@@ -14,6 +14,7 @@ import org.apache.commons.lang3.tuple.MutablePair;
 import org.apache.hadoop.fs.*;
 import org.apache.hadoop.hive.ql.io.orc.OrcOutputFormat;
 import org.apache.hadoop.hive.ql.io.orc.OrcSerde;
+import org.apache.hadoop.hive.common.type.HiveDecimal;
 import org.apache.hadoop.hive.serde2.objectinspector.ObjectInspector;
 import org.apache.hadoop.hive.serde2.objectinspector.ObjectInspectorFactory;
 import org.apache.hadoop.hive.serde2.objectinspector.StructObjectInspector;
@@ -433,6 +434,9 @@ public  class HdfsHelper {
                 case DOUBLE:
                     objectInspector = ObjectInspectorFactory.getReflectionObjectInspector(Double.class, ObjectInspectorFactory.ObjectInspectorOptions.JAVA);
                     break;
+                    case DECIMAL:
+                    objectInspector = ObjectInspectorFactory.getReflectionObjectInspector(HiveDecimal.class, ObjectInspectorFactory.ObjectInspectorOptions.JAVA);
+                    break;
                 case TIMESTAMP:
                     objectInspector = ObjectInspectorFactory.getReflectionObjectInspector(java.sql.Timestamp.class, ObjectInspectorFactory.ObjectInspectorOptions.JAVA);
                     break;
@@ -516,9 +520,19 @@ public  class HdfsHelper {
                                 recordList.add(column.asDouble());
                                 break;
                             case STRING:
+                                recordList.add(column.asString());
+                                break;
                             case VARCHAR:
+                                recordList.add(column.asString());
+                                break;
+                            case INTEGER:
+                                recordList.add(Integer.valueOf(rowData));
+                                break;
                             case CHAR:
                                 recordList.add(column.asString());
+                                break;
+                            case DECIMAL:
+                                recordList.add(HiveDecimal.create(column.asBigDecimal()));
                                 break;
                             case BOOLEAN:
                                 recordList.add(column.asBoolean());
