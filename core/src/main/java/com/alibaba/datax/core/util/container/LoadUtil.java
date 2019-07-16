@@ -14,7 +14,6 @@ import org.apache.commons.lang3.StringUtils;
 
 import java.util.HashMap;
 import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * Created by jingxing on 14-8-24.
@@ -47,10 +46,6 @@ public class LoadUtil {
      */
     private static Configuration pluginRegisterCenter;
 
-    private final static Map <Long ,Configuration> configurationSet = new ConcurrentHashMap<Long, Configuration>();
-    public static Map getConfigurationSet() {
-        return configurationSet;
-    }
     /**
      * jarLoader的缓冲
      */
@@ -61,12 +56,8 @@ public class LoadUtil {
      *
      * @param pluginConfigs
      */
-    public static synchronized void bind(Configuration pluginConfigs) {
+    public static void bind(Configuration pluginConfigs) {
         pluginRegisterCenter = pluginConfigs;
-        Long jobId = pluginConfigs.getLong(
-                CoreConstant.DATAX_CORE_CONTAINER_JOB_ID);
-        configurationSet.put(jobId,pluginConfigs);
-
     }
 
     private static String generatePluginKey(PluginType pluginType,
@@ -76,9 +67,8 @@ public class LoadUtil {
     }
 
     private static Configuration getPluginConf(PluginType pluginType,
-                                               String pluginName,Long jobId) {
-        Configuration pluginConf
-                = configurationSet.get(jobId)
+                                               String pluginName) {
+        Configuration pluginConf = pluginRegisterCenter
                 .getConfiguration(generatePluginKey(pluginType, pluginName));
 
         if (null == pluginConf) {
@@ -99,14 +89,14 @@ public class LoadUtil {
      * @return
      */
     public static AbstractJobPlugin loadJobPlugin(PluginType pluginType,
-                                                  String pluginName,Long jobId) {
+                                                  String pluginName) {
         Class<? extends AbstractPlugin> clazz = LoadUtil.loadPluginClass(
-                pluginType, pluginName, ContainerType.Job,jobId);
+                pluginType, pluginName, ContainerType.Job);
 
         try {
             AbstractJobPlugin jobPlugin = (AbstractJobPlugin) clazz
                     .newInstance();
-            jobPlugin.setPluginConf(getPluginConf(pluginType, pluginName,jobId));
+            jobPlugin.setPluginConf(getPluginConf(pluginType, pluginName));
             return jobPlugin;
         } catch (Exception e) {
             throw DataXException.asDataXException(
@@ -124,14 +114,14 @@ public class LoadUtil {
      * @return
      */
     public static AbstractTaskPlugin loadTaskPlugin(PluginType pluginType,
-                                                    String pluginName,Long jobId) {
+                                                    String pluginName) {
         Class<? extends AbstractPlugin> clazz = LoadUtil.loadPluginClass(
-                pluginType, pluginName, ContainerType.Task,jobId);
+                pluginType, pluginName, ContainerType.Task);
 
         try {
             AbstractTaskPlugin taskPlugin = (AbstractTaskPlugin) clazz
                     .newInstance();
-            taskPlugin.setPluginConf(getPluginConf(pluginType, pluginName,jobId));
+            taskPlugin.setPluginConf(getPluginConf(pluginType, pluginName));
             return taskPlugin;
         } catch (Exception e) {
             throw DataXException.asDataXException(FrameworkErrorCode.RUNTIME_ERROR,
@@ -147,9 +137,9 @@ public class LoadUtil {
      * @param pluginName
      * @return
      */
-    public static AbstractRunner loadPluginRunner(PluginType pluginType, String pluginName,Long jobId) {
+    public static AbstractRunner loadPluginRunner(PluginType pluginType, String pluginName) {
         AbstractTaskPlugin taskPlugin = LoadUtil.loadTaskPlugin(pluginType,
-                pluginName,jobId);
+                pluginName);
 
         switch (pluginType) {
             case READER:
@@ -175,9 +165,9 @@ public class LoadUtil {
     @SuppressWarnings("unchecked")
     private static synchronized Class<? extends AbstractPlugin> loadPluginClass(
             PluginType pluginType, String pluginName,
-            ContainerType pluginRunType,Long jobId) {
-        Configuration pluginConf = getPluginConf(pluginType, pluginName,jobId);
-        JarLoader jarLoader = LoadUtil.getJarLoader(pluginType, pluginName,jobId);
+            ContainerType pluginRunType) {
+        Configuration pluginConf = getPluginConf(pluginType, pluginName);
+        JarLoader jarLoader = LoadUtil.getJarLoader(pluginType, pluginName);
         try {
             return (Class<? extends AbstractPlugin>) jarLoader
                     .loadClass(pluginConf.getString("class") + "$"
@@ -188,8 +178,8 @@ public class LoadUtil {
     }
 
     public static synchronized JarLoader getJarLoader(PluginType pluginType,
-                                                      String pluginName,Long jobId) {
-        Configuration pluginConf = getPluginConf(pluginType, pluginName,jobId);
+                                                      String pluginName) {
+        Configuration pluginConf = getPluginConf(pluginType, pluginName);
 
         JarLoader jarLoader = jarLoaderCenter.get(generatePluginKey(pluginType,
                 pluginName));

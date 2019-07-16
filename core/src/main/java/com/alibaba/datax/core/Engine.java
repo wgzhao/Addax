@@ -201,7 +201,6 @@ public class Engine {
     public static void main(String[] args) throws Exception {
         int exitCode = 0;
         try {
-            LOG.debug("---> arguments[{}]", Arrays.toString(args));
             Engine.entry(args);
         } catch (Throwable e) {
             exitCode = 1;

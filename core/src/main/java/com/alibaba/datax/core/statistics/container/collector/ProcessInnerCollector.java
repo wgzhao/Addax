@@ -11,7 +11,7 @@ public class ProcessInnerCollector extends AbstractCollector {
 
     @Override
     public Communication collectFromTaskGroup() {
-        return LocalTGCommunicationManager.getJobCommunication(this.getJobId());
+        return LocalTGCommunicationManager.getJobCommunication();
     }
 
 }
