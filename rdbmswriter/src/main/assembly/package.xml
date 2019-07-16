@@ -19,7 +19,7 @@
         <fileSet>
             <directory>target/</directory>
             <includes>
-                <include>rdbmswriter-0.0.1-SNAPSHOT.jar</include>
+                <include>rdbmswriter-${datax-project-version}.jar</include>
             </includes>
             <outputDirectory>plugin/writer/rdbmswriter</outputDirectory>
         </fileSet>

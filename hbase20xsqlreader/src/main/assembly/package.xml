@@ -19,7 +19,7 @@
 		<fileSet>
 			<directory>target/</directory>
 			<includes>
-				<include>hbase20xsqlreader-0.0.1-SNAPSHOT.jar</include>
+				<include>hbase20xsqlreader-${datax-project-version}.jar</include>
 			</includes>
 			<outputDirectory>plugin/reader/hbase20xsqlreader</outputDirectory>
 		</fileSet>

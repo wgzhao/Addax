@@ -33,6 +33,27 @@
             <outputDirectory>datax</outputDirectory>
         </fileSet>
         <fileSet>
+            <directory>clickhousereader/target/datax/</directory>
+            <includes>
+                <include>**/*.*</include>
+            </includes>
+            <outputDirectory>datax</outputDirectory>
+        </fileSet>
+        <fileSet>
+            <directory>hivereader/target/datax/</directory>
+            <includes>
+                <include>**/*.*</include>
+            </includes>
+            <outputDirectory>datax</outputDirectory>
+        </fileSet>
+        <fileSet>
+            <directory>redisreader/target/datax/</directory>
+            <includes>
+                <include>**/*.*</include>
+            </includes>
+            <outputDirectory>datax</outputDirectory>
+        </fileSet>
+        <fileSet>
             <directory>oraclereader/target/datax/</directory>
             <includes>
                 <include>**/*.*</include>
@@ -67,7 +88,7 @@
             </includes>
             <outputDirectory>datax</outputDirectory>
         </fileSet>
-        <fileSet>
+		<fileSet>
             <directory>txtfilereader/target/datax/</directory>
             <includes>
                 <include>**/*.*</include>
@@ -109,10 +130,38 @@
             </includes>
             <outputDirectory>datax</outputDirectory>
         </fileSet>
+        <fileSet>
+            <directory>opentsdbreader/target/datax/</directory>
+            <includes>
+                <include>**/*.*</include>
+            </includes>
+            <outputDirectory>datax</outputDirectory>
+        </fileSet>
+        <fileSet>
+            <directory>jsonfilereader/target/datax/</directory>
+            <includes>
+                <include>**/*.*</include>
+            </includes>
+            <outputDirectory>datax</outputDirectory>
+        </fileSet>
 
         <!-- writer -->
         <fileSet>
             <directory>mysqlwriter/target/datax/</directory>
+            <includes>
+                <include>**/*.*</include>
+            </includes>
+            <outputDirectory>datax</outputDirectory>
+        </fileSet>
+        <fileSet>
+            <directory>clickhousewriter/target/datax/</directory>
+            <includes>
+                <include>**/*.*</include>
+            </includes>
+            <outputDirectory>datax</outputDirectory>
+        </fileSet>
+        <fileSet>
+            <directory>rediswriter/target/datax/</directory>
             <includes>
                 <include>**/*.*</include>
             </includes>
@@ -132,15 +181,9 @@
             </includes>
             <outputDirectory>datax</outputDirectory>
         </fileSet>
-       <fileSet>
-            <directory>streamwriter/target/datax/</directory>
-            <includes>
-                <include>**/*.*</include>
-            </includes>
-            <outputDirectory>datax</outputDirectory>
-        </fileSet>
+     
         <fileSet>
-            <directory>otswriter/target/datax/</directory>
+            <directory>streamwriter/target/datax/</directory>
             <includes>
                 <include>**/*.*</include>
             </includes>
@@ -195,7 +238,7 @@
             </includes>
             <outputDirectory>datax</outputDirectory>
         </fileSet>
-        <!--<fileSet>
+        <fileSet>
             <directory>hbase11xsqlwriter/target/datax/</directory>
             <includes>
                 <include>**/*.*</include>
@@ -208,7 +251,7 @@
                 <include>**/*.*</include>
             </includes>
             <outputDirectory>datax</outputDirectory>
-        </fileSet>-->
+        </fileSet>
         <fileSet>
             <directory>elasticsearchwriter/target/datax/</directory>
             <includes>
@@ -216,7 +259,7 @@
             </includes>
             <outputDirectory>datax</outputDirectory>
         </fileSet>
-        <!--<fileSet>
+        <fileSet>
             <directory>hbase20xsqlreader/target/datax/</directory>
             <includes>
                 <include>**/*.*</include>
@@ -230,12 +273,5 @@
             </includes>
             <outputDirectory>datax</outputDirectory>
         </fileSet>
-        <fileSet>
-            <directory>tsdbwriter/target/datax/</directory>
-            <includes>
-                <include>**/*.*</include>
-            </includes>
-            <outputDirectory>datax</outputDirectory>
-        </fileSet>-->
     </fileSets>
 </assembly>

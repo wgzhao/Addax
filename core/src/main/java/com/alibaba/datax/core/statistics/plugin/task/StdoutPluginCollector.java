@@ -6,7 +6,9 @@ import com.alibaba.datax.common.util.Configuration;
 import com.alibaba.datax.core.statistics.communication.Communication;
 import com.alibaba.datax.core.util.container.CoreConstant;
 import com.alibaba.datax.core.statistics.plugin.task.util.DirtyRecord;
-import com.alibaba.fastjson.JSON;
+
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
@@ -54,7 +56,15 @@ public class StdoutPluginCollector extends AbstractTaskPluginCollector {
                     .getColumns());
         }
 
-        return JSON.toJSONString(msgGroup);
+        //        return JSON.toJSONString(msgGroup);
+        final ObjectMapper objectMapper = new ObjectMapper();
+        try {
+            return objectMapper.writeValueAsString(msgGroup);
+        }
+        catch (JsonProcessingException e) {
+            LOG.error("", e);
+        }
+        return "";
     }
 
     @Override

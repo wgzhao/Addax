@@ -1,0 +1,50 @@
+{
+    "job": {
+        "content": [
+            {
+                "reader": {
+                    "name": "oraclereader",
+                    "parameter": {
+                        "column": ["*"],
+                        "connection": [
+                            {
+                                "jdbcUrl": ["jdbc:oracle:thin:@18.209.0.11/stage"],
+                                "table": ["${sdb}.${stable}"]
+                            }
+                        ],
+                        "password": "finebi",
+                        "username": "foundersc123"
+                    }
+                },
+                "writer": {
+                    "name": "hdfswriter",
+                    "parameter": {
+                        "column": [],
+                        "compress": "SNAPPY",
+                        "defaultFS": "hdfs:/fzzq",
+                        "fieldDelimiter": "\t",
+                        "fileName": "${stable}",
+                        "fileType": "orc",
+                        "path": "/apps/hive/warehouse/${stable}",
+                        "writeMode": "append"
+                    },
+                    "hadoopConfig":{
+                        "dfs.nameservices": "fzzq",
+                        "dfs.ha.namenodes.fzzq": "nn1,nn2",
+                        "dfs.namenode.rpc-address.fzzq.nn1": "hadoop1.fzzq.com:8020",
+                        "dfs.namenode.rpc-address.aliDfs.namenode2": "hadoop2.fzzq.com:8020",
+                        "dfs.client.failover.proxy.provider.fzzq": "org.apache.hadoop.hdfs.server.namenode.ha.ConfiguredFailoverProxyProvider"
+                    }
+                }
+            }
+        ],
+        "setting": {
+            "speed": {
+                "channel": 2,
+                "byte": -1,
+                "record": -1,
+                "batchSize": 4096
+            }
+        }
+    }
+}

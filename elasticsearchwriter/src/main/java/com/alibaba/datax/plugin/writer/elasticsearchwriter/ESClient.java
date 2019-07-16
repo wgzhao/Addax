@@ -59,7 +59,7 @@ public class ESClient {
                 .discoveryFrequency(5l, TimeUnit.MINUTES);
 
         if (!("".equals(user) || "".equals(passwd))) {
-            httpClientConfig.defaultCredentials(user, passwd);
+            httpClientConfig.setPreemptiveAuth(new HttpHost(endpoint)).defaultCredentials(user, passwd);
         }
 
         factory.setHttpClientConfig(httpClientConfig.build());

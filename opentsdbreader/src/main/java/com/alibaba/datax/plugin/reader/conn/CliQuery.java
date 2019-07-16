@@ -1,8 +1,5 @@
 package com.alibaba.datax.plugin.reader.conn;
 
-import net.opentsdb.core.*;
-import net.opentsdb.utils.DateTime;
-
 import java.util.ArrayList;
 import java.util.HashMap;
 

@@ -15,7 +15,7 @@ public abstract class Column {
 	private Type type;
 
 	private Object rawData;
-
+	private String sourceDataType;
 	private int byteSize;
 
 	public Column(final Object object, final Type type, int byteSize) {
@@ -23,7 +23,10 @@ public abstract class Column {
 		this.type = type;
 		this.byteSize = byteSize;
 	}
-
+	public void setSourceDataType(String sourceDataType)
+	{
+		this.sourceDataType = sourceDataType;
+	}
 	public Object getRawData() {
 		return this.rawData;
 	}
@@ -47,7 +50,10 @@ public abstract class Column {
 	protected void setByteSize(int byteSize) {
 		this.byteSize = byteSize;
 	}
-
+	public String getSourceDataType()
+	{
+		return sourceDataType;
+	}
 	public abstract Long asLong();
 
 	public abstract Double asDouble();
@@ -65,11 +71,15 @@ public abstract class Column {
 	public abstract BigInteger asBigInteger();
 
 	@Override
-	public String toString() {
-		return JSON.toJSONString(this);
+	public String toString()
+	{
+		return "Column{" +
+				"type=" + type +
+				", rawData=" + rawData +
+				", byteSize=" + byteSize +
+				'}';
 	}
-
 	public enum Type {
-		BAD, NULL, INT, LONG, DOUBLE, STRING, BOOL, DATE, BYTES
+		BAD, NULL, INT, LONG, DOUBLE, STRING, BOOL, DATE, BYTES, ARRAY, JAVA_OBJECT
 	}
 }

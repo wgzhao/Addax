@@ -9,6 +9,7 @@ import com.alibaba.datax.common.statistics.PerfRecord;
 import com.alibaba.datax.common.statistics.PerfTrace;
 import com.alibaba.datax.common.statistics.VMInfo;
 import com.alibaba.datax.common.util.Configuration;
+import com.alibaba.datax.core.statistics.communication.LocalTGCommunicationManager;
 import com.alibaba.datax.core.AbstractContainer;
 import com.alibaba.datax.core.statistics.communication.Communication;
 import com.alibaba.datax.core.statistics.communication.CommunicationTool;
@@ -89,6 +90,27 @@ public class TaskGroupContainer extends AbstractContainer {
         return taskGroupId;
     }
 
+    public void removeTaskGroup(){
+        try {
+            /**
+             * 移除根据JOBID做的一些标记 防止内存溢出
+             */
+            LoadUtil.getConfigurationSet().remove(jobId);
+            Iterator<Map.Entry<Integer, Communication>> it =
+                    LocalTGCommunicationManager.getTaskGroupCommunicationMap().entrySet().iterator();
+            while(it.hasNext()){
+                Map.Entry<Integer, Communication> entry = it.next();
+                String strJobId = String.valueOf(jobId);
+                String key = String.valueOf(entry.getKey());
+                if (key.startsWith(strJobId)) {
+                    it.remove();
+                }
+            }
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+
+    }
     @Override
     public void start() {
         try {
@@ -293,6 +315,7 @@ public class TaskGroupContainer extends AbstractContainer {
                 }
 
                 LOG.info(PerfTrace.getInstance().summarizeNoException());
+                removeTaskGroup();//移除指定JobId中的统计Map
             }
         }
     }
@@ -417,7 +440,7 @@ public class TaskGroupContainer extends AbstractContainer {
             //通过设置thread的contextClassLoader，即可实现同步和主程序不通的加载器
             this.writerThread.setContextClassLoader(LoadUtil.getJarLoader(
                     PluginType.WRITER, this.taskConfig.getString(
-                            CoreConstant.JOB_WRITER_NAME)));
+                            CoreConstant.JOB_WRITER_NAME),getJobId()));
 
             /**
              * 生成readerThread
@@ -431,7 +454,7 @@ public class TaskGroupContainer extends AbstractContainer {
              */
             this.readerThread.setContextClassLoader(LoadUtil.getJarLoader(
                     PluginType.READER, this.taskConfig.getString(
-                            CoreConstant.JOB_READER_NAME)));
+                            CoreConstant.JOB_READER_NAME),getJobId()));
         }
 
         public void doStart() {
@@ -468,7 +491,7 @@ public class TaskGroupContainer extends AbstractContainer {
             switch (pluginType) {
                 case READER:
                     newRunner = LoadUtil.loadPluginRunner(pluginType,
-                            this.taskConfig.getString(CoreConstant.JOB_READER_NAME));
+                            this.taskConfig.getString(CoreConstant.JOB_READER_NAME),getJobId());
                     newRunner.setJobConf(this.taskConfig.getConfiguration(
                             CoreConstant.JOB_READER_PARAMETER));
 
@@ -493,7 +516,7 @@ public class TaskGroupContainer extends AbstractContainer {
                     break;
                 case WRITER:
                     newRunner = LoadUtil.loadPluginRunner(pluginType,
-                            this.taskConfig.getString(CoreConstant.JOB_WRITER_NAME));
+                            this.taskConfig.getString(CoreConstant.JOB_WRITER_NAME),getJobId());
                     newRunner.setJobConf(this.taskConfig
                             .getConfiguration(CoreConstant.JOB_WRITER_PARAMETER));
 
@@ -532,7 +555,7 @@ public class TaskGroupContainer extends AbstractContainer {
 
             return true;
         }
-        
+
         private int getTaskId(){
         	return taskId;
         }

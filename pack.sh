@@ -1,5 +1,5 @@
 #!/bin/bash
-VER=3.0
+VER=$(grep -A1 '<artifactId>datax-all</artifactId>' ./pom.xml |tail -n1 |tr -d '<version/> ')
 [ -d target ] && rm -rf target
 mkdir -p target/datax
 
@@ -42,5 +42,5 @@ cd ../../../
 #packing
 echo "packing....."
 cd target
-tar -czf datax-${VER}.tar.gz datax
+#tar -czf datax-${VER}.tar.gz datax
 exit 0

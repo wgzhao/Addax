@@ -39,11 +39,17 @@ public class Communication extends BaseObject implements Cloneable {
      * task给job的信息 *
      */
     Map<String, List<String>> message;
-
+    private Long jobId;
     public Communication() {
         this.init();
     }
+    public Long getJobId() {
+        return jobId;
+    }
 
+    public void setJobId(Long jobId) {
+        this.jobId = jobId;
+    }
     public synchronized void reset() {
         this.init();
     }

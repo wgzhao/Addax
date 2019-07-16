@@ -4,11 +4,10 @@
     <parent>
         <groupId>com.alibaba.datax</groupId>
         <artifactId>datax-all</artifactId>
-        <version>3.0</version>
+        <version>3.0.2</version>
     </parent>
     <artifactId>hbase11xsqlreader</artifactId>
     <name>hbase11xsqlreader</name>
-    <version>3.0</version>
     <packaging>jar</packaging>
 
     <properties>
@@ -80,8 +79,8 @@
             <plugin>
                 <artifactId>maven-compiler-plugin</artifactId>
                 <configuration>
-                    <source>1.6</source>
-                    <target>1.6</target>
+                    <source>1.8</source>
+                    <target>1.8</target>
                     <encoding>${project-sourceEncoding}</encoding>
                 </configuration>
             </plugin>

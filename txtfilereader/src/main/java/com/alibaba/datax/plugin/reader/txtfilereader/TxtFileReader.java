@@ -52,6 +52,7 @@ public class TxtFileReader extends Reader {
 			this.pattern = new HashMap<String, Pattern>();
 			this.isRegexPath = new HashMap<String, Boolean>();
 			this.validateParameter();
+			UnstructuredStorageReaderUtil.validateParameter(this.originConfig);
 		}
 
 		private void validateParameter() {
@@ -194,8 +195,8 @@ public class TxtFileReader extends Reader {
 						".?");
 				Pattern patt = Pattern.compile(regexString);
 				this.pattern.put(eachPath, patt);
-				this.sourceFiles = this.buildSourceTargets();
 			}
+			this.sourceFiles = this.buildSourceTargets();
 
 			LOG.info(String.format("您即将读取的文件数为: [%s]", this.sourceFiles.size()));
 		}
