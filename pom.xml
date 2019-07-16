@@ -38,10 +38,10 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
         <maven.compiler.encoding>UTF-8</maven.compiler.encoding>
-        <java.source.version>1.8</java.source.version>
-        <java.target.version>1.8</java.target.version>
-        <maven.compiler.source>1.8</maven.compiler.source>
-        <maven.compiler.target>1.8</maven.compiler.target>
+        <java.source.version>1.6</java.source.version>
+        <java.target.version>1.6</java.target.version>
+        <maven.compiler.source>1.6</maven.compiler.source>
+        <maven.compiler.target>1.6</maven.compiler.target>
     </properties>
 
     <modules>
@@ -50,13 +50,14 @@
         <module>transformer</module>
 
         <!-- reader -->
+        <!--essential -->
         <module>mysqlreader</module>
-        <module>sqlserverreader</module>
-        <module>postgresqlreader</module>
         <module>oraclereader</module>
         <module>txtfilereader</module>
         <module>hdfsreader</module>
         <module>streamreader</module>
+        <!--optional -->
+        <!--
         <module>ftpreader</module>
         <module>mongodbreader</module>
         <module>rdbmsreader</module>
@@ -65,14 +66,20 @@
         <module>clickhousereader</module>
         <module>hivereader</module>
         <module>jsonfilereader</module>
+        <module>sqlserverreader</module>
+        <module>postgresqlreader</module>-->
+
          <!-- writer -->
+         <!-- essential -->
         <module>mysqlwriter</module>
         <module>txtfilewriter</module>
-        <module>ftpwriter</module>
         <module>hdfswriter</module>
         <module>streamwriter</module>
         <module>oraclewriter</module>
+        <!-- optional -->
+        <!--
         <module>sqlserverwriter</module>
+        <module>ftpwriter</module>
         <module>postgresqlwriter</module>
         <module>mongodbwriter</module>
         <module>rdbmswriter</module>
@@ -81,12 +88,12 @@
         <module>hbase11xsqlreader</module>
         <module>elasticsearchwriter</module>
         <module>rediswriter</module>
-        <module>clickhousewriter</module>
+        <module>clickhousewriter</module>-->
         <!-- common support module -->
         <module>plugin-rdbms-util</module>
         <module>plugin-unstructured-storage-util</module>
-        <module>hbase20xsqlreader</module>
-        <module>hbase20xsqlwriter</module>
+        <!--<module>hbase20xsqlreader</module>
+        <module>hbase20xsqlwriter</module>-->
     </modules>
 
     <dependencyManagement>
@@ -187,8 +194,8 @@
                 <artifactId>maven-compiler-plugin</artifactId>
                 <version>3.8.1</version>
                 <configuration>
-                    <source>1.8</source>
-                    <target>1.8</target>
+                    <source>1.6</source>
+                    <target>1.6</target>
                     <encoding>${project-sourceEncoding}</encoding>
                 </configuration>
             </plugin>
