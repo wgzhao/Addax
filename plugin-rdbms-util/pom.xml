@@ -4,10 +4,11 @@
 	<parent>
 		<groupId>com.alibaba.datax</groupId>
 		<artifactId>datax-all</artifactId>
-		<version>3.0</version>
+		<version>3.0.2</version>
 	</parent>
 	<artifactId>plugin-rdbms-util</artifactId>
 	<name>plugin-rdbms-util</name>
+    <version>${datax-project-version}</version>
 	<packaging>jar</packaging>
 
 	<dependencies>

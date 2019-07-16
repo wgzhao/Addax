@@ -4,7 +4,7 @@
 
     <groupId>com.alibaba.datax</groupId>
     <artifactId>datax-all</artifactId>
-    <version>3.0</version>
+    <version>3.0.2</version>
     <dependencies>
         <dependency>
             <groupId>org.hamcrest</groupId>
@@ -17,14 +17,15 @@
     <packaging>pom</packaging>
 
     <properties>
-        <datax-project-version>3.0</datax-project-version>
+        <datax-project-version>3.0.2</datax-project-version>
         <commons-lang3-version>3.3.2</commons-lang3-version>
         <commons-configuration-version>1.10</commons-configuration-version>
         <commons-cli-version>1.2</commons-cli-version>
         <fastjson-version>1.1.46.sec01</fastjson-version>
+        <clickhouse-jdbc.version>0.1.53</clickhouse-jdbc.version>
         <guava-version>16.0.1</guava-version>
         <diamond.version>3.7.2.1-SNAPSHOT</diamond.version>
-
+        <postgresql-jdbc.version>9.4.1207</postgresql-jdbc.version>
         <!--slf4j 1.7.10 和 logback-classic 1.0.13 是好基友 -->
         <slf4j-api-version>1.7.10</slf4j-api-version>
         <logback-classic-version>1.0.13</logback-classic-version>
@@ -32,11 +33,15 @@
         <junit-version>4.11</junit-version>
         <tddl.version>5.1.22-1</tddl.version>
         <swift-version>1.0.0</swift-version>
-
+        <jackson.version>2.9.9</jackson.version>
         <project-sourceEncoding>UTF-8</project-sourceEncoding>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
         <maven.compiler.encoding>UTF-8</maven.compiler.encoding>
+        <java.source.version>1.8</java.source.version>
+        <java.target.version>1.8</java.target.version>
+        <maven.compiler.source>1.8</maven.compiler.source>
+        <maven.compiler.target>1.8</maven.compiler.target>
     </properties>
 
     <modules>
@@ -56,33 +61,32 @@
         <module>mongodbreader</module>
         <module>rdbmsreader</module>
         <module>hbase11xreader</module>
-        <module>opentsdbreader</module>
-
-        <!-- writer -->
+        <module>redisreader</module>
+        <module>clickhousereader</module>
+        <module>hivereader</module>
+        <module>jsonfilereader</module>
+         <!-- writer -->
         <module>mysqlwriter</module>
-        <!-- <module>drdswriter</module> -->
-        <!-- <module>odpswriter</module> -->
         <module>txtfilewriter</module>
         <module>ftpwriter</module>
         <module>hdfswriter</module>
         <module>streamwriter</module>
-        <!-- <module>otswriter</module> -->
         <module>oraclewriter</module>
         <module>sqlserverwriter</module>
         <module>postgresqlwriter</module>
         <module>mongodbwriter</module>
         <module>rdbmswriter</module>
         <module>hbase11xwriter</module>
-        <!-- <module>hbase11xsqlwriter</module> -->
-        <!-- <module>hbase11xsqlreader</module> -->
+        <module>hbase11xsqlwriter</module>
+        <module>hbase11xsqlreader</module>
         <module>elasticsearchwriter</module>
-        <module>tsdbwriter</module>
-
+        <module>rediswriter</module>
+        <module>clickhousewriter</module>
         <!-- common support module -->
         <module>plugin-rdbms-util</module>
         <module>plugin-unstructured-storage-util</module>
-        <!-- <module>hbase20xsqlreader</module> -->
-        <!-- <module>hbase20xsqlwriter</module> -->
+        <module>hbase20xsqlreader</module>
+        <module>hbase20xsqlwriter</module>
     </modules>
 
     <dependencyManagement>
@@ -181,10 +185,10 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
-                <version>2.3.2</version>
+                <version>3.8.1</version>
                 <configuration>
-                    <source>1.6</source>
-                    <target>1.6</target>
+                    <source>1.8</source>
+                    <target>1.8</target>
                     <encoding>${project-sourceEncoding}</encoding>
                 </configuration>
             </plugin>

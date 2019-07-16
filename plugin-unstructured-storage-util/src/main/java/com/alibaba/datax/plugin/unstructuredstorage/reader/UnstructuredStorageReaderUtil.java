@@ -525,7 +525,7 @@ public class UnstructuredStorageReaderUtil {
 
 		// column: 1. index type 2.value type 3.when type is Date, may have format
 		validateColumn(readerConfiguration);
-
+		validateCsvReaderConfig(readerConfiguration);
 	}
 
 	public static void validateEncoding(Configuration readerConfiguration) {
