@@ -10,7 +10,7 @@
             "timeFormat": "HH:mm:ss",
             "dateFormat": "yyyy-MM-dd",
             "extraFormats":["yyyyMMdd"],
-            "timeZone": "GMT+8",
+            "timeZone": "PRC",
             "encoding": "utf-8"
         }
     },
