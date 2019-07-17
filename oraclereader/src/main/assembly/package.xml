@@ -36,6 +36,9 @@
         <dependencySet>
             <useProjectArtifact>false</useProjectArtifact>
             <outputDirectory>plugin/reader/oraclereader/libs</outputDirectory>
+            <excludes>
+                <exclude>datax-common-${datax-project-version}.jar</exclude>
+            </excludes>
             <scope>runtime</scope>
         </dependencySet>
     </dependencySets>
