@@ -14,7 +14,7 @@
             <includes>
                 <include>datax-transformer-${datax-project-version}.jar</include>
             </includes>
-            <outputDirectory>datax-$datax-project-version}/lib</outputDirectory>
+            <outputDirectory>datax-${datax-project-version}/lib</outputDirectory>
         </fileSet>
         <fileSet>
             <directory>core/target/datax/</directory>
