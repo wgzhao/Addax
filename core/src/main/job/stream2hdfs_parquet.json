@@ -37,13 +37,22 @@
                                 "type": "bytes"
                             }
                         ],
-                        "sliceRecordCount": 10
+                        "sliceRecordCount": 1000
                     }
                 },
                 "writer": {
-                    "name": "streamwriter",
+                    "name": "hdfswriter",
                     "parameter": {
-                        "print": true,
+						"column":[{"name":"col1","type":"string"},{"name":"col2","type":"int"},
+								  {"name":"col3","type":"string"},{"name":"col4","type":"boolean"},
+								 {"name":"col5","type":"string"}],
+						"defaultFS":"hdfs://localhost:8020",
+                        "path": "/tmp/out",
+						"fileType":"par",
+						"fieldDelimiter":"\u0001",
+						"compress":"SNAPPY",
+						"fileName":"test",
+						"writeMode":"overwrite",
                         "encoding": "UTF-8"
                     }
                 }

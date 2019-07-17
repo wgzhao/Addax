@@ -37,13 +37,15 @@
                                 "type": "bytes"
                             }
                         ],
-                        "sliceRecordCount": 10
+                        "sliceRecordCount": 1000
                     }
                 },
                 "writer": {
-                    "name": "streamwriter",
+                    "name": "txtfilewriter",
                     "parameter": {
-                        "print": true,
+                        "path": "/tmp/out",
+						"fileName":"test",
+						"writeMode":"truncate",
                         "encoding": "UTF-8"
                     }
                 }

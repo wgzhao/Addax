@@ -13,7 +13,9 @@ public enum DataBaseType {
     MySql("mysql", "com.mysql.jdbc.Driver"),
     Tddl("mysql", "com.mysql.jdbc.Driver"),
     DRDS("drds", "com.mysql.jdbc.Driver"),
+    Hive("hive", "org.apache.hive.jdbc.HiveDriver"),
     Oracle("oracle", "oracle.jdbc.OracleDriver"),
+    ClickHouse("clickhouse", "ru.yandex.clickhouse.ClickHouseDriver"),
     SQLServer("sqlserver", "com.microsoft.sqlserver.jdbc.SQLServerDriver"),
     PostgreSQL("postgresql", "org.postgresql.Driver"),
     RDBMS("rdbms", "com.alibaba.datax.plugin.rdbms.util.DataBaseType"),
@@ -52,8 +54,12 @@ public enum DataBaseType {
                 break;
             case DB2:
                 break;
-            case PostgreSQL:
+            case Hive:
             	break;
+            case ClickHouse:
+                break;
+            case PostgreSQL:
+                break;
             case RDBMS:
                 break;
             default:
@@ -85,7 +91,11 @@ public enum DataBaseType {
                 break;
             case Oracle:
                 break;
+            case Hive:
+                break;
             case SQLServer:
+                break;
+            case ClickHouse:
                 break;
             case DB2:
                 break;
