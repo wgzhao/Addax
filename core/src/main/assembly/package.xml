@@ -18,6 +18,7 @@
                 <exclude>*.pyc</exclude>
             </excludes>
             <directoryMode>775</directoryMode>
+            <fileMode>755</fileMode>
             <outputDirectory>/bin</outputDirectory>
         </fileSet>
         <!-- for scripts -->
@@ -27,6 +28,7 @@
                 <include>*.*</include>
             </includes>
             <directoryMode>775</directoryMode>
+            <fileMode>755</fileMode>
             <outputDirectory>/script</outputDirectory>
         </fileSet>
         <!-- for configs -->
