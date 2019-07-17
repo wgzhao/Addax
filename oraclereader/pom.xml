@@ -24,6 +24,7 @@
                     <groupId>org.slf4j</groupId>
                 </exclusion>
             </exclusions>
+            <scope>compile</scope>
         </dependency>
         <dependency>
             <groupId>org.slf4j</groupId>
@@ -40,13 +41,13 @@
             <version>${datax-project-version}</version>
         </dependency>
 
-        <dependency>
+        <!-- <dependency>
             <groupId>com.oracle</groupId>
             <artifactId>ojdbc6</artifactId>
             <version>11.2.0.3</version>
             <scope>system</scope>
-            <systemPath>${basedir}/src/main/lib/ojdbc6-11.2.0.3.jar</systemPath>
-        </dependency>
+            <systemPath>src/main/lib/ojdbc6-11.2.0.3.jar</systemPath>
+        </dependency> -->
 
     </dependencies>
 
@@ -56,8 +57,8 @@
             <plugin>
                 <artifactId>maven-compiler-plugin</artifactId>
                 <configuration>
-                    <source>1.6</source>
-                    <target>1.6</target>
+                    <source>1.8</source>
+                    <target>1.8</target>
                     <encoding>${project-sourceEncoding}</encoding>
                 </configuration>
             </plugin>
