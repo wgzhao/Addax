@@ -76,6 +76,13 @@
             </includes>
             <outputDirectory>datax-${datax-project-version}</outputDirectory>
         </fileSet>
+        <fileSet>
+            <directory>dbffilereader/target/datax/</directory>
+            <includes>
+                <include>**/*.*</include>
+            </includes>
+            <outputDirectory>datax-${datax-project-version}</outputDirectory>
+        </fileSet>
         <!--optional -->
         <!--<fileSet>
             <directory>clickhousereader/target/datax/</directory>
@@ -199,7 +206,13 @@
             </includes>
             <outputDirectory>datax-${datax-project-version}</outputDirectory>
         </fileSet>
-
+        <fileSet>
+            <directory>dbffilewriter/target/datax/</directory>
+            <includes>
+                <include>**/*.*</include>
+            </includes>
+            <outputDirectory>datax-${datax-project-version}</outputDirectory>
+        </fileSet>
         <!-- optional -->
         <!--
         <fileSet>
