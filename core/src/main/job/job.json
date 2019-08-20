@@ -3,7 +3,7 @@
         "setting": {
             "speed": {
                 "byte":-1,
-				"channel": 1
+		"channel": 1
             },
             "errorLimit": {
                 "record": 0,
@@ -44,6 +44,7 @@
                     "name": "streamwriter",
                     "parameter": {
                         "print": true,
+			"column":["col1"],
                         "encoding": "UTF-8"
                     }
                 }
