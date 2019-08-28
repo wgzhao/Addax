@@ -75,7 +75,7 @@ def getOptionParser():
                                      "Normal user use these options to set jvm parameters, job runtime mode etc. "
                                      "Make sure these options can be used in Product Env.")
     prodEnvOptionGroup.add_option("-j", "--jvm", metavar="<jvm parameters>", dest="jvmParameters", action="store",
-                                  default=DEFAULT_JVM, help="Set jvm parameters if necessary.")
+                                 help="Set jvm parameters if necessary.")
     prodEnvOptionGroup.add_option("--jobid", metavar="<job unique id>", dest="jobid", action="store", default="-1",
                                   help="Set job unique id when running by Distribute/Local Mode.")
     prodEnvOptionGroup.add_option("-m", "--mode", metavar="<job runtime mode>",
@@ -188,8 +188,8 @@ def buildStartCommand(options, args):
         jobFilename =os.path.splitext(os.path.split(jobResource)[-1])[0]
     else:
         jobFilename = jobResource[-20:].replace('/', '_').replace('.', '_')
-
-    jobParams = ("-Ddatax.log=%s -Dlog.file.name=datax_%s_%s") % (options.logdir, jobFilename, os.getpid())
+    curr_time =  time.strftime("%Y%m%d_%H%M%S")
+    jobParams = ("-Ddatax.log=%s -Dlog.file.name=datax_%s_%s_%s.log") % (options.logdir, jobFilename, curr_time, os.getpid())
     if options.params:
         jobParams = jobParams + " " + options.params
 
@@ -199,7 +199,7 @@ def buildStartCommand(options, args):
     commandMap["jvm"] = tempJVMCommand
     commandMap["params"] = jobParams
     commandMap["job"] = jobResource
-
+    print(commandMap['jvm'])
     return Template(ENGINE_COMMAND).substitute(**commandMap)
 
 
@@ -224,8 +224,6 @@ if __name__ == "__main__":
         sys.exit(RET_STATE['FAIL'])
 
     startCommand = buildStartCommand(options, args)
-    # print startCommand
-
     child_process = subprocess.Popen(startCommand, shell=True)
     register_signal()
     (stdout, stderr) = child_process.communicate()
