@@ -57,6 +57,7 @@
         <module>hdfsreader</module>
         <module>streamreader</module>
         <module>dbffilereader</module>
+        <module>rdbmsreader</module>
         <!--optional -->
         <!--
         <module>ftpreader</module>
@@ -78,6 +79,7 @@
         <module>streamwriter</module>
         <module>oraclewriter</module>
         <module>dbffilewriter</module>
+        <module>rdbmswriter</module>
         <!-- optional -->
         <!--
         <module>sqlserverwriter</module>
