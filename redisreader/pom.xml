@@ -31,9 +31,21 @@
             <artifactId>logback-classic</artifactId>
         </dependency>
         <dependency>
+<<<<<<< HEAD:redisreader/pom.xml
             <groupId>com.moilioncircle</groupId>
             <artifactId>redis-replicator</artifactId>
             <version>3.0.0-RC3</version>
+=======
+            <groupId>org.apache.hbase</groupId>
+            <artifactId>hbase</artifactId>
+            <version>0.94.27</version>
+            <exclusions>
+                <exclusion>
+                    <artifactId>jdk.tools</artifactId>
+                    <groupId>jdk.tools</groupId>
+                </exclusion>
+            </exclusions>
+>>>>>>> master:hbase094xreader/pom.xml
         </dependency>
         <dependency>
             <groupId>redis.clients</groupId>
@@ -53,8 +65,13 @@
             <plugin>
                 <artifactId>maven-compiler-plugin</artifactId>
                 <configuration>
+<<<<<<< HEAD:redisreader/pom.xml
                     <source>1.8</source>
                     <target>1.8</target>
+=======
+                    <source>${jdk-version}</source>
+                    <target>${jdk-version}</target>
+>>>>>>> master:hbase094xreader/pom.xml
                     <encoding>${project-sourceEncoding}</encoding>
                 </configuration>
             </plugin>
