@@ -77,13 +77,8 @@
 			<plugin>
 				<artifactId>maven-compiler-plugin</artifactId>
 				<configuration>
-<<<<<<< HEAD
-					<source>1.8</source>
-					<target>1.8</target>
-=======
 					<source>${jdk-version}</source>
 					<target>${jdk-version}</target>
->>>>>>> master
 					<encoding>${project-sourceEncoding}</encoding>
 				</configuration>
 			</plugin>
