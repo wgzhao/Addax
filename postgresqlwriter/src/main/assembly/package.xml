@@ -19,7 +19,7 @@
         <fileSet>
             <directory>target/</directory>
             <includes>
-                <include>postgresqlwriter-0.0.1-SNAPSHOT.jar</include>
+                <include>postgresqlwriter-${datax-project-version}.jar</include>
             </includes>
             <outputDirectory>plugin/writer/postgresqlwriter</outputDirectory>
         </fileSet>

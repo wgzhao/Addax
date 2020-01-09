@@ -26,7 +26,7 @@
         <fileSet>
             <directory>target/</directory>
             <includes>
-                <include>oraclereader-0.0.1-SNAPSHOT.jar</include>
+                <include>oraclereader-${datax-project-version}.jar</include>
             </includes>
             <outputDirectory>plugin/reader/oraclereader</outputDirectory>
         </fileSet>
@@ -36,6 +36,9 @@
         <dependencySet>
             <useProjectArtifact>false</useProjectArtifact>
             <outputDirectory>plugin/reader/oraclereader/libs</outputDirectory>
+            <excludes>
+                <exclude>datax-common-${datax-project-version}.jar</exclude>
+            </excludes>
             <scope>runtime</scope>
         </dependencySet>
     </dependencySets>

@@ -18,7 +18,7 @@
 		<fileSet>
 			<directory>target/</directory>
 			<includes>
-				<include>hbase11xsqlwriter-0.0.1-SNAPSHOT.jar</include>
+				<include>hbase11xsqlwriter-${datax-project-version}.jar</include>
 			</includes>
 			<outputDirectory>plugin/writer/hbase11xsqlwriter</outputDirectory>
 		</fileSet>
