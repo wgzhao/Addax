@@ -116,7 +116,16 @@ public class DFSUtil {
     }
 
     private HashSet<String> sourceHDFSAllFilesList = new HashSet<String>();
-
+    private void addSourceFileIfNotEmpty(FileStatus f) {
+        if (f.isFile()) {
+            String filePath = f.getPath().toString();
+            if (f.getLen() > 0) {
+                addSourceFileByType(filePath);
+            } else {
+                LOG.warn(String.format("文件[%s]长度为0，将会跳过不作处理！", filePath));
+            }
+        }
+    }
     public HashSet<String> getHDFSAllFiles(String hdfsPath) {
 
         try {
@@ -124,15 +133,10 @@ public class DFSUtil {
             //判断hdfsPath是否包含正则符号
             if (hdfsPath.contains("*") || hdfsPath.contains("?")) {
                 Path path = new Path(hdfsPath);
-                FileStatus stats[] = hdfs.globStatus(path);
+                FileStatus[] stats = hdfs.globStatus(path);
                 for (FileStatus f : stats) {
                     if (f.isFile()) {
-                        if (f.getLen() == 0) {
-                            String message = String.format("文件[%s]长度为0，将会跳过不作处理！", hdfsPath);
-                            LOG.warn(message);
-                        } else {
-                            addSourceFileByType(f.getPath().toString());
-                        }
+                        addSourceFileIfNotEmpty(f);
                     } else if (f.isDirectory()) {
                         getHDFSAllFilesNORegex(f.getPath().toString(), hdfs);
                     }
@@ -159,7 +163,7 @@ public class DFSUtil {
         // If the network disconnected, this method will retry 45 times
         // each time the retry interval for 20 seconds
         // 获取要读取的文件的根目录的所有二级子文件目录
-        FileStatus stats[] = hdfs.listStatus(listFiles);
+        FileStatus[] stats = hdfs.listStatus(listFiles);
 
         for (FileStatus f : stats) {
             // 判断是不是目录，如果是目录，递归调用
@@ -167,8 +171,7 @@ public class DFSUtil {
                 LOG.info(String.format("[%s] 是目录, 递归获取该目录下的文件", f.getPath().toString()));
                 getHDFSAllFilesNORegex(f.getPath().toString(), hdfs);
             } else if (f.isFile()) {
-
-                addSourceFileByType(f.getPath().toString());
+                addSourceFileIfNotEmpty(f);
             } else {
                 String message = String.format("该路径[%s]文件类型既不是目录也不是文件，插件自动忽略。",
                         f.getPath().toString());
@@ -331,26 +334,31 @@ public class DFSUtil {
                 //If the network disconnected, will retry 45 times, each time the retry interval for 20 seconds
                 //Each file as a split
                 //TODO multy threads
-                InputSplit[] splits = in.getSplits(conf, 1);
 
-                RecordReader reader = in.getRecordReader(splits[0], conf, Reporter.NULL);
-                Object key = reader.createKey();
-                Object value = reader.createValue();
-                // 获取列信息
-                List<? extends StructField> fields = inspector.getAllStructFieldRefs();
+                // OrcInputFormat getSplits params numSplits not used, splits size = block numbers
+                InputSplit[] splits = in.getSplits(conf, -1);
+                for (InputSplit split : splits) {
+                    {
+                        RecordReader reader = in.getRecordReader(split, conf, Reporter.NULL);
+                        Object key = reader.createKey();
+                        Object value = reader.createValue();
+                        // 获取列信息
+                        List<? extends StructField> fields = inspector.getAllStructFieldRefs();
 
-                List<Object> recordFields;
-                while (reader.next(key, value)) {
-                    recordFields = new ArrayList<Object>();
+                        List<Object> recordFields;
+                        while (reader.next(key, value)) {
+                            recordFields = new ArrayList<Object>();
 
-                    for (int i = 0; i <= columnIndexMax; i++) {
-                        Object field = inspector.getStructFieldData(value, fields.get(i));
-                        recordFields.add(field);
+                            for (int i = 0; i <= columnIndexMax; i++) {
+                                Object field = inspector.getStructFieldData(value, fields.get(i));
+                                recordFields.add(field);
+                            }
+                            transportOneRecord(column, recordFields, recordSender,
+                                    taskPluginCollector, isReadAllColumns, nullFormat);
+                        }
+                        reader.close();
                     }
-                    transportOneRecord(column, recordFields, recordSender,
-                            taskPluginCollector, isReadAllColumns, nullFormat);
                 }
-                reader.close();
             } catch (Exception e) {
                 String message = String.format("从orcfile文件路径[%s]中读取数据发生异常，请联系系统管理员。"
                         , sourceOrcFilePath);

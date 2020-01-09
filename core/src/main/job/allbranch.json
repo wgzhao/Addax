@@ -1,0 +1,86 @@
+
+{
+  "job": {
+    "content": [
+      {
+        "reader": {
+          "name": "oraclereader", 
+          "parameter": {
+            "column": [
+              "BRANCH_NO", 
+	           "2.3",
+              "BRANCH_NAME",
+	         "DW_CLT_DATE"
+            ], 
+            "connection": [
+              {
+                "jdbcUrl": [
+                  "jdbc:oracle:thin:@18.209.0.11:1521/stage"
+                ], 
+                "table": [
+                  "STGUF.ALLBRANCH"
+                ]
+              }
+            ], 
+            "password": "foundersc123", 
+            "username": "finebi", 
+            "where": "branch_no = '1211'",
+            "session": [
+              "alter session set NLS_DATE_FORMAT='yyyy/mm/dd hh24:mi:ss'",
+              "alter session set NLS_TIMESTAMP_FORMAT='yyyy/mm/dd hh24:mi:ss'",
+              "alter session set NLS_TIMESTAMP_TZ_FORMAT='yyyy-mm-dd hh24:mi:ss'",
+              "alter session set TIME_ZONE='Asia/Chongqing'"
+            ]
+          }
+        }, 
+        "writer": {
+          "name": "hdfswriter", 
+          "parameter": {
+            "column": [
+              {
+                "name": "branch_no", 
+                "type": "bigint"
+              }, 
+              {
+		        "name":"col2",
+		        "type":"string"
+	        },
+              {
+                "name": "branch_name", 
+                "type": "string"
+              },
+              {
+                "name":"col4",
+                "type":"string"
+              }
+            ], 
+            "compress": "SNAPPY", 
+            "defaultFS": "hdfs://fzzq", 
+            "fieldDelimiter": "\u0001", 
+            "fileName": "allbranch", 
+            "fileType": "orc", 
+            "path": "/data/odsxx/allbranch/logdate=20190719", 
+            "writeMode": "overwrite",
+	        "haveKerberos": "true",
+            "kerberosKeytabFilePath": "/etc/security/keytabs/hdfs.headless.keytab",
+            "kerberosPrincipal": "hdfs-fzzq@FZZQ.COM",
+             "hadoopConfig": {
+            "dfs.client.failover.proxy.provider.fzzq": "org.apache.hadoop.hdfs.server.namenode.ha.ConfiguredFailoverProxyProvider", 
+            "dfs.ha.namenodes.fzzq": "nn1,nn2", 
+            "dfs.namenode.rpc-address.fzzq.nn2": "hadoop2.fzzq.com:8020", 
+            "dfs.namenode.rpc-address.fzzq.nn1": "hadoop1.fzzq.com:8020", 
+            "dfs.nameservices": "fzzq"
+          }
+          }
+        }
+      }
+    ], 
+    "setting": {
+      "speed": {
+        "batchSize": 20480, 
+        "bytes": -1, 
+        "channel": 10
+      }
+    }
+  }
+}

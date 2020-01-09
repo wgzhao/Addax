@@ -36,7 +36,8 @@ import org.slf4j.LoggerFactory;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.List;
-
+import java.util.HashMap;
+import java.util.Map;
 /**
  * Created by jingxing on 14-8-24.
  * <p/>
@@ -216,10 +217,10 @@ public class JobContainer extends AbstractContainer {
         this.readerPluginName = this.configuration.getString(
                 CoreConstant.DATAX_JOB_CONTENT_READER_NAME);
         classLoaderSwapper.setCurrentThreadClassLoader(LoadUtil.getJarLoader(
-                PluginType.READER, this.readerPluginName));
+                PluginType.READER, this.readerPluginName,this.jobId));
 
         Reader.Job jobReader = (Reader.Job) LoadUtil.loadJobPlugin(
-                PluginType.READER, this.readerPluginName);
+                PluginType.READER, this.readerPluginName,this.jobId);
 
         this.configuration.set(CoreConstant.DATAX_JOB_CONTENT_READER_PARAMETER + ".dryRun", true);
 
@@ -229,7 +230,7 @@ public class JobContainer extends AbstractContainer {
         // 设置reader的readerConfig
         jobReader.setPeerPluginJobConf(this.configuration.getConfiguration(
                 CoreConstant.DATAX_JOB_CONTENT_READER_PARAMETER));
-
+        this.configuration.set(CoreConstant.DATAX_JOB_CONTENT_WRITER_PARAMETER+".jobid",this.jobId);
         jobReader.setJobPluginCollector(jobPluginCollector);
 
         classLoaderSwapper.restoreCurrentThreadClassLoader();
@@ -241,10 +242,10 @@ public class JobContainer extends AbstractContainer {
         this.writerPluginName = this.configuration.getString(
                 CoreConstant.DATAX_JOB_CONTENT_WRITER_NAME);
         classLoaderSwapper.setCurrentThreadClassLoader(LoadUtil.getJarLoader(
-                PluginType.WRITER, this.writerPluginName));
+                PluginType.WRITER, this.writerPluginName,this.jobId));
 
         Writer.Job jobWriter = (Writer.Job) LoadUtil.loadJobPlugin(
-                PluginType.WRITER, this.writerPluginName);
+                PluginType.WRITER, this.writerPluginName,this.jobId);
 
         this.configuration.set(CoreConstant.DATAX_JOB_CONTENT_WRITER_PARAMETER + ".dryRun", true);
 
@@ -265,7 +266,7 @@ public class JobContainer extends AbstractContainer {
 
     private void preCheckReader() {
         classLoaderSwapper.setCurrentThreadClassLoader(LoadUtil.getJarLoader(
-                PluginType.READER, this.readerPluginName));
+                PluginType.READER, this.readerPluginName,this.jobId));
         LOG.info(String.format("DataX Reader.Job [%s] do preCheck work .",
                 this.readerPluginName));
         this.jobReader.preCheck();
@@ -274,7 +275,7 @@ public class JobContainer extends AbstractContainer {
 
     private void preCheckWriter() {
         classLoaderSwapper.setCurrentThreadClassLoader(LoadUtil.getJarLoader(
-                PluginType.WRITER, this.writerPluginName));
+                PluginType.WRITER, this.writerPluginName,this.jobId));
         LOG.info(String.format("DataX Writer.Job [%s] do preCheck work .",
                 this.writerPluginName));
         this.jobWriter.preCheck();
@@ -328,10 +329,10 @@ public class JobContainer extends AbstractContainer {
                 CoreConstant.DATAX_JOB_PREHANDLER_PLUGINNAME);
 
         classLoaderSwapper.setCurrentThreadClassLoader(LoadUtil.getJarLoader(
-                handlerPluginType, handlerPluginName));
+                handlerPluginType, handlerPluginName,this.jobId));
 
         AbstractJobPlugin handler = LoadUtil.loadJobPlugin(
-                handlerPluginType, handlerPluginName);
+                handlerPluginType, handlerPluginName,this.jobId);
 
         JobPluginCollector jobPluginCollector = new DefaultJobPluginCollector(
                 this.getContainerCommunicator());
@@ -364,10 +365,10 @@ public class JobContainer extends AbstractContainer {
                 CoreConstant.DATAX_JOB_POSTHANDLER_PLUGINNAME);
 
         classLoaderSwapper.setCurrentThreadClassLoader(LoadUtil.getJarLoader(
-                handlerPluginType, handlerPluginName));
+                handlerPluginType, handlerPluginName,this.jobId));
 
         AbstractJobPlugin handler = LoadUtil.loadJobPlugin(
-                handlerPluginType, handlerPluginName);
+                handlerPluginType, handlerPluginName,this.jobId);
 
         JobPluginCollector jobPluginCollector = new DefaultJobPluginCollector(
                 this.getContainerCommunicator());
@@ -427,7 +428,7 @@ public class JobContainer extends AbstractContainer {
             Long channelLimitedByteSpeed = this.configuration
                     .getLong(CoreConstant.DATAX_CORE_TRANSPORT_CHANNEL_SPEED_BYTE);
             if (channelLimitedByteSpeed == null || channelLimitedByteSpeed <= 0) {
-                DataXException.asDataXException(
+                throw DataXException.asDataXException(
                         FrameworkErrorCode.CONFIG_ERROR,
                         "在有总bps限速条件下，单个channel的bps值不能为空，也不能为非正数");
             }
@@ -448,7 +449,7 @@ public class JobContainer extends AbstractContainer {
             Long channelLimitedRecordSpeed = this.configuration.getLong(
                     CoreConstant.DATAX_CORE_TRANSPORT_CHANNEL_SPEED_RECORD);
             if (channelLimitedRecordSpeed == null || channelLimitedRecordSpeed <= 0) {
-                DataXException.asDataXException(FrameworkErrorCode.CONFIG_ERROR,
+                throw DataXException.asDataXException(FrameworkErrorCode.CONFIG_ERROR,
                         "在有总tps限速条件下，单个channel的tps值不能为空，也不能为非正数");
             }
 
@@ -602,7 +603,14 @@ public class JobContainer extends AbstractContainer {
         reportCommunication.setLongCounter(CommunicationTool.RECORD_SPEED, recordSpeedPerSecond);
 
         super.getContainerCommunicator().report(reportCommunication);
-
+        LOG.info(CommunicationTool.Stringify.getSnapshot(communication));
+        Map<String,Object> log  = new HashMap<String,Object>();
+        log.put("startTimeStamp",startTimeStamp);
+        log.put("endTimeStamp",endTimeStamp);
+        log.put("totalCosts",totalCosts);
+        log.put("byteSpeedPerSecond",byteSpeedPerSecond);
+        log.put("recordSpeedPerSecond",recordSpeedPerSecond);
+        log.put("communication",communication);
 
         LOG.info(String.format(
                 "\n" + "%-26s: %-18s\n" + "%-26s: %-18s\n" + "%-26s: %19s\n"
@@ -656,11 +664,11 @@ public class JobContainer extends AbstractContainer {
         this.readerPluginName = this.configuration.getString(
                 CoreConstant.DATAX_JOB_CONTENT_READER_NAME);
         classLoaderSwapper.setCurrentThreadClassLoader(LoadUtil.getJarLoader(
-                PluginType.READER, this.readerPluginName));
+                PluginType.READER, this.readerPluginName,this.jobId));
 
         Reader.Job jobReader = (Reader.Job) LoadUtil.loadJobPlugin(
-                PluginType.READER, this.readerPluginName);
-
+                PluginType.READER, this.readerPluginName,this.jobId);
+        this.configuration.set(CoreConstant.DATAX_JOB_CONTENT_READER_PARAMETER_JOBID,this.jobId);
         // 设置reader的jobConfig
         jobReader.setPluginJobConf(this.configuration.getConfiguration(
                 CoreConstant.DATAX_JOB_CONTENT_READER_PARAMETER));
@@ -686,11 +694,11 @@ public class JobContainer extends AbstractContainer {
         this.writerPluginName = this.configuration.getString(
                 CoreConstant.DATAX_JOB_CONTENT_WRITER_NAME);
         classLoaderSwapper.setCurrentThreadClassLoader(LoadUtil.getJarLoader(
-                PluginType.WRITER, this.writerPluginName));
+                PluginType.WRITER, this.writerPluginName,this.jobId));
 
         Writer.Job jobWriter = (Writer.Job) LoadUtil.loadJobPlugin(
-                PluginType.WRITER, this.writerPluginName);
-
+                PluginType.WRITER, this.writerPluginName,this.jobId);
+        this.configuration.set(CoreConstant.DATAX_JOB_CONTENT_WRITER_PARAMETER_JOBID,this.jobId);
         // 设置writer的jobConfig
         jobWriter.setPluginJobConf(this.configuration.getConfiguration(
                 CoreConstant.DATAX_JOB_CONTENT_WRITER_PARAMETER));
@@ -709,7 +717,7 @@ public class JobContainer extends AbstractContainer {
 
     private void prepareJobReader() {
         classLoaderSwapper.setCurrentThreadClassLoader(LoadUtil.getJarLoader(
-                PluginType.READER, this.readerPluginName));
+                PluginType.READER, this.readerPluginName,this.jobId));
         LOG.info(String.format("DataX Reader.Job [%s] do prepare work .",
                 this.readerPluginName));
         this.jobReader.prepare();
@@ -718,7 +726,7 @@ public class JobContainer extends AbstractContainer {
 
     private void prepareJobWriter() {
         classLoaderSwapper.setCurrentThreadClassLoader(LoadUtil.getJarLoader(
-                PluginType.WRITER, this.writerPluginName));
+                PluginType.WRITER, this.writerPluginName,this.jobId));
         LOG.info(String.format("DataX Writer.Job [%s] do prepare work .",
                 this.writerPluginName));
         this.jobWriter.prepare();
@@ -728,7 +736,7 @@ public class JobContainer extends AbstractContainer {
     // TODO: 如果源头就是空数据
     private List<Configuration> doReaderSplit(int adviceNumber) {
         classLoaderSwapper.setCurrentThreadClassLoader(LoadUtil.getJarLoader(
-                PluginType.READER, this.readerPluginName));
+                PluginType.READER, this.readerPluginName,this.jobId));
         List<Configuration> readerSlicesConfigs =
                 this.jobReader.split(adviceNumber);
         if (readerSlicesConfigs == null || readerSlicesConfigs.size() <= 0) {
@@ -744,7 +752,7 @@ public class JobContainer extends AbstractContainer {
 
     private List<Configuration> doWriterSplit(int readerTaskNumber) {
         classLoaderSwapper.setCurrentThreadClassLoader(LoadUtil.getJarLoader(
-                PluginType.WRITER, this.writerPluginName));
+                PluginType.WRITER, this.writerPluginName,this.jobId));
 
         List<Configuration> writerSlicesConfigs = this.jobWriter
                 .split(readerTaskNumber);
@@ -938,7 +946,7 @@ public class JobContainer extends AbstractContainer {
 
     private void postJobReader() {
         classLoaderSwapper.setCurrentThreadClassLoader(LoadUtil.getJarLoader(
-                PluginType.READER, this.readerPluginName));
+                PluginType.READER, this.readerPluginName,this.jobId));
         LOG.info("DataX Reader.Job [{}] do post work.",
                 this.readerPluginName);
         this.jobReader.post();
@@ -947,7 +955,7 @@ public class JobContainer extends AbstractContainer {
 
     private void postJobWriter() {
         classLoaderSwapper.setCurrentThreadClassLoader(LoadUtil.getJarLoader(
-                PluginType.WRITER, this.writerPluginName));
+                PluginType.WRITER, this.writerPluginName,this.jobId));
         LOG.info("DataX Writer.Job [{}] do post work.",
                 this.writerPluginName);
         this.jobWriter.post();

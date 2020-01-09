@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <configuration>
-    <property name="log.dir" value="${datax.home}/log/" />
-    <property name="perf.dir" value="${datax.home}/log_perf/" />
-    <timestamp key="ymd" datePattern="yyyy-MM-dd"/>
-    <timestamp key="byMillionSecond" datePattern="HH_mm_ss.SSS"/>
+    <property name="log.dir" value="${datax.log}/" />
+    <property name="perf.dir" value="${datax.log}/" />
+    <timestamp key="ymd" datePattern="yyyyMMdd"/>
+    <timestamp key="bySecond" datePattern="HHmmss"/>
 
     <!-- 控制台输出 -->
     <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
@@ -16,7 +16,7 @@
 
     <appender name="FILE" class="ch.qos.logback.core.FileAppender">
         <encoder>UTF-8</encoder>
-        <file>${log.dir}/${ymd}/${log.file.name}-${byMillionSecond}.log</file>
+        <file>${log.dir}/${log.file.name}</file>
         <append>false</append>
         <encoder class="ch.qos.logback.classic.encoder.PatternLayoutEncoder">
             <pattern>%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %-5level %logger{0} - %msg%n
@@ -24,15 +24,15 @@
         </encoder>
     </appender>
 
-    <appender name="PERF" class="ch.qos.logback.core.FileAppender">
+    <!-- <appender name="PERF" class="ch.qos.logback.core.FileAppender">
         <encoder>UTF-8</encoder>
-        <file>${perf.dir}/${ymd}/${log.file.name}-${byMillionSecond}.log</file>
+        <file>${perf.dir}/${log.file.name}-${bySecond}.log</file>
         <append>false</append>
         <encoder class="ch.qos.logback.classic.encoder.PatternLayoutEncoder">
             <pattern>%msg%n
             </pattern>
         </encoder>
-    </appender>
+    </appender> -->
 
     <!-- 按照每天生成日志文件(对 DataX 不适应，DataX 是一个进程一个日志) -->
     <!--
@@ -133,9 +133,9 @@
     </appender>
     -->
 
-    <logger name="com.alibaba.datax.common.statistics.PerfRecord"  level="INFO" additivity="false">
+    <!-- <logger name="com.alibaba.datax.common.statistics.PerfRecord"  level="INFO" additivity="false">
         <appender-ref ref="PERF" />
-    </logger>
+    </logger> -->
 
     <root level="${loglevel:-INFO}">
         <appender-ref ref="STDOUT" />
