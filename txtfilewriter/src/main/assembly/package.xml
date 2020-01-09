@@ -19,7 +19,7 @@
 		<fileSet>
 			<directory>target/</directory>
 			<includes>
-				<include>txtfilewriter-0.0.1-SNAPSHOT.jar</include>
+				<include>txtfilewriter-${datax-project-version}.jar</include>
 			</includes>
 			<outputDirectory>plugin/writer/txtfilewriter</outputDirectory>
 		</fileSet>

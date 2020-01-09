@@ -4,7 +4,7 @@
 	<parent>
 		<groupId>com.alibaba.datax</groupId>
 		<artifactId>datax-all</artifactId>
-		<version>0.0.1-SNAPSHOT</version>
+		<version>3.0.2</version>
 	</parent>
 	<artifactId>sqlserverwriter</artifactId>
 	<name>sqlserverwriter</name>

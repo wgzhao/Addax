@@ -1,0 +1,10 @@
+{
+    "name": "dbffilewriter",
+    "parameter": {
+        "path": "",
+        "fileName": "",
+        "writeMode": "",
+        "fieldDelimiter":"",
+        "dateFormat": ""
+    }
+}

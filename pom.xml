@@ -4,7 +4,7 @@
 
     <groupId>com.alibaba.datax</groupId>
     <artifactId>datax-all</artifactId>
-    <version>0.0.1-SNAPSHOT</version>
+    <version>3.0.2</version>
     <dependencies>
         <dependency>
             <groupId>org.hamcrest</groupId>
@@ -17,15 +17,15 @@
     <packaging>pom</packaging>
 
     <properties>
-        <jdk-version>1.8</jdk-version>
-        <datax-project-version>0.0.1-SNAPSHOT</datax-project-version>
+        <datax-project-version>3.0.2</datax-project-version>
         <commons-lang3-version>3.3.2</commons-lang3-version>
         <commons-configuration-version>1.10</commons-configuration-version>
         <commons-cli-version>1.2</commons-cli-version>
-        <fastjson-version>1.1.46.sec01</fastjson-version>
-        <guava-version>16.0.1</guava-version>
-        <diamond.version>3.7.2.1-SNAPSHOT</diamond.version>
-
+        <fastjson-version>1.2.31</fastjson-version>
+        <clickhouse-jdbc.version>0.1.53</clickhouse-jdbc.version>
+        <guava-version>18.0.1</guava-version>
+        <diamond.version>3.7.3</diamond.version>
+        <postgresql-jdbc.version>9.4.1207</postgresql-jdbc.version>
         <!--slf4j 1.7.10 和 logback-classic 1.0.13 是好基友 -->
         <slf4j-api-version>1.7.10</slf4j-api-version>
         <logback-classic-version>1.0.13</logback-classic-version>
@@ -33,11 +33,15 @@
         <junit-version>4.11</junit-version>
         <tddl.version>5.1.22-1</tddl.version>
         <swift-version>1.0.0</swift-version>
-
+        <jackson.version>2.9.9</jackson.version>
         <project-sourceEncoding>UTF-8</project-sourceEncoding>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
         <maven.compiler.encoding>UTF-8</maven.compiler.encoding>
+        <java.source.version>1.8</java.source.version>
+        <java.target.version>1.8</java.target.version>
+        <maven.compiler.source>1.8</maven.compiler.source>
+        <maven.compiler.target>1.8</maven.compiler.target>
     </properties>
 
     <modules>
@@ -46,58 +50,54 @@
         <module>transformer</module>
 
         <!-- reader -->
+        <!--essential -->
         <module>mysqlreader</module>
-        <module>drdsreader</module>
-        <module>sqlserverreader</module>
-        <module>postgresqlreader</module>
         <module>oraclereader</module>
-        <module>odpsreader</module>
-        <module>otsreader</module>
-        <module>otsstreamreader</module>
         <module>txtfilereader</module>
         <module>hdfsreader</module>
         <module>streamreader</module>
-        <module>ossreader</module>
+        <module>dbffilereader</module>
+        <module>rdbmsreader</module>
+        <module>sqlserverreader</module>
+        <!--optional -->
+        <!--
         <module>ftpreader</module>
         <module>mongodbreader</module>
         <module>rdbmsreader</module>
         <module>hbase11xreader</module>
-        <module>hbase094xreader</module>
-        <module>tsdbreader</module>
-        <module>opentsdbreader</module>
-        <module>cassandrareader</module>
+        <module>redisreader</module>
+        <module>clickhousereader</module>
+        <module>hivereader</module>
+        <module>jsonfilereader</module>
+        <module>postgresqlreader</module>-->
 
-        <!-- writer -->
+         <!-- writer -->
+         <!-- essential -->
         <module>mysqlwriter</module>
-        <module>drdswriter</module>
-        <module>odpswriter</module>
         <module>txtfilewriter</module>
-        <module>ftpwriter</module>
         <module>hdfswriter</module>
         <module>streamwriter</module>
-        <module>otswriter</module>
         <module>oraclewriter</module>
+        <module>dbffilewriter</module>
+        <module>rdbmswriter</module>
         <module>sqlserverwriter</module>
+        <!-- optional -->
+        <!--
+        <module>ftpwriter</module>
         <module>postgresqlwriter</module>
-        <module>osswriter</module>
         <module>mongodbwriter</module>
-        <module>adswriter</module>
-        <module>ocswriter</module>
         <module>rdbmswriter</module>
         <module>hbase11xwriter</module>
-        <module>hbase094xwriter</module>
         <module>hbase11xsqlwriter</module>
         <module>hbase11xsqlreader</module>
         <module>elasticsearchwriter</module>
-        <module>tsdbwriter</module>
-        <module>adbpgwriter</module>
-        <module>gdbwriter</module>
-        <module>cassandrawriter</module>
+        <module>rediswriter</module>
+        <module>clickhousewriter</module>-->
         <!-- common support module -->
         <module>plugin-rdbms-util</module>
         <module>plugin-unstructured-storage-util</module>
-        <module>hbase20xsqlreader</module>
-        <module>hbase20xsqlwriter</module>
+        <!--<module>hbase20xsqlreader</module>
+        <module>hbase20xsqlwriter</module>-->
     </modules>
 
     <dependencyManagement>
@@ -209,7 +209,7 @@
             <plugin>
                 <artifactId>maven-assembly-plugin</artifactId>
                 <configuration>
-                    <finalName>datax</finalName>
+                    <finalName>datax-${datax-project-version}</finalName>
                     <descriptors>
                         <descriptor>package.xml</descriptor>
                     </descriptors>
@@ -224,7 +224,7 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
-                <version>2.3.2</version>
+                <version>3.8.1</version>
                 <configuration>
                     <source>${jdk-version}</source>
                     <target>${jdk-version}</target>

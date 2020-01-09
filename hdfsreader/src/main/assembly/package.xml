@@ -19,7 +19,7 @@
         <fileSet>
             <directory>target/</directory>
             <includes>
-                <include>hdfsreader-0.0.1-SNAPSHOT.jar</include>
+                <include>hdfsreader-${datax-project-version}.jar</include>
             </includes>
             <outputDirectory>plugin/reader/hdfsreader</outputDirectory>
         </fileSet>
@@ -39,11 +39,11 @@
         <!--</fileSet>-->
     </fileSets>
 
-    <dependencySets>
+    <!-- <dependencySets>
         <dependencySet>
             <useProjectArtifact>false</useProjectArtifact>
             <outputDirectory>plugin/reader/hdfsreader/libs</outputDirectory>
             <scope>runtime</scope>
         </dependencySet>
-    </dependencySets>
+    </dependencySets> -->
 </assembly>

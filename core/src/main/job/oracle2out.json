@@ -1,0 +1,38 @@
+{
+    "job": {
+        "content": [
+            {
+                "reader": {
+                    "name": "oraclereader", 
+                    "parameter": {
+                        "column": ["COL1"],
+                        "connection": [
+                            {
+                                "jdbcUrl": ["jdbc:oracle:thin:@18.209.0.11:1521/stage"], 
+                                "table": ["FINEBI.T"]
+                            }
+                        ], 
+                        "username": "finebi", 
+                        "password": "foundersc123"
+                    }
+                }, 
+		"writer": {
+                    "name": "txtfilewriter",
+                    "parameter": {
+                        "path": "/tmp/result",
+                        "fileName": "luohw",
+                        "writeMode": "truncate",
+                        "dateFormat": "yyyy-MM-dd"
+                    }
+                }
+          }
+        ], 
+        "setting": {
+            "speed": {
+                "bytes": -1,
+                "channel": 1,
+		"batchSize": 512 
+            }
+        }
+    }
+}

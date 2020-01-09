@@ -10,7 +10,8 @@ import java.io.File;
 public class CoreConstant {
 	// --------------------------- 全局使用的变量(最好按照逻辑顺序，调整下成员变量顺序)
 	// --------------------------------
-
+	public static final String DATAX_JOB_CONTENT_WRITER_PARAMETER_JOBID = "job.content[0].writer.parameter.jobid";
+	public static final String DATAX_JOB_CONTENT_READER_PARAMETER_JOBID = "job.content[0].reader.parameter.jobid";
 	public static final String DATAX_CORE_CONTAINER_TASKGROUP_CHANNEL = "core.container.taskGroup.channel";
 
 	public static final String DATAX_CORE_CONTAINER_MODEL = "core.container.model";

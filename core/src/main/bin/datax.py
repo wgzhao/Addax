@@ -1,6 +1,4 @@
-#!/usr/bin/env python
-# -*- coding:utf-8 -*-
-
+#!/usr/bin/env python3
 import sys
 import os
 import signal
@@ -27,9 +25,8 @@ if isWindows():
 else:
     CLASS_PATH = ("%s/lib/*:.") % (DATAX_HOME)
 LOGBACK_FILE = ("%s/conf/logback.xml") % (DATAX_HOME)
-DEFAULT_JVM = "-Xms1g -Xmx1g -XX:+HeapDumpOnOutOfMemoryError -XX:HeapDumpPath=%s/log" % (DATAX_HOME)
-DEFAULT_PROPERTY_CONF = "-Dfile.encoding=UTF-8 -Dlogback.statusListenerClass=ch.qos.logback.core.status.NopStatusListener -Djava.security.egd=file:///dev/urandom -Ddatax.home=%s -Dlogback.configurationFile=%s" % (
-    DATAX_HOME, LOGBACK_FILE)
+DEFAULT_JVM = "-Xms1g -Xmx1g -XX:+HeapDumpOnOutOfMemoryError -XX:HeapDumpPath=%s" % (DATAX_HOME)
+DEFAULT_PROPERTY_CONF = "-Dfile.encoding=UTF-8 -Dlogback.statusListenerClass=ch.qos.logback.core.status.NopStatusListener -Djava.security.egd=file:///dev/urandom -Ddatax.home=%s -Dlogback.configurationFile=%s " % (DATAX_HOME, LOGBACK_FILE)
 ENGINE_COMMAND = "java -server ${jvm} %s -classpath %s  ${params} com.alibaba.datax.core.Engine -mode ${mode} -jobid ${jobid} -job ${job}" % (
     DEFAULT_PROPERTY_CONF, CLASS_PATH)
 REMOTE_DEBUG_CONFIG = "-Xdebug -Xrunjdwp:transport=dt_socket,server=y,address=9999"
@@ -52,13 +49,13 @@ def getLocalIp():
 
 def suicide(signum, e):
     global child_process
-    print >> sys.stderr, "[Error] DataX receive unexpected signal %d, starts to suicide." % (signum)
+    print("[Error] DataX receive unexpected signal %d, starts to suicide." % (signum), file=sys.stderr)
 
     if child_process:
         child_process.send_signal(signal.SIGQUIT)
         time.sleep(1)
         child_process.kill()
-    print >> sys.stderr, "DataX Process was killed ! you did ?"
+    print("DataX Process was killed ! you did ?", file=sys.stderr)
     sys.exit(RET_STATE["KILL"])
 
 
@@ -78,7 +75,7 @@ def getOptionParser():
                                      "Normal user use these options to set jvm parameters, job runtime mode etc. "
                                      "Make sure these options can be used in Product Env.")
     prodEnvOptionGroup.add_option("-j", "--jvm", metavar="<jvm parameters>", dest="jvmParameters", action="store",
-                                  default=DEFAULT_JVM, help="Set jvm parameters if necessary.")
+                                 help="Set jvm parameters if necessary.")
     prodEnvOptionGroup.add_option("--jobid", metavar="<job unique id>", dest="jobid", action="store", default="-1",
                                   help="Set job unique id when running by Distribute/Local Mode.")
     prodEnvOptionGroup.add_option("-m", "--mode", metavar="<job runtime mode>",
@@ -97,6 +94,10 @@ def getOptionParser():
     prodEnvOptionGroup.add_option("-w", "--writer", metavar="<parameter used in view job config[writer] template>",
                                   action="store", dest="writer",type="string",
                                   help='View job config[writer] template, eg: mysqlwriter,streamwriter')
+    prodEnvOptionGroup.add_option("-l", "--logdir", metavar="<log directory>",
+                                  action="store", dest="logdir", type="string",
+                                  help="the directory which log writes to",
+                                  default=DATAX_HOME + '/log')
     parser.add_option_group(prodEnvOptionGroup)
 
     devEnvOptionGroup = OptionGroup(parser, "Develop/Debug Options",
@@ -111,10 +112,10 @@ def getOptionParser():
 def generateJobConfigTemplate(reader, writer):
     readerRef = "Please refer to the %s document:\n     https://github.com/alibaba/DataX/blob/master/%s/doc/%s.md \n" % (reader,reader,reader)
     writerRef = "Please refer to the %s document:\n     https://github.com/alibaba/DataX/blob/master/%s/doc/%s.md \n " % (writer,writer,writer)
-    print readerRef
-    print writerRef
-    jobGuid = 'Please save the following configuration as a json file and  use\n     python {DATAX_HOME}/bin/datax.py {JSON_FILE_NAME}.json \nto run the job.\n'
-    print jobGuid
+    print(readerRef)
+    print(writerRef)
+    jobGuid = 'Please save the following configuration as a json file and  use\n     python {DATAX_HOME}/bin/datax_v3.py {JSON_FILE_NAME}.json \nto run the job.\n'
+    print(jobGuid)
     jobTemplate={
       "job": {
         "setting": {
@@ -134,15 +135,15 @@ def generateJobConfigTemplate(reader, writer):
     writerTemplatePath = "%s/plugin/writer/%s/plugin_job_template.json" % (DATAX_HOME,writer)
     try:
       readerPar = readPluginTemplate(readerTemplatePath);
-    except Exception, e:
-       print "Read reader[%s] template error: can\'t find file %s" % (reader,readerTemplatePath)
+    except Exception as e:
+       print("Read reader[%s] template error: can\'t find file %s" % (reader,readerTemplatePath))
     try:
       writerPar = readPluginTemplate(writerTemplatePath);
-    except Exception, e:
-      print "Read writer[%s] template error: : can\'t find file %s" % (writer,writerTemplatePath)
+    except Exception as e:
+      print("Read writer[%s] template error: : can\'t find file %s" % (writer,writerTemplatePath))
     jobTemplate['job']['content'][0]['reader'] = readerPar;
     jobTemplate['job']['content'][0]['writer'] = writerPar;
-    print json.dumps(jobTemplate, indent=4, sort_keys=True)
+    print(json.dumps(jobTemplate, indent=4, sort_keys=True))
 
 def readPluginTemplate(plugin):
     with open(plugin, 'r') as f:
@@ -168,7 +169,7 @@ def buildStartCommand(options, args):
 
     if options.remoteDebug:
         tempJVMCommand = tempJVMCommand + " " + REMOTE_DEBUG_CONFIG
-        print 'local ip: ', getLocalIp()
+        print('local ip: ', getLocalIp())
 
     if options.loglevel:
         tempJVMCommand = tempJVMCommand + " " + ("-Dloglevel=%s" % (options.loglevel))
@@ -182,8 +183,13 @@ def buildStartCommand(options, args):
         jobResource = os.path.abspath(jobResource)
         if jobResource.lower().startswith("file://"):
             jobResource = jobResource[len("file://"):]
-
-    jobParams = ("-Dlog.file.name=%s") % (jobResource[-20:].replace('/', '_').replace('.', '_'))
+    # 获得job 的文件名称，如果是本地文件名的话
+    if not jobResource.startswith('http://') and not jobResource.startswith('https://'):
+        jobFilename =os.path.splitext(os.path.split(jobResource)[-1])[0]
+    else:
+        jobFilename = jobResource[-20:].replace('/', '_').replace('.', '_')
+    curr_time =  time.strftime("%Y%m%d_%H%M%S")
+    jobParams = ("-Ddatax.log=%s -Dlog.file.name=datax_%s_%s_%s.log") % (options.logdir, jobFilename, curr_time, os.getpid())
     if options.params:
         jobParams = jobParams + " " + options.params
 
@@ -193,16 +199,16 @@ def buildStartCommand(options, args):
     commandMap["jvm"] = tempJVMCommand
     commandMap["params"] = jobParams
     commandMap["job"] = jobResource
-
+    print(commandMap['jvm'])
     return Template(ENGINE_COMMAND).substitute(**commandMap)
 
 
 def printCopyright():
-    print '''
+    print('''
 DataX (%s), From Alibaba !
 Copyright (C) 2010-2017, Alibaba Group. All Rights Reserved.
 
-''' % DATAX_VERSION
+''' % DATAX_VERSION)
     sys.stdout.flush()
 
 
@@ -218,8 +224,6 @@ if __name__ == "__main__":
         sys.exit(RET_STATE['FAIL'])
 
     startCommand = buildStartCommand(options, args)
-    # print startCommand
-
     child_process = subprocess.Popen(startCommand, shell=True)
     register_signal()
     (stdout, stderr) = child_process.communicate()

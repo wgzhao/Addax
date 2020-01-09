@@ -1,0 +1,57 @@
+{
+    "job": {
+        "content": [
+            {
+                "writer": {
+                    "parameter": {
+                        "username": "finebi",
+                        "column": [
+                            "*"
+                        ],
+                        "connection": [
+                            {
+                                "table": [
+                                    "${ddb}.${dtable}"
+                                ],
+                                "jdbcUrl": "jdbc:oracle:thin:@18.209.0.11/stage"
+                            }
+                        ],
+                        "password": "foundersc123",
+                        "preSql": [
+                            "truncate table @table"
+                        ]
+                    },
+                    "name": "oraclewriter"
+                },
+                "reader": {
+                    "parameter": {
+                        "column": [
+                            "*"
+                        ],
+                        "username": "finebi",
+                        "connection": [
+                            {
+                                "table": [
+                                    "${sdb}.${stable}"
+                                ],
+                                "jdbcUrl": [
+                                    "jdbc:oracle:thin:@18.209.0.11/stage"
+                                ]
+                            }
+                        ],
+                        "password": "foundersc123"
+                    },
+                    "name": "oraclereader"
+                }
+            }
+        ],
+        "setting": {
+            "speed": {
+                "record": -1,
+                "byte": -1,
+                "batchSize": 4096,
+                "channel": 1
+            }
+        }
+    }
+}

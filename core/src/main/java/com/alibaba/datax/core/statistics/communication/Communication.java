@@ -10,16 +10,13 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.concurrent.ConcurrentHashMap;
-
-/**
- * DataX所有的状态及统计信息交互类，job、taskGroup、task等的消息汇报都走该类
- */
+@SuppressWarnings("unchecked")
 public class Communication extends BaseObject implements Cloneable {
     /**
      * 所有的数值key-value对 *
      */
     private Map<String, Number> counter;
-
+    private Long jobId;
     /**
      * 运行状态 *
      */
@@ -125,7 +122,6 @@ public class Communication extends BaseObject implements Cloneable {
 
     public synchronized Long getLongCounter(final String key) {
         Number value = this.counter.get(key);
-
         return value == null ? 0 : value.longValue();
     }
 
@@ -277,5 +273,11 @@ public class Communication extends BaseObject implements Cloneable {
     	return this.state == State.SUCCEEDED || this.state == State.FAILED	
     			|| this.state == State.KILLED;
     }
-    
+    public Long getJobId() {
+        return jobId;
+    }
+
+    public void setJobId(Long jobId) {
+        this.jobId = jobId;
+    }
 }

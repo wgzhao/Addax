@@ -3,6 +3,8 @@ package com.alibaba.datax.plugin.rdbms.reader;
 public final class Constant {
     public static final String PK_TYPE = "pkType";
 
+    public static String EACH_TABLE_SPLIT_SIZE = "eachTableSplitSize";
+
     public static final Object PK_TYPE_STRING = "pkTypeString";
 
     public static final Object PK_TYPE_LONG = "pkTypeLong";
