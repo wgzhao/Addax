@@ -83,6 +83,13 @@
             </includes>
             <outputDirectory>datax-${datax-project-version}</outputDirectory>
         </fileSet>
+        <fileSet>
+            <directory>sqlserverreader/target/datax/</directory>
+            <includes>
+                <include>**/*.*</include>
+            </includes>
+            <outputDirectory>datax-${datax-project-version}</outputDirectory>
+        </fileSet>
         <!--optional -->
         <!--<fileSet>
             <directory>clickhousereader/target/datax/</directory>
@@ -100,13 +107,6 @@
         </fileSet>
         <fileSet>
             <directory>redisreader/target/datax/</directory>
-            <includes>
-                <include>**/*.*</include>
-            </includes>
-            <outputDirectory>datax-${datax-project-version}</outputDirectory>
-        </fileSet>
-        <fileSet>
-            <directory>sqlserverreader/target/datax/</directory>
             <includes>
                 <include>**/*.*</include>
             </includes>
@@ -221,6 +221,13 @@
             </includes>
             <outputDirectory>datax-${datax-project-version}</outputDirectory>
         </fileSet>
+        <fileSet>
+            <directory>sqlserverwriter/target/datax/</directory>
+            <includes>
+                <include>**/*.*</include>
+            </includes>
+            <outputDirectory>datax-${datax-project-version}</outputDirectory>
+        </fileSet>
         <!-- optional -->
         <!--
         <fileSet>
@@ -239,13 +246,6 @@
         </fileSet>
         <fileSet>
             <directory>mongodbwriter/target/datax/</directory>
-            <includes>
-                <include>**/*.*</include>
-            </includes>
-            <outputDirectory>datax-${datax-project-version}</outputDirectory>
-        </fileSet>
-        <fileSet>
-            <directory>sqlserverwriter/target/datax/</directory>
             <includes>
                 <include>**/*.*</include>
             </includes>
