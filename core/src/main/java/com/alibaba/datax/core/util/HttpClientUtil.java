@@ -72,7 +72,7 @@ public class HttpClientUtil {
     private void initApacheHttpClient() {
         RequestConfig requestConfig = RequestConfig.custom().setSocketTimeout(HTTP_TIMEOUT_INMILLIONSECONDS)
                 .setConnectTimeout(HTTP_TIMEOUT_INMILLIONSECONDS).setConnectionRequestTimeout(HTTP_TIMEOUT_INMILLIONSECONDS)
-                .setStaleConnectionCheckEnabled(true).build();
+                .build();
 
           if(null == provider) {
               httpClient = HttpClientBuilder.create().setMaxConnTotal(POOL_SIZE).setMaxConnPerRoute(POOL_SIZE)

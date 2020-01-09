@@ -51,8 +51,8 @@ public class HdfsWriter extends Writer {
             this.defaultFS = this.writerSliceConfig.getNecessaryValue(Key.DEFAULT_FS, HdfsWriterErrorCode.REQUIRED_VALUE);
             //fileType check
             this.fileType = this.writerSliceConfig.getNecessaryValue(Key.FILE_TYPE, HdfsWriterErrorCode.REQUIRED_VALUE);
-            if( !fileType.equalsIgnoreCase("ORC") && !fileType.equalsIgnoreCase("TEXT")){
-                String message = "HdfsWriter插件目前只支持ORC和TEXT两种格式的文件,请将filetype选项的值配置为ORC或者TEXT";
+            if( !fileType.equalsIgnoreCase("ORC") && !fileType.equalsIgnoreCase("TEXT") && !fileType.equalsIgnoreCase("PAR")){
+                String message = "HdfsWriter插件目前只支持ORC和TEXT或PARQUET三种格式的文件,请将filetype选项的值配置为ORC或者TEXT或PARQUET";
                 throw DataXException.asDataXException(HdfsWriterErrorCode.ILLEGAL_VALUE, message);
             }
             //path
@@ -81,10 +81,10 @@ public class HdfsWriter extends Writer {
             //writeMode check
             this.writeMode = this.writerSliceConfig.getNecessaryValue(Key.WRITE_MODE, HdfsWriterErrorCode.REQUIRED_VALUE);
             writeMode = writeMode.toLowerCase().trim();
-            Set<String> supportedWriteModes = Sets.newHashSet("append", "nonconflict");
+            Set<String> supportedWriteModes = Sets.newHashSet("append", "nonconflict", "overwrite");
             if (!supportedWriteModes.contains(writeMode)) {
                 throw DataXException.asDataXException(HdfsWriterErrorCode.ILLEGAL_VALUE,
-                        String.format("仅支持append, nonConflict两种模式, 不支持您配置的 writeMode 模式 : [%s]",
+                        String.format("仅支持append, nonConflict,overwrite三种模式, 不支持您配置的 writeMode 模式 : [%s]",
                                 writeMode));
             }
             this.writerSliceConfig.set(Key.WRITE_MODE, writeMode);
@@ -126,6 +126,19 @@ public class HdfsWriter extends Writer {
                     }
                 }
 
+            }else if(fileType.equalsIgnoreCase("PAR")){
+                Set<String> parSupportedCompress = Sets.newHashSet("NONE", "SNAPPY");
+                if(null == compress){
+                    this.writerSliceConfig.set(Key.COMPRESS, "NONE");
+                }else {
+                    compress = compress.toUpperCase().trim();
+                    if(!parSupportedCompress.contains(compress)){
+                        throw DataXException.asDataXException(HdfsWriterErrorCode.ILLEGAL_VALUE,
+                                String.format("目前Parquet FILE仅支持SNAPPY压缩, 不支持您配置的 compress 模式 : [%s]",
+                                        compress));
+                    }
+                }
+
             }
             //Kerberos check
             Boolean haveKerberos = this.writerSliceConfig.getBool(Key.HAVE_KERBEROS, false);
@@ -160,14 +173,10 @@ public class HdfsWriter extends Writer {
                 if(existFilePaths.length > 0){
                     isExistFile = true;
                 }
-                /**
-                 if ("truncate".equals(writeMode) && isExistFile ) {
-                 LOG.info(String.format("由于您配置了writeMode truncate, 开始清理 [%s] 下面以 [%s] 开头的内容",
-                 path, fileName));
-                 hdfsHelper.deleteFiles(existFilePaths);
-                 } else
-                 */
-                if ("append".equalsIgnoreCase(writeMode)) {
+                if ("overwrite".equals(writeMode) && isExistFile) {
+                    LOG.info(String.format("由于您配置了writeMode truncate, 开始清理 [%s] 下面以 [%s] 开头的内容", path, fileName));
+                    hdfsHelper.deleteFiles(existFilePaths);
+                } else if ("append".equalsIgnoreCase(writeMode)) {
                     LOG.info(String.format("由于您配置了writeMode append, 写入前不做清理工作, [%s] 目录下写入相应文件名前缀  [%s] 的文件",
                             path, fileName));
                 } else if ("nonconflict".equalsIgnoreCase(writeMode) && isExistFile) {
@@ -212,8 +221,18 @@ public class HdfsWriter extends Writer {
             String fileSuffix;
             //临时存放路径
             String storePath =  buildTmpFilePath(this.path);
+            if(storePath != null && storePath.contains("/")){
+                //由于在window上调试获取的路径为转义字符代表的斜杠
+                //故出现被认为是文件名称的一部分，使得获取父目录存在问题
+                //最终影响到直接删除更高一层的目录，导致Hive数据出现问题。
+                storePath = storePath.replace('\\', '/');
+            }
             //最终存放路径
             String endStorePath = buildFilePath();
+            if(endStorePath != null && endStorePath.contains("/")){
+                //storePath.replaceAll("\\", "/");
+                endStorePath = endStorePath.replace('\\', '/');
+            }
             this.path = endStorePath;
             for (int i = 0; i < mandatoryNumber; i++) {
                 // handle same file name
@@ -362,6 +381,10 @@ public class HdfsWriter extends Writer {
             }else if(fileType.equalsIgnoreCase("ORC")){
                 //写ORC FILE
                 hdfsHelper.orcFileStartWrite(lineReceiver,this.writerSliceConfig, this.fileName,
+                        this.getTaskPluginCollector());
+            }else if(fileType.equalsIgnoreCase("PAR")){
+                //写Parquet FILE
+                hdfsHelper.parFileStartWrite(lineReceiver,this.writerSliceConfig, this.fileName,
                         this.getTaskPluginCollector());
             }
 

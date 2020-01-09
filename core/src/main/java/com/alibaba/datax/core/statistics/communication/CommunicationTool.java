@@ -81,6 +81,7 @@ public final class CommunicationTool {
     }
 
     public static long getTotalReadRecords(final Communication communication) {
+
         return communication.getLongCounter(READ_SUCCEED_RECORDS) +
                 communication.getLongCounter(READ_FAILED_RECORDS);
     }

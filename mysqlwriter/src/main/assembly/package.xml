@@ -19,7 +19,7 @@
 		<fileSet>
 			<directory>target/</directory>
 			<includes>
-				<include>mysqlwriter-0.0.1-SNAPSHOT.jar</include>
+				<include>mysqlwriter-${datax-project-version}.jar</include>
 			</includes>
 			<outputDirectory>plugin/writer/mysqlwriter</outputDirectory>
 		</fileSet>
