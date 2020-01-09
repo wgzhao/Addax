@@ -10,7 +10,7 @@ if [ $? -ne 0 ];then
 fi
 echo "Test stream to text......"
 /opt/anaconda3/bin/python3 bin/datax.py job/stream2txt.json
-if [$? -ne 0 ];then
+if [ $? -ne 0 ];then
   exit 2
 fi
 exit 0
