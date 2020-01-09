@@ -58,6 +58,7 @@
         <module>streamreader</module>
         <module>dbffilereader</module>
         <module>rdbmsreader</module>
+        <module>sqlserverreader</module>
         <!--optional -->
         <!--
         <module>ftpreader</module>
@@ -68,7 +69,6 @@
         <module>clickhousereader</module>
         <module>hivereader</module>
         <module>jsonfilereader</module>
-        <module>sqlserverreader</module>
         <module>postgresqlreader</module>-->
 
          <!-- writer -->
@@ -80,9 +80,9 @@
         <module>oraclewriter</module>
         <module>dbffilewriter</module>
         <module>rdbmswriter</module>
+        <module>sqlserverwriter</module>
         <!-- optional -->
         <!--
-        <module>sqlserverwriter</module>
         <module>ftpwriter</module>
         <module>postgresqlwriter</module>
         <module>mongodbwriter</module>
