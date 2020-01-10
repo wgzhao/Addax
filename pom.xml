@@ -21,7 +21,7 @@
         <commons-lang3-version>3.3.2</commons-lang3-version>
         <commons-configuration-version>1.10</commons-configuration-version>
         <commons-cli-version>1.2</commons-cli-version>
-        <fastjson-version>1.2.31</fastjson-version>
+        <fastjson-version>1.2.62</fastjson-version>
         <clickhouse-jdbc.version>0.1.53</clickhouse-jdbc.version>
         <guava-version>18.0.1</guava-version>
         <diamond.version>3.7.3</diamond.version>
