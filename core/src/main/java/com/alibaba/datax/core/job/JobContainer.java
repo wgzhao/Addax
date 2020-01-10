@@ -123,8 +123,7 @@ public class JobContainer extends AbstractContainer {
 
                 LOG.debug("jobContainer starts to do postHandle ...");
                 this.postHandle();
-                LOG.info("jobContainer starts to do record check...");
-                this.logStatistics();
+
                 LOG.info("DataX jobId [{}] completed successfully.", this.jobId);
                 // disable hook function
                 //this.invokeHooks();
@@ -651,12 +650,6 @@ public class JobContainer extends AbstractContainer {
                     "Transformer过滤记录总数",
                     communication.getLongCounter(CommunicationTool.TRANSFORMER_FILTER_RECORDS)
             ));
-        }
-
-        // 如果有写入失败的记录，则给出异常
-        if (CommunicationTool.getTotalErrorRecords(communication) > 0) {
-                throw DataXException.asDataXException(
-                        FrameworkErrorCode.RUNTIME_ERROR, "有失败的记录");
         }
     }
 
