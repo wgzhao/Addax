@@ -52,7 +52,11 @@ deploy_stage:
   stage: deploy
   script:
     - /bin/bash deploy.sh
-  environment: stage
+  only:
+    - master
+    - toad
+  environment: 
+    - name: stage
   
 deploy_prod:
   stage: deploy
@@ -61,5 +65,6 @@ deploy_prod:
   only:
     - master
     - toad
-  environment: prod
+  environment: 
+    - name: prod
   when: manual
