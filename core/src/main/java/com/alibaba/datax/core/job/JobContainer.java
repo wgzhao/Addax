@@ -672,13 +672,6 @@ public class JobContainer extends AbstractContainer {
                     communication.getLongCounter(CommunicationTool.TRANSFORMER_FILTER_RECORDS)
             ));
         }
-<<<<<<< HEAD
-=======
-        if (communication.getLongCounter(CommunicationTool.TRANSFORMER_FAILED_RECORDS) <= 0) {
-                throw DataXException.asDataXException(
-                        FrameworkErrorCode.RUNTIME_ERROR, "有失败的记录");
-        }
->>>>>>> parent of cbb1672... bugfixed: logical error
     }
 
     /**
