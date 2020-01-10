@@ -199,7 +199,6 @@ def buildStartCommand(options, args):
     commandMap["jvm"] = tempJVMCommand
     commandMap["params"] = jobParams
     commandMap["job"] = jobResource
-    print(commandMap['jvm'])
     return Template(ENGINE_COMMAND).substitute(**commandMap)
 
 
