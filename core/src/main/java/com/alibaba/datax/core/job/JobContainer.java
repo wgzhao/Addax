@@ -123,9 +123,10 @@ public class JobContainer extends AbstractContainer {
 
                 LOG.debug("jobContainer starts to do postHandle ...");
                 this.postHandle();
-                LOG.info("DataX jobId [{}] completed successfully.", this.jobId);
 
-                this.invokeHooks();
+                LOG.info("DataX jobId [{}] completed successfully.", this.jobId);
+                // disable hook function
+                //this.invokeHooks();
             }
         } catch (Throwable e) {
             LOG.error("Exception when job run", e);
@@ -650,8 +651,6 @@ public class JobContainer extends AbstractContainer {
                     communication.getLongCounter(CommunicationTool.TRANSFORMER_FILTER_RECORDS)
             ));
         }
-
-
     }
 
     /**

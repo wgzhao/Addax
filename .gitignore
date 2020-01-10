@@ -157,3 +157,4 @@ local.properties
 .worksheet
 .project
 .classpath
+.vscode
