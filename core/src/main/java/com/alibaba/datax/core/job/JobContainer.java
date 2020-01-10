@@ -288,6 +288,16 @@ public class JobContainer extends AbstractContainer {
      * 检查是否有失败的写入记录，如果有，抛出异常，而不用管容忍性
      */
     private void checkRecord() {
+            
+        if (super.getContainerCommunicator() == null) {
+                // 由于 containerCollector 是在 scheduler() 中初始化的，所以当在 scheduler() 之前出现异常时，需要在此处对 containerCollector 进行初始化
+
+                AbstractContainerCommunicator tempContainerCollector;
+                // standalone
+                tempContainerCollector = new StandAloneJobContainerCommunicator(configuration);
+
+                super.setContainerCommunicator(tempContainerCollector);
+        }
         Communication communication = super.getContainerCommunicator().collect();
         if (communication.getLongCounter(CommunicationTool.TRANSFORMER_FAILED_RECORDS) > 0) {
                 throw DataXException.asDataXException(
@@ -662,6 +672,13 @@ public class JobContainer extends AbstractContainer {
                     communication.getLongCounter(CommunicationTool.TRANSFORMER_FILTER_RECORDS)
             ));
         }
+<<<<<<< HEAD
+=======
+        if (communication.getLongCounter(CommunicationTool.TRANSFORMER_FAILED_RECORDS) <= 0) {
+                throw DataXException.asDataXException(
+                        FrameworkErrorCode.RUNTIME_ERROR, "有失败的记录");
+        }
+>>>>>>> parent of cbb1672... bugfixed: logical error
     }
 
     /**

@@ -57,6 +57,7 @@ deploy_stage:
     - toad
   environment: 
     name: stage
+    url: http://gitlab.ds.cfzq.com
   
 deploy_prod:
   stage: deploy
@@ -67,4 +68,5 @@ deploy_prod:
     - toad
   environment: 
     name: prod
+    url: http://gitlab.ds.cfzq.com
   when: manual
