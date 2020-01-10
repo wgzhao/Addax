@@ -653,7 +653,7 @@ public class JobContainer extends AbstractContainer {
                     communication.getLongCounter(CommunicationTool.TRANSFORMER_FILTER_RECORDS)
             ));
         }
-        if (communication.getLongCounter(CommunicationTool.TRANSFORMER_FAILED_RECORDS) <= 0) {
+        if (communication.getLongCounter(CommunicationTool.TRANSFORMER_FAILED_RECORDS) > 0) {
                 throw DataXException.asDataXException(
                         FrameworkErrorCode.RUNTIME_ERROR, "有失败的记录");
         }
