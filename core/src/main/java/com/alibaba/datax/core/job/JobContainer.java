@@ -123,12 +123,11 @@ public class JobContainer extends AbstractContainer {
 
                 LOG.debug("jobContainer starts to do postHandle ...");
                 this.postHandle();
+                LOG.info("jobContainer starts to do record check...");
+                this.checkRecord();
                 LOG.info("DataX jobId [{}] completed successfully.", this.jobId);
                 // disable hook function
                 //this.invokeHooks();
-                //add statistics
-                LOG.info("jobContainer starts to do statistic ...");
-                this.logStatistics();
             }
         } catch (Throwable e) {
             LOG.error("Exception when job run", e);
@@ -285,6 +284,16 @@ public class JobContainer extends AbstractContainer {
         classLoaderSwapper.restoreCurrentThreadClassLoader();
     }
 
+    /**
+     * 检查是否有失败的写入记录，如果有，抛出异常，而不用管容忍性
+     */
+    private void checkRecord() {
+        Communication communication = super.getContainerCommunicator().collect();
+        if (communication.getLongCounter(CommunicationTool.TRANSFORMER_FAILED_RECORDS) > 0) {
+                throw DataXException.asDataXException(
+                        FrameworkErrorCode.RUNTIME_ERROR, "有失败的记录");
+        }
+    }
     /**
      * reader和writer的初始化
      */
@@ -652,10 +661,6 @@ public class JobContainer extends AbstractContainer {
                     "Transformer过滤记录总数",
                     communication.getLongCounter(CommunicationTool.TRANSFORMER_FILTER_RECORDS)
             ));
-        }
-        if (communication.getLongCounter(CommunicationTool.TRANSFORMER_FAILED_RECORDS) > 0) {
-                throw DataXException.asDataXException(
-                        FrameworkErrorCode.RUNTIME_ERROR, "有失败的记录");
         }
     }
 
