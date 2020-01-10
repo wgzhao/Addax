@@ -56,7 +56,7 @@ deploy_stage:
     - master
     - toad
   environment: 
-    - name: stage
+    name: stage
   
 deploy_prod:
   stage: deploy
@@ -66,5 +66,5 @@ deploy_prod:
     - master
     - toad
   environment: 
-    - name: prod
+    name: prod
   when: manual
