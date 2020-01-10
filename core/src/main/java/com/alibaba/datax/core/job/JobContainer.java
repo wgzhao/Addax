@@ -124,8 +124,11 @@ public class JobContainer extends AbstractContainer {
                 LOG.debug("jobContainer starts to do postHandle ...");
                 this.postHandle();
                 LOG.info("DataX jobId [{}] completed successfully.", this.jobId);
-
-                this.invokeHooks();
+                // disable hook function
+                //this.invokeHooks();
+                //add statistics
+                LOG.info("jobContainer starts to do statistic ...");
+                this.logStatistics();
             }
         } catch (Throwable e) {
             LOG.error("Exception when job run", e);
@@ -581,7 +584,7 @@ public class JobContainer extends AbstractContainer {
         }
 
         if (super.getContainerCommunicator() == null) {
-            return;
+            return ;
         }
 
         Communication communication = super.getContainerCommunicator().collect();
@@ -650,8 +653,10 @@ public class JobContainer extends AbstractContainer {
                     communication.getLongCounter(CommunicationTool.TRANSFORMER_FILTER_RECORDS)
             ));
         }
-
-
+        if (communication.getLongCounter(CommunicationTool.TRANSFORMER_FAILED_RECORDS) <= 0) {
+                throw DataXException.asDataXException(
+                        FrameworkErrorCode.RUNTIME_ERROR, "有失败的记录");
+        }
     }
 
     /**
