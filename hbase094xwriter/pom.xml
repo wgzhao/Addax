@@ -5,13 +5,13 @@
     <parent>
         <artifactId>datax-all</artifactId>
         <groupId>com.alibaba.datax</groupId>
-        <version>0.0.1-SNAPSHOT</version>
+        <version>3.0.2</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
     <artifactId>hbase094xwriter</artifactId>
     <name>hbase094xwriter</name>
-    <version>0.0.1-SNAPSHOT</version>
+    <version>3.0.2</version>
 
     <properties>
         <commons-codec.version>1.8</commons-codec.version>
@@ -57,7 +57,7 @@
         <dependency>
             <groupId>org.apache.zookeeper</groupId>
             <artifactId>zookeeper</artifactId>
-            <version>3.3.2</version>
+            <version>[3.4.14,)</version>
         </dependency>
         <dependency>
             <groupId>commons-codec</groupId>
