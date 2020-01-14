@@ -12,6 +12,11 @@ function to_deploy
   return $?
 }
 
+if [ ! -d target/${fname} ];then
+  echo "target ${fname} not exists, check your build output"
+  exit 65
+fi
+
 if [ "$CI_ENVIRONMENT_NAME" = "stage" ];then
   echo "Deploying to stage environment......"
   to_deploy
