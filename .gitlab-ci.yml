@@ -53,8 +53,9 @@ deploy_stage:
   environment: 
     name: staging
     url: http://gitlab.ds.cfzq.com
-  dependencies:
-    - test
+  only:
+    changes:
+      - "^src/*.{java,xml}"
   when: on_success
   
 deploy_prod:
@@ -66,6 +67,7 @@ deploy_prod:
   environment: 
     name: production
     url: http://gitlab.ds.cfzq.com
-  dependencies:
-    - test
+  only:
+    changes:
+      - "^src/*.{java,xml}"
   when: manual
