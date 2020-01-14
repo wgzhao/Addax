@@ -41,6 +41,7 @@ test:
   only:
     changes:
       - "^src/*.{java,xml}"
+  when: on_success
 
 deploy_stage:
   stage: deploy
@@ -51,6 +52,7 @@ deploy_stage:
   environment: 
     name: staging
     url: http://gitlab.ds.cfzq.com
+  when: on_success
   
 deploy_prod:
   stage: deploy
@@ -62,3 +64,4 @@ deploy_prod:
     name: production
     url: http://gitlab.ds.cfzq.com
   when: manual
+
