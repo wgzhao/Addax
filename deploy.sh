@@ -12,16 +12,16 @@ function to_deploy
   return $?
 }
 
-if [ ! -d target/${fname} ];then
-  echo "target ${fname} not exists, check your build output"
+if [ ! -f target/${fname} ];then
+  echo "target file  'target/${fname}' not exists, check your build output"
   exit 65
 fi
 
-if [ "$CI_ENVIRONMENT_NAME" = "stage" ];then
-  echo "Deploying to stage environment......"
+if [ "$CI_ENVIRONMENT_NAME" = "staging" ];then
+  echo "Deploying to staging environment......"
   to_deploy
   exit $?
-elif [ "$CI_ENVIRONMENT_NAME" = "prod" ];then
+elif [ "$CI_ENVIRONMENT_NAME" = "production" ];then
   echo "Deploying to production environment......"
   IP=10.60.242.211
   to_deploy
