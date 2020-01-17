@@ -556,6 +556,9 @@ public  class HdfsHelper {
                 case BOOLEAN:
                     objectInspector = ObjectInspectorFactory.getReflectionObjectInspector(Boolean.class, ObjectInspectorFactory.ObjectInspectorOptions.JAVA);
                     break;
+                case BINARY:
+                    objectInspector = ObjectInspectorFactory.getReflectionObjectInspector(java.sql.Blob.class, ObjectInspectorFactory.ObjectInspectorOptions.JAVA);
+                    break;
                 default:
                     throw DataXException
                             .asDataXException(
@@ -623,6 +626,9 @@ public  class HdfsHelper {
                     break;
                 case BOOLEAN:
                     objectInspector = ObjectInspectorFactory.getReflectionObjectInspector(Boolean.class, ObjectInspectorFactory.ObjectInspectorOptions.JAVA);
+                    break;
+                case BINARY:
+                    objectInspector = ObjectInspectorFactory.getReflectionObjectInspector(java.sql.Blob.class, ObjectInspectorFactory.ObjectInspectorOptions.JAVA);
                     break;
                 default:
                     throw DataXException
@@ -716,6 +722,9 @@ public  class HdfsHelper {
                             case TIMESTAMP:
                                 recordList.add(new java.sql.Timestamp(column.asDate().getTime()));
                                 break;
+                            case BINARY:
+                                recordList.add(column.asBytes());
+                                break;
                             default:
                                 throw DataXException
                                         .asDataXException(
@@ -787,6 +796,8 @@ public  class HdfsHelper {
                             case BOOLEAN:
                                 builder.set(colname, column.asBoolean());
                                 break;
+                            case BINARY:
+                                builder.set(colname, column.asBytes());
                             default:
                                 throw DataXException
                                         .asDataXException(
