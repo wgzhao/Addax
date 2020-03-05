@@ -25,12 +25,12 @@
                 </exclusion>
             </exclusions>
         </dependency>
-        
+
         <dependency>
             <groupId>org.slf4j</groupId>
             <artifactId>slf4j-api</artifactId>
         </dependency>
-        
+
         <dependency>
             <groupId>ch.qos.logback</groupId>
             <artifactId>logback-classic</artifactId>
@@ -41,13 +41,13 @@
             <artifactId>plugin-rdbms-util</artifactId>
             <version>${datax-project-version}</version>
         </dependency>
-        
+
         <dependency>
   			<groupId>org.postgresql</groupId>
   			<artifactId>postgresql</artifactId>
   			<version>9.3-1102-jdbc4</version>
 		</dependency>
-		
+
     </dependencies>
 
     <build>
@@ -56,13 +56,8 @@
             <plugin>
                 <artifactId>maven-compiler-plugin</artifactId>
                 <configuration>
-<<<<<<< HEAD
-                    <source>1.8</source>
-                    <target>1.8</target>
-=======
                     <source>${jdk-version}</source>
                     <target>${jdk-version}</target>
->>>>>>> master
                     <encoding>${project-sourceEncoding}</encoding>
                 </configuration>
             </plugin>
