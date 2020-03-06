@@ -69,7 +69,7 @@
         <dependency>
             <groupId>org.apache.hive</groupId>
             <artifactId>hive-service</artifactId>
-            <version>[${hive.version},)</version>
+            <version>${hive.version}</version>
             <exclusions>
                 <exclusion>
                     <artifactId>jdk.tools</artifactId>
