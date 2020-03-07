@@ -35,7 +35,7 @@ public class SqlServerReader extends Reader {
 					com.alibaba.datax.plugin.rdbms.reader.Constant.FETCH_SIZE,
 					fetchSize);
 
-			this.commonRdbmsReaderJob = new CommonRdbmsReader.Job(
+			this.commonRdbmsReaderJob = new SqlServerRdbmsReader.Job(
 					DATABASE_TYPE);
 			this.commonRdbmsReaderJob.init(this.originalConfig);
 		}
@@ -66,7 +66,7 @@ public class SqlServerReader extends Reader {
 		@Override
 		public void init() {
 			this.readerSliceConfig = super.getPluginJobConf();
-			this.commonRdbmsReaderTask = new CommonRdbmsReader.Task(
+			this.commonRdbmsReaderTask = new SqlServerRdbmsReader.Task(
 					DATABASE_TYPE ,super.getTaskGroupId(), super.getTaskId());
 			this.commonRdbmsReaderTask.init(this.readerSliceConfig);
 		}
