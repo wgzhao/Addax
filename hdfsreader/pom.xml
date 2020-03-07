@@ -11,8 +11,8 @@
     <groupId>com.alibaba.datax</groupId>
     <packaging>jar</packaging>
     <properties>
-        <hive.version>2.3.4</hive.version>
-        <hadoop.version>2.7.3</hadoop.version>
+        <hive.version>3.1.0</hive.version>
+        <hadoop.version>3.1.1</hadoop.version>
     </properties>
     <dependencies>
         <dependency>
@@ -59,7 +59,7 @@
         <dependency>
             <groupId>org.apache.hive</groupId>
             <artifactId>hive-exec</artifactId>
-            <version>[${hive.version},)</version>
+            <version>${hive.version}</version>
         </dependency>
         <dependency>
             <groupId>org.apache.hive</groupId>
@@ -69,7 +69,7 @@
         <dependency>
             <groupId>org.apache.hive</groupId>
             <artifactId>hive-service</artifactId>
-            <version>[${hive.version},)</version>
+            <version>${hive.version}</version>
             <exclusions>
                 <exclusion>
                     <artifactId>jdk.tools</artifactId>
