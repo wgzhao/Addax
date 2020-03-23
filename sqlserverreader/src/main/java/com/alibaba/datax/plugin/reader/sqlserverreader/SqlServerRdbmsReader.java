@@ -16,6 +16,7 @@ import sun.misc.BASE64Encoder;
 import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
 import java.sql.Types;
+
 /**
  * @creaor:yyi
  * @createDate:2020/3/3
@@ -36,12 +37,14 @@ public class SqlServerRdbmsReader extends CommonRdbmsReader {
 
         private static final Logger LOG = LoggerFactory.getLogger(Task.class);
         private static final boolean IS_DEBUG = LOG.isDebugEnabled();
-        private  BASE64Encoder encoder = new BASE64Encoder();
+        private BASE64Encoder encoder = new BASE64Encoder();
+
         public Task(DataBaseType dataBaseType) {
             super(dataBaseType);
         }
-        public Task(DataBaseType dataBaseType,int taskGropuId, int taskId) {
-           super(dataBaseType,taskGropuId,taskId);
+
+        public Task(DataBaseType dataBaseType, int taskGropuId, int taskId) {
+            super(dataBaseType, taskGropuId, taskId);
         }
 
         @Override
@@ -60,9 +63,9 @@ public class SqlServerRdbmsReader extends CommonRdbmsReader {
                         case Types.NVARCHAR:
                         case Types.LONGNVARCHAR:
                             String rawData;
-                            if(StringUtils.isBlank(mandatoryEncoding)){
+                            if (StringUtils.isBlank(mandatoryEncoding)) {
                                 rawData = rs.getString(i);
-                            }else{
+                            } else {
                                 rawData = new String((rs.getBytes(i) == null ? EMPTY_CHAR_ARRAY :
                                         rs.getBytes(i)), mandatoryEncoding);
                             }
@@ -113,7 +116,11 @@ public class SqlServerRdbmsReader extends CommonRdbmsReader {
                         case Types.VARBINARY:
                         case Types.BLOB:
                         case Types.LONGVARBINARY:
-                            record.addColumn(new StringColumn(encoder.encode(rs.getBytes(i))));
+                            byte[] bytes = rs.getBytes(i);
+                            if (bytes == null)
+                                record.addColumn(new StringColumn(null));
+                            else
+                                record.addColumn(new StringColumn(encoder.encode(bytes)));
                             break;
 
                         // warn: bit(1) -> Types.BIT 可使用BoolColumn
@@ -125,7 +132,7 @@ public class SqlServerRdbmsReader extends CommonRdbmsReader {
 
                         case Types.NULL:
                             String stringData = null;
-                            if(rs.getObject(i) != null) {
+                            if (rs.getObject(i) != null) {
                                 stringData = rs.getObject(i).toString();
                             }
                             record.addColumn(new StringColumn(stringData));
