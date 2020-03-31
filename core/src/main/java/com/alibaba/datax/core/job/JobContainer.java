@@ -28,16 +28,24 @@ import com.alibaba.datax.core.util.container.CoreConstant;
 import com.alibaba.datax.core.util.container.LoadUtil;
 import com.alibaba.datax.dataxservice.face.domain.enums.ExecuteMode;
 import com.alibaba.fastjson.JSON;
+import com.cxzq.util.AsynHttpClient;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.Validate;
+import org.apache.http.HttpResponse;
+import org.apache.http.client.methods.HttpPost;
+import org.apache.http.concurrent.FutureCallback;
+import org.apache.http.entity.ContentType;
+import org.apache.http.impl.nio.client.CloseableHttpAsyncClient;
+import org.apache.http.util.EntityUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.IOException;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.Future;
+
 /**
  * Created by jingxing on 14-8-24.
  * <p/>
@@ -53,6 +61,8 @@ public class JobContainer extends AbstractContainer {
 
     private ClassLoaderSwapper classLoaderSwapper = ClassLoaderSwapper
             .newCurrentThreadClassLoaderSwapper();
+
+    private static final String jobResultSendUrl = "http://10.60.172.153:9090/mock/15/dataxJobResult";
 
     private long jobId;
 
@@ -82,6 +92,8 @@ public class JobContainer extends AbstractContainer {
     private int totalStage = 1;
 
     private ErrorRecordChecker errorLimit;
+
+
 
     public JobContainer(Configuration configuration) {
         super(configuration);
@@ -126,7 +138,7 @@ public class JobContainer extends AbstractContainer {
 
                 LOG.info("DataX jobId [{}] completed successfully.", this.jobId);
                 // disable hook function
-                //this.invokeHooks();
+                this.invokeHooks();
             }
         } catch (Throwable e) {
             LOG.error("Exception when job run", e);
@@ -547,7 +559,7 @@ public class JobContainer extends AbstractContainer {
         /**
          * 检查任务执行情况
          */
-        this.checkLimit();
+         this.checkLimit();
     }
 
 
@@ -979,5 +991,90 @@ public class JobContainer extends AbstractContainer {
         Communication comm = super.getContainerCommunicator().collect();
         HookInvoker invoker = new HookInvoker(CoreConstant.DATAX_HOME + "/hook", configuration, comm.getCounter());
         invoker.invokeAll();
+
+
+        LOG.info("invokeHooks begin");
+
+        long totalCosts = (this.endTimeStamp - this.startTimeStamp) / 1000;
+        long transferCosts = (this.endTransferTimeStamp - this.startTransferTimeStamp) / 1000;
+        if (0L == transferCosts) {
+            transferCosts = 1L;
+        }
+
+        if (super.getContainerCommunicator() == null) {
+            return;
+        }
+
+        Communication communication = super.getContainerCommunicator().collect();
+        communication.setTimestamp(this.endTimeStamp);
+
+        Communication tempComm = new Communication();
+        tempComm.setTimestamp(this.startTransferTimeStamp);
+
+        Communication reportCommunication = CommunicationTool.getReportCommunication(communication, tempComm, this.totalStage);
+
+        // 字节速率
+        long byteSpeedPerSecond = communication.getLongCounter(CommunicationTool.READ_SUCCEED_BYTES)
+                / transferCosts;
+
+        long recordSpeedPerSecond = communication.getLongCounter(CommunicationTool.READ_SUCCEED_RECORDS)
+                / transferCosts;
+
+
+
+        Map<String,Object> resultLog  = new HashMap<String,Object>();
+        resultLog.put("startTimeStamp",startTimeStamp);
+        resultLog.put("endTimeStamp",endTimeStamp);
+        resultLog.put("totalCosts",totalCosts);
+        resultLog.put("byteSpeedPerSecond",byteSpeedPerSecond);
+        resultLog.put("recordSpeedPerSecond",recordSpeedPerSecond);
+        resultLog.put("totalReadRecords",CommunicationTool.getTotalReadRecords(communication));
+        resultLog.put("totalErrorRecords",CommunicationTool.getTotalErrorRecords(communication));
+
+        String jsonStr =JSON.toJSONString(resultLog);
+
+        CloseableHttpAsyncClient httpClient = AsynHttpClient.getHttpClient();
+
+        HttpPost postBody = AsynHttpClient.getPostBody(jobResultSendUrl, jsonStr, ContentType.APPLICATION_JSON);
+
+        //回调
+        FutureCallback<HttpResponse> callback = new FutureCallback<HttpResponse>() {
+
+            public void completed(HttpResponse result) {
+                LOG.info("send jobResult completed");
+                LOG.info("result:"+result.getStatusLine());
+                String content = null;
+                try {
+                    content = EntityUtils.toString(result.getEntity(), "UTF-8");
+                    LOG.info(" response content is : " + content);
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+
+            public void failed(Exception e) {
+                e.printStackTrace();
+                LOG.info("send jobResult failed");
+            }
+
+            public void cancelled() {
+                LOG.info("send jobResult cancelled");
+            }
+        };
+        //连接池执行
+        Future<HttpResponse> responseFuture =  httpClient.execute(postBody,callback);
+
+        try {
+            HttpResponse httpResponse =responseFuture.get();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        } catch (ExecutionException e) {
+            e.printStackTrace();
+        }
+        LOG.info("invokeHooks end");
+
+
     }
+
+
 }
