@@ -62,7 +62,6 @@ public class JobContainer extends AbstractContainer {
     private ClassLoaderSwapper classLoaderSwapper = ClassLoaderSwapper
             .newCurrentThreadClassLoaderSwapper();
 
-    private static final String jobResultSendUrl = "http://10.60.172.153:9090/mock/15/dataxJobResult";
 
     private long jobId;
 
@@ -1023,19 +1022,24 @@ public class JobContainer extends AbstractContainer {
 
 
         Map<String,Object> resultLog  = new HashMap<String,Object>();
-        resultLog.put("startTimeStamp",startTimeStamp);
-        resultLog.put("endTimeStamp",endTimeStamp);
-        resultLog.put("totalCosts",totalCosts);
-        resultLog.put("byteSpeedPerSecond",byteSpeedPerSecond);
-        resultLog.put("recordSpeedPerSecond",recordSpeedPerSecond);
-        resultLog.put("totalReadRecords",CommunicationTool.getTotalReadRecords(communication));
-        resultLog.put("totalErrorRecords",CommunicationTool.getTotalErrorRecords(communication));
+
+        resultLog.put("startTimeStamp",dateFormat.format(startTimeStamp));
+        resultLog.put("endTimeStamp",dateFormat.format(endTimeStamp));
+        resultLog.put("totalCosts",String.valueOf(totalCosts));
+        resultLog.put("byteSpeedPerSecond",StrUtil.stringify(byteSpeedPerSecond) + "/s");
+        resultLog.put("recordSpeedPerSecond",String.valueOf(recordSpeedPerSecond)+ "rec/s");
+        resultLog.put("totalReadRecords",String.valueOf(CommunicationTool.getTotalReadRecords(communication)));
+        resultLog.put("totalErrorRecords",String.valueOf(CommunicationTool.getTotalErrorRecords(communication)));
 
         String jsonStr =JSON.toJSONString(resultLog);
 
         CloseableHttpAsyncClient httpClient = AsynHttpClient.getHttpClient();
 
-        HttpPost postBody = AsynHttpClient.getPostBody(jobResultSendUrl, jsonStr, ContentType.APPLICATION_JSON);
+        //http://10.60.172.153:9090/mock/15/dataxJobResult
+
+        String jobResultReportUrl = userConf.getString(CoreConstant.DATAX_CORE_DATAXSERVER_ADDRESS);
+        LOG.info("jobResultReportUrl:"+jobResultReportUrl);
+        HttpPost postBody = AsynHttpClient.getPostBody(jobResultReportUrl, jsonStr, ContentType.APPLICATION_JSON);
 
         //回调
         FutureCallback<HttpResponse> callback = new FutureCallback<HttpResponse>() {
