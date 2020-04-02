@@ -994,6 +994,13 @@ public class JobContainer extends AbstractContainer {
 
         LOG.info("invokeHooks begin");
 
+        String jobResultReportUrl = userConf.getString(CoreConstant.DATAX_CORE_DATAXSERVER_ADDRESS);
+
+        if(StringUtils.isBlank(jobResultReportUrl)){
+            LOG.info("结果上报URL未配置");
+            return;
+        }
+
         long totalCosts = (this.endTimeStamp - this.startTimeStamp) / 1000;
         long transferCosts = (this.endTransferTimeStamp - this.startTransferTimeStamp) / 1000;
         if (0L == transferCosts) {
@@ -1035,9 +1042,6 @@ public class JobContainer extends AbstractContainer {
 
         CloseableHttpAsyncClient httpClient = AsynHttpClient.getHttpClient();
 
-        //http://10.60.172.153:9090/mock/15/dataxJobResult
-
-        String jobResultReportUrl = userConf.getString(CoreConstant.DATAX_CORE_DATAXSERVER_ADDRESS);
         LOG.info("jobResultReportUrl:"+jobResultReportUrl);
         HttpPost postBody = AsynHttpClient.getPostBody(jobResultReportUrl, jsonStr, ContentType.APPLICATION_JSON);
 
