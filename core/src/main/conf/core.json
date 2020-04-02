@@ -16,10 +16,7 @@
     },
     "core": {
         "dataXServer": {
-            "address": "http://localhost:7001/api",
-            "timeout": 10000,
-            "reportDataxLog": false,
-            "reportPerfLog": false
+            "address": ""
         },
         "transport": {
             "channel": {
