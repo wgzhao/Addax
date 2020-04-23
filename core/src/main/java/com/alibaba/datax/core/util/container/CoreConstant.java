@@ -105,6 +105,8 @@ public class CoreConstant {
     public static final String DATAX_JOB_POSTHANDLER_PLUGINTYPE = "job.postHandler.pluginType";
 
     public static final String DATAX_JOB_POSTHANDLER_PLUGINNAME = "job.postHandler.pluginName";
+
+	public static final String DATAX_JOB_CONTENT_WRITER_PATH = "job.content[0].writer.parameter.path";
     // ----------------------------- 局部使用的变量
     public static final String JOB_WRITER = "reader";
 

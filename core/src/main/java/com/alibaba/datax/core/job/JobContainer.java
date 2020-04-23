@@ -1001,6 +1001,27 @@ public class JobContainer extends AbstractContainer {
             return;
         }
 
+        String jobContentWriterPath = userConf.getString(CoreConstant.DATAX_JOB_CONTENT_WRITER_PATH);
+        StringBuffer jobName = new StringBuffer("");
+
+        LOG.info("jobContentWriterPath:"+jobContentWriterPath);
+        if(StringUtils.isNotBlank(jobContentWriterPath)){
+
+            String[] pathArr = jobContentWriterPath.split("/");
+
+            if(pathArr.length>=4){
+                jobName.append(pathArr[2]).append(".").append(pathArr[3]);
+            }
+
+            LOG.info("任务名称:"+jobName);
+        }else{
+            jobName.append("jobName");
+            LOG.info("jobContentWriterPath属性未配置,任务名称设置默认值为jobName");
+        }
+
+
+
+
         long totalCosts = (this.endTimeStamp - this.startTimeStamp) / 1000;
         long transferCosts = (this.endTransferTimeStamp - this.startTransferTimeStamp) / 1000;
         if (0L == transferCosts) {
@@ -1037,6 +1058,8 @@ public class JobContainer extends AbstractContainer {
         resultLog.put("recordSpeedPerSecond",String.valueOf(recordSpeedPerSecond)+ "rec/s");
         resultLog.put("totalReadRecords",String.valueOf(CommunicationTool.getTotalReadRecords(communication)));
         resultLog.put("totalErrorRecords",String.valueOf(CommunicationTool.getTotalErrorRecords(communication)));
+        resultLog.put("jobName",jobName);
+
 
         String jsonStr =JSON.toJSONString(resultLog);
 
