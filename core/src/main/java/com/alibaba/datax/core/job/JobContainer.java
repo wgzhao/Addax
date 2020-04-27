@@ -1019,45 +1019,32 @@ public class JobContainer extends AbstractContainer {
             LOG.info("jobContentWriterPath属性未配置,任务名称设置默认值为jobName");
         }
 
-
-
-
+        if (0L == this.endTimeStamp) {
+              this.endTimeStamp =   System.currentTimeMillis();
+        }
         long totalCosts = (this.endTimeStamp - this.startTimeStamp) / 1000;
         long transferCosts = (this.endTransferTimeStamp - this.startTransferTimeStamp) / 1000;
-        if (0L == transferCosts) {
-            transferCosts = 1L;
-        }
-
-        if (super.getContainerCommunicator() == null) {
-            return;
-        }
 
         Communication communication = super.getContainerCommunicator().collect();
-        communication.setTimestamp(this.endTimeStamp);
-
-        Communication tempComm = new Communication();
-        tempComm.setTimestamp(this.startTransferTimeStamp);
-
-        Communication reportCommunication = CommunicationTool.getReportCommunication(communication, tempComm, this.totalStage);
 
         // 字节速率
         long byteSpeedPerSecond = communication.getLongCounter(CommunicationTool.READ_SUCCEED_BYTES)
-                / transferCosts;
+               / transferCosts;
 
         long recordSpeedPerSecond = communication.getLongCounter(CommunicationTool.READ_SUCCEED_RECORDS)
-                / transferCosts;
+               / transferCosts;
 
 
 
         Map<String,Object> resultLog  = new HashMap<String,Object>();
 
-        resultLog.put("startTimeStamp",dateFormat.format(startTimeStamp));
-        resultLog.put("endTimeStamp",dateFormat.format(endTimeStamp));
-        resultLog.put("totalCosts",String.valueOf(totalCosts));
-        resultLog.put("byteSpeedPerSecond",StrUtil.stringify(byteSpeedPerSecond) + "/s");
-        resultLog.put("recordSpeedPerSecond",String.valueOf(recordSpeedPerSecond)+ "rec/s");
-        resultLog.put("totalReadRecords",String.valueOf(CommunicationTool.getTotalReadRecords(communication)));
-        resultLog.put("totalErrorRecords",String.valueOf(CommunicationTool.getTotalErrorRecords(communication)));
+        resultLog.put("startTimeStamp",startTimeStamp / 1000);
+        resultLog.put("endTimeStamp",endTimeStamp / 1000);
+        resultLog.put("totalCosts",totalCosts);
+        resultLog.put("byteSpeedPerSecond",byteSpeedPerSecond);
+        resultLog.put("recordSpeedPerSecond",recordSpeedPerSecond);
+        resultLog.put("totalReadRecords",CommunicationTool.getTotalReadRecords(communication));
+        resultLog.put("totalErrorRecords",CommunicationTool.getTotalErrorRecords(communication));
         resultLog.put("jobName",jobName);
 
 
