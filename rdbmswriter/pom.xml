@@ -29,22 +29,16 @@
 			<groupId>com.dm</groupId>
 			<artifactId>dm</artifactId>
 			<version>16</version>
-			<scope>system</scope>
-			<systemPath>${basedir}/src/main/libs/Dm7JdbcDriver16.jar</systemPath>
 		</dependency>
 		<dependency>
             <groupId>com.sybase</groupId>
             <artifactId>jconn3</artifactId>
-            <version>1.0.0-SNAPSHOT</version>
-            <scope>system</scope>
-            <systemPath>${basedir}/src/main/libs/jconn3-1.0.0-SNAPSHOT.jar</systemPath>
+            <version>1.0.0</version>
         </dependency>
         <dependency>
             <groupId>ppas</groupId>
             <artifactId>ppas</artifactId>
             <version>16</version>
-            <scope>system</scope>
-            <systemPath>${basedir}/src/main/libs/edb-jdbc16.jar</systemPath>
         </dependency>
 
 		<dependency>
