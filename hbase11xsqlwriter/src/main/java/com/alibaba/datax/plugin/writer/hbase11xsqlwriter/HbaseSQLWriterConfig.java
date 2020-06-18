@@ -37,6 +37,11 @@ public class HbaseSQLWriterConfig {
     private String username;
     private String password;
 
+    // kerberos 配置
+    private boolean haveKerberos;
+    private String kerberosKeytabFilePath;
+    private String kerberosPrincipal;
+
     /**
      * @return 获取原始的datax配置
      */
@@ -103,6 +108,17 @@ public class HbaseSQLWriterConfig {
         return username;
     }
 
+    public boolean haveKerberos() {
+        return haveKerberos;
+    }
+    
+    public String getKerberosKeytabFilePath() {
+        return kerberosKeytabFilePath;
+    }
+
+    public String getKerberosPrincipal() {
+        return kerberosPrincipal;
+    }
     /**
      * @param dataxCfg
      * @return
@@ -123,6 +139,11 @@ public class HbaseSQLWriterConfig {
         cfg.batchSize = dataxCfg.getInt(Key.BATCH_SIZE, Constant.DEFAULT_BATCH_ROW_COUNT);
         cfg.truncate = dataxCfg.getBool(Key.TRUNCATE, Constant.DEFAULT_TRUNCATE);
         cfg.isThinClient = dataxCfg.getBool(Key.THIN_CLIENT, Constant.DEFAULT_USE_THIN_CLIENT);
+
+        // 4. 解析kerberos 配置
+        cfg.haveKerberos = dataxCfg.getBool(Key.HAVE_KERBEROS, Constant.DEFAULT_HAVE_KERBEROS);
+        cfg.kerberosPrincipal = dataxCfg.getString(Key.KERBEROS_PRINCIPAL, Constant.DEFAULT_KERBEROS_PRINCIPAL);
+        cfg.kerberosKeytabFilePath = dataxCfg.getString(Key.KERBEROS_KEYTAB_FILE_PATH, Constant.DEFAULT_KERBEROS_KEYTAB_FILE_PATH);
 
         // 4. 打印解析出来的配置
         LOG.info("HBase SQL writer config parsed:" + cfg.toString());
