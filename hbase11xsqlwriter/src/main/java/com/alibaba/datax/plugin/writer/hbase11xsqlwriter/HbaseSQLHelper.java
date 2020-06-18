@@ -42,8 +42,8 @@ public class HbaseSQLHelper {
     private static String kerberosKeytabFilePath;
     private static String kerberosPrincipal;
 
-    public static org.apache.hadoop.conf.Configuration hadoopConf = null;
-    public static final String HADOOP_SECURITY_AUTHENTICATION_KEY = "hadoop.security.authentication";
+    public static org.apache.hadoop.conf.Configuration hadoopConf = new org.apache.hadoop.conf.Configuration();
+    //public static final String HADOOP_SECURITY_AUTHENTICATION_KEY = "hadoop.security.authentication";
     /**
      * 将datax的配置解析成sql writer的配置
      */
@@ -117,11 +117,11 @@ public class HbaseSQLHelper {
         LOG.debug("Connecting to HBase cluster [" + connStr + "] ...");
         Connection conn;
         //是否有Kerberos认证
-        haveKerberos = taskConfig.getBool(Key.HAVE_KERBEROS, false);
+        haveKerberos = cfg.haveKerberos();
         if (haveKerberos) {
-            kerberosKeytabFilePath = cfg.get(Key.KERBEROS_KEYTAB_FILE_PATH);
-            kerberosPrincipal = taskConfig.getString(Key.KERBEROS_PRINCIPAL);
-            hadoopConf.set(HADOOP_SECURITY_AUTHENTICATION_KEY, "kerberos");
+            kerberosKeytabFilePath = cfg.getKerberosKeytabFilePath();
+            kerberosPrincipal = cfg.getKerberosPrincipal();
+            hadoopConf.set("hadoop.security.authentication", "Kerberos");
         }
         kerberosAuthentication(kerberosPrincipal, kerberosKeytabFilePath);
         try {

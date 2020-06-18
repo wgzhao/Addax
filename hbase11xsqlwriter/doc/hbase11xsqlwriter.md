@@ -10,7 +10,6 @@ HBase11xsqlwriter实现了向hbase中的SQL表(phoenix)批量导入数据的功�
 
 * 支持带索引的表的数据导入，可以同步更新所有的索引表
 
-
 ### 1.2 限制
 
 * 仅支持1.x系列的hbase
@@ -69,7 +68,10 @@ HBase11xsqlwriter实现了向hbase中的SQL表(phoenix)批量导入数据的功�
               "EVENTID",
               "CONTENT"
             ],
-            "hbaseConfig": {
+          "haveKerberos": "true",
+          "kerberosPrincipal": "hive@CFZQ.COM",
+          "kerberosKeytabFilePath": "/tmp/hive.headless.keytab",
+          "hbaseConfig": {
               "hbase.zookeeper.quorum": "目标hbase集群的ZK服务器地址，向PE咨询",
               "zookeeper.znode.parent": "目标hbase集群的znode，向PE咨询"
             },
@@ -88,23 +90,19 @@ HBase11xsqlwriter实现了向hbase中的SQL表(phoenix)批量导入数据的功�
 }
 ```
 
-
 ### 3.2 参数说明
 
 * **name**
-
    * 描述：插件名字，必须是`hbase11xsqlwriter`
    * 必选：是
    * 默认值：无
 
 * **table**
-
    * 描述：要导入的表名，大小写敏感，通常phoenix表都是**大写**表名
    * 必选：是
    * 默认值：无
 
 * **column**
-
    * 描述：列名，大小写敏感，通常phoenix的列名都是**大写**。
        * 需要注意列的顺序，必须与reader输出的列的顺序一一对应。
        * 不需要填写数据类型，会自动从phoenix获取列的元数据
@@ -112,13 +110,11 @@ HBase11xsqlwriter实现了向hbase中的SQL表(phoenix)批量导入数据的功�
    * 默认值：无
 
 * **hbaseConfig**
-
    * 描述：hbase集群地址，zk为必填项，格式：ip1,ip2,ip3，注意，多个IP之间使用英文的逗号分隔。znode是可选的，默认值是/hbase
    * 必选：是
    * 默认值：无
 
 * **batchSize**
-
    * 描述：批量写入的最大行数
    * 必选：否
    * 默认值：256
@@ -130,6 +126,27 @@ HBase11xsqlwriter实现了向hbase中的SQL表(phoenix)批量导入数据的功�
       * empty：插入空值，值类型的空值是0，varchar的空值是空字符串
    * 必选：否
    * 默认值：skip
+
+* **haveKerberos**
+  * 描述： 是否启用Kerberos认证，默认为false
+    * true: 启用
+    * false: 禁用
+  * 必须: 否
+  * 默认值: false
+  
+* **kerberosPrincipal**
+  * 描述： kerberos 凭证信息，当启用kerberos认证后有效
+  * 必须：否
+  * 默认值：null
+
+* **kerberosKeytabFilePath**
+  * 描述：kerberos 凭证文件的绝对路径，当启用kerberos认证时有效
+  * 必须：否
+  * 默认值： null
+
+注意：启用kerberos认证后，程序需要知道`hbase-site.xml` 所在的路径，一种办法是运行执行在环境变量 `CLASSPATH` 中增加该文件的所在路径。
+
+另外一个解决办法是修改 `datax.py` 中的 `CLASS_PATH` 变量，增加 `hbase-site.xml` 的路径
 
 ## 4. 性能报告
 
@@ -145,7 +162,6 @@ writer的列顺序是： x1, x2, x3, x4
 
 则reader输出的列c1就会赋值给writer的列x1。如果writer的列顺序是x1, x2, x4, x3，则c3会赋值给x4，c4会赋值给x3.
 
-
 ## 6. FAQ
 
 1. 并发开多少合适？速度慢时增加并发有用吗？
@@ -153,7 +169,5 @@ writer的列顺序是： x1, x2, x3, x4
 
 2. batchSize设置多少比较合适？
 默认是256，但应根据每行的大小来计算最合适的batchSize。通常一次操作的数据量在2MB-4MB左右，用这个值除以行大小，即可得到batchSize。
-
-
 
 
