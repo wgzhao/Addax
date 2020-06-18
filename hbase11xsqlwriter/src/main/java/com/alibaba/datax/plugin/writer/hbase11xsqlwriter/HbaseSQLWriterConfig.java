@@ -38,7 +38,7 @@ public class HbaseSQLWriterConfig {
     private String password;
 
     // kerberos 配置
-    private String haveKerberos;
+    private boolean haveKerberos;
     private String kerberosKeytabFilePath;
     private String kerberosPrincipal;
 
@@ -141,7 +141,9 @@ public class HbaseSQLWriterConfig {
         cfg.isThinClient = dataxCfg.getBool(Key.THIN_CLIENT, Constant.DEFAULT_USE_THIN_CLIENT);
 
         // 4. 解析kerberos 配置
-        cfg.kerberosPrincipal = dataXCfg.getString(key.HAVE_KERBEROS, Constant.DEFAULT_HAVE_KERBEROS);
+        cfg.haveKerberos = dataxCfg.getBool(Key.HAVE_KERBEROS, Constant.DEFAULT_HAVE_KERBEROS);
+        cfg.kerberosPrincipal = dataxCfg.getString(Key.KERBEROS_PRINCIPAL, Constant.DEFAULT_KERBEROS_PRINCIPAL);
+        cfg.kerberosKeytabFilePath = dataxCfg.getString(Key.KERBEROS_KEYTAB_FILE_PATH, Constant.DEFAULT_KERBEROS_KEYTAB_FILE_PATH);
 
         // 4. 打印解析出来的配置
         LOG.info("HBase SQL writer config parsed:" + cfg.toString());
