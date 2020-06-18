@@ -69,11 +69,11 @@ HBase11xsqlwriter实现了向hbase中的SQL表(phoenix)批量导入数据的功�
               "CONTENT"
             ],
           "haveKerberos": "true",
-          "kerberosPrincipal": "hive@CFZQ.COM",
+          "kerberosPrincipal": "hive@EXAMPLE.COM",
           "kerberosKeytabFilePath": "/tmp/hive.headless.keytab",
           "hbaseConfig": {
-              "hbase.zookeeper.quorum": "目标hbase集群的ZK服务器地址，向PE咨询",
-              "zookeeper.znode.parent": "目标hbase集群的znode，向PE咨询"
+              "hbase.zookeeper.quorum": "目标hbase集群的ZK服务器地址，比如node1,node2,node3，端口目前硬编码为2181",
+              "zookeeper.znode.parent": "目标hbase集群的znode，比如/hbase，安全模式下一般是/hbase-secure"
             },
             "nullMode": "skip",
             "table": "目标hbase表名，大小写有关"
