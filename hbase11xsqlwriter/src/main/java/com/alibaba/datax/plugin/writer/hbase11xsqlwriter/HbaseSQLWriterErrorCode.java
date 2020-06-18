@@ -13,6 +13,7 @@ public enum HbaseSQLWriterErrorCode implements ErrorCode {
     PUT_HBASE_ERROR("Hbasewriter-07", "写入hbase时发生IO异常."),
     DELETE_HBASE_ERROR("Hbasewriter-08", "delete hbase表时发生异常."),
     TRUNCATE_HBASE_ERROR("Hbasewriter-09", "truncate hbase表时发生异常."),
+    KERBEROS_LOGIN_ERROR("HbaseWriter-10", "KERBEROS认证失败");
     ;
 
     private final String code;

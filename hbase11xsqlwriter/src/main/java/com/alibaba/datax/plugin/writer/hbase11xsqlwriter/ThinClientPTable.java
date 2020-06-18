@@ -18,7 +18,7 @@ import org.apache.phoenix.schema.PTableType;
 import org.apache.phoenix.schema.RowKeySchema;
 import org.apache.phoenix.schema.SortOrder;
 import org.apache.phoenix.schema.types.PDataType;
-
+import org.apache.phoenix.transaction.TransactionFactory;
 import java.util.List;
 import java.util.Map;
 
@@ -298,7 +298,7 @@ public class ThinClientPTable implements PTable {
   }
 
   @Override
-  public boolean useStatsForParallelization() {
+  public Boolean useStatsForParallelization() {
     throw new UnsupportedOperationException("Not implement");
   }
 
@@ -307,6 +307,10 @@ public class ThinClientPTable implements PTable {
     throw new UnsupportedOperationException("Not implement");
   }
 
+  @Override 
+  public TransactionFactory.Provider getTransactionProvider() {
+    throw new UnsupportedOperationException("Not implement");
+  }
   public static class ThinClientPColumn implements PColumn {
 
     private String colName;

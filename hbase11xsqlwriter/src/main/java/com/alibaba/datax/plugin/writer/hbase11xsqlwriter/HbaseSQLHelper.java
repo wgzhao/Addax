@@ -4,9 +4,11 @@ import com.alibaba.datax.common.exception.DataXException;
 import com.alibaba.datax.common.util.Configuration;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.TypeReference;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.hadoop.hbase.TableName;
 import org.apache.hadoop.hbase.client.Admin;
 import org.apache.hadoop.hbase.util.Pair;
+import org.apache.hadoop.security.UserGroupInformation;
 import org.apache.phoenix.jdbc.PhoenixConnection;
 import org.apache.phoenix.schema.ColumnNotFoundException;
 import org.apache.phoenix.schema.MetaDataClient;
@@ -35,6 +37,13 @@ public class HbaseSQLHelper {
 
     public static ThinClientPTable ptable;
 
+    // Kerberos
+    private static Boolean haveKerberos = false;
+    private static String kerberosKeytabFilePath;
+    private static String kerberosPrincipal;
+
+    public static org.apache.hadoop.conf.Configuration hadoopConf = new org.apache.hadoop.conf.Configuration();
+    //public static final String HADOOP_SECURITY_AUTHENTICATION_KEY = "hadoop.security.authentication";
     /**
      * 将datax的配置解析成sql writer的配置
      */
@@ -107,6 +116,14 @@ public class HbaseSQLHelper {
         String connStr = cfg.getConnectionString();
         LOG.debug("Connecting to HBase cluster [" + connStr + "] ...");
         Connection conn;
+        //是否有Kerberos认证
+        haveKerberos = cfg.haveKerberos();
+        if (haveKerberos) {
+            kerberosKeytabFilePath = cfg.getKerberosKeytabFilePath();
+            kerberosPrincipal = cfg.getKerberosPrincipal();
+            hadoopConf.set("hadoop.security.authentication", "Kerberos");
+        }
+        kerberosAuthentication(kerberosPrincipal, kerberosKeytabFilePath);
         try {
             Class.forName("org.apache.phoenix.jdbc.PhoenixDriver");
             if (cfg.isThinClient()) {
@@ -121,6 +138,20 @@ public class HbaseSQLHelper {
         }
         LOG.debug("Connected to HBase cluster successfully.");
         return conn;
+    }
+
+    private static void kerberosAuthentication(String kerberosPrincipal, String kerberosKeytabFilePath) {
+        if (haveKerberos && StringUtils.isNotBlank(kerberosPrincipal) && StringUtils.isNotBlank(kerberosKeytabFilePath)) {
+            UserGroupInformation.setConfiguration(hadoopConf);
+            try {
+                UserGroupInformation.loginUserFromKeytab(kerberosPrincipal, kerberosKeytabFilePath);
+            } catch (Exception e) {
+                String message = String.format("kerberos认证失败,请确定kerberosKeytabFilePath[%s]和kerberosPrincipal[%s]填写正确",
+                        kerberosKeytabFilePath, kerberosPrincipal);
+                LOG.error(message);
+                throw DataXException.asDataXException(HbaseSQLWriterErrorCode.KERBEROS_LOGIN_ERROR, e);
+            }
+        }
     }
 
     /**
