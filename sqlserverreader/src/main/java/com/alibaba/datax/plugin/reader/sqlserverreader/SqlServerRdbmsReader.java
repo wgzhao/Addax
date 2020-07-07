@@ -11,7 +11,7 @@ import com.alibaba.datax.plugin.rdbms.util.DataBaseType;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import sun.misc.BASE64Encoder;
+import java.util.Base64;
 
 import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
@@ -37,7 +37,7 @@ public class SqlServerRdbmsReader extends CommonRdbmsReader {
 
         private static final Logger LOG = LoggerFactory.getLogger(Task.class);
         private static final boolean IS_DEBUG = LOG.isDebugEnabled();
-        private BASE64Encoder encoder = new BASE64Encoder();
+        //private BASE64Encoder encoder = new BASE64Encoder();
 
         public Task(DataBaseType dataBaseType) {
             super(dataBaseType);
@@ -120,7 +120,7 @@ public class SqlServerRdbmsReader extends CommonRdbmsReader {
                             if (bytes == null)
                                 record.addColumn(new StringColumn(null));
                             else
-                                record.addColumn(new StringColumn(encoder.encode(bytes)));
+                                record.addColumn(new StringColumn(Base64.getEncoder().encodeToString(bytes)));
                             break;
 
                         // warn: bit(1) -> Types.BIT 可使用BoolColumn
