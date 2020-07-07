@@ -82,6 +82,8 @@
         <module>rdbmswriter</module>
         <module>sqlserverwriter</module>
         <module>hbase11xsqlreader</module>
+        <module>hbase11xsqlwriter</module>
+
         <!-- optional -->
         <!--
         <module>ftpwriter</module>

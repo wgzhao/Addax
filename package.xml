@@ -90,6 +90,20 @@
             </includes>
             <outputDirectory>datax-${datax-project-version}</outputDirectory>
         </fileSet>
+        <fileSet>
+            <directory>hbase11xsqlreader/target/datax/</directory>
+            <includes>
+                <include>**/*.*</include>
+            </includes>
+            <outputDirectory>datax-${datax-project-version}</outputDirectory>
+        </fileSet>
+        <fileSet>
+            <directory>hbase11xsqlwriter/target/datax/</directory>
+            <includes>
+                <include>**/*.*</include>
+            </includes>
+            <outputDirectory>datax-${datax-project-version}</outputDirectory>
+        </fileSet>
         <!--optional -->
         <!--<fileSet>
             <directory>clickhousereader/target/datax/</directory>
