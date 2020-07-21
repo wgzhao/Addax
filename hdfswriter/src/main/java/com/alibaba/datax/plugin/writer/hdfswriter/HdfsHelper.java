@@ -213,8 +213,7 @@ public  class HdfsHelper {
         for (int i = 0; i < paths.length; i++) {
             LOG.info(String.format("delete file [%s].", paths[i].toString()));
             try {
-                fname = paths[i].getFileName().toString();
-                
+                fname = paths[i].getName();
                 if (delDotFile == true && fname.startsWith(".")) {
                     fileSystem.delete(paths[i], true);
                 }else if (delDotFile == false && ! fname.startsWith(".")) {
