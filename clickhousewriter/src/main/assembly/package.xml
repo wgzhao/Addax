@@ -12,13 +12,14 @@
             <directory>src/main/resources</directory>
             <includes>
                 <include>plugin.json</include>
-            </includes>
+ 				<include>plugin_job_template.json</include>
+ 			</includes>
             <outputDirectory>plugin/writer/clickhousewriter</outputDirectory>
         </fileSet>
         <fileSet>
             <directory>target/</directory>
             <includes>
-                <include>clickhousewriter-${datax-project-version}.jar</include>
+                <include>clickhousewriter-0.0.1-SNAPSHOT.jar</include>
             </includes>
             <outputDirectory>plugin/writer/clickhousewriter</outputDirectory>
         </fileSet>
