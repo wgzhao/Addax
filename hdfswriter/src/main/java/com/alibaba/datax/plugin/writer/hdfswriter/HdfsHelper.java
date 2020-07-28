@@ -202,6 +202,32 @@ public  class HdfsHelper {
         }
     }
 
+    /* 
+    * 根据标志来删除特定文件
+    * @link(https://gitlab.ds.cfzq.com/grp_ds/datax/-/issues/8)
+    * delDotFile: 是否删除点(.)开头的文件, true: 表示仅删除点开头的文件， false 表示不删除点开头的文件
+    * 
+    */
+    public void deleteFiles(Path[] paths, boolean delDotFile) {
+        String fname = null;
+        for (int i = 0; i < paths.length; i++) {
+            LOG.info(String.format("delete file [%s].", paths[i].toString()));
+            try {
+                fname = paths[i].getName();
+                if (delDotFile == true && fname.startsWith(".")) {
+                    fileSystem.delete(paths[i], true);
+                }else if (delDotFile == false && ! fname.startsWith(".")) {
+                    fileSystem.delete(paths[i], true);
+                }
+            } catch (IOException e) {
+                String message = String.format("删除文件[%s]时发生IO异常,请检查您的网络是否正常！",
+                        paths[i].toString());
+                LOG.error(message);
+                throw DataXException.asDataXException(HdfsWriterErrorCode.CONNECT_HDFS_IO_ERROR, e);
+            }
+        }
+    }
+
     public void deleteDir(Path path) {
         LOG.info(String.format("start delete tmp dir [%s] .", path.toString()));
         try {
