@@ -11,7 +11,7 @@ import org.slf4j.LoggerFactory;
 
 import java.util.List;
 
-public class ClickHouseReader extends Reader {
+public class ClickhouseReader extends Reader {
 
     private static final DataBaseType DATABASE_TYPE = DataBaseType.ClickHouse;
 

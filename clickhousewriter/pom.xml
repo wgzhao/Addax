@@ -5,7 +5,7 @@
     <parent>
         <artifactId>datax-all</artifactId>
         <groupId>com.alibaba.datax</groupId>
-        <version>0.0.1-SNAPSHOT</version>
+        <version>3.0.2</version>
     </parent>
 
     <modelVersion>4.0.0</modelVersion>
@@ -17,7 +17,7 @@
         <dependency>
             <groupId>ru.yandex.clickhouse</groupId>
             <artifactId>clickhouse-jdbc</artifactId>
-            <version>0.2.4</version>
+            <version>${clickhouse-jdbc-version}</version>
         </dependency>
         <dependency>
             <groupId>com.alibaba.datax</groupId>
@@ -29,12 +29,12 @@
             <artifactId>datax-common</artifactId>
             <version>${datax-project-version}</version>
         </dependency>
-        <dependency>
+        <!-- <dependency>
             <groupId>com.alibaba.datax</groupId>
             <artifactId>simulator</artifactId>
             <version>${datax-project-version}</version>
             <scope>test</scope>
-        </dependency>
+        </dependency> -->
         <dependency>
             <groupId>org.slf4j</groupId>
             <artifactId>slf4j-api</artifactId>

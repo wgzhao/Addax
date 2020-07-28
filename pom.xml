@@ -21,8 +21,8 @@
         <commons-lang3-version>3.3.2</commons-lang3-version>
         <commons-configuration-version>1.10</commons-configuration-version>
         <commons-cli-version>1.2</commons-cli-version>
-        <fastjson-version>[1.2.31,)</fastjson-version>
-        <clickhouse-jdbc.version>0.1.53</clickhouse-jdbc.version>
+        <fastjson-version>1.2.72</fastjson-version>
+        <clickhouse-jdbc-version>0.2.4</clickhouse-jdbc-version>
         <guava-version>18.0.1</guava-version>
         <diamond.version>3.7.3</diamond.version>
         <postgresql-jdbc.version>9.4.1207</postgresql-jdbc.version>
@@ -40,6 +40,7 @@
         <maven.compiler.encoding>UTF-8</maven.compiler.encoding>
         <java.source.version>1.8</java.source.version>
         <java.target.version>1.8</java.target.version>
+        <jdk-version>1.8</jdk-version>
         <maven.compiler.source>1.8</maven.compiler.source>
         <maven.compiler.target>1.8</maven.compiler.target>
     </properties>
@@ -59,6 +60,7 @@
         <module>dbffilereader</module>
         <module>rdbmsreader</module>
         <module>sqlserverreader</module>
+        <module>clickhousereader</module>
         <!--optional -->
         <!--
         <module>ftpreader</module>
@@ -81,6 +83,7 @@
         <module>dbffilewriter</module>
         <module>rdbmswriter</module>
         <module>sqlserverwriter</module>
+        <module>clickhousewriter</module>
         <module>hbase11xsqlreader</module>
         <module>hbase11xsqlwriter</module>
 
