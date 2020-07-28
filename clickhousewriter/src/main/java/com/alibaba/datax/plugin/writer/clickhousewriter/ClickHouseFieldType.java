@@ -1,6 +1,6 @@
 package com.alibaba.datax.plugin.writer.clickhousewriter;
 
-public enum ClickHouseFieldType {
+public enum ClickhouseFieldType {
     UINT8,
     UINT16,
     UINT32,
@@ -16,11 +16,11 @@ public enum ClickHouseFieldType {
     DATETIME,
     ARRAY;
 
-    public static ClickHouseFieldType getCHFieldType(String type) {
+    public static ClickhouseFieldType getCHFieldType(String type) {
         if (type == null) {
             return null;
         }
-        for (ClickHouseFieldType f : ClickHouseFieldType.values()) {
+        for (ClickhouseFieldType f : ClickhouseFieldType.values()) {
             if (f.name().compareTo(type.toUpperCase()) == 0) {
                 return f;
             }
