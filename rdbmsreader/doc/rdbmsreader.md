@@ -40,6 +40,7 @@ RDBMSReader插件实现了从RDBMS读取数据。在底层实现上，RDBMSReade
                     "name": "rdbmsreader",
                     "parameter": {
                         "username": "xxx",
+                        "passflag": "true",
                         "password": "xxx",
                         "column": [
                             "id",
@@ -93,6 +94,7 @@ RDBMSReader插件实现了从RDBMS读取数据。在底层实现上，RDBMSReade
                     "name": "rdbmsreader",
                     "parameter": {
                         "username": "xxx",
+                        "passflag": "true",
                         "password": "xxx",
                         "column": [
                             "id",
@@ -200,13 +202,22 @@ RDBMSReader插件实现了从RDBMS读取数据。在底层实现上，RDBMSReade
  
   * 默认值：无 <br />
 
+* **passflag**
+
+  * 描述：数据源是否需要输入密码。 <br />
+ 
+  * 必选：是 <br />
+ 
+  * 默认值：true <br />
+  
 * **password**
 
   * 描述：数据源指定用户名的密码。 <br />
  
-  * 必选：是 <br />
+  * 必选：当passflag是TRUE可以为空,否则必填 <br />
  
   * 默认值：无 <br />
+ 
  
 * **table**
 

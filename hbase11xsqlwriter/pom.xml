@@ -18,6 +18,8 @@
         <commons-codec.version>1.8</commons-codec.version>
         <protobuf.version>3.9.0</protobuf.version>
         <httpclient.version>4.5.2</httpclient.version>
+        <source.version>1.8</source.version>
+        <target.version>1.8</target.version>
     </properties>
 
     <dependencies>
