@@ -8,6 +8,8 @@ public final class Key {
 
     public final static String USERNAME = "username";
 
+    public final static String PASSFLAG = "passflag";
+
     public final static String PASSWORD = "password";
 
     public final static String TABLE = "table";

@@ -15,6 +15,7 @@ public enum DataBaseType {
     DRDS("drds", "com.mysql.jdbc.Driver"),
     Hive("hive", "org.apache.hive.jdbc.HiveDriver"),
     Oracle("oracle", "oracle.jdbc.OracleDriver"),
+    Presto("presto", "io.prestosql.jdbc.PrestoDriver"),
     ClickHouse("clickhouse", "ru.yandex.clickhouse.ClickHouseDriver"),
     SQLServer("sqlserver", "com.microsoft.sqlserver.jdbc.SQLServerDriver"),
     PostgreSQL("postgresql", "org.postgresql.Driver"),
@@ -56,6 +57,8 @@ public enum DataBaseType {
                 break;
             case Hive:
             	break;
+            case Presto:
+                break;
             case ClickHouse:
                 break;
             case PostgreSQL:
@@ -96,6 +99,8 @@ public enum DataBaseType {
             case SQLServer:
                 break;
             case ClickHouse:
+                break;
+            case Presto:
                 break;
             case DB2:
                 break;

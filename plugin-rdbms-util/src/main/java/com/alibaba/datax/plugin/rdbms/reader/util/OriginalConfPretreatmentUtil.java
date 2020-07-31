@@ -9,6 +9,7 @@ import com.alibaba.datax.plugin.rdbms.util.DBUtil;
 import com.alibaba.datax.plugin.rdbms.util.DBUtilErrorCode;
 import com.alibaba.datax.plugin.rdbms.util.DataBaseType;
 import com.alibaba.datax.plugin.rdbms.util.TableExpandUtil;
+import org.apache.commons.lang3.ObjectUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -26,8 +27,13 @@ public final class OriginalConfPretreatmentUtil {
         // 检查 username/password 配置（必填）
         originalConfig.getNecessaryValue(Key.USERNAME,
                 DBUtilErrorCode.REQUIRED_VALUE);
-        originalConfig.getNecessaryValue(Key.PASSWORD,
-                DBUtilErrorCode.REQUIRED_VALUE);
+        if (originalConfig.getString("passflag")==null){
+            originalConfig.getNecessaryValue(Key.PASSWORD,
+                    DBUtilErrorCode.REQUIRED_VALUE);
+        }else if(originalConfig.getString("passflag").equals("true")) {
+            originalConfig.getNecessaryValue(Key.PASSWORD,
+                    DBUtilErrorCode.REQUIRED_VALUE);
+        }
         dealWhere(originalConfig);
 
         simplifyConf(originalConfig);
