@@ -15,19 +15,15 @@
 
     <dependencies>
         <dependency>
-            <groupId>ru.yandex.clickhouse</groupId>
-            <artifactId>clickhouse-jdbc</artifactId>
-            <version>${clickhouse-jdbc-version}</version>
-        </dependency>
-        <dependency>
-            <groupId>com.alibaba.datax</groupId>
-            <artifactId>datax-core</artifactId>
-            <version>${datax-project-version}</version>
-        </dependency>
-        <dependency>
             <groupId>com.alibaba.datax</groupId>
             <artifactId>datax-common</artifactId>
             <version>${datax-project-version}</version>
+            <exclusions>
+                <exclusion>
+                    <artifactId>slf4j-log4j12</artifactId>
+                    <groupId>org.slf4j</groupId>
+                </exclusion>
+            </exclusions>
         </dependency>
         <!-- <dependency>
             <groupId>com.alibaba.datax</groupId>
@@ -47,6 +43,11 @@
             <groupId>com.alibaba.datax</groupId>
             <artifactId>plugin-rdbms-util</artifactId>
             <version>${datax-project-version}</version>
+        </dependency>
+        <dependency>
+            <groupId>ru.yandex.clickhouse</groupId>
+            <artifactId>clickhouse-jdbc</artifactId>
+            <version>${clickhouse-jdbc-version}</version>
         </dependency>
     </dependencies>
     <build>
