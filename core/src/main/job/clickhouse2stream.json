@@ -1,0 +1,40 @@
+{
+    "job": {
+        "setting": {
+            "speed": {
+                 "channel": 3
+            },
+            "errorLimit": {
+                "record": 0,
+                "percentage": 0.02
+            }
+        },
+        "content": [
+            {
+                "reader": {
+                    "name": "clickhousereader",
+                    "parameter": {
+                        "username": "default",
+                        "password": "",
+                        "passflag": "false",
+                        "column": [ "*" ],
+                        "connection": [
+                            {
+                                "jdbcUrl": [
+				     "jdbc:clickhouse://127.0.0.1:8123/tpch"
+                                ],
+                                "querySql": ["select * from orders limit 10"]
+                            }
+                        ]
+                    }
+                },
+               "writer": {
+                    "name": "streamwriter",
+                    "parameter": {
+                        "print":true
+                    }
+                }
+            }
+        ]
+    }
+}
