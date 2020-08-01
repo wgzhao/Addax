@@ -22,7 +22,7 @@ public class GroovyTransformer extends Transformer {
     private Transformer groovyTransformer;
 
     @Override
-    public Record evaluate(Record record, Object... paras) {
+    public Record evaluate(com.alibaba.datax.common.element.Record record, Object... paras) {
 
         if (groovyTransformer == null) {
             //全局唯一
@@ -80,7 +80,7 @@ public class GroovyTransformer extends Transformer {
         sb.append("import com.alibaba.datax.transformer.Transformer;");
         sb.append("import java.util.*;");
         sb.append("public class RULE extends Transformer").append("{");
-        sb.append("public Record evaluate(Record record, Object... paras) {");
+        sb.append("public Record evaluate(com.alibaba.datax.common.element.Record record, Object... paras) {");
         sb.append(expression);
         sb.append("}}");
 

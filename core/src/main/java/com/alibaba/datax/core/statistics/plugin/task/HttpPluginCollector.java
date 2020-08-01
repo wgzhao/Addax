@@ -15,7 +15,7 @@ public class HttpPluginCollector extends AbstractTaskPluginCollector {
     }
 
     @Override
-    public void collectDirtyRecord(Record dirtyRecord, Throwable t,
+    public void collectDirtyRecord(com.alibaba.datax.common.element.Record dirtyRecord, Throwable t,
                                    String errorMessage) {
         super.collectDirtyRecord(dirtyRecord, t, errorMessage);
     }

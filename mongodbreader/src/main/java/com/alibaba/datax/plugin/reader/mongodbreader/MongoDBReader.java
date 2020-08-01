@@ -123,7 +123,7 @@ public class MongoDBReader extends Reader {
             dbCursor = col.find(filter).iterator();
             while (dbCursor.hasNext()) {
                 Document item = dbCursor.next();
-                Record record = recordSender.createRecord();
+                com.alibaba.datax.common.element.Record record = recordSender.createRecord();
                 Iterator columnItera = mongodbColumnMeta.iterator();
                 while (columnItera.hasNext()) {
                     JSONObject column = (JSONObject)columnItera.next();

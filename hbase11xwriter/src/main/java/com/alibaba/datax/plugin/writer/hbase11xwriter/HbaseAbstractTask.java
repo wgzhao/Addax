@@ -45,7 +45,7 @@ public abstract class HbaseAbstractTask {
     }
 
     public void startWriter(RecordReceiver lineReceiver, TaskPluginCollector taskPluginCollector){
-        Record record;
+        com.alibaba.datax.common.element.Record record;
         try {
             while ((record = lineReceiver.getFromReader()) != null) {
                 Put put;
@@ -77,7 +77,7 @@ public abstract class HbaseAbstractTask {
     }
 
 
-    public abstract  Put convertRecordToPut(Record record);
+    public abstract  Put convertRecordToPut(com.alibaba.datax.common.element.Record record);
 
     public void close()  {
         //Hbase11xHelper.closeTable(this);

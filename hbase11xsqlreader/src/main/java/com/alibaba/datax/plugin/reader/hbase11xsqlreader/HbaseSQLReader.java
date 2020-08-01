@@ -50,7 +50,7 @@ public class HbaseSQLReader extends Reader {
         @Override
         public void startRead(RecordSender recordSender) {
             Long recordNum = 0L;
-            Record record = recordSender.createRecord();
+            com.alibaba.datax.common.element.Record record = recordSender.createRecord();
             boolean fetchOK;
             while (true) {
                 try {

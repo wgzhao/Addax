@@ -50,7 +50,7 @@ public abstract class AbstractTaskPluginCollector extends TaskPluginCollector {
     }
 
     @Override
-    public void collectDirtyRecord(Record dirtyRecord, Throwable t,
+    public void collectDirtyRecord(com.alibaba.datax.common.element.Record dirtyRecord, Throwable t,
                                    String errorMessage) {
 
         if (null == dirtyRecord) {

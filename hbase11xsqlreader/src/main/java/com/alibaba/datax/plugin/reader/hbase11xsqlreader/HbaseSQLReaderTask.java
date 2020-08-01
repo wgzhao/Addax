@@ -143,7 +143,7 @@ public class HbaseSQLReaderTask {
         return column;
     }
 
-    private void constructRecordFromPhoenix(Record record, Map<String, Object> phoenixRecord) throws IOException {
+    private void constructRecordFromPhoenix(com.alibaba.datax.common.element.Record record, Map<String, Object> phoenixRecord) throws IOException {
         for (Map.Entry<String, PColumn> pColumnItem : this.pColumns.entrySet()) {
             Column column = this.convertPhoenixValueToDataxColumn(
                     pColumnItem.getValue().getDataType().getSqlType(),
@@ -152,7 +152,7 @@ public class HbaseSQLReaderTask {
         }
     }
 
-    public boolean readRecord(Record record) throws IOException, InterruptedException {
+    public boolean readRecord(com.alibaba.datax.common.element.Record record) throws IOException, InterruptedException {
         boolean hasNext = false;
         hasNext = this.phoenixRecordReader.nextKeyValue();
         if (!hasNext)

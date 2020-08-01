@@ -28,7 +28,7 @@ public class NormalTask extends HbaseAbstractTask {
     }
 
     @Override
-    public Put convertRecordToPut(Record record){
+    public Put convertRecordToPut(com.alibaba.datax.common.element.Record record){
         byte[] rowkey = getRowkey(record);
         Put put = null;
         if(this.versionColumn == null){
@@ -68,7 +68,7 @@ public class NormalTask extends HbaseAbstractTask {
         return put;
     }
 
-    public byte[] getRowkey(Record record){
+    public byte[] getRowkey(com.alibaba.datax.common.element.Record record){
         byte[] rowkeyBuffer  = {};
         for (Configuration aRowkeyColumn : rowkeyColumn) {
             Integer index = aRowkeyColumn.getInt(Key.INDEX);
@@ -88,7 +88,7 @@ public class NormalTask extends HbaseAbstractTask {
         return rowkeyBuffer;
     }
 
-    public long getVersion(Record record){
+    public long getVersion(com.alibaba.datax.common.element.Record record){
         int index = versionColumn.getInt(Key.INDEX);
         long timestamp;
         if(index == -1){
