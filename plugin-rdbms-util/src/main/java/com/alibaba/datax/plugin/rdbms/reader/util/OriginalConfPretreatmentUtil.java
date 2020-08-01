@@ -27,10 +27,11 @@ public final class OriginalConfPretreatmentUtil {
         // 检查 username/password 配置（必填）
         originalConfig.getNecessaryValue(Key.USERNAME,
                 DBUtilErrorCode.REQUIRED_VALUE);
-        if (originalConfig.getString("passflag")==null){
-            originalConfig.getNecessaryValue(Key.PASSWORD,
-                    DBUtilErrorCode.REQUIRED_VALUE);
-        }else if(originalConfig.getString("passflag").equals("true")) {
+        /*
+         *有些数据库没有密码，因此需要可以绕过密码的方式
+         * @PASSFLAG 作为可选项，如果为true，则表示密码是必选项，否则密码为可选项
+        */
+        if (originalConfig.getBool(Key.PASSFLAG, true)) {
             originalConfig.getNecessaryValue(Key.PASSWORD,
                     DBUtilErrorCode.REQUIRED_VALUE);
         }
