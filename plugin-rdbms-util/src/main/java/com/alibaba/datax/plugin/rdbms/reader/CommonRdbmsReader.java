@@ -234,7 +234,7 @@ public class CommonRdbmsReader {
         protected Record transportOneRecord(RecordSender recordSender, ResultSet rs, 
                 ResultSetMetaData metaData, int columnNumber, String mandatoryEncoding, 
                 TaskPluginCollector taskPluginCollector) {
-            Record record = buildRecord(recordSender,rs,metaData,columnNumber,mandatoryEncoding,taskPluginCollector); 
+            com.alibaba.datax.common.element.Record record = buildRecord(recordSender,rs,metaData,columnNumber,mandatoryEncoding,taskPluginCollector); 
             recordSender.sendToWriter(record);
             return record;
         }

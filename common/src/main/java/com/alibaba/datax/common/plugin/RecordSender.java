@@ -22,7 +22,7 @@ public interface RecordSender {
 
 	public Record createRecord();
 
-	public void sendToWriter(Record record);
+	public void sendToWriter(com.alibaba.datax.common.element.Record record);
 
 	public void flush();
 

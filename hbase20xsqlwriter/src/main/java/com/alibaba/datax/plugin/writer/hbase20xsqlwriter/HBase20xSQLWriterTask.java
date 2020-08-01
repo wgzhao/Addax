@@ -155,7 +155,7 @@ public class HBase20xSQLWriterTask {
      */
     private void writeData(RecordReceiver lineReceiver) throws SQLException {
         List<Record> buffer = Lists.newArrayListWithExpectedSize(batchSize);
-        Record record = null;
+        com.alibaba.datax.common.element.Record record = null;
         while ((record = lineReceiver.getFromReader()) != null) {
             // 校验列数量是否符合预期
             if (record.getColumnNumber() != numberOfColumnsToRead) {
@@ -184,7 +184,7 @@ public class HBase20xSQLWriterTask {
     private void doBatchUpsert(List<Record> records) throws SQLException {
         try {
             // 将所有record提交到connection缓存
-            for (Record r : records) {
+            for (com.alibaba.datax.common.element.Record r : records) {
                 setupStatement(r);
                 pstmt.addBatch();
             }
@@ -214,7 +214,7 @@ public class HBase20xSQLWriterTask {
      */
     private void doSingleUpsert(List<Record> records) throws SQLException {
         int rowNumber = 0;
-        for (Record r : records) {
+        for (com.alibaba.datax.common.element.Record r : records) {
             try {
                 rowNumber ++;
                 setupStatement(r);
@@ -227,7 +227,7 @@ public class HBase20xSQLWriterTask {
         }
     }
 
-    private void setupStatement(Record record) throws SQLException {
+    private void setupStatement(com.alibaba.datax.common.element.Record record) throws SQLException {
         for (int i = 0; i < numberOfColumnsToWrite; i++) {
             Column col = record.getColumn(i);
             int sqlType = columnTypes[i];

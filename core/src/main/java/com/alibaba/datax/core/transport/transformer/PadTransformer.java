@@ -18,7 +18,7 @@ public class PadTransformer extends Transformer {
     }
 
     @Override
-    public Record evaluate(Record record, Object... paras) {
+    public Record evaluate(com.alibaba.datax.common.element.Record record, Object... paras) {
 
         int columnIndex;
         String padType;

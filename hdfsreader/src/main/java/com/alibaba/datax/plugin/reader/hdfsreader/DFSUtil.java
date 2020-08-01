@@ -371,9 +371,9 @@ public class DFSUtil {
         }
     }
 
-    private Record transportOneRecord(List<ColumnEntry> columnConfigs, List<Object> recordFields
+    private com.alibaba.datax.common.element.Record transportOneRecord(List<ColumnEntry> columnConfigs, List<Object> recordFields
             , RecordSender recordSender, TaskPluginCollector taskPluginCollector, boolean isReadAllColumns, String nullFormat) {
-        Record record = recordSender.createRecord();
+        com.alibaba.datax.common.element.Record record = recordSender.createRecord();
         Column columnGenerated;
         try {
             if (isReadAllColumns) {

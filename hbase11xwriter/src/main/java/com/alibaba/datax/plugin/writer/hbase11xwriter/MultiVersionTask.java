@@ -12,7 +12,7 @@ public  class MultiVersionTask extends HbaseAbstractTask {
     }
 
     @Override
-    public Put convertRecordToPut(Record record) {
+    public Put convertRecordToPut(com.alibaba.datax.common.element.Record record) {
         if (record.getColumnNumber() != 4 ) {
             // multversion 模式下源头读取字段列数为4元组(rowkey,column,timestamp,value),目的端需告诉[]
             throw DataXException
