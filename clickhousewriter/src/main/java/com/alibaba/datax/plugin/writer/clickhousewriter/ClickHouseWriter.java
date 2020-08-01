@@ -22,7 +22,6 @@ import java.sql.Types;
 import java.util.List;
 import java.util.regex.Pattern;
 
-
 public class ClickhouseWriter extends Writer {
 	private static final DataBaseType DATABASE_TYPE = DataBaseType.ClickHouse;
 
@@ -273,8 +272,8 @@ public class ClickhouseWriter extends Writer {
 				}
 
 				boolean fillPreparedStatementColumnType4CustomType(PreparedStatement ps,
-				                                                   int columnIndex, int columnSqltype,
-				                                                   Column column) throws SQLException {
+																   int columnIndex, int columnSqltype,
+																   Column column) throws SQLException {
 					switch (columnSqltype) {
 						case Types.OTHER:
 							if (this.resultSetMetaData.getRight().get(columnIndex).startsWith("Tuple")) {
