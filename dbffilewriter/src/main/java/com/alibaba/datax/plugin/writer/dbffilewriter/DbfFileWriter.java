@@ -322,7 +322,7 @@ public class DbfFileWriter extends Writer {
 
                 }
                 writer.setFields(fields);
-                Record record = null;
+                com.alibaba.datax.common.element.Record record = null;
                 while ((record = lineReceiver.getFromReader()) != null) {
                     Object rowData[] = new Object[columns.size()];
                     Column column;

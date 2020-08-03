@@ -271,7 +271,7 @@ public class CommonRdbmsWriter {
             List<Record> writeBuffer = new ArrayList<Record>(this.batchSize);
             int bufferBytes = 0;
             try {
-                Record record;
+                com.alibaba.datax.common.element.Record record;
                 while ((record = recordReceiver.getFromReader()) != null) {
                     if (record.getColumnNumber() != this.columnNumber) {
                         // 源头读取字段列数与目的表字段写入列数不相等，直接报错
@@ -349,7 +349,7 @@ public class CommonRdbmsWriter {
                 preparedStatement = connection
                         .prepareStatement(this.writeRecordSql);
 
-                for (Record record : buffer) {
+                for (com.alibaba.datax.common.element.Record record : buffer) {
                     preparedStatement = fillPreparedStatement(
                             preparedStatement, record);
                     preparedStatement.addBatch();
@@ -375,7 +375,7 @@ public class CommonRdbmsWriter {
                 preparedStatement = connection
                         .prepareStatement(this.writeRecordSql);
 
-                for (Record record : buffer) {
+                for (com.alibaba.datax.common.element.Record record : buffer) {
                     try {
                         preparedStatement = fillPreparedStatement(
                                 preparedStatement, record);
@@ -398,7 +398,7 @@ public class CommonRdbmsWriter {
         }
 
         // 直接使用了两个类变量：columnNumber,resultSetMetaData
-        protected PreparedStatement fillPreparedStatement(PreparedStatement preparedStatement, Record record)
+        protected PreparedStatement fillPreparedStatement(PreparedStatement preparedStatement, com.alibaba.datax.common.element.Record record)
                 throws SQLException {
             for (int i = 0; i < this.columnNumber; i++) {
                 int columnSqltype = this.resultSetMetaData.getMiddle().get(i);

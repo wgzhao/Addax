@@ -155,7 +155,7 @@ public class StreamWriter extends Writer {
                         BufferedWriter writer = new BufferedWriter(
                                 new OutputStreamWriter(System.out, "UTF-8"));
 
-                        Record record;
+                        com.alibaba.datax.common.element.Record record;
                         while ((record = recordReceiver.getFromReader()) != null) {
                             if (this.print) {
                                 writer.write(recordToString(record));
@@ -185,7 +185,7 @@ public class StreamWriter extends Writer {
                 writer = new BufferedWriter(
                         new OutputStreamWriter(new FileOutputStream(newFile, true), "UTF-8"));
 
-                Record record;
+                com.alibaba.datax.common.element.Record record;
                 int count =0;
                 while ((record = recordReceiver.getFromReader()) != null) {
                     if(recordNumBeforSleep > 0 && sleepTime >0 &&count == recordNumBeforSleep) {
@@ -214,7 +214,7 @@ public class StreamWriter extends Writer {
         public void destroy() {
         }
 
-        private String recordToString(Record record) {
+        private String recordToString(com.alibaba.datax.common.element.Record record) {
             int recordLength = record.getColumnNumber();
             if (0 == recordLength) {
                 return NEWLINE_FLAG;

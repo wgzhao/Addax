@@ -15,7 +15,7 @@ import java.util.List;
 public class DirtyRecord implements Record {
 	private List<Column> columns = new ArrayList<Column>();
 
-	public static DirtyRecord asDirtyRecord(final Record record) {
+	public static DirtyRecord asDirtyRecord(final com.alibaba.datax.common.element.Record record) {
 		DirtyRecord result = new DirtyRecord();
 		for (int i = 0; i < record.getColumnNumber(); i++) {
 			result.addColumn(record.getColumn(i));

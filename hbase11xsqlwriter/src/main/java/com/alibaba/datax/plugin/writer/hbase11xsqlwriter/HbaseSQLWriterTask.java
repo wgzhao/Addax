@@ -44,7 +44,7 @@ public class HbaseSQLWriterTask {
 
     public void startWriter(RecordReceiver lineReceiver, TaskPluginCollector taskPluginCollector) {
         this.taskPluginCollector = taskPluginCollector;
-        Record record;
+        com.alibaba.datax.common.element.Record record;
         try {
             // 准备阶段
             prepare();
@@ -116,7 +116,7 @@ public class HbaseSQLWriterTask {
     private void doBatchUpsert(List<Record> records) throws SQLException {
         try {
             // 将所有record提交到connection缓存
-            for (Record r : records) {
+            for (com.alibaba.datax.common.element.Record r : records) {
                 setupStatement(r);
                 ps.executeUpdate();
             }
@@ -138,7 +138,7 @@ public class HbaseSQLWriterTask {
      * 单行提交，将出错的行记录到脏数据中。由脏数据收集模块判断任务是否继续
      */
     private void doSingleUpsert(List<Record> records) throws SQLException {
-        for (Record r : records) {
+        for (com.alibaba.datax.common.element.Record r : records) {
             try {
                 setupStatement(r);
                 ps.executeUpdate();
@@ -215,7 +215,7 @@ public class HbaseSQLWriterTask {
         return types;
     }
 
-    private void setupStatement(Record record) throws SQLException {
+    private void setupStatement(com.alibaba.datax.common.element.Record record) throws SQLException {
         // 一开始的时候就已经校验过record中的列数量与ps中需要的值数量相等
         for (int i = 0; i < numberOfColumnsToWrite; i++) {
             Column col = record.getColumn(i);

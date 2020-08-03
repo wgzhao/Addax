@@ -79,7 +79,7 @@ public class RecordExchanger extends TransformerExchanger implements RecordSende
 	}
 
 	@Override
-	public void sendToWriter(Record record) {
+	public void sendToWriter(com.alibaba.datax.common.element.Record record) {
 		if(shutdown){
 			throw DataXException.asDataXException(CommonErrorCode.SHUT_DOWN_TASK, "");
 		}

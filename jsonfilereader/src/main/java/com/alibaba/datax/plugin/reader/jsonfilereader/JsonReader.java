@@ -442,7 +442,7 @@ public class JsonReader extends Reader {
 
         //传输一行数据
         private Record transportOneRecord(RecordSender recordSender, List<Column> sourceLine) {
-            Record record = recordSender.createRecord();
+            com.alibaba.datax.common.element.Record record = recordSender.createRecord();
             for(Column eachValue:sourceLine){
                 record.addColumn(eachValue);
             }

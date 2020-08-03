@@ -278,7 +278,7 @@ public class UnstructuredStorageWriterUtil {
             unstructuredWriter.writeOneRecord(headers);
         }
 
-        Record record = null;
+        com.alibaba.datax.common.element.Record record = null;
         while ((record = lineReceiver.getFromReader()) != null) {
             UnstructuredStorageWriterUtil.transportOneRecord(record,
                     nullFormat, dateParse, taskPluginCollector,
@@ -292,7 +292,7 @@ public class UnstructuredStorageWriterUtil {
     /**
      * 异常表示脏数据
      * */
-    public static void transportOneRecord(Record record, String nullFormat,
+    public static void transportOneRecord(com.alibaba.datax.common.element.Record record, String nullFormat,
             DateFormat dateParse, TaskPluginCollector taskPluginCollector,
             UnstructuredWriter unstructuredWriter) {
         // warn: default is null
