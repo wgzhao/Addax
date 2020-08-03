@@ -113,7 +113,7 @@ public class Adb4pgClientProxy implements AdbProxy {
     @Override
     public void startWriteWithConnection(RecordReceiver recordReceiver, Connection connection) {
         try {
-            Record record;
+            com.alibaba.datax.common.element.Record record;
             while ((record = recordReceiver.getFromReader()) != null) {
                 Row row = new Row();
                 List<Object> values = new ArrayList<Object>();
@@ -158,7 +158,7 @@ public class Adb4pgClientProxy implements AdbProxy {
         return;
     }
 
-    private void prepareColumnTypeValue(Record record, List<Object> values) {
+    private void prepareColumnTypeValue(com.alibaba.datax.common.element.Record record, List<Object> values) {
         for (int i = 0; i < this.columns.size(); i++) {
             Column column = record.getColumn(i);
             if (this.useRawData[i]) {

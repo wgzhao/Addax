@@ -57,7 +57,7 @@ public class MemoryChannel extends Channel {
 	}
 
 	@Override
-	protected void doPush(Record r) {
+	protected void doPush(com.alibaba.datax.common.element.Record r) {
 		try {
 			long startTime = System.nanoTime();
 			this.queue.put(r);
@@ -127,7 +127,7 @@ public class MemoryChannel extends Channel {
 
 	private int getRecordBytes(Collection<Record> rs){
 		int bytes = 0;
-		for(Record r : rs){
+		for(com.alibaba.datax.common.element.Record r : rs){
 			bytes += r.getMemorySize();
 		}
 		return bytes;

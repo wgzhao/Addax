@@ -82,7 +82,7 @@ public class BufferedRecordTransformerExchanger extends TransformerExchanger imp
     }
 
     @Override
-    public void sendToWriter(Record record) {
+    public void sendToWriter(com.alibaba.datax.common.element.Record record) {
         if (shutdown) {
             throw DataXException.asDataXException(CommonErrorCode.SHUT_DOWN_TASK, "");
         }
@@ -142,7 +142,7 @@ public class BufferedRecordTransformerExchanger extends TransformerExchanger imp
             receive();
         }
 
-        Record record = this.buffer.get(this.bufferIndex++);
+        com.alibaba.datax.common.element.Record record = this.buffer.get(this.bufferIndex++);
         if (record instanceof TerminateRecord) {
             record = null;
         }

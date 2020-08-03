@@ -39,7 +39,7 @@ public class NormalTask extends HbaseAbstractTask {
 
 
     @Override
-    public boolean fetchLine(Record record) throws Exception {
+    public boolean fetchLine(com.alibaba.datax.common.element.Record record) throws Exception {
         Result result = super.getNextHbaseRow();
 
         if (null == result) {

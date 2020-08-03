@@ -140,7 +140,7 @@ public abstract class Channel {
     }
 
     public Record pull() {
-        Record record = this.doPull();
+        com.alibaba.datax.common.element.Record record = this.doPull();
         this.statPull(1L, record.getByteSize());
         return record;
     }
@@ -151,7 +151,7 @@ public abstract class Channel {
         this.statPull(rs.size(), this.getByteSize(rs));
     }
 
-    protected abstract void doPush(Record r);
+    protected abstract void doPush(com.alibaba.datax.common.element.Record r);
 
     protected abstract void doPushAll(Collection<Record> rs);
 

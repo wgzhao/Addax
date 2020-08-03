@@ -2,13 +2,13 @@ package com.alibaba.datax.plugin.reader.clickhousereader;
 
 import com.alibaba.datax.common.spi.ErrorCode;
 
-public enum ClickhouseErrorCode implements ErrorCode {
+public enum ClickHouseErrorCode implements ErrorCode {
     ;
 
     private final String code;
     private final String description;
 
-    private ClickhouseErrorCode(String code, String description) {
+    private ClickHouseErrorCode(String code, String description) {
         this.code = code;
         this.description = description;
     }

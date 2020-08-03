@@ -26,7 +26,15 @@ public final class OriginalConfPretreatmentUtil {
     public static void doPretreatment(Configuration originalConfig, DataBaseType dataBaseType) {
         // 检查 username/password 配置（必填）
         originalConfig.getNecessaryValue(Key.USERNAME, DBUtilErrorCode.REQUIRED_VALUE);
-        originalConfig.getNecessaryValue(Key.PASSWORD, DBUtilErrorCode.REQUIRED_VALUE);
+
+        /*
+         *有些数据库没有密码，因此需要可以绕过密码的方式
+         * @PASSFLAG 作为可选项，如果为true，则表示密码是必选项，否则密码为可选项
+         */
+        if (originalConfig.getBool(Key.PASSFLAG, true)) {
+            originalConfig.getNecessaryValue(Key.PASSWORD,
+                    DBUtilErrorCode.REQUIRED_VALUE);
+        }
 
         doCheckBatchSize(originalConfig);
 

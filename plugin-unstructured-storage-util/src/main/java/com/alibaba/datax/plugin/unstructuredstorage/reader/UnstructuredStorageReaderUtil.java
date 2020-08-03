@@ -312,7 +312,7 @@ public class UnstructuredStorageReaderUtil {
 		}
 	}
 
-	public static Record transportOneRecord(RecordSender recordSender,
+	public static com.alibaba.datax.common.element.Record transportOneRecord(RecordSender recordSender,
 											Configuration configuration,
 											TaskPluginCollector taskPluginCollector,
 											String line){
@@ -340,10 +340,10 @@ public class UnstructuredStorageReaderUtil {
 		return transportOneRecord(recordSender, column, sourceLine, nullFormat, taskPluginCollector);
 	}
 
-	public static Record transportOneRecord(RecordSender recordSender,
+	public static com.alibaba.datax.common.element.Record transportOneRecord(RecordSender recordSender,
 											List<ColumnEntry> columnConfigs, String[] sourceLine,
 											String nullFormat, TaskPluginCollector taskPluginCollector) {
-		Record record = recordSender.createRecord();
+		com.alibaba.datax.common.element.Record record = recordSender.createRecord();
 		Column columnGenerated = null;
 
 		// 创建都为String类型column的record
