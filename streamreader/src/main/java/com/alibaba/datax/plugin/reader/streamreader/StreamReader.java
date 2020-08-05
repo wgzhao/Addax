@@ -220,7 +220,7 @@ public class StreamReader extends Reader {
 
 		@Override
 		public void startRead(RecordSender recordSender) {
-			Record oneRecord = buildOneRecord(recordSender, this.columns);
+			com.alibaba.datax.common.element.Record oneRecord = buildOneRecord(recordSender, this.columns);
 			while (this.sliceRecordCount > 0) {
                 if (this.haveMixupFunction) {
                     oneRecord = buildOneRecord(recordSender, this.columns);
@@ -306,7 +306,7 @@ public class StreamReader extends Reader {
             }
 		}
 
-		private Record buildOneRecord(RecordSender recordSender,
+		private com.alibaba.datax.common.element.Record buildOneRecord(RecordSender recordSender,
 				List<String> columns) {
 			if (null == recordSender) {
 				throw new IllegalArgumentException(
@@ -318,7 +318,7 @@ public class StreamReader extends Reader {
 						"参数[column]不能为空.");
 			}
 
-			Record record = recordSender.createRecord();
+			com.alibaba.datax.common.element.Record record = recordSender.createRecord();
 			try {
 				for (String eachColumn : columns) {
 					Configuration eachColumnConfig = Configuration.from(eachColumn);

@@ -39,7 +39,7 @@ public class HbaseSQLReaderTaskTest {
         for (int i = 0; i < splits.size(); i++) {
             RecordSender recordSender = mock(RecordSender.class);
             when(recordSender.createRecord()).thenReturn(new DefaultRecord());
-            Record record = recordSender.createRecord();
+            com.alibaba.datax.common.element.Record record = recordSender.createRecord();
 
             HbaseSQLReaderTask hbase11SQLReaderTask = new HbaseSQLReaderTask(splits.get(i));
             hbase11SQLReaderTask.init();

@@ -269,7 +269,7 @@ public class ESWriter extends Writer {
         @Override
         public void startWrite(RecordReceiver recordReceiver) {
             List<Record> writerBuffer = new ArrayList<Record>(this.batchSize);
-            Record record = null;
+            com.alibaba.datax.common.element.Record record = null;
             long total = 0;
             while ((record = recordReceiver.getFromReader()) != null) {
                 writerBuffer.add(record);
@@ -312,7 +312,7 @@ public class ESWriter extends Writer {
         private long doBatchInsert(final List<Record> writerBuffer) {
             Map<String, Object> data = null;
             final Bulk.Builder bulkaction = new Bulk.Builder().defaultIndex(this.index).defaultType(this.type);
-            for (Record record : writerBuffer) {
+            for (com.alibaba.datax.common.element.Record record : writerBuffer) {
                 data = new HashMap<String, Object>();
                 String id = null;
                 for (int i = 0; i < record.getColumnNumber(); i++) {

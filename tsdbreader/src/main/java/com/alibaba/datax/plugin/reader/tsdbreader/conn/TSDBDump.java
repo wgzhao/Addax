@@ -70,7 +70,7 @@ final class TSDBDump {
             return;
         }
         for (DataPoint4TSDB dp : dps) {
-            final Record record = sender.createRecord();
+            final com.alibaba.datax.common.element.Record record = sender.createRecord();
             final Map<String, Object> tagKV = dp.getTags();
 
             for (String column : columns4RDB) {
@@ -103,7 +103,7 @@ final class TSDBDump {
             return;
         }
         for (DataPoint4TSDB dp : dps) {
-            final Record record = sender.createRecord();
+            final com.alibaba.datax.common.element.Record record = sender.createRecord();
             final Map<String, Object> tagKV = dp.getTags();
 
             for (String column : columns4RDB) {
@@ -310,7 +310,7 @@ final class TSDBDump {
     private static void sendTSDBDps(RecordSender sender, List<String> dps) {
         for (String dp : dps) {
             StringColumn tsdbColumn = new StringColumn(dp);
-            Record record = sender.createRecord();
+            com.alibaba.datax.common.element.Record record = sender.createRecord();
             record.addColumn(tsdbColumn);
             sender.sendToWriter(record);
         }

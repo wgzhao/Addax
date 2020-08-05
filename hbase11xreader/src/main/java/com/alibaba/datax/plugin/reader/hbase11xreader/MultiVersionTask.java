@@ -39,7 +39,7 @@ public abstract class MultiVersionTask extends HbaseAbstractTask {
     }
 
     @Override
-    public boolean fetchLine(Record record) throws Exception {
+    public boolean fetchLine(com.alibaba.datax.common.element.Record record) throws Exception {
         Result result;
         if (this.cellArr == null || this.cellArr.length == this.currentReadPosition) {
             result = super.getNextHbaseRow();
@@ -67,7 +67,7 @@ public abstract class MultiVersionTask extends HbaseAbstractTask {
         return true;
     }
 
-    private void convertCellToLine(Cell cell, Record record) throws Exception {
+    private void convertCellToLine(Cell cell, com.alibaba.datax.common.element.Record record) throws Exception {
         byte[] rawRowkey = CellUtil.cloneRow(cell);
         long timestamp = cell.getTimestamp();
         byte[] cfAndQualifierName = Bytes.add(CellUtil.cloneFamily(cell), MultiVersionTask.COLON_BYTE, CellUtil.cloneQualifier(cell));

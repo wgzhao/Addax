@@ -15,12 +15,15 @@ public enum DataBaseType {
     DRDS("drds", "com.mysql.jdbc.Driver"),
     Hive("hive", "org.apache.hive.jdbc.HiveDriver"),
     Oracle("oracle", "oracle.jdbc.OracleDriver"),
+    Presto("presto", "io.prestosql.jdbc.PrestoDriver"),
     ClickHouse("clickhouse", "ru.yandex.clickhouse.ClickHouseDriver"),
     SQLServer("sqlserver", "com.microsoft.sqlserver.jdbc.SQLServerDriver"),
     PostgreSQL("postgresql", "org.postgresql.Driver"),
     RDBMS("rdbms", "com.alibaba.datax.plugin.rdbms.util.DataBaseType"),
     DB2("db2", "com.ibm.db2.jcc.DB2Driver"),
-    ADS("ads","com.mysql.jdbc.Driver");
+    ADS("ads","com.mysql.jdbc.Driver"),
+    Inceptor2("inceptor2", "io.transwarp.jdbc.InceptorDriver"),
+    Inceptor("inceptor", "io.transwarp.jdbc.InceptorDriver");
 
 
     private String typeName;
@@ -56,11 +59,17 @@ public enum DataBaseType {
                 break;
             case Hive:
             	break;
+            case Presto:
+                break;
             case ClickHouse:
                 break;
             case PostgreSQL:
                 break;
             case RDBMS:
+                break;
+            case Inceptor:
+                break;
+            case Inceptor2:
                 break;
             default:
                 throw DataXException.asDataXException(DBUtilErrorCode.UNSUPPORTED_TYPE, "unsupported database type.");
@@ -97,11 +106,17 @@ public enum DataBaseType {
                 break;
             case ClickHouse:
                 break;
+            case Presto:
+                break;
             case DB2:
                 break;
             case PostgreSQL:
             	break;
             case RDBMS:
+                break;
+            case Inceptor:
+                break;
+            case Inceptor2:
                 break;
             default:
                 throw DataXException.asDataXException(DBUtilErrorCode.UNSUPPORTED_TYPE, "unsupported database type.");

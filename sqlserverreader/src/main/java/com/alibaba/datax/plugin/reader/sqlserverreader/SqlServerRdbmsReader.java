@@ -48,9 +48,9 @@ public class SqlServerRdbmsReader extends CommonRdbmsReader {
         }
 
         @Override
-        protected Record buildRecord(RecordSender recordSender, ResultSet rs, ResultSetMetaData metaData, int columnNumber, String mandatoryEncoding,
+        protected com.alibaba.datax.common.element.Record buildRecord(RecordSender recordSender, ResultSet rs, ResultSetMetaData metaData, int columnNumber, String mandatoryEncoding,
                                      TaskPluginCollector taskPluginCollector) {
-            Record record = recordSender.createRecord();
+            com.alibaba.datax.common.element.Record record = recordSender.createRecord();
 
             try {
                 for (int i = 1; i <= columnNumber; i++) {

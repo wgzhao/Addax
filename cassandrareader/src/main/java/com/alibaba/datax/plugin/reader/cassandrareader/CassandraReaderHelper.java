@@ -260,7 +260,7 @@ public class CassandraReaderHelper {
     return newMap;
   }
 
-  static Record buildRecord(Record record, Row rs, ColumnDefinitions metaData, int columnNumber,
+  static Record buildRecord(com.alibaba.datax.common.element.Record record, Row rs, ColumnDefinitions metaData, int columnNumber,
       TaskPluginCollector taskPluginCollector) {
 
     try {
