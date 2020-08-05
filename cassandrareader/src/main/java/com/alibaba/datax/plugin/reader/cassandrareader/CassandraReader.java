@@ -106,7 +106,7 @@ public class CassandraReader extends Reader {
     @Override public void startRead(RecordSender recordSender) {
       ResultSet r = session.execute(new SimpleStatement(queryString).setConsistencyLevel(consistencyLevel));
       for (Row row : r ) {
-        Record record = recordSender.createRecord();
+        com.alibaba.datax.common.element.Record record = recordSender.createRecord();
         record = CassandraReaderHelper.buildRecord(record,row,r.getColumnDefinitions(),columnNumber,
             super.getTaskPluginCollector());
         if( record != null )

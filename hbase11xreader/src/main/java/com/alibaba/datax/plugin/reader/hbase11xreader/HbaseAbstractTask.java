@@ -41,7 +41,7 @@ public abstract class HbaseAbstractTask {
         this.scanBatchSize = configuration.getInt(Key.SCAN_BATCH_SIZE,Constant.DEFAULT_SCAN_BATCH_SIZE);
     }
 
-    public abstract boolean fetchLine(Record record) throws Exception;
+    public abstract boolean fetchLine(com.alibaba.datax.common.element.Record record) throws Exception;
 
     //不同模式设置不同,如多版本模式需要设置版本
     public abstract void initScan(Scan scan);

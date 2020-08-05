@@ -340,7 +340,7 @@ public  class HdfsHelper {
         }
         try {
             RecordWriter writer = outFormat.getRecordWriter(fileSystem, conf, outputPath.toString(), Reporter.NULL);
-            Record record = null;
+            com.alibaba.datax.common.element.Record record = null;
             while ((record = lineReceiver.getFromReader()) != null) {
                 MutablePair<Text, Boolean> transportResult = transportOneRecord(record, fieldDelimiter, columns, taskPluginCollector);
                 if (!transportResult.getRight()) {
@@ -358,7 +358,7 @@ public  class HdfsHelper {
     }
 
     public static MutablePair<Text, Boolean> transportOneRecord(
-            Record record, char fieldDelimiter, List<Configuration> columnsConfiguration, TaskPluginCollector taskPluginCollector) {
+            com.alibaba.datax.common.element.Record record, char fieldDelimiter, List<Configuration> columnsConfiguration, TaskPluginCollector taskPluginCollector) {
         MutablePair<List<Object>, Boolean> transportResultList = transportOneRecord(record, columnsConfiguration, taskPluginCollector);
         //保存<转换后的数据,是否是脏数据>
         MutablePair<Text, Boolean> transportResult = new MutablePair<Text, Boolean>();
@@ -463,7 +463,7 @@ public  class HdfsHelper {
 
 
             GenericRecordBuilder builder = new GenericRecordBuilder(parSchema);
-            Record record = null;
+            com.alibaba.datax.common.element.Record record = null;
             while ((record = lineReceiver.getFromReader()) != null) {
                 GenericRecord transportResult = transportParRecord(record, columns, taskPluginCollector, builder);
                 writer.write(transportResult);
@@ -510,7 +510,7 @@ public  class HdfsHelper {
         }
         try {
             RecordWriter writer = ((HiveOutputFormat) outFormat).getRecordWriter(fileSystem, conf, fileName, Reporter.NULL);
-            Record record = null;
+            com.alibaba.datax.common.element.Record record = null;
             while ((record = lineReceiver.getFromReader()) != null) {
                 MutablePair<List<Object>, Boolean> transportResult = transportOneRecord(record, columns, taskPluginCollector);
                 if (!transportResult.getRight()) {
@@ -687,7 +687,7 @@ public  class HdfsHelper {
     }
 
     public static MutablePair<List<Object>, Boolean> transportOneRecord(
-            Record record, List<Configuration> columnsConfiguration,
+            com.alibaba.datax.common.element.Record record, List<Configuration> columnsConfiguration,
             TaskPluginCollector taskPluginCollector) {
 
         MutablePair<List<Object>, Boolean> transportResult = new MutablePair<List<Object>, Boolean>();
@@ -780,7 +780,7 @@ public  class HdfsHelper {
     }
 
     public static GenericRecord transportParRecord(
-            Record record, List<Configuration> columnsConfiguration,
+            com.alibaba.datax.common.element.Record record, List<Configuration> columnsConfiguration,
             TaskPluginCollector taskPluginCollector, GenericRecordBuilder builder) {
 
         int recordLength = record.getColumnNumber();

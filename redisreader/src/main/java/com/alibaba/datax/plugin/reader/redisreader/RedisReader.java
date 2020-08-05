@@ -116,7 +116,7 @@ public class RedisReader extends Reader {
                                 collectType(dkv.getValueRdbType());
 
                                 if (Task.this.matchDB(dbNumber.intValue()) && Task.this.matchKey(key)) {
-                                    Record record = recordSender.createRecord();
+                                    com.alibaba.datax.common.element.Record record = recordSender.createRecord();
                                     record.addColumn(new LongColumn(dbNumber));
                                     record.addColumn(new LongColumn(dkv.getValueRdbType()));
                                     record.addColumn(new LongColumn(expire));

@@ -48,7 +48,7 @@ public class HBase20xSQLReaderTask {
             allResultPerfRecord.start();
 
             while (resultSet.next()) {
-                Record record = recordSender.createRecord();
+                com.alibaba.datax.common.element.Record record = recordSender.createRecord();
                 rsNextUsedTime += (System.nanoTime() - lastTime);
                 for (int i = 1; i <= columnNum; i++) {
                     Column column = this.convertPhoenixValueToDataxColumn(meta.getColumnType(i), resultSet.getObject(i));

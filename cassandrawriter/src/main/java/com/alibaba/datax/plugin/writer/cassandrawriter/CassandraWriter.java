@@ -74,7 +74,7 @@ public class CassandraWriter extends Writer {
 
     @Override public void startWrite(RecordReceiver lineReceiver) {
       try {
-        Record record;
+        com.alibaba.datax.common.element.Record record;
         while ((record = lineReceiver.getFromReader()) != null) {
           if (record.getColumnNumber() != columnNumber) {
             // 源头读取字段列数与目的表字段写入列数不相等，直接报错

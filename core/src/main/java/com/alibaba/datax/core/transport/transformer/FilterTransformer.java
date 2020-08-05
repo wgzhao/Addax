@@ -17,7 +17,7 @@ public class FilterTransformer extends Transformer {
     }
 
     @Override
-    public Record evaluate(Record record, Object... paras) {
+    public com.alibaba.datax.common.element.Record evaluate(com.alibaba.datax.common.element.Record record, Object... paras) {
 
         int columnIndex;
         String code;
@@ -69,7 +69,7 @@ public class FilterTransformer extends Transformer {
     }
 
 
-    private Record doGreat(Record record, String value, Column column, boolean hasEqual) {
+    private com.alibaba.datax.common.element.Record doGreat(com.alibaba.datax.common.element.Record record, String value, Column column, boolean hasEqual) {
 
         //如果字段为空，直接不参与比较。即空也属于无穷小
         if(column.getRawData() == null){
@@ -129,7 +129,7 @@ public class FilterTransformer extends Transformer {
         }
     }
 
-    private Record doLess(Record record, String value, Column column, boolean hasEqual) {
+    private com.alibaba.datax.common.element.Record doLess(com.alibaba.datax.common.element.Record record, String value, Column column, boolean hasEqual) {
 
         //如果字段为空，直接不参与比较。即空也属于无穷大
         if(column.getRawData() == null){
@@ -200,7 +200,7 @@ public class FilterTransformer extends Transformer {
      * @return 如果相等，则过滤。
      */
 
-    private Record doEqual(Record record, String value, Column column) {
+    private com.alibaba.datax.common.element.Record doEqual(com.alibaba.datax.common.element.Record record, String value, Column column) {
 
         //如果字段为空，只比较目标字段为"null"，否则null字段均不过滤
         if(column.getRawData() == null){
@@ -250,7 +250,7 @@ public class FilterTransformer extends Transformer {
      * @param column
      * @return 如果不相等，则过滤。
      */
-    private Record doNotEqual(Record record, String value, Column column) {
+    private com.alibaba.datax.common.element.Record doNotEqual(com.alibaba.datax.common.element.Record record, String value, Column column) {
 
         //如果字段为空，只比较目标字段为"null", 否则null字段均过滤。
         if(column.getRawData() == null){
@@ -291,7 +291,7 @@ public class FilterTransformer extends Transformer {
         }
     }
 
-    private Record doLike(Record record, String value, Column column) {
+    private com.alibaba.datax.common.element.Record doLike(com.alibaba.datax.common.element.Record record, String value, Column column) {
         String orivalue = column.asString();
         if (orivalue !=null && orivalue.matches(value)) {
             return null;
@@ -300,7 +300,7 @@ public class FilterTransformer extends Transformer {
         }
     }
 
-    private Record doNotLike(Record record, String value, Column column) {
+    private com.alibaba.datax.common.element.Record doNotLike(com.alibaba.datax.common.element.Record record, String value, Column column) {
         String orivalue = column.asString();
         if (orivalue !=null &&  orivalue.matches(value)) {
             return record;
