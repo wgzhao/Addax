@@ -17,8 +17,8 @@
             <excludes>
                 <exclude>*.pyc</exclude>
             </excludes>
-            <directoryMode>775</directoryMode>
-            <fileMode>755</fileMode>
+            <directoryMode>0775</directoryMode>
+            <fileMode>0644</fileMode>
             <outputDirectory>/bin</outputDirectory>
         </fileSet>
         <!-- for scripts -->
@@ -27,8 +27,8 @@
             <includes>
                 <include>*.*</include>
             </includes>
-            <directoryMode>775</directoryMode>
-            <fileMode>755</fileMode>
+            <directoryMode>0775</directoryMode>
+            <fileMode>0644</fileMode>
             <outputDirectory>/script</outputDirectory>
         </fileSet>
         <!-- for configs -->
@@ -81,7 +81,7 @@
         </fileSet>
 
         <fileSet>
-            <fileMode>777</fileMode>
+            <fileMode>0777</fileMode>
             <directory>src/main/tmp</directory>
             <includes>
                 <include>*.*</include>
