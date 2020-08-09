@@ -9,7 +9,7 @@
 
 当你打开这篇文档，想必已经不用在此解释什么是`DataX`了。那下一个问题便是：
 
-###  `DataX`为什么要使用插件机制？
+###  `DataX` 为什么要使用插件机制？
 
 从设计之初，`DataX`就把异构数据源同步作为自身的使命，为了应对不同数据源的差异、同时提供一致的同步原语和扩展能力，`DataX`自然而然地采用了`框架` + `插件` 的模式：
 
@@ -131,13 +131,13 @@ public class SomeReader extends Reader {
 
 框架按照如下的顺序执行`Job`和`Task`的接口：
 
-![DataXReaderWriter (2)](https://github.com/alibaba/DataX/blob/master/images/plugin_dev_guide_1.png)
+![DataXReaderWriter](images/plugin_dev_guide_1.png)
 
 上图中，黄色表示`Job`部分的执行阶段，蓝色表示`Task`部分的执行阶段，绿色表示框架执行阶段。
 
 相关类关系如下：
 
-![DataX](https://github.com/alibaba/DataX/blob/master/images/plugin_dev_guide_2.png)
+![DataX](images/plugin_dev_guide_2.png)
 
 ### 插件定义
 
@@ -397,7 +397,7 @@ public interface Record {
 
 `Column`除了提供数据相关的方法外，还提供一系列以`as`开头的数据类型转换转换方法。
 
-![Columns](https://github.com/alibaba/DataX/blob/master/images/plugin_dev_guide_3.png)
+![Columns](images/plugin_dev_guide_3.png)
 
 
 DataX的内部类型在实现上会选用不同的java类型：
