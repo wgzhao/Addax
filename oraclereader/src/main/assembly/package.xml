@@ -20,7 +20,7 @@
             <outputDirectory>plugin/reader/oraclereader/libs</outputDirectory>
             <directory>src/main/lib</directory>
             <includes>
-                <include>ojdbc6-11.2.0.3.jar</include>
+                <include>ojdbc8.jar</include>
             </includes>
              <excludes>
                  <exclude>datax-common-3.0.2.jar</exclude>
@@ -40,7 +40,7 @@
             <useProjectArtifact>false</useProjectArtifact>
             <outputDirectory>plugin/reader/oraclereader/libs</outputDirectory>
             <excludes>
-                <exclude>com.alibaba.datax:*</exclude>
+                <exclude>com.alibaba.datax:datax-*</exclude>
             </excludes>
         </dependencySet>
     </dependencySets>
