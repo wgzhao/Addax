@@ -22,7 +22,9 @@ import java.sql.Types;
 import java.util.List;
 import java.util.regex.Pattern;
 
-public class ClickhouseWriter extends Writer {
+import static com.alibaba.datax.plugin.writer.clickhousewriter.ClickHouseWriterErrorCode.TUPLE_NOT_SUPPORTED_ERROR;
+
+public class ClickHouseWriter extends Writer {
 	private static final DataBaseType DATABASE_TYPE = DataBaseType.ClickHouse;
 
 	public static class Job extends Writer.Job {
@@ -278,7 +280,7 @@ public class ClickhouseWriter extends Writer {
 						case Types.OTHER:
 							if (this.resultSetMetaData.getRight().get(columnIndex).startsWith("Tuple")) {
 								throw DataXException
-										.asDataXException(ClickhouseWriterErrorCode.TUPLE_NOT_SUPPORTED_ERROR, ClickhouseWriterErrorCode.TUPLE_NOT_SUPPORTED_ERROR.getDescription());
+										.asDataXException(TUPLE_NOT_SUPPORTED_ERROR, TUPLE_NOT_SUPPORTED_ERROR.getDescription());
 							} else {
 								ps.setString(columnIndex + 1, column.asString());
 							}
