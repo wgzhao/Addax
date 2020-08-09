@@ -42,13 +42,13 @@
             <scope>compile</scope>
         </dependency>
 
-        <!-- <dependency>
+        <dependency>
             <groupId>com.oracle</groupId>
             <artifactId>ojdbc6</artifactId>
-            <version>11.2.0.3</version>
+            <version>19.7.0.0.0</version>
             <scope>system</scope>
-            <systemPath>src/main/lib/ojdbc6-11.2.0.3.jar</systemPath>
-        </dependency> -->
+            <systemPath>${basedir}/src/main/lib/ojdbc8.jar</systemPath>
+        </dependency>
 
     </dependencies>
 
