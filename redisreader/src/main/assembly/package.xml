@@ -14,21 +14,21 @@
                 <include>plugin.json</include>
                 <include>plugin_job_template.json</include>
             </includes>
-            <outputDirectory>plugin/reader/tsdbreader</outputDirectory>
+            <outputDirectory>plugin/reader/redisreader</outputDirectory>
         </fileSet>
         <fileSet>
             <directory>target/</directory>
             <includes>
-                <include>tsdbreader-0.0.1-SNAPSHOT.jar</include>
+                <include>redisreader-${datax-project-version}.jar</include>
             </includes>
-            <outputDirectory>plugin/reader/tsdbreader</outputDirectory>
+            <outputDirectory>plugin/reader/redisreader</outputDirectory>
         </fileSet>
     </fileSets>
 
     <dependencySets>
         <dependencySet>
             <useProjectArtifact>false</useProjectArtifact>
-            <outputDirectory>plugin/reader/tsdbreader/libs</outputDirectory>
+            <outputDirectory>plugin/reader/redisreader/libs</outputDirectory>
             <scope>runtime</scope>
         </dependencySet>
     </dependencySets>

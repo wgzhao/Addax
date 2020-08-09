@@ -5,7 +5,7 @@
 	<parent>
 		<groupId>com.alibaba.datax</groupId>
 		<artifactId>datax-all</artifactId>
-		<version>0.0.1-SNAPSHOT</version>
+		<version>3.0.2</version>
 	</parent>
 	<artifactId>cassandrareader</artifactId>
 	<name>cassandrareader</name>
@@ -47,7 +47,7 @@
 		<dependency>
 			<groupId>com.google.guava</groupId>
 			<artifactId>guava</artifactId>
-			<version>16.0.1</version>
+			<version>${guava-version}</version>
 		</dependency>
 		<dependency>
 			<groupId>commons-codec</groupId>

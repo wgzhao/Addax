@@ -23,7 +23,7 @@
         <commons-cli-version>1.2</commons-cli-version>
         <fastjson-version>1.2.72</fastjson-version>
         <clickhouse-jdbc-version>0.2.4</clickhouse-jdbc-version>
-        <guava-version>[24.1.1,)</guava-version>
+        <guava-version>29.0-jre</guava-version>
         <diamond.version>3.7.3</diamond.version>
         <postgresql-jdbc.version>9.4.1207</postgresql-jdbc.version>
         <!--slf4j 1.7.10 和 logback-classic 1.0.13 是好基友 -->
@@ -46,64 +46,53 @@
     </properties>
 
     <modules>
+        <!-- common support module -->
         <module>common</module>
         <module>core</module>
+        <module>plugin-rdbms-util</module>
+        <module>plugin-unstructured-storage-util</module>
         <module>transformer</module>
 
         <!-- reader -->
-        <!--essential -->
+        <module>cassandrareader</module>
+        <module>clickhousereader</module>
+        <module>dbffilereader</module>
+        <module>ftpreader</module>
+        <module>hbase11xreader</module>
+        <module>hbase11xsqlreader</module>
+        <module>hbase20xsqlreader</module>
+        <module>hdfsreader</module>
+        <module>mongodbreader</module>
         <module>mysqlreader</module>
         <module>oraclereader</module>
-        <module>txtfilereader</module>
-        <module>hdfsreader</module>
-        <module>streamreader</module>
-        <module>dbffilereader</module>
+        <module>postgresqlreader</module>
         <module>rdbmsreader</module>
-        <module>sqlserverreader</module>
-        <module>clickhousereader</module>
-        <!--optional -->
-        <!--
-        <module>ftpreader</module>
-        <module>mongodbreader</module>
-        <module>rdbmsreader</module>
-        <module>hbase11xreader</module>
         <module>redisreader</module>
-        <module>clickhousereader</module>
-        <module>hivereader</module>
-        <module>jsonfilereader</module>
-        <module>postgresqlreader</module>-->
+        <module>sqlserverreader</module>
+        <module>streamreader</module>
+        <module>txtfilereader</module>
 
          <!-- writer -->
-         <!-- essential -->
-        <module>mysqlwriter</module>
-        <module>txtfilewriter</module>
-        <module>hdfswriter</module>
-        <module>streamwriter</module>
-        <module>oraclewriter</module>
-        <module>dbffilewriter</module>
-        <module>rdbmswriter</module>
-        <module>sqlserverwriter</module>
+        <module>cassandrawriter</module>
         <module>clickhousewriter</module>
-        <module>hbase11xsqlreader</module>
-        <module>hbase11xsqlwriter</module>
-
-        <!-- optional -->
-        <!--
-        <module>ftpwriter</module>
-        <module>postgresqlwriter</module>
-        <module>mongodbwriter</module>
-        <module>rdbmswriter</module>
-        <module>hbase11xwriter</module>
-        <module>hbase11xsqlwriter</module>
-        <module>hbase11xsqlreader</module>
+        <module>dbffilewriter</module>
         <module>elasticsearchwriter</module>
+        <module>ftpwriter</module>
+        <module>hbase11xsqlwriter</module>
+        <module>hbase11xwriter</module>
+        <module>hbase20xsqlwriter</module>
+        <module>hdfswriter</module>
+        <module>mongodbwriter</module>
+        <module>mysqlwriter</module>
+        <module>oraclewriter</module>
+        <module>postgresqlwriter</module>
+        <module>rdbmswriter</module>
         <module>rediswriter</module>
-        <module>clickhousewriter</module>-->
-        <!-- common support module -->
-        <module>plugin-rdbms-util</module>
-        <module>plugin-unstructured-storage-util</module>
-        <!--<module>hbase20xsqlreader</module>
-        <module>hbase20xsqlwriter</module>-->
+        <module>sqlserverwriter</module>
+        <module>streamwriter</module>
+        <module>txtfilewriter</module>
+
+
     </modules>
 
     <dependencyManagement>
@@ -181,34 +170,6 @@
             </dependency>
         </dependencies>
     </dependencyManagement>
-
-    <repositories>
-        <repository>
-            <id>central</id>
-            <name>Nexus aliyun</name>
-            <url>https://maven.aliyun.com/repository/central</url>
-            <releases>
-                <enabled>true</enabled>
-            </releases>
-            <snapshots>
-                <enabled>true</enabled>
-            </snapshots>
-        </repository>
-    </repositories>
-
-    <pluginRepositories>
-        <pluginRepository>
-            <id>central</id>
-            <name>Nexus aliyun</name>
-            <url>https://maven.aliyun.com/repository/central</url>
-            <releases>
-                <enabled>true</enabled>
-            </releases>
-            <snapshots>
-                <enabled>true</enabled>
-            </snapshots>
-        </pluginRepository>
-    </pluginRepositories>
 
     <build>
         <plugins>

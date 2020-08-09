@@ -476,12 +476,9 @@ public class DFSUtil {
                 }
             }
             recordSender.sendToWriter(record);
-        } catch (IllegalArgumentException iae) {
+        } catch (IllegalArgumentException | IndexOutOfBoundsException iae) {
             taskPluginCollector
                     .collectDirtyRecord(record, iae.getMessage());
-        } catch (IndexOutOfBoundsException ioe) {
-            taskPluginCollector
-                    .collectDirtyRecord(record, ioe.getMessage());
         } catch (Exception e) {
             if (e instanceof DataXException) {
                 throw (DataXException) e;
@@ -548,7 +545,7 @@ public class DFSUtil {
                     return false;
                 }
                 // 如果不是ORC,RC和SEQ,则默认为是TEXT或CSV类型
-                return !isORC && !isRC && !isSEQ;
+                return true;
 
             } else if (StringUtils.equalsIgnoreCase(specifiedFileType, Constant.ORC)) {
 
