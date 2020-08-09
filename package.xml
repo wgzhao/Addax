@@ -5,7 +5,6 @@
     <id/>
     <formats>
         <format>tar.gz</format>
-        <format>dir</format>
     </formats>
     <includeBaseDirectory>false</includeBaseDirectory>
     <fileSets>
@@ -26,7 +25,83 @@
         </fileSet>
 
         <!-- reader -->
-        <!--essential -->
+        <fileSet>
+            <directory>cassandrareader/target/datax/</directory>
+            <includes>
+                <include>**/*.*</include>
+            </includes>
+            <outputDirectory>datax-${datax-project-version}</outputDirectory>
+        </fileSet>
+        <fileSet>
+            <directory>clickhousereader/target/datax/</directory>
+            <includes>
+                <include>**/*.*</include>
+            </includes>
+            <outputDirectory>datax-${datax-project-version}</outputDirectory>
+        </fileSet>
+        <fileSet>
+            <directory>dbffilereader/target/datax/</directory>
+            <includes>
+                <include>**/*.*</include>
+            </includes>
+            <outputDirectory>datax-${datax-project-version}</outputDirectory>
+        </fileSet>
+        <fileSet>
+            <directory>ftpreader/target/datax/</directory>
+            <includes>
+                <include>**/*.*</include>
+            </includes>
+            <outputDirectory>datax-${datax-project-version}</outputDirectory>
+        </fileSet>
+        <fileSet>
+            <directory>hbase11xreader/target/datax/</directory>
+            <includes>
+                <include>**/*.*</include>
+            </includes>
+            <outputDirectory>datax-${datax-project-version}</outputDirectory>
+        </fileSet>
+        <fileSet>
+            <directory>hbase11xsqlreader/target/datax/</directory>
+            <includes>
+                <include>**/*.*</include>
+            </includes>
+            <outputDirectory>datax-${datax-project-version}</outputDirectory>
+        </fileSet>
+        <fileSet>
+            <directory>hbase20xsqlreader/target/datax/</directory>
+            <includes>
+                <include>**/*.*</include>
+            </includes>
+            <outputDirectory>datax-${datax-project-version}</outputDirectory>
+        </fileSet>
+        <fileSet>
+            <directory>hdfsreader/target/datax/</directory>
+            <includes>
+                <include>**/*.*</include>
+            </includes>
+            <outputDirectory>datax-${datax-project-version}</outputDirectory>
+        </fileSet>
+        <fileSet>
+            <directory>hivereader/target/datax/</directory>
+            <includes>
+                <include>**/*.*</include>
+            </includes>
+            <outputDirectory>datax-${datax-project-version}</outputDirectory>
+        </fileSet>
+        <fileSet>
+            <directory>jsonfilereader/target/datax/</directory>
+            <includes>
+                <include>**/*.*</include>
+            </includes>
+            <outputDirectory>datax</outputDirectory>
+        </fileSet>
+        <fileSet>
+            <directory>mongodbreader/target/datax/</directory>
+            <includes>
+                <include>**/*.*</include>
+            </includes>
+            <outputDirectory>datax-${datax-project-version}</outputDirectory>
+        </fileSet>
         <fileSet>
             <directory>mysqlreader/target/datax/</directory>
             <includes>
@@ -42,78 +117,7 @@
             <outputDirectory>datax-${datax-project-version}</outputDirectory>
         </fileSet>
         <fileSet>
-            <directory>txtfilereader/target/datax/</directory>
-            <includes>
-                <include>**/*.*</include>
-            </includes>
-            <outputDirectory>datax-${datax-project-version}</outputDirectory>
-        </fileSet>
-        <fileSet>
-            <directory>hdfsreader/target/datax/</directory>
-            <includes>
-                <include>**/*.*</include>
-            </includes>
-            <outputDirectory>datax-${datax-project-version}</outputDirectory>
-        </fileSet>
-        <fileSet>
-            <directory>rdbmsreader/target/datax/</directory>
-            <includes>
-                <include>**/*.*</include>
-            </includes>
-            <outputDirectory>datax-${datax-project-version}</outputDirectory>
-        </fileSet>
-        <fileSet>
-            <directory>streamreader/target/datax/</directory>
-            <includes>
-                <include>**/*.*</include>
-            </includes>
-            <outputDirectory>datax-${datax-project-version}</outputDirectory>
-        </fileSet>
-         <fileSet>
-            <directory>ftpreader/target/datax/</directory>
-            <includes>
-                <include>**/*.*</include>
-            </includes>
-            <outputDirectory>datax-${datax-project-version}</outputDirectory>
-        </fileSet>
-        <fileSet>
-            <directory>dbffilereader/target/datax/</directory>
-            <includes>
-                <include>**/*.*</include>
-            </includes>
-            <outputDirectory>datax-${datax-project-version}</outputDirectory>
-        </fileSet>
-        <fileSet>
-            <directory>sqlserverreader/target/datax/</directory>
-            <includes>
-                <include>**/*.*</include>
-            </includes>
-            <outputDirectory>datax-${datax-project-version}</outputDirectory>
-        </fileSet>
-        <fileSet>
-            <directory>hbase11xsqlreader/target/datax/</directory>
-            <includes>
-                <include>**/*.*</include>
-            </includes>
-            <outputDirectory>datax-${datax-project-version}</outputDirectory>
-        </fileSet>
-        <fileSet>
-            <directory>hbase11xsqlwriter/target/datax/</directory>
-            <includes>
-                <include>**/*.*</include>
-            </includes>
-            <outputDirectory>datax-${datax-project-version}</outputDirectory>
-        </fileSet>
-        <!--optional -->
-        <!--<fileSet>
-            <directory>clickhousereader/target/datax/</directory>
-            <includes>
-                <include>**/*.*</include>
-            </includes>
-            <outputDirectory>datax-${datax-project-version}</outputDirectory>
-        </fileSet>
-        <fileSet>
-            <directory>hivereader/target/datax/</directory>
+            <directory>postgresqlreader/target/datax/</directory>
             <includes>
                 <include>**/*.*</include>
             </includes>
@@ -127,58 +131,105 @@
             <outputDirectory>datax-${datax-project-version}</outputDirectory>
         </fileSet>
         <fileSet>
-            <directory>db2reader/target/datax/</directory>
+            <directory>rdbmsreader/target/datax/</directory>
             <includes>
                 <include>**/*.*</include>
             </includes>
             <outputDirectory>datax-${datax-project-version}</outputDirectory>
         </fileSet>
         <fileSet>
-            <directory>postgresqlreader/target/datax/</directory>
+            <directory>sqlserverreader/target/datax/</directory>
             <includes>
                 <include>**/*.*</include>
             </includes>
             <outputDirectory>datax-${datax-project-version}</outputDirectory>
         </fileSet>
         <fileSet>
-            <directory>mongodbreader/target/datax/</directory>
-            <includes>
-                <include>**/*.*</include>
-            </includes>
-            <outputDirectory>datax-${datax-project-version}</outputDirectory>
-        </fileSet> 
-        <fileSet>
-            <directory>hbase11xreader/target/datax/</directory>
+            <directory>streamreader/target/datax/</directory>
             <includes>
                 <include>**/*.*</include>
             </includes>
             <outputDirectory>datax-${datax-project-version}</outputDirectory>
         </fileSet>
         <fileSet>
-            <directory>opentsdbreader/target/datax/</directory>
+            <directory>txtfilereader/target/datax/</directory>
             <includes>
                 <include>**/*.*</include>
             </includes>
             <outputDirectory>datax-${datax-project-version}</outputDirectory>
         </fileSet>
-        <fileSet>
-            <directory>jsonfilereader/target/datax/</directory>
-            <includes>
-                <include>**/*.*</include>
-            </includes>
-            <outputDirectory>datax</outputDirectory>
-        </fileSet>
-        <fileSet>
-            <directory>cassandrareader/target/datax/</directory>
-            <includes>
-                <include>**/*.*</include>
-            </includes>
-            <outputDirectory>datax</outputDirectory>
-        </fileSet>
-    -->
 
         <!-- writer -->
-        <!-- essential -->
+        <fileSet>
+            <directory>cassandrawriter/target/datax/</directory>
+            <includes>
+                <include>**/*.*</include>
+            </includes>
+            <outputDirectory>datax-${datax-project-version}</outputDirectory>
+        </fileSet>
+        <fileSet>
+            <directory>clickhousewriter/target/datax/</directory>
+            <includes>
+                <include>**/*.*</include>
+            </includes>
+            <outputDirectory>datax-${datax-project-version}</outputDirectory>
+        </fileSet>
+        <fileSet>
+            <directory>dbffilewriter/target/datax/</directory>
+            <includes>
+                <include>**/*.*</include>
+            </includes>
+            <outputDirectory>datax-${datax-project-version}</outputDirectory>
+        </fileSet>
+        <fileSet>
+            <directory>elasticsearchwriter/target/datax/</directory>
+            <includes>
+                <include>**/*.*</include>
+            </includes>
+            <outputDirectory>datax-${datax-project-version}</outputDirectory>
+        </fileSet>
+        <fileSet>
+            <directory>ftpwriter/target/datax/</directory>
+            <includes>
+                <include>**/*.*</include>
+            </includes>
+            <outputDirectory>datax-${datax-project-version}</outputDirectory>
+        </fileSet>
+        <fileSet>
+            <directory>hbase11xsqlwriter/target/datax/</directory>
+            <includes>
+                <include>**/*.*</include>
+            </includes>
+            <outputDirectory>datax-${datax-project-version}</outputDirectory>
+        </fileSet>
+        <fileSet>
+            <directory>hbase11xwriter/target/datax/</directory>
+            <includes>
+                <include>**/*.*</include>
+            </includes>
+            <outputDirectory>datax-${datax-project-version}</outputDirectory>
+        </fileSet>
+        <fileSet>
+            <directory>hbase20xsqlwriter/target/datax/</directory>
+            <includes>
+                <include>**/*.*</include>
+            </includes>
+            <outputDirectory>datax-${datax-project-version}</outputDirectory>
+        </fileSet>
+        <fileSet>
+            <directory>hdfswriter/target/datax/</directory>
+            <includes>
+                <include>**/*.*</include>
+            </includes>
+            <outputDirectory>datax-${datax-project-version}</outputDirectory>
+        </fileSet>
+        <fileSet>
+            <directory>mongodbwriter/target/datax/</directory>
+            <includes>
+                <include>**/*.*</include>
+            </includes>
+            <outputDirectory>datax-${datax-project-version}</outputDirectory>
+        </fileSet>
         <fileSet>
             <directory>mysqlwriter/target/datax/</directory>
             <includes>
@@ -188,6 +239,34 @@
         </fileSet>
         <fileSet>
             <directory>oraclewriter/target/datax/</directory>
+            <includes>
+                <include>**/*.*</include>
+            </includes>
+            <outputDirectory>datax-${datax-project-version}</outputDirectory>
+        </fileSet>
+        <fileSet>
+            <directory>postgresqlwriter/target/datax/</directory>
+            <includes>
+                <include>**/*.*</include>
+            </includes>
+            <outputDirectory>datax-${datax-project-version}</outputDirectory>
+        </fileSet>
+        <fileSet>
+            <directory>rdbmswriter/target/datax/</directory>
+            <includes>
+                <include>**/*.*</include>
+            </includes>
+            <outputDirectory>datax-${datax-project-version}</outputDirectory>
+        </fileSet>
+        <fileSet>
+            <directory>rediswriter/target/datax/</directory>
+            <includes>
+                <include>**/*.*</include>
+            </includes>
+            <outputDirectory>datax-${datax-project-version}</outputDirectory>
+        </fileSet>
+        <fileSet>
+            <directory>sqlserverwriter/target/datax/</directory>
             <includes>
                 <include>**/*.*</include>
             </includes>
@@ -207,134 +286,5 @@
             </includes>
             <outputDirectory>datax-${datax-project-version}</outputDirectory>
         </fileSet>
-       <fileSet>
-            <directory>rdbmswriter/target/datax/</directory>
-            <includes>
-                <include>**/*.*</include>
-            </includes>
-            <outputDirectory>datax-${datax-project-version}</outputDirectory>
-        </fileSet>
-        <fileSet>
-            <directory>hdfswriter/target/datax/</directory>
-            <includes>
-                <include>**/*.*</include>
-            </includes>
-            <outputDirectory>datax-${datax-project-version}</outputDirectory>
-        </fileSet>
-        <fileSet>
-            <directory>ftpwriter/target/datax/</directory>
-            <includes>
-                <include>**/*.*</include>
-            </includes>
-            <outputDirectory>datax-${datax-project-version}</outputDirectory>
-        </fileSet>
-        <fileSet>
-            <directory>dbffilewriter/target/datax/</directory>
-            <includes>
-                <include>**/*.*</include>
-            </includes>
-            <outputDirectory>datax-${datax-project-version}</outputDirectory>
-        </fileSet>
-        <fileSet>
-            <directory>sqlserverwriter/target/datax/</directory>
-            <includes>
-                <include>**/*.*</include>
-            </includes>
-            <outputDirectory>datax-${datax-project-version}</outputDirectory>
-        </fileSet>
-        <!-- optional -->
-        <!--
-        <fileSet>
-            <directory>clickhousewriter/target/datax/</directory>
-            <includes>
-                <include>**/*.*</include>
-            </includes>
-            <outputDirectory>datax-${datax-project-version}</outputDirectory>
-        </fileSet>
-        <fileSet>
-            <directory>rediswriter/target/datax/</directory>
-            <includes>
-                <include>**/*.*</include>
-            </includes>
-            <outputDirectory>datax-${datax-project-version}</outputDirectory>
-        </fileSet>
-        <fileSet>
-            <directory>mongodbwriter/target/datax/</directory>
-            <includes>
-                <include>**/*.*</include>
-            </includes>
-            <outputDirectory>datax-${datax-project-version}</outputDirectory>
-        </fileSet>
-		<fileSet>
-            <directory>postgresqlwriter/target/datax/</directory>
-            <includes>
-                <include>**/*.*</include>
-            </includes>
-            <outputDirectory>datax-${datax-project-version}</outputDirectory>
-        </fileSet>
-        <fileSet>
-            <directory>hbase11xwriter/target/datax/</directory>
-            <includes>
-                <include>**/*.*</include>
-            </includes>
-            <outputDirectory>datax-${datax-project-version}</outputDirectory>
-        </fileSet>
-        <fileSet>
-            <directory>hbase11xsqlwriter/target/datax/</directory>
-            <includes>
-                <include>**/*.*</include>
-            </includes>
-            <outputDirectory>datax-${datax-project-version}</outputDirectory>
-        </fileSet>
-        <fileSet>
-            <directory>hbase11xsqlreader/target/datax/</directory>
-            <includes>
-                <include>**/*.*</include>
-            </includes>
-            <outputDirectory>datax-${datax-project-version}</outputDirectory>
-        </fileSet>
-        <fileSet>
-            <directory>elasticsearchwriter/target/datax/</directory>
-            <includes>
-                <include>**/*.*</include>
-            </includes>
-            <outputDirectory>datax-${datax-project-version}</outputDirectory>
-        </fileSet>
-        <fileSet>
-            <directory>hbase20xsqlreader/target/datax/</directory>
-            <includes>
-                <include>**/*.*</include>
-            </includes>
-            <outputDirectory>datax-${datax-project-version}</outputDirectory>
-        </fileSet>
-        <fileSet>
-            <directory>hbase20xsqlwriter/target/datax/</directory>
-            <includes>
-                <include>**/*.*</include>
-            </includes>
-            <outputDirectory>datax</outputDirectory>
-        </fileSet>
-        <fileSet>
-            <directory>tsdbwriter/target/datax/</directory>
-            <includes>
-                <include>**/*.*</include>
-            </includes>
-            <outputDirectory>datax</outputDirectory>
-        </fileSet>
-        <fileSet>
-            <directory>adbpgwriter/target/datax/</directory>
-            <includes>
-                <include>**/*.*</include>
-            </includes>
-            <outputDirectory>datax</outputDirectory>
-        </fileSet>
-        <fileSet>
-            <directory>cassandrawriter/target/datax/</directory>
-            <includes>
-                <include>**/*.*</include>
-            </includes>
-            <outputDirectory>datax</outputDirectory>
-        </fileSet>
-    -->
     </fileSets>
 </assembly>

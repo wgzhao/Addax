@@ -14,21 +14,21 @@
                 <include>plugin.json</include>
                 <include>plugin_job_template.json</include>
             </includes>
-            <outputDirectory>plugin/reader/cassandrareader</outputDirectory>
+            <outputDirectory>plugin/reader/rediswriter</outputDirectory>
         </fileSet>
         <fileSet>
             <directory>target/</directory>
             <includes>
-                <include>cassandrareader-${datax-project-version}.jar</include>
+                <include>rediswriter-${datax-project-version}.jar</include>
             </includes>
-            <outputDirectory>plugin/reader/cassandrareader</outputDirectory>
+            <outputDirectory>plugin/reader/rediswriter</outputDirectory>
         </fileSet>
     </fileSets>
 
     <dependencySets>
         <dependencySet>
             <useProjectArtifact>false</useProjectArtifact>
-            <outputDirectory>plugin/reader/cassandrareader/libs</outputDirectory>
+            <outputDirectory>plugin/reader/rediswriter/libs</outputDirectory>
             <scope>runtime</scope>
         </dependencySet>
     </dependencySets>

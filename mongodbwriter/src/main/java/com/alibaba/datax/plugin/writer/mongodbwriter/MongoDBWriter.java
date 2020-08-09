@@ -130,7 +130,7 @@ public class MongoDBWriter extends Writer{
             }
             MongoDatabase db = mongoClient.getDatabase(database);
             MongoCollection<BasicDBObject> col = db.getCollection(this.collection, BasicDBObject.class);
-            List<Record> writerBuffer = new ArrayList<Record>(this.batchSize);
+            List<com.alibaba.datax.common.element.Record> writerBuffer = new ArrayList<com.alibaba.datax.common.element.Record>(this.batchSize);
             com.alibaba.datax.common.element.Record record = null;
             while((record = lineReceiver.getFromReader()) != null) {
                 writerBuffer.add(record);
@@ -145,7 +145,7 @@ public class MongoDBWriter extends Writer{
             }
         }
 
-        private void doBatchInsert(MongoCollection<BasicDBObject> collection, List<Record> writerBuffer, JSONArray columnMeta) {
+        private void doBatchInsert(MongoCollection<BasicDBObject> collection, List<com.alibaba.datax.common.element.Record> writerBuffer, JSONArray columnMeta) {
 
             List<BasicDBObject> dataList = new ArrayList<BasicDBObject>();
 

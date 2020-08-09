@@ -14,8 +14,8 @@
     <packaging>jar</packaging>
 
     <properties>
-        <hbase.version>1.4.3</hbase.version>
-        <hadoop.version>2.7.3</hadoop.version>
+        <hbase.version>1.4.12</hbase.version>
+        <hadoop.version>3.1.1</hadoop.version>
         <commons-codec.version>1.8</commons-codec.version>
     </properties>
 
@@ -55,25 +55,13 @@
         <dependency>
             <groupId>com.google.guava</groupId>
             <artifactId>guava</artifactId>
-            <version>${guava-version}</version>
+           <version>${guava-version}</version>
         </dependency>
         <dependency>
             <groupId>commons-codec</groupId>
             <artifactId>commons-codec</artifactId>
             <version>${commons-codec.version}</version>
         </dependency>
-
-        <!-- <dependency>
-            <groupId>com.alibaba.hbase</groupId>
-            <artifactId>alihbase-connector</artifactId>
-            <version>1.0.4</version>
-            <exclusions>
-                <exclusion>
-                    <groupId>org.apache.hbase</groupId>
-                    <artifactId>hbase-client</artifactId>
-                </exclusion>
-            </exclusions>
-        </dependency> -->
 
         <dependency>
             <groupId>junit</groupId>

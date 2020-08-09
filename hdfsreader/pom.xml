@@ -105,6 +105,7 @@
                     <source>${jdk-version}</source>
                     <target>${jdk-version}</target>
                     <encoding>${project-sourceEncoding}</encoding>
+                    <compilerArgument>-Xlint:deprecation</compilerArgument>
                 </configuration>
             </plugin>
             <!-- assembly plugin -->
