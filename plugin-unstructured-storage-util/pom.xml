@@ -37,7 +37,7 @@
 		<dependency>
 			<groupId>com.google.guava</groupId>
 			<artifactId>guava</artifactId>
-			<version>16.0.1</version>
+			<version>29.0-jre</version>
 		</dependency>
 		<dependency>
 			<groupId>net.sourceforge.javacsv</groupId>
@@ -47,28 +47,28 @@
 		<dependency>
 			<groupId>org.apache.commons</groupId>
 			<artifactId>commons-compress</artifactId>
-			<version>1.9</version>
+			<version>1.20</version>
 		</dependency>
 		<dependency>
 			<groupId>org.anarres.lzo</groupId>
 			<artifactId>lzo-core</artifactId>
-			<version>1.0.5</version>
+			<version>1.0.6</version>
 		</dependency>
 		<dependency>
 			<groupId>com.aliyun.oss</groupId>
 			<artifactId>aliyun-sdk-oss</artifactId>
-			<version>2.0.2</version>
+			<version>3.10.2</version>
 			<scope>test</scope>
 		</dependency>
 		<dependency>
 			<groupId>io.airlift</groupId>
 			<artifactId>aircompressor</artifactId>
-			<version>0.3</version>
+			<version>0.16</version>
 		</dependency>
 		<dependency>
 			<groupId>com.facebook.presto.hadoop</groupId>
 			<artifactId>hadoop-apache2</artifactId>
-			<version>0.3</version>
+			<version>3.2.0-1</version>
 			<scope>provided</scope>
 		</dependency>
 		<dependency>
@@ -79,7 +79,7 @@
 		<dependency>
 			<groupId>commons-beanutils</groupId>
 			<artifactId>commons-beanutils</artifactId>
-			<version>1.9.2</version>
+			<version>1.9.4</version>
 		</dependency>
 		<!--hadoop dependency-->
 		<dependency>
