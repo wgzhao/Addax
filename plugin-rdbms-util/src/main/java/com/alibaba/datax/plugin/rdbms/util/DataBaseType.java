@@ -10,9 +10,7 @@ import java.util.regex.Pattern;
  * <p/>
  */
 public enum DataBaseType {
-    MySql("mysql", "com.mysql.jdbc.Driver"),
-    Tddl("mysql", "com.mysql.jdbc.Driver"),
-    DRDS("drds", "com.mysql.jdbc.Driver"),
+    MySql("mysql", "com.mysql.cj.jdbc.Driver"),
     Hive("hive", "org.apache.hive.jdbc.HiveDriver"),
     Oracle("oracle", "oracle.jdbc.OracleDriver"),
     Presto("presto", "io.prestosql.jdbc.PrestoDriver"),
@@ -21,7 +19,6 @@ public enum DataBaseType {
     PostgreSQL("postgresql", "org.postgresql.Driver"),
     RDBMS("rdbms", "com.alibaba.datax.plugin.rdbms.util.DataBaseType"),
     DB2("db2", "com.ibm.db2.jcc.DB2Driver"),
-    ADS("ads","com.mysql.jdbc.Driver"),
     Inceptor2("inceptor2", "io.transwarp.jdbc.InceptorDriver"),
     Inceptor("inceptor", "io.transwarp.jdbc.InceptorDriver");
 
@@ -43,7 +40,6 @@ public enum DataBaseType {
         String suffix = null;
         switch (this) {
             case MySql:
-            case DRDS:
                 suffix = "yearIsDateType=false&zeroDateTimeBehavior=convertToNull&tinyInt1isBit=false&rewriteBatchedStatements=true";
                 if (jdbc.contains("?")) {
                     result = jdbc + "&" + suffix;
@@ -84,14 +80,6 @@ public enum DataBaseType {
         switch (this) {
             case MySql:
                 suffix = "yearIsDateType=false&zeroDateTimeBehavior=convertToNull&rewriteBatchedStatements=true&tinyInt1isBit=false";
-                if (jdbc.contains("?")) {
-                    result = jdbc + "&" + suffix;
-                } else {
-                    result = jdbc + "?" + suffix;
-                }
-                break;
-            case DRDS:
-                suffix = "yearIsDateType=false&zeroDateTimeBehavior=convertToNull";
                 if (jdbc.contains("?")) {
                     result = jdbc + "&" + suffix;
                 } else {
