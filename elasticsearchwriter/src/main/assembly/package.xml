@@ -18,7 +18,7 @@
         <fileSet>
             <directory>target/</directory>
             <includes>
-                <include>elasticsearchwriter-${datax-project-version}.jar</include>
+                <include>elasticsearchwriter-${project.version}.jar</include>
             </includes>
             <outputDirectory>plugin/writer/elasticsearchwriter</outputDirectory>
         </fileSet>

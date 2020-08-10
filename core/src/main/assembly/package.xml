@@ -43,7 +43,7 @@
         <fileSet>
             <directory>target/</directory>
             <includes>
-                <include>datax-core-${datax-project-version}.jar</include>
+                <include>datax-core-${project.version}.jar</include>
             </includes>
             <outputDirectory>/lib</outputDirectory>
         </fileSet>

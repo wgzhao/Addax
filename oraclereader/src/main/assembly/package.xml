@@ -29,7 +29,7 @@
         <fileSet>
             <directory>target/</directory>
             <includes>
-                <include>oraclereader-${datax-project-version}.jar</include>
+                <include>oraclereader-${project.version}.jar</include>
             </includes>
             <outputDirectory>plugin/reader/oraclereader</outputDirectory>
         </fileSet>

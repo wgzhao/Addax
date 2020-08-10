@@ -11,7 +11,7 @@
         <fileSet>
             <directory>target/</directory>
             <includes>
-                <include>datax-transformer-${datax-project-version}.jar</include>
+                <include>datax-transformer-${project.version}.jar</include>
             </includes>
             <outputDirectory>/lib</outputDirectory>
         </fileSet>

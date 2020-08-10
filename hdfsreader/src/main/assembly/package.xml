@@ -19,7 +19,7 @@
         <fileSet>
             <directory>target/</directory>
             <includes>
-                <include>hdfsreader-${datax-project-version}.jar</include>
+                <include>hdfsreader-${project.version}.jar</include>
             </includes>
             <outputDirectory>plugin/reader/hdfsreader</outputDirectory>
         </fileSet>

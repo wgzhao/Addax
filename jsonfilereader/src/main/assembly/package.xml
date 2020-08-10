@@ -19,7 +19,7 @@
         <fileSet>
             <directory>target/</directory>
             <includes>
-                <include>jsonfilereader-${datax-project-version}.jar</include>
+                <include>jsonfilereader-${project.version}.jar</include>
             </includes>
             <outputDirectory>plugin/reader/jsonfilereader</outputDirectory>
         </fileSet>

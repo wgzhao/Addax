@@ -19,7 +19,7 @@
 		<fileSet>
 			<directory>target/</directory>
 			<includes>
-				<include>ftpreader-${datax-project-version}.jar</include>
+				<include>ftpreader-${project.version}.jar</include>
 			</includes>
 			<outputDirectory>plugin/reader/ftpreader</outputDirectory>
 		</fileSet>
