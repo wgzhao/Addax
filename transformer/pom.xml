@@ -8,20 +8,15 @@
     <modelVersion>4.0.0</modelVersion>
 
     <artifactId>datax-transformer</artifactId>
-    <packaging>jar</packaging>
-
     <name>datax-transformer</name>
-
-    <properties>
-        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <datax-version>3.0.2</datax-version>
-    </properties>
+    <description>data transformer</description>
+    <packaging>jar</packaging>
 
     <dependencies>
         <dependency>
             <groupId>com.alibaba.datax</groupId>
             <artifactId>datax-common</artifactId>
-            <version>${datax-version}</version>
+            <version>${project.version}</version>
             <exclusions>
                 <exclusion>
                     <artifactId>slf4j-log4j12</artifactId>
@@ -37,11 +32,6 @@
             <!-- compiler plugin -->
             <plugin>
                 <artifactId>maven-compiler-plugin</artifactId>
-                <configuration>
-                    <source>${jdk-version}</source>
-                    <target>${jdk-version}</target>
-                    <encoding>${project-sourceEncoding}</encoding>
-                </configuration>
             </plugin>
             <!-- assembly plugin -->
             <plugin>
