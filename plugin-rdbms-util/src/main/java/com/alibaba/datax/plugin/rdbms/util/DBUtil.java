@@ -706,12 +706,6 @@ public final class DBUtil {
                         new ArrayList<String>(), String.class);
                 DBUtil.doDealWithSessionConfig(conn, sessionConfig, message);
                 break;
-            case DRDS:
-                // 用于关闭 drds 的分布式事务开关
-                sessionConfig = new ArrayList<String>();
-                sessionConfig.add("set transaction policy 4");
-                DBUtil.doDealWithSessionConfig(conn, sessionConfig, message);
-                break;
             case MySql:
                 sessionConfig = config.getList(Key.SESSION,
                         new ArrayList<String>(), String.class);
