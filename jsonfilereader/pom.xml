@@ -15,7 +15,7 @@
         <dependency>
             <groupId>com.alibaba.datax</groupId>
             <artifactId>datax-common</artifactId>
-            <version>${datax-project-version}</version>
+            <version>${version}</version>
             <exclusions>
                 <exclusion>
                     <artifactId>slf4j-log4j12</artifactId>
@@ -26,7 +26,7 @@
         <dependency>
             <groupId>com.alibaba.datax</groupId>
             <artifactId>plugin-unstructured-storage-util</artifactId>
-            <version>${datax-project-version}</version>
+            <version>${version}</version>
         </dependency>
         <dependency>
             <groupId>org.slf4j</groupId>
