@@ -35,11 +35,13 @@ DbfFileWriter提供了向本地文件写入类dbf格式的一个或者多个表�
 ```json
 {
     "job": {
-        "setting": {
-            "speed": {
-                "channel": 2
-            }
-        },
+      "setting": {
+        "speed": {
+          "batchSize": 20480, 
+          "bytes": -1, 
+          "channel": 1
+        }
+      },
         "content": [
             {
         "reader": {
@@ -55,16 +57,12 @@ DbfFileWriter提供了向本地文件写入类dbf格式的一个或者多个表�
                             "type": "long"
                         },
                         {
-                            "value": "1988-08-08 08:08:08",
+                            "value": "1988-08-08 16:00:04",
                             "type": "date"
                         },
                         {
                             "value": true,
                             "type": "bool"
-                        },
-                        {
-                            "value": "test",
-                            "type": "bytes"
                         }
                     ],
                     "sliceRecordCount": 1000
@@ -75,36 +73,32 @@ DbfFileWriter提供了向本地文件写入类dbf格式的一个或者多个表�
                      "parameter": {
                        "column": [
                          {
-                           "name": "branch_no", 
-                           "type": "bigint"
+                           "name": "col1", 
+                           "type": "char",
+                           "length": 100
                          }, 
                          {
-           				"name":"col2",
-           				"type":"string",
-           				 },
+                          "name":"col2",
+                          "type":"numeric",
+                          "length": 18,
+                          "scale": 0
+                          },
                          {
-                           "name": "branch_name", 
-                           "type": "string"
+                           "name": "col3", 
+                           "type": "date"
                          },
                          {
-           				"name":"col4",
-           				"type":"string"
+                          "name":"col4",
+                          "type":"logical"
                          }
                        ], 
-           	    "fileName": "allbranch.dbf",
+           	          "fileName": "test.dbf",
                        "path": "/tmp/out",
                        "writeMode": "truncate"
                      }
                    }
             }
-        ], 
-             "setting": {
-               "speed": {
-                 "batchSize": 20480, 
-                 "bytes": -1, 
-                 "channel": 1
-               }
-             }
+        ]
     }
 }
 ```
@@ -126,17 +120,17 @@ DbfFileWriter提供了向本地文件写入类dbf格式的一个或者多个表�
 
 		```json
 		{"column":
-                 [
-                            {
-                                "name": "userName",
-                                "type": "string"
-                            },
-                            {
-                                "name": "age",
-                                "type": "long"
-                            }
-                 ]
-               }
+         [
+            {
+                "name": "userName",
+                "type": "string"
+            },
+            {
+                "name": "age",
+                "type": "long"
+            }
+         ]
+          }
 		```
 
 	* 必选：是 <br />
@@ -209,16 +203,15 @@ DbfFileWriter提供了向本地文件写入类dbf格式的一个或者多个表�
 ### 3.3 类型转换
 
 
-本地文件本身提供数据类型，该类型是DataX DbfFileWriter定义：
+当前该插件支持写入的类型以及对应关系如下：
 
-| DataX 内部类型| 本地文件 数据类型    |
-| -------- | -----  |
-|
-| Long     |numeric |
-| Double   |numeric|
-| String   |char|
-| Boolean  |logical |
-| Date     |Date |
+| XBase Type    | XBase Symbol | Java Type used in JavaDBF |
+|------------   | ------------ | ---------------------------
+|Character      | C            | java.lang.String          |
+|Numeric        | N            | java.math.BigDecimal      |
+|Floating Point | F            | java.math.BigDecimal      |
+|Logical        | L            | java.lang.Boolean         |
+|Date           | D            | java.util.Date            |
 
 其中：
 
