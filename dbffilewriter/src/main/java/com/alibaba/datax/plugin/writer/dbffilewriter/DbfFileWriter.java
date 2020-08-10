@@ -1,7 +1,6 @@
 package com.alibaba.datax.plugin.writer.dbffilewriter;
 
 import com.alibaba.datax.common.element.Column;
-import com.alibaba.datax.common.element.Record;
 import com.alibaba.datax.common.exception.DataXException;
 import com.alibaba.datax.common.plugin.RecordReceiver;
 import com.alibaba.datax.common.spi.Writer;
@@ -24,6 +23,7 @@ import java.io.FileOutputStream;
 import java.io.FilenameFilter;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.math.BigDecimal;
 import java.nio.charset.Charset;
 import java.util.*;
 
@@ -294,57 +294,73 @@ public class DbfFileWriter extends Writer {
             String fileFullPath = this.buildFilePath();
             LOG.info(String.format("write to file : [%s]", fileFullPath));
             List<Configuration> columns = this.writerSliceConfig.getListConfiguration("column");
-            DBFWriter writer = null;
+            DBFWriter writer;
             FileOutputStream fos = null;
             try {
                 File f = new File(fileFullPath);
-                f.createNewFile();
+//                f.createNewFile();
                 fos = new FileOutputStream(f);
-                writer = new DBFWriter(fos, Charset.forName("GBK"));
+                writer = new DBFWriter(new File(fileFullPath), Charset.forName("GBK"));
+
                 DBFField[] fields = new DBFField[columns.size()];
 
                 for (int i = 0; i <columns.size(); i++) {
                     fields[i] = new DBFField();
                     fields[i].setName(columns.get(i).getString("name"));
-                    if (columns.get(i).getString("type").equals("char")){
-                        fields[i].setType(DBFDataType.CHARACTER);
-                        fields[i].setLength(columns.get(i).getInt("length"));
-                    }else if (columns.get(i).getString("type").equals("numeric")){
-                        fields[i].setType(DBFDataType.NUMERIC);
-                        fields[i].setLength(columns.get(i).getInt("length"));
-                        fields[i].setDecimalCount(columns.get(i).getInt("scal"));
-
-                    }else if (columns.get(i).getString("type").equals("date")){
-                        fields[i].setType(DBFDataType.DATE);
+                    switch (columns.get(i).getString("type")) {
+                        case "char":
+                            fields[i].setType(DBFDataType.CHARACTER);
+                            fields[i].setLength(columns.get(i).getInt("length"));
+                            break;
+                        case "numeric":
+                            fields[i].setType(DBFDataType.NUMERIC);
+                            fields[i].setLength(columns.get(i).getInt("length"));
+                            fields[i].setDecimalCount(columns.get(i).getInt("scale"));
+                            break;
+                        case "date":
+                            fields[i].setType(DBFDataType.DATE);
+                            break;
+                        case "logical":
+                            fields[i].setType(DBFDataType.LOGICAL);
+                            break;
+                        default:
+                            LOG.warn("data type not find, convert it to char");
+                            fields[i].setType(DBFDataType.CHARACTER);
+                            fields[i].setLength(1000);
+                            break;
                     }
-
                     // Date类型不能设置字段长度，这里没有处理其它没有字段长度的类型
-
                 }
                 writer.setFields(fields);
-                com.alibaba.datax.common.element.Record record = null;
+
+                com.alibaba.datax.common.element.Record record;
                 while ((record = lineReceiver.getFromReader()) != null) {
-                    Object rowData[] = new Object[columns.size()];
+                    Object[] rowData = new Object[columns.size()];
                     Column column;
                     for (int i = 0; i <columns.size(); i++) {
                         column = record.getColumn(i);
                         if (null != column.getRawData()) {
                             String colData = column.getRawData().toString();
-                            if (columns.get(i).getString("type").equals("numeric")){
-                                rowData[i] = Float.valueOf(colData);
-                            } else if (columns.get(i).getString("type").equals("char")){
-                                //rowData[i] = new String(colData.getBytes("GBK"));
-                                rowData[i] = colData;
-                            }else if (columns.get(i).getString("type").equals("date")){
-                                rowData[i] = new Date(Long.parseLong(colData));
+                            switch (columns.get(i).getString("type")) {
+                                case "numeric":
+                                    rowData[i] = Float.valueOf(colData);
+                                    break;
+                                case "char":
+                                    //rowData[i] = new String(colData.getBytes("GBK"));
+                                    rowData[i] = colData;
+                                    break;
+                                case "date":
+                                    rowData[i] = new Date(Long.parseLong(colData));
+                                    break;
                             }
                         }
 
                     }
                     writer.addRecord(rowData);
                 }
-                DBFUtils.close(writer);
-            } catch (SecurityException se) {
+
+                writer.close();
+            } catch (SecurityException  se) {
                 throw DataXException.asDataXException(
                         DbfFileWriterErrorCode.SECURITY_NOT_ENOUGH,
                         String.format("您没有权限创建文件  : [%s]", this.fileName));
@@ -352,9 +368,10 @@ public class DbfFileWriter extends Writer {
                 throw DataXException.asDataXException(
                         DbfFileWriterErrorCode.Write_FILE_IO_ERROR,
                         String.format("无法创建待写文件 : [%s]", this.fileName), ioe);
-            }finally {
-                DBFUtils.close(writer);
             }
+//            finally {
+//                writer.close();
+//            }
             LOG.info("end do write");
         }
 
