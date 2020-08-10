@@ -48,26 +48,24 @@ deploy_stage:
   stage: deploy
   script:
     - /bin/bash deploy.sh
-  only:
-    - master
   environment: 
     name: staging
-    url: http://gitlab.ds.cfzq.com
   only:
     changes:
       - "^src/*.{java,xml}"
+    refs:
+      - master
   when: on_success
   
 deploy_prod:
   stage: deploy
   script:
     - /bin/bash deploy.sh
-  only:
-    - master
   environment: 
     name: production
-    url: http://gitlab.ds.cfzq.com
   only:
     changes:
       - "^src/*.{java,xml}"
+    refs:
+      - master
   when: manual

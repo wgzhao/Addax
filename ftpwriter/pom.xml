@@ -15,7 +15,7 @@
 		<dependency>
 			<groupId>com.alibaba.datax</groupId>
 			<artifactId>datax-common</artifactId>
-			<version>${version}</version>
+			<version>${project.version}</version>
 			<exclusions>
 				<exclusion>
 					<artifactId>slf4j-log4j12</artifactId>
@@ -26,7 +26,7 @@
 		<dependency>
 			<groupId>com.alibaba.datax</groupId>
 			<artifactId>plugin-unstructured-storage-util</artifactId>
-			<version>${version}</version>
+			<version>${project.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>org.slf4j</groupId>
@@ -39,7 +39,7 @@
 		<dependency>
 			<groupId>com.google.guava</groupId>
 			<artifactId>guava</artifactId>
-			<version>${guava-version}</version>
+			<version>${guava.version}</version>
 		</dependency>
 
 		<dependency>
@@ -61,15 +61,7 @@
 
 	<build>
 		<plugins>
-			<!-- compiler plugin -->
-			<plugin>
-				<artifactId>maven-compiler-plugin</artifactId>
-				<configuration>
-					<source>${jdk-version}</source>
-					<target>${jdk-version}</target>
-					<encoding>${project-sourceEncoding}</encoding>
-				</configuration>
-			</plugin>
+
 			<plugin>
 				<artifactId>maven-assembly-plugin</artifactId>
 				<configuration>

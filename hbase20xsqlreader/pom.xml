@@ -20,7 +20,7 @@
         <dependency>
             <groupId>com.alibaba.datax</groupId>
             <artifactId>datax-common</artifactId>
-            <version>${version}</version>
+            <version>${project.version}</version>
             <exclusions>
                 <exclusion>
                     <artifactId>slf4j-log4j12</artifactId>
@@ -50,7 +50,7 @@
         <dependency>
             <groupId>com.alibaba.datax</groupId>
             <artifactId>datax-core</artifactId>
-            <version>${version}</version>
+            <version>${project.version}</version>
             <exclusions>
                 <exclusion>
                     <groupId>com.alibaba.datax</groupId>
@@ -62,7 +62,7 @@
         <dependency>
             <groupId>com.alibaba.datax</groupId>
             <artifactId>plugin-rdbms-util</artifactId>
-            <version>${version}</version>
+            <version>${project.version}</version>
             <scope>compile</scope>
         </dependency>
     </dependencies>
@@ -80,11 +80,7 @@
             <!-- compiler plugin -->
             <plugin>
                 <artifactId>maven-compiler-plugin</artifactId>
-                <configuration>
-                    <source>${jdk-version}</source>
-                    <target>${jdk-version}</target>
-                    <encoding>${project-sourceEncoding}</encoding>
-                </configuration>
+
             </plugin>
             <plugin>
                 <artifactId>maven-assembly-plugin</artifactId>

@@ -17,7 +17,7 @@
         <dependency>
             <groupId>com.alibaba.datax</groupId>
             <artifactId>datax-common</artifactId>
-            <version>${version}</version>
+            <version>${project.version}</version>
             <exclusions>
                 <exclusion>
                     <artifactId>slf4j-log4j12</artifactId>
@@ -28,7 +28,7 @@
         <!-- <dependency>
             <groupId>com.alibaba.datax</groupId>
             <artifactId>simulator</artifactId>
-            <version>${version}</version>
+            <version>${project.version}</version>
             <scope>test</scope>
         </dependency> -->
         <dependency>
@@ -42,12 +42,12 @@
         <dependency>
             <groupId>com.alibaba.datax</groupId>
             <artifactId>plugin-rdbms-util</artifactId>
-            <version>${version}</version>
+            <version>${project.version}</version>
         </dependency>
         <dependency>
             <groupId>ru.yandex.clickhouse</groupId>
             <artifactId>clickhouse-jdbc</artifactId>
-            <version>${clickhouse-jdbc-version}</version>
+            <version>${clickhouse.jdbc.version}</version>
         </dependency>
     </dependencies>
     <build>
@@ -63,11 +63,7 @@
             <!-- compiler plugin -->
             <plugin>
                 <artifactId>maven-compiler-plugin</artifactId>
-                <configuration>
-                    <source>${jdk-version}</source>
-                    <target>${jdk-version}</target>
-                    <encoding>${project-sourceEncoding}</encoding>
-                </configuration>
+
             </plugin>
             <!-- assembly plugin -->
             <plugin>

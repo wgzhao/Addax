@@ -15,7 +15,7 @@
 		<dependency>
 			<groupId>com.alibaba.datax</groupId>
 			<artifactId>datax-common</artifactId>
-			<version>${version}</version>
+			<version>${project.version}</version>
 			<exclusions>
 				<exclusion>
 					<artifactId>slf4j-log4j12</artifactId>
@@ -34,21 +34,13 @@
 		<dependency>
 			<groupId>com.google.guava</groupId>
 			<artifactId>guava</artifactId>
-            <version>${guava-version}</version>
+            <version>${guava.version}</version>
 		</dependency>
 	</dependencies>
 
 	<build>
 		<plugins>
-			<!-- compiler plugin -->
-			<plugin>
-				<artifactId>maven-compiler-plugin</artifactId>
-				<configuration>
-					<source>${jdk-version}</source>
-					<target>${jdk-version}</target>
-					<encoding>${project-sourceEncoding}</encoding>
-				</configuration>
-			</plugin>
+
 			<!-- assembly plugin -->
 			<plugin>
 				<artifactId>maven-assembly-plugin</artifactId>
