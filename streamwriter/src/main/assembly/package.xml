@@ -18,7 +18,7 @@
         <fileSet>
             <directory>target/</directory>
             <includes>
-                <include>streamwriter-${datax-project-version}.jar</include>
+                <include>streamwriter-${project.version}.jar</include>
             </includes>
             <outputDirectory>plugin/writer/streamwriter</outputDirectory>
         </fileSet>

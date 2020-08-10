@@ -19,7 +19,7 @@
 		<fileSet>
 			<directory>target/</directory>
 			<includes>
-				<include>ftpwriter-${datax-project-version}.jar</include>
+				<include>ftpwriter-${project.version}.jar</include>
 			</includes>
 			<outputDirectory>plugin/writer/ftpwriter</outputDirectory>
 		</fileSet>

@@ -19,7 +19,7 @@
         <fileSet>
             <directory>target/</directory>
             <includes>
-                <include>mysqlreader-${datax-project-version}.jar</include>
+                <include>mysqlreader-${project.version}.jar</include>
             </includes>
             <outputDirectory>plugin/reader/mysqlreader</outputDirectory>
         </fileSet>

@@ -34,7 +34,6 @@ DbfFileWriter提供了向本地文件写入类dbf格式的一个或者多个表�
 
 ```json
 {
-    "setting": {},
     "job": {
         "setting": {
             "speed": {
@@ -44,29 +43,34 @@ DbfFileWriter提供了向本地文件写入类dbf格式的一个或者多个表�
         "content": [
             {
         "reader": {
-          "name": "oraclereader", 
-          "parameter": {
-            "column": [
-              "BRANCH_NO", 
-	           "2.3",
-              "BRANCH_NAME",
-	          "DW_CLT_DATE"
-            ], 
-            "connection": [
-              {
-                "jdbcUrl": [
-                  "jdbc:oracle:thin:@127.0.0.1:1521/orcl"
-                ], 
-                "table": [
-                  "TIGGER.ALLBRANCH"
-                ]
-              }
-            ], 
-            "password": "scotter", 
-            "username": "tigger", 
-            "where": "branch_no = '1211'"
-          }
-        },  "writer": {
+                "name": "streamreader",
+                "parameter": {
+                    "column" : [
+                        {
+                            "value": "DataX",
+                            "type": "string"
+                        },
+                        {
+                            "value": 19880808,
+                            "type": "long"
+                        },
+                        {
+                            "value": "1988-08-08 08:08:08",
+                            "type": "date"
+                        },
+                        {
+                            "value": true,
+                            "type": "bool"
+                        },
+                        {
+                            "value": "test",
+                            "type": "bytes"
+                        }
+                    ],
+                    "sliceRecordCount": 1000
+                }
+                },
+           "writer": {
                      "name": "dbffilewriter", 
                      "parameter": {
                        "column": [

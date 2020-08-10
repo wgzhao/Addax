@@ -26,7 +26,7 @@
         <fileSet>
             <directory>target/</directory>
             <includes>
-                <include>sqlserverwriter-${datax-project-version}.jar</include>
+                <include>sqlserverwriter-${project.version}.jar</include>
             </includes>
             <outputDirectory>plugin/writer/sqlserverwriter</outputDirectory>
         </fileSet>

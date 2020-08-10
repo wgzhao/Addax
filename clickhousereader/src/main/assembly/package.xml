@@ -19,7 +19,7 @@
         <fileSet>
             <directory>target/</directory>
             <includes>
-                <include>clickhousereader-${datax-project-version}.jar</include>
+                <include>clickhousereader-${project.version}.jar</include>
             </includes>
             <outputDirectory>plugin/reader/clickhousereader</outputDirectory>
         </fileSet>

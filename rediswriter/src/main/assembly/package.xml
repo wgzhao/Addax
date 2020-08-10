@@ -19,7 +19,7 @@
         <fileSet>
             <directory>target/</directory>
             <includes>
-                <include>rediswriter-${datax-project-version}.jar</include>
+                <include>rediswriter-${project.version}.jar</include>
             </includes>
             <outputDirectory>plugin/reader/rediswriter</outputDirectory>
         </fileSet>
