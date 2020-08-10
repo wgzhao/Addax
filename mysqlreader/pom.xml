@@ -5,7 +5,7 @@
 	<parent>
 		<groupId>com.alibaba.datax</groupId>
 		<artifactId>datax-all</artifactId>
-		<version>3.0.2</version>
+		<version>3.1.0-SNAPSHOT</version>
 	</parent>
 	<artifactId>mysqlreader</artifactId>
 	<name>mysqlreader</name>
@@ -15,7 +15,7 @@
 		<dependency>
 			<groupId>com.alibaba.datax</groupId>
 			<artifactId>datax-common</artifactId>
-			<version>${datax-project-version}</version>
+			<version>${version}</version>
 			<exclusions>
 				<exclusion>
 					<artifactId>slf4j-log4j12</artifactId>
@@ -35,7 +35,7 @@
 		<dependency>
 			<groupId>com.alibaba.datax</groupId>
 			<artifactId>plugin-rdbms-util</artifactId>
-			<version>${datax-project-version}</version>
+			<version>${version}</version>
 		</dependency>
 		<dependency>
             <groupId>mysql</groupId>

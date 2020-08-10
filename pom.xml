@@ -4,7 +4,7 @@
 
     <groupId>com.alibaba.datax</groupId>
     <artifactId>datax-all</artifactId>
-    <version>3.0.2</version>
+    <version>3.1.0-SNAPSHOT</version>
     <dependencies>
         <dependency>
             <groupId>org.hamcrest</groupId>
@@ -17,7 +17,6 @@
     <packaging>pom</packaging>
 
     <properties>
-        <datax-project-version>3.0.2</datax-project-version>
         <commons-lang3-version>3.3.2</commons-lang3-version>
         <commons-configuration-version>1.10</commons-configuration-version>
         <commons-cli-version>1.2</commons-cli-version>
@@ -176,7 +175,7 @@
             <plugin>
                 <artifactId>maven-assembly-plugin</artifactId>
                 <configuration>
-                    <finalName>datax-${datax-project-version}</finalName>
+                    <finalName>datax-${version}</finalName>
                     <descriptors>
                         <descriptor>package.xml</descriptor>
                     </descriptors>
