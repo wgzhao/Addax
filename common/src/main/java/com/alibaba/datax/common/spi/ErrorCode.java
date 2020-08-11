@@ -29,5 +29,6 @@ public interface ErrorCode {
 	 * </pre>
 	 * 
 	 */
+	@Override
 	String toString();
 }
