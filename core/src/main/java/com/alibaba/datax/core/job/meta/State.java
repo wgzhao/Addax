@@ -14,7 +14,7 @@ public enum State {
 
     int value;
 
-    private State(int value) {
+    State(int value) {
         this.value = value;
     }
 
