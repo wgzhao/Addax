@@ -10,7 +10,7 @@ public enum OracleReaderErrorCode implements ErrorCode {
     private final String code;
     private final String description;
 
-    private OracleReaderErrorCode(String code, String description) {
+    OracleReaderErrorCode(String code, String description) {
         this.code = code;
         this.description = description;
     }

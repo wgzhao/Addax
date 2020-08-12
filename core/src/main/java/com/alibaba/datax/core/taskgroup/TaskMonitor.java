@@ -17,7 +17,7 @@ public class TaskMonitor {
 
     private static final Logger LOG = LoggerFactory.getLogger(TaskMonitor.class);
     private static final TaskMonitor instance = new TaskMonitor();
-    private static long EXPIRED_TIME = 172800 * 1000;
+    private static long EXPIRED_TIME = 172800 * 1000; //48 hours
 
     private ConcurrentHashMap<Integer, TaskCommunication> tasks = new ConcurrentHashMap<Integer, TaskCommunication>();
 
@@ -84,7 +84,8 @@ public class TaskMonitor {
                 communication.setState(State.FAILED);
                 communication.setTimestamp(ttl);
                 communication.setThrowable(DataXException.asDataXException(CommonErrorCode.TASK_HUNG_EXPIRED,
-                        String.format("task(%s) hung expired [allReadRecord(%s), elased(%s)]", taskid, lastAllReadRecords, (ttl - lastUpdateComunicationTS))));
+                        String.format("task(%s) hung expired [allReadRecord(%s), elased(%s)]",
+                                taskid, lastAllReadRecords, (ttl - lastUpdateComunicationTS))));
             }
 
 

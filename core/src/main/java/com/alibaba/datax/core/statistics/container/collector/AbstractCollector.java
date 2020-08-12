@@ -10,7 +10,7 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 public abstract class AbstractCollector {
-    private Map<Integer, Communication> taskCommunicationMap = new ConcurrentHashMap<Integer, Communication>();
+    private Map<Integer, Communication> taskCommunicationMap = new ConcurrentHashMap<>();
     private Long jobId;
 
     public Map<Integer, Communication> getTaskCommunicationMap() {
