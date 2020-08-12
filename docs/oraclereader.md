@@ -1,83 +1,61 @@
 
 # OracleReader 插件文档
 
-
-___
-
-
 ## 1 快速介绍
 
 OracleReader插件实现了从Oracle读取数据。在底层实现上，OracleReader通过JDBC连接远程Oracle数据库，并执行相应的sql语句将数据从Oracle库中SELECT出来。
 
 ## 2 实现原理
 
-简而言之，OracleReader通过JDBC连接器连接到远程的Oracle数据库，并根据用户配置的信息生成查询SELECT SQL语句并发送到远程Oracle数据库，并将该SQL执行返回结果使用DataX自定义的数据类型拼装为抽象的数据集，并传递给下游Writer处理。
+简而言之，OracleReader通过JDBC连接器连接到远程的Oracle数据库，并根据用户配置的信息生成查询SELECT SQL语句并发送到远程Oracle数据库，
+并将该SQL执行返回结果使用DataX自定义的数据类型拼装为抽象的数据集，并传递给下游Writer处理。
 
 对于用户配置Table、Column、Where的信息，OracleReader将其拼接为SQL语句发送到Oracle数据库；对于用户配置querySql信息，Oracle直接将其发送到Oracle数据库。
-
 
 ## 3 功能说明
 
 ### 3.1 配置样例
 
-* 配置一个从Oracle数据库同步抽取数据到本地的作业:
+配置一个从Oracle数据库同步抽取数据到本地的作业:
 
-```
-{
-    "job": {
-        "setting": {
-            "speed": {
-            //设置传输速度 byte/s 尽量逼近这个速度但是不高于它.
-            // channel 表示通道数量，byte表示通道速度，如果单通道速度1MB，配置byte为1048576表示一个channel
-                 "byte": 1048576
-            },
-            //出错限制
-                "errorLimit": {
-                //先选择record
-                "record": 0,
-                //百分比  1表示100%
-                "percentage": 0.02
-            }
+```json
+{"job": {
+    "setting": {
+        "speed": {
+                "byte": 1048576, //设置传输速度 byte/s 尽量逼近这个速度但是不高于它.
+                "channel": 1 // channel 表示通道数量，byte表示通道速度，如果单通道速度1MB，配置byte为1048576表示一个channel
         },
-        "content": [
-            {
-                "reader": {
-                    "name": "oraclereader",
-                    "parameter": {
-                        // 数据库连接用户名
-                        "username": "root",
-                        // 数据库连接密码
-                        "password": "root",
-                        "column": [
-                            "id","name"
-                        ],
-                        //切分主键
-                        "splitPk": "db_id",
-                        "connection": [
-                            {
-                                "table": [
-                                    "table"
-                                ],
-                                "jdbcUrl": [
-     "jdbc:oracle:thin:@[HOST_NAME]:PORT:[DATABASE_NAME]"
-                                ]
-                            }
-                        ]
-                    }
-                },
-               "writer": {
-                  //writer类型
-                    "name": "streamwriter",
-                  // 是否打印内容
-                    "parameter": {
-                        "print": true
-                    }
+            "errorLimit": {
+            "record": 0,
+            "percentage": 0.02
+        }
+    },
+    "content": [
+        {
+            "reader": {
+                "name": "oraclereader",
+                "parameter": {
+                    "username": "root",
+                    "password": "root",
+                    "column": ["id","name"],
+                    "splitPk": "db_id",
+                    "connection": [
+                        {
+                            "table": [ "table"],
+                            "jdbcUrl": ["jdbc:oracle:thin:@<HOST_NAME>:PORT:<DATABASE_NAME>"]
+                        }
+                    ]
+                }
+            },
+            "writer": {
+                "name": "streamwriter",
+                "parameter": {
+                    "print": true
                 }
             }
-        ]
-    }
-}
-
+        }
+    ]
+}}
 ```
 
 * 配置一个自定义SQL的数据库同步任务到本地内容的作业：

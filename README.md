@@ -45,7 +45,22 @@
 
 ## 快速开始
 
-### 请点击：[Quick Start](docs/userGuid.md)
+### 编译
+
+```shell
+git clone https://github.com/wgzhao/DataX.git
+cd DataX
+mvn clean package assembly:assembly
+```
+
+### 测试 
+
+```shell
+cd target/datax-<version>/datax-<version>
+bin/datax.py job/job.json
+```
+
+更多的配置样例可以参考 `job` 目录下的文件
 
 ## 支持的数据库类型
 
