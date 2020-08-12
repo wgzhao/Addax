@@ -60,7 +60,7 @@ OracleReader插件实现了从Oracle读取数据。在底层实现上，OracleRe
 
 * 配置一个自定义SQL的数据库同步任务到本地内容的作业：
 
-```
+```json
 {
     "job": {
         "setting": {
@@ -101,122 +101,114 @@ OracleReader插件实现了从Oracle读取数据。在底层实现上，OracleRe
 }
 ```
 
+| 配置项          | 是否必须 | 默认值 |
+| :-------------- | :------: | ------ |
+| jdbcUrl         |    是    | 无     |
+| username        |    是    | 无     |
+| password        |    是    | 无     |
+| table           |    是    | 无     |
+| column          |    是    | 无     |
+| splitPk         |    否    | 无     |
+| where           |    否    | 无     |
+| querySql        |    否    | 无     |
+| fetchSize       |    否    | 1024   |
+| session         |    否    | 无     |
+| compress        |    否    | 无     |
+| hadoopConfig    |    否    | 无     |
+| csvReaderConfig |    否    | 无     |
 
 ### 3.2 参数说明
 
-* **jdbcUrl**
+#### jdbcUrl
 
-    * 描述：描述的是到对端数据库的JDBC连接信息，使用JSON的数组描述，并支持一个库填写多个连接地址。之所以使用JSON数组描述连接信息，是因为阿里集团内部支持多个IP探测，如果配置了多个，OracleReader可以依次探测ip的可连接性，直到选择一个合法的IP。如果全部连接失败，OracleReader报错。 注意，jdbcUrl必须包含在connection配置单元中。对于阿里集团外部使用情况，JSON数组填写一个JDBC连接即可。
+源端数据库的JDBC连接信息，使用JSON的数组描述，并支持一个库填写多个连接地址。之所以使用JSON数组描述连接信息，是因为阿里集团内部支持多个IP探测，如果配置了多个，OracleReader可以依次探测ip的可连接性，直到选择一个合法的IP。
+如果全部连接失败，OracleReader报错。 注意，jdbcUrl必须包含在 connection 配置单元中。
+对于阿里集团外部使用情况，JSON数组填写一个JDBC连接即可。
 
-		jdbcUrl按照Oracle官方规范，并可以填写连接附件控制信息。具体请参看[Oracle官方文档](http://www.oracle.com/technetwork/database/enterprise-edition/documentation/index.html)。
+`jdbcUrl` 按照 Oracle 官方规范，并可以填写连接附件控制信息。具体请参看[Oracle官方文档](http://www.oracle.com/technetwork/database/enterprise-edition/documentation/index.html)。
 
-	* 必选：是 <br />
+#### username
 
-	* 默认值：无 <br />
+数据源的用户名
 
-* **username**
+#### password
 
-	* 描述：数据源的用户名 <br />
+数据源指定用户名的密码 
 
-	* 必选：是 <br />
+#### table
 
-	* 默认值：无 <br />
+所选取的需要同步的表。使用JSON的数组描述，因此支持多张表同时抽取。
+当配置为多张表时，用户自己需保证多张表是同一schema结构，OracleReader不予检查表是否同一逻辑表。
+注意，table必须包含在connection配置单元中。
 
-* **password**
+#### column
 
-	* 描述：数据源指定用户名的密码 <br />
+所配置的表中需要同步的列名集合，使用JSON的数组描述字段信息。用户使用 `*` 代表默认使用所有列配置，例如 `["*"]`。
 
-	* 必选：是 <br />
+支持列裁剪，即列可以挑选部分列进行导出。
 
-	* 默认值：无 <br />
+支持列换序，即列可以不按照表schema信息进行导出。
 
-* **table**
+支持常量配置，用户需要按照JSON格式:
 
-	* 描述：所选取的需要同步的表。使用JSON的数组描述，因此支持多张表同时抽取。当配置为多张表时，用户自己需保证多张表是同一schema结构，OracleReader不予检查表是否同一逻辑表。注意，table必须包含在connection配置单元中。<br />
+``["id", "`table`", "1", "'bazhen.csy'", "null", "to_char(a + 1)", "2.3" , "true"]``
 
-	* 必选：是 <br />
+- `id` 为普通列名
+- `` `table` `` 为包含保留在的列名，
+- `1` 为整形数字常量，
+- `'bazhen.csy'`为字符串常量
+- `null` 为空指针，注意，这里的 `null` 必须以字符串形式出现，即用双引号引用
+- `to_char(a + 1)`为表达式，
+- `2.3` 为浮点数，
+- `true` 为布尔值，同样的，这里的布尔值也必须用双引号引用
 
-	* 默认值：无 <br />
+Column必须显示填写，不允许为空！
 
-* **column**
+#### splitPk
 
-	* 描述：所配置的表中需要同步的列名集合，使用JSON的数组描述字段信息。用户使用\*代表默认使用所有列配置，例如['\*']。
+OracleReader进行数据抽取时，如果指定splitPk，表示用户希望使用splitPk代表的字段进行数据分片，DataX因此会启动并发任务进行数据同步，这样可以大大提供数据同步的效能。
 
-	  支持列裁剪，即列可以挑选部分列进行导出。
+推荐splitPk用户使用表主键，因为表主键通常情况下比较均匀，因此切分出来的分片也不容易出现数据热点。
 
-      支持列换序，即列可以不按照表schema信息进行导出。
+目前splitPk仅支持整形、字符串型数据切分，不支持浮点、日期等其他类型。
+如果用户指定其他非支持类型，OracleReader将报错！
 
-	  支持常量配置，用户需要按照JSON格式:
-	  ["id", "`table`", "1", "'bazhen.csy'", "null", "to_char(a + 1)", "2.3" , "true"]
-	  id为普通列名，\`table\`为包含保留在的列名，1为整形数字常量，'bazhen.csy'为字符串常量，null为空指针，to_char(a + 1)为表达式，2.3为浮点数，true为布尔值。
+splitPk如果不填写，将视作用户不对单表进行切分，OracleReader使用单通道同步全量数据。
 
-		Column必须显示填写，不允许为空！
+#### where
 
-	* 必选：是 <br />
+筛选条件，OracleReader 根据指定的 `column`、`table`、`where` 条件拼接SQL，并根据这个SQL进行数据抽取。
+在实际业务场景中，往往会选择当天的数据进行同步，可以将 `where` 条件指定为 `logdate >= current_date()` 。
+注意：不可以将 `where` 条件指定为 `limit 10`，`limit` 不是SQL的合法where子句。
 
-	* 默认值：无 <br />
+where条件可以有效地进行业务增量同步。
 
-* **splitPk**
+#### querySql
 
-	* 描述：OracleReader进行数据抽取时，如果指定splitPk，表示用户希望使用splitPk代表的字段进行数据分片，DataX因此会启动并发任务进行数据同步，这样可以大大提供数据同步的效能。
+在有些业务场景下，where 这一配置项不足以描述所筛选的条件，用户可以通过该配置型来自定义筛选 SQL。
+当用户配置了这一项之后，DataX系统就会忽略 `table`，`column`这些配置型，直接使用这个配置项的内容对数据进行筛选，
+例如需要进行多表 join 后同步数据，使用 `select a,b from table_a join table_b on table_a.id = table_b.id` 
 
-	  推荐splitPk用户使用表主键，因为表主键通常情况下比较均匀，因此切分出来的分片也不容易出现数据热点。
+#### fetchSize
 
-	  目前splitPk仅支持整形、字符串型数据切分，`不支持浮点、日期等其他类型`。如果用户指定其他非支持类型，OracleReader将报错！
+该配置项定义了插件和数据库服务器端每次批量数据获取条数，该值决定了DataX和服务器端的网络交互次数，能够较大的提升数据抽取性能。
 
-	 splitPk如果不填写，将视作用户不对单表进行切分，OracleReader使用单通道同步全量数据。
+注意，该值过大(`>2048`)可能造成DataX进程OOM。
 
-	* 必选：否 <br />
+#### session
 
-	* 默认值：无 <br />
+控制写入数据的时间格式，时区等的配置，如果表中有时间字段，配置该值以明确告知写入 oracle 的时间格式。通常配置的参数为：`NLS_DATE_FORMAT`,`NLS_TIME_FORMAT`。其配置的值为 `json` 格式，例如：
 
-* **where**
-
-	* 描述：筛选条件，MysqlReader根据指定的column、table、where条件拼接SQL，并根据这个SQL进行数据抽取。在实际业务场景中，往往会选择当天的数据进行同步，可以将where条件指定为gmt_create > $bizdate 。注意：不可以将where条件指定为limit 10，limit不是SQL的合法where子句。<br />
-
-          where条件可以有效地进行业务增量同步。
-
-	* 必选：否 <br />
-
-	* 默认值：无 <br />
-
-* **querySql**
-
-	* 描述：在有些业务场景下，where这一配置项不足以描述所筛选的条件，用户可以通过该配置型来自定义筛选SQL。当用户配置了这一项之后，DataX系统就会忽略table，column这些配置型，直接使用这个配置项的内容对数据进行筛选，例如需要进行多表join后同步数据，使用select a,b from table_a join table_b on table_a.id = table_b.id <br />
-
-	 `当用户配置querySql时，OracleReader直接忽略table、column、where条件的配置`。
-
-	* 必选：否 <br />
-
-	* 默认值：无 <br />
-
-* **fetchSize**
-
-	* 描述：该配置项定义了插件和数据库服务器端每次批量数据获取条数，该值决定了DataX和服务器端的网络交互次数，能够较大的提升数据抽取性能。<br />
-
-	 `注意，该值过大(>2048)可能造成DataX进程OOM。`。
-
-	* 必选：否 <br />
-
-	* 默认值：1024 <br />
-
-* **session**
-
-	* 描述：控制写入数据的时间格式，时区等的配置，如果表中有时间字段，配置该值以明确告知写入 oracle 的时间格式。通常配置的参数为：NLS_DATE_FORMAT,NLS_TIME_FORMAT。其配置的值为 json 格式，例如：
-```
+```json
 "session": [
-              "alter session set NLS_DATE_FORMAT='yyyy-mm-dd hh24:mi:ss'",
-              "alter session set NLS_TIMESTAMP_FORMAT='yyyy-mm-dd hh24:mi:ss'",
-              "alter session set NLS_TIMESTAMP_TZ_FORMAT='yyyy-mm-dd hh24:mi:ss'",
-              "alter session set TIME_ZONE='US/Pacific'"
-            ]
+    "alter session set NLS_DATE_FORMAT='yyyy-mm-dd hh24:mi:ss'",
+    "alter session set NLS_TIMESTAMP_FORMAT='yyyy-mm-dd hh24:mi:ss'",
+    "alter session set NLS_TIMESTAMP_TZ_FORMAT='yyyy-mm-dd hh24:mi:ss'",
+    "alter session set TIME_ZONE='Asia/Chongqing'"
+]
 ```
-  `(注意&quot;是 " 的转义字符串)`。
 
-	* 必选：否 <br />
-
-	* 默认值：无 <br />
-
+注意 `&quot;`是 `"` 的转义字符串
 
 ### 3.3 类型转换
 
@@ -225,21 +217,19 @@ OracleReader插件实现了从Oracle读取数据。在底层实现上，OracleRe
 下面列出OracleReader针对Oracle类型转换列表:
 
 
-| DataX 内部类型| Oracle 数据类型    |
-| -------- | -----  |
-| Long     |NUMBER,INTEGER,INT,SMALLINT|
-| Double   |NUMERIC,DECIMAL,FLOAT,DOUBLE PRECISION,REAL|
-| String   |LONG,CHAR,NCHAR,VARCHAR,VARCHAR2,NVARCHAR2,CLOB,NCLOB,CHARACTER,CHARACTER VARYING,CHAR VARYING,NATIONAL CHARACTER,NATIONAL CHAR,NATIONAL CHARACTER VARYING,NATIONAL CHAR VARYING,NCHAR VARYING    |
-| Date     |TIMESTAMP,DATE    |
-| Boolean  |bit, bool   |
-| Bytes    |BLOB,BFILE,RAW,LONG RAW    |
-
+| DataX 内部类型 | Oracle 数据类型                                                                                                                                                                                               |
+| -------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Long           | NUMBER, INTEGER, INT, SMALLINT                                                                                                                                                                                |
+| Double         | NUMERIC, DECIMAL, FLOAT, DOUBLE PRECISION, REAL                                                                                                                                                               |
+| String         | LONG ,CHAR, NCHAR, VARCHAR, VARCHAR2, NVARCHAR2, CLOB, NCLOB, CHARACTER, CHARACTER VARYING, CHAR VARYING, NATIONAL CHARACTER, NATIONAL CHAR, NATIONAL CHARACTER VARYING, NATIONAL CHAR VARYING, NCHAR VARYING |
+| Date           | TIMESTAMP, DATE                                                                                                                                                                                               |
+| Boolean        | bit, bool                                                                                                                                                                                                     |
+| Bytes          | BLOB, BFILE, RAW, LONG RAW                                                                                                                                                                                    |
 
 
 请注意:
 
-* `除上述罗列字段类型外，其他类型均不支持`。
-
+除上述罗列字段类型外，其他类型均不支持
 
 ## 4 性能报告
 
@@ -260,9 +250,9 @@ OracleReader插件实现了从Oracle读取数据。在底层实现上，OracleRe
 #### 4.2.1 表1测试报告
 
 
-| 并发任务数| DataX速度(Rec/s)|DataX流量|网卡流量|DataX运行负载|DB运行负载|
-|--------| --------|--------|--------|--------|--------|
-|1| DataX 统计速度(Rec/s)|DataX统计流量|网卡流量|DataX运行负载|DB运行负载|
+| 并发任务数 | DataX速度(Rec/s)      | DataX流量     | 网卡流量 | DataX运行负载 | DB运行负载 |
+| ---------- | --------------------- | ------------- | -------- | ------------- | ---------- |
+| 1          | DataX 统计速度(Rec/s) | DataX统计流量 | 网卡流量 | DataX运行负载 | DB运行负载 |
 
 ## 5 约束限制
 
@@ -274,9 +264,9 @@ OracleReader插件实现了从Oracle读取数据。在底层实现上，OracleRe
 
 ### 5.2 一致性约束
 
-Oracle在数据存储划分中属于RDBMS系统，对外可以提供强一致性数据查询接口。例如当一次同步任务启动运行过程中，当该库存在其他数据写入方写入数据时，OracleReader完全不会获取到写入更新数据，这是由于数据库本身的快照特性决定的。关于数据库快照特性，请参看[MVCC Wikipedia](https://en.wikipedia.org/wiki/Multiversion_concurrency_control)
+Oracle 在数据存储划分中属于RDBMS系统，对外可以提供强一致性数据查询接口。例如当一次同步任务启动运行过程中，当该库存在其他数据写入方写入数据时，OracleReader完全不会获取到写入更新数据，这是由于数据库本身的快照特性决定的。关于数据库快照特性，请参看[MVCC Wikipedia](https://en.wikipedia.org/wiki/Multiversion_concurrency_control)
 
-上述是在OracleReader单线程模型下数据同步一致性的特性，由于OracleReader可以根据用户配置信息使用了并发数据抽取，因此不能严格保证数据一致性：当OracleReader根据splitPk进行数据切分后，会先后启动多个并发任务完成数据同步。由于多个并发任务相互之间不属于同一个读事务，同时多个并发任务存在时间间隔。因此这份数据并不是`完整的`、`一致的`数据快照信息。
+上述是在OracleReader单线程模型下数据同步一致性的特性，由于OracleReader可以根据用户配置信息使用了并发数据抽取，因此不能严格保证数据一致性：当 OracleReader 根据 splitPk 进行数据切分后，会先后启动多个并发任务完成数据同步。由于多个并发任务相互之间不属于同一个读事务，同时多个并发任务存在时间间隔。因此这份数据并不是`完整的`、`一致的`数据快照信息。
 
 针对多线程的一致性快照需求，在技术上目前无法实现，只能从工程角度解决，工程化的方式存在取舍，我们提供几个解决思路给用户，用户可以自行选择：
 
@@ -286,32 +276,31 @@ Oracle在数据存储划分中属于RDBMS系统，对外可以提供强一致性
 
 ### 5.3 数据库编码问题
 
-
 OracleReader底层使用JDBC进行数据抽取，JDBC天然适配各类编码，并在底层进行了编码转换。因此OracleReader不需用户指定编码，可以自动获取编码并转码。
 
-对于Oracle底层写入编码和其设定的编码不一致的混乱情况，OracleReader对此无法识别，对此也无法提供解决方案，对于这类情况，`导出有可能为乱码`。
+对于Oracle底层写入编码和其设定的编码不一致的混乱情况，OracleReader对此无法识别，对此也无法提供解决方案，对于这类情况，**导出有可能为乱码**。
 
 ### 5.4 增量数据同步
 
-OracleReader使用JDBC SELECT语句完成数据抽取工作，因此可以使用SELECT...WHERE...进行增量数据抽取，方式有多种：
+OracleReader使用JDBC SELECT 语句完成数据抽取工作，因此可以使用 `SELECT...WHERE...` 进行增量数据抽取，方式有多种：
 
-* 数据库在线应用写入数据库时，填充modify字段为更改时间戳，包括新增、更新、删除(逻辑删)。对于这类应用，OracleReader只需要WHERE条件跟上一同步阶段时间戳即可。
-* 对于新增流水型数据，OracleReader可以WHERE条件后跟上一阶段最大自增ID即可。
+* 数据库在线应用写入数据库时，填充 `modify` 字段为更改时间戳，包括新增、更新、删除(逻辑删)。对于这类应用，OracleReader只需要 `WHERE` 条件跟上一同步阶段时间戳即可。
+* 对于新增流水型数据，OracleReader可以 `WHERE`条件后跟上一阶段最大自增 ID 即可。
 
 对于业务上无字段区分新增、修改数据情况，OracleReader也无法进行增量数据同步，只能同步全量数据。
 
 ### 5.5 Sql安全性
 
-OracleReader提供querySql语句交给用户自己实现SELECT抽取语句，OracleReader本身对querySql不做任何安全性校验。这块交由DataX用户方自己保证。
+OracleReader提供 `querySql` 语句交给用户自己实现 `SELECT` 抽取语句，OracleReader 本身对 `querySql` 不做任何安全性校验。这块交由DataX用户方自己保证。
 
 ## 6 FAQ
 
-***
 
 **Q: OracleReader同步报错，报错信息为XXX**
 
  A: 网络或者权限问题，请使用Oracle命令行测试：
- sqlplus username/password@//host:port/sid
+
+ `sqlplus username/password@//host:port/sid`
 
 
 如果上述命令也报错，那可以证实是环境问题，请联系你的DBA。
@@ -319,10 +308,11 @@ OracleReader提供querySql语句交给用户自己实现SELECT抽取语句，Ora
 
 **Q: OracleReader抽取速度很慢怎么办？**
 
- A: 影响抽取时间的原因大概有如下几个：(来自专业 DBA 卫绾)
-  1.  由于SQL的plan异常，导致的抽取时间长； 在抽取时，尽可能使用全表扫描代替索引扫描;
-  2.  合理sql的并发度，减少抽取时间；根据表的大小，
-      <50G可以不用并发，
-      <100G添加如下hint: parallel(a,2）,
-      >100G添加如下hint : parallel(a,4);
-  3.  抽取sql要简单，尽量不用replace等函数，这个非常消耗cpu，会严重影响抽取速度;
+A: 影响抽取时间的原因大概有如下几个：(来自专业 DBA 卫绾)
+
+1.  由于SQL的plan异常，导致的抽取时间长； 在抽取时，尽可能使用全表扫描代替索引扫描;
+2.  合理sql的并发度，减少抽取时间；根据表的大小，
+    * `<50G` 可以不用并发，
+    * `<100G` 添加如下 `hint: parallel(a,2）`,
+    * `>100G` 添加如下 `hint : parallel(a,4)`;
+3.  抽取sql要简单，尽量不用 `replace` 等函数，这个非常消耗cpu，会严重影响抽取速度;

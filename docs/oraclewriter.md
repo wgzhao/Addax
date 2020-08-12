@@ -1,29 +1,19 @@
-# DataX OracleWriter
-
-
----
-
+# OracleWriter 插件文档
 
 ## 1 快速介绍
 
-OracleWriter 插件实现了写入数据到 Oracle 主库的目的表的功能。在底层实现上， OracleWriter 通过 JDBC 连接远程 Oracle 数据库，并执行相应的 insert into ...  sql 语句将数据写入 Oracle，内部会分批次提交入库。
+OracleWriter 插件实现了写入数据到 Oracle 主库的目的表的功能。在底层实现上， OracleWriter 通过 JDBC 连接远程 Oracle 数据库，并执行相应的 `insert into ...` 语句将数据写入 Oracle，内部会分批次提交入库。
 
-OracleWriter 面向ETL开发工程师，他们使用 OracleWriter 从数仓导入数据到 Oracle。同时 OracleWriter 亦可以作为数据迁移工具为DBA等用户提供服务。
-
+OracleWriter 面向 ETL 开发工程师，他们使用 OracleWriter 从数仓导入数据到 Oracle。同时 OracleWriter 亦可以作为数据迁移工具为DBA等用户提供服务。
 
 ## 2 实现原理
 
 OracleWriter 通过 DataX 框架获取 Reader 生成的协议数据，根据你配置生成相应的SQL语句
 
+注意：
 
-* `insert into...`(当主键/唯一性索引冲突时会写不进去冲突的行)
-
-<br />
-
-    注意：
-    1. 目的表所在数据库必须是主库才能写入数据；整个任务至少需具备 insert into...的权限，是否需要其他权限，取决于你任务配置中在 preSql 和 postSql 中指定的语句。
-    2.OracleWriter和MysqlWriter不同，不支持配置writeMode参数。
-
+1. 目的表所在数据库必须是主库才能写入数据；整个任务至少需具备 `insert into...`的权限，是否需要其他权限，取决于你任务配置中在 `preSql` 和 `postSql` 中指定的语句。
+2. OracleWriter 和 `MysqlWriter`不同，不支持配置 `writeMode` 参数。
 
 ## 3 功能说明
 
@@ -33,169 +23,149 @@ OracleWriter 通过 DataX 框架获取 Reader 生成的协议数据，根据你�
 
 ```json
 {
-    "job": {
-        "setting": {
-            "speed": {
-                "channel": 1
-            }
-        },
-        "content": [
-            {
-                 "reader": {
-                    "name": "streamreader",
-                    "parameter": {
-                        "column" : [
-                            {
-                                "value": "DataX",
-                                "type": "string"
-                            },
-                            {
-                                "value": 19880808,
-                                "type": "long"
-                            },
-                            {
-                                "value": "1988-08-08 08:08:08",
-                                "type": "date"
-                            },
-                            {
-                                "value": true,
-                                "type": "bool"
-                            },
-                            {
-                                "value": "test",
-                                "type": "bytes"
-                            }
-                        ],
-                        "sliceRecordCount": 1000
-                    }
+"job": {
+    "setting": {
+        "speed": {
+            "channel": 1
+        }
+    },
+    "content": [{
+        "reader": {
+        "name": "streamreader",
+        "parameter": {
+            "column" : [
+                {
+                    "value": "DataX",
+                    "type": "string"
                 },
-                "writer": {
-                    "name": "oraclewriter",
-                    "parameter": {
-                        "username": "root",
-                        "password": "root",
-                        "column": [
-                            "id",
-                            "name"
-                        ],
-                        "preSql": [
-                            "delete from test"
-                        ],
-                        "connection": [
-                            {
-                                "jdbcUrl": "jdbc:oracle:thin:@[HOST_NAME]:PORT:[DATABASE_NAME]",
-                                "table": [
-                                    "test"
-                                ]
-                            }
-                        ]
-                    }
+                {
+                    "value": 19880808,
+                    "type": "long"
+                },
+                {
+                    "value": "1988-08-08 08:08:08",
+                    "type": "date"
+                },
+                {
+                    "value": true,
+                    "type": "bool"
+                },
+                {
+                    "value": "test",
+                    "type": "bytes"
                 }
+            ],
+            "sliceRecordCount": 1000
+        }
+        },
+        "writer": {
+            "name": "oraclewriter",
+            "parameter": {
+                "username": "root",
+                "password": "root",
+                "column": [
+                    "id",
+                    "name"
+                ],
+                "preSql": [
+                    "delete from test"
+                ],
+                "connection": [{
+                    "jdbcUrl": "jdbc:oracle:thin:@[HOST_NAME]:PORT:[DATABASE_NAME]",
+                    "table": ["test"]
+                }]
             }
-        ]
-    }
+        }
+    }]
+}
 }
 
 ```
 
-
 ### 3.2 参数说明
 
-* **jdbcUrl**
+| 配置项          | 是否必须 | 默认值 |
+| :-------------- | :------: | ------ |
+| jdbcUrl         |    是    | 无     |
+| username        |    是    | 无     |
+| password        |    是    | 无     |
+| table           |    是    | 无     |
+| column          |    是    | 无     |
+| preSql          |    否    | 无     |
+| postSql         |    否    | 无     |
+| querySql        |    否    | 无     |
+| batchSize       |    否    | 1024   |
+| session         |    否    | 无     |
+| compress        |    否    | 无     |
+| hadoopConfig    |    否    | 无     |
+| csvReaderConfig |    否    | 无     |
 
-    * 描述：目的数据库的 JDBC 连接信息 ,jdbcUrl必须包含在connection配置单元中。
+#### jdbcUrl
 
-               注意：1、在一个数据库上只能配置一个值。这与 OracleReader 支持多个备库探测不同，因为此处不支持同一个数据库存在多个主库的情况(双主导入数据情况)
-                    2、jdbcUrl按照Oracle官方规范，并可以填写连接附加参数信息。具体请参看 Oracle官方文档或者咨询对应 DBA。
+目的数据库的 JDBC 连接信息 ,`jdbcUrl` 必须包含在connection配置单元中。
+注意：
 
+1. 在一个数据库上只能配置一个值。这与 OracleReader 支持多个备库探测不同，因为此处不支持同一个数据库存在多个主库的情况(双主导入数据情况)
+2. jdbcUrl按照Oracle官方规范，并可以填写连接附加参数信息。具体请参看 Oracle官方文档或者咨询对应 DBA。
 
-  * 必选：是 <br />
+#### username
 
-  * 默认值：无 <br />
+目的数据库的用户名 
 
-* **username**
+#### password
 
-  * 描述：目的数据库的用户名 <br />
+目的数据库的密码 
 
-  * 必选：是 <br />
+#### table
 
-  * 默认值：无 <br />
+目的表的表名称。支持写入一个或者多个表。当配置为多张表时，必须确保所有表结构保持一致。
 
-* **password**
+注意：table 和 jdbcUrl 必须包含在 connection 配置单元中
 
-  * 描述：目的数据库的密码 <br />
+#### column
 
-  * 必选：是 <br />
+目的表需要写入数据的字段,字段之间用英文逗号分隔。例如: `"column": ["id","name","age"]`。
+如果要依次写入全部列，使用 `*` 表示, 例如: `"column": ["*"]`
 
-  * 默认值：无 <br />
+*column* 配置项必须指定，不能留空！
 
-* **table**
+注意：
 
-  * 描述：目的表的表名称。支持写入一个或者多个表。当配置为多张表时，必须确保所有表结构保持一致。
-
-               注意：table 和 jdbcUrl 必须包含在 connection 配置单元中
-
-  * 必选：是 <br />
-
-  * 默认值：无 <br />
-
-* **column**
-
-  * 描述：目的表需要写入数据的字段,字段之间用英文逗号分隔。例如: "column": ["id","name","age"]。如果要依次写入全部列，使用*表示, 例如: "column": ["*"]
-
-    		**column配置项必须指定，不能留空！**
+1. 我们强烈不推荐你这样配置，因为当你目的表字段个数、类型等有改动时，你的任务可能运行不正确或者失败
+2. 此处 column 不能配置任何常量值
 
 
-               注意：1、我们强烈不推荐你这样配置，因为当你目的表字段个数、类型等有改动时，你的任务可能运行不正确或者失败
-                    2、此处 column 不能配置任何常量值
+#### preSql
 
-  * 必选：是 <br />
+写入数据到目的表前，会先执行这里的标准语句。如果 Sql 中有你需要操作到的表名称，请使用 `@table` 表示，这样在实际执行 Sql 语句时，会对变量按照实际表名称进行替换。比如你的任务是要写入到目的端的100个同构分表(表名称为: `datax_00,datax01, ... datax_98,datax_99`)，并且你希望导入数据前，先对表中数据进行删除操作，那么你可以这样配置：`"preSql":["delete from @table"]`，
 
-  * 默认值：否 <br />
+效果是：在执行到每个表写入数据前，会先执行对应的 `delete from 对应表名称`
 
-* **preSql**
+#### postSql
 
-  * 描述：写入数据到目的表前，会先执行这里的标准语句。如果 Sql 中有你需要操作到的表名称，请使用 `@table` 表示，这样在实际执行 Sql 语句时，会对变量按照实际表名称进行替换。比如你的任务是要写入到目的端的100个同构分表(表名称为:datax_00,datax01, ... datax_98,datax_99)，并且你希望导入数据前，先对表中数据进行删除操作，那么你可以这样配置：`"preSql":["delete from @table"]`，效果是：在执行到每个表写入数据前，会先执行对应的 delete from 对应表名称 <br />
+写入数据到目的表后，会执行这里的标准语句。原理同 `preSql` 
 
-  * 必选：否 <br />
+#### batchSize
 
-  * 默认值：无 <br />
+一次性批量提交的记录数大小，该值可以极大减少 DataX 与 Oracle 的网络交互次数，并提升整体吞吐量。
+但是该值设置过大可能会造成DataX运行进程OOM情况。同时也可能会出现目标库因 `redo` 配置过小的导致批次提交失败。
+该参数的的过大配置一定要经过严格的测试，实际生产部署经验来看，普通服务器不要超过 `4096` 。
 
-* **postSql**
+#### session
 
-  * 描述：写入数据到目的表后，会执行这里的标准语句。（原理同 preSql ） <br />
+描述：设置oracle连接时的session信息，格式示例如下：
 
-  * 必选：否 <br />
+```json
+"session":[
+    "alter session set nls_date_format = 'dd.mm.yyyy hh24:mi:ss';"
+    "alter session set NLS_LANG = 'AMERICAN';"
+]
 
-  * 默认值：无 <br />
-
-* **batchSize**
-
-	* 描述：一次性批量提交的记录数大小，该值可以极大减少DataX与Oracle的网络交互次数，并提升整体吞吐量。但是该值设置过大可能会造成DataX运行进程OOM情况。<br />
-
-	* 必选：否 <br />
-
-	* 默认值：1024 <br />
-
-* **session**
-
-    * 描述：设置oracle连接时的session信息，格式示例如下：<br />
-
-    ```
-    "session":[
-                "alter session set nls_date_format = 'dd.mm.yyyy hh24:mi:ss';"
-                "alter session set NLS_LANG = 'AMERICAN';"
-    ]
-
-    ```
-
-	* 必选：否 <br />
-
-	* 默认值：无 <br />
+```
 
 ### 3.3 类型转换
 
-类似 OracleReader ，目前 OracleWriter 支持大部分 Oracle 类型，但也存在部分个别类型没有支持的情况，请注意检查你的类型。
+类似 [OracleReader](oraclereader.md) ，目前 OracleWriter 支持大部分 Oracle 类型，但也存在部分个别类型没有支持的情况，请注意检查你的类型。
 
 下面列出 OracleWriter 针对 Oracle 类型转换列表:
 
@@ -209,33 +179,35 @@ OracleWriter 通过 DataX 框架获取 Reader 生成的协议数据，根据你�
 | Boolean  |bit, bool   |
 | Bytes    |BLOB,BFILE,RAW,LONG RAW    |
 
-
-
 ## 4 性能报告
 
 ### 4.1 环境准备
 
 #### 4.1.1 数据特征
-建表语句：
-```
+
+建表语句
+
+```sql
 --DROP TABLE PERF_ORACLE_WRITER;
 CREATE TABLE PERF_ORACLE_WRITER (
-COL1 VARCHAR2(255 BYTE) NULL ,
-COL2 NUMBER(32) NULL ,
-COL3 NUMBER(32) NULL ,
-COL4 DATE NULL ,
-COL5 FLOAT NULL ,
-COL6 VARCHAR2(255 BYTE) NULL ,
-COL7 VARCHAR2(255 BYTE) NULL ,
-COL8 VARCHAR2(255 BYTE) NULL ,
-COL9 VARCHAR2(255 BYTE) NULL ,
-COL10 VARCHAR2(255 BYTE) NULL
+    COL1 VARCHAR2(255 BYTE) NULL ,
+    COL2 NUMBER(32) NULL ,
+    COL3 NUMBER(32) NULL ,
+    COL4 DATE NULL ,
+    COL5 FLOAT NULL ,
+    COL6 VARCHAR2(255 BYTE) NULL ,
+    COL7 VARCHAR2(255 BYTE) NULL ,
+    COL8 VARCHAR2(255 BYTE) NULL ,
+    COL9 VARCHAR2(255 BYTE) NULL ,
+    COL10 VARCHAR2(255 BYTE) NULL
 )
 LOGGING
 NOCOMPRESS
 NOCACHE;
 ```
+
 单行记录类似于：
+
 ```
 col1:485924f6ab7f272af361cd3f7f2d23e0d764942351#$%^&fdafdasfdas%%^(*&^^&*
 co12:1
@@ -248,111 +220,112 @@ co18:100DAFDSAFDSAHOFJDPSAWIFDISHAF;dsadsafdsahfdsajf;dsfdsa;FJDSAL;11209
 co19:100dafdsafdsahofjdpsawifdishaf;DSADSAFDSAHFDSAJF;dsfdsa;fjdsal;11209
 co110:12~!2345100dafdsafdsahofjdpsawifdishaf;dsadsafdsahfdsajf;dsfdsa;fjdsal;11209
 ```
+
 #### 4.1.2 机器参数
 
-* 执行 DataX 的机器参数为:
-    1. cpu: 24 Core Intel(R) Xeon(R) CPU E5-2430 0 @ 2.20GHz
-    2. mem: 94GB
-	3. net: 千兆双网卡
-	4. disc: DataX 数据不落磁盘，不统计此项
+执行 DataX 的机器参数为:
 
-* Oracle 数据库机器参数为:
-    1. cpu: 4 Core Intel(R) Xeon(R) CPU E5420  @ 2.50GHz
-    2. mem: 7GB
+1. cpu: 24 Core Intel(R) Xeon(R) CPU E5-2430 0 @ 2.20GHz
+2. mem: 94GB
+3. NIC: 1000 bps
+
+Oracle 数据库机器参数为:
+
+ 1. cpu: 4 Core Intel(R) Xeon(R) CPU E5420  @ 2.50GHz
+ 2. mem: 7GB
 
 #### 4.1.3 DataX jvm 参数
 
-    -Xms1024m -Xmx1024m -XX:+HeapDumpOnOutOfMemoryError
+`-Xms1024m -Xmx1024m -XX:+HeapDumpOnOutOfMemoryError`
 
 #### 4.1.4 性能测试作业配置
 
-```
+```json
 {
-    "job": {
-        "setting": {
-            "speed": {
-                "channel": 4
-            }
-        },
-        "content": [
-            {
-                "reader": {
-                    "name": "streamreader",
-                    "parameter": {
-                        "sliceRecordCount": 1000000000,
-                        "column": [
-                            {
-                                "value": "485924f6ab7f272af361cd3f7f2d23e0d764942351#$%^&fdafdasfdas%%^(*&^^&*"
-                            },
-                            {
-                                "value": 1,
-                                "type": "long"
-                            },
-                            {
-                                "value": "1696248667889",
-                                "type": "long"
-                            },
-                            {
-                                "type": "date",
-                                "value": "2013-07-06 00:00:00",
-                                "dateFormat": "yyyy-mm-dd hh:mm:ss"
-                            },
-                            {
-                                "value": "3.141592653578",
-                                "type": "double"
-                            },
-                            {
-                                "value": "100dafdsafdsahofjdpsawifdishaf;dsadsafdsahfdsajf;dsfdsa;fjdsal;11209"
-                            },
-                            {
-                                "value": "100dafdsafdsahofjdpsawifdishaf;dsadsafdsahfdsajf;dsfdsa;fjdsal;11fdsafdsfdsa209"
-                            },
-                            {
-                                "value": "100DAFDSAFDSAHOFJDPSAWIFDISHAF;dsadsafdsahfdsajf;dsfdsa;FJDSAL;11209"
-                            },
-                            {
-                                "value": "100dafdsafdsahofjdpsawifdishaf;DSADSAFDSAHFDSAJF;dsfdsa;fjdsal;11209"
-                            },
-                            {
-                                "value": "12~!2345100dafdsafdsahofjdpsawifdishaf;dsadsafdsahfdsajf;dsfdsa;fjdsal;11209"
-                            }
-                        ]
+"job": {
+    "setting": {
+        "speed": {
+            "channel": 4
+        }
+    },
+    "content": [
+        {
+        "reader": {
+            "name": "streamreader",
+            "parameter": {
+                "sliceRecordCount": 1000000000,
+                "column": [
+                    {
+                        "value": "485924f6ab7f272af361cd3f7f2d23e0d764942351#$%^&fdafdasfdas%%^(*&^^&*"
+                    },
+                    {
+                        "value": 1,
+                        "type": "long"
+                    },
+                    {
+                        "value": "1696248667889",
+                        "type": "long"
+                    },
+                    {
+                        "type": "date",
+                        "value": "2013-07-06 00:00:00",
+                        "dateFormat": "yyyy-mm-dd hh:mm:ss"
+                    },
+                    {
+                        "value": "3.141592653578",
+                        "type": "double"
+                    },
+                    {
+                        "value": "100dafdsafdsahofjdpsawifdishaf;dsadsafdsahfdsajf;dsfdsa;fjdsal;11209"
+                    },
+                    {
+                        "value": "100dafdsafdsahofjdpsawifdishaf;dsadsafdsahfdsajf;dsfdsa;fjdsal;11fdsafdsfdsa209"
+                    },
+                    {
+                        "value": "100DAFDSAFDSAHOFJDPSAWIFDISHAF;dsadsafdsahfdsajf;dsfdsa;FJDSAL;11209"
+                    },
+                    {
+                        "value": "100dafdsafdsahofjdpsawifdishaf;DSADSAFDSAHFDSAJF;dsfdsa;fjdsal;11209"
+                    },
+                    {
+                        "value": "12~!2345100dafdsafdsahofjdpsawifdishaf;dsadsafdsahfdsajf;dsfdsa;fjdsal;11209"
                     }
-                },
-                "writer": {
-                    "name": "oraclewriter",
-                    "parameter": {
-                        "username": "username",
-                        "password": "password",
-                        "truncate": "true",
-                        "batchSize": "512",
-                        "column": [
-                            "col1",
-                            "col2",
-                            "col3",
-                            "col4",
-                            "col5",
-                            "col6",
-                            "col7",
-                            "col8",
-                            "col9",
-                            "col10"
-                        ],
-                        "connection": [
-                            {
-                                "table": [
-                                    "PERF_ORACLE_WRITER"
-                                ],
-                                "jdbcUrl": "jdbc:oracle:thin:@ip:port:dataplat"
-                            }
-                        ]
-                    }
+                ]
+                }
+            },
+            "writer": {
+                "name": "oraclewriter",
+                "parameter": {
+                    "username": "username",
+                    "password": "password",
+                    "truncate": "true",
+                    "batchSize": "512",
+                    "column": [
+                        "col1",
+                        "col2",
+                        "col3",
+                        "col4",
+                        "col5",
+                        "col6",
+                        "col7",
+                        "col8",
+                        "col9",
+                        "col10"
+                    ],
+                    "connection": [
+                        {
+                            "table": [
+                                "PERF_ORACLE_WRITER"
+                            ],
+                            "jdbcUrl": "jdbc:oracle:thin:@ip:port:dataplat"
+                        }
+                    ]
                 }
             }
-        ]
+        }
+    ]
     }
 }
-
 ```
 
 ### 4.2 测试报告
@@ -385,31 +358,21 @@ co110:12~!2345100dafdsafdsahofjdpsawifdishaf;dsadsafdsahfdsajf;dsfdsa;fjdsal;112
 |32|1024|34406|14.77|15.4|0.09|15.4|3.55|
 
 
-1. `batchSize 和 通道个数，对性能影响较大`
-2. `通常不建议写入数据库时，通道个数 >32`
-
-
+1. `batchSize` 和 通道个数，对性能影响较大
+2. 通常不建议写入数据库时，通道个数超过 32
 
 ## 5 约束限制
 
-
-
-
 ## FAQ
-
-***
 
 **Q: OracleWriter 执行 postSql 语句报错，那么数据导入到目标数据库了吗?**
 
 A: DataX 导入过程存在三块逻辑，pre 操作、导入操作、post 操作，其中任意一环报错，DataX 作业报错。由于 DataX 不能保证在同一个事务完成上述几个操作，因此有可能数据已经落入到目标端。
 
-***
 
 **Q: 按照上述说法，那么有部分脏数据导入数据库，如果影响到线上数据库怎么办?**
 
 A: 目前有两种解法，第一种配置 pre 语句，该 sql 可以清理当天导入数据， DataX 每次导入时候可以把上次清理干净并导入完整数据。第二种，向临时表导入数据，完成后再 rename 到线上表。
-
-***
 
 **Q: 上面第二种方法可以避免对线上数据造成影响，那我具体怎样操作?**
 
