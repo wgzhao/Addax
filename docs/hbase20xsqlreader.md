@@ -1,10 +1,5 @@
 # hbase20xsqlreader  插件文档
 
-
-___
-
-
- 
 ## 1 快速介绍
 
 hbase20xsqlreader插件实现了从Phoenix(HBase SQL)读取数据，对应版本为HBase2.X和Phoenix5.X。
@@ -17,21 +12,21 @@ hbase20xsqlreader插件实现了从Phoenix(HBase SQL)读取数据，对应版本
 
 ### 3.1 配置样例
 
-* 配置一个从Phoenix同步抽取数据到本地的作业:
+配置一个从Phoenix同步抽取数据到本地的作业:
 
-```
+```json
 {
     "job": {
         "content": [
             {
                 "reader": {
-                    "name": "hbase20xsqlreader",  //指定插件为hbase20xsqlreader
+                    "name": "hbase20xsqlreader",  
                     "parameter": {
-                        "queryServerAddress": "http://127.0.0.1:8765",  //填写连接Phoenix QueryServer地址
-                        "serialization": "PROTOBUF",  //QueryServer序列化格式
-                        "table": "TEST",    //读取表名
-                        "column": ["ID", "NAME"],   //所要读取列名
-                        "splitKey": "ID"    //切分列，必须是表主键
+                        "queryServerAddress": "http://127.0.0.1:8765", 
+                        "serialization": "PROTOBUF",  
+                        "table": "TEST",    
+                        "column": ["ID", "NAME"],   
+                        "splitKey": "ID"   
                     }
                 },
                 "writer": {
@@ -55,79 +50,19 @@ hbase20xsqlreader插件实现了从Phoenix(HBase SQL)读取数据，对应版本
 
 ### 3.2 参数说明
 
-* **queryServerAddress**
+| 配置项             | 是否必须 | 默认值   | 描述                                                                                          |
+| :----------------- | :------: | -------- | --------------------------------------------------------------------------------------- |
+| queryServerAddress |    是    | 无       | Phoenix QueryServer 地址, 该插件通过 PQS 进行连接                                             |
+| serialization      |    否    | PROTOBUF | QueryServer使用的序列化协议                                                                   |
+| table              |    是    | 无       | 所要读取表名                                                                                  |
+| schema             |    否    | 无       | 表所在的schema                                                                                |
+| column             |    否    | 全部列   | 填写需要从phoenix表中读取的列名集合，使用JSON的数组描述字段信息，空值表示读取所有列           |
+| splitKey           |    是    | 无       | 根据数据特征动态指定切分点，对表数据按照指定的列的最大、最小值进行切分,仅支持整型和字符串类型 |
+| splitPoints        |    否    | 无       | 按照表的split进行切分                                                                         |
+| where              |    否    | 无       | 支持对表查询增加过滤条件，每个切分都会携带该过滤条件                                          |
+| querySql           |    否    | 无       | 支持指定多个查询语句，但查询列类型和数目必须保持一致                                          |
 
-	* 描述：hbase20xsqlreader需要通过Phoenix轻客户端去连接Phoenix QueryServer，因此这里需要填写对应QueryServer地址。
- 
-	* 必选：是 <br />
- 
-	* 默认值：无 <br />
- 
-* **serialization**
- 
-	* 描述：QueryServer使用的序列化协议
- 
-	* 必选：否 <br />
- 
-	* 默认值：PROTOBUF <br />
-	
-* **table**
-
-	* 描述：所要读取表名
-	
-	* 必选：是 <br />
- 
-	* 默认值：无 <br />
-	
-* **schema**
-
-	* 描述：表所在的schema
-	
-	* 必选：否 <br />
- 
-	* 默认值：无 <br />
-		
-* **column**
-
-	* 描述：填写需要从phoenix表中读取的列名集合，使用JSON的数组描述字段信息，空值表示读取所有列。
- 
-	* 必选： 否<br />
- 
-	* 默认值：全部列 <br />
- 
-* **splitKey**
-
-	* 描述：读取表时对表进行切分并行读取，切分时有两种方式：1.根据该列的最大最小值按照指定channel个数均分，这种方式仅支持整形和字符串类型切分列；2.根据设置的splitPoint进行切分
-	
-	* 必选：是 <br />
- 
-	* 默认值：无 <br />
-
-* **splitPoints**
-
-	* 描述：由于根据切分列最大最小值切分时不能保证避免数据热点，splitKey支持用户根据数据特征动态指定切分点，对表数据进行切分。建议切分点根据Region的startkey和endkey设置，保证每个查询对应单个Region
- 
-	* 必选： 否<br />
- 
-	* 默认值：无 <br />
-	
-* **where**
     
-    * 描述：支持对表查询增加过滤条件，每个切分都会携带该过滤条件。
-     
-    * 必选： 否<br />
-     
-    * 默认值：无<br />
-    
-* **querySql**
-        
-    * 描述：支持指定多个查询语句，但查询列类型和数目必须保持一致，用户可根据实际情况手动输入表查询语句或多表联合查询语句，设置该参数后，除queryserverAddress参数必须设置外，其余参数将失去作用或可不设置。
-         
-    * 必选： 否<br />
-         
-    * 默认值：无<br />
-    
-
 ### 3.3 类型转换
 
 目前hbase20xsqlreader支持大部分Phoenix类型，但也存在部分个别类型没有支持的情况，请注意检查你的类型。
@@ -135,15 +70,14 @@ hbase20xsqlreader插件实现了从Phoenix(HBase SQL)读取数据，对应版本
 下面列出MysqlReader针对Mysql类型转换列表:
 
 
-| DataX 内部类型| Phoenix 数据类型    |
-| -------- | -----  |
-| String     |CHAR, VARCHAR|
-| Bytes   |BINARY, VARBINARY|
-| Bool   |BOOLEAN   | 
-| Long     |INTEGER, TINYINT, SMALLINT, BIGINT  | 
-| Double  |FLOAT, DECIMAL, DOUBLE,   |  
-| Date    |DATE, TIME, TIMESTAMP    | 
-
+| DataX 内部类型 | Phoenix 数据类型                   |
+| -------------- | ---------------------------------- |
+| String         | CHAR, VARCHAR                      |
+| Bytes          | BINARY, VARBINARY                  |
+| Bool           | BOOLEAN                            |
+| Long           | INTEGER, TINYINT, SMALLINT, BIGINT |
+| Double         | FLOAT, DECIMAL, DOUBLE,            |
+| Date           | DATE, TIME, TIMESTAMP              |
 
 
 ## 4 性能报告
@@ -158,7 +92,4 @@ hbase20xsqlreader插件实现了从Phoenix(HBase SQL)读取数据，对应版本
 * 仅支持通过Phoenix QeuryServer读取数据，因此您的Phoenix必须启动QueryServer服务才能使用本插件
 
 ## 6 FAQ
-
-***
-
 
