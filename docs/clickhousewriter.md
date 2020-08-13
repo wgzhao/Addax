@@ -1,11 +1,8 @@
 # DataX ClickHouseWriter
 
-
----
-
 ## 1 快速介绍
 
-数据导入clickhousewriter的插件
+ClickHouseWriter 插件实现了写入数据ClickHouse。在底层实现上，ClickHouseWriter 通过 JDBC 连接远程 ClickHouse 数据库，并执行相应的 `insert into ....` 语句将数据插入到ClickHouse库中。
 
 ## 2 实现原理
 
@@ -15,38 +12,66 @@
 
 ### 3.1 配置样例
 
-#### job.json
+配置一个从内存读取数据并写入ClickHouse数据库的作业:
 
-```
+```json
 {
-  "job": {
-    "setting": {
-        "speed": {
-            "channel": 2
-        }
-    },
-    "content": [
-      {
-        "reader": {
-          ...
-        },
-        "writer": {
-            "name": "clickhousewriter",
-            "parameter": {
-                "username": "default",
-                "password": "zifei123",
-                "column":["belonger","belonger_type","bs_flag","id","income_asset_code","income_fee","insert_time","logName","order_no","pair_id","price","quantity","trade_date","trade_no","trade_time","update_time"],
-                "connection": [
-                    {
-                        "jdbcUrl": "jdbc:clickhouse://127.0.0.1:8123/default",
-                        "table":["XXX"]
-                    }
-                ]
+    "job": {
+        "setting": {
+            "speed": {
+                 "channel": 3
+            },
+            "errorLimit": {
+                "record": 0,
+                "percentage": 0.02
             }
-        }
-      }
-    ]
-  }
+        },
+        "content": [
+            {
+                "writer": {
+                    "name": "clickhousewriter",
+                    "parameter": {
+                        "username": "default",
+                        "password": "",
+                        "passflag": "false",
+                        "column": [ "col1", "col2","col3","col4" ],
+                        "connection": [
+                            {
+                                "table": [
+                                    "test_tbl"
+                                ],
+                                "jdbcUrl": "jdbc:clickhouse://127.0.0.1:8123/default"
+                            }
+                        ]
+                    }
+                },
+               "reader": {
+                    "name": "streamreader",
+                    "parameter": {
+                        "column" : [
+                            {
+                                "value": "DataX",
+                                "type": "string"
+                            },
+                            {
+                                "value": 19890604,
+                                "type": "long"
+                            },
+                            {
+                                "value": "1989-06-04 00:00:00",
+                                "type": "date"
+                            },
+                            {
+                                "value": true,
+                                "type": "bool"
+                            }
+                        ],
+                        "sliceRecordCount": 1000
+                    }
+              }
+           }
+        ]
+    }
 }
 ```
 
@@ -71,11 +96,6 @@
  * 描述：每次批量数据的条数
  * 必选：否
  * 默认值：2048
-
-* trySize
- * 描述：失败后重试的次数
- * 必选：否
- * 默认值：30
 
 * column
  * 描述：elasticsearch所支持的字段类型，样例中包含了全部
