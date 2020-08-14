@@ -5,15 +5,21 @@
                 "reader": {
                     "name": "oraclereader",
                     "parameter": {
-                        "column": ["*"],
+                        "column": [
+                            "*"
+                        ],
                         "connection": [
                             {
-                                "jdbcUrl": ["jdbc:oracle:thin:@18.209.0.11/stage"],
-                                "table": ["${sdb}.${stable}"]
+                                "jdbcUrl": [
+                                    "jdbc:oracle:thin:@127.0.0.1/stage"
+                                ],
+                                "table": [
+                                    "${sdb}.${stable}"
+                                ]
                             }
                         ],
-                        "password": "finebi",
-                        "username": "foundersc123"
+                        "password": "password",
+                        "username": "oracle"
                     }
                 },
                 "writer": {
@@ -21,19 +27,19 @@
                     "parameter": {
                         "column": [],
                         "compress": "SNAPPY",
-                        "defaultFS": "hdfs:/fzzq",
+                        "defaultFS": "hdfs:/sandbox",
                         "fieldDelimiter": "\t",
                         "fileName": "${stable}",
                         "fileType": "orc",
                         "path": "/apps/hive/warehouse/${stable}",
                         "writeMode": "append"
                     },
-                    "hadoopConfig":{
-                        "dfs.nameservices": "fzzq",
-                        "dfs.ha.namenodes.fzzq": "nn1,nn2",
-                        "dfs.namenode.rpc-address.fzzq.nn1": "hadoop1.fzzq.com:8020",
-                        "dfs.namenode.rpc-address.aliDfs.namenode2": "hadoop2.fzzq.com:8020",
-                        "dfs.client.failover.proxy.provider.fzzq": "org.apache.hadoop.hdfs.server.namenode.ha.ConfiguredFailoverProxyProvider"
+                    "hadoopConfig": {
+                        "dfs.nameservices": "sandbox",
+                        "dfs.ha.namenodes.sandbox": "nn1,nn2",
+                        "dfs.namenode.rpc-address.sandbox.nn1": "hdp1.sandbox.com:8020",
+                        "dfs.namenode.rpc-address.sandbox.namenode2": "hdp2.sandbox.com:8020",
+                        "dfs.client.failover.proxy.provider.sandbox": "org.apache.hadoop.hdfs.server.namenode.ha.ConfiguredFailoverProxyProvider"
                     }
                 }
             }
@@ -42,8 +48,7 @@
             "speed": {
                 "channel": 2,
                 "byte": -1,
-                "record": -1,
-                "batchSize": 4096
+                "record": -1
             }
         }
     }

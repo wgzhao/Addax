@@ -84,7 +84,7 @@ public class SecretUtil {
         } else {
             throw DataXException.asDataXException(
                     FrameworkErrorCode.SECRET_ERROR,
-                    String.format("系统编程错误,不支持的加密类型", method));
+                    String.format("系统编程错误,不支持的加密类型: %s", method));
         }
     }
     
@@ -101,7 +101,7 @@ public class SecretUtil {
         } else {
             throw DataXException.asDataXException(
                     FrameworkErrorCode.SECRET_ERROR,
-                    String.format("系统编程错误,不支持的加密类型", method));
+                    String.format("系统编程错误,不支持的加密类型: %s", method));
         }
     }
 

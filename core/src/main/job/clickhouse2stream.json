@@ -2,7 +2,7 @@
     "job": {
         "setting": {
             "speed": {
-                 "channel": 3
+                "channel": 3
             },
             "errorLimit": {
                 "record": 0,
@@ -17,21 +17,25 @@
                         "username": "default",
                         "password": "",
                         "passflag": "false",
-                        "column": [ "*" ],
+                        "column": [
+                            "*"
+                        ],
                         "connection": [
                             {
                                 "jdbcUrl": [
-				     "jdbc:clickhouse://127.0.0.1:8123/tpch"
+                                    "jdbc:clickhouse://127.0.0.1:8123/tpch"
                                 ],
-                                "querySql": ["select * from orders limit 10"]
+                                "querySql": [
+                                    "select * from orders limit 10"
+                                ]
                             }
                         ]
                     }
                 },
-               "writer": {
+                "writer": {
                     "name": "streamwriter",
                     "parameter": {
-                        "print":true
+                        "print": true
                     }
                 }
             }

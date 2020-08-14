@@ -14,7 +14,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.File;
-import java.io.FilenameFilter;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
@@ -45,12 +44,7 @@ public class HookInvoker {
             return;
         }
 
-        String[] subDirs = baseDir.list(new FilenameFilter() {
-            @Override
-            public boolean accept(File dir, String name) {
-                return new File(dir, name).isDirectory();
-            }
-        });
+        String[] subDirs = baseDir.list((dir, name) -> new File(dir, name).isDirectory());
 
         if (subDirs == null) {
             throw DataXException.asDataXException(FrameworkErrorCode.HOOK_LOAD_ERROR, "获取HOOK子目录返回null");
