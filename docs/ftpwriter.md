@@ -63,27 +63,27 @@ FtpWriter实现了从DataX协议转为FTP文件功能，FTP文件本身是无结
 
 ### 3.2 参数说明
 
-| 配置项           | 是否必须 | 默认值  | 描述                                                                      |
-| :--------------- | :------: | ------- | ------------------------------------------------------------------------- |
-| protocol| 是 | 无 | ftp服务器协议，目前支持传输协议有ftp和sftp |
-| host | 是 | 无 | ftp服务器地址 |
-| port | 否 | 22/21 | 若传输协议是sftp协议，默认值是22；若传输协议是标准ftp协议，默认值是21 |
-| timeout | 否 | 60000 ｜ 连接ftp服务器连接超时时间，单位毫秒(ms) |
-| connectPattern | 否 | PASV | 连接模式，仅支持 `PORT`, `PASV` 模式。该参数只在传输协议是标准ftp协议时使用 ｜
-| username | 是 | 无 | ftp服务器访问用户名 |
-| password | 是 | 无 | ftp服务器访问密码 |
-| path | 是 | 无 | 远程FTP文件系统的路径信息，FtpWriter会写入Path目录下属多个文件 |
-| fileName | 是 | 无 | FtpWriter写入的文件名，该文件名会添加随机的后缀作为每个线程写入实际文件名 |
-| writeMode | 是 | 无 | FtpWriter写入前数据清理处理模式，支持 `truncate`, `append`, `nonConflict` ，详见下文 |
-|fieldDelimiter | 是 | `,` |  描述：读取的字段分隔符 |
-|compress | 否 | 无 | 文本压缩类型，暂不支持 |
-|encoding | 否 |utf-8 | 读取文件的编码配置 |
-|dateFormat | 否 | 无 | 日期类型的数据序列化到文件中时的格式，例如 `"dateFormat": "yyyy-MM-dd"` |
-|fileFormat | 否 | text | 文件写出的格式，包括csv, text两种，csv是严格的csv格式，如果待写数据包括列分隔符，则会按照csv的转义语法转义，转义符号为双引号`"`；text格式是用列分隔符简单分割待写数据，对于待写数据包括列分隔符情况下不做转义 |
-|header | 否 | 无 | text写出时的表头，示例 `['id', 'name', 'age']` |
-| nullFormat |否 | `\N`  |定义哪些字符串可以表示为null |
-| maxTraversalLevel | 否 | 100 | 允许遍历文件夹的最大层数 |
-| csvReaderConfig | 否 | 无  | 读取CSV类型文件参数配置，Map类型。读取CSV类型文件使用的CsvReader进行读取，会有很多配置，不配置则使用默认值,详见下文 |
+| 配置项            | 是否必须 | 默认值 | 描述                                                                                                                |
+| :---------------- | :------: | ------ | ------------------------------------------------------------------------------------------------------------------- |
+| protocol          |    是    | 无     | ftp服务器协议，目前支持传输协议有ftp和sftp                                                                          |
+| host              |    是    | 无     | ftp服务器地址                                                                                                       |
+| port              |    否    | 22/21  | 若传输协议是sftp协议，默认值是22；若传输协议是标准ftp协议，默认值是21                                               |
+| timeout           |    否    | 60000  | 连接ftp服务器连接超时时间，单位毫秒(ms)                                                                             |
+| connectPattern    |    否    | PASV   | 连接模式，仅支持 `PORT`, `PASV` 模式。该参数只在传输协议是标准ftp协议时使用 ｜                                      |
+| username          |    是    | 无     | ftp服务器访问用户名                                                                                                 |
+| password          |    是    | 无     | ftp服务器访问密码                                                                                                   |
+| path              |    是    | 无     | 远程FTP文件系统的路径信息，FtpWriter会写入Path目录下属多个文件                                                      |
+| fileName          |    是    | 无     | FtpWriter写入的文件名，该文件名会添加随机的后缀作为每个线程写入实际文件名                                           |
+| writeMode         |    是    | 无     | FtpWriter写入前数据清理处理模式，支持 `truncate`, `append`, `nonConflict` ，详见下文                                |
+| fieldDelimiter    |    是    | `,`    | 描述：读取的字段分隔符                                                                                              |
+| compress          |    否    | 无     | 文本压缩类型，暂不支持                                                                                              |
+| encoding          |    否    | utf-8  | 读取文件的编码配置                                                                                                  |
+| dateFormat        |    否    | 无     | 日期类型的数据序列化到文件中时的格式，例如 `"dateFormat": "yyyy-MM-dd"`                                             |
+| fileFormat        |    否    | text   | 文件写出的格式，包括csv, text两种，                                                                                 |
+| header            |    否    | 无     | text写出时的表头，示例 `['id', 'name', 'age']`                                                                      |
+| nullFormat        |    否    | `\N`   | 定义哪些字符串可以表示为null                                                                                        |
+| maxTraversalLevel |    否    | 100    | 允许遍历文件夹的最大层数                                                                                            |
+| csvReaderConfig   |    否    | 无     | 读取CSV类型文件参数配置，Map类型。读取CSV类型文件使用的CsvReader进行读取，会有很多配置，不配置则使用默认值,详见下文 |
 
 #### writeMod
 
@@ -97,27 +97,17 @@ FtpWriter实现了从DataX协议转为FTP文件功能，FTP文件本身是无结
 
 FTP文件本身不提供数据类型，该类型是DataX FtpWriter定义：
 
-| DataX 内部类型| FTP文件 数据类型    |
-| -------- | -----  |
-| Long     |Long -> 字符串序列化表示|
-| Double   |Double -> 字符串序列化表示|
-| String   |String -> 字符串序列化表示|
-| Boolean  |Boolean -> 字符串序列化表示|
-| Date     |Date -> 字符串序列化表示|
+| DataX 内部类型 | FTP文件 数据类型            |
+| -------------- | --------------------------- |
+| Long           | Long -> 字符串序列化表示    |
+| Double         | Double -> 字符串序列化表示  |
+| String         | String -> 字符串序列化表示  |
+| Boolean        | Boolean -> 字符串序列化表示 |
+| Date           | Date -> 字符串序列化表示    |
 
 其中：
 
-* FTP文件 Long是指FTP文件文本中使用整形的字符串表示形式，例如"19901219"。
-* FTP文件 Double是指FTP文件文本中使用Double的字符串表示形式，例如"3.1415"。
-* FTP文件 Boolean是指FTP文件文本中使用Boolean的字符串表示形式，例如"true"、"false"。不区分大小写。
-* FTP文件 Date是指FTP文件文本中使用Date的字符串表示形式，例如"2014-12-31"，Date可以指定format格式。
-
-## 4 性能报告
-
-## 5 约束限制
-
-略
-
-## 6 FAQ
-
-略
+- Long 是指FTP文件文本中使用整形的字符串表示形式，例如"19901219"。
+- Double 是指FTP文件文本中使用Double的字符串表示形式，例如"3.1415"。
+- Boolean 是指FTP文件文本中使用Boolean的字符串表示形式，例如"true"、"false"。不区分大小写。
+- Date 是指FTP文件文本中使用Date的字符串表示形式，例如"2014-12-31"，Date可以指定format格式。

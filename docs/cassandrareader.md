@@ -110,13 +110,3 @@ CassandraReader插件实现了从Cassandra读取数据。在底层实现上，Ca
 请注意:
 
 目前不支持counter类型和custom类型。
-
-## 4 性能报告
-
-略
-
-## 5 约束限制
-
-略
-
-## 6 FAQ

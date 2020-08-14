@@ -9,16 +9,18 @@ HdfsWriter提供向HDFS文件系统指定路径中写入 `TEXTFile` ， `ORCFile
 1. 目前HdfsWriter仅支持 textfile ，orcfile， parquet 三种格式的文件，且文件内容存放的必须是一张逻辑意义上的二维表;
 2. 由于HDFS是文件系统，不存在schema的概念，因此不支持对部分列写入;
 3. 目前仅支持与以下Hive数据类型：
-	- 数值型：TINYINT(txt或ORC), SMALLINT(txt或ORC), INT(orc或parquet), INTEGER(txt或ORC), BIGINT(txt或ORC), LONG(parquet), FLOAT(orc或parquet), DOUBLE(orc或parquet), DECIMAL(orc或TXT), DECIMAL(18.9) (只有PARQUET必须带精度)
-	- 字符串类型：STRING(TXT/orc或parquet),VARCHAR(TXT/orc),CHAR(TXT/orC)
-	- 布尔类型：BOOLEAN(TXT/orc或parquet)
-	- 时间类型：DATE(TXT/orC),TIMESTAMP(TXT/orC)
-**目前不支持：binary、arrays、maps、structs、union类型**;
-4. 对于Hive分区表目前仅支持一次写入单个分区;
-5. 对于textfile需用户保证写入hdfs文件的分隔符**与在Hive上创建表时的分隔符一致**,从而实现写入hdfs数据与Hive表字段关联;
-6. HdfsWriter实现过程是：首先根据用户指定的path，在path目录下，创建点开头(`.`)的临时目录，创建规则：`.path_<uuid>`；然后将读取的文件写入这个临时目录；全部写入后再将这个临时目录下的文件移动到用户指定目录（在创建文件时保证文件名不重复）; 最后删除临时目录。如果在中间过程发生网络中断等情况造成无法与hdfs建立连接，需要用户手动删除已经写入的文件和临时目录。
-7. 目前插件中Hive版本为3.1.1，Hadoop版本为 3.1.1， ,在Hadoop 2.7.x, Hadoop 3.1.x 和 Hive 2.x, Hive 3.1.x 测试环境中写入正常；其它版本理论上都支持，但用于生产之前建议进一步测试；
-8. 目前HdfsWriter支持Kerberos认证
+   - 数值型：TINYINT(txt或ORC), SMALLINT(txt或ORC), INT(orc或parquet), INTEGER(txt或ORC), BIGINT(txt或ORC), LONG(parquet), FLOAT(orc或parquet), DOUBLE(orc或parquet), DECIMAL(orc或TXT), DECIMAL(18.9) (只有PARQUET必须带精度)
+   - 字符串类型：STRING(TXT/orc或parquet),VARCHAR(TXT/orc),CHAR(TXT/orC)
+   - 布尔类型：BOOLEAN(TXT/orc或parquet)
+   - 时间类型：DATE(TXT/orC),TIMESTAMP(TXT/orC)
+  
+**目前不支持：binary、arrays、maps、structs、union类型**
+
+1. 对于Hive分区表目前仅支持一次写入单个分区;
+2. 对于textfile需用户保证写入hdfs文件的分隔符**与在Hive上创建表时的分隔符一致**,从而实现写入hdfs数据与Hive表字段关联;
+3. HdfsWriter实现过程是：首先根据用户指定的path，在path目录下，创建点开头(`.`)的临时目录，创建规则：`.path_<uuid>`；然后将读取的文件写入这个临时目录；全部写入后再将这个临时目录下的文件移动到用户指定目录（在创建文件时保证文件名不重复）; 最后删除临时目录。如果在中间过程发生网络中断等情况造成无法与hdfs建立连接，需要用户手动删除已经写入的文件和临时目录。
+4. 目前插件中Hive版本为3.1.1，Hadoop版本为 3.1.1， ,在Hadoop 2.7.x, Hadoop 3.1.x 和 Hive 2.x, Hive 3.1.x 测试环境中写入正常；其它版本理论上都支持，但用于生产之前建议进一步测试；
+5. 目前HdfsWriter支持Kerberos认证
 
 ## 3 功能说明
 
@@ -225,11 +227,3 @@ Kerberos认证 keytab文件路径，绝对路径
 | String   |STRING,VARCHAR,CHAR |
 | Boolean  |BOOLEAN |
 | Date     |DATE,TIMESTAMP |
-
-## 4 约束限制
-
-略
-
-## 5 FAQ
-
-略

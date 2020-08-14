@@ -41,8 +41,6 @@
 | totalReadRecords     | 读出记录总数       | 是   | 0      |
 | totalErrorRecords    | 读写失败总数       | 是   | 0      |
 
-**说明** 
-
 `jobName` 的设置规则如下:
 
 1. 在命令行通过传递 `-P-DjobName=xxxx` 方式指定,否则
