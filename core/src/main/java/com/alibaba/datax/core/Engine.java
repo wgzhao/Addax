@@ -88,7 +88,7 @@ public class Engine {
         Configuration jobInfoConfig = allConf.getConfiguration(CoreConstant.DATAX_JOB_JOBINFO);
         //初始化PerfTrace
         PerfTrace perfTrace = PerfTrace.getInstance(isJob, instanceId, taskGroupId, priority, traceEnable);
-        perfTrace.setJobInfo(jobInfoConfig,perfReportEnable,channelNumber);
+        perfTrace.setJobInfo(jobInfoConfig, perfReportEnable, channelNumber);
         container.start();
 
     }

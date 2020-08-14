@@ -2,8 +2,8 @@
     "job": {
         "setting": {
             "speed": {
-                "byte":-1,
-		"channel": 1
+                "byte": -1,
+                "channel": 1
             },
             "errorLimit": {
                 "record": 0,
@@ -15,7 +15,7 @@
                 "reader": {
                     "name": "streamreader",
                     "parameter": {
-                        "column" : [
+                        "column": [
                             {
                                 "value": "DataX",
                                 "type": "string"
@@ -44,7 +44,9 @@
                     "name": "streamwriter",
                     "parameter": {
                         "print": true,
-			"column":["col1"],
+                        "column": [
+                            "col1"
+                        ],
                         "encoding": "UTF-8"
                     }
                 }

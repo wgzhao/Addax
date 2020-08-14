@@ -92,20 +92,17 @@ public class TaskGroupContainer extends AbstractContainer {
     @Override
     public void start() {
         try {
-            /**
-             * 状态check时间间隔，较短，可以把任务及时分发到对应channel中
-             */
+
+            // 状态check时间间隔，较短，可以把任务及时分发到对应channel中
             int sleepIntervalInMillSec = this.configuration.getInt(
                     CoreConstant.DATAX_CORE_CONTAINER_TASKGROUP_SLEEPINTERVAL, 100);
-            /**
-             * 状态汇报时间间隔，稍长，避免大量汇报
-             */
+
+            // 状态汇报时间间隔，稍长，避免大量汇报
             long reportIntervalInMillSec = this.configuration.getLong(
                     CoreConstant.DATAX_CORE_CONTAINER_TASKGROUP_REPORTINTERVAL,
                     10000);
-            /**
-             * 2分钟汇报一次性能统计
-             */
+
+            // 2分钟汇报一次性能统计
 
             // 获取channel数目
             int channelNumber = this.configuration.getInt(
@@ -136,9 +133,9 @@ public class TaskGroupContainer extends AbstractContainer {
 
             Map<Integer, Configuration> taskConfigMap = buildTaskConfigMap(taskConfigs); //taskId与task配置
             List<Configuration> taskQueue = buildRemainTasks(taskConfigs); //待运行task列表
-            Map<Integer, TaskExecutor> taskFailedExecutorMap = new HashMap<Integer, TaskExecutor>(); //taskId与上次失败实例
-            List<TaskExecutor> runTasks = new ArrayList<TaskExecutor>(channelNumber); //正在运行task
-            Map<Integer, Long> taskStartTimeMap = new HashMap<Integer, Long>(); //任务开始时间
+            Map<Integer, TaskExecutor> taskFailedExecutorMap = new HashMap<>(); //taskId与上次失败实例
+            List<TaskExecutor> runTasks = new ArrayList<>(channelNumber); //正在运行task
+            Map<Integer, Long> taskStartTimeMap = new HashMap<>(); //任务开始时间
 
             long lastReportTimeStamp = 0;
             Communication lastTaskGroupContainerCommunication = new Communication();
@@ -161,7 +158,8 @@ public class TaskGroupContainer extends AbstractContainer {
                     //失败，看task是否支持failover，重试次数未超过最大限制
             		if(taskCommunication.getState() == State.FAILED){
                         taskFailedExecutorMap.put(taskId, taskExecutor);
-            			if(taskExecutor.supportFailOver() && taskExecutor.getAttemptCount() < taskMaxRetryTimes){
+                        assert taskExecutor != null;
+                        if(taskExecutor.supportFailOver() && taskExecutor.getAttemptCount() < taskMaxRetryTimes){
                             taskExecutor.shutdown(); //关闭老的executor
                             containerCommunicator.resetCommunication(taskId); //将task的状态重置
             				Configuration taskConfig = taskConfigMap.get(taskId);
@@ -176,11 +174,12 @@ public class TaskGroupContainer extends AbstractContainer {
             		}else if(taskCommunication.getState() == State.SUCCEEDED){
                         Long taskStartTime = taskStartTimeMap.get(taskId);
                         if(taskStartTime != null){
-                            Long usedTime = System.currentTimeMillis() - taskStartTime;
-                            LOG.info("taskGroup[{}] taskId[{}] is successed, used[{}]ms",
+                            long usedTime = System.currentTimeMillis() - taskStartTime;
+                            LOG.info("taskGroup[{}] taskId[{}] is successful, used[{}]ms",
                                     this.taskGroupId, taskId, usedTime);
                             //usedTime*1000*1000 转换成PerfRecord记录的ns，这里主要是简单登记，进行最长任务的打印。因此增加特定静态方法
-                            PerfRecord.addPerfRecord(taskGroupId, taskId, PerfRecord.PHASE.TASK_TOTAL,taskStartTime, usedTime * 1000L * 1000L);
+                            PerfRecord.addPerfRecord(taskGroupId, taskId, PerfRecord.PHASE.TASK_TOTAL,taskStartTime,
+                                    usedTime * 1000L * 1000L);
                             taskStartTimeMap.remove(taskId);
                             taskConfigMap.remove(taskId);
                         }
@@ -299,7 +298,7 @@ public class TaskGroupContainer extends AbstractContainer {
     }
     
     private Map<Integer, Configuration> buildTaskConfigMap(List<Configuration> configurations){
-    	Map<Integer, Configuration> map = new HashMap<Integer, Configuration>();
+    	Map<Integer, Configuration> map = new HashMap<>();
     	for(Configuration taskConfig : configurations){
         	int taskId = taskConfig.getInt(CoreConstant.TASK_ID);
         	map.put(taskId, taskConfig);
@@ -308,11 +307,7 @@ public class TaskGroupContainer extends AbstractContainer {
     }
 
     private List<Configuration> buildRemainTasks(List<Configuration> configurations){
-    	List<Configuration> remainTasks = new LinkedList<Configuration>();
-    	for(Configuration taskConfig : configurations){
-    		remainTasks.add(taskConfig);
-    	}
-    	return remainTasks;
+        return new LinkedList<>(configurations);
     }
     
     private TaskExecutor removeTask(List<TaskExecutor> taskList, int taskId){
@@ -463,7 +458,7 @@ public class TaskGroupContainer extends AbstractContainer {
         }
 
         private AbstractRunner generateRunner(PluginType pluginType, List<TransformerExecution> transformerInfoExecs) {
-            AbstractRunner newRunner = null;
+            AbstractRunner newRunner;
             TaskPluginCollector pluginCollector;
 
             switch (pluginType) {
@@ -567,9 +562,8 @@ public class TaskGroupContainer extends AbstractContainer {
 
     public void removeTaskGroup(){
         try {
-            /**
-             * 移除根据JOBID做的一些标记 防止内存溢出
-             */
+
+            // 移除根据JOBID做的一些标记 防止内存溢出
             LoadUtil.getConfigurationSet().remove(this.jobId);
             Iterator<Map.Entry<Integer, Communication>> it =
                     LocalTGCommunicationManager.getTaskGroupCommunicationMap().entrySet().iterator();

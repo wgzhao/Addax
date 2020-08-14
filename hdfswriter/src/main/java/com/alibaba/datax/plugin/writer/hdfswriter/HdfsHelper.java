@@ -1,7 +1,6 @@
 package com.alibaba.datax.plugin.writer.hdfswriter;
 
 import com.alibaba.datax.common.element.Column;
-import com.alibaba.datax.common.element.Record;
 import com.alibaba.datax.common.exception.DataXException;
 import com.alibaba.datax.common.plugin.RecordReceiver;
 import com.alibaba.datax.common.plugin.TaskPluginCollector;
@@ -48,7 +47,7 @@ public  class HdfsHelper {
     public JobConf conf = null;
     public org.apache.hadoop.conf.Configuration hadoopConf = null;
     public static final String HADOOP_SECURITY_AUTHENTICATION_KEY = "hadoop.security.authentication";
-    public static final String HDFS_DEFAULTFS_KEY = "fs.defaultFS";
+    public static final String HDFS_DEFAULT_FS_KEY = "fs.defaultFS";
 
     // Kerberos
     private Boolean haveKerberos = false;
@@ -66,7 +65,7 @@ public  class HdfsHelper {
                 hadoopConf.set(each, hadoopSiteParamsAsJsonObject.getString(each));
             }
         }
-        hadoopConf.set(HDFS_DEFAULTFS_KEY, defaultFS);
+        hadoopConf.set(HDFS_DEFAULT_FS_KEY, defaultFS);
 
         //是否有Kerberos认证
         this.haveKerberos = taskConfig.getBool(Key.HAVE_KERBEROS, false);

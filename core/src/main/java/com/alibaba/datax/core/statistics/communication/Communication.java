@@ -111,11 +111,7 @@ public class Communication extends BaseObject implements Cloneable {
 
     public synchronized void addMessage(final String key, final String value) {
         Validate.isTrue(StringUtils.isNotBlank(key), "增加message的key不能为空");
-        List valueList = this.message.get(key);
-        if (null == valueList) {
-            valueList = new ArrayList<String>();
-            this.message.put(key, valueList);
-        }
+        List valueList = this.message.computeIfAbsent(key, k -> new ArrayList<String>());
 
         valueList.add(value);
     }
@@ -236,11 +232,7 @@ public class Communication extends BaseObject implements Cloneable {
          */
         for (Entry<String, List<String>> entry : otherComm.getMessage().entrySet()) {
             String key = entry.getKey();
-            List<String> valueList = this.message.get(key);
-            if (valueList == null) {
-                valueList = new ArrayList<String>();
-                this.message.put(key, valueList);
-            }
+            List<String> valueList = this.message.computeIfAbsent(key, k -> new ArrayList<String>());
 
             valueList.addAll(entry.getValue());
         }

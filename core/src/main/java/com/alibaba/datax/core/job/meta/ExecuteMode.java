@@ -8,7 +8,7 @@ public enum ExecuteMode {
 
     String value;
 
-    private ExecuteMode(String value) {
+    ExecuteMode(String value) {
         this.value = value;
     }
 

@@ -65,8 +65,8 @@ public class CommonRdbmsWriter {
             List<Object> connections = originalConfig.getList(Constant.CONN_MARK,
                     Object.class);
 
-            for (int i = 0, len = connections.size(); i < len; i++) {
-                Configuration connConf = Configuration.from(connections.get(i).toString());
+            for (Object connection : connections) {
+                Configuration connConf = Configuration.from(connection.toString());
                 String jdbcUrl = connConf.getString(Key.JDBC_URL);
                 List<String> expandedTables = connConf.getList(Key.TABLE, String.class);
                 boolean hasInsertPri = DBUtil.checkInsertPrivilege(dataBaseType, jdbcUrl, username, password, expandedTables);
@@ -214,7 +214,7 @@ public class CommonRdbmsWriter {
                 if (ss.length != 3) {
                     throw DataXException
                             .asDataXException(
-                                    DBUtilErrorCode.JDBC_OB10_ADDRESS_ERROR, "JDBC OB10格式错误，请联系askdatax");
+                                    DBUtilErrorCode.JDBC_OB10_ADDRESS_ERROR, "JDBC OB10格式错误，请联系datax");
                 }
                 LOG.info("this is ob1_0 jdbc url.");
                 this.username = ss[1].trim() + ":" + this.username;

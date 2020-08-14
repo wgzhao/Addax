@@ -2,12 +2,8 @@
     "job": {
         "setting": {
             "speed": {
-                "byte":-1,
-				"channel": 1
-            },
-            "errorLimit": {
-                "record": 0,
-                "percentage": 0.02
+                "byte": -1,
+                "channel": 1
             }
         },
         "content": [
@@ -15,7 +11,7 @@
                 "reader": {
                     "name": "streamreader",
                     "parameter": {
-                        "column" : [
+                        "column": [
                             {
                                 "value": "DataX",
                                 "type": "string"
@@ -43,16 +39,35 @@
                 "writer": {
                     "name": "hdfswriter",
                     "parameter": {
-						"column":[{"name":"col1","type":"string"},{"name":"col2","type":"int"},
-								  {"name":"col3","type":"string"},{"name":"col4","type":"boolean"},
-								 {"name":"col5","type":"string"}],
-						"defaultFS":"hdfs://localhost:8020",
+                        "column": [
+                            {
+                                "name": "col1",
+                                "type": "string"
+                            },
+                            {
+                                "name": "col2",
+                                "type": "int"
+                            },
+                            {
+                                "name": "col3",
+                                "type": "string"
+                            },
+                            {
+                                "name": "col4",
+                                "type": "boolean"
+                            },
+                            {
+                                "name": "col5",
+                                "type": "string"
+                            }
+                        ],
+                        "defaultFS": "hdfs://localhost:8020",
                         "path": "/tmp/out",
-						"fileType":"par",
-						"fieldDelimiter":"\u0001",
-						"compress":"SNAPPY",
-						"fileName":"test",
-						"writeMode":"overwrite",
+                        "fileType": "par",
+                        "fieldDelimiter": "\u0001",
+                        "compress": "SNAPPY",
+                        "fileName": "test",
+                        "writeMode": "overwrite",
                         "encoding": "UTF-8"
                     }
                 }

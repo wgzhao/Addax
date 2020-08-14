@@ -80,7 +80,7 @@ public class OracleReader extends Reader {
 		private void dealHint(Configuration originalConfig) {
 			String hint = originalConfig.getString(Key.HINT);
 			if (StringUtils.isNotBlank(hint)) {
-				boolean isTableMode = originalConfig.getBool(com.alibaba.datax.plugin.rdbms.reader.Constant.IS_TABLE_MODE).booleanValue();
+				boolean isTableMode = originalConfig.getBool(com.alibaba.datax.plugin.rdbms.reader.Constant.IS_TABLE_MODE);
 				if(!isTableMode){
 					throw DataXException.asDataXException(OracleReaderErrorCode.HINT_ERROR, "当且仅当非 querySql 模式读取 oracle 时才能配置 HINT.");
 				}
