@@ -98,7 +98,3 @@ ClickHouseReader插件实现了从ClickHouse读取数据。在底层实现上，
 请注意:
 
 除上述罗列字段类型外，其他类型均不支持，如Array、Nested等
-
-## 4 性能报告
-
-## 5 约束限制

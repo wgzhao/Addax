@@ -111,7 +111,6 @@ orcfile，它的全名是Optimized Row Columnar file，是对RCFile做了优化�
 | kerberosPrincipal      |    否    | 无                  |
 | compress               |    否    | 无                  |
 | hadoopConfig           |    否    | 无                  |
-| csvReaderConfig        |    否    | 无                  |
 
 #### path
 

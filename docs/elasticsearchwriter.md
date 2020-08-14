@@ -103,9 +103,7 @@
 | column           |    是    | 无      | elasticsearch所支持的字段类型，文档中给出的样例中包含了全部支持的字段类型 |
 | dynamic          |    否    | false   | 不使用datax的mappings，使用es自己的自动mappings                           |
 
-## 4 性能报告
-
-## 5 约束限制
+## 4 约束限制
 
 - 如果导入id，这样数据导入失败也会重试，重新导入也仅仅是覆盖，保证数据一致性
 - 如果不导入id，就是append_only模式，elasticsearch自动生成id，速度会提升20%左右，但数据无法修复，适合日志型数据(对数据精度要求不高的)

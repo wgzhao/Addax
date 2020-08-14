@@ -83,13 +83,10 @@ ROW                                   COLUMN+CELL
  | xiaoming | info:birthday    | 1457082186830 | 1987-06-17 |
  | xiaoming | info:company     | 1457082189826 | alibaba    |
 
-
 ### 1.2 限制
 
 1. 目前不支持动态列的读取。考虑网络传输流量（支持动态列，需要先将hbase所有列的数据读取出来，再按规则进行过滤），现支持的两种读取模式中需要用户明确指定要读取的列。
-
 2. 关于同步作业的切分：目前的切分方式是根据用户hbase表数据的region分布进行切分。即：在用户填写的 `[startrowkey，endrowkey］` 范围内，一个region会切分成一个task，单个region不进行切分。 
-
 3. multiVersionFixedColumn模式下不支持增加常量列
 
 ## 2 实现原理
@@ -267,19 +264,19 @@ ROW                                   COLUMN+CELL
 **normal 模式**
 
 name指定读取的hbase列，除了rowkey外，必须为 列族:列名 的格式，type指定源数据的类型，format指定日期类型的格式，value指定当前类型为常量，不从hbase读取数据，而是根据value值自动生成对应的列。配置格式如下：
-	
+
 ```json
-"column": 
+"column":
 [
-	{
-	    "name": "rowkey",
-	    "type": "string"
-	},
-	{
-	    "value": "test",
-	    "type": "string"
-	}
-] 	            
+    {
+        "name": "rowkey",
+        "type": "string"
+    },
+    {
+        "value": "test",
+        "type": "string"
+    }
+]
 ```
 
 normal 模式下，对于用户指定Column信息，type必须填写，name/value必须选择其一。    
@@ -287,7 +284,7 @@ normal 模式下，对于用户指定Column信息，type必须填写，name/valu
 **multiVersionFixedColumn 模式**
 
 name指定读取的hbase列，除了rowkey外，必须为 列族:列名 的格式，type指定源数据的类型，format指定日期类型的格式 。multiVersionFixedColumn模式下不支持常量列。配置格式如下：
-		
+
 ```json
 "column": [
     {
@@ -298,7 +295,7 @@ name指定读取的hbase列，除了rowkey外，必须为 列族:列名 的格�
         "name": "info: age",
         "type": "string"
     }
-]	
+]
 ```
 
 #### range
@@ -308,9 +305,9 @@ name指定读取的hbase列，除了rowkey外，必须为 列族:列名 的格�
 - startRowkey：指定开始rowkey
 - endRowkey指定结束rowkey
 - isBinaryRowkey：指定配置的startRowkey和endRowkey转换为`byte[]`时的方式，默认值为false,若为true，则调用`Bytes.toBytesBinary(rowkey)`方法进行转换;若为false：则调用`Bytes.toBytes(rowkey)`
-	
-配置格式如下：   
-	
+
+配置格式如下：
+
 ```json
 "range": {
   "startRowkey": "aaa",
@@ -320,7 +317,6 @@ name指定读取的hbase列，除了rowkey外，必须为 列族:列名 的格�
 ```
 
 ### 3.3 类型转换
-
 
 下面列出支持的读取HBase数据类型，HbaseReader 针对 HBase 类型转换列表:
 
@@ -332,18 +328,6 @@ name指定读取的hbase列，除了rowkey外，必须为 列族:列名 的格�
 | Date           | date                |
 | Boolean        | boolean             |
 
-
 请注意:
 
 `除上述罗列字段类型外，其他类型均不支持`
-
-## 4 性能报告
-
-略
-
-## 5 约束限制
-
-略
-	
-## 6 FAQ
-

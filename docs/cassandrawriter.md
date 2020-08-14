@@ -112,11 +112,7 @@ CassandraWriter插件实现了向Cassandra写入数据。在底层实现上，Ca
 
 目前不支持counter类型和custom类型。
 
-## 4 性能报告
-
-略
-
-## 5 约束限制
+## 4 约束限制
 
 ### batchSize
 
@@ -125,4 +121,4 @@ CassandraWriter插件实现了向Cassandra写入数据。在底层实现上，Ca
 3. 如果batch中的内容超过了 `batch_size_warn_threshold_in_kb` 的限制，会打出warn日志，但并不影响写入，忽略即可。
 4. 如果批量提交失败，会把这个批量的所有内容重新逐条写入一遍。
 
-## 6 FAQ
+

@@ -10,7 +10,6 @@ HBase20xsqlwriter实现了向hbase中的SQL表(phoenix)批量导入数据的功�
 
 支持带索引的表的数据导入，可以同步更新所有的索引表
 
-
 ### 1.2 限制
 
 1. 要求版本为Phoenix5.x及HBase2.x
@@ -95,13 +94,3 @@ HBase20xsqlwriter实现了向hbase中的SQL表(phoenix)批量导入数据的功�
 | batchSize          | 否  | 256 | 一次批量写入的最大行数 |
 | column             |    否    | 全部列   | 列名，大小写敏感，通常phoenix的列名都是**大写**, 数据类型无需填写,会自动获取列          |
 | nullMode        |    否    | skip   | 读取的null值时，如何处理, `skip` 表示不向hbase写这列；`empty`：写入 `HConstants.EMPTY_BYTE_ARRAY`，即`new byte [0]`               |
-
-
-## 4. 性能报告
-
-## 5. 约束限制
-
-## 6. FAQ
-
-
-

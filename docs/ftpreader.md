@@ -117,10 +117,9 @@ FtpReader实现了从远程FTP文件读取数据并转为DataX协议的功能，
 | maxTraversalLevel |    否    | 100            | 允许遍历文件夹的最大层数                                                |
 | csvReaderConfig   |    否    | 无             | 读取CSV类型文件参数配置，Map类型。不配置则使用默认值,详见下文 |
 
-
 #### path
 
-远程FTP文件系统的路径信息，注意这里可以支持填写多个路径。 
+远程FTP文件系统的路径信息，注意这里可以支持填写多个路径。
 
 - 当指定单个远程FTP文件，FtpReader暂时只能使用单线程进行数据抽取。二期考虑在非压缩文件情况下针对单个File可以进行多线程并发读取
 = 当指定多个远程FTP文件，FtpReader支持使用多线程进行数据抽取。线程并发数通过通道数指定
@@ -199,17 +198,7 @@ boolean captureRawRecord = true;
 
 其中：
 
-* 远程FTP文件 Long是指远程FTP文件文本中使用整形的字符串表示形式，例如"19901219"。
-* 远程FTP文件 Double是指远程FTP文件文本中使用Double的字符串表示形式，例如"3.1415"。
-* 远程FTP文件 Boolean是指远程FTP文件文本中使用Boolean的字符串表示形式，例如"true"、"false"。不区分大小写。
-* 远程FTP文件 Date是指远程FTP文件文本中使用Date的字符串表示形式，例如"2014-12-31"，Date可以指定format格式。
-
-## 4 性能报告
-
-## 5 约束限制
-
-略
-
-## 6 FAQ
-
-略
+- Long 是指远程FTP文件文本中使用整形的字符串表示形式，例如"19901219"。
+- Double 是指远程FTP文件文本中使用Double的字符串表示形式，例如"3.1415"。
+- Boolean 是指远程FTP文件文本中使用Boolean的字符串表示形式，例如"true"、"false"。不区分大小写。
+- Date 是指远程FTP文件文本中使用Date的字符串表示形式，例如"2014-12-31"，Date可以指定format格式。

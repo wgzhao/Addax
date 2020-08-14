@@ -160,11 +160,10 @@ HbaseWriter 插件实现了从向Hbase中写取数据。在底层实现上，Hba
 | scanCacheSize   |    否    | 256    | Hbase client每次rpc从服务器端读取的行数                                                                                           |
 | scanBatchSize   |    否    | 100    | Hbase client每次rpc从服务器端读取的列数                                                                                           |
 
-	
 #### column
 
 要写入的hbase字段。index：指定该列对应reader端column的索引，从0开始；name：指定hbase表中的列，必须为 列族:列名 的格式；type：指定写入数据类型，用于转换HBase byte[]。配置格式如下：
-	
+
 ```json
 "column": [
     {
@@ -177,13 +176,13 @@ HbaseWriter 插件实现了从向Hbase中写取数据。在底层实现上，Hba
       "name": "cf1:q2",
       "type": "string"
     }
-］ 		            
+]
 ```
 
 #### rowkeyColumn
 
 要写入的hbase的rowkey列。index：指定该列对应reader端column的索引，从0开始，若为常量index为－1；type：指定写入数据类型，用于转换HBase byte[]；value：配置常量，常作为多个字段的拼接符。hbasewriter会将rowkeyColumn中所有列按照配置顺序进行拼接作为写入hbase的rowkey，不能全为常量。配置格式如下：
-	
+
 ```json
 "rowkeyColumn": [
   {
@@ -195,9 +194,9 @@ HbaseWriter 插件实现了从向Hbase中写取数据。在底层实现上，Hba
     "type":"string",
     "value":"_"
   }
-] 	          
+]
 ```
-	
+
 #### versionColumn
 
 指定写入hbase的时间戳。支持：当前时间、指定时间列，指定时间，三者选一。若不配置表示用当前时间。
@@ -207,40 +206,30 @@ index：指定对应reader端column的索引，从0开始，需保证能转换�
 若为指定时间index为 `－1`；
 
 value：指定时间的值,long值。配置格式如下：
-	
+
 ```json
 "versionColumn":{
-	"index":1
-}          
+  "index":1
+}
 ```
-	
+
 或者
-	
+
 ```json
 "versionColumn":{
-	"index":－1,
-	"value":123456789
+  "index":－1,
+  "value":123456789
 }
 ```
 
 ### 3.3 HBase支持的列类型
 
-* BOOLEAN
-* SHORT
-* INT
-* LONG
-* FLOAT
-* DOUBLE
-* STRING
+- BOOLEAN
+- SHORT
+- INT
+- LONG
+- FLOAT
+- DOUBLE
+- STRING
 
-
-请注意:
-
-除上述罗列字段类型外，其他类型均不支持
-
-## 4 性能报告
-
-## 5 约束限制
-
-## 6 FAQ
-
+请注意: 除上述罗列字段类型外，其他类型均不支持
