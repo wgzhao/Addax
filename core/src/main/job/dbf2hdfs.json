@@ -77,7 +77,7 @@
                         {"name":"s33", "type": "decimal"}
 					],
                     "compress": "SNAPPY",
-                    "defaultFS": "hdfs://fzzq",
+                    "defaultFS": "hdfs://sandbox",
                     "fieldDelimiter": "\t",
                     "fileName": "dbf_orc",
                     "fileType": "orc",
@@ -85,13 +85,13 @@
                     "writeMode": "overwrite",
                     "haveKerberos": "true",
                     "kerberosKeytabFilePath": "/etc/security/keytabs/hdfs.headless.keytab",
-                    "kerberosPrincipal": "hdfs-fzzq@FZZQ.COM",
+                    "kerberosPrincipal": "hdfs-sandbox@SANDBOX.COM",
                     "hadoopConfig":{
-                        "dfs.nameservices": "fzzq",
-                        "dfs.ha.namenodes.fzzq": "nn1,nn2",
-                        "dfs.namenode.rpc-address.fzzq.nn1": "hadoop1.fzzq.com:8020",
-                        "dfs.namenode.rpc-address.fzzq.nn2": "hadoop2.fzzq.com:8020",
-                        "dfs.client.failover.proxy.provider.fzzq": "org.apache.hadoop.hdfs.server.namenode.ha.ConfiguredFailoverProxyProvider"
+                        "dfs.nameservices": "sandbox",
+                        "dfs.ha.namenodes.sandbox": "nn1,nn2",
+                        "dfs.namenode.rpc-address.sandbox.nn1": "hdp1.sandbox.com:8020",
+                        "dfs.namenode.rpc-address.sandbox.nn2": "hdp2.sandbox.com:8020",
+                        "dfs.client.failover.proxy.provider.sandbox": "org.apache.hadoop.hdfs.server.namenode.ha.ConfiguredFailoverProxyProvider"
                         }
                     }
                 }

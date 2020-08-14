@@ -2,12 +2,8 @@
     "job": {
         "setting": {
             "speed": {
-                "byte":-1,
-				"channel": 1
-            },
-            "errorLimit": {
-                "record": 0,
-                "percentage": 0.02
+                "byte": -1,
+                "channel": 1
             }
         },
         "content": [
@@ -15,7 +11,7 @@
                 "reader": {
                     "name": "streamreader",
                     "parameter": {
-                        "column" : [
+                        "column": [
                             {
                                 "value": "DataX",
                                 "type": "string"
@@ -44,8 +40,8 @@
                     "name": "txtfilewriter",
                     "parameter": {
                         "path": "/tmp/out",
-						"fileName":"test",
-						"writeMode":"truncate",
+                        "fileName": "test",
+                        "writeMode": "truncate",
                         "encoding": "UTF-8"
                     }
                 }
