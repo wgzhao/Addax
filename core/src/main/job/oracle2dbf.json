@@ -1,29 +1,28 @@
-
 {
   "job": {
     "content": [
       {
         "reader": {
-          "name": "oraclereader", 
+          "name": "oraclereader",
           "parameter": {
             "column": [
-              "BRANCH_NO", 
-	      "2.3",
+              "BRANCH_NO",
+              "2.3",
               "BRANCH_NAME",
-	      "DW_CLT_DATE"
-            ], 
+              "DW_CLT_DATE"
+            ],
             "connection": [
               {
                 "jdbcUrl": [
-                  "jdbc:oracle:thin:@18.209.0.11:1521/stage"
-                ], 
+                  "jdbc:oracle:thin:@127.0.0.1:1521/stage"
+                ],
                 "table": [
                   "STGUF.ALLBRANCH"
                 ]
               }
-            ], 
-            "password": "foundersc123", 
-            "username": "finebi", 
+            ],
+            "password": "password",
+            "username": "oracle",
             "where": "branch_no = '1211'",
             "session": [
               "alter session set NLS_DATE_FORMAT='yyyy/mm/dd hh24:mi:ss'",
@@ -32,44 +31,44 @@
               "alter session set TIME_ZONE='Asia/Chongqing'"
             ]
           }
-        }, 
+        },
         "writer": {
-          "name": "dbffilewriter", 
+          "name": "dbffilewriter",
           "parameter": {
             "column": [
               {
-                "name": "col1", 
+                "name": "col1",
                 "type": "numeric",
                 "length": 10,
                 "scal": 0
-              }, 
+              },
               {
-				"name":"col2",
-				"type":"numeric",
+                "name": "col2",
+                "type": "numeric",
                 "length": 10,
                 "scal": 2
-				 },
+              },
               {
-                "name": "col3", 
+                "name": "col3",
                 "type": "char",
                 "length": 250
               },
               {
-				"name":"col4",
-				"type":"date"
+                "name": "col4",
+                "type": "date"
               }
-            ], 
-	    "fileName": "allbranch.dbf",
+            ],
+            "fileName": "allbranch.dbf",
             "path": "/tmp/out",
             "writeMode": "truncate"
           }
         }
       }
-    ], 
+    ],
     "setting": {
       "speed": {
-        "batchSize": 20480, 
-        "bytes": -1, 
+        "batchSize": 20480,
+        "bytes": -1,
         "channel": 10
       }
     }

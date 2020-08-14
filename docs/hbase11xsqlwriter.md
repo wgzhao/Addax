@@ -100,15 +100,6 @@ HBase11xsqlwriter实现了向hbase中的SQL表(phoenix)批量导入数据的功�
 | kerberosPrincipal      |    否    | null   | kerberos 凭证信息，仅当 `havekerberos` 启用后有效                                                                   |
 | kerberosKeytabFilePath |    否    | null   | kerberos 凭证文件的绝对路径，仅当 `havekerberos` 启用后有效                                                         |
 
-
 注意：启用kerberos认证后，程序需要知道`hbase-site.xml` 所在的路径，一种办法是运行执行在环境变量 `CLASSPATH` 中增加该文件的所在路径。
 
 另外一个解决办法是修改 `datax.py` 中的 `CLASS_PATH` 变量，增加 `hbase-site.xml` 的路径
-
-## 4. 性能报告
-
-## 5. 约束限制
-
-## 6. FAQ
-
-

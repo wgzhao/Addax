@@ -1,4 +1,5 @@
-#!/usr/bin/env python3
+#!/usr/bin/env python
+from __future__ import print_function
 import sys
 import os
 import signal
@@ -13,22 +14,29 @@ from string import Template
 import codecs
 import platform
 
+
 def isWindows():
     return platform.system() == 'Windows'
 
-DATAX_HOME = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
-DATAX_VERSION = 'DATAX-OPENSOURCE-3.0'
+DATAX_HOME = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+DATAX_VERSION = 'DATAX-V3'
+
 if isWindows():
-    codecs.register(lambda name: name == 'cp65001' and codecs.lookup('utf-8') or None)
+    codecs.register(lambda name: name ==
+                    'cp65001' and codecs.lookup('utf-8') or None)
     CLASS_PATH = ("%s/lib/*") % (DATAX_HOME)
 else:
     CLASS_PATH = ("%s/lib/*:.") % (DATAX_HOME)
 LOGBACK_FILE = ("%s/conf/logback.xml") % (DATAX_HOME)
-DEFAULT_JVM = "-Xms64m -Xmx2g -XX:+HeapDumpOnOutOfMemoryError -XX:HeapDumpPath=%s" % (DATAX_HOME)
-DEFAULT_PROPERTY_CONF = "-Dfile.encoding=UTF-8 -Dlogback.statusListenerClass=ch.qos.logback.core.status.NopStatusListener -Djava.security.egd=file:///dev/urandom -Ddatax.home=%s -Dlogback.configurationFile=%s " % (DATAX_HOME, LOGBACK_FILE)
-ENGINE_COMMAND = "java -server ${jvm} %s -classpath %s  ${params} com.alibaba.datax.core.Engine -mode ${mode} -jobid ${jobid} -job ${job}" % (
-    DEFAULT_PROPERTY_CONF, "/etc/hbase/conf:" + CLASS_PATH)
+DEFAULT_JVM = "-Xms64m -Xmx2g -XX:+HeapDumpOnOutOfMemoryError -XX:HeapDumpPath=%s" % (
+    DATAX_HOME)
+DEFAULT_PROPERTY_CONF = "-Dfile.encoding=UTF-8 -Dlogback.statusListenerClass=ch.qos.logback.core.status.NopStatusListener \
+                        -Djava.security.egd=file:///dev/urandom -Ddatax.home=%s -Dlogback.configurationFile=%s " % \
+                            (DATAX_HOME, LOGBACK_FILE)
+ENGINE_COMMAND = "java -server ${jvm} %s -classpath %s  ${params} com.alibaba.datax.core.Engine \
+                -mode ${mode} -jobid ${jobid} -job ${job}" % \
+                    (DEFAULT_PROPERTY_CONF, "/etc/hbase/conf:" + CLASS_PATH)
 REMOTE_DEBUG_CONFIG = "-Xdebug -Xrunjdwp:transport=dt_socket,server=y,address=9999"
 
 RET_STATE = {
@@ -49,7 +57,8 @@ def getLocalIp():
 
 def suicide(signum, e):
     global child_process
-    print("[Error] DataX receive unexpected signal %d, starts to suicide." % (signum), file=sys.stderr)
+    print("[Error] DataX receive unexpected signal %d, starts to suicide." %
+          (signum), file=sys.stderr)
 
     if child_process:
         child_process.send_signal(signal.SIGQUIT)
@@ -75,7 +84,7 @@ def getOptionParser():
                                      "Normal user use these options to set jvm parameters, job runtime mode etc. "
                                      "Make sure these options can be used in Product Env.")
     prodEnvOptionGroup.add_option("-j", "--jvm", metavar="<jvm parameters>", dest="jvmParameters", action="store",
-                                 help="Set jvm parameters if necessary.")
+                                  help="Set jvm parameters if necessary.")
     prodEnvOptionGroup.add_option("--jobid", metavar="<job unique id>", dest="jobid", action="store", default="-1",
                                   help="Set job unique id when running by Distribute/Local Mode.")
     prodEnvOptionGroup.add_option("-m", "--mode", metavar="<job runtime mode>",
@@ -89,10 +98,10 @@ def getOptionParser():
                                        'if you have mutiple parameters: -p"-DtableName=your-table-name -DcolumnName=your-column-name".'
                                        'Note: you should config in you job tableName with ${tableName}.')
     prodEnvOptionGroup.add_option("-r", "--reader", metavar="<parameter used in view job config[reader] template>",
-                                  action="store", dest="reader",type="string",
+                                  action="store", dest="reader", type="string",
                                   help='View job config[reader] template, eg: mysqlreader,streamreader')
     prodEnvOptionGroup.add_option("-w", "--writer", metavar="<parameter used in view job config[writer] template>",
-                                  action="store", dest="writer",type="string",
+                                  action="store", dest="writer", type="string",
                                   help='View job config[writer] template, eg: mysqlwriter,streamwriter')
     prodEnvOptionGroup.add_option("-l", "--logdir", metavar="<log directory>",
                                   action="store", dest="logdir", type="string",
@@ -109,45 +118,54 @@ def getOptionParser():
     parser.add_option_group(devEnvOptionGroup)
     return parser
 
+
 def generateJobConfigTemplate(reader, writer):
-    readerRef = "Please refer to the %s document:\n     https://github.com/alibaba/DataX/blob/master/%s/doc/%s.md \n" % (reader,reader,reader)
-    writerRef = "Please refer to the %s document:\n     https://github.com/alibaba/DataX/blob/master/%s/doc/%s.md \n " % (writer,writer,writer)
+    readerRef = "Please refer to the %s document:\n     https://github.com/wgzhao/DataX/blob/master/docs/%s.md \n" % (
+        reader, reader, reader)
+    writerRef = "Please refer to the %s document:\n     https://github.com/wgzhao/DataX/blob/master/docs/%s.md \n " % (
+        writer, writer, writer)
     print(readerRef)
     print(writerRef)
-    jobGuid = 'Please save the following configuration as a json file and  use\n     python {DATAX_HOME}/bin/datax_v3.py {JSON_FILE_NAME}.json \nto run the job.\n'
+    jobGuid = 'Please save the following configuration as a json file and  use\n     python {DATAX_HOME}/bin/datax.py {JSON_FILE_NAME}.json \nto run the job.\n'
     print(jobGuid)
-    jobTemplate={
-      "job": {
-        "setting": {
-          "speed": {
-            "channel": ""
-          }
-        },
-        "content": [
-          {
-            "reader": {},
-            "writer": {}
-          }
-        ]
-      }
+    jobTemplate = {
+        "job": {
+            "setting": {
+                "speed": {
+                    "channel": ""
+                }
+            },
+            "content": [
+                {
+                    "reader": {},
+                    "writer": {}
+                }
+            ]
+        }
     }
-    readerTemplatePath = "%s/plugin/reader/%s/plugin_job_template.json" % (DATAX_HOME,reader)
-    writerTemplatePath = "%s/plugin/writer/%s/plugin_job_template.json" % (DATAX_HOME,writer)
+    readerTemplatePath = "%s/plugin/reader/%s/plugin_job_template.json" % (
+        DATAX_HOME, reader)
+    writerTemplatePath = "%s/plugin/writer/%s/plugin_job_template.json" % (
+        DATAX_HOME, writer)
     try:
-      readerPar = readPluginTemplate(readerTemplatePath);
+        readerPar = readPluginTemplate(readerTemplatePath)
     except Exception as e:
-       print("Read reader[%s] template error: can\'t find file %s" % (reader,readerTemplatePath))
+        print("Read reader[%s] template error: can\'t find file %s" % (
+            reader, readerTemplatePath))
     try:
-      writerPar = readPluginTemplate(writerTemplatePath);
+        writerPar = readPluginTemplate(writerTemplatePath)
     except Exception as e:
-      print("Read writer[%s] template error: : can\'t find file %s" % (writer,writerTemplatePath))
-    jobTemplate['job']['content'][0]['reader'] = readerPar;
-    jobTemplate['job']['content'][0]['writer'] = writerPar;
+        print("Read writer[%s] template error: : can\'t find file %s" % (
+            writer, writerTemplatePath))
+    jobTemplate['job']['content'][0]['reader'] = readerPar
+    jobTemplate['job']['content'][0]['writer'] = writerPar
     print(json.dumps(jobTemplate, indent=4, sort_keys=True))
+
 
 def readPluginTemplate(plugin):
     with open(plugin, 'r') as f:
-            return json.load(f)
+        return json.load(f)
+
 
 def isUrl(path):
     if not path:
@@ -172,24 +190,26 @@ def buildStartCommand(options, args):
         print('local ip: ', getLocalIp())
 
     if options.loglevel:
-        tempJVMCommand = tempJVMCommand + " " + ("-Dloglevel=%s" % (options.loglevel))
+        tempJVMCommand = tempJVMCommand + " " + \
+            ("-Dloglevel=%s" % (options.loglevel))
 
     if options.mode:
         commandMap["mode"] = options.mode
 
-    # jobResource 可能是 URL，也可能是本地文件路径（相对,绝对）
+    # jobResource may be url , or local file(ralative, absolution)
     jobResource = args[0]
     if not isUrl(jobResource):
         jobResource = os.path.abspath(jobResource)
         if jobResource.lower().startswith("file://"):
             jobResource = jobResource[len("file://"):]
-    # 获得job 的文件名称，如果是本地文件名的话
+    # get job's filename if it's local file
     if not jobResource.startswith('http://') and not jobResource.startswith('https://'):
-        jobFilename =os.path.splitext(os.path.split(jobResource)[-1])[0]
+        jobFilename = os.path.splitext(os.path.split(jobResource)[-1])[0]
     else:
         jobFilename = jobResource[-20:].replace('/', '_').replace('.', '_')
-    curr_time =  time.strftime("%Y%m%d_%H%M%S")
-    jobParams = ("-Ddatax.log=%s -Dlog.file.name=datax_%s_%s_%s.log") % (options.logdir, jobFilename, curr_time, os.getpid())
+    curr_time = time.strftime("%Y%m%d_%H%M%S")
+    jobParams = ("-Ddatax.log=%s -Dlog.file.name=datax_%s_%s_%s.log") % (
+        options.logdir, jobFilename, curr_time, os.getpid())
     if options.params:
         jobParams = jobParams + " " + options.params
 
@@ -216,7 +236,7 @@ if __name__ == "__main__":
     parser = getOptionParser()
     options, args = parser.parse_args(sys.argv[1:])
     if options.reader is not None and options.writer is not None:
-        generateJobConfigTemplate(options.reader,options.writer)
+        generateJobConfigTemplate(options.reader, options.writer)
         sys.exit(RET_STATE['OK'])
     if len(args) != 1:
         parser.print_help()
