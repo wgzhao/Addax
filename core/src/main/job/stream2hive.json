@@ -2,52 +2,60 @@
     "job": {
         "content": [
             {
-		"reader": {
+                "reader": {
                     "name": "streamreader",
                     "parameter": {
-                        "column" : [
+                        "column": [
                             {
                                 "value": 1989060419890604.198906041,
                                 "type": "double"
                             },
-			    {
-				"value":"sssaaaa", 
-				"type":"string"
-			 }
+                            {
+                                "value": "sssaaaa",
+                                "type": "string"
+                            }
                         ],
-                        "sliceRecordCount":100 
+                        "sliceRecordCount": 100
                     }
-		},
+                },
                 "writer": {
-                    "name": "hdfswriter", 
+                    "name": "hdfswriter",
                     "parameter": {
-                        "column": [{"name":"col1", "type":"decimal(38.9)"},{"name":"col2","type":"string"}],
-                        "compress": "SNAPPY", 
-                        "defaultFS": "hdfs://fzzq", 
-                        "fieldDelimiter": "\t", 
-                        "fileName": "par", 
-                        "fileType": "par", 
-                        "path": "/user/infa/datax_orc", 
+                        "column": [
+                            {
+                                "name": "col1",
+                                "type": "decimal(38.9)"
+                            },
+                            {
+                                "name": "col2",
+                                "type": "string"
+                            }
+                        ],
+                        "compress": "SNAPPY",
+                        "defaultFS": "hdfs://sandbox",
+                        "fieldDelimiter": "\t",
+                        "fileName": "par",
+                        "fileType": "par",
+                        "path": "/tmp/datax_orc",
                         "writeMode": "overwrite",
-			"haveKerberos": "true",
-			"kerberosKeytabFilePath": "/etc/security/keytabs/infa.headless.keytab",
-			"kerberosPrincipal": "infa@FZZQ.COM",
-			 "hadoopConfig":{
-				 "dfs.nameservices": "fzzq",
-				 "dfs.ha.namenodes.fzzq": "nn1,nn2",
-				 "dfs.namenode.rpc-address.fzzq.nn1": "hadoop1.fzzq.com:8020",
-				 "dfs.namenode.rpc-address.fzzq.nn2": "hadoop2.fzzq.com:8020",
-    		          	 "dfs.client.failover.proxy.provider.fzzq": "org.apache.hadoop.hdfs.server.namenode.ha.ConfiguredFailoverProxyProvider"
-			 }
-			}
+                        "haveKerberos": "true",
+                        "kerberosKeytabFilePath": "/etc/security/keytabs/hive.headless.keytab",
+                        "kerberosPrincipal": "hive@SANDBOX.COM",
+                        "hadoopConfig": {
+                            "dfs.nameservices": "sandbox",
+                            "dfs.ha.namenodes.sandbox": "nn1,nn2",
+                            "dfs.namenode.rpc-address.sandbox.nn1": "hdp1.sandbox.com:8020",
+                            "dfs.namenode.rpc-address.sandbox.nn2": "hdp2.sandbox.com:8020",
+                            "dfs.client.failover.proxy.provider.sandbox": "org.apache.hadoop.hdfs.server.namenode.ha.ConfiguredFailoverProxyProvider"
+                        }
+                    }
                 }
             }
-        ], 
+        ],
         "setting": {
             "speed": {
                 "bytes": -1,
-                "channel": 1,
-		"batchSize": 8192
+                "channel": 1
             }
         }
     }

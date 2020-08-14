@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 # -*- coding:utf-8 -*-
-
+from __future__ import print_function
 
 """
    Life's short, Python more.
@@ -91,9 +91,9 @@ warn: test write performance will write data into your table, you can use a temp
 
 def printCopyright():
     DATAX_VERSION = 'UNKNOWN_DATAX_VERSION'
-    print '''
-DataX Util Tools (%s), From Alibaba !
-Copyright (C) 2010-2016, Alibaba Group. All Rights Reserved.''' % DATAX_VERSION
+    print('''
+DataX Util Tools ({}), From Alibaba !
+Copyright (C) 2010-2016, Alibaba Group. All Rights Reserved.''').format(DATAX_VERSION)
     sys.stdout.flush()
 
 
@@ -113,7 +113,7 @@ def yesNoChoice():
 ##begin process logic
 def suicide(signum, e):
     global childProcess
-    print >> sys.stderr, "[Error] Receive unexpected signal %d, starts to suicide." % (signum)
+    print >> sys.stderr, "[Error] Receive unexpected signal {}, starts to suicide.".format(signum)
     if childProcess:
         childProcess.send_signal(signal.SIGQUIT)
         time.sleep(1)
@@ -144,7 +144,7 @@ def fork(command, isShell=False):
 #warn: if not '': -> true;   if not None: -> true
 def notNone(obj, context):
     if not obj:
-        raise Exception("Configuration property [%s] could not be blank!" % (context))
+        raise Exception("Configuration property [{}] could not be blank!".format(context))
 
 def attributeNotNone(obj, attributes):
     for key in attributes:
@@ -174,7 +174,7 @@ def parsePluginName(jdbcUrl, pluginType):
     db2Regex = re.compile('jdbc:(db2)://.*')
     if (db2Regex.match(jdbcUrl)):
         name = 'db2'
-    return "%s%s" % (name, pluginType)
+    return "{}{}".format(name, pluginType)
 
 def renderDataXJson(paramsDict, readerOrWriter = 'reader', channel = 1):
     dataxTemplate = {
@@ -224,7 +224,7 @@ def renderDataXJson(paramsDict, readerOrWriter = 'reader', channel = 1):
 
     pluginName = ''
     if paramsDict.get('datasourceType'):
-        pluginName = '%s%s' % (paramsDict['datasourceType'], readerOrWriter)
+        pluginName = '{}{}'.format(paramsDict['datasourceType'], readerOrWriter)
     elif paramsDict.get('jdbcUrl'):
         pluginName = parsePluginName(paramsDict['jdbcUrl'], readerOrWriter)
     elif paramsDict.get('url'):
@@ -287,7 +287,8 @@ def readJobJsonFromLocal(jobConfigPath):
     finally:
         file.close()
     if not jobConfigContent:
-        raise Exception("Your job configuration file read the result is empty, please check the configuration is legal, path: [%s]\nconfiguration:\n%s" % (jobConfigPath, str(jobConfigContent)))
+        raise Exception("Your job configuration file read the result is empty, please check the configuration is legal, path: [{}]\nconfiguration:\n{}".format(
+                        jobConfigPath, str(jobConfigContent)))
     return jobConfigContent
 
 
@@ -300,11 +301,11 @@ def readJobJsonFromRemote(jobConfigPath):
 def parseJson(strConfig, context):
     try:
         return json.loads(strConfig)
-    except Exception, e:
+    except Exception as e:
         import traceback
         traceback.print_exc()
         sys.stdout.flush()
-        print >> sys.stderr, '%s %s need in line with json syntax' % (context, strConfig)
+        print >> sys.stderr, '{} {} need in line with json syntax'.format(context, strConfig)
         sys.exit(-1)
 
 def convert(options, args):
@@ -314,7 +315,7 @@ def convert(options, args):
             traceJobJson = readJobJsonFromRemote(options.file)
         else:
             traceJobJson = readJobJsonFromLocal(options.file)
-        traceJobDict = parseJson(traceJobJson, '%s content' % options.file)
+        traceJobDict = parseJson(traceJobJson, '{} content'.format(options.file)
         attributeNotNone(traceJobDict, ['job'])
         attributeNotNone(traceJobDict['job'], ['content'])
         attributeNotNone(traceJobDict['job']['content'][0], ['reader', 'writer'])
@@ -355,7 +356,7 @@ def convert(options, args):
         traceWriterDict = parseJson(options.writer, 'writer config')
         return renderDataXJson(traceWriterDict, 'writer', options.channel)
     else:
-        print getUsage()
+        print(getUsage())
         sys.exit(-1)
     #dataxParams = {}
     #for opt, value in options.__dict__.items():
@@ -375,24 +376,24 @@ if __name__ == "__main__":
     dataxJobPath = os.path.join(os.getcwd(), "perftrace-" + str(uuid.uuid1()))
     jobConfigOk = True
     if os.path.exists(dataxJobPath):
-        print "file already exists, truncate and rewrite it? %s" % dataxJobPath
+        print("file already exists, truncate and rewrite it? {}".format(dataxJobPath)
         if yesNoChoice():
             jobConfigOk = True
         else:
-            print "exit failed, because of file conflict"
+            print("exit failed, because of file conflict")
             sys.exit(-1)
     fileWriter = open(dataxJobPath, 'w')
     fileWriter.write(dataxTraceJobJson)
     fileWriter.close()
 
 
-    print "trace environments:"
-    print "dataxJobPath:  %s" % dataxJobPath
+    print("trace environments:")
+    print("dataxJobPath:  {}").formatdataxJobPath)
     dataxHomePath = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-    print "dataxHomePath: %s" % dataxHomePath
+    print("dataxHomePath: {}".format(dataxHomePath)
 
-    dataxCommand = "%s %s" % (os.path.join(dataxHomePath, "bin", "datax.py"), dataxJobPath)
-    print "dataxCommand:  %s" % dataxCommand
+    dataxCommand = "{} {}".format(os.path.join(dataxHomePath, "bin", "datax.py"), dataxJobPath)
+    print("dataxCommand:  {}".format(dataxCommand))
 
     returncode = fork(dataxCommand, True)
     if options.delete == 'true':

@@ -3,20 +3,26 @@
         "content": [
             {
                 "reader": {
-                    "name": "oraclereader", 
+                    "name": "oraclereader",
                     "parameter": {
-                        "column": ["COL1"],
+                        "column": [
+                            "COL1"
+                        ],
                         "connection": [
                             {
-                                "jdbcUrl": ["jdbc:oracle:thin:@18.209.0.11:1521/stage"], 
-                                "table": ["FINEBI.T"]
+                                "jdbcUrl": [
+                                    "jdbc:oracle:thin:@127.0.0.1:1521/stage"
+                                ],
+                                "table": [
+                                    "FINEBI.T"
+                                ]
                             }
-                        ], 
-                        "username": "finebi", 
-                        "password": "foundersc123"
+                        ],
+                        "username": "oracle",
+                        "password": "password"
                     }
-                }, 
-		"writer": {
+                },
+                "writer": {
                     "name": "txtfilewriter",
                     "parameter": {
                         "path": "/tmp/result",
@@ -25,13 +31,12 @@
                         "dateFormat": "yyyy-MM-dd"
                     }
                 }
-          }
-        ], 
+            }
+        ],
         "setting": {
             "speed": {
                 "bytes": -1,
-                "channel": 1,
-		"batchSize": 512 
+                "channel": 1
             }
         }
     }

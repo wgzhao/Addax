@@ -3,8 +3,10 @@
         "content": [
             {
                 "writer": {
+                    "name": "oraclewriter",
                     "parameter": {
-                        "username": "finebi",
+                        "username": "oracle",
+                        "password": "password",
                         "column": [
                             "*"
                         ],
@@ -13,35 +15,34 @@
                                 "table": [
                                     "${ddb}.${dtable}"
                                 ],
-                                "jdbcUrl": "jdbc:oracle:thin:@18.209.0.11/stage"
+                                "jdbcUrl": "jdbc:oracle:thin:@127.0.0.1/stage"
                             }
                         ],
-                        "password": "foundersc123",
+                        
                         "preSql": [
                             "truncate table @table"
                         ]
-                    },
-                    "name": "oraclewriter"
+                    }
                 },
                 "reader": {
+                    "name": "oraclereader",
                     "parameter": {
                         "column": [
                             "*"
                         ],
-                        "username": "finebi",
+                        "username": "oracle",
+                        "password": "password",
                         "connection": [
                             {
                                 "table": [
                                     "${sdb}.${stable}"
                                 ],
                                 "jdbcUrl": [
-                                    "jdbc:oracle:thin:@18.209.0.11/stage"
+                                    "jdbc:oracle:thin:@127.0.0.1/stage"
                                 ]
                             }
-                        ],
-                        "password": "foundersc123"
-                    },
-                    "name": "oraclereader"
+                        ]
+                    }
                 }
             }
         ],
@@ -49,7 +50,6 @@
             "speed": {
                 "record": -1,
                 "byte": -1,
-                "batchSize": 4096,
                 "channel": 1
             }
         }
