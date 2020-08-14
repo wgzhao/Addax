@@ -3,57 +3,56 @@
     "content": [
       {
         "reader": {
-          "name": "oraclereader", 
+          "name": "oraclereader",
           "parameter": {
+            "password": "password",
+            "username": "oracle",
+            "where": "",
             "column": [
-              "BRANCH_NO", 
+              "BRANCH_NO",
               "BRANCH_NAME"
-            ], 
+            ],
             "connection": [
               {
                 "jdbcUrl": [
-                  "jdbc:oracle:thin:@18.209.0.11:1521/stage"
-                ], 
+                  "jdbc:oracle:thin:@127.0.0.1:1521/stage"
+                ],
                 "table": [
                   "STGUF.ALLBRANCH"
                 ]
               }
-            ], 
-            "password": "foundersc123", 
-            "username": "finebi", 
-            "where": ""
+            ]
           }
-        }, 
+        },
         "writer": {
-          "name": "txtfilewriter", 
+          "name": "txtfilewriter",
           "parameter": {
             "column": [
               {
-                "name": "branch_no", 
+                "name": "branch_no",
                 "type": "bigint"
-              }, 
+              },
               {
-		"name":"col2",
-		"type":"string",
-		"value":""
-	     },
+                "name": "col2",
+                "type": "string",
+                "value": ""
+              },
               {
-                "name": "branch_name", 
+                "name": "branch_name",
                 "type": "string"
               }
-            ], 
-            "fieldDelimiter": "\u0001", 
-            "fileName": "allbranch", 
+            ],
+            "fieldDelimiter": "\u0001",
+            "fileName": "allbranch",
             "path": "/tmp/out",
             "writeMode": "truncate"
           }
         }
       }
-    ], 
+    ],
     "setting": {
       "speed": {
-        "batchSize": 20480, 
-        "bytes": -1, 
+        "bytes": -1,
         "channel": 10
       }
     }

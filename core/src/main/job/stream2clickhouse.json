@@ -2,11 +2,7 @@
     "job": {
         "setting": {
             "speed": {
-                 "channel": 3
-            },
-            "errorLimit": {
-                "record": 0,
-                "percentage": 0.02
+                "channel": 3
             }
         },
         "content": [
@@ -27,16 +23,16 @@
                                     "test_tbl"
                                 ],
                                 "jdbcUrl": [
-     "jdbc:clickhouse://127.0.0.1:8123/default"
+                                    "jdbc:clickhouse://127.0.0.1:8123/default"
                                 ]
                             }
                         ]
                     }
                 },
-               "reader": {
+                "reader": {
                     "name": "streamreader",
                     "parameter": {
-                        "column" : [
+                        "column": [
                             {
                                 "value": "DataX",
                                 "type": "string"
@@ -60,8 +56,8 @@
                         ],
                         "sliceRecordCount": 1000
                     }
-              }
-           }
+                }
+            }
         ]
     }
 }

@@ -12,7 +12,6 @@ import com.alibaba.datax.common.util.Configuration;
 import com.alibaba.datax.common.util.StrUtil;
 import com.alibaba.datax.core.AbstractContainer;
 import com.alibaba.datax.core.Engine;
-import com.alibaba.datax.core.container.util.HookInvoker;
 import com.alibaba.datax.core.container.util.JobAssignUtil;
 import com.alibaba.datax.core.job.scheduler.AbstractScheduler;
 import com.alibaba.datax.core.job.scheduler.processinner.StandAloneScheduler;
@@ -616,13 +615,13 @@ public class JobContainer extends AbstractContainer {
 
         super.getContainerCommunicator().report(reportCommunication);
         LOG.info(CommunicationTool.Stringify.getSnapshot(communication));
-        Map<String,Object> log  = new HashMap<String,Object>();
-        log.put("startTimeStamp",startTimeStamp);
-        log.put("endTimeStamp",endTimeStamp);
-        log.put("totalCosts",totalCosts);
-        log.put("byteSpeedPerSecond",byteSpeedPerSecond);
-        log.put("recordSpeedPerSecond",recordSpeedPerSecond);
-        log.put("communication",communication);
+//        Map<String,Object> log  = new HashMap<String,Object>();
+//        log.put("startTimeStamp",startTimeStamp);
+//        log.put("endTimeStamp",endTimeStamp);
+//        log.put("totalCosts",totalCosts);
+//        log.put("byteSpeedPerSecond",byteSpeedPerSecond);
+//        log.put("recordSpeedPerSecond",recordSpeedPerSecond);
+//        log.put("communication",communication);
 
         LOG.info(String.format(
                 "\n" + "%-26s: %-18s\n" + "%-26s: %-18s\n" + "%-26s: %19s\n"
@@ -635,16 +634,16 @@ public class JobContainer extends AbstractContainer {
                 dateFormat.format(endTimeStamp),
 
                 "任务总计耗时",
-                String.valueOf(totalCosts) + "s",
+                totalCosts + "s",
                 "任务平均流量",
                 StrUtil.stringify(byteSpeedPerSecond)
                         + "/s",
                 "记录写入速度",
-                String.valueOf(recordSpeedPerSecond)
+                recordSpeedPerSecond
                         + "rec/s", "读出记录总数",
-                String.valueOf(CommunicationTool.getTotalReadRecords(communication)),
+                CommunicationTool.getTotalReadRecords(communication),
                 "读写失败总数",
-                String.valueOf(CommunicationTool.getTotalErrorRecords(communication))
+                CommunicationTool.getTotalErrorRecords(communication)
         ));
 
         if (communication.getLongCounter(CommunicationTool.TRANSFORMER_SUCCEED_RECORDS) > 0
@@ -667,7 +666,6 @@ public class JobContainer extends AbstractContainer {
     /**
      * reader job的初始化，返回Reader.Job
      *
-     * @return
      */
     private Reader.Job initJobReader(
             JobPluginCollector jobPluginCollector) {
@@ -697,7 +695,6 @@ public class JobContainer extends AbstractContainer {
     /**
      * writer job的初始化，返回Writer.Job
      *
-     * @return
      */
     private Writer.Job initJobWriter(
             JobPluginCollector jobPluginCollector) {
@@ -975,7 +972,7 @@ public class JobContainer extends AbstractContainer {
     /**
      * 检查最终结果是否超出阈值，如果阈值设定小于1，则表示百分数阈值，大于1表示条数阈值。
      *
-     * @param
+     *
      */
     private void checkLimit() {
         Communication communication = super.getContainerCommunicator().collect();
@@ -988,8 +985,8 @@ public class JobContainer extends AbstractContainer {
      */
     private void invokeHooks() {
         Communication comm = super.getContainerCommunicator().collect();
-        HookInvoker invoker = new HookInvoker(CoreConstant.DATAX_HOME + "/hook", configuration, comm.getCounter());
-        invoker.invokeAll();
+//        HookInvoker invoker = new HookInvoker(CoreConstant.DATAX_HOME + "/hook", configuration, comm.getCounter());
+//        invoker.invokeAll();
 
 
         LOG.info("invokeHooks begin");
@@ -997,31 +994,32 @@ public class JobContainer extends AbstractContainer {
         String jobResultReportUrl = userConf.getString(CoreConstant.DATAX_CORE_DATAXSERVER_ADDRESS);
 
         if(StringUtils.isBlank(jobResultReportUrl)){
-            LOG.info("结果上报URL未配置");
+            LOG.info("report url not found");
             return;
         }
 
+        // 获得任务名称，两种方式获取，一种是命令行通过 -DjobName 传递；第二种是分析writer插件的写入路径，提取第2，3个目录拼接
         String jobContentWriterPath = userConf.getString(CoreConstant.DATAX_JOB_CONTENT_WRITER_PATH);
-        StringBuffer jobName = new StringBuffer("");
-
-        LOG.info("jobContentWriterPath:"+jobContentWriterPath);
-        if(StringUtils.isNotBlank(jobContentWriterPath)){
-
+        StringBuffer jobName = new StringBuffer();
+        if (System.getProperty("jobName") != null) {
+            jobName.append(System.getProperty("jobName"));
+        }
+        else if (StringUtils.isNotBlank(jobContentWriterPath))
+        {
             String[] pathArr = jobContentWriterPath.split("/");
 
             if(pathArr.length>=4){
                 jobName.append(pathArr[2]).append(".").append(pathArr[3]);
             }
-
-            LOG.info("任务名称:"+jobName);
-        }else{
+        } else {
             jobName.append("jobName");
-            LOG.info("jobContentWriterPath属性未配置,任务名称设置默认值为jobName");
         }
+        LOG.info("jobName:"+jobName);
 
         if (0L == this.endTimeStamp) {
               this.endTimeStamp =   System.currentTimeMillis();
         }
+
         long totalCosts = (this.endTimeStamp - this.startTimeStamp) / 1000;
         long transferCosts = (this.endTransferTimeStamp - this.startTransferTimeStamp) / 1000;
 
@@ -1061,10 +1059,10 @@ public class JobContainer extends AbstractContainer {
             public void completed(HttpResponse result) {
                 LOG.info("send jobResult completed");
                 LOG.info("result:"+result.getStatusLine());
-                String content = null;
+                String content;
                 try {
                     content = EntityUtils.toString(result.getEntity(), "UTF-8");
-                    LOG.info(" response content is : " + content);
+                    LOG.info("report contents: " + content);
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
@@ -1083,10 +1081,8 @@ public class JobContainer extends AbstractContainer {
         Future<HttpResponse> responseFuture =  httpClient.execute(postBody,callback);
 
         try {
-            HttpResponse httpResponse =responseFuture.get();
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        } catch (ExecutionException e) {
+            responseFuture.get();
+        } catch (InterruptedException | ExecutionException e) {
             e.printStackTrace();
         }
         LOG.info("invokeHooks end");

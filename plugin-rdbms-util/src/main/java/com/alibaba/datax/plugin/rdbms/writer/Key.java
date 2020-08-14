@@ -22,7 +22,7 @@ public final class Key {
 
     public final static String TDDL_APP_NAME = "appName";
 
-    //默认值：256
+    //默认值：2048
     public final static String BATCH_SIZE = "batchSize";
 
     //默认值：32m

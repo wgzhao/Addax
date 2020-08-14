@@ -2,12 +2,9 @@ package com.alibaba.datax.core.statistics.communication;
 
 import com.alibaba.datax.common.statistics.PerfTrace;
 import com.alibaba.datax.common.util.StrUtil;
-import com.alibaba.fastjson.JSON;
 import org.apache.commons.lang.Validate;
 
 import java.text.DecimalFormat;
-import java.util.HashMap;
-import java.util.Map;
 
 /**
  * 这里主要是业务层面的处理
@@ -47,7 +44,7 @@ public final class CommunicationTool {
     public static final String TRANSFORMER_SUCCEED_RECORDS = "totalTransformerSuccessRecords";
     public static final String TRANSFORMER_FAILED_RECORDS = "totalTransformerFailedRecords";
     public static final String TRANSFORMER_FILTER_RECORDS = "totalTransformerFilterRecords";
-    public static final String TRANSFORMER_NAME_PREFIX = "usedTimeByTransformer_";
+//    public static final String TRANSFORMER_NAME_PREFIX = "usedTimeByTransformer_";
 
     public static Communication getReportCommunication(Communication now, Communication old, int totalStage) {
         Validate.isTrue(now != null && old != null,
@@ -176,110 +173,110 @@ public final class CommunicationTool {
         }
     }
 
-    public static class Jsonify {
-        @SuppressWarnings("rawtypes")
-        public static String getSnapshot(Communication communication) {
-            Validate.notNull(communication);
-
-            Map<String, Object> state = new HashMap<String, Object>();
-
-            Pair pair = getTotalBytes(communication);
-            state.put((String) pair.getKey(), pair.getValue());
-
-            pair = getTotalRecords(communication);
-            state.put((String) pair.getKey(), pair.getValue());
-
-            pair = getSpeedRecord(communication);
-            state.put((String) pair.getKey(), pair.getValue());
-
-            pair = getSpeedByte(communication);
-            state.put((String) pair.getKey(), pair.getValue());
-
-            pair = getStage(communication);
-            state.put((String) pair.getKey(), pair.getValue());
-
-            pair = getErrorRecords(communication);
-            state.put((String) pair.getKey(), pair.getValue());
-
-            pair = getErrorBytes(communication);
-            state.put((String) pair.getKey(), pair.getValue());
-
-            pair = getErrorMessage(communication);
-            state.put((String) pair.getKey(), pair.getValue());
-
-            pair = getPercentage(communication);
-            state.put((String) pair.getKey(), pair.getValue());
-
-            pair = getWaitReaderTime(communication);
-            state.put((String) pair.getKey(), pair.getValue());
-
-            pair = getWaitWriterTime(communication);
-            state.put((String) pair.getKey(), pair.getValue());
-
-            return JSON.toJSONString(state);
-        }
-
-        private static Pair<String, Long> getTotalBytes(final Communication communication) {
-            return new Pair<String, Long>("totalBytes", communication.getLongCounter(TOTAL_READ_BYTES));
-        }
-
-        private static Pair<String, Long> getTotalRecords(final Communication communication) {
-            return new Pair<String, Long>("totalRecords", communication.getLongCounter(TOTAL_READ_RECORDS));
-        }
-
-        private static Pair<String, Long> getSpeedByte(final Communication communication) {
-            return new Pair<String, Long>("speedBytes", communication.getLongCounter(BYTE_SPEED));
-        }
-
-        private static Pair<String, Long> getSpeedRecord(final Communication communication) {
-            return new Pair<String, Long>("speedRecords", communication.getLongCounter(RECORD_SPEED));
-        }
-
-        private static Pair<String, Long> getErrorRecords(final Communication communication) {
-            return new Pair<String, Long>("errorRecords", communication.getLongCounter(TOTAL_ERROR_RECORDS));
-        }
-
-        private static Pair<String, Long> getErrorBytes(final Communication communication) {
-            return new Pair<String, Long>("errorBytes", communication.getLongCounter(TOTAL_ERROR_BYTES));
-        }
-
-        private static Pair<String, Long> getStage(final Communication communication) {
-            return new Pair<String, Long>("stage", communication.getLongCounter(STAGE));
-        }
-
-        private static Pair<String, Double> getPercentage(final Communication communication) {
-            return new Pair<String, Double>("percentage", communication.getDoubleCounter(PERCENTAGE));
-        }
-
-        private static Pair<String, String> getErrorMessage(final Communication communication) {
-            return new Pair<String, String>("errorMessage", communication.getThrowableMessage());
-        }
-
-        private static Pair<String, Long> getWaitReaderTime(final Communication communication) {
-            return new Pair<String, Long>("waitReaderTime", communication.getLongCounter(CommunicationTool.WAIT_READER_TIME));
-        }
-
-        private static Pair<String, Long> getWaitWriterTime(final Communication communication) {
-            return new Pair<String, Long>("waitWriterTime", communication.getLongCounter(CommunicationTool.WAIT_WRITER_TIME));
-        }
-
-        static class Pair<K, V> {
-            public Pair(final K key, final V value) {
-                this.key = key;
-                this.value = value;
-            }
-
-            public K getKey() {
-                return key;
-            }
-
-            public V getValue() {
-                return value;
-            }
-
-            private K key;
-
-            private V value;
-        }
-    }
+//    public static class Jsonify {
+//        @SuppressWarnings("rawtypes")
+//        public static String getSnapshot(Communication communication) {
+//            Validate.notNull(communication);
+//
+//            Map<String, Object> state = new HashMap<String, Object>();
+//
+//            Pair pair = getTotalBytes(communication);
+//            state.put((String) pair.getKey(), pair.getValue());
+//
+//            pair = getTotalRecords(communication);
+//            state.put((String) pair.getKey(), pair.getValue());
+//
+//            pair = getSpeedRecord(communication);
+//            state.put((String) pair.getKey(), pair.getValue());
+//
+//            pair = getSpeedByte(communication);
+//            state.put((String) pair.getKey(), pair.getValue());
+//
+//            pair = getStage(communication);
+//            state.put((String) pair.getKey(), pair.getValue());
+//
+//            pair = getErrorRecords(communication);
+//            state.put((String) pair.getKey(), pair.getValue());
+//
+//            pair = getErrorBytes(communication);
+//            state.put((String) pair.getKey(), pair.getValue());
+//
+//            pair = getErrorMessage(communication);
+//            state.put((String) pair.getKey(), pair.getValue());
+//
+//            pair = getPercentage(communication);
+//            state.put((String) pair.getKey(), pair.getValue());
+//
+//            pair = getWaitReaderTime(communication);
+//            state.put((String) pair.getKey(), pair.getValue());
+//
+//            pair = getWaitWriterTime(communication);
+//            state.put((String) pair.getKey(), pair.getValue());
+//
+//            return JSON.toJSONString(state);
+//        }
+//
+//        private static Pair<String, Long> getTotalBytes(final Communication communication) {
+//            return new Pair<>("totalBytes", communication.getLongCounter(TOTAL_READ_BYTES));
+//        }
+//
+//        private static Pair<String, Long> getTotalRecords(final Communication communication) {
+//            return new Pair<>("totalRecords", communication.getLongCounter(TOTAL_READ_RECORDS));
+//        }
+//
+//        private static Pair<String, Long> getSpeedByte(final Communication communication) {
+//            return new Pair<>("speedBytes", communication.getLongCounter(BYTE_SPEED));
+//        }
+//
+//        private static Pair<String, Long> getSpeedRecord(final Communication communication) {
+//            return new Pair<>("speedRecords", communication.getLongCounter(RECORD_SPEED));
+//        }
+//
+//        private static Pair<String, Long> getErrorRecords(final Communication communication) {
+//            return new Pair<>("errorRecords", communication.getLongCounter(TOTAL_ERROR_RECORDS));
+//        }
+//
+//        private static Pair<String, Long> getErrorBytes(final Communication communication) {
+//            return new Pair<>("errorBytes", communication.getLongCounter(TOTAL_ERROR_BYTES));
+//        }
+//
+//        private static Pair<String, Long> getStage(final Communication communication) {
+//            return new Pair<>("stage", communication.getLongCounter(STAGE));
+//        }
+//
+//        private static Pair<String, Double> getPercentage(final Communication communication) {
+//            return new Pair<>("percentage", communication.getDoubleCounter(PERCENTAGE));
+//        }
+//
+//        private static Pair<String, String> getErrorMessage(final Communication communication) {
+//            return new Pair<>("errorMessage", communication.getThrowableMessage());
+//        }
+//
+//        private static Pair<String, Long> getWaitReaderTime(final Communication communication) {
+//            return new Pair<>("waitReaderTime", communication.getLongCounter(CommunicationTool.WAIT_READER_TIME));
+//        }
+//
+//        private static Pair<String, Long> getWaitWriterTime(final Communication communication) {
+//            return new Pair<>("waitWriterTime", communication.getLongCounter(CommunicationTool.WAIT_WRITER_TIME));
+//        }
+//
+//        static class Pair<K, V> {
+//            public Pair(final K key, final V value) {
+//                this.key = key;
+//                this.value = value;
+//            }
+//
+//            public K getKey() {
+//                return key;
+//            }
+//
+//            public V getValue() {
+//                return value;
+//            }
+//
+//            private K key;
+//
+//            private V value;
+//        }
+//    }
 }

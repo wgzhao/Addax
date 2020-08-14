@@ -22,7 +22,7 @@
             <outputDirectory>/bin</outputDirectory>
         </fileSet>
         <!-- for scripts -->
-        <fileSet>
+        <!-- <fileSet>
             <directory>src/main/script</directory>
             <includes>
                 <include>*.*</include>
@@ -30,7 +30,7 @@
             <directoryMode>0775</directoryMode>
             <fileMode>0644</fileMode>
             <outputDirectory>/script</outputDirectory>
-        </fileSet>
+        </fileSet> -->
         <!-- for configs -->
         <fileSet>
             <directory>src/main/conf</directory>
@@ -47,23 +47,6 @@
             </includes>
             <outputDirectory>/lib</outputDirectory>
         </fileSet>
-
-        <!--<fileSet>-->
-            <!--<directory>src/main/log/</directory>-->
-            <!--<includes>-->
-                <!--<include>*.log</include>-->
-            <!--</includes>-->
-            <!--<outputDirectory>/log</outputDirectory>-->
-        <!--</fileSet>-->
-
-        <!--<fileSet>-->
-            <!--<directory>src/main/log/</directory>-->
-            <!--<includes>-->
-                <!--<include>*.log</include>-->
-            <!--</includes>-->
-            <!--<outputDirectory>/log_perf</outputDirectory>-->
-        <!--</fileSet>-->
-
         <fileSet>
             <directory>src/main/job/</directory>
             <includes>

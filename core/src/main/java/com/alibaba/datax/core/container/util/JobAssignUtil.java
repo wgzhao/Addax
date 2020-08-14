@@ -79,23 +79,19 @@ public final class JobAssignUtil {
      */
     private static LinkedHashMap<String, List<Integer>> parseAndGetResourceMarkAndTaskIdMap(List<Configuration> contentConfig) {
         // key: resourceMark, value: taskId
-        LinkedHashMap<String, List<Integer>> readerResourceMarkAndTaskIdMap = new LinkedHashMap<String, List<Integer>>();
-        LinkedHashMap<String, List<Integer>> writerResourceMarkAndTaskIdMap = new LinkedHashMap<String, List<Integer>>();
+        LinkedHashMap<String, List<Integer>> readerResourceMarkAndTaskIdMap = new LinkedHashMap<>();
+        LinkedHashMap<String, List<Integer>> writerResourceMarkAndTaskIdMap = new LinkedHashMap<>();
 
         for (Configuration aTaskConfig : contentConfig) {
             int taskId = aTaskConfig.getInt(CoreConstant.TASK_ID);
             // 把 readerResourceMark 加到 readerResourceMarkAndTaskIdMap 中
             String readerResourceMark = aTaskConfig.getString(CoreConstant.JOB_READER_PARAMETER + "." + CommonConstant.LOAD_BALANCE_RESOURCE_MARK);
-            if (readerResourceMarkAndTaskIdMap.get(readerResourceMark) == null) {
-                readerResourceMarkAndTaskIdMap.put(readerResourceMark, new LinkedList<Integer>());
-            }
+            readerResourceMarkAndTaskIdMap.computeIfAbsent(readerResourceMark, k -> new LinkedList<>());
             readerResourceMarkAndTaskIdMap.get(readerResourceMark).add(taskId);
 
             // 把 writerResourceMark 加到 writerResourceMarkAndTaskIdMap 中
             String writerResourceMark = aTaskConfig.getString(CoreConstant.JOB_WRITER_PARAMETER + "." + CommonConstant.LOAD_BALANCE_RESOURCE_MARK);
-            if (writerResourceMarkAndTaskIdMap.get(writerResourceMark) == null) {
-                writerResourceMarkAndTaskIdMap.put(writerResourceMark, new LinkedList<Integer>());
-            }
+            writerResourceMarkAndTaskIdMap.computeIfAbsent(writerResourceMark, k -> new LinkedList<>());
             writerResourceMarkAndTaskIdMap.get(writerResourceMark).add(taskId);
         }
 
@@ -132,16 +128,16 @@ public final class JobAssignUtil {
         Configuration taskGroupTemplate = jobConfiguration.clone();
         taskGroupTemplate.remove(CoreConstant.DATAX_JOB_CONTENT);
 
-        List<Configuration> result = new LinkedList<Configuration>();
+        List<Configuration> result = new LinkedList<>();
 
-        List<List<Configuration>> taskGroupConfigList = new ArrayList<List<Configuration>>(taskGroupNumber);
+        List<List<Configuration>> taskGroupConfigList = new ArrayList<>(taskGroupNumber);
         for (int i = 0; i < taskGroupNumber; i++) {
-            taskGroupConfigList.add(new LinkedList<Configuration>());
+            taskGroupConfigList.add(new LinkedList<>());
         }
 
         int mapValueMaxLength = -1;
 
-        List<String> resourceMarks = new ArrayList<String>();
+        List<String> resourceMarks = new ArrayList<>();
         for (Map.Entry<String, List<Integer>> entry : resourceMarkAndTaskIdMap.entrySet()) {
             resourceMarks.add(entry.getKey());
             if (entry.getValue().size() > mapValueMaxLength) {

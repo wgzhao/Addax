@@ -2,7 +2,7 @@
 version=$(head -n10 pom.xml|grep '<version>' |tr -d '<version>/ \t') 
 fname="datax-${version}.tar.gz"
 DESTDIR="/opt/infalog"
-IP=10.60.192.12
+IP=stageinfo
 
 function to_deploy
 {
@@ -23,7 +23,7 @@ if [ "$CI_ENVIRONMENT_NAME" = "staging" ];then
   exit $?
 elif [ "$CI_ENVIRONMENT_NAME" = "production" ];then
   echo "Deploying to production environment......"
-  IP=10.60.242.211
+  IP=infa01
   to_deploy
   exit $?
 else
