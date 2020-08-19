@@ -122,3 +122,11 @@ splitPk如果不填写，将视作用户不对单表进行切分，OracleReader�
 ### 3.3 类型转换
 
 目前RDBMSReader支持大部分通用得关系数据库类型如数字、字符等，但也存在部分个别类型没有支持的情况，请注意检查你的类型，根据具体的数据库做选择。
+
+
+## 4. 当前支持的数据库
+
+- [PrestoSQL](https://prestosql.io)
+- [TDH Inceptor2](http://transwarp.io/transwarp/)
+- [IBM DB2](https://www.ibm.com/analytics/db2)
+- [Apache Hive](https://hive.apache.org)
