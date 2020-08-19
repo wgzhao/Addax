@@ -19,7 +19,8 @@ public enum DataBaseType {
     PostgreSQL("postgresql", "org.postgresql.Driver"),
     RDBMS("rdbms", "com.alibaba.datax.plugin.rdbms.util.DataBaseType"),
     DB2("db2", "com.ibm.db2.jcc.DB2Driver"),
-    Inceptor2("inceptor2", "org.apache.hive.jdbc.HiveDriver");
+    Inceptor2("inceptor2", "org.apache.hive.jdbc.HiveDriver"),
+    Impala("impala", "com.cloudera.impala.jdbc41.Driver");
 
 
     private String typeName;
@@ -54,6 +55,8 @@ public enum DataBaseType {
                 break;
             case Hive:
             	break;
+            case Impala:
+                break;
             case Presto:
                 break;
             case ClickHouse:
