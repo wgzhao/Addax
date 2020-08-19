@@ -11,7 +11,7 @@ import java.util.regex.Pattern;
  */
 public enum DataBaseType {
     MySql("mysql", "com.mysql.cj.jdbc.Driver"),
-    Hive("hive", "org.apache.hive.jdbc.HiveDriver"),
+    Hive("hive2", "org.apache.hive.jdbc.HiveDriver"),
     Oracle("oracle", "oracle.jdbc.OracleDriver"),
     Presto("presto", "io.prestosql.jdbc.PrestoDriver"),
     ClickHouse("clickhouse", "ru.yandex.clickhouse.ClickHouseDriver"),
@@ -19,8 +19,7 @@ public enum DataBaseType {
     PostgreSQL("postgresql", "org.postgresql.Driver"),
     RDBMS("rdbms", "com.alibaba.datax.plugin.rdbms.util.DataBaseType"),
     DB2("db2", "com.ibm.db2.jcc.DB2Driver"),
-    Inceptor2("inceptor2", "io.transwarp.jdbc.InceptorDriver"),
-    Inceptor("inceptor", "io.transwarp.jdbc.InceptorDriver");
+    Inceptor2("inceptor2", "org.apache.hive.jdbc.HiveDriver");
 
 
     private String typeName;
@@ -63,8 +62,6 @@ public enum DataBaseType {
                 break;
             case RDBMS:
                 break;
-            case Inceptor:
-                break;
             case Inceptor2:
                 break;
             default:
@@ -101,8 +98,6 @@ public enum DataBaseType {
             case PostgreSQL:
             	break;
             case RDBMS:
-                break;
-            case Inceptor:
                 break;
             case Inceptor2:
                 break;
