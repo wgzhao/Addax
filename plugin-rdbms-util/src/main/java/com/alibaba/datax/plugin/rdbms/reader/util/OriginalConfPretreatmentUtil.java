@@ -9,7 +9,6 @@ import com.alibaba.datax.plugin.rdbms.util.DBUtil;
 import com.alibaba.datax.plugin.rdbms.util.DBUtilErrorCode;
 import com.alibaba.datax.plugin.rdbms.util.DataBaseType;
 import com.alibaba.datax.plugin.rdbms.util.TableExpandUtil;
-import org.apache.commons.lang3.ObjectUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -255,11 +254,11 @@ public final class OriginalConfPretreatmentUtil {
             isQuerySqlMode = StringUtils.isNotBlank(querySql);
             querySqlModeFlags.add(isQuerySqlMode);
 
-            if (false == isTableMode && false == isQuerySqlMode) {
+            if (!isTableMode && !isQuerySqlMode) {
                 // table 和 querySql 二者均未配制
                 throw DataXException.asDataXException(
                         DBUtilErrorCode.TABLE_QUERYSQL_MISSING, "您的配置有误. 因为table和querySql应该配置并且只能配置一个. 请检查您的配置并作出修改.");
-            } else if (true == isTableMode && true == isQuerySqlMode) {
+            } else if (isTableMode && isQuerySqlMode) {
                 // table 和 querySql 二者均配置
                 throw DataXException.asDataXException(DBUtilErrorCode.TABLE_QUERYSQL_MIXED,
                         "您的配置凌乱了. 因为datax不能同时既配置table又配置querySql.请检查您的配置并作出修改.");
@@ -268,7 +267,7 @@ public final class OriginalConfPretreatmentUtil {
 
         // 混合配制 table 和 querySql
         if (!ListUtil.checkIfValueSame(tableModeFlags)
-                || !ListUtil.checkIfValueSame(tableModeFlags)) {
+                || !ListUtil.checkIfValueSame(querySqlModeFlags)) {
             throw DataXException.asDataXException(DBUtilErrorCode.TABLE_QUERYSQL_MIXED,
                     "您配置凌乱了. 不能同时既配置table又配置querySql. 请检查您的配置并作出修改.");
         }

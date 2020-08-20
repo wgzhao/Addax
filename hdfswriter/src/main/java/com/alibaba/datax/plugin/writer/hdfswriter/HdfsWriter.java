@@ -179,7 +179,7 @@ public class HdfsWriter extends Writer {
                     isExistFile = true;
                 }
                 if ("overwrite".equals(writeMode) && isExistFile) {
-                    LOG.info(String.format("由于您配置了writeMode truncate, 开始清理 [%s] 下面所有的内容(包括子目录)", path, fileName));
+                    LOG.info(String.format("由于您配置了writeMode truncate, 开始清理 [%s] 下面所有的内容(包括子目录)", path));
                     hdfsHelper.deleteFiles(existFilePaths, true);
                 } else if ("append".equalsIgnoreCase(writeMode)) {
                     LOG.info(String.format("由于您配置了writeMode append, 写入前不做清理工作, [%s] 目录下写入相应文件名前缀  [%s] 的文件",

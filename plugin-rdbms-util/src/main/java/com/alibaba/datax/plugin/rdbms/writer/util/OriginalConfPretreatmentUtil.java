@@ -152,7 +152,7 @@ public final class OriginalConfPretreatmentUtil {
         List<String> columns = originalConfig.getList(Key.COLUMN, String.class);
 
         String jdbcUrl = originalConfig.getString(String.format("%s[0].%s",
-                Constant.CONN_MARK, Key.JDBC_URL, String.class));
+                Constant.CONN_MARK, Key.JDBC_URL));
 
         // 默认为：insert 方式
         String writeMode = originalConfig.getString(Key.WRITE_MODE, "INSERT");
