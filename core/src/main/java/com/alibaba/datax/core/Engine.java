@@ -113,7 +113,7 @@ public class Engine {
             boolean isSensitive = StringUtils.endsWithIgnoreCase(key, "password")
                     || StringUtils.endsWithIgnoreCase(key, "accessKey");
             if (isSensitive && configuration.get(key) instanceof String) {
-                configuration.set(key, configuration.getString(key).replaceAll(".", "*"));
+                configuration.set(key, "*****");
             }
         }
         return configuration;

@@ -302,7 +302,7 @@ public  class HdfsHelper {
             fSDataOutputStream = fileSystem.create(storePath);
         } catch (IOException e) {
             String message = String.format("Create an FSDataOutputStream at the indicated Path[%s] failed: [%s]",
-                    "message:path =" + path);
+                    "message:path =", path);
             LOG.error(message);
             throw DataXException.asDataXException(HdfsWriterErrorCode.Write_FILE_IO_ERROR, e);
         }
