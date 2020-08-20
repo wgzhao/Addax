@@ -42,6 +42,7 @@
         <!-- for engine -->
         <fileSet>
             <directory>target/</directory>
+            <fileMode>0644</fileMode>
             <includes>
                 <include>datax-core-${project.version}.jar</include>
             </includes>
@@ -77,6 +78,7 @@
         <dependencySet>
             <useProjectArtifact>false</useProjectArtifact>
             <outputDirectory>/lib</outputDirectory>
+            <fileMode>0644</fileMode>
             <scope>runtime</scope>
         </dependencySet>
     </dependencySets>
