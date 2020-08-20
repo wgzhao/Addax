@@ -54,47 +54,6 @@
 			<artifactId>commons-codec</artifactId>
 			<version>1.9</version>
 		</dependency>
-
-		<!-- for test -->
-		<dependency>
-			<groupId>junit</groupId>
-			<artifactId>junit</artifactId>
-			<scope>test</scope>
-		</dependency>
-		<dependency>
-			<groupId>com.alibaba.datax</groupId>
-			<artifactId>datax-core</artifactId>
-			<version>${project.version}</version>
-			<exclusions>
-				<exclusion>
-					<groupId>com.alibaba.datax</groupId>
-					<artifactId>datax-service-face</artifactId>
-				</exclusion>
-				<exclusion>
-					<groupId>org.apache.hadoop</groupId>
-					<artifactId>hadoop-common</artifactId>
-				</exclusion>
-				<exclusion>
-					<groupId>org.apache.hive</groupId>
-					<artifactId>hive-exec</artifactId>
-				</exclusion>
-				<exclusion>
-					<groupId>org.apache.hive</groupId>
-					<artifactId>hive-serde</artifactId>
-				</exclusion>
-				<exclusion>
-					<groupId>javolution</groupId>
-					<artifactId>javolution</artifactId>
-				</exclusion>
-			</exclusions>
-			<scope>test</scope>
-		</dependency>
-		<dependency>
-			<groupId>org.mockito</groupId>
-			<artifactId>mockito-all</artifactId>
-			<scope>test</scope>
-		</dependency>
-
 	</dependencies>
 
 	<build>
