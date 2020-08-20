@@ -39,11 +39,11 @@
         <!--</fileSet>-->
     </fileSets>
 
-    <!-- <dependencySets>
+    <dependencySets>
         <dependencySet>
             <useProjectArtifact>false</useProjectArtifact>
             <outputDirectory>plugin/reader/hdfsreader/libs</outputDirectory>
             <scope>runtime</scope>
         </dependencySet>
-    </dependencySets> -->
+    </dependencySets>
 </assembly>
