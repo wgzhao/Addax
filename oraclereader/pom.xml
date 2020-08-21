@@ -26,10 +26,7 @@
             </exclusions>
             <scope>compile</scope>
         </dependency>
-        <dependency>
-            <groupId>org.slf4j</groupId>
-            <artifactId>slf4j-api</artifactId>
-        </dependency>
+
         <dependency>
             <groupId>ch.qos.logback</groupId>
             <artifactId>logback-classic</artifactId>
@@ -47,6 +44,7 @@
             <artifactId>ojdbc8</artifactId>
             <version>19.7.0.0</version>
         </dependency>
+
     </dependencies>
 
     <build>
