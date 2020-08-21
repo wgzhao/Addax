@@ -12,14 +12,12 @@
     <artifactId>hbase11xsqlwriter</artifactId>
     <name>hbase11xsqlwriter</name>
     <packaging>jar</packaging>
+
     <properties>
         <phoenix.version>4.14.3-HBase-1.4</phoenix.version>
-        <hadoop.version>3.1.1</hadoop.version>
         <commons-codec.version>1.8</commons-codec.version>
         <protobuf.version>3.9.0</protobuf.version>
         <httpclient.version>4.5.2</httpclient.version>
-        <source.version>1.8</source.version>
-        <target.version>1.8</target.version>
     </properties>
 
     <dependencies>
@@ -34,16 +32,19 @@
                 </exclusion>
             </exclusions>
         </dependency>
+
         <dependency>
             <groupId>org.apache.hadoop</groupId>
             <artifactId>hadoop-hdfs</artifactId>
             <version>${hadoop.version}</version>
         </dependency>
+
         <dependency>
             <groupId>org.apache.hadoop</groupId>
             <artifactId>hadoop-common</artifactId>
             <version>${hadoop.version}</version>
         </dependency>
+
         <dependency>
             <groupId>org.apache.phoenix</groupId>
             <artifactId>phoenix-core</artifactId>
@@ -55,16 +56,13 @@
                 </exclusion>
             </exclusions>
         </dependency>
-        <dependency>
-            <groupId>org.apache.phoenix</groupId>
-            <artifactId>phoenix-queryserver-client</artifactId>
-            <version>${phoenix.version}</version>
-        </dependency>
+
+
         <dependency>
             <groupId>com.google.guava</groupId>
             <artifactId>guava</artifactId>
-           <version>${guava.version}</version>
         </dependency>
+
         <dependency>
             <groupId>commons-codec</groupId>
             <artifactId>commons-codec</artifactId>
@@ -80,36 +78,17 @@
         <!-- httpclient end -->
 
         <dependency>
+            <groupId>org.apache.phoenix</groupId>
+            <artifactId>phoenix-queryserver-client</artifactId>
+            <version>${phoenix.version}</version>
+        </dependency>
+
+        <dependency>
             <groupId>com.google.protobuf</groupId>
             <artifactId>protobuf-java</artifactId>
             <version>${protobuf.version}</version>
         </dependency>
 
-
-        <!-- for test -->
-        <dependency>
-            <groupId>junit</groupId>
-            <artifactId>junit</artifactId>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>com.alibaba.datax</groupId>
-            <artifactId>datax-core</artifactId>
-            <version>${project.version}</version>
-            <exclusions>
-                <exclusion>
-                    <groupId>com.alibaba.datax</groupId>
-                    <artifactId>datax-service-face</artifactId>
-                </exclusion>
-            </exclusions>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.mockito</groupId>
-            <artifactId>mockito-all</artifactId>
-            <version>2.0.2-beta</version>
-            <scope>test</scope>
-        </dependency>
     </dependencies>
 
     <build>
