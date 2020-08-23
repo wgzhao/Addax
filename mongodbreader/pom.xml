@@ -24,32 +24,16 @@
             </exclusions>
         </dependency>
 
-        <dependency>
-            <groupId>com.alibaba.datax</groupId>
-            <artifactId>plugin-unstructured-storage-util</artifactId>
-            <version>${project.version}</version>
-        </dependency>
-
-        <dependency>
-            <groupId>ch.qos.logback</groupId>
-            <artifactId>logback-classic</artifactId>
-        </dependency>
-
-        <dependency>
-            <groupId>com.google.guava</groupId>
-            <artifactId>guava</artifactId>
-        </dependency>
+<!--        <dependency>-->
+<!--            <groupId>com.google.guava</groupId>-->
+<!--            <artifactId>guava</artifactId>-->
+<!--        </dependency>-->
 
         <dependency>
 		  <groupId>org.mongodb</groupId>
 		  <artifactId>mongo-java-driver</artifactId>
 		  <version>3.12.7</version>
 		</dependency>
-
-        <dependency>
-            <groupId>org.slf4j</groupId>
-            <artifactId>slf4j-api</artifactId>
-        </dependency>
 
     </dependencies>
 
