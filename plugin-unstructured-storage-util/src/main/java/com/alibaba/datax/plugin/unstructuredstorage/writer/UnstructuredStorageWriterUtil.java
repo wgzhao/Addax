@@ -24,7 +24,6 @@ import org.slf4j.LoggerFactory;
 
 import com.alibaba.datax.common.element.Column;
 import com.alibaba.datax.common.element.DateColumn;
-import com.alibaba.datax.common.element.Record;
 import com.alibaba.datax.common.exception.DataXException;
 import com.alibaba.datax.common.plugin.RecordReceiver;
 import com.alibaba.datax.common.plugin.TaskPluginCollector;

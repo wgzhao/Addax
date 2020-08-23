@@ -26,11 +26,6 @@
         </dependency>
 
         <dependency>
-            <groupId>ch.qos.logback</groupId>
-            <artifactId>logback-classic</artifactId>
-        </dependency>
-
-        <dependency>
             <groupId>io.searchbox</groupId>
             <artifactId>jest-common</artifactId>
             <version>2.4.0</version>
@@ -45,6 +40,7 @@
         <dependency>
             <groupId>joda-time</groupId>
             <artifactId>joda-time</artifactId>
+            <version>${joda.time.version}</version>
         </dependency>
 
         <dependency>
