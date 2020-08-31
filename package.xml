@@ -5,7 +5,7 @@
     <id/>
     <formats>
         <format>dir</format>
-        <format>tar.gz</format>
+<!--        <format>tar.gz</format>-->
     </formats>
     <includeBaseDirectory>false</includeBaseDirectory>
     <fileSets>
@@ -14,6 +14,7 @@
             <includes>
                 <include>datax-transformer-${project.version}.jar</include>
             </includes>
+            <fileMode>0644</fileMode>
             <outputDirectory>datax-${project.version}/lib</outputDirectory>
         </fileSet>
         <fileSet>
@@ -31,6 +32,7 @@
             <includes>
                 <include>**/*.*</include>
             </includes>
+            <fileMode>0644</fileMode>
             <outputDirectory>datax-${project.version}</outputDirectory>
         </fileSet>
         <fileSet>
@@ -38,6 +40,7 @@
             <includes>
                 <include>**/*.*</include>
             </includes>
+            <fileMode>0644</fileMode>
             <outputDirectory>datax-${project.version}</outputDirectory>
         </fileSet>
         <fileSet>
@@ -45,6 +48,7 @@
             <includes>
                 <include>**/*.*</include>
             </includes>
+            <fileMode>0644</fileMode>
             <outputDirectory>datax-${project.version}</outputDirectory>
         </fileSet>
         <fileSet>
@@ -52,6 +56,7 @@
             <includes>
                 <include>**/*.*</include>
             </includes>
+            <fileMode>0644</fileMode>
             <outputDirectory>datax-${project.version}</outputDirectory>
         </fileSet>
         <fileSet>
@@ -59,6 +64,7 @@
             <includes>
                 <include>**/*.*</include>
             </includes>
+            <fileMode>0644</fileMode>
             <outputDirectory>datax-${project.version}</outputDirectory>
         </fileSet>
         <fileSet>
@@ -66,6 +72,7 @@
             <includes>
                 <include>**/*.*</include>
             </includes>
+            <fileMode>0644</fileMode>
             <outputDirectory>datax-${project.version}</outputDirectory>
         </fileSet>
         <fileSet>
@@ -73,6 +80,7 @@
             <includes>
                 <include>**/*.*</include>
             </includes>
+            <fileMode>0644</fileMode>
             <outputDirectory>datax-${project.version}</outputDirectory>
         </fileSet>
         <fileSet>
@@ -80,6 +88,7 @@
             <includes>
                 <include>**/*.*</include>
             </includes>
+            <fileMode>0644</fileMode>
             <outputDirectory>datax-${project.version}</outputDirectory>
         </fileSet>
         <fileSet>
@@ -87,6 +96,7 @@
             <includes>
                 <include>**/*.*</include>
             </includes>
+            <fileMode>0644</fileMode>
             <outputDirectory>datax-${project.version}</outputDirectory>
         </fileSet>
         <fileSet>
@@ -94,13 +104,15 @@
             <includes>
                 <include>**/*.*</include>
             </includes>
-            <outputDirectory>datax</outputDirectory>
+            <fileMode>0644</fileMode>
+            <outputDirectory>datax-${project.version}</outputDirectory>
         </fileSet>
         <fileSet>
             <directory>mongodbreader/target/datax/</directory>
             <includes>
                 <include>**/*.*</include>
             </includes>
+            <fileMode>0644</fileMode>
             <outputDirectory>datax-${project.version}</outputDirectory>
         </fileSet>
         <fileSet>
@@ -108,6 +120,7 @@
             <includes>
                 <include>**/*.*</include>
             </includes>
+            <fileMode>0644</fileMode>
             <outputDirectory>datax-${project.version}</outputDirectory>
         </fileSet>
         <fileSet>
@@ -115,6 +128,7 @@
             <includes>
                 <include>**/*.*</include>
             </includes>
+            <fileMode>0644</fileMode>
             <outputDirectory>datax-${project.version}</outputDirectory>
         </fileSet>
         <fileSet>
@@ -122,6 +136,7 @@
             <includes>
                 <include>**/*.*</include>
             </includes>
+            <fileMode>0644</fileMode>
             <outputDirectory>datax-${project.version}</outputDirectory>
         </fileSet>
         <fileSet>
@@ -129,6 +144,7 @@
             <includes>
                 <include>**/*.*</include>
             </includes>
+            <fileMode>0644</fileMode>
             <outputDirectory>datax-${project.version}</outputDirectory>
         </fileSet>
         <fileSet>
@@ -136,6 +152,7 @@
             <includes>
                 <include>**/*.*</include>
             </includes>
+            <fileMode>0644</fileMode>
             <outputDirectory>datax-${project.version}</outputDirectory>
         </fileSet>
         <fileSet>
@@ -143,6 +160,7 @@
             <includes>
                 <include>**/*.*</include>
             </includes>
+            <fileMode>0644</fileMode>
             <outputDirectory>datax-${project.version}</outputDirectory>
         </fileSet>
         <fileSet>
@@ -150,6 +168,7 @@
             <includes>
                 <include>**/*.*</include>
             </includes>
+            <fileMode>0644</fileMode>
             <outputDirectory>datax-${project.version}</outputDirectory>
         </fileSet>
         <fileSet>
@@ -157,6 +176,7 @@
             <includes>
                 <include>**/*.*</include>
             </includes>
+            <fileMode>0644</fileMode>
             <outputDirectory>datax-${project.version}</outputDirectory>
         </fileSet>
 
@@ -166,6 +186,7 @@
             <includes>
                 <include>**/*.*</include>
             </includes>
+            <fileMode>0644</fileMode>
             <outputDirectory>datax-${project.version}</outputDirectory>
         </fileSet>
         <fileSet>
@@ -173,6 +194,7 @@
             <includes>
                 <include>**/*.*</include>
             </includes>
+            <fileMode>0644</fileMode>
             <outputDirectory>datax-${project.version}</outputDirectory>
         </fileSet>
         <fileSet>
@@ -180,6 +202,7 @@
             <includes>
                 <include>**/*.*</include>
             </includes>
+            <fileMode>0644</fileMode>
             <outputDirectory>datax-${project.version}</outputDirectory>
         </fileSet>
         <fileSet>
@@ -187,6 +210,7 @@
             <includes>
                 <include>**/*.*</include>
             </includes>
+            <fileMode>0644</fileMode>
             <outputDirectory>datax-${project.version}</outputDirectory>
         </fileSet>
         <fileSet>
@@ -194,6 +218,7 @@
             <includes>
                 <include>**/*.*</include>
             </includes>
+            <fileMode>0644</fileMode>
             <outputDirectory>datax-${project.version}</outputDirectory>
         </fileSet>
         <fileSet>
@@ -201,6 +226,7 @@
             <includes>
                 <include>**/*.*</include>
             </includes>
+            <fileMode>0644</fileMode>
             <outputDirectory>datax-${project.version}</outputDirectory>
         </fileSet>
         <fileSet>
@@ -208,6 +234,7 @@
             <includes>
                 <include>**/*.*</include>
             </includes>
+            <fileMode>0644</fileMode>
             <outputDirectory>datax-${project.version}</outputDirectory>
         </fileSet>
         <fileSet>
@@ -215,6 +242,7 @@
             <includes>
                 <include>**/*.*</include>
             </includes>
+            <fileMode>0644</fileMode>
             <outputDirectory>datax-${project.version}</outputDirectory>
         </fileSet>
         <fileSet>
@@ -222,6 +250,10 @@
             <includes>
                 <include>**/*.*</include>
             </includes>
+            <excludes>
+                <exclude>**/datax-common*.jar</exclude>
+            </excludes>
+            <fileMode>0644</fileMode>
             <outputDirectory>datax-${project.version}</outputDirectory>
         </fileSet>
         <fileSet>
@@ -229,6 +261,7 @@
             <includes>
                 <include>**/*.*</include>
             </includes>
+            <fileMode>0644</fileMode>
             <outputDirectory>datax-${project.version}</outputDirectory>
         </fileSet>
         <fileSet>
@@ -236,6 +269,7 @@
             <includes>
                 <include>**/*.*</include>
             </includes>
+            <fileMode>0644</fileMode>
             <outputDirectory>datax-${project.version}</outputDirectory>
         </fileSet>
         <fileSet>
@@ -243,6 +277,7 @@
             <includes>
                 <include>**/*.*</include>
             </includes>
+            <fileMode>0644</fileMode>
             <outputDirectory>datax-${project.version}</outputDirectory>
         </fileSet>
         <fileSet>
@@ -250,6 +285,7 @@
             <includes>
                 <include>**/*.*</include>
             </includes>
+            <fileMode>0644</fileMode>
             <outputDirectory>datax-${project.version}</outputDirectory>
         </fileSet>
         <fileSet>
@@ -257,6 +293,7 @@
             <includes>
                 <include>**/*.*</include>
             </includes>
+            <fileMode>0644</fileMode>
             <outputDirectory>datax-${project.version}</outputDirectory>
         </fileSet>
         <fileSet>
@@ -264,6 +301,7 @@
             <includes>
                 <include>**/*.*</include>
             </includes>
+            <fileMode>0644</fileMode>
             <outputDirectory>datax-${project.version}</outputDirectory>
         </fileSet>
         <fileSet>
@@ -271,6 +309,7 @@
             <includes>
                 <include>**/*.*</include>
             </includes>
+            <fileMode>0644</fileMode>
             <outputDirectory>datax-${project.version}</outputDirectory>
         </fileSet>
         <fileSet>
@@ -278,6 +317,7 @@
             <includes>
                 <include>**/*.*</include>
             </includes>
+            <fileMode>0644</fileMode>
             <outputDirectory>datax-${project.version}</outputDirectory>
         </fileSet>
         <fileSet>
@@ -285,6 +325,7 @@
             <includes>
                 <include>**/*.*</include>
             </includes>
+            <fileMode>0644</fileMode>
             <outputDirectory>datax-${project.version}</outputDirectory>
         </fileSet>
     </fileSets>

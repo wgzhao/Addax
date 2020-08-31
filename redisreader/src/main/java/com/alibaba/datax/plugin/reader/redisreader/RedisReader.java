@@ -2,7 +2,6 @@ package com.alibaba.datax.plugin.reader.redisreader;
 
 import com.alibaba.datax.common.element.BytesColumn;
 import com.alibaba.datax.common.element.LongColumn;
-import com.alibaba.datax.common.element.Record;
 import com.alibaba.datax.common.plugin.RecordSender;
 import com.alibaba.datax.common.spi.Reader;
 import com.alibaba.datax.common.util.Configuration;
@@ -14,7 +13,6 @@ import com.moilioncircle.redis.replicator.event.EventListener;
 import com.moilioncircle.redis.replicator.event.PostRdbSyncEvent;
 import com.moilioncircle.redis.replicator.event.PreRdbSyncEvent;
 import com.moilioncircle.redis.replicator.io.RawByteListener;
-import com.moilioncircle.redis.replicator.rdb.datatype.KeyValuePair;
 import com.moilioncircle.redis.replicator.rdb.dump.DumpRdbVisitor;
 import com.moilioncircle.redis.replicator.rdb.dump.datatype.DumpKeyValuePair;
 import com.moilioncircle.redis.replicator.rdb.skip.SkipRdbVisitor;
@@ -26,16 +24,41 @@ import org.apache.http.impl.client.HttpClientBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.*;
+import java.io.BufferedOutputStream;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.nio.charset.Charset;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.TreeMap;
+import java.util.UUID;
 import java.util.regex.Pattern;
 
-import static com.moilioncircle.redis.replicator.Constants.*;
+import static com.moilioncircle.redis.replicator.Constants.RDB_TYPE_HASH;
+import static com.moilioncircle.redis.replicator.Constants.RDB_TYPE_HASH_ZIPLIST;
+import static com.moilioncircle.redis.replicator.Constants.RDB_TYPE_HASH_ZIPMAP;
+import static com.moilioncircle.redis.replicator.Constants.RDB_TYPE_LIST;
+import static com.moilioncircle.redis.replicator.Constants.RDB_TYPE_LIST_QUICKLIST;
+import static com.moilioncircle.redis.replicator.Constants.RDB_TYPE_LIST_ZIPLIST;
+import static com.moilioncircle.redis.replicator.Constants.RDB_TYPE_MODULE;
 import static com.moilioncircle.redis.replicator.Constants.RDB_TYPE_MODULE_2;
+import static com.moilioncircle.redis.replicator.Constants.RDB_TYPE_SET;
+import static com.moilioncircle.redis.replicator.Constants.RDB_TYPE_SET_INTSET;
 import static com.moilioncircle.redis.replicator.Constants.RDB_TYPE_STREAM_LISTPACKS;
+import static com.moilioncircle.redis.replicator.Constants.RDB_TYPE_STRING;
+import static com.moilioncircle.redis.replicator.Constants.RDB_TYPE_ZSET;
+import static com.moilioncircle.redis.replicator.Constants.RDB_TYPE_ZSET_2;
+import static com.moilioncircle.redis.replicator.Constants.RDB_TYPE_ZSET_ZIPLIST;
 
 public class RedisReader extends Reader {
 

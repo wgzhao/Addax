@@ -149,7 +149,7 @@ public class PerfRecord implements Comparable<PerfRecord> {
         if (o == null) {
             return 1;
         }
-        return this.elapsedTimeInNs > o.elapsedTimeInNs ? 1 : this.elapsedTimeInNs == o.elapsedTimeInNs ? 0 : -1;
+        return Long.compare(this.elapsedTimeInNs, o.elapsedTimeInNs);
     }
 
     @Override

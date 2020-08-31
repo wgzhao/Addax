@@ -39,10 +39,11 @@
 			</exclusions>
 		</dependency>
 
-<!--		<dependency>-->
-<!--			<groupId>com.google.guava</groupId>-->
-<!--			<artifactId>guava</artifactId>-->
-<!--		</dependency>-->
+		<dependency>
+			<groupId>com.google.guava</groupId>
+			<artifactId>guava</artifactId>
+			<version>${guava.version}</version>
+		</dependency>
 
 		<dependency>
 			<groupId>commons-codec</groupId>
@@ -54,6 +55,7 @@
 			<groupId>org.slf4j</groupId>
 			<artifactId>slf4j-api</artifactId>
 		</dependency>
+
 
 	</dependencies>
 
