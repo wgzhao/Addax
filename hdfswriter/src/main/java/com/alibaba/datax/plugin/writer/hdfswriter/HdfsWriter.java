@@ -8,17 +8,11 @@ import com.alibaba.datax.plugin.unstructuredstorage.writer.Constant;
 import com.google.common.collect.Sets;
 import org.apache.commons.io.Charsets;
 import org.apache.commons.io.IOUtils;
-import org.apache.commons.lang3.StringUtils;
 import org.apache.hadoop.fs.Path;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
-import java.util.UUID;
+import java.util.*;
 
 
 public class HdfsWriter extends Writer {
@@ -108,7 +102,7 @@ public class HdfsWriter extends Writer {
             if (fileType.equalsIgnoreCase("TEXT")) {
                 Set<String> textSupportedCompress = Sets.newHashSet("GZIP", "BZIP2");
                 //用户可能配置的是compress:"",空字符串,需要将compress设置为null
-                if (StringUtils.isBlank(compress)) {
+                if ("".equals(compress)) {
                     this.writerSliceConfig.set(Key.COMPRESS, null);
                 } else {
                     compress = compress.toUpperCase().trim();
@@ -190,7 +184,7 @@ public class HdfsWriter extends Writer {
                     for (Path eachFile : existFilePaths) {
                         allFiles.add(eachFile.toString());
                     }
-                    LOG.error(String.format("冲突文件列表为: [%s]", StringUtils.join(allFiles, ",")));
+                    LOG.error(String.format("冲突文件列表为: [%s]", String.join(",", allFiles)));
                     throw DataXException.asDataXException(HdfsWriterErrorCode.ILLEGAL_VALUE,
                             String.format("由于您配置了writeMode nonConflict,但您配置的path: [%s] 目录不为空, 下面存在其他文件或文件夹.", path));
                 }

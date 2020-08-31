@@ -29,6 +29,11 @@
 		<dependencySet>
 			<useProjectArtifact>false</useProjectArtifact>
 			<outputDirectory>plugin/writer/hdfswriter/libs</outputDirectory>
+			<excludes>
+				<exclude>
+					<groupId></groupId>
+				</exclude>
+			</excludes>
 			<scope>runtime</scope>
 		</dependencySet>
 	</dependencySets>
