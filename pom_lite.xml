@@ -20,9 +20,9 @@
         <groovy.version>2.4.20</groovy.version>
         <diamond.version>3.7.3</diamond.version>
         <postgresql.jdbc.version>9.4.1207</postgresql.jdbc.version>
-        <!--slf4j 1.7.10 和 logback.classic 1.0.13 是好基友 -->
-        <slf4j.api.version>1.7.10</slf4j.api.version>
-        <logback.classic.version>1.3.0-alpha5</logback.classic.version>
+        <!--slf4j 1.7.28 和 logback.classic 1.2.3 是好基友 -->
+        <slf4j.version>1.7.28</slf4j.version>
+        <logback.version>1.2.3</logback.version>
         <commons.io.version>2.7</commons.io.version>
         <junit.version>4.13</junit.version>
         <swift.version>1.0.0</swift.version>

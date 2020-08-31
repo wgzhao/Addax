@@ -1,16 +1,18 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
-    <parent>
-        <artifactId>datax-all</artifactId>
-        <groupId>com.alibaba.datax</groupId>
-        <version>3.1.0-SNAPSHOT</version>
-    </parent>
     <modelVersion>4.0.0</modelVersion>
 
+    <parent>
+        <groupId>com.alibaba.datax</groupId>
+        <artifactId>datax-all</artifactId>
+        <version>3.1.0-SNAPSHOT</version>
+    </parent>
+
     <artifactId>elasticsearchwriter</artifactId>
-    <groupId>com.alibaba.datax</groupId>
     <packaging>jar</packaging>
+
     <dependencies>
+
         <dependency>
             <groupId>com.alibaba.datax</groupId>
             <artifactId>datax-common</artifactId>
@@ -22,35 +24,25 @@
                 </exclusion>
             </exclusions>
         </dependency>
-        <dependency>
-            <groupId>org.slf4j</groupId>
-            <artifactId>slf4j-api</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>ch.qos.logback</groupId>
-            <artifactId>logback-classic</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>io.searchbox</groupId>
-            <artifactId>jest-common</artifactId>
-            <version>2.4.0</version>
-        </dependency>
+
         <dependency>
             <groupId>io.searchbox</groupId>
             <artifactId>jest</artifactId>
             <version>2.4.0</version>
         </dependency>
+
+        <dependency>
+            <groupId>io.searchbox</groupId>
+            <artifactId>jest-common</artifactId>
+            <version>2.4.0</version>
+        </dependency>
+
         <dependency>
             <groupId>joda-time</groupId>
             <artifactId>joda-time</artifactId>
-            <version>2.9.7</version>
+            <version>${joda.time.version}</version>
         </dependency>
-        <dependency>
-            <groupId>junit</groupId>
-            <artifactId>junit</artifactId>
-            <version>4.11</version>
-            <scope>test</scope>
-        </dependency>
+
     </dependencies>
     <build>
         <plugins>

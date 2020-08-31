@@ -19,12 +19,16 @@
         <guava.version>29.0-jre</guava.version>
         <groovy.version>2.4.20</groovy.version>
         <diamond.version>3.7.3</diamond.version>
+        <hadoop.version>3.1.1</hadoop.version>
+        <hive.version>3.1.1</hive.version>
         <postgresql.jdbc.version>9.4.1207</postgresql.jdbc.version>
         <!--slf4j 1.7.28 和 logback.classic 1.2.3 是好基友 -->
         <slf4j.version>1.7.28</slf4j.version>
         <logback.version>1.2.3</logback.version>
         <commons.io.version>2.7</commons.io.version>
+        <commons.codec.version>1.9</commons.codec.version>
         <junit.version>4.13</junit.version>
+        <joda.time.version>2.10.6</joda.time.version>
         <swift.version>1.0.0</swift.version>
         <jackson.version>2.9.9</jackson.version>
         <mockito.version>2.0.2-beta</mockito.version>
@@ -101,12 +105,6 @@
             </dependency>
 
             <dependency>
-                <groupId>com.alibaba.search.swift</groupId>
-                <artifactId>swift_client</artifactId>
-                <version>${swift.version}</version>
-            </dependency>
-
-            <dependency>
                 <groupId>ch.qos.logback</groupId>
                 <artifactId>logback-classic</artifactId>
                 <version>${logback.version}</version>
@@ -119,74 +117,8 @@
             </dependency>
 
             <dependency>
-                <groupId>com.google.guava</groupId>
-                <artifactId>guava</artifactId>
-                <version>${guava.version}</version>
-            </dependency>
-
-            <dependency>
-                <groupId>com.google.guava</groupId>
-                <artifactId>guava-all</artifactId>
-                <version>${guava.version}</version>
-            </dependency>
-
-            <dependency>
-                <groupId>com.taobao.diamond</groupId>
-                <artifactId>diamond-client</artifactId>
-                <version>${diamond.version}</version>
-            </dependency>
-
-            <dependency>
-                <groupId>commons-cli</groupId>
-                <artifactId>commons-cli</artifactId>
-                <version>${commons.cli.version}</version>
-            </dependency>
-
-            <dependency>
-                <groupId>commons-configuration</groupId>
-                <artifactId>commons-configuration</artifactId>
-                <version>${commons.configuration.version}</version>
-            </dependency>
-
-            <dependency>
-                <groupId>commons-io</groupId>
-                <artifactId>commons-io</artifactId>
-                <version>${commons.io.version}</version>
-            </dependency>
-
-            <dependency>
-                <groupId>junit</groupId>
-                <artifactId>junit</artifactId>
-                <version>${junit.version}</version>
-            </dependency>
-
-            <dependency>
-                <groupId>org.apache.commons</groupId>
-                <artifactId>commons-lang3</artifactId>
-                <version>3.11</version>
-            </dependency>
-
-            <dependency>
-                <groupId>org.codehaus.groovy</groupId>
-                <artifactId>groovy-all</artifactId>
-                <version>${groovy.version}</version>
-            </dependency>
-
-            <dependency>
-                <groupId>org.hamcrest</groupId>
-                <artifactId>hamcrest-core</artifactId>
-                <version>2.2</version>
-            </dependency>
-
-            <dependency>
                 <groupId>org.slf4j</groupId>
                 <artifactId>slf4j-api</artifactId>
-                <version>${slf4j.version}</version>
-            </dependency>
-
-            <dependency>
-                <groupId>org.slf4j</groupId>
-                <artifactId>slf4j-log4j12</artifactId>
                 <version>${slf4j.version}</version>
             </dependency>
 
@@ -216,7 +148,6 @@
                         </compound>
                         <requireUpperBoundDeps>
                             <excludes combine.children="append">
-                                <!-- TODO: fix this in Airlift resolver -->
                                 <exclude>org.codehaus.plexus:plexus-utils</exclude>
                                 <exclude>com.google.guava:guava</exclude>
                                 <exclude>com.fasterxml.jackson.core:jackson-core</exclude>
@@ -249,6 +180,7 @@
                     <descriptors>
                         <descriptor>package.xml</descriptor>
                     </descriptors>
+                    <attach>false</attach>
                 </configuration>
                 <executions>
                     <execution>
@@ -261,24 +193,6 @@
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
                 <version>3.8.1</version>
-                <configuration>
-<!--                    <compilerId>javac-with-errorprone</compilerId>-->
-<!--                    <forceJavacCompilerUse>true</forceJavacCompilerUse>-->
-                    <fork>true</fork>
-                    <compilerArgs>
-                        <arg>-XDcompilePolicy=simple</arg>
-                        <arg>-Xplugin:ErrorProne</arg>
-                    </compilerArgs>
-                </configuration>
-                <executions>
-                    <execution>
-                        <id>compile-with-error-prone</id>
-                        <phase>verify</phase>
-                        <goals>
-                            <goal>compile</goal>
-                        </goals>
-                    </execution>
-                </executions>
                 <dependencies>
                     <dependency>
                         <groupId>com.google.errorprone</groupId>
@@ -297,6 +211,23 @@
                     </dependency>
                 </dependencies>
             </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-dependency-plugin</artifactId>
+                <version>3.1.2</version>
+            </plugin>
+<!--            <plugin>-->
+<!--                <groupId>se.kth.castor</groupId>-->
+<!--                <artifactId>depclean-maven-plugin</artifactId>-->
+<!--                <version>1.1.0</version>-->
+<!--                <executions>-->
+<!--                    <execution>-->
+<!--                        <goals>-->
+<!--                            <goal>depclean</goal>-->
+<!--                        </goals>-->
+<!--                    </execution>-->
+<!--                </executions>-->
+<!--            </plugin>-->
         </plugins>
     </build>
 </project>

@@ -12,6 +12,7 @@
 	<packaging>jar</packaging>
 
 	<dependencies>
+
 		<dependency>
 			<groupId>com.alibaba.datax</groupId>
 			<artifactId>datax-common</artifactId>
@@ -23,42 +24,32 @@
 				</exclusion>
 			</exclusions>
 		</dependency>
+
 		<dependency>
 			<groupId>com.alibaba.datax</groupId>
 			<artifactId>plugin-unstructured-storage-util</artifactId>
 			<version>${project.version}</version>
 		</dependency>
+
+<!--		<dependency>-->
+<!--			<groupId>com.google.guava</groupId>-->
+<!--			<artifactId>guava</artifactId>-->
+<!--		</dependency>-->
+
+<!--		<dependency>-->
+<!--			<groupId>commons-io</groupId>-->
+<!--			<artifactId>commons-io</artifactId>-->
+<!--		</dependency>-->
+
 		<dependency>
 			<groupId>org.slf4j</groupId>
 			<artifactId>slf4j-api</artifactId>
 		</dependency>
-		<dependency>
-			<groupId>ch.qos.logback</groupId>
-			<artifactId>logback-classic</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>com.google.guava</groupId>
-			<artifactId>guava</artifactId>
-            <version>${guava.version}</version>
-		</dependency>
-		<dependency>
-			<groupId>commons-io</groupId>
-			<artifactId>commons-io</artifactId>
-			<version>2.7</version>
-		</dependency>
+
 	</dependencies>
 
 	<build>
 		<plugins>
-			<!-- compiler plugin -->
-			<plugin>
-				<artifactId>maven-compiler-plugin</artifactId>
-				<configuration>
-					<source>1.7</source>
-					<target>1.7</target>
-					<encoding>${project-sourceEncoding}</encoding>
-				</configuration>
-			</plugin>
 			<plugin>
 				<artifactId>maven-assembly-plugin</artifactId>
 				<configuration>
