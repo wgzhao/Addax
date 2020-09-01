@@ -39,3 +39,4 @@ sphinxcontrib-serializinghtml
 text-unidecode
 Unidecode
 urllib3
+sphinx_markdown_tables
