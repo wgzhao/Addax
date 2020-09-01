@@ -25,7 +25,7 @@ recommonmark
 six
 snowballstemmer
 soupsieve
-Sphinx
+Sphinx==2.4.4
 sphinx-autobuild
 sphinx-markdown-builder
 sphinx-material
