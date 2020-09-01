@@ -83,8 +83,8 @@ SqlServerWriter 通过 DataX 框架获取 Reader 生成的协议数据，根据�
 | password        |    是    | 无     | 数据源指定用户名的密码 |
 | passflag        |    否    | true   | 是否强制需要密码，设置为false时，连接数据库将会忽略`password` 配置项 |
 | table           |    是    | 无     | 所选取的需要同步的表名,使用JSON数据格式，当配置为多张表时，用户自己需保证多张表是同一表结构 |
-| column          |    是    | 无     |  所配置的表中需要同步的列名集合，详细描述见[rdbmswriter](rdbmswriter.md) |
-| splitPk         |    否    | 无     | 使用splitPk代表的字段进行数据分片，详细描述见[rdbms](rdbmsreader.md)|
+| column          |    是    | 无     |  所配置的表中需要同步的列名集合，详细描述见[rdbmswriter](../writer/rdbmswriter.md) |
+| splitPk         |    否    | 无     | 使用splitPk代表的字段进行数据分片，详细描述见[rdbms](../reader/rdbmsreader.md)|
 | preSql | 否  | 无 | 数据写入前先执行的sql语句 |
 | postSql        |   否      | 无    | 数据写入完成后,再执行的SQL语句 |
 | batchSize       |    否    | 1024   |  定义了插件和数据库服务器端每次批量数据获取条数，调高该值可能导致 DataX 出现OOM |

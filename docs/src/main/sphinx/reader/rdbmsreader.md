@@ -23,8 +23,7 @@ RDBMSReader是一个通用的关系数据库读插件，您可以通过注册数
     "job": {
         "setting": {
             "speed": {
-                "byte": -1,
-                "channel": 1
+                "byte": 1048576
             },
             "errorLimit": {
                 "record": 0,
