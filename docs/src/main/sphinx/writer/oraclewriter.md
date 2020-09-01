@@ -111,7 +111,7 @@ OracleWriter 通过 DataX 框架获取 Reader 生成的协议数据，根据你�
 
 ### 3.3 类型转换
 
-类似 [OracleReader](oraclereader.md) ，目前 OracleWriter 支持大部分 Oracle 类型，但也存在部分个别类型没有支持的情况，请注意检查你的类型。
+类似 [OracleReader](../reader/oraclereader.md) ，目前 OracleWriter 支持大部分 Oracle 类型，但也存在部分个别类型没有支持的情况，请注意检查你的类型。
 
 下面列出 OracleWriter 针对 Oracle 类型转换列表:
 

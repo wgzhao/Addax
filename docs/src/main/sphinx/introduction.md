@@ -1,6 +1,6 @@
-# 阿里云开源离线同步工具DataX3.0介绍
+# DataX 3 介绍
 
-## 一、 DataX3.0 概览
+## 一、 DataX 3 概览
 
 DataX 是一个异构数据源离线同步工具，致力于实现包括关系型数据库(MySQL、Oracle等)、HDFS、Hive、ODPS、HBase、FTP等各种异构数据源之间稳定高效的数据同步功能。
 
@@ -96,4 +96,4 @@ DataX作业是极易受外部因素的干扰，网络闪断、数据源不稳定
 
 - 线程级别重试
 
-  目前DataX已经可以实现TaskFailover，针对于中间失败的Task，DataX框架可以做到整个Task级别的重新调度。
+  目前DataX已经可以实现 TaskFailover，针对于中间失败的Task，DataX框架可以做到整个Task级别的重新调度。
