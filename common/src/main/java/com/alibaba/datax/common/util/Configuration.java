@@ -423,7 +423,14 @@ public class Configuration {
 
         List<T> result = new ArrayList<T>();
 
-        List<Object> origin = (List<Object>) object;
+        List<Object> origin = new ArrayList<>();
+        try {
+            origin = (List<Object>) object;
+        }catch(ClassCastException e){
+            // .warn("{} 转为 List 时发生了异常，默认将此值添加到 List 中", String.valueOf(object));
+            origin.add(String.valueOf(object));
+        }
+
         for (final Object each : origin) {
             result.add((T) each);
         }
