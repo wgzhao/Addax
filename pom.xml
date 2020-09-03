@@ -178,7 +178,7 @@
                 <configuration>
                     <finalName>datax-${project.version}</finalName>
                     <descriptors>
-                        <descriptor>package.xml</descriptor>
+                        <descriptor>${project.basedir}/src/assembly/package.xml</descriptor>
                     </descriptors>
                     <attach>false</attach>
                 </configuration>
