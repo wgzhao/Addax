@@ -12,7 +12,12 @@ import org.apache.hadoop.fs.Path;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+import java.util.UUID;
 
 
 public class HdfsWriter extends Writer {
@@ -23,15 +28,11 @@ public class HdfsWriter extends Writer {
 
         private String defaultFS;
         private String path;
-        private String fileType;
         private String fileName;
-        private List<Configuration> columns;
         private String writeMode;
-        private String fieldDelimiter;
         private String compress;
-        private String encoding;
-        private HashSet<String> tmpFiles = new HashSet<>();//临时文件全路径
-        private HashSet<String> endFiles = new HashSet<>();//最终文件全路径
+        private final HashSet<String> tmpFiles = new HashSet<>();//临时文件全路径
+        private final HashSet<String> endFiles = new HashSet<>();//最终文件全路径
 
         private HdfsHelper hdfsHelper = null;
 
@@ -49,8 +50,9 @@ public class HdfsWriter extends Writer {
         private void validateParameter() {
             this.defaultFS = this.writerSliceConfig.getNecessaryValue(Key.DEFAULT_FS, HdfsWriterErrorCode.REQUIRED_VALUE);
             //fileType check
-            this.fileType = this.writerSliceConfig.getNecessaryValue(Key.FILE_TYPE, HdfsWriterErrorCode.REQUIRED_VALUE);
-            if (!fileType.equalsIgnoreCase("ORC") && !fileType.equalsIgnoreCase("TEXT") && !fileType.equalsIgnoreCase("PAR")) {
+            String fileType = this.writerSliceConfig.getNecessaryValue(Key.FILE_TYPE, HdfsWriterErrorCode.REQUIRED_VALUE);
+            if (!fileType.equalsIgnoreCase("ORC") && !fileType.equalsIgnoreCase("TEXT")
+                    && !fileType.equalsIgnoreCase("PARQUET")) {
                 String message = "HdfsWriter插件目前只支持ORC和TEXT或PARQUET三种格式的文件,请将filetype选项的值配置为ORC或者TEXT或PARQUET";
                 throw DataXException.asDataXException(HdfsWriterErrorCode.ILLEGAL_VALUE, message);
             }
@@ -68,7 +70,7 @@ public class HdfsWriter extends Writer {
             //fileName
             this.fileName = this.writerSliceConfig.getNecessaryValue(Key.FILE_NAME, HdfsWriterErrorCode.REQUIRED_VALUE);
             //columns check
-            this.columns = this.writerSliceConfig.getListConfiguration(Key.COLUMN);
+            List<Configuration> columns = this.writerSliceConfig.getListConfiguration(Key.COLUMN);
             if (null == columns || columns.size() == 0) {
                 throw DataXException.asDataXException(HdfsWriterErrorCode.REQUIRED_VALUE, "您需要指定 columns");
             } else {
@@ -80,7 +82,7 @@ public class HdfsWriter extends Writer {
             //writeMode check
             this.writeMode = this.writerSliceConfig.getNecessaryValue(Key.WRITE_MODE, HdfsWriterErrorCode.REQUIRED_VALUE);
             writeMode = writeMode.toLowerCase().trim();
-            Set<String> supportedWriteModes = Sets.newHashSet("append", "nonconflict", "overwrite");
+            Set<String> supportedWriteModes = new HashSet<>(Arrays.asList("append", "nonconflict", "overwrite"));
             if (!supportedWriteModes.contains(writeMode)) {
                 throw DataXException.asDataXException(HdfsWriterErrorCode.ILLEGAL_VALUE,
                         String.format("仅支持append, nonConflict,overwrite三种模式, 不支持您配置的 writeMode 模式 : [%s]",
@@ -88,7 +90,7 @@ public class HdfsWriter extends Writer {
             }
             this.writerSliceConfig.set(Key.WRITE_MODE, writeMode);
             //fieldDelimiter check
-            this.fieldDelimiter = this.writerSliceConfig.getString(Key.FIELD_DELIMITER, null);
+            String fieldDelimiter = this.writerSliceConfig.getString(Key.FIELD_DELIMITER, null);
             if (null == fieldDelimiter) {
                 throw DataXException.asDataXException(HdfsWriterErrorCode.REQUIRED_VALUE,
                         String.format("您提供配置文件有误，[%s]是必填参数.", Key.FIELD_DELIMITER));
@@ -125,8 +127,8 @@ public class HdfsWriter extends Writer {
                     }
                 }
 
-            } else if (fileType.equalsIgnoreCase("PAR")) {
-                Set<String> parSupportedCompress = Sets.newHashSet("NONE", "SNAPPY");
+            } else if (fileType.equalsIgnoreCase("PARQUET")) {
+                Set<String> parSupportedCompress = new HashSet<>(Arrays.asList("NONE", "SNAPPY"));
                 if (null == compress) {
                     this.writerSliceConfig.set(Key.COMPRESS, "NONE");
                 } else {
@@ -146,7 +148,7 @@ public class HdfsWriter extends Writer {
                 this.writerSliceConfig.getNecessaryValue(Key.KERBEROS_PRINCIPAL, HdfsWriterErrorCode.REQUIRED_VALUE);
             }
             // encoding check
-            this.encoding = this.writerSliceConfig.getString(Key.ENCODING, Constant.DEFAULT_ENCODING);
+            String encoding = this.writerSliceConfig.getString(Key.ENCODING, Constant.DEFAULT_ENCODING);
             try {
                 encoding = encoding.trim();
                 this.writerSliceConfig.set(Key.ENCODING, encoding);
@@ -180,7 +182,7 @@ public class HdfsWriter extends Writer {
                             path, fileName));
                 } else if ("nonconflict".equalsIgnoreCase(writeMode) && isExistFile) {
                     LOG.info(String.format("由于您配置了writeMode nonConflict, 开始检查 [%s] 下面的内容", path));
-                    List<String> allFiles = new ArrayList<String>();
+                    List<String> allFiles = new ArrayList<>();
                     for (Path eachFile : existFilePaths) {
                         allFiles.add(eachFile.toString());
                     }
@@ -348,7 +350,6 @@ public class HdfsWriter extends Writer {
 
         private Configuration writerSliceConfig;
 
-        private String defaultFS;
         private String fileType;
         private String fileName;
 
@@ -358,7 +359,7 @@ public class HdfsWriter extends Writer {
         public void init() {
             this.writerSliceConfig = this.getPluginJobConf();
 
-            this.defaultFS = this.writerSliceConfig.getString(Key.DEFAULT_FS);
+            String defaultFS = this.writerSliceConfig.getString(Key.DEFAULT_FS);
             this.fileType = this.writerSliceConfig.getString(Key.FILE_TYPE);
             //得当的已经是绝对路径，eg：hdfs://10.101.204.12:9000/user/hive/warehouse/writer.db/text/test.textfile
             this.fileName = this.writerSliceConfig.getString(Key.FILE_NAME);
