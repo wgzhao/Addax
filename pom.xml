@@ -178,7 +178,7 @@
                 <configuration>
                     <finalName>datax-${project.version}</finalName>
                     <descriptors>
-                        <descriptor>${project.basedir}/src/assembly/package.xml</descriptor>
+                        <descriptor>package.xml</descriptor>
                     </descriptors>
                     <attach>false</attach>
                 </configuration>
@@ -216,18 +216,6 @@
                 <artifactId>maven-dependency-plugin</artifactId>
                 <version>3.1.2</version>
             </plugin>
-<!--            <plugin>-->
-<!--                <groupId>se.kth.castor</groupId>-->
-<!--                <artifactId>depclean-maven-plugin</artifactId>-->
-<!--                <version>1.1.0</version>-->
-<!--                <executions>-->
-<!--                    <execution>-->
-<!--                        <goals>-->
-<!--                            <goal>depclean</goal>-->
-<!--                        </goals>-->
-<!--                    </execution>-->
-<!--                </executions>-->
-<!--            </plugin>-->
         </plugins>
     </build>
 </project>
