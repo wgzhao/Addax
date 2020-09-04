@@ -37,15 +37,9 @@
             <version>${guava.version}</version>
         </dependency>
 
-<!--        <dependency>-->
-<!--            <groupId>commons-codec</groupId>-->
-<!--            <artifactId>commons-codec</artifactId>-->
-<!--            <version>${commons-codec.version}</version>-->
-<!--        </dependency>-->
-
         <dependency>
-            <groupId>org.apache.hadoop</groupId>
-            <artifactId>hadoop-hdfs</artifactId>
+            <groupId>io.prestosql.hadoop</groupId>
+            <artifactId>hadoop-apache</artifactId>
             <version>${hadoop.version}</version>
         </dependency>
 
@@ -68,7 +62,5 @@
         </dependency>
 
     </dependencies>
-
-
 
 </project>
