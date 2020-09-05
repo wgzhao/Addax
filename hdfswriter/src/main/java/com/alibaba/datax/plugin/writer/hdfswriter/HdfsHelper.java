@@ -305,22 +305,6 @@ public  class HdfsHelper {
         }
     }
 
-
-    //textfile格式文件
-    public FSDataOutputStream getOutputStream(String path) {
-        Path storePath = new Path(path);
-        FSDataOutputStream fSDataOutputStream;
-        try {
-            fSDataOutputStream = fileSystem.create(storePath);
-        } catch (IOException e) {
-            String message = String.format("Create an FSDataOutputStream at the indicated Path[%s] failed: [%s]",
-                    "message:path =", path);
-            LOG.error(message);
-            throw DataXException.asDataXException(HdfsWriterErrorCode.Write_FILE_IO_ERROR, e);
-        }
-        return fSDataOutputStream;
-    }
-
     /**
      * 写textfile类型文件
      *
@@ -415,7 +399,7 @@ public  class HdfsHelper {
      * 写Parquetfile类型文件
      *
      */
-    public void parFileStartWrite(RecordReceiver lineReceiver, Configuration config, String fileName,
+    public void parquetFileStartWrite(RecordReceiver lineReceiver, Configuration config, String fileName,
                                   TaskPluginCollector taskPluginCollector) {
 
         List<Configuration> columns = config.getListConfiguration(Key.COLUMN);
