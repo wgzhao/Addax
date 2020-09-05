@@ -385,9 +385,9 @@ public class HdfsWriter extends Writer {
                 //写ORC FILE
                 hdfsHelper.orcFileStartWrite(lineReceiver, this.writerSliceConfig, this.fileName,
                         this.getTaskPluginCollector());
-            } else if (fileType.equalsIgnoreCase("PAR")) {
+            } else if (fileType.equalsIgnoreCase("PARQUET")) {
                 //写Parquet FILE
-                hdfsHelper.parFileStartWrite(lineReceiver, this.writerSliceConfig, this.fileName,
+                hdfsHelper.parquetFileStartWrite(lineReceiver, this.writerSliceConfig, this.fileName,
                         this.getTaskPluginCollector());
             }
 
