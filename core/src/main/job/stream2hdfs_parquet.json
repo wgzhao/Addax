@@ -63,7 +63,7 @@
                         ],
                         "defaultFS": "hdfs://localhost:8020",
                         "path": "/tmp/out",
-                        "fileType": "par",
+                        "fileType": "parquet",
                         "fieldDelimiter": "\u0001",
                         "compress": "SNAPPY",
                         "fileName": "test",
