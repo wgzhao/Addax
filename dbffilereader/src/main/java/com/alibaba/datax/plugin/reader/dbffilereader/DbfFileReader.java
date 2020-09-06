@@ -9,7 +9,6 @@ import com.alibaba.datax.plugin.reader.dbffilereader.structure.DbfField;
 import com.alibaba.datax.plugin.reader.dbffilereader.structure.DbfHeader;
 import com.alibaba.datax.plugin.unstructuredstorage.reader.ColumnEntry;
 import com.alibaba.datax.plugin.unstructuredstorage.reader.UnstructuredStorageReaderUtil;
-import com.google.common.collect.Sets;
 
 import org.apache.commons.io.Charsets;
 import org.apache.commons.io.FileUtils;
@@ -51,12 +50,12 @@ public class DbfFileReader extends Reader {
 		@Override
 		public void init() {
 			this.originConfig = this.getPluginJobConf();
-			this.pattern = new HashMap<String, Pattern>();
-			this.isRegexPath = new HashMap<String, Boolean>();
+			this.pattern = new HashMap<>();
+			this.isRegexPath = new HashMap<>();
 			this.validateParameter();
 			//UnstructuredStorageReaderUtil.validateColumn(this.originConfig);
-			UnstructuredStorageReaderUtil.validateEncoding(this.originConfig);
-			UnstructuredStorageReaderUtil.validateCompress(this.originConfig);
+//			UnstructuredStorageReaderUtil.validateEncoding(this.originConfig);
+//			UnstructuredStorageReaderUtil.validateCompress(this.originConfig);
 		}
 
 		private void validateParameter() {
@@ -69,7 +68,7 @@ public class DbfFileReader extends Reader {
 						"您需要指定待读取的源目录或文件");
 			}
 			if (!pathInString.startsWith("[") && !pathInString.endsWith("]")) {
-				path = new ArrayList<String>();
+				path = new ArrayList<>();
 				path.add(pathInString);
 			} else {
 				path = this.originConfig.getList(Key.PATH, String.class);
@@ -127,52 +126,50 @@ public class DbfFileReader extends Reader {
 				}
 
 
-				if (null != columns && columns.size() != 0) {
-					for (Configuration eachColumnConf : columns) {
-						eachColumnConf.getNecessaryValue(com.alibaba.datax.plugin.unstructuredstorage.reader.Key.TYPE, DbfFileReaderErrorCode.REQUIRED_VALUE);
-						Integer columnIndex = eachColumnConf.getInt(com.alibaba.datax.plugin.unstructuredstorage.reader.Key.INDEX);
-						String columnValue = eachColumnConf.getString(com.alibaba.datax.plugin.unstructuredstorage.reader.Key.VALUE);
+				for (Configuration eachColumnConf : columns) {
+					eachColumnConf.getNecessaryValue(com.alibaba.datax.plugin.unstructuredstorage.reader.Key.TYPE, DbfFileReaderErrorCode.REQUIRED_VALUE);
+					Integer columnIndex = eachColumnConf.getInt(com.alibaba.datax.plugin.unstructuredstorage.reader.Key.INDEX);
+					String columnValue = eachColumnConf.getString(com.alibaba.datax.plugin.unstructuredstorage.reader.Key.VALUE);
 
-						if (null == columnIndex && null == columnValue) {
-							throw DataXException.asDataXException(
-									DbfFileReaderErrorCode.NO_INDEX_VALUE,
-									"由于您配置了type, 则至少需要配置 index 或 value");
-						}
-
-						if (null != columnIndex && null != columnValue) {
-							throw DataXException.asDataXException(
-									DbfFileReaderErrorCode.MIXED_INDEX_VALUE,
-									"您混合配置了index, value, 每一列同时仅能选择其中一种");
-						}
-
+					if (null == columnIndex && null == columnValue) {
+						throw DataXException.asDataXException(
+								DbfFileReaderErrorCode.NO_INDEX_VALUE,
+								"由于您配置了type, 则至少需要配置 index 或 value");
 					}
+
+					if (null != columnIndex && null != columnValue) {
+						throw DataXException.asDataXException(
+								DbfFileReaderErrorCode.MIXED_INDEX_VALUE,
+								"您混合配置了index, value, 每一列同时仅能选择其中一种");
+					}
+
 				}
 			}
 
 
 			// only support compress types
-			String compress = this.originConfig
-					.getString(com.alibaba.datax.plugin.unstructuredstorage.reader.Key.COMPRESS);
-			if (StringUtils.isBlank(compress)) {
-				this.originConfig
-						.set(com.alibaba.datax.plugin.unstructuredstorage.reader.Key.COMPRESS,
-								null);
-			} else {
-				Set<String> supportedCompress = Sets
-						.newHashSet("gzip", "bzip2", "zip");
-				compress = compress.toLowerCase().trim();
-				if (!supportedCompress.contains(compress)) {
-					throw DataXException
-							.asDataXException(
-									DbfFileReaderErrorCode.ILLEGAL_VALUE,
-									String.format(
-											"仅支持 gzip, bzip2, zip 文件压缩格式 , 不支持您配置的文件压缩格式: [%s]",
-											compress));
-				}
-				this.originConfig
-						.set(com.alibaba.datax.plugin.unstructuredstorage.reader.Key.COMPRESS,
-								compress);
-			}
+//			String compress = this.originConfig
+//					.getString(com.alibaba.datax.plugin.unstructuredstorage.reader.Key.COMPRESS);
+//			if (StringUtils.isBlank(compress)) {
+//				this.originConfig
+//						.set(com.alibaba.datax.plugin.unstructuredstorage.reader.Key.COMPRESS,
+//								null);
+//			} else {
+//				Set<String> supportedCompress = Sets
+//						.newHashSet("gzip", "bzip2", "zip");
+//				compress = compress.toLowerCase().trim();
+//				if (!supportedCompress.contains(compress)) {
+//					throw DataXException
+//							.asDataXException(
+//									DbfFileReaderErrorCode.ILLEGAL_VALUE,
+//									String.format(
+//											"仅支持 gzip, bzip2, zip 文件压缩格式 , 不支持您配置的文件压缩格式: [%s]",
+//											compress));
+//				}
+//				this.originConfig
+//						.set(com.alibaba.datax.plugin.unstructuredstorage.reader.Key.COMPRESS,
+//								compress);
+//			}
 
 
 		}
@@ -205,7 +202,7 @@ public class DbfFileReader extends Reader {
 		@Override
 		public List<Configuration> split(int adviceNumber) {
 			LOG.debug("split() begin...");
-			List<Configuration> readerSplitConfigs = new ArrayList<Configuration>();
+			List<Configuration> readerSplitConfigs = new ArrayList<>();
 
 			// warn:每个slice拖且仅拖一个文件,
 			// int splitNumber = adviceNumber;
@@ -231,17 +228,15 @@ public class DbfFileReader extends Reader {
 		// validate the path, path must be a absolute path
 		private List<String> buildSourceTargets() {
 			// for eath path
-			Set<String> toBeReadFiles = new HashSet<String>();
+			Set<String> toBeReadFiles = new HashSet<>();
 			for (String eachPath : this.path) {
 				int endMark;
 				for (endMark = 0; endMark < eachPath.length(); endMark++) {
-					if ('*' != eachPath.charAt(endMark)
-							&& '?' != eachPath.charAt(endMark)) {
-						continue;
-					} else {
-						this.isRegexPath.put(eachPath, true);
-						break;
-					}
+					if ('*' == eachPath.charAt(endMark)
+							|| '?' == eachPath.charAt(endMark)) {
+								this.isRegexPath.put(eachPath, true);
+								break;
+							}
 				}
 
 				String parentDirectory;
@@ -294,7 +289,6 @@ public class DbfFileReader extends Reader {
 					LOG.info(String.format(
 							"add file [%s] as a candidate to be read.",
 							parentDirectory));
-
 				}
 			} else {
 				// 是目录
@@ -341,11 +335,11 @@ public class DbfFileReader extends Reader {
 
 		private <T> List<List<T>> splitSourceFiles(final List<T> sourceList,
 				int adviceNumber) {
-			List<List<T>> splitedList = new ArrayList<List<T>>();
+			List<List<T>> splitedList = new ArrayList<>();
 			int averageLength = sourceList.size() / adviceNumber;
 			averageLength = averageLength == 0 ? 1 : averageLength;
 
-			for (int begin = 0, end = 0; begin < sourceList.size(); begin = end) {
+			for (int begin = 0, end; begin < sourceList.size(); begin = end) {
 				end = begin + averageLength;
 				if (end > sourceList.size()) {
 					end = sourceList.size();
@@ -358,7 +352,7 @@ public class DbfFileReader extends Reader {
 	}
 
 	public static class Task extends Reader.Task {
-		private static Logger LOG = LoggerFactory.getLogger(Task.class);
+		private static final Logger LOG = LoggerFactory.getLogger(Task.class);
 
 		private Configuration readerSliceConfig;
 		private List<String> sourceFiles;
