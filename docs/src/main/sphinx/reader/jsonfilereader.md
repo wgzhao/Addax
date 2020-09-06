@@ -17,7 +17,7 @@ JsonFileReader实现了从本地文件读取数据并转为DataX协议的功能�
 
 1. 单个File支持多线程并发读取，这里涉及到单个File内部切分算法。
 2. 单个File在压缩情况下，从技术上无法支持多线程并发读取。
-3. 暂不支持读取压缩文件和日期类型的自定义 日期
+3. 暂不支持读取压缩文件和日期类型的自定义日期
 
 ## 3 功能说明
 
@@ -25,55 +25,78 @@ JsonFileReader实现了从本地文件读取数据并转为DataX协议的功能�
 
 ```json
 {
-    "setting": {},
-    "job": {
-        "setting": {
-            "speed": {
-                "channel": 2
-            }
-        },
-        "content": [
-            {
-                "reader": {
-                "name": "jsonfilereader",
-                "parameter": {
-                    "path": ["/home/unicom/"],
-                    "column": [
-                      {
-                        "index": "$.a",
-                        "type": "long"
-                      },
-                      {
-                        "index": "$.b",
-                        "type": "boolean"
-                      },
-                      {
-                        "index": "$.c.d",
-                        "type": "double"
-                      },
-                      {
-                        "index": "$.e[0]",
-                        "type": "string"
-                      },
-                      {
-                        "index": "$.f",
-                        "type": "date"
-                      }
-                  ]
-                  }
-                },
-                "writer": {
-                           "name": "streamwriter",
-                           "parameter": {
-                            "encoding": "",
-                            "print": true
+     "job": {
+         "setting": {
+             "speed": {
+                 "channel": 1,
+                 "bytes": -1
+             }
+         },
+         "content": [
+             {
+                 "writer": {
+                     "name": "streamwriter",
+                     "parameter": {
+                         "print": "true"
+                     }
+                 },
+                 "reader": {
+                     "name": "jsonfilereader",
+                     "parameter": {
+                         "path": ["/tmp/test*.json"],
+                         "column": [
+                             {
+                                 "index": "$.id",
+                                 "type": "long"
+                             },
+                             {
+                                 "index": "$.name",
+                                 "type": "string"
+                             },
+                             {
+                                 "index": "$.age",
+                                 "type": "long"
+                             },
+                             {
+                                 "index": "$.score.math",
+                                 "type": "double"
+                             },
+                             {
+                                 "index": "$.score.english",
+                                 "type": "double"
+                             },
+                            {
+                                "index": "$.pubdate",
+                                "type": "date"
+                            },
+                            {
+                            "type": "string",
+                            "value": "constant string"
                             }
-                }
-        ]
-    }
-}
+                         ]
+                     }
+                 }
+             }
+         ]
+     }
+ }
 ```
 
+其中 `/tmp/test*.json` 为同一个 json 文件的多个复制，内容如下：
+
+```json
+{
+    "name": "zhangshan",
+    "id": 19890604,
+    "age": 12,
+    "score": {
+        "math": 92.5,
+        "english": 97.5,
+        "chinese": 95
+    },
+   "pubdate": "2020-09-05"
+}
+```
 ### 3.2 参数说明
 
 
@@ -97,38 +120,11 @@ JsonFileReader实现了从本地文件读取数据并转为DataX协议的功能�
 
 #### column
 
-读取字段列表，type指定源数据的类型，index指定当前列来自于json的指定，语法为Jayway JsonPath的语法，value指定当前类型为常量，不从源头文件读取数据，而是根据value值自动生成对应的列。
-用户必须指定Column字段信息，配置如下：
+读取字段列表，type指定源数据的类型，index指定当前列来自于json的指定，语法为 [Jayway JsonPath](https://github.com/json-path/JsonPath) 的语法，value指定当前类型为常量，不从源头文件读取数据，而是根据value值自动生成对应的列。
+用户必须指定Column字段信息
 
-```json
-{
-  "index": "$.a",
-  "type": "long"
-},
-{
-"index": "$.c.d",
-"type": "double"
-},
-{
-"index": "$.e[0]",
-"type": "string"
-}
-```
+对于用户指定Column信息，type必须填写，index/value必须选择其一
 
-对于用户指定Column信息，type必须填写，index/value必须选择其一。上面表示从下面的json:
-
-```json
-{
-  "a": 1,
-  "b": 2,
-  "c": {
-    "d": 4
-  },
-  "e": [5]
-}
-```
-
-抽取的数据1, 4, 5形成类似二维表的形式，如果数据中对应的Key值没有的话，会自动补充上null值。
 
 ### 3.3 类型转换
 
@@ -136,7 +132,6 @@ JsonFileReader实现了从本地文件读取数据并转为DataX协议的功能�
 
 | DataX 内部类型| 本地文件 数据类型    |
 | -------- | -----  |
-|
 | Long     |Long |
 | Double   |Double|
 | String   |String|
