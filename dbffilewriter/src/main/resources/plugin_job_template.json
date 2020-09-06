@@ -5,6 +5,7 @@
         "fileName": "",
         "writeMode": "",
         "fieldDelimiter":"",
-        "dateFormat": ""
+        "dateFormat": "",
+        "encoding": ""
     }
 }

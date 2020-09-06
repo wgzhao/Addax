@@ -20,9 +20,9 @@ public enum DbfDataType {
     /* package */ static DbfDataType valueOf(byte value) {
         final DbfDataType[] values = values();
         final int count = values.length;
-        for (int i = 0; i < count; i++) {
-            if (values[i].byteValue == value) {
-                return values[i];
+        for (DbfDataType dbfDataType : values) {
+            if (dbfDataType.byteValue == value) {
+                return dbfDataType;
             }
         }
         return null;
