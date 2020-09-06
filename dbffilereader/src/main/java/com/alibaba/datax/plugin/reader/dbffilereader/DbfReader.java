@@ -7,7 +7,15 @@ import com.alibaba.datax.plugin.reader.dbffilereader.structure.DbfHeader;
 import com.alibaba.datax.plugin.reader.dbffilereader.structure.DbfRow;
 import com.alibaba.datax.plugin.reader.dbffilereader.utils.DbfUtils;
 
-import java.io.*;
+import java.io.BufferedInputStream;
+import java.io.Closeable;
+import java.io.DataInput;
+import java.io.DataInputStream;
+import java.io.EOFException;
+import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.RandomAccessFile;
 import java.nio.charset.Charset;
 import java.util.Date;
 import java.util.GregorianCalendar;

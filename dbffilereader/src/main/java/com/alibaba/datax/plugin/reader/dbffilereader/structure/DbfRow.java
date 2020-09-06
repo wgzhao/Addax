@@ -43,8 +43,7 @@ public class DbfRow {
      * @throws DbfException if there's no field with name fieldName
      */
     public Date getDate(String fieldName) throws DbfException {
-        Date value = (Date) get(fieldName);
-        return value == null ? null : value;
+        return  (Date) get(fieldName);
     }
 
     /**
