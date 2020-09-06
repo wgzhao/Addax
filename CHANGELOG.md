@@ -2,6 +2,23 @@
 
 ## 3.1.1 
 
- * transformer 增加字段的基本运算
- * hadoop, hive 切换到 `io.prestosql` 包，减少依赖jar的数量和大小
- * `hdfswriter` 支持的文件格式 `parquest` 配置值由 `par` 更改为 `parquet`
+### General
+
+* Transformer add column's basic operation 
+* Use prestosql's hadoop and hive jars instead of apache's
+ 
+### dbffilereader
+
+* remove supported for reading compressed dbf file
+    
+### jsonreader
+ 
+* fixed parse non-string type value
+  
+### dbffilewriter
+ 
+* fixed boolean type writing error
+   
+### hdfswriter
+
+*  Use keyword `parquest` indicates support parquet format,  old keyword `par` is not used
