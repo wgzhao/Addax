@@ -10,6 +10,7 @@
 
     <artifactId>oraclereader</artifactId>
     <name>oraclereader</name>
+    <description>read data from Oracle Database</description>
     <packaging>jar</packaging>
 
     <dependencies>

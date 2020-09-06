@@ -10,8 +10,6 @@ import com.alibaba.datax.plugin.rdbms.reader.util.HintUtil;
 import com.alibaba.datax.plugin.rdbms.util.DBUtilErrorCode;
 import com.alibaba.datax.plugin.rdbms.util.DataBaseType;
 import org.apache.commons.lang3.StringUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.util.List;
 
@@ -20,9 +18,6 @@ public class OracleReader extends Reader {
 	private static final DataBaseType DATABASE_TYPE = DataBaseType.Oracle;
 
 	public static class Job extends Reader.Job {
-		private static final Logger LOG = LoggerFactory
-				.getLogger(OracleReader.Job.class);
-
 		private Configuration originalConfig = null;
 		private CommonRdbmsReader.Job commonRdbmsReaderJob;
 
