@@ -9,7 +9,6 @@ import com.alibaba.datax.plugin.unstructuredstorage.writer.UnstructuredStorageWr
 
 import com.linuxense.javadbf.DBFDataType;
 import com.linuxense.javadbf.DBFField;
-import com.linuxense.javadbf.DBFUtils;
 import com.linuxense.javadbf.DBFWriter;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
@@ -19,13 +18,16 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.File;
-import java.io.FileOutputStream;
 import java.io.FilenameFilter;
 import java.io.IOException;
-import java.io.OutputStream;
-import java.math.BigDecimal;
 import java.nio.charset.Charset;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Date;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+import java.util.UUID;
 
 /**
  * Created by haiwei.luo on 14-9-17.
@@ -161,7 +163,7 @@ public class DbfFileWriter extends Writer {
                         FilenameFilter filter = new PrefixFileFilter(fileName);
                         File[] filesWithFileNamePrefix = dir.listFiles(filter);
                         if (filesWithFileNamePrefix.length > 0) {
-                            List<String> allFiles = new ArrayList<String>();
+                            List<String> allFiles = new ArrayList<>();
                             for (File eachFile : filesWithFileNamePrefix) {
                                 allFiles.add(eachFile.getName());
                             }
@@ -217,12 +219,12 @@ public class DbfFileWriter extends Writer {
             String filePrefix = this.writerSliceConfig
                     .getString(com.alibaba.datax.plugin.unstructuredstorage.writer.Key.FILE_NAME);
 
-            Set<String> allFiles = new HashSet<String>();
+            Set<String> allFiles;
             String path = null;
             try {
                 path = this.writerSliceConfig.getString(Key.PATH);
                 File dir = new File(path);
-                allFiles.addAll(Arrays.asList(dir.list()));
+                allFiles = new HashSet<>(Arrays.asList(dir.list()));
             } catch (SecurityException se) {
                 throw DataXException.asDataXException(
                         DbfFileWriterErrorCode.SECURITY_NOT_ENOUGH,
@@ -236,7 +238,7 @@ public class DbfFileWriter extends Writer {
                 Configuration splitedTaskConfig = this.writerSliceConfig
                         .clone();
 
-                String fullFileName = null;
+                String fullFileName;
                 if (mandatoryNumber>1){
                     fileSuffix = UUID.randomUUID().toString().replace('-', '_');
                     fullFileName = String.format("%s__%s", filePrefix, fileSuffix);
@@ -295,12 +297,10 @@ public class DbfFileWriter extends Writer {
             LOG.info(String.format("write to file : [%s]", fileFullPath));
             List<Configuration> columns = this.writerSliceConfig.getListConfiguration("column");
             DBFWriter writer;
-            FileOutputStream fos = null;
             try {
                 File f = new File(fileFullPath);
-//                f.createNewFile();
-                fos = new FileOutputStream(f);
-                writer = new DBFWriter(new File(fileFullPath), Charset.forName("GBK"));
+                String charset = this.writerSliceConfig.getString(com.alibaba.datax.plugin.unstructuredstorage.writer.Key.ENCODING, "GBK");
+                writer = new DBFWriter(f, Charset.forName(charset));
 
                 DBFField[] fields = new DBFField[columns.size()];
 
@@ -352,6 +352,9 @@ public class DbfFileWriter extends Writer {
                                 case "date":
                                     rowData[i] = new Date(Long.parseLong(colData));
                                     break;
+                                case "logical":
+                                    rowData[i] = Boolean.parseBoolean(colData);
+                                    break;
                             }
                         }
 
@@ -364,14 +367,7 @@ public class DbfFileWriter extends Writer {
                 throw DataXException.asDataXException(
                         DbfFileWriterErrorCode.SECURITY_NOT_ENOUGH,
                         String.format("您没有权限创建文件  : [%s]", this.fileName));
-            } catch (IOException ioe) {
-                throw DataXException.asDataXException(
-                        DbfFileWriterErrorCode.Write_FILE_IO_ERROR,
-                        String.format("无法创建待写文件 : [%s]", this.fileName), ioe);
             }
-//            finally {
-//                writer.close();
-//            }
             LOG.info("end do write");
         }
 

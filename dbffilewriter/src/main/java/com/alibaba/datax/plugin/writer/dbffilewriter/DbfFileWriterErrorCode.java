@@ -17,7 +17,7 @@ public enum DbfFileWriterErrorCode implements ErrorCode {
     private final String code;
     private final String description;
 
-    private DbfFileWriterErrorCode(String code, String description) {
+    DbfFileWriterErrorCode(String code, String description) {
         this.code = code;
         this.description = description;
     }
