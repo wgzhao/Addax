@@ -19,7 +19,7 @@ public enum JsonReaderErrorCode implements ErrorCode{
     private final String code;
     private final String description;
 
-    private JsonReaderErrorCode(String code, String description) {
+    JsonReaderErrorCode(String code, String description) {
         this.code = code;
         this.description = description;
     }

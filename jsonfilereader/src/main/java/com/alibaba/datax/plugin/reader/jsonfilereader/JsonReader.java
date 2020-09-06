@@ -1,13 +1,17 @@
 package com.alibaba.datax.plugin.reader.jsonfilereader;
 
-import com.alibaba.datax.common.element.Record;
+import com.alibaba.datax.common.element.BoolColumn;
+import com.alibaba.datax.common.element.Column;
+import com.alibaba.datax.common.element.DateColumn;
+import com.alibaba.datax.common.element.DoubleColumn;
+import com.alibaba.datax.common.element.LongColumn;
 import com.alibaba.datax.common.element.StringColumn;
 import com.alibaba.datax.common.exception.DataXException;
 import com.alibaba.datax.common.plugin.RecordSender;
 import com.alibaba.datax.common.spi.Reader;
 import com.alibaba.datax.common.util.Configuration;
-import com.alibaba.datax.common.element.*;
 
+import com.jayway.jsonpath.DocumentContext;
 import com.jayway.jsonpath.JsonPath;
 import org.apache.commons.io.Charsets;
 import org.apache.commons.io.IOUtils;
@@ -16,11 +20,24 @@ import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.*;
+
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.nio.charset.UnsupportedCharsetException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
-import java.util.*;
+
+
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 import java.util.regex.Pattern;
 
 /**
@@ -43,8 +60,8 @@ public class JsonReader extends Reader {
         @Override
         public void init() {
             this.originConfig = this.getPluginJobConf();
-            this.pattern = new HashMap<String, Pattern>();
-            this.isRegexPath = new HashMap<String, Boolean>();
+            this.pattern = new HashMap<>();
+            this.isRegexPath = new HashMap<>();
             this.validateParameter();
         }
 
@@ -58,7 +75,7 @@ public class JsonReader extends Reader {
                         "您需要指定待读取的源目录或文件");
             }
             if (!pathInString.startsWith("[") && !pathInString.endsWith("]")) {
-                path = new ArrayList<String>();
+                path = new ArrayList<>();
                 path.add(pathInString);
             } else {
                 path = this.originConfig.getList(Key.PATH, String.class);
@@ -106,7 +123,6 @@ public class JsonReader extends Reader {
                             .getNecessaryValue(
                                     Key.TYPE,
                                     JsonReaderErrorCode.REQUIRED_VALUE);
-                    //读取正则表达式，使用jsonpath支持的 后续需要支持常量value
                     String columnIndex = eachColumnConf
                             .getString(Key.INDEX);
                     String columnValue = eachColumnConf
@@ -123,7 +139,6 @@ public class JsonReader extends Reader {
                                 JsonReaderErrorCode.MIXED_INDEX_VALUE,
                                 "您混合配置了index, value, 每一列同时仅能选择其中一种");
                     }
-                    //TODO 增加jsonpath语法的识别
                 }
             }
 
@@ -181,7 +196,7 @@ public class JsonReader extends Reader {
         @Override
         public List<Configuration> split(int adviceNumber) {
             LOG.debug("split() begin...");
-            List<Configuration> readerSplitConfigs = new ArrayList<Configuration>();
+            List<Configuration> readerSplitConfigs = new ArrayList<>();
 
             // warn:每个slice拖且仅拖一个文件,
             // int splitNumber = adviceNumber;
@@ -207,17 +222,15 @@ public class JsonReader extends Reader {
         // validate the path, path must be a absolute path
         private List<String> buildSourceTargets() {
             // for eath path
-            Set<String> toBeReadFiles = new HashSet<String>();
+            Set<String> toBeReadFiles = new HashSet<>();
             for (String eachPath : this.path) {
                 int endMark;
                 for (endMark = 0; endMark < eachPath.length(); endMark++) {
-                    if ('*' != eachPath.charAt(endMark)
-                            && '?' != eachPath.charAt(endMark)) {
-                        continue;
-                    } else {
-                        this.isRegexPath.put(eachPath, true);
-                        break;
-                    }
+                    if ('*' == eachPath.charAt(endMark)
+                            || '?' == eachPath.charAt(endMark)) {
+                                this.isRegexPath.put(eachPath, true);
+                                break;
+                            }
                 }
 
                 String parentDirectory;
@@ -317,11 +330,11 @@ public class JsonReader extends Reader {
 
         private <T> List<List<T>> splitSourceFiles(final List<T> sourceList,
                                                    int adviceNumber) {
-            List<List<T>> splitedList = new ArrayList<List<T>>();
+            List<List<T>> splitedList = new ArrayList<>();
             int averageLength = sourceList.size() / adviceNumber;
             averageLength = averageLength == 0 ? 1 : averageLength;
 
-            for (int begin = 0, end = 0; begin < sourceList.size(); begin = end) {
+            for (int begin = 0, end; begin < sourceList.size(); begin = end) {
                 end = begin + averageLength;
                 if (end > sourceList.size()) {
                     end = sourceList.size();
@@ -334,16 +347,15 @@ public class JsonReader extends Reader {
     }
 
     public static class Task extends Reader.Task {
-        private static Logger LOG = LoggerFactory.getLogger(Task.class);
+        private static final Logger LOG = LoggerFactory.getLogger(Task.class);
 
-        private Configuration readerSliceConfig;
         private List<String> sourceFiles;
         private List<Configuration> columns;
 
         @Override
         public void init() {
-            this.readerSliceConfig = this.getPluginJobConf();
-            this.sourceFiles = this.readerSliceConfig.getList(
+            Configuration readerSliceConfig = this.getPluginJobConf();
+            this.sourceFiles = readerSliceConfig.getList(
                     Constant.SOURCE_FILES, String.class);
             this.columns = readerSliceConfig
                     .getListConfiguration(Key.COLUMN);
@@ -351,8 +363,8 @@ public class JsonReader extends Reader {
 
         //解析json，返回已经经过处理的行
         private List<Column> parseFromJson(String json){
-            List<Column> splitLine = new ArrayList<Column>();
-            Object document = com.jayway.jsonpath.Configuration.defaultConfiguration().jsonProvider().parse(json);
+            List<Column> splitLine = new ArrayList<>();
+            DocumentContext document =  JsonPath.parse(json);
             String tempValue;
             for (Configuration eachColumnConf : columns) {
                 String columnIndex = eachColumnConf
@@ -368,7 +380,7 @@ public class JsonReader extends Reader {
                     tempValue = columnValue;
                 }else{
                     try{
-                        tempValue = JsonPath.read(document, columnIndex);
+                        tempValue = document.read(columnIndex, columnType.getClass());
                     }catch (Exception ignore){
                         tempValue = null;
                     }
@@ -383,71 +395,76 @@ public class JsonReader extends Reader {
         private Column getColumn(String type, String columnValue, String columnFormat) {
             Column columnGenerated;
             //类型转换 后续可以考虑使用switch case
-            if (type.equals(Key.STRING)) {
-                columnGenerated = new StringColumn(columnValue);
-            } else if (type.equals(Key.DOUBLE)) {
-                try {
-                    columnGenerated = new DoubleColumn(columnValue);
-                } catch (Exception e) {
-                    throw new IllegalArgumentException(String.format(
-                            "类型转换错误, 无法将[%s] 转换为[%s]", columnValue,
-                            "DOUBLE"));
-                }
-            } else if (type.equals(Key.BOOLEAN)) {
-                try {
-                    columnGenerated = new BoolColumn(columnValue);
-                } catch (Exception e) {
-                    throw new IllegalArgumentException(String.format(
-                            "类型转换错误, 无法将[%s] 转换为[%s]", columnValue,
-                            "BOOLEAN"));
-                }
-            } else if (type.equals(Key.LONG)) {
-                try {
-                        columnGenerated = new LongColumn(columnValue);
-                } catch (Exception e) {
-                    System.out.println(e.getMessage());
-                    throw new IllegalArgumentException(String.format(
-                            "类型转换错误, 无法将[%s] 转换为[%s]", columnValue,
-                             "LONG"));
-                }
-            } else if (type.equals(Key.DATE)) {
-                try { //直接利用datax支持的处理日期数据
-                    if (StringUtils.isNotBlank(columnFormat)) {
-                        // 用户自己配置的格式转换, 脏数据行为出现变化
-                        DateFormat format = new SimpleDateFormat(columnFormat);
-                        columnGenerated = new DateColumn(
-                                format.parse(columnValue));
-                    } else {
-                        // 框架尝试转换
-                        columnGenerated = new DateColumn(
-                                new StringColumn(columnValue)
-                                        .asDate());
+            switch (type) {
+                case Key.STRING:
+                    columnGenerated = new StringColumn(columnValue);
+                    break;
+                case Key.DOUBLE:
+                    try {
+                        columnGenerated = new DoubleColumn(columnValue);
+                    } catch (Exception e) {
+                        throw new IllegalArgumentException(String.format(
+                                "类型转换错误, 无法将[%s] 转换为[%s]", columnValue,
+                                "DOUBLE"));
                     }
-                } catch (Exception e) {
-                    throw new IllegalArgumentException(String.format(
-                            "类型转换错误, 无法将[%s] 转换为[%s]", columnValue,
-                            "DATE"));
-                }
-            } else {
-                String errorMessage = String.format(
-                        "您配置的列类型暂不支持 : [%s]", type);
-                LOG.error(errorMessage);
-                throw DataXException
-                        .asDataXException(
-                                JsonReaderErrorCode.NOT_SUPPORT_TYPE,
-                                errorMessage);
+                    break;
+                case Key.BOOLEAN:
+                    try {
+                        columnGenerated = new BoolColumn(columnValue);
+                    } catch (Exception e) {
+                        throw new IllegalArgumentException(String.format(
+                                "类型转换错误, 无法将[%s] 转换为[%s]", columnValue,
+                                "BOOLEAN"));
+                    }
+                    break;
+                case Key.LONG:
+                    try {
+                        columnGenerated = new LongColumn(columnValue);
+                    } catch (Exception e) {
+                        System.out.println(e.getMessage());
+                        throw new IllegalArgumentException(String.format(
+                                "类型转换错误, 无法将[%s] 转换为[%s]", columnValue,
+                                "LONG"));
+                    }
+                    break;
+                case Key.DATE:
+                    try { //直接利用datax支持的处理日期数据
+                        if (StringUtils.isNotBlank(columnFormat)) {
+                            // 用户自己配置的格式转换, 脏数据行为出现变化
+                            DateFormat format = new SimpleDateFormat(columnFormat);
+                            columnGenerated = new DateColumn(
+                                    format.parse(columnValue));
+                        } else {
+                            // 框架尝试转换
+                            columnGenerated = new DateColumn(
+                                    new StringColumn(columnValue)
+                                            .asDate());
+                        }
+                    } catch (Exception e) {
+                        throw new IllegalArgumentException(String.format(
+                                "类型转换错误, 无法将[%s] 转换为[%s]", columnValue,
+                                "DATE"));
+                    }
+                    break;
+                default:
+                    String errorMessage = String.format(
+                            "您配置的列类型暂不支持 : [%s]", type);
+                    LOG.error(errorMessage);
+                    throw DataXException
+                            .asDataXException(
+                                    JsonReaderErrorCode.NOT_SUPPORT_TYPE,
+                                    errorMessage);
             }
             return columnGenerated;
         }
 
         //传输一行数据
-        private Record transportOneRecord(RecordSender recordSender, List<Column> sourceLine) {
+        private void transportOneRecord(RecordSender recordSender, List<Column> sourceLine) {
             com.alibaba.datax.common.element.Record record = recordSender.createRecord();
             for(Column eachValue:sourceLine){
                 record.addColumn(eachValue);
             }
             recordSender.sendToWriter(record);
-            return record;
         }
 
 
@@ -471,15 +488,10 @@ public class JsonReader extends Reader {
             LOG.debug("start read source files...");
             for (String fileName : this.sourceFiles) {
                 LOG.info(String.format("reading file : [%s]", fileName));
-                File file = new File(fileName);
-                BufferedReader reader = null;
                 try {
-                    reader = new BufferedReader(new FileReader(file));
-                    String json;
-                    while ((json = reader.readLine()) != null) {
-                        List<Column> sourceLine = parseFromJson(json);
-                        transportOneRecord(recordSender, sourceLine);
-                    }
+                    String json = new String(Files.readAllBytes(Paths.get(fileName)));
+                    List<Column> sourceLine = parseFromJson(json);
+                    transportOneRecord(recordSender, sourceLine);
                     recordSender.flush();
                 } catch (FileNotFoundException e) {
                     // warn: sock 文件无法read,能影响所有文件的传输,需要用户自己保证
