@@ -15,7 +15,6 @@ import org.apache.avro.generic.GenericRecord;
 import org.apache.avro.generic.GenericRecordBuilder;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.tuple.MutablePair;
-import org.apache.hadoop.fs.FSDataOutputStream;
 import org.apache.hadoop.fs.FileStatus;
 import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
@@ -189,7 +188,7 @@ public  class HdfsHelper {
         Path path = new Path(filePath);
         boolean isDir;
         try {
-            isDir = fileSystem.isDirectory(path);
+            isDir = fileSystem.getFileStatus(path).isDirectory();
         } catch (IOException e) {
             String message = String.format("判断路径[%s]是否是目录时发生网络IO异常,请检查您的网络是否正常！", filePath);
             LOG.error(message);
@@ -482,7 +481,9 @@ public  class HdfsHelper {
         List<String> columnNames = getColumnNames(columns);
         List<ObjectInspector> columnTypeInspectors = getColumnTypeInspectors(columns);
         StructObjectInspector inspector = ObjectInspectorFactory.getStandardStructObjectInspector(columnNames, columnTypeInspectors);
-
+        for (ObjectInspector col: columnTypeInspectors) {
+            System.out.print(col.getTypeName() + ",");
+        }
         OrcSerde orcSerde = new OrcSerde();
 //        HiveOutputFormat outFormat = new OrcOutputFormat();
         FileOutputFormat outFormat = new OrcOutputFormat();
