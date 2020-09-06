@@ -31,7 +31,8 @@ HdfsWriter提供向HDFS文件系统指定路径中写入 `TEXTFile` ， `ORCFile
     "job": {
         "setting": {
             "speed": {
-                "channel": 2
+                "channel": 2,
+                "bytes": -1
             }
         },
         "content": [
@@ -81,7 +82,7 @@ HdfsWriter提供向HDFS文件系统指定路径中写入 `TEXTFile` ， `ORCFile
                                 },
                                 {
                                     "name": "col3",
-                                    "type": "timestamp"
+                                    "type": "string"
                                 },
                                 {
                                     "name": "col4",
@@ -138,9 +139,10 @@ Hadoop hdfs文件系统namenode节点地址。格式：`hdfs://ip:port` ；例�
 
 描述：文件的类型，目前只支持用户配置为
 
-- text 表示textfile文件格式
-- orc 表示orcfile文件格式
-- rc 表示rcfile文件格式
+- text 表示 Text file文件格式
+- orc 表示 OrcFile文件格式
+- parquet 表示 Parquet 文件格式
+- rc 表示 Rcfile 文件格式
 - seq 表示sequence file文件格式
 - csv 表示普通hdfs文件格式（逻辑二维表）
 

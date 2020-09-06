@@ -61,12 +61,12 @@ import java.util.Set;
 public class DFSUtil {
     private static final Logger LOG = LoggerFactory.getLogger(HdfsReader.Job.class);
 
-    private org.apache.hadoop.conf.Configuration hadoopConf = null;
+    private final org.apache.hadoop.conf.Configuration hadoopConf;
     private String specifiedFileType = null;
-    private Boolean haveKerberos = false;
+    private final Boolean haveKerberos;
     private String kerberosKeytabFilePath;
     private String kerberosPrincipal;
-
+    private final HashSet<String> sourceHDFSAllFilesList = new HashSet<>();
 
     private static final int DIRECTORY_SIZE_GUESS = 16 * 1024;
 
@@ -132,7 +132,6 @@ public class DFSUtil {
         return sourceHDFSAllFilesList;
     }
 
-    private HashSet<String> sourceHDFSAllFilesList = new HashSet<String>();
     private void addSourceFileIfNotEmpty(FileStatus f) {
         if (f.isFile()) {
             String filePath = f.getPath().toString();
@@ -143,7 +142,7 @@ public class DFSUtil {
             }
         }
     }
-    public HashSet<String> getHDFSAllFiles(String hdfsPath) {
+    public void getHDFSAllFiles(String hdfsPath) {
 
         try {
             FileSystem hdfs = FileSystem.get(hadoopConf);
@@ -161,9 +160,6 @@ public class DFSUtil {
             } else {
                 getHDFSAllFilesNORegex(hdfsPath, hdfs);
             }
-
-            return sourceHDFSAllFilesList;
-
         } catch (IOException e) {
             String message = String.format("无法读取路径[%s]下的所有文件,请确认您的配置项fs.defaultFS, path的值是否正确，" +
                     "是否有读写权限，网络是否已断开！", hdfsPath);
@@ -172,7 +168,7 @@ public class DFSUtil {
         }
     }
 
-    private HashSet<String> getHDFSAllFilesNORegex(String path, FileSystem hdfs) throws IOException {
+    private void getHDFSAllFilesNORegex(String path, FileSystem hdfs) throws IOException {
 
         // 获取要读取的文件的根目录
         Path listFiles = new Path(path);
@@ -195,7 +191,6 @@ public class DFSUtil {
                 LOG.info(message);
             }
         }
-        return sourceHDFSAllFilesList;
     }
 
     // 根据用户指定的文件类型，将指定的文件类型的路径加入sourceHDFSAllFilesList
@@ -270,7 +265,7 @@ public class DFSUtil {
         String nullFormat = readerSliceConfig.getString(com.alibaba.datax.plugin.unstructuredstorage.reader.Key.NULL_FORMAT);
 
         Path rcFilePath = new Path(sourceRcFilePath);
-        FileSystem fs = null;
+        FileSystem fs;
         RCFileRecordReader recordReader = null;
         try {
             fs = FileSystem.get(rcFilePath.toUri(), hadoopConf);
@@ -318,7 +313,7 @@ public class DFSUtil {
         StringBuilder allColumns = new StringBuilder();
         StringBuilder allColumnTypes = new StringBuilder();
         boolean isReadAllColumns = false;
-        int columnIndexMax = -1;
+        int columnIndexMax;
         // 判断是否读取所有列
         if (null == column || column.size() == 0) {
             int allColumnsCount = getAllColumnsCount(sourceOrcFilePath);
@@ -364,7 +359,7 @@ public class DFSUtil {
 
                         List<Object> recordFields;
                         while (reader.next(key, value)) {
-                            recordFields = new ArrayList<Object>();
+                            recordFields = new ArrayList<>();
 
                             for (int i = 0; i <= columnIndexMax; i++) {
                                 Object field = inspector.getStructFieldData(value, fields.get(i));
@@ -388,7 +383,7 @@ public class DFSUtil {
         }
     }
 
-    private com.alibaba.datax.common.element.Record transportOneRecord(List<ColumnEntry> columnConfigs, List<Object> recordFields
+    private void transportOneRecord(List<ColumnEntry> columnConfigs, List<Object> recordFields
             , RecordSender recordSender, TaskPluginCollector taskPluginCollector, boolean isReadAllColumns, String nullFormat) {
         com.alibaba.datax.common.element.Record record = recordSender.createRecord();
         Column columnGenerated;
@@ -504,14 +499,15 @@ public class DFSUtil {
             taskPluginCollector.collectDirtyRecord(record, e.getMessage());
         }
 
-        return record;
+        //return record;
     }
 
     private int getAllColumnsCount(String filePath) {
         Path path = new Path(filePath);
         try {
             Reader reader = OrcFile.createReader(path, OrcFile.readerOptions(hadoopConf));
-            return reader.getTypes().get(0).getSubtypesCount();
+//            return reader.getTypes().get(0).getSubtypesCount();
+            return reader.getSchema().getChildren().size();
         } catch (IOException e) {
             String message = "读取orcfile column列数失败，请联系系统管理员";
             throw DataXException.asDataXException(HdfsReaderErrorCode.READ_FILE_ERROR, message);
@@ -558,12 +554,8 @@ public class DFSUtil {
                     return false;
                 }
                 boolean isSEQ = isSequenceFile(filepath, in);// 判断是否是 Sequence File
-                if (isSEQ) {
-                    return false;
-                }
                 // 如果不是ORC,RC和SEQ,则默认为是TEXT或CSV类型
-                return true;
-
+                return !isSEQ;
             } else if (StringUtils.equalsIgnoreCase(specifiedFileType, Constant.ORC)) {
 
                 return isORCFile(file, fs, in);
@@ -639,8 +631,9 @@ public class DFSUtil {
         final byte ORIGINAL_MAGIC_VERSION_WITH_METADATA = 6;
         // All of the versions should be place in this list.
         final int ORIGINAL_VERSION = 0;  // version with SEQ
-        final int NEW_MAGIC_VERSION = 1; // version with RCF
-        final int CURRENT_VERSION = NEW_MAGIC_VERSION;
+//        final int NEW_MAGIC_VERSION = 1; // version with RCF
+//        final int CURRENT_VERSION = NEW_MAGIC_VERSION;
+        final  int CURRENT_VERSION = 1;
         byte version;
 
         byte[] magic = new byte[RC_MAGIC.length];
@@ -678,13 +671,11 @@ public class DFSUtil {
                     return false;
                 }
             }
-            boolean decompress = in.readBoolean(); // is compressed?
+//            boolean decompress = in.readBoolean(); // is compressed?
             if (version == ORIGINAL_VERSION) {
                 // is block-compressed? it should be always false.
                 boolean blkCompressed = in.readBoolean();
-                if (blkCompressed) {
-                    return false;
-                }
+                return !blkCompressed;
             }
             return true;
         } catch (IOException e) {
@@ -700,11 +691,7 @@ public class DFSUtil {
         try {
             in.seek(0);
             in.readFully(magic);
-            if (Arrays.equals(magic, SEQ_MAGIC)) {
-                return true;
-            } else {
-                return false;
-            }
+            return Arrays.equals(magic, SEQ_MAGIC);
         } catch (IOException e) {
             LOG.info(String.format("检查文件类型: [%s] 不是Sequence File.", filepath));
         }

@@ -36,7 +36,6 @@ public class HdfsReader extends Reader {
                 .getLogger(Job.class);
 
         private Configuration readerOriginConfig = null;
-        private String encoding = null;
         private HashSet<String> sourceFiles;
         private String specifiedFileType = null;
         private DFSUtil dfsUtil = null;
@@ -60,7 +59,7 @@ public class HdfsReader extends Reader {
             // path check
             String pathInString = this.readerOriginConfig.getNecessaryValue(Key.PATH, HdfsReaderErrorCode.REQUIRED_VALUE);
             if (!pathInString.startsWith("[") && !pathInString.endsWith("]")) {
-                path = new ArrayList<String>();
+                path = new ArrayList<>();
                 path.add(pathInString);
             } else {
                 path = this.readerOriginConfig.getList(Key.PATH, String.class);
@@ -87,7 +86,7 @@ public class HdfsReader extends Reader {
                 throw DataXException.asDataXException(HdfsReaderErrorCode.FILE_TYPE_ERROR, message);
             }
 
-            encoding = this.readerOriginConfig.getString(com.alibaba.datax.plugin.unstructuredstorage.reader.Key.ENCODING, "UTF-8");
+            String encoding = this.readerOriginConfig.getString(com.alibaba.datax.plugin.unstructuredstorage.reader.Key.ENCODING, "UTF-8");
 
             try {
                 Charsets.toCharset(encoding);
@@ -141,25 +140,23 @@ public class HdfsReader extends Reader {
                             "您需要指定 columns");
                 }
 
-                if (null != columns && columns.size() != 0) {
-                    for (Configuration eachColumnConf : columns) {
-                        eachColumnConf.getNecessaryValue(com.alibaba.datax.plugin.unstructuredstorage.reader.Key.TYPE, HdfsReaderErrorCode.REQUIRED_VALUE);
-                        Integer columnIndex = eachColumnConf.getInt(com.alibaba.datax.plugin.unstructuredstorage.reader.Key.INDEX);
-                        String columnValue = eachColumnConf.getString(com.alibaba.datax.plugin.unstructuredstorage.reader.Key.VALUE);
+                for (Configuration eachColumnConf : columns) {
+                    eachColumnConf.getNecessaryValue(com.alibaba.datax.plugin.unstructuredstorage.reader.Key.TYPE, HdfsReaderErrorCode.REQUIRED_VALUE);
+                    Integer columnIndex = eachColumnConf.getInt(com.alibaba.datax.plugin.unstructuredstorage.reader.Key.INDEX);
+                    String columnValue = eachColumnConf.getString(com.alibaba.datax.plugin.unstructuredstorage.reader.Key.VALUE);
 
-                        if (null == columnIndex && null == columnValue) {
-                            throw DataXException.asDataXException(
-                                    HdfsReaderErrorCode.NO_INDEX_VALUE,
-                                    "由于您配置了type, 则至少需要配置 index 或 value");
-                        }
-
-                        if (null != columnIndex && null != columnValue) {
-                            throw DataXException.asDataXException(
-                                    HdfsReaderErrorCode.MIXED_INDEX_VALUE,
-                                    "您混合配置了index, value, 每一列同时仅能选择其中一种");
-                        }
-
+                    if (null == columnIndex && null == columnValue) {
+                        throw DataXException.asDataXException(
+                                HdfsReaderErrorCode.NO_INDEX_VALUE,
+                                "由于您配置了type, 则至少需要配置 index 或 value");
                     }
+
+                    if (null != columnIndex && null != columnValue) {
+                        throw DataXException.asDataXException(
+                                HdfsReaderErrorCode.MIXED_INDEX_VALUE,
+                                "您混合配置了index, value, 每一列同时仅能选择其中一种");
+                    }
+
                 }
             }
         }
@@ -177,7 +174,7 @@ public class HdfsReader extends Reader {
         public List<Configuration> split(int adviceNumber) {
 
             LOG.info("split() begin...");
-            List<Configuration> readerSplitConfigs = new ArrayList<Configuration>();
+            List<Configuration> readerSplitConfigs = new ArrayList<>();
             // warn:每个slice拖且仅拖一个文件,
             // int splitNumber = adviceNumber;
             int splitNumber = this.sourceFiles.size();
@@ -186,7 +183,7 @@ public class HdfsReader extends Reader {
                         String.format("未能找到待读取的文件,请确认您的配置项path: %s", this.readerOriginConfig.getString(Key.PATH)));
             }
 
-            List<List<String>> splitedSourceFiles = this.splitSourceFiles(new ArrayList<String>(this.sourceFiles), splitNumber);
+            List<List<String>> splitedSourceFiles = this.splitSourceFiles(new ArrayList<>(this.sourceFiles), splitNumber);
             for (List<String> files : splitedSourceFiles) {
                 Configuration splitedConfig = this.readerOriginConfig.clone();
                 splitedConfig.set(Constant.SOURCE_FILES, files);
@@ -198,11 +195,11 @@ public class HdfsReader extends Reader {
 
 
         private <T> List<List<T>> splitSourceFiles(final List<T> sourceList, int adviceNumber) {
-            List<List<T>> splitedList = new ArrayList<List<T>>();
+            List<List<T>> splitedList = new ArrayList<>();
             int averageLength = sourceList.size() / adviceNumber;
             averageLength = averageLength == 0 ? 1 : averageLength;
 
-            for (int begin = 0, end = 0; begin < sourceList.size(); begin = end) {
+            for (int begin = 0, end; begin < sourceList.size(); begin = end) {
                 end = begin + averageLength;
                 if (end > sourceList.size()) {
                     end = sourceList.size();
@@ -227,13 +224,11 @@ public class HdfsReader extends Reader {
 
     public static class Task extends Reader.Task {
 
-        private static Logger LOG = LoggerFactory.getLogger(Reader.Task.class);
+        private static final Logger LOG = LoggerFactory.getLogger(Reader.Task.class);
         private Configuration taskConfig;
         private List<String> sourceFiles;
         private String specifiedFileType;
-        private String encoding;
         private DFSUtil dfsUtil = null;
-        private int bufferSize;
 
         @Override
         public void init() {
@@ -241,10 +236,10 @@ public class HdfsReader extends Reader {
             this.taskConfig = super.getPluginJobConf();
             this.sourceFiles = this.taskConfig.getList(Constant.SOURCE_FILES, String.class);
             this.specifiedFileType = this.taskConfig.getNecessaryValue(Key.FILETYPE, HdfsReaderErrorCode.REQUIRED_VALUE);
-            this.encoding = this.taskConfig.getString(com.alibaba.datax.plugin.unstructuredstorage.reader.Key.ENCODING, "UTF-8");
+//            String encoding = this.taskConfig.getString(com.alibaba.datax.plugin.unstructuredstorage.reader.Key.ENCODING, "UTF-8");
             this.dfsUtil = new DFSUtil(this.taskConfig);
-            this.bufferSize = this.taskConfig.getInt(com.alibaba.datax.plugin.unstructuredstorage.reader.Key.BUFFER_SIZE,
-                    com.alibaba.datax.plugin.unstructuredstorage.reader.Constant.DEFAULT_BUFFER_SIZE);
+//            int bufferSize = this.taskConfig.getInt(com.alibaba.datax.plugin.unstructuredstorage.reader.Key.BUFFER_SIZE,
+//                    com.alibaba.datax.plugin.unstructuredstorage.reader.Constant.DEFAULT_BUFFER_SIZE);
         }
 
         @Override
