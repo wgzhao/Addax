@@ -125,16 +125,15 @@ public class UnstructuredStorageWriterUtil {
     public static List<Configuration> split(Configuration writerSliceConfig,
             Set<String> originAllFileExists, int mandatoryNumber) {
         LOG.info("begin do split...");
-        Set<String> allFileExists = new HashSet<String>();
-        allFileExists.addAll(originAllFileExists);
-        List<Configuration> writerSplitConfigs = new ArrayList<Configuration>();
+        Set<String> allFileExists = new HashSet<>(originAllFileExists);
+        List<Configuration> writerSplitConfigs = new ArrayList<>();
         String filePrefix = writerSliceConfig.getString(Key.FILE_NAME);
 
         String fileSuffix;
         for (int i = 0; i < mandatoryNumber; i++) {
             // handle same file name
             Configuration splitedTaskConfig = writerSliceConfig.clone();
-            String fullFileName = null;
+            String fullFileName;
             fileSuffix = UUID.randomUUID().toString().replace('-', '_');
             fullFileName = String.format("%s__%s", filePrefix, fileSuffix);
             while (allFileExists.contains(fullFileName)) {
@@ -233,7 +232,7 @@ public class UnstructuredStorageWriterUtil {
                     UnstructuredStorageWriterErrorCode.Write_FILE_IO_ERROR,
                     String.format("流写入错误 : [%s]", context), e);
         } finally {
-            IOUtils.closeQuietly(writer);
+            IOUtils.closeQuietly(writer, null);
         }
     }
 
@@ -277,7 +276,7 @@ public class UnstructuredStorageWriterUtil {
             unstructuredWriter.writeOneRecord(headers);
         }
 
-        com.alibaba.datax.common.element.Record record = null;
+        com.alibaba.datax.common.element.Record record;
         while ((record = lineReceiver.getFromReader()) != null) {
             UnstructuredStorageWriterUtil.transportOneRecord(record,
                     nullFormat, dateParse, taskPluginCollector,
@@ -299,7 +298,7 @@ public class UnstructuredStorageWriterUtil {
             nullFormat = "null";
         }
         try {
-            List<String> splitedRows = new ArrayList<String>();
+            List<String> splitedRows = new ArrayList<>();
             int recordLength = record.getColumnNumber();
             if (0 != recordLength) {
                 Column column;

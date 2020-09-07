@@ -109,7 +109,7 @@ public class CommonRdbmsWriter {
                         preSqls, table);
 
                 originalConfig.remove(Constant.CONN_MARK);
-                if (null != renderedPreSqls && !renderedPreSqls.isEmpty()) {
+                if (!renderedPreSqls.isEmpty()) {
                     // 说明有 preSql 配置，则此处删除掉
                     originalConfig.remove(Key.PRE_SQL);
 
@@ -149,7 +149,7 @@ public class CommonRdbmsWriter {
                 List<String> renderedPostSqls = WriterUtil.renderPreOrPostSqls(
                         postSqls, table);
 
-                if (null != renderedPostSqls && !renderedPostSqls.isEmpty()) {
+                if (!renderedPostSqls.isEmpty()) {
                     // 说明有 postSql 配置，则此处删除掉
                     originalConfig.remove(Key.POST_SQL);
 
@@ -268,7 +268,7 @@ public class CommonRdbmsWriter {
             // 写数据库的SQL语句
             calcWriteRecordSql();
 
-            List<Record> writeBuffer = new ArrayList<Record>(this.batchSize);
+            List<Record> writeBuffer = new ArrayList<>(this.batchSize);
             int bufferBytes = 0;
             try {
                 com.alibaba.datax.common.element.Record record;
@@ -419,6 +419,8 @@ public class CommonRdbmsWriter {
                 case Types.LONGVARCHAR:
                 case Types.NVARCHAR:
                 case Types.LONGNVARCHAR:
+
+                case Types.BOOLEAN:
                     preparedStatement.setString(columnIndex + 1, column
                             .asString());
                     break;
@@ -511,10 +513,6 @@ public class CommonRdbmsWriter {
                 case Types.LONGVARBINARY:
                     preparedStatement.setBytes(columnIndex + 1, column
                             .asBytes());
-                    break;
-
-                case Types.BOOLEAN:
-                    preparedStatement.setString(columnIndex + 1, column.asString());
                     break;
 
                 // warn: bit(1) -> Types.BIT 可使用setBoolean

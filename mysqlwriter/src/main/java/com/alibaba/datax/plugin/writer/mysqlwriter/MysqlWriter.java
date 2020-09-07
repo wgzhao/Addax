@@ -10,7 +10,6 @@ import com.alibaba.datax.plugin.rdbms.writer.Key;
 import java.util.List;
 
 
-//TODO writeProxy
 public class MysqlWriter extends Writer {
     private static final DataBaseType DATABASE_TYPE = DataBaseType.MySql;
 
@@ -19,7 +18,7 @@ public class MysqlWriter extends Writer {
         private CommonRdbmsWriter.Job commonRdbmsWriterJob;
 
         @Override
-        public void preCheck(){
+        public void preCheck() {
             this.init();
             this.commonRdbmsWriterJob.writerPreCheck(this.originalConfig, DATABASE_TYPE);
         }
@@ -90,7 +89,7 @@ public class MysqlWriter extends Writer {
         }
 
         @Override
-        public boolean supportFailOver(){
+        public boolean supportFailOver() {
             String writeMode = writerSliceConfig.getString(Key.WRITE_MODE);
             return "replace".equalsIgnoreCase(writeMode);
         }

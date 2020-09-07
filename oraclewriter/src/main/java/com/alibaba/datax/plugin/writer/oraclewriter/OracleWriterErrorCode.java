@@ -8,7 +8,7 @@ public enum OracleWriterErrorCode implements ErrorCode {
 	private final String code;
 	private final String describe;
 
-	private OracleWriterErrorCode(String code, String describe) {
+	OracleWriterErrorCode(String code, String describe) {
 		this.code = code;
 		this.describe = describe;
 	}

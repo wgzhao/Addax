@@ -1,6 +1,11 @@
 package com.alibaba.datax.plugin.rdbms.reader;
 
-import com.alibaba.datax.common.element.*;
+import com.alibaba.datax.common.element.BoolColumn;
+import com.alibaba.datax.common.element.BytesColumn;
+import com.alibaba.datax.common.element.DateColumn;
+import com.alibaba.datax.common.element.DoubleColumn;
+import com.alibaba.datax.common.element.LongColumn;
+import com.alibaba.datax.common.element.StringColumn;
 import com.alibaba.datax.common.exception.DataXException;
 import com.alibaba.datax.common.plugin.RecordSender;
 import com.alibaba.datax.common.plugin.TaskPluginCollector;
@@ -21,8 +26,7 @@ public class ResultSetReadProxy {
 	private static final boolean IS_DEBUG = LOG.isDebugEnabled();
 	private static final byte[] EMPTY_CHAR_ARRAY = new byte[0];
 
-	//TODO
-	public static void transportOneRecord(RecordSender recordSender, ResultSet rs, 
+	public static void transportOneRecord(RecordSender recordSender, ResultSet rs,
 			ResultSetMetaData metaData, int columnNumber, String mandatoryEncoding, 
 			TaskPluginCollector taskPluginCollector) {
 		com.alibaba.datax.common.element.Record record = recordSender.createRecord();
@@ -61,18 +65,15 @@ public class ResultSetReadProxy {
 
 				case Types.NUMERIC:
 				case Types.DECIMAL:
-					record.addColumn(new DoubleColumn(rs.getString(i)));
-					break;
-
 				case Types.FLOAT:
 				case Types.REAL:
 				case Types.DOUBLE:
 					record.addColumn(new DoubleColumn(rs.getString(i)));
-					break;
+				break;
 
 				case Types.TIME:
-					record.addColumn(new DateColumn(rs.getTime(i)));
-					break;
+				record.addColumn(new DateColumn(rs.getTime(i)));
+				break;
 
 				// for mysql bug, see http://bugs.mysql.com/bug.php?id=35115
 				case Types.DATE:

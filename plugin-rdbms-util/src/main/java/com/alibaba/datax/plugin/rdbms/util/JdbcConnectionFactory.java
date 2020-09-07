@@ -9,11 +9,11 @@ public class JdbcConnectionFactory implements ConnectionFactory {
 
     private DataBaseType dataBaseType;
 
-    private String jdbcUrl;
+    private final String jdbcUrl;
 
-    private String userName;
+    private final String userName;
 
-    private String password;
+    private final String password;
 
     public JdbcConnectionFactory(DataBaseType dataBaseType, String jdbcUrl, String userName, String password) {
         this.dataBaseType = dataBaseType;

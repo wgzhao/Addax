@@ -7,19 +7,15 @@ import com.alibaba.datax.plugin.rdbms.reader.Key;
 import com.alibaba.datax.plugin.rdbms.util.DataBaseType;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.Validate;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
 import java.util.List;
 
 public final class ReaderSplitUtil {
-    private static final Logger LOG = LoggerFactory
-            .getLogger(ReaderSplitUtil.class);
 
     public static List<Configuration> doSplit(
             Configuration originalSliceConfig, int adviceNumber) {
-        boolean isTableMode = originalSliceConfig.getBool(Constant.IS_TABLE_MODE).booleanValue();
+        boolean isTableMode = originalSliceConfig.getBool(Constant.IS_TABLE_MODE);
         boolean isUserSpecifyEachTableSplitSize = originalSliceConfig.getInt(Constant.EACH_TABLE_SPLIT_SIZE, -1) != -1;
         int eachTableShouldSplittedNumber = -1;
         if (isTableMode) {
@@ -40,12 +36,12 @@ public final class ReaderSplitUtil {
 
         List<Object> conns = originalSliceConfig.getList(Constant.CONN_MARK, Object.class);
 
-        List<Configuration> splittedConfigs = new ArrayList<Configuration>();
+        List<Configuration> splittedConfigs = new ArrayList<>();
 
-        for (int i = 0, len = conns.size(); i < len; i++) {
+        for (Object conn : conns) {
             Configuration sliceConfig = originalSliceConfig.clone();
 
-            Configuration connConf = Configuration.from(conns.get(i).toString());
+            Configuration connConf = Configuration.from(conn.toString());
             String jdbcUrl = connConf.getString(Key.JDBC_URL);
             sliceConfig.set(Key.JDBC_URL, jdbcUrl);
 
@@ -73,7 +69,7 @@ public final class ReaderSplitUtil {
                         //原来:如果是单表的，主键切分num=num*2+1
                         // splitPk is null这类的情况的数据量本身就比真实数据量少很多, 和channel大小比率关系时，不建议考虑
                         //eachTableShouldSplittedNumber = eachTableShouldSplittedNumber * 2 + 1;// 不应该加1导致长尾
-                        
+
                         //考虑其他比率数字?(splitPk is null, 忽略此长尾)
                         tableSplitNumber = tableSplitNumber * 5;
                     }
@@ -115,7 +111,7 @@ public final class ReaderSplitUtil {
 
     public static Configuration doPreCheckSplit(Configuration originalSliceConfig) {
         Configuration queryConfig = originalSliceConfig.clone();
-        boolean isTableMode = originalSliceConfig.getBool(Constant.IS_TABLE_MODE).booleanValue();
+        boolean isTableMode = originalSliceConfig.getBool(Constant.IS_TABLE_MODE);
 
         String splitPK = originalSliceConfig.getString(Key.SPLIT_PK);
         String column = originalSliceConfig.getString(Key.COLUMN);
@@ -125,8 +121,8 @@ public final class ReaderSplitUtil {
 
         for (int i = 0, len = conns.size(); i < len; i++){
             Configuration connConf = Configuration.from(conns.get(i).toString());
-            List<String> querys = new ArrayList<String>();
-            List<String> splitPkQuerys = new ArrayList<String>();
+            List<String> querys = new ArrayList<>();
+            List<String> splitPkQuerys = new ArrayList<>();
             String connPath = String.format("connection[%d]",i);
             // 说明是配置的 table 方式
             if (isTableMode) {
@@ -148,9 +144,7 @@ public final class ReaderSplitUtil {
                 // 说明是配置的 querySql 方式
                 List<String> sqls = connConf.getList(Key.QUERY_SQL,
                         String.class);
-                for (String querySql : sqls) {
-                    querys.add(querySql);
-                }
+                querys.addAll(sqls);
                 connConf.set(Key.QUERY_SQL,querys);
                 queryConfig.set(connPath,connConf);
             }
