@@ -4,7 +4,6 @@ import com.alibaba.datax.common.exception.DataXException;
 import com.alibaba.datax.common.util.Configuration;
 import com.alibaba.datax.plugin.reader.mongodbreader.KeyConstant;
 import com.alibaba.datax.plugin.reader.mongodbreader.MongoDBReaderErrorCode;
-import com.google.common.base.Strings;
 import com.mongodb.MongoClient;
 import com.mongodb.MongoCommandException;
 import com.mongodb.client.MongoCollection;
@@ -13,7 +12,7 @@ import org.bson.Document;
 import org.bson.types.ObjectId;
 
 import java.util.ArrayList;
-import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 /**
@@ -26,13 +25,13 @@ public class CollectionSplitUtil {
     public static List<Configuration> doSplit(
         Configuration originalSliceConfig, int adviceNumber, MongoClient mongoClient) {
 
-        List<Configuration> confList = new ArrayList<Configuration>();
+        List<Configuration> confList = new ArrayList<>();
 
         String dbName = originalSliceConfig.getString(KeyConstant.MONGO_DB_NAME, originalSliceConfig.getString(KeyConstant.MONGO_DATABASE));
 
         String collName = originalSliceConfig.getString(KeyConstant.MONGO_COLLECTION_NAME);
 
-        if(Strings.isNullOrEmpty(dbName) || Strings.isNullOrEmpty(collName) || mongoClient == null) {
+        if(null == dbName || dbName.isEmpty()  || null == collName || collName.isEmpty() || mongoClient == null) {
             throw DataXException.asDataXException(MongoDBReaderErrorCode.ILLEGAL_VALUE,
                 MongoDBReaderErrorCode.ILLEGAL_VALUE.getDescription());
         }
@@ -55,11 +54,9 @@ public class CollectionSplitUtil {
         MongoDatabase database = mongoClient.getDatabase(dbName);
         MongoCollection<Document> col = database.getCollection(collName);
         Document doc = col.find().limit(1).first();
+        assert doc != null;
         Object id = doc.get(KeyConstant.MONGO_PRIMARY_ID);
-        if (id instanceof ObjectId) {
-            return true;
-        }
-        return false;
+        return id instanceof ObjectId;
     }
 
     // split the collection into multiple chunks, each chunk specifies a range
@@ -67,12 +64,12 @@ public class CollectionSplitUtil {
                                                  String dbName, String collName, boolean isObjectId) {
 
         MongoDatabase database = mongoClient.getDatabase(dbName);
-        List<Range> rangeList = new ArrayList<Range>();
+        List<Range> rangeList = new ArrayList<>();
         if (adviceNumber == 1) {
             Range range = new Range();
             range.lowerBound = "min";
             range.upperBound = "max";
-            return Arrays.asList(range);
+            return Collections.singletonList(range);
         }
 
         Document result = database.runCommand(new Document("collStats", collName));
@@ -83,7 +80,7 @@ public class CollectionSplitUtil {
         int avgObjSize = 1;
         Object avgObjSizeObj = result.get("avgObjSize");
         if (avgObjSizeObj instanceof Integer) {
-            avgObjSize = ((Integer) avgObjSizeObj).intValue();
+            avgObjSize = (Integer) avgObjSizeObj;
         } else if (avgObjSizeObj instanceof Double) {
             avgObjSize = ((Double) avgObjSizeObj).intValue();
         }
@@ -124,11 +121,10 @@ public class CollectionSplitUtil {
             }
             ArrayList<Document> splitKeys = result.get("splitKeys", ArrayList.class);
 
-            for (int i = 0; i < splitKeys.size(); i++) {
-                Document splitKey = splitKeys.get(i);
+            for (Document splitKey : splitKeys) {
                 Object id = splitKey.get(KeyConstant.MONGO_PRIMARY_ID);
                 if (isObjectId) {
-                    ObjectId oid = (ObjectId)id;
+                    ObjectId oid = (ObjectId) id;
                     splitPoints.add(oid.toHexString());
                 } else {
                     splitPoints.add(id);
@@ -140,10 +136,8 @@ public class CollectionSplitUtil {
 
             for (int i = 0; i < splitPointCount; i++) {
                 Document doc = col.find().skip(skipCount).limit(chunkDocCount).first();
+                assert doc != null;
                 Object id = doc.get(KeyConstant.MONGO_PRIMARY_ID);
-                if (doc == null) {
-                    break;
-                }
                 if (isObjectId) {
                     ObjectId oid = (ObjectId)id;
                     splitPoints.add(oid.toHexString());

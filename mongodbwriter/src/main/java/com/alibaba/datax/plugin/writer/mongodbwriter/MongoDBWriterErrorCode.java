@@ -13,7 +13,7 @@ public enum MongoDBWriterErrorCode implements ErrorCode {
 
     private final String description;
 
-    private MongoDBWriterErrorCode(String code,String description) {
+    MongoDBWriterErrorCode(String code, String description) {
         this.code = code;
         this.description = description;
     }
