@@ -57,8 +57,11 @@
             </exclusions>
         </dependency>
 
+        <dependency>
+            <groupId>org.apache.zookeeper</groupId>
+            <artifactId>zookeeper</artifactId>
+            <version>3.5.6</version>
+            <scope>runtime</scope>
+        </dependency>
     </dependencies>
-
-
-
 </project>

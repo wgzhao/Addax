@@ -1,7 +1,6 @@
 package com.alibaba.datax.plugin.reader.hbase11xreader;
 
-import com.alibaba.datax.common.element.*;
-import com.alibaba.datax.common.exception.DataXException;
+import com.alibaba.datax.common.element.LongColumn;
 import com.alibaba.datax.common.util.Configuration;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.hadoop.hbase.Cell;
@@ -10,7 +9,7 @@ import org.apache.hadoop.hbase.client.Result;
 import org.apache.hadoop.hbase.client.Scan;
 import org.apache.hadoop.hbase.util.Bytes;
 
-import java.io.UnsupportedEncodingException;
+import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -18,12 +17,12 @@ import java.util.Map;
 public abstract class MultiVersionTask extends HbaseAbstractTask {
     private static byte[] COLON_BYTE;
 
-    private int maxVersion;
-    private Cell cellArr[] = null;
+    private final int maxVersion;
+    private Cell[] cellArr = null;
 
     private int currentReadPosition = 0;
     public List<Map> column;
-    private HashMap<String,HashMap<String,String>> familyQualifierMap = null;
+    private final HashMap<String,HashMap<String,String>> familyQualifierMap;
 
     public MultiVersionTask(Configuration configuration) {
         super(configuration);
@@ -31,11 +30,7 @@ public abstract class MultiVersionTask extends HbaseAbstractTask {
         this.column = configuration.getList(Key.COLUMN, Map.class);
         this.familyQualifierMap = Hbase11xHelper.parseColumnOfMultiversionMode(this.column);
 
-        try {
-            MultiVersionTask.COLON_BYTE = ":".getBytes("utf8");
-        } catch (UnsupportedEncodingException e) {
-            throw DataXException.asDataXException(Hbase11xReaderErrorCode.PREPAR_READ_ERROR, "系统内部获取 列族与列名冒号分隔符的二进制时失败.", e);
-        }
+        MultiVersionTask.COLON_BYTE = ":".getBytes(StandardCharsets.UTF_8);
     }
 
     @Override
@@ -59,8 +54,6 @@ public abstract class MultiVersionTask extends HbaseAbstractTask {
 
             convertCellToLine(cell, record);
 
-        } catch (Exception e) {
-            throw e;
         } finally {
             this.currentReadPosition++;
         }

@@ -55,6 +55,7 @@
         <module>ftpreader</module>
         <module>hbase11xreader</module>
         <module>hbase11xsqlreader</module>
+        <module>hbase20xreader</module>
         <module>hbase20xsqlreader</module>
         <module>hdfsreader</module>
         <module>jsonfilereader</module>

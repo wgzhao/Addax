@@ -20,7 +20,7 @@ public enum ColumnType {
     BINARY_STRING("binarystring")
     ;
 
-    private String typeName;
+    private final String typeName;
 
     ColumnType(String typeName) {
         this.typeName = typeName;

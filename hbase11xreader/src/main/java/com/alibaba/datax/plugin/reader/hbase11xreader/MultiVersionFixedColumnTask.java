@@ -4,7 +4,6 @@ import com.alibaba.datax.common.util.Configuration;
 import org.apache.hadoop.hbase.client.Scan;
 import org.apache.hadoop.hbase.util.Bytes;
 
-import java.util.List;
 import java.util.Map;
 
 public class MultiVersionFixedColumnTask extends MultiVersionTask {
