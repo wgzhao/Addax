@@ -9,7 +9,7 @@ public enum MysqlWriterErrorCode implements ErrorCode {
     private final String code;
     private final String describe;
 
-    private MysqlWriterErrorCode(String code, String describe) {
+    MysqlWriterErrorCode(String code, String describe) {
         this.code = code;
         this.describe = describe;
     }

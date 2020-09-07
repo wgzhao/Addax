@@ -7,10 +7,10 @@ import java.sql.Connection;
  */
 public interface ConnectionFactory {
 
-    public Connection getConnecttion();
+    Connection getConnecttion();
 
-    public Connection getConnecttionWithoutRetry();
+    Connection getConnecttionWithoutRetry();
 
-    public String getConnectionInfo();
+    String getConnectionInfo();
 
 }

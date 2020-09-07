@@ -24,7 +24,7 @@ public enum DataBaseType {
 
 
     private String typeName;
-    private String driverClassName;
+    private final String driverClassName;
 
     DataBaseType(String typeName, String driverClassName) {
         this.typeName = typeName;
@@ -37,7 +37,7 @@ public enum DataBaseType {
 
     public String appendJDBCSuffixForReader(String jdbc) {
         String result = jdbc;
-        String suffix = null;
+        String suffix;
         switch (this) {
             case MySql:
                 suffix = "yearIsDateType=false&zeroDateTimeBehavior=convertToNull&tinyInt1isBit=false&rewriteBatchedStatements=true";
@@ -48,23 +48,14 @@ public enum DataBaseType {
                 }
                 break;
             case Oracle:
-                break;
             case SQLServer:
-                break;
             case DB2:
-                break;
             case Hive:
-            	break;
             case Impala:
-                break;
             case Presto:
-                break;
             case ClickHouse:
-                break;
             case PostgreSQL:
-                break;
             case RDBMS:
-                break;
             case Inceptor2:
                 break;
             default:
@@ -76,7 +67,7 @@ public enum DataBaseType {
 
     public String appendJDBCSuffixForWriter(String jdbc) {
         String result = jdbc;
-        String suffix = null;
+        String suffix;
         switch (this) {
             case MySql:
                 suffix = "yearIsDateType=false&zeroDateTimeBehavior=convertToNull&rewriteBatchedStatements=true&tinyInt1isBit=false";
@@ -87,21 +78,13 @@ public enum DataBaseType {
                 }
                 break;
             case Oracle:
-                break;
             case Hive:
-                break;
             case SQLServer:
-                break;
             case ClickHouse:
-                break;
             case Presto:
-                break;
             case DB2:
-                break;
             case PostgreSQL:
-            	break;
             case RDBMS:
-                break;
             case Inceptor2:
                 break;
             default:
@@ -145,12 +128,11 @@ public enum DataBaseType {
                 result = "`" + columnName.replace("`", "``") + "`";
                 break;
             case Oracle:
+            case DB2:
+            case PostgreSQL:
                 break;
             case SQLServer:
                 result = "[" + columnName + "]";
-                break;
-            case DB2:
-            case PostgreSQL:
                 break;
             default:
                 throw DataXException.asDataXException(DBUtilErrorCode.UNSUPPORTED_TYPE, "unsupported database type");
@@ -167,11 +149,8 @@ public enum DataBaseType {
                 result = "`" + tableName.replace("`", "``") + "`";
                 break;
             case Oracle:
-                break;
             case SQLServer:
-                break;
             case DB2:
-                break;
             case PostgreSQL:
                 break;
             default:
@@ -181,8 +160,8 @@ public enum DataBaseType {
         return result;
     }
 
-    private static Pattern mysqlPattern = Pattern.compile("jdbc:mysql://(.+):\\d+/.+");
-    private static Pattern oraclePattern = Pattern.compile("jdbc:oracle:thin:@(.+):\\d+:.+");
+    private static final Pattern mysqlPattern = Pattern.compile("jdbc:mysql://(.+):\\d+/.+");
+    private static final Pattern oraclePattern = Pattern.compile("jdbc:oracle:thin:@(.+):\\d+:.+");
 
     /**
      * 注意：目前只实现了从 mysql/oracle 中识别出ip 信息.未识别到则返回 null.

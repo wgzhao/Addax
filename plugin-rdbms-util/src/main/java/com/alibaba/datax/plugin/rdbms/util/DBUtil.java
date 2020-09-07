@@ -15,22 +15,30 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.File;
-import java.sql.*;
-import java.util.*;
-import java.util.concurrent.*;
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.ResultSet;
+import java.sql.ResultSetMetaData;
+import java.sql.SQLException;
+import java.sql.Statement;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Properties;
+import java.util.concurrent.Callable;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
+import java.util.concurrent.TimeUnit;
 
 public final class DBUtil {
     private static final Logger LOG = LoggerFactory.getLogger(DBUtil.class);
 
-    private static final ThreadLocal<ExecutorService> rsExecutors = new ThreadLocal<ExecutorService>() {
-        @Override
-        protected ExecutorService initialValue() {
-            return Executors.newFixedThreadPool(1, new ThreadFactoryBuilder()
-                    .setNameFormat("rsExecutors-%d")
-                    .setDaemon(true)
-                    .build());
-        }
-    };
+    private static final ThreadLocal<ExecutorService> rsExecutors = ThreadLocal.withInitial(() -> Executors.newFixedThreadPool(1, new ThreadFactoryBuilder()
+            .setNameFormat("rsExecutors-%d")
+            .setDaemon(true)
+            .build()));
 
     private DBUtil() {
     }
@@ -48,29 +56,25 @@ public final class DBUtil {
         }
 
         try {
-            return RetryUtil.executeWithRetry(new Callable<String>() {
-
-                @Override
-                public String call() throws Exception {
-                    boolean connOK = false;
-                    for (String url : jdbcUrls) {
-                        if (StringUtils.isNotBlank(url)) {
-                            url = url.trim();
-                            if (null != preSql && !preSql.isEmpty()) {
-                                connOK = testConnWithoutRetry(dataBaseType,
-                                        url, username, password, preSql);
-                            } else {
-                                connOK = testConnWithoutRetry(dataBaseType,
-                                        url, username, password, checkSlave);
-                            }
-                            if (connOK) {
-                                return url;
-                            }
+            return RetryUtil.executeWithRetry(() -> {
+                boolean connOK ;
+                for (String url : jdbcUrls) {
+                    if (StringUtils.isNotBlank(url)) {
+                        url = url.trim();
+                        if (null != preSql && !preSql.isEmpty()) {
+                            connOK = testConnWithoutRetry(dataBaseType,
+                                    url, username, password, preSql);
+                        } else {
+                            connOK = testConnWithoutRetry(dataBaseType,
+                                    url, username, password, checkSlave);
+                        }
+                        if (connOK) {
+                            return url;
                         }
                     }
-                    throw new Exception("DataX无法连接对应的数据库，可能原因是：1) 配置的ip/port/database/jdbc错误，无法连接。2) 配置的username/password错误，鉴权失败。请和DBA确认该数据库的连接信息是否正确。");
-//                    throw new Exception(DBUtilErrorCode.JDBC_NULL.toString());
                 }
+                throw new Exception("DataX无法连接对应的数据库，可能原因是：1) 配置的ip/port/database/jdbc错误，无法连接。2) 配置的username/password错误，鉴权失败。请和DBA确认该数据库的连接信息是否正确。");
+//                    throw new Exception(DBUtilErrorCode.JDBC_NULL.toString());
             }, 7, 1000L, true);
             //warn: 7 means 2 minutes
         } catch (Exception e) {
@@ -93,7 +97,7 @@ public final class DBUtil {
                             StringUtils.join(jdbcUrls, ",")));
         }
 
-        boolean connOK = false;
+        boolean connOK;
         for (String url : jdbcUrls) {
             if (StringUtils.isNotBlank(url)) {
                 url = url.trim();
@@ -128,7 +132,6 @@ public final class DBUtil {
      * 否则范围true
      *
      * @author ZiChi
-     * @version 1.0 2014-12-01
      */
     private static boolean isSlaveBehind(Connection conn) {
         try {
@@ -169,21 +172,20 @@ public final class DBUtil {
      * 其它验证都不通过
      *
      * @author ZiChi
-     * @version 1.0 2015-01-28
      */
     public static boolean hasInsertPrivilege(DataBaseType dataBaseType, String jdbcURL, String userName, String password, List<String> tableList) {
         /*准备参数*/
 
         String[] urls = jdbcURL.split("/");
         String dbName;
-        if (urls != null && urls.length != 0) {
+        if (urls.length != 0) {
             dbName = urls[3];
         }else{
             return false;
         }
 
         String dbPattern = "`" + dbName + "`.*";
-        Collection<String> tableNames = new HashSet<String>(tableList.size());
+        Collection<String> tableNames = new HashSet<>(tableList.size());
         tableNames.addAll(tableList);
 
         Connection connection = connect(dataBaseType, jdbcURL, userName, password);
@@ -191,10 +193,10 @@ public final class DBUtil {
             ResultSet rs = query(connection, "SHOW GRANTS FOR " + userName);
             while (DBUtil.asyncResultSetNext(rs)) {
                 String grantRecord = rs.getString("Grants for " + userName + "@%");
-                String[] params = grantRecord.split("\\`");
-                if (params != null && params.length >= 3) {
+                String[] params = grantRecord.split("`");
+                if (params.length >= 3) {
                     String tableName = params[3];
-                    if (params[0].contains("INSERT") && !tableName.equals("*") && tableNames.contains(tableName))
+                    if (params[0].contains("INSERT") && !tableName.equals("*"))
                         tableNames.remove(tableName);
                 } else {
                     if (grantRecord.contains("INSERT") ||grantRecord.contains("ALL PRIVILEGES")) {
@@ -209,9 +211,7 @@ public final class DBUtil {
         } catch (Exception e) {
             LOG.warn("Check the database has the Insert Privilege failed, errorMessage:[{}]", e.getMessage());
         }
-        if (tableNames.isEmpty())
-            return true;
-        return false;
+        return tableNames.isEmpty();
     }
 
 
@@ -220,7 +220,7 @@ public final class DBUtil {
         String insertTemplate = "insert into %s(select * from %s where 1 = 2)";
 
         boolean hasInsertPrivilege = true;
-        Statement insertStmt = null;
+        Statement insertStmt;
         for(String tableName : tableList) {
             String checkInsertPrivilegeSql = String.format(insertTemplate, tableName, tableName);
             try {
@@ -251,7 +251,7 @@ public final class DBUtil {
         String deleteTemplate = "delete from %s WHERE 1 = 2";
 
         boolean hasInsertPrivilege = true;
-        Statement deleteStmt = null;
+        Statement deleteStmt;
         for(String tableName : tableList) {
             String checkDeletePrivilegeSQL = String.format(deleteTemplate, tableName);
             try {
@@ -271,7 +271,7 @@ public final class DBUtil {
     }
 
     public static boolean needCheckDeletePrivilege(Configuration originalConfig) {
-        List<String> allSqls =new ArrayList<String>();
+        List<String> allSqls = new ArrayList<>();
         List<String> preSQLs = originalConfig.getList(Key.PRE_SQL, String.class);
         List<String> postSQLs = originalConfig.getList(Key.POST_SQL, String.class);
         if (preSQLs != null && !preSQLs.isEmpty()){
@@ -303,26 +303,12 @@ public final class DBUtil {
         return getConnection(dataBaseType, jdbcUrl, username, password, String.valueOf(Constant.SOCKET_TIMEOUT_INSECOND * 1000));
     }
 
-    /**
-     *
-     * @param dataBaseType
-     * @param jdbcUrl
-     * @param username
-     * @param password
-     * @param socketTimeout 设置socketTimeout，单位ms，String类型
-     * @return
-     */
     public static Connection getConnection(final DataBaseType dataBaseType,
                                            final String jdbcUrl, final String username, final String password, final String socketTimeout) {
 
         try {
-            return RetryUtil.executeWithRetry(new Callable<Connection>() {
-                @Override
-                public Connection call() throws Exception {
-                    return DBUtil.connect(dataBaseType, jdbcUrl, username,
-                            password, socketTimeout);
-                }
-            }, 9, 1000L, true);
+            return RetryUtil.executeWithRetry(() -> DBUtil.connect(dataBaseType, jdbcUrl, username,
+                    password, socketTimeout), 9, 1000L, true);
         } catch (Exception e) {
             throw DataXException.asDataXException(
                     DBUtilErrorCode.CONN_DB_ERROR,
@@ -407,9 +393,9 @@ public final class DBUtil {
      *
      * @param conn         Database connection .
      * @param sql          sql statement to be executed
-     * @param fetchSize
+     * @param fetchSize     fetch size each batch
      * @param queryTimeout unit:second
-     * @return
+     * @return ResultSet
      * @throws SQLException
      */
     public static ResultSet query(Connection conn, String sql, int fetchSize, int queryTimeout)
@@ -469,21 +455,21 @@ public final class DBUtil {
         if (null != rs) {
             try {
                 rs.close();
-            } catch (SQLException unused) {
+            } catch (SQLException ignored) {
             }
         }
 
         if (null != stmt) {
             try {
                 stmt.close();
-            } catch (SQLException unused) {
+            } catch (SQLException ignored) {
             }
         }
 
         if (null != conn) {
             try {
                 conn.close();
-            } catch (SQLException unused) {
+            } catch (SQLException ignored) {
             }
         }
     }
@@ -499,7 +485,7 @@ public final class DBUtil {
     }
 
     public static List<String> getTableColumnsByConn(DataBaseType dataBaseType, Connection conn, String tableName, String basicMsg) {
-        List<String> columns = new ArrayList<String>();
+        List<String> columns = new ArrayList<>();
         Statement statement = null;
         ResultSet rs = null;
         String queryColumnSql = null;
@@ -545,9 +531,9 @@ public final class DBUtil {
         Statement statement = null;
         ResultSet rs = null;
 
-        Triple<List<String>, List<Integer>, List<String>> columnMetaData = new ImmutableTriple<List<String>, List<Integer>, List<String>>(
-                new ArrayList<String>(), new ArrayList<Integer>(),
-                new ArrayList<String>());
+        Triple<List<String>, List<Integer>, List<String>> columnMetaData = new ImmutableTriple<>(
+                new ArrayList<>(), new ArrayList<>(),
+                new ArrayList<>());
         try {
             statement = conn.createStatement();
             String queryColumnSql = "select " + column + " from " + tableName
@@ -579,10 +565,9 @@ public final class DBUtil {
         try {
             connection = connect(dataBaseType, url, user, pass);
             if (connection != null) {
-                if (dataBaseType.equals(dataBaseType.MySql) && checkSlave) {
+                if (dataBaseType.equals(DataBaseType.MySql) && checkSlave) {
                     //dataBaseType.MySql
-                    boolean connOk = !isSlaveBehind(connection);
-                    return connOk;
+                    return !isSlaveBehind(connection);
                 } else {
                     return true;
                 }
@@ -603,7 +588,7 @@ public final class DBUtil {
             connection = connect(dataBaseType, url, user, pass);
             if (null != connection) {
                 for (String pre : preSql) {
-                    if (doPreCheck(connection, pre) == false) {
+                    if (!doPreCheck(connection, pre)) {
                         LOG.warn("doPreCheck failed.");
                         return false;
                     }
@@ -622,22 +607,19 @@ public final class DBUtil {
 
     public static boolean isOracleMaster(final String url, final String user, final String pass) {
         try {
-            return RetryUtil.executeWithRetry(new Callable<Boolean>() {
-                @Override
-                public Boolean call() throws Exception {
-                    Connection conn = null;
-                    try {
-                        conn = connect(DataBaseType.Oracle, url, user, pass);
-                        ResultSet rs = query(conn, "select DATABASE_ROLE from V$DATABASE");
-                        if (DBUtil.asyncResultSetNext(rs, 5)) {
-                            String role = rs.getString("DATABASE_ROLE");
-                            return "PRIMARY".equalsIgnoreCase(role);
-                        }
-                        throw DataXException.asDataXException(DBUtilErrorCode.RS_ASYNC_ERROR,
-                                String.format("select DATABASE_ROLE from V$DATABASE failed,请检查您的jdbcUrl:%s.", url));
-                    } finally {
-                        DBUtil.closeDBResources(null, conn);
+            return RetryUtil.executeWithRetry(() -> {
+                Connection conn = null;
+                try {
+                    conn = connect(DataBaseType.Oracle, url, user, pass);
+                    ResultSet rs = query(conn, "select DATABASE_ROLE from V$DATABASE");
+                    if (DBUtil.asyncResultSetNext(rs, 5)) {
+                        String role = rs.getString("DATABASE_ROLE");
+                        return "PRIMARY".equalsIgnoreCase(role);
                     }
+                    throw DataXException.asDataXException(DBUtilErrorCode.RS_ASYNC_ERROR,
+                            String.format("select DATABASE_ROLE from V$DATABASE failed,请检查您的jdbcUrl:%s.", url));
+                } finally {
+                    DBUtil.closeDBResources(null, conn);
                 }
             }, 3, 1000L, true);
         } catch (Exception e) {
@@ -691,16 +673,12 @@ public final class DBUtil {
     // warn:until now, only oracle need to handle session config.
     public static void dealWithSessionConfig(Connection conn,
                                              Configuration config, DataBaseType databaseType, String message) {
-        List<String> sessionConfig = null;
+        List<String> sessionConfig;
         switch (databaseType) {
             case Oracle:
-                sessionConfig = config.getList(Key.SESSION,
-                        new ArrayList<String>(), String.class);
-                DBUtil.doDealWithSessionConfig(conn, sessionConfig, message);
-                break;
             case MySql:
                 sessionConfig = config.getList(Key.SESSION,
-                        new ArrayList<String>(), String.class);
+                        new ArrayList<>(), String.class);
                 DBUtil.doDealWithSessionConfig(conn, sessionConfig, message);
                 break;
             default:
@@ -744,20 +722,15 @@ public final class DBUtil {
 
     /**
      * 异步获取resultSet的next(),注意，千万不能应用在数据的读取中。只能用在meta的获取
-     * @param resultSet
-     * @return
+     * @param resultSet resut set
+     * @return boolean
      */
     public static boolean asyncResultSetNext(final ResultSet resultSet) {
         return asyncResultSetNext(resultSet, 3600);
     }
 
     public static boolean asyncResultSetNext(final ResultSet resultSet, int timeout) {
-        Future<Boolean> future = rsExecutors.get().submit(new Callable<Boolean>() {
-            @Override
-            public Boolean call() throws Exception {
-                return resultSet.next();
-            }
-        });
+        Future<Boolean> future = rsExecutors.get().submit(resultSet::next);
         try {
             return future.get(timeout, TimeUnit.SECONDS);
         } catch (Exception e) {

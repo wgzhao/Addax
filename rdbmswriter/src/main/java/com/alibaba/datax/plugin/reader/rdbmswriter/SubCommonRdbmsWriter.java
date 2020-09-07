@@ -80,7 +80,7 @@ public class SubCommonRdbmsWriter extends CommonRdbmsWriter {
                     break;
 
                 case Types.DATE:
-                    java.sql.Date sqlDate = null;
+                    java.sql.Date sqlDate;
                     utilDate = column.asDate();
                     if (null != utilDate) {
                         sqlDate = new java.sql.Date(utilDate.getTime());
@@ -91,7 +91,7 @@ public class SubCommonRdbmsWriter extends CommonRdbmsWriter {
                     break;
 
                 case Types.TIME:
-                    java.sql.Time sqlTime = null;
+                    java.sql.Time sqlTime;
                     utilDate = column.asDate();
                     if (null != utilDate) {
                         sqlTime = new java.sql.Time(utilDate.getTime());
@@ -102,7 +102,7 @@ public class SubCommonRdbmsWriter extends CommonRdbmsWriter {
                     break;
 
                 case Types.TIMESTAMP:
-                    java.sql.Timestamp sqlTimestamp = null;
+                    java.sql.Timestamp sqlTimestamp;
                     utilDate = column.asDate();
                     if (null != utilDate) {
                         sqlTimestamp = new java.sql.Timestamp(

@@ -72,9 +72,9 @@ public class CommonRdbmsReader {
                 exec = Executors.newFixedThreadPool(10);
             }
             Collection<PreCheckTask> taskList = new ArrayList<PreCheckTask>();
-            for (int i = 0, len = connList.size(); i < len; i++){
-                Configuration connConf = Configuration.from(connList.get(i).toString());
-                PreCheckTask t = new PreCheckTask(username,password,connConf,dataBaseType,splitPK);
+            for (Object o : connList) {
+                Configuration connConf = Configuration.from(o.toString());
+                PreCheckTask t = new PreCheckTask(username, password, connConf, dataBaseType, splitPK);
                 taskList.add(t);
             }
             List<Future<Boolean>> results = Lists.newArrayList();

@@ -8,8 +8,6 @@ import com.alibaba.datax.common.util.Configuration;
 import com.moilioncircle.redis.replicator.FileType;
 import com.moilioncircle.redis.replicator.RedisReplicator;
 import com.moilioncircle.redis.replicator.Replicator;
-import com.moilioncircle.redis.replicator.event.Event;
-import com.moilioncircle.redis.replicator.event.EventListener;
 import com.moilioncircle.redis.replicator.event.PostRdbSyncEvent;
 import com.moilioncircle.redis.replicator.event.PreRdbSyncEvent;
 import com.moilioncircle.redis.replicator.io.RawByteListener;
@@ -32,7 +30,7 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -69,22 +67,22 @@ public class RedisReader extends Reader {
         /**
          * 包含key正则
          */
-        private final List<Pattern> includePatterns = new ArrayList<Pattern>();
+        private final List<Pattern> includePatterns = new ArrayList<>();
 
         /**
          * 排除key正则
          */
-        private final List<Pattern> excludePatterns = new ArrayList<Pattern>();
+        private final List<Pattern> excludePatterns = new ArrayList<>();
 
         /**
          * 包含DB
          */
-        private final Set<Integer> includeDB = new HashSet<Integer>();
+        private final Set<Integer> includeDB = new HashSet<>();
 
         /**
          * 记录redis 比较大的key 用于展示
          */
-        private Map<String, Integer> bigKey = new TreeMap<String, Integer>();
+        private final Map<String, Integer> bigKey = new TreeMap<>();
 
         /**
          * value达到64m阀值，将记录该key
@@ -95,14 +93,14 @@ public class RedisReader extends Reader {
         /**
          * 用于记录数据类型分布
          */
-        private final Map<String, Long> collectTypeMap = new HashMap<String, Long>();
+        private final Map<String, Long> collectTypeMap = new HashMap<>();
 
         @Override
         public void startRead(final RecordSender recordSender) {
             Configuration pluginJobConf = super.getPluginJobConf();
 
             try {
-                List connections = pluginJobConf.getList("connection");
+                List<Object> connections = pluginJobConf.getList("connection");
 
                 for (Object obj : connections) {
                     Map connection = (Map) obj;
@@ -124,31 +122,29 @@ public class RedisReader extends Reader {
                     LOG.info("loading " + file.getAbsolutePath());
                     RedisReplicator r = new RedisReplicator(file, FileType.RDB, com.moilioncircle.redis.replicator.Configuration.defaultSetting());
                     r.setRdbVisitor(new DumpRdbVisitor(r));
-                    r.addEventListener(new EventListener() {
-                        public void onEvent(Replicator replicator, Event event) {
-                            if (event instanceof DumpKeyValuePair) {
-                                DumpKeyValuePair dkv = (DumpKeyValuePair) event;
-                                Long dbNumber = dkv.getDb().getDbNumber();
-                                byte[] key = dkv.getKey();
-                                long expire = dkv.getExpiredMs() == null ? 0 : dkv.getExpiredMs();
+                    r.addEventListener((replicator, event) -> {
+                        if (event instanceof DumpKeyValuePair) {
+                            DumpKeyValuePair dkv = (DumpKeyValuePair) event;
+                            Long dbNumber = dkv.getDb().getDbNumber();
+                            byte[] key = dkv.getKey();
+                            long expire = dkv.getExpiredMs() == null ? 0 : dkv.getExpiredMs();
 
-                                //记录较大的key
-                                recordBigKey(dbNumber, dkv.getValueRdbType(), dkv.getKey(), dkv.getValue());
+                            //记录较大的key
+                            recordBigKey(dbNumber, dkv.getValueRdbType(), dkv.getKey(), dkv.getValue());
 
-                                //记录数据类型
-                                collectType(dkv.getValueRdbType());
+                            //记录数据类型
+                            collectType(dkv.getValueRdbType());
 
-                                if (Task.this.matchDB(dbNumber.intValue()) && Task.this.matchKey(key)) {
-                                    com.alibaba.datax.common.element.Record record = recordSender.createRecord();
-                                    record.addColumn(new LongColumn(dbNumber));
-                                    record.addColumn(new LongColumn(dkv.getValueRdbType()));
-                                    record.addColumn(new LongColumn(expire));
-                                    record.addColumn(new BytesColumn(key));
-                                    record.addColumn(new BytesColumn(dkv.getValue()));
-                                    recordSender.sendToWriter(record);
-                                }
-
+                            if (Task.this.matchDB(dbNumber.intValue()) && Task.this.matchKey(key)) {
+                                com.alibaba.datax.common.element.Record record = recordSender.createRecord();
+                                record.addColumn(new LongColumn(dbNumber));
+                                record.addColumn(new LongColumn(dkv.getValueRdbType()));
+                                record.addColumn(new LongColumn(expire));
+                                record.addColumn(new BytesColumn(key));
+                                record.addColumn(new BytesColumn(dkv.getValue()));
+                                recordSender.sendToWriter(record);
                             }
+
                         }
                     });
                     r.open();
@@ -190,17 +186,9 @@ public class RedisReader extends Reader {
 
         }
 
-        /**
-         * 记录较大的key 用于展示
-         *
-         * @param db
-         * @param type
-         * @param key
-         * @param value
-         */
         private void recordBigKey(Long db, int type, byte[] key, byte[] value) {
             if (value.length > keyThresholdLength) {
-                bigKey.put(db + "\t" + new String(key, Charset.forName("utf-8")), value.length);
+                bigKey.put(db + "\t" + new String(key, StandardCharsets.UTF_8), value.length);
             }
         }
 
@@ -230,16 +218,10 @@ public class RedisReader extends Reader {
             LOG.info("\r\n" + sb.toString());
         }
 
-        /**
-         * 判断是否匹配key
-         *
-         * @param bytes key
-         * @return
-         */
         private boolean matchKey(byte[] bytes) {
             if (includePatterns.isEmpty() && excludePatterns.isEmpty()) return true;
 
-            String key = new String(bytes, Charset.forName("utf-8"));
+            String key = new String(bytes, StandardCharsets.UTF_8);
 
             for (Pattern pattern : includePatterns) {
                 boolean isMatch = pattern.matcher(key).find();
@@ -257,8 +239,6 @@ public class RedisReader extends Reader {
         /**
          * 判断是否包含相关db
          *
-         * @param db
-         * @return
          */
         private boolean matchDB(int db) {
             return this.includeDB.isEmpty() || this.includeDB.contains(db);
@@ -267,42 +247,34 @@ public class RedisReader extends Reader {
         /**
          * 通过sync命令远程下载redis server rdb文件
          *
-         * @param uri     redis地址
-         * @param outFile 输出路径
-         * @throws IOException
-         * @throws URISyntaxException
          */
         private void dump(String uri, File outFile) throws IOException, URISyntaxException {
             final OutputStream out = new BufferedOutputStream(new FileOutputStream(outFile));
-            final RawByteListener rawByteListener = new RawByteListener() {
-                public void handle(byte... rawBytes) {
-                    try {
-                        out.write(rawBytes);
-                    } catch (IOException e) {
-                        throw new RuntimeException(e.getMessage(), e);
-                    }
+            final RawByteListener rawByteListener = rawBytes -> {
+                try {
+                    out.write(rawBytes);
+                } catch (IOException e) {
+                    throw new RuntimeException(e.getMessage(), e);
                 }
             };
             Replicator replicator = new RedisReplicator(uri);
             replicator.setRdbVisitor(new SkipRdbVisitor(replicator));
-            replicator.addEventListener(new EventListener() {
-                public void onEvent(Replicator replicator, Event event) {
-                    if (event instanceof PreRdbSyncEvent) {
-                        replicator.addRawByteListener(rawByteListener);
-                    }
-
-                    if (event instanceof PostRdbSyncEvent) {
-                        replicator.removeRawByteListener(rawByteListener);
-
-                        try {
-                            out.close();
-                            replicator.close();
-                        } catch (IOException e) {
-                            LOG.warn(e.getMessage(), e);
-                        }
-                    }
-
+            replicator.addEventListener((replicator1, event) -> {
+                if (event instanceof PreRdbSyncEvent) {
+                    replicator1.addRawByteListener(rawByteListener);
                 }
+
+                if (event instanceof PostRdbSyncEvent) {
+                    replicator1.removeRawByteListener(rawByteListener);
+
+                    try {
+                        out.close();
+                        replicator1.close();
+                    } catch (IOException e) {
+                        LOG.warn(e.getMessage(), e);
+                    }
+                }
+
             });
             replicator.open();
         }
@@ -310,9 +282,6 @@ public class RedisReader extends Reader {
         /**
          * 下载远程rdb文件
          *
-         * @param uri     rdb路径
-         * @param outFile 输出路径
-         * @throws IOException
          */
         private void download(URI uri, File outFile) throws IOException {
             CloseableHttpClient httpClient = this.getHttpClient();

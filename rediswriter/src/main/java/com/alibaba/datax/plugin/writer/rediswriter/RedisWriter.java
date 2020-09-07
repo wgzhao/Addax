@@ -14,7 +14,11 @@ import redis.clients.jedis.exceptions.JedisDataException;
 import redis.clients.util.JedisClusterCRC16;
 
 import java.net.URI;
-import java.util.*;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
 import java.util.Map.Entry;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicLong;
@@ -27,10 +31,10 @@ public class RedisWriter extends Writer {
         /**
          * slot 对应cluster Redis 节点
          */
-        private final Map<Integer, Jedis> cluster = new HashMap<Integer, Jedis>();
+        private final Map<Integer, Jedis> cluster = new HashMap<>();
 
 
-        private final Map<Jedis, AtomicLong> nodeCounterMap = new HashMap<Jedis, AtomicLong>();
+        private final Map<Jedis, AtomicLong> nodeCounterMap = new HashMap<>();
 
         /**
          * 单机redis
@@ -138,7 +142,7 @@ public class RedisWriter extends Writer {
             }
 
             this.nodeCounterMap.clear();
-            for (Jedis jedis : new HashSet<Jedis>(this.cluster.values())) {
+            for (Jedis jedis : new HashSet<>(this.cluster.values())) {
                 jedis.close();
             }
 
@@ -149,7 +153,6 @@ public class RedisWriter extends Writer {
         /**
          * 单机或proxy 写入模式
          *
-         * @param lineReceiver
          */
         private void standaloneWrite(RecordReceiver lineReceiver) {
             AtomicLong counter = new AtomicLong(0L);
@@ -178,7 +181,6 @@ public class RedisWriter extends Writer {
         /**
          * redis cluster 集群写入
          *
-         * @param lineReceiver
          */
         private void clusterWrite(RecordReceiver lineReceiver) {
 
@@ -237,7 +239,7 @@ public class RedisWriter extends Writer {
 
 
                 if (isCluster) {
-                    for (Jedis jedis : new HashSet<Jedis>(cluster.values())) {
+                    for (Jedis jedis : new HashSet<>(cluster.values())) {
                         Client client = jedis.getClient();
                         LOG.info("格式化:" + client.getHost() + ":" + client.getPort());
                         jedis.flushAll();
@@ -257,7 +259,6 @@ public class RedisWriter extends Writer {
         /**
          * 发送并检查异常
          *
-         * @param client
          */
         private void flushAndCheckReply(Client client) {
             List<Object> allReply = client.getAll();

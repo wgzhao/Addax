@@ -8,7 +8,7 @@ public enum MysqlReaderErrorCode implements ErrorCode {
     private final String code;
     private final String description;
 
-    private MysqlReaderErrorCode(String code, String description) {
+    MysqlReaderErrorCode(String code, String description) {
         this.code = code;
         this.description = description;
     }

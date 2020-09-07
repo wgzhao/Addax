@@ -7,8 +7,6 @@ import com.alibaba.datax.plugin.rdbms.util.DBUtil;
 import com.alibaba.datax.plugin.rdbms.util.DataBaseType;
 import com.alibaba.datax.plugin.rdbms.util.RdbmsException;
 import com.alibaba.druid.sql.parser.ParserException;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.sql.Connection;
 import java.sql.ResultSet;
@@ -19,12 +17,11 @@ import java.util.concurrent.Callable;
  * Created by judy.lt on 2015/6/4.
  */
 public class PreCheckTask implements Callable<Boolean>{
-    private static final Logger LOG = LoggerFactory.getLogger(PreCheckTask.class);
-    private String userName;
-    private String password;
-    private String splitPkId;
-    private Configuration connection;
-    private DataBaseType dataBaseType;
+    private final String userName;
+    private final String password;
+    private final String splitPkId;
+    private final Configuration connection;
+    private final DataBaseType dataBaseType;
 
     public PreCheckTask(String userName,
                         String password,

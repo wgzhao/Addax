@@ -4,7 +4,11 @@ import com.alibaba.datax.common.exception.DataXException;
 import com.alibaba.datax.common.util.Configuration;
 import com.alibaba.datax.plugin.rdbms.reader.Constant;
 import com.alibaba.datax.plugin.rdbms.reader.Key;
-import com.alibaba.datax.plugin.rdbms.util.*;
+import com.alibaba.datax.plugin.rdbms.util.DBUtil;
+import com.alibaba.datax.plugin.rdbms.util.DBUtilErrorCode;
+import com.alibaba.datax.plugin.rdbms.util.DataBaseType;
+import com.alibaba.datax.plugin.rdbms.util.RdbmsException;
+import com.alibaba.datax.plugin.rdbms.util.RdbmsRangeSplitWrap;
 import com.alibaba.fastjson.JSON;
 
 import org.apache.commons.lang3.StringUtils;
@@ -32,7 +36,7 @@ public class SingleTableSplitUtil {
 
     public static List<Configuration> splitSingleTable(
             Configuration configuration, int adviceNum) {
-        List<Configuration> pluginParams = new ArrayList<Configuration>();
+        List<Configuration> pluginParams = new ArrayList<>();
         List<String> rangeList;
         String splitPkName = configuration.getString(Key.SPLIT_PK);
         String column = configuration.getString(Key.COLUMN);
@@ -82,7 +86,7 @@ public class SingleTableSplitUtil {
             }
         }
         String tempQuerySql;
-        List<String> allQuerySql = new ArrayList<String>();
+        List<String> allQuerySql = new ArrayList<>();
 
         if (null != rangeList && !rangeList.isEmpty()) {
             for (String range : rangeList) {
@@ -187,7 +191,7 @@ public class SingleTableSplitUtil {
                                 .set(Constant.PK_TYPE, Constant.PK_TYPE_STRING);
                     }
                     while (DBUtil.asyncResultSetNext(rs)) {
-                        minMaxPK = new ImmutablePair<Object, Object>(
+                        minMaxPK = new ImmutablePair<>(
                                 rs.getString(1), rs.getString(2));
                     }
                 } else if (isLongType(rsMetaData.getColumnType(1))) {
@@ -196,7 +200,7 @@ public class SingleTableSplitUtil {
                     }
 
                     while (DBUtil.asyncResultSetNext(rs)) {
-                        minMaxPK = new ImmutablePair<Object, Object>(
+                        minMaxPK = new ImmutablePair<>(
                                 rs.getString(1), rs.getString(2));
 
                         // check: string shouldn't contain '.', for oracle
@@ -252,12 +256,8 @@ public class SingleTableSplitUtil {
         boolean isValidLongType = type == Types.BIGINT || type == Types.INTEGER
                 || type == Types.SMALLINT || type == Types.TINYINT;
 
-        switch (SingleTableSplitUtil.DATABASE_TYPE) {
-            case Oracle:
-                isValidLongType |= type == Types.NUMERIC;
-                break;
-            default:
-                break;
+        if (SingleTableSplitUtil.DATABASE_TYPE == DataBaseType.Oracle) {
+            isValidLongType |= type == Types.NUMERIC;
         }
         return isValidLongType;
     }
@@ -319,7 +319,7 @@ public class SingleTableSplitUtil {
                 username, password);
         LOG.info("split pk [sql={}] is running... ", splitSql);
         ResultSet rs = null;
-        List<Pair<Object, Integer>> splitedRange = new ArrayList<Pair<Object, Integer>>();
+        List<Pair<Object, Integer>> splitedRange = new ArrayList<>();
         try {
             try {
                 rs = DBUtil.query(conn, splitSql, fetchSize);
@@ -327,13 +327,11 @@ public class SingleTableSplitUtil {
                 throw RdbmsException.asQueryException(DATABASE_TYPE, e,
                         splitSql, table, username);
             }
-            if (configuration != null) {
-                configuration
-                        .set(Constant.PK_TYPE, Constant.PK_TYPE_MONTECARLO);
-            }
+            configuration
+                    .set(Constant.PK_TYPE, Constant.PK_TYPE_MONTECARLO);
             ResultSetMetaData rsMetaData = rs.getMetaData();
             while (DBUtil.asyncResultSetNext(rs)) {
-                ImmutablePair<Object, Integer> eachPoint = new ImmutablePair<Object, Integer>(
+                ImmutablePair<Object, Integer> eachPoint = new ImmutablePair<>(
                         rs.getObject(1), rsMetaData.getColumnType(1));
                 splitedRange.add(eachPoint);
             }
@@ -347,7 +345,7 @@ public class SingleTableSplitUtil {
             DBUtil.closeDBResources(rs, null, null);
         }
         LOG.debug(JSON.toJSONString(splitedRange));
-        List<String> rangeSql = new ArrayList<String>();
+        List<String> rangeSql = new ArrayList<>();
         int splitedRangeSize = splitedRange.size();
         // warn: splitedRangeSize may be 0 or 1，切分规则为IS NULL以及 IS NOT NULL
         // demo: Parameter rangeResult can not be null and its length can not <2. detail:rangeResult=[24999930].
@@ -369,8 +367,8 @@ public class SingleTableSplitUtil {
                 // warn: treated as string type
                 String[] stringPoints = new String[splitedRange.size()];
                 for (int i = 0; i < splitedRangeSize; i++) {
-                    stringPoints[i] = new String(splitedRange.get(i).getLeft()
-                            .toString());
+                    stringPoints[i] = splitedRange.get(i).getLeft()
+                            .toString();
                 }
                 rangeSql.addAll(RdbmsRangeSplitWrap.wrapRange(stringPoints,
                         splitPK, "'", DATABASE_TYPE));

@@ -12,7 +12,7 @@ public class ZipCycleInputStream extends InputStream {
     private static final Logger LOG = LoggerFactory
             .getLogger(ZipCycleInputStream.class);
 
-    private ZipInputStream zipInputStream;
+    private final ZipInputStream zipInputStream;
     private ZipEntry currentZipEntry;
 
     public ZipCycleInputStream(InputStream in) {

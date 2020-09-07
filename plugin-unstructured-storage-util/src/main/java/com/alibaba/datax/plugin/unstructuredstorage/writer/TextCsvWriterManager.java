@@ -26,13 +26,11 @@ public class TextCsvWriterManager {
 class CsvWriterImpl implements UnstructuredWriter {
     private static final Logger LOG = LoggerFactory
             .getLogger(CsvWriterImpl.class);
-    // csv 严格符合csv语法, 有标准的转义等处理
-    private char fieldDelimiter;
-    private CsvWriter csvWriter;
+    private final CsvWriter csvWriter;
 
     public CsvWriterImpl(Writer writer, char fieldDelimiter) {
-        this.fieldDelimiter = fieldDelimiter;
-        this.csvWriter = new CsvWriter(writer, this.fieldDelimiter);
+        // csv 严格符合csv语法, 有标准的转义等处理
+        this.csvWriter = new CsvWriter(writer, fieldDelimiter);
         this.csvWriter.setTextQualifier('"');
         this.csvWriter.setUseTextQualifier(true);
         // warn: in linux is \n , in windows is \r\n
@@ -44,17 +42,17 @@ class CsvWriterImpl implements UnstructuredWriter {
         if (splitedRows.isEmpty()) {
             LOG.info("Found one record line which is empty.");
         }
-        this.csvWriter.writeRecord((String[]) splitedRows
+        this.csvWriter.writeRecord(splitedRows
                 .toArray(new String[0]));
     }
 
     @Override
-    public void flush() throws IOException {
+    public void flush() {
         this.csvWriter.flush();
     }
 
     @Override
-    public void close() throws IOException {
+    public void close() {
         this.csvWriter.close();
     }
 
@@ -64,8 +62,8 @@ class TextWriterImpl implements UnstructuredWriter {
     private static final Logger LOG = LoggerFactory
             .getLogger(TextWriterImpl.class);
     // text StringUtils的join方式, 简单的字符串拼接
-    private char fieldDelimiter;
-    private Writer textWriter;
+    private final char fieldDelimiter;
+    private final Writer textWriter;
 
     public TextWriterImpl(Writer writer, char fieldDelimiter) {
         this.fieldDelimiter = fieldDelimiter;

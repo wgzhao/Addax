@@ -28,11 +28,11 @@ public final class TableExpandUtil {
 	 */
 	public static List<String> splitTables(DataBaseType dataBaseType,
 			String tables) {
-		List<String> splittedTables = new ArrayList<String>();
+		List<String> splittedTables = new ArrayList<>();
 
 		String[] tableArrays = tables.split(",");
 
-		String tableName = null;
+		String tableName;
 		for (String tableArray : tableArrays) {
 			Matcher matcher = pattern.matcher(tableArray.trim());
 			if (!matcher.matches()) {
@@ -41,28 +41,27 @@ public final class TableExpandUtil {
 			} else {
 				String start = matcher.group(3).trim();
 				String end = matcher.group(4).trim();
-				String tmp = "";
-				if (Integer.valueOf(start) > Integer.valueOf(end)) {
+				String tmp;
+				if (Integer.parseInt(start) > Integer.parseInt(end)) {
 					tmp = start;
 					start = end;
 					end = tmp;
 				}
 				int len = start.length();
-				String schema = null;
-				for (int k = Integer.valueOf(start); k <= Integer.valueOf(end); k++) {
+				String schema;
+				for (int k = Integer.parseInt(start); k <= Integer.parseInt(end); k++) {
 					schema = (null == matcher.group(1)) ? "" : matcher.group(1)
 							.trim();
 					if (start.startsWith("0")) {
 						tableName = schema + matcher.group(2).trim()
 								+ String.format("%0" + len + "d", k)
 								+ matcher.group(5).trim();
-						splittedTables.add(tableName);
 					} else {
 						tableName = schema + matcher.group(2).trim()
 								+ String.format("%d", k)
 								+ matcher.group(5).trim();
-						splittedTables.add(tableName);
 					}
+					splittedTables.add(tableName);
 				}
 			}
 		}
@@ -71,7 +70,7 @@ public final class TableExpandUtil {
 
 	public static List<String> expandTableConf(DataBaseType dataBaseType,
 			List<String> tables) {
-		List<String> parsedTables = new ArrayList<String>();
+		List<String> parsedTables = new ArrayList<>();
 		for (String table : tables) {
 			List<String> splittedTables = splitTables(dataBaseType, table);
 			parsedTables.addAll(splittedTables);
