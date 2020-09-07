@@ -4,6 +4,22 @@
 
 HbaseReader 插件实现了从 Hbase中读取数据。在底层实现上，HbaseReader 通过 HBase 的 Java 客户端连接远程 HBase 服务，并通过 Scan 方式读取你指定 rowkey 范围内的数据，并将读取的数据使用 DataX 自定义的数据类型拼装为抽象的数据集，并传递给下游 Writer 处理。
 
+以下演示基于下面创建的表以及数据
+
+```shell
+create 'users', 'address','info'
+put 'users', 'lisi', 'address:country', 'china'
+put 'users', 'lisi', 'address:province',    'beijing'
+put 'users', 'lisi', 'info:age',        27
+put 'users', 'lisi', 'info:birthday',   '1987-06-17'
+put 'users', 'lisi', 'info:company',    'baidu'
+put 'users', 'xiaoming', 'address:city',    'hangzhou'
+put 'users', 'xiaoming', 'address:country', 'china'
+put 'users', 'xiaoming', 'address:province',    'zhejiang'
+put 'users', 'xiaoming', 'info:age',        29
+put 'users', 'xiaoming', 'info:birthday',   '1987-06-17'
+put 'users', 'xiaoming', 'info:company',    'alibaba'
+```
 
 ### 1.1  支持模式
 目前HbaseReader支持两模式读取：normal 模式、multiVersionFixedColumn模式；
@@ -14,30 +30,29 @@ HbaseReader 插件实现了从 Hbase中读取数据。在底层实现上，Hbase
 
 ```shell
 hbase(main):017:0> scan 'users'
-ROW                                   COLUMN+CELL
- lisi                                 column=address:city, timestamp=1457101972764, value=beijing
- lisi                                 column=address:contry, timestamp=1457102773908, value=china
- lisi                                 column=address:province, timestamp=1457101972736, value=beijing
- lisi                                 column=info:age, timestamp=1457101972548, value=27
- lisi                                 column=info:birthday, timestamp=1457101972604, value=1987-06-17
- lisi                                 column=info:company, timestamp=1457101972653, value=baidu
- xiaoming                             column=address:city, timestamp=1457082196082, value=hangzhou
- xiaoming                             column=address:contry, timestamp=1457082195729, value=china
- xiaoming                             column=address:province, timestamp=1457082195773, value=zhejiang
- xiaoming                             column=info:age, timestamp=1457082218735, value=29
- xiaoming                             column=info:birthday, timestamp=1457082186830, value=1987-06-17
- xiaoming                             column=info:company, timestamp=1457082189826, value=alibaba
+ROW           COLUMN+CELL
+ lisi         column=address:city, timestamp=1457101972764, value=beijing
+ lisi         column=address:country, timestamp=1457102773908, value=china
+ lisi         column=address:province, timestamp=1457101972736, value=beijing
+ lisi         column=info:age, timestamp=1457101972548, value=27
+ lisi         column=info:birthday, timestamp=1457101972604, value=1987-06-17
+ lisi         column=info:company, timestamp=1457101972653, value=baidu
+ xiaoming     column=address:city, timestamp=1457082196082, value=hangzhou
+ xiaoming     column=address:country, timestamp=1457082195729, value=china
+ xiaoming     column=address:province, timestamp=1457082195773, value=zhejiang
+ xiaoming     column=info:age, timestamp=1457082218735, value=29
+ xiaoming     column=info:birthday, timestamp=1457082186830, value=1987-06-17
+ xiaoming     column=info:company, timestamp=1457082189826, value=alibaba
 2 row(s) in 0.0580 seconds
 ```
 
 读取后数据
 
 
-| rowKey   | addres:city | address:contry | address:province | info:age | info:birthday | info:company |
+| rowKey   | addres:city | address:country | address:province | info:age | info:birthday | info:company |
 | -------- | ----------- | -------------- | ---------------- | -------- | ------------- | ------------ |
 | lisi     | beijing     | china          | beijing          | 27       | 1987-06-17    | baidu        |
 | xiaoming | hangzhou    | china          | zhejiang         | 29       | 1987-06-17    | alibaba      |
-
 
 
 #### multiVersionFixedColumn模式

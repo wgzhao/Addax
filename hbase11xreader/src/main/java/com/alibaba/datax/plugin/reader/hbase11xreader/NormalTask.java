@@ -1,7 +1,6 @@
 package com.alibaba.datax.plugin.reader.hbase11xreader;
 
 import com.alibaba.datax.common.element.Column;
-import com.alibaba.datax.common.element.Record;
 import com.alibaba.datax.common.element.StringColumn;
 import com.alibaba.datax.common.util.Configuration;
 import org.apache.hadoop.hbase.client.Result;
@@ -13,7 +12,7 @@ import java.util.Map;
 
 public class NormalTask extends HbaseAbstractTask {
     private List<Map> column;
-    private List<HbaseColumnCell> hbaseColumnCells;
+    private final List<HbaseColumnCell> hbaseColumnCells;
 
     public NormalTask(Configuration configuration) {
         super(configuration);

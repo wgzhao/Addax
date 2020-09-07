@@ -1,7 +1,6 @@
 package com.alibaba.datax.plugin.reader.hbase11xreader;
 
 
-import com.alibaba.datax.common.element.Record;
 import com.alibaba.datax.common.exception.DataXException;
 import com.alibaba.datax.common.plugin.RecordSender;
 import com.alibaba.datax.common.spi.Reader;
@@ -38,21 +37,20 @@ public class Hbase11xReader extends Reader {
 
     }
     public static class Task extends Reader.Task {
-        private Configuration taskConfig;
-        private static Logger LOG = LoggerFactory.getLogger(Task.class);
+        private static final Logger LOG = LoggerFactory.getLogger(Task.class);
         private HbaseAbstractTask hbaseTaskProxy;
         @Override
         public void init() {
-            this.taskConfig = super.getPluginJobConf();
-            String mode = this.taskConfig.getString(Key.MODE);
+            Configuration taskConfig = super.getPluginJobConf();
+            String mode = taskConfig.getString(Key.MODE);
             ModeType modeType = ModeType.getByTypeName(mode);
 
             switch (modeType) {
                 case Normal:
-                    this.hbaseTaskProxy = new NormalTask(this.taskConfig);
+                    this.hbaseTaskProxy = new NormalTask(taskConfig);
                     break;
                 case MultiVersionFixedColumn:
-                    this.hbaseTaskProxy = new MultiVersionFixedColumnTask(this.taskConfig);
+                    this.hbaseTaskProxy = new MultiVersionFixedColumnTask(taskConfig);
                     break;
                 default:
                     throw DataXException.asDataXException(Hbase11xReaderErrorCode.ILLEGAL_VALUE, "Hbasereader 不支持此类模式:" + modeType);

@@ -9,7 +9,7 @@ public enum ModeType {
     MultiVersionFixedColumn("multiVersionFixedColumn")
     ;
 
-    private String mode;
+    private final String mode;
 
 
     ModeType(String mode) {

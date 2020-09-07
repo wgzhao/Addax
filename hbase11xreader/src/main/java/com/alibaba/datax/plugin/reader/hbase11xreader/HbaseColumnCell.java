@@ -9,7 +9,7 @@ import org.apache.hadoop.hbase.util.Bytes;
  * 描述 hbasereader 插件中，column 配置中的一个单元项实体
  */
 public class HbaseColumnCell extends BaseObject {
-    private ColumnType columnType;
+    private final ColumnType columnType;
 
     // columnName 格式为：列族:列名
     private String columnName;
@@ -21,7 +21,7 @@ public class HbaseColumnCell extends BaseObject {
     private String columnValue;
 
     //当配置了 columnValue 时，isConstant=true（这个成员变量是用于方便使用本类的地方判断是否是常量类型字段）
-    private boolean isConstant;
+    private final boolean isConstant;
 
     // 只在类型是时间类型时，才会设置该值，无默认值。形式如：yyyy-MM-dd HH:mm:ss
     private String dateformat;
@@ -90,7 +90,7 @@ public class HbaseColumnCell extends BaseObject {
 
     // 内部 builder 类
     public static class Builder {
-        private ColumnType columnType;
+        private final ColumnType columnType;
         private String columnName;
         private String columnValue;
 

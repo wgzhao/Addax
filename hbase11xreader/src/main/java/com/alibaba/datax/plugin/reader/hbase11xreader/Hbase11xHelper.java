@@ -221,7 +221,7 @@ public class Hbase11xHelper {
      * 用于解析 Normal 模式下的列配置
      */
     public static List<HbaseColumnCell> parseColumnOfNormalMode(List<Map> column) {
-        List<HbaseColumnCell> hbaseColumnCells = new ArrayList<HbaseColumnCell>();
+        List<HbaseColumnCell> hbaseColumnCells = new ArrayList<>();
 
         HbaseColumnCell oneColumnCell;
 
@@ -261,7 +261,7 @@ public class Hbase11xHelper {
     //将多竖表column变成<familyQualifier,<>>形式
     public static HashMap<String,HashMap<String,String>> parseColumnOfMultiversionMode(List<Map> column){
 
-        HashMap<String,HashMap<String,String>> familyQualifierMap = new HashMap<String,HashMap<String,String>>();
+        HashMap<String,HashMap<String,String>> familyQualifierMap = new HashMap<>();
         for (Map<String, String> aColumn : column) {
             String type = aColumn.get(Key.TYPE);
             String columnName = aColumn.get(Key.NAME);
@@ -444,7 +444,7 @@ public class Hbase11xHelper {
         originalConfig.set(Key.SCAN_BATCH_SIZE,scanBatchSize);
     }
 
-    private static String validateMode(com.alibaba.datax.common.util.Configuration  originalConfig) {
+    private static void validateMode(com.alibaba.datax.common.util.Configuration  originalConfig) {
         String mode = originalConfig.getNecessaryValue(Key.MODE,Hbase11xReaderErrorCode.REQUIRED_VALUE);
         List<Map> column = originalConfig.getList(Key.COLUMN, Map.class);
         if (column == null || column.isEmpty()) {
@@ -471,7 +471,6 @@ public class Hbase11xHelper {
                 throw DataXException.asDataXException(Hbase11xReaderErrorCode.ILLEGAL_VALUE,
                         String.format("HbaseReader不支持该 mode 类型:%s", mode));
         }
-        return mode;
     }
 
     // 检查 maxVersion 是否存在，并且值是否合法

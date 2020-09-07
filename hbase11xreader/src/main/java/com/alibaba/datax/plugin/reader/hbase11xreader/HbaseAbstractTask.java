@@ -17,8 +17,8 @@ import java.io.IOException;
 public abstract class HbaseAbstractTask {
     private final static Logger LOG = LoggerFactory.getLogger(HbaseAbstractTask.class);
 
-    private byte[] startKey = null;
-    private byte[] endKey = null;
+    private final byte[] startKey;
+    private final byte[] endKey;
 
     protected Table htable;
     protected String encoding;
@@ -50,8 +50,8 @@ public abstract class HbaseAbstractTask {
     public void prepare() throws Exception {
         this.scan = new Scan();
         this.scan.setSmall(false);
-        this.scan.setStartRow(startKey);
-        this.scan.setStopRow(endKey);
+        this.scan.withStartRow(startKey);
+        this.scan.withStopRow(endKey);
         LOG.info("The task set startRowkey=[{}], endRowkey=[{}].", Bytes.toStringBinary(this.startKey), Bytes.toStringBinary(this.endKey));
         //scan的Caching Batch全部留在hconfig中每次从服务器端读取的行数，设置默认值未256
         this.scan.setCaching(this.scanCacheSize);
@@ -75,7 +75,7 @@ public abstract class HbaseAbstractTask {
             result = resultScanner.next();
         } catch (IOException e) {
             if (lastResult != null) {
-                this.scan.setStartRow(lastResult.getRow());
+                this.scan.withStopRow(lastResult.getRow());
             }
             resultScanner = this.htable.getScanner(scan);
             result = resultScanner.next();
@@ -117,7 +117,7 @@ public abstract class HbaseAbstractTask {
                 break;
             case DATE:
                 String dateValue = Bytes.toStringBinary(byteArray);
-                column = new DateColumn(ArrayUtils.isEmpty(byteArray) ? null : DateUtils.parseDate(dateValue, new String[]{dateformat}));
+                column = new DateColumn(ArrayUtils.isEmpty(byteArray) ? null : DateUtils.parseDate(dateValue, dateformat));
                 break;
             default:
                 throw DataXException.asDataXException(Hbase11xReaderErrorCode.ILLEGAL_VALUE, "Hbasereader 不支持您配置的列类型:" + columnType);
@@ -144,7 +144,7 @@ public abstract class HbaseAbstractTask {
                 column = new StringColumn(constantValue);
                 break;
             case DATE:
-                column = new DateColumn(DateUtils.parseDate(constantValue, new String[]{dateformat}));
+                column = new DateColumn(DateUtils.parseDate(constantValue, dateformat));
                 break;
             default:
                 throw DataXException.asDataXException(Hbase11xReaderErrorCode.ILLEGAL_VALUE, "Hbasereader 常量列不支持您配置的列类型:" + columnType);
