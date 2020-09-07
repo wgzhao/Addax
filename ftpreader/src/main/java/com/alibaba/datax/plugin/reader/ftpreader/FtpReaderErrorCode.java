@@ -29,7 +29,7 @@ public enum FtpReaderErrorCode implements ErrorCode {
 	private final String code;
 	private final String description;
 
-	private FtpReaderErrorCode(String code, String description) {
+	FtpReaderErrorCode(String code, String description) {
 		this.code = code;
 		this.description = description;
 	}

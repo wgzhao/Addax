@@ -1,23 +1,22 @@
 package com.alibaba.datax.plugin.reader.ftpreader;
 
-import java.io.InputStream;
-import java.util.HashSet;
-import java.util.Properties;
-import java.util.Vector;
-
-import org.apache.commons.io.IOUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import com.alibaba.datax.common.exception.DataXException;
 import com.alibaba.datax.plugin.unstructuredstorage.reader.UnstructuredStorageReaderUtil;
 import com.jcraft.jsch.ChannelSftp;
+import com.jcraft.jsch.ChannelSftp.LsEntry;
 import com.jcraft.jsch.JSch;
 import com.jcraft.jsch.JSchException;
 import com.jcraft.jsch.Session;
 import com.jcraft.jsch.SftpATTRS;
 import com.jcraft.jsch.SftpException;
-import com.jcraft.jsch.ChannelSftp.LsEntry;
+import org.apache.commons.io.IOUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import java.io.InputStream;
+import java.util.HashSet;
+import java.util.Properties;
+import java.util.Vector;
 
 public class SftpHelper extends FtpHelper {
 	private static final Logger LOG = LoggerFactory.getLogger(SftpHelper.class);
@@ -149,11 +148,11 @@ public class SftpHelper extends FtpHelper {
 		}
 	}
 
-	HashSet<String> sourceFiles = new HashSet<String>();
+	HashSet<String> sourceFiles = new HashSet<>();
 	@Override
 	public HashSet<String> getListFiles(String directoryPath, int parentLevel, int maxTraversalLevel) {
 		if(parentLevel < maxTraversalLevel){
-			String parentPath = null;// 父级目录,以'/'结尾
+			String parentPath;// 父级目录,以'/'结尾
 			int pathLen = directoryPath.length();
 			if (directoryPath.contains("*") || directoryPath.contains("?")) {//*和？的限制
 				// path是正则表达式
@@ -191,23 +190,23 @@ public class SftpHelper extends FtpHelper {
 	
 			try {
 				Vector vector = channelSftp.ls(directoryPath);
-				for (int i = 0; i < vector.size(); i++) {
-					LsEntry le = (LsEntry) vector.get(i);
+				for (Object o : vector) {
+					LsEntry le = (LsEntry) o;
 					String strName = le.getFilename();
 					String filePath = parentPath + strName;
-	
+
 					if (isDirExist(filePath)) {
 						// 是子目录
 						if (!(strName.equals(".") || strName.equals(".."))) {
 							//递归处理
-							getListFiles(filePath, parentLevel+1, maxTraversalLevel);
+							getListFiles(filePath, parentLevel + 1, maxTraversalLevel);
 						}
-					} else if(isSymbolicLink(filePath)){
+					} else if (isSymbolicLink(filePath)) {
 						//是链接文件
 						String message = String.format("文件:[%s]是链接文件，当前不支持链接文件的读取", filePath);
 						LOG.error(message);
 						throw DataXException.asDataXException(FtpReaderErrorCode.LINK_FILE, message);
-					}else if (isFileExist(filePath)) {
+					} else if (isFileExist(filePath)) {
 						// 是文件
 						sourceFiles.add(filePath);
 					} else {
@@ -215,7 +214,7 @@ public class SftpHelper extends FtpHelper {
 						LOG.error(message);
 						throw DataXException.asDataXException(FtpReaderErrorCode.FILE_NOT_EXISTS, message);
 					}
-	
+
 				} // end for vector
 			} catch (SftpException e) {
 				String message = String.format("获取path：[%s] 下文件列表时发生I/O异常,请确认与ftp服务器的连接正常", directoryPath);

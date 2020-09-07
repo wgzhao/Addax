@@ -29,7 +29,6 @@ public class FtpWriter extends Writer {
         private Configuration writerSliceConfig = null;
         private Set<String> allFileExists = null;
 
-        private String protocol;
         private String host;
         private int port;
         private String username;
@@ -45,13 +44,10 @@ public class FtpWriter extends Writer {
             UnstructuredStorageWriterUtil
                     .validateParameter(this.writerSliceConfig);
             try {
-                RetryUtil.executeWithRetry(new Callable<Void>() {
-                    @Override
-                    public Void call() throws Exception {
-                        ftpHelper.loginFtpServer(host, username, password,
-                                port, timeout);
-                        return null;
-                    }
+                RetryUtil.executeWithRetry((Callable<Void>) () -> {
+                    ftpHelper.loginFtpServer(host, username, password,
+                            port, timeout);
+                    return null;
                 }, 3, 4000, true);
             } catch (Exception e) {
                 String message = String
@@ -86,13 +82,13 @@ public class FtpWriter extends Writer {
             this.timeout = this.writerSliceConfig.getInt(Key.TIMEOUT,
                     Constant.DEFAULT_TIMEOUT);
 
-            this.protocol = this.writerSliceConfig.getNecessaryValue(
+            String protocol = this.writerSliceConfig.getNecessaryValue(
                     Key.PROTOCOL, FtpWriterErrorCode.REQUIRED_VALUE);
-            if ("sftp".equalsIgnoreCase(this.protocol)) {
+            if ("sftp".equalsIgnoreCase(protocol)) {
                 this.port = this.writerSliceConfig.getInt(Key.PORT,
                         Constant.DEFAULT_SFTP_PORT);
                 this.ftpHelper = new SftpHelperImpl();
-            } else if ("ftp".equalsIgnoreCase(this.protocol)) {
+            } else if ("ftp".equalsIgnoreCase(protocol)) {
                 this.port = this.writerSliceConfig.getInt(Key.PORT,
                         Constant.DEFAULT_FTP_PORT);
                 this.ftpHelper = new StandardFtpHelperImpl();
@@ -125,7 +121,7 @@ public class FtpWriter extends Writer {
                 LOG.info(String.format(
                         "由于您配置了writeMode truncate, 开始清理 [%s] 下面以 [%s] 开头的内容",
                         path, fileName));
-                Set<String> fullFileNameToDelete = new HashSet<String>();
+                Set<String> fullFileNameToDelete = new HashSet<>();
                 for (String each : allFileExists) {
                     fullFileNameToDelete.add(UnstructuredStorageWriterUtil
                             .buildFilePath(path, each, null));
@@ -203,7 +199,6 @@ public class FtpWriter extends Writer {
         private String fileName;
         private String suffix;
 
-        private String protocol;
         private String host;
         private int port;
         private String username;
@@ -227,21 +222,18 @@ public class FtpWriter extends Writer {
             this.password = this.writerSliceConfig.getString(Key.PASSWORD);
             this.timeout = this.writerSliceConfig.getInt(Key.TIMEOUT,
                     Constant.DEFAULT_TIMEOUT);
-            this.protocol = this.writerSliceConfig.getString(Key.PROTOCOL);
+            String protocol = this.writerSliceConfig.getString(Key.PROTOCOL);
 
-            if ("sftp".equalsIgnoreCase(this.protocol)) {
+            if ("sftp".equalsIgnoreCase(protocol)) {
                 this.ftpHelper = new SftpHelperImpl();
-            } else if ("ftp".equalsIgnoreCase(this.protocol)) {
+            } else if ("ftp".equalsIgnoreCase(protocol)) {
                 this.ftpHelper = new StandardFtpHelperImpl();
             }
             try {
-                RetryUtil.executeWithRetry(new Callable<Void>() {
-                    @Override
-                    public Void call() throws Exception {
-                        ftpHelper.loginFtpServer(host, username, password,
-                                port, timeout);
-                        return null;
-                    }
+                RetryUtil.executeWithRetry((Callable<Void>) () -> {
+                    ftpHelper.loginFtpServer(host, username, password,
+                            port, timeout);
+                    return null;
                 }, 3, 4000, true);
             } catch (Exception e) {
                 String message = String
@@ -276,7 +268,7 @@ public class FtpWriter extends Writer {
                         FtpWriterErrorCode.WRITE_FILE_IO_ERROR,
                         String.format("无法创建待写文件 : [%s]", this.fileName), e);
             } finally {
-                IOUtils.closeQuietly(outputStream);
+                IOUtils.closeQuietly(outputStream, null);
             }
             LOG.info("end do write");
         }

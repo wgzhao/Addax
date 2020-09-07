@@ -1,18 +1,17 @@
 package com.alibaba.datax.plugin.reader.ftpreader;
 
-import java.io.InputStream;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import com.alibaba.datax.common.exception.DataXException;
 import com.alibaba.datax.common.plugin.RecordSender;
 import com.alibaba.datax.common.spi.Reader;
 import com.alibaba.datax.common.util.Configuration;
 import com.alibaba.datax.plugin.unstructuredstorage.reader.UnstructuredStorageReaderUtil;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import java.io.InputStream;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
 
 public class FtpReader extends Reader {
 	public static class Job extends Reader.Job {
@@ -39,7 +38,7 @@ public class FtpReader extends Reader {
 		@Override
 		public void init() {
 			this.originConfig = this.getPluginJobConf();
-			this.sourceFiles = new HashSet<String>();
+			this.sourceFiles = new HashSet<>();
 
 			this.validateParameter();
 			UnstructuredStorageReaderUtil.validateParameter(this.originConfig);
@@ -84,7 +83,7 @@ public class FtpReader extends Reader {
 			//path check
 			String pathInString = this.originConfig.getNecessaryValue(Key.PATH, FtpReaderErrorCode.REQUIRED_VALUE);
 			if (!pathInString.startsWith("[") && !pathInString.endsWith("]")) {
-				path = new ArrayList<String>();
+				path = new ArrayList<>();
 				path.add(pathInString);
 			} else {
 				path = this.originConfig.getList(Key.PATH, String.class);
@@ -131,7 +130,7 @@ public class FtpReader extends Reader {
 		@Override
 		public List<Configuration> split(int adviceNumber) {
 			LOG.debug("split() begin...");
-			List<Configuration> readerSplitConfigs = new ArrayList<Configuration>();
+			List<Configuration> readerSplitConfigs = new ArrayList<>();
 
 			// warn:每个slice拖且仅拖一个文件,
 			// int splitNumber = adviceNumber;
@@ -152,11 +151,11 @@ public class FtpReader extends Reader {
 		}
 
 		private <T> List<List<T>> splitSourceFiles(final List<T> sourceList, int adviceNumber) {
-			List<List<T>> splitedList = new ArrayList<List<T>>();
+			List<List<T>> splitedList = new ArrayList<>();
 			int averageLength = sourceList.size() / adviceNumber;
 			averageLength = averageLength == 0 ? 1 : averageLength;
 
-			for (int begin = 0, end = 0; begin < sourceList.size(); begin = end) {
+			for (int begin = 0, end; begin < sourceList.size(); begin = end) {
 				end = begin + averageLength;
 				if (end > sourceList.size()) {
 					end = sourceList.size();
@@ -169,14 +168,11 @@ public class FtpReader extends Reader {
 	}
 
 	public static class Task extends Reader.Task {
-		private static Logger LOG = LoggerFactory.getLogger(Task.class);
+		private static final Logger LOG = LoggerFactory.getLogger(Task.class);
 
 		private String host;
 		private int port;
 		private String username;
-		private String password;
-		private String protocol;
-		private int timeout;
 		private String connectPattern;
 
 		private Configuration readerSliceConfig;
@@ -189,10 +185,10 @@ public class FtpReader extends Reader {
 			/* for ftp connection */
 			this.readerSliceConfig = this.getPluginJobConf();
 			this.host = readerSliceConfig.getString(Key.HOST);
-			this.protocol = readerSliceConfig.getString(Key.PROTOCOL);
+			String protocol = readerSliceConfig.getString(Key.PROTOCOL);
 			this.username = readerSliceConfig.getString(Key.USERNAME);
-			this.password = readerSliceConfig.getString(Key.PASSWORD);
-			this.timeout = readerSliceConfig.getInt(Key.TIMEOUT, Constant.DEFAULT_TIMEOUT);
+			String password = readerSliceConfig.getString(Key.PASSWORD);
+			int timeout = readerSliceConfig.getInt(Key.TIMEOUT, Constant.DEFAULT_TIMEOUT);
 
 			this.sourceFiles = this.readerSliceConfig.getList(Constant.SOURCE_FILES, String.class);
 
@@ -237,7 +233,7 @@ public class FtpReader extends Reader {
 			LOG.debug("start read source files...");
 			for (String fileName : this.sourceFiles) {
 				LOG.info(String.format("reading file : [%s]", fileName));
-				InputStream inputStream = null;
+				InputStream inputStream;
 				
 				inputStream = ftpHelper.getInputStream(fileName);
 	
