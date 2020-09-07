@@ -7,95 +7,69 @@ import java.util.List;
 public abstract class FtpHelper {
 	/**
 	 * 
-	* @Title: LoginFtpServer 
-	* @Description: 与ftp服务器建立连接
-	* @param @param host
-	* @param @param username
-	* @param @param password
-	* @param @param port
-	* @param @param timeout
-	* @param @param connectMode     
-	* @return void 
-	* @throws
+	* 与ftp服务器建立连接
+	* @param host 要连接的主机名，可以是IP地址
+	* @param username 连接的账号
+	* @param password 账号对应的密码
+	* @param port 连接端口
+	* @param timeout 超时时间（单位为秒）
+	* @param connectMode 连接模式
 	 */
 	public abstract void loginFtpServer(String host, String username, String password, int port, int timeout,String connectMode) ;
 	/**
-	 * 
-	* @Title: LogoutFtpServer 
-	* todo 方法名首字母
-	* @Description: 断开与ftp服务器的连接 
-	* @param      
-	* @return void 
-	* @throws
+	 *
+	* 断开与ftp服务器的连接
 	 */
 	public abstract void logoutFtpServer();
 	/**
-	 * 
-	* @Title: isDirExist 
-	* @Description: 判断指定路径是否是目录
-	* @param @param directoryPath
-	* @param @return     
-	* @return boolean 
-	* @throws
+	 *
+	* 判断指定路径是否是目录
+	* @param directoryPath 要判断的目录
+	* @return boolean
 	 */
 	public abstract boolean isDirExist(String directoryPath);
 	/**
 	 * 
-	* @Title: isFileExist 
-	* @Description: 判断指定路径是否是文件
-	* @param @param filePath
-	* @param @return     
-	* @return boolean 
-	* @throws
+	* 判断指定路径是否是文件
+	* @param filePath 要判断的文件
+	* @return boolean
 	 */
 	public abstract boolean isFileExist(String filePath);
 	/**
 	 * 
-	* @Title: isSymbolicLink 
-	* @Description: 判断指定路径是否是软链接
-	* @param @param filePath
-	* @param @return     
-	* @return boolean 
-	* @throws
+	* 判断指定路径是否是软链接
+	* @param filePath 要判断的文件
+	* @return boolean
 	 */
 	public abstract boolean isSymbolicLink(String filePath);
 	/**
 	 * 
-	* @Title: getListFiles 
-	* @Description: 递归获取指定路径下符合条件的所有文件绝对路径
-	* @param @param directoryPath
-	* @param @param parentLevel 父目录的递归层数（首次为0）
-	* @param @param maxTraversalLevel 允许的最大递归层数
-	* @param @return     
-	* @return HashSet<String> 
-	* @throws
+	* 递归获取指定路径下符合条件的所有文件绝对路径
+	* @param directoryPath 根目录
+	* @param parentLevel 父目录的递归层数（首次为0）
+	* @param maxTraversalLevel 允许的最大递归层数
+	* @return HashSet<String>
 	 */
 	public abstract HashSet<String> getListFiles(String directoryPath, int parentLevel, int maxTraversalLevel);
 	
 	/**
 	 * 
-	* @Title: getInputStream 
-	* @Description: 获取指定路径的输入流
-	* @param @param filePath
-	* @param @return     
-	* @return InputStream 
-	* @throws
+	* 获取指定路径的输入流
+	* @param filePath 需要获取的文件目录
+	* @return InputStream
 	 */
 	public abstract InputStream getInputStream(String filePath);
 	
 	/**
-	 * 
-	* @Title: getAllFiles 
-	* @Description: 获取指定路径列表下符合条件的所有文件的绝对路径  
-	* @param @param srcPaths 路径列表
-	* @param @param parentLevel 父目录的递归层数（首次为0）
-	* @param @param maxTraversalLevel 允许的最大递归层数
-	* @param @return     
-	* @return HashSet<String> 
-	* @throws
+	 *
+	* 获取指定路径列表下符合条件的所有文件的绝对路径
+	* @param srcPaths 路径列表
+	* @param parentLevel 父目录的递归层数（首次为0）
+	* @param maxTraversalLevel 允许的最大递归层数
+	* @return HashSet<String>
 	 */
 	public HashSet<String> getAllFiles(List<String> srcPaths, int parentLevel, int maxTraversalLevel){
-		HashSet<String> sourceAllFiles = new HashSet<String>();
+		HashSet<String> sourceAllFiles = new HashSet<>();
 		if (!srcPaths.isEmpty()) {
 			for (String eachPath : srcPaths) {
 				sourceAllFiles.addAll(getListFiles(eachPath, parentLevel, maxTraversalLevel));

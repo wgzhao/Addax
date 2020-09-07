@@ -1,21 +1,19 @@
 package com.alibaba.datax.plugin.reader.ftpreader;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.net.UnknownHostException;
-import java.util.HashSet;
-
+import com.alibaba.datax.common.exception.DataXException;
+import com.alibaba.datax.plugin.unstructuredstorage.reader.UnstructuredStorageReaderUtil;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.net.ftp.FTP;
 import org.apache.commons.net.ftp.FTPClient;
-import org.apache.commons.net.ftp.FTPClientConfig;
 import org.apache.commons.net.ftp.FTPFile;
 import org.apache.commons.net.ftp.FTPReply;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.alibaba.datax.common.exception.DataXException;
-import com.alibaba.datax.plugin.unstructuredstorage.reader.UnstructuredStorageReaderUtil;
+import java.io.IOException;
+import java.io.InputStream;
+import java.net.UnknownHostException;
+import java.util.HashSet;
 
 public class StandardFtpHelper extends FtpHelper {
 	private static final Logger LOG = LoggerFactory.getLogger(StandardFtpHelper.class);
@@ -79,17 +77,6 @@ public class StandardFtpHelper extends FtpHelper {
 				String message = "与ftp服务器断开连接失败";
 				LOG.error(message);
 				throw DataXException.asDataXException(FtpReaderErrorCode.FAIL_DISCONNECT, message, e);
-			}finally {
-				if(ftpClient.isConnected()){
-					try {
-						ftpClient.disconnect();
-					} catch (IOException e) {
-						String message = "与ftp服务器断开连接失败";
-						LOG.error(message);
-						throw DataXException.asDataXException(FtpReaderErrorCode.FAIL_DISCONNECT, message, e);
-					}
-				}
-
 			}
 		}
 	}
@@ -137,11 +124,11 @@ public class StandardFtpHelper extends FtpHelper {
 		return isExitFlag;
 	}
 
-	HashSet<String> sourceFiles = new HashSet<String>();
+	HashSet<String> sourceFiles = new HashSet<>();
 	@Override
 	public HashSet<String> getListFiles(String directoryPath, int parentLevel, int maxTraversalLevel) {
 		if(parentLevel < maxTraversalLevel){
-			String parentPath = null;// 父级目录,以'/'结尾
+			String parentPath;// 父级目录,以'/'结尾
 			int pathLen = directoryPath.length();
 			if (directoryPath.contains("*") || directoryPath.contains("?")) {
 				// path是正则表达式				
