@@ -12,7 +12,7 @@ MongoDBReader通过Datax框架从MongoDB并行的读取数据，通过主控的J
 
 ### 3.1 配置样例
 
-该示例从ODPS读一份数据到MongoDB。
+该示例从MongoDB中读一张表并打印到终端
 
 ```json
 {
@@ -27,11 +27,11 @@ MongoDBReader通过Datax框架从MongoDB并行的读取数据，通过主控的J
             "reader": {
             "name": "mongodbreader",
             "parameter": {
-            "address": ["127.0.0.1:27017"],
+            "address": ["127.0.0.1:32768"],
             "userName": "",
             "userPassword": "",
             "dbName": "tag_per_data",
-            "collectionName": "tag_data12",
+            "collectionName": "tag_data",
             "column": [
                 {
                     "name": "unique_id",
@@ -96,31 +96,9 @@ MongoDBReader通过Datax框架从MongoDB并行的读取数据，通过主控的J
             }
             },
             "writer": {
-                "name": "odpswriter",
+                "name": "streamwriter",
                 "parameter": {
-                    "project": "tb_ai_recommendation",
-                    "table": "jianying_tag_datax_read_test01",
-                    "column": [
-                        "unique_id",
-                        "sid",
-                        "user_id",
-                        "auction_id",
-                        "content_type",
-                        "pool_type",
-                        "frontcat_id",
-                        "categoryid",
-                        "gmt_create",
-                        "taglist",
-                        "property",
-                        "scorea",
-                        "scoreb"
-                    ],
-                    "accessId": "**************",
-                    "accessKey": "********************",
-                    "truncate": true,
-                    "odpsServer": "xxx/api",
-                    "tunnelServer": "xxx",
-     "accountType": "aliyun"
+                    "print": "true"
                 }
             }
         }

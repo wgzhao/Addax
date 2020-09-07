@@ -1,6 +1,12 @@
 package com.alibaba.datax.plugin.writer.mongodbwriter;
 
-import com.alibaba.datax.common.element.*;
+import com.alibaba.datax.common.element.BoolColumn;
+import com.alibaba.datax.common.element.BytesColumn;
+import com.alibaba.datax.common.element.Column;
+import com.alibaba.datax.common.element.DateColumn;
+import com.alibaba.datax.common.element.DoubleColumn;
+import com.alibaba.datax.common.element.LongColumn;
+import com.alibaba.datax.common.element.StringColumn;
 import com.alibaba.datax.common.exception.DataXException;
 import com.alibaba.datax.common.plugin.RecordReceiver;
 import com.alibaba.datax.common.spi.Writer;
@@ -10,16 +16,15 @@ import com.alibaba.datax.plugin.writer.mongodbwriter.util.MongoUtil;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
-import com.google.common.base.Strings;
-import com.mongodb.*;
+import com.mongodb.BasicDBObject;
+import com.mongodb.MongoClient;
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoDatabase;
 import com.mongodb.client.model.BulkWriteOptions;
 import com.mongodb.client.model.ReplaceOneModel;
 import com.mongodb.client.model.UpdateOptions;
+import org.bson.Document;
 import org.bson.types.ObjectId;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -32,7 +37,7 @@ public class MongoDBWriter extends Writer{
 
         @Override
         public List<Configuration> split(int mandatoryNumber) {
-            List<Configuration> configList = new ArrayList<Configuration>();
+            List<Configuration> configList = new ArrayList<>();
             for(int i = 0; i < mandatoryNumber; i++) {
                 configList.add(this.originalConfig.clone());
             }
@@ -57,39 +62,38 @@ public class MongoDBWriter extends Writer{
 
     public static class Task extends Writer.Task {
 
-        private static final Logger logger = LoggerFactory.getLogger(Task.class);
         private   Configuration       writerSliceConfig;
 
         private MongoClient mongoClient;
-
-        private String userName = null;
-        private String password = null;
 
         private String database = null;
         private String collection = null;
         private Integer batchSize = null;
         private JSONArray mongodbColumnMeta = null;
         private JSONObject writeMode = null;
-        private static int BATCH_SIZE = 1000;
 
+        private boolean isNullOrEmpty(String obj) {
+            return  obj == null || obj.isEmpty();
+        }
+        
         @Override
         public void prepare() {
             super.prepare();
             //获取presql配置，并执行
             String preSql = writerSliceConfig.getString(Key.PRE_SQL);
-            if(Strings.isNullOrEmpty(preSql)) {
+            if(isNullOrEmpty((preSql))) {
                 return;
             }
             Configuration conConf = Configuration.from(preSql);
-            if(Strings.isNullOrEmpty(database) || Strings.isNullOrEmpty(collection)
+            if(isNullOrEmpty((database)) || isNullOrEmpty((collection))
                     || mongoClient == null || mongodbColumnMeta == null || batchSize == null) {
                 throw DataXException.asDataXException(MongoDBWriterErrorCode.ILLEGAL_VALUE,
                         MongoDBWriterErrorCode.ILLEGAL_VALUE.getDescription());
             }
             MongoDatabase db = mongoClient.getDatabase(database);
-            MongoCollection col = db.getCollection(this.collection);
+            MongoCollection<Document> col = db.getCollection(this.collection);
             String type = conConf.getString("type");
-            if (Strings.isNullOrEmpty(type)){
+            if (isNullOrEmpty((type))){
                 return;
             }
             if (type.equals("drop")){
@@ -97,12 +101,12 @@ public class MongoDBWriter extends Writer{
             } else if (type.equals("remove")){
                 String json = conConf.getString("json");
                 BasicDBObject query;
-                if (Strings.isNullOrEmpty(json)) {
+                if (isNullOrEmpty((json))) {
                     query = new BasicDBObject();
                     List<Object> items = conConf.getList("item", Object.class);
                     for (Object con : items) {
                         Configuration _conf = Configuration.from(con.toString());
-                        if (Strings.isNullOrEmpty(_conf.getString("condition"))) {
+                        if (isNullOrEmpty((_conf.getString("condition")))) {
                             query.put(_conf.getString("name"), _conf.get("value"));
                         } else {
                             query.put(_conf.getString("name"),
@@ -116,22 +120,19 @@ public class MongoDBWriter extends Writer{
                 }
                 col.deleteMany(query);
             }
-            if(logger.isDebugEnabled()) {
-                logger.debug("After job prepare(), originalConfig now is:[\n{}\n]", writerSliceConfig.toJSON());
-            }
         }
 
         @Override
         public void startWrite(RecordReceiver lineReceiver) {
-            if(Strings.isNullOrEmpty(database) || Strings.isNullOrEmpty(collection)
+            if(isNullOrEmpty((database)) || isNullOrEmpty((collection))
                     || mongoClient == null || mongodbColumnMeta == null || batchSize == null) {
                 throw DataXException.asDataXException(MongoDBWriterErrorCode.ILLEGAL_VALUE,
                                                 MongoDBWriterErrorCode.ILLEGAL_VALUE.getDescription());
             }
             MongoDatabase db = mongoClient.getDatabase(database);
             MongoCollection<BasicDBObject> col = db.getCollection(this.collection, BasicDBObject.class);
-            List<com.alibaba.datax.common.element.Record> writerBuffer = new ArrayList<com.alibaba.datax.common.element.Record>(this.batchSize);
-            com.alibaba.datax.common.element.Record record = null;
+            List<com.alibaba.datax.common.element.Record> writerBuffer = new ArrayList<>(this.batchSize);
+            com.alibaba.datax.common.element.Record record;
             while((record = lineReceiver.getFromReader()) != null) {
                 writerBuffer.add(record);
                 if(writerBuffer.size() >= this.batchSize) {
@@ -147,7 +148,7 @@ public class MongoDBWriter extends Writer{
 
         private void doBatchInsert(MongoCollection<BasicDBObject> collection, List<com.alibaba.datax.common.element.Record> writerBuffer, JSONArray columnMeta) {
 
-            List<BasicDBObject> dataList = new ArrayList<BasicDBObject>();
+            List<BasicDBObject> dataList = new ArrayList<>();
 
             for(com.alibaba.datax.common.element.Record record : writerBuffer) {
 
@@ -157,7 +158,7 @@ public class MongoDBWriter extends Writer{
 
                     String type = columnMeta.getJSONObject(i).getString(KeyConstant.COLUMN_TYPE);
                     //空记录处理
-                    if (Strings.isNullOrEmpty(record.getColumn(i).asString())) {
+                    if (isNullOrEmpty((record.getColumn(i)).asString())) {
                         if (KeyConstant.isArrayType(type.toLowerCase())) {
                             data.put(columnMeta.getJSONObject(i).getString(KeyConstant.COLUMN_NAME), new Object[0]);
                         } else {
@@ -182,7 +183,7 @@ public class MongoDBWriter extends Writer{
                                     new ObjectId(record.getColumn(i).asString()));
                             } else if (KeyConstant.isArrayType(type.toLowerCase())) {
                                 String splitter = columnMeta.getJSONObject(i).getString(KeyConstant.COLUMN_SPLITTER);
-                                if (Strings.isNullOrEmpty(splitter)) {
+                                if (isNullOrEmpty((splitter))) {
                                     throw DataXException.asDataXException(MongoDBWriterErrorCode.ILLEGAL_VALUE,
                                             MongoDBWriterErrorCode.ILLEGAL_VALUE.getDescription());
                                 }
@@ -191,31 +192,31 @@ public class MongoDBWriter extends Writer{
                                     //如果数组指定类型不为空，将其转换为指定类型
                                     String[] item = record.getColumn(i).asString().split(splitter);
                                     if (itemType.equalsIgnoreCase(Column.Type.DOUBLE.name())) {
-                                        ArrayList<Double> list = new ArrayList<Double>();
+                                        ArrayList<Double> list = new ArrayList<>();
                                         for (String s : item) {
                                             list.add(Double.parseDouble(s));
                                         }
                                         data.put(columnMeta.getJSONObject(i).getString(KeyConstant.COLUMN_NAME), list.toArray(new Double[0]));
                                     } else if (itemType.equalsIgnoreCase(Column.Type.INT.name())) {
-                                        ArrayList<Integer> list = new ArrayList<Integer>();
+                                        ArrayList<Integer> list = new ArrayList<>();
                                         for (String s : item) {
                                             list.add(Integer.parseInt(s));
                                         }
                                         data.put(columnMeta.getJSONObject(i).getString(KeyConstant.COLUMN_NAME), list.toArray(new Integer[0]));
                                     } else if (itemType.equalsIgnoreCase(Column.Type.LONG.name())) {
-                                        ArrayList<Long> list = new ArrayList<Long>();
+                                        ArrayList<Long> list = new ArrayList<>();
                                         for (String s : item) {
                                             list.add(Long.parseLong(s));
                                         }
                                         data.put(columnMeta.getJSONObject(i).getString(KeyConstant.COLUMN_NAME), list.toArray(new Long[0]));
                                     } else if (itemType.equalsIgnoreCase(Column.Type.BOOL.name())) {
-                                        ArrayList<Boolean> list = new ArrayList<Boolean>();
+                                        ArrayList<Boolean> list = new ArrayList<>();
                                         for (String s : item) {
                                             list.add(Boolean.parseBoolean(s));
                                         }
                                         data.put(columnMeta.getJSONObject(i).getString(KeyConstant.COLUMN_NAME), list.toArray(new Boolean[0]));
                                     } else if (itemType.equalsIgnoreCase(Column.Type.BYTES.name())) {
-                                        ArrayList<Byte> list = new ArrayList<Byte>();
+                                        ArrayList<Byte> list = new ArrayList<>();
                                         for (String s : item) {
                                             list.add(Byte.parseByte(s));
                                         }
@@ -286,21 +287,18 @@ public class MongoDBWriter extends Writer{
                 }
                 dataList.add(data);
             }
-            /**
-             * 如果存在重复的值覆盖
-             */
+
+             // 如果存在重复的值覆盖
             if(this.writeMode != null &&
                     this.writeMode.getString(KeyConstant.IS_REPLACE) != null &&
                     KeyConstant.isValueTrue(this.writeMode.getString(KeyConstant.IS_REPLACE))) {
                 String uniqueKey = this.writeMode.getString(KeyConstant.UNIQUE_KEY);
-                if(!Strings.isNullOrEmpty(uniqueKey)) {
-                    List<ReplaceOneModel<BasicDBObject>> replaceOneModelList = new ArrayList<ReplaceOneModel<BasicDBObject>>();
+                if(!isNullOrEmpty((uniqueKey))) {
+                    List<ReplaceOneModel<BasicDBObject>> replaceOneModelList = new ArrayList<>();
                     for(BasicDBObject data : dataList) {
                         BasicDBObject query = new BasicDBObject();
-                        if(uniqueKey != null) {
-                            query.put(uniqueKey,data.get(uniqueKey));
-                        }
-                        ReplaceOneModel<BasicDBObject> replaceOneModel = new ReplaceOneModel<BasicDBObject>(query, data, new UpdateOptions().upsert(true));
+                        query.put(uniqueKey,data.get(uniqueKey));
+                        ReplaceOneModel<BasicDBObject> replaceOneModel = new ReplaceOneModel<>(query, data, new UpdateOptions().upsert(true));
                         replaceOneModelList.add(replaceOneModel);
                     }
                     collection.bulkWrite(replaceOneModelList, new BulkWriteOptions().ordered(false));
@@ -317,16 +315,16 @@ public class MongoDBWriter extends Writer{
         @Override
         public void init() {
             this.writerSliceConfig = this.getPluginJobConf();
-            this.userName = writerSliceConfig.getString(KeyConstant.MONGO_USER_NAME);
-            this.password = writerSliceConfig.getString(KeyConstant.MONGO_USER_PASSWORD);
+            String userName = writerSliceConfig.getString(KeyConstant.MONGO_USER_NAME);
+            String password = writerSliceConfig.getString(KeyConstant.MONGO_USER_PASSWORD);
             this.database = writerSliceConfig.getString(KeyConstant.MONGO_DB_NAME);
-            if(!Strings.isNullOrEmpty(userName) && !Strings.isNullOrEmpty(password)) {
-                this.mongoClient = MongoUtil.initCredentialMongoClient(this.writerSliceConfig,userName,password,database);
+            if(!isNullOrEmpty((userName)) && !isNullOrEmpty((password))) {
+                this.mongoClient = MongoUtil.initCredentialMongoClient(this.writerSliceConfig, userName, password,database);
             } else {
                 this.mongoClient = MongoUtil.initMongoClient(this.writerSliceConfig);
             }
             this.collection = writerSliceConfig.getString(KeyConstant.MONGO_COLLECTION_NAME);
-            this.batchSize = BATCH_SIZE;
+            this.batchSize = 1000;
             this.mongodbColumnMeta = JSON.parseArray(writerSliceConfig.getString(KeyConstant.MONGO_COLUMN));
             this.writeMode = JSON.parseObject(writerSliceConfig.getString(KeyConstant.WRITE_MODE));
         }

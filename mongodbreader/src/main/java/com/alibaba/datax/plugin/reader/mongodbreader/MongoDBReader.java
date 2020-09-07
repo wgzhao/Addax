@@ -3,14 +3,12 @@ package com.alibaba.datax.plugin.reader.mongodbreader;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
-import java.util.Iterator;
 import java.util.List;
 
 import com.alibaba.datax.common.element.BoolColumn;
 import com.alibaba.datax.common.element.DateColumn;
 import com.alibaba.datax.common.element.DoubleColumn;
 import com.alibaba.datax.common.element.LongColumn;
-import com.alibaba.datax.common.element.Record;
 import com.alibaba.datax.common.element.StringColumn;
 import com.alibaba.datax.common.exception.DataXException;
 import com.alibaba.datax.common.plugin.RecordSender;
@@ -22,8 +20,6 @@ import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 
-import com.google.common.base.Joiner;
-import com.google.common.base.Strings;
 import com.mongodb.MongoClient;
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoCursor;
@@ -44,8 +40,9 @@ public class MongoDBReader extends Reader {
 
         private MongoClient mongoClient;
 
-        private String userName = null;
-        private String password = null;
+        private boolean isNullOrEmpty(String obj) {
+            return  obj == null || obj.isEmpty();
+        }
 
         @Override
         public List<Configuration> split(int adviceNumber) {
@@ -55,12 +52,12 @@ public class MongoDBReader extends Reader {
         @Override
         public void init() {
             this.originalConfig = super.getPluginJobConf();
-            this.userName = originalConfig.getString(KeyConstant.MONGO_USER_NAME, originalConfig.getString(KeyConstant.MONGO_USERNAME));
-            this.password = originalConfig.getString(KeyConstant.MONGO_USER_PASSWORD, originalConfig.getString(KeyConstant.MONGO_PASSWORD));
+            String userName = originalConfig.getString(KeyConstant.MONGO_USER_NAME, originalConfig.getString(KeyConstant.MONGO_USERNAME));
+            String password = originalConfig.getString(KeyConstant.MONGO_USER_PASSWORD, originalConfig.getString(KeyConstant.MONGO_PASSWORD));
             String database =  originalConfig.getString(KeyConstant.MONGO_DB_NAME, originalConfig.getString(KeyConstant.MONGO_DATABASE));
             String authDb =  originalConfig.getString(KeyConstant.MONGO_AUTHDB, database);
-            if(!Strings.isNullOrEmpty(this.userName) && !Strings.isNullOrEmpty(this.password)) {
-                this.mongoClient = MongoUtil.initCredentialMongoClient(originalConfig,userName,password,authDb);
+            if(!isNullOrEmpty((userName)) && !isNullOrEmpty((password))) {
+                this.mongoClient = MongoUtil.initCredentialMongoClient(originalConfig, userName, password,authDb);
             } else {
                 this.mongoClient = MongoUtil.initMongoClient(originalConfig);
             }
@@ -75,14 +72,8 @@ public class MongoDBReader extends Reader {
 
     public static class Task extends Reader.Task {
 
-        private Configuration readerSliceConfig;
-
         private MongoClient mongoClient;
 
-        private String userName = null;
-        private String password = null;
-
-        private String authDb = null;
         private String database = null;
         private String collection = null;
 
@@ -93,6 +84,10 @@ public class MongoDBReader extends Reader {
         private Object upperBound = null;
         private boolean isObjectId = true;
 
+        private boolean isNullOrEmpty(String obj) {
+            return  obj == null || obj.isEmpty();
+        }
+        
         @Override
         public void startRead(RecordSender recordSender) {
 
@@ -103,9 +98,9 @@ public class MongoDBReader extends Reader {
                     MongoDBReaderErrorCode.ILLEGAL_VALUE.getDescription());
             }
             MongoDatabase db = mongoClient.getDatabase(database);
-            MongoCollection col = db.getCollection(this.collection);
+            MongoCollection<Document> col = db.getCollection(this.collection);
 
-            MongoCursor<Document> dbCursor = null;
+            MongoCursor<Document> dbCursor;
             Document filter = new Document();
             if (lowerBound.equals("min")) {
                 if (!upperBound.equals("max")) {
@@ -116,7 +111,7 @@ public class MongoDBReader extends Reader {
             } else {
                 filter.append(KeyConstant.MONGO_PRIMARY_ID, new Document("$gte", isObjectId ? new ObjectId(lowerBound.toString()) : lowerBound).append("$lt", isObjectId ? new ObjectId(upperBound.toString()) : upperBound));
             }
-            if(!Strings.isNullOrEmpty(query)) {
+            if(!isNullOrEmpty((query))) {
                 Document queryFilter = Document.parse(query);
                 filter = new Document("$and", Arrays.asList(filter, queryFilter));
             }
@@ -124,9 +119,8 @@ public class MongoDBReader extends Reader {
             while (dbCursor.hasNext()) {
                 Document item = dbCursor.next();
                 com.alibaba.datax.common.element.Record record = recordSender.createRecord();
-                Iterator columnItera = mongodbColumnMeta.iterator();
-                while (columnItera.hasNext()) {
-                    JSONObject column = (JSONObject)columnItera.next();
+                for (Object o : mongodbColumnMeta) {
+                    JSONObject column = (JSONObject) o;
                     Object tempCol = item.get(column.getString(KeyConstant.COLUMN_NAME));
                     if (tempCol == null) {
                         if (KeyConstant.isDocumentType(column.getString(KeyConstant.COLUMN_TYPE))) {
@@ -141,17 +135,14 @@ public class MongoDBReader extends Reader {
                                     }
                                 }
 
-                                if (null != nestedDocument) {
-                                    Document doc = nestedDocument;
-                                    tempCol = doc.get(name[name.length - 1]);
-                                }
+                                tempCol = nestedDocument.get(name[name.length - 1]);
                             }
                         }
                     }
                     if (tempCol == null) {
                         //continue; 这个不能直接continue会导致record到目的端错位
                         record.addColumn(new StringColumn(null));
-                    }else if (tempCol instanceof Double) {
+                    } else if (tempCol instanceof Double) {
                         //TODO deal with Double.isNaN()
                         record.addColumn(new DoubleColumn((Double) tempCol));
                     } else if (tempCol instanceof Boolean) {
@@ -160,17 +151,18 @@ public class MongoDBReader extends Reader {
                         record.addColumn(new DateColumn((Date) tempCol));
                     } else if (tempCol instanceof Integer) {
                         record.addColumn(new LongColumn((Integer) tempCol));
-                    }else if (tempCol instanceof Long) {
+                    } else if (tempCol instanceof Long) {
                         record.addColumn(new LongColumn((Long) tempCol));
                     } else {
-                        if(KeyConstant.isArrayType(column.getString(KeyConstant.COLUMN_TYPE))) {
+                        if (KeyConstant.isArrayType(column.getString(KeyConstant.COLUMN_TYPE))) {
                             String splitter = column.getString(KeyConstant.COLUMN_SPLITTER);
-                            if(Strings.isNullOrEmpty(splitter)) {
+                            if (isNullOrEmpty((splitter))) {
                                 throw DataXException.asDataXException(MongoDBReaderErrorCode.ILLEGAL_VALUE,
-                                    MongoDBReaderErrorCode.ILLEGAL_VALUE.getDescription());
+                                        MongoDBReaderErrorCode.ILLEGAL_VALUE.getDescription());
                             } else {
-                                ArrayList array = (ArrayList)tempCol;
-                                String tempArrayStr = Joiner.on(splitter).join(array);
+                                ArrayList<String> array = (ArrayList) tempCol;
+                                //String tempArrayStr = Joiner.on(splitter).join(array);
+                                String tempArrayStr = String.join(splitter, array);
                                 record.addColumn(new StringColumn(tempArrayStr));
                             }
                         } else {
@@ -184,13 +176,13 @@ public class MongoDBReader extends Reader {
 
         @Override
         public void init() {
-            this.readerSliceConfig = super.getPluginJobConf();
-            this.userName = readerSliceConfig.getString(KeyConstant.MONGO_USER_NAME, readerSliceConfig.getString(KeyConstant.MONGO_USERNAME));
-            this.password = readerSliceConfig.getString(KeyConstant.MONGO_USER_PASSWORD, readerSliceConfig.getString(KeyConstant.MONGO_PASSWORD));
+            Configuration readerSliceConfig = super.getPluginJobConf();
+            String userName = readerSliceConfig.getString(KeyConstant.MONGO_USER_NAME, readerSliceConfig.getString(KeyConstant.MONGO_USERNAME));
+            String password = readerSliceConfig.getString(KeyConstant.MONGO_USER_PASSWORD, readerSliceConfig.getString(KeyConstant.MONGO_PASSWORD));
             this.database = readerSliceConfig.getString(KeyConstant.MONGO_DB_NAME, readerSliceConfig.getString(KeyConstant.MONGO_DATABASE));
-            this.authDb = readerSliceConfig.getString(KeyConstant.MONGO_AUTHDB, this.database);
-            if(!Strings.isNullOrEmpty(userName) && !Strings.isNullOrEmpty(password)) {
-                mongoClient = MongoUtil.initCredentialMongoClient(readerSliceConfig,userName,password,authDb);
+            String authDb = readerSliceConfig.getString(KeyConstant.MONGO_AUTHDB, this.database);
+            if(!isNullOrEmpty((userName)) && !isNullOrEmpty((password))) {
+                mongoClient = MongoUtil.initCredentialMongoClient(readerSliceConfig, userName, password, authDb);
             } else {
                 mongoClient = MongoUtil.initMongoClient(readerSliceConfig);
             }

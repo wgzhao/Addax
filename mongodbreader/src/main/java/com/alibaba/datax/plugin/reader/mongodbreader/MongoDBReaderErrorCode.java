@@ -15,7 +15,7 @@ public enum MongoDBReaderErrorCode implements ErrorCode {
 
     private final String description;
 
-    private MongoDBReaderErrorCode(String code,String description) {
+    MongoDBReaderErrorCode(String code, String description) {
         this.code = code;
         this.description = description;
     }

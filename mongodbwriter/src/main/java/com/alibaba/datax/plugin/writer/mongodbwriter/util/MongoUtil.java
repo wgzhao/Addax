@@ -66,8 +66,8 @@ public class MongoUtil {
     }
     /**
      * 转换为mongo地址协议
-     * @param rawAddressList
-     * @return
+     * @param rawAddressList raw address list
+     * @return List<ServerAddress>
      */
     private static List<ServerAddress> parseServerAddress(List<Object> rawAddressList) throws UnknownHostException{
         List<ServerAddress> addressList = new ArrayList<ServerAddress>();
@@ -85,7 +85,7 @@ public class MongoUtil {
 
     public static void main(String[] args) {
         try {
-            ArrayList hostAddress = new ArrayList();
+            ArrayList<Object> hostAddress = new ArrayList<>();
             hostAddress.add("127.0.0.1:27017");
             System.out.println(MongoUtil.isHostPortPattern(hostAddress));
         } catch (Exception e) {

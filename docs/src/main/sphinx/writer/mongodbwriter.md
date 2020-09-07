@@ -12,40 +12,88 @@ MongoDBWriter通过Datax框架获取Reader生成的数据，然后将Datax支持
 
 ### 3.1 配置样例
 
-该示例从ODPS读一份数据到MongoDB。
+该示例将流式数据写入到 MongoDB 表中
 
 ```json
 {
 "job": {
 "setting": {
     "speed": {
-        "channel": 2
+        "channel": 1,
+        "bytes": -1
     }
 },
 "content": [
     {
         "reader": {
-            "name": "odpsreader",
+            "name": "streamreader",
             "parameter": {
-                "accessId": "********",
-                "accessKey": "*********",
-                "project": "tb_ai_recommendation",
-                "table": "jianying_tag_datax_test",
                 "column": [
-                    "unique_id",  "sid", "user_id", "auction_id",
-                    "content_type", "pool_type", "frontcat_id",
-                    "categoryid",  "gmt_create", "taglist",
-                    "property","scorea", "scoreb"
+                    {
+                        "value": "unique_id",
+                        "type": "string"
+                    },
+                    {
+                        "value": "sid",
+                        "type": "string"
+                    },
+                    {
+                        "value": "user_id",
+                        "type": "string"
+                    },
+                    {
+                        "value": "auction_id",
+                        "type": "string"
+                    },
+                    {
+                        "value": "content_type",
+                        "type": "string"
+                    },
+                    {
+                        "value": "pool_type",
+                        "type": "string"
+                    },
+                    {
+                        "value": "a1 a2 a3",
+                        "type": "string"
+                    },
+                    {
+                        "value": "c1 c2 c3",
+                        "type": "string"
+                    },
+                    {
+                        "value": "2020-09-06",
+                        "type": "string"
+                    },
+                    {
+                        "value": "tag1 tag2 tag3",
+                        "type": "string"
+                    },
+                    {
+                        "value": "property",
+                        "type": "string"
+                    },
+                    {
+                        "value": 1984,
+                        "type": "long"
+                    },
+                    {
+                        "value": 1900,
+                        "type": "long"
+                    },
+                    {
+                        "value": 75,
+                        "type": "long"
+                    }
                 ],
-                "splitMode": "record",
-                "odpsServer": "http://xxx/api"
+                "sliceRecordCount": 10
             }
         },
         "writer": {
             "name": "mongodbwriter",
             "parameter": {
                 "address": [
-                    "127.0.0.1:27017"
+                    "127.0.0.1:32768"
                 ],
                 "userName": "",
                 "userPassword": "",

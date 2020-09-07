@@ -24,12 +24,6 @@
         </dependency>
 
         <dependency>
-            <groupId>com.google.guava</groupId>
-            <artifactId>guava</artifactId>
-            <version>${guava.version}</version>
-        </dependency>
-
-        <dependency>
 		  <groupId>org.mongodb</groupId>
 		  <artifactId>mongo-java-driver</artifactId>
 		  <version>3.12.7</version>
