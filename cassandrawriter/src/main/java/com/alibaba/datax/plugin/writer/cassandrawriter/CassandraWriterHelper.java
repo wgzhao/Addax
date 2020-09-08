@@ -185,16 +185,16 @@ public class CassandraWriterHelper {
       return InetAddress.getByName((String)jsonObject);
 
     case LIST:
-      List l = new ArrayList();
+      List<Object> l = new ArrayList<>();
       for( Object o : (JSONArray)jsonObject ) {
         l.add(parseFromJson(o,type.getTypeArguments().get(0)));
       }
       return l;
 
     case MAP: {
-      Map m = new HashMap();
-      for (JSONObject.Entry e : ((JSONObject)jsonObject).entrySet()) {
-        Object k = parseFromString((String) e.getKey(), type.getTypeArguments().get(0));
+      Map<Object, Object> m = new HashMap<>();
+      for (JSONObject.Entry<String, Object> e : ((JSONObject)jsonObject).entrySet()) {
+        Object k = parseFromString(e.getKey(), type.getTypeArguments().get(0));
         Object v = parseFromJson(e.getValue(), type.getTypeArguments().get(1));
         m.put(k,v);
       }
@@ -202,7 +202,7 @@ public class CassandraWriterHelper {
     }
 
     case SET:
-      Set s = new HashSet();
+      Set<Object> s = new HashSet<>();
       for( Object o : (JSONArray)jsonObject ) {
         s.add(parseFromJson(o,type.getTypeArguments().get(0)));
       }
@@ -222,9 +222,9 @@ public class CassandraWriterHelper {
     case UDT: {
       UDTValue t = ((UserType) type).newValue();
       UserType userType = t.getType();
-      for (JSONObject.Entry e : ((JSONObject)jsonObject).entrySet()) {
-        DataType eleType = userType.getFieldType((String)e.getKey());
-        t.set((String)e.getKey(), parseFromJson(e.getValue(), eleType), registry.codecFor(eleType).getJavaType());
+      for (JSONObject.Entry<String, Object> e : ((JSONObject)jsonObject).entrySet()) {
+        DataType eleType = userType.getFieldType(e.getKey());
+        t.set(e.getKey(), parseFromJson(e.getValue(), eleType), registry.codecFor(eleType).getJavaType());
       }
       return t;
     }
@@ -312,11 +312,11 @@ public class CassandraWriterHelper {
         break;
 
       case MAP:
-        ps.setMap(pos, (Map) parseFromString(col.asString(), sqlType));
+        ps.setMap(pos, (Map<?,?>) parseFromString(col.asString(), sqlType));
         break;
 
       case SET:
-        ps.setSet(pos, (Set) parseFromString(col.asString(), sqlType));
+        ps.setSet(pos, (Set<?>) parseFromString(col.asString(), sqlType));
         break;
 
       case TUPLE:
