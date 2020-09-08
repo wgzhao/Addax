@@ -65,7 +65,6 @@
         <module>ftpreader</module>
         <module>hbase11xreader</module>
         <module>hbase11xsqlreader</module>
-        <module>hbase20xreader</module>
         <module>hbase20xsqlreader</module>
         <module>hdfsreader</module>
         <module>jsonfilereader</module>
@@ -184,7 +183,6 @@
             </plugin>
 
             <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-assembly-plugin</artifactId>
                 <version>3.3.0</version>
                 <configuration>
@@ -198,6 +196,9 @@
                     <execution>
                         <id>make-assembly</id>
                         <phase>package</phase>
+                        <goals>
+                            <goal>single</goal>
+                        </goals>
                     </execution>
                 </executions>
             </plugin>
