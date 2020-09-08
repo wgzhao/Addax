@@ -24,20 +24,4 @@ public class Key {
    */
   public final static String BATCH_SIZE = "batchSize";
 
-  /**
-   * 每个列的名字
-   */
-  public static final String COLUMN_NAME = "name";
-  /**
-   * 列分隔符
-   */
-  public static final String COLUMN_SPLITTER = "format";
-  public static final String ELEMENT_SPLITTER = "splitter";
-  public static final String ENTRY_SPLITTER = "entrySplitter";
-  public static final String KV_SPLITTER = "kvSplitter";
-  public static final String ELEMENT_CONFIG = "element";
-  public static final String TUPLE_CONNECTOR = "_";
-  public static final String KEY_CONFIG = "key";
-  public static final String VALUE_CONFIG = "value";
-
 }
