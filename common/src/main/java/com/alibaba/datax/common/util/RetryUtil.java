@@ -87,7 +87,7 @@ public final class RetryUtil {
     public static ThreadPoolExecutor createThreadPoolExecutor() {
         return new ThreadPoolExecutor(0, 5,
                 60L, TimeUnit.SECONDS,
-                new SynchronousQueue<Runnable>());
+                new SynchronousQueue<>());
     }
 
 
@@ -134,14 +134,11 @@ public final class RetryUtil {
                         long timeToSleep;
                         if (exponential) {
                             timeToSleep = sleepTimeInMilliSecond * (long) Math.pow(2, i);
-                            if(timeToSleep >= MAX_SLEEP_MILLISECOND) {
-                                timeToSleep = MAX_SLEEP_MILLISECOND;
-                            }
                         } else {
                             timeToSleep = sleepTimeInMilliSecond;
-                            if(timeToSleep >= MAX_SLEEP_MILLISECOND) {
-                                timeToSleep = MAX_SLEEP_MILLISECOND;
-                            }
+                        }
+                        if(timeToSleep >= MAX_SLEEP_MILLISECOND) {
+                            timeToSleep = MAX_SLEEP_MILLISECOND;
                         }
 
                         try {
@@ -167,8 +164,8 @@ public final class RetryUtil {
 
     private static class AsyncRetry extends Retry {
 
-        private long timeoutMs;
-        private ThreadPoolExecutor executor;
+        private final long timeoutMs;
+        private final ThreadPoolExecutor executor;
 
         public AsyncRetry(long timeoutMs, ThreadPoolExecutor executor) {
             this.timeoutMs = timeoutMs;
@@ -182,11 +179,6 @@ public final class RetryUtil {
          * 如果抛异常（可能是执行超时、执行异常、被其他线程cancel或interrupt），都记录日志并且网上抛异常。
          * 正常和非正常的情况都会判断任务是否结束，如果没有结束，则cancel任务。cancel参数为true，表示即使
          * 任务正在执行，也会interrupt线程。
-         *
-         * @param callable
-         * @param <T>
-         * @return
-         * @throws Exception
          */
         @Override
         protected <T> T call(Callable<T> callable) throws Exception {

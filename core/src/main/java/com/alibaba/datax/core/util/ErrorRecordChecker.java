@@ -19,7 +19,7 @@ public final class ErrorRecordChecker {
     private static final Logger LOG = LoggerFactory
             .getLogger(ErrorRecordChecker.class);
 
-    private Long recordLimit;
+    private final Long recordLimit;
     private Double percentageLimit;
 
     public ErrorRecordChecker(Configuration configuration) {

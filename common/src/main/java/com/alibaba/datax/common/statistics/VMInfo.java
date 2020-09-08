@@ -206,7 +206,7 @@ public class VMInfo {
         return -1;
     }
 
-    private class PhyOSStatus {
+    private static class PhyOSStatus {
         long totalPhysicalMemory = -1;
         long freePhysicalMemory = -1;
         long maxFileDescriptorCount = -1;
@@ -240,38 +240,34 @@ public class VMInfo {
         }
 
         public String getDeltaString() {
-            StringBuilder sb = new StringBuilder();
-            sb.append("\n\t [delta cpu info] => \n");
-            sb.append("\t\t");
-            sb.append(String.format("%-30s | %-30s | %-30s | %-30s \n", "curDeltaCpu", "averageCpu", "maxDeltaCpu", "minDeltaCpu"));
-            sb.append("\t\t");
-            sb.append(String.format("%-30s | %-30s | %-30s | %-30s \n",
-                    String.format("%,.2f%%", processCpuStatus.curDeltaCpu),
-                    String.format("%,.2f%%", processCpuStatus.averageCpu),
-                    String.format("%,.2f%%", processCpuStatus.maxDeltaCpu),
-                    String.format("%,.2f%%\n", processCpuStatus.minDeltaCpu)));
 
-            return sb.toString();
+            return "\n\t [delta cpu info] => \n" +
+                    "\t\t" +
+                    String.format("%-30s | %-30s | %-30s | %-30s \n", "curDeltaCpu", "averageCpu", "maxDeltaCpu", "minDeltaCpu") +
+                    "\t\t" +
+                    String.format("%-30s | %-30s | %-30s | %-30s \n",
+                            String.format("%,.2f%%", processCpuStatus.curDeltaCpu),
+                            String.format("%,.2f%%", processCpuStatus.averageCpu),
+                            String.format("%,.2f%%", processCpuStatus.maxDeltaCpu),
+                            String.format("%,.2f%%\n", processCpuStatus.minDeltaCpu));
         }
 
         public String getTotalString() {
-            StringBuilder sb = new StringBuilder();
-            sb.append("\n\t [total cpu info] => \n");
-            sb.append("\t\t");
-            sb.append(String.format("%-30s | %-30s | %-30s \n", "averageCpu", "maxDeltaCpu", "minDeltaCpu"));
-            sb.append("\t\t");
-            sb.append(String.format("%-30s | %-30s | %-30s \n",
-                    String.format("%,.2f%%", processCpuStatus.averageCpu),
-                    String.format("%,.2f%%", processCpuStatus.maxDeltaCpu),
-                    String.format("%,.2f%%\n", processCpuStatus.minDeltaCpu)));
 
-            return sb.toString();
+            return "\n\t [total cpu info] => \n" +
+                    "\t\t" +
+                    String.format("%-30s | %-30s | %-30s \n", "averageCpu", "maxDeltaCpu", "minDeltaCpu") +
+                    "\t\t" +
+                    String.format("%-30s | %-30s | %-30s \n",
+                            String.format("%,.2f%%", processCpuStatus.averageCpu),
+                            String.format("%,.2f%%", processCpuStatus.maxDeltaCpu),
+                            String.format("%,.2f%%\n", processCpuStatus.minDeltaCpu));
         }
 
     }
 
-    private class ProcessGCStatus {
-        final Map<String, GCStatus> gcStatusMap = new HashMap<String, GCStatus>();
+    private static class ProcessGCStatus {
+        final Map<String, GCStatus> gcStatusMap = new HashMap<>();
 
         public String toString() {
             return "\tGC Names\t" + gcStatusMap.keySet() + "\n";
@@ -313,8 +309,8 @@ public class VMInfo {
         }
     }
 
-    private class ProcessMemoryStatus {
-        final Map<String, MemoryStatus> memoryStatusMap = new HashMap<String, MemoryStatus>();
+    private static class ProcessMemoryStatus {
+        final Map<String, MemoryStatus> memoryStatusMap = new HashMap<>();
 
         public String toString() {
             StringBuilder sb = new StringBuilder();
@@ -337,16 +333,16 @@ public class VMInfo {
                 sb.append("\t\t ");
                 sb.append(String.format("%-30s | %-30s | %-30s | %-30s | %-30s \n",
                         ms.name, String.format("%,.2f", (float) ms.usedSize / MB) + "MB",
-                        String.format("%,.2f", (float) ms.percent) + "%",
+                        String.format("%,.2f", ms.percent) + "%",
                         String.format("%,.2f", (float) ms.maxUsedSize / MB) + "MB",
-                        String.format("%,.2f", (float) ms.maxpercent) + "%"));
+                        String.format("%,.2f", ms.maxpercent) + "%"));
 
             }
             return sb.toString();
         }
     }
 
-    private class GCStatus {
+    private static class GCStatus {
         String name;
         long maxDeltaGCCount = -1;
         long minDeltaGCCount = -1;
@@ -384,7 +380,7 @@ public class VMInfo {
         }
     }
 
-    private class MemoryStatus {
+    private static class MemoryStatus {
         String name;
         long initSize;
         long maxSize;

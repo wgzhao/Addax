@@ -9,7 +9,7 @@ public enum ClickHouseWriterErrorCode implements ErrorCode {
     private final String code;
     private final String description;
 
-    private ClickHouseWriterErrorCode(String code, String description) {
+    ClickHouseWriterErrorCode(String code, String description) {
         this.code = code;
         this.description = description;
     }

@@ -6,6 +6,7 @@ import org.slf4j.LoggerFactory;
 
 import java.net.InetAddress;
 import java.net.UnknownHostException;
+import java.nio.charset.StandardCharsets;
 
 /**
  * Created by liqiang on 15/8/25.
@@ -32,11 +33,11 @@ public class HostUtils {
             try {
                 Process process = Runtime.getRuntime().exec("hostname -i");
                 if (process.waitFor() == 0) {
-                    ip = new String(IOUtils.toByteArray(process.getInputStream()), "UTF8");
+                    ip = new String(IOUtils.toByteArray(process.getInputStream()), StandardCharsets.UTF_8);
                 }
                 process = Runtime.getRuntime().exec("hostname");
                 if (process.waitFor() == 0) {
-                    hostname = (new String(IOUtils.toByteArray(process.getInputStream()), "UTF8")).trim();
+                    hostname = (new String(IOUtils.toByteArray(process.getInputStream()), StandardCharsets.UTF_8)).trim();
                 }
             } catch (Exception e) {
                 log.warn("get hostname failed {}", e.getMessage());

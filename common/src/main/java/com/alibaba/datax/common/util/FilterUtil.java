@@ -12,7 +12,7 @@ public final class FilterUtil {
     //已经去重
     public static List<String> filterByRegular(List<String> allStrs,
                                                String regular) {
-        List<String> matchedValues = new ArrayList<String>();
+        List<String> matchedValues = new ArrayList<>();
 
         // 语法习惯上的兼容处理(pt=* 实际正则应该是：pt=.*)
         String newReqular = regular.replace(".*", "*").replace("*", ".*");
@@ -33,12 +33,12 @@ public final class FilterUtil {
     //已经去重
     public static List<String> filterByRegulars(List<String> allStrs,
                                                 List<String> regulars) {
-        List<String> matchedValues = new ArrayList<String>();
+        List<String> matchedValues = new ArrayList<>();
 
-        List<String> tempMatched = null;
+        List<String> tempMatched;
         for (String regular : regulars) {
             tempMatched = filterByRegular(allStrs, regular);
-            if (null != tempMatched && !tempMatched.isEmpty()) {
+            if (!tempMatched.isEmpty()) {
                 for (String temp : tempMatched) {
                     if (!matchedValues.contains(temp)) {
                         matchedValues.add(temp);

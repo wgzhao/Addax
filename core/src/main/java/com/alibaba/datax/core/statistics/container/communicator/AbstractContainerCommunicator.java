@@ -13,13 +13,13 @@ import java.util.List;
 import java.util.Map;
 
 public abstract class AbstractContainerCommunicator {
-    private Configuration configuration;
+    private final Configuration configuration;
     private AbstractCollector collector;
     private AbstractReporter reporter;
 
-    private Long jobId;
+    private final Long jobId;
 
-    private VMInfo vmInfo = VMInfo.getVmInfo();
+    private final VMInfo vmInfo = VMInfo.getVmInfo();
     private long lastReportTime = System.currentTimeMillis();
 
 

@@ -13,7 +13,7 @@ import java.util.Date;
 import java.util.List;
 
 public class DirtyRecord implements Record {
-	private List<Column> columns = new ArrayList<Column>();
+	private List<Column> columns = new ArrayList<>();
 
 	public static DirtyRecord asDirtyRecord(final com.alibaba.datax.common.element.Record record) {
 		DirtyRecord result = new DirtyRecord();

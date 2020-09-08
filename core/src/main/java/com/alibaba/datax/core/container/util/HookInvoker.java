@@ -1,9 +1,5 @@
 package com.alibaba.datax.core.container.util;
 
-/**
- * Created by xiafei.qiuxf on 14/12/17.
- */
-
 import com.alibaba.datax.common.exception.CommonErrorCode;
 import com.alibaba.datax.common.exception.DataXException;
 import com.alibaba.datax.common.spi.Hook;
@@ -14,7 +10,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.File;
-import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.ServiceLoader;
@@ -30,7 +25,7 @@ public class HookInvoker {
     private final Map<String, Number> msg;
     private final Configuration conf;
 
-    private File baseDir;
+    private final File baseDir;
 
     public HookInvoker(String baseDirName, Configuration conf, Map<String, Number> msg) {
         this.baseDir = new File(baseDirName);
@@ -76,10 +71,5 @@ public class HookInvoker {
         } finally {
             Thread.currentThread().setContextClassLoader(oldClassLoader);
         }
-    }
-
-    public static void main(String[] args) {
-        new HookInvoker("/Users/xiafei/workspace/datax3/target/datax/datax/hook",
-                null, new HashMap<String, Number>()).invokeAll();
     }
 }

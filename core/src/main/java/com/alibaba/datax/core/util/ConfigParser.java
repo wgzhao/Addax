@@ -12,6 +12,7 @@ import org.slf4j.LoggerFactory;
 import java.io.File;
 import java.io.IOException;
 import java.net.URL;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -40,7 +41,7 @@ public final class ConfigParser {
         String postHandlerName = configuration.getString(
                 CoreConstant.DATAX_JOB_POSTHANDLER_PLUGINNAME);
 
-        Set<String> pluginList = new HashSet<String>();
+        Set<String> pluginList = new HashSet<>();
         pluginList.add(readerPluginName);
         pluginList.add(writerPluginName);
 
@@ -51,7 +52,7 @@ public final class ConfigParser {
             pluginList.add(postHandlerName);
         }
         try {
-            configuration.merge(parsePluginConfig(new ArrayList<String>(pluginList)), false);
+            configuration.merge(parsePluginConfig(new ArrayList<>(pluginList)), false);
         }catch (Exception e){
             //吞掉异常，保持log干净。这里message足够。
             LOG.warn(String.format("插件[%s,%s]加载失败，1s后重试... Exception:%s ", readerPluginName, writerPluginName, e.getMessage()));
@@ -60,7 +61,7 @@ public final class ConfigParser {
             } catch (InterruptedException e1) {
                 //
             }
-            configuration.merge(parsePluginConfig(new ArrayList<String>(pluginList)), false);
+            configuration.merge(parsePluginConfig(new ArrayList<>(pluginList)), false);
         }
 
         return configuration;
@@ -96,14 +97,14 @@ public final class ConfigParser {
                 HttpGet httpGet = HttpClientUtil.getGetRequest();
                 httpGet.setURI(url.toURI());
 
-                jobContent = httpClientUtil.executeAndGetWithFailedRetry(httpGet, 1, 1000l);
+                jobContent = httpClientUtil.executeAndGetWithFailedRetry(httpGet, 1, 1000L);
             } catch (Exception e) {
                 throw DataXException.asDataXException(FrameworkErrorCode.CONFIG_ERROR, "获取作业配置信息失败:" + jobResource, e);
             }
         } else {
             // jobResource 是本地文件绝对路径
             try {
-                jobContent = FileUtils.readFileToString(new File(jobResource));
+                jobContent = FileUtils.readFileToString(new File(jobResource), StandardCharsets.UTF_8);
             } catch (IOException e) {
                 throw DataXException.asDataXException(FrameworkErrorCode.CONFIG_ERROR, "获取作业配置信息失败:" + jobResource, e);
             }
@@ -118,7 +119,7 @@ public final class ConfigParser {
     public static Configuration parsePluginConfig(List<String> wantPluginNames) {
         Configuration configuration = Configuration.newDefault();
 
-        Set<String> replicaCheckPluginSet = new HashSet<String>();
+        Set<String> replicaCheckPluginSet = new HashSet<>();
         int complete = 0;
         for (final String each : ConfigParser
                 .getDirAsList(CoreConstant.DATAX_PLUGIN_READER_HOME)) {
@@ -180,7 +181,7 @@ public final class ConfigParser {
     }
 
     private static List<String> getDirAsList(String path) {
-        List<String> result = new ArrayList<String>();
+        List<String> result = new ArrayList<>();
 
         String[] paths = new File(path).list();
         if (null == paths) {

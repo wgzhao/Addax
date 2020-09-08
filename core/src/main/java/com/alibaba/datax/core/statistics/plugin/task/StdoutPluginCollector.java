@@ -27,7 +27,7 @@ public class StdoutPluginCollector extends AbstractTaskPluginCollector {
 
     private AtomicInteger maxLogNum = new AtomicInteger(0);
 
-    private AtomicInteger currentLogNum = new AtomicInteger(0);
+    private final AtomicInteger currentLogNum = new AtomicInteger(0);
 
     public StdoutPluginCollector(Configuration configuration, Communication communication,
                                  PluginType type) {
@@ -40,7 +40,7 @@ public class StdoutPluginCollector extends AbstractTaskPluginCollector {
 
     private String formatDirty(final Record dirty, final Throwable t,
                                final String msg) {
-        Map<String, Object> msgGroup = new HashMap<String, Object>();
+        Map<String, Object> msgGroup = new HashMap<>();
 
         msgGroup.put("type", super.getPluginType().toString());
         if (StringUtils.isNotBlank(msg)) {

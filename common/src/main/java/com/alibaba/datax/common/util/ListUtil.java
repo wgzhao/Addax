@@ -35,14 +35,12 @@ public final class ListUtil {
             throw new IllegalArgumentException("您提供的作业配置有误, List不能为空.");
         }
 
-        if (1 == aList.size()) {
-            return;
-        } else {
-            List<String> list = null;
+        if (1 != aList.size()) {
+            List<String> list;
             if (!caseSensitive) {
                 list = valueToLowerCase(aList);
             } else {
-                list = new ArrayList<String>(aList);
+                list = new ArrayList<>(aList);
             }
 
             Collections.sort(list);
@@ -83,15 +81,15 @@ public final class ListUtil {
             throw new IllegalArgumentException("您提供的作业配置有误, List不能为空.");
         }
 
-        List<String> all = null;
-        List<String> part = null;
+        List<String> all;
+        List<String> part;
 
         if (!caseSensitive) {
             all = valueToLowerCase(aList);
             part = valueToLowerCase(bList);
         } else {
-            all = new ArrayList<String>(aList);
-            part = new ArrayList<String>(bList);
+            all = new ArrayList<>(aList);
+            part = new ArrayList<>(bList);
         }
 
         for (String oneValue : part) {
@@ -112,24 +110,22 @@ public final class ListUtil {
             throw new IllegalArgumentException("您提供的作业配置有误, List不能为空.");
         }
 
-        if (1 == aList.size()) {
-            return true;
-        } else {
+        if (1 != aList.size()) {
             Boolean firstValue = aList.get(0);
             for (int i = 1, len = aList.size(); i < len; i++) {
                 if (firstValue.booleanValue() != aList.get(i).booleanValue()) {
                     return false;
                 }
             }
-            return true;
         }
+        return true;
     }
 
     public static List<String> valueToLowerCase(List<String> aList) {
         if (null == aList || aList.isEmpty()) {
             throw new IllegalArgumentException("您提供的作业配置有误, List不能为空.");
         }
-        List<String> result = new ArrayList<String>(aList.size());
+        List<String> result = new ArrayList<>(aList.size());
         for (String oneValue : aList) {
             result.add(null != oneValue ? oneValue.toLowerCase() : null);
         }

@@ -14,7 +14,7 @@ public class DateColumn extends Column {
 
 	private DateType subType = DateType.DATETIME;
 
-	public static enum DateType {
+	public enum DateType {
 		DATE, TIME, DATETIME
 	}
 

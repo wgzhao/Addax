@@ -8,7 +8,7 @@ public enum ClickHouseErrorCode implements ErrorCode {
     private final String code;
     private final String description;
 
-    private ClickHouseErrorCode(String code, String description) {
+    ClickHouseErrorCode(String code, String description) {
         this.code = code;
         this.description = description;
     }

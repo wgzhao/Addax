@@ -17,11 +17,6 @@ import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
 import java.sql.Types;
 
-/**
- * @creaor:yyi
- * @createDate:2020/3/3
- * @Describle
- */
 public class SqlServerRdbmsReader extends CommonRdbmsReader {
     static {
         DBUtil.loadDriverClass("reader", "rdbms");
@@ -86,8 +81,6 @@ public class SqlServerRdbmsReader extends CommonRdbmsReader {
 
                         case Types.NUMERIC:
                         case Types.DECIMAL:
-                            record.addColumn(new DoubleColumn(rs.getString(i)));
-                            break;
 
                         case Types.FLOAT:
                         case Types.REAL:

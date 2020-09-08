@@ -67,7 +67,7 @@ class StringCast {
 		StringCast.timeFormat = configuration.getString(
 				"common.column.timeFormat", StringCast.timeFormat);
 		StringCast.extraFormats = configuration.getList(
-				"common.column.extraFormats", Collections.<String>emptyList(), String.class);
+				"common.column.extraFormats", Collections.emptyList(), String.class);
 
 		StringCast.timeZone = configuration.getString("common.column.timeZone",
 				StringCast.timeZone);
@@ -102,15 +102,15 @@ class StringCast {
 		ParseException e;
 		try {
 			return StringCast.timeFormatter.parse(column.asString());
-		} catch (ParseException ignored) {
-			e = ignored;
+		} catch (ParseException pe) {
+			e = pe;
 		}
 
 		for (String format : StringCast.extraFormats) {
 			try{
 				return FastDateFormat.getInstance(format, StringCast.timeZoner).parse(column.asString());
-			} catch (ParseException ignored){
-				e = ignored;
+			} catch (ParseException pe){
+				e = pe;
 			}
 		}
 		throw e;
@@ -153,7 +153,6 @@ class DateCast {
 		DateCast.timeZone = configuration.getString("common.column.timeZone",
 				DateCast.timeZone);
 		DateCast.timeZoner = TimeZone.getTimeZone(DateCast.timeZone);
-		return;
 	}
 
 	static String asString(final DateColumn column) {
@@ -185,7 +184,6 @@ class BytesCast {
 	static void init(final Configuration configuration) {
 		BytesCast.encoding = configuration.getString("common.column.encoding",
 				BytesCast.encoding);
-		return;
 	}
 
 	static String asString(final BytesColumn column)

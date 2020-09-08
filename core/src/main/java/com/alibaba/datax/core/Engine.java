@@ -41,7 +41,7 @@ public class Engine {
         // 绑定column转换信息
         ColumnCast.bind(allConf);
 
-        /**
+        /*
          * 初始化PluginLoader，可以获取各种插件配置
          */
         LoadUtil.bind(allConf);
@@ -198,7 +198,7 @@ public class Engine {
         return -1;
     }
 
-    public static void main(String[] args) throws Exception {
+    public static void main(String[] args) {
         int exitCode = 0;
         try {
             Engine.entry(args);

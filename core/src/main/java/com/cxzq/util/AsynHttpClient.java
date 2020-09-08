@@ -42,6 +42,7 @@ public class AsynHttpClient {
                     } catch (IOReactorException e) {
                         e.printStackTrace();
                     }
+                    assert ioReactor != null;
                     PoolingNHttpClientConnectionManager connManager = new PoolingNHttpClientConnectionManager(ioReactor);
                     connManager.setMaxTotal(5);//最大连接数设置1
                     connManager.setDefaultMaxPerRoute(5);//per route最大连接数设置
@@ -59,8 +60,8 @@ public class AsynHttpClient {
     }
 
     public static HttpPost getPostBody(String urls, String bodys, ContentType contentType) {
-        HttpPost post = null;
-        StringEntity entity = null;
+        HttpPost post;
+        StringEntity entity;
         post = new HttpPost(urls);
         entity = new StringEntity(bodys, contentType);
         post.setEntity(entity);

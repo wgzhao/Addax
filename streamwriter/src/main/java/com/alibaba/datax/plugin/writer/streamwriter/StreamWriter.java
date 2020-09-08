@@ -2,7 +2,6 @@
 package com.alibaba.datax.plugin.writer.streamwriter;
 
 import com.alibaba.datax.common.element.Column;
-import com.alibaba.datax.common.element.Record;
 import com.alibaba.datax.common.exception.DataXException;
 import com.alibaba.datax.common.plugin.RecordReceiver;
 import com.alibaba.datax.common.spi.Writer;
@@ -13,14 +12,17 @@ import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.*;
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.OutputStreamWriter;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
 
 public class StreamWriter extends Writer {
     public static class Job extends Writer.Job {
-        private static final Logger LOG = LoggerFactory
-                .getLogger(Job.class);
 
         private Configuration originalConfig;
 
@@ -83,7 +85,7 @@ public class StreamWriter extends Writer {
 
         @Override
         public List<Configuration> split(int mandatoryNumber) {
-            List<Configuration> writerSplitConfigs = new ArrayList<Configuration>();
+            List<Configuration> writerSplitConfigs = new ArrayList<>();
             for (int i = 0; i < mandatoryNumber; i++) {
                 writerSplitConfigs.add(this.originalConfig);
             }
@@ -106,8 +108,6 @@ public class StreamWriter extends Writer {
 
         private static final String NEWLINE_FLAG = System.getProperty("line.separator", "\n");
 
-        private Configuration writerSliceConfig;
-
         private String fieldDelimiter;
         private boolean print;
 
@@ -121,16 +121,16 @@ public class StreamWriter extends Writer {
 
         @Override
         public void init() {
-            this.writerSliceConfig = getPluginJobConf();
+            Configuration writerSliceConfig = getPluginJobConf();
 
-            this.fieldDelimiter = this.writerSliceConfig.getString(
+            this.fieldDelimiter = writerSliceConfig.getString(
                     Key.FIELD_DELIMITER, "\t");
-            this.print = this.writerSliceConfig.getBool(Key.PRINT, true);
+            this.print = writerSliceConfig.getBool(Key.PRINT, true);
 
-            this.path = this.writerSliceConfig.getString(Key.PATH, null);
-            this.fileName = this.writerSliceConfig.getString(Key.FILE_NAME, null);
-            this.recordNumBeforSleep = this.writerSliceConfig.getLong(Key.RECORD_NUM_BEFORE_SLEEP, 0);
-            this.sleepTime = this.writerSliceConfig.getLong(Key.SLEEP_TIME, 0);
+            this.path = writerSliceConfig.getString(Key.PATH, null);
+            this.fileName = writerSliceConfig.getString(Key.FILE_NAME, null);
+            this.recordNumBeforSleep = writerSliceConfig.getLong(Key.RECORD_NUM_BEFORE_SLEEP, 0);
+            this.sleepTime = writerSliceConfig.getLong(Key.SLEEP_TIME, 0);
             if(recordNumBeforSleep < 0) {
                 throw DataXException.asDataXException(StreamWriterErrorCode.CONFIG_INVALID_EXCEPTION, "recordNumber 不能为负值");
             }
@@ -153,7 +153,7 @@ public class StreamWriter extends Writer {
                 } else {
                     try {
                         BufferedWriter writer = new BufferedWriter(
-                                new OutputStreamWriter(System.out, "UTF-8"));
+                                new OutputStreamWriter(System.out, StandardCharsets.UTF_8));
 
                         com.alibaba.datax.common.element.Record record;
                         while ((record = recordReceiver.getFromReader()) != null) {
@@ -183,7 +183,7 @@ public class StreamWriter extends Writer {
                 newFile.createNewFile();
 
                 writer = new BufferedWriter(
-                        new OutputStreamWriter(new FileOutputStream(newFile, true), "UTF-8"));
+                        new OutputStreamWriter(new FileOutputStream(newFile, true), StandardCharsets.UTF_8));
 
                 com.alibaba.datax.common.element.Record record;
                 int count =0;
@@ -191,8 +191,8 @@ public class StreamWriter extends Writer {
                     if(recordNumBeforSleep > 0 && sleepTime >0 &&count == recordNumBeforSleep) {
                         LOG.info("StreamWriter start to sleep ... recordNumBeforSleep={},sleepTime={}",recordNumBeforSleep,sleepTime);
                         try {
-                            Thread.sleep(sleepTime * 1000l);
-                        } catch (InterruptedException e) {
+                            Thread.sleep(sleepTime * 1000L);
+                        } catch (InterruptedException ignored) {
                         }
                     }
                    writer.write(recordToString(record));
@@ -202,7 +202,7 @@ public class StreamWriter extends Writer {
             } catch (Exception e) {
                 throw DataXException.asDataXException(StreamWriterErrorCode.RUNTIME_EXCEPTION, e);
             } finally {
-                IOUtils.closeQuietly(writer);
+                IOUtils.closeQuietly(writer, null);
             }
         }
 

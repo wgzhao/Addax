@@ -6,8 +6,6 @@ import com.alibaba.datax.common.util.Configuration;
 import com.alibaba.datax.plugin.rdbms.reader.CommonRdbmsReader;
 import com.alibaba.datax.plugin.rdbms.reader.Constant;
 import com.alibaba.datax.plugin.rdbms.util.DataBaseType;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.util.List;
 
@@ -16,8 +14,6 @@ public class ClickHouseReader extends Reader {
     private static final DataBaseType DATABASE_TYPE = DataBaseType.ClickHouse;
 
     public static class Job extends Reader.Job {
-        private static final Logger LOG = LoggerFactory
-                .getLogger(Job.class);
 
         private Configuration originalConfig = null;
         private CommonRdbmsReader.Job commonRdbmsReaderJob;

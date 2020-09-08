@@ -15,11 +15,11 @@ public class DoubleColumn extends Column {
 	}
 
 	public DoubleColumn(Long data) {
-		this(data == null ? (String) null : String.valueOf(data));
+		this(data == null ? null : String.valueOf(data));
 	}
 
 	public DoubleColumn(Integer data) {
-		this(data == null ? (String) null : String.valueOf(data));
+		this(data == null ? null : String.valueOf(data));
 	}
 
 	/**
@@ -27,7 +27,7 @@ public class DoubleColumn extends Column {
 	 * 
 	 * */
 	public DoubleColumn(final Double data) {
-		this(data == null ? (String) null
+		this(data == null ? null
 				: new BigDecimal(String.valueOf(data)).toPlainString());
 	}
 
@@ -36,16 +36,16 @@ public class DoubleColumn extends Column {
 	 * 
 	 * */
 	public DoubleColumn(final Float data) {
-		this(data == null ? (String) null
+		this(data == null ? null
 				: new BigDecimal(String.valueOf(data)).toPlainString());
 	}
 
 	public DoubleColumn(final BigDecimal data) {
-		this(null == data ? (String) null : data.toPlainString());
+		this(null == data ? null : data.toPlainString());
 	}
 
 	public DoubleColumn(final BigInteger data) {
-		this(null == data ? (String) null : data.toString());
+		this(null == data ? null : data.toString());
 	}
 
 	public DoubleColumn() {
@@ -68,7 +68,7 @@ public class DoubleColumn extends Column {
 			throw DataXException.asDataXException(
 					CommonErrorCode.CONVERT_NOT_SUPPORT,
 					String.format("String[%s] 无法转换为Double类型 .",
-							(String) this.getRawData()));
+							this.getRawData()));
 		}
 	}
 

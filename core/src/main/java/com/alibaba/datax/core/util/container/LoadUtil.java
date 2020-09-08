@@ -28,9 +28,9 @@ public class LoadUtil {
 
     private enum ContainerType {
         Job("Job"), Task("Task");
-        private String type;
+        private final String type;
 
-        private ContainerType(String type) {
+        ContainerType(String type) {
             this.type = type;
         }
 
@@ -39,27 +39,24 @@ public class LoadUtil {
         }
     }
 
-    /**
-     * 所有插件配置放置在pluginRegisterCenter中，为区别reader、transformer和writer，还能区别
-     * 具体pluginName，故使用pluginType.pluginName作为key放置在该map中
-     */
-    private static Configuration pluginRegisterCenter;
-    private final static Map <Long ,Configuration> configurationSet = new ConcurrentHashMap<Long, Configuration>();
+    private final static Map <Long ,Configuration> configurationSet = new ConcurrentHashMap<>();
     public static Map getConfigurationSet(){
         return configurationSet;
     }
     /**
      * jarLoader的缓冲
      */
-    private static Map<String, JarLoader> jarLoaderCenter = new HashMap<String, JarLoader>();
+    private static final Map<String, JarLoader> jarLoaderCenter = new HashMap<>();
 
     /**
      * 设置pluginConfigs，方便后面插件来获取
      *
-     * @param pluginConfigs
      */
     public static synchronized void bind(Configuration pluginConfigs) {
-        pluginRegisterCenter = pluginConfigs;
+        /*
+         * 所有插件配置放置在pluginRegisterCenter中，为区别reader、transformer和writer，还能区别
+         * 具体pluginName，故使用pluginType.pluginName作为key放置在该map中
+         */
         Long jobId = pluginConfigs.getLong(
                 CoreConstant.DATAX_CORE_CONTAINER_JOB_ID);
         if(jobId==-1) { jobId = (long)0;}
@@ -93,9 +90,6 @@ public class LoadUtil {
     /**
      * 加载JobPlugin，reader、writer都可能要加载
      *
-     * @param pluginType
-     * @param pluginName
-     * @return
      */
     public static AbstractJobPlugin loadJobPlugin(PluginType pluginType,
                                                   String pluginName,Long jobId) {
@@ -118,9 +112,6 @@ public class LoadUtil {
     /**
      * 加载taskPlugin，reader、writer都可能加载
      *
-     * @param pluginType
-     * @param pluginName
-     * @return
      */
     public static AbstractTaskPlugin loadTaskPlugin(PluginType pluginType,
                                                     String pluginName,Long jobId) {
@@ -142,9 +133,6 @@ public class LoadUtil {
     /**
      * 根据插件类型、名字和执行时taskGroupId加载对应运行器
      *
-     * @param pluginType
-     * @param pluginName
-     * @return
      */
     public static AbstractRunner loadPluginRunner(PluginType pluginType, String pluginName,Long jobId) {
         AbstractTaskPlugin taskPlugin = LoadUtil.loadTaskPlugin(pluginType,
@@ -166,10 +154,6 @@ public class LoadUtil {
     /**
      * 反射出具体plugin实例
      *
-     * @param pluginType
-     * @param pluginName
-     * @param pluginRunType
-     * @return
      */
     @SuppressWarnings("unchecked")
     private static synchronized Class<? extends AbstractPlugin> loadPluginClass(

@@ -13,7 +13,7 @@ public enum StreamWriterErrorCode implements ErrorCode {
     private final String code;
     private final String description;
 
-    private StreamWriterErrorCode(String code, String description) {
+    StreamWriterErrorCode(String code, String description) {
         this.code = code;
         this.description = description;
     }

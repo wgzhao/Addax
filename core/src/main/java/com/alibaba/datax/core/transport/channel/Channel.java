@@ -35,7 +35,7 @@ public abstract class Channel {
 
     protected volatile boolean isClosed = false;
 
-    protected Configuration configuration = null;
+    protected Configuration configuration;
 
     protected volatile long waitReaderTime = 0;
 
@@ -45,7 +45,7 @@ public abstract class Channel {
 
     private Communication currentCommunication;
 
-    private Communication lastCommunication = new Communication();
+    private final Communication lastCommunication = new Communication();
 
     public Channel(final Configuration configuration) {
         //channel的queue里默认record为1万条。原来为512条
@@ -216,8 +216,7 @@ public abstract class Channel {
             }
 
             // 休眠时间取较大值
-            long sleepTime = byteLimitSleepTime < recordLimitSleepTime ?
-                    recordLimitSleepTime : byteLimitSleepTime;
+            long sleepTime = Math.max(byteLimitSleepTime, recordLimitSleepTime);
             if (sleepTime > 0) {
                 try {
                     Thread.sleep(sleepTime);

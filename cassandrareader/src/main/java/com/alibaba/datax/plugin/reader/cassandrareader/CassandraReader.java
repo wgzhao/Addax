@@ -1,6 +1,5 @@
 package com.alibaba.datax.plugin.reader.cassandrareader;
 
-import com.alibaba.datax.common.element.Record;
 import com.alibaba.datax.common.plugin.RecordSender;
 import com.alibaba.datax.common.spi.Reader;
 import com.alibaba.datax.common.util.Configuration;
@@ -36,13 +35,13 @@ public class CassandraReader extends Reader {
 
       if ((username != null) && !username.isEmpty()) {
         Cluster.Builder clusterBuilder = Cluster.builder().withCredentials(username, password)
-            .withPort(Integer.valueOf(port)).addContactPoints(hosts.split(","));
+            .withPort(port).addContactPoints(hosts.split(","));
         if (useSSL) {
           clusterBuilder = clusterBuilder.withSSL();
         }
         cluster = clusterBuilder.build();
       } else {
-        cluster = Cluster.builder().withPort(Integer.valueOf(port))
+        cluster = Cluster.builder().withPort(port)
             .addContactPoints(hosts.split(",")).build();
       }
       CassandraReaderHelper.checkConfig(jobConfig,cluster);
@@ -53,41 +52,38 @@ public class CassandraReader extends Reader {
     }
 
     @Override public List<Configuration> split(int adviceNumber) {
-      List<Configuration> splittedConfigs = CassandraReaderHelper.splitJob(adviceNumber,jobConfig,cluster);
-      return splittedConfigs;
+      return CassandraReaderHelper.splitJob(adviceNumber,jobConfig,cluster);
     }
 
   }
 
   public static class Task extends Reader.Task {
-    private Configuration taskConfig;
-    private Cluster cluster = null;
     private Session session = null;
     private String queryString = null;
     private ConsistencyLevel consistencyLevel;
     private int columnNumber = 0;
-    private List<String> columnMeta = null;
 
     @Override public void init() {
-      this.taskConfig = super.getPluginJobConf();
+      Configuration taskConfig = super.getPluginJobConf();
       String username = taskConfig.getString(Key.USERNAME);
       String password = taskConfig.getString(Key.PASSWORD);
       String hosts = taskConfig.getString(Key.HOST);
       Integer port = taskConfig.getInt(Key.PORT);
       boolean useSSL = taskConfig.getBool(Key.USESSL);
       String keyspace = taskConfig.getString(Key.KEYSPACE);
-      this.columnMeta = taskConfig.getList(Key.COLUMN,String.class);
+      List<String> columnMeta = taskConfig.getList(Key.COLUMN, String.class);
       columnNumber = columnMeta.size();
 
+      Cluster cluster;
       if ((username != null) && !username.isEmpty()) {
         Cluster.Builder clusterBuilder = Cluster.builder().withCredentials(username, password)
-            .withPort(Integer.valueOf(port)).addContactPoints(hosts.split(","));
+            .withPort(port).addContactPoints(hosts.split(","));
         if (useSSL) {
           clusterBuilder = clusterBuilder.withSSL();
         }
         cluster = clusterBuilder.build();
       } else {
-        cluster = Cluster.builder().withPort(Integer.valueOf(port))
+        cluster = Cluster.builder().withPort(port)
             .addContactPoints(hosts.split(",")).build();
       }
       session = cluster.connect(keyspace);
@@ -98,7 +94,7 @@ public class CassandraReader extends Reader {
         consistencyLevel = ConsistencyLevel.LOCAL_QUORUM;
       }
 
-      queryString = CassandraReaderHelper.getQueryString(taskConfig,cluster);
+      queryString = CassandraReaderHelper.getQueryString(taskConfig, cluster);
       LOG.info("query = " + queryString);
 
     }

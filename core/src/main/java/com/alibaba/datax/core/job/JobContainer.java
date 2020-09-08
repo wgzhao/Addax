@@ -58,7 +58,7 @@ public class JobContainer extends AbstractContainer {
     private static final SimpleDateFormat dateFormat = new SimpleDateFormat(
             "yyyy-MM-dd HH:mm:ss");
 
-    private ClassLoaderSwapper classLoaderSwapper = ClassLoaderSwapper
+    private final ClassLoaderSwapper classLoaderSwapper = ClassLoaderSwapper
             .newCurrentThreadClassLoaderSwapper();
 
 
@@ -89,7 +89,7 @@ public class JobContainer extends AbstractContainer {
 
     private int totalStage = 1;
 
-    private ErrorRecordChecker errorLimit;
+    private final ErrorRecordChecker errorLimit;
 
 
 
@@ -411,7 +411,7 @@ public class JobContainer extends AbstractContainer {
         List<Configuration> transformerList = this.configuration.getListConfiguration(CoreConstant.DATAX_JOB_CONTENT_TRANSFORMER);
 
         LOG.debug("transformer configuration: "+ JSON.toJSONString(transformerList));
-        /**
+        /*
          * 输入是reader和writer的parameter list，输出是content下面元素的list
          */
         List<Configuration> contentConfig = mergeReaderAndWriterTaskConfigs(
@@ -501,7 +501,7 @@ public class JobContainer extends AbstractContainer {
      * 同时不同的执行模式调用不同的调度策略，将所有任务调度起来
      */
     private void schedule() {
-        /**
+        /*
          * 这里的全局speed和每个channel的速度设置为B/s
          */
         int channelsPerTaskGroup = this.configuration.getInt(
@@ -512,7 +512,7 @@ public class JobContainer extends AbstractContainer {
         this.needChannelNumber = Math.min(this.needChannelNumber, taskNumber);
         PerfTrace.getInstance().setChannelNumber(needChannelNumber);
 
-        /**
+        /*
          * 通过获取配置信息得到每个taskGroup需要运行哪些tasks任务
          */
 
@@ -553,7 +553,7 @@ public class JobContainer extends AbstractContainer {
                     FrameworkErrorCode.RUNTIME_ERROR, e);
         }
 
-        /**
+        /*
          * 检查任务执行情况
          */
          this.checkLimit();
@@ -777,9 +777,6 @@ public class JobContainer extends AbstractContainer {
     /**
      * 按顺序整合reader和writer的配置，这里的顺序不能乱！ 输入是reader、writer级别的配置，输出是一个完整task的配置
      *
-     * @param readerTasksConfigs
-     * @param writerTasksConfigs
-     * @return
      */
     private List<Configuration> mergeReaderAndWriterTaskConfigs(
             List<Configuration> readerTasksConfigs,
@@ -799,7 +796,7 @@ public class JobContainer extends AbstractContainer {
             );
         }
 
-        List<Configuration> contentConfigs = new ArrayList<Configuration>();
+        List<Configuration> contentConfigs = new ArrayList<>();
         for (int i = 0; i < readerTasksConfigs.size(); i++) {
             Configuration taskConfig = Configuration.newDefault();
             taskConfig.set(CoreConstant.JOB_READER_NAME,
@@ -842,10 +839,6 @@ public class JobContainer extends AbstractContainer {
      * <p/>
      * TODO delete it
      *
-     * @param averTaskPerChannel
-     * @param channelNumber
-     * @param channelsPerTaskGroup
-     * @return 每个taskGroup独立的全部配置
      */
     @SuppressWarnings("serial")
     private List<Configuration> distributeTasksToTaskGroup(
@@ -862,12 +855,12 @@ public class JobContainer extends AbstractContainer {
             taskGroupNumber += 1;
         }
 
-        /**
+        /*
          * 如果只有一个taskGroup，直接打标返回
          */
         if (taskGroupNumber == 1) {
             final Configuration taskGroupConfig = this.configuration.clone();
-            /**
+            /*
              * configure的clone不能clone出
              */
             taskGroupConfig.set(CoreConstant.DATAX_JOB_CONTENT, this.configuration
@@ -882,8 +875,8 @@ public class JobContainer extends AbstractContainer {
             };
         }
 
-        List<Configuration> taskGroupConfigs = new ArrayList<Configuration>();
-        /**
+        List<Configuration> taskGroupConfigs = new ArrayList<>();
+        /*
          * 将每个taskGroup中content的配置清空
          */
         for (int i = 0; i < taskGroupNumber; i++) {
@@ -900,7 +893,7 @@ public class JobContainer extends AbstractContainer {
         int channelIndex = 0;
         int taskGroupConfigIndex = 0;
 
-        /**
+        /*
          * 先处理掉taskGroup包含channel数不是平均值的taskGroup
          */
         if (leftChannelNumber > 0) {
@@ -921,12 +914,12 @@ public class JobContainer extends AbstractContainer {
                     taskGroupConfigIndex++);
         }
 
-        /**
+        /*
          * 下面需要轮询分配，并打上channel数和taskGroupId标记
          */
         int equalDivisionStartIndex = taskGroupConfigIndex;
-        for (; taskConfigIndex < taskConfigs.size()
-                && equalDivisionStartIndex < taskGroupConfigs.size(); ) {
+        while (taskConfigIndex < taskConfigs.size()
+                && equalDivisionStartIndex < taskGroupConfigs.size()) {
             for (taskGroupConfigIndex = equalDivisionStartIndex; taskGroupConfigIndex < taskGroupConfigs
                     .size() && taskConfigIndex < taskConfigs.size(); taskGroupConfigIndex++) {
                 Configuration taskGroupConfig = taskGroupConfigs.get(taskGroupConfigIndex);
@@ -983,7 +976,7 @@ public class JobContainer extends AbstractContainer {
      * 调用外部hook
      */
     private void invokeHooks() {
-        Communication comm = super.getContainerCommunicator().collect();
+//        Communication comm = super.getContainerCommunicator().collect();
 //        HookInvoker invoker = new HookInvoker(CoreConstant.DATAX_HOME + "/hook", configuration, comm.getCounter());
 //        invoker.invokeAll();
 
@@ -1033,7 +1026,7 @@ public class JobContainer extends AbstractContainer {
 
 
 
-        Map<String,Object> resultLog  = new HashMap<String,Object>();
+        Map<String,Object> resultLog  = new HashMap<>();
 
         resultLog.put("startTimeStamp",startTimeStamp / 1000);
         resultLog.put("endTimeStamp",endTimeStamp / 1000);

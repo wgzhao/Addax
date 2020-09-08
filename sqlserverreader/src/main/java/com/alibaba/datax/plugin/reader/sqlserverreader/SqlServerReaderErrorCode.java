@@ -5,10 +5,10 @@ import com.alibaba.datax.common.spi.ErrorCode;
 public enum SqlServerReaderErrorCode implements ErrorCode {
     ;
 
-    private String code;
-    private String description;
+    private final String code;
+    private final String description;
 
-    private SqlServerReaderErrorCode(String code, String description) {
+    SqlServerReaderErrorCode(String code, String description) {
         this.code = code;
         this.description = description;
     }

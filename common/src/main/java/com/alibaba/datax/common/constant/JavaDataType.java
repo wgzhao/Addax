@@ -52,7 +52,7 @@ public enum JavaDataType
     NULL("null"),
     BADTYPE("BadType");
 
-    private String clzName;
+    private final String clzName;
 
     JavaDataType(String clzName)
     {

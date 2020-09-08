@@ -9,7 +9,7 @@ public enum CassandraReaderErrorCode implements ErrorCode {
     private final String code;
     private final String description;
 
-    private CassandraReaderErrorCode(String code, String description) {
+    CassandraReaderErrorCode(String code, String description) {
         this.code = code;
         this.description = description;
     }

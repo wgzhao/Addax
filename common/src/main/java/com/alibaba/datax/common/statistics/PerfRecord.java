@@ -6,14 +6,15 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.Date;
+import java.util.Objects;
 
 /**
  * Created by liqiang on 15/8/23.
  */
 @SuppressWarnings("NullableProblems")
 public class PerfRecord implements Comparable<PerfRecord> {
-    private static Logger perf = LoggerFactory.getLogger(PerfRecord.class);
-    private static String datetimeFormat = "yyyy-MM-dd HH:mm:ss";
+    private static final Logger perf = LoggerFactory.getLogger(PerfRecord.class);
+    private static final String datetimeFormat = "yyyy-MM-dd HH:mm:ss";
 
 
     public enum PHASE {
@@ -54,7 +55,7 @@ public class PerfRecord implements Comparable<PerfRecord> {
 
         TRANSFORMER_TIME(201);
 
-        private int val;
+        private final int val;
 
         PHASE(int val) {
             this.val = val;
@@ -175,9 +176,8 @@ public class PerfRecord implements Comparable<PerfRecord> {
         if (this.getInstId() != dst.getInstId()) return false;
         if (this.taskGroupId != dst.taskGroupId) return false;
         if (this.taskId != dst.taskId) return false;
-        if (phase != null ? !phase.equals(dst.phase) : dst.phase != null) return false;
-        if (startTime != null ? !startTime.equals(dst.startTime) : dst.startTime != null) return false;
-        return true;
+        if (!Objects.equals(phase, dst.phase)) return false;
+        return Objects.equals(startTime, dst.startTime);
     }
 
     public PerfRecord copy() {

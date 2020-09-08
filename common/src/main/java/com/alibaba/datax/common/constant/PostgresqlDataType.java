@@ -68,7 +68,7 @@ public enum PostgresqlDataType
     VARBIT("varbit"),
     VARCHAR("varchar"),
     NULL("null");
-    private String typeName;
+    private final String typeName;
 
     PostgresqlDataType(String typeName)
     {
