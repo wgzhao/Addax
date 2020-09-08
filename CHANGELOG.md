@@ -6,6 +6,7 @@
 
 * Transformer add column's basic operation 
 * Use prestosql's hadoop and hive jars instead of apache's
+* various misc codes optimize
  
 ### dbffilereader
 

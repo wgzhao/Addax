@@ -3,9 +3,9 @@
     <modelVersion>4.0.0</modelVersion>
 
     <parent>
-            <groupId>com.alibaba.datax</groupId>
-            <artifactId>datax-all</artifactId>
-            <version>3.1.0-SNAPSHOT</version>
+        <groupId>com.alibaba.datax</groupId>
+        <artifactId>datax-all</artifactId>
+        <version>3.1.1-SNAPSHOT</version>
     </parent>
 
     <artifactId>datax-docs</artifactId>
@@ -81,7 +81,7 @@
                         </goals>
                         <configuration>
                             <descriptors>
-                                <descriptor>src/main/assembly/sources.xml</descriptor>
+                                <descriptor>src/assembly/sources.xml</descriptor>
                             </descriptors>
                         </configuration>
                     </execution>
