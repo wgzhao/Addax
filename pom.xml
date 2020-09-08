@@ -7,7 +7,16 @@
     <version>3.1.1-SNAPSHOT</version>
 
     <name>datax-all</name>
+    <description>DataX generical ETL tool</description>
     <packaging>pom</packaging>
+    <url>https://datax.readthedocs.io</url>
+
+    <scm>
+        <connection>scm:git:https://github.com/wgzhao/datax.git</connection>
+        <developerConnection>scm:git:git@github.com:wgzhao/datax.git</developerConnection>
+        <url>https://github.com/wgzhao/datax</url>
+        <tag>HEAD</tag>
+    </scm>
 
     <properties>
         <commons.lang3.version>3.4</commons.lang3.version>
