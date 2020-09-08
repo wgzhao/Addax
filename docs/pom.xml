@@ -5,16 +5,12 @@
     <parent>
         <groupId>com.alibaba.datax</groupId>
         <artifactId>datax-all</artifactId>
-        <version>3.1.1-SNAPSHOT</version>
+        <version>3.1.2-SNAPSHOT</version>
     </parent>
 
     <artifactId>datax-docs</artifactId>
     <name>datax-docs</name>
     <packaging>pom</packaging>
-
-    <properties>
-        <air.main.basedir>${project.parent.basedir}</air.main.basedir>
-    </properties>
 
     <build>
         <pluginManagement>
@@ -37,6 +33,7 @@
             <plugin>
                 <groupId>org.codehaus.mojo</groupId>
                 <artifactId>exec-maven-plugin</artifactId>
+                <version>3.0.0</version>
                 <executions>
                     <execution>
                         <id>run-sphinx</id>
@@ -58,6 +55,7 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-assembly-plugin</artifactId>
+                <version>3.3.0</version>
                 <executions>
                     <execution>
                         <id>docs</id>
@@ -68,7 +66,7 @@
                         <configuration>
                             <appendAssemblyId>false</appendAssemblyId>
                             <descriptors>
-                                <descriptor>src/main/assembly/docs.xml</descriptor>
+                                <descriptor>src/assembly/docs.xml</descriptor>
                             </descriptors>
                         </configuration>
                     </execution>

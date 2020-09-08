@@ -53,6 +53,7 @@
         <!-- common support module -->
         <module>common</module>
         <module>core</module>
+        <module>docs</module>
         <module>plugin-rdbms-util</module>
         <module>plugin-unstructured-storage-util</module>
         <module>transformer</module>
