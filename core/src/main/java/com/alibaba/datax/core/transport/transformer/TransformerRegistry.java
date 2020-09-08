@@ -23,10 +23,10 @@ import java.util.Map;
 public class TransformerRegistry {
 
     private static final Logger LOG = LoggerFactory.getLogger(TransformerRegistry.class);
-    private static Map<String, TransformerInfo> registedTransformer = new HashMap<String, TransformerInfo>();
+    private static final Map<String, TransformerInfo> registedTransformer = new HashMap<>();
 
     static {
-        /**
+        /*
          * add native transformer
          * local storage and from server will be delay load.
          */
@@ -110,13 +110,11 @@ public class TransformerRegistry {
 
     public static TransformerInfo getTransformer(String transformerName) {
 
-        TransformerInfo result = registedTransformer.get(transformerName);
-
         //if (result == null) {
-        //todo 再尝试从disk读取
+        // todo 再尝试从disk读取
         //}
 
-        return result;
+        return registedTransformer.get(transformerName);
     }
 
     public static synchronized void registTransformer(Transformer transformer) {
@@ -173,6 +171,6 @@ public class TransformerRegistry {
     }
 
     public static List<String> getAllSuportTransformer() {
-        return new ArrayList<String>(registedTransformer.keySet());
+        return new ArrayList<>(registedTransformer.keySet());
     }
 }

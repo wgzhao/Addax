@@ -46,10 +46,10 @@ public class Communication extends BaseObject implements Cloneable {
     }
 
     private void init() {
-        this.counter = new ConcurrentHashMap<String, Number>();
+        this.counter = new ConcurrentHashMap<>();
         this.state = State.RUNNING;
         this.throwable = null;
-        this.message = new ConcurrentHashMap<String, List<String>>();
+        this.message = new ConcurrentHashMap<>();
         this.timestamp = System.currentTimeMillis();
     }
 
@@ -111,7 +111,7 @@ public class Communication extends BaseObject implements Cloneable {
 
     public synchronized void addMessage(final String key, final String value) {
         Validate.isTrue(StringUtils.isNotBlank(key), "增加message的key不能为空");
-        List valueList = this.message.computeIfAbsent(key, k -> new ArrayList<String>());
+        List<String> valueList = this.message.computeIfAbsent(key, k -> new ArrayList<>());
 
         valueList.add(value);
     }
@@ -149,7 +149,7 @@ public class Communication extends BaseObject implements Cloneable {
     public Communication clone() {
         Communication communication = new Communication();
 
-        /**
+        /*
          * clone counter
          */
         if (this.counter != null) {
@@ -168,13 +168,13 @@ public class Communication extends BaseObject implements Cloneable {
         communication.setThrowable(this.throwable, true);
         communication.setTimestamp(this.timestamp);
 
-        /**
+        /*
          * clone message
          */
         if (this.message != null) {
             for (final Map.Entry<String, List<String>> entry : this.message.entrySet()) {
                 String key = entry.getKey();
-                List value = new ArrayList() {{
+                List<String> value = new ArrayList<String>() {{
                     addAll(entry.getValue());
                 }};
                 communication.getMessage().put(key, value);
@@ -189,7 +189,7 @@ public class Communication extends BaseObject implements Cloneable {
             return this;
         }
 
-        /**
+        /*
          * counter的合并，将otherComm的值累加到this中，不存在的则创建
          * 同为long
          */
@@ -217,22 +217,22 @@ public class Communication extends BaseObject implements Cloneable {
         // 合并state
         mergeStateFrom(otherComm);
 
-        /**
+        /*
          * 合并throwable，当this的throwable为空时，
          * 才将otherComm的throwable合并进来
          */
         this.throwable = this.throwable == null ? otherComm.getThrowable() : this.throwable;
 
-        /**
+        /*
          * timestamp是整个一次合并的时间戳，单独两两communication不作合并
          */
 
-        /**
+        /*
          * message的合并采取求并的方式，即全部累计在一起
          */
         for (Entry<String, List<String>> entry : otherComm.getMessage().entrySet()) {
             String key = entry.getKey();
-            List<String> valueList = this.message.computeIfAbsent(key, k -> new ArrayList<String>());
+            List<String> valueList = this.message.computeIfAbsent(key, k -> new ArrayList<>());
 
             valueList.addAll(entry.getValue());
         }

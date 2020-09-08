@@ -22,6 +22,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Objects;
 import java.util.Set;
 import java.util.UUID;
 
@@ -110,6 +111,7 @@ public class TxtFileWriter extends Writer {
                         // warn:不要使用FileUtils.deleteQuietly(dir);
                         FilenameFilter filter = new PrefixFileFilter(fileName);
                         File[] filesWithFileNamePrefix = dir.listFiles(filter);
+                        assert filesWithFileNamePrefix != null;
                         for (File eachFile : filesWithFileNamePrefix) {
                             LOG.info(String.format("delete file [%s].",
                                     eachFile.getName()));
@@ -158,8 +160,9 @@ public class TxtFileWriter extends Writer {
                         // fileName is not null
                         FilenameFilter filter = new PrefixFileFilter(fileName);
                         File[] filesWithFileNamePrefix = dir.listFiles(filter);
+                        assert filesWithFileNamePrefix != null;
                         if (filesWithFileNamePrefix.length > 0) {
-                            List<String> allFiles = new ArrayList<String>();
+                            List<String> allFiles = new ArrayList<>();
                             for (File eachFile : filesWithFileNamePrefix) {
                                 allFiles.add(eachFile.getName());
                             }
@@ -211,16 +214,16 @@ public class TxtFileWriter extends Writer {
         @Override
         public List<Configuration> split(int mandatoryNumber) {
             LOG.info("begin do split...");
-            List<Configuration> writerSplitConfigs = new ArrayList<Configuration>();
+            List<Configuration> writerSplitConfigs = new ArrayList<>();
             String filePrefix = this.writerSliceConfig
                     .getString(com.alibaba.datax.plugin.unstructuredstorage.writer.Key.FILE_NAME);
 
-            Set<String> allFiles = new HashSet<String>();
+            Set<String> allFiles;
             String path = null;
             try {
                 path = this.writerSliceConfig.getString(Key.PATH);
                 File dir = new File(path);
-                allFiles.addAll(Arrays.asList(dir.list()));
+                allFiles = new HashSet<>(Arrays.asList(Objects.requireNonNull(dir.list())));
             } catch (SecurityException se) {
                 throw DataXException.asDataXException(
                         TxtFileWriterErrorCode.SECURITY_NOT_ENOUGH,
@@ -234,7 +237,7 @@ public class TxtFileWriter extends Writer {
                 Configuration splitedTaskConfig = this.writerSliceConfig
                         .clone();
 
-                String fullFileName = null;
+                String fullFileName;
                 fileSuffix = UUID.randomUUID().toString().replace('-', '_');
                 fullFileName = String.format("%s__%s", filePrefix, fileSuffix);
                 while (allFiles.contains(fullFileName)) {
@@ -304,7 +307,7 @@ public class TxtFileWriter extends Writer {
                         TxtFileWriterErrorCode.Write_FILE_IO_ERROR,
                         String.format("无法创建待写文件 : [%s]", this.fileName), ioe);
             } finally {
-                IOUtils.closeQuietly(outputStream);
+                IOUtils.closeQuietly(outputStream, null);
             }
             LOG.info("end do write");
         }

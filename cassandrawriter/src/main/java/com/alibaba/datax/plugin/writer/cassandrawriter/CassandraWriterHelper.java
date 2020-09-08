@@ -1,28 +1,10 @@
 package com.alibaba.datax.plugin.writer.cassandrawriter;
 
-import java.math.BigDecimal;
-import java.math.BigInteger;
-import java.net.InetAddress;
-import java.nio.ByteBuffer;
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.UUID;
-
 import com.alibaba.datax.common.element.Column;
 import com.alibaba.datax.common.exception.DataXException;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
-import com.alibaba.fastjson.JSONException;
 import com.alibaba.fastjson.JSONObject;
-
 import com.datastax.driver.core.BoundStatement;
 import com.datastax.driver.core.CodecRegistry;
 import com.datastax.driver.core.DataType;
@@ -33,9 +15,20 @@ import com.datastax.driver.core.TupleType;
 import com.datastax.driver.core.TupleValue;
 import com.datastax.driver.core.UDTValue;
 import com.datastax.driver.core.UserType;
-import com.datastax.driver.core.UserType.Field;
-import com.google.common.base.Splitter;
 import org.apache.commons.codec.binary.Base64;
+
+import java.math.BigDecimal;
+import java.math.BigInteger;
+import java.net.InetAddress;
+import java.nio.ByteBuffer;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.UUID;
 
 /**
  * Created by mazhenlin on 2019/8/21.
@@ -59,9 +52,6 @@ public class CassandraWriterHelper {
       return s;
 
     case BLOB:
-      if (s.length() == 0) {
-        return new byte[0];
-      }
       byte[] byteArray = new byte[s.length() / 2];
       for (int i = 0; i < byteArray.length; i++) {
         String subStr = s.substring(2 * i, 2 * i + 2);
@@ -82,7 +72,9 @@ public class CassandraWriterHelper {
       return Integer.valueOf(s);
 
     case BIGINT:
-      return Long.valueOf(s);
+
+      case TIME:
+        return Long.valueOf(s);
 
     case VARINT:
       return new BigInteger(s, 10);
@@ -101,15 +93,12 @@ public class CassandraWriterHelper {
       if (a.length != 3) {
         throw new Exception(String.format("DATE类型数据 '%s' 格式不正确，必须为yyyy-mm-dd格式", s));
       }
-      return LocalDate.fromYearMonthDay(Integer.valueOf(a[0]), Integer.valueOf(a[1]),
-          Integer.valueOf(a[2]));
+      return LocalDate.fromYearMonthDay(Integer.parseInt(a[0]), Integer.parseInt(a[1]),
+          Integer.parseInt(a[2]));
     }
 
-    case TIME:
-      return Long.valueOf(s);
-
-    case TIMESTAMP:
-      return new Date(Long.valueOf(s));
+      case TIMESTAMP:
+      return new Date(Long.parseLong(s));
 
     case UUID:
     case TIMEUUID:

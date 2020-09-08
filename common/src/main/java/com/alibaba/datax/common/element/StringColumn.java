@@ -1,11 +1,11 @@
 package com.alibaba.datax.common.element;
 
+import com.alibaba.datax.common.exception.CommonErrorCode;
+import com.alibaba.datax.common.exception.DataXException;
+
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.util.Date;
-
-import com.alibaba.datax.common.exception.CommonErrorCode;
-import com.alibaba.datax.common.exception.DataXException;
 
 /**
  * Created by jingxing on 14-8-24.
@@ -14,7 +14,7 @@ import com.alibaba.datax.common.exception.DataXException;
 public class StringColumn extends Column {
 
 	public StringColumn() {
-		this((String) null);
+		this(null);
 	}
 
 	public StringColumn(final String rawData) {
@@ -38,8 +38,6 @@ public class StringColumn extends Column {
 					CommonErrorCode.CONVERT_NOT_SUPPORT,
 					String.format("String[\"%s\"]属于Double特殊类型，不能转为其他类型 .", data));
 		}
-
-		return;
 	}
 
 	@Override

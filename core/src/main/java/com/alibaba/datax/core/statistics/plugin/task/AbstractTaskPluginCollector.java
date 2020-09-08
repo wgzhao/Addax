@@ -3,7 +3,6 @@ package com.alibaba.datax.core.statistics.plugin.task;
 import com.alibaba.datax.core.statistics.communication.Communication;
 import com.alibaba.datax.core.statistics.communication.CommunicationTool;
 import com.alibaba.datax.common.constant.PluginType;
-import com.alibaba.datax.common.element.Record;
 import com.alibaba.datax.common.exception.DataXException;
 import com.alibaba.datax.common.plugin.TaskPluginCollector;
 import com.alibaba.datax.common.util.Configuration;
@@ -19,11 +18,11 @@ public abstract class AbstractTaskPluginCollector extends TaskPluginCollector {
     private static final Logger LOG = LoggerFactory
             .getLogger(AbstractTaskPluginCollector.class);
 
-    private Communication communication;
+    private final Communication communication;
 
-    private Configuration configuration;
+    private final Configuration configuration;
 
-    private PluginType pluginType;
+    private final PluginType pluginType;
 
     public AbstractTaskPluginCollector(Configuration conf, Communication communication,
                                        PluginType type) {

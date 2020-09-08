@@ -45,13 +45,13 @@ public class StrUtil {
         } else if (byteNumber / KB_IN_BYTES > 0) {
             return df.format((double) byteNumber / (double) KB_IN_BYTES) + "KB";
         } else {
-            return String.valueOf(byteNumber) + "B";
+            return byteNumber + "B";
         }
     }
 
 
     public static String replaceVariable(final String param) {
-        Map<String, String> mapping = new HashMap<String, String>();
+        Map<String, String> mapping = new HashMap<>();
 
         Matcher matcher = VARIABLE_PATTERN.matcher(param);
         while (matcher.find()) {

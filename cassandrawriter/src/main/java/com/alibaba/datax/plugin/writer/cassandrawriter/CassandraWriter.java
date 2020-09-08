@@ -1,16 +1,10 @@
 package com.alibaba.datax.plugin.writer.cassandrawriter;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.concurrent.TimeUnit;
-
 import com.alibaba.datax.common.element.Column;
-import com.alibaba.datax.common.element.Record;
 import com.alibaba.datax.common.exception.DataXException;
 import com.alibaba.datax.common.plugin.RecordReceiver;
 import com.alibaba.datax.common.spi.Writer;
 import com.alibaba.datax.common.util.Configuration;
-
 import com.datastax.driver.core.BatchStatement;
 import com.datastax.driver.core.BatchStatement.Type;
 import com.datastax.driver.core.BoundStatement;
@@ -29,6 +23,10 @@ import com.datastax.driver.core.querybuilder.QueryBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.concurrent.TimeUnit;
+
 import static com.datastax.driver.core.querybuilder.QueryBuilder.timestamp;
 
 /**
@@ -41,7 +39,7 @@ public class CassandraWriter extends Writer {
     private Configuration originalConfig = null;
 
     @Override public List<Configuration> split(int mandatoryNumber) {
-      List<Configuration> splitResultConfigs = new ArrayList<Configuration>();
+      List<Configuration> splitResultConfigs = new ArrayList<>();
       for (int j = 0; j < mandatoryNumber; j++) {
         splitResultConfigs.add(originalConfig.clone());
       }
@@ -59,13 +57,10 @@ public class CassandraWriter extends Writer {
   }
 
   public static class Task extends Writer.Task {
-    private Configuration taskConfig;
-    private Cluster cluster = null;
     private Session session = null;
     private PreparedStatement statement = null;
     private int columnNumber = 0;
     private List<DataType> columnTypes;
-    private List<String> columnMeta = null;
     private int writeTimeCol = -1;
     private boolean asyncWrite = false;
     private long batchSize = 1;
@@ -154,7 +149,7 @@ public class CassandraWriter extends Writer {
 
 
     @Override public void init() {
-      this.taskConfig = super.getPluginJobConf();
+      Configuration taskConfig = super.getPluginJobConf();
       String username = taskConfig.getString(Key.USERNAME);
       String password = taskConfig.getString(Key.PASSWORD);
       String hosts = taskConfig.getString(Key.HOST);
@@ -163,8 +158,8 @@ public class CassandraWriter extends Writer {
       String keyspace = taskConfig.getString(Key.KEYSPACE);
       String table = taskConfig.getString(Key.TABLE);
       batchSize = taskConfig.getLong(Key.BATCH_SIZE,1);
-      this.columnMeta = taskConfig.getList(Key.COLUMN,String.class);
-      columnTypes = new ArrayList<DataType>(columnMeta.size());
+      List<String> columnMeta = taskConfig.getList(Key.COLUMN, String.class);
+      columnTypes = new ArrayList<>(columnMeta.size());
       columnNumber = columnMeta.size();
       asyncWrite = taskConfig.getBool(Key.ASYNC_WRITE,false);
 
@@ -177,20 +172,20 @@ public class CassandraWriter extends Writer {
       Cluster.Builder clusterBuilder = Cluster.builder().withPoolingOptions(poolingOpts);
       if ((username != null) && !username.isEmpty()) {
         clusterBuilder = clusterBuilder.withCredentials(username, password)
-            .withPort(Integer.valueOf(port)).addContactPoints(hosts.split(","));
+            .withPort(port).addContactPoints(hosts.split(","));
         if (useSSL) {
           clusterBuilder = clusterBuilder.withSSL();
         }
       } else {
-        clusterBuilder = clusterBuilder.withPort(Integer.valueOf(port))
+        clusterBuilder = clusterBuilder.withPort(port)
             .addContactPoints(hosts.split(","));
       }
-      cluster = clusterBuilder.build();
+      Cluster cluster = clusterBuilder.build();
       session = cluster.connect(keyspace);
       TableMetadata meta = cluster.getMetadata().getKeyspace(keyspace).getTable(table);
 
       Insert insertStmt = QueryBuilder.insertInto(table);
-      for( String colunmnName : columnMeta ) {
+      for( String colunmnName : columnMeta) {
         if( colunmnName.toLowerCase().equals(Key.WRITE_TIME) ) {
           if( writeTimeCol != -1 ) {
             throw DataXException
@@ -227,9 +222,9 @@ public class CassandraWriter extends Writer {
 
       if( batchSize > 1 ) {
         if( asyncWrite ) {
-          unConfirmedWrite = new ArrayList<ResultSetFuture>();
+          unConfirmedWrite = new ArrayList<>();
         } else {
-          bufferedWrite = new ArrayList<BoundStatement>();
+          bufferedWrite = new ArrayList<>();
         }
       }
 

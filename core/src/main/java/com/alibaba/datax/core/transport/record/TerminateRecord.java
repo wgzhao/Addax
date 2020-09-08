@@ -43,6 +43,5 @@ public class TerminateRecord implements Record {
 
 	@Override
 	public void setColumn(int i, Column column) {
-		return;
 	}
 }

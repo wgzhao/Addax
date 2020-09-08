@@ -10,7 +10,11 @@ import org.apache.http.auth.AuthScope;
 import org.apache.http.auth.UsernamePasswordCredentials;
 import org.apache.http.client.CredentialsProvider;
 import org.apache.http.client.config.RequestConfig;
-import org.apache.http.client.methods.*;
+import org.apache.http.client.methods.HttpDelete;
+import org.apache.http.client.methods.HttpGet;
+import org.apache.http.client.methods.HttpPost;
+import org.apache.http.client.methods.HttpPut;
+import org.apache.http.client.methods.HttpRequestBase;
 import org.apache.http.impl.client.BasicCredentialsProvider;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClientBuilder;
@@ -18,7 +22,6 @@ import org.apache.http.util.EntityUtils;
 
 import java.io.IOException;
 import java.util.Properties;
-import java.util.concurrent.Callable;
 import java.util.concurrent.ThreadPoolExecutor;
 
 
@@ -35,7 +38,7 @@ public class HttpClientUtil {
 
     private static final int POOL_SIZE = 20;
 
-    private static ThreadPoolExecutor asyncExecutor = RetryUtil.createThreadPoolExecutor();
+    private static final ThreadPoolExecutor asyncExecutor = RetryUtil.createThreadPoolExecutor();
 
     public static void setHttpTimeoutInMillionSeconds(int httpTimeoutInMillionSeconds) {
         HTTP_TIMEOUT_INMILLIONSECONDS = httpTimeoutInMillionSeconds;
@@ -112,27 +115,21 @@ public class HttpClientUtil {
 
     public String executeAndGet(HttpRequestBase httpRequestBase) throws Exception {
         HttpResponse response;
-        String entiStr = "";
-        try {
-            response = httpClient.execute(httpRequestBase);
+        String entiStr;
+        response = httpClient.execute(httpRequestBase);
 
-            if (response.getStatusLine().getStatusCode() != HttpStatus.SC_OK) {
-                System.err.println("请求地址：" + httpRequestBase.getURI() + ", 请求方法：" + httpRequestBase.getMethod()
-                        + ",STATUS CODE = " + response.getStatusLine().getStatusCode());
-                if (httpRequestBase != null) {
-                    httpRequestBase.abort();
-                }
-                throw new Exception("Response Status Code : " + response.getStatusLine().getStatusCode());
+        if (response.getStatusLine().getStatusCode() != HttpStatus.SC_OK) {
+            System.err.println("请求地址：" + httpRequestBase.getURI() + ", 请求方法：" + httpRequestBase.getMethod()
+                    + ",STATUS CODE = " + response.getStatusLine().getStatusCode());
+            httpRequestBase.abort();
+            throw new Exception("Response Status Code : " + response.getStatusLine().getStatusCode());
+        } else {
+            HttpEntity entity = response.getEntity();
+            if (entity != null) {
+                entiStr = EntityUtils.toString(entity, Consts.UTF_8);
             } else {
-                HttpEntity entity = response.getEntity();
-                if (entity != null) {
-                    entiStr = EntityUtils.toString(entity, Consts.UTF_8);
-                } else {
-                    throw new Exception("Response Entity Is Null");
-                }
+                throw new Exception("Response Entity Is Null");
             }
-        } catch (Exception e) {
-            throw e;
         }
 
         return entiStr;
@@ -140,12 +137,7 @@ public class HttpClientUtil {
 
     public String executeAndGetWithRetry(final HttpRequestBase httpRequestBase, final int retryTimes, final long retryInterval) {
         try {
-            return RetryUtil.asyncExecuteWithRetry(new Callable<String>() {
-                @Override
-                public String call() throws Exception {
-                    return executeAndGet(httpRequestBase);
-                }
-            }, retryTimes, retryInterval, true, HTTP_TIMEOUT_INMILLIONSECONDS + 1000, asyncExecutor);
+            return RetryUtil.asyncExecuteWithRetry(() -> executeAndGet(httpRequestBase), retryTimes, retryInterval, true, HTTP_TIMEOUT_INMILLIONSECONDS + 1000, asyncExecutor);
         } catch (Exception e) {
             throw DataXException.asDataXException(FrameworkErrorCode.RUNTIME_ERROR, e);
         }
@@ -153,15 +145,12 @@ public class HttpClientUtil {
 
     public String executeAndGetWithFailedRetry(final HttpRequestBase httpRequestBase, final int retryTimes, final long retryInterval){
         try {
-            return RetryUtil.asyncExecuteWithRetry(new Callable<String>() {
-                @Override
-                public String call() throws Exception {
-                    String result = executeAndGet(httpRequestBase);
-                    if(result!=null && result.startsWith("{\"result\":-1")){
-                        throw DataXException.asDataXException(FrameworkErrorCode.CALL_REMOTE_FAILED, "远程接口返回-1,将重试");
-                    }
-                    return result;
+            return RetryUtil.asyncExecuteWithRetry(() -> {
+                String result = executeAndGet(httpRequestBase);
+                if(result!=null && result.startsWith("{\"result\":-1")){
+                    throw DataXException.asDataXException(FrameworkErrorCode.CALL_REMOTE_FAILED, "远程接口返回-1,将重试");
                 }
+                return result;
             }, retryTimes, retryInterval, true, HTTP_TIMEOUT_INMILLIONSECONDS + 1000, asyncExecutor);
         } catch (Exception e) {
             throw DataXException.asDataXException(FrameworkErrorCode.RUNTIME_ERROR, e);

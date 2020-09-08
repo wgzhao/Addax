@@ -11,7 +11,7 @@ import java.util.Map;
  * Created by liqiang on 16/3/8.
  */
 public class ComplexTransformerProxy extends ComplexTransformer {
-    private Transformer realTransformer;
+    private final Transformer realTransformer;
 
     public ComplexTransformerProxy(Transformer transformer) {
         setTransformerName(transformer.getTransformerName());

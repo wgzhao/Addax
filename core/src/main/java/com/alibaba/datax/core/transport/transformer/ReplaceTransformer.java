@@ -30,8 +30,8 @@ public class ReplaceTransformer extends Transformer {
             }
 
             columnIndex = (Integer) paras[0];
-            startIndex = Integer.valueOf((String) paras[1]);
-            length = Integer.valueOf((String) paras[2]);
+            startIndex = Integer.parseInt((String) paras[1]);
+            length = Integer.parseInt((String) paras[2]);
             replaceString = (String) paras[3];
         } catch (Exception e) {
             throw DataXException.asDataXException(TransformerErrorCode.TRANSFORMER_ILLEGAL_PARAMETER, "paras:" + Arrays.asList(paras).toString() + " => " + e.getMessage());
@@ -53,7 +53,7 @@ public class ReplaceTransformer extends Transformer {
             if (startIndex + length >= oriValue.length()) {
                 newValue = oriValue.substring(0, startIndex) + replaceString;
             } else {
-                newValue = oriValue.substring(0, startIndex) + replaceString + oriValue.substring(startIndex + length, oriValue.length());
+                newValue = oriValue.substring(0, startIndex) + replaceString + oriValue.substring(startIndex + length);
             }
 
             record.setColumn(columnIndex, new StringColumn(newValue));

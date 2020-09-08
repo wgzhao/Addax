@@ -19,12 +19,12 @@ public interface Pluginable {
 
     Configuration getPeerPluginJobConf();
 
-    public String getPeerPluginName();
+    String getPeerPluginName();
 
     void setPluginJobConf(Configuration jobConf);
 
     void setPeerPluginJobConf(Configuration peerPluginJobConf);
 
-    public void setPeerPluginName(String peerPluginName);
+    void setPeerPluginName(String peerPluginName);
 
 }

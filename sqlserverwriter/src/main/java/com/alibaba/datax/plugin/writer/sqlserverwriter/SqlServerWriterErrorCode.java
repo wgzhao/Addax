@@ -8,7 +8,7 @@ public enum SqlServerWriterErrorCode implements ErrorCode {
     private final String code;
     private final String describe;
 
-    private SqlServerWriterErrorCode(String code, String describe) {
+    SqlServerWriterErrorCode(String code, String describe) {
         this.code = code;
         this.describe = describe;
     }

@@ -49,8 +49,8 @@ public class TxtFileReader extends Reader {
 		@Override
 		public void init() {
 			this.originConfig = this.getPluginJobConf();
-			this.pattern = new HashMap<String, Pattern>();
-			this.isRegexPath = new HashMap<String, Boolean>();
+			this.pattern = new HashMap<>();
+			this.isRegexPath = new HashMap<>();
 			this.validateParameter();
 			UnstructuredStorageReaderUtil.validateParameter(this.originConfig);
 		}
@@ -65,7 +65,7 @@ public class TxtFileReader extends Reader {
 						"您需要指定待读取的源目录或文件");
 			}
 			if (!pathInString.startsWith("[") && !pathInString.endsWith("]")) {
-				path = new ArrayList<String>();
+				path = new ArrayList<>();
 				path.add(pathInString);
 			} else {
 				path = this.originConfig.getList(Key.PATH, String.class);
@@ -213,7 +213,7 @@ public class TxtFileReader extends Reader {
 		@Override
 		public List<Configuration> split(int adviceNumber) {
 			LOG.debug("split() begin...");
-			List<Configuration> readerSplitConfigs = new ArrayList<Configuration>();
+			List<Configuration> readerSplitConfigs = new ArrayList<>();
 
 			// warn:每个slice拖且仅拖一个文件,
 			// int splitNumber = adviceNumber;
@@ -239,17 +239,15 @@ public class TxtFileReader extends Reader {
 		// validate the path, path must be a absolute path
 		private List<String> buildSourceTargets() {
 			// for eath path
-			Set<String> toBeReadFiles = new HashSet<String>();
+			Set<String> toBeReadFiles = new HashSet<>();
 			for (String eachPath : this.path) {
 				int endMark;
 				for (endMark = 0; endMark < eachPath.length(); endMark++) {
-					if ('*' != eachPath.charAt(endMark)
-							&& '?' != eachPath.charAt(endMark)) {
-						continue;
-					} else {
-						this.isRegexPath.put(eachPath, true);
-						break;
-					}
+					if ('*' == eachPath.charAt(endMark)
+							|| '?' == eachPath.charAt(endMark)) {
+								this.isRegexPath.put(eachPath, true);
+								break;
+							}
 				}
 
 				String parentDirectory;
@@ -349,11 +347,11 @@ public class TxtFileReader extends Reader {
 
 		private <T> List<List<T>> splitSourceFiles(final List<T> sourceList,
 				int adviceNumber) {
-			List<List<T>> splitedList = new ArrayList<List<T>>();
+			List<List<T>> splitedList = new ArrayList<>();
 			int averageLength = sourceList.size() / adviceNumber;
 			averageLength = averageLength == 0 ? 1 : averageLength;
 
-			for (int begin = 0, end = 0; begin < sourceList.size(); begin = end) {
+			for (int begin = 0, end; begin < sourceList.size(); begin = end) {
 				end = begin + averageLength;
 				if (end > sourceList.size()) {
 					end = sourceList.size();
@@ -366,7 +364,7 @@ public class TxtFileReader extends Reader {
 	}
 
 	public static class Task extends Reader.Task {
-		private static Logger LOG = LoggerFactory.getLogger(Task.class);
+		private static final Logger LOG = LoggerFactory.getLogger(Task.class);
 
 		private Configuration readerSliceConfig;
 		private List<String> sourceFiles;

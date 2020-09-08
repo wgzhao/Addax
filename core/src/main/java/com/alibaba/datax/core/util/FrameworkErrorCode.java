@@ -33,7 +33,7 @@ public enum FrameworkErrorCode implements ErrorCode {
 
     private final String description;
 
-    private FrameworkErrorCode(String code, String description) {
+    FrameworkErrorCode(String code, String description) {
         this.code = code;
         this.description = description;
     }

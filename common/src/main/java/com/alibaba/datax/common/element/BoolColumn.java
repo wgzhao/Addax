@@ -26,7 +26,6 @@ public class BoolColumn extends Column {
 			this.setRawData(Boolean.valueOf(data));
 			this.setByteSize(1);
 		}
-		return;
 	}
 
 	public BoolColumn() {

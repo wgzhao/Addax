@@ -30,8 +30,8 @@ public class SubstrTransformer extends Transformer {
             }
 
             columnIndex = (Integer) paras[0];
-            startIndex = Integer.valueOf((String) paras[1]);
-            length = Integer.valueOf((String) paras[2]);
+            startIndex = Integer.parseInt((String) paras[1]);
+            length = Integer.parseInt((String) paras[2]);
 
         } catch (Exception e) {
             throw DataXException.asDataXException(TransformerErrorCode.TRANSFORMER_ILLEGAL_PARAMETER, "paras:" + Arrays.asList(paras).toString() + " => " + e.getMessage());
@@ -50,7 +50,7 @@ public class SubstrTransformer extends Transformer {
                 throw new RuntimeException(String.format("dx_substr startIndex(%s) out of range(%s)", startIndex, oriValue.length()));
             }
             if (startIndex + length >= oriValue.length()) {
-                newValue = oriValue.substring(startIndex, oriValue.length());
+                newValue = oriValue.substring(startIndex);
             } else {
                 newValue = oriValue.substring(startIndex, startIndex + length);
             }

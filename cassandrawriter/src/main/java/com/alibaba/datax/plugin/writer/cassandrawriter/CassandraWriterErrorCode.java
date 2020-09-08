@@ -13,7 +13,7 @@ public enum CassandraWriterErrorCode implements ErrorCode {
   private final String code;
   private final String description;
 
-  private CassandraWriterErrorCode(String code, String description) {
+  CassandraWriterErrorCode(String code, String description) {
     this.code = code;
     this.description = description;
   }

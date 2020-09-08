@@ -1,18 +1,5 @@
 package com.alibaba.datax.plugin.reader.cassandrareader;
 
-import java.math.BigDecimal;
-import java.math.BigInteger;
-import java.net.InetAddress;
-import java.nio.ByteBuffer;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-
 import com.alibaba.datax.common.element.BoolColumn;
 import com.alibaba.datax.common.element.BytesColumn;
 import com.alibaba.datax.common.element.DateColumn;
@@ -24,7 +11,6 @@ import com.alibaba.datax.common.exception.DataXException;
 import com.alibaba.datax.common.plugin.TaskPluginCollector;
 import com.alibaba.datax.common.util.Configuration;
 import com.alibaba.fastjson.JSON;
-
 import com.datastax.driver.core.Cluster;
 import com.datastax.driver.core.CodecRegistry;
 import com.datastax.driver.core.ColumnDefinitions;
@@ -42,6 +28,19 @@ import com.google.common.reflect.TypeToken;
 import org.apache.commons.codec.binary.Base64;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.math.BigDecimal;
+import java.math.BigInteger;
+import java.net.InetAddress;
+import java.nio.ByteBuffer;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 /**
  * Created by mazhenlin on 2019/8/21.
@@ -90,10 +89,9 @@ public class CassandraReaderHelper {
 
     case BLOB:
       ByteBuffer byteBuffer = (ByteBuffer)o;
-      String s = Base64.encodeBase64String(
+      return Base64.encodeBase64String(
             Arrays.copyOfRange(byteBuffer.array(),byteBuffer.position(),
                 byteBuffer.limit()));
-      return s;
 
     case DATE:
       return ((LocalDate)o).getMillisSinceEpoch();

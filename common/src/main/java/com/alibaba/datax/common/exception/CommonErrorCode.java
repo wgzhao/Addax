@@ -21,7 +21,7 @@ public enum CommonErrorCode implements ErrorCode {
 
     private final String describe;
 
-    private CommonErrorCode(String code, String describe) {
+    CommonErrorCode(String code, String describe) {
         this.code = code;
         this.describe = describe;
     }

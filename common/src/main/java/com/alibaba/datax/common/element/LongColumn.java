@@ -39,11 +39,11 @@ public class LongColumn extends Column {
 	}
 
 	public LongColumn(Long data) {
-		this(null == data ? (BigInteger) null : BigInteger.valueOf(data));
+		this(null == data ? null : BigInteger.valueOf(data));
 	}
 
 	public LongColumn(Integer data) {
-		this(null == data ? (BigInteger) null : BigInteger.valueOf(data));
+		this(null == data ? null : BigInteger.valueOf(data));
 	}
 
 	public LongColumn(BigInteger data) {
@@ -97,8 +97,7 @@ public class LongColumn extends Column {
 			return null;
 		}
 
-		return this.asBigInteger().compareTo(BigInteger.ZERO) != 0 ? true
-				: false;
+		return this.asBigInteger().compareTo(BigInteger.ZERO) != 0;
 	}
 
 	@Override
@@ -115,7 +114,7 @@ public class LongColumn extends Column {
 		if (null == this.getRawData()) {
 			return null;
 		}
-		return ((BigInteger) this.getRawData()).toString();
+		return this.getRawData().toString();
 	}
 
 	@Override

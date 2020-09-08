@@ -18,11 +18,11 @@ import java.sql.Timestamp;
  */
 public abstract class ResourceColumn<T extends JavaDataType, U extends JDBCType>
 {
-    private T jType;
-    private U jdbcDataType;
-    private String dbBaseDataType;
-    private Object rawData;
-    private long byteSize;
+    private final T jType;
+    private final U jdbcDataType;
+    private final String dbBaseDataType;
+    private final Object rawData;
+    private final long byteSize;
 
     public ResourceColumn(T jType, U jdbcDataType, String dbBaseDataType, Object rawData, long byteSize)
     {

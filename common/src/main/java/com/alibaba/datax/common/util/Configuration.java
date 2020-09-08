@@ -11,6 +11,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.builder.ToStringBuilder;
 
 import java.io.*;
+import java.nio.charset.StandardCharsets;
 import java.util.*;
 
 /**
@@ -57,9 +58,9 @@ public class Configuration {
      * 为的是后面分布式情况下将该值加密后抛到DataXServer中
      */
     private Set<String> secretKeyPathSet =
-            new HashSet<String>();
+            new HashSet<>();
 
-    private Object root = null;
+    private Object root;
 
     /**
      * 初始化空白的Configuration
@@ -90,7 +91,7 @@ public class Configuration {
     public static Configuration from(File file) {
         try {
             return Configuration.from(IOUtils
-                    .toString(new FileInputStream(file)));
+                    .toString(new FileInputStream(file), StandardCharsets.UTF_8));
         } catch (FileNotFoundException e) {
             throw DataXException.asDataXException(CommonErrorCode.CONFIG_ERROR,
                     String.format("配置信息错误，您提供的配置文件[%s]不存在. 请检查您的配置文件.", file.getAbsolutePath()));
@@ -107,7 +108,7 @@ public class Configuration {
      */
     public static Configuration from(InputStream is) {
         try {
-            return Configuration.from(IOUtils.toString(is));
+            return Configuration.from(IOUtils.toString(is, StandardCharsets.UTF_8));
         } catch (IOException e) {
             throw DataXException.asDataXException(CommonErrorCode.CONFIG_ERROR,
                     String.format("请检查您的配置文件. 您提供的配置文件读取失败，错误原因: %s. 请检查您的配置文件的权限设置.", e));
@@ -404,11 +405,7 @@ public class Configuration {
      */
     @SuppressWarnings("unchecked")
     public List<Object> getList(final String path) {
-        List<Object> list = this.get(path, List.class);
-        if (null == list) {
-            return null;
-        }
-        return list;
+        return this.get(path, List.class);
     }
 
     /**
@@ -416,16 +413,16 @@ public class Configuration {
      */
     @SuppressWarnings("unchecked")
     public <T> List<T> getList(final String path, Class<T> t) {
-        Object object = this.get(path, List.class);
+        List<Object> object = this.get(path, List.class);
         if (null == object) {
             return null;
         }
 
-        List<T> result = new ArrayList<T>();
+        List<T> result = new ArrayList<>();
 
         List<Object> origin = new ArrayList<>();
         try {
-            origin = (List<Object>) object;
+            origin = object;
         }catch(ClassCastException e){
             // .warn("{} 转为 List 时发生了异常，默认将此值添加到 List 中", String.valueOf(object));
             origin.add(String.valueOf(object));
@@ -472,7 +469,7 @@ public class Configuration {
             return null;
         }
 
-        List<Configuration> result = new ArrayList<Configuration>();
+        List<Configuration> result = new ArrayList<>();
         for (final Object object : lists) {
             result.add(Configuration.from(Configuration.toJSONString(object)));
         }
@@ -482,26 +479,20 @@ public class Configuration {
     /**
      * 根据用户提供的json path，寻址Map对象，如果对象不存在，返回null
      */
-    @SuppressWarnings("unchecked")
     public Map<String, Object> getMap(final String path) {
-        Map<String, Object> result = this.get(path, Map.class);
-        if (null == result) {
-            return null;
-        }
-        return result;
+        return this.get(path, Map.class);
     }
 
     /**
      * 根据用户提供的json path，寻址Map对象，如果对象不存在，返回null;
      */
-    @SuppressWarnings("unchecked")
     public <T> Map<String, T> getMap(final String path, Class<T> t) {
         Map<String, Object> map = this.get(path, Map.class);
         if (null == map) {
             return null;
         }
 
-        Map<String, T> result = new HashMap<String, T>();
+        Map<String, T> result = new HashMap<>();
         for (final String key : map.keySet()) {
             result.put(key, (T) map.get(key));
         }
@@ -512,14 +503,13 @@ public class Configuration {
     /**
      * 根据用户提供的json path，寻址Map对象，如果对象不存在，返回默认map
      */
-    @SuppressWarnings("unchecked")
     public Map<String, Object> getMap(final String path,
                                       final Map<String, Object> defaultMap) {
-        Object object = this.getMap(path);
+        Map<String, Object> object = this.getMap(path);
         if (null == object) {
             return defaultMap;
         }
-        return (Map<String, Object>) object;
+        return object;
     }
 
     /**
@@ -709,7 +699,6 @@ public class Configuration {
      * 比如：
      * a.b.c
      * a.b[2].c
-     * @param path
      */
     public void addSecretKeyPath(String path) {
         if(StringUtils.isNotBlank(path)) {
@@ -733,7 +722,6 @@ public class Configuration {
         return this.secretKeyPathSet.contains(path);
     }
 
-    @SuppressWarnings("unchecked")
     void getKeysRecursive(final Object current, String path, Set<String> collect) {
         boolean isRegularElement = !(current instanceof Map || current instanceof List);
         if (isRegularElement) {
@@ -762,10 +750,8 @@ public class Configuration {
                 getKeysRecursive(lists.get(i), path + String.format("[%d]", i),
                         collect);
             }
-            return;
         }
 
-        return;
     }
 
     public Object getInternal() {
@@ -793,7 +779,7 @@ public class Configuration {
         }
 
         if (object instanceof List) {
-            List<Object> result = new ArrayList<Object>();
+            List<Object> result = new ArrayList<>();
             for (final Object each : (List<Object>) object) {
                 result.add(extractFromConfiguration(each));
             }
@@ -801,7 +787,7 @@ public class Configuration {
         }
 
         if (object instanceof Map) {
-            Map<String, Object> result = new HashMap<String, Object>();
+            Map<String, Object> result = new HashMap<>();
             for (final String key : ((Map<String, Object>) object).keySet()) {
                 result.put(key,
                         extractFromConfiguration(((Map<String, Object>) object)
@@ -837,14 +823,14 @@ public class Configuration {
             String path = paths.get(i);
 
             if (isPathMap(path)) {
-                Map<String, Object> mapping = new HashMap<String, Object>();
+                Map<String, Object> mapping = new HashMap<>();
                 mapping.put(path, child);
                 child = mapping;
                 continue;
             }
 
             if (isPathList(path)) {
-                List<Object> lists = new ArrayList<Object>(
+                List<Object> lists = new ArrayList<>(
                         this.getIndex(path) + 1);
                 expand(lists, this.getIndex(path) + 1);
                 lists.set(this.getIndex(path), child);
@@ -879,7 +865,7 @@ public class Configuration {
             // 当前不是map，因此全部替换为map，并返回新建的map对象
             boolean isCurrentMap = current instanceof Map;
             if (!isCurrentMap) {
-                mapping = new HashMap<String, Object>();
+                mapping = new HashMap<>();
                 mapping.put(
                         path,
                         buildObject(paths.subList(index + 1, paths.size()),
@@ -913,7 +899,7 @@ public class Configuration {
             // 当前是list，直接新建并返回即可
             boolean isCurrentList = current instanceof List;
             if (!isCurrentList) {
-                lists = expand(new ArrayList<Object>(), listIndexer + 1);
+                lists = expand(new ArrayList<>(), listIndexer + 1);
                 lists.set(
                         listIndexer,
                         buildObject(paths.subList(index + 1, paths.size()),
@@ -956,10 +942,8 @@ public class Configuration {
         for (final String each : split2List(path)) {
             if (isPathMap(each)) {
                 target = findObjectInMap(target, each);
-                continue;
             } else {
                 target = findObjectInList(target, each);
-                continue;
             }
         }
 
@@ -1001,7 +985,7 @@ public class Configuration {
                             index));
         }
 
-        return ((List<Object>) target).get(Integer.valueOf(index));
+        return ((List<Object>) target).get(Integer.parseInt(index));
     }
 
     private List<Object> expand(List<Object> list, int size) {
@@ -1021,15 +1005,11 @@ public class Configuration {
     }
 
     private int getIndex(final String index) {
-        return Integer.valueOf(index.replace("[", "").replace("]", ""));
+        return Integer.parseInt(index.replace("[", "").replace("]", ""));
     }
 
     private boolean isSuitForRoot(final Object object) {
-        if (null != object && (object instanceof List || object instanceof Map)) {
-            return true;
-        }
-
-        return false;
+        return (object instanceof List || object instanceof Map);
     }
 
     private String split(final String path) {
@@ -1054,7 +1034,6 @@ public class Configuration {
         }
     }
 
-    @SuppressWarnings("unused")
     private String toJSONPath(final String path) {
         return (StringUtils.isBlank(path) ? "$" : "$." + path).replace("$.[",
                 "$[");

@@ -139,7 +139,7 @@ public final class RangeSplitUtil {
 
         StringBuilder resultStringBuilder = new StringBuilder();
 
-        List<Integer> list = new ArrayList<Integer>();
+        List<Integer> list = new ArrayList<>();
         BigInteger radixBigInteger = BigInteger.valueOf(radix);
         BigInteger currentValue = bigInteger;
 
@@ -155,7 +155,7 @@ public final class RangeSplitUtil {
             list.add(0, bigInteger.remainder(radixBigInteger).intValue());
         }
 
-        Map<Integer, Character> map = new HashMap<Integer, Character>();
+        Map<Integer, Character> map = new HashMap<>();
         for (int i = 0; i < radix; i++) {
             map.put(i, (char) (i));
         }
@@ -189,7 +189,7 @@ public final class RangeSplitUtil {
             max = max > temp ? max : temp;
         }
 
-        return new ImmutablePair<Character, Character>(min, max);
+        return new ImmutablePair<>(min, max);
     }
 
     private static boolean isPureAscii(String aString) {

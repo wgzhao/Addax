@@ -4,7 +4,7 @@ import java.math.BigDecimal;
 
 /**
  * @title 数学计算工具类
- * @description 提供常用的数值加减乘除计算 , 及多个数值的求和 , 平均值 , 最大最小值计算
+ * 提供常用的数值加减乘除计算 , 及多个数值的求和 , 平均值 , 最大最小值计算
  */
 public class MathUtil {
     /** 默认的除法精确度 */

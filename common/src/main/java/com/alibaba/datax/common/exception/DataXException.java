@@ -9,7 +9,7 @@ public class DataXException extends RuntimeException {
 
     private static final long serialVersionUID = 1L;
 
-    private ErrorCode errorCode;
+    private final ErrorCode errorCode;
 
     public DataXException(ErrorCode errorCode, String errorMessage) {
         super(errorCode.toString() + " - " + errorMessage);

@@ -41,24 +41,24 @@ public class TaskGroupContainer extends AbstractContainer {
     /**
      * 当前taskGroup所属jobId
      */
-    private long jobId;
+    private final long jobId;
 
     /**
      * 当前taskGroupId
      */
-    private int taskGroupId;
+    private final int taskGroupId;
 
     /**
      * 使用的channel类
      */
-    private String channelClazz;
+    private final String channelClazz;
 
     /**
      * task收集器使用的类
      */
-    private String taskCollectorClass;
+    private final String taskCollectorClass;
 
-    private TaskMonitor taskMonitor = TaskMonitor.getInstance();
+    private final TaskMonitor taskMonitor = TaskMonitor.getInstance();
 
     public TaskGroupContainer(Configuration configuration) {
         super(configuration);
@@ -350,21 +350,21 @@ public class TaskGroupContainer extends AbstractContainer {
      * 其中包括1：1的reader和writer
      */
     class TaskExecutor {
-        private Configuration taskConfig;
+        private final Configuration taskConfig;
 
-        private int taskId;
+        private final int taskId;
 
-        private int attemptCount;
+        private final int attemptCount;
 
-        private Channel channel;
+        private final Channel channel;
 
-        private Thread readerThread;
+        private final Thread readerThread;
 
-        private Thread writerThread;
+        private final Thread writerThread;
         
-        private ReaderRunner readerRunner;
+        private final ReaderRunner readerRunner;
         
-        private WriterRunner writerRunner;
+        private final WriterRunner writerRunner;
 
         /**
          * 该处的taskCommunication在多处用到：
@@ -372,7 +372,7 @@ public class TaskGroupContainer extends AbstractContainer {
          * 2. readerRunner和writerRunner
          * 3. reader和writer的taskPluginCollector
          */
-        private Communication taskCommunication;
+        private final Communication taskCommunication;
 
         public TaskExecutor(Configuration taskConf, int attemptCount) {
             // 获取该taskExecutor的配置
@@ -385,7 +385,7 @@ public class TaskGroupContainer extends AbstractContainer {
             this.taskId = this.taskConfig.getInt(CoreConstant.TASK_ID);
             this.attemptCount = attemptCount;
 
-            /**
+            /*
              * 由taskId得到该taskExecutor的Communication
              * 要传给readerRunner和writerRunner，同时要传给channel作统计用
              */
@@ -397,13 +397,13 @@ public class TaskGroupContainer extends AbstractContainer {
                     Channel.class, configuration);
             this.channel.setCommunication(this.taskCommunication);
 
-            /**
+            /*
              * 获取transformer的参数
              */
 
             List<TransformerExecution> transformerInfoExecs = TransformerUtil.buildTransformerInfo(taskConfig);
 
-            /**
+            /*
              * 生成writerThread
              */
             writerRunner = (WriterRunner) generateRunner(PluginType.WRITER);
@@ -415,14 +415,14 @@ public class TaskGroupContainer extends AbstractContainer {
                     PluginType.WRITER, this.taskConfig.getString(
                             CoreConstant.JOB_WRITER_NAME),getJobId()));
 
-            /**
+            /*
              * 生成readerThread
              */
             readerRunner = (ReaderRunner) generateRunner(PluginType.READER,transformerInfoExecs);
             this.readerThread = new Thread(readerRunner,
                     String.format("%d-%d-%d-reader",
                             jobId, taskGroupId, this.taskId));
-            /**
+            /*
              * 通过设置thread的contextClassLoader，即可实现同步和主程序不通的加载器
              */
             this.readerThread.setContextClassLoader(LoadUtil.getJarLoader(
@@ -482,7 +482,7 @@ public class TaskGroupContainer extends AbstractContainer {
 
                     ((ReaderRunner) newRunner).setRecordSender(recordSender);
 
-                    /**
+                    /*
                      * 设置taskPlugin的collector，用来处理脏数据和job/task通信
                      */
                     newRunner.setTaskPluginCollector(pluginCollector);
@@ -499,7 +499,7 @@ public class TaskGroupContainer extends AbstractContainer {
                             PluginType.WRITER);
                     ((WriterRunner) newRunner).setRecordReceiver(new BufferedRecordExchanger(
                             this.channel, pluginCollector));
-                    /**
+                    /*
                      * 设置taskPlugin的collector，用来处理脏数据和job/task通信
                      */
                     newRunner.setTaskPluginCollector(pluginCollector);
@@ -522,11 +522,7 @@ public class TaskGroupContainer extends AbstractContainer {
                 return false;
             }
 
-            if(taskCommunication==null || !taskCommunication.isFinished()){
-        		return false;
-        	}
-
-            return true;
+            return taskCommunication != null && taskCommunication.isFinished();
         }
         
         private int getTaskId(){

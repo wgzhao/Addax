@@ -22,7 +22,7 @@ public enum TxtFileReaderErrorCode implements ErrorCode {
 	private final String code;
 	private final String description;
 
-	private TxtFileReaderErrorCode(String code, String description) {
+	TxtFileReaderErrorCode(String code, String description) {
 		this.code = code;
 		this.description = description;
 	}

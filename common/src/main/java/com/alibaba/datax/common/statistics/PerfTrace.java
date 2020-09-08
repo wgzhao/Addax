@@ -19,10 +19,9 @@ import java.util.concurrent.TimeUnit;
 
 public class PerfTrace {
 
-    private static Logger LOG = LoggerFactory.getLogger(PerfTrace.class);
+    private static final Logger LOG = LoggerFactory.getLogger(PerfTrace.class);
     private static PerfTrace instance;
     private static final Object lock = new Object();
-    private String perfTraceId;
     private volatile boolean enable;
     private volatile boolean isJob;
     private long instId;
@@ -36,24 +35,15 @@ public class PerfTrace {
     private volatile boolean perfReportEnable = true;
 
     //jobid_jobversion,instanceid,taskid, src_mark, dst_mark,
-    private Map<Integer, String> taskDetails = new ConcurrentHashMap<Integer, String>();
+    private final Map<Integer, String> taskDetails = new ConcurrentHashMap<>();
     //PHASE => PerfRecord
-    private ConcurrentHashMap<PHASE, SumPerfRecord4Print> perfRecordMaps4print = new ConcurrentHashMap<PHASE, SumPerfRecord4Print>();
+    private final ConcurrentHashMap<PHASE, SumPerfRecord4Print> perfRecordMaps4print = new ConcurrentHashMap<PHASE, SumPerfRecord4Print>();
     // job_phase => SumPerf4Report
-    private SumPerf4Report sumPerf4Report = new SumPerf4Report();
-    private SumPerf4Report sumPerf4Report4NotEnd;
+    private final SumPerf4Report sumPerf4Report = new SumPerf4Report();
     private Configuration jobInfo;
-    private final Set<PerfRecord> needReportPool4NotEnd = new HashSet<PerfRecord>();
-    private final List<PerfRecord> totalEndReport = new ArrayList<PerfRecord>();
+    private final Set<PerfRecord> needReportPool4NotEnd = new HashSet<>();
+    private final List<PerfRecord> totalEndReport = new ArrayList<>();
 
-    /**
-     * 单实例
-     *
-     * @param isJob
-     * @param jobId
-     * @param taskGroupId
-     * @return
-     */
     public static PerfTrace getInstance(boolean isJob, long jobId, int taskGroupId, int priority, boolean enable) {
 
         if (instance == null) {
@@ -69,7 +59,6 @@ public class PerfTrace {
     /**
      * 因为一个JVM只有一个，因此在getInstance(isJob,jobId,taskGroupId)调用完成实例化后，方便后续调用，直接返回该实例
      *
-     * @return
      */
     public static PerfTrace getInstance() {
         if (instance == null) {
@@ -85,13 +74,13 @@ public class PerfTrace {
 
     private PerfTrace(boolean isJob, long jobId, int taskGroupId, int priority, boolean enable) {
         try {
-            this.perfTraceId = isJob ? "job_" + jobId : String.format("taskGroup_%s_%s", jobId, taskGroupId);
+            String perfTraceId = isJob ? "job_" + jobId : String.format("taskGroup_%s_%s", jobId, taskGroupId);
             this.enable = enable;
             this.isJob = isJob;
             this.taskGroupId = taskGroupId;
             this.instId = jobId;
             this.priority = priority;
-            LOG.info(String.format("PerfTrace traceId=%s, isEnable=%s, priority=%s", this.perfTraceId, this.enable, this.priority));
+            LOG.info(String.format("PerfTrace traceId=%s, isEnable=%s, priority=%s", perfTraceId, this.enable, this.priority));
 
         } catch (Exception e) {
             // do nothing
@@ -104,7 +93,7 @@ public class PerfTrace {
             String before = "";
             int index = detail.indexOf("?");
             String current = detail.substring(0, index == -1 ? detail.length() : index);
-            if (current.indexOf("[") >= 0) {
+            if (current.contains("[")) {
                 current += "]";
             }
             if (taskDetails.containsKey(taskId)) {
@@ -374,10 +363,10 @@ public class PerfTrace {
             }
 
             //每次将未完成的task的统计清空
-            sumPerf4Report4NotEnd = new SumPerf4Report();
-            Set<PerfRecord> needReportPool4NotEndTmp = null;
+            SumPerf4Report sumPerf4Report4NotEnd = new SumPerf4Report();
+            Set<PerfRecord> needReportPool4NotEndTmp;
             synchronized (needReportPool4NotEnd) {
-                needReportPool4NotEndTmp = new HashSet<PerfRecord>(needReportPool4NotEnd);
+                needReportPool4NotEndTmp = new HashSet<>(needReportPool4NotEnd);
             }
 
             long curNanoTime = System.nanoTime();
@@ -595,7 +584,7 @@ public class PerfTrace {
             return totalCount;
         }
     }
-    class JobStatisticsDto2 {
+    static class JobStatisticsDto2 {
 
         private Long id;
         private Date gmtCreate;

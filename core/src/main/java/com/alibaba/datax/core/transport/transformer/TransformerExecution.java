@@ -22,14 +22,6 @@ public class TransformerExecution {
     }
 
     /**
-     * 以下是动态统计信息，暂时未用
-     */
-    private long exaustedTime = 0;
-    private long successRecords = 0;
-    private long failedRecords = 0;
-    private long filterRecords = 0;
-
-    /**
      * 参数采取延迟检查
      */
 
@@ -37,7 +29,7 @@ public class TransformerExecution {
 
     public void genFinalParas() {
 
-        /**
+        /*
          * groovy不支持传参
          */
         if (transformerInfo.getTransformer().getTransformerName().equals("dx_groovy")) {
@@ -46,7 +38,7 @@ public class TransformerExecution {
             finalParas[1] = transformerExecutionParas.getExtraPackage();
             return;
         }
-        /**
+        /*
          * 其他function，按照columnIndex和para的顺序，如果columnIndex为空，跳过conlumnIndex
          */
         if (transformerExecutionParas.getColumnIndex() != null) {
@@ -74,19 +66,22 @@ public class TransformerExecution {
     }
 
     public long getExaustedTime() {
-        return exaustedTime;
+        /*
+         * 以下是动态统计信息，暂时未用
+         */
+        return 0;
     }
 
     public long getSuccessRecords() {
-        return successRecords;
+        return 0;
     }
 
     public long getFailedRecords() {
-        return failedRecords;
+        return 0;
     }
 
     public long getFilterRecords() {
-        return filterRecords;
+        return 0;
     }
 
     public void setIsChecked(boolean isChecked) {

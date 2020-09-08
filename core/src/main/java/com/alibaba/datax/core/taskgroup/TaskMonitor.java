@@ -17,9 +17,8 @@ public class TaskMonitor {
 
     private static final Logger LOG = LoggerFactory.getLogger(TaskMonitor.class);
     private static final TaskMonitor instance = new TaskMonitor();
-    private static long EXPIRED_TIME = 172800 * 1000; //48 hours
 
-    private ConcurrentHashMap<Integer, TaskCommunication> tasks = new ConcurrentHashMap<Integer, TaskCommunication>();
+    private final ConcurrentHashMap<Integer, TaskCommunication> tasks = new ConcurrentHashMap<>();
 
     private TaskMonitor() {
     }
@@ -59,9 +58,9 @@ public class TaskMonitor {
 
 
     public static class TaskCommunication {
-        private Integer taskid;
+        private final Integer taskid;
         //记录最后更新的communication
-        private long lastAllReadRecords = -1;
+        private long lastAllReadRecords;
         //只有第一次，或者统计变更时才会更新TS
         private long lastUpdateComunicationTS;
         private long ttl;
@@ -92,6 +91,8 @@ public class TaskMonitor {
         }
 
         private boolean isExpired(long lastUpdateComunicationTS) {
+            //48 hours
+            long EXPIRED_TIME = 172800 * 1000;
             return System.currentTimeMillis() - lastUpdateComunicationTS > EXPIRED_TIME;
         }
 

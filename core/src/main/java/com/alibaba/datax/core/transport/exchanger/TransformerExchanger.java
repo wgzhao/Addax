@@ -8,8 +8,6 @@ import com.alibaba.datax.core.statistics.communication.CommunicationTool;
 import com.alibaba.datax.core.transport.transformer.TransformerErrorCode;
 import com.alibaba.datax.core.transport.transformer.TransformerExecution;
 import com.alibaba.datax.core.util.container.ClassLoaderSwapper;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.util.List;
 
@@ -19,7 +17,6 @@ import java.util.List;
  */
 public abstract class TransformerExchanger {
 
-    private static final Logger LOG = LoggerFactory.getLogger(TransformerExchanger.class);
     protected final TaskPluginCollector pluginCollector;
 
     protected final int taskGroupId;
@@ -32,9 +29,9 @@ public abstract class TransformerExchanger {
     private long totalFailedRecords = 0;
 
 
-    private List<TransformerExecution> transformerExecs;
+    private final List<TransformerExecution> transformerExecs;
 
-    private ClassLoaderSwapper classLoaderSwapper = ClassLoaderSwapper
+    private final ClassLoaderSwapper classLoaderSwapper = ClassLoaderSwapper
             .newCurrentThreadClassLoaderSwapper();
 
 
@@ -67,7 +64,7 @@ public abstract class TransformerExchanger {
                 classLoaderSwapper.setCurrentThreadClassLoader(transformerInfoExec.getClassLoader());
             }
 
-            /**
+            /*
              * 延迟检查transformer参数的有效性，直接抛出异常，不作为脏数据
              * 不需要在插件中检查参数的有效性。但参数的个数等和插件相关的参数，在插件内部检查
              */
@@ -100,7 +97,7 @@ public abstract class TransformerExchanger {
             }
 
             if (result == null) {
-                /**
+                /*
                  * 这个null不能传到writer，必须消化掉
                  */
                 totalFilterRecords++;
@@ -128,7 +125,7 @@ public abstract class TransformerExchanger {
 
     public void doStat() {
 
-        /**
+        /*
          * todo 对于多个transformer时，各个transformer的单独统计进行显示。最后再汇总整个transformer的时间消耗.
          * 暂时不统计。
          */

@@ -32,7 +32,7 @@ public class PadTransformer extends Transformer {
 
             columnIndex = (Integer) paras[0];
             padType = (String) paras[1];
-            length = Integer.valueOf((String) paras[2]);
+            length = Integer.parseInt((String) paras[2]);
             padString = (String) paras[3];
         } catch (Exception e) {
             throw DataXException.asDataXException(TransformerErrorCode.TRANSFORMER_ILLEGAL_PARAMETER, "paras:" + Arrays.asList(paras).toString() + " => " + e.getMessage());
@@ -68,15 +68,15 @@ public class PadTransformer extends Transformer {
 
     private String doPad(String padType, String oriValue, int length, String padString) {
 
-        String finalPad = "";
+        StringBuilder finalPad = new StringBuilder();
         int NeedLength = length - oriValue.length();
         while (NeedLength > 0) {
 
             if (NeedLength >= padString.length()) {
-                finalPad += padString;
+                finalPad.append(padString);
                 NeedLength -= padString.length();
             } else {
-                finalPad += padString.substring(0, NeedLength);
+                finalPad.append(padString, 0, NeedLength);
                 NeedLength = 0;
             }
         }

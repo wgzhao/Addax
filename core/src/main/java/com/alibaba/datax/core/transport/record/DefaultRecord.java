@@ -20,7 +20,7 @@ public class DefaultRecord implements Record {
 
 	private static final int RECORD_AVERGAE_COLUMN_NUMBER = 16;
 
-	private List<Column> columns;
+	private final List<Column> columns;
 
 	private int byteSize;
 
@@ -28,7 +28,7 @@ public class DefaultRecord implements Record {
 	private int memorySize = ClassSize.DefaultRecordHead;
 
 	public DefaultRecord() {
-		this.columns = new ArrayList<Column>(RECORD_AVERGAE_COLUMN_NUMBER);
+		this.columns = new ArrayList<>(RECORD_AVERGAE_COLUMN_NUMBER);
 	}
 
 	@Override
@@ -63,7 +63,7 @@ public class DefaultRecord implements Record {
 
 	@Override
 	public String toString() {
-		Map<String, Object> json = new HashMap<String, Object>();
+		Map<String, Object> json = new HashMap<>();
 		json.put("size", this.getColumnNumber());
 		json.put("data", this.columns);
 		return JSON.toJSONString(json);

@@ -194,10 +194,6 @@ public class FilterTransformer extends Transformer {
     /**
      * DateColumn将比较long值，StringColumn，ByteColumn以及BooleanColumn比较其String值
      *
-     * @param record
-     * @param value
-     * @param column
-     * @return 如果相等，则过滤。
      */
 
     private com.alibaba.datax.common.element.Record doEqual(com.alibaba.datax.common.element.Record record, String value, Column column) {

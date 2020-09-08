@@ -19,9 +19,7 @@ public abstract class AbstractScheduler {
     private static final Logger LOG = LoggerFactory
             .getLogger(AbstractScheduler.class);
 
-    private ErrorRecordChecker errorLimit;
-
-    private AbstractContainerCommunicator containerCommunicator;
+    private final AbstractContainerCommunicator containerCommunicator;
 
     private Long jobId;
 
@@ -44,7 +42,7 @@ public abstract class AbstractScheduler {
         this.jobId = configurations.get(0).getLong(
                 CoreConstant.DATAX_CORE_CONTAINER_JOB_ID);
 
-        errorLimit = new ErrorRecordChecker(configurations.get(0));
+        ErrorRecordChecker errorLimit = new ErrorRecordChecker(configurations.get(0));
 
         /**
          * 给 taskGroupContainer 的 Communication 注册

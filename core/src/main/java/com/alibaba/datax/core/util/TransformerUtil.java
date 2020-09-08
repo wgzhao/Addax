@@ -25,10 +25,10 @@ public class TransformerUtil {
             return null;
         }
 
-        List<TransformerExecution> result = new ArrayList<TransformerExecution>();
+        List<TransformerExecution> result = new ArrayList<>();
 
 
-        List<String> functionNames = new ArrayList<String>();
+        List<String> functionNames = new ArrayList<>();
 
 
         for (Configuration configuration : tfConfigs) {
@@ -43,7 +43,7 @@ public class TransformerUtil {
             functionNames.add(functionName);
         }
 
-        /**
+        /*
          * 延迟load 第三方插件的function，并按需load
          */
         LOG.info(String.format(" user config tranformers [%s], loading...", functionNames));
@@ -58,11 +58,11 @@ public class TransformerUtil {
                 throw DataXException.asDataXException(TransformerErrorCode.TRANSFORMER_NOTFOUND_ERROR, "name=" + functionName);
             }
 
-            /**
+            /*
              * 具体的UDF对应一个paras
              */
             TransformerExecutionParas transformerExecutionParas = new TransformerExecutionParas();
-            /**
+            /*
              * groovy function仅仅只有code
              */
             if (!functionName.equals("dx_groovy") && !functionName.equals("dx_fackGroovy")) {

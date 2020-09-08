@@ -52,9 +52,6 @@ public class SecretUtil {
     /**
      * BASE64加密
      *
-     * @param plaintextBytes
-     * @return
-     * @throws Exception
      */
     public static String encryptBASE64(byte[] plaintextBytes) throws Exception {
         return new String(base64.encode(plaintextBytes), ENCODING);
@@ -63,9 +60,6 @@ public class SecretUtil {
     /**
      * BASE64解密
      *
-     * @param cipherText
-     * @return
-     * @throws Exception
      */
     public static byte[] decryptBASE64(String cipherText) {
         return base64.decode(cipherText);
@@ -112,7 +106,6 @@ public class SecretUtil {
      * @param data 裸的原始数据
      * @param key  经过base64加密的公钥
      * @return 结果也采用base64加密
-     * @throws Exception
      */
     public static String encryptRSA(String data, String key) {
         try {
@@ -141,8 +134,7 @@ public class SecretUtil {
      *
      * @param data 已经经过base64加密的密文
      * @param key  已经经过base64加密私钥
-     * @return
-     * @throws Exception
+     * @return String
      */
     public static String decryptRSA(String data, String key) {
         try {
@@ -168,8 +160,6 @@ public class SecretUtil {
     /**
      * 初始化密钥 for RSA ALGORITHM
      *
-     * @return
-     * @throws Exception
      */
     public static String[] initKey() throws Exception {
         KeyPairGenerator keyPairGen = KeyPairGenerator
@@ -184,11 +174,9 @@ public class SecretUtil {
         // 私钥
         RSAPrivateKey privateKey = (RSAPrivateKey) keyPair.getPrivate();
 
-        String[] publicAndPrivateKey = {
+        return new String[]{
                 encryptBASE64(publicKey.getEncoded()),
                 encryptBASE64(privateKey.getEncoded())};
-
-        return publicAndPrivateKey;
     }
     
     /**
@@ -198,7 +186,6 @@ public class SecretUtil {
      * @param data 裸的原始数据
      * @param key  加密的密钥
      * @return 结果也采用base64加密
-     * @throws Exception
      */
     public static String encrypt3DES(String data, String key) {
         try {
@@ -221,8 +208,6 @@ public class SecretUtil {
      *
      * @param data 已经经过base64加密的密文
      * @param key  解密的密钥
-     * @return
-     * @throws Exception
      */
     public static String decrypt3DES(String data, String key) {
         try {
@@ -251,13 +236,9 @@ public class SecretUtil {
             // 声明一个24位的字节数组，默认里面都是0，warn: 字符串0(48)和数组默认值0不一样，统一字符串0(48)
             byte[] key = "000000000000000000000000".getBytes(ENCODING);
             byte[] temp = keyStr.getBytes(ENCODING);
-            if (key.length > temp.length) {
-                // 如果temp不够24位，则拷贝temp数组整个长度的内容到key数组中
-                System.arraycopy(temp, 0, key, 0, temp.length);
-            } else {
-                // 如果temp大于24位，则拷贝temp数组24个长度的内容到key数组中
-                System.arraycopy(temp, 0, key, 0, key.length);
-            }
+            // 如果temp不够24位，则拷贝temp数组整个长度的内容到key数组中
+            // 如果temp大于24位，则拷贝temp数组24个长度的内容到key数组中
+            System.arraycopy(temp, 0, key, 0, Math.min(key.length, temp.length));
             return key;
         } catch (Exception e) {
             throw DataXException.asDataXException(
@@ -267,7 +248,7 @@ public class SecretUtil {
 
     public static synchronized Properties getSecurityProperties() {
         if (properties == null) {
-            InputStream secretStream = null;
+            InputStream secretStream;
             try {
                 secretStream = new FileInputStream(
                         CoreConstant.DATAX_SECRET_PATH);
@@ -316,7 +297,7 @@ public class SecretUtil {
                     String.format("DataX配置的密钥版本为[%s]，但在系统中没有配置，可能是任务密钥配置错误，也可能是系统维护问题", keyVersion));
         }
 
-        String tempEncrptedData = null;
+        String tempEncrptedData;
         for (String path : configuration.getSecretKeyPathSet()) {
             tempEncrptedData = SecretUtil.encrypt(configuration.getString(path), key, method);
             int lastPathIndex = path.lastIndexOf(".") + 1;
@@ -377,7 +358,7 @@ public class SecretUtil {
 
     private static synchronized Map<String, Triple<String, String, String>> getPrivateKeyMap() {
         if (versionKeyMap == null) {
-            versionKeyMap = new HashMap<String, Triple<String, String, String>>();
+            versionKeyMap = new HashMap<>();
             Properties properties = SecretUtil.getSecurityProperties();
 
             String[] serviceUsernames = new String[] {
