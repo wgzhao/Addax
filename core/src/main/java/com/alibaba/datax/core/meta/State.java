@@ -1,35 +1,32 @@
-package com.alibaba.datax.dataxservice.face.domain.enums;
+package com.alibaba.datax.core.meta;
 
-public enum State implements EnumVal {
-
+/**
+ * Created by liupeng on 15/12/21.
+ */
+public enum State {
     SUBMITTING(10),
     WAITING(20),
     RUNNING(30),
     KILLING(40),
     KILLED(50),
     FAILED(60),
-    SUCCEEDED(70);
+    SUCCEEDED(70), ;
 
-
-    /* 一定会被初始化的 */
     int value;
 
     State(int value) {
         this.value = value;
     }
 
-    @Override
     public int value() {
-        return value;
+        return this.value;
     }
-
 
     public boolean isFinished() {
         return this == KILLED || this == FAILED || this == SUCCEEDED;
     }
 
     public boolean isRunning() {
-        return !isFinished();
+        return !this.isFinished();
     }
-
 }
