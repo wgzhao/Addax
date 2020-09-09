@@ -37,7 +37,7 @@ public class PerfTrace {
     //jobid_jobversion,instanceid,taskid, src_mark, dst_mark,
     private final Map<Integer, String> taskDetails = new ConcurrentHashMap<>();
     //PHASE => PerfRecord
-    private final ConcurrentHashMap<PHASE, SumPerfRecord4Print> perfRecordMaps4print = new ConcurrentHashMap<PHASE, SumPerfRecord4Print>();
+    private final ConcurrentHashMap<PHASE, SumPerfRecord4Print> perfRecordMaps4print = new ConcurrentHashMap<>();
     // job_phase => SumPerf4Report
     private final SumPerf4Report sumPerf4Report = new SumPerf4Report();
     private Configuration jobInfo;
@@ -181,13 +181,8 @@ public class PerfTrace {
         info.append("\n   1. all phase average time info and max time task info: \n\n");
         info.append(String.format("%-20s | %18s | %18s | %18s | %18s | %-100s\n", "PHASE", "AVERAGE USED TIME", "ALL TASK NUM", "MAX USED TIME", "MAX TASK ID", "MAX TASK INFO"));
 
-        List<PHASE> keys = new ArrayList<PHASE>(perfRecordMaps4print.keySet());
-        Collections.sort(keys, new Comparator<PHASE>() {
-            @Override
-            public int compare(PHASE o1, PHASE o2) {
-                return o1.toInt() - o2.toInt();
-            }
-        });
+        List<PHASE> keys = new ArrayList<>(perfRecordMaps4print.keySet());
+        keys.sort(Comparator.comparingInt(PHASE::toInt));
         for (PHASE phase : keys) {
             SumPerfRecord4Print sumPerfRecord = perfRecordMaps4print.get(phase);
             if (sumPerfRecord == null) {
@@ -247,23 +242,8 @@ public class PerfTrace {
     }
 
 
-    public synchronized ConcurrentHashMap<PHASE, SumPerfRecord4Print> getPerfRecordMaps4print() {
-        if (totalEndReport.size() > 0) {
-            sumPerf4EndPrint(totalEndReport);
-        }
-        return perfRecordMaps4print;
-    }
-
-    public SumPerf4Report getSumPerf4Report() {
-        return sumPerf4Report;
-    }
-
     public Set<PerfRecord> getNeedReportPool4NotEnd() {
         return needReportPool4NotEnd;
-    }
-
-    public List<PerfRecord> getTotalEndReport() {
-        return totalEndReport;
     }
 
     public Map<Integer, String> getTaskDetails() {
@@ -474,9 +454,6 @@ public class PerfTrace {
             return sqlQueryTimeInMs;
         }
 
-        public long getResultNextTimeInMs() {
-            return resultNextTimeInMs;
-        }
     }
 
     public static class SumPerfRecord4Print {
@@ -519,10 +496,6 @@ public class PerfTrace {
             totalCount++;
         }
 
-        public long getPerfTimeTotal() {
-            return perfTimeTotal;
-        }
-
         public long getAverageTime() {
             if (totalCount > 0) {
                 averageTime = perfTimeTotal / totalCount;
@@ -534,16 +507,8 @@ public class PerfTrace {
             return maxTime;
         }
 
-        public int getMaxTaskId() {
-            return maxTaskId;
-        }
-
         public int getMaxTaskGroupId() {
             return maxTaskGroupId;
-        }
-
-        public long getRecordsTotal() {
-            return recordsTotal;
         }
 
         public long getSizesTotal() {

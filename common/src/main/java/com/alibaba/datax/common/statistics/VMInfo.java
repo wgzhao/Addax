@@ -19,7 +19,7 @@ public class VMInfo {
     private static final Logger LOG = LoggerFactory.getLogger(VMInfo.class);
     static final long MB = 1024 * 1024;
     static final long GB = 1024 * 1024 * 1024;
-    public static Object lock = new Object();
+    public final static Object lock = new Object();
     private static VMInfo vmInfo;
 
     /**
@@ -124,10 +124,6 @@ public class VMInfo {
 
     public String totalString() {
         return (processCpuStatus.getTotalString() + processGCStatus.getTotalString());
-    }
-
-    public void getDelta() {
-        getDelta(true);
     }
 
     public synchronized void getDelta(boolean print) {
