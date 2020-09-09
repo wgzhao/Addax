@@ -1,6 +1,6 @@
 package com.alibaba.datax.core.statistics.communication;
 
-import com.alibaba.datax.dataxservice.face.domain.enums.State;
+import com.alibaba.datax.core.meta.State;
 import org.apache.commons.lang3.Validate;
 
 import java.util.Map;

@@ -21,19 +21,20 @@ import java.util.concurrent.locks.ReentrantLock;
  */
 public class MemoryChannel extends Channel {
 
-	private int bufferSize = 0;
+	private final int bufferSize;
 
-	private AtomicInteger memoryBytes = new AtomicInteger(0);
+	private final AtomicInteger memoryBytes = new AtomicInteger(0);
 
-	private ArrayBlockingQueue<Record> queue = null;
+	private final ArrayBlockingQueue<Record> queue;
 
-	private ReentrantLock lock;
+	private final ReentrantLock lock;
 
-	private Condition notInsufficient, notEmpty;
+	private final Condition notInsufficient;
+	private final Condition notEmpty;
 
 	public MemoryChannel(final Configuration configuration) {
 		super(configuration);
-		this.queue = new ArrayBlockingQueue<Record>(this.getCapacity());
+		this.queue = new ArrayBlockingQueue<>(this.getCapacity());
 		this.bufferSize = configuration.getInt(CoreConstant.DATAX_CORE_TRANSPORT_EXCHANGER_BUFFERSIZE);
 
 		lock = new ReentrantLock();

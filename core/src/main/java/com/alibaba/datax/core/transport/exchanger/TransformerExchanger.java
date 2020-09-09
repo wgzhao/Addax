@@ -48,7 +48,7 @@ public abstract class TransformerExchanger {
 
 
     public Record doTransformer(com.alibaba.datax.common.element.Record record) {
-        if (transformerExecs == null || transformerExecs.size() == 0) {
+        if (transformerExecs == null || transformerExecs.isEmpty()) {
             return record;
         }
 

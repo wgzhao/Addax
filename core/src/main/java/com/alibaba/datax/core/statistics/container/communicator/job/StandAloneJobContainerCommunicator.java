@@ -7,7 +7,7 @@ import com.alibaba.datax.core.statistics.container.collector.ProcessInnerCollect
 import com.alibaba.datax.core.statistics.container.communicator.AbstractContainerCommunicator;
 import com.alibaba.datax.core.statistics.container.report.ProcessInnerReporter;
 import com.alibaba.datax.core.util.container.CoreConstant;
-import com.alibaba.datax.dataxservice.face.domain.enums.State;
+import com.alibaba.datax.core.meta.State;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

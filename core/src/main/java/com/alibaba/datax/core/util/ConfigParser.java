@@ -139,7 +139,7 @@ public final class ConfigParser {
             }
         }
 
-        if (wantPluginNames != null && wantPluginNames.size() > 0 && wantPluginNames.size() != complete) {
+        if (wantPluginNames != null && !wantPluginNames.isEmpty() && wantPluginNames.size() != complete) {
             throw DataXException.asDataXException(FrameworkErrorCode.PLUGIN_INIT_ERROR, "插件加载失败，未完成指定插件加载:" + wantPluginNames);
         }
 
@@ -162,7 +162,7 @@ public final class ConfigParser {
         }
 
         //不是想要的插件，返回null
-        if (wantPluginNames != null && wantPluginNames.size() > 0 && !wantPluginNames.contains(pluginName)) {
+        if (wantPluginNames != null && !wantPluginNames.isEmpty() && !wantPluginNames.contains(pluginName)) {
             return null;
         }
 

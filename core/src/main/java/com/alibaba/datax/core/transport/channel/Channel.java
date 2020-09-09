@@ -88,14 +88,6 @@ public abstract class Channel {
         this.isClosed = true;
     }
 
-    public void open() {
-        this.isClosed = false;
-    }
-
-    public boolean isClosed() {
-        return isClosed;
-    }
-
     public int getTaskGroupId() {
         return this.taskGroupId;
     }

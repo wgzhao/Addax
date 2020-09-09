@@ -361,10 +361,10 @@ public class SecretUtil {
             versionKeyMap = new HashMap<>();
             Properties properties = SecretUtil.getSecurityProperties();
 
-            String[] serviceUsernames = new String[] {
+            String[] serviceUsernames = {
                     CoreConstant.LAST_SERVICE_USERNAME,
                     CoreConstant.CURRENT_SERVICE_USERNAME };
-            String[] servicePasswords = new String[] {
+            String[] servicePasswords = {
                     CoreConstant.LAST_SERVICE_PASSWORD,
                     CoreConstant.CURRENT_SERVICE_PASSWORD };
 
@@ -387,12 +387,9 @@ public class SecretUtil {
                 }
             }
 
-            String[] keyVersions = new String[] { CoreConstant.LAST_KEYVERSION,
-                    CoreConstant.CURRENT_KEYVERSION };
-            String[] privateKeys = new String[] { CoreConstant.LAST_PRIVATEKEY,
-                    CoreConstant.CURRENT_PRIVATEKEY };
-            String[] publicKeys = new String[] { CoreConstant.LAST_PUBLICKEY,
-                    CoreConstant.CURRENT_PUBLICKEY };
+            String[] keyVersions = { CoreConstant.LAST_KEYVERSION, CoreConstant.CURRENT_KEYVERSION };
+            String[] privateKeys = { CoreConstant.LAST_PRIVATEKEY, CoreConstant.CURRENT_PRIVATEKEY };
+            String[] publicKeys = { CoreConstant.LAST_PUBLICKEY, CoreConstant.CURRENT_PUBLICKEY };
             for (int i = 0; i < keyVersions.length; i++) {
                 String keyVersion = properties.getProperty(keyVersions[i]);
                 if (StringUtils.isNotBlank(keyVersion)) {
