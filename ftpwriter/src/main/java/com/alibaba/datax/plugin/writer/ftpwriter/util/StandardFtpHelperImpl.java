@@ -10,7 +10,6 @@ import java.util.Set;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.net.ftp.FTPClient;
-import org.apache.commons.net.ftp.FTPClientConfig;
 import org.apache.commons.net.ftp.FTPFile;
 import org.apache.commons.net.ftp.FTPReply;
 import org.slf4j.Logger;
@@ -99,8 +98,8 @@ public class StandardFtpHelperImpl implements IFtpHelper {
                                 "与ftp服务器断开连接失败, errorMessage:%s",
                                 e.getMessage());
                         LOG.error(message);
-                        throw DataXException.asDataXException(
-                                FtpWriterErrorCode.FAIL_DISCONNECT, message, e);
+//                        throw DataXException.asDataXException(
+//                                FtpWriterErrorCode.FAIL_DISCONNECT, message, e);
                     }
                 }
                 this.ftpClient = null;
@@ -169,10 +168,8 @@ public class StandardFtpHelperImpl implements IFtpHelper {
         // 如果directoryPath目录不存在,则创建
         if (!isDirExist) {
             int replayCode = this.ftpClient.mkd(directoryPath);
-            if (replayCode != FTPReply.COMMAND_OK
-                    && replayCode != FTPReply.PATHNAME_CREATED) {
-                return false;
-            }
+            return replayCode == FTPReply.COMMAND_OK
+                    || replayCode == FTPReply.PATHNAME_CREATED;
         }
         return true;
     }
@@ -218,7 +215,7 @@ public class StandardFtpHelperImpl implements IFtpHelper {
             ByteArrayOutputStream outputStream = new ByteArrayOutputStream(22);
             this.ftpClient.retrieveFile(filePath, outputStream);
             String result = outputStream.toString();
-            IOUtils.closeQuietly(outputStream);
+            IOUtils.closeQuietly(outputStream, null);
             return result;
         } catch (IOException e) {
             String message = String.format(
@@ -232,7 +229,7 @@ public class StandardFtpHelperImpl implements IFtpHelper {
 
     @Override
     public Set<String> getAllFilesInDir(String dir, String prefixFileName) {
-        Set<String> allFilesWithPointedPrefix = new HashSet<String>();
+        Set<String> allFilesWithPointedPrefix = new HashSet<>();
         try {
             boolean isDirExist = this.ftpClient.changeWorkingDirectory(dir);
             if (!isDirExist) {
@@ -265,7 +262,7 @@ public class StandardFtpHelperImpl implements IFtpHelper {
     @Override
     public void deleteFiles(Set<String> filesToDelete) {
         String eachFile = null;
-        boolean deleteOk = false;
+        boolean deleteOk;
         try {
             this.printWorkingDirectory();
             for (String each : filesToDelete) {
