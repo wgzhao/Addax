@@ -23,3 +23,9 @@
 ### hdfswriter
 
 *  Use keyword `parquest` indicates support parquet format,  old keyword `par` is not used
+
+## 3.1.2
+
+### General
+
+* Does not parse the `-m` command line argument, it doesn't really do anything!
