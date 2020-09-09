@@ -231,7 +231,7 @@ public class SftpHelperImpl implements IFtpHelper {
             ByteArrayOutputStream outputStream = new ByteArrayOutputStream(22);
             this.channelSftp.get(filePath, outputStream);
             String result = outputStream.toString();
-            IOUtils.closeQuietly(outputStream);
+            IOUtils.closeQuietly(outputStream, null);
             return result;
         } catch (SftpException e) {
             String message = String.format(
@@ -245,15 +245,15 @@ public class SftpHelperImpl implements IFtpHelper {
 
     @Override
     public Set<String> getAllFilesInDir(String dir, String prefixFileName) {
-        Set<String> allFilesWithPointedPrefix = new HashSet<String>();
+        Set<String> allFilesWithPointedPrefix = new HashSet<>();
         try {
             this.printWorkingDirectory();
             @SuppressWarnings("rawtypes")
             Vector allFiles = this.channelSftp.ls(dir);
             LOG.debug(String.format("ls: %s", JSON.toJSONString(allFiles,
                     SerializerFeature.UseSingleQuotes)));
-            for (int i = 0; i < allFiles.size(); i++) {
-                LsEntry le = (LsEntry) allFiles.get(i);
+            for (Object allFile : allFiles) {
+                LsEntry le = (LsEntry) allFile;
                 String strName = le.getFilename();
                 if (strName.startsWith(prefixFileName)) {
                     allFilesWithPointedPrefix.add(strName);

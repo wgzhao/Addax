@@ -13,7 +13,7 @@ public class Key {
     
     public static final String TIMEOUT = "timeout";
     
-    public static final String CONNECTPATTERN = "connectPattern";
+//    public static final String CONNECTPATTERN = "connectPattern";
     
     public static final String PATH = "path";
 }
