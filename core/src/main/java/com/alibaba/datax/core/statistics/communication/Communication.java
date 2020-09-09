@@ -1,7 +1,7 @@
 package com.alibaba.datax.core.statistics.communication;
 
 import com.alibaba.datax.common.base.BaseObject;
-import com.alibaba.datax.dataxservice.face.domain.enums.State;
+import com.alibaba.datax.core.meta.State;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.Validate;
 
@@ -10,7 +10,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.concurrent.ConcurrentHashMap;
-@SuppressWarnings("unchecked")
+
+
 public class Communication extends BaseObject implements Cloneable {
     /**
      * 所有的数值key-value对 *
@@ -62,7 +63,7 @@ public class Communication extends BaseObject implements Cloneable {
     }
 
     public synchronized void setState(State state, boolean isForce) {
-        if (!isForce && this.state.equals(State.FAILED)) {
+        if (!isForce && this.state == State.FAILED) {
             return;
         }
 

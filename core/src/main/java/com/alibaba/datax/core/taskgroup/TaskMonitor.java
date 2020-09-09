@@ -4,7 +4,7 @@ import com.alibaba.datax.common.exception.CommonErrorCode;
 import com.alibaba.datax.common.exception.DataXException;
 import com.alibaba.datax.core.statistics.communication.Communication;
 import com.alibaba.datax.core.statistics.communication.CommunicationTool;
-import com.alibaba.datax.dataxservice.face.domain.enums.State;
+import com.alibaba.datax.core.meta.State;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

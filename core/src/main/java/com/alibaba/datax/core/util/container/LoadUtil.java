@@ -12,7 +12,8 @@ import com.alibaba.datax.core.taskgroup.runner.WriterRunner;
 import com.alibaba.datax.core.util.FrameworkErrorCode;
 import org.apache.commons.lang3.StringUtils;
 
-import java.util.*;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 /**
  * Created by jingxing on 14-8-24.
@@ -40,7 +41,7 @@ public class LoadUtil {
     }
 
     private final static Map <Long ,Configuration> configurationSet = new ConcurrentHashMap<>();
-    public static Map getConfigurationSet(){
+    public static Map<Long, Configuration> getConfigurationSet(){
         return configurationSet;
     }
     /**

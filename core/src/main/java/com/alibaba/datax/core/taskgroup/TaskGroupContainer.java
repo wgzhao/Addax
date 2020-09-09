@@ -26,13 +26,19 @@ import com.alibaba.datax.core.util.FrameworkErrorCode;
 import com.alibaba.datax.core.util.TransformerUtil;
 import com.alibaba.datax.core.util.container.CoreConstant;
 import com.alibaba.datax.core.util.container.LoadUtil;
-import com.alibaba.datax.dataxservice.face.domain.enums.State;
+import com.alibaba.datax.core.meta.State;
 import com.alibaba.fastjson.JSON;
 import org.apache.commons.lang3.Validate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import com.alibaba.datax.core.statistics.communication.LocalTGCommunicationManager;
-import java.util.*;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
 
 public class TaskGroupContainer extends AbstractContainer {
     private static final Logger LOG = LoggerFactory
@@ -474,7 +480,7 @@ public class TaskGroupContainer extends AbstractContainer {
                             PluginType.READER);
 
                     RecordSender recordSender;
-                    if (transformerInfoExecs != null && transformerInfoExecs.size() > 0) {
+                    if (transformerInfoExecs != null && !transformerInfoExecs.isEmpty()) {
                         recordSender = new BufferedRecordTransformerExchanger(taskGroupId, this.taskId, this.channel,this.taskCommunication ,pluginCollector, transformerInfoExecs);
                     } else {
                         recordSender = new BufferedRecordExchanger(this.channel, pluginCollector);

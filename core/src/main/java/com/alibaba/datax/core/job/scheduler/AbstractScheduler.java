@@ -8,7 +8,7 @@ import com.alibaba.datax.core.statistics.container.communicator.AbstractContaine
 import com.alibaba.datax.core.util.ErrorRecordChecker;
 import com.alibaba.datax.core.util.FrameworkErrorCode;
 import com.alibaba.datax.core.util.container.CoreConstant;
-import com.alibaba.datax.dataxservice.face.domain.enums.State;
+import com.alibaba.datax.core.meta.State;
 import org.apache.commons.lang.Validate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -44,7 +44,7 @@ public abstract class AbstractScheduler {
 
         ErrorRecordChecker errorLimit = new ErrorRecordChecker(configurations.get(0));
 
-        /**
+        /*
          * 给 taskGroupContainer 的 Communication 注册
          */
         this.containerCommunicator.registerCommunication(configurations);
@@ -57,7 +57,7 @@ public abstract class AbstractScheduler {
         long lastReportTimeStamp = System.currentTimeMillis();
         try {
             while (true) {
-                /**
+                /*
                  * step 1: collect job stat
                  * step 2: getReport info, then report it
                  * step 3: errorLimit do check

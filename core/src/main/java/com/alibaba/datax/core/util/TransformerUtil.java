@@ -2,7 +2,11 @@ package com.alibaba.datax.core.util;
 
 import com.alibaba.datax.common.exception.DataXException;
 import com.alibaba.datax.common.util.Configuration;
-import com.alibaba.datax.core.transport.transformer.*;
+import com.alibaba.datax.core.transport.transformer.TransformerErrorCode;
+import com.alibaba.datax.core.transport.transformer.TransformerExecution;
+import com.alibaba.datax.core.transport.transformer.TransformerExecutionParas;
+import com.alibaba.datax.core.transport.transformer.TransformerInfo;
+import com.alibaba.datax.core.transport.transformer.TransformerRegistry;
 import com.alibaba.datax.core.util.container.CoreConstant;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
@@ -21,7 +25,7 @@ public class TransformerUtil {
 
     public static List<TransformerExecution> buildTransformerInfo(Configuration taskConfig) {
         List<Configuration> tfConfigs = taskConfig.getListConfiguration(CoreConstant.JOB_TRANSFORMER);
-        if (tfConfigs == null || tfConfigs.size() == 0) {
+        if (tfConfigs == null || tfConfigs.isEmpty()) {
             return null;
         }
 
@@ -74,7 +78,7 @@ public class TransformerUtil {
 
                 transformerExecutionParas.setColumnIndex(columnIndex);
                 List<String> paras = configuration.getList(CoreConstant.TRANSFORMER_PARAMETER_PARAS, String.class);
-                if (paras != null && paras.size() > 0) {
+                if (paras != null && !paras.isEmpty()) {
                     transformerExecutionParas.setParas(paras.toArray(new String[0]));
                 }
             } else {
@@ -85,7 +89,7 @@ public class TransformerUtil {
                 transformerExecutionParas.setCode(code);
 
                 List<String> extraPackage = configuration.getList(CoreConstant.TRANSFORMER_PARAMETER_EXTRAPACKAGE, String.class);
-                if (extraPackage != null && extraPackage.size() > 0) {
+                if (extraPackage != null && !extraPackage.isEmpty()) {
                     transformerExecutionParas.setExtraPackage(extraPackage);
                 }
             }

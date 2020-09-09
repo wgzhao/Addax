@@ -21,8 +21,6 @@ public class BufferedRecordExchanger implements RecordSender, RecordReceiver {
 
 	private final Channel channel;
 
-	private final Configuration configuration;
-
 	private final List<Record> buffer;
 
 	private int bufferSize ;
@@ -46,10 +44,10 @@ public class BufferedRecordExchanger implements RecordSender, RecordReceiver {
 
 		this.channel = channel;
 		this.pluginCollector = pluginCollector;
-		this.configuration = channel.getConfiguration();
+		Configuration configuration = channel.getConfiguration();
 
 		this.bufferSize = configuration
-				.getInt(CoreConstant.DATAX_CORE_TRANSPORT_EXCHANGER_BUFFERSIZE);
+				.getInt(CoreConstant.DATAX_CORE_TRANSPORT_EXCHANGER_BUFFERSIZE, 32);
 		this.buffer = new ArrayList<>(bufferSize);
 
 		//channel的queue默认大小为8M，原来为64M

@@ -6,7 +6,13 @@ import com.alibaba.datax.core.util.container.CoreConstant;
 import org.apache.commons.lang.Validate;
 import org.apache.commons.lang3.StringUtils;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.LinkedHashMap;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
+import java.util.Random;
 
 public final class JobAssignUtil {
     private JobAssignUtil() {
@@ -15,13 +21,13 @@ public final class JobAssignUtil {
     /**
      * 公平的分配 task 到对应的 taskGroup 中。
      * 公平体现在：会考虑 task 中对资源负载作的 load 标识进行更均衡的作业分配操作。
-     * TODO 具体文档举例说明
+     *
      */
     public static List<Configuration> assignFairly(Configuration configuration, int channelNumber, int channelsPerTaskGroup) {
         Validate.isTrue(configuration != null, "框架获得的 Job 不能为 null.");
 
         List<Configuration> contentConfig = configuration.getListConfiguration(CoreConstant.DATAX_JOB_CONTENT);
-        Validate.isTrue(contentConfig.size() > 0, "框架获得的切分后的 Job 无内容.");
+        Validate.isTrue(!contentConfig.isEmpty(), "框架获得的切分后的 Job 无内容.");
 
         Validate.isTrue(channelNumber > 0 && channelsPerTaskGroup > 0,
                 "每个channel的平均task数[averTaskPerChannel]，channel数目[channelNumber]，每个taskGroup的平均channel数[channelsPerTaskGroup]都应该为正数");
@@ -148,7 +154,7 @@ public final class JobAssignUtil {
         int taskGroupIndex = 0;
         for (int i = 0; i < mapValueMaxLength; i++) {
             for (String resourceMark : resourceMarks) {
-                if (resourceMarkAndTaskIdMap.get(resourceMark).size() > 0) {
+                if (!resourceMarkAndTaskIdMap.get(resourceMark).isEmpty()) {
                     int taskId = resourceMarkAndTaskIdMap.get(resourceMark).get(0);
                     taskGroupConfigList.get(taskGroupIndex % taskGroupNumber).add(contentConfig.get(taskId));
                     taskGroupIndex++;

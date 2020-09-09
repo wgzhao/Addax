@@ -57,7 +57,7 @@ public abstract class AbstractTaskPluginCollector extends TaskPluginCollector {
             return;
         }
 
-        if (this.pluginType.equals(PluginType.READER)) {
+        if (this.pluginType == PluginType.READER) {
             this.communication.increaseCounter(
                     CommunicationTool.READ_FAILED_RECORDS, 1);
             this.communication.increaseCounter(

@@ -13,6 +13,7 @@ import com.alibaba.datax.common.util.StrUtil;
 import com.alibaba.datax.core.AbstractContainer;
 import com.alibaba.datax.core.Engine;
 import com.alibaba.datax.core.container.util.JobAssignUtil;
+import com.alibaba.datax.core.hook.JobReport;
 import com.alibaba.datax.core.job.scheduler.AbstractScheduler;
 import com.alibaba.datax.core.job.scheduler.processinner.StandAloneScheduler;
 import com.alibaba.datax.core.statistics.communication.Communication;
@@ -25,11 +26,8 @@ import com.alibaba.datax.core.util.FrameworkErrorCode;
 import com.alibaba.datax.core.util.container.ClassLoaderSwapper;
 import com.alibaba.datax.core.util.container.CoreConstant;
 import com.alibaba.datax.core.util.container.LoadUtil;
-import com.alibaba.datax.dataxservice.face.domain.enums.ExecuteMode;
 import com.alibaba.fastjson.JSON;
-import com.cxzq.util.AsynHttpClient;
 import org.apache.commons.lang.StringUtils;
-import org.apache.commons.lang.Validate;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.concurrent.FutureCallback;
@@ -41,7 +39,10 @@ import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.text.SimpleDateFormat;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 
@@ -521,33 +522,14 @@ public class JobContainer extends AbstractContainer {
 
         LOG.info("Scheduler starts [{}] taskGroups.", taskGroupConfigs.size());
 
-        ExecuteMode executeMode = null;
         AbstractScheduler scheduler;
         try {
-        	executeMode = ExecuteMode.STANDALONE;
             scheduler = initStandaloneScheduler(this.configuration);
-
-            //设置 executeMode
-            for (Configuration taskGroupConfig : taskGroupConfigs) {
-                taskGroupConfig.set(CoreConstant.DATAX_CORE_CONTAINER_JOB_MODE, executeMode.getValue());
-            }
-
-            if (executeMode == ExecuteMode.LOCAL || executeMode == ExecuteMode.DISTRIBUTE) {
-                if (this.jobId <= 0) {
-                    throw DataXException.asDataXException(FrameworkErrorCode.RUNTIME_ERROR,
-                            "在[ local | distribute ]模式下必须设置jobId，并且其值 > 0 .");
-                }
-            }
-
-            LOG.info("Running by {} Mode.", executeMode);
-
             this.startTransferTimeStamp = System.currentTimeMillis();
-
             scheduler.schedule(taskGroupConfigs);
-
             this.endTransferTimeStamp = System.currentTimeMillis();
         } catch (Exception e) {
-            LOG.error("运行scheduler 模式[{}]出错.", executeMode);
+            LOG.error("运行scheduler出错.");
             this.endTransferTimeStamp = System.currentTimeMillis();
             throw DataXException.asDataXException(
                     FrameworkErrorCode.RUNTIME_ERROR, e);
@@ -780,12 +762,6 @@ public class JobContainer extends AbstractContainer {
      */
     private List<Configuration> mergeReaderAndWriterTaskConfigs(
             List<Configuration> readerTasksConfigs,
-            List<Configuration> writerTasksConfigs) {
-        return mergeReaderAndWriterTaskConfigs(readerTasksConfigs, writerTasksConfigs, null);
-    }
-
-    private List<Configuration> mergeReaderAndWriterTaskConfigs(
-            List<Configuration> readerTasksConfigs,
             List<Configuration> writerTasksConfigs,
             List<Configuration> transformerConfigs) {
         if (readerTasksConfigs.size() != writerTasksConfigs.size()) {
@@ -808,7 +784,7 @@ public class JobContainer extends AbstractContainer {
             taskConfig.set(CoreConstant.JOB_WRITER_PARAMETER,
                     writerTasksConfigs.get(i));
 
-            if(transformerConfigs!=null && transformerConfigs.size()>0){
+            if(transformerConfigs!=null && !transformerConfigs.isEmpty()){
                 taskConfig.set(CoreConstant.JOB_TRANSFORMER, transformerConfigs);
             }
 
@@ -817,130 +793,6 @@ public class JobContainer extends AbstractContainer {
         }
 
         return contentConfigs;
-    }
-
-    /**
-     * 这里比较复杂，分两步整合 1. tasks到channel 2. channel到taskGroup
-     * 合起来考虑，其实就是把tasks整合到taskGroup中，需要满足计算出的channel数，同时不能多起channel
-     * <p/>
-     * example:
-     * <p/>
-     * 前提条件： 切分后是1024个分表，假设用户要求总速率是1000M/s，每个channel的速率的3M/s，
-     * 每个taskGroup负责运行7个channel
-     * <p/>
-     * 计算： 总channel数为：1000M/s / 3M/s =
-     * 333个，为平均分配，计算可知有308个每个channel有3个tasks，而有25个每个channel有4个tasks，
-     * 需要的taskGroup数为：333 / 7 =
-     * 47...4，也就是需要48个taskGroup，47个是每个负责7个channel，有4个负责1个channel
-     * <p/>
-     * 处理：我们先将这负责4个channel的taskGroup处理掉，逻辑是：
-     * 先按平均为3个tasks找4个channel，设置taskGroupId为0，
-     * 接下来就像发牌一样轮询分配task到剩下的包含平均channel数的taskGroup中
-     * <p/>
-     * TODO delete it
-     *
-     */
-    @SuppressWarnings("serial")
-    private List<Configuration> distributeTasksToTaskGroup(
-            int averTaskPerChannel, int channelNumber,
-            int channelsPerTaskGroup) {
-        Validate.isTrue(averTaskPerChannel > 0 && channelNumber > 0
-                        && channelsPerTaskGroup > 0,
-                "每个channel的平均task数[averTaskPerChannel]，channel数目[channelNumber]，每个taskGroup的平均channel数[channelsPerTaskGroup]都应该为正数");
-        List<Configuration> taskConfigs = this.configuration
-                .getListConfiguration(CoreConstant.DATAX_JOB_CONTENT);
-        int taskGroupNumber = channelNumber / channelsPerTaskGroup;
-        int leftChannelNumber = channelNumber % channelsPerTaskGroup;
-        if (leftChannelNumber > 0) {
-            taskGroupNumber += 1;
-        }
-
-        /*
-         * 如果只有一个taskGroup，直接打标返回
-         */
-        if (taskGroupNumber == 1) {
-            final Configuration taskGroupConfig = this.configuration.clone();
-            /*
-             * configure的clone不能clone出
-             */
-            taskGroupConfig.set(CoreConstant.DATAX_JOB_CONTENT, this.configuration
-                    .getListConfiguration(CoreConstant.DATAX_JOB_CONTENT));
-            taskGroupConfig.set(CoreConstant.DATAX_CORE_CONTAINER_TASKGROUP_CHANNEL,
-                    channelNumber);
-            taskGroupConfig.set(CoreConstant.DATAX_CORE_CONTAINER_TASKGROUP_ID, 0);
-            return new ArrayList<Configuration>() {
-                {
-                    add(taskGroupConfig);
-                }
-            };
-        }
-
-        List<Configuration> taskGroupConfigs = new ArrayList<>();
-        /*
-         * 将每个taskGroup中content的配置清空
-         */
-        for (int i = 0; i < taskGroupNumber; i++) {
-            Configuration taskGroupConfig = this.configuration.clone();
-            List<Configuration> taskGroupJobContent = taskGroupConfig
-                    .getListConfiguration(CoreConstant.DATAX_JOB_CONTENT);
-            taskGroupJobContent.clear();
-            taskGroupConfig.set(CoreConstant.DATAX_JOB_CONTENT, taskGroupJobContent);
-
-            taskGroupConfigs.add(taskGroupConfig);
-        }
-
-        int taskConfigIndex = 0;
-        int channelIndex = 0;
-        int taskGroupConfigIndex = 0;
-
-        /*
-         * 先处理掉taskGroup包含channel数不是平均值的taskGroup
-         */
-        if (leftChannelNumber > 0) {
-            Configuration taskGroupConfig = taskGroupConfigs.get(taskGroupConfigIndex);
-            for (; channelIndex < leftChannelNumber; channelIndex++) {
-                for (int i = 0; i < averTaskPerChannel; i++) {
-                    List<Configuration> taskGroupJobContent = taskGroupConfig
-                            .getListConfiguration(CoreConstant.DATAX_JOB_CONTENT);
-                    taskGroupJobContent.add(taskConfigs.get(taskConfigIndex++));
-                    taskGroupConfig.set(CoreConstant.DATAX_JOB_CONTENT,
-                            taskGroupJobContent);
-                }
-            }
-
-            taskGroupConfig.set(CoreConstant.DATAX_CORE_CONTAINER_TASKGROUP_CHANNEL,
-                    leftChannelNumber);
-            taskGroupConfig.set(CoreConstant.DATAX_CORE_CONTAINER_TASKGROUP_ID,
-                    taskGroupConfigIndex++);
-        }
-
-        /*
-         * 下面需要轮询分配，并打上channel数和taskGroupId标记
-         */
-        int equalDivisionStartIndex = taskGroupConfigIndex;
-        while (taskConfigIndex < taskConfigs.size()
-                && equalDivisionStartIndex < taskGroupConfigs.size()) {
-            for (taskGroupConfigIndex = equalDivisionStartIndex; taskGroupConfigIndex < taskGroupConfigs
-                    .size() && taskConfigIndex < taskConfigs.size(); taskGroupConfigIndex++) {
-                Configuration taskGroupConfig = taskGroupConfigs.get(taskGroupConfigIndex);
-                List<Configuration> taskGroupJobContent = taskGroupConfig
-                        .getListConfiguration(CoreConstant.DATAX_JOB_CONTENT);
-                taskGroupJobContent.add(taskConfigs.get(taskConfigIndex++));
-                taskGroupConfig.set(
-                        CoreConstant.DATAX_JOB_CONTENT, taskGroupJobContent);
-            }
-        }
-
-        for (taskGroupConfigIndex = equalDivisionStartIndex;
-             taskGroupConfigIndex < taskGroupConfigs.size(); ) {
-            Configuration taskGroupConfig = taskGroupConfigs.get(taskGroupConfigIndex);
-            taskGroupConfig.set(CoreConstant.DATAX_CORE_CONTAINER_TASKGROUP_CHANNEL,
-                    channelsPerTaskGroup);
-            taskGroupConfig.set(CoreConstant.DATAX_CORE_CONTAINER_TASKGROUP_ID,
-                    taskGroupConfigIndex++);
-        }
-
-        return taskGroupConfigs;
     }
 
     private void postJobReader() {
@@ -1040,10 +892,10 @@ public class JobContainer extends AbstractContainer {
 
         String jsonStr =JSON.toJSONString(resultLog);
 
-        CloseableHttpAsyncClient httpClient = AsynHttpClient.getHttpClient();
+        CloseableHttpAsyncClient httpClient = JobReport.getHttpClient();
 
         LOG.info("jobResultReportUrl:"+jobResultReportUrl);
-        HttpPost postBody = AsynHttpClient.getPostBody(jobResultReportUrl, jsonStr, ContentType.APPLICATION_JSON);
+        HttpPost postBody = JobReport.getPostBody(jobResultReportUrl, jsonStr, ContentType.APPLICATION_JSON);
 
         //回调
         FutureCallback<HttpResponse> callback = new FutureCallback<HttpResponse>() {
