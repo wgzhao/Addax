@@ -1,4 +1,4 @@
-package com.cxzq.util;
+package com.alibaba.datax.core.hook;
 
 import org.apache.http.client.config.RequestConfig;
 import org.apache.http.client.methods.HttpPost;
@@ -13,16 +13,19 @@ import org.apache.http.nio.reactor.ConnectingIOReactor;
 import org.apache.http.nio.reactor.IOReactorException;
 
 /**
- * Created by Administrator on 2020/3/30.
+ * 将统计上报到指定的接口上
+ * 接口从 conf/core.json 文件中的 $.core.dataXServer.address 中获取
+ * 如果该配置项为空，则跳过该接口，否则，将通过该接口上传本次任务执行的统计信息
+ * 详细信息可以参考文档 statsreport.md
+ *
  */
-public class AsynHttpClient {
+public class JobReport {
 
     private static CloseableHttpAsyncClient client = null;
 
-
     public static CloseableHttpAsyncClient getHttpClient() {
         if (client == null) {
-            synchronized (AsynHttpClient.class) {
+            synchronized (JobReport.class) {
                 if (client == null) {
                     RequestConfig requestConfig = RequestConfig.custom()
                             .setConnectTimeout(2000)//连接超时,连接建立时间,三次握手完成时间
