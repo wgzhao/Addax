@@ -180,15 +180,6 @@ public class PerfRecord implements Comparable<PerfRecord> {
         return Objects.equals(startTime, dst.startTime);
     }
 
-    public PerfRecord copy() {
-        PerfRecord copy = new PerfRecord(this.taskGroupId, this.getTaskId(), this.phase);
-        copy.action = this.action;
-        copy.startTime = this.startTime;
-        copy.elapsedTimeInNs = this.elapsedTimeInNs;
-        copy.count = this.count;
-        copy.size = this.size;
-        return copy;
-    }
     public int getTaskGroupId() {
         return taskGroupId;
     }

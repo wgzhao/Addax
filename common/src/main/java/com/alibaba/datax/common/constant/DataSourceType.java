@@ -9,5 +9,5 @@ package com.alibaba.datax.common.constant;
  */
 public enum DataSourceType
 {
-    MYSQL, POSTGRESQL, CLICKHOUSE, HIVE, ELASTICSEARCH;
+    MYSQL, POSTGRESQL, CLICKHOUSE, HIVE, ELASTICSEARCH
 }

@@ -71,7 +71,7 @@ public class FtpReader extends Reader {
 			this.maxTraversalLevel = originConfig.getInt(Key.MAXTRAVERSALLEVEL, Constant.DEFAULT_MAX_TRAVERSAL_LEVEL);
 			
 			// only support connect pattern
-			this.connectPattern = this.originConfig.getUnnecessaryValue(Key.CONNECTPATTERN, Constant.DEFAULT_FTP_CONNECT_PATTERN, null);
+			this.connectPattern = this.originConfig.getUnnecessaryValue(Key.CONNECTPATTERN, Constant.DEFAULT_FTP_CONNECT_PATTERN);
 			boolean connectPatternTag = "PORT".equals(connectPattern) || "PASV".equals(connectPattern);
 			if (!connectPatternTag) {
 				throw DataXException.asDataXException(FtpReaderErrorCode.ILLEGAL_VALUE,

@@ -139,21 +139,11 @@ public class Configuration {
         return value;
     }
 
-    public String getUnnecessaryValue(String key,String defaultValue,ErrorCode errorCode) {
+    public String getUnnecessaryValue(String key,String defaultValue) {
         String value = this.getString(key, defaultValue);
         if (StringUtils.isBlank(value)) {
             value = defaultValue;
         }
-        return value;
-    }
-
-    public Boolean getNecessaryBool(String key, ErrorCode errorCode) {
-        Boolean value = this.getBool(key);
-        if (value == null) {
-            throw DataXException.asDataXException(errorCode,
-                    String.format("您提供配置文件有误，[%s]是必填参数，不允许为空或者留白 .", key));
-        }
-
         return value;
     }
 
@@ -438,14 +428,13 @@ public class Configuration {
     /**
      * 根据用户提供的json path，寻址List对象，如果对象不存在，返回默认List
      */
-    @SuppressWarnings("unchecked")
     public List<Object> getList(final String path,
                                 final List<Object> defaultList) {
-        Object object = this.getList(path);
+        List<Object> object = this.getList(path);
         if (null == object) {
             return defaultList;
         }
-        return (List<Object>) object;
+        return object;
     }
 
     /**
@@ -479,25 +468,9 @@ public class Configuration {
     /**
      * 根据用户提供的json path，寻址Map对象，如果对象不存在，返回null
      */
+    @SuppressWarnings("unchecked")
     public Map<String, Object> getMap(final String path) {
         return this.get(path, Map.class);
-    }
-
-    /**
-     * 根据用户提供的json path，寻址Map对象，如果对象不存在，返回null;
-     */
-    public <T> Map<String, T> getMap(final String path, Class<T> t) {
-        Map<String, Object> map = this.get(path, Map.class);
-        if (null == map) {
-            return null;
-        }
-
-        Map<String, T> result = new HashMap<>();
-        for (final String key : map.keySet()) {
-            result.put(key, (T) map.get(key));
-        }
-
-        return result;
     }
 
     /**
@@ -510,37 +483,6 @@ public class Configuration {
             return defaultMap;
         }
         return object;
-    }
-
-    /**
-     * 根据用户提供的json path，寻址Map对象，如果对象不存在，返回默认map
-     */
-    public <T> Map<String, T> getMap(final String path,
-                                     final Map<String, T> defaultMap, Class<T> t) {
-        Map<String, T> result = getMap(path, t);
-        if (null == result) {
-            return defaultMap;
-        }
-        return result;
-    }
-
-    /**
-     * 根据用户提供的json path，寻址包含Configuration的Map，如果对象不存在，返回默认null
-     */
-    @SuppressWarnings("unchecked")
-    public Map<String, Configuration> getMapConfiguration(final String path) {
-        Map<String, Object> map = this.get(path, Map.class);
-        if (null == map) {
-            return null;
-        }
-
-        Map<String, Configuration> result = new HashMap<String, Configuration>();
-        for (final String key : map.keySet()) {
-            result.put(key, Configuration.from(Configuration.toJSONString(map
-                    .get(key))));
-        }
-
-        return result;
     }
 
     /**
@@ -620,7 +562,7 @@ public class Configuration {
      * 下属的key包括: a.b.c[0],a.b.c[1],a.b.c[2],a.b.c[3],x
      */
     public Set<String> getKeys() {
-        Set<String> collect = new HashSet<String>();
+        Set<String> collect = new HashSet<>();
         this.getKeysRecursive(this.getInternal(), "", collect);
         return collect;
     }
@@ -647,7 +589,6 @@ public class Configuration {
      *            合并加入的第三方Configuration
      * @param updateWhenConflict
      *            当合并双方出现KV冲突时候，选择更新当前KV，或者忽略该KV
-     * @return 返回合并后对象
      */
     public Configuration merge(final Configuration another,
                                boolean updateWhenConflict) {
@@ -718,10 +659,7 @@ public class Configuration {
         }
     }
 
-    public boolean isSecretPath(String path) {
-        return this.secretKeyPathSet.contains(path);
-    }
-
+    @SuppressWarnings("unchecked")
     void getKeysRecursive(final Object current, String path, Set<String> collect) {
         boolean isRegularElement = !(current instanceof Map || current instanceof List);
         if (isRegularElement) {
@@ -743,13 +681,10 @@ public class Configuration {
             return;
         }
 
-        boolean isList = current instanceof List;
-        if (isList) {
-            List<Object> lists = (List<Object>) current;
-            for (int i = 0; i < lists.size(); i++) {
-                getKeysRecursive(lists.get(i), path + String.format("[%d]", i),
-                        collect);
-            }
+        List<Object> lists = (List<Object>) current;
+        for (int i = 0; i < lists.size(); i++) {
+            getKeysRecursive(lists.get(i), path + String.format("[%d]", i),
+                    collect);
         }
 
     }
@@ -908,8 +843,7 @@ public class Configuration {
             }
 
             // 当前是list，但是对应的indexer是没有具体的值，也就是我们新建对象然后插入到该list，并返回该List
-            lists = (List<Object>) current;
-            lists = expand(lists, listIndexer + 1);
+            lists = expand((List<Object>) current, listIndexer + 1);
 
             boolean hasSameIndex = lists.get(listIndexer) != null;
             if (!hasSameIndex) {
@@ -1032,11 +966,6 @@ public class Configuration {
                         "系统编程错误, 路径[%s]不合法, 路径层次之间不能出现空白字符 .", path));
             }
         }
-    }
-
-    private String toJSONPath(final String path) {
-        return (StringUtils.isBlank(path) ? "$" : "$." + path).replace("$.[",
-                "$[");
     }
 
     private static void checkJSON(final String json) {
