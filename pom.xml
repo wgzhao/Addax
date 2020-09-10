@@ -19,7 +19,7 @@
     </scm>
 
     <properties>
-        <commons.lang3.version>3.4</commons.lang3.version>
+        <commons.lang3.version>3.11</commons.lang3.version>
         <commons.configuration.version>1.10</commons.configuration.version>
         <commons.cli.version>1.2</commons.cli.version>
         <fastjson.version>1.2.72</fastjson.version>
