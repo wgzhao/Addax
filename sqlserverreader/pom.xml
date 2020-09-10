@@ -29,7 +29,7 @@
 		<dependency>
 			<groupId>com.microsoft.sqlserver</groupId>
 			<artifactId>mssql-jdbc</artifactId>
-			<version>8.4.0.jre8</version>
+			<version>8.4.1.jre14</version>
 		</dependency>
 
 		<dependency>
