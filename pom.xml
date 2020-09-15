@@ -31,7 +31,7 @@
         <hive.version>3.1.2-1</hive.version>
         <postgresql.jdbc.version>9.4.1207</postgresql.jdbc.version>
         <!--slf4j 1.7.28 和 logback.classic 1.2.3 是好基友 -->
-        <slf4j.version>1.7.28</slf4j.version>
+        <slf4j.version>1.7.30</slf4j.version>
         <logback.version>1.2.3</logback.version>
         <commons.io.version>2.8.0</commons.io.version>
         <commons.codec.version>1.9</commons.codec.version>
