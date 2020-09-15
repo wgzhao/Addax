@@ -1,6 +1,10 @@
 package com.alibaba.datax.plugin.reader.sqlserverreader;
 
-import com.alibaba.datax.common.element.*;
+import com.alibaba.datax.common.element.BoolColumn;
+import com.alibaba.datax.common.element.DateColumn;
+import com.alibaba.datax.common.element.DoubleColumn;
+import com.alibaba.datax.common.element.LongColumn;
+import com.alibaba.datax.common.element.StringColumn;
 import com.alibaba.datax.common.exception.DataXException;
 import com.alibaba.datax.common.plugin.RecordSender;
 import com.alibaba.datax.common.plugin.TaskPluginCollector;
@@ -136,7 +140,8 @@ public class SqlServerRdbmsReader extends CommonRdbmsReader {
                                     .asDataXException(
                                             DBUtilErrorCode.UNSUPPORTED_TYPE,
                                             String.format(
-                                                    "您的配置文件中的列配置信息有误. 因为DataX 不支持数据库读取这种字段类型. 字段名:[%s], 字段名称:[%s], 字段Java类型:[%s]. 请尝试使用数据库函数将其转换datax支持的类型 或者不同步该字段 .",
+                                                    "您的配置文件中的列配置信息有误. 因为DataX 不支持数据库读取这种字段类型. 字段名:[%s], "
+                                                    + "字段类型编号:[%s], 字段Java类型:[%s]. 请尝试使用数据库函数将其转换datax支持的类型 或者不同步该字段 .",
                                                     metaData.getColumnName(i),
                                                     metaData.getColumnType(i),
                                                     metaData.getColumnClassName(i)));
