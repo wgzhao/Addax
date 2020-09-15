@@ -10,9 +10,12 @@ import com.alibaba.datax.plugin.rdbms.util.DataBaseType;
 
 import java.util.List;
 
+import static com.alibaba.datax.plugin.rdbms.reader.Constant.FETCH_SIZE;
+
 public class SqlServerReader extends Reader {
 
 	private static final DataBaseType DATABASE_TYPE = DataBaseType.SQLServer;
+	public static final int DEFAULT_FETCH_SIZE = 1024;
 
 	public static class Job extends Reader.Job {
 
@@ -23,8 +26,8 @@ public class SqlServerReader extends Reader {
 		public void init() {
 			this.originalConfig = super.getPluginJobConf();
 			int fetchSize = this.originalConfig.getInt(
-					com.alibaba.datax.plugin.rdbms.reader.Constant.FETCH_SIZE,
-					Constant.DEFAULT_FETCH_SIZE);
+					FETCH_SIZE,
+					DEFAULT_FETCH_SIZE);
 			if (fetchSize < 1) {
 				throw DataXException
 						.asDataXException(DBUtilErrorCode.REQUIRED_VALUE,
@@ -32,7 +35,7 @@ public class SqlServerReader extends Reader {
 										fetchSize));
 			}
 			this.originalConfig.set(
-					com.alibaba.datax.plugin.rdbms.reader.Constant.FETCH_SIZE,
+					FETCH_SIZE,
 					fetchSize);
 
 			this.commonRdbmsReaderJob = new SqlServerRdbmsReader.Job(
@@ -74,7 +77,7 @@ public class SqlServerReader extends Reader {
 		@Override
 		public void startRead(RecordSender recordSender) {
 			int fetchSize = this.readerSliceConfig
-					.getInt(com.alibaba.datax.plugin.rdbms.reader.Constant.FETCH_SIZE);
+					.getInt(FETCH_SIZE);
 
 			this.commonRdbmsReaderTask.startRead(this.readerSliceConfig,
 					recordSender, super.getTaskPluginCollector(), fetchSize);
