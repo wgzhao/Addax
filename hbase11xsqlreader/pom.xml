@@ -10,7 +10,7 @@
     <packaging>jar</packaging>
 
     <properties>
-        <phoenix.version>4.14.3-HBase-1.4</phoenix.version>
+        <phoenix.version>5.0.0-HBase-2.0</phoenix.version>
     </properties>
 
     <dependencies>
