@@ -14,14 +14,13 @@ import com.alibaba.datax.plugin.rdbms.reader.CommonRdbmsReader;
 import com.alibaba.datax.plugin.rdbms.util.DBUtil;
 import com.alibaba.datax.plugin.rdbms.util.DBUtilErrorCode;
 import com.alibaba.datax.plugin.rdbms.util.DataBaseType;
+import org.apache.commons.lang3.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
 import java.sql.Types;
-
-import org.apache.commons.lang3.StringUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 public class SubCommonRdbmsReader extends CommonRdbmsReader {
     static {
@@ -110,6 +109,7 @@ public class SubCommonRdbmsReader extends CommonRdbmsReader {
                         break;
 
                     case Types.TIMESTAMP:
+                    case -151: // 兼容老的SQLServer版本的datetime数据类型
                         record.addColumn(new DateColumn(rs.getTimestamp(i)));
                         break;
 
