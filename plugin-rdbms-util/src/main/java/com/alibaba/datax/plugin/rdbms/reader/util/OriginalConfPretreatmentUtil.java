@@ -112,8 +112,7 @@ public final class OriginalConfPretreatmentUtil {
                 // 对每一个connection 上配置的table 项进行解析(已对表名称进行了 ` 处理的)
                 List<String> tables = connConf.getList(Key.TABLE, String.class);
 
-                List<String> expandedTables = TableExpandUtil.expandTableConf(
-                        DATABASE_TYPE, tables);
+                List<String> expandedTables = TableExpandUtil.expandTableConf(tables);
 
                 if (null == expandedTables || expandedTables.isEmpty()) {
                     throw DataXException.asDataXException(
