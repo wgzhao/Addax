@@ -71,7 +71,7 @@ public class CommonRdbmsReader {
             }else{
                 exec = Executors.newFixedThreadPool(10);
             }
-            Collection<PreCheckTask> taskList = new ArrayList<PreCheckTask>();
+            Collection<PreCheckTask> taskList = new ArrayList<>();
             for (Object o : connList) {
                 Configuration connConf = Configuration.from(o.toString());
                 PreCheckTask t = new PreCheckTask(username, password, connConf, dataBaseType, splitPK);
@@ -88,8 +88,7 @@ public class CommonRdbmsReader {
                 try {
                     result.get();
                 } catch (ExecutionException e) {
-                    DataXException de = (DataXException) e.getCause();
-                    throw de;
+                    throw (DataXException) e.getCause();
                 }catch (InterruptedException e) {
                     Thread.currentThread().interrupt();
                 }
@@ -119,9 +118,9 @@ public class CommonRdbmsReader {
         private static final boolean IS_DEBUG = LOG.isDebugEnabled();
         protected final byte[] EMPTY_CHAR_ARRAY = new byte[0];
 
-        private DataBaseType dataBaseType;
-        private int taskGroupId = -1;
-        private int taskId=-1;
+        private final DataBaseType dataBaseType;
+        private final int taskGroupId;
+        private final int taskId;
 
         private String username;
         private String password;
@@ -175,8 +174,8 @@ public class CommonRdbmsReader {
             DBUtil.dealWithSessionConfig(conn, readerSliceConfig,
                     this.dataBaseType, basicMsg);
 
-            int columnNumber = 0;
-            ResultSet rs = null;
+            int columnNumber;
+            ResultSet rs;
             try {
                 rs = DBUtil.query(conn, querySql, fetchSize);
                 queryPerfRecord.end();
@@ -220,12 +219,16 @@ public class CommonRdbmsReader {
         protected Record transportOneRecord(RecordSender recordSender, ResultSet rs, 
                 ResultSetMetaData metaData, int columnNumber, String mandatoryEncoding, 
                 TaskPluginCollector taskPluginCollector) {
-            com.alibaba.datax.common.element.Record record = buildRecord(recordSender,rs,metaData,columnNumber,mandatoryEncoding,taskPluginCollector); 
+            Record record = buildRecord(recordSender,rs,metaData,columnNumber,
+                                                            mandatoryEncoding,taskPluginCollector);
             recordSender.sendToWriter(record);
             return record;
         }
-        protected Record buildRecord(RecordSender recordSender,ResultSet rs, ResultSetMetaData metaData, int columnNumber, String mandatoryEncoding,
-        		TaskPluginCollector taskPluginCollector) {
+
+        protected Record buildRecord(RecordSender recordSender,ResultSet rs, ResultSetMetaData metaData,
+                                     int columnNumber, String mandatoryEncoding,
+                                     TaskPluginCollector taskPluginCollector)
+        {
         	Record record = recordSender.createRecord();
 
             try {

@@ -7,7 +7,7 @@ import java.sql.Connection;
  */
 public class JdbcConnectionFactory implements ConnectionFactory {
 
-    private DataBaseType dataBaseType;
+    private final DataBaseType dataBaseType;
 
     private final String jdbcUrl;
 

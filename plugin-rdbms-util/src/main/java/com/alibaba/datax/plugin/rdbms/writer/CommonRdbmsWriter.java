@@ -27,7 +27,7 @@ import java.util.List;
 public class CommonRdbmsWriter {
 
     public static class Job {
-        private DataBaseType dataBaseType;
+        private final DataBaseType dataBaseType;
 
         private static final Logger LOG = LoggerFactory
                 .getLogger(Job.class);
@@ -282,14 +282,12 @@ public class CommonRdbmsWriter {
                 if (!writeBuffer.isEmpty()) {
                     doBatchInsert(connection, writeBuffer);
                     writeBuffer.clear();
-                    bufferBytes = 0;
                 }
             } catch (Exception e) {
                 throw DataXException.asDataXException(
                         DBUtilErrorCode.WRITE_DATA_ERROR, e);
             } finally {
                 writeBuffer.clear();
-                bufferBytes = 0;
                 DBUtil.closeDBResources(null, null, connection);
             }
         }
@@ -310,7 +308,7 @@ public class CommonRdbmsWriter {
             int tableNumber = writerSliceConfig.getInt(
                     Constant.TABLE_NUMBER_MARK);
 
-            boolean hasPostSql = (this.postSqls != null && this.postSqls.size() > 0);
+            boolean hasPostSql = (this.postSqls != null && !this.postSqls.isEmpty());
             if (tableNumber == 1 || !hasPostSql) {
                 return;
             }
@@ -528,15 +526,13 @@ public class CommonRdbmsWriter {
 
         private void calcWriteRecordSql() {
             if (!VALUE_HOLDER.equals(calcValueHolder(""))) {
-                List<String> valueHolders = new ArrayList<String>(columnNumber);
+                List<String> valueHolders = new ArrayList<>(columnNumber);
                 for (int i = 0; i < columns.size(); i++) {
                     String type = resultSetMetaData.getRight().get(i);
                     valueHolders.add(calcValueHolder(type));
                 }
 
-                boolean forceUseUpdate = false;
-
-                INSERT_OR_REPLACE_TEMPLATE = WriterUtil.getWriteTemplate(columns, valueHolders, writeMode, dataBaseType, forceUseUpdate);
+                INSERT_OR_REPLACE_TEMPLATE = WriterUtil.getWriteTemplate(columns, valueHolders, writeMode, dataBaseType, false);
                 writeRecordSql = String.format(INSERT_OR_REPLACE_TEMPLATE, this.table);
             }
         }

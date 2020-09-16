@@ -75,7 +75,7 @@ __pycache__/
 .Python
 build/
 develop-eggs/
-dist/
+src/
 downloads/
 eggs/
 .eggs/

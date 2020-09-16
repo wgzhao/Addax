@@ -12,7 +12,7 @@ public class RdbmsException extends DataXException{
     }
 
     public static DataXException asConnException(DataBaseType dataBaseType,Exception e,String userName,String dbName){
-        if (dataBaseType.equals(DataBaseType.MySql)){
+        if (dataBaseType == DataBaseType.MySql){
             DBUtilErrorCode dbUtilErrorCode = mySqlConnectionErrorAna(e.getMessage());
             if (dbUtilErrorCode == DBUtilErrorCode.MYSQL_CONN_DB_ERROR && dbName !=null ){
                 return DataXException.asDataXException(dbUtilErrorCode,"该数据库名称为："+dbName+" 具体错误信息为："+e);
@@ -23,7 +23,7 @@ public class RdbmsException extends DataXException{
             return DataXException.asDataXException(dbUtilErrorCode," 具体错误信息为："+e);
         }
 
-        if (dataBaseType.equals(DataBaseType.Oracle)){
+        if (dataBaseType == DataBaseType.Oracle){
             DBUtilErrorCode dbUtilErrorCode = oracleConnectionErrorAna(e.getMessage());
             if (dbUtilErrorCode == DBUtilErrorCode.ORACLE_CONN_DB_ERROR && dbName != null){
                 return DataXException.asDataXException(dbUtilErrorCode,"该数据库名称为："+dbName+" 具体错误信息为："+e);
@@ -69,7 +69,7 @@ public class RdbmsException extends DataXException{
     }
 
     public static DataXException asQueryException(DataBaseType dataBaseType, Exception e,String querySql,String table,String userName){
-        if (dataBaseType.equals(DataBaseType.MySql)){
+        if (dataBaseType == DataBaseType.MySql){
             DBUtilErrorCode dbUtilErrorCode = mySqlQueryErrorAna(e.getMessage());
             if (dbUtilErrorCode == DBUtilErrorCode.MYSQL_QUERY_TABLE_NAME_ERROR && table != null){
                 return DataXException.asDataXException(dbUtilErrorCode,"表名为："+table+" 执行的SQL为:"+querySql+" 具体错误信息为："+e);
@@ -81,7 +81,7 @@ public class RdbmsException extends DataXException{
             return DataXException.asDataXException(dbUtilErrorCode,"执行的SQL为: "+querySql+" 具体错误信息为："+e);
         }
 
-        if (dataBaseType.equals(DataBaseType.Oracle)){
+        if (dataBaseType == DataBaseType.Oracle){
             DBUtilErrorCode dbUtilErrorCode = oracleQueryErrorAna(e.getMessage());
             if (dbUtilErrorCode == DBUtilErrorCode.ORACLE_QUERY_TABLE_NAME_ERROR && table != null){
                 return DataXException.asDataXException(dbUtilErrorCode,"表名为："+table+" 执行的SQL为:"+querySql+" 具体错误信息为："+e);
@@ -122,66 +122,66 @@ public class RdbmsException extends DataXException{
     }
 
     public static DataXException asSqlParserException(DataBaseType dataBaseType, Exception e,String querySql){
-        if (dataBaseType.equals(DataBaseType.MySql)){
+        if (dataBaseType == DataBaseType.MySql){
             throw DataXException.asDataXException(DBUtilErrorCode.MYSQL_QUERY_SQL_PARSER_ERROR, "执行的SQL为:"+querySql+" 具体错误信息为：" + e);
         }
-        if (dataBaseType.equals(DataBaseType.Oracle)){
+        if (dataBaseType == DataBaseType.Oracle){
             throw DataXException.asDataXException(DBUtilErrorCode.ORACLE_QUERY_SQL_PARSER_ERROR,"执行的SQL为:"+querySql+" 具体错误信息为：" +e);
         }
         throw DataXException.asDataXException(DBUtilErrorCode.READ_RECORD_FAIL,"执行的SQL为:"+querySql+" 具体错误信息为："+e);
     }
 
     public static DataXException asPreSQLParserException(DataBaseType dataBaseType, Exception e,String querySql){
-        if (dataBaseType.equals(DataBaseType.MySql)){
+        if (dataBaseType == DataBaseType.MySql){
             throw DataXException.asDataXException(DBUtilErrorCode.MYSQL_PRE_SQL_ERROR, "执行的SQL为:"+querySql+" 具体错误信息为：" + e);
         }
 
-        if (dataBaseType.equals(DataBaseType.Oracle)){
+        if (dataBaseType == DataBaseType.Oracle){
             throw DataXException.asDataXException(DBUtilErrorCode.ORACLE_PRE_SQL_ERROR,"执行的SQL为:"+querySql+" 具体错误信息为：" +e);
         }
         throw DataXException.asDataXException(DBUtilErrorCode.READ_RECORD_FAIL,"执行的SQL为:"+querySql+" 具体错误信息为："+e);
     }
 
     public static DataXException asPostSQLParserException(DataBaseType dataBaseType, Exception e,String querySql){
-        if (dataBaseType.equals(DataBaseType.MySql)){
+        if (dataBaseType == DataBaseType.MySql){
             throw DataXException.asDataXException(DBUtilErrorCode.MYSQL_POST_SQL_ERROR, "执行的SQL为:"+querySql+" 具体错误信息为：" + e);
         }
 
-        if (dataBaseType.equals(DataBaseType.Oracle)){
+        if (dataBaseType == DataBaseType.Oracle){
             throw DataXException.asDataXException(DBUtilErrorCode.ORACLE_POST_SQL_ERROR,"执行的SQL为:"+querySql+" 具体错误信息为：" +e);
         }
         throw DataXException.asDataXException(DBUtilErrorCode.READ_RECORD_FAIL,"执行的SQL为:"+querySql+" 具体错误信息为："+e);
     }
 
     public static DataXException asInsertPriException(DataBaseType dataBaseType, String userName,String jdbcUrl){
-        if (dataBaseType.equals(DataBaseType.MySql)){
+        if (dataBaseType == DataBaseType.MySql){
             throw DataXException.asDataXException(DBUtilErrorCode.MYSQL_INSERT_ERROR, "用户名为:"+userName+" jdbcURL为："+jdbcUrl);
         }
 
-        if (dataBaseType.equals(DataBaseType.Oracle)){
+        if (dataBaseType == DataBaseType.Oracle){
             throw DataXException.asDataXException(DBUtilErrorCode.ORACLE_INSERT_ERROR,"用户名为:"+userName+" jdbcURL为："+jdbcUrl);
         }
         throw DataXException.asDataXException(DBUtilErrorCode.NO_INSERT_PRIVILEGE,"用户名为:"+userName+" jdbcURL为："+jdbcUrl);
     }
 
     public static DataXException asDeletePriException(DataBaseType dataBaseType, String userName,String jdbcUrl){
-        if (dataBaseType.equals(DataBaseType.MySql)){
+        if (dataBaseType == DataBaseType.MySql){
             throw DataXException.asDataXException(DBUtilErrorCode.MYSQL_DELETE_ERROR, "用户名为:"+userName+" jdbcURL为："+jdbcUrl);
         }
 
-        if (dataBaseType.equals(DataBaseType.Oracle)){
+        if (dataBaseType == DataBaseType.Oracle){
             throw DataXException.asDataXException(DBUtilErrorCode.ORACLE_DELETE_ERROR,"用户名为:"+userName+" jdbcURL为："+jdbcUrl);
         }
         throw DataXException.asDataXException(DBUtilErrorCode.NO_DELETE_PRIVILEGE,"用户名为:"+userName+" jdbcURL为："+jdbcUrl);
     }
 
     public static DataXException asSplitPKException(DataBaseType dataBaseType, Exception e,String splitSql,String splitPkID){
-        if (dataBaseType.equals(DataBaseType.MySql)){
+        if (dataBaseType == DataBaseType.MySql){
 
             return DataXException.asDataXException(DBUtilErrorCode.MYSQL_SPLIT_PK_ERROR,"配置的SplitPK为: "+splitPkID+", 执行的SQL为: "+splitSql+" 具体错误信息为："+e);
         }
 
-        if (dataBaseType.equals(DataBaseType.Oracle)){
+        if (dataBaseType == DataBaseType.Oracle){
             return DataXException.asDataXException(DBUtilErrorCode.ORACLE_SPLIT_PK_ERROR,"配置的SplitPK为: "+splitPkID+", 执行的SQL为: "+splitSql+" 具体错误信息为："+e);
         }
 
