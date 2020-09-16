@@ -32,7 +32,7 @@ public enum DataBaseType {
     }
 
     public String getDriverClassName() {
-        return this.driverClassName;
+        return driverClassName;
     }
 
     public String appendJDBCSuffixForReader(String jdbc) {
@@ -97,16 +97,17 @@ public enum DataBaseType {
     public String formatPk(String splitPk) {
         String result = splitPk;
 
+        String result1 = splitPk.substring(1, splitPk.length() - 1).toLowerCase();
         switch (this) {
             case MySql:
             case Oracle:
-                if (splitPk.length() >= 2 && splitPk.startsWith("`") && splitPk.endsWith("`")) {
-                    result = splitPk.substring(1, splitPk.length() - 1).toLowerCase();
+                if (splitPk.startsWith("`") && splitPk.endsWith("`")) {
+                    result = result1;
                 }
                 break;
             case SQLServer:
-                if (splitPk.length() >= 2 && splitPk.startsWith("[") && splitPk.endsWith("]")) {
-                    result = splitPk.substring(1, splitPk.length() - 1).toLowerCase();
+                if (splitPk.startsWith("[") && splitPk.endsWith("]")) {
+                    result = result1;
                 }
                 break;
             case DB2:
@@ -118,7 +119,6 @@ public enum DataBaseType {
 
         return result;
     }
-
 
     public String quoteColumnName(String columnName) {
         String result = columnName;

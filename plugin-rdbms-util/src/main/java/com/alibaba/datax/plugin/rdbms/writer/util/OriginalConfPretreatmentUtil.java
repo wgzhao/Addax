@@ -75,7 +75,7 @@ public final class OriginalConfPretreatmentUtil {
                 throw DataXException.asDataXException(DBUtilErrorCode.REQUIRED_VALUE, "您未配置的写入数据库表的 jdbcUrl.");
             }
 
-            jdbcUrl = DATABASE_TYPE.appendJDBCSuffixForReader(jdbcUrl);
+            jdbcUrl = DATABASE_TYPE.appendJDBCSuffixForWriter(jdbcUrl);
             originalConfig.set(String.format("%s[%d].%s", Constant.CONN_MARK, i, Key.JDBC_URL),
                     jdbcUrl);
 
@@ -89,7 +89,7 @@ public final class OriginalConfPretreatmentUtil {
             // 对每一个connection 上配置的table 项进行解析
             List<String> expandedTables = TableExpandUtil.expandTableConf(tables);
 
-            if (null == expandedTables || expandedTables.isEmpty()) {
+            if (expandedTables.isEmpty()) {
                 throw DataXException.asDataXException(DBUtilErrorCode.CONF_ERROR,
                         "您配置的写入数据库表名称错误. DataX找不到您配置的表，请检查您的配置并作出修改.");
             }
@@ -112,9 +112,9 @@ public final class OriginalConfPretreatmentUtil {
             boolean isPreCheck = originalConfig.getBool(Key.DRYRUN, false);
             List<String> allColumns;
             if (isPreCheck){
-                allColumns = DBUtil.getTableColumnsByConn(DATABASE_TYPE,connectionFactory.getConnecttionWithoutRetry(), oneTable, connectionFactory.getConnectionInfo());
+                allColumns = DBUtil.getTableColumnsByConn(DATABASE_TYPE,connectionFactory.getConnecttionWithoutRetry(), oneTable);
             }else{
-                allColumns = DBUtil.getTableColumnsByConn(DATABASE_TYPE,connectionFactory.getConnecttion(), oneTable, connectionFactory.getConnectionInfo());
+                allColumns = DBUtil.getTableColumnsByConn(DATABASE_TYPE,connectionFactory.getConnecttion(), oneTable);
             }
 
             LOG.info("table:[{}] all columns:[\n{}\n].", oneTable,

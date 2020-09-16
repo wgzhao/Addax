@@ -15,12 +15,6 @@ public final class RdbmsRangeSplitWrap {
         return RdbmsRangeSplitWrap.wrapRange(tempResult, columnName, quote, dataBaseType);
     }
 
-    // warn: do not use this method long->BigInteger
-    public static List<String> splitAndWrap(long left, long right, int expectSliceNumber, String columnName) {
-        long[] tempResult = RangeSplitUtil.doLongSplit(left, right, expectSliceNumber);
-        return RdbmsRangeSplitWrap.wrapRange(tempResult, columnName);
-    }
-
     public static List<String> splitAndWrap(BigInteger left, BigInteger right, int expectSliceNumber, String columnName) {
         BigInteger[] tempResult = RangeSplitUtil.doBigIntegerSplit(left, right, expectSliceNumber);
         return RdbmsRangeSplitWrap.wrapRange(tempResult, columnName);
@@ -73,10 +67,6 @@ public final class RdbmsRangeSplitWrap {
         return String.format(" ((%s < %s%s%s) OR (%s%s%s < %s)) ", columnName, quote, quoteConstantValue(firstPoint, dataBaseType),
                 quote, quote, quoteConstantValue(lastPoint, dataBaseType), quote, columnName);
     }
-    
-    public static String wrapFirstLastPoint(Long firstPoint, Long lastPoint, String columnName) {
-        return wrapFirstLastPoint(firstPoint.toString(), lastPoint.toString(), columnName, "", null);
-    }
 
     public static String wrapFirstLastPoint(BigInteger firstPoint, BigInteger lastPoint, String columnName) {
         return wrapFirstLastPoint(firstPoint.toString(), lastPoint.toString(), columnName, "", null);
@@ -88,9 +78,9 @@ public final class RdbmsRangeSplitWrap {
             return aString;
         }
 
-        if (dataBaseType.equals(DataBaseType.MySql)) {
+        if (dataBaseType == DataBaseType.MySql) {
             return aString.replace("'", "''").replace("\\", "\\\\");
-        } else if (dataBaseType.equals(DataBaseType.Oracle) || dataBaseType.equals(DataBaseType.SQLServer)) {
+        } else if (dataBaseType == DataBaseType.Oracle || dataBaseType == DataBaseType.SQLServer) {
             return aString.replace("'", "''");
         } else {
             //TODO other type supported

@@ -26,7 +26,7 @@ public final class WriterUtil {
     public static List<Configuration> doSplit(Configuration simplifiedConf,
                                               int adviceNumber) {
 
-        List<Configuration> splitResultConfigs = new ArrayList<Configuration>();
+        List<Configuration> splitResultConfigs = new ArrayList<>();
 
         int tableNumber = simplifiedConf.getInt(Constant.TABLE_NUMBER_MARK);
 
@@ -83,7 +83,7 @@ public final class WriterUtil {
             return Collections.emptyList();
         }
 
-        List<String> renderedSqls = new ArrayList<String>();
+        List<String> renderedSqls = new ArrayList<>();
         for (String sql : preOrPostSqls) {
             //preSql为空时，不加入执行队列
             if (StringUtils.isNotBlank(sql)) {

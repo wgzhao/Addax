@@ -43,7 +43,7 @@ public class HintUtil {
 
     public static String buildQueryColumn(String jdbcUrl, String table, String column){
         try{
-            if(tablePattern != null && DataBaseType.Oracle.equals(dataBaseType)) {
+            if(tablePattern != null && DataBaseType.Oracle == dataBaseType) {
                 Matcher m = tablePattern.matcher(table);
                 if(m.find()){
                     String[] tableStr = table.split("\\.");

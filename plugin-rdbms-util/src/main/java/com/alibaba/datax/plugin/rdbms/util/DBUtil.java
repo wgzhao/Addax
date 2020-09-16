@@ -7,7 +7,6 @@ import com.alibaba.datax.plugin.rdbms.reader.Key;
 import com.alibaba.druid.sql.parser.SQLParserUtils;
 import com.alibaba.druid.sql.parser.SQLStatementParser;
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
-
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.tuple.ImmutableTriple;
 import org.apache.commons.lang3.tuple.Triple;
@@ -26,7 +25,6 @@ import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Properties;
-import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
@@ -227,7 +225,7 @@ public final class DBUtil {
                 insertStmt = connection.createStatement();
                 executeSqlWithoutResultSet(insertStmt, checkInsertPrivilegeSql);
             } catch (Exception e) {
-                if(DataBaseType.Oracle.equals(dataBaseType)) {
+                if(DataBaseType.Oracle == dataBaseType) {
                     if(e.getMessage() != null && e.getMessage().contains("insufficient privileges")) {
                         hasInsertPrivilege = false;
                         LOG.warn("User [" + userName +"] has no 'insert' privilege on table[" + tableName + "], errorMessage:[{}]", e.getMessage());
@@ -396,7 +394,6 @@ public final class DBUtil {
      * @param fetchSize     fetch size each batch
      * @param queryTimeout unit:second
      * @return ResultSet
-     * @throws SQLException
      */
     public static ResultSet query(Connection conn, String sql, int fetchSize, int queryTimeout)
             throws SQLException {
@@ -432,7 +429,6 @@ public final class DBUtil {
      * {@link ResultSet}
      *
      * @param rs {@link ResultSet} to be closed
-     * @throws IllegalArgumentException
      */
     public static void closeResultSet(ResultSet rs) {
         try {
@@ -440,11 +436,9 @@ public final class DBUtil {
                 Statement stmt = rs.getStatement();
                 if (null != stmt) {
                     stmt.close();
-                    stmt = null;
                 }
                 rs.close();
             }
-            rs = null;
         } catch (SQLException e) {
             throw new IllegalStateException(e);
         }
@@ -481,10 +475,10 @@ public final class DBUtil {
     public static List<String> getTableColumns(DataBaseType dataBaseType,
                                                String jdbcUrl, String user, String pass, String tableName) {
         Connection conn = getConnection(dataBaseType, jdbcUrl, user, pass);
-        return getTableColumnsByConn(dataBaseType, conn, tableName, "jdbcUrl:"+jdbcUrl);
+        return getTableColumnsByConn(dataBaseType, conn, tableName);
     }
 
-    public static List<String> getTableColumnsByConn(DataBaseType dataBaseType, Connection conn, String tableName, String basicMsg) {
+    public static List<String> getTableColumnsByConn(DataBaseType dataBaseType, Connection conn, String tableName) {
         List<String> columns = new ArrayList<>();
         Statement statement = null;
         ResultSet rs = null;
@@ -565,7 +559,7 @@ public final class DBUtil {
         try {
             connection = connect(dataBaseType, url, user, pass);
             if (connection != null) {
-                if (dataBaseType.equals(DataBaseType.MySql) && checkSlave) {
+                if (dataBaseType == DataBaseType.MySql && checkSlave) {
                     //dataBaseType.MySql
                     return !isSlaveBehind(connection);
                 } else {

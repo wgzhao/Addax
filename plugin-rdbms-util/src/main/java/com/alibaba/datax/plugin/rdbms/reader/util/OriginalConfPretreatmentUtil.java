@@ -114,7 +114,7 @@ public final class OriginalConfPretreatmentUtil {
 
                 List<String> expandedTables = TableExpandUtil.expandTableConf(tables);
 
-                if (null == expandedTables || expandedTables.isEmpty()) {
+                if (expandedTables.isEmpty()) {
                     throw DataXException.asDataXException(
                             DBUtilErrorCode.ILLEGAL_VALUE, String.format("您所配置的读取数据库表:%s 不正确. 因为DataX根据您的配置找不到这张表. 请检查您的配置并作出修改." +
                                     "请先了解 DataX 配置.", StringUtils.join(tables, ",")));
@@ -124,8 +124,6 @@ public final class OriginalConfPretreatmentUtil {
 
                 originalConfig.set(String.format("%s[%d].%s",
                         Constant.CONN_MARK, i, Key.TABLE), expandedTables);
-            } else {
-                // 说明是配置的 querySql 方式，不做处理.
             }
         }
 
@@ -168,7 +166,7 @@ public final class OriginalConfPretreatmentUtil {
                             tableName, StringUtils.join(allColumns, ","));
                     // warn:注意mysql表名区分大小写
                     allColumns = ListUtil.valueToLowerCase(allColumns);
-                    List<String> quotedColumns = new ArrayList<String>();
+                    List<String> quotedColumns = new ArrayList<>();
 
                     for (String column : userConfiguredColumns) {
                         if ("*".equals(column)) {
@@ -200,13 +198,11 @@ public final class OriginalConfPretreatmentUtil {
                                     String.format("您的配置文件中的列配置信息有误. 因为根据您的配置，您读取的数据库表:%s 中没有主键名为:%s. 请检查您的配置并作出修改.", tableName, splitPk));
                         }
                     }
-
                 }
             }
         } else {
             // querySql模式，不希望配制 column，那样是混淆不清晰的
-            if (null != userConfiguredColumns
-                    && userConfiguredColumns.size() > 0) {
+            if (null != userConfiguredColumns && !userConfiguredColumns.isEmpty()) {
                 LOG.warn("您的配置有误. 由于您读取数据库表采用了querySql的方式, 所以您不需要再配置 column. 如果您不想看到这条提醒，请移除您源头表中配置中的 column.");
                 originalConfig.remove(Key.COLUMN);
             }
@@ -241,9 +237,9 @@ public final class OriginalConfPretreatmentUtil {
 
         boolean isTableMode = false;
         boolean isQuerySqlMode = false;
-        for (int i = 0, len = conns.size(); i < len; i++) {
+        for (Object conn : conns) {
             Configuration connConf = Configuration
-                    .from(conns.get(i).toString());
+                    .from(conn.toString());
             table = connConf.getString(Key.TABLE, null);
             querySql = connConf.getString(Key.QUERY_SQL, null);
 
@@ -254,7 +250,7 @@ public final class OriginalConfPretreatmentUtil {
             querySqlModeFlags.add(isQuerySqlMode);
 
             if (!isTableMode && !isQuerySqlMode) {
-                // table 和 querySql 二者均未配制
+                // table 和 querySql 二者均未配置
                 throw DataXException.asDataXException(
                         DBUtilErrorCode.TABLE_QUERYSQL_MISSING, "您的配置有误. 因为table和querySql应该配置并且只能配置一个. 请检查您的配置并作出修改.");
             } else if (isTableMode && isQuerySqlMode) {

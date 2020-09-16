@@ -72,7 +72,7 @@ public enum DBUtilErrorCode implements ErrorCode {
 
     private final String description;
 
-    private DBUtilErrorCode(String code, String description) {
+    DBUtilErrorCode(String code, String description) {
         this.code = code;
         this.description = description;
     }
