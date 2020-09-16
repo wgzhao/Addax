@@ -9,12 +9,9 @@ import com.alibaba.datax.plugin.reader.dbffilereader.structure.DbfField;
 import com.alibaba.datax.plugin.reader.dbffilereader.structure.DbfHeader;
 import com.alibaba.datax.plugin.unstructuredstorage.reader.ColumnEntry;
 import com.alibaba.datax.plugin.unstructuredstorage.reader.UnstructuredStorageReaderUtil;
-
 import org.apache.commons.io.Charsets;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
-import org.apache.commons.lang3.BooleanUtils;
-import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -47,6 +44,17 @@ public class DbfFileReader extends Reader {
 
 		private Map<String, Boolean> isRegexPath;
 
+		private boolean isBlank(Object object)
+		{
+			if (null == object) {
+				return true;
+			}
+			if ((object instanceof String)){
+				return "".equals(((String)object).trim());
+			}
+			return false;
+		}
+
 		@Override
 		public void init() {
 			this.originConfig = this.getPluginJobConf();
@@ -62,7 +70,7 @@ public class DbfFileReader extends Reader {
 			// Compatible with the old version, path is a string before
 			String pathInString = this.originConfig.getNecessaryValue(Key.PATH,
 					DbfFileReaderErrorCode.REQUIRED_VALUE);
-			if (StringUtils.isBlank(pathInString)) {
+			if (isBlank(pathInString)) {
 				throw DataXException.asDataXException(
 						DbfFileReaderErrorCode.REQUIRED_VALUE,
 						"您需要指定待读取的源目录或文件");
@@ -72,7 +80,7 @@ public class DbfFileReader extends Reader {
 				path.add(pathInString);
 			} else {
 				path = this.originConfig.getList(Key.PATH, String.class);
-				if (null == path || path.size() == 0) {
+				if (null == path || path.isEmpty()) {
 					throw DataXException.asDataXException(
 							DbfFileReaderErrorCode.REQUIRED_VALUE,
 							"您需要指定待读取的源目录或文件");
@@ -83,7 +91,7 @@ public class DbfFileReader extends Reader {
 					.getString(
 							com.alibaba.datax.plugin.unstructuredstorage.reader.Key.ENCODING,
 							com.alibaba.datax.plugin.unstructuredstorage.reader.Constant.DEFAULT_ENCODING);
-			if (StringUtils.isBlank(encoding)) {
+			if (isBlank(encoding)) {
                 this.originConfig
                         .set(com.alibaba.datax.plugin.unstructuredstorage.reader.Key.ENCODING,
                                 com.alibaba.datax.plugin.unstructuredstorage.reader.Constant.DEFAULT_ENCODING);
@@ -119,7 +127,7 @@ public class DbfFileReader extends Reader {
 				List<Configuration> columns = this.originConfig
 						.getListConfiguration(com.alibaba.datax.plugin.unstructuredstorage.reader.Key.COLUMN);
 
-				if (null == columns || columns.size() == 0) {
+				if (null == columns || columns.isEmpty()) {
 					throw DataXException.asDataXException(
 							DbfFileReaderErrorCode.CONFIG_INVALID_EXCEPTION,
 							"您需要指定 columns");
@@ -230,6 +238,7 @@ public class DbfFileReader extends Reader {
 			// for eath path
 			Set<String> toBeReadFiles = new HashSet<>();
 			for (String eachPath : this.path) {
+				LOG.info("parse path {}", eachPath);
 				int endMark;
 				for (endMark = 0; endMark < eachPath.length(); endMark++) {
 					if ('*' == eachPath.charAt(endMark)
@@ -240,7 +249,7 @@ public class DbfFileReader extends Reader {
 				}
 
 				String parentDirectory;
-				if (BooleanUtils.isTrue(this.isRegexPath.get(eachPath))) {
+				if (! this.isRegexPath.isEmpty() && this.isRegexPath.containsKey(eachPath)) {
 					int lastDirSeparator = eachPath.substring(0, endMark)
 							.lastIndexOf(IOUtils.DIR_SEPARATOR);
 					parentDirectory = eachPath.substring(0,
@@ -378,6 +387,7 @@ public class DbfFileReader extends Reader {
 		public void destroy() {
 
 		}
+
 		@Override
 		public void startRead(RecordSender recordSender) {
 			LOG.debug("start read dbf files...");
@@ -388,13 +398,13 @@ public class DbfFileReader extends Reader {
 				String nullFormat = readerSliceConfig.getString(com.alibaba.datax.plugin.unstructuredstorage.reader.Key.NULL_FORMAT);
 				DbfReader reader = new DbfReader(FileUtils.getFile(fileName));
 
-				List<ColumnEntry> column = UnstructuredStorageReaderUtil
-						.getListColumnEntry(readerSliceConfig, com.alibaba.datax.plugin.unstructuredstorage.reader.Key.COLUMN);
+				List<ColumnEntry> column = UnstructuredStorageReaderUtil.getListColumnEntry(readerSliceConfig,
+						com.alibaba.datax.plugin.unstructuredstorage.reader.Key.COLUMN);
 				DbfHeader header = reader.getHeader();
-				int colnum=column.size()==0?header.getFieldsCount():column.size();
+				assert column != null;
+				int colnum= column.isEmpty() ?header.getFieldsCount():column.size();
 				Object[] row;
 				while ((row = reader.nextRecord()) != null) {
-				//if ((row = reader.nextRecord()) != null) {
 					String[] sourceLine = new String[colnum];
 					for (int i = 0; i < colnum; i++) {
 						if (column.get(i).getValue()!=null){
