@@ -39,7 +39,7 @@
 		<dependency>
 			<groupId>com.github.albfernandez</groupId>
 			<artifactId>javadbf</artifactId>
-			<version>1.11.1</version>
+			<version>1.11.2</version>
 		</dependency>
 
 		<dependency>
