@@ -26,7 +26,7 @@ public final class WriterUtil {
     public static List<Configuration> doSplit(Configuration simplifiedConf,
                                               int adviceNumber) {
 
-        List<Configuration> splitResultConfigs = new ArrayList<>();
+        List<Configuration> splitResultConfigs = new ArrayList<Configuration>();
 
         int tableNumber = simplifiedConf.getInt(Constant.TABLE_NUMBER_MARK);
 
@@ -83,7 +83,7 @@ public final class WriterUtil {
             return Collections.emptyList();
         }
 
-        List<String> renderedSqls = new ArrayList<>();
+        List<String> renderedSqls = new ArrayList<String>();
         for (String sql : preOrPostSqls) {
             //preSql为空时，不加入执行队列
             if (StringUtils.isNotBlank(sql)) {
@@ -111,8 +111,9 @@ public final class WriterUtil {
     }
 
     public static String getWriteTemplate(List<String> columnHolders, List<String> valueHolders, String writeMode, DataBaseType dataBaseType, boolean forceUseUpdate) {
-        String mode =  writeMode.trim().toLowerCase();
-        boolean isWriteModeLegal = mode.startsWith("insert") || mode.startsWith("replace") || mode.startsWith("update");
+        boolean isWriteModeLegal = writeMode.trim().toLowerCase().startsWith("insert")
+                || writeMode.trim().toLowerCase().startsWith("replace")
+                || writeMode.trim().toLowerCase().startsWith("update");
 
         if (!isWriteModeLegal) {
             throw DataXException.asDataXException(DBUtilErrorCode.ILLEGAL_VALUE,
@@ -121,24 +122,26 @@ public final class WriterUtil {
         // && writeMode.trim().toLowerCase().startsWith("replace")
         String writeDataSqlTemplate;
         if (forceUseUpdate ||
-                (dataBaseType == DataBaseType.MySql && mode.startsWith("update"))
+                (dataBaseType == DataBaseType.MySql && writeMode.trim().toLowerCase().startsWith("update"))
                 ) {
             //update只在mysql下使用
 
-            writeDataSqlTemplate = "INSERT INTO %s (" + StringUtils.join(columnHolders, ",") +
-                    ") VALUES(" + StringUtils.join(valueHolders, ",") +
-                    ")" +
-                    onDuplicateKeyUpdateString(columnHolders);
+            writeDataSqlTemplate = new StringBuilder()
+                    .append("INSERT INTO %s (").append(StringUtils.join(columnHolders, ","))
+                    .append(") VALUES(").append(StringUtils.join(valueHolders, ","))
+                    .append(")")
+                    .append(onDuplicateKeyUpdateString(columnHolders))
+                    .toString();
         } else {
 
             //这里是保护,如果其他错误的使用了update,需要更换为replace
-            if (mode.startsWith("update")) {
+            if (writeMode.trim().toLowerCase().startsWith("update")) {
                 writeMode = "replace";
             }
-            writeDataSqlTemplate = writeMode +
-                    " INTO %s (" + StringUtils.join(columnHolders, ",") +
-                    ") VALUES(" + StringUtils.join(valueHolders, ",") +
-                    ")";
+            writeDataSqlTemplate = new StringBuilder().append(writeMode)
+                    .append(" INTO %s (").append(StringUtils.join(columnHolders, ","))
+                    .append(") VALUES(").append(StringUtils.join(valueHolders, ","))
+                    .append(")").toString();
         }
 
         return writeDataSqlTemplate;
@@ -176,7 +179,7 @@ public final class WriterUtil {
         List<String> renderedPreSqls = WriterUtil.renderPreOrPostSqls(
                 preSqls, table);
 
-        if (!renderedPreSqls.isEmpty()) {
+        if (null != renderedPreSqls && !renderedPreSqls.isEmpty()) {
             LOG.info("Begin to preCheck preSqls:[{}].",
                     StringUtils.join(renderedPreSqls, ";"));
             for(String sql : renderedPreSqls) {
@@ -198,7 +201,7 @@ public final class WriterUtil {
                 String.class);
         List<String> renderedPostSqls = WriterUtil.renderPreOrPostSqls(
                 postSqls, table);
-        if (!renderedPostSqls.isEmpty()) {
+        if (null != renderedPostSqls && !renderedPostSqls.isEmpty()) {
 
             LOG.info("Begin to preCheck postSqls:[{}].",
                     StringUtils.join(renderedPostSqls, ";"));
