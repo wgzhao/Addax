@@ -3,7 +3,12 @@ package com.alibaba.datax.plugin.rdbms.writer.util;
 import com.alibaba.datax.common.exception.DataXException;
 import com.alibaba.datax.common.util.Configuration;
 import com.alibaba.datax.common.util.ListUtil;
-import com.alibaba.datax.plugin.rdbms.util.*;
+import com.alibaba.datax.plugin.rdbms.util.ConnectionFactory;
+import com.alibaba.datax.plugin.rdbms.util.DBUtil;
+import com.alibaba.datax.plugin.rdbms.util.DBUtilErrorCode;
+import com.alibaba.datax.plugin.rdbms.util.DataBaseType;
+import com.alibaba.datax.plugin.rdbms.util.JdbcConnectionFactory;
+import com.alibaba.datax.plugin.rdbms.util.TableExpandUtil;
 import com.alibaba.datax.plugin.rdbms.writer.Constant;
 import com.alibaba.datax.plugin.rdbms.writer.Key;
 import org.apache.commons.lang3.StringUtils;
@@ -82,8 +87,7 @@ public final class OriginalConfPretreatmentUtil {
             }
 
             // 对每一个connection 上配置的table 项进行解析
-            List<String> expandedTables = TableExpandUtil
-                    .expandTableConf(DATABASE_TYPE, tables);
+            List<String> expandedTables = TableExpandUtil.expandTableConf(tables);
 
             if (null == expandedTables || expandedTables.isEmpty()) {
                 throw DataXException.asDataXException(DBUtilErrorCode.CONF_ERROR,
@@ -163,10 +167,6 @@ public final class OriginalConfPretreatmentUtil {
         }
 
         boolean forceUseUpdate = false;
-        //ob10的处理
-        if (dataBaseType == DataBaseType.MySql && isOB10(jdbcUrl)) {
-            forceUseUpdate = true;
-        }
 
         String writeDataSqlTemplate = WriterUtil.getWriteTemplate(columns, valueHolders, writeMode,dataBaseType, forceUseUpdate);
 
@@ -174,19 +174,4 @@ public final class OriginalConfPretreatmentUtil {
 
         originalConfig.set(Constant.INSERT_OR_REPLACE_TEMPLATE_MARK, writeDataSqlTemplate);
     }
-
-    public static boolean isOB10(String jdbcUrl) {
-        //ob10的处理
-        if (jdbcUrl.startsWith(com.alibaba.datax.plugin.rdbms.writer.Constant.OB10_SPLIT_STRING)) {
-            String[] ss = jdbcUrl.split(com.alibaba.datax.plugin.rdbms.writer.Constant.OB10_SPLIT_STRING_PATTERN);
-            if (ss.length != 3) {
-                throw DataXException
-                        .asDataXException(
-                                DBUtilErrorCode.JDBC_OB10_ADDRESS_ERROR, "JDBC OB10格式错误，请联系askdatax");
-            }
-            return true;
-        }
-        return false;
-    }
-
 }

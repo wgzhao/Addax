@@ -24,10 +24,9 @@ public final class TableExpandUtil {
 	 *            a string contains table name(one or many).
 	 * @return a split result of table name.
 	 *         <p/>
-	 *         TODO 删除参数 DataBaseType
 	 */
-	public static List<String> splitTables(DataBaseType dataBaseType,
-			String tables) {
+	public static List<String> splitTables(String tables)
+	{
 		List<String> splittedTables = new ArrayList<>();
 
 		String[] tableArrays = tables.split(",");
@@ -68,11 +67,10 @@ public final class TableExpandUtil {
 		return splittedTables;
 	}
 
-	public static List<String> expandTableConf(DataBaseType dataBaseType,
-			List<String> tables) {
+	public static List<String> expandTableConf(List<String> tables) {
 		List<String> parsedTables = new ArrayList<>();
 		for (String table : tables) {
-			List<String> splittedTables = splitTables(dataBaseType, table);
+			List<String> splittedTables = splitTables(table);
 			parsedTables.addAll(splittedTables);
 		}
 
