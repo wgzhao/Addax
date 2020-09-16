@@ -478,7 +478,6 @@ public class CommonRdbmsWriter {
                     break;
 
                 case Types.TIMESTAMP:
-                case -151: // 兼容老的SQLServer版本的datetime数据类型
                     java.sql.Timestamp sqlTimestamp = null;
                     try {
                         utilDate = column.asDate();
