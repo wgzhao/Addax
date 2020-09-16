@@ -208,20 +208,6 @@ public class CommonRdbmsWriter {
             this.password = writerSliceConfig.getString(Key.PASSWORD);
             this.jdbcUrl = writerSliceConfig.getString(Key.JDBC_URL);
 
-            //ob10的处理
-            if (this.jdbcUrl.startsWith(Constant.OB10_SPLIT_STRING) && this.dataBaseType == DataBaseType.MySql) {
-                String[] ss = this.jdbcUrl.split(Constant.OB10_SPLIT_STRING_PATTERN);
-                if (ss.length != 3) {
-                    throw DataXException
-                            .asDataXException(
-                                    DBUtilErrorCode.JDBC_OB10_ADDRESS_ERROR, "JDBC OB10格式错误，请联系datax");
-                }
-                LOG.info("this is ob1_0 jdbc url.");
-                this.username = ss[1].trim() + ":" + this.username;
-                this.jdbcUrl = ss[2];
-                LOG.info("this is ob1_0 jdbc url. user=" + this.username + " :url=" + this.jdbcUrl);
-            }
-
             this.table = writerSliceConfig.getString(Key.TABLE);
 
             this.columns = writerSliceConfig.getList(Key.COLUMN, String.class);
@@ -492,6 +478,7 @@ public class CommonRdbmsWriter {
                     break;
 
                 case Types.TIMESTAMP:
+                case -151: // 兼容老的SQLServer版本的datetime数据类型
                     java.sql.Timestamp sqlTimestamp = null;
                     try {
                         utilDate = column.asDate();
@@ -549,10 +536,6 @@ public class CommonRdbmsWriter {
                 }
 
                 boolean forceUseUpdate = false;
-                //ob10的处理
-                if (dataBaseType != null && dataBaseType == DataBaseType.MySql && OriginalConfPretreatmentUtil.isOB10(jdbcUrl)) {
-                    forceUseUpdate = true;
-                }
 
                 INSERT_OR_REPLACE_TEMPLATE = WriterUtil.getWriteTemplate(columns, valueHolders, writeMode, dataBaseType, forceUseUpdate);
                 writeRecordSql = String.format(INSERT_OR_REPLACE_TEMPLATE, this.table);
