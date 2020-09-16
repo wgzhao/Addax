@@ -29,3 +29,7 @@
 ### General
 
 * Does not parse the `-m` command line argument, it doesn't really do anything!
+
+### SQLServer reader
+
+* Add support for `datetime` data type with old SQLServer edition
