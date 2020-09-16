@@ -149,20 +149,6 @@ public class CommonRdbmsReader {
             this.password = readerSliceConfig.getString(Key.PASSWORD);
             this.jdbcUrl = readerSliceConfig.getString(Key.JDBC_URL);
 
-            //ob10的处理
-            if (this.jdbcUrl.startsWith(com.alibaba.datax.plugin.rdbms.writer.Constant.OB10_SPLIT_STRING) && this.dataBaseType == DataBaseType.MySql) {
-                String[] ss = this.jdbcUrl.split(com.alibaba.datax.plugin.rdbms.writer.Constant.OB10_SPLIT_STRING_PATTERN);
-                if (ss.length != 3) {
-                    throw DataXException
-                            .asDataXException(
-                                    DBUtilErrorCode.JDBC_OB10_ADDRESS_ERROR, "JDBC OB10格式错误，请联系askdatax");
-                }
-                LOG.info("this is ob1_0 jdbc url.");
-                this.username = ss[1].trim() +":"+this.username;
-                this.jdbcUrl = ss[2];
-                LOG.info("this is ob1_0 jdbc url. user=" + this.username + " :url=" + this.jdbcUrl);
-            }
-
             this.mandatoryEncoding = readerSliceConfig.getString(Key.MANDATORY_ENCODING, "");
 
             basicMsg = String.format("jdbcUrl:[%s]", this.jdbcUrl);
@@ -299,6 +285,7 @@ public class CommonRdbmsReader {
                         break;
 
                     case Types.TIMESTAMP:
+                    case -151: // 兼容老的SQLServer版本的datetime数据类型
                         record.addColumn(new DateColumn(rs.getTimestamp(i)));
                         break;
 

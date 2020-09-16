@@ -11,7 +11,7 @@ import org.slf4j.LoggerFactory;
 import redis.clients.jedis.Client;
 import redis.clients.jedis.Jedis;
 import redis.clients.jedis.exceptions.JedisDataException;
-import redis.clients.util.JedisClusterCRC16;
+import redis.clients.jedis.util.JedisClusterCRC16;
 
 import java.net.URI;
 import java.util.Collections;
@@ -70,7 +70,7 @@ public class RedisWriter extends Writer {
             boolean isCluster = pluginJobConf.getBool("redisCluster", false);
             int timeout = pluginJobConf.getInt("timeout", 60000);
             this.batchSize = pluginJobConf.getLong("batchSize", 1000L);
-            if (connections.size() == 0) {
+            if (connections.isEmpty()) {
                 throw new RuntimeException("请添加redis 连接");
             } else {
                 Map connection = (Map) connections.get(0);
@@ -261,7 +261,7 @@ public class RedisWriter extends Writer {
          *
          */
         private void flushAndCheckReply(Client client) {
-            List<Object> allReply = client.getAll();
+            List<Object> allReply = client.getObjectMultiBulkReply();
             for (Object o : allReply) {
                 if (o instanceof JedisDataException) {
                     throw (JedisDataException) o;
