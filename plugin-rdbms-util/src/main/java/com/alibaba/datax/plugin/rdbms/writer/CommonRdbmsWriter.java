@@ -437,8 +437,8 @@ public class CommonRdbmsWriter {
 
                 // for mysql bug, see http://bugs.mysql.com/bug.php?id=35115
                 case Types.DATE:
-                    if (this.resultSetMetaData.getRight().get(columnIndex)
-                            .equalsIgnoreCase("year")) {
+                    if ("year"
+                            .equalsIgnoreCase(this.resultSetMetaData.getRight().get(columnIndex))) {
                         if (column.asBigInteger() == null) {
                             preparedStatement.setString(columnIndex + 1, null);
                         } else {
@@ -513,13 +513,11 @@ public class CommonRdbmsWriter {
                             .asDataXException(
                                     DBUtilErrorCode.UNSUPPORTED_TYPE,
                                     String.format(
-                                            "您的配置文件中的列配置信息有误. 因为DataX 不支持数据库写入这种字段类型. 字段名:[%s], 字段类型:[%d], 字段Java类型:[%s]. 请修改表中该字段的类型或者不同步该字段.",
-                                            this.resultSetMetaData.getLeft()
-                                                    .get(columnIndex),
-                                            this.resultSetMetaData.getMiddle()
-                                                    .get(columnIndex),
-                                            this.resultSetMetaData.getRight()
-                                                    .get(columnIndex)));
+                                            "您的配置文件中的列配置信息有误. 因为DataX 不支持数据库写入这种字段类型. 字段名:[%s], " +
+                                                    "字段SQL类型编号:[%d], 字段Java类型:[%s]. 请修改表中该字段的类型或者不同步该字段.",
+                                            this.resultSetMetaData.getLeft().get(columnIndex),
+                                            this.resultSetMetaData.getMiddle().get(columnIndex),
+                                            this.resultSetMetaData.getRight().get(columnIndex)));
             }
             return preparedStatement;
         }
