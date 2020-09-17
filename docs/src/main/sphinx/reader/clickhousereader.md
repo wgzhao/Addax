@@ -1,21 +1,10 @@
+# ClickHouse Reader 
 
-# ClickHouseReader 插件文档
+`ClickHouseReader` 插件支持从 [ClickHouse](https://clickhouse.tech)数据库读取数据。
 
-## 1 快速介绍
+## 配置
 
-ClickHouseReader插件实现了从ClickHouse读取数据。在底层实现上，ClickHouseReader通过JDBC连接远程ClickHouse数据库，并执行相应的sql语句将数据从ClickHouse库中SELECT出来。
-
-## 2 实现原理
-
-简而言之，ClickHouseReader通过JDBC连接器连接到远程的ClickHouse数据库，并根据用户配置的信息生成查询SELECT SQL语句，然后发送到远程ClickHouse数据库，并将该SQL执行返回结果使用DataX自定义的数据类型拼装为抽象的数据集，并传递给下游Writer处理。
-
-对于用户配置Table、Column、Where的信息，ClickHouseReader将其拼接为SQL语句发送到ClickHouse数据库；对于用户配置querySql信息，ClickHouseReader直接将其发送到ClickHouse数据库。
-
-## 3 功能说明
-
-### 3.1 配置样例
-
-配置一个从ClickHouse数据库同步抽取数据到本地的作业:
+下面的配置文件表示从 ClickHouse 数据库读取指定的表数据并打印到终端
 
 ```json
 {
@@ -36,19 +25,12 @@ ClickHouseReader插件实现了从ClickHouse读取数据。在底层实现上，
                     "parameter": {
                         "username": "root",
                         "password": "root",
-                        "column": [
-                            "id",
-                            "name"
-                        ],
-                        "splitPk": "db_id",
+                        "column": ["*"],
+                        "splitPk": "",
                         "connection": [
                             {
-                                "table": [
-                                    "table"
-                                ],
-                                "jdbcUrl": [
-     "jdbc:clickhouse://127.0.0.1:8123/default"
-                                ]
+                                "table": [ "tbl"],
+                                "jdbcUrl": [ "jdbc:clickhouse://127.0.0.1:8123/default"]
                             }
                         ]
                     }
@@ -66,7 +48,9 @@ ClickHouseReader插件实现了从ClickHouse读取数据。在底层实现上，
 
 ```
 
-### 3.2 参数说明
+## 参数说明
+
+`parameter` 配置项支持以下配置
 
 | 配置项          | 是否必须 | 默认值 |   描述          |
 | :-------------- | :------: | ------ |-------------|
@@ -80,7 +64,7 @@ ClickHouseReader插件实现了从ClickHouse读取数据。在底层实现上，
 | where           |    否    | 无     | 筛选条件 |
 | querySql        |    否    | 无     | 使用SQL查询而不是直接指定表的方式读取数据，当用户配置querySql时，ClickHouseReader直接忽略table、column、where条件的配置 |
 
-### 3.3 类型转换
+## 支持的数据类型
 
 目前ClickHouseReader支持大部分ClickHouse类型，但也存在部分个别类型没有支持的情况，请注意检查你的类型。
 
@@ -95,6 +79,7 @@ ClickHouseReader插件实现了从ClickHouse读取数据。在底层实现上，
 | Boolean  |UInt8 |
 | Bytes    |String|
 
-请注意:
+
+## 限制
 
 除上述罗列字段类型外，其他类型均不支持，如Array、Nested等

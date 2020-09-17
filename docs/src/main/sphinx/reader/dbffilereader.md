@@ -1,32 +1,10 @@
-# DataX DbfFileReader 说明
+# DbfFile Reader
 
-## 1 快速介绍
+`DbfFileReader` 插件支持读取DBF格式文件
 
-DbfFileReader。在底层实现上，DbfFileReader，并转换为DataX传输协议传递给Writer。
+## 配置说明
 
-**本地文件内容存放的是一张逻辑意义上的二维表，例如dbf格式的文件信息。**
-
-## 2 功能与限制
-
-DbfFileReader，本地文件本身是无结构化数据存储，对于DataX而言，DbfFileReader，有诸多相似之处。目前DbfFileReader支持功能如下：
-
-1. 支持且仅支持读取dbf的文件。
-
-2. 支持递归读取、支持文件名过滤。
-
-3. 支持文件压缩，现有压缩格式为zip、gzip、bzip2。
-
-4. 多个File可以支持并发读取。
-
-我们暂时不能做到：
-
-1. 单个DBF支持多线程并发读取，这里涉及到单个DBF内部切分算法。二期考虑支持。
-
-2. 单个DBF在压缩情况下，从技术上无法支持多线程并发读取。
-
-## 3 功能说明
-
-### 3.1 配置样例
+以下是读取 DBF 文件后打印到终端的配置样例
 
 ```json
 {
@@ -71,7 +49,7 @@ DbfFileReader，本地文件本身是无结构化数据存储，对于DataX而�
                             "type": "string"
                         }
                     ],
-                    "path": "/tmp/test.dbf",
+                    "path": ["/tmp/test.dbf"],
                     "encoding": "GBK"
                 }
             },
@@ -87,7 +65,9 @@ DbfFileReader，本地文件本身是无结构化数据存储，对于DataX而�
 }
 ```
 
-### 3.2 参数说明
+## 参数说明
+
+`parameter` 配置项支持以下配置
 
 | 配置项           | 是否必须 | 默认值       |    描述    |
 | :--------------- | :------: | ------------ |-------------|
@@ -98,7 +78,7 @@ DbfFileReader，本地文件本身是无结构化数据存储，对于DataX而�
 | nullFormat   |    否    | `\N`         | 定义哪个字符串可以表示为null, |
 | dbversion |    否    | 无 | 指定DBF文件版本，不指定则自动猜测 |
 
-#### path
+### path
 
 描述：本地文件系统的路径信息，注意这里可以支持填写多个路径。 
 
@@ -126,17 +106,19 @@ dbfFileReader目前只支持 `*` 作为文件通配符。
 ```json
 {
     "type": "long",
-    "index": 0    //从本地DBF文件第一列获取int字段
+    "index": 0   
 },
 {
     "type": "string",
-    "value": "alibaba"  //从dbfFileReader内部生成alibaba的字符串字段作为当前字段
+    "value": "alibaba"  
 }
 ```
 
+`index: 0` 表示从本地DBF文件第一列获取int字段
+`value: alibaba` 表示从dbfFileReader内部生成alibaba的字符串字段作为当前字段
 对于用户指定Column信息，type必须填写，index/value必须选择其一。
 
-### 3.3 类型转换
+### 支持的数据类型
 
 本地文件本身提供数据类型，该类型是DataX dbfFileReader定义：
 
