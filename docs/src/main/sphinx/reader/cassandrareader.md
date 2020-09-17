@@ -1,22 +1,10 @@
+# Cassandra Reader
 
-# CassandraReader 插件文档
+`CassandraReader` 插件实现了从[Cassandra](https://cassandra.apache.org) 读取数据。
 
+## 配置
 
-## 1 快速介绍
-
-CassandraReader插件实现了从Cassandra读取数据。在底层实现上，CassandraReader通过datastax的java driver连接Cassandra实例，并执行相应的cql语句将数据从cassandra中SELECT出来。
-
-## 2 实现原理
-
-简而言之，CassandraReader通过java driver连接到Cassandra实例，并根据用户配置的信息生成查询SELECT CQL语句，然后发送到Cassandra，并将该CQL执行返回结果使用DataX自定义的数据类型拼装为抽象的数据集，并传递给下游Writer处理。
-
-对于用户配置Table、Column的信息，CassandraReader将其拼接为CQL语句发送到Cassandra。
-
-## 3 功能说明
-
-### 3.1 配置样例
-
-配置一个从Cassandra同步抽取数据到本地的作业:
+下面是配置一个从 Cassandra 读取数据到终端的例子
 
 ```json
 {
@@ -57,9 +45,9 @@ CassandraReader插件实现了从Cassandra读取数据。在底层实现上，Ca
                             "durationCol",
                             "listCol",
                             "mapCol",
-                            "setCol"
-                            "tupleCol"
-                            "udtCol",
+                            "setCol",
+                            "tupleCol",
+                            "udtCol"
                         ]
                     }
                },
@@ -73,10 +61,11 @@ CassandraReader插件实现了从Cassandra读取数据。在底层实现上，Ca
         ]
     }
 }
-
 ```
 
-### 3.2 参数说明
+## 参数说明
+
+`parameter` 配置项支持以下配置
 
 | 配置项           | 是否必须 | 默认值       |    描述    |
 | :--------------- | :------: | ------------ |-------------|
@@ -92,11 +81,11 @@ CassandraReader插件实现了从Cassandra读取数据。在底层实现上，Ca
 | allowFiltering   |    否    | 无           | 是否在服务端过滤数据，详细描述参考官方文档的[相关描述](https://cassandra.apache.org/doc/latest/cql/dml.html#allowing-filtering) |
 | consistancyLevel |    否    | LOCAL_QUORUM | 数据一致性级别, 可选 `ONE|QUORUM|LOCAL_QUORUM|EACH_QUORUM|ALL|ANY|TWO|THREE|LOCAL_ONE`  
 
-### 3.3 类型转换
+### 支持的数据类型
 
-目前CassandraReader支持除counter和Custom类型之外的所有类型。
+目前支持除 `counter` 和 `Custom` 类型之外的所有类型。
 
-下面列出CassandraReader针对Cassandra类型转换列表:
+下面列出 `CassandraReader` 针对 `Cassandra` 类型转换列表:
 
 | DataX 内部类型 | Cassandra 数据类型                                                     |
 | -------------- | ---------------------------------------------------------------------- |
@@ -106,7 +95,3 @@ CassandraReader插件实现了从Cassandra读取数据。在底层实现上，Ca
 | Date           | date, timestamp                                                        |
 | Boolean        | bool                                                                   |
 | Bytes          | blob                                                                   |
-
-请注意:
-
-目前不支持counter类型和custom类型。

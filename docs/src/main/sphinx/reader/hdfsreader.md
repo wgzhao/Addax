@@ -226,7 +226,7 @@ Kerberos认证 keytab文件路径，绝对路径
 常见配置：
 
 ```json
-"csvReaderConfig":{
+"csvReaderConfig": {
         "safetySwitch": false,
         "skipEmptyRecords": false,
         "useTextQualifier": false
@@ -235,7 +235,7 @@ Kerberos认证 keytab文件路径，绝对路径
 
 所有配置项及默认值,配置时 csvReaderConfig 的map中请 **严格按照以下字段名字进行配置**：
 
-```java
+```
 boolean caseSensitive = true;
 char textQualifier = 34;
 boolean trimWhitespace = true;
@@ -301,7 +301,7 @@ Hive在建表的时候，可以指定分区partition，例如创建分区partiti
  需要在json的reader里增加如下配置
 
  ```json
- "csvReaderConfig":{
+ "csvReaderConfig": {
 	"safetySwitch": false,
 	"skipEmptyRecords": false,
 	"useTextQualifier": false

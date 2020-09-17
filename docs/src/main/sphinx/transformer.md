@@ -222,7 +222,7 @@ String code3 = "Column column = record.getColumn(1);\n" +
                     },
                     {
                         "name": "dx_groovy",
-                          "parameter":
+                          "parameter": {
                                "code": "//groovy code//",  
                                "extraPackage":[
                                "import somePackage1;",
