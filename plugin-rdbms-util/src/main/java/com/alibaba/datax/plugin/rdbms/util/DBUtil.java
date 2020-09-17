@@ -41,10 +41,10 @@ public final class DBUtil {
     private DBUtil() {
     }
 
-    public static String chooseJdbcUrl(final DataBaseType dataBaseType,
-                                       final List<String> jdbcUrls, final String username,
-                                       final String password, final List<String> preSql,
-                                       final boolean checkSlave) {
+    public static String chooseJdbcUrl(DataBaseType dataBaseType,
+                                       List<String> jdbcUrls, String username,
+                                       String password, List<String> preSql,
+                                       boolean checkSlave) {
 
         if (null == jdbcUrls || jdbcUrls.isEmpty()) {
             throw DataXException.asDataXException(

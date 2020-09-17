@@ -110,10 +110,10 @@ public final class WriterUtil {
         }
     }
 
-    public static String getWriteTemplate(List<String> columnHolders, List<String> valueHolders, String writeMode, DataBaseType dataBaseType, boolean forceUseUpdate) {
-        boolean isWriteModeLegal = writeMode.trim().toLowerCase().startsWith("insert")
-                || writeMode.trim().toLowerCase().startsWith("replace")
-                || writeMode.trim().toLowerCase().startsWith("update");
+    public static String getWriteTemplate(List<String> columnHolders, List<String> valueHolders,
+                                        String writeMode, DataBaseType dataBaseType, boolean forceUseUpdate) {
+        String mode = writeMode.trim().toLowerCase();
+        boolean isWriteModeLegal = mode.startsWith("insert")  || mode.startsWith("replace") || mode.startsWith("update");
 
         if (!isWriteModeLegal) {
             throw DataXException.asDataXException(DBUtilErrorCode.ILLEGAL_VALUE,
@@ -122,26 +122,24 @@ public final class WriterUtil {
         // && writeMode.trim().toLowerCase().startsWith("replace")
         String writeDataSqlTemplate;
         if (forceUseUpdate ||
-                (dataBaseType == DataBaseType.MySql && writeMode.trim().toLowerCase().startsWith("update"))
+                (dataBaseType == DataBaseType.MySql && mode.startsWith("update"))
                 ) {
             //update只在mysql下使用
 
-            writeDataSqlTemplate = new StringBuilder()
-                    .append("INSERT INTO %s (").append(StringUtils.join(columnHolders, ","))
-                    .append(") VALUES(").append(StringUtils.join(valueHolders, ","))
-                    .append(")")
-                    .append(onDuplicateKeyUpdateString(columnHolders))
-                    .toString();
+            writeDataSqlTemplate = "INSERT INTO %s (" + StringUtils.join(columnHolders, ",") +
+                    ") VALUES(" + StringUtils.join(valueHolders, ",") +
+                    ")" +
+                    onDuplicateKeyUpdateString(columnHolders);
         } else {
 
             //这里是保护,如果其他错误的使用了update,需要更换为replace
-            if (writeMode.trim().toLowerCase().startsWith("update")) {
+            if (mode.startsWith("update")) {
                 writeMode = "replace";
             }
-            writeDataSqlTemplate = new StringBuilder().append(writeMode)
-                    .append(" INTO %s (").append(StringUtils.join(columnHolders, ","))
-                    .append(") VALUES(").append(StringUtils.join(valueHolders, ","))
-                    .append(")").toString();
+            writeDataSqlTemplate = writeMode +
+                    " INTO %s (" + StringUtils.join(columnHolders, ",") +
+                    ") VALUES(" + StringUtils.join(valueHolders, ",") +
+                    ")";
         }
 
         return writeDataSqlTemplate;
@@ -179,7 +177,7 @@ public final class WriterUtil {
         List<String> renderedPreSqls = WriterUtil.renderPreOrPostSqls(
                 preSqls, table);
 
-        if (null != renderedPreSqls && !renderedPreSqls.isEmpty()) {
+        if (!renderedPreSqls.isEmpty()) {
             LOG.info("Begin to preCheck preSqls:[{}].",
                     StringUtils.join(renderedPreSqls, ";"));
             for(String sql : renderedPreSqls) {
@@ -201,7 +199,7 @@ public final class WriterUtil {
                 String.class);
         List<String> renderedPostSqls = WriterUtil.renderPreOrPostSqls(
                 postSqls, table);
-        if (null != renderedPostSqls && !renderedPostSqls.isEmpty()) {
+        if (!renderedPostSqls.isEmpty()) {
 
             LOG.info("Begin to preCheck postSqls:[{}].",
                     StringUtils.join(renderedPostSqls, ";"));
