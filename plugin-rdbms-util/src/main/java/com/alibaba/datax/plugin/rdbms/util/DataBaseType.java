@@ -10,7 +10,7 @@ import java.util.regex.Pattern;
  * <p/>
  */
 public enum DataBaseType {
-    MySql("mysql", "com.mysql.cj.jdbc.Driver"),
+    MySql("mysql", "com.mysql.jdbc.Driver"),
     Hive("hive2", "org.apache.hive.jdbc.HiveDriver"),
     Oracle("oracle", "oracle.jdbc.OracleDriver"),
     Presto("presto", "io.prestosql.jdbc.PrestoDriver"),

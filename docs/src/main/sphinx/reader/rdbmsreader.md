@@ -1,22 +1,18 @@
-# RDBMSReader 插件文档
+# RDBMS Reader
 
-## 1 快速介绍
+RDBMSReader 插件支持从传统 RDBMS 读取数据。这是一个通用关系数据库读取插件，可以通过注册数据库驱动等方式支持更多关系数据库读取。
 
-RDBMSReader插件实现了从RDBMS读取数据。在底层实现上，RDBMSReader通过JDBC连接远程RDBMS数据库，并执行相应的sql语句将数据从RDBMS库中SELECT出来。目前支持[db2](https://www.ibm.com/products/db2-database)、[presto](https://prestosql.io) 数据库的读取。
+同时 RDBMS Reader 又是其他关系型数据库读取插件的的基础类。以下读取插件均依赖该插件
 
-RDBMSReader是一个通用的关系数据库读插件，您可以通过注册数据库驱动等方式增加任意多样的关系数据库读支持。
+- Oracle Reader
+- MySQL Reader
+- PostgreSQL Reader
+- ClickHouse Reader
+- SQLServer Reader
 
-## 2 实现原理
+## 配置说明
 
-简而言之，RDBMSReader通过JDBC连接器连接到远程的RDBMS数据库，并根据用户配置的信息生成查询SELECT SQL语句并发送到远程RDBMS数据库，并将该SQL执行返回结果使用DataX自定义的数据类型拼装为抽象的数据集，并传递给下游Writer处理。
-
-对于用户配置Table、Column、Where的信息，RDBMSReader将其拼接为SQL语句发送到RDBMS数据库；对于用户配置querySql信息，RDBMS直接将其发送到RDBMS数据库。
-
-## 3 功能说明
-
-### 3.1 配置样例
-
-配置一个从RDBMS数据库同步抽取数据作业:
+以下配置展示了如何从 Presto 数据库读取数据到终端
 
 ```json
 {
@@ -35,21 +31,19 @@ RDBMSReader是一个通用的关系数据库读插件，您可以通过注册数
                 "reader": {
                     "name": "rdbmsreader",
                     "parameter": {
-                        "username": "xxx",
-                        "passflag": "true",
-                        "password": "xxx",
+                        "username": "hive",
+                        "passflag": "false",
+                        "password": "",
                         "column": [
-                            "id",
-                            "name"
+                            "*"
                         ],
-                        "splitPk": "pk",
                         "connection": [
                             {
                                 "table": [
-                                    "table"
+                                    "default.table"
                                 ],
                                 "jdbcUrl": [
-                                    "jdbc:dm://ip:port/database"
+                                    "jdbc:presto://127.0.0.1:8080/hive"
                                 ]
                             }
                         ],
@@ -70,7 +64,9 @@ RDBMSReader是一个通用的关系数据库读插件，您可以通过注册数
 
 ```
 
-### 3.2 参数说明
+## 参数说明
+
+`parameter` 配置项支持以下配置
 
 | 配置项          | 是否必须 | 默认值 |         描述   |
 | :-------------- | :------: | ------ |------------- |
@@ -84,6 +80,25 @@ RDBMSReader是一个通用的关系数据库读插件，您可以通过注册数
 | where           |    否    | 无     | 针对表的筛选条件 |
 | querySql        |    否    | 无     | 使用自定义的SQL而不是指定表来获取数据，当配置了这一项之后，DataX系统就会忽略 `table`，`column`这些配置项 |
 | fetchSize       |    否    | 1024   |  定义了插件和数据库服务器端每次批量数据获取条数，调高该值可能导致 DataX 出现OOM |
+
+
+### jdbcUrl
+
+`jdbcUrl` 配置除了配置必要的信息外，我们还可以在增加每种特定驱动的特定配置属性，这里特别提到我们可以利用配置属性对代理的支持从而实现通过代理访问数据库的功能。
+比如对于 PrestoSQL 数据库的 JDBC 驱动而言，支持 `socksProxy` 参数，于是上述配置的 `jdbcUrl` 可以修改为 
+
+`jdbc:presto://127.0.0.1:8080/hive?socksProxy=192.168.1.101:1081` 
+
+大部分关系型数据库的 JDBC 驱动支持 `socksProxyHost,socksProxyPort` 参数来支持代理访问。也有一些特别的情况。
+
+以下是各类数据库 JDBC 驱动所支持的代理类型以及配置方式
+
+| 数据库 | 代理类型    | 代理配置                       |   例子        |
+| ------| ----------| -----------------------------|--------------------|
+| MySQL | socks     | socksProxyHost,socksProxyPort | `socksProxyHost=192.168.1.101&socksProxyPort=1081` |
+| Presto | socks    | socksProxy   | `socksProxy=192.168.1.101:1081` |
+| Presto | http     | httpProxy   | `httpProxy=192.168.1.101:3128` |
+
 
 #### column
 

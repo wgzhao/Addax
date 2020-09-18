@@ -1,18 +1,17 @@
-# RDBMSWriter 插件文档
+# RDBMS Writer 
 
-## 1 快速介绍
+RDBMSWriter 插件支持从传统 RDBMS 读取数据。这是一个通用关系数据库读取插件，可以通过注册数据库驱动等方式支持更多关系数据库读取。
 
-RDBMSWriter 插件实现了写入数据到 RDBMS 主库的目的表的功能。在底层实现上， RDBMSWriter 通过 JDBC 连接远程 RDBMS 数据库，并执行相应的 insert into ... 的 sql 语句将数据写入 RDBMS。 RDBMSWriter是一个通用的关系数据库写插件，您可以通过注册数据库驱动等方式增加任意多样的关系数据库写支持。
+同时 RDBMS Writer 又是其他关系型数据库读取插件的的基础类。以下读取插件均依赖该插件
 
-RDBMSWriter 面向ETL开发工程师，他们使用 RDBMSWriter 从数仓导入数据到 RDBMS。同时 RDBMSWriter 亦可以作为数据迁移工具为DBA等用户提供服务。
+- Oracle Writer
+- MySQL Writer
+- PostgreSQL Writer
+- ClickHouse Writer
+- SQLServer Writer
 
-## 2 实现原理
 
-RDBMSWriter 通过 DataX 框架获取 Reader 生成的协议数据，RDBMSWriter 通过 JDBC 连接远程 RDBMS 数据库，并执行相应的 `insert into ...` 的 sql 语句将数据写入 RDBMS。
-
-## 3 功能说明
-
-### 3.1 配置样例
+## 配置说明
 
 配置一个写入RDBMS的作业。
 
@@ -119,6 +118,19 @@ RDBMSWriter 通过 DataX 框架获取 Reader 生成的协议数据，RDBMSWriter
 
 Column必须显示填写，不允许为空！
 
-### 3.3 类型转换
+### jdbcUrl
 
-目前RDBMSReader支持大部分通用得关系数据库类型如数字、字符等，但也存在部分个别类型没有支持的情况，请注意检查你的类型，根据具体的数据库做选择。
+`jdbcUrl` 配置除了配置必要的信息外，我们还可以在增加每种特定驱动的特定配置属性，这里特别提到我们可以利用配置属性对代理的支持从而实现通过代理访问数据库的功能。
+比如对于 PrestoSQL 数据库的 JDBC 驱动而言，支持 `socksProxy` 参数，比如一个可能的 `jdbcUrl` 为 
+
+`jdbc:presto://127.0.0.1:8080/hive?socksProxy=192.168.1.101:1081` 
+
+大部分关系型数据库的 JDBC 驱动支持 `socksProxyHost,socksProxyPort` 参数来支持代理访问。也有一些特别的情况。
+
+以下是各类数据库 JDBC 驱动所支持的代理类型以及配置方式
+
+| 数据库 | 代理类型    | 代理配置                       |   例子        |
+| ------| ----------| -----------------------------|--------------------|
+| MySQL | socks     | socksProxyHost,socksProxyPort | `socksProxyHost=192.168.1.101&socksProxyPort=1081` |
+| Presto | socks    | socksProxy   | `socksProxy=192.168.1.101:1081` |
+| Presto | http     | httpProxy   | `httpProxy=192.168.1.101:3128` |
