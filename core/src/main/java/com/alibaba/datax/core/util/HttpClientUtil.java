@@ -10,10 +10,7 @@ import org.apache.http.auth.AuthScope;
 import org.apache.http.auth.UsernamePasswordCredentials;
 import org.apache.http.client.CredentialsProvider;
 import org.apache.http.client.config.RequestConfig;
-import org.apache.http.client.methods.HttpDelete;
 import org.apache.http.client.methods.HttpGet;
-import org.apache.http.client.methods.HttpPost;
-import org.apache.http.client.methods.HttpPut;
 import org.apache.http.client.methods.HttpRequestBase;
 import org.apache.http.impl.client.BasicCredentialsProvider;
 import org.apache.http.impl.client.CloseableHttpClient;
@@ -31,7 +28,7 @@ public class HttpClientUtil {
 
     private CloseableHttpClient httpClient;
 
-    private volatile static HttpClientUtil clientUtil;
+    private static HttpClientUtil clientUtil;
 
     //构建httpclient的时候一定要设置这两个参数。淘宝很多生产故障都由此引起
     private static int HTTP_TIMEOUT_INMILLIONSECONDS = 5000;
@@ -99,18 +96,6 @@ public class HttpClientUtil {
 
     public static HttpGet getGetRequest() {
         return new HttpGet();
-    }
-
-    public static HttpPost getPostRequest() {
-        return new HttpPost();
-    }
-
-    public static HttpPut getPutRequest() {
-        return new HttpPut();
-    }
-
-    public static HttpDelete getDeleteRequest() {
-        return new HttpDelete();
     }
 
     public String executeAndGet(HttpRequestBase httpRequestBase) throws Exception {

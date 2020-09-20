@@ -14,9 +14,11 @@ import com.alibaba.datax.core.util.ExceptionTracker;
 import com.alibaba.datax.core.util.FrameworkErrorCode;
 import com.alibaba.datax.core.util.container.CoreConstant;
 import com.alibaba.datax.core.util.container.LoadUtil;
-import org.apache.commons.cli.BasicParser;
+import jdk.nashorn.internal.runtime.ParserException;
+import org.apache.commons.cli.DefaultParser;
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.Options;
+import org.apache.commons.cli.ParseException;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -76,7 +78,7 @@ public class Engine {
         try {
             priority = Integer.parseInt(System.getenv("SKYNET_PRIORITY"));
         }catch (NumberFormatException e){
-            LOG.warn("prioriy set to 0, because NumberFormatException, the value is: "+System.getProperty("PROIORY"));
+            LOG.warn("prioriy set to 0, because NumberFormatException, the value is: {} ", System.getProperty("PROIORY"));
         }
 
         Configuration jobInfoConfig = allConf.getConfiguration(CoreConstant.DATAX_JOB_JOBINFO);
@@ -113,56 +115,61 @@ public class Engine {
         return configuration;
     }
 
-    public static void entry(final String[] args) throws Throwable {
+    public static void entry(final String[] args)
+    {
         Options options = new Options();
         options.addOption("job", true, "Job config.");
         options.addOption("jobid", true, "Job unique id.");
         options.addOption("mode", true, "Job runtime mode.");
 
-        BasicParser parser = new BasicParser();
-        CommandLine cl = parser.parse(options, args);
+        try {
+            DefaultParser parser = new DefaultParser();
+            CommandLine cl = parser.parse(options, args);
 
-        String jobPath = cl.getOptionValue("job");
+            String jobPath = cl.getOptionValue("job");
 
-        Configuration configuration = ConfigParser.parse(jobPath);
-        // jobid 默认值为-1
-        configuration.set(CoreConstant.DATAX_CORE_CONTAINER_JOB_ID, -1);
-        // 默认运行模式
-        configuration.set(CoreConstant.DATAX_CORE_CONTAINER_JOB_MODE, "standalone");
+            Configuration configuration = ConfigParser.parse(jobPath);
+            // jobid 默认值为-1
+            configuration.set(CoreConstant.DATAX_CORE_CONTAINER_JOB_ID, -1);
+            // 默认运行模式
+            configuration.set(CoreConstant.DATAX_CORE_CONTAINER_JOB_MODE, "standalone");
 
-        //打印vmInfo
-        VMInfo vmInfo = VMInfo.getVmInfo();
-        if (vmInfo != null) {
-            LOG.info(vmInfo.toString());
+            //打印vmInfo
+            VMInfo vmInfo = VMInfo.getVmInfo();
+            if (vmInfo != null) {
+                LOG.info(vmInfo.toString());
+            }
+
+            LOG.info("\n{}\n", Engine.filterJobConfiguration(configuration));
+
+            LOG.debug(configuration.toJSON());
+
+            ConfigurationValidate.doValidate(configuration);
+            Engine engine = new Engine();
+            engine.start(configuration);
+        } catch (ParseException e) {
+            throw new ParserException(e.getMessage());
+        } catch (DataXException e) {
+            throw new DataXException(e.getErrorCode(), e.getMessage());
         }
-
-        LOG.info("\n" + Engine.filterJobConfiguration(configuration) + "\n");
-
-        LOG.debug(configuration.toJSON());
-
-        ConfigurationValidate.doValidate(configuration);
-        Engine engine = new Engine();
-        engine.start(configuration);
     }
 
     public static void main(String[] args) {
         int exitCode = 0;
+        if (args.length < 2) {
+            LOG.error("need a job file");
+            System.exit(1);
+        }
         try {
             Engine.entry(args);
-        } catch (Throwable e) {
-            exitCode = 1;
-            LOG.error("\n\n经DataX智能分析,该任务最可能的错误原因是:\n" + ExceptionTracker.trace(e));
-
-            if (e instanceof DataXException) {
-                DataXException tempException = (DataXException) e;
-                ErrorCode errorCode = tempException.getErrorCode();
+        }
+        catch(DataXException e) {
+                ErrorCode errorCode = e.getErrorCode();
                 if (errorCode instanceof FrameworkErrorCode) {
                     FrameworkErrorCode tempErrorCode = (FrameworkErrorCode) errorCode;
                     exitCode = tempErrorCode.toExitValue();
+                    System.exit(exitCode);
                 }
-            }
-
-            System.exit(exitCode);
         }
         System.exit(exitCode);
     }

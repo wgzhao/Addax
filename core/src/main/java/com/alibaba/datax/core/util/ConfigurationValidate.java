@@ -9,6 +9,8 @@ import org.apache.commons.lang.Validate;
  * 对配置文件做整体检查
  */
 public class ConfigurationValidate {
+
+    private ConfigurationValidate() {};
     public static void doValidate(Configuration allConfig) {
         Validate.isTrue(allConfig!=null, "");
 
