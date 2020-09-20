@@ -5,8 +5,8 @@ package com.alibaba.datax.core.util;
  */
 public class ClassSize {
 
-    public static  final int DefaultRecordHead;
-    public static  final int ColumnHead;
+    public static final int DEFAULT_RECORD_HEAD;
+    public static final int COLUMN_HEAD;
 
     //objectHead的大小
     public static final int REFERENCE;
@@ -25,10 +25,11 @@ public class ClassSize {
         ARRAYLIST = align(OBJECT + align(REFERENCE) + align(ARRAY) +
                 (2 * Long.SIZE / Byte.SIZE));
         // 8+64+8
-        DefaultRecordHead = align(align(REFERENCE) + ClassSize.ARRAYLIST + 2 * Integer.SIZE / Byte.SIZE);
+        DEFAULT_RECORD_HEAD = align(align(REFERENCE) + ClassSize.ARRAYLIST + 2 * Integer.SIZE / Byte.SIZE);
         //16+4
-        ColumnHead = align(2 * REFERENCE + Integer.SIZE / Byte.SIZE);
+        COLUMN_HEAD = align(2 * REFERENCE + Integer.SIZE / Byte.SIZE);
     }
+    private ClassSize() {}
 
     public static int align(int num) {
         return (int)(align((long)num));
