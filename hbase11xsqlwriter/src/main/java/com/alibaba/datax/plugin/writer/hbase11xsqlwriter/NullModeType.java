@@ -9,7 +9,7 @@ public enum NullModeType {
     Empty("empty")
     ;
 
-    private String mode;
+    private final String mode;
 
 
     NullModeType(String mode) {

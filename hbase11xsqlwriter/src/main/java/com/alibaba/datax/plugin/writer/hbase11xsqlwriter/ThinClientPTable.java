@@ -4,8 +4,6 @@ import org.apache.hadoop.hbase.io.ImmutableBytesWritable;
 import org.apache.phoenix.hbase.index.util.KeyValueBuilder;
 import org.apache.phoenix.index.IndexMaintainer;
 import org.apache.phoenix.jdbc.PhoenixConnection;
-import org.apache.phoenix.schema.AmbiguousColumnException;
-import org.apache.phoenix.schema.ColumnFamilyNotFoundException;
 import org.apache.phoenix.schema.ColumnNotFoundException;
 import org.apache.phoenix.schema.PColumn;
 import org.apache.phoenix.schema.PColumnFamily;
@@ -19,6 +17,7 @@ import org.apache.phoenix.schema.RowKeySchema;
 import org.apache.phoenix.schema.SortOrder;
 import org.apache.phoenix.schema.types.PDataType;
 import org.apache.phoenix.transaction.TransactionFactory;
+
 import java.util.List;
 import java.util.Map;
 
@@ -91,17 +90,17 @@ public class ThinClientPTable implements PTable {
   }
 
   @Override
-  public PColumnFamily getColumnFamily(byte[] bytes) throws ColumnFamilyNotFoundException {
+  public PColumnFamily getColumnFamily(byte[] bytes) {
     throw new UnsupportedOperationException("Not implement");
   }
 
   @Override
-  public PColumnFamily getColumnFamily(String s) throws ColumnFamilyNotFoundException {
+  public PColumnFamily getColumnFamily(String s) {
     throw new UnsupportedOperationException("Not implement");
   }
 
   @Override
-  public PColumn getColumnForColumnName(String colname) throws ColumnNotFoundException, AmbiguousColumnException {
+  public PColumn getColumnForColumnName(String colname) throws ColumnNotFoundException {
     if (!colMap.containsKey(colname)) {
       throw new ColumnNotFoundException("Col " + colname + " not found");
     }
@@ -109,13 +108,12 @@ public class ThinClientPTable implements PTable {
   }
 
   @Override
-  public PColumn getColumnForColumnQualifier(byte[] bytes, byte[] bytes1)
-      throws ColumnNotFoundException, AmbiguousColumnException {
+  public PColumn getColumnForColumnQualifier(byte[] bytes, byte[] bytes1) {
     throw new UnsupportedOperationException("Not implement");
   }
 
   @Override
-  public PColumn getPKColumn(String s) throws ColumnNotFoundException {
+  public PColumn getPKColumn(String s) {
     throw new UnsupportedOperationException("Not implement");
   }
 
@@ -313,12 +311,9 @@ public class ThinClientPTable implements PTable {
   }
   public static class ThinClientPColumn implements PColumn {
 
-    private String colName;
-
-    private PDataType pDataType;
+    private final PDataType pDataType;
 
     public ThinClientPColumn(String colName, PDataType pDataType) {
-      this.colName = colName;
       this.pDataType = pDataType;
     }
 

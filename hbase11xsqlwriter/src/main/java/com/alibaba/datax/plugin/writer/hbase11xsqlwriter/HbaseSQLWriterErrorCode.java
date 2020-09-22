@@ -14,12 +14,11 @@ public enum HbaseSQLWriterErrorCode implements ErrorCode {
     DELETE_HBASE_ERROR("Hbasewriter-08", "delete hbase表时发生异常."),
     TRUNCATE_HBASE_ERROR("Hbasewriter-09", "truncate hbase表时发生异常."),
     KERBEROS_LOGIN_ERROR("HbaseWriter-10", "KERBEROS认证失败");
-    ;
 
     private final String code;
     private final String description;
 
-    private HbaseSQLWriterErrorCode(String code, String description) {
+    HbaseSQLWriterErrorCode(String code, String description) {
         this.code = code;
         this.description = description;
     }

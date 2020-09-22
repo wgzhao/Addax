@@ -35,7 +35,7 @@ public class HbaseSQLWriter extends Writer {
 
         @Override
         public List<Configuration> split(int mandatoryNumber) {
-            List<Configuration> splitResultConfigs = new ArrayList<Configuration>();
+            List<Configuration> splitResultConfigs = new ArrayList<>();
             for (int j = 0; j < mandatoryNumber; j++) {
                 splitResultConfigs.add(config.getOriginalConfig().clone());
             }
@@ -49,18 +49,17 @@ public class HbaseSQLWriter extends Writer {
     }
 
     public static class Task extends Writer.Task {
-        private Configuration taskConfig;
         private HbaseSQLWriterTask hbaseSQLWriterTask;
 
         @Override
         public void init() {
-            this.taskConfig = super.getPluginJobConf();
-            this.hbaseSQLWriterTask = new HbaseSQLWriterTask(this.taskConfig);
+            Configuration taskConfig = getPluginJobConf();
+            this.hbaseSQLWriterTask = new HbaseSQLWriterTask(taskConfig);
         }
 
         @Override
         public void startWrite(RecordReceiver lineReceiver) {
-            this.hbaseSQLWriterTask.startWriter(lineReceiver, super.getTaskPluginCollector());
+            this.hbaseSQLWriterTask.startWriter(lineReceiver, getTaskPluginCollector());
         }
 
 
