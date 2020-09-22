@@ -72,7 +72,6 @@ public class HbaseSQLWriterConfig {
 
     /**
      *
-     * @return
      */
     public NullModeType getNullMode() {
         return nullMode;
@@ -120,8 +119,8 @@ public class HbaseSQLWriterConfig {
         return kerberosPrincipal;
     }
     /**
-     * @param dataxCfg
-     * @return
+     * @param dataxCfg datax configuration json
+     * @return hbase writer class
      */
     public static HbaseSQLWriterConfig parse(Configuration dataxCfg) {
         assert dataxCfg != null;
@@ -146,7 +145,7 @@ public class HbaseSQLWriterConfig {
         cfg.kerberosKeytabFilePath = dataxCfg.getString(Key.KERBEROS_KEYTAB_FILE_PATH, Constant.DEFAULT_KERBEROS_KEYTAB_FILE_PATH);
 
         // 4. 打印解析出来的配置
-        LOG.info("HBase SQL writer config parsed:" + cfg.toString());
+        LOG.info("HBase SQL writer config parsed:" + cfg);
 
         return cfg;
     }
@@ -204,20 +203,24 @@ public class HbaseSQLWriterConfig {
                     "HBase的zookeeper.znode.parent配置不能为空，请联系HBase PE获取该信息.");
             }
 
-            // 生成sql使用的连接字符串， 格式： jdbc:phoenix:zk_quorum:2181:/znode_parent
-            cfg.connectionString = "jdbc:phoenix:" + zkQuorum + ":2181:" + znode;
+            // 生成sql使用的连接字符串， 格式： jdbc:phoenix:zk_quorum:[:port]:/znode_parent
+            cfg.connectionString = "jdbc:phoenix:" + zkQuorum + ":" + znode;
         }
     }
 
     private static void parseTableConfig(HbaseSQLWriterConfig cfg, Configuration dataxCfg) {
         // 解析并检查表名
         cfg.tableName = dataxCfg.getString(Key.TABLE);
+//        if (cfg.tableName.contains(".")) {
+//            cfg.namespace = cfg.tableName.split("\\.")[0];
+//            cfg.tableName = cfg.tableName.split("\\.")[1];
+//        }
         if (cfg.tableName == null || cfg.tableName.isEmpty()) {
             throw DataXException.asDataXException(
                     HbaseSQLWriterErrorCode.ILLEGAL_VALUE, "HBase的tableName配置不能为空,请检查并修改配置.");
         }
         try {
-            TableName tn = TableName.valueOf(cfg.tableName);
+            TableName.valueOf(cfg.tableName);
         } catch (Exception e) {
             throw DataXException.asDataXException(
                     HbaseSQLWriterErrorCode.ILLEGAL_VALUE,

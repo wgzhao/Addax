@@ -62,11 +62,15 @@ public class HbaseSQLHelper {
         assert hbaseCfgString != null;
         Map<String, String> hbaseConfigMap = JSON.parseObject(hbaseCfgString, new TypeReference<Map<String, String>>() {});
         String zkQuorum = hbaseConfigMap.get(Key.HBASE_ZK_QUORUM);
+        // 如果没有提供Zookeeper端口，则使用默认端口
+        if (! zkQuorum.contains(":")) {
+            zkQuorum = zkQuorum + ":2181";
+        }
         String znode = hbaseConfigMap.get(Key.HBASE_ZNODE_PARENT);
         if (znode == null || znode.isEmpty()) {
             znode = Constant.DEFAULT_ZNODE;
         }
-        return new Pair<String, String>(zkQuorum, znode);
+        return new Pair<>(zkQuorum, znode);
     }
 
     public static Map<String, String> getThinConnectConfig(String hbaseCfgString) {
@@ -85,7 +89,7 @@ public class HbaseSQLHelper {
         checkTable(conn, cfg.getNamespace(), cfg.getTableName(), cfg.isThinClient());
 
         // 校验元数据：配置中给出的列必须是目的表中已经存在的列
-        PTable schema = null;
+        PTable schema;
         try {
             schema = getTableSchema(conn, cfg.getNamespace(), cfg.getTableName(), cfg.isThinClient());
         } catch (SQLException e) {
@@ -156,27 +160,22 @@ public class HbaseSQLHelper {
 
     /**
      * 创建 thin client jdbc连接
-     * @param cfg
-     * @return
-     * @throws SQLException
+     * @param cfg hbase configuration string
+     * @return Connection
+     * @throws SQLException sql connection exception
      */
     public static Connection getThinClientJdbcConnection(HbaseSQLWriterConfig cfg) throws SQLException {
         String connStr = cfg.getConnectionString();
         LOG.info("Connecting to HBase cluster [" + connStr + "] use thin client ...");
         Connection conn = DriverManager.getConnection(connStr, cfg.getUsername(), cfg.getPassword());
         String userNamespaceQuery = "use " + cfg.getNamespace();
-        Statement statement = null;
-        try {
-          statement = conn.createStatement();
-          statement.executeUpdate(userNamespaceQuery);
-          return conn;
-        } catch (Exception e) {
-          throw DataXException.asDataXException(HbaseSQLWriterErrorCode.GET_HBASE_CONNECTION_ERROR,
-              "无法连接配置的namespace, 请检查配置 或者 联系 HBase 管理员.", e);
-        } finally {
-          if (statement != null) {
-            statement.close();
-          }
+        try (Statement statement = conn.createStatement()) {
+            statement.executeUpdate(userNamespaceQuery);
+            return conn;
+        }
+        catch (Exception e) {
+            throw DataXException.asDataXException(HbaseSQLWriterErrorCode.GET_HBASE_CONNECTION_ERROR,
+                    "无法连接配置的namespace, 请检查配置 或者 联系 HBase 管理员.", e);
         }
     }
 
@@ -196,12 +195,12 @@ public class HbaseSQLHelper {
 
     /**
      *  获取一张表的元数据信息
-     * @param conn
-     * @param namespace
-     * @param fullTableName
+     * @param conn phoenix connection
+     * @param namespace hbase table's namespace
+     * @param fullTableName hbase full-qualtity table name
      * @param isThinClient  是否使用thin client
      * @return 表的元数据
-     * @throws SQLException
+     * @throws SQLException exception
      */
     public static PTable getTableSchema(Connection conn, String namespace, String fullTableName, boolean isThinClient)
         throws
@@ -211,15 +210,10 @@ public class HbaseSQLHelper {
             return getTableSchema(conn, fullTableName);
         } else {
             if (ptable == null) {
-                ResultSet result = conn.getMetaData().getColumns(null, namespace, fullTableName, null);
-                try {
+                try (ResultSet result = conn.getMetaData().getColumns(null, namespace, fullTableName, null)) {
                     ThinClientPTable retTable = new ThinClientPTable();
                     retTable.setColTypeMap(parseColType(result));
                     ptable = retTable;
-                }finally {
-                    if (result != null) {
-                        result.close();
-                    }
                 }
             }
             return ptable;
@@ -229,13 +223,12 @@ public class HbaseSQLHelper {
 
     /**
      * 解析字段
-     * @param rs
-     * @return
-     * @throws SQLException
+     * @param rs Resultset
+     * @return Map pair
+     * @throws SQLException exception
      */
     public static Map<String, ThinClientPTable.ThinClientPColumn>  parseColType(ResultSet rs) throws SQLException {
-        Map<String, ThinClientPTable.ThinClientPColumn> cols = new HashMap<String, ThinClientPTable
-            .ThinClientPColumn>();
+        Map<String, ThinClientPTable.ThinClientPColumn> cols = new HashMap<>();
         ResultSetMetaData md = rs.getMetaData();
         int columnCount = md.getColumnCount();
 
@@ -243,9 +236,9 @@ public class HbaseSQLHelper {
             String colName  = null;
             PDataType colType = null;
             for (int i = 1; i <= columnCount; i++) {
-                if (md.getColumnLabel(i).equals("TYPE_NAME")) {
+                if ("TYPE_NAME".equals(md.getColumnLabel(i))) {
                     colType = PDataType.fromSqlTypeName((String) rs.getObject(i));
-                } else if (md.getColumnLabel(i).equals("COLUMN_NAME")) {
+                } else if ("COLUMN_NAME".equals(md.getColumnLabel(i))) {
                     colName = (String) rs.getObject(i);
                 }
             }
@@ -262,12 +255,12 @@ public class HbaseSQLHelper {
      * 清空表
      */
     public static void truncateTable(Connection conn, String tableName) {
-        PhoenixConnection sqlConn = null;
+        PhoenixConnection sqlConn;
         Admin admin = null;
         try {
             sqlConn = conn.unwrap(PhoenixConnection.class);
             admin = sqlConn.getQueryServices().getAdmin();
-            TableName hTableName = TableName.valueOf(tableName);
+            TableName hTableName = getTableName(tableName);
             // 确保表存在、可用
             checkTable(admin, hTableName);
             // 清空表
@@ -287,18 +280,12 @@ public class HbaseSQLHelper {
 
     /**
      * 检查表
-     * @param conn
-     * @param namespace
-     * @param tableName
-     * @param isThinClient
-     * @throws DataXException
      */
     public static void checkTable(Connection conn, String namespace, String tableName, boolean isThinClient)
         throws DataXException {
+        //ignore check table when use thin client
         if (!isThinClient) {
             checkTable(conn, tableName);
-        } else {
-            //ignore check table when use thin client
         }
     }
 
@@ -307,20 +294,17 @@ public class HbaseSQLHelper {
      * 检查表：表要存在，enabled
      */
     public static void checkTable(Connection conn, String tableName) throws DataXException {
-        PhoenixConnection sqlConn = null;
+        PhoenixConnection sqlConn;
         Admin admin = null;
         try {
             sqlConn = conn.unwrap(PhoenixConnection.class);
             admin = sqlConn.getQueryServices().getAdmin();
-            TableName hTableName = TableName.valueOf(tableName);
-            checkTable(admin, hTableName);
-        } catch (SQLException t) {
+            checkTable(admin, getTableName(tableName));
+        } catch (SQLException | IOException t) {
             throw DataXException.asDataXException(HbaseSQLWriterErrorCode.TRUNCATE_HBASE_ERROR,
                     "表" + tableName + "状态检查未通过，请检查您的集群和表状态 或者 联系 Hbase 管理员.", t);
-        } catch (IOException t) {
-            throw DataXException.asDataXException(HbaseSQLWriterErrorCode.TRUNCATE_HBASE_ERROR,
-                    "表" + tableName + "状态检查未通过，请检查您的集群和表状态 或者 联系 Hbase 管理员.", t);
-        } finally {
+        }
+        finally {
             if (admin != null) {
                 closeAdmin(admin);
             }
@@ -330,16 +314,17 @@ public class HbaseSQLHelper {
     private static void checkTable(Admin admin, TableName tableName) throws IOException {
         if(!admin.tableExists(tableName)){
             throw DataXException.asDataXException(HbaseSQLWriterErrorCode.ILLEGAL_VALUE,
-                    "HBase目的表" + tableName.toString() + "不存在, 请检查您的配置 或者 联系 Hbase 管理员.");
+                    "HBase目的表" + tableName + "不存在, 请检查您的配置 或者 联系 Hbase 管理员.");
         }
         if(!admin.isTableAvailable(tableName)){
             throw DataXException.asDataXException(HbaseSQLWriterErrorCode.ILLEGAL_VALUE,
-                    "HBase目的表" + tableName.toString() + "不可用, 请检查您的配置 或者 联系 Hbase 管理员.");
+                    "HBase目的表" + tableName + "不可用, 请检查您的配置 或者 联系 Hbase 管理员.");
         }
         if(admin.isTableDisabled(tableName)){
             throw DataXException.asDataXException(HbaseSQLWriterErrorCode.ILLEGAL_VALUE,
-                    "HBase目的表" + tableName.toString() + "不可用, 请检查您的配置 或者 联系 Hbase 管理员.");
+                    "HBase目的表" + tableName + "不可用, 请检查您的配置 或者 联系 Hbase 管理员.");
         }
+        LOG.info("table {} exists", tableName);
     }
 
     private static void closeAdmin(Admin admin){
@@ -349,5 +334,15 @@ public class HbaseSQLHelper {
         } catch (IOException e) {
             throw DataXException.asDataXException(HbaseSQLWriterErrorCode.CLOSE_HBASE_AMIN_ERROR, e);
         }
+    }
+
+    /*
+    * 如果是phoenix风格的表名，则需要替换成hbase风格
+     */
+    private static TableName getTableName(String tableName) {
+        if (tableName.contains(".")) {
+            tableName = tableName.replace(".",":");
+        }
+        return TableName.valueOf(tableName);
     }
 }

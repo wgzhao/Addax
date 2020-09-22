@@ -15,7 +15,7 @@
     <properties>
         <phoenix.version>4.14.3-HBase-1.4</phoenix.version>
         <commons-codec.version>1.15</commons-codec.version>
-        <protobuf.version>3.13.0</protobuf.version>
+        <protobuf.version>2.5.0</protobuf.version>
         <httpclient.version>4.5.2</httpclient.version>
     </properties>
 
@@ -35,7 +35,7 @@
         <dependency>
             <groupId>com.google.protobuf</groupId>
             <artifactId>protobuf-java</artifactId>
-            <version>${protobuf.version}</version>
+            <version>2.5.0</version>
         </dependency>
 
         <dependency>
@@ -44,16 +44,22 @@
             <version>${commons-codec.version}</version>
         </dependency>
 
+<!--        <dependency>-->
+<!--            <groupId>io.prestosql.hadoop</groupId>-->
+<!--            <artifactId>hadoop-apache</artifactId>-->
+<!--            <version>${hadoop.version}</version>-->
+<!--        </dependency>-->
+
         <dependency>
-            <groupId>io.prestosql.hadoop</groupId>
-            <artifactId>hadoop-apache</artifactId>
-            <version>${hadoop.version}</version>
+            <groupId>org.apache.commons</groupId>
+            <artifactId>commons-lang3</artifactId>
+            <version>${commons.lang3.version}</version>
         </dependency>
 
         <dependency>
-            <groupId>org.apache.httpcomponents</groupId>
-            <artifactId>httpclient</artifactId>
-            <version>${httpclient.version}</version>
+            <groupId>org.apache.hbase</groupId>
+            <artifactId>hbase-shaded-client</artifactId>
+            <version>1.4.12</version>
         </dependency>
 
         <dependency>
@@ -75,7 +81,5 @@
         </dependency>
 
     </dependencies>
-
-
 
 </project>

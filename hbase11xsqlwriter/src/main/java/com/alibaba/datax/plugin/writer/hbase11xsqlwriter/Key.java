@@ -24,7 +24,6 @@ public final class Key {
      * 【必选】列配置
      */
     public final static String COLUMN = "column";
-    public static final String NAME = "name";
 
     /**
      * 【可选】遇到空值默认跳过

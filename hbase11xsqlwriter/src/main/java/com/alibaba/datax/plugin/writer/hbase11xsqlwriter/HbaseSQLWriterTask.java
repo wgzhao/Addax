@@ -27,14 +27,13 @@ public class HbaseSQLWriterTask {
     private final static Logger LOG = LoggerFactory.getLogger(HbaseSQLWriterTask.class);
 
     private TaskPluginCollector taskPluginCollector;
-    private HbaseSQLWriterConfig cfg;
+    private final HbaseSQLWriterConfig cfg;
     private Connection connection = null;
     private PreparedStatement ps = null;
     // 需要向hbsae写入的列的数量,即用户配置的column参数中列的个数。时间戳不包含在内
     private int numberOfColumnsToWrite;
     // 期待从源头表的Record中拿到多少列
     private int numberOfColumnsToRead;
-    private boolean needExplicitVersion = false;
     private int[] columnTypes;
 
     public HbaseSQLWriterTask(Configuration configuration) {
@@ -137,7 +136,7 @@ public class HbaseSQLWriterTask {
     /**
      * 单行提交，将出错的行记录到脏数据中。由脏数据收集模块判断任务是否继续
      */
-    private void doSingleUpsert(List<Record> records) throws SQLException {
+    private void doSingleUpsert(List<Record> records)  {
         for (com.alibaba.datax.common.element.Record r : records) {
             try {
                 setupStatement(r);
@@ -179,7 +178,7 @@ public class HbaseSQLWriterTask {
 
         // 生成UPSERT模板
         String tableName = cfg.getTableName();
-        StringBuilder upsertBuilder = null;
+        StringBuilder upsertBuilder;
         if (cfg.isThinClient()) {
             upsertBuilder = new StringBuilder("upsert into " + tableName + " (" + columnNames + " ) values (");
         } else {
@@ -340,7 +339,7 @@ public class HbaseSQLWriterTask {
 
             case Types.INTEGER:
             case Constant.TYPE_UNSIGNED_INTEGER:
-                return (int) 0;
+                return 0;
 
             case Types.BIGINT:
             case Constant.TYPE_UNSIGNED_LONG:
@@ -350,7 +349,7 @@ public class HbaseSQLWriterTask {
                 return (float) 0.0;
 
             case Types.DOUBLE:
-                return (double) 0.0;
+                return 0.0;
 
             case Types.DECIMAL:
                 return new BigDecimal(0);
