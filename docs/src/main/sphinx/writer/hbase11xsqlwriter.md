@@ -69,7 +69,7 @@ HBase11xsqlwriter实现了向hbase中的SQL表(phoenix)批量导入数据的功�
             "kerberosPrincipal": "hive@EXAMPLE.COM",
             "kerberosKeytabFilePath": "/tmp/hive.headless.keytab",
             "hbaseConfig": {
-                "hbase.zookeeper.quorum": "node1,node2,node3",
+                "hbase.zookeeper.quorum": "node1,node2,node3:2181",
                 "zookeeper.znode.parent": "/hbase-secure"
               },
             "nullMode": "skip",
@@ -91,7 +91,7 @@ HBase11xsqlwriter实现了向hbase中的SQL表(phoenix)批量导入数据的功�
 
 | 配置项                 | 是否必须 | 默认值 | 描述                                                                                                          |
 | :--------------------- | :------: | ------ | ----------------------------------------------------------------------------------------------------------|
-| hbaseConfig            |    是    | 无     | hbase集群地址，zk为必填项，格式：`ip1,ip2,ip3`，znode是可选的，默认值是 `/hbase`                                    |
+| hbaseConfig            |    是    | 无     | hbase集群地址，zk为必填项，格式：`ip1,ip2,ip3[:port]`，znode是可选的，默认值是 `/hbase`                                    |
 | table                  |    是    | 无     | 要导入的表名，大小写敏感，通常phoenix表都是**大写**表名                                                             |
 | column                 |    是    | 无     | 列名，大小写敏感，通常phoenix的列名都是**大写**,数据类型无需填写,会自动获取列                                       |
 | batchSize              |    否    | 256    | 一次写入的最大记录数                                                                                                |
