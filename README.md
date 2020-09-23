@@ -39,9 +39,183 @@
 7. 绝大部分依赖包升级到了最新稳定版本，减少了潜在漏洞
 8. 不同插件下的相同依赖包做了版本统一
 
+## 快速开始
+
+### 编译
+
+因 `assembly` 配置文件还在调整，所以编译打包需要分两部分走
+
+```shell
+git clone https://github.com/wgzhao/datax.git DataX
+cd DataX
+mvn clean package
+mvn package assembly:assembly
+```
+
+### 开始第一个任务
+
+编译打包成功后，会在项目目录的`target/datax` 目录下创建一个 `datax-<version>`的 文件夹，其中 `<version` 表示版本。
+
+该目录的 `job` 子目录包含了大量的任务样本，其中 `job.json` 可以作为冒烟测试，执行如下
+
+```shell
+cd target/datax/datax-<version>
+bin/datax.py job/job.json
+```
+
+上述命令的输出大致如下：
+
+```
+ bin/datax.py job/job.json
+
+DataX (DATAX-V3), From Alibaba !
+Copyright (C) 2010-2017, Alibaba Group. All Rights Reserved.
+
+
+2020-09-23 19:51:30.990 [main] INFO  VMInfo - VMInfo# operatingSystem class => sun.management.OperatingSystemImpl
+2020-09-23 19:51:30.997 [main] INFO  Engine - the machine info  =>
+
+	osInfo:	Oracle Corporation 1.8 25.181-b13
+	jvmInfo:	Mac OS X x86_64 10.15.6
+	cpu num:	4
+
+	totalPhysicalMemory:	-0.00G
+	freePhysicalMemory:	-0.00G
+	maxFileDescriptorCount:	-1
+	currentOpenFileDescriptorCount:	-1
+
+	GC Names	[PS MarkSweep, PS Scavenge]
+
+	MEMORY_NAME                    | allocation_size                | init_size
+	PS Eden Space                  | 677.50MB                       | 16.00MB
+	Code Cache                     | 240.00MB                       | 2.44MB
+	Compressed Class Space         | 1,024.00MB                     | 0.00MB
+	PS Survivor Space              | 2.50MB                         | 2.50MB
+	PS Old Gen                     | 1,365.50MB                     | 43.00MB
+	Metaspace                      | -0.00MB                        | 0.00MB
+
+
+2020-09-23 19:51:31.009 [main] INFO  Engine -
+{
+	"content":[
+		{
+			"reader":{
+				"parameter":{
+					"column":[
+						{
+							"type":"string",
+							"value":"DataX"
+						},
+						{
+							"type":"long",
+							"value":19890604
+						},
+						{
+							"type":"date",
+							"value":"1989-06-04 00:00:00"
+						},
+						{
+							"type":"bool",
+							"value":true
+						},
+						{
+							"type":"bytes",
+							"value":"test"
+						}
+					],
+					"sliceRecordCount":10
+				},
+				"name":"streamreader"
+			},
+			"writer":{
+				"parameter":{
+					"print":true,
+					"column":[
+						"col1"
+					],
+					"encoding":"UTF-8"
+				},
+				"name":"streamwriter"
+			}
+		}
+	],
+	"setting":{
+		"errorLimit":{
+			"record":0,
+			"percentage":0.02
+		},
+		"speed":{
+			"byte":-1,
+			"channel":1
+		}
+	}
+}
+
+2020-09-23 19:51:31.068 [main] WARN  Engine - prioriy set to 0, because NumberFormatException, the value is: null
+2020-09-23 19:51:31.069 [main] INFO  PerfTrace - PerfTrace traceId=job_-1, isEnable=false, priority=0
+2020-09-23 19:51:31.069 [main] INFO  JobContainer - DataX jobContainer starts job.
+2020-09-23 19:51:31.070 [main] INFO  JobContainer - Set jobId = 0
+2020-09-23 19:51:31.082 [job-0] INFO  JobContainer - jobContainer starts to do prepare ...
+2020-09-23 19:51:31.082 [job-0] INFO  JobContainer - DataX Reader.Job [streamreader] do prepare work .
+2020-09-23 19:51:31.083 [job-0] INFO  JobContainer - DataX Writer.Job [streamwriter] do prepare work .
+2020-09-23 19:51:31.083 [job-0] INFO  JobContainer - jobContainer starts to do split ...
+2020-09-23 19:51:31.083 [job-0] INFO  JobContainer - Job set Channel-Number to 1 channels.
+2020-09-23 19:51:31.083 [job-0] INFO  JobContainer - DataX Reader.Job [streamreader] splits to [1] tasks.
+2020-09-23 19:51:31.084 [job-0] INFO  JobContainer - DataX Writer.Job [streamwriter] splits to [1] tasks.
+2020-09-23 19:51:31.102 [job-0] INFO  JobContainer - jobContainer starts to do schedule ...
+2020-09-23 19:51:31.111 [job-0] INFO  JobContainer - Scheduler starts [1] taskGroups.
+2020-09-23 19:51:31.117 [taskGroup-0] INFO  TaskGroupContainer - taskGroupId=[0] start [1] channels for [1] tasks.
+2020-09-23 19:51:31.119 [taskGroup-0] INFO  Channel - Channel set byte_speed_limit to -1, No bps activated.
+2020-09-23 19:51:31.120 [taskGroup-0] INFO  Channel - Channel set record_speed_limit to -1, No tps activated.
+2020-09-23 19:51:31.129 [taskGroup-0] INFO  TaskGroupContainer - taskGroup[0] taskId[0] attemptCount[1] is started
+DataX	19890604	1989-06-04 00:00:00	true	test
+DataX	19890604	1989-06-04 00:00:00	true	test
+DataX	19890604	1989-06-04 00:00:00	true	test
+DataX	19890604	1989-06-04 00:00:00	true	test
+DataX	19890604	1989-06-04 00:00:00	true	test
+DataX	19890604	1989-06-04 00:00:00	true	test
+DataX	19890604	1989-06-04 00:00:00	true	test
+DataX	19890604	1989-06-04 00:00:00	true	test
+DataX	19890604	1989-06-04 00:00:00	true	test
+DataX	19890604	1989-06-04 00:00:00	true	test
+2020-09-23 19:51:31.231 [taskGroup-0] INFO  TaskGroupContainer - taskGroup[0] taskId[0] is successful, used[103]ms
+2020-09-23 19:51:31.232 [taskGroup-0] INFO  TaskGroupContainer - taskGroup[0] completed it's tasks.
+2020-09-23 19:51:41.129 [job-0] INFO  StandAloneJobContainerCommunicator - Total 10 records, 260 bytes | Speed 26B/s, 1 records/s | Error 0 records, 0 bytes |  All Task WaitWriterTime 0.000s |  All Task WaitReaderTime 0.000s | Percentage 100.00%
+2020-09-23 19:51:41.130 [job-0] INFO  AbstractScheduler - Scheduler accomplished all tasks.
+2020-09-23 19:51:41.130 [job-0] INFO  JobContainer - DataX Writer.Job [streamwriter] do post work.
+2020-09-23 19:51:41.130 [job-0] INFO  JobContainer - DataX Reader.Job [streamreader] do post work.
+2020-09-23 19:51:41.130 [job-0] INFO  JobContainer - DataX jobId [0] completed successfully.
+2020-09-23 19:51:41.130 [job-0] INFO  JobContainer - invokeHooks begin
+2020-09-23 19:51:41.130 [job-0] INFO  JobContainer - report url not found
+2020-09-23 19:51:41.133 [job-0] INFO  JobContainer -
+	 [total cpu info] =>
+		averageCpu                     | maxDeltaCpu                    | minDeltaCpu
+		-1.00%                         | -1.00%                         | -1.00%
+
+
+	 [total gc info] =>
+		 NAME                 | totalGCCount       | maxDeltaGCCount    | minDeltaGCCount    | totalGCTime        | maxDeltaGCTime     | minDeltaGCTime
+		 PS MarkSweep         | 0                  | 0                  | 0                  | 0.000s             | 0.000s             | 0.000s
+		 PS Scavenge          | 2                  | 2                  | 2                  | 0.006s             | 0.006s             | 0.006s
+
+2020-09-23 19:51:41.133 [job-0] INFO  JobContainer - PerfTrace not enable!
+2020-09-23 19:51:41.133 [job-0] INFO  StandAloneJobContainerCommunicator - Total 10 records, 260 bytes | Speed 26B/s, 1 records/s | Error 0 records, 0 bytes |  All Task WaitWriterTime 0.000s |  All Task WaitReaderTime 0.000s | Percentage 100.00%
+2020-09-23 19:51:41.134 [job-0] INFO  JobContainer - Total 10 records, 260 bytes | Speed 26B/s, 1 records/s | Error 0 records, 0 bytes |  All Task WaitWriterTime 0.000s |  All Task WaitReaderTime 0.000s | Percentage 100.00%
+2020-09-23 19:51:41.134 [job-0] INFO  JobContainer -
+任务启动时刻                    : 2020-09-23 19:51:31
+任务结束时刻                    : 2020-09-23 19:51:41
+任务总计耗时                    :                 10s
+任务平均流量                    :               26B/s
+记录写入速度                    :              1rec/s
+读出记录总数                    :                  10
+读写失败总数                    :                   0
+```
+
+更多说明，可以说明文档
+
 ## 文档
 
-[在线文档](https://datax.readthedocs.io)
+[在线文档](https://datax.readthedocs.io)  
 [项目内文档](docs/src/main/sphinx/index.rst)
 
 ## License
