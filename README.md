@@ -2,6 +2,15 @@
 
 该项目从阿里的[DataX](https://github.com/alibaba/datax) 而来，经过了精简和改造，说明如下
 
+当前mvn配置文件存在一些问题，如果打包过程出现问题，请使用以下命令进行打包
+详细情况可以参考这个 #48
+
+```shell
+mvn clean install
+mvn package assembly:single
+mvn package assembly:single
+````
+
 ## 功能差别说明
 
 ### 精简
