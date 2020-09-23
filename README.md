@@ -3,7 +3,7 @@
 该项目从阿里的[DataX](https://github.com/alibaba/datax) 而来，经过了精简和改造，说明如下
 
 当前mvn配置文件存在一些问题，如果打包过程出现问题，请使用以下命令进行打包
-详细情况可以参考这个 #48
+详细情况可以参考这个 [#48](https://github.com/wgzhao/DataX/issues/48#issue-707147863)
 
 ```shell
 mvn clean install
