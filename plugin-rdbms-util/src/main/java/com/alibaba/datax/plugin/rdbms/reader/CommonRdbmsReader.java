@@ -287,7 +287,7 @@ public class CommonRdbmsReader {
                         }
                         break;
 
-                    case Types.TIMESTAMP:
+                    case Types.TIMESTAMP: case -151: // 兼容老的SQLServer版本的datetime数据类型
                         record.addColumn(new DateColumn(rs.getTimestamp(i)));
                         break;
 
