@@ -44,22 +44,10 @@
             <version>${commons-codec.version}</version>
         </dependency>
 
-<!--        <dependency>-->
-<!--            <groupId>io.prestosql.hadoop</groupId>-->
-<!--            <artifactId>hadoop-apache</artifactId>-->
-<!--            <version>${hadoop.version}</version>-->
-<!--        </dependency>-->
-
         <dependency>
             <groupId>org.apache.commons</groupId>
             <artifactId>commons-lang3</artifactId>
             <version>${commons.lang3.version}</version>
-        </dependency>
-
-        <dependency>
-            <groupId>org.apache.hbase</groupId>
-            <artifactId>hbase-shaded-client</artifactId>
-            <version>1.4.12</version>
         </dependency>
 
         <dependency>
