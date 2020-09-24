@@ -2,14 +2,6 @@
 
 该项目从阿里的[DataX](https://github.com/alibaba/datax) 而来，经过了精简和改造，说明如下
 
-当前mvn配置文件存在一些问题，如果打包过程出现问题，请使用以下命令进行打包
-详细情况可以参考这个 [#48](https://github.com/wgzhao/DataX/issues/48#issue-707147863)
-
-```shell
-mvn clean install
-mvn package assembly:single
-mvn package assembly:single
-````
 
 ## 功能差别说明
 
@@ -50,22 +42,20 @@ mvn package assembly:single
 
 ## 快速开始
 
-### 编译
-
-因 `assembly` 配置文件还在调整，所以编译打包需要分两部分走
+### 编译及打包
 
 ```shell
 git clone https://github.com/wgzhao/datax.git DataX
 cd DataX
 mvn clean package
-mvn package assembly:assembly
+mvn package assembly:single
 ```
-
-### 开始第一个任务
 
 编译打包成功后，会在项目目录的`target/datax` 目录下创建一个 `datax-<version>`的 文件夹，其中 `<version` 表示版本。
 
-该目录的 `job` 子目录包含了大量的任务样本，其中 `job.json` 可以作为冒烟测试，执行如下
+### 开始第一个任务
+
+`job` 子目录包含了大量的任务样本，其中 `job.json` 可以作为冒烟测试，执行如下
 
 ```shell
 cd target/datax/datax-<version>
