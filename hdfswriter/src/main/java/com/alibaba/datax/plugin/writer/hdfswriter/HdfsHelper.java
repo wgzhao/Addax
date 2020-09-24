@@ -19,6 +19,7 @@ import org.apache.hadoop.fs.FileStatus;
 import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.hive.common.type.HiveDecimal;
+import org.apache.hadoop.hive.common.type.Timestamp;
 import org.apache.hadoop.hive.ql.io.HiveOutputFormat;
 import org.apache.hadoop.hive.ql.io.orc.OrcOutputFormat;
 import org.apache.hadoop.hive.ql.io.orc.OrcSerde;
@@ -197,19 +198,6 @@ public  class HdfsHelper {
         return isDir;
     }
 
-//    public void deleteFiles(Path[] paths) {
-//        for (Path path : paths) {
-//            LOG.info(String.format("delete file [%s].", path.toString()));
-//            try {
-//                fileSystem.delete(path, true);
-//            } catch (IOException e) {
-//                String message = String.format("删除文件[%s]时发生IO异常,请检查您的网络是否正常！",
-//                        path.toString());
-//                LOG.error(message);
-//                throw DataXException.asDataXException(HdfsWriterErrorCode.CONNECT_HDFS_IO_ERROR, e);
-//            }
-//        }
-//    }
 
     /* 
     * 根据标志来删除特定文件
@@ -229,8 +217,7 @@ public  class HdfsHelper {
                     fileSystem.delete(path, true);
                 }
             } catch (IOException e) {
-                String message = String.format("删除文件[%s]时发生IO异常,请检查您的网络是否正常！",
-                        path.toString());
+                String message = String.format("删除文件[%s]时发生IO异常,请检查您的网络是否正常！", path);
                 LOG.error(message);
                 throw DataXException.asDataXException(HdfsWriterErrorCode.CONNECT_HDFS_IO_ERROR, e);
             }
@@ -238,17 +225,16 @@ public  class HdfsHelper {
     }
 
     public void deleteDir(Path path) {
-        LOG.info(String.format("start delete tmp dir [%s] .", path.toString()));
+        LOG.info("start delete tmp dir [{}] .", path);
         try {
             if (isPathexists(path.toString())) {
                 fileSystem.delete(path, true);
             }
         } catch (Exception e) {
-            String message = String.format("删除临时目录[%s]时发生IO异常,请检查您的网络是否正常！", path.toString());
-            LOG.error(message);
+            LOG.error("删除临时目录[{}]时发生IO异常,请检查您的网络是否正常！", path);
             throw DataXException.asDataXException(HdfsWriterErrorCode.CONNECT_HDFS_IO_ERROR, e);
         }
-        LOG.info(String.format("finish delete tmp dir [%s] .", path.toString()));
+        LOG.info("finish delete tmp dir [{}] .", path);
     }
 
     public void renameFile(HashSet<String> tmpFiles, HashSet<String> endFiles) {
@@ -267,7 +253,7 @@ public  class HdfsHelper {
                     if (tmpFilesParent == null) {
                         tmpFilesParent = srcFilePah.getParent();
                     }
-                    LOG.info(String.format("start rename file [%s] to file [%s].", srcFile, dstFile));
+                    LOG.info("start rename file [{}] to file [{}].", srcFile, dstFile);
                     boolean renameTag;
                     long fileLen = fileSystem.getFileStatus(srcFilePah).getLen();
                     if (fileLen > 0) {
@@ -277,14 +263,13 @@ public  class HdfsHelper {
                             LOG.error(message);
                             throw DataXException.asDataXException(HdfsWriterErrorCode.HDFS_RENAME_FILE_ERROR, message);
                         }
-                        LOG.info(String.format("finish rename file [%s] to file [%s].", srcFile, dstFile));
+                        LOG.info("finish rename file [{}] to file [{}].", srcFile, dstFile);
                     } else {
-                        LOG.info(String.format("文件［%s］内容为空,请检查写入是否正常！", srcFile));
+                        LOG.info("文件［{}］内容为空,请检查写入是否正常！", srcFile);
                     }
                 }
             } catch (Exception e) {
-                String message = "重命名文件时发生异常,请检查您的网络是否正常！";
-                LOG.error(message);
+                LOG.error("重命名文件时发生异常,请检查您的网络是否正常！");
                 throw DataXException.asDataXException(HdfsWriterErrorCode.CONNECT_HDFS_IO_ERROR, e);
             } finally {
                 if (null != tmpFilesParent)
@@ -298,8 +283,7 @@ public  class HdfsHelper {
         try {
             fileSystem.close();
         } catch (IOException e) {
-            String message = "关闭FileSystem时发生IO异常,请检查您的网络是否正常！";
-            LOG.error(message);
+            LOG.error("关闭FileSystem时发生IO异常,请检查您的网络是否正常！");
             throw DataXException.asDataXException(HdfsWriterErrorCode.CONNECT_HDFS_IO_ERROR, e);
         }
     }
@@ -342,8 +326,7 @@ public  class HdfsHelper {
             }
             writer.close(Reporter.NULL);
         } catch (Exception e) {
-            String message = String.format("写文件文件[%s]时发生IO异常,请检查您的网络是否正常！", fileName);
-            LOG.error(message);
+            LOG.error("写文件文件[{}]时发生IO异常,请检查您的网络是否正常！", fileName);
             Path path = new Path(fileName);
             deleteDir(path.getParent());
             throw DataXException.asDataXException(HdfsWriterErrorCode.Write_FILE_IO_ERROR, e);
@@ -463,8 +446,7 @@ public  class HdfsHelper {
             }
             writer.close();
         } catch (Exception e) {
-            String message = String.format("写文件文件[%s]时发生IO异常,请检查您的网络是否正常！", fileName);
-            LOG.error(message);
+            LOG.error("写文件文件[{}]时发生IO异常,请检查您的网络是否正常！", fileName);
             deleteDir(path.getParent());
             throw DataXException.asDataXException(HdfsWriterErrorCode.Write_FILE_IO_ERROR, e);
         }
@@ -504,8 +486,7 @@ public  class HdfsHelper {
             }
             writer.close(Reporter.NULL);
         } catch (Exception e) {
-            String message = String.format("写文件文件[%s]时发生IO异常,请检查您的网络是否正常！", fileName);
-            LOG.error(message);
+            LOG.error("写文件文件[{}]时发生IO异常,请检查您的网络是否正常！", fileName);
             Path path = new Path(fileName);
             deleteDir(path.getParent());
             throw DataXException.asDataXException(HdfsWriterErrorCode.Write_FILE_IO_ERROR, e);
@@ -552,10 +533,10 @@ public  class HdfsHelper {
                     objectInspector = ObjectInspectorFactory.getReflectionObjectInspector(HiveDecimal.class, ObjectInspectorFactory.ObjectInspectorOptions.JAVA);
                     break;
                 case TIMESTAMP:
-                    objectInspector = ObjectInspectorFactory.getReflectionObjectInspector(java.sql.Timestamp.class, ObjectInspectorFactory.ObjectInspectorOptions.JAVA);
+                    objectInspector = ObjectInspectorFactory.getReflectionObjectInspector(Timestamp.class, ObjectInspectorFactory.ObjectInspectorOptions.JAVA);
                     break;
                 case DATE:
-                    objectInspector = ObjectInspectorFactory.getReflectionObjectInspector(java.sql.Date.class, ObjectInspectorFactory.ObjectInspectorOptions.JAVA);
+                    objectInspector = ObjectInspectorFactory.getReflectionObjectInspector(org.apache.hadoop.hive.common.type.Date.class, ObjectInspectorFactory.ObjectInspectorOptions.JAVA);
                     break;
                 case STRING:
                 case VARCHAR:
@@ -621,7 +602,8 @@ public  class HdfsHelper {
                     objectInspector = ObjectInspectorFactory.getReflectionObjectInspector(HiveDecimal.class, ObjectInspectorFactory.ObjectInspectorOptions.JAVA);
                     break;
                 case TIMESTAMP:
-                    objectInspector = ObjectInspectorFactory.getReflectionObjectInspector(java.sql.Timestamp.class, ObjectInspectorFactory.ObjectInspectorOptions.JAVA);
+//                    objectInspector = ObjectInspectorFactory.getReflectionObjectInspector(java.sql.Timestamp.class, ObjectInspectorFactory.ObjectInspectorOptions.JAVA);
+                      objectInspector = ObjectInspectorFactory.getReflectionObjectInspector(Long.class, ObjectInspectorFactory.ObjectInspectorOptions.JAVA);
                     break;
                 case DATE:
                     objectInspector = ObjectInspectorFactory.getReflectionObjectInspector(java.sql.Date.class, ObjectInspectorFactory.ObjectInspectorOptions.JAVA);
@@ -638,8 +620,7 @@ public  class HdfsHelper {
                     objectInspector = ObjectInspectorFactory.getReflectionObjectInspector(java.sql.Blob.class, ObjectInspectorFactory.ObjectInspectorOptions.JAVA);
                     break;
                 default:
-                    throw DataXException
-                            .asDataXException(
+                    throw DataXException.asDataXException(
                                     HdfsWriterErrorCode.ILLEGAL_VALUE,
                                     String.format(
                                             "您的配置文件中的列配置信息有误. 因为DataX 不支持数据库写入这种字段类型. 字段名:[%s], 字段类型:[%s]. 请修改表中该字段的类型或者不同步该字段.",
@@ -651,21 +632,6 @@ public  class HdfsHelper {
         }
         return columnTypeInspectors;
     }
-
-//    public OrcSerde getOrcSerde(Configuration config) {
-//        String fieldDelimiter = config.getString(Key.FIELD_DELIMITER);
-//        String compress = config.getString(Key.COMPRESS);
-//        String encoding = config.getString(Key.ENCODING);
-//
-//        OrcSerde orcSerde = new OrcSerde();
-//        Properties properties = new Properties();
-//        properties.setProperty("orc.bloom.filter.columns", fieldDelimiter);
-//        properties.setProperty("orc.compress", compress);
-//        properties.setProperty("orc.encoding.strategy", encoding);
-//
-//        orcSerde.initialize(conf, properties);
-//        return orcSerde;
-//    }
 
     public static MutablePair<List<Object>, Boolean> transportOneRecord(
             com.alibaba.datax.common.element.Record record, List<Configuration> columnsConfiguration,
@@ -718,10 +684,9 @@ public  class HdfsHelper {
                                 recordList.add(column.asBoolean());
                                 break;
                             case DATE:
-                                recordList.add(new java.sql.Date(column.asDate().getTime()));
-                                break;
+                                recordList.add(org.apache.hadoop.hive.common.type.Date.valueOf(column.asString()));
                             case TIMESTAMP:
-                                recordList.add(new java.sql.Timestamp(column.asDate().getTime()));
+                                recordList.add(Timestamp.valueOf(column.asString()));
                                 break;
                             case BINARY:
                                 recordList.add(column.asBytes());
@@ -737,9 +702,10 @@ public  class HdfsHelper {
                         }
                     } catch (Exception e) {
                         // warn: 此处认为脏数据
+                        e.printStackTrace();
                         String message = String.format(
                                 "字段类型转换错误：你目标字段为[%s]类型，实际字段值为[%s].",
-                                columnsConfiguration.get(i).getString(Key.TYPE), column.getRawData().toString());
+                                columnsConfiguration.get(i).getString(Key.TYPE), column.getRawData());
                         taskPluginCollector.collectDirtyRecord(record, message);
                         transportResult.setRight(true);
                         break;
@@ -809,8 +775,8 @@ public  class HdfsHelper {
                     } catch (Exception e) {
                         // warn: 此处认为脏数据
                         String message = String.format(
-                                "字段类型转换错误：你目标字段为[%s]类型，实际字段值为[%s].",
-                                columnsConfiguration.get(i).getString(Key.TYPE), column.getRawData().toString());
+                                "字段类型转换错误：目标字段为[%s]类型，实际字段值为[%s].",
+                                columnsConfiguration.get(i).getString(Key.TYPE), column.getRawData());
                         taskPluginCollector.collectDirtyRecord(record, message);
                         break;
                     }
