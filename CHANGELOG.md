@@ -38,3 +38,7 @@
 
 * Add support for truncating table before inserting records
 * Add support for specifing zookeeper's port, if not presents, it uses `2181` as default port 
+
+### HDFS writer
+
+* Add support for `timestamp` data type
