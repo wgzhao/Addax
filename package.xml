@@ -10,11 +10,18 @@
     <includeBaseDirectory>false</includeBaseDirectory>
     <fileSets>
         <fileSet>
+            <directory>common/target/datax/</directory>
+            <includes>
+                <include>*.jar</include>
+            </includes>
+            <fileMode>0644</fileMode>
+            <outputDirectory>datax-${project.version}/lib</outputDirectory>
+        </fileSet>
+        <fileSet>
             <directory>core/target/datax/</directory>
             <includes>
                 <include>**/*.*</include>
             </includes>
-            <fileMode>0755</fileMode>
             <outputDirectory>datax-${project.version}</outputDirectory>
         </fileSet>
         <fileSet>
