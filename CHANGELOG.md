@@ -42,3 +42,4 @@
 ### HDFS writer
 
 * Add support for `timestamp` data type
+* Add support for `lz4`, `zstd` compress format
