@@ -1,5 +1,9 @@
 package com.alibaba.datax.plugin.writer.hdfswriter;
 
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.Set;
+
 /**
  * Created by shf on 15/10/8.
  */
@@ -33,4 +37,9 @@ public class Key {
     public static final String KERBEROS_PRINCIPAL = "kerberosPrincipal";
     // hadoop config
     public static final String HADOOP_CONFIG = "hadoopConfig";
+
+    // hdfs format
+
+    public static final Set<String> SUPPORT_FORMAT = new HashSet<>(Arrays.asList("ORC", "PARQUET", "TEXT"));
+
 }
