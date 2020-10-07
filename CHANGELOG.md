@@ -42,3 +42,7 @@
 ### HDFS writer
 
 * Add support for `timestamp` data type
+
+### MongoDB reader
+
+* Add support for `json` data type
