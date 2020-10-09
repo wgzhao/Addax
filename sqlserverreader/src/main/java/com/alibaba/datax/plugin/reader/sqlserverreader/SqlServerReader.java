@@ -24,7 +24,7 @@ public class SqlServerReader extends Reader {
 
 		@Override
 		public void init() {
-			this.originalConfig = super.getPluginJobConf();
+			this.originalConfig = getPluginJobConf();
 			int fetchSize = this.originalConfig.getInt(
 					FETCH_SIZE,
 					DEFAULT_FETCH_SIZE);
@@ -68,9 +68,9 @@ public class SqlServerReader extends Reader {
 
 		@Override
 		public void init() {
-			this.readerSliceConfig = super.getPluginJobConf();
+			this.readerSliceConfig = getPluginJobConf();
 			this.commonRdbmsReaderTask = new SqlServerRdbmsReader.Task(
-					DATABASE_TYPE ,super.getTaskGroupId(), super.getTaskId());
+					DATABASE_TYPE , getTaskGroupId(), getTaskId());
 			this.commonRdbmsReaderTask.init(this.readerSliceConfig);
 		}
 
@@ -80,7 +80,7 @@ public class SqlServerReader extends Reader {
 					.getInt(FETCH_SIZE);
 
 			this.commonRdbmsReaderTask.startRead(this.readerSliceConfig,
-					recordSender, super.getTaskPluginCollector(), fetchSize);
+					recordSender, getTaskPluginCollector(), fetchSize);
 		}
 
 		@Override

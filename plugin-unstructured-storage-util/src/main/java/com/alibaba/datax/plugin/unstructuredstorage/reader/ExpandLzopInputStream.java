@@ -43,9 +43,8 @@ public class ExpandLzopInputStream extends LzopInputStream {
     @Override
     protected int readHeader() throws IOException {
         short LZO_LIBRARY_VERSION = 0x2060;
-        Log LOG = LogFactory.getLog(LzopInputStream.class);
-        byte[] LZOP_MAGIC = new byte[]{
-                -119, 'L', 'Z', 'O', 0, '\r', '\n', '\032', '\n'};
+        Log log = LogFactory.getLog(LzopInputStream.class);
+        byte[] LZOP_MAGIC = { -119, 'L', 'Z', 'O', 0, '\r', '\n', '\032', '\n'};
         byte[] buf = new byte[9];
         readBytes(buf, 0, 9);
         if (!Arrays.equals(buf, LZOP_MAGIC))
@@ -55,7 +54,7 @@ public class ExpandLzopInputStream extends LzopInputStream {
         CRC32 crc32 = new CRC32();
         int hitem = readHeaderItem(buf, 2, adler, crc32); // lzop version
         if (hitem > LzopConstants.LZOP_VERSION) {
-            LOG.debug("Compressed with later version of lzop: "
+            log.debug("Compressed with later version of lzop: "
                     + Integer.toHexString(hitem) + " (expected 0x"
                     + Integer.toHexString(LzopConstants.LZOP_VERSION) + ")");
         }
@@ -110,7 +109,7 @@ public class ExpandLzopInputStream extends LzopInputStream {
                     + Integer.toHexString(hitem) + ")");
         }
         if (extraField) { // lzop 1.08 ultimately ignores this
-            LOG.debug("Extra header field not processed");
+            log.debug("Extra header field not processed");
             adler.reset();
             crc32.reset();
             hitem = readHeaderItem(buf, 4, adler, crc32);
