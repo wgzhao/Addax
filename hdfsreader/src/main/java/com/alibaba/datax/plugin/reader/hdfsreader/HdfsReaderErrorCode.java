@@ -24,7 +24,7 @@ public enum HdfsReaderErrorCode implements ErrorCode {
     private final String code;
     private final String description;
 
-    private HdfsReaderErrorCode(String code, String description) {
+    HdfsReaderErrorCode(String code, String description) {
         this.code = code;
         this.description = description;
     }
