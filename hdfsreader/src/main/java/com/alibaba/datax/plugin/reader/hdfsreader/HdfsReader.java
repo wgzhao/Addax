@@ -6,7 +6,6 @@ import com.alibaba.datax.common.spi.Reader;
 import com.alibaba.datax.common.util.Configuration;
 import com.alibaba.datax.plugin.unstructuredstorage.reader.UnstructuredStorageReaderUtil;
 import org.apache.commons.io.Charsets;
-import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -16,7 +15,11 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 
-public class HdfsReader extends Reader {
+import static com.alibaba.datax.plugin.unstructuredstorage.reader.Key.ENCODING;
+
+public class HdfsReader
+        extends Reader
+{
 
     /**
      * Job 中的方法仅执行一次，Task 中方法会由框架启动多个 Task 线程并行执行。
@@ -31,7 +34,9 @@ public class HdfsReader extends Reader {
      * Job类post-->destroy
      * </pre>
      */
-    public static class Job extends Reader.Job {
+    public static class Job
+            extends Reader.Job
+    {
         private static final Logger LOG = LoggerFactory
                 .getLogger(Job.class);
 
@@ -42,17 +47,18 @@ public class HdfsReader extends Reader {
         private List<String> path = null;
 
         @Override
-        public void init() {
+        public void init()
+        {
 
             LOG.info("init() begin...");
-            this.readerOriginConfig = super.getPluginJobConf();
+            this.readerOriginConfig = getPluginJobConf();
             this.validate();
             dfsUtil = new DFSUtil(this.readerOriginConfig);
             LOG.info("init() ok and end...");
-
         }
 
-        public void validate(){
+        public void validate()
+        {
             this.readerOriginConfig.getNecessaryValue(Key.DEFAULT_FS,
                     HdfsReaderErrorCode.DEFAULT_FS_NOT_FIND_ERROR);
 
@@ -61,13 +67,14 @@ public class HdfsReader extends Reader {
             if (!pathInString.startsWith("[") && !pathInString.endsWith("]")) {
                 path = new ArrayList<>();
                 path.add(pathInString);
-            } else {
+            }
+            else {
                 path = this.readerOriginConfig.getList(Key.PATH, String.class);
-                if (null == path || path.size() == 0) {
+                if (null == path || path.isEmpty()) {
                     throw DataXException.asDataXException(HdfsReaderErrorCode.REQUIRED_VALUE, "您需要指定待读取的源目录或文件");
                 }
                 for (String eachPath : path) {
-                    if(!eachPath.startsWith("/")){
+                    if (!eachPath.startsWith("/")) {
                         String message = String.format("请检查参数path:[%s],需要配置为绝对路径", eachPath);
                         LOG.error(message);
                         throw DataXException.asDataXException(HdfsReaderErrorCode.ILLEGAL_VALUE, message);
@@ -75,33 +82,35 @@ public class HdfsReader extends Reader {
                 }
             }
 
-            specifiedFileType = this.readerOriginConfig.getNecessaryValue(Key.FILETYPE, HdfsReaderErrorCode.REQUIRED_VALUE);
-            if( !specifiedFileType.equalsIgnoreCase(Constant.ORC) &&
-                    !specifiedFileType.equalsIgnoreCase(Constant.TEXT) &&
-                    !specifiedFileType.equalsIgnoreCase(Constant.CSV) &&
-                    !specifiedFileType.equalsIgnoreCase(Constant.SEQ) &&
-                    !specifiedFileType.equalsIgnoreCase(Constant.RC)){
+            specifiedFileType = this.readerOriginConfig.getNecessaryValue(Key.FILETYPE, HdfsReaderErrorCode.REQUIRED_VALUE).toUpperCase();
+            if (!specifiedFileType.equals(Constant.ORC) &&
+                    !specifiedFileType.equals(Constant.TEXT) &&
+                    !specifiedFileType.equals(Constant.CSV) &&
+                    !specifiedFileType.equals(Constant.SEQ) &&
+                    !specifiedFileType.equals(Constant.RC)) {
                 String message = "HdfsReader插件目前支持ORC, TEXT, CSV, SEQUENCE, RC五种格式的文件," +
                         "请将fileType选项的值配置为ORC, TEXT, CSV, SEQUENCE 或者 RC";
                 throw DataXException.asDataXException(HdfsReaderErrorCode.FILE_TYPE_ERROR, message);
             }
 
-            String encoding = this.readerOriginConfig.getString(com.alibaba.datax.plugin.unstructuredstorage.reader.Key.ENCODING, "UTF-8");
+            String encoding = this.readerOriginConfig.getString(ENCODING, "UTF-8");
 
             try {
                 Charsets.toCharset(encoding);
-            } catch (UnsupportedCharsetException uce) {
+            }
+            catch (UnsupportedCharsetException uce) {
                 throw DataXException.asDataXException(
                         HdfsReaderErrorCode.ILLEGAL_VALUE,
                         String.format("不支持的编码格式 : [%s]", encoding), uce);
-            } catch (Exception e) {
+            }
+            catch (Exception e) {
                 throw DataXException.asDataXException(
                         HdfsReaderErrorCode.ILLEGAL_VALUE,
                         String.format("运行配置异常 : %s", e.getMessage()), e);
             }
             //check Kerberos
-            Boolean haveKerberos = this.readerOriginConfig.getBool(Key.HAVE_KERBEROS, false);
-            if(haveKerberos) {
+            boolean haveKerberos = this.readerOriginConfig.getBool(Key.HAVE_KERBEROS, false);
+            if (haveKerberos) {
                 this.readerOriginConfig.getNecessaryValue(Key.KERBEROS_KEYTAB_FILE_PATH, HdfsReaderErrorCode.REQUIRED_VALUE);
                 this.readerOriginConfig.getNecessaryValue(Key.KERBEROS_PRINCIPAL, HdfsReaderErrorCode.REQUIRED_VALUE);
             }
@@ -109,16 +118,16 @@ public class HdfsReader extends Reader {
             // validate the Columns
             validateColumns();
 
-            if(this.specifiedFileType.equalsIgnoreCase(Constant.TEXT)
-                        || this.specifiedFileType.equalsIgnoreCase(Constant.CSV)){
+            if (this.specifiedFileType.equals(Constant.TEXT)
+                    || this.specifiedFileType.equals(Constant.CSV)) {
                 //compress校验
                 UnstructuredStorageReaderUtil.validateCompress(this.readerOriginConfig);
                 UnstructuredStorageReaderUtil.validateCsvReaderConfig(this.readerOriginConfig);
             }
-
         }
 
-        private void validateColumns(){
+        private void validateColumns()
+        {
 
             // 检测是column 是否为 ["*"] 若是则填为空
             List<Configuration> column = this.readerOriginConfig
@@ -129,12 +138,13 @@ public class HdfsReader extends Reader {
                     .equals(column.get(0).toString()))) {
                 readerOriginConfig
                         .set(com.alibaba.datax.plugin.unstructuredstorage.reader.Key.COLUMN, new ArrayList<String>());
-            } else {
+            }
+            else {
                 // column: 1. index type 2.value type 3.when type is Data, may have format
                 List<Configuration> columns = this.readerOriginConfig
                         .getListConfiguration(com.alibaba.datax.plugin.unstructuredstorage.reader.Key.COLUMN);
 
-                if (null == columns || columns.size() == 0) {
+                if (null == columns || columns.isEmpty()) {
                     throw DataXException.asDataXException(
                             HdfsReaderErrorCode.CONFIG_INVALID_EXCEPTION,
                             "您需要指定 columns");
@@ -156,22 +166,21 @@ public class HdfsReader extends Reader {
                                 HdfsReaderErrorCode.MIXED_INDEX_VALUE,
                                 "您混合配置了index, value, 每一列同时仅能选择其中一种");
                     }
-
                 }
             }
         }
 
         @Override
-        public void prepare() {
+        public void prepare()
+        {
             LOG.info("prepare(), start to getAllFiles...");
             this.sourceFiles = dfsUtil.getAllFiles(path, specifiedFileType);
-            LOG.info(String.format("您即将读取的文件数为: [%s], 列表为: [%s]",
-                    this.sourceFiles.size(),
-                    StringUtils.join(this.sourceFiles, ",")));
+            LOG.info("您即将读取的文件数为: [{}], 列表为: [{}]", this.sourceFiles.size(), this.sourceFiles);
         }
 
         @Override
-        public List<Configuration> split(int adviceNumber) {
+        public List<Configuration> split(int adviceNumber)
+        {
 
             LOG.info("split() begin...");
             List<Configuration> readerSplitConfigs = new ArrayList<>();
@@ -193,8 +202,8 @@ public class HdfsReader extends Reader {
             return readerSplitConfigs;
         }
 
-
-        private <T> List<List<T>> splitSourceFiles(final List<T> sourceList, int adviceNumber) {
+        private <T> List<List<T>> splitSourceFiles(List<T> sourceList, int adviceNumber)
+        {
             List<List<T>> splitedList = new ArrayList<>();
             int averageLength = sourceList.size() / adviceNumber;
             averageLength = averageLength == 0 ? 1 : averageLength;
@@ -209,20 +218,22 @@ public class HdfsReader extends Reader {
             return splitedList;
         }
 
-
         @Override
-        public void post() {
+        public void post()
+        {
 
         }
 
         @Override
-        public void destroy() {
+        public void destroy()
+        {
 
         }
-
     }
 
-    public static class Task extends Reader.Task {
+    public static class Task
+            extends Reader.Task
+    {
 
         private static final Logger LOG = LoggerFactory.getLogger(Reader.Task.class);
         private Configuration taskConfig;
@@ -231,52 +242,56 @@ public class HdfsReader extends Reader {
         private DFSUtil dfsUtil = null;
 
         @Override
-        public void init() {
+        public void init()
+        {
 
             this.taskConfig = super.getPluginJobConf();
             this.sourceFiles = this.taskConfig.getList(Constant.SOURCE_FILES, String.class);
             this.specifiedFileType = this.taskConfig.getNecessaryValue(Key.FILETYPE, HdfsReaderErrorCode.REQUIRED_VALUE);
-//            String encoding = this.taskConfig.getString(com.alibaba.datax.plugin.unstructuredstorage.reader.Key.ENCODING, "UTF-8");
             this.dfsUtil = new DFSUtil(this.taskConfig);
-//            int bufferSize = this.taskConfig.getInt(com.alibaba.datax.plugin.unstructuredstorage.reader.Key.BUFFER_SIZE,
-//                    com.alibaba.datax.plugin.unstructuredstorage.reader.Constant.DEFAULT_BUFFER_SIZE);
         }
 
         @Override
-        public void prepare() {
+        public void prepare()
+        {
 
         }
 
         @Override
-        public void startRead(RecordSender recordSender) {
+        public void startRead(RecordSender recordSender)
+        {
 
             LOG.info("read start");
             for (String sourceFile : this.sourceFiles) {
-                LOG.info(String.format("reading file : [%s]", sourceFile));
+                LOG.info("reading file : [{}]", sourceFile);
 
-                if(specifiedFileType.equalsIgnoreCase(Constant.TEXT)
+                if (specifiedFileType.equalsIgnoreCase(Constant.TEXT)
                         || specifiedFileType.equalsIgnoreCase(Constant.CSV)) {
 
                     InputStream inputStream = dfsUtil.getInputStream(sourceFile);
                     UnstructuredStorageReaderUtil.readFromStream(inputStream, sourceFile, this.taskConfig,
                             recordSender, this.getTaskPluginCollector());
-                }else if(specifiedFileType.equalsIgnoreCase(Constant.ORC)){
+                }
+                else if (specifiedFileType.equalsIgnoreCase(Constant.ORC)) {
 
                     dfsUtil.orcFileStartRead(sourceFile, this.taskConfig, recordSender, this.getTaskPluginCollector());
-                }else if(specifiedFileType.equalsIgnoreCase(Constant.SEQ)){
+                }
+                else if (specifiedFileType.equalsIgnoreCase(Constant.SEQ)) {
 
                     dfsUtil.sequenceFileStartRead(sourceFile, this.taskConfig, recordSender, this.getTaskPluginCollector());
-                }else if(specifiedFileType.equalsIgnoreCase(Constant.RC)){
+                }
+                else if (specifiedFileType.equalsIgnoreCase(Constant.RC)) {
 
                     dfsUtil.rcFileStartRead(sourceFile, this.taskConfig, recordSender, this.getTaskPluginCollector());
-                }else {
+                }
+                else {
 
                     String message = "HdfsReader插件目前支持ORC, TEXT, CSV, SEQUENCE, RC五种格式的文件," +
                             "请将fileType选项的值配置为ORC, TEXT, CSV, SEQUENCE 或者 RC";
                     throw DataXException.asDataXException(HdfsReaderErrorCode.FILE_TYPE_UNSUPPORT, message);
                 }
 
-                if(recordSender != null){
+                if (recordSender != null) {
                     recordSender.flush();
                 }
             }
@@ -285,15 +300,15 @@ public class HdfsReader extends Reader {
         }
 
         @Override
-        public void post() {
+        public void post()
+        {
 
         }
 
         @Override
-        public void destroy() {
+        public void destroy()
+        {
 
         }
-
     }
-
 }

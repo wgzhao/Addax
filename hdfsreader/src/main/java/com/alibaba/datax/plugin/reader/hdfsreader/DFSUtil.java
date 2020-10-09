@@ -623,16 +623,17 @@ public class DFSUtil {
     private boolean isRCFile(String filepath, FSDataInputStream in) {
 
         // The first version of RCFile used the sequence file header.
-        final byte[] ORIGINAL_MAGIC = new byte[]{(byte) 'S', (byte) 'E', (byte) 'Q'};
+        byte[] ORIGINAL_MAGIC = {(byte) 'S', (byte) 'E', (byte) 'Q'};
         // The 'magic' bytes at the beginning of the RCFile
-        final byte[] RC_MAGIC = new byte[]{(byte) 'R', (byte) 'C', (byte) 'F'};
+        byte[] RC_MAGIC = {(byte) 'R', (byte) 'C', (byte) 'F'};
         // the version that was included with the original magic, which is mapped
         // into ORIGINAL_VERSION
         final byte ORIGINAL_MAGIC_VERSION_WITH_METADATA = 6;
         // All of the versions should be place in this list.
         final int ORIGINAL_VERSION = 0;  // version with SEQ
-//        final int NEW_MAGIC_VERSION = 1; // version with RCF
-//        final int CURRENT_VERSION = NEW_MAGIC_VERSION;
+        // version with RCF
+        // final int NEW_MAGIC_VERSION = 1;
+        // final int CURRENT_VERSION = NEW_MAGIC_VERSION;
         final  int CURRENT_VERSION = 1;
         byte version;
 
@@ -686,7 +687,7 @@ public class DFSUtil {
 
     // 判断file是否是Sequence file
     private boolean isSequenceFile(String filepath, FSDataInputStream in) {
-        byte[] SEQ_MAGIC = new byte[]{(byte) 'S', (byte) 'E', (byte) 'Q'};
+        byte[] SEQ_MAGIC = {(byte) 'S', (byte) 'E', (byte) 'Q'};
         byte[] magic = new byte[SEQ_MAGIC.length];
         try {
             in.seek(0);
