@@ -20,7 +20,7 @@ public class SqlServerWriter extends Writer {
 
         @Override
         public void init() {
-            this.originalConfig = super.getPluginJobConf();
+            this.originalConfig = getPluginJobConf();
 
             // warn：not like mysql, sqlserver only support insert mode
             String writeMode = this.originalConfig.getString(Key.WRITE_MODE);
@@ -66,7 +66,7 @@ public class SqlServerWriter extends Writer {
 
         @Override
         public void init() {
-            this.writerSliceConfig = super.getPluginJobConf();
+            this.writerSliceConfig = getPluginJobConf();
             this.commonRdbmsWriterTask = new CommonRdbmsWriter.Task(
                     DATABASE_TYPE);
             this.commonRdbmsWriterTask.init(this.writerSliceConfig);
@@ -79,7 +79,7 @@ public class SqlServerWriter extends Writer {
 
         public void startWrite(RecordReceiver recordReceiver) {
             this.commonRdbmsWriterTask.startWrite(recordReceiver,
-                    this.writerSliceConfig, super.getTaskPluginCollector());
+                    this.writerSliceConfig, getTaskPluginCollector());
         }
 
         @Override

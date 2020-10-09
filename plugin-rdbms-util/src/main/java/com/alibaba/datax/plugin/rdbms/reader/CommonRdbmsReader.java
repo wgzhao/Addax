@@ -265,9 +265,6 @@ public class CommonRdbmsReader {
 
                     case Types.NUMERIC:
                     case Types.DECIMAL:
-                        record.addColumn(new DoubleColumn(rs.getString(i)));
-                        break;
-
                     case Types.FLOAT:
                     case Types.REAL:
                     case Types.DOUBLE:
@@ -280,7 +277,7 @@ public class CommonRdbmsReader {
 
                     // for mysql bug, see http://bugs.mysql.com/bug.php?id=35115
                     case Types.DATE:
-                        if (metaData.getColumnTypeName(i).equalsIgnoreCase("year")) {
+                        if ("year".equalsIgnoreCase(metaData.getColumnTypeName(i))) {
                             record.addColumn(new LongColumn(rs.getInt(i)));
                         } else {
                             record.addColumn(new DateColumn(rs.getDate(i)));
@@ -326,8 +323,7 @@ public class CommonRdbmsReader {
                 }
             } catch (Exception e) {
                 if (IS_DEBUG) {
-                    LOG.debug("read data " + record.toString()
-                            + " occur exception:", e);
+                    LOG.debug("read data " + record + " occur exception: " + e);
                 }
                 //TODO 这里识别为脏数据靠谱吗？
                 taskPluginCollector.collectDirtyRecord(record, e);
