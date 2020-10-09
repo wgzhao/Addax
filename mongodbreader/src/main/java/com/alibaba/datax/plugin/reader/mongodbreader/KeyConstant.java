@@ -16,6 +16,13 @@ public class KeyConstant {
      * 嵌入文档类型
      */
     public static final String DOCUMENT_TYPE = "document";
+
+    /**
+     * 与{@link #DOCUMENT_TYPE}一样，都作用于{@link org.bson.Document}，
+     * 但会将字段解析为json，并且不支持提取嵌套字段
+     */
+    public static final String JSON_TYPE = "json";
+
     /**
      * mongodb 的 host 地址
      */
@@ -83,10 +90,11 @@ public class KeyConstant {
     public static final int MONGO_UNAUTHORIZED_ERR_CODE = 13;
     public static final int MONGO_ILLEGALOP_ERR_CODE = 20;
     public static final int MONGO_COMMAND_NOT_FOUND_CODE = 59;
+
     /**
      * 判断是否为数组类型
      * @param type 数据类型
-     * @return
+     * @return boolean
      */
     public static boolean isArrayType(String type) {
         return ARRAY_TYPE.equals(type) || DOCUMENT_ARRAY_TYPE.equals(type);
@@ -94,5 +102,9 @@ public class KeyConstant {
 
     public static boolean isDocumentType(String type) {
         return type.startsWith(DOCUMENT_TYPE);
+    }
+
+    public static boolean isJsonType(String type) {
+        return type.startsWith(JSON_TYPE);
     }
 }
