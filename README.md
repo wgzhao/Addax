@@ -48,7 +48,8 @@
 
 | 版本  | 连接地址                                                     | md5值                            |
 | ----- | ------------------------------------------------------------ | -------------------------------- |
-| 3.1.1 | 链接: https://pan.baidu.com/s/1GwmFA7-hPkd6GKiZEvUKXg 提取码: 1inn | 0fa4e7902420704b2e814fef098f40ae |
+| 3.1.1 | https://pan.baidu.com/s/1GwmFA7-hPkd6GKiZEvUKXg 提取码: 1inn | 0fa4e7902420704b2e814fef098f40ae |
+| 3.1.2 | https://pan.baidu.com/s/1zFqv8E6iJX549zdSZDQgiQ 提取码: 7jdk | 3674711fc9b68fad3086f3c8526a3427 |
 
 
 
