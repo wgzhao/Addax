@@ -74,6 +74,8 @@ bin/datax.py job/job.json
 ```
 
 上述命令的输出大致如下：
+<details>
+<summary>点击展开</summary>
 
 ```
  bin/datax.py job/job.json
@@ -220,6 +222,8 @@ DataX	19890604	1989-06-04 00:00:00	true	test
 读出记录总数                    :                  10
 读写失败总数                    :                   0
 ```
+
+</details>
 
 更多说明，可以说明文档
 
