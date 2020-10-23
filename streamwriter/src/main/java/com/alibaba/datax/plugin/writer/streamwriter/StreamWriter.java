@@ -2,6 +2,7 @@
 package com.alibaba.datax.plugin.writer.streamwriter;
 
 import com.alibaba.datax.common.element.Column;
+import com.alibaba.datax.common.element.Record;
 import com.alibaba.datax.common.exception.DataXException;
 import com.alibaba.datax.common.plugin.RecordReceiver;
 import com.alibaba.datax.common.spi.Writer;
@@ -21,24 +22,30 @@ import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
 
-public class StreamWriter extends Writer {
-    public static class Job extends Writer.Job {
+public class StreamWriter
+        extends Writer
+{
+    public static class Job
+            extends Writer.Job
+    {
 
         private Configuration originalConfig;
 
         @Override
-        public void init() {
-            this.originalConfig = super.getPluginJobConf();
+        public void init()
+        {
+            this.originalConfig = getPluginJobConf();
 
             String path = this.originalConfig.getString(Key.PATH, null);
             String fileName = this.originalConfig.getString(Key.FILE_NAME, null);
 
-            if(StringUtils.isNoneBlank(path) && StringUtils.isNoneBlank(fileName)) {
+            if (StringUtils.isNoneBlank(path) && StringUtils.isNoneBlank(fileName)) {
                 validateParameter(path, fileName);
             }
         }
 
-        private void validateParameter(String path, String fileName) {
+        private void validateParameter(String path, String fileName)
+        {
             try {
                 // warn: 这里用户需要配一个目录
                 File dir = new File(path);
@@ -63,16 +70,18 @@ public class StreamWriter extends Writer {
 
                 String fileFullPath = buildFilePath(path, fileName);
                 File newFile = new File(fileFullPath);
-                if(newFile.exists()) {
+                if (newFile.exists()) {
                     try {
                         FileUtils.forceDelete(newFile);
-                    } catch (IOException e) {
+                    }
+                    catch (IOException e) {
                         throw DataXException.asDataXException(
                                 StreamWriterErrorCode.RUNTIME_EXCEPTION,
                                 String.format("删除文件失败 : [%s] ", fileFullPath), e);
                     }
                 }
-            } catch (SecurityException se) {
+            }
+            catch (SecurityException se) {
                 throw DataXException.asDataXException(
                         StreamWriterErrorCode.SECURITY_NOT_ENOUGH,
                         String.format("您没有权限创建文件路径 : [%s] ", path), se);
@@ -80,11 +89,14 @@ public class StreamWriter extends Writer {
         }
 
         @Override
-        public void prepare() {
+        public void prepare()
+        {
+            //
         }
 
         @Override
-        public List<Configuration> split(int mandatoryNumber) {
+        public List<Configuration> split(int mandatoryNumber)
+        {
             List<Configuration> writerSplitConfigs = new ArrayList<>();
             for (int i = 0; i < mandatoryNumber; i++) {
                 writerSplitConfigs.add(this.originalConfig);
@@ -94,15 +106,21 @@ public class StreamWriter extends Writer {
         }
 
         @Override
-        public void post() {
+        public void post()
+        {
+            //
         }
 
         @Override
-        public void destroy() {
+        public void destroy()
+        {
+            //
         }
     }
 
-    public static class Task extends Writer.Task {
+    public static class Task
+            extends Writer.Task
+    {
         private static final Logger LOG = LoggerFactory
                 .getLogger(Task.class);
 
@@ -117,10 +135,9 @@ public class StreamWriter extends Writer {
         private long recordNumBeforSleep;
         private long sleepTime;
 
-
-
         @Override
-        public void init() {
+        public void init()
+        {
             Configuration writerSliceConfig = getPluginJobConf();
 
             this.fieldDelimiter = writerSliceConfig.getString(
@@ -131,90 +148,100 @@ public class StreamWriter extends Writer {
             this.fileName = writerSliceConfig.getString(Key.FILE_NAME, null);
             this.recordNumBeforSleep = writerSliceConfig.getLong(Key.RECORD_NUM_BEFORE_SLEEP, 0);
             this.sleepTime = writerSliceConfig.getLong(Key.SLEEP_TIME, 0);
-            if(recordNumBeforSleep < 0) {
+            if (recordNumBeforSleep < 0) {
                 throw DataXException.asDataXException(StreamWriterErrorCode.CONFIG_INVALID_EXCEPTION, "recordNumber 不能为负值");
             }
-            if(sleepTime <0) {
+            if (sleepTime < 0) {
                 throw DataXException.asDataXException(StreamWriterErrorCode.CONFIG_INVALID_EXCEPTION, "sleep 不能为负值");
             }
-
         }
 
         @Override
-        public void prepare() {
+        public void prepare()
+        {
+            //
         }
 
         @Override
-        public void startWrite(RecordReceiver recordReceiver) {
+        public void startWrite(RecordReceiver recordReceiver)
+        {
 
+            if (StringUtils.isNoneBlank(path) && StringUtils.isNoneBlank(fileName)) {
+                writeToFile(recordReceiver, path, fileName, recordNumBeforSleep, sleepTime);
+            }
+            else {
+                try {
+                    BufferedWriter writer = new BufferedWriter(
+                            new OutputStreamWriter(System.out, StandardCharsets.UTF_8));
 
-                if(StringUtils.isNoneBlank(path) && StringUtils.isNoneBlank(fileName)) {
-                    writeToFile(recordReceiver,path, fileName, recordNumBeforSleep, sleepTime);
-                } else {
-                    try {
-                        BufferedWriter writer = new BufferedWriter(
-                                new OutputStreamWriter(System.out, StandardCharsets.UTF_8));
-
-                        com.alibaba.datax.common.element.Record record;
-                        while ((record = recordReceiver.getFromReader()) != null) {
-                            if (this.print) {
-                                writer.write(recordToString(record));
-                            } else {
-                        /* do nothing */
-                            }
+                    com.alibaba.datax.common.element.Record record;
+                    while ((record = recordReceiver.getFromReader()) != null) {
+                        if (this.print) {
+                            writer.write(recordToString(record));
                         }
-                        writer.flush();
-
-                    } catch (Exception e) {
-                        throw DataXException.asDataXException(StreamWriterErrorCode.RUNTIME_EXCEPTION, e);
+                        else {
+                            /* do nothing */
+                        }
                     }
+                    writer.flush();
                 }
+                catch (Exception e) {
+                    throw DataXException.asDataXException(StreamWriterErrorCode.RUNTIME_EXCEPTION, e);
+                }
+            }
         }
 
         private void writeToFile(RecordReceiver recordReceiver, String path, String fileName,
-                                 long recordNumBeforSleep, long sleepTime) {
+                long recordNumBeforSleep, long sleepTime)
+        {
 
             LOG.info("begin do write...");
             String fileFullPath = buildFilePath(path, fileName);
-            LOG.info(String.format("write to file : [%s]", fileFullPath));
-            BufferedWriter writer = null;
+            LOG.info("write to file : [{}]", fileFullPath);
+            File newFile = new File(fileFullPath);
             try {
-                File newFile = new File(fileFullPath);
-                newFile.createNewFile();
-
-                writer = new BufferedWriter(
-                        new OutputStreamWriter(new FileOutputStream(newFile, true), StandardCharsets.UTF_8));
-
-                com.alibaba.datax.common.element.Record record;
-                int count =0;
+                if (! newFile.createNewFile())
+                {
+                    LOG.error("failed to create file {}", fileFullPath);
+                }
+            } catch (IOException ioe)
+            {
+                LOG.error("failed to create file {}", fileFullPath);
+            }
+            try(BufferedWriter writer = new BufferedWriter(
+                    new OutputStreamWriter(new FileOutputStream(newFile, true), StandardCharsets.UTF_8)))
+            {
+                Record record;
+                int count = 0;
                 while ((record = recordReceiver.getFromReader()) != null) {
-                    if(recordNumBeforSleep > 0 && sleepTime >0 &&count == recordNumBeforSleep) {
-                        LOG.info("StreamWriter start to sleep ... recordNumBeforSleep={},sleepTime={}",recordNumBeforSleep,sleepTime);
-                        try {
-                            Thread.sleep(sleepTime * 1000L);
-                        } catch (InterruptedException ignored) {
-                        }
+                    if (recordNumBeforSleep > 0 && sleepTime > 0 && count == recordNumBeforSleep) {
+                        LOG.info("StreamWriter start to sleep ... recordNumBeforSleep={},sleepTime={}", recordNumBeforSleep, sleepTime);
+                        Thread.sleep(sleepTime * 1000L);
                     }
-                   writer.write(recordToString(record));
-                   count++;
+                    writer.write(recordToString(record));
+                    count++;
                 }
                 writer.flush();
-            } catch (Exception e) {
+            }
+            catch (Exception e) {
                 throw DataXException.asDataXException(StreamWriterErrorCode.RUNTIME_EXCEPTION, e);
-            } finally {
-                IOUtils.closeQuietly(writer, null);
             }
         }
 
         @Override
-        public void post() {
+        public void post()
+        {
+            //
         }
 
         @Override
-        public void destroy() {
+        public void destroy()
+        {
+            //
         }
 
-        private String recordToString(com.alibaba.datax.common.element.Record record) {
+        private String recordToString(Record record)
+        {
             int recordLength = record.getColumnNumber();
             if (0 == recordLength) {
                 return NEWLINE_FLAG;
@@ -233,7 +260,8 @@ public class StreamWriter extends Writer {
         }
     }
 
-    private static String buildFilePath(String path, String fileName) {
+    private static String buildFilePath(String path, String fileName)
+    {
         boolean isEndWithSeparator = false;
         switch (IOUtils.DIR_SEPARATOR) {
             case IOUtils.DIR_SEPARATOR_UNIX:
