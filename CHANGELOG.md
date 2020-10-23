@@ -46,3 +46,10 @@
 ### MongoDB reader
 
 * Add support for `json` data type
+
+## 3.1.3
+
+### Redis reader
+
+* Delete temporary local file
+* Only parse redis `String` data type, other types will be ignore

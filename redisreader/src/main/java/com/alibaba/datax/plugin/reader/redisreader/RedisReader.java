@@ -2,6 +2,7 @@ package com.alibaba.datax.plugin.reader.redisreader;
 
 import com.alibaba.datax.common.element.BytesColumn;
 import com.alibaba.datax.common.element.LongColumn;
+import com.alibaba.datax.common.element.Record;
 import com.alibaba.datax.common.plugin.RecordSender;
 import com.alibaba.datax.common.spi.Reader;
 import com.alibaba.datax.common.util.Configuration;
@@ -11,8 +12,8 @@ import com.moilioncircle.redis.replicator.Replicator;
 import com.moilioncircle.redis.replicator.event.PostRdbSyncEvent;
 import com.moilioncircle.redis.replicator.event.PreRdbSyncEvent;
 import com.moilioncircle.redis.replicator.io.RawByteListener;
-import com.moilioncircle.redis.replicator.rdb.dump.DumpRdbVisitor;
-import com.moilioncircle.redis.replicator.rdb.dump.datatype.DumpKeyValuePair;
+import com.moilioncircle.redis.replicator.rdb.datatype.KeyStringValueList;
+import com.moilioncircle.redis.replicator.rdb.datatype.KeyStringValueString;
 import com.moilioncircle.redis.replicator.rdb.skip.SkipRdbVisitor;
 import org.apache.http.HttpEntity;
 import org.apache.http.client.methods.CloseableHttpResponse;
@@ -31,6 +32,8 @@ import java.io.OutputStream;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -97,21 +100,20 @@ public class RedisReader extends Reader {
 
         @Override
         public void startRead(final RecordSender recordSender) {
-            Configuration pluginJobConf = super.getPluginJobConf();
-
+            Configuration pluginJobConf = getPluginJobConf();
+            List<Object> connections = pluginJobConf.getList("connection");
             try {
-                List<Object> connections = pluginJobConf.getList("connection");
-
-                for (Object obj : connections) {
+                for (Object obj : connections)
+                {
                     Map connection = (Map) obj;
                     URI uri = URI.create(connection.get("uri").toString());
-                    File file = new File("./" + UUID.randomUUID().toString() + ".rdb");
+                    File file = new File(UUID.randomUUID() + ".rdb");
                     if ("http".equals(uri.getScheme())) {
                         this.download(uri, file);
                     } else if ("tcp".equals(uri.getScheme())) {
                         String auth = "";
                         if (connection.get("auth") != null) {
-                            auth = "?authPassword=" + connection.get("auth").toString();
+                            auth = "?authPassword=" + connection.get("auth");
                         }
 
                         this.dump(uri.toString().replace("tcp://", "redis://") + auth, file);
@@ -119,37 +121,42 @@ public class RedisReader extends Reader {
                         file = new File(uri);
                     }
 
-                    LOG.info("loading " + file.getAbsolutePath());
+                    LOG.info("loading {} ", file.getAbsolutePath());
                     RedisReplicator r = new RedisReplicator(file, FileType.RDB, com.moilioncircle.redis.replicator.Configuration.defaultSetting());
-                    r.setRdbVisitor(new DumpRdbVisitor(r));
                     r.addEventListener((replicator, event) -> {
-                        if (event instanceof DumpKeyValuePair) {
-                            DumpKeyValuePair dkv = (DumpKeyValuePair) event;
-                            Long dbNumber = dkv.getDb().getDbNumber();
-                            byte[] key = dkv.getKey();
+                        if (event instanceof KeyStringValueString) {
+                            KeyStringValueString dkv = (KeyStringValueString) event;
+                            long dbNumber = dkv.getDb().getDbNumber();
+                            int rdbType = dkv.getValueRdbType();
+                            byte[] key =  dkv.getKey();
+                            byte[] value = dkv.getValue();
                             long expire = dkv.getExpiredMs() == null ? 0 : dkv.getExpiredMs();
 
                             //记录较大的key
-                            recordBigKey(dbNumber, dkv.getValueRdbType(), dkv.getKey(), dkv.getValue());
+                            recordBigKey(dbNumber, rdbType, key, value);
 
                             //记录数据类型
-                            collectType(dkv.getValueRdbType());
+                            collectType(rdbType);
 
-                            if (Task.this.matchDB(dbNumber.intValue()) && Task.this.matchKey(key)) {
-                                com.alibaba.datax.common.element.Record record = recordSender.createRecord();
+                            if (Task.this.matchDB((int) dbNumber) && Task.this.matchKey(key)) {
+                                Record record = recordSender.createRecord();
                                 record.addColumn(new LongColumn(dbNumber));
-                                record.addColumn(new LongColumn(dkv.getValueRdbType()));
+                                record.addColumn(new LongColumn(rdbType));
                                 record.addColumn(new LongColumn(expire));
                                 record.addColumn(new BytesColumn(key));
-                                record.addColumn(new BytesColumn(dkv.getValue()));
+                                record.addColumn(new BytesColumn(value));
                                 recordSender.sendToWriter(record);
                             }
 
+                        } else {
+                            LOG.warn("non-keyvalue type not support yet");
                         }
                     });
                     r.open();
                     r.close();
-                }
+                    // delete temporary local file
+                    Files.deleteIfExists(Paths.get(file.getAbsolutePath()));
+                } // end for
 
             } catch (Exception e) {
                 throw new RuntimeException(e.getMessage(), e);
@@ -195,27 +202,27 @@ public class RedisReader extends Reader {
 
         @Override
         public void destroy() {
-            StringBuilder sb = new StringBuilder("Redis中较大的key:\r\n");
+            StringBuilder sb = new StringBuilder("Redis中较大的key:\n");
 
             for (Map.Entry<String, Integer> entry : bigKey.entrySet()) {
                 sb.append(entry.getKey())
                         .append("\t")
                         .append(entry.getValue())
-                        .append("\r\n");
+                        .append("\n");
             }
 
-            LOG.info("\r\n" + sb.toString());
+            LOG.info(sb.toString());
 
-            sb = new StringBuilder("Redis数据类型分布:\r\n");
+            sb = new StringBuilder("Redis数据类型分布:\n");
 
             for (Map.Entry<String, Long> entry : collectTypeMap.entrySet()) {
                 sb.append(entry.getKey())
                         .append("\t")
                         .append(entry.getValue())
-                        .append("\r\n");
+                        .append("\n");
             }
 
-            LOG.info("\r\n" + sb.toString());
+            LOG.info(sb.toString());
         }
 
         private boolean matchKey(byte[] bytes) {
@@ -283,24 +290,22 @@ public class RedisReader extends Reader {
          * 下载远程rdb文件
          *
          */
-        private void download(URI uri, File outFile) throws IOException {
+        private void download(URI uri, File outFile) throws IOException
+        {
             CloseableHttpClient httpClient = this.getHttpClient();
             CloseableHttpResponse response = httpClient.execute(new HttpGet(uri));
             HttpEntity entity = response.getEntity();
             InputStream in = entity.getContent();
-            FileOutputStream out = new FileOutputStream(outFile);
             byte[] bytes = new byte[4096 * 1000];
 
             int len;
-            System.err.print("Downloading");
-            while ((len = in.read(bytes)) != -1) {
-                out.write(bytes, 0, len);
-                out.flush();
-                System.out.print(".");
+            try (FileOutputStream out = new FileOutputStream(outFile)) {
+                while ((len = in.read(bytes)) != -1) {
+                    out.write(bytes, 0, len);
+                    out.flush();
+                }
+                in.close();
             }
-
-            out.close();
-            in.close();
         }
 
         private CloseableHttpClient getHttpClient() {
@@ -371,5 +376,21 @@ public class RedisReader extends Reader {
         @Override
         public void destroy() {
         }
+    }
+
+    public static void main(String[] args) throws URISyntaxException, IOException
+    {
+        Replicator r = new RedisReplicator("redis:///usr/local/var/db/redis/dump.rdb");
+        r.addEventListener((replicator, event) ->{
+                if (event instanceof KeyStringValueList) {
+                    KeyStringValueList kv = (KeyStringValueList) event;
+                    System.out.println(new String(kv.getKey()));
+                    for(int i=0; i<=kv.getValue().size();i++) {
+                        System.out.println(new String(kv.getValue().get(i)));
+                    }
+                }
+        });
+        r.open();
+        r.close();
     }
 }
