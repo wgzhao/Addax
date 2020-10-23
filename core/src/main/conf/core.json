@@ -1,7 +1,7 @@
 
 {
     "entry": {
-        "jvm": "-Xms1G -Xmx1G",
+        "jvm": "-Xms32M -Xmx1G",
         "environment": {}
     },
     "common": {
@@ -36,7 +36,8 @@
         },
         "container": {
             "job": {
-                "reportInterval": 10000
+                "reportInterval": 10000,
+                "sleepInterval": 3000
             },
             "taskGroup": {
                 "channel": 5
