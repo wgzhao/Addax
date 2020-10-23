@@ -26,5 +26,5 @@ public abstract class ComplexTransformer {
      * @param tContext transformer运行的配置项
      * @param paras    transformer函数参数
      */
-    abstract public Record evaluate(com.alibaba.datax.common.element.Record record, Map<String, Object> tContext, Object... paras);
+    public abstract Record evaluate(Record record, Map<String, Object> tContext, Object... paras);
 }
