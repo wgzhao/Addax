@@ -31,14 +31,18 @@
 
 ### 部分插件增强功能，罗列如下
 
-1. hdfswriter 增加了对ORC格式的支持
-2. hdfswrite 增加了目录覆盖模式
-3. hdfswriter 的临时目录位置改动为当前写入目录下的隐藏目录，解决了之前和写入目录平行导致的自动增加分区的问题
-4. hdfswriter 在覆盖模式下，改进了文件删除机制，减少了对应表查询为空的时间窗口
-5. hbasex11sqlwrite  增加了 Kerberos 支持
-6. 尽可能减少了本地jar包的依赖，转为从maven仓库获取
-7. 绝大部分依赖包升级到了最新稳定版本，减少了潜在漏洞
-8. 不同插件下的相同依赖包做了版本统一
+- hdfswriter 增加了对 Decimal 数据类型格式的支持
+- hdfswriter 增加了对 Parquet 文件格式的支持
+- hdfswrite 增加了目录覆盖模式
+- hdfswriter 增加了更多的文件压缩格式支持
+- hdfswriter 的临时目录位置改动为当前写入目录下的隐藏目录，解决了之前和写入目录平行导致的自动增加分区的问题
+- hdfswriter 在覆盖模式下，改进了文件删除机制，减少了对应表查询为空的时间窗口
+- hdfsreader 增加了对 Parquet 文件格式的支持
+- hdfsreader 增加了更多的文件压缩格式支持
+- hbasex11sqlwrite  增加了 Kerberos 支持
+- 尽可能减少了本地jar包的依赖，转为从maven仓库获取
+- 绝大部分依赖包升级到了最新稳定版本，减少了潜在漏洞
+- 不同插件下的相同依赖包做了版本统一
 
 ## 快速开始
 
@@ -48,9 +52,8 @@
 
 | 版本  | 连接地址                                                     | md5值                            |
 | ----- | ------------------------------------------------------------ | -------------------------------- |
-| 3.1.1 | https://pan.baidu.com/s/1GwmFA7-hPkd6GKiZEvUKXg 提取码: 1inn | 0fa4e7902420704b2e814fef098f40ae |
 | 3.1.2 | https://pan.baidu.com/s/1zFqv8E6iJX549zdSZDQgiQ 提取码: 7jdk | 3674711fc9b68fad3086f3c8526a3427 |
-
+| 3.1.1 | https://pan.baidu.com/s/1GwmFA7-hPkd6GKiZEvUKXg 提取码: 1inn | 0fa4e7902420704b2e814fef098f40ae |
 
 
 ### 编译及打包
@@ -229,8 +232,8 @@ DataX	19890604	1989-06-04 00:00:00	true	test
 
 ## 文档
 
-[在线文档](https://datax.readthedocs.io)  
-[项目内文档](docs/src/main/sphinx/index.rst)
+- [在线文档](https://datax.readthedocs.io)  
+- [项目内文档](docs/src/main/sphinx/index.rst)
 
 ## License
 
