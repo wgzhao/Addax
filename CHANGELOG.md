@@ -53,3 +53,7 @@
 
 * Delete temporary local file
 * Only parse redis `String` data type, other types will be ignore
+
+### HDFS reader
+
+* Add support for reading Parquet file (#54)
