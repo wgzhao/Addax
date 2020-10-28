@@ -11,6 +11,7 @@ HdfsReader提供了读取分布式文件系统数据存储的能力。在底层�
 - rcfile（rc）
 - sequence file（seq）
 - Csv(csv)
+- parquet
 
 ## 2 功能与限制
 
@@ -22,7 +23,7 @@ orcfile，它的全名是Optimized Row Columnar file，是对RCFile做了优化�
 
 据官方文档介绍，这种文件格式可以提供一种高效的方法来存储Hive数据。HdfsReader利用Hive提供的OrcSerde类，读取解析orcfile文件的数据。目前HdfsReader支持的功能如下：
 
-1. 支持textfile、orcfile、rcfile、sequence file和csv格式的文件，且要求文件内容存放的是一张逻辑意义上的二维表。
+1. 支持textfile、orcfile、parquet、rcfile、sequence file和csv格式的文件，且要求文件内容存放的是一张逻辑意义上的二维表。
 
 2. 支持多种类型数据读取(使用String表示)，支持列裁剪，支持列常量
 
@@ -137,6 +138,7 @@ Hadoop hdfs文件系统namenode节点地址，如果 hdfs 配置了 HA 模式，
 - rc 表示rcfile文件格式
 - seq 表示sequence file文件格式
 - csv 表示普通hdfs文件格式（逻辑二维表）
+- parquet 表示parquetfile文件格式
 
 特别需要注意的是，HdfsReader能够自动识别文件是orcfile、textfile或者还是其它类型的文件，但该项是必填项，HdfsReader则会只读取用户配置的类型的文件，忽略路径下其他格式的文件
 
@@ -210,14 +212,18 @@ Kerberos认证 keytab文件路径，绝对路径
 `hadoopConfig` 里可以配置与 Hadoop 相关的一些高级参数，比如HA的配置
 
 ```json
-"hadoopConfig":{
-    "dfs.nameservices": "testDfs",
-    "dfs.ha.namenodes.testDfs": "nn01,nn02",
-    "dfs.namenode.rpc-address.testDfs.namenode1": "192.168.1.1",
-    "dfs.namenode.rpc-address.testDfs.namenode2": "192.168.1.2",
-    "dfs.client.failover.proxy.provider.testDfs": "org.apache.hadoop.hdfs.server.namenode.ha.ConfiguredFailoverProxyProvider"
+{
+    "hadoopConfig": {
+        "dfs.nameservices": "cluster",
+        "dfs.ha.namenodes.cluster": "nn1,nn2",
+        "dfs.namenode.rpc-address.cluster.nn1": "node1.example.com:8020",
+        "dfs.namenode.rpc-address.cluster.nn2": "node2.example.com:8020",
+        "dfs.client.failover.proxy.provider.cluster": "org.apache.hadoop.hdfs.server.namenode.ha.ConfiguredFailoverProxyProvider"
+    }
 }
 ```
+这里的 `cluster` 表示 HDFS 配置成HA时的名字，也即是 `defaultFS` 配置项中的名字
+如果实际环境中的名字不是 `cluster` ，则上述配置中所有写有 `cluster` 都需要替换 
 
 #### csvReaderConfig
 
@@ -287,8 +293,6 @@ Hive在建表的时候，可以指定分区partition，例如创建分区partiti
 ```json
 "path": "/user/hive/warehouse/mytable01/20150820/*"
 ```
-
-## 4 性能报告
 
 ## 5 约束限制
 
