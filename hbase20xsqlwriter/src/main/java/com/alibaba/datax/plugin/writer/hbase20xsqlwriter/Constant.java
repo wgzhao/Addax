@@ -1,6 +1,7 @@
 package com.alibaba.datax.plugin.writer.hbase20xsqlwriter;
 
-public final class Constant {
+public final class Constant
+{
     public static final String DEFAULT_NULL_MODE = "skip";
     public static final String DEFAULT_SERIALIZATION = "PROTOBUF";
     public static final int DEFAULT_BATCH_ROW_COUNT = 256;   // 默认一次写256行

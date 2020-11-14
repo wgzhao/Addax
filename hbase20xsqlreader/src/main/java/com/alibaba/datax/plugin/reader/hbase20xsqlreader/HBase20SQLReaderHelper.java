@@ -11,11 +11,18 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.math.BigInteger;
-import java.sql.*;
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.ResultSet;
+import java.sql.ResultSetMetaData;
+import java.sql.SQLException;
+import java.sql.Statement;
+import java.sql.Types;
 import java.util.ArrayList;
 import java.util.List;
 
-public class HBase20SQLReaderHelper {
+public class HBase20SQLReaderHelper
+{
     private static final Logger LOG = LoggerFactory.getLogger(HBase20SQLReaderHelper.class);
 
     private Configuration configuration;
@@ -27,14 +34,72 @@ public class HBase20SQLReaderHelper {
     private String splitKey;
     private List<Object> splitPoints;
 
-
-    public HBase20SQLReaderHelper (Configuration configuration) {
+    public HBase20SQLReaderHelper(Configuration configuration)
+    {
         this.configuration = configuration;
     }
+
+    public static String buildQuerySql(List<String> columnNames, String table,
+            String where)
+    {
+        String querySql;
+        StringBuilder columnBuilder = new StringBuilder();
+        for (String columnName : columnNames) {
+            columnBuilder.append("\"").append(columnName).append("\",");
+        }
+        columnBuilder.setLength(columnBuilder.length() - 1);
+        if (StringUtils.isBlank(where)) {
+            querySql = String.format(Constant.QUERY_SQL_TEMPLATE_WITHOUT_WHERE,
+                    columnBuilder.toString(), table);
+        }
+        else {
+            querySql = String.format(Constant.QUERY_SQL_TEMPLATE, columnBuilder.toString(),
+                    table, where);
+        }
+        return querySql;
+    }
+
+    private static boolean isPKTypeValid(ResultSetMetaData rsMetaData)
+    {
+        boolean ret = false;
+        try {
+            int minType = rsMetaData.getColumnType(1);
+            int maxType = rsMetaData.getColumnType(2);
+
+            boolean isNumberType = isLongType(minType);
+
+            boolean isStringType = isStringType(minType);
+
+            if (minType == maxType && (isNumberType || isStringType)) {
+                ret = true;
+            }
+        }
+        catch (Exception e) {
+            throw DataXException.asDataXException(DBUtilErrorCode.ILLEGAL_SPLIT_PK,
+                    "DataX获取切分主键(splitPk)字段类型失败. 该错误通常是系统底层异常导致. 请联系旺旺:askdatax或者DBA处理.");
+        }
+        return ret;
+    }
+
+    private static boolean isLongType(int type)
+    {
+        boolean isValidLongType = type == Types.BIGINT || type == Types.INTEGER
+                || type == Types.SMALLINT || type == Types.TINYINT;
+        return isValidLongType;
+    }
+
+    private static boolean isStringType(int type)
+    {
+        return type == Types.CHAR || type == Types.NCHAR
+                || type == Types.VARCHAR || type == Types.LONGVARCHAR
+                || type == Types.NVARCHAR;
+    }
+
     /**
-     *  校验配置参数是否正确
+     * 校验配置参数是否正确
      */
-    public void validateParameter() {
+    public void validateParameter()
+    {
         // queryserver地址必须配置
         String queryServerAddress = configuration.getNecessaryValue(Key.QUERYSERVER_ADDRESS,
                 HBase20xSQLReaderErrorCode.REQUIRED_VALUE);
@@ -50,7 +115,8 @@ public class HBase20SQLReaderHelper {
             String tableName = configuration.getNecessaryValue(Key.TABLE, HBase20xSQLReaderErrorCode.REQUIRED_VALUE);
             if (schema != null && !schema.isEmpty()) {
                 fullTableName = "\"" + schema + "\".\"" + tableName + "\"";
-            } else {
+            }
+            else {
                 fullTableName = "\"" + tableName + "\"";
             }
             // 如果列名未配置，默认读取全部列*
@@ -59,13 +125,15 @@ public class HBase20SQLReaderHelper {
             splitPoints = configuration.getList(Key.SPLIT_POINT);
             checkTable(schema, tableName);
             dealWhere();
-        } else {
+        }
+        else {
             // 用户指定querySql，切分不做处理，根据给定sql读取数据即可
             LOG.info("Split according to query sql.");
         }
     }
 
-    public Connection getConnection(String queryServerAddress, String serialization) {
+    public Connection getConnection(String queryServerAddress, String serialization)
+    {
         String url = String.format(Constant.CONNECT_STRING_TEMPLATE, queryServerAddress, serialization);
         LOG.debug("Connecting to QueryServer [" + url + "] ...");
         Connection conn;
@@ -73,7 +141,8 @@ public class HBase20SQLReaderHelper {
             Class.forName(Constant.CONNECT_DRIVER_STRING);
             conn = DriverManager.getConnection(url);
             conn.setAutoCommit(false);
-        } catch (Throwable e) {
+        }
+        catch (Throwable e) {
             throw DataXException.asDataXException(HBase20xSQLReaderErrorCode.GET_QUERYSERVER_CONNECTION_ERROR,
                     "无法连接QueryServer，配置不正确或服务未启动，请检查配置和服务状态或者联系HBase管理员.", e);
         }
@@ -84,7 +153,8 @@ public class HBase20SQLReaderHelper {
     /**
      * 检查表名、列名和切分列是否存在
      */
-    public void checkTable(String schema, String tableName) {
+    public void checkTable(String schema, String tableName)
+    {
         Statement statement = null;
         ResultSet resultSet = null;
         try {
@@ -94,7 +164,8 @@ public class HBase20SQLReaderHelper {
             // 处理schema不为空情况
             if (schema == null || schema.isEmpty()) {
                 selectSql = selectSql + " AND TABLE_SCHEM IS NULL";
-            } else {
+            }
+            else {
                 selectSql = selectSql + " AND TABLE_SCHEM = '" + schema + "'";
             }
             resultSet = statement.executeQuery(selectSql);
@@ -116,7 +187,8 @@ public class HBase20SQLReaderHelper {
                                 "您配置的列" + columnName + "在表" + tableName + "的元数据中不存在，请检查您的配置或者联系HBase管理员.");
                     }
                 }
-            } else {
+            }
+            else {
                 columnNames = allColumnName;
                 configuration.set(Key.COLUMN, allColumnName);
             }
@@ -127,17 +199,18 @@ public class HBase20SQLReaderHelper {
                             "您配置的切分列" + splitKey + "不是表" + tableName + "的主键，请检查您的配置或者联系HBase管理员.");
                 }
             }
-
-        } catch (SQLException e) {
+        }
+        catch (SQLException e) {
             throw DataXException.asDataXException(HBase20xSQLReaderErrorCode.GET_PHOENIX_TABLE_ERROR,
                     "获取表" + tableName + "信息失败，请检查您的集群和表状态或者联系HBase管理员.", e);
-
-        } finally {
+        }
+        finally {
             closeJdbc(null, statement, resultSet);
         }
     }
 
-    public void closeJdbc(Connection connection, Statement statement, ResultSet resultSet) {
+    public void closeJdbc(Connection connection, Statement statement, ResultSet resultSet)
+    {
         try {
             if (resultSet != null) {
                 resultSet.close();
@@ -148,17 +221,19 @@ public class HBase20SQLReaderHelper {
             if (connection != null) {
                 connection.close();
             }
-        } catch (SQLException e) {
+        }
+        catch (SQLException e) {
             LOG.warn("数据库连接关闭异常.", HBase20xSQLReaderErrorCode.CLOSE_PHOENIX_CONNECTION_ERROR, e);
         }
     }
 
-    public void dealWhere() {
+    public void dealWhere()
+    {
         String where = configuration.getString(Key.WHERE, null);
-        if(StringUtils.isNotBlank(where)) {
+        if (StringUtils.isNotBlank(where)) {
             String whereImprove = where.trim();
-            if(whereImprove.endsWith(";") || whereImprove.endsWith("；")) {
-                whereImprove = whereImprove.substring(0,whereImprove.length()-1);
+            if (whereImprove.endsWith(";") || whereImprove.endsWith("；")) {
+                whereImprove = whereImprove.substring(0, whereImprove.length() - 1);
             }
             configuration.set(Key.WHERE, whereImprove);
         }
@@ -167,7 +242,8 @@ public class HBase20SQLReaderHelper {
     /**
      * 对表进行切分
      */
-    public List<Configuration> doSplit(int adviceNumber) {
+    public List<Configuration> doSplit(int adviceNumber)
+    {
         List<Configuration> pluginParams = new ArrayList<Configuration>();
         List<String> rangeList;
         String where = configuration.getString(Key.WHERE);
@@ -196,18 +272,20 @@ public class HBase20SQLReaderHelper {
                             String.valueOf(minMaxPK.getLeft()),
                             String.valueOf(minMaxPK.getRight()), adviceNumber,
                             splitKey, "'", null);
-                } else if (isLongType) {
+                }
+                else if (isLongType) {
                     rangeList = RdbmsRangeSplitWrap.splitAndWrap(
                             new BigInteger(minMaxPK.getLeft().toString()),
                             new BigInteger(minMaxPK.getRight().toString()),
                             adviceNumber, splitKey);
-                } else {
+                }
+                else {
                     throw DataXException.asDataXException(HBase20xSQLReaderErrorCode.ILLEGAL_SPLIT_PK,
                             "您配置的切分主键(splitPk) 类型 DataX 不支持. DataX 仅支持切分主键为一个,并且类型为整数或者字符串类型. " +
                                     "请尝试使用其他的切分主键或者联系HBase管理员进行处理.");
                 }
-
-            } else {
+            }
+            else {
                 LOG.info("Split accoring splitPoints...");
                 // 根据指定splitPoints进行切分
                 rangeList = buildSplitRange();
@@ -223,7 +301,8 @@ public class HBase20SQLReaderHelper {
                     tempConfig.set(Constant.QUERY_SQL_PER_SPLIT, tempQuerySql);
                     pluginParams.add(tempConfig);
                 }
-            } else {
+            }
+            else {
                 Configuration tempConfig = configuration.clone();
                 tempQuerySql = buildQuerySql(columnNames, fullTableName, where)
                         + (hasWhere ? " and " : " where ")
@@ -232,7 +311,8 @@ public class HBase20SQLReaderHelper {
                 tempConfig.set(Constant.QUERY_SQL_PER_SPLIT, tempQuerySql);
                 pluginParams.add(tempConfig);
             }
-        } else {
+        }
+        else {
             // 指定querySql不需要切分
             for (String sql : querySql) {
                 Configuration tempConfig = configuration.clone();
@@ -243,25 +323,8 @@ public class HBase20SQLReaderHelper {
         return pluginParams;
     }
 
-    public static String buildQuerySql(List<String> columnNames, String table,
-                                       String where) {
-        String querySql;
-        StringBuilder columnBuilder = new StringBuilder();
-        for (String columnName : columnNames) {
-            columnBuilder.append("\"").append(columnName).append("\",");
-        }
-        columnBuilder.setLength(columnBuilder.length() -1);
-        if (StringUtils.isBlank(where)) {
-            querySql = String.format(Constant.QUERY_SQL_TEMPLATE_WITHOUT_WHERE,
-                    columnBuilder.toString(), table);
-        } else {
-            querySql = String.format(Constant.QUERY_SQL_TEMPLATE, columnBuilder.toString(),
-                    table, where);
-        }
-        return querySql;
-    }
-
-    private List<String> buildSplitRange() {
+    private List<String> buildSplitRange()
+    {
         String getSplitKeyTypeSQL = String.format(Constant.QUERY_COLUMN_TYPE_TEMPLATE, splitKey, fullTableName);
         Statement statement = null;
         ResultSet resultSet = null;
@@ -297,9 +360,11 @@ public class HBase20SQLReaderHelper {
             for (int i = 0; i <= splitPoints.size(); i++) {
                 if (i == 0) {
                     splitCondition = splitKey + " <= " + String.format(symbol, splitPoints.get(i));
-                } else if (i == splitPoints.size()) {
+                }
+                else if (i == splitPoints.size()) {
                     splitCondition = splitKey + " > " + String.format(symbol, splitPoints.get(i - 1));
-                } else {
+                }
+                else {
                     splitCondition = splitKey + " > " + String.format(symbol, splitPoints.get(i - 1)) +
                             " AND " + splitKey + " <= " + String.format(symbol, splitPoints.get(i));
                 }
@@ -307,16 +372,18 @@ public class HBase20SQLReaderHelper {
             }
 
             return splitConditions;
-        } catch (SQLException e) {
+        }
+        catch (SQLException e) {
             throw DataXException.asDataXException(HBase20xSQLReaderErrorCode.GET_TABLE_COLUMNTYPE_ERROR,
                     "获取切分列类型失败，请检查服务或给定表和切分列是否正常，或者联系HBase管理员进行处理。", e);
-        } finally {
+        }
+        finally {
             closeJdbc(null, statement, resultSet);
         }
-
     }
 
-    private Pair<Object, Object> getPkRange(Configuration configuration) {
+    private Pair<Object, Object> getPkRange(Configuration configuration)
+    {
         String pkRangeSQL = String.format(Constant.QUERY_MIN_MAX_TEMPLATE, splitKey, splitKey, fullTableName);
         String where = configuration.getString(Key.WHERE);
         if (StringUtils.isNotBlank(where)) {
@@ -334,7 +401,7 @@ public class HBase20SQLReaderHelper {
 
             if (isPKTypeValid(rsMetaData)) {
                 if (isStringType(rsMetaData.getColumnType(1))) {
-                    if(configuration != null) {
+                    if (configuration != null) {
                         configuration
                                 .set(Constant.PK_TYPE, Constant.PK_TYPE_STRING);
                     }
@@ -342,62 +409,35 @@ public class HBase20SQLReaderHelper {
                         minMaxPK = new ImmutablePair<Object, Object>(
                                 resultSet.getString(1), resultSet.getString(2));
                     }
-                } else if (isLongType(rsMetaData.getColumnType(1))) {
-                    if(configuration != null) {
+                }
+                else if (isLongType(rsMetaData.getColumnType(1))) {
+                    if (configuration != null) {
                         configuration.set(Constant.PK_TYPE, Constant.PK_TYPE_LONG);
                     }
                     if (resultSet.next()) {
                         minMaxPK = new ImmutablePair<Object, Object>(
                                 resultSet.getLong(1), resultSet.getLong(2));
                     }
-                } else {
+                }
+                else {
                     throw DataXException.asDataXException(HBase20xSQLReaderErrorCode.ILLEGAL_SPLIT_PK,
                             "您配置的DataX切分主键(splitPk)有误. 因为您配置的切分主键(splitPk) 类型 DataX 不支持. " +
                                     "DataX 仅支持切分主键为一个,并且类型为整数或者字符串类型. 请尝试使用其他的切分主键或者联系HBASE管理员进行处理.");
                 }
-            } else {
+            }
+            else {
                 throw DataXException.asDataXException(HBase20xSQLReaderErrorCode.ILLEGAL_SPLIT_PK,
                         "您配置的DataX切分主键(splitPk)有误. 因为您配置的切分主键(splitPk) 类型 DataX 不支持. " +
                                 "DataX 仅支持切分主键为一个,并且类型为整数或者字符串类型. 请尝试使用其他的切分主键或者联系HBASE管理员进行处理.");
             }
-        } catch (SQLException e) {
+        }
+        catch (SQLException e) {
             throw DataXException.asDataXException(HBase20xSQLReaderErrorCode.ILLEGAL_SPLIT_PK, e);
-        } finally {
+        }
+        finally {
             closeJdbc(null, statement, resultSet);
         }
 
         return minMaxPK;
-    }
-
-    private static boolean isPKTypeValid(ResultSetMetaData rsMetaData) {
-        boolean ret = false;
-        try {
-            int minType = rsMetaData.getColumnType(1);
-            int maxType = rsMetaData.getColumnType(2);
-
-            boolean isNumberType = isLongType(minType);
-
-            boolean isStringType = isStringType(minType);
-
-            if (minType == maxType && (isNumberType || isStringType)) {
-                ret = true;
-            }
-        } catch (Exception e) {
-            throw DataXException.asDataXException(DBUtilErrorCode.ILLEGAL_SPLIT_PK,
-                    "DataX获取切分主键(splitPk)字段类型失败. 该错误通常是系统底层异常导致. 请联系旺旺:askdatax或者DBA处理.");
-        }
-        return ret;
-    }
-
-    private static boolean isLongType(int type) {
-        boolean isValidLongType = type == Types.BIGINT || type == Types.INTEGER
-                || type == Types.SMALLINT || type == Types.TINYINT;
-        return isValidLongType;
-    }
-
-    private static boolean isStringType(int type) {
-        return type == Types.CHAR || type == Types.NCHAR
-                || type == Types.VARCHAR || type == Types.LONGVARCHAR
-                || type == Types.NVARCHAR;
     }
 }

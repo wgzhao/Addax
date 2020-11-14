@@ -10,9 +10,20 @@ import org.apache.commons.lang3.CharUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.builder.ToStringBuilder;
 
-import java.io.*;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 /**
  * Configuration 提供多级JSON配置信息无损存储 <br>
@@ -51,7 +62,8 @@ import java.util.*;
  * 2. 返回树形结构，例如 a.b.c.d = "bazhen"，如果返回"a"下的所有元素，实际上是一个Map，需要合并处理 <br>
  * 3. 输出JSON，将上述对象转为JSON，要把上述Map的多级key转为树形结构，并输出为JSON <br>
  */
-public class Configuration {
+public class Configuration
+{
 
     /**
      * 对于加密的keyPath，需要记录下来
@@ -62,40 +74,56 @@ public class Configuration {
 
     private Object root;
 
+    private Configuration(final String json)
+    {
+        try {
+            this.root = JSON.parse(json);
+        }
+        catch (Exception e) {
+            throw DataXException.asDataXException(CommonErrorCode.CONFIG_ERROR,
+                    String.format("配置信息错误. 您提供的配置信息不是合法的JSON格式: %s . 请按照标准json格式提供配置信息. ", e.getMessage()));
+        }
+    }
+
     /**
      * 初始化空白的Configuration
      */
-    public static Configuration newDefault() {
+    public static Configuration newDefault()
+    {
         return Configuration.from("{}");
     }
 
     /**
      * 从JSON字符串加载Configuration
      */
-    public static Configuration from(String json) {
+    public static Configuration from(String json)
+    {
         json = StrUtil.replaceVariable(json);
         checkJSON(json);
 
         try {
             return new Configuration(json);
-        } catch (Exception e) {
+        }
+        catch (Exception e) {
             throw DataXException.asDataXException(CommonErrorCode.CONFIG_ERROR,
                     e);
         }
-
     }
 
     /**
      * 从包括json的File对象加载Configuration
      */
-    public static Configuration from(File file) {
+    public static Configuration from(File file)
+    {
         try {
             return Configuration.from(IOUtils
                     .toString(new FileInputStream(file), StandardCharsets.UTF_8));
-        } catch (FileNotFoundException e) {
+        }
+        catch (FileNotFoundException e) {
             throw DataXException.asDataXException(CommonErrorCode.CONFIG_ERROR,
                     String.format("配置信息错误，您提供的配置文件[%s]不存在. 请检查您的配置文件.", file.getAbsolutePath()));
-        } catch (IOException e) {
+        }
+        catch (IOException e) {
             throw DataXException.asDataXException(
                     CommonErrorCode.CONFIG_ERROR,
                     String.format("配置信息错误. 您提供配置文件[%s]读取失败，错误原因: %s. 请检查您的配置文件的权限设置.",
@@ -106,10 +134,12 @@ public class Configuration {
     /**
      * 从包括json的InputStream对象加载Configuration
      */
-    public static Configuration from(InputStream is) {
+    public static Configuration from(InputStream is)
+    {
         try {
             return Configuration.from(IOUtils.toString(is, StandardCharsets.UTF_8));
-        } catch (IOException e) {
+        }
+        catch (IOException e) {
             throw DataXException.asDataXException(CommonErrorCode.CONFIG_ERROR,
                     String.format("请检查您的配置文件. 您提供的配置文件读取失败，错误原因: %s. 请检查您的配置文件的权限设置.", e));
         }
@@ -118,18 +148,34 @@ public class Configuration {
     /**
      * 从Map对象加载Configuration
      */
-    public static Configuration from(final Map<String, Object> object) {
+    public static Configuration from(final Map<String, Object> object)
+    {
         return Configuration.from(Configuration.toJSONString(object));
     }
 
     /**
      * 从List对象加载Configuration
      */
-    public static Configuration from(final List<Object> object) {
+    public static Configuration from(final List<Object> object)
+    {
         return Configuration.from(Configuration.toJSONString(object));
     }
 
-    public String getNecessaryValue(String key, ErrorCode errorCode) {
+    private static void checkJSON(final String json)
+    {
+        if (StringUtils.isBlank(json)) {
+            throw DataXException.asDataXException(CommonErrorCode.CONFIG_ERROR,
+                    "配置信息错误. 因为您提供的配置信息不是合法的JSON格式, JSON不能为空白. 请按照标准json格式提供配置信息. ");
+        }
+    }
+
+    private static String toJSONString(final Object object)
+    {
+        return JSON.toJSONString(object);
+    }
+
+    public String getNecessaryValue(String key, ErrorCode errorCode)
+    {
         String value = this.getString(key, null);
         if (StringUtils.isBlank(value)) {
             throw DataXException.asDataXException(errorCode,
@@ -139,7 +185,8 @@ public class Configuration {
         return value;
     }
 
-    public String getUnnecessaryValue(String key,String defaultValue) {
+    public String getUnnecessaryValue(String key, String defaultValue)
+    {
         String value = this.getString(key, defaultValue);
         if (StringUtils.isBlank(value)) {
             value = defaultValue;
@@ -167,11 +214,13 @@ public class Configuration {
      *
      * @return Java表示的JSON对象，如果path不存在或者对象不存在，均返回null。
      */
-    public Object get(final String path) {
+    public Object get(final String path)
+    {
         this.checkPath(path);
         try {
             return this.findObject(path);
-        } catch (Exception e) {
+        }
+        catch (Exception e) {
             return null;
         }
     }
@@ -182,7 +231,8 @@ public class Configuration {
      * <br>
      * 如果path获取的路径或者对象不存在，返回null
      */
-    public Configuration getConfiguration(final String path) {
+    public Configuration getConfiguration(final String path)
+    {
         Object object = this.get(path);
         if (null == object) {
             return null;
@@ -196,7 +246,8 @@ public class Configuration {
      *
      * @return String对象，如果path不存在或者String不存在，返回null
      */
-    public String getString(final String path) {
+    public String getString(final String path)
+    {
         Object string = this.get(path);
         if (null == string) {
             return null;
@@ -209,7 +260,8 @@ public class Configuration {
      *
      * @return String对象，如果path不存在或者String不存在，返回默认字符串
      */
-    public String getString(final String path, final String defaultValue) {
+    public String getString(final String path, final String defaultValue)
+    {
         String result = this.getString(path);
 
         if (null == result) {
@@ -224,7 +276,8 @@ public class Configuration {
      *
      * @return Character对象，如果path不存在或者Character不存在，返回null
      */
-    public Character getChar(final String path) {
+    public Character getChar(final String path)
+    {
         String result = this.getString(path);
         if (null == result) {
             return null;
@@ -232,7 +285,8 @@ public class Configuration {
 
         try {
             return CharUtils.toChar(result);
-        } catch (Exception e) {
+        }
+        catch (Exception e) {
             throw DataXException.asDataXException(
                     CommonErrorCode.CONFIG_ERROR,
                     String.format("任务读取配置文件出错. 因为配置文件路径[%s] 值非法，期望是字符类型: %s. 请检查您的配置并作出修改.", path,
@@ -245,7 +299,8 @@ public class Configuration {
      *
      * @return Character对象，如果path不存在或者Character不存在，返回默认Character对象
      */
-    public Character getChar(final String path, char defaultValue) {
+    public Character getChar(final String path, char defaultValue)
+    {
         Character result = this.getChar(path);
         if (null == result) {
             return defaultValue;
@@ -258,21 +313,24 @@ public class Configuration {
      *
      * @return Boolean对象，如果path值非true,false ，将报错.特别注意：当 path 不存在时，会返回：null.
      */
-    public Boolean getBool(final String path) {
+    public Boolean getBool(final String path)
+    {
         String result = this.getString(path);
 
         if (null == result) {
-            return null;
-        } else if ("true".equalsIgnoreCase(result)) {
+            return null; //NOSONAR
+        }
+        else if ("true".equalsIgnoreCase(result)) {
             return Boolean.TRUE;
-        } else if ("false".equalsIgnoreCase(result)) {
+        }
+        else if ("false".equalsIgnoreCase(result)) {
             return Boolean.FALSE;
-        } else {
+        }
+        else {
             throw DataXException.asDataXException(CommonErrorCode.CONFIG_ERROR,
                     String.format("您提供的配置信息有误，因为从[%s]获取的值[%s]无法转换为bool类型. 请检查源表的配置并且做出相应的修改.",
                             path, result));
         }
-
     }
 
     /**
@@ -280,7 +338,8 @@ public class Configuration {
      *
      * @return Boolean对象，如果path不存在或者Boolean不存在，返回默认Boolean对象
      */
-    public Boolean getBool(final String path, boolean defaultValue) {
+    public Boolean getBool(final String path, boolean defaultValue)
+    {
         Boolean result = this.getBool(path);
         if (null == result) {
             return defaultValue;
@@ -293,7 +352,8 @@ public class Configuration {
      *
      * @return Integer对象，如果path不存在或者Integer不存在，返回null
      */
-    public Integer getInt(final String path) {
+    public Integer getInt(final String path)
+    {
         String result = this.getString(path);
         if (null == result) {
             return null;
@@ -301,7 +361,8 @@ public class Configuration {
 
         try {
             return Integer.valueOf(result);
-        } catch (Exception e) {
+        }
+        catch (Exception e) {
             throw DataXException.asDataXException(
                     CommonErrorCode.CONFIG_ERROR,
                     String.format("任务读取配置文件出错. 配置文件路径[%s] 值非法, 期望是整数类型: %s. 请检查您的配置并作出修改.", path,
@@ -314,7 +375,8 @@ public class Configuration {
      *
      * @return Integer对象，如果path不存在或者Integer不存在，返回默认Integer对象
      */
-    public Integer getInt(final String path, int defaultValue) {
+    public Integer getInt(final String path, int defaultValue)
+    {
         Integer object = this.getInt(path);
         if (null == object) {
             return defaultValue;
@@ -327,7 +389,8 @@ public class Configuration {
      *
      * @return Long对象，如果path不存在或者Long不存在，返回null
      */
-    public Long getLong(final String path) {
+    public Long getLong(final String path)
+    {
         String result = this.getString(path);
         if (StringUtils.isBlank(result)) {
             return null;
@@ -335,7 +398,8 @@ public class Configuration {
 
         try {
             return Long.valueOf(result);
-        } catch (Exception e) {
+        }
+        catch (Exception e) {
             throw DataXException.asDataXException(
                     CommonErrorCode.CONFIG_ERROR,
                     String.format("任务读取配置文件出错. 配置文件路径[%s] 值非法, 期望是整数类型: %s. 请检查您的配置并作出修改.", path,
@@ -348,7 +412,8 @@ public class Configuration {
      *
      * @return Long对象，如果path不存在或者Integer不存在，返回默认Long对象
      */
-    public Long getLong(final String path, long defaultValue) {
+    public Long getLong(final String path, long defaultValue)
+    {
         Long result = this.getLong(path);
         if (null == result) {
             return defaultValue;
@@ -361,7 +426,8 @@ public class Configuration {
      *
      * @return Double对象，如果path不存在或者Double不存在，返回null
      */
-    public Double getDouble(final String path) {
+    public Double getDouble(final String path)
+    {
         String result = this.getString(path);
         if (StringUtils.isBlank(result)) {
             return null;
@@ -369,7 +435,8 @@ public class Configuration {
 
         try {
             return Double.valueOf(result);
-        } catch (Exception e) {
+        }
+        catch (Exception e) {
             throw DataXException.asDataXException(
                     CommonErrorCode.CONFIG_ERROR,
                     String.format("任务读取配置文件出错. 配置文件路径[%s] 值非法, 期望是浮点类型: %s. 请检查您的配置并作出修改.", path,
@@ -382,7 +449,8 @@ public class Configuration {
      *
      * @return Double对象，如果path不存在或者Double不存在，返回默认Double对象
      */
-    public Double getDouble(final String path, double defaultValue) {
+    public Double getDouble(final String path, double defaultValue)
+    {
         Double result = this.getDouble(path);
         if (null == result) {
             return defaultValue;
@@ -394,7 +462,8 @@ public class Configuration {
      * 根据用户提供的json path，寻址List对象，如果对象不存在，返回null
      */
     @SuppressWarnings("unchecked")
-    public List<Object> getList(final String path) {
+    public List<Object> getList(final String path)
+    {
         return this.get(path, List.class);
     }
 
@@ -402,10 +471,11 @@ public class Configuration {
      * 根据用户提供的json path，寻址List对象，如果对象不存在，返回null
      */
     @SuppressWarnings("unchecked")
-    public <T> List<T> getList(final String path, Class<T> t) {
+    public <T> List<T> getList(final String path, Class<T> t)
+    {
         List<Object> object = this.get(path, List.class);
         if (null == object) {
-            return null;
+            return Collections.emptyList();
         }
 
         List<T> result = new ArrayList<>();
@@ -413,8 +483,9 @@ public class Configuration {
         List<Object> origin = new ArrayList<>();
         try {
             origin = object;
-        }catch(ClassCastException e){
-            // .warn("{} 转为 List 时发生了异常，默认将此值添加到 List 中", String.valueOf(object));
+        }
+        catch (ClassCastException e) {
+            // .warn("{} 转为 List 时发生了异常，默认将此值添加到 List 中", String.valueOf(object))
             origin.add(String.valueOf(object));
         }
 
@@ -429,7 +500,8 @@ public class Configuration {
      * 根据用户提供的json path，寻址List对象，如果对象不存在，返回默认List
      */
     public List<Object> getList(final String path,
-                                final List<Object> defaultList) {
+            final List<Object> defaultList)
+    {
         List<Object> object = this.getList(path);
         if (null == object) {
             return defaultList;
@@ -441,7 +513,8 @@ public class Configuration {
      * 根据用户提供的json path，寻址List对象，如果对象不存在，返回默认List
      */
     public <T> List<T> getList(final String path, final List<T> defaultList,
-                               Class<T> t) {
+            Class<T> t)
+    {
         List<T> list = this.getList(path, t);
         if (null == list) {
             return defaultList;
@@ -452,10 +525,11 @@ public class Configuration {
     /**
      * 根据用户提供的json path，寻址包含Configuration的List，如果对象不存在，返回默认null
      */
-    public List<Configuration> getListConfiguration(final String path) {
+    public List<Configuration> getListConfiguration(final String path)
+    {
         List<Object> lists = getList(path);
         if (lists == null) {
-            return null;
+            return Collections.emptyList();
         }
 
         List<Configuration> result = new ArrayList<>();
@@ -469,7 +543,8 @@ public class Configuration {
      * 根据用户提供的json path，寻址Map对象，如果对象不存在，返回null
      */
     @SuppressWarnings("unchecked")
-    public Map<String, Object> getMap(final String path) {
+    public Map<String, Object> getMap(final String path)
+    {
         return this.get(path, Map.class);
     }
 
@@ -477,7 +552,8 @@ public class Configuration {
      * 根据用户提供的json path，寻址Map对象，如果对象不存在，返回默认map
      */
     public Map<String, Object> getMap(final String path,
-                                      final Map<String, Object> defaultMap) {
+            final Map<String, Object> defaultMap)
+    {
         Map<String, Object> object = this.getMap(path);
         if (null == object) {
             return defaultMap;
@@ -506,7 +582,8 @@ public class Configuration {
      * @return Java表示的JSON对象，如果转型失败，将抛出异常
      */
     @SuppressWarnings("unchecked")
-    public <T> T get(final String path, Class<T> clazz) {
+    public <T> T get(final String path, Class<T> clazz)
+    {
         this.checkPath(path);
         return (T) this.get(path);
     }
@@ -514,7 +591,8 @@ public class Configuration {
     /**
      * 格式化Configuration输出
      */
-    public String beautify() {
+    public String beautify()
+    {
         return JSON.toJSONString(this.getInternal(),
                 SerializerFeature.PrettyFormat);
     }
@@ -534,13 +612,12 @@ public class Configuration {
      * 对于插入对象，Configuration不做任何限制，但是请务必保证该对象是简单对象(包括Map<String,
      * Object>、List<Object>)，不要使用自定义对象，否则后续对于JSON序列化等情况会出现未定义行为。
      *
-     * @param path
-     *            JSON path对象
-     * @param object
-     *            需要插入的对象
+     * @param path JSON path对象
+     * @param object 需要插入的对象
      * @return Java表示的JSON对象
      */
-    public Object set(final String path, final Object object) {
+    public Object set(final String path, final Object object)
+    {
         checkPath(path);
 
         Object result = this.get(path);
@@ -561,7 +638,8 @@ public class Configuration {
      * <p/>
      * 下属的key包括: a.b.c[0],a.b.c[1],a.b.c[2],a.b.c[3],x
      */
-    public Set<String> getKeys() {
+    public Set<String> getKeys()
+    {
         Set<String> collect = new HashSet<>();
         this.getKeysRecursive(this.getInternal(), "", collect);
         return collect;
@@ -570,7 +648,8 @@ public class Configuration {
     /**
      * 删除path对应的值，如果path不存在，将抛出异常。
      */
-    public Object remove(final String path) {
+    public Object remove(final String path)
+    {
         final Object result = this.get(path);
         if (null == result) {
             throw DataXException.asDataXException(
@@ -585,42 +664,41 @@ public class Configuration {
     /**
      * 合并其他Configuration，并修改两者冲突的KV配置
      *
-     * @param another
-     *            合并加入的第三方Configuration
-     * @param updateWhenConflict
-     *            当合并双方出现KV冲突时候，选择更新当前KV，或者忽略该KV
+     * @param another 合并加入的第三方Configuration
+     * @param updateWhenConflict 当合并双方出现KV冲突时候，选择更新当前KV，或者忽略该KV
      */
     public Configuration merge(final Configuration another,
-                               boolean updateWhenConflict) {
+            boolean updateWhenConflict)
+    {
         Set<String> keys = another.getKeys();
 
-        for (final String key : keys) {
-            // 如果使用更新策略，凡是another存在的key，均需要更新
+        // 如果使用更新策略，凡是another存在的key，均需要更新
+        // 使用忽略策略，只有another Configuration存在但是当前Configuration不存在的key，才需要更新
+        keys.forEach(key -> {
             if (updateWhenConflict) {
                 this.set(key, another.get(key));
-                continue;
+                return;
             }
-
-            // 使用忽略策略，只有another Configuration存在但是当前Configuration不存在的key，才需要更新
             boolean isCurrentExists = this.get(key) != null;
             if (isCurrentExists) {
-                continue;
+                return;
             }
-
             this.set(key, another.get(key));
-        }
+        });
         return this;
     }
 
     @Override
-    public String toString() {
+    public String toString()
+    {
         return this.toJSON();
     }
 
     /**
      * 将Configuration作为JSON输出
      */
-    public String toJSON() {
+    public String toJSON()
+    {
         return Configuration.toJSONString(this.getInternal());
     }
 
@@ -628,7 +706,8 @@ public class Configuration {
      * 拷贝当前Configuration，注意，这里使用了深拷贝，避免冲突
      */
     @Override
-    public Configuration clone() {
+    public Configuration clone()
+    {
         Configuration config = Configuration
                 .from(Configuration.toJSONString(this.getInternal()));
         config.addSecretKeyPath(this.secretKeyPathSet);
@@ -641,26 +720,23 @@ public class Configuration {
      * a.b.c
      * a.b[2].c
      */
-    public void addSecretKeyPath(String path) {
-        if(StringUtils.isNotBlank(path)) {
+    public void addSecretKeyPath(String path)
+    {
+        if (StringUtils.isNotBlank(path)) {
             this.secretKeyPathSet.add(path);
         }
     }
 
-    public void addSecretKeyPath(Set<String> pathSet) {
-        if(pathSet != null) {
+    public void addSecretKeyPath(Set<String> pathSet)
+    {
+        if (pathSet != null) {
             this.secretKeyPathSet.addAll(pathSet);
         }
     }
 
-    public void setSecretKeyPathSet(Set<String> keyPathSet) {
-        if(keyPathSet != null) {
-            this.secretKeyPathSet = keyPathSet;
-        }
-    }
-
     @SuppressWarnings("unchecked")
-    void getKeysRecursive(final Object current, String path, Set<String> collect) {
+    void getKeysRecursive(final Object current, String path, Set<String> collect)
+    {
         boolean isRegularElement = !(current instanceof Map || current instanceof List);
         if (isRegularElement) {
             collect.add(path);
@@ -670,14 +746,15 @@ public class Configuration {
         boolean isMap = current instanceof Map;
         if (isMap) {
             Map<String, Object> mapping = ((Map<String, Object>) current);
-            for (final String key : mapping.keySet()) {
+            mapping.keySet().forEach(key -> {
                 if (StringUtils.isBlank(path)) {
                     getKeysRecursive(mapping.get(key), key.trim(), collect);
-                } else {
+                }
+                else {
                     getKeysRecursive(mapping.get(key), path + "." + key.trim(),
                             collect);
                 }
-            }
+            });
             return;
         }
 
@@ -686,14 +763,15 @@ public class Configuration {
             getKeysRecursive(lists.get(i), path + String.format("[%d]", i),
                     collect);
         }
-
     }
 
-    public Object getInternal() {
+    public Object getInternal()
+    {
         return this.root;
     }
 
-    private void setObject(final String path, final Object object) {
+    private void setObject(final String path, final Object object)
+    {
         Object newRoot = setObjectRecursive(this.root, split2List(path), 0,
                 object);
 
@@ -708,7 +786,8 @@ public class Configuration {
     }
 
     @SuppressWarnings("unchecked")
-    private Object extractConfiguration(final Object object) {
+    private Object extractConfiguration(final Object object)
+    {
         if (object instanceof Configuration) {
             return extractFromConfiguration(object);
         }
@@ -734,7 +813,8 @@ public class Configuration {
         return object;
     }
 
-    private Object extractFromConfiguration(final Object object) {
+    private Object extractFromConfiguration(final Object object)
+    {
         if (object instanceof Configuration) {
             return ((Configuration) object).getInternal();
         }
@@ -742,7 +822,8 @@ public class Configuration {
         return object;
     }
 
-    Object buildObject(final List<String> paths, final Object object) {
+    Object buildObject(final List<String> paths, final Object object)
+    {
         if (null == paths) {
             throw DataXException.asDataXException(
                     CommonErrorCode.RUNTIME_ERROR,
@@ -784,7 +865,8 @@ public class Configuration {
 
     @SuppressWarnings("unchecked")
     Object setObjectRecursive(Object current, final List<String> paths,
-                              int index, final Object value) {
+            int index, final Object value)
+    {
 
         // 如果是已经超出path，我们就返回value即可，作为最底层叶子节点
         boolean isLastIndex = index == paths.size();
@@ -865,7 +947,8 @@ public class Configuration {
                 "该异常代表系统编程错误, 请联系DataX开发团队 !");
     }
 
-    private Object findObject(final String path) {
+    private Object findObject(final String path)
+    {
         boolean isRootQuery = StringUtils.isBlank(path);
         if (isRootQuery) {
             return this.root;
@@ -876,7 +959,8 @@ public class Configuration {
         for (final String each : split2List(path)) {
             if (isPathMap(each)) {
                 target = findObjectInMap(target, each);
-            } else {
+            }
+            else {
                 target = findObjectInList(target, each);
             }
         }
@@ -885,7 +969,8 @@ public class Configuration {
     }
 
     @SuppressWarnings("unchecked")
-    private Object findObjectInMap(final Object target, final String index) {
+    private Object findObjectInMap(final Object target, final String index)
+    {
         boolean isMap = (target instanceof Map);
         if (!isMap) {
             throw new IllegalArgumentException(String.format(
@@ -902,8 +987,9 @@ public class Configuration {
         return result;
     }
 
-    @SuppressWarnings({ "unchecked" })
-    private Object findObjectInList(final Object target, final String each) {
+    @SuppressWarnings({"unchecked"})
+    private Object findObjectInList(final Object target, final String each)
+    {
         boolean isList = (target instanceof List);
         if (!isList) {
             throw new IllegalArgumentException(String.format(
@@ -922,7 +1008,8 @@ public class Configuration {
         return ((List<Object>) target).get(Integer.parseInt(index));
     }
 
-    private List<Object> expand(List<Object> list, int size) {
+    private List<Object> expand(List<Object> list, int size)
+    {
         int expand = size - list.size();
         while (expand-- > 0) {
             list.add(null);
@@ -930,31 +1017,38 @@ public class Configuration {
         return list;
     }
 
-    private boolean isPathList(final String path) {
+    private boolean isPathList(final String path)
+    {
         return path.contains("[") && path.contains("]");
     }
 
-    private boolean isPathMap(final String path) {
+    private boolean isPathMap(final String path)
+    {
         return StringUtils.isNotBlank(path) && !isPathList(path);
     }
 
-    private int getIndex(final String index) {
+    private int getIndex(final String index)
+    {
         return Integer.parseInt(index.replace("[", "").replace("]", ""));
     }
 
-    private boolean isSuitForRoot(final Object object) {
+    private boolean isSuitForRoot(final Object object)
+    {
         return (object instanceof List || object instanceof Map);
     }
 
-    private String split(final String path) {
+    private String split(final String path)
+    {
         return StringUtils.replace(path, "[", ".[");
     }
 
-    private List<String> split2List(final String path) {
+    private List<String> split2List(final String path)
+    {
         return Arrays.asList(StringUtils.split(split(path), "."));
     }
 
-    private void checkPath(final String path) {
+    private void checkPath(final String path)
+    {
         if (null == path) {
             throw new IllegalArgumentException(
                     "系统编程错误, 该异常代表系统编程错误, 请联系DataX开发团队!.");
@@ -968,27 +1062,15 @@ public class Configuration {
         }
     }
 
-    private static void checkJSON(final String json) {
-        if (StringUtils.isBlank(json)) {
-            throw DataXException.asDataXException(CommonErrorCode.CONFIG_ERROR,
-                    "配置信息错误. 因为您提供的配置信息不是合法的JSON格式, JSON不能为空白. 请按照标准json格式提供配置信息. ");
-        }
-    }
-
-    private Configuration(final String json) {
-        try {
-            this.root = JSON.parse(json);
-        } catch (Exception e) {
-            throw DataXException.asDataXException(CommonErrorCode.CONFIG_ERROR,
-                    String.format("配置信息错误. 您提供的配置信息不是合法的JSON格式: %s . 请按照标准json格式提供配置信息. ", e.getMessage()));
-        }
-    }
-
-    private static String toJSONString(final Object object) {
-        return JSON.toJSONString(object);
-    }
-
-    public Set<String> getSecretKeyPathSet() {
+    public Set<String> getSecretKeyPathSet()
+    {
         return secretKeyPathSet;
+    }
+
+    public void setSecretKeyPathSet(Set<String> keyPathSet)
+    {
+        if (keyPathSet != null) {
+            this.secretKeyPathSet = keyPathSet;
+        }
     }
 }

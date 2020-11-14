@@ -2,20 +2,21 @@ package com.alibaba.datax.core.job.scheduler;
 
 import com.alibaba.datax.common.exception.DataXException;
 import com.alibaba.datax.common.util.Configuration;
+import com.alibaba.datax.core.meta.State;
 import com.alibaba.datax.core.statistics.communication.Communication;
 import com.alibaba.datax.core.statistics.communication.CommunicationTool;
 import com.alibaba.datax.core.statistics.container.communicator.AbstractContainerCommunicator;
 import com.alibaba.datax.core.util.ErrorRecordChecker;
 import com.alibaba.datax.core.util.FrameworkErrorCode;
 import com.alibaba.datax.core.util.container.CoreConstant;
-import com.alibaba.datax.core.meta.State;
 import org.apache.commons.lang.Validate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.List;
 
-public abstract class AbstractScheduler {
+public abstract class AbstractScheduler
+{
     private static final Logger LOG = LoggerFactory
             .getLogger(AbstractScheduler.class);
 
@@ -23,15 +24,18 @@ public abstract class AbstractScheduler {
 
     private Long jobId;
 
-    public Long getJobId() {
-        return jobId;
-    }
-
-    public AbstractScheduler(AbstractContainerCommunicator containerCommunicator) {
+    public AbstractScheduler(AbstractContainerCommunicator containerCommunicator)
+    {
         this.containerCommunicator = containerCommunicator;
     }
 
-    public void schedule(List<Configuration> configurations) {
+    public Long getJobId()
+    {
+        return jobId;
+    }
+
+    public void schedule(List<Configuration> configurations)
+    {
         Validate.notNull(configurations,
                 "scheduler配置不能为空");
         int jobReportIntervalInMillSec = configurations.get(0).getInt(
@@ -93,20 +97,21 @@ public abstract class AbstractScheduler {
 
                 if (isJobKilling(this.getJobId())) {
                     dealKillingStat(this.containerCommunicator, totalTasks);
-                } else if (nowJobContainerCommunication.getState() == State.FAILED) {
+                }
+                else if (nowJobContainerCommunication.getState() == State.FAILED) {
                     dealFailedStat(this.containerCommunicator, nowJobContainerCommunication.getThrowable());
                 }
 
                 Thread.sleep(jobSleepIntervalInMillSec);
             }
-        } catch (InterruptedException e) {
+        }
+        catch (InterruptedException e) {
             // 以 failed 状态退出
             LOG.error("捕获到InterruptedException异常!", e);
 
             throw DataXException.asDataXException(
                     FrameworkErrorCode.RUNTIME_ERROR, e);
         }
-
     }
 
     protected abstract void startAllTaskGroup(List<Configuration> configurations);
@@ -115,7 +120,8 @@ public abstract class AbstractScheduler {
 
     protected abstract void dealKillingStat(AbstractContainerCommunicator frameworkCollector, int totalTasks);
 
-    private int calculateTaskCount(List<Configuration> configurations) {
+    private int calculateTaskCount(List<Configuration> configurations)
+    {
         int totalTasks = 0;
         for (Configuration taskGroupConfiguration : configurations) {
             totalTasks += taskGroupConfiguration.getListConfiguration(
@@ -129,5 +135,5 @@ public abstract class AbstractScheduler {
 //        return jobInfo.getData() == State.KILLING.value();
 //    }
 
-    protected  abstract  boolean isJobKilling(Long jobId);
+    protected abstract boolean isJobKilling(Long jobId);
 }

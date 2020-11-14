@@ -10,66 +10,76 @@ import java.util.Date;
  * Created by jingxing on 14-8-24.
  * <p/>
  */
-public abstract class Column {
+public abstract class Column
+{
 
-	private Type type;
+    private Type type;
 
-	private Object rawData;
+    private Object rawData;
 
-	private int byteSize;
+    private int byteSize;
 
-	public Column(final Object object, final Type type, int byteSize) {
-		this.rawData = object;
-		this.type = type;
-		this.byteSize = byteSize;
-	}
+    public Column(final Object object, final Type type, int byteSize)
+    {
+        this.rawData = object;
+        this.type = type;
+        this.byteSize = byteSize;
+    }
 
-	public Object getRawData() {
-		return this.rawData;
-	}
+    public Object getRawData()
+    {
+        return this.rawData;
+    }
 
-	public Type getType() {
-		return this.type;
-	}
+    protected void setRawData(Object rawData)
+    {
+        this.rawData = rawData;
+    }
 
-	public int getByteSize() {
-		return this.byteSize;
-	}
+    public Type getType()
+    {
+        return this.type;
+    }
 
-	protected void setType(Type type) {
-		this.type = type;
-	}
+    protected void setType(Type type)
+    {
+        this.type = type;
+    }
 
-	protected void setRawData(Object rawData) {
-		this.rawData = rawData;
-	}
+    public int getByteSize()
+    {
+        return this.byteSize;
+    }
 
-	protected void setByteSize(int byteSize) {
-		this.byteSize = byteSize;
-	}
+    protected void setByteSize(int byteSize)
+    {
+        this.byteSize = byteSize;
+    }
 
-	public abstract Long asLong();
+    public abstract Long asLong();
 
-	public abstract Double asDouble();
+    public abstract Double asDouble();
 
-	public abstract String asString();
+    public abstract String asString();
 
-	public abstract Date asDate();
+    public abstract Date asDate();
 
-	public abstract byte[] asBytes();
+    public abstract byte[] asBytes();
 
-	public abstract Boolean asBoolean();
+    public abstract Boolean asBoolean();
 
-	public abstract BigDecimal asBigDecimal();
+    public abstract BigDecimal asBigDecimal();
 
-	public abstract BigInteger asBigInteger();
+    public abstract BigInteger asBigInteger();
 
-	@Override
-	public String toString() {
-		return JSON.toJSONString(this);
-	}
+    @Override
+    public String toString()
+    {
+        return JSON.toJSONString(this);
+    }
 
-	public enum Type {
-		BAD, NULL, INT, LONG, DOUBLE, STRING, BOOL, DATE, BYTES, ARRAY, JAVA_OBJECT
-	}
+    public enum Type
+    {
+        BAD, NULL, INT, LONG, DOUBLE, STRING, BOOL, DATE, BYTES, ARRAY, JAVA_OBJECT
+    }
 }

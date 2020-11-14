@@ -7,7 +7,8 @@ import java.util.Set;
 /**
  * Created by shf on 15/10/8.
  */
-public class Key {
+public class Key
+{
     // must have
     public static final String PATH = "path";
     //must have
@@ -41,5 +42,4 @@ public class Key {
     // hdfs format
 
     public static final Set<String> SUPPORT_FORMAT = new HashSet<>(Arrays.asList("ORC", "PARQUET", "TEXT"));
-
 }

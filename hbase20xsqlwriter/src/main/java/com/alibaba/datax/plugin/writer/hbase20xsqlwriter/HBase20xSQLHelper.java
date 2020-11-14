@@ -5,13 +5,16 @@ import com.alibaba.datax.common.util.Configuration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.sql.*;
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
 
-public class HBase20xSQLHelper {
-    private static final Logger LOG = LoggerFactory.getLogger(HBase20xSQLHelper.class);
-
+public class HBase20xSQLHelper
+{
     /**
      * phoenix瘦客户端连接前缀
      */
@@ -24,11 +27,13 @@ public class HBase20xSQLHelper {
      * 从系统表查找配置表信息
      */
     public static final String SELECT_CATALOG_TABLE_STRING = "SELECT COLUMN_NAME FROM SYSTEM.CATALOG WHERE TABLE_NAME='%s' AND COLUMN_NAME IS NOT NULL";
+    private static final Logger LOG = LoggerFactory.getLogger(HBase20xSQLHelper.class);
 
     /**
      * 验证配置参数是否正确
      */
-    public static void validateParameter(com.alibaba.datax.common.util.Configuration originalConfig) {
+    public static void validateParameter(com.alibaba.datax.common.util.Configuration originalConfig)
+    {
         // 表名和queryserver地址必须配置，否则抛异常
         String tableName = originalConfig.getNecessaryValue(Key.TABLE, HBase20xSQLWriterErrorCode.REQUIRED_VALUE);
         String queryServerAddress = originalConfig.getNecessaryValue(Key.QUERYSERVER_ADDRESS, HBase20xSQLWriterErrorCode.REQUIRED_VALUE);
@@ -53,14 +58,16 @@ public class HBase20xSQLHelper {
     /**
      * 获取JDBC连接，轻量级连接，使用完后必须显式close
      */
-    public static Connection getThinClientConnection(String connStr) {
+    public static Connection getThinClientConnection(String connStr)
+    {
         LOG.debug("Connecting to QueryServer [" + connStr + "] ...");
         Connection conn;
         try {
             Class.forName(CONNECT_DRIVER_STRING);
             conn = DriverManager.getConnection(connStr);
             conn.setAutoCommit(false);
-        } catch (Throwable e) {
+        }
+        catch (Throwable e) {
             throw DataXException.asDataXException(HBase20xSQLWriterErrorCode.GET_QUERYSERVER_CONNECTION_ERROR,
                     "无法连接QueryServer，配置不正确或服务未启动，请检查配置和服务状态或者联系HBase管理员.", e);
         }
@@ -68,7 +75,8 @@ public class HBase20xSQLHelper {
         return conn;
     }
 
-    public static Connection getJdbcConnection(Configuration conf) {
+    public static Connection getJdbcConnection(Configuration conf)
+    {
         String queryServerAddress = conf.getNecessaryValue(Key.QUERYSERVER_ADDRESS, HBase20xSQLWriterErrorCode.REQUIRED_VALUE);
         // 序列化格式，可不配置，默认PROTOBUF
         String serialization = conf.getString(Key.SERIALIZATION_NAME, "PROTOBUF");
@@ -76,13 +84,15 @@ public class HBase20xSQLHelper {
         return getThinClientConnection(connStr);
     }
 
-
-    public static String getConnectionUrl(String queryServerAddress, String serialization) {
+    public static String getConnectionUrl(String queryServerAddress, String serialization)
+    {
         String urlFmt = CONNECT_STRING_PREFIX + "url=%s;serialization=%s";
         return String.format(urlFmt, queryServerAddress, serialization);
     }
 
-    public static void checkTable(Connection conn, String schema, String tableName, List<String> columnNames) throws DataXException {
+    public static void checkTable(Connection conn, String schema, String tableName, List<String> columnNames)
+            throws DataXException
+    {
         String selectSystemTable = getSelectSystemSQL(schema, tableName);
         Statement st = null;
         ResultSet rs = null;
@@ -92,7 +102,8 @@ public class HBase20xSQLHelper {
             List<String> allColumns = new ArrayList<String>();
             if (rs.next()) {
                 allColumns.add(rs.getString(1));
-            } else {
+            }
+            else {
                 LOG.error(tableName + "表不存在，请检查表名是否正确或是否已创建.", HBase20xSQLWriterErrorCode.GET_HBASE_TABLE_ERROR);
                 throw DataXException.asDataXException(HBase20xSQLWriterErrorCode.GET_HBASE_TABLE_ERROR,
                         tableName + "表不存在，请检查表名是否正确或是否已创建.");
@@ -107,16 +118,18 @@ public class HBase20xSQLHelper {
                             "您配置的列" + columnName + "在目的表" + tableName + "的元数据中不存在，请检查您的配置或者联系HBase管理员.");
                 }
             }
-
-        } catch (SQLException t) {
+        }
+        catch (SQLException t) {
             throw DataXException.asDataXException(HBase20xSQLWriterErrorCode.GET_HBASE_TABLE_ERROR,
                     "获取表" + tableName + "信息失败，请检查您的集群和表状态或者联系HBase管理员.", t);
-        } finally {
+        }
+        finally {
             closeJdbc(conn, st, rs);
         }
     }
 
-    private static String getSelectSystemSQL(String schema, String tableName) {
+    private static String getSelectSystemSQL(String schema, String tableName)
+    {
         String sql = String.format(SELECT_CATALOG_TABLE_STRING, tableName);
         if (schema != null) {
             sql = sql + " AND TABLE_SCHEM = '" + schema + "'";
@@ -124,7 +137,8 @@ public class HBase20xSQLHelper {
         return sql;
     }
 
-    public static void closeJdbc(Connection connection, Statement statement, ResultSet resultSet) {
+    public static void closeJdbc(Connection connection, Statement statement, ResultSet resultSet)
+    {
         try {
             if (resultSet != null) {
                 resultSet.close();
@@ -135,7 +149,8 @@ public class HBase20xSQLHelper {
             if (connection != null) {
                 connection.close();
             }
-        } catch (SQLException e) {
+        }
+        catch (SQLException e) {
             LOG.warn("数据库连接关闭异常.", HBase20xSQLWriterErrorCode.CLOSE_HBASE_CONNECTION_ERROR);
         }
     }

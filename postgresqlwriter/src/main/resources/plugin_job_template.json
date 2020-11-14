@@ -1,17 +1,17 @@
 {
-    "name": "postgresqlwriter",
-    "parameter": {
-        "username": "",
-        "password": "",
-        "column": [],
-        "preSql": [],
-        "connection": [
-            {
-                "jdbcUrl": "",
-                "table": []
-            }
-        ],
-        "preSql": [],
-        "postSql": []
-    }
+  "name": "postgresqlwriter",
+  "parameter": {
+    "username": "",
+    "password": "",
+    "column": [],
+    "preSql": [],
+    "connection": [
+      {
+        "jdbcUrl": "",
+        "table": []
+      }
+    ],
+    "preSql": [],
+    "postSql": []
+  }
 }

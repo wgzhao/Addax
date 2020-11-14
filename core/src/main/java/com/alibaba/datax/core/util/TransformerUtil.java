@@ -19,11 +19,13 @@ import java.util.List;
  * no comments.
  * Created by liqiang on 16/3/9.
  */
-public class TransformerUtil {
+public class TransformerUtil
+{
 
     private static final Logger LOG = LoggerFactory.getLogger(TransformerUtil.class);
 
-    public static List<TransformerExecution> buildTransformerInfo(Configuration taskConfig) {
+    public static List<TransformerExecution> buildTransformerInfo(Configuration taskConfig)
+    {
         List<Configuration> tfConfigs = taskConfig.getListConfiguration(CoreConstant.JOB_TRANSFORMER);
         if (tfConfigs == null || tfConfigs.isEmpty()) {
             return null;
@@ -31,9 +33,7 @@ public class TransformerUtil {
 
         List<TransformerExecution> result = new ArrayList<>();
 
-
         List<String> functionNames = new ArrayList<>();
-
 
         for (Configuration configuration : tfConfigs) {
             String functionName = configuration.getString("name");
@@ -81,7 +81,8 @@ public class TransformerUtil {
                 if (paras != null && !paras.isEmpty()) {
                     transformerExecutionParas.setParas(paras.toArray(new String[0]));
                 }
-            } else {
+            }
+            else {
                 String code = configuration.getString(CoreConstant.TRANSFORMER_PARAMETER_CODE);
                 if (StringUtils.isEmpty(code)) {
                     throw DataXException.asDataXException(TransformerErrorCode.TRANSFORMER_ILLEGAL_PARAMETER, "groovy code must be set by UDF:name=" + functionName);
@@ -106,6 +107,5 @@ public class TransformerUtil {
         }
 
         return result;
-
     }
 }

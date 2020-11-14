@@ -2,7 +2,8 @@ package com.alibaba.datax.plugin.reader.hbase11xsqlreader;
 
 import org.apache.hadoop.hbase.HConstants;
 
-public final class Key {
+public final class Key
+{
 
     public final static String MOCK_JOBID_IDENTIFIER = "phoenixreader";
     public final static int MOCK_JOBID = 1;
@@ -24,5 +25,4 @@ public final class Key {
      * 【必选】列配置
      */
     public final static String COLUMN = "column";
-
 }

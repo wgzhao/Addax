@@ -11,12 +11,17 @@ import java.util.List;
 /**
  * @author yanghan.y
  */
-public class HbaseSQLWriter extends Writer {
-    public static class Job extends Writer.Job {
+public class HbaseSQLWriter
+        extends Writer
+{
+    public static class Job
+            extends Writer.Job
+    {
         private HbaseSQLWriterConfig config;
 
         @Override
-        public void init() {
+        public void init()
+        {
             // 解析配置
             config = HbaseSQLHelper.parseConfig(this.getPluginJobConf());
 
@@ -25,16 +30,18 @@ public class HbaseSQLWriter extends Writer {
         }
 
         @Override
-        public void  prepare() {
+        public void prepare()
+        {
             // 写之前是否要清空目标表，默认不清空
-            if(config.truncate()) {
+            if (config.truncate()) {
                 Connection conn = HbaseSQLHelper.getJdbcConnection(config);
                 HbaseSQLHelper.truncateTable(conn, config.getTableName());
             }
         }
 
         @Override
-        public List<Configuration> split(int mandatoryNumber) {
+        public List<Configuration> split(int mandatoryNumber)
+        {
             List<Configuration> splitResultConfigs = new ArrayList<>();
             for (int j = 0; j < mandatoryNumber; j++) {
                 splitResultConfigs.add(config.getOriginalConfig().clone());
@@ -43,28 +50,33 @@ public class HbaseSQLWriter extends Writer {
         }
 
         @Override
-        public void destroy() {
+        public void destroy()
+        {
             // NOOP
         }
     }
 
-    public static class Task extends Writer.Task {
+    public static class Task
+            extends Writer.Task
+    {
         private HbaseSQLWriterTask hbaseSQLWriterTask;
 
         @Override
-        public void init() {
+        public void init()
+        {
             Configuration taskConfig = getPluginJobConf();
             this.hbaseSQLWriterTask = new HbaseSQLWriterTask(taskConfig);
         }
 
         @Override
-        public void startWrite(RecordReceiver lineReceiver) {
+        public void startWrite(RecordReceiver lineReceiver)
+        {
             this.hbaseSQLWriterTask.startWriter(lineReceiver, getTaskPluginCollector());
         }
 
-
         @Override
-        public void destroy() {
+        public void destroy()
+        {
             // hbaseSQLTask不需要close
         }
     }

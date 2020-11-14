@@ -14,15 +14,19 @@ import java.util.List;
  * no comments.
  * Created by liqiang on 16/3/4.
  */
-public class GroovyTransformer extends Transformer {
-    public GroovyTransformer() {
+public class GroovyTransformer
+        extends Transformer
+{
+    private Transformer groovyTransformer;
+
+    public GroovyTransformer()
+    {
         setTransformerName("dx_groovy");
     }
 
-    private Transformer groovyTransformer;
-
     @Override
-    public Record evaluate(com.alibaba.datax.common.element.Record record, Object... paras) {
+    public Record evaluate(com.alibaba.datax.common.element.Record record, Object... paras)
+    {
 
         if (groovyTransformer == null) {
             //全局唯一
@@ -33,7 +37,7 @@ public class GroovyTransformer extends Transformer {
 
                 if (groovyTransformer == null) {
                     String code = (String) paras[0];
-                    @SuppressWarnings("unchecked") List<String> extraPackage = paras.length == 2 ?  (List<String>) paras[1] : null;
+                    @SuppressWarnings("unchecked") List<String> extraPackage = paras.length == 2 ? (List<String>) paras[1] : null;
                     initGroovyTransformer(code, extraPackage);
                 }
             }
@@ -42,14 +46,16 @@ public class GroovyTransformer extends Transformer {
         return this.groovyTransformer.evaluate(record);
     }
 
-    private void initGroovyTransformer(String code, List<String> extraPackage) {
+    private void initGroovyTransformer(String code, List<String> extraPackage)
+    {
         GroovyClassLoader loader = new GroovyClassLoader(GroovyTransformer.class.getClassLoader());
         String groovyRule = getGroovyRule(code, extraPackage);
 
         Class groovyClass;
         try {
             groovyClass = loader.parseClass(groovyRule);
-        } catch (CompilationFailedException cfe) {
+        }
+        catch (CompilationFailedException cfe) {
             throw DataXException.asDataXException(TransformerErrorCode.TRANSFORMER_GROOVY_INIT_EXCEPTION, cfe);
         }
 
@@ -59,15 +65,16 @@ public class GroovyTransformer extends Transformer {
                 throw DataXException.asDataXException(TransformerErrorCode.TRANSFORMER_GROOVY_INIT_EXCEPTION, "datax bug! contact askdatax");
             }
             this.groovyTransformer = (Transformer) t;
-        } catch (Throwable ex) {
+        }
+        catch (Throwable ex) {
             throw DataXException.asDataXException(TransformerErrorCode.TRANSFORMER_GROOVY_INIT_EXCEPTION, ex);
         }
     }
 
-
-    private String getGroovyRule(String expression, List<String> extraPackagesStrList) {
+    private String getGroovyRule(String expression, List<String> extraPackagesStrList)
+    {
         StringBuilder sb = new StringBuilder();
-        if(extraPackagesStrList!=null) {
+        if (extraPackagesStrList != null) {
             for (String extraPackagesStr : extraPackagesStrList) {
                 if (StringUtils.isNotEmpty(extraPackagesStr)) {
                     sb.append(extraPackagesStr);
@@ -86,6 +93,4 @@ public class GroovyTransformer extends Transformer {
 
         return sb.toString();
     }
-
-
 }

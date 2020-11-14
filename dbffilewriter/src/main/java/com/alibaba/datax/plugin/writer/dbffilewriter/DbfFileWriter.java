@@ -6,7 +6,6 @@ import com.alibaba.datax.common.plugin.RecordReceiver;
 import com.alibaba.datax.common.spi.Writer;
 import com.alibaba.datax.common.util.Configuration;
 import com.alibaba.datax.plugin.unstructuredstorage.writer.UnstructuredStorageWriterUtil;
-
 import com.linuxense.javadbf.DBFDataType;
 import com.linuxense.javadbf.DBFField;
 import com.linuxense.javadbf.DBFWriter;
@@ -32,14 +31,19 @@ import java.util.UUID;
 /**
  * Created by haiwei.luo on 14-9-17.
  */
-public class DbfFileWriter extends Writer {
-    public static class Job extends Writer.Job {
+public class DbfFileWriter
+        extends Writer
+{
+    public static class Job
+            extends Writer.Job
+    {
         private static final Logger LOG = LoggerFactory.getLogger(Job.class);
 
         private Configuration writerSliceConfig = null;
 
         @Override
-        public void init() {
+        public void init()
+        {
             this.writerSliceConfig = this.getPluginJobConf();
             this.validateParameter();
             String dateFormatOld = this.writerSliceConfig
@@ -58,7 +62,8 @@ public class DbfFileWriter extends Writer {
                     .validateParameter(this.writerSliceConfig);
         }
 
-        private void validateParameter() {
+        private void validateParameter()
+        {
             this.writerSliceConfig
                     .getNecessaryValue(
                             com.alibaba.datax.plugin.unstructuredstorage.writer.Key.FILE_NAME,
@@ -88,7 +93,8 @@ public class DbfFileWriter extends Writer {
                                                 path));
                     }
                 }
-            } catch (SecurityException se) {
+            }
+            catch (SecurityException se) {
                 throw DataXException.asDataXException(
                         DbfFileWriterErrorCode.SECURITY_NOT_ENOUGH,
                         String.format("您没有权限创建文件路径 : [%s] ", path), se);
@@ -96,7 +102,8 @@ public class DbfFileWriter extends Writer {
         }
 
         @Override
-        public void prepare() {
+        public void prepare()
+        {
             String path = this.writerSliceConfig.getString(Key.PATH);
             String fileName = this.writerSliceConfig
                     .getString(com.alibaba.datax.plugin.unstructuredstorage.writer.Key.FILE_NAME);
@@ -121,30 +128,36 @@ public class DbfFileWriter extends Writer {
                         }
                         // FileUtils.cleanDirectory(dir);
                     }
-                } catch (NullPointerException npe) {
+                }
+                catch (NullPointerException npe) {
                     throw DataXException
                             .asDataXException(
                                     DbfFileWriterErrorCode.Write_FILE_ERROR,
                                     String.format("您配置的目录清空时出现空指针异常 : [%s]",
                                             path), npe);
-                } catch (IllegalArgumentException iae) {
+                }
+                catch (IllegalArgumentException iae) {
                     throw DataXException.asDataXException(
                             DbfFileWriterErrorCode.SECURITY_NOT_ENOUGH,
                             String.format("您配置的目录参数异常 : [%s]", path));
-                } catch (SecurityException se) {
+                }
+                catch (SecurityException se) {
                     throw DataXException.asDataXException(
                             DbfFileWriterErrorCode.SECURITY_NOT_ENOUGH,
                             String.format("您没有权限查看目录 : [%s]", path));
-                } catch (IOException e) {
+                }
+                catch (IOException e) {
                     throw DataXException.asDataXException(
                             DbfFileWriterErrorCode.Write_FILE_ERROR,
                             String.format("无法清空目录 : [%s]", path), e);
                 }
-            } else if ("append".equals(writeMode)) {
+            }
+            else if ("append".equals(writeMode)) {
                 LOG.info(String
                         .format("由于您配置了writeMode append, 写入前不做清理工作, [%s] 目录下写入相应文件名前缀  [%s] 的文件",
                                 path, fileName));
-            } else if ("nonConflict".equals(writeMode)) {
+            }
+            else if ("nonConflict".equals(writeMode)) {
                 LOG.info(String.format(
                         "由于您配置了writeMode nonConflict, 开始检查 [%s] 下面的内容", path));
                 // warn: check two times about exists, mkdirs
@@ -176,7 +189,8 @@ public class DbfFileWriter extends Writer {
                                                     "您配置的path: [%s] 目录不为空, 下面存在其他文件或文件夹.",
                                                     path));
                         }
-                    } else {
+                    }
+                    else {
                         boolean createdOk = dir.mkdirs();
                         if (!createdOk) {
                             throw DataXException
@@ -187,12 +201,14 @@ public class DbfFileWriter extends Writer {
                                                     path));
                         }
                     }
-                } catch (SecurityException se) {
+                }
+                catch (SecurityException se) {
                     throw DataXException.asDataXException(
                             DbfFileWriterErrorCode.SECURITY_NOT_ENOUGH,
                             String.format("您没有权限查看目录 : [%s]", path));
                 }
-            } else {
+            }
+            else {
                 throw DataXException
                         .asDataXException(
                                 DbfFileWriterErrorCode.ILLEGAL_VALUE,
@@ -203,17 +219,20 @@ public class DbfFileWriter extends Writer {
         }
 
         @Override
-        public void post() {
+        public void post()
+        {
 
         }
 
         @Override
-        public void destroy() {
+        public void destroy()
+        {
 
         }
 
         @Override
-        public List<Configuration> split(int mandatoryNumber) {
+        public List<Configuration> split(int mandatoryNumber)
+        {
             LOG.info("begin do split...");
             List<Configuration> writerSplitConfigs = new ArrayList<Configuration>();
             String filePrefix = this.writerSliceConfig
@@ -225,7 +244,8 @@ public class DbfFileWriter extends Writer {
                 path = this.writerSliceConfig.getString(Key.PATH);
                 File dir = new File(path);
                 allFiles = new HashSet<>(Arrays.asList(dir.list()));
-            } catch (SecurityException se) {
+            }
+            catch (SecurityException se) {
                 throw DataXException.asDataXException(
                         DbfFileWriterErrorCode.SECURITY_NOT_ENOUGH,
                         String.format("您没有权限查看目录 : [%s]", path));
@@ -239,7 +259,7 @@ public class DbfFileWriter extends Writer {
                         .clone();
 
                 String fullFileName;
-                if (mandatoryNumber>1){
+                if (mandatoryNumber > 1) {
                     fileSuffix = UUID.randomUUID().toString().replace('-', '_');
                     fullFileName = String.format("%s__%s", filePrefix, fileSuffix);
                     while (allFiles.contains(fullFileName)) {
@@ -247,9 +267,9 @@ public class DbfFileWriter extends Writer {
                         fullFileName = String.format("%s__%s", filePrefix,
                                 fileSuffix);
                     }
-
-                }else {
-                    fullFileName=filePrefix;
+                }
+                else {
+                    fullFileName = filePrefix;
                 }
                 allFiles.add(fullFileName);
 
@@ -265,10 +285,11 @@ public class DbfFileWriter extends Writer {
             LOG.info("end do split.");
             return writerSplitConfigs;
         }
-
     }
 
-    public static class Task extends Writer.Task {
+    public static class Task
+            extends Writer.Task
+    {
         private static final Logger LOG = LoggerFactory.getLogger(Task.class);
 
         private Configuration writerSliceConfig;
@@ -278,7 +299,8 @@ public class DbfFileWriter extends Writer {
         private String fileName;
 
         @Override
-        public void init() {
+        public void init()
+        {
             this.writerSliceConfig = this.getPluginJobConf();
             this.path = this.writerSliceConfig.getString(Key.PATH);
             this.fileName = this.writerSliceConfig
@@ -286,12 +308,14 @@ public class DbfFileWriter extends Writer {
         }
 
         @Override
-        public void prepare() {
+        public void prepare()
+        {
 
         }
 
         @Override
-        public void startWrite(RecordReceiver lineReceiver) {
+        public void startWrite(RecordReceiver lineReceiver)
+        {
             LOG.info("begin do write...");
             String fileFullPath = this.buildFilePath();
             LOG.info(String.format("write to file : [%s]", fileFullPath));
@@ -304,7 +328,7 @@ public class DbfFileWriter extends Writer {
 
                 DBFField[] fields = new DBFField[columns.size()];
 
-                for (int i = 0; i <columns.size(); i++) {
+                for (int i = 0; i < columns.size(); i++) {
                     fields[i] = new DBFField();
                     fields[i].setName(columns.get(i).getString("name"));
                     switch (columns.get(i).getString("type")) {
@@ -337,7 +361,7 @@ public class DbfFileWriter extends Writer {
                 while ((record = lineReceiver.getFromReader()) != null) {
                     Object[] rowData = new Object[columns.size()];
                     Column column;
-                    for (int i = 0; i <columns.size(); i++) {
+                    for (int i = 0; i < columns.size(); i++) {
                         column = record.getColumn(i);
                         if (null != column.getRawData()) {
                             String colData = column.getRawData().toString();
@@ -357,13 +381,13 @@ public class DbfFileWriter extends Writer {
                                     break;
                             }
                         }
-
                     }
                     writer.addRecord(rowData);
                 }
 
                 writer.close();
-            } catch (SecurityException  se) {
+            }
+            catch (SecurityException se) {
                 throw DataXException.asDataXException(
                         DbfFileWriterErrorCode.SECURITY_NOT_ENOUGH,
                         String.format("您没有权限创建文件  : [%s]", this.fileName));
@@ -371,7 +395,8 @@ public class DbfFileWriter extends Writer {
             LOG.info("end do write");
         }
 
-        private String buildFilePath() {
+        private String buildFilePath()
+        {
             boolean isEndWithSeparator = false;
             switch (IOUtils.DIR_SEPARATOR) {
                 case IOUtils.DIR_SEPARATOR_UNIX:
@@ -392,12 +417,14 @@ public class DbfFileWriter extends Writer {
         }
 
         @Override
-        public void post() {
+        public void post()
+        {
 
         }
 
         @Override
-        public void destroy() {
+        public void destroy()
+        {
 
         }
     }

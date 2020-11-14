@@ -1,19 +1,22 @@
 package com.alibaba.datax.plugin.writer.hbase11xwriter;
 
-import com.alibaba.datax.common.element.Record;
 import com.alibaba.datax.common.exception.DataXException;
 import com.alibaba.datax.common.util.Configuration;
 import org.apache.hadoop.hbase.client.Put;
 
-public  class MultiVersionTask extends HbaseAbstractTask {
+public class MultiVersionTask
+        extends HbaseAbstractTask
+{
 
-    public MultiVersionTask(Configuration configuration) {
+    public MultiVersionTask(Configuration configuration)
+    {
         super(configuration);
     }
 
     @Override
-    public Put convertRecordToPut(com.alibaba.datax.common.element.Record record) {
-        if (record.getColumnNumber() != 4 ) {
+    public Put convertRecordToPut(com.alibaba.datax.common.element.Record record)
+    {
+        if (record.getColumnNumber() != 4) {
             // multversion 模式下源头读取字段列数为4元组(rowkey,column,timestamp,value),目的端需告诉[]
             throw DataXException
                     .asDataXException(
@@ -58,5 +61,4 @@ public  class MultiVersionTask extends HbaseAbstractTask {
 //        );
         return put;
     }
-
 }

@@ -16,20 +16,22 @@ import org.slf4j.LoggerFactory;
 import java.util.ArrayList;
 import java.util.List;
 
-public final class OriginalConfPretreatmentUtil {
+public final class OriginalConfPretreatmentUtil
+{
     private static final Logger LOG = LoggerFactory
             .getLogger(OriginalConfPretreatmentUtil.class);
 
     public static DataBaseType DATABASE_TYPE;
 
-    public static void doPretreatment(Configuration originalConfig) {
+    public static void doPretreatment(Configuration originalConfig)
+    {
         // 检查 username/password 配置（必填）
         originalConfig.getNecessaryValue(Key.USERNAME,
                 DBUtilErrorCode.REQUIRED_VALUE);
         /*
          *有些数据库没有密码，因此需要可以绕过密码的方式
          * @PASSFLAG 作为可选项，如果为true，则表示密码是必选项，否则密码为可选项
-        */
+         */
         if (originalConfig.getBool(Key.PASSFLAG, true)) {
             originalConfig.getNecessaryValue(Key.PASSWORD,
                     DBUtilErrorCode.REQUIRED_VALUE);
@@ -39,12 +41,13 @@ public final class OriginalConfPretreatmentUtil {
         simplifyConf(originalConfig);
     }
 
-    public static void dealWhere(Configuration originalConfig) {
+    public static void dealWhere(Configuration originalConfig)
+    {
         String where = originalConfig.getString(Key.WHERE, null);
-        if(StringUtils.isNotBlank(where)) {
+        if (StringUtils.isNotBlank(where)) {
             String whereImprove = where.trim();
-            if(whereImprove.endsWith(";") || whereImprove.endsWith("；")) {
-                whereImprove = whereImprove.substring(0,whereImprove.length()-1);
+            if (whereImprove.endsWith(";") || whereImprove.endsWith("；")) {
+                whereImprove = whereImprove.substring(0, whereImprove.length() - 1);
             }
             originalConfig.set(Key.WHERE, whereImprove);
         }
@@ -58,7 +61,8 @@ public final class OriginalConfPretreatmentUtil {
      * <li>对 table 模式，确定分表个数，并处理 column 转 *事项</li>
      * </ol>
      */
-    private static void simplifyConf(Configuration originalConfig) {
+    private static void simplifyConf(Configuration originalConfig)
+    {
         boolean isTableMode = recognizeTableOrQuerySqlMode(originalConfig);
         originalConfig.set(Constant.IS_TABLE_MODE, isTableMode);
 
@@ -67,12 +71,13 @@ public final class OriginalConfPretreatmentUtil {
         dealColumnConf(originalConfig);
     }
 
-    private static void dealJdbcAndTable(Configuration originalConfig) {
+    private static void dealJdbcAndTable(Configuration originalConfig)
+    {
         String username = originalConfig.getString(Key.USERNAME);
         String password = originalConfig.getString(Key.PASSWORD);
         boolean checkSlave = originalConfig.getBool(Key.CHECK_SLAVE, false);
         boolean isTableMode = originalConfig.getBool(Constant.IS_TABLE_MODE);
-        boolean isPreCheck = originalConfig.getBool(Key.DRYRUN,false);
+        boolean isPreCheck = originalConfig.getBool(Key.DRYRUN, false);
 
         List<Object> conns = originalConfig.getList(Constant.CONN_MARK,
                 Object.class);
@@ -94,7 +99,8 @@ public final class OriginalConfPretreatmentUtil {
             if (isPreCheck) {
                 jdbcUrl = DBUtil.chooseJdbcUrlWithoutRetry(DATABASE_TYPE, jdbcUrls,
                         username, password, preSql, checkSlave);
-            } else {
+            }
+            else {
                 jdbcUrl = DBUtil.chooseJdbcUrl(DATABASE_TYPE, jdbcUrls,
                         username, password, preSql, checkSlave);
             }
@@ -105,7 +111,7 @@ public final class OriginalConfPretreatmentUtil {
             originalConfig.set(String.format("%s[%d].%s", Constant.CONN_MARK,
                     i, Key.JDBC_URL), jdbcUrl);
 
-            LOG.info("Available jdbcUrl:{}.",jdbcUrl);
+            LOG.info("Available jdbcUrl:{}.", jdbcUrl);
 
             if (isTableMode) {
                 // table 方式
@@ -130,7 +136,8 @@ public final class OriginalConfPretreatmentUtil {
         originalConfig.set(Constant.TABLE_NUMBER_MARK, tableNum);
     }
 
-    private static void dealColumnConf(Configuration originalConfig) {
+    private static void dealColumnConf(Configuration originalConfig)
+    {
         boolean isTableMode = originalConfig.getBool(Constant.IS_TABLE_MODE);
 
         List<String> userConfiguredColumns = originalConfig.getList(Key.COLUMN,
@@ -141,7 +148,8 @@ public final class OriginalConfPretreatmentUtil {
                     || userConfiguredColumns.isEmpty()) {
                 throw DataXException.asDataXException(DBUtilErrorCode.REQUIRED_VALUE, "您未配置读取数据库表的列信息. " +
                         "正确的配置方式是给 column 配置上您需要读取的列名称,用英文逗号分隔. 例如: \"column\": [\"id\", \"name\"],请参考上述配置并作出修改.");
-            } else {
+            }
+            else {
                 String splitPk = originalConfig.getString(Key.SPLIT_PK, null);
 
                 if (1 == userConfiguredColumns.size()
@@ -149,7 +157,8 @@ public final class OriginalConfPretreatmentUtil {
                     LOG.warn("您的配置文件中的列配置存在一定的风险. 因为您未配置读取数据库表的列，当您的表字段个数、类型有变动时，可能影响任务正确性甚至会运行出错。请检查您的配置并作出修改.");
                     // 回填其值，需要以 String 的方式转交后续处理
                     originalConfig.set(Key.COLUMN, "*");
-                } else {
+                }
+                else {
                     String jdbcUrl = originalConfig.getString(String.format(
                             "%s[0].%s", Constant.CONN_MARK, Key.JDBC_URL));
 
@@ -200,7 +209,8 @@ public final class OriginalConfPretreatmentUtil {
                     }
                 }
             }
-        } else {
+        }
+        else {
             // querySql模式，不希望配制 column，那样是混淆不清晰的
             if (null != userConfiguredColumns && !userConfiguredColumns.isEmpty()) {
                 LOG.warn("您的配置有误. 由于您读取数据库表采用了querySql的方式, 所以您不需要再配置 column. 如果您不想看到这条提醒，请移除您源头表中配置中的 column.");
@@ -221,11 +231,11 @@ public final class OriginalConfPretreatmentUtil {
                 originalConfig.remove(Key.SPLIT_PK);
             }
         }
-
     }
 
     private static boolean recognizeTableOrQuerySqlMode(
-            Configuration originalConfig) {
+            Configuration originalConfig)
+    {
         List<Object> conns = originalConfig.getList(Constant.CONN_MARK,
                 Object.class);
 
@@ -253,7 +263,8 @@ public final class OriginalConfPretreatmentUtil {
                 // table 和 querySql 二者均未配置
                 throw DataXException.asDataXException(
                         DBUtilErrorCode.TABLE_QUERYSQL_MISSING, "您的配置有误. 因为table和querySql应该配置并且只能配置一个. 请检查您的配置并作出修改.");
-            } else if (isTableMode && isQuerySqlMode) {
+            }
+            else if (isTableMode && isQuerySqlMode) {
                 // table 和 querySql 二者均配置
                 throw DataXException.asDataXException(DBUtilErrorCode.TABLE_QUERYSQL_MIXED,
                         "您的配置凌乱了. 因为datax不能同时既配置table又配置querySql.请检查您的配置并作出修改.");
@@ -269,5 +280,4 @@ public final class OriginalConfPretreatmentUtil {
 
         return tableModeFlags.get(0);
     }
-
 }

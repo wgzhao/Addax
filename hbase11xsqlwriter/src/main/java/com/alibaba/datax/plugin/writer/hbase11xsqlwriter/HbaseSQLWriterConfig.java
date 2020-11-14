@@ -17,7 +17,8 @@ import java.util.Map;
  *
  * @author yanghan.y
  */
-public class HbaseSQLWriterConfig {
+public class HbaseSQLWriterConfig
+{
     private final static Logger LOG = LoggerFactory.getLogger(HbaseSQLWriterConfig.class);
     private Configuration originalConfig;   // 原始的配置数据
 
@@ -43,86 +44,18 @@ public class HbaseSQLWriterConfig {
     private String kerberosPrincipal;
 
     /**
-     * @return 获取原始的datax配置
+     * 禁止直接实例化本类，必须调用{@link #parse}接口来初始化
      */
-    public Configuration getOriginalConfig() {
-        return originalConfig;
+    private HbaseSQLWriterConfig()
+    {
     }
 
-    /**
-     * @return 获取连接字符串，使用ZK模式
-     */
-    public String getConnectionString() {
-        return connectionString;
-    }
-
-    /**
-     * @return 获取表名
-     */
-    public String getTableName() {
-        return tableName;
-    }
-
-    /**
-     * @return 返回所有的列，包括主键列和非主键列，但不包括version列
-     */
-    public List<String> getColumns() {
-        return columns;
-    }
-
-    /**
-     *
-     */
-    public NullModeType getNullMode() {
-        return nullMode;
-    }
-
-    /**
-     * @return 批量写入的最大行数
-     */
-    public int getBatchSize() {
-        return batchSize;
-    }
-
-    /**
-     * @return 在writer初始化的时候是否要清空目标表
-     */
-    public boolean truncate() {
-        return truncate;
-    }
-
-    public boolean isThinClient() {
-        return isThinClient;
-    }
-
-    public String getNamespace() {
-        return namespace;
-    }
-
-    public String getPassword() {
-        return password;
-    }
-
-    public String getUsername() {
-        return username;
-    }
-
-    public boolean haveKerberos() {
-        return haveKerberos;
-    }
-    
-    public String getKerberosKeytabFilePath() {
-        return kerberosKeytabFilePath;
-    }
-
-    public String getKerberosPrincipal() {
-        return kerberosPrincipal;
-    }
     /**
      * @param dataxCfg datax configuration json
      * @return hbase writer class
      */
-    public static HbaseSQLWriterConfig parse(Configuration dataxCfg) {
+    public static HbaseSQLWriterConfig parse(Configuration dataxCfg)
+    {
         assert dataxCfg != null;
         HbaseSQLWriterConfig cfg = new HbaseSQLWriterConfig();
         cfg.originalConfig = dataxCfg;
@@ -150,7 +83,8 @@ public class HbaseSQLWriterConfig {
         return cfg;
     }
 
-    private static void parseClusterConfig(HbaseSQLWriterConfig cfg, Configuration dataxCfg) {
+    private static void parseClusterConfig(HbaseSQLWriterConfig cfg, Configuration dataxCfg)
+    {
         // 获取hbase集群的连接信息字符串
         String hbaseCfg = dataxCfg.getString(Key.HBASE_CONFIG);
         if (StringUtils.isBlank(hbaseCfg)) {
@@ -160,7 +94,6 @@ public class HbaseSQLWriterConfig {
                     "读 Hbase 时需要配置hbaseConfig，其内容为 Hbase 连接信息，请联系 Hbase PE 获取该信息.");
         }
 
-
         if (dataxCfg.getBool(Key.THIN_CLIENT, Constant.DEFAULT_USE_THIN_CLIENT)) {
             Map<String, String> thinConnectConfig = HbaseSQLHelper.getThinConnectConfig(hbaseCfg);
             String thinConnectStr = thinConnectConfig.get(Key.HBASE_THIN_CONNECT_URL);
@@ -169,38 +102,40 @@ public class HbaseSQLWriterConfig {
             cfg.password = thinConnectConfig.get(Key.HBASE_THIN_CONNECT_PASSWORD);
             if (Strings.isNullOrEmpty(thinConnectStr)) {
                 throw DataXException.asDataXException(
-                    HbaseSQLWriterErrorCode.ILLEGAL_VALUE,
-                    "thinClient=true的轻客户端模式下HBase的hbase.thin.connect.url配置不能为空，请联系HBase PE获取该信息.");
+                        HbaseSQLWriterErrorCode.ILLEGAL_VALUE,
+                        "thinClient=true的轻客户端模式下HBase的hbase.thin.connect.url配置不能为空，请联系HBase PE获取该信息.");
             }
             if (Strings.isNullOrEmpty(cfg.namespace) || Strings.isNullOrEmpty(cfg.username) || Strings
-                .isNullOrEmpty(cfg.password)) {
+                    .isNullOrEmpty(cfg.password)) {
                 throw DataXException.asDataXException(HbaseSQLWriterErrorCode.ILLEGAL_VALUE,
-                    "thinClient=true的轻客户端模式下HBase的hbase.thin.connect.namespce|username|password配置不能为空，请联系HBase "
-                        + "PE获取该信息.");
+                        "thinClient=true的轻客户端模式下HBase的hbase.thin.connect.namespce|username|password配置不能为空，请联系HBase "
+                                + "PE获取该信息.");
             }
             cfg.connectionString = thinConnectStr;
-        } else {
+        }
+        else {
             // 解析zk服务器和znode信息
             Pair<String, String> zkCfg;
             try {
                 zkCfg = HbaseSQLHelper.getHbaseConfig(hbaseCfg);
-            } catch (Throwable t) {
+            }
+            catch (Throwable t) {
                 // 解析hbase配置错误
                 throw DataXException.asDataXException(
-                    HbaseSQLWriterErrorCode.REQUIRED_VALUE,
-                    "解析hbaseConfig出错，请确认您配置的hbaseConfig为合法的json数据格式，内容正确.");
+                        HbaseSQLWriterErrorCode.REQUIRED_VALUE,
+                        "解析hbaseConfig出错，请确认您配置的hbaseConfig为合法的json数据格式，内容正确.");
             }
             String zkQuorum = zkCfg.getFirst();
             String znode = zkCfg.getSecond();
             if (zkQuorum == null || zkQuorum.isEmpty()) {
                 throw DataXException.asDataXException(
-                    HbaseSQLWriterErrorCode.ILLEGAL_VALUE,
-                    "HBase的hbase.zookeeper.quorum配置不能为空，请联系HBase PE获取该信息.");
+                        HbaseSQLWriterErrorCode.ILLEGAL_VALUE,
+                        "HBase的hbase.zookeeper.quorum配置不能为空，请联系HBase PE获取该信息.");
             }
             if (znode == null || znode.isEmpty()) {
                 throw DataXException.asDataXException(
-                    HbaseSQLWriterErrorCode.ILLEGAL_VALUE,
-                    "HBase的zookeeper.znode.parent配置不能为空，请联系HBase PE获取该信息.");
+                        HbaseSQLWriterErrorCode.ILLEGAL_VALUE,
+                        "HBase的zookeeper.znode.parent配置不能为空，请联系HBase PE获取该信息.");
             }
 
             // 生成sql使用的连接字符串， 格式： jdbc:phoenix:zk_quorum:[:port]:/znode_parent
@@ -208,7 +143,8 @@ public class HbaseSQLWriterConfig {
         }
     }
 
-    private static void parseTableConfig(HbaseSQLWriterConfig cfg, Configuration dataxCfg) {
+    private static void parseTableConfig(HbaseSQLWriterConfig cfg, Configuration dataxCfg)
+    {
         // 解析并检查表名
         cfg.tableName = dataxCfg.getString(Key.TABLE);
 //        if (cfg.tableName.contains(".")) {
@@ -221,7 +157,8 @@ public class HbaseSQLWriterConfig {
         }
         try {
             TableName.valueOf(cfg.tableName);
-        } catch (Exception e) {
+        }
+        catch (Exception e) {
             throw DataXException.asDataXException(
                     HbaseSQLWriterErrorCode.ILLEGAL_VALUE,
                     "您配置的tableName(" + cfg.tableName + ")含有非法字符，请检查您的配置 或者 联系 Hbase 管理员.");
@@ -235,8 +172,100 @@ public class HbaseSQLWriterConfig {
         }
     }
 
+    /**
+     * @return 获取原始的datax配置
+     */
+    public Configuration getOriginalConfig()
+    {
+        return originalConfig;
+    }
+
+    /**
+     * @return 获取连接字符串，使用ZK模式
+     */
+    public String getConnectionString()
+    {
+        return connectionString;
+    }
+
+    /**
+     * @return 获取表名
+     */
+    public String getTableName()
+    {
+        return tableName;
+    }
+
+    /**
+     * @return 返回所有的列，包括主键列和非主键列，但不包括version列
+     */
+    public List<String> getColumns()
+    {
+        return columns;
+    }
+
+    /**
+     *
+     */
+    public NullModeType getNullMode()
+    {
+        return nullMode;
+    }
+
+    /**
+     * @return 批量写入的最大行数
+     */
+    public int getBatchSize()
+    {
+        return batchSize;
+    }
+
+    /**
+     * @return 在writer初始化的时候是否要清空目标表
+     */
+    public boolean truncate()
+    {
+        return truncate;
+    }
+
+    public boolean isThinClient()
+    {
+        return isThinClient;
+    }
+
+    public String getNamespace()
+    {
+        return namespace;
+    }
+
+    public String getPassword()
+    {
+        return password;
+    }
+
+    public String getUsername()
+    {
+        return username;
+    }
+
+    public boolean haveKerberos()
+    {
+        return haveKerberos;
+    }
+
+    public String getKerberosKeytabFilePath()
+    {
+        return kerberosKeytabFilePath;
+    }
+
+    public String getKerberosPrincipal()
+    {
+        return kerberosPrincipal;
+    }
+
     @Override
-    public String toString() {
+    public String toString()
+    {
         StringBuilder ret = new StringBuilder();
         // 集群配置
         ret.append("\n[jdbc]");
@@ -267,11 +296,5 @@ public class HbaseSQLWriterConfig {
         ret.append("\n");
 
         return ret.toString();
-    }
-
-    /**
-     * 禁止直接实例化本类，必须调用{@link #parse}接口来初始化
-     */
-    private HbaseSQLWriterConfig() {
     }
 }

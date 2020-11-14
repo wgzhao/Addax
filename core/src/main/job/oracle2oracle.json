@@ -1,57 +1,56 @@
 {
-    "job": {
-        "content": [
-            {
-                "writer": {
-                    "name": "oraclewriter",
-                    "parameter": {
-                        "username": "oracle",
-                        "password": "password",
-                        "column": [
-                            "*"
-                        ],
-                        "connection": [
-                            {
-                                "table": [
-                                    "${ddb}.${dtable}"
-                                ],
-                                "jdbcUrl": "jdbc:oracle:thin:@127.0.0.1/stage"
-                            }
-                        ],
-                        
-                        "preSql": [
-                            "truncate table @table"
-                        ]
-                    }
-                },
-                "reader": {
-                    "name": "oraclereader",
-                    "parameter": {
-                        "column": [
-                            "*"
-                        ],
-                        "username": "oracle",
-                        "password": "password",
-                        "connection": [
-                            {
-                                "table": [
-                                    "${sdb}.${stable}"
-                                ],
-                                "jdbcUrl": [
-                                    "jdbc:oracle:thin:@127.0.0.1/stage"
-                                ]
-                            }
-                        ]
-                    }
-                }
-            }
-        ],
-        "setting": {
-            "speed": {
-                "record": -1,
-                "byte": -1,
-                "channel": 1
-            }
+  "job": {
+    "content": [
+      {
+        "writer": {
+          "name": "oraclewriter",
+          "parameter": {
+            "username": "oracle",
+            "password": "password",
+            "column": [
+              "*"
+            ],
+            "connection": [
+              {
+                "table": [
+                  "${ddb}.${dtable}"
+                ],
+                "jdbcUrl": "jdbc:oracle:thin:@127.0.0.1/stage"
+              }
+            ],
+            "preSql": [
+              "truncate table @table"
+            ]
+          }
+        },
+        "reader": {
+          "name": "oraclereader",
+          "parameter": {
+            "column": [
+              "*"
+            ],
+            "username": "oracle",
+            "password": "password",
+            "connection": [
+              {
+                "table": [
+                  "${sdb}.${stable}"
+                ],
+                "jdbcUrl": [
+                  "jdbc:oracle:thin:@127.0.0.1/stage"
+                ]
+              }
+            ]
+          }
         }
+      }
+    ],
+    "setting": {
+      "speed": {
+        "record": -1,
+        "byte": -1,
+        "channel": 1
+      }
     }
+  }
 }

@@ -22,25 +22,33 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
-import java.net.URLEncoder;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.concurrent.Callable;
 
-public class ESWriter extends Writer {
+public class ESWriter
+        extends Writer
+{
     private final static String WRITE_COLUMNS = "write_columns";
 
-    public static class Job extends Writer.Job {
+    public static class Job
+            extends Writer.Job
+    {
         private static final Logger log = LoggerFactory.getLogger(Job.class);
 
         private Configuration conf = null;
 
         @Override
-        public void init() {
+        public void init()
+        {
             this.conf = super.getPluginJobConf();
         }
 
         @Override
-        public void prepare() {
+        public void prepare()
+        {
             /**
              * 注意：此方法仅执行一次。
              * 最佳实践：如果 Job 中有需要进行数据同步之前的处理，可以在此处完成，如果没有必要则可以直接去掉。
@@ -72,13 +80,15 @@ public class ESWriter extends Writer {
                 if (!esClient.createIndex(indexName, typeName, mappings, settings, dynamic)) {
                     throw new IOException("create index or mapping failed");
                 }
-            } catch (Exception ex) {
+            }
+            catch (Exception ex) {
                 throw DataXException.asDataXException(ESWriterErrorCode.ES_MAPPINGS, ex.toString());
             }
             esClient.closeJestClient();
         }
 
-        private String genMappings(String typeName) {
+        private String genMappings(String typeName)
+        {
             String mappings = null;
             Map<String, Object> propMap = new HashMap<String, Object>();
             List<ESColumn> columnList = new ArrayList<ESColumn>();
@@ -182,7 +192,8 @@ public class ESWriter extends Writer {
         }
 
         @Override
-        public List<Configuration> split(int mandatoryNumber) {
+        public List<Configuration> split(int mandatoryNumber)
+        {
             List<Configuration> configurations = new ArrayList<Configuration>(mandatoryNumber);
             for (int i = 0; i < mandatoryNumber; i++) {
                 configurations.add(conf);
@@ -191,7 +202,8 @@ public class ESWriter extends Writer {
         }
 
         @Override
-        public void post() {
+        public void post()
+        {
             ESClient esClient = new ESClient();
             esClient.createClient(Key.getEndpoint(conf),
                     Key.getAccessID(conf),
@@ -205,26 +217,27 @@ public class ESWriter extends Writer {
                 log.info(String.format("alias [%s] to [%s]", alias, Key.getIndexName(conf)));
                 try {
                     esClient.alias(Key.getIndexName(conf), alias, Key.isNeedCleanAlias(conf));
-                } catch (IOException e) {
+                }
+                catch (IOException e) {
                     throw DataXException.asDataXException(ESWriterErrorCode.ES_ALIAS_MODIFY, e);
                 }
             }
         }
 
         @Override
-        public void destroy() {
+        public void destroy()
+        {
 
         }
     }
 
-    public static class Task extends Writer.Task {
+    public static class Task
+            extends Writer.Task
+    {
 
         private static final Logger log = LoggerFactory.getLogger(Job.class);
-
-        private Configuration conf;
-
-
         ESClient esClient = null;
+        private Configuration conf;
         private List<ESFieldType> typeList;
         private List<ESColumn> columnList;
 
@@ -235,7 +248,8 @@ public class ESWriter extends Writer {
         private String splitter;
 
         @Override
-        public void init() {
+        public void init()
+        {
             this.conf = super.getPluginJobConf();
             index = Key.getIndexName(conf);
             type = Key.getTypeName(conf);
@@ -243,7 +257,8 @@ public class ESWriter extends Writer {
             trySize = Key.getTrySize(conf);
             batchSize = Key.getBatchSize(conf);
             splitter = Key.getSplitter(conf);
-            columnList = JSON.parseObject(this.conf.getString(WRITE_COLUMNS), new TypeReference<List<ESColumn>>() {
+            columnList = JSON.parseObject(this.conf.getString(WRITE_COLUMNS), new TypeReference<List<ESColumn>>()
+            {
             });
 
             typeList = new ArrayList<ESFieldType>();
@@ -256,7 +271,8 @@ public class ESWriter extends Writer {
         }
 
         @Override
-        public void prepare() {
+        public void prepare()
+        {
             esClient.createClient(Key.getEndpoint(conf),
                     Key.getAccessID(conf),
                     Key.getAccessKey(conf),
@@ -267,7 +283,8 @@ public class ESWriter extends Writer {
         }
 
         @Override
-        public void startWrite(RecordReceiver recordReceiver) {
+        public void startWrite(RecordReceiver recordReceiver)
+        {
             List<Record> writerBuffer = new ArrayList<Record>(this.batchSize);
             com.alibaba.datax.common.element.Record record = null;
             long total = 0;
@@ -290,7 +307,8 @@ public class ESWriter extends Writer {
             esClient.closeJestClient();
         }
 
-        private String getDateStr(ESColumn esColumn, Column column) {
+        private String getDateStr(ESColumn esColumn, Column column)
+        {
             DateTime date = null;
             DateTimeZone dtz = DateTimeZone.getDefault();
             if (esColumn.getTimezone() != null) {
@@ -301,15 +319,18 @@ public class ESWriter extends Writer {
                 DateTimeFormatter formatter = DateTimeFormat.forPattern(esColumn.getFormat());
                 date = formatter.withZone(dtz).parseDateTime(column.asString());
                 return date.toString();
-            } else if (column.getType() == Column.Type.DATE) {
+            }
+            else if (column.getType() == Column.Type.DATE) {
                 date = new DateTime(column.asLong(), dtz);
                 return date.toString();
-            } else {
+            }
+            else {
                 return column.asString();
             }
         }
 
-        private long doBatchInsert(final List<Record> writerBuffer) {
+        private long doBatchInsert(final List<Record> writerBuffer)
+        {
             Map<String, Object> data = null;
             final Bulk.Builder bulkaction = new Bulk.Builder().defaultIndex(this.index).defaultType(this.type);
             for (com.alibaba.datax.common.element.Record record : writerBuffer) {
@@ -324,18 +345,21 @@ public class ESWriter extends Writer {
                         String[] dataList = column.asString().split(splitter);
                         if (!columnType.equals(ESFieldType.DATE)) {
                             data.put(columnName, dataList);
-                        } else {
+                        }
+                        else {
                             for (int pos = 0; pos < dataList.length; pos++) {
                                 dataList[pos] = getDateStr(columnList.get(i), column);
                             }
                             data.put(columnName, dataList);
                         }
-                    } else {
+                    }
+                    else {
                         switch (columnType) {
                             case ID:
                                 if (id != null) {
                                     id += record.getColumn(i).asString();
-                                } else {
+                                }
+                                else {
                                     id = record.getColumn(i).asString();
                                 }
                                 break;
@@ -343,7 +367,8 @@ public class ESWriter extends Writer {
                                 try {
                                     String dateStr = getDateStr(columnList.get(i), column);
                                     data.put(columnName, dateStr);
-                                } catch (Exception e) {
+                                }
+                                catch (Exception e) {
                                     getTaskPluginCollector().collectDirtyRecord(record, String.format("时间类型解析失败 [%s:%s] exception: %s", columnName, column.toString(), e.toString()));
                                 }
                                 break;
@@ -388,15 +413,19 @@ public class ESWriter extends Writer {
                 if (id == null) {
                     //id = UUID.randomUUID().toString();
                     bulkaction.addAction(new Index.Builder(data).build());
-                } else {
+                }
+                else {
                     bulkaction.addAction(new Index.Builder(data).id(id).build());
                 }
             }
 
             try {
-                return RetryUtil.executeWithRetry(new Callable<Integer>() {
+                return RetryUtil.executeWithRetry(new Callable<Integer>()
+                {
                     @Override
-                    public Integer call() throws Exception {
+                    public Integer call()
+                            throws Exception
+                    {
                         JestResult jestResult = esClient.bulkInsert(bulkaction, 1);
                         if (jestResult.isSucceeded()) {
                             return writerBuffer.size();
@@ -411,7 +440,8 @@ public class ESWriter extends Writer {
                                 if (item.status != 400) {
                                     // 400 BAD_REQUEST  如果非数据异常,请求异常,则不允许忽略
                                     throw DataXException.asDataXException(ESWriterErrorCode.ES_INDEX_INSERT, String.format("status:[%d], error: %s", item.status, item.error));
-                                } else {
+                                }
+                                else {
                                     // 如果用户选择不忽略解析错误,则抛异常,默认为忽略
                                     if (!Key.isIgnoreParseError(conf)) {
                                         throw DataXException.asDataXException(ESWriterErrorCode.ES_INDEX_INSERT, String.format("status:[%d], error: %s, config not ignoreParseError so throw this error", item.status, item.error));
@@ -427,7 +457,8 @@ public class ESWriter extends Writer {
                                 }
                             }
                             return writerBuffer.size() - brst.getFailedItems().size();
-                        } else {
+                        }
+                        else {
                             Integer status = esClient.getStatus(jestResult);
                             switch (status) {
                                 case 429: //TOO_MANY_REQUESTS
@@ -438,10 +469,12 @@ public class ESWriter extends Writer {
                         }
                     }
                 }, trySize, 60000L, true);
-            } catch (Exception e) {
+            }
+            catch (Exception e) {
                 if (Key.isIgnoreWriteError(this.conf)) {
                     log.warn(String.format("重试[%d]次写入失败，忽略该错误，继续写入!", trySize));
-                } else {
+                }
+                else {
                     throw DataXException.asDataXException(ESWriterErrorCode.ES_INDEX_INSERT, e);
                 }
             }
@@ -449,11 +482,13 @@ public class ESWriter extends Writer {
         }
 
         @Override
-        public void post() {
+        public void post()
+        {
         }
 
         @Override
-        public void destroy() {
+        public void destroy()
+        {
             esClient.closeJestClient();
         }
     }

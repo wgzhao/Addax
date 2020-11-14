@@ -10,16 +10,21 @@ import com.alibaba.datax.plugin.rdbms.util.DataBaseType;
 
 import java.util.List;
 
-public class RdbmsReader extends Reader {
+public class RdbmsReader
+        extends Reader
+{
     private static final DataBaseType DATABASE_TYPE = DataBaseType.RDBMS;
 
-    public static class Job extends Reader.Job {
+    public static class Job
+            extends Reader.Job
+    {
 
         private Configuration originalConfig;
         private CommonRdbmsReader.Job commonRdbmsReaderMaster;
 
         @Override
-        public void init() {
+        public void init()
+        {
             this.originalConfig = getPluginJobConf();
             int fetchSize = this.originalConfig.getInt(
                     com.alibaba.datax.plugin.rdbms.reader.Constant.FETCH_SIZE,
@@ -42,30 +47,35 @@ public class RdbmsReader extends Reader {
         }
 
         @Override
-        public List<Configuration> split(int adviceNumber) {
+        public List<Configuration> split(int adviceNumber)
+        {
             return this.commonRdbmsReaderMaster.split(this.originalConfig,
                     adviceNumber);
         }
 
         @Override
-        public void post() {
+        public void post()
+        {
             this.commonRdbmsReaderMaster.post(this.originalConfig);
         }
 
         @Override
-        public void destroy() {
+        public void destroy()
+        {
             this.commonRdbmsReaderMaster.destroy(this.originalConfig);
         }
-
     }
 
-    public static class Task extends Reader.Task {
+    public static class Task
+            extends Reader.Task
+    {
 
         private Configuration readerSliceConfig;
         private CommonRdbmsReader.Task commonRdbmsReaderSlave;
 
         @Override
-        public void init() {
+        public void init()
+        {
             this.readerSliceConfig = getPluginJobConf();
             this.commonRdbmsReaderSlave = new SubCommonRdbmsReader.Task(
                     DATABASE_TYPE);
@@ -73,7 +83,8 @@ public class RdbmsReader extends Reader {
         }
 
         @Override
-        public void startRead(RecordSender recordSender) {
+        public void startRead(RecordSender recordSender)
+        {
             int fetchSize = this.readerSliceConfig
                     .getInt(com.alibaba.datax.plugin.rdbms.reader.Constant.FETCH_SIZE);
 
@@ -82,12 +93,14 @@ public class RdbmsReader extends Reader {
         }
 
         @Override
-        public void post() {
+        public void post()
+        {
             this.commonRdbmsReaderSlave.post(this.readerSliceConfig);
         }
 
         @Override
-        public void destroy() {
+        public void destroy()
+        {
             this.commonRdbmsReaderSlave.destroy(this.readerSliceConfig);
         }
     }

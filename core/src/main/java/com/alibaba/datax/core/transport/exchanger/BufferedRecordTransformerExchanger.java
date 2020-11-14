@@ -19,30 +19,26 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
 
-public class BufferedRecordTransformerExchanger extends TransformerExchanger implements RecordSender, RecordReceiver {
-
-    private final Channel channel;
-
-    private final List<Record> buffer;
-
-    private int bufferSize;
-
-    protected final int byteCapacity;
-
-    private final AtomicInteger memoryBytes = new AtomicInteger(0);
-
-    private int bufferIndex = 0;
+public class BufferedRecordTransformerExchanger
+        extends TransformerExchanger
+        implements RecordSender, RecordReceiver
+{
 
     private static Class<? extends Record> RECORD_CLASS;
-
+    protected final int byteCapacity;
+    private final Channel channel;
+    private final List<Record> buffer;
+    private final AtomicInteger memoryBytes = new AtomicInteger(0);
+    private int bufferSize;
+    private int bufferIndex = 0;
     private volatile boolean shutdown = false;
-
 
     @SuppressWarnings("unchecked")
     public BufferedRecordTransformerExchanger(final int taskGroupId, final int taskId,
-                                              final Channel channel, final Communication communication,
-                                              final TaskPluginCollector pluginCollector,
-                                              final List<TransformerExecution> tInfoExecs) {
+            final Channel channel, final Communication communication,
+            final TaskPluginCollector pluginCollector,
+            final List<TransformerExecution> tInfoExecs)
+    {
         super(taskGroupId, taskId, communication, tInfoExecs, pluginCollector);
         assert null != channel;
         assert null != channel.getConfiguration();
@@ -63,24 +59,28 @@ public class BufferedRecordTransformerExchanger extends TransformerExchanger imp
                     .forName(configuration.getString(
                             CoreConstant.DATAX_CORE_TRANSPORT_RECORD_CLASS,
                             "com.alibaba.datax.core.transport.record.DefaultRecord")));
-        } catch (Exception e) {
+        }
+        catch (Exception e) {
             throw DataXException.asDataXException(
                     FrameworkErrorCode.CONFIG_ERROR, e);
         }
     }
 
     @Override
-    public Record createRecord() {
+    public Record createRecord()
+    {
         try {
             return BufferedRecordTransformerExchanger.RECORD_CLASS.newInstance();
-        } catch (Exception e) {
+        }
+        catch (Exception e) {
             throw DataXException.asDataXException(
                     FrameworkErrorCode.CONFIG_ERROR, e);
         }
     }
 
     @Override
-    public void sendToWriter(com.alibaba.datax.common.element.Record record) {
+    public void sendToWriter(com.alibaba.datax.common.element.Record record)
+    {
         if (shutdown) {
             throw DataXException.asDataXException(CommonErrorCode.SHUT_DOWN_TASK, "");
         }
@@ -89,7 +89,7 @@ public class BufferedRecordTransformerExchanger extends TransformerExchanger imp
 
         record = doTransformer(record);
 
-        if(record == null){
+        if (record == null) {
             return;
         }
 
@@ -109,7 +109,8 @@ public class BufferedRecordTransformerExchanger extends TransformerExchanger imp
     }
 
     @Override
-    public void flush() {
+    public void flush()
+    {
         if (shutdown) {
             throw DataXException.asDataXException(CommonErrorCode.SHUT_DOWN_TASK, "");
         }
@@ -122,7 +123,8 @@ public class BufferedRecordTransformerExchanger extends TransformerExchanger imp
     }
 
     @Override
-    public void terminate() {
+    public void terminate()
+    {
         if (shutdown) {
             throw DataXException.asDataXException(CommonErrorCode.SHUT_DOWN_TASK, "");
         }
@@ -131,7 +133,8 @@ public class BufferedRecordTransformerExchanger extends TransformerExchanger imp
     }
 
     @Override
-    public Record getFromReader() {
+    public Record getFromReader()
+    {
         if (shutdown) {
             throw DataXException.asDataXException(CommonErrorCode.SHUT_DOWN_TASK, "");
         }
@@ -148,17 +151,20 @@ public class BufferedRecordTransformerExchanger extends TransformerExchanger imp
     }
 
     @Override
-    public void shutdown() {
+    public void shutdown()
+    {
         shutdown = true;
         try {
             buffer.clear();
             channel.clear();
-        } catch (Throwable t) {
+        }
+        catch (Throwable t) {
             t.printStackTrace();
         }
     }
 
-    private void receive() {
+    private void receive()
+    {
         this.channel.pullAll(this.buffer);
         this.bufferIndex = 0;
         this.bufferSize = this.buffer.size();

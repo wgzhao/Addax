@@ -14,7 +14,11 @@ import io.searchbox.core.Bulk;
 import io.searchbox.indices.CreateIndex;
 import io.searchbox.indices.DeleteIndex;
 import io.searchbox.indices.IndicesExists;
-import io.searchbox.indices.aliases.*;
+import io.searchbox.indices.aliases.AddAliasMapping;
+import io.searchbox.indices.aliases.AliasMapping;
+import io.searchbox.indices.aliases.GetAliases;
+import io.searchbox.indices.aliases.ModifyAliases;
+import io.searchbox.indices.aliases.RemoveAliasMapping;
 import io.searchbox.indices.mapping.PutMapping;
 import org.apache.http.HttpHost;
 import org.slf4j.Logger;
@@ -29,22 +33,25 @@ import java.util.concurrent.TimeUnit;
 /**
  * Created by xiongfeng.bxf on 17/2/8.
  */
-public class ESClient {
+public class ESClient
+{
     private static final Logger log = LoggerFactory.getLogger(ESClient.class);
 
     private JestClient jestClient;
 
-    public JestClient getClient() {
+    public JestClient getClient()
+    {
         return jestClient;
     }
 
     public void createClient(String endpoint,
-                                   String user,
-                                   String passwd,
-                                   boolean multiThread,
-                                   int readTimeout,
-                                   boolean compression,
-                                   boolean discovery) {
+            String user,
+            String passwd,
+            boolean multiThread,
+            int readTimeout,
+            boolean compression,
+            boolean discovery)
+    {
 
         JestClientFactory factory = new JestClientFactory();
         Builder httpClientConfig = new HttpClientConfig
@@ -67,12 +74,15 @@ public class ESClient {
         jestClient = factory.getObject();
     }
 
-    public boolean indicesExists(String indexName) throws Exception {
+    public boolean indicesExists(String indexName)
+            throws Exception
+    {
         boolean isIndicesExists = false;
         JestResult rst = jestClient.execute(new IndicesExists.Builder(indexName).build());
         if (rst.isSucceeded()) {
             isIndicesExists = true;
-        } else {
+        }
+        else {
             switch (rst.getResponseCode()) {
                 case 404:
                     isIndicesExists = false;
@@ -87,21 +97,26 @@ public class ESClient {
         return isIndicesExists;
     }
 
-    public boolean deleteIndex(String indexName) throws Exception {
+    public boolean deleteIndex(String indexName)
+            throws Exception
+    {
         log.info("delete index " + indexName);
         if (indicesExists(indexName)) {
             JestResult rst = execute(new DeleteIndex.Builder(indexName).build());
             if (!rst.isSucceeded()) {
                 return false;
             }
-        } else {
+        }
+        else {
             log.info("index cannot found, skip delete " + indexName);
         }
         return true;
     }
 
     public boolean createIndex(String indexName, String typeName,
-                               Object mappings, String settings, boolean dynamic) throws Exception {
+            Object mappings, String settings, boolean dynamic)
+            throws Exception
+    {
         JestResult rst = null;
         if (!indicesExists(indexName)) {
             log.info("create index " + indexName);
@@ -116,11 +131,13 @@ public class ESClient {
                 if (getStatus(rst) == 400) {
                     log.info(String.format("index [%s] already exists", indexName));
                     return true;
-                } else {
+                }
+                else {
                     log.error(rst.getErrorMessage());
                     return false;
                 }
-            } else {
+            }
+            else {
                 log.info(String.format("create [%s] index success", indexName));
             }
         }
@@ -131,7 +148,7 @@ public class ESClient {
                 break;
             }
             Thread.sleep(2000);
-            idx ++;
+            idx++;
         }
         if (idx >= 5) {
             return false;
@@ -147,17 +164,21 @@ public class ESClient {
         if (!rst.isSucceeded()) {
             if (getStatus(rst) == 400) {
                 log.info(String.format("index [%s] mappings already exists", indexName));
-            } else {
+            }
+            else {
                 log.error(rst.getErrorMessage());
                 return false;
             }
-        } else {
+        }
+        else {
             log.info(String.format("index [%s] put mappings success", indexName));
         }
         return true;
     }
 
-    public JestResult execute(Action<JestResult> clientRequest) throws Exception {
+    public JestResult execute(Action<JestResult> clientRequest)
+            throws Exception
+    {
         JestResult rst = null;
         rst = jestClient.execute(clientRequest);
         if (!rst.isSucceeded()) {
@@ -166,7 +187,8 @@ public class ESClient {
         return rst;
     }
 
-    public Integer getStatus(JestResult rst) {
+    public Integer getStatus(JestResult rst)
+    {
         JsonObject jsonObject = rst.getJsonObject();
         if (jsonObject.has("status")) {
             return jsonObject.get("status").getAsInt();
@@ -174,13 +196,15 @@ public class ESClient {
         return 600;
     }
 
-    public boolean isBulkResult(JestResult rst) {
+    public boolean isBulkResult(JestResult rst)
+    {
         JsonObject jsonObject = rst.getJsonObject();
         return jsonObject.has("items");
     }
 
-
-    public boolean alias(String indexname, String aliasname, boolean needClean) throws IOException {
+    public boolean alias(String indexname, String aliasname, boolean needClean)
+            throws IOException
+    {
         GetAliases getAliases = new GetAliases.Builder().addIndex(aliasname).build();
         AliasMapping addAliasMapping = new AddAliasMapping.Builder(indexname, aliasname).build();
         JestResult rst = jestClient.execute(getAliases);
@@ -188,8 +212,8 @@ public class ESClient {
         List<AliasMapping> list = new ArrayList<AliasMapping>();
         if (rst.isSucceeded()) {
             JsonParser jp = new JsonParser();
-            JsonObject jo = (JsonObject)jp.parse(rst.getJsonString());
-            for(Map.Entry<String, JsonElement> entry : jo.entrySet()){
+            JsonObject jo = (JsonObject) jp.parse(rst.getJsonString());
+            for (Map.Entry<String, JsonElement> entry : jo.entrySet()) {
                 String tindex = entry.getKey();
                 if (indexname.equals(tindex)) {
                     continue;
@@ -212,7 +236,9 @@ public class ESClient {
         return true;
     }
 
-    public JestResult bulkInsert(Bulk.Builder bulk, int trySize) throws Exception {
+    public JestResult bulkInsert(Bulk.Builder bulk, int trySize)
+            throws Exception
+    {
         // es_rejected_execution_exception
         // illegal_argument_exception
         // cluster_block_exception
@@ -226,9 +252,9 @@ public class ESClient {
 
     /**
      * 关闭JestClient客户端
-     *
      */
-    public void closeJestClient() {
+    public void closeJestClient()
+    {
         if (jestClient != null) {
             jestClient.shutdownClient();
         }

@@ -2,8 +2,8 @@
 <configuration>
     <property name="log.dir" value="${datax.log}/" />
     <property name="perf.dir" value="${datax.log}/" />
-    <timestamp key="ymd" datePattern="yyyyMMdd"/>
-    <timestamp key="bySecond" datePattern="HHmmss"/>
+    <timestamp key="ymd" datePattern="yyyyMMdd" />
+    <timestamp key="bySecond" datePattern="HHmmss" />
 
     <!-- 控制台输出 -->
     <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">

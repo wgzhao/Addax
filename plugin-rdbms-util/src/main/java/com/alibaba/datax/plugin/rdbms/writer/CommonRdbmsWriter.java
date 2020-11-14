@@ -24,20 +24,23 @@ import java.sql.Types;
 import java.util.ArrayList;
 import java.util.List;
 
-public class CommonRdbmsWriter {
+public class CommonRdbmsWriter
+{
 
-    public static class Job {
-        private final DataBaseType dataBaseType;
-
+    public static class Job
+    {
         private static final Logger LOG = LoggerFactory
                 .getLogger(Job.class);
+        private final DataBaseType dataBaseType;
 
-        public Job(DataBaseType dataBaseType) {
+        public Job(DataBaseType dataBaseType)
+        {
             this.dataBaseType = dataBaseType;
             OriginalConfPretreatmentUtil.DATABASE_TYPE = this.dataBaseType;
         }
 
-        public void init(Configuration originalConfig) {
+        public void init(Configuration originalConfig)
+        {
             OriginalConfPretreatmentUtil.doPretreatment(originalConfig, this.dataBaseType);
 
             LOG.debug("After job init(), originalConfig now is:[\n{}\n]",
@@ -45,20 +48,23 @@ public class CommonRdbmsWriter {
         }
 
         /*目前只支持MySQL Writer跟Oracle Writer;检查PreSQL跟PostSQL语法以及insert，delete权限*/
-        public void writerPreCheck(Configuration originalConfig, DataBaseType dataBaseType) {
+        public void writerPreCheck(Configuration originalConfig, DataBaseType dataBaseType)
+        {
             /*检查PreSql跟PostSql语句*/
             prePostSqlValid(originalConfig, dataBaseType);
             /*检查insert 跟delete权限*/
             privilegeValid(originalConfig, dataBaseType);
         }
 
-        public void prePostSqlValid(Configuration originalConfig, DataBaseType dataBaseType) {
+        public void prePostSqlValid(Configuration originalConfig, DataBaseType dataBaseType)
+        {
             /*检查PreSql跟PostSql语句*/
             WriterUtil.preCheckPrePareSQL(originalConfig, dataBaseType);
             WriterUtil.preCheckPostSQL(originalConfig, dataBaseType);
         }
 
-        public void privilegeValid(Configuration originalConfig, DataBaseType dataBaseType) {
+        public void privilegeValid(Configuration originalConfig, DataBaseType dataBaseType)
+        {
             /*检查insert 跟delete权限*/
             String username = originalConfig.getString(Key.USERNAME);
             String password = originalConfig.getString(Key.PASSWORD);
@@ -85,7 +91,8 @@ public class CommonRdbmsWriter {
         }
 
         // 一般来说，是需要推迟到 task 中进行pre 的执行（单表情况例外）
-        public void prepare(Configuration originalConfig) {
+        public void prepare(Configuration originalConfig)
+        {
             int tableNumber = originalConfig.getInt(Constant.TABLE_NUMBER_MARK);
             if (tableNumber == 1) {
                 String username = originalConfig.getString(Key.USERNAME);
@@ -128,12 +135,14 @@ public class CommonRdbmsWriter {
         }
 
         public List<Configuration> split(Configuration originalConfig,
-                                         int mandatoryNumber) {
+                int mandatoryNumber)
+        {
             return WriterUtil.doSplit(originalConfig, mandatoryNumber);
         }
 
         // 一般来说，是需要推迟到 task 中进行post 的执行（单表情况例外）
-        public void post(Configuration originalConfig) {
+        public void post(Configuration originalConfig)
+        {
             int tableNumber = originalConfig.getInt(Constant.TABLE_NUMBER_MARK);
             if (tableNumber == 1) {
                 String username = originalConfig.getString(Key.USERNAME);
@@ -165,18 +174,20 @@ public class CommonRdbmsWriter {
             }
         }
 
-        public void destroy(Configuration originalConfig) {
+        public void destroy(Configuration originalConfig)
+        {
         }
-
     }
 
-    public static class Task {
+    public static class Task
+    {
         protected static final Logger LOG = LoggerFactory
                 .getLogger(Task.class);
-
-        protected DataBaseType dataBaseType;
         private static final String VALUE_HOLDER = "?";
-
+        // 作为日志显示信息时，需要附带的通用信息。比如信息所对应的数据库连接等信息，针对哪个表做的操作
+        protected static String BASIC_MESSAGE;
+        protected static String INSERT_OR_REPLACE_TEMPLATE;
+        protected DataBaseType dataBaseType;
         protected String username;
         protected String password;
         protected String jdbcUrl;
@@ -188,22 +199,18 @@ public class CommonRdbmsWriter {
         protected int batchByteSize;
         protected int columnNumber = 0;
         protected TaskPluginCollector taskPluginCollector;
-
-        // 作为日志显示信息时，需要附带的通用信息。比如信息所对应的数据库连接等信息，针对哪个表做的操作
-        protected static String BASIC_MESSAGE;
-
-        protected static String INSERT_OR_REPLACE_TEMPLATE;
-
         protected String writeRecordSql;
         protected String writeMode;
         protected boolean emptyAsNull;
         protected Triple<List<String>, List<Integer>, List<String>> resultSetMetaData;
 
-        public Task(DataBaseType dataBaseType) {
+        public Task(DataBaseType dataBaseType)
+        {
             this.dataBaseType = dataBaseType;
         }
 
-        public void init(Configuration writerSliceConfig) {
+        public void init(Configuration writerSliceConfig)
+        {
             this.username = writerSliceConfig.getString(Key.USERNAME);
             this.password = writerSliceConfig.getString(Key.PASSWORD);
             this.jdbcUrl = writerSliceConfig.getString(Key.JDBC_URL);
@@ -227,7 +234,8 @@ public class CommonRdbmsWriter {
                     this.jdbcUrl, this.table);
         }
 
-        public void prepare(Configuration writerSliceConfig) {
+        public void prepare(Configuration writerSliceConfig)
+        {
             Connection connection = DBUtil.getConnection(this.dataBaseType,
                     this.jdbcUrl, username, password);
 
@@ -245,7 +253,8 @@ public class CommonRdbmsWriter {
             DBUtil.closeDBResources(null, null, connection);
         }
 
-        public void startWriteWithConnection(RecordReceiver recordReceiver, TaskPluginCollector taskPluginCollector, Connection connection) {
+        public void startWriteWithConnection(RecordReceiver recordReceiver, TaskPluginCollector taskPluginCollector, Connection connection)
+        {
             this.taskPluginCollector = taskPluginCollector;
 
             // 用于写入数据的时候的类型根据目的表字段类型转换
@@ -283,10 +292,12 @@ public class CommonRdbmsWriter {
                     doBatchInsert(connection, writeBuffer);
                     writeBuffer.clear();
                 }
-            } catch (Exception e) {
+            }
+            catch (Exception e) {
                 throw DataXException.asDataXException(
                         DBUtilErrorCode.WRITE_DATA_ERROR, e);
-            } finally {
+            }
+            finally {
                 writeBuffer.clear();
                 DBUtil.closeDBResources(null, null, connection);
             }
@@ -294,8 +305,9 @@ public class CommonRdbmsWriter {
 
         // TODO 改用连接池，确保每次获取的连接都是可用的（注意：连接可能需要每次都初始化其 session）
         public void startWrite(RecordReceiver recordReceiver,
-                               Configuration writerSliceConfig,
-                               TaskPluginCollector taskPluginCollector) {
+                Configuration writerSliceConfig,
+                TaskPluginCollector taskPluginCollector)
+        {
             Connection connection = DBUtil.getConnection(this.dataBaseType,
                     this.jdbcUrl, username, password);
             DBUtil.dealWithSessionConfig(connection, writerSliceConfig,
@@ -303,8 +315,8 @@ public class CommonRdbmsWriter {
             startWriteWithConnection(recordReceiver, taskPluginCollector, connection);
         }
 
-
-        public void post(Configuration writerSliceConfig) {
+        public void post(Configuration writerSliceConfig)
+        {
             int tableNumber = writerSliceConfig.getInt(
                     Constant.TABLE_NUMBER_MARK);
 
@@ -322,11 +334,13 @@ public class CommonRdbmsWriter {
             DBUtil.closeDBResources(null, null, connection);
         }
 
-        public void destroy(Configuration writerSliceConfig) {
+        public void destroy(Configuration writerSliceConfig)
+        {
         }
 
         protected void doBatchInsert(Connection connection, List<Record> buffer)
-                throws SQLException {
+                throws SQLException
+        {
             PreparedStatement preparedStatement = null;
             try {
                 connection.setAutoCommit(false);
@@ -340,19 +354,23 @@ public class CommonRdbmsWriter {
                 }
                 preparedStatement.executeBatch();
                 connection.commit();
-            } catch (SQLException e) {
+            }
+            catch (SQLException e) {
                 LOG.warn("回滚此次写入, 采用每次写入一行方式提交. 因为:" + e.getMessage());
                 connection.rollback();
                 doOneInsert(connection, buffer);
-            } catch (Exception e) {
+            }
+            catch (Exception e) {
                 throw DataXException.asDataXException(
                         DBUtilErrorCode.WRITE_DATA_ERROR, e);
-            } finally {
+            }
+            finally {
                 DBUtil.closeDBResources(preparedStatement, null);
             }
         }
 
-        protected void doOneInsert(Connection connection, List<Record> buffer) {
+        protected void doOneInsert(Connection connection, List<Record> buffer)
+        {
             PreparedStatement preparedStatement = null;
             try {
                 connection.setAutoCommit(true);
@@ -364,26 +382,31 @@ public class CommonRdbmsWriter {
                         preparedStatement = fillPreparedStatement(
                                 preparedStatement, record);
                         preparedStatement.execute();
-                    } catch (SQLException e) {
+                    }
+                    catch (SQLException e) {
                         LOG.debug(e.toString());
 
                         this.taskPluginCollector.collectDirtyRecord(record, e);
-                    } finally {
+                    }
+                    finally {
                         // 最后不要忘了关闭 preparedStatement
                         preparedStatement.clearParameters();
                     }
                 }
-            } catch (Exception e) {
+            }
+            catch (Exception e) {
                 throw DataXException.asDataXException(
                         DBUtilErrorCode.WRITE_DATA_ERROR, e);
-            } finally {
+            }
+            finally {
                 DBUtil.closeDBResources(preparedStatement, null);
             }
         }
 
         // 直接使用了两个类变量：columnNumber,resultSetMetaData
         protected PreparedStatement fillPreparedStatement(PreparedStatement preparedStatement, com.alibaba.datax.common.element.Record record)
-                throws SQLException {
+                throws SQLException
+        {
             for (int i = 0; i < this.columnNumber; i++) {
                 int columnSqltype = this.resultSetMetaData.getMiddle().get(i);
                 preparedStatement = fillPreparedStatementColumnType(preparedStatement, i, columnSqltype, record.getColumn(i));
@@ -392,7 +415,9 @@ public class CommonRdbmsWriter {
             return preparedStatement;
         }
 
-        protected PreparedStatement fillPreparedStatementColumnType(PreparedStatement preparedStatement, int columnIndex, int columnSqltype, Column column) throws SQLException {
+        protected PreparedStatement fillPreparedStatementColumnType(PreparedStatement preparedStatement, int columnIndex, int columnSqltype, Column column)
+                throws SQLException
+        {
             java.util.Date utilDate;
             switch (columnSqltype) {
                 case Types.CHAR:
@@ -420,7 +445,8 @@ public class CommonRdbmsWriter {
                     String strValue = column.asString();
                     if (emptyAsNull && "".equals(strValue)) {
                         preparedStatement.setString(columnIndex + 1, null);
-                    } else {
+                    }
+                    else {
                         preparedStatement.setString(columnIndex + 1, strValue);
                     }
                     break;
@@ -430,7 +456,8 @@ public class CommonRdbmsWriter {
                     Long longValue = column.asLong();
                     if (null == longValue) {
                         preparedStatement.setString(columnIndex + 1, null);
-                    } else {
+                    }
+                    else {
                         preparedStatement.setString(columnIndex + 1, longValue.toString());
                     }
                     break;
@@ -441,14 +468,17 @@ public class CommonRdbmsWriter {
                             .equalsIgnoreCase(this.resultSetMetaData.getRight().get(columnIndex))) {
                         if (column.asBigInteger() == null) {
                             preparedStatement.setString(columnIndex + 1, null);
-                        } else {
+                        }
+                        else {
                             preparedStatement.setInt(columnIndex + 1, column.asBigInteger().intValue());
                         }
-                    } else {
+                    }
+                    else {
                         java.sql.Date sqlDate = null;
                         try {
                             utilDate = column.asDate();
-                        } catch (DataXException e) {
+                        }
+                        catch (DataXException e) {
                             throw new SQLException(String.format(
                                     "Date 类型转换错误：[%s]", column));
                         }
@@ -464,7 +494,8 @@ public class CommonRdbmsWriter {
                     java.sql.Time sqlTime = null;
                     try {
                         utilDate = column.asDate();
-                    } catch (DataXException e) {
+                    }
+                    catch (DataXException e) {
                         throw new SQLException(String.format(
                                 "TIME 类型转换错误：[%s]", column));
                     }
@@ -479,7 +510,8 @@ public class CommonRdbmsWriter {
                     java.sql.Timestamp sqlTimestamp = null;
                     try {
                         utilDate = column.asDate();
-                    } catch (DataXException e) {
+                    }
+                    catch (DataXException e) {
                         throw new SQLException(String.format(
                                 "TIMESTAMP 类型转换错误：[%s]", column));
                     }
@@ -504,7 +536,8 @@ public class CommonRdbmsWriter {
                 case Types.BIT:
                     if (this.dataBaseType == DataBaseType.MySql) {
                         preparedStatement.setBoolean(columnIndex + 1, column.asBoolean());
-                    } else {
+                    }
+                    else {
                         preparedStatement.setString(columnIndex + 1, column.asString());
                     }
                     break;
@@ -522,7 +555,8 @@ public class CommonRdbmsWriter {
             return preparedStatement;
         }
 
-        private void calcWriteRecordSql() {
+        private void calcWriteRecordSql()
+        {
             if (!VALUE_HOLDER.equals(calcValueHolder(""))) {
                 List<String> valueHolders = new ArrayList<>(columnNumber);
                 for (int i = 0; i < columns.size(); i++) {
@@ -535,7 +569,8 @@ public class CommonRdbmsWriter {
             }
         }
 
-        protected String calcValueHolder(String columnType) {
+        protected String calcValueHolder(String columnType)
+        {
             return VALUE_HOLDER;
         }
     }

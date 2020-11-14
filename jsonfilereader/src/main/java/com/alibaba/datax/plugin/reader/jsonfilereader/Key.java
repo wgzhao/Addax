@@ -3,7 +3,8 @@ package com.alibaba.datax.plugin.reader.jsonfilereader;
 /**
  * Created by jin.zhang on 18-06-01.
  */
-public class Key {
+public class Key
+{
     public static final String PATH = "path";
     public static final String COLUMN = "column";
     public static final String NULL_FORMAT = "nullFormat";

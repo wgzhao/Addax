@@ -1,6 +1,6 @@
 {
-    "name": "dbffilereader",
-    "class": "com.alibaba.datax.plugin.reader.dbffilereader.DbfFileReader",
-    "description": "useScene: test. mechanism: use datax framework to transport data from dbf file. warn: The more you know about the data, the less problems you encounter.",
-    "developer": "alibaba"
+  "name": "dbffilereader",
+  "class": "com.alibaba.datax.plugin.reader.dbffilereader.DbfFileReader",
+  "description": "useScene: test. mechanism: use datax framework to transport data from dbf file. warn: The more you know about the data, the less problems you encounter.",
+  "developer": "alibaba"
 }

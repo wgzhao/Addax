@@ -222,17 +222,7 @@ def buildStartCommand(options, args):
     return Template(ENGINE_COMMAND).substitute(**commandMap)
 
 
-def printCopyright():
-    print('''
-DataX (%s), From Alibaba !
-Copyright (C) 2010-2017, Alibaba Group. All Rights Reserved.
-
-''' % DATAX_VERSION)
-    sys.stdout.flush()
-
-
 if __name__ == "__main__":
-    printCopyright()
     parser = getOptionParser()
     options, args = parser.parse_args(sys.argv[1:])
     if options.reader is not None and options.writer is not None:

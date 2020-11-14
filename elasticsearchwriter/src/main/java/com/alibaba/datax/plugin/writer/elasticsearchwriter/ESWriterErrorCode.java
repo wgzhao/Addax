@@ -2,7 +2,9 @@ package com.alibaba.datax.plugin.writer.elasticsearchwriter;
 
 import com.alibaba.datax.common.spi.ErrorCode;
 
-public enum ESWriterErrorCode implements ErrorCode {
+public enum ESWriterErrorCode
+        implements ErrorCode
+{
     BAD_CONFIG_VALUE("ESWriter-00", "您配置的值不合法."),
     ES_INDEX_DELETE("ESWriter-01", "删除index错误."),
     ES_INDEX_CREATE("ESWriter-02", "创建index错误."),
@@ -14,23 +16,27 @@ public enum ESWriterErrorCode implements ErrorCode {
     private final String code;
     private final String description;
 
-    ESWriterErrorCode(String code, String description) {
+    ESWriterErrorCode(String code, String description)
+    {
         this.code = code;
         this.description = description;
     }
 
     @Override
-    public String getCode() {
+    public String getCode()
+    {
         return this.code;
     }
 
     @Override
-    public String getDescription() {
+    public String getDescription()
+    {
         return this.description;
     }
 
     @Override
-    public String toString() {
+    public String toString()
+    {
         return String.format("Code:[%s], Description:[%s]. ", this.code,
                 this.description);
     }

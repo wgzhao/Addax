@@ -15,7 +15,8 @@ import java.util.regex.Pattern;
 /**
  * Created by liuyi on 15/9/18.
  */
-public class HintUtil {
+public class HintUtil
+{
     private static final Logger LOG = LoggerFactory.getLogger(ReaderSplitUtil.class);
 
     private static DataBaseType dataBaseType;
@@ -24,44 +25,48 @@ public class HintUtil {
     private static Pattern tablePattern;
     private static String hintExpression;
 
-    public static void initHintConf(DataBaseType type, Configuration configuration){
+    public static void initHintConf(DataBaseType type, Configuration configuration)
+    {
         dataBaseType = type;
         username = configuration.getString(Key.USERNAME);
         password = configuration.getString(Key.PASSWORD);
         String hint = configuration.getString(Key.HINT);
-        if(StringUtils.isNotBlank(hint)){
+        if (StringUtils.isNotBlank(hint)) {
             String[] tablePatternAndHint = hint.split("#");
-            if(tablePatternAndHint.length==1){
+            if (tablePatternAndHint.length == 1) {
                 tablePattern = Pattern.compile(".*");
                 hintExpression = tablePatternAndHint[0];
-            }else{
+            }
+            else {
                 tablePattern = Pattern.compile(tablePatternAndHint[0]);
                 hintExpression = tablePatternAndHint[1];
             }
         }
     }
 
-    public static String buildQueryColumn(String jdbcUrl, String table, String column){
-        try{
-            if(tablePattern != null && DataBaseType.Oracle == dataBaseType) {
+    public static String buildQueryColumn(String jdbcUrl, String table, String column)
+    {
+        try {
+            if (tablePattern != null && DataBaseType.Oracle == dataBaseType) {
                 Matcher m = tablePattern.matcher(table);
-                if(m.find()){
+                if (m.find()) {
                     String[] tableStr = table.split("\\.");
-                    String tableWithoutSchema = tableStr[tableStr.length-1];
+                    String tableWithoutSchema = tableStr[tableStr.length - 1];
                     String finalHint = hintExpression.replaceAll(Constant.TABLE_NAME_PLACEHOLDER, tableWithoutSchema);
                     //主库不并发读取
-                    if(finalHint.indexOf("parallel") > 0 && DBUtil.isOracleMaster(jdbcUrl, username, password)){
+                    if (finalHint.indexOf("parallel") > 0 && DBUtil.isOracleMaster(jdbcUrl, username, password)) {
                         LOG.info("master:{} will not use hint:{}", jdbcUrl, finalHint);
-                    }else{
+                    }
+                    else {
                         LOG.info("table:{} use hint:{}.", table, finalHint);
                         return finalHint + column;
                     }
                 }
             }
-        } catch (Exception e){
+        }
+        catch (Exception e) {
             LOG.warn("match hint exception, will not use hint", e);
         }
         return column;
     }
-
 }

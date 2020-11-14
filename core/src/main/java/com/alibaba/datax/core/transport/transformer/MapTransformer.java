@@ -13,20 +13,24 @@ import java.util.Arrays;
  * no comments.
  * Created by liqiang on 16/3/4.
  */
-public class MapTransformer extends Transformer {
-    public MapTransformer() {
+public class MapTransformer
+        extends Transformer
+{
+    public MapTransformer()
+    {
         setTransformerName("dx_map");
     }
 
     @Override
-    public Record evaluate(Record record, Object... paras) {
+    public Record evaluate(Record record, Object... paras)
+    {
 
         int columnIndex;
         String code;
         String value;
         String newValue;
         Column column;
-        int scale =2; //默认精度
+        int scale = 2; //默认精度
 
         try {
             if (paras.length != 3) {
@@ -37,20 +41,20 @@ public class MapTransformer extends Transformer {
             code = (String) paras[1];
             value = (String) paras[2];
             column = record.getColumn(columnIndex);
-            if(column.getRawData() == null){
+            if (column.getRawData() == null) {
                 return record;
             }
 
             Double.valueOf(column.asString());
             Double.valueOf(value);
-        } catch (Exception e) {
+        }
+        catch (Exception e) {
             throw DataXException.asDataXException(TransformerErrorCode.TRANSFORMER_ILLEGAL_PARAMETER, "paras:" + Arrays.asList(paras).toString() + " => " + e.getMessage());
         }
 
-        if (column.asString().split("\\.").length>=2){
+        if (column.asString().split("\\.").length >= 2) {
             scale = column.asString().split("\\.")[1].length();
         }
-
 
         try {
             switch (code) {
@@ -72,11 +76,11 @@ public class MapTransformer extends Transformer {
                 default:
                     throw new RuntimeException("dx_map can't support code:" + code);
             }
-            record.setColumn(columnIndex,new StringColumn(newValue));
-            return  record;
-        } catch (Exception e) {
+            record.setColumn(columnIndex, new StringColumn(newValue));
+            return record;
+        }
+        catch (Exception e) {
             throw DataXException.asDataXException(TransformerErrorCode.TRANSFORMER_RUN_EXCEPTION, e.getMessage(), e);
         }
     }
-
 }

@@ -11,11 +11,15 @@ import org.slf4j.LoggerFactory;
 
 import java.util.List;
 
-public class MysqlReader extends Reader {
+public class MysqlReader
+        extends Reader
+{
 
     private static final DataBaseType DATABASE_TYPE = DataBaseType.MySql;
 
-    public static class Job extends Reader.Job {
+    public static class Job
+            extends Reader.Job
+    {
         private static final Logger LOG = LoggerFactory
                 .getLogger(Job.class);
 
@@ -23,7 +27,8 @@ public class MysqlReader extends Reader {
         private CommonRdbmsReader.Job commonRdbmsReaderJob;
 
         @Override
-        public void init() {
+        public void init()
+        {
             this.originalConfig = super.getPluginJobConf();
 
             Integer userConfigedFetchSize = this.originalConfig.getInt(Constant.FETCH_SIZE);
@@ -38,44 +43,49 @@ public class MysqlReader extends Reader {
         }
 
         @Override
-        public void preCheck(){
+        public void preCheck()
+        {
             init();
-            this.commonRdbmsReaderJob.preCheck(this.originalConfig,DATABASE_TYPE);
-
+            this.commonRdbmsReaderJob.preCheck(this.originalConfig, DATABASE_TYPE);
         }
 
         @Override
-        public List<Configuration> split(int adviceNumber) {
+        public List<Configuration> split(int adviceNumber)
+        {
             return this.commonRdbmsReaderJob.split(this.originalConfig, adviceNumber);
         }
 
         @Override
-        public void post() {
+        public void post()
+        {
             this.commonRdbmsReaderJob.post(this.originalConfig);
         }
 
         @Override
-        public void destroy() {
+        public void destroy()
+        {
             this.commonRdbmsReaderJob.destroy(this.originalConfig);
         }
-
     }
 
-    public static class Task extends Reader.Task {
+    public static class Task
+            extends Reader.Task
+    {
 
         private Configuration readerSliceConfig;
         private CommonRdbmsReader.Task commonRdbmsReaderTask;
 
         @Override
-        public void init() {
+        public void init()
+        {
             this.readerSliceConfig = super.getPluginJobConf();
-            this.commonRdbmsReaderTask = new CommonRdbmsReader.Task(DATABASE_TYPE,super.getTaskGroupId(), super.getTaskId());
+            this.commonRdbmsReaderTask = new CommonRdbmsReader.Task(DATABASE_TYPE, super.getTaskGroupId(), super.getTaskId());
             this.commonRdbmsReaderTask.init(this.readerSliceConfig);
-
         }
 
         @Override
-        public void startRead(RecordSender recordSender) {
+        public void startRead(RecordSender recordSender)
+        {
             int fetchSize = this.readerSliceConfig.getInt(Constant.FETCH_SIZE);
 
             this.commonRdbmsReaderTask.startRead(this.readerSliceConfig, recordSender,
@@ -83,15 +93,15 @@ public class MysqlReader extends Reader {
         }
 
         @Override
-        public void post() {
+        public void post()
+        {
             this.commonRdbmsReaderTask.post(this.readerSliceConfig);
         }
 
         @Override
-        public void destroy() {
+        public void destroy()
+        {
             this.commonRdbmsReaderTask.destroy(this.readerSliceConfig);
         }
-
     }
-
 }

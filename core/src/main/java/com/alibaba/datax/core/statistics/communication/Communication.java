@@ -15,6 +15,10 @@ public class Communication
         extends BaseObject
 {
     /**
+     * task给job的信息 *
+     */
+    Map<String, List<String>> message;
+    /**
      * 所有的数值key-value对 *
      */
     private Map<String, Number> counter;
@@ -23,25 +27,47 @@ public class Communication
      * 运行状态 *
      */
     private State state;
-
     /**
      * 异常记录 *
      */
     private Throwable throwable;
-
     /**
      * 记录的timestamp *
      */
     private long timestamp;
 
-    /**
-     * task给job的信息 *
-     */
-    Map<String, List<String>> message;
-
     public Communication()
     {
         this.init();
+    }
+
+    public Communication(Communication communication)
+    {
+        for (Map.Entry<String, Number> entry : this.counter.entrySet()) {
+            String key = entry.getKey();
+            Number value = entry.getValue();
+            if (value instanceof Long) {
+                communication.setLongCounter(key, (Long) value);
+            }
+            else if (value instanceof Double) {
+                communication.setDoubleCounter(key, (Double) value);
+            }
+        }
+
+        communication.setState(this.state, true);
+        communication.setThrowable(this.throwable, true);
+        communication.setTimestamp(this.timestamp);
+
+        /*
+         * clone message
+         */
+        if (this.message != null) {
+            for (Map.Entry<String, List<String>> entry : this.message.entrySet()) {
+                String key = entry.getKey();
+                List<String> value = new ArrayList<>(entry.getValue());
+                communication.getMessage().put(key, value);
+            }
+        }
     }
 
     public synchronized void reset()
@@ -68,6 +94,11 @@ public class Communication
         return this.state;
     }
 
+    public synchronized void setState(State state)
+    {
+        setState(state, false);
+    }
+
     public synchronized void setState(State state, boolean isForce)
     {
         if (!isForce && this.state == State.FAILED) {
@@ -77,24 +108,19 @@ public class Communication
         this.state = state;
     }
 
-    public synchronized void setState(State state)
-    {
-        setState(state, false);
-    }
-
     public Throwable getThrowable()
     {
         return this.throwable;
     }
 
-    public synchronized String getThrowableMessage()
-    {
-        return this.throwable == null ? "" : this.throwable.getMessage();
-    }
-
     public void setThrowable(Throwable throwable)
     {
         setThrowable(throwable, false);
+    }
+
+    public synchronized String getThrowableMessage()
+    {
+        return this.throwable == null ? "" : this.throwable.getMessage();
     }
 
     public synchronized void setThrowable(Throwable throwable, boolean isForce)
@@ -167,36 +193,6 @@ public class Communication
         long value = this.getLongCounter(key);
 
         this.counter.put(key, value + deltaValue);
-    }
-
-    public Communication(Communication communication)
-    {
-        for (Map.Entry<String, Number> entry : this.counter.entrySet()) {
-            String key = entry.getKey();
-            Number value = entry.getValue();
-            if (value instanceof Long) {
-                communication.setLongCounter(key, (Long) value);
-            }
-            else if (value instanceof Double) {
-                communication.setDoubleCounter(key, (Double) value);
-            }
-        }
-
-
-        communication.setState(this.state, true);
-        communication.setThrowable(this.throwable, true);
-        communication.setTimestamp(this.timestamp);
-
-        /*
-         * clone message
-         */
-        if (this.message != null) {
-            for (Map.Entry<String, List<String>> entry : this.message.entrySet()) {
-                String key = entry.getKey();
-                List<String> value = new ArrayList<>(entry.getValue());
-                communication.getMessage().put(key, value);
-            }
-        }
     }
 
     public synchronized Communication mergeFrom(Communication otherComm)

@@ -12,13 +12,17 @@ import java.util.Arrays;
  * no comments.
  * Created by liqiang on 16/3/4.
  */
-public class PadTransformer extends Transformer {
-    public PadTransformer() {
+public class PadTransformer
+        extends Transformer
+{
+    public PadTransformer()
+    {
         setTransformerName("dx_pad");
     }
 
     @Override
-    public Record evaluate(com.alibaba.datax.common.element.Record record, Object... paras) {
+    public Record evaluate(com.alibaba.datax.common.element.Record record, Object... paras)
+    {
 
         int columnIndex;
         String padType;
@@ -34,7 +38,8 @@ public class PadTransformer extends Transformer {
             padType = (String) paras[1];
             length = Integer.parseInt((String) paras[2]);
             padString = (String) paras[3];
-        } catch (Exception e) {
+        }
+        catch (Exception e) {
             throw DataXException.asDataXException(TransformerErrorCode.TRANSFORMER_ILLEGAL_PARAMETER, "paras:" + Arrays.asList(paras).toString() + " => " + e.getMessage());
         }
 
@@ -44,7 +49,7 @@ public class PadTransformer extends Transformer {
             String oriValue = column.asString();
 
             //如果字段为空，作为空字符串处理
-            if(oriValue==null){
+            if (oriValue == null) {
                 oriValue = "";
             }
             String newValue;
@@ -53,20 +58,22 @@ public class PadTransformer extends Transformer {
             }
             if (length <= oriValue.length()) {
                 newValue = oriValue.substring(0, length);
-            } else {
+            }
+            else {
 
                 newValue = doPad(padType, oriValue, length, padString);
             }
 
             record.setColumn(columnIndex, new StringColumn(newValue));
-
-        } catch (Exception e) {
-            throw DataXException.asDataXException(TransformerErrorCode.TRANSFORMER_RUN_EXCEPTION, e.getMessage(),e);
+        }
+        catch (Exception e) {
+            throw DataXException.asDataXException(TransformerErrorCode.TRANSFORMER_RUN_EXCEPTION, e.getMessage(), e);
         }
         return record;
     }
 
-    private String doPad(String padType, String oriValue, int length, String padString) {
+    private String doPad(String padType, String oriValue, int length, String padString)
+    {
 
         StringBuilder finalPad = new StringBuilder();
         int NeedLength = length - oriValue.length();
@@ -75,7 +82,8 @@ public class PadTransformer extends Transformer {
             if (NeedLength >= padString.length()) {
                 finalPad.append(padString);
                 NeedLength -= padString.length();
-            } else {
+            }
+            else {
                 finalPad.append(padString, 0, NeedLength);
                 NeedLength = 0;
             }
@@ -83,9 +91,9 @@ public class PadTransformer extends Transformer {
 
         if (padType.equalsIgnoreCase("l")) {
             return finalPad + oriValue;
-        } else {
+        }
+        else {
             return oriValue + finalPad;
         }
     }
-
 }

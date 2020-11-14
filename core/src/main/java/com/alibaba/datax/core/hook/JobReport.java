@@ -17,13 +17,16 @@ import org.apache.http.nio.reactor.IOReactorException;
  * 接口从 conf/core.json 文件中的 $.core.dataXServer.address 中获取
  * 如果该配置项为空，则跳过该接口，否则，将通过该接口上传本次任务执行的统计信息
  * 详细信息可以参考文档 statsreport.md
- *
  */
-public class JobReport {
+public class JobReport
+{
 
     private static CloseableHttpAsyncClient client = null;
 
-    public static CloseableHttpAsyncClient getHttpClient() {
+    private JobReport() {}
+
+    public static CloseableHttpAsyncClient getHttpClient()
+    {
         if (client == null) {
             synchronized (JobReport.class) {
                 if (client == null) {
@@ -42,7 +45,8 @@ public class JobReport {
                     ConnectingIOReactor ioReactor = null;
                     try {
                         ioReactor = new DefaultConnectingIOReactor(ioReactorConfig);
-                    } catch (IOReactorException e) {
+                    }
+                    catch (IOReactorException e) {
                         e.printStackTrace();
                     }
                     assert ioReactor != null;
@@ -55,14 +59,14 @@ public class JobReport {
                             .setDefaultRequestConfig(requestConfig)
                             .build();
                     client.start();
-
                 }
             }
         }
         return client;
     }
 
-    public static HttpPost getPostBody(String urls, String bodys, ContentType contentType) {
+    public static HttpPost getPostBody(String urls, String bodys, ContentType contentType)
+    {
         HttpPost post;
         StringEntity entity;
         post = new HttpPost(urls);

@@ -10,7 +10,6 @@ import com.alibaba.datax.common.exception.DataXException;
 import com.alibaba.datax.common.plugin.RecordSender;
 import com.alibaba.datax.common.spi.Reader;
 import com.alibaba.datax.common.util.Configuration;
-
 import com.jayway.jsonpath.DocumentContext;
 import com.jayway.jsonpath.JsonPath;
 import org.apache.commons.io.Charsets;
@@ -20,7 +19,6 @@ import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -29,8 +27,6 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
-
-
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -43,8 +39,12 @@ import java.util.regex.Pattern;
 /**
  * Created by jin.zhang on 18-05-30.
  */
-public class JsonReader extends Reader {
-    public static class Job extends Reader.Job {
+public class JsonReader
+        extends Reader
+{
+    public static class Job
+            extends Reader.Job
+    {
         private static final Logger LOG = LoggerFactory.getLogger(Job.class);
 
         private Configuration originConfig = null;
@@ -58,14 +58,16 @@ public class JsonReader extends Reader {
         private Map<String, Boolean> isRegexPath;
 
         @Override
-        public void init() {
+        public void init()
+        {
             this.originConfig = this.getPluginJobConf();
             this.pattern = new HashMap<>();
             this.isRegexPath = new HashMap<>();
             this.validateParameter();
         }
 
-        private void validateParameter() {
+        private void validateParameter()
+        {
             // Compatible with the old version, path is a string before
             String pathInString = this.originConfig.getNecessaryValue(Key.PATH,
                     JsonReaderErrorCode.REQUIRED_VALUE);
@@ -77,7 +79,8 @@ public class JsonReader extends Reader {
             if (!pathInString.startsWith("[") && !pathInString.endsWith("]")) {
                 path = new ArrayList<>();
                 path.add(pathInString);
-            } else {
+            }
+            else {
                 path = this.originConfig.getList(Key.PATH, String.class);
                 if (null == path || path.size() == 0) {
                     throw DataXException.asDataXException(
@@ -93,18 +96,21 @@ public class JsonReader extends Reader {
             if (StringUtils.isBlank(encoding)) {
                 this.originConfig
                         .set(Key.ENCODING, Constant.DEFAULT_ENCODING);
-            } else {
+            }
+            else {
                 try {
                     encoding = encoding.trim();
                     this.originConfig
                             .set(Key.ENCODING,
                                     encoding);
                     Charsets.toCharset(encoding);
-                } catch (UnsupportedCharsetException uce) {
+                }
+                catch (UnsupportedCharsetException uce) {
                     throw DataXException.asDataXException(
                             JsonReaderErrorCode.ILLEGAL_VALUE,
                             String.format("不支持您配置的编码格式 : [%s]", encoding), uce);
-                } catch (Exception e) {
+                }
+                catch (Exception e) {
                     throw DataXException.asDataXException(
                             JsonReaderErrorCode.CONFIG_INVALID_EXCEPTION,
                             String.format("编码配置异常, 请联系我们: %s", e.getMessage()),
@@ -169,7 +175,8 @@ public class JsonReader extends Reader {
         }
 
         @Override
-        public void prepare() {
+        public void prepare()
+        {
             LOG.debug("prepare() begin...");
             // warn:make sure this regex string
             // warn:no need trim
@@ -185,16 +192,19 @@ public class JsonReader extends Reader {
         }
 
         @Override
-        public void post() {
+        public void post()
+        {
         }
 
         @Override
-        public void destroy() {
+        public void destroy()
+        {
         }
 
         // warn: 如果源目录为空会报错，拖空目录意图=>空文件显示指定此意图
         @Override
-        public List<Configuration> split(int adviceNumber) {
+        public List<Configuration> split(int adviceNumber)
+        {
             LOG.debug("split() begin...");
             List<Configuration> readerSplitConfigs = new ArrayList<>();
 
@@ -220,7 +230,8 @@ public class JsonReader extends Reader {
         }
 
         // validate the path, path must be a absolute path
-        private List<String> buildSourceTargets() {
+        private List<String> buildSourceTargets()
+        {
             // for eath path
             Set<String> toBeReadFiles = new HashSet<>();
             for (String eachPath : this.path) {
@@ -228,9 +239,9 @@ public class JsonReader extends Reader {
                 for (endMark = 0; endMark < eachPath.length(); endMark++) {
                     if ('*' == eachPath.charAt(endMark)
                             || '?' == eachPath.charAt(endMark)) {
-                                this.isRegexPath.put(eachPath, true);
-                                break;
-                            }
+                        this.isRegexPath.put(eachPath, true);
+                        break;
+                    }
                 }
 
                 String parentDirectory;
@@ -239,7 +250,8 @@ public class JsonReader extends Reader {
                             .lastIndexOf(IOUtils.DIR_SEPARATOR);
                     parentDirectory = eachPath.substring(0,
                             lastDirSeparator + 1);
-                } else {
+                }
+                else {
                     this.isRegexPath.put(eachPath, false);
                     parentDirectory = eachPath;
                 }
@@ -250,7 +262,8 @@ public class JsonReader extends Reader {
         }
 
         private void buildSourceTargetsEathPath(String regexPath,
-                                                String parentDirectory, Set<String> toBeReadFiles) {
+                String parentDirectory, Set<String> toBeReadFiles)
+        {
             // 检测目录是否存在，错误情况更明确
             try {
                 File dir = new File(parentDirectory);
@@ -262,7 +275,8 @@ public class JsonReader extends Reader {
                     throw DataXException.asDataXException(
                             JsonReaderErrorCode.FILE_NOT_EXISTS, message);
                 }
-            } catch (SecurityException se) {
+            }
+            catch (SecurityException se) {
                 String message = String.format("您没有权限查看目录 : [%s]",
                         parentDirectory);
                 LOG.error(message);
@@ -274,7 +288,8 @@ public class JsonReader extends Reader {
         }
 
         private void directoryRover(String regexPath, String parentDirectory,
-                                    Set<String> toBeReadFiles) {
+                Set<String> toBeReadFiles)
+        {
             File directory = new File(parentDirectory);
             // is a normal file
             if (!directory.isDirectory()) {
@@ -283,9 +298,9 @@ public class JsonReader extends Reader {
                     LOG.info(String.format(
                             "add file [%s] as a candidate to be read.",
                             parentDirectory));
-
                 }
-            } else {
+            }
+            else {
                 // 是目录
                 try {
                     // warn:对于没有权限的目录,listFiles 返回null，而不是抛出SecurityException
@@ -296,7 +311,8 @@ public class JsonReader extends Reader {
                                     subFileNames.getAbsolutePath(),
                                     toBeReadFiles);
                         }
-                    } else {
+                    }
+                    else {
                         // warn: 对于没有权限的文件，是直接throw DataXException
                         String message = String.format("您没有权限查看目录 : [%s]",
                                 directory);
@@ -305,8 +321,8 @@ public class JsonReader extends Reader {
                                 JsonReaderErrorCode.SECURITY_NOT_ENOUGH,
                                 message);
                     }
-
-                } catch (SecurityException e) {
+                }
+                catch (SecurityException e) {
                     String message = String.format("您没有权限查看目录 : [%s]",
                             directory);
                     LOG.error(message);
@@ -318,18 +334,20 @@ public class JsonReader extends Reader {
         }
 
         // 正则过滤
-        private boolean isTargetFile(String regexPath, String absoluteFilePath) {
+        private boolean isTargetFile(String regexPath, String absoluteFilePath)
+        {
             if (this.isRegexPath.get(regexPath)) {
                 return this.pattern.get(regexPath).matcher(absoluteFilePath)
                         .matches();
-            } else {
+            }
+            else {
                 return true;
             }
-
         }
 
         private <T> List<List<T>> splitSourceFiles(final List<T> sourceList,
-                                                   int adviceNumber) {
+                int adviceNumber)
+        {
             List<List<T>> splitedList = new ArrayList<>();
             int averageLength = sourceList.size() / adviceNumber;
             averageLength = averageLength == 0 ? 1 : averageLength;
@@ -343,17 +361,19 @@ public class JsonReader extends Reader {
             }
             return splitedList;
         }
-
     }
 
-    public static class Task extends Reader.Task {
+    public static class Task
+            extends Reader.Task
+    {
         private static final Logger LOG = LoggerFactory.getLogger(Task.class);
 
         private List<String> sourceFiles;
         private List<Configuration> columns;
 
         @Override
-        public void init() {
+        public void init()
+        {
             Configuration readerSliceConfig = this.getPluginJobConf();
             this.sourceFiles = readerSliceConfig.getList(
                     Constant.SOURCE_FILES, String.class);
@@ -362,9 +382,10 @@ public class JsonReader extends Reader {
         }
 
         //解析json，返回已经经过处理的行
-        private List<Column> parseFromJson(String json){
+        private List<Column> parseFromJson(String json)
+        {
             List<Column> splitLine = new ArrayList<>();
-            DocumentContext document =  JsonPath.parse(json);
+            DocumentContext document = JsonPath.parse(json);
             String tempValue;
             for (Configuration eachColumnConf : columns) {
                 String columnIndex = eachColumnConf
@@ -376,12 +397,14 @@ public class JsonReader extends Reader {
                 String columnValue = eachColumnConf
                         .getString(Key.VALUE);
                 // 这里是为了支持常量Value 现在需要考虑做容错，如果json里面没有的解析路径置为null
-                if(null != columnValue){
+                if (null != columnValue) {
                     tempValue = columnValue;
-                }else{
-                    try{
+                }
+                else {
+                    try {
                         tempValue = document.read(columnIndex, columnType.getClass());
-                    }catch (Exception ignore){
+                    }
+                    catch (Exception ignore) {
                         tempValue = null;
                     }
                 }
@@ -392,7 +415,8 @@ public class JsonReader extends Reader {
         }
 
         //匹配类型
-        private Column getColumn(String type, String columnValue, String columnFormat) {
+        private Column getColumn(String type, String columnValue, String columnFormat)
+        {
             Column columnGenerated;
             //类型转换 后续可以考虑使用switch case
             switch (type) {
@@ -402,7 +426,8 @@ public class JsonReader extends Reader {
                 case Key.DOUBLE:
                     try {
                         columnGenerated = new DoubleColumn(columnValue);
-                    } catch (Exception e) {
+                    }
+                    catch (Exception e) {
                         throw new IllegalArgumentException(String.format(
                                 "类型转换错误, 无法将[%s] 转换为[%s]", columnValue,
                                 "DOUBLE"));
@@ -411,7 +436,8 @@ public class JsonReader extends Reader {
                 case Key.BOOLEAN:
                     try {
                         columnGenerated = new BoolColumn(columnValue);
-                    } catch (Exception e) {
+                    }
+                    catch (Exception e) {
                         throw new IllegalArgumentException(String.format(
                                 "类型转换错误, 无法将[%s] 转换为[%s]", columnValue,
                                 "BOOLEAN"));
@@ -420,7 +446,8 @@ public class JsonReader extends Reader {
                 case Key.LONG:
                     try {
                         columnGenerated = new LongColumn(columnValue);
-                    } catch (Exception e) {
+                    }
+                    catch (Exception e) {
                         System.out.println(e.getMessage());
                         throw new IllegalArgumentException(String.format(
                                 "类型转换错误, 无法将[%s] 转换为[%s]", columnValue,
@@ -434,13 +461,15 @@ public class JsonReader extends Reader {
                             DateFormat format = new SimpleDateFormat(columnFormat);
                             columnGenerated = new DateColumn(
                                     format.parse(columnValue));
-                        } else {
+                        }
+                        else {
                             // 框架尝试转换
                             columnGenerated = new DateColumn(
                                     new StringColumn(columnValue)
                                             .asDate());
                         }
-                    } catch (Exception e) {
+                    }
+                    catch (Exception e) {
                         throw new IllegalArgumentException(String.format(
                                 "类型转换错误, 无法将[%s] 转换为[%s]", columnValue,
                                 "DATE"));
@@ -459,32 +488,36 @@ public class JsonReader extends Reader {
         }
 
         //传输一行数据
-        private void transportOneRecord(RecordSender recordSender, List<Column> sourceLine) {
+        private void transportOneRecord(RecordSender recordSender, List<Column> sourceLine)
+        {
             com.alibaba.datax.common.element.Record record = recordSender.createRecord();
-            for(Column eachValue:sourceLine){
+            for (Column eachValue : sourceLine) {
                 record.addColumn(eachValue);
             }
             recordSender.sendToWriter(record);
         }
 
-
         @Override
-        public void prepare() {
+        public void prepare()
+        {
 
         }
 
         @Override
-        public void post() {
+        public void post()
+        {
 
         }
 
         @Override
-        public void destroy() {
+        public void destroy()
+        {
 
         }
 
         @Override
-        public void startRead(RecordSender recordSender) {
+        public void startRead(RecordSender recordSender)
+        {
             LOG.debug("start read source files...");
             for (String fileName : this.sourceFiles) {
                 LOG.info(String.format("reading file : [%s]", fileName));
@@ -493,7 +526,8 @@ public class JsonReader extends Reader {
                     List<Column> sourceLine = parseFromJson(json);
                     transportOneRecord(recordSender, sourceLine);
                     recordSender.flush();
-                } catch (FileNotFoundException e) {
+                }
+                catch (FileNotFoundException e) {
                     // warn: sock 文件无法read,能影响所有文件的传输,需要用户自己保证
                     String message = String
                             .format("找不到待读取的文件 : [%s]", fileName);
@@ -512,6 +546,5 @@ public class JsonReader extends Reader {
             }
             LOG.debug("end read source files...");
         }
-
     }
 }

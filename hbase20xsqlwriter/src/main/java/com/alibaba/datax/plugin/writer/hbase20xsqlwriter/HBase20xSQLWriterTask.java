@@ -11,11 +11,20 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.math.BigDecimal;
-import java.sql.*;
+import java.sql.Connection;
+import java.sql.Date;
+import java.sql.PreparedStatement;
+import java.sql.ResultSetMetaData;
+import java.sql.SQLException;
+import java.sql.Statement;
+import java.sql.Time;
+import java.sql.Timestamp;
+import java.sql.Types;
 import java.util.Arrays;
 import java.util.List;
 
-public class HBase20xSQLWriterTask {
+public class HBase20xSQLWriterTask
+{
     private final static Logger LOG = LoggerFactory.getLogger(HBase20xSQLWriterTask.class);
 
     private Configuration configuration;
@@ -35,12 +44,14 @@ public class HBase20xSQLWriterTask {
     private NullModeType nullModeType;
     private int batchSize;
 
-    public HBase20xSQLWriterTask(Configuration configuration) {
+    public HBase20xSQLWriterTask(Configuration configuration)
+    {
         // 这里仅解析配置，不访问远端集群，配置的合法性检查在writer的init过程中进行
         this.configuration = configuration;
     }
 
-    public void startWriter(RecordReceiver lineReceiver, TaskPluginCollector taskPluginCollector) {
+    public void startWriter(RecordReceiver lineReceiver, TaskPluginCollector taskPluginCollector)
+    {
         this.taskPluginCollector = taskPluginCollector;
 
         try {
@@ -49,21 +60,24 @@ public class HBase20xSQLWriterTask {
 
             // 写入数据
             writeData(lineReceiver);
-
-        } catch (Throwable e) {
+        }
+        catch (Throwable e) {
             throw DataXException.asDataXException(HBase20xSQLWriterErrorCode.PUT_HBASE_ERROR, e);
-        } finally {
+        }
+        finally {
             // 关闭jdbc连接
             HBase20xSQLHelper.closeJdbc(connection, pstmt, null);
         }
-
     }
 
     /**
      * 初始化JDBC操作对象及列类型
+     *
      * @throws SQLException
      */
-    private void initialize() throws SQLException {
+    private void initialize()
+            throws SQLException
+    {
         if (connection == null) {
             connection = HBase20xSQLHelper.getJdbcConnection(configuration);
             connection.setAutoCommit(false);
@@ -87,7 +101,9 @@ public class HBase20xSQLWriterTask {
     /**
      * 生成sql模板，并根据模板创建PreparedStatement
      */
-    private PreparedStatement createPreparedStatement() throws SQLException {
+    private PreparedStatement createPreparedStatement()
+            throws SQLException
+    {
         // 生成列名集合，列之间用逗号分隔： col1,col2,col3,...
         StringBuilder columnNamesBuilder = new StringBuilder();
         for (String col : columns) {
@@ -121,7 +137,9 @@ public class HBase20xSQLWriterTask {
     /**
      * 根据列名来从数据库元数据中获取这一列对应的SQL类型
      */
-    private int[] getColumnSqlType() throws SQLException {
+    private int[] getColumnSqlType()
+            throws SQLException
+    {
         int[] types = new int[numberOfColumnsToWrite];
         StringBuilder columnNamesBuilder = new StringBuilder();
         for (String columnName : columns) {
@@ -140,10 +158,12 @@ public class HBase20xSQLWriterTask {
                 types[i] = meta.getColumnType(i + 1);
                 LOG.debug("Column name : " + name + ", sql type = " + types[i] + " " + meta.getColumnTypeName(i + 1));
             }
-        } catch (SQLException e) {
+        }
+        catch (SQLException e) {
             throw DataXException.asDataXException(HBase20xSQLWriterErrorCode.GET_TABLE_COLUMNTYPE_ERROR,
                     "获取表" + fullTableName + "列类型失败，请检查配置和服务状态或者联系HBase管理员.", e);
-        } finally {
+        }
+        finally {
             HBase20xSQLHelper.closeJdbc(null, statement, null);
         }
 
@@ -153,7 +173,9 @@ public class HBase20xSQLWriterTask {
     /**
      * 从接收器中获取每条记录，写入Phoenix
      */
-    private void writeData(RecordReceiver lineReceiver) throws SQLException {
+    private void writeData(RecordReceiver lineReceiver)
+            throws SQLException
+    {
         List<Record> buffer = Lists.newArrayListWithExpectedSize(batchSize);
         com.alibaba.datax.common.element.Record record = null;
         while ((record = lineReceiver.getFromReader()) != null) {
@@ -181,7 +203,9 @@ public class HBase20xSQLWriterTask {
     /**
      * 批量提交一组数据，如果失败，则尝试一行行提交，如果仍然失败，抛错给用户
      */
-    private void doBatchUpsert(List<Record> records) throws SQLException {
+    private void doBatchUpsert(List<Record> records)
+            throws SQLException
+    {
         try {
             // 将所有record提交到connection缓存
             for (com.alibaba.datax.common.element.Record r : records) {
@@ -194,8 +218,8 @@ public class HBase20xSQLWriterTask {
             connection.commit();
             pstmt.clearParameters();
             pstmt.clearBatch();
-
-        } catch (SQLException e) {
+        }
+        catch (SQLException e) {
             LOG.error("Failed batch committing " + records.size() + " records", e);
 
             // 批量提交失败，则一行行重试，以确定哪一行出错
@@ -204,7 +228,8 @@ public class HBase20xSQLWriterTask {
             connection.setAutoCommit(true);
             pstmt = createPreparedStatement();
             doSingleUpsert(records);
-        } catch (Exception e) {
+        }
+        catch (Exception e) {
             throw DataXException.asDataXException(HBase20xSQLWriterErrorCode.PUT_HBASE_ERROR, e);
         }
     }
@@ -212,14 +237,17 @@ public class HBase20xSQLWriterTask {
     /**
      * 单行提交，将出错的行记录到脏数据中。由脏数据收集模块判断任务是否继续
      */
-    private void doSingleUpsert(List<Record> records) throws SQLException {
+    private void doSingleUpsert(List<Record> records)
+            throws SQLException
+    {
         int rowNumber = 0;
         for (com.alibaba.datax.common.element.Record r : records) {
             try {
-                rowNumber ++;
+                rowNumber++;
                 setupStatement(r);
                 pstmt.executeUpdate();
-            } catch (SQLException e) {
+            }
+            catch (SQLException e) {
                 //出错了，记录脏数据
                 LOG.error("Failed writing to phoenix, rowNumber: " + rowNumber);
                 this.taskPluginCollector.collectDirtyRecord(r, e);
@@ -227,7 +255,9 @@ public class HBase20xSQLWriterTask {
         }
     }
 
-    private void setupStatement(com.alibaba.datax.common.element.Record record) throws SQLException {
+    private void setupStatement(com.alibaba.datax.common.element.Record record)
+            throws SQLException
+    {
         for (int i = 0; i < numberOfColumnsToWrite; i++) {
             Column col = record.getColumn(i);
             int sqlType = columnTypes[i];
@@ -236,7 +266,9 @@ public class HBase20xSQLWriterTask {
         }
     }
 
-    private void setupColumn(int pos, int sqlType, Column col) throws SQLException {
+    private void setupColumn(int pos, int sqlType, Column col)
+            throws SQLException
+    {
         if (col.getRawData() != null) {
             switch (sqlType) {
                 case Types.CHAR:
@@ -304,9 +336,10 @@ public class HBase20xSQLWriterTask {
                     throw DataXException.asDataXException(HBase20xSQLWriterErrorCode.ILLEGAL_VALUE,
                             "不支持您配置的列类型:" + sqlType + ", 请检查您的配置 或者 联系 Hbase 管理员.");
             }
-        } else {
+        }
+        else {
             // 没有值，按空值的配置情况处理
-            switch (nullModeType){
+            switch (nullModeType) {
                 case Skip:
                     // 跳过空值，则不插入该列,
                     pstmt.setNull(pos, sqlType);
@@ -330,9 +363,11 @@ public class HBase20xSQLWriterTask {
     /**
      * 根据类型获取"空值"
      * 值类型的空值都是0，bool是false，String是空字符串
+     *
      * @param sqlType sql数据类型，定义于{@link Types}
      */
-    private Object getEmptyValue(int sqlType) {
+    private Object getEmptyValue(int sqlType)
+    {
         switch (sqlType) {
             case Types.VARCHAR:
                 return "";

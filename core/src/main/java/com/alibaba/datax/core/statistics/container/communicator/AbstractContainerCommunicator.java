@@ -1,57 +1,60 @@
 package com.alibaba.datax.core.statistics.container.communicator;
 
-
 import com.alibaba.datax.common.statistics.VMInfo;
 import com.alibaba.datax.common.util.Configuration;
+import com.alibaba.datax.core.meta.State;
 import com.alibaba.datax.core.statistics.communication.Communication;
 import com.alibaba.datax.core.statistics.container.collector.AbstractCollector;
 import com.alibaba.datax.core.statistics.container.report.AbstractReporter;
 import com.alibaba.datax.core.util.container.CoreConstant;
-import com.alibaba.datax.core.meta.State;
 
 import java.util.List;
 import java.util.Map;
 
-public abstract class AbstractContainerCommunicator {
+public abstract class AbstractContainerCommunicator
+{
     private final Configuration configuration;
+    private final Long jobId;
+    private final VMInfo vmInfo = VMInfo.getVmInfo();
     private AbstractCollector collector;
     private AbstractReporter reporter;
-
-    private final Long jobId;
-
-    private final VMInfo vmInfo = VMInfo.getVmInfo();
     private long lastReportTime = System.currentTimeMillis();
 
-
-    public Configuration getConfiguration() {
-        return this.configuration;
-    }
-
-    public AbstractCollector getCollector() {
-        return collector;
-    }
-
-    public AbstractReporter getReporter() {
-        return reporter;
-    }
-
-    public void setCollector(AbstractCollector collector) {
-        this.collector = collector;
-    }
-
-    public void setReporter(AbstractReporter reporter) {
-        this.reporter = reporter;
-    }
-
-    public Long getJobId() {
-        return jobId;
-    }
-
-    public AbstractContainerCommunicator(Configuration configuration) {
+    public AbstractContainerCommunicator(Configuration configuration)
+    {
         this.configuration = configuration;
         this.jobId = configuration.getLong(CoreConstant.DATAX_CORE_CONTAINER_JOB_ID);
     }
 
+    public Configuration getConfiguration()
+    {
+        return this.configuration;
+    }
+
+    public AbstractCollector getCollector()
+    {
+        return collector;
+    }
+
+    public void setCollector(AbstractCollector collector)
+    {
+        this.collector = collector;
+    }
+
+    public AbstractReporter getReporter()
+    {
+        return reporter;
+    }
+
+    public void setReporter(AbstractReporter reporter)
+    {
+        this.reporter = reporter;
+    }
+
+    public Long getJobId()
+    {
+        return jobId;
+    }
 
     public abstract void registerCommunication(List<Configuration> configurationList);
 
@@ -69,15 +72,17 @@ public abstract class AbstractContainerCommunicator {
      */
     public abstract Map<Integer, Communication> getCommunicationMap();
 
-    public void resetCommunication(Integer id){
+    public void resetCommunication(Integer id)
+    {
         Map<Integer, Communication> map = getCommunicationMap();
         map.put(id, new Communication());
     }
 
-    public void reportVmInfo(){
+    public void reportVmInfo()
+    {
         long now = System.currentTimeMillis();
         //每5分钟打印一次
-        if(now - lastReportTime >= 300000) {
+        if (now - lastReportTime >= 300000) {
             //当前仅打印
             if (vmInfo != null) {
                 vmInfo.getDelta(true);

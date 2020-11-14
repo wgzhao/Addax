@@ -10,20 +10,25 @@ import java.util.Map;
  * no comments.
  * Created by liqiang on 16/3/8.
  */
-public class ComplexTransformerProxy extends ComplexTransformer {
+public class ComplexTransformerProxy
+        extends ComplexTransformer
+{
     private final Transformer realTransformer;
 
-    public ComplexTransformerProxy(Transformer transformer) {
+    public ComplexTransformerProxy(Transformer transformer)
+    {
         setTransformerName(transformer.getTransformerName());
         this.realTransformer = transformer;
     }
 
     @Override
-    public Record evaluate(com.alibaba.datax.common.element.Record record, Map<String, Object> tContext, Object... paras) {
+    public Record evaluate(com.alibaba.datax.common.element.Record record, Map<String, Object> tContext, Object... paras)
+    {
         return this.realTransformer.evaluate(record, paras);
     }
 
-    public Transformer getRealTransformer() {
+    public Transformer getRealTransformer()
+    {
         return realTransformer;
     }
 }

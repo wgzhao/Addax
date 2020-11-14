@@ -3,7 +3,8 @@ package com.alibaba.datax.plugin.writer.elasticsearchwriter;
 /**
  * Created by xiongfeng.bxf on 17/3/1.
  */
-public enum ESFieldType {
+public enum ESFieldType
+{
     ID,
     STRING,
     TEXT,
@@ -33,7 +34,8 @@ public enum ESFieldType {
     OBJECT,
     NESTED;
 
-    public static ESFieldType getESFieldType(String type) {
+    public static ESFieldType getESFieldType(String type)
+    {
         if (type == null) {
             return null;
         }

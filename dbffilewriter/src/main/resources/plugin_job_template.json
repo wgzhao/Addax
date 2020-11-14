@@ -1,11 +1,11 @@
 {
-    "name": "dbffilewriter",
-    "parameter": {
-        "path": "",
-        "fileName": "",
-        "writeMode": "",
-        "fieldDelimiter":"",
-        "dateFormat": "",
-        "encoding": ""
-    }
+  "name": "dbffilewriter",
+  "parameter": {
+    "path": "",
+    "fileName": "",
+    "writeMode": "",
+    "fieldDelimiter": "",
+    "dateFormat": "",
+    "encoding": ""
+  }
 }

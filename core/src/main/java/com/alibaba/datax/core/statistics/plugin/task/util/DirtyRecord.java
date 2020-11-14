@@ -12,140 +12,160 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
-public class DirtyRecord implements Record {
-	private List<Column> columns = new ArrayList<>();
+public class DirtyRecord
+        implements Record
+{
+    private List<Column> columns = new ArrayList<>();
 
-	public static DirtyRecord asDirtyRecord(final com.alibaba.datax.common.element.Record record) {
-		DirtyRecord result = new DirtyRecord();
-		for (int i = 0; i < record.getColumnNumber(); i++) {
-			result.addColumn(record.getColumn(i));
-		}
+    private static final String NOT_SUPPORT_METHOD =  "该方法不支持!";
 
-		return result;
-	}
+    public static DirtyRecord asDirtyRecord(final com.alibaba.datax.common.element.Record record)
+    {
+        DirtyRecord result = new DirtyRecord();
+        for (int i = 0; i < record.getColumnNumber(); i++) {
+            result.addColumn(record.getColumn(i));
+        }
 
-	@Override
-	public void addColumn(Column column) {
-		this.columns.add(
+        return result;
+    }
+
+    @Override
+    public void addColumn(Column column)
+    {
+        this.columns.add(
                 DirtyColumn.asDirtyColumn(column, this.columns.size()));
-	}
+    }
 
-	@Override
-	public String toString() {
-		return JSON.toJSONString(this.columns);
-	}
+    @Override
+    public String toString()
+    {
+        return JSON.toJSONString(this.columns);
+    }
 
-	@Override
-	public void setColumn(int i, Column column) {
-		throw DataXException.asDataXException(FrameworkErrorCode.RUNTIME_ERROR,
-				"该方法不支持!");
-	}
+    @Override
+    public void setColumn(int i, Column column)
+    {
+        throw DataXException.asDataXException(FrameworkErrorCode.RUNTIME_ERROR,
+               NOT_SUPPORT_METHOD);
+    }
 
-	@Override
-	public Column getColumn(int i) {
-		throw DataXException.asDataXException(FrameworkErrorCode.RUNTIME_ERROR,
-				"该方法不支持!");
-	}
+    @Override
+    public Column getColumn(int i)
+    {
+        throw DataXException.asDataXException(FrameworkErrorCode.RUNTIME_ERROR,
+               NOT_SUPPORT_METHOD);
+    }
 
-	@Override
-	public int getColumnNumber() {
-		throw DataXException.asDataXException(FrameworkErrorCode.RUNTIME_ERROR,
-				"该方法不支持!");
-	}
+    @Override
+    public int getColumnNumber()
+    {
+        throw DataXException.asDataXException(FrameworkErrorCode.RUNTIME_ERROR,
+               NOT_SUPPORT_METHOD);
+    }
 
-	@Override
-	public int getByteSize() {
-		throw DataXException.asDataXException(FrameworkErrorCode.RUNTIME_ERROR,
-				"该方法不支持!");
-	}
+    @Override
+    public int getByteSize()
+    {
+        throw DataXException.asDataXException(FrameworkErrorCode.RUNTIME_ERROR,
+               NOT_SUPPORT_METHOD);
+    }
 
-	@Override
-	public int getMemorySize() {
-		throw DataXException.asDataXException(FrameworkErrorCode.RUNTIME_ERROR,
-				"该方法不支持!");
-	}
+    @Override
+    public int getMemorySize()
+    {
+        throw DataXException.asDataXException(FrameworkErrorCode.RUNTIME_ERROR,
+               NOT_SUPPORT_METHOD);
+    }
 
-	public List<Column> getColumns() {
-		return columns;
-	}
+    public List<Column> getColumns()
+    {
+        return columns;
+    }
 
-	public void setColumns(List<Column> columns) {
-		this.columns = columns;
-	}
-
+    public void setColumns(List<Column> columns)
+    {
+        this.columns = columns;
+    }
 }
 
-class DirtyColumn extends Column {
-	private int index;
+class DirtyColumn
+        extends Column
+{
 
-	public static Column asDirtyColumn(final Column column, int index) {
-		return new DirtyColumn(column, index);
-	}
+    private static final String NOT_SUPPORT_METHOD =  "该方法不支持!";
 
-	private DirtyColumn(Column column, int index) {
-		this(null == column ? null : column.getRawData(),
-				null == column ? Column.Type.NULL : column.getType(),
-				null == column ? 0 : column.getByteSize(), index);
-	}
+    private DirtyColumn(Column column, int index)
+    {
+        this(null == column ? null : column.getRawData(),
+                null == column ? Column.Type.NULL : column.getType(),
+                null == column ? 0 : column.getByteSize(), index);
+    }
 
-	public int getIndex() {
-		return index;
-	}
+    private DirtyColumn(Object object, Type type, int byteSize, int index)
+    {
+        super(object, type, byteSize);
+        // this.setIndex(index)
+    }
 
-	public void setIndex(int index) {
-		this.index = index;
-	}
+    public static Column asDirtyColumn(final Column column, int index)
+    {
+        return new DirtyColumn(column, index);
+    }
 
-	@Override
-	public Long asLong() {
-		throw DataXException.asDataXException(FrameworkErrorCode.RUNTIME_ERROR,
-				"该方法不支持!");
-	}
 
-	@Override
-	public Double asDouble() {
-		throw DataXException.asDataXException(FrameworkErrorCode.RUNTIME_ERROR,
-				"该方法不支持!");
-	}
+    @Override
+    public Long asLong()
+    {
+        throw DataXException.asDataXException(FrameworkErrorCode.RUNTIME_ERROR,
+               NOT_SUPPORT_METHOD);
+    }
 
-	@Override
-	public String asString() {
-		throw DataXException.asDataXException(FrameworkErrorCode.RUNTIME_ERROR,
-				"该方法不支持!");
-	}
+    @Override
+    public Double asDouble()
+    {
+        throw DataXException.asDataXException(FrameworkErrorCode.RUNTIME_ERROR,
+               NOT_SUPPORT_METHOD);
+    }
 
-	@Override
-	public Date asDate() {
-		throw DataXException.asDataXException(FrameworkErrorCode.RUNTIME_ERROR,
-				"该方法不支持!");
-	}
+    @Override
+    public String asString()
+    {
+        throw DataXException.asDataXException(FrameworkErrorCode.RUNTIME_ERROR,
+               NOT_SUPPORT_METHOD);
+    }
 
-	@Override
-	public byte[] asBytes() {
-		throw DataXException.asDataXException(FrameworkErrorCode.RUNTIME_ERROR,
-				"该方法不支持!");
-	}
+    @Override
+    public Date asDate()
+    {
+        throw DataXException.asDataXException(FrameworkErrorCode.RUNTIME_ERROR,
+               NOT_SUPPORT_METHOD);
+    }
 
-	@Override
-	public Boolean asBoolean() {
-		throw DataXException.asDataXException(FrameworkErrorCode.RUNTIME_ERROR,
-				"该方法不支持!");
-	}
+    @Override
+    public byte[] asBytes()
+    {
+        throw DataXException.asDataXException(FrameworkErrorCode.RUNTIME_ERROR,
+               NOT_SUPPORT_METHOD);
+    }
 
-	@Override
-	public BigDecimal asBigDecimal() {
-		throw DataXException.asDataXException(FrameworkErrorCode.RUNTIME_ERROR,
-				"该方法不支持!");
-	}
+    @Override
+    public Boolean asBoolean()
+    {
+        throw DataXException.asDataXException(FrameworkErrorCode.RUNTIME_ERROR,
+               NOT_SUPPORT_METHOD);
+    }
 
-	@Override
-	public BigInteger asBigInteger() {
-		throw DataXException.asDataXException(FrameworkErrorCode.RUNTIME_ERROR,
-				"该方法不支持!");
-	}
+    @Override
+    public BigDecimal asBigDecimal()
+    {
+        throw DataXException.asDataXException(FrameworkErrorCode.RUNTIME_ERROR,
+               NOT_SUPPORT_METHOD);
+    }
 
-	private DirtyColumn(Object object, Type type, int byteSize, int index) {
-		super(object, type, byteSize);
-		this.setIndex(index);
-	}
+    @Override
+    public BigInteger asBigInteger()
+    {
+        throw DataXException.asDataXException(FrameworkErrorCode.RUNTIME_ERROR,
+               NOT_SUPPORT_METHOD);
+    }
 }

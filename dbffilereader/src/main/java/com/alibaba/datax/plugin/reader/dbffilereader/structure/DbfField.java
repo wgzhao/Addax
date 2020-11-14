@@ -6,17 +6,17 @@ import com.alibaba.datax.plugin.reader.dbffilereader.utils.DbfUtils;
 import java.io.DataInput;
 import java.io.IOException;
 
-
 /**
  * Field descriptor in dbf header (fix 32 bytes for each field)
- * @see <a href="http://www.fship.com/dbfspecs.txt">DBF specification (2a, 2b)</a>
  *
  * @author Sergey Polovko
+ * @see <a href="http://www.fship.com/dbfspecs.txt">DBF specification (2a, 2b)</a>
  */
-public class DbfField {
+public class DbfField
+{
 
     public static final int HEADER_TERMINATOR = 0x0d;
-
+    private final int fieldIndex;
     private String fieldName;                   /* 0-10  */
     private DbfDataType dataType;               /* 11    */
     private int reserv1;                        /* 12-15 */
@@ -28,9 +28,9 @@ public class DbfField {
     private byte setFieldsFlag;                 /* 23    */
     private byte[] reserv4 = new byte[7];       /* 24-30 */
     private byte indexFieldFlag;                /* 31    */
-    private final int fieldIndex;
 
-    private DbfField(int fieldIndex) {
+    private DbfField(int fieldIndex)
+    {
         this.fieldIndex = fieldIndex;
     }
 
@@ -43,7 +43,9 @@ public class DbfField {
      * @return created DBFField object.
      * @throws DbfException if any stream reading problems occurs.
      */
-    public static DbfField read(DataInput in, int fieldIndex) throws DbfException {
+    public static DbfField read(DataInput in, int fieldIndex)
+            throws DbfException
+    {
         try {
             DbfField field = new DbfField(fieldIndex);
 
@@ -58,9 +60,11 @@ public class DbfField {
             nameBuf[0] = firstByte;
 
             int zeroIndex = 0;
-            while (zeroIndex < nameBuf.length && nameBuf[zeroIndex] != 0) zeroIndex++;
+            while (zeroIndex < nameBuf.length && nameBuf[zeroIndex] != 0) {
+                zeroIndex++;
+            }
             field.fieldName = new String(nameBuf, 0, zeroIndex);
-            byte fieldType  = in.readByte();
+            byte fieldType = in.readByte();
             field.dataType = DbfDataType.valueOf(fieldType);    /* 11    */
             if (field.dataType == null) {
                 throw new DbfException(
@@ -81,28 +85,34 @@ public class DbfField {
             field.indexFieldFlag = in.readByte();               /* 31    */
 
             return field;
-        } catch (IOException e) {
+        }
+        catch (IOException e) {
             throw new DbfException("Cannot read Dbf field", e);
         }
     }
 
-    public String getName() {
+    public String getName()
+    {
         return fieldName;
     }
 
-    public DbfDataType getDataType() {
+    public DbfDataType getDataType()
+    {
         return dataType;
     }
 
-    public int getFieldLength() {
+    public int getFieldLength()
+    {
         return fieldLength;
     }
 
-    public int getDecimalCount() {
+    public int getDecimalCount()
+    {
         return decimalCount;
     }
 
-    public int getFieldIndex() {
+    public int getFieldIndex()
+    {
         return fieldIndex;
     }
 }

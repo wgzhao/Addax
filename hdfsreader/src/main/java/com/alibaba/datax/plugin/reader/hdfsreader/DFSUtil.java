@@ -71,19 +71,16 @@ import java.util.Set;
  */
 public class DFSUtil
 {
-    private static final Logger LOG = LoggerFactory.getLogger(DFSUtil.class);
-
-    private final org.apache.hadoop.conf.Configuration hadoopConf;
-    private String specifiedFileType = null;
-    private final boolean haveKerberos;
-    private String kerberosKeytabFilePath;
-    private String kerberosPrincipal;
-    private final HashSet<String> sourceHDFSAllFilesList = new HashSet<>();
-
-    private static final int DIRECTORY_SIZE_GUESS = 16 * 1024;
-
     public static final String HDFS_DEFAULTFS_KEY = "fs.defaultFS";
     public static final String HADOOP_SECURITY_AUTHENTICATION_KEY = "hadoop.security.authentication";
+    private static final Logger LOG = LoggerFactory.getLogger(DFSUtil.class);
+    private static final int DIRECTORY_SIZE_GUESS = 16 * 1024;
+    private final org.apache.hadoop.conf.Configuration hadoopConf;
+    private final boolean haveKerberos;
+    private final HashSet<String> sourceHDFSAllFilesList = new HashSet<>();
+    private String specifiedFileType = null;
+    private String kerberosKeytabFilePath;
+    private String kerberosPrincipal;
 
     public DFSUtil(Configuration taskConfig)
     {
@@ -110,6 +107,40 @@ public class DFSUtil
         this.kerberosAuthentication(this.kerberosPrincipal, this.kerberosKeytabFilePath);
 
         LOG.info("hadoopConfig details:{}", JSON.toJSONString(this.hadoopConf));
+    }
+
+    public static void main(String[] args)
+    {
+        ParquetReader<GenericData.Record> reader = null;
+        Path path = new Path("/tmp/000000_0");
+        try {
+            GenericData decimalSupport = new GenericData();
+            decimalSupport.addLogicalTypeConversion(new Conversions.DecimalConversion());
+            reader = AvroParquetReader
+                    .<GenericData.Record>builder(path)
+                    .withDataModel(decimalSupport)
+                    .withConf(new org.apache.hadoop.conf.Configuration())
+                    .build();
+            GenericData.Record record = reader.read();
+            while (record != null) {
+                System.out.println(record);
+                record = reader.read();
+            }
+        }
+        catch (IOException e) {
+            e.printStackTrace();
+        }
+        finally {
+            if (reader != null) {
+                try {
+                    reader.close();
+                }
+                catch (IOException e) {
+                    // TODO Auto-generated catch block
+                    e.printStackTrace();
+                }
+            }
+        }
     }
 
     private void kerberosAuthentication(String kerberosPrincipal, String kerberosKeytabFilePath)
@@ -701,11 +732,6 @@ public class DFSUtil
         return maxIndex;
     }
 
-    private enum Type
-    {
-        STRING, LONG, BOOLEAN, DOUBLE, DATE,
-    }
-
     public boolean checkHdfsFileType(String filepath, String specifiedFileType)
     {
 
@@ -907,37 +933,8 @@ public class DFSUtil
         return false;
     }
 
-    public static void main(String[] args)
+    private enum Type
     {
-        ParquetReader<GenericData.Record> reader = null;
-        Path path = new Path("/tmp/000000_0");
-        try {
-            GenericData decimalSupport = new GenericData();
-            decimalSupport.addLogicalTypeConversion(new Conversions.DecimalConversion());
-            reader = AvroParquetReader
-                    .<GenericData.Record>builder(path)
-                    .withDataModel(decimalSupport)
-                    .withConf(new org.apache.hadoop.conf.Configuration())
-                    .build();
-            GenericData.Record record = reader.read();
-            while (record != null) {
-                System.out.println(record);
-                record = reader.read();
-            }
-        }
-        catch (IOException e) {
-            e.printStackTrace();
-        }
-        finally {
-            if (reader != null) {
-                try {
-                    reader.close();
-                }
-                catch (IOException e) {
-                    // TODO Auto-generated catch block
-                    e.printStackTrace();
-                }
-            }
-        }
+        STRING, LONG, BOOLEAN, DOUBLE, DATE,
     }
 }

@@ -1,6 +1,6 @@
 {
-    "name": "clickhousewriter",
-    "class": "com.alibaba.datax.plugin.writer.clickhousewriter.ClickHouseWriter",
-    "description": "ClickHouse writer plugin ,support 20.3.5 and later",
-    "developer": "jiye.tjy"
+  "name": "clickhousewriter",
+  "class": "com.alibaba.datax.plugin.writer.clickhousewriter.ClickHouseWriter",
+  "description": "ClickHouse writer plugin ,support 20.3.5 and later",
+  "developer": "jiye.tjy"
 }

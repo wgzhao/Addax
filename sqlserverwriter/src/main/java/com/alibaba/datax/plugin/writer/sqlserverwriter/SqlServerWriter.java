@@ -11,15 +11,20 @@ import com.alibaba.datax.plugin.rdbms.writer.Key;
 
 import java.util.List;
 
-public class SqlServerWriter extends Writer {
+public class SqlServerWriter
+        extends Writer
+{
     private static final DataBaseType DATABASE_TYPE = DataBaseType.SQLServer;
 
-    public static class Job extends Writer.Job {
+    public static class Job
+            extends Writer.Job
+    {
         private Configuration originalConfig = null;
         private CommonRdbmsWriter.Job commonRdbmsWriterJob;
 
         @Override
-        public void init() {
+        public void init()
+        {
             this.originalConfig = getPluginJobConf();
 
             // warn：not like mysql, sqlserver only support insert mode
@@ -38,34 +43,40 @@ public class SqlServerWriter extends Writer {
         }
 
         @Override
-        public void prepare() {
+        public void prepare()
+        {
             this.commonRdbmsWriterJob.prepare(this.originalConfig);
         }
 
         @Override
-        public List<Configuration> split(int mandatoryNumber) {
+        public List<Configuration> split(int mandatoryNumber)
+        {
             return this.commonRdbmsWriterJob.split(this.originalConfig,
                     mandatoryNumber);
         }
 
         @Override
-        public void post() {
+        public void post()
+        {
             this.commonRdbmsWriterJob.post(this.originalConfig);
         }
 
         @Override
-        public void destroy() {
+        public void destroy()
+        {
             this.commonRdbmsWriterJob.destroy(this.originalConfig);
         }
-
     }
 
-    public static class Task extends Writer.Task {
+    public static class Task
+            extends Writer.Task
+    {
         private Configuration writerSliceConfig;
         private CommonRdbmsWriter.Task commonRdbmsWriterTask;
 
         @Override
-        public void init() {
+        public void init()
+        {
             this.writerSliceConfig = getPluginJobConf();
             this.commonRdbmsWriterTask = new CommonRdbmsWriter.Task(
                     DATABASE_TYPE);
@@ -73,25 +84,27 @@ public class SqlServerWriter extends Writer {
         }
 
         @Override
-        public void prepare() {
+        public void prepare()
+        {
             this.commonRdbmsWriterTask.prepare(this.writerSliceConfig);
         }
 
-        public void startWrite(RecordReceiver recordReceiver) {
+        public void startWrite(RecordReceiver recordReceiver)
+        {
             this.commonRdbmsWriterTask.startWrite(recordReceiver,
                     this.writerSliceConfig, getTaskPluginCollector());
         }
 
         @Override
-        public void post() {
+        public void post()
+        {
             this.commonRdbmsWriterTask.post(this.writerSliceConfig);
         }
 
         @Override
-        public void destroy() {
+        public void destroy()
+        {
             this.commonRdbmsWriterTask.destroy(this.writerSliceConfig);
         }
-
     }
-
 }

@@ -1,10 +1,10 @@
 {
-    "name": "txtfilewriter",
-    "parameter": {
-        "path": "",
-        "fileName": "",
-        "writeMode": "",
-        "fieldDelimiter":"",
-        "dateFormat": ""
-    }
+  "name": "txtfilewriter",
+  "parameter": {
+    "path": "",
+    "fileName": "",
+    "writeMode": "",
+    "fieldDelimiter": "",
+    "dateFormat": ""
+  }
 }
