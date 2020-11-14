@@ -23,48 +23,47 @@ import java.util.Map.Entry;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicLong;
 
-public class RedisWriter extends Writer {
+public class RedisWriter
+        extends Writer
+{
 
+    public static class Task
+            extends com.alibaba.datax.common.spi.Writer.Task
+    {
 
-    public static class Task extends com.alibaba.datax.common.spi.Writer.Task {
-
+        private static final Logger LOG = LoggerFactory.getLogger(RedisWriter.Job.class);
+        private static final AtomicBoolean FLUSH_FLAG = new AtomicBoolean(false);
         /**
          * slot 对应cluster Redis 节点
          */
         private final Map<Integer, Jedis> cluster = new HashMap<>();
-
-
         private final Map<Jedis, AtomicLong> nodeCounterMap = new HashMap<>();
-
         /**
          * 单机redis
          */
         private Jedis jedis;
-
-        private static final Logger LOG = LoggerFactory.getLogger(RedisWriter.Job.class);
-
-
         /**
          * 每次批量处理数量
          */
         private long batchSize = 1000L;
 
-
         @Override
-        public void startWrite(RecordReceiver lineReceiver) {
+        public void startWrite(RecordReceiver lineReceiver)
+        {
             Configuration pluginJobConf = this.getPluginJobConf();
 
             boolean isCluster = pluginJobConf.getBool("redisCluster", false);
             if (isCluster) {
                 this.clusterWrite(lineReceiver);
-            } else {
+            }
+            else {
                 this.standaloneWrite(lineReceiver);
             }
-
         }
 
         @Override
-        public void init() {
+        public void init()
+        {
             Configuration pluginJobConf = this.getPluginJobConf();
             List connections = pluginJobConf.getList("connection");
             boolean isCluster = pluginJobConf.getBool("redisCluster", false);
@@ -72,7 +71,8 @@ public class RedisWriter extends Writer {
             this.batchSize = pluginJobConf.getLong("batchSize", 1000L);
             if (connections.isEmpty()) {
                 throw new RuntimeException("请添加redis 连接");
-            } else {
+            }
+            else {
                 Map connection = (Map) connections.get(0);
                 URI uri = URI.create(connection.get("uri").toString());
                 String host = uri.getHost();
@@ -110,16 +110,15 @@ public class RedisWriter extends Writer {
                                 .append(start)
                                 .append("-").append(end)
                                 .append("\r\n");
-
                     }
                     LOG.info(sb.toString());
-                } else {
+                }
+                else {
                     String auth = (String) connection.get("auth");
                     if (StringUtils.isNotBlank(auth)) {
                         this.jedis.auth(auth);
                     }
                 }
-
             }
             prepare();
         }
@@ -128,15 +127,16 @@ public class RedisWriter extends Writer {
          * 判断是否携带格式化redis 数据库
          */
         @Override
-        public void prepare() {
+        public void prepare()
+        {
             Boolean isFlushDB = getPluginJobConf().getBool("flushDB", false);
             if (isFlushDB) {
                 flushDB();
             }
         }
 
-
-        public void destroy() {
+        public void destroy()
+        {
             if (this.jedis != null) {
                 this.jedis.close();
             }
@@ -147,14 +147,13 @@ public class RedisWriter extends Writer {
             }
 
             this.cluster.clear();
-
         }
 
         /**
          * 单机或proxy 写入模式
-         *
          */
-        private void standaloneWrite(RecordReceiver lineReceiver) {
+        private void standaloneWrite(RecordReceiver lineReceiver)
+        {
             AtomicLong counter = new AtomicLong(0L);
             Client client = this.jedis.getClient();
             Record fromReader;
@@ -177,12 +176,11 @@ public class RedisWriter extends Writer {
             }
         }
 
-
         /**
          * redis cluster 集群写入
-         *
          */
-        private void clusterWrite(RecordReceiver lineReceiver) {
+        private void clusterWrite(RecordReceiver lineReceiver)
+        {
 
             Record fromReader;
             while ((fromReader = lineReceiver.getFromReader()) != null) {
@@ -207,17 +205,16 @@ public class RedisWriter extends Writer {
                     flushAndCheckReply(client);
                 }
             }
-
         }
 
-        private void restore(Client client, byte[] key, byte[] value, long expire, AtomicLong currentCounter) {
+        private void restore(Client client, byte[] key, byte[] value, long expire, AtomicLong currentCounter)
+        {
 
             client.restore(key, 0, value);
 
             if (expire > 0) {
                 client.expireAt(key, expire);
             }
-
 
             long count = currentCounter.incrementAndGet();
 
@@ -226,10 +223,8 @@ public class RedisWriter extends Writer {
             }
         }
 
-        private static final AtomicBoolean FLUSH_FLAG = new AtomicBoolean(false);
-
-
-        private void flushDB() {
+        private void flushDB()
+        {
             synchronized (FLUSH_FLAG) {
                 if (FLUSH_FLAG.get()) {
                     return;
@@ -237,14 +232,14 @@ public class RedisWriter extends Writer {
 
                 boolean isCluster = getPluginJobConf().getBool("redisCluster", false);
 
-
                 if (isCluster) {
                     for (Jedis jedis : new HashSet<>(cluster.values())) {
                         Client client = jedis.getClient();
                         LOG.info("格式化:" + client.getHost() + ":" + client.getPort());
                         jedis.flushAll();
                     }
-                } else {
+                }
+                else {
                     if (this.jedis != null) {
                         Client client = jedis.getClient();
                         LOG.info("格式化:" + client.getHost() + ":" + client.getPort());
@@ -258,9 +253,9 @@ public class RedisWriter extends Writer {
 
         /**
          * 发送并检查异常
-         *
          */
-        private void flushAndCheckReply(Client client) {
+        private void flushAndCheckReply(Client client)
+        {
             List<Object> allReply = client.getObjectMultiBulkReply();
             for (Object o : allReply) {
                 if (o instanceof JedisDataException) {
@@ -270,21 +265,24 @@ public class RedisWriter extends Writer {
         }
     }
 
-
-    public static class Job extends com.alibaba.datax.common.spi.Writer.Job {
+    public static class Job
+            extends com.alibaba.datax.common.spi.Writer.Job
+    {
 
         @Override
-        public List<Configuration> split(int mandatoryNumber) {
+        public List<Configuration> split(int mandatoryNumber)
+        {
             return Collections.singletonList(getPluginJobConf());
         }
 
         @Override
-        public void init() {
+        public void init()
+        {
         }
 
         @Override
-        public void destroy() {
+        public void destroy()
+        {
         }
-
     }
 }

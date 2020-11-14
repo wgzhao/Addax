@@ -3,7 +3,8 @@ package com.alibaba.datax.plugin.writer.elasticsearchwriter;
 /**
  * Created by xiongfeng.bxf on 17/3/2.
  */
-public class ESColumn {
+public class ESColumn
+{
 
     private String name;//: "appkey",
 
@@ -15,51 +16,63 @@ public class ESColumn {
 
     private Boolean array;
 
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public void setType(String type) {
-        this.type = type;
-    }
-
-    public void setTimeZone(String timezone) {
+    public void setTimeZone(String timezone)
+    {
         this.timezone = timezone;
     }
 
-    public void setFormat(String format) {
-        this.format = format;
-    }
-
-    public String getName() {
+    public String getName()
+    {
         return name;
     }
 
-    public String getType() {
+    public void setName(String name)
+    {
+        this.name = name;
+    }
+
+    public String getType()
+    {
         return type;
     }
 
-    public String getTimezone() {
+    public void setType(String type)
+    {
+        this.type = type;
+    }
+
+    public String getTimezone()
+    {
         return timezone;
     }
 
-    public String getFormat() {
-        return format;
-    }
-
-    public void setTimezone(String timezone) {
+    public void setTimezone(String timezone)
+    {
         this.timezone = timezone;
     }
 
-    public Boolean isArray() {
+    public String getFormat()
+    {
+        return format;
+    }
+
+    public void setFormat(String format)
+    {
+        this.format = format;
+    }
+
+    public Boolean isArray()
+    {
         return array;
     }
 
-    public void setArray(Boolean array) {
+    public Boolean getArray()
+    {
+        return array;
+    }
+
+    public void setArray(Boolean array)
+    {
         this.array = array;
-    }
-
-    public Boolean getArray() {
-        return array;
     }
 }

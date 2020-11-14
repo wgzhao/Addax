@@ -23,11 +23,11 @@ import java.util.List;
 /**
  * @author yanghan.y
  */
-public class HbaseSQLWriterTask {
+public class HbaseSQLWriterTask
+{
     private final static Logger LOG = LoggerFactory.getLogger(HbaseSQLWriterTask.class);
-
-    private TaskPluginCollector taskPluginCollector;
     private final HbaseSQLWriterConfig cfg;
+    private TaskPluginCollector taskPluginCollector;
     private Connection connection = null;
     private PreparedStatement ps = null;
     // 需要向hbsae写入的列的数量,即用户配置的column参数中列的个数。时间戳不包含在内
@@ -36,12 +36,14 @@ public class HbaseSQLWriterTask {
     private int numberOfColumnsToRead;
     private int[] columnTypes;
 
-    public HbaseSQLWriterTask(Configuration configuration) {
+    public HbaseSQLWriterTask(Configuration configuration)
+    {
         // 这里仅解析配置，不访问远端集群，配置的合法性检查在writer的init过程中进行
         cfg = HbaseSQLHelper.parseConfig(configuration);
     }
 
-    public void startWriter(RecordReceiver lineReceiver, TaskPluginCollector taskPluginCollector) {
+    public void startWriter(RecordReceiver lineReceiver, TaskPluginCollector taskPluginCollector)
+    {
         this.taskPluginCollector = taskPluginCollector;
         com.alibaba.datax.common.element.Record record;
         try {
@@ -54,7 +56,7 @@ public class HbaseSQLWriterTask {
                 if (record.getColumnNumber() != numberOfColumnsToRead) {
                     throw DataXException.asDataXException(HbaseSQLWriterErrorCode.ILLEGAL_VALUE,
                             "数据源给出的列数量[" + record.getColumnNumber() + "]与您配置中的列数量[" + numberOfColumnsToRead +
-                            "]不同, 请检查您的配置 或者 联系 Hbase 管理员.");
+                                    "]不同, 请检查您的配置 或者 联系 Hbase 管理员.");
                 }
 
                 buffer.add(record);
@@ -69,15 +71,19 @@ public class HbaseSQLWriterTask {
                 doBatchUpsert(buffer);
                 buffer.clear();
             }
-        } catch (Throwable t) {
+        }
+        catch (Throwable t) {
             // 确保所有异常都转化为DataXException
             throw DataXException.asDataXException(HbaseSQLWriterErrorCode.PUT_HBASE_ERROR, t);
-        } finally {
+        }
+        finally {
             close();
         }
     }
 
-    private void prepare() throws SQLException {
+    private void prepare()
+            throws SQLException
+    {
         if (connection == null) {
             connection = HbaseSQLHelper.getJdbcConnection(cfg);
             connection.setAutoCommit(false);    // 批量提交
@@ -90,11 +96,13 @@ public class HbaseSQLWriterTask {
         }
     }
 
-    private void close()  {
+    private void close()
+    {
         if (ps != null) {
             try {
                 ps.close();
-            } catch (SQLException e) {
+            }
+            catch (SQLException e) {
                 // 不会出错
                 LOG.error("Failed closing PreparedStatement", e);
             }
@@ -102,7 +110,8 @@ public class HbaseSQLWriterTask {
         if (connection != null) {
             try {
                 connection.close();
-            } catch (SQLException e) {
+            }
+            catch (SQLException e) {
                 // 不会出错
                 LOG.error("Failed closing Connection", e);
             }
@@ -112,7 +121,9 @@ public class HbaseSQLWriterTask {
     /**
      * 批量提交一组数据，如果失败，则尝试一行行提交，如果仍然失败，抛错给用户
      */
-    private void doBatchUpsert(List<Record> records) throws SQLException {
+    private void doBatchUpsert(List<Record> records)
+            throws SQLException
+    {
         try {
             // 将所有record提交到connection缓存
             for (com.alibaba.datax.common.element.Record r : records) {
@@ -122,13 +133,15 @@ public class HbaseSQLWriterTask {
 
             // 将缓存的数据提交到hbase
             connection.commit();
-        } catch (SQLException e) {
+        }
+        catch (SQLException e) {
             LOG.error("Failed batch committing " + records.size() + " records", e);
 
             // 批量提交失败，则一行行重试，以确定那一行出错
             connection.rollback();
             doSingleUpsert(records);
-        } catch (Exception e) {
+        }
+        catch (Exception e) {
             throw DataXException.asDataXException(HbaseSQLWriterErrorCode.PUT_HBASE_ERROR, e);
         }
     }
@@ -136,13 +149,15 @@ public class HbaseSQLWriterTask {
     /**
      * 单行提交，将出错的行记录到脏数据中。由脏数据收集模块判断任务是否继续
      */
-    private void doSingleUpsert(List<Record> records)  {
+    private void doSingleUpsert(List<Record> records)
+    {
         for (com.alibaba.datax.common.element.Record r : records) {
             try {
                 setupStatement(r);
                 ps.executeUpdate();
                 connection.commit();
-            } catch (SQLException e) {
+            }
+            catch (SQLException e) {
                 //出错了，记录脏数据
                 LOG.error("Failed writing hbase", e);
                 this.taskPluginCollector.collectDirtyRecord(r, e);
@@ -153,7 +168,9 @@ public class HbaseSQLWriterTask {
     /**
      * 生成sql模板，并根据模板创建PreparedStatement
      */
-    private PreparedStatement createPreparedStatement() throws SQLException {
+    private PreparedStatement createPreparedStatement()
+            throws SQLException
+    {
         // 生成列名集合，列之间用逗号分隔： col1,col2,col3,...
         StringBuilder columnNamesBuilder = new StringBuilder();
         if (cfg.isThinClient()) {
@@ -162,7 +179,8 @@ public class HbaseSQLWriterTask {
                 columnNamesBuilder.append(col);
                 columnNamesBuilder.append(",");
             }
-        } else {
+        }
+        else {
             for (String col : cfg.getColumns()) {
                 // 列名使用双引号，则不自动转换为全大写，而是保留用户配置的大小写
                 columnNamesBuilder.append("\"");
@@ -181,7 +199,8 @@ public class HbaseSQLWriterTask {
         StringBuilder upsertBuilder;
         if (cfg.isThinClient()) {
             upsertBuilder = new StringBuilder("upsert into " + tableName + " (" + columnNames + " ) values (");
-        } else {
+        }
+        else {
             // 表名使用双引号，则不自动转换为全大写，而是保留用户配置的大小写
             upsertBuilder = new StringBuilder("upsert into \"" + tableName + "\" (" + columnNames + " ) values (");
         }
@@ -200,10 +219,12 @@ public class HbaseSQLWriterTask {
     /**
      * 根据列名来从数据库元数据中获取这一列对应的SQL类型
      */
-    private int[] getColumnSqlType(List<String> columnNames) throws SQLException {
+    private int[] getColumnSqlType(List<String> columnNames)
+            throws SQLException
+    {
         int[] types = new int[numberOfColumnsToWrite];
         PTable ptable = HbaseSQLHelper
-            .getTableSchema(connection, cfg.getNamespace(), cfg.getTableName(), cfg.isThinClient());
+                .getTableSchema(connection, cfg.getNamespace(), cfg.getTableName(), cfg.isThinClient());
 
         for (int i = 0; i < columnNames.size(); i++) {
             String name = columnNames.get(i);
@@ -214,7 +235,9 @@ public class HbaseSQLWriterTask {
         return types;
     }
 
-    private void setupStatement(com.alibaba.datax.common.element.Record record) throws SQLException {
+    private void setupStatement(com.alibaba.datax.common.element.Record record)
+            throws SQLException
+    {
         // 一开始的时候就已经校验过record中的列数量与ps中需要的值数量相等
         for (int i = 0; i < numberOfColumnsToWrite; i++) {
             Column col = record.getColumn(i);
@@ -224,7 +247,9 @@ public class HbaseSQLWriterTask {
         }
     }
 
-    private void setupColumn(int pos, int sqlType, Column col) throws SQLException {
+    private void setupColumn(int pos, int sqlType, Column col)
+            throws SQLException
+    {
         if (col.getRawData() != null) {
             switch (sqlType) {
                 case Types.CHAR:
@@ -291,11 +316,11 @@ public class HbaseSQLWriterTask {
                 default:
                     throw DataXException.asDataXException(HbaseSQLWriterErrorCode.ILLEGAL_VALUE,
                             "不支持您配置的列类型:" + sqlType + ", 请检查您的配置 或者 联系 Hbase 管理员.");
-
             } // end switch
-        } else {
+        }
+        else {
             // 没有值，按空值的配置情况处理
-            switch (cfg.getNullMode()){
+            switch (cfg.getNullMode()) {
                 case Skip:
                     // 跳过空值，则不插入该列,
                     ps.setNull(pos, sqlType);
@@ -310,8 +335,8 @@ public class HbaseSQLWriterTask {
                 default:
                     // nullMode的合法性在初始化配置的时候已经校验过，这里一定不会出错
                     throw DataXException.asDataXException(HbaseSQLWriterErrorCode.ILLEGAL_VALUE,
-                        "Hbasewriter 不支持该 nullMode 类型: " + cfg.getNullMode() +
-                        ", 目前支持的 nullMode 类型是:" + Arrays.asList(NullModeType.values()));
+                            "Hbasewriter 不支持该 nullMode 类型: " + cfg.getNullMode() +
+                                    ", 目前支持的 nullMode 类型是:" + Arrays.asList(NullModeType.values()));
             }
         }
     }
@@ -319,9 +344,11 @@ public class HbaseSQLWriterTask {
     /**
      * 根据类型获取"空值"
      * 值类型的空值都是0，bool是false，String是空字符串
+     *
      * @param sqlType sql数据类型，定义于{@link Types}
      */
-    private Object getEmptyValue(int sqlType) {
+    private Object getEmptyValue(int sqlType)
+    {
         switch (sqlType) {
             case Types.VARCHAR:
                 return "";

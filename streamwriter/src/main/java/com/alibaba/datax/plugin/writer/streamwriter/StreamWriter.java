@@ -1,4 +1,3 @@
-
 package com.alibaba.datax.plugin.writer.streamwriter;
 
 import com.alibaba.datax.common.element.Column;
@@ -25,6 +24,27 @@ import java.util.List;
 public class StreamWriter
         extends Writer
 {
+    private static String buildFilePath(String path, String fileName)
+    {
+        boolean isEndWithSeparator = false;
+        switch (IOUtils.DIR_SEPARATOR) {
+            case IOUtils.DIR_SEPARATOR_UNIX:
+                isEndWithSeparator = path.endsWith(String
+                        .valueOf(IOUtils.DIR_SEPARATOR));
+                break;
+            case IOUtils.DIR_SEPARATOR_WINDOWS:
+                isEndWithSeparator = path.endsWith(String
+                        .valueOf(IOUtils.DIR_SEPARATOR_WINDOWS));
+                break;
+            default:
+                break;
+        }
+        if (!isEndWithSeparator) {
+            path = path + IOUtils.DIR_SEPARATOR;
+        }
+        return String.format("%s%s", path, fileName);
+    }
+
     public static class Job
             extends Writer.Job
     {
@@ -169,19 +189,14 @@ public class StreamWriter
             if (StringUtils.isNoneBlank(path) && StringUtils.isNoneBlank(fileName)) {
                 writeToFile(recordReceiver, path, fileName, recordNumBeforSleep, sleepTime);
             }
-            else {
+            else if (this.print) {
                 try {
                     BufferedWriter writer = new BufferedWriter(
                             new OutputStreamWriter(System.out, StandardCharsets.UTF_8));
 
-                    com.alibaba.datax.common.element.Record record;
+                    Record record;
                     while ((record = recordReceiver.getFromReader()) != null) {
-                        if (this.print) {
-                            writer.write(recordToString(record));
-                        }
-                        else {
-                            /* do nothing */
-                        }
+                        writer.write(recordToString(record));
                     }
                     writer.flush();
                 }
@@ -200,17 +215,15 @@ public class StreamWriter
             LOG.info("write to file : [{}]", fileFullPath);
             File newFile = new File(fileFullPath);
             try {
-                if (! newFile.createNewFile())
-                {
+                if (!newFile.createNewFile()) {
                     LOG.error("failed to create file {}", fileFullPath);
                 }
-            } catch (IOException ioe)
-            {
+            }
+            catch (IOException ioe) {
                 LOG.error("failed to create file {}", fileFullPath);
             }
-            try(BufferedWriter writer = new BufferedWriter(
-                    new OutputStreamWriter(new FileOutputStream(newFile, true), StandardCharsets.UTF_8)))
-            {
+            try (BufferedWriter writer = new BufferedWriter(
+                    new OutputStreamWriter(new FileOutputStream(newFile, true), StandardCharsets.UTF_8))) {
                 Record record;
                 int count = 0;
                 while ((record = recordReceiver.getFromReader()) != null) {
@@ -258,26 +271,5 @@ public class StreamWriter
 
             return sb.toString();
         }
-    }
-
-    private static String buildFilePath(String path, String fileName)
-    {
-        boolean isEndWithSeparator = false;
-        switch (IOUtils.DIR_SEPARATOR) {
-            case IOUtils.DIR_SEPARATOR_UNIX:
-                isEndWithSeparator = path.endsWith(String
-                        .valueOf(IOUtils.DIR_SEPARATOR));
-                break;
-            case IOUtils.DIR_SEPARATOR_WINDOWS:
-                isEndWithSeparator = path.endsWith(String
-                        .valueOf(IOUtils.DIR_SEPARATOR_WINDOWS));
-                break;
-            default:
-                break;
-        }
-        if (!isEndWithSeparator) {
-            path = path + IOUtils.DIR_SEPARATOR;
-        }
-        return String.format("%s%s", path, fileName);
     }
 }

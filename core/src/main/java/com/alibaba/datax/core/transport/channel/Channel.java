@@ -17,44 +17,33 @@ import java.util.Collection;
  * <p/>
  * 统计和限速都在这里
  */
-public abstract class Channel {
+public abstract class Channel
+{
 
     private static final Logger LOG = LoggerFactory.getLogger(Channel.class);
-
-    protected int taskGroupId;
-
-    protected int capacity;
-
-    protected int byteCapacity;
-
-    protected long byteSpeed; // bps: bytes/s
-
-    protected long recordSpeed; // tps: records/s
-
-    protected long flowControlInterval;
-
-    protected volatile boolean isClosed = false;
-
-    protected Configuration configuration;
-
-    protected volatile long waitReaderTime = 0;
-
-    protected volatile long waitWriterTime = 0;
-
     private static Boolean isFirstPrint = true;
-
+    private final Communication lastCommunication = new Communication();
+    protected int taskGroupId;
+    protected int capacity;
+    protected int byteCapacity;
+    protected long byteSpeed; // bps: bytes/s
+    protected long recordSpeed; // tps: records/s
+    protected long flowControlInterval;
+    protected volatile boolean isClosed = false;
+    protected Configuration configuration;
+    protected volatile long waitReaderTime = 0;
+    protected volatile long waitWriterTime = 0;
     private Communication currentCommunication;
 
-    private final Communication lastCommunication = new Communication();
-
-    public Channel(final Configuration configuration) {
+    public Channel(final Configuration configuration)
+    {
         //channel的queue里默认record为1万条。原来为512条
         int capacity = configuration.getInt(
                 CoreConstant.DATAX_CORE_TRANSPORT_CHANNEL_CAPACITY, 2048);
         long byteSpeed = configuration.getLong(
-                CoreConstant.DATAX_CORE_TRANSPORT_CHANNEL_SPEED_BYTE, 1024 * 1024);
+                CoreConstant.DATAX_CORE_TRANSPORT_CHANNEL_SPEED_BYTE, 1024 * 1024L);
         long recordSpeed = configuration.getLong(
-                CoreConstant.DATAX_CORE_TRANSPORT_CHANNEL_SPEED_RECORD, 10000);
+                CoreConstant.DATAX_CORE_TRANSPORT_CHANNEL_SPEED_RECORD, 10000L);
 
         if (capacity <= 0) {
             throw new IllegalArgumentException(String.format(
@@ -84,38 +73,46 @@ public abstract class Channel {
         this.configuration = configuration;
     }
 
-    public void close() {
+    public void close()
+    {
         this.isClosed = true;
     }
 
-    public int getTaskGroupId() {
+    public int getTaskGroupId()
+    {
         return this.taskGroupId;
     }
 
-    public int getCapacity() {
+    public int getCapacity()
+    {
         return capacity;
     }
 
-    public long getByteSpeed() {
+    public long getByteSpeed()
+    {
         return byteSpeed;
     }
 
-    public Configuration getConfiguration() {
+    public Configuration getConfiguration()
+    {
         return this.configuration;
     }
 
-    public void setCommunication(final Communication communication) {
+    public void setCommunication(final Communication communication)
+    {
         this.currentCommunication = communication;
         this.lastCommunication.reset();
     }
 
-    public void push(final Record r) {
+    public void push(final Record r)
+    {
         Validate.notNull(r, "record不能为空.");
         this.doPush(r);
         this.statPush(1L, r.getByteSize());
     }
 
-    public void pushTerminate(final TerminateRecord r) {
+    public void pushTerminate(final TerminateRecord r)
+    {
         Validate.notNull(r, "record不能为空.");
         this.doPush(r);
 
@@ -124,20 +121,23 @@ public abstract class Channel {
 //                currentCommunication.getLongCounter(CommunicationTool.STAGE) + 1);
     }
 
-    public void pushAll(final Collection<Record> rs) {
+    public void pushAll(final Collection<Record> rs)
+    {
         Validate.notNull(rs);
         Validate.noNullElements(rs);
         this.doPushAll(rs);
         this.statPush(rs.size(), this.getByteSize(rs));
     }
 
-    public Record pull() {
+    public Record pull()
+    {
         com.alibaba.datax.common.element.Record record = this.doPull();
         this.statPull(1L, record.getByteSize());
         return record;
     }
 
-    public void pullAll(final Collection<Record> rs) {
+    public void pullAll(final Collection<Record> rs)
+    {
         Validate.notNull(rs);
         this.doPullAll(rs);
         this.statPull(rs.size(), this.getByteSize(rs));
@@ -157,7 +157,8 @@ public abstract class Channel {
 
     public abstract void clear();
 
-    private long getByteSize(final Collection<Record> rs) {
+    private long getByteSize(final Collection<Record> rs)
+    {
         long size = 0;
         for (final Record each : rs) {
             size += each.getByteSize();
@@ -165,7 +166,8 @@ public abstract class Channel {
         return size;
     }
 
-    private void statPush(long recordSize, long byteSize) {
+    private void statPush(long recordSize, long byteSize)
+    {
         currentCommunication.increaseCounter(CommunicationTool.READ_SUCCEED_RECORDS,
                 recordSize);
         currentCommunication.increaseCounter(CommunicationTool.READ_SUCCEED_BYTES,
@@ -212,7 +214,8 @@ public abstract class Channel {
             if (sleepTime > 0) {
                 try {
                     Thread.sleep(sleepTime);
-                } catch (InterruptedException e) {
+                }
+                catch (InterruptedException e) {
                     Thread.currentThread().interrupt();
                 }
             }
@@ -229,11 +232,11 @@ public abstract class Channel {
         }
     }
 
-    private void statPull(long recordSize, long byteSize) {
+    private void statPull(long recordSize, long byteSize)
+    {
         currentCommunication.increaseCounter(
                 CommunicationTool.WRITE_RECEIVED_RECORDS, recordSize);
         currentCommunication.increaseCounter(
                 CommunicationTool.WRITE_RECEIVED_BYTES, byteSize);
     }
-
 }

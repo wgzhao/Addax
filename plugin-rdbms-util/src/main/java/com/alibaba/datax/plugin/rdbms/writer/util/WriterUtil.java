@@ -19,12 +19,14 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-public final class WriterUtil {
+public final class WriterUtil
+{
     private static final Logger LOG = LoggerFactory.getLogger(WriterUtil.class);
 
     //TODO 切分报错
     public static List<Configuration> doSplit(Configuration simplifiedConf,
-                                              int adviceNumber) {
+            int adviceNumber)
+    {
 
         List<Configuration> splitResultConfigs = new ArrayList<>();
 
@@ -72,13 +74,13 @@ public final class WriterUtil {
 
                 splitResultConfigs.add(tempSlice);
             }
-
         }
 
         return splitResultConfigs;
     }
 
-    public static List<String> renderPreOrPostSqls(List<String> preOrPostSqls, String tableName) {
+    public static List<String> renderPreOrPostSqls(List<String> preOrPostSqls, String tableName)
+    {
         if (null == preOrPostSqls) {
             return Collections.emptyList();
         }
@@ -94,7 +96,8 @@ public final class WriterUtil {
         return renderedSqls;
     }
 
-    public static void executeSqls(Connection conn, List<String> sqls, String basicMessage,DataBaseType dataBaseType) {
+    public static void executeSqls(Connection conn, List<String> sqls, String basicMessage, DataBaseType dataBaseType)
+    {
         Statement stmt = null;
         String currentSql = null;
         try {
@@ -103,17 +106,20 @@ public final class WriterUtil {
                 currentSql = sql;
                 DBUtil.executeSqlWithoutResultSet(stmt, sql);
             }
-        } catch (Exception e) {
-            throw RdbmsException.asQueryException(dataBaseType,e,currentSql,null,null);
-        } finally {
+        }
+        catch (Exception e) {
+            throw RdbmsException.asQueryException(dataBaseType, e, currentSql, null, null);
+        }
+        finally {
             DBUtil.closeDBResources(null, stmt, null);
         }
     }
 
     public static String getWriteTemplate(List<String> columnHolders, List<String> valueHolders,
-                                        String writeMode, DataBaseType dataBaseType, boolean forceUseUpdate) {
+            String writeMode, DataBaseType dataBaseType, boolean forceUseUpdate)
+    {
         String mode = writeMode.trim().toLowerCase();
-        boolean isWriteModeLegal = mode.startsWith("insert")  || mode.startsWith("replace") || mode.startsWith("update");
+        boolean isWriteModeLegal = mode.startsWith("insert") || mode.startsWith("replace") || mode.startsWith("update");
 
         if (!isWriteModeLegal) {
             throw DataXException.asDataXException(DBUtilErrorCode.ILLEGAL_VALUE,
@@ -123,14 +129,15 @@ public final class WriterUtil {
         String writeDataSqlTemplate;
         if (forceUseUpdate ||
                 (dataBaseType == DataBaseType.MySql && mode.startsWith("update"))
-                ) {
+        ) {
             //update只在mysql下使用
 
             writeDataSqlTemplate = "INSERT INTO %s (" + StringUtils.join(columnHolders, ",") +
                     ") VALUES(" + StringUtils.join(valueHolders, ",") +
                     ")" +
                     onDuplicateKeyUpdateString(columnHolders);
-        } else {
+        }
+        else {
 
             //这里是保护,如果其他错误的使用了update,需要更换为replace
             if (mode.startsWith("update")) {
@@ -145,17 +152,19 @@ public final class WriterUtil {
         return writeDataSqlTemplate;
     }
 
-    public static String onDuplicateKeyUpdateString(List<String> columnHolders){
+    public static String onDuplicateKeyUpdateString(List<String> columnHolders)
+    {
         if (columnHolders == null || columnHolders.size() < 1) {
             return "";
         }
         StringBuilder sb = new StringBuilder();
         sb.append(" ON DUPLICATE KEY UPDATE ");
         boolean first = true;
-        for(String column:columnHolders){
-            if(!first){
+        for (String column : columnHolders) {
+            if (!first) {
                 sb.append(",");
-            }else{
+            }
+            else {
                 first = false;
             }
             sb.append(column);
@@ -167,7 +176,8 @@ public final class WriterUtil {
         return sb.toString();
     }
 
-    public static void preCheckPrePareSQL(Configuration originalConfig, DataBaseType type) {
+    public static void preCheckPrePareSQL(Configuration originalConfig, DataBaseType type)
+    {
         List<Object> conns = originalConfig.getList(Constant.CONN_MARK, Object.class);
         Configuration connConf = Configuration.from(conns.get(0).toString());
         String table = connConf.getList(Key.TABLE, String.class).get(0);
@@ -180,17 +190,19 @@ public final class WriterUtil {
         if (!renderedPreSqls.isEmpty()) {
             LOG.info("Begin to preCheck preSqls:[{}].",
                     StringUtils.join(renderedPreSqls, ";"));
-            for(String sql : renderedPreSqls) {
-                try{
+            for (String sql : renderedPreSqls) {
+                try {
                     DBUtil.sqlValid(sql, type);
-                }catch(ParserException e) {
-                    throw RdbmsException.asPreSQLParserException(type,e,sql);
+                }
+                catch (ParserException e) {
+                    throw RdbmsException.asPreSQLParserException(type, e, sql);
                 }
             }
         }
     }
 
-    public static void preCheckPostSQL(Configuration originalConfig, DataBaseType type) {
+    public static void preCheckPostSQL(Configuration originalConfig, DataBaseType type)
+    {
         List<Object> conns = originalConfig.getList(Constant.CONN_MARK, Object.class);
         Configuration connConf = Configuration.from(conns.get(0).toString());
         String table = connConf.getList(Key.TABLE, String.class).get(0);
@@ -203,16 +215,14 @@ public final class WriterUtil {
 
             LOG.info("Begin to preCheck postSqls:[{}].",
                     StringUtils.join(renderedPostSqls, ";"));
-            for(String sql : renderedPostSqls) {
-                try{
+            for (String sql : renderedPostSqls) {
+                try {
                     DBUtil.sqlValid(sql, type);
-                }catch(ParserException e){
-                    throw RdbmsException.asPostSQLParserException(type,e,sql);
                 }
-
+                catch (ParserException e) {
+                    throw RdbmsException.asPostSQLParserException(type, e, sql);
+                }
             }
         }
     }
-
-
 }

@@ -10,7 +10,6 @@ import com.alibaba.datax.plugin.writer.ftpwriter.util.Constant;
 import com.alibaba.datax.plugin.writer.ftpwriter.util.IFtpHelper;
 import com.alibaba.datax.plugin.writer.ftpwriter.util.SftpHelperImpl;
 import com.alibaba.datax.plugin.writer.ftpwriter.util.StandardFtpHelperImpl;
-
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
@@ -22,8 +21,12 @@ import java.util.List;
 import java.util.Set;
 import java.util.concurrent.Callable;
 
-public class FtpWriter extends Writer {
-    public static class Job extends Writer.Job {
+public class FtpWriter
+        extends Writer
+{
+    public static class Job
+            extends Writer.Job
+    {
         private static final Logger LOG = LoggerFactory.getLogger(Job.class);
 
         private Configuration writerSliceConfig = null;
@@ -38,7 +41,8 @@ public class FtpWriter extends Writer {
         private IFtpHelper ftpHelper = null;
 
         @Override
-        public void init() {
+        public void init()
+        {
             this.writerSliceConfig = this.getPluginJobConf();
             this.validateParameter();
             UnstructuredStorageWriterUtil
@@ -49,7 +53,8 @@ public class FtpWriter extends Writer {
                             port, timeout);
                     return null;
                 }, 3, 4000, true);
-            } catch (Exception e) {
+            }
+            catch (Exception e) {
                 String message = String
                         .format("与ftp服务器建立连接失败, host:%s, username:%s, port:%s, errorMessage:%s",
                                 host, username, port, e.getMessage());
@@ -59,7 +64,8 @@ public class FtpWriter extends Writer {
             }
         }
 
-        private void validateParameter() {
+        private void validateParameter()
+        {
             this.writerSliceConfig
                     .getNecessaryValue(
                             com.alibaba.datax.plugin.unstructuredstorage.writer.Key.FILE_NAME,
@@ -88,11 +94,13 @@ public class FtpWriter extends Writer {
                 this.port = this.writerSliceConfig.getInt(Key.PORT,
                         Constant.DEFAULT_SFTP_PORT);
                 this.ftpHelper = new SftpHelperImpl();
-            } else if ("ftp".equalsIgnoreCase(protocol)) {
+            }
+            else if ("ftp".equalsIgnoreCase(protocol)) {
                 this.port = this.writerSliceConfig.getInt(Key.PORT,
                         Constant.DEFAULT_FTP_PORT);
                 this.ftpHelper = new StandardFtpHelperImpl();
-            } else {
+            }
+            else {
                 throw DataXException.asDataXException(
                         FtpWriterErrorCode.ILLEGAL_VALUE, String.format(
                                 "仅支持 ftp和sftp 传输协议 , 不支持您配置的传输协议: [%s]",
@@ -102,7 +110,8 @@ public class FtpWriter extends Writer {
         }
 
         @Override
-        public void prepare() {
+        public void prepare()
+        {
             String path = this.writerSliceConfig.getString(Key.PATH);
             // warn: 这里用户需要配一个目录
             this.ftpHelper.mkDirRecursive(path);
@@ -132,7 +141,8 @@ public class FtpWriter extends Writer {
                         StringUtils.join(fullFileNameToDelete.iterator(), ", ")));
 
                 this.ftpHelper.deleteFiles(fullFileNameToDelete);
-            } else if ("append".equals(writeMode)) {
+            }
+            else if ("append".equals(writeMode)) {
                 LOG.info(String
                         .format("由于您配置了writeMode append, 写入前不做清理工作, [%s] 目录下写入相应文件名前缀  [%s] 的文件",
                                 path, fileName));
@@ -140,7 +150,8 @@ public class FtpWriter extends Writer {
                         "目录path:[%s] 下已经存在的指定前缀fileName:[%s] 文件列表如下: [%s]",
                         path, fileName,
                         StringUtils.join(allFileExists.iterator(), ", ")));
-            } else if ("nonConflict".equals(writeMode)) {
+            }
+            else if ("nonConflict".equals(writeMode)) {
                 LOG.info(String.format(
                         "由于您配置了writeMode nonConflict, 开始检查 [%s] 下面的内容", path));
                 if (!allFileExists.isEmpty()) {
@@ -155,7 +166,8 @@ public class FtpWriter extends Writer {
                                             "您配置的path: [%s] 目录不为空, 下面存在其他文件或文件夹.",
                                             path));
                 }
-            } else {
+            }
+            else {
                 throw DataXException
                         .asDataXException(
                                 FtpWriterErrorCode.ILLEGAL_VALUE,
@@ -166,15 +178,18 @@ public class FtpWriter extends Writer {
         }
 
         @Override
-        public void post() {
+        public void post()
+        {
 
         }
 
         @Override
-        public void destroy() {
+        public void destroy()
+        {
             try {
                 this.ftpHelper.logoutFtpServer();
-            } catch (Exception e) {
+            }
+            catch (Exception e) {
                 String message = String
                         .format("关闭与ftp服务器连接失败, host:%s, username:%s, port:%s, errorMessage:%s",
                                 host, username, port, e.getMessage());
@@ -183,14 +198,16 @@ public class FtpWriter extends Writer {
         }
 
         @Override
-        public List<Configuration> split(int mandatoryNumber) {
+        public List<Configuration> split(int mandatoryNumber)
+        {
             return UnstructuredStorageWriterUtil.split(this.writerSliceConfig,
                     this.allFileExists, mandatoryNumber);
         }
-
     }
 
-    public static class Task extends Writer.Task {
+    public static class Task
+            extends Writer.Task
+    {
         private static final Logger LOG = LoggerFactory.getLogger(Task.class);
 
         private Configuration writerSliceConfig;
@@ -208,7 +225,8 @@ public class FtpWriter extends Writer {
         private IFtpHelper ftpHelper = null;
 
         @Override
-        public void init() {
+        public void init()
+        {
             this.writerSliceConfig = this.getPluginJobConf();
             this.path = this.writerSliceConfig.getString(Key.PATH);
             this.fileName = this.writerSliceConfig
@@ -226,7 +244,8 @@ public class FtpWriter extends Writer {
 
             if ("sftp".equalsIgnoreCase(protocol)) {
                 this.ftpHelper = new SftpHelperImpl();
-            } else if ("ftp".equalsIgnoreCase(protocol)) {
+            }
+            else if ("ftp".equalsIgnoreCase(protocol)) {
                 this.ftpHelper = new StandardFtpHelperImpl();
             }
             try {
@@ -235,7 +254,8 @@ public class FtpWriter extends Writer {
                             port, timeout);
                     return null;
                 }, 3, 4000, true);
-            } catch (Exception e) {
+            }
+            catch (Exception e) {
                 String message = String
                         .format("与ftp服务器建立连接失败, host:%s, username:%s, port:%s, errorMessage:%s",
                                 host, username, port, e.getMessage());
@@ -246,12 +266,14 @@ public class FtpWriter extends Writer {
         }
 
         @Override
-        public void prepare() {
+        public void prepare()
+        {
 
         }
 
         @Override
-        public void startWrite(RecordReceiver lineReceiver) {
+        public void startWrite(RecordReceiver lineReceiver)
+        {
             LOG.info("begin do write...");
             String fileFullPath = UnstructuredStorageWriterUtil.buildFilePath(
                     this.path, this.fileName, this.suffix);
@@ -263,26 +285,31 @@ public class FtpWriter extends Writer {
                 UnstructuredStorageWriterUtil.writeToStream(lineReceiver,
                         outputStream, this.writerSliceConfig, this.fileName,
                         this.getTaskPluginCollector());
-            } catch (Exception e) {
+            }
+            catch (Exception e) {
                 throw DataXException.asDataXException(
                         FtpWriterErrorCode.WRITE_FILE_IO_ERROR,
                         String.format("无法创建待写文件 : [%s]", this.fileName), e);
-            } finally {
+            }
+            finally {
                 IOUtils.closeQuietly(outputStream, null);
             }
             LOG.info("end do write");
         }
 
         @Override
-        public void post() {
+        public void post()
+        {
 
         }
 
         @Override
-        public void destroy() {
+        public void destroy()
+        {
             try {
                 this.ftpHelper.logoutFtpServer();
-            } catch (Exception e) {
+            }
+            catch (Exception e) {
                 String message = String
                         .format("关闭与ftp服务器连接失败, host:%s, username:%s, port:%s, errorMessage:%s",
                                 host, username, port, e.getMessage());

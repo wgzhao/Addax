@@ -30,11 +30,12 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-
-public class HbaseSQLHelper {
+public class HbaseSQLHelper
+{
     private static final Logger LOG = LoggerFactory.getLogger(HbaseSQLHelper.class);
 
-    public static org.apache.hadoop.conf.Configuration generatePhoenixConf(HbaseSQLReaderConfig readerConfig) {
+    public static org.apache.hadoop.conf.Configuration generatePhoenixConf(HbaseSQLReaderConfig readerConfig)
+    {
         org.apache.hadoop.conf.Configuration conf = new org.apache.hadoop.conf.Configuration();
 
         String table = readerConfig.getTableName();
@@ -50,19 +51,24 @@ public class HbaseSQLHelper {
         PhoenixEmbeddedDriver.ConnectionInfo info = null;
         try {
             info = PhoenixEmbeddedDriver.ConnectionInfo.create(zkUrl);
-        } catch (SQLException e) {
+        }
+        catch (SQLException e) {
             throw DataXException.asDataXException(
                     HbaseSQLReaderErrorCode.GET_PHOENIX_CONNECTIONINFO_ERROR, "通过zkURL获取phoenix的connectioninfo出错，请检查hbase集群服务是否正常", e);
         }
         conf.set(HConstants.ZOOKEEPER_QUORUM, info.getZookeeperQuorum());
-        if (info.getPort() != null)
+        if (info.getPort() != null) {
             conf.setInt(HConstants.ZOOKEEPER_CLIENT_PORT, info.getPort());
-        if (info.getRootNode() != null)
+        }
+        if (info.getRootNode() != null) {
             conf.set(HConstants.ZOOKEEPER_ZNODE_PARENT, info.getRootNode());
+        }
         return conf;
     }
 
-    public static List<String> getPColumnNames(String connectionString, String tableName) throws SQLException {
+    public static List<String> getPColumnNames(String connectionString, String tableName)
+            throws SQLException
+    {
         Connection con =
                 DriverManager.getConnection(connectionString);
         PhoenixConnection phoenixConnection = con.unwrap(PhoenixConnection.class);
@@ -70,16 +76,18 @@ public class HbaseSQLHelper {
         PTable table = metaDataClient.updateCache("", tableName).getTable();
         List<String> columnNames = new ArrayList<String>();
         for (PColumn pColumn : table.getColumns()) {
-            if (!pColumn.getName().getString().equals(SaltingUtil.SALTING_COLUMN_NAME))
+            if (!pColumn.getName().getString().equals(SaltingUtil.SALTING_COLUMN_NAME)) {
                 columnNames.add(pColumn.getName().getString());
-            else
+            }
+            else {
                 LOG.info(tableName + " is salt table");
+            }
         }
         return columnNames;
     }
 
-
-    public static List<Configuration> split(HbaseSQLReaderConfig readerConfig) {
+    public static List<Configuration> split(HbaseSQLReaderConfig readerConfig)
+    {
         PhoenixInputFormat inputFormat = new PhoenixInputFormat<PhoenixRecordWritable>();
         org.apache.hadoop.conf.Configuration conf = generatePhoenixConf(readerConfig);
         JobID jobId = new JobID(Key.MOCK_JOBID_IDENTIFIER, Key.MOCK_JOBID);
@@ -97,10 +105,12 @@ public class HbaseSQLHelper {
                 cfg.set(Key.SPLIT_KEY, splitBase64Str);
                 resultConfigurations.add(cfg);
             }
-        } catch (IOException e) {
+        }
+        catch (IOException e) {
             throw DataXException.asDataXException(
                     HbaseSQLReaderErrorCode.GET_PHOENIX_SPLITS_ERROR, "获取表的split信息时出现了异常，请检查hbase集群服务是否正常," + e.getMessage(), e);
-        } catch (InterruptedException e) {
+        }
+        catch (InterruptedException e) {
             throw DataXException.asDataXException(
                     HbaseSQLReaderErrorCode.GET_PHOENIX_SPLITS_ERROR, "获取表的split信息时被中断，请重试，若还有问题请联系datax管理员," + e.getMessage(), e);
         }
@@ -108,18 +118,22 @@ public class HbaseSQLHelper {
         return resultConfigurations;
     }
 
-    public static HbaseSQLReaderConfig parseConfig(Configuration cfg) {
+    public static HbaseSQLReaderConfig parseConfig(Configuration cfg)
+    {
         return HbaseSQLReaderConfig.parse(cfg);
     }
 
-    public static Pair<String, String> getHbaseConfig(String hbaseCfgString) {
+    public static Pair<String, String> getHbaseConfig(String hbaseCfgString)
+    {
         assert hbaseCfgString != null;
-        Map<String, String> hbaseConfigMap = JSON.parseObject(hbaseCfgString, new TypeReference<Map<String, String>>() {
+        Map<String, String> hbaseConfigMap = JSON.parseObject(hbaseCfgString, new TypeReference<Map<String, String>>()
+        {
         });
         String zkQuorum = hbaseConfigMap.get(Key.HBASE_ZK_QUORUM);
         String znode = hbaseConfigMap.get(Key.HBASE_ZNODE_PARENT);
-        if(znode == null)
+        if (znode == null) {
             znode = "";
+        }
         return new Pair<String, String>(zkQuorum, znode);
     }
 }

@@ -1,19 +1,19 @@
 {
-    "name": "ftpreader",
-    "parameter": {
-        "host": "",
-        "protocol": "sftp",
-        "port":"",
-        "username": "",
-        "password": "",
-        "path": [],
-        "column": [
-            {
-                "index": 0,
-                "type": ""
-            }
-        ],
-        "fieldDelimiter": ",",
-        "encoding": "UTF-8"
-    }
+  "name": "ftpreader",
+  "parameter": {
+    "host": "",
+    "protocol": "sftp",
+    "port": "",
+    "username": "",
+    "password": "",
+    "path": [],
+    "column": [
+      {
+        "index": 0,
+        "type": ""
+      }
+    ],
+    "fieldDelimiter": ",",
+    "encoding": "UTF-8"
+  }
 }

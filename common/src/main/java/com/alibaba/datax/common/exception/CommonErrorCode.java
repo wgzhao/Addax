@@ -5,7 +5,9 @@ import com.alibaba.datax.common.spi.ErrorCode;
 /**
  *
  */
-public enum CommonErrorCode implements ErrorCode {
+public enum CommonErrorCode
+        implements ErrorCode
+{
 
     CONFIG_ERROR("Common-00", "您提供的配置文件存在错误信息，请检查您的作业配置 ."),
     CONVERT_NOT_SUPPORT("Common-01", "同步数据出现业务脏数据情况，数据类型转换错误 ."),
@@ -21,25 +23,28 @@ public enum CommonErrorCode implements ErrorCode {
 
     private final String describe;
 
-    CommonErrorCode(String code, String describe) {
+    CommonErrorCode(String code, String describe)
+    {
         this.code = code;
         this.describe = describe;
     }
 
     @Override
-    public String getCode() {
+    public String getCode()
+    {
         return this.code;
     }
 
     @Override
-    public String getDescription() {
+    public String getDescription()
+    {
         return this.describe;
     }
 
     @Override
-    public String toString() {
+    public String toString()
+    {
         return String.format("Code:[%s], Describe:[%s]", this.code,
                 this.describe);
     }
-
 }

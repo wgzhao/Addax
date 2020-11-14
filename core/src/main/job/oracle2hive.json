@@ -1,163 +1,163 @@
 {
-    "job": {
-        "content": [
-            {
-                "reader": {
-                    "name": "oraclereader",
-                    "parameter": {
-                        "column": [
-                            "*"
-                        ],
-                        "connection": [
-                            {
-                                "jdbcUrl": [
-                                    "jdbc:oracle:thin:@127.0.0.1:1521/stage"
-                                ],
-                                "table": [
-                                    "STGUF.CSDCHOLDER"
-                                ]
-                            }
-                        ],
-                        "username": "oracle",
-                        "password": "password"
-                    }
-                },
-                "writer": {
-                    "name": "hdfswriter",
-                    "parameter": {
-                        "column": [
-                            {
-                                "name": "CSDC_CLIENT_NAME",
-                                "type": "string"
-                            },
-                            {
-                                "name": "CSDC_ID_KIND",
-                                "type": "string"
-                            },
-                            {
-                                "name": "CSDC_ID_NO",
-                                "type": "string"
-                            },
-                            {
-                                "name": "CSDC_ACODE_TYPE",
-                                "type": "string"
-                            },
-                            {
-                                "name": "CSDC_ACODE_ACCOUNT",
-                                "type": "string"
-                            },
-                            {
-                                "name": "CSDC_ACODE_STATUS",
-                                "type": "string"
-                            },
-                            {
-                                "name": "CSDC_HOLDER_KIND",
-                                "type": "string"
-                            },
-                            {
-                                "name": "CSDC_STOCK_ACCOUNT",
-                                "type": "string"
-                            },
-                            {
-                                "name": "CSDC_OPEN_TYPE",
-                                "type": "string"
-                            },
-                            {
-                                "name": "CSDC_OPENORGAN_NAME",
-                                "type": "string"
-                            },
-                            {
-                                "name": "CSDC_CANCEL_DATE",
-                                "type": "bigint"
-                            },
-                            {
-                                "name": "CSDC_CANCEL_ORGAN_NAME",
-                                "type": "string"
-                            },
-                            {
-                                "name": "CSDC_HOLDER_STATUS",
-                                "type": "string"
-                            },
-                            {
-                                "name": "CSDC_OPEN_DATE",
-                                "type": "bigint"
-                            },
-                            {
-                                "name": "CSDC_RELATION_FLAG",
-                                "type": "string"
-                            },
-                            {
-                                "name": "CSDC_RELATION_ORGAN_NAME",
-                                "type": "string"
-                            },
-                            {
-                                "name": "CSDC_UNQU_FLAG",
-                                "type": "string"
-                            },
-                            {
-                                "name": "CSDC_UNQU_TRADE_RESTRICTS",
-                                "type": "string"
-                            },
-                            {
-                                "name": "CSDC_UNQU_REASON_KIND",
-                                "type": "string"
-                            },
-                            {
-                                "name": "REMARK",
-                                "type": "string"
-                            },
-                            {
-                                "name": "DW_CLT_DATE",
-                                "type": "timestamp"
-                            },
-                            {
-                                "name": "MODIFIER_NO",
-                                "type": "string"
-                            },
-                            {
-                                "name": "DW_TRADE_DATE",
-                                "type": "bigint"
-                            },
-                            {
-                                "name": "CSDC_DISTRIB_STOCK_ACCT",
-                                "type": "string"
-                            },
-                            {
-                                "name": "CSDC_SCAN_FLAG",
-                                "type": "string"
-                            },
-                            {
-                                "name": "CSDC_UNQU_ORGAN_NAME",
-                                "type": "string"
-                            }
-                        ],
-                        "compress": "",
-                        "defaultFS": "hdfs://sandbox",
-                        "fieldDelimiter": "\t",
-                        "fileName": "csdcholderfull",
-                        "fileType": "text",
-                        "path": "/apps/hive/warehouse/csdcholder",
-                        "writeMode": "append",
-                        "haveKerberos": "true",
-                        "kerberosKeytabFilePath": "/etc/security/keytabs/hive.headless.keytab",
-                        "kerberosPrincipal": "hive@SANDBOX.COM",
-                        "hadoopConfig": {
-                            "dfs.nameservices": "sandbox",
-                            "dfs.ha.namenodes.sandbox": "nn1,nn2",
-                            "dfs.namenode.rpc-address.sandbox.nn1": "hdp1.sandbox.com:8020",
-                            "dfs.namenode.rpc-address.sandbox.nn2": "hdp2.sandbox.com:8020",
-                            "dfs.client.failover.proxy.provider.sandbox": "org.apache.hadoop.hdfs.server.namenode.ha.ConfiguredFailoverProxyProvider"
-                        }
-                    }
-                }
+  "job": {
+    "content": [
+      {
+        "reader": {
+          "name": "oraclereader",
+          "parameter": {
+            "column": [
+              "*"
+            ],
+            "connection": [
+              {
+                "jdbcUrl": [
+                  "jdbc:oracle:thin:@127.0.0.1:1521/stage"
+                ],
+                "table": [
+                  "STGUF.CSDCHOLDER"
+                ]
+              }
+            ],
+            "username": "oracle",
+            "password": "password"
+          }
+        },
+        "writer": {
+          "name": "hdfswriter",
+          "parameter": {
+            "column": [
+              {
+                "name": "CSDC_CLIENT_NAME",
+                "type": "string"
+              },
+              {
+                "name": "CSDC_ID_KIND",
+                "type": "string"
+              },
+              {
+                "name": "CSDC_ID_NO",
+                "type": "string"
+              },
+              {
+                "name": "CSDC_ACODE_TYPE",
+                "type": "string"
+              },
+              {
+                "name": "CSDC_ACODE_ACCOUNT",
+                "type": "string"
+              },
+              {
+                "name": "CSDC_ACODE_STATUS",
+                "type": "string"
+              },
+              {
+                "name": "CSDC_HOLDER_KIND",
+                "type": "string"
+              },
+              {
+                "name": "CSDC_STOCK_ACCOUNT",
+                "type": "string"
+              },
+              {
+                "name": "CSDC_OPEN_TYPE",
+                "type": "string"
+              },
+              {
+                "name": "CSDC_OPENORGAN_NAME",
+                "type": "string"
+              },
+              {
+                "name": "CSDC_CANCEL_DATE",
+                "type": "bigint"
+              },
+              {
+                "name": "CSDC_CANCEL_ORGAN_NAME",
+                "type": "string"
+              },
+              {
+                "name": "CSDC_HOLDER_STATUS",
+                "type": "string"
+              },
+              {
+                "name": "CSDC_OPEN_DATE",
+                "type": "bigint"
+              },
+              {
+                "name": "CSDC_RELATION_FLAG",
+                "type": "string"
+              },
+              {
+                "name": "CSDC_RELATION_ORGAN_NAME",
+                "type": "string"
+              },
+              {
+                "name": "CSDC_UNQU_FLAG",
+                "type": "string"
+              },
+              {
+                "name": "CSDC_UNQU_TRADE_RESTRICTS",
+                "type": "string"
+              },
+              {
+                "name": "CSDC_UNQU_REASON_KIND",
+                "type": "string"
+              },
+              {
+                "name": "REMARK",
+                "type": "string"
+              },
+              {
+                "name": "DW_CLT_DATE",
+                "type": "timestamp"
+              },
+              {
+                "name": "MODIFIER_NO",
+                "type": "string"
+              },
+              {
+                "name": "DW_TRADE_DATE",
+                "type": "bigint"
+              },
+              {
+                "name": "CSDC_DISTRIB_STOCK_ACCT",
+                "type": "string"
+              },
+              {
+                "name": "CSDC_SCAN_FLAG",
+                "type": "string"
+              },
+              {
+                "name": "CSDC_UNQU_ORGAN_NAME",
+                "type": "string"
+              }
+            ],
+            "compress": "",
+            "defaultFS": "hdfs://sandbox",
+            "fieldDelimiter": "\t",
+            "fileName": "csdcholderfull",
+            "fileType": "text",
+            "path": "/apps/hive/warehouse/csdcholder",
+            "writeMode": "append",
+            "haveKerberos": "true",
+            "kerberosKeytabFilePath": "/etc/security/keytabs/hive.headless.keytab",
+            "kerberosPrincipal": "hive@SANDBOX.COM",
+            "hadoopConfig": {
+              "dfs.nameservices": "sandbox",
+              "dfs.ha.namenodes.sandbox": "nn1,nn2",
+              "dfs.namenode.rpc-address.sandbox.nn1": "hdp1.sandbox.com:8020",
+              "dfs.namenode.rpc-address.sandbox.nn2": "hdp2.sandbox.com:8020",
+              "dfs.client.failover.proxy.provider.sandbox": "org.apache.hadoop.hdfs.server.namenode.ha.ConfiguredFailoverProxyProvider"
             }
-        ],
-        "setting": {
-            "speed": {
-                "bytes": -1,
-                "channel": 10,
-                "batchSize": 8192
-            }
+          }
         }
+      }
+    ],
+    "setting": {
+      "speed": {
+        "bytes": -1,
+        "channel": 10,
+        "batchSize": 8192
+      }
     }
+  }
 }

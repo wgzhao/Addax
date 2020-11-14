@@ -1,5 +1,21 @@
 package com.alibaba.datax.plugin.writer.ftpwriter.util;
 
+import com.alibaba.datax.common.exception.DataXException;
+import com.alibaba.datax.plugin.writer.ftpwriter.FtpWriterErrorCode;
+import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.serializer.SerializerFeature;
+import com.jcraft.jsch.ChannelSftp;
+import com.jcraft.jsch.ChannelSftp.LsEntry;
+import com.jcraft.jsch.JSch;
+import com.jcraft.jsch.JSchException;
+import com.jcraft.jsch.Session;
+import com.jcraft.jsch.SftpATTRS;
+import com.jcraft.jsch.SftpException;
+import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang3.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.io.ByteArrayOutputStream;
 import java.io.OutputStream;
 import java.util.HashSet;
@@ -7,24 +23,9 @@ import java.util.Properties;
 import java.util.Set;
 import java.util.Vector;
 
-import org.apache.commons.io.IOUtils;
-import org.apache.commons.lang3.StringUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import com.alibaba.datax.common.exception.DataXException;
-import com.alibaba.datax.plugin.writer.ftpwriter.FtpWriterErrorCode;
-import com.alibaba.fastjson.JSON;
-import com.alibaba.fastjson.serializer.SerializerFeature;
-import com.jcraft.jsch.ChannelSftp;
-import com.jcraft.jsch.JSch;
-import com.jcraft.jsch.JSchException;
-import com.jcraft.jsch.Session;
-import com.jcraft.jsch.SftpATTRS;
-import com.jcraft.jsch.SftpException;
-import com.jcraft.jsch.ChannelSftp.LsEntry;
-
-public class SftpHelperImpl implements IFtpHelper {
+public class SftpHelperImpl
+        implements IFtpHelper
+{
     private static final Logger LOG = LoggerFactory
             .getLogger(SftpHelperImpl.class);
 
@@ -33,7 +34,8 @@ public class SftpHelperImpl implements IFtpHelper {
 
     @Override
     public void loginFtpServer(String host, String username, String password,
-            int port, int timeout) {
+            int port, int timeout)
+    {
         JSch jsch = new JSch();
         try {
             this.session = jsch.getSession(username, host, port);
@@ -53,7 +55,8 @@ public class SftpHelperImpl implements IFtpHelper {
 
             this.channelSftp = (ChannelSftp) this.session.openChannel("sftp");
             this.channelSftp.connect();
-        } catch (JSchException e) {
+        }
+        catch (JSchException e) {
             if (null != e.getCause()) {
                 String cause = e.getCause().toString();
                 String unknownHostException = "java.net.UnknownHostException: "
@@ -68,7 +71,8 @@ public class SftpHelperImpl implements IFtpHelper {
                     LOG.error(message);
                     throw DataXException.asDataXException(
                             FtpWriterErrorCode.FAIL_LOGIN, message, e);
-                } else if (illegalArgumentException.equals(cause)
+                }
+                else if (illegalArgumentException.equals(cause)
                         || wrongPort.equals(cause)) {
                     String message = String.format(
                             "请确认连接ftp服务器端口是否正确，错误的端口: [%s], errorMessage:%s",
@@ -77,7 +81,8 @@ public class SftpHelperImpl implements IFtpHelper {
                     throw DataXException.asDataXException(
                             FtpWriterErrorCode.FAIL_LOGIN, message, e);
                 }
-            } else {
+            }
+            else {
                 String message = String
                         .format("与ftp服务器建立连接失败,请检查主机、用户名、密码是否正确, host:%s, port:%s, username:%s, errorMessage:%s",
                                 host, port, username, e.getMessage());
@@ -86,11 +91,11 @@ public class SftpHelperImpl implements IFtpHelper {
                         FtpWriterErrorCode.FAIL_LOGIN, message);
             }
         }
-
     }
 
     @Override
-    public void logoutFtpServer() {
+    public void logoutFtpServer()
+    {
         if (this.channelSftp != null) {
             this.channelSftp.disconnect();
             this.channelSftp = null;
@@ -102,13 +107,15 @@ public class SftpHelperImpl implements IFtpHelper {
     }
 
     @Override
-    public void mkdir(String directoryPath) {
+    public void mkdir(String directoryPath)
+    {
         boolean isDirExist = false;
         try {
             this.printWorkingDirectory();
             SftpATTRS sftpATTRS = this.channelSftp.lstat(directoryPath);
             isDirExist = sftpATTRS.isDir();
-        } catch (SftpException e) {
+        }
+        catch (SftpException e) {
             if (e.getMessage().toLowerCase().equals("no such file")) {
                 LOG.warn(String.format(
                         "您的配置项path:[%s]不存在，将尝试进行目录创建, errorMessage:%s",
@@ -120,7 +127,8 @@ public class SftpHelperImpl implements IFtpHelper {
             try {
                 // warn 检查mkdir -p
                 this.channelSftp.mkdir(directoryPath);
-            } catch (SftpException e) {
+            }
+            catch (SftpException e) {
                 String message = String
                         .format("创建目录:%s时发生I/O异常,请确认与ftp服务器的连接正常,拥有目录创建权限, errorMessage:%s",
                                 directoryPath, e.getMessage());
@@ -134,13 +142,15 @@ public class SftpHelperImpl implements IFtpHelper {
     }
 
     @Override
-    public void mkDirRecursive(String directoryPath){
+    public void mkDirRecursive(String directoryPath)
+    {
         boolean isDirExist = false;
         try {
             this.printWorkingDirectory();
             SftpATTRS sftpATTRS = this.channelSftp.lstat(directoryPath);
             isDirExist = sftpATTRS.isDir();
-        } catch (SftpException e) {
+        }
+        catch (SftpException e) {
             if (e.getMessage().toLowerCase().equals("no such file")) {
                 LOG.warn(String.format(
                         "您的配置项path:[%s]不存在，将尝试进行目录创建, errorMessage:%s",
@@ -151,15 +161,16 @@ public class SftpHelperImpl implements IFtpHelper {
         if (!isDirExist) {
             StringBuilder dirPath = new StringBuilder();
             dirPath.append(IOUtils.DIR_SEPARATOR_UNIX);
-            String[] dirSplit = StringUtils.split(directoryPath,IOUtils.DIR_SEPARATOR_UNIX);
+            String[] dirSplit = StringUtils.split(directoryPath, IOUtils.DIR_SEPARATOR_UNIX);
             try {
                 // ftp server不支持递归创建目录,只能一级一级创建
-                for(String dirName : dirSplit){
+                for (String dirName : dirSplit) {
                     dirPath.append(dirName);
                     mkDirSingleHierarchy(dirPath.toString());
                     dirPath.append(IOUtils.DIR_SEPARATOR_UNIX);
                 }
-            } catch (SftpException e) {
+            }
+            catch (SftpException e) {
                 String message = String
                         .format("创建目录:%s时发生I/O异常,请确认与ftp服务器的连接正常,拥有目录创建权限, errorMessage:%s",
                                 directoryPath, e.getMessage());
@@ -172,27 +183,31 @@ public class SftpHelperImpl implements IFtpHelper {
         }
     }
 
-    public boolean mkDirSingleHierarchy(String directoryPath) throws SftpException {
+    public boolean mkDirSingleHierarchy(String directoryPath)
+            throws SftpException
+    {
         boolean isDirExist = false;
         try {
             SftpATTRS sftpATTRS = this.channelSftp.lstat(directoryPath);
             isDirExist = sftpATTRS.isDir();
-        } catch (SftpException e) {
-            if(!isDirExist){
-                LOG.info(String.format("正在逐级创建目录 [%s]",directoryPath));
+        }
+        catch (SftpException e) {
+            if (!isDirExist) {
+                LOG.info(String.format("正在逐级创建目录 [%s]", directoryPath));
                 this.channelSftp.mkdir(directoryPath);
                 return true;
             }
         }
-        if(!isDirExist){
-            LOG.info(String.format("正在逐级创建目录 [%s]",directoryPath));
+        if (!isDirExist) {
+            LOG.info(String.format("正在逐级创建目录 [%s]", directoryPath));
             this.channelSftp.mkdir(directoryPath);
         }
         return true;
     }
 
     @Override
-    public OutputStream getOutputStream(String filePath) {
+    public OutputStream getOutputStream(String filePath)
+    {
         try {
             this.printWorkingDirectory();
             String parentDir = filePath.substring(0,
@@ -209,7 +224,8 @@ public class SftpHelperImpl implements IFtpHelper {
                         FtpWriterErrorCode.OPEN_FILE_ERROR, message);
             }
             return writeOutputStream;
-        } catch (SftpException e) {
+        }
+        catch (SftpException e) {
             String message = String.format(
                     "写出文件[%s] 时出错,请确认文件%s有权限写出, errorMessage:%s", filePath,
                     filePath, e.getMessage());
@@ -220,7 +236,8 @@ public class SftpHelperImpl implements IFtpHelper {
     }
 
     @Override
-    public String getRemoteFileContent(String filePath) {
+    public String getRemoteFileContent(String filePath)
+    {
         try {
             this.completePendingCommand();
             this.printWorkingDirectory();
@@ -233,7 +250,8 @@ public class SftpHelperImpl implements IFtpHelper {
             String result = outputStream.toString();
             IOUtils.closeQuietly(outputStream, null);
             return result;
-        } catch (SftpException e) {
+        }
+        catch (SftpException e) {
             String message = String.format(
                     "写出文件[%s] 时出错,请确认文件%s有权限写出, errorMessage:%s", filePath,
                     filePath, e.getMessage());
@@ -244,7 +262,8 @@ public class SftpHelperImpl implements IFtpHelper {
     }
 
     @Override
-    public Set<String> getAllFilesInDir(String dir, String prefixFileName) {
+    public Set<String> getAllFilesInDir(String dir, String prefixFileName)
+    {
         Set<String> allFilesWithPointedPrefix = new HashSet<>();
         try {
             this.printWorkingDirectory();
@@ -259,7 +278,8 @@ public class SftpHelperImpl implements IFtpHelper {
                     allFilesWithPointedPrefix.add(strName);
                 }
             }
-        } catch (SftpException e) {
+        }
+        catch (SftpException e) {
             String message = String
                     .format("获取path:[%s] 下文件列表时发生I/O异常,请确认与ftp服务器的连接正常,拥有目录ls权限, errorMessage:%s",
                             dir, e.getMessage());
@@ -271,7 +291,8 @@ public class SftpHelperImpl implements IFtpHelper {
     }
 
     @Override
-    public void deleteFiles(Set<String> filesToDelete) {
+    public void deleteFiles(Set<String> filesToDelete)
+    {
         String eachFile = null;
         try {
             this.printWorkingDirectory();
@@ -280,7 +301,8 @@ public class SftpHelperImpl implements IFtpHelper {
                 eachFile = each;
                 this.channelSftp.rm(each);
             }
-        } catch (SftpException e) {
+        }
+        catch (SftpException e) {
             String message = String.format(
                     "删除文件:[%s] 时发生异常,请确认指定文件有删除权限,以及网络交互正常, errorMessage:%s",
                     eachFile, e.getMessage());
@@ -290,18 +312,20 @@ public class SftpHelperImpl implements IFtpHelper {
         }
     }
 
-    private void printWorkingDirectory() {
+    private void printWorkingDirectory()
+    {
         try {
             LOG.info(String.format("current working directory:%s",
                     this.channelSftp.pwd()));
-        } catch (Exception e) {
+        }
+        catch (Exception e) {
             LOG.warn(String.format("printWorkingDirectory error:%s",
                     e.getMessage()));
         }
     }
 
     @Override
-    public void completePendingCommand() {
+    public void completePendingCommand()
+    {
     }
-
 }

@@ -1,6 +1,7 @@
 package com.alibaba.datax.plugin.writer.hbase20xsqlwriter;
 
-public class Key {
+public class Key
+{
 
     /**
      * 【必选】writer要写入的表的表名
@@ -32,5 +33,4 @@ public class Key {
      * 【可选】Phoenix表所属schema，默认为空
      */
     public static final String SCHEMA = "schema";
-
 }

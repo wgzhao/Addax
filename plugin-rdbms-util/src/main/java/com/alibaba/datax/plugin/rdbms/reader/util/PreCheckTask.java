@@ -16,7 +16,9 @@ import java.util.concurrent.Callable;
 /**
  * Created by judy.lt on 2015/6/4.
  */
-public class PreCheckTask implements Callable<Boolean>{
+public class PreCheckTask
+        implements Callable<Boolean>
+{
     private final String userName;
     private final String password;
     private final String splitPkId;
@@ -24,31 +26,34 @@ public class PreCheckTask implements Callable<Boolean>{
     private final DataBaseType dataBaseType;
 
     public PreCheckTask(String userName,
-                        String password,
-                        Configuration connection,
-                        DataBaseType dataBaseType,
-                        String splitPkId){
+            String password,
+            Configuration connection,
+            DataBaseType dataBaseType,
+            String splitPkId)
+    {
         this.connection = connection;
-        this.userName=userName;
-        this.password=password;
+        this.userName = userName;
+        this.password = password;
         this.dataBaseType = dataBaseType;
         this.splitPkId = splitPkId;
     }
 
     @Override
-    public Boolean call() throws DataXException {
+    public Boolean call()
+            throws DataXException
+    {
         String jdbcUrl = this.connection.getString(Key.JDBC_URL);
         List<Object> querySqls = this.connection.getList(Key.QUERY_SQL, Object.class);
         List<Object> splitPkSqls = this.connection.getList(Key.SPLIT_PK_SQL, Object.class);
-        List<Object> tables = this.connection.getList(Key.TABLE,Object.class);
+        List<Object> tables = this.connection.getList(Key.TABLE, Object.class);
         Connection conn = DBUtil.getConnectionWithoutRetry(this.dataBaseType, jdbcUrl,
                 this.userName, password);
         int fetchSize = 1;
-        if(DataBaseType.MySql == dataBaseType) {
+        if (DataBaseType.MySql == dataBaseType) {
             fetchSize = Integer.MIN_VALUE;
         }
-        try{
-            for (int i=0;i<querySqls.size();i++) {
+        try {
+            for (int i = 0; i < querySqls.size(); i++) {
 
                 String splitPkSql = null;
                 String querySql = querySqls.get(i).toString();
@@ -58,38 +63,45 @@ public class PreCheckTask implements Callable<Boolean>{
                     table = tables.get(i).toString();
                 }
 
-            /*verify query*/
+                /*verify query*/
                 ResultSet rs = null;
                 try {
-                    DBUtil.sqlValid(querySql,dataBaseType);
-                    if(i == 0) {
+                    DBUtil.sqlValid(querySql, dataBaseType);
+                    if (i == 0) {
                         rs = DBUtil.query(conn, querySql, fetchSize);
                     }
-                } catch (ParserException e) {
+                }
+                catch (ParserException e) {
                     throw RdbmsException.asSqlParserException(this.dataBaseType, e, querySql);
-                } catch (Exception e) {
+                }
+                catch (Exception e) {
                     throw RdbmsException.asQueryException(this.dataBaseType, e, querySql, table, userName);
-                } finally {
+                }
+                finally {
                     DBUtil.closeDBResources(rs, null, null);
                 }
-            /*verify splitPK*/
-                try{
+                /*verify splitPK*/
+                try {
                     if (splitPkSqls != null && !splitPkSqls.isEmpty()) {
                         splitPkSql = splitPkSqls.get(i).toString();
-                        DBUtil.sqlValid(splitPkSql,dataBaseType);
-                        if(i == 0) {
+                        DBUtil.sqlValid(splitPkSql, dataBaseType);
+                        if (i == 0) {
                             SingleTableSplitUtil.precheckSplitPk(conn, splitPkSql, fetchSize, table, userName);
                         }
                     }
-                } catch (ParserException e) {
+                }
+                catch (ParserException e) {
                     throw RdbmsException.asSqlParserException(this.dataBaseType, e, splitPkSql);
-                } catch (DataXException e) {
+                }
+                catch (DataXException e) {
                     throw e;
-                } catch (Exception e) {
-                    throw RdbmsException.asSplitPKException(this.dataBaseType, e, splitPkSql,this.splitPkId.trim());
+                }
+                catch (Exception e) {
+                    throw RdbmsException.asSplitPKException(this.dataBaseType, e, splitPkSql, this.splitPkId.trim());
                 }
             }
-        } finally {
+        }
+        finally {
             DBUtil.closeDBResources(null, conn);
         }
         return true;

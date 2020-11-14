@@ -11,25 +11,28 @@ import java.nio.charset.StandardCharsets;
 /**
  * Created by liqiang on 15/8/25.
  */
-public class HostUtils {
+public class HostUtils
+{
+
+    private HostUtils() {}
 
     public static final String IP;
     public static final String HOSTNAME;
     private static final Logger log = LoggerFactory.getLogger(HostUtils.class);
+    private static final String UNKNOWN = "UNKNOWN";
 
     static {
-        String ip;
-        String hostname;
+        String ip = UNKNOWN;
+        String hostname = UNKNOWN;
         try {
             InetAddress addr = InetAddress.getLocalHost();
             ip = addr.getHostAddress();
             hostname = addr.getHostName();
-        } catch (UnknownHostException e) {
-            log.error("Can't find out address: " + e.getMessage());
-            ip = "UNKNOWN";
-            hostname = "UNKNOWN";
         }
-        if (ip.equals("127.0.0.1") || ip.equals("::1") || ip.equals("UNKNOWN")) {
+        catch (UnknownHostException e) {
+            log.error("Can't find out address: {}", e.getMessage());
+        }
+        if (ip.equals("127.0.0.1") || ip.equals("::1") || ip.equals(UNKNOWN)) {
             try {
                 Process process = Runtime.getRuntime().exec("hostname -i");
                 if (process.waitFor() == 0) {
@@ -39,7 +42,8 @@ public class HostUtils {
                 if (process.waitFor() == 0) {
                     hostname = (new String(IOUtils.toByteArray(process.getInputStream()), StandardCharsets.UTF_8)).trim();
                 }
-            } catch (Exception e) {
+            }
+            catch (Exception e) {
                 log.warn("get hostname failed {}", e.getMessage());
             }
         }

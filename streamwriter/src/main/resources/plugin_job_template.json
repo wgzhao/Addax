@@ -1,7 +1,7 @@
 {
-    "name": "streamwriter",
-    "parameter": {
-        "encoding": "",
-        "print": true
-    }
+  "name": "streamwriter",
+  "parameter": {
+    "encoding": "",
+    "print": true
+  }
 }

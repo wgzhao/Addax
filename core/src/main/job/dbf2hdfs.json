@@ -1,109 +1,289 @@
 {
-    "job": {
-        "content": [
-            {
-                "reader": {
-                    "name": "dbffilereader",
-                    "parameter": {
-                        "column": [						
-                        {"index":0, "type":  "string"},
-                        {"index":1, "type":  "string"},
-                        {"index":2, "type":  "double"},
-                        {"index":3, "type":  "double"},
-                        {"index":4, "type":  "double"},
-                        {"index":5, "type":  "double"},
-                        {"index":6, "type":  "double"},
-                        {"index":7, "type":  "double"},
-                        {"index":8, "type":  "double"},
-                        {"index":9, "type":  "double"},
-                        {"index":10, "type": "double"},
-                        {"index":11, "type": "double"},
-                        {"index":12, "type": "double"},
-                        {"index":13, "type": "double"},
-                        {"index":14, "type": "double"},
-                        {"index":15, "type": "double"},
-                        {"index":16, "type": "double"},
-                        {"index":17, "type": "double"},
-                        {"index":18, "type": "double"},
-                        {"index":19, "type": "double"},
-                        {"index":20, "type": "double"},
-                        {"index":21, "type": "double"},
-                        {"index":22, "type": "double"},
-                        {"index":23, "type": "double"},
-                        {"index":24, "type": "double"},
-                        {"index":25, "type": "double"},
-                        {"index":26, "type": "double"},
-                        {"index":27, "type": "double"},
-                        {"index":28, "type": "double"},
-                        {"index":29, "type": "double"}
-					],
-			"path": "/tmp/show2003.dbf",
-			"encoding": "GBK"
-                    }
-                },
-            "writer": {
-                "name": "hdfswriter",
-                "parameter": {
-                    "column": [
-                        {"name":"s1", "type":  "string"},
-                        {"name":"s2", "type":  "string"},
-                        {"name":"s3", "type":  "decimal"},
-                        {"name":"s4", "type":  "decimal"},
-                        {"name":"s5", "type":  "decimal"},
-                        {"name":"s6", "type":  "decimal"},
-                        {"name":"s7", "type":  "decimal"},
-                        {"name":"s8", "type":  "decimal"},
-                        {"name":"s9", "type":  "decimal"},
-                        {"name":"s10", "type": "decimal"},
-                        {"name":"s11", "type": "decimal"},
-                        {"name":"s13", "type": "decimal"},
-                        {"name":"s15", "type": "decimal"},
-                        {"name":"s16", "type": "decimal"},
-                        {"name":"s17", "type": "decimal"},
-                        {"name":"s18", "type": "decimal"},
-                        {"name":"s19", "type": "decimal"},
-                        {"name":"s21", "type": "decimal"},
-                        {"name":"s22", "type": "decimal"},
-                        {"name":"s23", "type": "decimal"},
-                        {"name":"s24", "type": "decimal"},
-                        {"name":"s25", "type": "decimal"},
-                        {"name":"s26", "type": "decimal"},
-                        {"name":"s27", "type": "decimal"},
-                        {"name":"s28", "type": "decimal"},
-                        {"name":"s29", "type": "decimal"},
-                        {"name":"s30", "type": "decimal"},
-                        {"name":"s31", "type": "decimal"},
-                        {"name":"s32", "type": "decimal"},
-                        {"name":"s33", "type": "decimal"}
-					],
-                    "compress": "SNAPPY",
-                    "defaultFS": "hdfs://sandbox",
-                    "fieldDelimiter": "\t",
-                    "fileName": "dbf_orc",
-                    "fileType": "orc",
-                    "path": "/tmp/dbftest",
-                    "writeMode": "overwrite",
-                    "haveKerberos": "true",
-                    "kerberosKeytabFilePath": "/etc/security/keytabs/hdfs.headless.keytab",
-                    "kerberosPrincipal": "hdfs-sandbox@SANDBOX.COM",
-                    "hadoopConfig":{
-                        "dfs.nameservices": "sandbox",
-                        "dfs.ha.namenodes.sandbox": "nn1,nn2",
-                        "dfs.namenode.rpc-address.sandbox.nn1": "hdp1.sandbox.com:8020",
-                        "dfs.namenode.rpc-address.sandbox.nn2": "hdp2.sandbox.com:8020",
-                        "dfs.client.failover.proxy.provider.sandbox": "org.apache.hadoop.hdfs.server.namenode.ha.ConfiguredFailoverProxyProvider"
-                        }
-                    }
-                }
+  "job": {
+    "content": [
+      {
+        "reader": {
+          "name": "dbffilereader",
+          "parameter": {
+            "column": [
+              {
+                "index": 0,
+                "type": "string"
+              },
+              {
+                "index": 1,
+                "type": "string"
+              },
+              {
+                "index": 2,
+                "type": "double"
+              },
+              {
+                "index": 3,
+                "type": "double"
+              },
+              {
+                "index": 4,
+                "type": "double"
+              },
+              {
+                "index": 5,
+                "type": "double"
+              },
+              {
+                "index": 6,
+                "type": "double"
+              },
+              {
+                "index": 7,
+                "type": "double"
+              },
+              {
+                "index": 8,
+                "type": "double"
+              },
+              {
+                "index": 9,
+                "type": "double"
+              },
+              {
+                "index": 10,
+                "type": "double"
+              },
+              {
+                "index": 11,
+                "type": "double"
+              },
+              {
+                "index": 12,
+                "type": "double"
+              },
+              {
+                "index": 13,
+                "type": "double"
+              },
+              {
+                "index": 14,
+                "type": "double"
+              },
+              {
+                "index": 15,
+                "type": "double"
+              },
+              {
+                "index": 16,
+                "type": "double"
+              },
+              {
+                "index": 17,
+                "type": "double"
+              },
+              {
+                "index": 18,
+                "type": "double"
+              },
+              {
+                "index": 19,
+                "type": "double"
+              },
+              {
+                "index": 20,
+                "type": "double"
+              },
+              {
+                "index": 21,
+                "type": "double"
+              },
+              {
+                "index": 22,
+                "type": "double"
+              },
+              {
+                "index": 23,
+                "type": "double"
+              },
+              {
+                "index": 24,
+                "type": "double"
+              },
+              {
+                "index": 25,
+                "type": "double"
+              },
+              {
+                "index": 26,
+                "type": "double"
+              },
+              {
+                "index": 27,
+                "type": "double"
+              },
+              {
+                "index": 28,
+                "type": "double"
+              },
+              {
+                "index": 29,
+                "type": "double"
+              }
+            ],
+            "path": "/tmp/show2003.dbf",
+            "encoding": "GBK"
+          }
+        },
+        "writer": {
+          "name": "hdfswriter",
+          "parameter": {
+            "column": [
+              {
+                "name": "s1",
+                "type": "string"
+              },
+              {
+                "name": "s2",
+                "type": "string"
+              },
+              {
+                "name": "s3",
+                "type": "decimal"
+              },
+              {
+                "name": "s4",
+                "type": "decimal"
+              },
+              {
+                "name": "s5",
+                "type": "decimal"
+              },
+              {
+                "name": "s6",
+                "type": "decimal"
+              },
+              {
+                "name": "s7",
+                "type": "decimal"
+              },
+              {
+                "name": "s8",
+                "type": "decimal"
+              },
+              {
+                "name": "s9",
+                "type": "decimal"
+              },
+              {
+                "name": "s10",
+                "type": "decimal"
+              },
+              {
+                "name": "s11",
+                "type": "decimal"
+              },
+              {
+                "name": "s13",
+                "type": "decimal"
+              },
+              {
+                "name": "s15",
+                "type": "decimal"
+              },
+              {
+                "name": "s16",
+                "type": "decimal"
+              },
+              {
+                "name": "s17",
+                "type": "decimal"
+              },
+              {
+                "name": "s18",
+                "type": "decimal"
+              },
+              {
+                "name": "s19",
+                "type": "decimal"
+              },
+              {
+                "name": "s21",
+                "type": "decimal"
+              },
+              {
+                "name": "s22",
+                "type": "decimal"
+              },
+              {
+                "name": "s23",
+                "type": "decimal"
+              },
+              {
+                "name": "s24",
+                "type": "decimal"
+              },
+              {
+                "name": "s25",
+                "type": "decimal"
+              },
+              {
+                "name": "s26",
+                "type": "decimal"
+              },
+              {
+                "name": "s27",
+                "type": "decimal"
+              },
+              {
+                "name": "s28",
+                "type": "decimal"
+              },
+              {
+                "name": "s29",
+                "type": "decimal"
+              },
+              {
+                "name": "s30",
+                "type": "decimal"
+              },
+              {
+                "name": "s31",
+                "type": "decimal"
+              },
+              {
+                "name": "s32",
+                "type": "decimal"
+              },
+              {
+                "name": "s33",
+                "type": "decimal"
+              }
+            ],
+            "compress": "SNAPPY",
+            "defaultFS": "hdfs://sandbox",
+            "fieldDelimiter": "\t",
+            "fileName": "dbf_orc",
+            "fileType": "orc",
+            "path": "/tmp/dbftest",
+            "writeMode": "overwrite",
+            "haveKerberos": "true",
+            "kerberosKeytabFilePath": "/etc/security/keytabs/hdfs.headless.keytab",
+            "kerberosPrincipal": "hdfs-sandbox@SANDBOX.COM",
+            "hadoopConfig": {
+              "dfs.nameservices": "sandbox",
+              "dfs.ha.namenodes.sandbox": "nn1,nn2",
+              "dfs.namenode.rpc-address.sandbox.nn1": "hdp1.sandbox.com:8020",
+              "dfs.namenode.rpc-address.sandbox.nn2": "hdp2.sandbox.com:8020",
+              "dfs.client.failover.proxy.provider.sandbox": "org.apache.hadoop.hdfs.server.namenode.ha.ConfiguredFailoverProxyProvider"
             }
-        ],
-        "setting": {
-            "speed": {
-                "channel": 2,
-                "byte": -1,
-                "record": -1,
-                "batchSize": 4096
-            }
+          }
         }
+      }
+    ],
+    "setting": {
+      "speed": {
+        "channel": 2,
+        "byte": -1,
+        "record": -1,
+        "batchSize": 4096
+      }
     }
+  }
 }

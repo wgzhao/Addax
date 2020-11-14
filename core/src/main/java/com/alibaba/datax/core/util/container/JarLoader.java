@@ -16,16 +16,21 @@ import java.util.Objects;
 /**
  * 提供Jar隔离的加载机制，会把传入的路径、及其子路径、以及路径中的jar文件加入到class path。
  */
-public class JarLoader extends URLClassLoader {
-    public JarLoader(String[] paths) {
+public class JarLoader
+        extends URLClassLoader
+{
+    public JarLoader(String[] paths)
+    {
         this(paths, JarLoader.class.getClassLoader());
     }
 
-    public JarLoader(String[] paths, ClassLoader parent) {
+    public JarLoader(String[] paths, ClassLoader parent)
+    {
         super(getURLs(paths), parent);
     }
 
-    private static URL[] getURLs(String[] paths) {
+    private static URL[] getURLs(String[] paths)
+    {
         Validate.isTrue(null != paths && 0 != paths.length,
                 "jar包路径不能为空.");
 
@@ -43,7 +48,8 @@ public class JarLoader extends URLClassLoader {
         return urls.toArray(new URL[0]);
     }
 
-    private static void collectDirs(String path, List<String> collector) {
+    private static void collectDirs(String path, List<String> collector)
+    {
         if (null == path || StringUtils.isBlank(path)) {
             return;
         }
@@ -63,7 +69,8 @@ public class JarLoader extends URLClassLoader {
         }
     }
 
-    private static List<URL> doGetURLs(final String path) {
+    private static List<URL> doGetURLs(final String path)
+    {
         Validate.isTrue(!StringUtils.isBlank(path), "jar包路径不能为空.");
 
         File jarPath = new File(path);
@@ -71,10 +78,10 @@ public class JarLoader extends URLClassLoader {
         Validate.isTrue(jarPath.exists() && jarPath.isDirectory(),
                 "jar包路径必须存在且为目录.");
 
-		/* set filter */
+        /* set filter */
         FileFilter jarFilter = pathname -> pathname.getName().endsWith(".jar");
 
-		/* iterate all jar */
+        /* iterate all jar */
         File[] allJars = new File(path).listFiles(jarFilter);
         assert allJars != null;
         List<URL> jarURLs = new ArrayList<>(allJars.length);
@@ -82,7 +89,8 @@ public class JarLoader extends URLClassLoader {
         for (File allJar : allJars) {
             try {
                 jarURLs.add(allJar.toURI().toURL());
-            } catch (Exception e) {
+            }
+            catch (Exception e) {
                 throw DataXException.asDataXException(
                         FrameworkErrorCode.PLUGIN_INIT_ERROR,
                         "系统加载jar包出错", e);

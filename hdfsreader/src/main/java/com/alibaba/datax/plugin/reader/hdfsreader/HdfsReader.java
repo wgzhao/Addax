@@ -83,8 +83,8 @@ public class HdfsReader
             }
 
             specifiedFileType = this.readerOriginConfig.getNecessaryValue(Key.FILETYPE, HdfsReaderErrorCode.REQUIRED_VALUE).toUpperCase();
-            if (! Constant.SUPPORT_FILE_TYPE.contains(specifiedFileType)) {
-                String message = "HdfsReader插件目前支持 " + Constant.SUPPORT_FILE_TYPE +  "几种格式的文件,请将fileType选项的值配置为以上各种的一种";
+            if (!Constant.SUPPORT_FILE_TYPE.contains(specifiedFileType)) {
+                String message = "HdfsReader插件目前支持 " + Constant.SUPPORT_FILE_TYPE + "几种格式的文件,请将fileType选项的值配置为以上各种的一种";
                 throw DataXException.asDataXException(HdfsReaderErrorCode.FILE_TYPE_ERROR, message);
             }
 

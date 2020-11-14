@@ -1,43 +1,43 @@
 {
-    "job": {
-        "content": [
-            {
-                "reader": {
-                    "name": "oraclereader",
-                    "parameter": {
-                        "column": [
-                            "COL1"
-                        ],
-                        "connection": [
-                            {
-                                "jdbcUrl": [
-                                    "jdbc:oracle:thin:@127.0.0.1:1521/stage"
-                                ],
-                                "table": [
-                                    "FINEBI.T"
-                                ]
-                            }
-                        ],
-                        "username": "oracle",
-                        "password": "password"
-                    }
-                },
-                "writer": {
-                    "name": "txtfilewriter",
-                    "parameter": {
-                        "path": "/tmp/result",
-                        "fileName": "luohw",
-                        "writeMode": "truncate",
-                        "dateFormat": "yyyy-MM-dd"
-                    }
-                }
-            }
-        ],
-        "setting": {
-            "speed": {
-                "bytes": -1,
-                "channel": 1
-            }
+  "job": {
+    "content": [
+      {
+        "reader": {
+          "name": "oraclereader",
+          "parameter": {
+            "column": [
+              "COL1"
+            ],
+            "connection": [
+              {
+                "jdbcUrl": [
+                  "jdbc:oracle:thin:@127.0.0.1:1521/stage"
+                ],
+                "table": [
+                  "FINEBI.T"
+                ]
+              }
+            ],
+            "username": "oracle",
+            "password": "password"
+          }
+        },
+        "writer": {
+          "name": "txtfilewriter",
+          "parameter": {
+            "path": "/tmp/result",
+            "fileName": "luohw",
+            "writeMode": "truncate",
+            "dateFormat": "yyyy-MM-dd"
+          }
         }
+      }
+    ],
+    "setting": {
+      "speed": {
+        "bytes": -1,
+        "channel": 1
+      }
     }
+  }
 }

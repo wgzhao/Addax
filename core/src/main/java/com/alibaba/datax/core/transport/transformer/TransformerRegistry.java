@@ -20,32 +20,20 @@ import java.util.Map;
  * no comments.
  * Created by liqiang on 16/3/3.
  */
-public class TransformerRegistry {
+public class TransformerRegistry
+{
 
     private static final Logger LOG = LoggerFactory.getLogger(TransformerRegistry.class);
     private static final Map<String, TransformerInfo> registedTransformer = new HashMap<>();
 
-    static {
-        /*
-         * add native transformer
-         * local storage and from server will be delay load.
-         */
-
-        registTransformer(new SubstrTransformer());
-        registTransformer(new PadTransformer());
-        registTransformer(new ReplaceTransformer());
-        registTransformer(new FilterTransformer());
-        registTransformer(new GroovyTransformer());
-        registTransformer(new MapTransformer());
-    }
-
-    public static void loadTransformerFromLocalStorage() {
+    public static void loadTransformerFromLocalStorage()
+    {
         //add local_storage transformer
         loadTransformerFromLocalStorage(null);
     }
 
-
-    public static void loadTransformerFromLocalStorage(List<String> transformers) {
+    public static void loadTransformerFromLocalStorage(List<String> transformers)
+    {
 
         String[] paths = new File(CoreConstant.DATAX_STORAGE_TRANSFORMER_HOME).list();
         if (null == paths) {
@@ -57,19 +45,21 @@ public class TransformerRegistry {
                 if (transformers == null || transformers.contains(each)) {
                     loadTransformer(each);
                 }
-            } catch (Exception e) {
+            }
+            catch (Exception e) {
                 LOG.error(String.format("skip transformer(%s) loadTransformer has Exception(%s)", each, e.getMessage()), e);
             }
-
         }
     }
 
-    public static void loadTransformer(String each) {
+    public static void loadTransformer(String each)
+    {
         String transformerPath = CoreConstant.DATAX_STORAGE_TRANSFORMER_HOME + File.separator + each;
         Configuration transformerConfiguration;
         try {
             transformerConfiguration = loadTransFormerConfig(transformerPath);
-        } catch (Exception e) {
+        }
+        catch (Exception e) {
             LOG.error(String.format("skip transformer(%s),load transformer.json error, path = %s, ", each, transformerPath), e);
             return;
         }
@@ -84,7 +74,7 @@ public class TransformerRegistry {
         if (!each.equals(funName)) {
             LOG.warn(String.format("transformer(%s) name not match transformer.json config name[%s], will ignore json's name, path = %s, config = %s", each, funName, transformerPath, transformerConfiguration.beautify()));
         }
-        JarLoader jarLoader = new JarLoader(new String[]{transformerPath});
+        JarLoader jarLoader = new JarLoader(new String[] {transformerPath});
 
         try {
             Class<?> transformerClass = jarLoader.loadClass(className);
@@ -92,23 +82,28 @@ public class TransformerRegistry {
             if (ComplexTransformer.class.isAssignableFrom(transformer.getClass())) {
                 ((ComplexTransformer) transformer).setTransformerName(each);
                 registComplexTransformer((ComplexTransformer) transformer, jarLoader, false);
-            } else if (Transformer.class.isAssignableFrom(transformer.getClass())) {
+            }
+            else if (Transformer.class.isAssignableFrom(transformer.getClass())) {
                 ((Transformer) transformer).setTransformerName(each);
                 registTransformer((Transformer) transformer, jarLoader, false);
-            } else {
+            }
+            else {
                 LOG.error(String.format("load Transformer class(%s) error, path = %s", className, transformerPath));
             }
-        } catch (Exception e) {
+        }
+        catch (Exception e) {
             //错误funciton跳过
             LOG.error(String.format("skip transformer(%s),load Transformer class error, path = %s ", each, transformerPath), e);
         }
     }
 
-    private static Configuration loadTransFormerConfig(String transformerPath) {
+    private static Configuration loadTransFormerConfig(String transformerPath)
+    {
         return Configuration.from(new File(transformerPath + File.separator + "transformer.json"));
     }
 
-    public static TransformerInfo getTransformer(String transformerName) {
+    public static TransformerInfo getTransformer(String transformerName)
+    {
 
         //if (result == null) {
         // todo 再尝试从disk读取
@@ -117,11 +112,13 @@ public class TransformerRegistry {
         return registedTransformer.get(transformerName);
     }
 
-    public static synchronized void registTransformer(Transformer transformer) {
+    public static synchronized void registTransformer(Transformer transformer)
+    {
         registTransformer(transformer, null, true);
     }
 
-    public static synchronized void registTransformer(Transformer transformer, ClassLoader classLoader, boolean isNative) {
+    public static synchronized void registTransformer(Transformer transformer, ClassLoader classLoader, boolean isNative)
+    {
 
         checkName(transformer.getTransformerName(), isNative);
 
@@ -130,10 +127,10 @@ public class TransformerRegistry {
         }
 
         registedTransformer.put(transformer.getTransformerName(), buildTransformerInfo(new ComplexTransformerProxy(transformer), isNative, classLoader));
-
     }
 
-    public static synchronized void registComplexTransformer(ComplexTransformer complexTransformer, ClassLoader classLoader, boolean isNative) {
+    public static synchronized void registComplexTransformer(ComplexTransformer complexTransformer, ClassLoader classLoader, boolean isNative)
+    {
 
         checkName(complexTransformer.getTransformerName(), isNative);
 
@@ -144,13 +141,15 @@ public class TransformerRegistry {
         registedTransformer.put(complexTransformer.getTransformerName(), buildTransformerInfo(complexTransformer, isNative, classLoader));
     }
 
-    private static void checkName(String functionName, boolean isNative) {
+    private static void checkName(String functionName, boolean isNative)
+    {
         boolean checkResult = true;
         if (isNative) {
             if (!functionName.startsWith("dx_")) {
                 checkResult = false;
             }
-        } else {
+        }
+        else {
             if (functionName.startsWith("dx_")) {
                 checkResult = false;
             }
@@ -159,10 +158,10 @@ public class TransformerRegistry {
         if (!checkResult) {
             throw DataXException.asDataXException(TransformerErrorCode.TRANSFORMER_NAME_ERROR, " name=" + functionName + ": isNative=" + isNative);
         }
-
     }
 
-    private static TransformerInfo buildTransformerInfo(ComplexTransformer complexTransformer, boolean isNative, ClassLoader classLoader) {
+    private static TransformerInfo buildTransformerInfo(ComplexTransformer complexTransformer, boolean isNative, ClassLoader classLoader)
+    {
         TransformerInfo transformerInfo = new TransformerInfo();
         transformerInfo.setClassLoader(classLoader);
         transformerInfo.setIsNative(isNative);
@@ -170,7 +169,22 @@ public class TransformerRegistry {
         return transformerInfo;
     }
 
-    public static List<String> getAllSuportTransformer() {
+    public static List<String> getAllSuportTransformer()
+    {
         return new ArrayList<>(registedTransformer.keySet());
+    }
+
+    static {
+        /*
+         * add native transformer
+         * local storage and from server will be delay load.
+         */
+
+        registTransformer(new SubstrTransformer());
+        registTransformer(new PadTransformer());
+        registTransformer(new ReplaceTransformer());
+        registTransformer(new FilterTransformer());
+        registTransformer(new GroovyTransformer());
+        registTransformer(new MapTransformer());
     }
 }

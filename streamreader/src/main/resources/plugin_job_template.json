@@ -1,7 +1,7 @@
 {
-    "name": "streamreader",
-    "parameter": {
-        "sliceRecordCount": "",
-        "column": []
-    }
+  "name": "streamreader",
+  "parameter": {
+    "sliceRecordCount": "",
+    "column": []
+  }
 }

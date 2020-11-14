@@ -8,25 +8,23 @@ import org.apache.hadoop.hbase.util.Bytes;
 /**
  * 描述 hbasereader 插件中，column 配置中的一个单元项实体
  */
-public class HbaseColumnCell extends BaseObject {
+public class HbaseColumnCell
+        extends BaseObject
+{
     private final ColumnType columnType;
-
-    // columnName 格式为：列族:列名
-    private String columnName;
-
-    private byte[] columnFamily;
-    private byte[] qualifier;
-
-    //对于常量类型，其常量值放到 columnValue 里
-    private String columnValue;
-
     //当配置了 columnValue 时，isConstant=true（这个成员变量是用于方便使用本类的地方判断是否是常量类型字段）
     private final boolean isConstant;
-
+    // columnName 格式为：列族:列名
+    private String columnName;
+    private byte[] columnFamily;
+    private byte[] qualifier;
+    //对于常量类型，其常量值放到 columnValue 里
+    private String columnValue;
     // 只在类型是时间类型时，才会设置该值，无默认值。形式如：yyyy-MM-dd HH:mm:ss
     private String dateformat;
 
-    private HbaseColumnCell(Builder builder) {
+    private HbaseColumnCell(Builder builder)
+    {
         this.columnType = builder.columnType;
 
         //columnName 和 columnValue 必须有一个为 null
@@ -50,7 +48,8 @@ public class HbaseColumnCell extends BaseObject {
                 this.columnFamily = Bytes.toBytes(cfAndQualifier[0].trim());
                 this.qualifier = Bytes.toBytes(cfAndQualifier[1].trim());
             }
-        } else {
+        }
+        else {
             this.isConstant = true;
             this.columnValue = builder.columnValue;
         }
@@ -60,62 +59,75 @@ public class HbaseColumnCell extends BaseObject {
         }
     }
 
-    public ColumnType getColumnType() {
+    public ColumnType getColumnType()
+    {
         return columnType;
     }
 
-    public String getColumnName() {
+    public String getColumnName()
+    {
         return columnName;
     }
 
-    public byte[] getColumnFamily() {
+    public byte[] getColumnFamily()
+    {
         return columnFamily;
     }
 
-    public byte[] getQualifier() {
+    public byte[] getQualifier()
+    {
         return qualifier;
     }
 
-    public String getDateformat() {
+    public String getDateformat()
+    {
         return dateformat;
     }
 
-    public String getColumnValue() {
+    public String getColumnValue()
+    {
         return columnValue;
     }
 
-    public boolean isConstant() {
+    public boolean isConstant()
+    {
         return isConstant;
     }
 
     // 内部 builder 类
-    public static class Builder {
+    public static class Builder
+    {
         private final ColumnType columnType;
         private String columnName;
         private String columnValue;
 
         private String dateformat;
 
-        public Builder(ColumnType columnType) {
+        public Builder(ColumnType columnType)
+        {
             this.columnType = columnType;
         }
 
-        public Builder columnName(String columnName) {
+        public Builder columnName(String columnName)
+        {
             this.columnName = columnName;
             return this;
         }
 
-        public Builder columnValue(String columnValue) {
+        public Builder columnValue(String columnValue)
+        {
             this.columnValue = columnValue;
             return this;
         }
 
-        public Builder dateformat(String dateformat) {
+        public Builder dateformat(String dateformat)
+        {
             this.dateformat = dateformat;
             return this;
         }
 
-        public HbaseColumnCell build() {
+        public HbaseColumnCell build()
+        {
             return new HbaseColumnCell(this);
         }
     }

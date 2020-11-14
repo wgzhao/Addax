@@ -12,34 +12,26 @@ import java.util.List;
  * 提供针对 DataX中使用的 List 较为常见的一些封装。 比如：checkIfValueDuplicate 可以用于检查用户配置的 writer
  * 的列不能重复。makeSureNoValueDuplicate亦然，只是会严格报错。
  */
-public final class ListUtil {
+public final class ListUtil
+{
 
-    public static boolean checkIfValueDuplicate(List<String> aList,
-                                                boolean caseSensitive) {
-        if (null == aList || aList.isEmpty()) {
-            throw DataXException.asDataXException(CommonErrorCode.CONFIG_ERROR,
-                    "您提供的作业配置有误，List不能为空.");
-        }
+    private static final String ERROR_MESSAGE = "您提供的作业配置有误, List不能为空.";
 
-        try {
-            makeSureNoValueDuplicate(aList, caseSensitive);
-        } catch (Exception e) {
-            return true;
-        }
-        return false;
-    }
+    private ListUtil() {}
 
     public static void makeSureNoValueDuplicate(List<String> aList,
-                                                boolean caseSensitive) {
+            boolean caseSensitive)
+    {
         if (null == aList || aList.isEmpty()) {
-            throw new IllegalArgumentException("您提供的作业配置有误, List不能为空.");
+            throw new IllegalArgumentException(ERROR_MESSAGE);
         }
 
         if (1 != aList.size()) {
             List<String> list;
             if (!caseSensitive) {
                 list = valueToLowerCase(aList);
-            } else {
+            }
+            else {
                 list = new ArrayList<>(aList);
             }
 
@@ -60,25 +52,28 @@ public final class ListUtil {
     }
 
     public static boolean checkIfBInA(List<String> aList, List<String> bList,
-                                      boolean caseSensitive) {
+            boolean caseSensitive)
+    {
         if (null == aList || aList.isEmpty() || null == bList
                 || bList.isEmpty()) {
-            throw new IllegalArgumentException("您提供的作业配置有误, List不能为空.");
+            throw new IllegalArgumentException(ERROR_MESSAGE);
         }
 
         try {
             makeSureBInA(aList, bList, caseSensitive);
-        } catch (Exception e) {
+        }
+        catch (Exception e) {
             return false;
         }
         return true;
     }
 
     public static void makeSureBInA(List<String> aList, List<String> bList,
-                                    boolean caseSensitive) {
+            boolean caseSensitive)
+    {
         if (null == aList || aList.isEmpty() || null == bList
                 || bList.isEmpty()) {
-            throw new IllegalArgumentException("您提供的作业配置有误, List不能为空.");
+            throw new IllegalArgumentException(ERROR_MESSAGE);
         }
 
         List<String> all;
@@ -87,7 +82,8 @@ public final class ListUtil {
         if (!caseSensitive) {
             all = valueToLowerCase(aList);
             part = valueToLowerCase(bList);
-        } else {
+        }
+        else {
             all = new ArrayList<>(aList);
             part = new ArrayList<>(bList);
         }
@@ -102,12 +98,12 @@ public final class ListUtil {
                                         oneValue, StringUtils.join(aList, ",")));
             }
         }
-
     }
 
-    public static boolean checkIfValueSame(List<Boolean> aList) {
+    public static boolean checkIfValueSame(List<Boolean> aList)
+    {
         if (null == aList || aList.isEmpty()) {
-            throw new IllegalArgumentException("您提供的作业配置有误, List不能为空.");
+            throw new IllegalArgumentException(ERROR_MESSAGE);
         }
 
         if (1 != aList.size()) {
@@ -121,9 +117,10 @@ public final class ListUtil {
         return true;
     }
 
-    public static List<String> valueToLowerCase(List<String> aList) {
+    public static List<String> valueToLowerCase(List<String> aList)
+    {
         if (null == aList || aList.isEmpty()) {
-            throw new IllegalArgumentException("您提供的作业配置有误, List不能为空.");
+            throw new IllegalArgumentException(ERROR_MESSAGE);
         }
         List<String> result = new ArrayList<>(aList.size());
         for (String oneValue : aList) {

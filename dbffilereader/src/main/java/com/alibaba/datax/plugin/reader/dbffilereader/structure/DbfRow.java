@@ -5,11 +5,12 @@ import com.alibaba.datax.plugin.reader.dbffilereader.exception.DbfException;
 import java.math.BigDecimal;
 import java.nio.charset.Charset;
 import java.util.Date;
-import static java.lang.String.format;
+
 import static com.alibaba.datax.plugin.reader.dbffilereader.utils.DbfUtils.trimLeftSpaces;
+import static java.lang.String.format;
 
-
-public class DbfRow {
+public class DbfRow
+{
 
     private static final Long ZERO = 0L;
 
@@ -17,7 +18,8 @@ public class DbfRow {
     private final Charset defaultCharset;
     private final Object[] row;
 
-    public DbfRow(DbfHeader header, Charset defaultCharset, Object[] row) {
+    public DbfRow(DbfHeader header, Charset defaultCharset, Object[] row)
+    {
         this.header = header;
         this.defaultCharset = defaultCharset;
         this.row = row;
@@ -30,7 +32,9 @@ public class DbfRow {
      * @return the field value, or null (if the dbf value is NULL)
      * @throws DbfException if there's no field with name fieldName
      */
-    public BigDecimal getBigDecimal(String fieldName) throws DbfException {
+    public BigDecimal getBigDecimal(String fieldName)
+            throws DbfException
+    {
         Object value = get(fieldName);
         return value == null ? null : new BigDecimal(value.toString());
     }
@@ -42,8 +46,10 @@ public class DbfRow {
      * @return the field value, or null (if the dbf value is NULL)
      * @throws DbfException if there's no field with name fieldName
      */
-    public Date getDate(String fieldName) throws DbfException {
-        return  (Date) get(fieldName);
+    public Date getDate(String fieldName)
+            throws DbfException
+    {
+        return (Date) get(fieldName);
     }
 
     /**
@@ -53,7 +59,9 @@ public class DbfRow {
      * @return the field value, or null (if the dbf value is NULL)
      * @throws DbfException if there's no field with name fieldName
      */
-    public String getString(String fieldName) throws DbfException {
+    public String getString(String fieldName)
+            throws DbfException
+    {
         return getString(fieldName, defaultCharset);
     }
 
@@ -66,7 +74,9 @@ public class DbfRow {
      * @return the field value, or null (if the dbf value is NULL)
      * @throws DbfException if there's no field with name fieldName
      */
-    public String getString(String fieldName, Charset charset) throws DbfException {
+    public String getString(String fieldName, Charset charset)
+            throws DbfException
+    {
         Object value = get(fieldName);
         return value == null
                 ? null
@@ -80,7 +90,9 @@ public class DbfRow {
      * @return the field value, or false (if the dbf value is NULL)
      * @throws DbfException if there's no field with name fieldName
      */
-    public boolean getBoolean(String fieldName) throws DbfException {
+    public boolean getBoolean(String fieldName)
+            throws DbfException
+    {
         Boolean value = (Boolean) get(fieldName);
         return value != null && value;
     }
@@ -92,7 +104,9 @@ public class DbfRow {
      * @return the field value, or 0 (if the dbf value is NULL)
      * @throws DbfException if there's no field with name fieldName
      */
-    public int getInt(String fieldName) throws DbfException {
+    public int getInt(String fieldName)
+            throws DbfException
+    {
         return getNumber(fieldName).intValue();
     }
 
@@ -103,7 +117,9 @@ public class DbfRow {
      * @return the field value, or 0 (if the dbf value is NULL)
      * @throws DbfException if there's no field with name fieldName
      */
-    public short getShort(String fieldName) throws DbfException {
+    public short getShort(String fieldName)
+            throws DbfException
+    {
         return getNumber(fieldName).shortValue();
     }
 
@@ -114,7 +130,9 @@ public class DbfRow {
      * @return the field value, or 0 (if the dbf value is NULL)
      * @throws DbfException if there's no field with name fieldName
      */
-    public byte getByte(String fieldName) throws DbfException {
+    public byte getByte(String fieldName)
+            throws DbfException
+    {
         return getNumber(fieldName).byteValue();
     }
 
@@ -125,7 +143,9 @@ public class DbfRow {
      * @return the field value, or 0 (if the dbf value is NULL)
      * @throws DbfException if there's no field with name fieldName
      */
-    public long getLong(String fieldName) throws DbfException {
+    public long getLong(String fieldName)
+            throws DbfException
+    {
         return getNumber(fieldName).longValue();
     }
 
@@ -136,7 +156,9 @@ public class DbfRow {
      * @return the field value, or 0 (if the dbf value is NULL)
      * @throws DbfException if there's no field with name fieldName
      */
-    public float getFloat(String fieldName) throws DbfException {
+    public float getFloat(String fieldName)
+            throws DbfException
+    {
         return getNumber(fieldName).floatValue();
     }
 
@@ -147,7 +169,9 @@ public class DbfRow {
      * @return the field value, or 0 (if the dbf value is NULL)
      * @throws DbfException if there's no field with name fieldName
      */
-    public double getDouble(String fieldName) throws DbfException {
+    public double getDouble(String fieldName)
+            throws DbfException
+    {
         return getNumber(fieldName).doubleValue();
     }
 
@@ -158,16 +182,20 @@ public class DbfRow {
      * @return the field value, or null (if the dbf value is NULL)
      * @throws DbfException if there's no field with name fieldName
      */
-    public Object getObject(String fieldName) throws DbfException {
+    public Object getObject(String fieldName)
+            throws DbfException
+    {
         return get(fieldName);
     }
 
-    private Number getNumber(String fieldName) {
+    private Number getNumber(String fieldName)
+    {
         Number value = (Number) get(fieldName);
         return value == null ? ZERO : value;
     }
 
-    private Object get(String fieldName) {
+    private Object get(String fieldName)
+    {
         int fieldIndex = header.getFieldIndex(fieldName);
         if (fieldIndex < 0) {
             throw new DbfException(format("Field \"%s\" does not exist", fieldName));

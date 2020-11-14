@@ -6,7 +6,8 @@ import com.alibaba.datax.transformer.ComplexTransformer;
  * 单实例.
  * Created by liqiang on 16/3/9.
  */
-public class TransformerInfo {
+public class TransformerInfo
+{
 
     /**
      * function基本信息
@@ -15,28 +16,33 @@ public class TransformerInfo {
     private ClassLoader classLoader;
     private boolean isNative;
 
-
-    public ComplexTransformer getTransformer() {
+    public ComplexTransformer getTransformer()
+    {
         return transformer;
     }
 
-    public ClassLoader getClassLoader() {
-        return classLoader;
-    }
-
-    public boolean isNative() {
-        return isNative;
-    }
-
-    public void setTransformer(ComplexTransformer transformer) {
+    public void setTransformer(ComplexTransformer transformer)
+    {
         this.transformer = transformer;
     }
 
-    public void setClassLoader(ClassLoader classLoader) {
+    public ClassLoader getClassLoader()
+    {
+        return classLoader;
+    }
+
+    public void setClassLoader(ClassLoader classLoader)
+    {
         this.classLoader = classLoader;
     }
 
-    public void setIsNative(boolean isNative) {
+    public boolean isNative()
+    {
+        return isNative;
+    }
+
+    public void setIsNative(boolean isNative)
+    {
         this.isNative = isNative;
     }
 }

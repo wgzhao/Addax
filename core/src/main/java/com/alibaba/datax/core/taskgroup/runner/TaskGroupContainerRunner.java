@@ -1,44 +1,52 @@
 package com.alibaba.datax.core.taskgroup.runner;
 
 import com.alibaba.datax.common.exception.DataXException;
+import com.alibaba.datax.core.meta.State;
 import com.alibaba.datax.core.taskgroup.TaskGroupContainer;
 import com.alibaba.datax.core.util.FrameworkErrorCode;
-import com.alibaba.datax.core.meta.State;
 
-public class TaskGroupContainerRunner implements Runnable {
+public class TaskGroupContainerRunner
+        implements Runnable
+{
 
-	private final TaskGroupContainer taskGroupContainer;
+    private final TaskGroupContainer taskGroupContainer;
 
-	private State state;
+    private State state;
 
-	public TaskGroupContainerRunner(TaskGroupContainer taskGroup) {
-		this.taskGroupContainer = taskGroup;
-		this.state = State.SUCCEEDED;
-	}
+    public TaskGroupContainerRunner(TaskGroupContainer taskGroup)
+    {
+        this.taskGroupContainer = taskGroup;
+        this.state = State.SUCCEEDED;
+    }
 
-	@Override
-	public void run() {
-		try {
+    @Override
+    public void run()
+    {
+        try {
             Thread.currentThread().setName(
                     String.format("taskGroup-%d", this.taskGroupContainer.getTaskGroupId()));
             this.taskGroupContainer.start();
-			this.state = State.SUCCEEDED;
-		} catch (Throwable e) {
-			this.state = State.FAILED;
-			throw DataXException.asDataXException(
-					FrameworkErrorCode.RUNTIME_ERROR, e);
-		}
-	}
+            this.state = State.SUCCEEDED;
+        }
+        catch (Throwable e) {
+            this.state = State.FAILED;
+            throw DataXException.asDataXException(
+                    FrameworkErrorCode.RUNTIME_ERROR, e);
+        }
+    }
 
-	public TaskGroupContainer getTaskGroupContainer() {
-		return taskGroupContainer;
-	}
+    public TaskGroupContainer getTaskGroupContainer()
+    {
+        return taskGroupContainer;
+    }
 
-	public State getState() {
-		return state;
-	}
+    public State getState()
+    {
+        return state;
+    }
 
-	public void setState(State state) {
-		this.state = state;
-	}
+    public void setState(State state)
+    {
+        this.state = state;
+    }
 }

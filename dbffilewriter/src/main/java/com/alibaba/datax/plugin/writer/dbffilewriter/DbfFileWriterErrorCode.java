@@ -5,8 +5,10 @@ import com.alibaba.datax.common.spi.ErrorCode;
 /**
  * Created by haiwei.luo on 14-9-17.
  */
-public enum DbfFileWriterErrorCode implements ErrorCode {
-    
+public enum DbfFileWriterErrorCode
+        implements ErrorCode
+{
+
     CONFIG_INVALID_EXCEPTION("DbfFileWriter-00", "您的参数配置错误."),
     REQUIRED_VALUE("DbfFileWriter-01", "您缺失了必须填写的参数值."),
     ILLEGAL_VALUE("DbfFileWriter-02", "您填写的参数值不合法."),
@@ -17,25 +19,28 @@ public enum DbfFileWriterErrorCode implements ErrorCode {
     private final String code;
     private final String description;
 
-    DbfFileWriterErrorCode(String code, String description) {
+    DbfFileWriterErrorCode(String code, String description)
+    {
         this.code = code;
         this.description = description;
     }
 
     @Override
-    public String getCode() {
+    public String getCode()
+    {
         return this.code;
     }
 
     @Override
-    public String getDescription() {
+    public String getDescription()
+    {
         return this.description;
     }
 
     @Override
-    public String toString() {
+    public String toString()
+    {
         return String.format("Code:[%s], Description:[%s].", this.code,
                 this.description);
     }
-
 }

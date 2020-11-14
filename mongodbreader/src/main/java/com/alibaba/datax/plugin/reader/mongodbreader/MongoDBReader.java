@@ -1,10 +1,5 @@
 package com.alibaba.datax.plugin.reader.mongodbreader;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Date;
-import java.util.List;
-
 import com.alibaba.datax.common.element.BoolColumn;
 import com.alibaba.datax.common.element.DateColumn;
 import com.alibaba.datax.common.element.DoubleColumn;
@@ -19,7 +14,6 @@ import com.alibaba.datax.plugin.reader.mongodbreader.util.MongoUtil;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
-
 import com.mongodb.MongoClient;
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoCursor;
@@ -27,50 +21,65 @@ import com.mongodb.client.MongoDatabase;
 import org.bson.Document;
 import org.bson.types.ObjectId;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Date;
+import java.util.List;
+
 /**
  * Created by jianying.wcj on 2015/3/19 0019.
  * Modified by mingyan.zc on 2016/6/13.
  * Modified by mingyan.zc on 2017/7/5.
  */
-public class MongoDBReader extends Reader {
+public class MongoDBReader
+        extends Reader
+{
 
-    public static class Job extends Reader.Job {
+    public static class Job
+            extends Reader.Job
+    {
 
         private Configuration originalConfig = null;
 
         private MongoClient mongoClient;
 
-        private boolean isNullOrEmpty(String obj) {
-            return  obj == null || obj.isEmpty();
+        private boolean isNullOrEmpty(String obj)
+        {
+            return obj == null || obj.isEmpty();
         }
 
         @Override
-        public List<Configuration> split(int adviceNumber) {
-            return CollectionSplitUtil.doSplit(originalConfig,adviceNumber,mongoClient);
+        public List<Configuration> split(int adviceNumber)
+        {
+            return CollectionSplitUtil.doSplit(originalConfig, adviceNumber, mongoClient);
         }
 
         @Override
-        public void init() {
+        public void init()
+        {
             this.originalConfig = super.getPluginJobConf();
             String userName = originalConfig.getString(KeyConstant.MONGO_USER_NAME, originalConfig.getString(KeyConstant.MONGO_USERNAME));
             String password = originalConfig.getString(KeyConstant.MONGO_USER_PASSWORD, originalConfig.getString(KeyConstant.MONGO_PASSWORD));
-            String database =  originalConfig.getString(KeyConstant.MONGO_DB_NAME, originalConfig.getString(KeyConstant.MONGO_DATABASE));
-            String authDb =  originalConfig.getString(KeyConstant.MONGO_AUTHDB, database);
-            if(!isNullOrEmpty((userName)) && !isNullOrEmpty((password))) {
-                this.mongoClient = MongoUtil.initCredentialMongoClient(originalConfig, userName, password,authDb);
-            } else {
+            String database = originalConfig.getString(KeyConstant.MONGO_DB_NAME, originalConfig.getString(KeyConstant.MONGO_DATABASE));
+            String authDb = originalConfig.getString(KeyConstant.MONGO_AUTHDB, database);
+            if (!isNullOrEmpty((userName)) && !isNullOrEmpty((password))) {
+                this.mongoClient = MongoUtil.initCredentialMongoClient(originalConfig, userName, password, authDb);
+            }
+            else {
                 this.mongoClient = MongoUtil.initMongoClient(originalConfig);
             }
         }
 
         @Override
-        public void destroy() {
+        public void destroy()
+        {
 
         }
     }
 
-
-    public static class Task extends Reader.Task {
+    public static class Task
+            extends Reader.Task
+    {
 
         private MongoClient mongoClient;
 
@@ -84,18 +93,20 @@ public class MongoDBReader extends Reader {
         private Object upperBound = null;
         private boolean isObjectId = true;
 
-        private boolean isNullOrEmpty(String obj) {
-            return  obj == null || obj.isEmpty();
+        private boolean isNullOrEmpty(String obj)
+        {
+            return obj == null || obj.isEmpty();
         }
-        
-        @Override
-        public void startRead(RecordSender recordSender) {
 
-            if(lowerBound== null || upperBound == null ||
-                mongoClient == null || database == null ||
-                collection == null  || mongodbColumnMeta == null) {
+        @Override
+        public void startRead(RecordSender recordSender)
+        {
+
+            if (lowerBound == null || upperBound == null ||
+                    mongoClient == null || database == null ||
+                    collection == null || mongodbColumnMeta == null) {
                 throw DataXException.asDataXException(MongoDBReaderErrorCode.ILLEGAL_VALUE,
-                    MongoDBReaderErrorCode.ILLEGAL_VALUE.getDescription());
+                        MongoDBReaderErrorCode.ILLEGAL_VALUE.getDescription());
             }
             MongoDatabase db = mongoClient.getDatabase(database);
             MongoCollection<Document> col = db.getCollection(this.collection);
@@ -106,12 +117,14 @@ public class MongoDBReader extends Reader {
                 if (!upperBound.equals("max")) {
                     filter.append(KeyConstant.MONGO_PRIMARY_ID, new Document("$lt", isObjectId ? new ObjectId(upperBound.toString()) : upperBound));
                 }
-            } else if (upperBound.equals("max")) {
+            }
+            else if (upperBound.equals("max")) {
                 filter.append(KeyConstant.MONGO_PRIMARY_ID, new Document("$gte", isObjectId ? new ObjectId(lowerBound.toString()) : lowerBound));
-            } else {
+            }
+            else {
                 filter.append(KeyConstant.MONGO_PRIMARY_ID, new Document("$gte", isObjectId ? new ObjectId(lowerBound.toString()) : lowerBound).append("$lt", isObjectId ? new ObjectId(upperBound.toString()) : upperBound));
             }
-            if(!isNullOrEmpty((query))) {
+            if (!isNullOrEmpty((query))) {
                 Document queryFilter = Document.parse(query);
                 filter = new Document("$and", Arrays.asList(filter, queryFilter));
             }
@@ -142,36 +155,46 @@ public class MongoDBReader extends Reader {
                     if (tempCol == null) {
                         //continue; 这个不能直接continue会导致record到目的端错位
                         record.addColumn(new StringColumn(null));
-                    } else if (tempCol instanceof Double) {
+                    }
+                    else if (tempCol instanceof Double) {
                         //TODO deal with Double.isNaN()
                         record.addColumn(new DoubleColumn((Double) tempCol));
-                    } else if (tempCol instanceof Boolean) {
+                    }
+                    else if (tempCol instanceof Boolean) {
                         record.addColumn(new BoolColumn((Boolean) tempCol));
-                    } else if (tempCol instanceof Date) {
+                    }
+                    else if (tempCol instanceof Date) {
                         record.addColumn(new DateColumn((Date) tempCol));
-                    } else if (tempCol instanceof Integer) {
+                    }
+                    else if (tempCol instanceof Integer) {
                         record.addColumn(new LongColumn((Integer) tempCol));
-                    } else if (tempCol instanceof Long) {
+                    }
+                    else if (tempCol instanceof Long) {
                         record.addColumn(new LongColumn((Long) tempCol));
-                    } else  if (tempCol instanceof Document) {
+                    }
+                    else if (tempCol instanceof Document) {
                         if (KeyConstant.isJsonType(column.getString(KeyConstant.COLUMN_TYPE))) {
                             record.addColumn(new StringColumn(((Document) tempCol).toJson()));
-                        } else {
+                        }
+                        else {
                             record.addColumn(new StringColumn(tempCol.toString()));
                         }
-                    } else {
+                    }
+                    else {
                         if (KeyConstant.isArrayType(column.getString(KeyConstant.COLUMN_TYPE))) {
                             String splitter = column.getString(KeyConstant.COLUMN_SPLITTER);
                             if (isNullOrEmpty((splitter))) {
                                 throw DataXException.asDataXException(MongoDBReaderErrorCode.ILLEGAL_VALUE,
                                         MongoDBReaderErrorCode.ILLEGAL_VALUE.getDescription());
-                            } else {
+                            }
+                            else {
                                 ArrayList<String> array = (ArrayList) tempCol;
                                 //String tempArrayStr = Joiner.on(splitter).join(array);
                                 String tempArrayStr = String.join(splitter, array);
                                 record.addColumn(new StringColumn(tempArrayStr));
                             }
-                        } else {
+                        }
+                        else {
                             record.addColumn(new StringColumn(tempCol.toString()));
                         }
                     }
@@ -181,15 +204,17 @@ public class MongoDBReader extends Reader {
         }
 
         @Override
-        public void init() {
+        public void init()
+        {
             Configuration readerSliceConfig = super.getPluginJobConf();
             String userName = readerSliceConfig.getString(KeyConstant.MONGO_USER_NAME, readerSliceConfig.getString(KeyConstant.MONGO_USERNAME));
             String password = readerSliceConfig.getString(KeyConstant.MONGO_USER_PASSWORD, readerSliceConfig.getString(KeyConstant.MONGO_PASSWORD));
             this.database = readerSliceConfig.getString(KeyConstant.MONGO_DB_NAME, readerSliceConfig.getString(KeyConstant.MONGO_DATABASE));
             String authDb = readerSliceConfig.getString(KeyConstant.MONGO_AUTHDB, this.database);
-            if(!isNullOrEmpty((userName)) && !isNullOrEmpty((password))) {
+            if (!isNullOrEmpty((userName)) && !isNullOrEmpty((password))) {
                 mongoClient = MongoUtil.initCredentialMongoClient(readerSliceConfig, userName, password, authDb);
-            } else {
+            }
+            else {
                 mongoClient = MongoUtil.initMongoClient(readerSliceConfig);
             }
 
@@ -202,9 +227,9 @@ public class MongoDBReader extends Reader {
         }
 
         @Override
-        public void destroy() {
+        public void destroy()
+        {
 
         }
-
     }
 }

@@ -4,12 +4,16 @@ import java.io.Closeable;
 import java.io.IOException;
 import java.util.List;
 
-public interface UnstructuredWriter extends Closeable {
+public interface UnstructuredWriter
+        extends Closeable
+{
 
-    void writeOneRecord(List<String> splitedRows) throws IOException;
+    void writeOneRecord(List<String> splitedRows)
+            throws IOException;
 
-    void flush() throws IOException;
+    void flush()
+            throws IOException;
 
-    void close() throws IOException;
-
+    void close()
+            throws IOException;
 }

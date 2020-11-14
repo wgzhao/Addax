@@ -18,9 +18,10 @@ package com.alibaba.datax.common.plugin;
 
 import com.alibaba.datax.common.element.Record;
 
-public interface RecordReceiver {
+public interface RecordReceiver
+{
 
-	Record getFromReader();
+    Record getFromReader();
 
-	void shutdown();
+    void shutdown();
 }

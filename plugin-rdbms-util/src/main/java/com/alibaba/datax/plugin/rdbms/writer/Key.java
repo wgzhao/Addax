@@ -1,6 +1,7 @@
 package com.alibaba.datax.plugin.rdbms.writer;
 
-public final class Key {
+public final class Key
+{
     public final static String JDBC_URL = "jdbcUrl";
 
     public final static String USERNAME = "username";
@@ -27,6 +28,6 @@ public final class Key {
     public final static String BATCH_BYTE_SIZE = "batchByteSize";
 
     public final static String EMPTY_AS_NULL = "emptyAsNull";
-    
+
     public final static String DRYRUN = "dryRun";
 }

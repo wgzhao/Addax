@@ -2,7 +2,9 @@ package com.alibaba.datax.plugin.writer.hbase11xsqlwriter;
 
 import com.alibaba.datax.common.spi.ErrorCode;
 
-public enum HbaseSQLWriterErrorCode implements ErrorCode {
+public enum HbaseSQLWriterErrorCode
+        implements ErrorCode
+{
     REQUIRED_VALUE("Hbasewriter-00", "您缺失了必须填写的参数值."),
     ILLEGAL_VALUE("Hbasewriter-01", "您填写的参数值不合法."),
     GET_HBASE_CONNECTION_ERROR("Hbasewriter-02", "获取Hbase连接时出错."),
@@ -18,23 +20,27 @@ public enum HbaseSQLWriterErrorCode implements ErrorCode {
     private final String code;
     private final String description;
 
-    HbaseSQLWriterErrorCode(String code, String description) {
+    HbaseSQLWriterErrorCode(String code, String description)
+    {
         this.code = code;
         this.description = description;
     }
 
     @Override
-    public String getCode() {
+    public String getCode()
+    {
         return this.code;
     }
 
     @Override
-    public String getDescription() {
+    public String getDescription()
+    {
         return this.description;
     }
 
     @Override
-    public String toString() {
+    public String toString()
+    {
         return String.format("Code:[%s], Description:[%s].", this.code, this.description);
     }
 }

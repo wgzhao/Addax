@@ -6,17 +6,21 @@ import org.apache.hadoop.hbase.util.Bytes;
 
 import java.util.Map;
 
-public class MultiVersionFixedColumnTask extends MultiVersionTask {
+public class MultiVersionFixedColumnTask
+        extends MultiVersionTask
+{
 
-    public MultiVersionFixedColumnTask(Configuration configuration) {
+    public MultiVersionFixedColumnTask(Configuration configuration)
+    {
         super(configuration);
     }
 
     @Override
-    public void initScan(Scan scan) {
+    public void initScan(Scan scan)
+    {
         for (Map<String, String> aColumn : column) {
             String columnName = aColumn.get(Key.NAME);
-            if(!Hbase11xHelper.isRowkeyColumn(columnName)){
+            if (!Hbase11xHelper.isRowkeyColumn(columnName)) {
                 String[] cfAndQualifier = columnName.split(":");
                 scan.addColumn(Bytes.toBytes(cfAndQualifier[0].trim()), Bytes.toBytes(cfAndQualifier[1].trim()));
             }

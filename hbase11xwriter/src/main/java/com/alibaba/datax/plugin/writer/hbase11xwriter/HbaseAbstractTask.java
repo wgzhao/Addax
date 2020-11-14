@@ -1,7 +1,6 @@
 package com.alibaba.datax.plugin.writer.hbase11xwriter;
 
 import com.alibaba.datax.common.element.Column;
-import com.alibaba.datax.common.element.Record;
 import com.alibaba.datax.common.exception.DataXException;
 import com.alibaba.datax.common.plugin.RecordReceiver;
 import com.alibaba.datax.common.plugin.TaskPluginCollector;
@@ -17,7 +16,8 @@ import java.io.IOException;
 import java.nio.charset.Charset;
 import java.util.List;
 
-public abstract class HbaseAbstractTask {
+public abstract class HbaseAbstractTask
+{
     private final static Logger LOG = LoggerFactory.getLogger(HbaseAbstractTask.class);
 
     public NullModeType nullMode = null;
@@ -26,68 +26,73 @@ public abstract class HbaseAbstractTask {
     public List<Configuration> rowkeyColumn;
     public Configuration versionColumn;
 
-
     //public Table htable;
     public String encoding;
     public Boolean walFlag;
     public BufferedMutator bufferedMutator;
 
-
-    public HbaseAbstractTask(com.alibaba.datax.common.util.Configuration configuration) {
+    public HbaseAbstractTask(com.alibaba.datax.common.util.Configuration configuration)
+    {
         //this.htable = Hbase11xHelper.getTable(configuration);
         this.bufferedMutator = Hbase11xHelper.getBufferedMutator(configuration);
         this.columns = configuration.getListConfiguration(Key.COLUMN);
         this.rowkeyColumn = configuration.getListConfiguration(Key.ROWKEY_COLUMN);
         this.versionColumn = configuration.getConfiguration(Key.VERSION_COLUMN);
-        this.encoding = configuration.getString(Key.ENCODING,Constant.DEFAULT_ENCODING);
-        this.nullMode = NullModeType.getByTypeName(configuration.getString(Key.NULL_MODE,Constant.DEFAULT_NULL_MODE));
+        this.encoding = configuration.getString(Key.ENCODING, Constant.DEFAULT_ENCODING);
+        this.nullMode = NullModeType.getByTypeName(configuration.getString(Key.NULL_MODE, Constant.DEFAULT_NULL_MODE));
         this.walFlag = configuration.getBool(Key.WAL_FLAG, false);
     }
 
-    public void startWriter(RecordReceiver lineReceiver, TaskPluginCollector taskPluginCollector){
+    public void startWriter(RecordReceiver lineReceiver, TaskPluginCollector taskPluginCollector)
+    {
         com.alibaba.datax.common.element.Record record;
         try {
             while ((record = lineReceiver.getFromReader()) != null) {
                 Put put;
                 try {
                     put = convertRecordToPut(record);
-                } catch (Exception e) {
+                }
+                catch (Exception e) {
                     taskPluginCollector.collectDirtyRecord(record, e);
                     continue;
                 }
                 try {
                     //this.htable.put(put);
                     this.bufferedMutator.mutate(put);
-                } catch (IllegalArgumentException e) {
-                    if(e.getMessage().equals("No columns to insert") && nullMode.equals(NullModeType.Skip)){
+                }
+                catch (IllegalArgumentException e) {
+                    if (e.getMessage().equals("No columns to insert") && nullMode.equals(NullModeType.Skip)) {
                         LOG.info(String.format("record is empty, 您配置nullMode为[skip],将会忽略这条记录,record[%s]", record.toString()));
                         continue;
-                    }else {
+                    }
+                    else {
                         taskPluginCollector.collectDirtyRecord(record, e);
                         continue;
                     }
                 }
             }
-        }catch (IOException e){
-            throw DataXException.asDataXException(Hbase11xWriterErrorCode.PUT_HBASE_ERROR,e);
-        }finally {
+        }
+        catch (IOException e) {
+            throw DataXException.asDataXException(Hbase11xWriterErrorCode.PUT_HBASE_ERROR, e);
+        }
+        finally {
             //Hbase11xHelper.closeTable(this.htable);
             Hbase11xHelper.closeBufferedMutator(this.bufferedMutator);
         }
     }
 
+    public abstract Put convertRecordToPut(com.alibaba.datax.common.element.Record record);
 
-    public abstract  Put convertRecordToPut(com.alibaba.datax.common.element.Record record);
-
-    public void close()  {
+    public void close()
+    {
         //Hbase11xHelper.closeTable(this);
         Hbase11xHelper.closeBufferedMutator(this.bufferedMutator);
     }
 
-
-    public byte[] getColumnByte(ColumnType columnType, Column column){
+    public byte[] getColumnByte(ColumnType columnType, Column column)
+    {
         byte[] bytes;
-        if(column.getRawData() != null){
+        if (column.getRawData() != null) {
             switch (columnType) {
                 case INT:
                     bytes = Bytes.toBytes(column.asLong().intValue());
@@ -108,15 +113,16 @@ public abstract class HbaseAbstractTask {
                     bytes = Bytes.toBytes(column.asBoolean());
                     break;
                 case STRING:
-                    bytes = this.getValueByte(columnType,column.asString());
+                    bytes = this.getValueByte(columnType, column.asString());
                     break;
                 default:
                     throw DataXException.asDataXException(Hbase11xWriterErrorCode.ILLEGAL_VALUE, "HbaseWriter列不支持您配置的列类型:" + columnType);
             }
-        }else{
-            switch (nullMode){
+        }
+        else {
+            switch (nullMode) {
                 case Skip:
-                    bytes =  null;
+                    bytes = null;
                     break;
                 case Empty:
                     bytes = HConstants.EMPTY_BYTE_ARRAY;
@@ -125,12 +131,13 @@ public abstract class HbaseAbstractTask {
                     throw DataXException.asDataXException(Hbase11xWriterErrorCode.ILLEGAL_VALUE, "HbaseWriter nullMode不支持您配置的类型,只支持skip或者empty");
             }
         }
-        return  bytes;
+        return bytes;
     }
 
-    public byte[] getValueByte(ColumnType columnType, String value){
+    public byte[] getValueByte(ColumnType columnType, String value)
+    {
         byte[] bytes;
-        if(value != null){
+        if (value != null) {
             switch (columnType) {
                 case INT:
                     bytes = Bytes.toBytes(Integer.parseInt(value));
@@ -156,9 +163,10 @@ public abstract class HbaseAbstractTask {
                 default:
                     throw DataXException.asDataXException(Hbase11xWriterErrorCode.ILLEGAL_VALUE, "HbaseWriter列不支持您配置的列类型:" + columnType);
             }
-        }else{
+        }
+        else {
             bytes = HConstants.EMPTY_BYTE_ARRAY;
         }
-        return  bytes;
+        return bytes;
     }
 }

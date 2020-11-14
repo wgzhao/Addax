@@ -1,6 +1,7 @@
 package com.alibaba.datax.plugin.writer.hbase11xwriter;
 
-public final class Key {
+public final class Key
+{
 
     public final static String HBASE_CONFIG = "hbaseConfig";
 
@@ -14,7 +15,6 @@ public final class Key {
      * multiVersion
      */
     public final static String MODE = "mode";
-
 
     public final static String ROWKEY_COLUMN = "rowkeyColumn";
 
@@ -40,14 +40,13 @@ public final class Key {
     /**
      * 默认为 EMPTY_BYTES
      */
-    public static  final String NULL_MODE = "nullMode";
+    public static final String NULL_MODE = "nullMode";
 
-    public static  final String TRUNCATE = "truncate";
+    public static final String TRUNCATE = "truncate";
 
-    public static  final String AUTO_FLUSH = "autoFlush";
+    public static final String AUTO_FLUSH = "autoFlush";
 
-    public static  final String WAL_FLAG = "walFlag";
+    public static final String WAL_FLAG = "walFlag";
 
-    public static  final String WRITE_BUFFER_SIZE = "writeBufferSize";
-
+    public static final String WRITE_BUFFER_SIZE = "writeBufferSize";
 }

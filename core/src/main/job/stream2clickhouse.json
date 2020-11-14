@@ -1,56 +1,60 @@
 {
-    "job": {
-        "setting": {
-            "speed": {
-                "channel": 3
-            }
+  "job": {
+    "setting": {
+      "speed": {
+        "channel": 3
+      }
+    },
+    "content": [
+      {
+        "writer": {
+          "name": "clickhousewriter",
+          "parameter": {
+            "username": "default",
+            "password": "",
+            "passflag": "false",
+            "column": [
+              "*"
+            ],
+            "connection": [
+              {
+                "table": [
+                  "test_tbl"
+                ],
+                "jdbcUrl": "jdbc:clickhouse://127.0.0.1:8123/default"
+              }
+            ]
+          }
         },
-        "content": [
-            {
-                "writer": {
-                    "name": "clickhousewriter",
-                    "parameter": {
-                        "username": "default",
-                        "password": "",
-                        "passflag": "false",
-                        "column": [ "*" ],
-                        "connection": [
-                            {
-                                "table": [ "test_tbl"],
-                                "jdbcUrl": "jdbc:clickhouse://127.0.0.1:8123/default"
-                            }
-                        ]
-                    }
-                },
-                "reader": {
-                    "name": "streamreader",
-                    "parameter": {
-                        "column": [
-                            {
-                                "value": "DataX",
-                                "type": "string"
-                            },
-                            {
-                                "value": 19890604,
-                                "type": "long"
-                            },
-                            {
-                                "value": "1989-06-04 00:00:00",
-                                "type": "date"
-                            },
-                            {
-                                "value": true,
-                                "type": "bool"
-                            },
-                            {
-                                "value": "test",
-                                "type": "bytes"
-                            }
-                        ],
-                        "sliceRecordCount": 1000
-                    }
-                }
-            }
-        ]
-    }
+        "reader": {
+          "name": "streamreader",
+          "parameter": {
+            "column": [
+              {
+                "value": "DataX",
+                "type": "string"
+              },
+              {
+                "value": 19890604,
+                "type": "long"
+              },
+              {
+                "value": "1989-06-04 00:00:00",
+                "type": "date"
+              },
+              {
+                "value": true,
+                "type": "bool"
+              },
+              {
+                "value": "test",
+                "type": "bytes"
+              }
+            ],
+            "sliceRecordCount": 1000
+          }
+        }
+      }
+    ]
+  }
 }

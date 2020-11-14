@@ -1,6 +1,11 @@
 package com.alibaba.datax.plugin.reader.hbase11xreader;
 
-import com.alibaba.datax.common.element.*;
+import com.alibaba.datax.common.element.BoolColumn;
+import com.alibaba.datax.common.element.Column;
+import com.alibaba.datax.common.element.DateColumn;
+import com.alibaba.datax.common.element.DoubleColumn;
+import com.alibaba.datax.common.element.LongColumn;
+import com.alibaba.datax.common.element.StringColumn;
 import com.alibaba.datax.common.exception.DataXException;
 import org.apache.commons.lang.ArrayUtils;
 import org.apache.commons.lang3.time.DateUtils;
@@ -14,7 +19,8 @@ import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 
-public abstract class HbaseAbstractTask {
+public abstract class HbaseAbstractTask
+{
     private final static Logger LOG = LoggerFactory.getLogger(HbaseAbstractTask.class);
 
     private final byte[] startKey;
@@ -23,31 +29,33 @@ public abstract class HbaseAbstractTask {
     protected Table htable;
     protected String encoding;
     protected int scanCacheSize;
-    protected int  scanBatchSize;
+    protected int scanBatchSize;
 
     protected Result lastResult = null;
     protected Scan scan;
     protected ResultScanner resultScanner;
 
-
-    public HbaseAbstractTask(com.alibaba.datax.common.util.Configuration configuration) {
+    public HbaseAbstractTask(com.alibaba.datax.common.util.Configuration configuration)
+    {
 
         this.htable = Hbase11xHelper.getTable(configuration);
 
-        this.encoding = configuration.getString(Key.ENCODING,Constant.DEFAULT_ENCODING);
+        this.encoding = configuration.getString(Key.ENCODING, Constant.DEFAULT_ENCODING);
         this.startKey = Hbase11xHelper.convertInnerStartRowkey(configuration);
-        this.endKey =  Hbase11xHelper.convertInnerEndRowkey(configuration);
-        this.scanCacheSize = configuration.getInt(Key.SCAN_CACHE_SIZE,Constant.DEFAULT_SCAN_CACHE_SIZE);
-        this.scanBatchSize = configuration.getInt(Key.SCAN_BATCH_SIZE,Constant.DEFAULT_SCAN_BATCH_SIZE);
+        this.endKey = Hbase11xHelper.convertInnerEndRowkey(configuration);
+        this.scanCacheSize = configuration.getInt(Key.SCAN_CACHE_SIZE, Constant.DEFAULT_SCAN_CACHE_SIZE);
+        this.scanBatchSize = configuration.getInt(Key.SCAN_BATCH_SIZE, Constant.DEFAULT_SCAN_BATCH_SIZE);
     }
 
-    public abstract boolean fetchLine(com.alibaba.datax.common.element.Record record) throws Exception;
+    public abstract boolean fetchLine(com.alibaba.datax.common.element.Record record)
+            throws Exception;
 
     //不同模式设置不同,如多版本模式需要设置版本
     public abstract void initScan(Scan scan);
 
-
-    public void prepare() throws Exception {
+    public void prepare()
+            throws Exception
+    {
         this.scan = new Scan();
         this.scan.setSmall(false);
         this.scan.withStartRow(startKey);
@@ -64,16 +72,20 @@ public abstract class HbaseAbstractTask {
         this.resultScanner = this.htable.getScanner(this.scan);
     }
 
-    public void close()  {
+    public void close()
+    {
         Hbase11xHelper.closeResultScanner(this.resultScanner);
         Hbase11xHelper.closeTable(this.htable);
     }
 
-    protected Result getNextHbaseRow() throws IOException {
+    protected Result getNextHbaseRow()
+            throws IOException
+    {
         Result result;
         try {
             result = resultScanner.next();
-        } catch (IOException e) {
+        }
+        catch (IOException e) {
             if (lastResult != null) {
                 this.scan.withStopRow(lastResult.getRow());
             }
@@ -88,7 +100,9 @@ public abstract class HbaseAbstractTask {
         return result;
     }
 
-    public Column convertBytesToAssignType(ColumnType columnType, byte[] byteArray,String dateformat) throws Exception {
+    public Column convertBytesToAssignType(ColumnType columnType, byte[] byteArray, String dateformat)
+            throws Exception
+    {
         Column column;
         switch (columnType) {
             case BOOLEAN:
@@ -125,7 +139,9 @@ public abstract class HbaseAbstractTask {
         return column;
     }
 
-    public Column convertValueToAssignType(ColumnType columnType, String constantValue,String dateformat) throws Exception {
+    public Column convertValueToAssignType(ColumnType columnType, String constantValue, String dateformat)
+            throws Exception
+    {
         Column column;
         switch (columnType) {
             case BOOLEAN:

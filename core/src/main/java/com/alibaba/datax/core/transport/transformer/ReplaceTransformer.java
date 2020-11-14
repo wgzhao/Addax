@@ -12,13 +12,17 @@ import java.util.Arrays;
  * no comments.
  * Created by liqiang on 16/3/4.
  */
-public class ReplaceTransformer extends Transformer {
-    public ReplaceTransformer() {
+public class ReplaceTransformer
+        extends Transformer
+{
+    public ReplaceTransformer()
+    {
         setTransformerName("dx_replace");
     }
 
     @Override
-    public Record evaluate(com.alibaba.datax.common.element.Record record, Object... paras) {
+    public Record evaluate(com.alibaba.datax.common.element.Record record, Object... paras)
+    {
 
         int columnIndex;
         int startIndex;
@@ -33,7 +37,8 @@ public class ReplaceTransformer extends Transformer {
             startIndex = Integer.parseInt((String) paras[1]);
             length = Integer.parseInt((String) paras[2]);
             replaceString = (String) paras[3];
-        } catch (Exception e) {
+        }
+        catch (Exception e) {
             throw DataXException.asDataXException(TransformerErrorCode.TRANSFORMER_ILLEGAL_PARAMETER, "paras:" + Arrays.asList(paras).toString() + " => " + e.getMessage());
         }
 
@@ -43,8 +48,8 @@ public class ReplaceTransformer extends Transformer {
             String oriValue = column.asString();
 
             //如果字段为空，跳过replace处理
-            if(oriValue == null){
-                return  record;
+            if (oriValue == null) {
+                return record;
             }
             String newValue;
             if (startIndex > oriValue.length()) {
@@ -52,14 +57,15 @@ public class ReplaceTransformer extends Transformer {
             }
             if (startIndex + length >= oriValue.length()) {
                 newValue = oriValue.substring(0, startIndex) + replaceString;
-            } else {
+            }
+            else {
                 newValue = oriValue.substring(0, startIndex) + replaceString + oriValue.substring(startIndex + length);
             }
 
             record.setColumn(columnIndex, new StringColumn(newValue));
-
-        } catch (Exception e) {
-            throw DataXException.asDataXException(TransformerErrorCode.TRANSFORMER_RUN_EXCEPTION, e.getMessage(),e);
+        }
+        catch (Exception e) {
+            throw DataXException.asDataXException(TransformerErrorCode.TRANSFORMER_RUN_EXCEPTION, e.getMessage(), e);
         }
         return record;
     }

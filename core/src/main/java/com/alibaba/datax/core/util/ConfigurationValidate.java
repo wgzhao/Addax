@@ -5,14 +5,19 @@ import org.apache.commons.lang.Validate;
 
 /**
  * Created by jingxing on 14-9-16.
- *
+ * <p>
  * 对配置文件做整体检查
  */
-public class ConfigurationValidate {
+public class ConfigurationValidate
+{
 
-    private ConfigurationValidate() {};
-    public static void doValidate(Configuration allConfig) {
-        Validate.isTrue(allConfig!=null, "");
+    private ConfigurationValidate() {}
+
+    ;
+
+    public static void doValidate(Configuration allConfig)
+    {
+        Validate.isTrue(allConfig != null, "");
 
         coreValidate(allConfig);
 
@@ -21,12 +26,15 @@ public class ConfigurationValidate {
         jobValidate(allConfig);
     }
 
-    private static void coreValidate(Configuration allconfig) {
+    private static void coreValidate(Configuration allconfig)
+    {
     }
 
-    private static void pluginValidate(Configuration allConfig) {
+    private static void pluginValidate(Configuration allConfig)
+    {
     }
 
-    private static void jobValidate(Configuration allConfig) {
+    private static void jobValidate(Configuration allConfig)
+    {
     }
 }

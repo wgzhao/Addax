@@ -18,14 +18,17 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-public final class ConfigParser {
+public final class ConfigParser
+{
     private static final Logger LOG = LoggerFactory.getLogger(ConfigParser.class);
 
     private ConfigParser() {}
+
     /**
      * 指定Job配置路径，ConfigParser会解析Job、Plugin、Core全部信息，并以Configuration返回
      */
-    public static Configuration parse(final String jobPath) {
+    public static Configuration parse(final String jobPath)
+    {
         Configuration configuration = ConfigParser.parseJobConfig(jobPath);
 
         configuration.merge(
@@ -47,20 +50,22 @@ public final class ConfigParser {
         pluginList.add(readerPluginName);
         pluginList.add(writerPluginName);
 
-        if(StringUtils.isNotEmpty(preHandlerName)) {
+        if (StringUtils.isNotEmpty(preHandlerName)) {
             pluginList.add(preHandlerName);
         }
-        if(StringUtils.isNotEmpty(postHandlerName)) {
+        if (StringUtils.isNotEmpty(postHandlerName)) {
             pluginList.add(postHandlerName);
         }
         try {
             configuration.merge(parsePluginConfig(new ArrayList<>(pluginList)), false);
-        }catch (Exception e){
+        }
+        catch (Exception e) {
             //吞掉异常，保持log干净。这里message足够。
             LOG.warn(String.format("插件[%s,%s]加载失败，1s后重试... Exception:%s ", readerPluginName, writerPluginName, e.getMessage()));
             try {
                 Thread.sleep(1000);
-            } catch (InterruptedException e1) {
+            }
+            catch (InterruptedException e1) {
                 //
             }
             configuration.merge(parsePluginConfig(new ArrayList<>(pluginList)), false);
@@ -69,22 +74,24 @@ public final class ConfigParser {
         return configuration;
     }
 
-    private static Configuration parseCoreConfig(final String path) {
+    private static Configuration parseCoreConfig(final String path)
+    {
         return Configuration.from(new File(path));
     }
 
-    public static Configuration parseJobConfig(final String path) {
+    public static Configuration parseJobConfig(final String path)
+    {
         String jobContent = getJobContent(path);
         Configuration config = Configuration.from(jobContent);
 
         return SecretUtil.decryptSecretKey(config);
     }
 
-    private static String getJobContent(String jobResource) {
+    private static String getJobContent(String jobResource)
+    {
         String jobContent;
 
         boolean isJobResourceFromHttp = jobResource.trim().toLowerCase().startsWith("http");
-
 
         if (isJobResourceFromHttp) {
             //设置httpclient的 HTTP_TIMEOUT_INMILLIONSECONDS
@@ -100,14 +107,17 @@ public final class ConfigParser {
                 httpGet.setURI(url.toURI());
 
                 jobContent = httpClientUtil.executeAndGetWithFailedRetry(httpGet, 1, 1000L);
-            } catch (Exception e) {
+            }
+            catch (Exception e) {
                 throw DataXException.asDataXException(FrameworkErrorCode.CONFIG_ERROR, "获取作业配置信息失败:" + jobResource, e);
             }
-        } else {
+        }
+        else {
             // jobResource 是本地文件绝对路径
             try {
                 jobContent = FileUtils.readFileToString(new File(jobResource), StandardCharsets.UTF_8);
-            } catch (IOException e) {
+            }
+            catch (IOException e) {
                 throw DataXException.asDataXException(FrameworkErrorCode.CONFIG_ERROR, "获取作业配置信息失败:" + jobResource, e);
             }
         }
@@ -118,7 +128,8 @@ public final class ConfigParser {
         return jobContent;
     }
 
-    public static Configuration parsePluginConfig(List<String> wantPluginNames) {
+    public static Configuration parsePluginConfig(List<String> wantPluginNames)
+    {
         Configuration configuration = Configuration.newDefault();
 
         Set<String> replicaCheckPluginSet = new HashSet<>();
@@ -126,7 +137,7 @@ public final class ConfigParser {
         for (final String each : ConfigParser
                 .getDirAsList(CoreConstant.DATAX_PLUGIN_READER_HOME)) {
             Configuration eachReaderConfig = ConfigParser.parseOnePluginConfig(each, "reader", replicaCheckPluginSet, wantPluginNames);
-            if(eachReaderConfig!=null) {
+            if (eachReaderConfig != null) {
                 configuration.merge(eachReaderConfig, true);
                 complete += 1;
             }
@@ -135,7 +146,7 @@ public final class ConfigParser {
         for (final String each : ConfigParser
                 .getDirAsList(CoreConstant.DATAX_PLUGIN_WRITER_HOME)) {
             Configuration eachWriterConfig = ConfigParser.parseOnePluginConfig(each, "writer", replicaCheckPluginSet, wantPluginNames);
-            if(eachWriterConfig!=null) {
+            if (eachWriterConfig != null) {
                 configuration.merge(eachWriterConfig, true);
                 complete += 1;
             }
@@ -148,18 +159,19 @@ public final class ConfigParser {
         return configuration;
     }
 
-
     public static Configuration parseOnePluginConfig(final String path,
-                                                     final String type,
-                                                     Set<String> pluginSet, List<String> wantPluginNames) {
+            final String type,
+            Set<String> pluginSet, List<String> wantPluginNames)
+    {
         String filePath = path + File.separator + "plugin.json";
         Configuration configuration = Configuration.from(new File(filePath));
 
         String pluginPath = configuration.getString("path");
         String pluginName = configuration.getString("name");
-        if(!pluginSet.contains(pluginName)) {
+        if (!pluginSet.contains(pluginName)) {
             pluginSet.add(pluginName);
-        } else {
+        }
+        else {
             throw DataXException.asDataXException(FrameworkErrorCode.PLUGIN_INIT_ERROR, "插件加载失败,存在重复插件:" + filePath);
         }
 
@@ -182,7 +194,8 @@ public final class ConfigParser {
         return result;
     }
 
-    private static List<String> getDirAsList(String path) {
+    private static List<String> getDirAsList(String path)
+    {
         List<String> result = new ArrayList<>();
 
         String[] paths = new File(path).list();
@@ -196,5 +209,4 @@ public final class ConfigParser {
 
         return result;
     }
-
 }

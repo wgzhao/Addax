@@ -1,6 +1,12 @@
 package com.alibaba.datax.plugin.reader.hbase20xsqlreader;
 
-import com.alibaba.datax.common.element.*;
+import com.alibaba.datax.common.element.BoolColumn;
+import com.alibaba.datax.common.element.BytesColumn;
+import com.alibaba.datax.common.element.Column;
+import com.alibaba.datax.common.element.DateColumn;
+import com.alibaba.datax.common.element.DoubleColumn;
+import com.alibaba.datax.common.element.LongColumn;
+import com.alibaba.datax.common.element.StringColumn;
 import com.alibaba.datax.common.exception.DataXException;
 import com.alibaba.datax.common.plugin.RecordSender;
 import com.alibaba.datax.common.statistics.PerfRecord;
@@ -9,22 +15,33 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.math.BigDecimal;
-import java.sql.*;
+import java.sql.Connection;
+import java.sql.Date;
+import java.sql.ResultSet;
+import java.sql.ResultSetMetaData;
+import java.sql.SQLException;
+import java.sql.Statement;
+import java.sql.Time;
+import java.sql.Timestamp;
+import java.sql.Types;
 
-public class HBase20xSQLReaderTask {
+public class HBase20xSQLReaderTask
+{
     private static final Logger LOG = LoggerFactory.getLogger(HBase20xSQLReaderTask.class);
 
     private Configuration readerConfig;
     private int taskGroupId = -1;
-    private int taskId=-1;
+    private int taskId = -1;
 
-    public HBase20xSQLReaderTask(Configuration config, int taskGroupId, int taskId) {
+    public HBase20xSQLReaderTask(Configuration config, int taskGroupId, int taskId)
+    {
         this.readerConfig = config;
         this.taskGroupId = taskGroupId;
         this.taskId = taskId;
     }
 
-    public void readRecord(RecordSender recordSender) {
+    public void readRecord(RecordSender recordSender)
+    {
         String querySql = readerConfig.getString(Constant.QUERY_SQL_PER_SPLIT);
         LOG.info("Begin to read record by Sql: [{}\n] {}.", querySql);
         HBase20SQLReaderHelper helper = new HBase20SQLReaderHelper(readerConfig);
@@ -37,7 +54,7 @@ public class HBase20xSQLReaderTask {
             long lastTime = System.nanoTime();
             statement = conn.createStatement();
             // 统计查询时间
-            PerfRecord queryPerfRecord = new PerfRecord(taskGroupId,taskId, PerfRecord.PHASE.SQL_QUERY);
+            PerfRecord queryPerfRecord = new PerfRecord(taskGroupId, taskId, PerfRecord.PHASE.SQL_QUERY);
             queryPerfRecord.start();
 
             resultSet = statement.executeQuery(querySql);
@@ -59,16 +76,18 @@ public class HBase20xSQLReaderTask {
             }
             allResultPerfRecord.end(rsNextUsedTime);
             LOG.info("Finished read record by Sql: [{}\n] {}.", querySql);
-        } catch (SQLException e) {
+        }
+        catch (SQLException e) {
             throw DataXException.asDataXException(
                     HBase20xSQLReaderErrorCode.QUERY_DATA_ERROR, "查询Phoenix数据出现异常，请检查服务状态或与HBase管理员联系！", e);
-        } finally {
+        }
+        finally {
             helper.closeJdbc(conn, statement, resultSet);
         }
-
     }
 
-    private Column convertPhoenixValueToDataxColumn(int sqlType, Object value) {
+    private Column convertPhoenixValueToDataxColumn(int sqlType, Object value)
+    {
         Column column;
         switch (sqlType) {
             case Types.CHAR:
@@ -98,7 +117,7 @@ public class HBase20xSQLReaderTask {
                 column = new DoubleColumn((Float.valueOf(value.toString())));
                 break;
             case Types.DECIMAL:
-                column = new DoubleColumn((BigDecimal)value);
+                column = new DoubleColumn((BigDecimal) value);
                 break;
             case Types.DOUBLE:
                 column = new DoubleColumn((Double) value);

@@ -14,16 +14,18 @@ import java.util.List;
 import java.util.Map;
 import java.util.Random;
 
-public final class JobAssignUtil {
-    private JobAssignUtil() {
+public final class JobAssignUtil
+{
+    private JobAssignUtil()
+    {
     }
 
     /**
      * 公平的分配 task 到对应的 taskGroup 中。
      * 公平体现在：会考虑 task 中对资源负载作的 load 标识进行更均衡的作业分配操作。
-     *
      */
-    public static List<Configuration> assignFairly(Configuration configuration, int channelNumber, int channelsPerTaskGroup) {
+    public static List<Configuration> assignFairly(Configuration configuration, int channelNumber, int channelsPerTaskGroup)
+    {
         Validate.isTrue(configuration != null, "框架获得的 Job 不能为 null.");
 
         List<Configuration> contentConfig = configuration.getListConfiguration(CoreConstant.DATAX_JOB_CONTENT);
@@ -62,7 +64,8 @@ public final class JobAssignUtil {
         return taskGroupConfig;
     }
 
-    private static void adjustChannelNumPerTaskGroup(List<Configuration> taskGroupConfig, int channelNumber) {
+    private static void adjustChannelNumPerTaskGroup(List<Configuration> taskGroupConfig, int channelNumber)
+    {
         int taskGroupNumber = taskGroupConfig.size();
         int avgChannelsPerTaskGroup = channelNumber / taskGroupNumber;
         int remainderChannelCount = channelNumber % taskGroupNumber;
@@ -83,7 +86,8 @@ public final class JobAssignUtil {
      * 根据task 配置，获取到：
      * 资源名称 --> taskId(List) 的 map 映射关系
      */
-    private static LinkedHashMap<String, List<Integer>> parseAndGetResourceMarkAndTaskIdMap(List<Configuration> contentConfig) {
+    private static LinkedHashMap<String, List<Integer>> parseAndGetResourceMarkAndTaskIdMap(List<Configuration> contentConfig)
+    {
         // key: resourceMark, value: taskId
         LinkedHashMap<String, List<Integer>> readerResourceMarkAndTaskIdMap = new LinkedHashMap<>();
         LinkedHashMap<String, List<Integer>> writerResourceMarkAndTaskIdMap = new LinkedHashMap<>();
@@ -104,12 +108,12 @@ public final class JobAssignUtil {
         if (readerResourceMarkAndTaskIdMap.size() >= writerResourceMarkAndTaskIdMap.size()) {
             // 采用 reader 对资源做的标记进行 shuffle
             return readerResourceMarkAndTaskIdMap;
-        } else {
+        }
+        else {
             // 采用 writer 对资源做的标记进行 shuffle
             return writerResourceMarkAndTaskIdMap;
         }
     }
-
 
     /**
      * /**
@@ -128,7 +132,8 @@ public final class JobAssignUtil {
      *
      * </pre>
      */
-    private static List<Configuration> doAssign(LinkedHashMap<String, List<Integer>> resourceMarkAndTaskIdMap, Configuration jobConfiguration, int taskGroupNumber) {
+    private static List<Configuration> doAssign(LinkedHashMap<String, List<Integer>> resourceMarkAndTaskIdMap, Configuration jobConfiguration, int taskGroupNumber)
+    {
         List<Configuration> contentConfig = jobConfiguration.getListConfiguration(CoreConstant.DATAX_JOB_CONTENT);
 
         Configuration taskGroupTemplate = jobConfiguration.clone();
@@ -168,12 +173,11 @@ public final class JobAssignUtil {
         for (int i = 0; i < taskGroupNumber; i++) {
             tempTaskGroupConfig = taskGroupTemplate.clone();
             tempTaskGroupConfig.set(CoreConstant.DATAX_JOB_CONTENT, taskGroupConfigList.get(i));
-            tempTaskGroupConfig.set(CoreConstant.DATAX_CORE_CONTAINER_TASKGROUP_ID,Integer.parseInt(jobId+ ""+ i));
+            tempTaskGroupConfig.set(CoreConstant.DATAX_CORE_CONTAINER_TASKGROUP_ID, Integer.parseInt(jobId + "" + i));
 
             result.add(tempTaskGroupConfig);
         }
 
         return result;
     }
-
 }

@@ -15,29 +15,26 @@ import java.util.List;
  * no comments.
  * Created by liqiang on 16/3/9.
  */
-public abstract class TransformerExchanger {
+public abstract class TransformerExchanger
+{
 
     protected final TaskPluginCollector pluginCollector;
 
     protected final int taskGroupId;
     protected final int taskId;
     protected final Communication currentCommunication;
-
+    private final List<TransformerExecution> transformerExecs;
+    private final ClassLoaderSwapper classLoaderSwapper = ClassLoaderSwapper
+            .newCurrentThreadClassLoaderSwapper();
     private long totalExaustedTime = 0;
     private long totalFilterRecords = 0;
     private long totalSuccessRecords = 0;
     private long totalFailedRecords = 0;
 
-
-    private final List<TransformerExecution> transformerExecs;
-
-    private final ClassLoaderSwapper classLoaderSwapper = ClassLoaderSwapper
-            .newCurrentThreadClassLoaderSwapper();
-
-
     public TransformerExchanger(int taskGroupId, int taskId, Communication communication,
-                                List<TransformerExecution> transformerExecs,
-                                final TaskPluginCollector pluginCollector) {
+            List<TransformerExecution> transformerExecs,
+            final TaskPluginCollector pluginCollector)
+    {
 
         this.transformerExecs = transformerExecs;
         this.pluginCollector = pluginCollector;
@@ -46,8 +43,8 @@ public abstract class TransformerExchanger {
         this.currentCommunication = communication;
     }
 
-
-    public Record doTransformer(com.alibaba.datax.common.element.Record record) {
+    public Record doTransformer(com.alibaba.datax.common.element.Record record)
+    {
         if (transformerExecs == null || transformerExecs.isEmpty()) {
             return record;
         }
@@ -81,7 +78,8 @@ public abstract class TransformerExchanger {
 
             try {
                 result = transformerInfoExec.getTransformer().evaluate(result, transformerInfoExec.gettContext(), transformerInfoExec.getFinalParas());
-            } catch (Exception e) {
+            }
+            catch (Exception e) {
                 errorMsg = String.format("transformer(%s) has Exception(%s)", transformerInfoExec.getTransformerName(),
                         e.getMessage());
                 failed = true;
@@ -89,8 +87,8 @@ public abstract class TransformerExchanger {
                 // transformerInfoExec.addFailedRecords(1);
                 //脏数据不再进行后续transformer处理，按脏数据处理，并过滤该record。
                 break;
-
-            } finally {
+            }
+            finally {
                 if (transformerInfoExec.getClassLoader() != null) {
                     classLoaderSwapper.restoreCurrentThreadClassLoader();
                 }
@@ -117,13 +115,15 @@ public abstract class TransformerExchanger {
             totalFailedRecords++;
             this.pluginCollector.collectDirtyRecord(record, errorMsg);
             return null;
-        } else {
+        }
+        else {
             totalSuccessRecords++;
             return result;
         }
     }
 
-    public void doStat() {
+    public void doStat()
+    {
 
         /*
          * todo 对于多个transformer时，各个transformer的单独统计进行显示。最后再汇总整个transformer的时间消耗.
@@ -139,6 +139,4 @@ public abstract class TransformerExchanger {
         currentCommunication.setLongCounter(CommunicationTool.TRANSFORMER_FILTER_RECORDS, totalFilterRecords);
         currentCommunication.setLongCounter(CommunicationTool.TRANSFORMER_USED_TIME, totalExaustedTime);
     }
-
-
 }

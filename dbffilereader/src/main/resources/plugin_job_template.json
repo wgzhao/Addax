@@ -1,9 +1,9 @@
 {
-    "name": "dbffilereader",
-    "parameter": {
-        "path": [],
-        "encoding": "",
-        "column": [],
-        "fieldDelimiter": ""
-    }
+  "name": "dbffilereader",
+  "parameter": {
+    "path": [],
+    "encoding": "",
+    "column": [],
+    "fieldDelimiter": ""
+  }
 }

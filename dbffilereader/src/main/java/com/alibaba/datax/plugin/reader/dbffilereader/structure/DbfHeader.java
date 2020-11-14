@@ -1,6 +1,5 @@
 package com.alibaba.datax.plugin.reader.dbffilereader.structure;
 
-
 import com.alibaba.datax.plugin.reader.dbffilereader.exception.DbfException;
 import com.alibaba.datax.plugin.reader.dbffilereader.utils.DbfUtils;
 
@@ -13,11 +12,12 @@ import java.util.Map;
 
 /**
  * DBF Header (variable size, depending on field count)
- * @see <a href="http://www.fship.com/dbfspecs.txt">DBF specification (2)</a>
  *
  * @author Sergey Polovko
+ * @see <a href="http://www.fship.com/dbfspecs.txt">DBF specification (2)</a>
  */
-public class DbfHeader {
+public class DbfHeader
+{
 
     private byte signature;              /* 0     */
     private byte year;                   /* 1     */
@@ -39,8 +39,9 @@ public class DbfHeader {
 
     private Map<String, Integer> fieldIndexesByNames;
 
-
-    public static DbfHeader read(DataInput dataInput) throws DbfException {
+    public static DbfHeader read(DataInput dataInput)
+            throws DbfException
+    {
         try {
             DbfHeader header = new DbfHeader();
 
@@ -71,48 +72,59 @@ public class DbfHeader {
             }
 
             return header;
-        } catch (IOException e) {
+        }
+        catch (IOException e) {
             throw new DbfException("Cannot read Dbf header", e);
         }
     }
 
-    public short getHeaderLength() {
+    public short getHeaderLength()
+    {
         return headerLength;
     }
 
-    public int getFieldsCount() {
+    public int getFieldsCount()
+    {
         return fields.size();
     }
 
-    public byte getYear() {
+    public byte getYear()
+    {
         return year;
     }
 
-    public byte getMonth() {
+    public byte getMonth()
+    {
         return month;
     }
 
-    public byte getDay() {
+    public byte getDay()
+    {
         return day;
     }
 
-    public DbfField getField(int i) {
+    public DbfField getField(int i)
+    {
         return fields.get(i);
     }
 
-    public DbfField getField(String fieldName) {
+    public DbfField getField(String fieldName)
+    {
         return getField(getFieldIndex(fieldName));
     }
 
-    public int getNumberOfRecords() {
+    public int getNumberOfRecords()
+    {
         return numberOfRecords;
     }
 
-    public short getRecordLength() {
+    public short getRecordLength()
+    {
         return recordLength;
     }
 
-    public int getFieldIndex(String fieldName) {
+    public int getFieldIndex(String fieldName)
+    {
         if (fieldIndexesByNames == null) {
             initFieldIndexesByNames();
         }
@@ -120,7 +132,8 @@ public class DbfHeader {
         return index == null ? -1 : index;
     }
 
-    private void initFieldIndexesByNames() {
+    private void initFieldIndexesByNames()
+    {
         fieldIndexesByNames = new HashMap<>(fields.size());
         for (int i = 0; i < fields.size(); i++) {
             DbfField field = fields.get(i);

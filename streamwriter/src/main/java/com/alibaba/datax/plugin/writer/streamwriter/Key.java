@@ -1,6 +1,7 @@
 package com.alibaba.datax.plugin.writer.streamwriter;
 
-public class Key {
+public class Key
+{
     public static final String FIELD_DELIMITER = "fieldDelimiter";
 
     public static final String PRINT = "print";
@@ -12,5 +13,4 @@ public class Key {
     public static final String RECORD_NUM_BEFORE_SLEEP = "recordNumBeforeSleep";
 
     public static final String SLEEP_TIME = "sleepTime";
-
 }

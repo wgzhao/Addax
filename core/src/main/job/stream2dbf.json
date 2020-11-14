@@ -1,66 +1,68 @@
 {
-"job": {
-  "setting": {
-    "speed": {
-      "batchSize": 20480,
-      "bytes": -1,
-      "channel": 1
+  "job": {
+    "setting": {
+      "speed": {
+        "batchSize": 20480,
+        "bytes": -1,
+        "channel": 1
       }
-  },
-  "content": [{
-    "reader": {
-      "name": "streamreader",
-      "parameter": {
-          "column" : [
-              {
-                  "value": "DataX",
-                  "type": "string"
-              },
-              {
-                  "value": 19880808,
-                  "type": "long"
-              },
-              {
-                  "value": "1988-08-08 16:00:04",
-                  "type": "date"
-              },
-              {
-                  "value": true,
-                  "type": "bool"
-              }
-          ],
-          "sliceRecordCount": 1000
-          }
     },
-  "writer": {
-            "name": "dbffilewriter",
-            "parameter": {
-              "column": [
-                {
-                  "name": "col1",
-                  "type": "char",
-                  "length": 100
-                },
-                {
-                "name":"col2",
-                "type":"numeric",
+    "content": [
+      {
+        "reader": {
+          "name": "streamreader",
+          "parameter": {
+            "column": [
+              {
+                "value": "DataX",
+                "type": "string"
+              },
+              {
+                "value": 19880808,
+                "type": "long"
+              },
+              {
+                "value": "1988-08-08 16:00:04",
+                "type": "date"
+              },
+              {
+                "value": true,
+                "type": "bool"
+              }
+            ],
+            "sliceRecordCount": 1000
+          }
+        },
+        "writer": {
+          "name": "dbffilewriter",
+          "parameter": {
+            "column": [
+              {
+                "name": "col1",
+                "type": "char",
+                "length": 100
+              },
+              {
+                "name": "col2",
+                "type": "numeric",
                 "length": 18,
                 "scale": 0
-                },
-                {
-                  "name": "col3",
-                  "type": "date"
-                },
-                {
-                "name":"col4",
-                "type":"logical"
-                }
-              ],
+              },
+              {
+                "name": "col3",
+                "type": "date"
+              },
+              {
+                "name": "col4",
+                "type": "logical"
+              }
+            ],
             "fileName": "test.dbf",
-              "path": "/tmp/out",
-              "writeMode": "truncate"
-            }
+            "path": "/tmp/out",
+            "writeMode": "truncate"
           }
+        }
       }
-  ]}
+    ]
+  }
 }

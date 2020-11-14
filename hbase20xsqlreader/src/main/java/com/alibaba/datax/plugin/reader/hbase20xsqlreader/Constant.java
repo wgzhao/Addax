@@ -1,6 +1,7 @@
 package com.alibaba.datax.plugin.reader.hbase20xsqlreader;
 
-public class Constant {
+public class Constant
+{
     public static final String PK_TYPE = "pkType";
 
     public static final Object PK_TYPE_STRING = "pkTypeString";
@@ -24,5 +25,4 @@ public class Constant {
     public static String QUERY_COLUMN_TYPE_TEMPLATE = "SELECT %s FROM %s LIMIT 1";
 
     public static String QUERY_SQL_PER_SPLIT = "querySqlPerSplit";
-
 }

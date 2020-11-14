@@ -2,15 +2,16 @@ package com.alibaba.datax.common.plugin;
 
 import com.alibaba.datax.common.element.Record;
 
-public interface RecordSender {
+public interface RecordSender
+{
 
-	Record createRecord();
+    Record createRecord();
 
-	void sendToWriter(com.alibaba.datax.common.element.Record record);
+    void sendToWriter(com.alibaba.datax.common.element.Record record);
 
-	void flush();
+    void flush();
 
-	void terminate();
+    void terminate();
 
-	void shutdown();
+    void shutdown();
 }

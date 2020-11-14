@@ -1,6 +1,7 @@
 package com.alibaba.datax.plugin.reader.hbase20xreader;
 
-public final class Constant {
+public final class Constant
+{
     public static final String RANGE = "range";
 
     public static final String ROWKEY_FLAG = "rowkey";
@@ -12,5 +13,4 @@ public final class Constant {
     public static final int DEFAULT_SCAN_CACHE_SIZE = 256;
 
     public static final int DEFAULT_SCAN_BATCH_SIZE = 100;
-    
 }

@@ -1,6 +1,7 @@
 package com.alibaba.datax.plugin.reader.hbase20xsqlreader;
 
-public class Key {
+public class Key
+{
     /**
      * 【必选】writer要读取的表的表名
      */

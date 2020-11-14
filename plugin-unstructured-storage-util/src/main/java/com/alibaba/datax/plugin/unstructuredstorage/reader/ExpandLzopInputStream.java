@@ -20,6 +20,7 @@ import org.apache.commons.logging.LogFactory;
 
 import javax.annotation.Nonnegative;
 import javax.annotation.Nonnull;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Arrays;
@@ -29,10 +30,13 @@ import java.util.zip.CRC32;
 /**
  * Created by mingya.wmy on 16/8/26.
  */
-public class ExpandLzopInputStream extends LzopInputStream {
+public class ExpandLzopInputStream
+        extends LzopInputStream
+{
 
-
-    public ExpandLzopInputStream(@Nonnull InputStream in) throws IOException {
+    public ExpandLzopInputStream(@Nonnull InputStream in)
+            throws IOException
+    {
         super(in);
     }
 
@@ -41,14 +45,17 @@ public class ExpandLzopInputStream extends LzopInputStream {
      * and ignoring most everything else.
      */
     @Override
-    protected int readHeader() throws IOException {
+    protected int readHeader()
+            throws IOException
+    {
         short LZO_LIBRARY_VERSION = 0x2060;
         Log log = LogFactory.getLog(LzopInputStream.class);
-        byte[] LZOP_MAGIC = { -119, 'L', 'Z', 'O', 0, '\r', '\n', '\032', '\n'};
+        byte[] LZOP_MAGIC = {-119, 'L', 'Z', 'O', 0, '\r', '\n', '\032', '\n'};
         byte[] buf = new byte[9];
         readBytes(buf, 0, 9);
-        if (!Arrays.equals(buf, LZOP_MAGIC))
+        if (!Arrays.equals(buf, LZOP_MAGIC)) {
             throw new IOException("Invalid LZO header");
+        }
         Arrays.fill(buf, (byte) 0);
         Adler32 adler = new Adler32();
         CRC32 crc32 = new CRC32();
@@ -85,12 +92,15 @@ public class ExpandLzopInputStream extends LzopInputStream {
         int flags = readHeaderItem(buf, 4, adler, crc32);
         boolean useCRC32 = (flags & LzopConstants.F_H_CRC32) != 0;
         boolean extraField = (flags & LzopConstants.F_H_EXTRA_FIELD) != 0;
-        if ((flags & LzopConstants.F_MULTIPART) != 0)
+        if ((flags & LzopConstants.F_MULTIPART) != 0) {
             throw new IOException("Multipart lzop not supported");
-        if ((flags & LzopConstants.F_H_FILTER) != 0)
+        }
+        if ((flags & LzopConstants.F_H_FILTER) != 0) {
             throw new IOException("lzop filter not supported");
-        if ((flags & LzopConstants.F_RESERVED) != 0)
+        }
+        if ((flags & LzopConstants.F_RESERVED) != 0) {
             throw new IOException("Unknown flags in header");
+        }
         // known !F_H_FILTER, so no optional block
 
         readHeaderItem(buf, 4, adler, crc32); // ignore mode
@@ -123,7 +133,9 @@ public class ExpandLzopInputStream extends LzopInputStream {
         return flags;
     }
 
-    private int readHeaderItem(@Nonnull byte[] buf, @Nonnegative int len, @Nonnull Adler32 adler, @Nonnull CRC32 crc32) throws IOException {
+    private int readHeaderItem(@Nonnull byte[] buf, @Nonnegative int len, @Nonnull Adler32 adler, @Nonnull CRC32 crc32)
+            throws IOException
+    {
         int ret = readInt(buf, len);
         adler.update(buf, 0, len);
         crc32.update(buf, 0, len);
@@ -137,7 +149,8 @@ public class ExpandLzopInputStream extends LzopInputStream {
      */
     // @Nonnegative ?
     private int readInt(@Nonnull byte[] buf, @Nonnegative int len)
-            throws IOException {
+            throws IOException
+    {
         readBytes(buf, 0, len);
         int ret = (0xFF & buf[0]) << 24;
         ret |= (0xFF & buf[1]) << 16;
@@ -145,5 +158,4 @@ public class ExpandLzopInputStream extends LzopInputStream {
         ret |= (0xFF & buf[3]);
         return (len > 3) ? ret : (ret >>> (8 * (4 - len)));
     }
-
 }

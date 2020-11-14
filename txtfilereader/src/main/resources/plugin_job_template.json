@@ -1,9 +1,9 @@
 {
-    "name": "txtfilereader",
-    "parameter": {
-        "path": [],
-        "encoding": "",
-        "column": [],
-        "fieldDelimiter": ""
-    }
+  "name": "txtfilereader",
+  "parameter": {
+    "path": [],
+    "encoding": "",
+    "column": [],
+    "fieldDelimiter": ""
+  }
 }
