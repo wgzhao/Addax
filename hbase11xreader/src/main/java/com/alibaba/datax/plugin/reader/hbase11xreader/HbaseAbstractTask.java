@@ -18,6 +18,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
+import java.text.ParseException;
 
 public abstract class HbaseAbstractTask
 {
@@ -101,6 +103,7 @@ public abstract class HbaseAbstractTask
     }
 
     public Column convertBytesToAssignType(ColumnType columnType, byte[] byteArray, String dateformat)
+            throws UnsupportedEncodingException, ParseException
     {
         Column column;
         boolean isEmpty = ArrayUtils.isEmpty(byteArray);
@@ -140,6 +143,7 @@ public abstract class HbaseAbstractTask
     }
 
     public Column convertValueToAssignType(ColumnType columnType, String constantValue, String dateformat)
+            throws ParseException
     {
         Column column;
         switch (columnType) {
