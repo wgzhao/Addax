@@ -55,8 +55,8 @@ public class VMInfo
         garbageCollectorMXBeanList = java.lang.management.ManagementFactory.getGarbageCollectorMXBeans();
         memoryPoolMXBeanList = java.lang.management.ManagementFactory.getMemoryPoolMXBeans();
 
-        osInfo = runtimeMXBean.getVmVendor() + " " + runtimeMXBean.getSpecVersion() + " " + runtimeMXBean.getVmVersion();
-        jvmInfo = osMXBean.getName() + " " + osMXBean.getArch() + " " + osMXBean.getVersion();
+        jvmInfo = runtimeMXBean.getVmVendor() + " " + runtimeMXBean.getSpecVersion() + " " + runtimeMXBean.getVmVersion();
+        osInfo = osMXBean.getName() + " " + osMXBean.getArch() + " " + osMXBean.getVersion();
         totalProcessorCount = osMXBean.getAvailableProcessors();
 
         //构建startPhyOSStatus
@@ -124,13 +124,13 @@ public class VMInfo
 
     public String toString()
     {
-        return "the machine info  => %n%n"
-                + "\tosInfo:\t" + osInfo + "%n"
-                + "\tjvmInfo:\t" + jvmInfo + "%n"
-                + "\tcpu num:\t" + totalProcessorCount + "%n%n"
-                + startPhyOSStatus.toString() + "%n"
-                + processGCStatus.toString() + "%n"
-                + processMomoryStatus.toString() + "%n";
+        return "the machine info  => \n\n"
+                + "\tosInfo: \t" + osInfo + "\n"
+                + "\tjvmInfo:\t" + jvmInfo + "\n"
+                + "\tcpu num:\t" + totalProcessorCount + "\n\n"
+                + startPhyOSStatus.toString() + "\n"
+                + processGCStatus.toString() + "\n"
+                + processMomoryStatus.toString() + "\n";
     }
 
     public String totalString()
