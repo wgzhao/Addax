@@ -12,7 +12,7 @@ import java.util.List;
 
 public class HbaseSQLReaderConfig
 {
-    private final static Logger LOG = LoggerFactory.getLogger(HbaseSQLReaderConfig.class);
+    private static final Logger LOG = LoggerFactory.getLogger(HbaseSQLReaderConfig.class);
     private Configuration originalConfig;     // 原始的配置数据
 
     // 集群配置
@@ -29,8 +29,8 @@ public class HbaseSQLReaderConfig
     }
 
     /**
-     * @param dataxCfg
-     * @return
+     * @param dataxCfg datax configure
+     * @return HbaseSQLReaderConfig
      */
     public static HbaseSQLReaderConfig parse(Configuration dataxCfg)
     {
@@ -45,7 +45,7 @@ public class HbaseSQLReaderConfig
         parseTableConfig(cfg, dataxCfg);
 
         // 4. 打印解析出来的配置
-        LOG.info("HBase SQL reader config parsed:" + cfg.toString());
+        LOG.info("HBase SQL reader config parsed: {}", cfg);
 
         return cfg;
     }

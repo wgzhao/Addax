@@ -48,12 +48,12 @@ public class ExpandLzopInputStream
     protected int readHeader()
             throws IOException
     {
-        short LZO_LIBRARY_VERSION = 0x2060;
+        short lzoLibraryVersion = 0x2060;
         Log log = LogFactory.getLog(LzopInputStream.class);
-        byte[] LZOP_MAGIC = {-119, 'L', 'Z', 'O', 0, '\r', '\n', '\032', '\n'};
+        byte[] lzopMagic = {-119, 'L', 'Z', 'O', 0, '\r', '\n', '\032', '\n'};
         byte[] buf = new byte[9];
         readBytes(buf, 0, 9);
-        if (!Arrays.equals(buf, LZOP_MAGIC)) {
+        if (!Arrays.equals(buf, lzopMagic)) {
             throw new IOException("Invalid LZO header");
         }
         Arrays.fill(buf, (byte) 0);
@@ -66,7 +66,7 @@ public class ExpandLzopInputStream
                     + Integer.toHexString(LzopConstants.LZOP_VERSION) + ")");
         }
         hitem = readHeaderItem(buf, 2, adler, crc32); // lzo library version
-        if (hitem > LZO_LIBRARY_VERSION) {
+        if (hitem > lzoLibraryVersion) {
             throw new IOException("Compressed with incompatible lzo version: 0x"
                     + Integer.toHexString(hitem) + " (expected 0x"
                     + Integer.toHexString(LzoVersion.LZO_LIBRARY_VERSION) + ")");

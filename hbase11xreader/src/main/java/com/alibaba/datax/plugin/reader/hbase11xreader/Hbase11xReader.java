@@ -37,7 +37,7 @@ public class Hbase11xReader
         @Override
         public void destroy()
         {
-
+            //
         }
     }
 
@@ -55,10 +55,10 @@ public class Hbase11xReader
             ModeType modeType = ModeType.getByTypeName(mode);
 
             switch (modeType) {
-                case Normal:
+                case NORMAL:
                     this.hbaseTaskProxy = new NormalTask(taskConfig);
                     break;
-                case MultiVersionFixedColumn:
+                case MULTI_VERSION_FIXED_COLUMN:
                     this.hbaseTaskProxy = new MultiVersionFixedColumnTask(taskConfig);
                     break;
                 default:
@@ -81,8 +81,8 @@ public class Hbase11xReader
         public void startRead(RecordSender recordSender)
         {
             com.alibaba.datax.common.element.Record record = recordSender.createRecord();
-            boolean fetchOK;
-            while (true) {
+            boolean fetchOK = true;
+            while (fetchOK) {
                 try {
                     fetchOK = this.hbaseTaskProxy.fetchLine(record);
                 }
@@ -95,9 +95,6 @@ public class Hbase11xReader
                 if (fetchOK) {
                     recordSender.sendToWriter(record);
                     record = recordSender.createRecord();
-                }
-                else {
-                    break;
                 }
             }
             recordSender.flush();

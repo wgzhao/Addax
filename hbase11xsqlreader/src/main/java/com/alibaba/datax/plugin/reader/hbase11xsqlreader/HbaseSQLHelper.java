@@ -34,6 +34,8 @@ public class HbaseSQLHelper
 {
     private static final Logger LOG = LoggerFactory.getLogger(HbaseSQLHelper.class);
 
+    private HbaseSQLHelper() {}
+
     public static org.apache.hadoop.conf.Configuration generatePhoenixConf(HbaseSQLReaderConfig readerConfig)
     {
         org.apache.hadoop.conf.Configuration conf = new org.apache.hadoop.conf.Configuration();
@@ -69,21 +71,22 @@ public class HbaseSQLHelper
     public static List<String> getPColumnNames(String connectionString, String tableName)
             throws SQLException
     {
-        Connection con =
-                DriverManager.getConnection(connectionString);
-        PhoenixConnection phoenixConnection = con.unwrap(PhoenixConnection.class);
-        MetaDataClient metaDataClient = new MetaDataClient(phoenixConnection);
-        PTable table = metaDataClient.updateCache("", tableName).getTable();
-        List<String> columnNames = new ArrayList<String>();
-        for (PColumn pColumn : table.getColumns()) {
-            if (!pColumn.getName().getString().equals(SaltingUtil.SALTING_COLUMN_NAME)) {
-                columnNames.add(pColumn.getName().getString());
+        try (Connection con = DriverManager.getConnection(connectionString))
+        {
+            PhoenixConnection phoenixConnection = con.unwrap(PhoenixConnection.class);
+            MetaDataClient metaDataClient = new MetaDataClient(phoenixConnection);
+            PTable table = metaDataClient.updateCache("", tableName).getTable();
+            List<String> columnNames = new ArrayList<>();
+            for (PColumn pColumn : table.getColumns()) {
+                if (!pColumn.getName().getString().equals(SaltingUtil.SALTING_COLUMN_NAME)) {
+                    columnNames.add(pColumn.getName().getString());
+                }
+                else {
+                    LOG.info("{} is salt table", tableName);
+                }
             }
-            else {
-                LOG.info(tableName + " is salt table");
-            }
+            return columnNames;
         }
-        return columnNames;
     }
 
     public static List<Configuration> split(HbaseSQLReaderConfig readerConfig)
@@ -92,11 +95,11 @@ public class HbaseSQLHelper
         org.apache.hadoop.conf.Configuration conf = generatePhoenixConf(readerConfig);
         JobID jobId = new JobID(Key.MOCK_JOBID_IDENTIFIER, Key.MOCK_JOBID);
         JobContextImpl jobContext = new JobContextImpl(conf, jobId);
-        List<Configuration> resultConfigurations = new ArrayList<Configuration>();
-        List<InputSplit> rawSplits = null;
+        List<Configuration> resultConfigurations = new ArrayList<>();
+        List<InputSplit> rawSplits;
         try {
             rawSplits = inputFormat.getSplits(jobContext);
-            LOG.info("split size is " + rawSplits.size());
+            LOG.info("split size is {}", rawSplits.size());
             for (InputSplit split : rawSplits) {
                 Configuration cfg = readerConfig.getOriginalConfig().clone();
 
@@ -134,6 +137,6 @@ public class HbaseSQLHelper
         if (znode == null) {
             znode = "";
         }
-        return new Pair<String, String>(zkQuorum, znode);
+        return new Pair<>(zkQuorum, znode);
     }
 }

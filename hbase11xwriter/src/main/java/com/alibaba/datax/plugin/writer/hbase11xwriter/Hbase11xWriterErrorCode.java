@@ -27,7 +27,7 @@ public enum Hbase11xWriterErrorCode
     private final String code;
     private final String description;
 
-    private Hbase11xWriterErrorCode(String code, String description)
+    Hbase11xWriterErrorCode(String code, String description)
     {
         this.code = code;
         this.description = description;

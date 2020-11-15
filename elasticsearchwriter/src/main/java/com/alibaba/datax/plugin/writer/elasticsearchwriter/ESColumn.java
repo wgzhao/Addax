@@ -46,11 +46,6 @@ public class ESColumn
         return timezone;
     }
 
-    public void setTimezone(String timezone)
-    {
-        this.timezone = timezone;
-    }
-
     public String getFormat()
     {
         return format;
@@ -62,11 +57,6 @@ public class ESColumn
     }
 
     public Boolean isArray()
-    {
-        return array;
-    }
-
-    public Boolean getArray()
     {
         return array;
     }

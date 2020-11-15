@@ -1,6 +1,7 @@
 package com.alibaba.datax.plugin.writer.hbase11xwriter;
 
 import com.alibaba.datax.common.element.Column;
+import com.alibaba.datax.common.element.Record;
 import com.alibaba.datax.common.exception.DataXException;
 import com.alibaba.datax.common.plugin.RecordReceiver;
 import com.alibaba.datax.common.plugin.TaskPluginCollector;
@@ -18,22 +19,22 @@ import java.util.List;
 
 public abstract class HbaseAbstractTask
 {
-    private final static Logger LOG = LoggerFactory.getLogger(HbaseAbstractTask.class);
+    private static final Logger LOG = LoggerFactory.getLogger(HbaseAbstractTask.class);
 
-    public NullModeType nullMode = null;
+    public NullModeType nullMode;
 
     public List<Configuration> columns;
     public List<Configuration> rowkeyColumn;
     public Configuration versionColumn;
 
-    //public Table htable;
+    //public Table htable
     public String encoding;
     public Boolean walFlag;
     public BufferedMutator bufferedMutator;
 
     public HbaseAbstractTask(com.alibaba.datax.common.util.Configuration configuration)
     {
-        //this.htable = Hbase11xHelper.getTable(configuration);
+        //this.htable = Hbase11xHelper.getTable(configuration)
         this.bufferedMutator = Hbase11xHelper.getBufferedMutator(configuration);
         this.columns = configuration.getListConfiguration(Key.COLUMN);
         this.rowkeyColumn = configuration.getListConfiguration(Key.ROWKEY_COLUMN);
@@ -45,7 +46,7 @@ public abstract class HbaseAbstractTask
 
     public void startWriter(RecordReceiver lineReceiver, TaskPluginCollector taskPluginCollector)
     {
-        com.alibaba.datax.common.element.Record record;
+        Record record;
         try {
             while ((record = lineReceiver.getFromReader()) != null) {
                 Put put;
@@ -57,17 +58,15 @@ public abstract class HbaseAbstractTask
                     continue;
                 }
                 try {
-                    //this.htable.put(put);
+                    //this.htable.put(put)
                     this.bufferedMutator.mutate(put);
                 }
                 catch (IllegalArgumentException e) {
-                    if (e.getMessage().equals("No columns to insert") && nullMode.equals(NullModeType.Skip)) {
+                    if (e.getMessage().equals("No columns to insert") && nullMode.equals(NullModeType.SKIP)) {
                         LOG.info(String.format("record is empty, 您配置nullMode为[skip],将会忽略这条记录,record[%s]", record.toString()));
-                        continue;
                     }
                     else {
                         taskPluginCollector.collectDirtyRecord(record, e);
-                        continue;
                     }
                 }
             }
@@ -76,7 +75,7 @@ public abstract class HbaseAbstractTask
             throw DataXException.asDataXException(Hbase11xWriterErrorCode.PUT_HBASE_ERROR, e);
         }
         finally {
-            //Hbase11xHelper.closeTable(this.htable);
+            //Hbase11xHelper.closeTable(this.htable)
             Hbase11xHelper.closeBufferedMutator(this.bufferedMutator);
         }
     }
@@ -121,10 +120,10 @@ public abstract class HbaseAbstractTask
         }
         else {
             switch (nullMode) {
-                case Skip:
+                case SKIP:
                     bytes = null;
                     break;
-                case Empty:
+                case EMPTY:
                     bytes = HConstants.EMPTY_BYTE_ARRAY;
                     break;
                 default:

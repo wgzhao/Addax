@@ -6,8 +6,8 @@ import java.util.Arrays;
 
 public enum NullModeType
 {
-    Skip("skip"),
-    Empty("empty");
+    SKIP("skip"),
+    EMPTY("empty");
 
     private final String mode;
 

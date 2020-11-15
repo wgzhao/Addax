@@ -63,11 +63,13 @@ public class KeyConstant
      */
     public static final String UNIQUE_KEY = "replaceKey";
 
+    private KeyConstant() {}
+
     /**
      * 判断是否为数组类型
      *
      * @param type 数据类型
-     * @return
+     * @return boolean
      */
     public static boolean isArrayType(String type)
     {
@@ -78,7 +80,7 @@ public class KeyConstant
      * 判断是否为ObjectId类型
      *
      * @param type 数据类型
-     * @return
+     * @return boolean
      */
     public static boolean isObjectIdType(String type)
     {
@@ -88,8 +90,8 @@ public class KeyConstant
     /**
      * 判断一个值是否为true
      *
-     * @param value
-     * @return
+     * @param value string of judege
+     * @return boolean
      */
     public static boolean isValueTrue(String value)
     {

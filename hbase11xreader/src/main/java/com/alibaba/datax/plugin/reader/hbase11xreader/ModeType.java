@@ -6,8 +6,8 @@ import java.util.Arrays;
 
 public enum ModeType
 {
-    Normal("normal"),
-    MultiVersionFixedColumn("multiVersionFixedColumn");
+    NORMAL("normal"),
+    MULTI_VERSION_FIXED_COLUMN("multiVersionFixedColumn");
 
     private final String mode;
 

@@ -17,4 +17,6 @@ public class Constant
     public static final String MIXUP_FUNCTION_PATTERN = "\\s*(.*)\\s*,\\s*(.*)\\s*";
     public static final String MIXUP_FUNCTION_PARAM1 = "mixupParam1";
     public static final String MIXUP_FUNCTION_PARAM2 = "mixupParam2";
+
+    private Constant() {}
 }

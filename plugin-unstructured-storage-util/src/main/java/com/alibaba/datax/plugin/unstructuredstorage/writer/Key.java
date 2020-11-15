@@ -32,8 +32,10 @@ public class Key
     public static final String HEADER = "header";
 
     // writer maxFileSize
-    public static final String MAX_FILE_SIZE = "maxFileSize";
+//    public static final String MAX_FILE_SIZE = "maxFileSize"
 
     // writer file type suffix, like .txt  .csv
     public static final String SUFFIX = "suffix";
+
+    private Key() {}
 }

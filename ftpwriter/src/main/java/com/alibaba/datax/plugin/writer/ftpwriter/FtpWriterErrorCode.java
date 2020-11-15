@@ -26,7 +26,7 @@ public enum FtpWriterErrorCode
 //    OUT_MAX_DIRECTORY_LEVEL("FtpWriter-15", "超出允许的最大目录层数."),
 //    LINK_FILE("FtpWriter-16", "您尝试读取的文件为链接文件."),
 //    COMMAND_FTP_ENCODING_EXCEPTION("FtpWriter-17", "与ftp服务器连接，使用指定编码异常."),
-//    FAIL_LOGOUT("FtpWriter-18", "登出失败,关闭与ftp服务器建立连接失败,但这不影响任务同步."),;
+//    FAIL_LOGOUT("FtpWriter-18", "登出失败,关闭与ftp服务器建立连接失败,但这不影响任务同步.")
 
     private final String code;
     private final String description;

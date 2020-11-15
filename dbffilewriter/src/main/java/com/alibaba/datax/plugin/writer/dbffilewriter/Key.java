@@ -5,6 +5,8 @@ package com.alibaba.datax.plugin.writer.dbffilewriter;
  */
 public class Key
 {
+    private Key() {}
+
     // must have
     public static final String PATH = "path";
 }

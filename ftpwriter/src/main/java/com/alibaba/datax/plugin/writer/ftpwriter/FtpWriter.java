@@ -121,44 +121,38 @@ public class FtpWriter
             String writeMode = this.writerSliceConfig
                     .getString(com.alibaba.datax.plugin.unstructuredstorage.writer.Key.WRITE_MODE);
 
-            Set<String> allFileExists = this.ftpHelper.getAllFilesInDir(path,
+            Set<String> allFilesInDir = this.ftpHelper.getAllFilesInDir(path,
                     fileName);
-            this.allFileExists = allFileExists;
+            this.allFileExists = allFilesInDir;
 
             // truncate option handler
             if ("truncate".equals(writeMode)) {
-                LOG.info(String.format(
-                        "由于您配置了writeMode truncate, 开始清理 [%s] 下面以 [%s] 开头的内容",
-                        path, fileName));
+                LOG.info("由于您配置了writeMode truncate, 开始清理 [{}] 下面以 [{}] 开头的内容",
+                        path, fileName);
                 Set<String> fullFileNameToDelete = new HashSet<>();
-                for (String each : allFileExists) {
+                for (String each : allFilesInDir) {
                     fullFileNameToDelete.add(UnstructuredStorageWriterUtil
                             .buildFilePath(path, each, null));
                 }
-                LOG.info(String.format(
-                        "删除目录path:[%s] 下指定前缀fileName:[%s] 文件列表如下: [%s]", path,
+                LOG.info("删除目录path:[{}] 下指定前缀fileName:[{}] 文件列表如下: [{}]", path,
                         fileName,
-                        StringUtils.join(fullFileNameToDelete.iterator(), ", ")));
+                        StringUtils.join(fullFileNameToDelete.iterator(), ", "));
 
                 this.ftpHelper.deleteFiles(fullFileNameToDelete);
             }
             else if ("append".equals(writeMode)) {
-                LOG.info(String
-                        .format("由于您配置了writeMode append, 写入前不做清理工作, [%s] 目录下写入相应文件名前缀  [%s] 的文件",
-                                path, fileName));
-                LOG.info(String.format(
-                        "目录path:[%s] 下已经存在的指定前缀fileName:[%s] 文件列表如下: [%s]",
+                LOG.info("由于您配置了writeMode append, 写入前不做清理工作, [{}] 目录下写入相应文件名前缀  [{}] 的文件",
+                                path, fileName);
+                LOG.info("目录path:[{}] 下已经存在的指定前缀fileName:[{}] 文件列表如下: [{}]",
                         path, fileName,
-                        StringUtils.join(allFileExists.iterator(), ", ")));
+                        StringUtils.join(allFilesInDir.iterator(), ", "));
             }
             else if ("nonConflict".equals(writeMode)) {
-                LOG.info(String.format(
-                        "由于您配置了writeMode nonConflict, 开始检查 [%s] 下面的内容", path));
-                if (!allFileExists.isEmpty()) {
-                    LOG.info(String.format(
-                            "目录path:[%s] 下指定前缀fileName:[%s] 冲突文件列表如下: [%s]",
+                LOG.info("由于您配置了writeMode nonConflict, 开始检查 [{}] 下面的内容", path);
+                if (!allFilesInDir.isEmpty()) {
+                    LOG.info("目录path:[{}] 下指定前缀fileName:[{}] 冲突文件列表如下: [{}]",
                             path, fileName,
-                            StringUtils.join(allFileExists.iterator(), ", ")));
+                            StringUtils.join(allFilesInDir.iterator(), ", "));
                     throw DataXException
                             .asDataXException(
                                     FtpWriterErrorCode.ILLEGAL_VALUE,
@@ -180,7 +174,7 @@ public class FtpWriter
         @Override
         public void post()
         {
-
+            //
         }
 
         @Override
@@ -268,7 +262,7 @@ public class FtpWriter
         @Override
         public void prepare()
         {
-
+            //
         }
 
         @Override
@@ -300,7 +294,7 @@ public class FtpWriter
         @Override
         public void post()
         {
-
+            //
         }
 
         @Override

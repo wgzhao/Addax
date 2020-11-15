@@ -25,9 +25,9 @@ import java.util.List;
 
 public class HBase20xSQLWriterTask
 {
-    private final static Logger LOG = LoggerFactory.getLogger(HBase20xSQLWriterTask.class);
+    private static final Logger LOG = LoggerFactory.getLogger(HBase20xSQLWriterTask.class);
 
-    private Configuration configuration;
+    private final Configuration configuration;
     private TaskPluginCollector taskPluginCollector;
 
     private Connection connection = null;
@@ -130,7 +130,7 @@ public class HBase20xSQLWriterTask
 
         String sql = upsertBuilder.toString();
         PreparedStatement ps = connection.prepareStatement(sql);
-        LOG.debug("SQL template generated: " + sql);
+        LOG.debug("SQL template generated: {}", sql);
         return ps;
     }
 
@@ -138,7 +138,6 @@ public class HBase20xSQLWriterTask
      * 根据列名来从数据库元数据中获取这一列对应的SQL类型
      */
     private int[] getColumnSqlType()
-            throws SQLException
     {
         int[] types = new int[numberOfColumnsToWrite];
         StringBuilder columnNamesBuilder = new StringBuilder();
@@ -156,7 +155,7 @@ public class HBase20xSQLWriterTask
             for (int i = 0; i < columns.size(); i++) {
                 String name = columns.get(i);
                 types[i] = meta.getColumnType(i + 1);
-                LOG.debug("Column name : " + name + ", sql type = " + types[i] + " " + meta.getColumnTypeName(i + 1));
+                LOG.debug("Column name : {}, sql type = {} {}", name, types[i], meta.getColumnTypeName(i + 1));
             }
         }
         catch (SQLException e) {
@@ -177,7 +176,7 @@ public class HBase20xSQLWriterTask
             throws SQLException
     {
         List<Record> buffer = Lists.newArrayListWithExpectedSize(batchSize);
-        com.alibaba.datax.common.element.Record record = null;
+        Record record;
         while ((record = lineReceiver.getFromReader()) != null) {
             // 校验列数量是否符合预期
             if (record.getColumnNumber() != numberOfColumnsToRead) {
@@ -220,7 +219,7 @@ public class HBase20xSQLWriterTask
             pstmt.clearBatch();
         }
         catch (SQLException e) {
-            LOG.error("Failed batch committing " + records.size() + " records", e);
+            LOG.error("Failed batch committing {} records", records.size(), e);
 
             // 批量提交失败，则一行行重试，以确定哪一行出错
             connection.rollback();
@@ -238,7 +237,6 @@ public class HBase20xSQLWriterTask
      * 单行提交，将出错的行记录到脏数据中。由脏数据收集模块判断任务是否继续
      */
     private void doSingleUpsert(List<Record> records)
-            throws SQLException
     {
         int rowNumber = 0;
         for (com.alibaba.datax.common.element.Record r : records) {
@@ -249,7 +247,7 @@ public class HBase20xSQLWriterTask
             }
             catch (SQLException e) {
                 //出错了，记录脏数据
-                LOG.error("Failed writing to phoenix, rowNumber: " + rowNumber);
+                LOG.error("Failed writing to phoenix, rowNumber: {}", rowNumber);
                 this.taskPluginCollector.collectDirtyRecord(r, e);
             }
         }
@@ -345,7 +343,7 @@ public class HBase20xSQLWriterTask
                     pstmt.setNull(pos, sqlType);
                     break;
 
-                case Empty:
+                case EMPTY:
                     // 插入"空值"，请注意不同类型的空值不同
                     // 另外，对SQL来说，空值本身是有值的，这与直接操作HBASE Native API时的空值完全不同
                     pstmt.setObject(pos, getEmptyValue(sqlType));
@@ -385,7 +383,7 @@ public class HBase20xSQLWriterTask
 
             case Types.INTEGER:
             case Constant.TYPE_UNSIGNED_INTEGER:
-                return (int) 0;
+                return 0;
 
             case Types.BIGINT:
             case Constant.TYPE_UNSIGNED_LONG:
@@ -395,7 +393,7 @@ public class HBase20xSQLWriterTask
                 return (float) 0.0;
 
             case Types.DOUBLE:
-                return (double) 0.0;
+                return 0.0;
 
             case Types.DECIMAL:
                 return new BigDecimal(0);

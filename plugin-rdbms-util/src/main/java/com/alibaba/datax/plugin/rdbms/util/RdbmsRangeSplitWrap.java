@@ -10,6 +10,8 @@ import java.util.List;
 public final class RdbmsRangeSplitWrap
 {
 
+    private  RdbmsRangeSplitWrap() {}
+    
     public static List<String> splitAndWrap(String left, String right, int expectSliceNumber,
             String columnName, String quote, DataBaseType dataBaseType)
     {

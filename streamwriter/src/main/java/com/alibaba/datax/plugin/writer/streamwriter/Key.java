@@ -13,4 +13,6 @@ public class Key
     public static final String RECORD_NUM_BEFORE_SLEEP = "recordNumBeforeSleep";
 
     public static final String SLEEP_TIME = "sleepTime";
+
+    private Key() {}
 }

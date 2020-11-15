@@ -25,7 +25,7 @@ import java.util.List;
  */
 public class HbaseSQLWriterTask
 {
-    private final static Logger LOG = LoggerFactory.getLogger(HbaseSQLWriterTask.class);
+    private static final Logger LOG = LoggerFactory.getLogger(HbaseSQLWriterTask.class);
     private final HbaseSQLWriterConfig cfg;
     private TaskPluginCollector taskPluginCollector;
     private Connection connection = null;
@@ -212,7 +212,7 @@ public class HbaseSQLWriterTask
 
         String sql = upsertBuilder.toString();
         PreparedStatement ps = connection.prepareStatement(sql);
-        LOG.debug("SQL template generated: " + sql);
+        LOG.debug("SQL template generated: {}", sql);
         return ps;
     }
 
@@ -230,7 +230,7 @@ public class HbaseSQLWriterTask
             String name = columnNames.get(i);
             PDataType type = ptable.getColumnForColumnName(name).getDataType();
             types[i] = type.getSqlType();
-            LOG.debug("Column name : " + name + ", sql type = " + type.getSqlType() + " " + type.getSqlTypeName());
+            LOG.debug("Column name : {}, sql type = {} {} ", name, type.getSqlType(), type.getSqlTypeName());
         }
         return types;
     }
@@ -321,12 +321,12 @@ public class HbaseSQLWriterTask
         else {
             // 没有值，按空值的配置情况处理
             switch (cfg.getNullMode()) {
-                case Skip:
+                case SKIP:
                     // 跳过空值，则不插入该列,
                     ps.setNull(pos, sqlType);
                     break;
 
-                case Empty:
+                case EMPTY:
                     // 插入"空值"，请注意不同类型的空值不同
                     // 另外，对SQL来说，空值本身是有值的，这与直接操作HBASE Native API时的空值完全不同
                     ps.setObject(pos, getEmptyValue(sqlType));

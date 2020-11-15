@@ -23,11 +23,9 @@ public final class OriginalConfPretreatmentUtil
     private static final Logger LOG = LoggerFactory
             .getLogger(OriginalConfPretreatmentUtil.class);
 
-    public static DataBaseType DATABASE_TYPE;
+    public static DataBaseType dataBaseType;
 
-//    public static void doPretreatment(Configuration originalConfig) {
-//        doPretreatment(originalConfig,null);
-//    }
+    private OriginalConfPretreatmentUtil() {}
 
     public static void doPretreatment(Configuration originalConfig, DataBaseType dataBaseType)
     {
@@ -79,7 +77,7 @@ public final class OriginalConfPretreatmentUtil
                 throw DataXException.asDataXException(DBUtilErrorCode.REQUIRED_VALUE, "您未配置的写入数据库表的 jdbcUrl.");
             }
 
-            jdbcUrl = DATABASE_TYPE.appendJDBCSuffixForWriter(jdbcUrl);
+            jdbcUrl = dataBaseType.appendJDBCSuffixForWriter(jdbcUrl);
             originalConfig.set(String.format("%s[%d].%s", Constant.CONN_MARK, i, Key.JDBC_URL),
                     jdbcUrl);
 
@@ -118,10 +116,10 @@ public final class OriginalConfPretreatmentUtil
             boolean isPreCheck = originalConfig.getBool(Key.DRYRUN, false);
             List<String> allColumns;
             if (isPreCheck) {
-                allColumns = DBUtil.getTableColumnsByConn(DATABASE_TYPE, connectionFactory.getConnecttionWithoutRetry(), oneTable);
+                allColumns = DBUtil.getTableColumnsByConn(dataBaseType, connectionFactory.getConnecttionWithoutRetry(), oneTable);
             }
             else {
-                allColumns = DBUtil.getTableColumnsByConn(DATABASE_TYPE, connectionFactory.getConnecttion(), oneTable);
+                allColumns = DBUtil.getTableColumnsByConn(dataBaseType, connectionFactory.getConnecttion(), oneTable);
             }
 
             LOG.info("table:[{}] all columns:[\n{}\n].", oneTable,
@@ -160,7 +158,7 @@ public final class OriginalConfPretreatmentUtil
         String oneTable = originalConfig.getString(String.format(
                 "%s[0].%s[0]", Constant.CONN_MARK, Key.TABLE));
 
-        JdbcConnectionFactory jdbcConnectionFactory = new JdbcConnectionFactory(DATABASE_TYPE, jdbcUrl, username, password);
+        JdbcConnectionFactory jdbcConnectionFactory = new JdbcConnectionFactory(dataBaseType, jdbcUrl, username, password);
         dealColumnConf(originalConfig, jdbcConnectionFactory, oneTable);
     }
 

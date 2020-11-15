@@ -71,15 +71,16 @@ public class KeyConstant
     /**
      * 跳过的列数
      */
-    public static final String SKIP_COUNT = "skipCount";
+//    public static final String SKIP_COUNT = "skipCount"
 
     public static final String LOWER_BOUND = "lowerBound";
     public static final String UPPER_BOUND = "upperBound";
     public static final String IS_OBJECTID = "isObjectId";
-    /**
+
+    /*
      * 批量获取的记录数
      */
-    public static final String BATCH_SIZE = "batchSize";
+//    public static final String BATCH_SIZE = "batchSize"
     /**
      * MongoDB的_id
      */
@@ -90,6 +91,8 @@ public class KeyConstant
     public static final int MONGO_UNAUTHORIZED_ERR_CODE = 13;
     public static final int MONGO_ILLEGALOP_ERR_CODE = 20;
     public static final int MONGO_COMMAND_NOT_FOUND_CODE = 59;
+
+    private KeyConstant() {}
 
     /**
      * 判断是否为数组类型

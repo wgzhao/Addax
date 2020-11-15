@@ -66,9 +66,6 @@ public class DbfFileReader
             this.pattern = new HashMap<>();
             this.isRegexPath = new HashMap<>();
             this.validateParameter();
-            //UnstructuredStorageReaderUtil.validateColumn(this.originConfig);
-//			UnstructuredStorageReaderUtil.validateEncoding(this.originConfig);
-//			UnstructuredStorageReaderUtil.validateCompress(this.originConfig);
         }
 
         private void validateParameter()
@@ -162,31 +159,6 @@ public class DbfFileReader
                     }
                 }
             }
-
-            // only support compress types
-//			String compress = this.originConfig
-//					.getString(com.alibaba.datax.plugin.unstructuredstorage.reader.Key.COMPRESS);
-//			if (StringUtils.isBlank(compress)) {
-//				this.originConfig
-//						.set(com.alibaba.datax.plugin.unstructuredstorage.reader.Key.COMPRESS,
-//								null);
-//			} else {
-//				Set<String> supportedCompress = Sets
-//						.newHashSet("gzip", "bzip2", "zip");
-//				compress = compress.toLowerCase().trim();
-//				if (!supportedCompress.contains(compress)) {
-//					throw DataXException
-//							.asDataXException(
-//									DbfFileReaderErrorCode.ILLEGAL_VALUE,
-//									String.format(
-//											"仅支持 gzip, bzip2, zip 文件压缩格式 , 不支持您配置的文件压缩格式: [%s]",
-//											compress));
-//				}
-//				this.originConfig
-//						.set(com.alibaba.datax.plugin.unstructuredstorage.reader.Key.COMPRESS,
-//								compress);
-//			}
-
         }
 
         @Override
@@ -203,17 +175,19 @@ public class DbfFileReader
             }
             this.sourceFiles = this.buildSourceTargets();
 
-            LOG.info(String.format("您即将读取的文件数为: [%s]", this.sourceFiles.size()));
+            LOG.info("您即将读取的文件数为: [{}]", this.sourceFiles.size());
         }
 
         @Override
         public void post()
         {
+            //
         }
 
         @Override
         public void destroy()
         {
+            //
         }
 
         // warn: 如果源目录为空会报错，拖空目录意图=>空文件显示指定此意图
@@ -224,7 +198,6 @@ public class DbfFileReader
             List<Configuration> readerSplitConfigs = new ArrayList<>();
 
             // warn:每个slice拖且仅拖一个文件,
-            // int splitNumber = adviceNumber;
             int splitNumber = this.sourceFiles.size();
             if (0 == splitNumber) {
                 throw DataXException.asDataXException(
@@ -311,9 +284,7 @@ public class DbfFileReader
             if (!directory.isDirectory()) {
                 if (this.isTargetFile(regexPath, directory.getAbsolutePath())) {
                     toBeReadFiles.add(parentDirectory);
-                    LOG.info(String.format(
-                            "add file [%s] as a candidate to be read.",
-                            parentDirectory));
+                    LOG.info("add file [{}] as a candidate to be read.", parentDirectory);
                 }
             }
             else {
@@ -352,7 +323,7 @@ public class DbfFileReader
         // 正则过滤
         private boolean isTargetFile(String regexPath, String absoluteFilePath)
         {
-            if (this.isRegexPath.get(regexPath)) {
+            if (Boolean.TRUE.equals(this.isRegexPath.get(regexPath))) {
                 return this.pattern.get(regexPath).matcher(absoluteFilePath)
                         .matches();
             }
@@ -398,19 +369,19 @@ public class DbfFileReader
         @Override
         public void prepare()
         {
-
+            //
         }
 
         @Override
         public void post()
         {
-
+            //
         }
 
         @Override
         public void destroy()
         {
-
+            //
         }
 
         @Override

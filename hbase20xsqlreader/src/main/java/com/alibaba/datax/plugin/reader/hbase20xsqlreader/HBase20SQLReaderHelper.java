@@ -25,7 +25,7 @@ public class HBase20SQLReaderHelper
 {
     private static final Logger LOG = LoggerFactory.getLogger(HBase20SQLReaderHelper.class);
 
-    private Configuration configuration;
+    private final Configuration configuration;
 
     private Connection connection;
     private List<String> querySql;
@@ -83,9 +83,8 @@ public class HBase20SQLReaderHelper
 
     private static boolean isLongType(int type)
     {
-        boolean isValidLongType = type == Types.BIGINT || type == Types.INTEGER
+        return type == Types.BIGINT || type == Types.INTEGER
                 || type == Types.SMALLINT || type == Types.TINYINT;
-        return isValidLongType;
     }
 
     private static boolean isStringType(int type)
@@ -135,7 +134,7 @@ public class HBase20SQLReaderHelper
     public Connection getConnection(String queryServerAddress, String serialization)
     {
         String url = String.format(Constant.CONNECT_STRING_TEMPLATE, queryServerAddress, serialization);
-        LOG.debug("Connecting to QueryServer [" + url + "] ...");
+        LOG.debug("Connecting to QueryServer [{}] ...", url);
         Connection conn;
         try {
             Class.forName(Constant.CONNECT_DRIVER_STRING);
@@ -169,8 +168,8 @@ public class HBase20SQLReaderHelper
                 selectSql = selectSql + " AND TABLE_SCHEM = '" + schema + "'";
             }
             resultSet = statement.executeQuery(selectSql);
-            List<String> primaryColumnNames = new ArrayList<String>();
-            List<String> allColumnName = new ArrayList<String>();
+            List<String> primaryColumnNames = new ArrayList<>();
+            List<String> allColumnName = new ArrayList<>();
             while (resultSet.next()) {
                 String columnName = resultSet.getString(1);
                 allColumnName.add(columnName);
@@ -192,12 +191,10 @@ public class HBase20SQLReaderHelper
                 columnNames = allColumnName;
                 configuration.set(Key.COLUMN, allColumnName);
             }
-            if (splitKey != null) {
+            if (splitKey != null && !primaryColumnNames.contains(splitKey)) {
                 // 切分列必须是主键列，否则会严重影响读取性能
-                if (!primaryColumnNames.contains(splitKey)) {
-                    throw DataXException.asDataXException(HBase20xSQLReaderErrorCode.ILLEGAL_VALUE,
+                throw DataXException.asDataXException(HBase20xSQLReaderErrorCode.ILLEGAL_VALUE,
                             "您配置的切分列" + splitKey + "不是表" + tableName + "的主键，请检查您的配置或者联系HBase管理员.");
-                }
             }
         }
         catch (SQLException e) {
@@ -223,7 +220,7 @@ public class HBase20SQLReaderHelper
             }
         }
         catch (SQLException e) {
-            LOG.warn("数据库连接关闭异常.", HBase20xSQLReaderErrorCode.CLOSE_PHOENIX_CONNECTION_ERROR, e);
+            LOG.warn("数据库连接关闭异常. {}", HBase20xSQLReaderErrorCode.CLOSE_PHOENIX_CONNECTION_ERROR, e);
         }
     }
 
@@ -244,7 +241,7 @@ public class HBase20SQLReaderHelper
      */
     public List<Configuration> doSplit(int adviceNumber)
     {
-        List<Configuration> pluginParams = new ArrayList<Configuration>();
+        List<Configuration> pluginParams = new ArrayList<>();
         List<String> rangeList;
         String where = configuration.getString(Key.WHERE);
         boolean hasWhere = StringUtils.isNotBlank(where);
@@ -297,7 +294,7 @@ public class HBase20SQLReaderHelper
 
                     tempQuerySql = buildQuerySql(columnNames, fullTableName, where)
                             + (hasWhere ? " and " : " where ") + range;
-                    LOG.info("Query SQL: " + tempQuerySql);
+                    LOG.info("Query SQL: {}", tempQuerySql);
                     tempConfig.set(Constant.QUERY_SQL_PER_SPLIT, tempQuerySql);
                     pluginParams.add(tempConfig);
                 }
@@ -307,7 +304,7 @@ public class HBase20SQLReaderHelper
                 tempQuerySql = buildQuerySql(columnNames, fullTableName, where)
                         + (hasWhere ? " and " : " where ")
                         + String.format(" %s IS NOT NULL", splitKey);
-                LOG.info("Query SQL: " + tempQuerySql);
+                LOG.info("Query SQL: {}", tempQuerySql);
                 tempConfig.set(Constant.QUERY_SQL_PER_SPLIT, tempQuerySql);
                 pluginParams.add(tempConfig);
             }
@@ -328,7 +325,7 @@ public class HBase20SQLReaderHelper
         String getSplitKeyTypeSQL = String.format(Constant.QUERY_COLUMN_TYPE_TEMPLATE, splitKey, fullTableName);
         Statement statement = null;
         ResultSet resultSet = null;
-        List<String> splitConditions = new ArrayList<String>();
+        List<String> splitConditions = new ArrayList<>();
 
         try {
             statement = connection.createStatement();
@@ -355,8 +352,10 @@ public class HBase20SQLReaderHelper
                 case Types.ARRAY:
                     throw DataXException.asDataXException(HBase20xSQLReaderErrorCode.ILLEGAL_SPLIT_PK,
                             "切分列类型为" + rsMetaData.getColumnTypeName(1) + "，暂不支持该类型字段作为切分列。");
+                default:
+                    break;
             }
-            String splitCondition = null;
+            String splitCondition;
             for (int i = 0; i <= splitPoints.size(); i++) {
                 if (i == 0) {
                     splitCondition = splitKey + " <= " + String.format(symbol, splitPoints.get(i));
@@ -401,21 +400,18 @@ public class HBase20SQLReaderHelper
 
             if (isPKTypeValid(rsMetaData)) {
                 if (isStringType(rsMetaData.getColumnType(1))) {
-                    if (configuration != null) {
-                        configuration
-                                .set(Constant.PK_TYPE, Constant.PK_TYPE_STRING);
-                    }
+                    configuration.set(Constant.PK_TYPE, Constant.PK_TYPE_STRING);
+
                     if (resultSet.next()) {
-                        minMaxPK = new ImmutablePair<Object, Object>(
+                        minMaxPK = new ImmutablePair<>(
                                 resultSet.getString(1), resultSet.getString(2));
                     }
                 }
                 else if (isLongType(rsMetaData.getColumnType(1))) {
-                    if (configuration != null) {
-                        configuration.set(Constant.PK_TYPE, Constant.PK_TYPE_LONG);
-                    }
+                    configuration.set(Constant.PK_TYPE, Constant.PK_TYPE_LONG);
+
                     if (resultSet.next()) {
-                        minMaxPK = new ImmutablePair<Object, Object>(
+                        minMaxPK = new ImmutablePair<>(
                                 resultSet.getLong(1), resultSet.getLong(2));
                     }
                 }

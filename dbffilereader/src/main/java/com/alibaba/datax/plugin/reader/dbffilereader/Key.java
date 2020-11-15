@@ -5,5 +5,7 @@ package com.alibaba.datax.plugin.reader.dbffilereader;
  */
 public class Key
 {
+    private Key() {}
+
     public static final String PATH = "path";
 }

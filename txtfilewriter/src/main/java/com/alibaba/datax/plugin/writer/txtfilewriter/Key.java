@@ -7,4 +7,6 @@ public class Key
 {
     // must have
     public static final String PATH = "path";
+
+    private Key() {}
 }

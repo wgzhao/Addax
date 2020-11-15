@@ -25,6 +25,7 @@ import java.util.Arrays;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Objects;
 import java.util.Set;
 import java.util.UUID;
 
@@ -111,28 +112,27 @@ public class DbfFileWriter
                     .getString(com.alibaba.datax.plugin.unstructuredstorage.writer.Key.WRITE_MODE);
             // truncate option handler
             if ("truncate".equals(writeMode)) {
-                LOG.info(String.format(
-                        "由于您配置了writeMode truncate, 开始清理 [%s] 下面以 [%s] 开头的内容",
-                        path, fileName));
+                LOG.info("由于您配置了writeMode truncate, 开始清理 [{}] 下面以 [{}] 开头的内容",
+                        path, fileName);
                 File dir = new File(path);
                 // warn:需要判断文件是否存在，不存在时，不能删除
                 try {
                     if (dir.exists()) {
-                        // warn:不要使用FileUtils.deleteQuietly(dir);
+                        // warn:不要使用FileUtils.deleteQuietly(dir)
                         FilenameFilter filter = new PrefixFileFilter(fileName);
                         File[] filesWithFileNamePrefix = dir.listFiles(filter);
+                        assert filesWithFileNamePrefix != null;
                         for (File eachFile : filesWithFileNamePrefix) {
-                            LOG.info(String.format("delete file [%s].",
-                                    eachFile.getName()));
+                            LOG.info("delete file [{}].", eachFile.getName());
                             FileUtils.forceDelete(eachFile);
                         }
-                        // FileUtils.cleanDirectory(dir);
+                        // FileUtils.cleanDirectory(dir)
                     }
                 }
                 catch (NullPointerException npe) {
                     throw DataXException
                             .asDataXException(
-                                    DbfFileWriterErrorCode.Write_FILE_ERROR,
+                                    DbfFileWriterErrorCode.WRITE_FILE_ERROR,
                                     String.format("您配置的目录清空时出现空指针异常 : [%s]",
                                             path), npe);
                 }
@@ -148,18 +148,16 @@ public class DbfFileWriter
                 }
                 catch (IOException e) {
                     throw DataXException.asDataXException(
-                            DbfFileWriterErrorCode.Write_FILE_ERROR,
+                            DbfFileWriterErrorCode.WRITE_FILE_ERROR,
                             String.format("无法清空目录 : [%s]", path), e);
                 }
             }
             else if ("append".equals(writeMode)) {
-                LOG.info(String
-                        .format("由于您配置了writeMode append, 写入前不做清理工作, [%s] 目录下写入相应文件名前缀  [%s] 的文件",
-                                path, fileName));
+                LOG.info("由于您配置了writeMode append, 写入前不做清理工作, [{}] 目录下写入相应文件名前缀 [{}] 的文件",
+                                path, fileName);
             }
             else if ("nonConflict".equals(writeMode)) {
-                LOG.info(String.format(
-                        "由于您配置了writeMode nonConflict, 开始检查 [%s] 下面的内容", path));
+                LOG.info("由于您配置了writeMode nonConflict, 开始检查 [{}] 下面的内容", path);
                 // warn: check two times about exists, mkdirs
                 File dir = new File(path);
                 try {
@@ -175,13 +173,14 @@ public class DbfFileWriter
                         // fileName is not null
                         FilenameFilter filter = new PrefixFileFilter(fileName);
                         File[] filesWithFileNamePrefix = dir.listFiles(filter);
+                        assert filesWithFileNamePrefix != null;
                         if (filesWithFileNamePrefix.length > 0) {
                             List<String> allFiles = new ArrayList<>();
                             for (File eachFile : filesWithFileNamePrefix) {
                                 allFiles.add(eachFile.getName());
                             }
-                            LOG.error(String.format("冲突文件列表为: [%s]",
-                                    StringUtils.join(allFiles, ",")));
+                            LOG.error("冲突文件列表为: [{}]",
+                                    StringUtils.join(allFiles, ","));
                             throw DataXException
                                     .asDataXException(
                                             DbfFileWriterErrorCode.ILLEGAL_VALUE,
@@ -221,20 +220,20 @@ public class DbfFileWriter
         @Override
         public void post()
         {
-
+            //
         }
 
         @Override
         public void destroy()
         {
-
+            //
         }
 
         @Override
         public List<Configuration> split(int mandatoryNumber)
         {
             LOG.info("begin do split...");
-            List<Configuration> writerSplitConfigs = new ArrayList<Configuration>();
+            List<Configuration> writerSplitConfigs = new ArrayList<>();
             String filePrefix = this.writerSliceConfig
                     .getString(com.alibaba.datax.plugin.unstructuredstorage.writer.Key.FILE_NAME);
 
@@ -243,7 +242,7 @@ public class DbfFileWriter
             try {
                 path = this.writerSliceConfig.getString(Key.PATH);
                 File dir = new File(path);
-                allFiles = new HashSet<>(Arrays.asList(dir.list()));
+                allFiles = new HashSet<>(Arrays.asList(Objects.requireNonNull(dir.list())));
             }
             catch (SecurityException se) {
                 throw DataXException.asDataXException(
@@ -370,7 +369,7 @@ public class DbfFileWriter
                                     rowData[i] = Float.valueOf(colData);
                                     break;
                                 case "char":
-                                    //rowData[i] = new String(colData.getBytes("GBK"));
+                                    //rowData[i] = new String(colData.getBytes("GBK"))
                                     rowData[i] = colData;
                                     break;
                                 case "date":
@@ -378,6 +377,8 @@ public class DbfFileWriter
                                     break;
                                 case "logical":
                                     rowData[i] = Boolean.parseBoolean(colData);
+                                    break;
+                                default:
                                     break;
                             }
                         }
@@ -419,13 +420,13 @@ public class DbfFileWriter
         @Override
         public void post()
         {
-
+            //
         }
 
         @Override
         public void destroy()
         {
-
+            //
         }
     }
 }

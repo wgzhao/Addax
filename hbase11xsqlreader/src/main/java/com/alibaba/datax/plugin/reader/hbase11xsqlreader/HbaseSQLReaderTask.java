@@ -40,7 +40,7 @@ import java.util.Map;
  */
 public class HbaseSQLReaderTask
 {
-    private static Logger LOG = LoggerFactory.getLogger(HbaseSQLReaderTask.class);
+    private static final Logger log = LoggerFactory.getLogger(HbaseSQLReaderTask.class);
     PhoenixInputSplit phoenixInputSplit;
     private PhoenixInputFormat phoenixInputFormat;
     private PhoenixRecordReader phoenixRecordReader;
@@ -51,28 +51,30 @@ public class HbaseSQLReaderTask
     public HbaseSQLReaderTask(Configuration config)
     {
         this.readerConfig = HbaseSQLHelper.parseConfig(config);
-        pColumns = new LinkedHashMap<String, PColumn>();
+        pColumns = new LinkedHashMap<>();
     }
 
     private void getPColumns()
             throws SQLException
     {
-        Connection con =
-                DriverManager.getConnection(this.readerConfig.getConnectionString());
-        PhoenixConnection phoenixConnection = con.unwrap(PhoenixConnection.class);
-        MetaDataClient metaDataClient = new MetaDataClient(phoenixConnection);
-        PTable table = metaDataClient.updateCache("", this.readerConfig.getTableName()).getTable();
-        List<String> columnNames = this.readerConfig.getColumns();
-        for (PColumn pColumn : table.getColumns()) {
-            if (columnNames.contains(pColumn.getName().getString())) {
-                pColumns.put(pColumn.getName().getString(), pColumn);
+        try(Connection con =
+                DriverManager.getConnection(this.readerConfig.getConnectionString()))
+        {
+            PhoenixConnection phoenixConnection = con.unwrap(PhoenixConnection.class);
+            MetaDataClient metaDataClient = new MetaDataClient(phoenixConnection);
+            PTable table = metaDataClient.updateCache("", this.readerConfig.getTableName()).getTable();
+            List<String> columnNames = this.readerConfig.getColumns();
+            for (PColumn pColumn : table.getColumns()) {
+                if (columnNames.contains(pColumn.getName().getString())) {
+                    pColumns.put(pColumn.getName().getString(), pColumn);
+                }
             }
         }
     }
 
     public void init()
     {
-        LOG.info("reader table info: " + this.readerConfig.toString());
+        log.info("reader table info: {}", this.readerConfig);
         try {
             this.getPColumns();
         }

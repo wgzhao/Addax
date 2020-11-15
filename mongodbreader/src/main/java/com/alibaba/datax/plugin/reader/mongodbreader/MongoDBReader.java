@@ -73,7 +73,7 @@ public class MongoDBReader
         @Override
         public void destroy()
         {
-
+            //
         }
     }
 
@@ -157,7 +157,6 @@ public class MongoDBReader
                         record.addColumn(new StringColumn(null));
                     }
                     else if (tempCol instanceof Double) {
-                        //TODO deal with Double.isNaN()
                         record.addColumn(new DoubleColumn((Double) tempCol));
                     }
                     else if (tempCol instanceof Boolean) {
@@ -189,7 +188,7 @@ public class MongoDBReader
                             }
                             else {
                                 ArrayList<String> array = (ArrayList) tempCol;
-                                //String tempArrayStr = Joiner.on(splitter).join(array);
+                                //String tempArrayStr = Joiner.on(splitter).join(array)
                                 String tempArrayStr = String.join(splitter, array);
                                 record.addColumn(new StringColumn(tempArrayStr));
                             }
@@ -229,7 +228,7 @@ public class MongoDBReader
         @Override
         public void destroy()
         {
-
+            //
         }
     }
 }

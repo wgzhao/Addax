@@ -109,40 +109,6 @@ public class DFSUtil
         LOG.info("hadoopConfig details:{}", JSON.toJSONString(this.hadoopConf));
     }
 
-    public static void main(String[] args)
-    {
-        ParquetReader<GenericData.Record> reader = null;
-        Path path = new Path("/tmp/000000_0");
-        try {
-            GenericData decimalSupport = new GenericData();
-            decimalSupport.addLogicalTypeConversion(new Conversions.DecimalConversion());
-            reader = AvroParquetReader
-                    .<GenericData.Record>builder(path)
-                    .withDataModel(decimalSupport)
-                    .withConf(new org.apache.hadoop.conf.Configuration())
-                    .build();
-            GenericData.Record record = reader.read();
-            while (record != null) {
-                System.out.println(record);
-                record = reader.read();
-            }
-        }
-        catch (IOException e) {
-            e.printStackTrace();
-        }
-        finally {
-            if (reader != null) {
-                try {
-                    reader.close();
-                }
-                catch (IOException e) {
-                    // TODO Auto-generated catch block
-                    e.printStackTrace();
-                }
-            }
-        }
-    }
-
     private void kerberosAuthentication(String kerberosPrincipal, String kerberosKeytabFilePath)
     {
         if (haveKerberos && StringUtils.isNotBlank(this.kerberosPrincipal) && StringUtils.isNotBlank(this.kerberosKeytabFilePath)) {
@@ -464,6 +430,7 @@ public class DFSUtil
         if (columnIndexMax >= 0) {
             JobConf conf = new JobConf(hadoopConf);
             Path parquetFilePath = new Path(sourceParquestFilePath);
+//            InputFile inputFile =
             GenericData decimalSupport = new GenericData();
             decimalSupport.addLogicalTypeConversion(new Conversions.DecimalConversion());
             try (ParquetReader<GenericData.Record> reader = AvroParquetReader
@@ -697,7 +664,7 @@ public class DFSUtil
             taskPluginCollector.collectDirtyRecord(record, e.getMessage());
         }
 
-//        return record;
+//        return record
     }
 
     private int getAllColumnsCount(String filePath)
@@ -705,7 +672,7 @@ public class DFSUtil
         Path path = new Path(filePath);
         try {
             Reader reader = OrcFile.createReader(path, OrcFile.readerOptions(hadoopConf));
-//            return reader.getTypes().get(0).getSubtypesCount();
+//            return reader.getTypes().get(0).getSubtypesCount()
             return reader.getSchema().getChildren().size();
         }
         catch (IOException e) {
@@ -835,26 +802,26 @@ public class DFSUtil
     {
 
         // The first version of RCFile used the sequence file header.
-        byte[] ORIGINAL_MAGIC = {(byte) 'S', (byte) 'E', (byte) 'Q'};
+        final byte[] originalMagic = {(byte) 'S', (byte) 'E', (byte) 'Q'};
         // The 'magic' bytes at the beginning of the RCFile
-        byte[] RC_MAGIC = {(byte) 'R', (byte) 'C', (byte) 'F'};
+        final byte[] rcMagic = {(byte) 'R', (byte) 'C', (byte) 'F'};
         // the version that was included with the original magic, which is mapped
         // into ORIGINAL_VERSION
         final byte ORIGINAL_MAGIC_VERSION_WITH_METADATA = 6;
         // All of the versions should be place in this list.
         final int ORIGINAL_VERSION = 0;  // version with SEQ
         // version with RCF
-        // final int NEW_MAGIC_VERSION = 1;
-        // final int CURRENT_VERSION = NEW_MAGIC_VERSION;
+        // final int NEW_MAGIC_VERSION = 1
+        // final int CURRENT_VERSION = NEW_MAGIC_VERSION
         final int CURRENT_VERSION = 1;
         byte version;
 
-        byte[] magic = new byte[RC_MAGIC.length];
+        byte[] magic = new byte[rcMagic.length];
         try {
             in.seek(0);
             in.readFully(magic);
 
-            if (Arrays.equals(magic, ORIGINAL_MAGIC)) {
+            if (Arrays.equals(magic, originalMagic)) {
                 byte vers = in.readByte();
                 if (vers != ORIGINAL_MAGIC_VERSION_WITH_METADATA) {
                     return false;
@@ -862,7 +829,7 @@ public class DFSUtil
                 version = ORIGINAL_VERSION;
             }
             else {
-                if (!Arrays.equals(magic, RC_MAGIC)) {
+                if (!Arrays.equals(magic, rcMagic)) {
                     return false;
                 }
 
@@ -903,12 +870,12 @@ public class DFSUtil
     // 判断file是否是Sequence file
     private boolean isSequenceFile(Path filepath, FSDataInputStream in)
     {
-        byte[] SEQ_MAGIC = {(byte) 'S', (byte) 'E', (byte) 'Q'};
-        byte[] magic = new byte[SEQ_MAGIC.length];
+        final byte[] seqMagic = {(byte) 'S', (byte) 'E', (byte) 'Q'};
+        byte[] magic = new byte[seqMagic.length];
         try {
             in.seek(0);
             in.readFully(magic);
-            return Arrays.equals(magic, SEQ_MAGIC);
+            return Arrays.equals(magic, seqMagic);
         }
         catch (IOException e) {
             LOG.info("检查文件类型: [{}] 不是Sequence File.", filepath);

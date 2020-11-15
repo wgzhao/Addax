@@ -16,6 +16,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.RandomAccessFile;
 import java.nio.charset.Charset;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.regex.Matcher;
@@ -33,8 +34,8 @@ import static java.nio.charset.Charset.defaultCharset;
 public class DbfReader
         implements Closeable
 {
-    protected final byte DATA_ENDED = 0x1A;
-    protected final byte DATA_DELETED = 0x2A;
+    protected static final byte DATA_ENDED = 0x1A;
+    protected static final byte DATA_DELETED = 0x2A;
     private final DbfHeader header;
     private Charset charset = defaultCharset();
     private DataInput dataInput;
@@ -143,7 +144,7 @@ public class DbfReader
             do {
                 nextByte = dataInput.readByte();
                 if (nextByte == DATA_ENDED) {
-                    return null;
+                    return new Object[0];
                 }
                 else if (nextByte == DATA_DELETED) {
                     dataInput.skipBytes(header.getRecordLength() - 1);
@@ -151,14 +152,14 @@ public class DbfReader
             }
             while (nextByte == DATA_DELETED);
 
-            Object recordObjects[] = new Object[header.getFieldsCount()];
+            Object[] recordObjects = new Object[header.getFieldsCount()];
             for (int i = 0; i < header.getFieldsCount(); i++) {
                 recordObjects[i] = readFieldValue(header.getField(i));
             }
             return recordObjects;
         }
         catch (EOFException e) {
-            return null; // we currently end reading file
+            return new Object[0]; // we currently end reading file
         }
         catch (IOException e) {
             throw new DbfException("Cannot read next record form Dbf file", e);
@@ -194,7 +195,6 @@ public class DbfReader
     }
 
     protected Date readDateValue(DbfField field, byte[] buf)
-            throws IOException
     {
         int year = DbfUtils.parseInt(buf, 0, 4);
         int month = DbfUtils.parseInt(buf, 4, 6);
@@ -203,7 +203,6 @@ public class DbfReader
     }
 
     protected Float readFloatValue(DbfField field, byte[] buf)
-            throws IOException
     {
         try {
             byte[] floatBuf = DbfUtils.trimLeftSpaces(buf);
@@ -216,14 +215,12 @@ public class DbfReader
     }
 
     protected Boolean readLogicalValue(DbfField field, byte[] buf)
-            throws IOException
     {
         boolean isTrue = (buf[0] == 'Y' || buf[0] == 'y' || buf[0] == 'T' || buf[0] == 't');
         return isTrue ? Boolean.TRUE : Boolean.FALSE;
     }
 
     protected Number readNumericValue(DbfField field, byte[] buf)
-            throws IOException
     {
         try {
             byte[] numericBuf = DbfUtils.trimLeftSpaces(buf);

@@ -30,11 +30,11 @@ public class NormalTask
     public Put convertRecordToPut(com.alibaba.datax.common.element.Record record)
     {
         byte[] rowkey = getRowkey(record);
-        Put put = null;
+        Put put;
         if (this.versionColumn == null) {
             put = new Put(rowkey);
             if (!super.walFlag) {
-                //等价与0.94 put.setWriteToWAL(super.walFlag);
+                //等价与0.94 put.setWriteToWAL(super.walFlag)
                 put.setDurability(Durability.SKIP_WAL);
             }
         }
@@ -62,9 +62,6 @@ public class NormalTask
                         cfAndQualifier[0]),
                         Bytes.toBytes(cfAndQualifier[1]),
                         columnBytes);
-            }
-            else {
-                continue;
             }
         }
         return put;
@@ -111,19 +108,19 @@ public class NormalTask
             if (record.getColumn(index).getRawData() == null) {
                 throw DataXException.asDataXException(Hbase11xWriterErrorCode.CONSTRUCT_VERSION_ERROR, "您指定的版本为空!");
             }
-            SimpleDateFormat df_senconds = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-            SimpleDateFormat df_ms = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss SSS");
+            SimpleDateFormat dfSenconds = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+            SimpleDateFormat dfMs = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss SSS");
             if (record.getColumn(index) instanceof LongColumn || record.getColumn(index) instanceof DoubleColumn) {
                 timestamp = record.getColumn(index).asLong();
             }
             else {
                 Date date;
                 try {
-                    date = df_ms.parse(record.getColumn(index).asString());
+                    date = dfMs.parse(record.getColumn(index).asString());
                 }
                 catch (ParseException e) {
                     try {
-                        date = df_senconds.parse(record.getColumn(index).asString());
+                        date = dfSenconds.parse(record.getColumn(index).asString());
                     }
                     catch (ParseException e1) {
                         LOG.info(String.format("您指定第[%s]列作为hbase写入版本,但在尝试用yyyy-MM-dd HH:mm:ss 和 yyyy-MM-dd HH:mm:ss SSS 去解析为Date时均出错,请检查并修改", index));

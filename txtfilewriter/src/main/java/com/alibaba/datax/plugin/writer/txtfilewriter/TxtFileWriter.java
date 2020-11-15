@@ -123,7 +123,7 @@ public class TxtFileWriter
             // path can writer it ?
             if (!dir.canWrite()) {
                 throw DataXException.asDataXException(
-                        TxtFileWriterErrorCode.Write_FILE_ERROR, String.format("您配置的路径 [%s] 没有写入权限", path)
+                        TxtFileWriterErrorCode.WRITE_FILE_ERROR, String.format("您配置的路径 [%s] 没有写入权限", path)
                 );
             }
             // truncate option handler
@@ -142,7 +142,7 @@ public class TxtFileWriter
                 catch (NullPointerException npe) {
                     throw DataXException
                             .asDataXException(
-                                    TxtFileWriterErrorCode.Write_FILE_ERROR,
+                                    TxtFileWriterErrorCode.WRITE_FILE_ERROR,
                                     String.format("您配置的目录清空时出现空指针异常 : [%s]",
                                             path), npe);
                 }
@@ -153,7 +153,7 @@ public class TxtFileWriter
                 }
                 catch (IOException e) {
                     throw DataXException.asDataXException(
-                            TxtFileWriterErrorCode.Write_FILE_ERROR,
+                            TxtFileWriterErrorCode.WRITE_FILE_ERROR,
                             String.format("无法清空目录 : [%s]", path), e);
                 }
             }
@@ -214,13 +214,13 @@ public class TxtFileWriter
         @Override
         public void post()
         {
-
+            //
         }
 
         @Override
         public void destroy()
         {
-
+            //
         }
 
         @Override
@@ -297,7 +297,7 @@ public class TxtFileWriter
         @Override
         public void prepare()
         {
-
+            //
         }
 
         @Override
@@ -324,7 +324,7 @@ public class TxtFileWriter
             }
             catch (IOException ioe) {
                 throw DataXException.asDataXException(
-                        TxtFileWriterErrorCode.Write_FILE_IO_ERROR,
+                        TxtFileWriterErrorCode.WRITE_FILE_IO_ERROR,
                         String.format("无法创建待写文件 : [%s]", this.fileName), ioe);
             }
             finally {
@@ -357,13 +357,13 @@ public class TxtFileWriter
         @Override
         public void post()
         {
-
+            //
         }
 
         @Override
         public void destroy()
         {
-
+            //
         }
     }
 }

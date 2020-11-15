@@ -19,7 +19,7 @@ public enum HBase20xSQLReaderErrorCode
     private final String code;
     private final String description;
 
-    private HBase20xSQLReaderErrorCode(String code, String description)
+    HBase20xSQLReaderErrorCode(String code, String description)
     {
         this.code = code;
         this.description = description;

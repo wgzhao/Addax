@@ -21,7 +21,9 @@ public final class OriginalConfPretreatmentUtil
     private static final Logger LOG = LoggerFactory
             .getLogger(OriginalConfPretreatmentUtil.class);
 
-    public static DataBaseType DATABASE_TYPE;
+    public static DataBaseType dataBaseType;
+
+    private OriginalConfPretreatmentUtil() {}
 
     public static void doPretreatment(Configuration originalConfig)
     {
@@ -97,15 +99,15 @@ public final class OriginalConfPretreatmentUtil
 
             String jdbcUrl;
             if (isPreCheck) {
-                jdbcUrl = DBUtil.chooseJdbcUrlWithoutRetry(DATABASE_TYPE, jdbcUrls,
+                jdbcUrl = DBUtil.chooseJdbcUrlWithoutRetry(dataBaseType, jdbcUrls,
                         username, password, preSql, checkSlave);
             }
             else {
-                jdbcUrl = DBUtil.chooseJdbcUrl(DATABASE_TYPE, jdbcUrls,
+                jdbcUrl = DBUtil.chooseJdbcUrl(dataBaseType, jdbcUrls,
                         username, password, preSql, checkSlave);
             }
 
-            jdbcUrl = DATABASE_TYPE.appendJDBCSuffixForReader(jdbcUrl);
+            jdbcUrl = dataBaseType.appendJDBCSuffixForReader(jdbcUrl);
 
             // 回写到connection[i].jdbcUrl
             originalConfig.set(String.format("%s[%d].%s", Constant.CONN_MARK,
@@ -169,7 +171,7 @@ public final class OriginalConfPretreatmentUtil
                             "%s[0].%s[0]", Constant.CONN_MARK, Key.TABLE));
 
                     List<String> allColumns = DBUtil.getTableColumns(
-                            DATABASE_TYPE, jdbcUrl, username, password,
+                            dataBaseType, jdbcUrl, username, password,
                             tableName);
                     LOG.info("table:[{}] has columns:[{}].",
                             tableName, StringUtils.join(allColumns, ","));
@@ -185,27 +187,14 @@ public final class OriginalConfPretreatmentUtil
                         }
 
                         quotedColumns.add(column);
-                        //以下判断没有任何意义
-//                        if (null == column) {
-//                            quotedColumns.add(null);
-//                        } else {
-//                            if (allColumns.contains(column.toLowerCase())) {
-//                                quotedColumns.add(column);
-//                            } else {
-//                                // 可能是由于用户填写为函数，或者自己对字段进行了`处理或者常量
-//                            	quotedColumns.add(column);
-//                            }
-//                        }
                     }
 
                     originalConfig.set(Key.COLUMN_LIST, quotedColumns);
                     originalConfig.set(Key.COLUMN,
                             StringUtils.join(quotedColumns, ","));
-                    if (StringUtils.isNotBlank(splitPk)) {
-                        if (!allColumns.contains(splitPk.toLowerCase())) {
-                            throw DataXException.asDataXException(DBUtilErrorCode.ILLEGAL_SPLIT_PK,
-                                    String.format("您的配置文件中的列配置信息有误. 因为根据您的配置，您读取的数据库表:%s 中没有主键名为:%s. 请检查您的配置并作出修改.", tableName, splitPk));
-                        }
+                    if (StringUtils.isNotBlank(splitPk) && !allColumns.contains(splitPk.toLowerCase())) {
+                        throw DataXException.asDataXException(DBUtilErrorCode.ILLEGAL_SPLIT_PK,
+                                String.format("您的配置文件中的列配置信息有误. 因为根据您的配置，您读取的数据库表:%s 中没有主键名为:%s. 请检查您的配置并作出修改.", tableName, splitPk));
                     }
                 }
             }
@@ -239,14 +228,14 @@ public final class OriginalConfPretreatmentUtil
         List<Object> conns = originalConfig.getList(Constant.CONN_MARK,
                 Object.class);
 
-        List<Boolean> tableModeFlags = new ArrayList<Boolean>();
-        List<Boolean> querySqlModeFlags = new ArrayList<Boolean>();
+        List<Boolean> tableModeFlags = new ArrayList<>();
+        List<Boolean> querySqlModeFlags = new ArrayList<>();
 
-        String table = null;
-        String querySql = null;
+        String table;
+        String querySql;
 
-        boolean isTableMode = false;
-        boolean isQuerySqlMode = false;
+        boolean isTableMode;
+        boolean isQuerySqlMode;
         for (Object conn : conns) {
             Configuration connConf = Configuration
                     .from(conn.toString());

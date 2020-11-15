@@ -23,6 +23,8 @@ import java.util.List;
 public class CollectionSplitUtil
 {
 
+    private CollectionSplitUtil() {}
+
     public static List<Configuration> doSplit(
             Configuration originalSliceConfig, int adviceNumber, MongoClient mongoClient)
     {
@@ -90,7 +92,7 @@ public class CollectionSplitUtil
         }
         int splitPointCount = adviceNumber - 1;
         int chunkDocCount = docCount / adviceNumber;
-        ArrayList<Object> splitPoints = new ArrayList<Object>();
+        ArrayList<Object> splitPoints = new ArrayList<>();
 
         // test if user has splitVector role(clusterManager)
         boolean supportSplitVector = true;
@@ -110,7 +112,7 @@ public class CollectionSplitUtil
         if (supportSplitVector) {
             boolean forceMedianSplit = false;
             int maxChunkSize = (docCount / splitPointCount - 1) * 2 * avgObjSize / (1024 * 1024);
-            //int maxChunkSize = (chunkDocCount - 1) * 2 * avgObjSize / (1024 * 1024);
+            //int maxChunkSize = (chunkDocCount - 1) * 2 * avgObjSize / (1024 * 1024)
             if (maxChunkSize < 1) {
                 forceMedianSplit = true;
             }

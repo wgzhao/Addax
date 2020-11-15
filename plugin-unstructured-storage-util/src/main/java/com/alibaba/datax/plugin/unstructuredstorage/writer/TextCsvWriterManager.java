@@ -39,7 +39,7 @@ class CsvWriterImpl
         this.csvWriter.setTextQualifier('"');
         this.csvWriter.setUseTextQualifier(true);
         // warn: in linux is \n , in windows is \r\n
-        this.csvWriter.setRecordDelimiter(IOUtils.LINE_SEPARATOR.charAt(0));
+        this.csvWriter.setRecordDelimiter(IOUtils.LINE_SEPARATOR_UNIX.charAt(0));
     }
 
     @Override
@@ -90,7 +90,7 @@ class TextWriterImpl
         }
         this.textWriter.write(String.format("%s%s",
                 StringUtils.join(splitedRows, this.fieldDelimiter),
-                IOUtils.LINE_SEPARATOR));
+                IOUtils.LINE_SEPARATOR_UNIX));
     }
 
     @Override

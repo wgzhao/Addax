@@ -36,7 +36,7 @@ public class CommonRdbmsWriter
         public Job(DataBaseType dataBaseType)
         {
             this.dataBaseType = dataBaseType;
-            OriginalConfPretreatmentUtil.DATABASE_TYPE = this.dataBaseType;
+            OriginalConfPretreatmentUtil.dataBaseType = this.dataBaseType;
         }
 
         public void init(Configuration originalConfig)
@@ -176,6 +176,7 @@ public class CommonRdbmsWriter
 
         public void destroy(Configuration originalConfig)
         {
+            //
         }
     }
 
@@ -185,8 +186,8 @@ public class CommonRdbmsWriter
                 .getLogger(Task.class);
         private static final String VALUE_HOLDER = "?";
         // 作为日志显示信息时，需要附带的通用信息。比如信息所对应的数据库连接等信息，针对哪个表做的操作
-        protected static String BASIC_MESSAGE;
-        protected static String INSERT_OR_REPLACE_TEMPLATE;
+        protected static String basicMessage;
+        protected static String insertOrReplaceTemplate;
         protected DataBaseType dataBaseType;
         protected String username;
         protected String password;
@@ -227,10 +228,10 @@ public class CommonRdbmsWriter
 
             writeMode = writerSliceConfig.getString(Key.WRITE_MODE, "INSERT");
             emptyAsNull = writerSliceConfig.getBool(Key.EMPTY_AS_NULL, true);
-            INSERT_OR_REPLACE_TEMPLATE = writerSliceConfig.getString(Constant.INSERT_OR_REPLACE_TEMPLATE_MARK);
-            this.writeRecordSql = String.format(INSERT_OR_REPLACE_TEMPLATE, this.table);
+            insertOrReplaceTemplate = writerSliceConfig.getString(Constant.INSERT_OR_REPLACE_TEMPLATE_MARK);
+            this.writeRecordSql = String.format(insertOrReplaceTemplate, this.table);
 
-            BASIC_MESSAGE = String.format("jdbcUrl:[%s], table:[%s]",
+            basicMessage = String.format("jdbcUrl:[%s], table:[%s]",
                     this.jdbcUrl, this.table);
         }
 
@@ -240,14 +241,14 @@ public class CommonRdbmsWriter
                     this.jdbcUrl, username, password);
 
             DBUtil.dealWithSessionConfig(connection, writerSliceConfig,
-                    this.dataBaseType, BASIC_MESSAGE);
+                    this.dataBaseType, basicMessage);
 
             int tableNumber = writerSliceConfig.getInt(
                     Constant.TABLE_NUMBER_MARK);
             if (tableNumber != 1) {
                 LOG.info("Begin to execute preSqls:[{}]. context info:{}.",
-                        StringUtils.join(this.preSqls, ";"), BASIC_MESSAGE);
-                WriterUtil.executeSqls(connection, this.preSqls, BASIC_MESSAGE, dataBaseType);
+                        StringUtils.join(this.preSqls, ";"), basicMessage);
+                WriterUtil.executeSqls(connection, this.preSqls, basicMessage, dataBaseType);
             }
 
             DBUtil.closeDBResources(null, null, connection);
@@ -311,7 +312,7 @@ public class CommonRdbmsWriter
             Connection connection = DBUtil.getConnection(this.dataBaseType,
                     this.jdbcUrl, username, password);
             DBUtil.dealWithSessionConfig(connection, writerSliceConfig,
-                    this.dataBaseType, BASIC_MESSAGE);
+                    this.dataBaseType, basicMessage);
             startWriteWithConnection(recordReceiver, taskPluginCollector, connection);
         }
 
@@ -329,13 +330,14 @@ public class CommonRdbmsWriter
                     this.jdbcUrl, username, password);
 
             LOG.info("Begin to execute postSqls:[{}]. context info:{}.",
-                    StringUtils.join(this.postSqls, ";"), BASIC_MESSAGE);
-            WriterUtil.executeSqls(connection, this.postSqls, BASIC_MESSAGE, dataBaseType);
+                    StringUtils.join(this.postSqls, ";"), basicMessage);
+            WriterUtil.executeSqls(connection, this.postSqls, basicMessage, dataBaseType);
             DBUtil.closeDBResources(null, null, connection);
         }
 
         public void destroy(Configuration writerSliceConfig)
         {
+            //
         }
 
         protected void doBatchInsert(Connection connection, List<Record> buffer)
@@ -356,7 +358,7 @@ public class CommonRdbmsWriter
                 connection.commit();
             }
             catch (SQLException e) {
-                LOG.warn("回滚此次写入, 采用每次写入一行方式提交. 因为:" + e.getMessage());
+                LOG.warn("回滚此次写入, 采用每次写入一行方式提交. 因为: {}", e.getMessage());
                 connection.rollback();
                 doOneInsert(connection, buffer);
             }
@@ -451,7 +453,6 @@ public class CommonRdbmsWriter
                     }
                     break;
 
-                //tinyint is a little special in some database like mysql {boolean->tinyint(1)}
                 case Types.TINYINT:
                     Long longValue = column.asLong();
                     if (null == longValue) {
@@ -564,8 +565,8 @@ public class CommonRdbmsWriter
                     valueHolders.add(calcValueHolder(type));
                 }
 
-                INSERT_OR_REPLACE_TEMPLATE = WriterUtil.getWriteTemplate(columns, valueHolders, writeMode, dataBaseType, false);
-                writeRecordSql = String.format(INSERT_OR_REPLACE_TEMPLATE, this.table);
+                insertOrReplaceTemplate = WriterUtil.getWriteTemplate(columns, valueHolders, writeMode, dataBaseType, false);
+                writeRecordSql = String.format(insertOrReplaceTemplate, this.table);
             }
         }
 

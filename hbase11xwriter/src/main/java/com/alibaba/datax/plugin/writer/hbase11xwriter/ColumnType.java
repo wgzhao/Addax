@@ -18,7 +18,7 @@ public enum ColumnType
     FLOAT("float"),
     DOUBLE("double");
 
-    private String typeName;
+    private final String typeName;
 
     ColumnType(String typeName)
     {

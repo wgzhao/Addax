@@ -18,7 +18,7 @@ public final class Key
     public static final String WHERE = "where";
     public static final String HINT = "hint";
     public static final String SPLIT_PK = "splitPk";
-    public static final String SPLIT_MODE = "splitMode";
+//    public static final String SPLIT_MODE = "splitMode"
     public static final String SAMPLE_PERCENTAGE = "samplePercentage";
     public static final String QUERY_SQL = "querySql";
     public static final String SPLIT_PK_SQL = "splitPkSql";
@@ -26,7 +26,7 @@ public final class Key
     public static final String POST_SQL = "postSql";
     public static final String CHECK_SLAVE = "checkSlave";
     public static final String SESSION = "session";
-    public static final String DBNAME = "dbName";
+//    public static final String DBNAME = "dbName"
     public static final String DRYRUN = "dryRun";
 
     private Key() {}

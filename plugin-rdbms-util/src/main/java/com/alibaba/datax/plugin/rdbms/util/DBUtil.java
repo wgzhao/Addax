@@ -76,7 +76,7 @@ public final class DBUtil
                     }
                 }
                 throw new Exception("DataX无法连接对应的数据库，可能原因是：1) 配置的ip/port/database/jdbc错误，无法连接。2) 配置的username/password错误，鉴权失败。请和DBA确认该数据库的连接信息是否正确。");
-//                    throw new Exception(DBUtilErrorCode.JDBC_NULL.toString());
+//                    throw new Exception(DBUtilErrorCode.JDBC_NULL.toString())
             }, 3, 1000L, true);
             //warn: 7 means 2 minutes
         }
@@ -216,10 +216,7 @@ public final class DBUtil
                 }
                 else {
                     if (grantRecord.contains("INSERT") || grantRecord.contains("ALL PRIVILEGES")) {
-                        if (grantRecord.contains("*.*")) {
-                            return true;
-                        }
-                        else if (grantRecord.contains(dbPattern)) {
+                        if (grantRecord.contains("*.*") || grantRecord.contains(dbPattern) ) {
                             return true;
                         }
                     }
@@ -249,12 +246,12 @@ public final class DBUtil
                 if (DataBaseType.Oracle == dataBaseType) {
                     if (e.getMessage() != null && e.getMessage().contains("insufficient privileges")) {
                         hasInsertPrivilege = false;
-                        LOG.warn("User [" + userName + "] has no 'insert' privilege on table[" + tableName + "], errorMessage:[{}]", e.getMessage());
+                        LOG.warn("User [{}] has no 'insert' privilege on table[{}], errorMessage:[{}]", userName, tableName, e.getMessage());
                     }
                 }
                 else {
                     hasInsertPrivilege = false;
-                    LOG.warn("User [" + userName + "] has no 'insert' privilege on table[" + tableName + "], errorMessage:[{}]", e.getMessage());
+                    LOG.warn("User [{}] has no 'insert' privilege on table[{}], errorMessage:[{}]", userName, tableName, e.getMessage());
                 }
             }
         }
@@ -262,7 +259,7 @@ public final class DBUtil
             connection.close();
         }
         catch (SQLException e) {
-            LOG.warn("connection close failed, " + e.getMessage());
+            LOG.warn("connection close failed, {}", e.getMessage());
         }
         return hasInsertPrivilege;
     }
@@ -282,14 +279,14 @@ public final class DBUtil
             }
             catch (Exception e) {
                 hasInsertPrivilege = false;
-                LOG.warn("User [" + userName + "] has no 'delete' privilege on table[" + tableName + "], errorMessage:[{}]", e.getMessage());
+                LOG.warn("User [{}] has no 'delete' privilege on table[{}], errorMessage:[{}]", userName, tableName, e.getMessage());
             }
         }
         try {
             connection.close();
         }
         catch (SQLException e) {
-            LOG.warn("connection close failed, " + e.getMessage());
+            LOG.warn("connection close failed, {}", e.getMessage());
         }
         return hasInsertPrivilege;
     }
@@ -306,10 +303,8 @@ public final class DBUtil
             allSqls.addAll(postSQLs);
         }
         for (String sql : allSqls) {
-            if (StringUtils.isNotBlank(sql)) {
-                if (sql.trim().toUpperCase().startsWith("DELETE")) {
-                    return true;
-                }
+            if (StringUtils.isNotBlank(sql) && sql.trim().toUpperCase().startsWith("DELETE")) {
+                return true;
             }
         }
         return false;
@@ -438,11 +433,12 @@ public final class DBUtil
     {
         // make sure autocommit is off
         conn.setAutoCommit(false);
-        Statement stmt = conn.createStatement(ResultSet.TYPE_FORWARD_ONLY,
-                ResultSet.CONCUR_READ_ONLY);
-        stmt.setFetchSize(fetchSize);
-        stmt.setQueryTimeout(queryTimeout);
-        return query(stmt, sql);
+        try(Statement stmt = conn.createStatement(ResultSet.TYPE_FORWARD_ONLY,
+                ResultSet.CONCUR_READ_ONLY)) {
+            stmt.setFetchSize(fetchSize);
+            stmt.setQueryTimeout(queryTimeout);
+            return query(stmt, sql);
+        }
     }
 
     /**
@@ -495,6 +491,7 @@ public final class DBUtil
                 rs.close();
             }
             catch (SQLException ignored) {
+                //
             }
         }
 
@@ -503,6 +500,7 @@ public final class DBUtil
                 stmt.close();
             }
             catch (SQLException ignored) {
+                //
             }
         }
 
@@ -511,6 +509,7 @@ public final class DBUtil
                 conn.close();
             }
             catch (SQLException ignored) {
+                //
             }
         }
     }
@@ -614,14 +613,12 @@ public final class DBUtil
         Connection connection = null;
         try {
             connection = connect(dataBaseType, url, user, pass);
-            if (connection != null) {
-                if (dataBaseType == DataBaseType.MySql && checkSlave) {
-                    //dataBaseType.MySql
-                    return !isSlaveBehind(connection);
-                }
-                else {
-                    return true;
-                }
+            if (dataBaseType == DataBaseType.MySql && checkSlave) {
+                //dataBaseType.MySql
+                return !isSlaveBehind(connection);
+            }
+            else {
+                return true;
             }
         }
         catch (Exception e) {
@@ -640,15 +637,13 @@ public final class DBUtil
         Connection connection = null;
         try {
             connection = connect(dataBaseType, url, user, pass);
-            if (null != connection) {
-                for (String pre : preSql) {
-                    if (!doPreCheck(connection, pre)) {
-                        LOG.warn("doPreCheck failed.");
-                        return false;
-                    }
+            for (String pre : preSql) {
+                if (!doPreCheck(connection, pre)) {
+                    LOG.warn("doPreCheck failed.");
+                    return false;
                 }
-                return true;
             }
+            return true;
         }
         catch (Exception e) {
             LOG.warn("test connection of [{}] failed, for {}.", url,
@@ -690,11 +685,12 @@ public final class DBUtil
     public static ResultSet query(Connection conn, String sql)
             throws SQLException
     {
-        Statement stmt = conn.createStatement(ResultSet.TYPE_FORWARD_ONLY,
-                ResultSet.CONCUR_READ_ONLY);
-        //默认3600 seconds
-        stmt.setQueryTimeout(Constant.SOCKET_TIMEOUT_INSECOND);
-        return query(stmt, sql);
+        try (Statement stmt = conn.createStatement(ResultSet.TYPE_FORWARD_ONLY,
+                ResultSet.CONCUR_READ_ONLY)) {
+            //默认3600 seconds
+            stmt.setQueryTimeout(Constant.SOCKET_TIMEOUT_INSECOND);
+            return query(stmt, sql);
+        }
     }
 
     private static boolean doPreCheck(Connection conn, String pre)

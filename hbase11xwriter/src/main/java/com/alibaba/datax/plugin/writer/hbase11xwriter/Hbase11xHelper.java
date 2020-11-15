@@ -32,6 +32,8 @@ public class Hbase11xHelper
 
     private static final Logger LOG = LoggerFactory.getLogger(Hbase11xHelper.class);
 
+    private Hbase11xHelper() {}
+
     public static org.apache.hadoop.conf.Configuration getHbaseConfiguration(String hbaseConfig)
     {
         if (StringUtils.isBlank(hbaseConfig)) {
@@ -123,12 +125,10 @@ public class Hbase11xHelper
     public static void deleteTable(com.alibaba.datax.common.util.Configuration configuration)
     {
         String userTable = configuration.getString(Key.TABLE);
-        LOG.info(String.format("由于您配置了deleteType delete,HBasWriter begins to delete table %s .", userTable));
+        LOG.info("HBasWriter begins to delete table {} .", userTable);
         Scan scan = new Scan();
         org.apache.hadoop.hbase.client.Table hTable = Hbase11xHelper.getTable(configuration);
-        ResultScanner scanner = null;
-        try {
-            scanner = hTable.getScanner(scan);
+        try (ResultScanner scanner = hTable.getScanner(scan)) {
             for (Result rr = scanner.next(); rr != null; rr = scanner.next()) {
                 hTable.delete(new Delete(rr.getRow()));
             }
@@ -137,9 +137,6 @@ public class Hbase11xHelper
             throw DataXException.asDataXException(Hbase11xWriterErrorCode.DELETE_HBASE_ERROR, e);
         }
         finally {
-            if (scanner != null) {
-                scanner.close();
-            }
             Hbase11xHelper.closeTable(hTable);
         }
     }
@@ -148,7 +145,7 @@ public class Hbase11xHelper
     {
         String hbaseConfig = configuration.getString(Key.HBASE_CONFIG);
         String userTable = configuration.getString(Key.TABLE);
-        LOG.info(String.format("由于您配置了 truncate 为true,HBasWriter begins to truncate table %s .", userTable));
+        LOG.info("HBasWriter begins to truncate table {} .", userTable);
         TableName hTableName = TableName.valueOf(userTable);
         org.apache.hadoop.hbase.client.Connection hConnection = Hbase11xHelper.getHbaseConnection(hbaseConfig);
         org.apache.hadoop.hbase.client.Admin admin = null;
@@ -255,16 +252,14 @@ public class Hbase11xHelper
     {
         String mode = originalConfig.getNecessaryValue(Key.MODE, Hbase11xWriterErrorCode.REQUIRED_VALUE);
         ModeType modeType = ModeType.getByTypeName(mode);
-        switch (modeType) {
-            case Normal: {
-                validateRowkeyColumn(originalConfig);
-                validateColumn(originalConfig);
-                validateVersionColumn(originalConfig);
-                break;
-            }
-            default:
-                throw DataXException.asDataXException(Hbase11xWriterErrorCode.ILLEGAL_VALUE,
-                        String.format("Hbase11xWriter不支持该 mode 类型:%s", mode));
+        if (modeType == ModeType.NORMAL) {
+            validateRowkeyColumn(originalConfig);
+            validateColumn(originalConfig);
+            validateVersionColumn(originalConfig);
+        }
+        else {
+            throw DataXException.asDataXException(Hbase11xWriterErrorCode.ILLEGAL_VALUE,
+                    String.format("Hbase11xWriter不支持该 mode 类型:%s", mode));
         }
     }
 
@@ -295,7 +290,6 @@ public class Hbase11xHelper
             throw DataXException.asDataXException(Hbase11xWriterErrorCode.REQUIRED_VALUE, "rowkeyColumn为必填项，其形式为：rowkeyColumn:[{\"index\": 0,\"type\": \"string\"},{\"index\": -1,\"type\": \"string\",\"value\": \"_\"}]");
         }
         int rowkeyColumnSize = rowkeyColumn.size();
-        //包含{"index":0,"type":"string"} 或者 {"index":-1,"type":"string","value":"_"}
         for (Configuration aRowkeyColumn : rowkeyColumn) {
             Integer index = aRowkeyColumn.getInt(Key.INDEX);
             String type = aRowkeyColumn.getNecessaryValue(Key.TYPE, Hbase11xWriterErrorCode.REQUIRED_VALUE);

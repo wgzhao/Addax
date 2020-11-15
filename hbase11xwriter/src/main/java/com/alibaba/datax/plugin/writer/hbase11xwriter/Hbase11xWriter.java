@@ -30,7 +30,7 @@ public class Hbase11xWriter
         @Override
         public void prepare()
         {
-            Boolean truncate = originConfig.getBool(Key.TRUNCATE, false);
+            boolean truncate = originConfig.getBool(Key.TRUNCATE, false);
             if (truncate) {
                 Hbase11xHelper.truncateTable(this.originConfig);
             }
@@ -39,7 +39,7 @@ public class Hbase11xWriter
         @Override
         public List<Configuration> split(int mandatoryNumber)
         {
-            List<Configuration> splitResultConfigs = new ArrayList<Configuration>();
+            List<Configuration> splitResultConfigs = new ArrayList<>();
             for (int j = 0; j < mandatoryNumber; j++) {
                 splitResultConfigs.add(originConfig.clone());
             }
@@ -49,29 +49,27 @@ public class Hbase11xWriter
         @Override
         public void destroy()
         {
-
+            //
         }
     }
 
     public static class Task
             extends Writer.Task
     {
-        private Configuration taskConfig;
         private HbaseAbstractTask hbaseTaskProxy;
 
         @Override
         public void init()
         {
-            this.taskConfig = super.getPluginJobConf();
-            String mode = this.taskConfig.getString(Key.MODE);
+            Configuration taskConfig = super.getPluginJobConf();
+            String mode = taskConfig.getString(Key.MODE);
             ModeType modeType = ModeType.getByTypeName(mode);
 
-            switch (modeType) {
-                case Normal:
-                    this.hbaseTaskProxy = new NormalTask(this.taskConfig);
-                    break;
-                default:
-                    throw DataXException.asDataXException(Hbase11xWriterErrorCode.ILLEGAL_VALUE, "Hbasereader 不支持此类模式:" + modeType);
+            if (modeType == ModeType.NORMAL) {
+                this.hbaseTaskProxy = new NormalTask(taskConfig);
+            }
+            else {
+                throw DataXException.asDataXException(Hbase11xWriterErrorCode.ILLEGAL_VALUE, "Hbasereader 不支持此类模式:" + modeType);
             }
         }
 
