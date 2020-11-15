@@ -18,7 +18,7 @@
                 <exclude>*.pyc</exclude>
             </excludes>
             <directoryMode>0775</directoryMode>
-            <fileMode>0644</fileMode>
+            <fileMode>0755</fileMode>
             <outputDirectory>bin</outputDirectory>
         </fileSet>
         <!-- for scripts -->
