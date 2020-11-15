@@ -15,7 +15,7 @@ public class Key
 
     public static final String TYPE = "type";
 
-    public static final String FORMAT = "format";
+//    public static final String FORMAT = "format"
 
     public static final String INDEX = "index";
 
@@ -28,4 +28,6 @@ public class Key
     public static final String BUFFER_SIZE = "bufferSize";
 
     public static final String CSV_READER_CONFIG = "csvReaderConfig";
+
+    private Key() {}
 }

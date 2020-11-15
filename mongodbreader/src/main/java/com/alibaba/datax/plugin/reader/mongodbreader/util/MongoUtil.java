@@ -20,11 +20,13 @@ import java.util.List;
 public class MongoUtil
 {
 
+    private MongoUtil() {}
+
     public static MongoClient initMongoClient(Configuration conf)
     {
 
         List<Object> addressList = conf.getList(KeyConstant.MONGO_ADDRESS);
-        if (addressList == null || addressList.size() <= 0) {
+        if (addressList == null || addressList.isEmpty()) {
             throw DataXException.asDataXException(MongoDBReaderErrorCode.ILLEGAL_VALUE, "不合法参数");
         }
         try {

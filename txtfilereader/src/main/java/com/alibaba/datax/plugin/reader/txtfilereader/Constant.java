@@ -6,4 +6,6 @@ package com.alibaba.datax.plugin.reader.txtfilereader;
 public class Constant
 {
     public static final String SOURCE_FILES = "sourceFiles";
+
+    private Constant() {}
 }

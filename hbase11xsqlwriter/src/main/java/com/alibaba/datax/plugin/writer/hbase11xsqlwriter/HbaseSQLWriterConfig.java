@@ -19,7 +19,7 @@ import java.util.Map;
  */
 public class HbaseSQLWriterConfig
 {
-    private final static Logger LOG = LoggerFactory.getLogger(HbaseSQLWriterConfig.class);
+    private static final Logger LOG = LoggerFactory.getLogger(HbaseSQLWriterConfig.class);
     private Configuration originalConfig;   // 原始的配置数据
 
     // 集群配置
@@ -78,7 +78,7 @@ public class HbaseSQLWriterConfig
         cfg.kerberosKeytabFilePath = dataxCfg.getString(Key.KERBEROS_KEYTAB_FILE_PATH, Constant.DEFAULT_KERBEROS_KEYTAB_FILE_PATH);
 
         // 4. 打印解析出来的配置
-        LOG.info("HBase SQL writer config parsed:" + cfg);
+        LOG.info("HBase SQL writer config parsed: {}", cfg);
 
         return cfg;
     }
@@ -147,10 +147,7 @@ public class HbaseSQLWriterConfig
     {
         // 解析并检查表名
         cfg.tableName = dataxCfg.getString(Key.TABLE);
-//        if (cfg.tableName.contains(".")) {
-//            cfg.namespace = cfg.tableName.split("\\.")[0];
-//            cfg.tableName = cfg.tableName.split("\\.")[1];
-//        }
+
         if (cfg.tableName == null || cfg.tableName.isEmpty()) {
             throw DataXException.asDataXException(
                     HbaseSQLWriterErrorCode.ILLEGAL_VALUE, "HBase的tableName配置不能为空,请检查并修改配置.");

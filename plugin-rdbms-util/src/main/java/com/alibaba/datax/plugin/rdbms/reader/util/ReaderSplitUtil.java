@@ -14,6 +14,8 @@ import java.util.List;
 public final class ReaderSplitUtil
 {
 
+    private ReaderSplitUtil() {}
+    
     public static List<Configuration> doSplit(
             Configuration originalSliceConfig, int adviceNumber)
     {
@@ -101,7 +103,6 @@ public final class ReaderSplitUtil
                 // 说明是配置的 querySql 方式
                 List<String> sqls = connConf.getList(Key.QUERY_SQL, String.class);
 
-                // TODO 是否check 配置为多条语句？？
                 for (String querySql : sqls) {
                     tempSlice = sliceConfig.clone();
                     tempSlice.set(Key.QUERY_SQL, querySql);

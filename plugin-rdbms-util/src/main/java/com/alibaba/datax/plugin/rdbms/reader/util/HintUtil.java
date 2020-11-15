@@ -17,13 +17,15 @@ import java.util.regex.Pattern;
  */
 public class HintUtil
 {
-    private static final Logger LOG = LoggerFactory.getLogger(ReaderSplitUtil.class);
+    private static final Logger LOG = LoggerFactory.getLogger(HintUtil.class);
 
     private static DataBaseType dataBaseType;
     private static String username;
     private static String password;
     private static Pattern tablePattern;
     private static String hintExpression;
+
+    private HintUtil() {}
 
     public static void initHintConf(DataBaseType type, Configuration configuration)
     {

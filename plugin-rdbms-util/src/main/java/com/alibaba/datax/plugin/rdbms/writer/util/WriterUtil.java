@@ -23,7 +23,8 @@ public final class WriterUtil
 {
     private static final Logger LOG = LoggerFactory.getLogger(WriterUtil.class);
 
-    //TODO 切分报错
+    private WriterUtil() {}
+
     public static List<Configuration> doSplit(Configuration simplifiedConf,
             int adviceNumber)
     {
@@ -154,7 +155,7 @@ public final class WriterUtil
 
     public static String onDuplicateKeyUpdateString(List<String> columnHolders)
     {
-        if (columnHolders == null || columnHolders.size() < 1) {
+        if (columnHolders == null || columnHolders.isEmpty()) {
             return "";
         }
         StringBuilder sb = new StringBuilder();

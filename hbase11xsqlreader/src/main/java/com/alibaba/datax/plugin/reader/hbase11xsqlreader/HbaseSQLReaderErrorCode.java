@@ -13,13 +13,13 @@ public enum HbaseSQLReaderErrorCode
     PHOENIX_CREATEREADER_ERROR("Hbasewriter-05", "获取phoenix的reader错误"),
     PHOENIX_READERINIT_ERROR("Hbasewriter-06", "phoenix reader的初始化错误"),
     PHOENIX_COLUMN_TYPE_CONVERT_ERROR("Hbasewriter-07", "phoenix的列类型转换错误"),
-    PHOENIX_RECORD_READ_ERROR("Hbasewriter-08", "phoenix record 读取错误"),
+//    PHOENIX_RECORD_READ_ERROR("Hbasewriter-08", "phoenix record 读取错误"),
     PHOENIX_READER_CLOSE_ERROR("Hbasewriter-09", "phoenix reader 的close错误");
 
     private final String code;
     private final String description;
 
-    private HbaseSQLReaderErrorCode(String code, String description)
+    HbaseSQLReaderErrorCode(String code, String description)
     {
         this.code = code;
         this.description = description;

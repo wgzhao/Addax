@@ -12,7 +12,6 @@ import com.moilioncircle.redis.replicator.Replicator;
 import com.moilioncircle.redis.replicator.event.PostRdbSyncEvent;
 import com.moilioncircle.redis.replicator.event.PreRdbSyncEvent;
 import com.moilioncircle.redis.replicator.io.RawByteListener;
-import com.moilioncircle.redis.replicator.rdb.datatype.KeyStringValueList;
 import com.moilioncircle.redis.replicator.rdb.datatype.KeyStringValueString;
 import com.moilioncircle.redis.replicator.rdb.skip.SkipRdbVisitor;
 import org.apache.http.HttpEntity;
@@ -65,28 +64,11 @@ public class RedisReader
         extends Reader
 {
 
-    public static void main(String[] args)
-            throws URISyntaxException, IOException
-    {
-        Replicator r = new RedisReplicator("redis:///usr/local/var/db/redis/dump.rdb");
-        r.addEventListener((replicator, event) -> {
-            if (event instanceof KeyStringValueList) {
-                KeyStringValueList kv = (KeyStringValueList) event;
-                System.out.println(new String(kv.getKey()));
-                for (int i = 0; i <= kv.getValue().size(); i++) {
-                    System.out.println(new String(kv.getValue().get(i)));
-                }
-            }
-        });
-        r.open();
-        r.close();
-    }
-
     public static class Task
             extends com.alibaba.datax.common.spi.Reader.Task
     {
 
-        private static final Logger LOG = LoggerFactory.getLogger(RedisReader.Job.class);
+        private static final Logger LOG = LoggerFactory.getLogger(Task.class);
 
         /**
          * 包含key正则
@@ -406,11 +388,13 @@ public class RedisReader
         @Override
         public void init()
         {
+            //
         }
 
         @Override
         public void destroy()
         {
+            //
         }
     }
 }

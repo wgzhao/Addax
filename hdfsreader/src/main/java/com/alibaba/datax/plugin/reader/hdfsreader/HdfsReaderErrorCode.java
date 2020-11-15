@@ -6,7 +6,7 @@ public enum HdfsReaderErrorCode
         implements ErrorCode
 {
     BAD_CONFIG_VALUE("HdfsReader-00", "您配置的值不合法."),
-    PATH_NOT_FIND_ERROR("HdfsReader-01", "您未配置path值"),
+//    PATH_NOT_FIND_ERROR("HdfsReader-01", "您未配置path值"),
     DEFAULT_FS_NOT_FIND_ERROR("HdfsReader-02", "您未配置defaultFS值"),
     ILLEGAL_VALUE("HdfsReader-03", "值错误"),
     CONFIG_INVALID_EXCEPTION("HdfsReader-04", "参数配置错误"),
@@ -16,13 +16,12 @@ public enum HdfsReaderErrorCode
     EMPTY_DIR_EXCEPTION("HdfsReader-08", "您尝试读取的文件目录为空."),
     PATH_CONFIG_ERROR("HdfsReader-09", "您配置的path格式有误"),
     READ_FILE_ERROR("HdfsReader-10", "读取文件出错"),
-    MALFORMED_ORC_ERROR("HdfsReader-10", "ORCFILE格式异常"),
+//    MALFORMED_ORC_ERROR("HdfsReader-10", "ORCFILE格式异常"),
     FILE_TYPE_ERROR("HdfsReader-11", "文件类型配置错误"),
     FILE_TYPE_UNSUPPORT("HdfsReader-12", "文件类型目前不支持"),
     KERBEROS_LOGIN_ERROR("HdfsReader-13", "KERBEROS认证失败"),
     READ_SEQUENCEFILE_ERROR("HdfsReader-14", "读取SequenceFile文件出错"),
-    READ_RCFILE_ERROR("HdfsReader-15", "读取RCFile文件出错"),
-    ;
+    READ_RCFILE_ERROR("HdfsReader-15", "读取RCFile文件出错");
 
     private final String code;
     private final String description;

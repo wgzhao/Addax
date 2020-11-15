@@ -7,7 +7,7 @@ public class Key
 {
     public static final String PATH = "path";
     public static final String COLUMN = "column";
-    public static final String NULL_FORMAT = "nullFormat";
+//    public static final String NULL_FORMAT = "nullFormat";
     public static final String INDEX = "index";
     public static final String TYPE = "type";
     public static final String STRING = "string";
@@ -18,4 +18,6 @@ public class Key
     public static final String FORMAT = "format";
     public static final String ENCODING = "encoding";
     public static final String VALUE = "value";
+
+    private Key() {}
 }

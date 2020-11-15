@@ -63,7 +63,6 @@ public class FtpReader
 
         private void validateParameter()
         {
-            //todo 常量
             this.protocol = this.originConfig.getNecessaryValue(Key.PROTOCOL, FtpReaderErrorCode.REQUIRED_VALUE);
             boolean ptrotocolTag = "ftp".equals(this.protocol) || "sftp".equals(this.protocol);
             if (!ptrotocolTag) {
@@ -95,7 +94,7 @@ public class FtpReader
             }
             else {
                 path = this.originConfig.getList(Key.PATH, String.class);
-                if (null == path || path.size() == 0) {
+                if (null == path || path.isEmpty() ) {
                     throw DataXException.asDataXException(FtpReaderErrorCode.REQUIRED_VALUE, "您需要指定待读取的源目录或文件");
                 }
                 for (String eachPath : path) {
@@ -113,14 +112,15 @@ public class FtpReader
         {
             LOG.debug("prepare() begin...");
 
-            this.sourceFiles = ftpHelper.getAllFiles(path, 0, maxTraversalLevel);
+            this.sourceFiles = (HashSet<String>) ftpHelper.getAllFiles(path, 0, maxTraversalLevel);
 
-            LOG.info(String.format("您即将读取的文件数为: [%s]", this.sourceFiles.size()));
+            LOG.info("您即将读取的文件数为: [{}]", this.sourceFiles.size());
         }
 
         @Override
         public void post()
         {
+            //
         }
 
         @Override

@@ -2,6 +2,8 @@ package com.alibaba.datax.plugin.writer.ftpwriter;
 
 public class Key
 {
+    private Key() {}
+
     public static final String PROTOCOL = "protocol";
 
     public static final String HOST = "host";
@@ -14,7 +16,7 @@ public class Key
 
     public static final String TIMEOUT = "timeout";
 
-//    public static final String CONNECTPATTERN = "connectPattern";
+//    public static final String CONNECTPATTERN = "connectPattern"
 
     public static final String PATH = "path";
 }

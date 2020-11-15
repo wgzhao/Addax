@@ -6,10 +6,10 @@ import java.util.Arrays;
 
 public enum ModeType
 {
-    Normal("normal"),
-    MultiVersion("multiVersion");
+    NORMAL("normal"),
+    MULTI_VERSION("multiVersion");
 
-    private String mode;
+    private final String mode;
 
     ModeType(String mode)
     {
@@ -25,10 +25,5 @@ public enum ModeType
         }
         throw DataXException.asDataXException(Hbase11xWriterErrorCode.ILLEGAL_VALUE,
                 String.format("Hbasewriter 不支持该 mode 类型:%s, 目前支持的 mode 类型是:%s", modeName, Arrays.asList(values())));
-    }
-
-    public String getMode()
-    {
-        return mode;
     }
 }

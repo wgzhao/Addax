@@ -36,13 +36,15 @@ public class HbaseSQLHelper
 {
     private static final Logger LOG = LoggerFactory.getLogger(HbaseSQLHelper.class);
 
-    public static ThinClientPTable ptable;
-    public static org.apache.hadoop.conf.Configuration hadoopConf = new org.apache.hadoop.conf.Configuration();
+    public static  ThinClientPTable ptable;
+    public static final org.apache.hadoop.conf.Configuration hadoopConf = new org.apache.hadoop.conf.Configuration();
     // Kerberos
-    private static Boolean haveKerberos = false;
+    private static boolean haveKerberos = false;
     private static String kerberosKeytabFilePath;
     private static String kerberosPrincipal;
-    //public static final String HADOOP_SECURITY_AUTHENTICATION_KEY = "hadoop.security.authentication";
+    //public static final String HADOOP_SECURITY_AUTHENTICATION_KEY = "hadoop.security.authentication"
+
+    private HbaseSQLHelper() {}
 
     /**
      * 将datax的配置解析成sql writer的配置
@@ -127,7 +129,7 @@ public class HbaseSQLHelper
     public static Connection getJdbcConnection(HbaseSQLWriterConfig cfg)
     {
         String connStr = cfg.getConnectionString();
-        LOG.debug("Connecting to HBase cluster [" + connStr + "] ...");
+        LOG.debug("Connecting to HBase cluster [{}] ...", connStr);
         Connection conn;
         //是否有Kerberos认证
         haveKerberos = cfg.haveKerberos();
@@ -182,7 +184,7 @@ public class HbaseSQLHelper
             throws SQLException
     {
         String connStr = cfg.getConnectionString();
-        LOG.info("Connecting to HBase cluster [" + connStr + "] use thin client ...");
+        LOG.info("Connecting to HBase cluster [{}] use thin client ...", connStr);
         Connection conn = DriverManager.getConnection(connStr, cfg.getUsername(), cfg.getPassword());
         String userNamespaceQuery = "use " + cfg.getNamespace();
         try (Statement statement = conn.createStatement()) {
@@ -226,7 +228,7 @@ public class HbaseSQLHelper
             throws
             SQLException
     {
-        LOG.info("Start to get table schema of namespace=" + namespace + " , fullTableName=" + fullTableName);
+        LOG.info("Start to get table schema of namespace={}, fullTableName={}", namespace, fullTableName);
         if (!isThinClient) {
             return getTableSchema(conn, fullTableName);
         }
@@ -291,7 +293,7 @@ public class HbaseSQLHelper
             // 清空表
             admin.disableTable(hTableName);
             admin.truncateTable(hTableName, true);
-            LOG.debug("Table " + tableName + " has been truncated.");
+            LOG.debug("Table {} has been truncated.", tableName);
         }
         catch (Throwable t) {
             // 清空表失败
@@ -309,7 +311,6 @@ public class HbaseSQLHelper
      * 检查表
      */
     public static void checkTable(Connection conn, String namespace, String tableName, boolean isThinClient)
-            throws DataXException
     {
         //ignore check table when use thin client
         if (!isThinClient) {
@@ -321,7 +322,6 @@ public class HbaseSQLHelper
      * 检查表：表要存在，enabled
      */
     public static void checkTable(Connection conn, String tableName)
-            throws DataXException
     {
         PhoenixConnection sqlConn;
         Admin admin = null;

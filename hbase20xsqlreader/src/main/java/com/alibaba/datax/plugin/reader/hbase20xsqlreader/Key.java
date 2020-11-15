@@ -5,15 +5,15 @@ public class Key
     /**
      * 【必选】writer要读取的表的表名
      */
-    public final static String TABLE = "table";
+    public static final String TABLE = "table";
     /**
      * 【必选】writer要读取哪些列
      */
-    public final static String COLUMN = "column";
+    public static final String COLUMN = "column";
     /**
      * 【必选】Phoenix QueryServer服务地址
      */
-    public final static String QUERYSERVER_ADDRESS = "queryServerAddress";
+    public static final String QUERYSERVER_ADDRESS = "queryServerAddress";
     /**
      * 【可选】序列化格式，默认为PROTOBUF
      */
@@ -38,4 +38,6 @@ public class Key
      * 【可选】查询语句配置
      */
     public static final String QUERY_SQL = "querySql";
+
+    private Key() {}
 }

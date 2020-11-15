@@ -205,6 +205,7 @@ public class StreamReader
         @Override
         public void prepare()
         {
+            //
         }
 
         @Override
@@ -221,11 +222,13 @@ public class StreamReader
         @Override
         public void post()
         {
+            //
         }
 
         @Override
         public void destroy()
         {
+            //
         }
     }
 
@@ -255,6 +258,7 @@ public class StreamReader
         @Override
         public void prepare()
         {
+            //
         }
 
         @Override
@@ -273,11 +277,13 @@ public class StreamReader
         @Override
         public void post()
         {
+            //
         }
 
         @Override
         public void destroy()
         {
+            //
         }
 
         private Column buildOneColumn(Configuration eachColumnConfig)

@@ -13,6 +13,8 @@ public final class Key
     // ----------------------------------------
     public static final String PRIMARY_KEY_COLUMN_NAME = "pk";
 
+    private Key() {}
+
     public static ActionType getActionType(Configuration conf)
     {
         String actionType = conf.getString("actionType", "index");
@@ -109,10 +111,7 @@ public final class Key
 
     public static boolean isHighSpeedMode(Configuration conf)
     {
-        if ("highspeed".equals(conf.getString("mode", ""))) {
-            return true;
-        }
-        return false;
+        return "highspeed".equals(conf.getString("mode", ""));
     }
 
     public static String getAlias(Configuration conf)
@@ -123,15 +122,12 @@ public final class Key
     public static boolean isNeedCleanAlias(Configuration conf)
     {
         String mode = conf.getString("aliasMode", "append");
-        if ("exclusive".equals(mode)) {
-            return true;
-        }
-        return false;
+        return "exclusive".equals(mode);
     }
 
     public static Map<String, Object> getSettings(Configuration conf)
     {
-        return conf.getMap("settings", new HashMap<String, Object>());
+        return conf.getMap("settings", new HashMap<>());
     }
 
     public static String getSplitter(Configuration conf)
@@ -144,7 +140,7 @@ public final class Key
         return conf.getBool("dynamic", false);
     }
 
-    public static enum ActionType
+    public enum ActionType
     {
         UNKONW,
         INDEX,

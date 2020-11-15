@@ -14,9 +14,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.InputStream;
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Properties;
-import java.util.Vector;
 
 public class SftpHelper
         extends FtpHelper
@@ -52,8 +52,8 @@ public class SftpHelper
             channelSftp.connect(); // 建立SFTP通道的连接
 
             //设置命令传输编码
-            //String fileEncoding = System.getProperty("file.encoding");
-            //channelSftp.setFilenameEncoding(fileEncoding);		
+            //String fileEncoding = System.getProperty("file.encoding")
+            //channelSftp.setFilenameEncoding(fileEncoding)
         }
         catch (JSchException e) {
             if (null != e.getCause()) {
@@ -108,7 +108,7 @@ public class SftpHelper
             return sftpATTRS.isDir();
         }
         catch (SftpException e) {
-            if (e.getMessage().toLowerCase().equals("no such file")) {
+            if (e.getMessage().equalsIgnoreCase("no such file")) {
                 String message = String.format("请确认您的配置项path:[%s]存在，且配置的用户有权限读取", directoryPath);
                 LOG.error(message);
                 throw DataXException.asDataXException(FtpReaderErrorCode.FILE_NOT_EXISTS, message);
@@ -130,7 +130,7 @@ public class SftpHelper
             }
         }
         catch (SftpException e) {
-            if (e.getMessage().toLowerCase().equals("no such file")) {
+            if (e.getMessage().equalsIgnoreCase("no such file")) {
                 String message = String.format("请确认您的配置项path:[%s]存在，且配置的用户有权限读取", filePath);
                 LOG.error(message);
                 throw DataXException.asDataXException(FtpReaderErrorCode.FILE_NOT_EXISTS, message);
@@ -152,7 +152,7 @@ public class SftpHelper
             return sftpATTRS.isLink();
         }
         catch (SftpException e) {
-            if (e.getMessage().toLowerCase().equals("no such file")) {
+            if (e.getMessage().equalsIgnoreCase("no such file")) {
                 String message = String.format("请确认您的配置项path:[%s]存在，且配置的用户有权限读取", filePath);
                 LOG.error(message);
                 throw DataXException.asDataXException(FtpReaderErrorCode.FILE_NOT_EXISTS, message);
@@ -211,7 +211,7 @@ public class SftpHelper
             }
 
             try {
-                Vector vector = channelSftp.ls(directoryPath);
+                ArrayList<Object> vector = new ArrayList<>(channelSftp.ls(directoryPath));
                 for (Object o : vector) {
                     LsEntry le = (LsEntry) o;
                     String strName = le.getFilename();

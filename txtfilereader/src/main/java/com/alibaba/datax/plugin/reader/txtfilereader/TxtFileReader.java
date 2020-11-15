@@ -75,7 +75,7 @@ public class TxtFileReader
             }
             else {
                 path = this.originConfig.getList(Key.PATH, String.class);
-                if (null == path || path.size() == 0) {
+                if (null == path || path.isEmpty()) {
                     throw DataXException.asDataXException(
                             TxtFileReaderErrorCode.REQUIRED_VALUE,
                             "您需要指定待读取的源目录或文件");
@@ -127,7 +127,7 @@ public class TxtFileReader
                 }
             }
 
-            if (null != columns && columns.size() != 0) {
+            if (null != columns && ! columns.isEmpty()) {
                 for (Configuration eachColumnConf : columns) {
                     eachColumnConf
                             .getNecessaryValue(
@@ -214,11 +214,13 @@ public class TxtFileReader
         @Override
         public void post()
         {
+            //
         }
 
         @Override
         public void destroy()
         {
+            //
         }
 
         // warn: 如果源目录为空会报错，拖空目录意图=>空文件显示指定此意图
@@ -229,7 +231,7 @@ public class TxtFileReader
             List<Configuration> readerSplitConfigs = new ArrayList<>();
 
             // warn:每个slice拖且仅拖一个文件,
-            // int splitNumber = adviceNumber;
+            // int splitNumber = adviceNumber
             int splitNumber = this.sourceFiles.size();
             if (0 == splitNumber) {
                 throw DataXException.asDataXException(
@@ -315,9 +317,8 @@ public class TxtFileReader
             if (!directory.isDirectory()) {
                 if (this.isTargetFile(regexPath, directory.getAbsolutePath())) {
                     toBeReadFiles.add(parentDirectory);
-                    LOG.info(String.format(
-                            "add file [%s] as a candidate to be read.",
-                            parentDirectory));
+                    LOG.info("add file [{}] as a candidate to be read.",
+                            parentDirectory);
                 }
             }
             else {
@@ -402,19 +403,19 @@ public class TxtFileReader
         @Override
         public void prepare()
         {
-
+            //
         }
 
         @Override
         public void post()
         {
-
+            //
         }
 
         @Override
         public void destroy()
         {
-
+            //
         }
 
         @Override
@@ -422,7 +423,7 @@ public class TxtFileReader
         {
             LOG.debug("start read source files...");
             for (String fileName : this.sourceFiles) {
-                LOG.info(String.format("reading file : [%s]", fileName));
+                LOG.info("reading file : [{}]", fileName);
                 InputStream inputStream;
                 try {
                     inputStream = new FileInputStream(fileName);

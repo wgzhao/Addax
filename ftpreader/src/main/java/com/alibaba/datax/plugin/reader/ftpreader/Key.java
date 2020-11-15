@@ -2,6 +2,8 @@ package com.alibaba.datax.plugin.reader.ftpreader;
 
 public class Key
 {
+    private Key() {}
+
     public static final String PROTOCOL = "protocol";
     public static final String HOST = "host";
     public static final String USERNAME = "username";

@@ -17,7 +17,7 @@ public enum HBase20xSQLWriterErrorCode
     private final String code;
     private final String description;
 
-    private HBase20xSQLWriterErrorCode(String code, String description)
+    HBase20xSQLWriterErrorCode(String code, String description)
     {
         this.code = code;
         this.description = description;

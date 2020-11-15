@@ -16,13 +16,15 @@ public class Constant
 
     public static final String SELECT_COLUMNS_TEMPLATE = "SELECT COLUMN_NAME, COLUMN_FAMILY FROM SYSTEM.CATALOG WHERE TABLE_NAME='%s' AND COLUMN_NAME IS NOT NULL";
 
-    public static String QUERY_SQL_TEMPLATE_WITHOUT_WHERE = "select %s from %s ";
+    public static final String QUERY_SQL_TEMPLATE_WITHOUT_WHERE = "select %s from %s ";
 
-    public static String QUERY_SQL_TEMPLATE = "select %s from %s where (%s)";
+    public static final String QUERY_SQL_TEMPLATE = "select %s from %s where (%s)";
 
-    public static String QUERY_MIN_MAX_TEMPLATE = "SELECT MIN(%s),MAX(%s) FROM %s";
+    public static final String QUERY_MIN_MAX_TEMPLATE = "SELECT MIN(%s),MAX(%s) FROM %s";
 
-    public static String QUERY_COLUMN_TYPE_TEMPLATE = "SELECT %s FROM %s LIMIT 1";
+    public static final String QUERY_COLUMN_TYPE_TEMPLATE = "SELECT %s FROM %s LIMIT 1";
 
-    public static String QUERY_SQL_PER_SPLIT = "querySqlPerSplit";
+    public static final String QUERY_SQL_PER_SPLIT = "querySqlPerSplit";
+
+    private Constant() {}
 }

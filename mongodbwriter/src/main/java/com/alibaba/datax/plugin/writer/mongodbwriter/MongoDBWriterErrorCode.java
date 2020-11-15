@@ -8,7 +8,7 @@ public enum MongoDBWriterErrorCode
 
     ILLEGAL_VALUE("ILLEGAL_PARAMETER_VALUE", "参数不合法"),
     ILLEGAL_ADDRESS("ILLEGAL_ADDRESS", "不合法的Mongo地址"),
-    JSONCAST_EXCEPTION("JSONCAST_EXCEPTION", "json类型转换异常"),
+//    JSONCAST_EXCEPTION("JSONCAST_EXCEPTION", "json类型转换异常"),
     UNEXCEPT_EXCEPTION("UNEXCEPT_EXCEPTION", "未知异常");
 
     private final String code;

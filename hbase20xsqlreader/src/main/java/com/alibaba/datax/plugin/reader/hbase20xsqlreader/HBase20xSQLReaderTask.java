@@ -29,7 +29,7 @@ public class HBase20xSQLReaderTask
 {
     private static final Logger LOG = LoggerFactory.getLogger(HBase20xSQLReaderTask.class);
 
-    private Configuration readerConfig;
+    private final Configuration readerConfig;
     private int taskGroupId = -1;
     private int taskId = -1;
 
@@ -43,7 +43,7 @@ public class HBase20xSQLReaderTask
     public void readRecord(RecordSender recordSender)
     {
         String querySql = readerConfig.getString(Constant.QUERY_SQL_PER_SPLIT);
-        LOG.info("Begin to read record by Sql: [{}\n] {}.", querySql);
+        LOG.info("Begin to read record by Sql: [{}].", querySql);
         HBase20SQLReaderHelper helper = new HBase20SQLReaderHelper(readerConfig);
         Connection conn = helper.getConnection(readerConfig.getString(Key.QUERYSERVER_ADDRESS),
                 readerConfig.getString(Key.SERIALIZATION_NAME, Constant.DEFAULT_SERIALIZATION));
@@ -75,7 +75,7 @@ public class HBase20xSQLReaderTask
                 recordSender.sendToWriter(record);
             }
             allResultPerfRecord.end(rsNextUsedTime);
-            LOG.info("Finished read record by Sql: [{}\n] {}.", querySql);
+            LOG.info("Finished read record by Sql: [{}].", querySql);
         }
         catch (SQLException e) {
             throw DataXException.asDataXException(

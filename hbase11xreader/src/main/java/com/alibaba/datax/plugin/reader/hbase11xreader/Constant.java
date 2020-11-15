@@ -2,6 +2,8 @@ package com.alibaba.datax.plugin.reader.hbase11xreader;
 
 public final class Constant
 {
+    private Constant() {}
+
     public static final String RANGE = "range";
 
     public static final String ROWKEY_FLAG = "rowkey";

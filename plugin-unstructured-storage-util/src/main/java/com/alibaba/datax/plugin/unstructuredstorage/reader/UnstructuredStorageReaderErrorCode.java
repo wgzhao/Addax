@@ -16,7 +16,7 @@ public enum UnstructuredStorageReaderErrorCode
     NO_INDEX_VALUE("UnstructuredStorageReader-05", "您明确的配置列信息,但未填写相应的index,value."),
     FILE_NOT_EXISTS("UnstructuredStorageReader-06", "您配置的源路径不存在."),
     OPEN_FILE_WITH_CHARSET_ERROR("UnstructuredStorageReader-07", "您配置的编码和实际存储编码不符合."),
-    OPEN_FILE_ERROR("UnstructuredStorageReader-08", "您配置的源在打开时异常,建议您检查源源是否有隐藏实体,管道文件等特殊文件."),
+//    OPEN_FILE_ERROR("UnstructuredStorageReader-08", "您配置的源在打开时异常,建议您检查源源是否有隐藏实体,管道文件等特殊文件."),
     READ_FILE_IO_ERROR("UnstructuredStorageReader-09", "您配置的文件在读取时出现IO异常."),
     SECURITY_NOT_ENOUGH("UnstructuredStorageReader-10", "您缺少权限执行相应的文件读取操作."),
     RUNTIME_EXCEPTION("UnstructuredStorageReader-11", "出现运行时异常, 请联系我们");
@@ -24,7 +24,7 @@ public enum UnstructuredStorageReaderErrorCode
     private final String code;
     private final String description;
 
-    private UnstructuredStorageReaderErrorCode(String code, String description)
+    UnstructuredStorageReaderErrorCode(String code, String description)
     {
         this.code = code;
         this.description = description;

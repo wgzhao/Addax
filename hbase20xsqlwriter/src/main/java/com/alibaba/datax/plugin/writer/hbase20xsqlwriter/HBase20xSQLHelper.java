@@ -29,6 +29,8 @@ public class HBase20xSQLHelper
     public static final String SELECT_CATALOG_TABLE_STRING = "SELECT COLUMN_NAME FROM SYSTEM.CATALOG WHERE TABLE_NAME='%s' AND COLUMN_NAME IS NOT NULL";
     private static final Logger LOG = LoggerFactory.getLogger(HBase20xSQLHelper.class);
 
+    private HBase20xSQLHelper() {}
+
     /**
      * 验证配置参数是否正确
      */
@@ -60,7 +62,7 @@ public class HBase20xSQLHelper
      */
     public static Connection getThinClientConnection(String connStr)
     {
-        LOG.debug("Connecting to QueryServer [" + connStr + "] ...");
+        LOG.debug("Connecting to QueryServer [{}] ...", connStr);
         Connection conn;
         try {
             Class.forName(CONNECT_DRIVER_STRING);
@@ -91,7 +93,6 @@ public class HBase20xSQLHelper
     }
 
     public static void checkTable(Connection conn, String schema, String tableName, List<String> columnNames)
-            throws DataXException
     {
         String selectSystemTable = getSelectSystemSQL(schema, tableName);
         Statement st = null;
@@ -99,12 +100,12 @@ public class HBase20xSQLHelper
         try {
             st = conn.createStatement();
             rs = st.executeQuery(selectSystemTable);
-            List<String> allColumns = new ArrayList<String>();
+            List<String> allColumns = new ArrayList<>();
             if (rs.next()) {
                 allColumns.add(rs.getString(1));
             }
             else {
-                LOG.error(tableName + "表不存在，请检查表名是否正确或是否已创建.", HBase20xSQLWriterErrorCode.GET_HBASE_TABLE_ERROR);
+                LOG.error("表 {} 不存在，请检查表名是否正确或是否已创建. {}", tableName , HBase20xSQLWriterErrorCode.GET_HBASE_TABLE_ERROR);
                 throw DataXException.asDataXException(HBase20xSQLWriterErrorCode.GET_HBASE_TABLE_ERROR,
                         tableName + "表不存在，请检查表名是否正确或是否已创建.");
             }
@@ -151,7 +152,7 @@ public class HBase20xSQLHelper
             }
         }
         catch (SQLException e) {
-            LOG.warn("数据库连接关闭异常.", HBase20xSQLWriterErrorCode.CLOSE_HBASE_CONNECTION_ERROR);
+            LOG.warn("数据库连接关闭异常. {}", HBase20xSQLWriterErrorCode.CLOSE_HBASE_CONNECTION_ERROR);
         }
     }
 }

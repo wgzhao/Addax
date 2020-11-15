@@ -1,5 +1,6 @@
 package com.alibaba.datax.plugin.reader.hbase11xsqlreader;
 
+import com.alibaba.datax.common.element.Record;
 import com.alibaba.datax.common.plugin.RecordSender;
 import com.alibaba.datax.common.spi.Reader;
 import com.alibaba.datax.common.util.Configuration;
@@ -31,14 +32,14 @@ public class HbaseSQLReader
         @Override
         public void destroy()
         {
-
+            //
         }
     }
 
     public static class Task
             extends Reader.Task
     {
-        private static Logger LOG = LoggerFactory.getLogger(Task.class);
+        private static Logger log = LoggerFactory.getLogger(Task.class);
         private HbaseSQLReaderTask hbase11SQLReaderTask;
 
         @Override
@@ -57,15 +58,15 @@ public class HbaseSQLReader
         @Override
         public void startRead(RecordSender recordSender)
         {
-            Long recordNum = 0L;
-            com.alibaba.datax.common.element.Record record = recordSender.createRecord();
-            boolean fetchOK;
-            while (true) {
+            long recordNum = 0L;
+            Record record = recordSender.createRecord();
+            boolean fetchOK = true;
+            while (fetchOK) {
                 try {
                     fetchOK = this.hbase11SQLReaderTask.readRecord(record);
                 }
                 catch (Exception e) {
-                    LOG.info("Read record exception", e);
+                    log.info("Read record exception", e);
                     e.printStackTrace();
                     super.getTaskPluginCollector().collectDirtyRecord(record, e);
                     record = recordSender.createRecord();
@@ -75,12 +76,9 @@ public class HbaseSQLReader
                     recordSender.sendToWriter(record);
                     recordNum++;
                     if (recordNum % 10000 == 0) {
-                        LOG.info("already read record num is " + recordNum);
+                        log.info("already read record num is {}", recordNum);
                     }
                     record = recordSender.createRecord();
-                }
-                else {
-                    break;
                 }
             }
             recordSender.flush();

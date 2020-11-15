@@ -393,7 +393,7 @@ public class HdfsWriter
         @Override
         public void prepare()
         {
-
+            //
         }
 
         @Override
@@ -423,13 +423,13 @@ public class HdfsWriter
         @Override
         public void post()
         {
-
+            //
         }
 
         @Override
         public void destroy()
         {
-
+            //
         }
     }
 }

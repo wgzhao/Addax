@@ -101,37 +101,37 @@ public abstract class HbaseAbstractTask
     }
 
     public Column convertBytesToAssignType(ColumnType columnType, byte[] byteArray, String dateformat)
-            throws Exception
     {
         Column column;
+        boolean isEmpty = ArrayUtils.isEmpty(byteArray);
         switch (columnType) {
             case BOOLEAN:
-                column = new BoolColumn(ArrayUtils.isEmpty(byteArray) ? null : Bytes.toBoolean(byteArray));
+                column = new BoolColumn(isEmpty ? null : Bytes.toBoolean(byteArray));
                 break;
             case SHORT:
-                column = new LongColumn(ArrayUtils.isEmpty(byteArray) ? null : String.valueOf(Bytes.toShort(byteArray)));
+                column = new LongColumn(isEmpty ? null : String.valueOf(Bytes.toShort(byteArray)));
                 break;
             case INT:
-                column = new LongColumn(ArrayUtils.isEmpty(byteArray) ? null : Bytes.toInt(byteArray));
+                column = new LongColumn(isEmpty ? null : Bytes.toInt(byteArray));
                 break;
             case LONG:
-                column = new LongColumn(ArrayUtils.isEmpty(byteArray) ? null : Bytes.toLong(byteArray));
+                column = new LongColumn(isEmpty ? null : Bytes.toLong(byteArray));
                 break;
             case FLOAT:
-                column = new DoubleColumn(ArrayUtils.isEmpty(byteArray) ? null : Bytes.toFloat(byteArray));
+                column = new DoubleColumn(isEmpty ? null : Bytes.toFloat(byteArray));
                 break;
             case DOUBLE:
-                column = new DoubleColumn(ArrayUtils.isEmpty(byteArray) ? null : Bytes.toDouble(byteArray));
+                column = new DoubleColumn(isEmpty ? null : Bytes.toDouble(byteArray));
                 break;
             case STRING:
-                column = new StringColumn(ArrayUtils.isEmpty(byteArray) ? null : new String(byteArray, encoding));
+                column = new StringColumn(isEmpty ? null : new String(byteArray, encoding));
                 break;
             case BINARY_STRING:
-                column = new StringColumn(ArrayUtils.isEmpty(byteArray) ? null : Bytes.toStringBinary(byteArray));
+                column = new StringColumn(isEmpty ? null : Bytes.toStringBinary(byteArray));
                 break;
             case DATE:
                 String dateValue = Bytes.toStringBinary(byteArray);
-                column = new DateColumn(ArrayUtils.isEmpty(byteArray) ? null : DateUtils.parseDate(dateValue, dateformat));
+                column = new DateColumn(isEmpty ? null : DateUtils.parseDate(dateValue, dateformat));
                 break;
             default:
                 throw DataXException.asDataXException(Hbase11xReaderErrorCode.ILLEGAL_VALUE, "Hbasereader 不支持您配置的列类型:" + columnType);
@@ -140,7 +140,6 @@ public abstract class HbaseAbstractTask
     }
 
     public Column convertValueToAssignType(ColumnType columnType, String constantValue, String dateformat)
-            throws Exception
     {
         Column column;
         switch (columnType) {

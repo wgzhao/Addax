@@ -35,12 +35,14 @@ public class Hbase11xHelper
 {
 
     private static final Logger LOG = LoggerFactory.getLogger(Hbase11xHelper.class);
-    private static org.apache.hadoop.hbase.client.Connection H_CONNECTION = null;
+    private static org.apache.hadoop.hbase.client.Connection hConnection = null;
+
+    private Hbase11xHelper() {}
 
     public static org.apache.hadoop.hbase.client.Connection getHbaseConnection(String hbaseConfig)
     {
-        if (H_CONNECTION != null && !H_CONNECTION.isClosed()) {
-            return H_CONNECTION;
+        if (hConnection != null && !hConnection.isClosed()) {
+            return hConnection;
         }
         if (StringUtils.isBlank(hbaseConfig)) {
             throw DataXException.asDataXException(Hbase11xReaderErrorCode.REQUIRED_VALUE, "读 Hbase 时需要配置hbaseConfig，其内容为 Hbase 连接信息，请联系 Hbase PE 获取该信息.");
@@ -50,7 +52,8 @@ public class Hbase11xHelper
             Map<String, String> hbaseConfigMap = JSON.parseObject(hbaseConfig, new TypeReference<Map<String, String>>() {});
             // 用户配置的 key-value 对 来表示 hbaseConfig
             Validate.isTrue(hbaseConfigMap != null && hbaseConfigMap.size() != 0, "hbaseConfig不能为空Map结构!");
-            for (Map.Entry<String, String> entry : hbaseConfigMap.entrySet()) {
+            for (Map.Entry<String, String> entry : hbaseConfigMap.entrySet())  //NOSONAR
+            {
                 hConfiguration.set(entry.getKey(), entry.getValue());
             }
         }
@@ -58,13 +61,13 @@ public class Hbase11xHelper
             throw DataXException.asDataXException(Hbase11xReaderErrorCode.GET_HBASE_CONNECTION_ERROR, e);
         }
         try {
-            H_CONNECTION = ConnectionFactory.createConnection(hConfiguration);
+            hConnection = ConnectionFactory.createConnection(hConfiguration);
         }
         catch (Exception e) {
-            Hbase11xHelper.closeConnection(H_CONNECTION);
+            Hbase11xHelper.closeConnection(hConnection);
             throw DataXException.asDataXException(Hbase11xReaderErrorCode.GET_HBASE_CONNECTION_ERROR, e);
         }
-        return H_CONNECTION;
+        return hConnection;
     }
 
     public static Table getTable(com.alibaba.datax.common.util.Configuration configuration)
@@ -111,7 +114,7 @@ public class Hbase11xHelper
         return regionLocator;
     }
 
-    public synchronized static void closeConnection(Connection hConnection)
+    public static synchronized void closeConnection(Connection hConnection)
     {
         try {
             if (null != hConnection) {
@@ -313,7 +316,7 @@ public class Hbase11xHelper
                 familyQualifier = columnName.trim();
             }
 
-            HashMap<String, String> typeAndFormat = new HashMap<String, String>();
+            HashMap<String, String> typeAndFormat = new HashMap<>();
             typeAndFormat.put(Key.TYPE, type);
             typeAndFormat.put(Key.FORMAT, dateformat);
             familyQualifierMap.put(familyQualifier, typeAndFormat);
@@ -356,7 +359,7 @@ public class Hbase11xHelper
             byte[] endRowkeyByte, Pair<byte[][], byte[][]> regionRanges)
     {
 
-        List<Configuration> configurations = new ArrayList<Configuration>();
+        List<Configuration> configurations = new ArrayList<>();
 
         for (int i = 0; i < regionRanges.getFirst().length; i++) {
 
@@ -494,7 +497,7 @@ public class Hbase11xHelper
         }
         ModeType modeType = ModeType.getByTypeName(mode);
         switch (modeType) {
-            case Normal: {
+            case NORMAL: {
                 // normal 模式不需要配置 maxVersion，需要配置 column，并且 column 格式为 Map 风格
                 String maxVersion = originalConfig.getString(Key.MAX_VERSION);
                 Validate.isTrue(maxVersion == null, "您配置的是 normal 模式读取 hbase 中的数据，所以不能配置无关项：maxVersion");
@@ -502,7 +505,7 @@ public class Hbase11xHelper
                 Hbase11xHelper.parseColumnOfNormalMode(column);
                 break;
             }
-            case MultiVersionFixedColumn: {
+            case MULTI_VERSION_FIXED_COLUMN: {
                 // multiVersionFixedColumn 模式需要配置 maxVersion
                 checkMaxVersion(originalConfig, mode);
 

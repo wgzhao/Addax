@@ -7,4 +7,6 @@ public class Constant
 {
     public static final String SOURCE_FILES = "sourceFiles";
     public static final String DEFAULT_ENCODING = "UTF-8";
+
+    private Constant() {}
 }

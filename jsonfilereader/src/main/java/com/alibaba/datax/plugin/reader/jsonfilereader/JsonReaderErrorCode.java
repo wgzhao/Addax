@@ -10,7 +10,7 @@ public enum JsonReaderErrorCode
     MIXED_INDEX_VALUE("JsonFilereader-02", "您的列信息配置同时包含了index,value."),
     NO_INDEX_VALUE("JsonFilereader-03", "您明确的配置列信息,但未填写相应的index,value."),
     FILE_NOT_EXISTS("JsonFilereader-04", "您配置的目录文件路径不存在."),
-    OPEN_FILE_WITH_CHARSET_ERROR("JsonFilereader-05", "您配置的文件编码和实际文件编码不符合."),
+//    OPEN_FILE_WITH_CHARSET_ERROR("JsonFilereader-05", "您配置的文件编码和实际文件编码不符合."),
     OPEN_FILE_ERROR("JsonFilereader-06", "您配置的文件在打开时异常,建议您检查源目录是否有隐藏文件,管道文件等特殊文件."),
     READ_FILE_IO_ERROR("JsonFilereader-07", "您配置的文件在读取时出现IO异常."),
     SECURITY_NOT_ENOUGH("JsonFilereader-08", "您缺少权限执行相应的文件操作."),

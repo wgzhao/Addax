@@ -192,8 +192,8 @@ public class UnstructuredStorageWriterUtil
                 Constant.DEFAULT_ENCODING);
         // handle blank encoding
         if (StringUtils.isBlank(encoding)) {
-            LOG.warn(String.format("您配置的encoding为[%s], 使用默认值[%s]", encoding,
-                    Constant.DEFAULT_ENCODING));
+            LOG.warn("您配置的encoding为[{}], 使用默认值[{}]", encoding,
+                    Constant.DEFAULT_ENCODING);
             encoding = Constant.DEFAULT_ENCODING;
         }
         String compress = config.getString(Key.COMPRESS);
@@ -206,7 +206,6 @@ public class UnstructuredStorageWriterUtil
                         outputStream, encoding));
             }
             else {
-                // TODO more compress
                 if ("gzip".equalsIgnoreCase(compress)) {
                     CompressorOutputStream compressorOutputStream = new GzipCompressorOutputStream(
                             outputStream);
@@ -234,7 +233,7 @@ public class UnstructuredStorageWriterUtil
         catch (UnsupportedEncodingException uee) {
             throw DataXException
                     .asDataXException(
-                            UnstructuredStorageWriterErrorCode.Write_FILE_WITH_CHARSET_ERROR,
+                            UnstructuredStorageWriterErrorCode.WRITE_FILE_WITH_CHARSET_ERROR,
                             String.format("不支持的编码格式 : [%s]", encoding), uee);
         }
         catch (NullPointerException e) {
@@ -244,7 +243,7 @@ public class UnstructuredStorageWriterUtil
         }
         catch (IOException e) {
             throw DataXException.asDataXException(
-                    UnstructuredStorageWriterErrorCode.Write_FILE_IO_ERROR,
+                    UnstructuredStorageWriterErrorCode.WRITE_FILE_IO_ERROR,
                     String.format("流写入错误 : [%s]", context), e);
         }
         finally {

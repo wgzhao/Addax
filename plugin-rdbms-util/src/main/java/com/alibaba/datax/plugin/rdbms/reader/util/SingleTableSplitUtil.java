@@ -22,6 +22,7 @@ import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
 import java.sql.Types;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 public class SingleTableSplitUtil
@@ -29,7 +30,7 @@ public class SingleTableSplitUtil
     private static final Logger LOG = LoggerFactory
             .getLogger(SingleTableSplitUtil.class);
 
-    public static DataBaseType DATABASE_TYPE;
+    public static DataBaseType dataBaseType;
 
     private SingleTableSplitUtil()
     {
@@ -46,9 +47,7 @@ public class SingleTableSplitUtil
         String where = configuration.getString(Key.WHERE, null);
         boolean hasWhere = StringUtils.isNotBlank(where);
 
-        //String splitMode = configuration.getString(Key.SPLIT_MODE, "");
-        //if (Constant.SPLIT_MODE_RANDOMSAMPLE.equals(splitMode) && DATABASE_TYPE == DataBaseType.Oracle) {
-        if (DATABASE_TYPE == DataBaseType.Oracle) {
+        if (dataBaseType == DataBaseType.Oracle) {
             rangeList = genSplitSqlForOracle(splitPkName, table, where,
                     configuration, adviceNum);
             // warn: mysql etc to be added...
@@ -76,7 +75,7 @@ public class SingleTableSplitUtil
                 rangeList = RdbmsRangeSplitWrap.splitAndWrap(
                         String.valueOf(minMaxPK.getLeft()),
                         String.valueOf(minMaxPK.getRight()), adviceNum,
-                        splitPkName, "'", DATABASE_TYPE);
+                        splitPkName, "'", dataBaseType);
             }
             else if (isLongType) {
                 rangeList = RdbmsRangeSplitWrap.splitAndWrap(
@@ -92,7 +91,7 @@ public class SingleTableSplitUtil
         String tempQuerySql;
         List<String> allQuerySql = new ArrayList<>();
 
-        if (null != rangeList && !rangeList.isEmpty()) {
+        if (!rangeList.isEmpty()) {
             for (String range : rangeList) {
                 Configuration tempConfig = configuration.clone();
 
@@ -160,7 +159,7 @@ public class SingleTableSplitUtil
         String password = configuration.getString(Key.PASSWORD);
         String table = configuration.getString(Key.TABLE);
 
-        Connection conn = DBUtil.getConnection(DATABASE_TYPE, jdbcURL, username, password);
+        Connection conn = DBUtil.getConnection(dataBaseType, jdbcURL, username, password);
         Pair<Object, Object> minMaxPK = checkSplitPk(conn, pkRangeSQL, fetchSize, table, username, configuration);
         DBUtil.closeDBResources(null, null, conn);
         return minMaxPK;
@@ -187,11 +186,12 @@ public class SingleTableSplitUtil
         ResultSet rs = null;
         Pair<Object, Object> minMaxPK = null;
         try {
+            String errorMsg = "您配置的DataX切分主键(splitPk)有误. 因为您配置的切分主键(splitPk) 类型 DataX 不支持. DataX 仅支持切分主键为一个,并且类型为整数或者字符串类型. 请尝试使用其他的切分主键或者联系 DBA 进行处理.";
             try {
                 rs = DBUtil.query(conn, pkRangeSQL, fetchSize);
             }
             catch (Exception e) {
-                throw RdbmsException.asQueryException(DATABASE_TYPE, e, pkRangeSQL, table, username);
+                throw RdbmsException.asQueryException(dataBaseType, e, pkRangeSQL, table, username);
             }
             ResultSetMetaData rsMetaData = rs.getMetaData();
             if (isPKTypeValid(rsMetaData)) {
@@ -217,19 +217,16 @@ public class SingleTableSplitUtil
                         // check: string shouldn't contain '.', for oracle
                         String minMax = rs.getString(1) + rs.getString(2);
                         if (StringUtils.contains(minMax, '.')) {
-                            throw DataXException.asDataXException(DBUtilErrorCode.ILLEGAL_SPLIT_PK,
-                                    "您配置的DataX切分主键(splitPk)有误. 因为您配置的切分主键(splitPk) 类型 DataX 不支持. DataX 仅支持切分主键为一个,并且类型为整数或者字符串类型. 请尝试使用其他的切分主键或者联系 DBA 进行处理.");
+                            throw DataXException.asDataXException(DBUtilErrorCode.ILLEGAL_SPLIT_PK, errorMsg);
                         }
                     }
                 }
                 else {
-                    throw DataXException.asDataXException(DBUtilErrorCode.ILLEGAL_SPLIT_PK,
-                            "您配置的DataX切分主键(splitPk)有误. 因为您配置的切分主键(splitPk) 类型 DataX 不支持. DataX 仅支持切分主键为一个,并且类型为整数或者字符串类型. 请尝试使用其他的切分主键或者联系 DBA 进行处理.");
+                    throw DataXException.asDataXException(DBUtilErrorCode.ILLEGAL_SPLIT_PK, errorMsg);
                 }
             }
             else {
-                throw DataXException.asDataXException(DBUtilErrorCode.ILLEGAL_SPLIT_PK,
-                        "您配置的DataX切分主键(splitPk)有误. 因为您配置的切分主键(splitPk) 类型 DataX 不支持. DataX 仅支持切分主键为一个,并且类型为整数或者字符串类型. 请尝试使用其他的切分主键或者联系 DBA 进行处理.");
+                throw DataXException.asDataXException(DBUtilErrorCode.ILLEGAL_SPLIT_PK, errorMsg);
             }
         }
         catch (DataXException e) {
@@ -275,7 +272,7 @@ public class SingleTableSplitUtil
         boolean isValidLongType = type == Types.BIGINT || type == Types.INTEGER
                 || type == Types.SMALLINT || type == Types.TINYINT;
 
-        if (SingleTableSplitUtil.DATABASE_TYPE == DataBaseType.Oracle) {
+        if (SingleTableSplitUtil.dataBaseType == DataBaseType.Oracle) {
             isValidLongType |= type == Types.NUMERIC;
         }
         return isValidLongType;
@@ -322,7 +319,7 @@ public class SingleTableSplitUtil
                     "切分份数不能小于1. 此处:adviceNum=[%s].", adviceNum));
         }
         else if (adviceNum == 1) {
-            return null;
+            return Collections.emptyList();
         }
         String whereSql = String.format("%s IS NOT NULL", splitPK);
         if (StringUtils.isNotBlank(where)) {
@@ -340,7 +337,7 @@ public class SingleTableSplitUtil
         String jdbcURL = configuration.getString(Key.JDBC_URL);
         String username = configuration.getString(Key.USERNAME);
         String password = configuration.getString(Key.PASSWORD);
-        Connection conn = DBUtil.getConnection(DATABASE_TYPE, jdbcURL,
+        Connection conn = DBUtil.getConnection(dataBaseType, jdbcURL,
                 username, password);
         LOG.info("split pk [sql={}] is running... ", splitSql);
         ResultSet rs = null;
@@ -350,7 +347,7 @@ public class SingleTableSplitUtil
                 rs = DBUtil.query(conn, splitSql, fetchSize);
             }
             catch (Exception e) {
-                throw RdbmsException.asQueryException(DATABASE_TYPE, e,
+                throw RdbmsException.asQueryException(dataBaseType, e,
                         splitSql, table, username);
             }
             configuration
@@ -401,11 +398,11 @@ public class SingleTableSplitUtil
                             .toString();
                 }
                 rangeSql.addAll(RdbmsRangeSplitWrap.wrapRange(stringPoints,
-                        splitPK, "'", DATABASE_TYPE));
+                        splitPK, "'", dataBaseType));
                 // its ok if splitedRangeSize is 1
                 rangeSql.add(RdbmsRangeSplitWrap.wrapFirstLastPoint(
                         stringPoints[0], stringPoints[splitedRangeSize - 1],
-                        splitPK, "'", DATABASE_TYPE));
+                        splitPK, "'", dataBaseType));
             }
             else {
                 throw DataXException

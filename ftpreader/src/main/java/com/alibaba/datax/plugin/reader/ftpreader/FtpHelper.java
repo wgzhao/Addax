@@ -3,6 +3,7 @@ package com.alibaba.datax.plugin.reader.ftpreader;
 import java.io.InputStream;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 public abstract class FtpHelper
 {
@@ -55,7 +56,7 @@ public abstract class FtpHelper
      * @param maxTraversalLevel 允许的最大递归层数
      * @return HashSet<String>
      */
-    public abstract HashSet<String> getListFiles(String directoryPath, int parentLevel, int maxTraversalLevel);
+    public abstract Set<String> getListFiles(String directoryPath, int parentLevel, int maxTraversalLevel);
 
     /**
      * 获取指定路径的输入流
@@ -73,7 +74,7 @@ public abstract class FtpHelper
      * @param maxTraversalLevel 允许的最大递归层数
      * @return HashSet<String>
      */
-    public HashSet<String> getAllFiles(List<String> srcPaths, int parentLevel, int maxTraversalLevel)
+    public Set<String> getAllFiles(List<String> srcPaths, int parentLevel, int maxTraversalLevel)
     {
         HashSet<String> sourceAllFiles = new HashSet<>();
         if (!srcPaths.isEmpty()) {

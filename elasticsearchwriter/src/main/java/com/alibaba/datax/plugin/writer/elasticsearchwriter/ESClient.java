@@ -63,7 +63,7 @@ public class ESClient
                 .maxTotalConnection(200)
                 .requestCompressionEnabled(compression)
                 .discoveryEnabled(discovery)
-                .discoveryFrequency(5l, TimeUnit.MINUTES);
+                .discoveryFrequency(5L, TimeUnit.MINUTES);
 
         if (!("".equals(user) || "".equals(passwd))) {
             httpClientConfig.setPreemptiveAuth(new HttpHost(endpoint)).defaultCredentials(user, passwd);
@@ -85,7 +85,6 @@ public class ESClient
         else {
             switch (rst.getResponseCode()) {
                 case 404:
-                    isIndicesExists = false;
                     break;
                 case 401:
                     // 无权访问
@@ -100,15 +99,13 @@ public class ESClient
     public boolean deleteIndex(String indexName)
             throws Exception
     {
-        log.info("delete index " + indexName);
+        log.info("delete index {}", indexName);
         if (indicesExists(indexName)) {
             JestResult rst = execute(new DeleteIndex.Builder(indexName).build());
-            if (!rst.isSucceeded()) {
-                return false;
-            }
+            return rst.isSucceeded();
         }
         else {
-            log.info("index cannot found, skip delete " + indexName);
+            log.info("index cannot found, skip delete {}", indexName);
         }
         return true;
     }
@@ -117,9 +114,9 @@ public class ESClient
             Object mappings, String settings, boolean dynamic)
             throws Exception
     {
-        JestResult rst = null;
+        JestResult rst;
         if (!indicesExists(indexName)) {
-            log.info("create index " + indexName);
+            log.info("create index {}", indexName);
             rst = jestClient.execute(
                     new CreateIndex.Builder(indexName)
                             .settings(settings)
@@ -129,7 +126,7 @@ public class ESClient
             //index_already_exists_exception
             if (!rst.isSucceeded()) {
                 if (getStatus(rst) == 400) {
-                    log.info(String.format("index [%s] already exists", indexName));
+                    log.info("index [{}] already exists", indexName);
                     return true;
                 }
                 else {
@@ -138,7 +135,7 @@ public class ESClient
                 }
             }
             else {
-                log.info(String.format("create [%s] index success", indexName));
+                log.info("create [{}] index success", indexName);
             }
         }
 
@@ -158,12 +155,12 @@ public class ESClient
             log.info("ignore mappings");
             return true;
         }
-        log.info("create mappings for " + indexName + "  " + mappings);
+        log.info("create mappings for {} {}", indexName, mappings);
         rst = jestClient.execute(new PutMapping.Builder(indexName, typeName, mappings)
                 .setParameter("master_timeout", "5m").build());
         if (!rst.isSucceeded()) {
             if (getStatus(rst) == 400) {
-                log.info(String.format("index [%s] mappings already exists", indexName));
+                log.info("index [{}] mappings already exists", indexName);
             }
             else {
                 log.error(rst.getErrorMessage());
@@ -171,7 +168,7 @@ public class ESClient
             }
         }
         else {
-            log.info(String.format("index [%s] put mappings success", indexName));
+            log.info("index [{}] put mappings success", indexName);
         }
         return true;
     }
@@ -179,10 +176,10 @@ public class ESClient
     public JestResult execute(Action<JestResult> clientRequest)
             throws Exception
     {
-        JestResult rst = null;
+        JestResult rst;
         rst = jestClient.execute(clientRequest);
         if (!rst.isSucceeded()) {
-            //log.warn(rst.getErrorMessage());
+            log.warn(rst.getErrorMessage());
         }
         return rst;
     }
@@ -209,7 +206,7 @@ public class ESClient
         AliasMapping addAliasMapping = new AddAliasMapping.Builder(indexname, aliasname).build();
         JestResult rst = jestClient.execute(getAliases);
         log.info(rst.getJsonString());
-        List<AliasMapping> list = new ArrayList<AliasMapping>();
+        List<AliasMapping> list = new ArrayList<>();
         if (rst.isSucceeded()) {
             JsonParser jp = new JsonParser();
             JsonObject jo = (JsonObject) jp.parse(rst.getJsonString());
@@ -242,7 +239,7 @@ public class ESClient
         // es_rejected_execution_exception
         // illegal_argument_exception
         // cluster_block_exception
-        JestResult rst = null;
+        JestResult rst;
         rst = jestClient.execute(bulk.build());
         if (!rst.isSucceeded()) {
             log.warn(rst.getErrorMessage());

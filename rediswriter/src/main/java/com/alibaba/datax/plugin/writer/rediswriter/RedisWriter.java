@@ -31,7 +31,7 @@ public class RedisWriter
             extends com.alibaba.datax.common.spi.Writer.Task
     {
 
-        private static final Logger LOG = LoggerFactory.getLogger(RedisWriter.Job.class);
+        private static final Logger LOG = LoggerFactory.getLogger(Task.class);
         private static final AtomicBoolean FLUSH_FLAG = new AtomicBoolean(false);
         /**
          * slot 对应cluster Redis 节点
@@ -142,8 +142,8 @@ public class RedisWriter
             }
 
             this.nodeCounterMap.clear();
-            for (Jedis jedis : new HashSet<>(this.cluster.values())) {
-                jedis.close();
+            for (Jedis cJedis : new HashSet<>(this.cluster.values())) {
+                cJedis.close();
             }
 
             this.cluster.clear();
@@ -159,7 +159,7 @@ public class RedisWriter
             Record fromReader;
             while ((fromReader = lineReceiver.getFromReader()) != null) {
                 Column dbColumn = fromReader.getColumn(0);
-                Column type = fromReader.getColumn(1);
+//                Column type = fromReader.getColumn(1)
                 Column expireColumn = fromReader.getColumn(2);
                 Column keyColumn = fromReader.getColumn(3);
                 Column valueColumn = fromReader.getColumn(4);
@@ -233,16 +233,16 @@ public class RedisWriter
                 boolean isCluster = getPluginJobConf().getBool("redisCluster", false);
 
                 if (isCluster) {
-                    for (Jedis jedis : new HashSet<>(cluster.values())) {
-                        Client client = jedis.getClient();
-                        LOG.info("格式化:" + client.getHost() + ":" + client.getPort());
+                    for (Jedis cJedis : new HashSet<>(cluster.values())) {
+                        Client client = cJedis.getClient();
+                        LOG.info("格式化: {}: {}", client.getHost(), client.getPort());
                         jedis.flushAll();
                     }
                 }
                 else {
                     if (this.jedis != null) {
                         Client client = jedis.getClient();
-                        LOG.info("格式化:" + client.getHost() + ":" + client.getPort());
+                        LOG.info("格式化: {}:{}", client.getHost(), client.getPort());
                         jedis.flushAll();
                     }
                 }
@@ -278,11 +278,13 @@ public class RedisWriter
         @Override
         public void init()
         {
+            //
         }
 
         @Override
         public void destroy()
         {
+            //
         }
     }
 }

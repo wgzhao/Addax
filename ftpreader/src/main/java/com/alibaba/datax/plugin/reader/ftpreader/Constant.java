@@ -2,6 +2,8 @@ package com.alibaba.datax.plugin.reader.ftpreader;
 
 public class Constant
 {
+    private Constant() {}
+    
     public static final String SOURCE_FILES = "sourceFiles";
 
     public static final int DEFAULT_FTP_PORT = 21;

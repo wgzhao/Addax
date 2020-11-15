@@ -27,7 +27,7 @@ public class HBase20xSQLWriter
         @Override
         public List<Configuration> split(int mandatoryNumber)
         {
-            List<Configuration> splitResultConfigs = new ArrayList<Configuration>();
+            List<Configuration> splitResultConfigs = new ArrayList<>();
             for (int j = 0; j < mandatoryNumber; j++) {
                 splitResultConfigs.add(config.clone());
             }
@@ -44,14 +44,13 @@ public class HBase20xSQLWriter
     public static class Task
             extends Writer.Task
     {
-        private Configuration taskConfig;
         private HBase20xSQLWriterTask writerTask;
 
         @Override
         public void init()
         {
-            this.taskConfig = super.getPluginJobConf();
-            this.writerTask = new HBase20xSQLWriterTask(this.taskConfig);
+            Configuration taskConfig = super.getPluginJobConf();
+            this.writerTask = new HBase20xSQLWriterTask(taskConfig);
         }
 
         @Override

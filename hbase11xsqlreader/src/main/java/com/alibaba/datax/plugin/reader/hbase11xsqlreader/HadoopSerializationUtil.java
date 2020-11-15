@@ -11,6 +11,8 @@ import java.io.IOException;
 public class HadoopSerializationUtil
 {
 
+    private HadoopSerializationUtil() {}
+
     public static byte[] serialize(Writable writable)
             throws IOException
     {
@@ -22,7 +24,7 @@ public class HadoopSerializationUtil
     }
 
     public static void deserialize(Writable writable, byte[] bytes)
-            throws Exception
+            throws IOException
     {
 
         ByteArrayInputStream in = new ByteArrayInputStream(bytes);

@@ -15,7 +15,7 @@ public enum DbfDataType
 
     public final byte byteValue;
 
-    private DbfDataType(char byteValue)
+    DbfDataType(char byteValue)
     {
         this.byteValue = (byte) (byteValue & 0xff);
     }
@@ -24,7 +24,6 @@ public enum DbfDataType
     static DbfDataType valueOf(byte value)
     {
         final DbfDataType[] values = values();
-        final int count = values.length;
         for (DbfDataType dbfDataType : values) {
             if (dbfDataType.byteValue == value) {
                 return dbfDataType;

@@ -48,8 +48,8 @@ public class CommonRdbmsReader
 
         public Job(DataBaseType dataBaseType)
         {
-            OriginalConfPretreatmentUtil.DATABASE_TYPE = dataBaseType;
-            SingleTableSplitUtil.DATABASE_TYPE = dataBaseType;
+            OriginalConfPretreatmentUtil.dataBaseType = dataBaseType;
+            SingleTableSplitUtil.dataBaseType = dataBaseType;
         }
 
         public void init(Configuration originalConfig)

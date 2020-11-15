@@ -31,7 +31,7 @@ import java.util.concurrent.Callable;
 public class ESWriter
         extends Writer
 {
-    private final static String WRITE_COLUMNS = "write_columns";
+    private static final String WRITE_COLUMNS = "write_columns";
 
     public static class Job
             extends Writer.Job
@@ -66,10 +66,10 @@ public class ESWriter
             String typeName = Key.getTypeName(conf);
             boolean dynamic = Key.getDynamic(conf);
             String mappings = genMappings(typeName);
-            String settings = JSONObject.toJSONString(
+            String settings = JSON.toJSONString(
                     Key.getSettings(conf)
             );
-            log.info(String.format("index:[%s], type:[%s], mappings:[%s]", indexName, typeName, mappings));
+            log.info("index:[{}], type:[{}], mappings:[{}]", indexName, typeName, mappings);
 
             try {
                 boolean isIndicesExists = esClient.indicesExists(indexName);
@@ -89,14 +89,14 @@ public class ESWriter
 
         private String genMappings(String typeName)
         {
-            String mappings = null;
-            Map<String, Object> propMap = new HashMap<String, Object>();
-            List<ESColumn> columnList = new ArrayList<ESColumn>();
+            String mappings;
+            Map<String, Object> propMap = new HashMap<>();
+            List<ESColumn> columnList = new ArrayList<>();
 
             List column = conf.getList("column");
             if (column != null) {
                 for (Object col : column) {
-                    JSONObject jo = JSONObject.parseObject(col.toString());
+                    JSONObject jo = JSON.parseObject(col.toString());
                     String colName = jo.getString("name");
                     String colTypeStr = jo.getString("type");
                     if (colTypeStr == null) {
@@ -128,7 +128,7 @@ public class ESWriter
                     if (array != null) {
                         columnItem.setArray(array);
                     }
-                    Map<String, Object> field = new HashMap<String, Object>();
+                    Map<String, Object> field = new HashMap<>();
                     field.put("type", colTypeStr);
                     //https://www.elastic.co/guide/en/elasticsearch/reference/5.2/breaking_50_mapping_changes.html#_literal_index_literal_property
                     // https://www.elastic.co/guide/en/elasticsearch/guide/2.x/_deep_dive_on_doc_values.html#_disabling_doc_values
@@ -143,6 +143,7 @@ public class ESWriter
                         case KEYWORD:
                             // https://www.elastic.co/guide/en/elasticsearch/reference/current/tune-for-search-speed.html#_warm_up_global_ordinals
                             field.put("eager_global_ordinals", jo.getBoolean("eager_global_ordinals"));
+                            break;
                         case TEXT:
                             field.put("analyzer", jo.getString("analyzer"));
                             // 优化disk使用,也同步会提高index性能
@@ -154,17 +155,11 @@ public class ESWriter
                             columnItem.setTimeZone(jo.getString("timezone"));
                             columnItem.setFormat(jo.getString("format"));
                             // 后面时间会处理为带时区的标准时间,所以不需要给ES指定格式
-                            /*
-                            if (jo.getString("format") != null) {
-                                field.put("format", jo.getString("format"));
-                            } else {
-                                //field.put("format", "strict_date_optional_time||epoch_millis||yyyy-MM-dd HH:mm:ss||yyyy-MM-dd");
-                            }
-                            */
                             break;
                         case GEO_SHAPE:
                             field.put("tree", jo.getString("tree"));
                             field.put("precision", jo.getString("precision"));
+                            break;
                         default:
                             break;
                     }
@@ -177,8 +172,8 @@ public class ESWriter
 
             log.info(JSON.toJSONString(columnList));
 
-            Map<String, Object> rootMappings = new HashMap<String, Object>();
-            Map<String, Object> typeMappings = new HashMap<String, Object>();
+            Map<String, Object> rootMappings = new HashMap<>();
+            Map<String, Object> typeMappings = new HashMap<>();
             typeMappings.put("properties", propMap);
             rootMappings.put(typeName, typeMappings);
 
@@ -194,7 +189,7 @@ public class ESWriter
         @Override
         public List<Configuration> split(int mandatoryNumber)
         {
-            List<Configuration> configurations = new ArrayList<Configuration>(mandatoryNumber);
+            List<Configuration> configurations = new ArrayList<>(mandatoryNumber);
             for (int i = 0; i < mandatoryNumber; i++) {
                 configurations.add(conf);
             }
@@ -227,7 +222,7 @@ public class ESWriter
         @Override
         public void destroy()
         {
-
+            //
         }
     }
 
@@ -235,7 +230,7 @@ public class ESWriter
             extends Writer.Task
     {
 
-        private static final Logger log = LoggerFactory.getLogger(Job.class);
+        private static final Logger log = LoggerFactory.getLogger(Task.class);
         ESClient esClient = null;
         private Configuration conf;
         private List<ESFieldType> typeList;
@@ -261,7 +256,7 @@ public class ESWriter
             {
             });
 
-            typeList = new ArrayList<ESFieldType>();
+            typeList = new ArrayList<>();
 
             for (ESColumn col : columnList) {
                 typeList.add(ESFieldType.getESFieldType(col.getType()));
@@ -285,8 +280,8 @@ public class ESWriter
         @Override
         public void startWrite(RecordReceiver recordReceiver)
         {
-            List<Record> writerBuffer = new ArrayList<Record>(this.batchSize);
-            com.alibaba.datax.common.element.Record record = null;
+            List<Record> writerBuffer = new ArrayList<>(this.batchSize);
+            Record record;
             long total = 0;
             while ((record = recordReceiver.getFromReader()) != null) {
                 writerBuffer.add(record);
@@ -334,7 +329,7 @@ public class ESWriter
             Map<String, Object> data = null;
             final Bulk.Builder bulkaction = new Bulk.Builder().defaultIndex(this.index).defaultType(this.type);
             for (com.alibaba.datax.common.element.Record record : writerBuffer) {
-                data = new HashMap<String, Object>();
+                data = new HashMap<>();
                 String id = null;
                 for (int i = 0; i < record.getColumnNumber(); i++) {
                     Column column = record.getColumn(i);
@@ -411,7 +406,7 @@ public class ESWriter
                 }
 
                 if (id == null) {
-                    //id = UUID.randomUUID().toString();
+                    //id = UUID.randomUUID().toString()
                     bulkaction.addAction(new Index.Builder(data).build());
                 }
                 else {
@@ -460,10 +455,9 @@ public class ESWriter
                         }
                         else {
                             Integer status = esClient.getStatus(jestResult);
-                            switch (status) {
-                                case 429: //TOO_MANY_REQUESTS
-                                    log.warn("server response too many requests, so auto reduce speed");
-                                    break;
+                            if (status == 429) {
+                                //TOO_MANY_REQUESTS
+                                log.warn("server response too many requests, so auto reduce speed");
                             }
                             throw DataXException.asDataXException(ESWriterErrorCode.ES_INDEX_INSERT, jestResult.getErrorMessage());
                         }
@@ -484,6 +478,7 @@ public class ESWriter
         @Override
         public void post()
         {
+            //
         }
 
         @Override

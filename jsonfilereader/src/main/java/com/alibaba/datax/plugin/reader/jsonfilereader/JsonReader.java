@@ -82,7 +82,7 @@ public class JsonReader
             }
             else {
                 path = this.originConfig.getList(Key.PATH, String.class);
-                if (null == path || path.size() == 0) {
+                if (null == path || path.isEmpty()) {
                     throw DataXException.asDataXException(
                             JsonReaderErrorCode.REQUIRED_VALUE,
                             "您需要指定待读取的源目录或文件");
@@ -123,7 +123,7 @@ public class JsonReader
                     .getListConfiguration(Key.COLUMN);
             // 不再支持 ["*"]，必须指定json数据的路径
 
-            if (null != columns && columns.size() != 0) {
+            if (null != columns && !columns.isEmpty()) {
                 for (Configuration eachColumnConf : columns) {
                     eachColumnConf
                             .getNecessaryValue(
@@ -147,31 +147,7 @@ public class JsonReader
                     }
                 }
             }
-
             // 后续支持解压缩，现在暂不支持
-/*            String compress = this.originConfig
-                    .getString(com.alibaba.datax.plugin.unstructuredstorage.reader.Key.COMPRESS);
-            if (StringUtils.isBlank(compress)) {
-                this.originConfig
-                        .set(com.alibaba.datax.plugin.unstructuredstorage.reader.Key.COMPRESS,
-                                null);
-            } else {
-                Set<String> supportedCompress = Sets
-                        .newHashSet("gzip", "bzip2", "zip");
-                compress = compress.toLowerCase().trim();
-                if (!supportedCompress.contains(compress)) {
-                    throw DataXException
-                            .asDataXException(
-                                    JsonReaderErrorCode.ILLEGAL_VALUE,
-                                    String.format(
-                                            "仅支持 gzip, bzip2, zip 文件压缩格式 , 不支持您配置的文件压缩格式: [%s]",
-                                            compress));
-                }
-                this.originConfig
-                        .set(com.alibaba.datax.plugin.unstructuredstorage.reader.Key.COMPRESS,
-                                compress);
-            }*/
-
         }
 
         @Override
@@ -188,17 +164,19 @@ public class JsonReader
                 this.sourceFiles = this.buildSourceTargets();
             }
 
-            LOG.info(String.format("您即将读取的文件数为: [%s]", this.sourceFiles.size()));
+            LOG.info("您即将读取的文件数为: [{}]", this.sourceFiles.size());
         }
 
         @Override
         public void post()
         {
+            //
         }
 
         @Override
         public void destroy()
         {
+            //
         }
 
         // warn: 如果源目录为空会报错，拖空目录意图=>空文件显示指定此意图
@@ -209,7 +187,7 @@ public class JsonReader
             List<Configuration> readerSplitConfigs = new ArrayList<>();
 
             // warn:每个slice拖且仅拖一个文件,
-            // int splitNumber = adviceNumber;
+            // int splitNumber = adviceNumber
             int splitNumber = this.sourceFiles.size();
             if (0 == splitNumber) {
                 throw DataXException.asDataXException(
@@ -418,7 +396,7 @@ public class JsonReader
         private Column getColumn(String type, String columnValue, String columnFormat)
         {
             Column columnGenerated;
-            //类型转换 后续可以考虑使用switch case
+            String errorTemplate = " 类型转换错误, 无法将[%s] 转换为[%s]";
             switch (type) {
                 case Key.STRING:
                     columnGenerated = new StringColumn(columnValue);
@@ -429,8 +407,7 @@ public class JsonReader
                     }
                     catch (Exception e) {
                         throw new IllegalArgumentException(String.format(
-                                "类型转换错误, 无法将[%s] 转换为[%s]", columnValue,
-                                "DOUBLE"));
+                                errorTemplate, columnValue, "DOUBLE"));
                     }
                     break;
                 case Key.BOOLEAN:
@@ -439,8 +416,7 @@ public class JsonReader
                     }
                     catch (Exception e) {
                         throw new IllegalArgumentException(String.format(
-                                "类型转换错误, 无法将[%s] 转换为[%s]", columnValue,
-                                "BOOLEAN"));
+                                errorTemplate, columnValue, "BOOLEAN"));
                     }
                     break;
                 case Key.LONG:
@@ -448,10 +424,9 @@ public class JsonReader
                         columnGenerated = new LongColumn(columnValue);
                     }
                     catch (Exception e) {
-                        System.out.println(e.getMessage());
+                        LOG.error(e.getMessage());
                         throw new IllegalArgumentException(String.format(
-                                "类型转换错误, 无法将[%s] 转换为[%s]", columnValue,
-                                "LONG"));
+                                errorTemplate, columnValue, "LONG"));
                     }
                     break;
                 case Key.DATE:
@@ -471,8 +446,7 @@ public class JsonReader
                     }
                     catch (Exception e) {
                         throw new IllegalArgumentException(String.format(
-                                "类型转换错误, 无法将[%s] 转换为[%s]", columnValue,
-                                "DATE"));
+                                errorTemplate, columnValue, "DATE"));
                     }
                     break;
                 default:
@@ -500,19 +474,19 @@ public class JsonReader
         @Override
         public void prepare()
         {
-
+            //
         }
 
         @Override
         public void post()
         {
-
+            //
         }
 
         @Override
         public void destroy()
         {
-
+            //
         }
 
         @Override
@@ -520,7 +494,7 @@ public class JsonReader
         {
             LOG.debug("start read source files...");
             for (String fileName : this.sourceFiles) {
-                LOG.info(String.format("reading file : [%s]", fileName));
+                LOG.info("reading file : [{}]", fileName);
                 try {
                     String json = new String(Files.readAllBytes(Paths.get(fileName)));
                     List<Column> sourceLine = parseFromJson(json);

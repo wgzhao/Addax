@@ -33,15 +33,15 @@ public class ZipCycleInputStream
                 return -1;
             }
             else {
-                LOG.info(String.format("Validate zipEntry with name: %s",
-                        this.currentZipEntry.getName()));
+                LOG.info("Validate zipEntry with name: {}",
+                        this.currentZipEntry.getName());
             }
         }
 
         // 不支持zip下的嵌套, 对于目录跳过
         if (this.currentZipEntry.isDirectory()) {
-            LOG.warn(String.format("meet a directory %s, ignore...",
-                    this.currentZipEntry.getName()));
+            LOG.warn("meet a directory {}, ignore...",
+                    this.currentZipEntry.getName());
             this.currentZipEntry = null;
             return this.read();
         }

@@ -3,7 +3,6 @@ package com.alibaba.datax.plugin.reader.ftpreader;
 import com.alibaba.datax.common.exception.DataXException;
 import com.alibaba.datax.plugin.unstructuredstorage.reader.UnstructuredStorageReaderUtil;
 import org.apache.commons.io.IOUtils;
-import org.apache.commons.net.ftp.FTP;
 import org.apache.commons.net.ftp.FTPClient;
 import org.apache.commons.net.ftp.FTPFile;
 import org.apache.commons.net.ftp.FTPReply;
@@ -13,6 +12,7 @@ import org.slf4j.LoggerFactory;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.UnknownHostException;
+import java.nio.charset.StandardCharsets;
 import java.util.HashSet;
 
 public class StandardFtpHelper
@@ -33,7 +33,7 @@ public class StandardFtpHelper
             // 登录
             ftpClient.login(username, password);
             // 不需要写死ftp server的OS TYPE,FTPClient getSystemType()方法会自动识别
-            // ftpClient.configure(new FTPClientConfig(FTPClientConfig.SYST_UNIX));
+            // ftpClient.configure(new FTPClientConfig(FTPClientConfig.SYST_UNIX))
             ftpClient.setConnectTimeout(timeout);
             ftpClient.setDataTimeout(timeout);
             if ("PASV".equals(connectMode)) {
@@ -42,7 +42,7 @@ public class StandardFtpHelper
             }
             else if ("PORT".equals(connectMode)) {
                 ftpClient.enterLocalActiveMode();
-                // ftpClient.enterRemoteActiveMode(host, port);
+                // ftpClient.enterRemoteActiveMode(host, port)
             }
             int reply = ftpClient.getReplyCode();
             if (!FTPReply.isPositiveCompletion(reply)) {
@@ -79,7 +79,7 @@ public class StandardFtpHelper
     {
         if (ftpClient.isConnected()) {
             try {
-                //todo ftpClient.completePendingCommand();//打开流操作之后必须，原因还需要深究
+                // ftpClient.completePendingCommand();//打开流操作之后必须，原因还需要深究
                 ftpClient.logout();
             }
             catch (IOException e) {
@@ -94,7 +94,7 @@ public class StandardFtpHelper
     public boolean isDirExist(String directoryPath)
     {
         try {
-            return ftpClient.changeWorkingDirectory(new String(directoryPath.getBytes(), FTP.DEFAULT_CONTROL_ENCODING));
+            return ftpClient.changeWorkingDirectory(new String(directoryPath.getBytes(), StandardCharsets.ISO_8859_1));
         }
         catch (IOException e) {
             String message = String.format("进入目录：[%s]时发生I/O异常,请确认与ftp服务器的连接正常", directoryPath);
@@ -108,7 +108,7 @@ public class StandardFtpHelper
     {
         boolean isExitFlag = false;
         try {
-            FTPFile[] ftpFiles = ftpClient.listFiles(new String(filePath.getBytes(), FTP.DEFAULT_CONTROL_ENCODING));
+            FTPFile[] ftpFiles = ftpClient.listFiles(new String(filePath.getBytes(), StandardCharsets.ISO_8859_1));
             if (ftpFiles.length == 1 && ftpFiles[0].isFile()) {
                 isExitFlag = true;
             }
@@ -126,7 +126,7 @@ public class StandardFtpHelper
     {
         boolean isExitFlag = false;
         try {
-            FTPFile[] ftpFiles = ftpClient.listFiles(new String(filePath.getBytes(), FTP.DEFAULT_CONTROL_ENCODING));
+            FTPFile[] ftpFiles = ftpClient.listFiles(new String(filePath.getBytes(), StandardCharsets.ISO_8859_1));
             if (ftpFiles.length == 1 && ftpFiles[0].isSymbolicLink()) {
                 isExitFlag = true;
             }
@@ -185,7 +185,7 @@ public class StandardFtpHelper
             }
 
             try {
-                FTPFile[] fs = ftpClient.listFiles(new String(directoryPath.getBytes(), FTP.DEFAULT_CONTROL_ENCODING));
+                FTPFile[] fs = ftpClient.listFiles(new String(directoryPath.getBytes(), StandardCharsets.ISO_8859_1));
                 for (FTPFile ff : fs) {
                     String strName = ff.getName();
                     String filePath = parentPath + strName;
@@ -231,7 +231,7 @@ public class StandardFtpHelper
     public InputStream getInputStream(String filePath)
     {
         try {
-            return ftpClient.retrieveFileStream(new String(filePath.getBytes(), FTP.DEFAULT_CONTROL_ENCODING));
+            return ftpClient.retrieveFileStream(new String(filePath.getBytes(), StandardCharsets.ISO_8859_1));
         }
         catch (IOException e) {
             String message = String.format("读取文件 : [%s] 时出错,请确认文件：[%s]存在且配置的用户有权限读取", filePath, filePath);

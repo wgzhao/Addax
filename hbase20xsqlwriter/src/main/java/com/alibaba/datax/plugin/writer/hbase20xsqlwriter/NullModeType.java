@@ -6,10 +6,10 @@ import java.util.Arrays;
 
 public enum NullModeType
 {
-    Skip("skip"),
-    Empty("empty");
+    SKIP("skip"),
+    EMPTY("empty");
 
-    private String mode;
+    private final String mode;
 
     NullModeType(String mode)
     {
@@ -25,10 +25,5 @@ public enum NullModeType
         }
         throw DataXException.asDataXException(HBase20xSQLWriterErrorCode.ILLEGAL_VALUE,
                 "Hbasewriter 不支持该 nullMode 类型:" + modeName + ", 目前支持的 nullMode 类型是:" + Arrays.asList(values()));
-    }
-
-    public String getMode()
-    {
-        return mode;
     }
 }

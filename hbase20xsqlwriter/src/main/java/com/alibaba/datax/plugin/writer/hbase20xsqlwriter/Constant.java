@@ -10,9 +10,11 @@ public final class Constant
     public static final int TYPE_UNSIGNED_SMALLINT = 13;
     public static final int TYPE_UNSIGNED_INTEGER = 9;
     public static final int TYPE_UNSIGNED_LONG = 10;
-    public static final int TYPE_UNSIGNED_FLOAT = 14;
-    public static final int TYPE_UNSIGNED_DOUBLE = 15;
+//    public static final int TYPE_UNSIGNED_FLOAT = 14
+//    public static final int TYPE_UNSIGNED_DOUBLE = 15
     public static final int TYPE_UNSIGNED_DATE = 19;
     public static final int TYPE_UNSIGNED_TIME = 18;
     public static final int TYPE_UNSIGNED_TIMESTAMP = 20;
+
+    private Constant() {}
 }

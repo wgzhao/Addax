@@ -34,9 +34,7 @@ public final class DbfUtils
     public static byte[] trimLeftSpaces(byte[] arr)
     {
         int i = arr.length;
-        while (--i >= 0 && arr[i] == ' ') /* EMPTY LOOP */ {
-            ;
-        }
+        while (--i >= 0 && arr[i] == ' ');
         byte[] result = new byte[++i];
         if (i > 0) {
             System.arraycopy(arr, 0, result, 0, i);
