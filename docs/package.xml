@@ -9,7 +9,7 @@
     <fileSets>
         <fileSet>
             <directory>${project.build.directory}/html</directory>
-            <outputDirectory>/html</outputDirectory>
+            <outputDirectory>html</outputDirectory>
             <excludes>
                 <exclude>**/.buildinfo</exclude>
                 <exclude>**/.doctrees/**</exclude>
