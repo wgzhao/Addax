@@ -338,7 +338,7 @@ public class HBase20xSQLWriterTask
         else {
             // 没有值，按空值的配置情况处理
             switch (nullModeType) {
-                case Skip:
+                case SKIP:
                     // 跳过空值，则不插入该列,
                     pstmt.setNull(pos, sqlType);
                     break;
