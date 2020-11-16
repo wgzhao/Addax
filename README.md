@@ -52,6 +52,7 @@
 
 | 版本  | 连接地址                                                     | md5值                            |
 | ----- | ------------------------------------------------------------ | -------------------------------- |
+| 3.1.3 |https://pan.baidu.com/s/115FJ41s1k9DJ_SMFFkcQ6w 提取码: 4q3s  | dd3740d297e53f400ab79cb099d82373 |
 | 3.1.2 | https://pan.baidu.com/s/1zFqv8E6iJX549zdSZDQgiQ 提取码: 7jdk | 3674711fc9b68fad3086f3c8526a3427 |
 | 3.1.1 | https://pan.baidu.com/s/1GwmFA7-hPkd6GKiZEvUKXg 提取码: 1inn | 0fa4e7902420704b2e814fef098f40ae |
 
