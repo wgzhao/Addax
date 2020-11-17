@@ -56,7 +56,6 @@
         <module>plugin-rdbms-util</module>
         <module>plugin-unstructured-storage-util</module>
         <module>transformer</module>
-        <module>docs</module>
 
         <!-- reader -->
         <module>cassandrareader</module>
