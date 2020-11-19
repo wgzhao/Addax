@@ -28,7 +28,7 @@
         <groovy.version>2.4.20</groovy.version>
         <diamond.version>3.7.3</diamond.version>
         <hadoop.version>3.2.0-9</hadoop.version>
-        <hive.version>3.1.2-1</hive.version>
+        <hive.version>3.1.2-5</hive.version>
         <postgresql.jdbc.version>9.4.1207</postgresql.jdbc.version>
         <!--slf4j 1.7.28 和 logback.classic 1.2.3 是好基友 -->
         <slf4j.version>1.7.28</slf4j.version>
