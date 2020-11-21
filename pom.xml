@@ -180,6 +180,7 @@
                 <configuration>
                     <preparationGoals>clean verify -DskipTests</preparationGoals>
                     <tagNameFormat>@{project.version}</tagNameFormat>
+                    <autoVersionSubmodules>true</autoVersionSubmodules>
                 </configuration>
             </plugin>
 
