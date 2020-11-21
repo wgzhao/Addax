@@ -36,7 +36,7 @@ public final class OriginalConfPretreatmentUtil
          *有些数据库没有密码，因此需要可以绕过密码的方式
          * @PASSFLAG 作为可选项，如果为true，则表示密码是必选项，否则密码为可选项
          */
-        if (originalConfig.getBool(Key.PASSFLAG, true)) {
+        if (Boolean.TRUE.equals(originalConfig.getBool(Key.PASSFLAG, true))) {
             originalConfig.getNecessaryValue(Key.PASSWORD,
                     DBUtilErrorCode.REQUIRED_VALUE);
         }
@@ -122,7 +122,7 @@ public final class OriginalConfPretreatmentUtil
                 allColumns = DBUtil.getTableColumnsByConn(dataBaseType, connectionFactory.getConnecttion(), oneTable);
             }
 
-            LOG.info("table:[{}] all columns:[\n{}\n].", oneTable,
+            LOG.info("table:[{}] all columns:[{}].", oneTable,
                     StringUtils.join(allColumns, ","));
 
             if (1 == userConfiguredColumns.size() && "*".equals(userConfiguredColumns.get(0))) {
@@ -139,7 +139,6 @@ public final class OriginalConfPretreatmentUtil
             else {
                 // 确保用户配置的 column 不重复
                 ListUtil.makeSureNoValueDuplicate(userConfiguredColumns, false);
-
                 // 检查列是否都为数据库表中正确的列（通过执行一次 select column from table 进行判断）
                 java.sql.Connection connection = connectionFactory.getConnecttion();
                 DBUtil.getColumnMetaData(connection, oneTable, StringUtils.join(userConfiguredColumns, ","));

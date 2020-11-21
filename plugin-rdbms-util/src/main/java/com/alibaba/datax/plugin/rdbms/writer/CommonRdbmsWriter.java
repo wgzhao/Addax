@@ -27,6 +27,8 @@ import java.util.List;
 public class CommonRdbmsWriter
 {
 
+    private CommonRdbmsWriter() {}
+
     public static class Job
     {
         private static final Logger LOG = LoggerFactory

@@ -433,12 +433,12 @@ public final class DBUtil
     {
         // make sure autocommit is off
         conn.setAutoCommit(false);
-        try(Statement stmt = conn.createStatement(ResultSet.TYPE_FORWARD_ONLY,
-                ResultSet.CONCUR_READ_ONLY)) {
-            stmt.setFetchSize(fetchSize);
-            stmt.setQueryTimeout(queryTimeout);
-            return query(stmt, sql);
-        }
+
+        Statement stmt = conn.createStatement(ResultSet.TYPE_FORWARD_ONLY, ResultSet.CONCUR_READ_ONLY); //NOSONAR
+        stmt.setFetchSize(fetchSize);
+        stmt.setQueryTimeout(queryTimeout);
+        return query(stmt, sql);
+
     }
 
     /**

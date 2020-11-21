@@ -2,7 +2,6 @@ package com.alibaba.datax.plugin.rdbms.util;
 
 import com.alibaba.datax.common.spi.ErrorCode;
 
-//TODO
 public enum DBUtilErrorCode
         implements ErrorCode
 {
