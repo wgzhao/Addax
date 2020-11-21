@@ -57,3 +57,9 @@
 ### HDFS reader
 
 * Add support for reading Parquet file (#54)
+
+## 3.1.4
+
+This is an emergency fix version to fix a serious problem in a previous release ( [\#62](https://github.com/wgzhao/DataX/issues/62)).
+
+
