@@ -1,6 +1,7 @@
 package com.alibaba.datax.plugin.writer.dbffilewriter;
 
 import com.alibaba.datax.common.element.Column;
+import com.alibaba.datax.common.element.Record;
 import com.alibaba.datax.common.exception.DataXException;
 import com.alibaba.datax.common.plugin.RecordReceiver;
 import com.alibaba.datax.common.spi.Writer;
@@ -276,8 +277,7 @@ public class DbfFileWriter
                         .set(com.alibaba.datax.plugin.unstructuredstorage.writer.Key.FILE_NAME,
                                 fullFileName);
 
-                LOG.info(String.format("splited write file name:[%s]",
-                        fullFileName));
+                LOG.info("splited write file name:[{}]", fullFileName);
 
                 writerSplitConfigs.add(splitedTaskConfig);
             }
@@ -317,7 +317,7 @@ public class DbfFileWriter
         {
             LOG.info("begin do write...");
             String fileFullPath = this.buildFilePath();
-            LOG.info(String.format("write to file : [%s]", fileFullPath));
+            LOG.info("write to file : [{}]", fileFullPath);
             List<Configuration> columns = this.writerSliceConfig.getListConfiguration("column");
             DBFWriter writer;
             try {
@@ -356,7 +356,7 @@ public class DbfFileWriter
                 }
                 writer.setFields(fields);
 
-                com.alibaba.datax.common.element.Record record;
+                Record record;
                 while ((record = lineReceiver.getFromReader()) != null) {
                     Object[] rowData = new Object[columns.size()];
                     Column column;
@@ -373,6 +373,7 @@ public class DbfFileWriter
                                     rowData[i] = colData;
                                     break;
                                 case "date":
+                                    System.out.println("date value:" + colData);
                                     rowData[i] = new Date(Long.parseLong(colData));
                                     break;
                                 case "logical":

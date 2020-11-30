@@ -6,6 +6,7 @@ import com.alibaba.datax.common.element.Column;
 import com.alibaba.datax.common.element.DateColumn;
 import com.alibaba.datax.common.element.DoubleColumn;
 import com.alibaba.datax.common.element.LongColumn;
+import com.alibaba.datax.common.element.Record;
 import com.alibaba.datax.common.element.StringColumn;
 import com.alibaba.datax.common.exception.DataXException;
 import com.alibaba.datax.common.plugin.RecordSender;
@@ -327,6 +328,7 @@ public class StreamReader
                         return new DateColumn(new Date(RandomUtils.nextLong(param1Int, param2Int + 1)));
                     }
                     else {
+                        System.out.println(format.parse(columnValue));
                         return new DateColumn(format.parse(columnValue));
                     }
                 case BOOL:
@@ -364,7 +366,7 @@ public class StreamReader
             }
         }
 
-        private com.alibaba.datax.common.element.Record buildOneRecord(RecordSender recordSender,
+        private Record buildOneRecord(RecordSender recordSender,
                 List<String> columns)
         {
             if (null == recordSender) {
@@ -377,7 +379,7 @@ public class StreamReader
                         "参数[column]不能为空.");
             }
 
-            com.alibaba.datax.common.element.Record record = recordSender.createRecord();
+            Record record = recordSender.createRecord();
             try {
                 for (String eachColumn : columns) {
                     Configuration eachColumnConfig = Configuration.from(eachColumn);
