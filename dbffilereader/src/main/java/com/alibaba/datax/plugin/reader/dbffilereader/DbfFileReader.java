@@ -4,9 +4,10 @@ import com.alibaba.datax.common.exception.DataXException;
 import com.alibaba.datax.common.plugin.RecordSender;
 import com.alibaba.datax.common.spi.Reader;
 import com.alibaba.datax.common.util.Configuration;
-import com.alibaba.datax.plugin.reader.dbffilereader.structure.DbfDataType;
-import com.alibaba.datax.plugin.reader.dbffilereader.structure.DbfField;
-import com.alibaba.datax.plugin.reader.dbffilereader.structure.DbfHeader;
+import org.jamel.dbf.DbfReader;
+import org.jamel.dbf.structure.DbfDataType;
+import org.jamel.dbf.structure.DbfField;
+import org.jamel.dbf.structure.DbfHeader;
 import com.alibaba.datax.plugin.unstructuredstorage.reader.ColumnEntry;
 import com.alibaba.datax.plugin.unstructuredstorage.reader.UnstructuredStorageReaderUtil;
 import org.apache.commons.io.Charsets;
@@ -389,28 +390,27 @@ public class DbfFileReader
         {
             LOG.debug("start read dbf files...");
             for (String fileName : this.sourceFiles) {
-                LOG.info(String.format("reading file : [%s]", fileName));
+                LOG.info("reading file : [{}]", fileName);
 
                 String encod = readerSliceConfig.getString(com.alibaba.datax.plugin.unstructuredstorage.reader.Key.ENCODING);
                 String nullFormat = readerSliceConfig.getString(com.alibaba.datax.plugin.unstructuredstorage.reader.Key.NULL_FORMAT);
-                DbfReader reader = new DbfReader(FileUtils.getFile(fileName));
 
-                List<ColumnEntry> column = UnstructuredStorageReaderUtil.getListColumnEntry(readerSliceConfig,
-                        com.alibaba.datax.plugin.unstructuredstorage.reader.Key.COLUMN);
-                DbfHeader header = reader.getHeader();
-                assert column != null;
-                int colnum = column.isEmpty() ? header.getFieldsCount() : column.size();
-                Object[] row;
-                while ((row = reader.nextRecord()) != null) {
-                    String[] sourceLine = new String[colnum];
-                    for (int i = 0; i < colnum; i++) {
-                        if (column.get(i).getValue() != null) {
-                            sourceLine[i] = column.get(i).getValue();
-                        }
-                        else if (i < header.getFieldsCount()) {
-                            DbfField field = header.getField(i);
-                            try {
+                try (DbfReader reader = new DbfReader(FileUtils.getFile(fileName))) {
 
+                    List<ColumnEntry> column = UnstructuredStorageReaderUtil.getListColumnEntry(readerSliceConfig,
+                            com.alibaba.datax.plugin.unstructuredstorage.reader.Key.COLUMN);
+                    DbfHeader header = reader.getHeader();
+                    assert column != null;
+                    int colnum = column.isEmpty() ? header.getFieldsCount() : column.size();
+                    Object[] row;
+                    while ((row = reader.nextRecord()) != null) {
+                        String[] sourceLine = new String[colnum];
+                        for (int i = 0; i < colnum; i++) {
+                            if (column.get(i).getValue() != null) {
+                                sourceLine[i] = column.get(i).getValue();
+                            }
+                            else if (i < header.getFieldsCount()) {
+                                DbfField field = header.getField(i);
                                 String value = field.getDataType() == DbfDataType.CHAR
                                         ? new String((byte[]) row[i], encod)
                                         : String.valueOf(row[i]);
@@ -419,12 +419,12 @@ public class DbfFileReader
                                 }
                                 sourceLine[i] = value;
                             }
-                            catch (UnsupportedEncodingException e) {
-                                e.printStackTrace();
-                            }
                         }
+                        UnstructuredStorageReaderUtil.transportOneRecord(recordSender, column, sourceLine, nullFormat, this.getTaskPluginCollector());
                     }
-                    UnstructuredStorageReaderUtil.transportOneRecord(recordSender, column, sourceLine, nullFormat, this.getTaskPluginCollector());
+                }
+                catch (UnsupportedEncodingException e) {
+                    e.printStackTrace();
                 }
             }
             LOG.debug("end read dbf files...");
