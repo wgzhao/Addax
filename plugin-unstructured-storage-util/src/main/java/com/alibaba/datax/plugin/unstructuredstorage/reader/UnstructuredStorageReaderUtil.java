@@ -5,6 +5,7 @@ import com.alibaba.datax.common.element.Column;
 import com.alibaba.datax.common.element.DateColumn;
 import com.alibaba.datax.common.element.DoubleColumn;
 import com.alibaba.datax.common.element.LongColumn;
+import com.alibaba.datax.common.element.Record;
 import com.alibaba.datax.common.element.StringColumn;
 import com.alibaba.datax.common.exception.DataXException;
 import com.alibaba.datax.common.plugin.RecordSender;
@@ -372,11 +373,11 @@ public class UnstructuredStorageReaderUtil
         return transportOneRecord(recordSender, column, sourceLine, nullFormat, taskPluginCollector);
     }
 
-    public static com.alibaba.datax.common.element.Record transportOneRecord(RecordSender recordSender,
+    public static Record transportOneRecord(RecordSender recordSender,
             List<ColumnEntry> columnConfigs, String[] sourceLine,
             String nullFormat, TaskPluginCollector taskPluginCollector)
     {
-        com.alibaba.datax.common.element.Record record = recordSender.createRecord();
+        Record record = recordSender.createRecord();
         Column columnGenerated;
 
         // 创建都为String类型column的record
