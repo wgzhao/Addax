@@ -328,7 +328,6 @@ public class StreamReader
                         return new DateColumn(new Date(RandomUtils.nextLong(param1Int, param2Int + 1)));
                     }
                     else {
-                        System.out.println(format.parse(columnValue));
                         return new DateColumn(format.parse(columnValue));
                     }
                 case BOOL:
