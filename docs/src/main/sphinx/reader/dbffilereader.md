@@ -8,60 +8,56 @@
 
 ```json
 {
-"job": {
+  "job": {
     "setting": {
-        "speed": {
-            "channel": 2
-        }
+      "speed": {
+        "channel": 2
+      }
     },
     "content": [
-        {
-            "reader": {
-                "name": "dbffilereader",
-                "parameter": {
-                    "column": [
-                        {
-                            "index": 0,
-                            "type": "string"
-                        },
-                        {
-                            "index": 1,
-                            "type": "string"
-                        },
-                        {
-                            "index": 2,
-                            "type": "string"
-                        },
-                        {
-                            "index": 3,
-                            "type": "string"
-                        },
-                        {
-                            "index": 4,
-                            "type": "string"
-                        },
-                        {
-                            "value": "201908",
-                            "type": "string"
-                        },
-                        {
-                            "value": "dbf",
-                            "type": "string"
-                        }
-                    ],
-                    "path": ["/tmp/test.dbf"],
-                    "encoding": "GBK"
-                }
-            },
-            "writer": {
-                "name": "streamwriter",
-                "parameter": {
-                    "print": "true"
-                }
-            }
-    }
+      {
+        "reader": {
+          "name": "dbffilereader",
+          "parameter": {
+            "column": [
+              {
+                "index": 0,
+                "type": "string"
+              },
+              {
+                "index": 1,
+                "type": "long"
+              },
+              {
+                "index": 2,
+                "type": "string"
+              },
+              {
+                "index": 3,
+                "type": "boolean"
+              },
+              {
+                "index": 4,
+                "type": "string"
+              },
+              {
+                "value": "dbf",
+                "type": "string"
+              }
+            ],
+            "path": [ "/tmp/out"],
+            "encoding": "GBK"
+          }
+        },
+        "writer": {
+          "name": "streamwriter",
+          "parameter": {
+            "print": "true"
+          }
+        }
+      }
     ]
-}
+  }
 }
 ```
 
@@ -69,15 +65,13 @@
 
 `parameter` 配置项支持以下配置
 
-| 配置项           | 是否必须 | 默认值       |    描述    |
-| :--------------- | :------: | ------------ |-------------|
-| path             |    是    | 无           | DBF文件路径，支持写多个路径，详细情况见下 |
-| column           |    是    | 类型默认为String           | 所配置的表中需要同步的列集合, 是 `{type: value}` 或 `{type: index}` 的集合，详细配置见下 |
-| compress         | 否       | 无       | 文本压缩类型，默认不填写意味着没有压缩。支持压缩类型为zip、gzip、bzip2  |
-| encoding            |    否    | UTF-8         | DBF文件编码，比如 `GBK`, `UTF-8` |
-| nullFormat   |    否    | `\N`         | 定义哪个字符串可以表示为null, |
-| dbversion |    否    | 无 | 指定DBF文件版本，不指定则自动猜测 |
-
+| 配置项      | 是否必须 | 默认值       |    描述    |
+| :----------| :------: | ------------ |-------------|
+| path       |    是    | 无           | DBF文件路径，支持写多个路径，详细情况见下 |
+| column     |    是    | 类型默认为String  | 所配置的表中需要同步的列集合, 是 `{type: value}` 或 `{type: index}` 的集合，详细配置见下 |
+| encoding   |    否    | GBK        | DBF文件编码，比如 `GBK`, `UTF-8` |
+| nullFormat |    否    | `\N`         | 定义哪个字符串可以表示为null, |
+ 
 ### path
 
 描述：本地文件系统的路径信息，注意这里可以支持填写多个路径。 
