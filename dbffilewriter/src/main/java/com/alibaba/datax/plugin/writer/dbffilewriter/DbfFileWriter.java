@@ -309,7 +309,7 @@ public class DbfFileWriter
         @Override
         public void prepare()
         {
-
+            //
         }
 
         @Override
@@ -349,7 +349,7 @@ public class DbfFileWriter
                         default:
                             LOG.warn("data type not find, convert it to char");
                             fields[i].setType(DBFDataType.CHARACTER);
-                            fields[i].setLength(1000);
+                            fields[i].setLength(columns.get(i).getInt("length"));
                             break;
                     }
                     // Date类型不能设置字段长度，这里没有处理其它没有字段长度的类型
@@ -373,8 +373,7 @@ public class DbfFileWriter
                                     rowData[i] = colData;
                                     break;
                                 case "date":
-                                    System.out.println("date value:" + colData);
-                                    rowData[i] = new Date(Long.parseLong(colData));
+                                    rowData[i] =new Date(Long.parseLong(colData));
                                     break;
                                 case "logical":
                                     rowData[i] = Boolean.parseBoolean(colData);
