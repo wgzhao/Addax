@@ -6,90 +6,88 @@ DbfFileWriter提供了向本地文件写入类dbf格式的一个或者多个表�
 
 写入本地文件内容存放的是一张dbf表，例如dbf格式的文件信息。
 
-## 2 功能与限制
+## 2 功能说明
 
-件实现了从DataX协议转为本地dbf文件功能，本地文件本身是结构化数据存储，DbfFileWriter如下几个方面约定:
-
-1. 支持且仅支持写入dbf的文件。
-
-2. 支持文本压缩，现有压缩格式为gzip、bzip2。
-
-3. 支持多线程写入，每个线程写入不同子文件。
-
-我们不能做到：
-
-1. 单个文件不能支持并发写入。
-
-## 3 功能说明
-
-### 3.1 配置样例
+### 2.1 配置样例
 
 ```json
 {
-"job": {
-  "setting": {
-    "speed": {
-      "batchSize": 20480,
-      "bytes": -1,
-      "channel": 1
+  "job": {
+    "setting": {
+      "speed": {
+        "batchSize": 20480,
+        "bytes": -1,
+        "channel": 1
       }
-  },
-  "content": [{
-    "reader": {
-      "name": "streamreader",
-      "parameter": {
-          "column" : [
-              {
-                  "value": "DataX",
-                  "type": "string"
-              },
-              {
-                  "value": 19880808,
-                  "type": "long"
-              },
-              {
-                  "value": "1988-08-08 16:00:04",
-                  "type": "date"
-              },
-              {
-                  "value": true,
-                  "type": "bool"
-              }
-          ],
-          "sliceRecordCount": 1000
-          }
     },
-  "writer": {
-            "name": "dbffilewriter",
-            "parameter": {
-              "column": [
-                {
-                  "name": "col1",
-                  "type": "char",
-                  "length": 100
-                },
-                {
-                "name":"col2",
-                "type":"numeric",
+    "content": [
+      {
+        "reader": {
+          "name": "streamreader",
+          "parameter": {
+            "column": [
+              {
+                "value": "DataX",
+                "type": "string"
+              },
+              {
+                "value": 19880808,
+                "type": "long"
+              },
+              {
+                "value": "1989-06-04 00:00:00",
+                "type": "date"
+              },
+              {
+                "value": true,
+                "type": "bool"
+              },
+	          {
+			    "value":"中文测试",
+				"type": "string"
+              }
+            ],
+            "sliceRecordCount": 10
+          }
+        },
+        "writer": {
+          "name": "dbffilewriter",
+          "parameter": {
+            "column": [
+              {
+                "name": "col1",
+                "type": "char",
+                "length": 100
+              },
+              {
+                "name": "col2",
+                "type": "numeric",
                 "length": 18,
                 "scale": 0
-                },
-                {
-                  "name": "col3",
-                  "type": "date"
-                },
-                {
-                "name":"col4",
-                "type":"logical"
-                }
-              ],
+              },
+              {
+                "name": "col3",
+                "type": "date"
+              },
+              {
+                "name": "col4",
+                "type": "logical"
+              },
+			  {
+				"name": "col5",
+				"type":"char",
+				"length": 100
+			  }
+            ],
             "fileName": "test.dbf",
-              "path": "/tmp/out",
-              "writeMode": "truncate"
-            }
+            "path": "/tmp/out",
+            "writeMode": "truncate",
+			"encoding": "GBK"
           }
+        }
       }
-  ]}
+    ]
+  }
 }
 ```
 
@@ -101,11 +99,9 @@ DbfFileWriter提供了向本地文件写入类dbf格式的一个或者多个表�
 | column           |    是    | 类型默认为String  | 所配置的表中需要同步的列集合, 是 `{type: value}` 或 `{type: index}` 的集合 |
 | fileName        | 是     | 无  | DbfFileWriter写入的文件名 |
 | writeMode       | 是     | 无  | DbfFileWriter写入前数据清理处理模式，支持 `truncate`, `append`, `nonConflict` 三种模式，详见如下 |
-| compress         | 否       | 无       | 文本压缩类型，默认不填写意味着没有压缩。支持压缩类型为zip、gzip、bzip2  |
 | encoding            |    否    | UTF-8         | DBF文件编码，比如 `GBK`, `UTF-8` |
 | nullFormat   |    否    | `\N`         | 定义哪个字符串可以表示为null, |
 | dateFormat |  否   |  无  |  日期类型的数据序列化到文件中时的格式，例如 `"dateFormat": "yyyy-MM-dd"` |
-| fileFormat |    否    | 无 | 文件写出的格式，暂时只支持DBASE III |  
 
 #### writeMode
 

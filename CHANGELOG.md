@@ -1,32 +1,39 @@
 # Changelog
 
-## 3.1.1 
+## 3.1.5
 
-### General
+### General Changes
 
-* Transformer add column's basic operation 
-* Use prestosql's hadoop and hive jars instead of apache's
-* various misc codes optimize
- 
-### dbffilereader
+* Various code clean
 
-* remove supported for reading compressed dbf file
-    
-### jsonreader
- 
-* fixed parse non-string type value
-  
-### dbffilewriter
- 
-* fixed boolean type writing error
-   
-### hdfswriter
+### DBF reader
 
-*  Use keyword `parquest` indicates support parquet format,  old keyword `par` is not used
+* Reconstruct this plugin with 3rd-party jar package
+* Add support for `Date` type
+* Fix for the occasional null pointer exception
+
+### DBF writer
+
+* Add support for `Date` type
+
+## 3.1.4
+
+This is an emergency fix version to fix a serious problem in a previous release ( [\#62](https://github.com/wgzhao/DataX/issues/62)).
+
+## 3.1.3
+
+### Redis reader
+
+* Delete temporary local file
+* Only parse redis `String` data type, other types will be ignore
+
+### HDFS reader
+
+* Add support for reading Parquet file (#54)
 
 ## 3.1.2
 
-### General
+### General Changes
 
 * Does not parse the `-m` command line argument, it doesn't really do anything!
 
@@ -47,19 +54,27 @@
 
 * Add support for `json` data type
 
-## 3.1.3
+## 3.1.1 
 
-### Redis reader
+### General Changes
 
-* Delete temporary local file
-* Only parse redis `String` data type, other types will be ignore
+* Transformer add column's basic operation 
+* Use prestosql's hadoop and hive jars instead of apache's
+* various misc codes optimize
+ 
+### dbffilereader
 
-### HDFS reader
+* remove supported for reading compressed dbf file
+    
+### jsonreader
+ 
+* fixed parse non-string type value
+  
+### dbffilewriter
+ 
+* fixed boolean type writing error
+   
+### hdfswriter
 
-* Add support for reading Parquet file (#54)
-
-## 3.1.4
-
-This is an emergency fix version to fix a serious problem in a previous release ( [\#62](https://github.com/wgzhao/DataX/issues/62)).
-
+*  Use keyword `parquest` indicates support parquet format,  old keyword `par` is not used
 
