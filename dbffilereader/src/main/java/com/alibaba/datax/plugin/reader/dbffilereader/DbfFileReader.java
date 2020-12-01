@@ -4,23 +4,25 @@ import com.alibaba.datax.common.exception.DataXException;
 import com.alibaba.datax.common.plugin.RecordSender;
 import com.alibaba.datax.common.spi.Reader;
 import com.alibaba.datax.common.util.Configuration;
-import org.jamel.dbf.DbfReader;
-import org.jamel.dbf.structure.DbfDataType;
-import org.jamel.dbf.structure.DbfField;
-import org.jamel.dbf.structure.DbfHeader;
 import com.alibaba.datax.plugin.unstructuredstorage.reader.ColumnEntry;
 import com.alibaba.datax.plugin.unstructuredstorage.reader.UnstructuredStorageReaderUtil;
 import org.apache.commons.io.Charsets;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
+import org.jamel.dbf.DbfReader;
+import org.jamel.dbf.structure.DbfDataType;
+import org.jamel.dbf.structure.DbfField;
+import org.jamel.dbf.structure.DbfHeader;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.io.UnsupportedEncodingException;
 import java.nio.charset.UnsupportedCharsetException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -411,9 +413,16 @@ public class DbfFileReader
                             }
                             else if (i < header.getFieldsCount()) {
                                 DbfField field = header.getField(i);
-                                String value = field.getDataType() == DbfDataType.CHAR
-                                        ? new String((byte[]) row[i], encod)
-                                        : String.valueOf(row[i]);
+                                String value;
+                                if (field.getDataType() == DbfDataType.DATE) {
+                                    value =
+                                            new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format((Date) row[i]);
+                                }
+                                else {
+                                    value = field.getDataType() == DbfDataType.CHAR
+                                            ? new String((byte[]) row[i], encod)
+                                            : String.valueOf(row[i]);
+                                }
                                 if (value != null) {
                                     value = value.trim();
                                 }
