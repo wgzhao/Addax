@@ -16,6 +16,10 @@
 
 * Add support for `Date` type
 
+### HDFS reader
+
+* Fix read failure when the filetype is text ([\#66](https://github.com/wgzhao/DataX/issues/66))
+
 ## 3.1.4
 
 This is an emergency fix version to fix a serious problem in a previous release ( [\#62](https://github.com/wgzhao/DataX/issues/62)).
