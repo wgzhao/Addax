@@ -52,6 +52,7 @@ import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.text.SimpleDateFormat;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
@@ -59,15 +60,16 @@ import java.util.Set;
 import java.util.StringJoiner;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 public class HdfsHelper
 {
     public static final Logger LOG = LoggerFactory.getLogger(HdfsHelper.class);
     public static final String HADOOP_SECURITY_AUTHENTICATION_KEY = "hadoop.security.authentication";
     public static final String HDFS_DEFAULT_FS_KEY = "fs.defaultFS";
-    public FileSystem fileSystem = null;
-    public JobConf conf = null;
-    public org.apache.hadoop.conf.Configuration hadoopConf = null;
+    private FileSystem fileSystem = null;
+    private JobConf conf = null;
+    private org.apache.hadoop.conf.Configuration hadoopConf = null;
     // Kerberos
     private boolean haveKerberos = false;
     private String kerberosKeytabFilePath;
@@ -400,23 +402,18 @@ public class HdfsHelper
      */
     public void deleteFiles(Path[] paths, boolean delDotFile)
     {
-        String fname;
-        for (Path path : paths) {
-            LOG.info("delete file [{}], include dotfile({}).", path, delDotFile);
+        List<Path> needDelPaths;
+        if (delDotFile) {
+            LOG.info("仅删除指定目录下的点(.)开头的文件或文件夹");
+            needDelPaths = Arrays.stream(paths).filter(x -> x.getName().startsWith(".")).collect(Collectors.toList());
+        } else {
+            LOG.info("删除指定目录下的不以点(.)开头的文件夹或文件夹");
+            needDelPaths = Arrays.stream(paths).filter(x -> ! x.getName().startsWith(".")).collect(Collectors.toList());
+        }
+
+        for (Path path : needDelPaths) {
             try {
-                fname = path.getName();
-                // 如果只要删除点开头的文件
-                if (delDotFile) {
-                    if (fname.startsWith(".")) {
-                        fileSystem.delete(path, true);
-                    }
-                }
-                else {
-                    // 保留dot文件，其他删除
-                    if (!fname.startsWith(("."))) {
-                        fileSystem.delete(path, true);
-                    }
-                }
+                fileSystem.delete(path, true);
             }
             catch (IOException e) {
                 LOG.error("删除文件[{}]时发生IO异常,请检查您的网络是否正常！", path);
@@ -482,7 +479,7 @@ public class HdfsHelper
                             LOG.error(message);
                             throw DataXException.asDataXException(HdfsWriterErrorCode.HDFS_RENAME_FILE_ERROR, message);
                         }
-                        LOG.info("finish rename file [{}] to file [{}].", srcFile, dstFile);
+                        LOG.info("finish rename file.");
                     }
                     else {
                         LOG.info("文件［{}］内容为空,请检查写入是否正常！", srcFile);
@@ -609,7 +606,7 @@ public class HdfsHelper
         if ("NONE".equals(compress)) {
             compress = "UNCOMPRESSED";
         }
-//        List<String> columnNames = getColumnNames(columns);
+//        List<String> columnNames = getColumnNames(columns)
 //        List<ObjectInspector> columnTypeInspectors = getparColumnTypeInspectors(columns);
 //        StructObjectInspector inspector = ObjectInspectorFactory
 //                .getStandardStructObjectInspector(columnNames, columnTypeInspectors);
