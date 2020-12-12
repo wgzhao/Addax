@@ -705,32 +705,10 @@ public class DFSUtil
         Path file = new Path(filepath);
 
         try (FileSystem fs = FileSystem.get(hadoopConf); FSDataInputStream in = fs.open(file)) {
-
-            if (StringUtils.equalsIgnoreCase(specifiedFileType, Constant.CSV)
-                    || StringUtils.equalsIgnoreCase(specifiedFileType, Constant.TEXT)) {
-
-                boolean isORC = isORCFile(file, fs, in);// 判断是否是 ORC File
-                if (isORC) {
-                    return false;
-                }
-                boolean isRC = isRCFile(filepath, in);// 判断是否是 RC File
-                if (isRC) {
-                    return false;
-                }
-                boolean isSEQ = isSequenceFile(file, in);// 判断是否是 Sequence File
-                if (isSEQ) {
-                    return false;
-                }
-                boolean isParquet = isParquetFile(file, in); //判断是否为Parquet File
-                // 如果不是ORC,RC,PARQUET,SEQ,则默认为是TEXT或CSV类型
-                return !isParquet;
-            }
-            else if (StringUtils.equalsIgnoreCase(specifiedFileType, Constant.ORC)) {
-
+           if (StringUtils.equalsIgnoreCase(specifiedFileType, Constant.ORC)) {
                 return isORCFile(file, fs, in);
             }
             else if (StringUtils.equalsIgnoreCase(specifiedFileType, Constant.RC)) {
-
                 return isRCFile(filepath, in);
             }
             else if (StringUtils.equalsIgnoreCase(specifiedFileType, Constant.SEQ)) {
@@ -740,10 +718,14 @@ public class DFSUtil
             else if (StringUtils.equalsIgnoreCase(specifiedFileType, Constant.PARQUET)) {
                 return isParquetFile(file, in);
             }
+            else if (StringUtils.equalsIgnoreCase(specifiedFileType, Constant.CSV)
+                    || StringUtils.equalsIgnoreCase(specifiedFileType, Constant.TEXT)) {
+                return true;
+           }
         }
         catch (Exception e) {
-            String message = String.format("检查文件[%s]类型失败，目前支持ORC,SEQUENCE,RCFile,TEXT,CSV五种格式的文件," +
-                    "请检查您文件类型和文件是否正确。", filepath);
+            String message = String.format("检查文件[%s]类型失败，目前支持 %s 格式的文件," +
+                    "请检查您文件类型和文件是否正确。", filepath, Constant.SUPPORT_FILE_TYPE);
             LOG.error(message);
             throw DataXException.asDataXException(HdfsReaderErrorCode.READ_FILE_ERROR, message, e);
         }
