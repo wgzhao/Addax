@@ -205,7 +205,7 @@ public class HdfsWriter
             if ("overwrite".equals(writeMode)) {
                 hdfsHelper.deleteFiles(existFilePaths, false);
             }
-            hdfsHelper.renameFile(tmpFiles, endFiles);
+            hdfsHelper.renameFile(this.tmpFiles, this.endFiles);
             // 删除临时目录
             hdfsHelper.deleteFiles(existFilePaths, true);
         }
@@ -283,6 +283,9 @@ public class HdfsWriter
                         this.tmpFiles.add(fullFileName);
                         this.endFiles.add(endFullFileName);
                     }
+                } else {
+                    this.tmpFiles.add(fullFileName);
+                    this.endFiles.add(endFullFileName);
                 }
 
                 splitedTaskConfig
@@ -399,8 +402,7 @@ public class HdfsWriter
         @Override
         public void startWrite(RecordReceiver lineReceiver)
         {
-            LOG.info("begin do write...");
-            LOG.info(String.format("write to file : [%s]", this.fileName));
+            LOG.info("write to file : [{}]", this.fileName);
             if ("TEXT".equals(fileType)) {
                 //写TEXT FILE
                 hdfsHelper.textFileStartWrite(lineReceiver, this.writerSliceConfig, this.fileName,
