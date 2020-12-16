@@ -9,7 +9,6 @@ import io.searchbox.client.JestClient;
 import io.searchbox.client.JestClientFactory;
 import io.searchbox.client.JestResult;
 import io.searchbox.client.config.HttpClientConfig;
-import io.searchbox.client.config.HttpClientConfig.Builder;
 import io.searchbox.core.Bulk;
 import io.searchbox.indices.CreateIndex;
 import io.searchbox.indices.DeleteIndex;
@@ -54,9 +53,8 @@ public class ESClient
     {
 
         JestClientFactory factory = new JestClientFactory();
-        Builder httpClientConfig = new HttpClientConfig
+        HttpClientConfig.Builder httpClientConfig = new HttpClientConfig
                 .Builder(endpoint)
-                .setPreemptiveAuth(new HttpHost(endpoint))
                 .multiThreaded(multiThread)
                 .connTimeout(30000)
                 .readTimeout(readTimeout)
