@@ -18,34 +18,33 @@
 {
   "job": {
     "setting": {
-        "speed": {
-            "channel": 1
-        }
+      "speed": {
+        "channel": 1
+      }
     },
     "content": [
       {
         "reader": {
-            "name": "streamreader",
-            "parameter": {
-              "column": [
-                    {"value": 1111111, "type": "long"},
-                    {"value": "1.1.1.1", "type": "string"},
-                    {"value": 19890604.0, "type": "double"},
-                    {"value": 19890604, "type": "long"},
-                    {"value": 19890604, "type": "long"},
-                    {"value": "hello world", "type": "string"},
-                    {"value": "long text", "type": "string"},
-                    {"value": "41.12,-71.34", "type": "string"},
-                    {"value": "2017-05-25", "type": "string"}
-                    ]
-            }
+          "name": "streamreader",
+          "parameter": {
+            "column": [
+              {"random": "10,1000", "type": "long"},
+              {"value": "1.1.1.1", "type": "string"},
+              {"value": 19890604.0, "type": "double"},
+              {"value": 19890604, "type": "long"},
+              {"value": 19890604, "type": "long"},
+              {"value": "hello world", "type": "string"},
+              {"value": "long text", "type": "string"},
+              {"value": "41.12,-71.34", "type": "string"},
+              {"value": "2017-05-25 11:22:33", "type": "string"}
+            ],
+            "sliceRecordCount": 100
+          }
         },
         "writer": {
           "name": "elasticsearchwriter",
           "parameter": {
-            "endpoint": "http://xxx:9999",
-            "accessId": "xxxx",
-            "accessKey": "xxxx",
+            "endpoint": "http://localhost:9200",
             "index": "test-1",
             "type": "default",
             "cleanup": true,
@@ -76,6 +75,7 @@
     ]
   }
 }
+
 ```
 
 #### 3.2 参数说明
