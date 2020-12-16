@@ -78,7 +78,7 @@ public class HbaseSQLWriterConfig
         cfg.kerberosKeytabFilePath = dataxCfg.getString(Key.KERBEROS_KEYTAB_FILE_PATH, Constant.DEFAULT_KERBEROS_KEYTAB_FILE_PATH);
 
         // 4. 打印解析出来的配置
-        LOG.info("HBase SQL writer config parsed: {}", cfg);
+        LOG.debug("HBase SQL writer config parsed: {}", cfg);
 
         return cfg;
     }
@@ -212,7 +212,7 @@ public class HbaseSQLWriterConfig
     /**
      * @return 批量写入的最大行数
      */
-    public int getBatchSize()
+    public int  getBatchSize()
     {
         return batchSize;
     }

@@ -45,7 +45,7 @@ public class HbaseSQLWriterTask
     public void startWriter(RecordReceiver lineReceiver, TaskPluginCollector taskPluginCollector)
     {
         this.taskPluginCollector = taskPluginCollector;
-        com.alibaba.datax.common.element.Record record;
+        Record record;
         try {
             // 准备阶段
             prepare();
@@ -126,7 +126,7 @@ public class HbaseSQLWriterTask
     {
         try {
             // 将所有record提交到connection缓存
-            for (com.alibaba.datax.common.element.Record r : records) {
+            for (Record r : records) {
                 setupStatement(r);
                 ps.executeUpdate();
             }
@@ -135,7 +135,7 @@ public class HbaseSQLWriterTask
             connection.commit();
         }
         catch (SQLException e) {
-            LOG.error("Failed batch committing " + records.size() + " records", e);
+            LOG.error("Failed batch committing {} records", records.size(), e);
 
             // 批量提交失败，则一行行重试，以确定那一行出错
             connection.rollback();
@@ -151,7 +151,7 @@ public class HbaseSQLWriterTask
      */
     private void doSingleUpsert(List<Record> records)
     {
-        for (com.alibaba.datax.common.element.Record r : records) {
+        for (Record r : records) {
             try {
                 setupStatement(r);
                 ps.executeUpdate();
@@ -235,7 +235,7 @@ public class HbaseSQLWriterTask
         return types;
     }
 
-    private void setupStatement(com.alibaba.datax.common.element.Record record)
+    private void setupStatement(Record record)
             throws SQLException
     {
         // 一开始的时候就已经校验过record中的列数量与ps中需要的值数量相等
