@@ -16,9 +16,13 @@
 
 * Add support for `Date` type
 
+### Elasticsearch writer
+
+* Fixed missing dependency jars ([\#68](https://github.com/wgzhao/DataX/issues/68))
+
 ### HDFS reader
 
-* Fix read failure when the filetype is text ([\#66](https://github.com/wgzhao/DataX/issues/66))
+* Fix read failure when the filetype is text ([\#66](https://github.com/wgzhao/DataX/issues/66), [\#68](https://github.com/wgzhao/DataX/issues/68))
 
 ## 3.1.4
 
