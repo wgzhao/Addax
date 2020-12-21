@@ -25,7 +25,7 @@
         <fastjson.version>1.2.73</fastjson.version>
         <clickhouse.jdbc.version>0.2.4</clickhouse.jdbc.version>
         <guava.version>29.0-jre</guava.version>
-        <groovy.version>2.4.20</groovy.version>
+        <groovy.version>2.4.21</groovy.version>
         <diamond.version>3.7.3</diamond.version>
         <hadoop.version>3.2.0-9</hadoop.version>
         <hive.version>3.1.2-1</hive.version>
