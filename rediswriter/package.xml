@@ -14,21 +14,21 @@
                 <include>plugin.json</include>
                 <include>plugin_job_template.json</include>
             </includes>
-            <outputDirectory>plugin/reader/rediswriter</outputDirectory>
+            <outputDirectory>plugin/writer/rediswriter</outputDirectory>
         </fileSet>
         <fileSet>
             <directory>target/</directory>
             <includes>
                 <include>rediswriter-${project.version}.jar</include>
             </includes>
-            <outputDirectory>plugin/reader/rediswriter</outputDirectory>
+            <outputDirectory>plugin/writer/rediswriter</outputDirectory>
         </fileSet>
     </fileSets>
 
     <dependencySets>
         <dependencySet>
             <useProjectArtifact>false</useProjectArtifact>
-            <outputDirectory>plugin/reader/rediswriter/libs</outputDirectory>
+            <outputDirectory>plugin/writer/rediswriter/libs</outputDirectory>
             <scope>runtime</scope>
         </dependencySet>
     </dependencySets>
