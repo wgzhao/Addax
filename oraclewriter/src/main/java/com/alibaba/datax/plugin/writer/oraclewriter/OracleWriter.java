@@ -31,17 +31,6 @@ public class OracleWriter
         {
             this.originalConfig = super.getPluginJobConf();
 
-            // warn：not like mysql, oracle only support insert mode, don't use
-//            String writeMode = this.originalConfig.getString(Key.WRITE_MODE);
-//            if (null != writeMode) {
-//                throw DataXException
-//                        .asDataXException(
-//                                DBUtilErrorCode.CONF_ERROR,
-//                                String.format(
-//                                        "写入模式(writeMode)配置错误. 因为Oracle不支持配置项 writeMode: %s, Oracle只能使用insert sql 插入数据. 请检查您的配置并作出修改",
-//                                        writeMode));
-//            }
-
             this.commonRdbmsWriterJob = new CommonRdbmsWriter.Job(
                     DATABASE_TYPE);
             this.commonRdbmsWriterJob.init(this.originalConfig);

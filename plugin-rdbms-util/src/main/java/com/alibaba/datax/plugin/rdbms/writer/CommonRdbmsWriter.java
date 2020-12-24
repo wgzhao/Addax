@@ -284,12 +284,8 @@ public class CommonRdbmsWriter
                     mergeColumns.add(i++, column);
                 }
             }
-//            if (! mergeColumns.isEmpty()) {
-//                this.columns.addAll(0, mergeColumns);
-//            }
              mergeColumns.addAll(this.columns);
-            LOG.info("this.columns size {}, mergeColumn size: {}", this.columns.size(),
-                    mergeColumns.size());
+
             // 用于写入数据的时候的类型根据目的表字段类型转换
             this.resultSetMetaData = DBUtil.getColumnMetaData(connection,
                     this.table, StringUtils.join(mergeColumns, ","));
