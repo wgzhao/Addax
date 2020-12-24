@@ -22,6 +22,7 @@ import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.sql.Types;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 public class CommonRdbmsWriter
@@ -256,17 +257,49 @@ public class CommonRdbmsWriter
         public void startWriteWithConnection(RecordReceiver recordReceiver, TaskPluginCollector taskPluginCollector, Connection connection)
         {
             this.taskPluginCollector = taskPluginCollector;
+            List<String> mergeColumns = new ArrayList<>();
 
+            if (this.dataBaseType == DataBaseType.Oracle
+                    && !"insert".equalsIgnoreCase(this.writeMode)) {
+                List<String> columnsOne = new ArrayList<>();
+                List<String> columnsTwo = new ArrayList<>();
+                String merge = this.writeMode;
+                String[] sArray = WriterUtil.getStrings(merge);
+                int i = 0;
+                for (String s : this.columns) {
+                    if (Arrays.asList(sArray).contains(s)) {
+                        columnsOne.add(s);
+                    }
+                }
+                for (String s : this.columns) {
+                    if (!Arrays.asList(sArray).contains(s)) {
+                        columnsTwo.add(s);
+                    }
+                }
+                for (String column : columnsOne) {
+                    mergeColumns.add(i++, column);
+                }
+                i = 0;
+                for (String column : columnsTwo) {
+                    mergeColumns.add(i++, column);
+                }
+            }
+//            if (! mergeColumns.isEmpty()) {
+//                this.columns.addAll(0, mergeColumns);
+//            }
+             mergeColumns.addAll(this.columns);
+            LOG.info("this.columns size {}, mergeColumn size: {}", this.columns.size(),
+                    mergeColumns.size());
             // 用于写入数据的时候的类型根据目的表字段类型转换
             this.resultSetMetaData = DBUtil.getColumnMetaData(connection,
-                    this.table, StringUtils.join(this.columns, ","));
+                    this.table, StringUtils.join(mergeColumns, ","));
             // 写数据库的SQL语句
             calcWriteRecordSql();
 
             List<Record> writeBuffer = new ArrayList<>(this.batchSize);
             int bufferBytes = 0;
             try {
-                com.alibaba.datax.common.element.Record record;
+                Record record;
                 while ((record = recordReceiver.getFromReader()) != null) {
                     if (record.getColumnNumber() != this.columnNumber) {
                         // 源头读取字段列数与目的表字段写入列数不相等，直接报错
@@ -347,14 +380,43 @@ public class CommonRdbmsWriter
                 connection.setAutoCommit(false);
                 preparedStatement = connection
                         .prepareStatement(this.writeRecordSql);
-
-                for (com.alibaba.datax.common.element.Record record : buffer) {
-                    preparedStatement = fillPreparedStatement(
-                            preparedStatement, record);
-                    preparedStatement.addBatch();
+                if (this.dataBaseType == DataBaseType.Oracle &&
+                        ! "insert".equalsIgnoreCase(this.writeMode))
+                {
+                    String merge = this.writeMode;
+                    String[] sArray = WriterUtil.getStrings(merge);
+                    for (Record record : buffer) {
+                        List<Column> recordOne = new ArrayList<>();
+                        for (int j = 0; j < this.columns.size(); j++) {
+                            if (Arrays.asList(sArray).contains(this.columns.get(j))) {
+                                recordOne.add(record.getColumn(j));
+                            }
+                        }
+                        for (int j = 0; j < this.columns.size(); j++) {
+                            if (!Arrays.asList(sArray).contains(this.columns.get(j))) {
+                                recordOne.add(record.getColumn(j));
+                            }
+                        }
+                        for (int j = 0; j < this.columns.size(); j++) {
+                            recordOne.add(record.getColumn(j));
+                        }
+                        for (int j = 0; j < recordOne.size(); j++) {
+                            record.setColumn(j, recordOne.get(j));
+                        }
+                        preparedStatement = fillPreparedStatement(
+                                preparedStatement, record);
+                        preparedStatement.addBatch();
+                    }
                 }
-                preparedStatement.executeBatch();
-                connection.commit();
+                else {
+                    for (Record record : buffer) {
+                        preparedStatement = fillPreparedStatement(
+                                preparedStatement, record);
+                        preparedStatement.addBatch();
+                    }
+                    preparedStatement.executeBatch();
+                    connection.commit();
+                }
             }
             catch (SQLException e) {
                 LOG.warn("回滚此次写入, 采用每次写入一行方式提交. 因为: {}", e.getMessage());
@@ -378,7 +440,7 @@ public class CommonRdbmsWriter
                 preparedStatement = connection
                         .prepareStatement(this.writeRecordSql);
 
-                for (com.alibaba.datax.common.element.Record record : buffer) {
+                for (Record record : buffer) {
                     try {
                         preparedStatement = fillPreparedStatement(
                                 preparedStatement, record);
@@ -405,10 +467,10 @@ public class CommonRdbmsWriter
         }
 
         // 直接使用了两个类变量：columnNumber,resultSetMetaData
-        protected PreparedStatement fillPreparedStatement(PreparedStatement preparedStatement, com.alibaba.datax.common.element.Record record)
+        protected PreparedStatement fillPreparedStatement(PreparedStatement preparedStatement, Record record)
                 throws SQLException
         {
-            for (int i = 0; i < this.columnNumber; i++) {
+            for (int i = 0; i < record.getColumnNumber(); i++) {
                 int columnSqltype = this.resultSetMetaData.getMiddle().get(i);
                 preparedStatement = fillPreparedStatementColumnType(preparedStatement, i, columnSqltype, record.getColumn(i));
             }
