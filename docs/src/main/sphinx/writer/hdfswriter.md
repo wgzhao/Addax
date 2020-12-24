@@ -123,7 +123,6 @@ HdfsWriter提供向HDFS文件系统指定路径中写入 `TEXTFile` ， `ORCFile
 | kerberosPrincipal      |    否    | 无                  |
 | compress               |    否    | 无                  |
 | hadoopConfig           |    否    | 无                  |
-| csvReaderConfig        |    否    | 无                  |
 
 #### path
 
