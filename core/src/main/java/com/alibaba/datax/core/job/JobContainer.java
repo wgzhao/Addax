@@ -170,7 +170,7 @@ public class JobContainer
                     VMInfo vmInfo = VMInfo.getVmInfo();
                     if (vmInfo != null) {
                         vmInfo.getDelta(false);
-                        LOG.info(vmInfo.toString());
+                        LOG.info(vmInfo.totalString());
                     }
 
                     LOG.info(PerfTrace.getInstance().summarizeNoException());
