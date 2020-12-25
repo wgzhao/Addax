@@ -69,6 +69,13 @@ mvn clean package
 mvn package assembly:single
 ```
 
+如果需要编译文档，请执行下面的命令
+
+```shell
+cd docs
+mvn clean package
+```
+
 编译打包成功后，会在项目目录的`target/datax` 目录下创建一个 `datax-<version>`的 文件夹，其中 `<version` 表示版本。
 
 ### 开始第一个任务
