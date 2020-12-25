@@ -34,13 +34,18 @@ public final class OriginalConfPretreatmentUtil
 
         /*
          *有些数据库没有密码，因此需要可以绕过密码的方式
-         * @PASSFLAG 作为可选项，如果为true，则表示密码是必选项，否则密码为可选项
+         * @NEEDPASSWORD 作为可选项，如果为true，则表示密码是必选项，否则密码为可选项
+         * @PASSFLAG 为废弃选项
          */
-        if (Boolean.TRUE.equals(originalConfig.getBool(Key.PASSFLAG, true))) {
+        if (originalConfig.getBool(Key.PASSFLAG, true)) {
+            LOG.warn("参数 {} 已经废弃，请尽快使用 {} 参数替代", Key.PASSFLAG, Key.NEEDPASSWORD);
             originalConfig.getNecessaryValue(Key.PASSWORD,
                     DBUtilErrorCode.REQUIRED_VALUE);
         }
-
+        if (originalConfig.getBool(Key.NEEDPASSWORD, true)) {
+            originalConfig.getNecessaryValue(Key.PASSWORD,
+                    DBUtilErrorCode.REQUIRED_VALUE);
+        }
         doCheckBatchSize(originalConfig);
 
         simplifyConf(originalConfig);
