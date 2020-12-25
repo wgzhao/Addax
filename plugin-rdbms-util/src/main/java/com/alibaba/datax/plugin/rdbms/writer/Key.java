@@ -14,7 +14,11 @@ public final class Key
 
     public static final String COLUMN = "column";
 
-    //可选值为：insert,replace，默认为 insert （mysql 支持，oracle 没用 replace 机制，只能 insert,oracle 可以不暴露这个参数）
+    // 可选值为：insert,replace，update, 默认为 insert
+    // mysql 支持 insert, replace
+    // oracle 支持insert, update
+    // postgresql 支持 update
+    // 其他数据库仅支持insert
     public static final String WRITE_MODE = "writeMode";
 
     public static final String PRE_SQL = "preSql";
