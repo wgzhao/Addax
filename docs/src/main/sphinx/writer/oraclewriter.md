@@ -86,9 +86,10 @@ OracleWriter 通过 DataX 框架获取 Reader 生成的协议数据，根据你�
 
 | 配置项    | 是否必须 | 默认值 | 描述                                                                                                                                                                        |
 | :-------- | :------: | ------ | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| jdbcUrl   |    是    | 无     | 对端数据库的JDBC连接信息，jdbcUrl按照RDBMS官方规范，并可以填写连接[附件控制信息](http://www.oracle.com/technetwork/database/enterprise-edition/documentation/index.html) ｜ |
+| jdbcUrl   |    是    | 无     | 对端数据库的JDBC连接信息，jdbcUrl按照RDBMS官方规范，并可以填写连接[附件控制信息](http://www.oracle.com/technetwork/database/enterprise-edition/documentation/index.html)  |
 | username  |    是    | 无     | 数据源的用户名                                                                                                                                                              |
 | password  |    是    | 无     | 数据源指定用户名的密码                                                                                                                                                      |
+| writeMode |    否    | insert | 写入方式，支持 insert， update，详见下文 |
 | passflag  |    否    | true   | 是否强制需要密码，设置为false时，连接数据库将会忽略`password` 配置项                                                                                                        |
 | table     |    是    | 无     | 所选取的需要同步的表名,使用JSON数据格式，当配置为多张表时，用户自己需保证多张表是同一表结构                                                                                 |
 | column    |    是    | 无     | 所配置的表中需要同步的列名集合，详细描述[rdbmswriter](rdbmswriter.md) ｜                                                                                                    |
@@ -96,6 +97,23 @@ OracleWriter 通过 DataX 框架获取 Reader 生成的协议数据，根据你�
 | postSql   |    否    | 无     | 执行数据同步任务之后执行的sql语句，目前只允许执行一条SQL语句，例如加上某一个时间戳                                                                                          |
 | batchSize |    否    | 1024   | 定义了插件和数据库服务器端每次批量数据获取条数，调高该值可能导致 DataX 出现OOM或者目标数据库事务提交失败导致挂起                                                            |
 | session   |    否    | 无     | 设置oracle连接时的session信息, 详见下文                                                                                                                                     |
+
+#### writeMode
+
+默认情况下， 采取 `insert into ` 语法写入 Oracle 表，如果你希望采取主键存在时更新，不存在则写入的方式，也就是 Oracle 的 `merge into` 语法，
+可以使用 `update` 模式。假定表的主键为 `id` ,则 `writeMode` 配置方法如下：
+
+```
+"writeMode": "update(id)"
+```
+
+如果是联合唯一索引，则配置方法如下：
+
+```
+"writeMode": "update(col1, col2)"
+```
+
+注： `update` 模式在 `3.1.6` 版本首次增加，之前版本并不支持。
 
 #### session
 
