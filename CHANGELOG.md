@@ -6,9 +6,18 @@
 
 * Add tar.gz release package
 
-### rediswriter
+### Redis writer
 
 * Fixed incorrect target packaging folder ([\#81](https://github.com/wgzhao/DataX/issues/81))
+
+### Oracle writer
+
+* Add support for `merge into` statement via configuring `wirteMode` item ([\#82](https://github.com/wgzhao/DataX/issues/81))
+
+### PostgreSQL writer
+
+* Add support for `insert into ... on conflict` statement via configuring `wirteMode` item ([\#82](https://github.com/wgzhao/DataX/issues/81))
+
 ## 3.1.5
 
 ### General Changes
