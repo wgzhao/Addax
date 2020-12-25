@@ -1,5 +1,14 @@
 # Changelog
 
+## 3.1.6
+
+### General Changes
+
+* Add tar.gz release package
+
+### rediswriter
+
+* Fixed incorrect target packaging folder ([\#81](https://github.com/wgzhao/DataX/issues/81))
 ## 3.1.5
 
 ### General Changes

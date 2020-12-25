@@ -16,6 +16,7 @@ import org.slf4j.LoggerFactory;
 import java.sql.Connection;
 import java.sql.Statement;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
@@ -126,20 +127,26 @@ public final class WriterUtil
             throw DataXException.asDataXException(DBUtilErrorCode.ILLEGAL_VALUE,
                     String.format("您所配置的 writeMode:%s 错误. 因为DataX 目前仅支持replace,update 或 insert 方式. 请检查您的配置并作出修改.", writeMode));
         }
-        // && writeMode.trim().toLowerCase().startsWith("replace")
         String writeDataSqlTemplate;
-        if (forceUseUpdate ||
-                (dataBaseType == DataBaseType.MySql && mode.startsWith("update"))
-        ) {
-            //update只在mysql下使用
-
-            writeDataSqlTemplate = "INSERT INTO %s (" + StringUtils.join(columnHolders, ",") +
-                    ") VALUES(" + StringUtils.join(valueHolders, ",") +
-                    ")" +
-                    onDuplicateKeyUpdateString(columnHolders);
+        if (forceUseUpdate || mode.startsWith("update")) {
+            if (dataBaseType == DataBaseType.MySql) {
+                writeDataSqlTemplate = "INSERT INTO %s (" + StringUtils.join(columnHolders, ",") +
+                        ") VALUES(" + StringUtils.join(valueHolders, ",") +
+                        ")" +
+                        onDuplicateKeyUpdateString(columnHolders);
+            }
+            else if (dataBaseType == DataBaseType.Oracle) {
+                writeDataSqlTemplate = onMergeIntoDoString(writeMode, columnHolders, valueHolders) + "INSERT (" +
+                        StringUtils.join(columnHolders, ",") +
+                        ") VALUES(" + StringUtils.join(valueHolders, ",") +
+                        ")";
+            }
+            else {
+                throw DataXException.asDataXException(DBUtilErrorCode.ILLEGAL_VALUE,
+                        String.format("当前数据库不支持 writeMode:%s 模式.", writeMode));
+            }
         }
         else {
-
             //这里是保护,如果其他错误的使用了update,需要更换为replace
             if (mode.startsWith("update")) {
                 writeMode = "replace";
@@ -175,6 +182,65 @@ public final class WriterUtil
         }
 
         return sb.toString();
+    }
+
+    public static String onMergeIntoDoString(String merge, List<String> columnHolders, List<String> valueHolders)
+    {
+        String[] sArray = getStrings(merge);
+        StringBuilder sb = new StringBuilder();
+        sb.append("MERGE INTO %s A USING ( SELECT ");
+
+        boolean first = true;
+        boolean first1 = true;
+        StringBuilder str = new StringBuilder();
+        StringBuilder update = new StringBuilder();
+        for (String columnHolder : columnHolders) {
+            if (Arrays.asList(sArray).contains(columnHolder)) {
+                if (!first) {
+                    sb.append(",");
+                    str.append(" AND ");
+                }
+                else {
+                    first = false;
+                }
+                str.append("TMP.").append(columnHolder);
+                sb.append("?");
+                str.append(" = ");
+                sb.append(" AS ");
+                str.append("A.").append(columnHolder);
+                sb.append(columnHolder);
+            }
+        }
+
+        for (String columnHolder : columnHolders) {
+            if (!Arrays.asList(sArray).contains(columnHolder)) {
+                if (!first1) {
+                    update.append(",");
+                }
+                else {
+                    first1 = false;
+                }
+                update.append(columnHolder);
+                update.append(" = ");
+                update.append("?");
+            }
+        }
+
+        sb.append(" FROM DUAL ) TMP ON (");
+        sb.append(str);
+        sb.append(" ) WHEN MATCHED THEN UPDATE SET ");
+        sb.append(update);
+        sb.append(" WHEN NOT MATCHED THEN ");
+        return sb.toString();
+    }
+
+    public static String[] getStrings(String merge)
+    {
+        merge = merge.replace("update", "");
+        merge = merge.replace("(", "");
+        merge = merge.replace(")", "");
+        merge = merge.replace(" ", "");
+        return merge.split(",");
     }
 
     public static void preCheckPrePareSQL(Configuration originalConfig, DataBaseType type)
