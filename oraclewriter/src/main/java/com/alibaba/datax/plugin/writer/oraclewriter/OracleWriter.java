@@ -1,10 +1,13 @@
 package com.alibaba.datax.plugin.writer.oraclewriter;
 
+import com.alibaba.datax.common.exception.DataXException;
 import com.alibaba.datax.common.plugin.RecordReceiver;
 import com.alibaba.datax.common.spi.Writer;
 import com.alibaba.datax.common.util.Configuration;
+import com.alibaba.datax.plugin.rdbms.util.DBUtilErrorCode;
 import com.alibaba.datax.plugin.rdbms.util.DataBaseType;
 import com.alibaba.datax.plugin.rdbms.writer.CommonRdbmsWriter;
+import com.alibaba.datax.plugin.rdbms.writer.Key;
 
 import java.util.List;
 
@@ -29,7 +32,18 @@ public class OracleWriter
         @Override
         public void init()
         {
-            this.originalConfig = super.getPluginJobConf();
+            this.originalConfig = getPluginJobConf();
+
+            String writeMode = this.originalConfig.getString(Key.WRITE_MODE);
+            if (null != writeMode) {
+                if (!"insert".equalsIgnoreCase(writeMode)
+                        && !writeMode.startsWith("update"))   {
+                throw DataXException.asDataXException(
+                        DBUtilErrorCode.CONF_ERROR,
+                        String.format("写入模式(writeMode)配置错误. Oracle仅支持insert, update两种模式. %s 不支持",
+                                        writeMode));
+            }
+            }
 
             this.commonRdbmsWriterJob = new CommonRdbmsWriter.Job(
                     DATABASE_TYPE);
@@ -71,7 +85,7 @@ public class OracleWriter
         @Override
         public void init()
         {
-            this.writerSliceConfig = super.getPluginJobConf();
+            this.writerSliceConfig = getPluginJobConf();
             this.commonRdbmsWriterTask = new CommonRdbmsWriter.Task(DATABASE_TYPE);
             this.commonRdbmsWriterTask.init(this.writerSliceConfig);
         }
@@ -85,7 +99,7 @@ public class OracleWriter
         public void startWrite(RecordReceiver recordReceiver)
         {
             this.commonRdbmsWriterTask.startWrite(recordReceiver,
-                    this.writerSliceConfig, super.getTaskPluginCollector());
+                    this.writerSliceConfig, getTaskPluginCollector());
         }
 
         @Override

@@ -261,6 +261,7 @@ public class CommonRdbmsWriter
 
             if (this.dataBaseType == DataBaseType.Oracle
                     && !"insert".equalsIgnoreCase(this.writeMode)) {
+                LOG.info("write oracle using {} mode", this.writeMode);
                 List<String> columnsOne = new ArrayList<>();
                 List<String> columnsTwo = new ArrayList<>();
                 String merge = this.writeMode;
@@ -410,9 +411,9 @@ public class CommonRdbmsWriter
                                 preparedStatement, record);
                         preparedStatement.addBatch();
                     }
-                    preparedStatement.executeBatch();
-                    connection.commit();
                 }
+                preparedStatement.executeBatch();
+                connection.commit();
             }
             catch (SQLException e) {
                 LOG.warn("回滚此次写入, 采用每次写入一行方式提交. 因为: {}", e.getMessage());
@@ -470,7 +471,6 @@ public class CommonRdbmsWriter
                 int columnSqltype = this.resultSetMetaData.getMiddle().get(i);
                 preparedStatement = fillPreparedStatementColumnType(preparedStatement, i, columnSqltype, record.getColumn(i));
             }
-
             return preparedStatement;
         }
 

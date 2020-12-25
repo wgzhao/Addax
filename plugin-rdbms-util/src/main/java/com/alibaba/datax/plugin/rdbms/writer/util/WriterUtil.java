@@ -130,8 +130,6 @@ public final class WriterUtil
         String writeDataSqlTemplate;
         if (forceUseUpdate || mode.startsWith("update")) {
             if (dataBaseType == DataBaseType.MySql) {
-                //update只在mysql下使用
-
                 writeDataSqlTemplate = "INSERT INTO %s (" + StringUtils.join(columnHolders, ",") +
                         ") VALUES(" + StringUtils.join(valueHolders, ",") +
                         ")" +
