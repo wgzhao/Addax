@@ -141,6 +141,12 @@ public final class WriterUtil
                         ") VALUES(" + StringUtils.join(valueHolders, ",") +
                         ")";
             }
+            else if (dataBaseType == DataBaseType.PostgreSQL) {
+                writeDataSqlTemplate = "INSERT INTO %s (" +
+                        StringUtils.join(columnHolders, ",") +
+                        ") VALUES(" + StringUtils.join(valueHolders, ",") +
+                        ")" + onConFlictDoString(writeMode, columnHolders);
+            }
             else {
                 throw DataXException.asDataXException(DBUtilErrorCode.ILLEGAL_VALUE,
                         String.format("当前数据库不支持 writeMode:%s 模式.", writeMode));
@@ -158,6 +164,32 @@ public final class WriterUtil
         }
 
         return writeDataSqlTemplate;
+    }
+
+    private static String onConFlictDoString(String writeMode, List<String> columnHolders)
+    {
+        String conflict = writeMode.replace("update", "");
+        StringBuilder sb = new StringBuilder();
+        sb.append(" ON CONFLICT ");
+        sb.append(conflict);
+        sb.append(" DO ");
+        if (columnHolders == null || columnHolders.size() < 1) {
+            sb.append("NOTHING");
+            return sb.toString();
+        }
+        sb.append(" UPDATE SET ");
+        boolean first = true;
+        for (String column : columnHolders) {
+            if (!first) {
+                sb.append(",");
+            } else {
+                first = false;
+            }
+            sb.append(column);
+            sb.append("=excluded.");
+            sb.append(column);
+        }
+        return sb.toString();
     }
 
     public static String onDuplicateKeyUpdateString(List<String> columnHolders)
