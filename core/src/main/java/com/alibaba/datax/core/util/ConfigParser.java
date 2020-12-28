@@ -27,14 +27,13 @@ public final class ConfigParser
     /**
      * 指定Job配置路径，ConfigParser会解析Job、Plugin、Core全部信息，并以Configuration返回
      */
-    public static Configuration parse(final String jobPath)
+    public static Configuration parse(String jobPath)
     {
         Configuration configuration = ConfigParser.parseJobConfig(jobPath);
 
         configuration.merge(
                 ConfigParser.parseCoreConfig(CoreConstant.DATAX_CONF_PATH),
                 false);
-        // todo config优化，只捕获需要的plugin
         String readerPluginName = configuration.getString(
                 CoreConstant.DATAX_JOB_CONTENT_READER_NAME);
         String writerPluginName = configuration.getString(
@@ -74,17 +73,15 @@ public final class ConfigParser
         return configuration;
     }
 
-    private static Configuration parseCoreConfig(final String path)
+    private static Configuration parseCoreConfig(String path)
     {
         return Configuration.from(new File(path));
     }
 
-    public static Configuration parseJobConfig(final String path)
+    public static Configuration parseJobConfig(String path)
     {
         String jobContent = getJobContent(path);
-        Configuration config = Configuration.from(jobContent);
-
-        return SecretUtil.decryptSecretKey(config);
+        return Configuration.from(jobContent);
     }
 
     private static String getJobContent(String jobResource)
@@ -134,7 +131,7 @@ public final class ConfigParser
 
         Set<String> replicaCheckPluginSet = new HashSet<>();
         int complete = 0;
-        for (final String each : ConfigParser
+        for (String each : ConfigParser
                 .getDirAsList(CoreConstant.DATAX_PLUGIN_READER_HOME)) {
             Configuration eachReaderConfig = ConfigParser.parseOnePluginConfig(each, "reader", replicaCheckPluginSet, wantPluginNames);
             if (eachReaderConfig != null) {
@@ -143,7 +140,7 @@ public final class ConfigParser
             }
         }
 
-        for (final String each : ConfigParser
+        for (String each : ConfigParser
                 .getDirAsList(CoreConstant.DATAX_PLUGIN_WRITER_HOME)) {
             Configuration eachWriterConfig = ConfigParser.parseOnePluginConfig(each, "writer", replicaCheckPluginSet, wantPluginNames);
             if (eachWriterConfig != null) {
@@ -159,8 +156,7 @@ public final class ConfigParser
         return configuration;
     }
 
-    public static Configuration parseOnePluginConfig(final String path,
-            final String type,
+    public static Configuration parseOnePluginConfig(String path, String type,
             Set<String> pluginSet, List<String> wantPluginNames)
     {
         String filePath = path + File.separator + "plugin.json";
@@ -203,7 +199,7 @@ public final class ConfigParser
             return result;
         }
 
-        for (final String each : paths) {
+        for (String each : paths) {
             result.add(path + File.separator + each);
         }
 
