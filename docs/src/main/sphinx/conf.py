@@ -102,7 +102,7 @@ html_theme = 'sphinx_rtd_theme'
 
 html_title = '%s %s Documentation' % (project, release)
 
-html_logo = 'images/DataX-logo.jpg'
+html_logo = 'images/datax-logo.jpg'
 
 html_add_permalinks = '#'
 html_show_copyright = False
