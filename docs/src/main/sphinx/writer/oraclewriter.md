@@ -88,9 +88,8 @@ OracleWriter 通过 DataX 框架获取 Reader 生成的协议数据，根据你�
 | :-------- | :------: | ------ | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | jdbcUrl   |    是    | 无     | 对端数据库的JDBC连接信息，jdbcUrl按照RDBMS官方规范，并可以填写连接[附件控制信息](http://www.oracle.com/technetwork/database/enterprise-edition/documentation/index.html)  |
 | username  |    是    | 无     | 数据源的用户名                                                                                                                                                              |
-| password  |    是    | 无     | 数据源指定用户名的密码                                                                                                                                                      |
+| password  |    否    | 无     | 数据源指定用户名的密码                                                                                                                                                      |
 | writeMode |    否    | insert | 写入方式，支持 insert， update，详见下文 |
-| passflag  |    否    | true   | 是否强制需要密码，设置为false时，连接数据库将会忽略`password` 配置项                                                                                                        |
 | table     |    是    | 无     | 所选取的需要同步的表名,使用JSON数据格式，当配置为多张表时，用户自己需保证多张表是同一表结构                                                                                 |
 | column    |    是    | 无     | 所配置的表中需要同步的列名集合，详细描述[rdbmswriter](rdbmswriter.md) ｜                                                                                                    |
 | preSql    |    否    | 无     | 执行数据同步任务之前率先执行的sql语句，目前只允许执行一条SQL语句，例如清除旧数据,涉及到的表可用 `@table`表示                                                                |

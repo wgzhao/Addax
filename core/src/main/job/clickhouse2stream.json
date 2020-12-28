@@ -16,7 +16,6 @@
           "parameter": {
             "username": "default",
             "password": "",
-            "passflag": "false",
             "column": [
               "*"
             ],

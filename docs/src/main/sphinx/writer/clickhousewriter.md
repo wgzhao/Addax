@@ -33,7 +33,6 @@ ClickHouseWriter 插件实现了写入数据ClickHouse。在底层实现上，Cl
                     "parameter": {
                         "username": "default",
                         "password": "",
-                        "passflag": "false",
                         "column": [ "col1", "col2","col3","col4" ],
                         "connection": [
                             {
@@ -81,8 +80,7 @@ ClickHouseWriter 插件实现了写入数据ClickHouse。在底层实现上，Cl
 | :-------- | :------: | ------ | --------------------------------------------------------------------------------------------------------------------------------------- |
 | jdbcUrl   |    是    | 无     | ClickHouse JDBC 连接信息 ,可按照官方规范填写连接附件控制信息。具体请参看[ClickHouse官方文档](https://github.com/yandex/clickhouse-jdbc) |
 | username  |    是    | 无     | 数据源的用户名                                                                                                                          |
-| password  |    是    | 无     | 数据源指定用户名的密码                                                                                                                  |
-| passflag  |    否    | true   | 是否强制需要密码，填写为false时，则忽略password的填写内容                                                                               |
+| password  |    否    | 无     | 数据源指定用户名的密码                                                                                                                  |
 | table     |    是    | 无     | 所选取的需要同步的表 ,当配置为多张表时，用户自己需保证多张表是同一schema结构                                                            |
 | column    |    是    | 无     | 所配置的表中需要同步的列名集合, 使用JSON的数组描述字段信息。用户使用 `*` 代表默认使用所有列配置，例如 `"['*']"`                         |
 | batchSize |    否    | 2048   | 每次批量数据的条数                                                                                                                      |

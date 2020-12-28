@@ -56,28 +56,11 @@ OracleReader插件实现了从Oracle读取数据。在底层实现上，OracleRe
 
 ### 3.2 参数说明
 
-| 配置项          | 是否必须 | 默认值 | 描述                                                                                                                                                                                            |
-| :-------------- | :------: | ------ | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| jdbcUrl         |    是    | 无     | 源端数据库的JDBC连接信息，使用JSON的数组描述，并支持一个库填写多个连接地址,并可以填写连接[附件控制信息](http://www.oracle.com/technetwork/database/enterprise-edition/documentation/index.html) |
-| username        |    是    | 无     |
-| password        |    是    | 无     |
-| table           |    是    | 无     |
-| column          |    是    | 无     |
-| splitPk         |    否    | 无     |
-| where           |    否    | 无     |
-| querySql        |    否    | 无     |
-| fetchSize       |    否    | 1024   |
-| session         |    否    | 无     |
-| compress        |    否    | 无     |
-| hadoopConfig    |    否    | 无     |
-| csvReaderConfig |    否    | 无     |
-
 | 配置项    | 是否必须 | 默认值 | 描述                                                                                                                                                                        |
 | :-------- | :------: | ------ | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | jdbcUrl   |    是    | 无     | 对端数据库的JDBC连接信息，jdbcUrl按照RDBMS官方规范，并可以填写连接[附件控制信息](http://www.oracle.com/technetwork/database/enterprise-edition/documentation/index.html) ｜ |
 | username  |    是    | 无     | 数据源的用户名                                                                                                                                                              |
-| password  |    是    | 无     | 数据源指定用户名的密码                                                                                                                                                      |
-| passflag  |    否    | true   | 是否强制需要密码，设置为false时，连接数据库将会忽略`password` 配置项                                                                                                        |
+| password  |    否    | 无     | 数据源指定用户名的密码                                                                                                                                                      |
 | table     |    是    | 无     | 所选取的需要同步的表名,使用JSON数据格式，当配置为多张表时，用户自己需保证多张表是同一表结构                                                                                 |
 | column    |    是    | 无     | 所配置的表中需要同步的列名集合，详细描述见[rdbmsreader](rdbmsreader.md)                                                                                                     |
 | splitPk   |    否    | 无     | 使用splitPk代表的字段进行数据分片，DataX因此会启动并发任务进行数据同步，这样可以大大提供数据同步的效能                                                                      |
