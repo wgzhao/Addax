@@ -5,7 +5,7 @@
     <groupId>com.alibaba.datax</groupId>
     <artifactId>datax-docs</artifactId>
     <name>datax-docs</name>
-    <version>3.1.5</version>
+    <version>3.1.6</version>
     <packaging>pom</packaging>
 
     <build>
