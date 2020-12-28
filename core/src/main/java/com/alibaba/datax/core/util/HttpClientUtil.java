@@ -6,19 +6,15 @@ import org.apache.http.Consts;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
 import org.apache.http.HttpStatus;
-import org.apache.http.auth.AuthScope;
-import org.apache.http.auth.UsernamePasswordCredentials;
 import org.apache.http.client.CredentialsProvider;
 import org.apache.http.client.config.RequestConfig;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpRequestBase;
-import org.apache.http.impl.client.BasicCredentialsProvider;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.http.util.EntityUtils;
 
 import java.io.IOException;
-import java.util.Properties;
 import java.util.concurrent.ThreadPoolExecutor;
 
 public class HttpClientUtil
@@ -34,33 +30,12 @@ public class HttpClientUtil
 
     public HttpClientUtil()
     {
-        Properties prob = SecretUtil.getSecurityProperties();
-        HttpClientUtil.setBasicAuth(prob.getProperty("auth.user"), prob.getProperty("auth.pass"));
         initApacheHttpClient();
     }
 
     public static void setHttpTimeoutInMillionSeconds(int httpTimeoutInMillionSeconds)
     {
         HTTP_TIMEOUT_INMILLIONSECONDS = httpTimeoutInMillionSeconds;
-    }
-
-    public static synchronized HttpClientUtil getHttpClientUtil()
-    {
-        if (null == clientUtil) {
-            synchronized (HttpClientUtil.class) {
-                if (null == clientUtil) {
-                    clientUtil = new HttpClientUtil();
-                }
-            }
-        }
-        return clientUtil;
-    }
-
-    public static void setBasicAuth(String username, String password)
-    {
-        provider = new BasicCredentialsProvider();
-        provider.setCredentials(AuthScope.ANY,
-                new UsernamePasswordCredentials(username, password));
     }
 
     public static HttpGet getGetRequest()
@@ -127,16 +102,6 @@ public class HttpClientUtil
         }
 
         return entiStr;
-    }
-
-    public String executeAndGetWithRetry(final HttpRequestBase httpRequestBase, final int retryTimes, final long retryInterval)
-    {
-        try {
-            return RetryUtil.asyncExecuteWithRetry(() -> executeAndGet(httpRequestBase), retryTimes, retryInterval, true, HTTP_TIMEOUT_INMILLIONSECONDS + 1000, asyncExecutor);
-        }
-        catch (Exception e) {
-            throw DataXException.asDataXException(FrameworkErrorCode.RUNTIME_ERROR, e);
-        }
     }
 
     public String executeAndGetWithFailedRetry(final HttpRequestBase httpRequestBase, final int retryTimes, final long retryInterval)
