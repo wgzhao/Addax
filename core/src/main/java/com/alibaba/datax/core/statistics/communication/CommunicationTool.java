@@ -76,38 +76,38 @@ public final class CommunicationTool
         return now;
     }
 
-    public static long getTotalReadRecords(final Communication communication)
+    public static long getTotalReadRecords(Communication communication)
     {
 
         return communication.getLongCounter(READ_SUCCEED_RECORDS) +
                 communication.getLongCounter(READ_FAILED_RECORDS);
     }
 
-    public static long getTotalReadBytes(final Communication communication)
+    public static long getTotalReadBytes(Communication communication)
     {
         return communication.getLongCounter(READ_SUCCEED_BYTES) +
                 communication.getLongCounter(READ_FAILED_BYTES);
     }
 
-    public static long getTotalErrorRecords(final Communication communication)
+    public static long getTotalErrorRecords(Communication communication)
     {
         return communication.getLongCounter(READ_FAILED_RECORDS) +
                 communication.getLongCounter(WRITE_FAILED_RECORDS);
     }
 
-    public static long getTotalErrorBytes(final Communication communication)
+    public static long getTotalErrorBytes(Communication communication)
     {
         return communication.getLongCounter(READ_FAILED_BYTES) +
                 communication.getLongCounter(WRITE_FAILED_BYTES);
     }
 
-    public static long getWriteSucceedRecords(final Communication communication)
+    public static long getWriteSucceedRecords(Communication communication)
     {
         return communication.getLongCounter(WRITE_RECEIVED_RECORDS) -
                 communication.getLongCounter(WRITE_FAILED_RECORDS);
     }
 
-    public static long getWriteSucceedBytes(final Communication communication)
+    public static long getWriteSucceedBytes(Communication communication)
     {
         return communication.getLongCounter(WRITE_RECEIVED_BYTES) -
                 communication.getLongCounter(WRITE_FAILED_BYTES);
@@ -119,7 +119,7 @@ public final class CommunicationTool
 
         private Stringify() {}
 
-        public static String getSnapshot(final Communication communication)
+        public static String getSnapshot(Communication communication)
         {
             StringBuilder sb = new StringBuilder();
             sb.append("Total ");
@@ -159,137 +159,30 @@ public final class CommunicationTool
             return sb.toString();
         }
 
-        private static String getTotal(final Communication communication)
+        private static String getTotal(Communication communication)
         {
             return String.format("%d records, %d bytes",
                     communication.getLongCounter(TOTAL_READ_RECORDS),
                     communication.getLongCounter(TOTAL_READ_BYTES));
         }
 
-        private static String getSpeed(final Communication communication)
+        private static String getSpeed(Communication communication)
         {
             return String.format("%s/s, %d records/s",
                     StrUtil.stringify(communication.getLongCounter(BYTE_SPEED)),
                     communication.getLongCounter(RECORD_SPEED));
         }
 
-        private static String getError(final Communication communication)
+        private static String getError(Communication communication)
         {
             return String.format("%d records, %d bytes",
                     communication.getLongCounter(TOTAL_ERROR_RECORDS),
                     communication.getLongCounter(TOTAL_ERROR_BYTES));
         }
 
-        private static String getPercentage(final Communication communication)
+        private static String getPercentage(Communication communication)
         {
             return df.format(communication.getDoubleCounter(PERCENTAGE) * 100) + "%";
         }
     }
-
-//    public static class Jsonify {
-//        @SuppressWarnings("rawtypes")
-//        public static String getSnapshot(Communication communication) {
-//            Validate.notNull(communication);
-//
-//            Map<String, Object> state = new HashMap<String, Object>();
-//
-//            Pair pair = getTotalBytes(communication);
-//            state.put((String) pair.getKey(), pair.getValue());
-//
-//            pair = getTotalRecords(communication);
-//            state.put((String) pair.getKey(), pair.getValue());
-//
-//            pair = getSpeedRecord(communication);
-//            state.put((String) pair.getKey(), pair.getValue());
-//
-//            pair = getSpeedByte(communication);
-//            state.put((String) pair.getKey(), pair.getValue());
-//
-//            pair = getStage(communication);
-//            state.put((String) pair.getKey(), pair.getValue());
-//
-//            pair = getErrorRecords(communication);
-//            state.put((String) pair.getKey(), pair.getValue());
-//
-//            pair = getErrorBytes(communication);
-//            state.put((String) pair.getKey(), pair.getValue());
-//
-//            pair = getErrorMessage(communication);
-//            state.put((String) pair.getKey(), pair.getValue());
-//
-//            pair = getPercentage(communication);
-//            state.put((String) pair.getKey(), pair.getValue());
-//
-//            pair = getWaitReaderTime(communication);
-//            state.put((String) pair.getKey(), pair.getValue());
-//
-//            pair = getWaitWriterTime(communication);
-//            state.put((String) pair.getKey(), pair.getValue());
-//
-//            return JSON.toJSONString(state);
-//        }
-//
-//        private static Pair<String, Long> getTotalBytes(final Communication communication) {
-//            return new Pair<>("totalBytes", communication.getLongCounter(TOTAL_READ_BYTES));
-//        }
-//
-//        private static Pair<String, Long> getTotalRecords(final Communication communication) {
-//            return new Pair<>("totalRecords", communication.getLongCounter(TOTAL_READ_RECORDS));
-//        }
-//
-//        private static Pair<String, Long> getSpeedByte(final Communication communication) {
-//            return new Pair<>("speedBytes", communication.getLongCounter(BYTE_SPEED));
-//        }
-//
-//        private static Pair<String, Long> getSpeedRecord(final Communication communication) {
-//            return new Pair<>("speedRecords", communication.getLongCounter(RECORD_SPEED));
-//        }
-//
-//        private static Pair<String, Long> getErrorRecords(final Communication communication) {
-//            return new Pair<>("errorRecords", communication.getLongCounter(TOTAL_ERROR_RECORDS));
-//        }
-//
-//        private static Pair<String, Long> getErrorBytes(final Communication communication) {
-//            return new Pair<>("errorBytes", communication.getLongCounter(TOTAL_ERROR_BYTES));
-//        }
-//
-//        private static Pair<String, Long> getStage(final Communication communication) {
-//            return new Pair<>("stage", communication.getLongCounter(STAGE));
-//        }
-//
-//        private static Pair<String, Double> getPercentage(final Communication communication) {
-//            return new Pair<>("percentage", communication.getDoubleCounter(PERCENTAGE));
-//        }
-//
-//        private static Pair<String, String> getErrorMessage(final Communication communication) {
-//            return new Pair<>("errorMessage", communication.getThrowableMessage());
-//        }
-//
-//        private static Pair<String, Long> getWaitReaderTime(final Communication communication) {
-//            return new Pair<>("waitReaderTime", communication.getLongCounter(CommunicationTool.WAIT_READER_TIME));
-//        }
-//
-//        private static Pair<String, Long> getWaitWriterTime(final Communication communication) {
-//            return new Pair<>("waitWriterTime", communication.getLongCounter(CommunicationTool.WAIT_WRITER_TIME));
-//        }
-//
-//        static class Pair<K, V> {
-//            public Pair(final K key, final V value) {
-//                this.key = key;
-//                this.value = value;
-//            }
-//
-//            public K getKey() {
-//                return key;
-//            }
-//
-//            public V getValue() {
-//                return value;
-//            }
-//
-//            private K key;
-//
-//            private V value;
-//        }
-//    }
 }

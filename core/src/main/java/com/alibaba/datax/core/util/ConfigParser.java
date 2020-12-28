@@ -56,18 +56,21 @@ public final class ConfigParser
             pluginList.add(postHandlerName);
         }
         try {
-            configuration.merge(parsePluginConfig(new ArrayList<>(pluginList)), false);
+            configuration.merge(parsePluginConfig(new ArrayList<>(pluginList)),
+                    false);
         }
         catch (Exception e) {
             //吞掉异常，保持log干净。这里message足够。
-            LOG.warn(String.format("插件[%s,%s]加载失败，1s后重试... Exception:%s ", readerPluginName, writerPluginName, e.getMessage()));
+            LOG.warn(String.format("插件[%s,%s]加载失败，1s后重试... Exception:%s ",
+                    readerPluginName, writerPluginName, e.getMessage()));
             try {
                 Thread.sleep(1000);
             }
             catch (InterruptedException e1) {
                 //
             }
-            configuration.merge(parsePluginConfig(new ArrayList<>(pluginList)), false);
+            configuration.merge(parsePluginConfig(new ArrayList<>(pluginList)),
+                    false);
         }
 
         return configuration;
@@ -103,10 +106,12 @@ public final class ConfigParser
                 HttpGet httpGet = HttpClientUtil.getGetRequest();
                 httpGet.setURI(url.toURI());
 
-                jobContent = httpClientUtil.executeAndGetWithFailedRetry(httpGet, 1, 1000L);
+                jobContent = httpClientUtil.executeAndGetWithFailedRetry(
+                        httpGet, 1, 1000L);
             }
             catch (Exception e) {
-                throw DataXException.asDataXException(FrameworkErrorCode.CONFIG_ERROR, "获取作业配置信息失败:" + jobResource, e);
+                throw DataXException.asDataXException(FrameworkErrorCode.CONFIG_ERROR,
+                        "获取作业配置信息失败:" + jobResource, e);
             }
         }
         else {
@@ -115,12 +120,14 @@ public final class ConfigParser
                 jobContent = FileUtils.readFileToString(new File(jobResource), StandardCharsets.UTF_8);
             }
             catch (IOException e) {
-                throw DataXException.asDataXException(FrameworkErrorCode.CONFIG_ERROR, "获取作业配置信息失败:" + jobResource, e);
+                throw DataXException.asDataXException(FrameworkErrorCode.CONFIG_ERROR,
+                        "获取作业配置信息失败:" + jobResource, e);
             }
         }
 
         if (jobContent == null) {
-            throw DataXException.asDataXException(FrameworkErrorCode.CONFIG_ERROR, "获取作业配置信息失败:" + jobResource);
+            throw DataXException.asDataXException(FrameworkErrorCode.CONFIG_ERROR,
+                    "获取作业配置信息失败:" + jobResource);
         }
         return jobContent;
     }
@@ -133,7 +140,8 @@ public final class ConfigParser
         int complete = 0;
         for (String each : ConfigParser
                 .getDirAsList(CoreConstant.DATAX_PLUGIN_READER_HOME)) {
-            Configuration eachReaderConfig = ConfigParser.parseOnePluginConfig(each, "reader", replicaCheckPluginSet, wantPluginNames);
+            Configuration eachReaderConfig = ConfigParser.parseOnePluginConfig(each,
+                    "reader", replicaCheckPluginSet, wantPluginNames);
             if (eachReaderConfig != null) {
                 configuration.merge(eachReaderConfig, true);
                 complete += 1;
@@ -142,15 +150,18 @@ public final class ConfigParser
 
         for (String each : ConfigParser
                 .getDirAsList(CoreConstant.DATAX_PLUGIN_WRITER_HOME)) {
-            Configuration eachWriterConfig = ConfigParser.parseOnePluginConfig(each, "writer", replicaCheckPluginSet, wantPluginNames);
+            Configuration eachWriterConfig = ConfigParser.parseOnePluginConfig(each,
+                    "writer", replicaCheckPluginSet, wantPluginNames);
             if (eachWriterConfig != null) {
                 configuration.merge(eachWriterConfig, true);
                 complete += 1;
             }
         }
 
-        if (wantPluginNames != null && !wantPluginNames.isEmpty() && wantPluginNames.size() != complete) {
-            throw DataXException.asDataXException(FrameworkErrorCode.PLUGIN_INIT_ERROR, "插件加载失败，未完成指定插件加载:" + wantPluginNames);
+        if (wantPluginNames != null && !wantPluginNames.isEmpty()
+                && wantPluginNames.size() != complete) {
+            throw DataXException.asDataXException(FrameworkErrorCode.PLUGIN_INIT_ERROR,
+                    "插件加载失败，未完成指定插件加载:" + wantPluginNames);
         }
 
         return configuration;
@@ -168,7 +179,8 @@ public final class ConfigParser
             pluginSet.add(pluginName);
         }
         else {
-            throw DataXException.asDataXException(FrameworkErrorCode.PLUGIN_INIT_ERROR, "插件加载失败,存在重复插件:" + filePath);
+            throw DataXException.asDataXException(FrameworkErrorCode.PLUGIN_INIT_ERROR,
+                    "插件加载失败,存在重复插件:" + filePath);
         }
 
         //不是想要的插件，返回null
