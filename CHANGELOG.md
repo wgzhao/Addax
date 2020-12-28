@@ -5,6 +5,7 @@
 ### General Changes
 
 * Add tar.gz release package
+* Takes item `password` to optional instead of  required one
 
 ### Redis writer
 
