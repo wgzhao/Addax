@@ -54,8 +54,9 @@
 
 如果你懒得编译或者因为环境无法编译，可以从以下链接下载对应的版本
 
-| 版本  | 连接地址                                                     | md5值                            |
-| ----- | ------------------------------------------------------------ | -------------------------------- |
+| 版本  | 连接地址                                                     | md5值                             |
+| ----- | -----------------------------------------------------------| ----------------------------------|
+| 3.1.6 | https://pan.baidu.com/s/1Ldg10E3qWkbUT44rkH19og 提取码: 4av4 | f6aea7e0ce4b9ec83554e9c6d6ab3cb6 |
 | 3.1.5 | https://pan.baidu.com/s/1yY_lJqulE6hKqktoQbbGmQ 提取码: 2r4p | 9ae27c1c434a097f67a17bb704f70731 |
 | 3.1.4 | https://pan.baidu.com/s/1_plsvzD_GrWN-HffPBtz-g 提取码: kpjn | 7aca526fe7f6f0f54dc467f6ca1647b1 |
 | 3.1.2 | https://pan.baidu.com/s/1zFqv8E6iJX549zdSZDQgiQ 提取码: 7jdk | 3674711fc9b68fad3086f3c8526a3427 |
