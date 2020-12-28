@@ -23,21 +23,21 @@ public class StandAloneJobContainerCommunicator
     public StandAloneJobContainerCommunicator(Configuration configuration)
     {
         super(configuration);
-        super.setCollector(new ProcessInnerCollector(configuration.getLong(
+        setCollector(new ProcessInnerCollector(configuration.getLong(
                 CoreConstant.DATAX_CORE_CONTAINER_JOB_ID)));
-        super.setReporter(new ProcessInnerReporter());
+        setReporter(new ProcessInnerReporter());
     }
 
     @Override
     public void registerCommunication(List<Configuration> configurationList)
     {
-        super.getCollector().registerTGCommunication(configurationList);
+        getCollector().registerTGCommunication(configurationList);
     }
 
     @Override
     public Communication collect()
     {
-        return super.getCollector().collectFromTaskGroup();
+        return getCollector().collectFromTaskGroup();
     }
 
     @Override
@@ -52,7 +52,7 @@ public class StandAloneJobContainerCommunicator
     @Override
     public void report(Communication communication)
     {
-        super.getReporter().reportJobCommunication(super.getJobId(), communication);
+        getReporter().reportJobCommunication(getJobId(), communication);
 
         LOG.info(CommunicationTool.Stringify.getSnapshot(communication));
         reportVmInfo();
@@ -61,12 +61,12 @@ public class StandAloneJobContainerCommunicator
     @Override
     public Communication getCommunication(Integer taskGroupId)
     {
-        return super.getCollector().getTGCommunication(taskGroupId);
+        return getCollector().getTGCommunication(taskGroupId);
     }
 
     @Override
     public Map<Integer, Communication> getCommunicationMap()
     {
-        return super.getCollector().getTGCommunicationMap();
+        return getCollector().getTGCommunicationMap();
     }
 }

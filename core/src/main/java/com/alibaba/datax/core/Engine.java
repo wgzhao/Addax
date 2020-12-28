@@ -78,12 +78,6 @@ public class Engine
         }
 
         int priority = 0;
-//        try {
-//            priority = Integer.parseInt(System.getenv("SKYNET_PRIORITY"));
-//        }
-//        catch (NumberFormatException e) {
-//            LOG.warn("prioriy set to 0, because NumberFormatException, the value is: {} ", System.getProperty("PROIORY"));
-//        }
 
         Configuration jobInfoConfig = allConf.getConfiguration(CoreConstant.DATAX_JOB_JOBINFO);
         //初始化PerfTrace
@@ -109,7 +103,7 @@ public class Engine
     public static Configuration filterSensitiveConfiguration(Configuration configuration)
     {
         Set<String> keys = configuration.getKeys();
-        for (final String key : keys) {
+        for (String key : keys) {
             boolean isSensitive = StringUtils.endsWithIgnoreCase(key, "password")
                     || StringUtils.endsWithIgnoreCase(key, "accessKey");
             if (isSensitive && configuration.get(key) instanceof String) {
@@ -119,7 +113,7 @@ public class Engine
         return configuration;
     }
 
-    public static void entry(final String[] args)
+    public static void entry(String[] args)
     {
         Options options = new Options();
         options.addOption("job", true, "Job config.");

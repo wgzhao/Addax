@@ -13,7 +13,7 @@ public enum FrameworkErrorCode
     ARGUMENT_ERROR("Framework-01", "DataX引擎运行错误，该问题通常是由于内部编程错误引起，请联系DataX开发团队解决 ."),
     RUNTIME_ERROR("Framework-02", "DataX引擎运行过程出错，具体原因请参看DataX运行结束时的错误诊断信息  ."),
     CONFIG_ERROR("Framework-03", "DataX引擎配置错误，该问题通常是由于DataX安装错误引起，请联系您的运维解决 ."),
-    SECRET_ERROR("Framework-04", "DataX引擎加解密出错，该问题通常是由于DataX密钥配置错误引起，请联系您的运维解决 ."),
+//    SECRET_ERROR("Framework-04", "DataX引擎加解密出错，该问题通常是由于DataX密钥配置错误引起，请联系您的运维解决 ."),
 //    HOOK_LOAD_ERROR("Framework-05", "加载外部Hook出现错误，通常是由于DataX安装引起的"),
 //    HOOK_FAIL_ERROR("Framework-06", "执行外部Hook出现错误"),
 

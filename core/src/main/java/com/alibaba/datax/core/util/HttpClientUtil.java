@@ -51,17 +51,28 @@ public class HttpClientUtil
     // 创建包含connection pool与超时设置的client
     private void initApacheHttpClient()
     {
-        RequestConfig requestConfig = RequestConfig.custom().setSocketTimeout(HTTP_TIMEOUT_INMILLIONSECONDS)
-                .setConnectTimeout(HTTP_TIMEOUT_INMILLIONSECONDS).setConnectionRequestTimeout(HTTP_TIMEOUT_INMILLIONSECONDS)
+        RequestConfig requestConfig = RequestConfig
+                .custom()
+                .setSocketTimeout(HTTP_TIMEOUT_INMILLIONSECONDS)
+                .setConnectTimeout(HTTP_TIMEOUT_INMILLIONSECONDS)
+                .setConnectionRequestTimeout(HTTP_TIMEOUT_INMILLIONSECONDS)
                 .build();
 
         if (null == provider) {
-            httpClient = HttpClientBuilder.create().setMaxConnTotal(POOL_SIZE).setMaxConnPerRoute(POOL_SIZE)
+            httpClient = HttpClientBuilder
+                    .create()
+                    .setMaxConnTotal(POOL_SIZE)
+                    .setMaxConnPerRoute(POOL_SIZE)
                     .setDefaultRequestConfig(requestConfig).build();
         }
         else {
-            httpClient = HttpClientBuilder.create().setMaxConnTotal(POOL_SIZE).setMaxConnPerRoute(POOL_SIZE)
-                    .setDefaultRequestConfig(requestConfig).setDefaultCredentialsProvider(provider).build();
+            httpClient = HttpClientBuilder
+                    .create()
+                    .setMaxConnTotal(POOL_SIZE)
+                    .setMaxConnPerRoute(POOL_SIZE)
+                    .setDefaultRequestConfig(requestConfig)
+                    .setDefaultCredentialsProvider(provider)
+                    .build();
         }
     }
 
@@ -86,10 +97,12 @@ public class HttpClientUtil
         response = httpClient.execute(httpRequestBase);
 
         if (response.getStatusLine().getStatusCode() != HttpStatus.SC_OK) {
-            System.err.println("请求地址：" + httpRequestBase.getURI() + ", 请求方法：" + httpRequestBase.getMethod()
+            System.err.println("请求地址：" + httpRequestBase.getURI()
+                    + ", 请求方法：" + httpRequestBase.getMethod()
                     + ",STATUS CODE = " + response.getStatusLine().getStatusCode());
             httpRequestBase.abort();
-            throw new Exception("Response Status Code : " + response.getStatusLine().getStatusCode());
+            throw new Exception("Response Status Code : "
+                    + response.getStatusLine().getStatusCode());
         }
         else {
             HttpEntity entity = response.getEntity();
@@ -104,16 +117,19 @@ public class HttpClientUtil
         return entiStr;
     }
 
-    public String executeAndGetWithFailedRetry(final HttpRequestBase httpRequestBase, final int retryTimes, final long retryInterval)
+    public String executeAndGetWithFailedRetry(HttpRequestBase httpRequestBase,
+            int retryTimes, long retryInterval)
     {
         try {
             return RetryUtil.asyncExecuteWithRetry(() -> {
                 String result = executeAndGet(httpRequestBase);
                 if (result != null && result.startsWith("{\"result\":-1")) {
-                    throw DataXException.asDataXException(FrameworkErrorCode.CALL_REMOTE_FAILED, "远程接口返回-1,将重试");
+                    throw DataXException.asDataXException(
+                            FrameworkErrorCode.CALL_REMOTE_FAILED, "远程接口返回-1,将重试");
                 }
                 return result;
-            }, retryTimes, retryInterval, true, HTTP_TIMEOUT_INMILLIONSECONDS + 1000, asyncExecutor);
+            }, retryTimes, retryInterval, true,
+                    HTTP_TIMEOUT_INMILLIONSECONDS + 1000, asyncExecutor);
         }
         catch (Exception e) {
             throw DataXException.asDataXException(FrameworkErrorCode.RUNTIME_ERROR, e);
