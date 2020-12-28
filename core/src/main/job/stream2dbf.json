@@ -22,15 +22,19 @@
                 "type": "long"
               },
               {
-                "value": "1988-08-08 16:00:04",
+                "value": "1989-06-04 00:00:00",
                 "type": "date"
               },
               {
                 "value": true,
                 "type": "bool"
+              },
+	          {
+			    "value":"中文测试",
+				"type": "string"
               }
             ],
-            "sliceRecordCount": 1000
+            "sliceRecordCount": 10
           }
         },
         "writer": {
@@ -55,11 +59,17 @@
               {
                 "name": "col4",
                 "type": "logical"
-              }
+              },
+			  {
+				"name": "col5",
+				"type":"char",
+				"length": 100
+			  }
             ],
             "fileName": "test.dbf",
             "path": "/tmp/out",
-            "writeMode": "truncate"
+            "writeMode": "truncate",
+			"encoding": "UTF-8"
           }
         }
       }

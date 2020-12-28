@@ -17,7 +17,7 @@
               },
               {
                 "index": 1,
-                "type": "string"
+                "type": "long"
               },
               {
                 "index": 2,
@@ -25,7 +25,7 @@
               },
               {
                 "index": 3,
-                "type": "string"
+                "type": "boolean"
               },
               {
                 "index": 4,
@@ -43,7 +43,8 @@
             "path": [
               "/tmp/out"
             ],
-            "encoding": "GBK"
+			"compress": "gzip",
+            "encoding": "UTF-8"
           }
         },
         "writer": {

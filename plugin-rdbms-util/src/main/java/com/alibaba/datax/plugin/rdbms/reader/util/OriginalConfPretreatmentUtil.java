@@ -27,22 +27,14 @@ public final class OriginalConfPretreatmentUtil
 
     public static void doPretreatment(Configuration originalConfig)
     {
-        // 检查 username/password 配置（必填）
+        // 检查 username 配置（必填）
         originalConfig.getNecessaryValue(Key.USERNAME,
                 DBUtilErrorCode.REQUIRED_VALUE);
         /*
-         *有些数据库没有密码，因此需要可以绕过密码的方式
-         * @NEEDPASSWORD 作为可选项，如果为true，则表示密码是必选项，否则密码为可选项
-         * @PASSFLAG 为废弃选项
+         * 有些数据库没有密码，因此密码不再作为必选项
          */
-        if (originalConfig.getBool(Key.PASSFLAG, true)) {
-            LOG.warn("参数 {} 已经废弃，请尽快使用 {} 参数替代", Key.PASSFLAG, Key.NEEDPASSWORD);
-            originalConfig.getNecessaryValue(Key.PASSWORD,
-                    DBUtilErrorCode.REQUIRED_VALUE);
-        }
-        if (originalConfig.getBool(Key.NEEDPASSWORD, true)) {
-            originalConfig.getNecessaryValue(Key.PASSWORD,
-                    DBUtilErrorCode.REQUIRED_VALUE);
+        if (originalConfig.getString(Key.PASSWORD) == null ) {
+            originalConfig.set(Key.PASSWORD, "");
         }
         dealWhere(originalConfig);
 

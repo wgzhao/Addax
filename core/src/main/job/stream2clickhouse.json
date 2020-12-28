@@ -2,7 +2,7 @@
   "job": {
     "setting": {
       "speed": {
-        "channel": 3
+        "channel": 1
       }
     },
     "content": [
@@ -12,7 +12,6 @@
           "parameter": {
             "username": "default",
             "password": "",
-            "passflag": "false",
             "column": [
               "*"
             ],
@@ -21,7 +20,9 @@
                 "table": [
                   "test_tbl"
                 ],
-                "jdbcUrl": "jdbc:clickhouse://127.0.0.1:8123/default"
+                "jdbcUrl": "jdbc:clickhouse://127.0.0.1:8123/default",
+				"postSql": "select 1",
+				"preSql": "truncate table @table"
               }
             ]
           }

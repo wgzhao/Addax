@@ -7,11 +7,7 @@ public final class Key
     public static final String USERNAME = "username";
 
     public static final String PASSWORD = "password";
-
-    // @decrepated, use NEEDPASSWORD instead
-    public static final String PASSFLAG = "passflag";
-    public static final String NEEDPASSWORD = "needPassword";
-
+    
     public static final String TABLE = "table";
 
     public static final String COLUMN = "column";

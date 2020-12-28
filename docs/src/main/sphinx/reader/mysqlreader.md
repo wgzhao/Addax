@@ -58,8 +58,7 @@ MysqlReader插件实现了从Mysql读取数据。在底层实现上，MysqlReade
 | :-------------- | :------: | ------ |------------- |
 | jdbcUrl         |    是    | 无     | 对端数据库的JDBC连接信息，jdbcUrl按照RDBMS官方规范，并可以填写连接[附件控制信息](http://dev.mysql.com/doc/connector-j/en/connector-j-reference-configuration-properties.html) ｜
 | username        |    是    | 无     | 数据源的用户名 |
-| password        |    是    | 无     | 数据源指定用户名的密码 |
-| passflag        |    否    | true   | 是否强制需要密码，设置为false时，连接数据库将会忽略`password` 配置项 |
+| password        |    否    | 无     | 数据源指定用户名的密码 |
 | table           |    是    | 无     | 所选取的需要同步的表名,使用JSON数据格式，当配置为多张表时，用户自己需保证多张表是同一表结构 |
 | column          |    是    | 无     |  所配置的表中需要同步的列名集合，详细描述[rdbmreader](rdbmsreader.md) ｜
 | splitPk         |    否    | 无     | 使用splitPk代表的字段进行数据分片，详细描述见[rdbmreader](rdbmsreader.md)|
