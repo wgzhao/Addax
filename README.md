@@ -1,6 +1,9 @@
 # DataX
+![datax-log](docs/src/main/sphinx/images/datax-logo.png)
+
 ![Maven Package](https://github.com/wgzhao/DataX/workflows/Maven%20Package/badge.svg) 
 [![Documentation Status](https://readthedocs.org/projects/datax/badge/?version=latest)](https://datax.readthedocs.io/zh_CN/latest/?badge=latest)
+
 
 该项目从阿里的[DataX](https://github.com/alibaba/datax) 而来，经过了精简和改造，说明如下
 
