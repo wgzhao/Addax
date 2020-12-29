@@ -1,12 +1,19 @@
-# DataX
-![datax-log](docs/src/main/sphinx/images/datax-logo.png)
-
-![Maven Package](https://github.com/wgzhao/DataX/workflows/Maven%20Package/badge.svg) 
-[![Documentation Status](https://readthedocs.org/projects/datax/badge/?version=latest)](https://datax.readthedocs.io/zh_CN/latest/?badge=latest)
+<p align="center">
+    <img alt="DataX Logo" src="https://github.com/wgzhao/DataX/blob/master/docs/images/datax-logo.png?raw=true" width="80%" />
+</p>
+<p align="center">DataX 是一个支持主流数据库的通用数据采集工具</p>
+<p align="center"><a href="https://datax.readthedocs.io">使用文档</a> 详细描述了如何安装部署和每个采集插件的使用方法 </p>
+<p align="center">
+   <a href="https://github.com/wgzhao/DataX/workflows/Maven%20Package/badge.svg">
+       <img src="https://github.com/wgzhao/DataX/workflows/Maven%20Package/badge.svg" alt="Maven Package" />
+   </a>
+   <a href="https://datax.readthedocs.io/zh_CN/latest/?badge=latest">
+       <img src="https://readthedocs.org/projects/datax/badge/?version=latest" alt="Documentation Status" />
+   </a>
+</p>
 
 
 该项目从阿里的[DataX](https://github.com/alibaba/datax) 而来，经过了精简和改造，说明如下
-
 
 ## 功能差别说明
 
