@@ -1,0 +1,33 @@
+{
+    "job": {
+        "content": [
+            {
+                "reader": {
+                    "name": "redisreader",
+                    "parameter": {
+                        "connection": [
+                            {
+                                "uri": "tcp://10.60.172.162:6379",
+								"auth": "redis@123"
+                            }
+                        ],
+                        "include":[],
+                        "exclude":[],
+                        "db":[0]
+                    }
+                },
+                "writer": {
+                    "name": "streamwriter",
+                    "parameter": {
+						"print":"true"
+                    }
+                }
+            }
+        ],
+        "setting": {
+            "speed": {
+                "channel": 1
+            }
+        }
+    }
+}
