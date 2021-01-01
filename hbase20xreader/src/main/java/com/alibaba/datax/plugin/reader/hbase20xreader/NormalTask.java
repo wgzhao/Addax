@@ -14,13 +14,12 @@ public class NormalTask
         extends HbaseAbstractTask
 {
     private final List<HbaseColumnCell> hbaseColumnCells;
-    private List<Map> column;
 
     public NormalTask(Configuration configuration)
     {
         super(configuration);
-        this.column = configuration.getList(Key.COLUMN, Map.class);
-        this.hbaseColumnCells = Hbase20xHelper.parseColumnOfNormalMode(this.column);
+        List<Map> column = configuration.getList(Key.COLUMN, Map.class);
+        this.hbaseColumnCells = Hbase20xHelper.parseColumnOfNormalMode(column);
     }
 
     /**

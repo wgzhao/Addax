@@ -1,6 +1,11 @@
 package com.alibaba.datax.plugin.reader.hbase20xreader;
 
-import com.alibaba.datax.common.element.*;
+import com.alibaba.datax.common.element.BoolColumn;
+import com.alibaba.datax.common.element.Column;
+import com.alibaba.datax.common.element.DateColumn;
+import com.alibaba.datax.common.element.DoubleColumn;
+import com.alibaba.datax.common.element.LongColumn;
+import com.alibaba.datax.common.element.StringColumn;
 import com.alibaba.datax.common.exception.DataXException;
 import org.apache.commons.lang.ArrayUtils;
 import org.apache.commons.lang3.time.DateUtils;
