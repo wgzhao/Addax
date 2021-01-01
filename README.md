@@ -51,12 +51,37 @@
 - hdfswriter 在覆盖模式下，改进了文件删除机制，减少了对应表查询为空的时间窗口
 - hdfsreader 增加了对 Parquet 文件格式的支持
 - hdfsreader 增加了更多的文件压缩格式支持
-- hbasex11sqlwrite  增加了 Kerberos 支持
+- hbasex11sqlwrite 增加了 Kerberos 支持
 - oraclewriter 增加对 `merge into` 语法支持(感谢 @weihebu 提供的建议和参考)
 - postgresqlwriter 增加 `insert into ... on conflict` 语法支持 (感谢 @weihebu 提供的建议和参考)
 - 尽可能减少了本地jar包的依赖，转为从maven仓库获取
 - 绝大部分依赖包升级到了最新稳定版本，减少了潜在漏洞
 - 不同插件下的相同依赖包做了版本统一
+
+## 支持的数据库一览表
+
+| 数据库或文件系统   | 读取     | 写入    |  插件名称(reader/writer)     |  备注     |
+|-------------|---------|--------|--------------|----------|
+| Cassander   | 支持     | 支持   |  cassandrareader/cassandrawriter | |
+| ClickHouse  | 支持     | 支持   | clickhousereader/clickhousewriter | |
+| DB2       |支持        | 支持   | rbdmsreader/rdbmswriter | 理论上支持，但未实际测试 |
+| DBF         | 支持     | 支持   | dbffilereader/dbffilewriter | |
+| ElasticSearch | 不支持  | 支持  | elasticsearchwriter | |
+| FTP         | 支持     | 支持  | ftpreader/ftpwriter | |
+| HBase 1.x   | 支持 | 支持 | hbase11xreader/hbase11xwriter| 直接操作HBase |
+| HBase 1.x   | 支持 | 支持 | hbase11xsqlreader/hbase11xsqlwriter| 通过[Phoenix](https://phoenix.apache.org)操作HBase |
+| HBase 2.x   | 支持 | 不支持 | hbase20xreader | 直接操作HBase |
+| HBase 2.x   | 支持 | 支持 | hbase20xsqlreader/hbase20xsqlwriter| 通过[Phoenix](https://phoenix.apache.org)操作HBase |
+| HDFS        | 支持 | 支持 | hdfsreader/hdfswriter | HDFS 2.x 以上版本 |
+| json        | 支持 | 不支持 | jsonfilereader | |
+| MongoDB     | 支持 | 支持 | mongodbreader/mongodbwriter | |
+| MySQL/MariaDB | 支持 | 支持 | mysqlreader/mysqlwriter | |
+| Oracle      | 支持 | 支持 | oraclereader/oraclewriter | |
+| PostgreSQL  | 支持 | 支持 | postgresqlreader/postgresqlwriter | |
+| PrestoSQL  | 支持 | 支持 | rdbmsreader/rdbmswriter | [trino(原PrestoSQL)](https://trino.io) 310以上 |
+| SQL Server  |支持 | 支持 | sqlserverreader/sqlserverwriter | |
+| TDH Inceptor2 | 支持 | 支持 | rdbmsreader/rdbmswriter | [星环 TDH](http://transwarp.cn/transwarp/product-TDH.html?categoryId=18) 5.1以上版本 |
+| TEXT       | 支持 | 支持 | textfilereader/textfilewriter | |
 
 ## 快速开始
 
@@ -71,7 +96,6 @@
 | 3.1.4 | https://pan.baidu.com/s/1_plsvzD_GrWN-HffPBtz-g 提取码: kpjn | 7aca526fe7f6f0f54dc467f6ca1647b1 |
 | 3.1.2 | https://pan.baidu.com/s/1zFqv8E6iJX549zdSZDQgiQ 提取码: 7jdk | 3674711fc9b68fad3086f3c8526a3427 |
 | 3.1.1 | https://pan.baidu.com/s/1GwmFA7-hPkd6GKiZEvUKXg 提取码: 1inn | 0fa4e7902420704b2e814fef098f40ae |
-
 
 ### 编译及打包
 
@@ -256,7 +280,7 @@ DataX	19890604	1989-06-04 00:00:00	true	test
 
 ## 文档
 
-- [在线文档](https://datax.readthedocs.io)  
+- [在线文档](https://datax.readthedocs.io)
 - [项目内文档](docs/src/main/sphinx/index.rst)
 
 ## License
