@@ -1,30 +1,41 @@
 # Hbase11XReader 插件文档
 
-## 1 快速介绍
+HbaseReader 插件实现了从 Hbase中读取数据。在底层实现上，HbaseReader 通过 HBase 的 Java 客户端连接远程 HBase 服务，并通过 Scan 方式读取你指定 rowkey 范围内的数据，
+并将读取的数据使用 DataX 自定义的数据类型拼装为抽象的数据集，并传递给下游 Writer 处理。
 
-HbaseReader 插件实现了从 Hbase中读取数据。在底层实现上，HbaseReader 通过 HBase 的 Java 客户端连接远程 HBase 服务，并通过 Scan 方式读取你指定 rowkey 范围内的数据，并将读取的数据使用 DataX 自定义的数据类型拼装为抽象的数据集，并传递给下游 Writer 处理。
+## 配置
 
 以下演示基于下面创建的表以及数据
 
 ```shell
-create 'users', 'address','info'
-put 'users', 'lisi', 'address:country', 'china'
-put 'users', 'lisi', 'address:province',    'beijing'
-put 'users', 'lisi', 'info:age',        27
-put 'users', 'lisi', 'info:birthday',   '1987-06-17'
-put 'users', 'lisi', 'info:company',    'baidu'
-put 'users', 'xiaoming', 'address:city',    'hangzhou'
-put 'users', 'xiaoming', 'address:country', 'china'
-put 'users', 'xiaoming', 'address:province',    'zhejiang'
-put 'users', 'xiaoming', 'info:age',        29
-put 'users', 'xiaoming', 'info:birthday',   '1987-06-17'
-put 'users', 'xiaoming', 'info:company',    'alibaba'
+create 'users', {NAME=>'address', VERSIONS=>100},{NAME=>'info',VERSIONS=>1000}
+put 'users', 'lisi', 'address:country', 'china1', 20200101
+put 'users', 'lisi', 'address:province',    'beijing1', 20200101
+put 'users', 'lisi', 'info:age',        27, 20200101
+put 'users', 'lisi', 'info:birthday',   '1987-06-17', 20200101
+put 'users', 'lisi', 'info:company',    'baidu1', 20200101
+put 'users', 'xiaoming', 'address:city',    'hangzhou1', 20200101
+put 'users', 'xiaoming', 'address:country', 'china1', 20200101
+put 'users', 'xiaoming', 'address:province',    'zhejiang1',20200101
+put 'users', 'xiaoming', 'info:age',        29, 20200101
+put 'users', 'xiaoming', 'info:birthday',   '1987-06-17',20200101
+put 'users', 'xiaoming', 'info:company',    'alibaba1', 20200101
+put 'users', 'lisi', 'address:country', 'china2', 20200102
+put 'users', 'lisi', 'address:province',    'beijing2', 20200102
+put 'users', 'lisi', 'info:age',        27, 20200102
+put 'users', 'lisi', 'info:birthday',   '1987-06-17', 20200102
+put 'users', 'lisi', 'info:company',    'baidu2', 20200102
+put 'users', 'xiaoming', 'address:city',    'hangzhou2', 20200102
+put 'users', 'xiaoming', 'address:country', 'china2', 20200102
+put 'users', 'xiaoming', 'address:province',    'zhejiang2', 20200102
+put 'users', 'xiaoming', 'info:age',        29, 20200102
+put 'users', 'xiaoming', 'info:birthday',   '1987-06-17', 20200102
+put 'users', 'xiaoming', 'info:company',    'alibaba2', 20200102
 ```
 
-### 1.1  支持模式
 目前HbaseReader支持两模式读取：normal 模式、multiVersionFixedColumn模式；
 
-#### normal 模式
+### normal 模式
 
 把HBase中的表，当成普通二维表（横表）进行读取,读取最新版本数据。如：
 
@@ -55,7 +66,7 @@ ROW           COLUMN+CELL
 | xiaoming | hangzhou    | china          | zhejiang         | 29       | 1987-06-17    | alibaba      |
 
 
-#### multiVersionFixedColumn模式
+### multiVersionFixedColumn 模式
 
 把HBase中的表，当成竖表进行读取。读出的每条记录一定是四列形式，依次为：`rowKey`，`family:qualifier`，`timestamp`，`value`。
 
@@ -98,19 +109,6 @@ ROW                                   COLUMN+CELL
  | xiaoming | info:birthday    | 1457082186830 | 1987-06-17 |
  | xiaoming | info:company     | 1457082189826 | alibaba    |
 
-### 1.2 限制
-
-1. 目前不支持动态列的读取。考虑网络传输流量（支持动态列，需要先将hbase所有列的数据读取出来，再按规则进行过滤），现支持的两种读取模式中需要用户明确指定要读取的列。
-2. 关于同步作业的切分：目前的切分方式是根据用户hbase表数据的region分布进行切分。即：在用户填写的 `[startrowkey，endrowkey］` 范围内，一个region会切分成一个task，单个region不进行切分。 
-3. multiVersionFixedColumn模式下不支持增加常量列
-
-## 2 实现原理
-
-简而言之，HbaseReader 通过 HBase 的 Java 客户端，通过 HTable, Scan, ResultScanner 等 API，读取你指定 rowkey 范围内的数据，并将读取的数据使用 DataX 自定义的数据类型拼装为抽象的数据集，并传递给下游 Writer 处理。hbase11xreader与hbase094xreader的主要不同在于API的调用不同，Hbase1.1.x废弃了很多Hbase0.94.x的api。
-
-## 3 功能说明
-
-### 3.1 配置样例
 
 配置一个从 HBase 抽取数据到本地的作业:（normal 模式）
 
@@ -258,7 +256,7 @@ ROW                                   COLUMN+CELL
 }
 ```
 
-### 3.2 参数说明
+## 参数说明
 
 | 配置项        | 是否必须 | 默认值 | 描述                                                                                                                              |
 | :------------ | :------: | ------ | --------------------------------------------------------------------------------------------------------------------------------- |
@@ -272,7 +270,7 @@ ROW                                   COLUMN+CELL
 | scanCacheSize |    否    | 256    | Hbase client每次rpc从服务器端读取的行数                                                                                           |
 | scanBatchSize |    否    | 100    | Hbase client每次rpc从服务器端读取的列数                                                                                           |
   
-#### column
+### column
 
 描述：要读取的hbase字段，normal 模式与multiVersionFixedColumn 模式下必填项。 
 
@@ -281,17 +279,18 @@ ROW                                   COLUMN+CELL
 name指定读取的hbase列，除了rowkey外，必须为 列族:列名 的格式，type指定源数据的类型，format指定日期类型的格式，value指定当前类型为常量，不从hbase读取数据，而是根据value值自动生成对应的列。配置格式如下：
 
 ```json
-"column":
-[
-    {
-        "name": "rowkey",
-        "type": "string"
-    },
-    {
-        "value": "test",
-        "type": "string"
-    }
-]
+{
+ "column": [
+  {
+   "name": "rowkey",
+   "type": "string"
+  },
+  {
+   "value": "test",
+   "type": "string"
+  }
+ ]
+}
 ```
 
 normal 模式下，对于用户指定Column信息，type必须填写，name/value必须选择其一。    
@@ -301,19 +300,23 @@ normal 模式下，对于用户指定Column信息，type必须填写，name/valu
 name指定读取的hbase列，除了rowkey外，必须为 列族:列名 的格式，type指定源数据的类型，format指定日期类型的格式 。multiVersionFixedColumn模式下不支持常量列。配置格式如下：
 
 ```json
-"column": [
-    {
-        "name": "rowkey",
-        "type": "string"
-    },
-    {
-        "name": "info: age",
-        "type": "string"
-    }
-]
+{
+ "mode": "multiVersionFixedColumn",
+ "maxVersion": 3,
+ "column": [
+  {
+   "name": "rowkey",
+   "type": "string"
+  },
+  {
+   "name": "info: age",
+   "type": "string"
+  }
+ ]
+}
 ```
 
-#### range
+### range
 
 指定hbasereader读取的rowkey范围  
 
@@ -324,14 +327,16 @@ name指定读取的hbase列，除了rowkey外，必须为 列族:列名 的格�
 配置格式如下：
 
 ```json
-"range": {
+{
+ "range": {
   "startRowkey": "aaa",
   "endRowkey": "ccc",
-  "isBinaryRowkey":false
+  "isBinaryRowkey": false
+ }
 }
 ```
 
-### 3.3 类型转换
+## 类型转换
 
 下面列出支持的读取HBase数据类型，HbaseReader 针对 HBase 类型转换列表:
 
@@ -346,3 +351,9 @@ name指定读取的hbase列，除了rowkey外，必须为 列族:列名 的格�
 请注意:
 
 `除上述罗列字段类型外，其他类型均不支持`
+
+## 限制
+
+1. 目前不支持动态列的读取。考虑网络传输流量（支持动态列，需要先将hbase所有列的数据读取出来，再按规则进行过滤），现支持的两种读取模式中需要用户明确指定要读取的列。
+2. 关于同步作业的切分：目前的切分方式是根据用户hbase表数据的region分布进行切分。即：在用户填写的 `[startrowkey，endrowkey］` 范围内，一个region会切分成一个task，单个region不进行切分。
+3. multiVersionFixedColumn模式下不支持增加常量列

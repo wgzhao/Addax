@@ -8,8 +8,8 @@ import com.alibaba.datax.common.spi.ErrorCode;
 public enum Hbase20xReaderErrorCode
         implements ErrorCode
 {
-    REQUIRED_VALUE("Hbase11xReader-00", "您缺失了必须填写的参数值."),
-    ILLEGAL_VALUE("Hbase11xReader-01", "您填写的参数值不合法."),
+    REQUIRED_VALUE("Hbase20xReader-00", "您缺失了必须填写的参数值."),
+    ILLEGAL_VALUE("Hbase20xReader-01", "您填写的参数值不合法."),
     PREPAR_READ_ERROR("HbaseReader-02", "准备读取 Hbase 时出错."),
     SPLIT_ERROR("HbaseReader-03", "切分 Hbase 表时出错."),
     GET_HBASE_CONNECTION_ERROR("HbaseReader-04", "获取Hbase连接时出错."),
@@ -23,7 +23,7 @@ public enum Hbase20xReaderErrorCode
     private final String code;
     private final String description;
 
-    private Hbase20xReaderErrorCode(String code, String description)
+    Hbase20xReaderErrorCode(String code, String description)
     {
         this.code = code;
         this.description = description;

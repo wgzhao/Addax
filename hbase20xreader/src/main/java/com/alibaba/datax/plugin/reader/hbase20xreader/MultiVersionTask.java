@@ -17,22 +17,20 @@ import java.util.Map;
 public abstract class MultiVersionTask
         extends HbaseAbstractTask
 {
-    private static byte[] COLON_BYTE;
-
+    private static final byte[] colonByte = ":".getBytes(StandardCharsets.UTF_8);
+    public static List<Map> column;
     private final int maxVersion;
     private final HashMap<String, HashMap<String, String>> familyQualifierMap;
-    public List<Map> column;
     private Cell[] cellArr = null;
     private int currentReadPosition = 0;
 
-    public MultiVersionTask(Configuration configuration)
+    protected MultiVersionTask(Configuration configuration)
     {
         super(configuration);
+
         this.maxVersion = configuration.getInt(Key.MAX_VERSION);
         this.column = configuration.getList(Key.COLUMN, Map.class);
         this.familyQualifierMap = Hbase20xHelper.parseColumnOfMultiversionMode(this.column);
-
-        MultiVersionTask.COLON_BYTE = ":".getBytes(StandardCharsets.UTF_8);
     }
 
     @Override
@@ -69,11 +67,11 @@ public abstract class MultiVersionTask
     {
         byte[] rawRowkey = CellUtil.cloneRow(cell);
         long timestamp = cell.getTimestamp();
-        byte[] cfAndQualifierName = Bytes.add(CellUtil.cloneFamily(cell), MultiVersionTask.COLON_BYTE, CellUtil.cloneQualifier(cell));
+        byte[] cfAndQualifierName = Bytes.add(CellUtil.cloneFamily(cell), MultiVersionTask.colonByte, CellUtil.cloneQualifier(cell));
         byte[] columnValue = CellUtil.cloneValue(cell);
 
         ColumnType rawRowkeyType = ColumnType.getByTypeName(familyQualifierMap.get(Constant.ROWKEY_FLAG).get(Key.TYPE));
-        String familyQualifier = new String(cfAndQualifierName, Constant.DEFAULT_ENCODING);
+        String familyQualifier = new String(cfAndQualifierName, StandardCharsets.UTF_8);
         ColumnType columnValueType = ColumnType.getByTypeName(familyQualifierMap.get(familyQualifier).get(Key.TYPE));
         String columnValueFormat = familyQualifierMap.get(familyQualifier).get(Key.FORMAT);
         if (StringUtils.isBlank(columnValueFormat)) {
@@ -90,10 +88,10 @@ public abstract class MultiVersionTask
     public void setMaxVersions(Scan scan)
     {
         if (this.maxVersion == -1 || this.maxVersion == Integer.MAX_VALUE) {
-            scan.setMaxVersions();
+            scan.readAllVersions();
         }
         else {
-            scan.setMaxVersions(this.maxVersion);
+            scan.readVersions(this.maxVersion);
         }
     }
 }

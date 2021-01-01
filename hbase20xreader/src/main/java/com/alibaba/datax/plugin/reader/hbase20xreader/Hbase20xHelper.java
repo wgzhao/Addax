@@ -9,7 +9,12 @@ import org.apache.commons.lang3.Validate;
 import org.apache.hadoop.hbase.HBaseConfiguration;
 import org.apache.hadoop.hbase.HConstants;
 import org.apache.hadoop.hbase.TableName;
-import org.apache.hadoop.hbase.client.*;
+import org.apache.hadoop.hbase.client.Admin;
+import org.apache.hadoop.hbase.client.Connection;
+import org.apache.hadoop.hbase.client.ConnectionFactory;
+import org.apache.hadoop.hbase.client.RegionLocator;
+import org.apache.hadoop.hbase.client.ResultScanner;
+import org.apache.hadoop.hbase.client.Table;
 import org.apache.hadoop.hbase.util.Bytes;
 import org.apache.hadoop.hbase.util.Pair;
 import org.slf4j.Logger;
@@ -65,14 +70,13 @@ public class Hbase20xHelper
         org.apache.hadoop.hbase.client.Connection hConnection = Hbase20xHelper.getHbaseConnection(hbaseConfig);
         TableName hTableName = TableName.valueOf(userTable);
         org.apache.hadoop.hbase.client.Admin admin = null;
-        org.apache.hadoop.hbase.client.Table hTable = null;
+        org.apache.hadoop.hbase.client.Table hTable;
         try {
             admin = hConnection.getAdmin();
             Hbase20xHelper.checkHbaseTable(admin, hTableName);
             hTable = hConnection.getTable(hTableName);
         }
         catch (Exception e) {
-            Hbase20xHelper.closeTable(hTable);
             Hbase20xHelper.closeAdmin(admin);
             Hbase20xHelper.closeConnection(hConnection);
             throw DataXException.asDataXException(Hbase20xReaderErrorCode.GET_HBASE_TABLE_ERROR, e);
@@ -87,14 +91,13 @@ public class Hbase20xHelper
         org.apache.hadoop.hbase.client.Connection hConnection = Hbase20xHelper.getHbaseConnection(hbaseConfig);
         TableName hTableName = TableName.valueOf(userTable);
         org.apache.hadoop.hbase.client.Admin admin = null;
-        RegionLocator regionLocator = null;
+        RegionLocator regionLocator;
         try {
             admin = hConnection.getAdmin();
             Hbase20xHelper.checkHbaseTable(admin, hTableName);
             regionLocator = hConnection.getRegionLocator(hTableName);
         }
         catch (Exception e) {
-            Hbase20xHelper.closeRegionLocator(regionLocator);
             Hbase20xHelper.closeAdmin(admin);
             Hbase20xHelper.closeConnection(hConnection);
             throw DataXException.asDataXException(Hbase20xReaderErrorCode.GET_HBASE_REGINLOCTOR_ERROR, e);
@@ -256,7 +259,10 @@ public class Hbase20xHelper
                 if (dateformat == null) {
                     dateformat = Constant.DEFAULT_DATA_FORMAT;
                 }
-                Validate.isTrue(StringUtils.isNotBlank(columnName) || StringUtils.isNotBlank(columnValue), "Hbasereader 在 normal 方式读取时则要么是 type + name + format 的组合，要么是type + value + format 的组合. 而您的配置非这两种组合，请检查并修改.");
+                Validate.isTrue(StringUtils.isNotBlank(columnName)
+                        || StringUtils.isNotBlank(columnValue),
+                        "Hbasereader 在 normal 方式读取时则要么是 type + name + format 的组合，" +
+                                "要么是type + value + format 的组合. 而您的配置非这两种组合，请检查并修改.");
 
                 oneColumnCell = new HbaseColumnCell
                         .Builder(type)
@@ -266,7 +272,10 @@ public class Hbase20xHelper
                         .build();
             }
             else {
-                Validate.isTrue(StringUtils.isNotBlank(columnName) || StringUtils.isNotBlank(columnValue), "Hbasereader 在 normal 方式读取时，其列配置中，如果类型不是时间，则要么是 type + name 的组合，要么是type + value 的组合. 而您的配置非这两种组合，请检查并修改.");
+                Validate.isTrue(StringUtils.isNotBlank(columnName)
+                        || StringUtils.isNotBlank(columnValue),
+                        "Hbasereader 在 normal 方式读取时，其列配置中，如果类型不是时间，" +
+                                "则要么是 type + name 的组合，要么是type + value 的组合. 而您的配置非这两种组合，请检查并修改.");
                 oneColumnCell = new HbaseColumnCell.Builder(type)
                         .columnName(columnName)
                         .columnValue(columnValue)
@@ -481,11 +490,12 @@ public class Hbase20xHelper
         String mode = originalConfig.getNecessaryValue(Key.MODE, Hbase20xReaderErrorCode.REQUIRED_VALUE);
         List<Map> column = originalConfig.getList(Key.COLUMN, Map.class);
         if (column == null || column.isEmpty()) {
-            throw DataXException.asDataXException(Hbase20xReaderErrorCode.REQUIRED_VALUE, "您配置的column为空,Hbase必须配置 column，其形式为：column:[{\"name\": \"cf0:column0\",\"type\": \"string\"},{\"name\": \"cf1:column1\",\"type\": \"long\"}]");
+            throw DataXException.asDataXException(Hbase20xReaderErrorCode.REQUIRED_VALUE,
+                    "您配置的column为空,Hbase必须配置 column，其形式为：column:[{\"name\": \"cf0:column0\",\"type\": \"string\"},{\"name\": \"cf1:column1\",\"type\": \"long\"}]");
         }
         ModeType modeType = ModeType.getByTypeName(mode);
         switch (modeType) {
-            case Normal: {
+            case NORMAL: {
                 // normal 模式不需要配置 maxVersion，需要配置 column，并且 column 格式为 Map 风格
                 String maxVersion = originalConfig.getString(Key.MAX_VERSION);
                 Validate.isTrue(maxVersion == null, "您配置的是 normal 模式读取 hbase 中的数据，所以不能配置无关项：maxVersion");
@@ -493,7 +503,7 @@ public class Hbase20xHelper
                 Hbase20xHelper.parseColumnOfNormalMode(column);
                 break;
             }
-            case MultiVersionFixedColumn: {
+            case MULTI_VERSION_FIXED_COLUMN: {
                 // multiVersionFixedColumn 模式需要配置 maxVersion
                 checkMaxVersion(originalConfig, mode);
 
