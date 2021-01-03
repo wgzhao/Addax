@@ -330,6 +330,10 @@ public class CommonRdbmsReader
                             record.addColumn(new StringColumn(stringData));
                             break;
 
+                        case Types.ARRAY:
+                            record.addColumn(new StringColumn(rs.getArray(i).toString()));
+                            break;
+
                         default:
                             throw DataXException
                                     .asDataXException(
