@@ -280,7 +280,6 @@ public class CommonRdbmsWriter
                 for (String column : columnsOne) {
                     mergeColumns.add(i++, column);
                 }
-                i = 0;
                 for (String column : columnsTwo) {
                     mergeColumns.add(i++, column);
                 }
@@ -377,6 +376,7 @@ public class CommonRdbmsWriter
                 connection.setAutoCommit(false);
                 preparedStatement = connection
                         .prepareStatement(this.writeRecordSql);
+                LOG.info("writeRecordSql="+this.writeRecordSql);
                 if (this.dataBaseType == DataBaseType.Oracle &&
                         ! "insert".equalsIgnoreCase(this.writeMode))
                 {
@@ -400,6 +400,7 @@ public class CommonRdbmsWriter
                         for (int j = 0; j < recordOne.size(); j++) {
                             record.setColumn(j, recordOne.get(j));
                         }
+                        LOG.info("record="+record.toString());
                         preparedStatement = fillPreparedStatement(
                                 preparedStatement, record);
                         preparedStatement.addBatch();
