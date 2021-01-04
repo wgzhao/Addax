@@ -76,7 +76,8 @@ HBase20xsqlwriter实现了向hbase中的SQL表(phoenix)批量导入数据的功�
     ],
     "setting": {
       "speed": {
-        "channel": 5
+        "channel": 5,
+        "bytes": -1
       }
     }
   }

@@ -1,4 +1,3 @@
-
 # MysqlReader 插件文档
 
 ## 1 快速介绍
@@ -21,34 +20,46 @@ MysqlReader插件实现了从Mysql读取数据。在底层实现上，MysqlReade
 
 ```json
 {
-"job": {
+  "job": {
     "setting": {
-        "speed": {
-            "channel": 3
-        }
+      "speed": {
+        "channel": 3,
+        "bytes": -1
+      }
     },
-    "content": [{
+    "content": [
+      {
         "reader": {
-            "name": "mysqlreader",
-            "parameter": {
-                "username": "root",
-                "password": "root",
-                "column": [ "id","name" ],
-                "splitPk": "db_id",
-                "connection": [{
-                    "table": ["table"],
-                    "jdbcUrl": ["jdbc:mysql://127.0.0.1:3306/database"]
-                }]
-            }
+          "name": "mysqlreader",
+          "parameter": {
+            "username": "root",
+            "password": "root",
+            "column": [
+              "id",
+              "name"
+            ],
+            "splitPk": "db_id",
+            "connection": [
+              {
+                "table": [
+                  "table"
+                ],
+                "jdbcUrl": [
+                  "jdbc:mysql://127.0.0.1:3306/database"
+                ]
+              }
+            ]
+          }
         },
         "writer": {
-            "name": "streamwriter",
-            "parameter": {
-                "print":true
-            }
+          "name": "streamwriter",
+          "parameter": {
+            "print": true
+          }
         }
-    }]
-}
+      }
+    ]
+  }
 }
 ```
 

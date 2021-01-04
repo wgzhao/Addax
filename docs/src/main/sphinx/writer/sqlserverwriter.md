@@ -2,7 +2,7 @@
 
 ## 1 快速介绍
 
-SqlServerWriter 插件实现了写入数据到 SqlServer 库的目的表的功能。在底层实现上， SqlServerWriter 通过 JDBC 连接远程 SqlServer 数据库，并执行相应的 insert into ...  sql 语句将数据写入 SqlServer，内部会分批次提交入库。
+SqlServerWriter 插件实现了写入数据到 SqlServer 库的目的表的功能。在底层实现上， SqlServerWriter 通过 JDBC 连接远程 SqlServer 数据库，并执行相应的 insert into ... sql 语句将数据写入 SqlServer，内部会分批次提交入库。
 
 SqlServerWriter 面向ETL开发工程师，他们使用 SqlServerWriter 从数仓导入数据到 SqlServer。同时 SqlServerWriter 亦可以作为数据迁移工具为DBA等用户提供服务。
 
@@ -23,53 +23,54 @@ SqlServerWriter 通过 DataX 框架获取 Reader 生成的协议数据，根据�
 
 ```json
 {
-    "job": {
-        "setting": {
-            "speed": {
-                "channel": 5
-            }
-        },
-        "content": [
-            {
-                "reader": {},
-                "writer": {
-                    "name": "sqlserverwriter",
-                    "parameter": {
-                        "username": "root",
-                        "password": "root",
-                        "column": [
-                            "db_id",
-                            "db_type",
-                            "db_ip",
-                            "db_port",
-                            "db_role",
-                            "db_name",
-                            "db_username",
-                            "db_password",
-                            "db_modify_time",
-                            "db_modify_user",
-                            "db_description",
-                            "db_tddl_info"
-                        ],
-                        "connection": [
-                            {
-                                "table": [
-                                    "db_info_for_writer"
-                                ],
-                                "jdbcUrl": "jdbc:sqlserver://[HOST_NAME]:PORT;DatabaseName=[DATABASE_NAME]"
-                            }
-                        ],
-                        "preSql": [
-                            "delete from @table where db_id = -1;"
-                        ],
-                        "postSql": [
-                            "update @table set db_modify_time = now() where db_id = 1;"
-                        ]
-                    }
-                }
-            }
-        ]
-    }
+  "job": {
+    "setting": {
+      "speed": {
+        "channel": 1,
+        "bytes": -1
+      }
+    },
+    "content": [
+      {
+        "reader": {},
+        "writer": {
+          "name": "sqlserverwriter",
+          "parameter": {
+            "username": "root",
+            "password": "root",
+            "column": [
+              "db_id",
+              "db_type",
+              "db_ip",
+              "db_port",
+              "db_role",
+              "db_name",
+              "db_username",
+              "db_password",
+              "db_modify_time",
+              "db_modify_user",
+              "db_description",
+              "db_tddl_info"
+            ],
+            "connection": [
+              {
+                "table": [
+                  "db_info_for_writer"
+                ],
+                "jdbcUrl": "jdbc:sqlserver://[HOST_NAME]:PORT;DatabaseName=[DATABASE_NAME]"
+              }
+            ],
+            "preSql": [
+              "delete from @table where db_id = -1;"
+            ],
+            "postSql": [
+              "update @table set db_modify_time = now() where db_id = 1;"
+            ]
+          }
+        }
+      }
+    ]
+  }
 }
 
 ```

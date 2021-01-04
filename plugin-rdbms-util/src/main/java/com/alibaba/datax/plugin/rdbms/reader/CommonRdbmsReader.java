@@ -232,14 +232,13 @@ public class CommonRdbmsReader
             // do nothing
         }
 
-        protected Record transportOneRecord(RecordSender recordSender, ResultSet rs,
+        protected void transportOneRecord(RecordSender recordSender, ResultSet rs,
                 ResultSetMetaData metaData, int columnNumber, String mandatoryEncoding,
                 TaskPluginCollector taskPluginCollector)
         {
             Record record = buildRecord(recordSender, rs, metaData, columnNumber,
                     mandatoryEncoding, taskPluginCollector);
             recordSender.sendToWriter(record);
-            return record;
         }
 
         protected Record buildRecord(RecordSender recordSender, ResultSet rs, ResultSetMetaData metaData,
@@ -285,8 +284,17 @@ public class CommonRdbmsReader
                         case Types.DECIMAL:
                         case Types.FLOAT:
                         case Types.REAL:
-                        case Types.DOUBLE:
                             record.addColumn(new DoubleColumn(rs.getString(i)));
+                            break;
+
+                        case Types.DOUBLE:
+                            if ("money".equalsIgnoreCase(metaData.getColumnTypeName(i))) {
+                                // remove currency nonation($) and currency formatting nonation(,)
+                                // TODO process it more elegantly
+                                record.addColumn(new DoubleColumn(rs.getString(i).substring(1).replace(",","")));
+                            } else {
+                                record.addColumn(new DoubleColumn(rs.getString(i)));
+                            }
                             break;
 
                         case Types.TIME:
@@ -315,11 +323,18 @@ public class CommonRdbmsReader
                             record.addColumn(new BytesColumn(rs.getBytes(i)));
                             break;
 
-                        // warn: bit(1) -> Types.BIT 可使用BoolColumn
-                        // warn: bit(>1) -> Types.VARBINARY 可使用BytesColumn
                         case Types.BOOLEAN:
-                        case Types.BIT:
                             record.addColumn(new BoolColumn(rs.getBoolean(i)));
+                            break;
+                        case Types.BIT:
+                            // bit(1) -> Types.BIT 可使用BoolColumn
+                            // bit(>1) -> Types.VARBINARY 可使用BytesColumn
+                            if (metaData.getPrecision(i) == 1) {
+                                record.addColumn(new BoolColumn(rs.getBoolean(i)));
+                            }
+                            else {
+                                record.addColumn(new BytesColumn(rs.getBytes(i)));
+                            }
                             break;
 
                         case Types.NULL:
@@ -330,14 +345,39 @@ public class CommonRdbmsReader
                             record.addColumn(new StringColumn(stringData));
                             break;
 
+                        case Types.ARRAY:
+                            record.addColumn(new StringColumn(rs.getArray(i).toString()));
+                            break;
+
+                        case Types.JAVA_OBJECT:
+                            record.addColumn(new StringColumn(rs.getObject(i).toString()));
+                            break;
+
+                        case Types.SQLXML:
+                            record.addColumn(new StringColumn(rs.getSQLXML(i).toString()));
+                            break;
+
+                        case Types.OTHER:
+                            // database-specific type, convert it to string as default
+                            if ("image".equals(metaData.getColumnTypeName(i))) {
+                                record.addColumn(new BytesColumn(rs.getBytes(i)));
+                            } else {
+                                record.addColumn(new StringColumn(rs.getObject(i).toString()));
+                            }
+                            break;
+
                         default:
                             throw DataXException
                                     .asDataXException(
                                             DBUtilErrorCode.UNSUPPORTED_TYPE,
                                             String.format(
-                                                    "您的配置文件中的列配置信息有误. 因为DataX 不支持数据库读取这种字段类型. 字段名:[%s], 字段名称:[%s], 字段Java类型:[%s]. 请尝试使用数据库函数将其转换datax支持的类型 或者不同步该字段 .",
+                                                    "您的配置文件中的列配置信息有误. 因为DataX 不支持数据库读取这种字段类型. " +
+                                                            "字段名:[%s], 字段类型:[%s], " +
+                                                            "字段类型名称:[%s], 字段Java类型:[%s]. " +
+                                                            "请尝试使用数据库函数将其转换datax支持的类型 或者不同步该字段 .",
                                                     metaData.getColumnName(i),
                                                     metaData.getColumnType(i),
+                                                    metaData.getColumnTypeName(i),
                                                     metaData.getColumnClassName(i)));
                     }
                 }

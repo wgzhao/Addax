@@ -1,4 +1,4 @@
-# hbase20xsqlreader  插件文档
+# hbase20xsqlreader 插件文档
 
 ## 1 快速介绍
 
@@ -16,34 +16,38 @@ hbase20xsqlreader插件实现了从Phoenix(HBase SQL)读取数据，对应版本
 
 ```json
 {
-    "job": {
-        "content": [
-            {
-                "reader": {
-                    "name": "hbase20xsqlreader",  
-                    "parameter": {
-                        "queryServerAddress": "http://127.0.0.1:8765",
-                        "serialization": "PROTOBUF",  
-                        "table": "TEST",
-                        "column": ["ID", "NAME"],
-                        "splitKey": "ID"
-                    }
-                },
-                "writer": {
-                    "name": "streamwriter",
-                    "parameter": {
-                        "encoding": "UTF-8",
-                        "print": true
-                    }
-                }
-            }
-        ],
-        "setting": {
-            "speed": {
-                "channel": "3"
-            }
+  "job": {
+    "content": [
+      {
+        "reader": {
+          "name": "hbase20xsqlreader",
+          "parameter": {
+            "queryServerAddress": "http://127.0.0.1:8765",
+            "serialization": "PROTOBUF",
+            "table": "TEST",
+            "column": [
+              "ID",
+              "NAME"
+            ],
+            "splitKey": "ID"
+          }
+        },
+        "writer": {
+          "name": "streamwriter",
+          "parameter": {
+            "encoding": "UTF-8",
+            "print": true
+          }
         }
+      }
+    ],
+    "setting": {
+      "speed": {
+        "channel": 3,
+        "bytes": -1
+      }
     }
+  }
 }
 ```
 
