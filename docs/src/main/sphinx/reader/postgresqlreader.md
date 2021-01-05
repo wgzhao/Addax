@@ -87,6 +87,7 @@ insert into datax_tbl values(
             "column": [
               "*"
             ],
+            "splitPk": "id",
             "connection": [
               {
                 "table": [
