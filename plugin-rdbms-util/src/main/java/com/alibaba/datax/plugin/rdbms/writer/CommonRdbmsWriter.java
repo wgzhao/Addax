@@ -266,7 +266,6 @@ public class CommonRdbmsWriter
                 List<String> columnsTwo = new ArrayList<>();
                 String merge = this.writeMode;
                 String[] sArray = WriterUtil.getStrings(merge);
-                int i = 0;
                 for (String s : this.columns) {
                     if (Arrays.asList(sArray).contains(s)) {
                         columnsOne.add(s);
@@ -277,10 +276,10 @@ public class CommonRdbmsWriter
                         columnsTwo.add(s);
                     }
                 }
+                int i = 0;
                 for (String column : columnsOne) {
                     mergeColumns.add(i++, column);
                 }
-                i = 0;
                 for (String column : columnsTwo) {
                     mergeColumns.add(i++, column);
                 }
@@ -469,7 +468,8 @@ public class CommonRdbmsWriter
         {
             for (int i = 0; i < record.getColumnNumber(); i++) {
                 int columnSqltype = this.resultSetMetaData.getMiddle().get(i);
-                preparedStatement = fillPreparedStatementColumnType(preparedStatement, i, columnSqltype, record.getColumn(i));
+                preparedStatement = fillPreparedStatementColumnType(preparedStatement, i,
+                        columnSqltype, record.getColumn(i));
             }
             return preparedStatement;
         }
