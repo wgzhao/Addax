@@ -1,4 +1,3 @@
-
 # PostgresqlReader 插件文档
 
 ## 1 快速介绍
@@ -15,50 +14,57 @@ PostgresqlReader插件实现了从PostgreSQL读取数据。在底层实现上，
 
 ### 3.1 配置样例
 
+假定建表语句如下：
+
+```sql
+
+```
+
 配置一个从PostgreSQL数据库同步抽取数据到本地的作业:
 
 ```json
 {
-    "job": {
-        "setting": {
-            "speed": {
-                 "byte": 1048576
-            }
+  "job": {
+    "setting": {
+      "speed": {
+        "byte": -1,
+        "channel": 1
+      }
+    },
+    "content": [
+      {
+        "reader": {
+          "name": "postgresqlreader",
+          "parameter": {
+            "username": "xx",
+            "password": "xx",
+            "column": [
+              "id",
+              "name"
+            ],
+            "splitPk": "id",
+            "connection": [
+              {
+                "table": [
+                  "table"
+                ],
+                "jdbcUrl": [
+                  "jdbc:postgresql://host:port/database"
+                ]
+              }
+            ]
+          }
         },
-        "content": [
-            {
-                "reader": {
-                    "name": "postgresqlreader",
-                    "parameter": {
-                        "username": "xx",
-                        "password": "xx",
-                        "column": [
-                            "id", "name"
-                        ],
-                        "splitPk": "id",
-                        "connection": [
-                            {
-                                "table": [
-                                    "table"
-                                ],
-                                "jdbcUrl": [
-                "jdbc:postgresql://host:port/database"
-                                ]
-                            }
-                        ]
-                    }
-                },
-               "writer": {
-                    "name": "streamwriter",
-                    "parameter": {
-                        "print":true
-                    }
-                }
-            }
-        ]
-    }
+        "writer": {
+          "name": "streamwriter",
+          "parameter": {
+            "print": true
+          }
+        }
+      }
+    ]
+  }
 }
-
 ```
 
 ### 3.2 参数说明
@@ -81,16 +87,15 @@ PostgresqlReader插件实现了从PostgreSQL读取数据。在底层实现上，
 
 下面列出PostgresqlReader针对PostgreSQL类型转换列表:
 
-
 | DataX 内部类型 | PostgreSQL 数据类型                          |
 | -------------- | -------------------------------------------- |
 | Long           | bigint, bigserial, integer, smallint, serial |
 | Double         | double precision, money, numeric, real       |
-| String         | varchar, char, text, bit, inet               |
+| String         | varchar, char, text, bit(>1), inet, array,uuid,json,xml    |
 | Date           | date, time, timestamp                        |
-| Boolean        | bool                                         |
+| Boolean        | bool,bit(1)                                   |
 | Bytes          | bytea                                        |
 
 请注意:
 
-除上述罗列字段类型外，其他类型均不支持; `money`,`inet`,`bit` 需用户使用 `a_inet::varchar` 类似的语法转换
+除上述罗列字段类型外，其他类型均不支持; 
