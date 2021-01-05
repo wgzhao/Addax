@@ -34,65 +34,65 @@ FtpReader实现了从远程FTP文件读取数据并转为DataX协议的功能，
 
 ```json
 {
-    "setting": {},
-    "job": {
-        "setting": {
-            "speed": {
-                "channel": 2
-            }
+  "job": {
+    "setting": {
+      "speed": {
+        "channel": 2,
+        "bytes": -1
+      }
+    },
+    "content": [
+      {
+        "reader": {
+          "name": "ftpreader",
+          "parameter": {
+            "protocol": "sftp",
+            "host": "127.0.0.1",
+            "port": 22,
+            "username": "xx",
+            "password": "xxx",
+            "path": [
+              "/var/pub/ftpReaderTest/data"
+            ],
+            "column": [
+              {
+                "index": 0,
+                "type": "long"
+              },
+              {
+                "index": 1,
+                "type": "boolean"
+              },
+              {
+                "index": 2,
+                "type": "double"
+              },
+              {
+                "index": 3,
+                "type": "string"
+              },
+              {
+                "index": 4,
+                "type": "date",
+                "format": "yyyy.MM.dd"
+              }
+            ],
+            "encoding": "UTF-8",
+            "fieldDelimiter": ","
+          }
         },
-        "content": [
-            {
-                "reader": {
-                    "name": "ftpreader",
-                    "parameter": {
-                        "protocol": "sftp",
-                        "host": "127.0.0.1",
-                        "port": 22,
-                        "username": "xx",
-                        "password": "xxx",
-                        "path": [
-                            "/var/pub/ftpReaderTest/data"
-                        ],
-                        "column": [
-                            {
-                                "index": 0,
-                                "type": "long"
-                            },
-                            {
-                                "index": 1,
-                                "type": "boolean"
-                            },
-                            {
-                                "index": 2,
-                                "type": "double"
-                            },
-                            {
-                                "index": 3,
-                                "type": "string"
-                            },
-                            {
-                                "index": 4,
-                                "type": "date",
-                                "format": "yyyy.MM.dd"
-                            }
-                        ],
-                        "encoding": "UTF-8",
-                        "fieldDelimiter": ","
-                    }
-                },
-                "writer": {
-                    "name": "ftpWriter",
-                    "parameter": {
-                        "path": "/var/ftp/FtpWriter/result",
-                        "fileName": "shihf",
-                        "writeMode": "truncate",
-                        "format": "yyyy-MM-dd"
-                    }
-                }
-            }
-        ]
-    }
+        "writer": {
+          "name": "ftpWriter",
+          "parameter": {
+            "path": "/var/ftp/FtpWriter/result",
+            "fileName": "shihf",
+            "writeMode": "truncate",
+            "format": "yyyy-MM-dd"
+          }
+        }
+      }
+    ]
+  }
 }
 ```
 
@@ -121,13 +121,10 @@ FtpReader实现了从远程FTP文件读取数据并转为DataX协议的功能，
 
 远程FTP文件系统的路径信息，注意这里可以支持填写多个路径。
 
-- 当指定单个远程FTP文件，FtpReader暂时只能使用单线程进行数据抽取。二期考虑在非压缩文件情况下针对单个File可以进行多线程并发读取
-= 当指定多个远程FTP文件，FtpReader支持使用多线程进行数据抽取。线程并发数通过通道数指定
+- 当指定单个远程FTP文件，FtpReader暂时只能使用单线程进行数据抽取。二期考虑在非压缩文件情况下针对单个File可以进行多线程并发读取 = 当指定多个远程FTP文件，FtpReader支持使用多线程进行数据抽取。线程并发数通过通道数指定
 - 当指定通配符，FtpReader尝试遍历出多个文件信息。例如: 指定 `/*` 代表读取/目录下所有的文件，指定 `/bazhen/*` 代表读取 bazhen 目录下游所有的文件。目前只支持 `*` 作为文件通配符。
-  
-特别需要注意的是，DataX会将一个作业下同步的所有Text File视作同一张数据表。用户必须自己保证所有的File能够适配同一套schema信息。读取文件用户必须保证为类CSV格式，并且提供给DataX权限可读。
-特别需要注意的是，如果Path指定的路径下没有符合匹配的文件抽取，DataX将报错。
 
+特别需要注意的是，DataX会将一个作业下同步的所有Text File视作同一张数据表。用户必须自己保证所有的File能够适配同一套schema信息。读取文件用户必须保证为类CSV格式，并且提供给DataX权限可读。 特别需要注意的是，如果Path指定的路径下没有符合匹配的文件抽取，DataX将报错。
 
 #### column
 
@@ -143,12 +140,13 @@ FtpReader实现了从远程FTP文件读取数据并转为DataX协议的功能，
 
 ```json
 {
-    "type": "long",
-    "index": 0    //从远程FTP文件文本第一列获取int字段
+  "type": "long",
+  "index": 0
+  //从远程FTP文件文本第一列获取int字段
 },
 {
-    "type": "string",
-    "value": "alibaba"  //从FtpReader内部生成alibaba的字符串字段作为当前字段
+"type": "string",
+"value": "alibaba"  //从FtpReader内部生成alibaba的字符串字段作为当前字段
 }
 ```
 
@@ -160,9 +158,9 @@ FtpReader实现了从远程FTP文件读取数据并转为DataX协议的功能，
 
 ```json
 "csvReaderConfig":{
-    "safetySwitch": false,
-    "skipEmptyRecords": false,
-    "useTextQualifier": false
+"safetySwitch": false,
+"skipEmptyRecords": false,
+"useTextQualifier": false
 }
 ```
 

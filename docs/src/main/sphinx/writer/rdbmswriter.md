@@ -1,4 +1,4 @@
-# RDBMS Writer 
+# RDBMS Writer
 
 RDBMSWriter 插件支持从传统 RDBMS 读取数据。这是一个通用关系数据库读取插件，可以通过注册数据库驱动等方式支持更多关系数据库读取。
 
@@ -10,74 +10,74 @@ RDBMSWriter 插件支持从传统 RDBMS 读取数据。这是一个通用关系�
 - ClickHouse Writer
 - SQLServer Writer
 
-
 ## 配置说明
 
 配置一个写入RDBMS的作业。
 
 ```json
 {
-    "job": {
-        "setting": {
-            "speed": {
-                "channel": 1
-            }
+  "job": {
+    "setting": {
+      "speed": {
+        "channel": 1,
+        "bytes": -1
+      }
+    },
+    "content": [
+      {
+        "reader": {
+          "name": "streamreader",
+          "parameter": {
+            "column": [
+              {
+                "value": "DataX",
+                "type": "string"
+              },
+              {
+                "value": 19880808,
+                "type": "long"
+              },
+              {
+                "value": "1988-08-08 08:08:08",
+                "type": "date"
+              },
+              {
+                "value": true,
+                "type": "bool"
+              },
+              {
+                "value": "test",
+                "type": "bytes"
+              }
+            ],
+            "sliceRecordCount": 1000
+          }
         },
-        "content": [
-            {
-                "reader": {
-                    "name": "streamreader",
-                    "parameter": {
-                        "column": [
-                            {
-                                "value": "DataX",
-                                "type": "string"
-                            },
-                            {
-                                "value": 19880808,
-                                "type": "long"
-                            },
-                            {
-                                "value": "1988-08-08 08:08:08",
-                                "type": "date"
-                            },
-                            {
-                                "value": true,
-                                "type": "bool"
-                            },
-                            {
-                                "value": "test",
-                                "type": "bytes"
-                            }
-                        ],
-                        "sliceRecordCount": 1000
-                    }
-                },
-                "writer": {
-                    "name": "rdbmswriter",
-                    "parameter": {
-                        "connection": [
-                            {
-                                "jdbcUrl": "jdbc:dm://ip:port/database",
-                                "table": [
-                                    "table"
-                                ]
-                            }
-                        ],
-                        "username": "username",
-                        "password": "password",
-                        "table": "table",
-                        "column": [
-                            "*"
-                        ],
-                        "preSql": [
-                            "delete from XXX;"
-                        ]
-                    }
-                }
-            }
-        ]
-    }
+        "writer": {
+          "name": "rdbmswriter",
+          "parameter": {
+            "connection": [
+              {
+                "jdbcUrl": "jdbc:dm://ip:port/database",
+                "table": [
+                  "table"
+                ]
+              }
+            ],
+            "username": "username",
+            "password": "password",
+            "table": "table",
+            "column": [
+              "*"
+            ],
+            "preSql": [
+              "delete from XXX;"
+            ]
+          }
+        }
+      }
+    ]
+  }
 }
 ```
 
@@ -96,8 +96,8 @@ RDBMSWriter 插件支持从传统 RDBMS 读取数据。这是一个通用关系�
 
 #### column
 
-所配置的表中需要同步的列名集合，使用JSON的数组描述字段信息。用户使用 `*` 代表默认使用所有列配置，例如 `["*"]`。  
-  
+所配置的表中需要同步的列名集合，使用JSON的数组描述字段信息。用户使用 `*` 代表默认使用所有列配置，例如 `["*"]`。
+
 支持列裁剪，即列可以挑选部分列进行导出。
 
 支持列换序，即列可以不按照表schema信息进行导出。
@@ -119,10 +119,9 @@ Column必须显示填写，不允许为空！
 
 ### jdbcUrl
 
-`jdbcUrl` 配置除了配置必要的信息外，我们还可以在增加每种特定驱动的特定配置属性，这里特别提到我们可以利用配置属性对代理的支持从而实现通过代理访问数据库的功能。
-比如对于 PrestoSQL 数据库的 JDBC 驱动而言，支持 `socksProxy` 参数，比如一个可能的 `jdbcUrl` 为 
+`jdbcUrl` 配置除了配置必要的信息外，我们还可以在增加每种特定驱动的特定配置属性，这里特别提到我们可以利用配置属性对代理的支持从而实现通过代理访问数据库的功能。 比如对于 PrestoSQL 数据库的 JDBC 驱动而言，支持 `socksProxy` 参数，比如一个可能的 `jdbcUrl` 为
 
-`jdbc:presto://127.0.0.1:8080/hive?socksProxy=192.168.1.101:1081` 
+`jdbc:presto://127.0.0.1:8080/hive?socksProxy=192.168.1.101:1081`
 
 大部分关系型数据库的 JDBC 驱动支持 `socksProxyHost,socksProxyPort` 参数来支持代理访问。也有一些特别的情况。
 

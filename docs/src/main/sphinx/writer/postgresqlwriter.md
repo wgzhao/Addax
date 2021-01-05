@@ -18,67 +18,68 @@ PostgresqlWriter通过 DataX 框架获取 Reader 生成的协议数据，根据�
 
 ```json
 {
-    "job": {
-        "setting": {
-            "speed": {
-                "channel": 1
-            }
+  "job": {
+    "setting": {
+      "speed": {
+        "channel": 1,
+        "bytes": -1
+      }
+    },
+    "content": [
+      {
+        "reader": {
+          "name": "streamreader",
+          "parameter": {
+            "column": [
+              {
+                "value": "DataX",
+                "type": "string"
+              },
+              {
+                "value": 19880808,
+                "type": "long"
+              },
+              {
+                "value": "1988-08-08 08:08:08",
+                "type": "date"
+              },
+              {
+                "value": true,
+                "type": "bool"
+              },
+              {
+                "value": "test",
+                "type": "bytes"
+              }
+            ],
+            "sliceRecordCount": 1000
+          }
         },
-        "content": [
-            {
-                 "reader": {
-                    "name": "streamreader",
-                    "parameter": {
-                        "column" : [
-                            {
-                                "value": "DataX",
-                                "type": "string"
-                            },
-                            {
-                                "value": 19880808,
-                                "type": "long"
-                            },
-                            {
-                                "value": "1988-08-08 08:08:08",
-                                "type": "date"
-                            },
-                            {
-                                "value": true,
-                                "type": "bool"
-                            },
-                            {
-                                "value": "test",
-                                "type": "bytes"
-                            }
-                        ],
-                        "sliceRecordCount": 1000
-                    }
-                },
-                "writer": {
-                    "name": "postgresqlwriter",
-                    "parameter": {
-                        "username": "xx",
-                        "password": "xx",
-                        "column": [
-                            "id",
-                            "name"
-                        ],
-                        "preSql": [
-                            "delete from test"
-                        ],
-                        "connection": [
-                            {
-                                "jdbcUrl": "jdbc:postgresql://127.0.0.1:3002/datax",
-                                "table": [
-                                    "test"
-                                ]
-                            }
-                        ]
-                    }
-                }
-            }
-        ]
-    }
+        "writer": {
+          "name": "postgresqlwriter",
+          "parameter": {
+            "username": "xx",
+            "password": "xx",
+            "column": [
+              "id",
+              "name"
+            ],
+            "preSql": [
+              "delete from test"
+            ],
+            "connection": [
+              {
+                "jdbcUrl": "jdbc:postgresql://127.0.0.1:3002/datax",
+                "table": [
+                  "test"
+                ]
+              }
+            ]
+          }
+        }
+      }
+    ]
+  }
 }
 ```
 
@@ -98,8 +99,7 @@ PostgresqlWriter通过 DataX 框架获取 Reader 生成的协议数据，根据�
 
 #### writeMode
 
-默认情况下， 采取 `insert into ` 语法写入 postgresql 表，如果你希望采取主键存在时更新，不存在则写入的方式，
-可以使用 `update` 模式。假定表的主键为 `id` ,则 `writeMode` 配置方法如下：
+默认情况下， 采取 `insert into ` 语法写入 postgresql 表，如果你希望采取主键存在时更新，不存在则写入的方式， 可以使用 `update` 模式。假定表的主键为 `id` ,则 `writeMode` 配置方法如下：
 
 ```
 "writeMode": "update(id)"
@@ -123,7 +123,7 @@ PostgresqlWriter通过 DataX 框架获取 Reader 生成的协议数据，根据�
 | -------- | -----  |
 | Long     |bigint, bigserial, integer, smallint, serial |
 | Double   |double precision, money, numeric, real |
-| String   |varchar, char, text, bit|
+| String   |varchar, char, text, bit, inet,cidr,macaddr,uuid,xml,json|
 | Date     |date, time, timestamp |
 | Boolean  |bool|
 | Bytes    |bytea|

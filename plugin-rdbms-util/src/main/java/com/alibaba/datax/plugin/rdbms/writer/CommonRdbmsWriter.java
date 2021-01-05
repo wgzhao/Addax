@@ -284,7 +284,7 @@ public class CommonRdbmsWriter
                     mergeColumns.add(i++, column);
                 }
             }
-             mergeColumns.addAll(this.columns);
+            mergeColumns.addAll(this.columns);
 
             // 用于写入数据的时候的类型根据目的表字段类型转换
             this.resultSetMetaData = DBUtil.getColumnMetaData(connection,
@@ -377,8 +377,7 @@ public class CommonRdbmsWriter
                 preparedStatement = connection
                         .prepareStatement(this.writeRecordSql);
                 if (this.dataBaseType == DataBaseType.Oracle &&
-                        ! "insert".equalsIgnoreCase(this.writeMode))
-                {
+                        !"insert".equalsIgnoreCase(this.writeMode)) {
                     String merge = this.writeMode;
                     String[] sArray = WriterUtil.getStrings(merge);
                     for (Record record : buffer) {
@@ -602,6 +601,15 @@ public class CommonRdbmsWriter
 
                 case Types.ARRAY:
                     preparedStatement.setString(columnIndex + 1, column.asString());
+                    break;
+
+                case Types.OTHER:
+                    if ("image".equals(this.resultSetMetaData.getRight().get(columnIndex))) {
+                        preparedStatement.setBytes(columnIndex + 1, column.asBytes());
+                    }
+                    else {
+                        preparedStatement.setObject(columnIndex + 1, column.asString());
+                    }
                     break;
 
                 default:

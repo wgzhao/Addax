@@ -8,58 +8,59 @@
 
 ```json
 {
-    "job": {
-        "setting": {
-            "speed": {
-                 "channel": 3
-            }
+  "job": {
+    "setting": {
+      "speed": {
+        "channel": 1,
+        "bytes": -1
+      }
+    },
+    "content": [
+      {
+        "reader": {
+          "name": "cassandrareader",
+          "parameter": {
+            "host": "localhost",
+            "port": 9042,
+            "useSSL": false,
+            "keyspace": "test",
+            "table": "datax_src",
+            "column": [
+              "textCol",
+              "blobCol",
+              "writetime(blobCol)",
+              "boolCol",
+              "smallintCol",
+              "tinyintCol",
+              "intCol",
+              "bigintCol",
+              "varintCol",
+              "floatCol",
+              "doubleCol",
+              "decimalCol",
+              "dateCol",
+              "timeCol",
+              "timeStampCol",
+              "uuidCol",
+              "inetCol",
+              "durationCol",
+              "listCol",
+              "mapCol",
+              "setCol",
+              "tupleCol",
+              "udtCol"
+            ]
+          }
         },
-        "content": [
-            {
-               "reader": {
-                    "name": "cassandrareader",
-                    "parameter": {
-                        "host": "localhost",
-                        "port": 9042,
-                        "useSSL": false,
-                        "keyspace": "test",
-                        "table": "datax_src",
-                        "column": [
-                            "textCol",
-                            "blobCol",
-                            "writetime(blobCol)",
-                            "boolCol",
-                            "smallintCol",
-                            "tinyintCol",
-                            "intCol",
-                            "bigintCol",
-                            "varintCol",
-                            "floatCol",
-                            "doubleCol",
-                            "decimalCol",
-                            "dateCol",
-                            "timeCol",
-                            "timeStampCol",
-                            "uuidCol",
-                            "inetCol",
-                            "durationCol",
-                            "listCol",
-                            "mapCol",
-                            "setCol",
-                            "tupleCol",
-                            "udtCol"
-                        ]
-                    }
-               },
-               "writer": {
-                    "name": "streamwriter",
-                    "parameter": {
-                        "print":true
-                    }
-                }
-            }
-        ]
-    }
+        "writer": {
+          "name": "streamwriter",
+          "parameter": {
+            "print": true
+          }
+        }
+      }
+    ]
+  }
 }
 ```
 

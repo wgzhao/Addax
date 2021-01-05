@@ -16,94 +16,97 @@ MongoDBReader通过Datax框架从MongoDB并行的读取数据，通过主控的J
 
 ```json
 {
-"job": {
+  "job": {
     "setting": {
-        "speed": {
-            "channel": 2
-        }
+      "speed": {
+        "channel": 2,
+        "bytes": -1
+      }
     },
     "content": [
-        {
-            "reader": {
-            "name": "mongodbreader",
-            "parameter": {
-            "address": ["127.0.0.1:32768"],
+      {
+        "reader": {
+          "name": "mongodbreader",
+          "parameter": {
+            "address": [
+              "127.0.0.1:32768"
+            ],
             "userName": "",
             "userPassword": "",
             "dbName": "tag_per_data",
             "collectionName": "tag_data",
             "column": [
-                {
-                    "name": "unique_id",
-                    "type": "string"
-                },
-                {
-                    "name": "sid",
-                    "type": "string"
-                },
-                {
-                    "name": "user_id",
-                    "type": "string"
-                },
-                {
-                    "name": "auction_id",
-                    "type": "string"
-                },
-                {
-                    "name": "content_type",
-                    "type": "string"
-                },
-                {
-                    "name": "pool_type",
-                    "type": "string"
-                },
-                {
-                    "name": "frontcat_id",
-                    "type": "Array",
-                    "spliter": ""
-                },
-                {
-                    "name": "categoryid",
-                    "type": "Array",
-                    "spliter": ""
-                },
-                {
-                    "name": "gmt_create",
-                    "type": "string"
-                },
-                {
-                    "name": "taglist",
-                    "type": "Array",
-                    "spliter": " "
-                },
-                {
-                    "name": "property",
-                    "type": "string"
-                },
-                {
-                    "name": "scorea",
-                    "type": "int"
-                },
-                {
-                    "name": "scoreb",
-                    "type": "int"
-                },
-                {
-                    "name": "scorec",
-                    "type": "int"
-                }
+              {
+                "name": "unique_id",
+                "type": "string"
+              },
+              {
+                "name": "sid",
+                "type": "string"
+              },
+              {
+                "name": "user_id",
+                "type": "string"
+              },
+              {
+                "name": "auction_id",
+                "type": "string"
+              },
+              {
+                "name": "content_type",
+                "type": "string"
+              },
+              {
+                "name": "pool_type",
+                "type": "string"
+              },
+              {
+                "name": "frontcat_id",
+                "type": "Array",
+                "spliter": ""
+              },
+              {
+                "name": "categoryid",
+                "type": "Array",
+                "spliter": ""
+              },
+              {
+                "name": "gmt_create",
+                "type": "string"
+              },
+              {
+                "name": "taglist",
+                "type": "Array",
+                "spliter": " "
+              },
+              {
+                "name": "property",
+                "type": "string"
+              },
+              {
+                "name": "scorea",
+                "type": "int"
+              },
+              {
+                "name": "scoreb",
+                "type": "int"
+              },
+              {
+                "name": "scorec",
+                "type": "int"
+              }
             ]
-            }
-            },
-            "writer": {
-                "name": "streamwriter",
-                "parameter": {
-                    "print": "true"
-                }
-            }
+          }
+        },
+        "writer": {
+          "name": "streamwriter",
+          "parameter": {
+            "print": "true"
+          }
         }
+      }
     ]
-}
+  }
 }
 ```
 

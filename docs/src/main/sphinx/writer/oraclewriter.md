@@ -26,7 +26,8 @@ OracleWriter 通过 DataX 框架获取 Reader 生成的协议数据，根据你�
 "job": {
     "setting": {
         "speed": {
-            "channel": 1
+            "channel": 1,
+          "bytes": -1
         }
     },
     "content": [{

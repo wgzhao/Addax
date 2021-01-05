@@ -26,63 +26,64 @@ TxtFileWriter实现了从DataX协议转为本地TXT文件功能，本地文件�
 
 ```json
 {
-    "setting": {},
-    "job": {
-        "setting": {
-            "speed": {
-                "channel": 2
-            }
+  "job": {
+    "setting": {
+      "speed": {
+        "channel": 2,
+        "bytes": -1
+      }
+    },
+    "content": [
+      {
+        "reader": {
+          "name": "txtfilereader",
+          "parameter": {
+            "path": [
+              "/tmp/data"
+            ],
+            "encoding": "UTF-8",
+            "column": [
+              {
+                "index": 0,
+                "type": "long"
+              },
+              {
+                "index": 1,
+                "type": "boolean"
+              },
+              {
+                "index": 2,
+                "type": "double"
+              },
+              {
+                "index": 3,
+                "type": "string"
+              },
+              {
+                "index": 4,
+                "type": "date",
+                "format": "yyyy.MM.dd"
+              }
+            ],
+            "fieldDelimiter": ","
+          }
         },
-        "content": [
-            {
-                "reader": {
-                    "name": "txtfilereader",
-                    "parameter": {
-                        "path": ["/tmp/data"],
-                        "encoding": "UTF-8",
-                        "column": [
-                            {
-                                "index": 0,
-                                "type": "long"
-                            },
-                            {
-                                "index": 1,
-                                "type": "boolean"
-                            },
-                            {
-                                "index": 2,
-                                "type": "double"
-                            },
-                            {
-                                "index": 3,
-                                "type": "string"
-                            },
-                            {
-                                "index": 4,
-                                "type": "date",
-                                "format": "yyyy.MM.dd"
-                            }
-                        ],
-                        "fieldDelimiter": ","
-                    }
-                },
-                "writer": {
-                    "name": "txtfilewriter",
-                    "parameter": {
-                        "path": "/tmp/result",
-                        "fileName": "luohw",
-                        "writeMode": "truncate",
-                        "dateFormat": "yyyy-MM-dd"
-                    }
-                }
-            }
-        ]
-    }
+        "writer": {
+          "name": "txtfilewriter",
+          "parameter": {
+            "path": "/tmp/result",
+            "fileName": "luohw",
+            "writeMode": "truncate",
+            "dateFormat": "yyyy-MM-dd"
+          }
+        }
+      }
+    ]
+  }
 }
 ```
 
 ### 3.2 参数说明
-
 
 | 配置项         | 是否必须 | 默认值         | 描述                                                                                 |
 | :------------- | :------: | -------------- | ------------------------------------------------------------------------------------ |
@@ -108,8 +109,7 @@ TxtFileWriter实现了从DataX协议转为本地TXT文件功能，本地文件�
 
 #### fileFormat
 
-文件写出的格式，包括 csv 和 text 两种，csv是严格的csv格式，如果待写数据包括列分隔符，则会按照csv的转义语法转义，转义符号为双引号 `"`；
-text格式是用列分隔符简单分割待写数据，对于待写数据包括列分隔符情况下不做转义。
+文件写出的格式，包括 csv 和 text 两种，csv是严格的csv格式，如果待写数据包括列分隔符，则会按照csv的转义语法转义，转义符号为双引号 `"`； text格式是用列分隔符简单分割待写数据，对于待写数据包括列分隔符情况下不做转义。
 
 ### 3.3 类型转换
 

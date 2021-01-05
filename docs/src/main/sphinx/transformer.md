@@ -21,7 +21,7 @@
 - `length`: 目标字段长度
 
 返回： 从字符串的指定位置（包含）截取指定长度的字符串。如果开始位置非法抛出异常。如果字段为空值，直接返回（即不参与本transformer）
-  
+
 ### dx_pad
 
 `dx_pad(idx, flag, length, chr)`
@@ -32,7 +32,7 @@
 - `flag`: "l","r", 指示是在头进行填充，还是尾进行填充
 - `length`: 目标字段长度
 - `chr`: 需要填充的字符
-  
+
 返回： 如果源字符串长度小于目标字段长度，按照位置添加pad字符后返回。如果长于，直接截断（都截右边）。如果字段为空值，转换为空字符串进行pad，即最后的字符串全是需要pad的字符
 
 举例：
@@ -103,54 +103,56 @@ dx_filter(1,">=","10")
 Record 数据类型
 
 注意：
+
 - `dx_groovy` 只能调用一次。不能多次调用。
-- `groovy code` 中支持 `java.lang`, `java.util` 的包，可直接引用的对象有 `record`，以及element下的各种column（BoolColumn.class,BytesColumn.class,DateColumn.class,DoubleColumn.class,LongColumn.clas- tringColumn.class）。不支持其他包，如果用户有需要用到其他包，可设置extraPackage，注意extraPackage不支持第三方jar包。
+- `groovy code` 中支持 `java.lang`, `java.util` 的包，可直接引用的对象有 `record`，以及element下的各种column（BoolColumn.class,BytesColumn.class,DateColumn.class,DoubleColumn.class,LongColumn.clas-
+  tringColumn.class）。不支持其他包，如果用户有需要用到其他包，可设置extraPackage，注意extraPackage不支持第三方jar包。
 - `groovy code` 中，返回更新过的 `Record`（比如record.setColumn(columnIndex, new StringColumn(newValue));），或者null。返回null表示过滤此行。
 - 用户可以直接调用静态的Util方式（GroovyTransformerStaticUtil
-  
+
 举例:
 
 groovy 实现的 subStr
 
 ```java
-String code = "Column column = record.getColumn(1);\n" +
-        " String oriValue = column.asString();\n" +
-        " String newValue = oriValue.substring(0, 3);\n" +
-        " record.setColumn(1, new StringColumn(newValue));\n" +
+String code="Column column = record.getColumn(1);\n"+
+        " String oriValue = column.asString();\n"+
+        " String newValue = oriValue.substring(0, 3);\n"+
+        " record.setColumn(1, new StringColumn(newValue));\n"+
         " return record;";
-dx_groovy(record);
+        dx_groovy(record);
 ```
 
 groovy 实现的Replace
 
 ```java
-String code2 = "Column column = record.getColumn(1);\n" +
-        " String oriValue = column.asString();\n" +
-        " String newValue = \"****\" + oriValue.substring(3, oriValue.length());\n" +
-        " record.setColumn(1, new StringColumn(newValue));\n" +
+String code2="Column column = record.getColumn(1);\n"+
+        " String oriValue = column.asString();\n"+
+        " String newValue = \"****\" + oriValue.substring(3, oriValue.length());\n"+
+        " record.setColumn(1, new StringColumn(newValue));\n"+
         " return record;";
 ```
 
 groovy 实现的Pad
 
 ```java
-String code3 = "Column column = record.getColumn(1);\n" +
-        " String oriValue = column.asString();\n" +
-        " String padString = \"12345\";\n" +
-        " String finalPad = \"\";\n" +
-        " int NeedLength = 8 - oriValue.length();\n" +
-        "        while (NeedLength > 0) {\n" +
-        "\n" +
-        "            if (NeedLength >= padString.length()) {\n" +
-        "                finalPad += padString;\n" +
-        "                NeedLength -= padString.length();\n" +
-        "            } else {\n" +
-        "                finalPad += padString.substring(0, NeedLength);\n" +
-        "                NeedLength = 0;\n" +
-        "            }\n" +
-        "        }\n" +
-        " String newValue= finalPad + oriValue;\n" +
-        " record.setColumn(1, new StringColumn(newValue));\n" +
+String code3="Column column = record.getColumn(1);\n"+
+        " String oriValue = column.asString();\n"+
+        " String padString = \"12345\";\n"+
+        " String finalPad = \"\";\n"+
+        " int NeedLength = 8 - oriValue.length();\n"+
+        "        while (NeedLength > 0) {\n"+
+        "\n"+
+        "            if (NeedLength >= padString.length()) {\n"+
+        "                finalPad += padString;\n"+
+        "                NeedLength -= padString.length();\n"+
+        "            } else {\n"+
+        "                finalPad += padString.substring(0, NeedLength);\n"+
+        "                NeedLength = 0;\n"+
+        "            }\n"+
+        "        }\n"+
+        " String newValue= finalPad + oriValue;\n"+
+        " record.setColumn(1, new StringColumn(newValue));\n"+
         " return record;";
 ```
 
@@ -160,80 +162,85 @@ String code3 = "Column column = record.getColumn(1);\n" +
 
 ```json
 {
-    "job": {
-        "setting": {
-            "speed": {
-                "channel": 1
-            }
+  "job": {
+    "setting": {
+      "speed": {
+        "channel": 1
+      }
+    },
+    "content": [
+      {
+        "reader": {
+          "name": "streamreader",
+          "parameter": {
+            "column": [
+              {
+                "value": "DataX",
+                "type": "string"
+              },
+              {
+                "value": 19890604,
+                "type": "long"
+              },
+              {
+                "value": "1989-06-04 00:00:00",
+                "type": "date"
+              },
+              {
+                "value": true,
+                "type": "bool"
+              },
+              {
+                "value": "test",
+                "type": "bytes"
+              }
+            ],
+            "sliceRecordCount": 100000
+          }
         },
-        "content": [
-            {
-                "reader": {
-                    "name": "streamreader",
-                    "parameter": {
-                        "column": [
-                            {
-                                "value": "DataX",
-                                "type": "string"
-                            },
-                            {
-                                "value": 19890604,
-                                "type": "long"
-                            },
-                            {
-                                "value": "1989-06-04 00:00:00",
-                                "type": "date"
-                            },
-                            {
-                                "value": true,
-                                "type": "bool"
-                            },
-                            {
-                                "value": "test",
-                                "type": "bytes"
-                            }
-                        ],
-                        "sliceRecordCount": 100000
-                    }
-                },
-                "writer": {
-                    "name": "streamwriter",
-                    "parameter": {
-                        "print": false,
-                        "encoding": "UTF-8"
-                    }
-                },
-                "transformer": [
-                    {
-                        "name": "dx_substr",
-                        "parameter":
-                            {
-                            "columnIndex":5,
-                            "paras":["1","3"]
-                            }  
-                    },
-                    {
-                        "name": "dx_replace",
-                        "parameter":
-                            {
-                            "columnIndex":4,
-                            "paras":["3","4","****"]
-                            }  
-                    },
-                    {
-                        "name": "dx_groovy",
-                          "parameter": {
-                               "code": "//groovy code//",  
-                               "extraPackage":[
-                               "import somePackage1;",
-                               "import somePackage2;"
-                               ]
-                            }  
-                    }
-                ]
+        "writer": {
+          "name": "streamwriter",
+          "parameter": {
+            "print": false,
+            "encoding": "UTF-8"
+          }
+        },
+        "transformer": [
+          {
+            "name": "dx_substr",
+            "parameter": {
+              "columnIndex": 5,
+              "paras": [
+                "1",
+                "3"
+              ]
             }
+          },
+          {
+            "name": "dx_replace",
+            "parameter": {
+              "columnIndex": 4,
+              "paras": [
+                "3",
+                "4",
+                "****"
+              ]
+            }
+          },
+          {
+            "name": "dx_groovy",
+            "parameter": {
+              "code": "//groovy code//",
+              "extraPackage": [
+                "import somePackage1;",
+                "import somePackage2;"
+              ]
+            }
+          }
         ]
-    }
+      }
+    ]
+  }
 }
 ```
 

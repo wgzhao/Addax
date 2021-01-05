@@ -1,4 +1,3 @@
-
 # CassandraWriter 插件文档
 
 ## 1 快速介绍
@@ -22,7 +21,8 @@ CassandraWriter插件实现了向Cassandra写入数据。在底层实现上，Ca
   "job": {
     "setting": {
       "speed": {
-        "channel": 5
+        "channel": 5,
+        "bytes": -1
       }
     },
     "content": [
@@ -31,19 +31,52 @@ CassandraWriter插件实现了向Cassandra写入数据。在底层实现上，Ca
           "name": "streamreader",
           "parameter": {
             "column": [
-              {"value":"name","type": "string"},
-              {"value":"false","type":"bool"},
-              {"value":"1988-08-08 08:08:08","type":"date"},
-              {"value":"addr","type":"bytes"},
-              {"value":1.234,"type":"double"},
-              {"value":12345678,"type":"long"},
-              {"value":2.345,"type":"double"},
-              {"value":3456789,"type":"long"},
-              {"value":"4a0ef8c0-4d97-11d0-db82-ebecdb03ffa5","type":"string"},
-              {"value":"value","type":"bytes"},
-              {"value":"-838383838,37377373,-383883838,27272772,393993939,-38383883,83883838,-1350403181,817650816,1630642337,251398784,-622020148","type":"string"},
+              {
+                "value": "name",
+                "type": "string"
+              },
+              {
+                "value": "false",
+                "type": "bool"
+              },
+              {
+                "value": "1988-08-08 08:08:08",
+                "type": "date"
+              },
+              {
+                "value": "addr",
+                "type": "bytes"
+              },
+              {
+                "value": 1.234,
+                "type": "double"
+              },
+              {
+                "value": 12345678,
+                "type": "long"
+              },
+              {
+                "value": 2.345,
+                "type": "double"
+              },
+              {
+                "value": 3456789,
+                "type": "long"
+              },
+              {
+                "value": "4a0ef8c0-4d97-11d0-db82-ebecdb03ffa5",
+                "type": "string"
+              },
+              {
+                "value": "value",
+                "type": "bytes"
+              },
+              {
+                "value": "-838383838,37377373,-383883838,27272772,393993939,-38383883,83883838,-1350403181,817650816,1630642337,251398784,-622020148",
+                "type": "string"
+              }
             ],
-           "sliceRecordCount": 10000000
+            "sliceRecordCount": 10000000
           }
         },
         "writer": {
@@ -54,7 +87,7 @@ CassandraWriter插件实现了向Cassandra写入数据。在底层实现上，Ca
             "useSSL": false,
             "keyspace": "stresscql",
             "table": "dst",
-            "batchSize":10,
+            "batchSize": 10,
             "column": [
               "name",
               "choice",
