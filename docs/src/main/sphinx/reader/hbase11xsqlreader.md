@@ -19,7 +19,8 @@ hbase11xsqlreader插件实现了从Phoenix(HBase SQL)读取数据。在底层实
     "job": {
         "setting": {
             "speed": {
-                "byte":10485760
+                "byte":-1,
+              "channel": 1
             }
         },  
         "content": [ {

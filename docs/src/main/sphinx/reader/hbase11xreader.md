@@ -192,7 +192,8 @@ ROW                                   COLUMN+CELL
   "job": {
     "setting": {
       "speed": {
-        "channel": 1
+        "channel": 1,
+       "bytes": -1
       }
     },
     "content": [
@@ -201,7 +202,7 @@ ROW                                   COLUMN+CELL
           "name": "hbase11xreader",
           "parameter": {
             "hbaseConfig": {
-              "hbase.zookeeper.quorum": "xxx"
+              "hbase.zookeeper.quorum": "127.0.0.1:2181"
             },
             "table": "users",
             "encoding": "utf-8",

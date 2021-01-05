@@ -266,7 +266,6 @@ public class CommonRdbmsWriter
                 List<String> columnsTwo = new ArrayList<>();
                 String merge = this.writeMode;
                 String[] sArray = WriterUtil.getStrings(merge);
-                int i = 0;
                 for (String s : this.columns) {
                     if (Arrays.asList(sArray).contains(s)) {
                         columnsOne.add(s);
@@ -277,15 +276,15 @@ public class CommonRdbmsWriter
                         columnsTwo.add(s);
                     }
                 }
+                int i = 0;
                 for (String column : columnsOne) {
                     mergeColumns.add(i++, column);
                 }
-                i = 0;
                 for (String column : columnsTwo) {
                     mergeColumns.add(i++, column);
                 }
             }
-             mergeColumns.addAll(this.columns);
+            mergeColumns.addAll(this.columns);
 
             // 用于写入数据的时候的类型根据目的表字段类型转换
             this.resultSetMetaData = DBUtil.getColumnMetaData(connection,
@@ -378,8 +377,7 @@ public class CommonRdbmsWriter
                 preparedStatement = connection
                         .prepareStatement(this.writeRecordSql);
                 if (this.dataBaseType == DataBaseType.Oracle &&
-                        ! "insert".equalsIgnoreCase(this.writeMode))
-                {
+                        !"insert".equalsIgnoreCase(this.writeMode)) {
                     String merge = this.writeMode;
                     String[] sArray = WriterUtil.getStrings(merge);
                     for (Record record : buffer) {
@@ -469,7 +467,8 @@ public class CommonRdbmsWriter
         {
             for (int i = 0; i < record.getColumnNumber(); i++) {
                 int columnSqltype = this.resultSetMetaData.getMiddle().get(i);
-                preparedStatement = fillPreparedStatementColumnType(preparedStatement, i, columnSqltype, record.getColumn(i));
+                preparedStatement = fillPreparedStatementColumnType(preparedStatement, i,
+                        columnSqltype, record.getColumn(i));
             }
             return preparedStatement;
         }
@@ -599,6 +598,20 @@ public class CommonRdbmsWriter
                         preparedStatement.setString(columnIndex + 1, column.asString());
                     }
                     break;
+
+                case Types.ARRAY:
+                    preparedStatement.setString(columnIndex + 1, column.asString());
+                    break;
+
+                case Types.OTHER:
+                    if ("image".equals(this.resultSetMetaData.getRight().get(columnIndex))) {
+                        preparedStatement.setBytes(columnIndex + 1, column.asBytes());
+                    }
+                    else {
+                        preparedStatement.setObject(columnIndex + 1, column.asString());
+                    }
+                    break;
+
                 default:
                     throw DataXException
                             .asDataXException(

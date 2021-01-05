@@ -25,39 +25,40 @@ FtpWriter实现了从DataX协议转为FTP文件功能，FTP文件本身是无结
 
 ```json
 {
-    "job": {
-        "setting": {
-            "speed": {
-                "channel": 2
-            }
-        },
-        "content": [
-            {
-                "reader": {},
-                "writer": {
-                    "name": "ftpwriter",
-                    "parameter": {
-                        "protocol": "sftp",
-                        "host": "***",
-                        "port": 22,
-                        "username": "xxx",
-                        "password": "xxx",
-                        "timeout": "60000",
-                        "connectPattern": "PASV",
-                        "path": "/tmp/data/",
-                        "fileName": "yixiao",
-                        "writeMode": "truncate|append|nonConflict",
-                        "fieldDelimiter": ",",
-                        "encoding": "UTF-8",
-                        "nullFormat": "null",
-                        "dateFormat": "yyyy-MM-dd",
-                        "fileFormat": "csv",
-                        "header": []
-                    }
-                }
-            }
-        ]
-    }
+  "job": {
+    "setting": {
+      "speed": {
+        "channel": 2,
+        "bytes": -1
+      }
+    },
+    "content": [
+      {
+        "reader": {},
+        "writer": {
+          "name": "ftpwriter",
+          "parameter": {
+            "protocol": "sftp",
+            "host": "***",
+            "port": 22,
+            "username": "xxx",
+            "password": "xxx",
+            "timeout": "60000",
+            "connectPattern": "PASV",
+            "path": "/tmp/data/",
+            "fileName": "yixiao",
+            "writeMode": "truncate|append|nonConflict",
+            "fieldDelimiter": ",",
+            "encoding": "UTF-8",
+            "nullFormat": "null",
+            "dateFormat": "yyyy-MM-dd",
+            "fileFormat": "csv",
+            "header": []
+          }
+        }
+      }
+    ]
+  }
 }
 ```
 

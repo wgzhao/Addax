@@ -1,4 +1,4 @@
-# ClickHouse Reader 
+# ClickHouse Reader
 
 `ClickHouseReader` 插件支持从 [ClickHouse](https://clickhouse.tech)数据库读取数据。
 
@@ -8,42 +8,49 @@
 
 ```json
 {
-    "job": {
-        "setting": {
-            "speed": {
-                 "channel": 3
-            },
-            "errorLimit": {
-                "record": 0,
-                "percentage": 0.02
-            }
+  "job": {
+    "setting": {
+      "speed": {
+        "channel": 1,
+        "bytes": -1
+      },
+      "errorLimit": {
+        "record": 0,
+        "percentage": 0.02
+      }
+    },
+    "content": [
+      {
+        "reader": {
+          "name": "clickhousereader",
+          "parameter": {
+            "username": "root",
+            "password": "root",
+            "column": [
+              "*"
+            ],
+            "splitPk": "",
+            "connection": [
+              {
+                "table": [
+                  "tbl"
+                ],
+                "jdbcUrl": [
+                  "jdbc:clickhouse://127.0.0.1:8123/default"
+                ]
+              }
+            ]
+          }
         },
-        "content": [
-            {
-                "reader": {
-                    "name": "clickhousereader",
-                    "parameter": {
-                        "username": "root",
-                        "password": "root",
-                        "column": ["*"],
-                        "splitPk": "",
-                        "connection": [
-                            {
-                                "table": [ "tbl"],
-                                "jdbcUrl": [ "jdbc:clickhouse://127.0.0.1:8123/default"]
-                            }
-                        ]
-                    }
-                },
-               "writer": {
-                    "name": "streamwriter",
-                    "parameter": {
-                        "print":true
-                    }
-                }
-            }
-        ]
-    }
+        "writer": {
+          "name": "streamwriter",
+          "parameter": {
+            "print": true
+          }
+        }
+      }
+    ]
+  }
 }
 
 ```
@@ -77,7 +84,6 @@
 | Date     |Date, Datetime |
 | Boolean  |UInt8 |
 | Bytes    |String|
-
 
 ## 限制
 

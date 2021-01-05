@@ -2,11 +2,9 @@
 
 ## 1 快速介绍
 
-HbaseWriter 插件实现了从向Hbase中写取数据。在底层实现上，HbaseWriter 通过 HBase 的 Java 客户端连接远程 HBase 服务，并通过 put 方式写入Hbase。  
-
+HbaseWriter 插件实现了从向Hbase中写取数据。在底层实现上，HbaseWriter 通过 HBase 的 Java 客户端连接远程 HBase 服务，并通过 put 方式写入Hbase。
 
 ### 1.1支持功能
-
 
 - 目前HbaseWriter支持源端多个字段拼接作为hbase 表的 rowkey，具体配置参考：rowkeyColumn配置；
 - 写入hbase的时间戳（版本）支持：用当前时间作为版本，指定源端列作为版本，指定一个时间 三种方式作为版本；
@@ -18,8 +16,7 @@ HbaseWriter 插件实现了从向Hbase中写取数据。在底层实现上，Hba
 
 ## 2 实现原理
 
-简而言之，HbaseWriter 通过 HBase 的 Java 客户端，通过 HTable, Put等 API，将从上游Reader读取的数据写入HBase
-你hbase11xwriter与hbase094xwriter的主要不同在于API的调用不同，
+简而言之，HbaseWriter 通过 HBase 的 Java 客户端，通过 HTable, Put等 API，将从上游Reader读取的数据写入HBase 你hbase11xwriter与hbase094xwriter的主要不同在于API的调用不同，
 
 ## 3 功能说明
 
@@ -32,7 +29,8 @@ HbaseWriter 插件实现了从向Hbase中写取数据。在底层实现上，Hba
   "job": {
     "setting": {
       "speed": {
-        "channel": 5
+        "channel": 5,
+        "bytes": -1
       }
     },
     "content": [
@@ -71,7 +69,6 @@ HbaseWriter 插件实现了从向Hbase中写取数据。在底层实现上，Hba
                 "index": 6,
                 "type": "string"
               }
-
             ],
             "fieldDelimiter": ","
           }
@@ -85,51 +82,51 @@ HbaseWriter 插件实现了从向Hbase中写取数据。在底层实现上，Hba
             "table": "writer",
             "mode": "normal",
             "rowkeyColumn": [
-                {
-                  "index":0,
-                  "type":"string"
-                },
-                {
-                  "index":-1,
-                  "type":"string",
-                  "value":"_"
-                }
+              {
+                "index": 0,
+                "type": "string"
+              },
+              {
+                "index": -1,
+                "type": "string",
+                "value": "_"
+              }
             ],
             "column": [
               {
-                "index":1,
+                "index": 1,
                 "name": "cf1:q1",
                 "type": "string"
               },
               {
-                "index":2,
+                "index": 2,
                 "name": "cf1:q2",
                 "type": "string"
               },
               {
-                "index":3,
+                "index": 3,
                 "name": "cf1:q3",
                 "type": "string"
               },
               {
-                "index":4,
+                "index": 4,
                 "name": "cf2:q1",
                 "type": "string"
               },
               {
-                "index":5,
+                "index": 5,
                 "name": "cf2:q2",
                 "type": "string"
               },
               {
-                "index":6,
+                "index": 6,
                 "name": "cf2:q3",
                 "type": "string"
               }
             ],
-            "versionColumn":{
+            "versionColumn": {
               "index": -1,
-              "value":"123456789"
+              "value": "123456789"
             },
             "encoding": "utf-8"
           }
@@ -139,7 +136,6 @@ HbaseWriter 插件实现了从向Hbase中写取数据。在底层实现上，Hba
   }
 }
 ```
-
 
 ### 3.2 参数说明
 
@@ -166,16 +162,16 @@ HbaseWriter 插件实现了从向Hbase中写取数据。在底层实现上，Hba
 
 ```json
 "column": [
-    {
-      "index":1,
-      "name": "cf1:q1",
-      "type": "string"
-    },
-    {
-      "index":2,
-      "name": "cf1:q2",
-      "type": "string"
-    }
+{
+"index": 1,
+"name": "cf1:q1",
+"type": "string"
+},
+{
+"index": 2,
+"name": "cf1:q2",
+"type": "string"
+}
 ]
 ```
 
@@ -185,15 +181,15 @@ HbaseWriter 插件实现了从向Hbase中写取数据。在底层实现上，Hba
 
 ```json
 "rowkeyColumn": [
-  {
-    "index":0,
-    "type":"string"
-  },
-  {
-    "index":-1,
-    "type":"string",
-    "value":"_"
-  }
+{
+"index": 0,
+"type": "string"
+},
+{
+"index": -1,
+"type": "string",
+"value": "_"
+}
 ]
 ```
 
@@ -201,15 +197,13 @@ HbaseWriter 插件实现了从向Hbase中写取数据。在底层实现上，Hba
 
 指定写入hbase的时间戳。支持：当前时间、指定时间列，指定时间，三者选一。若不配置表示用当前时间。
 
-index：指定对应reader端column的索引，从0开始，需保证能转换为long,若是Date类型，
-会尝试用`yyyy-MM-dd HH:mm:ss`和`yyyy-MM-dd HH:mm:ss SSS`去解析；
-若为指定时间index为 `－1`；
+index：指定对应reader端column的索引，从0开始，需保证能转换为long,若是Date类型， 会尝试用`yyyy-MM-dd HH:mm:ss`和`yyyy-MM-dd HH:mm:ss SSS`去解析； 若为指定时间index为 `－1`；
 
 value：指定时间的值,long值。配置格式如下：
 
 ```json
 "versionColumn":{
-  "index":1
+"index": 1
 }
 ```
 
@@ -217,8 +211,8 @@ value：指定时间的值,long值。配置格式如下：
 
 ```json
 "versionColumn":{
-  "index":－1,
-  "value":123456789
+"index": －1,
+"value": 123456789
 }
 ```
 

@@ -1,7 +1,6 @@
 # Hbase11XReader 插件文档
 
-HbaseReader 插件实现了从 Hbase中读取数据。在底层实现上，HbaseReader 通过 HBase 的 Java 客户端连接远程 HBase 服务，并通过 Scan 方式读取你指定 rowkey 范围内的数据，
-并将读取的数据使用 DataX 自定义的数据类型拼装为抽象的数据集，并传递给下游 Writer 处理。
+HbaseReader 插件实现了从 Hbase中读取数据。在底层实现上，HbaseReader 通过 HBase 的 Java 客户端连接远程 HBase 服务，并通过 Scan 方式读取你指定 rowkey 范围内的数据， 并将读取的数据使用 DataX 自定义的数据类型拼装为抽象的数据集，并传递给下游 Writer 处理。
 
 ## 配置
 
@@ -59,12 +58,10 @@ ROW           COLUMN+CELL
 
 读取后数据
 
-
 | rowKey   | addres:city | address:country | address:province | info:age | info:birthday | info:company |
 | -------- | ----------- | -------------- | ---------------- | -------- | ------------- | ------------ |
 | lisi     | beijing     | china          | beijing          | 27       | 1987-06-17    | baidu        |
 | xiaoming | hangzhou    | china          | zhejiang         | 29       | 1987-06-17    | alibaba      |
-
 
 ### multiVersionFixedColumn 模式
 
@@ -93,93 +90,93 @@ ROW                                   COLUMN+CELL
 
 读取后数据(4列)
 
- | rowKey   | column:qualifier | timestamp     | value      |
+| rowKey   | column:qualifier | timestamp     | value      |
  | -------- | ---------------- | ------------- | ---------- |
- | lisi     | address:city     | 1457101972764 | beijing    |
- | lisi     | address:contry   | 1457102773908 | china      |
- | lisi     | address:province | 1457101972736 | beijing    |
- | lisi     | info:age         | 1457101972548 | 27         |
- | lisi     | info:birthday    | 1457101972604 | 1987-06-17 |
- | lisi     | info:company     | 1457101972653 | beijing    |
- | xiaoming | address:city     | 1457082196082 | hangzhou   |
- | xiaoming | address:contry   | 1457082195729 | china      |
- | xiaoming | address:province | 1457082195773 | zhejiang   |
- | xiaoming | info:age         | 1457082218735 | 29         |
- | xiaoming | info:age         | 1457082178630 | 24         |
- | xiaoming | info:birthday    | 1457082186830 | 1987-06-17 |
- | xiaoming | info:company     | 1457082189826 | alibaba    |
-
+| lisi     | address:city     | 1457101972764 | beijing    |
+| lisi     | address:contry   | 1457102773908 | china      |
+| lisi     | address:province | 1457101972736 | beijing    |
+| lisi     | info:age         | 1457101972548 | 27         |
+| lisi     | info:birthday    | 1457101972604 | 1987-06-17 |
+| lisi     | info:company     | 1457101972653 | beijing    |
+| xiaoming | address:city     | 1457082196082 | hangzhou   |
+| xiaoming | address:contry   | 1457082195729 | china      |
+| xiaoming | address:province | 1457082195773 | zhejiang   |
+| xiaoming | info:age         | 1457082218735 | 29         |
+| xiaoming | info:age         | 1457082178630 | 24         |
+| xiaoming | info:birthday    | 1457082186830 | 1987-06-17 |
+| xiaoming | info:company     | 1457082189826 | alibaba    |
 
 配置一个从 HBase 抽取数据到本地的作业:（normal 模式）
 
 ```json
 {
-    "job": {
-        "setting": {
-            "speed": {
-                "channel": 1
+  "job": {
+    "setting": {
+      "speed": {
+        "channel": 1,
+        "bytes": -1
+      }
+    },
+    "content": [
+      {
+        "reader": {
+          "name": "hbase11xreader",
+          "parameter": {
+            "hbaseConfig": {
+              "hbase.zookeeper.quorum": "xxxf"
+            },
+            "table": "users",
+            "encoding": "utf-8",
+            "mode": "normal",
+            "column": [
+              {
+                "name": "rowkey",
+                "type": "string"
+              },
+              {
+                "name": "info: age",
+                "type": "string"
+              },
+              {
+                "name": "info: birthday",
+                "type": "date",
+                "format": "yyyy-MM-dd"
+              },
+              {
+                "name": "info: company",
+                "type": "string"
+              },
+              {
+                "name": "address: country",
+                "type": "string"
+              },
+              {
+                "name": "address: province",
+                "type": "string"
+              },
+              {
+                "name": "address: city",
+                "type": "string"
+              }
+            ],
+            "range": {
+              "startRowkey": "",
+              "endRowkey": "",
+              "isBinaryRowkey": true
             }
+          }
         },
-        "content": [
-            {
-                "reader": {
-                    "name": "hbase11xreader",
-                    "parameter": {
-                        "hbaseConfig": {
-                            "hbase.zookeeper.quorum": "xxxf"
-                        },
-                        "table": "users",
-                        "encoding": "utf-8",
-                        "mode": "normal",
-                        "column": [
-                            {
-                                "name": "rowkey",
-                                "type": "string"
-                            },
-                            {
-                                "name": "info: age",
-                                "type": "string"
-                            },
-                            {
-                                "name": "info: birthday",
-                                "type": "date",
-                                "format":"yyyy-MM-dd"
-                            },
-                            {
-                                "name": "info: company",
-                                "type": "string"
-                            },
-                            {
-                                "name": "address: country",
-                                "type": "string"
-                            },
-                            {
-                                "name": "address: province",
-                                "type": "string"
-                            },
-                            {
-                                "name": "address: city",
-                                "type": "string"
-                            }
-                        ],
-                        "range": {
-                            "startRowkey": "",
-                            "endRowkey": "",
-                            "isBinaryRowkey": true
-                        }
-                    }
-                },
-                "writer": {
-                    "name": "txtfilewriter",
-                    "parameter": {
-                        "path": "/Users/shf/workplace/datax_test/hbase11xreader/result",
-                        "fileName": "qiran",
-                        "writeMode": "truncate"
-                    }
-                }
-            }
-        ]
-    }
+        "writer": {
+          "name": "txtfilewriter",
+          "parameter": {
+            "path": "/Users/shf/workplace/datax_test/hbase11xreader/result",
+            "fileName": "qiran",
+            "writeMode": "truncate"
+          }
+        }
+      }
+    ]
+  }
 }
 ```
 
@@ -190,7 +187,8 @@ ROW                                   COLUMN+CELL
   "job": {
     "setting": {
       "speed": {
-        "channel": 1
+        "channel": 1,
+        "bytes": -1
       }
     },
     "content": [
@@ -206,35 +204,35 @@ ROW                                   COLUMN+CELL
             "mode": "multiVersionFixedColumn",
             "maxVersion": "-1",
             "column": [
-                {
-                    "name": "rowkey",
-                    "type": "string"
-                },
-                {
-                    "name": "info: age",
-                    "type": "string"
-                },
-                {
-                    "name": "info: birthday",
-                    "type": "date",
-                    "format":"yyyy-MM-dd"
-                },
-                {
-                    "name": "info: company",
-                    "type": "string"
-                },
-                {
-                    "name": "address: contry",
-                    "type": "string"
-                },
-                {
-                    "name": "address: province",
-                    "type": "string"
-                },
-                {
-                    "name": "address: city",
-                    "type": "string"
-                }
+              {
+                "name": "rowkey",
+                "type": "string"
+              },
+              {
+                "name": "info: age",
+                "type": "string"
+              },
+              {
+                "name": "info: birthday",
+                "type": "date",
+                "format": "yyyy-MM-dd"
+              },
+              {
+                "name": "info: company",
+                "type": "string"
+              },
+              {
+                "name": "address: contry",
+                "type": "string"
+              },
+              {
+                "name": "address: province",
+                "type": "string"
+              },
+              {
+                "name": "address: city",
+                "type": "string"
+              }
             ],
             "range": {
               "startRowkey": "",
@@ -269,10 +267,10 @@ ROW                                   COLUMN+CELL
 | range         |    否    | 无     | 指定hbasereader读取的rowkey范围, 详见下文                                                                                         |
 | scanCacheSize |    否    | 256    | Hbase client每次rpc从服务器端读取的行数                                                                                           |
 | scanBatchSize |    否    | 100    | Hbase client每次rpc从服务器端读取的列数                                                                                           |
-  
+
 ### column
 
-描述：要读取的hbase字段，normal 模式与multiVersionFixedColumn 模式下必填项。 
+描述：要读取的hbase字段，normal 模式与multiVersionFixedColumn 模式下必填项。
 
 **normal 模式**
 
@@ -280,45 +278,45 @@ name指定读取的hbase列，除了rowkey外，必须为 列族:列名 的格�
 
 ```json
 {
- "column": [
-  {
-   "name": "rowkey",
-   "type": "string"
-  },
-  {
-   "value": "test",
-   "type": "string"
-  }
- ]
+  "column": [
+    {
+      "name": "rowkey",
+      "type": "string"
+    },
+    {
+      "value": "test",
+      "type": "string"
+    }
+  ]
 }
 ```
 
-normal 模式下，对于用户指定Column信息，type必须填写，name/value必须选择其一。    
-    
+normal 模式下，对于用户指定Column信息，type必须填写，name/value必须选择其一。
+
 **multiVersionFixedColumn 模式**
 
 name指定读取的hbase列，除了rowkey外，必须为 列族:列名 的格式，type指定源数据的类型，format指定日期类型的格式 。multiVersionFixedColumn模式下不支持常量列。配置格式如下：
 
 ```json
 {
- "mode": "multiVersionFixedColumn",
- "maxVersion": 3,
- "column": [
-  {
-   "name": "rowkey",
-   "type": "string"
-  },
-  {
-   "name": "info: age",
-   "type": "string"
-  }
- ]
+  "mode": "multiVersionFixedColumn",
+  "maxVersion": 3,
+  "column": [
+    {
+      "name": "rowkey",
+      "type": "string"
+    },
+    {
+      "name": "info: age",
+      "type": "string"
+    }
+  ]
 }
 ```
 
 ### range
 
-指定hbasereader读取的rowkey范围  
+指定hbasereader读取的rowkey范围
 
 - startRowkey：指定开始rowkey
 - endRowkey指定结束rowkey
@@ -328,11 +326,11 @@ name指定读取的hbase列，除了rowkey外，必须为 列族:列名 的格�
 
 ```json
 {
- "range": {
-  "startRowkey": "aaa",
-  "endRowkey": "ccc",
-  "isBinaryRowkey": false
- }
+  "range": {
+    "startRowkey": "aaa",
+    "endRowkey": "ccc",
+    "isBinaryRowkey": false
+  }
 }
 ```
 
