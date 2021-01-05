@@ -1,4 +1,3 @@
-
 # SqlServerReader 插件文档
 
 ## 1 快速介绍
@@ -19,45 +18,46 @@ SqlServerReader插件实现了从SqlServer读取数据。在底层实现上，Sq
 
 ```json
 {
-    "job": {
-        "setting": {
-            "speed": {
-                 "byte": 1048576
-            }
+  "job": {
+    "setting": {
+      "speed": {
+        "byte": -1,
+        "channel": 1
+      }
+    },
+    "content": [
+      {
+        "reader": {
+          "name": "sqlserverreader",
+          "parameter": {
+            "username": "root",
+            "password": "root",
+            "column": [
+              "*"
+            ],
+            "splitPk": "db_id",
+            "connection": [
+              {
+                "table": [
+                  "table"
+                ],
+                "jdbcUrl": [
+                  "jdbc:sqlserver://localhost:3433;DatabaseName=dbname"
+                ]
+              }
+            ]
+          }
         },
-        "content": [
-            {
-                "reader": {
-                    "name": "sqlserverreader",
-                    "parameter": {
-                        "username": "root",
-                        "password": "root",
-                        "column": [
-                            "id"
-                        ],
-                        "splitPk": "db_id",
-                        "connection": [
-                            {
-                                "table": [
-                                    "table"
-                                ],
-                                "jdbcUrl": [
-                                "jdbc:sqlserver://localhost:3433;DatabaseName=dbname"
-                                ]
-                            }
-                        ]
-                    }
-                },
-               "writer": {
-                    "name": "streamwriter",
-                    "parameter": {
-                        "print": true,
-                        "encoding": "UTF-8"
-                    }
-                }
-            }
-        ]
-    }
+        "writer": {
+          "name": "streamwriter",
+          "parameter": {
+            "print": true,
+            "encoding": "UTF-8"
+          }
+        }
+      }
+    ]
+  }
 }
 ```
 
@@ -88,7 +88,7 @@ SqlServerReader插件实现了从SqlServer读取数据。在底层实现上，Sq
 |String  |char,nchar,ntext,nvarchar,text,varchar,nvarchar(MAX),varchar(MAX)|
 | Date     |date, datetime, time    |
 | Boolean  |bit|
-| Bytes    |binary,varbinary,varbinary(MAX),timestamp|
+| Bytes    |binary,varbinary,varbinary(MAX),timestamp, image|
 
 请注意:
 

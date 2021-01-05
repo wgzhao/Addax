@@ -37,7 +37,7 @@ orcfile，它的全名是Optimized Row Columnar file，是对RCFile做了优化�
 
 7. csv类型支持压缩格式有：gzip、bz2、zip、lzo、lzo_deflate、snappy。
 
-8. 目前插件中Hive版本为 `3.1.1`，Hadoop版本为`3.1.1`, 在Hadoop `2.7.x`, Hadoop `3.1.x` 和Hive `2.x`, hive `3.1.x` 测试环境中写入正常；其它版本理论上都支持，但在生产环境使用前，请进一步测试； 
+8. 目前插件中Hive版本为 `3.1.1`，Hadoop版本为`3.1.1`, 在Hadoop `2.7.x`, Hadoop `3.1.x` 和Hive `2.x`, hive `3.1.x` 测试环境中写入正常；其它版本理论上都支持，但在生产环境使用前，请进一步测试；
 
 9. 支持`kerberos` 认证
 
@@ -47,52 +47,52 @@ orcfile，它的全名是Optimized Row Columnar file，是对RCFile做了优化�
 
 ```json
 {
-    "job": {
-        "setting": {
-            "speed": {
-                "channel": 3
-            }
+  "job": {
+    "setting": {
+      "speed": {
+        "channel": 3,
+        "bytes": -1
+      }
+    },
+    "content": [
+      {
+        "reader": {
+          "name": "hdfsreader",
+          "parameter": {
+            "path": "/user/hive/warehouse/mytable01/*",
+            "defaultFS": "hdfs://xxx:port",
+            "column": [
+              {
+                "index": 0,
+                "type": "long"
+              },
+              {
+                "index": 1,
+                "type": "boolean"
+              },
+              {
+                "type": "string",
+                "value": "hello"
+              },
+              {
+                "index": 2,
+                "type": "double"
+              }
+            ],
+            "fileType": "orc",
+            "encoding": "UTF-8",
+            "fieldDelimiter": ","
+          }
         },
-        "content": [
-            {
-                "reader": {
-                    "name": "hdfsreader",
-                    "parameter": {
-                        "path": "/user/hive/warehouse/mytable01/*",
-                        "defaultFS": "hdfs://xxx:port",
-                        "column": [
-                               {
-                                "index": 0,
-                                "type": "long"
-                               },
-                               {
-                                "index": 1,
-                                "type": "boolean"
-                               },
-                               {
-                                "type": "string",
-                                "value": "hello"
-                               },
-                               {
-                                "index": 2,
-                                "type": "double"
-                               }
-                        ],
-                        "fileType": "orc",
-                        "encoding": "UTF-8",
-                        "fieldDelimiter": ","
-                    }
-
-                },
-                "writer": {
-                    "name": "streamwriter",
-                    "parameter": {
-                        "print": true
-                    }
-                }
-            }
-        ]
-    }
+        "writer": {
+          "name": "streamwriter",
+          "parameter": {
+            "print": true
+          }
+        }
+      }
+    ]
+  }
 }
 ```
 
@@ -154,7 +154,7 @@ Hadoop hdfs文件系统namenode节点地址，如果 hdfs 配置了 HA 模式，
 
 #### column
 
-读取字段列表，type指定源数据的类型，index指定当前列来自于文本第几列(以0开始)，value指定当前类型为常量，不从源头文件读取数据，而是根据value值自动生成对应的列。 
+读取字段列表，type指定源数据的类型，index指定当前列来自于文本第几列(以0开始)，value指定当前类型为常量，不从源头文件读取数据，而是根据value值自动生成对应的列。
 
 默认情况下，用户可以全部按照String类型读取数据，配置如下：
 
@@ -166,8 +166,9 @@ Hadoop hdfs文件系统namenode节点地址，如果 hdfs 配置了 HA 模式，
 
 ```json
 {
-"type": "long",
-"index": 0    //从本地文件文本第一列获取int字段
+  "type": "long",
+  "index": 0
+  //从本地文件文本第一列获取int字段
 },
 {
 "type": "string",
@@ -205,7 +206,8 @@ Kerberos认证 keytab文件路径，绝对路径
 
 #### compress
 
-当fileType（文件类型）为csv下的文件压缩方式，目前仅支持 gzip、bz2、zip、lzo、lzo_deflate、hadoop-snappy、framing-snappy压缩；值得注意的是，lzo存在两种压缩格式：lzo和lzo_deflate，用户在配置的时候需要留心，不要配错了；另外，由于snappy目前没有统一的stream format，datax目前只支持最主流的两种：hadoop-snappy（hadoop上的snappy stream format）和 framing-snappy（google建议的snappy stream format）;
+当fileType（文件类型）为csv下的文件压缩方式，目前仅支持 gzip、bz2、zip、lzo、lzo_deflate、hadoop-snappy、framing-snappy压缩；值得注意的是，lzo存在两种压缩格式：lzo和lzo_deflate，用户在配置的时候需要留心，不要配错了；另外，由于snappy目前没有统一的stream
+format，datax目前只支持最主流的两种：hadoop-snappy（hadoop上的snappy stream format）和 framing-snappy（google建议的snappy stream format）;
 
 #### hadoopConfig
 
@@ -213,17 +215,17 @@ Kerberos认证 keytab文件路径，绝对路径
 
 ```json
 {
-    "hadoopConfig": {
-        "dfs.nameservices": "cluster",
-        "dfs.ha.namenodes.cluster": "nn1,nn2",
-        "dfs.namenode.rpc-address.cluster.nn1": "node1.example.com:8020",
-        "dfs.namenode.rpc-address.cluster.nn2": "node2.example.com:8020",
-        "dfs.client.failover.proxy.provider.cluster": "org.apache.hadoop.hdfs.server.namenode.ha.ConfiguredFailoverProxyProvider"
-    }
+  "hadoopConfig": {
+    "dfs.nameservices": "cluster",
+    "dfs.ha.namenodes.cluster": "nn1,nn2",
+    "dfs.namenode.rpc-address.cluster.nn1": "node1.example.com:8020",
+    "dfs.namenode.rpc-address.cluster.nn2": "node2.example.com:8020",
+    "dfs.client.failover.proxy.provider.cluster": "org.apache.hadoop.hdfs.server.namenode.ha.ConfiguredFailoverProxyProvider"
+  }
 }
 ```
-这里的 `cluster` 表示 HDFS 配置成HA时的名字，也即是 `defaultFS` 配置项中的名字
-如果实际环境中的名字不是 `cluster` ，则上述配置中所有写有 `cluster` 都需要替换 
+
+这里的 `cluster` 表示 HDFS 配置成HA时的名字，也即是 `defaultFS` 配置项中的名字 如果实际环境中的名字不是 `cluster` ，则上述配置中所有写有 `cluster` 都需要替换
 
 #### csvReaderConfig
 
@@ -233,9 +235,9 @@ Kerberos认证 keytab文件路径，绝对路径
 
 ```json
 "csvReaderConfig": {
-        "safetySwitch": false,
-        "skipEmptyRecords": false,
-        "useTextQualifier": false
+"safetySwitch": false,
+"skipEmptyRecords": false,
+"useTextQualifier": false
 }
 ```
 
@@ -283,7 +285,6 @@ string类型。HdfsReader提供了类型转换的建议表如下：
 
 * Hive支持的数据类型 TIMESTAMP 可以精确到纳秒级别，所以 textfile、orcfile 中 TIMESTAMP 存放的数据类似于 `2015-08-21 22:40:47.397898389`，如果转换的类型配置为DataX的Date，转换之后会导致纳秒部分丢失，所以如果需要保留纳秒部分的数据，请配置转换类型为DataX的String类型。
 
-
 ### 3.4 按分区读取
 
 Hive在建表的时候，可以指定分区partition，例如创建分区partition(day="20150820",hour="09")，对应的hdfs文件系统中，相应的表的目录下则会多出/20150820和/09两个目录，且/20150820是/09的父目录。了解了分区都会列成相应的目录结构，在按照某个分区读取某个表所有数据时，则只需配置好json中path的值即可。
@@ -302,14 +303,14 @@ Hive在建表的时候，可以指定分区partition，例如创建分区partiti
 
 1. 如果报java.io.IOException: Maximum column length of 100,000 exceeded in column...异常信息，说明数据源column字段长度超过了100000字符。
 
- 需要在json的reader里增加如下配置
+需要在json的reader里增加如下配置
 
  ```json
  "csvReaderConfig": {
-	"safetySwitch": false,
-	"skipEmptyRecords": false,
-	"useTextQualifier": false
- }
+"safetySwitch": false,
+"skipEmptyRecords": false,
+"useTextQualifier": false
+}
  ```
 
 `safetySwitch = false; //单列长度不限制100000字符`

@@ -232,14 +232,13 @@ public class CommonRdbmsReader
             // do nothing
         }
 
-        protected Record transportOneRecord(RecordSender recordSender, ResultSet rs,
+        protected void transportOneRecord(RecordSender recordSender, ResultSet rs,
                 ResultSetMetaData metaData, int columnNumber, String mandatoryEncoding,
                 TaskPluginCollector taskPluginCollector)
         {
             Record record = buildRecord(recordSender, rs, metaData, columnNumber,
                     mandatoryEncoding, taskPluginCollector);
             recordSender.sendToWriter(record);
-            return record;
         }
 
         protected Record buildRecord(RecordSender recordSender, ResultSet rs, ResultSetMetaData metaData,
@@ -359,16 +358,10 @@ public class CommonRdbmsReader
                             break;
 
                         case Types.OTHER:
-                            // database-specific type
-                            String otherType = metaData.getColumnTypeName(i).toLowerCase();
-                            if ("json".equals(otherType)
-                                    || "uuid".equals(otherType)
-                                    || "xml".equals(otherType)) {
-                                record.addColumn(new StringColumn(rs.getObject(i).toString()));
-                            }
-                            else {
-                                LOG.warn("unknown data type: {}, try to convert to string",
-                                        otherType);
+                            // database-specific type, convert it to string as default
+                            if ("image".equals(metaData.getColumnTypeName(i))) {
+                                record.addColumn(new BytesColumn(rs.getBytes(i)));
+                            } else {
                                 record.addColumn(new StringColumn(rs.getObject(i).toString()));
                             }
                             break;

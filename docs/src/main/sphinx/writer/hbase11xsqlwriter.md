@@ -69,9 +69,9 @@ HBase11xsqlwriter实现了向hbase中的SQL表(phoenix)批量导入数据的功�
             "kerberosPrincipal": "hive@EXAMPLE.COM",
             "kerberosKeytabFilePath": "/tmp/hive.headless.keytab",
             "hbaseConfig": {
-                "hbase.zookeeper.quorum": "node1,node2,node3:2181",
-                "zookeeper.znode.parent": "/hbase-secure"
-              },
+              "hbase.zookeeper.quorum": "node1,node2,node3:2181",
+              "zookeeper.znode.parent": "/hbase-secure"
+            },
             "nullMode": "skip",
             "table": "TEST_TBL"
           }
@@ -80,7 +80,8 @@ HBase11xsqlwriter实现了向hbase中的SQL表(phoenix)批量导入数据的功�
     ],
     "setting": {
       "speed": {
-        "channel": 5
+        "channel": 5,
+        "bytes": -1
       }
     }
   }
