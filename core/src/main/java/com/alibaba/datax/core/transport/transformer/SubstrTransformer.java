@@ -21,7 +21,7 @@ public class SubstrTransformer
     }
 
     @Override
-    public Record evaluate(com.alibaba.datax.common.element.Record record, Object... paras)
+    public Record evaluate(Record record, Object... paras)
     {
 
         int columnIndex;
