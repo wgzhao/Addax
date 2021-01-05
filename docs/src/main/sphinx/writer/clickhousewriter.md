@@ -16,61 +16,67 @@ ClickHouseWriter 插件实现了写入数据ClickHouse。在底层实现上，Cl
 
 ```json
 {
-    "job": {
-        "setting": {
-            "speed": {
-                 "channel": 3
-            },
-            "errorLimit": {
-                "record": 0,
-                "percentage": 0.02
-            }
-        },
-        "content": [
-            {
-                "writer": {
-                    "name": "clickhousewriter",
-                    "parameter": {
-                        "username": "default",
-                        "password": "",
-                        "column": [ "col1", "col2","col3","col4" ],
-                        "connection": [
-                            {
-                                "table": [
-                                    "test_tbl"
-                                ],
-                                "jdbcUrl": "jdbc:clickhouse://127.0.0.1:8123/default"
-                            }
-                        ]
-                    }
-                },
-               "reader": {
-                    "name": "streamreader",
-                    "parameter": {
-                        "column" : [
-                            {
-                                "value": "DataX",
-                                "type": "string"
-                            },
-                            {
-                                "value": 19890604,
-                                "type": "long"
-                            },
-                            {
-                                "value": "1989-06-04 00:00:00",
-                                "type": "date"
-                            },
-                            {
-                                "value": true,
-                                "type": "bool"
-                            }
-                        ],
-                        "sliceRecordCount": 1000
-                    }
+  "job": {
+    "setting": {
+      "speed": {
+        "channel": 3,
+        "bytes": -1
+      },
+      "errorLimit": {
+        "record": 0,
+        "percentage": 0.02
+      }
+    },
+    "content": [
+      {
+        "writer": {
+          "name": "clickhousewriter",
+          "parameter": {
+            "username": "default",
+            "password": "",
+            "column": [
+              "col1",
+              "col2",
+              "col3",
+              "col4"
+            ],
+            "connection": [
+              {
+                "table": [
+                  "test_tbl"
+                ],
+                "jdbcUrl": "jdbc:clickhouse://127.0.0.1:8123/default"
               }
-           }
-        ]
-    }
+            ]
+          }
+        },
+        "reader": {
+          "name": "streamreader",
+          "parameter": {
+            "column": [
+              {
+                "value": "DataX",
+                "type": "string"
+              },
+              {
+                "value": 19890604,
+                "type": "long"
+              },
+              {
+                "value": "1989-06-04 00:00:00",
+                "type": "date"
+              },
+              {
+                "value": true,
+                "type": "bool"
+              }
+            ],
+            "sliceRecordCount": 1000
+          }
+        }
+      }
+    ]
+  }
 }
 ```
 

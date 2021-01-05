@@ -15,7 +15,6 @@ DbfFileWriter提供了向本地文件写入类dbf格式的一个或者多个表�
   "job": {
     "setting": {
       "speed": {
-        "batchSize": 20480,
         "bytes": -1,
         "channel": 1
       }
@@ -42,9 +41,9 @@ DbfFileWriter提供了向本地文件写入类dbf格式的一个或者多个表�
                 "value": true,
                 "type": "bool"
               },
-	          {
-			    "value":"中文测试",
-				"type": "string"
+              {
+                "value": "中文测试",
+                "type": "string"
               }
             ],
             "sliceRecordCount": 10
@@ -73,16 +72,16 @@ DbfFileWriter提供了向本地文件写入类dbf格式的一个或者多个表�
                 "name": "col4",
                 "type": "logical"
               },
-			  {
-				"name": "col5",
-				"type":"char",
-				"length": 100
-			  }
+              {
+                "name": "col5",
+                "type": "char",
+                "length": 100
+              }
             ],
             "fileName": "test.dbf",
             "path": "/tmp/out",
             "writeMode": "truncate",
-			"encoding": "GBK"
+            "encoding": "GBK"
           }
         }
       }

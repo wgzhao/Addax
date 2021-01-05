@@ -2,14 +2,7 @@
 
 本文面向DataX插件开发人员，尝试尽可能全面地阐述开发一个DataX插件所经过的历程，力求消除开发者的困惑，让插件开发变得简单。
 
-## 一、开发之前
-
-> 路走对了，就不怕远。✓
-> 路走远了，就不管对不对。✕
-
-当你打开这篇文档，想必已经不用在此解释什么是 `DataX` 了。那下一个问题便是：
-
-### `DataX` 为什么要使用插件机制
+## `DataX` 为什么要使用插件机制
 
 从设计之初，`DataX` 就把异构数据源同步作为自身的使命，为了应对不同数据源的差异、同时提供一致的同步原语和扩展能力，`DataX` 自然而然地采用了 `框架` + `插件` 的模式：
 
@@ -21,11 +14,7 @@
 1. 数据源本身的读写数据正确性。
 2. 如何与框架沟通、合理正确地使用框架。
 
-### 开工前需要想明白的问题
-
-就插件本身而言，希望在您动手coding之前，能够回答我们列举的这些问题，不然路走远了发现没走对，就尴尬了。
-
-## 二、插件视角看框架
+## 插件视角看框架
 
 ### 逻辑执行模型
 
@@ -47,61 +36,75 @@
 - `Local`: 单进程运行，统计信息、错误信息汇报到集中存储。
 - `Distrubuted`: 分布式多进程运行，依赖 `DataX Service` 服务。
 
-当然，上述三种模式对插件的编写而言没有什么区别，你只需要避开一些小错误，插件就能够在单机/分布式之间无缝切换了。
-当 `JobContainer` 和 `TaskGroupContainer` 运行在同一个进程内时，就是单机模式（`Standalone`和`Local`）；当它们分布在不同的进程中执行时，就是分布式（`Distributed`）模式。
+当然，上述三种模式对插件的编写而言没有什么区别，你只需要避开一些小错误，插件就能够在单机/分布式之间无缝切换了。 当 `JobContainer` 和 `TaskGroupContainer` 运行在同一个进程内时，就是单机模式（`Standalone`和`Local`）；当它们分布在不同的进程中执行时，就是分布式（`Distributed`）模式。
 
-是不是很简单？
-
-### 编程接口
+## 编程接口
 
 那么，`Job` 和 `Task` 的逻辑应是怎么对应到具体的代码中的？
 
 首先，插件的入口类必须扩展 `Reader` 或 `Writer` 抽象类，并且实现分别实现 `Job` 和 `Task` 两个内部抽象类，`Job` 和 `Task` 的实现必须是 **内部类** 的形式，原因见 **加载原理** 一节。以Reader为例：
 
 ```java
-public class SomeReader extends Reader {
-    public static class Job extends Reader.Job {
+public class SomeReader
+        extends Reader
+{
+    public static class Job
+            extends Reader.Job
+    {
         @Override
-        public void init() {
+        public void init()
+        {
         }
 
-    @Override
-    public void prepare() {
-        }
         @Override
-        public List<Configuration> split(int adviceNumber) {
+        public void prepare()
+        {
+        }
+
+        @Override
+        public List<Configuration> split(int adviceNumber)
+        {
             return null;
         }
 
         @Override
-        public void post() {
+        public void post()
+        {
         }
 
         @Override
-        public void destroy() {
+        public void destroy()
+        {
         }
     }
 
-    public static class Task extends Reader.Task {
+    public static class Task
+            extends Reader.Task
+    {
 
         @Override
-        public void init() {
-        }
-
-    @Override
-    public void prepare() {
-        }
-
-        @Override
-        public void startRead(RecordSender recordSender) {
+        public void init()
+        {
         }
 
         @Override
-        public void post() {
+        public void prepare()
+        {
         }
 
         @Override
-        public void destroy() {
+        public void startRead(RecordSender recordSender)
+        {
+        }
+
+        @Override
+        public void post()
+        {
+        }
+
+        @Override
+        public void destroy()
+        {
         }
     }
 }
@@ -147,10 +150,10 @@ public class SomeReader extends Reader {
 
 ```json
 {
-    "name": "mysqlwriter",
-    "class": "com.alibaba.datax.plugin.writer.mysqlwriter.MysqlWriter",
-    "description": "Use Jdbc connect to database, execute insert sql.",
-    "developer": "alibaba"
+  "name": "mysqlwriter",
+  "class": "com.alibaba.datax.plugin.writer.mysqlwriter.MysqlWriter",
+  "description": "Use Jdbc connect to database, execute insert sql.",
+  "developer": "alibaba"
 }
 ```
 
@@ -161,10 +164,10 @@ public class SomeReader extends Reader {
 
 ### 打包发布
 
-`DataX` 使用 `assembly` 打包，`assembly` 的使用方法请咨询谷哥或者度娘。打包命令如下：
+`DataX` 使用 `assembly` 打包，打包命令如下：
 
 ```bash
-mvn clean package -DskipTests assembly:assembly
+mvn clean package -DskipTests assembly:single
 ```
 
 `DataX`插件需要遵循统一的目录结构：
@@ -212,7 +215,7 @@ ${DATAX_HOME}
 
 **插件的目录名字必须和 `plugin.json` 中定义的插件名称一致。**
 
-### 配置文件
+## 配置文件
 
 `DataX` 使用 `json` 作为配置文件的格式。一个典型的 `DataX` 任务配置如下：
 
@@ -226,7 +229,9 @@ ${DATAX_HOME}
           "parameter": {
             "accessKey": "",
             "accessId": "",
-            "column": [""],
+            "column": [
+              ""
+            ],
             "isCompress": "",
             "odpsServer": "",
             "partition": [
@@ -242,7 +247,9 @@ ${DATAX_HOME}
           "parameter": {
             "username": "",
             "password": "",
-            "column": ["*"],
+            "column": [
+              "*"
+            ],
             "connection": [
               {
                 "jdbcUrl": "",
@@ -274,8 +281,8 @@ ${DATAX_HOME}
 - 驼峰命名：所有配置项采用驼峰命名法，首字母小写，单词首字母大写。
 - 正交原则：配置项必须正交，功能没有重复，没有潜规则。
 - 富类型：合理使用json的类型，减少无谓的处理逻辑，减少出错的可能。
-  - 使用正确的数据类型。比如，bool类型的值使用 `true`/`false`，而非 `"yes"`/`"true"`/`0` 等。
-  - 合理使用集合类型，比如，用数组替代有分隔符的字符串。
+    - 使用正确的数据类型。比如，bool类型的值使用 `true`/`false`，而非 `"yes"`/`"true"`/`0` 等。
+    - 合理使用集合类型，比如，用数组替代有分隔符的字符串。
 - 类似通用：遵守同一类型的插件的习惯，比如关系型数据库的 `connection` 参数都是如下结构：
 
   ```json
@@ -305,7 +312,7 @@ ${DATAX_HOME}
   }
   ```
 
-#### 如何使用`Configuration`类
+### 如何使用`Configuration`类
 
 为了简化对json的操作，`DataX`提供了简单的DSL配合`Configuration`类使用。
 
@@ -348,7 +355,7 @@ ${DATAX_HOME}
 
 更多`Configuration`的操作请参考`ConfigurationTest.java`。
 
-### 插件数据传输
+## 插件数据传输
 
 跟一般的 `生产者-消费者` 模式一样，`Reader` 插件和 `Writer` 插件之间也是通过 `channel` 来实现数据的传输的。`channel` 可以是内存的，也可能是持久化的，插件不必关心。插件通过`RecordSender`往`channel`写入数据，通过`RecordReceiver`从`channel`读取数据。
 
@@ -357,17 +364,23 @@ ${DATAX_HOME}
 `Record`有如下方法：
 
 ```java
-public interface Record {
+public interface Record
+{
     // 加入一个列，放在最后的位置
     void addColumn(Column column);
+
     // 在指定下标处放置一个列
     void setColumn(int i, final Column column);
+
     // 获取一个列
     Column getColumn(int i);
+
     // 转换为json String
     String toString();
+
     // 获取总列数
     int getColumnNumber();
+
     // 计算整条记录在内存中占用的字节数
     int getByteSize();
 }
@@ -375,11 +388,12 @@ public interface Record {
 
 因为`Record`是一个接口，`Reader`插件首先调用`RecordSender.createRecord()`创建一个`Record`实例，然后把`Column`一个个添加到`Record`中。
 
-`Writer` 插件调用`RecordReceiver.getFromReader()`方法获取`Record`，然后把`Column`遍历出来，写入目标存储中。当`Reader`尚未退出，传输还在进行时，如果暂时没有数据`RecordReceiver.getFromReader()`方法会阻塞直到有数据。如果传输已经结束，会返回`null`，`Writer`插件可以据此判断是否结束`startWrite`方法。
+`Writer` 插件调用`RecordReceiver.getFromReader()`方法获取`Record`，然后把`Column`遍历出来，写入目标存储中。当`Reader`尚未退出，传输还在进行时，如果暂时没有数据`RecordReceiver.getFromReader()`方法会阻塞直到有数据。如果传输已经结束，会返回`null`，`Writer`
+插件可以据此判断是否结束`startWrite`方法。
 
 `Column` 的构造和操作，我们在《类型转换》一节介绍。
 
-### 类型转换
+## 类型转换
 
 为了规范源端和目的端类型转换操作，保证数据不失真，DataX支持六种内部数据类型：
 
@@ -409,7 +423,7 @@ DataX的内部类型在实现上会选用不同的java类型：
 
 类型之间相互转换的关系如下：
 
-| from\to     |   Date  |  Long  | Double | Bytes   | String | Bool   |
+| from/to     |   Date  |  Long  | Double | Bytes   | String | Bool   |
 | -----   | -------- | ----- | ------ | -------- | ----- |  ----- |
 | Date    |    -     |  使用毫秒时间戳  |   不支持  |    不支持      |   使用系统配置的date/time/datetime格式转换    |  不支持  |
 | Long    |  作为毫秒时间戳构造Date    |   -   | BigInteger转为BigDecimal，然后BigDecimal.doubleValue()       |    不支持      |  BigInteger.toString()    | 0为false，否则true   |
@@ -418,9 +432,9 @@ DataX的内部类型在实现上会选用不同的java类型：
 | String  | 按照配置的date/time/datetime/extra格式解析 |  用String构造BigDecimal，然后取longValue()  |   用String构造BigDecimal，然后取doubleValue(),会正确处理`NaN`/`Infinity`/`-Infinity`  |   按照`common.column.encoding`配置的编码转换为byte[]，默认`utf-8`     |    -  |    "true"为`true`, "false"为`false`，大小写不敏感。其他字符串不支持    |
 | Bool    |    不支持  |  `true`为`1L`，否则`0L`     |        | `true`为`1.0`，否则`0.0`   |  不支持  |    -   |
 
-### 脏数据处理
+## 脏数据处理
 
-#### 什么是脏数据
+### 什么是脏数据
 
 目前主要有三类脏数据：
 
@@ -428,13 +442,13 @@ DataX的内部类型在实现上会选用不同的java类型：
 2. 不支持的类型转换，比如：`Bytes`转换为`Date`。
 3. 写入目标端失败，比如：写mysql整型长度超长。
 
-#### 如何处理脏数据
+### 如何处理脏数据
 
 在`Reader.Task`和`Writer.Task`中，功过`AbstractTaskPlugin.getPluginCollector()`可以拿到一个`TaskPluginCollector`，它提供了一系列`collectDirtyRecord`的方法。当脏数据出现时，只需要调用合适的`collectDirtyRecord`方法，把被认为是脏数据的`Record`传入即可。
 
 用户可以在任务的配置中指定脏数据限制条数或者百分比限制，当脏数据超出限制时，框架会结束同步任务，退出。插件需要保证脏数据都被收集到，其他工作交给框架就好。
 
-### 加载原理
+## 加载原理
 
 1. 框架扫描`plugin/reader`和`plugin/writer`目录，加载每个插件的`plugin.json`文件。
 2. 以`plugin.json`文件中`name`为key，索引所有的插件配置。如果发现重名的插件，框架会异常退出。

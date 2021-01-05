@@ -18,44 +18,45 @@ RedisWrite 提供了还原Redis dump命令的能力，并写入到目标Redis。
 
 ```json
 {
-    "job": {
-        "content": [
-            {
-                "reader": {
-                    "name": "redisreader",
-                    "parameter": {
-                        "connection": [
-                            {
-                                "uri": "file:///root/dump.rdb",
-                                "uri": "http://localhost/dump.rdb",
-                                "uri": "tcp://127.0.0.1:7001",
-                                "uri": "tcp://127.0.0.1:7002",
-                                "uri": "tcp://127.0.0.1:7003",
-                            }
-                        ]
-                    }
-                },
-                "writer": {
-                    "name": "rediswriter",
-                    "parameter": {
-                        "connection": [
-                            {
-                                "uri": "tcp://127.0.0.1:6379",
-                                "auth": "123456"
-                            }
-                        ],
-                        "redisCluster":false,
-                        "flushDB":false
-                    }
-                }
-            }
-        ],
-        "setting": {
-            "speed": {
-                "channel": 1
-            }
+  "job": {
+    "content": [
+      {
+        "reader": {
+          "name": "redisreader",
+          "parameter": {
+            "connection": [
+              {
+                "uri": "file:///root/dump.rdb",
+                "uri": "http://localhost/dump.rdb",
+                "uri": "tcp://127.0.0.1:7001",
+                "uri": "tcp://127.0.0.1:7002",
+                "uri": "tcp://127.0.0.1:7003"
+              }
+            ]
+          }
+        },
+        "writer": {
+          "name": "rediswriter",
+          "parameter": {
+            "connection": [
+              {
+                "uri": "tcp://127.0.0.1:6379",
+                "auth": "123456"
+              }
+            ],
+            "redisCluster": false,
+            "flushDB": false
+          }
         }
+      }
+    ],
+    "setting": {
+      "speed": {
+        "channel": 1,
+        "bytes": -1
+      }
     }
+  }
 }
 ```
 

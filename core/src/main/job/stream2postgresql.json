@@ -1,0 +1,54 @@
+{
+  "job": {
+    "content": [
+      {
+        "writer": {
+          "name": "postgresqlwriter",
+          "parameter": {
+            "column": [
+              "id","subid","msg"
+            ],
+            "connection": [
+              {
+                "jdbcUrl": "jdbc:postgresql://127.0.0.1:5432/pgtest"
+                ,
+                "table": [
+                  "datax_tbl"
+                ]
+              }
+            ],
+            "username": "pgtest",
+            "password": "pgtest",
+            "writeMode": "update(id, subid)"
+          }
+        },
+        "reader": {
+          "name": "streamreader",
+          "parameter": {
+            "column": [
+              {
+                "random": "100,1000",
+                "type": "long"
+              },
+              {
+                "random": "110,1100",
+                "type": "long"
+              },
+              {
+                "value": "update",
+                "type": "string"
+              }
+            ],
+            "sliceRecordCount": 1
+          }
+        }
+      }
+    ],
+    "setting": {
+      "speed": {
+        "bytes": -1,
+        "channel": 1
+      }
+    }
+  }
+}

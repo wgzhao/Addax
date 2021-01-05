@@ -1,4 +1,3 @@
-
 # PostgresqlReader 插件文档
 
 ## 1 快速介绍
@@ -15,50 +14,102 @@ PostgresqlReader插件实现了从PostgreSQL读取数据。在底层实现上，
 
 ### 3.1 配置样例
 
+假定建表语句以及输入插入语句如下：
+
+```sql
+create table if not exists datax_tbl 
+(
+    c_bigint bigint,
+    c_bit bit(3),
+    c_bool boolean,
+    c_byte bytea,
+    c_char char(10),
+    c_varchar varchar(20),
+    c_date  date,
+    c_double float8,
+    c_int integer,
+    c_json json,
+    c_number decimal(8,3),
+    c_real  real,
+    c_small smallint,
+    c_text  text,
+    c_ts timestamp,
+    c_uuid uuid,
+    c_xml xml,
+    c_money money,
+    c_inet inet,
+    c_cidr cidr,
+    c_macaddr macaddr
+);
+insert into datax_tbl values(
+    999988887777,
+    B'101',
+    TRUE,
+    '\xDEADBEEF',
+    'hello',
+    'hello, world',
+    '2021-01-04',
+    999888.9972,
+    9876542,
+    '{"bar": "baz", "balance": 7.77, "active": false}'::json,
+    12345.123,
+    123.123,
+    126,
+    'this is a long text ',
+    '2020-01-04 12:13:14',
+    'A0EEBC99-9C0B-4EF8-BB6D-6BB9BD380A11'::uuid,
+    '<foo>bar</foo>'::xml,
+    '52093.89'::money,
+    '192.168.1.1'::inet,
+    '192.168.1/24'::cidr,
+    '08002b:010203'::macaddr
+);
+```
+
 配置一个从PostgreSQL数据库同步抽取数据到本地的作业:
 
 ```json
 {
-    "job": {
-        "setting": {
-            "speed": {
-                 "byte": 1048576
-            }
+  "job": {
+    "setting": {
+      "speed": {
+        "byte": -1,
+        "channel": 1
+      }
+    },
+    "content": [
+      {
+        "reader": {
+          "name": "postgresqlreader",
+          "parameter": {
+            "username": "xx",
+            "password": "xx",
+            "column": [
+              "*"
+            ],
+            "splitPk": "id",
+            "connection": [
+              {
+                "table": [
+                  "table"
+                ],
+                "jdbcUrl": [
+                  "jdbc:postgresql://host:port/database"
+                ]
+              }
+            ]
+          }
         },
-        "content": [
-            {
-                "reader": {
-                    "name": "postgresqlreader",
-                    "parameter": {
-                        "username": "xx",
-                        "password": "xx",
-                        "column": [
-                            "id", "name"
-                        ],
-                        "splitPk": "id",
-                        "connection": [
-                            {
-                                "table": [
-                                    "table"
-                                ],
-                                "jdbcUrl": [
-                "jdbc:postgresql://host:port/database"
-                                ]
-                            }
-                        ]
-                    }
-                },
-               "writer": {
-                    "name": "streamwriter",
-                    "parameter": {
-                        "print":true
-                    }
-                }
-            }
-        ]
-    }
+        "writer": {
+          "name": "streamwriter",
+          "parameter": {
+            "print": true
+          }
+        }
+      }
+    ]
+  }
 }
-
 ```
 
 ### 3.2 参数说明
@@ -81,16 +132,15 @@ PostgresqlReader插件实现了从PostgreSQL读取数据。在底层实现上，
 
 下面列出PostgresqlReader针对PostgreSQL类型转换列表:
 
-
 | DataX 内部类型 | PostgreSQL 数据类型                          |
 | -------------- | -------------------------------------------- |
 | Long           | bigint, bigserial, integer, smallint, serial |
 | Double         | double precision, money, numeric, real       |
-| String         | varchar, char, text, bit, inet               |
+| String         | varchar, char, text, bit(>1), inet, cidr, macaddr, array,uuid,json,xml    |
 | Date           | date, time, timestamp                        |
-| Boolean        | bool                                         |
+| Boolean        | bool,bit(1)                                   |
 | Bytes          | bytea                                        |
 
 请注意:
 
-除上述罗列字段类型外，其他类型均不支持; `money`,`inet`,`bit` 需用户使用 `a_inet::varchar` 类似的语法转换
+除上述罗列字段类型外，其他类型均不支持; 
