@@ -17,14 +17,14 @@
 
 ```json
 {
-    "jobName": "test",
-    "startTimeStamp": 1587971621,
-    "endTimeStamp": 1587971621,
-    "totalCosts": 10,
-    "byteSpeedPerSecond": 33,
-    "recordSpeedPerSecond": 1,
-    "totalReadRecords": 6,
-    "totalErrorRecords": 0
+  "jobName": "test",
+  "startTimeStamp": 1587971621,
+  "endTimeStamp": 1587971621,
+  "totalCosts": 10,
+  "byteSpeedPerSecond": 33,
+  "recordSpeedPerSecond": 1,
+  "totalReadRecords": 6,
+  "totalErrorRecords": 0
 }
 ```
 

@@ -24,47 +24,54 @@ RedisReader 提供了读取Redis RDB 的能力。在底层实现上获取本地R
 
 ```json
 {
-    "job": {
-        "content": [
-            {
-                "reader": {
-                    "name": "redisreader",
-                    "parameter": {
-                        "connection": [
-                            {
-                                "uri": "file:///root/dump.rdb",
-                                "uri": "http://localhost/dump.rdb",
-                                "uri": "tcp://127.0.0.1:7001",
-                                "uri": "tcp://127.0.0.1:7002",
-                                "uri": "tcp://127.0.0.1:7003",
-                                "auth": "password"
-                            }
-                        ],
-                        "include":["^user"],
-                        "exclude":["^password"],
-                        "db":[0,1]
-                    }
-                },
-                "writer": {
-                    "name": "rediswriter",
-                    "parameter": {
-                        "connection": [
-                            {
-                                "uri": "tcp://127.0.0.1:6379",
-                                "auth": "123456"
-                            }
-                        ],
-                        "timeout":60000
-                    }
-                }
-            }
-        ],
-        "setting": {
-            "speed": {
-                "channel": 1
-            }
+  "job": {
+    "content": [
+      {
+        "reader": {
+          "name": "redisreader",
+          "parameter": {
+            "connection": [
+              {
+                "uri": "file:///root/dump.rdb",
+                "uri": "http://localhost/dump.rdb",
+                "uri": "tcp://127.0.0.1:7001",
+                "uri": "tcp://127.0.0.1:7002",
+                "uri": "tcp://127.0.0.1:7003",
+                "auth": "password"
+              }
+            ],
+            "include": [
+              "^user"
+            ],
+            "exclude": [
+              "^password"
+            ],
+            "db": [
+              0,
+              1
+            ]
+          }
+        },
+        "writer": {
+          "name": "rediswriter",
+          "parameter": {
+            "connection": [
+              {
+                "uri": "tcp://127.0.0.1:6379",
+                "auth": "123456"
+              }
+            ],
+            "timeout": 60000
+          }
         }
+      }
+    ],
+    "setting": {
+      "speed": {
+        "channel": 1
+      }
     }
+  }
 }
 ```
 
