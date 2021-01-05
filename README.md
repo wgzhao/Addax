@@ -36,6 +36,8 @@
 
 1. clickhousereader
 2. dbffilereader
+3. hbase20xreader
+4. jsonfilereader
 
 #### writer plugin
 
@@ -43,6 +45,7 @@
 
 ### 部分插件增强功能，罗列如下
 
+- 关系型数据库 增加了几乎所有基本数据类型和一部分复杂类型的支持
 - hdfswriter 增加了对 Decimal 数据类型格式的支持
 - hdfswriter 增加了对 Parquet 文件格式的支持
 - hdfswrite 增加了目录覆盖模式
@@ -54,6 +57,7 @@
 - hbasex11sqlwrite 增加了 Kerberos 支持
 - oraclewriter 增加对 `merge into` 语法支持(感谢 @weihebu 提供的建议和参考)
 - postgresqlwriter 增加 `insert into ... on conflict` 语法支持 (感谢 @weihebu 提供的建议和参考)
+- rdbmsreader/rdbmswriter 增加了TDH Inceptor， Trino 查询引擎支持 
 - 尽可能减少了本地jar包的依赖，转为从maven仓库获取
 - 绝大部分依赖包升级到了最新稳定版本，减少了潜在漏洞
 - 不同插件下的相同依赖包做了版本统一
