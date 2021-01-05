@@ -34,58 +34,60 @@ TxtFileReader实现了从本地文件读取数据并转为DataX协议的功能�
 
 ```json
 {
-    "setting": {},
-    "job": {
-        "setting": {
-            "speed": {
-                "channel": 2
-            }
+  "job": {
+    "setting": {
+      "speed": {
+        "channel": 2,
+        "bytes": -1
+      }
+    },
+    "content": [
+      {
+        "reader": {
+          "name": "txtfilereader",
+          "parameter": {
+            "path": [
+              "/tmp/data"
+            ],
+            "encoding": "UTF-8",
+            "column": [
+              {
+                "index": 0,
+                "type": "long"
+              },
+              {
+                "index": 1,
+                "type": "boolean"
+              },
+              {
+                "index": 2,
+                "type": "double"
+              },
+              {
+                "index": 3,
+                "type": "string"
+              },
+              {
+                "index": 4,
+                "type": "date",
+                "format": "yyyy.MM.dd"
+              }
+            ],
+            "fieldDelimiter": ","
+          }
         },
-        "content": [
-            {
-                "reader": {
-                    "name": "txtfilereader",
-                    "parameter": {
-                        "path": ["/home/haiwei.luo/case00/data"],
-                        "encoding": "UTF-8",
-                        "column": [
-                            {
-                                "index": 0,
-                                "type": "long"
-                            },
-                            {
-                                "index": 1,
-                                "type": "boolean"
-                            },
-                            {
-                                "index": 2,
-                                "type": "double"
-                            },
-                            {
-                                "index": 3,
-                                "type": "string"
-                            },
-                            {
-                                "index": 4,
-                                "type": "date",
-                                "format": "yyyy.MM.dd"
-                            }
-                        ],
-                        "fieldDelimiter": ","
-                    }
-                },
-                "writer": {
-                    "name": "txtfilewriter",
-                    "parameter": {
-                        "path": "/home/haiwei.luo/case00/result",
-                        "fileName": "luohw",
-                        "writeMode": "truncate",
-                        "format": "yyyy-MM-dd"
-                    }
-                }
-            }
-        ]
-    }
+        "writer": {
+          "name": "txtfilewriter",
+          "parameter": {
+            "path": "/tmp/result",
+            "fileName": "txt_",
+            "writeMode": "truncate",
+            "format": "yyyy-MM-dd"
+          }
+        }
+      }
+    ]
+  }
 }
 ```
 
@@ -103,7 +105,7 @@ TxtFileReader实现了从本地文件读取数据并转为DataX协议的功能�
 
 #### path
 
-本地文件系统的路径信息，注意这里可以支持填写多个路径。 
+本地文件系统的路径信息，注意这里可以支持填写多个路径。
 
 - 当指定单个本地文件，TxtFileReader暂时只能使用单线程进行数据抽取。二期考虑在非压缩文件情况下针对单个File可以进行多线程并发读取
 - 当指定多个本地文件，TxtFileReader支持使用多线程进行数据抽取。线程并发数通过通道数指定
@@ -127,12 +129,12 @@ TxtFileReader实现了从本地文件读取数据并转为DataX协议的功能�
 
 ```json
 {
-    "type": "long",
-    "index": 0
+  "type": "long",
+  "index": 0
 },
 {
-    "type": "string",
-    "value": "alibaba"  
+"type": "string",
+"value": "alibaba"
 }
 ```
 
@@ -146,9 +148,9 @@ TxtFileReader实现了从本地文件读取数据并转为DataX协议的功能�
 
 ```json
 "csvReaderConfig":{
-        "safetySwitch": false,
-        "skipEmptyRecords": false,
-        "useTextQualifier": false
+"safetySwitch": false,
+"skipEmptyRecords": false,
+"useTextQualifier": false
 }
 ```
 

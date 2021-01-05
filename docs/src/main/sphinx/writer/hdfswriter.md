@@ -9,11 +9,12 @@ HdfsWriter提供向HDFS文件系统指定路径中写入 `TEXTFile` ， `ORCFile
 1. 目前HdfsWriter仅支持 textfile ，orcfile， parquet 三种格式的文件，且文件内容存放的必须是一张逻辑意义上的二维表;
 2. 由于HDFS是文件系统，不存在schema的概念，因此不支持对部分列写入;
 3. 目前仅支持与以下Hive数据类型：
-   - 数值型：TINYINT(txt或ORC), SMALLINT(txt或ORC), INT(orc或parquet), INTEGER(txt或ORC), BIGINT(txt或ORC), LONG(parquet), FLOAT(orc或parquet), DOUBLE(orc或parquet), DECIMAL(orc或TXT), DECIMAL(18.9) (只有PARQUET必须带精度)
-   - 字符串类型：STRING(TXT/orc或parquet),VARCHAR(TXT/orc),CHAR(TXT/orC)
-   - 布尔类型：BOOLEAN(TXT/orc或parquet)
-   - 时间类型：DATE(TXT/orC),TIMESTAMP(TXT/orC)
-  
+    - 数值型：TINYINT(txt或ORC), SMALLINT(txt或ORC), INT(orc或parquet), INTEGER(txt或ORC), BIGINT(txt或ORC), LONG(parquet), FLOAT(orc或parquet), DOUBLE(orc或parquet), DECIMAL(orc或TXT), DECIMAL(18.9) (
+      只有PARQUET必须带精度)
+    - 字符串类型：STRING(TXT/orc或parquet),VARCHAR(TXT/orc),CHAR(TXT/orC)
+    - 布尔类型：BOOLEAN(TXT/orc或parquet)
+    - 时间类型：DATE(TXT/orC),TIMESTAMP(TXT/orC)
+
 **目前不支持：binary、arrays、maps、structs、union类型**
 
 1. 对于Hive分区表目前仅支持一次写入单个分区;
@@ -28,80 +29,80 @@ HdfsWriter提供向HDFS文件系统指定路径中写入 `TEXTFile` ， `ORCFile
 
 ```json
 {
-    "job": {
-        "setting": {
-            "speed": {
-                "channel": 2,
-                "bytes": -1
-            }
-        },
-        "content": [
-            {
-                "reader": {
-                    "name": "streamreader",
-                    "parameter": {
-                        "column": [
-                            {
-                                "value": "DataX",
-                                "type": "string"
-                            },
-                            {
-                                "value": 19890604,
-                                "type": "long"
-                            },
-                            {
-                                "value": "1989-06-04 00:00:00",
-                                "type": "date"
-                            },
-                            {
-                                "value": true,
-                                "type": "bool"
-                            },
-                            {
-                                "value": "test",
-                                "type": "bytes"
-                            }
-                        ],
-                        "sliceRecordCount": 1000
-                    },
-                    "writer": {
-                        "name": "hdfswriter",
-                        "parameter": {
-                            "defaultFS": "hdfs://xxx:port",
-                            "fileType": "orc",
-                            "path": "/user/hive/warehouse/writerorc.db/orcfull",
-                            "fileName": "xxxx",
-                            "column": [
-                                {
-                                    "name": "col1",
-                                    "type": "string"
-                                },
-                                {
-                                    "name": "col2",
-                                    "type": "int"
-                                },
-                                {
-                                    "name": "col3",
-                                    "type": "string"
-                                },
-                                {
-                                    "name": "col4",
-                                    "type": "boolean"
-                                },
-                                {
-                                    "name": "col5",
-                                    "type": "string"
-                                }
-                            ],
-                            "writeMode": "overwrite",
-                            "fieldDelimiter": "\u0001",
-                            "compress": "SNAPPY"
-                        }
-                    }
+  "job": {
+    "setting": {
+      "speed": {
+        "channel": 2,
+        "bytes": -1
+      }
+    },
+    "content": [
+      {
+        "reader": {
+          "name": "streamreader",
+          "parameter": {
+            "column": [
+              {
+                "value": "DataX",
+                "type": "string"
+              },
+              {
+                "value": 19890604,
+                "type": "long"
+              },
+              {
+                "value": "1989-06-04 00:00:00",
+                "type": "date"
+              },
+              {
+                "value": true,
+                "type": "bool"
+              },
+              {
+                "value": "test",
+                "type": "bytes"
+              }
+            ],
+            "sliceRecordCount": 1000
+          },
+          "writer": {
+            "name": "hdfswriter",
+            "parameter": {
+              "defaultFS": "hdfs://xxx:port",
+              "fileType": "orc",
+              "path": "/user/hive/warehouse/writerorc.db/orcfull",
+              "fileName": "xxxx",
+              "column": [
+                {
+                  "name": "col1",
+                  "type": "string"
+                },
+                {
+                  "name": "col2",
+                  "type": "int"
+                },
+                {
+                  "name": "col3",
+                  "type": "string"
+                },
+                {
+                  "name": "col4",
+                  "type": "boolean"
+                },
+                {
+                  "name": "col5",
+                  "type": "string"
                 }
-            ]
+              ],
+              "writeMode": "overwrite",
+              "fieldDelimiter": "\u0001",
+              "compress": "SNAPPY"
+            }
+          }
         }
-    }
+      }
+    ]
+  }
 }
 ```
 
@@ -126,13 +127,12 @@ HdfsWriter提供向HDFS文件系统指定路径中写入 `TEXTFile` ， `ORCFile
 
 #### path
 
-存储到Hadoop hdfs文件系统的路径信息，HdfsWriter 会根据并发配置在 `Path` 目录下写入多个文件。为与hive表关联，请填写hive表在hdfs上的存储路径。
-例：Hive上设置的数据仓库的存储路径为：`/user/hive/warehouse/` ，已建立数据库：`test`，表：`hello`；
-则对应的存储路径为：`/user/hive/warehouse/test.db/hello` (如果建表时指定了`location` 属性，则依据该属性的路径)  
-  
+存储到Hadoop hdfs文件系统的路径信息，HdfsWriter 会根据并发配置在 `Path` 目录下写入多个文件。为与hive表关联，请填写hive表在hdfs上的存储路径。 例：Hive上设置的数据仓库的存储路径为：`/user/hive/warehouse/` ，已建立数据库：`test`，表：`hello`；
+则对应的存储路径为：`/user/hive/warehouse/test.db/hello` (如果建表时指定了`location` 属性，则依据该属性的路径)
+
 #### defaultFS
 
-Hadoop hdfs文件系统namenode节点地址。格式：`hdfs://ip:port` ；例如：`hdfs://127.0.0.1:9000` , 如果启用了HA，则为 servicename 模式，比如 `hdfs://sandbox` 
+Hadoop hdfs文件系统namenode节点地址。格式：`hdfs://ip:port` ；例如：`hdfs://127.0.0.1:9000` , 如果启用了HA，则为 servicename 模式，比如 `hdfs://sandbox`
 
 #### fileType
 
@@ -147,26 +147,27 @@ Hadoop hdfs文件系统namenode节点地址。格式：`hdfs://ip:port` ；例�
 
 #### fileName
 
-HdfsWriter写入时的文件名，实际执行时会在该文件名后添加随机的后缀作为每个线程写入实际文件名。 
+HdfsWriter写入时的文件名，实际执行时会在该文件名后添加随机的后缀作为每个线程写入实际文件名。
 
 #### column
 
-写入数据的字段，不支持对部分列写入。为与hive中表关联，需要指定表中所有字段名和字段类型，
-其中：name指定字段名，type指定字段类型。
+写入数据的字段，不支持对部分列写入。为与hive中表关联，需要指定表中所有字段名和字段类型， 其中：name指定字段名，type指定字段类型。
 
 用户可以指定 column 字段信息，配置如下：
 
 ```json
-{"column":[
+{
+  "column": [
     {
-        "name": "userName",
-        "type": "string"
+      "name": "userName",
+      "type": "string"
     },
     {
-        "name": "age",
-        "type": "long"
+      "name": "age",
+      "type": "long"
     }
-]}
+  ]
+}
 ```
 
 #### writeMode
@@ -195,11 +196,11 @@ hdfswriter写入时的字段分隔符， 需要用户保证与创建的Hive表�
 
 ```json
 "hadoopConfig":{
-    "dfs.nameservices": "testDfs",
-    "dfs.ha.namenodes.testDfs": "nn01,nn02",
-    "dfs.namenode.rpc-address.testDfs.namenode1": "192.168.1.1",
-    "dfs.namenode.rpc-address.testDfs.namenode2": "192.168.1.2",
-    "dfs.client.failover.proxy.provider.testDfs": "org.apache.hadoop.hdfs.server.namenode.ha.ConfiguredFailoverProxyProvider"
+"dfs.nameservices": "testDfs",
+"dfs.ha.namenodes.testDfs": "nn01,nn02",
+"dfs.namenode.rpc-address.testDfs.namenode1": "192.168.1.1",
+"dfs.namenode.rpc-address.testDfs.namenode2": "192.168.1.2",
+"dfs.client.failover.proxy.provider.testDfs": "org.apache.hadoop.hdfs.server.namenode.ha.ConfiguredFailoverProxyProvider"
 }
 ```
 

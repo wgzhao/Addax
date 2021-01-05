@@ -1,4 +1,3 @@
-
 # OracleReader 插件文档
 
 ## 1 快速介绍
@@ -7,8 +6,7 @@ OracleReader插件实现了从Oracle读取数据。在底层实现上，OracleRe
 
 ## 2 实现原理
 
-简而言之，OracleReader通过JDBC连接器连接到远程的Oracle数据库，并根据用户配置的信息生成查询SELECT SQL语句并发送到远程Oracle数据库，
-并将该SQL执行返回结果使用DataX自定义的数据类型拼装为抽象的数据集，并传递给下游Writer处理。
+简而言之，OracleReader通过JDBC连接器连接到远程的Oracle数据库，并根据用户配置的信息生成查询SELECT SQL语句并发送到远程Oracle数据库， 并将该SQL执行返回结果使用DataX自定义的数据类型拼装为抽象的数据集，并传递给下游Writer处理。
 
 对于用户配置Table、Column、Where的信息，OracleReader将其拼接为SQL语句发送到Oracle数据库；对于用户配置querySql信息，Oracle直接将其发送到Oracle数据库。
 
@@ -19,39 +17,48 @@ OracleReader插件实现了从Oracle读取数据。在底层实现上，OracleRe
 配置一个从Oracle数据库同步抽取数据到本地的作业:
 
 ```json
-{"job": {
+{
+  "job": {
     "setting": {
-        "speed": {
-                "byte": 1048576,
-                "channel": 1
-        }
+      "speed": {
+        "byte": 1048576,
+        "channel": 1
+      }
     },
     "content": [
-        {
-            "reader": {
-                "name": "oraclereader",
-                "parameter": {
-                    "username": "root",
-                    "password": "root",
-                    "column": ["id","name"],
-                    "splitPk": "db_id",
-                    "connection": [
-                        {
-                            "table": [ "table"],
-                            "jdbcUrl": ["jdbc:oracle:thin:@<HOST_NAME>:PORT:<DATABASE_NAME>"]
-                        }
-                    ]
-                }
-            },
-            "writer": {
-                "name": "streamwriter",
-                "parameter": {
-                    "print": true
-                }
-            }
+      {
+        "reader": {
+          "name": "oraclereader",
+          "parameter": {
+            "username": "root",
+            "password": "root",
+            "column": [
+              "id",
+              "name"
+            ],
+            "splitPk": "db_id",
+            "connection": [
+              {
+                "table": [
+                  "table"
+                ],
+                "jdbcUrl": [
+                  "jdbc:oracle:thin:@<HOST_NAME>:PORT:<DATABASE_NAME>"
+                ]
+              }
+            ]
+          }
+        },
+        "writer": {
+          "name": "streamwriter",
+          "parameter": {
+            "print": true
+          }
         }
+      }
     ]
-}}
+  }
+}
 ```
 
 ### 3.2 参数说明
@@ -75,10 +82,10 @@ OracleReader插件实现了从Oracle读取数据。在底层实现上，OracleRe
 
 ```json
 "session": [
-    "alter session set NLS_DATE_FORMAT='yyyy-mm-dd hh24:mi:ss'",
-    "alter session set NLS_TIMESTAMP_FORMAT='yyyy-mm-dd hh24:mi:ss'",
-    "alter session set NLS_TIMESTAMP_TZ_FORMAT='yyyy-mm-dd hh24:mi:ss'",
-    "alter session set TIME_ZONE='Asia/Chongqing'"
+"alter session set NLS_DATE_FORMAT='yyyy-mm-dd hh24:mi:ss'",
+"alter session set NLS_TIMESTAMP_FORMAT='yyyy-mm-dd hh24:mi:ss'",
+"alter session set NLS_TIMESTAMP_TZ_FORMAT='yyyy-mm-dd hh24:mi:ss'",
+"alter session set TIME_ZONE='Asia/Chongqing'"
 ]
 ```
 
