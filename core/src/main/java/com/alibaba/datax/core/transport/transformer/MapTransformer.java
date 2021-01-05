@@ -73,6 +73,9 @@ public class MapTransformer
                 case "%":
                     newValue = MathUtil.mod(column.asString(), value);
                     break;
+                case "^":
+                    newValue = MathUtil.pow(column.asString(), value);
+                    break;
                 default:
                     throw new RuntimeException("dx_map can't support code:" + code);
             }

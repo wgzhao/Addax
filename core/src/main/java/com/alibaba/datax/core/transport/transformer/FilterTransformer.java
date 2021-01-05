@@ -6,6 +6,7 @@ import com.alibaba.datax.common.element.Column;
 import com.alibaba.datax.common.element.DateColumn;
 import com.alibaba.datax.common.element.DoubleColumn;
 import com.alibaba.datax.common.element.LongColumn;
+import com.alibaba.datax.common.element.Record;
 import com.alibaba.datax.common.element.StringColumn;
 import com.alibaba.datax.common.exception.DataXException;
 import com.alibaba.datax.transformer.Transformer;
@@ -26,7 +27,7 @@ public class FilterTransformer
     }
 
     @Override
-    public com.alibaba.datax.common.element.Record evaluate(com.alibaba.datax.common.element.Record record, Object... paras)
+    public Record evaluate(Record record, Object... paras)
     {
 
         int columnIndex;
@@ -87,7 +88,7 @@ public class FilterTransformer
         }
     }
 
-    private com.alibaba.datax.common.element.Record doGreat(com.alibaba.datax.common.element.Record record, String value, Column column, boolean hasEqual)
+    private Record doGreat(Record record, String value, Column column, boolean hasEqual)
     {
 
         //如果字段为空，直接不参与比较。即空也属于无穷小
@@ -160,7 +161,7 @@ public class FilterTransformer
         }
     }
 
-    private com.alibaba.datax.common.element.Record doLess(com.alibaba.datax.common.element.Record record, String value, Column column, boolean hasEqual)
+    private Record doLess(Record record, String value, Column column, boolean hasEqual)
     {
 
         //如果字段为空，直接不参与比较。即空也属于无穷大
@@ -238,7 +239,7 @@ public class FilterTransformer
      * DateColumn将比较long值，StringColumn，ByteColumn以及BooleanColumn比较其String值
      */
 
-    private com.alibaba.datax.common.element.Record doEqual(com.alibaba.datax.common.element.Record record, String value, Column column)
+    private Record doEqual(Record record, String value, Column column)
     {
 
         //如果字段为空，只比较目标字段为"null"，否则null字段均不过滤
@@ -290,7 +291,7 @@ public class FilterTransformer
     /**
      * DateColumn将比较long值，StringColumn，ByteColumn以及BooleanColumn比较其String值
      */
-    private com.alibaba.datax.common.element.Record doNotEqual(com.alibaba.datax.common.element.Record record, String value, Column column)
+    private Record doNotEqual(Record record, String value, Column column)
     {
 
         //如果字段为空，只比较目标字段为"null", 否则null字段均过滤。
@@ -339,7 +340,7 @@ public class FilterTransformer
         }
     }
 
-    private com.alibaba.datax.common.element.Record doLike(com.alibaba.datax.common.element.Record record, String value, Column column)
+    private Record doLike(Record record, String value, Column column)
     {
         String orivalue = column.asString();
         if (orivalue != null && orivalue.matches(value)) {
@@ -350,7 +351,7 @@ public class FilterTransformer
         }
     }
 
-    private com.alibaba.datax.common.element.Record doNotLike(com.alibaba.datax.common.element.Record record, String value, Column column)
+    private Record doNotLike(Record record, String value, Column column)
     {
         String orivalue = column.asString();
         if (orivalue != null && orivalue.matches(value)) {

@@ -47,7 +47,7 @@ public class TransformerRegistry
                 }
             }
             catch (Exception e) {
-                LOG.error(String.format("skip transformer(%s) loadTransformer has Exception(%s)", each, e.getMessage()), e);
+                LOG.error("skip transformer({}) loadTransformer has Exception({})", each, e.getMessage(), e);
             }
         }
     }
@@ -60,23 +60,23 @@ public class TransformerRegistry
             transformerConfiguration = loadTransFormerConfig(transformerPath);
         }
         catch (Exception e) {
-            LOG.error(String.format("skip transformer(%s),load transformer.json error, path = %s, ", each, transformerPath), e);
+            LOG.error("skip transformer({}),load transformer.json error, path = {}, ", each, transformerPath, e);
             return;
         }
 
         String className = transformerConfiguration.getString("class");
         if (StringUtils.isEmpty(className)) {
-            LOG.error(String.format("skip transformer(%s),class not config, path = %s, config = %s", each, transformerPath, transformerConfiguration.beautify()));
+            LOG.error("skip transformer({}),class not config, path = {}, config = {}", each, transformerPath, transformerConfiguration.beautify());
             return;
         }
 
         String funName = transformerConfiguration.getString("name");
         if (!each.equals(funName)) {
-            LOG.warn(String.format("transformer(%s) name not match transformer.json config name[%s], will ignore json's name, path = %s, config = %s", each, funName, transformerPath, transformerConfiguration.beautify()));
+            LOG.warn("transformer({}) name not match transformer.json config name[{}], " +
+                    "will ignore json's name, path = {}, config = {}", each, funName, transformerPath, transformerConfiguration.beautify());
         }
-        JarLoader jarLoader = new JarLoader(new String[] {transformerPath});
 
-        try {
+        try (JarLoader jarLoader = new JarLoader(new String[] {transformerPath})) {
             Class<?> transformerClass = jarLoader.loadClass(className);
             Object transformer = transformerClass.newInstance();
             if (ComplexTransformer.class.isAssignableFrom(transformer.getClass())) {
@@ -88,12 +88,12 @@ public class TransformerRegistry
                 registTransformer((Transformer) transformer, jarLoader, false);
             }
             else {
-                LOG.error(String.format("load Transformer class(%s) error, path = %s", className, transformerPath));
+                LOG.error("load Transformer class({}) error, path = {}", className, transformerPath);
             }
         }
         catch (Exception e) {
             //错误funciton跳过
-            LOG.error(String.format("skip transformer(%s),load Transformer class error, path = %s ", each, transformerPath), e);
+            LOG.error("skip transformer({}),load Transformer class error, path = {} ", each, transformerPath, e);
         }
     }
 
@@ -179,12 +179,11 @@ public class TransformerRegistry
          * add native transformer
          * local storage and from server will be delay load.
          */
-
-        registTransformer(new SubstrTransformer());
-        registTransformer(new PadTransformer());
-        registTransformer(new ReplaceTransformer());
         registTransformer(new FilterTransformer());
         registTransformer(new GroovyTransformer());
         registTransformer(new MapTransformer());
+        registTransformer(new PadTransformer());
+        registTransformer(new ReplaceTransformer());
+        registTransformer(new SubstrTransformer());
     }
 }

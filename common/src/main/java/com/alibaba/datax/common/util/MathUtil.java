@@ -71,6 +71,20 @@ public class MathUtil
     }
 
     /**
+     * 幂运算
+     * @param v1 底数
+     * @param v2 指数
+     * @return v1的v2次方
+     */
+    public static BigDecimal pow(BigDecimal v1, int v2)
+    {
+        if (null == v1) {
+            v1 = BigDecimal.ONE;
+        }
+        return v1.pow(v2);
+    }
+
+    /**
      * ( 相对 )精确除法运算 , 当发生除不尽情况时 , 精确到 小数点以后2位 , 以后数字四舍五入
      *
      * @param v1 被除数
@@ -192,6 +206,25 @@ public class MathUtil
         BigDecimal b1 = new BigDecimal(v1.trim());
         BigDecimal b2 = new BigDecimal(v2.trim());
         return String.valueOf(multiply(b1, b2));
+    }
+
+    /**
+     * 幂运算
+     * @param v1 底数
+     * @param v2 指数
+     * @return v1的v2次方值
+     */
+    public static String pow(String v1, String v2)
+    {
+        if (isBlank(v1)) {
+            v1 = "1";
+        }
+        if (isBlank(v2)) {
+            v2 = "0";
+        }
+        BigDecimal b1 = new BigDecimal(v1.trim());
+        int b2 = Integer.parseInt(v2.trim());
+        return String.valueOf(pow(b1, b2));
     }
 
     /**

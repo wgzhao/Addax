@@ -76,16 +76,16 @@ public class PadTransformer
     {
 
         StringBuilder finalPad = new StringBuilder();
-        int NeedLength = length - oriValue.length();
-        while (NeedLength > 0) {
+        int needLength = length - oriValue.length();
+        while (needLength > 0) {
 
-            if (NeedLength >= padString.length()) {
+            if (needLength >= padString.length()) {
                 finalPad.append(padString);
-                NeedLength -= padString.length();
+                needLength -= padString.length();
             }
             else {
-                finalPad.append(padString, 0, NeedLength);
-                NeedLength = 0;
+                finalPad.append(padString, 0, needLength);
+                needLength = 0;
             }
         }
 
