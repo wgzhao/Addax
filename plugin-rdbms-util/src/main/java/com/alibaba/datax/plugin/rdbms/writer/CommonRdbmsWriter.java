@@ -564,6 +564,11 @@ public class CommonRdbmsWriter
                     break;
 
                 case Types.TIMESTAMP:
+                    if (this.resultSetMetaData.getRight().get(columnIndex).startsWith("DateTime(")) {
+                        // ClickHouse DateTime(timezone)
+                        // TODO 含时区，当作Timestamp处理会有时区的差异
+                        preparedStatement.setString(columnIndex + 1, column.asString());
+                    } else {
                     java.sql.Timestamp sqlTimestamp = null;
                     try {
                         utilDate = column.asDate();
@@ -577,7 +582,8 @@ public class CommonRdbmsWriter
                         sqlTimestamp = new java.sql.Timestamp(
                                 utilDate.getTime());
                     }
-                    preparedStatement.setTimestamp(columnIndex + 1, sqlTimestamp);
+                        preparedStatement.setTimestamp(columnIndex + 1, sqlTimestamp);
+                    }
                     break;
 
                 case Types.BINARY:
@@ -604,8 +610,17 @@ public class CommonRdbmsWriter
                     break;
 
                 case Types.OTHER:
-                    if ("image".equals(this.resultSetMetaData.getRight().get(columnIndex))) {
+                    String dType = this.resultSetMetaData.getRight().get(columnIndex);
+                    LOG.debug("database-specific data type, column name: {}, column type: {}",
+                            this.resultSetMetaData.getLeft().get(columnIndex),
+                            dType);
+                    if ("image".equals(dType)) {
                         preparedStatement.setBytes(columnIndex + 1, column.asBytes());
+                    }
+                    else if (dType.startsWith("DateTime64(") && dType.contains(",")) {
+                        // ClickHouse DateTime64(p, timezone)
+                        // TODO 含时区，当作Timestamp处理会有时区的差异
+                        preparedStatement.setString(columnIndex + 1, column.asString());
                     }
                     else {
                         preparedStatement.setObject(columnIndex + 1, column.asString());
