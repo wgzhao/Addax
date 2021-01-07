@@ -38,24 +38,29 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 
-public class CommonRdbmsReader {
+public class CommonRdbmsReader
+{
 
-    public static class Job {
+    public static class Job
+    {
         private static final Logger LOG = LoggerFactory.getLogger(Job.class);
 
-        public Job(DataBaseType dataBaseType) {
+        public Job(DataBaseType dataBaseType)
+        {
             OriginalConfPretreatmentUtil.dataBaseType = dataBaseType;
             SingleTableSplitUtil.dataBaseType = dataBaseType;
         }
 
-        public void init(Configuration originalConfig) {
+        public void init(Configuration originalConfig)
+        {
 
             OriginalConfPretreatmentUtil.doPretreatment(originalConfig);
 
             LOG.debug("After job init(), job config now is:[\n{}\n]", originalConfig.toJSON());
         }
 
-        public void preCheck(Configuration originalConfig, DataBaseType dataBaseType) {
+        public void preCheck(Configuration originalConfig, DataBaseType dataBaseType)
+        {
             /* 检查每个表是否有读权限，以及querySql跟splik Key是否正确 */
             Configuration queryConf = ReaderSplitUtil.doPreCheckSplit(originalConfig);
             String splitPK = queryConf.getString(Key.SPLIT_PK);
@@ -65,7 +70,8 @@ public class CommonRdbmsReader {
             ExecutorService exec;
             if (connList.size() < 10) {
                 exec = Executors.newFixedThreadPool(connList.size());
-            } else {
+            }
+            else {
                 exec = Executors.newFixedThreadPool(10);
             }
             Collection<PreCheckTask> taskList = new ArrayList<>();
@@ -77,36 +83,43 @@ public class CommonRdbmsReader {
             List<Future<Boolean>> results = Lists.newArrayList();
             try {
                 results = exec.invokeAll(taskList);
-            } catch (InterruptedException e) {
+            }
+            catch (InterruptedException e) {
                 Thread.currentThread().interrupt();
             }
 
             for (Future<Boolean> result : results) {
                 try {
                     result.get();
-                } catch (ExecutionException e) {
+                }
+                catch (ExecutionException e) {
                     throw (DataXException) e.getCause();
-                } catch (InterruptedException e) {
+                }
+                catch (InterruptedException e) {
                     Thread.currentThread().interrupt();
                 }
             }
             exec.shutdownNow();
         }
 
-        public List<Configuration> split(Configuration originalConfig, int adviceNumber) {
+        public List<Configuration> split(Configuration originalConfig, int adviceNumber)
+        {
             return ReaderSplitUtil.doSplit(originalConfig, adviceNumber);
         }
 
-        public void post(Configuration originalConfig) {
+        public void post(Configuration originalConfig)
+        {
             // do nothing
         }
 
-        public void destroy(Configuration originalConfig) {
+        public void destroy(Configuration originalConfig)
+        {
             // do nothing
         }
     }
 
-    public static class Task {
+    public static class Task
+    {
         private static final Logger LOG = LoggerFactory.getLogger(Task.class);
         private static final boolean IS_DEBUG = LOG.isDebugEnabled();
         protected final byte[] EMPTY_CHAR_ARRAY = new byte[0];
@@ -123,17 +136,20 @@ public class CommonRdbmsReader {
         // 作为日志显示信息时，需要附带的通用信息。比如信息所对应的数据库连接等信息，针对哪个表做的操作
         private String basicMsg;
 
-        public Task(DataBaseType dataBaseType) {
+        public Task(DataBaseType dataBaseType)
+        {
             this(dataBaseType, -1, -1);
         }
 
-        public Task(DataBaseType dataBaseType, int taskGropuId, int taskId) {
+        public Task(DataBaseType dataBaseType, int taskGropuId, int taskId)
+        {
             this.dataBaseType = dataBaseType;
             this.taskGroupId = taskGropuId;
             this.taskId = taskId;
         }
 
-        public void init(Configuration readerSliceConfig) {
+        public void init(Configuration readerSliceConfig)
+        {
 
             /* for database connection */
 
@@ -147,7 +163,8 @@ public class CommonRdbmsReader {
         }
 
         public void startRead(Configuration readerSliceConfig, RecordSender recordSender,
-                TaskPluginCollector taskPluginCollector, int fetchSize) {
+                TaskPluginCollector taskPluginCollector, int fetchSize)
+        {
             String querySql = readerSliceConfig.getString(Key.QUERY_SQL);
             String table = readerSliceConfig.getString(Key.TABLE);
 
@@ -187,30 +204,36 @@ public class CommonRdbmsReader {
                 allResultPerfRecord.end(rsNextUsedTime);
                 // 目前大盘是依赖这个打印，而之前这个Finish read record是包含了sql查询和result next的全部时间
                 LOG.info("Finished read record by Sql: [{}\n] {}.", querySql, basicMsg);
-            } catch (Exception e) {
+            }
+            catch (Exception e) {
                 throw RdbmsException.asQueryException(this.dataBaseType, e, querySql, table, username);
-            } finally {
+            }
+            finally {
                 DBUtil.closeDBResources(null, conn);
             }
         }
 
-        public void post(Configuration originalConfig) {
+        public void post(Configuration originalConfig)
+        {
             // do nothing
         }
 
-        public void destroy(Configuration originalConfig) {
+        public void destroy(Configuration originalConfig)
+        {
             // do nothing
         }
 
         protected void transportOneRecord(RecordSender recordSender, ResultSet rs, ResultSetMetaData metaData,
-                int columnNumber, String mandatoryEncoding, TaskPluginCollector taskPluginCollector) {
+                int columnNumber, String mandatoryEncoding, TaskPluginCollector taskPluginCollector)
+        {
             Record record = buildRecord(recordSender, rs, metaData, columnNumber, mandatoryEncoding,
                     taskPluginCollector);
             recordSender.sendToWriter(record);
         }
 
         protected Record buildRecord(RecordSender recordSender, ResultSet rs, ResultSetMetaData metaData,
-                int columnNumber, String mandatoryEncoding, TaskPluginCollector taskPluginCollector) {
+                int columnNumber, String mandatoryEncoding, TaskPluginCollector taskPluginCollector)
+        {
             Record record = recordSender.createRecord();
 
             try {
@@ -226,7 +249,8 @@ public class CommonRdbmsReader {
                             String rawData;
                             if (StringUtils.isBlank(mandatoryEncoding)) {
                                 rawData = rs.getString(i);
-                            } else {
+                            }
+                            else {
                                 rawData = new String((rs.getBytes(i) == null ? EMPTY_CHAR_ARRAY : rs.getBytes(i)),
                                         mandatoryEncoding);
                             }
@@ -257,7 +281,8 @@ public class CommonRdbmsReader {
                                 // remove currency nonation($) and currency formatting nonation(,)
                                 // TODO process it more elegantly
                                 record.addColumn(new DoubleColumn(rs.getString(i).substring(1).replace(",", "")));
-                            } else {
+                            }
+                            else {
                                 record.addColumn(new DoubleColumn(rs.getString(i)));
                             }
                             break;
@@ -270,14 +295,22 @@ public class CommonRdbmsReader {
                         case Types.DATE:
                             if ("year".equalsIgnoreCase(metaData.getColumnTypeName(i))) {
                                 record.addColumn(new LongColumn(rs.getInt(i)));
-                            } else {
+                            }
+                            else {
                                 record.addColumn(new DateColumn(rs.getDate(i)));
                             }
                             break;
 
                         case Types.TIMESTAMP:
                         case -151: // 兼容老的SQLServer版本的datetime数据类型
-                            record.addColumn(new DateColumn(rs.getTimestamp(i)));
+                            if (metaData.getColumnTypeName(i).startsWith("DateTime(")) {
+                                // clickhouse DateTime(zoneinfo)
+                                // TODO 含时区，当作Timestamp处理会有时区的差异
+                                record.addColumn(new StringColumn(rs.getString(i)));
+                            }
+                            else {
+                                record.addColumn(new DateColumn(rs.getTimestamp(i)));
+                            }
                             break;
 
                         case Types.BINARY:
@@ -295,7 +328,8 @@ public class CommonRdbmsReader {
                             // bit(>1) -> Types.VARBINARY 可使用BytesColumn
                             if (metaData.getPrecision(i) == 1) {
                                 record.addColumn(new BoolColumn(rs.getBoolean(i)));
-                            } else {
+                            }
+                            else {
                                 record.addColumn(new BytesColumn(rs.getBytes(i)));
                             }
                             break;
@@ -322,9 +356,23 @@ public class CommonRdbmsReader {
 
                         case Types.OTHER:
                             // database-specific type, convert it to string as default
-                            if ("image".equals(metaData.getColumnTypeName(i))) {
+                            String dType = metaData.getColumnTypeName(i);
+                            LOG.debug("data-specific data type , column name: {}, column type:{}"
+                                    , metaData.getColumnName(i), dType);
+                            if ("image".equals(dType)) {
                                 record.addColumn(new BytesColumn(rs.getBytes(i)));
-                            } else {
+                            }
+                            else if (dType.startsWith("DateTime64")) {
+                                // ClickHouse DateTime64(zoneinfo)
+                                if (dType.contains(",")) {
+                                    // TODO 含时区，当作Timestamp处理会有时区的差异
+                                    record.addColumn(new StringColumn(rs.getString(i)));
+                                }
+                                else {
+                                    record.addColumn(new DateColumn(rs.getTimestamp(i)));
+                                }
+                            }
+                            else {
                                 record.addColumn(new StringColumn(rs.getObject(i).toString()));
                             }
                             break;
@@ -332,12 +380,13 @@ public class CommonRdbmsReader {
                         default:
                             throw DataXException.asDataXException(DBUtilErrorCode.UNSUPPORTED_TYPE,
                                     String.format("您的配置文件中的列配置信息有误. 因为DataX 不支持数据库读取这种字段类型. " + "字段名:[%s], 字段类型:[%s], "
-                                            + "字段类型名称:[%s], 字段Java类型:[%s]. " + "请尝试使用数据库函数将其转换datax支持的类型 或者不同步该字段 .",
+                                                    + "字段类型名称:[%s], 字段Java类型:[%s]. " + "请尝试使用数据库函数将其转换datax支持的类型 或者不同步该字段 .",
                                             metaData.getColumnName(i), metaData.getColumnType(i),
                                             metaData.getColumnTypeName(i), metaData.getColumnClassName(i)));
                     }
                 }
-            } catch (Exception e) {
+            }
+            catch (Exception e) {
                 if (IS_DEBUG) {
                     LOG.debug("read data " + record + " occur exception: " + e);
                 }

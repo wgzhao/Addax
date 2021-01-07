@@ -1,30 +1,73 @@
-# ClickHouseWriter 插件文档
-
-## 1 快速介绍
+# ClickHouseWriter
 
 ClickHouseWriter 插件实现了写入数据ClickHouse。在底层实现上，ClickHouseWriter 通过 JDBC 连接远程 ClickHouse 数据库，并执行相应的 `insert into ....` 语句将数据插入到ClickHouse库中。
 
-## 2 实现原理
+## 示例
 
-使用clickhousewriter的官方jdbc接口， 批量把从reader读入的数据写入ClickHouse
+以下示例我们演示从 clickhouse 中读取一张表的内容，并写入到相同表结构的另外一张表中，用来测试插件所支持的数据结构
 
-## 3 功能说明
+### 表结构以数据
 
-### 3.1 配置样例
+假定要读取的表结构及数据如下：
+```sql
+CREATE TABLE ck_datax (
+    c_int8 Int8,
+    c_int16 Int16,
+    c_int32 Int32,
+    c_int64 Int64,
+    c_uint8 UInt8,
+    c_uint16 UInt16,
+    c_uint32 UInt32,
+    c_uint64 UInt64,
+    c_float32 Float32,
+    c_float64 Float64,
+    c_decimal Decimal(38,10),
+    c_string String,
+    c_fixstr FixedString(36),
+    c_uuid UUID,
+    c_date Date,
+    c_datetime DateTime('Asia/Chongqing'),
+    c_datetime64 DateTime64(3, 'Asia/Chongqing'),
+    c_enum Enum('hello' = 1, 'world'=2)
+) ENGINE = MergeTree() ORDER BY (c_int8, c_int16) SETTINGS index_granularity = 8192;
 
-配置一个从内存读取数据并写入ClickHouse数据库的作业:
+insert into ck_datax values(
+    127,
+    -32768,
+    2147483647,
+    -9223372036854775808,
+    255,
+    65535,
+    4294967295,
+    18446744073709551615,
+    0.999999999999,
+    0.99999999999999999,
+    1234567891234567891234567891.1234567891,
+    'Hello String',
+    '2c:16:db:a3:3a:4f',
+    '5F042A36-5B0C-4F71-ADFD-4DF4FCA1B863',
+    '2021-01-01',
+    '2021-01-01 00:00:00',
+    '2021-01-01 00:00:00',
+    'hello'
+);
+```
+要写入的表采取和读取表结构相同，其建表语句如下：
+
+```sql
+create table ck_datax_writer as ck_datax;
+```
+
+## 配置
+
+以下为配置文件
 
 ```json
 {
   "job": {
     "setting": {
       "speed": {
-        "channel": 3,
-        "bytes": -1
-      },
-      "errorLimit": {
-        "record": 0,
-        "percentage": 0.02
+        "channel": 1
       }
     },
     "content": [
@@ -33,45 +76,35 @@ ClickHouseWriter 插件实现了写入数据ClickHouse。在底层实现上，Cl
           "name": "clickhousewriter",
           "parameter": {
             "username": "default",
-            "password": "",
             "column": [
-              "col1",
-              "col2",
-              "col3",
-              "col4"
+              "*"
             ],
             "connection": [
               {
                 "table": [
-                  "test_tbl"
+                  "ck_datax_writer"
                 ],
-                "jdbcUrl": "jdbc:clickhouse://127.0.0.1:8123/default"
+                "jdbcUrl": "jdbc:clickhouse://127.0.0.1:8123/default",
               }
-            ]
+            ],
+            "preSql": ["alter table @table delete where 1=1"]
           }
         },
         "reader": {
-          "name": "streamreader",
+          "name": "clickhousereader",
           "parameter": {
+            "username": "default",
             "column": [
-              {
-                "value": "DataX",
-                "type": "string"
-              },
-              {
-                "value": 19890604,
-                "type": "long"
-              },
-              {
-                "value": "1989-06-04 00:00:00",
-                "type": "date"
-              },
-              {
-                "value": true,
-                "type": "bool"
-              }
+              "*"
             ],
-            "sliceRecordCount": 1000
+            "connection": [
+              {
+                "jdbcUrl": [
+                  "jdbc:clickhouse://127.0.0.1:8123/"
+                ],
+                "table":["ck_datax"]
+              }
+            ]
           }
         }
       }
