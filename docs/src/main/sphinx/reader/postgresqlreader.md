@@ -1,18 +1,8 @@
-# PostgresqlReader 插件文档
-
-## 1 快速介绍
+# PostgresqlReader 
 
 PostgresqlReader插件实现了从PostgreSQL读取数据。在底层实现上，PostgresqlReader通过JDBC连接远程PostgreSQL数据库，并执行相应的sql语句将数据从PostgreSQL库中SELECT出来。
 
-## 2 实现原理
-
-简而言之，PostgresqlReader通过JDBC连接器连接到远程的PostgreSQL数据库，并根据用户配置的信息生成查询SELECT SQL语句并发送到远程PostgreSQL数据库，并将该SQL执行返回结果使用DataX自定义的数据类型拼装为抽象的数据集，并传递给下游Writer处理。
-
-对于用户配置Table、Column、Where的信息，PostgresqlReader将其拼接为SQL语句发送到PostgreSQL数据库；对于用户配置querySql信息，PostgresqlReader直接将其发送到PostgreSQL数据库。
-
-## 3 功能说明
-
-### 3.1 配置样例
+## 示例
 
 假定建表语句以及输入插入语句如下：
 
@@ -82,19 +72,18 @@ insert into datax_tbl values(
         "reader": {
           "name": "postgresqlreader",
           "parameter": {
-            "username": "xx",
-            "password": "xx",
+            "username": "pgtest",
+            "password": "pgtest",
             "column": [
               "*"
             ],
-            "splitPk": "id",
             "connection": [
               {
                 "table": [
-                  "table"
+                  "datax_tbl"
                 ],
                 "jdbcUrl": [
-                  "jdbc:postgresql://host:port/database"
+                  "jdbc:postgresql://127.0.0.1:5432/pgtest"
                 ]
               }
             ]
@@ -112,7 +101,71 @@ insert into datax_tbl values(
 }
 ```
 
-### 3.2 参数说明
+将上述配置文件保存为   `job/postgres2stream.json`
+
+### 执行采集命令
+
+执行以下命令进行数据采集
+
+```shell
+bin/datax.py job/postgres2stream.json
+```
+
+其输出信息如下（删除了非关键信息)
+
+```
+2021-01-07 10:15:12.295 [main] INFO  Engine -
+{
+	"content":[
+		{
+			"reader":{
+				"parameter":{
+					"password":"*****",
+					"column":[
+						"*"
+					],
+					"connection":[
+						{
+							"jdbcUrl":[
+								"jdbc:postgresql://localhost:5432/pgtest"
+							],
+							"table":[
+								"datax_tbl"
+							]
+						}
+					],
+					"username":"pgtest"
+				},
+				"name":"postgresqlreader"
+			},
+			"writer":{
+				"parameter":{
+					"print":true
+				},
+				"name":"streamwriter"
+			}
+		}
+	],
+	"setting":{
+		"speed":{
+			"byte":-1,
+			"channel":1
+		}
+	}
+}
+
+999988887777	101	true   	ޭ��	hello     	hello, world	2021-01-04	999888.99719999998	9876542	{"bar": "baz", "balance": 7.77, "active": false}	12345.123	123.123	126	this is a long text 	2020-01-04 12:13:14	a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11	<foo>bar</foo>	52093.89	192.168.1.1	192.168.1.0/24	08:00:2b:01:02:03
+
+任务启动时刻                    : 2021-01-07 10:15:12
+任务结束时刻                    : 2021-01-07 10:15:15
+任务总计耗时                    :                  3s
+任务平均流量                    :               90B/s
+记录写入速度                    :              0rec/s
+读出记录总数                    :                   1
+读写失败总数                    :                   0
+```
+
+## 参数说明
 
 | 配置项    | 是否必须 | 默认值 | 描述                                                                                                                                   |
 | :-------- | :------: | ------ | -----------------------------------------------------------------------------------------------------------------------------------|
@@ -126,7 +179,7 @@ insert into datax_tbl values(
 | querySql  |    否    | 无     | 使用自定义的SQL而不是指定表来获取数据，当配置了这一项之后，DataX系统就会忽略 `table`，`column`这些配置项                                       |
 | fetchSize |    否    | 1024   | 定义了插件和数据库服务器端每次批量数据获取条数，调高该值可能导致 DataX 出现OOM                                                                 |
 
-### 3.3 类型转换
+## 类型转换
 
 目前PostgresqlReader支持大部分PostgreSQL类型，但也存在部分个别类型没有支持的情况，请注意检查你的类型。
 
@@ -141,6 +194,6 @@ insert into datax_tbl values(
 | Boolean        | bool,bit(1)                                   |
 | Bytes          | bytea                                        |
 
-请注意:
+## 已知限制
 
 除上述罗列字段类型外，其他类型均不支持; 
