@@ -84,7 +84,7 @@ create table ck_datax_writer as ck_datax;
                 "table": [
                   "ck_datax_writer"
                 ],
-                "jdbcUrl": "jdbc:clickhouse://127.0.0.1:8123/default",
+                "jdbcUrl": "jdbc:clickhouse://127.0.0.1:8123/default"
               }
             ],
             "preSql": ["alter table @table delete where 1=1"]
