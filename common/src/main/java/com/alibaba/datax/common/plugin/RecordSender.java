@@ -7,7 +7,7 @@ public interface RecordSender
 
     Record createRecord();
 
-    void sendToWriter(com.alibaba.datax.common.element.Record record);
+    void sendToWriter(Record record);
 
     void flush();
 

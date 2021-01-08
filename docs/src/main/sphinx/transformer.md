@@ -158,7 +158,7 @@ String code3="Column column = record.getColumn(1);\n"+
 
 ## Job定义
 
-本例中，配置3个UDF。
+本例中，配置4个UDF。
 
 ```json
 {
@@ -175,7 +175,11 @@ String code3="Column column = record.getColumn(1);\n"+
           "parameter": {
             "column": [
               {
-                "value": "DataX",
+                "value": "My name is xxxx",
+                "type": "string"
+              },
+              {
+                "value": "password is Passw0rd",
                 "type": "string"
               },
               {
@@ -193,47 +197,61 @@ String code3="Column column = record.getColumn(1);\n"+
               {
                 "value": "test",
                 "type": "bytes"
+              },
+              {
+                "random": "0,10",
+                "type": "long"
               }
             ],
-            "sliceRecordCount": 100000
+            "sliceRecordCount": 10
           }
         },
         "writer": {
           "name": "streamwriter",
           "parameter": {
-            "print": false,
+            "print": true,
             "encoding": "UTF-8"
           }
         },
         "transformer": [
           {
-            "name": "dx_substr",
-            "parameter": {
-              "columnIndex": 5,
-              "paras": [
-                "1",
-                "3"
-              ]
-            }
-          },
-          {
             "name": "dx_replace",
             "parameter": {
-              "columnIndex": 4,
+              "columnIndex": 0,
               "paras": [
-                "3",
-                "4",
-                "****"
+                "11",
+                "6",
+                "wgzhao"
               ]
             }
           },
           {
-            "name": "dx_groovy",
+            "name": "dx_substr",
             "parameter": {
-              "code": "//groovy code//",
-              "extraPackage": [
-                "import somePackage1;",
-                "import somePackage2;"
+              "columnIndex": 1,
+              "paras": [
+                "0",
+                "12"
+              ]
+            }
+          },
+          {
+            "name": "dx_map",
+            "parameter": {
+              "columnIndex": 2,
+              "paras": [
+                "^",
+                "2"
+              ]
+            }
+          },
+          {
+            "name": "dx_filter",
+            "parameter": {
+              "columnIndex": 6,
+              "paras": [
+                "<",
+                "5"
               ]
             }
           }

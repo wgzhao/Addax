@@ -39,7 +39,8 @@ public class ReplaceTransformer
             replaceString = (String) paras[3];
         }
         catch (Exception e) {
-            throw DataXException.asDataXException(TransformerErrorCode.TRANSFORMER_ILLEGAL_PARAMETER, "paras:" + Arrays.asList(paras).toString() + " => " + e.getMessage());
+            throw DataXException.asDataXException(TransformerErrorCode.TRANSFORMER_ILLEGAL_PARAMETER,
+                    "paras:" + Arrays.asList(paras) + " => " + e.getMessage());
         }
 
         Column column = record.getColumn(columnIndex);
@@ -53,19 +54,22 @@ public class ReplaceTransformer
             }
             String newValue;
             if (startIndex > oriValue.length()) {
-                throw new RuntimeException(String.format("dx_replace startIndex(%s) out of range(%s)", startIndex, oriValue.length()));
+                throw new RuntimeException(String.format("dx_replace startIndex(%s) out of range(%s)",
+                        startIndex, oriValue.length()));
             }
             if (startIndex + length >= oriValue.length()) {
                 newValue = oriValue.substring(0, startIndex) + replaceString;
             }
             else {
-                newValue = oriValue.substring(0, startIndex) + replaceString + oriValue.substring(startIndex + length);
+                newValue = oriValue.substring(0, startIndex) + replaceString
+                        + oriValue.substring(startIndex + length);
             }
 
             record.setColumn(columnIndex, new StringColumn(newValue));
         }
         catch (Exception e) {
-            throw DataXException.asDataXException(TransformerErrorCode.TRANSFORMER_RUN_EXCEPTION, e.getMessage(), e);
+            throw DataXException.asDataXException(
+                    TransformerErrorCode.TRANSFORMER_RUN_EXCEPTION, e.getMessage(), e);
         }
         return record;
     }

@@ -35,7 +35,7 @@ public abstract class Channel
     protected volatile long waitWriterTime = 0;
     private Communication currentCommunication;
 
-    public Channel(final Configuration configuration)
+    public Channel(Configuration configuration)
     {
         //channel的queue里默认record为1万条。原来为512条
         int capacity = configuration.getInt(
@@ -104,14 +104,14 @@ public abstract class Channel
         this.lastCommunication.reset();
     }
 
-    public void push(final Record r)
+    public void push(Record r)
     {
         Validate.notNull(r, "record不能为空.");
         this.doPush(r);
         this.statPush(1L, r.getByteSize());
     }
 
-    public void pushTerminate(final TerminateRecord r)
+    public void pushTerminate(TerminateRecord r)
     {
         Validate.notNull(r, "record不能为空.");
         this.doPush(r);
@@ -121,7 +121,7 @@ public abstract class Channel
 //                currentCommunication.getLongCounter(CommunicationTool.STAGE) + 1);
     }
 
-    public void pushAll(final Collection<Record> rs)
+    public void pushAll(Collection<Record> rs)
     {
         Validate.notNull(rs);
         Validate.noNullElements(rs);
@@ -136,7 +136,7 @@ public abstract class Channel
         return record;
     }
 
-    public void pullAll(final Collection<Record> rs)
+    public void pullAll(Collection<Record> rs)
     {
         Validate.notNull(rs);
         this.doPullAll(rs);
@@ -157,10 +157,10 @@ public abstract class Channel
 
     public abstract void clear();
 
-    private long getByteSize(final Collection<Record> rs)
+    private long getByteSize(Collection<Record> rs)
     {
         long size = 0;
-        for (final Record each : rs) {
+        for (Record each : rs) {
             size += each.getByteSize();
         }
         return size;

@@ -21,7 +21,7 @@ public class PadTransformer
     }
 
     @Override
-    public Record evaluate(com.alibaba.datax.common.element.Record record, Object... paras)
+    public Record evaluate(Record record, Object... paras)
     {
 
         int columnIndex;
@@ -40,7 +40,9 @@ public class PadTransformer
             padString = (String) paras[3];
         }
         catch (Exception e) {
-            throw DataXException.asDataXException(TransformerErrorCode.TRANSFORMER_ILLEGAL_PARAMETER, "paras:" + Arrays.asList(paras).toString() + " => " + e.getMessage());
+            throw DataXException.asDataXException(
+                    TransformerErrorCode.TRANSFORMER_ILLEGAL_PARAMETER,
+                    "paras:" + Arrays.asList(paras) + " => " + e.getMessage());
         }
 
         Column column = record.getColumn(columnIndex);
@@ -53,7 +55,7 @@ public class PadTransformer
                 oriValue = "";
             }
             String newValue;
-            if (!padType.equalsIgnoreCase("r") && !padType.equalsIgnoreCase("l")) {
+            if (!"r".equalsIgnoreCase(padType) && !"l".equalsIgnoreCase(padType)) {
                 throw new RuntimeException(String.format("dx_pad first para(%s) support l or r", padType));
             }
             if (length <= oriValue.length()) {
@@ -67,7 +69,8 @@ public class PadTransformer
             record.setColumn(columnIndex, new StringColumn(newValue));
         }
         catch (Exception e) {
-            throw DataXException.asDataXException(TransformerErrorCode.TRANSFORMER_RUN_EXCEPTION, e.getMessage(), e);
+            throw DataXException.asDataXException(
+                    TransformerErrorCode.TRANSFORMER_RUN_EXCEPTION, e.getMessage(), e);
         }
         return record;
     }
@@ -89,7 +92,7 @@ public class PadTransformer
             }
         }
 
-        if (padType.equalsIgnoreCase("l")) {
+        if ("l".equalsIgnoreCase(padType)) {
             return finalPad + oriValue;
         }
         else {

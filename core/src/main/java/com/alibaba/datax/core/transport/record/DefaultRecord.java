@@ -51,7 +51,7 @@ public class DefaultRecord
     }
 
     @Override
-    public void setColumn(int i, final Column column)
+    public void setColumn(int i, Column column)
     {
         if (i < 0) {
             throw DataXException.asDataXException(FrameworkErrorCode.ARGUMENT_ERROR,
@@ -93,7 +93,7 @@ public class DefaultRecord
         return memorySize;
     }
 
-    private void decrByteSize(final Column column)
+    private void decrByteSize(Column column)
     {
         if (null == column) {
             return;
@@ -105,7 +105,7 @@ public class DefaultRecord
         memorySize = memorySize - ClassSize.COLUMN_HEAD - column.getByteSize();
     }
 
-    private void incrByteSize(final Column column)
+    private void incrByteSize(Column column)
     {
         if (null == column) {
             return;

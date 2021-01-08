@@ -30,7 +30,7 @@ public class SubstrTransformer
 
         try {
             if (paras.length != 3) {
-                throw new RuntimeException("dx_substr paras must be 3");
+                throw new RuntimeException("dx_substr argument number must be equal 3");
             }
 
             columnIndex = (Integer) paras[0];
@@ -38,7 +38,8 @@ public class SubstrTransformer
             length = Integer.parseInt((String) paras[2]);
         }
         catch (Exception e) {
-            throw DataXException.asDataXException(TransformerErrorCode.TRANSFORMER_ILLEGAL_PARAMETER, "paras:" + Arrays.asList(paras).toString() + " => " + e.getMessage());
+            throw DataXException.asDataXException(TransformerErrorCode.TRANSFORMER_ILLEGAL_PARAMETER,
+                    "paras:" + Arrays.asList(paras) + " => " + e.getMessage());
         }
 
         Column column = record.getColumn(columnIndex);
@@ -51,7 +52,8 @@ public class SubstrTransformer
             }
             String newValue;
             if (startIndex > oriValue.length()) {
-                throw new RuntimeException(String.format("dx_substr startIndex(%s) out of range(%s)", startIndex, oriValue.length()));
+                throw new RuntimeException(String.format("dx_substr startIndex(%s) out of range" +
+                        "(%s) of (%s)", startIndex, oriValue.length(), oriValue));
             }
             if (startIndex + length >= oriValue.length()) {
                 newValue = oriValue.substring(startIndex);
@@ -63,7 +65,8 @@ public class SubstrTransformer
             record.setColumn(columnIndex, new StringColumn(newValue));
         }
         catch (Exception e) {
-            throw DataXException.asDataXException(TransformerErrorCode.TRANSFORMER_RUN_EXCEPTION, e.getMessage(), e);
+            throw DataXException.asDataXException(
+                    TransformerErrorCode.TRANSFORMER_RUN_EXCEPTION, e.getMessage(), e);
         }
         return record;
     }
