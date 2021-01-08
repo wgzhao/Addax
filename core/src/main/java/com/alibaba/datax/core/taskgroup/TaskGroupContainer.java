@@ -469,7 +469,7 @@ public class TaskGroupContainer
                     String.format("%d-%d-%d-reader",
                             jobId, taskGroupId, this.taskId));
             /*
-             * 通过设置thread的contextClassLoader，即可实现同步和主程序不通的加载器
+             * 通过设置thread的contextClassLoader，即可实现同步和主程序不同的加载器
              */
             this.readerThread.setContextClassLoader(LoadUtil.getJarLoader(
                     PluginType.READER, this.taskConfig.getString(

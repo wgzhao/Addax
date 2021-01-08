@@ -33,7 +33,7 @@ public class MemoryChannel
     private final Condition notInsufficient;
     private final Condition notEmpty;
 
-    public MemoryChannel(final Configuration configuration)
+    public MemoryChannel(Configuration configuration)
     {
         super(configuration);
         this.queue = new ArrayBlockingQueue<>(this.getCapacity());

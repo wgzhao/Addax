@@ -34,10 +34,10 @@ public class BufferedRecordTransformerExchanger
     private volatile boolean shutdown = false;
 
     @SuppressWarnings("unchecked")
-    public BufferedRecordTransformerExchanger(final int taskGroupId, final int taskId,
-            final Channel channel, final Communication communication,
-            final TaskPluginCollector pluginCollector,
-            final List<TransformerExecution> tInfoExecs)
+    public BufferedRecordTransformerExchanger(int taskGroupId, int taskId,
+            Channel channel, Communication communication,
+            TaskPluginCollector pluginCollector,
+            List<TransformerExecution> tInfoExecs)
     {
         super(taskGroupId, taskId, communication, tInfoExecs, pluginCollector);
         assert null != channel;
@@ -79,7 +79,7 @@ public class BufferedRecordTransformerExchanger
     }
 
     @Override
-    public void sendToWriter(com.alibaba.datax.common.element.Record record)
+    public void sendToWriter(Record record)
     {
         if (shutdown) {
             throw DataXException.asDataXException(CommonErrorCode.SHUT_DOWN_TASK, "");
@@ -94,11 +94,13 @@ public class BufferedRecordTransformerExchanger
         }
 
         if (record.getMemorySize() > this.byteCapacity) {
-            this.pluginCollector.collectDirtyRecord(record, new Exception(String.format("单条记录超过大小限制，当前限制为:%s", this.byteCapacity)));
+            this.pluginCollector.collectDirtyRecord(record,
+                    new Exception(String.format("单条记录超过大小限制，当前限制为:%s", this.byteCapacity)));
             return;
         }
 
-        boolean isFull = (this.bufferIndex >= this.bufferSize || this.memoryBytes.get() + record.getMemorySize() > this.byteCapacity);
+        boolean isFull = (this.bufferIndex >= this.bufferSize
+                || this.memoryBytes.get() + record.getMemorySize() > this.byteCapacity);
         if (isFull) {
             flush();
         }
@@ -143,7 +145,7 @@ public class BufferedRecordTransformerExchanger
             receive();
         }
 
-        com.alibaba.datax.common.element.Record record = this.buffer.get(this.bufferIndex++);
+        Record record = this.buffer.get(this.bufferIndex++);
         if (record instanceof TerminateRecord) {
             record = null;
         }

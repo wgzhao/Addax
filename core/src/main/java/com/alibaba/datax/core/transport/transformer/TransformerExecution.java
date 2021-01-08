@@ -20,7 +20,8 @@ public class TransformerExecution
 
     private boolean isChecked = false;
 
-    public TransformerExecution(TransformerInfo transformerInfo, TransformerExecutionParas transformerExecutionParas)
+    public TransformerExecution(TransformerInfo transformerInfo,
+            TransformerExecutionParas transformerExecutionParas)
     {
         this.transformerExecutionParas = transformerExecutionParas;
         this.transformerInfo = transformerInfo;
@@ -32,7 +33,7 @@ public class TransformerExecution
         /*
          * groovy不支持传参
          */
-        if (transformerInfo.getTransformer().getTransformerName().equals("dx_groovy")) {
+        if ("dx_groovy".equals(transformerInfo.getTransformer().getTransformerName())) {
             finalParas = new Object[2];
             finalParas[0] = transformerExecutionParas.getCode();
             finalParas[1] = transformerExecutionParas.getExtraPackage();
@@ -44,7 +45,9 @@ public class TransformerExecution
         if (transformerExecutionParas.getColumnIndex() != null) {
             if (transformerExecutionParas.getParas() != null) {
                 finalParas = new Object[transformerExecutionParas.getParas().length + 1];
-                System.arraycopy(transformerExecutionParas.getParas(), 0, finalParas, 1, transformerExecutionParas.getParas().length);
+                System.arraycopy(transformerExecutionParas.getParas(),
+                        0, finalParas, 1,
+                        transformerExecutionParas.getParas().length);
             }
             else {
                 finalParas = new Object[1];

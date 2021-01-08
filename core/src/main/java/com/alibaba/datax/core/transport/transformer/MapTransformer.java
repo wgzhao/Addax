@@ -4,10 +4,16 @@ import com.alibaba.datax.common.element.Column;
 import com.alibaba.datax.common.element.Record;
 import com.alibaba.datax.common.element.StringColumn;
 import com.alibaba.datax.common.exception.DataXException;
-import com.alibaba.datax.common.util.MathUtil;
 import com.alibaba.datax.transformer.Transformer;
 
 import java.util.Arrays;
+
+import static com.alibaba.datax.common.util.MathUtil.add;
+import static com.alibaba.datax.common.util.MathUtil.divide;
+import static com.alibaba.datax.common.util.MathUtil.mod;
+import static com.alibaba.datax.common.util.MathUtil.multiply;
+import static com.alibaba.datax.common.util.MathUtil.pow;
+import static com.alibaba.datax.common.util.MathUtil.subtract;
 
 /**
  * no comments.
@@ -49,7 +55,9 @@ public class MapTransformer
             Double.valueOf(value);
         }
         catch (Exception e) {
-            throw DataXException.asDataXException(TransformerErrorCode.TRANSFORMER_ILLEGAL_PARAMETER, "paras:" + Arrays.asList(paras).toString() + " => " + e.getMessage());
+            throw DataXException.asDataXException(
+                    TransformerErrorCode.TRANSFORMER_ILLEGAL_PARAMETER,
+                    "paras:" + Arrays.asList(paras) + " => " + e.getMessage());
         }
 
         if (column.asString().split("\\.").length >= 2) {
@@ -59,22 +67,22 @@ public class MapTransformer
         try {
             switch (code) {
                 case "+":
-                    newValue = MathUtil.add(column.asString(), value);
+                    newValue = add(column.asString(), value);
                     break;
                 case "-":
-                    newValue = MathUtil.subtract(column.asString(), value);
+                    newValue = subtract(column.asString(), value);
                     break;
                 case "*":
-                    newValue = MathUtil.multiply(column.asString(), value);
+                    newValue = multiply(column.asString(), value);
                     break;
                 case "/":
-                    newValue = MathUtil.divide(column.asString(), value, scale);
+                    newValue = divide(column.asString(), value, scale);
                     break;
                 case "%":
-                    newValue = MathUtil.mod(column.asString(), value);
+                    newValue = mod(column.asString(), value);
                     break;
                 case "^":
-                    newValue = MathUtil.pow(column.asString(), value);
+                    newValue = pow(column.asString(), value);
                     break;
                 default:
                     throw new RuntimeException("dx_map can't support code:" + code);
@@ -83,7 +91,8 @@ public class MapTransformer
             return record;
         }
         catch (Exception e) {
-            throw DataXException.asDataXException(TransformerErrorCode.TRANSFORMER_RUN_EXCEPTION, e.getMessage(), e);
+            throw DataXException.asDataXException(
+                    TransformerErrorCode.TRANSFORMER_RUN_EXCEPTION, e.getMessage(), e);
         }
     }
 }

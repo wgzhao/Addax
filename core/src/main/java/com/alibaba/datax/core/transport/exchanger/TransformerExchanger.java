@@ -33,7 +33,7 @@ public abstract class TransformerExchanger
 
     public TransformerExchanger(int taskGroupId, int taskId, Communication communication,
             List<TransformerExecution> transformerExecs,
-            final TaskPluginCollector pluginCollector)
+            TaskPluginCollector pluginCollector)
     {
 
         this.transformerExecs = transformerExecs;
@@ -43,7 +43,7 @@ public abstract class TransformerExchanger
         this.currentCommunication = communication;
     }
 
-    public Record doTransformer(com.alibaba.datax.common.element.Record record)
+    public Record doTransformer(Record record)
     {
         if (transformerExecs == null || transformerExecs.isEmpty()) {
             return record;
@@ -67,7 +67,8 @@ public abstract class TransformerExchanger
              */
             if (!transformerInfoExec.isChecked()) {
 
-                if (transformerInfoExec.getColumnIndex() != null && transformerInfoExec.getColumnIndex() >= record.getColumnNumber()) {
+                if (transformerInfoExec.getColumnIndex() != null
+                        && transformerInfoExec.getColumnIndex() >= record.getColumnNumber()) {
                     throw DataXException.asDataXException(TransformerErrorCode.TRANSFORMER_ILLEGAL_PARAMETER,
                             String.format("columnIndex[%s] out of bound[%s]. name=%s",
                                     transformerInfoExec.getColumnIndex(), record.getColumnNumber(),
@@ -77,10 +78,14 @@ public abstract class TransformerExchanger
             }
 
             try {
-                result = transformerInfoExec.getTransformer().evaluate(result, transformerInfoExec.gettContext(), transformerInfoExec.getFinalParas());
+                result = transformerInfoExec
+                        .getTransformer()
+                        .evaluate(result, transformerInfoExec.gettContext(),
+                                transformerInfoExec.getFinalParas());
             }
             catch (Exception e) {
-                errorMsg = String.format("transformer(%s) has Exception(%s)", transformerInfoExec.getTransformerName(),
+                errorMsg = String.format("transformer(%s) has Exception(%s)",
+                        transformerInfoExec.getTransformerName(),
                         e.getMessage());
                 failed = true;
                 //LOG.error(errorMsg, e);
@@ -104,9 +109,7 @@ public abstract class TransformerExchanger
             }
 
             long diff = System.nanoTime() - startTs;
-            //transformerInfoExec.addExaustedTime(diff);
             diffExaustedTime += diff;
-            //transformerInfoExec.addSuccessRecords(1);
         }
 
         totalExaustedTime += diffExaustedTime;

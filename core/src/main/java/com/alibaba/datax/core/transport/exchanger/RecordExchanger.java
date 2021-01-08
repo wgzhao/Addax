@@ -26,8 +26,8 @@ public class RecordExchanger
     private volatile boolean shutdown = false;
 
     @SuppressWarnings("unchecked")
-    public RecordExchanger(final int taskGroupId, final int taskId, final Channel channel, final Communication communication,
-            List<TransformerExecution> transformerExecs, final TaskPluginCollector pluginCollector)
+    public RecordExchanger(int taskGroupId, int taskId, Channel channel, Communication communication,
+            List<TransformerExecution> transformerExecs, TaskPluginCollector pluginCollector)
     {
         super(taskGroupId, taskId, communication, transformerExecs, pluginCollector);
         assert channel != null;
@@ -68,7 +68,7 @@ public class RecordExchanger
     }
 
     @Override
-    public void sendToWriter(com.alibaba.datax.common.element.Record record)
+    public void sendToWriter(Record record)
     {
         if (shutdown) {
             throw DataXException.asDataXException(CommonErrorCode.SHUT_DOWN_TASK, "");
