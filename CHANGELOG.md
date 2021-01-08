@@ -1,5 +1,23 @@
 # Changelog
 
+## 3.1.7
+
+### General Changes
+
+* Add support for more data type such as `Array`, `UUID`, `JSON`, `XML` 
+* Add more deme job files
+* Add support for HBase 2.0 reader ( `hbase20xreader` )
+* Fixes for some minor issues
+* Update some sample job json-string for documentation
+
+### Oracle writer
+
+* Fixed incorrect column cuased by duplicate variable initialization ([\#92](https://github.com/wgzhao/DataX/issues/92))
+
+### Transformer
+
+* Add power expressions (`^`) for `dx_map` function
+
 ## 3.1.6
 
 ### General Changes
