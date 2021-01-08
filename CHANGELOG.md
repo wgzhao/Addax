@@ -10,6 +10,30 @@
 * Fixes for some minor issues
 * Update some sample job json-string for documentation
 
+### ClickHouse reader
+
+* Add support for `DateTime`, `DateTime64` data type
+
+### ClickHouse writer
+
+* Add support for `DateTime`, `DateTime64` data type
+
+### PostgreSQL reader
+
+* Add support for `UUID`,`JSON`, `INET`,`MACADDR` data type
+
+### PostgreSQL writer
+
+* Add support for `UUID`,`JSON`, `INET`,`MACADDR` data type
+
+### SQLServer reader
+
+* Add support for `image` data type
+
+### SQLServer writer
+
+* Add support for `image` data type
+
 ### Oracle writer
 
 * Fixed incorrect column cuased by duplicate variable initialization ([\#92](https://github.com/wgzhao/DataX/issues/92))
