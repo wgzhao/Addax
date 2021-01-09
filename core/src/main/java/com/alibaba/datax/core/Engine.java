@@ -171,6 +171,8 @@ public class Engine
                 FrameworkErrorCode tempErrorCode = (FrameworkErrorCode) errorCode;
                 exitCode = tempErrorCode.toExitValue();
                 System.exit(exitCode);
+            } else {
+                System.exit(99);
             }
         }
         System.exit(exitCode);
