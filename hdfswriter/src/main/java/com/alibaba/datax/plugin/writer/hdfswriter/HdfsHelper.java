@@ -51,6 +51,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.text.SimpleDateFormat;
 import java.util.Arrays;
 import java.util.Date;
@@ -287,7 +288,7 @@ public class HdfsHelper
             throw DataXException.asDataXException(HdfsWriterErrorCode.CONNECT_HDFS_IO_ERROR, e);
         }
 
-        if (null == fileSystem ) {
+        if (null == fileSystem) {
             String message = String.format("获取FileSystem失败,请检查HDFS地址是否正确: [message:defaultFS = %s]",
                     defaultFS);
             LOG.error(message);
@@ -406,9 +407,10 @@ public class HdfsHelper
         if (delDotFile) {
             LOG.info("仅删除指定目录下的点(.)开头的文件或文件夹");
             needDelPaths = Arrays.stream(paths).filter(x -> x.getName().startsWith(".")).collect(Collectors.toList());
-        } else {
+        }
+        else {
             LOG.info("删除指定目录下的不以点(.)开头的文件夹或文件夹");
-            needDelPaths = Arrays.stream(paths).filter(x -> ! x.getName().startsWith(".")).collect(Collectors.toList());
+            needDelPaths = Arrays.stream(paths).filter(x -> !x.getName().startsWith(".")).collect(Collectors.toList());
         }
 
         for (Path path : needDelPaths) {
@@ -689,7 +691,12 @@ public class HdfsHelper
                 case VARCHAR:
                 case CHAR:
                 case BINARY:
-                    byte[] buffer = record.getColumn(i).asBytes();
+                    byte[] buffer;
+                    if ("DATE".equals( record.getColumn(i).getType().toString())) {
+                         buffer = record.getColumn(i).asString().getBytes(StandardCharsets.UTF_8);
+                    } else {
+                        buffer = record.getColumn(i).asBytes();
+                    }
                     ((BytesColumnVector) batch.cols[i]).setRef(row, buffer, 0, buffer.length);
                     break;
                 default:
