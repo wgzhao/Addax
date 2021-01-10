@@ -137,9 +137,8 @@ public class TaskGroupContainer
             }
 
             int taskCountInThisTaskGroup = taskConfigs.size();
-            LOG.info(String.format(
-                    "taskGroupId=[%d] start [%d] channels for [%d] tasks.",
-                    this.taskGroupId, channelNumber, taskCountInThisTaskGroup));
+            LOG.info("taskGroupId=[{}] start [{}] channels for [{}] tasks.",
+                    this.taskGroupId, channelNumber, taskCountInThisTaskGroup);
 
             this.containerCommunicator.registerCommunication(taskConfigs);
 
@@ -190,7 +189,7 @@ public class TaskGroupContainer
                         Long taskStartTime = taskStartTimeMap.get(taskId);
                         if (taskStartTime != null) {
                             long usedTime = System.currentTimeMillis() - taskStartTime;
-                            LOG.info("taskGroup[{}] taskId[{}] is successful, used[{}]ms",
+                            LOG.debug("taskGroup[{}] taskId[{}] is successful, used[{}]ms",
                                     this.taskGroupId, taskId, usedTime);
                             //usedTime*1000*1000 转换成PerfRecord记录的ns，这里主要是简单登记，进行最长任务的打印。因此增加特定静态方法
                             PerfRecord.addPerfRecord(taskGroupId, taskId, PerfRecord.PHASE.TASK_TOTAL, taskStartTime,
@@ -236,7 +235,7 @@ public class TaskGroupContainer
                             }
                         }
                         else {
-                            LOG.info("taskGroup[{}] taskId[{}] attemptCount[{}] has already shutdown",
+                            LOG.debug("taskGroup[{}] taskId[{}] attemptCount[{}] has already shutdown",
                                     this.taskGroupId, taskId, lastExecutor.getAttemptCount());
                         }
                     }
@@ -252,7 +251,7 @@ public class TaskGroupContainer
                     taskMonitor.registerTask(taskId, this.containerCommunicator.getCommunication(taskId));
 
                     taskFailedExecutorMap.remove(taskId);
-                    LOG.info("taskGroup[{}] taskId[{}] attemptCount[{}] is started",
+                    LOG.debug("taskGroup[{}] taskId[{}] attemptCount[{}] is started",
                             this.taskGroupId, taskId, attemptCount);
                 }
 
@@ -262,7 +261,7 @@ public class TaskGroupContainer
                     lastTaskGroupContainerCommunication = reportTaskGroupCommunication(
                             lastTaskGroupContainerCommunication, taskCountInThisTaskGroup);
 
-                    LOG.info("taskGroup[{}] completed it's tasks.", this.taskGroupId);
+                    LOG.debug("taskGroup[{}] completed it's tasks.", this.taskGroupId);
                     break;
                 }
 
@@ -304,10 +303,10 @@ public class TaskGroupContainer
                 VMInfo vmInfo = VMInfo.getVmInfo();
                 if (vmInfo != null) {
                     vmInfo.getDelta(false);
-                    LOG.info(vmInfo.totalString());
+                    LOG.debug(vmInfo.totalString());
                 }
 
-                LOG.info(PerfTrace.getInstance().summarizeNoException());
+                LOG.debug(PerfTrace.getInstance().summarizeNoException());
                 this.removeTaskGroup();//移除指定JobId中的统计Map
             }
         }

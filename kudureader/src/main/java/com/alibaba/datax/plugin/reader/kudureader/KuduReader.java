@@ -27,7 +27,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Created by roy on 2019/12/12 1543.
+ * Kudu reader plugin
  */
 public class KuduReader
         extends Reader
