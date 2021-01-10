@@ -100,7 +100,7 @@ public class Engine
         return jobConfWithSetting.beautify();
     }
 
-    public static Configuration filterSensitiveConfiguration(Configuration configuration)
+    public static void filterSensitiveConfiguration(Configuration configuration)
     {
         Set<String> keys = configuration.getKeys();
         for (String key : keys) {
@@ -110,7 +110,6 @@ public class Engine
                 configuration.set(key, "*****");
             }
         }
-        return configuration;
     }
 
     public static void entry(String[] args)
@@ -135,7 +134,7 @@ public class Engine
             //打印vmInfo
             VMInfo vmInfo = VMInfo.getVmInfo();
             if (vmInfo != null) {
-                LOG.info(vmInfo.toString());
+                LOG.debug(vmInfo.toString());
             }
 
             LOG.info("\n{}\n", Engine.filterJobConfiguration(configuration));

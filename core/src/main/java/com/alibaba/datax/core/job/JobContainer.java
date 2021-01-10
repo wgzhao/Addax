@@ -111,11 +111,11 @@ public class JobContainer
 
                 LOG.debug("jobContainer starts to do init ...");
                 this.init();
-                LOG.info("jobContainer starts to do prepare ...");
+                LOG.debug("jobContainer starts to do prepare ...");
                 this.prepare();
-                LOG.info("jobContainer starts to do split ...");
+                LOG.debug("jobContainer starts to do split ...");
                 this.totalStage = this.split();
-                LOG.info("jobContainer starts to do schedule ...");
+                LOG.debug("jobContainer starts to do schedule ...");
                 this.schedule();
                 LOG.debug("jobContainer starts to do post ...");
                 this.post();
@@ -123,7 +123,7 @@ public class JobContainer
                 LOG.debug("jobContainer starts to do postHandle ...");
                 this.postHandle();
 
-                LOG.info("DataX jobId [{}] completed successfully.", this.jobId);
+                LOG.debug("DataX jobId [{}] completed successfully.", this.jobId);
                 // disable hook function
                 this.invokeHooks();
             }
@@ -170,7 +170,7 @@ public class JobContainer
                     VMInfo vmInfo = VMInfo.getVmInfo();
                     if (vmInfo != null) {
                         vmInfo.getDelta(false);
-                        LOG.info(vmInfo.totalString());
+                        LOG.debug(vmInfo.totalString());
                     }
 
                     LOG.info(PerfTrace.getInstance().summarizeNoException());
@@ -593,7 +593,7 @@ public class JobContainer
         reportCommunication.setLongCounter(CommunicationTool.RECORD_SPEED, recordSpeedPerSecond);
 
         super.getContainerCommunicator().report(reportCommunication);
-        LOG.info(CommunicationTool.Stringify.getSnapshot(communication));
+        LOG.debug(CommunicationTool.Stringify.getSnapshot(communication));
 
         LOG.info(String.format(
                 "\n" + "%-26s: %-18s\n" + "%-26s: %-18s\n" + "%-26s: %19s\n"
@@ -824,12 +824,12 @@ public class JobContainer
     {
 
         String jobKey = "jobName";
-        LOG.info("invokeHooks begin");
+        LOG.debug("invokeHooks begin");
 
         String jobResultReportUrl = userConf.getString(CoreConstant.DATAX_CORE_DATAXSERVER_ADDRESS);
 
         if (StringUtils.isBlank(jobResultReportUrl)) {
-            LOG.info("report url not found");
+            LOG.debug("report url not found");
             return;
         }
 
@@ -849,7 +849,7 @@ public class JobContainer
         else {
             jobName.append(jobKey);
         }
-        LOG.info("jobName: {}", jobName);
+        LOG.debug("jobName: {}", jobName);
 
         if (0L == this.endTimeStamp) {
             this.endTimeStamp = System.currentTimeMillis();
@@ -882,7 +882,7 @@ public class JobContainer
 
         CloseableHttpAsyncClient httpClient = JobReport.getHttpClient();
 
-        LOG.info("jobResultReportUrl: {}", jobResultReportUrl);
+        LOG.debug("jobResultReportUrl: {}", jobResultReportUrl);
         HttpPost postBody = JobReport.getPostBody(jobResultReportUrl, jsonStr, ContentType.APPLICATION_JSON);
 
         //回调
@@ -891,12 +891,11 @@ public class JobContainer
 
             public void completed(HttpResponse result)
             {
-                LOG.info("send jobResult completed");
-                LOG.info("result:{}", result.getStatusLine());
+                LOG.debug("send jobResult completed, result: {}", result.getStatusLine());
                 String content;
                 try {
                     content = EntityUtils.toString(result.getEntity(), "UTF-8");
-                    LOG.info("report contents: {}", content);
+                    LOG.debug("report contents: {}", content);
                 }
                 catch (IOException e) {
                     e.printStackTrace();
@@ -906,12 +905,12 @@ public class JobContainer
             public void failed(Exception e)
             {
                 e.printStackTrace();
-                LOG.info("send jobResult failed");
+                LOG.warn("send jobResult failed");
             }
 
             public void cancelled()
             {
-                LOG.info("send jobResult cancelled");
+                LOG.warn("send jobResult cancelled");
             }
         };
         //连接池执行
@@ -924,6 +923,6 @@ public class JobContainer
             e.printStackTrace();
             Thread.currentThread().interrupt();
         }
-        LOG.info("invokeHooks end");
+        LOG.debug("invokeHooks end");
     }
 }
