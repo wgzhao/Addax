@@ -67,6 +67,7 @@
         <module>hbase20xreader</module>
         <module>hbase20xsqlreader</module>
         <module>hdfsreader</module>
+        <module>kudureader</module>
         <module>jsonfilereader</module>
         <module>mongodbreader</module>
         <module>mysqlreader</module>
