@@ -57,7 +57,7 @@
 - hbasex11sqlwrite 增加了 Kerberos 支持
 - oraclewriter 增加对 `merge into` 语法支持(感谢 @weihebu 提供的建议和参考)
 - postgresqlwriter 增加 `insert into ... on conflict` 语法支持 (感谢 @weihebu 提供的建议和参考)
-- rdbmsreader/rdbmswriter 增加了TDH Inceptor， Trino 查询引擎支持 
+- rdbmsreader/rdbmswriter 增加了TDH Inceptor， Trino 查询引擎支持
 - 尽可能减少了本地jar包的依赖，转为从maven仓库获取
 - 绝大部分依赖包升级到了最新稳定版本，减少了潜在漏洞
 - 不同插件下的相同依赖包做了版本统一
@@ -78,6 +78,7 @@
 | HBase 2.x   | 支持 | 支持 | hbase20xsqlreader/hbase20xsqlwriter| 通过[Phoenix](https://phoenix.apache.org)操作HBase |
 | HDFS        | 支持 | 支持 | hdfsreader/hdfswriter | HDFS 2.x 以上版本 |
 | json        | 支持 | 不支持 | jsonfilereader | |
+| kudu        | 支持 | 不支持 | kudureader |  | 
 | MongoDB     | 支持 | 支持 | mongodbreader/mongodbwriter | |
 | MySQL/MariaDB | 支持 | 支持 | mysqlreader/mysqlwriter | |
 | Oracle      | 支持 | 支持 | oraclereader/oraclewriter | |
