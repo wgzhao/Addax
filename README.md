@@ -83,6 +83,7 @@
 | Oracle      | 支持 | 支持 | oraclereader/oraclewriter | |
 | PostgreSQL  | 支持 | 支持 | postgresqlreader/postgresqlwriter | |
 | PrestoSQL  | 支持 | 支持 | rdbmsreader/rdbmswriter | [trino(原PrestoSQL)](https://trino.io) 310以上 |
+| Redis      | 支持 | 支持 | redisreader/rediswriter | |
 | SQL Server  |支持 | 支持 | sqlserverreader/sqlserverwriter | |
 | TDH Inceptor2 | 支持 | 支持 | rdbmsreader/rdbmswriter | [星环 TDH](http://transwarp.cn/transwarp/product-TDH.html?categoryId=18) 5.1以上版本 |
 | TEXT       | 支持 | 支持 | textfilereader/textfilewriter | |
