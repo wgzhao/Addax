@@ -18,8 +18,8 @@ import org.apache.kudu.client.PartialRow;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.nio.charset.Charset;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -47,7 +47,8 @@ public class KuduHelper
         try {
             kConfiguration = JSON.parseObject(kuduConfig, HashMap.class);
             Validate.isTrue(kConfiguration != null, "kuduConfig is null!");
-            kConfiguration.put(Key.KUDU_ADMIN_TIMEOUT, kConfiguration.getOrDefault(Key.KUDU_ADMIN_TIMEOUT, Constant.ADMIN_TIMEOUT));
+            kConfiguration.put(Key.KUDU_ADMIN_TIMEOUT,
+                    kConfiguration.getOrDefault(Key.KUDU_ADMIN_TIMEOUT, Constant.ADMIN_TIMEOUT));
             kConfiguration.put(Key.KUDU_SESSION_TIMEOUT, kConfiguration.getOrDefault(Key.KUDU_SESSION_TIMEOUT, Constant.SESSION_TIMEOUT));
         }
         catch (Exception e) {
@@ -57,105 +58,31 @@ public class KuduHelper
         return kConfiguration;
     }
 
-    public static KuduClient getKuduClient(String kuduConfig)
+    public static KuduClient getKuduClient(Configuration configuration)
     {
-        Map<String, Object> conf = KuduHelper.getKuduConfiguration(kuduConfig);
-        KuduClient kuduClient = null;
         try {
-            String masterAddress = (String) conf.get(Key.KUDU_MASTER);
-            kuduClient = new KuduClient.KuduClientBuilder(masterAddress)
-                    .defaultAdminOperationTimeoutMs(Long.parseLong(conf.get(Key.KUDU_ADMIN_TIMEOUT).toString()))
-                    .defaultOperationTimeoutMs(Long.parseLong(conf.get(Key.KUDU_SESSION_TIMEOUT).toString()))
+            String masterAddress = (String) configuration.get(Key.KUDU_MASTER_ADDRESSES);
+            return new KuduClient.KuduClientBuilder(masterAddress)
+                    .defaultAdminOperationTimeoutMs(
+                            Long.parseLong(configuration.getString(
+                                    Key.KUDU_ADMIN_TIMEOUT, "60")) * 1000L)
+                    .defaultOperationTimeoutMs(
+                            Long.parseLong(configuration.getString(
+                                    Key.KUDU_SESSION_TIMEOUT, "100"))* 1000L)
                     .build();
         }
         catch (Exception e) {
             throw DataXException.asDataXException(KuduWriterErrorCode.GET_KUDU_CONNECTION_ERROR, e);
         }
-        return kuduClient;
     }
 
-    public static KuduTable getKuduTable(Configuration configuration, KuduClient kuduClient)
+    public static KuduTable getKuduTable(KuduClient kuduClient, String tableName)
     {
-        String tableName = configuration.getString(Key.TABLE);
-
-        KuduTable table = null;
         try {
-            if (kuduClient.tableExists(tableName)) {
-                table = kuduClient.openTable(tableName);
-            }
-            else {
-                synchronized (KuduHelper.class) {
-                    if (!kuduClient.tableExists(tableName)) {
-                        Schema schema = KuduHelper.getSchema(configuration);
-                        CreateTableOptions tableOptions = new CreateTableOptions();
-
-                        KuduHelper.setTablePartition(configuration, tableOptions, schema);
-                        // replica number
-                        Integer numReplicas = configuration.getInt(Key.NUM_REPLICAS, 3);
-                        tableOptions.setNumReplicas(numReplicas);
-                        table = kuduClient.createTable(tableName, schema, tableOptions);
-                    }
-                    else {
-                        table = kuduClient.openTable(tableName);
-                    }
-                }
-            }
+            return kuduClient.openTable(tableName);
         }
         catch (Exception e) {
             throw DataXException.asDataXException(KuduWriterErrorCode.GET_KUDU_TABLE_ERROR, e);
-        }
-        return table;
-    }
-
-    public static void createTable(Configuration configuration)
-    {
-        String tableName = configuration.getString(Key.TABLE);
-        String kuduConfig = configuration.getString(Key.KUDU_CONFIG);
-        KuduClient kuduClient = KuduHelper.getKuduClient(kuduConfig);
-        try {
-            Schema schema = KuduHelper.getSchema(configuration);
-            CreateTableOptions tableOptions = new CreateTableOptions();
-
-            KuduHelper.setTablePartition(configuration, tableOptions, schema);
-            //副本数
-            Integer numReplicas = configuration.getInt(Key.NUM_REPLICAS, 3);
-            tableOptions.setNumReplicas(numReplicas);
-            kuduClient.createTable(tableName, schema, tableOptions);
-        }
-        catch (Exception e) {
-            throw DataXException.asDataXException(KuduWriterErrorCode.GREATE_KUDU_TABLE_ERROR, e);
-        }
-        finally {
-            AtomicInteger i = new AtomicInteger(10);
-            while (i.get() > 0) {
-                try {
-                    if (kuduClient.isCreateTableDone(tableName)) {
-                        KuduHelper.closeClient(kuduClient);
-                        LOG.info("Table " + tableName + " is created!");
-                        break;
-                    }
-                    i.decrementAndGet();
-                    LOG.error("timeout!");
-                }
-                catch (KuduException e) {
-                    LOG.info("Wait for the table to be created..... " + i);
-                    try {
-                        Thread.sleep(100L);
-                    }
-                    catch (InterruptedException ex) {
-                        ex.printStackTrace();
-                    }
-                    i.decrementAndGet();
-                }
-            }
-            try {
-                if (kuduClient != null) {
-                    kuduClient.close();
-                }
-            }
-            catch (KuduException e) {
-                LOG.info("Kudu client has been shut down!");
-            }
         }
     }
 
@@ -206,9 +133,9 @@ public class KuduHelper
 
     public static boolean isTableExists(Configuration configuration)
     {
-        String tableName = configuration.getString(Key.TABLE);
+        String tableName = configuration.getString(Key.KUDU_TABLE_NAME);
         String kuduConfig = configuration.getString(Key.KUDU_CONFIG);
-        KuduClient kuduClient =KuduHelper.getKuduClient(kuduConfig);
+        KuduClient kuduClient =KuduHelper.getKuduClient(configuration);
         try {
             return kuduClient.tableExists(tableName);
         }
@@ -335,14 +262,15 @@ public class KuduHelper
     public static void validateParameter(Configuration configuration)
     {
         LOG.info("Start validating parameters！");
-        configuration.getNecessaryValue(Key.KUDU_CONFIG, KuduWriterErrorCode.REQUIRED_VALUE);
-        configuration.getNecessaryValue(Key.TABLE, KuduWriterErrorCode.REQUIRED_VALUE);
-        String encoding = configuration.getString(Key.ENCODING, Constant.DEFAULT_ENCODING);
-        if (!Charset.isSupported(encoding)) {
-            throw DataXException.asDataXException(KuduWriterErrorCode.ILLEGAL_VALUE,
-                    String.format("Encoding is not supported:[%s] .", encoding));
-        }
-        configuration.set(Key.ENCODING, encoding);
+        // configuration.getNecessaryValue(Key.KUDU_CONFIG, KuduWriterErrorCode.REQUIRED_VALUE);
+        configuration.getNecessaryValue(Key.KUDU_TABLE_NAME, KuduWriterErrorCode.REQUIRED_VALUE);
+        configuration.getNecessaryValue(Key.KUDU_MASTER_ADDRESSES, KuduWriterErrorCode.REQUIRED_VALUE);
+//        String encoding = configuration.getString(Key.ENCODING, Constant.DEFAULT_ENCODING);
+//        if (!Charset.isSupported(encoding)) {
+//            throw DataXException.asDataXException(KuduWriterErrorCode.ILLEGAL_VALUE,
+//                    String.format("Encoding is not supported:[%s] .", encoding));
+//        }
+//        configuration.set(Key.ENCODING, encoding);
         String insertMode = configuration.getString(Key.INSERT_MODE, Constant.INSERT_MODE);
         try {
             InsertModeType.getByTypeName(insertMode);
@@ -374,20 +302,20 @@ public class KuduHelper
                 col.set(Key.INDEX, index);
                 indexFlag++;
             }
-            if (primaryKey != col.getBool(Key.PRIMARYKEY, false)) {
-                primaryKey = col.getBool(Key.PRIMARYKEY, false);
-                primaryKeyFlag++;
-            }
+//            if (primaryKey != col.getBool(Key.PRIMARYKEY, false)) {
+//                primaryKey = col.getBool(Key.PRIMARYKEY, false);
+//                primaryKeyFlag++;
+//            }
             goalColumns.add(col);
         }
         if (indexFlag != 0 && indexFlag != columns.size()) {
             throw DataXException.asDataXException(KuduWriterErrorCode.ILLEGAL_VALUE,
                     "\"index\" either has values for all of them, or all of them are null!");
         }
-        if (primaryKeyFlag > 1) {
-            throw DataXException.asDataXException(KuduWriterErrorCode.ILLEGAL_VALUE,
-                    "\"primaryKey\" must be written in the front！");
-        }
+//        if (primaryKeyFlag > 1) {
+//            throw DataXException.asDataXException(KuduWriterErrorCode.ILLEGAL_VALUE,
+//                    "\"primaryKey\" must be written in the front！");
+//        }
         configuration.set(Key.COLUMN, goalColumns);
 //        LOG.info("------------------------------------");
 //        LOG.info(configuration.toString());
@@ -398,9 +326,9 @@ public class KuduHelper
     public static void truncateTable(Configuration configuration)
     {
         String kuduConfig = configuration.getString(Key.KUDU_CONFIG);
-        String userTable = configuration.getString(Key.TABLE);
+        String userTable = configuration.getString(Key.KUDU_TABLE_NAME);
         LOG.info(String.format("Because you have configured truncate is true,KuduWriter begins to truncate table %s .", userTable));
-        KuduClient kuduClient = KuduHelper.getKuduClient(kuduConfig);
+        KuduClient kuduClient = KuduHelper.getKuduClient(configuration);
 
         try {
             if (kuduClient.tableExists(userTable)) {
@@ -414,5 +342,40 @@ public class KuduHelper
         finally {
             KuduHelper.closeClient(kuduClient);
         }
+    }
+
+    /**
+     * 生成插入表的列信息
+     * 允许配置文件的 columns 为 "*" 配置或者指定列名进行配置
+     * @param kuduClient kudu 客户端
+     * @param configuration 配置文件
+     * @return list of configuration
+     */
+    public static List<Map<String, Type>> getColumns(KuduClient kuduClient,
+            Configuration configuration)
+    {
+        List<Map<String, Type>> result = new ArrayList<>();
+        Object originColumns = configuration.get(Key.COLUMN);
+        Map<String, Type> map = new HashMap<>();
+        if (originColumns.equals("*")) {
+            // 从表中获取字段名称
+            KuduTable kuduTable = KuduHelper.getKuduTable(kuduClient,
+                    configuration.getString(Key.KUDU_TABLE_NAME));
+            Schema schema = kuduTable.getSchema();
+            for (ColumnSchema col: schema.getColumns()) {
+                map.put(col.getName(), col.getType());
+                result.add(map);
+                map.clear();
+            }
+        } else {
+            // 用户提供了表字段以及类型，直接获取
+            for( Map<String, String> col :
+            (Collection<? extends Map<String, String>>) originColumns) {
+                map.put(col.get("name"), Type.getTypeForName(col.get("type")));
+                result.add(map);
+                map.clear();
+            }
+        }
+        return  result;
     }
 }

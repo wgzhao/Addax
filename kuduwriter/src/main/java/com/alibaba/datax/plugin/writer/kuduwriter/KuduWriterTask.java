@@ -6,7 +6,7 @@ import com.alibaba.datax.common.exception.DataXException;
 import com.alibaba.datax.common.plugin.RecordReceiver;
 import com.alibaba.datax.common.plugin.TaskPluginCollector;
 import com.alibaba.datax.common.util.Configuration;
-import org.apache.commons.lang3.StringUtils;
+import org.apache.kudu.Type;
 import org.apache.kudu.client.Insert;
 import org.apache.kudu.client.KuduClient;
 import org.apache.kudu.client.KuduException;
@@ -18,7 +18,11 @@ import org.apache.kudu.client.Upsert;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.math.BigDecimal;
+import java.sql.Date;
+import java.sql.Timestamp;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -29,6 +33,7 @@ public class KuduWriterTask
     public KuduSession session;
     private List<Configuration> columns;
     private List<List<Configuration>> columnLists;
+    private List<Map<String, Type>> needColumns;
     private ThreadPoolExecutor pool;
     private String encoding;
     private Double batchSize;
@@ -49,8 +54,10 @@ public class KuduWriterTask
         this.isSkipFail = configuration.getBool(Key.SKIP_FAIL);
         long mutationBufferSpace = configuration.getLong(Key.MUTATION_BUFFER_SPACE);
 
-        this.kuduClient = KuduHelper.getKuduClient(configuration.getString(Key.KUDU_CONFIG));
-        this.table = KuduHelper.getKuduTable(configuration, kuduClient);
+        this.kuduClient = KuduHelper.getKuduClient(configuration);
+        this.table = KuduHelper.getKuduTable(this.kuduClient,
+                configuration.getString(Key.KUDU_TABLE_NAME));
+        needColumns = KuduHelper.getColumns(this.kuduClient, configuration);
         this.session = kuduClient.newSession();
         session.setFlushMode(SessionConfiguration.FlushMode.MANUAL_FLUSH);
         session.setMutationBufferSpace((int) mutationBufferSpace);
@@ -64,22 +71,22 @@ public class KuduWriterTask
         Record record;
         try {
             while ((record = lineReceiver.getFromReader()) != null) {
-                if (record.getColumnNumber() != columns.size()) {
-                    throw DataXException.asDataXException(KuduWriterErrorCode.PARAMETER_NUM_ERROR,
-                            " number of record fields:" + record.getColumnNumber()
-                                    + " number of configuration fields:" + columns.size());
-                }
+//                if (record.getColumnNumber() != columns.size()) {
+//                    throw DataXException.asDataXException(KuduWriterErrorCode.PARAMETER_NUM_ERROR,
+//                            " number of record fields:" + record.getColumnNumber()
+//                                    + " number of configuration fields:" + columns.size());
+//                }
                 boolean isDirtyRecord = false;
 
-                for (int i = 0; i < primaryKeyIndexUntil && !isDirtyRecord; i++) {
-                    Column column = record.getColumn(i);
-                    isDirtyRecord = StringUtils.isBlank(column.asString());
-                }
-
-                if (isDirtyRecord) {
-                    taskPluginCollector.collectDirtyRecord(record, "primarykey field is null");
-                    continue;
-                }
+//                for (int i = 0; i < primaryKeyIndexUntil && !isDirtyRecord; i++) {
+//                    Column column = record.getColumn(i);
+//                    isDirtyRecord = StringUtils.isBlank(column.asString());
+//                }
+//
+//                if (isDirtyRecord) {
+//                    taskPluginCollector.collectDirtyRecord(record, "primarykey field is null");
+//                    continue;
+//                }
                 Upsert upsert = table.newUpsert();
                 Insert insert = table.newInsert();
                 PartialRow row;
@@ -91,54 +98,64 @@ public class KuduWriterTask
                     //增量更新
                     row = insert.getRow();
                 }
-                for (List<Configuration> columnList : columnLists) {
-
-                    for (Configuration col : columnList) {
-                        String name = col.getString(Key.NAME);
-                        ColumnType type = ColumnType.getByTypeName(col.getString(Key.TYPE, "string"));
-                        Column column = record.getColumn(col.getInt(Key.INDEX));
-                        String rawData = column.asString();
-                        if (rawData == null) {
-                            row.setNull(name);
-                            continue;
+                for (int i = 0; i < record.getColumnNumber(); i++) {
+                    Column column = record.getColumn(i);
+                    String name = needColumns.get(i).keySet().toArray()[0].toString();
+                    Type type = (Type) needColumns.get(i).keySet().toArray()[1];
+                    if (column.getRawData() == null) {
+                        row.setNull(name);
+                        continue;
+                    }
+                    switch (type) {
+                        case INT8:
+                        case INT16:
+                        case INT32:
+                            row.addInt(name, Integer.parseInt(column.asString()));
+                            break;
+                        case FLOAT:
+                        case DOUBLE:
+                            row.addDouble(name, column.asDouble());
+                            break;
+                        case STRING:
+                            row.addString(name, column.asString());
+                            break;
+                        case BOOL:
+                            row.addBoolean(name, column.asBoolean());
+                            break;
+                        case BINARY:
+                            row.addBinary(name, column.asBytes());
+                            break;
+                        case DECIMAL:
+                            row.addDecimal(name, new BigDecimal(column.asString()));
+                            break;
+                        case UNIXTIME_MICROS:
+                            row.addTimestamp(name, new Timestamp(column.asLong()));
+                            break;
+                        case DATE:
+                            row.addDate(name,
+                                    (Date) new java.util.Date(column.asDate().getTime()));
+                            break;
+                        default:
+                            row.addString(name, column.asString());
+                            break;
+                    }
+                    try {
+                        if (isUpsert) {
+                            session.apply(upsert);
                         }
-                        switch (type) {
-                            case INT:
-                                row.addInt(name, Integer.parseInt(rawData));
-                                break;
-                            case LONG:
-                            case BIGINT:
-                                row.addLong(name, Long.parseLong(rawData));
-                                break;
-                            case FLOAT:
-                                row.addFloat(name, Float.parseFloat(rawData));
-                                break;
-                            case DOUBLE:
-                                row.addDouble(name, Double.parseDouble(rawData));
-                                break;
-                            case BOOLEAN:
-                                row.addBoolean(name, Boolean.getBoolean(rawData));
-                                break;
-                            case STRING:
-                            default:
-                                row.addString(name, rawData);
+                        else {
+                            session.apply(insert);
                         }
-                        try {
-                            if (isUpsert) {
-                                session.apply(upsert);
-                            } else {
-                                session.apply(insert);
-                            }
+                    }
+                    catch (Exception e) {
+                        e.printStackTrace();
+                        LOG.error("Record Write Failure!", e);
+                        if (isSkipFail) {
+                            LOG.warn("Since you have configured \"skipFail\" to be true, this record will be skipped !");
+                            taskPluginCollector.collectDirtyRecord(record, e.getMessage());
                         }
-                        catch (Exception e) {
-                            LOG.error("Record Write Failure!", e);
-                            if (isSkipFail) {
-                                LOG.warn("Since you have configured \"skipFail\" to be true, this record will be skipped !");
-                                taskPluginCollector.collectDirtyRecord(record, e.getMessage());
-                            }
-                            else {
-                                throw DataXException.asDataXException(KuduWriterErrorCode.PUT_KUDU_ERROR, e.getMessage());
-                            }
+                        else {
+                            throw DataXException.asDataXException(KuduWriterErrorCode.PUT_KUDU_ERROR, e.getMessage());
                         }
                     }
                 }

@@ -3,11 +3,11 @@ package com.alibaba.datax.plugin.writer.kuduwriter;
 public class Key
 {
     public final static String KUDU_CONFIG = "kuduConfig";
-    public final static String KUDU_MASTER = "masterAddress";
+    public final static String KUDU_MASTER_ADDRESSES = "masterAddress";
     public final static String KUDU_ADMIN_TIMEOUT = "timeout";
     public final static String KUDU_SESSION_TIMEOUT = "sessionTimeout";
 
-    public final static String TABLE = "table";
+    public final static String KUDU_TABLE_NAME = "table";
     public final static String PARTITION = "partition";
     public final static String COLUMN = "column";
 
