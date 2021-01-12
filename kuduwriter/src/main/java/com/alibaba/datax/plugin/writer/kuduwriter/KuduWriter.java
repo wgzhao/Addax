@@ -18,14 +18,40 @@ public class KuduWriter
     {
         private static final Logger LOG = LoggerFactory.getLogger(Job.class);
         private Configuration config = null;
+        private String writeMode;
 
         @Override
         public void init()
         {
             this.config = this.getPluginJobConf();
-            KuduHelper.validateParameter(this.config);
+            this.validateParameter();
         }
 
+        private void validateParameter()
+        {
+            config.getNecessaryValue(Key.KUDU_TABLE_NAME, KuduWriterErrorCode.REQUIRED_VALUE);
+            config.getNecessaryValue(Key.KUDU_MASTER_ADDRESSES, KuduWriterErrorCode.REQUIRED_VALUE);
+            config.getNecessaryValue(Key.KUDU_TABLE_NAME, KuduWriterErrorCode.REQUIRED_VALUE);
+
+            // column check
+            List<Configuration> columns = this.config.getListConfiguration(Key.COLUMN);
+            if (null == columns || columns.isEmpty()) {
+                throw DataXException.asDataXException(
+                        KuduWriterErrorCode.REQUIRED_VALUE, "您需要指定 columns"
+                );
+            } else {
+                for (Configuration eachColumnConf : columns) {
+                    eachColumnConf.getNecessaryValue(Key.NAME, KuduWriterErrorCode.REQUIRED_VALUE);
+                    eachColumnConf.getNecessaryValue(Key.TYPE, KuduWriterErrorCode.REQUIRED_VALUE);
+                }
+            }
+            // writeMode check
+            this.writeMode = this.config.getString(Key.WRITE_MODE, Constant.INSERT_MODE);
+            this.config.set(Key.WRITE_MODE, this.writeMode);
+
+            // timeout
+
+        }
         @Override
         public void prepare()
         {
@@ -56,7 +82,7 @@ public class KuduWriter
         @Override
         public void destroy()
         {
-
+            //
         }
     }
 

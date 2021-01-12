@@ -15,11 +15,11 @@ import org.apache.kudu.client.KuduClient;
 import org.apache.kudu.client.KuduException;
 import org.apache.kudu.client.KuduTable;
 import org.apache.kudu.client.PartialRow;
+import org.apache.kudu.shaded.com.google.common.collect.Lists;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -36,27 +36,6 @@ public class KuduHelper
 {
 
     private static final Logger LOG = LoggerFactory.getLogger(KuduHelper.class);
-
-    public static Map<String, Object> getKuduConfiguration(String kuduConfig)
-    {
-        if (StringUtils.isBlank(kuduConfig)) {
-            throw DataXException.asDataXException(KuduWriterErrorCode.REQUIRED_VALUE,
-                    "Connection configuration information required.");
-        }
-        Map<String, Object> kConfiguration;
-        try {
-            kConfiguration = JSON.parseObject(kuduConfig, HashMap.class);
-            Validate.isTrue(kConfiguration != null, "kuduConfig is null!");
-            kConfiguration.put(Key.KUDU_ADMIN_TIMEOUT,
-                    kConfiguration.getOrDefault(Key.KUDU_ADMIN_TIMEOUT, Constant.ADMIN_TIMEOUT));
-            kConfiguration.put(Key.KUDU_SESSION_TIMEOUT, kConfiguration.getOrDefault(Key.KUDU_SESSION_TIMEOUT, Constant.SESSION_TIMEOUT));
-        }
-        catch (Exception e) {
-            throw DataXException.asDataXException(KuduWriterErrorCode.GET_KUDU_CONNECTION_ERROR, e);
-        }
-
-        return kConfiguration;
-    }
 
     public static KuduClient getKuduClient(Configuration configuration)
     {
@@ -271,14 +250,14 @@ public class KuduHelper
 //                    String.format("Encoding is not supported:[%s] .", encoding));
 //        }
 //        configuration.set(Key.ENCODING, encoding);
-        String insertMode = configuration.getString(Key.INSERT_MODE, Constant.INSERT_MODE);
+        String insertMode = configuration.getString(Key.WRITE_MODE, Constant.INSERT_MODE);
         try {
             InsertModeType.getByTypeName(insertMode);
         }
         catch (Exception e) {
             insertMode = Constant.INSERT_MODE;
         }
-        configuration.set(Key.INSERT_MODE, insertMode);
+        configuration.set(Key.WRITE_MODE, insertMode);
 
         Long writeBufferSize = configuration.getLong(Key.WRITE_BATCH_SIZE, Constant.DEFAULT_WRITE_BATCH_SIZE);
         configuration.set(Key.WRITE_BATCH_SIZE, writeBufferSize);
@@ -344,38 +323,13 @@ public class KuduHelper
         }
     }
 
-    /**
-     * 生成插入表的列信息
-     * 允许配置文件的 columns 为 "*" 配置或者指定列名进行配置
-     * @param kuduClient kudu 客户端
-     * @param configuration 配置文件
-     * @return list of configuration
-     */
-    public static List<Map<String, Type>> getColumns(KuduClient kuduClient,
-            Configuration configuration)
-    {
-        List<Map<String, Type>> result = new ArrayList<>();
-        Object originColumns = configuration.get(Key.COLUMN);
-        Map<String, Type> map = new HashMap<>();
-        if (originColumns.equals("*")) {
-            // 从表中获取字段名称
-            KuduTable kuduTable = KuduHelper.getKuduTable(kuduClient,
-                    configuration.getString(Key.KUDU_TABLE_NAME));
-            Schema schema = kuduTable.getSchema();
-            for (ColumnSchema col: schema.getColumns()) {
-                map.put(col.getName(), col.getType());
-                result.add(map);
-                map.clear();
-            }
-        } else {
-            // 用户提供了表字段以及类型，直接获取
-            for( Map<String, String> col :
-            (Collection<? extends Map<String, String>>) originColumns) {
-                map.put(col.get("name"), Type.getTypeForName(col.get("type")));
-                result.add(map);
-                map.clear();
-            }
-        }
-        return  result;
+    public static List<String> getColumnNames(List<Configuration> columns)
+{
+    List<String> columnNames = Lists.newArrayList();
+    for (Configuration eachColumnConf : columns) {
+        columnNames.add(eachColumnConf.getString(Key.NAME));
     }
+    return columnNames;
+}
+
 }

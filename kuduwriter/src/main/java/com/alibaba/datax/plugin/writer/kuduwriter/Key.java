@@ -29,7 +29,7 @@ public class Key
 
     public static final String TRUNCATE = "truncate";
 
-    public static final String INSERT_MODE = "writeMode";
+    public static final String WRITE_MODE = "writeMode";
 
     public static final String WRITE_BATCH_SIZE = "batchSize";
 
