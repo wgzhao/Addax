@@ -80,16 +80,15 @@ public class KuduWriterTask
                     taskPluginCollector.collectDirtyRecord(record, "primarykey field is null");
                     continue;
                 }
-
+                Upsert upsert = table.newUpsert();
+                Insert insert = table.newInsert();
                 PartialRow row;
                 if (isUpsert) {
                     //覆盖更新
-                    Upsert insert = table.newUpsert();
-                    row = insert.getRow();
+                    row = upsert.getRow();
                 }
                 else {
                     //增量更新
-                    Insert insert = table.newInsert();
                     row = insert.getRow();
                 }
                 for (List<Configuration> columnList : columnLists) {
@@ -125,7 +124,11 @@ public class KuduWriterTask
                                 row.addString(name, rawData);
                         }
                         try {
+                            if (isUpsert) {
+                                session.apply(upsert);
+                            } else {
                                 session.apply(insert);
+                            }
                         }
                         catch (Exception e) {
                             LOG.error("Record Write Failure!", e);
