@@ -6,7 +6,7 @@
         "splitKey": "",
         "lowerBound": "min",
         "upperBound": "max",
-        "socketReadTimeoutMs": 30000,
+        "ReadTimeoutMs": 30000,
         "scanRequestTimeout": 30000
     }
 }
