@@ -78,7 +78,7 @@
 | HBase 2.x   | 支持 | 支持 | hbase20xsqlreader/hbase20xsqlwriter| 通过[Phoenix](https://phoenix.apache.org)操作HBase |
 | HDFS        | 支持 | 支持 | hdfsreader/hdfswriter | HDFS 2.x 以上版本 |
 | json        | 支持 | 不支持 | jsonfilereader | |
-| kudu        | 支持 | 不支持 | kudureader |  | 
+| kudu        | 支持 | 支持 | kudureader/kuduwriter | 通过原生接口，计划更新Impala连接 | 
 | MongoDB     | 支持 | 支持 | mongodbreader/mongodbwriter | |
 | MySQL/MariaDB | 支持 | 支持 | mysqlreader/mysqlwriter | |
 | Oracle      | 支持 | 支持 | oraclereader/oraclewriter | |
