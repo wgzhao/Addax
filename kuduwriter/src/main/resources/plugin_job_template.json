@@ -1,0 +1,32 @@
+{
+  "name": "kuduwriter",
+  "parameter": {
+    "masterAddress": "***",
+    "timeout": 60,
+    "sessionTimeout": 60,
+    "table": "",
+    "replicaCount": 3,
+    "truncate": false,
+    "writeMode": "upsert",
+    "column": [
+      {
+        "index": 0,
+        "name": "c1",
+        "type": "string",
+        "primaryKey": true
+      },
+      {
+        "index": 1,
+        "name": "c2",
+        "type": "string",
+        "compress": "DEFAULT_COMPRESSION",
+        "encoding": "AUTO_ENCODING",
+        "comment": "注解xxxx"
+      }
+    ],
+    "batchSize": 1024,
+    "bufferSize": 2048,
+    "skipFail": false,
+    "encoding": "UTF-8"
+  }
+}
