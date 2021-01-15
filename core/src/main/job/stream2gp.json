@@ -1,0 +1,70 @@
+{
+    "job": {
+        "setting": {
+            "speed": {
+                "channel": 1,
+                "bytes": -1
+            }
+        },
+        "content": [
+            {
+                 "reader": {
+                    "name": "streamreader",
+                    "parameter": {
+                        "column" : [
+                            {
+                                "value": "DataX",
+                                "type": "string"
+                            },
+                            {
+                                "value": 19880808,
+                                "type": "long"
+                            },
+                            {
+                                "value": "1988-08-08 08:08:08",
+                                "type": "date"
+                            },
+                            {
+                                "value": true,
+                                "type": "bool"
+                            },
+                            {
+                                "value": "test",
+                                "type": "bytes"
+                            }
+                        ],
+                        "sliceRecordCount": 1000
+                    }
+                },
+                "writer": {
+                    "name": "greenplumwriter",
+                    "parameter": {
+                        "username": "wgzhao",
+                        "password": "wgzhao",
+                        "copy_queue_size": 50,
+                        "num_copy_processor": 2,
+                        "num_copy_writer": 1,
+                        "column": [
+                            "name",
+                            "file_size",
+                            "file_date",
+                            "flag_open",
+                            "memo"
+                        ],
+                        "preSql": [
+                            "truncate table @table"
+                        ],
+                        "connection": [
+                            {
+                                "jdbcUrl": "jdbc:postgresql://localhost:5432/wgzhao",
+                                "table": [
+                                    "gp_test"
+                                ]
+                            }
+                        ]
+                    }
+                }
+            }
+        ]
+    }
+}
