@@ -5,7 +5,7 @@ import com.alibaba.datax.common.plugin.RecordReceiver;
 import com.alibaba.datax.common.spi.Writer;
 import com.alibaba.datax.common.util.Configuration;
 import com.alibaba.datax.common.util.RetryUtil;
-import com.alibaba.datax.plugin.unstructuredstorage.writer.UnstructuredStorageWriterUtil;
+import com.alibaba.datax.plugin.storage.writer.StorageWriterUtil;
 import com.alibaba.datax.plugin.writer.ftpwriter.util.Constant;
 import com.alibaba.datax.plugin.writer.ftpwriter.util.IFtpHelper;
 import com.alibaba.datax.plugin.writer.ftpwriter.util.SftpHelperImpl;
@@ -45,7 +45,7 @@ public class FtpWriter
         {
             this.writerSliceConfig = this.getPluginJobConf();
             this.validateParameter();
-            UnstructuredStorageWriterUtil
+            StorageWriterUtil
                     .validateParameter(this.writerSliceConfig);
             try {
                 RetryUtil.executeWithRetry((Callable<Void>) () -> {
@@ -68,7 +68,7 @@ public class FtpWriter
         {
             this.writerSliceConfig
                     .getNecessaryValue(
-                            com.alibaba.datax.plugin.unstructuredstorage.writer.Key.FILE_NAME,
+                            com.alibaba.datax.plugin.storage.writer.Key.FILE_NAME,
                             FtpWriterErrorCode.REQUIRED_VALUE);
             String path = this.writerSliceConfig.getNecessaryValue(Key.PATH,
                     FtpWriterErrorCode.REQUIRED_VALUE);
@@ -117,9 +117,9 @@ public class FtpWriter
             this.ftpHelper.mkDirRecursive(path);
 
             String fileName = this.writerSliceConfig
-                    .getString(com.alibaba.datax.plugin.unstructuredstorage.writer.Key.FILE_NAME);
+                    .getString(com.alibaba.datax.plugin.storage.writer.Key.FILE_NAME);
             String writeMode = this.writerSliceConfig
-                    .getString(com.alibaba.datax.plugin.unstructuredstorage.writer.Key.WRITE_MODE);
+                    .getString(com.alibaba.datax.plugin.storage.writer.Key.WRITE_MODE);
 
             Set<String> allFilesInDir = this.ftpHelper.getAllFilesInDir(path,
                     fileName);
@@ -131,7 +131,7 @@ public class FtpWriter
                         path, fileName);
                 Set<String> fullFileNameToDelete = new HashSet<>();
                 for (String each : allFilesInDir) {
-                    fullFileNameToDelete.add(UnstructuredStorageWriterUtil
+                    fullFileNameToDelete.add(StorageWriterUtil
                             .buildFilePath(path, each, null));
                 }
                 LOG.info("删除目录path:[{}] 下指定前缀fileName:[{}] 文件列表如下: [{}]", path,
@@ -194,7 +194,7 @@ public class FtpWriter
         @Override
         public List<Configuration> split(int mandatoryNumber)
         {
-            return UnstructuredStorageWriterUtil.split(this.writerSliceConfig,
+            return StorageWriterUtil.split(this.writerSliceConfig,
                     this.allFileExists, mandatoryNumber);
         }
     }
@@ -224,9 +224,9 @@ public class FtpWriter
             this.writerSliceConfig = this.getPluginJobConf();
             this.path = this.writerSliceConfig.getString(Key.PATH);
             this.fileName = this.writerSliceConfig
-                    .getString(com.alibaba.datax.plugin.unstructuredstorage.writer.Key.FILE_NAME);
+                    .getString(com.alibaba.datax.plugin.storage.writer.Key.FILE_NAME);
             this.suffix = this.writerSliceConfig
-                    .getString(com.alibaba.datax.plugin.unstructuredstorage.writer.Key.SUFFIX);
+                    .getString(com.alibaba.datax.plugin.storage.writer.Key.SUFFIX);
 
             this.host = this.writerSliceConfig.getString(Key.HOST);
             this.port = this.writerSliceConfig.getInt(Key.PORT);
@@ -269,14 +269,14 @@ public class FtpWriter
         public void startWrite(RecordReceiver lineReceiver)
         {
             LOG.info("begin do write...");
-            String fileFullPath = UnstructuredStorageWriterUtil.buildFilePath(
+            String fileFullPath = StorageWriterUtil.buildFilePath(
                     this.path, this.fileName, this.suffix);
             LOG.info(String.format("write to file : [%s]", fileFullPath));
 
             OutputStream outputStream = null;
             try {
                 outputStream = this.ftpHelper.getOutputStream(fileFullPath);
-                UnstructuredStorageWriterUtil.writeToStream(lineReceiver,
+                StorageWriterUtil.writeToStream(lineReceiver,
                         outputStream, this.writerSliceConfig, this.fileName,
                         this.getTaskPluginCollector());
             }

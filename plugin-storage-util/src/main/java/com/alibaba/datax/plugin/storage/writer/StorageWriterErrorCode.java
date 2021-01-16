@@ -1,8 +1,8 @@
-package com.alibaba.datax.plugin.unstructuredstorage.writer;
+package com.alibaba.datax.plugin.storage.writer;
 
 import com.alibaba.datax.common.spi.ErrorCode;
 
-public enum UnstructuredStorageWriterErrorCode
+public enum StorageWriterErrorCode
         implements ErrorCode
 {
     ILLEGAL_VALUE("UnstructuredStorageWriter-00", "您填写的参数值不合法."),
@@ -15,7 +15,7 @@ public enum UnstructuredStorageWriterErrorCode
     private final String code;
     private final String description;
 
-    UnstructuredStorageWriterErrorCode(String code, String description)
+    StorageWriterErrorCode(String code, String description)
     {
         this.code = code;
         this.description = description;

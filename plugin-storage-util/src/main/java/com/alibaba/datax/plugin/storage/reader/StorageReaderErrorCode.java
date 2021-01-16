@@ -1,11 +1,11 @@
-package com.alibaba.datax.plugin.unstructuredstorage.reader;
+package com.alibaba.datax.plugin.storage.reader;
 
 import com.alibaba.datax.common.spi.ErrorCode;
 
 /**
  * Created by haiwei.luo on 14-9-20.
  */
-public enum UnstructuredStorageReaderErrorCode
+public enum StorageReaderErrorCode
         implements ErrorCode
 {
     CONFIG_INVALID_EXCEPTION("UnstructuredStorageReader-00", "您的参数配置错误."),
@@ -24,7 +24,7 @@ public enum UnstructuredStorageReaderErrorCode
     private final String code;
     private final String description;
 
-    UnstructuredStorageReaderErrorCode(String code, String description)
+    StorageReaderErrorCode(String code, String description)
     {
         this.code = code;
         this.description = description;

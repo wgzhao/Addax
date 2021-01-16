@@ -5,9 +5,9 @@
         <artifactId>datax-all</artifactId>
         <version>3.1.8-SNAPSHOT</version>
     </parent>
-    <artifactId>plugin-unstructured-storage-util</artifactId>
-    <name>plugin-unstructured-storage-util</name>
-    <description>plugin-unstructured-storage-util通用的文件类型的读取写入方法，
+    <artifactId>plugin-storage-util</artifactId>
+    <name>plugin-storage-util</name>
+    <description>plugin-storage-util通用的文件类型的读取写入方法，
         供TxtFileReader/Writer, OSSReader/Writer ,FtpReader/Writer, HdfsReader/Writer使用。
     </description>
     <packaging>jar</packaging>

@@ -1,7 +1,7 @@
 package com.alibaba.datax.plugin.reader.ftpreader;
 
 import com.alibaba.datax.common.exception.DataXException;
-import com.alibaba.datax.plugin.unstructuredstorage.reader.UnstructuredStorageReaderUtil;
+import com.alibaba.datax.plugin.storage.reader.StorageReaderUtil;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.net.ftp.FTPClient;
 import org.apache.commons.net.ftp.FTPFile;
@@ -147,7 +147,7 @@ public class StandardFtpHelper
             int pathLen = directoryPath.length();
             if (directoryPath.contains("*") || directoryPath.contains("?")) {
                 // path是正则表达式				
-                String subPath = UnstructuredStorageReaderUtil.getRegexPathParentPath(directoryPath);
+                String subPath = StorageReaderUtil.getRegexPathParentPath(directoryPath);
                 if (isDirExist(subPath)) {
                     parentPath = subPath;
                 }

@@ -35,7 +35,7 @@
 
         <dependency>
             <groupId>com.alibaba.datax</groupId>
-            <artifactId>plugin-unstructured-storage-util</artifactId>
+            <artifactId>plugin-storage-util</artifactId>
             <version>${project.version}</version>
             <exclusions>
                 <exclusion>

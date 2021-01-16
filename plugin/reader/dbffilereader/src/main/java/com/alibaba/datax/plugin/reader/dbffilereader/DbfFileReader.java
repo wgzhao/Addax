@@ -4,8 +4,8 @@ import com.alibaba.datax.common.exception.DataXException;
 import com.alibaba.datax.common.plugin.RecordSender;
 import com.alibaba.datax.common.spi.Reader;
 import com.alibaba.datax.common.util.Configuration;
-import com.alibaba.datax.plugin.unstructuredstorage.reader.ColumnEntry;
-import com.alibaba.datax.plugin.unstructuredstorage.reader.UnstructuredStorageReaderUtil;
+import com.alibaba.datax.plugin.storage.reader.ColumnEntry;
+import com.alibaba.datax.plugin.storage.reader.StorageReaderUtil;
 import org.apache.commons.io.Charsets;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
@@ -96,18 +96,18 @@ public class DbfFileReader
 
             String encoding = this.originConfig
                     .getString(
-                            com.alibaba.datax.plugin.unstructuredstorage.reader.Key.ENCODING,
-                            com.alibaba.datax.plugin.unstructuredstorage.reader.Constant.DEFAULT_ENCODING);
+                            com.alibaba.datax.plugin.storage.reader.Key.ENCODING,
+                            com.alibaba.datax.plugin.storage.reader.Constant.DEFAULT_ENCODING);
             if (isBlank(encoding)) {
                 this.originConfig
-                        .set(com.alibaba.datax.plugin.unstructuredstorage.reader.Key.ENCODING,
-                                com.alibaba.datax.plugin.unstructuredstorage.reader.Constant.DEFAULT_ENCODING);
+                        .set(com.alibaba.datax.plugin.storage.reader.Key.ENCODING,
+                                com.alibaba.datax.plugin.storage.reader.Constant.DEFAULT_ENCODING);
             }
             else {
                 try {
                     encoding = encoding.trim();
                     this.originConfig
-                            .set(com.alibaba.datax.plugin.unstructuredstorage.reader.Key.ENCODING,
+                            .set(com.alibaba.datax.plugin.storage.reader.Key.ENCODING,
                                     encoding);
                     Charsets.toCharset(encoding);
                 }
@@ -125,18 +125,18 @@ public class DbfFileReader
             }
             // 检测是column 是否为 ["*"] 若是则填为空
             List<Configuration> column = this.originConfig
-                    .getListConfiguration(com.alibaba.datax.plugin.unstructuredstorage.reader.Key.COLUMN);
+                    .getListConfiguration(com.alibaba.datax.plugin.storage.reader.Key.COLUMN);
             if (null != column
                     && 1 == column.size()
                     && ("\"*\"".equals(column.get(0).toString()) || "'*'"
                     .equals(column.get(0).toString()))) {
                 originConfig
-                        .set(com.alibaba.datax.plugin.unstructuredstorage.reader.Key.COLUMN, new ArrayList<String>());
+                        .set(com.alibaba.datax.plugin.storage.reader.Key.COLUMN, new ArrayList<String>());
             }
             else {
                 // column: 1. index type 2.value type 3.when type is Data, may have format
                 List<Configuration> columns = this.originConfig
-                        .getListConfiguration(com.alibaba.datax.plugin.unstructuredstorage.reader.Key.COLUMN);
+                        .getListConfiguration(com.alibaba.datax.plugin.storage.reader.Key.COLUMN);
 
                 if (null == columns || columns.isEmpty()) {
                     throw DataXException.asDataXException(
@@ -145,9 +145,9 @@ public class DbfFileReader
                 }
 
                 for (Configuration eachColumnConf : columns) {
-                    eachColumnConf.getNecessaryValue(com.alibaba.datax.plugin.unstructuredstorage.reader.Key.TYPE, DbfFileReaderErrorCode.REQUIRED_VALUE);
-                    Integer columnIndex = eachColumnConf.getInt(com.alibaba.datax.plugin.unstructuredstorage.reader.Key.INDEX);
-                    String columnValue = eachColumnConf.getString(com.alibaba.datax.plugin.unstructuredstorage.reader.Key.VALUE);
+                    eachColumnConf.getNecessaryValue(com.alibaba.datax.plugin.storage.reader.Key.TYPE, DbfFileReaderErrorCode.REQUIRED_VALUE);
+                    Integer columnIndex = eachColumnConf.getInt(com.alibaba.datax.plugin.storage.reader.Key.INDEX);
+                    String columnValue = eachColumnConf.getString(com.alibaba.datax.plugin.storage.reader.Key.VALUE);
 
                     if (null == columnIndex && null == columnValue) {
                         throw DataXException.asDataXException(
@@ -394,13 +394,13 @@ public class DbfFileReader
             for (String fileName : this.sourceFiles) {
                 LOG.info("reading file : [{}]", fileName);
 
-                String encod = readerSliceConfig.getString(com.alibaba.datax.plugin.unstructuredstorage.reader.Key.ENCODING);
-                String nullFormat = readerSliceConfig.getString(com.alibaba.datax.plugin.unstructuredstorage.reader.Key.NULL_FORMAT);
+                String encod = readerSliceConfig.getString(com.alibaba.datax.plugin.storage.reader.Key.ENCODING);
+                String nullFormat = readerSliceConfig.getString(com.alibaba.datax.plugin.storage.reader.Key.NULL_FORMAT);
 
                 try (DbfReader reader = new DbfReader(FileUtils.getFile(fileName))) {
 
-                    List<ColumnEntry> column = UnstructuredStorageReaderUtil.getListColumnEntry(readerSliceConfig,
-                            com.alibaba.datax.plugin.unstructuredstorage.reader.Key.COLUMN);
+                    List<ColumnEntry> column = StorageReaderUtil.getListColumnEntry(readerSliceConfig,
+                            com.alibaba.datax.plugin.storage.reader.Key.COLUMN);
                     DbfHeader header = reader.getHeader();
                     assert column != null;
                     int colnum = column.isEmpty() ? header.getFieldsCount() : column.size();
@@ -429,7 +429,7 @@ public class DbfFileReader
                                 sourceLine[i] = value;
                             }
                         }
-                        UnstructuredStorageReaderUtil.transportOneRecord(recordSender, column, sourceLine, nullFormat, this.getTaskPluginCollector());
+                        StorageReaderUtil.transportOneRecord(recordSender, column, sourceLine, nullFormat, this.getTaskPluginCollector());
                     }
                 }
                 catch (UnsupportedEncodingException e) {

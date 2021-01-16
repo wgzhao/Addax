@@ -1,10 +1,10 @@
-package com.alibaba.datax.plugin.unstructuredstorage.writer;
+package com.alibaba.datax.plugin.storage.writer;
 
 import java.io.Closeable;
 import java.io.IOException;
 import java.util.List;
 
-public interface UnstructuredWriter
+public interface Writer
         extends Closeable
 {
 

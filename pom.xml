@@ -54,7 +54,7 @@
         <module>common</module>
         <module>core</module>
         <module>plugin-rdbms-util</module>
-        <module>plugin-unstructured-storage-util</module>
+        <module>plugin-storage-util</module>
         <module>transformer</module>
 
         <!-- reader -->
