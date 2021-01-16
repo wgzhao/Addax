@@ -38,10 +38,13 @@
 2. dbffilereader
 3. hbase20xreader
 4. jsonfilereader
+5. kudureader
 
 #### writer plugin
 
 1. dbffilewrite
+2. greenplumwriter
+3. kuduwriter
 
 ### 部分插件增强功能，罗列如下
 
@@ -77,6 +80,7 @@
 | HBase 2.x   | 支持 | 不支持 | hbase20xreader | 直接操作HBase |
 | HBase 2.x   | 支持 | 支持 | hbase20xsqlreader/hbase20xsqlwriter| 通过[Phoenix](https://phoenix.apache.org)操作HBase |
 | HDFS        | 支持 | 支持 | hdfsreader/hdfswriter | HDFS 2.x 以上版本 |
+| Greenplum   | 支持 | 支持 | postgresqlreader/greenplumwriter | |
 | json        | 支持 | 不支持 | jsonfilereader | |
 | kudu        | 支持 | 支持 | kudureader/kuduwriter | 通过原生接口，计划更新Impala连接 | 
 | MongoDB     | 支持 | 支持 | mongodbreader/mongodbwriter | |
