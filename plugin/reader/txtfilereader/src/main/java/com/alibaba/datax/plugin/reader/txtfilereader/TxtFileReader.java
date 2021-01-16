@@ -4,8 +4,8 @@ import com.alibaba.datax.common.exception.DataXException;
 import com.alibaba.datax.common.plugin.RecordSender;
 import com.alibaba.datax.common.spi.Reader;
 import com.alibaba.datax.common.util.Configuration;
-import com.alibaba.datax.plugin.unstructuredstorage.reader.UnstructuredStorageReaderErrorCode;
-import com.alibaba.datax.plugin.unstructuredstorage.reader.UnstructuredStorageReaderUtil;
+import com.alibaba.datax.plugin.storage.reader.StorageReaderErrorCode;
+import com.alibaba.datax.plugin.storage.reader.StorageReaderUtil;
 import com.google.common.collect.Sets;
 import org.apache.commons.io.Charsets;
 import org.apache.commons.io.IOUtils;
@@ -56,7 +56,7 @@ public class TxtFileReader
             this.pattern = new HashMap<>();
             this.isRegexPath = new HashMap<>();
             this.validateParameter();
-            UnstructuredStorageReaderUtil.validateParameter(this.originConfig);
+            StorageReaderUtil.validateParameter(this.originConfig);
         }
 
         private void validateParameter()
@@ -84,18 +84,18 @@ public class TxtFileReader
 
             String encoding = this.originConfig
                     .getString(
-                            com.alibaba.datax.plugin.unstructuredstorage.reader.Key.ENCODING,
-                            com.alibaba.datax.plugin.unstructuredstorage.reader.Constant.DEFAULT_ENCODING);
+                            com.alibaba.datax.plugin.storage.reader.Key.ENCODING,
+                            com.alibaba.datax.plugin.storage.reader.Constant.DEFAULT_ENCODING);
             if (StringUtils.isBlank(encoding)) {
                 this.originConfig
-                        .set(com.alibaba.datax.plugin.unstructuredstorage.reader.Key.ENCODING,
-                                com.alibaba.datax.plugin.unstructuredstorage.reader.Constant.DEFAULT_ENCODING);
+                        .set(com.alibaba.datax.plugin.storage.reader.Key.ENCODING,
+                                com.alibaba.datax.plugin.storage.reader.Constant.DEFAULT_ENCODING);
             }
             else {
                 try {
                     encoding = encoding.trim();
                     this.originConfig
-                            .set(com.alibaba.datax.plugin.unstructuredstorage.reader.Key.ENCODING,
+                            .set(com.alibaba.datax.plugin.storage.reader.Key.ENCODING,
                                     encoding);
                     Charsets.toCharset(encoding);
                 }
@@ -115,13 +115,13 @@ public class TxtFileReader
             // column: 1. index type 2.value type 3.when type is Date, may have
             // format
             List<Configuration> columns = this.originConfig
-                    .getListConfiguration(com.alibaba.datax.plugin.unstructuredstorage.reader.Key.COLUMN);
+                    .getListConfiguration(com.alibaba.datax.plugin.storage.reader.Key.COLUMN);
             // handle ["*"]
             if (null != columns && 1 == columns.size()) {
                 String columnsInStr = columns.get(0).toString();
                 if ("\"*\"".equals(columnsInStr) || "'*'".equals(columnsInStr)) {
                     this.originConfig
-                            .set(com.alibaba.datax.plugin.unstructuredstorage.reader.Key.COLUMN,
+                            .set(com.alibaba.datax.plugin.storage.reader.Key.COLUMN,
                                     null);
                     columns = null;
                 }
@@ -131,12 +131,12 @@ public class TxtFileReader
                 for (Configuration eachColumnConf : columns) {
                     eachColumnConf
                             .getNecessaryValue(
-                                    com.alibaba.datax.plugin.unstructuredstorage.reader.Key.TYPE,
+                                    com.alibaba.datax.plugin.storage.reader.Key.TYPE,
                                     TxtFileReaderErrorCode.REQUIRED_VALUE);
                     Integer columnIndex = eachColumnConf
-                            .getInt(com.alibaba.datax.plugin.unstructuredstorage.reader.Key.INDEX);
+                            .getInt(com.alibaba.datax.plugin.storage.reader.Key.INDEX);
                     String columnValue = eachColumnConf
-                            .getString(com.alibaba.datax.plugin.unstructuredstorage.reader.Key.VALUE);
+                            .getString(com.alibaba.datax.plugin.storage.reader.Key.VALUE);
 
                     if (null == columnIndex && null == columnValue) {
                         throw DataXException.asDataXException(
@@ -160,10 +160,10 @@ public class TxtFileReader
 
             // only support compress types
             String compress = this.originConfig
-                    .getString(com.alibaba.datax.plugin.unstructuredstorage.reader.Key.COMPRESS);
+                    .getString(com.alibaba.datax.plugin.storage.reader.Key.COMPRESS);
             if (StringUtils.isBlank(compress)) {
                 this.originConfig
-                        .set(com.alibaba.datax.plugin.unstructuredstorage.reader.Key.COMPRESS,
+                        .set(com.alibaba.datax.plugin.storage.reader.Key.COMPRESS,
                                 null);
             }
             else {
@@ -179,16 +179,16 @@ public class TxtFileReader
                                             compress));
                 }
                 this.originConfig
-                        .set(com.alibaba.datax.plugin.unstructuredstorage.reader.Key.COMPRESS,
+                        .set(com.alibaba.datax.plugin.storage.reader.Key.COMPRESS,
                                 compress);
             }
 
             String delimiterInStr = this.originConfig
-                    .getString(com.alibaba.datax.plugin.unstructuredstorage.reader.Key.FIELD_DELIMITER);
+                    .getString(com.alibaba.datax.plugin.storage.reader.Key.FIELD_DELIMITER);
             // warn: if have, length must be one
             if (null != delimiterInStr && 1 != delimiterInStr.length()) {
                 throw DataXException.asDataXException(
-                        UnstructuredStorageReaderErrorCode.ILLEGAL_VALUE,
+                        StorageReaderErrorCode.ILLEGAL_VALUE,
                         String.format("仅仅支持单字符切分, 您配置的切分为 : [%s]",
                                 delimiterInStr));
             }
@@ -427,7 +427,7 @@ public class TxtFileReader
                 InputStream inputStream;
                 try {
                     inputStream = new FileInputStream(fileName);
-                    UnstructuredStorageReaderUtil.readFromStream(inputStream,
+                    StorageReaderUtil.readFromStream(inputStream,
                             fileName, this.readerSliceConfig, recordSender,
                             this.getTaskPluginCollector());
                     recordSender.flush();

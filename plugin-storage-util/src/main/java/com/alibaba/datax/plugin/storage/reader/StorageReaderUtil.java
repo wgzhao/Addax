@@ -1,4 +1,4 @@
-package com.alibaba.datax.plugin.unstructuredstorage.reader;
+package com.alibaba.datax.plugin.storage.reader;
 
 import com.alibaba.datax.common.element.BoolColumn;
 import com.alibaba.datax.common.element.Column;
@@ -44,13 +44,13 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 
-public class UnstructuredStorageReaderUtil
+public class StorageReaderUtil
 {
     private static final Logger LOG = LoggerFactory
-            .getLogger(UnstructuredStorageReaderUtil.class);
+            .getLogger(StorageReaderUtil.class);
     public static HashMap<String, Object> csvReaderConfigMap;
 
-    private UnstructuredStorageReaderUtil()
+    private StorageReaderUtil()
     {
 
     }
@@ -229,32 +229,32 @@ public class UnstructuredStorageReaderUtil
                 else {
                     throw DataXException
                             .asDataXException(
-                                    UnstructuredStorageReaderErrorCode.ILLEGAL_VALUE,
+                                    StorageReaderErrorCode.ILLEGAL_VALUE,
                                     String.format("仅支持 gzip, bzip2, zip, lzo, lzo_deflate, hadoop-snappy, framing-snappy" +
                                             "文件压缩格式 , 不支持您配置的文件压缩格式: [%s]", compress));
                 }
             }
-            UnstructuredStorageReaderUtil.doReadFromStream(reader, context,
+            StorageReaderUtil.doReadFromStream(reader, context,
                     readerSliceConfig, recordSender, taskPluginCollector);
         }
         catch (UnsupportedEncodingException uee) {
             throw DataXException
                     .asDataXException(
-                            UnstructuredStorageReaderErrorCode.OPEN_FILE_WITH_CHARSET_ERROR,
+                            StorageReaderErrorCode.OPEN_FILE_WITH_CHARSET_ERROR,
                             String.format("不支持的编码格式 : [%s]", encoding), uee);
         }
         catch (NullPointerException e) {
             throw DataXException.asDataXException(
-                    UnstructuredStorageReaderErrorCode.RUNTIME_EXCEPTION,
+                    StorageReaderErrorCode.RUNTIME_EXCEPTION,
                     "运行时错误, 请联系我们", e);
         }/* catch (ArchiveException e) {
 			throw DataXException.asDataXException(
-					UnstructuredStorageReaderErrorCode.READ_FILE_IO_ERROR,
+					StorageReaderErrorCode.READ_FILE_IO_ERROR,
 					String.format("压缩文件流读取错误 : [%s]", context), e);
 		} */
         catch (IOException e) {
             throw DataXException.asDataXException(
-                    UnstructuredStorageReaderErrorCode.READ_FILE_IO_ERROR,
+                    StorageReaderErrorCode.READ_FILE_IO_ERROR,
                     String.format("流读取错误 : [%s]", context), e);
         }
         finally {
@@ -273,7 +273,7 @@ public class UnstructuredStorageReaderUtil
                 .getString(Key.FIELD_DELIMITER);
         if (null != delimiterInStr && 1 != delimiterInStr.length()) {
             throw DataXException.asDataXException(
-                    UnstructuredStorageReaderErrorCode.ILLEGAL_VALUE,
+                    StorageReaderErrorCode.ILLEGAL_VALUE,
                     String.format("仅仅支持单字符切分, 您配置的切分为 : [%s]", delimiterInStr));
         }
         if (null == delimiterInStr) {
@@ -293,7 +293,7 @@ public class UnstructuredStorageReaderUtil
         // warn: Configuration -> List<ColumnEntry> for performance
         // List<Configuration> column = readerSliceConfig
         // .getListConfiguration(Key.COLUMN);
-        List<ColumnEntry> column = UnstructuredStorageReaderUtil
+        List<ColumnEntry> column = StorageReaderUtil
                 .getListColumnEntry(readerSliceConfig, Key.COLUMN);
         CsvReader csvReader = null;
 
@@ -311,31 +311,31 @@ public class UnstructuredStorageReaderUtil
             setCsvReaderConfig(csvReader);
 
             String[] parseRows;
-            while ((parseRows = UnstructuredStorageReaderUtil
+            while ((parseRows = StorageReaderUtil
                     .splitBufferedReader(csvReader)) != null) {
-                UnstructuredStorageReaderUtil.transportOneRecord(recordSender,
+                StorageReaderUtil.transportOneRecord(recordSender,
                         column, parseRows, nullFormat, taskPluginCollector);
             }
         }
         catch (UnsupportedEncodingException uee) {
             throw DataXException
                     .asDataXException(
-                            UnstructuredStorageReaderErrorCode.OPEN_FILE_WITH_CHARSET_ERROR,
+                            StorageReaderErrorCode.OPEN_FILE_WITH_CHARSET_ERROR,
                             String.format("不支持的编码格式 : [%s]", encoding), uee);
         }
         catch (FileNotFoundException fnfe) {
             throw DataXException.asDataXException(
-                    UnstructuredStorageReaderErrorCode.FILE_NOT_EXISTS,
+                    StorageReaderErrorCode.FILE_NOT_EXISTS,
                     String.format("无法找到文件 : [%s]", context), fnfe);
         }
         catch (IOException ioe) {
             throw DataXException.asDataXException(
-                    UnstructuredStorageReaderErrorCode.READ_FILE_IO_ERROR,
+                    StorageReaderErrorCode.READ_FILE_IO_ERROR,
                     String.format("读取文件错误 : [%s]", context), ioe);
         }
         catch (Exception e) {
             throw DataXException.asDataXException(
-                    UnstructuredStorageReaderErrorCode.RUNTIME_EXCEPTION,
+                    StorageReaderErrorCode.RUNTIME_EXCEPTION,
                     String.format("运行时异常 : %s", e.getMessage()), e);
         }
         finally {
@@ -349,14 +349,14 @@ public class UnstructuredStorageReaderUtil
             TaskPluginCollector taskPluginCollector,
             String line)
     {
-        List<ColumnEntry> column = UnstructuredStorageReaderUtil
+        List<ColumnEntry> column = StorageReaderUtil
                 .getListColumnEntry(configuration, Key.COLUMN);
         // 注意: nullFormat 没有默认值
         String nullFormat = configuration.getString(Key.NULL_FORMAT);
         String delimiterInStr = configuration.getString(Key.FIELD_DELIMITER);
         if (null != delimiterInStr && 1 != delimiterInStr.length()) {
             throw DataXException.asDataXException(
-                    UnstructuredStorageReaderErrorCode.ILLEGAL_VALUE,
+                    StorageReaderErrorCode.ILLEGAL_VALUE,
                     String.format("仅仅支持单字符切分, 您配置的切分为 : [%s]", delimiterInStr));
         }
         if (null == delimiterInStr) {
@@ -406,14 +406,14 @@ public class UnstructuredStorageReaderUtil
                     if (null == columnIndex && null == columnConst) {
                         throw DataXException
                                 .asDataXException(
-                                        UnstructuredStorageReaderErrorCode.NO_INDEX_VALUE,
+                                        StorageReaderErrorCode.NO_INDEX_VALUE,
                                         "由于您配置了type, 则至少需要配置 index 或 value");
                     }
 
                     if (null != columnIndex && null != columnConst) {
                         throw DataXException
                                 .asDataXException(
-                                        UnstructuredStorageReaderErrorCode.MIXED_INDEX_VALUE,
+                                        StorageReaderErrorCode.MIXED_INDEX_VALUE,
                                         "您混合配置了index, value, 每一列同时仅能选择其中一种");
                     }
 
@@ -507,7 +507,7 @@ public class UnstructuredStorageReaderUtil
                             LOG.error(errorMessage);
                             throw DataXException
                                     .asDataXException(
-                                            UnstructuredStorageReaderErrorCode.NOT_SUPPORT_TYPE,
+                                            StorageReaderErrorCode.NOT_SUPPORT_TYPE,
                                             errorMessage);
                     }
 
@@ -574,19 +574,19 @@ public class UnstructuredStorageReaderUtil
         // encoding check
         String encoding = readerConfiguration
                 .getString(
-                        com.alibaba.datax.plugin.unstructuredstorage.reader.Key.ENCODING,
-                        com.alibaba.datax.plugin.unstructuredstorage.reader.Constant.DEFAULT_ENCODING);
+                        com.alibaba.datax.plugin.storage.reader.Key.ENCODING,
+                        com.alibaba.datax.plugin.storage.reader.Constant.DEFAULT_ENCODING);
         try {
             encoding = encoding.trim();
             readerConfiguration.set(Key.ENCODING, encoding);
             Charsets.toCharset(encoding);
         }
         catch (UnsupportedCharsetException uce) {
-            throw DataXException.asDataXException(UnstructuredStorageReaderErrorCode.ILLEGAL_VALUE,
+            throw DataXException.asDataXException(StorageReaderErrorCode.ILLEGAL_VALUE,
                     String.format("不支持您配置的编码格式 : [%s]", encoding), uce);
         }
         catch (Exception e) {
-            throw DataXException.asDataXException(UnstructuredStorageReaderErrorCode.CONFIG_INVALID_EXCEPTION,
+            throw DataXException.asDataXException(StorageReaderErrorCode.CONFIG_INVALID_EXCEPTION,
                     String.format("编码配置异常, 请联系我们: %s", e.getMessage()), e);
         }
     }
@@ -594,14 +594,14 @@ public class UnstructuredStorageReaderUtil
     public static void validateCompress(Configuration readerConfiguration)
     {
         String compress = readerConfiguration
-                .getUnnecessaryValue(com.alibaba.datax.plugin.unstructuredstorage.reader.Key.COMPRESS, null);
+                .getUnnecessaryValue(com.alibaba.datax.plugin.storage.reader.Key.COMPRESS, null);
         if (StringUtils.isNotBlank(compress)) {
             compress = compress.toLowerCase().trim();
             boolean compressTag = "gzip".equals(compress) || "bzip2".equals(compress) || "zip".equals(compress)
                     || "lzo".equals(compress) || "lzo_deflate".equals(compress) || "hadoop-snappy".equals(compress)
                     || "framing-snappy".equals(compress);
             if (!compressTag) {
-                throw DataXException.asDataXException(UnstructuredStorageReaderErrorCode.ILLEGAL_VALUE,
+                throw DataXException.asDataXException(StorageReaderErrorCode.ILLEGAL_VALUE,
                         String.format("仅支持 gzip, bzip2, zip, lzo, lzo_deflate, hadoop-snappy, framing-snappy " +
                                 "文件压缩格式, 不支持您配置的文件压缩格式: [%s]", compress));
             }
@@ -610,21 +610,21 @@ public class UnstructuredStorageReaderUtil
             // 用户可能配置的是 compress:"",空字符串,需要将compress设置为null
             compress = null;
         }
-        readerConfiguration.set(com.alibaba.datax.plugin.unstructuredstorage.reader.Key.COMPRESS, compress);
+        readerConfiguration.set(com.alibaba.datax.plugin.storage.reader.Key.COMPRESS, compress);
     }
 
     public static void validateFieldDelimiter(Configuration readerConfiguration)
     {
         //fieldDelimiter check
-        String delimiterInStr = readerConfiguration.getString(com.alibaba.datax.plugin.unstructuredstorage.reader.Key.FIELD_DELIMITER, null);
+        String delimiterInStr = readerConfiguration.getString(com.alibaba.datax.plugin.storage.reader.Key.FIELD_DELIMITER, null);
         if (null == delimiterInStr) {
-            throw DataXException.asDataXException(UnstructuredStorageReaderErrorCode.REQUIRED_VALUE,
+            throw DataXException.asDataXException(StorageReaderErrorCode.REQUIRED_VALUE,
                     String.format("您提供配置文件有误，[%s]是必填参数.",
-                            com.alibaba.datax.plugin.unstructuredstorage.reader.Key.FIELD_DELIMITER));
+                            com.alibaba.datax.plugin.storage.reader.Key.FIELD_DELIMITER));
         }
         else if (1 != delimiterInStr.length()) {
             // warn: if have, length must be one
-            throw DataXException.asDataXException(UnstructuredStorageReaderErrorCode.ILLEGAL_VALUE,
+            throw DataXException.asDataXException(StorageReaderErrorCode.ILLEGAL_VALUE,
                     String.format("仅仅支持单字符切分, 您配置的切分为 : [%s]", delimiterInStr));
         }
     }
@@ -634,39 +634,39 @@ public class UnstructuredStorageReaderUtil
         // column: 1. index type 2.value type 3.when type is Date, may have
         // format
         List<Configuration> columns = readerConfiguration
-                .getListConfiguration(com.alibaba.datax.plugin.unstructuredstorage.reader.Key.COLUMN);
+                .getListConfiguration(com.alibaba.datax.plugin.storage.reader.Key.COLUMN);
         if (null == columns || columns.isEmpty()) {
-            throw DataXException.asDataXException(UnstructuredStorageReaderErrorCode.REQUIRED_VALUE, "您需要指定 columns");
+            throw DataXException.asDataXException(StorageReaderErrorCode.REQUIRED_VALUE, "您需要指定 columns");
         }
         // handle ["*"]
         if (1 == columns.size()) {
             String columnsInStr = columns.get(0).toString();
             if ("\"*\"".equals(columnsInStr) || "'*'".equals(columnsInStr)) {
-                readerConfiguration.set(com.alibaba.datax.plugin.unstructuredstorage.reader.Key.COLUMN, null);
+                readerConfiguration.set(com.alibaba.datax.plugin.storage.reader.Key.COLUMN, null);
                 columns = null;
             }
         }
 
         if (null != columns && !columns.isEmpty()) {
             for (Configuration eachColumnConf : columns) {
-                eachColumnConf.getNecessaryValue(com.alibaba.datax.plugin.unstructuredstorage.reader.Key.TYPE,
-                        UnstructuredStorageReaderErrorCode.REQUIRED_VALUE);
+                eachColumnConf.getNecessaryValue(com.alibaba.datax.plugin.storage.reader.Key.TYPE,
+                        StorageReaderErrorCode.REQUIRED_VALUE);
                 Integer columnIndex = eachColumnConf
-                        .getInt(com.alibaba.datax.plugin.unstructuredstorage.reader.Key.INDEX);
+                        .getInt(com.alibaba.datax.plugin.storage.reader.Key.INDEX);
                 String columnValue = eachColumnConf
-                        .getString(com.alibaba.datax.plugin.unstructuredstorage.reader.Key.VALUE);
+                        .getString(com.alibaba.datax.plugin.storage.reader.Key.VALUE);
 
                 if (null == columnIndex && null == columnValue) {
-                    throw DataXException.asDataXException(UnstructuredStorageReaderErrorCode.NO_INDEX_VALUE,
+                    throw DataXException.asDataXException(StorageReaderErrorCode.NO_INDEX_VALUE,
                             "由于您配置了type, 则至少需要配置 index 或 value");
                 }
 
                 if (null != columnIndex && null != columnValue) {
-                    throw DataXException.asDataXException(UnstructuredStorageReaderErrorCode.MIXED_INDEX_VALUE,
+                    throw DataXException.asDataXException(StorageReaderErrorCode.MIXED_INDEX_VALUE,
                             "您混合配置了index, value, 每一列同时仅能选择其中一种");
                 }
                 if (null != columnIndex && columnIndex < 0) {
-                    throw DataXException.asDataXException(UnstructuredStorageReaderErrorCode.ILLEGAL_VALUE,
+                    throw DataXException.asDataXException(StorageReaderErrorCode.ILLEGAL_VALUE,
                             String.format("index需要大于等于0, 您配置的index为[%s]", columnIndex));
                 }
             }
@@ -678,7 +678,7 @@ public class UnstructuredStorageReaderUtil
         String csvReaderConfig = readerConfiguration.getString(Key.CSV_READER_CONFIG);
         if (StringUtils.isNotBlank(csvReaderConfig)) {
             try {
-                UnstructuredStorageReaderUtil.csvReaderConfigMap = JSON.parseObject(csvReaderConfig, new TypeReference<HashMap<String, Object>>() {});
+                StorageReaderUtil.csvReaderConfigMap = JSON.parseObject(csvReaderConfig, new TypeReference<HashMap<String, Object>>() {});
             }
             catch (Exception e) {
                 LOG.info("WARN!!!!忽略csvReaderConfig配置! 配置错误,值只能为空或者为Map结构,您配置的值为: {}", csvReaderConfig);
@@ -720,7 +720,7 @@ public class UnstructuredStorageReaderUtil
         String parentPath;
         parentPath = regexPath.substring(0, lastDirSeparator + 1);
         if (parentPath.contains("*") || parentPath.contains("?")) {
-            throw DataXException.asDataXException(UnstructuredStorageReaderErrorCode.ILLEGAL_VALUE,
+            throw DataXException.asDataXException(StorageReaderErrorCode.ILLEGAL_VALUE,
                     String.format("配置项目path中：[%s]不合法，目前只支持在最后一级目录使用通配符*或者?", regexPath));
         }
         return parentPath;
@@ -728,21 +728,21 @@ public class UnstructuredStorageReaderUtil
 
     public static void setCsvReaderConfig(CsvReader csvReader)
     {
-        if (null != UnstructuredStorageReaderUtil.csvReaderConfigMap && !UnstructuredStorageReaderUtil.csvReaderConfigMap.isEmpty()) {
+        if (null != StorageReaderUtil.csvReaderConfigMap && !StorageReaderUtil.csvReaderConfigMap.isEmpty()) {
             try {
-                BeanUtils.populate(csvReader, UnstructuredStorageReaderUtil.csvReaderConfigMap);
+                BeanUtils.populate(csvReader, StorageReaderUtil.csvReaderConfigMap);
                 LOG.info("csvReaderConfig设置成功,设置后CsvReader: {}", JSON.toJSONString(csvReader));
             }
             catch (Exception e) {
                 LOG.info("WARN!!!!忽略csvReaderConfig配置!通过BeanUtils.populate配置您的csvReaderConfig发生异常,您配置的值为: {};请检查您的配置!CsvReader使用默认值[{}]",
-                        JSON.toJSONString(UnstructuredStorageReaderUtil.csvReaderConfigMap), JSON.toJSONString(csvReader));
+                        JSON.toJSONString(StorageReaderUtil.csvReaderConfigMap), JSON.toJSONString(csvReader));
             }
         }
         else {
             //默认关闭安全模式, 放开10W字节的限制
             csvReader.setSafetySwitch(false);
             LOG.info("CsvReader使用默认值[{}],csvReaderConfig值为[{}]",
-                    JSON.toJSONString(csvReader), JSON.toJSONString(UnstructuredStorageReaderUtil.csvReaderConfigMap));
+                    JSON.toJSONString(csvReader), JSON.toJSONString(StorageReaderUtil.csvReaderConfigMap));
         }
     }
 

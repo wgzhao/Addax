@@ -6,7 +6,7 @@ import com.alibaba.datax.common.exception.DataXException;
 import com.alibaba.datax.common.plugin.RecordReceiver;
 import com.alibaba.datax.common.spi.Writer;
 import com.alibaba.datax.common.util.Configuration;
-import com.alibaba.datax.plugin.unstructuredstorage.writer.UnstructuredStorageWriterUtil;
+import com.alibaba.datax.plugin.storage.writer.StorageWriterUtil;
 import com.linuxense.javadbf.DBFDataType;
 import com.linuxense.javadbf.DBFField;
 import com.linuxense.javadbf.DBFWriter;
@@ -49,18 +49,18 @@ public class DbfFileWriter
             this.writerSliceConfig = this.getPluginJobConf();
             this.validateParameter();
             String dateFormatOld = this.writerSliceConfig
-                    .getString(com.alibaba.datax.plugin.unstructuredstorage.writer.Key.FORMAT);
+                    .getString(com.alibaba.datax.plugin.storage.writer.Key.FORMAT);
             String dateFormatNew = this.writerSliceConfig
-                    .getString(com.alibaba.datax.plugin.unstructuredstorage.writer.Key.DATE_FORMAT);
+                    .getString(com.alibaba.datax.plugin.storage.writer.Key.DATE_FORMAT);
             if (null == dateFormatNew) {
                 this.writerSliceConfig
-                        .set(com.alibaba.datax.plugin.unstructuredstorage.writer.Key.DATE_FORMAT,
+                        .set(com.alibaba.datax.plugin.storage.writer.Key.DATE_FORMAT,
                                 dateFormatOld);
             }
             if (null != dateFormatOld) {
                 LOG.warn("您使用format配置日期格式化, 这是不推荐的行为, 请优先使用dateFormat配置项, 两项同时存在则使用dateFormat.");
             }
-            UnstructuredStorageWriterUtil
+            StorageWriterUtil
                     .validateParameter(this.writerSliceConfig);
         }
 
@@ -68,7 +68,7 @@ public class DbfFileWriter
         {
             this.writerSliceConfig
                     .getNecessaryValue(
-                            com.alibaba.datax.plugin.unstructuredstorage.writer.Key.FILE_NAME,
+                            com.alibaba.datax.plugin.storage.writer.Key.FILE_NAME,
                             DbfFileWriterErrorCode.REQUIRED_VALUE);
 
             String path = this.writerSliceConfig.getNecessaryValue(Key.PATH,
@@ -108,9 +108,9 @@ public class DbfFileWriter
         {
             String path = this.writerSliceConfig.getString(Key.PATH);
             String fileName = this.writerSliceConfig
-                    .getString(com.alibaba.datax.plugin.unstructuredstorage.writer.Key.FILE_NAME);
+                    .getString(com.alibaba.datax.plugin.storage.writer.Key.FILE_NAME);
             String writeMode = this.writerSliceConfig
-                    .getString(com.alibaba.datax.plugin.unstructuredstorage.writer.Key.WRITE_MODE);
+                    .getString(com.alibaba.datax.plugin.storage.writer.Key.WRITE_MODE);
             // truncate option handler
             if ("truncate".equals(writeMode)) {
                 LOG.info("由于您配置了writeMode truncate, 开始清理 [{}] 下面以 [{}] 开头的内容",
@@ -236,7 +236,7 @@ public class DbfFileWriter
             LOG.info("begin do split...");
             List<Configuration> writerSplitConfigs = new ArrayList<>();
             String filePrefix = this.writerSliceConfig
-                    .getString(com.alibaba.datax.plugin.unstructuredstorage.writer.Key.FILE_NAME);
+                    .getString(com.alibaba.datax.plugin.storage.writer.Key.FILE_NAME);
 
             Set<String> allFiles;
             String path = null;
@@ -274,7 +274,7 @@ public class DbfFileWriter
                 allFiles.add(fullFileName);
 
                 splitedTaskConfig
-                        .set(com.alibaba.datax.plugin.unstructuredstorage.writer.Key.FILE_NAME,
+                        .set(com.alibaba.datax.plugin.storage.writer.Key.FILE_NAME,
                                 fullFileName);
 
                 LOG.info("splited write file name:[{}]", fullFileName);
@@ -303,7 +303,7 @@ public class DbfFileWriter
             this.writerSliceConfig = this.getPluginJobConf();
             this.path = this.writerSliceConfig.getString(Key.PATH);
             this.fileName = this.writerSliceConfig
-                    .getString(com.alibaba.datax.plugin.unstructuredstorage.writer.Key.FILE_NAME);
+                    .getString(com.alibaba.datax.plugin.storage.writer.Key.FILE_NAME);
         }
 
         @Override
@@ -322,7 +322,7 @@ public class DbfFileWriter
             DBFWriter writer;
             try {
                 File f = new File(fileFullPath);
-                String charset = this.writerSliceConfig.getString(com.alibaba.datax.plugin.unstructuredstorage.writer.Key.ENCODING, "GBK");
+                String charset = this.writerSliceConfig.getString(com.alibaba.datax.plugin.storage.writer.Key.ENCODING, "GBK");
                 writer = new DBFWriter(f, Charset.forName(charset));
 
                 DBFField[] fields = new DBFField[columns.size()];

@@ -1,4 +1,4 @@
-package com.alibaba.datax.plugin.unstructuredstorage.reader;
+package com.alibaba.datax.plugin.storage.reader;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

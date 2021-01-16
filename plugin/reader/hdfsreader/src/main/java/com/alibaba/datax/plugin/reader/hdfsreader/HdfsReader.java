@@ -4,7 +4,7 @@ import com.alibaba.datax.common.exception.DataXException;
 import com.alibaba.datax.common.plugin.RecordSender;
 import com.alibaba.datax.common.spi.Reader;
 import com.alibaba.datax.common.util.Configuration;
-import com.alibaba.datax.plugin.unstructuredstorage.reader.UnstructuredStorageReaderUtil;
+import com.alibaba.datax.plugin.storage.reader.StorageReaderUtil;
 import org.apache.commons.io.Charsets;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -15,7 +15,7 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 
-import static com.alibaba.datax.plugin.unstructuredstorage.reader.Key.ENCODING;
+import static com.alibaba.datax.plugin.storage.reader.Key.ENCODING;
 
 public class HdfsReader
         extends Reader
@@ -116,8 +116,8 @@ public class HdfsReader
             if (this.specifiedFileType.equals(Constant.TEXT)
                     || this.specifiedFileType.equals(Constant.CSV)) {
                 //compress校验
-                UnstructuredStorageReaderUtil.validateCompress(this.readerOriginConfig);
-                UnstructuredStorageReaderUtil.validateCsvReaderConfig(this.readerOriginConfig);
+                StorageReaderUtil.validateCompress(this.readerOriginConfig);
+                StorageReaderUtil.validateCsvReaderConfig(this.readerOriginConfig);
             }
         }
 
@@ -126,18 +126,18 @@ public class HdfsReader
 
             // 检测是column 是否为 ["*"] 若是则填为空
             List<Configuration> column = this.readerOriginConfig
-                    .getListConfiguration(com.alibaba.datax.plugin.unstructuredstorage.reader.Key.COLUMN);
+                    .getListConfiguration(com.alibaba.datax.plugin.storage.reader.Key.COLUMN);
             if (null != column
                     && 1 == column.size()
                     && ("\"*\"".equals(column.get(0).toString()) || "'*'"
                     .equals(column.get(0).toString()))) {
                 readerOriginConfig
-                        .set(com.alibaba.datax.plugin.unstructuredstorage.reader.Key.COLUMN, new ArrayList<String>());
+                        .set(com.alibaba.datax.plugin.storage.reader.Key.COLUMN, new ArrayList<String>());
             }
             else {
                 // column: 1. index type 2.value type 3.when type is Data, may have format
                 List<Configuration> columns = this.readerOriginConfig
-                        .getListConfiguration(com.alibaba.datax.plugin.unstructuredstorage.reader.Key.COLUMN);
+                        .getListConfiguration(com.alibaba.datax.plugin.storage.reader.Key.COLUMN);
 
                 if (null == columns || columns.isEmpty()) {
                     throw DataXException.asDataXException(
@@ -146,9 +146,9 @@ public class HdfsReader
                 }
 
                 for (Configuration eachColumnConf : columns) {
-                    eachColumnConf.getNecessaryValue(com.alibaba.datax.plugin.unstructuredstorage.reader.Key.TYPE, HdfsReaderErrorCode.REQUIRED_VALUE);
-                    Integer columnIndex = eachColumnConf.getInt(com.alibaba.datax.plugin.unstructuredstorage.reader.Key.INDEX);
-                    String columnValue = eachColumnConf.getString(com.alibaba.datax.plugin.unstructuredstorage.reader.Key.VALUE);
+                    eachColumnConf.getNecessaryValue(com.alibaba.datax.plugin.storage.reader.Key.TYPE, HdfsReaderErrorCode.REQUIRED_VALUE);
+                    Integer columnIndex = eachColumnConf.getInt(com.alibaba.datax.plugin.storage.reader.Key.INDEX);
+                    String columnValue = eachColumnConf.getString(com.alibaba.datax.plugin.storage.reader.Key.VALUE);
 
                     if (null == columnIndex && null == columnValue) {
                         throw DataXException.asDataXException(
@@ -263,7 +263,7 @@ public class HdfsReader
                         || specifiedFileType.equalsIgnoreCase(Constant.CSV)) {
 
                     InputStream inputStream = dfsUtil.getInputStream(sourceFile);
-                    UnstructuredStorageReaderUtil.readFromStream(inputStream, sourceFile, this.taskConfig,
+                    StorageReaderUtil.readFromStream(inputStream, sourceFile, this.taskConfig,
                             recordSender, this.getTaskPluginCollector());
                 }
                 else if (specifiedFileType.equalsIgnoreCase(Constant.ORC)) {

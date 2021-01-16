@@ -4,7 +4,7 @@ import com.alibaba.datax.common.exception.DataXException;
 import com.alibaba.datax.common.plugin.RecordSender;
 import com.alibaba.datax.common.spi.Reader;
 import com.alibaba.datax.common.util.Configuration;
-import com.alibaba.datax.plugin.unstructuredstorage.reader.UnstructuredStorageReaderUtil;
+import com.alibaba.datax.plugin.storage.reader.StorageReaderUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -46,7 +46,7 @@ public class FtpReader
             this.sourceFiles = new HashSet<>();
 
             this.validateParameter();
-            UnstructuredStorageReaderUtil.validateParameter(this.originConfig);
+            StorageReaderUtil.validateParameter(this.originConfig);
 
             if ("sftp".equals(protocol)) {
                 //sftp协议
@@ -257,7 +257,7 @@ public class FtpReader
 
                 inputStream = ftpHelper.getInputStream(fileName);
 
-                UnstructuredStorageReaderUtil.readFromStream(inputStream, fileName, this.readerSliceConfig,
+                StorageReaderUtil.readFromStream(inputStream, fileName, this.readerSliceConfig,
                         recordSender, this.getTaskPluginCollector());
                 recordSender.flush();
             }

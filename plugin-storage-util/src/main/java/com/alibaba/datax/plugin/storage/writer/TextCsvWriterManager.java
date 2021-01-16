@@ -1,4 +1,4 @@
-package com.alibaba.datax.plugin.unstructuredstorage.writer;
+package com.alibaba.datax.plugin.storage.writer;
 
 import com.csvreader.CsvWriter;
 import org.apache.commons.io.IOUtils;
@@ -7,13 +7,12 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
-import java.io.Writer;
 import java.util.List;
 
 public class TextCsvWriterManager
 {
-    public static UnstructuredWriter produceUnstructuredWriter(
-            String fileFormat, char fieldDelimiter, Writer writer)
+    public static Writer produceUnstructuredWriter(
+            String fileFormat, char fieldDelimiter, java.io.Writer writer)
     {
         // warn: false means plain text(old way), true means strict csv format
         if (Constant.FILE_FORMAT_TEXT.equals(fileFormat)) {
@@ -26,13 +25,13 @@ public class TextCsvWriterManager
 }
 
 class CsvWriterImpl
-        implements UnstructuredWriter
+        implements Writer
 {
     private static final Logger LOG = LoggerFactory
             .getLogger(CsvWriterImpl.class);
     private final CsvWriter csvWriter;
 
-    public CsvWriterImpl(Writer writer, char fieldDelimiter)
+    public CsvWriterImpl(java.io.Writer writer, char fieldDelimiter)
     {
         // csv 严格符合csv语法, 有标准的转义等处理
         this.csvWriter = new CsvWriter(writer, fieldDelimiter);
@@ -67,15 +66,15 @@ class CsvWriterImpl
 }
 
 class TextWriterImpl
-        implements UnstructuredWriter
+        implements Writer
 {
     private static final Logger LOG = LoggerFactory
             .getLogger(TextWriterImpl.class);
     // text StringUtils的join方式, 简单的字符串拼接
     private final char fieldDelimiter;
-    private final Writer textWriter;
+    private final java.io.Writer textWriter;
 
-    public TextWriterImpl(Writer writer, char fieldDelimiter)
+    public TextWriterImpl(java.io.Writer writer, char fieldDelimiter)
     {
         this.fieldDelimiter = fieldDelimiter;
         this.textWriter = writer;

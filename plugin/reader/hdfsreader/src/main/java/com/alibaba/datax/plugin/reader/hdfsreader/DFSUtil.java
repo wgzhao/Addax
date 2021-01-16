@@ -11,9 +11,9 @@ import com.alibaba.datax.common.exception.DataXException;
 import com.alibaba.datax.common.plugin.RecordSender;
 import com.alibaba.datax.common.plugin.TaskPluginCollector;
 import com.alibaba.datax.common.util.Configuration;
-import com.alibaba.datax.plugin.unstructuredstorage.reader.ColumnEntry;
-import com.alibaba.datax.plugin.unstructuredstorage.reader.UnstructuredStorageReaderErrorCode;
-import com.alibaba.datax.plugin.unstructuredstorage.reader.UnstructuredStorageReaderUtil;
+import com.alibaba.datax.plugin.storage.reader.ColumnEntry;
+import com.alibaba.datax.plugin.storage.reader.StorageReaderErrorCode;
+import com.alibaba.datax.plugin.storage.reader.StorageReaderUtil;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import org.apache.avro.Conversions;
@@ -267,7 +267,7 @@ public class DFSUtil
             Text value = new Text();
             while (reader.next(key, value)) {
                 if (StringUtils.isNotBlank(value.toString())) {
-                    UnstructuredStorageReaderUtil.transportOneRecord(recordSender,
+                    StorageReaderUtil.transportOneRecord(recordSender,
                             readerSliceConfig, taskPluginCollector, value.toString());
                 }
             }
@@ -283,10 +283,10 @@ public class DFSUtil
             RecordSender recordSender, TaskPluginCollector taskPluginCollector)
     {
         LOG.info("Start Read rcfile [{}].", sourceRcFilePath);
-        List<ColumnEntry> column = UnstructuredStorageReaderUtil
-                .getListColumnEntry(readerSliceConfig, com.alibaba.datax.plugin.unstructuredstorage.reader.Key.COLUMN);
+        List<ColumnEntry> column = StorageReaderUtil
+                .getListColumnEntry(readerSliceConfig, com.alibaba.datax.plugin.storage.reader.Key.COLUMN);
         // warn: no default value '\N'
-        String nullFormat = readerSliceConfig.getString(com.alibaba.datax.plugin.unstructuredstorage.reader.Key.NULL_FORMAT);
+        String nullFormat = readerSliceConfig.getString(com.alibaba.datax.plugin.storage.reader.Key.NULL_FORMAT);
 
         Path rcFilePath = new Path(sourceRcFilePath);
         RCFileRecordReader recordReader = null;
@@ -305,7 +305,7 @@ public class DFSUtil
                     txt.set(v.getData(), v.getStart(), v.getLength());
                     sourceLine[i] = txt.toString();
                 }
-                UnstructuredStorageReaderUtil.transportOneRecord(recordSender,
+                StorageReaderUtil.transportOneRecord(recordSender,
                         column, sourceLine, nullFormat, taskPluginCollector);
             }
         }
@@ -331,9 +331,9 @@ public class DFSUtil
             RecordSender recordSender, TaskPluginCollector taskPluginCollector)
     {
         LOG.info("Start Read orcfile [{}].", sourceOrcFilePath);
-        List<ColumnEntry> column = UnstructuredStorageReaderUtil
-                .getListColumnEntry(readerSliceConfig, com.alibaba.datax.plugin.unstructuredstorage.reader.Key.COLUMN);
-        String nullFormat = readerSliceConfig.getString(com.alibaba.datax.plugin.unstructuredstorage.reader.Key.NULL_FORMAT);
+        List<ColumnEntry> column = StorageReaderUtil
+                .getListColumnEntry(readerSliceConfig, com.alibaba.datax.plugin.storage.reader.Key.COLUMN);
+        String nullFormat = readerSliceConfig.getString(com.alibaba.datax.plugin.storage.reader.Key.NULL_FORMAT);
         StringBuilder allColumns = new StringBuilder();
         StringBuilder allColumnTypes = new StringBuilder();
         boolean isReadAllColumns = false;
@@ -413,9 +413,9 @@ public class DFSUtil
             RecordSender recordSender, TaskPluginCollector taskPluginCollector)
     {
         LOG.info("Start Read orcfile [{}].", sourceParquestFilePath);
-        List<ColumnEntry> column = UnstructuredStorageReaderUtil
-                .getListColumnEntry(readerSliceConfig, com.alibaba.datax.plugin.unstructuredstorage.reader.Key.COLUMN);
-        String nullFormat = readerSliceConfig.getString(com.alibaba.datax.plugin.unstructuredstorage.reader.Key.NULL_FORMAT);
+        List<ColumnEntry> column = StorageReaderUtil
+                .getListColumnEntry(readerSliceConfig, com.alibaba.datax.plugin.storage.reader.Key.COLUMN);
+        String nullFormat = readerSliceConfig.getString(com.alibaba.datax.plugin.storage.reader.Key.NULL_FORMAT);
         boolean isReadAllColumns = false;
         int columnIndexMax;
         // 判断是否读取所有列
@@ -534,7 +534,7 @@ public class DFSUtil
                                 LOG.error(errorMessage);
                                 throw DataXException
                                         .asDataXException(
-                                                UnstructuredStorageReaderErrorCode.NOT_SUPPORT_TYPE,
+                                                StorageReaderErrorCode.NOT_SUPPORT_TYPE,
                                                 errorMessage);
                         }
                     }
@@ -638,7 +638,7 @@ public class DFSUtil
                                 LOG.error(errorMessage);
                                 throw DataXException
                                         .asDataXException(
-                                                UnstructuredStorageReaderErrorCode.NOT_SUPPORT_TYPE,
+                                                StorageReaderErrorCode.NOT_SUPPORT_TYPE,
                                                 errorMessage);
                         }
                     }

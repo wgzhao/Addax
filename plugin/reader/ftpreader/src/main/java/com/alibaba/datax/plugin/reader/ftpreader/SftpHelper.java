@@ -1,7 +1,7 @@
 package com.alibaba.datax.plugin.reader.ftpreader;
 
 import com.alibaba.datax.common.exception.DataXException;
-import com.alibaba.datax.plugin.unstructuredstorage.reader.UnstructuredStorageReaderUtil;
+import com.alibaba.datax.plugin.storage.reader.StorageReaderUtil;
 import com.jcraft.jsch.ChannelSftp;
 import com.jcraft.jsch.ChannelSftp.LsEntry;
 import com.jcraft.jsch.JSch;
@@ -173,7 +173,7 @@ public class SftpHelper
             int pathLen = directoryPath.length();
             if (directoryPath.contains("*") || directoryPath.contains("?")) {//*和？的限制
                 // path是正则表达式
-                String subPath = UnstructuredStorageReaderUtil.getRegexPathParentPath(directoryPath);
+                String subPath = StorageReaderUtil.getRegexPathParentPath(directoryPath);
                 if (isDirExist(subPath)) {
                     parentPath = subPath;
                 }

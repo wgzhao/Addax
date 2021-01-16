@@ -4,7 +4,7 @@ import com.alibaba.datax.common.exception.DataXException;
 import com.alibaba.datax.common.plugin.RecordReceiver;
 import com.alibaba.datax.common.spi.Writer;
 import com.alibaba.datax.common.util.Configuration;
-import com.alibaba.datax.plugin.unstructuredstorage.writer.Constant;
+import com.alibaba.datax.plugin.storage.writer.Constant;
 import org.apache.commons.io.Charsets;
 import org.apache.commons.io.IOUtils;
 import org.apache.hadoop.fs.Path;
@@ -289,7 +289,7 @@ public class HdfsWriter
                 }
 
                 splitedTaskConfig
-                        .set(com.alibaba.datax.plugin.unstructuredstorage.writer.Key.FILE_NAME,
+                        .set(com.alibaba.datax.plugin.storage.writer.Key.FILE_NAME,
                                 fullFileName);
 
                 LOG.info("splited write file name:[{}]", fullFileName);

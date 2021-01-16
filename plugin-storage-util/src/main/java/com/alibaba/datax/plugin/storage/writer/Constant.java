@@ -1,4 +1,4 @@
-package com.alibaba.datax.plugin.unstructuredstorage.writer;
+package com.alibaba.datax.plugin.storage.writer;
 
 public class Constant
 {
