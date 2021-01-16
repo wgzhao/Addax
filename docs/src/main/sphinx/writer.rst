@@ -12,10 +12,12 @@
     DBF Writer                      <writer/dbffilewriter>
     ElasticSearch Writer            <writer/elasticsearchwriter>
     FTP Writer                      <writer/ftpwriter>
+    Greenplum Reader                <reader/greenlumreader>
     HBase 1.x Writer                <writer/hbase11xwriter>
     HBase 1.x Writer with Phoenix   <writer/hbase11xsqlwriter>
     HBase 2.0 Writer with Phoenix   <writer/hbase20xsqlwriter>
     HDFS Writer                     <writer/hdfswriter>
+    Kudu Writer                     <writer/kuduwriter>
     MongoDB Writer                  <writer/mongodbwriter>
     MySQL Writer                    <writer/mysqlwriter>
     Oracle Writer                   <writer/oraclewriter>
