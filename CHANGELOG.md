@@ -1,5 +1,19 @@
 # Changelog
 
+## 3.1.8
+
+### General Changes
+
+* Add Kudu reader plugin
+* Add kudu writer plugin
+* Add Greenplum writer plugin
+* Change loglevel to reduce console output
+* Add more exit code
+
+### HDFS writer
+
+* Fixed Date type can not convert to bytes
+
 ## 3.1.7
 
 ### General Changes
