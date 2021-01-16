@@ -1,0 +1,22 @@
+{
+  "name": "greenplumwriter",
+  "parameter": {
+    "username": "",
+    "password": "",
+    "queueSize": 1000,
+    "numProc": 4,
+    "numWriter": 1,
+    "column": [
+      "*"
+    ],
+    "preSql": [],
+    "connection": [
+      {
+        "jdbcUrl": "",
+        "table": []
+      }
+    ],
+    "postSql": []
+  }
+}
+

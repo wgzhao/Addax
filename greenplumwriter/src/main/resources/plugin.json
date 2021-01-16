@@ -1,0 +1,6 @@
+{
+  "name": "greenplumwriter",
+  "class": "com.alibaba.datax.plugin.writer.greenplumwriter.GreenplumWriter",
+  "description": "Write data to Greenplum Database",
+  "developer": "wgzhao"
+}
