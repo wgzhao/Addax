@@ -21,6 +21,7 @@ public enum DataBaseType
     RDBMS("rdbms", "com.alibaba.datax.plugin.rdbms.util.DataBaseType"),
     DB2("db2", "com.ibm.db2.jcc.DB2Driver"),
     Inceptor2("inceptor2", "org.apache.hive.jdbc.HiveDriver"),
+    InfluxDB("influxdb","org.influxdb.influxdb-java"),
     Impala("impala", "com.cloudera.impala.jdbc41.Driver");
 
     private static final Pattern mysqlPattern = Pattern.compile("jdbc:mysql://(.+):\\d+/.+");
@@ -78,6 +79,7 @@ public enum DataBaseType
             case ClickHouse:
             case PostgreSQL:
             case RDBMS:
+            case InfluxDB:
             case Inceptor2:
                 break;
             default:
@@ -109,6 +111,7 @@ public enum DataBaseType
             case DB2:
             case PostgreSQL:
             case RDBMS:
+            case InfluxDB:
             case Inceptor2:
                 break;
             default:

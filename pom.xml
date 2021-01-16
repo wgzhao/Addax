@@ -85,11 +85,12 @@
         <module>dbffilewriter</module>
         <module>elasticsearchwriter</module>
         <module>ftpwriter</module>
+        <module>greenplumwriter</module>
         <module>hbase11xsqlwriter</module>
         <module>hbase11xwriter</module>
         <module>hbase20xsqlwriter</module>
         <module>hdfswriter</module>
-        <module>greenplumwriter</module>
+        <module>influxdbreader</module>
         <module>kuduwriter</module>
         <module>mongodbwriter</module>
         <module>mysqlwriter</module>
