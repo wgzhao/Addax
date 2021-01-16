@@ -39,6 +39,7 @@
 3. hbase20xreader
 4. jsonfilereader
 5. kudureader
+6. influxdbreader
 
 #### writer plugin
 
@@ -81,6 +82,7 @@
 | HBase 2.x   | 支持 | 支持 | hbase20xsqlreader/hbase20xsqlwriter| 通过[Phoenix](https://phoenix.apache.org)操作HBase |
 | HDFS        | 支持 | 支持 | hdfsreader/hdfswriter | HDFS 2.x 以上版本 |
 | Greenplum   | 支持 | 支持 | postgresqlreader/greenplumwriter | |
+| InfluxDB    | 支持 | 不支持 | influxdbreader | 仅支持1.x版本，2.0及以上暂不支持 | 
 | json        | 支持 | 不支持 | jsonfilereader | |
 | kudu        | 支持 | 支持 | kudureader/kuduwriter | 通过原生接口，计划更新Impala连接 | 
 | MongoDB     | 支持 | 支持 | mongodbreader/mongodbwriter | |

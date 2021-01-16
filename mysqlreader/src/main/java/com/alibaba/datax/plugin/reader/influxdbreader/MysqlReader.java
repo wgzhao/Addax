@@ -1,4 +1,4 @@
-package com.alibaba.datax.plugin.reader.mysqlreader;
+package com.alibaba.datax.plugin.reader.influxdbreader;
 
 import com.alibaba.datax.common.plugin.RecordSender;
 import com.alibaba.datax.common.spi.Reader;
