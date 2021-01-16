@@ -89,6 +89,7 @@
         <module>hbase11xwriter</module>
         <module>hbase20xsqlwriter</module>
         <module>hdfswriter</module>
+        <module>greenplumwriter</module>
         <module>kuduwriter</module>
         <module>mongodbwriter</module>
         <module>mysqlwriter</module>
