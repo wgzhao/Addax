@@ -91,6 +91,7 @@
         <module>plugin/writer/hbase11xwriter</module>
         <module>plugin/writer/hbase20xsqlwriter</module>
         <module>plugin/writer/hdfswriter</module>
+        <module>plugin/writer/influxdbwriter</module>
         <module>plugin/writer/kuduwriter</module>
         <module>plugin/writer/mongodbwriter</module>
         <module>plugin/writer/mysqlwriter</module>
