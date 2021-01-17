@@ -46,6 +46,7 @@
 1. dbffilewrite
 2. greenplumwriter
 3. kuduwriter
+4. influxdbwriter
 
 ### 部分插件增强功能，罗列如下
 
@@ -134,7 +135,7 @@ mvn clean package
 
 ```shell
 cd target/datax/datax-<version>
-bin/datax.py job/job.json
+python bin/datax.py job/job.json
 ```
 
 上述命令的输出大致如下：
@@ -290,6 +291,11 @@ DataX	19890604	1989-06-04 00:00:00	true	test
 </details>
 
 更多说明，可以说明文档
+
+## 运行要求
+
+- JDK 1.8+
+- Python 2.7+ / Python 3.7+
 
 ## 文档
 
