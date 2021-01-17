@@ -1,0 +1,16 @@
+{
+  "name": "influxdbwriter",
+  "parameter": {
+    "username": "",
+    "password": "",
+    "column": [],
+    "connection": [
+      {
+        "endpoint": "",
+        "database": "",
+        "table": ""
+      }
+    ],
+    "batchSize": ""
+  }
+}

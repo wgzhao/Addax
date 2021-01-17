@@ -295,6 +295,17 @@
             <outputDirectory>datax-${project.version}</outputDirectory>
         </fileSet>
         <fileSet>
+            <directory>plugin/writer/influxdbwriter/target/datax/</directory>
+            <includes>
+                <include>**/*.*</include>
+            </includes>
+            <excludes>
+                <exclude>**/datax-common*.jar</exclude>
+            </excludes>
+            <fileMode>0644</fileMode>
+            <outputDirectory>datax-${project.version}</outputDirectory>
+        </fileSet>
+        <fileSet>
             <directory>plugin/writer/kuduwriter/target/datax/</directory>
             <includes>
                 <include>**/*.*</include>
