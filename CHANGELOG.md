@@ -7,7 +7,8 @@
 * Add Kudu reader plugin
 * Add kudu writer plugin
 * Add Greenplum writer plugin
-* Add InfluxDB reader plugin  
+* Add InfluxDB reader plugin
+* Add InfluxDB Writer plugin  
 * Change loglevel to reduce console output
 * Add more exit code
 
