@@ -17,6 +17,7 @@
     HBase 1.x Writer with Phoenix   <writer/hbase11xsqlwriter>
     HBase 2.0 Writer with Phoenix   <writer/hbase20xsqlwriter>
     HDFS Writer                     <writer/hdfswriter>
+    InfluxDB Writer                 <writer/influxdbwriter>
     Kudu Writer                     <writer/kuduwriter>
     MongoDB Writer                  <writer/mongodbwriter>
     MySQL Writer                    <writer/mysqlwriter>
