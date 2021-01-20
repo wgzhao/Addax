@@ -16,6 +16,7 @@
     HBase 1.x Reader with Phoenix   <reader/hbase11xsqlreader>
     HBase 2.0 Reader with Phoenix   <reader/hbase20xsqlreader>
     HDFS Reader                     <reader/hdfsreader>
+    HTTP Reader                     <reader/httpreader>
     InfluxDB Reader                 <reader/influxdbreader>
     JSON file Reader                <reader/jsonfilereader>
     Kudu Reader                     <reader/kudureader>
