@@ -1,13 +1,15 @@
 {
   "name": "httpreader",
   "parameter": {
-    "connection": [{
-      "url": "",
-      "proxy": {
-        "address":"socks5://127.0.0.1:8080",
-        "auth": "username:password"
+    "connection": [
+      {
+        "url": "",
+        "proxy": {
+          "address": "socks5://127.0.0.1:8080",
+          "auth": "username:password"
+        }
       }
-    }],
+    ],
     "username": "",
     "password": "",
     "token": "",
@@ -22,6 +24,8 @@
       "key2": "value2"
     },
     "encoding": "",
-    "column": ["*"]
+    "column": [
+      "*"
+    ]
   }
 }
