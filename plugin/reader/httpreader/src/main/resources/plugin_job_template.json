@@ -1,0 +1,31 @@
+{
+  "name": "httpreader",
+  "parameter": {
+    "connection": [
+      {
+        "url": "",
+        "proxy": {
+          "address": "socks5://127.0.0.1:8080",
+          "auth": "username:password"
+        }
+      }
+    ],
+    "username": "",
+    "password": "",
+    "token": "",
+    "method": "post",
+    "resultKey": "",
+    "reqParams": {
+      "key1": "value1",
+      "key2": "value2"
+    },
+    "headers": {
+      "key1": "value1",
+      "key2": "value2"
+    },
+    "encoding": "",
+    "column": [
+      "*"
+    ]
+  }
+}

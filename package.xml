@@ -252,7 +252,7 @@
             <outputDirectory>datax-${project.version}</outputDirectory>
         </fileSet>
         <fileSet>
-            <directory>plugin/writer/greenplum/target/datax/</directory>
+            <directory>plugin/writer/greenplumwriter/target/datax/</directory>
             <includes>
                 <include>**/*.*</include>
             </includes>
