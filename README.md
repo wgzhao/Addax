@@ -69,32 +69,33 @@
 
 ## 支持的数据库一览表
 
-| 数据库或文件系统   | 读取     | 写入    |  插件名称(reader/writer)     |  备注     |
-|-------------|---------|--------|--------------|----------|
-| Cassander   | 支持     | 支持   |  cassandrareader/cassandrawriter | |
-| ClickHouse  | 支持     | 支持   | clickhousereader/clickhousewriter | |
-| DB2       |支持        | 支持   | rbdmsreader/rdbmswriter | 理论上支持，但未实际测试 |
-| DBF         | 支持     | 支持   | dbffilereader/dbffilewriter | |
-| ElasticSearch | 不支持  | 支持  | elasticsearchwriter | |
-| FTP         | 支持     | 支持  | ftpreader/ftpwriter | |
-| HBase 1.x   | 支持 | 支持 | hbase11xreader/hbase11xwriter| 直接操作HBase |
-| HBase 1.x   | 支持 | 支持 | hbase11xsqlreader/hbase11xsqlwriter| 通过[Phoenix](https://phoenix.apache.org)操作HBase |
-| HBase 2.x   | 支持 | 不支持 | hbase20xreader | 直接操作HBase |
-| HBase 2.x   | 支持 | 支持 | hbase20xsqlreader/hbase20xsqlwriter| 通过[Phoenix](https://phoenix.apache.org)操作HBase |
-| HDFS        | 支持 | 支持 | hdfsreader/hdfswriter | HDFS 2.x 以上版本 |
-| Greenplum   | 支持 | 支持 | postgresqlreader/greenplumwriter | |
-| InfluxDB    | 支持 | 支持 | influxdbreader/influxdbwriter | 仅支持1.x版本，2.0及以上暂不支持 | 
-| json        | 支持 | 不支持 | jsonfilereader | |
-| kudu        | 支持 | 支持 | kudureader/kuduwriter | 通过原生接口，计划更新Impala连接 | 
-| MongoDB     | 支持 | 支持 | mongodbreader/mongodbwriter | |
-| MySQL/MariaDB | 支持 | 支持 | mysqlreader/mysqlwriter | |
-| Oracle      | 支持 | 支持 | oraclereader/oraclewriter | |
-| PostgreSQL  | 支持 | 支持 | postgresqlreader/postgresqlwriter | |
-| PrestoSQL  | 支持 | 支持 | rdbmsreader/rdbmswriter | [trino(原PrestoSQL)](https://trino.io) 310以上 |
-| Redis      | 支持 | 支持 | redisreader/rediswriter | |
-| SQL Server  |支持 | 支持 | sqlserverreader/sqlserverwriter | |
-| TDH Inceptor2 | 支持 | 支持 | rdbmsreader/rdbmswriter | [星环 TDH](http://transwarp.cn/transwarp/product-TDH.html?categoryId=18) 5.1以上版本 |
-| TEXT       | 支持 | 支持 | textfilereader/textfilewriter | |
+| 数据库或文件系统 | 读取   | 写入   | 插件名称(reader/writer)             | 备注                                                                                 |
+| ---------------- | ------ | ------ | ----------------------------------- | ------------------------------------------------------------------------------------ |
+| Cassander        | 支持   | 支持   | cassandrareader/cassandrawriter     |                                                                                      |
+| ClickHouse       | 支持   | 支持   | clickhousereader/clickhousewriter   |                                                                                      |
+| DB2              | 支持   | 支持   | rbdmsreader/rdbmswriter             | 理论上支持，但未实际测试                                                             |
+| DBF              | 支持   | 支持   | dbffilereader/dbffilewriter         |                                                                                      |
+| ElasticSearch    | 不支持 | 支持   | elasticsearchwriter                 |                                                                                      |
+| FTP              | 支持   | 支持   | ftpreader/ftpwriter                 |                                                                                      |
+| HBase 1.x        | 支持   | 支持   | hbase11xreader/hbase11xwriter       | 直接操作HBase                                                                        |
+| HBase 1.x        | 支持   | 支持   | hbase11xsqlreader/hbase11xsqlwriter | 通过[Phoenix](https://phoenix.apache.org)操作HBase                                   |
+| HBase 2.x        | 支持   | 不支持 | hbase20xreader                      | 直接操作HBase                                                                        |
+| HBase 2.x        | 支持   | 支持   | hbase20xsqlreader/hbase20xsqlwriter | 通过[Phoenix](https://phoenix.apache.org)操作HBase                                   |
+| HDFS             | 支持   | 支持   | hdfsreader/hdfswriter               | HDFS 2.x 以上版本                                                                    |
+| HTTP             | 支持   | 不支持 | httpreader                          | 仅支持返回值为JSON类型的接口                                                         |
+| Greenplum        | 支持   | 支持   | postgresqlreader/greenplumwriter    |                                                                                      |
+| InfluxDB         | 支持   | 支持   | influxdbreader/influxdbwriter       | 仅支持1.x版本，2.0及以上暂不支持                                                     |
+| json             | 支持   | 不支持 | jsonfilereader                      |                                                                                      |
+| kudu             | 支持   | 支持   | kudureader/kuduwriter               | 通过原生接口，计划更新Impala连接                                                     |
+| MongoDB          | 支持   | 支持   | mongodbreader/mongodbwriter         |                                                                                      |
+| MySQL/MariaDB    | 支持   | 支持   | mysqlreader/mysqlwriter             |                                                                                      |
+| Oracle           | 支持   | 支持   | oraclereader/oraclewriter           |                                                                                      |
+| PostgreSQL       | 支持   | 支持   | postgresqlreader/postgresqlwriter   |                                                                                      |
+| PrestoSQL        | 支持   | 支持   | rdbmsreader/rdbmswriter             | [trino(原PrestoSQL)](https://trino.io) 310以上                                       |
+| Redis            | 支持   | 支持   | redisreader/rediswriter             |                                                                                      |
+| SQL Server       | 支持   | 支持   | sqlserverreader/sqlserverwriter     |                                                                                      |
+| TDH Inceptor2    | 支持   | 支持   | rdbmsreader/rdbmswriter             | [星环 TDH](http://transwarp.cn/transwarp/product-TDH.html?categoryId=18) 5.1以上版本 |
+| TEXT             | 支持   | 支持   | textfilereader/textfilewriter       |                                                                                      |
 
 ## 快速开始
 

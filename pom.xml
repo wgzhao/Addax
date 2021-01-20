@@ -67,6 +67,7 @@
         <module>plugin/reader/hbase20xreader</module>
         <module>plugin/reader/hbase20xsqlreader</module>
         <module>plugin/reader/hdfsreader</module>
+        <module>plugin/reader/httpreader</module>
         <module>plugin/reader/influxdbreader</module>
         <module>plugin/reader/kudureader</module>
         <module>plugin/reader/jsonfilereader</module>
