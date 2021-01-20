@@ -11,24 +11,23 @@
         <fileSet>
             <directory>src/main/resources</directory>
             <includes>
-                <include>plugin.json</include>
-                <include>plugin_job_template.json</include>
+                <include>*.json</include>
             </includes>
-            <outputDirectory>plugin/reader/hbase20xsqlreader</outputDirectory>
+            <outputDirectory>plugin/reader/${project.artifactId}</outputDirectory>
         </fileSet>
         <fileSet>
             <directory>target/</directory>
             <includes>
-                <include>hbase20xsqlreader-${project.version}.jar</include>
+                <include>${project.artifactId}-${project.version}.jar</include>
             </includes>
-            <outputDirectory>plugin/reader/hbase20xsqlreader</outputDirectory>
+            <outputDirectory>plugin/reader/${project.artifactId}</outputDirectory>
         </fileSet>
     </fileSets>
 
     <dependencySets>
         <dependencySet>
             <useProjectArtifact>false</useProjectArtifact>
-            <outputDirectory>plugin/reader/hbase20xsqlreader/libs</outputDirectory>
+            <outputDirectory>plugin/reader/${project.artifactId}/libs</outputDirectory>
             <scope>runtime</scope>
         </dependencySet>
     </dependencySets>
