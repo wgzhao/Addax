@@ -5,11 +5,7 @@ import com.alibaba.datax.common.element.StringColumn;
 import com.alibaba.datax.common.exception.DataXException;
 import com.alibaba.datax.common.plugin.RecordSender;
 import com.alibaba.datax.common.plugin.TaskPluginCollector;
-import com.alibaba.datax.common.statistics.PerfRecord;
-import com.alibaba.datax.common.statistics.PerfTrace;
 import com.alibaba.datax.common.util.Configuration;
-import com.alibaba.datax.plugin.rdbms.util.DBUtil;
-import com.alibaba.datax.plugin.rdbms.util.RdbmsException;
 import org.influxdb.InfluxDB;
 import org.influxdb.InfluxDBFactory;
 import org.influxdb.dto.Query;
@@ -17,9 +13,6 @@ import org.influxdb.dto.QueryResult;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.sql.Connection;
-import java.sql.ResultSet;
-import java.sql.ResultSetMetaData;
 import java.util.List;
 
 public class InfluxDBReaderTask
@@ -55,7 +48,6 @@ public class InfluxDBReaderTask
         InfluxDB influxDB = InfluxDBFactory.connect(endpoint, username, password);
         influxDB.setDatabase(database);
         if (querySql == null) {
-
             if (where != null) {
                 querySql = "select * from " + table + " where " + where;
             } else {
