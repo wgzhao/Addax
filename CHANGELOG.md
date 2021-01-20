@@ -1,5 +1,12 @@
 # Changelog
 
+## 3.1.9
+
+### General Changes
+
+* Add HTTP reader plugin
+* make `package.xml` more general
+
 ## 3.1.8
 
 ### General Changes

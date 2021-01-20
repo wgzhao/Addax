@@ -40,6 +40,7 @@
 4. jsonfilereader
 5. kudureader
 6. influxdbreader
+7. httpreader
 
 #### writer plugin
 
