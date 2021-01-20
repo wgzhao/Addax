@@ -9,39 +9,26 @@
     <includeBaseDirectory>false</includeBaseDirectory>
     <fileSets>
         <fileSet>
-            <outputDirectory>plugin/reader/oraclereader</outputDirectory>
             <directory>src/main/resources</directory>
             <includes>
-                <include>plugin.json</include>
-                <include>plugin_job_template.json</include>
+                <include>*.json</include>
             </includes>
-        </fileSet>
-        <fileSet>
-            <outputDirectory>plugin/reader/oraclereader/libs</outputDirectory>
-            <directory>src/main/lib</directory>
-            <includes>
-                <include>ojdbc8.jar</include>
-            </includes>
-            <excludes>
-                <exclude>datax-common-3.0.2.jar</exclude>
-            </excludes>
+            <outputDirectory>plugin/reader/${project.artifactId}</outputDirectory>
         </fileSet>
         <fileSet>
             <directory>target/</directory>
             <includes>
-                <include>oraclereader-${project.version}.jar</include>
+                <include>${project.artifactId}-${project.version}.jar</include>
             </includes>
-            <outputDirectory>plugin/reader/oraclereader</outputDirectory>
+            <outputDirectory>plugin/reader/${project.artifactId}</outputDirectory>
         </fileSet>
     </fileSets>
 
     <dependencySets>
         <dependencySet>
             <useProjectArtifact>false</useProjectArtifact>
-            <outputDirectory>plugin/reader/oraclereader/libs</outputDirectory>
-            <excludes>
-                <exclude>com.alibaba.datax:datax-*</exclude>
-            </excludes>
+            <outputDirectory>plugin/reader/${project.artifactId}/libs</outputDirectory>
+            <scope>runtime</scope>
         </dependencySet>
     </dependencySets>
 </assembly>

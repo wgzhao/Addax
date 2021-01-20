@@ -11,38 +11,23 @@
         <fileSet>
             <directory>src/main/resources</directory>
             <includes>
-                <include>plugin.json</include>
-                <include>plugin_job_template.json</include>
+                <include>*.json</include>
             </includes>
-            <outputDirectory>plugin/reader/hdfsreader</outputDirectory>
+            <outputDirectory>plugin/reader/${project.artifactId}</outputDirectory>
         </fileSet>
         <fileSet>
             <directory>target/</directory>
             <includes>
-                <include>hdfsreader-${project.version}.jar</include>
+                <include>${project.artifactId}-${project.version}.jar</include>
             </includes>
-            <outputDirectory>plugin/reader/hdfsreader</outputDirectory>
+            <outputDirectory>plugin/reader/${project.artifactId}</outputDirectory>
         </fileSet>
-        <!--<fileSet>-->
-        <!--<directory>src/main/cpp</directory>-->
-        <!--<includes>-->
-        <!--<include>libhadoop.a</include>-->
-        <!--<include>libhadoop.so</include>-->
-        <!--<include>libhadoop.so.1.0.0</include>-->
-        <!--<include>libhadooppipes.a</include>-->
-        <!--<include>libhadooputils.a</include>-->
-        <!--<include>libhdfs.a</include>-->
-        <!--<include>libhdfs.so</include>-->
-        <!--<include>libhdfs.so.0.0.0</include>-->
-        <!--</includes>-->
-        <!--<outputDirectory>plugin/reader/hdfsreader/libs</outputDirectory>-->
-        <!--</fileSet>-->
     </fileSets>
 
     <dependencySets>
         <dependencySet>
             <useProjectArtifact>false</useProjectArtifact>
-            <outputDirectory>plugin/reader/hdfsreader/libs</outputDirectory>
+            <outputDirectory>plugin/reader/${project.artifactId}/libs</outputDirectory>
             <scope>runtime</scope>
         </dependencySet>
     </dependencySets>

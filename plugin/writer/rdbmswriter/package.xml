@@ -11,31 +11,30 @@
         <fileSet>
             <directory>src/main/resources</directory>
             <includes>
-                <include>plugin.json</include>
-                <include>plugin_job_template.json</include>
+                <include>*.json</include>
             </includes>
-            <outputDirectory>plugin/writer/rdbmswriter</outputDirectory>
+            <outputDirectory>plugin/writer/${project.artifactId}</outputDirectory>
         </fileSet>
         <fileSet>
             <directory>target/</directory>
             <includes>
-                <include>rdbmswriter-${project.version}.jar</include>
+                <include>${project.artifactId}-${project.version}.jar</include>
             </includes>
-            <outputDirectory>plugin/writer/rdbmswriter</outputDirectory>
+            <outputDirectory>plugin/writer/${project.artifactId}</outputDirectory>
         </fileSet>
         <fileSet>
             <directory>src/main/libs</directory>
             <includes>
                 <include>*.*</include>
             </includes>
-            <outputDirectory>plugin/writer/rdbmswriter/libs</outputDirectory>
+            <outputDirectory>plugin/writer/${project.artifactId}/libs</outputDirectory>
         </fileSet>
     </fileSets>
 
     <dependencySets>
         <dependencySet>
             <useProjectArtifact>false</useProjectArtifact>
-            <outputDirectory>plugin/writer/rdbmswriter/libs</outputDirectory>
+            <outputDirectory>plugin/writer/${project.artifactId}/libs</outputDirectory>
             <scope>runtime</scope>
         </dependencySet>
     </dependencySets>
