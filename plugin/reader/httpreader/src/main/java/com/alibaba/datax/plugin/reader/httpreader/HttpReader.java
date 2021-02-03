@@ -9,23 +9,42 @@ import com.alibaba.datax.common.util.Configuration;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
+import com.alibaba.fastjson.JSONPath;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpHost;
+import org.apache.http.HttpStatus;
+import org.apache.http.StatusLine;
+import org.apache.http.auth.AuthScope;
+import org.apache.http.auth.UsernamePasswordCredentials;
+import org.apache.http.client.CredentialsProvider;
+import org.apache.http.client.config.RequestConfig;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.client.utils.URIBuilder;
+import org.apache.http.conn.ssl.NoopHostnameVerifier;
+import org.apache.http.conn.ssl.SSLConnectionSocketFactory;
+import org.apache.http.conn.ssl.TrustSelfSignedStrategy;
+import org.apache.http.impl.client.BasicCredentialsProvider;
 import org.apache.http.impl.client.CloseableHttpClient;
+import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.http.impl.client.HttpClients;
+import org.apache.http.ssl.SSLContextBuilder;
 import org.apache.http.util.EntityUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import javax.net.ssl.HostnameVerifier;
+import javax.net.ssl.SSLContext;
 
 import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
+import java.security.KeyManagementException;
+import java.security.KeyStoreException;
+import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -85,17 +104,11 @@ public class HttpReader
                     readerSliceConfig.getListConfiguration(Key.CONNECTION).get(0);
             uriBuilder = new URIBuilder(URI.create(conn.getString(Key.URL)));
 
-            if (readerSliceConfig.getString(Key.PROXY, null) != null) {
+            if (conn.getString(Key.PROXY, null) != null) {
                 // set proxy
-                Configuration proxyConf = conn.getConfiguration(Key.PROXY);
-                String address = proxyConf.getString(Key.ADDRESS);
-                if (address.startsWith("socks")) {
-                    throw DataXException.asDataXException(
-                            HttpReaderErrorCode.NOT_SUPPORT, "sockes 代理暂时不支持"
-                    );
-                }
-                proxy = new HttpHost(address);
+                createProxy(conn.getConfiguration(Key.PROXY));
             }
+
             Map<String, Object> requestParams =
                     readerSliceConfig.getMap(Key.REQUEST_PARAMETERS, new HashMap<>());
             requestParams.forEach((k, v) -> uriBuilder.setParameter(k, v.toString()));
@@ -110,28 +123,17 @@ public class HttpReader
         @Override
         public void startRead(RecordSender recordSender)
         {
-            Map<String, Object> headers = readerSliceConfig.getMap(Key.HEADERS, new HashMap<>());
             String method = readerSliceConfig.getString(Key.METHOD, "get");
-            CloseableHttpResponse response = null;
+            CloseableHttpResponse response;
             try {
-                if ("get".equalsIgnoreCase(method)) {
-                    HttpGet request = new HttpGet(uriBuilder.build());
-                    headers.forEach((k, v) -> request.setHeader(k, v.toString()));
-                    CloseableHttpClient httpClient = HttpClients.createDefault();
-                    response = httpClient.execute(request);
-                }
-                else if ("post".equalsIgnoreCase(method)) {
-                    HttpPost request = new HttpPost(uriBuilder.build());
-                    headers.forEach((k, v) -> request.setHeader(k, v.toString()));
-                    CloseableHttpClient httpClient = HttpClients.createDefault();
-                    response = httpClient.execute(request);
-                }
-                else {
-                    throw DataXException.asDataXException(
-                            HttpReaderErrorCode.ILLEGAL_VALUE, "不支持的请求模式: " + method
-                    );
+                response = createCloseableHttpResponse(method);
+                StatusLine statusLine = response.getStatusLine();
+                if (statusLine.getStatusCode() != HttpStatus.SC_OK) {
+                    response.getEntity().getContent().close();
+                    throw new IOException(statusLine.getReasonPhrase());
                 }
                 HttpEntity entity = response.getEntity();
+
                 String encoding = readerSliceConfig.getString(Key.ENCODING, null);
                 Charset charset;
                 if (encoding != null) {
@@ -172,54 +174,137 @@ public class HttpReader
                     );
                 }
                 Record record;
+                JSONObject jsonObject = jsonArray.getJSONObject(0);
                 if (columns.size() == 1 && "*".equals(columns.get(0))) {
-                    log.info("get all keys beacause you setup columns with \"*\"");
-                    for (int i = 0; i < jsonArray.size(); i++) {
-                        JSONObject jsonObject = jsonArray.getJSONObject(i);
-                        record = recordSender.createRecord();
-                        for (Map.Entry<String, Object> entry : jsonObject.entrySet()) {
-                            if (entry.getValue() == null) {
-                                record.addColumn(new StringColumn(null));
-                            }
-                            else {
-                                record.addColumn(new StringColumn(entry.getValue().toString()));
-                            }
-                        }
-                        recordSender.sendToWriter(record);
+                    // 没有给定key的情况下，提取JSON的第一层key作为字段处理
+                    columns.remove(0);
+                    for (Object obj: JSONPath.keySet(jsonObject, "/")) {
+                        columns.add(obj.toString());
                     }
                 }
-                else {
-                    // get specified key instead of all
-                    // first, check key exists or not ?
-                    JSONObject jsonObject = jsonArray.getJSONObject(0);
+                // first, check key exists or not ?
+                for (String k : columns) {
+                    if (!JSONPath.contains(jsonObject, k)) {
+                        throw DataXException.asDataXException(
+                                HttpReaderErrorCode.ILLEGAL_VALUE,
+                                "您尝试从结果中获取key为 '" + k + "'的结果，但实际结果中不存在该key值"
+                        );
+                    }
+                }
+                for (int i = 0; i < jsonArray.size(); i++) {
+                    jsonObject = jsonArray.getJSONObject(i);
+                    record = recordSender.createRecord();
                     for (String k : columns) {
-                        if (!jsonObject.containsKey(k)) {
-                            throw DataXException.asDataXException(
-                                    HttpReaderErrorCode.ILLEGAL_VALUE,
-                                    "您尝试从结果中获取key为 '" + k + "'的结果，但实际结果中不存在该key值"
-                            );
+                        Object v = JSONPath.eval(jsonObject, k);
+                        if (v == null) {
+                            record.addColumn(new StringColumn(null));
+                        }
+                        else {
+                            record.addColumn(new StringColumn(v.toString()));
                         }
                     }
-                    for (int i = 0; i < jsonArray.size(); i++) {
-                        jsonObject = jsonArray.getJSONObject(i);
-                        record = recordSender.createRecord();
-                        for (String k : columns) {
-                            Object v = jsonObject.get(k);
-                            if (v == null) {
-                                record.addColumn(new StringColumn(null));
-                            }
-                            else {
-                                record.addColumn(new StringColumn(v.toString()));
-                            }
-                        }
-                        recordSender.sendToWriter(record);
-                    }
+                    recordSender.sendToWriter(record);
                 }
             }
+
             catch (URISyntaxException | IOException e) {
                 throw DataXException.asDataXException(
                         HttpReaderErrorCode.ILLEGAL_VALUE, e.getMessage()
                 );
+            }
+        }
+
+
+        private void createProxy(Configuration proxyConf)
+        {
+            String host = proxyConf.getString(Key.ADDRESS);
+            if (host.startsWith("socks")) {
+                throw DataXException.asDataXException(
+                        HttpReaderErrorCode.NOT_SUPPORT, "sockes 代理暂时不支持"
+                );
+            }
+            URI uri = URI.create(host);
+            this.proxy = new HttpHost(uri.getHost(), uri.getPort(), uri.getScheme());
+        }
+
+        private CloseableHttpResponse createCloseableHttpResponse(String method)
+                throws URISyntaxException, IOException
+        {
+            Map<String, Object> headers = readerSliceConfig.getMap(Key.HEADERS, new HashMap<>());
+            CloseableHttpClient httpClient;
+            CloseableHttpResponse response;
+            if ("get".equalsIgnoreCase(method)) {
+                HttpGet request = new HttpGet(uriBuilder.build());
+                headers.forEach((k, v) -> request.setHeader(k, v.toString()));
+                httpClient = createCloseableHttpClient();
+
+                RequestConfig config = RequestConfig.custom()
+                        .setProxy(proxy)
+                        .build();
+                request.setConfig(config);
+                response = httpClient.execute(request);
+            }
+            else if ("post".equalsIgnoreCase(method)) {
+                HttpPost request = new HttpPost(uriBuilder.build());
+                headers.forEach((k, v) -> request.setHeader(k, v.toString()));
+                httpClient = createCloseableHttpClient();
+                RequestConfig config = RequestConfig.custom()
+                        .setProxy(proxy)
+                        .build();
+                request.setConfig(config);
+                response = httpClient.execute(request);
+            }
+            else {
+                throw DataXException.asDataXException(
+                        HttpReaderErrorCode.ILLEGAL_VALUE, "不支持的请求模式: " + method
+                );
+            }
+            return response;
+        }
+
+        private CloseableHttpClient createCloseableHttpClient()
+        {
+            HttpClientBuilder httpClientBuilder = HttpClients.custom();
+
+            if (this.password != null) {
+                log.info("set authentication with user:{}", this.username);
+                httpClientBuilder = HttpClientBuilder.create();
+                // setup BasicAuth
+                CredentialsProvider provider = new BasicCredentialsProvider();
+                // Create the authentication scope
+                AuthScope scope = new AuthScope(AuthScope.ANY_HOST, AuthScope.ANY_PORT, AuthScope.ANY_REALM);
+                // Create credential pair
+                UsernamePasswordCredentials credentials = new UsernamePasswordCredentials(this.username, this.password);
+                // Inject the credentials
+                provider.setCredentials(scope, credentials);
+                // Set the default credentials provider
+                httpClientBuilder.setDefaultCredentialsProvider(provider);
+            }
+            httpClientBuilder.setSSLSocketFactory(ignoreSSLErrors());
+
+            return httpClientBuilder.build();
+        }
+
+        private SSLConnectionSocketFactory ignoreSSLErrors()
+        {
+            try {
+                // use the TrustSelfSignedStrategy to allow Self Signed Certificates
+                SSLContext sslContext = SSLContextBuilder
+                        .create()
+                        .loadTrustMaterial(new TrustSelfSignedStrategy())
+                        .build();
+
+                // we can optionally disable hostname verification.
+                // if you don't want to further weaken the security, you don't have to include this.
+                HostnameVerifier allowAllHosts = new NoopHostnameVerifier();
+
+                // create an SSL Socket Factory to use the SSLContext with the trust self signed certificate strategy
+                // and allow all hosts verifier.
+                return new SSLConnectionSocketFactory(sslContext, allowAllHosts);
+            }
+            catch (NoSuchAlgorithmException | KeyStoreException | KeyManagementException e) {
+                e.printStackTrace();
+                return null;
             }
         }
     }

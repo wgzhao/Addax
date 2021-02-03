@@ -22,6 +22,7 @@
                     <groupId>org.slf4j</groupId>
                 </exclusion>
             </exclusions>
+            <scope>compile</scope>
         </dependency>
 
         <dependency>
