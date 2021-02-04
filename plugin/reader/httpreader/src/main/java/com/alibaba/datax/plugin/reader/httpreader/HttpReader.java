@@ -31,8 +31,6 @@ import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.http.impl.client.HttpClients;
 import org.apache.http.ssl.SSLContextBuilder;
 import org.apache.http.util.EntityUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import javax.net.ssl.HostnameVerifier;
 import javax.net.ssl.SSLContext;
@@ -56,7 +54,6 @@ public class HttpReader
     public static class Job
             extends Reader.Job
     {
-        private static final Logger log = LoggerFactory.getLogger(Job.class);
         private Configuration originConfig = null;
 
         @Override
@@ -68,7 +65,7 @@ public class HttpReader
         @Override
         public void destroy()
         {
-
+            //
         }
 
         @Override
@@ -83,15 +80,12 @@ public class HttpReader
     public static class Task
             extends Reader.Task
     {
-        private static final Logger log = LoggerFactory.getLogger(Task.class);
         private Configuration readerSliceConfig = null;
-        private String url;
-        private URI fullUri;
         private URIBuilder uriBuilder;
         private HttpHost proxy;
         private String username;
         private String password;
-        private String token;
+        private String proxyAuth;
 
         @Override
         public void init()
@@ -99,7 +93,6 @@ public class HttpReader
             this.readerSliceConfig = this.getPluginJobConf();
             this.username = readerSliceConfig.getString(Key.USERNAME, null);
             this.password = readerSliceConfig.getString(Key.PASSWORD, null);
-            this.token = readerSliceConfig.getString(Key.TOKEN, null);
             Configuration conn =
                     readerSliceConfig.getListConfiguration(Key.CONNECTION).get(0);
             uriBuilder = new URIBuilder(URI.create(conn.getString(Key.URL)));
@@ -214,10 +207,10 @@ public class HttpReader
             }
         }
 
-
         private void createProxy(Configuration proxyConf)
         {
-            String host = proxyConf.getString(Key.ADDRESS);
+            String host = proxyConf.getString(Key.HOST);
+            this.proxyAuth = proxyConf.getString(Key.AUTH);
             if (host.startsWith("socks")) {
                 throw DataXException.asDataXException(
                         HttpReaderErrorCode.NOT_SUPPORT, "sockes 代理暂时不支持"
@@ -265,19 +258,32 @@ public class HttpReader
         private CloseableHttpClient createCloseableHttpClient()
         {
             HttpClientBuilder httpClientBuilder = HttpClients.custom();
-
+            CredentialsProvider provider = null;
             if (this.password != null) {
-                log.info("set authentication with user:{}", this.username);
                 httpClientBuilder = HttpClientBuilder.create();
                 // setup BasicAuth
-                CredentialsProvider provider = new BasicCredentialsProvider();
+                provider = new BasicCredentialsProvider();
                 // Create the authentication scope
-                AuthScope scope = new AuthScope(AuthScope.ANY_HOST, AuthScope.ANY_PORT, AuthScope.ANY_REALM);
+                HttpHost target = new HttpHost(uriBuilder.getHost(), uriBuilder.getPort());
+                AuthScope scope = new AuthScope(target);
                 // Create credential pair
                 UsernamePasswordCredentials credentials = new UsernamePasswordCredentials(this.username, this.password);
                 // Inject the credentials
                 provider.setCredentials(scope, credentials);
                 // Set the default credentials provider
+            }
+
+            if (this.proxyAuth != null) {
+                String[] up = this.proxyAuth.split(":");
+                provider = new BasicCredentialsProvider();
+                if (up.length == 1) {
+                    provider.setCredentials(new AuthScope(this.proxy), new UsernamePasswordCredentials(up[0], null));
+                }
+                if (up.length == 2) {
+                    provider.setCredentials(new AuthScope(this.proxy), new UsernamePasswordCredentials(up[0], up[1]));
+                }
+            }
+            if (provider != null) {
                 httpClientBuilder.setDefaultCredentialsProvider(provider);
             }
             httpClientBuilder.setSSLSocketFactory(ignoreSSLErrors());

@@ -173,7 +173,11 @@ HttpReader 插件实现了读取Restful API 数据的能力
           "parameter": {
             "connection": [
               {
-                "url": "http://127.0.0.1:9090/mock/17/LDJSC/ASSET"
+                "url": "http://127.0.0.1:9090/mock/17/LDJSC/ASSET",
+                "proxy": {
+                    "host": "http://127.0.0.1:3128",
+                    "auth": "user:pass"
+                }
               }
             ],
             "reqParams": {
@@ -182,7 +186,12 @@ HttpReader 插件实现了读取Restful API 数据的能力
             },
             "resultKey":"result",
             "method": "GET",
-            "column": ["CURR_DATE","DEPT","TOTAL_MANAGED_MARKET_VALUE","TOTAL_MANAGED_MARKET_VALUE_GROWTH"]
+            "column": ["CURR_DATE","DEPT","TOTAL_MANAGED_MARKET_VALUE","TOTAL_MANAGED_MARKET_VALUE_GROWTH"],
+            "username": "user",
+            "password": "passw0rd",
+            "headers": {
+                "X-Powered-by": "DataX"
+            }
           }
         },
         "writer": {
@@ -307,10 +316,30 @@ bin/datax.py job/httpreader2stream.json
 | resultKey |    否    |  string  |   无   | 要获取结果的那个key值，如果是获取整个返回值，则可以不用填写 |
 | method    |    否    |  string  |  get   | 请求模式，仅支持GET，POST两种，不区分大小写                 |
 | column    |    是    |   list   |   无   | 要获取的key，如果配置为 `"*"` ，则表示获取所有key的值       |
+| username  |    否    |   string |  无    | 接口请求需要的认证帐号（如有) |
+| password  |    否    |   string |  无    | 接口请求需要的密码（如有) |
+| proxy     |    否    |  map     | 无     | 代理地址,详见下面描述    |
+| headers   |    否    |  map     | 无     | 定制的请求头信息 |
+
+#### proxy
+
+如果访问的接口需要通过代理，则可以配置 `proxy` 配置项，该配置项是一个 json 字典，包含一个必选的 `host` 字段和一个可选的 `auth` 字段。
+
+```json
+{
+  "proxy": {
+    "host": "http://127.0.0.1:8080",
+    "auth": "user:pass"
+  }
+}
+```
+
+`host` 是代理地址，包含代理类型，目前仅支持 `http` 代理，其他类型比如 `socks5` 不支持。 如果代理需要认证，则可以配置  `auth` , 它由 用户名和密码组成，两者之间用冒号(:) 隔开。
 
 ### 限制说明
 
 1. 返回的结果必须是JSON类型
 2. 当前所有key的值均当作字符串类型
-3. 暂不支持接口认证和Token鉴权模式
+3. 暂不支持接口Token鉴权模式
 4. 暂不支持分页获取
+5. 代理仅支持 `http` 模式

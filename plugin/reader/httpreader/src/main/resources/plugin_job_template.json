@@ -5,7 +5,7 @@
       {
         "url": "",
         "proxy": {
-          "address": "socks5://127.0.0.1:8080",
+          "host": "socks5://127.0.0.1:8080",
           "auth": "username:password"
         }
       }
