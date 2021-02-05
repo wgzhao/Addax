@@ -4,6 +4,7 @@ import com.alibaba.datax.common.element.BoolColumn;
 import com.alibaba.datax.common.element.DateColumn;
 import com.alibaba.datax.common.element.DoubleColumn;
 import com.alibaba.datax.common.element.LongColumn;
+import com.alibaba.datax.common.element.Record;
 import com.alibaba.datax.common.element.StringColumn;
 import com.alibaba.datax.common.exception.DataXException;
 import com.alibaba.datax.common.plugin.RecordSender;
@@ -129,9 +130,16 @@ public class MongoDBReader
                 filter = new Document("$and", Arrays.asList(filter, queryFilter));
             }
             dbCursor = col.find(filter).iterator();
+            Document item;
+            if (mongodbColumnMeta.size() == 1 && mongodbColumnMeta.get(0) == "*" ) {
+                item = dbCursor.next();
+                mongodbColumnMeta = JSONArray.parseArray(item.toJson());
+                System.out.println(mongodbColumnMeta);
+            }
             while (dbCursor.hasNext()) {
-                Document item = dbCursor.next();
-                com.alibaba.datax.common.element.Record record = recordSender.createRecord();
+                item = dbCursor.next();
+                Record record = recordSender.createRecord();
+
                 for (Object o : mongodbColumnMeta) {
                     JSONObject column = (JSONObject) o;
                     Object tempCol = item.get(column.getString(KeyConstant.COLUMN_NAME));
@@ -219,6 +227,10 @@ public class MongoDBReader
 
             this.collection = readerSliceConfig.getString(KeyConstant.MONGO_COLLECTION_NAME);
             this.query = readerSliceConfig.getString(KeyConstant.MONGO_QUERY);
+            List<String> column = readerSliceConfig.getList(KeyConstant.MONGO_COLUMN, String.class);
+            if (column.size() == 1 && column.get(0) == "*") {
+                // get all columns from record
+            }
             this.mongodbColumnMeta = JSON.parseArray(readerSliceConfig.getString(KeyConstant.MONGO_COLUMN));
             this.lowerBound = readerSliceConfig.get(KeyConstant.LOWER_BOUND);
             this.upperBound = readerSliceConfig.get(KeyConstant.UPPER_BOUND);
