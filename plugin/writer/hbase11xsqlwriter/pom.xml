@@ -16,7 +16,6 @@
         <phoenix.version>4.14.3-HBase-1.4</phoenix.version>
         <commons-codec.version>1.15</commons-codec.version>
         <protobuf.version>2.5.0</protobuf.version>
-        <httpclient.version>4.5.2</httpclient.version>
     </properties>
 
     <dependencies>

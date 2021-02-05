@@ -11,9 +11,6 @@
     <name>influxdbreader</name>
     <packaging>jar</packaging>
 
-    <properties>
-        <influxdbClient.version>2.21</influxdbClient.version>
-    </properties>
     <dependencies>
         <dependency>
             <groupId>com.alibaba.datax</groupId>
