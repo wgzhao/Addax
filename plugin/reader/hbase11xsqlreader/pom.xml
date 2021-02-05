@@ -10,10 +10,6 @@
     <name>hbase11xsqlreader</name>
     <packaging>jar</packaging>
 
-    <properties>
-        <phoenix.version>4.14.3-HBase-1.4</phoenix.version>
-    </properties>
-
     <dependencies>
 
         <dependency>
@@ -37,7 +33,7 @@
         <dependency>
             <groupId>org.apache.phoenix</groupId>
             <artifactId>phoenix-core</artifactId>
-            <version>${phoenix.version}</version>
+            <version>${phoenix1.version}</version>
             <exclusions>
                 <exclusion>
                     <artifactId>servlet-api</artifactId>

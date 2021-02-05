@@ -19,17 +19,15 @@
     </scm>
 
     <properties>
+        <!-- basic components -->
         <commons.lang3.version>3.11</commons.lang3.version>
         <commons.configuration.version>1.10</commons.configuration.version>
         <commons.cli.version>1.4</commons.cli.version>
         <fastjson.version>1.2.75</fastjson.version>
-        <clickhouse.jdbc.version>0.2.4</clickhouse.jdbc.version>
         <guava.version>29.0-jre</guava.version>
         <groovy.version>2.4.21</groovy.version>
         <diamond.version>3.7.3</diamond.version>
-        <hadoop.version>3.2.0-9</hadoop.version>
-        <hive.version>3.1.2-1</hive.version>
-        <postgresql.jdbc.version>9.4.1207</postgresql.jdbc.version>
+        <httpclient.version>4.5.13</httpclient.version>
         <!--slf4j 1.7.28 和 logback.classic 1.2.3 是好基友 -->
         <slf4j.version>1.7.28</slf4j.version>
         <logback.version>1.2.3</logback.version>
@@ -40,6 +38,21 @@
         <swift.version>1.0.0</swift.version>
         <jackson.version>2.9.9</jackson.version>
         <mockito.version>2.0.2-beta</mockito.version>
+
+        <!-- jdbc driver version -->
+        <cassandra.jdbc.version>3.10.2</cassandra.jdbc.version>
+        <clickhouse.jdbc.version>0.2.5</clickhouse.jdbc.version>
+        <hive.version>3.1.2-1</hive.version>
+        <influxdbClient.version>2.21</influxdbClient.version>
+        <hadoop.version>3.2.0-9</hadoop.version>
+        <mongodb.jdbc.version>3.12.7</mongodb.jdbc.version>
+        <mysql.jdbc.version>8.0.16</mysql.jdbc.version>
+        <oracle.jdbc.version>19.7.0.0</oracle.jdbc.version>
+        <phoenix1.version>4.14.3-HBase-1.4</phoenix1.version>
+
+        <postgresql.jdbc.version>9.4.1207</postgresql.jdbc.version>
+
+        <!-- maven configuration -->
         <project.sourceEncoding>UTF-8</project.sourceEncoding>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
