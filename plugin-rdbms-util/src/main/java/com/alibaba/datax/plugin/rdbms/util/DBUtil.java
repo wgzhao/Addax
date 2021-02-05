@@ -43,12 +43,8 @@ public final class DBUtil
     {
     }
 
-    public static String chooseJdbcUrl(DataBaseType dataBaseType,
-            List<String> jdbcUrls, String username,
-            String password, List<String> preSql,
-            boolean checkSlave)
+    public static String chooseJdbcUrl(DataBaseType dataBaseType, List<String> jdbcUrls, String username,  String password, List<String> preSql, boolean checkSlave)
     {
-
         if (null == jdbcUrls || jdbcUrls.isEmpty()) {
             throw DataXException.asDataXException(
                     DBUtilErrorCode.CONF_ERROR,
@@ -88,11 +84,10 @@ public final class DBUtil
         }
     }
 
-    public static String chooseJdbcUrlWithoutRetry(final DataBaseType dataBaseType,
-            final List<String> jdbcUrls, final String username,
-            final String password, final List<String> preSql,
-            final boolean checkSlave)
-            throws DataXException
+    public static String chooseJdbcUrlWithoutRetry(DataBaseType dataBaseType,
+            List<String> jdbcUrls, String username,
+            String password, List<String> preSql,
+            boolean checkSlave)
     {
 
         if (null == jdbcUrls || jdbcUrls.isEmpty()) {
@@ -210,13 +205,13 @@ public final class DBUtil
                 String[] params = grantRecord.split("`");
                 if (params.length >= 3) {
                     String tableName = params[3];
-                    if (params[0].contains("INSERT") && !tableName.equals("*")) {
+                    if (params[0].contains("INSERT") && !"*".equals(tableName)) {
                         tableNames.remove(tableName);
                     }
                 }
                 else {
                     if (grantRecord.contains("INSERT") || grantRecord.contains("ALL PRIVILEGES")) {
-                        if (grantRecord.contains("*.*") || grantRecord.contains(dbPattern) ) {
+                        if (grantRecord.contains("*.*") || grantRecord.contains(dbPattern)) {
                             return true;
                         }
                     }
@@ -317,15 +312,15 @@ public final class DBUtil
      * <p/>
      * NOTE: In DataX, we don't need connection pool in fact
      */
-    public static Connection getConnection(final DataBaseType dataBaseType,
-            final String jdbcUrl, final String username, final String password)
+    public static Connection getConnection(DataBaseType dataBaseType,
+            String jdbcUrl, String username, String password)
     {
 
         return getConnection(dataBaseType, jdbcUrl, username, password, String.valueOf(Constant.SOCKET_TIMEOUT_INSECOND * 1000));
     }
 
-    public static Connection getConnection(final DataBaseType dataBaseType,
-            final String jdbcUrl, final String username, final String password, final String socketTimeout)
+    public static Connection getConnection(DataBaseType dataBaseType,
+            String jdbcUrl, String username, String password, String socketTimeout)
     {
 
         try {
@@ -346,15 +341,15 @@ public final class DBUtil
      * <p/>
      * NOTE: In DataX, we don't need connection pool in fact
      */
-    public static Connection getConnectionWithoutRetry(final DataBaseType dataBaseType,
-            final String jdbcUrl, final String username, final String password)
+    public static Connection getConnectionWithoutRetry(DataBaseType dataBaseType,
+            String jdbcUrl, String username, String password)
     {
         return getConnectionWithoutRetry(dataBaseType, jdbcUrl, username,
                 password, String.valueOf(Constant.SOCKET_TIMEOUT_INSECOND * 1000));
     }
 
-    public static Connection getConnectionWithoutRetry(final DataBaseType dataBaseType,
-            final String jdbcUrl, final String username, final String password, String socketTimeout)
+    public static Connection getConnectionWithoutRetry(DataBaseType dataBaseType,
+            String jdbcUrl, String username, String password, String socketTimeout)
     {
         return DBUtil.connect(dataBaseType, jdbcUrl, username,
                 password, socketTimeout);
@@ -438,7 +433,6 @@ public final class DBUtil
         stmt.setFetchSize(fetchSize);
         stmt.setQueryTimeout(queryTimeout);
         return query(stmt, sql);
-
     }
 
     /**
@@ -556,23 +550,6 @@ public final class DBUtil
      * @return Left:ColumnName Middle:ColumnType Right:ColumnTypeName
      */
     public static Triple<List<String>, List<Integer>, List<String>> getColumnMetaData(
-            DataBaseType dataBaseType, String jdbcUrl, String user,
-            String pass, String tableName, String column)
-    {
-        Connection conn = null;
-        try {
-            conn = getConnection(dataBaseType, jdbcUrl, user, pass);
-            return getColumnMetaData(conn, tableName, column);
-        }
-        finally {
-            DBUtil.closeDBResources(null, null, conn);
-        }
-    }
-
-    /**
-     * @return Left:ColumnName Middle:ColumnType Right:ColumnTypeName
-     */
-    public static Triple<List<String>, List<Integer>, List<String>> getColumnMetaData(
             Connection conn, String tableName, String column)
     {
         Statement statement = null;
@@ -656,7 +633,7 @@ public final class DBUtil
         return false;
     }
 
-    public static boolean isOracleMaster(final String url, final String user, final String pass)
+    public static boolean isOracleMaster(String url, String user, String pass)
     {
         try {
             return RetryUtil.executeWithRetry(() -> {
@@ -789,12 +766,12 @@ public final class DBUtil
      * @param resultSet resut set
      * @return boolean
      */
-    public static boolean asyncResultSetNext(final ResultSet resultSet)
+    public static boolean asyncResultSetNext(ResultSet resultSet)
     {
         return asyncResultSetNext(resultSet, 3600);
     }
 
-    public static boolean asyncResultSetNext(final ResultSet resultSet, int timeout)
+    public static boolean asyncResultSetNext(ResultSet resultSet, int timeout)
     {
         Future<Boolean> future = rsExecutors.get().submit(resultSet::next);
         try {
