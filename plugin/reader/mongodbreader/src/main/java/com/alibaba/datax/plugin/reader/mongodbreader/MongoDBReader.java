@@ -12,20 +12,22 @@ import com.alibaba.datax.common.spi.Reader;
 import com.alibaba.datax.common.util.Configuration;
 import com.alibaba.datax.plugin.reader.mongodbreader.util.CollectionSplitUtil;
 import com.alibaba.datax.plugin.reader.mongodbreader.util.MongoUtil;
-import com.alibaba.fastjson.JSON;
-import com.alibaba.fastjson.JSONArray;
-import com.alibaba.fastjson.JSONObject;
 import com.mongodb.MongoClient;
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoCursor;
 import com.mongodb.client.MongoDatabase;
 import org.bson.Document;
 import org.bson.types.ObjectId;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
+import java.sql.Array;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
+
+import static java.util.stream.Collectors.toList;
 
 /**
  * Created by jianying.wcj on 2015/3/19 0019.
@@ -81,6 +83,7 @@ public class MongoDBReader
     public static class Task
             extends Reader.Task
     {
+        private static final Logger LOG = LoggerFactory.getLogger(Task.class);
 
         private MongoClient mongoClient;
 
@@ -89,7 +92,7 @@ public class MongoDBReader
 
         private String query = null;
 
-        private JSONArray mongodbColumnMeta = null;
+        private List<String> mongodbColumn = null;
         private Object lowerBound = null;
         private Object upperBound = null;
         private boolean isObjectId = true;
@@ -99,13 +102,20 @@ public class MongoDBReader
             return obj == null || obj.isEmpty();
         }
 
+        private void setMongoColumn(MongoClient client, String db, String tbl)
+        {
+            Document item = client.getDatabase(db).getCollection(tbl).find().first();
+            assert item != null;
+            this.mongodbColumn = item.keySet().stream().filter(x -> !"_id".equals(x)).collect(toList());
+        }
+
         @Override
         public void startRead(RecordSender recordSender)
         {
 
             if (lowerBound == null || upperBound == null ||
                     mongoClient == null || database == null ||
-                    collection == null || mongodbColumnMeta == null) {
+                    collection == null || mongodbColumn == null) {
                 throw DataXException.asDataXException(MongoDBReaderErrorCode.ILLEGAL_VALUE,
                         MongoDBReaderErrorCode.ILLEGAL_VALUE.getDescription());
             }
@@ -129,81 +139,48 @@ public class MongoDBReader
                 Document queryFilter = Document.parse(query);
                 filter = new Document("$and", Arrays.asList(filter, queryFilter));
             }
+
+            LOG.info("column info {}", mongodbColumn);
+
             dbCursor = col.find(filter).iterator();
-            Document item;
-            if (mongodbColumnMeta.size() == 1 && mongodbColumnMeta.get(0) == "*" ) {
-                item = dbCursor.next();
-                mongodbColumnMeta = JSONArray.parseArray(item.toJson());
-                System.out.println(mongodbColumnMeta);
-            }
+
             while (dbCursor.hasNext()) {
-                item = dbCursor.next();
                 Record record = recordSender.createRecord();
-
-                for (Object o : mongodbColumnMeta) {
-                    JSONObject column = (JSONObject) o;
-                    Object tempCol = item.get(column.getString(KeyConstant.COLUMN_NAME));
+                Document item = dbCursor.next();
+                for (String field : mongodbColumn) {
+                    Object tempCol = item.get(field);
                     if (tempCol == null) {
-                        if (KeyConstant.isDocumentType(column.getString(KeyConstant.COLUMN_TYPE))) {
-                            String[] name = column.getString(KeyConstant.COLUMN_NAME).split("\\.");
-                            if (name.length > 1) {
-                                Object obj;
-                                Document nestedDocument = item;
-                                for (String str : name) {
-                                    obj = nestedDocument.get(str);
-                                    if (obj instanceof Document) {
-                                        nestedDocument = (Document) obj;
-                                    }
-                                }
-
-                                tempCol = nestedDocument.get(name[name.length - 1]);
-                            }
-                        }
-                    }
-                    if (tempCol == null) {
-                        //continue; 这个不能直接continue会导致record到目的端错位
                         record.addColumn(new StringColumn(null));
+                        continue;
                     }
-                    else if (tempCol instanceof Double) {
-                        record.addColumn(new DoubleColumn((Double) tempCol));
-                    }
-                    else if (tempCol instanceof Boolean) {
-                        record.addColumn(new BoolColumn((Boolean) tempCol));
-                    }
-                    else if (tempCol instanceof Date) {
-                        record.addColumn(new DateColumn((Date) tempCol));
-                    }
-                    else if (tempCol instanceof Integer) {
-                        record.addColumn(new LongColumn((Integer) tempCol));
-                    }
-                    else if (tempCol instanceof Long) {
-                        record.addColumn(new LongColumn((Long) tempCol));
-                    }
-                    else if (tempCol instanceof Document) {
-                        if (KeyConstant.isJsonType(column.getString(KeyConstant.COLUMN_TYPE))) {
+                    switch (tempCol.getClass().getSimpleName())
+                    {
+                        case "Boolean":
+                            record.addColumn(new BoolColumn((Boolean) tempCol));
+                            break;
+                        case "Integer":
+                            record.addColumn(new LongColumn((Integer) tempCol));
+                            break;
+                        case "Long":
+                            record.addColumn(new LongColumn((Long) tempCol));
+                            break;
+                        case "Double":
+                            record.addColumn(new DoubleColumn((Double) tempCol));
+                            break;
+                        case "Date":
+                            record.addColumn(new DateColumn((Date) tempCol));
+                            break;
+                        case "Document":
                             record.addColumn(new StringColumn(((Document) tempCol).toJson()));
-                        }
-                        else {
+                            break;
+                        case "ArrayList":
+                            ArrayList<String> array = (ArrayList<String>) tempCol;
+                            String tempArrayStr = "{" + String.join(",", array) + "}";
+                            record.addColumn(new StringColumn(tempArrayStr));
+                            break;
+                        default:
                             record.addColumn(new StringColumn(tempCol.toString()));
-                        }
-                    }
-                    else {
-                        if (KeyConstant.isArrayType(column.getString(KeyConstant.COLUMN_TYPE))) {
-                            String splitter = column.getString(KeyConstant.COLUMN_SPLITTER);
-                            if (isNullOrEmpty((splitter))) {
-                                throw DataXException.asDataXException(MongoDBReaderErrorCode.ILLEGAL_VALUE,
-                                        MongoDBReaderErrorCode.ILLEGAL_VALUE.getDescription());
-                            }
-                            else {
-                                ArrayList<String> array = (ArrayList) tempCol;
-                                //String tempArrayStr = Joiner.on(splitter).join(array)
-                                String tempArrayStr = String.join(splitter, array);
-                                record.addColumn(new StringColumn(tempArrayStr));
-                            }
-                        }
-                        else {
-                            record.addColumn(new StringColumn(tempCol.toString()));
-                        }
+                            break;
                     }
                 }
                 recordSender.sendToWriter(record);
@@ -227,11 +204,10 @@ public class MongoDBReader
 
             this.collection = readerSliceConfig.getString(KeyConstant.MONGO_COLLECTION_NAME);
             this.query = readerSliceConfig.getString(KeyConstant.MONGO_QUERY);
-            List<String> column = readerSliceConfig.getList(KeyConstant.MONGO_COLUMN, String.class);
-            if (column.size() == 1 && column.get(0) == "*") {
-                // get all columns from record
+            this.mongodbColumn = readerSliceConfig.getList(KeyConstant.MONGO_COLUMN, String.class);
+            if (mongodbColumn.size() == 1 && mongodbColumn.get(0).equals("*")) {
+                setMongoColumn(mongoClient, database, collection);
             }
-            this.mongodbColumnMeta = JSON.parseArray(readerSliceConfig.getString(KeyConstant.MONGO_COLUMN));
             this.lowerBound = readerSliceConfig.get(KeyConstant.LOWER_BOUND);
             this.upperBound = readerSliceConfig.get(KeyConstant.UPPER_BOUND);
             this.isObjectId = readerSliceConfig.getBool(KeyConstant.IS_OBJECTID);
