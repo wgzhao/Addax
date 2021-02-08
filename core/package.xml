@@ -81,7 +81,7 @@
             <fileMode>0644</fileMode>
                         <scope>runtime</scope>
             <excludes>
-                <exclude>com.alibaba.datax:datax-common</exclude>
+                <exclude>com.wgzhao.datax:datax-common</exclude>
             </excludes>
         </dependencySet>
     </dependencySets>

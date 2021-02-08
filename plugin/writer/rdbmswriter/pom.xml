@@ -5,7 +5,7 @@
 
     <parent>
         <artifactId>datax-all</artifactId>
-        <groupId>com.alibaba.datax</groupId>
+        <groupId>com.wgzhao.datax</groupId>
         <version>3.1.10-SNAPSHOT</version>
         <relativePath>../../../pom.xml</relativePath>
     </parent>
@@ -16,7 +16,7 @@
 
     <dependencies>
         <dependency>
-            <groupId>com.alibaba.datax</groupId>
+            <groupId>com.wgzhao.datax</groupId>
             <artifactId>datax-common</artifactId>
             <version>${project.version}</version>
             <exclusions>
@@ -28,7 +28,7 @@
         </dependency>
 
         <dependency>
-            <groupId>com.alibaba.datax</groupId>
+            <groupId>com.wgzhao.datax</groupId>
             <artifactId>plugin-rdbms-util</artifactId>
             <version>${project.version}</version>
         </dependency>

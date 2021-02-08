@@ -2,7 +2,7 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
-    <groupId>com.alibaba.datax</groupId>
+    <groupId>com.wgzhao.datax</groupId>
     <artifactId>datax-all</artifactId>
     <version>3.1.10-SNAPSHOT</version>
 
@@ -123,7 +123,7 @@
     <dependencyManagement>
         <dependencies>
             <dependency>
-                <groupId>com.alibaba.datax</groupId>
+                <groupId>com.wgzhao.datax</groupId>
                 <artifactId>datax-common</artifactId>
                 <version>${project.version}</version>
             </dependency>
@@ -169,7 +169,7 @@
                             <pomSectionPriorities>
                                 modelVersion,parent,groupId,artifactId,version,name,description,packaging,url,inceptionYear,licenses,scm,properties,modules
                             </pomSectionPriorities>
-                            <dependenciesGroupIdPriorities>com.alibaba, com.alibaba.datax
+                            <dependenciesGroupIdPriorities>com.alibaba, com.wgzhao.datax
                             </dependenciesGroupIdPriorities>
                             <dependenciesOrderBy>scope,groupId,artifactId</dependenciesOrderBy>
                             <dependenciesScopePriorities>compile,runtime,provided,test</dependenciesScopePriorities>

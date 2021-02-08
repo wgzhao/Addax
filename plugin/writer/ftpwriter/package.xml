@@ -30,7 +30,7 @@
             <outputDirectory>plugin/writer/${project.artifactId}/libs</outputDirectory>
             <scope>runtime</scope>
             <excludes>
-                <exclude>com.alibaba.datax:datax-common</exclude>
+                <exclude>com.wgzhao.datax:datax-common</exclude>
             </excludes>
         </dependencySet>
     </dependencySets>

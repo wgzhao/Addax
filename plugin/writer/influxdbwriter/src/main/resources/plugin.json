@@ -1,6 +1,6 @@
 {
   "name": "influxdbwriter",
-  "class": "com.alibaba.datax.plugin.writer.influxdbwriter.InfluxDBWriter",
+  "class": "com.wgzhao.datax.plugin.writer.influxdbwriter.InfluxDBWriter",
   "description": "writer data into InfluxDB table",
   "developer": "wgzhao"
 }
