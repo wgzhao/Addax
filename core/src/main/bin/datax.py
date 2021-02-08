@@ -1,42 +1,52 @@
 #!/usr/bin/env python
 from __future__ import print_function
-import sys
-import os
-import signal
-import subprocess
-import time
-import re
-import socket
-import json
-from optparse import OptionParser
-from optparse import OptionGroup
-from string import Template
+
 import codecs
+import json
+import os
 import platform
+import re
+import signal
+import socket
+import subprocess
+import sys
+import time
+from glob import glob
+from optparse import OptionGroup
+from optparse import OptionParser
+from string import Template
 
 
 def isWindows():
     return platform.system() == 'Windows'
 
 
+# extract version from lib/datax-core-<version>.jar package
+def get_version():
+    core_jar = glob("{}/lib/datax-core-*.jar".format(DATAX_HOME))[0]
+    if not core_jar:
+        return None
+    else:
+        return os.path.basename(core_jar)[11:-4]
+
+
 DATAX_HOME = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-DATAX_VERSION = 'DATAX-V3'
+DATAX_VERSION = 'DataX ' + get_version()
 
 if isWindows():
-    codecs.register(lambda name: name ==
-                    'cp65001' and codecs.lookup('utf-8') or None)
-    CLASS_PATH = ("%s/lib/*") % (DATAX_HOME)
+    codecs.register(
+        lambda name: name == 'cp65001' and codecs.lookup('utf-8') or None)
+    CLASS_PATH = "{}/lib/*".format(DATAX_HOME)
 else:
-    CLASS_PATH = ("%s/lib/*:.") % (DATAX_HOME)
-LOGBACK_FILE = ("%s/conf/logback.xml") % (DATAX_HOME)
-DEFAULT_JVM = "-Xms64m -Xmx2g -XX:+HeapDumpOnOutOfMemoryError -XX:HeapDumpPath=%s" % (
-    DATAX_HOME)
+    CLASS_PATH = "{}/lib/*:.".format(DATAX_HOME)
+LOGBACK_FILE = "{}/conf/logback.xml".format(DATAX_HOME)
+DEFAULT_JVM = "-Xms64m -Xmx2g -XX:+HeapDumpOnOutOfMemoryError -XX:HeapDumpPath={}".format(DATAX_HOME)
 DEFAULT_PROPERTY_CONF = "-Dfile.encoding=UTF-8 -Dlogback.statusListenerClass=ch.qos.logback.core.status.NopStatusListener \
                         -Djava.security.egd=file:///dev/urandom -Ddatax.home=%s -Dlogback.configurationFile=%s " % \
-    (DATAX_HOME, LOGBACK_FILE)
+                        (DATAX_HOME, LOGBACK_FILE)
 ENGINE_COMMAND = "java -server ${jvm} %s -classpath %s  ${params} com.alibaba.datax.core.Engine \
                 -mode ${mode} -jobid ${jobid} -job ${job}" % \
-    (DEFAULT_PROPERTY_CONF, "/etc/hbase/conf:" + CLASS_PATH)
+                 (DEFAULT_PROPERTY_CONF, "/etc/hbase/conf:" + CLASS_PATH)
 REMOTE_DEBUG_CONFIG = "-Xdebug -Xrunjdwp:transport=dt_socket,server=y,address=9999"
 
 RET_STATE = {
@@ -57,8 +67,7 @@ def getLocalIp():
 
 def suicide(signum, e):
     global child_process
-    print("[Error] DataX receive unexpected signal %d, starts to suicide." %
-          (signum))
+    print("[Error] DataX receive unexpected signal {}, starts to suicide.".format(signum))
 
     if child_process:
         child_process.send_signal(signal.SIGQUIT)
@@ -79,6 +88,7 @@ def register_signal():
 def getOptionParser():
     usage = "usage: %prog [options] job-url-or-path"
     parser = OptionParser(usage=usage)
+    parser.add_option("-v", "--version", action="store_true", help="Print version and exit")
 
     prodEnvOptionGroup = OptionGroup(parser, "Product Env Options",
                                      "Normal user use these options to set jvm parameters, job runtime mode etc. "
@@ -120,12 +130,11 @@ def getOptionParser():
 
 
 def generateJobConfigTemplate(reader, writer):
-    readerRef = "Please refer to the %s document:\n     https://github.com/wgzhao/DataX/blob/master/docs/%s.md \n" % (
-        reader, reader, reader)
-    writerRef = "Please refer to the %s document:\n     https://github.com/wgzhao/DataX/blob/master/docs/%s.md \n " % (
-        writer, writer, writer)
-    print(readerRef)
-    print(writerRef)
+    readerRef = "Please refer to the document:\n\thttps://datax.readthedocs.io/zh_CN/latest/reader/%s.html\n".format(
+        reader)
+    writerRef = "Please refer to the %s document:\n\thttps://datax.readthedocs.io/zh_CN/latest/writer/%s.html\n".format(
+        writer)
+    print(readerRef, writerRef)
     jobGuid = 'Please save the following configuration as a json file and  use\n     python {DATAX_HOME}/bin/datax.py {JSON_FILE_NAME}.json \nto run the job.\n'
     print(jobGuid)
     jobTemplate = {
@@ -147,6 +156,8 @@ def generateJobConfigTemplate(reader, writer):
         DATAX_HOME, reader)
     writerTemplatePath = "%s/plugin/writer/%s/plugin_job_template.json" % (
         DATAX_HOME, writer)
+    readerPar = None
+    writerPar = None
     try:
         readerPar = readPluginTemplate(readerTemplatePath)
     except Exception as e:
@@ -155,8 +166,8 @@ def generateJobConfigTemplate(reader, writer):
     try:
         writerPar = readPluginTemplate(writerTemplatePath)
     except Exception as e:
-        print("Read writer[%s] template error: : can\'t find file %s" % (
-            writer, writerTemplatePath))
+        print("Read writer[{}] template error: : can\'t find file {}: {}".format(
+            writer, writerTemplatePath, e))
     jobTemplate['job']['content'][0]['reader'] = readerPar
     jobTemplate['job']['content'][0]['writer'] = writerPar
     print(json.dumps(jobTemplate, indent=4, sort_keys=True))
@@ -191,7 +202,7 @@ def buildStartCommand(options, args):
 
     if options.loglevel:
         tempJVMCommand = tempJVMCommand + " " + \
-            ("-Dloglevel=%s" % (options.loglevel))
+                         ("-Dloglevel=%s" % (options.loglevel))
 
     if options.mode:
         commandMap["mode"] = options.mode
@@ -225,6 +236,10 @@ def buildStartCommand(options, args):
 if __name__ == "__main__":
     parser = getOptionParser()
     options, args = parser.parse_args(sys.argv[1:])
+    if options.version:
+        print(DATAX_VERSION)
+        sys.exit(0)
+
     if options.reader is not None and options.writer is not None:
         generateJobConfigTemplate(options.reader, options.writer)
         sys.exit(RET_STATE['OK'])
