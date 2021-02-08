@@ -11,7 +11,7 @@ import java.util.regex.Pattern;
  */
 public enum DataBaseType
 {
-    MySql("mysql", "com.mysql.jdbc.Driver"),
+    MySql("mysql", "com.mysql.cj.jdbc.Driver"),
     Hive("hive2", "org.apache.hive.jdbc.HiveDriver"),
     Oracle("oracle", "oracle.jdbc.OracleDriver"),
     Presto("presto", "io.prestosql.jdbc.PrestoDriver"),
@@ -21,12 +21,13 @@ public enum DataBaseType
     RDBMS("rdbms", "com.alibaba.datax.plugin.rdbms.util.DataBaseType"),
     DB2("db2", "com.ibm.db2.jcc.DB2Driver"),
     Inceptor2("inceptor2", "org.apache.hive.jdbc.HiveDriver"),
-    InfluxDB("influxdb","org.influxdb.influxdb-java"),
-    Impala("impala", "com.cloudera.impala.jdbc41.Driver");
+    InfluxDB("influxdb", "org.influxdb.influxdb-java"),
+    Impala("impala", "com.cloudera.impala.jdbc41.Driver"),
+    Trino("trino", "io.trino.jdbc.TrinoDriver");
 
     private static final Pattern mysqlPattern = Pattern.compile("jdbc:mysql://(.+):\\d+/.+");
     private static final Pattern oraclePattern = Pattern.compile("jdbc:oracle:thin:@(.+):\\d+:.+");
-    private final String driverClassName;
+    private String driverClassName;
     private String typeName;
 
     DataBaseType(String typeName, String driverClassName)
@@ -58,67 +59,32 @@ public enum DataBaseType
 
     public String appendJDBCSuffixForReader(String jdbc)
     {
-        String result = jdbc;
-        String suffix;
-        switch (this) {
-            case MySql:
-                suffix = "yearIsDateType=false&zeroDateTimeBehavior=convertToNull&tinyInt1isBit=false&rewriteBatchedStatements=true";
-                if (jdbc.contains("?")) {
-                    result = jdbc + "&" + suffix;
-                }
-                else {
-                    result = jdbc + "?" + suffix;
-                }
-                break;
-            case Oracle:
-            case SQLServer:
-            case DB2:
-            case Hive:
-            case Impala:
-            case Presto:
-            case ClickHouse:
-            case PostgreSQL:
-            case RDBMS:
-            case InfluxDB:
-            case Inceptor2:
-                break;
-            default:
-                throw DataXException.asDataXException(DBUtilErrorCode.UNSUPPORTED_TYPE, "unsupported database type.");
+        if (this == MySql) {
+            String suffix;
+            suffix = "yearIsDateType=false&zeroDateTimeBehavior=convertToNull&tinyInt1isBit=false&rewriteBatchedStatements=true";
+            if (jdbc.contains("?")) {
+                return jdbc + "&" + suffix;
+            }
+            else {
+                return jdbc + "?" + suffix;
+            }
         }
-
-        return result;
+        return jdbc;
     }
 
     public String appendJDBCSuffixForWriter(String jdbc)
     {
-        String result = jdbc;
-        String suffix;
-        switch (this) {
-            case MySql:
-                suffix = "yearIsDateType=false&zeroDateTimeBehavior=convertToNull&rewriteBatchedStatements=true&tinyInt1isBit=false";
-                if (jdbc.contains("?")) {
-                    result = jdbc + "&" + suffix;
-                }
-                else {
-                    result = jdbc + "?" + suffix;
-                }
-                break;
-            case Oracle:
-            case Hive:
-            case SQLServer:
-            case ClickHouse:
-            case Presto:
-            case DB2:
-            case PostgreSQL:
-            case RDBMS:
-            case InfluxDB:
-            case Inceptor2:
-                break;
-            default:
-                throw DataXException.asDataXException(DBUtilErrorCode.UNSUPPORTED_TYPE, "unsupported database type.");
+        if (this == MySql) {
+            String suffix;
+            suffix = "yearIsDateType=false&zeroDateTimeBehavior=convertToNull&rewriteBatchedStatements=true&tinyInt1isBit=false";
+            if (jdbc.contains("?")) {
+                return jdbc + "&" + suffix;
+            }
+            else {
+                return jdbc + "?" + suffix;
+            }
         }
-
-        return result;
+        return jdbc;
     }
 
     public String formatPk(String splitPk)
@@ -150,44 +116,27 @@ public enum DataBaseType
 
     public String quoteColumnName(String columnName)
     {
-        String result = columnName;
-
-        switch (this) {
-            case MySql:
-                result = "`" + columnName.replace("`", "``") + "`";
-                break;
-            case Oracle:
-            case DB2:
-            case PostgreSQL:
-                break;
-            case SQLServer:
-                result = "[" + columnName + "]";
-                break;
-            default:
-                throw DataXException.asDataXException(DBUtilErrorCode.UNSUPPORTED_TYPE, "unsupported database type");
+        if (this == MySql || this == Hive) {
+            return "`" + columnName.replace("`", "``") + "`";
         }
-
-        return result;
+        if (this == Presto || this == Trino || this == Oracle) {
+            return "\"" + columnName + "\"";
+        }
+        if (this == SQLServer) {
+            return "[" + columnName + "]";
+        }
+        return columnName;
     }
 
     public String quoteTableName(String tableName)
     {
-        String result = tableName;
-
-        switch (this) {
-            case MySql:
-                result = "`" + tableName.replace("`", "``") + "`";
-                break;
-            case Oracle:
-            case SQLServer:
-            case DB2:
-            case PostgreSQL:
-                break;
-            default:
-                throw DataXException.asDataXException(DBUtilErrorCode.UNSUPPORTED_TYPE, "unsupported database type");
+        if (this == MySql || this == Hive) {
+            return "`" + tableName.replace("`", "``") + "`";
         }
-
-        return result;
+        if (this == Presto || this == Trino || this == Oracle) {
+            return "\"" + tableName + "\"";
+        }
+        return tableName;
     }
 
     public String getTypeName()
@@ -198,5 +147,15 @@ public enum DataBaseType
     public void setTypeName(String typeName)
     {
         this.typeName = typeName;
+    }
+
+    public String getDriveClassName()
+    {
+        return driverClassName;
+    }
+
+    public void setDriverClassName(String driverClassName)
+    {
+        this.driverClassName = driverClassName;
     }
 }

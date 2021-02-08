@@ -21,8 +21,6 @@ import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Properties;
 import java.util.concurrent.ExecutorService;
@@ -43,7 +41,7 @@ public final class DBUtil
     {
     }
 
-    public static String chooseJdbcUrl(DataBaseType dataBaseType, List<String> jdbcUrls, String username,  String password, List<String> preSql, boolean checkSlave)
+    public static String chooseJdbcUrl(DataBaseType dataBaseType, List<String> jdbcUrls, String username, String password, List<String> preSql)
     {
         if (null == jdbcUrls || jdbcUrls.isEmpty()) {
             throw DataXException.asDataXException(
@@ -51,7 +49,6 @@ public final class DBUtil
                     String.format("您的jdbcUrl的配置信息有错, 因为jdbcUrl[%s]不能为空. 请检查您的配置并作出修改.",
                             StringUtils.join(jdbcUrls, ",")));
         }
-
         try {
             return RetryUtil.executeWithRetry(() -> {
                 boolean connOK;
@@ -59,22 +56,19 @@ public final class DBUtil
                     if (StringUtils.isNotBlank(url)) {
                         url = url.trim();
                         if (null != preSql && !preSql.isEmpty()) {
-                            connOK = testConnWithoutRetry(dataBaseType,
-                                    url, username, password, preSql);
+                            connOK = testConnWithoutRetry(dataBaseType, url, username, password, preSql);
                         }
                         else {
-                            connOK = testConnWithoutRetry(dataBaseType,
-                                    url, username, password, checkSlave);
+                            connOK = testConnWithoutRetry(dataBaseType, url, username, password);
                         }
                         if (connOK) {
                             return url;
                         }
                     }
                 }
-                throw new Exception("DataX无法连接对应的数据库，可能原因是：1) 配置的ip/port/database/jdbc错误，无法连接。2) 配置的username/password错误，鉴权失败。请和DBA确认该数据库的连接信息是否正确。");
-//                    throw new Exception(DBUtilErrorCode.JDBC_NULL.toString())
+                throw new Exception("DataX无法连接对应的数据库，可能原因是：1) 配置的ip/port/database/jdbc错误，无法连接。" +
+                        "2) 配置的username/password错误，鉴权失败。请和DBA确认该数据库的连接信息是否正确。");
             }, 3, 1000L, true);
-            //warn: 7 means 2 minutes
         }
         catch (Exception e) {
             throw DataXException.asDataXException(
@@ -86,10 +80,8 @@ public final class DBUtil
 
     public static String chooseJdbcUrlWithoutRetry(DataBaseType dataBaseType,
             List<String> jdbcUrls, String username,
-            String password, List<String> preSql,
-            boolean checkSlave)
+            String password, List<String> preSql)
     {
-
         if (null == jdbcUrls || jdbcUrls.isEmpty()) {
             throw DataXException.asDataXException(
                     DBUtilErrorCode.CONF_ERROR,
@@ -108,7 +100,7 @@ public final class DBUtil
                 else {
                     try {
                         connOK = testConnWithoutRetry(dataBaseType,
-                                url, username, password, checkSlave);
+                                url, username, password);
                     }
                     catch (Exception e) {
                         throw DataXException.asDataXException(
@@ -126,102 +118,6 @@ public final class DBUtil
                 DBUtilErrorCode.CONN_DB_ERROR,
                 String.format("数据库连接失败. 因为根据您配置的连接信息,无法从:%s 中找到可连接的jdbcUrl. 请检查您的配置并作出修改.",
                         StringUtils.join(jdbcUrls, ",")));
-    }
-
-    /**
-     * 检查slave的库中的数据是否已到凌晨00:00
-     * 如果slave同步的数据还未到00:00返回false
-     * 否则范围true
-     *
-     * @author ZiChi
-     */
-    private static boolean isSlaveBehind(Connection conn)
-    {
-        try {
-            ResultSet rs = query(conn, "SHOW VARIABLES LIKE 'read_only'");
-            if (DBUtil.asyncResultSetNext(rs)) {
-                String readOnly = rs.getString("Value");
-                if ("ON".equalsIgnoreCase(readOnly)) { //备库
-                    ResultSet rs1 = query(conn, "SHOW SLAVE STATUS");
-                    if (DBUtil.asyncResultSetNext(rs1)) {
-                        String ioRunning = rs1.getString("Slave_IO_Running");
-                        String sqlRunning = rs1.getString("Slave_SQL_Running");
-                        long secondsBehindMaster = rs1.getLong("Seconds_Behind_Master");
-                        if ("Yes".equalsIgnoreCase(ioRunning) && "Yes".equalsIgnoreCase(sqlRunning)) {
-                            ResultSet rs2 = query(conn, "SELECT TIMESTAMPDIFF(SECOND, CURDATE(), NOW())");
-                            DBUtil.asyncResultSetNext(rs2);
-                            long secondsOfDay = rs2.getLong(1);
-                            return secondsBehindMaster > secondsOfDay;
-                        }
-                        else {
-                            return true;
-                        }
-                    }
-                    else {
-                        LOG.warn("SHOW SLAVE STATUS has no result");
-                    }
-                }
-            }
-            else {
-                LOG.warn("SHOW VARIABLES like 'read_only' has no result");
-            }
-        }
-        catch (Exception e) {
-            LOG.warn("checkSlave failed, errorMessage:[{}].", e.getMessage());
-        }
-        return false;
-    }
-
-    /**
-     * 检查表是否具有insert 权限
-     * insert on *.* 或者 insert on database.* 时验证通过
-     * 当insert on database.tableName时，确保tableList中的所有table有insert 权限，验证通过
-     * 其它验证都不通过
-     *
-     * @author ZiChi
-     */
-    public static boolean hasInsertPrivilege(DataBaseType dataBaseType, String jdbcURL, String userName, String password, List<String> tableList)
-    {
-        /*准备参数*/
-
-        String[] urls = jdbcURL.split("/");
-        String dbName;
-        if (urls.length != 0) {
-            dbName = urls[3];
-        }
-        else {
-            return false;
-        }
-
-        String dbPattern = "`" + dbName + "`.*";
-        Collection<String> tableNames = new HashSet<>(tableList.size());
-        tableNames.addAll(tableList);
-
-        Connection connection = connect(dataBaseType, jdbcURL, userName, password);
-        try {
-            ResultSet rs = query(connection, "SHOW GRANTS FOR " + userName);
-            while (DBUtil.asyncResultSetNext(rs)) {
-                String grantRecord = rs.getString("Grants for " + userName + "@%");
-                String[] params = grantRecord.split("`");
-                if (params.length >= 3) {
-                    String tableName = params[3];
-                    if (params[0].contains("INSERT") && !"*".equals(tableName)) {
-                        tableNames.remove(tableName);
-                    }
-                }
-                else {
-                    if (grantRecord.contains("INSERT") || grantRecord.contains("ALL PRIVILEGES")) {
-                        if (grantRecord.contains("*.*") || grantRecord.contains(dbPattern)) {
-                            return true;
-                        }
-                    }
-                }
-            }
-        }
-        catch (Exception e) {
-            LOG.warn("Check the database has the Insert Privilege failed, errorMessage:[{}]", e.getMessage());
-        }
-        return tableNames.isEmpty();
     }
 
     public static boolean checkInsertPrivilege(DataBaseType dataBaseType, String jdbcURL, String userName, String password, List<String> tableList)
@@ -585,21 +481,15 @@ public final class DBUtil
     }
 
     public static boolean testConnWithoutRetry(DataBaseType dataBaseType,
-            String url, String user, String pass, boolean checkSlave)
+            String url, String user, String pass)
     {
         Connection connection = null;
         try {
             connection = connect(dataBaseType, url, user, pass);
-            if (dataBaseType == DataBaseType.MySql && checkSlave) {
-                //dataBaseType.MySql
-                return !isSlaveBehind(connection);
-            }
-            else {
-                return true;
-            }
+            return true;
         }
         catch (Exception e) {
-            LOG.warn("test connection of [{}] failed, for {}.", url,
+            LOG.error("test connection of [{}] failed, for {}.", url,
                     e.getMessage());
         }
         finally {
@@ -631,32 +521,6 @@ public final class DBUtil
         }
 
         return false;
-    }
-
-    public static boolean isOracleMaster(String url, String user, String pass)
-    {
-        try {
-            return RetryUtil.executeWithRetry(() -> {
-                Connection conn = null;
-                try {
-                    conn = connect(DataBaseType.Oracle, url, user, pass);
-                    ResultSet rs = query(conn, "select DATABASE_ROLE from V$DATABASE");
-                    if (DBUtil.asyncResultSetNext(rs, 5)) {
-                        String role = rs.getString("DATABASE_ROLE");
-                        return "PRIMARY".equalsIgnoreCase(role);
-                    }
-                    throw DataXException.asDataXException(DBUtilErrorCode.RS_ASYNC_ERROR,
-                            String.format("select DATABASE_ROLE from V$DATABASE failed,请检查您的jdbcUrl:%s.", url));
-                }
-                finally {
-                    DBUtil.closeDBResources(null, conn);
-                }
-            }, 3, 1000L, true);
-        }
-        catch (Exception e) {
-            throw DataXException.asDataXException(DBUtilErrorCode.CONN_DB_ERROR,
-                    String.format("select DATABASE_ROLE from V$DATABASE failed, url: %s", url), e);
-        }
     }
 
     public static ResultSet query(Connection conn, String sql)
