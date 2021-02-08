@@ -18,8 +18,7 @@ import java.util.List;
 
 public final class OriginalConfPretreatmentUtil
 {
-    private static final Logger LOG = LoggerFactory
-            .getLogger(OriginalConfPretreatmentUtil.class);
+    private static final Logger LOG = LoggerFactory.getLogger(OriginalConfPretreatmentUtil.class);
 
     public static DataBaseType dataBaseType;
 
@@ -28,8 +27,7 @@ public final class OriginalConfPretreatmentUtil
     public static void doPretreatment(Configuration originalConfig)
     {
         // 检查 username 配置（必填）
-        originalConfig.getNecessaryValue(Key.USERNAME,
-                DBUtilErrorCode.REQUIRED_VALUE);
+        originalConfig.getNecessaryValue(Key.USERNAME, DBUtilErrorCode.REQUIRED_VALUE);
         /*
          * 有些数据库没有密码，因此密码不再作为必选项
          */
@@ -75,7 +73,6 @@ public final class OriginalConfPretreatmentUtil
     {
         String username = originalConfig.getString(Key.USERNAME);
         String password = originalConfig.getString(Key.PASSWORD);
-        boolean checkSlave = originalConfig.getBool(Key.CHECK_SLAVE, false);
         boolean isTableMode = originalConfig.getBool(Constant.IS_TABLE_MODE);
         boolean isPreCheck = originalConfig.getBool(Key.DRYRUN, false);
 
@@ -86,23 +83,23 @@ public final class OriginalConfPretreatmentUtil
         int tableNum = 0;
 
         for (int i = 0, len = conns.size(); i < len; i++) {
-            Configuration connConf = Configuration
-                    .from(conns.get(i).toString());
+            Configuration connConf = Configuration.from(conns.get(i).toString());
+            // 是否配置的定制的驱动名称
+            String driverClass = connConf.getString(Key.JDBC_DRIVER, null);
+            if (driverClass != null && ! driverClass.isEmpty()) {
+                LOG.warn("use specified driver class: {}", driverClass);
+                dataBaseType.setDriverClassName(driverClass);
+            }
+            connConf.getNecessaryValue(Key.JDBC_URL, DBUtilErrorCode.REQUIRED_VALUE);
 
-            connConf.getNecessaryValue(Key.JDBC_URL,
-                    DBUtilErrorCode.REQUIRED_VALUE);
-
-            List<String> jdbcUrls = connConf
-                    .getList(Key.JDBC_URL, String.class);
+            List<String> jdbcUrls = connConf.getList(Key.JDBC_URL, String.class);
 
             String jdbcUrl;
             if (isPreCheck) {
-                jdbcUrl = DBUtil.chooseJdbcUrlWithoutRetry(dataBaseType, jdbcUrls,
-                        username, password, preSql, checkSlave);
+                jdbcUrl = DBUtil.chooseJdbcUrlWithoutRetry(dataBaseType, jdbcUrls, username, password, preSql);
             }
             else {
-                jdbcUrl = DBUtil.chooseJdbcUrl(dataBaseType, jdbcUrls,
-                        username, password, preSql, checkSlave);
+                jdbcUrl = DBUtil.chooseJdbcUrl(dataBaseType, jdbcUrls, username, password, preSql);
             }
 
             jdbcUrl = dataBaseType.appendJDBCSuffixForReader(jdbcUrl);

@@ -7,6 +7,8 @@ public final class Key
 {
 
     public static final String JDBC_URL = "jdbcUrl";
+    // 自定义的驱动名字
+    public static final String JDBC_DRIVER = "driver";
     public static final String USERNAME = "username";
 
     public static final String PASSWORD = "password";
