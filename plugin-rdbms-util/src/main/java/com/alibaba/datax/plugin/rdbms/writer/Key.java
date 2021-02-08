@@ -32,6 +32,8 @@ public final class Key
     public static final String EMPTY_AS_NULL = "emptyAsNull";
 
     public static final String DRYRUN = "dryRun";
+    // 允许自定义驱动类名
+    public static final String JDBC_DRIVER = "driver";
 
     private Key() {}
 }

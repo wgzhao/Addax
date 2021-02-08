@@ -68,7 +68,12 @@ public final class OriginalConfPretreatmentUtil
 
         for (int i = 0, len = connections.size(); i < len; i++) {
             Configuration connConf = Configuration.from(connections.get(i).toString());
-
+            // 是否配置的定制的驱动名称
+            String driverClass = connConf.getString(Key.JDBC_DRIVER, null);
+            if (driverClass != null && ! driverClass.isEmpty()) {
+                LOG.warn("use specified driver class: {}", driverClass);
+                dataBaseType.setDriverClassName(driverClass);
+            }
             String jdbcUrl = connConf.getString(Key.JDBC_URL);
             if (StringUtils.isBlank(jdbcUrl)) {
                 throw DataXException.asDataXException(DBUtilErrorCode.REQUIRED_VALUE, "您未配置的写入数据库表的 jdbcUrl.");
