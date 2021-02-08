@@ -10,6 +10,8 @@ import com.alibaba.datax.plugin.rdbms.util.DataBaseType;
 
 import java.util.List;
 
+import static com.alibaba.datax.plugin.rdbms.reader.Constant.FETCH_SIZE;
+
 public class RdbmsReader
         extends Reader
 {
@@ -26,9 +28,7 @@ public class RdbmsReader
         public void init()
         {
             this.originalConfig = getPluginJobConf();
-            int fetchSize = this.originalConfig.getInt(
-                    com.alibaba.datax.plugin.rdbms.reader.Constant.FETCH_SIZE,
-                    Constant.DEFAULT_FETCH_SIZE);
+            int fetchSize = this.originalConfig.getInt(FETCH_SIZE, Constant.DEFAULT_FETCH_SIZE);
             if (fetchSize < 1) {
                 throw DataXException
                         .asDataXException(
@@ -37,12 +37,9 @@ public class RdbmsReader
                                         "您配置的fetchSize有误，根据DataX的设计，fetchSize : [%d] 设置值不能小于 1.",
                                         fetchSize));
             }
-            this.originalConfig.set(
-                    com.alibaba.datax.plugin.rdbms.reader.Constant.FETCH_SIZE,
-                    fetchSize);
+            this.originalConfig.set(FETCH_SIZE, fetchSize);
 
-            this.commonRdbmsReaderMaster = new SubCommonRdbmsReader.Job(
-                    DATABASE_TYPE);
+            this.commonRdbmsReaderMaster = new SubCommonRdbmsReader.Job(DATABASE_TYPE);
             this.commonRdbmsReaderMaster.init(this.originalConfig);
         }
 

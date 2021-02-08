@@ -79,7 +79,10 @@
             <useProjectArtifact>false</useProjectArtifact>
             <outputDirectory>lib</outputDirectory>
             <fileMode>0644</fileMode>
-            <scope>runtime</scope>
+                        <scope>runtime</scope>
+            <excludes>
+                <exclude>com.alibaba.datax:datax-common</exclude>
+            </excludes>
         </dependencySet>
     </dependencySets>
 </assembly>
