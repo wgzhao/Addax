@@ -50,7 +50,7 @@
         <mysql.jdbc.version>8.0.16</mysql.jdbc.version>
         <oracle.jdbc.version>19.7.0.0</oracle.jdbc.version>
         <phoenix1.version>4.14.3-HBase-1.4</phoenix1.version>
-        <postgresql.jdbc.version>9.4.1207</postgresql.jdbc.version>
+        <postgresql.jdbc.version>42.2.18</postgresql.jdbc.version>
         <trino.jdbc.version>351</trino.jdbc.version>
 
         <!-- maven configuration -->
