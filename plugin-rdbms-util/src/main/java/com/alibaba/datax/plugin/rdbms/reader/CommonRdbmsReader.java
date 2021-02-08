@@ -21,7 +21,6 @@ import com.alibaba.datax.plugin.rdbms.util.DBUtil;
 import com.alibaba.datax.plugin.rdbms.util.DBUtilErrorCode;
 import com.alibaba.datax.plugin.rdbms.util.DataBaseType;
 import com.alibaba.datax.plugin.rdbms.util.RdbmsException;
-import com.google.common.collect.Lists;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -80,7 +79,7 @@ public class CommonRdbmsReader
                 PreCheckTask t = new PreCheckTask(username, password, connConf, dataBaseType, splitPK);
                 taskList.add(t);
             }
-            List<Future<Boolean>> results = Lists.newArrayList();
+            List<Future<Boolean>> results = new ArrayList<>();
             try {
                 results = exec.invokeAll(taskList);
             }
