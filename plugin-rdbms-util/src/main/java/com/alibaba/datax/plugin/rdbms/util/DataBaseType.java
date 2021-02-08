@@ -61,7 +61,11 @@ public enum DataBaseType
     {
         if (this == MySql) {
             String suffix;
-            suffix = "yearIsDateType=false&zeroDateTimeBehavior=convertToNull&tinyInt1isBit=false&rewriteBatchedStatements=true";
+            if ("com.mysql.jdbc.Driver".equals(this.driverClassName)) {
+                suffix = "yearIsDateType=false&zeroDateTimeBehavior=convertToNull&tinyInt1isBit=false&rewriteBatchedStatements=true";
+            } else {
+                suffix = "yearIsDateType=false&zeroDateTimeBehavior=CONVERT_TO_NULL&tinyInt1isBit=false&rewriteBatchedStatements=true";
+            }
             if (jdbc.contains("?")) {
                 return jdbc + "&" + suffix;
             }
@@ -76,7 +80,11 @@ public enum DataBaseType
     {
         if (this == MySql) {
             String suffix;
-            suffix = "yearIsDateType=false&zeroDateTimeBehavior=convertToNull&rewriteBatchedStatements=true&tinyInt1isBit=false";
+            if ("com.mysql.jdbc.Driver".equals(this.driverClassName)) {
+                suffix = "yearIsDateType=false&zeroDateTimeBehavior=convertToNull&rewriteBatchedStatements=true&tinyInt1isBit=false";
+            } else {
+                suffix = "yearIsDateType=false&zeroDateTimeBehavior=CONVERT_TO_NULL&rewriteBatchedStatements=true&tinyInt1isBit=false";
+            }
             if (jdbc.contains("?")) {
                 return jdbc + "&" + suffix;
             }
