@@ -7,7 +7,8 @@
     "connection": [
       {
         "jdbcUrl": [],
-        "table": []
+        "table": [],
+        "driver": ""
       }
     ],
     "where": ""
