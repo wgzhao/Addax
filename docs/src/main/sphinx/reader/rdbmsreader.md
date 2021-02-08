@@ -44,7 +44,8 @@ RDBMSReader 插件支持从传统 RDBMS 读取数据。这是一个通用关系�
                 ],
                 "jdbcUrl": [
                   "jdbc:presto://127.0.0.1:8080/hive"
-                ]
+                ],
+                "driver": ""
               }
             ],
             "fetchSize": 1024,
@@ -71,6 +72,7 @@ RDBMSReader 插件支持从传统 RDBMS 读取数据。这是一个通用关系�
 | 配置项          | 是否必须  | 数据类型 | 默认值 |         描述   |
 | :--------------| :------: | ------ |--------|------------- |
 | jdbcUrl         |    是    |  array    | 无     | 对端数据库的JDBC连接信息，jdbcUrl按照RDBMS官方规范，并可以填写连接附件控制信息 |
+| driver          |   否     |  string   | 无      | 自定义驱动类名，解决兼容性问题，详见下面描述 |
 | username        |    是    |  string     | 无     | 数据源的用户名 |
 | password        |    否    |  string     | 无     | 数据源指定用户名的密码 |
 | table           |    是    |  array     | 无     | 所选取的需要同步的表名,使用JSON数据格式，当配置为多张表时，用户自己需保证多张表是同一表结构 |
@@ -95,6 +97,11 @@ RDBMSReader 插件支持从传统 RDBMS 读取数据。这是一个通用关系�
 | MySQL | socks     | socksProxyHost,socksProxyPort | `socksProxyHost=192.168.1.101&socksProxyPort=1081` |
 | Presto | socks    | socksProxy   | `socksProxy=192.168.1.101:1081` |
 | Presto | http     | httpProxy   | `httpProxy=192.168.1.101:3128` |
+
+### driver 
+
+大部分情况下，一个数据库的JDBC驱动是固定的，但有些因为版本的不同，所建议的驱动类名不同，比如 MySQL。
+新的 MySQL JDBC 驱动类型推荐使用 `com.mysql.cj.jdbc.Driver` 而不是以前的 `com.mysql.jdbc.Drver`。如果想要使用就的驱动名称，则可以配置 `driver` 配置项。
 
 #### column
 
