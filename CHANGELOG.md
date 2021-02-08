@@ -1,5 +1,19 @@
 # Changelog
 
+## 3.1.10
+
+### General Changes
+
+* Remove unnecessary jar packages
+
+### RDBMS Reader
+
+* Allow specify jdbc driver class name ([\#164c](https://github.com/wgzhao/DataX/commit/164cdeae521e4be1f9eb441b6a00e26efea933e4))
+
+### RDBMS Writer
+
+* Allow specify jdbc driver class name ([\#164c](https://github.com/wgzhao/DataX/commit/164cdeae521e4be1f9eb441b6a00e26efea933e4))
+
 ## 3.1.9
 
 ### General Changes
