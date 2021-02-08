@@ -93,7 +93,7 @@ public final class ReaderSplitUtil
                     for (String table : tables) {
                         tempSlice = sliceConfig.clone();
                         tempSlice.set(Key.TABLE, table);
-                        String queryColumn = HintUtil.buildQueryColumn(jdbcUrl, table, column);
+                        String queryColumn = HintUtil.buildQueryColumn(table, column);
                         tempSlice.set(Key.QUERY_SQL, SingleTableSplitUtil.buildQuerySql(queryColumn, table, where));
                         splittedConfigs.add(tempSlice);
                     }
