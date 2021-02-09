@@ -6,20 +6,15 @@ import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.util.Date;
 
-/**
- * Created by jingxing on 14-8-24.
- * <p/>
- */
 public abstract class Column
 {
-
     private Type type;
 
     private Object rawData;
 
     private int byteSize;
 
-    public Column(final Object object, final Type type, int byteSize)
+    public Column(Object object, Type type, int byteSize)
     {
         this.rawData = object;
         this.type = type;

@@ -19,7 +19,7 @@ public final class ClassLoaderSwapper
         return new ClassLoaderSwapper();
     }
 
-    /**
+    /*
      * 保存当前classLoader，并将当前线程的classLoader设置为所给classLoader
      */
     public void setCurrentThreadClassLoader(ClassLoader classLoader)

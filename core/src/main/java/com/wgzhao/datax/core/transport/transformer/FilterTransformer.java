@@ -245,8 +245,11 @@ public class FilterTransformer
 
     /**
      * DateColumn将比较long值，StringColumn，ByteColumn以及BooleanColumn比较其String值
+     * @param record message record
+     * @param value value to compared
+     * @param column the column of record
+     * @return Record
      */
-
     private Record doEqual(Record record, String value, Column column)
     {
 
@@ -301,6 +304,11 @@ public class FilterTransformer
 
     /**
      * DateColumn将比较long值，StringColumn，ByteColumn以及BooleanColumn比较其String值
+     *
+     * @param record message record
+     * @param value value to compared
+     * @param column the column of record
+     * @return Record
      */
     private Record doNotEqual(Record record, String value, Column column)
     {

@@ -10,7 +10,9 @@ public final class ClassUtil
      *
      * @param className 反射的类名称
      * @param t 反射类的类型Class对象
+     * @param <T> class type
      * @param args 构造参数
+     * @return T
      */
     @SuppressWarnings({"rawtypes", "unchecked"})
     public static <T> T instantiate(String className, Class<T> t,

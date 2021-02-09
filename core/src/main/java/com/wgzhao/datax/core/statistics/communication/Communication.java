@@ -14,26 +14,22 @@ import java.util.concurrent.ConcurrentHashMap;
 public class Communication
         extends BaseObject
 {
-    /**
-     * task给job的信息 *
-     */
+
+    // task给job的信息
     Map<String, List<String>> message;
-    /**
-     * 所有的数值key-value对 *
-     */
+
+    // 所有的数值key-value对
+
     private Map<String, Number> counter;
     private Long jobId;
-    /**
-     * 运行状态 *
-     */
+
+    // 运行状态
     private State state;
-    /**
-     * 异常记录 *
-     */
+
+    // 异常记录
     private Throwable throwable;
-    /**
-     * 记录的timestamp *
-     */
+
+    // 记录的timestamp
     private long timestamp;
 
     public Communication()
@@ -255,8 +251,11 @@ public class Communication
     }
 
     /**
-     * 合并state，优先级： (Failed | Killed) > Running > Success
+     * 合并state，优先级： ( Failed | Killed )  &gt; Running &gt; Success
      * 这里不会出现 Killing 状态，killing 状态只在 Job 自身状态上才有.
+     *
+     * @param otherComm communication
+     * @return the communication state
      */
     public synchronized State mergeStateFrom(Communication otherComm)
     {

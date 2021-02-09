@@ -40,7 +40,7 @@ public class StorageWriterUtil
 
     }
 
-    /**
+    /*
      * check parameter: writeMode, encoding, compress, filedDelimiter
      */
     public static void validateParameter(Configuration writerConfiguration)
@@ -305,7 +305,7 @@ public class StorageWriterUtil
         // IOUtils.closeQuietly(unstructuredWriter);
     }
 
-    /**
+    /*
      * 异常表示脏数据
      */
     public static void transportOneRecord(Record record, String nullFormat,

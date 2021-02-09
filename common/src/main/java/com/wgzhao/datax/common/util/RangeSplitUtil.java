@@ -112,6 +112,11 @@ public final class RangeSplitUtil
 
     /**
      * 由于只支持 ascii 码对应字符，所以radix 范围为[1,128]
+     *
+     * @param aString ascii码
+     * @param radix 指数
+     *
+     * @return bigint
      */
     public static BigInteger stringToBigInteger(String aString, int radix)
     {
@@ -141,6 +146,11 @@ public final class RangeSplitUtil
 
     /**
      * 把BigInteger 转换为 String.注意：radix 和 basic 范围都为[1,128], radix + basic 的范围也必须在[1,128].
+     *
+     * @param bigInteger 要转的数
+     * @param radix  范围
+     *
+     * @return string
      */
     private static String bigIntegerToString(BigInteger bigInteger, int radix)
     {
@@ -183,6 +193,10 @@ public final class RangeSplitUtil
     /**
      * 获取字符串中的最小字符和最大字符（依据 ascii 进行判断）.要求字符串必须非空，并且为 ascii 字符串.
      * 返回的Pair，left=最小字符，right=最大字符.
+     *
+     * @param aString 字符串
+     *
+     * @return pair
      */
     public static Pair<Character, Character> getMinAndMaxCharacter(String aString)
     {

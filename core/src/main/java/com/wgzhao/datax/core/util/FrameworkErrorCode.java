@@ -58,7 +58,7 @@ public enum FrameworkErrorCode
                 this.description);
     }
 
-    /**
+    /*
      * 通过 "Framework-143" 来标示 任务是 Killed 状态
      */
     public int toExitValue()
