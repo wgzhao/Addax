@@ -59,7 +59,7 @@
                     <descriptors>
                         <descriptor>package.xml</descriptor>
                     </descriptors>
-                    <finalName>datax</finalName>
+                    <finalName>${project.artifactId}-${project.version}</finalName>
                 </configuration>
                 <executions>
                     <execution>
