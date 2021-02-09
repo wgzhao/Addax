@@ -58,7 +58,7 @@ public class BufferedRecordTransformerExchanger
             BufferedRecordTransformerExchanger.RECORD_CLASS = ((Class<? extends Record>) Class
                     .forName(configuration.getString(
                             CoreConstant.DATAX_CORE_TRANSPORT_RECORD_CLASS,
-                            "com.alibaba.datax.core.transport.record.DefaultRecord")));
+                            "com.wgzhao.datax.core.transport.record.DefaultRecord")));
         }
         catch (Exception e) {
             throw DataXException.asDataXException(

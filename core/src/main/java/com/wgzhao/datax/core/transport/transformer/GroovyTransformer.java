@@ -88,10 +88,10 @@ public class GroovyTransformer
                 }
             }
         }
-        sb.append("import static com.alibaba.datax.core.transport.transformer.GroovyTransformerStaticUtil.*;");
-        sb.append("import com.alibaba.datax.common.element.*;");
-        sb.append("import com.alibaba.datax.common.exception.DataXException;");
-        sb.append("import com.alibaba.datax.transformer.Transformer;");
+        sb.append("import static com.wgzhao.datax.core.transport.transformer.GroovyTransformerStaticUtil.*;");
+        sb.append("import com.wgzhao.datax.common.element.*;");
+        sb.append("import com.wgzhao.datax.common.exception.DataXException;");
+        sb.append("import com.wgzhao.datax.transformer.Transformer;");
         sb.append("import java.util.*;");
         sb.append("public class RULE extends Transformer").append("{");
         sb.append("public Record evaluate(Record record, Object... paras) {");

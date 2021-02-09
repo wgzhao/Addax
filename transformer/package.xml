@@ -21,7 +21,7 @@
         <dependencySet>
             <useProjectArtifact>false</useProjectArtifact>
             <outputDirectory>lib</outputDirectory>
-                        <scope>runtime</scope>
+            <scope>runtime</scope>
             <excludes>
                 <exclude>com.wgzhao.datax:datax-common</exclude>
             </excludes>

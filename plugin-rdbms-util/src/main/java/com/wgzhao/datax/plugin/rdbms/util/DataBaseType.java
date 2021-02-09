@@ -18,7 +18,7 @@ public enum DataBaseType
     ClickHouse("clickhouse", "ru.yandex.clickhouse.ClickHouseDriver"),
     SQLServer("sqlserver", "com.microsoft.sqlserver.jdbc.SQLServerDriver"),
     PostgreSQL("postgresql", "org.postgresql.Driver"),
-    RDBMS("rdbms", "com.alibaba.datax.plugin.rdbms.util.DataBaseType"),
+    RDBMS("rdbms", "com.wgzhao.datax.plugin.rdbms.util.DataBaseType"),
     DB2("db2", "com.ibm.db2.jcc.DB2Driver"),
     Inceptor2("inceptor2", "org.apache.hive.jdbc.HiveDriver"),
     InfluxDB("influxdb", "org.influxdb.influxdb-java"),
