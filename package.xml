@@ -34,7 +34,7 @@
         </fileSet>
         <!-- reader -->
         <fileSet>
-            <directory>plugin/reader/cassandrareader/target/datax/</directory>
+            <directory>plugin/reader/cassandrareader/target/cassandrareader-${project.version}/</directory>
             <includes>
                 <include>**/*.*</include>
             </includes>
@@ -42,7 +42,7 @@
             <outputDirectory>datax-${project.version}</outputDirectory>
         </fileSet>
         <fileSet>
-            <directory>plugin/reader/clickhousereader/target/datax/</directory>
+            <directory>plugin/reader/clickhousereader/target/clickhousereader-${project.version}/</directory>
             <includes>
                 <include>**/*.*</include>
             </includes>
@@ -50,7 +50,7 @@
             <outputDirectory>datax-${project.version}</outputDirectory>
         </fileSet>
         <fileSet>
-            <directory>plugin/reader/dbffilereader/target/datax/</directory>
+            <directory>plugin/reader/dbffilereader/target/dbffilereader-${project.version}/</directory>
             <includes>
                 <include>**/*.*</include>
             </includes>
@@ -58,7 +58,7 @@
             <outputDirectory>datax-${project.version}</outputDirectory>
         </fileSet>
         <fileSet>
-            <directory>plugin/reader/ftpreader/target/datax/</directory>
+            <directory>plugin/reader/ftpreader/target/ftpreader-${project.version}/</directory>
             <includes>
                 <include>**/*.*</include>
             </includes>
@@ -66,7 +66,7 @@
             <outputDirectory>datax-${project.version}</outputDirectory>
         </fileSet>
         <fileSet>
-            <directory>plugin/reader/influxdbreader/target/datax/</directory>
+            <directory>plugin/reader/influxdbreader/target/influxdbreader-${project.version}/</directory>
             <includes>
                 <include>**/*.*</include>
             </includes>
@@ -74,7 +74,7 @@
             <outputDirectory>datax-${project.version}</outputDirectory>
         </fileSet>
         <fileSet>
-            <directory>plugin/reader/hbase11xreader/target/datax/</directory>
+            <directory>plugin/reader/hbase11xreader/target/hbase11xreader-${project.version}/</directory>
             <includes>
                 <include>**/*.*</include>
             </includes>
@@ -82,7 +82,7 @@
             <outputDirectory>datax-${project.version}</outputDirectory>
         </fileSet>
         <fileSet>
-            <directory>plugin/reader/hbase11xsqlreader/target/datax/</directory>
+            <directory>plugin/reader/hbase11xsqlreader/target/hbase11xsqlreader-${project.version}/</directory>
             <includes>
                 <include>**/*.*</include>
             </includes>
@@ -90,7 +90,7 @@
             <outputDirectory>datax-${project.version}</outputDirectory>
         </fileSet>
         <fileSet>
-            <directory>plugin/reader/hbase20xreader/target/datax/</directory>
+            <directory>plugin/reader/hbase20xreader/target/hbase20xreader-${project.version}/</directory>
             <includes>
                 <include>**/*.*</include>
             </includes>
@@ -98,7 +98,7 @@
             <outputDirectory>datax-${project.version}</outputDirectory>
         </fileSet>
         <fileSet>
-            <directory>plugin/reader/hbase20xsqlreader/target/datax/</directory>
+            <directory>plugin/reader/hbase20xsqlreader/target/hbase20xsqlreader-${project.version}/</directory>
             <includes>
                 <include>**/*.*</include>
             </includes>
@@ -106,7 +106,7 @@
             <outputDirectory>datax-${project.version}</outputDirectory>
         </fileSet>
         <fileSet>
-            <directory>plugin/reader/hdfsreader/target/datax/</directory>
+            <directory>plugin/reader/hdfsreader/target/hdfsreader-${project.version}/</directory>
             <includes>
                 <include>**/*.*</include>
             </includes>
@@ -114,7 +114,7 @@
             <outputDirectory>datax-${project.version}</outputDirectory>
         </fileSet>
         <fileSet>
-            <directory>plugin/reader/hivereader/target/datax/</directory>
+            <directory>plugin/reader/hivereader/target/hivereader-${project.version}/</directory>
             <includes>
                 <include>**/*.*</include>
             </includes>
@@ -122,7 +122,7 @@
             <outputDirectory>datax-${project.version}</outputDirectory>
         </fileSet>
         <fileSet>
-            <directory>plugin/reader/jsonfilereader/target/datax/</directory>
+            <directory>plugin/reader/jsonfilereader/target/jsonfilereader-${project.version}/</directory>
             <includes>
                 <include>**/*.*</include>
             </includes>
@@ -130,7 +130,7 @@
             <outputDirectory>datax-${project.version}</outputDirectory>
         </fileSet>
         <fileSet>
-            <directory>plugin/reader/kudureader/target/datax/</directory>
+            <directory>plugin/reader/kudureader/target/kudureader-${project.version}/</directory>
             <includes>
                 <include>**/*.*</include>
             </includes>
@@ -138,7 +138,7 @@
             <outputDirectory>datax-${project.version}</outputDirectory>
         </fileSet>
         <fileSet>
-            <directory>plugin/reader/mongodbreader/target/datax/</directory>
+            <directory>plugin/reader/mongodbreader/target/mongodbreader-${project.version}/</directory>
             <includes>
                 <include>**/*.*</include>
             </includes>
@@ -146,7 +146,7 @@
             <outputDirectory>datax-${project.version}</outputDirectory>
         </fileSet>
         <fileSet>
-            <directory>plugin/reader/mysqlreader/target/datax/</directory>
+            <directory>plugin/reader/mysqlreader/target/mysqlreader-${project.version}/</directory>
             <includes>
                 <include>**/*.*</include>
             </includes>
@@ -154,7 +154,7 @@
             <outputDirectory>datax-${project.version}</outputDirectory>
         </fileSet>
         <fileSet>
-            <directory>plugin/reader/oraclereader/target/datax/</directory>
+            <directory>plugin/reader/oraclereader/target/oraclereader-${project.version}/</directory>
             <includes>
                 <include>**/*.*</include>
             </includes>
@@ -162,7 +162,7 @@
             <outputDirectory>datax-${project.version}</outputDirectory>
         </fileSet>
         <fileSet>
-            <directory>plugin/reader/postgresqlreader/target/datax/</directory>
+            <directory>plugin/reader/postgresqlreader/target/postgresqlreader-${project.version}/</directory>
             <includes>
                 <include>**/*.*</include>
             </includes>
@@ -170,7 +170,7 @@
             <outputDirectory>datax-${project.version}</outputDirectory>
         </fileSet>
         <fileSet>
-            <directory>plugin/reader/redisreader/target/datax/</directory>
+            <directory>plugin/reader/redisreader/target/redisreader-${project.version}/</directory>
             <includes>
                 <include>**/*.*</include>
             </includes>
@@ -178,7 +178,7 @@
             <outputDirectory>datax-${project.version}</outputDirectory>
         </fileSet>
         <fileSet>
-            <directory>plugin/reader/rdbmsreader/target/datax/</directory>
+            <directory>plugin/reader/rdbmsreader/target/rdbmsreader-${project.version}/</directory>
             <includes>
                 <include>**/*.*</include>
             </includes>
@@ -186,7 +186,7 @@
             <outputDirectory>datax-${project.version}</outputDirectory>
         </fileSet>
         <fileSet>
-            <directory>plugin/reader/sqlserverreader/target/datax/</directory>
+            <directory>plugin/reader/sqlserverreader/target/sqlserverreader-${project.version}/</directory>
             <includes>
                 <include>**/*.*</include>
             </includes>
@@ -194,7 +194,7 @@
             <outputDirectory>datax-${project.version}</outputDirectory>
         </fileSet>
         <fileSet>
-            <directory>plugin/reader/streamreader/target/datax/</directory>
+            <directory>plugin/reader/streamreader/target/streamreader-${project.version}/</directory>
             <includes>
                 <include>**/*.*</include>
             </includes>
@@ -202,7 +202,7 @@
             <outputDirectory>datax-${project.version}</outputDirectory>
         </fileSet>
         <fileSet>
-            <directory>plugin/reader/txtfilereader/target/datax/</directory>
+            <directory>plugin/reader/txtfilereader/target/txtfilereader-${project.version}/</directory>
             <includes>
                 <include>**/*.*</include>
             </includes>
@@ -212,7 +212,7 @@
 
         <!-- writer -->
         <fileSet>
-            <directory>plugin/writer/cassandrawriter/target/datax/</directory>
+            <directory>plugin/writer/cassandrawriter/target/cassandrawriter-${project.version}/</directory>
             <includes>
                 <include>**/*.*</include>
             </includes>
@@ -220,7 +220,7 @@
             <outputDirectory>datax-${project.version}</outputDirectory>
         </fileSet>
         <fileSet>
-            <directory>plugin/writer/clickhousewriter/target/datax/</directory>
+            <directory>plugin/writer/clickhousewriter/target/clickhousewriter-${project.version}/</directory>
             <includes>
                 <include>**/*.*</include>
             </includes>
@@ -228,7 +228,7 @@
             <outputDirectory>datax-${project.version}</outputDirectory>
         </fileSet>
         <fileSet>
-            <directory>plugin/writer/dbffilewriter/target/datax/</directory>
+            <directory>plugin/writer/dbffilewriter/target/dbffilewriter-${project.version}/</directory>
             <includes>
                 <include>**/*.*</include>
             </includes>
@@ -236,7 +236,7 @@
             <outputDirectory>datax-${project.version}</outputDirectory>
         </fileSet>
         <fileSet>
-            <directory>plugin/writer/elasticsearchwriter/target/datax/</directory>
+            <directory>plugin/writer/elasticsearchwriter/target/elasticsearchwriter-${project.version}/</directory>
             <includes>
                 <include>**/*.*</include>
             </includes>
@@ -244,7 +244,7 @@
             <outputDirectory>datax-${project.version}</outputDirectory>
         </fileSet>
         <fileSet>
-            <directory>plugin/writer/ftpwriter/target/datax/</directory>
+            <directory>plugin/writer/ftpwriter/target/ftpwriter-${project.version}/</directory>
             <includes>
                 <include>**/*.*</include>
             </includes>
@@ -252,7 +252,7 @@
             <outputDirectory>datax-${project.version}</outputDirectory>
         </fileSet>
         <fileSet>
-            <directory>plugin/writer/greenplumwriter/target/datax/</directory>
+            <directory>plugin/writer/greenplumwriter/target/greenplumwriter-${project.version}/</directory>
             <includes>
                 <include>**/*.*</include>
             </includes>
@@ -260,7 +260,7 @@
             <outputDirectory>datax-${project.version}</outputDirectory>
         </fileSet>
         <fileSet>
-            <directory>plugin/writer/hbase11xsqlwriter/target/datax/</directory>
+            <directory>plugin/writer/hbase11xsqlwriter/target/hbase11xsqlwriter-${project.version}/</directory>
             <includes>
                 <include>**/*.*</include>
             </includes>
@@ -268,7 +268,7 @@
             <outputDirectory>datax-${project.version}</outputDirectory>
         </fileSet>
         <fileSet>
-            <directory>plugin/writer/hbase11xwriter/target/datax/</directory>
+            <directory>plugin/writer/hbase11xwriter/target/hbase11xwriter-${project.version}/</directory>
             <includes>
                 <include>**/*.*</include>
             </includes>
@@ -276,7 +276,7 @@
             <outputDirectory>datax-${project.version}</outputDirectory>
         </fileSet>
         <fileSet>
-            <directory>plugin/writer/hbase20xsqlwriter/target/datax/</directory>
+            <directory>plugin/writer/hbase20xsqlwriter/target/hbase20xsqlwriter-${project.version}/</directory>
             <includes>
                 <include>**/*.*</include>
             </includes>
@@ -284,18 +284,7 @@
             <outputDirectory>datax-${project.version}</outputDirectory>
         </fileSet>
         <fileSet>
-            <directory>plugin/writer/hdfswriter/target/datax/</directory>
-            <includes>
-                <include>**/*.*</include>
-            </includes>
-            <excludes>
-                <exclude>**/datax-common*.jar</exclude>
-            </excludes>
-            <fileMode>0644</fileMode>
-            <outputDirectory>datax-${project.version}</outputDirectory>
-        </fileSet>
-        <fileSet>
-            <directory>plugin/writer/influxdbwriter/target/datax/</directory>
+            <directory>plugin/writer/hdfswriter/target/hdfswriter-${project.version}/</directory>
             <includes>
                 <include>**/*.*</include>
             </includes>
@@ -306,7 +295,7 @@
             <outputDirectory>datax-${project.version}</outputDirectory>
         </fileSet>
         <fileSet>
-            <directory>plugin/writer/kuduwriter/target/datax/</directory>
+            <directory>plugin/writer/influxdbwriter/target/influxdbwriter-${project.version}/</directory>
             <includes>
                 <include>**/*.*</include>
             </includes>
@@ -317,7 +306,18 @@
             <outputDirectory>datax-${project.version}</outputDirectory>
         </fileSet>
         <fileSet>
-            <directory>plugin/writer/mongodbwriter/target/datax/</directory>
+            <directory>plugin/writer/kuduwriter/target/kuduwriter-${project.version}/</directory>
+            <includes>
+                <include>**/*.*</include>
+            </includes>
+            <excludes>
+                <exclude>**/datax-common*.jar</exclude>
+            </excludes>
+            <fileMode>0644</fileMode>
+            <outputDirectory>datax-${project.version}</outputDirectory>
+        </fileSet>
+        <fileSet>
+            <directory>plugin/writer/mongodbwriter/target/mongodbwriter-${project.version}/</directory>
             <includes>
                 <include>**/*.*</include>
             </includes>
@@ -325,7 +325,7 @@
             <outputDirectory>datax-${project.version}</outputDirectory>
         </fileSet>
         <fileSet>
-            <directory>plugin/writer/mysqlwriter/target/datax/</directory>
+            <directory>plugin/writer/mysqlwriter/target/mysqlwriter-${project.version}/</directory>
             <includes>
                 <include>**/*.*</include>
             </includes>
@@ -333,7 +333,7 @@
             <outputDirectory>datax-${project.version}</outputDirectory>
         </fileSet>
         <fileSet>
-            <directory>plugin/writer/oraclewriter/target/datax/</directory>
+            <directory>plugin/writer/oraclewriter/target/oraclewriter-${project.version}/</directory>
             <includes>
                 <include>**/*.*</include>
             </includes>
@@ -341,7 +341,7 @@
             <outputDirectory>datax-${project.version}</outputDirectory>
         </fileSet>
         <fileSet>
-            <directory>plugin/writer/postgresqlwriter/target/datax/</directory>
+            <directory>plugin/writer/postgresqlwriter/target/postgresqlwriter-${project.version}/</directory>
             <includes>
                 <include>**/*.*</include>
             </includes>
@@ -349,7 +349,7 @@
             <outputDirectory>datax-${project.version}</outputDirectory>
         </fileSet>
         <fileSet>
-            <directory>plugin/writer/rdbmswriter/target/datax/</directory>
+            <directory>plugin/writer/rdbmswriter/target/rdbmswriter-${project.version}/</directory>
             <includes>
                 <include>**/*.*</include>
             </includes>
@@ -357,7 +357,7 @@
             <outputDirectory>datax-${project.version}</outputDirectory>
         </fileSet>
         <fileSet>
-            <directory>plugin/writer/rediswriter/target/datax/</directory>
+            <directory>plugin/writer/rediswriter/target/rediswriter-${project.version}/</directory>
             <includes>
                 <include>**/*.*</include>
             </includes>
@@ -365,7 +365,7 @@
             <outputDirectory>datax-${project.version}</outputDirectory>
         </fileSet>
         <fileSet>
-            <directory>plugin/writer/sqlserverwriter/target/datax/</directory>
+            <directory>plugin/writer/sqlserverwriter/target/sqlserverwriter-${project.version}/</directory>
             <includes>
                 <include>**/*.*</include>
             </includes>
@@ -373,7 +373,7 @@
             <outputDirectory>datax-${project.version}</outputDirectory>
         </fileSet>
         <fileSet>
-            <directory>plugin/writer/streamwriter/target/datax/</directory>
+            <directory>plugin/writer/streamwriter/target/streamwriter-${project.version}/</directory>
             <includes>
                 <include>**/*.*</include>
             </includes>
@@ -381,7 +381,7 @@
             <outputDirectory>datax-${project.version}</outputDirectory>
         </fileSet>
         <fileSet>
-            <directory>plugin/writer/txtfilewriter/target/datax/</directory>
+            <directory>plugin/writer/txtfilewriter/target/txtfilewriter-${project.version}/</directory>
             <includes>
                 <include>**/*.*</include>
             </includes>

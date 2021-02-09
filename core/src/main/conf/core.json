@@ -21,7 +21,7 @@
     },
     "transport": {
       "channel": {
-        "class": "com.alibaba.datax.core.transport.channel.memory.MemoryChannel",
+        "class": "com.wgzhao.datax.core.transport.channel.memory.MemoryChannel",
         "speed": {
           "byte": -1,
           "record": -1
@@ -31,7 +31,7 @@
         "byteCapacity": 67108864
       },
       "exchanger": {
-        "class": "com.alibaba.datax.core.plugin.BufferedRecordExchanger",
+        "class": "com.wgzhao.datax.core.plugin.BufferedRecordExchanger",
         "bufferSize": 32
       }
     },
@@ -50,7 +50,7 @@
     "statistics": {
       "collector": {
         "plugin": {
-          "taskClass": "com.alibaba.datax.core.statistics.plugin.task.StdoutPluginCollector",
+          "taskClass": "com.wgzhao.datax.core.statistics.plugin.task.StdoutPluginCollector",
           "maxDirtyNumber": 10
         }
       }

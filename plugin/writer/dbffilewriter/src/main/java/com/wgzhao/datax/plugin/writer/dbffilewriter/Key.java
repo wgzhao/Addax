@@ -1,0 +1,12 @@
+package com.wgzhao.datax.plugin.writer.dbffilewriter;
+
+/**
+ * Created by haiwei.luo on 14-9-17.
+ */
+public class Key
+{
+    private Key() {}
+
+    // must have
+    public static final String PATH = "path";
+}
