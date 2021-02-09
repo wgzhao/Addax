@@ -151,9 +151,9 @@ public class SomeReader
 ```json
 {
   "name": "mysqlwriter",
-  "class": "com.alibaba.datax.plugin.writer.mysqlwriter.MysqlWriter",
+  "class": "com.wgzhao.datax.plugin.writer.mysqlwriter.MysqlWriter",
   "description": "Use Jdbc connect to database, execute insert sql.",
-  "developer": "alibaba"
+  "developer": "wgzhao"
 }
 ```
 

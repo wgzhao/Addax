@@ -133,7 +133,7 @@
     </appender>
     -->
 
-    <!-- <logger name="com.alibaba.datax.common.statistics.PerfRecord"  level="INFO" additivity="false">
+    <!-- <logger name="PerfRecord"  level="INFO" additivity="false">
         <appender-ref ref="PERF" />
     </logger> -->
 

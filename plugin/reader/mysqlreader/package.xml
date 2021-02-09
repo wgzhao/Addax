@@ -4,7 +4,8 @@
         xsi:schemaLocation="http://maven.apache.org/plugins/maven-assembly-plugin/assembly/1.1.2 http://maven.apache.org/xsd/assembly-component-1.1.2.xsd">
     <id>release</id>
     <formats>
-        <format>dir</format>
+<!--        <format>dir</format>-->
+        <format>zip</format>
     </formats>
     <includeBaseDirectory>false</includeBaseDirectory>
     <fileSets>
@@ -30,7 +31,7 @@
             <outputDirectory>plugin/reader/${project.artifactId}/libs</outputDirectory>
             <scope>runtime</scope>
             <excludes>
-                <exclude>com.alibaba.datax:datax-common</exclude>
+                <exclude>com.wgzhao.datax:datax-common</exclude>
             </excludes>
         </dependencySet>
     </dependencySets>
