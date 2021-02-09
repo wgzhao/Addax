@@ -6,7 +6,9 @@ name: Maven Package
 on:
   release:
     types: [ created ]
-
+  push:
+    tags:
+      - *
 jobs:
   build:
 
@@ -28,3 +30,6 @@ jobs:
         run: mvn deploy -s $GITHUB_WORKSPACE/settings.xml
         env:
           GITHUB_TOKEN: ${{ github.token }}
+      - name: Publish to Nexus maven repo
+        run: mvn deploy -DrepositoryId=ossrh -Dusername=${{ ossrh_username }} -Dpassword=${{ ossrh_password }}
+
