@@ -46,9 +46,9 @@ import java.util.Map;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 
-/**
+/*
  * Created by jingxing on 14-8-24.
- * <p/>
+ * <p>
  * job实例运行在jobContainer容器中，它是所有任务的master，负责初始化、拆分、调度、运行、回收、监控和汇报
  * 但它并不做实际的数据同步操作
  */
@@ -86,7 +86,7 @@ public class JobContainer
         errorLimit = new ErrorRecordChecker(configuration);
     }
 
-    /**
+    /*
      * jobContainer主要负责的工作全部在start()里面，包括init、prepare、split、scheduler、
      * post以及destroy和statistics
      */
@@ -283,7 +283,7 @@ public class JobContainer
         classLoaderSwapper.restoreCurrentThreadClassLoader();
     }
 
-    /**
+    /*
      * reader和writer的初始化
      */
     private void init()
@@ -384,7 +384,7 @@ public class JobContainer
         classLoaderSwapper.restoreCurrentThreadClassLoader();
     }
 
-    /**
+    /*
      * 执行reader和writer最细粒度的切分，需要注意的是，writer的切分结果要参照reader的切分结果，
      * 达到切分后数目相等，才能满足1：1的通道模型，所以这里可以将reader和writer的配置整合到一起，
      * 然后，为避免顺序给读写端带来长尾影响，将整合的结果shuffler掉
@@ -490,7 +490,7 @@ public class JobContainer
                 "Job运行速度必须设置");
     }
 
-    /**
+    /*
      * schedule首先完成的工作是把上一步reader和writer split的结果整合到具体taskGroupContainer中,
      * 同时不同的执行模式调用不同的调度策略，将所有任务调度起来
      */
@@ -635,7 +635,7 @@ public class JobContainer
         }
     }
 
-    /**
+    /*
      * reader job的初始化，返回Reader.Job
      */
     private Reader.Job initJobReader(
@@ -664,7 +664,7 @@ public class JobContainer
         return jobReader;
     }
 
-    /**
+    /*
      * writer job的初始化，返回Writer.Job
      */
     private Writer.Job initJobWriter(
@@ -748,7 +748,7 @@ public class JobContainer
         return writerSlicesConfigs;
     }
 
-    /**
+    /*
      * 按顺序整合reader和writer的配置，这里的顺序不能乱！ 输入是reader、writer级别的配置，输出是一个完整task的配置
      */
     private List<Configuration> mergeReaderAndWriterTaskConfigs(

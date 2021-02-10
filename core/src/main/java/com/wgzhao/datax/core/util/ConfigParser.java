@@ -24,7 +24,7 @@ public final class ConfigParser
 
     private ConfigParser() {}
 
-    /**
+    /*
      * 指定Job配置路径，ConfigParser会解析Job、Plugin、Core全部信息，并以Configuration返回
      */
     public static Configuration parse(String jobPath)

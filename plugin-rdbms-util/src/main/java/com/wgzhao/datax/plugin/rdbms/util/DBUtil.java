@@ -203,9 +203,9 @@ public final class DBUtil
 
     /**
      * Get direct JDBC connection
-     * <p/>
+     * <p>
      * if connecting failed, try to connect for MAX_TRY_TIMES times
-     * <p/>
+     * <p>
      * NOTE: In DataX, we don't need connection pool in fact
      */
     public static Connection getConnection(DataBaseType dataBaseType,
@@ -232,9 +232,9 @@ public final class DBUtil
 
     /**
      * Get direct JDBC connection
-     * <p/>
+     * <p>
      * if connecting failed, try to connect for MAX_TRY_TIMES times
-     * <p/>
+     * <p>
      * NOTE: In DataX, we don't need connection pool in fact
      */
     public static Connection getConnectionWithoutRetry(DataBaseType dataBaseType,

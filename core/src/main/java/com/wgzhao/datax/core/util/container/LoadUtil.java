@@ -18,7 +18,7 @@ import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * Created by jingxing on 14-8-24.
- * <p/>
+ * <p>
  * 插件加载器，大体上分reader、transformer（还未实现）和writer三中插件类型，
  * reader和writer在执行时又可能出现Job和Task两种运行时（加载的类不同）
  */
@@ -26,7 +26,8 @@ public class LoadUtil
 {
     private static final String pluginTypeNameFormat = "plugin.%s.%s";
     private final static Map<Long, Configuration> configurationSet = new ConcurrentHashMap<>();
-    /**
+
+    /*
      * jarLoader的缓冲
      */
     private static final Map<String, JarLoader> jarLoaderCenter = new HashMap<>();
@@ -40,7 +41,7 @@ public class LoadUtil
         return configurationSet;
     }
 
-    /**
+    /*
      * 设置pluginConfigs，方便后面插件来获取
      */
     public static synchronized void bind(Configuration pluginConfigs)
@@ -83,7 +84,7 @@ public class LoadUtil
         return pluginConf;
     }
 
-    /**
+    /*
      * 加载JobPlugin，reader、writer都可能要加载
      */
     public static AbstractJobPlugin loadJobPlugin(PluginType pluginType,
@@ -106,7 +107,7 @@ public class LoadUtil
         }
     }
 
-    /**
+    /*
      * 加载taskPlugin，reader、writer都可能加载
      */
     public static AbstractTaskPlugin loadTaskPlugin(PluginType pluginType,
@@ -128,7 +129,7 @@ public class LoadUtil
         }
     }
 
-    /**
+    /*
      * 根据插件类型、名字和执行时taskGroupId加载对应运行器
      */
     public static AbstractRunner loadPluginRunner(PluginType pluginType, String pluginName, Long jobId)
@@ -149,7 +150,7 @@ public class LoadUtil
         }
     }
 
-    /**
+    /*
      * 反射出具体plugin实例
      */
     @SuppressWarnings("unchecked")

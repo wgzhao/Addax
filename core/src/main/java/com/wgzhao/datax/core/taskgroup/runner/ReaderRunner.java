@@ -10,7 +10,7 @@ import org.slf4j.LoggerFactory;
 
 /**
  * Created by jingxing on 14-9-1.
- * <p/>
+ * <p>
  * 单个slice的reader执行调用
  */
 public class ReaderRunner

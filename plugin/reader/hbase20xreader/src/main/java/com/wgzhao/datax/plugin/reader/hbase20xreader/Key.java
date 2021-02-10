@@ -9,22 +9,21 @@ public final class Key
 
     /**
      * mode 可以取 normal 或者 multiVersionFixedColumn 或者 multiVersionDynamicColumn 三个值，无默认值。
-     * <p/>
+     * <p>
      * normal 配合 column(Map 结构的)使用
      */
     public static final String MODE = "mode";
 
     /**
      * 配合 mode = multiVersion 时使用，指明需要读取的版本个数。无默认值
-     * -1 表示去读全部版本
-     * 不能为0，1
-     * >1 表示最多读取对应个数的版本数(不能超过 Integer 的最大值)
+     * <code>-1</code> 表示去读全部版本
+     * 不能为 <code>0,1</code>
+     * &gt; 1 表示最多读取对应个数的版本数(不能超过 Integer 的最大值)
      */
     public static final String MAX_VERSION = "maxVersion";
 
-    /**
-     * 默认为 utf8
-     */
+
+    // 默认为 utf8
     public static final String ENCODING = "encoding";
 
     public static final String COLUMN = "column";

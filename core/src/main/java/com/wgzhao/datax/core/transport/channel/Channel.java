@@ -14,7 +14,7 @@ import java.util.Collection;
 
 /**
  * Created by jingxing on 14-8-25.
- * <p/>
+ * <p>
  * 统计和限速都在这里
  */
 public abstract class Channel
