@@ -8,7 +8,7 @@ on:
     types: [ created ]
   push:
     tags:
-      - *
+      - '*'
 jobs:
   build:
 
