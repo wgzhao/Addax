@@ -27,15 +27,13 @@ public class HdfsReader
 
     /**
      * Job 中的方法仅执行一次，Task 中方法会由框架启动多个 Task 线程并行执行。
-     * <p/>
+     * <p>
      * 整个 Reader 执行流程是：
      * <pre>
-     * Job类init-->prepare-->split
-     *
-     * Task类init-->prepare-->startRead-->post-->destroy
-     * Task类init-->prepare-->startRead-->post-->destroy
-     *
-     * Job类post-->destroy
+     * Job类init--&gt;prepare--&gt;split
+     * Task类init--&gt;prepare--&gt;startRead--&gt;post--&gt;destroy
+     * Task类init--&gt;prepare--&gt;startRead--&gt;post--&gt;destroy
+     * Job类post--&gt;destroy
      * </pre>
      */
     public static class Job

@@ -28,41 +28,41 @@ public class DateColumn
      * 构建值为stamp(Unix时间戳)的DateColumn，使用Date子类型为DATETIME
      * 实际存储有date改为long的ms，节省存储
      */
-    public DateColumn(final Long stamp)
+    public DateColumn( Long stamp)
     {
         super(stamp, Column.Type.DATE, (null == stamp ? 0 : 8));
     }
 
-    /**
+    /*
      * 构建值为date(java.util.Date)的DateColumn，使用Date子类型为DATETIME
      */
-    public DateColumn(final Date date)
+    public DateColumn( Date date)
     {
         this(date == null ? null : date.getTime());
     }
 
-    /**
+    /*
      * 构建值为date(java.sql.Date)的DateColumn，使用Date子类型为DATE，只有日期，没有时间
      */
-    public DateColumn(final java.sql.Date date)
+    public DateColumn( java.sql.Date date)
     {
         this(date == null ? null : date.getTime());
         this.setSubType(DateType.DATE);
     }
 
-    /**
+    /*
      * 构建值为time(java.sql.Time)的DateColumn，使用Date子类型为TIME，只有时间，没有日期
      */
-    public DateColumn(final java.sql.Time time)
+    public DateColumn( java.sql.Time time)
     {
         this(time == null ? null : time.getTime());
         this.setSubType(DateType.TIME);
     }
 
-    /**
+    /*
      * 构建值为ts(java.sql.Timestamp)的DateColumn，使用Date子类型为DATETIME
      */
-    public DateColumn(final java.sql.Timestamp ts)
+    public DateColumn( java.sql.Timestamp ts)
     {
         this(ts == null ? null : ts.getTime());
         this.setSubType(DateType.DATETIME);

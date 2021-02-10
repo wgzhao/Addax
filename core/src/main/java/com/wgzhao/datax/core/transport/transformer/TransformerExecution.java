@@ -102,7 +102,7 @@ public class TransformerExecution
         return isChecked;
     }
 
-    /**
+    /*
      * 一些代理方法
      */
     public ClassLoader getClassLoader()

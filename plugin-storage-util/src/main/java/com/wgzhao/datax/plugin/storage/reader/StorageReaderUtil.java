@@ -687,10 +687,10 @@ public class StorageReaderUtil
     }
 
     /**
-     * @param regexPath
+     * 获取正则表达式目录的父目录
+     *
+     * @param regexPath path regex present
      * @return String
-     * @throws
-     * @Description: 获取正则表达式目录的父目录
      */
     public static String getRegexPathParent(String regexPath)
     {

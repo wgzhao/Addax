@@ -23,6 +23,11 @@ public final class JobAssignUtil
     /**
      * 公平的分配 task 到对应的 taskGroup 中。
      * 公平体现在：会考虑 task 中对资源负载作的 load 标识进行更均衡的作业分配操作。
+     *
+     * @param configuration configuration
+     * @param channelNumber  the number of channel
+     * @param channelsPerTaskGroup the channel of task group
+     * @return list of configuration
      */
     public static List<Configuration> assignFairly(Configuration configuration, int channelNumber, int channelsPerTaskGroup)
     {
@@ -84,7 +89,10 @@ public final class JobAssignUtil
 
     /**
      * 根据task 配置，获取到：
-     * 资源名称 --> taskId(List) 的 map 映射关系
+     * 资源名称到 taskId(List) 的 map 映射关系
+     *
+     * @param contentConfig configuration
+     * @return hashmap
      */
     private static LinkedHashMap<String, List<Integer>> parseAndGetResourceMarkAndTaskIdMap(List<Configuration> contentConfig)
     {
@@ -116,7 +124,7 @@ public final class JobAssignUtil
     }
 
     /**
-     * /**
+     *
      * 需要实现的效果通过例子来说是：
      * <pre>
      * a 库上有表：0, 1, 2
@@ -131,6 +139,11 @@ public final class JobAssignUtil
      * taskGroup-3: 1,  7
      *
      * </pre>
+     *
+     * @param resourceMarkAndTaskIdMap  resource map
+     * @param jobConfiguration  configuration
+     * @param taskGroupNumber the number of group
+     * @return list of configuration
      */
     private static List<Configuration> doAssign(LinkedHashMap<String, List<Integer>> resourceMarkAndTaskIdMap, Configuration jobConfiguration, int taskGroupNumber)
     {

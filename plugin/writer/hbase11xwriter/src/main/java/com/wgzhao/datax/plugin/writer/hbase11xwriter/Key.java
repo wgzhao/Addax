@@ -9,9 +9,9 @@ public final class Key
 
     /**
      * mode 可以取 normal 或者 multiVersionFixedColumn 或者 multiVersionDynamicColumn 三个值，无默认值。
-     * <p/>
+     * <p>
      * normal 配合 column(Map 结构的)使用
-     * <p/>
+     * <p>
      * multiVersion
      */
     public static final String MODE = "mode";

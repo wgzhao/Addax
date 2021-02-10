@@ -62,8 +62,8 @@ public class MongoUtil
     /**
      * 判断地址类型是否符合要求
      *
-     * @param addressList
-     * @return
+     * @param addressList list of object
+     * @return boolean
      */
     private static boolean isHostPortPattern(List<Object> addressList)
     {
@@ -80,7 +80,7 @@ public class MongoUtil
      * 转换为mongo地址协议
      *
      * @param rawAddressList raw address list
-     * @return List<ServerAddress>
+     * @return List of ServerAddress
      */
     private static List<ServerAddress> parseServerAddress(List<Object> rawAddressList)
             throws UnknownHostException

@@ -54,7 +54,7 @@ public abstract class FtpHelper
      * @param directoryPath 根目录
      * @param parentLevel 父目录的递归层数（首次为0）
      * @param maxTraversalLevel 允许的最大递归层数
-     * @return HashSet<String>
+     * @return HashSet of String
      */
     public abstract Set<String> getListFiles(String directoryPath, int parentLevel, int maxTraversalLevel);
 
@@ -72,7 +72,7 @@ public abstract class FtpHelper
      * @param srcPaths 路径列表
      * @param parentLevel 父目录的递归层数（首次为0）
      * @param maxTraversalLevel 允许的最大递归层数
-     * @return HashSet<String>
+     * @return HashSet of String
      */
     public Set<String> getAllFiles(List<String> srcPaths, int parentLevel, int maxTraversalLevel)
     {

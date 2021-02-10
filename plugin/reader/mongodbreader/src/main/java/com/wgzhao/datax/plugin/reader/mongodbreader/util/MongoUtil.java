@@ -86,7 +86,8 @@ public class MongoUtil
      * 转换为mongo地址协议
      *
      * @param rawAddressList raw address list
-     * @return List<ServerAddress>
+     * @return List of ServerAddress
+     * @throws UnknownHostException can not find host or ip address
      */
     private static List<ServerAddress> parseServerAddress(List<Object> rawAddressList)
             throws UnknownHostException

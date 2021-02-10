@@ -7,7 +7,7 @@ import java.util.regex.Pattern;
 
 /**
  * refer:http://blog.csdn.net/ring0hx/article/details/6152528
- * <p/>
+ * <p>
  */
 public enum DataBaseType
 {

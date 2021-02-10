@@ -23,11 +23,12 @@ public final class RetryUtil
      * 重试次数工具方法.
      *
      * @param callable 实际逻辑
-     * @param retryTimes 最大重试次数（>1）
+     * @param retryTimes 最大重试次数
      * @param sleepTimeInMilliSecond 运行失败后休眠对应时间再重试
      * @param exponential 休眠时间是否指数递增
      * @param <T> 返回值类型
      * @return 经过重试的callable的执行结果
+     * @throws Exception 运行异常
      */
     public static <T> T executeWithRetry(Callable<T> callable,
             int retryTimes,
@@ -43,12 +44,13 @@ public final class RetryUtil
      * 重试次数工具方法.
      *
      * @param callable 实际逻辑
-     * @param retryTimes 最大重试次数（>1）
+     * @param retryTimes 最大重试次数
      * @param sleepTimeInMilliSecond 运行失败后休眠对应时间再重试
      * @param exponential 休眠时间是否指数递增
      * @param <T> 返回值类型
      * @param retryExceptionClasss 出现指定的异常类型时才进行重试
      * @return 经过重试的callable的执行结果
+     * @throws Exception 运行异常
      */
     public static <T> T executeWithRetry(Callable<T> callable,
             int retryTimes,
@@ -64,17 +66,17 @@ public final class RetryUtil
     /**
      * 在外部线程执行并且重试。每次执行需要在timeoutMs内执行完，不然视为失败。
      * 执行异步操作的线程池从外部传入，线程池的共享粒度由外部控制。比如，HttpClientUtil共享一个线程池。
-     * <p/>
      * 限制条件：仅仅能够在阻塞的时候interrupt线程
      *
      * @param callable 实际逻辑
-     * @param retryTimes 最大重试次数（>1）
+     * @param retryTimes 最大重试次数
      * @param sleepTimeInMilliSecond 运行失败后休眠对应时间再重试
      * @param exponential 休眠时间是否指数递增
      * @param timeoutMs callable执行超时时间，毫秒
      * @param executor 执行异步操作的线程池
      * @param <T> 返回值类型
      * @return 经过重试的callable的执行结果
+     * @throws Exception 运行异常
      */
     public static <T> T asyncExecuteWithRetry(Callable<T> callable,
             int retryTimes,
@@ -162,6 +164,7 @@ public final class RetryUtil
                             Thread.sleep(timeToSleep);
                         }
                         catch (InterruptedException ignored) {
+                            // ignore interrupted exception
                         }
 
                         long realTimeSleep = System.currentTimeMillis() - startTime;
@@ -196,7 +199,6 @@ public final class RetryUtil
 
         /**
          * 使用传入的线程池异步执行任务，并且等待。
-         * <p/>
          * future.get()方法，等待指定的毫秒数。如果任务在超时时间内结束，则正常返回。
          * 如果抛异常（可能是执行超时、执行异常、被其他线程cancel或interrupt），都记录日志并且网上抛异常。
          * 正常和非正常的情况都会判断任务是否结束，如果没有结束，则cancel任务。cancel参数为true，表示即使
@@ -211,7 +213,6 @@ public final class RetryUtil
                 return future.get(timeoutMs, TimeUnit.MILLISECONDS);
             }
             catch (Exception e) {
-                LOG.warn("Try once failed", e);
                 throw e;
             }
             finally {

@@ -4,7 +4,7 @@ import java.math.BigDecimal;
 import java.math.RoundingMode;
 
 /**
- * @title 数学计算工具类
+ * 数学计算工具类
  * 提供常用的数值加减乘除计算 , 及多个数值的求和 , 平均值 , 最大最小值计算
  */
 public class MathUtil
@@ -285,6 +285,7 @@ public class MathUtil
     /**
      * 精确加法运算 , 计算多个数值总和 , 若其中有null值则忽略
      *
+     * @param v1 被加数
      * @param valList 被加数集合
      * @return 两个参数的和(BigDecimal)
      */
@@ -307,6 +308,7 @@ public class MathUtil
     /**
      * 精确加法运算 , 计算多个数值总和 , 若其中有null值则忽略
      *
+     * @param v1 要计算的值
      * @param valList 被加数集合
      * @return 两个参数的和(String)
      */

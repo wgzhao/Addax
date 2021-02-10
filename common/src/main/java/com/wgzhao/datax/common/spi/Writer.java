@@ -24,6 +24,8 @@ public abstract class Writer
          * 切分任务。<br>
          *
          * @param mandatoryNumber 为了做到Reader、Writer任务数对等，这里要求Writer插件必须按照源端的切分数进行切分。否则框架报错！
+         *
+         * @return list of configuration
          */
         public abstract List<Configuration> split(int mandatoryNumber);
     }

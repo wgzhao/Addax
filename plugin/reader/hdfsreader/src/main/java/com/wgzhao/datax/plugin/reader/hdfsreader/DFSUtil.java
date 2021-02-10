@@ -132,6 +132,7 @@ public class DFSUtil
      *
      * @param srcPaths 路径列表
      * @param specifiedFileType 指定文件类型
+     * @return set of string
      */
     public Set<String> getAllFiles(List<String> srcPaths, String specifiedFileType)
     {

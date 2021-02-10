@@ -81,7 +81,7 @@ public class PerfTrace
         return instance;
     }
 
-    /**
+    /*
      * 因为一个JVM只有一个，因此在getInstance(isJob,jobId,taskGroupId)调用完成实例化后，方便后续调用，直接返回该实例
      */
     public static synchronized PerfTrace getInstance()
