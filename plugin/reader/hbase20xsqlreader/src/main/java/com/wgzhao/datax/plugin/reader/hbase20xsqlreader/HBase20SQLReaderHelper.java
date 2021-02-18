@@ -151,6 +151,9 @@ public class HBase20SQLReaderHelper
 
     /**
      * 检查表名、列名和切分列是否存在
+     *
+     * @param schema phoenix schema
+     * @param tableName phoenix table name
      */
     public void checkTable(String schema, String tableName)
     {
@@ -238,6 +241,9 @@ public class HBase20SQLReaderHelper
 
     /**
      * 对表进行切分
+     *
+     * @param adviceNumber the advice number of split
+     * @return list of configuration
      */
     public List<Configuration> doSplit(int adviceNumber)
     {

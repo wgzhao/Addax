@@ -20,7 +20,7 @@ public class MongoUtil
     {
 
         List<Object> addressList = conf.getList(KeyConstant.MONGO_ADDRESS);
-        if (addressList == null || addressList.size() <= 0) {
+        if (addressList == null || addressList.isEmpty()) {
             throw DataXException.asDataXException(MongoDBWriterErrorCode.ILLEGAL_VALUE, "不合法参数");
         }
         try {
@@ -81,15 +81,16 @@ public class MongoUtil
      *
      * @param rawAddressList raw address list
      * @return List of ServerAddress
+     * @throws UnknownHostException host not reached
      */
     private static List<ServerAddress> parseServerAddress(List<Object> rawAddressList)
             throws UnknownHostException
     {
-        List<ServerAddress> addressList = new ArrayList<ServerAddress>();
+        List<ServerAddress> addressList = new ArrayList<>();
         for (Object address : rawAddressList) {
             String[] tempAddress = ((String) address).split(":");
             try {
-                ServerAddress sa = new ServerAddress(tempAddress[0], Integer.valueOf(tempAddress[1]));
+                ServerAddress sa = new ServerAddress(tempAddress[0], Integer.parseInt(tempAddress[1]));
                 addressList.add(sa);
             }
             catch (Exception e) {
@@ -97,17 +98,5 @@ public class MongoUtil
             }
         }
         return addressList;
-    }
-
-    public static void main(String[] args)
-    {
-        try {
-            ArrayList<Object> hostAddress = new ArrayList<>();
-            hostAddress.add("127.0.0.1:27017");
-            System.out.println(MongoUtil.isHostPortPattern(hostAddress));
-        }
-        catch (Exception e) {
-            e.printStackTrace();
-        }
     }
 }

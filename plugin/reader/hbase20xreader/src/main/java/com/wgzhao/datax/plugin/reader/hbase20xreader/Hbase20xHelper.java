@@ -202,7 +202,11 @@ public class Hbase20xHelper
     }
 
     /**
-     * 注意：convertUserStartRowkey 和 convertInnerStartRowkey，前者会受到 isBinaryRowkey 的影响，只用于第一次对用户配置的 String 类型的 rowkey 转为二进制时使用。而后者约定：切分时得到的二进制的 rowkey 回填到配置中时采用
+     * 注意：convertUserStartRowkey 和 convertInnerStartRowkey，前者会受到 isBinaryRowkey 的影响，
+     * 只用于第一次对用户配置的 String 类型的 rowkey 转为二进制时使用。而后者约定：切分时得到的二进制的 rowkey 回填到配置中时采用
+     *
+     * @param configuration configuration
+     * @return An array of byte, the rowkey start position
      */
     public static byte[] convertInnerStartRowkey(Configuration configuration)
     {
@@ -241,6 +245,9 @@ public class Hbase20xHelper
 
     /**
      * 用于解析 Normal 模式下的列配置
+     *
+     * @param column column
+     * @return list of hbase cell
      */
     public static List<HbaseColumnCell> parseColumnOfNormalMode(List<Map> column)
     {

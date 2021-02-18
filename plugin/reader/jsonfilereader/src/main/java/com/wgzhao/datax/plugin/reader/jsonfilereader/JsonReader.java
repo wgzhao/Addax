@@ -256,8 +256,7 @@ public class JsonReader
                 }
             }
             catch (SecurityException se) {
-                String message = String.format("您没有权限查看目录 : [%s]",
-                        parentDirectory);
+                String message = String.format("您没有权限查看目录 : [%s]", parentDirectory);
                 LOG.error(message);
                 throw DataXException.asDataXException(
                         JsonReaderErrorCode.SECURITY_NOT_ENOUGH, message);
@@ -274,9 +273,7 @@ public class JsonReader
             if (!directory.isDirectory()) {
                 if (this.isTargetFile(regexPath, directory.getAbsolutePath())) {
                     toBeReadFiles.add(parentDirectory);
-                    LOG.info(String.format(
-                            "add file [%s] as a candidate to be read.",
-                            parentDirectory));
+                    LOG.info("add file [{}] as a candidate to be read.", parentDirectory);
                 }
             }
             else {
@@ -316,16 +313,14 @@ public class JsonReader
         private boolean isTargetFile(String regexPath, String absoluteFilePath)
         {
             if (this.isRegexPath.get(regexPath)) {
-                return this.pattern.get(regexPath).matcher(absoluteFilePath)
-                        .matches();
+                return this.pattern.get(regexPath).matcher(absoluteFilePath).matches();
             }
             else {
                 return true;
             }
         }
 
-        private <T> List<List<T>> splitSourceFiles(final List<T> sourceList,
-                int adviceNumber)
+        private <T> List<List<T>> splitSourceFiles(List<T> sourceList, int adviceNumber)
         {
             List<List<T>> splitedList = new ArrayList<>();
             int averageLength = sourceList.size() / adviceNumber;

@@ -1,5 +1,6 @@
 package com.wgzhao.datax.plugin.reader.streamreader;
 
+import com.alibaba.fastjson.JSONObject;
 import com.wgzhao.datax.common.element.BoolColumn;
 import com.wgzhao.datax.common.element.BytesColumn;
 import com.wgzhao.datax.common.element.Column;
@@ -12,7 +13,6 @@ import com.wgzhao.datax.common.exception.DataXException;
 import com.wgzhao.datax.common.plugin.RecordSender;
 import com.wgzhao.datax.common.spi.Reader;
 import com.wgzhao.datax.common.util.Configuration;
-import com.alibaba.fastjson.JSONObject;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.apache.commons.lang3.RandomUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -192,13 +192,11 @@ public class StreamReader
                                 String.format("random混淆函数不合法[%s], 混淆函数random的参数不能为负数:%s, %s",
                                         columnMixup, param1, param2));
                     }
-                    if (!Type.BOOL.name().equalsIgnoreCase(typeName)) {
-                        if (param1Int > param2Int) {
-                            throw DataXException.asDataXException(
-                                    StreamReaderErrorCode.ILLEGAL_VALUE,
-                                    String.format("random混淆函数不合法[%s], 混淆函数random的参数需要第一个小于等于第二个:%s, %s",
-                                            columnMixup, param1, param2));
-                        }
+                    if (!Type.BOOL.name().equalsIgnoreCase(typeName) && param1Int > param2Int) {
+                        throw DataXException.asDataXException(
+                                StreamReaderErrorCode.ILLEGAL_VALUE,
+                                String.format("random混淆函数不合法[%s], 混淆函数random的参数需要第一个小于等于第二个:%s, %s",
+                                        columnMixup, param1, param2));
                     }
                     eachColumnConfig.set(Constant.MIXUP_FUNCTION_PARAM1, param1Int);
                     eachColumnConfig.set(Constant.MIXUP_FUNCTION_PARAM2, param2Int);
@@ -299,50 +297,24 @@ public class StreamReader
         private Column buildOneColumn(Configuration eachColumnConfig)
                 throws Exception
         {
-            String columnValue = eachColumnConfig
-                    .getString(Constant.VALUE);
-            Type columnType = Type.valueOf(eachColumnConfig.getString(
-                    Constant.TYPE).toUpperCase());
+            String columnValue = eachColumnConfig.getString(Constant.VALUE);
+            Type columnType = Type.valueOf(eachColumnConfig.getString(Constant.TYPE).toUpperCase());
             String columnMixup = eachColumnConfig.getString(Constant.RANDOM);
             long param1Int = eachColumnConfig.getLong(Constant.MIXUP_FUNCTION_PARAM1, 0L);
             long param2Int = eachColumnConfig.getLong(Constant.MIXUP_FUNCTION_PARAM2, 1L);
             boolean isColumnMixup = StringUtils.isNotBlank(columnMixup);
-
-            switch (columnType) {
-                case STRING:
-                    if (isColumnMixup) {
+            if (isColumnMixup) {
+                switch (columnType) {
+                    case STRING:
                         return new StringColumn(RandomStringUtils.randomAlphanumeric(
                                 (int) RandomUtils.nextLong(param1Int, param2Int + 1)));
-                    }
-                    else {
-                        return new StringColumn(columnValue);
-                    }
-                case LONG:
-                    if (isColumnMixup) {
+                    case LONG:
                         return new LongColumn(RandomUtils.nextLong(param1Int, param2Int + 1));
-                    }
-                    else {
-                        return new LongColumn(columnValue);
-                    }
-                case DOUBLE:
-                    if (isColumnMixup) {
+                    case DOUBLE:
                         return new DoubleColumn(RandomUtils.nextDouble(param1Int, param2Int + 1));
-                    }
-                    else {
-                        return new DoubleColumn(columnValue);
-                    }
-                case DATE:
-                    SimpleDateFormat format = new SimpleDateFormat(
-                            eachColumnConfig.getString(Constant.DATE_FORMAT_MARK,
-                                    Constant.DEFAULT_DATE_FORMAT));
-                    if (isColumnMixup) {
+                    case DATE:
                         return new DateColumn(new Date(RandomUtils.nextLong(param1Int, param2Int + 1)));
-                    }
-                    else {
-                        return new DateColumn(format.parse(columnValue));
-                    }
-                case BOOL:
-                    if (isColumnMixup) {
+                    case BOOL:
                         // warn: no concern -10 etc..., how about (0, 0)(0, 1)(1,2)
                         if (param1Int == param2Int) {
                             param1Int = 0;
@@ -358,22 +330,36 @@ public class StreamReader
                             long randomInt = RandomUtils.nextLong(0, param1Int + param2Int + 1);
                             return new BoolColumn(randomInt > param1Int);
                         }
-                    }
-                    else {
-                        return new BoolColumn("true".equalsIgnoreCase(columnValue));
-                    }
-                case BYTES:
-                    if (isColumnMixup) {
+                    case BYTES:
                         return new BytesColumn(RandomStringUtils.randomAlphanumeric((int)
                                 RandomUtils.nextLong(param1Int, param2Int + 1)).getBytes());
-                    }
-                    else {
+                    default:
+                        // in fact,never to be here
+                        throw new Exception(String.format("不支持类型[%s]", columnType.name()));
+                }
+            }
+            else {
+                switch (columnType) {
+                    case STRING:
+                        return new StringColumn(columnValue);
+                    case LONG:
+                        return new LongColumn(columnValue);
+                    case DOUBLE:
+                        return new DoubleColumn(columnValue);
+                    case DATE:
+                        SimpleDateFormat format = new SimpleDateFormat(
+                                eachColumnConfig.getString(Constant.DATE_FORMAT_MARK,
+                                        Constant.DEFAULT_DATE_FORMAT));
+                        return new DateColumn(format.parse(columnValue));
+                    case BOOL:
+                        return new BoolColumn("true".equalsIgnoreCase(columnValue));
+                    case BYTES:
                         return new BytesColumn(columnValue.getBytes());
-                    }
-                default:
-                    // in fact,never to be here
-                    throw new Exception(String.format("不支持类型[%s]",
-                            columnType.name()));
+                    default:
+                        // in fact,never to be here
+                        throw new Exception(String.format("不支持类型[%s]",
+                                columnType.name()));
+                }
             }
         }
 

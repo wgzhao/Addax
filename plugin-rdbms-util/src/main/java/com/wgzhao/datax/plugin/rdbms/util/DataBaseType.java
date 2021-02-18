@@ -7,7 +7,6 @@ import java.util.regex.Pattern;
 
 /**
  * refer:http://blog.csdn.net/ring0hx/article/details/6152528
- * <p>
  */
 public enum DataBaseType
 {
@@ -38,6 +37,9 @@ public enum DataBaseType
 
     /**
      * 注意：目前只实现了从 mysql/oracle 中识别出ip 信息.未识别到则返回 null.
+     *
+     * @param jdbcUrl java jdbc url
+     * @return ip address
      */
     public static String parseIpFromJdbcUrl(String jdbcUrl)
     {

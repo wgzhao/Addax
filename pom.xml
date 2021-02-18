@@ -11,6 +11,23 @@
     <packaging>pom</packaging>
     <url>https://datax.readthedocs.io</url>
 
+    <licenses>
+        <license>
+            <name>Apache License</name>
+            <url>https://github.com/wgzhao/DataX/blob/master/license.txt</url>
+            <distribution>repo</distribution>
+        </license>
+    </licenses>
+
+    <developers>
+        <developer>
+            <id>wgzhao</id>
+            <name>Steven Zhao</name>
+            <email>wgzhao@gmail.com</email>
+            <timezone>+8</timezone>
+        </developer>
+    </developers>
+
     <scm>
         <connection>scm:git:https://github.com/wgzhao/datax.git</connection>
         <developerConnection>scm:git:git@github.com:wgzhao/datax.git</developerConnection>
@@ -261,10 +278,31 @@
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-javadoc-plugin</artifactId>
                 <version>3.2.0</version>
+                <executions>
+                    <execution>
+                        <id>attach-javadocs</id>
+                        <goals>
+                            <goal>jar</goal>
+                        </goals>
+                    </execution>
+                </executions>
                 <configuration>
                     <show>private</show>
                     <nohelp>true</nohelp>
                 </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-source-plugin</artifactId>
+                <version>3.2.1</version>
+                <executions>
+                    <execution>
+                        <id>attach-sources</id>
+                        <goals>
+                            <goal>jar</goal>
+                        </goals>
+                    </execution>
+                </executions>
             </plugin>
             <plugin>
                 <groupId>org.sonatype.plugins</groupId>

@@ -24,7 +24,6 @@ public final class TableExpandUtil
      *
      * @param tables a string contains table name(one or many).
      * @return a split result of table name.
-     * <p>
      */
     public static List<String> splitTables(String tables)
     {
