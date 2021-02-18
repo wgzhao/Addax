@@ -32,6 +32,7 @@ public enum ESFieldType
 
     ARRAY,
     OBJECT,
+    FLATTENED,
     NESTED;
 
     public static ESFieldType getESFieldType(String type)
