@@ -15,6 +15,12 @@
 
 该项目从阿里的[DataX](https://github.com/alibaba/datax) 而来，经过了精简和改造，说明如下
 
+## 当前稳定版
+
+`3.2.1`
+
+注： 从 `3.2.1` 版本开始，包类名已经更改，因此不再兼容 `3.1.x` 版本
+
 ## 功能差别说明
 
 ### 精简
@@ -106,6 +112,7 @@
 
 | 版本   | 连接地址                                                     | md5值                             |
 | ----- | ------------------------------------------------------------| ---------------------------------|
+| 3.2.1 | https://pan.baidu.com/s/1as6sL09HlxAN8b2pZ1DttQ 提取码: hwgx | ecda4a961b032c75718502caf54246a8 |
 | 3.1.9 | https://pan.baidu.com/s/1GYpehEvB-W3qnqilhskXFw 提取码: q4wv | 48c4104294cd9bb0c749efc50b32b4dd |
 | 3.1.8 | https://pan.baidu.com/s/1jv-tb-11grYaUnsgnEhDzw 提取码: 2dnf | ef110ae1ea31e1761dc25d6930300485 |
 | 3.1.7 | https://pan.baidu.com/s/1CE5I8V5TNptdOp6GLid3Jg 提取码: v5u3 | fecca6c4a32f2bf7246fdef8bc2912fe |
