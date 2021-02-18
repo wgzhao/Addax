@@ -18,6 +18,7 @@ public class DateColumn
 
     /**
      * 构建值为null的DateColumn，使用Date子类型为DATETIME
+     *
      */
     public DateColumn()
     {
@@ -27,6 +28,8 @@ public class DateColumn
     /**
      * 构建值为stamp(Unix时间戳)的DateColumn，使用Date子类型为DATETIME
      * 实际存储有date改为long的ms，节省存储
+     *
+     * @param stamp 时间戳
      */
     public DateColumn( Long stamp)
     {

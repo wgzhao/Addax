@@ -118,7 +118,7 @@ public class HbaseSQLWriterTask
         }
     }
 
-    /**
+    /*
      * 批量提交一组数据，如果失败，则尝试一行行提交，如果仍然失败，抛错给用户
      */
     private void doBatchUpsert(List<Record> records)
@@ -146,7 +146,7 @@ public class HbaseSQLWriterTask
         }
     }
 
-    /**
+    /*
      * 单行提交，将出错的行记录到脏数据中。由脏数据收集模块判断任务是否继续
      */
     private void doSingleUpsert(List<Record> records)
@@ -165,7 +165,7 @@ public class HbaseSQLWriterTask
         }
     }
 
-    /**
+    /*
      * 生成sql模板，并根据模板创建PreparedStatement
      */
     private PreparedStatement createPreparedStatement()
@@ -216,7 +216,7 @@ public class HbaseSQLWriterTask
         return ps;
     }
 
-    /**
+    /*
      * 根据列名来从数据库元数据中获取这一列对应的SQL类型
      */
     private int[] getColumnSqlType(List<String> columnNames)
@@ -346,6 +346,7 @@ public class HbaseSQLWriterTask
      * 值类型的空值都是0，bool是false，String是空字符串
      *
      * @param sqlType sql数据类型，定义于{@link Types}
+     * @return Object
      */
     private Object getEmptyValue(int sqlType)
     {

@@ -146,8 +146,12 @@ public class ExpandLzopInputStream
     /**
      * Read len bytes into buf, st LSB of int returned is the last byte of the
      * first word read.
+     *
+     * @param buf bytes including integer
+     * @param len the lenght of bytes buffer
+     * @return integer
+     * @throws IOException read exception
      */
-    // @Nonnegative ?
     private int readInt(@Nonnull byte[] buf, @Nonnegative int len)
             throws IOException
     {

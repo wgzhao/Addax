@@ -13,11 +13,15 @@ public interface IFtpHelper
 
     /**
      * warn: 不支持递归创建, 比如 mkdir -p
+     *
+     * @param directoryPath the path
      */
     void mkdir(String directoryPath);
 
     /**
      * 支持目录递归创建
+     *
+     * @param directoryPath the path
      */
     void mkDirRecursive(String directoryPath);
 
@@ -29,6 +33,8 @@ public interface IFtpHelper
 
     /**
      * warn: 不支持文件夹删除, 比如 rm -rf
+     *
+     * @param filesToDelete list of files which to be deleted
      */
     void deleteFiles(Set<String> filesToDelete);
 

@@ -94,6 +94,8 @@ public class StorageReaderUtil
     /**
      * 不支持转义
      *
+     * @param inputLine 要分割的字符串
+     * @param delimiter 分割字符
      * @return 分隔符分隔后的字符串数，
      */
     public static String[] splitOneLine(String inputLine, String delimiter)
@@ -552,6 +554,8 @@ public class StorageReaderUtil
 
     /**
      * check parameter:encoding, compress, filedDelimiter
+     *
+     * @param readerConfiguration 配置项
      */
     public static void validateParameter(Configuration readerConfiguration)
     {

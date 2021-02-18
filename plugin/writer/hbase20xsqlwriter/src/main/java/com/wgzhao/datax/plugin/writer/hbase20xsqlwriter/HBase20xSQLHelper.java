@@ -15,15 +15,15 @@ import java.util.List;
 
 public class HBase20xSQLHelper
 {
-    /**
+    /*
      * phoenix瘦客户端连接前缀
      */
     public static final String CONNECT_STRING_PREFIX = "jdbc:phoenix:thin:";
-    /**
+    /*
      * phoenix驱动名
      */
     public static final String CONNECT_DRIVER_STRING = "org.apache.phoenix.queryserver.client.Driver";
-    /**
+    /*
      * 从系统表查找配置表信息
      */
     public static final String SELECT_CATALOG_TABLE_STRING = "SELECT COLUMN_NAME FROM SYSTEM.CATALOG WHERE TABLE_NAME='%s' AND COLUMN_NAME IS NOT NULL";
@@ -31,7 +31,7 @@ public class HBase20xSQLHelper
 
     private HBase20xSQLHelper() {}
 
-    /**
+    /*
      * 验证配置参数是否正确
      */
     public static void validateParameter(Configuration originalConfig)
@@ -57,7 +57,7 @@ public class HBase20xSQLHelper
         checkTable(conn, schema, tableName, columnNames);
     }
 
-    /**
+    /*
      * 获取JDBC连接，轻量级连接，使用完后必须显式close
      */
     public static Connection getThinClientConnection(String connStr)

@@ -178,6 +178,14 @@ public class SingleTableSplitUtil
     /**
      * 检测splitPk的配置是否正确。
      * configuration为null, 是precheck的逻辑，不需要回写PK_TYPE到configuration中
+     *
+     * @param conn database connection
+     * @param pkRangeSQL query sql for getting the primary key range
+     * @param fetchSize fetch size
+     * @param table  the table name
+     * @param username database connect username
+     * @param configuration connect configuration
+     * @return primary key range pair
      */
     private static Pair<Object, Object> checkSplitPk(Connection conn, String pkRangeSQL, int fetchSize, String table,
             String username, Configuration configuration)
@@ -309,6 +317,14 @@ public class SingleTableSplitUtil
 
     /**
      * support Number and String split
+     *
+     *
+     * @param splitPK primary key will be splitted
+     * @param table table name
+     * @param where where clause
+     * @param configuration configuration
+     * @param adviceNum the number of split
+     * @return list of string
      */
     public static List<String> genSplitSqlForOracle(String splitPK,
             String table, String where, Configuration configuration,

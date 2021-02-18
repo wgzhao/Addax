@@ -99,7 +99,7 @@ public class RedisReader
         private int keyThresholdLength = 64 * 1024 * 1024;
 
         @Override
-        public void startRead(final RecordSender recordSender)
+        public void startRead(RecordSender recordSender)
         {
             Configuration pluginJobConf = getPluginJobConf();
             List<Object> connections = pluginJobConf.getList("connection");
@@ -254,6 +254,9 @@ public class RedisReader
 
         /**
          * 判断是否包含相关db
+         *
+         * @param db db index
+         * @return true if match else false
          */
         private boolean matchDB(int db)
         {
@@ -262,12 +265,17 @@ public class RedisReader
 
         /**
          * 通过sync命令远程下载redis server rdb文件
+         *
+         * @param uri uri
+         * @param outFile file which dump to
+         * @throws IOException file not found
+         * @throws URISyntaxException uri parser error
          */
         private void dump(String uri, File outFile)
                 throws IOException, URISyntaxException
         {
-            final OutputStream out = new BufferedOutputStream(new FileOutputStream(outFile));
-            final RawByteListener rawByteListener = rawBytes -> {
+            OutputStream out = new BufferedOutputStream(new FileOutputStream(outFile));
+            RawByteListener rawByteListener = rawBytes -> {
                 try {
                     out.write(rawBytes);
                 }
@@ -299,6 +307,10 @@ public class RedisReader
 
         /**
          * 下载远程rdb文件
+         *
+         * @param uri uri
+         * @param outFile file will be written
+         * @throws IOException when can not reach to uri
          */
         private void download(URI uri, File outFile)
                 throws IOException

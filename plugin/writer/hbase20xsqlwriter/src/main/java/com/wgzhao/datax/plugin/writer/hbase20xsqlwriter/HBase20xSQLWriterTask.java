@@ -73,7 +73,7 @@ public class HBase20xSQLWriterTask
     /**
      * 初始化JDBC操作对象及列类型
      *
-     * @throws SQLException
+     * @throws SQLException sql exeception
      */
     private void initialize()
             throws SQLException
@@ -100,6 +100,8 @@ public class HBase20xSQLWriterTask
 
     /**
      * 生成sql模板，并根据模板创建PreparedStatement
+     * @return A {@link PreparedStatement}
+     * @throws SQLException if occured
      */
     private PreparedStatement createPreparedStatement()
             throws SQLException
@@ -136,6 +138,8 @@ public class HBase20xSQLWriterTask
 
     /**
      * 根据列名来从数据库元数据中获取这一列对应的SQL类型
+     *
+     * @return Array of integers
      */
     private int[] getColumnSqlType()
     {
@@ -171,6 +175,9 @@ public class HBase20xSQLWriterTask
 
     /**
      * 从接收器中获取每条记录，写入Phoenix
+     *
+     * @param lineReceiver record
+     * @throws SQLException sql exeception
      */
     private void writeData(RecordReceiver lineReceiver)
             throws SQLException
@@ -201,6 +208,9 @@ public class HBase20xSQLWriterTask
 
     /**
      * 批量提交一组数据，如果失败，则尝试一行行提交，如果仍然失败，抛错给用户
+     *
+     * @param records list of recrod
+     * @throws SQLException sql exeception
      */
     private void doBatchUpsert(List<Record> records)
             throws SQLException
@@ -235,6 +245,8 @@ public class HBase20xSQLWriterTask
 
     /**
      * 单行提交，将出错的行记录到脏数据中。由脏数据收集模块判断任务是否继续
+     *
+     * @param records list of records
      */
     private void doSingleUpsert(List<Record> records)
     {
@@ -363,6 +375,7 @@ public class HBase20xSQLWriterTask
      * 值类型的空值都是0，bool是false，String是空字符串
      *
      * @param sqlType sql数据类型，定义于{@link Types}
+     * @return value
      */
     private Object getEmptyValue(int sqlType)
     {

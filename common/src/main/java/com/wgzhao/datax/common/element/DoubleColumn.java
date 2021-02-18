@@ -29,6 +29,8 @@ public class DoubleColumn
 
     /**
      * Double无法表示准确的小数数据，我们不推荐使用该方法保存Double数据，建议使用String作为构造入参
+     *
+     * @param data 要转成double类型的double数
      */
     public DoubleColumn( Double data)
     {
@@ -38,6 +40,8 @@ public class DoubleColumn
 
     /**
      * Float无法表示准确的小数数据，我们不推荐使用该方法保存Float数据，建议使用String作为构造入参
+     *
+     * @param data 要转成double类型的浮点数
      */
     public DoubleColumn( Float data)
     {

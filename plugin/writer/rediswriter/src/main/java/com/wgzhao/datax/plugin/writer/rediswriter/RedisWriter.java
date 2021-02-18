@@ -151,6 +151,8 @@ public class RedisWriter
 
         /**
          * 单机或proxy 写入模式
+         *
+         * @param lineReceiver record
          */
         private void standaloneWrite(RecordReceiver lineReceiver)
         {
@@ -178,6 +180,8 @@ public class RedisWriter
 
         /**
          * redis cluster 集群写入
+         *
+         * @param lineReceiver record
          */
         private void clusterWrite(RecordReceiver lineReceiver)
         {
@@ -253,6 +257,8 @@ public class RedisWriter
 
         /**
          * 发送并检查异常
+         *
+         * @param client redis client
          */
         private void flushAndCheckReply(Client client)
         {

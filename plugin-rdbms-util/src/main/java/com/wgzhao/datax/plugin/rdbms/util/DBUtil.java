@@ -207,6 +207,12 @@ public final class DBUtil
      * if connecting failed, try to connect for MAX_TRY_TIMES times
      * <p>
      * NOTE: In DataX, we don't need connection pool in fact
+     *
+     * @param dataBaseType database type.
+     * @param jdbcUrl java jdbc url.
+     * @param username User for login.
+     * @param password Password to use when connecting to server.
+     * @return Connection class {@link Connection}
      */
     public static Connection getConnection(DataBaseType dataBaseType,
             String jdbcUrl, String username, String password)
@@ -236,6 +242,12 @@ public final class DBUtil
      * if connecting failed, try to connect for MAX_TRY_TIMES times
      * <p>
      * NOTE: In DataX, we don't need connection pool in fact
+     *
+     * @param dataBaseType  The database's type
+     * @param jdbcUrl jdbc url
+     * @param username User for login
+     * @param password Password to use when connecting to server
+     * @return Connection class {@link Connection}
      */
     public static Connection getConnectionWithoutRetry(DataBaseType dataBaseType,
             String jdbcUrl, String username, String password)
@@ -300,6 +312,7 @@ public final class DBUtil
      *
      * @param conn Database connection .
      * @param sql sql statement to be executed
+     * @param fetchSize fetch size
      * @return a {@link ResultSet}
      * @throws SQLException if occurs SQLException.
      */
@@ -317,7 +330,7 @@ public final class DBUtil
      * @param sql sql statement to be executed
      * @param fetchSize fetch size each batch
      * @param queryTimeout unit:second
-     * @return ResultSet
+     * @return A {@link ResultSet}
      */
     public static ResultSet query(Connection conn, String sql, int fetchSize, int queryTimeout)
             throws SQLException
@@ -443,6 +456,11 @@ public final class DBUtil
     }
 
     /**
+     * get column description
+     *
+     * @param conn database connection
+     * @param tableName  The table name
+     * @param column table column
      * @return Left:ColumnName Middle:ColumnType Right:ColumnTypeName
      */
     public static Triple<List<String>, List<Integer>, List<String>> getColumnMetaData(

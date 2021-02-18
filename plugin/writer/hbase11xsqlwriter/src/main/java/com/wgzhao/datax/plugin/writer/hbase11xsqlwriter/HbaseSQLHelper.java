@@ -48,6 +48,9 @@ public class HbaseSQLHelper
 
     /**
      * 将datax的配置解析成sql writer的配置
+     *
+     * @param cfg configuration
+     * @return HbaseSQLWriterConfig class
      */
     public static HbaseSQLWriterConfig parseConfig(Configuration cfg)
     {
@@ -86,6 +89,8 @@ public class HbaseSQLHelper
 
     /**
      * 校验配置
+     *
+     * @param cfg configuration
      */
     public static void validateConfig(HbaseSQLWriterConfig cfg)
     {
@@ -125,6 +130,9 @@ public class HbaseSQLHelper
 
     /**
      * 获取JDBC连接，轻量级连接，使用完后必须显式close
+     *
+     * @param cfg configuration
+     * @return database connection class {@link Connection}
      */
     public static Connection getJdbcConnection(HbaseSQLWriterConfig cfg)
     {
@@ -202,7 +210,8 @@ public class HbaseSQLHelper
      *
      * @param conn hbsae sql的jdbc连接
      * @param fullTableName 目标表的完整表名
-     * @return 表的元数据
+     * @return 表的元数据 {@link PTable}
+     * @throws SQLException sql exception
      */
     public static PTable getTableSchema(Connection conn, String fullTableName)
             throws SQLException
@@ -221,7 +230,7 @@ public class HbaseSQLHelper
      * @param namespace hbase table's namespace
      * @param fullTableName hbase full-qualtity table name
      * @param isThinClient 是否使用thin client
-     * @return 表的元数据
+     * @return 表的元数据 {@link PTable}
      * @throws SQLException exception
      */
     public static PTable getTableSchema(Connection conn, String namespace, String fullTableName, boolean isThinClient)
@@ -279,6 +288,9 @@ public class HbaseSQLHelper
 
     /**
      * 清空表
+     *
+     * @param conn database connection {@link Connection}
+     * @param tableName the table's name
      */
     public static void truncateTable(Connection conn, String tableName)
     {
@@ -309,6 +321,11 @@ public class HbaseSQLHelper
 
     /**
      * 检查表
+     *
+     * @param conn database connection {@link Connection}
+     * @param namespace hbase namespace
+     * @param tableName  table name
+     * @param isThinClient whether thin client or not
      */
     public static void checkTable(Connection conn, String namespace, String tableName, boolean isThinClient)
     {
@@ -320,6 +337,9 @@ public class HbaseSQLHelper
 
     /**
      * 检查表：表要存在，enabled
+     *
+     * @param conn The {@link Connection} instance
+     * @param tableName hbase table name
      */
     public static void checkTable(Connection conn, String tableName)
     {

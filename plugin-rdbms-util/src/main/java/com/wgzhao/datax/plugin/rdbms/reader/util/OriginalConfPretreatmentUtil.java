@@ -58,6 +58,8 @@ public final class OriginalConfPretreatmentUtil
      * <li>识别并标记是采用querySql 模式还是 table 模式</li>
      * <li>对 table 模式，确定分表个数，并处理 column 转 *事项</li>
      * </ol>
+     *
+     * @param originalConfig configuration
      */
     private static void simplifyConf(Configuration originalConfig)
     {

@@ -1,5 +1,12 @@
 package com.wgzhao.datax.plugin.reader.mongodbreader;
 
+import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONArray;
+import com.alibaba.fastjson.JSONObject;
+import com.mongodb.MongoClient;
+import com.mongodb.client.MongoCollection;
+import com.mongodb.client.MongoCursor;
+import com.mongodb.client.MongoDatabase;
 import com.wgzhao.datax.common.element.BoolColumn;
 import com.wgzhao.datax.common.element.DateColumn;
 import com.wgzhao.datax.common.element.DoubleColumn;
@@ -12,13 +19,6 @@ import com.wgzhao.datax.common.spi.Reader;
 import com.wgzhao.datax.common.util.Configuration;
 import com.wgzhao.datax.plugin.reader.mongodbreader.util.CollectionSplitUtil;
 import com.wgzhao.datax.plugin.reader.mongodbreader.util.MongoUtil;
-import com.alibaba.fastjson.JSON;
-import com.alibaba.fastjson.JSONArray;
-import com.alibaba.fastjson.JSONObject;
-import com.mongodb.MongoClient;
-import com.mongodb.client.MongoCollection;
-import com.mongodb.client.MongoCursor;
-import com.mongodb.client.MongoDatabase;
 import org.bson.Document;
 import org.bson.types.ObjectId;
 
@@ -58,7 +58,7 @@ public class MongoDBReader
         @Override
         public void init()
         {
-            this.originalConfig = super.getPluginJobConf();
+            this.originalConfig = getPluginJobConf();
             String userName = originalConfig.getString(KeyConstant.MONGO_USER_NAME, originalConfig.getString(KeyConstant.MONGO_USERNAME));
             String password = originalConfig.getString(KeyConstant.MONGO_USER_PASSWORD, originalConfig.getString(KeyConstant.MONGO_PASSWORD));
             String database = originalConfig.getString(KeyConstant.MONGO_DB_NAME, originalConfig.getString(KeyConstant.MONGO_DATABASE));
@@ -123,7 +123,8 @@ public class MongoDBReader
                 filter.append(KeyConstant.MONGO_PRIMARY_ID, new Document("$gte", isObjectId ? new ObjectId(lowerBound.toString()) : lowerBound));
             }
             else {
-                filter.append(KeyConstant.MONGO_PRIMARY_ID, new Document("$gte", isObjectId ? new ObjectId(lowerBound.toString()) : lowerBound).append("$lt", isObjectId ? new ObjectId(upperBound.toString()) : upperBound));
+                filter.append(KeyConstant.MONGO_PRIMARY_ID, new Document("$gte", isObjectId ? new ObjectId(lowerBound.toString()) : lowerBound)
+                        .append("$lt", isObjectId ? new ObjectId(upperBound.toString()) : upperBound));
             }
             if (!isNullOrEmpty((query))) {
                 Document queryFilter = Document.parse(query);
@@ -131,10 +132,9 @@ public class MongoDBReader
             }
             dbCursor = col.find(filter).iterator();
             Document item;
-            if (mongodbColumnMeta.size() == 1 && mongodbColumnMeta.get(0) == "*" ) {
+            if (mongodbColumnMeta.size() == 1 && mongodbColumnMeta.get(0) == "*") {
                 item = dbCursor.next();
-                mongodbColumnMeta = JSONArray.parseArray(item.toJson());
-                System.out.println(mongodbColumnMeta);
+                mongodbColumnMeta = JSON.parseArray(item.toJson());
             }
             while (dbCursor.hasNext()) {
                 item = dbCursor.next();
@@ -143,21 +143,19 @@ public class MongoDBReader
                 for (Object o : mongodbColumnMeta) {
                     JSONObject column = (JSONObject) o;
                     Object tempCol = item.get(column.getString(KeyConstant.COLUMN_NAME));
-                    if (tempCol == null) {
-                        if (KeyConstant.isDocumentType(column.getString(KeyConstant.COLUMN_TYPE))) {
-                            String[] name = column.getString(KeyConstant.COLUMN_NAME).split("\\.");
-                            if (name.length > 1) {
-                                Object obj;
-                                Document nestedDocument = item;
-                                for (String str : name) {
-                                    obj = nestedDocument.get(str);
-                                    if (obj instanceof Document) {
-                                        nestedDocument = (Document) obj;
-                                    }
+                    if (tempCol == null && KeyConstant.isDocumentType(column.getString(KeyConstant.COLUMN_TYPE))) {
+                        String[] name = column.getString(KeyConstant.COLUMN_NAME).split("\\.");
+                        if (name.length > 1) {
+                            Object obj;
+                            Document nestedDocument = item;
+                            for (String str : name) {
+                                obj = nestedDocument.get(str);
+                                if (obj instanceof Document) {
+                                    nestedDocument = (Document) obj;
                                 }
-
-                                tempCol = nestedDocument.get(name[name.length - 1]);
                             }
+
+                            tempCol = nestedDocument.get(name[name.length - 1]);
                         }
                     }
                     if (tempCol == null) {
@@ -213,7 +211,7 @@ public class MongoDBReader
         @Override
         public void init()
         {
-            Configuration readerSliceConfig = super.getPluginJobConf();
+            Configuration readerSliceConfig = getPluginJobConf();
             String userName = readerSliceConfig.getString(KeyConstant.MONGO_USER_NAME, readerSliceConfig.getString(KeyConstant.MONGO_USERNAME));
             String password = readerSliceConfig.getString(KeyConstant.MONGO_USER_PASSWORD, readerSliceConfig.getString(KeyConstant.MONGO_PASSWORD));
             this.database = readerSliceConfig.getString(KeyConstant.MONGO_DB_NAME, readerSliceConfig.getString(KeyConstant.MONGO_DATABASE));
@@ -228,8 +226,8 @@ public class MongoDBReader
             this.collection = readerSliceConfig.getString(KeyConstant.MONGO_COLLECTION_NAME);
             this.query = readerSliceConfig.getString(KeyConstant.MONGO_QUERY);
             List<String> column = readerSliceConfig.getList(KeyConstant.MONGO_COLUMN, String.class);
-            if (column.size() == 1 && column.get(0) == "*") {
-                // get all columns from record
+            if (column.size() == 1 && "*".equals(column.get(0))) {
+                // TODO get all columns from record
             }
             this.mongodbColumnMeta = JSON.parseArray(readerSliceConfig.getString(KeyConstant.MONGO_COLUMN));
             this.lowerBound = readerSliceConfig.get(KeyConstant.LOWER_BOUND);

@@ -77,6 +77,9 @@ public class CopyProcessor
     /**
      * Any occurrence within the value of a QUOTE character or the ESCAPE
      * character is preceded by the escape character.
+     *
+     * @param data string will be escaped
+     * @return escaped string
      */
     protected String escapeString(String data)
     {
@@ -103,6 +106,9 @@ public class CopyProcessor
 
     /**
      * Non-printable characters are inserted as '\nnn' (octal) and '\' as '\\'.
+     *
+     * @param data byte[] bytes array will be escaped
+     * @return escaped string
      */
     protected String escapeBinary(byte[] data)
     {

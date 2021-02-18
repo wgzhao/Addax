@@ -507,9 +507,8 @@ public class HdfsHelper
         }
     }
 
-    /**
-     * 写textfile类型文件
-     */
+
+    // 写textfile类型文件
     public void textFileStartWrite(RecordReceiver lineReceiver, Configuration config, String fileName,
             TaskPluginCollector taskPluginCollector)
     {
@@ -596,7 +595,7 @@ public class HdfsHelper
         return m.replaceAll(" ").trim().split(" ")[1];
     }
 
-    /**
+    /*
      * 写Parquetfile类型文件
      */
     public void parquetFileStartWrite(RecordReceiver lineReceiver, Configuration config, String fileName,
@@ -711,7 +710,7 @@ public class HdfsHelper
         }
     }
 
-    /**
+    /*
      * 写orcfile类型文件
      */
     public void orcFileStartWrite(RecordReceiver lineReceiver, Configuration config, String fileName,
@@ -763,7 +762,7 @@ public class HdfsHelper
         return columnNames;
     }
 
-    /**
+    /*
      * 根据writer配置的字段类型，构建inspector
      */
     public List<ObjectInspector> getColumnTypeInspectors(List<Configuration> columns)

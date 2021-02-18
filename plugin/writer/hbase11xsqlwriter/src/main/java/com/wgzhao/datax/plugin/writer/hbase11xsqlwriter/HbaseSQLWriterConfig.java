@@ -201,9 +201,6 @@ public class HbaseSQLWriterConfig
         return columns;
     }
 
-    /**
-     *
-     */
     public NullModeType getNullMode()
     {
         return nullMode;

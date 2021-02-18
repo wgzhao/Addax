@@ -108,20 +108,19 @@ public class OracleReader
         @Override
         public void init()
         {
-            this.readerSliceConfig = super.getPluginJobConf();
+            this.readerSliceConfig = getPluginJobConf();
             this.commonRdbmsReaderTask = new CommonRdbmsReader.Task(
-                    DATABASE_TYPE, super.getTaskGroupId(), super.getTaskId());
+                    DATABASE_TYPE, getTaskGroupId(), getTaskId());
             this.commonRdbmsReaderTask.init(this.readerSliceConfig);
         }
 
         @Override
         public void startRead(RecordSender recordSender)
         {
-            int fetchSize = this.readerSliceConfig
-                    .getInt(FETCH_SIZE);
+            int fetchSize = this.readerSliceConfig.getInt(FETCH_SIZE);
 
             this.commonRdbmsReaderTask.startRead(this.readerSliceConfig,
-                    recordSender, super.getTaskPluginCollector(), fetchSize);
+                    recordSender, getTaskPluginCollector(), fetchSize);
         }
 
         @Override
