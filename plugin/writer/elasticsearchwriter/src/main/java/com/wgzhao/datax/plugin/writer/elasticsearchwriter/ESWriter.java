@@ -49,7 +49,7 @@ public class ESWriter
         @Override
         public void prepare()
         {
-            /**
+            /*
              * 注意：此方法仅执行一次。
              * 最佳实践：如果 Job 中有需要进行数据同步之前的处理，可以在此处完成，如果没有必要则可以直接去掉。
              */
@@ -396,6 +396,7 @@ public class ESWriter
                                 break;
                             case NESTED:
                             case OBJECT:
+                            case FLATTENED:
                             case GEO_SHAPE:
                                 data.put(columnName, JSON.parse(column.asString()));
                                 break;
