@@ -1,0 +1,17 @@
+{
+  "name": "elasticsearchreader",
+  "parameter": {
+    "endpoint": "",
+    "index": "",
+    "type": "",
+    "searchType": "dfs_query_then_fetch",
+    "headers": {},
+    "scroll": "3m",
+    "search": [
+      {
+        "size": 100
+      }
+    ],
+    "column": []
+  }
+}
