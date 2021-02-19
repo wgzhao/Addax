@@ -82,7 +82,7 @@
 | ClickHouse       | 支持   | 支持   | clickhousereader/clickhousewriter   |                                                                                      |
 | DB2              | 支持   | 支持   | rbdmsreader/rdbmswriter             | 理论上支持，但未实际测试                                                             |
 | DBF              | 支持   | 支持   | dbffilereader/dbffilewriter         |                                                                                      |
-| ElasticSearch    | 不支持 | 支持   | elasticsearchwriter                 |                                                                                      |
+| ElasticSearch    | 支持 | 支持     | elasticsearchreader/elasticsearchwriter                 | 原始代码来自[@Kestrong](https://github.com/Kestrong/datax-elasticsearch)               |
 | FTP              | 支持   | 支持   | ftpreader/ftpwriter                 |                                                                                      |
 | HBase 1.x        | 支持   | 支持   | hbase11xreader/hbase11xwriter       | 直接操作HBase                                                                        |
 | HBase 1.x        | 支持   | 支持   | hbase11xsqlreader/hbase11xsqlwriter | 通过[Phoenix](https://phoenix.apache.org)操作HBase                                   |
