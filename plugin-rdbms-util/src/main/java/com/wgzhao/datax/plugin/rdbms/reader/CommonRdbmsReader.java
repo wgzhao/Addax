@@ -181,13 +181,7 @@ public class CommonRdbmsReader
             int columnNumber;
             ResultSet rs;
             try {
-                if (this.dataBaseType == DataBaseType.TDengine) {
-                    // TDengine JDBC-RS Driver DOES NOT support fetch size
-                    LOG.warn("TDengine JDBC-RS driver does not support fetchSize feature, disable it");
-                    rs = DBUtil.query(conn, querySql);
-                } else {
-                    rs = DBUtil.query(conn, querySql, fetchSize);
-                }
+                rs = DBUtil.query(conn, querySql, fetchSize);
                 queryPerfRecord.end();
 
                 ResultSetMetaData metaData = rs.getMetaData();

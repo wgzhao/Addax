@@ -337,8 +337,14 @@ public final class DBUtil
     {
         // make sure autocommit is off
         conn.setAutoCommit(false);
-
-        Statement stmt = conn.createStatement(ResultSet.TYPE_FORWARD_ONLY, ResultSet.CONCUR_READ_ONLY); //NOSONAR
+        Statement stmt;
+        try {
+            stmt = conn.createStatement(ResultSet.TYPE_FORWARD_ONLY, ResultSet.CONCUR_READ_ONLY); //NOSONAR
+        } catch (SQLException ignore) {
+            // some database does not support TYPE_FORWARD_ONLY/CONCUR_READ_ONLY
+            LOG.warn("current database does not supoort TYPE_FORWARD_ONLY/CONCUR_READ_ONLY");
+            stmt = conn.createStatement();
+        }
         stmt.setFetchSize(fetchSize);
         stmt.setQueryTimeout(queryTimeout);
         return query(stmt, sql);
