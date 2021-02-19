@@ -1,37 +1,63 @@
-# DataX ElasticSearchReader
+# ElasticSearchReader
 
+ElasticSearchReader 插件实现了从 [Elasticsearch](https://www.elastic.co/cn/elasticsearch/) 读取索引的功能， 它通过 Elasticsearch 提供的 Rest API （默认端口9200），执行指定的查询语句批量获取数据
 
----
+## 示例
 
-## 1 快速介绍
-
-[Datax](https://github.com/alibaba/DataX)
-读取elasticsearch数据的插件
-
-## 2 实现原理
-
-使用elasticsearch的rest api接口， 批量读取elasticsearch的数据
-
-## 3 功能说明
-
-### 3.1 配置样例
-
-#### es索引示例
+假定要获取的索引内容如下
 
 ```
 {
-  "flow_id" : 590000001878,
-  "taches" : [
-    {
-      "tch_id" : 590000000750,
-      "flow_id" : 590000001878,
-      "tch_mod" : 5081
-    }
-  ],
+"took": 14,
+"timed_out": false,
+"_shards": {
+"total": 1,
+"successful": 1,
+"skipped": 0,
+"failed": 0
+},
+"hits": {
+"total": 2,
+"max_score": 1,
+"hits": [
+{
+"_index": "test-1",
+"_type": "default",
+"_id": "38",
+"_score": 1,
+"_source": {
+"col_date": "2017-05-25T11:22:33.000+08:00",
+"col_integer": 19890604,
+"col_keyword": "hello world",
+"col_ip": "1.1.1.1",
+"col_text": "long text",
+"col_double": 19890604,
+"col_long": 19890604,
+"col_geo_point": "41.12,-71.34"
+}
+},
+{
+"_index": "test-1",
+"_type": "default",
+"_id": "103",
+"_score": 1,
+"_source": {
+"col_date": "2017-05-25T11:22:33.000+08:00",
+"col_integer": 19890604,
+"col_keyword": "hello world",
+"col_ip": "1.1.1.1",
+"col_text": "long text",
+"col_double": 19890604,
+"col_long": 19890604,
+"col_geo_point": "41.12,-71.34"
+}
+}
+]
+}
 }
 ```
 
-#### job.json
+配置一个从 Elasticsearch 读取数据并打印到终端的任务
 
 ```
 {
@@ -40,10 +66,6 @@
       "speed": {
         "byte": -1,
         "channel": 1
-      },
-      "errorLimit": {
-        "record": 0,
-        "percentage": 0.02
       }
     },
     "content": [
@@ -52,55 +74,33 @@
           "name": "elasticsearchreader",
           "parameter": {
             "endpoint": "http://127.0.0.1:9200",
-            "accessId": "",
-            "accessKey": "",
+            "accessId":"",
+            "accesskey":"",
             "index": "test-1",
             "type": "default",
             "searchType": "dfs_query_then_fetch",
-            "headers": {
-            },
+            "headers": {},
             "scroll": "3m",
             "search": [
               {
-                "size": 5,
                 "query": {
-                  "bool": {
-                    "must": [
-                      {
-                        "match": {
-                          "_id": "590000001878"
-                        }
-                      }
-                    ]
+                  "match": {
+                    "col_ip": "1.1.1.1"
+                  }
+                },
+                "aggregations": {
+                  "top_10_states": {
+                    "terms": {
+                      "field": "col_date",
+                      "size": 10
+                    }
                   }
                 }
               }
             ],
-            "table":{
-              "name": "TACHE",
-              "filter": "pk != null",
-              "nameCase": "UPPERCASE",
-              "column": [
-                {
-                  "name": "flow_id",
-                  "alias": "pk", 
-                },
-                {
-                  "name": "taches",
-                  "child": [
-                    {
-                      "name": "tch_id"
-                    },
-                    {
-                      "name": "tch_mod"
-                    },
-                    {
-                      "name": "flow_id"
-                    }
-                  ]
-                }
-              ]
-            }
+            "column": ["col_ip", "col_double", "col_long","col_integer",
+              "col_keyword", "col_text","col_geo_point","col_date"
+            ]
           }
         },
         "writer": {
@@ -116,90 +116,151 @@
 }
 ```
 
-#### 3.2 参数说明
+将上述内容保存为 `job/es2stream.json`
 
-* endpoint
-  * 描述：ElasticSearch的连接地址
-  * 必选：是
-  * 默认值：无
+执行下面的命令进行采集
 
-* accessId
-  * 描述：http auth中的user
-  * 必选：否
-  * 默认值：空
+```shell
+bin/datax.py job/es2stream.json
+```
 
-* accessKey
-  * 描述：http auth中的password
-  * 必选：否
-  * 默认值：空
+其输出结果类似如下（输出记录数有删减)
 
-* index
-  * 描述：elasticsearch中的index名
-  * 必选：是
-  * 默认值：无
+```
+2021-02-19 13:38:15.860 [main] INFO  VMInfo - VMInfo# operatingSystem class => com.sun.management.internal.OperatingSystemImpl
+2021-02-19 13:38:15.895 [main] INFO  Engine -
+{
+	"content":[
+		{
+			"reader":{
+				"parameter":{
+					"accessId":"",
+					"headers":{},
+					"endpoint":"http://127.0.0.1:9200",
+					"search":[
+                      {
+                        "query": {
+                          "match": {
+                            "col_ip": "1.1.1.1"
+                          }
+                        },
+                        "aggregations": {
+                          "top_10_states": {
+                            "terms": {
+                              "field": "col_date",
+                              "size": 10
+                            }
+                          }
+                        }
+                      }
+					],
+					"accesskey":"*****",
+					"searchType":"dfs_query_then_fetch",
+					"scroll":"3m",
+					"column":[
+						"col_ip",
+						"col_double",
+						"col_long",
+						"col_integer",
+						"col_keyword",
+						"col_text",
+						"col_geo_point",
+						"col_date"
+					],
+					"index":"test-1",
+					"type":"default"
+				},
+				"name":"elasticsearchreader"
+			},
+			"writer":{
+				"parameter":{
+					"print":true,
+					"encoding":"UTF-8"
+				},
+				"name":"streamwriter"
+			}
+		}
+	],
+	"setting":{
+		"errorLimit":{
+			"record":0,
+			"percentage":0.02
+		},
+		"speed":{
+			"byte":-1,
+			"channel":1
+		}
+	}
+}
 
-* type
-  * 描述：elasticsearch中index的type名
-  * 必选：否
-  * 默认值：index名
+2021-02-19 13:38:15.934 [main] INFO  PerfTrace - PerfTrace traceId=job_-1, isEnable=false, priority=0
+2021-02-19 13:38:15.934 [main] INFO  JobContainer - DataX jobContainer starts job.
+2021-02-19 13:38:15.937 [main] INFO  JobContainer - Set jobId = 0
 
-* timeout
-  * 描述：客户端超时时间
-  * 必选：否
-  * 默认值：600000
+2017-05-25T11:22:33.000+08:00	19890604	hello world	1.1.1.1	long text	19890604	19890604	41.12,-71.34
+2017-05-25T11:22:33.000+08:00	19890604	hello world	1.1.1.1	long text	19890604	19890604	41.12,-71.34
 
-* discovery
-  * 描述：启用节点发现将(轮询)并定期更新客户机中的服务器列表。
-  * 必选：否
-  * 默认值：false
+2021-02-19 13:38:19.845 [job-0] INFO  AbstractScheduler - Scheduler accomplished all tasks.
+2021-02-19 13:38:19.848 [job-0] INFO  JobContainer - DataX Writer.Job [streamwriter] do post work.
+2021-02-19 13:38:19.849 [job-0] INFO  JobContainer - DataX Reader.Job [elasticsearchreader] do post work.
+2021-02-19 13:38:19.855 [job-0] INFO  JobContainer - PerfTrace not enable!
+2021-02-19 13:38:19.858 [job-0] INFO  StandAloneJobContainerCommunicator - Total 95 records, 8740 bytes | Speed 2.84KB/s, 31 records/s | Error 0 records, 0 bytes |  All Task WaitWriterTime 0.000s |  All Task WaitReaderTime 0.103s | Percentage 100.00%
+2021-02-19 13:38:19.861 [job-0] INFO  JobContainer -
+任务启动时刻                    : 2021-02-19 13:38:15
+任务结束时刻                    : 2021-02-19 13:38:19
+任务总计耗时                    :                  3s
+任务平均流量                    :            2.84KB/s
+记录写入速度                    :             31rec/s
+读出记录总数                    :                   2
+读写失败总数                    :                   0
+```
 
-* compression
-  * 描述：http请求，开启压缩
-  * 必选：否
-  * 默认值：true
+## 参数说明
 
-* multiThread
-  * 描述：http请求，是否有多线程
-  * 必选：否
-  * 默认值：true
+| 配置项      | 是否必须 | 类型    | 默认值                 | 描述                                               |
+| :---------- | :------: | ------- | ---------------------- | -------------------------------------------------- |
+| endpoint    |    是    | string  | 无                     | ElasticSearch的连接地址                            |
+| accessId    |    否    | string  | `""`                   | http auth中的user                                  |
+| accessKey   |    否    | string  | `""`                   | http auth中的password                              |
+| index       |    是    | string  | 无                     | elasticsearch中的index名                           |
+| type        |    否    | string  | index名                | elasticsearch中index的type名                       |
+| search      |    是    | list    | `[]`                   | json格式api搜索数据体                              |
+| column      |    是    | list    | 无                     | 需要读取的字段                                     |
+| timeout     |    否    | int     | 60                     | 客户端超时时间（单位：秒)                          |
+| discovery   |    否    | boolean | false                  | 启用节点发现将(轮询)并定期更新客户机中的服务器列表 |
+| compression |    否    | boolean | true                   | http请求，开启压缩                                 |
+| multiThread |    否    | boolean | true                   | http请求，是否有多线程                             |
+| searchType  |    否    | string  | `dfs_query_then_fetch` | 搜索类型                                           |
+| headers     |    否    | map     | `{}`                   | http请求头                                         |
+| scroll      |    否    | string  | `""`                   | 滚动分页配置                                       |
 
-* searchType
-  * 描述：搜索类型
-  * 必选：否
-  * 默认值：dfs_query_then_fetch
- 
-* headers
-  * 描述：http请求头
-  * 必选：否
-  * 默认值：空
-  
-* scroll
-  * 描述：滚动分页配置
-  * 必选：否
-  * 默认值：空
+### search
 
-* search
-  * 描述：json格式api搜索数据体
-  * 必选：是
-  * 默认值：[]
+search 配置项允许配置为满足 Elasticsearch API 查询要求的内容，比如这样：
 
-* table
-  * 描述: 数据读取规则配置，name命名，nameCase全局字段大小写，filter使用ognl表达式进行过滤
-  * 必选: 是
-  * 默认值: 无
+```json
+{
+  "query": {
+    "match": {
+      "message": "myProduct"
+    }
+  },
+  "aggregations": {
+    "top_10_states": {
+      "terms": {
+        "field": "state",
+        "size": 10
+      }
+    }
+  }
+}
+```
 
-* column
-  * 描述：需要读取的字段，name对应es文档的key，alias为最终记录的字段名如果为空则使用name，value表示字段为常量，child为嵌套对象
-  * 必选：是
-  * 默认值：无
+### searchType
 
+searchType 目前支持以下几种：
 
-## 4 性能报告
-
-略
-
-## 5 约束限制
-
-* filter使用ognl表达式，根对象为整个table对象，key为column最终写入的名称
-
-## 6 FAQ
+- dfs_query_then_fetch
+- query_then_fetch
+- count
+- scan

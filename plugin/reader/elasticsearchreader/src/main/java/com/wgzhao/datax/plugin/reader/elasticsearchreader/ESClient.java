@@ -33,7 +33,7 @@ import java.util.concurrent.TimeUnit;
 
 /**
  * @author kesc
- * @since  2020-04-14 10:32
+ * @since 2020-04-14 10:32
  */
 public class ESClient
 {
@@ -57,7 +57,6 @@ public class ESClient
 
         JestClientFactory factory = new JestClientFactory();
         HttpClientConfig.Builder httpClientConfig = new HttpClientConfig.Builder(endpoint)
-                .setPreemptiveAuth(new HttpHost(endpoint))
                 .multiThreaded(multiThread)
                 .connTimeout(30000)
                 .readTimeout(readTimeout)
@@ -66,8 +65,9 @@ public class ESClient
                 .discoveryEnabled(discovery)
                 .discoveryFrequency(5L, TimeUnit.MINUTES);
 
-        if (!("".equals(user) || "".equals(passwd))) {
+        if (!user.isEmpty() && !passwd.isEmpty()) {
             httpClientConfig.defaultCredentials(user, passwd);
+            httpClientConfig.setPreemptiveAuth(new HttpHost(endpoint));
         }
 
         factory.setHttpClientConfig(httpClientConfig.build());

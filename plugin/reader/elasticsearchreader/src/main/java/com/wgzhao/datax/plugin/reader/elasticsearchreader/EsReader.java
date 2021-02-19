@@ -23,6 +23,7 @@ import io.searchbox.client.JestResult;
 import io.searchbox.core.SearchResult;
 import io.searchbox.params.SearchType;
 import ognl.Ognl;
+import ognl.OgnlContext;
 import ognl.OgnlException;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
@@ -32,10 +33,7 @@ import java.io.IOException;
 import java.lang.reflect.Array;
 import java.math.BigDecimal;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.Date;
-import java.util.HashMap;
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -88,7 +86,7 @@ public class EsReader
         @Override
         public void init()
         {
-            this.conf = super.getPluginJobConf();
+            this.conf = getPluginJobConf();
         }
 
         @Override
@@ -107,7 +105,7 @@ public class EsReader
         @Override
         public void post()
         {
-            super.post();
+            //
         }
 
         @Override
@@ -120,7 +118,8 @@ public class EsReader
     public static class Task
             extends Reader.Task
     {
-        private static final Logger log = LoggerFactory.getLogger(Job.class);
+        private static final Logger log = LoggerFactory.getLogger(Task.class);
+        private final OgnlContext ognlContext = new OgnlContext(null, null, new DefaultMemberAccess(true));
         ESClient esClient = null;
         Gson gson = null;
         private Configuration conf;
@@ -130,7 +129,8 @@ public class EsReader
         private Map<String, Object> headers;
         private String query;
         private String scroll;
-        private EsTable table;
+        private List<String> column;
+        private String filter;
 
         @Override
         public void prepare()
@@ -147,7 +147,7 @@ public class EsReader
         @Override
         public void init()
         {
-            this.conf = super.getPluginJobConf();
+            this.conf = getPluginJobConf();
             this.esClient = new ESClient();
             this.gson = new GsonBuilder().registerTypeAdapterFactory(MapTypeAdapter.FACTORY).create();
             this.index = Key.getIndexName(conf);
@@ -156,18 +156,23 @@ public class EsReader
             this.headers = Key.getHeaders(conf);
             this.query = Key.getQuery(conf);
             this.scroll = Key.getScroll(conf);
-            this.table = Key.getTable(conf);
-            if (table == null || table.getColumn() == null || table.getColumn().isEmpty()) {
-                throw DataXException.asDataXException(ESReaderErrorCode.COLUMN_CANT_BE_EMPTY, "请检查job的elasticsearchreader插件下parameter是否配置了table参数");
+            this.filter = Key.getFilter(conf);
+            this.column = Key.getColumn(conf);
+            if (column == null || column.isEmpty()) {
+                throw DataXException.asDataXException(ESReaderErrorCode.COLUMN_CANT_BE_EMPTY, "column必须配置");
+            }
+            if (column.size() == 1 && "*".equals(column.get(0))) {
+                // TODO get column from record
+                throw DataXException.asDataXException(ESReaderErrorCode.COLUMN_CANT_BE_EMPTY, "column暂不支持*配置");
             }
         }
 
         @Override
         public void startRead(RecordSender recordSender)
         {
-            PerfTrace.getInstance().addTaskDetails(super.getTaskId(), index);
+            PerfTrace.getInstance().addTaskDetails(getTaskId(), index);
             //search
-            PerfRecord queryPerfRecord = new PerfRecord(super.getTaskGroupId(), super.getTaskId(), PerfRecord.PHASE.SQL_QUERY);
+            PerfRecord queryPerfRecord = new PerfRecord(getTaskGroupId(), getTaskId(), PerfRecord.PHASE.SQL_QUERY);
             queryPerfRecord.start();
             SearchResult searchResult;
             try {
@@ -181,7 +186,7 @@ public class EsReader
             }
             queryPerfRecord.end();
             //transport records
-            PerfRecord allResultPerfRecord = new PerfRecord(super.getTaskGroupId(), super.getTaskId(), PerfRecord.PHASE.RESULT_NEXT_ALL);
+            PerfRecord allResultPerfRecord = new PerfRecord(getTaskGroupId(), getTaskId(), PerfRecord.PHASE.RESULT_NEXT_ALL);
             allResultPerfRecord.start();
             this.transportRecords(recordSender, searchResult);
             allResultPerfRecord.end();
@@ -191,18 +196,19 @@ public class EsReader
                 return;
             }
             String scrollId = scrollIdElement.getAsString();
-            log.info("scroll id:{}", scrollId);
+            log.debug("scroll id:{}", scrollId);
             try {
                 boolean hasElement = true;
                 while (hasElement) {
                     queryPerfRecord.start();
-                    JestResult scroll = esClient.scroll(scrollId, this.scroll);
+                    JestResult currScroll = esClient.scroll(scrollId, this.scroll);
                     queryPerfRecord.end();
-                    if (!scroll.isSucceeded()) {
-                        throw DataXException.asDataXException(ESReaderErrorCode.ES_SEARCH_ERROR, String.format("scroll[id=%s] search error,code:%s,msg:%s", scrollId, scroll.getResponseCode(), scroll.getErrorMessage()));
+                    if (!currScroll.isSucceeded()) {
+                        throw DataXException.asDataXException(ESReaderErrorCode.ES_SEARCH_ERROR,
+                                String.format("scroll[id=%s] search error,code:%s,msg:%s", scrollId, currScroll.getResponseCode(), currScroll.getErrorMessage()));
                     }
                     allResultPerfRecord.start();
-                    hasElement = this.transportRecords(recordSender, parseSearchResult(scroll));
+                    hasElement = this.transportRecords(recordSender, parseSearchResult(currScroll));
                     allResultPerfRecord.end();
                 }
             }
@@ -232,65 +238,13 @@ public class EsReader
             return searchResult;
         }
 
-        private void setDefaultValue(List<EsField> column, Map<String, Object> data)
-        {
-            for (EsField field : column) {
-                if (field.hasChild()) {
-                    setDefaultValue(field.getChild(), data);
-                }
-                else {
-                    data.putIfAbsent(field.getFinalName(table.getNameCase()), null);
-                }
-            }
-        }
-
-        private void getPathSource(List<Map<String, Object>> result, Map<String, Object> source, List<EsField> column, Map<String, Object> parent)
-        {
-            if (source.isEmpty()) {
-                return;
-            }
-            for (EsField esField : column) {
-                if (!esField.hasChild()) {
-                    parent.put(esField.getFinalName(table.getNameCase()), source.getOrDefault(esField.getName(), esField.getValue()));
-                }
-            }
-            for (EsField esField : column) {
-                if (!esField.hasChild()) {
-                    continue;
-                }
-                Object value = source.get(esField.getName());
-                if (value instanceof Map) {
-                    getPathSource(result, (Map<String, Object>) value, esField.getChild(), parent);
-                }
-                else if (value instanceof List) {
-                    List<Map<String, Object>> valueList = (List<Map<String, Object>>) value;
-                    if (valueList.isEmpty()) {
-                        continue;
-                    }
-                    List<Map<String, Object>> joinResults = new ArrayList<>();
-                    ArrayList<Map<String, Object>> copyResult = new ArrayList<>(result);
-                    result.clear();
-                    for (Map<String, Object> joinParent : copyResult) {
-                        for (Map<String, Object> item : valueList) {
-                            HashMap<String, Object> childData = new LinkedHashMap<>(joinParent);
-                            joinResults.add(childData);
-                            getPathSource(joinResults, item, esField.getChild(), childData);
-                            result.addAll(joinResults);
-                            joinResults.clear();
-                        }
-                    }
-                    copyResult.clear();
-                }
-            }
-        }
-
         private Object getOgnlValue(Object expression, Map<String, Object> root, Object defaultValue)
         {
             try {
                 if (!(expression instanceof String)) {
                     return defaultValue;
                 }
-                Object value = Ognl.getValue(expression.toString(), root);
+                Object value = Ognl.getValue(expression.toString(), ognlContext, root);
                 if (value == null) {
                     return defaultValue;
                 }
@@ -318,56 +272,37 @@ public class EsReader
                 return false;
             }
             List<String> sources = result.getSourceAsStringList();
-            if (sources == null) {
-                sources = Collections.emptyList();
+            if (sources == null || sources.isEmpty()) {
+                return false;
             }
-//            log.info("search result: total={},maxScore={},hits={}", result.getTotal(), result.getMaxScore(), sources.size());
-            List<Map<String, Object>> recordMaps = new ArrayList<>();
             for (String source : sources) {
-                List<EsField> column = table.getColumn();
-                if (column == null || column.isEmpty()) {
-                    continue;
-                }
-                Map<String, Object> parent = new LinkedHashMap<>((int) (column.size() * 1.5));
-                setDefaultValue(table.getColumn(), parent);
-                recordMaps.add(parent);
-                getPathSource(recordMaps, gson.fromJson(source, Map.class), column, parent);
-                this.transportOneRecord(table, recordSender, recordMaps);
-                recordMaps.clear();
+                this.transportOneRecord(recordSender, gson.fromJson(source, Map.class));
             }
-            return sources.size() > 0;
+            return true;
         }
 
-        private void transportOneRecord(EsTable table, RecordSender recordSender, List<Map<String, Object>> recordMaps)
+        private void transportOneRecord(RecordSender recordSender, Map<String, Object> recordMap)
         {
-            for (Map<String, Object> o : recordMaps) {
-                boolean allow = filter(table.getFilter(), table.getDeleteFilterKey(), o);
-                if (allow && o.entrySet().stream().anyMatch(x -> x.getValue() != null)) {
-                    Record record = buildRecord(recordSender, o);
-                    recordSender.sendToWriter(record);
+            boolean allow = filter(this.filter, null, recordMap);
+            if (allow && recordMap.entrySet().stream().anyMatch(x -> x.getValue() != null)) {
+                Record record = recordSender.createRecord();
+                boolean hasDirty = false;
+                StringBuilder sb = new StringBuilder();
+                for (Map.Entry<String, Object> entry : recordMap.entrySet()) {
+                    try {
+                        Object o = recordMap.get(entry.getKey());
+                        record.addColumn(getColumn(o));
+                    }
+                    catch (Exception e) {
+                        hasDirty = true;
+                        sb.append(e);
+                    }
                 }
-            }
-        }
-
-        private Record buildRecord(RecordSender recordSender, Map<String, Object> source)
-        {
-            Record record = recordSender.createRecord();
-            boolean hasDirty = false;
-            StringBuilder sb = new StringBuilder();
-            for (Map.Entry<String, Object> entry : source.entrySet()) {
-                try {
-                    Object o = source.get(entry.getKey());
-                    record.addColumn(getColumn(o));
+                if (hasDirty) {
+                    getTaskPluginCollector().collectDirtyRecord(record, sb.toString());
                 }
-                catch (Exception e) {
-                    hasDirty = true;
-                    sb.append(e);
-                }
+                recordSender.sendToWriter(record);
             }
-            if (hasDirty) {
-                getTaskPluginCollector().collectDirtyRecord(record, sb.toString());
-            }
-            return record;
         }
 
         private Column getColumn(Object value)
@@ -424,13 +359,13 @@ public class EsReader
         @Override
         public void post()
         {
-            super.post();
+            //
         }
 
         @Override
         public void destroy()
         {
-            log.info("============elasticsearch reader taskGroup[{}] taskId[{}] destroy=================", getTaskGroupId(), getTaskId());
+            log.debug("============elasticsearch reader taskGroup[{}] taskId[{}] destroy=================", getTaskGroupId(), getTaskId());
             esClient.closeJestClient();
         }
     }

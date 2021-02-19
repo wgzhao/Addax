@@ -1,11 +1,11 @@
 package com.wgzhao.datax.plugin.reader.elasticsearchreader;
 
-import com.alibaba.fastjson.JSON;
 import com.wgzhao.datax.common.util.Configuration;
 import io.searchbox.params.SearchType;
 import org.apache.commons.lang3.StringUtils;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 public final class Key
@@ -16,30 +16,12 @@ public final class Key
 
     public static final String SEARCH_KEY = "search";
 
+    private Key() {}
+
     public static SearchType getSearchType(Configuration conf)
     {
         String searchType = conf.getString("searchType", SearchType.DFS_QUERY_THEN_FETCH.toString());
         return SearchType.valueOf(searchType.toUpperCase());
-    }
-
-    public static ActionType getActionType(Configuration conf)
-    {
-        String actionType = conf.getString("actionType", "index");
-        if ("index".equals(actionType)) {
-            return ActionType.INDEX;
-        }
-        else if ("create".equals(actionType)) {
-            return ActionType.CREATE;
-        }
-        else if ("delete".equals(actionType)) {
-            return ActionType.DELETE;
-        }
-        else if ("update".equals(actionType)) {
-            return ActionType.UPDATE;
-        }
-        else {
-            return ActionType.UNKONW;
-        }
     }
 
     public static String getEndpoint(Configuration conf)
@@ -69,7 +51,7 @@ public final class Key
 
     public static int getTimeout(Configuration conf)
     {
-        return conf.getInt("timeout", 600000);
+        return conf.getInt("timeout", 60) * 1000;
     }
 
     public static boolean isCleanup(Configuration conf)
@@ -106,43 +88,6 @@ public final class Key
         return indexType;
     }
 
-    public static boolean isIgnoreWriteError(Configuration conf)
-    {
-        return conf.getBool("ignoreWriteError", false);
-    }
-
-    public static boolean isIgnoreParseError(Configuration conf)
-    {
-        return conf.getBool("ignoreParseError", true);
-    }
-
-    public static boolean isHighSpeedMode(Configuration conf)
-    {
-        if ("highspeed".equals(conf.getString("mode", ""))) {
-            return true;
-        }
-        return false;
-    }
-
-    public static String getAlias(Configuration conf)
-    {
-        return conf.getString("alias", "");
-    }
-
-    public static boolean isNeedCleanAlias(Configuration conf)
-    {
-        String mode = conf.getString("aliasMode", "append");
-        if ("exclusive".equals(mode)) {
-            return true;
-        }
-        return false;
-    }
-
-    public static Map<String, Object> getSettings(Configuration conf)
-    {
-        return conf.getMap("settings", new HashMap<String, Object>());
-    }
-
     public static Map<String, Object> getHeaders(Configuration conf)
     {
         return conf.getMap("headers", new HashMap<>());
@@ -153,33 +98,18 @@ public final class Key
         return conf.getConfiguration(Key.SEARCH_KEY).toString();
     }
 
-    public static String getSplitter(Configuration conf)
-    {
-        return conf.getString("splitter", "-,-");
-    }
-
-    public static boolean getDynamic(Configuration conf)
-    {
-        return conf.getBool("dynamic", false);
-    }
-
     public static String getScroll(Configuration conf)
     {
         return conf.getString("scroll");
     }
 
-    public static EsTable getTable(Configuration conf)
+    public static List<String> getColumn(Configuration conf)
     {
-        String column = conf.getString("table");
-        return JSON.parseObject(column, EsTable.class);
+        return conf.getList("column", String.class);
     }
 
-    public enum ActionType
+    public static String getFilter(Configuration conf)
     {
-        UNKONW,
-        INDEX,
-        CREATE,
-        DELETE,
-        UPDATE
+        return conf.getString("filter", null);
     }
 }
