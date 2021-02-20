@@ -443,8 +443,13 @@ public final class DBUtil
         String queryColumnSql = null;
         try {
             statement = conn.createStatement();
-            queryColumnSql = String.format("select * from %s where 1=2",
-                    tableName);
+            if (DataBaseType.TDengine.getDriverClassName().equals(conn.getMetaData().getDriverName())) {
+                // TDengine does not support 1=2 clause
+                queryColumnSql = String.format("select * from %s limit 0", tableName);
+            } else {
+                queryColumnSql = String.format("select * from %s where 1=2", tableName);
+            }
+
             rs = statement.executeQuery(queryColumnSql);
             ResultSetMetaData rsMetaData = rs.getMetaData();
             for (int i = 0, len = rsMetaData.getColumnCount(); i < len; i++) {
@@ -480,17 +485,19 @@ public final class DBUtil
                 new ArrayList<>());
         try {
             statement = conn.createStatement();
-            String queryColumnSql = "select " + column + " from " + tableName
-                    + " where 1=2";
-
+            String queryColumnSql;
+            if (DataBaseType.TDengine.getDriverClassName().equals(conn.getMetaData().getDriverName())) {
+                // TDengine does not support 1=2 clause
+                queryColumnSql = "select " + column + " from " + tableName + " limit 0";
+            } else {
+                queryColumnSql = "select " + column + " from " + tableName + " where 1=2";
+            }
             rs = statement.executeQuery(queryColumnSql);
             ResultSetMetaData rsMetaData = rs.getMetaData();
             for (int i = 0, len = rsMetaData.getColumnCount(); i < len; i++) {
-
                 columnMetaData.getLeft().add(rsMetaData.getColumnName(i + 1));
                 columnMetaData.getMiddle().add(rsMetaData.getColumnType(i + 1));
-                columnMetaData.getRight().add(
-                        rsMetaData.getColumnTypeName(i + 1));
+                columnMetaData.getRight().add(rsMetaData.getColumnTypeName(i + 1));
             }
             return columnMetaData;
         }

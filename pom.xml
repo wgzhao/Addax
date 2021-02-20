@@ -136,6 +136,7 @@
         <module>plugin/writer/rediswriter</module>
         <module>plugin/writer/sqlserverwriter</module>
         <module>plugin/writer/streamwriter</module>
+        <module>plugin/writer/tdenginewriter</module>
         <module>plugin/writer/txtfilewriter</module>
 
     </modules>
