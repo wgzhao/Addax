@@ -22,6 +22,8 @@ public enum DataBaseType
     Inceptor2("inceptor2", "org.apache.hive.jdbc.HiveDriver"),
     InfluxDB("influxdb", "org.influxdb.influxdb-java"),
     Impala("impala", "com.cloudera.impala.jdbc41.Driver"),
+    //    TDengine("tdengine","com.taosdata.jdbc.rs.RestfulDriver"),
+    TDengine("tdengine", "com.taosdata.jdbc.TSDBDriver"),
     Trino("trino", "io.trino.jdbc.TrinoDriver");
 
     private static final Pattern mysqlPattern = Pattern.compile("jdbc:mysql://(.+):\\d+/.+");
@@ -65,7 +67,8 @@ public enum DataBaseType
             String suffix;
             if ("com.mysql.jdbc.Driver".equals(this.driverClassName)) {
                 suffix = "yearIsDateType=false&zeroDateTimeBehavior=convertToNull&tinyInt1isBit=false&rewriteBatchedStatements=true";
-            } else {
+            }
+            else {
                 suffix = "yearIsDateType=false&zeroDateTimeBehavior=CONVERT_TO_NULL&tinyInt1isBit=false&rewriteBatchedStatements=true&useSSL=false";
             }
             if (jdbc.contains("?")) {
@@ -84,7 +87,8 @@ public enum DataBaseType
             String suffix;
             if ("com.mysql.jdbc.Driver".equals(this.driverClassName)) {
                 suffix = "yearIsDateType=false&zeroDateTimeBehavior=convertToNull&rewriteBatchedStatements=true&tinyInt1isBit=false";
-            } else {
+            }
+            else {
                 suffix = "yearIsDateType=false&zeroDateTimeBehavior=CONVERT_TO_NULL&rewriteBatchedStatements=true&tinyInt1isBit=false&useSSL=false";
             }
             if (jdbc.contains("?")) {
