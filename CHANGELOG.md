@@ -5,6 +5,7 @@
 ### General Changes
 
 * Add support for Elasticsearch reader ([\#121](https://github.com/wgzhao/DataX/pull/121))
+* Add support for TDengine reader and writer ([\#124](https://github.com/wgzhao/DataX/pull/124))
 
 ## 3.2.1
 

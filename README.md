@@ -48,6 +48,7 @@
 6. influxdbreader
 7. httpreader
 8. elastichsearchreader
+9. tdenginereader
 
 #### writer plugin
 
@@ -55,6 +56,7 @@
 2. greenplumwriter
 3. kuduwriter
 4. influxdbwriter
+5. tdenginewriter
 
 ### 部分插件增强功能，罗列如下
 
@@ -101,7 +103,8 @@
 | PostgreSQL       | 支持   | 支持   | postgresqlreader/postgresqlwriter   |                                                                                      |
 | PrestoSQL        | 支持   | 支持   | rdbmsreader/rdbmswriter             | [trino(原PrestoSQL)](https://trino.io) 310以上                                       |
 | Redis            | 支持   | 支持   | redisreader/rediswriter             |                                                                                      |
-| SQL Server       | 支持   | 支持   | sqlserverreader/sqlserverwriter     |                                                                                      |
+| SQL Server       | 支持   | 支持   | sqlserverreader/sqlserverwriter     |                                                                                    |
+| TDengine         | 支持   | 支持   | tdenginereader/tdenginewriter       | 支持 [TDengine](https://www.taosdata.com/cn/) 数据库读写                              |
 | TDH Inceptor2    | 支持   | 支持   | rdbmsreader/rdbmswriter             | [星环 TDH](http://transwarp.cn/transwarp/product-TDH.html?categoryId=18) 5.1以上版本 |
 | TEXT             | 支持   | 支持   | textfilereader/textfilewriter       |                                                                                      |
 
