@@ -1,5 +1,21 @@
 # Changelog
 
+## 3.2.2
+
+### General Changes
+
+* Add support for Elasticsearch reader ([\#121](https://github.com/wgzhao/DataX/pull/121))
+
+## 3.2.1
+
+### General Changes
+
+* change class package to `com.wgzhao`
+
+## 3.2.0 
+
+This is draft version
+
 ## 3.1.10
 
 ### General Changes

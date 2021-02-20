@@ -1,0 +1,6 @@
+{
+  "name": "tdenginewriter",
+  "class": "com.wgzhao.datax.plugin.writer.tdenginewriter.TDengineWriter",
+  "description": "Writer data into TDengine database",
+  "developer": "wgzhao"
+}

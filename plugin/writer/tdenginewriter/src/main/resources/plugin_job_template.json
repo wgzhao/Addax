@@ -1,0 +1,17 @@
+{
+  "name": "tdenginewriter",
+  "parameter": {
+    "username": "",
+    "password": "",
+    "writeMode": "",
+    "column": [],
+    "session": [],
+    "preSql": [],
+    "connection": [
+      {
+        "jdbcUrl": "",
+        "table": []
+      }
+    ]
+  }
+}
