@@ -68,12 +68,13 @@ public class InfluxDBWriter
         }
 
         @Override
-        public List<Configuration> split(int adviceNumber)
+        public List<Configuration> split(int mandatoryNumber)
         {
-            Configuration readerSliceConfig = super.getPluginJobConf();
-            List<Configuration> splittedConfigs = new ArrayList<>();
-            splittedConfigs.add(readerSliceConfig);
-            return splittedConfigs;
+            List<Configuration> splitResultConfigs = new ArrayList<>();
+            for (int j = 0; j < mandatoryNumber; j++) {
+                splitResultConfigs.add(this.originalConfig.clone());
+            }
+            return splitResultConfigs;
         }
 
         @Override
