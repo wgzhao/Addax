@@ -20,8 +20,7 @@ public class InfluxDBWriter
     public static class Job
             extends Writer.Job
     {
-        private static final Logger LOG = LoggerFactory
-                .getLogger(Job.class);
+        private static final Logger LOG = LoggerFactory.getLogger(Job.class);
 
         private Configuration originalConfig = null;
 
@@ -111,7 +110,7 @@ public class InfluxDBWriter
         @Override
         public void init()
         {
-            Configuration writerSliceConfig = super.getPluginJobConf();
+            Configuration writerSliceConfig = getPluginJobConf();
             this.influxDBWriterTask = new InfluxDBWriterTask(writerSliceConfig);
             this.influxDBWriterTask.init();
         }
@@ -124,7 +123,7 @@ public class InfluxDBWriter
 
         public void startWrite(RecordReceiver recordReceiver)
         {
-            this.influxDBWriterTask.startWrite(recordReceiver, super.getTaskPluginCollector());
+            this.influxDBWriterTask.startWrite(recordReceiver, getTaskPluginCollector());
         }
 
         @Override
