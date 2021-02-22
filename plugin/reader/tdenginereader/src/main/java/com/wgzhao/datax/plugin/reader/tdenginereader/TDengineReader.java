@@ -5,17 +5,11 @@ import com.wgzhao.datax.common.spi.Reader;
 import com.wgzhao.datax.common.util.Configuration;
 import com.wgzhao.datax.plugin.rdbms.reader.CommonRdbmsReader;
 import com.wgzhao.datax.plugin.rdbms.reader.Constant;
-import com.wgzhao.datax.plugin.rdbms.util.DBUtil;
 import com.wgzhao.datax.plugin.rdbms.util.DataBaseType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.ResultSet;
-import java.sql.SQLException;
 import java.util.List;
-import java.util.Properties;
 
 public class TDengineReader
         extends Reader
