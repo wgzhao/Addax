@@ -119,6 +119,7 @@
         <module>plugin/writer/cassandrawriter</module>
         <module>plugin/writer/clickhousewriter</module>
         <module>plugin/writer/dbffilewriter</module>
+        <module>plugin/writer/doriswriter</module>
         <module>plugin/writer/elasticsearchwriter</module>
         <module>plugin/writer/ftpwriter</module>
         <module>plugin/writer/greenplumwriter</module>
