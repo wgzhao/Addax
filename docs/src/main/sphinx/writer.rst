@@ -10,6 +10,7 @@
     Cassandra Writer                <writer/cassandrawriter>
     ClickHouse Writer               <writer/clickhousewriter>
     DBF Writer                      <writer/dbffilewriter>
+    Doris Writer                    <writer/doriswriter>
     ElasticSearch Writer            <writer/elasticsearchwriter>
     FTP Writer                      <writer/ftpwriter>
     Greenplum Reader                <reader/greenlumreader>
