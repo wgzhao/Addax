@@ -29,8 +29,6 @@ import org.influxdb.InfluxDB;
 import org.influxdb.InfluxDBFactory;
 import org.influxdb.dto.Point;
 import org.influxdb.dto.Query;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.util.HashMap;
 import java.util.List;
@@ -39,8 +37,6 @@ import java.util.concurrent.TimeUnit;
 
 public class InfluxDBWriterTask
 {
-    private static final Logger LOG = LoggerFactory.getLogger(InfluxDBWriterTask.class);
-
     private final Configuration configuration;
     protected List<Configuration> columns;
     protected int columnNumber = 0;
@@ -76,7 +72,7 @@ public class InfluxDBWriterTask
     {
         List<String> postSqls = configuration.getList(Key.POST_SQL, String.class);
         if (!postSqls.isEmpty()) {
-            for (String sql :postSqls) {
+            for (String sql : postSqls) {
                 this.influxDB.query(new Query(sql));
             }
         }
@@ -87,14 +83,14 @@ public class InfluxDBWriterTask
         //
     }
 
-    public void startWrite( RecordReceiver recordReceiver, TaskPluginCollector taskPluginCollector)
+    public void startWrite(RecordReceiver recordReceiver, TaskPluginCollector taskPluginCollector)
     {
         influxDB.enableBatch(batchSize, 100, TimeUnit.MILLISECONDS);
         // Retention policy
         String rp = "autogen";
         Record record = null;
         try {
-            while ((record = recordReceiver.getFromReader()) != null ) {
+            while ((record = recordReceiver.getFromReader()) != null) {
                 if (record.getColumnNumber() != this.columnNumber) {
                     throw DataXException.asDataXException(
                             InfluxDBWriterErrorCode.CONF_ERROR,
@@ -106,9 +102,9 @@ public class InfluxDBWriterTask
                 }
                 Point.Builder builder = Point.measurement(table);
                 Map<String, Object> fields = new HashMap<>();
-                // 第一个字符必须是时间戳类型
+                // 第一列必须是时间戳类型，这是时序数据库的特征
                 builder.time(record.getColumn(0).asLong(), TimeUnit.MILLISECONDS);
-                for (int i=1; i< columnNumber; i++) {
+                for (int i = 1; i < columnNumber; i++) {
                     String name = this.columns.get(i).getString("name");
                     String type = this.columns.get(i).getString("type").toUpperCase();
                     Column column = record.getColumn(i);
@@ -128,6 +124,9 @@ public class InfluxDBWriterTask
                             break;
                         case "BINARY":
                             fields.put(name, column.asBytes());
+                            break;
+                        case "TAG":
+                            fields.put(name, column.asString());
                             break;
                         default:
                             fields.put(name, column.asString());

@@ -39,8 +39,7 @@ public class InfluxDBWriter
     public static class Job
             extends Writer.Job
     {
-        private static final Logger LOG = LoggerFactory
-                .getLogger(Job.class);
+        private static final Logger LOG = LoggerFactory.getLogger(Job.class);
 
         private Configuration originalConfig = null;
 
@@ -88,12 +87,13 @@ public class InfluxDBWriter
         }
 
         @Override
-        public List<Configuration> split(int adviceNumber)
+        public List<Configuration> split(int mandatoryNumber)
         {
-            Configuration readerSliceConfig = super.getPluginJobConf();
-            List<Configuration> splittedConfigs = new ArrayList<>();
-            splittedConfigs.add(readerSliceConfig);
-            return splittedConfigs;
+            List<Configuration> splitResultConfigs = new ArrayList<>();
+            for (int j = 0; j < mandatoryNumber; j++) {
+                splitResultConfigs.add(this.originalConfig.clone());
+            }
+            return splitResultConfigs;
         }
 
         @Override
@@ -130,7 +130,7 @@ public class InfluxDBWriter
         @Override
         public void init()
         {
-            Configuration writerSliceConfig = super.getPluginJobConf();
+            Configuration writerSliceConfig = getPluginJobConf();
             this.influxDBWriterTask = new InfluxDBWriterTask(writerSliceConfig);
             this.influxDBWriterTask.init();
         }
@@ -143,7 +143,7 @@ public class InfluxDBWriter
 
         public void startWrite(RecordReceiver recordReceiver)
         {
-            this.influxDBWriterTask.startWrite(recordReceiver, super.getTaskPluginCollector());
+            this.influxDBWriterTask.startWrite(recordReceiver, getTaskPluginCollector());
         }
 
         @Override
