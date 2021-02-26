@@ -19,15 +19,15 @@
 
 package com.wgzhao.datax.plugin.writer.hdfswriter;
 
+import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONObject;
+import com.google.common.collect.Lists;
 import com.wgzhao.datax.common.element.Column;
 import com.wgzhao.datax.common.element.Record;
 import com.wgzhao.datax.common.exception.DataXException;
 import com.wgzhao.datax.common.plugin.RecordReceiver;
 import com.wgzhao.datax.common.plugin.TaskPluginCollector;
 import com.wgzhao.datax.common.util.Configuration;
-import com.alibaba.fastjson.JSON;
-import com.alibaba.fastjson.JSONObject;
-import com.google.common.collect.Lists;
 import org.apache.avro.Conversions;
 import org.apache.avro.Schema;
 import org.apache.avro.generic.GenericData;
@@ -64,6 +64,7 @@ import org.apache.orc.OrcFile;
 import org.apache.orc.TypeDescription;
 import org.apache.orc.Writer;
 import org.apache.parquet.avro.AvroParquetWriter;
+import org.apache.parquet.column.ParquetProperties;
 import org.apache.parquet.hadoop.ParquetWriter;
 import org.apache.parquet.hadoop.metadata.CompressionCodecName;
 import org.slf4j.Logger;
@@ -526,7 +527,6 @@ public class HdfsHelper
         }
     }
 
-
     // 写textfile类型文件
     public void textFileStartWrite(RecordReceiver lineReceiver, Configuration config, String fileName,
             TaskPluginCollector taskPluginCollector)
@@ -616,6 +616,23 @@ public class HdfsHelper
 
     /*
      * 写Parquetfile类型文件
+     * 一个parquet文件的schema类似如下：
+     * {
+     *    "type":	"record",
+     *    "name":	"testFile",
+     *    "doc":	"test records",
+     *    "fields":
+     *      [{
+     *        "name":	"id",
+     *        "type":	"int"
+     *
+     *      },
+     *      {
+     *        "name":	"empName",
+     *        "type":	"string"
+     *      }
+     *    ]
+     *  }
      */
     public void parquetFileStartWrite(RecordReceiver lineReceiver, Configuration config, String fileName,
             TaskPluginCollector taskPluginCollector)
@@ -626,14 +643,11 @@ public class HdfsHelper
         if ("NONE".equals(compress)) {
             compress = "UNCOMPRESSED";
         }
-//        List<String> columnNames = getColumnNames(columns)
-//        List<ObjectInspector> columnTypeInspectors = getparColumnTypeInspectors(columns);
-//        StructObjectInspector inspector = ObjectInspectorFactory
-//                .getStandardStructObjectInspector(columnNames, columnTypeInspectors);
-        Path path = new Path(fileName);
+        // construct parquet schema
+
         String strschema = "{"
                 + "\"type\": \"record\"," //Must be set as record
-                + "\"name\": \"record\"," //Not used in Parquet, can put anything
+                + "\"name\": \"dataxFile\"," //Not used in Parquet, can put anything
                 + "\"fields\": [";
 
         for (Configuration column : columns) {
@@ -648,6 +662,8 @@ public class HdfsHelper
                         + column.getString("type") + "\"},";
             }
         }
+        Path path = new Path(fileName);
+        LOG.info("write parquet file {}", fileName);
         strschema = strschema.substring(0, strschema.length() - 1) + " ]}";
         Schema.Parser parser = new Schema.Parser().setValidate(true);
         Schema parSchema = parser.parse(strschema);
@@ -656,13 +672,18 @@ public class HdfsHelper
 
         GenericData decimalSupport = new GenericData();
         decimalSupport.addLogicalTypeConversion(new Conversions.DecimalConversion());
-        try {
-            ParquetWriter<GenericRecord> writer = AvroParquetWriter
-                    .<GenericRecord>builder(path)
-                    .withDataModel(decimalSupport)
-                    .withCompressionCodec(codecName)
-                    .withSchema(parSchema)
-                    .build();
+        try (ParquetWriter<GenericRecord> writer = AvroParquetWriter
+                .<GenericRecord>builder(path)
+                .withRowGroupSize(ParquetWriter.DEFAULT_BLOCK_SIZE)
+                .withPageSize(ParquetWriter.DEFAULT_PAGE_SIZE)
+                .withSchema(parSchema)
+                .withConf(hadoopConf)
+                .withCompressionCodec(codecName)
+                .withValidation(false)
+                .withDictionaryEncoding(false)
+                .withDataModel(decimalSupport)
+                .withWriterVersion(ParquetProperties.WriterVersion.PARQUET_1_0)
+                .build()) {
 
             GenericRecordBuilder builder = new GenericRecordBuilder(parSchema);
             Record record;
@@ -670,7 +691,6 @@ public class HdfsHelper
                 GenericRecord transportResult = transportParRecord(record, columns, taskPluginCollector, builder);
                 writer.write(transportResult);
             }
-            writer.close();
         }
         catch (Exception e) {
             LOG.error("写文件文件[{}]时发生IO异常,请检查您的网络是否正常！", fileName);
@@ -710,9 +730,10 @@ public class HdfsHelper
                 case CHAR:
                 case BINARY:
                     byte[] buffer;
-                    if ("DATE".equals( record.getColumn(i).getType().toString())) {
-                         buffer = record.getColumn(i).asString().getBytes(StandardCharsets.UTF_8);
-                    } else {
+                    if ("DATE".equals(record.getColumn(i).getType().toString())) {
+                        buffer = record.getColumn(i).asString().getBytes(StandardCharsets.UTF_8);
+                    }
+                    else {
                         buffer = record.getColumn(i).asBytes();
                     }
                     ((BytesColumnVector) batch.cols[i]).setRef(row, buffer, 0, buffer.length);
