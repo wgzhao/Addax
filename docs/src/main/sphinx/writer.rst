@@ -27,4 +27,6 @@
     RDBMS Writer                    <writer/rdbmswriter>
     Redis Writer                    <writer/rediswriter>
     SQLServer Writer                <writer/sqlserverwriter>
+    Stream Writer                   <writer/streamwriter>
+    TDengine Writer                 <writer/tdenginewriter>
     Textfile Writer                 <writer/txtfilewriter>
