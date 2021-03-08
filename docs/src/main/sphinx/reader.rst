@@ -28,4 +28,6 @@
     RDBMS Reader                    <reader/rdbmsreader>
     Redis Reader                    <reader/redisreader>
     SQLServer Reader                <reader/sqlserverreader>
+    Stream  Reader                  <reader/streamreader>
+    TDengine Reader                 <reader/tdenginereader>
     Textfile Reader                 <reader/txtfilereader>
