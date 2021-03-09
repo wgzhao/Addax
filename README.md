@@ -17,7 +17,7 @@
 
 ## 当前稳定版
 
-`3.2.1`
+`3.2.2`
 
 注： 从 `3.2.1` 版本开始，包类名已经更改，因此不再兼容 `3.1.x` 版本
 
@@ -116,6 +116,7 @@
 
 | 版本   | 连接地址                                                     | md5值                             |
 | ----- | ------------------------------------------------------------| ---------------------------------|
+| 3.2.2 | https://pan.baidu.com/s/1TQyaERnIk9EQRDULfQE69w 提取码: jh31 | b04d2563adb36457b85e48c318757ea3 |
 | 3.2.1 | https://pan.baidu.com/s/1as6sL09HlxAN8b2pZ1DttQ 提取码: hwgx | ecda4a961b032c75718502caf54246a8 |
 | 3.1.9 | https://pan.baidu.com/s/1GYpehEvB-W3qnqilhskXFw 提取码: q4wv | 48c4104294cd9bb0c749efc50b32b4dd |
 | 3.1.8 | https://pan.baidu.com/s/1jv-tb-11grYaUnsgnEhDzw 提取码: 2dnf | ef110ae1ea31e1761dc25d6930300485 |
