@@ -20,14 +20,34 @@ jobs:
         uses: actions/setup-java@v1
         with:
           java-version: 1.8
-          server-id: github # Value of the distributionManagement/repository/id field of the pom.xml
+#          server-id: github # Value of the distributionManagement/repository/id field of the pom.xml
           settings-path: ${{ github.workspace }} # location for the settings.xml file
+          server-id: ossrh # Value of the distributionManagement/repository/id field of the pom.xml
+          server-username: OSSRH_USERNAME # env variable for username in deploy
+          server-password: OSSRH_TOKEN # env variable for token in deploy
+          gpg-private-key: ${{ secrets.MAVEN_GPG_PRIVATE_KEY }} # Value of the GPG private key to import
+          gpg-passphrase: MAVEN_GPG_PASSPHRASE # env variable for GPG private key passphrase
+
 
       - name: Build with Maven
         run: mvn -B package --file pom.xml
+
+      - name: Configure GPG Key
+        run: |
+          mkdir -p ~/.gnupg/
+          printf "$GPG_SIGNING_KEY" | base64 --decode > ~/.gnupg/private.key
+          gpg --import ~/.gnupg/private.key
+        env:
+          GPG_SIGNING_KEY: ${{ secrets.GPG_SIGNING_KEY }}
 
       - name: Publish to GitHub Packages Apache Maven
         run: mvn deploy -s $GITHUB_WORKSPACE/settings.xml
         env:
           GITHUB_TOKEN: ${{ github.token }}
+          OSSRH_USERNAME: ${{ secrets.OSSRH_USERNAME }}
+          OSSRH_PASSWORD: ${{ secrets.OSSRH_PASSWORD }}
+          GPG_PASS_PHRASE: ${ secrets.GPG_PASS_PHRASE }}
+          GPG_SIGNING_KEY: ${{ secrets.GPG_SIGNING_KEY }}
+
+
 
