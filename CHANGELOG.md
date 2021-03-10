@@ -6,6 +6,15 @@
 
 * Add support for Elasticsearch reader ([\#121](https://github.com/wgzhao/DataX/pull/121))
 * Add support for TDengine reader and writer ([\#124](https://github.com/wgzhao/DataX/pull/124))
+* Add Support for DorisDB writer ([\#131](https://github.com/wgzhao/DataX/pull/131))
+* Documentation streamreader and streamwriter
+
+### InfluxDB Writer
+
+* Add support more than one channel setup ([\#130](https://github.com/wgzhao/DataX/pull/130))
+
+### HDFS Writer
+Fixed: unknown host exception when writing parquet file ([\#135](https://github.com/wgzhao/DataX/pull/135))
 
 ## 3.2.1
 
