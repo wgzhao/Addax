@@ -41,6 +41,8 @@ import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.IOException;
+import java.util.Properties;
 import java.util.Set;
 
 /**
@@ -172,8 +174,20 @@ public class Engine
         }
     }
 
+    public static String getVersion()
+    {
+        try {
+            final Properties properties = new Properties();
+            properties.load(Engine.class.getClassLoader().getResourceAsStream("project.properties"));
+            return properties.getProperty("version");
+        } catch (IOException e) {
+            return null;
+        }
+    }
+
     public static void main(String[] args)
     {
+        LOG.info("DataX version {}", Engine.getVersion());
         int exitCode = 0;
         if (args.length < 2) {
             LOG.error("need a job file");
