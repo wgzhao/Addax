@@ -46,7 +46,22 @@ jobs:
         # By default, queries listed here will override any specified in a config file.
         # Prefix the list here with "+" to use these queries and those in the config file.
         # queries: ./path/to/local/query, your-org/your-repo/queries@main
-
+    - name: Setup Java JDK
+      uses: actions/setup-java@v1.4.3
+      with:
+        # The Java version to make available on the path. Takes a whole or semver Java version, or 1.x syntax (e.g. 1.8 => Java 8.x). Early access versions can be specified in the form of e.g. 14-ea, 14.0.0-ea, or 14.0.0-ea.28
+        java-version: 1.8
+        # The package type (jre, jdk, jdk+fx)
+        java-package: jdk # optional, default is jdk
+        # The architecture (x86, x64) of the package.
+        architecture: x64 # optional, default is x64
+        # Path to where the compressed JDK is located. The path could be in your source repository or a local path on the agent.
+        # ID of the distributionManagement repository in the pom.xml file. Default is `github`
+        # Environment variable name for the username for authentication to the Apache Maven repository. Default is $GITHUB_ACTOR
+        # Environment variable name for password or token for authentication to the Apache Maven repository. Default is $GITHUB_TOKEN
+        # Path to where the settings.xml file will be written. Default is ~/.m2.
+        # GPG private key to import. Default is empty string.
+      
     # Autobuild attempts to build any compiled languages  (C/C++, C#, or Java).
     # If this step fails, then you should remove it and run the build manually (see below)
     - name: Autobuild
