@@ -1,8 +1,8 @@
 <p align="center">
     <img alt="DataX Logo" src="https://github.com/wgzhao/DataX/blob/master/docs/images/datax-logo.png?raw=true" width="205" />
 </p>
-<p align="center">DataX 是一个支持主流数据库的通用数据采集工具</p>
-<p align="center"><a href="https://datax.readthedocs.io">使用文档</a> 详细描述了如何安装部署和每个采集插件的使用方法 </p>
+<p align="center">DataX is an open source univeral ETL tool</p>
+<p align="center"><a href="https://datax.readthedocs.io">Documentation</a> Detailed description of how to install and deploy and how to use each collection plugin </p>
 <p align="center">
    <a href="https://github.com/wgzhao/DataX/workflows/Maven%20Package/badge.svg">
        <img src="https://github.com/wgzhao/DataX/workflows/Maven%20Package/badge.svg" alt="Maven Package" />
@@ -12,20 +12,23 @@
    </a>
 </p>
 
+English | [简体中文](README_zh.md)
 
-该项目从阿里的[DataX](https://github.com/alibaba/datax) 而来，经过了精简和改造，说明如下
-
-## 当前稳定版
+## current stable version
 
 `3.2.2`
 
-注： 从 `3.2.1` 版本开始，包类名已经更改，因此不再兼容 `3.1.x` 版本
+Note: As of `3.2.1`, the package class names have been changed and are therefore no longer compatible with `3.1.x` versions.
 
-## 功能差别说明
+The project, originally from Ali's [DataX]((https://github.com/alibaba/datax)), has been streamlined and adapted, as described below
 
-### 精简
 
-删除了仅限于阿里内部的数据库，这些数据库在非阿里集团无法使用，因此直接删除，包括：
+## Description of functional differences
+
+### Removed
+
+Deleted databases that were restricted to Ali internal databases that were not available in 
+non-Ali groups and were therefore deleted outright, including:
 
 - ADS
 - DRDS
@@ -34,9 +37,9 @@
 - OSS
 - OTS
 
-### 增加
+### Added
 
-增加了部分插件，目前包括
+Added some plug-ins, which currently include
 
 #### reader plugin
 
@@ -58,76 +61,94 @@
 4. influxdbwriter
 5. tdenginewriter
 
-### 部分插件增强功能，罗列如下
+### Some plug-in enhancements are listed below
 
-- 关系型数据库 增加了几乎所有基本数据类型和一部分复杂类型的支持
-- hdfswriter 增加了对 Decimal 数据类型格式的支持
-- hdfswriter 增加了对 Parquet 文件格式的支持
-- hdfswrite 增加了目录覆盖模式
-- hdfswriter 增加了更多的文件压缩格式支持
-- hdfswriter 的临时目录位置改动为当前写入目录下的隐藏目录，解决了之前和写入目录平行导致的自动增加分区的问题
-- hdfswriter 在覆盖模式下，改进了文件删除机制，减少了对应表查询为空的时间窗口
-- hdfsreader 增加了对 Parquet 文件格式的支持
-- hdfsreader 增加了更多的文件压缩格式支持
-- hbasex11sqlwrite 增加了 Kerberos 支持
-- oraclewriter 增加对 `merge into` 语法支持(感谢 @weihebu 提供的建议和参考)
-- postgresqlwriter 增加 `insert into ... on conflict` 语法支持 (感谢 @weihebu 提供的建议和参考)
-- rdbmsreader/rdbmswriter 增加了TDH Inceptor， Trino 查询引擎支持
-- 尽可能减少了本地jar包的依赖，转为从maven仓库获取
-- 绝大部分依赖包升级到了最新稳定版本，减少了潜在漏洞
-- 不同插件下的相同依赖包做了版本统一
+#### rdbms-ralative plugins
 
-## 支持的数据库一览表
+add support for almost basic data type, and some complex data type.
 
-| 数据库或文件系统 | 读取   | 写入   | 插件名称(reader/writer)             | 备注                                                                                 |
+#### hdfswriter
+
+1. Add support for Decimal data type.
+2. Add support for writing Parquet files.
+3. Add support for writing with the overwrite mode.
+4. Add support for more compression algorithm.
+5. The temporary directory location is changed to a hidden directory under the current write directory, which solves the problem of automatic partition increase caused by the previous parallelism with the write directory.
+6. In overwrite mode, the file deletion mechanism has been improved to reduce the time window when the corresponding table query is empty
+
+#### hdfsreader
+
+1. Add support for reading Parquet files.
+2. Add support for more compression algorithm.
+
+#### hbasex11sqlwrite 
+
+1. Add support for Kerberos authentication.
+
+#### oraclewriter
+
+1. Add support for `merge into` statement.
+
+#### postgresqlwriter 
+
+1. Add support for `insert into ... on conflict` statement.
+
+#### rdbmsreader/rdbmswriter 
+
+1. Add support TDH Inceptor, Trino query engine
+
+
+## Supported databases
+
+| database/filesystem| reader   | writer   | plugin(reader/writer)             | memo                                                                                 |
 | ---------------- | ------ | ------ | ----------------------------------- | ------------------------------------------------------------------------------------ |
-| Cassander        | 支持   | 支持   | cassandrareader/cassandrawriter     |                                                                                      |
-| ClickHouse       | 支持   | 支持   | clickhousereader/clickhousewriter   |                                                                                      |
-| DB2              | 支持   | 支持   | rbdmsreader/rdbmswriter             | 理论上支持，但未实际测试                                                             |
-| DBF              | 支持   | 支持   | dbffilereader/dbffilewriter         |                                                                                      |
-| ElasticSearch    | 支持 | 支持     | elasticsearchreader/elasticsearchwriter | 原始代码来自[@Kestrong](https://github.com/Kestrong/datax-elasticsearch)               |
-| FTP              | 支持   | 支持   | ftpreader/ftpwriter                 |                                                                                      |
-| HBase 1.x        | 支持   | 支持   | hbase11xreader/hbase11xwriter       | 直接操作HBase                                                                        |
-| HBase 1.x        | 支持   | 支持   | hbase11xsqlreader/hbase11xsqlwriter | 通过[Phoenix](https://phoenix.apache.org)操作HBase                                   |
-| HBase 2.x        | 支持   | 不支持 | hbase20xreader                      | 直接操作HBase                                                                        |
-| HBase 2.x        | 支持   | 支持   | hbase20xsqlreader/hbase20xsqlwriter | 通过[Phoenix](https://phoenix.apache.org)操作HBase                                   |
-| HDFS             | 支持   | 支持   | hdfsreader/hdfswriter               | HDFS 2.x 以上版本                                                                    |
-| HTTP             | 支持   | 不支持 | httpreader                          | 仅支持返回值为JSON类型的接口                                                         |
-| Greenplum        | 支持   | 支持   | postgresqlreader/greenplumwriter    |                                                                                      |
-| InfluxDB         | 支持   | 支持   | influxdbreader/influxdbwriter       | 仅支持1.x版本，2.0及以上暂不支持                                                     |
-| json             | 支持   | 不支持 | jsonfilereader                      |                                                                                      |
-| kudu             | 支持   | 支持   | kudureader/kuduwriter               | 通过原生接口，计划更新Impala连接                                                     |
-| MongoDB          | 支持   | 支持   | mongodbreader/mongodbwriter         |                                                                                      |
-| MySQL/MariaDB    | 支持   | 支持   | mysqlreader/mysqlwriter             |                                                                                      |
-| Oracle           | 支持   | 支持   | oraclereader/oraclewriter           |                                                                                      |
-| PostgreSQL       | 支持   | 支持   | postgresqlreader/postgresqlwriter   |                                                                                      |
-| PrestoSQL        | 支持   | 支持   | rdbmsreader/rdbmswriter             | [trino(原PrestoSQL)](https://trino.io) 310以上                                       |
-| Redis            | 支持   | 支持   | redisreader/rediswriter             |                                                                                      |
-| SQL Server       | 支持   | 支持   | sqlserverreader/sqlserverwriter     |                                                                                    |
-| TDengine         | 支持   | 支持   | tdenginereader/tdenginewriter       | 支持 [TDengine](https://www.taosdata.com/cn/) 数据库读写                              |
-| TDH Inceptor2    | 支持   | 支持   | rdbmsreader/rdbmswriter             | [星环 TDH](http://transwarp.cn/transwarp/product-TDH.html?categoryId=18) 5.1以上版本 |
-| TEXT             | 支持   | 支持   | textfilereader/textfilewriter       |                                                                                      |
+| Cassander        | YES   | YES   | cassandrareader/cassandrawriter     |                                                                                      |
+| ClickHouse       | YES   | YES   | clickhousereader/clickhousewriter   |                                                                                      |
+| DB2              | YES   | YES   | rbdmsreader/rdbmswriter             |   not fully tested                                                           |
+| DBF              | YES   | YES   | dbffilereader/dbffilewriter         |                                                                                      |
+| ElasticSearch    | YES | YES     | elasticsearchreader/elasticsearchwriter | originally from [@Kestrong](https://github.com/Kestrong/datax-elasticsearch)               |
+| FTP              | YES   | YES   | ftpreader/ftpwriter                 |                                                                                      |
+| HBase 1.x        | YES   | YES   | hbase11xreader/hbase11xwriter       | use HBASE API                                                                      |
+| HBase 1.x        | YES   | YES   | hbase11xsqlreader/hbase11xsqlwriter | use Phoenix[Phoenix](https://phoenix.apache.org)                               |
+| HBase 2.x        | YES   | NO | hbase20xreader                      | use HBase API                                                                       |
+| HBase 2.x        | YES   | YES   | hbase20xsqlreader/hbase20xsqlwriter | 通过[Phoenix](https://phoenix.apache.org)操作HBase                                   |
+| HDFS             | YES   | YES   | hdfsreader/hdfswriter               | support HDFS 2.0 or later                                                                    |
+| HTTP             | YES   | NO | httpreader                          |  support RestFul API                                                        |
+| Greenplum        | YES   | YES   | postgresqlreader/greenplumwriter    |                                                                                      |
+| InfluxDB         | YES   | YES   | influxdbreader/influxdbwriter       | ONLY support  InfluxDB 1.x                                               |
+| json             | YES   | NO | jsonfilereader                      |                                                                                      |
+| kudu             | YES   | YES   | kudureader/kuduwriter               |                                                   |
+| MongoDB          | YES   | YES   | mongodbreader/mongodbwriter         |                                                                                      |
+| MySQL/MariaDB    | YES   | YES   | mysqlreader/mysqlwriter             |                                                                                      |
+| Oracle           | YES   | YES   | oraclereader/oraclewriter           |                                                                                      |
+| PostgreSQL       | YES   | YES   | postgresqlreader/postgresqlwriter   |                                                                                      |
+| Trino            | YES   | YES   | rdbmsreader/rdbmswriter             | [trino( formerly PrestoSQL)](https://trino.io)                                       |
+| Redis            | YES   | YES   | redisreader/rediswriter             |                                                                                      |
+| SQL Server       | YES   | YES   | sqlserverreader/sqlserverwriter     |                                                                                    |
+| TDengine         | YES   | YES   | tdenginereader/tdenginewriter       |  [TDengine](https://www.taosdata.com/cn/)                             |
+| TDH Inceptor2    | YES   | YES   | rdbmsreader/rdbmswriter             | [Transwarp TDH](http://transwarp.cn/transwarp/product-TDH.html?categoryId=18) 5.1 or later |
+| TEXT             | YES   | YES   | textfilereader/textfilewriter       |                                                                                      |
 
-## 快速开始
+## quick started
 
-### 不想编译
+### Do not want to compile?
 
-如果你懒得编译或者因为环境无法编译，可以从以下链接下载对应的版本
+If you are too lazy to compile or cannot compile because of your environment, you can download the corresponding version from the following link
 
-| 版本   | 连接地址                                                     | md5值                             |
+| version   | download                                                     | md5                            |
 | ----- | ------------------------------------------------------------| ---------------------------------|
-| 3.2.2 | https://pan.baidu.com/s/1TQyaERnIk9EQRDULfQE69w 提取码: jh31 | b04d2563adb36457b85e48c318757ea3 |
-| 3.2.1 | https://pan.baidu.com/s/1as6sL09HlxAN8b2pZ1DttQ 提取码: hwgx | ecda4a961b032c75718502caf54246a8 |
-| 3.1.9 | https://pan.baidu.com/s/1GYpehEvB-W3qnqilhskXFw 提取码: q4wv | 48c4104294cd9bb0c749efc50b32b4dd |
-| 3.1.8 | https://pan.baidu.com/s/1jv-tb-11grYaUnsgnEhDzw 提取码: 2dnf | ef110ae1ea31e1761dc25d6930300485 |
-| 3.1.7 | https://pan.baidu.com/s/1CE5I8V5TNptdOp6GLid3Jg 提取码: v5u3 | fecca6c4a32f2bf7246fdef8bc2912fe |
-| 3.1.6 | https://pan.baidu.com/s/1Ldg10E3qWkbUT44rkH19og 提取码: 4av4 | f6aea7e0ce4b9ec83554e9c6d6ab3cb6 |
-| 3.1.5 | https://pan.baidu.com/s/1yY_lJqulE6hKqktoQbbGmQ 提取码: 2r4p | 9ae27c1c434a097f67a17bb704f70731 |
-| 3.1.4 | https://pan.baidu.com/s/1_plsvzD_GrWN-HffPBtz-g 提取码: kpjn | 7aca526fe7f6f0f54dc467f6ca1647b1 |
-| 3.1.2 | https://pan.baidu.com/s/1zFqv8E6iJX549zdSZDQgiQ 提取码: 7jdk | 3674711fc9b68fad3086f3c8526a3427 |
-| 3.1.1 | https://pan.baidu.com/s/1GwmFA7-hPkd6GKiZEvUKXg 提取码: 1inn | 0fa4e7902420704b2e814fef098f40ae |
+| 3.2.2 | https://pan.baidu.com/s/1TQyaERnIk9EQRDULfQE69w code: jh31 | b04d2563adb36457b85e48c318757ea3 |
+| 3.2.1 | https://pan.baidu.com/s/1as6sL09HlxAN8b2pZ1DttQ code: hwgx | ecda4a961b032c75718502caf54246a8 |
+| 3.1.9 | https://pan.baidu.com/s/1GYpehEvB-W3qnqilhskXFw code: q4wv | 48c4104294cd9bb0c749efc50b32b4dd |
+| 3.1.8 | https://pan.baidu.com/s/1jv-tb-11grYaUnsgnEhDzw code: 2dnf | ef110ae1ea31e1761dc25d6930300485 |
+| 3.1.7 | https://pan.baidu.com/s/1CE5I8V5TNptdOp6GLid3Jg code: v5u3 | fecca6c4a32f2bf7246fdef8bc2912fe |
+| 3.1.6 | https://pan.baidu.com/s/1Ldg10E3qWkbUT44rkH19og code: 4av4 | f6aea7e0ce4b9ec83554e9c6d6ab3cb6 |
+| 3.1.5 | https://pan.baidu.com/s/1yY_lJqulE6hKqktoQbbGmQ code: 2r4p | 9ae27c1c434a097f67a17bb704f70731 |
+| 3.1.4 | https://pan.baidu.com/s/1_plsvzD_GrWN-HffPBtz-g code: kpjn | 7aca526fe7f6f0f54dc467f6ca1647b1 |
+| 3.1.2 | https://pan.baidu.com/s/1zFqv8E6iJX549zdSZDQgiQ code: 7jdk | 3674711fc9b68fad3086f3c8526a3427 |
+| 3.1.1 | https://pan.baidu.com/s/1GwmFA7-hPkd6GKiZEvUKXg code: 1inn | 0fa4e7902420704b2e814fef098f40ae |
 
-### 编译及打包
+### compile and package
 
 ```shell
 git clone https://github.com/wgzhao/datax.git DataX
@@ -136,27 +157,28 @@ mvn clean package
 mvn package assembly:single
 ```
 
-如果需要编译文档，请执行下面的命令
+If you want compile doc, you can execute the following instructions.
 
 ```shell
 cd docs
 mvn clean package
 ```
 
-编译打包成功后，会在项目目录的`target/datax` 目录下创建一个 `datax-<version>`的 文件夹，其中 `<version` 表示版本。
+After successful compilation and packaging, a `datax-<version>` folder will be created in the `target/datax` directory of the project directory, where `<version` indicates the version.
 
-### 开始第一个任务
+### begin your first job
 
-`job` 子目录包含了大量的任务样本，其中 `job.json` 可以作为冒烟测试，执行如下
+The `job` subdirectory contains many sample jobs, of which `job.json` can be used as a smoke-out test and executed as follows
 
 ```shell
 cd target/datax/datax-<version>
 python bin/datax.py job/job.json
 ```
 
-上述命令的输出大致如下：
+The output of the above command is roughly as follows.
+
 <details>
-<summary>点击展开</summary>
+<summary>Click to expand</summary>
 
 ```
  bin/datax.py job/job.json
@@ -306,18 +328,17 @@ DataX	19890604	1989-06-04 00:00:00	true	test
 
 </details>
 
-更多说明，可以说明文档
 
-## 运行要求
+## runtime requirements
 
 - JDK 1.8+
 - Python 2.7+ / Python 3.7+
 
-## 文档
+## documentation
 
-- [在线文档](https://datax.readthedocs.io)
-- [项目内文档](docs/src/main/sphinx/index.rst)
+- [online](https://datax.readthedocs.io)
+- [project](docs/src/main/sphinx/index.rst)
 
 ## License
 
-This software is free to use under the Apache License [Apache license](/license.txt).
+This software is free to use under the Apache License [Apache license](/LICENSE).
