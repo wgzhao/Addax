@@ -58,6 +58,14 @@
             <outputDirectory>datax-${project.version}</outputDirectory>
         </fileSet>
         <fileSet>
+            <directory>plugin/reader/elastichsearchreader/target/dbffilereader-${project.version}/</directory>
+            <includes>
+                <include>**/*.*</include>
+            </includes>
+            <fileMode>0644</fileMode>
+            <outputDirectory>datax-${project.version}</outputDirectory>
+        </fileSet>
+        <fileSet>
             <directory>plugin/reader/ftpreader/target/ftpreader-${project.version}/</directory>
             <includes>
                 <include>**/*.*</include>
