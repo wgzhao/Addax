@@ -42,7 +42,9 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -72,8 +74,7 @@ public class StreamReader
             extends Reader.Job
     {
 
-        private static final Logger LOG = LoggerFactory
-                .getLogger(Job.class);
+        private static final Logger LOG = LoggerFactory.getLogger(Job.class);
         private Pattern mixupFunctionPattern;
         private Configuration originalConfig;
 
@@ -157,17 +158,55 @@ public class StreamReader
             // BYTES: random 0, 10 0到10长度之间的随机字符串获取其UTF-8编码的二进制串
             // 配置了混淆函数后，可不配置value
             // 2者都没有配置
+            // 支持递增函数，当前仅支持整数类型，demo如下
+            // LONG: incr 100 从100开始，每次加1
+            // LONG: incr 0, 1 从0开始，每次加1
+            // LONG: incr 1, 10 从 1 开始，每次加10
+            // LONG: incr 1000, 1 从 1000开始，每次加-1，允许出现负数
             String columnValue = eachColumnConfig.getString(Constant.VALUE);
             String columnMixup = eachColumnConfig.getString(Constant.RANDOM);
-            if (StringUtils.isBlank(columnMixup)) {
+            String columnIncr = eachColumnConfig.getString(Constant.INCR);
+            if (StringUtils.isBlank(columnMixup) && StringUtils.isBlank(columnIncr)) {
                 eachColumnConfig.getNecessaryValue(Constant.VALUE,
                         StreamReaderErrorCode.REQUIRED_VALUE);
             }
-            // 2者都有配置
-            if (StringUtils.isNotBlank(columnMixup) && StringUtils.isNotBlank(columnValue)) {
-                LOG.warn("您配置了streamreader常量列(value:{})和随机混淆列(random:{}), 常量列优先",
-                        columnValue, columnMixup);
-                eachColumnConfig.remove(Constant.RANDOM);
+            if (StringUtils.isNotBlank(columnIncr)) {
+                // 类型判断
+                if (!"long".equalsIgnoreCase(eachColumnConfig.getString(Constant.TYPE))) {
+                    throw DataXException.asDataXException(
+                            StreamReaderErrorCode.NOT_SUPPORT_TYPE,
+                            "递增序列当前仅支持整数类型(long)"
+                    );
+                }
+                //  columnValue is valid number ?
+                if (!columnIncr.contains(",")) {
+                    // setup the default step value
+                    columnIncr = columnIncr + ",1";
+                    eachColumnConfig.set(Constant.INCR, columnIncr);
+                }
+                // validate value
+                try {
+                    Long.parseLong(columnIncr.split(",")[0].trim());
+                    Long.parseLong(columnIncr.split(",")[1].trim());
+                }
+                catch (NumberFormatException e) {
+                    throw DataXException.asDataXException(
+                            StreamReaderErrorCode.ILLEGAL_VALUE,
+                            columnValue + " 不是合法的数字字符串"
+                    );
+                }
+                this.originalConfig.set(Constant.HAVE_INCR_FUNCTION, true);
+            }
+            // 三者都有配置
+            if ((StringUtils.isNotBlank(columnMixup) || StringUtils.isNotBlank(columnIncr)) && StringUtils.isNotBlank(columnValue)) {
+                LOG.warn("您配置了streamreader常量列(value:{})和随机混淆列(random:{})或递增列(incr:{}), 常量列优先",
+                        columnValue, columnMixup, columnIncr);
+                if (StringUtils.isNotBlank(columnMixup)) {
+                    eachColumnConfig.remove(Constant.RANDOM);
+                }
+                if (StringUtils.isNotBlank(columnIncr)) {
+                    eachColumnConfig.remove(Constant.INCR);
+                }
             }
             if (StringUtils.isNotBlank(columnMixup)) {
                 Matcher matcher = this.mixupFunctionPattern.matcher(columnMixup);
@@ -262,24 +301,25 @@ public class StreamReader
     public static class Task
             extends Reader.Task
     {
-
         private List<String> columns;
 
         private long sliceRecordCount;
 
         private boolean haveMixupFunction;
+        private boolean haveIncrFunction;
+
+        // 递增字段字段，用于存储当前的递增值
+        private static final Map<Integer, Long> incrMap = new HashMap<>();
 
         @Override
         public void init()
         {
             Configuration readerSliceConfig = getPluginJobConf();
-            this.columns = readerSliceConfig.getList(Key.COLUMN,
-                    String.class);
+            this.columns = readerSliceConfig.getList(Key.COLUMN, String.class);
 
-            this.sliceRecordCount = readerSliceConfig
-                    .getLong(Key.SLICE_RECORD_COUNT);
-            this.haveMixupFunction = readerSliceConfig.getBool(
-                    Constant.HAVE_MIXUP_FUNCTION, false);
+            this.sliceRecordCount = readerSliceConfig.getLong(Key.SLICE_RECORD_COUNT);
+            this.haveMixupFunction = readerSliceConfig.getBool(Constant.HAVE_MIXUP_FUNCTION, false);
+            this.haveIncrFunction = readerSliceConfig.getBool(Constant.HAVE_INCR_FUNCTION, false);
         }
 
         @Override
@@ -293,11 +333,11 @@ public class StreamReader
         {
             Record oneRecord = buildOneRecord(recordSender, this.columns);
             while (this.sliceRecordCount > 0) {
-                if (this.haveMixupFunction) {
-                    oneRecord = buildOneRecord(recordSender, this.columns);
-                }
                 recordSender.sendToWriter(oneRecord);
                 this.sliceRecordCount--;
+                if (this.haveMixupFunction || this.haveIncrFunction) {
+                    oneRecord = buildOneRecord(recordSender, this.columns);
+                }
             }
         }
 
@@ -313,15 +353,17 @@ public class StreamReader
             //
         }
 
-        private Column buildOneColumn(Configuration eachColumnConfig)
+        private Column buildOneColumn(Configuration eachColumnConfig, int columnIndex)
                 throws Exception
         {
             String columnValue = eachColumnConfig.getString(Constant.VALUE);
             Type columnType = Type.valueOf(eachColumnConfig.getString(Constant.TYPE).toUpperCase());
             String columnMixup = eachColumnConfig.getString(Constant.RANDOM);
+            String columnIncr = eachColumnConfig.getString(Constant.INCR);
             long param1Int = eachColumnConfig.getLong(Constant.MIXUP_FUNCTION_PARAM1, 0L);
             long param2Int = eachColumnConfig.getLong(Constant.MIXUP_FUNCTION_PARAM2, 1L);
             boolean isColumnMixup = StringUtils.isNotBlank(columnMixup);
+            boolean isIncr = StringUtils.isNotBlank(columnIncr);
             if (isColumnMixup) {
                 switch (columnType) {
                     case STRING:
@@ -356,6 +398,14 @@ public class StreamReader
                         // in fact,never to be here
                         throw new Exception(String.format("不支持类型[%s]", columnType.name()));
                 }
+            }
+            else if (isIncr) {
+                //get initial value and step
+                long currVal = Long.parseLong(columnIncr.split(",")[0]);
+                long step = Long.parseLong(columnIncr.split(",")[1]);
+                currVal = incrMap.getOrDefault(columnIndex, currVal);
+                incrMap.put(columnIndex, currVal + step);
+                return new LongColumn(currVal);
             }
             else {
                 switch (columnType) {
@@ -397,9 +447,9 @@ public class StreamReader
 
             Record record = recordSender.createRecord();
             try {
-                for (String eachColumn : columns) {
-                    Configuration eachColumnConfig = Configuration.from(eachColumn);
-                    record.addColumn(this.buildOneColumn(eachColumnConfig));
+                for (int i = 0; i < columns.size(); i++) {
+                    Configuration eachColumnConfig = Configuration.from(columns.get(i));
+                    record.addColumn(this.buildOneColumn(eachColumnConfig, i));
                 }
             }
             catch (Exception e) {
