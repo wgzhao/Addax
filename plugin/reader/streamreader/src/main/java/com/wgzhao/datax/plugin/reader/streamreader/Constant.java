@@ -28,6 +28,9 @@ public class Constant
 
     public static final String RANDOM = "random";
 
+    // 递增字段
+    public static final String INCR = "incr";
+
     public static final String DATE_FORMAT_MARK = "dateFormat";
 
     public static final String DEFAULT_DATE_FORMAT = "yyyy-MM-dd HH:mm:ss";
@@ -36,6 +39,8 @@ public class Constant
     public static final String MIXUP_FUNCTION_PATTERN = "\\s*(.*)\\s*,\\s*(.*)\\s*";
     public static final String MIXUP_FUNCTION_PARAM1 = "mixupParam1";
     public static final String MIXUP_FUNCTION_PARAM2 = "mixupParam2";
+
+    public static final String HAVE_INCR_FUNCTION = "hasIncrFunction";
 
     private Constant() {}
 }
