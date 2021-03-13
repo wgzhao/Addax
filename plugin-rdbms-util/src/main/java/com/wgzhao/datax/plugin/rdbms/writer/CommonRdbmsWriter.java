@@ -39,6 +39,7 @@ import org.slf4j.LoggerFactory;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
+import java.sql.SQLXML;
 import java.sql.Types;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -486,7 +487,7 @@ public class CommonRdbmsWriter
         {
             for (int i = 0; i < record.getColumnNumber(); i++) {
                 int columnSqltype = this.resultSetMetaData.getMiddle().get(i);
-                preparedStatement = fillPreparedStatementColumnType(preparedStatement, i,
+                preparedStatement = fillPreparedStatementColumnType(preparedStatement, i+1,
                         columnSqltype, record.getColumn(i));
             }
             return preparedStatement;
@@ -507,8 +508,7 @@ public class CommonRdbmsWriter
                 case Types.LONGNVARCHAR:
 
                 case Types.BOOLEAN:
-                    preparedStatement.setString(columnIndex + 1, column
-                            .asString());
+                    preparedStatement.setString(columnIndex, column.asString());
                     break;
 
                 case Types.SMALLINT:
@@ -521,20 +521,20 @@ public class CommonRdbmsWriter
                 case Types.DOUBLE:
                     String strValue = column.asString();
                     if (emptyAsNull && "".equals(strValue)) {
-                        preparedStatement.setString(columnIndex + 1, null);
+                        preparedStatement.setString(columnIndex, null);
                     }
                     else {
-                        preparedStatement.setString(columnIndex + 1, strValue);
+                        preparedStatement.setString(columnIndex, strValue);
                     }
                     break;
 
                 case Types.TINYINT:
                     Long longValue = column.asLong();
                     if (null == longValue) {
-                        preparedStatement.setString(columnIndex + 1, null);
+                        preparedStatement.setString(columnIndex, null);
                     }
                     else {
-                        preparedStatement.setString(columnIndex + 1, longValue.toString());
+                        preparedStatement.setString(columnIndex, longValue.toString());
                     }
                     break;
 
@@ -543,10 +543,10 @@ public class CommonRdbmsWriter
                     if ("year"
                             .equalsIgnoreCase(this.resultSetMetaData.getRight().get(columnIndex))) {
                         if (column.asBigInteger() == null) {
-                            preparedStatement.setString(columnIndex + 1, null);
+                            preparedStatement.setString(columnIndex, null);
                         }
                         else {
-                            preparedStatement.setInt(columnIndex + 1, column.asBigInteger().intValue());
+                            preparedStatement.setInt(columnIndex, column.asBigInteger().intValue());
                         }
                     }
                     else {
@@ -562,7 +562,7 @@ public class CommonRdbmsWriter
                         if (null != utilDate) {
                             sqlDate = new java.sql.Date(utilDate.getTime());
                         }
-                        preparedStatement.setDate(columnIndex + 1, sqlDate);
+                        preparedStatement.setDate(columnIndex, sqlDate);
                     }
                     break;
 
@@ -579,14 +579,14 @@ public class CommonRdbmsWriter
                     if (null != utilDate) {
                         sqlTime = new java.sql.Time(utilDate.getTime());
                     }
-                    preparedStatement.setTime(columnIndex + 1, sqlTime);
+                    preparedStatement.setTime(columnIndex, sqlTime);
                     break;
 
                 case Types.TIMESTAMP:
                     if (this.resultSetMetaData.getRight().get(columnIndex).startsWith("DateTime(")) {
                         // ClickHouse DateTime(timezone)
                         // TODO 含时区，当作Timestamp处理会有时区的差异
-                        preparedStatement.setString(columnIndex + 1, column.asString());
+                        preparedStatement.setString(columnIndex, column.asString());
                     } else {
                     java.sql.Timestamp sqlTimestamp = null;
                     try {
@@ -601,7 +601,7 @@ public class CommonRdbmsWriter
                         sqlTimestamp = new java.sql.Timestamp(
                                 utilDate.getTime());
                     }
-                        preparedStatement.setTimestamp(columnIndex + 1, sqlTimestamp);
+                        preparedStatement.setTimestamp(columnIndex, sqlTimestamp);
                     }
                     break;
 
@@ -609,7 +609,7 @@ public class CommonRdbmsWriter
                 case Types.VARBINARY:
                 case Types.BLOB:
                 case Types.LONGVARBINARY:
-                    preparedStatement.setBytes(columnIndex + 1, column
+                    preparedStatement.setBytes(columnIndex, column
                             .asBytes());
                     break;
 
@@ -617,32 +617,36 @@ public class CommonRdbmsWriter
                 // warn: bit(>1) -> Types.VARBINARY 可使用setBytes
                 case Types.BIT:
                     if (this.dataBaseType == DataBaseType.MySql) {
-                        preparedStatement.setBoolean(columnIndex + 1, column.asBoolean());
+                        preparedStatement.setBoolean(columnIndex, column.asBoolean());
                     }
                     else {
-                        preparedStatement.setString(columnIndex + 1, column.asString());
+                        preparedStatement.setString(columnIndex, column.asString());
                     }
                     break;
 
                 case Types.ARRAY:
-                    preparedStatement.setString(columnIndex + 1, column.asString());
+                    preparedStatement.setString(columnIndex, column.asString());
+                    break;
+
+                case Types.SQLXML:
+                    preparedStatement.setString(columnIndex, column.asString());
                     break;
 
                 case Types.OTHER:
-                    String dType = this.resultSetMetaData.getRight().get(columnIndex);
+                    String dType = this.resultSetMetaData.getRight().get(columnIndex-1);
                     LOG.debug("database-specific data type, column name: {}, column type: {}",
-                            this.resultSetMetaData.getLeft().get(columnIndex),
+                            this.resultSetMetaData.getLeft().get(columnIndex-1),
                             dType);
                     if ("image".equals(dType)) {
-                        preparedStatement.setBytes(columnIndex + 1, column.asBytes());
+                        preparedStatement.setBytes(columnIndex, column.asBytes());
                     }
                     else if (dType.startsWith("DateTime64(") && dType.contains(",")) {
                         // ClickHouse DateTime64(p, timezone)
                         // TODO 含时区，当作Timestamp处理会有时区的差异
-                        preparedStatement.setString(columnIndex + 1, column.asString());
+                        preparedStatement.setString(columnIndex, column.asString());
                     }
                     else {
-                        preparedStatement.setObject(columnIndex + 1, column.asString());
+                        preparedStatement.setObject(columnIndex, column.asString());
                     }
                     break;
 
