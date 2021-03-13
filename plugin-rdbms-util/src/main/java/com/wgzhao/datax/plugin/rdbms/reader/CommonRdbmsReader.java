@@ -369,7 +369,7 @@ public class CommonRdbmsReader
                             break;
 
                         case Types.SQLXML:
-                            record.addColumn(new StringColumn(rs.getSQLXML(i).toString()));
+                            record.addColumn(new StringColumn(rs.getSQLXML(i).getString()));
                             break;
 
                         case Types.OTHER:
