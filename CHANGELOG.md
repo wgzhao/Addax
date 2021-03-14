@@ -1,5 +1,15 @@
 # Changelog
 
+## 3.2.3
+
+### RDBMS Reader
+
+* Fixed get `XML` data as string instead of SQLXML handler
+
+### RDBMS Writer
+
+* Add support `XML` data type
+
 ## 3.2.2
 
 ### General Changes

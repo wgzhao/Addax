@@ -10,7 +10,71 @@ MysqlReader通过JDBC连接器连接到远程的Mysql数据库，并根据用户
 
 ## 示例
 
-下面的配置一个从Mysql数据库同步抽取数据到本地的作业:
+我们在 MySQL 的 test 库上创建如下表：
+
+```sql
+CREATE TABLE datax_reader (
+    c_bigint bigint,
+    c_varchar varchar(100),
+    c_timestamp timestamp,
+    c_text text,
+    c_decimal decimal(8, 3),
+    c_mediumtext mediumtext,
+    c_longtext longtext,
+    c_int int,
+    c_time time,
+    c_datetime datetime,
+    c_enum enum('one', 'two', 'three'),
+    c_float float,
+    c_smallint smallint,
+    c_bit bit,
+    c_double double,
+    c_blob blob,
+    c_char char(5),
+    c_varbinary varbinary(100),
+    c_tinyint tinyint,
+    c_json json,
+    c_set SET ('a', 'b', 'c', 'd'),
+    c_binary binary,
+    c_longblob longblob,
+    c_mediumblob mediumblob
+);
+
+然后插入下面一条记录
+
+```sql
+INSERT INTO
+    datax_reader
+VALUES
+(
+        2E18,
+        'a varchar data',
+        '2021-12-12 12:12:12',
+        'a long text',
+        12345.122,
+        'a medium text',
+        'a long text',
+        2 ^ 32 -1,
+        '12:13:14',
+        '2021-12-12 12:13:14',
+        'one',
+        17.191,
+        126,
+        0,
+        1114.1114,
+        'blob',
+        'a123b',
+        'a var binary content',
+        126,
+        '{"k1":"val1","k2":"val2"}',
+        'b',
+        binary(1),
+        x'89504E470D0A1A0A0000000D494844520000001000000010080200000090916836000000017352474200',
+        x'89504E470D0A1A0A0000000D'
+    );
+```
+
+下面的配置是读取该表到终端的作业:
 
 ```json
 {
@@ -29,17 +93,15 @@ MysqlReader通过JDBC连接器连接到远程的Mysql数据库，并根据用户
             "username": "root",
             "password": "root",
             "column": [
-              "id",
-              "name"
+             "*"
             ],
-            "splitPk": "db_id",
             "connection": [
               {
                 "table": [
-                  "table"
+                  "datax_reader"
                 ],
                 "jdbcUrl": [
-                  "jdbc:mysql://127.0.0.1:3306/database"
+                  "jdbc:mysql://127.0.0.1:3306/test"
                 ],
                 "driver": "com.mysql.jdbc.Driver"
               }
@@ -107,7 +169,7 @@ bin/datax.py job/mysql2stream.json
 
 下面列出MysqlReader针对Mysql类型转换列表:
 
-| DataX 内部类型| Mysql 数据类型    |
+| DataX 内部类型| MySQL 数据类型    |
 | -------- | -----  |
 | Long     |int, tinyint, smallint, mediumint, int, bigint|
 | Double   |float, double, decimal|
