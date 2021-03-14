@@ -350,6 +350,7 @@ public final class DBUtil
      * @param fetchSize fetch size each batch
      * @param queryTimeout unit:second
      * @return A {@link ResultSet}
+     * @throws SQLException if failed to execute sql statement
      */
     public static ResultSet query(Connection conn, String sql, int fetchSize, int queryTimeout)
             throws SQLException
@@ -362,7 +363,7 @@ public final class DBUtil
         } catch (SQLException ignore) {
             // some database does not support TYPE_FORWARD_ONLY/CONCUR_READ_ONLY
             LOG.warn("current database does not supoort TYPE_FORWARD_ONLY/CONCUR_READ_ONLY");
-            stmt = conn.createStatement();
+            stmt = conn.createStatement(); //NOSONAR
         }
         stmt.setFetchSize(fetchSize);
         stmt.setQueryTimeout(queryTimeout);
