@@ -140,6 +140,16 @@ splitPk如果不填写，将视作用户不对单表进行切分，OracleReader�
 
 目前RDBMSReader支持大部分通用得关系数据库类型如数字、字符等，但也存在部分个别类型没有支持的情况，请注意检查你的类型，根据具体的数据库做选择。
 
+| DataX 内部类型| RDBMS 数据类型    |
+| -------- | -----  |
+| Long     |int, tinyint, smallint, mediumint, int, bigint|
+| Double   |float, double, decimal|
+| String   |varchar, char, tinytext, text, mediumtext, longtext, year,xml   |
+| Date     |date, datetime, timestamp, time    |
+| Boolean  |bit, bool   |
+| Bytes    |tinyblob, mediumblob, blob, longblob, varbinary    |
+
+
 ## 4. 当前支持的数据库
 
 - [PrestoSQL](https://prestosql.io)
