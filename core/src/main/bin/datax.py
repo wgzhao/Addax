@@ -21,13 +21,16 @@ def isWindows():
     return platform.system() == 'Windows'
 
 
-# extract version from lib/datax-core-<version>.jar package
+
 def get_version():
-    core_jar = glob("{}/lib/datax-core-*.jar".format(DATAX_HOME))[0]
+    """
+    extract version from lib/datax-core-<version>.jar package
+    """
+    core_jar = glob(os.path.join(DATAX_HOME, "lib", "datax-core-*.jar"))
     if not core_jar:
-        return None
+        return ""
     else:
-        return os.path.basename(core_jar)[11:-4]
+        return os.path.basename(core_jar[0])[11:-4]
 
 
 DATAX_HOME = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -36,11 +39,12 @@ DATAX_VERSION = 'DataX ' + get_version()
 if isWindows():
     codecs.register(
         lambda name: name == 'cp65001' and codecs.lookup('utf-8') or None)
-    CLASS_PATH = "{}/lib/*".format(DATAX_HOME)
+    CLASS_PATH = "{1}{0}lib{0}*".format(os.sep, DATAX_HOME)
 else:
-    CLASS_PATH = "{}/lib/*:.".format(DATAX_HOME)
-LOGBACK_FILE = "{}/conf/logback.xml".format(DATAX_HOME)
-DEFAULT_JVM = "-Xms64m -Xmx2g -XX:+HeapDumpOnOutOfMemoryError -XX:HeapDumpPath={}".format(DATAX_HOME)
+    CLASS_PATH = "{1}{0}lib{0}*:.".format(os.sep, DATAX_HOME)
+LOGBACK_FILE = "{1}{0}conf{0}logback.xml".format(os.sep, DATAX_HOME)
+DEFAULT_JVM = "-Xms64m -Xmx2g -XX:+HeapDumpOnOutOfMemoryError -XX:HeapDumpPath={}".format(
+    DATAX_HOME)
 DEFAULT_PROPERTY_CONF = "-Dfile.encoding=UTF-8 -Dlogback.statusListenerClass=ch.qos.logback.core.status.NopStatusListener \
                         -Djava.security.egd=file:///dev/urandom -Ddatax.home=%s -Dlogback.configurationFile=%s " % \
                         (DATAX_HOME, LOGBACK_FILE)
@@ -88,7 +92,8 @@ def register_signal():
 def getOptionParser():
     usage = "usage: %prog [options] job-url-or-path"
     parser = OptionParser(usage=usage)
-    parser.add_option("-v", "--version", action="store_true", help="Print version and exit")
+    parser.add_option("-v", "--version", action="store_true",
+                      help="Print version and exit")
 
     prodEnvOptionGroup = OptionGroup(parser, "Product Env Options",
                                      "Normal user use these options to set jvm parameters, job runtime mode etc. "
@@ -130,9 +135,9 @@ def getOptionParser():
 
 
 def generateJobConfigTemplate(reader, writer):
-    readerRef = "Please refer to the document:\n\thttps://datax.readthedocs.io/zh_CN/latest/reader/%s.html\n".format(
+    readerRef = "Please refer to the document:\n\thttps://datax.readthedocs.io/zh_CN/latest/reader/{}.html\n".format(
         reader)
-    writerRef = "Please refer to the %s document:\n\thttps://datax.readthedocs.io/zh_CN/latest/writer/%s.html\n".format(
+    writerRef = "Please refer to the document:\n\thttps://datax.readthedocs.io/zh_CN/latest/writer/{}.html\n".format(
         writer)
     print(readerRef, writerRef)
     jobGuid = 'Please save the following configuration as a json file and  use\n     python {DATAX_HOME}/bin/datax.py {JSON_FILE_NAME}.json \nto run the job.\n'
@@ -152,10 +157,10 @@ def generateJobConfigTemplate(reader, writer):
             ]
         }
     }
-    readerTemplatePath = "%s/plugin/reader/%s/plugin_job_template.json" % (
-        DATAX_HOME, reader)
-    writerTemplatePath = "%s/plugin/writer/%s/plugin_job_template.json" % (
-        DATAX_HOME, writer)
+    readerTemplatePath = os.path.join(
+        DATAX_HOME, "plugin", "reader", reader, "plugin_job_template.json")
+    writerTemplatePath = os.path.join(
+        DATAX_HOME, "plugin", "writer", writer, "plugin_job_template.json")
     readerPar = None
     writerPar = None
     try:
@@ -202,7 +207,7 @@ def buildStartCommand(options, args):
 
     if options.loglevel:
         tempJVMCommand = tempJVMCommand + " " + \
-                         ("-Dloglevel=%s" % (options.loglevel))
+            ("-Dloglevel=%s" % (options.loglevel))
 
     if options.mode:
         commandMap["mode"] = options.mode
@@ -248,6 +253,8 @@ if __name__ == "__main__":
         sys.exit(RET_STATE['FAIL'])
 
     startCommand = buildStartCommand(options, args)
+    if options.loglevel.lower() == "debug":
+        print("start command: {}".format(startCommand))
     child_process = subprocess.Popen(startCommand, shell=True)
     register_signal()
     (stdout, stderr) = child_process.communicate()
