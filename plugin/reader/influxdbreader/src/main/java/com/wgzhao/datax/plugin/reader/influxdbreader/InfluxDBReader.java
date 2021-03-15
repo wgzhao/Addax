@@ -86,21 +86,19 @@ public class InfluxDBReader
             extends Reader.Task
     {
 
-        private Configuration readerSliceConfig;
         private InfluxDBReaderTask influxDBReaderTask;
 
         @Override
         public void init()
         {
-            this.readerSliceConfig = super.getPluginJobConf();
+            Configuration readerSliceConfig = super.getPluginJobConf();
             this.influxDBReaderTask = new InfluxDBReaderTask(readerSliceConfig);
         }
 
         @Override
         public void startRead(RecordSender recordSender)
         {
-            this.influxDBReaderTask.startRead(this.readerSliceConfig, recordSender,
-                    super.getTaskPluginCollector());
+            this.influxDBReaderTask.startRead(recordSender, super.getTaskPluginCollector());
         }
 
         @Override

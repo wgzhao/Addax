@@ -65,6 +65,9 @@ influx --execute "CREATE DATABASE datax"
                 "table": "datax_tbl"
               }
             ],
+            "connTimeout": 15,
+            "readTimeout": 20,
+            "writeTimeout": 20,
             "username": "influx",
             "password": "influx123",
             "column": [
@@ -101,6 +104,9 @@ bin/datax.py job/stream2kudu.json
 | database        |    是      | string |  无      | 数据源指定的数据库  |
 | table           |    是    | string |无     | 要写入的表（指标） |
 | column          |    是    | list  | 无     |  所配置的表中需要同步的列名集合 |
+| connTimeout     |    否    | int   | 15     | 设置连接超时值，单位为秒     |
+| readTimeout     |    否    | int   | 20     | 设置读取超时值，单位为秒     |
+| writeTimeout    |    否    | int   | 20     | 设置写入超时值，单位为秒     |
 | preSql        |    否    | list |无     | 插入数据前执行的SQL语句|
 | postSql       | 否      | list | 无     | 数据插入完毕后需要执行的语句 |
 
