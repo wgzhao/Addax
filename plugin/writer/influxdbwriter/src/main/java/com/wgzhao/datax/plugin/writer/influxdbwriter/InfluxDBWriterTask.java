@@ -25,6 +25,7 @@ import com.wgzhao.datax.common.exception.DataXException;
 import com.wgzhao.datax.common.plugin.RecordReceiver;
 import com.wgzhao.datax.common.plugin.TaskPluginCollector;
 import com.wgzhao.datax.common.util.Configuration;
+import okhttp3.OkHttpClient;
 import org.influxdb.InfluxDB;
 import org.influxdb.InfluxDBFactory;
 import org.influxdb.dto.Point;
@@ -37,29 +38,53 @@ import java.util.concurrent.TimeUnit;
 
 public class InfluxDBWriterTask
 {
-    private final Configuration configuration;
+    private static final int CONNECT_TIMEOUT_SECONDS_DEFAULT = 15;
+    private static final int READ_TIMEOUT_SECONDS_DEFAULT = 20;
+    private static final int WRITE_TIMEOUT_SECONDS_DEFAULT = 20;
     protected List<Configuration> columns;
-    protected int columnNumber = 0;
-    private String database;
-    private String table;
-    private int batchSize;
+    private final int columnNumber;
+    private final int batchSize;
     private InfluxDB influxDB;
 
-    public InfluxDBWriterTask(Configuration configuration) {this.configuration = configuration;}
+    private final List<String> postSqls;
+    private final String table;
+    private final String database;
+    private final String endpoint;
+    private final String username;
+    private final String password;
 
-    public void init()
+    private final int connTimeout;
+    private final int readTimeout;
+    private final int writeTimeout;
+
+    public InfluxDBWriterTask(Configuration configuration)
     {
         List<Object> connList = configuration.getList(Key.CONNECTION);
         Configuration conn = Configuration.from(connList.get(0).toString());
-        String endpoint = conn.getString(Key.ENDPOINT);
+        this.endpoint = conn.getString(Key.ENDPOINT);
         this.table = conn.getString(Key.TABLE);
         this.database = conn.getString(Key.DATABASE);
         this.columns = configuration.getListConfiguration(Key.COLUMN);
         this.columnNumber = this.columns.size();
-        String username = configuration.getString(Key.USERNAME);
-        String password = configuration.getString(Key.PASSWORD, null);
-        this.influxDB = InfluxDBFactory.connect(endpoint, username, password);
+        this.username = configuration.getString(Key.USERNAME);
+        this.password = configuration.getString(Key.PASSWORD, null);
+        this.connTimeout = configuration.getInt(Key.CONNECT_TIMEOUT_SECONDS, CONNECT_TIMEOUT_SECONDS_DEFAULT);
+        this.readTimeout = configuration.getInt(Key.READ_TIMEOUT_SECONDS, READ_TIMEOUT_SECONDS_DEFAULT);
+        this.writeTimeout = configuration.getInt(Key.WRITE_TIMEOUT_SECONDS, WRITE_TIMEOUT_SECONDS_DEFAULT);
         this.batchSize = configuration.getInt(Key.BATCH_SIZE, 1024);
+        this.postSqls = configuration.getList(Key.POST_SQL, String.class);
+
+    }
+
+    public void init()
+    {
+        OkHttpClient.Builder okHttpClientBuilder = new OkHttpClient().newBuilder()
+                .connectTimeout(connTimeout, TimeUnit.SECONDS)
+                .readTimeout(readTimeout, TimeUnit.SECONDS)
+                .writeTimeout(writeTimeout, TimeUnit.SECONDS);
+
+        this.influxDB = InfluxDBFactory.connect(endpoint, username, password, okHttpClientBuilder);
+        this.influxDB.enableBatch(this.batchSize, this.writeTimeout, TimeUnit.SECONDS);
         influxDB.setDatabase(database);
     }
 
@@ -70,7 +95,7 @@ public class InfluxDBWriterTask
 
     public void post()
     {
-        List<String> postSqls = configuration.getList(Key.POST_SQL, String.class);
+
         if (!postSqls.isEmpty()) {
             for (String sql : postSqls) {
                 this.influxDB.query(new Query(sql));
@@ -85,7 +110,6 @@ public class InfluxDBWriterTask
 
     public void startWrite(RecordReceiver recordReceiver, TaskPluginCollector taskPluginCollector)
     {
-        influxDB.enableBatch(batchSize, 100, TimeUnit.MILLISECONDS);
         // Retention policy
         String rp = "autogen";
         Record record = null;
