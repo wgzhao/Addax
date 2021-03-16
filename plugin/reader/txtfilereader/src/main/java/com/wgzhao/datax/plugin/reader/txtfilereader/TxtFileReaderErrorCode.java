@@ -39,6 +39,11 @@ public enum TxtFileReaderErrorCode
     CONFIG_INVALID_EXCEPTION("TxtFileReader-09", "您的参数配置错误."),
 //    RUNTIME_EXCEPTION("TxtFileReader-10", "出现运行时异常, 请联系我们"),
     EMPTY_DIR_EXCEPTION("TxtFileReader-11", "您尝试读取的文件目录为空."),
+    NOT_SUPPORT_TYPE("TxtFileReader-12", "您配置的列类型暂不支持."),
+    OPEN_FILE_WITH_CHARSET_ERROR("TxtFileReader-13", "您配置的编码和实际存储编码不符合."),
+    //    OPEN_FILE_ERROR("UnstructuredStorageReader-08", "您配置的源在打开时异常,建议您检查源源是否有隐藏实体,管道文件等特殊文件."),
+    READ_FILE_IO_ERROR("TxtFileReader-14", "您配置的文件在读取时出现IO异常."),
+    RUNTIME_EXCEPTION("TxtFileReader-15", "出现运行时异常, 请联系我们")
     ;
 
     private final String code;
