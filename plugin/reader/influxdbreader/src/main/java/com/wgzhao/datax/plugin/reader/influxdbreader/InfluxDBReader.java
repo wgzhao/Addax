@@ -23,6 +23,7 @@ import com.wgzhao.datax.common.exception.DataXException;
 import com.wgzhao.datax.common.plugin.RecordSender;
 import com.wgzhao.datax.common.spi.Reader;
 import com.wgzhao.datax.common.util.Configuration;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -53,6 +54,14 @@ public class InfluxDBReader
             init();
             originalConfig.getNecessaryValue(Key.ENDPOINT, InfluxDBReaderErrorCode.REQUIRED_VALUE);
             List<String> columns = originalConfig.getList(Key.COLUMN, String.class);
+            String querySql = originalConfig.getString(Key.QUERY_SQL, null);
+            String database = originalConfig.getString(Key.DATABASE, null);
+            if (StringUtils.isAllBlank(querySql,database)) {
+                throw DataXException.asDataXException(
+                        InfluxDBReaderErrorCode.REQUIRED_VALUE,
+                        "One of database or querysql must be specified"
+                );
+            }
             if (columns == null || columns.isEmpty()) {
                 throw DataXException.asDataXException(
                         InfluxDBReaderErrorCode.REQUIRED_VALUE,
