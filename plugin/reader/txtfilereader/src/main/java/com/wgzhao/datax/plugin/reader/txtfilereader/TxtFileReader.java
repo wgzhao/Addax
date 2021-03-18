@@ -187,24 +187,6 @@ public class TxtFileReader
                 }
             }
 
-            // only support compress types
-            String compress = this.originConfig.getString(Key.COMPRESS, null);
-            if (StringUtils.isBlank(compress)) {
-                this.originConfig.set(Key.COMPRESS, null);
-            }
-            else {
-                List<String> suppertedCompress = Arrays.asList("gzip", "bzip2", "zip");
-                compress = compress.toLowerCase().trim();
-                if (!suppertedCompress.contains(compress)) {
-                    throw DataXException
-                            .asDataXException(
-                                    TxtFileReaderErrorCode.ILLEGAL_VALUE,
-                                    String.format("仅支持 %s 文件压缩格式 , 不支持您配置的文件压缩格式: [%s]",
-                                            suppertedCompress, compress));
-                }
-                this.originConfig.set(Key.COMPRESS, compress);
-            }
-
             String delimiterInStr = this.originConfig.getString(Key.FIELD_DELIMITER);
             // warn: if have, length must be one
             if (null != delimiterInStr && 1 != delimiterInStr.length()) {
@@ -419,9 +401,10 @@ public class TxtFileReader
         private List<Configuration> column;
         private String encoding;
         private int bufferSize;
-        private static Character fieldDelimiter;
-        private static boolean skipHeader;
-        private static String nullFormat;
+        private Character fieldDelimiter;
+        private boolean skipHeader;
+        private String nullFormat;
+
         @Override
         public void init()
         {
