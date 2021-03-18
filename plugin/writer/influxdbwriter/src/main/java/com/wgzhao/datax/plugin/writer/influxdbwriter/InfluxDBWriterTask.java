@@ -73,7 +73,6 @@ public class InfluxDBWriterTask
         this.writeTimeout = configuration.getInt(Key.WRITE_TIMEOUT_SECONDS, WRITE_TIMEOUT_SECONDS_DEFAULT);
         this.batchSize = configuration.getInt(Key.BATCH_SIZE, 1024);
         this.postSqls = configuration.getList(Key.POST_SQL, String.class);
-
     }
 
     public void init()
@@ -105,7 +104,7 @@ public class InfluxDBWriterTask
 
     public void destroy()
     {
-        //
+        this.influxDB.close();
     }
 
     public void startWrite(RecordReceiver recordReceiver, TaskPluginCollector taskPluginCollector)
@@ -132,33 +131,39 @@ public class InfluxDBWriterTask
                     String name = this.columns.get(i).getString("name");
                     String type = this.columns.get(i).getString("type").toUpperCase();
                     Column column = record.getColumn(i);
-                    switch (type) {
-                        case "INT":
-                        case "LONG":
-                            fields.put(name, column.asLong());
-                            break;
-                        case "DATE":
-                            fields.put(name, column.asDate());
-                            break;
-                        case "DOUBLE":
-                            fields.put(name, column.asDouble());
-                            break;
-                        case "DECIMAL":
-                            fields.put(name, column.asBigDecimal());
-                            break;
-                        case "BINARY":
-                            fields.put(name, column.asBytes());
-                            break;
-                        case "TAG":
-                            fields.put(name, column.asString());
-                            break;
-                        default:
-                            fields.put(name, column.asString());
-                            break;
+                    if ("TAG".equals(type)) {
+                        builder.tag(name, column.asString());
+                    }
+                    else {
+                        switch (type) {
+                            case "INT":
+                            case "LONG":
+                                fields.put(name, column.asLong());
+                                break;
+                            case "DATE":
+                                fields.put(name, column.asDate());
+                                break;
+                            case "DOUBLE":
+                                fields.put(name, column.asDouble());
+                                break;
+                            case "DECIMAL":
+                                fields.put(name, column.asBigDecimal());
+                                break;
+                            case "BINARY":
+                                fields.put(name, column.asBytes());
+                                break;
+                            default:
+                                fields.put(name, column.asString());
+                                break;
+                        }
                     }
                 }
                 builder.fields(fields);
                 influxDB.write(database, rp, builder.build());
+            }
+            // flush last batch manual for avoid missing data
+            if (influxDB.isBatchEnabled()) {
+                influxDB.flush();
             }
         }
         catch (Exception e) {
