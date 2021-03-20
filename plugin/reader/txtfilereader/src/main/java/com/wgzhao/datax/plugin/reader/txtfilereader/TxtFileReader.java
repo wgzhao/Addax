@@ -467,12 +467,18 @@ public class TxtFileReader
                     throw DataXException.asDataXException(
                             TxtFileReaderErrorCode.OPEN_FILE_ERROR, String.format("找不到待读取的文件 : [%s]", fileName));
                 }
-
                 try {
-                    if (FileHelper.isCompressed(inputStream)) {
-                        BufferedInputStream bis = new BufferedInputStream(inputStream);
-                        CompressorInputStream input = new CompressorStreamFactory().createCompressorInputStream(bis);
-                        reader = new BufferedReader(new InputStreamReader(input, encoding), bufferSize);
+                    String compressType = FileHelper.getCompressType(fileName);
+                    if (compressType != null) {
+                        if ("zip".equals(compressType)) {
+                            ZipCycleInputStream zis = new ZipCycleInputStream(inputStream);
+                            reader = new BufferedReader(new InputStreamReader(zis, encoding), bufferSize);
+                        }
+                        else {
+                            BufferedInputStream bis = new BufferedInputStream(inputStream);
+                            CompressorInputStream input = new CompressorStreamFactory().createCompressorInputStream(bis);
+                            reader = new BufferedReader(new InputStreamReader(input, encoding), bufferSize);
+                        }
                     }
                     else {
                         reader = new BufferedReader(new InputStreamReader(inputStream, encoding), bufferSize);
@@ -494,7 +500,6 @@ public class TxtFileReader
                 TaskPluginCollector taskPluginCollector)
         {
 
-
             CsvReader csvReader = null;
 
             // every line logic
@@ -512,7 +517,7 @@ public class TxtFileReader
 
                 String[] parseRows;
                 while ((parseRows = splitBufferedReader(csvReader)) != null) {
-                    transportOneRecord(recordSender,parseRows, taskPluginCollector);
+                    transportOneRecord(recordSender, parseRows, taskPluginCollector);
                 }
             }
             catch (UnsupportedEncodingException uee) {
@@ -537,12 +542,13 @@ public class TxtFileReader
                         String.format("运行时异常 : %s", e.getMessage()), e);
             }
             finally {
-                if (csvReader != null ) {
+                if (csvReader != null) {
                     csvReader.close();
                 }
                 IOUtils.closeQuietly(reader, null);
             }
         }
+
         private void transportOneRecord(RecordSender recordSender, String[] sourceLine, TaskPluginCollector taskPluginCollector)
         {
             Record record = recordSender.createRecord();
@@ -719,18 +725,17 @@ public class TxtFileReader
             if (null != csvReaderConfigMap && !csvReaderConfigMap.isEmpty()) {
                 try {
                     BeanUtils.populate(csvReader, csvReaderConfigMap);
-                    LOG.info("csvReaderConfig设置成功,设置后CsvReader: {}", JSON.toJSONString(csvReader));
+                    LOG.debug("csvReaderConfig设置成功,设置后CsvReader: {}", JSON.toJSONString(csvReader));
                 }
                 catch (Exception e) {
-                    LOG.info("WARN!!!!忽略csvReaderConfig配置!通过BeanUtils.populate配置您的csvReaderConfig发生异常,您配置的值为: {};请检查您的配置!CsvReader使用默认值[{}]",
+                    LOG.warn("WARN!!!!忽略csvReaderConfig配置!通过BeanUtils.populate配置您的csvReaderConfig发生异常,您配置的值为: {};请检查您的配置!CsvReader使用默认值[{}]",
                             JSON.toJSONString(csvReaderConfigMap), JSON.toJSONString(csvReader));
                 }
             }
             else {
                 //默认关闭安全模式, 放开10W字节的限制
                 csvReader.setSafetySwitch(false);
-                LOG.info("CsvReader使用默认值[{}],csvReaderConfig值为[{}]",
-                        JSON.toJSONString(csvReader), JSON.toJSONString(csvReaderConfigMap));
+                LOG.debug("CsvReader使用默认值[{}],csvReaderConfig值为[{}]", JSON.toJSONString(csvReader), JSON.toJSONString(csvReaderConfigMap));
             }
         }
     }

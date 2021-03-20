@@ -40,6 +40,7 @@ public class FileHelper
         mFileTypes.put("377A", "7z");
         mFileTypes.put("FD37", "xz");
         mFileTypes.put("0422", "lz4");
+        mFileTypes.put("7573", "tar");
     }
 
     private static String bytesToHexString(byte[] src) {
@@ -59,20 +60,18 @@ public class FileHelper
         return builder.toString();
     }
 
-    public static boolean isCompressed(String filePath)
+    public static String getCompressType(String filePath)
             throws IOException
     {
         FileInputStream fis =  new FileInputStream(filePath);
-        byte[] b = new byte[2];
-        fis.read(b, 0, b.length);
-        return mFileTypes.getOrDefault(bytesToHexString(b), null) != null;
+        return getCompressType(fis);
     }
 
-    public static boolean isCompressed(InputStream inputStream)
+    public static String getCompressType(InputStream inputStream)
             throws IOException
     {
         byte[] b = new byte[2];
         inputStream.read(b, 0, b.length);
-        return mFileTypes.getOrDefault(bytesToHexString(b), null) != null;
+        return mFileTypes.getOrDefault(bytesToHexString(b), null);
     }
 }
