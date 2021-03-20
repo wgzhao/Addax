@@ -18,7 +18,7 @@ TxtFileReader实现了从本地文件读取数据并转为DataX协议的功能�
 
 4. 支持递归读取、支持文件名过滤。
 
-5. 支持文本压缩，现有压缩格式为zip、gzip、bzip2。
+5. 支持文本压缩，且自动猜测压缩格式
 
 6. 多个File可以支持并发读取。
 
@@ -98,7 +98,6 @@ TxtFileReader实现了从本地文件读取数据并转为DataX协议的功能�
 | path            |    是    | 无             | 本地文件系统的路径信息，注意这里可以支持填写多个路径,详细描述见下文                |
 | column            |    是    | 默认String类型 | 读取字段列表，type指定源数据的类型，详见下文                                 |
 | fieldDelimiter    |    是    | `,`            | 描述：读取的字段分隔符                                                  |
-| compress          |    否    | 无             | 文本压缩类型，默认不填写意味着没有压缩。支持压缩类型为zip、gzip、bzip2       |
 | encoding          |    否    | utf-8          | 读取文件的编码配置                                                     |
 | skipHeader        |    否    | false          | 类CSV格式文件可能存在表头为标题情况，需要跳过。默认不跳过                    |
 | csvReaderConfig   |    否    | 无             | 读取CSV类型文件参数配置，Map类型。不配置则使用默认值,详见下文 |
@@ -115,6 +114,16 @@ TxtFileReader实现了从本地文件读取数据并转为DataX协议的功能�
 
 特别需要注意的是，如果Path指定的路径下没有符合匹配的文件抽取，DataX将报错。
 
+从 3.2.3 版本起， `path` 下允许混合不同压缩格式的文件，插件会尝试自动猜测压缩格式并自动解压，目前支持的压缩格式有：
+
+- zip
+- bzip2
+- gzip
+- LZ4
+- PACK200
+- XZ
+- Compress
+
 #### column
 
 读取字段列表，type指定源数据的类型，index指定当前列来自于文本第几列(以0开始)，value指定当前类型为常量，不从源头文件读取数据，而是根据value值自动生成对应的列。 <br />
@@ -122,20 +131,26 @@ TxtFileReader实现了从本地文件读取数据并转为DataX协议的功能�
 默认情况下，用户可以全部按照String类型读取数据，配置如下：
 
 ```json
-    "column": ["*"]
+{
+  "column": [
+    "*"
+  ]
+}
 ```
 
 用户可以指定Column字段信息，配置如下：
 
 ```json
-{
-  "type": "long",
-  "index": 0
-},
-{
-"type": "string",
-"value": "alibaba"
-}
+[
+  {
+    "type": "long",
+    "index": 0
+  },
+  {
+    "type": "string",
+    "value": "alibaba"
+  }
+]
 ```
 
 对于用户指定Column信息，type必须填写，index/value必须选择其一。
@@ -147,10 +162,12 @@ TxtFileReader实现了从本地文件读取数据并转为DataX协议的功能�
 常见配置：
 
 ```json
-"csvReaderConfig":{
-"safetySwitch": false,
-"skipEmptyRecords": false,
-"useTextQualifier": false
+{
+  "csvReaderConfig": {
+    "safetySwitch": false,
+    "skipEmptyRecords": false,
+    "useTextQualifier": false
+  }
 }
 ```
 
