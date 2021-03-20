@@ -19,13 +19,25 @@
 
 package com.wgzhao.datax.plugin.reader.txtfilereader;
 
-import com.google.common.collect.Sets;
+import com.alibaba.fastjson.JSON;
+import com.csvreader.CsvReader;
+import com.wgzhao.datax.common.element.BoolColumn;
+import com.wgzhao.datax.common.element.BytesColumn;
+import com.wgzhao.datax.common.element.Column;
+import com.wgzhao.datax.common.element.DateColumn;
+import com.wgzhao.datax.common.element.DoubleColumn;
+import com.wgzhao.datax.common.element.LongColumn;
+import com.wgzhao.datax.common.element.Record;
+import com.wgzhao.datax.common.element.StringColumn;
 import com.wgzhao.datax.common.exception.DataXException;
 import com.wgzhao.datax.common.plugin.RecordSender;
+import com.wgzhao.datax.common.plugin.TaskPluginCollector;
 import com.wgzhao.datax.common.spi.Reader;
 import com.wgzhao.datax.common.util.Configuration;
-import com.wgzhao.datax.plugin.storage.reader.StorageReaderErrorCode;
-import com.wgzhao.datax.plugin.storage.reader.StorageReaderUtil;
+import org.apache.commons.beanutils.BeanUtils;
+import org.apache.commons.compress.compressors.CompressorException;
+import org.apache.commons.compress.compressors.CompressorInputStream;
+import org.apache.commons.compress.compressors.CompressorStreamFactory;
 import org.apache.commons.io.Charsets;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.BooleanUtils;
@@ -33,28 +45,28 @@ import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.BufferedInputStream;
+import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.UnsupportedEncodingException;
+import java.nio.charset.StandardCharsets;
 import java.nio.charset.UnsupportedCharsetException;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.regex.Pattern;
-
-import static com.wgzhao.datax.plugin.storage.reader.Constant.DEFAULT_ENCODING;
-import static com.wgzhao.datax.plugin.storage.reader.Key.COLUMN;
-import static com.wgzhao.datax.plugin.storage.reader.Key.COMPRESS;
-import static com.wgzhao.datax.plugin.storage.reader.Key.ENCODING;
-import static com.wgzhao.datax.plugin.storage.reader.Key.FIELD_DELIMITER;
-import static com.wgzhao.datax.plugin.storage.reader.Key.INDEX;
-import static com.wgzhao.datax.plugin.storage.reader.Key.TYPE;
-import static com.wgzhao.datax.plugin.storage.reader.Key.VALUE;
 
 /**
  * Created by haiwei.luo on 14-9-20.
@@ -77,6 +89,8 @@ public class TxtFileReader
 
         private Map<String, Boolean> isRegexPath;
 
+        private String encoding;
+
         @Override
         public void init()
         {
@@ -84,18 +98,16 @@ public class TxtFileReader
             this.pattern = new HashMap<>();
             this.isRegexPath = new HashMap<>();
             this.validateParameter();
-            StorageReaderUtil.validateParameter(this.originConfig);
+            validateParameter();
         }
 
         private void validateParameter()
         {
             // Compatible with the old version, path is a string before
-            String pathInString = this.originConfig.getNecessaryValue(Key.PATH,
-                    TxtFileReaderErrorCode.REQUIRED_VALUE);
+            String pathInString = this.originConfig.getNecessaryValue(Key.PATH, TxtFileReaderErrorCode.REQUIRED_VALUE);
             if (StringUtils.isBlank(pathInString)) {
                 throw DataXException.asDataXException(
-                        TxtFileReaderErrorCode.REQUIRED_VALUE,
-                        "您需要指定待读取的源目录或文件");
+                        TxtFileReaderErrorCode.REQUIRED_VALUE, "您需要指定待读取的源目录或文件");
             }
             if (!pathInString.startsWith("[") && !pathInString.endsWith("]")) {
                 path = new ArrayList<>();
@@ -105,27 +117,19 @@ public class TxtFileReader
                 path = this.originConfig.getList(Key.PATH, String.class);
                 if (null == path || path.isEmpty()) {
                     throw DataXException.asDataXException(
-                            TxtFileReaderErrorCode.REQUIRED_VALUE,
-                            "您需要指定待读取的源目录或文件");
+                            TxtFileReaderErrorCode.REQUIRED_VALUE, "您需要指定待读取的源目录或文件");
                 }
             }
 
-            String encoding = this.originConfig
-                    .getString(
-                            ENCODING,
-                            DEFAULT_ENCODING);
+            this.encoding = this.originConfig.getString(Key.ENCODING, Constant.DEFAULT_ENCODING);
             if (StringUtils.isBlank(encoding)) {
-                this.originConfig
-                        .set(ENCODING,
-                                DEFAULT_ENCODING);
+                this.originConfig.set(Key.ENCODING, Constant.DEFAULT_ENCODING);
             }
             else {
                 try {
                     encoding = encoding.trim();
-                    this.originConfig
-                            .set(ENCODING,
-                                    encoding);
                     Charsets.toCharset(encoding);
+                    this.originConfig.set(Key.ENCODING, encoding);
                 }
                 catch (UnsupportedCharsetException uce) {
                     throw DataXException.asDataXException(
@@ -142,15 +146,12 @@ public class TxtFileReader
 
             // column: 1. index type 2.value type 3.when type is Date, may have
             // format
-            List<Configuration> columns = this.originConfig
-                    .getListConfiguration(COLUMN);
+            List<Configuration> columns = this.originConfig.getListConfiguration(Key.COLUMN);
             // handle ["*"]
             if (null != columns && 1 == columns.size()) {
                 String columnsInStr = columns.get(0).toString();
                 if ("\"*\"".equals(columnsInStr) || "'*'".equals(columnsInStr)) {
-                    this.originConfig
-                            .set(COLUMN,
-                                    null);
+                    this.originConfig.set(Key.COLUMN, null);
                     columns = null;
                 }
             }
@@ -159,12 +160,12 @@ public class TxtFileReader
                 for (Configuration eachColumnConf : columns) {
                     eachColumnConf
                             .getNecessaryValue(
-                                    TYPE,
+                                    Key.TYPE,
                                     TxtFileReaderErrorCode.REQUIRED_VALUE);
                     Integer columnIndex = eachColumnConf
-                            .getInt(INDEX);
+                            .getInt(Key.INDEX);
                     String columnValue = eachColumnConf
-                            .getString(VALUE);
+                            .getString(Key.VALUE);
 
                     if (null == columnIndex && null == columnValue) {
                         throw DataXException.asDataXException(
@@ -186,39 +187,12 @@ public class TxtFileReader
                 }
             }
 
-            // only support compress types
-            String compress = this.originConfig
-                    .getString(COMPRESS);
-            if (StringUtils.isBlank(compress)) {
-                this.originConfig
-                        .set(COMPRESS,
-                                null);
-            }
-            else {
-                Set<String> supportedCompress = Sets
-                        .newHashSet("gzip", "bzip2", "zip");
-                compress = compress.toLowerCase().trim();
-                if (!supportedCompress.contains(compress)) {
-                    throw DataXException
-                            .asDataXException(
-                                    TxtFileReaderErrorCode.ILLEGAL_VALUE,
-                                    String.format(
-                                            "仅支持 gzip, bzip2, zip 文件压缩格式 , 不支持您配置的文件压缩格式: [%s]",
-                                            compress));
-                }
-                this.originConfig
-                        .set(COMPRESS,
-                                compress);
-            }
-
-            String delimiterInStr = this.originConfig
-                    .getString(FIELD_DELIMITER);
+            String delimiterInStr = this.originConfig.getString(Key.FIELD_DELIMITER);
             // warn: if have, length must be one
             if (null != delimiterInStr && 1 != delimiterInStr.length()) {
                 throw DataXException.asDataXException(
-                        StorageReaderErrorCode.ILLEGAL_VALUE,
-                        String.format("仅仅支持单字符切分, 您配置的切分为 : [%s]",
-                                delimiterInStr));
+                        TxtFileReaderErrorCode.ILLEGAL_VALUE,
+                        String.format("仅仅支持单字符切分, 您配置的切分为 : [%s]", delimiterInStr));
             }
         }
 
@@ -236,7 +210,7 @@ public class TxtFileReader
             }
             this.sourceFiles = this.buildSourceTargets();
 
-            LOG.info(String.format("您即将读取的文件数为: [%s]", this.sourceFiles.size()));
+            LOG.info("您即将读取的文件数为: [{}]", this.sourceFiles.size());
         }
 
         @Override
@@ -386,8 +360,7 @@ public class TxtFileReader
         private boolean isTargetFile(String regexPath, String absoluteFilePath)
         {
             if (this.isRegexPath.get(regexPath)) {
-                return this.pattern.get(regexPath).matcher(absoluteFilePath)
-                        .matches();
+                return this.pattern.get(regexPath).matcher(absoluteFilePath).matches();
             }
             else {
                 return true;
@@ -417,15 +390,47 @@ public class TxtFileReader
     {
         private static final Logger LOG = LoggerFactory.getLogger(Task.class);
 
+        private enum Type
+        {
+            STRING, LONG, BOOL, DOUBLE, DATE, BYTES,
+            ;
+        }
+
         private Configuration readerSliceConfig;
         private List<String> sourceFiles;
+        private List<Configuration> column;
+        private String encoding;
+        private int bufferSize;
+        private Character fieldDelimiter;
+        private boolean skipHeader;
+        private String nullFormat;
 
         @Override
         public void init()
         {
             this.readerSliceConfig = this.getPluginJobConf();
-            this.sourceFiles = this.readerSliceConfig.getList(
-                    Constant.SOURCE_FILES, String.class);
+            this.sourceFiles = this.readerSliceConfig.getList(Constant.SOURCE_FILES, String.class);
+            this.column = readerSliceConfig.getListConfiguration(Key.COLUMN);
+            // handle ["*"] -> [], null
+            if (null != column && 1 == column.size() && "\"*\"".equals(column.get(0).toString())) {
+                this.column = null;
+            }
+            this.encoding = this.readerSliceConfig.getString(Key.ENCODING);
+            this.bufferSize = readerSliceConfig.getInt(Key.BUFFER_SIZE, Constant.DEFAULT_BUFFER_SIZE);
+            String delimiterInStr = readerSliceConfig.getString(Key.FIELD_DELIMITER);
+            if (null != delimiterInStr && 1 != delimiterInStr.length()) {
+                throw DataXException.asDataXException(
+                        TxtFileReaderErrorCode.ILLEGAL_VALUE,
+                        String.format("仅仅支持单字符切分, 您配置的切分为 : [%s]", delimiterInStr));
+            }
+            if (null == delimiterInStr) {
+                LOG.warn("您没有配置列分隔符, 使用默认值[{}]", Constant.DEFAULT_FIELD_DELIMITER);
+            }
+
+            this.fieldDelimiter = readerSliceConfig.getChar(Key.FIELD_DELIMITER, Constant.DEFAULT_FIELD_DELIMITER);
+            this.skipHeader = readerSliceConfig.getBool(Key.SKIP_HEADER, Constant.DEFAULT_SKIP_HEADER);
+            // warn: no default value '\N'
+            this.nullFormat = readerSliceConfig.getString(Key.NULL_FORMAT, Constant.DEFAULT_NULL_FORMAT);
         }
 
         @Override
@@ -450,26 +455,288 @@ public class TxtFileReader
         public void startRead(RecordSender recordSender)
         {
             LOG.debug("start read source files...");
+            BufferedReader reader = null;
+            InputStream inputStream;
             for (String fileName : this.sourceFiles) {
                 LOG.info("reading file : [{}]", fileName);
-                InputStream inputStream;
                 try {
                     inputStream = new FileInputStream(fileName);
-                    StorageReaderUtil.readFromStream(inputStream,
-                            fileName, this.readerSliceConfig, recordSender,
-                            this.getTaskPluginCollector());
-                    recordSender.flush();
                 }
                 catch (FileNotFoundException e) {
                     // warn: sock 文件无法read,能影响所有文件的传输,需要用户自己保证
-                    String message = String
-                            .format("找不到待读取的文件 : [%s]", fileName);
-                    LOG.error(message);
                     throw DataXException.asDataXException(
-                            TxtFileReaderErrorCode.OPEN_FILE_ERROR, message);
+                            TxtFileReaderErrorCode.OPEN_FILE_ERROR, String.format("找不到待读取的文件 : [%s]", fileName));
+                }
+                try {
+                    String compressType = FileHelper.getCompressType(fileName);
+                    if (compressType != null) {
+                        if ("zip".equals(compressType)) {
+                            ZipCycleInputStream zis = new ZipCycleInputStream(inputStream);
+                            reader = new BufferedReader(new InputStreamReader(zis, encoding), bufferSize);
+                        }
+                        else {
+                            BufferedInputStream bis = new BufferedInputStream(inputStream);
+                            CompressorInputStream input = new CompressorStreamFactory().createCompressorInputStream(bis);
+                            reader = new BufferedReader(new InputStreamReader(input, encoding), bufferSize);
+                        }
+                    }
+                    else {
+                        reader = new BufferedReader(new InputStreamReader(inputStream, encoding), bufferSize);
+                    }
+                    doReadFromStream(reader, fileName, readerSliceConfig, recordSender, getTaskPluginCollector());
+                    recordSender.flush();
+                }
+                catch (CompressorException | IOException e) {
+                    e.printStackTrace();
+                }
+                finally {
+                    IOUtils.closeQuietly(reader, null);
                 }
             }
             LOG.debug("end read source files...");
+        }
+
+        public void doReadFromStream(BufferedReader reader, String context, Configuration readerSliceConfig, RecordSender recordSender,
+                TaskPluginCollector taskPluginCollector)
+        {
+
+            CsvReader csvReader = null;
+
+            // every line logic
+            try {
+                // TODO lineDelimiter
+                if (skipHeader) {
+                    String fetchLine = reader.readLine();
+                    LOG.info("Header line {} has been skiped.",
+                            fetchLine);
+                }
+                csvReader = new CsvReader(reader);
+                csvReader.setDelimiter(fieldDelimiter);
+
+                setCsvReaderConfig(csvReader);
+
+                String[] parseRows;
+                while ((parseRows = splitBufferedReader(csvReader)) != null) {
+                    transportOneRecord(recordSender, parseRows, taskPluginCollector);
+                }
+            }
+            catch (UnsupportedEncodingException uee) {
+                throw DataXException
+                        .asDataXException(
+                                TxtFileReaderErrorCode.OPEN_FILE_WITH_CHARSET_ERROR,
+                                String.format("不支持的编码格式 : [%s]", encoding), uee);
+            }
+            catch (FileNotFoundException fnfe) {
+                throw DataXException.asDataXException(
+                        TxtFileReaderErrorCode.FILE_NOT_EXISTS,
+                        String.format("无法找到文件 : [%s]", context), fnfe);
+            }
+            catch (IOException ioe) {
+                throw DataXException.asDataXException(
+                        TxtFileReaderErrorCode.READ_FILE_IO_ERROR,
+                        String.format("读取文件错误 : [%s]", context), ioe);
+            }
+            catch (Exception e) {
+                throw DataXException.asDataXException(
+                        TxtFileReaderErrorCode.RUNTIME_EXCEPTION,
+                        String.format("运行时异常 : %s", e.getMessage()), e);
+            }
+            finally {
+                if (csvReader != null) {
+                    csvReader.close();
+                }
+                IOUtils.closeQuietly(reader, null);
+            }
+        }
+
+        private void transportOneRecord(RecordSender recordSender, String[] sourceLine, TaskPluginCollector taskPluginCollector)
+        {
+            Record record = recordSender.createRecord();
+            Column columnGenerated;
+
+            // 创建都为String类型column的record
+            if (null == column || column.isEmpty()) {
+                for (String columnValue : sourceLine) {
+                    // not equalsIgnoreCase, it's all ok if nullFormat is null
+                    if (columnValue.equals(nullFormat)) {
+                        columnGenerated = new StringColumn(null);
+                    }
+                    else {
+                        columnGenerated = new StringColumn(columnValue);
+                    }
+                    record.addColumn(columnGenerated);
+                }
+                recordSender.sendToWriter(record);
+            }
+            else {
+                try {
+                    for (Configuration columnConfig : column) {
+                        String columnType = columnConfig.getString(Key.TYPE);
+                        Integer columnIndex = columnConfig.getInt(Key.INDEX);
+                        String columnConst = columnConfig.getString(Key.VALUE);
+
+                        String columnValue;
+
+                        if (null == columnIndex && null == columnConst) {
+                            throw DataXException
+                                    .asDataXException(
+                                            TxtFileReaderErrorCode.NO_INDEX_VALUE,
+                                            "由于您配置了type, 则至少需要配置 index 或 value");
+                        }
+
+                        if (null != columnIndex && null != columnConst) {
+                            throw DataXException
+                                    .asDataXException(
+                                            TxtFileReaderErrorCode.MIXED_INDEX_VALUE,
+                                            "您混合配置了index, value, 每一列同时仅能选择其中一种");
+                        }
+
+                        if (null != columnIndex) {
+                            if (columnIndex >= sourceLine.length) {
+                                String message = String
+                                        .format("您尝试读取的列越界,源文件该行有 [%s] 列,您尝试读取第 [%s] 列, 数据详情[%s]",
+                                                sourceLine.length, columnIndex + 1,
+                                                StringUtils.join(sourceLine, ","));
+                                LOG.warn(message);
+                                throw new IndexOutOfBoundsException(message);
+                            }
+
+                            columnValue = sourceLine[columnIndex];
+                        }
+                        else {
+                            columnValue = columnConst;
+                        }
+                        Type type = Type.valueOf(columnType.toUpperCase());
+                        // it's all ok if nullFormat is null
+                        if (columnValue.equals(nullFormat)) {
+                            columnValue = null;
+                        }
+                        switch (type) {
+                            case STRING:
+                                columnGenerated = new StringColumn(columnValue);
+                                break;
+                            case LONG:
+                                try {
+                                    columnGenerated = new LongColumn(columnValue);
+                                }
+                                catch (Exception e) {
+                                    throw new IllegalArgumentException(String.format(
+                                            "类型转换错误, 无法将[%s] 转换为[%s]", columnValue,
+                                            "LONG"));
+                                }
+                                break;
+                            case DOUBLE:
+                                try {
+                                    columnGenerated = new DoubleColumn(columnValue);
+                                }
+                                catch (Exception e) {
+                                    throw new IllegalArgumentException(String.format(
+                                            "类型转换错误, 无法将[%s] 转换为[%s]", columnValue,
+                                            "DOUBLE"));
+                                }
+                                break;
+                            case BOOL:
+                                try {
+                                    columnGenerated = new BoolColumn(columnValue);
+                                }
+                                catch (Exception e) {
+                                    throw new IllegalArgumentException(String.format(
+                                            "类型转换错误, 无法将[%s] 转换为[%s]", columnValue,
+                                            "BOOLEAN"));
+                                }
+
+                                break;
+                            case DATE:
+                                try {
+                                    if (columnValue == null) {
+                                        Date date = null;
+                                        columnGenerated = new DateColumn(date);
+                                    }
+                                    else {
+                                        String formatString = columnConfig.getString(Key.FORMAT);
+                                        if (StringUtils.isNotBlank(formatString)) {
+                                            // 用户自己配置的格式转换, 脏数据行为出现变化
+                                            DateFormat format = new SimpleDateFormat(formatString);
+                                            columnGenerated = new DateColumn(format.parse(columnValue));
+                                        }
+                                        else {
+                                            // 框架尝试转换
+                                            columnGenerated = new DateColumn(
+                                                    new StringColumn(columnValue)
+                                                            .asDate());
+                                        }
+                                    }
+                                }
+                                catch (Exception e) {
+                                    throw new IllegalArgumentException(String.format(
+                                            "类型转换错误, 无法将[%s] 转换为[%s]", columnValue,
+                                            "DATE"));
+                                }
+                                break;
+                            case BYTES:
+                                if (columnValue == null) {
+                                    columnGenerated = new BytesColumn(new byte[0]);
+                                }
+                                else {
+                                    columnGenerated = new BytesColumn(columnValue.getBytes(StandardCharsets.UTF_8));
+                                }
+                                break;
+                            default:
+                                String errorMessage = String.format(
+                                        "您配置的列类型暂不支持 : [%s]", columnType);
+                                LOG.error(errorMessage);
+                                throw DataXException
+                                        .asDataXException(
+                                                TxtFileReaderErrorCode.NOT_SUPPORT_TYPE,
+                                                errorMessage);
+                        }
+
+                        record.addColumn(columnGenerated);
+                    }
+                    recordSender.sendToWriter(record);
+                }
+                catch (IllegalArgumentException | IndexOutOfBoundsException iae) {
+                    taskPluginCollector
+                            .collectDirtyRecord(record, iae.getMessage());
+                }
+                catch (Exception e) {
+                    if (e instanceof DataXException) {
+                        throw (DataXException) e;
+                    }
+                    // 每一种转换失败都是脏数据处理,包括数字格式 & 日期格式
+                    taskPluginCollector.collectDirtyRecord(record, e.getMessage());
+                }
+            }
+        }
+
+        public String[] splitBufferedReader(CsvReader csvReader)
+                throws IOException
+        {
+            String[] splitedResult = null;
+            if (csvReader.readRecord()) {
+                splitedResult = csvReader.getValues();
+            }
+            return splitedResult;
+        }
+
+        public void setCsvReaderConfig(CsvReader csvReader)
+        {
+            Map<String, Object> csvReaderConfigMap = readerSliceConfig.getMap(Key.CSV_READER_CONFIG);
+            if (null != csvReaderConfigMap && !csvReaderConfigMap.isEmpty()) {
+                try {
+                    BeanUtils.populate(csvReader, csvReaderConfigMap);
+                    LOG.debug("csvReaderConfig设置成功,设置后CsvReader: {}", JSON.toJSONString(csvReader));
+                }
+                catch (Exception e) {
+                    LOG.warn("WARN!!!!忽略csvReaderConfig配置!通过BeanUtils.populate配置您的csvReaderConfig发生异常,您配置的值为: {};请检查您的配置!CsvReader使用默认值[{}]",
+                            JSON.toJSONString(csvReaderConfigMap), JSON.toJSONString(csvReader));
+                }
+            }
+            else {
+                //默认关闭安全模式, 放开10W字节的限制
+                csvReader.setSafetySwitch(false);
+                LOG.debug("CsvReader使用默认值[{}],csvReaderConfig值为[{}]", JSON.toJSONString(csvReader), JSON.toJSONString(csvReaderConfigMap));
+            }
         }
     }
 }
