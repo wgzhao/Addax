@@ -22,7 +22,6 @@ Note: As of `3.2.1`, the package class names have been changed and are therefore
 
 The project, originally from Ali's [DataX]((https://github.com/alibaba/datax)), has been streamlined and adapted, as described below
 
-
 ## Description of functional differences
 
 ### Removed
@@ -81,7 +80,7 @@ add support for almost basic data type, and some complex data type.
 1. Add support for reading Parquet files.
 2. Add support for more compression algorithm.
 
-#### hbasex11sqlwrite 
+#### hbasex11sqlwrite
 
 1. Add support for Kerberos authentication.
 
@@ -89,45 +88,44 @@ add support for almost basic data type, and some complex data type.
 
 1. Add support for `merge into` statement.
 
-#### postgresqlwriter 
+#### postgresqlwriter
 
 1. Add support for `insert into ... on conflict` statement.
 
-#### rdbmsreader/rdbmswriter 
+#### rdbmsreader/rdbmswriter
 
 1. Add support TDH Inceptor, Trino query engine
 
-
 ## Supported databases
 
-| database/filesystem| reader   | writer   | plugin(reader/writer)             | memo                                                                                 |
-| ---------------- | ------ | ------ | ----------------------------------- | ------------------------------------------------------------------------------------ |
-| Cassander        | YES   | YES   | cassandrareader/cassandrawriter     |                                                                                      |
-| ClickHouse       | YES   | YES   | clickhousereader/clickhousewriter   |                                                                                      |
-| DB2              | YES   | YES   | rbdmsreader/rdbmswriter             |   not fully tested                                                           |
-| DBF              | YES   | YES   | dbffilereader/dbffilewriter         |                                                                                      |
-| ElasticSearch    | YES | YES     | elasticsearchreader/elasticsearchwriter | originally from [@Kestrong](https://github.com/Kestrong/datax-elasticsearch)               |
-| FTP              | YES   | YES   | ftpreader/ftpwriter                 |                                                                                      |
-| HBase 1.x        | YES   | YES   | hbase11xreader/hbase11xwriter       | use HBASE API                                                                      |
-| HBase 1.x        | YES   | YES   | hbase11xsqlreader/hbase11xsqlwriter | use Phoenix[Phoenix](https://phoenix.apache.org)                               |
-| HBase 2.x        | YES   | NO | hbase20xreader                      | use HBase API                                                                       |
-| HBase 2.x        | YES   | YES   | hbase20xsqlreader/hbase20xsqlwriter | 通过[Phoenix](https://phoenix.apache.org)操作HBase                                   |
-| HDFS             | YES   | YES   | hdfsreader/hdfswriter               | support HDFS 2.0 or later                                                                    |
-| HTTP             | YES   | NO | httpreader                          |  support RestFul API                                                        |
-| Greenplum        | YES   | YES   | postgresqlreader/greenplumwriter    |                                                                                      |
-| InfluxDB         | YES   | YES   | influxdbreader/influxdbwriter       | ONLY support  InfluxDB 1.x                                               |
-| json             | YES   | NO | jsonfilereader                      |                                                                                      |
-| kudu             | YES   | YES   | kudureader/kuduwriter               |                                                   |
-| MongoDB          | YES   | YES   | mongodbreader/mongodbwriter         |                                                                                      |
-| MySQL/MariaDB    | YES   | YES   | mysqlreader/mysqlwriter             |                                                                                      |
-| Oracle           | YES   | YES   | oraclereader/oraclewriter           |                                                                                      |
-| PostgreSQL       | YES   | YES   | postgresqlreader/postgresqlwriter   |                                                                                      |
-| Trino            | YES   | YES   | rdbmsreader/rdbmswriter             | [trino( formerly PrestoSQL)](https://trino.io)                                       |
-| Redis            | YES   | YES   | redisreader/rediswriter             |                                                                                      |
-| SQL Server       | YES   | YES   | sqlserverreader/sqlserverwriter     |                                                                                    |
-| TDengine         | YES   | YES   | tdenginereader/tdenginewriter       |  [TDengine](https://www.taosdata.com/cn/)                             |
-| TDH Inceptor2    | YES   | YES   | rdbmsreader/rdbmswriter             | [Transwarp TDH](http://transwarp.cn/transwarp/product-TDH.html?categoryId=18) 5.1 or later |
-| TEXT             | YES   | YES   | textfilereader/textfilewriter       |                                                                                      |
+| database/filesystem | reader | writer | plugin(reader/writer)                   | memo                                                                                       |
+| ------------------- | ------ | ------ | --------------------------------------- | ------------------------------------------------------------------------------------------ |
+| Cassander           | YES    | YES    | cassandrareader/cassandrawriter         |                                                                                            |
+| ClickHouse          | YES    | YES    | clickhousereader/clickhousewriter       |                                                                                            |
+| DB2                 | YES    | YES    | rbdmsreader/rdbmswriter                 | not fully tested                                                                           |
+| DBF                 | YES    | YES    | dbffilereader/dbffilewriter             |                                                                                            |
+| ElasticSearch       | YES    | YES    | elasticsearchreader/elasticsearchwriter | originally from [@Kestrong](https://github.com/Kestrong/datax-elasticsearch)               |
+| FTP                 | YES    | YES    | ftpreader/ftpwriter                     |                                                                                            |
+| HBase 1.x           | YES    | YES    | hbase11xreader/hbase11xwriter           | use HBASE API                                                                              |
+| HBase 1.x           | YES    | YES    | hbase11xsqlreader/hbase11xsqlwriter     | use Phoenix[Phoenix](https://phoenix.apache.org)                                           |
+| HBase 2.x           | YES    | NO     | hbase20xreader                          | use HBase API                                                                              |
+| HBase 2.x           | YES    | YES    | hbase20xsqlreader/hbase20xsqlwriter     | 通过[Phoenix](https://phoenix.apache.org)操作HBase                                         |
+| HDFS                | YES    | YES    | hdfsreader/hdfswriter                   | support HDFS 2.0 or later                                                                  |
+| HTTP                | YES    | NO     | httpreader                              | support RestFul API                                                                        |
+| Greenplum           | YES    | YES    | postgresqlreader/greenplumwriter        |                                                                                            |
+| InfluxDB            | YES    | YES    | influxdbreader/influxdbwriter           | ONLY support  InfluxDB 1.x                                                                 |
+| json                | YES    | NO     | jsonfilereader                          |                                                                                            |
+| kudu                | YES    | YES    | kudureader/kuduwriter                   |                                                                                            |
+| MongoDB             | YES    | YES    | mongodbreader/mongodbwriter             |                                                                                            |
+| MySQL/MariaDB       | YES    | YES    | mysqlreader/mysqlwriter                 |                                                                                            |
+| Oracle              | YES    | YES    | oraclereader/oraclewriter               |                                                                                            |
+| PostgreSQL          | YES    | YES    | postgresqlreader/postgresqlwriter       |                                                                                            |
+| Trino               | YES    | YES    | rdbmsreader/rdbmswriter                 | [trino( formerly PrestoSQL)](https://trino.io)                                             |
+| Redis               | YES    | YES    | redisreader/rediswriter                 |                                                                                            |
+| SQL Server          | YES    | YES    | sqlserverreader/sqlserverwriter         |                                                                                            |
+| TDengine            | YES    | YES    | tdenginereader/tdenginewriter           | [TDengine](https://www.taosdata.com/cn/)                                                   |
+| TDH Inceptor2       | YES    | YES    | rdbmsreader/rdbmswriter                 | [Transwarp TDH](http://transwarp.cn/transwarp/product-TDH.html?categoryId=18) 5.1 or later |
+| TEXT                | YES    | YES    | textfilereader/textfilewriter           |                                                                                            |
 
 ## quick started
 
@@ -135,18 +133,28 @@ add support for almost basic data type, and some complex data type.
 
 If you are too lazy to compile or cannot compile because of your environment, you can download the corresponding version from the following link
 
-| version   | download                                                     | md5                            |
-| ----- | ------------------------------------------------------------| ---------------------------------|
-| 3.2.2 | https://pan.baidu.com/s/1TQyaERnIk9EQRDULfQE69w code: jh31 | b04d2563adb36457b85e48c318757ea3 |
-| 3.2.1 | https://pan.baidu.com/s/1as6sL09HlxAN8b2pZ1DttQ code: hwgx | ecda4a961b032c75718502caf54246a8 |
-| 3.1.9 | https://pan.baidu.com/s/1GYpehEvB-W3qnqilhskXFw code: q4wv | 48c4104294cd9bb0c749efc50b32b4dd |
-| 3.1.8 | https://pan.baidu.com/s/1jv-tb-11grYaUnsgnEhDzw code: 2dnf | ef110ae1ea31e1761dc25d6930300485 |
-| 3.1.7 | https://pan.baidu.com/s/1CE5I8V5TNptdOp6GLid3Jg code: v5u3 | fecca6c4a32f2bf7246fdef8bc2912fe |
-| 3.1.6 | https://pan.baidu.com/s/1Ldg10E3qWkbUT44rkH19og code: 4av4 | f6aea7e0ce4b9ec83554e9c6d6ab3cb6 |
-| 3.1.5 | https://pan.baidu.com/s/1yY_lJqulE6hKqktoQbbGmQ code: 2r4p | 9ae27c1c434a097f67a17bb704f70731 |
-| 3.1.4 | https://pan.baidu.com/s/1_plsvzD_GrWN-HffPBtz-g code: kpjn | 7aca526fe7f6f0f54dc467f6ca1647b1 |
-| 3.1.2 | https://pan.baidu.com/s/1zFqv8E6iJX549zdSZDQgiQ code: 7jdk | 3674711fc9b68fad3086f3c8526a3427 |
-| 3.1.1 | https://pan.baidu.com/s/1GwmFA7-hPkd6GKiZEvUKXg code: 1inn | 0fa4e7902420704b2e814fef098f40ae |
+| version | download                                                   | md5                              |
+| ------- | ---------------------------------------------------------- | -------------------------------- |
+| 3.2.3   | https://pan.baidu.com/s/1ajjnSittf6u7rjXhJ7_3Aw code: qxry | ad47b0d840bf21de1668b9310a9782cf |
+| 3.2.2   | https://pan.baidu.com/s/1TQyaERnIk9EQRDULfQE69w code: jh31 | b04d2563adb36457b85e48c318757ea3 |
+| 3.2.1   | https://pan.baidu.com/s/1as6sL09HlxAN8b2pZ1DttQ code: hwgx | ecda4a961b032c75718502caf54246a8 |
+| 3.1.9   | https://pan.baidu.com/s/1GYpehEvB-W3qnqilhskXFw code: q4wv | 48c4104294cd9bb0c749efc50b32b4dd |
+| 3.1.8   | https://pan.baidu.com/s/1jv-tb-11grYaUnsgnEhDzw code: 2dnf | ef110ae1ea31e1761dc25d6930300485 |
+| 3.1.7   | https://pan.baidu.com/s/1CE5I8V5TNptdOp6GLid3Jg code: v5u3 | fecca6c4a32f2bf7246fdef8bc2912fe |
+| 3.1.6   | https://pan.baidu.com/s/1Ldg10E3qWkbUT44rkH19og code: 4av4 | f6aea7e0ce4b9ec83554e9c6d6ab3cb6 |
+| 3.1.5   | https://pan.baidu.com/s/1yY_lJqulE6hKqktoQbbGmQ code: 2r4p | 9ae27c1c434a097f67a17bb704f70731 |
+| 3.1.4   | https://pan.baidu.com/s/1_plsvzD_GrWN-HffPBtz-g code: kpjn | 7aca526fe7f6f0f54dc467f6ca1647b1 |
+| 3.1.2   | https://pan.baidu.com/s/1zFqv8E6iJX549zdSZDQgiQ code: 7jdk | 3674711fc9b68fad3086f3c8526a3427 |
+| 3.1.1   | https://pan.baidu.com/s/1GwmFA7-hPkd6GKiZEvUKXg code: 1inn | 0fa4e7902420704b2e814fef098f40ae |
+
+**Note**: Starting from version `3.2.3`, in order to reduce the installation package size, the compiled package only includes `streamreader` and `streamwriter` plug-ins, 
+other plug-ins need to be downloaded separately, the download shared directory list is as follows.
+
+### plugins download
+
+| version | download link                                              |
+| ------- | ---------------------------------------------------------- |
+| 3.2.3   | https://pan.baidu.com/s/1g4z3Pqc_BxKstkiYjWXopQ code: 2fip |
 
 ### compile and package
 
