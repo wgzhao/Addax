@@ -4,7 +4,7 @@
 
     <groupId>com.wgzhao.datax</groupId>
     <artifactId>datax-all</artifactId>
-    <version>3.2.3-SNAPSHOT</version>
+    <version>3.2.3</version>
 
     <name>datax-all</name>
     <description>DataX generical ETL tool</description>
@@ -32,7 +32,7 @@
         <connection>scm:git:https://github.com/wgzhao/datax.git</connection>
         <developerConnection>scm:git:git@github.com:wgzhao/datax.git</developerConnection>
         <url>https://github.com/wgzhao/datax</url>
-        <tag>HEAD</tag>
+        <tag>3.2.3</tag>
     </scm>
 
     <properties>
