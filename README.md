@@ -16,7 +16,7 @@ English | [简体中文](README_zh.md)
 
 ## current stable version
 
-`3.2.2`
+`3.2.3`
 
 Note: As of `3.2.1`, the package class names have been changed and are therefore no longer compatible with `3.1.x` versions.
 
