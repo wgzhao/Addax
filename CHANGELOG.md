@@ -2,6 +2,13 @@
 
 ## 3.2.3
 
+### General Changes
+
+* Bump protobuf-java from 2.5.0 to 3.15.5
+* Bump  mssql-jdbc from 8.4.0.jres8 to 9.2.1.jre15
+* Add missing ElasticSearchReader package
+* Add support for get version in `datax.py`
+
 ### RDBMS Reader
 
 * Fixed get `XML` data as string instead of SQLXML handler
@@ -9,6 +16,25 @@
 ### RDBMS Writer
 
 * Add support `XML` data type
+
+### Stream Reader
+
+* Add field value incrment function
+
+### InfluxDB Reader
+
+* Fixed job template file
+* Add timeout configure items
+* Use native influxDB API instead of influxdb-java ([\#153](https://github.com/wgzhao/DataX/issues/153))
+
+### InfluxDB Writer
+
+* Add timeout configure items
+
+### Textfile Reader
+
+* Add support for more compress format ([\#154](https://github.com/wgzhao/DataX/issues/154))
+
 
 ## 3.2.2
 
@@ -23,8 +49,10 @@
 
 * Add support more than one channel setup ([\#130](https://github.com/wgzhao/DataX/pull/130))
 
+
 ### HDFS Writer
-Fixed: unknown host exception when writing parquet file ([\#135](https://github.com/wgzhao/DataX/pull/135))
+
+* Fixed: unknown host exception when writing parquet file ([\#135](https://github.com/wgzhao/DataX/pull/135))
 
 ## 3.2.1
 
