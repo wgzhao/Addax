@@ -12,6 +12,10 @@
    </a>
 </p>
 
+![JetBrains](./jetbrains.png)
+
+This project is supported by [JetBrains](https://jb.gg/OpenSource)
+
 English | [简体中文](README_zh.md)
 
 ## current stable version
