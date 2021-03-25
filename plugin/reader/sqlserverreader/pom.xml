@@ -30,7 +30,7 @@
         <dependency>
             <groupId>com.microsoft.sqlserver</groupId>
             <artifactId>mssql-jdbc</artifactId>
-            <version>9.2.1.jre15</version>
+            <version>${mssql.jdbc.version}</version>
         </dependency>
 
         <dependency>
