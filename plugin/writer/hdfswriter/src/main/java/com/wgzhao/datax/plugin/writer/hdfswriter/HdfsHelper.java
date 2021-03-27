@@ -71,6 +71,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
+import java.math.BigDecimal;
 import java.nio.charset.StandardCharsets;
 import java.text.SimpleDateFormat;
 import java.util.Arrays;
@@ -95,6 +96,8 @@ public class HdfsHelper
     private boolean haveKerberos = false;
     private String kerberosKeytabFilePath;
     private String kerberosPrincipal;
+    private static final int DECIMAL_DEFAULT_PRECISION = 38;
+    private static final int DECIMAL_DEFAULT_SCALE = 10;
 
     public static MutablePair<Text, Boolean> transportOneRecord(
             Record record, char fieldDelimiter, List<Configuration> columnsConfiguration, TaskPluginCollector taskPluginCollector)
@@ -209,13 +212,13 @@ public class HdfsHelper
             Column column;
             for (int i = 0; i < recordLength; i++) {
                 column = record.getColumn(i);
-                if (null != column.getRawData()) {
+                String colname = columnsConfiguration.get(i).getString(Key.NAME);
+                String typename = columnsConfiguration.get(i).getString(Key.TYPE);
+                if (column.getRawData() == null) {
+                    builder.set(colname, null);
+                }
+                else {
                     String rowData = column.getRawData().toString();
-                    String colname = columnsConfiguration.get(i).getString("name");
-                    String typename = columnsConfiguration.get(i).getString(Key.TYPE).toUpperCase();
-                    if (typename.contains("DECIMAL(")) {
-                        typename = "DECIMAL";
-                    }
                     SupportHiveDataType columnType = SupportHiveDataType.valueOf(typename);
                     //根据writer端类型配置做类型转换
                     try {
@@ -237,7 +240,7 @@ public class HdfsHelper
                                 builder.set(colname, column.asString());
                                 break;
                             case DECIMAL:
-                                builder.set(colname, column.asBigDecimal());
+                                builder.set(colname, new BigDecimal(column.asString()).setScale(columnsConfiguration.get(i).getInt(Key.SCALE), BigDecimal.ROUND_HALF_UP));
                                 break;
                             case BOOLEAN:
                                 builder.set(colname, column.asBoolean());
@@ -425,11 +428,11 @@ public class HdfsHelper
     {
         List<Path> needDelPaths;
         if (delDotFile) {
-            LOG.info("仅删除指定目录下的点(.)开头的文件或文件夹");
+            LOG.info("ONLY delete files that starts with a dot (.)");
             needDelPaths = Arrays.stream(paths).filter(x -> x.getName().startsWith(".")).collect(Collectors.toList());
         }
         else {
-            LOG.info("删除指定目录下的不以点(.)开头的文件夹或文件夹");
+            LOG.info("Delete all files that DO NOT start with a dot (.) in specified path");
             needDelPaths = Arrays.stream(paths).filter(x -> !x.getName().startsWith(".")).collect(Collectors.toList());
         }
 
@@ -438,7 +441,7 @@ public class HdfsHelper
                 fileSystem.delete(path, true);
             }
             catch (IOException e) {
-                LOG.error("删除文件[{}]时发生IO异常,请检查您的网络是否正常！", path);
+                LOG.error("IO exception occurred when deleting file [{}], please check your network", path);
                 throw DataXException.asDataXException(HdfsWriterErrorCode.CONNECT_HDFS_IO_ERROR, e);
             }
         }
@@ -452,7 +455,7 @@ public class HdfsHelper
                 fileSystem.delete(path, true);
             }
             catch (IOException e) {
-                LOG.error("删除文件[{}]时发生IO异常,请检查您的网络是否正常！", path);
+                LOG.error("IO exception occurred when deleting file [{}], please check your network", path);
                 throw DataXException.asDataXException(HdfsWriterErrorCode.CONNECT_HDFS_IO_ERROR, e);
             }
         }
@@ -598,20 +601,27 @@ public class HdfsHelper
         return codecClass;
     }
 
-    public String getDecimalprec(String type)
+    public static int getDecimalprec(String type)
     {
-        String regEx = "[^0-9]";
-        Pattern p = Pattern.compile(regEx);
-        Matcher m = p.matcher(type);
-        return m.replaceAll(" ").trim().split(" ")[0];
+        if (!type.contains("(")) {
+            return DECIMAL_DEFAULT_PRECISION;
+        }
+        else {
+            String regEx = "[^0-9]";
+            Pattern p = Pattern.compile(regEx);
+            Matcher m = p.matcher(type);
+            return Integer.parseInt(m.replaceAll(" ").trim().split(" ")[0]);
+        }
     }
 
-    public String getDecimalscale(String type)
+    public static int getDecimalscale(String type)
     {
-        String regEx = "[^0-9]";
-        Pattern p = Pattern.compile(regEx);
-        Matcher m = p.matcher(type);
-        return m.replaceAll(" ").trim().split(" ")[1];
+        if (!type.contains(",")) {
+            return DECIMAL_DEFAULT_SCALE;
+        }
+        else {
+            return Integer.parseInt(type.split(",")[1].replace(")", "").trim());
+        }
     }
 
     /*
@@ -649,17 +659,18 @@ public class HdfsHelper
                 + "\"type\": \"record\"," //Must be set as record
                 + "\"name\": \"dataxFile\"," //Not used in Parquet, can put anything
                 + "\"fields\": [";
-
+        String filedName;
+        String type;
         for (Configuration column : columns) {
-            if (column.getString("type").toUpperCase().contains("DECIMAL(")) {
-                strschema += " {\"name\": \"" + column.getString("name")
-                        + "\", \"type\": {\"type\": \"fixed\", \"size\":16, \"logicalType\": \"decimal\", \"name\": \"decimal\", \"precision\": "
-                        + getDecimalprec(column.getString("type")) + ", \"scale\":"
-                        + getDecimalscale(column.getString("type")) + "}},";
+            filedName = column.getString(Key.NAME);
+            type = column.getString(Key.TYPE).trim();
+            if ( "decimal".equals(type)) {
+                strschema += " {\"name\": \"" + filedName
+                        + "\", \"type\": [\"null\", {\"type\": \"fixed\", \"name\": \"decimal\", \"size\": 16, \"logicalType\": \"decimal\""
+                        + ", \"precision\": " + column.getInt(Key.PRECISION) + ", \"scale\":" + column.getInt(Key.SCALE) + "}]},";
             }
             else {
-                strschema += " {\"name\": \"" + column.getString("name") + "\", \"type\": \""
-                        + column.getString("type") + "\"},";
+                strschema += " {\"name\": \"" + filedName + "\", \"type\": [\"null\",\"" + type + "\"]},";
             }
         }
         Path path = new Path(fileName);
@@ -667,7 +678,6 @@ public class HdfsHelper
         strschema = strschema.substring(0, strschema.length() - 1) + " ]}";
         Schema.Parser parser = new Schema.Parser().setValidate(true);
         Schema parSchema = parser.parse(strschema);
-
         CompressionCodecName codecName = CompressionCodecName.fromConf(compress);
 
         GenericData decimalSupport = new GenericData();
@@ -685,9 +695,9 @@ public class HdfsHelper
                 .withWriterVersion(ParquetProperties.WriterVersion.PARQUET_1_0)
                 .build()) {
 
-            GenericRecordBuilder builder = new GenericRecordBuilder(parSchema);
             Record record;
             while ((record = lineReceiver.getFromReader()) != null) {
+                GenericRecordBuilder builder = new GenericRecordBuilder(parSchema);
                 GenericRecord transportResult = transportParRecord(record, columns, taskPluginCollector, builder);
                 writer.write(transportResult);
             }
@@ -703,7 +713,15 @@ public class HdfsHelper
     {
         for (int i = 0; i < columns.size(); i++) {
             Configuration eachColumnConf = columns.get(i);
-            SupportHiveDataType columnType = SupportHiveDataType.valueOf(eachColumnConf.getString(Key.TYPE).toUpperCase());
+            String type = eachColumnConf.getString(Key.TYPE).trim().toUpperCase();
+            SupportHiveDataType columnType;
+            if (type.startsWith("DECIMAL")) {
+                columnType = SupportHiveDataType.DECIMAL;
+            }
+            else {
+                columnType = SupportHiveDataType.valueOf(type);
+            }
+
             switch (columnType) {
                 case TINYINT:
                 case SMALLINT:
@@ -719,7 +737,7 @@ public class HdfsHelper
                     break;
                 case DECIMAL:
                     HiveDecimalWritable hdw = new HiveDecimalWritable();
-                    hdw.set(HiveDecimal.create(record.getColumn(i).asBigDecimal()));
+                    hdw.set(HiveDecimal.create(record.getColumn(i).asBigDecimal()).setScale(eachColumnConf.getInt(Key.SCALE), HiveDecimal.ROUND_HALF_UP));
                     ((DecimalColumnVector) batch.cols[i]).set(row, hdw);
                     break;
                 case TIMESTAMP:
@@ -762,10 +780,13 @@ public class HdfsHelper
         List<ObjectInspector> columnTypeInspectors = getColumnTypeInspectors(columns);
         StringJoiner joiner = new StringJoiner(",");
         for (int i = 0; i < columns.size(); i++) {
-            joiner.add(columnNames.get(i) + ":" + columnTypeInspectors.get(i).getTypeName());
+            if ("decimal".equals(columns.get(i).getString(Key.TYPE))) {
+                joiner.add(columnNames.get(i) + ":decimal(" + columns.get(i).getString(Key.PRECISION) + "," + columns.get(i).getString(Key.SCALE) + ")");
+            } else {
+                joiner.add(columnNames.get(i) + ":" + columnTypeInspectors.get(i).getTypeName());
+            }
         }
         TypeDescription schema = TypeDescription.fromString("struct<" + joiner + ">");
-
         try (Writer writer = OrcFile.createWriter(new Path(fileName),
                 OrcFile.writerOptions(conf)
                         .setSchema(schema)
@@ -809,7 +830,14 @@ public class HdfsHelper
     {
         List<ObjectInspector> columnTypeInspectors = Lists.newArrayList();
         for (Configuration eachColumnConf : columns) {
-            SupportHiveDataType columnType = SupportHiveDataType.valueOf(eachColumnConf.getString(Key.TYPE).toUpperCase());
+            String type = eachColumnConf.getString(Key.TYPE).toUpperCase();
+            SupportHiveDataType columnType;
+            if (type.startsWith("DECIMAL")) {
+                columnType = SupportHiveDataType.DECIMAL;
+            }
+            else {
+                columnType = SupportHiveDataType.valueOf(eachColumnConf.getString(Key.TYPE).toUpperCase());
+            }
             ObjectInspector objectInspector;
             switch (columnType) {
                 case TINYINT:
@@ -832,6 +860,7 @@ public class HdfsHelper
                     break;
                 case DECIMAL:
                     objectInspector = ObjectInspectorFactory.getReflectionObjectInspector(HiveDecimal.class, ObjectInspectorFactory.ObjectInspectorOptions.JAVA);
+
                     break;
                 case TIMESTAMP:
                     objectInspector = ObjectInspectorFactory.getReflectionObjectInspector(Timestamp.class, ObjectInspectorFactory.ObjectInspectorOptions.JAVA);
