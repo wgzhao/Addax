@@ -58,6 +58,9 @@ public class Key
     // hadoop config
     public static final String HADOOP_CONFIG = "hadoopConfig";
 
+    // decimal type
+    public static final String PRECISION = "precision";
+    public static final String SCALE = "scale";
     // hdfs format
 
     protected static final Set<String> SUPPORT_FORMAT = new HashSet<>(Arrays.asList("ORC", "PARQUET", "TEXT"));

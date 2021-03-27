@@ -38,6 +38,8 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.UUID;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class HdfsWriter
         extends Writer
@@ -55,6 +57,8 @@ public class HdfsWriter
         private String writeMode;
         private String compress;
         private HdfsHelper hdfsHelper = null;
+        private static final int DECIMAL_DEFAULT_PRECISION = 38;
+        private static final int DECIMAL_DEFAULT_SCALE = 10;
 
         @Override
         public void init()
@@ -97,9 +101,22 @@ public class HdfsWriter
                 throw DataXException.asDataXException(HdfsWriterErrorCode.REQUIRED_VALUE, "您需要指定 columns");
             }
             else {
-                for (Configuration eachColumnConf : columns) {
+                boolean rewriteFlag = false;
+                for (int i=0; i<columns.size(); i++) {
+                    Configuration eachColumnConf = columns.get(i) ;
                     eachColumnConf.getNecessaryValue(Key.NAME, HdfsWriterErrorCode.COLUMN_REQUIRED_VALUE);
                     eachColumnConf.getNecessaryValue(Key.TYPE, HdfsWriterErrorCode.COLUMN_REQUIRED_VALUE);
+                    if (eachColumnConf.getString(Key.TYPE).toUpperCase().startsWith("DECIMAL")) {
+                        String type = eachColumnConf.getString(Key.TYPE);
+                        eachColumnConf.set(Key.TYPE, "decimal");
+                        eachColumnConf.set(Key.PRECISION, getDecimalprec(type));
+                        eachColumnConf.set(Key.SCALE, getDecimalscale(type));
+                        columns.set(i, eachColumnConf);
+                        rewriteFlag = true;
+                    }
+                }
+                if (rewriteFlag) {
+                    this.writerSliceConfig.set(Key.COLUMN, columns);
                 }
             }
             //writeMode check
@@ -383,6 +400,52 @@ public class HdfsWriter
                 }
             }
             return tmpFilePath;
+        }
+
+        /**
+         * get decimal type precision
+         * if not specified, use DECIMAL_DEFAULT_PRECISION as default
+         * example:
+         *  decimal -> 38
+         *  decimal(10) -> 10
+         * @param type decimal type including precision and scale (if present)
+         * @return decimal precision
+         */
+        private static int getDecimalprec(String type)
+        {
+            if (!type.contains("(")) {
+                return DECIMAL_DEFAULT_PRECISION;
+            }
+            else {
+                String regEx = "[^0-9]";
+                Pattern p = Pattern.compile(regEx);
+                Matcher m = p.matcher(type);
+                return Integer.parseInt(m.replaceAll(" ").trim().split(" ")[0]);
+            }
+        }
+
+        /**
+         * get decimal type scale
+         * if precision is not present, return DECIMAL_DEFAULT_SCALE
+         * if precision is present and not speicify scale, return 0
+         * example:
+         *  decimal -> 10
+         *  decimal(8) -> 0
+         *  decimal(8,2) -> 2
+         * @param type decimal type string, including precision and scale (if present)
+         * @return decimal scale
+         */
+        private static int getDecimalscale(String type)
+        {
+            if (! type.contains("(")) {
+                return DECIMAL_DEFAULT_SCALE;
+            }
+            if (!type.contains(",")) {
+                return 0;
+            }
+            else {
+                return Integer.parseInt(type.split(",")[1].replace(")", "").trim());
+            }
         }
     }
 
