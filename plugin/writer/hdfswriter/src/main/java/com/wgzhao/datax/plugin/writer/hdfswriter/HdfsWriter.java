@@ -406,8 +406,10 @@ public class HdfsWriter
          * get decimal type precision
          * if not specified, use DECIMAL_DEFAULT_PRECISION as default
          * example:
+         * <code>
          *  decimal -> 38
          *  decimal(10) -> 10
+         *  </code>
          * @param type decimal type including precision and scale (if present)
          * @return decimal precision
          */
