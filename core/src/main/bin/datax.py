@@ -48,9 +48,16 @@ DEFAULT_JVM = "-Xms64m -Xmx2g -XX:+HeapDumpOnOutOfMemoryError -XX:HeapDumpPath={
 DEFAULT_PROPERTY_CONF = "-Dfile.encoding=UTF-8 -Dlogback.statusListenerClass=ch.qos.logback.core.status.NopStatusListener \
                         -Djava.security.egd=file:///dev/urandom -Ddatax.home=%s -Dlogback.configurationFile=%s " % \
                         (DATAX_HOME, LOGBACK_FILE)
-ENGINE_COMMAND = "java -server ${jvm} %s -classpath %s  ${params} com.wgzhao.datax.core.Engine \
+
+if isWindows():
+    ENGINE_COMMAND = "java -server ${jvm} %s -classpath %s  ${params} com.wgzhao.datax.core.Engine \
+                -mode ${mode} -jobid ${jobid} -job ${job}" % \
+                 (DEFAULT_PROPERTY_CONF,CLASS_PATH)
+else:
+    ENGINE_COMMAND = "java -server ${jvm} %s -classpath %s  ${params} com.wgzhao.datax.core.Engine \
                 -mode ${mode} -jobid ${jobid} -job ${job}" % \
                  (DEFAULT_PROPERTY_CONF, "/etc/hbase/conf:" + CLASS_PATH)
+    
 REMOTE_DEBUG_CONFIG = "-Xdebug -Xrunjdwp:transport=dt_socket,server=y,address=9999"
 
 RET_STATE = {
