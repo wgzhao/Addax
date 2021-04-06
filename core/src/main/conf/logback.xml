@@ -26,7 +26,7 @@
 
     <!-- 控制台输出 -->
     <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
-        <Encoding>UTF-8</Encoding>
+<!--        <Encoding>UTF-8</Encoding>-->
         <encoder class="ch.qos.logback.classic.encoder.PatternLayoutEncoder">
             <pattern>%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %-5level %logger{0} - %msg%n
             </pattern>
@@ -34,7 +34,7 @@
     </appender>
 
     <appender name="FILE" class="ch.qos.logback.core.FileAppender">
-        <encoder>UTF-8</encoder>
+<!--        <encoder>UTF-8</encoder>--> <!-- use system encoding or specified encoding via command line -->
         <file>${log.dir}/${log.file.name}</file>
         <append>false</append>
         <encoder class="ch.qos.logback.classic.encoder.PatternLayoutEncoder">
