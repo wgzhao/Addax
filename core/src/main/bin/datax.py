@@ -35,22 +35,24 @@ def get_version():
 
 DATAX_HOME = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 DATAX_VERSION = 'DataX ' + get_version()
-
+CODING = '-Dfile.encoding=UTF-8'
 if isWindows():
     codecs.register(
         lambda name: name == 'cp65001' and codecs.lookup('utf-8') or None)
     CLASS_PATH = "{1}{0}lib{0}*".format(os.sep, DATAX_HOME)
+    CODING = '-Dfile.encoding=cp936'
 else:
-    CLASS_PATH = "{1}{0}lib{0}*:.".format(os.sep, DATAX_HOME)
+    CLASS_PATH = ".:/etc/hbase/conf:{1}{0}lib{0}*".format(os.sep, DATAX_HOME)
+
 LOGBACK_FILE = "{1}{0}conf{0}logback.xml".format(os.sep, DATAX_HOME)
 DEFAULT_JVM = "-Xms64m -Xmx2g -XX:+HeapDumpOnOutOfMemoryError -XX:HeapDumpPath={}".format(
     DATAX_HOME)
-DEFAULT_PROPERTY_CONF = "-Dfile.encoding=UTF-8 -Dlogback.statusListenerClass=ch.qos.logback.core.status.NopStatusListener \
+DEFAULT_PROPERTY_CONF = "%s -Dlogback.statusListenerClass=ch.qos.logback.core.status.NopStatusListener \
                         -Djava.security.egd=file:///dev/urandom -Ddatax.home=%s -Dlogback.configurationFile=%s " % \
-                        (DATAX_HOME, LOGBACK_FILE)
+                        (CODING, DATAX_HOME, LOGBACK_FILE)
 ENGINE_COMMAND = "java -server ${jvm} %s -classpath %s  ${params} com.wgzhao.datax.core.Engine \
                 -mode ${mode} -jobid ${jobid} -job ${job}" % \
-                 (DEFAULT_PROPERTY_CONF, "/etc/hbase/conf:" + CLASS_PATH)
+                 (DEFAULT_PROPERTY_CONF, CLASS_PATH)
 REMOTE_DEBUG_CONFIG = "-Xdebug -Xrunjdwp:transport=dt_socket,server=y,address=9999"
 
 RET_STATE = {
@@ -121,7 +123,7 @@ def getOptionParser():
     prodEnvOptionGroup.add_option("-l", "--logdir", metavar="<log directory>",
                                   action="store", dest="logdir", type="string",
                                   help="the directory which log writes to",
-                                  default=DATAX_HOME + '/log')
+                                  default=DATAX_HOME + os.sep + 'log')
     parser.add_option_group(prodEnvOptionGroup)
 
     devEnvOptionGroup = OptionGroup(parser, "Develop/Debug Options",
@@ -260,3 +262,4 @@ if __name__ == "__main__":
     (stdout, stderr) = child_process.communicate()
 
     sys.exit(child_process.returncode)
+
