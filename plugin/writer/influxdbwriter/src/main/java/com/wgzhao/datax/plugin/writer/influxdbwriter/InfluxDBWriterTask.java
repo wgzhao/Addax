@@ -29,19 +29,36 @@ import okhttp3.OkHttpClient;
 import org.influxdb.InfluxDB;
 import org.influxdb.InfluxDBFactory;
 import org.influxdb.dto.Point;
+import org.influxdb.dto.Pong;
 import org.influxdb.dto.Query;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Vector;
 import java.util.concurrent.TimeUnit;
 
 public class InfluxDBWriterTask
 {
+    private static final Logger LOG = LoggerFactory.getLogger(InfluxDBWriterTask.class);
+
     private static final int CONNECT_TIMEOUT_SECONDS_DEFAULT = 15;
     private static final int READ_TIMEOUT_SECONDS_DEFAULT = 20;
     private static final int WRITE_TIMEOUT_SECONDS_DEFAULT = 20;
-    protected List<Configuration> columns;
+
+    static class PointColumnDefine
+    {
+        PointColumnDefine() {
+            isTime = false;
+        }
+        public String name;
+        public String type;
+        public boolean isTime;
+    }
+    protected Vector<PointColumnDefine> columns = new Vector<>();
+
     private final int columnNumber;
     private final int batchSize;
     private InfluxDB influxDB;
@@ -64,8 +81,36 @@ public class InfluxDBWriterTask
         this.endpoint = conn.getString(Key.ENDPOINT);
         this.table = conn.getString(Key.TABLE);
         this.database = conn.getString(Key.DATABASE);
-        this.columns = configuration.getListConfiguration(Key.COLUMN);
-        this.columnNumber = this.columns.size();
+
+        List<Configuration>  columns = configuration.getListConfiguration(Key.COLUMN);
+        this.columnNumber = columns.size();
+        boolean foundTimeColumn = false;
+        for(Configuration column : columns) {
+            String name = column.getString("name");
+            String type = column.getString("type");
+
+            PointColumnDefine columnDefine = new PointColumnDefine();
+            columnDefine.name = name;
+
+            if (name.equals("time")) {
+                if (foundTimeColumn) {
+                    throw new RuntimeException("already exist time column");
+                }
+                columnDefine.isTime = true;
+                foundTimeColumn = true;
+                if (type != null) {
+                    LOG.warn("the time column not need type, will ignore");
+                }
+            } else {
+                columnDefine.type = type.toUpperCase();
+            }
+
+            this.columns.addElement(columnDefine);
+        }
+        if (!foundTimeColumn) {
+            LOG.warn("your column config not have time");
+        }
+
         this.username = configuration.getString(Key.USERNAME);
         this.password = configuration.getString(Key.PASSWORD, null);
         this.connTimeout = configuration.getInt(Key.CONNECT_TIMEOUT_SECONDS, CONNECT_TIMEOUT_SECONDS_DEFAULT);
@@ -85,6 +130,9 @@ public class InfluxDBWriterTask
         this.influxDB = InfluxDBFactory.connect(endpoint, username, password, okHttpClientBuilder);
         this.influxDB.enableBatch(this.batchSize, this.writeTimeout, TimeUnit.SECONDS);
         influxDB.setDatabase(database);
+
+        Pong pong = influxDB.ping();
+        LOG.info("ping influxdb: {} with username: {}, pong:{}", endpoint, username, pong.toString());
     }
 
     public void prepare()
@@ -125,37 +173,38 @@ public class InfluxDBWriterTask
                 }
                 Point.Builder builder = Point.measurement(table);
                 Map<String, Object> fields = new HashMap<>();
-                // 第一列必须是时间戳类型，这是时序数据库的特征
-                builder.time(record.getColumn(0).asLong(), TimeUnit.MILLISECONDS);
-                for (int i = 1; i < columnNumber; i++) {
-                    String name = this.columns.get(i).getString("name");
-                    String type = this.columns.get(i).getString("type").toUpperCase();
-                    Column column = record.getColumn(i);
-                    if ("TAG".equals(type)) {
-                        builder.tag(name, column.asString());
+                for (int i = 0; i < columnNumber; i++) {
+                    PointColumnDefine columnDefine = this.columns.get(i);
+                    // if the column is `time`, we set the point's time.
+                    if (columnDefine.isTime) {
+                        builder.time(record.getColumn(i).asLong(), TimeUnit.MILLISECONDS);
+                        continue;
                     }
-                    else {
-                        switch (type) {
-                            case "INT":
-                            case "LONG":
-                                fields.put(name, column.asLong());
-                                break;
-                            case "DATE":
-                                fields.put(name, column.asDate());
-                                break;
-                            case "DOUBLE":
-                                fields.put(name, column.asDouble());
-                                break;
-                            case "DECIMAL":
-                                fields.put(name, column.asBigDecimal());
-                                break;
-                            case "BINARY":
-                                fields.put(name, column.asBytes());
-                                break;
-                            default:
-                                fields.put(name, column.asString());
-                                break;
-                        }
+
+                    Column column = record.getColumn(i);
+                    switch (columnDefine.type) {
+                        case "INT":
+                        case "LONG":
+                            fields.put(columnDefine.name, column.asLong());
+                            break;
+                        case "DATE":
+                            fields.put(columnDefine.name, column.asDate());
+                            break;
+                        case "DOUBLE":
+                            fields.put(columnDefine.name, column.asDouble());
+                            break;
+                        case "DECIMAL":
+                            fields.put(columnDefine.name, column.asBigDecimal());
+                            break;
+                        case "BINARY":
+                            fields.put(columnDefine.name, column.asBytes());
+                            break;
+                        case "TAG":
+                            builder.tag(columnDefine.name, column.asString());
+                            break;
+                        default:
+                            fields.put(columnDefine.name, column.asString());
+                            break;
                     }
                 }
                 builder.fields(fields);
