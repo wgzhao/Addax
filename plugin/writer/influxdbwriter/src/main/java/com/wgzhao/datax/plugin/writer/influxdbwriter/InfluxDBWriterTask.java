@@ -26,6 +26,7 @@ import com.wgzhao.datax.common.plugin.RecordReceiver;
 import com.wgzhao.datax.common.plugin.TaskPluginCollector;
 import com.wgzhao.datax.common.util.Configuration;
 import okhttp3.OkHttpClient;
+import org.apache.commons.lang3.StringUtils;
 import org.influxdb.InfluxDB;
 import org.influxdb.InfluxDBFactory;
 import org.influxdb.dto.Point;
@@ -52,6 +53,7 @@ public class InfluxDBWriterTask
     private final String endpoint;
     private final String username;
     private final String password;
+    private final String retentionPolicy;
 
     private final int connTimeout;
     private final int readTimeout;
@@ -73,6 +75,7 @@ public class InfluxDBWriterTask
         this.writeTimeout = configuration.getInt(Key.WRITE_TIMEOUT_SECONDS, WRITE_TIMEOUT_SECONDS_DEFAULT);
         this.batchSize = configuration.getInt(Key.BATCH_SIZE, 1024);
         this.postSqls = configuration.getList(Key.POST_SQL, String.class);
+        this.retentionPolicy = configuration.getString(Key.RETENTION_POLICY, null);
     }
 
     public void init()
@@ -85,6 +88,9 @@ public class InfluxDBWriterTask
         this.influxDB = InfluxDBFactory.connect(endpoint, username, password, okHttpClientBuilder);
         this.influxDB.enableBatch(this.batchSize, this.writeTimeout, TimeUnit.SECONDS);
         influxDB.setDatabase(database);
+        if (StringUtils.isNotEmpty(this.retentionPolicy)) {
+            influxDB.setRetentionPolicy(this.retentionPolicy);
+        }
     }
 
     public void prepare()
