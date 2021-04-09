@@ -14,6 +14,7 @@
     "connTimeout": 15,
     "readTimeout": 20,
     "writeTimeout": 20,
-    "batchSize": ""
+    "batchSize": "",
+    "retentionPolicy": ""
   }
 }
