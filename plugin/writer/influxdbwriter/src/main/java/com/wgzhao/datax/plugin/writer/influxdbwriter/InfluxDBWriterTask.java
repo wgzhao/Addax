@@ -70,7 +70,7 @@ public class InfluxDBWriterTask
     private final String endpoint;
     private final String username;
     private final String password;
-    private final String retentionPolicy;
+    private final Configuration retentionPolicy;
 
     private final int connTimeout;
     private final int readTimeout;
@@ -120,7 +120,7 @@ public class InfluxDBWriterTask
         this.writeTimeout = configuration.getInt(Key.WRITE_TIMEOUT_SECONDS, WRITE_TIMEOUT_SECONDS_DEFAULT);
         this.batchSize = configuration.getInt(Key.BATCH_SIZE, 1024);
         this.postSqls = configuration.getList(Key.POST_SQL, String.class);
-        this.retentionPolicy = configuration.getString(Key.RETENTION_POLICY, null);
+        this.retentionPolicy = configuration.getConfiguration(Key.RETENTION_POLICY);
     }
 
     public void init()
@@ -135,6 +135,15 @@ public class InfluxDBWriterTask
         influxDB.setDatabase(database);
         Pong pong = influxDB.ping();
         LOG.info("ping influxdb: {} with username: {}, pong:{}", endpoint, username, pong.toString());
+        if (this.retentionPolicy != null) {
+            //create cutom retention policy
+            String rpName = this.retentionPolicy.getString(Key.RP_NAME, "rp");
+            String duration = this.retentionPolicy.getString(Key.RP_DURATION, "1d");
+            int replication = this.retentionPolicy.getInt(Key.RP_REPLICATION, 1);
+            influxDB.query(new Query("CREATE RETENTION POLICY " + rpName
+                    + " ON " + database + " DURATION " + duration + " REPLICATION " + replication ));
+            influxDB.setRetentionPolicy(rpName);
+        }
     }
 
     public void prepare()
@@ -159,8 +168,6 @@ public class InfluxDBWriterTask
 
     public void startWrite(RecordReceiver recordReceiver, TaskPluginCollector taskPluginCollector)
     {
-        // Retention policy
-        String rp = "autogen";
         Record record = null;
         try {
             while ((record = recordReceiver.getFromReader()) != null) {
@@ -210,9 +217,9 @@ public class InfluxDBWriterTask
                     }
                 }
                 builder.fields(fields);
-                influxDB.write(database, rp, builder.build());
+                influxDB.write(builder.build());
             }
-            // flush last batch manual for avoid missing data
+            // flush last batch manual to avoid missing data
             if (influxDB.isBatchEnabled()) {
                 influxDB.flush();
             }
