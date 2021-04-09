@@ -35,4 +35,8 @@ public class Key
     public static final String READ_TIMEOUT_SECONDS = "readTimeout";
     public static final String WRITE_TIMEOUT_SECONDS = "writeTimeout";
     public static final String RETENTION_POLICY = "retentionPolicy";
+    // retention policy item
+    public static final String RP_NAME = "name";
+    public static final String RP_DURATION = "duration";
+    public static final String RP_REPLICATION = "replication";
 }

@@ -78,7 +78,7 @@ influx --execute "CREATE DATABASE datax"
             ],
             "preSql": ["delete from datax_tbl"],
             "batchSize": 1024,
-            "retentionPolicy": "one_day_only"
+            "retentionPolicy": {"name":"one_day_only", "duration": "1d", "replication":1}
           }
         }
       }
@@ -110,11 +110,16 @@ bin/datax.py job/stream2kudu.json
 | writeTimeout    |    否    | int   | 20     | 设置写入超时值，单位为秒     |
 | preSql        |    否    | list |无     | 插入数据前执行的SQL语句|
 | postSql       | 否      | list | 无     | 数据插入完毕后需要执行的语句 |
-| retentionPolicy    | 否 | string | 无  | 设置数据库的 Retention Policy 策略 | 
+| retentionPolicy    | 否 | dict | 无  | 设置数据库的 Retention Policy 策略 | 
 
 ### column
 
 InfluxDB 作为时许数据库，需要每条记录都有时间戳字段，因此这里会把 `column` 配置的第一个字段默认当作时间戳
+
+### retentionPolicy
+
+设定数据库的 `Retention Policy` 策略，依据给定的配置，在指定数据库上创建一条 `Retention Policy` 信息。
+有关 `Retention Policy` 更详细的信息，可以参考[官方文档](https://docs.influxdata.com/influxdb/v1.8/query_language/manage-database/#create-retention-policies-with-create-retention-policy)
 
 ##  类型转换
 
