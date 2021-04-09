@@ -77,7 +77,8 @@ influx --execute "CREATE DATABASE datax"
               {"name":"salary", "type":"double"}
             ],
             "preSql": ["delete from datax_tbl"],
-            "batchSize": 1024
+            "batchSize": 1024,
+            "retentionPolicy": "one_day_only"
           }
         }
       }
@@ -109,6 +110,7 @@ bin/datax.py job/stream2kudu.json
 | writeTimeout    |    否    | int   | 20     | 设置写入超时值，单位为秒     |
 | preSql        |    否    | list |无     | 插入数据前执行的SQL语句|
 | postSql       | 否      | list | 无     | 数据插入完毕后需要执行的语句 |
+| retentionPolicy    | 否 | string | 无  | 设置数据库的 Retention Policy 策略 | 
 
 ### column
 
