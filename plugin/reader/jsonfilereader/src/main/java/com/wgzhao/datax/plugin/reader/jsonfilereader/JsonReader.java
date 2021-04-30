@@ -19,19 +19,19 @@
 
 package com.wgzhao.datax.plugin.reader.jsonfilereader;
 
+import com.jayway.jsonpath.DocumentContext;
+import com.jayway.jsonpath.JsonPath;
 import com.wgzhao.datax.common.element.BoolColumn;
 import com.wgzhao.datax.common.element.Column;
 import com.wgzhao.datax.common.element.DateColumn;
 import com.wgzhao.datax.common.element.DoubleColumn;
 import com.wgzhao.datax.common.element.LongColumn;
-import com.wgzhao.datax.common.element.StringColumn;
 import com.wgzhao.datax.common.element.Record;
+import com.wgzhao.datax.common.element.StringColumn;
 import com.wgzhao.datax.common.exception.DataXException;
 import com.wgzhao.datax.common.plugin.RecordSender;
 import com.wgzhao.datax.common.spi.Reader;
 import com.wgzhao.datax.common.util.Configuration;
-import com.jayway.jsonpath.DocumentContext;
-import com.jayway.jsonpath.JsonPath;
 import org.apache.commons.io.Charsets;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.BooleanUtils;
@@ -40,11 +40,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.nio.charset.UnsupportedCharsetException;
-import java.nio.file.Files;
-import java.nio.file.Paths;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -53,6 +52,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Scanner;
 import java.util.Set;
 import java.util.regex.Pattern;
 
@@ -379,6 +379,7 @@ public class JsonReader
         {
             List<Column> splitLine = new ArrayList<>();
             DocumentContext document = JsonPath.parse(json);
+//            JSONArray objects = JSON.parseArray(json);
             String tempValue;
             for (Configuration eachColumnConf : columns) {
                 String columnIndex = eachColumnConf
@@ -510,11 +511,15 @@ public class JsonReader
             LOG.debug("start read source files...");
             for (String fileName : this.sourceFiles) {
                 LOG.info("reading file : [{}]", fileName);
-                try {
-                    String json = new String(Files.readAllBytes(Paths.get(fileName)));
-                    List<Column> sourceLine = parseFromJson(json);
-                    transportOneRecord(recordSender, sourceLine);
-                    recordSender.flush();
+                try(FileInputStream fileInputStream = new FileInputStream(fileName);
+                    Scanner sc = new Scanner(fileInputStream)) {
+                    while (sc.hasNextLine()) {
+//                        String json = new String(Files.readAllBytes(Paths.get(fileName)));
+                        String json = sc.nextLine();
+                        List<Column> sourceLine = parseFromJson(json);
+                        transportOneRecord(recordSender, sourceLine);
+                        recordSender.flush();
+                    }
                 }
                 catch (FileNotFoundException e) {
                     // warn: sock 文件无法read,能影响所有文件的传输,需要用户自己保证
