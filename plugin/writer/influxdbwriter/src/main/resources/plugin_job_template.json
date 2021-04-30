@@ -15,6 +15,10 @@
     "readTimeout": 20,
     "writeTimeout": 20,
     "batchSize": "",
-    "retentionPolicy": ""
+    "retentionPolicy": {
+      "name": "",
+      "duration": "",
+      "replication": 1
+    }
   }
 }
