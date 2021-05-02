@@ -721,49 +721,54 @@ public class HdfsHelper
             else {
                 columnType = SupportHiveDataType.valueOf(type);
             }
-
-            switch (columnType) {
-                case TINYINT:
-                case SMALLINT:
-                case INT:
-                case BIGINT:
-                case DATE:
-                case BOOLEAN:
-                    ((LongColumnVector) batch.cols[i]).vector[row] = record.getColumn(i).asLong();
-                    break;
-                case FLOAT:
-                case DOUBLE:
-                    ((DoubleColumnVector) batch.cols[i]).vector[row] = record.getColumn(i).asDouble();
-                    break;
-                case DECIMAL:
-                    HiveDecimalWritable hdw = new HiveDecimalWritable();
-                    hdw.set(HiveDecimal.create(record.getColumn(i).asBigDecimal()).setScale(eachColumnConf.getInt(Key.SCALE), HiveDecimal.ROUND_HALF_UP));
-                    ((DecimalColumnVector) batch.cols[i]).set(row, hdw);
-                    break;
-                case TIMESTAMP:
-                    ((TimestampColumnVector) batch.cols[i]).set(row, java.sql.Timestamp.valueOf(record.getColumn(i).asString()));
-                    break;
-                case STRING:
-                case VARCHAR:
-                case CHAR:
-                case BINARY:
-                    byte[] buffer;
-                    if ("DATE".equals(record.getColumn(i).getType().toString())) {
-                        buffer = record.getColumn(i).asString().getBytes(StandardCharsets.UTF_8);
-                    }
-                    else {
-                        buffer = record.getColumn(i).asBytes();
-                    }
-                    ((BytesColumnVector) batch.cols[i]).setRef(row, buffer, 0, buffer.length);
-                    break;
-                default:
-                    throw DataXException
-                            .asDataXException(
-                                    HdfsWriterErrorCode.ILLEGAL_VALUE,
-                                    String.format(
-                                            "您的配置文件中的列配置信息有误. 因为DataX 不支持数据库写入这种字段类型. 字段名:[%s], 字段类型:[%s]. 请修改表中该字段的类型或者不同步该字段.",
-                                            eachColumnConf.getString(Key.NAME),
-                                            eachColumnConf.getString(Key.TYPE)));
+            try {
+                switch (columnType) {
+                    case TINYINT:
+                    case SMALLINT:
+                    case INT:
+                    case BIGINT:
+                    case DATE:
+                    case BOOLEAN:
+                        ((LongColumnVector) batch.cols[i]).vector[row] = record.getColumn(i).asLong();
+                        break;
+                    case FLOAT:
+                    case DOUBLE:
+                        ((DoubleColumnVector) batch.cols[i]).vector[row] = record.getColumn(i).asDouble();
+                        break;
+                    case DECIMAL:
+                        HiveDecimalWritable hdw = new HiveDecimalWritable();
+                        hdw.set(HiveDecimal.create(record.getColumn(i).asBigDecimal()).setScale(eachColumnConf.getInt(Key.SCALE), HiveDecimal.ROUND_HALF_UP));
+                        ((DecimalColumnVector) batch.cols[i]).set(row, hdw);
+                        break;
+                    case TIMESTAMP:
+                        ((TimestampColumnVector) batch.cols[i]).set(row, java.sql.Timestamp.valueOf(record.getColumn(i).asString()));
+                        break;
+                    case STRING:
+                    case VARCHAR:
+                    case CHAR:
+                    case BINARY:
+                        byte[] buffer;
+                        if ("DATE".equals(record.getColumn(i).getType().toString())) {
+                            buffer = record.getColumn(i).asString().getBytes(StandardCharsets.UTF_8);
+                        }
+                        else {
+                            buffer = record.getColumn(i).asBytes();
+                        }
+                        ((BytesColumnVector) batch.cols[i]).setRef(row, buffer, 0, buffer.length);
+                        break;
+                    default:
+                        throw DataXException
+                                .asDataXException(
+                                        HdfsWriterErrorCode.ILLEGAL_VALUE,
+                                        String.format(
+                                                "您的配置文件中的列配置信息有误. 因为DataX 不支持数据库写入这种字段类型. 字段名:[%s], 字段类型:[%s]. 请修改表中该字段的类型或者不同步该字段.",
+                                                eachColumnConf.getString(Key.NAME),
+                                                eachColumnConf.getString(Key.TYPE)));
+                }
+            } catch (Exception e) {
+                throw DataXException.asDataXException(HdfsWriterErrorCode.ILLEGAL_VALUE,
+                        String.format("设置Orc数据行失败，源列类型: %s, 目的原始类型:%s, 目的列Hive类型: %s, 字段名称: %s, 源值: %s",
+                                record.getColumn(i).getType(), columnType, eachColumnConf.getString(Key.TYPE), eachColumnConf.getString(Key.NAME),record.getColumn(i).getRawData()));
             }
         }
     }
