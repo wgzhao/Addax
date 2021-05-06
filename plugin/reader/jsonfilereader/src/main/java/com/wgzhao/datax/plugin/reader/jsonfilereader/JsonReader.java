@@ -32,6 +32,9 @@ import com.wgzhao.datax.common.exception.DataXException;
 import com.wgzhao.datax.common.plugin.RecordSender;
 import com.wgzhao.datax.common.spi.Reader;
 import com.wgzhao.datax.common.util.Configuration;
+import org.apache.commons.compress.compressors.CompressorException;
+import org.apache.commons.compress.compressors.CompressorInputStream;
+import org.apache.commons.compress.compressors.CompressorStreamFactory;
 import org.apache.commons.io.Charsets;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.BooleanUtils;
@@ -39,10 +42,14 @@ import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.BufferedInputStream;
+import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.UnsupportedEncodingException;
 import java.nio.charset.UnsupportedCharsetException;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
@@ -52,7 +59,6 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Scanner;
 import java.util.Set;
 import java.util.regex.Pattern;
 
@@ -60,11 +66,9 @@ import java.util.regex.Pattern;
  * Created by jin.zhang on 18-05-30.
  */
 public class JsonReader
-        extends Reader
-{
+        extends Reader {
     public static class Job
-            extends Reader.Job
-    {
+            extends Reader.Job {
         private static final Logger LOG = LoggerFactory.getLogger(Job.class);
 
         private Configuration originConfig = null;
@@ -78,16 +82,14 @@ public class JsonReader
         private Map<String, Boolean> isRegexPath;
 
         @Override
-        public void init()
-        {
+        public void init() {
             this.originConfig = this.getPluginJobConf();
             this.pattern = new HashMap<>();
             this.isRegexPath = new HashMap<>();
             this.validateParameter();
         }
 
-        private void validateParameter()
-        {
+        private void validateParameter() {
             // Compatible with the old version, path is a string before
             String pathInString = this.originConfig.getNecessaryValue(Key.PATH,
                     JsonReaderErrorCode.REQUIRED_VALUE);
@@ -99,8 +101,7 @@ public class JsonReader
             if (!pathInString.startsWith("[") && !pathInString.endsWith("]")) {
                 path = new ArrayList<>();
                 path.add(pathInString);
-            }
-            else {
+            } else {
                 path = this.originConfig.getList(Key.PATH, String.class);
                 if (null == path || path.isEmpty()) {
                     throw DataXException.asDataXException(
@@ -116,21 +117,18 @@ public class JsonReader
             if (StringUtils.isBlank(encoding)) {
                 this.originConfig
                         .set(Key.ENCODING, Constant.DEFAULT_ENCODING);
-            }
-            else {
+            } else {
                 try {
                     encoding = encoding.trim();
                     this.originConfig
                             .set(Key.ENCODING,
                                     encoding);
                     Charsets.toCharset(encoding);
-                }
-                catch (UnsupportedCharsetException uce) {
+                } catch (UnsupportedCharsetException uce) {
                     throw DataXException.asDataXException(
                             JsonReaderErrorCode.ILLEGAL_VALUE,
                             String.format("不支持您配置的编码格式 : [%s]", encoding), uce);
-                }
-                catch (Exception e) {
+                } catch (Exception e) {
                     throw DataXException.asDataXException(
                             JsonReaderErrorCode.CONFIG_INVALID_EXCEPTION,
                             String.format("编码配置异常, 请联系我们: %s", e.getMessage()),
@@ -171,8 +169,7 @@ public class JsonReader
         }
 
         @Override
-        public void prepare()
-        {
+        public void prepare() {
             LOG.debug("prepare() begin...");
             // warn:make sure this regex string
             // warn:no need trim
@@ -188,21 +185,18 @@ public class JsonReader
         }
 
         @Override
-        public void post()
-        {
+        public void post() {
             //
         }
 
         @Override
-        public void destroy()
-        {
+        public void destroy() {
             //
         }
 
         // warn: 如果源目录为空会报错，拖空目录意图=>空文件显示指定此意图
         @Override
-        public List<Configuration> split(int adviceNumber)
-        {
+        public List<Configuration> split(int adviceNumber) {
             LOG.debug("split() begin...");
             List<Configuration> readerSplitConfigs = new ArrayList<>();
 
@@ -228,8 +222,7 @@ public class JsonReader
         }
 
         // validate the path, path must be a absolute path
-        private List<String> buildSourceTargets()
-        {
+        private List<String> buildSourceTargets() {
             // for eath path
             Set<String> toBeReadFiles = new HashSet<>();
             for (String eachPath : this.path) {
@@ -248,8 +241,7 @@ public class JsonReader
                             .lastIndexOf(IOUtils.DIR_SEPARATOR);
                     parentDirectory = eachPath.substring(0,
                             lastDirSeparator + 1);
-                }
-                else {
+                } else {
                     this.isRegexPath.put(eachPath, false);
                     parentDirectory = eachPath;
                 }
@@ -260,8 +252,7 @@ public class JsonReader
         }
 
         private void buildSourceTargetsEathPath(String regexPath,
-                String parentDirectory, Set<String> toBeReadFiles)
-        {
+                                                String parentDirectory, Set<String> toBeReadFiles) {
             // 检测目录是否存在，错误情况更明确
             try {
                 File dir = new File(parentDirectory);
@@ -273,8 +264,7 @@ public class JsonReader
                     throw DataXException.asDataXException(
                             JsonReaderErrorCode.FILE_NOT_EXISTS, message);
                 }
-            }
-            catch (SecurityException se) {
+            } catch (SecurityException se) {
                 String message = String.format("您没有权限查看目录 : [%s]", parentDirectory);
                 LOG.error(message);
                 throw DataXException.asDataXException(
@@ -285,8 +275,7 @@ public class JsonReader
         }
 
         private void directoryRover(String regexPath, String parentDirectory,
-                Set<String> toBeReadFiles)
-        {
+                                    Set<String> toBeReadFiles) {
             File directory = new File(parentDirectory);
             // is a normal file
             if (!directory.isDirectory()) {
@@ -294,8 +283,7 @@ public class JsonReader
                     toBeReadFiles.add(parentDirectory);
                     LOG.info("add file [{}] as a candidate to be read.", parentDirectory);
                 }
-            }
-            else {
+            } else {
                 // 是目录
                 try {
                     // warn:对于没有权限的目录,listFiles 返回null，而不是抛出SecurityException
@@ -306,8 +294,7 @@ public class JsonReader
                                     subFileNames.getAbsolutePath(),
                                     toBeReadFiles);
                         }
-                    }
-                    else {
+                    } else {
                         // warn: 对于没有权限的文件，是直接throw DataXException
                         String message = String.format("您没有权限查看目录 : [%s]",
                                 directory);
@@ -316,8 +303,7 @@ public class JsonReader
                                 JsonReaderErrorCode.SECURITY_NOT_ENOUGH,
                                 message);
                     }
-                }
-                catch (SecurityException e) {
+                } catch (SecurityException e) {
                     String message = String.format("您没有权限查看目录 : [%s]",
                             directory);
                     LOG.error(message);
@@ -329,18 +315,15 @@ public class JsonReader
         }
 
         // 正则过滤
-        private boolean isTargetFile(String regexPath, String absoluteFilePath)
-        {
+        private boolean isTargetFile(String regexPath, String absoluteFilePath) {
             if (this.isRegexPath.get(regexPath)) {
                 return this.pattern.get(regexPath).matcher(absoluteFilePath).matches();
-            }
-            else {
+            } else {
                 return true;
             }
         }
 
-        private <T> List<List<T>> splitSourceFiles(List<T> sourceList, int adviceNumber)
-        {
+        private <T> List<List<T>> splitSourceFiles(List<T> sourceList, int adviceNumber) {
             List<List<T>> splitedList = new ArrayList<>();
             int averageLength = sourceList.size() / adviceNumber;
             averageLength = averageLength == 0 ? 1 : averageLength;
@@ -357,26 +340,27 @@ public class JsonReader
     }
 
     public static class Task
-            extends Reader.Task
-    {
+            extends Reader.Task {
         private static final Logger LOG = LoggerFactory.getLogger(Task.class);
 
         private List<String> sourceFiles;
         private List<Configuration> columns;
+        private String compressType;
+        private String encoding;
 
         @Override
-        public void init()
-        {
+        public void init() {
             Configuration readerSliceConfig = this.getPluginJobConf();
             this.sourceFiles = readerSliceConfig.getList(
                     Constant.SOURCE_FILES, String.class);
             this.columns = readerSliceConfig
                     .getListConfiguration(Key.COLUMN);
+            this.compressType = readerSliceConfig.getString(Key.COMPRESS, null);
+            this.encoding = readerSliceConfig.getString(Key.ENCODING, "utf-8");
         }
 
         //解析json，返回已经经过处理的行
-        private List<Column> parseFromJson(String json)
-        {
+        private List<Column> parseFromJson(String json) {
             List<Column> splitLine = new ArrayList<>();
             DocumentContext document = JsonPath.parse(json);
 //            JSONArray objects = JSON.parseArray(json);
@@ -393,12 +377,10 @@ public class JsonReader
                 // 这里是为了支持常量Value 现在需要考虑做容错，如果json里面没有的解析路径置为null
                 if (null != columnValue) {
                     tempValue = columnValue;
-                }
-                else {
+                } else {
                     try {
                         tempValue = document.read(columnIndex, columnType.getClass());
-                    }
-                    catch (Exception ignore) {
+                    } catch (Exception ignore) {
                         tempValue = null;
                     }
                 }
@@ -409,8 +391,7 @@ public class JsonReader
         }
 
         //匹配类型
-        private Column getColumn(String type, String columnValue, String columnFormat)
-        {
+        private Column getColumn(String type, String columnValue, String columnFormat) {
             Column columnGenerated;
             String errorTemplate = " 类型转换错误, 无法将[%s] 转换为[%s]";
             switch (type) {
@@ -420,8 +401,7 @@ public class JsonReader
                 case Key.DOUBLE:
                     try {
                         columnGenerated = new DoubleColumn(columnValue);
-                    }
-                    catch (Exception e) {
+                    } catch (Exception e) {
                         throw new IllegalArgumentException(String.format(
                                 errorTemplate, columnValue, "DOUBLE"));
                     }
@@ -429,8 +409,7 @@ public class JsonReader
                 case Key.BOOLEAN:
                     try {
                         columnGenerated = new BoolColumn(columnValue);
-                    }
-                    catch (Exception e) {
+                    } catch (Exception e) {
                         throw new IllegalArgumentException(String.format(
                                 errorTemplate, columnValue, "BOOLEAN"));
                     }
@@ -438,8 +417,7 @@ public class JsonReader
                 case Key.LONG:
                     try {
                         columnGenerated = new LongColumn(columnValue);
-                    }
-                    catch (Exception e) {
+                    } catch (Exception e) {
                         LOG.error(e.getMessage());
                         throw new IllegalArgumentException(String.format(
                                 errorTemplate, columnValue, "LONG"));
@@ -452,15 +430,13 @@ public class JsonReader
                             DateFormat format = new SimpleDateFormat(columnFormat);
                             columnGenerated = new DateColumn(
                                     format.parse(columnValue));
-                        }
-                        else {
+                        } else {
                             // 框架尝试转换
                             columnGenerated = new DateColumn(
                                     new StringColumn(columnValue)
                                             .asDate());
                         }
-                    }
-                    catch (Exception e) {
+                    } catch (Exception e) {
                         throw new IllegalArgumentException(String.format(
                                 errorTemplate, columnValue, "DATE"));
                     }
@@ -478,8 +454,7 @@ public class JsonReader
         }
 
         //传输一行数据
-        private void transportOneRecord(RecordSender recordSender, List<Column> sourceLine)
-        {
+        private void transportOneRecord(RecordSender recordSender, List<Column> sourceLine) {
             Record record = recordSender.createRecord();
             for (Column eachValue : sourceLine) {
                 record.addColumn(eachValue);
@@ -488,40 +463,32 @@ public class JsonReader
         }
 
         @Override
-        public void prepare()
-        {
+        public void prepare() {
             //
         }
 
         @Override
-        public void post()
-        {
+        public void post() {
             //
         }
 
         @Override
-        public void destroy()
-        {
+        public void destroy() {
             //
         }
 
         @Override
-        public void startRead(RecordSender recordSender)
-        {
+        public void startRead(RecordSender recordSender) {
             LOG.debug("start read source files...");
+            FileInputStream fileInputStream;
+            BufferedReader reader = null;
+            final int bufferSize = 8192;
             for (String fileName : this.sourceFiles) {
                 LOG.info("reading file : [{}]", fileName);
-                try(FileInputStream fileInputStream = new FileInputStream(fileName);
-                    Scanner sc = new Scanner(fileInputStream)) {
-                    while (sc.hasNextLine()) {
-//                        String json = new String(Files.readAllBytes(Paths.get(fileName)));
-                        String json = sc.nextLine();
-                        List<Column> sourceLine = parseFromJson(json);
-                        transportOneRecord(recordSender, sourceLine);
-                        recordSender.flush();
-                    }
-                }
-                catch (FileNotFoundException e) {
+                try {
+                    fileInputStream = new FileInputStream(fileName);
+
+                } catch (FileNotFoundException e) {
                     // warn: sock 文件无法read,能影响所有文件的传输,需要用户自己保证
                     String message = String
                             .format("找不到待读取的文件 : [%s]", fileName);
@@ -529,13 +496,41 @@ public class JsonReader
                     throw DataXException.asDataXException(
                             JsonReaderErrorCode.OPEN_FILE_ERROR, message);
                 }
-                catch (IOException e) {
+                try {
+                    if (compressType != null) {
+                        if ("zip".equalsIgnoreCase(compressType)) {
+                            ZipCycleInputStream zis = new ZipCycleInputStream(fileInputStream);
+                            reader = new BufferedReader(new InputStreamReader(zis, encoding), bufferSize);
+                        } else {
+                            BufferedInputStream bis = new BufferedInputStream(fileInputStream);
+                            CompressorInputStream input = new CompressorStreamFactory().createCompressorInputStream(bis);
+                            reader = new BufferedReader(new InputStreamReader(input, encoding), bufferSize);
+                        }
+                    } else {
+                        reader = new BufferedReader(new InputStreamReader(fileInputStream, encoding), bufferSize);
+                    }
+
+                    // read the content
+                    String jsonLine;
+                    jsonLine = reader.readLine();
+                    while (jsonLine != null) {
+//                        String json = new String(Files.readAllBytes(Paths.get(fileName)));
+                        List<Column> sourceLine = parseFromJson(jsonLine);
+                        transportOneRecord(recordSender, sourceLine);
+                        recordSender.flush();
+                        jsonLine = reader.readLine();
+                    }
+                } catch (CompressorException | UnsupportedEncodingException e) {
+                    e.printStackTrace();
+                } catch (IOException e) {
                     // warn: 有可能本地无法读取文件
                     String message = String
                             .format("无法读取文件 : [%s]", fileName);
                     LOG.error(message);
                     throw DataXException.asDataXException(
                             JsonReaderErrorCode.READ_FILE_IO_ERROR, message);
+                } finally {
+                    IOUtils.closeQuietly(reader, null);
                 }
             }
             LOG.debug("end read source files...");

@@ -37,6 +37,7 @@ public class Key
     public static final String FORMAT = "format";
     public static final String ENCODING = "encoding";
     public static final String VALUE = "value";
+    public static final String COMPRESS = "compress";
 
     private Key() {}
 }
