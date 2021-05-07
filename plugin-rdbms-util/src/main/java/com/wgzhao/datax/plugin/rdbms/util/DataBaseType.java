@@ -45,8 +45,8 @@ public enum DataBaseType
     TDengine("tdengine", "com.taosdata.jdbc.TSDBDriver"),
     Trino("trino", "io.trino.jdbc.TrinoDriver");
 
-    private static final Pattern mysqlPattern = Pattern.compile("jdbc:mysql://(.+):\\d+/.+");
-    private static final Pattern oraclePattern = Pattern.compile("jdbc:oracle:thin:@(.+):\\d+:.+");
+    private static final Pattern jdbcUrlPattern = Pattern.compile("jdbc:\\w+:(?:thin:url=|//|thin:@|)([\\w\\d.,]+).*");
+
     private String driverClassName;
     private String typeName;
 
@@ -57,20 +57,24 @@ public enum DataBaseType
     }
 
     /**
-     * 注意：目前只实现了从 mysql/oracle 中识别出ip 信息.未识别到则返回 null.
+     * 注意：从JDBC连接串中识别出 ip/host 信息.未识别到则返回 null.
+     * <code>
+     * jdbc:phoenix:thin:url=dn01,dn02:6667
+     * jdbc:phoenix:dn01,dn02,dn03:2181:/hbase-secure:trino@DOMAIN.COM:/etc/trino/trino.headless.keytab
+     * jdbc:mysql://127.0.0.1:3306
+     * jdbc:sqlserver://192.168.1.1:1433; DatabaseName=teammate_pro
+     * jdbc:mysql://127.0.0.1
+     * jdbc:oracle:thin:@192.168.1.11:1521/hgdb
+     * </code>
      *
      * @param jdbcUrl java jdbc url
      * @return ip address
      */
     public static String parseIpFromJdbcUrl(String jdbcUrl)
     {
-        Matcher mysql = mysqlPattern.matcher(jdbcUrl);
-        if (mysql.matches()) {
-            return mysql.group(1);
-        }
-        Matcher oracle = oraclePattern.matcher(jdbcUrl);
-        if (oracle.matches()) {
-            return oracle.group(1);
+        Matcher  matcher = jdbcUrlPattern.matcher(jdbcUrl);
+        if (matcher.matches()) {
+            return matcher.group(1);
         }
         return null;
     }
@@ -104,7 +108,7 @@ public enum DataBaseType
     {
         if (this == MySql) {
             String suffix;
-            if ("com.mysql.jdbc.Driver".equals(this.driverClassName)) {
+            if ("com.mysql.jdbc.Driver".equals(this.driverClassName) || "com.mysql.cj.jdbc.Driver".equals(this.driverClassName)) {
                 suffix = "yearIsDateType=false&zeroDateTimeBehavior=convertToNull&rewriteBatchedStatements=true&tinyInt1isBit=false";
             }
             else {
@@ -191,4 +195,5 @@ public enum DataBaseType
     {
         this.driverClassName = driverClassName;
     }
+
 }
