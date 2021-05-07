@@ -38,8 +38,6 @@ public class HintUtil
     private static final Logger LOG = LoggerFactory.getLogger(HintUtil.class);
 
     private static DataBaseType dataBaseType;
-    private static String username;
-    private static String password;
     private static Pattern tablePattern;
     private static String hintExpression;
 
@@ -48,8 +46,7 @@ public class HintUtil
     public static void initHintConf(DataBaseType type, Configuration configuration)
     {
         dataBaseType = type;
-        username = configuration.getString(Key.USERNAME);
-        password = configuration.getString(Key.PASSWORD);
+
         String hint = configuration.getString(Key.HINT);
         if (StringUtils.isNotBlank(hint)) {
             String[] tablePatternAndHint = hint.split("#");
