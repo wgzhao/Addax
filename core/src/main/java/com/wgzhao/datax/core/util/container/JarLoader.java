@@ -21,8 +21,8 @@ package com.wgzhao.datax.core.util.container;
 
 import com.wgzhao.datax.common.exception.DataXException;
 import com.wgzhao.datax.core.util.FrameworkErrorCode;
-import org.apache.commons.lang.StringUtils;
-import org.apache.commons.lang.Validate;
+import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.Validate;
 
 import java.io.File;
 import java.io.FileFilter;

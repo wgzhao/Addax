@@ -21,8 +21,8 @@ package com.wgzhao.datax.core.statistics.communication;
 
 import com.wgzhao.datax.common.base.BaseObject;
 import com.wgzhao.datax.core.meta.State;
-import org.apache.commons.lang.StringUtils;
-import org.apache.commons.lang.Validate;
+import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.Validate;
 
 import java.util.ArrayList;
 import java.util.List;

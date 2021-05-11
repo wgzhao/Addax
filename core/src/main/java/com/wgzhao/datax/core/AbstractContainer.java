@@ -21,7 +21,7 @@ package com.wgzhao.datax.core;
 
 import com.wgzhao.datax.common.util.Configuration;
 import com.wgzhao.datax.core.statistics.container.communicator.AbstractContainerCommunicator;
-import org.apache.commons.lang.Validate;
+import org.apache.commons.lang3.Validate;
 
 /**
  * 执行容器的抽象类，持有该容器全局的配置 configuration
@@ -34,6 +34,7 @@ public abstract class AbstractContainer
 
     public AbstractContainer(Configuration configuration)
     {
+
         Validate.notNull(configuration, "Configuration can not be null.");
 
         this.configuration = configuration;

@@ -25,7 +25,7 @@ import com.wgzhao.datax.core.statistics.communication.Communication;
 import com.wgzhao.datax.core.statistics.container.collector.ProcessInnerCollector;
 import com.wgzhao.datax.core.statistics.container.communicator.AbstractContainerCommunicator;
 import com.wgzhao.datax.core.util.container.CoreConstant;
-import org.apache.commons.lang.Validate;
+import org.apache.commons.lang3.Validate;
 
 import java.util.List;
 import java.util.Map;

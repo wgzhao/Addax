@@ -46,7 +46,7 @@ import com.wgzhao.datax.core.util.container.ClassLoaderSwapper;
 import com.wgzhao.datax.core.util.container.CoreConstant;
 import com.wgzhao.datax.core.util.container.LoadUtil;
 import com.alibaba.fastjson.JSON;
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.concurrent.FutureCallback;
