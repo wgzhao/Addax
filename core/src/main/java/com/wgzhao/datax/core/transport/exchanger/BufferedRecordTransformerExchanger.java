@@ -32,7 +32,7 @@ import com.wgzhao.datax.core.transport.record.TerminateRecord;
 import com.wgzhao.datax.core.transport.transformer.TransformerExecution;
 import com.wgzhao.datax.core.util.FrameworkErrorCode;
 import com.wgzhao.datax.core.util.container.CoreConstant;
-import org.apache.commons.lang.Validate;
+import org.apache.commons.lang3.Validate;
 
 import java.util.ArrayList;
 import java.util.List;

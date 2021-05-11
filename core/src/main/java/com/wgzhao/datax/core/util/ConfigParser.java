@@ -23,7 +23,7 @@ import com.wgzhao.datax.common.exception.DataXException;
 import com.wgzhao.datax.common.util.Configuration;
 import com.wgzhao.datax.core.util.container.CoreConstant;
 import org.apache.commons.io.FileUtils;
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.http.client.methods.HttpGet;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

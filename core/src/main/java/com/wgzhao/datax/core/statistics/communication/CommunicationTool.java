@@ -21,7 +21,7 @@ package com.wgzhao.datax.core.statistics.communication;
 
 import com.wgzhao.datax.common.statistics.PerfTrace;
 import com.wgzhao.datax.common.util.StrUtil;
-import org.apache.commons.lang.Validate;
+import org.apache.commons.lang3.Validate;
 
 import java.text.DecimalFormat;
 

@@ -25,7 +25,7 @@ import com.wgzhao.datax.common.util.Configuration;
 import com.wgzhao.datax.core.meta.State;
 import com.wgzhao.datax.core.statistics.communication.Communication;
 import com.wgzhao.datax.core.statistics.communication.CommunicationTool;
-import org.apache.commons.lang.Validate;
+import org.apache.commons.lang3.Validate;
 
 public abstract class AbstractRunner
 {
