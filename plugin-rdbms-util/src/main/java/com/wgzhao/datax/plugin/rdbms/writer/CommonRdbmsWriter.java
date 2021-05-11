@@ -39,7 +39,6 @@ import org.slf4j.LoggerFactory;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
-import java.sql.SQLXML;
 import java.sql.Types;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -352,7 +351,6 @@ public class CommonRdbmsWriter
             }
         }
 
-        // TODO 改用连接池，确保每次获取的连接都是可用的（注意：连接可能需要每次都初始化其 session）
         public void startWrite(RecordReceiver recordReceiver,
                 Configuration writerSliceConfig,
                 TaskPluginCollector taskPluginCollector)
