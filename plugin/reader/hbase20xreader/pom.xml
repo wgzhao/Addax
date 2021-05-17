@@ -3,7 +3,7 @@
     <parent>
         <groupId>com.wgzhao.datax</groupId>
         <artifactId>datax-all</artifactId>
-        <version>3.2.4</version>
+        <version>3.2.5-SNAPSHOT</version>
         <relativePath>../../../pom.xml</relativePath>
     </parent>
     <artifactId>hbase20xreader</artifactId>
