@@ -12,9 +12,6 @@
    </a>
 </p>
 
-![JetBrains](./jetbrains.png)
-
-This project is supported by [JetBrains](https://jb.gg/OpenSource)
 
 English | [简体中文](README_zh.md)
 
@@ -139,6 +136,7 @@ If you are too lazy to compile or cannot compile because of your environment, yo
 
 | version | download                                                   | md5                              |
 | ------- | ---------------------------------------------------------- | -------------------------------- |
+| 3.2.4   | https://pan.baidu.com/s/1VaOlAOTqGX4WwRtI5ewPeg code: i127 | 2d16125385b88405481e12bf4a8fd715 |
 | 3.2.3   | https://pan.baidu.com/s/1ajjnSittf6u7rjXhJ7_3Aw code: qxry | ad47b0d840bf21de1668b9310a9782cf |
 | 3.2.2   | https://pan.baidu.com/s/1TQyaERnIk9EQRDULfQE69w code: jh31 | b04d2563adb36457b85e48c318757ea3 |
 | 3.2.1   | https://pan.baidu.com/s/1as6sL09HlxAN8b2pZ1DttQ code: hwgx | ecda4a961b032c75718502caf54246a8 |
@@ -158,6 +156,7 @@ other plug-ins need to be downloaded separately, the download shared directory l
 
 | version | download link                                              |
 | ------- | ---------------------------------------------------------- |
+| 3.2.4   | https://pan.baidu.com/s/1gPJlJh66bGQUSUR-2mNOQw code: 7c4j |
 | 3.2.3   | https://pan.baidu.com/s/1g4z3Pqc_BxKstkiYjWXopQ code: 2fip |
 
 ### compile and package
@@ -354,3 +353,7 @@ DataX	19890604	1989-06-04 00:00:00	true	test
 ## License
 
 This software is free to use under the Apache License [Apache license](/LICENSE).
+
+![JetBrains](./jetbrains.png)
+
+This project is supported by [JetBrains](https://jb.gg/OpenSource)

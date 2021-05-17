@@ -115,7 +115,8 @@
 如果你懒得编译或者因为环境无法编译，可以从以下链接下载对应的版本
 
 | 版本  | 连接地址                                                     | md5值                            |
-| ----- | ------------------------------------------------------------ | -------------------------------- |
+| ----- | ------------------------------------------------------------| -------------------------------- |
+| 3.2.4 | https://pan.baidu.com/s/1VaOlAOTqGX4WwRtI5ewPeg 提取码: i127 | 2d16125385b88405481e12bf4a8fd715 |
 | 3.2.3 | https://pan.baidu.com/s/1ajjnSittf6u7rjXhJ7_3Aw 提取码: qxry | ad47b0d840bf21de1668b9310a9782cf |
 | 3.2.2 | https://pan.baidu.com/s/1TQyaERnIk9EQRDULfQE69w 提取码: jh31 | b04d2563adb36457b85e48c318757ea3 |
 | 3.2.1 | https://pan.baidu.com/s/1as6sL09HlxAN8b2pZ1DttQ 提取码: hwgx | ecda4a961b032c75718502caf54246a8 |
@@ -132,8 +133,9 @@
 
 预编译插件下载地址一览表
 
-| 版本  | 插件下载地址                                                 |
-| ----- | ------------------------------------------------------------ |
+| 版本  | 插件下载地址                                                  |
+| ----- | ------------------------------------------------------------|
+| 3.2.4 | https://pan.baidu.com/s/1gPJlJh66bGQUSUR-2mNOQw 提取码: 7c4j |
 | 3.2.3 | https://pan.baidu.com/s/1g4z3Pqc_BxKstkiYjWXopQ 提取码: 2fip |
 
 ### 编译及打包
@@ -330,3 +332,7 @@ DataX	19890604	1989-06-04 00:00:00	true	test
 ## License
 
 This software is free to use under the Apache License [Apache license](/license.txt).
+
+![JetBrains](./jetbrains.png)
+
+该项目开发工具由 [JetBrains](https://jb.gg/OpenSource) 提供赞助
