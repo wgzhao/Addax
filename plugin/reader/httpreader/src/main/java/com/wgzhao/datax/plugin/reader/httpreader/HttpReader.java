@@ -19,16 +19,17 @@
 
 package com.wgzhao.datax.plugin.reader.httpreader;
 
+import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONArray;
+import com.alibaba.fastjson.JSONObject;
+import com.alibaba.fastjson.JSONPath;
+import com.alibaba.fastjson.serializer.SerializerFeature;
 import com.wgzhao.datax.common.element.Record;
 import com.wgzhao.datax.common.element.StringColumn;
 import com.wgzhao.datax.common.exception.DataXException;
 import com.wgzhao.datax.common.plugin.RecordSender;
 import com.wgzhao.datax.common.spi.Reader;
 import com.wgzhao.datax.common.util.Configuration;
-import com.alibaba.fastjson.JSON;
-import com.alibaba.fastjson.JSONArray;
-import com.alibaba.fastjson.JSONObject;
-import com.alibaba.fastjson.JSONPath;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpHost;
 import org.apache.http.HttpStatus;
@@ -168,7 +169,9 @@ public class HttpReader
                 // 需要判断返回的结果仅仅是一条记录还是多条记录，如果是一条记录，则是一个map
                 // 否则是一个array
                 if (object instanceof JSONArray) {
-                    jsonArray = JSON.parseArray(object.toString());
+                    // 有空值的情况下, toString会过滤掉，所以不能简单的使用 object.toString()方式
+                    // https://github.com/wgzhao/DataX/issues/171
+                    jsonArray = JSON.parseArray(JSONObject.toJSONString(object, SerializerFeature.WriteMapNullValue));
                 }
                 else if (object instanceof JSONObject) {
                     jsonArray = new JSONArray();
@@ -178,6 +181,7 @@ public class HttpReader
                     // empty result
                     return;
                 }
+
                 List<String> columns = readerSliceConfig.getList(Key.COLUMN, String.class);
                 if (columns == null || columns.isEmpty()) {
                     throw DataXException.asDataXException(
@@ -196,7 +200,7 @@ public class HttpReader
                 }
                 // first, check key exists or not ?
                 for (String k : columns) {
-                    if (!JSONPath.contains(jsonObject, k)) {
+                    if (! jsonObject.containsKey(k)) {
                         throw DataXException.asDataXException(
                                 HttpReaderErrorCode.ILLEGAL_VALUE,
                                 "您尝试从结果中获取key为 '" + k + "'的结果，但实际结果中不存在该key值"
