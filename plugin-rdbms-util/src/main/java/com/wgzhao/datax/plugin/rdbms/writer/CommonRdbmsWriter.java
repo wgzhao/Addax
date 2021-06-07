@@ -42,6 +42,7 @@ import java.sql.SQLException;
 import java.sql.Types;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Calendar;
 import java.util.List;
 
 public class CommonRdbmsWriter
@@ -504,8 +505,10 @@ public class CommonRdbmsWriter
                 case Types.LONGVARCHAR:
                 case Types.NVARCHAR:
                 case Types.LONGNVARCHAR:
-
                 case Types.BOOLEAN:
+                case Types.SQLXML:
+
+                case Types.ARRAY:
                     preparedStatement.setString(columnIndex, column.asString());
                     break;
 
@@ -536,30 +539,27 @@ public class CommonRdbmsWriter
                     }
                     break;
 
-                // for mysql bug, see http://bugs.mysql.com/bug.php?id=35115
                 case Types.DATE:
+                    try {
+                        utilDate = column.asDate();
+                    }
+                    catch (DataXException e) {
+                        throw new SQLException(String.format(
+                                "Date 类型转换错误：[%s]", column));
+                    }
+                    if (utilDate == null) {
+                            throw new SQLException(String.format(
+                                    "无法将解析 Date 类型数据：[%s]", column));
+                    }
+                    java.sql.Date sqlDate = new java.sql.Date(utilDate.getTime());
+
                     if ("year"
-                            .equalsIgnoreCase(this.resultSetMetaData.getRight().get(columnIndex))) {
-                        if (column.asBigInteger() == null) {
-                            preparedStatement.setString(columnIndex, null);
-                        }
-                        else {
-                            preparedStatement.setInt(columnIndex, column.asBigInteger().intValue());
-                        }
+                            .equalsIgnoreCase(this.resultSetMetaData.getRight().get(columnIndex - 1))) {
+                        Calendar cal = Calendar.getInstance();
+                        cal.setTime(sqlDate);
+                        preparedStatement.setInt(columnIndex, cal.get(Calendar.YEAR));
                     }
                     else {
-                        java.sql.Date sqlDate = null;
-                        try {
-                            utilDate = column.asDate();
-                        }
-                        catch (DataXException e) {
-                            throw new SQLException(String.format(
-                                    "Date 类型转换错误：[%s]", column));
-                        }
-
-                        if (null != utilDate) {
-                            sqlDate = new java.sql.Date(utilDate.getTime());
-                        }
                         preparedStatement.setDate(columnIndex, sqlDate);
                     }
                     break;
@@ -581,7 +581,7 @@ public class CommonRdbmsWriter
                     break;
 
                 case Types.TIMESTAMP:
-                    if (this.resultSetMetaData.getRight().get(columnIndex).startsWith("DateTime(")) {
+                    if (this.resultSetMetaData.getRight().get(columnIndex - 1).startsWith("DateTime(")) {
                         // ClickHouse DateTime(timezone)
                         // TODO 含时区，当作Timestamp处理会有时区的差异
                         preparedStatement.setString(columnIndex, column.asString());
@@ -596,8 +596,7 @@ public class CommonRdbmsWriter
                     }
 
                     if (null != utilDate) {
-                        sqlTimestamp = new java.sql.Timestamp(
-                                utilDate.getTime());
+                        sqlTimestamp = new java.sql.Timestamp(utilDate.getTime());
                     }
                         preparedStatement.setTimestamp(columnIndex, sqlTimestamp);
                     }
@@ -620,14 +619,6 @@ public class CommonRdbmsWriter
                     else {
                         preparedStatement.setString(columnIndex, column.asString());
                     }
-                    break;
-
-                case Types.ARRAY:
-                    preparedStatement.setString(columnIndex, column.asString());
-                    break;
-
-                case Types.SQLXML:
-                    preparedStatement.setString(columnIndex, column.asString());
                     break;
 
                 case Types.OTHER:
