@@ -114,6 +114,14 @@
             <outputDirectory>datax-${project.version}</outputDirectory>
         </fileSet>
         <fileSet>
+            <directory>plugin/reader/httpreader/target/httpreader-${project.version}/</directory>
+            <includes>
+                <include>**/*.*</include>
+            </includes>
+            <fileMode>0644</fileMode>
+            <outputDirectory>datax-${project.version}</outputDirectory>
+        </fileSet>
+        <fileSet>
             <directory>plugin/reader/hdfsreader/target/hdfsreader-${project.version}/</directory>
             <includes>
                 <include>**/*.*</include>
@@ -288,6 +296,17 @@
             <includes>
                 <include>**/*.*</include>
             </includes>
+            <fileMode>0644</fileMode>
+            <outputDirectory>datax-${project.version}</outputDirectory>
+        </fileSet>
+        <fileSet>
+            <directory>plugin/writer/httpwriter/target/httpwriter-${project.version}/</directory>
+            <includes>
+                <include>**/*.*</include>
+            </includes>
+            <excludes>
+                <exclude>**/datax-common*.jar</exclude>
+            </excludes>
             <fileMode>0644</fileMode>
             <outputDirectory>datax-${project.version}</outputDirectory>
         </fileSet>
