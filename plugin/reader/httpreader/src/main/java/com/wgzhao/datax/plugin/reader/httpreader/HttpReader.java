@@ -30,6 +30,7 @@ import com.wgzhao.datax.common.exception.DataXException;
 import com.wgzhao.datax.common.plugin.RecordSender;
 import com.wgzhao.datax.common.spi.Reader;
 import com.wgzhao.datax.common.util.Configuration;
+import com.wgzhao.datax.common.util.ConsulUtils;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpHost;
 import org.apache.http.HttpStatus;
@@ -113,9 +114,29 @@ public class HttpReader
             this.readerSliceConfig = this.getPluginJobConf();
             this.username = readerSliceConfig.getString(Key.USERNAME, null);
             this.password = readerSliceConfig.getString(Key.PASSWORD, null);
+            
+            String consulIp = readerSliceConfig.getString(Key.CONSUL_IP, null);
+            Integer consulPort = readerSliceConfig.getInt(Key.CONSUL_PORT, 0);
+            String consulServiceName = readerSliceConfig.getString(Key.CONSUL_SERVICE_NAME,null);
+            
+            String singleService = "";
+            if(consulIp != null && consulPort != 0 && consulServiceName != null){
+                singleService = ConsulUtils.getSingleService(consulIp, consulPort, consulServiceName);
+            }
+            
             Configuration conn =
                     readerSliceConfig.getListConfiguration(Key.CONNECTION).get(0);
-            uriBuilder = new URIBuilder(URI.create(conn.getString(Key.URL)));
+
+            String serviceUrl = "";
+            
+            if (conn.getString(Key.URL).contains("${serviceName}")) {
+                serviceUrl = conn.getString(Key.URL).replace("${serviceName}",singleService);
+            }
+            else{
+                serviceUrl = conn.getString(Key.URL);
+            }
+            
+            uriBuilder = new URIBuilder(URI.create(serviceUrl));
 
             if (conn.getString(Key.PROXY, null) != null) {
                 // set proxy

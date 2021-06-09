@@ -33,6 +33,14 @@
             <groupId>org.slf4j</groupId>
             <artifactId>slf4j-api</artifactId>
         </dependency>
+
+        <dependency>
+            <groupId>com.ecwid.consul</groupId>
+            <artifactId>consul-api</artifactId>
+            <version>1.2.2</version>
+            <scope>compile</scope>
+        </dependency>
+        
     </dependencies>
     <build>
         <plugins>

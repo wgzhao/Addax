@@ -21,6 +21,12 @@ package com.wgzhao.datax.plugin.reader.httpreader;
 
 public class Key
 {
+    // 添加Consul Url参数，通过consul 获取 服务的的 ip / port 信息
+    public static final String CONSUL_IP = "consulIp";
+    // 添加Consul Url参数，通过consul 获取 服务的的 ip / port 信息
+    public static final String CONSUL_PORT = "consulPort";
+    // 服务名，通过consul 查找服务名，获得服务的相关信息
+    public static final String CONSUL_SERVICE_NAME = "consulServiceName";
     // 获取返回json的那个key值
     public static final String RESULT_KEY = "resultKey";
     // 连接信息
