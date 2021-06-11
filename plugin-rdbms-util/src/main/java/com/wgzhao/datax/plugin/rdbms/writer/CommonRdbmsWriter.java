@@ -495,6 +495,10 @@ public class CommonRdbmsWriter
         protected PreparedStatement fillPreparedStatementColumnType(PreparedStatement preparedStatement, int columnIndex, int columnSqltype, Column column)
                 throws SQLException
         {
+            if (column == null || column.getRawData() == null) {
+                preparedStatement.setObject(columnIndex, null);
+                return preparedStatement;
+            }
             java.util.Date utilDate;
             switch (columnSqltype) {
                 case Types.CHAR:
@@ -577,6 +581,9 @@ public class CommonRdbmsWriter
                     if (null != utilDate) {
                         sqlTime = new java.sql.Time(utilDate.getTime());
                     }
+                    // Bug: java.sql.Time does not have sufficient precision for new MySQL Time columns
+                    // https://bugs.openjdk.java.net/browse/JDK-8186415
+                    // TODO: set time with Fractinal Seconds
                     preparedStatement.setTime(columnIndex, sqlTime);
                     break;
 
