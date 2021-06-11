@@ -60,7 +60,6 @@ import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -611,6 +610,7 @@ public class TxtFileReader
                         if (columnValue.equals(nullFormat)) {
                             columnValue = null;
                         }
+                        String errorTemplate =  "类型转换错误, 无法将[%s] 转换为[%s]";
                         switch (type) {
                             case STRING:
                                 columnGenerated = new StringColumn(columnValue);
@@ -621,7 +621,7 @@ public class TxtFileReader
                                 }
                                 catch (Exception e) {
                                     throw new IllegalArgumentException(String.format(
-                                            "类型转换错误, 无法将[%s] 转换为[%s]", columnValue,
+                                            errorTemplate, columnValue,
                                             "LONG"));
                                 }
                                 break;
@@ -631,7 +631,7 @@ public class TxtFileReader
                                 }
                                 catch (Exception e) {
                                     throw new IllegalArgumentException(String.format(
-                                            "类型转换错误, 无法将[%s] 转换为[%s]", columnValue,
+                                            errorTemplate, columnValue,
                                             "DOUBLE"));
                                 }
                                 break;
@@ -641,16 +641,15 @@ public class TxtFileReader
                                 }
                                 catch (Exception e) {
                                     throw new IllegalArgumentException(String.format(
-                                            "类型转换错误, 无法将[%s] 转换为[%s]", columnValue,
+                                            errorTemplate, columnValue,
                                             "BOOLEAN"));
                                 }
 
                                 break;
                             case DATE:
                                 try {
-                                    if (columnValue == null) {
-                                        Date date = null;
-                                        columnGenerated = new DateColumn(date);
+                                    if (columnValue == null || StringUtils.isBlank(columnValue)) {
+                                        columnGenerated = null;
                                     }
                                     else {
                                         String formatString = columnConfig.getString(Key.FORMAT);
@@ -669,7 +668,7 @@ public class TxtFileReader
                                 }
                                 catch (Exception e) {
                                     throw new IllegalArgumentException(String.format(
-                                            "类型转换错误, 无法将[%s] 转换为[%s]", columnValue,
+                                            errorTemplate, columnValue,
                                             "DATE"));
                                 }
                                 break;
