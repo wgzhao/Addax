@@ -37,7 +37,6 @@ import org.apache.http.StatusLine;
 import org.apache.http.auth.AuthScope;
 import org.apache.http.auth.UsernamePasswordCredentials;
 import org.apache.http.client.CredentialsProvider;
-import org.apache.http.client.config.RequestConfig;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
@@ -57,7 +56,6 @@ import org.apache.http.impl.client.HttpClients;
 import org.apache.http.impl.conn.PoolingHttpClientConnectionManager;
 import org.apache.http.protocol.HttpContext;
 import org.apache.http.ssl.SSLContextBuilder;
-import org.apache.http.ssl.SSLContexts;
 import org.apache.http.util.EntityUtils;
 
 import javax.net.ssl.HostnameVerifier;
@@ -207,13 +205,13 @@ public class HttpReader
                 if (columns.size() == 1 && "*".equals(columns.get(0))) {
                     // 没有给定key的情况下，提取JSON的第一层key作为字段处理
                     columns.remove(0);
-                    for (Object obj: JSONPath.keySet(jsonObject, "/")) {
+                    for (Object obj : JSONPath.keySet(jsonObject, "/")) {
                         columns.add(obj.toString());
                     }
                 }
                 // first, check key exists or not ?
                 for (String k : columns) {
-                    if (! jsonObject.containsKey(k)) {
+                    if (!jsonObject.containsKey(k)) {
                         throw DataXException.asDataXException(
                                 HttpReaderErrorCode.ILLEGAL_VALUE,
                                 "您尝试从结果中获取key为 '" + k + "'的结果，但实际结果中不存在该key值"
@@ -248,14 +246,9 @@ public class HttpReader
             String host = proxyConf.getString(Key.HOST);
             this.proxyAuth = proxyConf.getString(Key.AUTH);
             URI uri = URI.create(host);
-            if (host.startsWith("socks")) {
-                InetSocketAddress socketAddress = new InetSocketAddress(uri.getHost(), uri.getPort());
+            this.context = HttpClientContext.create();
+            this.context.setAttribute("proxy", uri);
 
-                this.context = HttpClientContext.create();
-                this.context.setAttribute("socks.address", socketAddress);
-            } else {
-                this.proxy = new HttpHost(uri.getHost(), uri.getPort(), uri.getScheme());
-            }
 
         }
 
@@ -266,38 +259,17 @@ public class HttpReader
             CloseableHttpClient httpClient;
             CloseableHttpResponse response;
 
-
             if ("get".equalsIgnoreCase(method)) {
                 HttpGet request = new HttpGet(uriBuilder.build());
                 headers.forEach((k, v) -> request.setHeader(k, v.toString()));
                 httpClient = createCloseableHttpClient();
-                if (this.proxy != null) {
-                    RequestConfig config = RequestConfig.custom()
-                            .setProxy(proxy)
-                            .build();
-                    request.setConfig(config);
-                    response = httpClient.execute(request);
-                } else if (this.context != null) {
-                    response = httpClient.execute(request, this.context);
-                } else {
-                    response = httpClient.execute(request);
-                }
+                response = httpClient.execute(request, this.context);
             }
             else if ("post".equalsIgnoreCase(method)) {
                 HttpPost request = new HttpPost(uriBuilder.build());
                 headers.forEach((k, v) -> request.setHeader(k, v.toString()));
                 httpClient = createCloseableHttpClient();
-                if (this.proxy != null) {
-                    RequestConfig config = RequestConfig.custom()
-                            .setProxy(proxy)
-                            .build();
-                    request.setConfig(config);
-                    response = httpClient.execute(request);
-                } else if (this.context != null) {
-                    response = httpClient.execute(request, this.context);
-                } else {
-                    response = httpClient.execute(request);
-                }
+                response = httpClient.execute(request, this.context);
             }
             else {
                 throw DataXException.asDataXException(
@@ -313,12 +285,11 @@ public class HttpReader
             CredentialsProvider provider = null;
 
             Registry<ConnectionSocketFactory> reg = RegistryBuilder
-                    .<ConnectionSocketFactory> create()
+                    .<ConnectionSocketFactory>create()
                     .register("http", new MyConnectionSocketFactory())
-                    .register("https", new MySSLConnectionSocketFactory(SSLContexts.createSystemDefault()))
+                    .register("https", new MyConnectionSocketFactory())
                     .build();
-            PoolingHttpClientConnectionManager cm = new PoolingHttpClientConnectionManager(
-                    reg);
+            PoolingHttpClientConnectionManager cm = new PoolingHttpClientConnectionManager(reg);
             httpClientBuilder.setConnectionManager(cm);
             if (this.password != null) {
                 httpClientBuilder = HttpClientBuilder.create();
@@ -376,20 +347,33 @@ public class HttpReader
         }
     }
 
-    static class MyConnectionSocketFactory implements
+    static class MyConnectionSocketFactory
+            implements
             ConnectionSocketFactory
     {
 
         @Override
         public Socket createSocket(final HttpContext context)
-                throws IOException {
-            InetSocketAddress socksaddr = (InetSocketAddress) context
-                    .getAttribute("socks.address");
-            if (socksaddr != null) {
-                Proxy proxy = new Proxy(Proxy.Type.SOCKS, socksaddr);
-                return new Socket(proxy);
-            } else {
+                throws IOException
+        {
+            Proxy proxy = null;
+            URI uri = (URI) context.getAttribute("proxy");
+            if (uri == null) {
                 return null;
+            }
+
+            InetSocketAddress socksaddr = new InetSocketAddress(uri.getHost(), uri.getPort());
+            String proxyType = uri.getScheme();
+            if (proxyType.startsWith("socks")) {
+                proxy = new Proxy(Proxy.Type.SOCKS, socksaddr);
+            }
+            else if (proxyType.startsWith("http")) {
+                proxy = new Proxy(Proxy.Type.HTTP, socksaddr);
+            }
+            if (proxy == null) {
+                return null;
+            } else {
+                return new Socket(proxy);
             }
         }
 
@@ -398,12 +382,14 @@ public class HttpReader
                 final Socket socket, final HttpHost host,
                 final InetSocketAddress remoteAddress,
                 final InetSocketAddress localAddress,
-                final HttpContext context) throws IOException
+                final HttpContext context)
+                throws IOException
         {
             Socket sock;
             if (socket != null) {
                 sock = socket;
-            } else {
+            }
+            else {
                 sock = createSocket(context);
             }
             if (localAddress != null) {
@@ -411,32 +397,12 @@ public class HttpReader
             }
             try {
                 sock.connect(remoteAddress, connectTimeout);
-            } catch (SocketTimeoutException ex) {
+            }
+            catch (SocketTimeoutException ex) {
                 throw new ConnectTimeoutException(ex, host,
                         remoteAddress.getAddress());
             }
             return sock;
-        }
-    }
-
-    static class MySSLConnectionSocketFactory extends SSLConnectionSocketFactory {
-        public MySSLConnectionSocketFactory(final SSLContext sslContext) {
-            super(sslContext);
-        }
-
-        @Override
-        public Socket createSocket(final HttpContext context)
-        {
-            InetSocketAddress socksaddr = (InetSocketAddress) context.getAttribute("socks.address");
-            Proxy proxy = new Proxy(Proxy.Type.SOCKS, socksaddr);
-            return new Socket(proxy);
-        }
-
-        @Override
-        public Socket connectSocket(int connectTimeout, Socket socket, HttpHost host, InetSocketAddress remoteAddress,
-                InetSocketAddress localAddress, HttpContext context) throws IOException {
-            InetSocketAddress unresolvedRemote = InetSocketAddress.createUnresolved(host.getHostName(), remoteAddress.getPort());
-            return super.connectSocket(connectTimeout, socket, host, unresolvedRemote, localAddress, context);
         }
     }
 }
