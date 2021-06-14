@@ -307,17 +307,14 @@ public class HttpReader
 
             if (this.proxyAuth != null) {
                 String[] up = this.proxyAuth.split(":");
-                provider = new BasicCredentialsProvider();
-                if (up.length == 1) {
-                    provider.setCredentials(new AuthScope(this.proxy), new UsernamePasswordCredentials(up[0], null));
-                }
+                System.setProperty("java.net.socks.username", up[0]);
+                System.setProperty("http.proxyUser", up[0]);
                 if (up.length == 2) {
-                    provider.setCredentials(new AuthScope(this.proxy), new UsernamePasswordCredentials(up[0], up[1]));
+                    System.setProperty("java.net.socks.password", up[1]);
+                    System.setProperty("http.proxyPassword", up[1]);
                 }
             }
-            if (provider != null) {
-                httpClientBuilder.setDefaultCredentialsProvider(provider);
-            }
+
             httpClientBuilder.setSSLSocketFactory(ignoreSSLErrors());
 
             return httpClientBuilder.build();
