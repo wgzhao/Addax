@@ -17,7 +17,7 @@ English | [简体中文](README_zh.md)
 
 ## current stable version
 
-`3.2.4`
+`3.2.5`
 
 Note: As of `3.2.1`, the package class names have been changed and are therefore no longer compatible with `3.1.x` versions.
 
@@ -136,6 +136,7 @@ If you are too lazy to compile or cannot compile because of your environment, yo
 
 | version | download                                                   | md5                              |
 | ------- | ---------------------------------------------------------- | -------------------------------- |
+| 3.2.5   | https://pan.baidu.com/s/14_MnbtRUtJlvQh8tTKv6fg code: 1jdr | 43ddd0186ccbaf1f1bfee0aac22da935 |
 | 3.2.4   | https://pan.baidu.com/s/1VaOlAOTqGX4WwRtI5ewPeg code: i127 | 2d16125385b88405481e12bf4a8fd715 |
 | 3.2.3   | https://pan.baidu.com/s/1ajjnSittf6u7rjXhJ7_3Aw code: qxry | ad47b0d840bf21de1668b9310a9782cf |
 | 3.2.2   | https://pan.baidu.com/s/1TQyaERnIk9EQRDULfQE69w code: jh31 | b04d2563adb36457b85e48c318757ea3 |
@@ -156,6 +157,7 @@ other plug-ins need to be downloaded separately, the download shared directory l
 
 | version | download link                                              |
 | ------- | ---------------------------------------------------------- |
+| 3.2.5   | https://pan.baidu.com/s/1VMqPAYeL_kirCjOVAdvoAg code: hda9 |
 | 3.2.4   | https://pan.baidu.com/s/1gPJlJh66bGQUSUR-2mNOQw code: 7c4j |
 | 3.2.3   | https://pan.baidu.com/s/1g4z3Pqc_BxKstkiYjWXopQ code: 2fip |
 

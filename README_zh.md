@@ -17,7 +17,7 @@
 
 ## 当前稳定版
 
-`3.2.4`
+`3.2.5`
 
 注： 从 `3.2.1` 版本开始，包类名已经更改，因此不再兼容 `3.1.x` 版本
 
@@ -116,6 +116,7 @@
 
 | 版本  | 连接地址                                                     | md5值                            |
 | ----- | ------------------------------------------------------------| -------------------------------- |
+| 3.2.5   | https://pan.baidu.com/s/14_MnbtRUtJlvQh8tTKv6fg 提取码: 1jdr | 43ddd0186ccbaf1f1bfee0aac22da935 |
 | 3.2.4 | https://pan.baidu.com/s/1VaOlAOTqGX4WwRtI5ewPeg 提取码: i127 | 2d16125385b88405481e12bf4a8fd715 |
 | 3.2.3 | https://pan.baidu.com/s/1ajjnSittf6u7rjXhJ7_3Aw 提取码: qxry | ad47b0d840bf21de1668b9310a9782cf |
 | 3.2.2 | https://pan.baidu.com/s/1TQyaERnIk9EQRDULfQE69w 提取码: jh31 | b04d2563adb36457b85e48c318757ea3 |
@@ -135,6 +136,7 @@
 
 | 版本  | 插件下载地址                                                  |
 | ----- | ------------------------------------------------------------|
+| 3.2.5 | https://pan.baidu.com/s/1VMqPAYeL_kirCjOVAdvoAg 提取码: hda9 |
 | 3.2.4 | https://pan.baidu.com/s/1gPJlJh66bGQUSUR-2mNOQw 提取码: 7c4j |
 | 3.2.3 | https://pan.baidu.com/s/1g4z3Pqc_BxKstkiYjWXopQ 提取码: 2fip |
 
