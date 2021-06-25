@@ -1,0 +1,14 @@
+{
+  "type": "record",
+  "name": "dataxTest",
+  "aliases": ["datax","parquet"],
+  "fields" : [
+    {"name": "col1", "type": "long"},
+    {"name": "col2", "type": "int"},
+    {"name": "col3", "type": "string"},
+    {"name": "col4", "type": {"type": "fixed", "logicalType": "decimal", "name": "col4", "precision": 38, "scale":  10, "size": 16}},
+    {"name": "col5", "type": {"type": "int", "logicalType":"date"}},
+    {"name": "col6", "type": {"type": "long", "logicalType": "timestamp"}}
+  ]
+}
+
