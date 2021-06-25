@@ -40,7 +40,7 @@ jobs:
 
 
       - name: Build with Maven
-        run: mvn -B package --file pom.xml
+        run: mvn -B package -Dgpg.skip --file pom.xml
 
       - name: Configure GPG Key
         run: |
@@ -51,7 +51,7 @@ jobs:
           GPG_SIGNING_KEY: ${{ secrets.GPG_SIGNING_KEY }}
 
       - name: Publish to GitHub Packages Apache Maven
-        run: mvn deploy -s $GITHUB_WORKSPACE/settings.xml
+        run: mvn deploy -Dgpg.skip -s $GITHUB_WORKSPACE/settings.xml
         env:
           GITHUB_TOKEN: ${{ github.token }}
           OSSRH_USERNAME: ${{ secrets.OSSRH_USERNAME }}
