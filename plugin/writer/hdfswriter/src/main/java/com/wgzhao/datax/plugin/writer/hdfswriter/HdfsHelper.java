@@ -674,6 +674,11 @@ public class HdfsHelper
                     etype.put("logicalType", "uuid");
                     dtype.add(etype);
                     break;
+                case "binary":
+                    etype.put("type", "bytes");
+                    etype.put("logicalType", "binary");
+                    dtype.add(etype);
+                    break;
                 default:
                     dtype.add(type);
                     break;

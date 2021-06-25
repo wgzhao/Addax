@@ -407,7 +407,7 @@ public class DFSUtil
                         record.addColumn(null);
                         continue;
                     }
-                    switch(type) {
+                    switch (type) {
                         case LONG:
                         case DATE:
                         case BOOLEAN:
@@ -417,7 +417,7 @@ public class DFSUtil
                             columnGenerated = new DoubleColumn(((DoubleColumnVector) col).vector[row]);
                             break;
                         case STRING:
-                            columnGenerated =  new StringColumn(((BytesColumnVector) col).toString(row));
+                            columnGenerated = new StringColumn(((BytesColumnVector) col).toString(row));
                             break;
                         case BINARY:
                             BytesColumnVector b = (BytesColumnVector) col;
@@ -428,14 +428,14 @@ public class DFSUtil
                             columnGenerated = new DateColumn(((TimestampColumnVector) col).getTimestampAsLong(row) * 1000);
                             break;
                         default:
-                            columnGenerated =  new StringColumn(((BytesColumnVector) col).toString(row));
+                            columnGenerated = new StringColumn(((BytesColumnVector) col).toString(row));
                             break;
                     }
                     record.addColumn(columnGenerated);
                 }
                 recordSender.sendToWriter(record);
             }
-            catch (Exception e ) {
+            catch (Exception e) {
                 if (e instanceof DataXException) {
                     throw (DataXException) e;
                 }
@@ -444,379 +444,392 @@ public class DFSUtil
         }
     }
 
-        public void parquetFileStartRead (String sourceParquestFilePath, Configuration readerSliceConfig,
+    public void parquetFileStartRead(String sourceParquestFilePath, Configuration readerSliceConfig,
             RecordSender recordSender, TaskPluginCollector taskPluginCollector)
-        {
-            LOG.info("Start Read orcfile [{}].", sourceParquestFilePath);
-            List<ColumnEntry> column = StorageReaderUtil
-                    .getListColumnEntry(readerSliceConfig, COLUMN);
-            String nullFormat = readerSliceConfig.getString(NULL_FORMAT);
-            boolean isReadAllColumns = false;
-            int columnIndexMax;
-            // 判断是否读取所有列
-            if (null == column || column.isEmpty()) {
-                int allColumnsCount = getAllColumnsCount(sourceParquestFilePath);
-                columnIndexMax = allColumnsCount - 1;
-                isReadAllColumns = true;
-            }
-            else {
-                columnIndexMax = getMaxIndex(column);
-            }
-            if (columnIndexMax >= 0) {
-                JobConf conf = new JobConf(hadoopConf);
-                Path parquetFilePath = new Path(sourceParquestFilePath);
+    {
+        LOG.info("Start Read orcfile [{}].", sourceParquestFilePath);
+        List<ColumnEntry> column = StorageReaderUtil
+                .getListColumnEntry(readerSliceConfig, COLUMN);
+        String nullFormat = readerSliceConfig.getString(NULL_FORMAT);
+        boolean isReadAllColumns = false;
+        int columnIndexMax;
+        // 判断是否读取所有列
+        if (null == column || column.isEmpty()) {
+            int allColumnsCount = getAllColumnsCount(sourceParquestFilePath);
+            columnIndexMax = allColumnsCount - 1;
+            isReadAllColumns = true;
+        }
+        else {
+            columnIndexMax = getMaxIndex(column);
+        }
+        if (columnIndexMax >= 0) {
+            JobConf conf = new JobConf(hadoopConf);
+            Path parquetFilePath = new Path(sourceParquestFilePath);
 //            InputFile inputFile =
-                GenericData decimalSupport = new GenericData();
-                decimalSupport.addLogicalTypeConversion(new Conversions.DecimalConversion());
-                try (ParquetReader<GenericData.Record> reader = AvroParquetReader
-                        .<GenericData.Record>builder(parquetFilePath)
-                        .withDataModel(decimalSupport)
-                        .withConf(conf)
-                        .build()) {
-                    GenericData.Record gRecord = reader.read();
-                    Schema schema = gRecord.getSchema();
-                    while (gRecord != null) {
-                        transportOneRecord(column, gRecord, schema, recordSender, taskPluginCollector, isReadAllColumns, nullFormat
-                        );
-                        gRecord = reader.read();
-                    }
+            GenericData decimalSupport = new GenericData();
+            decimalSupport.addLogicalTypeConversion(new Conversions.DecimalConversion());
+            try (ParquetReader<GenericData.Record> reader = AvroParquetReader
+                    .<GenericData.Record>builder(parquetFilePath)
+                    .withDataModel(decimalSupport)
+                    .withConf(conf)
+                    .build()) {
+                GenericData.Record gRecord = reader.read();
+                Schema schema = gRecord.getSchema();
+                while (gRecord != null) {
+                    transportOneRecord(column, gRecord, schema, recordSender, taskPluginCollector, isReadAllColumns, nullFormat
+                    );
+                    gRecord = reader.read();
                 }
-                catch (IOException e) {
-                    String message = String.format("从parquetfile文件路径[%s]中读取数据发生异常，请联系系统管理员。"
-                            , sourceParquestFilePath);
-                    LOG.error(message);
-                    throw DataXException.asDataXException(HdfsReaderErrorCode.READ_FILE_ERROR, message);
-                }
-            }
-            else {
-                String message = String.format("请确认您所读取的列配置正确！columnIndexMax 小于0,column:%s", JSON.toJSONString(column));
-                throw DataXException.asDataXException(HdfsReaderErrorCode.BAD_CONFIG_VALUE, message);
-            }
-        }
-
-        /*
-         * create a transport record for Parquet file
-         *
-         *
-         */
-        private void transportOneRecord (List < ColumnEntry > columnConfigs, GenericData.Record gRecord, Schema schema, RecordSender recordSender,
-            TaskPluginCollector taskPluginCollector,boolean isReadAllColumns, String nullFormat)
-        {
-            Record record = recordSender.createRecord();
-            Column columnGenerated;
-            try {
-                if (isReadAllColumns) {
-                    for (int i = 0; i < schema.getFields().size(); i++) {
-                        record.addColumn(new StringColumn((String) gRecord.get(i)));
-                    }
-                }
-                else {
-                    for (ColumnEntry columnEntry : columnConfigs) {
-                        String columnType = columnEntry.getType();
-                        Integer columnIndex = columnEntry.getIndex();
-                        String columnConst = columnEntry.getValue();
-                        String columnValue = null;
-                        if (null != columnIndex) {
-                            if (null != gRecord.get(columnIndex)) {
-                                columnValue = gRecord.get(columnIndex).toString();
-                            }
-                        }
-                        else {
-                            columnValue = columnConst;
-                        }
-                        Type type = Type.valueOf(columnType.toUpperCase());
-                        if (StringUtils.equals(columnValue, nullFormat)) {
-                            columnValue = null;
-                        }
-                        try {
-                            switch (type) {
-                                case STRING:
-                                    columnGenerated = new StringColumn(columnValue);
-                                    break;
-                                case LONG:
-                                    columnGenerated = new LongColumn(columnValue);
-                                    break;
-                                case DOUBLE:
-                                    columnGenerated = new DoubleColumn(columnValue);
-                                    break;
-                                case BOOLEAN:
-                                    columnGenerated = new BoolColumn(columnValue);
-                                    break;
-                                case DATE:
-                                    if (columnValue == null) {
-                                        columnGenerated = new DateColumn((Date) null);
-                                    }
-                                    else {
-                                        String formatString = columnEntry.getFormat();
-                                        if (StringUtils.isNotBlank(formatString)) {
-                                            // 用户自己配置的格式转换
-                                            SimpleDateFormat format = new SimpleDateFormat(
-                                                    formatString);
-                                            columnGenerated = new DateColumn(
-                                                    format.parse(columnValue));
-                                        }
-                                        else {
-                                            // 框架尝试转换
-                                            columnGenerated = new DateColumn(
-                                                    new StringColumn(columnValue)
-                                                            .asDate());
-                                        }
-                                    }
-                                    break;
-                                default:
-                                    String errorMessage = String.format(
-                                            "您配置的列类型暂不支持 : [%s]", columnType);
-                                    LOG.error(errorMessage);
-                                    throw DataXException
-                                            .asDataXException(
-                                                    StorageReaderErrorCode.NOT_SUPPORT_TYPE,
-                                                    errorMessage);
-                            }
-                        }
-                        catch (Exception e) {
-                            throw new IllegalArgumentException(String.format(
-                                    "类型转换错误, 无法将[%s] 转换为[%s]", columnValue, type));
-                        }
-                        record.addColumn(columnGenerated);
-                    } // end for
-                } // end else
-                recordSender.sendToWriter(record);
-            }
-            catch (IllegalArgumentException | IndexOutOfBoundsException iae) {
-                taskPluginCollector
-                        .collectDirtyRecord(record, iae.getMessage());
-            }
-            catch (Exception e) {
-                if (e instanceof DataXException) {
-                    throw (DataXException) e;
-                }
-                // 每一种转换失败都是脏数据处理,包括数字格式 & 日期格式
-                taskPluginCollector.collectDirtyRecord(record, e.getMessage());
-            }
-        }
-
-        private int getAllColumnsCount (String filePath)
-        {
-            return getOrcSchema(filePath).getChildren().size();
-        }
-
-        private TypeDescription getOrcSchema (String filePath)
-        {
-            Path path = new Path(filePath);
-            try {
-                Reader reader = OrcFile.createReader(path, OrcFile.readerOptions(hadoopConf));
-//            return reader.getTypes().get(0).getSubtypesCount()
-                return reader.getSchema();
             }
             catch (IOException e) {
-                String message = "读取orcfile column列数失败，请联系系统管理员";
+                String message = String.format("从parquetfile文件路径[%s]中读取数据发生异常，请联系系统管理员。"
+                        , sourceParquestFilePath);
+                LOG.error(message);
                 throw DataXException.asDataXException(HdfsReaderErrorCode.READ_FILE_ERROR, message);
             }
         }
-
-        private int getMaxIndex (List < ColumnEntry > columnConfigs)
-        {
-            int maxIndex = -1;
-            for (ColumnEntry columnConfig : columnConfigs) {
-                Integer columnIndex = columnConfig.getIndex();
-                if (columnIndex != null && columnIndex < 0) {
-                    String message = String.format("您column中配置的index不能小于0，请修改为正确的index,column配置:%s",
-                            JSON.toJSONString(columnConfigs));
-                    LOG.error(message);
-                    throw DataXException.asDataXException(HdfsReaderErrorCode.CONFIG_INVALID_EXCEPTION, message);
-                }
-                else if (columnIndex != null && columnIndex > maxIndex) {
-                    maxIndex = columnIndex;
-                }
-            }
-            return maxIndex;
-        }
-
-        public boolean checkHdfsFileType (String filepath, String specifiedFileType)
-        {
-
-            Path file = new Path(filepath);
-
-            try (FileSystem fs = FileSystem.get(hadoopConf); FSDataInputStream in = fs.open(file)) {
-                if (StringUtils.equalsIgnoreCase(specifiedFileType, Constant.ORC)) {
-                    return isORCFile(file, fs, in);
-                }
-                else if (StringUtils.equalsIgnoreCase(specifiedFileType, Constant.RC)) {
-                    return isRCFile(filepath, in);
-                }
-                else if (StringUtils.equalsIgnoreCase(specifiedFileType, Constant.SEQ)) {
-
-                    return isSequenceFile(file, in);
-                }
-                else if (StringUtils.equalsIgnoreCase(specifiedFileType, Constant.PARQUET)) {
-                    return isParquetFile(file, in);
-                }
-                else if (StringUtils.equalsIgnoreCase(specifiedFileType, Constant.CSV)
-                        || StringUtils.equalsIgnoreCase(specifiedFileType, Constant.TEXT)) {
-                    return true;
-                }
-            }
-            catch (Exception e) {
-                String message = String.format("检查文件[%s]类型失败，目前支持 %s 格式的文件," +
-                        "请检查您文件类型和文件是否正确。", filepath, Constant.SUPPORT_FILE_TYPE);
-                LOG.error(message);
-                throw DataXException.asDataXException(HdfsReaderErrorCode.READ_FILE_ERROR, message, e);
-            }
-            return false;
-        }
-
-        // 判断file是否是ORC File
-        private boolean isORCFile (Path file, FileSystem fs, FSDataInputStream in)
-        {
-            try {
-                // figure out the size of the file using the option or filesystem
-                long size = fs.getFileStatus(file).getLen();
-
-                //read last bytes into buffer to get PostScript
-                int readSize = (int) Math.min(size, DIRECTORY_SIZE_GUESS);
-                in.seek(size - readSize);
-                ByteBuffer buffer = ByteBuffer.allocate(readSize);
-                in.readFully(buffer.array(), buffer.arrayOffset() + buffer.position(),
-                        buffer.remaining());
-
-                //read the PostScript
-                //get length of PostScript
-                int psLen = buffer.get(readSize - 1) & 0xff;
-                String orcMagic = org.apache.orc.OrcFile.MAGIC;
-                int len = orcMagic.length();
-                if (psLen < len + 1) {
-                    return false;
-                }
-                int offset = buffer.arrayOffset() + buffer.position() + buffer.limit() - 1
-                        - len;
-                byte[] array = buffer.array();
-                // now look for the magic string at the end of the postscript.
-                if (Text.decode(array, offset, len).equals(orcMagic)) {
-                    return true;
-                }
-                else {
-                    // If it isn't there, this may be the 0.11.0 version of ORC.
-                    // Read the first 3 bytes of the file to check for the header
-                    in.seek(0);
-                    byte[] header = new byte[len];
-                    in.readFully(header, 0, len);
-                    // if it isn't there, this isn't an ORC file
-                    if (Text.decode(header, 0, len).equals(orcMagic)) {
-                        return true;
-                    }
-                }
-            }
-            catch (IOException e) {
-                LOG.info("检查文件类型: [{}] 不是ORC File.", file);
-            }
-            return false;
-        }
-
-        // 判断file是否是RC file
-        private boolean isRCFile (String filepath, FSDataInputStream in)
-        {
-
-            // The first version of RCFile used the sequence file header.
-            final byte[] originalMagic = {(byte) 'S', (byte) 'E', (byte) 'Q'};
-            // The 'magic' bytes at the beginning of the RCFile
-            final byte[] rcMagic = {(byte) 'R', (byte) 'C', (byte) 'F'};
-            // the version that was included with the original magic, which is mapped
-            // into ORIGINAL_VERSION
-            final byte ORIGINAL_MAGIC_VERSION_WITH_METADATA = 6;
-            // All of the versions should be place in this list.
-            final int ORIGINAL_VERSION = 0;  // version with SEQ
-            // version with RCF
-            // final int NEW_MAGIC_VERSION = 1
-            // final int CURRENT_VERSION = NEW_MAGIC_VERSION
-            final int CURRENT_VERSION = 1;
-            byte version;
-
-            byte[] magic = new byte[rcMagic.length];
-            try {
-                in.seek(0);
-                in.readFully(magic);
-
-                if (Arrays.equals(magic, originalMagic)) {
-                    byte vers = in.readByte();
-                    if (vers != ORIGINAL_MAGIC_VERSION_WITH_METADATA) {
-                        return false;
-                    }
-                    version = ORIGINAL_VERSION;
-                }
-                else {
-                    if (!Arrays.equals(magic, rcMagic)) {
-                        return false;
-                    }
-
-                    // Set 'version'
-                    version = in.readByte();
-                    if (version > CURRENT_VERSION) {
-                        return false;
-                    }
-                }
-
-                if (version == ORIGINAL_VERSION) {
-                    try {
-                        Class<?> keyCls = hadoopConf.getClassByName(Text.readString(in));
-                        Class<?> valCls = hadoopConf.getClassByName(Text.readString(in));
-                        if (!keyCls.equals(RCFile.KeyBuffer.class)
-                                || !valCls.equals(RCFile.ValueBuffer.class)) {
-                            return false;
-                        }
-                    }
-                    catch (ClassNotFoundException e) {
-                        return false;
-                    }
-                }
-//            boolean decompress = in.readBoolean(); // is compressed?
-                if (version == ORIGINAL_VERSION) {
-                    // is block-compressed? it should be always false.
-                    boolean blkCompressed = in.readBoolean();
-                    return !blkCompressed;
-                }
-                return true;
-            }
-            catch (IOException e) {
-                LOG.info("检查文件类型: [{}] 不是RC File.", filepath);
-            }
-            return false;
-        }
-
-        // 判断file是否是Sequence file
-        private boolean isSequenceFile (Path filepath, FSDataInputStream in)
-        {
-            final byte[] seqMagic = {(byte) 'S', (byte) 'E', (byte) 'Q'};
-            byte[] magic = new byte[seqMagic.length];
-            try {
-                in.seek(0);
-                in.readFully(magic);
-                return Arrays.equals(magic, seqMagic);
-            }
-            catch (IOException e) {
-                LOG.info("检查文件类型: [{}] 不是Sequence File.", filepath);
-            }
-            return false;
-        }
-
-        //判断是否为parquet
-        private boolean isParquetFile (Path file, FSDataInputStream in)
-        {
-            try {
-                GroupReadSupport readSupport = new GroupReadSupport();
-                ParquetReader.Builder<Group> reader = ParquetReader.builder(readSupport, file);
-                ParquetReader<Group> build = reader.build();
-                if (build.read() != null) {
-                    return true;
-                }
-            }
-            catch (IOException e) {
-                LOG.info("检查文件类型: [{}] 不是Parquet File.", file);
-            }
-            return false;
-        }
-
-        private enum Type
-        {
-            STRING, LONG, BOOLEAN, DOUBLE, DATE, BINARY, TIMESTAMP,
+        else {
+            String message = String.format("请确认您所读取的列配置正确！columnIndexMax 小于0,column:%s", JSON.toJSONString(column));
+            throw DataXException.asDataXException(HdfsReaderErrorCode.BAD_CONFIG_VALUE, message);
         }
     }
+
+    /*
+     * create a transport record for Parquet file
+     *
+     *
+     */
+    private void transportOneRecord(List<ColumnEntry> columnConfigs, GenericData.Record gRecord, Schema schema, RecordSender recordSender,
+            TaskPluginCollector taskPluginCollector, boolean isReadAllColumns, String nullFormat)
+    {
+        Record record = recordSender.createRecord();
+        Column columnGenerated;
+        try {
+            if (isReadAllColumns) {
+                for (int i = 0; i < schema.getFields().size(); i++) {
+                    record.addColumn(new StringColumn((String) gRecord.get(i)));
+                }
+            }
+            else {
+                for (ColumnEntry columnEntry : columnConfigs) {
+                    String columnType = columnEntry.getType();
+                    Integer columnIndex = columnEntry.getIndex();
+                    String columnConst = columnEntry.getValue();
+                    String columnValue = null;
+                    if (null != columnIndex) {
+                        if (null != gRecord.get(columnIndex)) {
+                            columnValue = gRecord.get(columnIndex).toString();
+                        } else {
+                            record.addColumn(null);
+                            continue;
+                        }
+                    }
+                    else {
+                        columnValue = columnConst;
+                    }
+                    Type type = Type.valueOf(columnType.toUpperCase());
+                    if (StringUtils.equals(columnValue, nullFormat)) {
+                        columnValue = null;
+                    }
+                    try {
+                        switch (type) {
+                            case STRING:
+                                columnGenerated = new StringColumn(columnValue);
+                                break;
+                            case LONG:
+                                columnGenerated = new LongColumn(columnValue);
+                                break;
+                            case DOUBLE:
+                                columnGenerated = new DoubleColumn(columnValue);
+                                break;
+                            case BOOLEAN:
+                                columnGenerated = new BoolColumn(columnValue);
+                                break;
+                            case DATE:
+                                if (columnValue == null) {
+                                    columnGenerated = new DateColumn((Date) null);
+                                }
+                                else {
+                                    String formatString = columnEntry.getFormat();
+                                    if (StringUtils.isNotBlank(formatString)) {
+                                        // 用户自己配置的格式转换
+                                        SimpleDateFormat format = new SimpleDateFormat(
+                                                formatString);
+                                        columnGenerated = new DateColumn(
+                                                format.parse(columnValue));
+                                    }
+                                    else {
+                                        // 框架尝试转换
+                                        columnGenerated = new DateColumn(
+                                                new StringColumn(columnValue)
+                                                        .asDate());
+                                    }
+                                }
+                                break;
+                            case TIMESTAMP:
+                                if ( null == columnValue) {
+                                    columnGenerated = null;
+                                } else {
+                                    columnGenerated = new DateColumn(Long.parseLong(columnValue) * 1000);
+                                }
+                                break;
+                            case BINARY:
+                                columnGenerated = new BytesColumn(((ByteBuffer)gRecord.get(columnIndex)).array());
+                                break;
+                            default:
+                                String errorMessage = String.format(
+                                        "您配置的列类型暂不支持 : [%s]", columnType);
+                                LOG.error(errorMessage);
+                                throw DataXException
+                                        .asDataXException(
+                                                StorageReaderErrorCode.NOT_SUPPORT_TYPE,
+                                                errorMessage);
+                        }
+                    }
+                    catch (Exception e) {
+                        throw new IllegalArgumentException(String.format(
+                                "类型转换错误, 无法将[%s] 转换为[%s], %s", columnValue, type, e));
+                    }
+                    record.addColumn(columnGenerated);
+                } // end for
+            } // end else
+            recordSender.sendToWriter(record);
+        }
+        catch (IllegalArgumentException | IndexOutOfBoundsException iae) {
+            taskPluginCollector
+                    .collectDirtyRecord(record, iae.getMessage());
+        }
+        catch (Exception e) {
+            if (e instanceof DataXException) {
+                throw (DataXException) e;
+            }
+            // 每一种转换失败都是脏数据处理,包括数字格式 & 日期格式
+            taskPluginCollector.collectDirtyRecord(record, e.getMessage());
+        }
+    }
+
+    private int getAllColumnsCount(String filePath)
+    {
+        return getOrcSchema(filePath).getChildren().size();
+    }
+
+    private TypeDescription getOrcSchema(String filePath)
+    {
+        Path path = new Path(filePath);
+        try {
+            Reader reader = OrcFile.createReader(path, OrcFile.readerOptions(hadoopConf));
+//            return reader.getTypes().get(0).getSubtypesCount()
+            return reader.getSchema();
+        }
+        catch (IOException e) {
+            String message = "读取orcfile column列数失败，请联系系统管理员";
+            throw DataXException.asDataXException(HdfsReaderErrorCode.READ_FILE_ERROR, message);
+        }
+    }
+
+    private int getMaxIndex(List<ColumnEntry> columnConfigs)
+    {
+        int maxIndex = -1;
+        for (ColumnEntry columnConfig : columnConfigs) {
+            Integer columnIndex = columnConfig.getIndex();
+            if (columnIndex != null && columnIndex < 0) {
+                String message = String.format("您column中配置的index不能小于0，请修改为正确的index,column配置:%s",
+                        JSON.toJSONString(columnConfigs));
+                LOG.error(message);
+                throw DataXException.asDataXException(HdfsReaderErrorCode.CONFIG_INVALID_EXCEPTION, message);
+            }
+            else if (columnIndex != null && columnIndex > maxIndex) {
+                maxIndex = columnIndex;
+            }
+        }
+        return maxIndex;
+    }
+
+    public boolean checkHdfsFileType(String filepath, String specifiedFileType)
+    {
+
+        Path file = new Path(filepath);
+
+        try (FileSystem fs = FileSystem.get(hadoopConf); FSDataInputStream in = fs.open(file)) {
+            if (StringUtils.equalsIgnoreCase(specifiedFileType, Constant.ORC)) {
+                return isORCFile(file, fs, in);
+            }
+            else if (StringUtils.equalsIgnoreCase(specifiedFileType, Constant.RC)) {
+                return isRCFile(filepath, in);
+            }
+            else if (StringUtils.equalsIgnoreCase(specifiedFileType, Constant.SEQ)) {
+
+                return isSequenceFile(file, in);
+            }
+            else if (StringUtils.equalsIgnoreCase(specifiedFileType, Constant.PARQUET)) {
+                return isParquetFile(file, in);
+            }
+            else if (StringUtils.equalsIgnoreCase(specifiedFileType, Constant.CSV)
+                    || StringUtils.equalsIgnoreCase(specifiedFileType, Constant.TEXT)) {
+                return true;
+            }
+        }
+        catch (Exception e) {
+            String message = String.format("检查文件[%s]类型失败，目前支持 %s 格式的文件," +
+                    "请检查您文件类型和文件是否正确。", filepath, Constant.SUPPORT_FILE_TYPE);
+            LOG.error(message);
+            throw DataXException.asDataXException(HdfsReaderErrorCode.READ_FILE_ERROR, message, e);
+        }
+        return false;
+    }
+
+    // 判断file是否是ORC File
+    private boolean isORCFile(Path file, FileSystem fs, FSDataInputStream in)
+    {
+        try {
+            // figure out the size of the file using the option or filesystem
+            long size = fs.getFileStatus(file).getLen();
+
+            //read last bytes into buffer to get PostScript
+            int readSize = (int) Math.min(size, DIRECTORY_SIZE_GUESS);
+            in.seek(size - readSize);
+            ByteBuffer buffer = ByteBuffer.allocate(readSize);
+            in.readFully(buffer.array(), buffer.arrayOffset() + buffer.position(),
+                    buffer.remaining());
+
+            //read the PostScript
+            //get length of PostScript
+            int psLen = buffer.get(readSize - 1) & 0xff;
+            String orcMagic = org.apache.orc.OrcFile.MAGIC;
+            int len = orcMagic.length();
+            if (psLen < len + 1) {
+                return false;
+            }
+            int offset = buffer.arrayOffset() + buffer.position() + buffer.limit() - 1
+                    - len;
+            byte[] array = buffer.array();
+            // now look for the magic string at the end of the postscript.
+            if (Text.decode(array, offset, len).equals(orcMagic)) {
+                return true;
+            }
+            else {
+                // If it isn't there, this may be the 0.11.0 version of ORC.
+                // Read the first 3 bytes of the file to check for the header
+                in.seek(0);
+                byte[] header = new byte[len];
+                in.readFully(header, 0, len);
+                // if it isn't there, this isn't an ORC file
+                if (Text.decode(header, 0, len).equals(orcMagic)) {
+                    return true;
+                }
+            }
+        }
+        catch (IOException e) {
+            LOG.info("检查文件类型: [{}] 不是ORC File.", file);
+        }
+        return false;
+    }
+
+    // 判断file是否是RC file
+    private boolean isRCFile(String filepath, FSDataInputStream in)
+    {
+
+        // The first version of RCFile used the sequence file header.
+        final byte[] originalMagic = {(byte) 'S', (byte) 'E', (byte) 'Q'};
+        // The 'magic' bytes at the beginning of the RCFile
+        final byte[] rcMagic = {(byte) 'R', (byte) 'C', (byte) 'F'};
+        // the version that was included with the original magic, which is mapped
+        // into ORIGINAL_VERSION
+        final byte ORIGINAL_MAGIC_VERSION_WITH_METADATA = 6;
+        // All of the versions should be place in this list.
+        final int ORIGINAL_VERSION = 0;  // version with SEQ
+        // version with RCF
+        // final int NEW_MAGIC_VERSION = 1
+        // final int CURRENT_VERSION = NEW_MAGIC_VERSION
+        final int CURRENT_VERSION = 1;
+        byte version;
+
+        byte[] magic = new byte[rcMagic.length];
+        try {
+            in.seek(0);
+            in.readFully(magic);
+
+            if (Arrays.equals(magic, originalMagic)) {
+                byte vers = in.readByte();
+                if (vers != ORIGINAL_MAGIC_VERSION_WITH_METADATA) {
+                    return false;
+                }
+                version = ORIGINAL_VERSION;
+            }
+            else {
+                if (!Arrays.equals(magic, rcMagic)) {
+                    return false;
+                }
+
+                // Set 'version'
+                version = in.readByte();
+                if (version > CURRENT_VERSION) {
+                    return false;
+                }
+            }
+
+            if (version == ORIGINAL_VERSION) {
+                try {
+                    Class<?> keyCls = hadoopConf.getClassByName(Text.readString(in));
+                    Class<?> valCls = hadoopConf.getClassByName(Text.readString(in));
+                    if (!keyCls.equals(RCFile.KeyBuffer.class)
+                            || !valCls.equals(RCFile.ValueBuffer.class)) {
+                        return false;
+                    }
+                }
+                catch (ClassNotFoundException e) {
+                    return false;
+                }
+            }
+//            boolean decompress = in.readBoolean(); // is compressed?
+            if (version == ORIGINAL_VERSION) {
+                // is block-compressed? it should be always false.
+                boolean blkCompressed = in.readBoolean();
+                return !blkCompressed;
+            }
+            return true;
+        }
+        catch (IOException e) {
+            LOG.info("检查文件类型: [{}] 不是RC File.", filepath);
+        }
+        return false;
+    }
+
+    // 判断file是否是Sequence file
+    private boolean isSequenceFile(Path filepath, FSDataInputStream in)
+    {
+        final byte[] seqMagic = {(byte) 'S', (byte) 'E', (byte) 'Q'};
+        byte[] magic = new byte[seqMagic.length];
+        try {
+            in.seek(0);
+            in.readFully(magic);
+            return Arrays.equals(magic, seqMagic);
+        }
+        catch (IOException e) {
+            LOG.info("检查文件类型: [{}] 不是Sequence File.", filepath);
+        }
+        return false;
+    }
+
+    //判断是否为parquet
+    private boolean isParquetFile(Path file, FSDataInputStream in)
+    {
+        try {
+            GroupReadSupport readSupport = new GroupReadSupport();
+            ParquetReader.Builder<Group> reader = ParquetReader.builder(readSupport, file);
+            ParquetReader<Group> build = reader.build();
+            if (build.read() != null) {
+                return true;
+            }
+        }
+        catch (IOException e) {
+            LOG.info("检查文件类型: [{}] 不是Parquet File.", file);
+        }
+        return false;
+    }
+
+    private enum Type
+    {
+        STRING, LONG, BOOLEAN, DOUBLE, DATE, BINARY, TIMESTAMP,
+    }
+}

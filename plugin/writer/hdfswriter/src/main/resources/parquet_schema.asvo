@@ -8,7 +8,8 @@
     {"name": "col3", "type": "string"},
     {"name": "col4", "type": {"type": "fixed", "logicalType": "decimal", "name": "col4", "precision": 38, "scale":  10, "size": 16}},
     {"name": "col5", "type": {"type": "int", "logicalType":"date"}},
-    {"name": "col6", "type": {"type": "long", "logicalType": "timestamp"}}
+    {"name": "col6", "type": {"type": "long", "logicalType": "timestamp"}},
+    {"name": "col7", "type": {"type": "bytes", "logicalType": "binary"}}
   ]
 }
 
