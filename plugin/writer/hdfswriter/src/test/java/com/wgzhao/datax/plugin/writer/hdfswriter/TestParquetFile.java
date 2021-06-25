@@ -107,6 +107,10 @@ public class TestParquetFile
     @Test
     public void testParquetRead()
     {
+        File file = new File(filePath);
+        if (! file.exists()) {
+            testParquetWrite();
+        }
         Path parquetFilePath = new Path(filePath);
         GenericData decimalSupport = new GenericData();
         decimalSupport.addLogicalTypeConversion(new Conversions.DecimalConversion());
