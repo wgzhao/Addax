@@ -24,8 +24,19 @@ package com.wgzhao.datax.plugin.writer.dbffilewriter;
  */
 public class Key
 {
+
     private Key() {}
 
     // must have
     public static final String PATH = "path";
+    public static final String COLUMN = "column";
+    public static final String NAME = "name";
+    public static final String TYPE = "type";
+    public static final String LENGTH = "length";
+    public static final String SCALE = "scale";
+    public static final String FORMAT = "format";
+    public static final String DATE_FORMAT = "date_format";
+    public static final String FILE_NAME = "fileName";
+    public static final String WRITE_MODE = "writeMode";
+    public static final String ENCODING = "encoding";
 }
