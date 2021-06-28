@@ -35,7 +35,7 @@ public class Key
     public static final String LENGTH = "length";
     public static final String SCALE = "scale";
     public static final String FORMAT = "format";
-    public static final String DATE_FORMAT = "date_format";
+    public static final String DATE_FORMAT = "dateFormat";
     public static final String FILE_NAME = "fileName";
     public static final String WRITE_MODE = "writeMode";
     public static final String ENCODING = "encoding";
