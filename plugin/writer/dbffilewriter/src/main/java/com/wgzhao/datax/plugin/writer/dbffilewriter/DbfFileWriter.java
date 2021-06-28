@@ -19,17 +19,15 @@
 
 package com.wgzhao.datax.plugin.writer.dbffilewriter;
 
+import com.linuxense.javadbf.DBFDataType;
+import com.linuxense.javadbf.DBFField;
+import com.linuxense.javadbf.DBFWriter;
 import com.wgzhao.datax.common.element.Column;
 import com.wgzhao.datax.common.element.Record;
 import com.wgzhao.datax.common.exception.DataXException;
 import com.wgzhao.datax.common.plugin.RecordReceiver;
 import com.wgzhao.datax.common.spi.Writer;
 import com.wgzhao.datax.common.util.Configuration;
-import com.wgzhao.datax.plugin.storage.writer.Key;
-import com.wgzhao.datax.plugin.storage.writer.StorageWriterUtil;
-import com.linuxense.javadbf.DBFDataType;
-import com.linuxense.javadbf.DBFField;
-import com.linuxense.javadbf.DBFWriter;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.io.filefilter.PrefixFileFilter;
@@ -50,7 +48,7 @@ import java.util.Objects;
 import java.util.Set;
 import java.util.UUID;
 
-import static com.wgzhao.datax.plugin.writer.dbffilewriter.Key.PATH;
+
 
 /**
  * Created by haiwei.luo on 14-9-17.
@@ -82,8 +80,7 @@ public class DbfFileWriter
             if (null != dateFormatOld) {
                 LOG.warn("您使用format配置日期格式化, 这是不推荐的行为, 请优先使用dateFormat配置项, 两项同时存在则使用dateFormat.");
             }
-            StorageWriterUtil
-                    .validateParameter(this.writerSliceConfig);
+            validateParameter();
         }
 
         private void validateParameter()
@@ -93,7 +90,7 @@ public class DbfFileWriter
                             Key.FILE_NAME,
                             DbfFileWriterErrorCode.REQUIRED_VALUE);
 
-            String path = this.writerSliceConfig.getNecessaryValue(PATH,
+            String path = this.writerSliceConfig.getNecessaryValue(Key.PATH,
                     DbfFileWriterErrorCode.REQUIRED_VALUE);
 
             try {
@@ -128,11 +125,9 @@ public class DbfFileWriter
         @Override
         public void prepare()
         {
-            String path = this.writerSliceConfig.getString(PATH);
-            String fileName = this.writerSliceConfig
-                    .getString(Key.FILE_NAME);
-            String writeMode = this.writerSliceConfig
-                    .getString(Key.WRITE_MODE);
+            String path = this.writerSliceConfig.getString(Key.PATH);
+            String fileName = this.writerSliceConfig.getString(Key.FILE_NAME);
+            String writeMode = this.writerSliceConfig.getString(Key.WRITE_MODE);
             // truncate option handler
             if ("truncate".equals(writeMode)) {
                 LOG.info("由于您配置了writeMode truncate, 开始清理 [{}] 下面以 [{}] 开头的内容",
@@ -238,6 +233,27 @@ public class DbfFileWriter
                                         "仅支持 truncate, append, nonConflict 三种模式, 不支持您配置的 writeMode 模式 : [%s]",
                                         writeMode));
             }
+
+            // check column configuration is valid or not
+            List<Configuration> columns = this.writerSliceConfig.getListConfiguration(Key.COLUMN);
+            for (Configuration column: columns) {
+                if ( "numeric".equalsIgnoreCase(column.getString(Key.TYPE)) &&
+                        (column.getString(Key.LENGTH, null) == null || column.getString(Key.SCALE, null) == null))
+                {
+                    throw DataXException.asDataXException(
+                            DbfFileWriterErrorCode.CONFIG_INVALID_EXCEPTION,
+                            String.format("numeric 类型必须配置 %s 和 %s 项", Key.LENGTH, Key.SCALE)
+                    );
+                }
+
+                if ("char".equalsIgnoreCase(column.getString(Key.TYPE)) && column.getString(Key.LENGTH, null) == null)
+                {
+                    throw DataXException.asDataXException(
+                            DbfFileWriterErrorCode.CONFIG_INVALID_EXCEPTION,
+                            String.format("char 类型必须配置 %s 项", Key.LENGTH)
+                    );
+                }
+            }
         }
 
         @Override
@@ -263,7 +279,7 @@ public class DbfFileWriter
             Set<String> allFiles;
             String path = null;
             try {
-                path = this.writerSliceConfig.getString(PATH);
+                path = this.writerSliceConfig.getString(Key.PATH);
                 File dir = new File(path);
                 allFiles = new HashSet<>(Arrays.asList(Objects.requireNonNull(dir.list())));
             }
@@ -323,7 +339,7 @@ public class DbfFileWriter
         public void init()
         {
             this.writerSliceConfig = this.getPluginJobConf();
-            this.path = this.writerSliceConfig.getString(PATH);
+            this.path = this.writerSliceConfig.getString(Key.PATH);
             this.fileName = this.writerSliceConfig
                     .getString(Key.FILE_NAME);
         }
@@ -340,7 +356,7 @@ public class DbfFileWriter
             LOG.info("begin do write...");
             String fileFullPath = this.buildFilePath();
             LOG.info("write to file : [{}]", fileFullPath);
-            List<Configuration> columns = this.writerSliceConfig.getListConfiguration("column");
+            List<Configuration> columns = this.writerSliceConfig.getListConfiguration(Key.COLUMN);
             DBFWriter writer;
             try {
                 File f = new File(fileFullPath);
@@ -351,16 +367,16 @@ public class DbfFileWriter
 
                 for (int i = 0; i < columns.size(); i++) {
                     fields[i] = new DBFField();
-                    fields[i].setName(columns.get(i).getString("name"));
-                    switch (columns.get(i).getString("type")) {
+                    fields[i].setName(columns.get(i).getString(Key.NAME));
+                    switch (columns.get(i).getString(Key.TYPE)) {
                         case "char":
                             fields[i].setType(DBFDataType.CHARACTER);
-                            fields[i].setLength(columns.get(i).getInt("length"));
+                            fields[i].setLength(columns.get(i).getInt(Key.LENGTH));
                             break;
                         case "numeric":
                             fields[i].setType(DBFDataType.NUMERIC);
-                            fields[i].setLength(columns.get(i).getInt("length"));
-                            fields[i].setDecimalCount(columns.get(i).getInt("scale"));
+                            fields[i].setLength(columns.get(i).getInt(Key.LENGTH));
+                            fields[i].setDecimalCount(columns.get(i).getInt(Key.SCALE));
                             break;
                         case "date":
                             fields[i].setType(DBFDataType.DATE);
@@ -371,7 +387,7 @@ public class DbfFileWriter
                         default:
                             LOG.warn("data type not find, convert it to char");
                             fields[i].setType(DBFDataType.CHARACTER);
-                            fields[i].setLength(columns.get(i).getInt("length"));
+                            fields[i].setLength(columns.get(i).getInt(Key.LENGTH));
                             break;
                     }
                     // Date类型不能设置字段长度，这里没有处理其它没有字段长度的类型
@@ -386,7 +402,7 @@ public class DbfFileWriter
                         column = record.getColumn(i);
                         if (null != column.getRawData()) {
                             String colData = column.getRawData().toString();
-                            switch (columns.get(i).getString("type")) {
+                            switch (columns.get(i).getString(Key.TYPE)) {
                                 case "numeric":
                                     rowData[i] = Float.valueOf(colData);
                                     break;
