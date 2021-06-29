@@ -52,6 +52,7 @@ public class TestParquetFile
             throws IOException
     {
         schema = parser.parse(TestParquetFile.class.getResourceAsStream("/parquet_schema.asvo"));
+
     }
 
     private byte[] load_file()
@@ -121,8 +122,22 @@ public class TestParquetFile
                 .build()) {
             GenericData.Record gRecord = reader.read();
             Schema schema = gRecord.getSchema();
+            String stype;
+            Schema type;
             for (Schema.Field field: schema.getFields()) {
-                System.out.print(field.name() + "\t");
+                if (field.schema().getType() == Schema.Type.UNION) {
+                    type = field.schema().getTypes().get(1);
+                } else {
+                    type = field.schema();
+                }
+                stype = type.getProp("logicalType") != null ? type.getProp("logicalType"): type.getType().getName();
+//                schema.getField("col5").schema().getTypes().get(1).getProp("logicalType")
+//                if (type.getLogicalType() != null || type.getType() == Schema.Type.FIXED) {
+//                    stype = type.getLogicalType().getName();
+//                } else {
+//                    stype = type.getProp("logicalType") != null ? type.getProp("logicalType"): type.getType().getName();
+//                }
+                System.out.println("name: " + field.name() + "\t type: " + stype);
             }
             System.out.println();
             while (gRecord != null) {
