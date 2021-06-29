@@ -20,7 +20,6 @@
 package com.wgzhao.datax.plugin.writer.hdfswriter;
 
 import com.alibaba.fastjson.JSON;
-import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.google.common.collect.Lists;
 import com.wgzhao.datax.common.element.Column;
@@ -30,6 +29,7 @@ import com.wgzhao.datax.common.plugin.RecordReceiver;
 import com.wgzhao.datax.common.plugin.TaskPluginCollector;
 import com.wgzhao.datax.common.util.Configuration;
 import org.apache.avro.Conversions;
+import org.apache.avro.LogicalTypes;
 import org.apache.avro.Schema;
 import org.apache.avro.generic.GenericData;
 import org.apache.avro.generic.GenericRecord;
@@ -76,6 +76,7 @@ import java.io.IOException;
 import java.math.BigDecimal;
 import java.sql.Timestamp;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.Iterator;
@@ -635,71 +636,22 @@ public class HdfsHelper
             compress = "UNCOMPRESSED";
         }
         // construct parquet schema
-        JSONObject schema = new JSONObject();
-        schema.put("type", "record");
-        schema.put("name", "dataxFile");
-        JSONArray fields = new JSONArray();
-        String filedName;
-        String type;
-        for (Configuration column : columns) {
-            filedName = column.getString(Key.NAME);
-            type = column.getString(Key.TYPE).trim();
-            JSONObject field = new JSONObject();
-            field.put("name", filedName);
-            JSONArray dtype = new JSONArray();
-            dtype.add("null");
-            JSONObject etype = new JSONObject();
-            switch(type) {
-                case "decimal":
-                    etype.put("type", "fixed");
-                    etype.put("logicalType","decimal");
-                    etype.put("name", "decimal");
-                    etype.put("size", 16);
-                    etype.put("precision",  column.getInt(Key.PRECISION));
-                    etype.put("scale", column.getInt(Key.SCALE));
-                    dtype.add(etype);
-                    break;
-                case "date":
-                    etype.put("type", "int");
-                    etype.put("logicalType", "date");
-                    dtype.add(etype);
-                    break;
-                case "timestamp":
-                    etype.put("type", "long");
-                    etype.put("logicalType", "timestamp-millis");
-                    dtype.add(etype);
-                    break;
-                case "uuid":
-                    etype.put("type", "string");
-                    etype.put("logicalType", "uuid");
-                    dtype.add(etype);
-                    break;
-                case "binary":
-                    etype.put("type", "bytes");
-                    etype.put("logicalType", "binary");
-                    dtype.add(etype);
-                    break;
-                default:
-                    dtype.add(type);
-                    break;
-            }
-            field.put("type", dtype);
-            fields.add(field);
-        }
-        schema.put("fields", fields);
+        Schema schema = generateParquetSchema(columns);
+
         Path path = new Path(fileName);
         LOG.info("write parquet file {}", fileName);
         Schema.Parser parser = new Schema.Parser().setValidate(true);
-        Schema parSchema = parser.parse(schema.toJSONString());
+//        Schema parSchema = parser.parse(schema);
         CompressionCodecName codecName = CompressionCodecName.fromConf(compress);
 
         GenericData decimalSupport = new GenericData();
         decimalSupport.addLogicalTypeConversion(new Conversions.DecimalConversion());
+
         try (ParquetWriter<GenericRecord> writer = AvroParquetWriter
                 .<GenericRecord>builder(path)
                 .withRowGroupSize(ParquetWriter.DEFAULT_BLOCK_SIZE)
                 .withPageSize(ParquetWriter.DEFAULT_PAGE_SIZE)
-                .withSchema(parSchema)
+                .withSchema(schema)
                 .withConf(hadoopConf)
                 .withCompressionCodec(codecName)
                 .withValidation(false)
@@ -710,7 +662,7 @@ public class HdfsHelper
 
             Record record;
             while ((record = lineReceiver.getFromReader()) != null) {
-                GenericRecordBuilder builder = new GenericRecordBuilder(parSchema);
+                GenericRecordBuilder builder = new GenericRecordBuilder(schema);
                 GenericRecord transportResult = transportParRecord(record, columns, taskPluginCollector, builder);
                 writer.write(transportResult);
             }
@@ -720,6 +672,50 @@ public class HdfsHelper
             deleteDir(path.getParent());
             throw DataXException.asDataXException(HdfsWriterErrorCode.Write_FILE_IO_ERROR, e);
         }
+    }
+
+    private Schema generateParquetSchema(List<Configuration> columns)
+    {
+        List<Schema.Field> fields = new ArrayList<>();
+        String fieldName;
+        String type;
+        List<Schema> unionList = new ArrayList<>(2);
+        for (Configuration column : columns) {
+            unionList.clear();
+            fieldName = column.getString(Key.NAME);
+            type = column.getString(Key.TYPE).trim().toUpperCase();
+            unionList.add(Schema.create(Schema.Type.NULL));
+            switch(type) {
+                case "DECIMAL":
+                    Schema dec =   LogicalTypes.decimal(column.getInt(Key.PRECISION, 38),column.getInt(Key.SCALE, 10))
+                            .addToSchema(Schema.createFixed(fieldName, null, null, 16));
+                    unionList.add(dec);
+                    break;
+                case "DATE":
+                    Schema date = LogicalTypes.date().addToSchema(Schema.create(Schema.Type.INT));
+                    unionList.add(date);
+                    break;
+                case "TIMESTAMP":
+                    Schema ts = LogicalTypes.timestampMillis().addToSchema(Schema.create(Schema.Type.LONG));
+                    unionList.add(ts);
+                    break;
+                case "UUID":
+                    Schema uuid = LogicalTypes.uuid().addToSchema(Schema.create(Schema.Type.STRING));
+                    unionList.add(uuid);
+                    break;
+                case "BINARY":
+                    unionList.add(Schema.create(Schema.Type.BYTES));
+                    break;
+                default:
+                    // primi
+                    unionList.add(Schema.create(Schema.Type.valueOf(type)));
+                    break;
+            }
+            fields.add(new Schema.Field(fieldName, Schema.createUnion(unionList), null, null));
+        }
+        Schema schema =Schema.createRecord("datax", null,"parquet", false);
+        schema.setFields(fields);
+        return schema;
     }
 
     private void setRow(VectorizedRowBatch batch, int row, Record record, List<Configuration> columns)
