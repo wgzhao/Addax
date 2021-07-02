@@ -48,9 +48,6 @@ import org.apache.hadoop.hive.ql.exec.vector.LongColumnVector;
 import org.apache.hadoop.hive.ql.exec.vector.TimestampColumnVector;
 import org.apache.hadoop.hive.ql.exec.vector.VectorizedRowBatch;
 import org.apache.hadoop.hive.serde2.io.HiveDecimalWritable;
-import org.apache.hadoop.hive.serde2.lazy.objectinspector.primitive.LazyBinaryObjectInspector;
-import org.apache.hadoop.hive.serde2.objectinspector.ObjectInspector;
-import org.apache.hadoop.hive.serde2.objectinspector.ObjectInspectorFactory;
 import org.apache.hadoop.io.NullWritable;
 import org.apache.hadoop.io.Text;
 import org.apache.hadoop.io.compress.CompressionCodec;
@@ -340,39 +337,13 @@ public class HdfsHelper
     }
 
     /**
-     * 获取指定目录先的文件列表
+     * 获取指定目录下的文件列表
      *
      * @param dir 需要搜索的目录
-     * @return 拿到的是文件全路径，
+     * @return 文件数组，文件是全路径，
      * eg：hdfs://10.101.204.12:9000/user/hive/warehouse/writer.db/text/test.textfile
      */
-    public String[] hdfsDirList(String dir)
-    {
-        Path path = new Path(dir);
-        String[] files;
-        try {
-            FileStatus[] status = fileSystem.listStatus(path);
-            files = new String[status.length];
-            for (int i = 0; i < status.length; i++) {
-                files[i] = status[i].getPath().toString();
-            }
-        }
-        catch (IOException e) {
-            String message = String.format("获取目录[%s]文件列表时发生网络IO异常,请检查您的网络是否正常！", dir);
-            LOG.error(message);
-            throw DataXException.asDataXException(HdfsWriterErrorCode.CONNECT_HDFS_IO_ERROR, e);
-        }
-        return files;
-    }
-
-    /**
-     * 获取以指定目录下的所有fileName开头的文件
-     *
-     * @param dir 需要扫描的目录
-     * @param fileName String 要匹配的文件或者目录后缀，如果为空，则表示不做模式匹配
-     * @return Path[]
-     */
-    public Path[] hdfsDirList(String dir, String fileName)
+    public Path[] hdfsDirList(String dir)
     {
         Path path = new Path(dir);
         Path[] files;
@@ -384,7 +355,7 @@ public class HdfsHelper
             }
         }
         catch (IOException e) {
-            String message = String.format("获取目录[%s]下文件列表时发生网络IO异常,请检查您的网络是否正常！", dir);
+            String message = String.format("获取目录[%s]文件列表时发生网络IO异常,请检查您的网络是否正常！", dir);
             LOG.error(message);
             throw DataXException.asDataXException(HdfsWriterErrorCode.CONNECT_HDFS_IO_ERROR, e);
         }
@@ -439,19 +410,10 @@ public class HdfsHelper
             LOG.info("Delete all files that DO NOT start with a dot (.) in specified path");
             needDelPaths = Arrays.stream(paths).filter(x -> !x.getName().startsWith(".")).collect(Collectors.toList());
         }
-
-        for (Path path : needDelPaths) {
-            try {
-                fileSystem.delete(path, true);
-            }
-            catch (IOException e) {
-                LOG.error("IO exception occurred when deleting file [{}], please check your network", path);
-                throw DataXException.asDataXException(HdfsWriterErrorCode.CONNECT_HDFS_IO_ERROR, e);
-            }
-        }
+        deleteFiles(needDelPaths);
     }
 
-    public void deleteFiles(Path[] paths)
+    public void deleteFiles(List<Path> paths)
     {
         for (Path path : paths) {
             LOG.info("delete file [{}].", path);
@@ -640,8 +602,6 @@ public class HdfsHelper
 
         Path path = new Path(fileName);
         LOG.info("write parquet file {}", fileName);
-        Schema.Parser parser = new Schema.Parser().setValidate(true);
-//        Schema parSchema = parser.parse(schema);
         CompressionCodecName codecName = CompressionCodecName.fromConf(compress);
 
         GenericData decimalSupport = new GenericData();
@@ -685,9 +645,9 @@ public class HdfsHelper
             fieldName = column.getString(Key.NAME);
             type = column.getString(Key.TYPE).trim().toUpperCase();
             unionList.add(Schema.create(Schema.Type.NULL));
-            switch(type) {
+            switch (type) {
                 case "DECIMAL":
-                    Schema dec =   LogicalTypes.decimal(column.getInt(Key.PRECISION, 38),column.getInt(Key.SCALE, 10))
+                    Schema dec = LogicalTypes.decimal(column.getInt(Key.PRECISION, DECIMAL_DEFAULT_PRECISION), column.getInt(Key.SCALE, DECIMAL_DEFAULT_SCALE))
                             .addToSchema(Schema.createFixed(fieldName, null, null, 16));
                     unionList.add(dec);
                     break;
@@ -711,14 +671,14 @@ public class HdfsHelper
                     unionList.add(Schema.create(Schema.Type.valueOf(type)));
                     break;
             }
-            fields.add(new Schema.Field(fieldName, Schema.createUnion(unionList), null, null));
+            fields.add(new Schema.Field(fieldName, Schema.createUnion(unionList), null, (Object) null));
         }
-        Schema schema =Schema.createRecord("datax", null,"parquet", false);
+        Schema schema = Schema.createRecord("datax", null, "parquet", false);
         schema.setFields(fields);
         return schema;
     }
 
-    private void setRow(VectorizedRowBatch batch, int row, Record record, List<Configuration> columns)
+    private void setRow(VectorizedRowBatch batch, int row, Record record, List<Configuration> columns, TaskPluginCollector taskPluginCollector)
     {
         for (int i = 0; i < columns.size(); i++) {
             Configuration eachColumnConf = columns.get(i);
@@ -762,7 +722,7 @@ public class HdfsHelper
                     case STRING:
                     case VARCHAR:
                     case CHAR:
-                        byte[] buffer =  record.getColumn(i).asBytes();
+                        byte[] buffer = record.getColumn(i).asBytes();
                         ((BytesColumnVector) col).setRef(row, buffer, 0, buffer.length);
                         break;
                     case BINARY:
@@ -778,7 +738,9 @@ public class HdfsHelper
                                                 eachColumnConf.getString(Key.NAME),
                                                 eachColumnConf.getString(Key.TYPE)));
                 }
-            } catch (Exception e) {
+            }
+            catch (Exception e) {
+                taskPluginCollector.collectDirtyRecord(record, e.getMessage());
                 throw DataXException.asDataXException(HdfsWriterErrorCode.ILLEGAL_VALUE,
                         String.format("设置Orc数据行失败，源列类型: %s, 目的原始类型:%s, 目的列Hive类型: %s, 字段名称: %s, 源值: %s, 错误根源：\n %s",
                                 record.getColumn(i).getType(), columnType, eachColumnConf.getString(Key.TYPE), eachColumnConf.getString(Key.NAME),
@@ -795,14 +757,14 @@ public class HdfsHelper
     {
         List<Configuration> columns = config.getListConfiguration(Key.COLUMN);
         String compress = config.getString(Key.COMPRESS, "NONE").toUpperCase();
-        List<String> columnNames = getColumnNames(columns);
-        List<ObjectInspector> columnTypeInspectors = getColumnTypeInspectors(columns);
         StringJoiner joiner = new StringJoiner(",");
-        for (int i = 0; i < columns.size(); i++) {
-            if ("decimal".equals(columns.get(i).getString(Key.TYPE))) {
-                joiner.add(columnNames.get(i) + ":decimal(" + columns.get(i).getString(Key.PRECISION) + "," + columns.get(i).getString(Key.SCALE) + ")");
-            } else {
-                joiner.add(columnNames.get(i) + ":" + columnTypeInspectors.get(i).getTypeName());
+        for (Configuration column : columns) {
+            if ("decimal".equals(column.getString(Key.TYPE))) {
+                joiner.add(String.format("%s:%s(%s,%s)", column.getString(Key.NAME), "decimal",
+                        column.getInt(Key.PRECISION, DECIMAL_DEFAULT_PRECISION), column.getInt(Key.SCALE, DECIMAL_DEFAULT_SCALE)));
+            }
+            else {
+                joiner.add(String.format("%s:%s", column.getString(Key.NAME), column.getString(Key.TYPE)));
             }
         }
         TypeDescription schema = TypeDescription.fromString("struct<" + joiner + ">");
@@ -814,7 +776,7 @@ public class HdfsHelper
             VectorizedRowBatch batch = schema.createRowBatch(1024);
             while ((record = lineReceiver.getFromReader()) != null) {
                 int row = batch.size++;
-                setRow(batch, row, record, columns);
+                setRow(batch, row, record, columns, taskPluginCollector);
                 if (batch.size == batch.getMaxSize()) {
                     writer.addRowBatch(batch);
                     batch.reset();
@@ -832,85 +794,4 @@ public class HdfsHelper
             throw DataXException.asDataXException(HdfsWriterErrorCode.Write_FILE_IO_ERROR, e);
         }
     }
-
-    public List<String> getColumnNames(List<Configuration> columns)
-    {
-        List<String> columnNames = Lists.newArrayList();
-        for (Configuration eachColumnConf : columns) {
-            columnNames.add(eachColumnConf.getString(Key.NAME));
-        }
-        return columnNames;
-    }
-
-    /*
-     * 根据writer配置的字段类型，构建inspector
-     */
-    public List<ObjectInspector> getColumnTypeInspectors(List<Configuration> columns)
-    {
-        List<ObjectInspector> columnTypeInspectors = Lists.newArrayList();
-        for (Configuration eachColumnConf : columns) {
-            String type = eachColumnConf.getString(Key.TYPE).toUpperCase();
-            SupportHiveDataType columnType;
-            if (type.startsWith("DECIMAL")) {
-                columnType = SupportHiveDataType.DECIMAL;
-            }
-            else {
-                columnType = SupportHiveDataType.valueOf(eachColumnConf.getString(Key.TYPE).toUpperCase());
-            }
-            ObjectInspector objectInspector;
-            switch (columnType) {
-                case TINYINT:
-                    objectInspector = ObjectInspectorFactory.getReflectionObjectInspector(Byte.class, ObjectInspectorFactory.ObjectInspectorOptions.JAVA);
-                    break;
-                case SMALLINT:
-                    objectInspector = ObjectInspectorFactory.getReflectionObjectInspector(Short.class, ObjectInspectorFactory.ObjectInspectorOptions.JAVA);
-                    break;
-                case INT:
-                    objectInspector = ObjectInspectorFactory.getReflectionObjectInspector(Integer.class, ObjectInspectorFactory.ObjectInspectorOptions.JAVA);
-                    break;
-                case BIGINT:
-                    objectInspector = ObjectInspectorFactory.getReflectionObjectInspector(Long.class, ObjectInspectorFactory.ObjectInspectorOptions.JAVA);
-                    break;
-                case FLOAT:
-                    objectInspector = ObjectInspectorFactory.getReflectionObjectInspector(Float.class, ObjectInspectorFactory.ObjectInspectorOptions.JAVA);
-                    break;
-                case DOUBLE:
-                    objectInspector = ObjectInspectorFactory.getReflectionObjectInspector(Double.class, ObjectInspectorFactory.ObjectInspectorOptions.JAVA);
-                    break;
-                case DECIMAL:
-                    objectInspector = ObjectInspectorFactory.getReflectionObjectInspector(HiveDecimal.class, ObjectInspectorFactory.ObjectInspectorOptions.JAVA);
-
-                    break;
-                case TIMESTAMP:
-                    objectInspector = ObjectInspectorFactory.getReflectionObjectInspector(org.apache.hadoop.hive.common.type.Timestamp.class, ObjectInspectorFactory.ObjectInspectorOptions.JAVA);
-                    break;
-                case DATE:
-                    objectInspector = ObjectInspectorFactory.getReflectionObjectInspector(org.apache.hadoop.hive.common.type.Date.class, ObjectInspectorFactory.ObjectInspectorOptions.JAVA);
-                    break;
-                case STRING:
-                case VARCHAR:
-                case CHAR:
-                    objectInspector = ObjectInspectorFactory.getReflectionObjectInspector(String.class, ObjectInspectorFactory.ObjectInspectorOptions.JAVA);
-                    break;
-                case BOOLEAN:
-                    objectInspector = ObjectInspectorFactory.getReflectionObjectInspector(Boolean.class, ObjectInspectorFactory.ObjectInspectorOptions.JAVA);
-                    break;
-                case BINARY:
-                    objectInspector = new LazyBinaryObjectInspector();
-                    break;
-                default:
-                    throw DataXException
-                            .asDataXException(
-                                    HdfsWriterErrorCode.ILLEGAL_VALUE,
-                                    String.format(
-                                            "您的配置文件中的列配置信息有误. 因为DataX 不支持数据库写入这种字段类型. 字段名:[%s], 字段类型:[%s]. 请修改表中该字段的类型或者不同步该字段.",
-                                            eachColumnConf.getString(Key.NAME),
-                                            eachColumnConf.getString(Key.TYPE)));
-            }
-
-            columnTypeInspectors.add(objectInspector);
-        }
-        return columnTypeInspectors;
-    }
-
 }

@@ -207,12 +207,9 @@ public class HdfsWriter
                 }
 
                 //根据writeMode对目录下文件进行处理
-                Path[] existFilePaths = hdfsHelper.hdfsDirList(path, null);
+                Path[] existFilePaths = hdfsHelper.hdfsDirList(path);
 
-                boolean isExistFile = false;
-                if (existFilePaths.length > 0) {
-                    isExistFile = true;
-                }
+                boolean isExistFile = existFilePaths.length > 0;
                 if ("append".equalsIgnoreCase(writeMode)) {
                     LOG.info("由于您配置了writeMode append, 写入前不做清理工作, [{}] 目录下写入相应文件名前缀 [{}] 的文件",
                             path, fileName);
@@ -237,7 +234,7 @@ public class HdfsWriter
         @Override
         public void post()
         {
-            Path[] existFilePaths = hdfsHelper.hdfsDirList(path, null);
+            Path[] existFilePaths = hdfsHelper.hdfsDirList(path);
             if ("overwrite".equals(writeMode)) {
                 hdfsHelper.deleteFiles(existFilePaths, false);
             }
@@ -263,7 +260,9 @@ public class HdfsWriter
 
             //获取该路径下的所有已有文件列表
             if (hdfsHelper.isPathexists(path)) {
-                allFiles.addAll(Arrays.asList(hdfsHelper.hdfsDirList(path)));
+                for (Path p: hdfsHelper.hdfsDirList(path)) {
+                    allFiles.add(p.toString());
+                }
             }
 
             String fileSuffix;
