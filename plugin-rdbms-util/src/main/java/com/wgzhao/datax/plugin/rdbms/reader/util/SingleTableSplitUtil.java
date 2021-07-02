@@ -19,6 +19,7 @@
 
 package com.wgzhao.datax.plugin.rdbms.reader.util;
 
+import com.alibaba.fastjson.JSON;
 import com.wgzhao.datax.common.exception.DataXException;
 import com.wgzhao.datax.common.util.Configuration;
 import com.wgzhao.datax.plugin.rdbms.reader.Constant;
@@ -28,7 +29,6 @@ import com.wgzhao.datax.plugin.rdbms.util.DBUtilErrorCode;
 import com.wgzhao.datax.plugin.rdbms.util.DataBaseType;
 import com.wgzhao.datax.plugin.rdbms.util.RdbmsException;
 import com.wgzhao.datax.plugin.rdbms.util.RdbmsRangeSplitWrap;
-import com.alibaba.fastjson.JSON;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.apache.commons.lang3.tuple.Pair;
@@ -37,8 +37,11 @@ import org.slf4j.LoggerFactory;
 
 import java.math.BigInteger;
 import java.sql.Connection;
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
+import java.sql.SQLException;
+import java.sql.Statement;
 import java.sql.Types;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -447,5 +450,131 @@ public class SingleTableSplitUtil
             }
         }
         return rangeSql;
+    }
+
+    /**
+     * 尝试自动获取指定表的主键，如果有多个，则取第一个
+     *
+     * @param connection JDBC 连接串
+     * @param table 要查询的表
+     * @return 主键
+     */
+    public static String getPrimaryKey(Connection connection, String table)
+            throws SQLException
+    {
+        String sql;
+        if (dataBaseType == DataBaseType.Oracle) {
+            return getOraclePrimaryKey(connection, table);
+        } else {
+            sql = getPrimaryKeyQuery(table);
+            Statement statement = connection.createStatement();
+            ResultSet resultSet = statement.executeQuery(sql);
+            if (resultSet.next()) {
+                sql =  resultSet.getString(0);
+            }
+        }
+        return sql;
+    }
+
+    /**
+     * 依据不同数据库类型，返回对应的获取主键的SQL语句
+     *
+     * @param tableName 要查询的表
+     * @return 获取主键 SQL 语句
+     */
+    public static String getPrimaryKeyQuery(String tableName)
+    {
+        String sql = null;
+        switch (dataBaseType) {
+            case DataBaseType.MySql:
+                sql = "SELECT column_name FROM INFORMATION_SCHEMA.COLUMNS "
+                        + "WHERE TABLE_SCHEMA = SELECT SCHEMA() "
+                        + "AND TABLE_NAME = '"+tableName+"' "
+                        + "AND COLUMN_KEY = 'PRI'";
+                break;
+
+        }
+        return sql;
+    }
+
+    public static String getOraclePrimaryKey(Connection connection, String tableName)
+    {
+        PreparedStatement pStmt = null;
+        ResultSet rset = null;
+        List<String> columns = new ArrayList<String>();
+
+        String tableOwner = null;
+        String shortTableName = tableName;
+        int qualifierIndex = tableName.indexOf('.');
+        if (qualifierIndex != -1) {
+            tableOwner = tableName.substring(0, qualifierIndex);
+            shortTableName = tableName.substring(qualifierIndex + 1);
+        }
+
+        try {
+            conn = getConnection();
+
+            if (tableOwner == null) {
+                tableOwner = getSessionUser(conn);
+            }
+
+            pStmt = conn.prepareStatement(QUERY_PRIMARY_KEY_FOR_TABLE,
+                    ResultSet.TYPE_FORWARD_ONLY, ResultSet.CONCUR_READ_ONLY);
+            pStmt.setString(1, shortTableName);
+            pStmt.setString(2, tableOwner);
+            rset = pStmt.executeQuery();
+
+            while (rset.next()) {
+                columns.add(rset.getString(1));
+            }
+            conn.commit();
+        } catch (SQLException e) {
+            try {
+                if (conn != null) {
+                    conn.rollback();
+                }
+            } catch (SQLException ex) {
+                LoggingUtils.logAll(LOG, "Failed to rollback transaction", ex);
+            }
+            LoggingUtils.logAll(LOG, "Failed to list columns", e);
+        } finally {
+            if (rset != null) {
+                try {
+                    rset.close();
+                } catch (SQLException ex) {
+                    LoggingUtils.logAll(LOG, "Failed to close resultset", ex);
+                }
+            }
+            if (pStmt != null) {
+                try {
+                    pStmt.close();
+                } catch (SQLException ex) {
+                    LoggingUtils.logAll(LOG, "Failed to close statement", ex);
+                }
+            }
+
+            try {
+                close();
+            } catch (SQLException ex) {
+                LoggingUtils.logAll(LOG, "Unable to discard connection", ex);
+            }
+        }
+
+        if (columns.size() == 0) {
+            // Table has no primary key
+            return null;
+        }
+
+        if (columns.size() > 1) {
+            // The primary key is multi-column primary key. Warn the user.
+            // TODO select the appropriate column instead of the first column based
+            // on the datatype - giving preference to numerics over other types.
+            LOG.warn("The table " + tableName + " "
+                    + "contains a multi-column primary key. Sqoop will default to "
+                    + "the column " + columns.get(0) + " only for this job.");
+        }
+
+        return columns.get(0);
+
     }
 }
