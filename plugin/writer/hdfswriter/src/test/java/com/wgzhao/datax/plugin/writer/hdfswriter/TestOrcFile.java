@@ -22,10 +22,13 @@ package com.wgzhao.datax.plugin.writer.hdfswriter;
 import org.apache.commons.io.IOUtils;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.Path;
+import org.apache.hadoop.hive.common.type.HiveDecimal;
 import org.apache.hadoop.hive.ql.exec.vector.BytesColumnVector;
+import org.apache.hadoop.hive.ql.exec.vector.DecimalColumnVector;
 import org.apache.hadoop.hive.ql.exec.vector.LongColumnVector;
 import org.apache.hadoop.hive.ql.exec.vector.TimestampColumnVector;
 import org.apache.hadoop.hive.ql.exec.vector.VectorizedRowBatch;
+import org.apache.hadoop.hive.serde2.io.HiveDecimalWritable;
 import org.apache.orc.OrcFile;
 import org.apache.orc.Reader;
 import org.apache.orc.RecordReader;
@@ -48,7 +51,7 @@ public class TestOrcFile
     public void TestOrcWrite()
             throws IOException
     {
-        TypeDescription schema = TypeDescription.fromString("struct<x:int,y:string,z:timestamp,b:binary>");
+        TypeDescription schema = TypeDescription.fromString("struct<x:int,y:string,z:timestamp,b:binary,d:decimal(38,12)>");
         File file = new File(filePath);
         if (file.exists()) {
             file.delete();
@@ -62,10 +65,12 @@ public class TestOrcFile
         BytesColumnVector y = (BytesColumnVector) batch.cols[1];
         TimestampColumnVector z = (TimestampColumnVector) batch.cols[2];
         BytesColumnVector b = (BytesColumnVector) batch.cols[3];
+        DecimalColumnVector d = (DecimalColumnVector) batch.cols[4];
         x.noNulls = false;
         y.noNulls = false;
         z.noNulls = false;
         b.noNulls = false;
+        d.noNulls = false;
         int row ;
 
         // test non-null data
@@ -93,6 +98,15 @@ public class TestOrcFile
         z.isNull[row] = true;
         b.setRef(row, image, 0, image.length);
 
+        row = batch.size++;
+        x.vector[row] = 5;
+        y.setVal(row, "奴役即自由".getBytes(StandardCharsets.UTF_8));
+        z.set(row, Timestamp.valueOf("2021-07-02 09:12:15"));
+        b.isNull[row] = true;
+        HiveDecimalWritable hdw = new HiveDecimalWritable();
+        hdw.set(HiveDecimal.create("1234567891234567.123456789156").setScale(10, HiveDecimal.ROUND_HALF_UP));
+//        hdw.setFromDouble(Double.parseDouble("1234567891234567.123456789111"));
+        d.set(row, hdw);
         writer.addRowBatch(batch);
         writer.close();
     }
@@ -115,6 +129,7 @@ public class TestOrcFile
         BytesColumnVector y = (BytesColumnVector) batch.cols[1];
         TimestampColumnVector z = (TimestampColumnVector) batch.cols[2];
         BytesColumnVector b = (BytesColumnVector) batch.cols[3];
+        DecimalColumnVector d = (DecimalColumnVector) batch.cols[4];
         for (String colName: fieldNames) {
             System.out.print(colName + "\t");
         }
@@ -124,7 +139,7 @@ public class TestOrcFile
                 Date date = z.isNull[row] ? null : new Date(z.getTime(row));
                 byte[] val = Arrays.copyOfRange(b.vector[row], b.start[row], b.start[row] + b.length[row]);
                 System.out.println(x.vector[row] + "\t" + y.toString(row)
-                        + "\t" + date + "\t" + val.length);
+                        + "\t" + date +  "\t" + d.vector[row] + "\t" + val.length);
             }
         }
     }
