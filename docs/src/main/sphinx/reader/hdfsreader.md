@@ -29,7 +29,7 @@ orcfile，它的全名是Optimized Row Columnar file，是对RCFile做了优化�
 
 3. 支持递归读取、支持正则表达式（`*`和 `?`）。
 
-4. 支持orcfile数据压缩，目前支持SNAPPY，ZLIB两种压缩方式。
+4. 支持常见的压缩算法，包括 GZIP， SNAPPY， ZLIB等。
 
 5. 多个File可以支持并发读取。
 
@@ -225,7 +225,7 @@ format，datax目前只支持最主流的两种：hadoop-snappy（hadoop上的sn
 }
 ```
 
-这里的 `cluster` 表示 HDFS 配置成HA时的名字，也即是 `defaultFS` 配置项中的名字 如果实际环境中的名字不是 `cluster` ，则上述配置中所有写有 `cluster` 都需要替换
+这里的 `cluster` 表示 HDFS 配置成HA时的名字，也是 `defaultFS` 配置项中的名字 如果实际环境中的名字不是 `cluster` ，则上述配置中所有写有 `cluster` 都需要替换
 
 #### csvReaderConfig
 
@@ -273,6 +273,7 @@ string类型。HdfsReader提供了类型转换的建议表如下：
 | String   |String, CHAR, VARCHAR, STRUCT, MAP, ARRAY, UNION, BINARY|
 | Boolean  |BOOLEAN|
 | Date     |Date, TIMESTAMP|
+| Bytes     | BINARY |
 
 其中：
 
@@ -280,6 +281,7 @@ string类型。HdfsReader提供了类型转换的建议表如下：
 * Double 是指Hdfs文件文本中使用Double的字符串表示形式，例如 `3.1415`
 * Boolean 是指Hdfs文件文本中使用Boolean的字符串表示形式，例如 `true`、`false`。不区分大小写。
 * Date 是指Hdfs文件文本中使用Date的字符串表示形式，例如 `2014-12-31`
+* Bytes 是指HDFS文件中使用二进制存储的内容，比如一张图片的数据
 
 特别提醒：
 
