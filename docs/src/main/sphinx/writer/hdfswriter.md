@@ -236,8 +236,9 @@ Kerberos认证 keytab文件路径，绝对路径
 
 | DataX 内部类型| HIVE 数据类型    |
 | -------- | -----  |
-| Long     |TINYINT,SMALLINT,INT,INTEGER,BIGINT |
-| Double   |FLOAT,DOUBLE,DECIMAL |
-| String   |STRING,VARCHAR,CHAR |
-| Boolean  |BOOLEAN |
-| Date     |DATE,TIMESTAMP |
+| Long     | TINYINT,SMALLINT,INT,INTEGER,BIGINT |
+| Double   | FLOAT,DOUBLE,DECIMAL |
+| String   | STRING,VARCHAR,CHAR |
+| Boolean  | BOOLEAN |
+| Date     | DATE,TIMESTAMP |
+| Bytes    | BINARY |
