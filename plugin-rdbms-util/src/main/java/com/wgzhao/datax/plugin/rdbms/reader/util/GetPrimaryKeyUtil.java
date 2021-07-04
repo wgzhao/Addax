@@ -40,14 +40,13 @@ public class GetPrimaryKeyUtil
     public static DataBaseType dataBaseType;
 
     public static final String QUERY_PRIMARY_KEY_FOR_TABLE = "SELECT ALL_CONS_COLUMNS.COLUMN_NAME FROM ALL_CONS_COLUMNS, "
-                    + "ALL_CONSTRAINTS WHERE ALL_CONS_COLUMNS.CONSTRAINT_NAME = "
-                    + "ALL_CONSTRAINTS.CONSTRAINT_NAME AND "
-                    + "ALL_CONSTRAINTS.CONSTRAINT_TYPE = 'P' AND "
-                    + "ALL_CONS_COLUMNS.TABLE_NAME = ? AND "
-                    + "ALL_CONS_COLUMNS.OWNER = ?";
+            + "ALL_CONSTRAINTS WHERE ALL_CONS_COLUMNS.CONSTRAINT_NAME = "
+            + "ALL_CONSTRAINTS.CONSTRAINT_NAME AND "
+            + "ALL_CONSTRAINTS.CONSTRAINT_TYPE = 'P' AND "
+            + "ALL_CONS_COLUMNS.TABLE_NAME = ? AND "
+            + "ALL_CONS_COLUMNS.OWNER = ?";
 
-    public static final String QUERY_GET_SESSIONUSER =  "SELECT USER FROM DUAL";
-
+    public static final String QUERY_GET_SESSIONUSER = "SELECT USER FROM DUAL";
 
     private GetPrimaryKeyUtil()
     {
@@ -74,10 +73,11 @@ public class GetPrimaryKeyUtil
             table = table.split("\\.")[0];
         }
 
-        try(Connection connection = DBUtil.getConnection(dataBaseType, jdbc_url, username, password)) {
+        try (Connection connection = DBUtil.getConnection(dataBaseType, jdbc_url, username, password)) {
             if (dataBaseType == DataBaseType.Oracle) {
-                pk =  getOraclePrimaryKey(connection, schema, table);
-            } else {
+                pk = getOraclePrimaryKey(connection, schema, table);
+            }
+            else {
                 sql = getPrimaryKeyQuery(schema, table);
                 Statement statement = connection.createStatement();
                 ResultSet resultSet = statement.executeQuery(sql);
@@ -104,49 +104,81 @@ public class GetPrimaryKeyUtil
         String sql = null;
         switch (dataBaseType) {
             case MySql:
-                schema = schema == null ? "SELECT SCHEMA()" : schema;
                 sql = "SELECT column_name FROM INFORMATION_SCHEMA.COLUMNS "
-                        + "WHERE TABLE_SCHEMA = ( " + schema + ")"
+                        + "WHERE TABLE_SCHEMA = ( " + getSchema(schema) + ")"
                         + "AND TABLE_NAME = '" + tableName + "' "
                         + "AND COLUMN_KEY = 'PRI'";
                 break;
             case PostgreSQL:
-                schema = schema == null ? "SELECT CURRENT_SCHEMA()" : "'" + schema + "'";
                 sql = "SELECT col.ATTNAME FROM PG_CATALOG.PG_NAMESPACE sch, "
                         + "  PG_CATALOG.PG_CLASS tab, PG_CATALOG.PG_ATTRIBUTE col, "
                         + "  PG_CATALOG.PG_INDEX ind "
                         + "WHERE sch.OID = tab.RELNAMESPACE "
                         + "  AND tab.OID = col.ATTRELID "
                         + "  AND tab.OID = ind.INDRELID "
-                        + "  AND sch.NSPNAME = (" + schema + ") "
+                        + "  AND sch.NSPNAME = (" + getSchema(schema) + ") "
                         + "  AND tab.RELNAME = '" + tableName + "' "
                         + "  AND col.ATTNUM = ANY(ind.INDKEY) "
                         + "  AND ind.INDISPRIMARY";
                 break;
             case SQLServer:
-                schema = schema == null ? "SELECT SCHEMA_NAME()" : "'" + schema + "'";
                 sql = "SELECT kcu.COLUMN_NAME FROM INFORMATION_SCHEMA.TABLE_CONSTRAINTS tc, "
                         + "  INFORMATION_SCHEMA.KEY_COLUMN_USAGE kcu "
                         + "WHERE tc.TABLE_SCHEMA = kcu.TABLE_SCHEMA "
                         + "  AND tc.TABLE_NAME = kcu.TABLE_NAME "
                         + "  AND tc.CONSTRAINT_SCHEMA = kcu.CONSTRAINT_SCHEMA "
                         + "  AND tc.CONSTRAINT_NAME = kcu.CONSTRAINT_NAME "
-                        + "  AND tc.TABLE_SCHEMA = (" + schema + ") "
+                        + "  AND tc.TABLE_SCHEMA = (" + getSchema(schema) + ") "
                         + "  AND tc.TABLE_NAME = N'" + tableName + "' "
                         + "  AND tc.CONSTRAINT_TYPE = 'PRIMARY KEY'";
                 break;
+            case ClickHouse:
+                sql = "SELECT  name FROM system.columns "
+                        + " WHERE database = (" + getSchema(schema) + ") "
+                        + " AND table = '" + tableName + "'"
+                        + "AND is_in_primary_key = 1";
             default:
                 break;
         }
         return sql;
     }
 
+    /**
+     * get current schema
+     *
+     * @param schema schema name
+     * @return schema name or get schema expression
+     */
+    public static String getSchema(String schema)
+    {
+        if (schema != null) {
+            return "'" + schema + "'";
+        }
+        switch (dataBaseType) {
+            case MySql:
+                schema = "SELECT SCHEMA()";
+                break;
+            case PostgreSQL:
+                schema = "SELECT CURRENT_SCHEMA()";
+                break;
+            case SQLServer:
+                schema = "SELECT SCHEMA_NAME()";
+                break;
+            case ClickHouse:
+                schema = "SELECT currentDatabase()";
+                break;
+            default:
+                break;
+        }
+        return schema;
+    }
+
+
     public static String getOraclePrimaryKey(Connection conn, String tableOwner, String tableName)
     {
         PreparedStatement pStmt = null;
         ResultSet rset = null;
         List<String> columns = new ArrayList<>();
-
 
         try {
             if (tableOwner == null) {
