@@ -64,7 +64,7 @@ public class SqlServerReader
 
             this.commonRdbmsReaderJob = new SqlServerRdbmsReader.Job(
                     DATABASE_TYPE);
-            this.commonRdbmsReaderJob.init(this.originalConfig);
+            this.originalConfig = this.commonRdbmsReaderJob.init(this.originalConfig);
         }
 
         @Override

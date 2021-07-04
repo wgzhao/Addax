@@ -49,6 +49,7 @@ public final class Key
     public static final String SESSION = "session";
 //    public static final String DBNAME = "dbName"
     public static final String DRYRUN = "dryRun";
+    public static final String AUTO_PK = "autoPk";
 
     private Key() {}
 }

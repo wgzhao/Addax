@@ -56,7 +56,7 @@ public class PostgresqlReader
             this.originalConfig.set(FETCH_SIZE, fetchSize);
 
             this.commonRdbmsReaderMaster = new CommonRdbmsReader.Job(DATABASE_TYPE);
-            this.commonRdbmsReaderMaster.init(this.originalConfig);
+            this.originalConfig = this.commonRdbmsReaderMaster.init(this.originalConfig);
         }
 
         @Override
