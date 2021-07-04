@@ -59,7 +59,7 @@ public class RdbmsReader
             this.originalConfig.set(FETCH_SIZE, fetchSize);
 
             this.commonRdbmsReaderMaster = new SubCommonRdbmsReader.Job(DATABASE_TYPE);
-            this.commonRdbmsReaderMaster.init(this.originalConfig);
+            this.originalConfig = this.commonRdbmsReaderMaster.init(this.originalConfig);
         }
 
         @Override

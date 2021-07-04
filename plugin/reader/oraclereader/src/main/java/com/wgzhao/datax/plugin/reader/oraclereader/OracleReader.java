@@ -56,7 +56,7 @@ public class OracleReader
 
             this.commonRdbmsReaderJob = new CommonRdbmsReader.Job(
                     DATABASE_TYPE);
-            this.commonRdbmsReaderJob.init(this.originalConfig);
+            this.originalConfig = this.commonRdbmsReaderJob.init(this.originalConfig);
 
             // 注意：要在 this.commonRdbmsReaderJob.init(this.originalConfig); 之后执行，这样可以直接快速判断是否是querySql 模式
             dealHint(this.originalConfig);
