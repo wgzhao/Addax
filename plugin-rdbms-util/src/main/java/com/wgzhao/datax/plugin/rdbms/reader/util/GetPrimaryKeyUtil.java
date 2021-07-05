@@ -26,7 +26,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.sql.Connection;
-import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
@@ -38,15 +37,6 @@ public class GetPrimaryKeyUtil
     private static final Logger LOG = LoggerFactory.getLogger(GetPrimaryKeyUtil.class);
 
     public static DataBaseType dataBaseType;
-
-    public static final String QUERY_PRIMARY_KEY_FOR_TABLE = "SELECT ALL_CONS_COLUMNS.COLUMN_NAME FROM ALL_CONS_COLUMNS, "
-            + "ALL_CONSTRAINTS WHERE ALL_CONS_COLUMNS.CONSTRAINT_NAME = "
-            + "ALL_CONSTRAINTS.CONSTRAINT_NAME AND "
-            + "ALL_CONSTRAINTS.CONSTRAINT_TYPE = 'P' AND "
-            + "ALL_CONS_COLUMNS.TABLE_NAME = ? AND "
-            + "ALL_CONS_COLUMNS.OWNER = ?";
-
-    public static final String QUERY_GET_SESSIONUSER = "SELECT USER FROM DUAL";
 
     private GetPrimaryKeyUtil()
     {
@@ -69,25 +59,40 @@ public class GetPrimaryKeyUtil
         String password = readConf.getString(Key.PASSWORD, null);
         String schema = null;
         if (table.contains(".")) {
-            schema = table.split("\\.")[1];
-            table = table.split("\\.")[0];
+            schema = table.split("\\.")[0];
+            table = table.split("\\.")[1];
         }
 
         try (Connection connection = DBUtil.getConnection(dataBaseType, jdbc_url, username, password)) {
-            if (dataBaseType == DataBaseType.Oracle) {
-                pk = getOraclePrimaryKey(connection, schema, table);
+            sql = getPrimaryKeyQuery(schema, table, username);
+            if (sql == null) {
+                LOG.debug("NOT support current database yet ");
+                return null;
             }
-            else {
-                sql = getPrimaryKeyQuery(schema, table);
-                Statement statement = connection.createStatement();
-                ResultSet resultSet = statement.executeQuery(sql);
-                // TODO select the appropriate column instead of the first column based data type, numeric type is prefered
-                if (resultSet.next()) {
-                    pk = resultSet.getString(1);
-                }
+            LOG.debug("query primary sql: [{}]", sql);
+            Statement statement = connection.createStatement();
+            ResultSet resultSet = statement.executeQuery(sql);
+            List<String> columns = new ArrayList<>();
+            while (resultSet.next()) {
+                columns.add(resultSet.getString(1));
+            }
+            if (columns.isEmpty()) {
+                // Table has no primary key
+                LOG.debug("table {} has no primary key", table);
+            }
+
+            if (columns.size() > 1) {
+                pk = columns.get(0);
+                // The primary key is multi-column primary key. Warn the user.
+                // TODO select the appropriate column instead of the first column based
+                // on the datatype - giving preference to numerics over other types.
+                LOG.warn("The table " + table + " "
+                        + "contains a multi-column primary key. DataX will default to "
+                        + "the column " + pk + " only for this job.");
             }
         }
-        catch (SQLException ignore) {
+        catch (SQLException e) {
+            LOG.debug(e.getMessage());
         }
         return pk;
     }
@@ -97,9 +102,10 @@ public class GetPrimaryKeyUtil
      *
      * @param schema schema
      * @param tableName 要查询的表
+     * @param username username
      * @return 获取主键 SQL 语句
      */
-    public static String getPrimaryKeyQuery(String schema, String tableName)
+    public static String getPrimaryKeyQuery(String schema, String tableName, String username)
     {
         String sql = null;
         switch (dataBaseType) {
@@ -129,7 +135,7 @@ public class GetPrimaryKeyUtil
                         + "  AND tc.CONSTRAINT_SCHEMA = kcu.CONSTRAINT_SCHEMA "
                         + "  AND tc.CONSTRAINT_NAME = kcu.CONSTRAINT_NAME "
                         + "  AND tc.TABLE_SCHEMA = (" + getSchema(schema) + ") "
-                        + "  AND tc.TABLE_NAME = N'" + tableName + "' "
+                        + "  AND tc.TABLE_NAME = '" + tableName + "' "
                         + "  AND tc.CONSTRAINT_TYPE = 'PRIMARY KEY'";
                 break;
             case ClickHouse:
@@ -137,6 +143,26 @@ public class GetPrimaryKeyUtil
                         + " WHERE database = (" + getSchema(schema) + ") "
                         + " AND table = '" + tableName + "'"
                         + "AND is_in_primary_key = 1";
+                break;
+            case Oracle:
+                if (schema == null) {
+                    schema = username.toUpperCase();
+                }
+                else {
+                    schema = schema.toUpperCase();
+                }
+                // 表明如果没有强制原始大小写，则一律转为大写
+                if (!tableName.startsWith("\"")) {
+                    tableName = tableName.toUpperCase();
+                }
+                sql = "SELECT AC.COLUMN_NAME " +
+                        "FROM ALL_INDEXES AI, ALL_IND_COLUMNS AC " +
+                        "WHERE  AI.TABLE_NAME = AC.TABLE_NAME " +
+                        "AND AI.INDEX_NAME = AC.INDEX_NAME " +
+                        "AND AI.OWNER = '" + schema + "' " +
+                        "AND AI.UNIQUENESS = 'UNIQUE' " +
+                        "AND AI.TABLE_NAME = '" + tableName + "'";
+                break;
             default:
                 break;
         }
@@ -173,67 +199,6 @@ public class GetPrimaryKeyUtil
         return schema;
     }
 
-
-    public static String getOraclePrimaryKey(Connection conn, String tableOwner, String tableName)
-    {
-        PreparedStatement pStmt = null;
-        ResultSet rset = null;
-        List<String> columns = new ArrayList<>();
-
-        try {
-            if (tableOwner == null) {
-                tableOwner = getSessionUser(conn);
-            }
-
-            pStmt = conn.prepareStatement(QUERY_PRIMARY_KEY_FOR_TABLE,
-                    ResultSet.TYPE_FORWARD_ONLY, ResultSet.CONCUR_READ_ONLY);
-            LOG.debug("Get Oracle primary key's SQL: [{}], params [{},{}]", QUERY_PRIMARY_KEY_FOR_TABLE, tableOwner, tableName);
-            pStmt.setString(1, tableName);
-            pStmt.setString(2, tableOwner);
-            rset = pStmt.executeQuery();
-
-            while (rset.next()) {
-                columns.add(rset.getString(1));
-            }
-        }
-        catch (SQLException e) {
-            LOG.debug("Failed to guess primary key: {}", e.getMessage());
-        }
-        finally {
-            if (rset != null) {
-                try {
-                    rset.close();
-                }
-                catch (SQLException ignored) {
-                }
-            }
-            if (pStmt != null) {
-                try {
-                    pStmt.close();
-                }
-                catch (SQLException ignored) {
-                }
-            }
-        }
-
-        if (columns.size() == 0) {
-            // Table has no primary key
-            LOG.debug("table {} has no primary key", tableName);
-            return null;
-        }
-
-        if (columns.size() > 1) {
-            // The primary key is multi-column primary key. Warn the user.
-            // TODO select the appropriate column instead of the first column based
-            // on the datatype - giving preference to numerics over other types.
-            LOG.warn("The table " + tableName + " "
-                    + "contains a multi-column primary key. Sqoop will default to "
-                    + "the column " + columns.get(0) + " only for this job.");
-        }
-
-        return columns.get(0);
-    }
-
     public static String getSessionUser(Connection conn)
     {
         Statement stmt = null;
@@ -242,19 +207,13 @@ public class GetPrimaryKeyUtil
         try {
             stmt = conn.createStatement(ResultSet.TYPE_FORWARD_ONLY,
                     ResultSet.CONCUR_READ_ONLY);
-            rset = stmt.executeQuery(QUERY_GET_SESSIONUSER);
+            rset = stmt.executeQuery("SELECT USER FROM DUAL");
 
             if (rset.next()) {
                 user = rset.getString(1);
             }
-            conn.commit();
         }
-        catch (SQLException e) {
-            try {
-                conn.rollback();
-            }
-            catch (SQLException ignored) {
-            }
+        catch (SQLException ignore) {
         }
         finally {
             if (rset != null) {
@@ -273,7 +232,7 @@ public class GetPrimaryKeyUtil
             }
         }
         if (user == null) {
-            throw new RuntimeException("Unable to get current session user");
+            LOG.warn("Unable to get current session user");
         }
         return user;
     }
