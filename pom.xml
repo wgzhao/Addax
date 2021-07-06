@@ -41,7 +41,7 @@
         <commons.configuration.version>1.10</commons.configuration.version>
         <commons.cli.version>1.4</commons.cli.version>
         <druid.version>1.2.6</druid.version>
-        <fastjson.version>1.2.75</fastjson.version>
+        <fastjson.version>1.2.76</fastjson.version>
         <guava.version>29.0-jre</guava.version>
         <groovy.version>2.4.21</groovy.version>
         <diamond.version>3.7.3</diamond.version>
@@ -49,7 +49,7 @@
         <!--slf4j 1.7.28 和 logback.classic 1.2.3 是好基友 -->
         <slf4j.version>1.7.31</slf4j.version>
         <logback.version>1.2.3</logback.version>
-        <commons.io.version>2.8.0</commons.io.version>
+        <commons.io.version>2.10.0</commons.io.version>
         <commons.codec.version>1.9</commons.codec.version>
         <junit.version>4.13</junit.version>
         <joda.time.version>2.10.10</joda.time.version>
