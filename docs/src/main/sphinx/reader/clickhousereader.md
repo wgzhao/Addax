@@ -184,6 +184,7 @@ bin/datax.py job/clickhouse2stream.json
 | table           |    是    | array | 无     | 所选取的需要同步的表 ,当配置为多张表时，用户自己需保证多张表是同一schema结构|
 | column          |    是    | array | 无     |所配置的表中需要同步的列名集合, 使用JSON的数组描述字段信息。用户使用 `*` 代表默认使用所有列配置，例如 `"['*']"` |
 | splitPk         |    否    | string | 无     | 希望使用splitPk代表的字段进行数据分片,DataX因此会启动并发任务进行数据同步，这样可以大大提供数据同步的效能 |
+| autoPk          |    否    |  bool  | false | 是否自动猜测分片主键，`3.2.6` 版本引入 |
 | where           |    否    | string | 无     | 筛选条件 |
 | querySql        |    否    | array | 无     | 使用SQL查询而不是直接指定表的方式读取数据，当用户配置querySql时，ClickHouseReader直接忽略table、column、where条件的配置 |
 

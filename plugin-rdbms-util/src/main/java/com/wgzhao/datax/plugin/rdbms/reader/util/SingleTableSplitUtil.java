@@ -19,6 +19,7 @@
 
 package com.wgzhao.datax.plugin.rdbms.reader.util;
 
+import com.alibaba.fastjson.JSON;
 import com.wgzhao.datax.common.exception.DataXException;
 import com.wgzhao.datax.common.util.Configuration;
 import com.wgzhao.datax.plugin.rdbms.reader.Constant;
@@ -28,7 +29,6 @@ import com.wgzhao.datax.plugin.rdbms.util.DBUtilErrorCode;
 import com.wgzhao.datax.plugin.rdbms.util.DataBaseType;
 import com.wgzhao.datax.plugin.rdbms.util.RdbmsException;
 import com.wgzhao.datax.plugin.rdbms.util.RdbmsRangeSplitWrap;
-import com.alibaba.fastjson.JSON;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.apache.commons.lang3.tuple.Pair;
@@ -46,8 +46,7 @@ import java.util.List;
 
 public class SingleTableSplitUtil
 {
-    private static final Logger LOG = LoggerFactory
-            .getLogger(SingleTableSplitUtil.class);
+    private static final Logger LOG = LoggerFactory.getLogger(SingleTableSplitUtil.class);
 
     public static DataBaseType dataBaseType;
 
@@ -65,7 +64,6 @@ public class SingleTableSplitUtil
         String table = configuration.getString(Key.TABLE);
         String where = configuration.getString(Key.WHERE, null);
         boolean hasWhere = StringUtils.isNotBlank(where);
-
         if (dataBaseType == DataBaseType.Oracle) {
             rangeList = genSplitSqlForOracle(splitPkName, table, where,
                     configuration, adviceNum);

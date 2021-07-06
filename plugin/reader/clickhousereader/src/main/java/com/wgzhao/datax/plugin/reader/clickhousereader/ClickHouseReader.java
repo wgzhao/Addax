@@ -48,7 +48,7 @@ public class ClickHouseReader
             this.originalConfig.set(Constant.FETCH_SIZE, Integer.MIN_VALUE);
 
             this.commonRdbmsReaderJob = new CommonRdbmsReader.Job(DATABASE_TYPE);
-            this.commonRdbmsReaderJob.init(this.originalConfig);
+            this.originalConfig = this.commonRdbmsReaderJob.init(this.originalConfig);
         }
 
         @Override

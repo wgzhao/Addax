@@ -1,4 +1,4 @@
-# PostgresqlReader 
+# PostgresqlReader
 
 PostgresqlReader插件实现了从PostgreSQL读取数据。在底层实现上，PostgresqlReader通过JDBC连接远程PostgreSQL数据库，并执行相应的sql语句将数据从PostgreSQL库中SELECT出来。
 
@@ -31,29 +31,28 @@ create table if not exists datax_tbl
     c_cidr cidr,
     c_macaddr macaddr
 );
-insert into datax_tbl values(
-    999988887777,
-    B'101',
-    TRUE,
-    '\xDEADBEEF',
-    'hello',
-    'hello, world',
-    '2021-01-04',
-    999888.9972,
-    9876542,
-    '{"bar": "baz", "balance": 7.77, "active": false}'::json,
-    12345.123,
-    123.123,
-    126,
-    'this is a long text ',
-    '2020-01-04 12:13:14',
-    'A0EEBC99-9C0B-4EF8-BB6D-6BB9BD380A11'::uuid,
-    '<foo>bar</foo>'::xml,
-    '52093.89'::money,
-    '192.168.1.1'::inet,
-    '192.168.1/24'::cidr,
-    '08002b:010203'::macaddr
-);
+insert into datax_tbl
+values (999988887777,
+        B '101',
+        TRUE,
+        '\xDEADBEEF',
+        'hello',
+        'hello, world',
+        '2021-01-04',
+        999888.9972,
+        9876542,
+        '{"bar": "baz", "balance": 7.77, "active": false}'::json,
+        12345.123,
+        123.123,
+        126,
+        'this is a long text ',
+        '2020-01-04 12:13:14',
+        'A0EEBC99-9C0B-4EF8-BB6D-6BB9BD380A11'::uuid,
+        '<foo>bar</foo>'::xml,
+        '52093.89'::money,
+        '192.168.1.1'::inet,
+        '192.168.1/24'::cidr,
+        '08002b:010203'::macaddr);
 ```
 
 配置一个从PostgreSQL数据库同步抽取数据到本地的作业:
@@ -175,6 +174,7 @@ bin/datax.py job/postgres2stream.json
 | table     |    是    | 无     | 所选取的需要同步的表名,使用JSON数据格式，当配置为多张表时，用户自己需保证多张表是同一表结构                                                    |
 | column    |    是    | 无     | 所配置的表中需要同步的列名集合，详细描述见[rdbmsreader](rdbmsreader.md)                                                                        |
 | splitPk   |    否    | 无     | 使用splitPk代表的字段进行数据分片，DataX因此会启动并发任务进行数据同步，这样可以大大提供数据同步的效能                                         |
+| autoPk    |    否    | false | 是否自动猜测分片主键，`3.2.6` 版本引入 |
 | where     |    否    | 无     | 针对表的筛选条件                                                                                                                               |
 | querySql  |    否    | 无     | 使用自定义的SQL而不是指定表来获取数据，当配置了这一项之后，DataX系统就会忽略 `table`，`column`这些配置项                                       |
 | fetchSize |    否    | 1024   | 定义了插件和数据库服务器端每次批量数据获取条数，调高该值可能导致 DataX 出现OOM                                                                 |
