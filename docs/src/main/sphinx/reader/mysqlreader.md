@@ -1,4 +1,4 @@
-# MysqlReader 
+# MysqlReader
 
 MysqlReader插件实现了从Mysql读取数据。在底层实现上，MysqlReader通过JDBC连接远程Mysql数据库，并执行相应的sql语句将数据从mysql库中SELECT出来。
 
@@ -13,48 +13,46 @@ MysqlReader通过JDBC连接器连接到远程的Mysql数据库，并根据用户
 我们在 MySQL 的 test 库上创建如下表：
 
 ```sql
-CREATE TABLE datax_reader (
-    c_bigint bigint,
-    c_varchar varchar(100),
-    c_timestamp timestamp,
-    c_text text,
-    c_decimal decimal(8, 3),
+CREATE TABLE datax_reader
+(
+    c_bigint     bigint,
+    c_varchar    varchar(100),
+    c_timestamp  timestamp,
+    c_text       text,
+    c_decimal    decimal(8, 3),
     c_mediumtext mediumtext,
-    c_longtext longtext,
-    c_int int,
-    c_time time,
-    c_datetime datetime,
-    c_enum enum('one', 'two', 'three'),
-    c_float float,
-    c_smallint smallint,
-    c_bit bit,
-    c_double double,
-    c_blob blob,
-    c_char char(5),
-    c_varbinary varbinary(100),
-    c_tinyint tinyint,
-    c_json json,
+    c_longtext   longtext,
+    c_int        int,
+    c_time       time,
+    c_datetime   datetime,
+    c_enum       enum('one', 'two', 'three'),
+    c_float      float,
+    c_smallint   smallint,
+    c_bit        bit,
+    c_double     double,
+    c_blob       blob,
+    c_char       char(5),
+    c_varbinary  varbinary(100),
+    c_tinyint    tinyint,
+    c_json       json,
     c_set SET ('a', 'b', 'c', 'd'),
-    c_binary binary,
-    c_longblob longblob,
+    c_binary     binary,
+    c_longblob   longblob,
     c_mediumblob mediumblob
 );
 
 然后插入下面一条记录
 
 ```sql
-INSERT INTO
-    datax_reader
-VALUES
-(
-        2E18,
+INSERT INTO datax_reader
+VALUES (2E18,
         'a varchar data',
         '2021-12-12 12:12:12',
         'a long text',
         12345.122,
         'a medium text',
         'a long text',
-        2 ^ 32 -1,
+        2 ^ 32 - 1,
         '12:13:14',
         '2021-12-12 12:13:14',
         'one',
@@ -69,9 +67,8 @@ VALUES
         '{"k1":"val1","k2":"val2"}',
         'b',
         binary(1),
-        x'89504E470D0A1A0A0000000D494844520000001000000010080200000090916836000000017352474200',
-        x'89504E470D0A1A0A0000000D'
-    );
+        x '89504E470D0A1A0A0000000D494844520000001000000010080200000090916836000000017352474200',
+        x '89504E470D0A1A0A0000000D');
 ```
 
 下面的配置是读取该表到终端的作业:
@@ -93,7 +90,7 @@ VALUES
             "username": "root",
             "password": "root",
             "column": [
-             "*"
+              "*"
             ],
             "connection": [
               {
@@ -141,14 +138,13 @@ bin/datax.py job/mysql2stream.json
 | table           |    是    | list | 无     | 所选取的需要同步的表名,使用JSON数据格式，当配置为多张表时，用户自己需保证多张表是同一表结构 |
 | column          |    是    | list | 无     |  所配置的表中需要同步的列名集合，详细描述[rdbmreader](rdbmsreader.md) ｜
 | splitPk         |    否    | string | 无     | 使用splitPk代表的字段进行数据分片，详细描述见[rdbmreader](rdbmsreader.md)|
+| autoPk          |    否    |  bool       | false | 是否自动猜测分片主键，`3.2.6` 版本引入 |
 | where           |    否    | string | 无     | 针对表的筛选条件 |
 | querySql        |    否    | list | 无     | 使用自定义的SQL而不是指定表来获取数据，当配置了这一项之后，DataX系统就会忽略 `table`，`column`这些配置项 |
 
-
 ### driver
 
-当前 DataX 采用的 MySQL JDBC 驱动为 8.0 以上版本，驱动类名使用的 `com.mysql.cj.jdbc.Driver`，而不是 `com.mysql.jdbc.Driver`。
-如果你需要采集的 MySQL 服务低于 `5.6`，需要使用到 `Connector/J 5.1` 驱动，则可以采取下面的步骤：
+当前 DataX 采用的 MySQL JDBC 驱动为 8.0 以上版本，驱动类名使用的 `com.mysql.cj.jdbc.Driver`，而不是 `com.mysql.jdbc.Driver`。 如果你需要采集的 MySQL 服务低于 `5.6`，需要使用到 `Connector/J 5.1` 驱动，则可以采取下面的步骤：
 
 **替换插件内置的驱动**
 
@@ -160,8 +156,7 @@ bin/datax.py job/mysql2stream.json
 
 **指定驱动类名称**
 
-在你的 json 文件类，配置 `"driver": "com.mysql.jdbc.Driver"` 
-
+在你的 json 文件类，配置 `"driver": "com.mysql.jdbc.Driver"`
 
 ## 类型转换
 
