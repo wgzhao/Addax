@@ -39,6 +39,8 @@ import java.math.BigInteger;
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
+import java.sql.SQLException;
+import java.sql.Statement;
 import java.sql.Types;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -83,22 +85,14 @@ public class SingleTableSplitUtil
                 return pluginParams;
             }
 
-            boolean isStringType = Constant.PK_TYPE_STRING.equals(configuration
-                    .getString(Constant.PK_TYPE));
-            boolean isLongType = Constant.PK_TYPE_LONG.equals(configuration
-                    .getString(Constant.PK_TYPE));
+            boolean isStringType = Constant.PK_TYPE_STRING.equals(configuration.getString(Constant.PK_TYPE));
+            boolean isLongType = Constant.PK_TYPE_LONG.equals(configuration.getString(Constant.PK_TYPE));
 
             if (isStringType) {
-                rangeList = RdbmsRangeSplitWrap.splitAndWrap(
-                        String.valueOf(minMaxPK.getLeft()),
-                        String.valueOf(minMaxPK.getRight()), adviceNum,
-                        splitPkName, "'", dataBaseType);
+                rangeList = splitStringPk(configuration, table, where, minMaxPK.getLeft().toString(), minMaxPK.getRight().toString(), adviceNum, splitPkName);
             }
             else if (isLongType) {
-                rangeList = RdbmsRangeSplitWrap.splitAndWrap(
-                        new BigInteger(minMaxPK.getLeft().toString()),
-                        new BigInteger(minMaxPK.getRight().toString()),
-                        adviceNum, splitPkName);
+                rangeList = RdbmsRangeSplitWrap.splitAndWrap(new BigInteger(minMaxPK.getLeft().toString()), new BigInteger(minMaxPK.getRight().toString()), adviceNum, splitPkName);
             }
             else {
                 throw DataXException.asDataXException(DBUtilErrorCode.ILLEGAL_SPLIT_PK,
@@ -199,7 +193,7 @@ public class SingleTableSplitUtil
      * @param conn database connection
      * @param pkRangeSQL query sql for getting the primary key range
      * @param fetchSize fetch size
-     * @param table  the table name
+     * @param table the table name
      * @param username database connect username
      * @param configuration connect configuration
      * @return primary key range pair
@@ -335,7 +329,6 @@ public class SingleTableSplitUtil
     /**
      * support Number and String split
      *
-     *
      * @param splitPK primary key will be splitted
      * @param table table name
      * @param where where clause
@@ -445,5 +438,59 @@ public class SingleTableSplitUtil
             }
         }
         return rangeSql;
+    }
+
+    /**
+     * common String split method
+     *
+     * @param configuration configuration
+     * @param table the table which be queried
+     * @param where where clause
+     * @param minVal minmimal value
+     * @param maxVal maximal value
+     * @param splitNum expected split number
+     * @param pkName the column which splitted by
+     * @return list of string
+     */
+    private static List<String> splitStringPk(Configuration configuration, String table, String where, String minVal, String maxVal, int splitNum, String pkName)
+    {
+        List<String> rangeList = new ArrayList<>();
+        String splitSql = null;
+        if (splitNum < 2) {
+            rangeList.add(String.format("%s >= '%s' AND %s <= '%s'", pkName, minVal, pkName, maxVal));
+            return rangeList;
+        }
+        if (where == null ) {
+            where = "1=1";
+        }
+        if (dataBaseType == DataBaseType.MySql) {
+            splitSql = String.format("SELECT %1$s from (SELECT %1$s FROM %2$s WHERE %3$s ORDER BY RAND() LIMIT %4$d) T ORDER BY %1$s ASC", pkName, table, where, splitNum - 1);
+        } else if (dataBaseType == DataBaseType.PostgreSQL) {
+            splitSql = String.format("SELECT %s FROM %s TABLESAMPLE SYSTEM(10) REPEATABLE(200) ORDER BY ID  LIMIT %d", pkName, table, splitNum - 1);
+        } else {
+            return RdbmsRangeSplitWrap.splitAndWrap(minVal, maxVal, splitNum, pkName, "'", dataBaseType);
+        }
+        String jdbcURL = configuration.getString(Key.JDBC_URL);
+        String username = configuration.getString(Key.USERNAME);
+        String password = configuration.getString(Key.PASSWORD);
+        try (Connection conn = DBUtil.getConnection(dataBaseType, jdbcURL, username, password)){
+            Statement statement = conn.createStatement();
+            ResultSet resultSet = statement.executeQuery(splitSql);
+            List<String> values = new ArrayList<>();
+            while (resultSet.next()) {
+                values.add(resultSet.getString(1));
+            }
+            String preVal = minVal;
+            for(String val: values) {
+                rangeList.add(String.format("%1$s >='%2$s' AND %1%s <'%3$s' ", pkName, preVal, val));
+                preVal = val;
+            }
+            rangeList.add(String.format("%1$s >='%2$s' AND %1%s <='%3$s' ", pkName, preVal, maxVal));
+            return rangeList;
+        }
+        catch (SQLException throwables) {
+            throwables.printStackTrace();
+            return rangeList;
+        }
     }
 }
