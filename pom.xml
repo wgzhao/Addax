@@ -41,7 +41,7 @@
         <commons.configuration.version>1.10</commons.configuration.version>
         <commons.cli.version>1.4</commons.cli.version>
         <druid.version>1.2.6</druid.version>
-        <fastjson.version>1.2.75</fastjson.version>
+        <fastjson.version>1.2.76</fastjson.version>
         <guava.version>29.0-jre</guava.version>
         <groovy.version>2.4.21</groovy.version>
         <diamond.version>3.7.3</diamond.version>
@@ -52,7 +52,7 @@
         <commons.io.version>2.8.0</commons.io.version>
         <commons.codec.version>1.9</commons.codec.version>
         <junit.version>4.13</junit.version>
-        <joda.time.version>2.10.8</joda.time.version>
+        <joda.time.version>2.10.10</joda.time.version>
         <swift.version>1.0.0</swift.version>
         <jackson.version>2.9.9</jackson.version>
         <mockito.version>2.0.2-beta</mockito.version>
