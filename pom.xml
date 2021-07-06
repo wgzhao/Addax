@@ -49,7 +49,7 @@
         <!--slf4j 1.7.28 和 logback.classic 1.2.3 是好基友 -->
         <slf4j.version>1.7.31</slf4j.version>
         <logback.version>1.2.3</logback.version>
-        <commons.io.version>2.8.0</commons.io.version>
+        <commons.io.version>2.10.0</commons.io.version>
         <commons.codec.version>1.9</commons.codec.version>
         <junit.version>4.13</junit.version>
         <joda.time.version>2.10.10</joda.time.version>
@@ -69,7 +69,7 @@
         <oracle.jdbc.version>19.7.0.0</oracle.jdbc.version>
         <phoenix1.version>4.14.3-HBase-1.4</phoenix1.version>
         <postgresql.jdbc.version>42.2.22</postgresql.jdbc.version>
-        <taos.jdbc.version>2.0.18</taos.jdbc.version>
+        <taos.jdbc.version>2.0.32</taos.jdbc.version>
         <trino.jdbc.version>351</trino.jdbc.version>
 
         <!-- maven configuration -->
@@ -283,7 +283,7 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-javadoc-plugin</artifactId>
-                <version>3.2.0</version>
+                <version>3.3.0</version>
                 <executions>
                     <execution>
                         <id>attach-javadocs</id>
