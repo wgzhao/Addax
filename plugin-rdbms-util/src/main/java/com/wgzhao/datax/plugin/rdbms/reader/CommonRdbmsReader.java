@@ -75,7 +75,7 @@ public class CommonRdbmsReader
         {
 
             OriginalConfPretreatmentUtil.doPretreatment(originalConfig);
-            if (originalConfig.getString(Key.SPLIT_PK) == null && originalConfig.getBool(Key.AUTO_PK, true)) {
+            if (originalConfig.getString(Key.SPLIT_PK) == null && originalConfig.getBool(Key.AUTO_PK, false)) {
                     LOG.info("Does not configure splitPk, try to guess");
                     String splitPK = GetPrimaryKeyUtil.getPrimaryKey(originalConfig);
                     if (splitPK != null) {

@@ -50,7 +50,6 @@ public class GetPrimaryKeyUtil
      */
     public static String getPrimaryKey(Configuration readConf)
     {
-        String pk = null;
         String sql;
         Configuration connConf = Configuration.from(readConf.getList("connection").get(0).toString());
         String table = connConf.getList("table").get(0).toString();
@@ -79,22 +78,23 @@ public class GetPrimaryKeyUtil
             if (columns.isEmpty()) {
                 // Table has no primary key
                 LOG.debug("table {} has no primary key", table);
+                return null;
             }
 
             if (columns.size() > 1) {
-                pk = columns.get(0);
                 // The primary key is multi-column primary key. Warn the user.
                 // TODO select the appropriate column instead of the first column based
                 // on the datatype - giving preference to numerics over other types.
                 LOG.warn("The table " + table + " "
                         + "contains a multi-column primary key. DataX will default to "
-                        + "the column " + pk + " only for this job.");
+                        + "the column " + columns.get(0) + " only for this job.");
             }
+            return columns.get(0);
         }
         catch (SQLException e) {
             LOG.debug(e.getMessage());
         }
-        return pk;
+        return null;
     }
 
     /**
@@ -110,16 +110,24 @@ public class GetPrimaryKeyUtil
         String sql = null;
         switch (dataBaseType) {
             case MySql:
-                sql = "SELECT column_name FROM INFORMATION_SCHEMA.COLUMNS "
-                        + "WHERE TABLE_SCHEMA = ( " + getSchema(schema) + ")"
-                        + "AND TABLE_NAME = '" + tableName + "' "
-                        + "AND COLUMN_KEY = 'PRI'";
+                /*
+                only query primary key
+
+                SELECT COLUMN_NAME FROM INFORMATION_SCHEMA.COLUMNS
+                WHERE TABLE_SCHEMA = (" + getSchema(schema) + ") "
+                AND TABLE_NAME = '" + tableName + "'"
+                AND COLUMN_KEY = 'PRI'
+                 */
+                sql = "SELECT COLUMN_NAME FROM INFORMATION_SCHEMA.STATISTICS "
+                        + " WHERE TABLE_SCHEMA = (" + getSchema(schema) + ") "
+                        + " AND TABLE_NAME = '" + tableName + "'"
+                        + " AND NON_UNIQUE = 0 ORDER BY SEQ_IN_INDEX ASC";
                 break;
             case PostgreSQL:
                 sql = "SELECT col.ATTNAME FROM PG_CATALOG.PG_NAMESPACE sch, "
                         + "  PG_CATALOG.PG_CLASS tab, PG_CATALOG.PG_ATTRIBUTE col, "
                         + "  PG_CATALOG.PG_INDEX ind "
-                        + "WHERE sch.OID = tab.RELNAMESPACE "
+                        + "  WHERE sch.OID = tab.RELNAMESPACE "
                         + "  AND tab.OID = col.ATTRELID "
                         + "  AND tab.OID = ind.INDRELID "
                         + "  AND sch.NSPNAME = (" + getSchema(schema) + ") "
@@ -130,7 +138,7 @@ public class GetPrimaryKeyUtil
             case SQLServer:
                 sql = "SELECT kcu.COLUMN_NAME FROM INFORMATION_SCHEMA.TABLE_CONSTRAINTS tc, "
                         + "  INFORMATION_SCHEMA.KEY_COLUMN_USAGE kcu "
-                        + "WHERE tc.TABLE_SCHEMA = kcu.TABLE_SCHEMA "
+                        + "  WHERE tc.TABLE_SCHEMA = kcu.TABLE_SCHEMA "
                         + "  AND tc.TABLE_NAME = kcu.TABLE_NAME "
                         + "  AND tc.CONSTRAINT_SCHEMA = kcu.CONSTRAINT_SCHEMA "
                         + "  AND tc.CONSTRAINT_NAME = kcu.CONSTRAINT_NAME "
@@ -139,10 +147,10 @@ public class GetPrimaryKeyUtil
                         + "  AND tc.CONSTRAINT_TYPE = 'PRIMARY KEY'";
                 break;
             case ClickHouse:
-                sql = "SELECT  name FROM system.columns "
+                sql = "SELECT name FROM system.columns "
                         + " WHERE database = (" + getSchema(schema) + ") "
                         + " AND table = '" + tableName + "'"
-                        + "AND is_in_primary_key = 1";
+                        + " AND is_in_primary_key = 1";
                 break;
             case Oracle:
                 if (schema == null) {
@@ -197,43 +205,5 @@ public class GetPrimaryKeyUtil
                 break;
         }
         return schema;
-    }
-
-    public static String getSessionUser(Connection conn)
-    {
-        Statement stmt = null;
-        ResultSet rset = null;
-        String user = null;
-        try {
-            stmt = conn.createStatement(ResultSet.TYPE_FORWARD_ONLY,
-                    ResultSet.CONCUR_READ_ONLY);
-            rset = stmt.executeQuery("SELECT USER FROM DUAL");
-
-            if (rset.next()) {
-                user = rset.getString(1);
-            }
-        }
-        catch (SQLException ignore) {
-        }
-        finally {
-            if (rset != null) {
-                try {
-                    rset.close();
-                }
-                catch (SQLException ignored) {
-                }
-            }
-            if (stmt != null) {
-                try {
-                    stmt.close();
-                }
-                catch (SQLException ignored) {
-                }
-            }
-        }
-        if (user == null) {
-            LOG.warn("Unable to get current session user");
-        }
-        return user;
     }
 }
