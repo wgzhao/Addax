@@ -37,7 +37,7 @@
 
     <properties>
         <!-- basic components -->
-        <commons.lang3.version>3.11</commons.lang3.version>
+        <commons.lang3.version>3.12.0</commons.lang3.version>
         <commons.configuration.version>1.10</commons.configuration.version>
         <commons.cli.version>1.4</commons.cli.version>
         <druid.version>1.2.6</druid.version>
@@ -65,7 +65,7 @@
         <hadoop.version>3.2.0-9</hadoop.version>
         <mongodb.jdbc.version>3.12.8</mongodb.jdbc.version>
         <mysql.jdbc.version>8.0.16</mysql.jdbc.version>
-        <mssql.jdbc.version>9.2.1.jre8</mssql.jdbc.version>
+        <mssql.jdbc.version>9.3.1.jre15-preview</mssql.jdbc.version>
         <oracle.jdbc.version>19.7.0.0</oracle.jdbc.version>
         <phoenix1.version>4.14.3-HBase-1.4</phoenix1.version>
         <postgresql.jdbc.version>42.2.22</postgresql.jdbc.version>
@@ -313,7 +313,7 @@
             <plugin>
                 <groupId>org.sonatype.plugins</groupId>
                 <artifactId>nexus-staging-maven-plugin</artifactId>
-                <version>1.6.7</version>
+                <version>1.6.8</version>
                 <extensions>true</extensions>
                 <configuration>
                     <serverId>ossrh</serverId>
