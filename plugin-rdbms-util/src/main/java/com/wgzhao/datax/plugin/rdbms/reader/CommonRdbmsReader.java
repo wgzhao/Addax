@@ -32,6 +32,7 @@ import com.wgzhao.datax.common.plugin.TaskPluginCollector;
 import com.wgzhao.datax.common.statistics.PerfRecord;
 import com.wgzhao.datax.common.statistics.PerfTrace;
 import com.wgzhao.datax.common.util.Configuration;
+import com.wgzhao.datax.plugin.rdbms.reader.util.GetPrimaryKeyUtil;
 import com.wgzhao.datax.plugin.rdbms.reader.util.OriginalConfPretreatmentUtil;
 import com.wgzhao.datax.plugin.rdbms.reader.util.PreCheckTask;
 import com.wgzhao.datax.plugin.rdbms.reader.util.ReaderSplitUtil;
@@ -67,14 +68,27 @@ public class CommonRdbmsReader
         {
             OriginalConfPretreatmentUtil.dataBaseType = dataBaseType;
             SingleTableSplitUtil.dataBaseType = dataBaseType;
+            GetPrimaryKeyUtil.dataBaseType = dataBaseType;
         }
 
-        public void init(Configuration originalConfig)
+        public Configuration init(Configuration originalConfig)
         {
 
             OriginalConfPretreatmentUtil.doPretreatment(originalConfig);
+            if (originalConfig.getString(Key.SPLIT_PK) == null && originalConfig.getBool(Key.AUTO_PK, false)) {
+                    LOG.info("Does not configure splitPk, try to guess");
+                    String splitPK = GetPrimaryKeyUtil.getPrimaryKey(originalConfig);
+                    if (splitPK != null) {
+                        LOG.info("Try to use `" + splitPK + "` as primary key to split");
+                        originalConfig.set(Key.SPLIT_PK, splitPK);
+                        if (originalConfig.getInt(Constant.EACH_TABLE_SPLIT_SIZE, -1) == -1) {
+                            originalConfig.set(Constant.EACH_TABLE_SPLIT_SIZE, 5);
+                        }
+                    }
 
+            }
             LOG.debug("After job init(), job config now is:[\n{}\n]", originalConfig.toJSON());
+            return originalConfig;
         }
 
         public void preCheck(Configuration originalConfig, DataBaseType dataBaseType)

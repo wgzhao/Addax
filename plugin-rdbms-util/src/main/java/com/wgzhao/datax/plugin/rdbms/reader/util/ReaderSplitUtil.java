@@ -84,7 +84,6 @@ public final class ReaderSplitUtil
                 Validate.isTrue(null != tables && !tables.isEmpty(), "您读取数据库表配置错误.");
 
                 String splitPk = originalSliceConfig.getString(Key.SPLIT_PK, null);
-
                 //最终切分份数不一定等于 eachTableShouldSplittedNumber
                 boolean needSplitTable = tableSplitNumber > 1
                         && StringUtils.isNotBlank(splitPk);

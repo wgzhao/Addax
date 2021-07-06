@@ -357,6 +357,9 @@ public class StreamReader
                 throws Exception
         {
             String columnValue = eachColumnConfig.getString(Constant.VALUE);
+            if ("null".equals(columnValue)) {
+                columnValue = null;
+            }
             Type columnType = Type.valueOf(eachColumnConfig.getString(Constant.TYPE).toUpperCase());
             String columnMixup = eachColumnConfig.getString(Constant.RANDOM);
             String columnIncr = eachColumnConfig.getString(Constant.INCR);
