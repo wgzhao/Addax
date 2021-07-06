@@ -37,11 +37,11 @@
 
     <properties>
         <!-- basic components -->
-        <commons.lang3.version>3.11</commons.lang3.version>
+        <commons.lang3.version>3.12.0</commons.lang3.version>
         <commons.configuration.version>1.10</commons.configuration.version>
         <commons.cli.version>1.4</commons.cli.version>
         <druid.version>1.2.6</druid.version>
-        <fastjson.version>1.2.75</fastjson.version>
+        <fastjson.version>1.2.76</fastjson.version>
         <guava.version>29.0-jre</guava.version>
         <groovy.version>2.4.21</groovy.version>
         <diamond.version>3.7.3</diamond.version>
