@@ -2,7 +2,7 @@
 
 ## 1 快速介绍
 
-HbaseReader 插件实现了从 Hbase中读取数据。在底层实现上，HbaseReader 通过 HBase 的 Java 客户端连接远程 HBase 服务，并通过 Scan 方式读取你指定 rowkey 范围内的数据，并将读取的数据使用 DataX 自定义的数据类型拼装为抽象的数据集，并传递给下游 Writer 处理。
+HbaseReader 插件实现了从 Hbase中读取数据。在底层实现上，HbaseReader 通过 HBase 的 Java 客户端连接远程 HBase 服务，并通过 Scan 方式读取你指定 rowkey 范围内的数据，并将读取的数据使用 Addax 自定义的数据类型拼装为抽象的数据集，并传递给下游 Writer 处理。
 
 以下演示基于下面创建的表以及数据
 
@@ -106,7 +106,7 @@ ROW                                   COLUMN+CELL
 
 ## 2 实现原理
 
-简而言之，HbaseReader 通过 HBase 的 Java 客户端，通过 HTable, Scan, ResultScanner 等 API，读取你指定 rowkey 范围内的数据，并将读取的数据使用 DataX 自定义的数据类型拼装为抽象的数据集，并传递给下游 Writer 处理。hbase11xreader与hbase094xreader的主要不同在于API的调用不同，Hbase1.1.x废弃了很多Hbase0.94.x的api。
+简而言之，HbaseReader 通过 HBase 的 Java 客户端，通过 HTable, Scan, ResultScanner 等 API，读取你指定 rowkey 范围内的数据，并将读取的数据使用 Addax 自定义的数据类型拼装为抽象的数据集，并传递给下游 Writer 处理。hbase11xreader与hbase094xreader的主要不同在于API的调用不同，Hbase1.1.x废弃了很多Hbase0.94.x的api。
 
 ## 3 功能说明
 
@@ -174,7 +174,7 @@ ROW                                   COLUMN+CELL
                 "writer": {
                     "name": "txtfilewriter",
                     "parameter": {
-                        "path": "/Users/shf/workplace/datax_test/hbase11xreader/result",
+                        "path": "/Users/shf/workplace/addax_test/hbase11xreader/result",
                         "fileName": "qiran",
                         "writeMode": "truncate"
                     }
@@ -248,7 +248,7 @@ ROW                                   COLUMN+CELL
         "writer": {
           "name": "txtfilewriter",
           "parameter": {
-            "path": "/Users/shf/workplace/datax_test/hbase11xreader/result",
+            "path": "/Users/shf/workplace/addax_test/hbase11xreader/result",
             "fileName": "qiran",
             "writeMode": "truncate"
           }
@@ -336,7 +336,7 @@ name指定读取的hbase列，除了rowkey外，必须为 列族:列名 的格�
 
 下面列出支持的读取HBase数据类型，HbaseReader 针对 HBase 类型转换列表:
 
-| DataX 内部类型 | HBase 数据类型      |
+| Addax 内部类型 | HBase 数据类型      |
 | -------------- | ------------------- |
 | Long           | int, short ,long    |
 | Double         | float, double       |

@@ -1,6 +1,6 @@
 {
   "name": "mongodbwriter",
-  "class": "com.wgzhao.datax.plugin.writer.mongodbwriter.MongoDBWriter",
+  "class": "com.wgzhao.addax.plugin.writer.mongodbwriter.MongoDBWriter",
   "description": "useScene: prod. mechanism: via mongoclient connect mongodb write data concurrent.",
   "developer": "alibaba"
 }

@@ -6,7 +6,7 @@ hbase20xsqlreader插件实现了从Phoenix(HBase SQL)读取数据，对应版本
 
 ## 2 实现原理
 
-简而言之，hbase20xsqlreader通过Phoenix轻客户端去连接Phoenix QueryServer，并根据用户配置信息生成查询SELECT 语句，然后发送到QueryServer读取HBase数据，并将返回结果使用DataX自定义的数据类型拼装为抽象的数据集，最终传递给下游Writer处理。
+简而言之，hbase20xsqlreader通过Phoenix轻客户端去连接Phoenix QueryServer，并根据用户配置信息生成查询SELECT 语句，然后发送到QueryServer读取HBase数据，并将返回结果使用Addax自定义的数据类型拼装为抽象的数据集，最终传递给下游Writer处理。
 
 ## 3 功能说明
 
@@ -71,7 +71,7 @@ hbase20xsqlreader插件实现了从Phoenix(HBase SQL)读取数据，对应版本
 
 下面列出MysqlReader针对Mysql类型转换列表:
 
-| DataX 内部类型 | Phoenix 数据类型                   |
+| Addax 内部类型 | Phoenix 数据类型                   |
 | -------------- | ---------------------------------- |
 | String         | CHAR, VARCHAR                      |
 | Bytes          | BINARY, VARBINARY                  |

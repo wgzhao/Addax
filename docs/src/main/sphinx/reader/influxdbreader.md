@@ -72,7 +72,7 @@ influx -import -path=NOAA_data.txt -precision=s -database=NOAA_water_database
 执行下面的命令进行数据采集
 
 ```bash
-bin/datax.py job/influxdb2stream.json
+bin/addax.py job/influxdb2stream.json
 ```
 
 ##  参数说明
@@ -89,7 +89,7 @@ bin/datax.py job/influxdb2stream.json
 | readTimeout     |    否    | int   | 20     | 设置读取超时值，单位为秒     |
 | writeTimeout    |    否    | int   | 20     | 设置写入超时值，单位为秒     |
 | where           |    否    | 无     | 针对表的筛选条件 |
-| querySql        |    否    | 无     | 使用自定义的SQL而不是指定表来获取数据，当配置了这一项之后，DataX系统就会忽略 `table`，`column`这些配置项 |
+| querySql        |    否    | 无     | 使用自定义的SQL而不是指定表来获取数据，当配置了这一项之后，Addax系统就会忽略 `table`，`column`这些配置项 |
 
 ##  类型转换
 

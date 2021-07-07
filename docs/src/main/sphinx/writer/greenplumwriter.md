@@ -7,7 +7,7 @@ GreenplumWriter 插件使用 `copy from` 语法 将数据写入 [Greenplum](http
 以下配置演示从postgresql指定的表读取数据，并插入到具有相同表结构的另外一张表中，用来测试该插件所支持的数据类型。
 
 ```sql
-create table if not exists datax_tbl
+create table if not exists addax_tbl
 (
 c_bigint bigint,
 c_bit bit(3),
@@ -31,7 +31,7 @@ c_inet inet,
 c_cidr cidr,
 c_macaddr macaddr
 );
-insert into datax_tbl values(
+insert into addax_tbl values(
 999988887777,
 B'101',
 TRUE,
@@ -59,7 +59,7 @@ TRUE,
 创建需要插入的表的语句如下:
 
 ```sql
-create table gp_test ( like datax_tbl);
+create table gp_test ( like addax_tbl);
 ```
 
 ### 任务配置
@@ -88,7 +88,7 @@ create table gp_test ( like datax_tbl);
             "connection": [
               {
                 "table": [
-                  "datax_tbl"
+                  "addax_tbl"
                 ],
                 "jdbcUrl": [
                   "jdbc:postgresql://localhost:5432/wgzhao"
@@ -134,7 +134,7 @@ create table gp_test ( like datax_tbl);
 执行以下命令进行数据采集
 
 ```shell
-bin/datax.py job/pg2gp.json
+bin/addax.py job/pg2gp.json
 ```
 
 ## 参数说明
@@ -158,7 +158,7 @@ bin/datax.py job/pg2gp.json
 
 下面列出 GreenplumWriter 针对 Greenplum 类型转换列表:
 
-| DataX 内部类型| Greenplum 数据类型    |
+| Addax 内部类型| Greenplum 数据类型    |
 | -------- | -----  |
 | Long     |bigint, bigserial, integer, smallint, serial |
 | Double   |double precision, money, numeric, real |

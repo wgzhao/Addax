@@ -19,7 +19,7 @@ ln -sf /usr/lib64/libtaos.so.1 /usr/lib64/libtaos.so
 假定要写入的表如下：
 
 ```sql
-create table test.datax_test (
+create table test.addax_test (
     ts timestamp,
     name nchar(100),
     file_size int,
@@ -51,7 +51,7 @@ create table test.datax_test (
                 "type": "date"
               },
               {
-                "value": "DataX",
+                "value": "Addax",
                 "type": "string"
               },
               {
@@ -83,7 +83,7 @@ create table test.datax_test (
             "connection": [
               {
                 "jdbcUrl": "jdbc:TAOS://127.0.0.1:6030/test",
-                "table": [ "datax_test"]
+                "table": [ "addax_test"]
               }
             ]
           }
@@ -101,7 +101,7 @@ create table test.datax_test (
 执行以下命令进行数据采集
 
 ```shell
-bin/datax.py job/tdengine2stream.json
+bin/addax.py job/tdengine2stream.json
 ```
 
 命令输出类似如下：
@@ -121,7 +121,7 @@ bin/datax.py job/tdengine2stream.json
 						},
 						{
 							"type":"string",
-							"value":"DataX"
+							"value":"Addax"
 						},
 						{
 							"type":"long",
@@ -159,7 +159,7 @@ bin/datax.py job/tdengine2stream.json
 						{
 							"jdbcUrl":"jdbc:TAOS://127.0.0.1:6030/test",
 							"table":[
-								"datax_test"
+								"addax_test"
 							]
 						}
 					],
@@ -179,10 +179,10 @@ bin/datax.py job/tdengine2stream.json
 }
 
 2021-02-20 15:52:07.786 [main] INFO  PerfTrace - PerfTrace traceId=job_-1, isEnable=false, priority=0
-2021-02-20 15:52:07.787 [main] INFO  JobContainer - DataX jobContainer starts job.
+2021-02-20 15:52:07.787 [main] INFO  JobContainer - Addax jobContainer starts job.
 2021-02-20 15:52:07.789 [main] INFO  JobContainer - Set jobId = 0
 java.library.path:/usr/java/packages/lib/amd64:/usr/lib64:/lib64:/lib:/usr/lib
-2021-02-20 15:52:08.048 [job-0] INFO  OriginalConfPretreatmentUtil - table:[datax_test] all columns:[ts,name,file_size,file_date,flag_open,memo].
+2021-02-20 15:52:08.048 [job-0] INFO  OriginalConfPretreatmentUtil - table:[addax_test] all columns:[ts,name,file_size,file_date,flag_open,memo].
 2021-02-20 15:52:08.056 [job-0] INFO  OriginalConfPretreatmentUtil - Write data [
 INSERT INTO %s (ts,name,file_size,file_date,flag_open,memo) VALUES(?,?,?,?,?,?)
 ], which jdbcUrl like:[jdbc:TAOS://127.0.0.1:6030/test]
@@ -208,14 +208,14 @@ INSERT INTO %s (ts,name,file_size,file_date,flag_open,memo) VALUES(?,?,?,?,?,?)
 | column          |    是    | list | 无     |  所配置的表中需要同步的列名集合，详细描述见[rdbmswriter](rdbmswriter.md) ｜
 | preSql         |    否    | list  | 无     | 数据写入钱先执行的sql语句，例如清除旧数据,如果 Sql 中有你需要操作到的表名称，可用 `@table` 表示 |
 | postSql        |   否      | list | 无    | 数据写入完成后执行的sql语句，例如加上某一个时间戳|
-| batchSize       |    否    | int | 1024   | 定义了插件和数据库服务器端每次批量数据获取条数，调高该值可能导致 DataX 出现OOM或者目标数据库事务提交失败导致挂起 |
+| batchSize       |    否    | int | 1024   | 定义了插件和数据库服务器端每次批量数据获取条数，调高该值可能导致 Addax 出现OOM或者目标数据库事务提交失败导致挂起 |
 
 
 ## 类型转换
 
 目前 TDenginereader 支持 TDengine 所有类型，具体如下
 
-| DataX 内部类型| TDengine 数据类型    |
+| Addax 内部类型| TDengine 数据类型    |
 | -------- | -----  |
 | Long     | SMALLINT, TINYINT, INT, BIGINT, TIMESTAMP |
 | Double   | FLOAT, DOUBLE|

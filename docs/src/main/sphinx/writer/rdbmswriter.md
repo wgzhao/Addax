@@ -30,7 +30,7 @@ RDBMSWriter 插件支持从传统 RDBMS 读取数据。这是一个通用关系�
           "parameter": {
             "column": [
               {
-                "value": "DataX",
+                "value": "Addax",
                 "type": "string"
               },
               {
@@ -93,7 +93,7 @@ RDBMSWriter 插件支持从传统 RDBMS 读取数据。这是一个通用关系�
 | column          |    是    | array | 无     |  所配置的表中需要同步的列名集合，详细描述见后 ｜
 | preSql          |    否    | array | 无     | 执行数据同步任务之前率先执行的sql语句，目前只允许执行一条SQL语句，例如清除旧数据,涉及到的表可用 `@table`表示 |
 | postSql         |   否     | array | 无    | 执行数据同步任务之后执行的sql语句，目前只允许执行一条SQL语句，例如加上某一个时间戳|
-| batchSize       |    否    | int  | 1024   | 定义了插件和数据库服务器端每次批量数据获取条数，调高该值可能导致 DataX 出现OOM或者目标数据库事务提交失败导致挂起 |
+| batchSize       |    否    | int  | 1024   | 定义了插件和数据库服务器端每次批量数据获取条数，调高该值可能导致 Addax 出现OOM或者目标数据库事务提交失败导致挂起 |
 
 #### column
 

@@ -88,7 +88,7 @@ values
 执行下面的命令进行采集
 
 ```shell
-bin/datax.py job/kudu2stream.json
+bin/addax.py job/kudu2stream.json
 ```
 
 输出结果类似如下（删除了不必需要的内容)
@@ -158,7 +158,7 @@ bin/datax.py job/kudu2stream.json
 
 ## 类型转换
 
-| DataX 内部类型| Kudu 数据类型    |
+| Addax 内部类型| Kudu 数据类型    |
 | -------- | -----  |
 | Long     | byte, short, int, long |
 | Double   | float, double, decimal |

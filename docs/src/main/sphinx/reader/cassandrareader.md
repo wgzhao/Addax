@@ -24,7 +24,7 @@
             "port": 9042,
             "useSSL": false,
             "keyspace": "test",
-            "table": "datax_src",
+            "table": "addax_src",
             "column": [
               "textCol",
               "blobCol",
@@ -88,7 +88,7 @@
 
 下面列出 `CassandraReader` 针对 `Cassandra` 类型转换列表:
 
-| DataX 内部类型 | Cassandra 数据类型                                                     |
+| Addax 内部类型 | Cassandra 数据类型                                                     |
 | -------------- | ---------------------------------------------------------------------- |
 | Long           | int, tinyint, smallint,varint,bigint,time                              |
 | Double         | float, double, decimal                                                 |

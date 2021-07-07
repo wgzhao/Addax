@@ -1,8 +1,8 @@
-# DataX HdfsReader 插件文档
+# Addax HdfsReader 插件文档
 
 ## 1 快速介绍
 
-HdfsReader提供了读取分布式文件系统数据存储的能力。在底层实现上，HdfsReader获取分布式文件系统上文件的数据，并转换为DataX传输协议传递给Writer。
+HdfsReader提供了读取分布式文件系统数据存储的能力。在底层实现上，HdfsReader获取分布式文件系统上文件的数据，并转换为Addax传输协议传递给Writer。
 
 目前HdfsReader支持的文件格式如下：
 
@@ -15,9 +15,9 @@ HdfsReader提供了读取分布式文件系统数据存储的能力。在底层�
 
 ## 2 功能与限制
 
-HdfsReader实现了从Hadoop分布式文件系统Hdfs中读取文件数据并转为DataX协议的功能。
+HdfsReader实现了从Hadoop分布式文件系统Hdfs中读取文件数据并转为Addax协议的功能。
 
-`textfile` 是Hive建表时默认使用的存储格式，数据不做压缩，本质上textfile就是以文本的形式将数据存放在hdfs中，对于DataX而言，HdfsReader实现上类比TxtFileReader，有诸多相似之处。
+`textfile` 是Hive建表时默认使用的存储格式，数据不做压缩，本质上textfile就是以文本的形式将数据存放在hdfs中，对于Addax而言，HdfsReader实现上类比TxtFileReader，有诸多相似之处。
 
 orcfile，它的全名是Optimized Row Columnar file，是对RCFile做了优化。
 
@@ -121,7 +121,7 @@ orcfile，它的全名是Optimized Row Columnar file，是对RCFile做了优化�
 2. 当指定多个Hdfs文件，HdfsReader支持使用多线程进行数据抽取。线程并发数通过通道数指定。
 3. 当指定通配符，HdfsReader尝试遍历出多个文件信息。例如: 指定 `/*` 代表读取 `/` 目录下所有的文件，指定 `/bazhen/*` 代表读取 bazhen 目录下游所有的文件。HdfsReader目前只支持 `*`和 `?` 作为文件通配符。
 
-特别需要注意的是，DataX会将一个作业下同步的所有的文件视作同一张数据表。用户必须自己保证所有的File能够适配同一套schema信息。并且提供给DataX权限可读。
+特别需要注意的是，Addax会将一个作业下同步的所有的文件视作同一张数据表。用户必须自己保证所有的File能够适配同一套schema信息。并且提供给Addax权限可读。
 
 #### defaultFS
 
@@ -142,11 +142,11 @@ Hadoop hdfs文件系统namenode节点地址，如果 hdfs 配置了 HA 模式，
 
 特别需要注意的是，HdfsReader能够自动识别文件是orcfile、textfile或者还是其它类型的文件，但该项是必填项，HdfsReader则会只读取用户配置的类型的文件，忽略路径下其他格式的文件
 
-另外需要注意的是，由于textfile和orcfile是两种完全不同的文件格式，所以HdfsReader对这两种文件的解析方式也存在差异，这种差异导致hive支持的复杂复合类型(比如map,array,struct,union)在转换为DataX支持的String类型时，转换的结果格式略有差异，比如以map类型为例：
+另外需要注意的是，由于textfile和orcfile是两种完全不同的文件格式，所以HdfsReader对这两种文件的解析方式也存在差异，这种差异导致hive支持的复杂复合类型(比如map,array,struct,union)在转换为Addax支持的String类型时，转换的结果格式略有差异，比如以map类型为例：
 
-- orcfile map类型经hdfsreader解析转换成datax支持的string类型后，结果为 `{job=80, team=60, person=70}`
+- orcfile map类型经hdfsreader解析转换成addax支持的string类型后，结果为 `{job=80, team=60, person=70}`
 
-- textfile map类型经hdfsreader解析转换成datax支持的string类型后，结果为 `job:80,team:60,person:70`
+- textfile map类型经hdfsreader解析转换成addax支持的string类型后，结果为 `job:80,team:60,person:70`
 
 从上面的转换结果可以看出，数据本身没有变化，但是表示的格式略有差异，所以如果用户配置的文件路径中要同步的字段在Hive中是复合类型的话，建议配置统一的文件格式。
 
@@ -188,9 +188,9 @@ Hadoop hdfs文件系统namenode节点地址，如果 hdfs 配置了 HA 模式，
 
 #### nullFormat
 
-文本文件中无法使用标准字符串定义null(空指针)，DataX提供nullFormat定义哪些字符串可以表示为null。
+文本文件中无法使用标准字符串定义null(空指针)，Addax提供nullFormat定义哪些字符串可以表示为null。
 
-例如如果用户配置: `"\\N"` ，那么如果源头数据是 `"\N"` ，DataX视作 `null` 字段。
+例如如果用户配置: `"\\N"` ，那么如果源头数据是 `"\N"` ，Addax视作 `null` 字段。
 
 #### haveKerberos
 
@@ -207,7 +207,7 @@ Kerberos认证 keytab文件路径，绝对路径
 #### compress
 
 当fileType（文件类型）为csv下的文件压缩方式，目前仅支持 gzip、bz2、zip、lzo、lzo_deflate、hadoop-snappy、framing-snappy压缩；值得注意的是，lzo存在两种压缩格式：lzo和lzo_deflate，用户在配置的时候需要留心，不要配错了；另外，由于snappy目前没有统一的stream
-format，datax目前只支持最主流的两种：hadoop-snappy（hadoop上的snappy stream format）和 framing-snappy（google建议的snappy stream format）;
+format，addax目前只支持最主流的两种：hadoop-snappy（hadoop上的snappy stream format）和 framing-snappy（google建议的snappy stream format）;
 
 #### hadoopConfig
 
@@ -266,7 +266,7 @@ boolean captureRawRecord = true;
 
 string类型。HdfsReader提供了类型转换的建议表如下：
 
-| DataX 内部类型| Hive表 数据类型    |
+| Addax 内部类型| Hive表 数据类型    |
 | -------- | -----  |
 | Long     |TINYINT, SMALLINT, INT, BIGINT|
 | Double   |FLOAT, DOUBLE|
@@ -285,7 +285,7 @@ string类型。HdfsReader提供了类型转换的建议表如下：
 
 特别提醒：
 
-* Hive支持的数据类型 TIMESTAMP 可以精确到纳秒级别，所以 textfile、orcfile 中 TIMESTAMP 存放的数据类似于 `2015-08-21 22:40:47.397898389`，如果转换的类型配置为DataX的Date，转换之后会导致纳秒部分丢失，所以如果需要保留纳秒部分的数据，请配置转换类型为DataX的String类型。
+* Hive支持的数据类型 TIMESTAMP 可以精确到纳秒级别，所以 textfile、orcfile 中 TIMESTAMP 存放的数据类似于 `2015-08-21 22:40:47.397898389`，如果转换的类型配置为Addax的Date，转换之后会导致纳秒部分丢失，所以如果需要保留纳秒部分的数据，请配置转换类型为Addax的String类型。
 
 ### 3.4 按分区读取
 

@@ -1,6 +1,6 @@
 {
   "name": "dbffilewriter",
-  "class": "com.wgzhao.datax.plugin.writer.dbffilewriter.DbfFileWriter",
-  "description": "useScene: test. mechanism: use datax framework to transport data to dbf file. warn: The more you know about the data, the less problems you encounter.",
+  "class": "com.wgzhao.addax.plugin.writer.dbffilewriter.DbfFileWriter",
+  "description": "useScene: test. mechanism: use addax framework to transport data to dbf file. warn: The more you know about the data, the less problems you encounter.",
   "developer": "alibaba"
 }

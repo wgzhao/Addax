@@ -1,14 +1,14 @@
-# DataX TxtFileReader 说明
+# Addax TxtFileReader 说明
 
 ## 1 快速介绍
 
-TxtFileReader提供了读取本地文件系统数据存储的能力。在底层实现上，TxtFileReader获取本地文件数据，并转换为DataX传输协议传递给Writer。
+TxtFileReader提供了读取本地文件系统数据存储的能力。在底层实现上，TxtFileReader获取本地文件数据，并转换为Addax传输协议传递给Writer。
 
 **本地文件内容存放的是一张逻辑意义上的二维表，例如CSV格式的文本信息。**
 
 ## 2 功能与限制
 
-TxtFileReader实现了从本地文件读取数据并转为DataX协议的功能，本地文件本身是无结构化数据存储，对于DataX而言，TxtFileReader实现上类比OSSReader，有诸多相似之处。目前TxtFileReader支持功能如下：
+TxtFileReader实现了从本地文件读取数据并转为Addax协议的功能，本地文件本身是无结构化数据存储，对于Addax而言，TxtFileReader实现上类比OSSReader，有诸多相似之处。目前TxtFileReader支持功能如下：
 
 1. 支持且仅支持读取TXT的文件，且要求TXT中shema为一张二维表。
 
@@ -110,9 +110,9 @@ TxtFileReader实现了从本地文件读取数据并转为DataX协议的功能�
 - 当指定多个本地文件，TxtFileReader支持使用多线程进行数据抽取。线程并发数通过通道数指定
 - 当指定通配符，TxtFileReader尝试遍历出多个文件信息。例如: 指定 `/*`代表读取 `/` 目录下所有的文件，指定 `/bazhen/*` 代表读取bazhen目录下游所有的文件。目前只支持 `*` 作为文件通配符。
 
-特别需要注意的是，DataX会将一个作业下同步的所有Text File视作同一张数据表。用户必须自己保证所有的File能够适配同一套schema信息。读取文件用户必须保证为类CSV格式，并且提供给DataX权限可读。
+特别需要注意的是，Addax会将一个作业下同步的所有Text File视作同一张数据表。用户必须自己保证所有的File能够适配同一套schema信息。读取文件用户必须保证为类CSV格式，并且提供给Addax权限可读。
 
-特别需要注意的是，如果Path指定的路径下没有符合匹配的文件抽取，DataX将报错。
+特别需要注意的是，如果Path指定的路径下没有符合匹配的文件抽取，Addax将报错。
 
 从 3.2.3 版本起， `path` 下允许混合不同压缩格式的文件，插件会尝试自动猜测压缩格式并自动解压，目前支持的压缩格式有：
 
@@ -190,9 +190,9 @@ boolean captureRawRecord = true;
 
 ### 3.3 类型转换
 
-本地文件本身不提供数据类型，该类型是DataX TxtFileReader定义：
+本地文件本身不提供数据类型，该类型是Addax TxtFileReader定义：
 
-| DataX 内部类型| 本地文件 数据类型    |
+| Addax 内部类型| 本地文件 数据类型    |
 | -------- | -----  |
 |
 | Long     |Long |

@@ -2,7 +2,7 @@
 
 ## 1 快速介绍
 
-RedisReader 提供了读取Redis RDB 的能力。在底层实现上获取本地RDB文件/Redis Server数据，并转换为DataX传输协议传递给Writer。
+RedisReader 提供了读取Redis RDB 的能力。在底层实现上获取本地RDB文件/Redis Server数据，并转换为Addax传输协议传递给Writer。
 
 ## 2 功能与限制
 

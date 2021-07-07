@@ -1,9 +1,9 @@
 {
   "name": "streamwriter",
-  "class": "com.wgzhao.datax.plugin.writer.streamwriter.StreamWriter",
+  "class": "com.wgzhao.addax.plugin.writer.streamwriter.StreamWriter",
   "description": {
     "useScene": "only for developer test.",
-    "mechanism": "use datax framework to transport data to stream.",
+    "mechanism": "use addax framework to transport data to stream.",
     "warn": "Never use it in your real job."
   },
   "developer": "alibaba"

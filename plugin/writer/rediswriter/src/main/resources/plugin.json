@@ -1,6 +1,6 @@
 {
   "name": "rediswriter",
-  "class": "com.wgzhao.datax.plugin.writer.rediswriter.RedisWriter",
+  "class": "com.wgzhao.addax.plugin.writer.rediswriter.RedisWriter",
   "description": "Use jedis connect to redis, execute restore command",
   "developer": "alibaba"
 }

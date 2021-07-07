@@ -8,7 +8,7 @@ SqlServerWriter 面向ETL开发工程师，他们使用 SqlServerWriter 从数�
 
 ## 2 实现原理
 
-SqlServerWriter 通过 DataX 框架获取 Reader 生成的协议数据，根据你配置生成相应的SQL语句 `insert into...`(当主键/唯一性索引冲突时会写不进去冲突的行)
+SqlServerWriter 通过 Addax 框架获取 Reader 生成的协议数据，根据你配置生成相应的SQL语句 `insert into...`(当主键/唯一性索引冲突时会写不进去冲突的行)
 
 注意：
 
@@ -87,7 +87,7 @@ SqlServerWriter 通过 DataX 框架获取 Reader 生成的协议数据，根据�
 | splitPk         |    否    | 无     | 使用splitPk代表的字段进行数据分片，详细描述见[rdbms](../reader/rdbmsreader.md)|
 | preSql | 否  | 无 | 数据写入前先执行的sql语句 |
 | postSql        |   否      | 无    | 数据写入完成后,再执行的SQL语句 |
-| batchSize       |    否    | 1024   |  定义了插件和数据库服务器端每次批量数据获取条数，调高该值可能导致 DataX 出现OOM |
+| batchSize       |    否    | 1024   |  定义了插件和数据库服务器端每次批量数据获取条数，调高该值可能导致 Addax 出现OOM |
 
 ### 3.3 类型转换
 

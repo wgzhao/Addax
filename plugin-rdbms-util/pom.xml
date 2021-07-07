@@ -1,8 +1,8 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <parent>
-        <groupId>com.wgzhao.datax</groupId>
-        <artifactId>datax-all</artifactId>
+        <groupId>com.wgzhao.addax</groupId>
+        <artifactId>addax-all</artifactId>
         <version>3.2.6-SNAPSHOT</version>
     </parent>
     <artifactId>plugin-rdbms-util</artifactId>
@@ -23,8 +23,8 @@
         </dependency>
 
         <dependency>
-            <groupId>com.wgzhao.datax</groupId>
-            <artifactId>datax-common</artifactId>
+            <groupId>com.wgzhao.addax</groupId>
+            <artifactId>addax-common</artifactId>
             <version>${project.version}</version>
             <exclusions>
                 <exclusion>
@@ -65,7 +65,7 @@
                     <descriptors>
                         <descriptor>package.xml</descriptor>
                     </descriptors>
-                    <finalName>datax</finalName>
+                    <finalName>addax</finalName>
                 </configuration>
                 <executions>
                     <execution>

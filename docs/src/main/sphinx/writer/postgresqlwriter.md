@@ -13,7 +13,7 @@ PostgresqlWriter面向ETL开发工程师，他们使用PostgresqlWriter从数仓
 假定建表语句以及输入插入语句如下：
 
 ```sql
-create table if not exists datax_tbl 
+create table if not exists addax_tbl 
 (
     c_bigint bigint,
     c_bit bit(3),
@@ -37,7 +37,7 @@ create table if not exists datax_tbl
     c_cidr cidr,
     c_macaddr macaddr
 );
-insert into datax_tbl values(
+insert into addax_tbl values(
     999988887777,
     B'101',
     TRUE,
@@ -65,7 +65,7 @@ insert into datax_tbl values(
 创建需要插入的表的语句如下:
 
 ```sql
-create table datax_tbl1 ( like datax_tbl);
+create table addax_tbl1 ( like addax_tbl);
 ```
 
 ### 任务配置
@@ -94,7 +94,7 @@ create table datax_tbl1 ( like datax_tbl);
             "connection": [
               {
                 "table": [
-                  "datax_tbl"
+                  "addax_tbl"
                 ],
                 "jdbcUrl": [
                   "jdbc:postgresql://localhost:5432/pgtest"
@@ -116,7 +116,7 @@ create table datax_tbl1 ( like datax_tbl);
               {
                 "jdbcUrl": "jdbc:postgresql://127.0.0.1:5432/pgtest",
                 "table": [
-                  "datax_tbl1"
+                  "addax_tbl1"
                 ]
               }
             ],
@@ -138,7 +138,7 @@ create table datax_tbl1 ( like datax_tbl);
 执行以下命令进行数据采集
 
 ```shell
-bin/datax.py job/pg2pg.json
+bin/addax.py job/pg2pg.json
 ```
 
 ## 参数说明
@@ -153,7 +153,7 @@ bin/datax.py job/pg2pg.json
 | column          |    是    | 无     |  所配置的表中需要同步的列名集合，详细描述[rdbmswriter](rdbmswriter.md) |
 | preSql         |    否    | 无     | 执行数据同步任务之前率先执行的sql语句，目前只允许执行一条SQL语句，例如清除旧数据,涉及到的表可用 `@table`表示 |
 | postSql        |   否      | 无    | 执行数据同步任务之后执行的sql语句，目前只允许执行一条SQL语句，例如加上某一个时间戳|
-| batchSize       |    否    | 1024   | 定义了插件和数据库服务器端每次批量数据获取条数，调高该值可能导致 DataX 出现OOM或者目标数据库事务提交失败导致挂起 |
+| batchSize       |    否    | 1024   | 定义了插件和数据库服务器端每次批量数据获取条数，调高该值可能导致 Addax 出现OOM或者目标数据库事务提交失败导致挂起 |
 
 ### writeMode
 
@@ -177,7 +177,7 @@ bin/datax.py job/pg2pg.json
 
 下面列出 PostgresqlWriter针对 PostgreSQL类型转换列表:
 
-| DataX 内部类型| PostgreSQL 数据类型    |
+| Addax 内部类型| PostgreSQL 数据类型    |
 | -------- | -----  |
 | Long     |bigint, bigserial, integer, smallint, serial |
 | Double   |double precision, money, numeric, real |

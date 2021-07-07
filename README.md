@@ -1,19 +1,21 @@
 <p align="center">
-    <img alt="DataX Logo" src="https://github.com/wgzhao/DataX/blob/master/docs/images/datax-logo.png?raw=true" width="205" />
+    <img alt="Addax Logo" src="https://github.com/wgzhao/Addax/blob/master/docs/images/logo.png?raw=true" width="205" />
 </p>
-<p align="center">DataX is an open source univeral ETL tool</p>
-<p align="center"><a href="https://datax.readthedocs.io">Documentation</a> Detailed description of how to install and deploy and how to use each collection plugin </p>
+<p align="center">Addax is an open source univeral ETL tool</p>
+<p align="center"><a href="https://addax.readthedocs.io">Documentation</a> Detailed description of how to install and deploy and how to use each collection plugin </p>
 <p align="center">
-   <a href="https://github.com/wgzhao/DataX/workflows/Maven%20Package/badge.svg">
+   <a href="https://github.com/wgzhao/Addax/workflows/Maven%20Package/badge.svg">
        <img src="https://github.com/wgzhao/DataX/workflows/Maven%20Package/badge.svg" alt="Maven Package" />
    </a>
-   <a href="https://datax.readthedocs.io/zh_CN/latest/?badge=latest">
-       <img src="https://readthedocs.org/projects/datax/badge/?version=latest" alt="Documentation Status" />
+   <a href="https://addax.readthedocs.io/zh_CN/latest/?badge=latest">
+       <img src="https://readthedocs.org/projects/addax/badge/?version=latest" alt="Documentation Status" />
    </a>
 </p>
 
 
 English | [简体中文](README_zh.md)
+
+# I'm changing DataX to Addax
 
 ## current stable version
 
@@ -105,7 +107,7 @@ add support for almost basic data type, and some complex data type.
 | ClickHouse          | YES    | YES    | clickhousereader/clickhousewriter       |                                                                                            |
 | DB2                 | YES    | YES    | rbdmsreader/rdbmswriter                 | not fully tested                                                                           |
 | DBF                 | YES    | YES    | dbffilereader/dbffilewriter             |                                                                                            |
-| ElasticSearch       | YES    | YES    | elasticsearchreader/elasticsearchwriter | originally from [@Kestrong](https://github.com/Kestrong/datax-elasticsearch)               |
+| ElasticSearch       | YES    | YES    | elasticsearchreader/elasticsearchwriter | originally from [@Kestrong](https://github.com/Kestrong/addax-elasticsearch)               |
 | FTP                 | YES    | YES    | ftpreader/ftpwriter                     |                                                                                            |
 | HBase 1.x           | YES    | YES    | hbase11xreader/hbase11xwriter           | use HBASE API                                                                              |
 | HBase 1.x           | YES    | YES    | hbase11xsqlreader/hbase11xsqlwriter     | use Phoenix[Phoenix](https://phoenix.apache.org)                                           |
@@ -177,14 +179,14 @@ cd docs
 mvn clean package
 ```
 
-After successful compilation and packaging, a `datax-<version>` folder will be created in the `target/datax` directory of the project directory, where `<version` indicates the version.
+After successful compilation and packaging, a `addax-<version>` folder will be created in the `target/datax` directory of the project directory, where `<version` indicates the version.
 
 ### begin your first job
 
 The `job` subdirectory contains many sample jobs, of which `job.json` can be used as a smoke-out test and executed as follows
 
 ```shell
-cd target/datax/datax-<version>
+cd target/datax/addax-<version>
 python bin/datax.py job/job.json
 ```
 
@@ -196,7 +198,7 @@ The output of the above command is roughly as follows.
 ```
  bin/datax.py job/job.json
 
-DataX (DATAX-V3), From Alibaba !
+DataX (addax-V3), From Alibaba !
 Copyright (C) 2010-2017, Alibaba Group. All Rights Reserved.
 
 

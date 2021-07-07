@@ -1,6 +1,6 @@
 {
   "name": "kuduwriter",
-  "class": "com.wgzhao.datax.plugin.writer.kuduwriter.KuduWriter",
+  "class": "com.wgzhao.addax.plugin.writer.kuduwriter.KuduWriter",
   "description": "use put: prod. mechanism: use kudu java api put data.",
   "developer": "wgzhao"
 }

@@ -8,7 +8,7 @@ OracleWriter 面向 ETL 开发工程师，他们使用 OracleWriter 从数仓导
 
 ## 2 实现原理
 
-OracleWriter 通过 DataX 框架获取 Reader 生成的协议数据，根据你配置生成相应的SQL语句
+OracleWriter 通过 Addax 框架获取 Reader 生成的协议数据，根据你配置生成相应的SQL语句
 
 注意：
 
@@ -36,7 +36,7 @@ OracleWriter 通过 DataX 框架获取 Reader 生成的协议数据，根据你�
         "parameter": {
             "column" : [
                 {
-                    "value": "DataX",
+                    "value": "Addax",
                     "type": "string"
                 },
                 {
@@ -95,7 +95,7 @@ OracleWriter 通过 DataX 框架获取 Reader 生成的协议数据，根据你�
 | column    |    是    | 无     | 所配置的表中需要同步的列名集合，详细描述[rdbmswriter](rdbmswriter.md) ｜                                                                                                    |
 | preSql    |    否    | 无     | 执行数据同步任务之前率先执行的sql语句，目前只允许执行一条SQL语句，例如清除旧数据,涉及到的表可用 `@table`表示                                                                |
 | postSql   |    否    | 无     | 执行数据同步任务之后执行的sql语句，目前只允许执行一条SQL语句，例如加上某一个时间戳                                                                                          |
-| batchSize |    否    | 1024   | 定义了插件和数据库服务器端每次批量数据获取条数，调高该值可能导致 DataX 出现OOM或者目标数据库事务提交失败导致挂起                                                            |
+| batchSize |    否    | 1024   | 定义了插件和数据库服务器端每次批量数据获取条数，调高该值可能导致 Addax 出现OOM或者目标数据库事务提交失败导致挂起                                                            |
 | session   |    否    | 无     | 设置oracle连接时的session信息, 详见下文                                                                                                                                     |
 
 #### writeMode
@@ -133,7 +133,7 @@ OracleWriter 通过 DataX 框架获取 Reader 生成的协议数据，根据你�
 
 下面列出 OracleWriter 针对 Oracle 类型转换列表:
 
-| DataX 内部类型 | Oracle 数据类型                                                                                                                                                                                |
+| Addax 内部类型 | Oracle 数据类型                                                                                                                                                                                |
 | -------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | Long           | NUMBER,INTEGER,INT,SMALLINT                                                                                                                                                                    |
 | Double         | NUMERIC,DECIMAL,FLOAT,DOUBLE PRECISION,REAL                                                                                                                                                    |

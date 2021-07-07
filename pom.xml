@@ -2,19 +2,19 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
-    <groupId>com.wgzhao.datax</groupId>
-    <artifactId>datax-all</artifactId>
+    <groupId>com.wgzhao.addax</groupId>
+    <artifactId>addax-all</artifactId>
     <version>3.2.6-SNAPSHOT</version>
 
-    <name>datax-all</name>
-    <description>DataX generical ETL tool</description>
+    <name>addax-all</name>
+    <description>Addax generical ETL tool</description>
     <packaging>pom</packaging>
-    <url>https://datax.readthedocs.io</url>
+    <url>https://addax.readthedocs.io</url>
 
     <licenses>
         <license>
             <name>Apache License</name>
-            <url>https://github.com/wgzhao/DataX/blob/master/license.txt</url>
+            <url>https://github.com/wgzhao/Addax/blob/master/license.txt</url>
             <distribution>repo</distribution>
         </license>
     </licenses>
@@ -29,9 +29,9 @@
     </developers>
 
     <scm>
-        <connection>scm:git:https://github.com/wgzhao/datax.git</connection>
-        <developerConnection>scm:git:git@github.com:wgzhao/datax.git</developerConnection>
-        <url>https://github.com/wgzhao/datax</url>
+        <connection>scm:git:https://github.com/wgzhao/addax.git</connection>
+        <developerConnection>scm:git:git@github.com:wgzhao/addax.git</developerConnection>
+        <url>https://github.com.wgzhao.addax</url>
         <tag>HEAD</tag>
     </scm>
 
@@ -146,8 +146,8 @@
     <dependencyManagement>
         <dependencies>
             <dependency>
-                <groupId>com.wgzhao.datax</groupId>
-                <artifactId>datax-common</artifactId>
+                <groupId>com.wgzhao.addax</groupId>
+                <artifactId>addax-common</artifactId>
                 <version>${project.version}</version>
             </dependency>
             <!-- DataX external dependencies -->
@@ -192,7 +192,7 @@
                             <pomSectionPriorities>
                                 modelVersion,parent,groupId,artifactId,version,name,description,packaging,url,inceptionYear,licenses,scm,properties,modules
                             </pomSectionPriorities>
-                            <dependenciesGroupIdPriorities>com.alibaba, com.wgzhao.datax
+                            <dependenciesGroupIdPriorities>com.alibaba, com.wgzhao.addax
                             </dependenciesGroupIdPriorities>
                             <dependenciesOrderBy>scope,groupId,artifactId</dependenciesOrderBy>
                             <dependenciesScopePriorities>compile,runtime,provided,test</dependenciesScopePriorities>

@@ -1,6 +1,6 @@
 {
   "name": "tdenginereader",
-  "class": "com.wgzhao.datax.plugin.reader.tdenginereader.TDengineReader",
+  "class": "com.wgzhao.addax.plugin.reader.tdenginereader.TDengineReader",
   "description": "Retrieve data from TDengine",
   "developer": "wgzhao"
 }

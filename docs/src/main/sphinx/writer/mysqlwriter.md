@@ -4,7 +4,7 @@ MysqlWriter 插件实现了写入数据到 Mysql 主库的目的表的功能。�
 
 MysqlWriter 面向ETL开发工程师，他们使用 MysqlWriter 从数仓导入数据到 Mysql。同时 MysqlWriter 亦可以作为数据迁移工具为DBA等用户提供服务。
 
-MysqlWriter 通过 DataX 框架获取 Reader 生成的协议数据，根据你配置的 `writeMode` 生成 `insert into...`(当主键/唯一性索引冲突时会写不进去冲突的行)
+MysqlWriter 通过 Addax 框架获取 Reader 生成的协议数据，根据你配置的 `writeMode` 生成 `insert into...`(当主键/唯一性索引冲突时会写不进去冲突的行)
 或者 `replace into...`(没有遇到主键/唯一性索引冲突时，与 insert into 行为一致，冲突时会用新行替换原有行所有字段) 的语句写入数据到 Mysql。出于性能考虑，采用了 `PreparedStatement + Batch`，并且设置了：`rewriteBatchedStatements=true`，将数据缓冲到线程上下文 Buffer 中，当 Buffer
 累计到预定阈值时，才发起写入请求。
 
@@ -13,7 +13,7 @@ MysqlWriter 通过 DataX 框架获取 Reader 生成的协议数据，根据你�
 假定要写入的 MySQL 表建表语句如下：
 
 ```sql
-create table test.datax_tbl 
+create table test.addax_tbl 
 (
 col1 varchar(20) ,
 col2 int(4),
@@ -41,7 +41,7 @@ col5 binary
           "parameter": {
             "column": [
               {
-                "value": "DataX",
+                "value": "Addax",
                 "type": "string"
               },
               {
@@ -83,7 +83,7 @@ col5 binary
               {
                 "jdbcUrl": "jdbc:mysql://127.0.0.1:3306/test?useSSL=false",
                 "table": [
-                  "datax_tbl"
+                  "addax_tbl"
                 ],
                 "driver": "com.mysql.jdbc.Driver"
               }
@@ -103,7 +103,7 @@ col5 binary
 执行以下命令进行数据采集
 
 ```shell
-bin/datax.py job/stream2mysql.json
+bin/addax.py job/stream2mysql.json
 ```
 
 ## 参数说明
@@ -116,15 +116,15 @@ bin/datax.py job/stream2mysql.json
 | password        |    否    | string | 无     | 数据源指定用户名的密码 |
 | table           |    是    | list | 无     | 所选取的需要同步的表名,使用JSON数据格式，当配置为多张表时，用户自己需保证多张表是同一表结构 |
 | column          |    是    | list | 无     |  所配置的表中需要同步的列名集合，详细描述见[rdbmswriter](rdbmswriter.md) ｜
-| session         | 否      | list | 空  | DataX在获取Mysql连接时，执行session指定的SQL语句，修改当前connection session属性 |
+| session         | 否      | list | 空  | Addax在获取Mysql连接时，执行session指定的SQL语句，修改当前connection session属性 |
 | preSql         |    否    | list  | 无     | 数据写入钱先执行的sql语句，例如清除旧数据,如果 Sql 中有你需要操作到的表名称，可用 `@table` 表示 |
 | postSql        |   否      | list | 无    | 数据写入完成后执行的sql语句，例如加上某一个时间戳|
 | writeMode       | 是 |     string | insert | 数据写入表的方式, `insert` 表示采用 `insert into` , `replace`表示采用`replace into`方式 `update` 表示采用 `ON DUPLICATE KEY UPDATE` 语句 |
-| batchSize       |    否    | int | 1024   | 定义了插件和数据库服务器端每次批量数据获取条数，调高该值可能导致 DataX 出现OOM或者目标数据库事务提交失败导致挂起 |
+| batchSize       |    否    | int | 1024   | 定义了插件和数据库服务器端每次批量数据获取条数，调高该值可能导致 Addax 出现OOM或者目标数据库事务提交失败导致挂起 |
 
 ### driver
 
-当前 DataX 采用的 MySQL JDBC 驱动为 8.0 以上版本，驱动类名使用的 `com.mysql.cj.jdbc.Driver`，而不是 `com.mysql.jdbc.Driver`。
+当前 Addax 采用的 MySQL JDBC 驱动为 8.0 以上版本，驱动类名使用的 `com.mysql.cj.jdbc.Driver`，而不是 `com.mysql.jdbc.Driver`。
 如果你需要采集的 MySQL 服务低于 `5.6`，需要使用到 `Connector/J 5.1` 驱动，则可以采取下面的步骤：
 
 **替换插件内置的驱动**
@@ -145,7 +145,7 @@ bin/datax.py job/stream2mysql.json
 
 下面列出 MysqlWriter 针对 Mysql 类型转换列表:
 
-| DataX 内部类型| Mysql 数据类型    |
+| Addax 内部类型| Mysql 数据类型    |
 | -------- | -----  |
 | Long     |int, tinyint, smallint, mediumint, int, bigint, year|
 | Double   |float, double, decimal|

@@ -85,7 +85,7 @@ PROPERTIES("replication_num" = "1");
 执行下面的命令
 
 ```shell
-bin/datax.py job/stream2doris.json
+bin/addax.py job/stream2doris.json
 ```
 
 输出类似如下：
@@ -141,7 +141,7 @@ bin/datax.py job/stream2doris.json
 }
 
 2021-02-23 15:22:57.886 [main] INFO  PerfTrace - PerfTrace traceId=job_-1, isEnable=false, priority=0
-2021-02-23 15:22:57.886 [main] INFO  JobContainer - DataX jobContainer starts job.
+2021-02-23 15:22:57.886 [main] INFO  JobContainer - Addax jobContainer starts job.
 2021-02-23 15:22:57.920 [job-0] INFO  JobContainer - Scheduler starts [1] taskGroups.
 2021-02-23 15:22:57.928 [taskGroup-0] INFO  TaskGroupContainer - taskGroupId=[0] start [2] channels for [2] tasks.
 2021-02-23 15:22:57.935 [taskGroup-0] INFO  Channel - Channel set byte_speed_limit to -1, No bps activated.
@@ -169,7 +169,7 @@ bin/datax.py job/stream2doris.json
 | password        |    否    | string | 无     | HTTP 签名验证密码 |
 | table           |    是    | string | 无     | 所选取的需要同步的表名|
 | column          |    否    | list | 无     |  所配置的表中需要同步的列名集合，详细描述见[rdbmswriter](rdbmswriter.md) ｜
-| batchSize       |    否    | int | 1024   | 定义了插件和数据库服务器端每次批量数据获取条数，调高该值可能导致 DataX 出现OOM或者目标数据库事务提交失败导致挂起 |
+| batchSize       |    否    | int | 1024   | 定义了插件和数据库服务器端每次批量数据获取条数，调高该值可能导致 Addax 出现OOM或者目标数据库事务提交失败导致挂起 |
 
 ### column
 

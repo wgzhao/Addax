@@ -2,13 +2,13 @@
 
 ## 1 快速介绍
 
-FtpWriter提供了向远程FTP文件写入CSV格式的一个或者多个文件，在底层实现上，FtpWriter将DataX传输协议下的数据转换为csv格式，并使用FTP相关的网络协议写出到远程FTP服务器。
+FtpWriter提供了向远程FTP文件写入CSV格式的一个或者多个文件，在底层实现上，FtpWriter将Addax传输协议下的数据转换为csv格式，并使用FTP相关的网络协议写出到远程FTP服务器。
 
 写入FTP文件内容存放的是一张逻辑意义上的二维表，例如CSV格式的文本信息。
 
 ## 2 功能与限制
 
-FtpWriter实现了从DataX协议转为FTP文件功能，FTP文件本身是无结构化数据存储，FtpWriter如下几个方面约定:
+FtpWriter实现了从Addax协议转为FTP文件功能，FTP文件本身是无结构化数据存储，FtpWriter如下几个方面约定:
 
 1. 支持且仅支持写入文本类型(不支持BLOB如视频数据)的文件，且要求文本中shema为一张二维表。
 2. 支持类CSV格式文件，自定义分隔符。
@@ -91,14 +91,14 @@ FtpWriter实现了从DataX协议转为FTP文件功能，FTP文件本身是无结
 描述：FtpWriter写入前数据清理处理模式：
 
 1. `truncate`，写入前清理目录下一fileName前缀的所有文件。
-2. `append`，写入前不做任何处理，DataX FtpWriter直接使用filename写入，并保证文件名不冲突。
+2. `append`，写入前不做任何处理，Addax FtpWriter直接使用filename写入，并保证文件名不冲突。
 3. `nonConflict`，如果目录下有fileName前缀的文件，直接报错。
 
 ### 3.3 类型转换
 
-FTP文件本身不提供数据类型，该类型是DataX FtpWriter定义：
+FTP文件本身不提供数据类型，该类型是Addax FtpWriter定义：
 
-| DataX 内部类型 | FTP文件 数据类型            |
+| Addax 内部类型 | FTP文件 数据类型            |
 | -------------- | --------------------------- |
 | Long           | Long -> 字符串序列化表示    |
 | Double         | Double -> 字符串序列化表示  |
