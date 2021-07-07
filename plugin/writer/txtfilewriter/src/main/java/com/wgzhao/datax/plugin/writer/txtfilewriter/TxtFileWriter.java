@@ -42,7 +42,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Objects;
 import java.util.Set;
-import java.util.UUID;
 
 import static com.wgzhao.datax.plugin.storage.writer.Key.DATE_FORMAT;
 import static com.wgzhao.datax.plugin.storage.writer.Key.FILE_NAME;
@@ -67,58 +66,40 @@ public class TxtFileWriter
         {
             this.writerSliceConfig = this.getPluginJobConf();
             this.validateParameter();
-            String dateFormatOld = this.writerSliceConfig
-                    .getString(FORMAT);
-            String dateFormatNew = this.writerSliceConfig
-                    .getString(DATE_FORMAT);
+            String dateFormatOld = this.writerSliceConfig.getString(FORMAT);
+            String dateFormatNew = this.writerSliceConfig.getString(DATE_FORMAT);
             if (null == dateFormatNew) {
-                this.writerSliceConfig
-                        .set(DATE_FORMAT,
-                                dateFormatOld);
+                this.writerSliceConfig.set(DATE_FORMAT, dateFormatOld);
             }
             if (null != dateFormatOld) {
                 LOG.warn("您使用format配置日期格式化, 这是不推荐的行为, 请优先使用dateFormat配置项, 两项同时存在则使用dateFormat.");
             }
-            StorageWriterUtil
-                    .validateParameter(this.writerSliceConfig);
+            StorageWriterUtil.validateParameter(this.writerSliceConfig);
         }
 
         private void validateParameter()
         {
-            this.writerSliceConfig
-                    .getNecessaryValue(
-                            FILE_NAME,
-                            TxtFileWriterErrorCode.REQUIRED_VALUE);
+            this.writerSliceConfig.getNecessaryValue(FILE_NAME, TxtFileWriterErrorCode.REQUIRED_VALUE);
 
-            String path = this.writerSliceConfig.getNecessaryValue(Key.PATH,
-                    TxtFileWriterErrorCode.REQUIRED_VALUE);
+            String path = this.writerSliceConfig.getNecessaryValue(Key.PATH, TxtFileWriterErrorCode.REQUIRED_VALUE);
 
             try {
                 // warn: 这里用户需要配一个目录
                 File dir = new File(path);
                 if (dir.isFile()) {
-                    throw DataXException
-                            .asDataXException(
-                                    TxtFileWriterErrorCode.ILLEGAL_VALUE,
-                                    String.format(
-                                            "您配置的path: [%s] 不是一个合法的目录, 请您注意文件重名, 不合法目录名等情况.",
-                                            path));
+                    throw DataXException.asDataXException(
+                            TxtFileWriterErrorCode.ILLEGAL_VALUE,
+                            String.format("您配置的path: [%s] 不是一个合法的目录, 请您注意文件重名, 不合法目录名等情况.", path));
                 }
                 if (!dir.exists()) {
                     boolean createdOk = dir.mkdirs();
                     if (!createdOk) {
-                        throw DataXException
-                                .asDataXException(
-                                        TxtFileWriterErrorCode.CONFIG_INVALID_EXCEPTION,
-                                        String.format("您指定的文件路径 : [%s] 创建失败.",
-                                                path));
+                        throw DataXException.asDataXException(TxtFileWriterErrorCode.CONFIG_INVALID_EXCEPTION, String.format("您指定的文件路径 : [%s] 创建失败.", path));
                     }
                 }
             }
             catch (SecurityException se) {
-                throw DataXException.asDataXException(
-                        TxtFileWriterErrorCode.SECURITY_NOT_ENOUGH,
-                        String.format("您没有权限创建文件路径 : [%s] ", path), se);
+                throw DataXException.asDataXException(TxtFileWriterErrorCode.SECURITY_NOT_ENOUGH, String.format("您没有权限创建文件路径 : [%s] ", path), se);
             }
         }
 
@@ -126,29 +107,21 @@ public class TxtFileWriter
         public void prepare()
         {
             String path = this.writerSliceConfig.getString(Key.PATH);
-            String fileName = this.writerSliceConfig
-                    .getString(FILE_NAME);
-            String writeMode = this.writerSliceConfig
-                    .getString(WRITE_MODE);
+            String fileName = this.writerSliceConfig.getString(FILE_NAME);
+            String writeMode = this.writerSliceConfig.getString(WRITE_MODE);
 
             File dir = new File(path);
             //path is exists or not ?
             if (!dir.exists()) {
-                throw DataXException.asDataXException(
-                        TxtFileWriterErrorCode.PATH_NOT_VALID, String.format("您配置的路径 [%s] 不存在", path)
-                );
+                throw DataXException.asDataXException(TxtFileWriterErrorCode.PATH_NOT_VALID, String.format("您配置的路径 [%s] 不存在", path));
             }
             // path is directory or not ?
             if (!dir.isDirectory()) {
-                throw DataXException.asDataXException(
-                        TxtFileWriterErrorCode.PAHT_NOT_DIR, String.format("您配置的路径 [%s] 不是文件夹", path)
-                );
+                throw DataXException.asDataXException(TxtFileWriterErrorCode.PAHT_NOT_DIR, String.format("您配置的路径 [%s] 不是文件夹", path));
             }
             // path can writer it ?
             if (!dir.canWrite()) {
-                throw DataXException.asDataXException(
-                        TxtFileWriterErrorCode.WRITE_FILE_ERROR, String.format("您配置的路径 [%s] 没有写入权限", path)
-                );
+                throw DataXException.asDataXException(TxtFileWriterErrorCode.WRITE_FILE_ERROR, String.format("您配置的路径 [%s] 没有写入权限", path));
             }
             // truncate option handler
             if ("truncate".equals(writeMode)) {
@@ -164,21 +137,13 @@ public class TxtFileWriter
                     }
                 }
                 catch (NullPointerException npe) {
-                    throw DataXException
-                            .asDataXException(
-                                    TxtFileWriterErrorCode.WRITE_FILE_ERROR,
-                                    String.format("您配置的目录清空时出现空指针异常 : [%s]",
-                                            path), npe);
+                    throw DataXException.asDataXException(TxtFileWriterErrorCode.WRITE_FILE_ERROR, String.format("您配置的目录清空时出现空指针异常 : [%s]", path), npe);
                 }
                 catch (IllegalArgumentException iae) {
-                    throw DataXException.asDataXException(
-                            TxtFileWriterErrorCode.SECURITY_NOT_ENOUGH,
-                            String.format("您配置的目录参数异常 : [%s]", path));
+                    throw DataXException.asDataXException(TxtFileWriterErrorCode.SECURITY_NOT_ENOUGH, String.format("您配置的目录参数异常 : [%s]", path));
                 }
                 catch (IOException e) {
-                    throw DataXException.asDataXException(
-                            TxtFileWriterErrorCode.WRITE_FILE_ERROR,
-                            String.format("无法清空目录 : [%s]", path), e);
+                    throw DataXException.asDataXException(TxtFileWriterErrorCode.WRITE_FILE_ERROR, String.format("无法清空目录 : [%s]", path), e);
                 }
             }
             else if ("append".equals(writeMode)) {
@@ -187,51 +152,33 @@ public class TxtFileWriter
             else if ("nonConflict".equals(writeMode)) {
                 LOG.info("由于您配置了writeMode nonConflict, 开始检查 [{}] 下面的内容", path);
                 // warn: check two times about exists, mkdirs
-                try {
-                    if (dir.exists()) {
-                        // fileName is not null
-                        FilenameFilter filter = new PrefixFileFilter(fileName);
-                        File[] filesWithFileNamePrefix = dir.listFiles(filter);
-                        assert filesWithFileNamePrefix != null;
-                        if (filesWithFileNamePrefix.length > 0) {
-                            List<String> allFiles = new ArrayList<>();
-                            for (File eachFile : filesWithFileNamePrefix) {
-                                allFiles.add(eachFile.getName());
-                            }
-                            LOG.error("冲突文件列表为: [{}]", StringUtils.join(allFiles, ","));
-                            throw DataXException
-                                    .asDataXException(
-                                            TxtFileWriterErrorCode.ILLEGAL_VALUE,
-                                            String.format(
-                                                    "您配置的path: [%s] 目录不为空, 下面存在其他文件或文件夹.",
-                                                    path));
-                        }
+                if (dir.exists()) {
+                    if (!dir.canRead()) {
+                        throw DataXException.asDataXException(TxtFileWriterErrorCode.SECURITY_NOT_ENOUGH, String.format("您没有权限查看目录 : [%s]", path));
                     }
-                    else {
-                        boolean createdOk = dir.mkdirs();
-                        if (!createdOk) {
-                            throw DataXException
-                                    .asDataXException(
-                                            TxtFileWriterErrorCode.CONFIG_INVALID_EXCEPTION,
-                                            String.format(
-                                                    "您指定的文件路径 : [%s] 创建失败.",
-                                                    path));
+                    // fileName is not null
+                    FilenameFilter filter = new PrefixFileFilter(fileName);
+                    File[] filesWithFileNamePrefix = dir.listFiles(filter);
+                    assert filesWithFileNamePrefix != null;
+                    if (filesWithFileNamePrefix.length > 0) {
+                        List<String> allFiles = new ArrayList<>();
+                        for (File eachFile : filesWithFileNamePrefix) {
+                            allFiles.add(eachFile.getName());
                         }
+                        LOG.error("冲突文件列表为: [{}]", StringUtils.join(allFiles, ","));
+                        throw DataXException.asDataXException(TxtFileWriterErrorCode.ILLEGAL_VALUE, String.format("您配置的path: [%s] 目录不为空, 下面存在其他文件或文件夹.", path));
                     }
                 }
-                catch (SecurityException se) {
-                    throw DataXException.asDataXException(
-                            TxtFileWriterErrorCode.SECURITY_NOT_ENOUGH,
-                            String.format("您没有权限查看目录 : [%s]", path));
+                else {
+                    boolean createdOk = dir.mkdirs();
+                    if (!createdOk) {
+                        throw DataXException.asDataXException(TxtFileWriterErrorCode.CONFIG_INVALID_EXCEPTION, String.format("您指定的文件路径 : [%s] 创建失败.", path));
+                    }
                 }
             }
             else {
-                throw DataXException
-                        .asDataXException(
-                                TxtFileWriterErrorCode.ILLEGAL_VALUE,
-                                String.format(
-                                        "仅支持 truncate, append, nonConflict 三种模式, 不支持您配置的 writeMode 模式 : [%s]",
-                                        writeMode));
+                throw DataXException.asDataXException(TxtFileWriterErrorCode.ILLEGAL_VALUE,
+                        String.format("仅支持 truncate, append, nonConflict 三种模式, 不支持您配置的 writeMode 模式 : [%s]", writeMode));
             }
         }
 
@@ -250,11 +197,6 @@ public class TxtFileWriter
         @Override
         public List<Configuration> split(int mandatoryNumber)
         {
-            LOG.info("begin do split...");
-            List<Configuration> writerSplitConfigs = new ArrayList<>();
-            String filePrefix = this.writerSliceConfig
-                    .getString(FILE_NAME);
-
             Set<String> allFiles;
             String path = null;
             try {
@@ -263,38 +205,9 @@ public class TxtFileWriter
                 allFiles = new HashSet<>(Arrays.asList(Objects.requireNonNull(dir.list())));
             }
             catch (SecurityException se) {
-                throw DataXException.asDataXException(
-                        TxtFileWriterErrorCode.SECURITY_NOT_ENOUGH,
-                        String.format("您没有权限查看目录 : [%s]", path));
+                throw DataXException.asDataXException(TxtFileWriterErrorCode.SECURITY_NOT_ENOUGH, String.format("您没有权限查看目录 : [%s]", path));
             }
-
-            String fileSuffix;
-            for (int i = 0; i < mandatoryNumber; i++) {
-                // handle same file name
-
-                Configuration splitedTaskConfig = this.writerSliceConfig
-                        .clone();
-
-                String fullFileName;
-                fileSuffix = UUID.randomUUID().toString().replace('-', '_');
-                fullFileName = String.format("%s__%s", filePrefix, fileSuffix);
-                while (allFiles.contains(fullFileName)) {
-                    fileSuffix = UUID.randomUUID().toString().replace('-', '_');
-                    fullFileName = String.format("%s__%s", filePrefix,
-                            fileSuffix);
-                }
-                allFiles.add(fullFileName);
-
-                splitedTaskConfig
-                        .set(FILE_NAME,
-                                fullFileName);
-
-                LOG.info("splited write file name:[{}]", fullFileName);
-
-                writerSplitConfigs.add(splitedTaskConfig);
-            }
-            LOG.info("end do split.");
-            return writerSplitConfigs;
+            return StorageWriterUtil.split(writerSliceConfig, allFiles, mandatoryNumber);
         }
     }
 
@@ -304,24 +217,29 @@ public class TxtFileWriter
         private static final Logger LOG = LoggerFactory.getLogger(Task.class);
 
         private Configuration writerSliceConfig;
-
         private String path;
-
         private String fileName;
+        // add correspond compress suffix if compress is present
+        private String suffix;
 
         @Override
         public void init()
         {
             this.writerSliceConfig = this.getPluginJobConf();
             this.path = this.writerSliceConfig.getString(Key.PATH);
-            this.fileName = this.writerSliceConfig
-                    .getString(FILE_NAME);
+            this.fileName = this.writerSliceConfig.getString(FILE_NAME);
         }
 
         @Override
         public void prepare()
         {
-            //
+            String compress = this.writerSliceConfig.getString("compress").toLowerCase();
+            if ("gzip".equals(compress)) {
+                suffix = ".gz";
+            }
+            else if ("bzip2".equals(compress) || "bzip".equals(compress)) {
+                suffix = ".bz2";
+            }
         }
 
         @Override
@@ -337,19 +255,13 @@ public class TxtFileWriter
                 boolean isSucess = newFile.createNewFile();
                 assert isSucess;
                 outputStream = new FileOutputStream(newFile);
-                StorageWriterUtil.writeToStream(lineReceiver,
-                        outputStream, this.writerSliceConfig, this.fileName,
-                        this.getTaskPluginCollector());
+                StorageWriterUtil.writeToStream(lineReceiver, outputStream, this.writerSliceConfig, this.fileName, this.getTaskPluginCollector());
             }
             catch (SecurityException se) {
-                throw DataXException.asDataXException(
-                        TxtFileWriterErrorCode.SECURITY_NOT_ENOUGH,
-                        String.format("您没有权限创建文件  : [%s]", this.fileName));
+                throw DataXException.asDataXException(TxtFileWriterErrorCode.SECURITY_NOT_ENOUGH, String.format("您没有权限创建文件  : [%s]", this.fileName));
             }
             catch (IOException ioe) {
-                throw DataXException.asDataXException(
-                        TxtFileWriterErrorCode.WRITE_FILE_IO_ERROR,
-                        String.format("无法创建待写文件 : [%s]", this.fileName), ioe);
+                throw DataXException.asDataXException(TxtFileWriterErrorCode.WRITE_FILE_IO_ERROR, String.format("无法创建待写文件 : [%s]", this.fileName), ioe);
             }
             finally {
                 IOUtils.closeQuietly(outputStream, null);
@@ -362,12 +274,10 @@ public class TxtFileWriter
             boolean isEndWithSeparator = false;
             switch (IOUtils.DIR_SEPARATOR) {
                 case IOUtils.DIR_SEPARATOR_UNIX:
-                    isEndWithSeparator = this.path.endsWith(String
-                            .valueOf(IOUtils.DIR_SEPARATOR));
+                    isEndWithSeparator = this.path.endsWith(String.valueOf(IOUtils.DIR_SEPARATOR));
                     break;
                 case IOUtils.DIR_SEPARATOR_WINDOWS:
-                    isEndWithSeparator = this.path.endsWith(String
-                            .valueOf(IOUtils.DIR_SEPARATOR_WINDOWS));
+                    isEndWithSeparator = this.path.endsWith(String.valueOf(IOUtils.DIR_SEPARATOR_WINDOWS));
                     break;
                 default:
                     break;
@@ -375,7 +285,7 @@ public class TxtFileWriter
             if (!isEndWithSeparator) {
                 this.path = this.path + IOUtils.DIR_SEPARATOR;
             }
-            return String.format("%s%s", this.path, this.fileName);
+            return String.format("%s%s%s", this.path, this.fileName, this.suffix);
         }
 
         @Override
