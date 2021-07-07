@@ -14,18 +14,6 @@
     <dependencies>
         <dependency>
             <groupId>com.wgzhao.addax</groupId>
-            <artifactId>plugin-storage-util</artifactId>
-            <version>${project.version}</version>
-        </dependency>
-
-        <dependency>
-            <groupId>org.jamel.dbf</groupId>
-            <artifactId>dbf-reader</artifactId>
-            <version>0.3.0</version>
-        </dependency>
-
-        <dependency>
-            <groupId>com.wgzhao.addax</groupId>
             <artifactId>addax-common</artifactId>
             <version>${project.version}</version>
             <exclusions>
@@ -34,6 +22,18 @@
                     <groupId>org.slf4j</groupId>
                 </exclusion>
             </exclusions>
+        </dependency>
+
+        <dependency>
+            <groupId>com.wgzhao.addax</groupId>
+            <artifactId>plugin-storage-util</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.jamel.dbf</groupId>
+            <artifactId>dbf-reader</artifactId>
+            <version>0.3.0</version>
         </dependency>
 
         <dependency>

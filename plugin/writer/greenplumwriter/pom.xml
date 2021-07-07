@@ -8,31 +8,14 @@
     </parent>
 
     <artifactId>greenplumwriter</artifactId>
-    <name>greenplumwriter</name>
-    <packaging>jar</packaging>
     <description>writer data into Greenplum Database</description>
+    <packaging>jar</packaging>
 
     <dependencies>
         <dependency>
             <groupId>com.wgzhao.addax</groupId>
             <artifactId>addax-common</artifactId>
             <version>${project.version}</version>
-            <exclusions>
-                <exclusion>
-                    <artifactId>slf4j-log4j12</artifactId>
-                    <groupId>org.slf4j</groupId>
-                </exclusion>
-            </exclusions>
-        </dependency>
-
-        <dependency>
-            <groupId>org.slf4j</groupId>
-            <artifactId>slf4j-api</artifactId>
-        </dependency>
-
-        <dependency>
-            <groupId>ch.qos.logback</groupId>
-            <artifactId>logback-classic</artifactId>
         </dependency>
 
         <dependency>
@@ -42,11 +25,17 @@
         </dependency>
 
         <dependency>
+            <groupId>ch.qos.logback</groupId>
+            <artifactId>logback-classic</artifactId>
+        </dependency>
+
+        <dependency>
             <groupId>org.postgresql</groupId>
             <artifactId>postgresql</artifactId>
             <version>${postgresql.jdbc.version}</version>
         </dependency>
     </dependencies>
+
     <build>
         <plugins>
             <!-- assembly plugin -->

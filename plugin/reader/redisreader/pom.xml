@@ -10,6 +10,8 @@
     </parent>
 
     <artifactId>redisreader</artifactId>
+    <description>Redis Reader</description>
+    <packaging>jar</packaging>
 
     <dependencies>
         <dependency>
@@ -28,6 +30,12 @@
             <groupId>com.moilioncircle</groupId>
             <artifactId>redis-replicator</artifactId>
             <version>3.5.4</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>org.slf4j</groupId>
+                    <artifactId>slf4j-api</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
 
         <dependency>
@@ -37,9 +45,21 @@
         </dependency>
 
         <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-api</artifactId>
+            <version>${slf4j.version}</version>
+        </dependency>
+
+        <dependency>
             <groupId>redis.clients</groupId>
             <artifactId>jedis</artifactId>
             <version>3.6.1</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>org.slf4j</groupId>
+                    <artifactId>slf4j-api</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
 
     </dependencies>

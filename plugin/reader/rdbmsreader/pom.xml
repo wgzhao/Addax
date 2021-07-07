@@ -1,18 +1,19 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
     <parent>
         <artifactId>addax-all</artifactId>
         <groupId>com.wgzhao.addax</groupId>
         <version>3.2.6-SNAPSHOT</version>
         <relativePath>../../../pom.xml</relativePath>
     </parent>
-    <modelVersion>4.0.0</modelVersion>
 
     <artifactId>rdbmsreader</artifactId>
-    <name>rdbmsreader</name>
+    <description>RDBMS Reader</description>
     <packaging>jar</packaging>
 
     <dependencies>
+
         <dependency>
             <groupId>com.wgzhao.addax</groupId>
             <artifactId>addax-common</artifactId>
@@ -24,6 +25,13 @@
                 </exclusion>
             </exclusions>
         </dependency>
+
+        <dependency>
+            <groupId>com.wgzhao.addax</groupId>
+            <artifactId>plugin-rdbms-util</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+
         <dependency>
             <groupId>com.ibm.db2.jcc</groupId>
             <artifactId>db2jcc</artifactId>
@@ -35,13 +43,8 @@
             <artifactId>slf4j-api</artifactId>
         </dependency>
 
-        <dependency>
-            <groupId>com.wgzhao.addax</groupId>
-            <artifactId>plugin-rdbms-util</artifactId>
-            <version>${project.version}</version>
-        </dependency>
-
     </dependencies>
+
     <build>
         <plugins>
             <plugin>
@@ -64,4 +67,5 @@
             </plugin>
         </plugins>
     </build>
+
 </project>

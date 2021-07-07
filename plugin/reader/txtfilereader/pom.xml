@@ -9,21 +9,15 @@
     </parent>
 
     <artifactId>txtfilereader</artifactId>
-    <name>txtfilereader</name>
     <description>TxtFileReader提供了本地读取TEXT功能，并可以根据用户配置的类型进行类型转换，建议开发、测试环境使用。</description>
     <packaging>jar</packaging>
 
     <dependencies>
+
         <dependency>
             <groupId>com.wgzhao.addax</groupId>
             <artifactId>addax-common</artifactId>
             <version>${project.version}</version>
-            <exclusions>
-                <exclusion>
-                    <artifactId>slf4j-log4j12</artifactId>
-                    <groupId>org.slf4j</groupId>
-                </exclusion>
-            </exclusions>
         </dependency>
 
         <dependency>
@@ -33,21 +27,23 @@
         </dependency>
 
         <dependency>
-            <groupId>org.apache.commons</groupId>
-            <artifactId>commons-compress</artifactId>
-            <version>1.20</version>
+            <groupId>commons-beanutils</groupId>
+            <artifactId>commons-beanutils</artifactId>
+            <version>1.9.4</version>
+            <scope>compile</scope>
         </dependency>
+
         <dependency>
             <groupId>net.sourceforge.javacsv</groupId>
             <artifactId>javacsv</artifactId>
             <version>2.0</version>
             <scope>compile</scope>
         </dependency>
+
         <dependency>
-            <groupId>commons-beanutils</groupId>
-            <artifactId>commons-beanutils</artifactId>
-            <version>1.9.4</version>
-            <scope>compile</scope>
+            <groupId>org.apache.commons</groupId>
+            <artifactId>commons-compress</artifactId>
+            <version>1.20</version>
         </dependency>
 
     </dependencies>
