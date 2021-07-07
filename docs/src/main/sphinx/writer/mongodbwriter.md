@@ -190,7 +190,7 @@ MongoDBWriter通过Datax框架获取Reader生成的数据，然后将Datax支持
 
 ## 4 类型转换
 
-| DataX 内部类型 | MongoDB 数据类型 |
+| Addax 内部类型 | MongoDB 数据类型 |
 | -------------- | ---------------- |
 | Long           | int, Long        |
 | Double         | double           |

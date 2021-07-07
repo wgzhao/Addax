@@ -11,7 +11,7 @@
         <fileSet>
             <directory>target/</directory>
             <includes>
-                <include>datax-transformer-${project.version}.jar</include>
+                <include>addax-transformer-${project.version}.jar</include>
             </includes>
             <outputDirectory>lib</outputDirectory>
         </fileSet>
@@ -23,7 +23,7 @@
             <outputDirectory>lib</outputDirectory>
             <scope>runtime</scope>
             <excludes>
-                <exclude>com.wgzhao.datax:datax-common</exclude>
+                <exclude>com.wgzhao.addax:addax-common</exclude>
             </excludes>
         </dependencySet>
     </dependencySets>

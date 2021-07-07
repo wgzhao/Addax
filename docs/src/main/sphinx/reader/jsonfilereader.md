@@ -2,11 +2,11 @@
 
 ## 1 快速介绍
 
-JsonFileReader 提供了读取本地文件系统数据存储的能力。在底层实现上，JsonFileReader获取本地文件数据，使用Jayway JsonPath抽取Json字符串，并转换为DataX传输协议传递给Writer。
+JsonFileReader 提供了读取本地文件系统数据存储的能力。在底层实现上，JsonFileReader获取本地文件数据，使用Jayway JsonPath抽取Json字符串，并转换为Addax传输协议传递给Writer。
 
 ## 2 功能与限制
 
-JsonFileReader实现了从本地文件读取数据并转为DataX协议的功能，本地文件是可以是Json数据格式的集合，对于DataX而言，JsonFileReader实现上类比TxtFileReader，有诸多相似之处。目前JsonFileReader支持功能如下：
+JsonFileReader实现了从本地文件读取数据并转为Addax协议的功能，本地文件是可以是Json数据格式的集合，对于Addax而言，JsonFileReader实现上类比TxtFileReader，有诸多相似之处。目前JsonFileReader支持功能如下：
 
 1. 支持且仅支持读取TXT的文件，且要求TXT中s内容必须符合json
 2. 支持列常量和Json的Key为空值
@@ -118,7 +118,7 @@ JsonFileReader实现了从本地文件读取数据并转为DataX协议的功能�
 - 当指定多个本地文件，JsonFileReader支持使用多线程进行数据抽取。线程并发数通过通道数指定。
 - 当指定通配符，JsonFileReader尝试遍历出多个文件信息。例如: 指定`/*` 代表读取/目录下所有的文件，指定`/bazhen/*` 代表读取bazhen目录下游所有的文件。 JsonFileReader目前只支持 `*` 作为文件通配符。
 
-特别需要注意的是，如果Path指定的路径下没有符合匹配的文件抽取，DataX将报错。
+特别需要注意的是，如果Path指定的路径下没有符合匹配的文件抽取，Addax将报错。
 
 #### column
 
@@ -128,9 +128,9 @@ JsonFileReader实现了从本地文件读取数据并转为DataX协议的功能�
 
 ### 3.3 类型转换
 
-本地文件本身不提供数据类型，该类型是DataX JsonFileReade定义：
+本地文件本身不提供数据类型，该类型是Addax JsonFileReade定义：
 
-| DataX 内部类型| 本地文件 数据类型    |
+| Addax 内部类型| 本地文件 数据类型    |
 | -------- | -----  |
 | Long     |Long |
 | Double   |Double|

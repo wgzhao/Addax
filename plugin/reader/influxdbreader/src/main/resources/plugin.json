@@ -1,6 +1,6 @@
 {
   "name": "influxdbreader",
-  "class": "com.wgzhao.datax.plugin.reader.influxdbreader.InfluxDBReader",
+  "class": "com.wgzhao.addax.plugin.reader.influxdbreader.InfluxDBReader",
   "description": "read from InfluxDB table",
   "developer": "wgzhao"
 }

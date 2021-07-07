@@ -87,7 +87,7 @@ CREATE TABLE kudu.default.users (
 执行下下面的命令进行数据采集 
 
 ```bash
-bin/datax.py job/stream2kudu.json
+bin/addax.py job/stream2kudu.json
 ```
 
 ## 参数说明

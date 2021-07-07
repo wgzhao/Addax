@@ -6,7 +6,7 @@ SqlServerReader插件实现了从SqlServer读取数据。在底层实现上，Sq
 
 ## 2 实现原理
 
-简而言之，SqlServerReader通过JDBC连接器连接到远程的SqlServer数据库，并根据用户配置的信息生成查询SELECT SQL语句并发送到远程SqlServer数据库，并将该SQL执行返回结果使用DataX自定义的数据类型拼装为抽象的数据集，并传递给下游Writer处理。
+简而言之，SqlServerReader通过JDBC连接器连接到远程的SqlServer数据库，并根据用户配置的信息生成查询SELECT SQL语句并发送到远程SqlServer数据库，并将该SQL执行返回结果使用Addax自定义的数据类型拼装为抽象的数据集，并传递给下游Writer处理。
 
 对于用户配置Table、Column、Where的信息，SqlServerReader将其拼接为SQL语句发送到SqlServer数据库；对于用户配置querySql信息，SqlServer直接将其发送到SqlServer数据库。
 
@@ -73,8 +73,8 @@ SqlServerReader插件实现了从SqlServer读取数据。在底层实现上，Sq
 | splitPk         |    否    | 无     | 使用splitPk代表的字段进行数据分片，详细描述见[rdbms](rdbmsreader.md)|
 | autoPk          |    否    | false | 是否自动猜测分片主键，`3.2.6` 版本引入 |
 | where           |    否    | 无     | 针对表的筛选条件 |
-| querySql        |    否    | 无     | 使用自定义的SQL而不是指定表来获取数据，当配置了这一项之后，DataX系统就会忽略 `table`，`column`这些配置项 |
-| fetchSize       |    否    | 1024   |  定义了插件和数据库服务器端每次批量数据获取条数，调高该值可能导致 DataX 出现OOM |
+| querySql        |    否    | 无     | 使用自定义的SQL而不是指定表来获取数据，当配置了这一项之后，Addax系统就会忽略 `table`，`column`这些配置项 |
+| fetchSize       |    否    | 1024   |  定义了插件和数据库服务器端每次批量数据获取条数，调高该值可能导致 Addax 出现OOM |
 
 ### 3.3 类型转换
 
@@ -82,7 +82,7 @@ SqlServerReader插件实现了从SqlServer读取数据。在底层实现上，Sq
 
 下面列出SqlServerReader针对SqlServer类型转换列表:
 
-| DataX 内部类型| SqlServer 数据类型    |
+| Addax 内部类型| SqlServer 数据类型    |
 | -------- | -----  |
 | Long     |bigint, int, smallint, tinyint|
 | Double   |float, decimal, real, numeric|

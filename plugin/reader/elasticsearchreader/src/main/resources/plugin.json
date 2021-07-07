@@ -1,6 +1,6 @@
 {
   "name": "elasticsearchreader",
-  "class": "com.wgzhao.datax.plugin.reader.elasticsearchreader.EsReader",
+  "class": "com.wgzhao.addax.plugin.reader.elasticsearchreader.EsReader",
   "description": "Retrieve data from ElasticSearch",
   "developer": "kesc"
 }

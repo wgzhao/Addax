@@ -13,7 +13,7 @@ InfluxDBWriter 插件实现了将数据写入 [InfluxDB](https://www.influxdata.
 
 ```bash
 # create database
-influx --execute "CREATE DATABASE datax"
+influx --execute "CREATE DATABASE addax"
 ```
 
 ### 创建 job 文件
@@ -61,8 +61,8 @@ influx --execute "CREATE DATABASE datax"
             "connection": [
               {
                 "endpoint": "http://localhost:8086",
-                "database": "datax",
-                "table": "datax_tbl"
+                "database": "addax",
+                "table": "addax_tbl"
               }
             ],
             "connTimeout": 15,
@@ -76,7 +76,7 @@ influx --execute "CREATE DATABASE datax"
               {"name":"user_name", "type":"string"},
               {"name":"salary", "type":"double"}
             ],
-            "preSql": ["delete from datax_tbl"],
+            "preSql": ["delete from addax_tbl"],
             "batchSize": 1024,
             "retentionPolicy": {"name":"one_day_only", "duration": "1d", "replication":1}
           }
@@ -92,7 +92,7 @@ influx --execute "CREATE DATABASE datax"
 执行下面的命令进行数据采集
 
 ```bash
-bin/datax.py job/stream2kudu.json
+bin/addax.py job/stream2kudu.json
 ```
 
 ##  参数说明

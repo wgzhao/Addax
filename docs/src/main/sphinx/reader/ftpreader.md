@@ -1,14 +1,14 @@
-# DataX FtpReader 说明
+# Addax FtpReader 说明
 
 ## 1 快速介绍
 
-FtpReader提供了读取远程FTP文件系统数据存储的能力。在底层实现上，FtpReader获取远程FTP文件数据，并转换为DataX传输协议传递给Writer。
+FtpReader提供了读取远程FTP文件系统数据存储的能力。在底层实现上，FtpReader获取远程FTP文件数据，并转换为Addax传输协议传递给Writer。
 
 **本地文件内容存放的是一张逻辑意义上的二维表，例如CSV格式的文本信息。**
 
 ## 2 功能与限制
 
-FtpReader实现了从远程FTP文件读取数据并转为DataX协议的功能，远程FTP文件本身是无结构化数据存储，对于DataX而言，FtpReader实现上类比TxtFileReader，有诸多相似之处。目前FtpReader支持功能如下：
+FtpReader实现了从远程FTP文件读取数据并转为Addax协议的功能，远程FTP文件本身是无结构化数据存储，对于Addax而言，FtpReader实现上类比TxtFileReader，有诸多相似之处。目前FtpReader支持功能如下：
 
 1. 支持且仅支持读取TXT的文件，且要求TXT中shema为一张二维表。
 
@@ -124,7 +124,7 @@ FtpReader实现了从远程FTP文件读取数据并转为DataX协议的功能，
 - 当指定单个远程FTP文件，FtpReader暂时只能使用单线程进行数据抽取。二期考虑在非压缩文件情况下针对单个File可以进行多线程并发读取 = 当指定多个远程FTP文件，FtpReader支持使用多线程进行数据抽取。线程并发数通过通道数指定
 - 当指定通配符，FtpReader尝试遍历出多个文件信息。例如: 指定 `/*` 代表读取/目录下所有的文件，指定 `/bazhen/*` 代表读取 bazhen 目录下游所有的文件。目前只支持 `*` 作为文件通配符。
 
-特别需要注意的是，DataX会将一个作业下同步的所有Text File视作同一张数据表。用户必须自己保证所有的File能够适配同一套schema信息。读取文件用户必须保证为类CSV格式，并且提供给DataX权限可读。 特别需要注意的是，如果Path指定的路径下没有符合匹配的文件抽取，DataX将报错。
+特别需要注意的是，Addax会将一个作业下同步的所有Text File视作同一张数据表。用户必须自己保证所有的File能够适配同一套schema信息。读取文件用户必须保证为类CSV格式，并且提供给Addax权限可读。 特别需要注意的是，如果Path指定的路径下没有符合匹配的文件抽取，Addax将报错。
 
 #### column
 
@@ -183,9 +183,9 @@ boolean captureRawRecord = true;
 
 ### 3.3 类型转换
 
-远程FTP文件本身不提供数据类型，该类型是DataX FtpReader定义：
+远程FTP文件本身不提供数据类型，该类型是Addax FtpReader定义：
 
-| DataX 内部类型 | 远程FTP文件 数据类型 |
+| Addax 内部类型 | 远程FTP文件 数据类型 |
 | -------------- | -------------------- |
 |                |
 | Long           | Long                 |

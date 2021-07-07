@@ -1,4 +1,4 @@
-# DataX HdfsWriter 插件文档
+# Addax HdfsWriter 插件文档
 
 ## 1 快速介绍
 
@@ -45,7 +45,7 @@ HdfsWriter提供向HDFS文件系统指定路径中写入 `TEXTFile` ， `ORCFile
           "parameter": {
             "column": [
               {
-                "value": "DataX",
+                "value": "Addax",
                 "type": "string"
               },
               {
@@ -186,7 +186,7 @@ HdfsWriter写入时的文件名，实际执行时会在该文件名后添加随�
 
 描述：hdfswriter写入前数据清理处理模式：
 
-- append，写入前不做任何处理，DataX hdfswriter直接使用filename写入，并保证文件名不冲突。
+- append，写入前不做任何处理，Addax hdfswriter直接使用filename写入，并保证文件名不冲突。
 - overwrite 如果写入目录存在数据，则先删除，后写入
 - nonConflict，如果目录下有fileName前缀的文件，直接报错。
 
@@ -234,7 +234,7 @@ Kerberos认证 keytab文件路径，绝对路径
 
 下面列出 HdfsWriter 针对 Hive 数据类型转换列表:
 
-| DataX 内部类型| HIVE 数据类型    |
+| Addax 内部类型| HIVE 数据类型    |
 | -------- | -----  |
 | Long     | TINYINT,SMALLINT,INT,INTEGER,BIGINT |
 | Double   | FLOAT,DOUBLE,DECIMAL |

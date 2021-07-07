@@ -2,7 +2,7 @@
 
 ## Transformer定义
 
-在数据同步、传输过程中，存在用户对于数据传输进行特殊定制化的需求场景，包括裁剪列、转换列等工作，可以借助ETL的T过程实现(Transformer)。DataX包含了完成的E(Extract)、T(Transformer)、L(Load)支持。
+在数据同步、传输过程中，存在用户对于数据传输进行特殊定制化的需求场景，包括裁剪列、转换列等工作，可以借助ETL的T过程实现(Transformer)。Addax包含了完成的E(Extract)、T(Transformer)、L(Load)支持。
 
 ## 运行模型
 
@@ -58,8 +58,8 @@ dx_pad(1,"r","4","A"), 如果column 1 的值为 xyz=> xyzA， 值为 xyzzzzz => 
 举例：
 
 ```
-dx_replace(1,"2","4","****")  column 1的value为“dataxTest”=>"da****est"
-dx_replace(1,"5","10","****")  column 1的value为“dataxTest”=>"data****"
+dx_replace(1,"2","4","****")  column 1的value为“addaxTest”=>"da****est"
+dx_replace(1,"5","10","****")  column 1的value为“addaxTest”=>"data****"
 ```
 
 ### dx_filter

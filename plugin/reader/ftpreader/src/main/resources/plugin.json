@@ -1,7 +1,7 @@
 {
   "name": "ftpreader",
-  "class": "com.wgzhao.datax.plugin.reader.ftpreader.FtpReader",
-  "description": "useScene: test. mechanism: use datax framework to transport data from txt file. warn: The more you know about the data, the less problems you encounter.",
+  "class": "com.wgzhao.addax.plugin.reader.ftpreader.FtpReader",
+  "description": "useScene: test. mechanism: use addax framework to transport data from txt file. warn: The more you know about the data, the less problems you encounter.",
   "developer": "alibaba"
 }
 

@@ -121,7 +121,7 @@ ElasticSearchReader 插件实现了从 [Elasticsearch](https://www.elastic.co/cn
 执行下面的命令进行采集
 
 ```shell
-bin/datax.py job/es2stream.json
+bin/addax.py job/es2stream.json
 ```
 
 其输出结果类似如下（输出记录数有删减)
@@ -194,15 +194,15 @@ bin/datax.py job/es2stream.json
 }
 
 2021-02-19 13:38:15.934 [main] INFO  PerfTrace - PerfTrace traceId=job_-1, isEnable=false, priority=0
-2021-02-19 13:38:15.934 [main] INFO  JobContainer - DataX jobContainer starts job.
+2021-02-19 13:38:15.934 [main] INFO  JobContainer - Addax jobContainer starts job.
 2021-02-19 13:38:15.937 [main] INFO  JobContainer - Set jobId = 0
 
 2017-05-25T11:22:33.000+08:00	19890604	hello world	1.1.1.1	long text	19890604	19890604	41.12,-71.34
 2017-05-25T11:22:33.000+08:00	19890604	hello world	1.1.1.1	long text	19890604	19890604	41.12,-71.34
 
 2021-02-19 13:38:19.845 [job-0] INFO  AbstractScheduler - Scheduler accomplished all tasks.
-2021-02-19 13:38:19.848 [job-0] INFO  JobContainer - DataX Writer.Job [streamwriter] do post work.
-2021-02-19 13:38:19.849 [job-0] INFO  JobContainer - DataX Reader.Job [elasticsearchreader] do post work.
+2021-02-19 13:38:19.848 [job-0] INFO  JobContainer - Addax Writer.Job [streamwriter] do post work.
+2021-02-19 13:38:19.849 [job-0] INFO  JobContainer - Addax Reader.Job [elasticsearchreader] do post work.
 2021-02-19 13:38:19.855 [job-0] INFO  JobContainer - PerfTrace not enable!
 2021-02-19 13:38:19.858 [job-0] INFO  StandAloneJobContainerCommunicator - Total 95 records, 8740 bytes | Speed 2.84KB/s, 31 records/s | Error 0 records, 0 bytes |  All Task WaitWriterTime 0.000s |  All Task WaitReaderTime 0.103s | Percentage 100.00%
 2021-02-19 13:38:19.861 [job-0] INFO  JobContainer -

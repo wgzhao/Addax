@@ -1,19 +1,21 @@
 <p align="center">
-    <img alt="DataX Logo" src="https://github.com/wgzhao/DataX/blob/master/docs/images/datax-logo.png?raw=true" width="205" />
+    <img alt="Addax Logo" src="https://github.com/wgzhao/Addax/blob/master/docs/images/logo.png?raw=true" width="205" />
 </p>
 <p align="center">DataX 是一个支持主流数据库的通用数据采集工具</p>
-<p align="center"><a href="https://datax.readthedocs.io">使用文档</a> 详细描述了如何安装部署和每个采集插件的使用方法 </p>
+<p align="center"><a href="https://addax.readthedocs.io">使用文档</a> 详细描述了如何安装部署和每个采集插件的使用方法 </p>
 <p align="center">
-   <a href="https://github.com/wgzhao/DataX/workflows/Maven%20Package/badge.svg">
-       <img src="https://github.com/wgzhao/DataX/workflows/Maven%20Package/badge.svg" alt="Maven Package" />
+   <a href="https://github.com/wgzhao/Addax/workflows/Maven%20Package/badge.svg">
+       <img src="https://github.com/wgzhao/Addax/workflows/Maven%20Package/badge.svg" alt="Maven Package" />
    </a>
-   <a href="https://datax.readthedocs.io/zh_CN/latest/?badge=latest">
-       <img src="https://readthedocs.org/projects/datax/badge/?version=latest" alt="Documentation Status" />
+   <a href="https://addax.readthedocs.io/zh_CN/latest/?badge=latest">
+       <img src="https://readthedocs.org/projects/addax/badge/?version=latest" alt="Documentation Status" />
    </a>
 </p>
 
 
-该项目从阿里的[DataX](https://github.com/alibaba/datax) 而来，经过了精简和改造，说明如下
+# 该项目正在从 DataX 更名为 Addax
+
+该项目从[DataX](https://github.com/alibaba/datax) 而来，经过了精简和改造，说明如下
 
 ## 当前稳定版
 
@@ -85,7 +87,7 @@
 | ClickHouse       | 支持 | 支持   | clickhousereader/clickhousewriter       |                                                                                      |
 | DB2              | 支持 | 支持   | rbdmsreader/rdbmswriter                 | 理论上支持，但未实际测试                                                             |
 | DBF              | 支持 | 支持   | dbffilereader/dbffilewriter             |                                                                                      |
-| ElasticSearch    | 支持 | 支持   | elasticsearchreader/elasticsearchwriter | 原始代码来自[@Kestrong](https://github.com/Kestrong/datax-elasticsearch)             |
+| ElasticSearch    | 支持 | 支持   | elasticsearchreader/elasticsearchwriter | 原始代码来自[@Kestrong](https://github.com/Kestrong/addax-elasticsearch)             |
 | FTP              | 支持 | 支持   | ftpreader/ftpwriter                     |                                                                                      |
 | HBase 1.x        | 支持 | 支持   | hbase11xreader/hbase11xwriter           | 直接操作HBase                                                                        |
 | HBase 1.x        | 支持 | 支持   | hbase11xsqlreader/hbase11xsqlwriter     | 通过[Phoenix](https://phoenix.apache.org)操作HBase                                   |
@@ -156,14 +158,14 @@ cd docs
 mvn clean package
 ```
 
-编译打包成功后，会在项目目录的`target/datax` 目录下创建一个 `datax-<version>`的 文件夹，其中 `<version` 表示版本。
+编译打包成功后，会在项目目录的`target/datax` 目录下创建一个 `addax-<version>`的 文件夹，其中 `<version` 表示版本。
 
 ### 开始第一个任务
 
 `job` 子目录包含了大量的任务样本，其中 `job.json` 可以作为冒烟测试，执行如下
 
 ```shell
-cd target/datax/datax-<version>
+cd target/datax/addax-<version>
 python bin/datax.py job/job.json
 ```
 
@@ -174,7 +176,7 @@ python bin/datax.py job/job.json
 ```
  bin/datax.py job/job.json
 
-DataX (DATAX-V3), From Alibaba !
+DataX (addax-V3), From Alibaba !
 Copyright (C) 2010-2017, Alibaba Group. All Rights Reserved.
 
 

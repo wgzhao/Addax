@@ -38,9 +38,8 @@
             <outputDirectory>plugin/reader/${project.artifactId}/libs</outputDirectory>
             <scope>runtime</scope>
             <excludes>
-                <exclude>com.wgzhao.datax:datax-common</exclude>
+                <exclude>com.wgzhao.addax:addax-common</exclude>
             </excludes>
         </dependencySet>
     </dependencySets>
 </assembly>
-

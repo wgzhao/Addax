@@ -44,7 +44,7 @@
             <directory>target/</directory>
             <fileMode>0644</fileMode>
             <includes>
-                <include>datax-core-${project.version}.jar</include>
+                <include>addax-core-${project.version}.jar</include>
             </includes>
             <outputDirectory>lib</outputDirectory>
         </fileSet>

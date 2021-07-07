@@ -9,7 +9,7 @@
 假定需要的读取的表的结构以及数据如下：
 
 ```sql
-CREATE TABLE ck_datax (
+CREATE TABLE ck_addax (
     c_int8 Int8,
     c_int16 Int16,
     c_int32 Int32,
@@ -30,7 +30,7 @@ CREATE TABLE ck_datax (
     c_enum Enum('hello' = 1, 'world'=2)
 ) ENGINE = MergeTree() ORDER BY (c_int8, c_int16) SETTINGS index_granularity = 8192;
 
-insert into ck_datax values(
+insert into ck_addax values(
     127,
     -32768,
     2147483647,
@@ -82,7 +82,7 @@ insert into ck_datax values(
             "connection": [
               {
                 "table": [
-                  "ck_datax"
+                  "ck_addax"
                 ],
                 "jdbcUrl": [
                   "jdbc:clickhouse://127.0.0.1:8123/default"
@@ -110,7 +110,7 @@ insert into ck_datax values(
 执行以下命令进行数据采集
 
 ```shell
-bin/datax.py job/clickhouse2stream.json
+bin/addax.py job/clickhouse2stream.json
 ```
 
 其输出信息如下（删除了非关键信息)
@@ -133,7 +133,7 @@ bin/datax.py job/clickhouse2stream.json
 								"jdbc:clickhouse://127.0.0.1:8123/"
 							],
 							"table":[
-								"ck_datax"
+								"ck_addax"
 							]
 						}
 					],
@@ -183,7 +183,7 @@ bin/datax.py job/clickhouse2stream.json
 | password        |    否    | string | 无     | 数据源指定用户名的密码 |
 | table           |    是    | array | 无     | 所选取的需要同步的表 ,当配置为多张表时，用户自己需保证多张表是同一schema结构|
 | column          |    是    | array | 无     |所配置的表中需要同步的列名集合, 使用JSON的数组描述字段信息。用户使用 `*` 代表默认使用所有列配置，例如 `"['*']"` |
-| splitPk         |    否    | string | 无     | 希望使用splitPk代表的字段进行数据分片,DataX因此会启动并发任务进行数据同步，这样可以大大提供数据同步的效能 |
+| splitPk         |    否    | string | 无     | 希望使用splitPk代表的字段进行数据分片,Addax因此会启动并发任务进行数据同步，这样可以大大提供数据同步的效能 |
 | autoPk          |    否    |  bool  | false | 是否自动猜测分片主键，`3.2.6` 版本引入 |
 | where           |    否    | string | 无     | 筛选条件 |
 | querySql        |    否    | array | 无     | 使用SQL查询而不是直接指定表的方式读取数据，当用户配置querySql时，ClickHouseReader直接忽略table、column、where条件的配置 |
@@ -194,7 +194,7 @@ bin/datax.py job/clickhouse2stream.json
 
 下面列出ClickHouseReader针对ClickHouse类型转换列表:
 
-| DataX 内部类型| ClickHouse 数据类型    |
+| Addax 内部类型| ClickHouse 数据类型    |
 | -------- | -----  |
 | Long     |Uint8, Uint16, Uint32, Uint64, Int8, Int16, Int32, Int64, Enum8, Enum16|
 | Double   |Float32, Float64, Decimal|

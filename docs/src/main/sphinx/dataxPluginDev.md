@@ -1,10 +1,10 @@
-# DataX插件开发宝典
+# Addax插件开发宝典
 
-本文面向DataX插件开发人员，尝试尽可能全面地阐述开发一个DataX插件所经过的历程，力求消除开发者的困惑，让插件开发变得简单。
+本文面向Addax插件开发人员，尝试尽可能全面地阐述开发一个Addax插件所经过的历程，力求消除开发者的困惑，让插件开发变得简单。
 
-## `DataX` 为什么要使用插件机制
+## `Addax` 为什么要使用插件机制
 
-从设计之初，`DataX` 就把异构数据源同步作为自身的使命，为了应对不同数据源的差异、同时提供一致的同步原语和扩展能力，`DataX` 自然而然地采用了 `框架` + `插件` 的模式：
+从设计之初，`Addax` 就把异构数据源同步作为自身的使命，为了应对不同数据源的差异、同时提供一致的同步原语和扩展能力，`Addax` 自然而然地采用了 `框架` + `插件` 的模式：
 
 - 插件只需关心数据的读取或者写入本身。
 - 而同步的共性问题，比如：类型转换、性能、统计，则交由框架来处理。
@@ -20,7 +20,7 @@
 
 插件开发者不用关心太多，基本只需要关注特定系统读和写，以及自己的代码在逻辑上是怎样被执行的，哪一个方法是在什么时候被调用的。在此之前，需要明确以下概念：
 
-- `Job`: `Job` 是DataX用以描述从一个源头到一个目的端的同步作业，是DataX数据同步的最小业务单元。比如：从一张mysql的表同步到odps的一个表的特定分区。
+- `Job`: `Job` 是Addax用以描述从一个源头到一个目的端的同步作业，是Addax数据同步的最小业务单元。比如：从一张mysql的表同步到odps的一个表的特定分区。
 - `Task`: `Task` 是为最大化而把 `Job` 拆分得到的最小执行单元。比如：读一张有1024个分表的mysql分库分表的 `Job`，拆分成1024个读 `Task`，用若干个并发执行。
 - `TaskGroup`:  描述的是一组 `Task` 集合。在同一个`TaskGroupContainer`执行下的`Task`集合称之为 `TaskGroup`
 - `JobContainer`:  `Job` 执行器，负责`Job`全局拆分、调度、前置语句和后置语句等工作的工作单元。类似Yarn中的JobTracker
@@ -30,11 +30,11 @@
 
 ### 物理执行模型
 
-框架为插件提供物理上的执行能力（线程）。`DataX` 框架有三种运行模式：
+框架为插件提供物理上的执行能力（线程）。`Addax` 框架有三种运行模式：
 
 - `Standalone`: 单进程运行，没有外部依赖。
 - `Local`: 单进程运行，统计信息、错误信息汇报到集中存储。
-- `Distrubuted`: 分布式多进程运行，依赖 `DataX Service` 服务。
+- `Distrubuted`: 分布式多进程运行，依赖 `Addax Service` 服务。
 
 当然，上述三种模式对插件的编写而言没有什么区别，你只需要避开一些小错误，插件就能够在单机/分布式之间无缝切换了。 当 `JobContainer` 和 `TaskGroupContainer` 运行在同一个进程内时，就是单机模式（`Standalone`和`Local`）；当它们分布在不同的进程中执行时，就是分布式（`Distributed`）模式。
 
@@ -134,13 +134,13 @@ public class SomeReader
 
 框架按照如下的顺序执行 `Job` 和 `Task` 的接口：
 
-![DataXReaderWriter](images/plugin_dev_guide_1.png)
+![AddaxReaderWriter](images/plugin_dev_guide_1.png)
 
 上图中，黄色表示`Job`部分的执行阶段，蓝色表示`Task`部分的执行阶段，绿色表示框架执行阶段。
 
 相关类关系如下：
 
-![DataX](images/plugin_dev_guide_2.png)
+![Addax](images/plugin_dev_guide_2.png)
 
 ### 插件定义
 
@@ -151,7 +151,7 @@ public class SomeReader
 ```json
 {
   "name": "mysqlwriter",
-  "class": "com.wgzhao.datax.plugin.writer.mysqlwriter.MysqlWriter",
+  "class": "com.wgzhao.addax.plugin.writer.mysqlwriter.MysqlWriter",
   "description": "Use Jdbc connect to database, execute insert sql.",
   "developer": "wgzhao"
 }
@@ -164,23 +164,23 @@ public class SomeReader
 
 ### 打包发布
 
-`DataX` 使用 `assembly` 打包，打包命令如下：
+`Addax` 使用 `assembly` 打包，打包命令如下：
 
 ```bash
 mvn clean package -DskipTests assembly:single
 ```
 
-`DataX`插件需要遵循统一的目录结构：
+`Addax`插件需要遵循统一的目录结构：
 
 ```ini
 ${DATAX_HOME}
 |-- bin
-|   `-- datax.py
+|   `-- addax.py
 |-- conf
 |   |-- core.json
 |   `-- logback.xml
 |-- lib
-|   `-- datax-core-dependencies.jar
+|   `-- addax-core-dependencies.jar
 `-- plugin
     |-- reader
     |   `-- mysqlreader
@@ -217,7 +217,7 @@ ${DATAX_HOME}
 
 ## 配置文件
 
-`DataX` 使用 `json` 作为配置文件的格式。一个典型的 `DataX` 任务配置如下：
+`Addax` 使用 `json` 作为配置文件的格式。一个典型的 `Addax` 任务配置如下：
 
 ```json
 {
@@ -266,11 +266,11 @@ ${DATAX_HOME}
 }
 ```
 
-`DataX` 框架有 `core.json` 配置文件，指定了框架的默认行为。任务的配置里头可以指定框架中已经存在的配置项，而且具有更高的优先级，会覆盖 `core.json` 中的默认值。
+`Addax` 框架有 `core.json` 配置文件，指定了框架的默认行为。任务的配置里头可以指定框架中已经存在的配置项，而且具有更高的优先级，会覆盖 `core.json` 中的默认值。
 
 **配置中`job.content.reader.parameter`的value部分会传给`Reader.Job`；`job.content.writer.parameter`的value部分会传给`Writer.Job`** ，`Reader.Job`和`Writer.Job`可以通过`super.getPluginJobConf()`来获取。
 
-`DataX`框架支持对特定的配置项进行RSA加密，例子中以`*`开头的项目便是加密后的值。 **配置项加密解密过程对插件是透明，插件仍然以不带`*`的key来查询配置和操作配置项** 。
+`Addax`框架支持对特定的配置项进行RSA加密，例子中以`*`开头的项目便是加密后的值。 **配置项加密解密过程对插件是透明，插件仍然以不带`*`的key来查询配置和操作配置项** 。
 
 #### 如何设计配置参数
 
@@ -314,9 +314,9 @@ ${DATAX_HOME}
 
 ### 如何使用`Configuration`类
 
-为了简化对json的操作，`DataX`提供了简单的DSL配合`Configuration`类使用。
+为了简化对json的操作，`Addax`提供了简单的DSL配合`Configuration`类使用。
 
-`Configuration`提供了常见的`get`, `带类型get`，`带默认值get`，`set`等读写配置项的操作，以及`clone`, `toJSON`等方法。配置项读写操作都需要传入一个`path`做为参数，这个`path`就是`DataX`定义的DSL。语法有两条：
+`Configuration`提供了常见的`get`, `带类型get`，`带默认值get`，`set`等读写配置项的操作，以及`clone`, `toJSON`等方法。配置项读写操作都需要传入一个`path`做为参数，这个`path`就是`Addax`定义的DSL。语法有两条：
 
 1. 子map用`.key`表示，`path`的第一个点省略。
 2. 数组元素用`[index]`表示。
@@ -395,7 +395,7 @@ public interface Record
 
 ## 类型转换
 
-为了规范源端和目的端类型转换操作，保证数据不失真，DataX支持六种内部数据类型：
+为了规范源端和目的端类型转换操作，保证数据不失真，Addax支持六种内部数据类型：
 
 - `Long`：定点数(Int、Short、Long、BigInteger等)。
 - `Double`：浮点数(Float、Double、BigDecimal(无限精度)等)。
@@ -410,7 +410,7 @@ public interface Record
 
 ![Columns](images/plugin_dev_guide_3.png)
 
-DataX的内部类型在实现上会选用不同的java类型：
+Addax的内部类型在实现上会选用不同的java类型：
 
 | 内部类型 | 实现类型 | 备注 |
 | ----- | -------- | ----- |

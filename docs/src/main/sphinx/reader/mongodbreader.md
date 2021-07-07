@@ -125,7 +125,7 @@ MongoDBReader通过Datax框架从MongoDB并行的读取数据，通过主控的J
 
 #### 5 类型转换
 
-| DataX 内部类型 | MongoDB 数据类型 |
+| Addax 内部类型 | MongoDB 数据类型 |
 | -------------- | ---------------- |
 | Long           | int, Long        |
 | Double         | double           |

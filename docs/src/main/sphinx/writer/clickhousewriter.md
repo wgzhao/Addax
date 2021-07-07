@@ -10,7 +10,7 @@ ClickHouseWriter 插件实现了写入数据ClickHouse。在底层实现上，Cl
 
 假定要读取的表结构及数据如下：
 ```sql
-CREATE TABLE ck_datax (
+CREATE TABLE ck_addax (
     c_int8 Int8,
     c_int16 Int16,
     c_int32 Int32,
@@ -31,7 +31,7 @@ CREATE TABLE ck_datax (
     c_enum Enum('hello' = 1, 'world'=2)
 ) ENGINE = MergeTree() ORDER BY (c_int8, c_int16) SETTINGS index_granularity = 8192;
 
-insert into ck_datax values(
+insert into ck_addax values(
     127,
     -32768,
     2147483647,
@@ -55,7 +55,7 @@ insert into ck_datax values(
 要写入的表采取和读取表结构相同，其建表语句如下：
 
 ```sql
-create table ck_datax_writer as ck_datax;
+create table ck_addax_writer as ck_addax;
 ```
 
 ## 配置
@@ -82,7 +82,7 @@ create table ck_datax_writer as ck_datax;
             "connection": [
               {
                 "table": [
-                  "ck_datax_writer"
+                  "ck_addax_writer"
                 ],
                 "jdbcUrl": "jdbc:clickhouse://127.0.0.1:8123/default"
               }
@@ -102,7 +102,7 @@ create table ck_datax_writer as ck_datax;
                 "jdbcUrl": [
                   "jdbc:clickhouse://127.0.0.1:8123/"
                 ],
-                "table":["ck_datax"]
+                "table":["ck_addax"]
               }
             ]
           }
@@ -120,7 +120,7 @@ create table ck_datax_writer as ck_datax;
 执行以下命令进行数据采集
 
 ```shell
-bin/datax.py job/clickhouse2clickhouse.json
+bin/addax.py job/clickhouse2clickhouse.json
 ```
 
 ## 参数说明

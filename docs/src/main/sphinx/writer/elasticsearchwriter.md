@@ -183,7 +183,7 @@
 | settings         |    否    | 无      | 创建index时候的settings, 与elasticsearch官方相同                          |
 | splitter         |    否    | `,`     | 如果插入数据是array，就使用指定分隔符                                     |
 | column           |    是    | 无      | elasticsearch所支持的字段类型，文档中给出的样例中包含了全部支持的字段类型 |
-| dynamic          |    否    | false   | 不使用datax的mappings，使用es自己的自动mappings                           |
+| dynamic          |    否    | false   | 不使用addax的mappings，使用es自己的自动mappings                           |
 
 ## 4 约束限制
 

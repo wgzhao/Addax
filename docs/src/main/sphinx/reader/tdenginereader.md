@@ -72,7 +72,7 @@ TDengine 数据自带了一个演示数据库 [taosdemo](https://www.taosdata.co
 执行以下命令进行数据采集
 
 ```shell
-bin/datax.py job/tdengine2stream.json
+bin/addax.py job/tdengine2stream.json
 ```
 
 命令输出类似如下：
@@ -120,7 +120,7 @@ bin/datax.py job/tdengine2stream.json
 }
 
 2021-02-20 15:32:23.277 [main] INFO  PerfTrace - PerfTrace traceId=job_-1, isEnable=false, priority=0
-2021-02-20 15:32:23.278 [main] INFO  JobContainer - DataX jobContainer starts job.
+2021-02-20 15:32:23.278 [main] INFO  JobContainer - Addax jobContainer starts job.
 2021-02-20 15:32:23.281 [main] INFO  JobContainer - Set jobId = 0
 java.library.path:/usr/java/packages/lib/amd64:/usr/lib64:/lib64:/lib:/usr/lib
 ....
@@ -161,14 +161,14 @@ java.library.path:/usr/java/packages/lib/amd64:/usr/lib64:/lib64:/lib:/usr/lib
 | table           |    是    | list | 无     | 所选取的需要同步的表名,使用JSON数据格式，当配置为多张表时，用户自己需保证多张表是同一表结构 |
 | column          |    是    | list | 无     |  所配置的表中需要同步的列名集合，详细描述[rdbmreader](rdbmsreader.md) ｜
 | where           |    否    | string | 无     | 针对表的筛选条件 |
-| querySql        |    否    | list | 无     | 使用自定义的SQL而不是指定表来获取数据，当配置了这一项之后，DataX系统就会忽略 `table`，`column`这些配置项 |
+| querySql        |    否    | list | 无     | 使用自定义的SQL而不是指定表来获取数据，当配置了这一项之后，Addax系统就会忽略 `table`，`column`这些配置项 |
 
 
 ## 类型转换
 
 目前 TDenginereader 支持 TDengine 所有类型，具体如下
 
-| DataX 内部类型| TDengine 数据类型    |
+| Addax 内部类型| TDengine 数据类型    |
 | -------- | -----  |
 | Long     | SMALLINT, TINYINT, INT, BIGINT, TIMESTAMP |
 | Double   | FLOAT, DOUBLE|

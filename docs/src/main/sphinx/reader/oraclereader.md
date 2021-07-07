@@ -6,7 +6,7 @@ OracleReader插件实现了从Oracle读取数据。在底层实现上，OracleRe
 
 ## 2 实现原理
 
-简而言之，OracleReader通过JDBC连接器连接到远程的Oracle数据库，并根据用户配置的信息生成查询SELECT SQL语句并发送到远程Oracle数据库， 并将该SQL执行返回结果使用DataX自定义的数据类型拼装为抽象的数据集，并传递给下游Writer处理。
+简而言之，OracleReader通过JDBC连接器连接到远程的Oracle数据库，并根据用户配置的信息生成查询SELECT SQL语句并发送到远程Oracle数据库， 并将该SQL执行返回结果使用Addax自定义的数据类型拼装为抽象的数据集，并传递给下游Writer处理。
 
 对于用户配置Table、Column、Where的信息，OracleReader将其拼接为SQL语句发送到Oracle数据库；对于用户配置querySql信息，Oracle直接将其发送到Oracle数据库。
 
@@ -70,11 +70,11 @@ OracleReader插件实现了从Oracle读取数据。在底层实现上，OracleRe
 | password  |    否    | 无     | 数据源指定用户名的密码                                                                                                                                                      |
 | table     |    是    | 无     | 所选取的需要同步的表名,使用JSON数据格式，当配置为多张表时，用户自己需保证多张表是同一表结构                                                                                 |
 | column    |    是    | 无     | 所配置的表中需要同步的列名集合，详细描述见[rdbmsreader](rdbmsreader.md)                                                                                                     |
-| splitPk   |    否    | 无     | 使用splitPk代表的字段进行数据分片，DataX因此会启动并发任务进行数据同步，这样可以大大提供数据同步的效能                                                                      |
+| splitPk   |    否    | 无     | 使用splitPk代表的字段进行数据分片，Addax因此会启动并发任务进行数据同步，这样可以大大提供数据同步的效能                                                                      |
 | autoPk    |    否    | false | 是否自动猜测分片主键，`3.2.6` 版本引入 |
 | where     |    否    | 无     | 针对表的筛选条件                                                                                                                                                            |
-| querySql  |    否    | 无     | 使用自定义的SQL而不是指定表来获取数据，当配置了这一项之后，DataX系统就会忽略 `table`，`column`这些配置项                                                                    |
-| fetchSize |    否    | 1024   | 定义了插件和数据库服务器端每次批量数据获取条数，调高该值可能导致 DataX 出现OOM                                                                                              |
+| querySql  |    否    | 无     | 使用自定义的SQL而不是指定表来获取数据，当配置了这一项之后，Addax系统就会忽略 `table`，`column`这些配置项                                                                    |
+| fetchSize |    否    | 1024   | 定义了插件和数据库服务器端每次批量数据获取条数，调高该值可能导致 Addax 出现OOM                                                                                              |
 | session   |    否    | 无     | 针对本地连接,修改会话配置,详见下文                                                                                                                                          |
 
 #### session
@@ -98,7 +98,7 @@ OracleReader插件实现了从Oracle读取数据。在底层实现上，OracleRe
 
 下面列出OracleReader针对Oracle类型转换列表:
 
-| DataX 内部类型 | Oracle 数据类型                                                                                                                                                                                               |
+| Addax 内部类型 | Oracle 数据类型                                                                                                                                                                                               |
 | -------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | Long           | NUMBER, INTEGER, INT, SMALLINT                                                                                                                                                                                |
 | Double         | NUMERIC, DECIMAL, FLOAT, DOUBLE PRECISION, REAL                                                                                                                                                               |

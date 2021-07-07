@@ -1,6 +1,6 @@
 {
   "name": "doriswriter",
-  "class": "com.wgzhao.datax.plugin.writer.doriswriter.DorisWriter",
+  "class": "com.wgzhao.addax.plugin.writer.doriswriter.DorisWriter",
   "description": "writer data into DorisDB",
   "developer": "wgzhao"
 }

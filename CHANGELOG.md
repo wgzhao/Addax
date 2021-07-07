@@ -246,5 +246,5 @@ This is an emergency fix version to fix a serious problem in a previous release 
    
 ### hdfswriter
 
-*  Use keyword `parquest` indicates support parquet format,  old keyword `par` is not used
+*  Use keyword `parquet` indicates support parquet format,  old keyword `par` is not used
 

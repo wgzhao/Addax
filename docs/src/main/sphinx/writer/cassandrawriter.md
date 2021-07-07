@@ -132,7 +132,7 @@ CassandraWriter插件实现了向Cassandra写入数据。在底层实现上，Ca
 
 下面列出CassandraReader针对Cassandra类型转换列表:
 
-| DataX 内部类型 | Cassandra 数据类型                                                     |
+| Addax 内部类型 | Cassandra 数据类型                                                     |
 | -------------- | ---------------------------------------------------------------------- |
 | Long           | int, tinyint, smallint,varint,bigint,time                              |
 | Double         | float, double, decimal                                                 |

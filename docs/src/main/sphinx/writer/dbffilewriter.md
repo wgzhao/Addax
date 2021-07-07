@@ -2,7 +2,7 @@
 
 ## 1 快速介绍
 
-DbfFileWriter提供了向本地文件写入类dbf格式的一个或者多个表文件。DbfFileWriter服务的用户主要在于DataX开发、测试同学。
+DbfFileWriter提供了向本地文件写入类dbf格式的一个或者多个表文件。DbfFileWriter服务的用户主要在于Addax开发、测试同学。
 
 写入本地文件内容存放的是一张dbf表，例如dbf格式的文件信息。
 
@@ -26,7 +26,7 @@ DbfFileWriter提供了向本地文件写入类dbf格式的一个或者多个表�
           "parameter": {
             "column": [
               {
-                "value": "DataX",
+                "value": "Addax",
                 "type": "string"
               },
               {
@@ -107,7 +107,7 @@ DbfFileWriter提供了向本地文件写入类dbf格式的一个或者多个表�
 DbfFileWriter写入前数据清理处理模式：
 
 - truncate，写入前清理目录下一fileName前缀的所有文件。
-- append，写入前不做任何处理，DataX DbfFileWriter直接使用filename写入，并保证文件名不冲突。
+- append，写入前不做任何处理，Addax DbfFileWriter直接使用filename写入，并保证文件名不冲突。
 - nonConflict，如果目录下有fileName前缀的文件，直接报错。
 
 ### 3.3 类型转换

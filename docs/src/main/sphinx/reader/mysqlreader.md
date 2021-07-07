@@ -4,7 +4,7 @@ MysqlReader插件实现了从Mysql读取数据。在底层实现上，MysqlReade
 
 不同于其他关系型数据库，MysqlReader不支持FetchSize
 
-MysqlReader通过JDBC连接器连接到远程的Mysql数据库，并根据用户配置的信息生成查询SELECT SQL语句，然后发送到远程Mysql数据库，并将该SQL执行返回结果使用DataX自定义的数据类型拼装为抽象的数据集，并传递给下游Writer处理。
+MysqlReader通过JDBC连接器连接到远程的Mysql数据库，并根据用户配置的信息生成查询SELECT SQL语句，然后发送到远程Mysql数据库，并将该SQL执行返回结果使用Addax自定义的数据类型拼装为抽象的数据集，并传递给下游Writer处理。
 
 对于用户配置Table、Column、Where的信息，MysqlReader将其拼接为SQL语句发送到Mysql数据库；对于用户配置querySql信息，MysqlReader直接将其发送到Mysql数据库。
 
@@ -13,7 +13,7 @@ MysqlReader通过JDBC连接器连接到远程的Mysql数据库，并根据用户
 我们在 MySQL 的 test 库上创建如下表：
 
 ```sql
-CREATE TABLE datax_reader
+CREATE TABLE addax_reader
 (
     c_bigint     bigint,
     c_varchar    varchar(100),
@@ -44,7 +44,7 @@ CREATE TABLE datax_reader
 然后插入下面一条记录
 
 ```sql
-INSERT INTO datax_reader
+INSERT INTO addax_reader
 VALUES (2E18,
         'a varchar data',
         '2021-12-12 12:12:12',
@@ -95,7 +95,7 @@ VALUES (2E18,
             "connection": [
               {
                 "table": [
-                  "datax_reader"
+                  "addax_reader"
                 ],
                 "jdbcUrl": [
                   "jdbc:mysql://127.0.0.1:3306/test"
@@ -124,7 +124,7 @@ VALUES (2E18,
 执行以下命令进行数据采集
 
 ```shell
-bin/datax.py job/mysql2stream.json
+bin/addax.py job/mysql2stream.json
 ```
 
 ## 参数说明
@@ -140,11 +140,11 @@ bin/datax.py job/mysql2stream.json
 | splitPk         |    否    | string | 无     | 使用splitPk代表的字段进行数据分片，详细描述见[rdbmreader](rdbmsreader.md)|
 | autoPk          |    否    |  bool       | false | 是否自动猜测分片主键，`3.2.6` 版本引入 |
 | where           |    否    | string | 无     | 针对表的筛选条件 |
-| querySql        |    否    | list | 无     | 使用自定义的SQL而不是指定表来获取数据，当配置了这一项之后，DataX系统就会忽略 `table`，`column`这些配置项 |
+| querySql        |    否    | list | 无     | 使用自定义的SQL而不是指定表来获取数据，当配置了这一项之后，Addax系统就会忽略 `table`，`column`这些配置项 |
 
 ### driver
 
-当前 DataX 采用的 MySQL JDBC 驱动为 8.0 以上版本，驱动类名使用的 `com.mysql.cj.jdbc.Driver`，而不是 `com.mysql.jdbc.Driver`。 如果你需要采集的 MySQL 服务低于 `5.6`，需要使用到 `Connector/J 5.1` 驱动，则可以采取下面的步骤：
+当前 Addax 采用的 MySQL JDBC 驱动为 8.0 以上版本，驱动类名使用的 `com.mysql.cj.jdbc.Driver`，而不是 `com.mysql.jdbc.Driver`。 如果你需要采集的 MySQL 服务低于 `5.6`，需要使用到 `Connector/J 5.1` 驱动，则可以采取下面的步骤：
 
 **替换插件内置的驱动**
 
@@ -164,7 +164,7 @@ bin/datax.py job/mysql2stream.json
 
 下面列出MysqlReader针对Mysql类型转换列表:
 
-| DataX 内部类型| MySQL 数据类型    |
+| Addax 内部类型| MySQL 数据类型    |
 | -------- | -----  |
 | Long     |int, tinyint, smallint, mediumint, int, bigint|
 | Double   |float, double, decimal|
@@ -176,9 +176,9 @@ bin/datax.py job/mysql2stream.json
 请注意:
 
 * 除上述罗列字段类型外，其他类型均不支持
-* `tinyint(1)` DataX视作为整形
-* `year` DataX视作为字符串类型
-* `bit` DataX属于未定义行为
+* `tinyint(1)` Addax视作为整形
+* `year` Addax视作为字符串类型
+* `bit` Addax属于未定义行为
 
 ### 3.4 数据库编码问题
 

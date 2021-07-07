@@ -190,7 +190,7 @@ HttpReader 插件实现了读取Restful API 数据的能力
             "username": "user",
             "password": "passw0rd",
             "headers": {
-                "X-Powered-by": "DataX"
+                "X-Powered-by": "Addax"
             }
           }
         },
@@ -213,7 +213,7 @@ HttpReader 插件实现了读取Restful API 数据的能力
 执行以下命令，进行采集
 
 ```shell
-bin/datax.py job/httpreader2stream.json
+bin/addax.py job/httpreader2stream.json
 ```
 
 上述命令的输出结果大致如下：
@@ -287,7 +287,7 @@ bin/datax.py job/httpreader2stream.json
 }
 
 2021-01-20 09:07:41.926 [main] INFO  PerfTrace - PerfTrace traceId=job_-1, isEnable=false, priority=0
-2021-01-20 09:07:41.927 [main] INFO  JobContainer - DataX jobContainer starts job.
+2021-01-20 09:07:41.927 [main] INFO  JobContainer - Addax jobContainer starts job.
 2021-01-20 09:07:41.928 [main] INFO  JobContainer - Set jobId = 0
 2021-01-20 09:07:42.002 [taskGroup-0] INFO  TaskGroupContainer - taskGroup[0] taskId[0] attemptCount[1] is started
 

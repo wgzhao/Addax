@@ -1,6 +1,6 @@
 {
   "name": "hbase20xreader",
-  "class": "com.wgzhao.datax.plugin.reader.hbase20xreader.Hbase20xReader",
+  "class": "com.wgzhao.addax.plugin.reader.hbase20xreader.Hbase20xReader",
   "description": "useScene: prod. mechanism: Scan to read data.",
   "developer": "alibaba"
 }

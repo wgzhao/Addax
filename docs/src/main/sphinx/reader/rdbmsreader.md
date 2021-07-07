@@ -77,11 +77,11 @@ RDBMSReader 插件支持从传统 RDBMS 读取数据。这是一个通用关系�
 | password        |    否    |  string     | 无     | 数据源指定用户名的密码 |
 | table           |    是    |  array     | 无     | 所选取的需要同步的表名,使用JSON数据格式，当配置为多张表时，用户自己需保证多张表是同一表结构 |
 | column          |    是    |  array     | 无     |  所配置的表中需要同步的列名集合，详细描述见后 |
-| splitPk         |    否    |  string     | 无     | 使用splitPk代表的字段进行数据分片，DataX因此会启动并发任务进行数据同步，这样可以大大提供数据同步的效能，注意事项见后|
+| splitPk         |    否    |  string     | 无     | 使用splitPk代表的字段进行数据分片，Addax因此会启动并发任务进行数据同步，这样可以大大提供数据同步的效能，注意事项见后|
 | autoPk          |    否    |  bool       | false | 是否自动猜测分片主键，`3.2.6` 版本引入，详见后面描述  |
 | where           |    否    |  string     | 无     | 针对表的筛选条件 |
-| querySql        |    否    |  string     | 无     | 使用自定义的SQL而不是指定表来获取数据，当配置了这一项之后，DataX系统就会忽略 `table`，`column`这些配置项 |
-| fetchSize       |    否    |   int      | 1024   |  定义了插件和数据库服务器端每次批量数据获取条数，调高该值可能导致 DataX 出现OOM |
+| querySql        |    否    |  string     | 无     | 使用自定义的SQL而不是指定表来获取数据，当配置了这一项之后，Addax系统就会忽略 `table`，`column`这些配置项 |
+| fetchSize       |    否    |   int      | 1024   |  定义了插件和数据库服务器端每次批量数据获取条数，调高该值可能导致 Addax 出现OOM |
 
 ### jdbcUrl
 
@@ -129,7 +129,7 @@ Column必须显示填写，不允许为空！
 
 #### splitPk
 
-RdbmsReader 进行数据抽取时，如果指定splitPk，表示用户希望使用splitPk代表的字段进行数据分片，DataX 因此会启动并发任务进行数据同步，这样可以大大提供数据同步的效能。
+RdbmsReader 进行数据抽取时，如果指定splitPk，表示用户希望使用splitPk代表的字段进行数据分片，Addax 因此会启动并发任务进行数据同步，这样可以大大提供数据同步的效能。
 
 推荐 splitPk 用户使用表主键，因为表主键通常情况下比较均匀，因此切分出来的分片也不容易出现数据热点。
 
@@ -154,7 +154,7 @@ splitPk如果不填写，将视作用户不对单表进行切分，RDBMSReader �
 
 目前 RDBMSReader 支持大部分通用得关系数据库类型如数字、字符等，但也存在部分个别类型没有支持的情况，请注意检查你的类型，根据具体的数据库做选择。
 
-| DataX 内部类型| RDBMS 数据类型    |
+| Addax 内部类型| RDBMS 数据类型    |
 | -------- | -----  |
 | Long     |int, tinyint, smallint, mediumint, int, bigint|
 | Double   |float, double, decimal|

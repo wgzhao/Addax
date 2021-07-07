@@ -1,6 +1,6 @@
 {
   "name": "hbase11xsqlwriter",
-  "class": "com.wgzhao.datax.plugin.writer.hbase11xsqlwriter.HbaseSQLWriter",
+  "class": "com.wgzhao.addax.plugin.writer.hbase11xsqlwriter.HbaseSQLWriter",
   "description": "useScene: prod. mechanism: use hbase sql UPSERT to put data, index tables will be updated too.",
   "developer": "alibaba"
 }

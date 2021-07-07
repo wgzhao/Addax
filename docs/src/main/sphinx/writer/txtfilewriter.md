@@ -2,13 +2,13 @@
 
 ## 1 快速介绍
 
-TxtFileWriter提供了向本地文件写入类CSV格式的一个或者多个表文件。TxtFileWriter服务的用户主要在于DataX开发、测试同学。
+TxtFileWriter提供了向本地文件写入类CSV格式的一个或者多个表文件。TxtFileWriter服务的用户主要在于Addax开发、测试同学。
 
 **写入本地文件内容存放的是一张逻辑意义上的二维表，例如CSV格式的文本信息。**
 
 ## 2 功能与限制
 
-TxtFileWriter实现了从DataX协议转为本地TXT文件功能，本地文件本身是无结构化数据存储，TxtFileWriter如下几个方面约定:
+TxtFileWriter实现了从Addax协议转为本地TXT文件功能，本地文件本身是无结构化数据存储，TxtFileWriter如下几个方面约定:
 
 1. 支持且仅支持写入 TXT的文件，且要求TXT中shema为一张二维表。
 2. 支持类CSV格式文件，自定义分隔符。
@@ -113,9 +113,9 @@ TxtFileWriter实现了从DataX协议转为本地TXT文件功能，本地文件�
 
 ### 3.3 类型转换
 
-本地文件本身不提供数据类型，该类型是DataX TxtFileWriter定义：
+本地文件本身不提供数据类型，该类型是Addax TxtFileWriter定义：
 
-| DataX 内部类型 | 本地文件 数据类型 |
+| Addax 内部类型 | 本地文件 数据类型 |
 | -------------- | ----------------- |
 |                |
 | Long           | Long              |
