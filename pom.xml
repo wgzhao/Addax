@@ -7,7 +7,7 @@
     <version>3.2.6-SNAPSHOT</version>
 
     <name>addax-all</name>
-    <description>Addax generical ETL tool</description>
+    <description>Addax generic ETL tool</description>
     <packaging>pom</packaging>
     <url>https://addax.readthedocs.io</url>
 
@@ -18,15 +18,6 @@
             <distribution>repo</distribution>
         </license>
     </licenses>
-
-    <developers>
-        <developer>
-            <id>wgzhao</id>
-            <name>Steven Zhao</name>
-            <email>wgzhao@gmail.com</email>
-            <timezone>+8</timezone>
-        </developer>
-    </developers>
 
     <scm>
         <connection>scm:git:https://github.com/wgzhao/addax.git</connection>
@@ -143,6 +134,26 @@
 
     </modules>
 
+    <developers>
+        <developer>
+            <id>wgzhao</id>
+            <name>Steven Zhao</name>
+            <email>wgzhao@gmail.com</email>
+            <timezone>+8</timezone>
+        </developer>
+    </developers>
+
+    <distributionManagement>
+        <snapshotRepository>
+            <id>ossrh</id>
+            <url>https://oss.sonatype.org/content/repositories/snapshots</url>
+        </snapshotRepository>
+        <repository>
+            <id>ossrh</id>
+            <url>https://oss.sonatype.org/service/local/staging/deploy/maven2/</url>
+        </repository>
+    </distributionManagement>
+
     <dependencyManagement>
         <dependencies>
             <dependency>
@@ -150,13 +161,8 @@
                 <artifactId>addax-common</artifactId>
                 <version>${project.version}</version>
             </dependency>
-            <!-- DataX external dependencies -->
-            <dependency>
-                <groupId>com.alibaba</groupId>
-                <artifactId>fastjson</artifactId>
-                <version>${fastjson.version}</version>
-            </dependency>
 
+            <!-- Addax external dependencies -->
             <dependency>
                 <groupId>ch.qos.logback</groupId>
                 <artifactId>logback-classic</artifactId>
@@ -170,6 +176,12 @@
             </dependency>
 
             <dependency>
+                <groupId>com.alibaba</groupId>
+                <artifactId>fastjson</artifactId>
+                <version>${fastjson.version}</version>
+            </dependency>
+
+            <dependency>
                 <groupId>org.slf4j</groupId>
                 <artifactId>slf4j-api</artifactId>
                 <version>${slf4j.version}</version>
@@ -180,7 +192,7 @@
 
     <build>
         <plugins>
-            <plugin>
+        <!--    <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-enforcer-plugin</artifactId>
                 <version>3.0.0-M3</version>
@@ -192,12 +204,11 @@
                             <pomSectionPriorities>
                                 modelVersion,parent,groupId,artifactId,version,name,description,packaging,url,inceptionYear,licenses,scm,properties,modules
                             </pomSectionPriorities>
-                            <dependenciesGroupIdPriorities>com.alibaba, com.wgzhao.addax
-                            </dependenciesGroupIdPriorities>
+                            <dependenciesGroupIdPriorities>com.wgzhao.addax</dependenciesGroupIdPriorities>
                             <dependenciesOrderBy>scope,groupId,artifactId</dependenciesOrderBy>
                             <dependenciesScopePriorities>compile,runtime,provided,test</dependenciesScopePriorities>
                             <dependencyManagementOrderBy>groupId,artifactId</dependencyManagementOrderBy>
-                            <dependencyManagementGroupIdPriorities>com.alibaba</dependencyManagementGroupIdPriorities>
+                            <dependencyManagementGroupIdPriorities>com.wgzhao</dependencyManagementGroupIdPriorities>
                         </compound>
                         <requireUpperBoundDeps>
                             <excludes combine.children="append">
@@ -216,7 +227,7 @@
                         <version>2.0.0</version>
                     </dependency>
                 </dependencies>
-            </plugin>
+            </plugin>-->
 
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
@@ -232,7 +243,7 @@
                 <artifactId>maven-assembly-plugin</artifactId>
                 <version>3.3.0</version>
                 <configuration>
-                    <finalName>datax</finalName>
+                    <finalName>addax</finalName>
                     <descriptors>
                         <descriptor>package.xml</descriptor>
                     </descriptors>
@@ -337,14 +348,4 @@
             </plugin>
         </plugins>
     </build>
-    <distributionManagement>
-        <snapshotRepository>
-            <id>ossrh</id>
-            <url>https://oss.sonatype.org/content/repositories/snapshots</url>
-        </snapshotRepository>
-        <repository>
-            <id>ossrh</id>
-            <url>https://oss.sonatype.org/service/local/staging/deploy/maven2/</url>
-        </repository>
-    </distributionManagement>
 </project>
