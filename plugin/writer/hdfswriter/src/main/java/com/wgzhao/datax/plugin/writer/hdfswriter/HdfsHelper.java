@@ -71,6 +71,7 @@ import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.math.BigDecimal;
+import java.nio.charset.StandardCharsets;
 import java.sql.Timestamp;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -722,7 +723,7 @@ public class HdfsHelper
                     case STRING:
                     case VARCHAR:
                     case CHAR:
-                        byte[] buffer = record.getColumn(i).asBytes();
+                        byte[] buffer = record.getColumn(i).getRawData().toString().getBytes(StandardCharsets.UTF_8);
                         ((BytesColumnVector) col).setRef(row, buffer, 0, buffer.length);
                         break;
                     case BINARY:
@@ -793,5 +794,46 @@ public class HdfsHelper
             deleteDir(path.getParent());
             throw DataXException.asDataXException(HdfsWriterErrorCode.Write_FILE_IO_ERROR, e);
         }
+    }
+
+    /**
+     * 根据不同压缩算法，返回对应的文件名后缀
+     * @param compress compress alg name
+     * @return file suffix
+     */
+    public String getCompressFileSuffix(String compress)
+    {
+        String suffix = null;
+        if (compress == null ) {
+            return suffix;
+        }
+        switch(compress.toLowerCase()) {
+            case "snappy":
+                suffix =  ".snappy";
+                break;
+            case "bzip2":
+            case "bzip":
+                suffix =  ".bz2";
+                break;
+            case "lzo":
+                suffix =  ".lzo";
+                break;
+            case "gzip":
+                suffix = ".gz";
+                break;
+            case "lz4":
+                suffix = ".lz4";
+                break;
+            case "zlib":
+            case "deflate":
+                suffix = ".deflate";
+                break;
+            case "zstd":
+                suffix = ".zstd";
+                break;
+            default:
+                break;
+        }
+        return suffix;
     }
 }
