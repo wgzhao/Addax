@@ -455,7 +455,7 @@ public class SingleTableSplitUtil
     private static List<String> splitStringPk(Configuration configuration, String table, String where, String minVal, String maxVal, int splitNum, String pkName)
     {
         List<String> rangeList = new ArrayList<>();
-        String splitSql = null;
+        String splitSql;
         if (splitNum < 2) {
             rangeList.add(String.format("%s >= '%s' AND %s <= '%s'", pkName, minVal, pkName, maxVal));
             return rangeList;
@@ -466,7 +466,7 @@ public class SingleTableSplitUtil
         if (dataBaseType == DataBaseType.MySql) {
             splitSql = String.format("SELECT %1$s from (SELECT %1$s FROM %2$s WHERE %3$s ORDER BY RAND() LIMIT %4$d) T ORDER BY %1$s ASC", pkName, table, where, splitNum - 1);
         } else if (dataBaseType == DataBaseType.PostgreSQL) {
-            splitSql = String.format("SELECT %s FROM %s TABLESAMPLE SYSTEM(10) REPEATABLE(200) ORDER BY ID  LIMIT %d", pkName, table, splitNum - 1);
+            splitSql = String.format("SELECT %s FROM %s TABLESAMPLE SYSTEM(10) REPEATABLE(200) ORDER BY %s LIMIT %d", pkName, table, pkName, splitNum - 1);
         } else {
             return RdbmsRangeSplitWrap.splitAndWrap(minVal, maxVal, splitNum, pkName, "'", dataBaseType);
         }
@@ -482,10 +482,10 @@ public class SingleTableSplitUtil
             }
             String preVal = minVal;
             for(String val: values) {
-                rangeList.add(String.format("%1$s >='%2$s' AND %1%s <'%3$s' ", pkName, preVal, val));
+                rangeList.add(String.format("%1$s >='%2$s' AND %1$s <'%3$s' ", pkName, preVal, val));
                 preVal = val;
             }
-            rangeList.add(String.format("%1$s >='%2$s' AND %1%s <='%3$s' ", pkName, preVal, maxVal));
+            rangeList.add(String.format("%1$s >='%2$s' AND %1$s <='%3$s' ", pkName, preVal, maxVal));
             return rangeList;
         }
         catch (SQLException throwables) {
