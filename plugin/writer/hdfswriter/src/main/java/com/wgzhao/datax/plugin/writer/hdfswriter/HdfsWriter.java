@@ -471,11 +471,16 @@ public class HdfsWriter
 
             String defaultFS = this.writerSliceConfig.getString(Key.DEFAULT_FS);
             this.fileType = this.writerSliceConfig.getString(Key.FILE_TYPE).toUpperCase();
-            //得当的已经是绝对路径，eg：hdfs://10.101.204.12:9000/user/hive/warehouse/writer.db/text/test.textfile
-            this.fileName = this.writerSliceConfig.getString(Key.FILE_NAME);
 
             hdfsHelper = new HdfsHelper();
             hdfsHelper.getFileSystem(defaultFS, writerSliceConfig);
+            //得当的已经是绝对路径，eg：hdfs://10.101.204.12:9000/user/hive/warehouse/writer.db/text/test.textfile
+            String suffix = hdfsHelper.getCompressFileSuffix(this.writerSliceConfig.getString(Key.COMPRESS));
+            if (suffix == null) {
+                this.fileName = this.writerSliceConfig.getString(Key.FILE_NAME);
+            } else {
+                this.fileName = this.writerSliceConfig.getString(Key.FILE_NAME) + suffix;
+            }
         }
 
         @Override
@@ -490,18 +495,15 @@ public class HdfsWriter
             LOG.info("write to file : [{}]", this.fileName);
             if ("TEXT".equals(fileType)) {
                 //写TEXT FILE
-                hdfsHelper.textFileStartWrite(lineReceiver, this.writerSliceConfig, this.fileName,
-                        this.getTaskPluginCollector());
+                hdfsHelper.textFileStartWrite(lineReceiver, this.writerSliceConfig, this.fileName, this.getTaskPluginCollector());
             }
             else if ("ORC".equals(fileType)) {
                 //写ORC FILE
-                hdfsHelper.orcFileStartWrite(lineReceiver, this.writerSliceConfig, this.fileName,
-                        this.getTaskPluginCollector());
+                hdfsHelper.orcFileStartWrite(lineReceiver, this.writerSliceConfig, this.fileName, this.getTaskPluginCollector());
             }
             else if ("PARQUET".equals(fileType)) {
                 //写Parquet FILE
-                hdfsHelper.parquetFileStartWrite(lineReceiver, this.writerSliceConfig, this.fileName,
-                        this.getTaskPluginCollector());
+                hdfsHelper.parquetFileStartWrite(lineReceiver, this.writerSliceConfig, this.fileName, this.getTaskPluginCollector());
             }
 
             LOG.info("end do write");
