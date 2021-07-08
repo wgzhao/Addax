@@ -13,7 +13,7 @@
     <packaging>jar</packaging>
 
     <properties>
-        <phoenix.version>4.14.3-HBase-1.4</phoenix.version>
+        <phoenix.version>4.15.0-HBase-1.5</phoenix.version>
         <commons-codec.version>1.15</commons-codec.version>
         <protobuf.version>2.5.0</protobuf.version>
     </properties>
