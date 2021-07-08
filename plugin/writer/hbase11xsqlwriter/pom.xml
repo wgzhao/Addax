@@ -23,23 +23,18 @@
             <groupId>com.wgzhao.addax</groupId>
             <artifactId>addax-common</artifactId>
             <version>${project.version}</version>
+            <scope>compile</scope>
         </dependency>
 
         <dependency>
             <groupId>org.apache.hbase</groupId>
             <artifactId>hbase-client</artifactId>
-            <version>1.4.6</version>
-        </dependency>
-
-        <dependency>
-            <groupId>org.apache.hbase</groupId>
-            <artifactId>hbase-common</artifactId>
-            <version>1.4.6</version>
+            <version>1.4.13</version>
         </dependency>
 
         <dependency>
             <groupId>org.apache.phoenix</groupId>
-            <artifactId>phoenix-client</artifactId>
+            <artifactId>phoenix-core</artifactId>
             <version>${phoenix.version}</version>
             <exclusions>
                 <exclusion>
