@@ -359,6 +359,7 @@ public class StreamReader
             String columnValue = eachColumnConfig.getString(Constant.VALUE);
             if ("null".equals(columnValue)) {
                 columnValue = null;
+                return null;
             }
             Type columnType = Type.valueOf(eachColumnConfig.getString(Constant.TYPE).toUpperCase());
             String columnMixup = eachColumnConfig.getString(Constant.RANDOM);

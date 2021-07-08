@@ -233,11 +233,11 @@ public class TxtFileWriter
         @Override
         public void prepare()
         {
-            String compress = this.writerSliceConfig.getString("compress").toLowerCase();
-            if ("gzip".equals(compress)) {
+            String compress = this.writerSliceConfig.getString("compress");
+            if ("gzip".equalsIgnoreCase(compress)) {
                 suffix = ".gz";
             }
-            else if ("bzip2".equals(compress) || "bzip".equals(compress)) {
+            else if ("bzip2".equalsIgnoreCase(compress) || "bzip".equalsIgnoreCase(compress)) {
                 suffix = ".bz2";
             }
         }

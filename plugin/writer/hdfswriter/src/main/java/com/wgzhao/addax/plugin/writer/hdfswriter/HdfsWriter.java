@@ -66,7 +66,6 @@ public class HdfsWriter
             this.writerSliceConfig = this.getPluginJobConf();
             this.validateParameter();
 
-            //创建textfile存储
             hdfsHelper = new HdfsHelper();
 
             hdfsHelper.getFileSystem(defaultFS, this.writerSliceConfig);
@@ -144,7 +143,7 @@ public class HdfsWriter
             this.compress = this.writerSliceConfig.getString(Key.COMPRESS, "NONE").toUpperCase().trim();
             if ("ORC".equals(fileType)) {
                 try {
-                    CompressionKind.valueOf(compress.toUpperCase().trim());
+                    CompressionKind.valueOf(compress);
                 }
                 catch (IllegalArgumentException e) {
                     throw AddaxException.asAddaxException(HdfsWriterErrorCode.ILLEGAL_VALUE,
@@ -252,7 +251,7 @@ public class HdfsWriter
         @Override
         public List<Configuration> split(int mandatoryNumber)
         {
-            LOG.info("begin do split...");
+            LOG.info("begin splitting ...");
             List<Configuration> writerSplitConfigs = new ArrayList<>();
             String filePrefix = fileName;
 
@@ -280,6 +279,7 @@ public class HdfsWriter
                 endStorePath = endStorePath.replace('\\', '/');
             }
             this.path = endStorePath;
+            String suffix = hdfsHelper.getCompressFileSuffix(this.compress);
             for (int i = 0; i < mandatoryNumber; i++) {
                 // handle same file name
 
@@ -288,9 +288,13 @@ public class HdfsWriter
                 String endFullFileName;
 
                 fileSuffix = UUID.randomUUID().toString().replace('-', '_');
-
-                fullFileName = String.format("%s%s%s__%s", defaultFS, storePath, filePrefix, fileSuffix);
-                endFullFileName = String.format("%s%s%s__%s", defaultFS, endStorePath, filePrefix, fileSuffix);
+                if (suffix != null) {
+                    fullFileName = String.format("%s%s%s__%s%s", defaultFS, storePath, filePrefix, fileSuffix, suffix);
+                    endFullFileName = String.format("%s%s%s__%s%s", defaultFS, endStorePath, filePrefix, fileSuffix, suffix);
+                } else {
+                    fullFileName = String.format("%s%s%s__%s", defaultFS, storePath, filePrefix, fileSuffix);
+                    endFullFileName = String.format("%s%s%s__%s", defaultFS, endStorePath, filePrefix, fileSuffix);
+                }
 
                 while (allFiles.contains(endFullFileName)) {
                     fileSuffix = UUID.randomUUID().toString().replace('-', '_');
@@ -298,40 +302,16 @@ public class HdfsWriter
                     endFullFileName = String.format("%s%s%s__%s", defaultFS, endStorePath, filePrefix, fileSuffix);
                 }
                 allFiles.add(endFullFileName);
+                this.tmpFiles.add(fullFileName);
+                this.endFiles.add(endFullFileName);
 
-                // 只有文本格式写入时，才会自动加上文件后缀，其他格式即便指定同样的压缩格式，也不会有后缀，因此这里需要加上判断
-                if ("TEXT".equalsIgnoreCase(writerSliceConfig.getNecessaryValue(Key.FILE_TYPE, HdfsWriterErrorCode.REQUIRED_VALUE))) {
-                    //设置临时文件全路径和最终文件全路径
-                    if ("GZIP".equalsIgnoreCase(this.compress)) {
-                        this.tmpFiles.add(fullFileName + ".gz");
-                        this.endFiles.add(endFullFileName + ".gz");
-                    }
-                    else if ("BZIP2".equalsIgnoreCase(compress)) {
-                        this.tmpFiles.add(fullFileName + ".bz2");
-                        this.endFiles.add(endFullFileName + ".bz2");
-                    }
-                    else if ("ZLIB".equals(compress)) {
-                        this.tmpFiles.add(fullFileName + ".deflate");
-                        this.endFiles.add(endFullFileName + ".deflate");
-                    }
-                    else {
-                        this.tmpFiles.add(fullFileName);
-                        this.endFiles.add(endFullFileName);
-                    }
-                } else {
-                    this.tmpFiles.add(fullFileName);
-                    this.endFiles.add(endFullFileName);
-                }
+                splitedTaskConfig.set(Key.FILE_NAME, fullFileName);
 
-                splitedTaskConfig
-                        .set(Key.FILE_NAME,
-                                fullFileName);
-
-                LOG.info("splited write file name:[{}]", fullFileName);
+                LOG.info("split wrote file name:[{}]", fullFileName);
 
                 writerSplitConfigs.add(splitedTaskConfig);
             }
-            LOG.info("end do split.");
+            LOG.info("end splitting.");
             return writerSplitConfigs;
         }
 
@@ -474,13 +454,8 @@ public class HdfsWriter
 
             hdfsHelper = new HdfsHelper();
             hdfsHelper.getFileSystem(defaultFS, writerSliceConfig);
-            //得当的已经是绝对路径，eg：hdfs://10.101.204.12:9000/user/hive/warehouse/writer.db/text/test.textfile
-            String suffix = hdfsHelper.getCompressFileSuffix(this.writerSliceConfig.getString(Key.COMPRESS));
-            if (suffix == null) {
-                this.fileName = this.writerSliceConfig.getString(Key.FILE_NAME);
-            } else {
-                this.fileName = this.writerSliceConfig.getString(Key.FILE_NAME) + suffix;
-            }
+            //得当的已经是绝对路径，eg：hdfs://10.101.204.12:9000/user/hive/warehouse/writer.db/text/test.snappy
+            this.fileName = this.writerSliceConfig.getString(Key.FILE_NAME);
         }
 
         @Override
