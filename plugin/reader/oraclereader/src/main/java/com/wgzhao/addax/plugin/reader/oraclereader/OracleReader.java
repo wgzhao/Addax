@@ -19,7 +19,7 @@
 
 package com.wgzhao.addax.plugin.reader.oraclereader;
 
-import com.wgzhao.addax.common.exception.DataXException;
+import com.wgzhao.addax.common.exception.AddaxException;
 import com.wgzhao.addax.common.plugin.RecordSender;
 import com.wgzhao.addax.common.spi.Reader;
 import com.wgzhao.addax.common.util.Configuration;
@@ -94,8 +94,8 @@ public class OracleReader
                     FETCH_SIZE,
                     Constant.DEFAULT_FETCH_SIZE);
             if (fetchSize < 1) {
-                throw DataXException
-                        .asDataXException(DBUtilErrorCode.REQUIRED_VALUE,
+                throw AddaxException
+                        .asAddaxException(DBUtilErrorCode.REQUIRED_VALUE,
                                 String.format("您配置的 fetchSize 有误，fetchSize:[%d] 值不能小于 1.",
                                         fetchSize));
             }
@@ -110,7 +110,7 @@ public class OracleReader
             if (StringUtils.isNotBlank(hint)) {
                 boolean isTableMode = originalConfig.getBool(IS_TABLE_MODE);
                 if (!isTableMode) {
-                    throw DataXException.asDataXException(OracleReaderErrorCode.HINT_ERROR, "当且仅当非 querySql 模式读取 oracle 时才能配置 HINT.");
+                    throw AddaxException.asAddaxException(OracleReaderErrorCode.HINT_ERROR, "当且仅当非 querySql 模式读取 oracle 时才能配置 HINT.");
                 }
                 HintUtil.initHintConf(DATABASE_TYPE, originalConfig);
             }

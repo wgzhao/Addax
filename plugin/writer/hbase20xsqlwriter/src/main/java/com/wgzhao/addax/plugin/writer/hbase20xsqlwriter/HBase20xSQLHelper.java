@@ -19,7 +19,7 @@
 
 package com.wgzhao.addax.plugin.writer.hbase20xsqlwriter;
 
-import com.wgzhao.addax.common.exception.DataXException;
+import com.wgzhao.addax.common.exception.AddaxException;
 import com.wgzhao.addax.common.util.Configuration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -68,7 +68,7 @@ public class HBase20xSQLHelper
 
         List<String> columnNames = originalConfig.getList(Key.COLUMN, String.class);
         if (columnNames == null || columnNames.isEmpty()) {
-            throw DataXException.asDataXException(
+            throw AddaxException.asAddaxException(
                     HBase20xSQLWriterErrorCode.ILLEGAL_VALUE, "HBase的columns配置不能为空,请添加目标表的列名配置.");
         }
         String schema = originalConfig.getString(Key.SCHEMA);
@@ -89,7 +89,7 @@ public class HBase20xSQLHelper
             conn.setAutoCommit(false);
         }
         catch (Throwable e) {
-            throw DataXException.asDataXException(HBase20xSQLWriterErrorCode.GET_QUERYSERVER_CONNECTION_ERROR,
+            throw AddaxException.asAddaxException(HBase20xSQLWriterErrorCode.GET_QUERYSERVER_CONNECTION_ERROR,
                     "无法连接QueryServer，配置不正确或服务未启动，请检查配置和服务状态或者联系HBase管理员.", e);
         }
         LOG.debug("Connected to QueryServer successfully.");
@@ -125,7 +125,7 @@ public class HBase20xSQLHelper
             }
             else {
                 LOG.error("表 {} 不存在，请检查表名是否正确或是否已创建. {}", tableName , HBase20xSQLWriterErrorCode.GET_HBASE_TABLE_ERROR);
-                throw DataXException.asDataXException(HBase20xSQLWriterErrorCode.GET_HBASE_TABLE_ERROR,
+                throw AddaxException.asAddaxException(HBase20xSQLWriterErrorCode.GET_HBASE_TABLE_ERROR,
                         tableName + "表不存在，请检查表名是否正确或是否已创建.");
             }
             while (rs.next()) {
@@ -134,13 +134,13 @@ public class HBase20xSQLHelper
             for (String columnName : columnNames) {
                 if (!allColumns.contains(columnName)) {
                     // 用户配置的列名在元数据中不存在
-                    throw DataXException.asDataXException(HBase20xSQLWriterErrorCode.ILLEGAL_VALUE,
+                    throw AddaxException.asAddaxException(HBase20xSQLWriterErrorCode.ILLEGAL_VALUE,
                             "您配置的列" + columnName + "在目的表" + tableName + "的元数据中不存在，请检查您的配置或者联系HBase管理员.");
                 }
             }
         }
         catch (SQLException t) {
-            throw DataXException.asDataXException(HBase20xSQLWriterErrorCode.GET_HBASE_TABLE_ERROR,
+            throw AddaxException.asAddaxException(HBase20xSQLWriterErrorCode.GET_HBASE_TABLE_ERROR,
                     "获取表" + tableName + "信息失败，请检查您的集群和表状态或者联系HBase管理员.", t);
         }
         finally {

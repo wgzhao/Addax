@@ -26,7 +26,7 @@ import com.wgzhao.addax.common.element.DoubleColumn;
 import com.wgzhao.addax.common.element.LongColumn;
 import com.wgzhao.addax.common.element.Record;
 import com.wgzhao.addax.common.element.StringColumn;
-import com.wgzhao.addax.common.exception.DataXException;
+import com.wgzhao.addax.common.exception.AddaxException;
 import com.wgzhao.addax.common.plugin.TaskPluginCollector;
 import com.wgzhao.addax.common.util.Configuration;
 import com.alibaba.fastjson.JSON;
@@ -415,8 +415,8 @@ public class CassandraReaderHelper
                         break;
 
                         default:
-                            throw DataXException
-                                    .asDataXException(
+                            throw AddaxException
+                                    .asAddaxException(
                                             CassandraReaderErrorCode.CONF_ERROR,
                                             String.format(
                                                     "您的配置文件中的列配置信息有误. 因为DataX 不支持数据库读取这种字段类型. 字段名:[%s], "
@@ -426,8 +426,8 @@ public class CassandraReaderHelper
                     }
                 }
                 catch (TypeNotSupported t) {
-                    throw DataXException
-                            .asDataXException(
+                    throw AddaxException
+                            .asAddaxException(
                                     CassandraReaderErrorCode.CONF_ERROR,
                                     String.format(
                                             "您的配置文件中的列配置信息有误. 因为DataX 不支持数据库读取这种字段类型. 字段名:[%s], "
@@ -440,8 +440,8 @@ public class CassandraReaderHelper
         catch (Exception e) {
             //TODO 这里识别为脏数据靠谱吗？
             taskPluginCollector.collectDirtyRecord(record, e);
-            if (e instanceof DataXException) {
-                throw (DataXException) e;
+            if (e instanceof AddaxException) {
+                throw (AddaxException) e;
             }
             return null;
         }
@@ -571,8 +571,8 @@ public class CassandraReaderHelper
         ///keyspace,table是否存在
         String keyspace = jobConfig.getString(Key.KEYSPACE);
         if (cluster.getMetadata().getKeyspace(keyspace) == null) {
-            throw DataXException
-                    .asDataXException(
+            throw AddaxException
+                    .asAddaxException(
                             CassandraReaderErrorCode.CONF_ERROR,
                             String.format(
                                     "配置信息有错误.keyspace'%s'不存在 .",
@@ -581,8 +581,8 @@ public class CassandraReaderHelper
         String table = jobConfig.getString(Key.TABLE);
         TableMetadata tableMetadata = cluster.getMetadata().getKeyspace(keyspace).getTable(table);
         if (tableMetadata == null) {
-            throw DataXException
-                    .asDataXException(
+            throw AddaxException
+                    .asAddaxException(
                             CassandraReaderErrorCode.CONF_ERROR,
                             String.format(
                                     "配置信息有错误.表'%s'不存在 .",
@@ -591,8 +591,8 @@ public class CassandraReaderHelper
         List<String> columns = jobConfig.getList(Key.COLUMN, String.class);
         for (String name : columns) {
             if (name == null || name.isEmpty()) {
-                throw DataXException
-                        .asDataXException(
+                throw AddaxException
+                        .asAddaxException(
                                 CassandraReaderErrorCode.CONF_ERROR,
                                 String.format(
                                         "配置信息有错误.列信息中需要包含'%s'字段 .", Key.COLUMN_NAME));
@@ -601,8 +601,8 @@ public class CassandraReaderHelper
                 String colName = name.substring(Key.WRITE_TIME.length(), name.length() - 1);
                 ColumnMetadata col = tableMetadata.getColumn(colName);
                 if (col == null) {
-                    throw DataXException
-                            .asDataXException(
+                    throw AddaxException
+                            .asAddaxException(
                                     CassandraReaderErrorCode.CONF_ERROR,
                                     String.format(
                                             "配置信息有错误.列'%s'不存在 .", colName));
@@ -611,8 +611,8 @@ public class CassandraReaderHelper
             else {
                 ColumnMetadata col = tableMetadata.getColumn(name);
                 if (col == null) {
-                    throw DataXException
-                            .asDataXException(
+                    throw AddaxException
+                            .asAddaxException(
                                     CassandraReaderErrorCode.CONF_ERROR,
                                     String.format(
                                             "配置信息有错误.列'%s'不存在 .", name));
@@ -624,8 +624,8 @@ public class CassandraReaderHelper
     static void ensureExists(Configuration jobConfig, String keyword)
     {
         if (jobConfig.get(keyword) == null) {
-            throw DataXException
-                    .asDataXException(
+            throw AddaxException
+                    .asAddaxException(
                             CassandraReaderErrorCode.CONF_ERROR,
                             String.format(
                                     "配置信息有错误.参数'%s'为必填项 .",
@@ -637,8 +637,8 @@ public class CassandraReaderHelper
     {
         ensureExists(jobConfig, keyword);
         if (jobConfig.getString(keyword).isEmpty()) {
-            throw DataXException
-                    .asDataXException(
+            throw AddaxException
+                    .asAddaxException(
                             CassandraReaderErrorCode.CONF_ERROR,
                             String.format(
                                     "配置信息有错误.参数'%s'不能为空 .",

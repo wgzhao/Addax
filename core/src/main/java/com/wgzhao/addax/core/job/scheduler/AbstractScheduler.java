@@ -19,7 +19,7 @@
 
 package com.wgzhao.addax.core.job.scheduler;
 
-import com.wgzhao.addax.common.exception.DataXException;
+import com.wgzhao.addax.common.exception.AddaxException;
 import com.wgzhao.addax.common.util.Configuration;
 import com.wgzhao.addax.core.meta.State;
 import com.wgzhao.addax.core.statistics.communication.Communication;
@@ -58,12 +58,12 @@ public abstract class AbstractScheduler
         Validate.notNull(configurations,
                 "scheduler配置不能为空");
         int jobReportIntervalInMillSec = configurations.get(0).getInt(
-                CoreConstant.DATAX_CORE_CONTAINER_JOB_REPORTINTERVAL, 30000);
+                CoreConstant.ADDAX_CORE_CONTAINER_JOB_REPORTINTERVAL, 30000);
         int jobSleepIntervalInMillSec = configurations.get(0).getInt(
-                CoreConstant.DATAX_CORE_CONTAINER_JOB_SLEEPINTERVAL, 10000);
+                CoreConstant.ADDAX_CORE_CONTAINER_JOB_SLEEPINTERVAL, 10000);
 
         this.jobId = configurations.get(0).getLong(
-                CoreConstant.DATAX_CORE_CONTAINER_JOB_ID);
+                CoreConstant.ADDAX_CORE_CONTAINER_JOB_ID);
 
         ErrorRecordChecker errorLimit = new ErrorRecordChecker(configurations.get(0));
 
@@ -128,7 +128,7 @@ public abstract class AbstractScheduler
             // 以 failed 状态退出
             LOG.error("捕获到InterruptedException异常!", e);
 
-            throw DataXException.asDataXException(
+            throw AddaxException.asAddaxException(
                     FrameworkErrorCode.RUNTIME_ERROR, e);
         }
     }
@@ -144,7 +144,7 @@ public abstract class AbstractScheduler
         int totalTasks = 0;
         for (Configuration taskGroupConfiguration : configurations) {
             totalTasks += taskGroupConfiguration.getListConfiguration(
-                    CoreConstant.DATAX_JOB_CONTENT).size();
+                    CoreConstant.ADDAX_JOB_CONTENT).size();
         }
         return totalTasks;
     }

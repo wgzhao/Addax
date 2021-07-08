@@ -28,7 +28,7 @@ import com.wgzhao.addax.common.element.DoubleColumn;
 import com.wgzhao.addax.common.element.LongColumn;
 import com.wgzhao.addax.common.element.Record;
 import com.wgzhao.addax.common.element.StringColumn;
-import com.wgzhao.addax.common.exception.DataXException;
+import com.wgzhao.addax.common.exception.AddaxException;
 import com.wgzhao.addax.common.plugin.RecordSender;
 import com.wgzhao.addax.common.spi.Reader;
 import com.wgzhao.addax.common.util.Configuration;
@@ -94,7 +94,7 @@ public class JsonReader
             String pathInString = this.originConfig.getNecessaryValue(Key.PATH,
                     JsonReaderErrorCode.REQUIRED_VALUE);
             if (StringUtils.isBlank(pathInString)) {
-                throw DataXException.asDataXException(
+                throw AddaxException.asAddaxException(
                         JsonReaderErrorCode.REQUIRED_VALUE,
                         "您需要指定待读取的源目录或文件");
             }
@@ -104,7 +104,7 @@ public class JsonReader
             } else {
                 path = this.originConfig.getList(Key.PATH, String.class);
                 if (null == path || path.isEmpty()) {
-                    throw DataXException.asDataXException(
+                    throw AddaxException.asAddaxException(
                             JsonReaderErrorCode.REQUIRED_VALUE,
                             "您需要指定待读取的源目录或文件");
                 }
@@ -125,11 +125,11 @@ public class JsonReader
                                     encoding);
                     Charsets.toCharset(encoding);
                 } catch (UnsupportedCharsetException uce) {
-                    throw DataXException.asDataXException(
+                    throw AddaxException.asAddaxException(
                             JsonReaderErrorCode.ILLEGAL_VALUE,
                             String.format("不支持您配置的编码格式 : [%s]", encoding), uce);
                 } catch (Exception e) {
-                    throw DataXException.asDataXException(
+                    throw AddaxException.asAddaxException(
                             JsonReaderErrorCode.CONFIG_INVALID_EXCEPTION,
                             String.format("编码配置异常, 请联系我们: %s", e.getMessage()),
                             e);
@@ -153,13 +153,13 @@ public class JsonReader
                             .getString(Key.VALUE);
 
                     if (null == columnIndex && null == columnValue) {
-                        throw DataXException.asDataXException(
+                        throw AddaxException.asAddaxException(
                                 JsonReaderErrorCode.NO_INDEX_VALUE,
                                 "由于您配置了type, 则至少需要配置 index 或 value");
                     }
 
                     if (null != columnIndex && null != columnValue) {
-                        throw DataXException.asDataXException(
+                        throw AddaxException.asAddaxException(
                                 JsonReaderErrorCode.MIXED_INDEX_VALUE,
                                 "您混合配置了index, value, 每一列同时仅能选择其中一种");
                     }
@@ -204,7 +204,7 @@ public class JsonReader
             // int splitNumber = adviceNumber
             int splitNumber = this.sourceFiles.size();
             if (0 == splitNumber) {
-                throw DataXException.asDataXException(
+                throw AddaxException.asAddaxException(
                         JsonReaderErrorCode.EMPTY_DIR_EXCEPTION, String
                                 .format("未能找到待读取的文件,请确认您的配置项path: %s",
                                         this.originConfig.getString(Key.PATH)));
@@ -261,13 +261,13 @@ public class JsonReader
                     String message = String.format("您设定的目录不存在 : [%s]",
                             parentDirectory);
                     LOG.error(message);
-                    throw DataXException.asDataXException(
+                    throw AddaxException.asAddaxException(
                             JsonReaderErrorCode.FILE_NOT_EXISTS, message);
                 }
             } catch (SecurityException se) {
                 String message = String.format("您没有权限查看目录 : [%s]", parentDirectory);
                 LOG.error(message);
-                throw DataXException.asDataXException(
+                throw AddaxException.asAddaxException(
                         JsonReaderErrorCode.SECURITY_NOT_ENOUGH, message);
             }
 
@@ -299,7 +299,7 @@ public class JsonReader
                         String message = String.format("您没有权限查看目录 : [%s]",
                                 directory);
                         LOG.error(message);
-                        throw DataXException.asDataXException(
+                        throw AddaxException.asAddaxException(
                                 JsonReaderErrorCode.SECURITY_NOT_ENOUGH,
                                 message);
                     }
@@ -307,7 +307,7 @@ public class JsonReader
                     String message = String.format("您没有权限查看目录 : [%s]",
                             directory);
                     LOG.error(message);
-                    throw DataXException.asDataXException(
+                    throw AddaxException.asAddaxException(
                             JsonReaderErrorCode.SECURITY_NOT_ENOUGH,
                             message, e);
                 }
@@ -445,8 +445,8 @@ public class JsonReader
                     String errorMessage = String.format(
                             "您配置的列类型暂不支持 : [%s]", type);
                     LOG.error(errorMessage);
-                    throw DataXException
-                            .asDataXException(
+                    throw AddaxException
+                            .asAddaxException(
                                     JsonReaderErrorCode.NOT_SUPPORT_TYPE,
                                     errorMessage);
             }
@@ -493,7 +493,7 @@ public class JsonReader
                     String message = String
                             .format("找不到待读取的文件 : [%s]", fileName);
                     LOG.error(message);
-                    throw DataXException.asDataXException(
+                    throw AddaxException.asAddaxException(
                             JsonReaderErrorCode.OPEN_FILE_ERROR, message);
                 }
                 try {
@@ -527,7 +527,7 @@ public class JsonReader
                     String message = String
                             .format("无法读取文件 : [%s]", fileName);
                     LOG.error(message);
-                    throw DataXException.asDataXException(
+                    throw AddaxException.asAddaxException(
                             JsonReaderErrorCode.READ_FILE_IO_ERROR, message);
                 } finally {
                     IOUtils.closeQuietly(reader, null);

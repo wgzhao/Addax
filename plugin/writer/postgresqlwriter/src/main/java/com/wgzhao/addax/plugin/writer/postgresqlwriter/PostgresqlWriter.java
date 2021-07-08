@@ -19,7 +19,7 @@
 
 package com.wgzhao.addax.plugin.writer.postgresqlwriter;
 
-import com.wgzhao.addax.common.exception.DataXException;
+import com.wgzhao.addax.common.exception.AddaxException;
 import com.wgzhao.addax.common.plugin.RecordReceiver;
 import com.wgzhao.addax.common.spi.Writer;
 import com.wgzhao.addax.common.util.Configuration;
@@ -50,7 +50,7 @@ public class PostgresqlWriter
             if (null != writeMode) {
                 if (!"insert".equalsIgnoreCase(writeMode)
                         && !writeMode.startsWith("update")) {
-                    throw DataXException.asDataXException(
+                    throw AddaxException.asAddaxException(
                             DBUtilErrorCode.CONF_ERROR,
                             String.format("写入模式(writeMode)配置错误. PostgreSQL 仅支持insert, update两种模式." +
                                             " %s 不支持",

@@ -20,7 +20,7 @@
 package com.wgzhao.addax.core.transport.channel.memory;
 
 import com.wgzhao.addax.common.element.Record;
-import com.wgzhao.addax.common.exception.DataXException;
+import com.wgzhao.addax.common.exception.AddaxException;
 import com.wgzhao.addax.common.util.Configuration;
 import com.wgzhao.addax.core.transport.channel.Channel;
 import com.wgzhao.addax.core.transport.record.TerminateRecord;
@@ -56,7 +56,7 @@ public class MemoryChannel
     {
         super(configuration);
         this.queue = new ArrayBlockingQueue<>(this.getCapacity());
-        this.bufferSize = configuration.getInt(CoreConstant.DATAX_CORE_TRANSPORT_EXCHANGER_BUFFERSIZE);
+        this.bufferSize = configuration.getInt(CoreConstant.ADDAX_CORE_TRANSPORT_EXCHANGER_BUFFERSIZE);
 
         lock = new ReentrantLock();
         notInsufficient = lock.newCondition();
@@ -111,7 +111,7 @@ public class MemoryChannel
             notEmpty.signalAll();
         }
         catch (InterruptedException e) {
-            throw DataXException.asDataXException(
+            throw AddaxException.asAddaxException(
                     FrameworkErrorCode.RUNTIME_ERROR, e);
         }
         finally {
@@ -152,7 +152,7 @@ public class MemoryChannel
             notInsufficient.signalAll();
         }
         catch (InterruptedException e) {
-            throw DataXException.asDataXException(
+            throw AddaxException.asAddaxException(
                     FrameworkErrorCode.RUNTIME_ERROR, e);
         }
         finally {

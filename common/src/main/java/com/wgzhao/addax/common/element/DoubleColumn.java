@@ -20,7 +20,7 @@
 package com.wgzhao.addax.common.element;
 
 import com.wgzhao.addax.common.exception.CommonErrorCode;
-import com.wgzhao.addax.common.exception.DataXException;
+import com.wgzhao.addax.common.exception.AddaxException;
 
 import java.math.BigDecimal;
 import java.math.BigInteger;
@@ -99,7 +99,7 @@ public class DoubleColumn
             return new BigDecimal((String) this.getRawData());
         }
         catch (NumberFormatException e) {
-            throw DataXException.asDataXException(
+            throw AddaxException.asAddaxException(
                     CommonErrorCode.CONVERT_NOT_SUPPORT,
                     String.format("String[%s] 无法转换为Double类型 .",
                             this.getRawData()));
@@ -162,21 +162,21 @@ public class DoubleColumn
     @Override
     public Boolean asBoolean()
     {
-        throw DataXException.asDataXException(
+        throw AddaxException.asAddaxException(
                 CommonErrorCode.CONVERT_NOT_SUPPORT, "Double类型无法转为Bool .");
     }
 
     @Override
     public Date asDate()
     {
-        throw DataXException.asDataXException(
+        throw AddaxException.asAddaxException(
                 CommonErrorCode.CONVERT_NOT_SUPPORT, "Double类型无法转为Date类型 .");
     }
 
     @Override
     public byte[] asBytes()
     {
-        throw DataXException.asDataXException(
+        throw AddaxException.asAddaxException(
                 CommonErrorCode.CONVERT_NOT_SUPPORT, "Double类型无法转为Bytes类型 .");
     }
 
@@ -195,7 +195,7 @@ public class DoubleColumn
             new BigDecimal(data);
         }
         catch (Exception e) {
-            throw DataXException.asDataXException(
+            throw AddaxException.asAddaxException(
                     CommonErrorCode.CONVERT_NOT_SUPPORT,
                     String.format("String[%s]无法转为Double类型 .", data));
         }

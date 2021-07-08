@@ -19,7 +19,7 @@
 
 package com.wgzhao.addax.plugin.reader.dbffilereader;
 
-import com.wgzhao.addax.common.exception.DataXException;
+import com.wgzhao.addax.common.exception.AddaxException;
 import com.wgzhao.addax.common.plugin.RecordSender;
 import com.wgzhao.addax.common.spi.Reader;
 import com.wgzhao.addax.common.util.Configuration;
@@ -104,7 +104,7 @@ public class DbfFileReader
             String pathInString = this.originConfig.getNecessaryValue(Key.PATH,
                     DbfFileReaderErrorCode.REQUIRED_VALUE);
             if (isBlank(pathInString)) {
-                throw DataXException.asDataXException(
+                throw AddaxException.asAddaxException(
                         DbfFileReaderErrorCode.REQUIRED_VALUE,
                         "您需要指定待读取的源目录或文件");
             }
@@ -115,7 +115,7 @@ public class DbfFileReader
             else {
                 path = this.originConfig.getList(Key.PATH, String.class);
                 if (null == path || path.isEmpty()) {
-                    throw DataXException.asDataXException(
+                    throw AddaxException.asAddaxException(
                             DbfFileReaderErrorCode.REQUIRED_VALUE,
                             "您需要指定待读取的源目录或文件");
                 }
@@ -139,12 +139,12 @@ public class DbfFileReader
                     Charsets.toCharset(encoding);
                 }
                 catch (UnsupportedCharsetException uce) {
-                    throw DataXException.asDataXException(
+                    throw AddaxException.asAddaxException(
                             DbfFileReaderErrorCode.ILLEGAL_VALUE,
                             String.format("不支持您配置的编码格式 : [%s]", encoding), uce);
                 }
                 catch (Exception e) {
-                    throw DataXException.asDataXException(
+                    throw AddaxException.asAddaxException(
                             DbfFileReaderErrorCode.CONFIG_INVALID_EXCEPTION,
                             String.format("编码配置异常, 请联系我们: %s", e.getMessage()),
                             e);
@@ -166,7 +166,7 @@ public class DbfFileReader
                         .getListConfiguration(COLUMN);
 
                 if (null == columns || columns.isEmpty()) {
-                    throw DataXException.asDataXException(
+                    throw AddaxException.asAddaxException(
                             DbfFileReaderErrorCode.CONFIG_INVALID_EXCEPTION,
                             "您需要指定 columns");
                 }
@@ -177,13 +177,13 @@ public class DbfFileReader
                     String columnValue = eachColumnConf.getString(VALUE);
 
                     if (null == columnIndex && null == columnValue) {
-                        throw DataXException.asDataXException(
+                        throw AddaxException.asAddaxException(
                                 DbfFileReaderErrorCode.NO_INDEX_VALUE,
                                 "由于您配置了type, 则至少需要配置 index 或 value");
                     }
 
                     if (null != columnIndex && null != columnValue) {
-                        throw DataXException.asDataXException(
+                        throw AddaxException.asAddaxException(
                                 DbfFileReaderErrorCode.MIXED_INDEX_VALUE,
                                 "您混合配置了index, value, 每一列同时仅能选择其中一种");
                     }
@@ -230,7 +230,7 @@ public class DbfFileReader
             // warn:每个slice拖且仅拖一个文件,
             int splitNumber = this.sourceFiles.size();
             if (0 == splitNumber) {
-                throw DataXException.asDataXException(
+                throw AddaxException.asAddaxException(
                         DbfFileReaderErrorCode.EMPTY_DIR_EXCEPTION, String
                                 .format("未能找到待读取的文件,请确认您的配置项path: %s",
                                         this.originConfig.getString(Key.PATH)));
@@ -291,7 +291,7 @@ public class DbfFileReader
                     String message = String.format("您设定的目录不存在 : [%s]",
                             parentDirectory);
                     LOG.error(message);
-                    throw DataXException.asDataXException(
+                    throw AddaxException.asAddaxException(
                             DbfFileReaderErrorCode.FILE_NOT_EXISTS, message);
                 }
             }
@@ -299,7 +299,7 @@ public class DbfFileReader
                 String message = String.format("您没有权限查看目录 : [%s]",
                         parentDirectory);
                 LOG.error(message);
-                throw DataXException.asDataXException(
+                throw AddaxException.asAddaxException(
                         DbfFileReaderErrorCode.SECURITY_NOT_ENOUGH, message);
             }
 
@@ -334,7 +334,7 @@ public class DbfFileReader
                         String message = String.format("您没有权限查看目录 : [%s]",
                                 directory);
                         LOG.error(message);
-                        throw DataXException.asDataXException(
+                        throw AddaxException.asAddaxException(
                                 DbfFileReaderErrorCode.SECURITY_NOT_ENOUGH,
                                 message);
                     }
@@ -343,7 +343,7 @@ public class DbfFileReader
                     String message = String.format("您没有权限查看目录 : [%s]",
                             directory);
                     LOG.error(message);
-                    throw DataXException.asDataXException(
+                    throw AddaxException.asAddaxException(
                             DbfFileReaderErrorCode.SECURITY_NOT_ENOUGH,
                             message, e);
                 }

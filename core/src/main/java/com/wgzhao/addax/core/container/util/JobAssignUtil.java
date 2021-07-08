@@ -52,7 +52,7 @@ public final class JobAssignUtil
     {
         Validate.isTrue(configuration != null, "框架获得的 Job 不能为 null.");
 
-        List<Configuration> contentConfig = configuration.getListConfiguration(CoreConstant.DATAX_JOB_CONTENT);
+        List<Configuration> contentConfig = configuration.getListConfiguration(CoreConstant.ADDAX_JOB_CONTENT);
         Validate.isTrue(!contentConfig.isEmpty(), "框架获得的切分后的 Job 无内容.");
 
         Validate.isTrue(channelNumber > 0 && channelsPerTaskGroup > 0,
@@ -98,11 +98,11 @@ public final class JobAssignUtil
 
         int i = 0;
         for (; i < remainderChannelCount; i++) {
-            taskGroupConfig.get(i).set(CoreConstant.DATAX_CORE_CONTAINER_TASKGROUP_CHANNEL, avgChannelsPerTaskGroup + 1);
+            taskGroupConfig.get(i).set(CoreConstant.ADDAX_CORE_CONTAINER_TASKGROUP_CHANNEL, avgChannelsPerTaskGroup + 1);
         }
 
         for (int j = 0; j < taskGroupNumber - remainderChannelCount; j++) {
-            taskGroupConfig.get(i + j).set(CoreConstant.DATAX_CORE_CONTAINER_TASKGROUP_CHANNEL, avgChannelsPerTaskGroup);
+            taskGroupConfig.get(i + j).set(CoreConstant.ADDAX_CORE_CONTAINER_TASKGROUP_CHANNEL, avgChannelsPerTaskGroup);
         }
     }
 
@@ -166,10 +166,10 @@ public final class JobAssignUtil
      */
     private static List<Configuration> doAssign(LinkedHashMap<String, List<Integer>> resourceMarkAndTaskIdMap, Configuration jobConfiguration, int taskGroupNumber)
     {
-        List<Configuration> contentConfig = jobConfiguration.getListConfiguration(CoreConstant.DATAX_JOB_CONTENT);
+        List<Configuration> contentConfig = jobConfiguration.getListConfiguration(CoreConstant.ADDAX_JOB_CONTENT);
 
         Configuration taskGroupTemplate = jobConfiguration.clone();
-        taskGroupTemplate.remove(CoreConstant.DATAX_JOB_CONTENT);
+        taskGroupTemplate.remove(CoreConstant.ADDAX_JOB_CONTENT);
 
         List<Configuration> result = new LinkedList<>();
 
@@ -200,12 +200,12 @@ public final class JobAssignUtil
                 }
             }
         }
-        Long jobId = taskGroupTemplate.getLong(CoreConstant.DATAX_CORE_CONTAINER_JOB_ID);
+        Long jobId = taskGroupTemplate.getLong(CoreConstant.ADDAX_CORE_CONTAINER_JOB_ID);
         Configuration tempTaskGroupConfig;
         for (int i = 0; i < taskGroupNumber; i++) {
             tempTaskGroupConfig = taskGroupTemplate.clone();
-            tempTaskGroupConfig.set(CoreConstant.DATAX_JOB_CONTENT, taskGroupConfigList.get(i));
-            tempTaskGroupConfig.set(CoreConstant.DATAX_CORE_CONTAINER_TASKGROUP_ID, Integer.parseInt(jobId + "" + i));
+            tempTaskGroupConfig.set(CoreConstant.ADDAX_JOB_CONTENT, taskGroupConfigList.get(i));
+            tempTaskGroupConfig.set(CoreConstant.ADDAX_CORE_CONTAINER_TASKGROUP_ID, Integer.parseInt(jobId + "" + i));
 
             result.add(tempTaskGroupConfig);
         }

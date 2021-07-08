@@ -21,7 +21,7 @@ package com.wgzhao.addax.core.taskgroup;
 
 import com.wgzhao.addax.common.constant.PluginType;
 import com.wgzhao.addax.common.exception.CommonErrorCode;
-import com.wgzhao.addax.common.exception.DataXException;
+import com.wgzhao.addax.common.exception.AddaxException;
 import com.wgzhao.addax.common.plugin.RecordSender;
 import com.wgzhao.addax.common.plugin.TaskPluginCollector;
 import com.wgzhao.addax.common.statistics.PerfRecord;
@@ -94,14 +94,14 @@ public class TaskGroupContainer
         initCommunicator(configuration);
 
         this.jobId = this.configuration.getLong(
-                CoreConstant.DATAX_CORE_CONTAINER_JOB_ID);
+                CoreConstant.ADDAX_CORE_CONTAINER_JOB_ID);
         this.taskGroupId = this.configuration.getInt(
-                CoreConstant.DATAX_CORE_CONTAINER_TASKGROUP_ID);
+                CoreConstant.ADDAX_CORE_CONTAINER_TASKGROUP_ID);
 
         this.channelClazz = this.configuration.getString(
-                CoreConstant.DATAX_CORE_TRANSPORT_CHANNEL_CLASS);
+                CoreConstant.ADDAX_CORE_TRANSPORT_CHANNEL_CLASS);
         this.taskCollectorClass = this.configuration.getString(
-                CoreConstant.DATAX_CORE_STATISTICS_COLLECTOR_PLUGIN_TASKCLASS);
+                CoreConstant.ADDAX_CORE_STATISTICS_COLLECTOR_PLUGIN_TASKCLASS);
     }
 
     private void initCommunicator(Configuration configuration)
@@ -126,29 +126,29 @@ public class TaskGroupContainer
 
             // 状态check时间间隔，较短，可以把任务及时分发到对应channel中
             int sleepIntervalInMillSec = this.configuration.getInt(
-                    CoreConstant.DATAX_CORE_CONTAINER_TASKGROUP_SLEEPINTERVAL, 100);
+                    CoreConstant.ADDAX_CORE_CONTAINER_TASKGROUP_SLEEPINTERVAL, 100);
 
             // 状态汇报时间间隔，稍长，避免大量汇报
             long reportIntervalInMillSec = this.configuration.getLong(
-                    CoreConstant.DATAX_CORE_CONTAINER_TASKGROUP_REPORTINTERVAL,
+                    CoreConstant.ADDAX_CORE_CONTAINER_TASKGROUP_REPORTINTERVAL,
                     10000);
 
             // 2分钟汇报一次性能统计
 
             // 获取channel数目
             int channelNumber = this.configuration.getInt(
-                    CoreConstant.DATAX_CORE_CONTAINER_TASKGROUP_CHANNEL);
+                    CoreConstant.ADDAX_CORE_CONTAINER_TASKGROUP_CHANNEL);
 
             int taskMaxRetryTimes = this.configuration.getInt(
-                    CoreConstant.DATAX_CORE_CONTAINER_TASK_FAILOVER_MAXRETRYTIMES, 1);
+                    CoreConstant.ADDAX_CORE_CONTAINER_TASK_FAILOVER_MAXRETRYTIMES, 1);
 
             long taskRetryIntervalInMsec = this.configuration.getLong(
-                    CoreConstant.DATAX_CORE_CONTAINER_TASK_FAILOVER_RETRYINTERVALINMSEC, 10000);
+                    CoreConstant.ADDAX_CORE_CONTAINER_TASK_FAILOVER_RETRYINTERVALINMSEC, 10000);
 
-            long taskMaxWaitInMsec = this.configuration.getLong(CoreConstant.DATAX_CORE_CONTAINER_TASK_FAILOVER_MAXWAITINMSEC, 60000);
+            long taskMaxWaitInMsec = this.configuration.getLong(CoreConstant.ADDAX_CORE_CONTAINER_TASK_FAILOVER_MAXWAITINMSEC, 60000);
 
             List<Configuration> taskConfigs = this.configuration
-                    .getListConfiguration(CoreConstant.DATAX_JOB_CONTENT);
+                    .getListConfiguration(CoreConstant.ADDAX_JOB_CONTENT);
 
             if (LOG.isDebugEnabled()) {
                 LOG.debug("taskGroup[{}]'s task configs[{}]", this.taskGroupId,
@@ -224,7 +224,7 @@ public class TaskGroupContainer
                     lastTaskGroupContainerCommunication = reportTaskGroupCommunication(
                             lastTaskGroupContainerCommunication, taskCountInThisTaskGroup);
 
-                    throw DataXException.asDataXException(
+                    throw AddaxException.asAddaxException(
                             FrameworkErrorCode.PLUGIN_RUNTIME_ERROR, lastTaskGroupContainerCommunication.getThrowable());
                 }
 
@@ -246,7 +246,7 @@ public class TaskGroupContainer
                             if (now - failedTime > taskMaxWaitInMsec) {
                                 markCommunicationFailed(taskId);
                                 reportTaskGroupCommunication(lastTaskGroupContainerCommunication, taskCountInThisTaskGroup);
-                                throw DataXException.asDataXException(CommonErrorCode.WAIT_TIME_EXCEED, "task failover等待超时");
+                                throw AddaxException.asAddaxException(CommonErrorCode.WAIT_TIME_EXCEED, "task failover等待超时");
                             }
                             else {
                                 lastExecutor.shutdown(); //再次尝试关闭
@@ -313,7 +313,7 @@ public class TaskGroupContainer
             nowTaskGroupContainerCommunication.setState(State.FAILED);
             this.containerCommunicator.report(nowTaskGroupContainerCommunication);
 
-            throw DataXException.asDataXException(
+            throw AddaxException.asAddaxException(
                     FrameworkErrorCode.RUNTIME_ERROR, e);
         }
         finally {
@@ -500,7 +500,7 @@ public class TaskGroupContainer
 
             // reader没有起来，writer不可能结束
             if (!this.writerThread.isAlive() || this.taskCommunication.getState() == State.FAILED) {
-                throw DataXException.asDataXException(
+                throw AddaxException.asAddaxException(
                         FrameworkErrorCode.RUNTIME_ERROR,
                         this.taskCommunication.getThrowable());
             }
@@ -510,7 +510,7 @@ public class TaskGroupContainer
             // 这里reader可能很快结束
             if (!this.readerThread.isAlive() && this.taskCommunication.getState() == State.FAILED) {
                 // 这里有可能出现Reader线上启动即挂情况 对于这类情况 需要立刻抛出异常
-                throw DataXException.asDataXException(
+                throw AddaxException.asAddaxException(
                         FrameworkErrorCode.RUNTIME_ERROR,
                         this.taskCommunication.getThrowable());
             }
@@ -571,7 +571,7 @@ public class TaskGroupContainer
                     newRunner.setTaskPluginCollector(pluginCollector);
                     break;
                 default:
-                    throw DataXException.asDataXException(FrameworkErrorCode.ARGUMENT_ERROR, "Cant generateRunner for:" + pluginType);
+                    throw AddaxException.asAddaxException(FrameworkErrorCode.ARGUMENT_ERROR, "Cant generateRunner for:" + pluginType);
             }
 
             newRunner.setTaskGroupId(taskGroupId);

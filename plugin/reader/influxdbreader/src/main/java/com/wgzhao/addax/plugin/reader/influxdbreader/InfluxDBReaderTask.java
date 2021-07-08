@@ -24,7 +24,7 @@ import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.wgzhao.addax.common.element.Record;
 import com.wgzhao.addax.common.element.StringColumn;
-import com.wgzhao.addax.common.exception.DataXException;
+import com.wgzhao.addax.common.exception.AddaxException;
 import com.wgzhao.addax.common.plugin.RecordSender;
 import com.wgzhao.addax.common.plugin.TaskPluginCollector;
 import com.wgzhao.addax.common.util.Configuration;
@@ -103,12 +103,12 @@ public class InfluxDBReaderTask
             url+="&q=" + URLEncoder.encode(querySql,enc);
             result = get(url);
         } catch (Exception e) {
-            throw DataXException.asDataXException(
+            throw AddaxException.asAddaxException(
                     InfluxDBReaderErrorCode.ILLEGAL_VALUE, "Failed to get data point！", e);
         }
 
         if(StringUtils.isBlank(result)){
-            throw DataXException.asDataXException(
+            throw AddaxException.asAddaxException(
                     InfluxDBReaderErrorCode.ILLEGAL_VALUE, "Get nothing!", null);
         }
         try {
@@ -135,12 +135,12 @@ public class InfluxDBReaderTask
                 }
 
             }else if(resultsMap.containsKey("error")){
-                throw DataXException.asDataXException(
+                throw AddaxException.asAddaxException(
                         InfluxDBReaderErrorCode.ILLEGAL_VALUE, "Error occured in data sets！", null);
             }
 
         } catch (Exception e) {
-            throw DataXException.asDataXException(
+            throw AddaxException.asAddaxException(
                     InfluxDBReaderErrorCode.ILLEGAL_VALUE, "Failed to send data", e);
         }
     }

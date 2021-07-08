@@ -26,7 +26,7 @@ import com.wgzhao.addax.common.element.DoubleColumn;
 import com.wgzhao.addax.common.element.LongColumn;
 import com.wgzhao.addax.common.element.StringColumn;
 import com.wgzhao.addax.common.element.Record;
-import com.wgzhao.addax.common.exception.DataXException;
+import com.wgzhao.addax.common.exception.AddaxException;
 import com.wgzhao.addax.common.util.Configuration;
 import org.apache.commons.lang.ArrayUtils;
 import org.apache.commons.lang3.time.DateUtils;
@@ -155,7 +155,7 @@ public abstract class HbaseAbstractTask
                 column = new DateColumn(ArrayUtils.isEmpty(byteArray) ? null : DateUtils.parseDate(dateValue, dateformat));
                 break;
             default:
-                throw DataXException.asDataXException(Hbase20xReaderErrorCode.ILLEGAL_VALUE, "Hbasereader 不支持您配置的列类型:" + columnType);
+                throw AddaxException.asAddaxException(Hbase20xReaderErrorCode.ILLEGAL_VALUE, "Hbasereader 不支持您配置的列类型:" + columnType);
         }
         return column;
     }
@@ -184,7 +184,7 @@ public abstract class HbaseAbstractTask
                 column = new DateColumn(DateUtils.parseDate(constantValue, dateformat));
                 break;
             default:
-                throw DataXException.asDataXException(Hbase20xReaderErrorCode.ILLEGAL_VALUE, "Hbasereader 常量列不支持您配置的列类型:" + columnType);
+                throw AddaxException.asAddaxException(Hbase20xReaderErrorCode.ILLEGAL_VALUE, "Hbasereader 常量列不支持您配置的列类型:" + columnType);
         }
         return column;
     }

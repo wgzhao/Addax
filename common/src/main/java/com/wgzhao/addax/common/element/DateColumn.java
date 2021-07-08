@@ -20,7 +20,7 @@
 package com.wgzhao.addax.common.element;
 
 import com.wgzhao.addax.common.exception.CommonErrorCode;
-import com.wgzhao.addax.common.exception.DataXException;
+import com.wgzhao.addax.common.exception.AddaxException;
 
 import java.math.BigDecimal;
 import java.math.BigInteger;
@@ -104,7 +104,7 @@ public class DateColumn
             return ColumnCast.date2String(this);
         }
         catch (Exception e) {
-            throw DataXException.asDataXException(
+            throw AddaxException.asAddaxException(
                     CommonErrorCode.CONVERT_NOT_SUPPORT,
                     String.format("Date[%s]类型不能转为String .", this.toString()));
         }
@@ -123,35 +123,35 @@ public class DateColumn
     @Override
     public byte[] asBytes()
     {
-        throw DataXException.asDataXException(
+        throw AddaxException.asAddaxException(
                 CommonErrorCode.CONVERT_NOT_SUPPORT, "Date类型不能转为Bytes .");
     }
 
     @Override
     public Boolean asBoolean()
     {
-        throw DataXException.asDataXException(
+        throw AddaxException.asAddaxException(
                 CommonErrorCode.CONVERT_NOT_SUPPORT, "Date类型不能转为Boolean .");
     }
 
     @Override
     public Double asDouble()
     {
-        throw DataXException.asDataXException(
+        throw AddaxException.asAddaxException(
                 CommonErrorCode.CONVERT_NOT_SUPPORT, "Date类型不能转为Double .");
     }
 
     @Override
     public BigInteger asBigInteger()
     {
-        throw DataXException.asDataXException(
+        throw AddaxException.asAddaxException(
                 CommonErrorCode.CONVERT_NOT_SUPPORT, "Date类型不能转为BigInteger .");
     }
 
     @Override
     public BigDecimal asBigDecimal()
     {
-        throw DataXException.asDataXException(
+        throw AddaxException.asAddaxException(
                 CommonErrorCode.CONVERT_NOT_SUPPORT, "Date类型不能转为BigDecimal .");
     }
 

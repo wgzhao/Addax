@@ -24,7 +24,7 @@ import com.wgzhao.addax.common.spi.ErrorCode;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 
-public class DataXException
+public class AddaxException
         extends RuntimeException
 {
 
@@ -32,38 +32,38 @@ public class DataXException
 
     private final transient ErrorCode errorCode;
 
-    public DataXException(ErrorCode errorCode, String errorMessage)
+    public AddaxException(ErrorCode errorCode, String errorMessage)
     {
         super(errorCode.toString() + " - " + errorMessage);
         this.errorCode = errorCode;
     }
 
-    private DataXException(ErrorCode errorCode, String errorMessage, Throwable cause)
+    private AddaxException(ErrorCode errorCode, String errorMessage, Throwable cause)
     {
         super(errorCode.toString() + " - " + getMessage(errorMessage) + " - " + getMessage(cause), cause);
 
         this.errorCode = errorCode;
     }
 
-    public static DataXException asDataXException(ErrorCode errorCode, String message)
+    public static AddaxException asAddaxException(ErrorCode errorCode, String message)
     {
-        return new DataXException(errorCode, message);
+        return new AddaxException(errorCode, message);
     }
 
-    public static DataXException asDataXException(ErrorCode errorCode, String message, Throwable cause)
+    public static AddaxException asAddaxException(ErrorCode errorCode, String message, Throwable cause)
     {
-        if (cause instanceof DataXException) {
-            return (DataXException) cause;
+        if (cause instanceof AddaxException) {
+            return (AddaxException) cause;
         }
-        return new DataXException(errorCode, message, cause);
+        return new AddaxException(errorCode, message, cause);
     }
 
-    public static DataXException asDataXException(ErrorCode errorCode, Throwable cause)
+    public static AddaxException asAddaxException(ErrorCode errorCode, Throwable cause)
     {
-        if (cause instanceof DataXException) {
-            return (DataXException) cause;
+        if (cause instanceof AddaxException) {
+            return (AddaxException) cause;
         }
-        return new DataXException(errorCode, getMessage(cause), cause);
+        return new AddaxException(errorCode, getMessage(cause), cause);
     }
 
     private static String getMessage(Object obj)

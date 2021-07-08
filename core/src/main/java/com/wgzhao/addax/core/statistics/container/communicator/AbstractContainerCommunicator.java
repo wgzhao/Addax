@@ -42,7 +42,7 @@ public abstract class AbstractContainerCommunicator
     public AbstractContainerCommunicator(Configuration configuration)
     {
         this.configuration = configuration;
-        this.jobId = configuration.getLong(CoreConstant.DATAX_CORE_CONTAINER_JOB_ID);
+        this.jobId = configuration.getLong(CoreConstant.ADDAX_CORE_CONTAINER_JOB_ID);
     }
 
     public Configuration getConfiguration()

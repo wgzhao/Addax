@@ -19,7 +19,7 @@
 
 package com.wgzhao.addax.core.util;
 
-import com.wgzhao.addax.common.exception.DataXException;
+import com.wgzhao.addax.common.exception.AddaxException;
 import com.wgzhao.addax.common.util.RetryUtil;
 import org.apache.http.Consts;
 import org.apache.http.HttpEntity;
@@ -143,7 +143,7 @@ public class HttpClientUtil
             return RetryUtil.asyncExecuteWithRetry(() -> {
                 String result = executeAndGet(httpRequestBase);
                 if (result != null && result.startsWith("{\"result\":-1")) {
-                    throw DataXException.asDataXException(
+                    throw AddaxException.asAddaxException(
                             FrameworkErrorCode.CALL_REMOTE_FAILED, "远程接口返回-1,将重试");
                 }
                 return result;
@@ -151,7 +151,7 @@ public class HttpClientUtil
                     HTTP_TIMEOUT_INMILLIONSECONDS + 1000, asyncExecutor);
         }
         catch (Exception e) {
-            throw DataXException.asDataXException(FrameworkErrorCode.RUNTIME_ERROR, e);
+            throw AddaxException.asAddaxException(FrameworkErrorCode.RUNTIME_ERROR, e);
         }
     }
 }

@@ -20,7 +20,7 @@
 package com.wgzhao.addax.plugin.rdbms.writer.util;
 
 import com.wgzhao.addax.plugin.rdbms.util.TableExpandUtil;
-import com.wgzhao.addax.common.exception.DataXException;
+import com.wgzhao.addax.common.exception.AddaxException;
 import com.wgzhao.addax.common.util.Configuration;
 import com.wgzhao.addax.common.util.ListUtil;
 import com.wgzhao.addax.plugin.rdbms.util.ConnectionFactory;
@@ -70,7 +70,7 @@ public final class OriginalConfPretreatmentUtil
         // 检查batchSize 配置（选填，如果未填写，则设置为默认值）
         int batchSize = originalConfig.getInt(Key.BATCH_SIZE, Constant.DEFAULT_BATCH_SIZE);
         if (batchSize < 1) {
-            throw DataXException.asDataXException(DBUtilErrorCode.ILLEGAL_VALUE, String.format(
+            throw AddaxException.asAddaxException(DBUtilErrorCode.ILLEGAL_VALUE, String.format(
                     "您的batchSize配置有误. 您所配置的写入数据库表的 batchSize:%s 不能小于1. 推荐配置范围为：[100-1000], 该值越大, 内存溢出可能性越大. 请检查您的配置并作出修改.",
                     batchSize));
         }
@@ -95,7 +95,7 @@ public final class OriginalConfPretreatmentUtil
             }
             String jdbcUrl = connConf.getString(Key.JDBC_URL);
             if (StringUtils.isBlank(jdbcUrl)) {
-                throw DataXException.asDataXException(DBUtilErrorCode.REQUIRED_VALUE, "您未配置的写入数据库表的 jdbcUrl.");
+                throw AddaxException.asAddaxException(DBUtilErrorCode.REQUIRED_VALUE, "您未配置的写入数据库表的 jdbcUrl.");
             }
 
             jdbcUrl = dataBaseType.appendJDBCSuffixForWriter(jdbcUrl);
@@ -105,7 +105,7 @@ public final class OriginalConfPretreatmentUtil
             List<String> tables = connConf.getList(Key.TABLE, String.class);
 
             if (null == tables || tables.isEmpty()) {
-                throw DataXException.asDataXException(DBUtilErrorCode.REQUIRED_VALUE,
+                throw AddaxException.asAddaxException(DBUtilErrorCode.REQUIRED_VALUE,
                         "您未配置写入数据库表的表名称. 根据配置DataX找不到您配置的表. 请检查您的配置并作出修改.");
             }
 
@@ -113,7 +113,7 @@ public final class OriginalConfPretreatmentUtil
             List<String> expandedTables = TableExpandUtil.expandTableConf(tables);
 
             if (expandedTables.isEmpty()) {
-                throw DataXException.asDataXException(DBUtilErrorCode.CONF_ERROR,
+                throw AddaxException.asAddaxException(DBUtilErrorCode.CONF_ERROR,
                         "您配置的写入数据库表名称错误. DataX找不到您配置的表，请检查您的配置并作出修改.");
             }
 
@@ -130,7 +130,7 @@ public final class OriginalConfPretreatmentUtil
     {
         List<String> userConfiguredColumns = originalConfig.getList(Key.COLUMN, String.class);
         if (null == userConfiguredColumns || userConfiguredColumns.isEmpty()) {
-            throw DataXException.asDataXException(DBUtilErrorCode.ILLEGAL_VALUE,
+            throw AddaxException.asAddaxException(DBUtilErrorCode.ILLEGAL_VALUE,
                     "您的配置文件中的列配置信息有误. 因为您未配置写入数据库表的列名称，DataX获取不到列信息. 请检查您的配置并作出修改.");
         }
         else {
@@ -153,7 +153,7 @@ public final class OriginalConfPretreatmentUtil
                 originalConfig.set(Key.COLUMN, allColumns);
             }
             else if (userConfiguredColumns.size() > allColumns.size()) {
-                throw DataXException.asDataXException(DBUtilErrorCode.ILLEGAL_VALUE,
+                throw AddaxException.asAddaxException(DBUtilErrorCode.ILLEGAL_VALUE,
                         String.format("您的配置文件中的列配置信息有误. 因为您所配置的写入数据库表的字段个数:%s 大于目的表的总字段总个数:%s. 请检查您的配置并作出修改.",
                                 userConfiguredColumns.size(), allColumns.size()));
             }

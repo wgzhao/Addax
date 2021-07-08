@@ -19,7 +19,7 @@
 
 package com.wgzhao.addax.plugin.writer.influxdbwriter;
 
-import com.wgzhao.addax.common.exception.DataXException;
+import com.wgzhao.addax.common.exception.AddaxException;
 import com.wgzhao.addax.common.plugin.RecordReceiver;
 import com.wgzhao.addax.common.spi.Writer;
 import com.wgzhao.addax.common.util.Configuration;
@@ -61,7 +61,7 @@ public class InfluxDBWriter
             this.password = originalConfig.getString(Key.PASSWORD);
             List<String> columns = originalConfig.getList(Key.COLUMN, String.class);
             if (columns == null || columns.isEmpty()) {
-                throw DataXException.asDataXException(
+                throw AddaxException.asAddaxException(
                         InfluxDBWriterErrorCode.REQUIRED_VALUE,
                         "The parameter [" + Key.COLUMN + "] is not set.");
             }
@@ -79,7 +79,7 @@ public class InfluxDBWriter
                     }
                 }
                 catch (Exception e) {
-                    throw DataXException.asDataXException(
+                    throw AddaxException.asAddaxException(
                             InfluxDBWriterErrorCode.CONNECT_ERROR, e
                     );
                 }
@@ -108,7 +108,7 @@ public class InfluxDBWriter
                     }
                 }
                 catch (Exception e) {
-                    throw DataXException.asDataXException(
+                    throw AddaxException.asAddaxException(
                             InfluxDBWriterErrorCode.ILLEGAL_VALUE, e
                     );
                 }

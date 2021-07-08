@@ -19,7 +19,7 @@
 
 package com.wgzhao.addax.plugin.writer.hbase11xsqlwriter;
 
-import com.wgzhao.addax.common.exception.DataXException;
+import com.wgzhao.addax.common.exception.AddaxException;
 import com.wgzhao.addax.common.util.Configuration;
 import com.google.common.base.Strings;
 import org.apache.commons.lang3.StringUtils;
@@ -108,7 +108,7 @@ public class HbaseSQLWriterConfig
         String hbaseCfg = dataxCfg.getString(Key.HBASE_CONFIG);
         if (StringUtils.isBlank(hbaseCfg)) {
             // 集群配置必须存在且不为空
-            throw DataXException.asDataXException(
+            throw AddaxException.asAddaxException(
                     HbaseSQLWriterErrorCode.REQUIRED_VALUE,
                     "读 Hbase 时需要配置hbaseConfig，其内容为 Hbase 连接信息，请联系 Hbase PE 获取该信息.");
         }
@@ -120,13 +120,13 @@ public class HbaseSQLWriterConfig
             cfg.username = thinConnectConfig.get(Key.HBASE_THIN_CONNECT_USERNAME);
             cfg.password = thinConnectConfig.get(Key.HBASE_THIN_CONNECT_PASSWORD);
             if (Strings.isNullOrEmpty(thinConnectStr)) {
-                throw DataXException.asDataXException(
+                throw AddaxException.asAddaxException(
                         HbaseSQLWriterErrorCode.ILLEGAL_VALUE,
                         "thinClient=true的轻客户端模式下HBase的hbase.thin.connect.url配置不能为空，请联系HBase PE获取该信息.");
             }
             if (Strings.isNullOrEmpty(cfg.namespace) || Strings.isNullOrEmpty(cfg.username) || Strings
                     .isNullOrEmpty(cfg.password)) {
-                throw DataXException.asDataXException(HbaseSQLWriterErrorCode.ILLEGAL_VALUE,
+                throw AddaxException.asAddaxException(HbaseSQLWriterErrorCode.ILLEGAL_VALUE,
                         "thinClient=true的轻客户端模式下HBase的hbase.thin.connect.namespce|username|password配置不能为空，请联系HBase "
                                 + "PE获取该信息.");
             }
@@ -140,19 +140,19 @@ public class HbaseSQLWriterConfig
             }
             catch (Throwable t) {
                 // 解析hbase配置错误
-                throw DataXException.asDataXException(
+                throw AddaxException.asAddaxException(
                         HbaseSQLWriterErrorCode.REQUIRED_VALUE,
                         "解析hbaseConfig出错，请确认您配置的hbaseConfig为合法的json数据格式，内容正确.");
             }
             String zkQuorum = zkCfg.getFirst();
             String znode = zkCfg.getSecond();
             if (zkQuorum == null || zkQuorum.isEmpty()) {
-                throw DataXException.asDataXException(
+                throw AddaxException.asAddaxException(
                         HbaseSQLWriterErrorCode.ILLEGAL_VALUE,
                         "HBase的hbase.zookeeper.quorum配置不能为空，请联系HBase PE获取该信息.");
             }
             if (znode == null || znode.isEmpty()) {
-                throw DataXException.asDataXException(
+                throw AddaxException.asAddaxException(
                         HbaseSQLWriterErrorCode.ILLEGAL_VALUE,
                         "HBase的zookeeper.znode.parent配置不能为空，请联系HBase PE获取该信息.");
             }
@@ -168,14 +168,14 @@ public class HbaseSQLWriterConfig
         cfg.tableName = dataxCfg.getString(Key.TABLE);
 
         if (cfg.tableName == null || cfg.tableName.isEmpty()) {
-            throw DataXException.asDataXException(
+            throw AddaxException.asAddaxException(
                     HbaseSQLWriterErrorCode.ILLEGAL_VALUE, "HBase的tableName配置不能为空,请检查并修改配置.");
         }
         try {
             TableName.valueOf(cfg.tableName);
         }
         catch (Exception e) {
-            throw DataXException.asDataXException(
+            throw AddaxException.asAddaxException(
                     HbaseSQLWriterErrorCode.ILLEGAL_VALUE,
                     "您配置的tableName(" + cfg.tableName + ")含有非法字符，请检查您的配置 或者 联系 Hbase 管理员.");
         }
@@ -183,7 +183,7 @@ public class HbaseSQLWriterConfig
         // 解析列配置
         cfg.columns = dataxCfg.getList(Key.COLUMN, String.class);
         if (cfg.columns == null || cfg.columns.isEmpty()) {
-            throw DataXException.asDataXException(
+            throw AddaxException.asAddaxException(
                     HbaseSQLWriterErrorCode.ILLEGAL_VALUE, "HBase的columns配置不能为空,请添加目标表的列名配置.");
         }
     }

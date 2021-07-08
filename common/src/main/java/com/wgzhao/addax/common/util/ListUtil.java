@@ -20,7 +20,7 @@
 package com.wgzhao.addax.common.util;
 
 import com.wgzhao.addax.common.exception.CommonErrorCode;
-import com.wgzhao.addax.common.exception.DataXException;
+import com.wgzhao.addax.common.exception.AddaxException;
 import org.apache.commons.lang3.StringUtils;
 
 import java.util.ArrayList;
@@ -58,8 +58,8 @@ public final class ListUtil
 
             for (int i = 0, len = list.size() - 1; i < len; i++) {
                 if (list.get(i).equals(list.get(i + 1))) {
-                    throw DataXException
-                            .asDataXException(
+                    throw AddaxException
+                            .asAddaxException(
                                     CommonErrorCode.CONFIG_ERROR,
                                     String.format(
                                             "您提供的作业配置信息有误, String:[%s] 不允许重复出现在列表中: [%s].",
@@ -109,8 +109,8 @@ public final class ListUtil
 
         for (String oneValue : part) {
             if (!all.contains(oneValue)) {
-                throw DataXException
-                        .asDataXException(
+                throw AddaxException
+                        .asAddaxException(
                                 CommonErrorCode.CONFIG_ERROR,
                                 String.format(
                                         "您提供的作业配置信息有误, String:[%s] 不存在于列表中:[%s].",

@@ -22,7 +22,7 @@ package com.wgzhao.addax.core.transport.transformer;
 import com.wgzhao.addax.common.element.Column;
 import com.wgzhao.addax.common.element.Record;
 import com.wgzhao.addax.common.element.StringColumn;
-import com.wgzhao.addax.common.exception.DataXException;
+import com.wgzhao.addax.common.exception.AddaxException;
 import com.wgzhao.addax.transformer.Transformer;
 
 import java.util.Arrays;
@@ -57,7 +57,7 @@ public class SubstrTransformer
             length = Integer.parseInt((String) paras[2]);
         }
         catch (Exception e) {
-            throw DataXException.asDataXException(TransformerErrorCode.TRANSFORMER_ILLEGAL_PARAMETER,
+            throw AddaxException.asAddaxException(TransformerErrorCode.TRANSFORMER_ILLEGAL_PARAMETER,
                     "paras:" + Arrays.asList(paras) + " => " + e.getMessage());
         }
 
@@ -84,7 +84,7 @@ public class SubstrTransformer
             record.setColumn(columnIndex, new StringColumn(newValue));
         }
         catch (Exception e) {
-            throw DataXException.asDataXException(
+            throw AddaxException.asAddaxException(
                     TransformerErrorCode.TRANSFORMER_RUN_EXCEPTION, e.getMessage(), e);
         }
         return record;

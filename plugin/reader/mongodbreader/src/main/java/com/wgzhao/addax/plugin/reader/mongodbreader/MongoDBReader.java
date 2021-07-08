@@ -32,7 +32,7 @@ import com.wgzhao.addax.common.element.DoubleColumn;
 import com.wgzhao.addax.common.element.LongColumn;
 import com.wgzhao.addax.common.element.Record;
 import com.wgzhao.addax.common.element.StringColumn;
-import com.wgzhao.addax.common.exception.DataXException;
+import com.wgzhao.addax.common.exception.AddaxException;
 import com.wgzhao.addax.common.plugin.RecordSender;
 import com.wgzhao.addax.common.spi.Reader;
 import com.wgzhao.addax.common.util.Configuration;
@@ -125,7 +125,7 @@ public class MongoDBReader
             if (lowerBound == null || upperBound == null ||
                     mongoClient == null || database == null ||
                     collection == null || mongodbColumnMeta == null) {
-                throw DataXException.asDataXException(MongoDBReaderErrorCode.ILLEGAL_VALUE,
+                throw AddaxException.asAddaxException(MongoDBReaderErrorCode.ILLEGAL_VALUE,
                         MongoDBReaderErrorCode.ILLEGAL_VALUE.getDescription());
             }
             MongoDatabase db = mongoClient.getDatabase(database);
@@ -208,7 +208,7 @@ public class MongoDBReader
                         if (KeyConstant.isArrayType(column.getString(KeyConstant.COLUMN_TYPE))) {
                             String splitter = column.getString(KeyConstant.COLUMN_SPLITTER);
                             if (isNullOrEmpty((splitter))) {
-                                throw DataXException.asDataXException(MongoDBReaderErrorCode.ILLEGAL_VALUE,
+                                throw AddaxException.asAddaxException(MongoDBReaderErrorCode.ILLEGAL_VALUE,
                                         MongoDBReaderErrorCode.ILLEGAL_VALUE.getDescription());
                             }
                             else {

@@ -27,7 +27,7 @@ import com.wgzhao.addax.common.element.DoubleColumn;
 import com.wgzhao.addax.common.element.LongColumn;
 import com.wgzhao.addax.common.element.StringColumn;
 import com.wgzhao.addax.common.element.Record;
-import com.wgzhao.addax.common.exception.DataXException;
+import com.wgzhao.addax.common.exception.AddaxException;
 import com.wgzhao.addax.common.plugin.RecordSender;
 import com.wgzhao.addax.common.statistics.PerfRecord;
 import com.wgzhao.addax.common.util.Configuration;
@@ -98,7 +98,7 @@ public class HBase20xSQLReaderTask
             LOG.info("Finished read record by Sql: [{}].", querySql);
         }
         catch (SQLException e) {
-            throw DataXException.asDataXException(
+            throw AddaxException.asAddaxException(
                     HBase20xSQLReaderErrorCode.QUERY_DATA_ERROR, "查询Phoenix数据出现异常，请检查服务状态或与HBase管理员联系！", e);
         }
         finally {
@@ -152,7 +152,7 @@ public class HBase20xSQLReaderTask
                 column = new DateColumn((Timestamp) value);
                 break;
             default:
-                throw DataXException.asDataXException(
+                throw AddaxException.asAddaxException(
                         HBase20xSQLReaderErrorCode.PHOENIX_COLUMN_TYPE_CONVERT_ERROR, "遇到不可识别的phoenix类型，" + "sqlType :" + sqlType);
         }
         return column;

@@ -19,7 +19,7 @@
 
 package com.wgzhao.addax.core.taskgroup.runner;
 
-import com.wgzhao.addax.common.exception.DataXException;
+import com.wgzhao.addax.common.exception.AddaxException;
 import com.wgzhao.addax.core.meta.State;
 import com.wgzhao.addax.core.taskgroup.TaskGroupContainer;
 import com.wgzhao.addax.core.util.FrameworkErrorCode;
@@ -49,7 +49,7 @@ public class TaskGroupContainerRunner
         }
         catch (Throwable e) {
             this.state = State.FAILED;
-            throw DataXException.asDataXException(
+            throw AddaxException.asAddaxException(
                     FrameworkErrorCode.RUNTIME_ERROR, e);
         }
     }

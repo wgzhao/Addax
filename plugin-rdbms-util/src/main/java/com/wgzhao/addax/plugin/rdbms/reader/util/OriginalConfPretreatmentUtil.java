@@ -21,7 +21,7 @@ package com.wgzhao.addax.plugin.rdbms.reader.util;
 
 import com.wgzhao.addax.plugin.rdbms.util.DataBaseType;
 import com.wgzhao.addax.plugin.rdbms.util.TableExpandUtil;
-import com.wgzhao.addax.common.exception.DataXException;
+import com.wgzhao.addax.common.exception.AddaxException;
 import com.wgzhao.addax.common.util.Configuration;
 import com.wgzhao.addax.common.util.ListUtil;
 import com.wgzhao.addax.plugin.rdbms.reader.Constant;
@@ -139,7 +139,7 @@ public final class OriginalConfPretreatmentUtil
                 List<String> expandedTables = TableExpandUtil.expandTableConf(tables);
 
                 if (expandedTables.isEmpty()) {
-                    throw DataXException.asDataXException(
+                    throw AddaxException.asAddaxException(
                             DBUtilErrorCode.ILLEGAL_VALUE, String.format("您所配置的读取数据库表:%s 不正确. 因为DataX根据您的配置找不到这张表. 请检查您的配置并作出修改." +
                                     "请先了解 DataX 配置.", StringUtils.join(tables, ",")));
                 }
@@ -164,7 +164,7 @@ public final class OriginalConfPretreatmentUtil
         if (isTableMode) {
             if (null == userConfiguredColumns
                     || userConfiguredColumns.isEmpty()) {
-                throw DataXException.asDataXException(DBUtilErrorCode.REQUIRED_VALUE, "您未配置读取数据库表的列信息. " +
+                throw AddaxException.asAddaxException(DBUtilErrorCode.REQUIRED_VALUE, "您未配置读取数据库表的列信息. " +
                         "正确的配置方式是给 column 配置上您需要读取的列名称,用英文逗号分隔. 例如: \"column\": [\"id\", \"name\"],请参考上述配置并作出修改.");
             }
             else {
@@ -197,7 +197,7 @@ public final class OriginalConfPretreatmentUtil
 
                     for (String column : userConfiguredColumns) {
                         if ("*".equals(column)) {
-                            throw DataXException.asDataXException(
+                            throw AddaxException.asAddaxException(
                                     DBUtilErrorCode.ILLEGAL_VALUE,
                                     "您的配置文件中的列配置信息有误. 因为根据您的配置，数据库表的列中存在多个*. 请检查您的配置并作出修改. ");
                         }
@@ -209,7 +209,7 @@ public final class OriginalConfPretreatmentUtil
                     originalConfig.set(Key.COLUMN,
                             StringUtils.join(quotedColumns, ","));
                     if (StringUtils.isNotBlank(splitPk) && !allColumns.contains(splitPk.toLowerCase())) {
-                        throw DataXException.asDataXException(DBUtilErrorCode.ILLEGAL_SPLIT_PK,
+                        throw AddaxException.asAddaxException(DBUtilErrorCode.ILLEGAL_SPLIT_PK,
                                 String.format("您的配置文件中的列配置信息有误. 因为根据您的配置，您读取的数据库表:%s 中没有主键名为:%s. 请检查您的配置并作出修改.", tableName, splitPk));
                     }
                 }
@@ -266,12 +266,12 @@ public final class OriginalConfPretreatmentUtil
 
             if (!isTableMode && !isQuerySqlMode) {
                 // table 和 querySql 二者均未配置
-                throw DataXException.asDataXException(
+                throw AddaxException.asAddaxException(
                         DBUtilErrorCode.TABLE_QUERYSQL_MISSING, "您的配置有误. 因为table和querySql应该配置并且只能配置一个. 请检查您的配置并作出修改.");
             }
             else if (isTableMode && isQuerySqlMode) {
                 // table 和 querySql 二者均配置
-                throw DataXException.asDataXException(DBUtilErrorCode.TABLE_QUERYSQL_MIXED,
+                throw AddaxException.asAddaxException(DBUtilErrorCode.TABLE_QUERYSQL_MIXED,
                         "您的配置凌乱了. 因为datax不能同时既配置table又配置querySql.请检查您的配置并作出修改.");
             }
         }
@@ -279,7 +279,7 @@ public final class OriginalConfPretreatmentUtil
         // 混合配制 table 和 querySql
         if (!ListUtil.checkIfValueSame(tableModeFlags)
                 || !ListUtil.checkIfValueSame(querySqlModeFlags)) {
-            throw DataXException.asDataXException(DBUtilErrorCode.TABLE_QUERYSQL_MIXED,
+            throw AddaxException.asAddaxException(DBUtilErrorCode.TABLE_QUERYSQL_MIXED,
                     "您配置凌乱了. 不能同时既配置table又配置querySql. 请检查您的配置并作出修改.");
         }
 

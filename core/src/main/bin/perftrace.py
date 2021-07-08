@@ -90,10 +90,10 @@ warn: test write performance will write data into your table, you can use a temp
 '''
 
 def printCopyright():
-    DATAX_VERSION = 'UNKNOWN_DATAX_VERSION'
+    ADDAX_VERSION = 'UNKNOWN_ADDAX_VERSION'
     print('''
 DataX Util Tools ({}), From Alibaba !
-Copyright (C) 2010-2016, Alibaba Group. All Rights Reserved.''').format(DATAX_VERSION)
+Copyright (C) 2010-2016, Alibaba Group. All Rights Reserved.''').format(ADDAX_VERSION)
     sys.stdout.flush()
 
 

@@ -29,7 +29,7 @@ import com.wgzhao.addax.common.element.DoubleColumn;
 import com.wgzhao.addax.common.element.LongColumn;
 import com.wgzhao.addax.common.element.Record;
 import com.wgzhao.addax.common.element.StringColumn;
-import com.wgzhao.addax.common.exception.DataXException;
+import com.wgzhao.addax.common.exception.AddaxException;
 import com.wgzhao.addax.common.plugin.RecordSender;
 import com.wgzhao.addax.common.plugin.TaskPluginCollector;
 import com.wgzhao.addax.common.spi.Reader;
@@ -105,7 +105,7 @@ public class TxtFileReader
             // Compatible with the old version, path is a string before
             String pathInString = this.originConfig.getNecessaryValue(Key.PATH, TxtFileReaderErrorCode.REQUIRED_VALUE);
             if (StringUtils.isBlank(pathInString)) {
-                throw DataXException.asDataXException(
+                throw AddaxException.asAddaxException(
                         TxtFileReaderErrorCode.REQUIRED_VALUE, "您需要指定待读取的源目录或文件");
             }
             if (!pathInString.startsWith("[") && !pathInString.endsWith("]")) {
@@ -115,7 +115,7 @@ public class TxtFileReader
             else {
                 path = this.originConfig.getList(Key.PATH, String.class);
                 if (null == path || path.isEmpty()) {
-                    throw DataXException.asDataXException(
+                    throw AddaxException.asAddaxException(
                             TxtFileReaderErrorCode.REQUIRED_VALUE, "您需要指定待读取的源目录或文件");
                 }
             }
@@ -131,12 +131,12 @@ public class TxtFileReader
                     this.originConfig.set(Key.ENCODING, encoding);
                 }
                 catch (UnsupportedCharsetException uce) {
-                    throw DataXException.asDataXException(
+                    throw AddaxException.asAddaxException(
                             TxtFileReaderErrorCode.ILLEGAL_VALUE,
                             String.format("不支持您配置的编码格式 : [%s]", encoding), uce);
                 }
                 catch (Exception e) {
-                    throw DataXException.asDataXException(
+                    throw AddaxException.asAddaxException(
                             TxtFileReaderErrorCode.CONFIG_INVALID_EXCEPTION,
                             String.format("编码配置异常, 请联系我们: %s", e.getMessage()),
                             e);
@@ -167,18 +167,18 @@ public class TxtFileReader
                             .getString(Key.VALUE);
 
                     if (null == columnIndex && null == columnValue) {
-                        throw DataXException.asDataXException(
+                        throw AddaxException.asAddaxException(
                                 TxtFileReaderErrorCode.NO_INDEX_VALUE,
                                 "由于您配置了type, 则至少需要配置 index 或 value");
                     }
 
                     if (null != columnIndex && null != columnValue) {
-                        throw DataXException.asDataXException(
+                        throw AddaxException.asAddaxException(
                                 TxtFileReaderErrorCode.MIXED_INDEX_VALUE,
                                 "您混合配置了index, value, 每一列同时仅能选择其中一种");
                     }
                     if (null != columnIndex && columnIndex < 0) {
-                        throw DataXException.asDataXException(
+                        throw AddaxException.asAddaxException(
                                 TxtFileReaderErrorCode.ILLEGAL_VALUE, String
                                         .format("index需要大于等于0, 您配置的index为[%s]",
                                                 columnIndex));
@@ -189,7 +189,7 @@ public class TxtFileReader
             String delimiterInStr = this.originConfig.getString(Key.FIELD_DELIMITER);
             // warn: if have, length must be one
             if (null != delimiterInStr && 1 != delimiterInStr.length()) {
-                throw DataXException.asDataXException(
+                throw AddaxException.asAddaxException(
                         TxtFileReaderErrorCode.ILLEGAL_VALUE,
                         String.format("仅仅支持单字符切分, 您配置的切分为 : [%s]", delimiterInStr));
             }
@@ -235,7 +235,7 @@ public class TxtFileReader
             // int splitNumber = adviceNumber
             int splitNumber = this.sourceFiles.size();
             if (0 == splitNumber) {
-                throw DataXException.asDataXException(
+                throw AddaxException.asAddaxException(
                         TxtFileReaderErrorCode.EMPTY_DIR_EXCEPTION, String
                                 .format("未能找到待读取的文件,请确认您的配置项path: %s",
                                         this.originConfig.getString(Key.PATH)));
@@ -295,7 +295,7 @@ public class TxtFileReader
                     String message = String.format("您设定的目录不存在 : [%s]",
                             parentDirectory);
                     LOG.error(message);
-                    throw DataXException.asDataXException(
+                    throw AddaxException.asAddaxException(
                             TxtFileReaderErrorCode.FILE_NOT_EXISTS, message);
                 }
             }
@@ -303,7 +303,7 @@ public class TxtFileReader
                 String message = String.format("您没有权限查看目录 : [%s]",
                         parentDirectory);
                 LOG.error(message);
-                throw DataXException.asDataXException(
+                throw AddaxException.asAddaxException(
                         TxtFileReaderErrorCode.SECURITY_NOT_ENOUGH, message);
             }
 
@@ -339,7 +339,7 @@ public class TxtFileReader
                         String message = String.format("您没有权限查看目录 : [%s]",
                                 directory);
                         LOG.error(message);
-                        throw DataXException.asDataXException(
+                        throw AddaxException.asAddaxException(
                                 TxtFileReaderErrorCode.SECURITY_NOT_ENOUGH,
                                 message);
                     }
@@ -348,7 +348,7 @@ public class TxtFileReader
                     String message = String.format("您没有权限查看目录 : [%s]",
                             directory);
                     LOG.error(message);
-                    throw DataXException.asDataXException(
+                    throw AddaxException.asAddaxException(
                             TxtFileReaderErrorCode.SECURITY_NOT_ENOUGH,
                             message, e);
                 }
@@ -418,7 +418,7 @@ public class TxtFileReader
             this.bufferSize = readerSliceConfig.getInt(Key.BUFFER_SIZE, Constant.DEFAULT_BUFFER_SIZE);
             String delimiterInStr = readerSliceConfig.getString(Key.FIELD_DELIMITER);
             if (null != delimiterInStr && 1 != delimiterInStr.length()) {
-                throw DataXException.asDataXException(
+                throw AddaxException.asAddaxException(
                         TxtFileReaderErrorCode.ILLEGAL_VALUE,
                         String.format("仅仅支持单字符切分, 您配置的切分为 : [%s]", delimiterInStr));
             }
@@ -463,7 +463,7 @@ public class TxtFileReader
                 }
                 catch (FileNotFoundException e) {
                     // warn: sock 文件无法read,能影响所有文件的传输,需要用户自己保证
-                    throw DataXException.asDataXException(
+                    throw AddaxException.asAddaxException(
                             TxtFileReaderErrorCode.OPEN_FILE_ERROR, String.format("找不到待读取的文件 : [%s]", fileName));
                 }
                 try {
@@ -520,23 +520,23 @@ public class TxtFileReader
                 }
             }
             catch (UnsupportedEncodingException uee) {
-                throw DataXException
-                        .asDataXException(
+                throw AddaxException
+                        .asAddaxException(
                                 TxtFileReaderErrorCode.OPEN_FILE_WITH_CHARSET_ERROR,
                                 String.format("不支持的编码格式 : [%s]", encoding), uee);
             }
             catch (FileNotFoundException fnfe) {
-                throw DataXException.asDataXException(
+                throw AddaxException.asAddaxException(
                         TxtFileReaderErrorCode.FILE_NOT_EXISTS,
                         String.format("无法找到文件 : [%s]", context), fnfe);
             }
             catch (IOException ioe) {
-                throw DataXException.asDataXException(
+                throw AddaxException.asAddaxException(
                         TxtFileReaderErrorCode.READ_FILE_IO_ERROR,
                         String.format("读取文件错误 : [%s]", context), ioe);
             }
             catch (Exception e) {
-                throw DataXException.asDataXException(
+                throw AddaxException.asAddaxException(
                         TxtFileReaderErrorCode.RUNTIME_EXCEPTION,
                         String.format("运行时异常 : %s", e.getMessage()), e);
             }
@@ -577,15 +577,15 @@ public class TxtFileReader
                         String columnValue;
 
                         if (null == columnIndex && null == columnConst) {
-                            throw DataXException
-                                    .asDataXException(
+                            throw AddaxException
+                                    .asAddaxException(
                                             TxtFileReaderErrorCode.NO_INDEX_VALUE,
                                             "由于您配置了type, 则至少需要配置 index 或 value");
                         }
 
                         if (null != columnIndex && null != columnConst) {
-                            throw DataXException
-                                    .asDataXException(
+                            throw AddaxException
+                                    .asAddaxException(
                                             TxtFileReaderErrorCode.MIXED_INDEX_VALUE,
                                             "您混合配置了index, value, 每一列同时仅能选择其中一种");
                         }
@@ -684,8 +684,8 @@ public class TxtFileReader
                                 String errorMessage = String.format(
                                         "您配置的列类型暂不支持 : [%s]", columnType);
                                 LOG.error(errorMessage);
-                                throw DataXException
-                                        .asDataXException(
+                                throw AddaxException
+                                        .asAddaxException(
                                                 TxtFileReaderErrorCode.NOT_SUPPORT_TYPE,
                                                 errorMessage);
                         }
@@ -699,8 +699,8 @@ public class TxtFileReader
                             .collectDirtyRecord(record, iae.getMessage());
                 }
                 catch (Exception e) {
-                    if (e instanceof DataXException) {
-                        throw (DataXException) e;
+                    if (e instanceof AddaxException) {
+                        throw (AddaxException) e;
                     }
                     // 每一种转换失败都是脏数据处理,包括数字格式 & 日期格式
                     taskPluginCollector.collectDirtyRecord(record, e.getMessage());

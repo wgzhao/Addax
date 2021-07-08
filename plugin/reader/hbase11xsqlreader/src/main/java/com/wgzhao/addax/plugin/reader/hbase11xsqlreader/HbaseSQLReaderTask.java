@@ -27,7 +27,7 @@ import com.wgzhao.addax.common.element.DoubleColumn;
 import com.wgzhao.addax.common.element.LongColumn;
 import com.wgzhao.addax.common.element.StringColumn;
 import com.wgzhao.addax.common.element.Record;
-import com.wgzhao.addax.common.exception.DataXException;
+import com.wgzhao.addax.common.exception.AddaxException;
 import com.wgzhao.addax.common.util.Configuration;
 import org.apache.hadoop.mapreduce.TaskAttemptID;
 import org.apache.hadoop.mapreduce.task.TaskAttemptContextImpl;
@@ -99,7 +99,7 @@ public class HbaseSQLReaderTask
             this.getPColumns();
         }
         catch (SQLException e) {
-            throw DataXException.asDataXException(
+            throw AddaxException.asAddaxException(
                     HbaseSQLReaderErrorCode.GET_PHOENIX_CONNECTIONINFO_ERROR, "获取表的列出问题，重试，若还有问题请检查hbase集群状态," + e.getMessage());
         }
         this.phoenixInputFormat = new PhoenixInputFormat<PhoenixRecordWritable>();
@@ -114,7 +114,7 @@ public class HbaseSQLReaderTask
             this.phoenixRecordReader = (PhoenixRecordReader) phoenixInputFormat.createRecordReader(phoenixInputSplit, hadoopAttemptContext);
         }
         catch (Exception e) {
-            throw DataXException.asDataXException(
+            throw AddaxException.asAddaxException(
                     HbaseSQLReaderErrorCode.PHOENIX_CREATEREADER_ERROR, "创建phoenix的reader出现问题,请重试，若还有问题请检查hbase集群状态," + e.getMessage());
         }
     }
@@ -125,11 +125,11 @@ public class HbaseSQLReaderTask
             this.phoenixRecordReader.initialize(this.phoenixInputSplit, hadoopAttemptContext);
         }
         catch (IOException e) {
-            throw DataXException.asDataXException(
+            throw AddaxException.asAddaxException(
                     HbaseSQLReaderErrorCode.PHOENIX_READERINIT_ERROR, "phoenix的reader初始化出现问题,请重试，若还有问题请检查hbase集群状态" + e.getMessage());
         }
         catch (InterruptedException e) {
-            throw DataXException.asDataXException(
+            throw AddaxException.asAddaxException(
                     HbaseSQLReaderErrorCode.PHOENIX_READERINIT_ERROR, "phoenix的reader初始化被中断,请重试," + e.getMessage());
         }
     }
@@ -181,7 +181,7 @@ public class HbaseSQLReaderTask
                 column = new DateColumn((Timestamp) value);
                 break;
             default:
-                throw DataXException.asDataXException(
+                throw AddaxException.asAddaxException(
                         HbaseSQLReaderErrorCode.PHOENIX_COLUMN_TYPE_CONVERT_ERROR, "遇到不可识别的phoenix类型，" + "sqlType :" + sqlType);
         }
         return column;
@@ -219,7 +219,7 @@ public class HbaseSQLReaderTask
                 this.phoenixRecordReader.close();
             }
             catch (IOException e) {
-                throw DataXException.asDataXException(
+                throw AddaxException.asAddaxException(
                         HbaseSQLReaderErrorCode.PHOENIX_READER_CLOSE_ERROR, "phoenix的reader close失败,请重试，若还有问题请检查hbase集群状态" + e.getMessage());
             }
         }

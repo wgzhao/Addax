@@ -21,7 +21,7 @@ package com.wgzhao.addax.plugin.writer.greenplumwriter;
 
 import com.wgzhao.addax.common.element.Column;
 import com.wgzhao.addax.common.element.Record;
-import com.wgzhao.addax.common.exception.DataXException;
+import com.wgzhao.addax.common.exception.AddaxException;
 import com.wgzhao.addax.plugin.rdbms.util.DBUtilErrorCode;
 import org.apache.commons.lang3.tuple.Triple;
 import org.slf4j.Logger;
@@ -74,7 +74,7 @@ public class CopyProcessor
 
             if (record.getColumnNumber() != this.columnNumber) {
                 // 源头读取字段列数与目的表字段写入列数不相等，直接报错
-                throw DataXException.asDataXException(DBUtilErrorCode.CONF_ERROR,
+                throw AddaxException.asAddaxException(DBUtilErrorCode.CONF_ERROR,
                         String.format("列配置信息有错误. 因为您配置的任务中，源头读取字段数:%s 与 目的表要写入的字段数:%s 不相等. 您可能配置了错误的表名称, 请检查您的配置并作出修改.",
                                 record.getColumnNumber(), this.columnNumber));
             }

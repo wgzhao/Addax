@@ -19,7 +19,7 @@
 
 package com.wgzhao.addax.plugin.writer.txtfilewriter;
 
-import com.wgzhao.addax.common.exception.DataXException;
+import com.wgzhao.addax.common.exception.AddaxException;
 import com.wgzhao.addax.common.plugin.RecordReceiver;
 import com.wgzhao.addax.common.spi.Writer;
 import com.wgzhao.addax.common.util.Configuration;
@@ -87,19 +87,19 @@ public class TxtFileWriter
                 // warn: 这里用户需要配一个目录
                 File dir = new File(path);
                 if (dir.isFile()) {
-                    throw DataXException.asDataXException(
+                    throw AddaxException.asAddaxException(
                             TxtFileWriterErrorCode.ILLEGAL_VALUE,
                             String.format("您配置的path: [%s] 不是一个合法的目录, 请您注意文件重名, 不合法目录名等情况.", path));
                 }
                 if (!dir.exists()) {
                     boolean createdOk = dir.mkdirs();
                     if (!createdOk) {
-                        throw DataXException.asDataXException(TxtFileWriterErrorCode.CONFIG_INVALID_EXCEPTION, String.format("您指定的文件路径 : [%s] 创建失败.", path));
+                        throw AddaxException.asAddaxException(TxtFileWriterErrorCode.CONFIG_INVALID_EXCEPTION, String.format("您指定的文件路径 : [%s] 创建失败.", path));
                     }
                 }
             }
             catch (SecurityException se) {
-                throw DataXException.asDataXException(TxtFileWriterErrorCode.SECURITY_NOT_ENOUGH, String.format("您没有权限创建文件路径 : [%s] ", path), se);
+                throw AddaxException.asAddaxException(TxtFileWriterErrorCode.SECURITY_NOT_ENOUGH, String.format("您没有权限创建文件路径 : [%s] ", path), se);
             }
         }
 
@@ -113,15 +113,15 @@ public class TxtFileWriter
             File dir = new File(path);
             //path is exists or not ?
             if (!dir.exists()) {
-                throw DataXException.asDataXException(TxtFileWriterErrorCode.PATH_NOT_VALID, String.format("您配置的路径 [%s] 不存在", path));
+                throw AddaxException.asAddaxException(TxtFileWriterErrorCode.PATH_NOT_VALID, String.format("您配置的路径 [%s] 不存在", path));
             }
             // path is directory or not ?
             if (!dir.isDirectory()) {
-                throw DataXException.asDataXException(TxtFileWriterErrorCode.PAHT_NOT_DIR, String.format("您配置的路径 [%s] 不是文件夹", path));
+                throw AddaxException.asAddaxException(TxtFileWriterErrorCode.PAHT_NOT_DIR, String.format("您配置的路径 [%s] 不是文件夹", path));
             }
             // path can writer it ?
             if (!dir.canWrite()) {
-                throw DataXException.asDataXException(TxtFileWriterErrorCode.WRITE_FILE_ERROR, String.format("您配置的路径 [%s] 没有写入权限", path));
+                throw AddaxException.asAddaxException(TxtFileWriterErrorCode.WRITE_FILE_ERROR, String.format("您配置的路径 [%s] 没有写入权限", path));
             }
             // truncate option handler
             if ("truncate".equals(writeMode)) {
@@ -137,13 +137,13 @@ public class TxtFileWriter
                     }
                 }
                 catch (NullPointerException npe) {
-                    throw DataXException.asDataXException(TxtFileWriterErrorCode.WRITE_FILE_ERROR, String.format("您配置的目录清空时出现空指针异常 : [%s]", path), npe);
+                    throw AddaxException.asAddaxException(TxtFileWriterErrorCode.WRITE_FILE_ERROR, String.format("您配置的目录清空时出现空指针异常 : [%s]", path), npe);
                 }
                 catch (IllegalArgumentException iae) {
-                    throw DataXException.asDataXException(TxtFileWriterErrorCode.SECURITY_NOT_ENOUGH, String.format("您配置的目录参数异常 : [%s]", path));
+                    throw AddaxException.asAddaxException(TxtFileWriterErrorCode.SECURITY_NOT_ENOUGH, String.format("您配置的目录参数异常 : [%s]", path));
                 }
                 catch (IOException e) {
-                    throw DataXException.asDataXException(TxtFileWriterErrorCode.WRITE_FILE_ERROR, String.format("无法清空目录 : [%s]", path), e);
+                    throw AddaxException.asAddaxException(TxtFileWriterErrorCode.WRITE_FILE_ERROR, String.format("无法清空目录 : [%s]", path), e);
                 }
             }
             else if ("append".equals(writeMode)) {
@@ -154,7 +154,7 @@ public class TxtFileWriter
                 // warn: check two times about exists, mkdirs
                 if (dir.exists()) {
                     if (!dir.canRead()) {
-                        throw DataXException.asDataXException(TxtFileWriterErrorCode.SECURITY_NOT_ENOUGH, String.format("您没有权限查看目录 : [%s]", path));
+                        throw AddaxException.asAddaxException(TxtFileWriterErrorCode.SECURITY_NOT_ENOUGH, String.format("您没有权限查看目录 : [%s]", path));
                     }
                     // fileName is not null
                     FilenameFilter filter = new PrefixFileFilter(fileName);
@@ -166,18 +166,18 @@ public class TxtFileWriter
                             allFiles.add(eachFile.getName());
                         }
                         LOG.error("冲突文件列表为: [{}]", StringUtils.join(allFiles, ","));
-                        throw DataXException.asDataXException(TxtFileWriterErrorCode.ILLEGAL_VALUE, String.format("您配置的path: [%s] 目录不为空, 下面存在其他文件或文件夹.", path));
+                        throw AddaxException.asAddaxException(TxtFileWriterErrorCode.ILLEGAL_VALUE, String.format("您配置的path: [%s] 目录不为空, 下面存在其他文件或文件夹.", path));
                     }
                 }
                 else {
                     boolean createdOk = dir.mkdirs();
                     if (!createdOk) {
-                        throw DataXException.asDataXException(TxtFileWriterErrorCode.CONFIG_INVALID_EXCEPTION, String.format("您指定的文件路径 : [%s] 创建失败.", path));
+                        throw AddaxException.asAddaxException(TxtFileWriterErrorCode.CONFIG_INVALID_EXCEPTION, String.format("您指定的文件路径 : [%s] 创建失败.", path));
                     }
                 }
             }
             else {
-                throw DataXException.asDataXException(TxtFileWriterErrorCode.ILLEGAL_VALUE,
+                throw AddaxException.asAddaxException(TxtFileWriterErrorCode.ILLEGAL_VALUE,
                         String.format("仅支持 truncate, append, nonConflict 三种模式, 不支持您配置的 writeMode 模式 : [%s]", writeMode));
             }
         }
@@ -205,7 +205,7 @@ public class TxtFileWriter
                 allFiles = new HashSet<>(Arrays.asList(Objects.requireNonNull(dir.list())));
             }
             catch (SecurityException se) {
-                throw DataXException.asDataXException(TxtFileWriterErrorCode.SECURITY_NOT_ENOUGH, String.format("您没有权限查看目录 : [%s]", path));
+                throw AddaxException.asAddaxException(TxtFileWriterErrorCode.SECURITY_NOT_ENOUGH, String.format("您没有权限查看目录 : [%s]", path));
             }
             return StorageWriterUtil.split(writerSliceConfig, allFiles, mandatoryNumber);
         }
@@ -258,10 +258,10 @@ public class TxtFileWriter
                 StorageWriterUtil.writeToStream(lineReceiver, outputStream, this.writerSliceConfig, this.fileName, this.getTaskPluginCollector());
             }
             catch (SecurityException se) {
-                throw DataXException.asDataXException(TxtFileWriterErrorCode.SECURITY_NOT_ENOUGH, String.format("您没有权限创建文件  : [%s]", this.fileName));
+                throw AddaxException.asAddaxException(TxtFileWriterErrorCode.SECURITY_NOT_ENOUGH, String.format("您没有权限创建文件  : [%s]", this.fileName));
             }
             catch (IOException ioe) {
-                throw DataXException.asDataXException(TxtFileWriterErrorCode.WRITE_FILE_IO_ERROR, String.format("无法创建待写文件 : [%s]", this.fileName), ioe);
+                throw AddaxException.asAddaxException(TxtFileWriterErrorCode.WRITE_FILE_IO_ERROR, String.format("无法创建待写文件 : [%s]", this.fileName), ioe);
             }
             finally {
                 IOUtils.closeQuietly(outputStream, null);

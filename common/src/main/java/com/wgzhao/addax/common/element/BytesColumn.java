@@ -20,7 +20,7 @@
 package com.wgzhao.addax.common.element;
 
 import com.wgzhao.addax.common.exception.CommonErrorCode;
-import com.wgzhao.addax.common.exception.DataXException;
+import com.wgzhao.addax.common.exception.AddaxException;
 import org.apache.commons.lang3.ArrayUtils;
 
 import java.math.BigDecimal;
@@ -66,7 +66,7 @@ public class BytesColumn
             return ColumnCast.bytes2String(this);
         }
         catch (Exception e) {
-            throw DataXException.asDataXException(
+            throw AddaxException.asAddaxException(
                     CommonErrorCode.CONVERT_NOT_SUPPORT,
                     String.format("Bytes[%s]不能转为String .", this.toString()));
         }
@@ -75,42 +75,42 @@ public class BytesColumn
     @Override
     public Long asLong()
     {
-        throw DataXException.asDataXException(
+        throw AddaxException.asAddaxException(
                 CommonErrorCode.CONVERT_NOT_SUPPORT, "Bytes类型不能转为Long .");
     }
 
     @Override
     public BigDecimal asBigDecimal()
     {
-        throw DataXException.asDataXException(
+        throw AddaxException.asAddaxException(
                 CommonErrorCode.CONVERT_NOT_SUPPORT, "Bytes类型不能转为BigDecimal .");
     }
 
     @Override
     public BigInteger asBigInteger()
     {
-        throw DataXException.asDataXException(
+        throw AddaxException.asAddaxException(
                 CommonErrorCode.CONVERT_NOT_SUPPORT, "Bytes类型不能转为BigInteger .");
     }
 
     @Override
     public Double asDouble()
     {
-        throw DataXException.asDataXException(
+        throw AddaxException.asAddaxException(
                 CommonErrorCode.CONVERT_NOT_SUPPORT, "Bytes类型不能转为Long .");
     }
 
     @Override
     public Date asDate()
     {
-        throw DataXException.asDataXException(
+        throw AddaxException.asAddaxException(
                 CommonErrorCode.CONVERT_NOT_SUPPORT, "Bytes类型不能转为Date .");
     }
 
     @Override
     public Boolean asBoolean()
     {
-        throw DataXException.asDataXException(
+        throw AddaxException.asAddaxException(
                 CommonErrorCode.CONVERT_NOT_SUPPORT, "Bytes类型不能转为Boolean .");
     }
 }

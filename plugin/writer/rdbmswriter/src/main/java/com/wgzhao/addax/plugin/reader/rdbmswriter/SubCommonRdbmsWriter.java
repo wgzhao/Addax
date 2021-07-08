@@ -20,7 +20,7 @@
 package com.wgzhao.addax.plugin.reader.rdbmswriter;
 
 import com.wgzhao.addax.common.element.Column;
-import com.wgzhao.addax.common.exception.DataXException;
+import com.wgzhao.addax.common.exception.AddaxException;
 import com.wgzhao.addax.plugin.rdbms.util.DBUtil;
 import com.wgzhao.addax.plugin.rdbms.util.DataBaseType;
 import com.wgzhao.addax.plugin.rdbms.writer.CommonRdbmsWriter;
@@ -194,7 +194,7 @@ public class SubCommonRdbmsWriter
                         break;
                 }
             }
-            catch (DataXException e) {
+            catch (AddaxException e) {
                 throw new SQLException(String.format(
                         "类型转换错误:[%s] 字段名:[%s], 字段类型:[%d], 字段Java类型:[%s].",
                         column,

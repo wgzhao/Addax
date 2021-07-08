@@ -19,7 +19,7 @@
 
 package com.wgzhao.addax.plugin.writer.mongodbwriter.util;
 
-import com.wgzhao.addax.common.exception.DataXException;
+import com.wgzhao.addax.common.exception.AddaxException;
 import com.wgzhao.addax.common.util.Configuration;
 import com.wgzhao.addax.plugin.writer.mongodbwriter.KeyConstant;
 import com.wgzhao.addax.plugin.writer.mongodbwriter.MongoDBWriterErrorCode;
@@ -40,19 +40,19 @@ public class MongoUtil
 
         List<Object> addressList = conf.getList(KeyConstant.MONGO_ADDRESS);
         if (addressList == null || addressList.isEmpty()) {
-            throw DataXException.asDataXException(MongoDBWriterErrorCode.ILLEGAL_VALUE, "不合法参数");
+            throw AddaxException.asAddaxException(MongoDBWriterErrorCode.ILLEGAL_VALUE, "不合法参数");
         }
         try {
             return new MongoClient(parseServerAddress(addressList));
         }
         catch (UnknownHostException e) {
-            throw DataXException.asDataXException(MongoDBWriterErrorCode.ILLEGAL_ADDRESS, "不合法的地址");
+            throw AddaxException.asAddaxException(MongoDBWriterErrorCode.ILLEGAL_ADDRESS, "不合法的地址");
         }
         catch (NumberFormatException e) {
-            throw DataXException.asDataXException(MongoDBWriterErrorCode.ILLEGAL_VALUE, "不合法参数");
+            throw AddaxException.asAddaxException(MongoDBWriterErrorCode.ILLEGAL_VALUE, "不合法参数");
         }
         catch (Exception e) {
-            throw DataXException.asDataXException(MongoDBWriterErrorCode.UNEXCEPT_EXCEPTION, "未知异常");
+            throw AddaxException.asAddaxException(MongoDBWriterErrorCode.UNEXCEPT_EXCEPTION, "未知异常");
         }
     }
 
@@ -61,20 +61,20 @@ public class MongoUtil
 
         List<Object> addressList = conf.getList(KeyConstant.MONGO_ADDRESS);
         if (!isHostPortPattern(addressList)) {
-            throw DataXException.asDataXException(MongoDBWriterErrorCode.ILLEGAL_VALUE, "不合法参数");
+            throw AddaxException.asAddaxException(MongoDBWriterErrorCode.ILLEGAL_VALUE, "不合法参数");
         }
         try {
             MongoCredential credential = MongoCredential.createCredential(userName, database, password.toCharArray());
             return new MongoClient(parseServerAddress(addressList), Arrays.asList(credential));
         }
         catch (UnknownHostException e) {
-            throw DataXException.asDataXException(MongoDBWriterErrorCode.ILLEGAL_ADDRESS, "不合法的地址");
+            throw AddaxException.asAddaxException(MongoDBWriterErrorCode.ILLEGAL_ADDRESS, "不合法的地址");
         }
         catch (NumberFormatException e) {
-            throw DataXException.asDataXException(MongoDBWriterErrorCode.ILLEGAL_VALUE, "不合法参数");
+            throw AddaxException.asAddaxException(MongoDBWriterErrorCode.ILLEGAL_VALUE, "不合法参数");
         }
         catch (Exception e) {
-            throw DataXException.asDataXException(MongoDBWriterErrorCode.UNEXCEPT_EXCEPTION, "未知异常");
+            throw AddaxException.asAddaxException(MongoDBWriterErrorCode.UNEXCEPT_EXCEPTION, "未知异常");
         }
     }
 

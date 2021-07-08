@@ -19,7 +19,7 @@
 
 package com.wgzhao.addax.plugin.writer.ftpwriter.util;
 
-import com.wgzhao.addax.common.exception.DataXException;
+import com.wgzhao.addax.common.exception.AddaxException;
 import com.wgzhao.addax.plugin.writer.ftpwriter.FtpWriterErrorCode;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.serializer.SerializerFeature;
@@ -59,8 +59,8 @@ public class SftpHelperImpl
         try {
             this.session = jsch.getSession(username, host, port);
             if (this.session == null) {
-                throw DataXException
-                        .asDataXException(FtpWriterErrorCode.FAIL_LOGIN,
+                throw AddaxException
+                        .asAddaxException(FtpWriterErrorCode.FAIL_LOGIN,
                                 "创建ftp连接this.session失败,无法通过sftp与服务器建立链接，请检查主机名和用户名是否正确.");
             }
 
@@ -88,7 +88,7 @@ public class SftpHelperImpl
                             .format("请确认ftp服务器地址是否正确，无法连接到地址为: [%s] 的ftp服务器, errorMessage:%s",
                                     host, e.getMessage());
                     LOG.error(message);
-                    throw DataXException.asDataXException(
+                    throw AddaxException.asAddaxException(
                             FtpWriterErrorCode.FAIL_LOGIN, message, e);
                 }
                 else if (illegalArgumentException.equals(cause)
@@ -97,7 +97,7 @@ public class SftpHelperImpl
                             "请确认连接ftp服务器端口是否正确，错误的端口: [%s], errorMessage:%s",
                             port, e.getMessage());
                     LOG.error(message);
-                    throw DataXException.asDataXException(
+                    throw AddaxException.asAddaxException(
                             FtpWriterErrorCode.FAIL_LOGIN, message, e);
                 }
             }
@@ -106,7 +106,7 @@ public class SftpHelperImpl
                         .format("与ftp服务器建立连接失败,请检查主机、用户名、密码是否正确, host:%s, port:%s, username:%s, errorMessage:%s",
                                 host, port, username, e.getMessage());
                 LOG.error(message);
-                throw DataXException.asDataXException(
+                throw AddaxException.asAddaxException(
                         FtpWriterErrorCode.FAIL_LOGIN, message);
             }
         }
@@ -152,8 +152,8 @@ public class SftpHelperImpl
                         .format("创建目录:%s时发生I/O异常,请确认与ftp服务器的连接正常,拥有目录创建权限, errorMessage:%s",
                                 directoryPath, e.getMessage());
                 LOG.error(message, e);
-                throw DataXException
-                        .asDataXException(
+                throw AddaxException
+                        .asAddaxException(
                                 FtpWriterErrorCode.COMMAND_FTP_IO_EXCEPTION,
                                 message, e);
             }
@@ -194,8 +194,8 @@ public class SftpHelperImpl
                         .format("创建目录:%s时发生I/O异常,请确认与ftp服务器的连接正常,拥有目录创建权限, errorMessage:%s",
                                 directoryPath, e.getMessage());
                 LOG.error(message, e);
-                throw DataXException
-                        .asDataXException(
+                throw AddaxException
+                        .asAddaxException(
                                 FtpWriterErrorCode.COMMAND_FTP_IO_EXCEPTION,
                                 message, e);
             }
@@ -239,7 +239,7 @@ public class SftpHelperImpl
                     "打开FTP文件[%s]获取写出流时出错,请确认文件%s有权限创建，有权限写出等", filePath,
                     filePath);
             if (null == writeOutputStream) {
-                throw DataXException.asDataXException(
+                throw AddaxException.asAddaxException(
                         FtpWriterErrorCode.OPEN_FILE_ERROR, message);
             }
             return writeOutputStream;
@@ -249,7 +249,7 @@ public class SftpHelperImpl
                     "写出文件[%s] 时出错,请确认文件%s有权限写出, errorMessage:%s", filePath,
                     filePath, e.getMessage());
             LOG.error(message);
-            throw DataXException.asDataXException(
+            throw AddaxException.asAddaxException(
                     FtpWriterErrorCode.OPEN_FILE_ERROR, message);
         }
     }
@@ -275,7 +275,7 @@ public class SftpHelperImpl
                     "写出文件[%s] 时出错,请确认文件%s有权限写出, errorMessage:%s", filePath,
                     filePath, e.getMessage());
             LOG.error(message);
-            throw DataXException.asDataXException(
+            throw AddaxException.asAddaxException(
                     FtpWriterErrorCode.OPEN_FILE_ERROR, message);
         }
     }
@@ -303,7 +303,7 @@ public class SftpHelperImpl
                     .format("获取path:[%s] 下文件列表时发生I/O异常,请确认与ftp服务器的连接正常,拥有目录ls权限, errorMessage:%s",
                             dir, e.getMessage());
             LOG.error(message);
-            throw DataXException.asDataXException(
+            throw AddaxException.asAddaxException(
                     FtpWriterErrorCode.COMMAND_FTP_IO_EXCEPTION, message, e);
         }
         return allFilesWithPointedPrefix;
@@ -326,7 +326,7 @@ public class SftpHelperImpl
                     "删除文件:[%s] 时发生异常,请确认指定文件有删除权限,以及网络交互正常, errorMessage:%s",
                     eachFile, e.getMessage());
             LOG.error(message);
-            throw DataXException.asDataXException(
+            throw AddaxException.asAddaxException(
                     FtpWriterErrorCode.COMMAND_FTP_IO_EXCEPTION, message, e);
         }
     }

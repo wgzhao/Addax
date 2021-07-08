@@ -20,7 +20,7 @@
 package com.wgzhao.addax.plugin.writer.greenplumwriter;
 
 import com.wgzhao.addax.common.element.Record;
-import com.wgzhao.addax.common.exception.DataXException;
+import com.wgzhao.addax.common.exception.AddaxException;
 import com.wgzhao.addax.common.plugin.RecordReceiver;
 import com.wgzhao.addax.common.plugin.TaskPluginCollector;
 import com.wgzhao.addax.common.util.Configuration;
@@ -171,10 +171,10 @@ public class CopyWriterTask
             }
         }
         catch (ExecutionException e) {
-            throw DataXException.asDataXException(DBUtilErrorCode.WRITE_DATA_ERROR, e.getCause());
+            throw AddaxException.asAddaxException(DBUtilErrorCode.WRITE_DATA_ERROR, e.getCause());
         }
         catch (Exception e) {
-            throw DataXException.asDataXException(DBUtilErrorCode.WRITE_DATA_ERROR, e);
+            throw AddaxException.asAddaxException(DBUtilErrorCode.WRITE_DATA_ERROR, e);
         }
         finally {
             threadPool.shutdownNow();

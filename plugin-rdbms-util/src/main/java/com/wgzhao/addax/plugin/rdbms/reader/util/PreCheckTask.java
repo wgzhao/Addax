@@ -20,7 +20,7 @@
 package com.wgzhao.addax.plugin.rdbms.reader.util;
 
 import com.wgzhao.addax.plugin.rdbms.util.DataBaseType;
-import com.wgzhao.addax.common.exception.DataXException;
+import com.wgzhao.addax.common.exception.AddaxException;
 import com.wgzhao.addax.common.util.Configuration;
 import com.wgzhao.addax.plugin.rdbms.reader.Key;
 import com.wgzhao.addax.plugin.rdbms.util.DBUtil;
@@ -59,7 +59,7 @@ public class PreCheckTask
 
     @Override
     public Boolean call()
-            throws DataXException
+            throws AddaxException
     {
         String jdbcUrl = this.connection.getString(Key.JDBC_URL);
         List<Object> querySqls = this.connection.getList(Key.QUERY_SQL, Object.class);
@@ -112,7 +112,7 @@ public class PreCheckTask
                 catch (ParserException e) {
                     throw RdbmsException.asSqlParserException(this.dataBaseType, e, splitPkSql);
                 }
-                catch (DataXException e) {
+                catch (AddaxException e) {
                     throw e;
                 }
                 catch (Exception e) {

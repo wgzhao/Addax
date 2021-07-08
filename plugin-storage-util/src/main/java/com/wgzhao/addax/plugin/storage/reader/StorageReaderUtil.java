@@ -26,7 +26,7 @@ import com.wgzhao.addax.common.element.DoubleColumn;
 import com.wgzhao.addax.common.element.LongColumn;
 import com.wgzhao.addax.common.element.Record;
 import com.wgzhao.addax.common.element.StringColumn;
-import com.wgzhao.addax.common.exception.DataXException;
+import com.wgzhao.addax.common.exception.AddaxException;
 import com.wgzhao.addax.common.plugin.RecordSender;
 import com.wgzhao.addax.common.plugin.TaskPluginCollector;
 import com.wgzhao.addax.common.util.Configuration;
@@ -248,8 +248,8 @@ public class StorageReaderUtil
                             zipCycleInputStream, encoding), bufferSize);
                 }
                 else {
-                    throw DataXException
-                            .asDataXException(
+                    throw AddaxException
+                            .asAddaxException(
                                     StorageReaderErrorCode.ILLEGAL_VALUE,
                                     String.format("仅支持 gzip, bzip2, zip, lzo, lzo_deflate, hadoop-snappy, framing-snappy" +
                                             "文件压缩格式 , 不支持您配置的文件压缩格式: [%s]", compress));
@@ -259,22 +259,22 @@ public class StorageReaderUtil
                     readerSliceConfig, recordSender, taskPluginCollector);
         }
         catch (UnsupportedEncodingException uee) {
-            throw DataXException
-                    .asDataXException(
+            throw AddaxException
+                    .asAddaxException(
                             StorageReaderErrorCode.OPEN_FILE_WITH_CHARSET_ERROR,
                             String.format("不支持的编码格式 : [%s]", encoding), uee);
         }
         catch (NullPointerException e) {
-            throw DataXException.asDataXException(
+            throw AddaxException.asAddaxException(
                     StorageReaderErrorCode.RUNTIME_EXCEPTION,
                     "运行时错误, 请联系我们", e);
         }/* catch (ArchiveException e) {
-			throw DataXException.asDataXException(
+			throw DataXException.asAddaxException(
 					StorageReaderErrorCode.READ_FILE_IO_ERROR,
 					String.format("压缩文件流读取错误 : [%s]", context), e);
 		} */
         catch (IOException e) {
-            throw DataXException.asDataXException(
+            throw AddaxException.asAddaxException(
                     StorageReaderErrorCode.READ_FILE_IO_ERROR,
                     String.format("流读取错误 : [%s]", context), e);
         }
@@ -293,7 +293,7 @@ public class StorageReaderUtil
         String delimiterInStr = readerSliceConfig
                 .getString(Key.FIELD_DELIMITER);
         if (null != delimiterInStr && 1 != delimiterInStr.length()) {
-            throw DataXException.asDataXException(
+            throw AddaxException.asAddaxException(
                     StorageReaderErrorCode.ILLEGAL_VALUE,
                     String.format("仅仅支持单字符切分, 您配置的切分为 : [%s]", delimiterInStr));
         }
@@ -339,23 +339,23 @@ public class StorageReaderUtil
             }
         }
         catch (UnsupportedEncodingException uee) {
-            throw DataXException
-                    .asDataXException(
+            throw AddaxException
+                    .asAddaxException(
                             StorageReaderErrorCode.OPEN_FILE_WITH_CHARSET_ERROR,
                             String.format("不支持的编码格式 : [%s]", encoding), uee);
         }
         catch (FileNotFoundException fnfe) {
-            throw DataXException.asDataXException(
+            throw AddaxException.asAddaxException(
                     StorageReaderErrorCode.FILE_NOT_EXISTS,
                     String.format("无法找到文件 : [%s]", context), fnfe);
         }
         catch (IOException ioe) {
-            throw DataXException.asDataXException(
+            throw AddaxException.asAddaxException(
                     StorageReaderErrorCode.READ_FILE_IO_ERROR,
                     String.format("读取文件错误 : [%s]", context), ioe);
         }
         catch (Exception e) {
-            throw DataXException.asDataXException(
+            throw AddaxException.asAddaxException(
                     StorageReaderErrorCode.RUNTIME_EXCEPTION,
                     String.format("运行时异常 : %s", e.getMessage()), e);
         }
@@ -376,7 +376,7 @@ public class StorageReaderUtil
         String nullFormat = configuration.getString(Key.NULL_FORMAT);
         String delimiterInStr = configuration.getString(Key.FIELD_DELIMITER);
         if (null != delimiterInStr && 1 != delimiterInStr.length()) {
-            throw DataXException.asDataXException(
+            throw AddaxException.asAddaxException(
                     StorageReaderErrorCode.ILLEGAL_VALUE,
                     String.format("仅仅支持单字符切分, 您配置的切分为 : [%s]", delimiterInStr));
         }
@@ -425,15 +425,15 @@ public class StorageReaderUtil
                     String columnValue;
 
                     if (null == columnIndex && null == columnConst) {
-                        throw DataXException
-                                .asDataXException(
+                        throw AddaxException
+                                .asAddaxException(
                                         StorageReaderErrorCode.NO_INDEX_VALUE,
                                         "由于您配置了type, 则至少需要配置 index 或 value");
                     }
 
                     if (null != columnIndex && null != columnConst) {
-                        throw DataXException
-                                .asDataXException(
+                        throw AddaxException
+                                .asAddaxException(
                                         StorageReaderErrorCode.MIXED_INDEX_VALUE,
                                         "您混合配置了index, value, 每一列同时仅能选择其中一种");
                     }
@@ -527,8 +527,8 @@ public class StorageReaderUtil
                             String errorMessage = String.format(
                                     "您配置的列类型暂不支持 : [%s]", columnType);
                             LOG.error(errorMessage);
-                            throw DataXException
-                                    .asDataXException(
+                            throw AddaxException
+                                    .asAddaxException(
                                             StorageReaderErrorCode.NOT_SUPPORT_TYPE,
                                             errorMessage);
                     }
@@ -546,8 +546,8 @@ public class StorageReaderUtil
                         .collectDirtyRecord(record, ioe.getMessage());
             }
             catch (Exception e) {
-                if (e instanceof DataXException) {
-                    throw (DataXException) e;
+                if (e instanceof AddaxException) {
+                    throw (AddaxException) e;
                 }
                 // 每一种转换失败都是脏数据处理,包括数字格式 & 日期格式
                 taskPluginCollector.collectDirtyRecord(record, e.getMessage());
@@ -606,11 +606,11 @@ public class StorageReaderUtil
             Charsets.toCharset(encoding);
         }
         catch (UnsupportedCharsetException uce) {
-            throw DataXException.asDataXException(StorageReaderErrorCode.ILLEGAL_VALUE,
+            throw AddaxException.asAddaxException(StorageReaderErrorCode.ILLEGAL_VALUE,
                     String.format("不支持您配置的编码格式 : [%s]", encoding), uce);
         }
         catch (Exception e) {
-            throw DataXException.asDataXException(StorageReaderErrorCode.CONFIG_INVALID_EXCEPTION,
+            throw AddaxException.asAddaxException(StorageReaderErrorCode.CONFIG_INVALID_EXCEPTION,
                     String.format("编码配置异常, 请联系我们: %s", e.getMessage()), e);
         }
     }
@@ -625,7 +625,7 @@ public class StorageReaderUtil
                     || "lzo".equals(compress) || "lzo_deflate".equals(compress) || "hadoop-snappy".equals(compress)
                     || "framing-snappy".equals(compress);
             if (!compressTag) {
-                throw DataXException.asDataXException(StorageReaderErrorCode.ILLEGAL_VALUE,
+                throw AddaxException.asAddaxException(StorageReaderErrorCode.ILLEGAL_VALUE,
                         String.format("仅支持 gzip, bzip2, zip, lzo, lzo_deflate, hadoop-snappy, framing-snappy " +
                                 "文件压缩格式, 不支持您配置的文件压缩格式: [%s]", compress));
             }
@@ -642,13 +642,13 @@ public class StorageReaderUtil
         //fieldDelimiter check
         String delimiterInStr = readerConfiguration.getString(Key.FIELD_DELIMITER, null);
         if (null == delimiterInStr) {
-            throw DataXException.asDataXException(StorageReaderErrorCode.REQUIRED_VALUE,
+            throw AddaxException.asAddaxException(StorageReaderErrorCode.REQUIRED_VALUE,
                     String.format("您提供配置文件有误，[%s]是必填参数.",
                             Key.FIELD_DELIMITER));
         }
         else if (1 != delimiterInStr.length()) {
             // warn: if have, length must be one
-            throw DataXException.asDataXException(StorageReaderErrorCode.ILLEGAL_VALUE,
+            throw AddaxException.asAddaxException(StorageReaderErrorCode.ILLEGAL_VALUE,
                     String.format("仅仅支持单字符切分, 您配置的切分为 : [%s]", delimiterInStr));
         }
     }
@@ -660,7 +660,7 @@ public class StorageReaderUtil
         List<Configuration> columns = readerConfiguration
                 .getListConfiguration(Key.COLUMN);
         if (null == columns || columns.isEmpty()) {
-            throw DataXException.asDataXException(StorageReaderErrorCode.REQUIRED_VALUE, "您需要指定 columns");
+            throw AddaxException.asAddaxException(StorageReaderErrorCode.REQUIRED_VALUE, "您需要指定 columns");
         }
         // handle ["*"]
         if (1 == columns.size()) {
@@ -681,16 +681,16 @@ public class StorageReaderUtil
                         .getString(Key.VALUE);
 
                 if (null == columnIndex && null == columnValue) {
-                    throw DataXException.asDataXException(StorageReaderErrorCode.NO_INDEX_VALUE,
+                    throw AddaxException.asAddaxException(StorageReaderErrorCode.NO_INDEX_VALUE,
                             "由于您配置了type, 则至少需要配置 index 或 value");
                 }
 
                 if (null != columnIndex && null != columnValue) {
-                    throw DataXException.asDataXException(StorageReaderErrorCode.MIXED_INDEX_VALUE,
+                    throw AddaxException.asAddaxException(StorageReaderErrorCode.MIXED_INDEX_VALUE,
                             "您混合配置了index, value, 每一列同时仅能选择其中一种");
                 }
                 if (null != columnIndex && columnIndex < 0) {
-                    throw DataXException.asDataXException(StorageReaderErrorCode.ILLEGAL_VALUE,
+                    throw AddaxException.asAddaxException(StorageReaderErrorCode.ILLEGAL_VALUE,
                             String.format("index需要大于等于0, 您配置的index为[%s]", columnIndex));
                 }
             }
@@ -744,7 +744,7 @@ public class StorageReaderUtil
         String parentPath;
         parentPath = regexPath.substring(0, lastDirSeparator + 1);
         if (parentPath.contains("*") || parentPath.contains("?")) {
-            throw DataXException.asDataXException(StorageReaderErrorCode.ILLEGAL_VALUE,
+            throw AddaxException.asAddaxException(StorageReaderErrorCode.ILLEGAL_VALUE,
                     String.format("配置项目path中：[%s]不合法，目前只支持在最后一级目录使用通配符*或者?", regexPath));
         }
         return parentPath;

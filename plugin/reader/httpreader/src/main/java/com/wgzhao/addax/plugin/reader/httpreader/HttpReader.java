@@ -26,7 +26,7 @@ import com.alibaba.fastjson.JSONPath;
 import com.alibaba.fastjson.serializer.SerializerFeature;
 import com.wgzhao.addax.common.element.Record;
 import com.wgzhao.addax.common.element.StringColumn;
-import com.wgzhao.addax.common.exception.DataXException;
+import com.wgzhao.addax.common.exception.AddaxException;
 import com.wgzhao.addax.common.plugin.RecordSender;
 import com.wgzhao.addax.common.spi.Reader;
 import com.wgzhao.addax.common.util.Configuration;
@@ -195,7 +195,7 @@ public class HttpReader
 
                 List<String> columns = readerSliceConfig.getList(Key.COLUMN, String.class);
                 if (columns == null || columns.isEmpty()) {
-                    throw DataXException.asDataXException(
+                    throw AddaxException.asAddaxException(
                             HttpReaderErrorCode.REQUIRED_VALUE,
                             "The parameter [" + Key.COLUMN + "] is not set."
                     );
@@ -212,7 +212,7 @@ public class HttpReader
                 // first, check key exists or not ?
                 for (String k : columns) {
                     if (!jsonObject.containsKey(k)) {
-                        throw DataXException.asDataXException(
+                        throw AddaxException.asAddaxException(
                                 HttpReaderErrorCode.ILLEGAL_VALUE,
                                 "您尝试从结果中获取key为 '" + k + "'的结果，但实际结果中不存在该key值"
                         );
@@ -235,7 +235,7 @@ public class HttpReader
             }
 
             catch (URISyntaxException | IOException e) {
-                throw DataXException.asDataXException(
+                throw AddaxException.asAddaxException(
                         HttpReaderErrorCode.ILLEGAL_VALUE, e.getMessage()
                 );
             }
@@ -272,7 +272,7 @@ public class HttpReader
                 response = httpClient.execute(request, this.context);
             }
             else {
-                throw DataXException.asDataXException(
+                throw AddaxException.asAddaxException(
                         HttpReaderErrorCode.ILLEGAL_VALUE, "不支持的请求模式: " + method
                 );
             }

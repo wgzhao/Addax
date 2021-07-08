@@ -19,7 +19,7 @@
 
 package com.wgzhao.addax.plugin.rdbms.writer.util;
 
-import com.wgzhao.addax.common.exception.DataXException;
+import com.wgzhao.addax.common.exception.AddaxException;
 import com.wgzhao.addax.common.util.Configuration;
 import com.wgzhao.addax.plugin.rdbms.util.DBUtil;
 import com.wgzhao.addax.plugin.rdbms.util.DBUtilErrorCode;
@@ -64,7 +64,7 @@ public final class WriterUtil
         }
 
         if (tableNumber != adviceNumber) {
-            throw DataXException.asDataXException(DBUtilErrorCode.CONF_ERROR,
+            throw AddaxException.asAddaxException(DBUtilErrorCode.CONF_ERROR,
                     String.format("您的配置文件中的列配置信息有误. 您要写入的目的端的表个数是:%s , 但是根据系统建议需要切分的份数是：%s. 请检查您的配置并作出修改.",
                             tableNumber, adviceNumber));
         }
@@ -143,7 +143,7 @@ public final class WriterUtil
         boolean isWriteModeLegal = mode.startsWith("insert") || mode.startsWith("replace") || mode.startsWith("update");
 
         if (!isWriteModeLegal) {
-            throw DataXException.asDataXException(DBUtilErrorCode.ILLEGAL_VALUE,
+            throw AddaxException.asAddaxException(DBUtilErrorCode.ILLEGAL_VALUE,
                     String.format("您所配置的 writeMode:%s 错误. 因为DataX 目前仅支持replace,update 或 insert 方式. 请检查您的配置并作出修改.", writeMode));
         }
         String writeDataSqlTemplate;
@@ -167,7 +167,7 @@ public final class WriterUtil
                         ")" + onConFlictDoString(writeMode, columnHolders);
             }
             else {
-                throw DataXException.asDataXException(DBUtilErrorCode.ILLEGAL_VALUE,
+                throw AddaxException.asAddaxException(DBUtilErrorCode.ILLEGAL_VALUE,
                         String.format("当前数据库不支持 writeMode:%s 模式.", writeMode));
             }
         }

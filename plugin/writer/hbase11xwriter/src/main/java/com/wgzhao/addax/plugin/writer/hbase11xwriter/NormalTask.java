@@ -22,7 +22,7 @@ package com.wgzhao.addax.plugin.writer.hbase11xwriter;
 import com.wgzhao.addax.common.element.DoubleColumn;
 import com.wgzhao.addax.common.element.LongColumn;
 import com.wgzhao.addax.common.element.Record;
-import com.wgzhao.addax.common.exception.DataXException;
+import com.wgzhao.addax.common.exception.AddaxException;
 import com.wgzhao.addax.common.util.Configuration;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.Validate;
@@ -73,7 +73,7 @@ public class NormalTask
                     && StringUtils.isNotBlank(cfAndQualifier[0])
                     && StringUtils.isNotBlank(cfAndQualifier[1]), promptInfo);
             if (index >= record.getColumnNumber()) {
-                throw DataXException.asDataXException(Hbase11xWriterErrorCode.ILLEGAL_VALUE, String.format("您的column配置项中中index值超出范围,根据reader端配置,index的值小于%s,而您配置的值为%s，请检查并修改.", record.getColumnNumber(), index));
+                throw AddaxException.asAddaxException(Hbase11xWriterErrorCode.ILLEGAL_VALUE, String.format("您的column配置项中中index值超出范围,根据reader端配置,index的值小于%s,而您配置的值为%s，请检查并修改.", record.getColumnNumber(), index));
             }
             byte[] columnBytes = getColumnByte(columnType, record.getColumn(index));
             //columnBytes 为null忽略这列
@@ -100,7 +100,7 @@ public class NormalTask
             }
             else {
                 if (index >= record.getColumnNumber()) {
-                    throw DataXException.asDataXException(Hbase11xWriterErrorCode.CONSTRUCT_ROWKEY_ERROR, String.format("您的rowkeyColumn配置项中中index值超出范围,根据reader端配置,index的值小于%s,而您配置的值为%s，请检查并修改.", record.getColumnNumber(), index));
+                    throw AddaxException.asAddaxException(Hbase11xWriterErrorCode.CONSTRUCT_ROWKEY_ERROR, String.format("您的rowkeyColumn配置项中中index值超出范围,根据reader端配置,index的值小于%s,而您配置的值为%s，请检查并修改.", record.getColumnNumber(), index));
                 }
                 byte[] value = getColumnByte(columnType, record.getColumn(index));
                 rowkeyBuffer = Bytes.add(rowkeyBuffer, value);
@@ -117,16 +117,16 @@ public class NormalTask
             //指定时间作为版本
             timestamp = versionColumn.getLong(Key.VALUE);
             if (timestamp < 0) {
-                throw DataXException.asDataXException(Hbase11xWriterErrorCode.CONSTRUCT_VERSION_ERROR, "您指定的版本非法!");
+                throw AddaxException.asAddaxException(Hbase11xWriterErrorCode.CONSTRUCT_VERSION_ERROR, "您指定的版本非法!");
             }
         }
         else {
             //指定列作为版本,long/doubleColumn直接record.aslong, 其它类型尝试用yyyy-MM-dd HH:mm:ss,yyyy-MM-dd HH:mm:ss SSS去format
             if (index >= record.getColumnNumber()) {
-                throw DataXException.asDataXException(Hbase11xWriterErrorCode.CONSTRUCT_VERSION_ERROR, String.format("您的versionColumn配置项中中index值超出范围,根据reader端配置,index的值小于%s,而您配置的值为%s，请检查并修改.", record.getColumnNumber(), index));
+                throw AddaxException.asAddaxException(Hbase11xWriterErrorCode.CONSTRUCT_VERSION_ERROR, String.format("您的versionColumn配置项中中index值超出范围,根据reader端配置,index的值小于%s,而您配置的值为%s，请检查并修改.", record.getColumnNumber(), index));
             }
             if (record.getColumn(index).getRawData() == null) {
-                throw DataXException.asDataXException(Hbase11xWriterErrorCode.CONSTRUCT_VERSION_ERROR, "您指定的版本为空!");
+                throw AddaxException.asAddaxException(Hbase11xWriterErrorCode.CONSTRUCT_VERSION_ERROR, "您指定的版本为空!");
             }
             SimpleDateFormat dfSenconds = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
             SimpleDateFormat dfMs = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss SSS");
@@ -144,7 +144,7 @@ public class NormalTask
                     }
                     catch (ParseException e1) {
                         LOG.info(String.format("您指定第[%s]列作为hbase写入版本,但在尝试用yyyy-MM-dd HH:mm:ss 和 yyyy-MM-dd HH:mm:ss SSS 去解析为Date时均出错,请检查并修改", index));
-                        throw DataXException.asDataXException(Hbase11xWriterErrorCode.CONSTRUCT_VERSION_ERROR, e1);
+                        throw AddaxException.asAddaxException(Hbase11xWriterErrorCode.CONSTRUCT_VERSION_ERROR, e1);
                     }
                 }
                 timestamp = date.getTime();

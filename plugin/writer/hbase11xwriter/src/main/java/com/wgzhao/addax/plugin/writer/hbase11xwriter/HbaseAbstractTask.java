@@ -21,7 +21,7 @@ package com.wgzhao.addax.plugin.writer.hbase11xwriter;
 
 import com.wgzhao.addax.common.element.Column;
 import com.wgzhao.addax.common.element.Record;
-import com.wgzhao.addax.common.exception.DataXException;
+import com.wgzhao.addax.common.exception.AddaxException;
 import com.wgzhao.addax.common.plugin.RecordReceiver;
 import com.wgzhao.addax.common.plugin.TaskPluginCollector;
 import com.wgzhao.addax.common.util.Configuration;
@@ -91,7 +91,7 @@ public abstract class HbaseAbstractTask
             }
         }
         catch (IOException e) {
-            throw DataXException.asDataXException(Hbase11xWriterErrorCode.PUT_HBASE_ERROR, e);
+            throw AddaxException.asAddaxException(Hbase11xWriterErrorCode.PUT_HBASE_ERROR, e);
         }
         finally {
             //Hbase11xHelper.closeTable(this.htable)
@@ -134,7 +134,7 @@ public abstract class HbaseAbstractTask
                     bytes = this.getValueByte(columnType, column.asString());
                     break;
                 default:
-                    throw DataXException.asDataXException(Hbase11xWriterErrorCode.ILLEGAL_VALUE, "HbaseWriter列不支持您配置的列类型:" + columnType);
+                    throw AddaxException.asAddaxException(Hbase11xWriterErrorCode.ILLEGAL_VALUE, "HbaseWriter列不支持您配置的列类型:" + columnType);
             }
         }
         else {
@@ -146,7 +146,7 @@ public abstract class HbaseAbstractTask
                     bytes = HConstants.EMPTY_BYTE_ARRAY;
                     break;
                 default:
-                    throw DataXException.asDataXException(Hbase11xWriterErrorCode.ILLEGAL_VALUE, "HbaseWriter nullMode不支持您配置的类型,只支持skip或者empty");
+                    throw AddaxException.asAddaxException(Hbase11xWriterErrorCode.ILLEGAL_VALUE, "HbaseWriter nullMode不支持您配置的类型,只支持skip或者empty");
             }
         }
         return bytes;
@@ -179,7 +179,7 @@ public abstract class HbaseAbstractTask
                     bytes = value.getBytes(Charset.forName(encoding));
                     break;
                 default:
-                    throw DataXException.asDataXException(Hbase11xWriterErrorCode.ILLEGAL_VALUE, "HbaseWriter列不支持您配置的列类型:" + columnType);
+                    throw AddaxException.asAddaxException(Hbase11xWriterErrorCode.ILLEGAL_VALUE, "HbaseWriter列不支持您配置的列类型:" + columnType);
             }
         }
         else {

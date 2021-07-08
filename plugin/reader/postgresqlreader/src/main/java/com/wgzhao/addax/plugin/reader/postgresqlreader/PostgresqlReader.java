@@ -19,7 +19,7 @@
 
 package com.wgzhao.addax.plugin.reader.postgresqlreader;
 
-import com.wgzhao.addax.common.exception.DataXException;
+import com.wgzhao.addax.common.exception.AddaxException;
 import com.wgzhao.addax.common.plugin.RecordSender;
 import com.wgzhao.addax.common.spi.Reader;
 import com.wgzhao.addax.common.util.Configuration;
@@ -50,7 +50,7 @@ public class PostgresqlReader
             int fetchSize = this.originalConfig.getInt(FETCH_SIZE,
                     Constant.DEFAULT_FETCH_SIZE);
             if (fetchSize < 1) {
-                throw DataXException.asDataXException(DBUtilErrorCode.REQUIRED_VALUE,
+                throw AddaxException.asAddaxException(DBUtilErrorCode.REQUIRED_VALUE,
                         String.format("您配置的fetchSize有误，根据DataX的设计，fetchSize : [%d] 设置值不能小于 1.", fetchSize));
             }
             this.originalConfig.set(FETCH_SIZE, fetchSize);

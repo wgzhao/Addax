@@ -19,7 +19,7 @@
 
 package com.wgzhao.addax.core.util.container;
 
-import com.wgzhao.addax.common.exception.DataXException;
+import com.wgzhao.addax.common.exception.AddaxException;
 import com.wgzhao.addax.core.util.FrameworkErrorCode;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.Validate;
@@ -110,7 +110,7 @@ public class JarLoader
                 jarURLs.add(allJar.toURI().toURL());
             }
             catch (Exception e) {
-                throw DataXException.asDataXException(
+                throw AddaxException.asAddaxException(
                         FrameworkErrorCode.PLUGIN_INIT_ERROR,
                         "系统加载jar包出错", e);
             }

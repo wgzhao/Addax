@@ -1,7 +1,7 @@
 package com.wgzhao.addax.plugin.writer.tdenginewriter;
 
 import com.wgzhao.addax.common.element.Column;
-import com.wgzhao.addax.common.exception.DataXException;
+import com.wgzhao.addax.common.exception.AddaxException;
 import com.wgzhao.addax.common.plugin.RecordReceiver;
 import com.wgzhao.addax.common.spi.Writer;
 import com.wgzhao.addax.common.util.Configuration;
@@ -111,7 +111,7 @@ public class TDengineWriter
                             // TDengine timestamp min values is 1500000000000, means 2017-07-14 10:40:00.0
                             // so if timestamp less than ths min value ,it will occure timestamp out of range
                             if (columnIndex == 0 && column.asLong() < 1500000000000L) {
-                              throw DataXException.asDataXException(DBUtilErrorCode.WRITE_DATA_ERROR,
+                              throw AddaxException.asAddaxException(DBUtilErrorCode.WRITE_DATA_ERROR,
                                       "TDengine 能写入的时间戳最小时间为 '2017-07-14 10:40:00.0', 当前要求写入的时间为 " +
                                               Timestamp.from(Instant.ofEpochMilli(column.asLong())));
                             }
@@ -124,8 +124,8 @@ public class TDengineWriter
                             break;
 
                         default:
-                            throw DataXException
-                                    .asDataXException(
+                            throw AddaxException
+                                    .asAddaxException(
                                             DBUtilErrorCode.UNSUPPORTED_TYPE,
                                             String.format(
                                                     "您的配置文件中的列配置信息有误. 因为DataX 不支持数据库写入这种字段类型. 字段名:[%s], " +

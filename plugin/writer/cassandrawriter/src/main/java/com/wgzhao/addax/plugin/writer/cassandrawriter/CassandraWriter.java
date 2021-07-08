@@ -21,7 +21,7 @@ package com.wgzhao.addax.plugin.writer.cassandrawriter;
 
 import com.wgzhao.addax.common.element.Column;
 import com.wgzhao.addax.common.element.Record;
-import com.wgzhao.addax.common.exception.DataXException;
+import com.wgzhao.addax.common.exception.AddaxException;
 import com.wgzhao.addax.common.plugin.RecordReceiver;
 import com.wgzhao.addax.common.spi.Writer;
 import com.wgzhao.addax.common.util.Configuration;
@@ -107,8 +107,8 @@ public class CassandraWriter
                 while ((record = lineReceiver.getFromReader()) != null) {
                     if (record.getColumnNumber() != columnNumber) {
                         // 源头读取字段列数与目的表字段写入列数不相等，直接报错
-                        throw DataXException
-                                .asDataXException(
+                        throw AddaxException
+                                .asAddaxException(
                                         CassandraWriterErrorCode.CONF_ERROR,
                                         String.format(
                                                 "列配置信息有错误. 因为您配置的任务中，源头读取字段数:%s 与 目的表要写入的字段数:%s 不相等. 请检查您的配置并作出修改.",
@@ -179,7 +179,7 @@ public class CassandraWriter
                 }
             }
             catch (Exception e) {
-                throw DataXException.asDataXException(
+                throw AddaxException.asAddaxException(
                         CassandraWriterErrorCode.WRITE_DATA_ERROR, e);
             }
         }
@@ -227,8 +227,8 @@ public class CassandraWriter
             for (String colunmnName : columnMeta) {
                 if (colunmnName.toLowerCase().equals(Key.WRITE_TIME)) {
                     if (writeTimeCol != -1) {
-                        throw DataXException
-                                .asDataXException(
+                        throw AddaxException
+                                .asAddaxException(
                                         CassandraWriterErrorCode.CONF_ERROR,
                                         "列配置信息有错误. 只能有一个时间戳列(writetime())");
                     }
@@ -238,8 +238,8 @@ public class CassandraWriter
                 insertStmt.value(colunmnName, QueryBuilder.bindMarker());
                 ColumnMetadata col = meta.getColumn(colunmnName);
                 if (col == null) {
-                    throw DataXException
-                            .asDataXException(
+                    throw AddaxException
+                            .asAddaxException(
                                     CassandraWriterErrorCode.CONF_ERROR,
                                     String.format(
                                             "列配置信息有错误. 表中未找到列名 '%s' .",

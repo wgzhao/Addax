@@ -27,7 +27,7 @@ import com.wgzhao.addax.common.element.DoubleColumn;
 import com.wgzhao.addax.common.element.LongColumn;
 import com.wgzhao.addax.common.element.Record;
 import com.wgzhao.addax.common.element.StringColumn;
-import com.wgzhao.addax.common.exception.DataXException;
+import com.wgzhao.addax.common.exception.AddaxException;
 import com.wgzhao.addax.transformer.Transformer;
 import org.apache.commons.lang3.StringUtils;
 
@@ -67,7 +67,7 @@ public class FilterTransformer
             }
         }
         catch (Exception e) {
-            throw DataXException.asDataXException(TransformerErrorCode.TRANSFORMER_ILLEGAL_PARAMETER,
+            throw AddaxException.asAddaxException(TransformerErrorCode.TRANSFORMER_ILLEGAL_PARAMETER,
                     "paras:" + Arrays.asList(paras) + " => " + e.getMessage());
         }
 
@@ -104,7 +104,7 @@ public class FilterTransformer
             }
         }
         catch (Exception e) {
-            throw DataXException.asDataXException(
+            throw AddaxException.asAddaxException(
                     TransformerErrorCode.TRANSFORMER_RUN_EXCEPTION, e.getMessage(), e);
         }
     }

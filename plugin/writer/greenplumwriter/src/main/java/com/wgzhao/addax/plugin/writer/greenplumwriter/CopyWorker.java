@@ -19,7 +19,7 @@
 
 package com.wgzhao.addax.plugin.writer.greenplumwriter;
 
-import com.wgzhao.addax.common.exception.DataXException;
+import com.wgzhao.addax.common.exception.AddaxException;
 import com.wgzhao.addax.plugin.rdbms.util.DBUtil;
 import com.wgzhao.addax.plugin.rdbms.util.DBUtilErrorCode;
 import com.wgzhao.addax.plugin.rdbms.util.DataBaseType;
@@ -131,14 +131,14 @@ public class CopyWorker
             }
             catch (ExecutionException exec) {
                 if (exec.getCause() instanceof PSQLException) {
-                    throw DataXException.asDataXException(DBUtilErrorCode.WRITE_DATA_ERROR, exec.getCause());
+                    throw AddaxException.asAddaxException(DBUtilErrorCode.WRITE_DATA_ERROR, exec.getCause());
                 }
                 // ignore others
             }
             catch (Exception ignore) {
             }
 
-            throw DataXException.asDataXException(DBUtilErrorCode.WRITE_DATA_ERROR, e);
+            throw AddaxException.asAddaxException(DBUtilErrorCode.WRITE_DATA_ERROR, e);
         }
         finally {
             try {
@@ -162,7 +162,7 @@ public class CopyWorker
             return copyResult.get();
         }
         catch (Exception e) {
-            throw DataXException.asDataXException(DBUtilErrorCode.WRITE_DATA_ERROR, e);
+            throw AddaxException.asAddaxException(DBUtilErrorCode.WRITE_DATA_ERROR, e);
         }
     }
 

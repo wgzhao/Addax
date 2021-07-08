@@ -23,7 +23,7 @@ import com.alibaba.druid.sql.parser.SQLParserUtils;
 import com.alibaba.druid.sql.parser.SQLStatementParser;
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import com.wgzhao.addax.plugin.rdbms.reader.Key;
-import com.wgzhao.addax.common.exception.DataXException;
+import com.wgzhao.addax.common.exception.AddaxException;
 import com.wgzhao.addax.common.util.Configuration;
 import com.wgzhao.addax.common.util.RetryUtil;
 import org.apache.commons.dbcp2.BasicDataSource;
@@ -59,7 +59,7 @@ public final class DBUtil {
 
     public static String chooseJdbcUrl(DataBaseType dataBaseType, List<String> jdbcUrls, String username, String password, List<String> preSql) {
         if (null == jdbcUrls || jdbcUrls.isEmpty()) {
-            throw DataXException.asDataXException(
+            throw AddaxException.asAddaxException(
                     DBUtilErrorCode.CONF_ERROR,
                     String.format("您的jdbcUrl的配置信息有错, 因为jdbcUrl[%s]不能为空. 请检查您的配置并作出修改.",
                             StringUtils.join(jdbcUrls, ",")));
@@ -84,7 +84,7 @@ public final class DBUtil {
                         "2) 配置的username/password错误，鉴权失败。请和DBA确认该数据库的连接信息是否正确。");
             }, 3, 1000L, true);
         } catch (Exception e) {
-            throw DataXException.asDataXException(
+            throw AddaxException.asAddaxException(
                     DBUtilErrorCode.CONN_DB_ERROR,
                     String.format("数据库连接失败. 因为根据您配置的连接信息,无法从:%s 中找到可连接的jdbcUrl. 请检查您的配置并作出修改.",
                             StringUtils.join(jdbcUrls, ",")), e);
@@ -95,7 +95,7 @@ public final class DBUtil {
                                                    List<String> jdbcUrls, String username,
                                                    String password, List<String> preSql) {
         if (null == jdbcUrls || jdbcUrls.isEmpty()) {
-            throw DataXException.asDataXException(
+            throw AddaxException.asAddaxException(
                     DBUtilErrorCode.CONF_ERROR,
                     String.format("您的jdbcUrl的配置信息有错, 因为jdbcUrl[%s]不能为空. 请检查您的配置并作出修改.",
                             StringUtils.join(jdbcUrls, ",")));
@@ -113,7 +113,7 @@ public final class DBUtil {
                         connOK = testConnWithoutRetry(dataBaseType,
                                 url, username, password);
                     } catch (Exception e) {
-                        throw DataXException.asDataXException(
+                        throw AddaxException.asAddaxException(
                                 DBUtilErrorCode.CONN_DB_ERROR,
                                 String.format("数据库连接失败. 因为根据您配置的连接信息,无法从:%s 中找到可连接的jdbcUrl. 请检查您的配置并作出修改.",
                                         StringUtils.join(jdbcUrls, ",")), e);
@@ -124,7 +124,7 @@ public final class DBUtil {
                 }
             }
         }
-        throw DataXException.asDataXException(
+        throw AddaxException.asAddaxException(
                 DBUtilErrorCode.CONN_DB_ERROR,
                 String.format("数据库连接失败. 因为根据您配置的连接信息,无法从:%s 中找到可连接的jdbcUrl. 请检查您的配置并作出修改.",
                         StringUtils.join(jdbcUrls, ",")));
@@ -229,7 +229,7 @@ public final class DBUtil {
             return RetryUtil.executeWithRetry(() -> DBUtil.connect(dataBaseType, jdbcUrl, username,
                     password, socketTimeout), 3, 1000L, true);
         } catch (Exception e) {
-            throw DataXException.asDataXException(
+            throw AddaxException.asAddaxException(
                     DBUtilErrorCode.CONN_DB_ERROR,
                     String.format("数据库连接失败. 因为根据您配置的连接信息:%s获取数据库连接失败. 请检查您的配置并作出修改.", jdbcUrl), e);
         }
@@ -495,8 +495,8 @@ public final class DBUtil {
             }
             return columnMetaData;
         } catch (SQLException e) {
-            throw DataXException
-                    .asDataXException(DBUtilErrorCode.GET_COLUMN_INFO_FAILED,
+            throw AddaxException
+                    .asAddaxException(DBUtilErrorCode.GET_COLUMN_INFO_FAILED,
                             String.format("获取表:%s 的字段的元信息时失败. 请联系 DBA 核查该库、表信息.", tableName), e);
         } finally {
             DBUtil.closeDBResources(rs, statement, null);
@@ -608,8 +608,8 @@ public final class DBUtil {
         try {
             stmt = conn.createStatement();
         } catch (SQLException e) {
-            throw DataXException
-                    .asDataXException(DBUtilErrorCode.SET_SESSION_ERROR, String
+            throw AddaxException
+                    .asAddaxException(DBUtilErrorCode.SET_SESSION_ERROR, String
                                     .format("session配置有误. 因为根据您的配置执行 session 设置失败. 上下文信息是:[%s]. 请检查您的配置并作出修改.", message),
                             e);
         }
@@ -619,7 +619,7 @@ public final class DBUtil {
             try {
                 DBUtil.executeSqlWithoutResultSet(stmt, sessionSql);
             } catch (SQLException e) {
-                throw DataXException.asDataXException(
+                throw AddaxException.asAddaxException(
                         DBUtilErrorCode.SET_SESSION_ERROR, String.format(
                                 "session配置有误. 因为根据您的配置执行 session 设置失败. 上下文信息是:[%s]. 请检查您的配置并作出修改.", message), e);
             }
@@ -647,7 +647,7 @@ public final class DBUtil {
         try {
             return future.get(timeout, TimeUnit.SECONDS);
         } catch (Exception e) {
-            throw DataXException.asDataXException(
+            throw AddaxException.asAddaxException(
                     DBUtilErrorCode.RS_ASYNC_ERROR, "异步获取ResultSet失败", e);
         }
     }
@@ -667,7 +667,7 @@ public final class DBUtil {
                 Class.forName(driver);
             }
         } catch (ClassNotFoundException e) {
-            throw DataXException.asDataXException(DBUtilErrorCode.CONF_ERROR,
+            throw AddaxException.asAddaxException(DBUtilErrorCode.CONF_ERROR,
                     "数据库驱动加载错误, 请确认libs目录有驱动jar包且plugin.json中drivers配置驱动类正确!",
                     e);
         }

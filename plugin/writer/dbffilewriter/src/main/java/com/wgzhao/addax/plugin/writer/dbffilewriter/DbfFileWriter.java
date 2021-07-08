@@ -24,7 +24,7 @@ import com.linuxense.javadbf.DBFField;
 import com.linuxense.javadbf.DBFWriter;
 import com.wgzhao.addax.common.element.Column;
 import com.wgzhao.addax.common.element.Record;
-import com.wgzhao.addax.common.exception.DataXException;
+import com.wgzhao.addax.common.exception.AddaxException;
 import com.wgzhao.addax.common.plugin.RecordReceiver;
 import com.wgzhao.addax.common.spi.Writer;
 import com.wgzhao.addax.common.util.Configuration;
@@ -97,8 +97,8 @@ public class DbfFileWriter
                 // warn: 这里用户需要配一个目录
                 File dir = new File(path);
                 if (dir.isFile()) {
-                    throw DataXException
-                            .asDataXException(
+                    throw AddaxException
+                            .asAddaxException(
                                     DbfFileWriterErrorCode.ILLEGAL_VALUE,
                                     String.format(
                                             "您配置的path: [%s] 不是一个合法的目录, 请您注意文件重名, 不合法目录名等情况.",
@@ -107,8 +107,8 @@ public class DbfFileWriter
                 if (!dir.exists()) {
                     boolean createdOk = dir.mkdirs();
                     if (!createdOk) {
-                        throw DataXException
-                                .asDataXException(
+                        throw AddaxException
+                                .asAddaxException(
                                         DbfFileWriterErrorCode.CONFIG_INVALID_EXCEPTION,
                                         String.format("您指定的文件路径 : [%s] 创建失败.",
                                                 path));
@@ -116,7 +116,7 @@ public class DbfFileWriter
                 }
             }
             catch (SecurityException se) {
-                throw DataXException.asDataXException(
+                throw AddaxException.asAddaxException(
                         DbfFileWriterErrorCode.SECURITY_NOT_ENOUGH,
                         String.format("您没有权限创建文件路径 : [%s] ", path), se);
             }
@@ -148,24 +148,24 @@ public class DbfFileWriter
                     }
                 }
                 catch (NullPointerException npe) {
-                    throw DataXException
-                            .asDataXException(
+                    throw AddaxException
+                            .asAddaxException(
                                     DbfFileWriterErrorCode.WRITE_FILE_ERROR,
                                     String.format("您配置的目录清空时出现空指针异常 : [%s]",
                                             path), npe);
                 }
                 catch (IllegalArgumentException iae) {
-                    throw DataXException.asDataXException(
+                    throw AddaxException.asAddaxException(
                             DbfFileWriterErrorCode.SECURITY_NOT_ENOUGH,
                             String.format("您配置的目录参数异常 : [%s]", path));
                 }
                 catch (SecurityException se) {
-                    throw DataXException.asDataXException(
+                    throw AddaxException.asAddaxException(
                             DbfFileWriterErrorCode.SECURITY_NOT_ENOUGH,
                             String.format("您没有权限查看目录 : [%s]", path));
                 }
                 catch (IOException e) {
-                    throw DataXException.asDataXException(
+                    throw AddaxException.asAddaxException(
                             DbfFileWriterErrorCode.WRITE_FILE_ERROR,
                             String.format("无法清空目录 : [%s]", path), e);
                 }
@@ -181,8 +181,8 @@ public class DbfFileWriter
                 try {
                     if (dir.exists()) {
                         if (dir.isFile()) {
-                            throw DataXException
-                                    .asDataXException(
+                            throw AddaxException
+                                    .asAddaxException(
                                             DbfFileWriterErrorCode.ILLEGAL_VALUE,
                                             String.format(
                                                     "您配置的path: [%s] 不是一个合法的目录, 请您注意文件重名, 不合法目录名等情况.",
@@ -199,8 +199,8 @@ public class DbfFileWriter
                             }
                             LOG.error("冲突文件列表为: [{}]",
                                     StringUtils.join(allFiles, ","));
-                            throw DataXException
-                                    .asDataXException(
+                            throw AddaxException
+                                    .asAddaxException(
                                             DbfFileWriterErrorCode.ILLEGAL_VALUE,
                                             String.format(
                                                     "您配置的path: [%s] 目录不为空, 下面存在其他文件或文件夹.",
@@ -210,8 +210,8 @@ public class DbfFileWriter
                     else {
                         boolean createdOk = dir.mkdirs();
                         if (!createdOk) {
-                            throw DataXException
-                                    .asDataXException(
+                            throw AddaxException
+                                    .asAddaxException(
                                             DbfFileWriterErrorCode.CONFIG_INVALID_EXCEPTION,
                                             String.format(
                                                     "您指定的文件路径 : [%s] 创建失败.",
@@ -220,14 +220,14 @@ public class DbfFileWriter
                     }
                 }
                 catch (SecurityException se) {
-                    throw DataXException.asDataXException(
+                    throw AddaxException.asAddaxException(
                             DbfFileWriterErrorCode.SECURITY_NOT_ENOUGH,
                             String.format("您没有权限查看目录 : [%s]", path));
                 }
             }
             else {
-                throw DataXException
-                        .asDataXException(
+                throw AddaxException
+                        .asAddaxException(
                                 DbfFileWriterErrorCode.ILLEGAL_VALUE,
                                 String.format(
                                         "仅支持 truncate, append, nonConflict 三种模式, 不支持您配置的 writeMode 模式 : [%s]",
@@ -240,7 +240,7 @@ public class DbfFileWriter
                 if ( "numeric".equalsIgnoreCase(column.getString(Key.TYPE)) &&
                         (column.getString(Key.LENGTH, null) == null || column.getString(Key.SCALE, null) == null))
                 {
-                    throw DataXException.asDataXException(
+                    throw AddaxException.asAddaxException(
                             DbfFileWriterErrorCode.CONFIG_INVALID_EXCEPTION,
                             String.format("numeric 类型必须配置 %s 和 %s 项", Key.LENGTH, Key.SCALE)
                     );
@@ -248,7 +248,7 @@ public class DbfFileWriter
 
                 if ("char".equalsIgnoreCase(column.getString(Key.TYPE)) && column.getString(Key.LENGTH, null) == null)
                 {
-                    throw DataXException.asDataXException(
+                    throw AddaxException.asAddaxException(
                             DbfFileWriterErrorCode.CONFIG_INVALID_EXCEPTION,
                             String.format("char 类型必须配置 %s 项", Key.LENGTH)
                     );
@@ -284,7 +284,7 @@ public class DbfFileWriter
                 allFiles = new HashSet<>(Arrays.asList(Objects.requireNonNull(dir.list())));
             }
             catch (SecurityException se) {
-                throw DataXException.asDataXException(
+                throw AddaxException.asAddaxException(
                         DbfFileWriterErrorCode.SECURITY_NOT_ENOUGH,
                         String.format("您没有权限查看目录 : [%s]", path));
             }
@@ -427,7 +427,7 @@ public class DbfFileWriter
                 writer.close();
             }
             catch (SecurityException se) {
-                throw DataXException.asDataXException(
+                throw AddaxException.asAddaxException(
                         DbfFileWriterErrorCode.SECURITY_NOT_ENOUGH,
                         String.format("您没有权限创建文件  : [%s]", this.fileName));
             }

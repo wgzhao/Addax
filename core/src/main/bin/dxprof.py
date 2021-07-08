@@ -54,21 +54,21 @@ def parse_query_table(line):
 def parse_task(fname):
     global LAST_SQL_UUID
     global LAST_COMMIT_UUID
-    global DATAX_JOBDICT
-    global DATAX_JOBDICT_COMMIT
+    global ADDAX_JOBDICT
+    global ADDAX_JOBDICT_COMMIT
     global UNIXTIME
     LAST_SQL_UUID = ''
-    DATAX_JOBDICT = {}
+    ADDAX_JOBDICT = {}
     LAST_COMMIT_UUID = ''
-    DATAX_JOBDICT_COMMIT = {}
+    ADDAX_JOBDICT_COMMIT = {}
 
     UNIXTIME = int(time.time())
     with open(fname, 'r') as f:
         for line in f.readlines():
             line = line.strip()
 
-            if (LAST_SQL_UUID and (LAST_SQL_UUID in DATAX_JOBDICT)):
-                DATAX_JOBDICT[LAST_SQL_UUID]['host'] = parse_query_host(line)
+            if (LAST_SQL_UUID and (LAST_SQL_UUID in ADDAX_JOBDICT)):
+                ADDAX_JOBDICT[LAST_SQL_UUID]['host'] = parse_query_host(line)
                 LAST_SQL_UUID = ''
 
             if line.find('CommonRdbmsReader$Task') > 0:
@@ -87,16 +87,16 @@ def parse_read_task(line):
 
     LAST_SQL_UUID = ser.group()
     if REG_SQL_WAKE.search(line):
-        DATAX_JOBDICT[LAST_SQL_UUID] = {
+        ADDAX_JOBDICT[LAST_SQL_UUID] = {
             'stat' : 'R',
             'wake' : parse_timestamp(line),
             'done' : UNIXTIME,
             'host' : parse_query_host(line),
             'path' : parse_query_table(line)
         }
-    elif ((LAST_SQL_UUID in DATAX_JOBDICT) and REG_SQL_DONE.search(line)):
-        DATAX_JOBDICT[LAST_SQL_UUID]['stat'] = 'D'
-        DATAX_JOBDICT[LAST_SQL_UUID]['done'] = parse_timestamp(line)
+    elif ((LAST_SQL_UUID in ADDAX_JOBDICT) and REG_SQL_DONE.search(line)):
+        ADDAX_JOBDICT[LAST_SQL_UUID]['stat'] = 'D'
+        ADDAX_JOBDICT[LAST_SQL_UUID]['done'] = parse_timestamp(line)
 # }}} #
 
 # {{{ function parse_write_task() #
@@ -107,14 +107,14 @@ def parse_write_task(line):
 
     LAST_COMMIT_UUID = ser.group()
     if REG_COMMIT_WAKE.search(line):
-        DATAX_JOBDICT_COMMIT[LAST_COMMIT_UUID] = {
+        ADDAX_JOBDICT_COMMIT[LAST_COMMIT_UUID] = {
             'stat' : 'R',
             'wake' : parse_timestamp(line),
             'done' : UNIXTIME,
         }
-    elif ((LAST_COMMIT_UUID in DATAX_JOBDICT_COMMIT) and REG_COMMIT_DONE.search(line)):
-        DATAX_JOBDICT_COMMIT[LAST_COMMIT_UUID]['stat'] = 'D'
-        DATAX_JOBDICT_COMMIT[LAST_COMMIT_UUID]['done'] = parse_timestamp(line)
+    elif ((LAST_COMMIT_UUID in ADDAX_JOBDICT_COMMIT) and REG_COMMIT_DONE.search(line)):
+        ADDAX_JOBDICT_COMMIT[LAST_COMMIT_UUID]['stat'] = 'D'
+        ADDAX_JOBDICT_COMMIT[LAST_COMMIT_UUID]['done'] = parse_timestamp(line)
 # }}} #
 
 # {{{ function result_analyse() #
@@ -128,8 +128,8 @@ def result_analyse():
     tasklist_commit = []
     statvars_commit = {'sum' : 0, 'cnt' : 0}
 
-    for idx in DATAX_JOBDICT:
-        item = DATAX_JOBDICT[idx]
+    for idx in ADDAX_JOBDICT:
+        item = ADDAX_JOBDICT[idx]
         item['uuid'] = idx;
         item['cost'] = item['done'] - item['wake']
         tasklist.append(item);
@@ -144,8 +144,8 @@ def result_analyse():
             statvars['max'] = max(statvars['max'], item['done'])
             statvars['min'] = min(statvars['min'], item['wake'])
 
-    for idx in DATAX_JOBDICT_COMMIT:
-        itemc = DATAX_JOBDICT_COMMIT[idx]
+    for idx in ADDAX_JOBDICT_COMMIT:
+        itemc = ADDAX_JOBDICT_COMMIT[idx]
         itemc['uuid'] = idx
         itemc['cost'] = itemc['done'] - itemc['wake']
         tasklist_commit.append(itemc)
