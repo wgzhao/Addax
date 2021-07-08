@@ -19,7 +19,7 @@
 
 package com.wgzhao.addax.core.util;
 
-import com.wgzhao.addax.common.exception.DataXException;
+import com.wgzhao.addax.common.exception.AddaxException;
 import com.wgzhao.addax.common.util.Configuration;
 import com.wgzhao.addax.core.transport.transformer.TransformerErrorCode;
 import com.wgzhao.addax.core.transport.transformer.TransformerExecution;
@@ -57,12 +57,12 @@ public class TransformerUtil
         for (Configuration configuration : tfConfigs) {
             String functionName = configuration.getString("name");
             if (StringUtils.isEmpty(functionName)) {
-                throw DataXException.asDataXException(TransformerErrorCode.TRANSFORMER_CONFIGURATION_ERROR,
+                throw AddaxException.asAddaxException(TransformerErrorCode.TRANSFORMER_CONFIGURATION_ERROR,
                         "config=" + configuration.toJSON());
             }
 
             if ("dx_groovy".equals(functionName) && functionNames.contains("dx_groovy")) {
-                throw DataXException.asDataXException(TransformerErrorCode.TRANSFORMER_CONFIGURATION_ERROR,
+                throw AddaxException.asAddaxException(TransformerErrorCode.TRANSFORMER_CONFIGURATION_ERROR,
                         "dx_groovy can be invoke once only.");
             }
             functionNames.add(functionName);
@@ -80,7 +80,7 @@ public class TransformerUtil
             String functionName = configuration.getString("name");
             TransformerInfo transformerInfo = TransformerRegistry.getTransformer(functionName);
             if (transformerInfo == null) {
-                throw DataXException.asDataXException(TransformerErrorCode.TRANSFORMER_NOTFOUND_ERROR,
+                throw AddaxException.asAddaxException(TransformerErrorCode.TRANSFORMER_NOTFOUND_ERROR,
                         "name=" + functionName);
             }
 
@@ -95,7 +95,7 @@ public class TransformerUtil
                 Integer columnIndex = configuration.getInt(CoreConstant.TRANSFORMER_PARAMETER_COLUMNINDEX);
 
                 if (columnIndex == null) {
-                    throw DataXException.asDataXException(TransformerErrorCode.TRANSFORMER_ILLEGAL_PARAMETER,
+                    throw AddaxException.asAddaxException(TransformerErrorCode.TRANSFORMER_ILLEGAL_PARAMETER,
                             "columnIndex must be set by UDF:name=" + functionName);
                 }
 
@@ -109,7 +109,7 @@ public class TransformerUtil
             else {
                 String code = configuration.getString(CoreConstant.TRANSFORMER_PARAMETER_CODE);
                 if (StringUtils.isEmpty(code)) {
-                    throw DataXException.asDataXException(TransformerErrorCode.TRANSFORMER_ILLEGAL_PARAMETER,
+                    throw AddaxException.asAddaxException(TransformerErrorCode.TRANSFORMER_ILLEGAL_PARAMETER,
                             "groovy code must be set by UDF:name=" + functionName);
                 }
                 transformerExecutionParas.setCode(code);

@@ -21,7 +21,7 @@ package com.wgzhao.addax.core.statistics.plugin.task;
 
 import com.wgzhao.addax.common.constant.PluginType;
 import com.wgzhao.addax.common.element.Record;
-import com.wgzhao.addax.common.exception.DataXException;
+import com.wgzhao.addax.common.exception.AddaxException;
 import com.wgzhao.addax.common.plugin.TaskPluginCollector;
 import com.wgzhao.addax.common.util.Configuration;
 import com.wgzhao.addax.core.statistics.communication.Communication;
@@ -97,7 +97,7 @@ public abstract class AbstractTaskPluginCollector
                     CommunicationTool.WRITE_FAILED_BYTES, dirtyRecord.getByteSize());
         }
         else {
-            throw DataXException.asDataXException(
+            throw AddaxException.asAddaxException(
                     FrameworkErrorCode.RUNTIME_ERROR,
                     String.format("不知道的插件类型[%s].", this.pluginType));
         }

@@ -20,7 +20,7 @@
 package com.wgzhao.addax.core.taskgroup;
 
 import com.wgzhao.addax.common.exception.CommonErrorCode;
-import com.wgzhao.addax.common.exception.DataXException;
+import com.wgzhao.addax.common.exception.AddaxException;
 import com.wgzhao.addax.core.meta.State;
 import com.wgzhao.addax.core.statistics.communication.Communication;
 import com.wgzhao.addax.core.statistics.communication.CommunicationTool;
@@ -112,7 +112,7 @@ public class TaskMonitor
             else if (isExpired(lastUpdateComunicationTS)) {
                 communication.setState(State.FAILED);
                 communication.setTimestamp(ttl);
-                communication.setThrowable(DataXException.asDataXException(CommonErrorCode.TASK_HUNG_EXPIRED,
+                communication.setThrowable(AddaxException.asAddaxException(CommonErrorCode.TASK_HUNG_EXPIRED,
                         String.format("task(%s) hung expired [allReadRecord(%s), elased(%s)]",
                                 taskid, lastAllReadRecords, (ttl - lastUpdateComunicationTS))));
             }

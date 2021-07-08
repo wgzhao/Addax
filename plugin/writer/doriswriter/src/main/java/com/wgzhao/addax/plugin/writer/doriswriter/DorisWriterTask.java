@@ -20,7 +20,7 @@
 package com.wgzhao.addax.plugin.writer.doriswriter;
 
 import com.wgzhao.addax.common.element.Record;
-import com.wgzhao.addax.common.exception.DataXException;
+import com.wgzhao.addax.common.exception.AddaxException;
 import com.wgzhao.addax.common.plugin.RecordReceiver;
 import com.wgzhao.addax.common.plugin.TaskPluginCollector;
 import com.wgzhao.addax.common.util.Configuration;
@@ -100,7 +100,7 @@ public class DorisWriterTask
         while ((record = recordReceiver.getFromReader()) != null) {
             int len = record.getColumnNumber();
             if (this.column != null && len != this.column.size()) {
-                throw DataXException.asDataXException(
+                throw AddaxException.asAddaxException(
                         DorisWriterErrorCode.ILLEGAL_VALUE,
                         String.format("源字段数和目标字段数不匹配，源字段数为%s, 目标字段数为%s", len, this.column.size())
                 );
@@ -156,7 +156,7 @@ public class DorisWriterTask
                 // statusCode 200 just indicates that doris be service is ok, not stream load
                 // you should see the output content to find whether stream load is success
                 if (statusCode != 200) {
-                    throw DataXException.asDataXException(
+                    throw AddaxException.asAddaxException(
                             DorisWriterErrorCode.WRITER_ERROR,
                             String.format("Stream load failed, statusCode=%s load result=%s", statusCode, loadResult)
                     );
@@ -164,7 +164,7 @@ public class DorisWriterTask
             }
         }
         catch (IOException e) {
-            throw DataXException.asDataXException(
+            throw AddaxException.asAddaxException(
                     DorisWriterErrorCode.CONNECT_ERROR,
                     String.format("Failed to connect Doris server with: %s, %s", this.loadUrl, e)
             );

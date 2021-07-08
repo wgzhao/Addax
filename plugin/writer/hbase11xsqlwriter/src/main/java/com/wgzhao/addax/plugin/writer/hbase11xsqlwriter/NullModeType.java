@@ -19,7 +19,7 @@
 
 package com.wgzhao.addax.plugin.writer.hbase11xsqlwriter;
 
-import com.wgzhao.addax.common.exception.DataXException;
+import com.wgzhao.addax.common.exception.AddaxException;
 
 import java.util.Arrays;
 
@@ -42,7 +42,7 @@ public enum NullModeType
                 return modeType;
             }
         }
-        throw DataXException.asDataXException(HbaseSQLWriterErrorCode.ILLEGAL_VALUE,
+        throw AddaxException.asAddaxException(HbaseSQLWriterErrorCode.ILLEGAL_VALUE,
                 "Hbasewriter 不支持该 nullMode 类型:" + modeName + ", 目前支持的 nullMode 类型是:" + Arrays.asList(values()));
     }
 

@@ -20,7 +20,7 @@
 package com.wgzhao.addax.common.element;
 
 import com.wgzhao.addax.common.exception.CommonErrorCode;
-import com.wgzhao.addax.common.exception.DataXException;
+import com.wgzhao.addax.common.exception.AddaxException;
 import org.apache.commons.lang3.math.NumberUtils;
 
 import java.math.BigDecimal;
@@ -56,7 +56,7 @@ public class LongColumn
             super.setByteSize(data.length());
         }
         catch (Exception e) {
-            throw DataXException.asDataXException(
+            throw AddaxException.asAddaxException(
                     CommonErrorCode.CONVERT_NOT_SUPPORT,
                     String.format("String[%s]不能转为Long .", data));
         }
@@ -164,7 +164,7 @@ public class LongColumn
     @Override
     public byte[] asBytes()
     {
-        throw DataXException.asDataXException(
+        throw AddaxException.asAddaxException(
                 CommonErrorCode.CONVERT_NOT_SUPPORT, "Long类型不能转为Bytes .");
     }
 }

@@ -19,7 +19,7 @@
 
 package com.wgzhao.addax.plugin.reader.ftpreader;
 
-import com.wgzhao.addax.common.exception.DataXException;
+import com.wgzhao.addax.common.exception.AddaxException;
 import com.wgzhao.addax.common.plugin.RecordSender;
 import com.wgzhao.addax.common.spi.Reader;
 import com.wgzhao.addax.common.util.Configuration;
@@ -85,7 +85,7 @@ public class FtpReader
             this.protocol = this.originConfig.getNecessaryValue(Key.PROTOCOL, FtpReaderErrorCode.REQUIRED_VALUE);
             boolean ptrotocolTag = "ftp".equals(this.protocol) || "sftp".equals(this.protocol);
             if (!ptrotocolTag) {
-                throw DataXException.asDataXException(FtpReaderErrorCode.ILLEGAL_VALUE,
+                throw AddaxException.asAddaxException(FtpReaderErrorCode.ILLEGAL_VALUE,
                         String.format("仅支持 ftp和sftp 传输协议 , 不支持您配置的传输协议: [%s]", protocol));
             }
             this.host = this.originConfig.getNecessaryValue(Key.HOST, FtpReaderErrorCode.REQUIRED_VALUE);
@@ -98,7 +98,7 @@ public class FtpReader
             this.connectPattern = this.originConfig.getUnnecessaryValue(Key.CONNECTPATTERN, Constant.DEFAULT_FTP_CONNECT_PATTERN);
             boolean connectPatternTag = "PORT".equals(connectPattern) || "PASV".equals(connectPattern);
             if (!connectPatternTag) {
-                throw DataXException.asDataXException(FtpReaderErrorCode.ILLEGAL_VALUE,
+                throw AddaxException.asAddaxException(FtpReaderErrorCode.ILLEGAL_VALUE,
                         String.format("不支持您配置的ftp传输模式: [%s]", connectPattern));
             }
             else {
@@ -114,13 +114,13 @@ public class FtpReader
             else {
                 path = this.originConfig.getList(Key.PATH, String.class);
                 if (null == path || path.isEmpty() ) {
-                    throw DataXException.asDataXException(FtpReaderErrorCode.REQUIRED_VALUE, "您需要指定待读取的源目录或文件");
+                    throw AddaxException.asAddaxException(FtpReaderErrorCode.REQUIRED_VALUE, "您需要指定待读取的源目录或文件");
                 }
                 for (String eachPath : path) {
                     if (!eachPath.startsWith("/")) {
                         String message = String.format("请检查参数path:[%s],需要配置为绝对路径", eachPath);
                         LOG.error(message);
-                        throw DataXException.asDataXException(FtpReaderErrorCode.ILLEGAL_VALUE, message);
+                        throw AddaxException.asAddaxException(FtpReaderErrorCode.ILLEGAL_VALUE, message);
                     }
                 }
             }
@@ -167,7 +167,7 @@ public class FtpReader
             // int splitNumber = adviceNumber;
             int splitNumber = this.sourceFiles.size();
             if (0 == splitNumber) {
-                throw DataXException.asDataXException(FtpReaderErrorCode.EMPTY_DIR_EXCEPTION,
+                throw AddaxException.asAddaxException(FtpReaderErrorCode.EMPTY_DIR_EXCEPTION,
                         String.format("未能找到待读取的文件,请确认您的配置项path: %s", this.originConfig.getString(Key.PATH)));
             }
 

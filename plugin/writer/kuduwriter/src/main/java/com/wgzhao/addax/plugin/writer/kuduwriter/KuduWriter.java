@@ -19,7 +19,7 @@
 
 package com.wgzhao.addax.plugin.writer.kuduwriter;
 
-import com.wgzhao.addax.common.exception.DataXException;
+import com.wgzhao.addax.common.exception.AddaxException;
 import com.wgzhao.addax.common.plugin.RecordReceiver;
 import com.wgzhao.addax.common.spi.Writer;
 import com.wgzhao.addax.common.util.Configuration;
@@ -55,7 +55,7 @@ public class KuduWriter
             // column check
             List<Configuration> columns = this.config.getListConfiguration(Key.COLUMN);
             if (null == columns || columns.isEmpty()) {
-                throw DataXException.asDataXException(
+                throw AddaxException.asAddaxException(
                         KuduWriterErrorCode.REQUIRED_VALUE, "您需要指定 columns"
                 );
             } else {
@@ -82,7 +82,7 @@ public class KuduWriter
             if (!KuduHelper.isTableExists(config)) {
                 //KuduHelper.createTable(config);
                 // we DO NOT create table
-                throw DataXException.asDataXException(KuduWriterErrorCode.TABLE_NOT_EXISTS,
+                throw AddaxException.asAddaxException(KuduWriterErrorCode.TABLE_NOT_EXISTS,
                         KuduWriterErrorCode.TABLE_NOT_EXISTS.getDescription());
             }
         }

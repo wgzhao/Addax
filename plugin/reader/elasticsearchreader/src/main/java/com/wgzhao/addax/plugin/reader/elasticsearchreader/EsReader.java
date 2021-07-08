@@ -31,7 +31,7 @@ import com.wgzhao.addax.common.element.DoubleColumn;
 import com.wgzhao.addax.common.element.LongColumn;
 import com.wgzhao.addax.common.element.Record;
 import com.wgzhao.addax.common.element.StringColumn;
-import com.wgzhao.addax.common.exception.DataXException;
+import com.wgzhao.addax.common.exception.AddaxException;
 import com.wgzhao.addax.common.plugin.RecordSender;
 import com.wgzhao.addax.common.spi.Reader;
 import com.wgzhao.addax.common.statistics.PerfRecord;
@@ -97,7 +97,7 @@ public class EsReader
                 }
             }
             catch (Exception ex) {
-                throw DataXException.asDataXException(ESReaderErrorCode.ES_INDEX_NOT_EXISTS, ex.toString());
+                throw AddaxException.asAddaxException(ESReaderErrorCode.ES_INDEX_NOT_EXISTS, ex.toString());
             }
             esClient.closeJestClient();
         }
@@ -178,11 +178,11 @@ public class EsReader
             this.filter = Key.getFilter(conf);
             this.column = Key.getColumn(conf);
             if (column == null || column.isEmpty()) {
-                throw DataXException.asDataXException(ESReaderErrorCode.COLUMN_CANT_BE_EMPTY, "column必须配置");
+                throw AddaxException.asAddaxException(ESReaderErrorCode.COLUMN_CANT_BE_EMPTY, "column必须配置");
             }
             if (column.size() == 1 && "*".equals(column.get(0))) {
                 // TODO get column from record
-                throw DataXException.asDataXException(ESReaderErrorCode.COLUMN_CANT_BE_EMPTY, "column暂不支持*配置");
+                throw AddaxException.asAddaxException(ESReaderErrorCode.COLUMN_CANT_BE_EMPTY, "column暂不支持*配置");
             }
         }
 
@@ -198,10 +198,10 @@ public class EsReader
                 searchResult = esClient.search(query, searchType, index, type, scroll, headers);
             }
             catch (Exception e) {
-                throw DataXException.asDataXException(ESReaderErrorCode.ES_SEARCH_ERROR, e);
+                throw AddaxException.asAddaxException(ESReaderErrorCode.ES_SEARCH_ERROR, e);
             }
             if (!searchResult.isSucceeded()) {
-                throw DataXException.asDataXException(ESReaderErrorCode.ES_SEARCH_ERROR, searchResult.getResponseCode() + ":" + searchResult.getErrorMessage());
+                throw AddaxException.asAddaxException(ESReaderErrorCode.ES_SEARCH_ERROR, searchResult.getResponseCode() + ":" + searchResult.getErrorMessage());
             }
             queryPerfRecord.end();
             //transport records
@@ -223,7 +223,7 @@ public class EsReader
                     JestResult currScroll = esClient.scroll(scrollId, this.scroll);
                     queryPerfRecord.end();
                     if (!currScroll.isSucceeded()) {
-                        throw DataXException.asDataXException(ESReaderErrorCode.ES_SEARCH_ERROR,
+                        throw AddaxException.asAddaxException(ESReaderErrorCode.ES_SEARCH_ERROR,
                                 String.format("scroll[id=%s] search error,code:%s,msg:%s", scrollId, currScroll.getResponseCode(), currScroll.getErrorMessage()));
                     }
                     allResultPerfRecord.start();
@@ -231,11 +231,11 @@ public class EsReader
                     allResultPerfRecord.end();
                 }
             }
-            catch (DataXException dxe) {
+            catch (AddaxException dxe) {
                 throw dxe;
             }
             catch (Exception e) {
-                throw DataXException.asDataXException(ESReaderErrorCode.ES_SEARCH_ERROR, e);
+                throw AddaxException.asAddaxException(ESReaderErrorCode.ES_SEARCH_ERROR, e);
             }
             finally {
                 esClient.clearScroll(scrollId);
@@ -370,7 +370,7 @@ public class EsReader
                 col = new StringColumn(JSON.toJSONString(value));
             }
             else {
-                throw DataXException.asDataXException(ESReaderErrorCode.UNKNOWN_DATA_TYPE, "type:" + value.getClass().getName());
+                throw AddaxException.asAddaxException(ESReaderErrorCode.UNKNOWN_DATA_TYPE, "type:" + value.getClass().getName());
             }
             return col;
         }

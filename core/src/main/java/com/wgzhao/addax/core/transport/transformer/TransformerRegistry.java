@@ -19,7 +19,7 @@
 
 package com.wgzhao.addax.core.transport.transformer;
 
-import com.wgzhao.addax.common.exception.DataXException;
+import com.wgzhao.addax.common.exception.AddaxException;
 import com.wgzhao.addax.common.util.Configuration;
 import com.wgzhao.addax.core.util.container.CoreConstant;
 import com.wgzhao.addax.core.util.container.JarLoader;
@@ -54,7 +54,7 @@ public class TransformerRegistry
     public static void loadTransformerFromLocalStorage(List<String> transformers)
     {
 
-        String[] paths = new File(CoreConstant.DATAX_STORAGE_TRANSFORMER_HOME).list();
+        String[] paths = new File(CoreConstant.ADDAX_STORAGE_TRANSFORMER_HOME).list();
         if (null == paths) {
             return;
         }
@@ -74,7 +74,7 @@ public class TransformerRegistry
 
     public static void loadTransformer(String each)
     {
-        String transformerPath = CoreConstant.DATAX_STORAGE_TRANSFORMER_HOME + File.separator + each;
+        String transformerPath = CoreConstant.ADDAX_STORAGE_TRANSFORMER_HOME + File.separator + each;
         Configuration transformerConfiguration;
         try {
             transformerConfiguration = loadTransFormerConfig(transformerPath);
@@ -147,7 +147,7 @@ public class TransformerRegistry
         checkName(transformer.getTransformerName(), isNative);
 
         if (registedTransformer.containsKey(transformer.getTransformerName())) {
-            throw DataXException.asDataXException(
+            throw AddaxException.asAddaxException(
                     TransformerErrorCode.TRANSFORMER_DUPLICATE_ERROR,
                     " name=" + transformer.getTransformerName());
         }
@@ -164,7 +164,7 @@ public class TransformerRegistry
         checkName(complexTransformer.getTransformerName(), isNative);
 
         if (registedTransformer.containsKey(complexTransformer.getTransformerName())) {
-            throw DataXException.asDataXException(
+            throw AddaxException.asAddaxException(
                     TransformerErrorCode.TRANSFORMER_DUPLICATE_ERROR,
                     " name=" + complexTransformer.getTransformerName());
         }
@@ -188,7 +188,7 @@ public class TransformerRegistry
         }
 
         if (!checkResult) {
-            throw DataXException.asDataXException(
+            throw AddaxException.asAddaxException(
                     TransformerErrorCode.TRANSFORMER_NAME_ERROR,
                     " name=" + functionName + ": isNative=" + isNative);
         }

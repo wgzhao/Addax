@@ -19,7 +19,7 @@
 
 package com.wgzhao.addax.plugin.reader.hbase20xreader;
 
-import com.wgzhao.addax.common.exception.DataXException;
+import com.wgzhao.addax.common.exception.AddaxException;
 import org.apache.commons.lang.StringUtils;
 
 import java.util.Arrays;
@@ -49,7 +49,7 @@ public enum ColumnType
     public static ColumnType getByTypeName(String typeName)
     {
         if (StringUtils.isBlank(typeName)) {
-            throw DataXException.asDataXException(Hbase20xReaderErrorCode.ILLEGAL_VALUE,
+            throw AddaxException.asAddaxException(Hbase20xReaderErrorCode.ILLEGAL_VALUE,
                     String.format("Hbasereader 不支持该类型:%s, 目前支持的类型是:%s", typeName, Arrays.asList(values())));
         }
         for (ColumnType columnType : values()) {
@@ -58,7 +58,7 @@ public enum ColumnType
             }
         }
 
-        throw DataXException.asDataXException(Hbase20xReaderErrorCode.ILLEGAL_VALUE,
+        throw AddaxException.asAddaxException(Hbase20xReaderErrorCode.ILLEGAL_VALUE,
                 String.format("Hbasereader 不支持该类型:%s, 目前支持的类型是:%s", typeName, Arrays.asList(values())));
     }
 

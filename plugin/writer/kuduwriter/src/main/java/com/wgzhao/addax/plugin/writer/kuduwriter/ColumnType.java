@@ -19,7 +19,7 @@
 
 package com.wgzhao.addax.plugin.writer.kuduwriter;
 
-import com.wgzhao.addax.common.exception.DataXException;
+import com.wgzhao.addax.common.exception.AddaxException;
 
 import java.util.Arrays;
 
@@ -46,7 +46,7 @@ public enum ColumnType
                 return modeType;
             }
         }
-        throw DataXException.asDataXException(KuduWriterErrorCode.ILLEGAL_VALUE,
+        throw AddaxException.asAddaxException(KuduWriterErrorCode.ILLEGAL_VALUE,
                 String.format("Kuduwriter does not support the type:%s, currently supported types are:%s",
                         modeName, Arrays.asList(values())));
     }

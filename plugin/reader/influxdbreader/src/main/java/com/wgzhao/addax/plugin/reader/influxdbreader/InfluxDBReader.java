@@ -19,7 +19,7 @@
 
 package com.wgzhao.addax.plugin.reader.influxdbreader;
 
-import com.wgzhao.addax.common.exception.DataXException;
+import com.wgzhao.addax.common.exception.AddaxException;
 import com.wgzhao.addax.common.plugin.RecordSender;
 import com.wgzhao.addax.common.spi.Reader;
 import com.wgzhao.addax.common.util.Configuration;
@@ -57,13 +57,13 @@ public class InfluxDBReader
             String querySql = originalConfig.getString(Key.QUERY_SQL, null);
             String database = originalConfig.getString(Key.DATABASE, null);
             if (StringUtils.isAllBlank(querySql,database)) {
-                throw DataXException.asDataXException(
+                throw AddaxException.asAddaxException(
                         InfluxDBReaderErrorCode.REQUIRED_VALUE,
                         "One of database or querysql must be specified"
                 );
             }
             if (columns == null || columns.isEmpty()) {
-                throw DataXException.asDataXException(
+                throw AddaxException.asAddaxException(
                         InfluxDBReaderErrorCode.REQUIRED_VALUE,
                         "The parameter [" + Key.COLUMN + "] is not set.");
             }

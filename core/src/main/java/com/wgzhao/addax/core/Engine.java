@@ -20,7 +20,7 @@
 package com.wgzhao.addax.core;
 
 import com.wgzhao.addax.common.element.ColumnCast;
-import com.wgzhao.addax.common.exception.DataXException;
+import com.wgzhao.addax.common.exception.AddaxException;
 import com.wgzhao.addax.common.spi.ErrorCode;
 import com.wgzhao.addax.common.statistics.PerfTrace;
 import com.wgzhao.addax.common.statistics.VMInfo;
@@ -65,32 +65,32 @@ public class Engine
         LoadUtil.bind(allConf);
 
         boolean isJob = !("taskGroup".equalsIgnoreCase(allConf
-                .getString(CoreConstant.DATAX_CORE_CONTAINER_MODEL)));
+                .getString(CoreConstant.ADDAX_CORE_CONTAINER_MODEL)));
         //JobContainer会在schedule后再行进行设置和调整值
         int channelNumber = 0;
         AbstractContainer container;
         long instanceId;
         int taskGroupId = -1;
         if (isJob) {
-            allConf.set(CoreConstant.DATAX_CORE_CONTAINER_JOB_MODE, "standalone");
+            allConf.set(CoreConstant.ADDAX_CORE_CONTAINER_JOB_MODE, "standalone");
             container = new JobContainer(allConf);
             instanceId = allConf.getLong(
-                    CoreConstant.DATAX_CORE_CONTAINER_JOB_ID, 0);
+                    CoreConstant.ADDAX_CORE_CONTAINER_JOB_ID, 0);
         }
         else {
             container = new TaskGroupContainer(allConf);
             instanceId = allConf.getLong(
-                    CoreConstant.DATAX_CORE_CONTAINER_JOB_ID);
+                    CoreConstant.ADDAX_CORE_CONTAINER_JOB_ID);
             taskGroupId = allConf.getInt(
-                    CoreConstant.DATAX_CORE_CONTAINER_TASKGROUP_ID);
+                    CoreConstant.ADDAX_CORE_CONTAINER_TASKGROUP_ID);
             channelNumber = allConf.getInt(
-                    CoreConstant.DATAX_CORE_CONTAINER_TASKGROUP_CHANNEL);
+                    CoreConstant.ADDAX_CORE_CONTAINER_TASKGROUP_CHANNEL);
         }
 
         //缺省打开perfTrace
-        boolean traceEnable = allConf.getBool(CoreConstant.DATAX_CORE_CONTAINER_TRACE_ENABLE,
+        boolean traceEnable = allConf.getBool(CoreConstant.ADDAX_CORE_CONTAINER_TRACE_ENABLE,
                 false);
-        boolean perfReportEnable = allConf.getBool(CoreConstant.DATAX_CORE_REPORT_DATAX_PERFLOG,
+        boolean perfReportEnable = allConf.getBool(CoreConstant.ADDAX_CORE_REPORT_ADDAX_PERFLOG,
                 false);
 
         //standlone模式的datax shell任务不进行汇报
@@ -100,7 +100,7 @@ public class Engine
 
         int priority = 0;
 
-        Configuration jobInfoConfig = allConf.getConfiguration(CoreConstant.DATAX_JOB_JOBINFO);
+        Configuration jobInfoConfig = allConf.getConfiguration(CoreConstant.ADDAX_JOB_JOBINFO);
         //初始化PerfTrace
         PerfTrace perfTrace = PerfTrace.getInstance(isJob, instanceId, taskGroupId, priority, traceEnable);
         perfTrace.setJobInfo(jobInfoConfig, perfReportEnable, channelNumber);
@@ -148,9 +148,9 @@ public class Engine
 
             Configuration configuration = ConfigParser.parse(jobPath);
             // jobid 默认值为-1
-            configuration.set(CoreConstant.DATAX_CORE_CONTAINER_JOB_ID, -1);
+            configuration.set(CoreConstant.ADDAX_CORE_CONTAINER_JOB_ID, -1);
             // 默认运行模式
-            configuration.set(CoreConstant.DATAX_CORE_CONTAINER_JOB_MODE, "standalone");
+            configuration.set(CoreConstant.ADDAX_CORE_CONTAINER_JOB_MODE, "standalone");
 
             //打印vmInfo
             VMInfo vmInfo = VMInfo.getVmInfo();
@@ -169,8 +169,8 @@ public class Engine
         catch (ParseException e) {
             throw new ParserException(e.getMessage());
         }
-        catch (DataXException e) {
-            throw new DataXException(e.getErrorCode(), e.getMessage());
+        catch (AddaxException e) {
+            throw new AddaxException(e.getErrorCode(), e.getMessage());
         }
     }
 
@@ -196,7 +196,7 @@ public class Engine
         try {
             Engine.entry(args);
         }
-        catch (DataXException e) {
+        catch (AddaxException e) {
             ErrorCode errorCode = e.getErrorCode();
             LOG.error(e.getMessage());
             if (errorCode instanceof FrameworkErrorCode) {

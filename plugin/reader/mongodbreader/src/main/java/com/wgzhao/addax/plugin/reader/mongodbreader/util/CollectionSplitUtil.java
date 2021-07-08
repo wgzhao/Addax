@@ -19,7 +19,7 @@
 
 package com.wgzhao.addax.plugin.reader.mongodbreader.util;
 
-import com.wgzhao.addax.common.exception.DataXException;
+import com.wgzhao.addax.common.exception.AddaxException;
 import com.wgzhao.addax.common.util.Configuration;
 import com.wgzhao.addax.plugin.reader.mongodbreader.KeyConstant;
 import com.wgzhao.addax.plugin.reader.mongodbreader.MongoDBReaderErrorCode;
@@ -55,7 +55,7 @@ public class CollectionSplitUtil
         String collName = originalSliceConfig.getString(KeyConstant.MONGO_COLLECTION_NAME);
 
         if (null == dbName || dbName.isEmpty() || null == collName || collName.isEmpty() || mongoClient == null) {
-            throw DataXException.asDataXException(MongoDBReaderErrorCode.ILLEGAL_VALUE,
+            throw AddaxException.asAddaxException(MongoDBReaderErrorCode.ILLEGAL_VALUE,
                     MongoDBReaderErrorCode.ILLEGAL_VALUE.getDescription());
         }
 

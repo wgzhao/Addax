@@ -26,7 +26,7 @@ import com.wgzhao.addax.common.element.DoubleColumn;
 import com.wgzhao.addax.common.element.LongColumn;
 import com.wgzhao.addax.common.element.Record;
 import com.wgzhao.addax.common.element.StringColumn;
-import com.wgzhao.addax.common.exception.DataXException;
+import com.wgzhao.addax.common.exception.AddaxException;
 import com.wgzhao.addax.common.plugin.RecordSender;
 import com.wgzhao.addax.common.spi.Reader;
 import com.wgzhao.addax.common.util.Configuration;
@@ -142,7 +142,7 @@ public class KuduReader
                 kuduTable = kuduClient.openTable(tableName);
             }
             catch (KuduException ex) {
-                throw DataXException.asDataXException(
+                throw AddaxException.asAddaxException(
                         KuduReaderErrorCode.UNEXCEPT_EXCEPTION,
                         ex.getMessage()
                 );
@@ -184,7 +184,7 @@ public class KuduReader
                     rows = kuduScanner.nextRows();
                 }
                 catch (KuduException ex) {
-                    throw DataXException.asDataXException(
+                    throw AddaxException.asAddaxException(
                             KuduReaderErrorCode.UNEXCEPT_EXCEPTION,
                             ex.getMessage()
                     );
@@ -260,7 +260,7 @@ public class KuduReader
                 kuduScanner.close();
             }
             catch (KuduException ex) {
-                throw DataXException.asDataXException(
+                throw AddaxException.asAddaxException(
                         KuduReaderErrorCode.UNEXCEPT_EXCEPTION,
                         ex.getMessage()
                 );
@@ -291,7 +291,7 @@ public class KuduReader
                 kuduClient.close();
             }
             catch (KuduException ex) {
-                throw DataXException.asDataXException(
+                throw AddaxException.asAddaxException(
                         KuduReaderErrorCode.UNEXCEPT_EXCEPTION,
                         ex.getMessage()
                 );

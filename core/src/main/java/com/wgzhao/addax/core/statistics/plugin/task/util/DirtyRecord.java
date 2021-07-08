@@ -21,7 +21,7 @@ package com.wgzhao.addax.core.statistics.plugin.task.util;
 
 import com.wgzhao.addax.common.element.Column;
 import com.wgzhao.addax.common.element.Record;
-import com.wgzhao.addax.common.exception.DataXException;
+import com.wgzhao.addax.common.exception.AddaxException;
 import com.wgzhao.addax.core.util.FrameworkErrorCode;
 import com.alibaba.fastjson.JSON;
 
@@ -64,35 +64,35 @@ public class DirtyRecord
     @Override
     public void setColumn(int i, Column column)
     {
-        throw DataXException.asDataXException(FrameworkErrorCode.RUNTIME_ERROR,
+        throw AddaxException.asAddaxException(FrameworkErrorCode.RUNTIME_ERROR,
                NOT_SUPPORT_METHOD);
     }
 
     @Override
     public Column getColumn(int i)
     {
-        throw DataXException.asDataXException(FrameworkErrorCode.RUNTIME_ERROR,
+        throw AddaxException.asAddaxException(FrameworkErrorCode.RUNTIME_ERROR,
                NOT_SUPPORT_METHOD);
     }
 
     @Override
     public int getColumnNumber()
     {
-        throw DataXException.asDataXException(FrameworkErrorCode.RUNTIME_ERROR,
+        throw AddaxException.asAddaxException(FrameworkErrorCode.RUNTIME_ERROR,
                NOT_SUPPORT_METHOD);
     }
 
     @Override
     public int getByteSize()
     {
-        throw DataXException.asDataXException(FrameworkErrorCode.RUNTIME_ERROR,
+        throw AddaxException.asAddaxException(FrameworkErrorCode.RUNTIME_ERROR,
                NOT_SUPPORT_METHOD);
     }
 
     @Override
     public int getMemorySize()
     {
-        throw DataXException.asDataXException(FrameworkErrorCode.RUNTIME_ERROR,
+        throw AddaxException.asAddaxException(FrameworkErrorCode.RUNTIME_ERROR,
                NOT_SUPPORT_METHOD);
     }
 
@@ -135,56 +135,56 @@ class DirtyColumn
     @Override
     public Long asLong()
     {
-        throw DataXException.asDataXException(FrameworkErrorCode.RUNTIME_ERROR,
+        throw AddaxException.asAddaxException(FrameworkErrorCode.RUNTIME_ERROR,
                NOT_SUPPORT_METHOD);
     }
 
     @Override
     public Double asDouble()
     {
-        throw DataXException.asDataXException(FrameworkErrorCode.RUNTIME_ERROR,
+        throw AddaxException.asAddaxException(FrameworkErrorCode.RUNTIME_ERROR,
                NOT_SUPPORT_METHOD);
     }
 
     @Override
     public String asString()
     {
-        throw DataXException.asDataXException(FrameworkErrorCode.RUNTIME_ERROR,
+        throw AddaxException.asAddaxException(FrameworkErrorCode.RUNTIME_ERROR,
                NOT_SUPPORT_METHOD);
     }
 
     @Override
     public Date asDate()
     {
-        throw DataXException.asDataXException(FrameworkErrorCode.RUNTIME_ERROR,
+        throw AddaxException.asAddaxException(FrameworkErrorCode.RUNTIME_ERROR,
                NOT_SUPPORT_METHOD);
     }
 
     @Override
     public byte[] asBytes()
     {
-        throw DataXException.asDataXException(FrameworkErrorCode.RUNTIME_ERROR,
+        throw AddaxException.asAddaxException(FrameworkErrorCode.RUNTIME_ERROR,
                NOT_SUPPORT_METHOD);
     }
 
     @Override
     public Boolean asBoolean()
     {
-        throw DataXException.asDataXException(FrameworkErrorCode.RUNTIME_ERROR,
+        throw AddaxException.asAddaxException(FrameworkErrorCode.RUNTIME_ERROR,
                NOT_SUPPORT_METHOD);
     }
 
     @Override
     public BigDecimal asBigDecimal()
     {
-        throw DataXException.asDataXException(FrameworkErrorCode.RUNTIME_ERROR,
+        throw AddaxException.asAddaxException(FrameworkErrorCode.RUNTIME_ERROR,
                NOT_SUPPORT_METHOD);
     }
 
     @Override
     public BigInteger asBigInteger()
     {
-        throw DataXException.asDataXException(FrameworkErrorCode.RUNTIME_ERROR,
+        throw AddaxException.asAddaxException(FrameworkErrorCode.RUNTIME_ERROR,
                NOT_SUPPORT_METHOD);
     }
 }

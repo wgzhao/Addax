@@ -20,7 +20,7 @@
 package com.wgzhao.addax.core.util.container;
 
 import com.wgzhao.addax.common.constant.PluginType;
-import com.wgzhao.addax.common.exception.DataXException;
+import com.wgzhao.addax.common.exception.AddaxException;
 import com.wgzhao.addax.common.plugin.AbstractJobPlugin;
 import com.wgzhao.addax.common.plugin.AbstractPlugin;
 import com.wgzhao.addax.common.plugin.AbstractTaskPlugin;
@@ -70,7 +70,7 @@ public class LoadUtil
          * 具体pluginName，故使用pluginType.pluginName作为key放置在该map中
          */
         Long jobId = pluginConfigs.getLong(
-                CoreConstant.DATAX_CORE_CONTAINER_JOB_ID);
+                CoreConstant.ADDAX_CORE_CONTAINER_JOB_ID);
         if (jobId == -1) {
             jobId = (long) 0;
         }
@@ -94,7 +94,7 @@ public class LoadUtil
                 .getConfiguration(generatePluginKey(pluginType, pluginName));
 
         if (null == pluginConf) {
-            throw DataXException.asDataXException(
+            throw AddaxException.asAddaxException(
                     FrameworkErrorCode.PLUGIN_INSTALL_ERROR,
                     String.format("DataX不能找到插件[%s]的配置.",
                             pluginName));
@@ -119,7 +119,7 @@ public class LoadUtil
             return jobPlugin;
         }
         catch (Exception e) {
-            throw DataXException.asDataXException(
+            throw AddaxException.asAddaxException(
                     FrameworkErrorCode.RUNTIME_ERROR,
                     String.format("DataX找到plugin[%s]的Job配置.",
                             pluginName), e);
@@ -142,7 +142,7 @@ public class LoadUtil
             return taskPlugin;
         }
         catch (Exception e) {
-            throw DataXException.asDataXException(FrameworkErrorCode.RUNTIME_ERROR,
+            throw AddaxException.asAddaxException(FrameworkErrorCode.RUNTIME_ERROR,
                     String.format("DataX不能找plugin[%s]的Task配置.",
                             pluginName), e);
         }
@@ -162,7 +162,7 @@ public class LoadUtil
             case WRITER:
                 return new WriterRunner(taskPlugin);
             default:
-                throw DataXException.asDataXException(
+                throw AddaxException.asAddaxException(
                         FrameworkErrorCode.RUNTIME_ERROR,
                         String.format("插件[%s]的类型必须是[reader]或[writer]!",
                                 pluginName));
@@ -185,7 +185,7 @@ public class LoadUtil
                             + pluginRunType.value());
         }
         catch (Exception e) {
-            throw DataXException.asDataXException(FrameworkErrorCode.RUNTIME_ERROR, e);
+            throw AddaxException.asAddaxException(FrameworkErrorCode.RUNTIME_ERROR, e);
         }
     }
 
@@ -198,7 +198,7 @@ public class LoadUtil
         if (null == jarLoader) {
             String pluginPath = pluginConf.getString("path");
             if (StringUtils.isBlank(pluginPath)) {
-                throw DataXException.asDataXException(
+                throw AddaxException.asAddaxException(
                         FrameworkErrorCode.RUNTIME_ERROR,
                         String.format(
                                 "%s插件[%s]路径非法!",

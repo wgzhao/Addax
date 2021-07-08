@@ -20,7 +20,7 @@
 package com.wgzhao.addax.plugin.writer.cassandrawriter;
 
 import com.wgzhao.addax.common.element.Column;
-import com.wgzhao.addax.common.exception.DataXException;
+import com.wgzhao.addax.common.exception.AddaxException;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
@@ -147,7 +147,7 @@ public class CassandraWriterHelper
                 return parseFromJson(jsonObject, sqlType);
 
             default:
-                throw DataXException.asDataXException(CassandraWriterErrorCode.CONF_ERROR,
+                throw AddaxException.asAddaxException(CassandraWriterErrorCode.CONF_ERROR,
                         "不支持您配置的列类型:" + sqlType + ", 请检查您的配置 或者 联系 管理员.");
         } // end switch
     }
@@ -354,7 +354,7 @@ public class CassandraWriterHelper
                     break;
 
                 default:
-                    throw DataXException.asDataXException(CassandraWriterErrorCode.CONF_ERROR,
+                    throw AddaxException.asAddaxException(CassandraWriterErrorCode.CONF_ERROR,
                             "不支持您配置的列类型:" + sqlType + ", 请检查您的配置 或者 联系 管理员.");
             } // end switch
         }

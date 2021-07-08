@@ -21,7 +21,7 @@ package com.wgzhao.addax.core.transport.exchanger;
 
 import com.wgzhao.addax.common.element.Record;
 import com.wgzhao.addax.common.exception.CommonErrorCode;
-import com.wgzhao.addax.common.exception.DataXException;
+import com.wgzhao.addax.common.exception.AddaxException;
 import com.wgzhao.addax.common.plugin.RecordReceiver;
 import com.wgzhao.addax.common.plugin.RecordSender;
 import com.wgzhao.addax.common.plugin.TaskPluginCollector;
@@ -66,21 +66,21 @@ public class BufferedRecordTransformerExchanger
         Configuration configuration = channel.getConfiguration();
 
         this.bufferSize = configuration
-                .getInt(CoreConstant.DATAX_CORE_TRANSPORT_EXCHANGER_BUFFERSIZE);
+                .getInt(CoreConstant.ADDAX_CORE_TRANSPORT_EXCHANGER_BUFFERSIZE);
         this.buffer = new ArrayList<>(bufferSize);
 
         //channel的queue默认大小为8M，原来为64M
         this.byteCapacity = configuration.getInt(
-                CoreConstant.DATAX_CORE_TRANSPORT_CHANNEL_CAPACITY_BYTE, 8 * 1024 * 1024);
+                CoreConstant.ADDAX_CORE_TRANSPORT_CHANNEL_CAPACITY_BYTE, 8 * 1024 * 1024);
 
         try {
             BufferedRecordTransformerExchanger.RECORD_CLASS = ((Class<? extends Record>) Class
                     .forName(configuration.getString(
-                            CoreConstant.DATAX_CORE_TRANSPORT_RECORD_CLASS,
+                            CoreConstant.ADDAX_CORE_TRANSPORT_RECORD_CLASS,
                             "com.wgzhao.addax.core.transport.record.DefaultRecord")));
         }
         catch (Exception e) {
-            throw DataXException.asDataXException(
+            throw AddaxException.asAddaxException(
                     FrameworkErrorCode.CONFIG_ERROR, e);
         }
     }
@@ -92,7 +92,7 @@ public class BufferedRecordTransformerExchanger
             return BufferedRecordTransformerExchanger.RECORD_CLASS.newInstance();
         }
         catch (Exception e) {
-            throw DataXException.asDataXException(
+            throw AddaxException.asAddaxException(
                     FrameworkErrorCode.CONFIG_ERROR, e);
         }
     }
@@ -101,7 +101,7 @@ public class BufferedRecordTransformerExchanger
     public void sendToWriter(Record record)
     {
         if (shutdown) {
-            throw DataXException.asDataXException(CommonErrorCode.SHUT_DOWN_TASK, "");
+            throw AddaxException.asAddaxException(CommonErrorCode.SHUT_DOWN_TASK, "");
         }
 
         Validate.notNull(record, "record不能为空.");
@@ -133,7 +133,7 @@ public class BufferedRecordTransformerExchanger
     public void flush()
     {
         if (shutdown) {
-            throw DataXException.asDataXException(CommonErrorCode.SHUT_DOWN_TASK, "");
+            throw AddaxException.asAddaxException(CommonErrorCode.SHUT_DOWN_TASK, "");
         }
         this.channel.pushAll(this.buffer);
         //和channel的统计保持同步
@@ -147,7 +147,7 @@ public class BufferedRecordTransformerExchanger
     public void terminate()
     {
         if (shutdown) {
-            throw DataXException.asDataXException(CommonErrorCode.SHUT_DOWN_TASK, "");
+            throw AddaxException.asAddaxException(CommonErrorCode.SHUT_DOWN_TASK, "");
         }
         flush();
         this.channel.pushTerminate(TerminateRecord.get());
@@ -157,7 +157,7 @@ public class BufferedRecordTransformerExchanger
     public Record getFromReader()
     {
         if (shutdown) {
-            throw DataXException.asDataXException(CommonErrorCode.SHUT_DOWN_TASK, "");
+            throw AddaxException.asAddaxException(CommonErrorCode.SHUT_DOWN_TASK, "");
         }
         boolean isEmpty = (this.bufferIndex >= this.buffer.size());
         if (isEmpty) {

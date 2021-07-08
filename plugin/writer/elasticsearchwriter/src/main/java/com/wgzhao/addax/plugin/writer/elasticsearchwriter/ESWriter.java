@@ -21,7 +21,7 @@ package com.wgzhao.addax.plugin.writer.elasticsearchwriter;
 
 import com.wgzhao.addax.common.element.Column;
 import com.wgzhao.addax.common.element.Record;
-import com.wgzhao.addax.common.exception.DataXException;
+import com.wgzhao.addax.common.exception.AddaxException;
 import com.wgzhao.addax.common.plugin.RecordReceiver;
 import com.wgzhao.addax.common.spi.Writer;
 import com.wgzhao.addax.common.util.Configuration;
@@ -101,7 +101,7 @@ public class ESWriter
                 }
             }
             catch (Exception ex) {
-                throw DataXException.asDataXException(ESWriterErrorCode.ES_MAPPINGS, ex.toString());
+                throw AddaxException.asAddaxException(ESWriterErrorCode.ES_MAPPINGS, ex.toString());
             }
             esClient.closeJestClient();
         }
@@ -119,11 +119,11 @@ public class ESWriter
                     String colName = jo.getString("name");
                     String colTypeStr = jo.getString("type");
                     if (colTypeStr == null) {
-                        throw DataXException.asDataXException(ESWriterErrorCode.BAD_CONFIG_VALUE, col.toString() + " column must have type");
+                        throw AddaxException.asAddaxException(ESWriterErrorCode.BAD_CONFIG_VALUE, col.toString() + " column must have type");
                     }
                     ESFieldType colType = ESFieldType.getESFieldType(colTypeStr);
                     if (colType == null) {
-                        throw DataXException.asDataXException(ESWriterErrorCode.BAD_CONFIG_VALUE, col.toString() + " unsupported type");
+                        throw AddaxException.asAddaxException(ESWriterErrorCode.BAD_CONFIG_VALUE, col.toString() + " unsupported type");
                     }
 
                     ESColumn columnItem = new ESColumn();
@@ -199,7 +199,7 @@ public class ESWriter
             mappings = JSON.toJSONString(rootMappings);
 
             if (mappings == null || "".equals(mappings)) {
-                throw DataXException.asDataXException(ESWriterErrorCode.BAD_CONFIG_VALUE, "must have mappings");
+                throw AddaxException.asAddaxException(ESWriterErrorCode.BAD_CONFIG_VALUE, "must have mappings");
             }
 
             return mappings;
@@ -233,7 +233,7 @@ public class ESWriter
                     esClient.alias(Key.getIndexName(conf), alias, Key.isNeedCleanAlias(conf));
                 }
                 catch (IOException e) {
-                    throw DataXException.asDataXException(ESWriterErrorCode.ES_ALIAS_MODIFY, e);
+                    throw AddaxException.asAddaxException(ESWriterErrorCode.ES_ALIAS_MODIFY, e);
                 }
             }
         }
@@ -454,12 +454,12 @@ public class ESWriter
                             for (BulkResult.BulkResultItem item : failedItems) {
                                 if (item.status != 400) {
                                     // 400 BAD_REQUEST  如果非数据异常,请求异常,则不允许忽略
-                                    throw DataXException.asDataXException(ESWriterErrorCode.ES_INDEX_INSERT, String.format("status:[%d], error: %s", item.status, item.error));
+                                    throw AddaxException.asAddaxException(ESWriterErrorCode.ES_INDEX_INSERT, String.format("status:[%d], error: %s", item.status, item.error));
                                 }
                                 else {
                                     // 如果用户选择不忽略解析错误,则抛异常,默认为忽略
                                     if (!Key.isIgnoreParseError(conf)) {
-                                        throw DataXException.asDataXException(ESWriterErrorCode.ES_INDEX_INSERT, String.format("status:[%d], error: %s, config not ignoreParseError so throw this error", item.status, item.error));
+                                        throw AddaxException.asAddaxException(ESWriterErrorCode.ES_INDEX_INSERT, String.format("status:[%d], error: %s, config not ignoreParseError so throw this error", item.status, item.error));
                                     }
                                 }
                             }
@@ -479,7 +479,7 @@ public class ESWriter
                                 //TOO_MANY_REQUESTS
                                 log.warn("server response too many requests, so auto reduce speed");
                             }
-                            throw DataXException.asDataXException(ESWriterErrorCode.ES_INDEX_INSERT, jestResult.getErrorMessage());
+                            throw AddaxException.asAddaxException(ESWriterErrorCode.ES_INDEX_INSERT, jestResult.getErrorMessage());
                         }
                     }
                 }, trySize, 60000L, true);
@@ -489,7 +489,7 @@ public class ESWriter
                     log.warn(String.format("重试[%d]次写入失败，忽略该错误，继续写入!", trySize));
                 }
                 else {
-                    throw DataXException.asDataXException(ESWriterErrorCode.ES_INDEX_INSERT, e);
+                    throw AddaxException.asAddaxException(ESWriterErrorCode.ES_INDEX_INSERT, e);
                 }
             }
             return 0;

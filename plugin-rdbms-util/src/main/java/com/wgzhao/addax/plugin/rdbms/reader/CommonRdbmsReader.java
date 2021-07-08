@@ -27,7 +27,7 @@ import com.wgzhao.addax.common.element.DoubleColumn;
 import com.wgzhao.addax.common.element.LongColumn;
 import com.wgzhao.addax.common.element.Record;
 import com.wgzhao.addax.common.element.StringColumn;
-import com.wgzhao.addax.common.exception.DataXException;
+import com.wgzhao.addax.common.exception.AddaxException;
 import com.wgzhao.addax.common.plugin.RecordSender;
 import com.wgzhao.addax.common.plugin.TaskPluginCollector;
 import com.wgzhao.addax.common.statistics.PerfRecord;
@@ -125,7 +125,7 @@ public class CommonRdbmsReader
                     result.get();
                 }
                 catch (ExecutionException e) {
-                    throw (DataXException) e.getCause();
+                    throw (AddaxException) e.getCause();
                 }
                 catch (InterruptedException e) {
                     Thread.currentThread().interrupt();
@@ -410,7 +410,7 @@ public class CommonRdbmsReader
                             break;
 
                         default:
-                            throw DataXException.asDataXException(DBUtilErrorCode.UNSUPPORTED_TYPE,
+                            throw AddaxException.asAddaxException(DBUtilErrorCode.UNSUPPORTED_TYPE,
                                     String.format("您的配置文件中的列配置信息有误. 因为DataX 不支持数据库读取这种字段类型. " + "字段名:[%s], 字段类型:[%s], "
                                                     + "字段类型名称:[%s], 字段Java类型:[%s]. " + "请尝试使用数据库函数将其转换datax支持的类型 或者不同步该字段 .",
                                             metaData.getColumnName(i), metaData.getColumnType(i),
@@ -424,8 +424,8 @@ public class CommonRdbmsReader
                 }
                 // TODO 这里识别为脏数据靠谱吗？
                 taskPluginCollector.collectDirtyRecord(record, e);
-                if (e instanceof DataXException) {
-                    throw (DataXException) e;
+                if (e instanceof AddaxException) {
+                    throw (AddaxException) e;
                 }
             }
             return record;

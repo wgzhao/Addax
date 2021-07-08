@@ -19,7 +19,7 @@
 
 package com.wgzhao.addax.core.job.scheduler.processinner;
 
-import com.wgzhao.addax.common.exception.DataXException;
+import com.wgzhao.addax.common.exception.AddaxException;
 import com.wgzhao.addax.common.util.Configuration;
 import com.wgzhao.addax.core.job.scheduler.AbstractScheduler;
 import com.wgzhao.addax.core.statistics.container.communicator.AbstractContainerCommunicator;
@@ -60,7 +60,7 @@ public abstract class ProcessInnerScheduler
     public void dealFailedStat(AbstractContainerCommunicator frameworkCollector, Throwable throwable)
     {
         this.taskGroupContainerExecutorService.shutdownNow();
-        throw DataXException.asDataXException(
+        throw AddaxException.asAddaxException(
                 FrameworkErrorCode.PLUGIN_RUNTIME_ERROR, throwable);
     }
 
@@ -69,7 +69,7 @@ public abstract class ProcessInnerScheduler
     {
         //通过进程退出返回码标示状态
         this.taskGroupContainerExecutorService.shutdownNow();
-        throw DataXException.asDataXException(FrameworkErrorCode.KILLED_EXIT_VALUE,
+        throw AddaxException.asAddaxException(FrameworkErrorCode.KILLED_EXIT_VALUE,
                 "job killed status");
     }
 

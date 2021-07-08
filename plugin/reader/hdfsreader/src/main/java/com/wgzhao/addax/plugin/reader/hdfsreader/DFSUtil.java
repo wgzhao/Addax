@@ -29,7 +29,7 @@ import com.wgzhao.addax.common.element.DoubleColumn;
 import com.wgzhao.addax.common.element.LongColumn;
 import com.wgzhao.addax.common.element.Record;
 import com.wgzhao.addax.common.element.StringColumn;
-import com.wgzhao.addax.common.exception.DataXException;
+import com.wgzhao.addax.common.exception.AddaxException;
 import com.wgzhao.addax.common.plugin.RecordSender;
 import com.wgzhao.addax.common.plugin.TaskPluginCollector;
 import com.wgzhao.addax.common.util.Configuration;
@@ -141,7 +141,7 @@ public class DFSUtil
             catch (Exception e) {
                 String message = String.format("kerberos认证失败,请确定kerberosKeytabFilePath[%s]和kerberosPrincipal[%s]填写正确",
                         kerberosKeytabFilePath, kerberosPrincipal);
-                throw DataXException.asDataXException(HdfsReaderErrorCode.KERBEROS_LOGIN_ERROR, message, e);
+                throw AddaxException.asAddaxException(HdfsReaderErrorCode.KERBEROS_LOGIN_ERROR, message, e);
             }
         }
     }
@@ -206,7 +206,7 @@ public class DFSUtil
             String message = String.format("无法读取路径[%s]下的所有文件,请确认您的配置项fs.defaultFS, path的值是否正确，" +
                     "是否有读写权限，网络是否已断开！", hdfsPath);
             LOG.error(message);
-            throw DataXException.asDataXException(HdfsReaderErrorCode.PATH_CONFIG_ERROR, e);
+            throw AddaxException.asAddaxException(HdfsReaderErrorCode.PATH_CONFIG_ERROR, e);
         }
     }
 
@@ -254,7 +254,7 @@ public class DFSUtil
                             "请确认您配置的目录下面所有文件的类型均为[%s]"
                     , filePath, this.specifiedFileType);
             LOG.error(message);
-            throw DataXException.asDataXException(
+            throw AddaxException.asAddaxException(
                     HdfsReaderErrorCode.FILE_TYPE_UNSUPPORT, message);
         }
     }
@@ -272,7 +272,7 @@ public class DFSUtil
         }
         catch (IOException e) {
             String message = String.format("读取文件 : [%s] 时出错,请确认文件：[%s]存在且配置的用户有权限读取", filepath, filepath);
-            throw DataXException.asDataXException(HdfsReaderErrorCode.READ_FILE_ERROR, message, e);
+            throw AddaxException.asAddaxException(HdfsReaderErrorCode.READ_FILE_ERROR, message, e);
         }
     }
 
@@ -298,7 +298,7 @@ public class DFSUtil
         catch (Exception e) {
             String message = String.format("SequenceFile.Reader读取文件[%s]时出错", sourceSequenceFilePath);
             LOG.error(message);
-            throw DataXException.asDataXException(HdfsReaderErrorCode.READ_SEQUENCEFILE_ERROR, message, e);
+            throw AddaxException.asAddaxException(HdfsReaderErrorCode.READ_SEQUENCEFILE_ERROR, message, e);
         }
     }
 
@@ -335,7 +335,7 @@ public class DFSUtil
         catch (IOException e) {
             String message = String.format("读取文件[%s]时出错", sourceRcFilePath);
             LOG.error(message);
-            throw DataXException.asDataXException(HdfsReaderErrorCode.READ_RCFILE_ERROR, message, e);
+            throw AddaxException.asAddaxException(HdfsReaderErrorCode.READ_RCFILE_ERROR, message, e);
         }
         finally {
             try {
@@ -381,7 +381,7 @@ public class DFSUtil
             String message = String.format("从orcfile文件路径[%s]中读取数据发生异常，请联系系统管理员。"
                     , sourceOrcFilePath);
             LOG.error(message);
-            throw DataXException.asDataXException(HdfsReaderErrorCode.READ_FILE_ERROR, message);
+            throw AddaxException.asAddaxException(HdfsReaderErrorCode.READ_FILE_ERROR, message);
         }
     }
 
@@ -444,8 +444,8 @@ public class DFSUtil
                 recordSender.sendToWriter(record);
             }
             catch (Exception e) {
-                if (e instanceof DataXException) {
-                    throw (DataXException) e;
+                if (e instanceof AddaxException) {
+                    throw (AddaxException) e;
                 }
                 taskPluginCollector.collectDirtyRecord(record, e.getMessage());
             }
@@ -507,7 +507,7 @@ public class DFSUtil
             String message = String.format("从parquetfile文件路径[%s]中读取数据发生异常，请联系系统管理员。"
                     , sourceParquestFilePath);
             LOG.error(message);
-            throw DataXException.asDataXException(HdfsReaderErrorCode.READ_FILE_ERROR, message);
+            throw AddaxException.asAddaxException(HdfsReaderErrorCode.READ_FILE_ERROR, message);
         }
     }
 
@@ -608,8 +608,8 @@ public class DFSUtil
                             String errorMessage = String.format(
                                     "您配置的列类型暂不支持 : [%s]", columnType);
                             LOG.error(errorMessage);
-                            throw DataXException
-                                    .asDataXException(
+                            throw AddaxException
+                                    .asAddaxException(
                                             StorageReaderErrorCode.NOT_SUPPORT_TYPE,
                                             errorMessage);
                     }
@@ -628,8 +628,8 @@ public class DFSUtil
                     .collectDirtyRecord(record, iae.getMessage());
         }
         catch (Exception e) {
-            if (e instanceof DataXException) {
-                throw (DataXException) e;
+            if (e instanceof AddaxException) {
+                throw (AddaxException) e;
             }
             // 每一种转换失败都是脏数据处理,包括数字格式 & 日期格式
             taskPluginCollector.collectDirtyRecord(record, e.getMessage());
@@ -651,7 +651,7 @@ public class DFSUtil
         }
         catch (IOException e) {
             String message = "读取orcfile column列数失败，请联系系统管理员";
-            throw DataXException.asDataXException(HdfsReaderErrorCode.READ_FILE_ERROR, message);
+            throw AddaxException.asAddaxException(HdfsReaderErrorCode.READ_FILE_ERROR, message);
         }
     }
 
@@ -664,7 +664,7 @@ public class DFSUtil
                 String message = String.format("您column中配置的index不能小于0，请修改为正确的index,column配置:%s",
                         JSON.toJSONString(columnConfigs));
                 LOG.error(message);
-                throw DataXException.asDataXException(HdfsReaderErrorCode.CONFIG_INVALID_EXCEPTION, message);
+                throw AddaxException.asAddaxException(HdfsReaderErrorCode.CONFIG_INVALID_EXCEPTION, message);
             }
             else if (columnIndex != null && columnIndex > maxIndex) {
                 maxIndex = columnIndex;
@@ -701,7 +701,7 @@ public class DFSUtil
             String message = String.format("检查文件[%s]类型失败，目前支持 %s 格式的文件," +
                     "请检查您文件类型和文件是否正确。", filepath, Constant.SUPPORT_FILE_TYPE);
             LOG.error(message);
-            throw DataXException.asDataXException(HdfsReaderErrorCode.READ_FILE_ERROR, message, e);
+            throw AddaxException.asAddaxException(HdfsReaderErrorCode.READ_FILE_ERROR, message, e);
         }
         return false;
     }

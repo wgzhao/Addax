@@ -20,7 +20,7 @@
 package com.wgzhao.addax.common.element;
 
 import com.wgzhao.addax.common.exception.CommonErrorCode;
-import com.wgzhao.addax.common.exception.DataXException;
+import com.wgzhao.addax.common.exception.AddaxException;
 
 import java.math.BigDecimal;
 import java.math.BigInteger;
@@ -59,7 +59,7 @@ public class StringColumn
     {
         if ("NaN".equals(data) || "Infinity".equals(data)
                 || "-Infinity".equals(data)) {
-            throw DataXException.asDataXException(
+            throw AddaxException.asAddaxException(
                     CommonErrorCode.CONVERT_NOT_SUPPORT,
                     String.format("String[\"%s\"]属于Double特殊类型，不能转为其他类型 .", data));
         }
@@ -78,7 +78,7 @@ public class StringColumn
             return this.asBigDecimal().toBigInteger();
         }
         catch (Exception e) {
-            throw DataXException.asDataXException(
+            throw AddaxException.asAddaxException(
                     CommonErrorCode.CONVERT_NOT_SUPPORT, String.format(
                             "String[\"%s\"]不能转为BigInteger .", this.asString()));
         }
@@ -99,7 +99,7 @@ public class StringColumn
             return integer.longValue();
         }
         catch (Exception e) {
-            throw DataXException.asDataXException(
+            throw AddaxException.asAddaxException(
                     CommonErrorCode.CONVERT_NOT_SUPPORT,
                     String.format("String[\"%s\"]不能转为Long .", this.asString()));
         }
@@ -118,7 +118,7 @@ public class StringColumn
             return new BigDecimal(this.asString());
         }
         catch (Exception e) {
-            throw DataXException.asDataXException(
+            throw AddaxException.asAddaxException(
                     CommonErrorCode.CONVERT_NOT_SUPPORT, String.format(
                             "String [\"%s\"] 不能转为BigDecimal .", this.asString()));
         }
@@ -165,7 +165,7 @@ public class StringColumn
             return false;
         }
 
-        throw DataXException.asDataXException(
+        throw AddaxException.asAddaxException(
                 CommonErrorCode.CONVERT_NOT_SUPPORT,
                 String.format("String[\"%s\"]不能转为Bool .", this.asString()));
     }
@@ -177,7 +177,7 @@ public class StringColumn
             return ColumnCast.string2Date(this);
         }
         catch (Exception e) {
-            throw DataXException.asDataXException(
+            throw AddaxException.asAddaxException(
                     CommonErrorCode.CONVERT_NOT_SUPPORT,
                     String.format("String[\"%s\"]不能转为Date .", this.asString()));
         }
@@ -190,7 +190,7 @@ public class StringColumn
             return ColumnCast.string2Bytes(this);
         }
         catch (Exception e) {
-            throw DataXException.asDataXException(
+            throw AddaxException.asAddaxException(
                     CommonErrorCode.CONVERT_NOT_SUPPORT,
                     String.format("String[\"%s\"]不能转为Bytes .", this.asString()));
         }

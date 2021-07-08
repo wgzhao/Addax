@@ -19,7 +19,7 @@
 
 package com.wgzhao.addax.core.util;
 
-import com.wgzhao.addax.common.exception.DataXException;
+import com.wgzhao.addax.common.exception.AddaxException;
 import com.wgzhao.addax.common.util.Configuration;
 import com.wgzhao.addax.core.util.container.CoreConstant;
 import org.apache.commons.io.FileUtils;
@@ -51,18 +51,18 @@ public final class ConfigParser
         Configuration configuration = ConfigParser.parseJobConfig(jobPath);
 
         configuration.merge(
-                ConfigParser.parseCoreConfig(CoreConstant.DATAX_CONF_PATH),
+                ConfigParser.parseCoreConfig(CoreConstant.ADDAX_CONF_PATH),
                 false);
         String readerPluginName = configuration.getString(
-                CoreConstant.DATAX_JOB_CONTENT_READER_NAME);
+                CoreConstant.ADDAX_JOB_CONTENT_READER_NAME);
         String writerPluginName = configuration.getString(
-                CoreConstant.DATAX_JOB_CONTENT_WRITER_NAME);
+                CoreConstant.ADDAX_JOB_CONTENT_WRITER_NAME);
 
         String preHandlerName = configuration.getString(
-                CoreConstant.DATAX_JOB_PREHANDLER_PLUGINNAME);
+                CoreConstant.ADDAX_JOB_PREHANDLER_PLUGINNAME);
 
         String postHandlerName = configuration.getString(
-                CoreConstant.DATAX_JOB_POSTHANDLER_PLUGINNAME);
+                CoreConstant.ADDAX_JOB_POSTHANDLER_PLUGINNAME);
 
         Set<String> pluginList = new HashSet<>();
         pluginList.add(readerPluginName);
@@ -114,9 +114,9 @@ public final class ConfigParser
 
         if (isJobResourceFromHttp) {
             //设置httpclient的 HTTP_TIMEOUT_INMILLIONSECONDS
-            Configuration coreConfig = ConfigParser.parseCoreConfig(CoreConstant.DATAX_CONF_PATH);
+            Configuration coreConfig = ConfigParser.parseCoreConfig(CoreConstant.ADDAX_CONF_PATH);
             int httpTimeOutInMillionSeconds = coreConfig.getInt(
-                    CoreConstant.DATAX_CORE_DATAXSERVER_TIMEOUT, 5000);
+                    CoreConstant.ADDAX_CORE_DATAXSERVER_TIMEOUT, 5000);
             HttpClientUtil.setHttpTimeoutInMillionSeconds(httpTimeOutInMillionSeconds);
 
             HttpClientUtil httpClientUtil = new HttpClientUtil();
@@ -129,7 +129,7 @@ public final class ConfigParser
                         httpGet, 1, 1000L);
             }
             catch (Exception e) {
-                throw DataXException.asDataXException(FrameworkErrorCode.CONFIG_ERROR,
+                throw AddaxException.asAddaxException(FrameworkErrorCode.CONFIG_ERROR,
                         "获取作业配置信息失败:" + jobResource, e);
             }
         }
@@ -139,13 +139,13 @@ public final class ConfigParser
                 jobContent = FileUtils.readFileToString(new File(jobResource), StandardCharsets.UTF_8);
             }
             catch (IOException e) {
-                throw DataXException.asDataXException(FrameworkErrorCode.CONFIG_ERROR,
+                throw AddaxException.asAddaxException(FrameworkErrorCode.CONFIG_ERROR,
                         "获取作业配置信息失败:" + jobResource, e);
             }
         }
 
         if (jobContent == null) {
-            throw DataXException.asDataXException(FrameworkErrorCode.CONFIG_ERROR,
+            throw AddaxException.asAddaxException(FrameworkErrorCode.CONFIG_ERROR,
                     "获取作业配置信息失败:" + jobResource);
         }
         return jobContent;
@@ -158,7 +158,7 @@ public final class ConfigParser
         Set<String> replicaCheckPluginSet = new HashSet<>();
         int complete = 0;
         for (String each : ConfigParser
-                .getDirAsList(CoreConstant.DATAX_PLUGIN_READER_HOME)) {
+                .getDirAsList(CoreConstant.ADDAX_PLUGIN_READER_HOME)) {
             Configuration eachReaderConfig = ConfigParser.parseOnePluginConfig(each,
                     "reader", replicaCheckPluginSet, wantPluginNames);
             if (eachReaderConfig != null) {
@@ -168,7 +168,7 @@ public final class ConfigParser
         }
 
         for (String each : ConfigParser
-                .getDirAsList(CoreConstant.DATAX_PLUGIN_WRITER_HOME)) {
+                .getDirAsList(CoreConstant.ADDAX_PLUGIN_WRITER_HOME)) {
             Configuration eachWriterConfig = ConfigParser.parseOnePluginConfig(each,
                     "writer", replicaCheckPluginSet, wantPluginNames);
             if (eachWriterConfig != null) {
@@ -179,7 +179,7 @@ public final class ConfigParser
 
         if (wantPluginNames != null && !wantPluginNames.isEmpty()
                 && wantPluginNames.size() != complete) {
-            throw DataXException.asDataXException(FrameworkErrorCode.PLUGIN_INIT_ERROR,
+            throw AddaxException.asAddaxException(FrameworkErrorCode.PLUGIN_INIT_ERROR,
                     "插件加载失败，未完成指定插件加载:" + wantPluginNames);
         }
 
@@ -198,7 +198,7 @@ public final class ConfigParser
             pluginSet.add(pluginName);
         }
         else {
-            throw DataXException.asDataXException(FrameworkErrorCode.PLUGIN_INIT_ERROR,
+            throw AddaxException.asAddaxException(FrameworkErrorCode.PLUGIN_INIT_ERROR,
                     "插件加载失败,存在重复插件:" + filePath);
         }
 

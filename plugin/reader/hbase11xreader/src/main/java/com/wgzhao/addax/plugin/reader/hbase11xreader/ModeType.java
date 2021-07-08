@@ -19,7 +19,7 @@
 
 package com.wgzhao.addax.plugin.reader.hbase11xreader;
 
-import com.wgzhao.addax.common.exception.DataXException;
+import com.wgzhao.addax.common.exception.AddaxException;
 
 import java.util.Arrays;
 
@@ -42,7 +42,7 @@ public enum ModeType
                 return modeType;
             }
         }
-        throw DataXException.asDataXException(Hbase11xReaderErrorCode.ILLEGAL_VALUE,
+        throw AddaxException.asAddaxException(Hbase11xReaderErrorCode.ILLEGAL_VALUE,
                 String.format("HbaseReader 不支持该 mode 类型:%s, 目前支持的 mode 类型是:%s", modeName, Arrays.asList(values())));
     }
 

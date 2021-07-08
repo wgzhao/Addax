@@ -20,7 +20,7 @@
 package com.wgzhao.addax.common.element;
 
 import com.wgzhao.addax.common.exception.CommonErrorCode;
-import com.wgzhao.addax.common.exception.DataXException;
+import com.wgzhao.addax.common.exception.AddaxException;
 
 import java.math.BigDecimal;
 import java.math.BigInteger;
@@ -49,7 +49,7 @@ public final class OverFlowUtil
         boolean isOverFlow = OverFlowUtil.isLongOverflow(integer);
 
         if (isOverFlow) {
-            throw DataXException.asDataXException(
+            throw AddaxException.asAddaxException(
                     CommonErrorCode.CONVERT_OVER_FLOW,
                     String.format("[%s] 转为Long类型出现溢出 .", integer.toString()));
         }
@@ -75,7 +75,7 @@ public final class OverFlowUtil
     {
         boolean isOverFlow = OverFlowUtil.isDoubleOverFlow(decimal);
         if (isOverFlow) {
-            throw DataXException.asDataXException(
+            throw AddaxException.asAddaxException(
                     CommonErrorCode.CONVERT_OVER_FLOW,
                     String.format("[%s]转为Double类型出现溢出 .",
                             decimal.toPlainString()));

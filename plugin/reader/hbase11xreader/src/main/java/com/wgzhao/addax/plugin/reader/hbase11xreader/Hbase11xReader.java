@@ -20,7 +20,7 @@
 package com.wgzhao.addax.plugin.reader.hbase11xreader;
 
 import com.wgzhao.addax.common.element.Record;
-import com.wgzhao.addax.common.exception.DataXException;
+import com.wgzhao.addax.common.exception.AddaxException;
 import com.wgzhao.addax.common.plugin.RecordSender;
 import com.wgzhao.addax.common.spi.Reader;
 import com.wgzhao.addax.common.util.Configuration;
@@ -82,7 +82,7 @@ public class Hbase11xReader
                     this.hbaseTaskProxy = new MultiVersionFixedColumnTask(taskConfig);
                     break;
                 default:
-                    throw DataXException.asDataXException(Hbase11xReaderErrorCode.ILLEGAL_VALUE, "Hbasereader 不支持此类模式:" + modeType);
+                    throw AddaxException.asAddaxException(Hbase11xReaderErrorCode.ILLEGAL_VALUE, "Hbasereader 不支持此类模式:" + modeType);
             }
         }
 
@@ -93,7 +93,7 @@ public class Hbase11xReader
                 this.hbaseTaskProxy.prepare();
             }
             catch (Exception e) {
-                throw DataXException.asDataXException(Hbase11xReaderErrorCode.PREPAR_READ_ERROR, e);
+                throw AddaxException.asAddaxException(Hbase11xReaderErrorCode.PREPAR_READ_ERROR, e);
             }
         }
 

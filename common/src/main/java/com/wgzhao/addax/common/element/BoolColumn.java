@@ -20,7 +20,7 @@
 package com.wgzhao.addax.common.element;
 
 import com.wgzhao.addax.common.exception.CommonErrorCode;
-import com.wgzhao.addax.common.exception.DataXException;
+import com.wgzhao.addax.common.exception.AddaxException;
 
 import java.math.BigDecimal;
 import java.math.BigInteger;
@@ -120,14 +120,14 @@ public class BoolColumn
     @Override
     public Date asDate()
     {
-        throw DataXException.asDataXException(
+        throw AddaxException.asAddaxException(
                 CommonErrorCode.CONVERT_NOT_SUPPORT, "Bool类型不能转为Date .");
     }
 
     @Override
     public byte[] asBytes()
     {
-        throw DataXException.asDataXException(
+        throw AddaxException.asAddaxException(
                 CommonErrorCode.CONVERT_NOT_SUPPORT, "Boolean类型不能转为Bytes .");
     }
 
@@ -141,7 +141,7 @@ public class BoolColumn
             return;
         }
 
-        throw DataXException.asDataXException(
+        throw AddaxException.asAddaxException(
                 CommonErrorCode.CONVERT_NOT_SUPPORT,
                 String.format("String[%s]不能转为Bool .", data));
     }

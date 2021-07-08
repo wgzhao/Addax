@@ -52,10 +52,10 @@ public abstract class AbstractTGContainerCommunicator
     {
         super(configuration);
         this.jobId = configuration.getInt(
-                CoreConstant.DATAX_CORE_CONTAINER_JOB_ID);
+                CoreConstant.ADDAX_CORE_CONTAINER_JOB_ID);
         super.setCollector(new ProcessInnerCollector(this.jobId));
         this.taskGroupId = configuration.getInt(
-                CoreConstant.DATAX_CORE_CONTAINER_TASKGROUP_ID);
+                CoreConstant.ADDAX_CORE_CONTAINER_TASKGROUP_ID);
     }
 
     @Override

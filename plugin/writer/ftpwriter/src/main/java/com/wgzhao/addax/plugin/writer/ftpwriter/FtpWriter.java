@@ -19,7 +19,7 @@
 
 package com.wgzhao.addax.plugin.writer.ftpwriter;
 
-import com.wgzhao.addax.common.exception.DataXException;
+import com.wgzhao.addax.common.exception.AddaxException;
 import com.wgzhao.addax.common.plugin.RecordReceiver;
 import com.wgzhao.addax.common.spi.Writer;
 import com.wgzhao.addax.common.util.Configuration;
@@ -82,7 +82,7 @@ public class FtpWriter
                         .format("与ftp服务器建立连接失败, host:%s, username:%s, port:%s, errorMessage:%s",
                                 host, username, port, e.getMessage());
                 LOG.error(message);
-                throw DataXException.asDataXException(
+                throw AddaxException.asAddaxException(
                         FtpWriterErrorCode.FAIL_LOGIN, message, e);
             }
         }
@@ -98,7 +98,7 @@ public class FtpWriter
             if (!path.startsWith("/")) {
                 String message = String.format("请检查参数path:%s,需要配置为绝对路径", path);
                 LOG.error(message);
-                throw DataXException.asDataXException(
+                throw AddaxException.asAddaxException(
                         FtpWriterErrorCode.ILLEGAL_VALUE, message);
             }
 
@@ -124,7 +124,7 @@ public class FtpWriter
                 this.ftpHelper = new StandardFtpHelperImpl();
             }
             else {
-                throw DataXException.asDataXException(
+                throw AddaxException.asAddaxException(
                         FtpWriterErrorCode.ILLEGAL_VALUE, String.format(
                                 "仅支持 ftp和sftp 传输协议 , 不支持您配置的传输协议: [%s]",
                                 protocol));
@@ -176,8 +176,8 @@ public class FtpWriter
                     LOG.info("目录path:[{}] 下指定前缀fileName:[{}] 冲突文件列表如下: [{}]",
                             path, fileName,
                             StringUtils.join(allFilesInDir.iterator(), ", "));
-                    throw DataXException
-                            .asDataXException(
+                    throw AddaxException
+                            .asAddaxException(
                                     FtpWriterErrorCode.ILLEGAL_VALUE,
                                     String.format(
                                             "您配置的path: [%s] 目录不为空, 下面存在其他文件或文件夹.",
@@ -185,8 +185,8 @@ public class FtpWriter
                 }
             }
             else {
-                throw DataXException
-                        .asDataXException(
+                throw AddaxException
+                        .asAddaxException(
                                 FtpWriterErrorCode.ILLEGAL_VALUE,
                                 String.format(
                                         "仅支持 truncate, append, nonConflict 三种模式, 不支持您配置的 writeMode 模式 : [%s]",
@@ -277,7 +277,7 @@ public class FtpWriter
                         .format("与ftp服务器建立连接失败, host:%s, username:%s, port:%s, errorMessage:%s",
                                 host, username, port, e.getMessage());
                 LOG.error(message);
-                throw DataXException.asDataXException(
+                throw AddaxException.asAddaxException(
                         FtpWriterErrorCode.FAIL_LOGIN, message, e);
             }
         }
@@ -304,7 +304,7 @@ public class FtpWriter
                         this.getTaskPluginCollector());
             }
             catch (Exception e) {
-                throw DataXException.asDataXException(
+                throw AddaxException.asAddaxException(
                         FtpWriterErrorCode.WRITE_FILE_IO_ERROR,
                         String.format("无法创建待写文件 : [%s]", this.fileName), e);
             }

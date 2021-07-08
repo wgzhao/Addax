@@ -21,7 +21,7 @@ package com.wgzhao.addax.plugin.writer.kuduwriter;
 
 import com.wgzhao.addax.common.element.Column;
 import com.wgzhao.addax.common.element.Record;
-import com.wgzhao.addax.common.exception.DataXException;
+import com.wgzhao.addax.common.exception.AddaxException;
 import com.wgzhao.addax.common.plugin.RecordReceiver;
 import com.wgzhao.addax.common.plugin.TaskPluginCollector;
 import com.wgzhao.addax.common.spi.Writer;
@@ -94,7 +94,7 @@ public class KuduWriterTask
         List<String> columnNames = KuduHelper.getColumnNames(columns);
         while ((record = lineReceiver.getFromReader()) != null) {
             if (record.getColumnNumber() != columns.size()) {
-                throw DataXException.asDataXException(KuduWriterErrorCode.PARAMETER_NUM_ERROR,
+                throw AddaxException.asAddaxException(KuduWriterErrorCode.PARAMETER_NUM_ERROR,
                         " number of record fields:" + record.getColumnNumber()
                                 + " number of configuration fields:" + columns.size());
             }
@@ -148,7 +148,7 @@ public class KuduWriterTask
                                 (Date) new java.util.Date(column.asDate().getTime()));
                         break;
                     default:
-                        throw DataXException.asDataXException(
+                        throw AddaxException.asAddaxException(
                                 KuduWriterErrorCode.ILLEGAL_VALUE, "unsupport data type " + type
                         );
                 }
@@ -168,7 +168,7 @@ public class KuduWriterTask
                     taskPluginCollector.collectDirtyRecord(record, e.getMessage());
                 }
                 else {
-                    throw DataXException.asDataXException(KuduWriterErrorCode.PUT_KUDU_ERROR, e.getMessage());
+                    throw AddaxException.asAddaxException(KuduWriterErrorCode.PUT_KUDU_ERROR, e.getMessage());
                 }
             }
         }

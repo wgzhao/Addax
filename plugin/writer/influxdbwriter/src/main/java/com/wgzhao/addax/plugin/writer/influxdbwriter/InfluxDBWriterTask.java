@@ -21,12 +21,11 @@ package com.wgzhao.addax.plugin.writer.influxdbwriter;
 
 import com.wgzhao.addax.common.element.Column;
 import com.wgzhao.addax.common.element.Record;
-import com.wgzhao.addax.common.exception.DataXException;
+import com.wgzhao.addax.common.exception.AddaxException;
 import com.wgzhao.addax.common.plugin.RecordReceiver;
 import com.wgzhao.addax.common.plugin.TaskPluginCollector;
 import com.wgzhao.addax.common.util.Configuration;
 import okhttp3.OkHttpClient;
-import org.apache.commons.lang3.StringUtils;
 import org.influxdb.InfluxDB;
 import org.influxdb.InfluxDBFactory;
 import org.influxdb.dto.Point;
@@ -172,7 +171,7 @@ public class InfluxDBWriterTask
         try {
             while ((record = recordReceiver.getFromReader()) != null) {
                 if (record.getColumnNumber() != this.columnNumber) {
-                    throw DataXException.asDataXException(
+                    throw AddaxException.asAddaxException(
                             InfluxDBWriterErrorCode.CONF_ERROR,
                             String.format(
                                     "列配置信息有错误. 因为您配置的任务中，源头读取字段数:%s 与 目的表要写入的字段数:%s 不相等. 请检查您的配置并作出修改.",
@@ -226,7 +225,7 @@ public class InfluxDBWriterTask
         }
         catch (Exception e) {
             taskPluginCollector.collectDirtyRecord(record, e);
-            throw DataXException.asDataXException(InfluxDBWriterErrorCode.ILLEGAL_VALUE, e);
+            throw AddaxException.asAddaxException(InfluxDBWriterErrorCode.ILLEGAL_VALUE, e);
         }
     }
 }

@@ -19,7 +19,7 @@
 
 package com.wgzhao.addax.plugin.writer.sqlserverwriter;
 
-import com.wgzhao.addax.common.exception.DataXException;
+import com.wgzhao.addax.common.exception.AddaxException;
 import com.wgzhao.addax.common.plugin.RecordReceiver;
 import com.wgzhao.addax.common.spi.Writer;
 import com.wgzhao.addax.common.util.Configuration;
@@ -49,8 +49,8 @@ public class SqlServerWriter
             // warn：not like mysql, sqlserver only support insert mode
             String writeMode = this.originalConfig.getString(Key.WRITE_MODE);
             if (null != writeMode) {
-                throw DataXException
-                        .asDataXException(
+                throw AddaxException
+                        .asAddaxException(
                                 DBUtilErrorCode.CONF_ERROR,
                                 String.format(
                                         "写入模式(writeMode)配置错误. 因为sqlserver不支持配置项 writeMode: %s, sqlserver只能使用insert sql 插入数据. 请检查您的配置并作出修改",

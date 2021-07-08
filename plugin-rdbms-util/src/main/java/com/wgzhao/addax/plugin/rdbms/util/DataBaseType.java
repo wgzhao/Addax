@@ -19,7 +19,7 @@
 
 package com.wgzhao.addax.plugin.rdbms.util;
 
-import com.wgzhao.addax.common.exception.DataXException;
+import com.wgzhao.addax.common.exception.AddaxException;
 
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -145,7 +145,7 @@ public enum DataBaseType
             case PostgreSQL:
                 break;
             default:
-                throw DataXException.asDataXException(DBUtilErrorCode.UNSUPPORTED_TYPE, "unsupported database type.");
+                throw AddaxException.asAddaxException(DBUtilErrorCode.UNSUPPORTED_TYPE, "unsupported database type.");
         }
 
         return result;

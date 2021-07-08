@@ -21,7 +21,7 @@ package com.wgzhao.addax.core.transport.record;
 
 import com.wgzhao.addax.common.element.Column;
 import com.wgzhao.addax.common.element.Record;
-import com.wgzhao.addax.common.exception.DataXException;
+import com.wgzhao.addax.common.exception.AddaxException;
 import com.wgzhao.addax.core.util.ClassSize;
 import com.wgzhao.addax.core.util.FrameworkErrorCode;
 import com.alibaba.fastjson.JSON;
@@ -73,7 +73,7 @@ public class DefaultRecord
     public void setColumn(int i, Column column)
     {
         if (i < 0) {
-            throw DataXException.asDataXException(FrameworkErrorCode.ARGUMENT_ERROR,
+            throw AddaxException.asAddaxException(FrameworkErrorCode.ARGUMENT_ERROR,
                     "不能给index小于0的column设置值");
         }
 

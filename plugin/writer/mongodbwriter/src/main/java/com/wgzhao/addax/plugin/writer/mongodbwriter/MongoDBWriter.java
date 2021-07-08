@@ -27,7 +27,7 @@ import com.wgzhao.addax.common.element.DoubleColumn;
 import com.wgzhao.addax.common.element.LongColumn;
 import com.wgzhao.addax.common.element.StringColumn;
 import com.wgzhao.addax.common.element.Record;
-import com.wgzhao.addax.common.exception.DataXException;
+import com.wgzhao.addax.common.exception.AddaxException;
 import com.wgzhao.addax.common.plugin.RecordReceiver;
 import com.wgzhao.addax.common.spi.Writer;
 import com.wgzhao.addax.common.util.Configuration;
@@ -119,7 +119,7 @@ public class MongoDBWriter
             Configuration conConf = Configuration.from(preSql);
             if (isNullOrEmpty((database)) || isNullOrEmpty((collection))
                     || mongoClient == null || mongodbColumnMeta == null || batchSize == null) {
-                throw DataXException.asDataXException(MongoDBWriterErrorCode.ILLEGAL_VALUE,
+                throw AddaxException.asAddaxException(MongoDBWriterErrorCode.ILLEGAL_VALUE,
                         MongoDBWriterErrorCode.ILLEGAL_VALUE.getDescription());
             }
             MongoDatabase db = mongoClient.getDatabase(database);
@@ -162,7 +162,7 @@ public class MongoDBWriter
         {
             if (isNullOrEmpty((database)) || isNullOrEmpty((collection))
                     || mongoClient == null || mongodbColumnMeta == null || batchSize == null) {
-                throw DataXException.asDataXException(MongoDBWriterErrorCode.ILLEGAL_VALUE,
+                throw AddaxException.asAddaxException(MongoDBWriterErrorCode.ILLEGAL_VALUE,
                         MongoDBWriterErrorCode.ILLEGAL_VALUE.getDescription());
             }
             MongoDatabase db = mongoClient.getDatabase(database);
@@ -225,7 +225,7 @@ public class MongoDBWriter
                             else if (KeyConstant.isArrayType(type.toLowerCase())) {
                                 String splitter = columnMeta.getJSONObject(i).getString(KeyConstant.COLUMN_SPLITTER);
                                 if (isNullOrEmpty((splitter))) {
-                                    throw DataXException.asDataXException(MongoDBWriterErrorCode.ILLEGAL_VALUE,
+                                    throw AddaxException.asAddaxException(MongoDBWriterErrorCode.ILLEGAL_VALUE,
                                             MongoDBWriterErrorCode.ILLEGAL_VALUE.getDescription());
                                 }
                                 String itemType = columnMeta.getJSONObject(i).getString(KeyConstant.ITEM_TYPE);
@@ -360,7 +360,7 @@ public class MongoDBWriter
                     collection.bulkWrite(replaceOneModelList, new BulkWriteOptions().ordered(false));
                 }
                 else {
-                    throw DataXException.asDataXException(MongoDBWriterErrorCode.ILLEGAL_VALUE,
+                    throw AddaxException.asAddaxException(MongoDBWriterErrorCode.ILLEGAL_VALUE,
                             MongoDBWriterErrorCode.ILLEGAL_VALUE.getDescription());
                 }
             }

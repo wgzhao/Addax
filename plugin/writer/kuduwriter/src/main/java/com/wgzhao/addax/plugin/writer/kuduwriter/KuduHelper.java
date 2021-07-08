@@ -19,7 +19,7 @@
 
 package com.wgzhao.addax.plugin.writer.kuduwriter;
 
-import com.wgzhao.addax.common.exception.DataXException;
+import com.wgzhao.addax.common.exception.AddaxException;
 import com.wgzhao.addax.common.util.Configuration;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
@@ -67,7 +67,7 @@ public class KuduHelper
                     .build();
         }
         catch (Exception e) {
-            throw DataXException.asDataXException(KuduWriterErrorCode.GET_KUDU_CONNECTION_ERROR, e);
+            throw AddaxException.asAddaxException(KuduWriterErrorCode.GET_KUDU_CONNECTION_ERROR, e);
         }
     }
 
@@ -77,7 +77,7 @@ public class KuduHelper
             return kuduClient.openTable(tableName);
         }
         catch (Exception e) {
-            throw DataXException.asDataXException(KuduWriterErrorCode.GET_KUDU_TABLE_ERROR, e);
+            throw AddaxException.asAddaxException(KuduWriterErrorCode.GET_KUDU_TABLE_ERROR, e);
         }
     }
 
@@ -135,7 +135,7 @@ public class KuduHelper
             return kuduClient.tableExists(tableName);
         }
         catch (Exception e) {
-            throw DataXException.asDataXException(KuduWriterErrorCode.GET_KUDU_CONNECTION_ERROR, e);
+            throw AddaxException.asAddaxException(KuduWriterErrorCode.GET_KUDU_CONNECTION_ERROR, e);
         }
         finally {
             KuduHelper.closeClient(kuduClient);
@@ -160,7 +160,7 @@ public class KuduHelper
         List<ColumnSchema> columnSchemas = new ArrayList<>();
         Schema schema = null;
         if (columns == null || columns.isEmpty()) {
-            throw DataXException.asDataXException(KuduWriterErrorCode.REQUIRED_VALUE,
+            throw AddaxException.asAddaxException(KuduWriterErrorCode.REQUIRED_VALUE,
                     "column is not defined，eg：column:[{\"name\": \"cf0:column0\",\"type\": \"string\"},{\"name\": \"cf1:column1\",\"type\": \"long\"}]");
         }
         try {
@@ -186,7 +186,7 @@ public class KuduHelper
             schema = new Schema(columnSchemas);
         }
         catch (Exception e) {
-            throw DataXException.asDataXException(KuduWriterErrorCode.REQUIRED_VALUE, e);
+            throw AddaxException.asAddaxException(KuduWriterErrorCode.REQUIRED_VALUE, e);
         }
         return schema;
     }
@@ -223,7 +223,7 @@ public class KuduHelper
                 Iterator<Object> iterator = lowerAndUppers.iterator();
                 String colum = rangeColum.getKey();
                 if (StringUtils.isBlank(colum)) {
-                    throw DataXException.asDataXException(KuduWriterErrorCode.REQUIRED_VALUE,
+                    throw AddaxException.asAddaxException(KuduWriterErrorCode.REQUIRED_VALUE,
                             "range partition column is empty, please check the configuration parameters.");
                 }
                 while (iterator.hasNext()) {
@@ -231,7 +231,7 @@ public class KuduHelper
                     String lowerValue = lowerAndUpper.getString(Key.LOWER);
                     String upperValue = lowerAndUpper.getString(Key.UPPER);
                     if (StringUtils.isBlank(lowerValue) || StringUtils.isBlank(upperValue)) {
-                        throw DataXException.asDataXException(KuduWriterErrorCode.REQUIRED_VALUE,
+                        throw AddaxException.asAddaxException(KuduWriterErrorCode.REQUIRED_VALUE,
                                 "\"lower\" or \"upper\" is empty, please check the configuration parameters.");
                     }
                     PartialRow lower = schema.newPartialRow();
@@ -262,7 +262,7 @@ public class KuduHelper
         configuration.getNecessaryValue(Key.KUDU_MASTER_ADDRESSES, KuduWriterErrorCode.REQUIRED_VALUE);
 //        String encoding = configuration.getString(Key.ENCODING, Constant.DEFAULT_ENCODING);
 //        if (!Charset.isSupported(encoding)) {
-//            throw DataXException.asDataXException(KuduWriterErrorCode.ILLEGAL_VALUE,
+//            throw DataXException.asAddaxException(KuduWriterErrorCode.ILLEGAL_VALUE,
 //                    String.format("Encoding is not supported:[%s] .", encoding));
 //        }
 //        configuration.set(Key.ENCODING, encoding);
@@ -304,11 +304,11 @@ public class KuduHelper
             goalColumns.add(col);
         }
         if (indexFlag != 0 && indexFlag != columns.size()) {
-            throw DataXException.asDataXException(KuduWriterErrorCode.ILLEGAL_VALUE,
+            throw AddaxException.asAddaxException(KuduWriterErrorCode.ILLEGAL_VALUE,
                     "\"index\" either has values for all of them, or all of them are null!");
         }
 //        if (primaryKeyFlag > 1) {
-//            throw DataXException.asDataXException(KuduWriterErrorCode.ILLEGAL_VALUE,
+//            throw DataXException.asAddaxException(KuduWriterErrorCode.ILLEGAL_VALUE,
 //                    "\"primaryKey\" must be written in the front！");
 //        }
         configuration.set(Key.COLUMN, goalColumns);
@@ -332,7 +332,7 @@ public class KuduHelper
             }
         }
         catch (KuduException e) {
-            throw DataXException.asDataXException(KuduWriterErrorCode.DELETE_KUDU_ERROR, e);
+            throw AddaxException.asAddaxException(KuduWriterErrorCode.DELETE_KUDU_ERROR, e);
         }
         finally {
             KuduHelper.closeClient(kuduClient);

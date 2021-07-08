@@ -20,7 +20,7 @@
 package com.wgzhao.addax.common.element;
 
 import com.wgzhao.addax.common.exception.CommonErrorCode;
-import com.wgzhao.addax.common.exception.DataXException;
+import com.wgzhao.addax.common.exception.AddaxException;
 import com.wgzhao.addax.common.util.Configuration;
 import org.apache.commons.lang3.time.DateFormatUtils;
 import org.apache.commons.lang3.time.FastDateFormat;
@@ -206,8 +206,8 @@ class DateCast
                 return DateFormatUtils.format(column.asDate(),
                         DateCast.datetimeFormat, DateCast.timeZoner);
             default:
-                throw DataXException
-                        .asDataXException(CommonErrorCode.CONVERT_NOT_SUPPORT,
+                throw AddaxException
+                        .asAddaxException(CommonErrorCode.CONVERT_NOT_SUPPORT,
                                 "时间类型出现不支持类型，目前仅支持DATE/TIME/DATETIME。该类型属于编程错误，请反馈给DataX开发团队 .");
         }
     }

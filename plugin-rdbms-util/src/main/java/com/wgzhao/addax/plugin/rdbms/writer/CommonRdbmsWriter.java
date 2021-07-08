@@ -24,7 +24,7 @@ import com.wgzhao.addax.plugin.rdbms.writer.util.OriginalConfPretreatmentUtil;
 import com.wgzhao.addax.plugin.rdbms.writer.util.WriterUtil;
 import com.wgzhao.addax.common.element.Column;
 import com.wgzhao.addax.common.element.Record;
-import com.wgzhao.addax.common.exception.DataXException;
+import com.wgzhao.addax.common.exception.AddaxException;
 import com.wgzhao.addax.common.plugin.RecordReceiver;
 import com.wgzhao.addax.common.plugin.TaskPluginCollector;
 import com.wgzhao.addax.common.util.Configuration;
@@ -319,8 +319,8 @@ public class CommonRdbmsWriter
                 while ((record = recordReceiver.getFromReader()) != null) {
                     if (record.getColumnNumber() != this.columnNumber) {
                         // 源头读取字段列数与目的表字段写入列数不相等，直接报错
-                        throw DataXException
-                                .asDataXException(
+                        throw AddaxException
+                                .asAddaxException(
                                         DBUtilErrorCode.CONF_ERROR,
                                         String.format(
                                                 "列配置信息有错误. 因为您配置的任务中，源头读取字段数:%s 与 目的表要写入的字段数:%s 不相等. 请检查您的配置并作出修改.",
@@ -343,7 +343,7 @@ public class CommonRdbmsWriter
                 }
             }
             catch (Exception e) {
-                throw DataXException.asDataXException(
+                throw AddaxException.asAddaxException(
                         DBUtilErrorCode.WRITE_DATA_ERROR, e);
             }
             finally {
@@ -438,7 +438,7 @@ public class CommonRdbmsWriter
                 doOneInsert(connection, buffer);
             }
             catch (Exception e) {
-                throw DataXException.asDataXException(
+                throw AddaxException.asAddaxException(
                         DBUtilErrorCode.WRITE_DATA_ERROR, e);
             }
             finally {
@@ -472,7 +472,7 @@ public class CommonRdbmsWriter
                 }
             }
             catch (Exception e) {
-                throw DataXException.asDataXException(
+                throw AddaxException.asAddaxException(
                         DBUtilErrorCode.WRITE_DATA_ERROR, e);
             }
             finally {
@@ -547,7 +547,7 @@ public class CommonRdbmsWriter
                     try {
                         utilDate = column.asDate();
                     }
-                    catch (DataXException e) {
+                    catch (AddaxException e) {
                         throw new SQLException(String.format(
                                 "Date 类型转换错误：[%s]", column));
                     }
@@ -573,7 +573,7 @@ public class CommonRdbmsWriter
                     try {
                         utilDate = column.asDate();
                     }
-                    catch (DataXException e) {
+                    catch (AddaxException e) {
                         throw new SQLException(String.format(
                                 "TIME 类型转换错误：[%s]", column));
                     }
@@ -597,7 +597,7 @@ public class CommonRdbmsWriter
                     try {
                         utilDate = column.asDate();
                     }
-                    catch (DataXException e) {
+                    catch (AddaxException e) {
                         throw new SQLException(String.format(
                                 "TIMESTAMP 类型转换错误：[%s]", column));
                     }
@@ -647,8 +647,8 @@ public class CommonRdbmsWriter
                     break;
 
                 default:
-                    throw DataXException
-                            .asDataXException(
+                    throw AddaxException
+                            .asAddaxException(
                                     DBUtilErrorCode.UNSUPPORTED_TYPE,
                                     String.format(
                                             "您的配置文件中的列配置信息有误. 因为DataX 不支持数据库写入这种字段类型. 字段名:[%s], " +

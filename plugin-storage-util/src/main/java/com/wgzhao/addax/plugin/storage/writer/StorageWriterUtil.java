@@ -22,7 +22,7 @@ package com.wgzhao.addax.plugin.storage.writer;
 import com.wgzhao.addax.common.element.Column;
 import com.wgzhao.addax.common.element.DateColumn;
 import com.wgzhao.addax.common.element.Record;
-import com.wgzhao.addax.common.exception.DataXException;
+import com.wgzhao.addax.common.exception.AddaxException;
 import com.wgzhao.addax.common.plugin.RecordReceiver;
 import com.wgzhao.addax.common.plugin.TaskPluginCollector;
 import com.wgzhao.addax.common.util.Configuration;
@@ -72,8 +72,8 @@ public class StorageWriterUtil
         Set<String> supportedWriteModes = Sets.newHashSet("truncate", "append",
                 "nonConflict");
         if (!supportedWriteModes.contains(writeMode)) {
-            throw DataXException
-                    .asDataXException(
+            throw AddaxException
+                    .asAddaxException(
                             StorageWriterErrorCode.ILLEGAL_VALUE,
                             String.format(
                                     "仅支持 truncate, append, nonConflict 三种模式, 不支持您配置的 writeMode 模式 : [%s]",
@@ -96,7 +96,7 @@ public class StorageWriterUtil
                 Charsets.toCharset(encoding);
             }
             catch (Exception e) {
-                throw DataXException.asDataXException(
+                throw AddaxException.asAddaxException(
                         StorageWriterErrorCode.ILLEGAL_VALUE,
                         String.format("不支持您配置的编码格式:[%s]", encoding), e);
             }
@@ -113,7 +113,7 @@ public class StorageWriterUtil
                 String message = String.format(
                         "仅支持 [%s] 文件压缩格式 , 不支持您配置的文件压缩格式: [%s]",
                         StringUtils.join(supportedCompress, ","), compress);
-                throw DataXException.asDataXException(
+                throw AddaxException.asAddaxException(
                         StorageWriterErrorCode.ILLEGAL_VALUE,
                         String.format(message, compress));
             }
@@ -124,7 +124,7 @@ public class StorageWriterUtil
                 .getString(Key.FIELD_DELIMITER);
         // warn: if have, length must be one
         if (null != delimiterInStr && 1 != delimiterInStr.length()) {
-            throw DataXException.asDataXException(
+            throw AddaxException.asAddaxException(
                     StorageWriterErrorCode.ILLEGAL_VALUE,
                     String.format("仅仅支持单字符切分, 您配置的切分为 : [%s]", delimiterInStr));
         }
@@ -140,7 +140,7 @@ public class StorageWriterUtil
                 Constant.FILE_FORMAT_TEXT);
         if (!Constant.FILE_FORMAT_CSV.equals(fileFormat)
                 && !Constant.FILE_FORMAT_TEXT.equals(fileFormat)) {
-            throw DataXException.asDataXException(
+            throw AddaxException.asAddaxException(
                     StorageWriterErrorCode.ILLEGAL_VALUE, String
                             .format("您配置的fileFormat [%s]错误, 支持csv, text两种.",
                                     fileFormat));
@@ -239,8 +239,8 @@ public class StorageWriterUtil
                             compressorOutputStream, encoding));
                 }
                 else {
-                    throw DataXException
-                            .asDataXException(
+                    throw AddaxException
+                            .asAddaxException(
                                     StorageWriterErrorCode.ILLEGAL_VALUE,
                                     String.format(
                                             "仅支持 gzip, bzip2 文件压缩格式 , 不支持您配置的文件压缩格式: [%s]",
@@ -251,18 +251,18 @@ public class StorageWriterUtil
                     context, config, taskPluginCollector);
         }
         catch (UnsupportedEncodingException uee) {
-            throw DataXException
-                    .asDataXException(
+            throw AddaxException
+                    .asAddaxException(
                             StorageWriterErrorCode.WRITE_FILE_WITH_CHARSET_ERROR,
                             String.format("不支持的编码格式 : [%s]", encoding), uee);
         }
         catch (NullPointerException e) {
-            throw DataXException.asDataXException(
+            throw AddaxException.asAddaxException(
                     StorageWriterErrorCode.RUNTIME_EXCEPTION,
                     "运行时错误, 请联系我们", e);
         }
         catch (IOException e) {
-            throw DataXException.asDataXException(
+            throw AddaxException.asAddaxException(
                     StorageWriterErrorCode.WRITE_FILE_IO_ERROR,
                     String.format("流写入错误 : [%s]", context), e);
         }
@@ -292,7 +292,7 @@ public class StorageWriterUtil
 
         String delimiterInStr = config.getString(Key.FIELD_DELIMITER);
         if (null != delimiterInStr && 1 != delimiterInStr.length()) {
-            throw DataXException.asDataXException(
+            throw AddaxException.asAddaxException(
                     StorageWriterErrorCode.ILLEGAL_VALUE,
                     String.format("仅仅支持单字符切分, 您配置的切分为 : [%s]", delimiterInStr));
         }

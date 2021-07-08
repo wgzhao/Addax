@@ -19,7 +19,7 @@
 
 package com.wgzhao.addax.plugin.writer.hbase11xwriter;
 
-import com.wgzhao.addax.common.exception.DataXException;
+import com.wgzhao.addax.common.exception.AddaxException;
 
 import java.util.Arrays;
 
@@ -42,7 +42,7 @@ public enum ModeType
                 return modeType;
             }
         }
-        throw DataXException.asDataXException(Hbase11xWriterErrorCode.ILLEGAL_VALUE,
+        throw AddaxException.asAddaxException(Hbase11xWriterErrorCode.ILLEGAL_VALUE,
                 String.format("Hbasewriter 不支持该 mode 类型:%s, 目前支持的 mode 类型是:%s", modeName, Arrays.asList(values())));
     }
 }

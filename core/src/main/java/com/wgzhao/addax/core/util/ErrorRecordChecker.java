@@ -19,7 +19,7 @@
 
 package com.wgzhao.addax.core.util;
 
-import com.wgzhao.addax.common.exception.DataXException;
+import com.wgzhao.addax.common.exception.AddaxException;
 import com.wgzhao.addax.common.util.Configuration;
 import com.wgzhao.addax.core.statistics.communication.Communication;
 import com.wgzhao.addax.core.statistics.communication.CommunicationTool;
@@ -44,8 +44,8 @@ public final class ErrorRecordChecker
 
     public ErrorRecordChecker(Configuration configuration)
     {
-        this(configuration.getLong(CoreConstant.DATAX_JOB_SETTING_ERRORLIMIT_RECORD),
-                configuration.getDouble(CoreConstant.DATAX_JOB_SETTING_ERRORLIMIT_PERCENT));
+        this(configuration.getLong(CoreConstant.ADDAX_JOB_SETTING_ERRORLIMIT_RECORD),
+                configuration.getDouble(CoreConstant.ADDAX_JOB_SETTING_ERRORLIMIT_PERCENT));
     }
 
     public ErrorRecordChecker(Long rec, Double percentage)
@@ -76,7 +76,7 @@ public final class ErrorRecordChecker
         long errorNumber = CommunicationTool.getTotalErrorRecords(communication);
         if (recordLimit < errorNumber) {
             LOG.debug("Error-limit set to {}, error count check.", recordLimit);
-            throw DataXException.asDataXException(
+            throw AddaxException.asAddaxException(
                     FrameworkErrorCode.PLUGIN_DIRTY_DATA_LIMIT_EXCEED,
                     String.format("脏数据条数检查不通过，限制是[%d]条，但实际上捕获了[%d]条.",
                             recordLimit, errorNumber));
@@ -94,7 +94,7 @@ public final class ErrorRecordChecker
         long error = CommunicationTool.getTotalErrorRecords(communication);
 
         if (total > 0 && ((double) error / (double) total) > percentageLimit) {
-            throw DataXException.asDataXException(
+            throw AddaxException.asAddaxException(
                     FrameworkErrorCode.PLUGIN_DIRTY_DATA_LIMIT_EXCEED,
                     String.format("脏数据百分比检查不通过，限制是[%f]，但实际上捕获到[%f].",
                             percentageLimit, ((double) error / (double) total)));
