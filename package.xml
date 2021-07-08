@@ -210,6 +210,14 @@
             <outputDirectory>addax-${project.version}</outputDirectory>
         </fileSet>
         <fileSet>
+            <directory>plugin/reader/tdenginereader/target/tdenginereader-${project.version}/</directory>
+            <includes>
+                <include>**/*.*</include>
+            </includes>
+            <fileMode>0644</fileMode>
+            <outputDirectory>addax-${project.version}</outputDirectory>
+        </fileSet>
+        <fileSet>
             <directory>plugin/reader/txtfilereader/target/txtfilereader-${project.version}/</directory>
             <includes>
                 <include>**/*.*</include>
@@ -382,6 +390,14 @@
         </fileSet>
         <fileSet>
             <directory>plugin/writer/streamwriter/target/streamwriter-${project.version}/</directory>
+            <includes>
+                <include>**/*.*</include>
+            </includes>
+            <fileMode>0644</fileMode>
+            <outputDirectory>addax-${project.version}</outputDirectory>
+        </fileSet>
+        <fileSet>
+            <directory>plugin/writer/tdenginewriter/target/tdenginewriter-${project.version}/</directory>
             <includes>
                 <include>**/*.*</include>
             </includes>
