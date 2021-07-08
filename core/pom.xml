@@ -104,7 +104,7 @@
                     <descriptors>
                         <descriptor>package.xml</descriptor>
                     </descriptors>
-                    <finalName>datax</finalName>
+                    <finalName>addax</finalName>
                 </configuration>
                 <executions>
                     <execution>
