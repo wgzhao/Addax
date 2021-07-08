@@ -797,38 +797,41 @@ public class HdfsHelper
     }
 
     /**
-     * 根据不同压缩算法，返回对应的文件名后缀
-     * @param compress compress alg name
+     * 根据不同压缩算法，返回对应的文件名后缀(包含点(.))
+     *
+     * @param compress 压缩算法名称字符串，传递过来应该是大写
      * @return file suffix
      */
     public String getCompressFileSuffix(String compress)
     {
-        String suffix = null;
         if (compress == null ) {
-            return suffix;
+            return null;
         }
-        switch(compress.toLowerCase()) {
-            case "snappy":
+
+        String suffix = null;
+
+        switch(compress) {
+            case "SNAPPY":
                 suffix =  ".snappy";
                 break;
-            case "bzip2":
-            case "bzip":
+            case "BZIP2":
+            case "BZIP":
                 suffix =  ".bz2";
                 break;
-            case "lzo":
+            case "LZO":
                 suffix =  ".lzo";
                 break;
-            case "gzip":
+            case "GZIP":
                 suffix = ".gz";
                 break;
-            case "lz4":
+            case "LZ4":
                 suffix = ".lz4";
                 break;
-            case "zlib":
-            case "deflate":
+            case "ZLIB":
+            case "DEFLATE":
                 suffix = ".deflate";
                 break;
-            case "zstd":
+            case "ZSTD":
                 suffix = ".zstd";
                 break;
             default:
