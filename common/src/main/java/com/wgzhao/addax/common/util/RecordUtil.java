@@ -104,7 +104,7 @@ public class RecordUtil
                     }
                     Type type = Type.valueOf(columnType.toUpperCase());
                     // it's all ok if nullFormat is null
-                    if (columnValue.equals(nullFormat)) {
+                    if (columnValue!= null && columnValue.equals(nullFormat)) {
                         columnValue = null;
                     }
                     String errorTemplate = "类型转换错误, 无法将[%s] 转换为[%s]";
