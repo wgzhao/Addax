@@ -19,6 +19,9 @@
 
 package com.wgzhao.addax.plugin.reader.dbffilereader;
 
+import com.linuxense.javadbf.DBFField;
+import com.linuxense.javadbf.DBFReader;
+import com.linuxense.javadbf.DBFRow;
 import com.wgzhao.addax.common.element.ColumnEntry;
 import com.wgzhao.addax.common.exception.AddaxException;
 import com.wgzhao.addax.common.plugin.RecordSender;
@@ -29,15 +32,14 @@ import com.wgzhao.addax.common.util.RecordUtil;
 import org.apache.commons.io.Charsets;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
-import org.jamel.dbf.DbfReader;
-import org.jamel.dbf.structure.DbfDataType;
-import org.jamel.dbf.structure.DbfField;
-import org.jamel.dbf.structure.DbfHeader;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.UnsupportedEncodingException;
+import java.nio.charset.Charset;
 import java.nio.charset.UnsupportedCharsetException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -387,42 +389,33 @@ public class DbfFileReader
                 String encode = readerSliceConfig.getString(Key.ENCODING);
                 String nullFormat = readerSliceConfig.getString(Key.NULL_FORMAT);
 
-                try (DbfReader reader = new DbfReader(FileUtils.getFile(fileName))) {
+                try (DBFReader reader = new DBFReader(new FileInputStream(fileName), Charset.forName(encode))) {
+
 
                     List<ColumnEntry> column = ColumnUtil.getListColumnEntry(readerSliceConfig, Key.COLUMN);
 
-                    DbfHeader header = reader.getHeader();
                     assert column != null;
-                    int colNum = column.isEmpty() ? header.getFieldsCount() : column.size();
-                    Object[] row;
-                    while ((row = reader.nextRecord()) != null) {
+                    int colNum = column.isEmpty() ? reader.getFieldCount() : column.size();
+                    DBFRow row;
+                    while ((row = reader.nextRow()) != null) {
                         String[] sourceLine = new String[colNum];
                         for (int i = 0; i < colNum; i++) {
+                            // constant value ?
                             if (column.get(i).getValue() != null) {
                                 sourceLine[i] = column.get(i).getValue();
+                                continue;
                             }
-                            else if (i < header.getFieldsCount()) {
-                                DbfField field = header.getField(i);
-                                String value;
-                                if (field.getDataType() == DbfDataType.DATE) {
-                                    value =
-                                            new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format((Date) row[i]);
-                                }
-                                else {
-                                    value = field.getDataType() == DbfDataType.CHAR
-                                            ? new String((byte[]) row[i], encode)
-                                            : String.valueOf(row[i]);
-                                }
-                                if (value != null) {
-                                    value = value.trim();
-                                }
-                                sourceLine[i] = value;
+                            if (row.getString(i)!= null && "date".equalsIgnoreCase(column.get(i).getType())) {
+                                // DBase's date type does not include time part
+                                sourceLine[i] =  new SimpleDateFormat("yyyy-MM-dd").format(row.getDate(i));
+                            } else {
+                                sourceLine[i] = row.getString(i);
                             }
                         }
                         RecordUtil.transportOneRecord(recordSender, column, sourceLine, nullFormat, this.getTaskPluginCollector());
                     }
                 }
-                catch (UnsupportedEncodingException e) {
+                catch (FileNotFoundException e) {
                     e.printStackTrace();
                 }
             }
