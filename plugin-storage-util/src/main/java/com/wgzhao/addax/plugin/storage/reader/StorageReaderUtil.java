@@ -19,8 +19,10 @@
 
 package com.wgzhao.addax.plugin.storage.reader;
 
+import com.wgzhao.addax.common.constant.Type;
 import com.wgzhao.addax.common.element.BoolColumn;
 import com.wgzhao.addax.common.element.Column;
+import com.wgzhao.addax.common.element.ColumnEntry;
 import com.wgzhao.addax.common.element.DateColumn;
 import com.wgzhao.addax.common.element.DoubleColumn;
 import com.wgzhao.addax.common.element.LongColumn;
@@ -29,9 +31,9 @@ import com.wgzhao.addax.common.element.StringColumn;
 import com.wgzhao.addax.common.exception.AddaxException;
 import com.wgzhao.addax.common.plugin.RecordSender;
 import com.wgzhao.addax.common.plugin.TaskPluginCollector;
+import com.wgzhao.addax.common.util.ColumnUtil;
 import com.wgzhao.addax.common.util.Configuration;
 import com.alibaba.fastjson.JSON;
-import com.alibaba.fastjson.JSONObject;
 import com.alibaba.fastjson.TypeReference;
 import com.csvreader.CsvReader;
 import io.airlift.compress.snappy.SnappyCodec;
@@ -58,15 +60,13 @@ import java.io.StringReader;
 import java.io.UnsupportedEncodingException;
 import java.nio.charset.UnsupportedCharsetException;
 import java.text.DateFormat;
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 
 public class StorageReaderUtil
 {
-    private static final Logger LOG = LoggerFactory
-            .getLogger(StorageReaderUtil.class);
+    private static final Logger LOG = LoggerFactory.getLogger(StorageReaderUtil.class);
     public static HashMap<String, Object> csvReaderConfigMap;
 
     private StorageReaderUtil()
@@ -557,19 +557,9 @@ public class StorageReaderUtil
         return record;
     }
 
-    public static List<ColumnEntry> getListColumnEntry(
-            Configuration configuration, final String path)
+    public static List<ColumnEntry> getListColumnEntry(Configuration configuration, final String path)
     {
-        List<JSONObject> lists = configuration.getList(path, JSONObject.class);
-        if (lists == null) {
-            return null;
-        }
-        List<ColumnEntry> result = new ArrayList<ColumnEntry>();
-        for (final JSONObject object : lists) {
-            result.add(JSON.parseObject(object.toJSONString(),
-                    ColumnEntry.class));
-        }
-        return result;
+        return ColumnUtil.getListColumnEntry(configuration, path);
     }
 
     /**
@@ -596,10 +586,7 @@ public class StorageReaderUtil
     public static void validateEncoding(Configuration readerConfiguration)
     {
         // encoding check
-        String encoding = readerConfiguration
-                .getString(
-                        Key.ENCODING,
-                        Constant.DEFAULT_ENCODING);
+        String encoding = readerConfiguration.getString(Key.ENCODING, Constant.DEFAULT_ENCODING);
         try {
             encoding = encoding.trim();
             readerConfiguration.set(Key.ENCODING, encoding);
@@ -673,12 +660,9 @@ public class StorageReaderUtil
 
         if (null != columns && !columns.isEmpty()) {
             for (Configuration eachColumnConf : columns) {
-                eachColumnConf.getNecessaryValue(Key.TYPE,
-                        StorageReaderErrorCode.REQUIRED_VALUE);
-                Integer columnIndex = eachColumnConf
-                        .getInt(Key.INDEX);
-                String columnValue = eachColumnConf
-                        .getString(Key.VALUE);
+                eachColumnConf.getNecessaryValue(Key.TYPE, StorageReaderErrorCode.REQUIRED_VALUE);
+                Integer columnIndex = eachColumnConf.getInt(Key.INDEX);
+                String columnValue = eachColumnConf.getString(Key.VALUE);
 
                 if (null == columnIndex && null == columnValue) {
                     throw AddaxException.asAddaxException(StorageReaderErrorCode.NO_INDEX_VALUE,
@@ -770,9 +754,4 @@ public class StorageReaderUtil
         }
     }
 
-    private enum Type
-    {
-        STRING, LONG, BOOLEAN, DOUBLE, DATE,
-        ;
-    }
 }
