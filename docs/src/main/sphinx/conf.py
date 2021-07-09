@@ -55,7 +55,7 @@ def maven_version(pom):
 
 
 def get_version():
-    version = os.environ.get('PRESTO_VERSION', '').strip()
+    version = os.environ.get('ADDAX_VERSION', '').strip()
     return version or maven_version('../../../pom.xml')
 
 # -- General configuration -----------------------------------------------------
@@ -84,7 +84,7 @@ source_suffix = ['.rst','.md']
 
 master_doc = 'index'
 
-project = u'DataX'
+project = u'Addax'
 
 version = get_version()
 release = version

@@ -2,7 +2,7 @@
 
 ## 一、 Addax  概览
 
-Addax 是一个异构数据源离线同步工具，致力于实现包括关系型数据库(MySQL、Oracle等)、HDFS、Hive、ODPS、HBase、FTP等各种异构数据源之间稳定高效的数据同步功能。
+Addax 是一个异构数据源离线同步工具（最初来源于阿里的 DataX），致力于实现包括关系型数据库(MySQL、Oracle等)、HDFS、Hive、ODPS、HBase、FTP等各种异构数据源之间稳定高效的数据同步功能。
 
 ![addax_why_new](images/addax_why_new.png)
 
@@ -83,7 +83,7 @@ Addax作为一个服务于大数据的ETL工具，除了提供数据快照搬迁
 #### 强劲的同步性能
 
 Addax 每一种读插件都有一种或多种切分策略，都能将作业合理切分成多个Task并行执行，单机多线程执行模型可以让Addax速度随并发成线性增长。在源端和目的端性能都足够的情况下，单个作业一定可以打满网卡。
-另外，Addax团队对所有的已经接入的插件都做了极致的性能优化，并且做了完整的性能测试。性能测试相关详情可以参照每单个数据源的详细介绍：[Addax数据源指南](https://github.com/alibaba/Addax/wiki/addax-all-data-channels)
+另外，Addax团队对所有的已经接入的插件都做了极致的性能优化，并且做了完整的性能测试。
 
 #### 健壮的容错机制
 
