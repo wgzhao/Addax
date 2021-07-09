@@ -17,7 +17,7 @@
  * under the License.
  */
 
-package com.wgzhao.addax.plugin.storage.reader;
+package com.wgzhao.addax.common.element;
 
 import com.alibaba.fastjson.JSON;
 import org.apache.commons.lang3.StringUtils;
