@@ -16,35 +16,27 @@
  * specific language governing permissions and limitations
  * under the License.
  */
+package com.wgzhao.addax.common.util;
 
-package com.wgzhao.addax.plugin.storage.reader;
+import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONObject;
+import com.wgzhao.addax.common.element.ColumnEntry;
 
-/**
- * Created by haiwei.luo on 14-12-5.
- */
-public class Key
+import java.util.ArrayList;
+import java.util.List;
+
+public class ColumnUtil
 {
-    public static final String COLUMN = "column";
-
-    public static final String ENCODING = "encoding";
-
-    public static final String FIELD_DELIMITER = "fieldDelimiter";
-
-    public static final String SKIP_HEADER = "skipHeader";
-
-    public static final String TYPE = "type";
-
-    public static final String INDEX = "index";
-
-    public static final String VALUE = "value";
-
-    public static final String COMPRESS = "compress";
-
-    public static final String NULL_FORMAT = "nullFormat";
-
-    public static final String BUFFER_SIZE = "bufferSize";
-
-    public static final String CSV_READER_CONFIG = "csvReaderConfig";
-
-    private Key() {}
+    public static List<ColumnEntry> getListColumnEntry(Configuration configuration, final String path)
+    {
+        List<JSONObject> lists = configuration.getList(path, JSONObject.class);
+        if (lists == null) {
+            return null;
+        }
+        List<ColumnEntry> result = new ArrayList<ColumnEntry>();
+        for (final JSONObject object : lists) {
+            result.add(JSON.parseObject(object.toJSONString(), ColumnEntry.class));
+        }
+        return result;
+    }
 }

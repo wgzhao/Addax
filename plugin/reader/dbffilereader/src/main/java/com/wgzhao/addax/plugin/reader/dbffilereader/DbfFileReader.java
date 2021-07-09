@@ -19,12 +19,13 @@
 
 package com.wgzhao.addax.plugin.reader.dbffilereader;
 
+import com.wgzhao.addax.common.element.ColumnEntry;
 import com.wgzhao.addax.common.exception.AddaxException;
 import com.wgzhao.addax.common.plugin.RecordSender;
 import com.wgzhao.addax.common.spi.Reader;
+import com.wgzhao.addax.common.util.ColumnUtil;
 import com.wgzhao.addax.common.util.Configuration;
-import com.wgzhao.addax.plugin.storage.reader.ColumnEntry;
-import com.wgzhao.addax.plugin.storage.reader.StorageReaderUtil;
+import com.wgzhao.addax.common.util.RecordUtil;
 import org.apache.commons.io.Charsets;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
@@ -48,14 +49,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.regex.Pattern;
-
-import static com.wgzhao.addax.plugin.storage.reader.Constant.DEFAULT_ENCODING;
-import static com.wgzhao.addax.plugin.storage.reader.Key.COLUMN;
-import static com.wgzhao.addax.plugin.storage.reader.Key.ENCODING;
-import static com.wgzhao.addax.plugin.storage.reader.Key.INDEX;
-import static com.wgzhao.addax.plugin.storage.reader.Key.NULL_FORMAT;
-import static com.wgzhao.addax.plugin.storage.reader.Key.TYPE;
-import static com.wgzhao.addax.plugin.storage.reader.Key.VALUE;
 
 /**
  * Created by zhongtian.hu on 19-8-8.
@@ -121,21 +114,14 @@ public class DbfFileReader
                 }
             }
 
-            String encoding = this.originConfig
-                    .getString(
-                            ENCODING,
-                            DEFAULT_ENCODING);
+            String encoding = this.originConfig.getString(Key.ENCODING, Key.DEFAULT_ENCODING);
             if (isBlank(encoding)) {
-                this.originConfig
-                        .set(ENCODING,
-                                DEFAULT_ENCODING);
+                this.originConfig.set(Key.ENCODING, Key.DEFAULT_ENCODING);
             }
             else {
                 try {
                     encoding = encoding.trim();
-                    this.originConfig
-                            .set(ENCODING,
-                                    encoding);
+                    this.originConfig.set(Key.ENCODING, encoding);
                     Charsets.toCharset(encoding);
                 }
                 catch (UnsupportedCharsetException uce) {
@@ -151,19 +137,14 @@ public class DbfFileReader
                 }
             }
             // 检测是column 是否为 ["*"] 若是则填为空
-            List<Configuration> column = this.originConfig
-                    .getListConfiguration(COLUMN);
-            if (null != column
-                    && 1 == column.size()
-                    && ("\"*\"".equals(column.get(0).toString()) || "'*'"
-                    .equals(column.get(0).toString()))) {
-                originConfig
-                        .set(COLUMN, new ArrayList<String>());
+            List<Configuration> column = this.originConfig.getListConfiguration(Key.COLUMN);
+            if (null != column && 1 == column.size() && ("\"*\"".equals(column.get(0).toString())
+                    || "'*'".equals(column.get(0).toString()))) {
+                originConfig.set(Key.COLUMN, new ArrayList<String>());
             }
             else {
                 // column: 1. index type 2.value type 3.when type is Data, may have format
-                List<Configuration> columns = this.originConfig
-                        .getListConfiguration(COLUMN);
+                List<Configuration> columns = this.originConfig.getListConfiguration(Key.COLUMN);
 
                 if (null == columns || columns.isEmpty()) {
                     throw AddaxException.asAddaxException(
@@ -172,9 +153,9 @@ public class DbfFileReader
                 }
 
                 for (Configuration eachColumnConf : columns) {
-                    eachColumnConf.getNecessaryValue(TYPE, DbfFileReaderErrorCode.REQUIRED_VALUE);
-                    Integer columnIndex = eachColumnConf.getInt(INDEX);
-                    String columnValue = eachColumnConf.getString(VALUE);
+                    eachColumnConf.getNecessaryValue(Key.TYPE, DbfFileReaderErrorCode.REQUIRED_VALUE);
+                    Integer columnIndex = eachColumnConf.getInt(Key.INDEX);
+                    String columnValue = eachColumnConf.getString(Key.VALUE);
 
                     if (null == columnIndex && null == columnValue) {
                         throw AddaxException.asAddaxException(
@@ -200,8 +181,8 @@ public class DbfFileReader
             for (String eachPath : this.path) {
                 String regexString = eachPath.replace("*", ".*").replace("?",
                         ".?");
-                Pattern patt = Pattern.compile(regexString);
-                this.pattern.put(eachPath, patt);
+                Pattern pattern = Pattern.compile(regexString);
+                this.pattern.put(eachPath, pattern);
             }
             this.sourceFiles = this.buildSourceTargets();
 
@@ -236,8 +217,7 @@ public class DbfFileReader
                                         this.originConfig.getString(Key.PATH)));
             }
 
-            List<List<String>> splitedSourceFiles = this.splitSourceFiles(
-                    this.sourceFiles, splitNumber);
+            List<List<String>> splitedSourceFiles = this.splitSourceFiles(this.sourceFiles, splitNumber);
             for (List<String> files : splitedSourceFiles) {
                 Configuration splitedConfig = this.originConfig.clone();
                 splitedConfig.set(Constant.SOURCE_FILES, files);
@@ -256,8 +236,7 @@ public class DbfFileReader
                 LOG.info("parse path {}", eachPath);
                 int endMark;
                 for (endMark = 0; endMark < eachPath.length(); endMark++) {
-                    if ('*' == eachPath.charAt(endMark)
-                            || '?' == eachPath.charAt(endMark)) {
+                    if ('*' == eachPath.charAt(endMark) || '?' == eachPath.charAt(endMark)) {
                         this.isRegexPath.put(eachPath, true);
                         break;
                     }
@@ -265,17 +244,14 @@ public class DbfFileReader
 
                 String parentDirectory;
                 if (!this.isRegexPath.isEmpty() && this.isRegexPath.containsKey(eachPath)) {
-                    int lastDirSeparator = eachPath.substring(0, endMark)
-                            .lastIndexOf(IOUtils.DIR_SEPARATOR);
-                    parentDirectory = eachPath.substring(0,
-                            lastDirSeparator + 1);
+                    int lastDirSeparator = eachPath.substring(0, endMark).lastIndexOf(IOUtils.DIR_SEPARATOR);
+                    parentDirectory = eachPath.substring(0, lastDirSeparator + 1);
                 }
                 else {
                     this.isRegexPath.put(eachPath, false);
                     parentDirectory = eachPath;
                 }
-                this.buildSourceTargetsEathPath(eachPath, parentDirectory,
-                        toBeReadFiles);
+                this.buildSourceTargetsEathPath(eachPath, parentDirectory, toBeReadFiles);
             }
             return Arrays.asList(toBeReadFiles.toArray(new String[0]));
         }
@@ -288,19 +264,15 @@ public class DbfFileReader
                 File dir = new File(parentDirectory);
                 boolean isExists = dir.exists();
                 if (!isExists) {
-                    String message = String.format("您设定的目录不存在 : [%s]",
-                            parentDirectory);
+                    String message = String.format("您设定的目录不存在 : [%s]", parentDirectory);
                     LOG.error(message);
-                    throw AddaxException.asAddaxException(
-                            DbfFileReaderErrorCode.FILE_NOT_EXISTS, message);
+                    throw AddaxException.asAddaxException(DbfFileReaderErrorCode.FILE_NOT_EXISTS, message);
                 }
             }
             catch (SecurityException se) {
-                String message = String.format("您没有权限查看目录 : [%s]",
-                        parentDirectory);
+                String message = String.format("您没有权限查看目录 : [%s]", parentDirectory);
                 LOG.error(message);
-                throw AddaxException.asAddaxException(
-                        DbfFileReaderErrorCode.SECURITY_NOT_ENOUGH, message);
+                throw AddaxException.asAddaxException(DbfFileReaderErrorCode.SECURITY_NOT_ENOUGH, message);
             }
 
             directoryRover(regexPath, parentDirectory, toBeReadFiles);
@@ -324,28 +296,20 @@ public class DbfFileReader
                     File[] files = directory.listFiles();
                     if (null != files) {
                         for (File subFileNames : files) {
-                            directoryRover(regexPath,
-                                    subFileNames.getAbsolutePath(),
-                                    toBeReadFiles);
+                            directoryRover(regexPath, subFileNames.getAbsolutePath(), toBeReadFiles);
                         }
                     }
                     else {
                         // warn: 对于没有权限的文件，是直接throw DataXException
-                        String message = String.format("您没有权限查看目录 : [%s]",
-                                directory);
+                        String message = String.format("您没有权限查看目录 : [%s]", directory);
                         LOG.error(message);
-                        throw AddaxException.asAddaxException(
-                                DbfFileReaderErrorCode.SECURITY_NOT_ENOUGH,
-                                message);
+                        throw AddaxException.asAddaxException(DbfFileReaderErrorCode.SECURITY_NOT_ENOUGH, message);
                     }
                 }
                 catch (SecurityException e) {
-                    String message = String.format("您没有权限查看目录 : [%s]",
-                            directory);
+                    String message = String.format("您没有权限查看目录 : [%s]", directory);
                     LOG.error(message);
-                    throw AddaxException.asAddaxException(
-                            DbfFileReaderErrorCode.SECURITY_NOT_ENOUGH,
-                            message, e);
+                    throw AddaxException.asAddaxException(DbfFileReaderErrorCode.SECURITY_NOT_ENOUGH, message, e);
                 }
             }
         }
@@ -354,8 +318,7 @@ public class DbfFileReader
         private boolean isTargetFile(String regexPath, String absoluteFilePath)
         {
             if (Boolean.TRUE.equals(this.isRegexPath.get(regexPath))) {
-                return this.pattern.get(regexPath).matcher(absoluteFilePath)
-                        .matches();
+                return this.pattern.get(regexPath).matcher(absoluteFilePath).matches();
             }
             else {
                 return true;
@@ -421,20 +384,20 @@ public class DbfFileReader
             for (String fileName : this.sourceFiles) {
                 LOG.info("reading file : [{}]", fileName);
 
-                String encod = readerSliceConfig.getString(ENCODING);
-                String nullFormat = readerSliceConfig.getString(NULL_FORMAT);
+                String encode = readerSliceConfig.getString(Key.ENCODING);
+                String nullFormat = readerSliceConfig.getString(Key.NULL_FORMAT);
 
                 try (DbfReader reader = new DbfReader(FileUtils.getFile(fileName))) {
 
-                    List<ColumnEntry> column = StorageReaderUtil.getListColumnEntry(readerSliceConfig,
-                            COLUMN);
+                    List<ColumnEntry> column = ColumnUtil.getListColumnEntry(readerSliceConfig, Key.COLUMN);
+
                     DbfHeader header = reader.getHeader();
                     assert column != null;
-                    int colnum = column.isEmpty() ? header.getFieldsCount() : column.size();
+                    int colNum = column.isEmpty() ? header.getFieldsCount() : column.size();
                     Object[] row;
                     while ((row = reader.nextRecord()) != null) {
-                        String[] sourceLine = new String[colnum];
-                        for (int i = 0; i < colnum; i++) {
+                        String[] sourceLine = new String[colNum];
+                        for (int i = 0; i < colNum; i++) {
                             if (column.get(i).getValue() != null) {
                                 sourceLine[i] = column.get(i).getValue();
                             }
@@ -447,7 +410,7 @@ public class DbfFileReader
                                 }
                                 else {
                                     value = field.getDataType() == DbfDataType.CHAR
-                                            ? new String((byte[]) row[i], encod)
+                                            ? new String((byte[]) row[i], encode)
                                             : String.valueOf(row[i]);
                                 }
                                 if (value != null) {
@@ -456,7 +419,7 @@ public class DbfFileReader
                                 sourceLine[i] = value;
                             }
                         }
-                        StorageReaderUtil.transportOneRecord(recordSender, column, sourceLine, nullFormat, this.getTaskPluginCollector());
+                        RecordUtil.transportOneRecord(recordSender, column, sourceLine, nullFormat, this.getTaskPluginCollector());
                     }
                 }
                 catch (UnsupportedEncodingException e) {
