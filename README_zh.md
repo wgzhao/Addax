@@ -19,7 +19,9 @@
 
 ## 当前稳定版
 
-`3.2.5`
+`4.0.0`
+
+注： 从 `4.0.0` 版本开始，启用新的项目名称 `Addax`, 因此它和以前的版本均不兼容
 
 注： 从 `3.2.1` 版本开始，包类名已经更改，因此不再兼容 `3.1.x` 版本
 
@@ -118,7 +120,8 @@
 
 | 版本  | 连接地址                                                     | md5值                            |
 | ----- | ------------------------------------------------------------| -------------------------------- |
-| 3.2.5   | https://pan.baidu.com/s/14_MnbtRUtJlvQh8tTKv6fg 提取码: 1jdr | 43ddd0186ccbaf1f1bfee0aac22da935 |
+| 4.0.0 | https://pan.baidu.com/s/1qmV6ed3CYpACIp29JCIDgQ 提取码: 559q | b9b759da228f3bc656965d20357dcb2a |
+| 3.2.5 | https://pan.baidu.com/s/14_MnbtRUtJlvQh8tTKv6fg 提取码: 1jdr | 43ddd0186ccbaf1f1bfee0aac22da935 |
 | 3.2.4 | https://pan.baidu.com/s/1VaOlAOTqGX4WwRtI5ewPeg 提取码: i127 | 2d16125385b88405481e12bf4a8fd715 |
 | 3.2.3 | https://pan.baidu.com/s/1ajjnSittf6u7rjXhJ7_3Aw 提取码: qxry | ad47b0d840bf21de1668b9310a9782cf |
 | 3.2.2 | https://pan.baidu.com/s/1TQyaERnIk9EQRDULfQE69w 提取码: jh31 | b04d2563adb36457b85e48c318757ea3 |
@@ -138,6 +141,7 @@
 
 | 版本  | 插件下载地址                                                  |
 | ----- | ------------------------------------------------------------|
+| 4.0.0 | https://pan.baidu.com/s/1gLWiw2I7W_4-KBiA1CCg2g 提取码: hxag |
 | 3.2.5 | https://pan.baidu.com/s/1VMqPAYeL_kirCjOVAdvoAg 提取码: hda9 |
 | 3.2.4 | https://pan.baidu.com/s/1gPJlJh66bGQUSUR-2mNOQw 提取码: 7c4j |
 | 3.2.3 | https://pan.baidu.com/s/1g4z3Pqc_BxKstkiYjWXopQ 提取码: 2fip |
@@ -145,8 +149,8 @@
 ### 编译及打包
 
 ```shell
-git clone https://github.com/wgzhao/datax.git DataX
-cd DataX
+git clone https://github.com/wgzhao/addax.git addax
+cd addax
 mvn clean package
 mvn package assembly:single
 ```
@@ -158,15 +162,15 @@ cd docs
 mvn clean package
 ```
 
-编译打包成功后，会在项目目录的`target/datax` 目录下创建一个 `addax-<version>`的 文件夹，其中 `<version` 表示版本。
+编译打包成功后，会在项目目录的`target/addax` 目录下创建一个 `addax-<version>`的 文件夹，其中 `<version>` 表示版本。
 
 ### 开始第一个任务
 
 `job` 子目录包含了大量的任务样本，其中 `job.json` 可以作为冒烟测试，执行如下
 
 ```shell
-cd target/datax/addax-<version>
-python bin/datax.py job/job.json
+cd target/addax/addax-<version>
+python bin/addax.py job/job.json
 ```
 
 上述命令的输出大致如下：
@@ -174,9 +178,9 @@ python bin/datax.py job/job.json
 <summary>点击展开</summary>
 
 ```
- bin/datax.py job/job.json
+ bin/addax.py job/job.json
 
-DataX (addax-V3), From Alibaba !
+Addax (addax-V3), From Alibaba !
 Copyright (C) 2010-2017, Alibaba Group. All Rights Reserved.
 
 
@@ -261,38 +265,38 @@ Copyright (C) 2010-2017, Alibaba Group. All Rights Reserved.
 
 2020-09-23 19:51:31.068 [main] WARN  Engine - prioriy set to 0, because NumberFormatException, the value is: null
 2020-09-23 19:51:31.069 [main] INFO  PerfTrace - PerfTrace traceId=job_-1, isEnable=false, priority=0
-2020-09-23 19:51:31.069 [main] INFO  JobContainer - DataX jobContainer starts job.
+2020-09-23 19:51:31.069 [main] INFO  JobContainer - Addax jobContainer starts job.
 2020-09-23 19:51:31.070 [main] INFO  JobContainer - Set jobId = 0
 2020-09-23 19:51:31.082 [job-0] INFO  JobContainer - jobContainer starts to do prepare ...
-2020-09-23 19:51:31.082 [job-0] INFO  JobContainer - DataX Reader.Job [streamreader] do prepare work .
-2020-09-23 19:51:31.083 [job-0] INFO  JobContainer - DataX Writer.Job [streamwriter] do prepare work .
+2020-09-23 19:51:31.082 [job-0] INFO  JobContainer - Addax Reader.Job [streamreader] do prepare work .
+2020-09-23 19:51:31.083 [job-0] INFO  JobContainer - Addax Writer.Job [streamwriter] do prepare work .
 2020-09-23 19:51:31.083 [job-0] INFO  JobContainer - jobContainer starts to do split ...
 2020-09-23 19:51:31.083 [job-0] INFO  JobContainer - Job set Channel-Number to 1 channels.
-2020-09-23 19:51:31.083 [job-0] INFO  JobContainer - DataX Reader.Job [streamreader] splits to [1] tasks.
-2020-09-23 19:51:31.084 [job-0] INFO  JobContainer - DataX Writer.Job [streamwriter] splits to [1] tasks.
+2020-09-23 19:51:31.083 [job-0] INFO  JobContainer - Addax Reader.Job [streamreader] splits to [1] tasks.
+2020-09-23 19:51:31.084 [job-0] INFO  JobContainer - Addax Writer.Job [streamwriter] splits to [1] tasks.
 2020-09-23 19:51:31.102 [job-0] INFO  JobContainer - jobContainer starts to do schedule ...
 2020-09-23 19:51:31.111 [job-0] INFO  JobContainer - Scheduler starts [1] taskGroups.
 2020-09-23 19:51:31.117 [taskGroup-0] INFO  TaskGroupContainer - taskGroupId=[0] start [1] channels for [1] tasks.
 2020-09-23 19:51:31.119 [taskGroup-0] INFO  Channel - Channel set byte_speed_limit to -1, No bps activated.
 2020-09-23 19:51:31.120 [taskGroup-0] INFO  Channel - Channel set record_speed_limit to -1, No tps activated.
 2020-09-23 19:51:31.129 [taskGroup-0] INFO  TaskGroupContainer - taskGroup[0] taskId[0] attemptCount[1] is started
-DataX	19890604	1989-06-04 00:00:00	true	test
-DataX	19890604	1989-06-04 00:00:00	true	test
-DataX	19890604	1989-06-04 00:00:00	true	test
-DataX	19890604	1989-06-04 00:00:00	true	test
-DataX	19890604	1989-06-04 00:00:00	true	test
-DataX	19890604	1989-06-04 00:00:00	true	test
-DataX	19890604	1989-06-04 00:00:00	true	test
-DataX	19890604	1989-06-04 00:00:00	true	test
-DataX	19890604	1989-06-04 00:00:00	true	test
-DataX	19890604	1989-06-04 00:00:00	true	test
+Addax	19890604	1989-06-04 00:00:00	true	test
+Addax	19890604	1989-06-04 00:00:00	true	test
+Addax	19890604	1989-06-04 00:00:00	true	test
+Addax	19890604	1989-06-04 00:00:00	true	test
+Addax	19890604	1989-06-04 00:00:00	true	test
+Addax	19890604	1989-06-04 00:00:00	true	test
+Addax	19890604	1989-06-04 00:00:00	true	test
+Addax	19890604	1989-06-04 00:00:00	true	test
+Addax	19890604	1989-06-04 00:00:00	true	test
+Addax	19890604	1989-06-04 00:00:00	true	test
 2020-09-23 19:51:31.231 [taskGroup-0] INFO  TaskGroupContainer - taskGroup[0] taskId[0] is successful, used[103]ms
 2020-09-23 19:51:31.232 [taskGroup-0] INFO  TaskGroupContainer - taskGroup[0] completed it's tasks.
 2020-09-23 19:51:41.129 [job-0] INFO  StandAloneJobContainerCommunicator - Total 10 records, 260 bytes | Speed 26B/s, 1 records/s | Error 0 records, 0 bytes |  All Task WaitWriterTime 0.000s |  All Task WaitReaderTime 0.000s | Percentage 100.00%
 2020-09-23 19:51:41.130 [job-0] INFO  AbstractScheduler - Scheduler accomplished all tasks.
-2020-09-23 19:51:41.130 [job-0] INFO  JobContainer - DataX Writer.Job [streamwriter] do post work.
-2020-09-23 19:51:41.130 [job-0] INFO  JobContainer - DataX Reader.Job [streamreader] do post work.
-2020-09-23 19:51:41.130 [job-0] INFO  JobContainer - DataX jobId [0] completed successfully.
+2020-09-23 19:51:41.130 [job-0] INFO  JobContainer - Addax Writer.Job [streamwriter] do post work.
+2020-09-23 19:51:41.130 [job-0] INFO  JobContainer - Addax Reader.Job [streamreader] do post work.
+2020-09-23 19:51:41.130 [job-0] INFO  JobContainer - Addax jobId [0] completed successfully.
 2020-09-23 19:51:41.130 [job-0] INFO  JobContainer - invokeHooks begin
 2020-09-23 19:51:41.130 [job-0] INFO  JobContainer - report url not found
 2020-09-23 19:51:41.133 [job-0] INFO  JobContainer -
@@ -330,7 +334,7 @@ DataX	19890604	1989-06-04 00:00:00	true	test
 
 ## 文档
 
-- [在线文档](https://datax.readthedocs.io)
+- [在线文档](https://addax.readthedocs.io)
 - [项目内文档](docs/src/main/sphinx/index.rst)
 
 ## License

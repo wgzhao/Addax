@@ -2,7 +2,7 @@
     <img alt="Addax Logo" src="https://github.com/wgzhao/Addax/blob/master/docs/images/logo.png?raw=true" width="205" />
 </p>
 <p align="center">Addax is an open source univeral ETL tool</p>
-<p align="center"><a href="https://addax.readthedocs.io">Documentation</a> Detailed description of how to install and deploy and how to use each collection plugin </p>
+<p align="center"><a href="https://addax.readthedocs.io">Documentation</a> detailed description of how to install and deploy and how to use each collection plugin </p>
 <p align="center">
    <a href="https://github.com/wgzhao/Addax/workflows/Maven%20Package/badge.svg">
        <img src="https://github.com/wgzhao/DataX/workflows/Maven%20Package/badge.svg" alt="Maven Package" />
@@ -19,7 +19,9 @@ English | [简体中文](README_zh.md)
 
 ## current stable version
 
-`3.2.5`
+`4.0.0`
+
+Note: We will use new brand `addax` since `4.0.0` and therefore no longer compatible with prior versions.
 
 Note: As of `3.2.1`, the package class names have been changed and are therefore no longer compatible with `3.1.x` versions.
 
@@ -138,6 +140,7 @@ If you are too lazy to compile or cannot compile because of your environment, yo
 
 | version | download                                                   | md5                              |
 | ------- | ---------------------------------------------------------- | -------------------------------- |
+| 4.0.0   | https://pan.baidu.com/s/1qmV6ed3CYpACIp29JCIDgQ code: 559q | b9b759da228f3bc656965d20357dcb2a |
 | 3.2.5   | https://pan.baidu.com/s/14_MnbtRUtJlvQh8tTKv6fg code: 1jdr | 43ddd0186ccbaf1f1bfee0aac22da935 |
 | 3.2.4   | https://pan.baidu.com/s/1VaOlAOTqGX4WwRtI5ewPeg code: i127 | 2d16125385b88405481e12bf4a8fd715 |
 | 3.2.3   | https://pan.baidu.com/s/1ajjnSittf6u7rjXhJ7_3Aw code: qxry | ad47b0d840bf21de1668b9310a9782cf |
@@ -152,13 +155,14 @@ If you are too lazy to compile or cannot compile because of your environment, yo
 | 3.1.2   | https://pan.baidu.com/s/1zFqv8E6iJX549zdSZDQgiQ code: 7jdk | 3674711fc9b68fad3086f3c8526a3427 |
 | 3.1.1   | https://pan.baidu.com/s/1GwmFA7-hPkd6GKiZEvUKXg code: 1inn | 0fa4e7902420704b2e814fef098f40ae |
 
-**Note**: Starting from version `3.2.3`, in order to reduce the installation package size, the compiled package only includes `streamreader` and `streamwriter` plug-ins, 
-other plug-ins need to be downloaded separately, the download shared directory list is as follows.
+**Note**: Starting from version `3.2.3`, in order to reduce the installation package size, the built-in package only includes `streamreader` and `streamwriter` plug-ins, 
+other plug-ins need to be downloaded separately, the download shared directory list is as the following.
 
 ### plugins download
 
 | version | download link                                              |
 | ------- | ---------------------------------------------------------- |
+| 4.0.0   | https://pan.baidu.com/s/1gLWiw2I7W_4-KBiA1CCg2g code: hxag | 
 | 3.2.5   | https://pan.baidu.com/s/1VMqPAYeL_kirCjOVAdvoAg code: hda9 |
 | 3.2.4   | https://pan.baidu.com/s/1gPJlJh66bGQUSUR-2mNOQw code: 7c4j |
 | 3.2.3   | https://pan.baidu.com/s/1g4z3Pqc_BxKstkiYjWXopQ code: 2fip |
@@ -166,13 +170,13 @@ other plug-ins need to be downloaded separately, the download shared directory l
 ### compile and package
 
 ```shell
-git clone https://github.com/wgzhao/datax.git DataX
-cd DataX
+git clone https://github.com/wgzhao/addax.git addax
+cd addax
 mvn clean package
 mvn package assembly:single
 ```
 
-If you want compile doc, you can execute the following instructions.
+If you want to compile the doc, you can execute the following instructions.
 
 ```shell
 cd docs
@@ -186,8 +190,8 @@ After successful compilation and packaging, a `addax-<version>` folder will be c
 The `job` subdirectory contains many sample jobs, of which `job.json` can be used as a smoke-out test and executed as follows
 
 ```shell
-cd target/datax/addax-<version>
-python bin/datax.py job/job.json
+cd target/addax/addax-<version>
+python bin/addax.py job/job.json
 ```
 
 The output of the above command is roughly as follows.
@@ -196,9 +200,9 @@ The output of the above command is roughly as follows.
 <summary>Click to expand</summary>
 
 ```
- bin/datax.py job/job.json
+ bin/addax.py job/job.json
 
-DataX (addax-V3), From Alibaba !
+Addax (addax-V3), From Alibaba !
 Copyright (C) 2010-2017, Alibaba Group. All Rights Reserved.
 
 
@@ -283,38 +287,38 @@ Copyright (C) 2010-2017, Alibaba Group. All Rights Reserved.
 
 2020-09-23 19:51:31.068 [main] WARN  Engine - prioriy set to 0, because NumberFormatException, the value is: null
 2020-09-23 19:51:31.069 [main] INFO  PerfTrace - PerfTrace traceId=job_-1, isEnable=false, priority=0
-2020-09-23 19:51:31.069 [main] INFO  JobContainer - DataX jobContainer starts job.
+2020-09-23 19:51:31.069 [main] INFO  JobContainer - Addax jobContainer starts job.
 2020-09-23 19:51:31.070 [main] INFO  JobContainer - Set jobId = 0
 2020-09-23 19:51:31.082 [job-0] INFO  JobContainer - jobContainer starts to do prepare ...
-2020-09-23 19:51:31.082 [job-0] INFO  JobContainer - DataX Reader.Job [streamreader] do prepare work .
-2020-09-23 19:51:31.083 [job-0] INFO  JobContainer - DataX Writer.Job [streamwriter] do prepare work .
+2020-09-23 19:51:31.082 [job-0] INFO  JobContainer - Addax Reader.Job [streamreader] do prepare work .
+2020-09-23 19:51:31.083 [job-0] INFO  JobContainer - Addax Writer.Job [streamwriter] do prepare work .
 2020-09-23 19:51:31.083 [job-0] INFO  JobContainer - jobContainer starts to do split ...
 2020-09-23 19:51:31.083 [job-0] INFO  JobContainer - Job set Channel-Number to 1 channels.
-2020-09-23 19:51:31.083 [job-0] INFO  JobContainer - DataX Reader.Job [streamreader] splits to [1] tasks.
-2020-09-23 19:51:31.084 [job-0] INFO  JobContainer - DataX Writer.Job [streamwriter] splits to [1] tasks.
+2020-09-23 19:51:31.083 [job-0] INFO  JobContainer - Addax Reader.Job [streamreader] splits to [1] tasks.
+2020-09-23 19:51:31.084 [job-0] INFO  JobContainer - Addax Writer.Job [streamwriter] splits to [1] tasks.
 2020-09-23 19:51:31.102 [job-0] INFO  JobContainer - jobContainer starts to do schedule ...
 2020-09-23 19:51:31.111 [job-0] INFO  JobContainer - Scheduler starts [1] taskGroups.
 2020-09-23 19:51:31.117 [taskGroup-0] INFO  TaskGroupContainer - taskGroupId=[0] start [1] channels for [1] tasks.
 2020-09-23 19:51:31.119 [taskGroup-0] INFO  Channel - Channel set byte_speed_limit to -1, No bps activated.
 2020-09-23 19:51:31.120 [taskGroup-0] INFO  Channel - Channel set record_speed_limit to -1, No tps activated.
 2020-09-23 19:51:31.129 [taskGroup-0] INFO  TaskGroupContainer - taskGroup[0] taskId[0] attemptCount[1] is started
-DataX	19890604	1989-06-04 00:00:00	true	test
-DataX	19890604	1989-06-04 00:00:00	true	test
-DataX	19890604	1989-06-04 00:00:00	true	test
-DataX	19890604	1989-06-04 00:00:00	true	test
-DataX	19890604	1989-06-04 00:00:00	true	test
-DataX	19890604	1989-06-04 00:00:00	true	test
-DataX	19890604	1989-06-04 00:00:00	true	test
-DataX	19890604	1989-06-04 00:00:00	true	test
-DataX	19890604	1989-06-04 00:00:00	true	test
-DataX	19890604	1989-06-04 00:00:00	true	test
+Addax	19890604	1989-06-04 00:00:00	true	test
+Addax	19890604	1989-06-04 00:00:00	true	test
+Addax	19890604	1989-06-04 00:00:00	true	test
+Addax	19890604	1989-06-04 00:00:00	true	test
+Addax	19890604	1989-06-04 00:00:00	true	test
+Addax	19890604	1989-06-04 00:00:00	true	test
+Addax	19890604	1989-06-04 00:00:00	true	test
+Addax	19890604	1989-06-04 00:00:00	true	test
+Addax	19890604	1989-06-04 00:00:00	true	test
+Addax	19890604	1989-06-04 00:00:00	true	test
 2020-09-23 19:51:31.231 [taskGroup-0] INFO  TaskGroupContainer - taskGroup[0] taskId[0] is successful, used[103]ms
 2020-09-23 19:51:31.232 [taskGroup-0] INFO  TaskGroupContainer - taskGroup[0] completed it's tasks.
 2020-09-23 19:51:41.129 [job-0] INFO  StandAloneJobContainerCommunicator - Total 10 records, 260 bytes | Speed 26B/s, 1 records/s | Error 0 records, 0 bytes |  All Task WaitWriterTime 0.000s |  All Task WaitReaderTime 0.000s | Percentage 100.00%
 2020-09-23 19:51:41.130 [job-0] INFO  AbstractScheduler - Scheduler accomplished all tasks.
-2020-09-23 19:51:41.130 [job-0] INFO  JobContainer - DataX Writer.Job [streamwriter] do post work.
-2020-09-23 19:51:41.130 [job-0] INFO  JobContainer - DataX Reader.Job [streamreader] do post work.
-2020-09-23 19:51:41.130 [job-0] INFO  JobContainer - DataX jobId [0] completed successfully.
+2020-09-23 19:51:41.130 [job-0] INFO  JobContainer - Addax Writer.Job [streamwriter] do post work.
+2020-09-23 19:51:41.130 [job-0] INFO  JobContainer - Addax Reader.Job [streamreader] do post work.
+2020-09-23 19:51:41.130 [job-0] INFO  JobContainer - Addax jobId [0] completed successfully.
 2020-09-23 19:51:41.130 [job-0] INFO  JobContainer - invokeHooks begin
 2020-09-23 19:51:41.130 [job-0] INFO  JobContainer - report url not found
 2020-09-23 19:51:41.133 [job-0] INFO  JobContainer -
@@ -351,7 +355,7 @@ DataX	19890604	1989-06-04 00:00:00	true	test
 
 ## documentation
 
-- [online](https://datax.readthedocs.io)
+- [online](https://addax.readthedocs.io)
 - [project](docs/src/main/sphinx/index.rst)
 
 ## License
