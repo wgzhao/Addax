@@ -68,14 +68,10 @@ public class DbfFileWriter
         {
             this.writerSliceConfig = this.getPluginJobConf();
             this.validateParameter();
-            String dateFormatOld = this.writerSliceConfig
-                    .getString(Key.FORMAT);
-            String dateFormatNew = this.writerSliceConfig
-                    .getString(Key.DATE_FORMAT);
+            String dateFormatOld = this.writerSliceConfig.getString(Key.FORMAT);
+            String dateFormatNew = this.writerSliceConfig.getString(Key.DATE_FORMAT);
             if (null == dateFormatNew) {
-                this.writerSliceConfig
-                        .set(Key.DATE_FORMAT,
-                                dateFormatOld);
+                this.writerSliceConfig.set(Key.DATE_FORMAT, dateFormatOld);
             }
             if (null != dateFormatOld) {
                 LOG.warn("您使用format配置日期格式化, 这是不推荐的行为, 请优先使用dateFormat配置项, 两项同时存在则使用dateFormat.");
@@ -85,33 +81,24 @@ public class DbfFileWriter
 
         private void validateParameter()
         {
-            this.writerSliceConfig
-                    .getNecessaryValue(
-                            Key.FILE_NAME,
-                            DbfFileWriterErrorCode.REQUIRED_VALUE);
+            this.writerSliceConfig.getNecessaryValue(Key.FILE_NAME, DbfFileWriterErrorCode.REQUIRED_VALUE);
 
-            String path = this.writerSliceConfig.getNecessaryValue(Key.PATH,
-                    DbfFileWriterErrorCode.REQUIRED_VALUE);
+            String path = this.writerSliceConfig.getNecessaryValue(Key.PATH, DbfFileWriterErrorCode.REQUIRED_VALUE);
 
             try {
                 // warn: 这里用户需要配一个目录
                 File dir = new File(path);
                 if (dir.isFile()) {
-                    throw AddaxException
-                            .asAddaxException(
+                    throw AddaxException.asAddaxException(
                                     DbfFileWriterErrorCode.ILLEGAL_VALUE,
-                                    String.format(
-                                            "您配置的path: [%s] 不是一个合法的目录, 请您注意文件重名, 不合法目录名等情况.",
-                                            path));
+                                    String.format("您配置的path: [%s] 不是一个合法的目录, 请您注意文件重名, 不合法目录名等情况.", path));
                 }
                 if (!dir.exists()) {
                     boolean createdOk = dir.mkdirs();
                     if (!createdOk) {
-                        throw AddaxException
-                                .asAddaxException(
+                        throw AddaxException.asAddaxException(
                                         DbfFileWriterErrorCode.CONFIG_INVALID_EXCEPTION,
-                                        String.format("您指定的文件路径 : [%s] 创建失败.",
-                                                path));
+                                        String.format("您指定的文件路径 : [%s] 创建失败.", path));
                     }
                 }
             }
@@ -130,8 +117,7 @@ public class DbfFileWriter
             String writeMode = this.writerSliceConfig.getString(Key.WRITE_MODE);
             // truncate option handler
             if ("truncate".equals(writeMode)) {
-                LOG.info("由于您配置了writeMode truncate, 开始清理 [{}] 下面以 [{}] 开头的内容",
-                        path, fileName);
+                LOG.info("由于您配置了writeMode truncate, 开始清理 [{}] 下面以 [{}] 开头的内容", path, fileName);
                 File dir = new File(path);
                 // warn:需要判断文件是否存在，不存在时，不能删除
                 try {
@@ -151,8 +137,7 @@ public class DbfFileWriter
                     throw AddaxException
                             .asAddaxException(
                                     DbfFileWriterErrorCode.WRITE_FILE_ERROR,
-                                    String.format("您配置的目录清空时出现空指针异常 : [%s]",
-                                            path), npe);
+                                    String.format("您配置的目录清空时出现空指针异常 : [%s]", path), npe);
                 }
                 catch (IllegalArgumentException iae) {
                     throw AddaxException.asAddaxException(
@@ -171,8 +156,7 @@ public class DbfFileWriter
                 }
             }
             else if ("append".equals(writeMode)) {
-                LOG.info("由于您配置了writeMode append, 写入前不做清理工作, [{}] 目录下写入相应文件名前缀 [{}] 的文件",
-                                path, fileName);
+                LOG.info("由于您配置了writeMode append, 写入前不做清理工作, [{}] 目录下写入相应文件名前缀 [{}] 的文件", path, fileName);
             }
             else if ("nonConflict".equals(writeMode)) {
                 LOG.info("由于您配置了writeMode nonConflict, 开始检查 [{}] 下面的内容", path);
@@ -184,9 +168,7 @@ public class DbfFileWriter
                             throw AddaxException
                                     .asAddaxException(
                                             DbfFileWriterErrorCode.ILLEGAL_VALUE,
-                                            String.format(
-                                                    "您配置的path: [%s] 不是一个合法的目录, 请您注意文件重名, 不合法目录名等情况.",
-                                                    path));
+                                            String.format("您配置的path: [%s] 不是一个合法的目录, 请您注意文件重名, 不合法目录名等情况.", path));
                         }
                         // fileName is not null
                         FilenameFilter filter = new PrefixFileFilter(fileName);
@@ -202,9 +184,7 @@ public class DbfFileWriter
                             throw AddaxException
                                     .asAddaxException(
                                             DbfFileWriterErrorCode.ILLEGAL_VALUE,
-                                            String.format(
-                                                    "您配置的path: [%s] 目录不为空, 下面存在其他文件或文件夹.",
-                                                    path));
+                                            String.format("您配置的path: [%s] 目录不为空, 下面存在其他文件或文件夹.", path));
                         }
                     }
                     else {
@@ -213,9 +193,7 @@ public class DbfFileWriter
                             throw AddaxException
                                     .asAddaxException(
                                             DbfFileWriterErrorCode.CONFIG_INVALID_EXCEPTION,
-                                            String.format(
-                                                    "您指定的文件路径 : [%s] 创建失败.",
-                                                    path));
+                                            String.format("您指定的文件路径 : [%s] 创建失败.", path));
                         }
                     }
                 }
@@ -229,9 +207,7 @@ public class DbfFileWriter
                 throw AddaxException
                         .asAddaxException(
                                 DbfFileWriterErrorCode.ILLEGAL_VALUE,
-                                String.format(
-                                        "仅支持 truncate, append, nonConflict 三种模式, 不支持您配置的 writeMode 模式 : [%s]",
-                                        writeMode));
+                                String.format("仅支持 truncate, append, nonConflict 三种模式, 不支持您配置的 writeMode 模式 : [%s]", writeMode));
             }
 
             // check column configuration is valid or not
@@ -273,8 +249,7 @@ public class DbfFileWriter
         {
             LOG.info("begin do split...");
             List<Configuration> writerSplitConfigs = new ArrayList<>();
-            String filePrefix = this.writerSliceConfig
-                    .getString(Key.FILE_NAME);
+            String filePrefix = this.writerSliceConfig.getString(Key.FILE_NAME);
 
             Set<String> allFiles;
             String path = null;
@@ -293,8 +268,7 @@ public class DbfFileWriter
             for (int i = 0; i < mandatoryNumber; i++) {
                 // handle same file name
 
-                Configuration splitedTaskConfig = this.writerSliceConfig
-                        .clone();
+                Configuration splitedTaskConfig = this.writerSliceConfig.clone();
 
                 String fullFileName;
                 if (mandatoryNumber > 1) {
@@ -311,11 +285,9 @@ public class DbfFileWriter
                 }
                 allFiles.add(fullFileName);
 
-                splitedTaskConfig
-                        .set(Key.FILE_NAME,
-                                fullFileName);
+                splitedTaskConfig.set(Key.FILE_NAME, fullFileName);
 
-                LOG.info("splited write file name:[{}]", fullFileName);
+                LOG.info("split write file name:[{}]", fullFileName);
 
                 writerSplitConfigs.add(splitedTaskConfig);
             }
@@ -340,8 +312,7 @@ public class DbfFileWriter
         {
             this.writerSliceConfig = this.getPluginJobConf();
             this.path = this.writerSliceConfig.getString(Key.PATH);
-            this.fileName = this.writerSliceConfig
-                    .getString(Key.FILE_NAME);
+            this.fileName = this.writerSliceConfig.getString(Key.FILE_NAME);
         }
 
         @Override
@@ -353,7 +324,7 @@ public class DbfFileWriter
         @Override
         public void startWrite(RecordReceiver lineReceiver)
         {
-            LOG.info("begin do write...");
+            LOG.info("begin to write...");
             String fileFullPath = this.buildFilePath();
             LOG.info("write to file : [{}]", fileFullPath);
             List<Configuration> columns = this.writerSliceConfig.getListConfiguration(Key.COLUMN);
@@ -368,7 +339,7 @@ public class DbfFileWriter
                 for (int i = 0; i < columns.size(); i++) {
                     fields[i] = new DBFField();
                     fields[i].setName(columns.get(i).getString(Key.NAME));
-                    switch (columns.get(i).getString(Key.TYPE)) {
+                    switch (columns.get(i).getString(Key.TYPE).toLowerCase()) {
                         case "char":
                             fields[i].setType(DBFDataType.CHARACTER);
                             fields[i].setLength(columns.get(i).getInt(Key.LENGTH));
@@ -385,7 +356,7 @@ public class DbfFileWriter
                             fields[i].setType(DBFDataType.LOGICAL);
                             break;
                         default:
-                            LOG.warn("data type not find, convert it to char");
+                            LOG.warn("Unknown data type, assume char type");
                             fields[i].setType(DBFDataType.CHARACTER);
                             fields[i].setLength(columns.get(i).getInt(Key.LENGTH));
                             break;
@@ -400,7 +371,7 @@ public class DbfFileWriter
                     Column column;
                     for (int i = 0; i < columns.size(); i++) {
                         column = record.getColumn(i);
-                        if (null != column.getRawData()) {
+                        if (column != null && null != column.getRawData()) {
                             String colData = column.getRawData().toString();
                             switch (columns.get(i).getString(Key.TYPE)) {
                                 case "numeric":
@@ -431,7 +402,7 @@ public class DbfFileWriter
                         DbfFileWriterErrorCode.SECURITY_NOT_ENOUGH,
                         String.format("您没有权限创建文件  : [%s]", this.fileName));
             }
-            LOG.info("end do write");
+            LOG.info("end write");
         }
 
         private String buildFilePath()
@@ -439,12 +410,10 @@ public class DbfFileWriter
             boolean isEndWithSeparator = false;
             switch (IOUtils.DIR_SEPARATOR) {
                 case IOUtils.DIR_SEPARATOR_UNIX:
-                    isEndWithSeparator = this.path.endsWith(String
-                            .valueOf(IOUtils.DIR_SEPARATOR));
+                    isEndWithSeparator = this.path.endsWith(String.valueOf(IOUtils.DIR_SEPARATOR));
                     break;
                 case IOUtils.DIR_SEPARATOR_WINDOWS:
-                    isEndWithSeparator = this.path.endsWith(String
-                            .valueOf(IOUtils.DIR_SEPARATOR_WINDOWS));
+                    isEndWithSeparator = this.path.endsWith(String.valueOf(IOUtils.DIR_SEPARATOR_WINDOWS));
                     break;
                 default:
                     break;

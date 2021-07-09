@@ -19,9 +19,9 @@
         </dependency>
 
         <dependency>
-            <groupId>org.jamel.dbf</groupId>
-            <artifactId>dbf-reader</artifactId>
-            <version>0.3.0</version>
+            <groupId>com.github.albfernandez</groupId>
+            <artifactId>javadbf</artifactId>
+            <version>1.13.1</version>
         </dependency>
 
         <dependency>
