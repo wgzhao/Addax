@@ -29,7 +29,7 @@
         <dependency>
             <groupId>com.moilioncircle</groupId>
             <artifactId>redis-replicator</artifactId>
-            <version>3.5.4</version>
+            <version>3.5.5</version>
             <exclusions>
                 <exclusion>
                     <groupId>org.slf4j</groupId>
