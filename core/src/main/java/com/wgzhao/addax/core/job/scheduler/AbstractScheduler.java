@@ -58,12 +58,12 @@ public abstract class AbstractScheduler
         Validate.notNull(configurations,
                 "scheduler配置不能为空");
         int jobReportIntervalInMillSec = configurations.get(0).getInt(
-                CoreConstant.ADDAX_CORE_CONTAINER_JOB_REPORTINTERVAL, 30000);
+                CoreConstant.CORE_CONTAINER_JOB_REPORT_INTERVAL, 30000);
         int jobSleepIntervalInMillSec = configurations.get(0).getInt(
-                CoreConstant.ADDAX_CORE_CONTAINER_JOB_SLEEPINTERVAL, 10000);
+                CoreConstant.CORE_CONTAINER_JOB_SLEEP_INTERVAL, 10000);
 
         this.jobId = configurations.get(0).getLong(
-                CoreConstant.ADDAX_CORE_CONTAINER_JOB_ID);
+                CoreConstant.CORE_CONTAINER_JOB_ID);
 
         ErrorRecordChecker errorLimit = new ErrorRecordChecker(configurations.get(0));
 
@@ -144,7 +144,7 @@ public abstract class AbstractScheduler
         int totalTasks = 0;
         for (Configuration taskGroupConfiguration : configurations) {
             totalTasks += taskGroupConfiguration.getListConfiguration(
-                    CoreConstant.ADDAX_JOB_CONTENT).size();
+                    CoreConstant.JOB_CONTENT).size();
         }
         return totalTasks;
     }

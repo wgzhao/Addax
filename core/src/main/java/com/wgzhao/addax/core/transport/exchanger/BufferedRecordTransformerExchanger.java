@@ -66,17 +66,17 @@ public class BufferedRecordTransformerExchanger
         Configuration configuration = channel.getConfiguration();
 
         this.bufferSize = configuration
-                .getInt(CoreConstant.ADDAX_CORE_TRANSPORT_EXCHANGER_BUFFERSIZE);
+                .getInt(CoreConstant.CORE_TRANSPORT_EXCHANGER_BUFFER_SIZE);
         this.buffer = new ArrayList<>(bufferSize);
 
         //channel的queue默认大小为8M，原来为64M
         this.byteCapacity = configuration.getInt(
-                CoreConstant.ADDAX_CORE_TRANSPORT_CHANNEL_CAPACITY_BYTE, 8 * 1024 * 1024);
+                CoreConstant.CORE_TRANSPORT_CHANNEL_CAPACITY_BYTE, 8 * 1024 * 1024);
 
         try {
             BufferedRecordTransformerExchanger.RECORD_CLASS = ((Class<? extends Record>) Class
                     .forName(configuration.getString(
-                            CoreConstant.ADDAX_CORE_TRANSPORT_RECORD_CLASS,
+                            CoreConstant.CORE_TRANSPORT_RECORD_CLASS,
                             "com.wgzhao.addax.core.transport.record.DefaultRecord")));
         }
         catch (Exception e) {

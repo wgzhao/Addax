@@ -26,7 +26,6 @@ import com.wgzhao.addax.common.statistics.PerfTrace;
 import com.wgzhao.addax.common.statistics.VMInfo;
 import com.wgzhao.addax.common.util.Configuration;
 import com.wgzhao.addax.core.job.JobContainer;
-import com.wgzhao.addax.core.taskgroup.TaskGroupContainer;
 import com.wgzhao.addax.core.util.ConfigParser;
 import com.wgzhao.addax.core.util.ConfigurationValidate;
 import com.wgzhao.addax.core.util.FrameworkErrorCode;
@@ -64,46 +63,19 @@ public class Engine
          */
         LoadUtil.bind(allConf);
 
-        boolean isJob = !("taskGroup".equalsIgnoreCase(allConf
-                .getString(CoreConstant.ADDAX_CORE_CONTAINER_MODEL)));
         //JobContainer会在schedule后再行进行设置和调整值
         int channelNumber = 0;
         AbstractContainer container;
         long instanceId;
-        int taskGroupId = -1;
-        if (isJob) {
-            allConf.set(CoreConstant.ADDAX_CORE_CONTAINER_JOB_MODE, "standalone");
-            container = new JobContainer(allConf);
-            instanceId = allConf.getLong(
-                    CoreConstant.ADDAX_CORE_CONTAINER_JOB_ID, 0);
-        }
-        else {
-            container = new TaskGroupContainer(allConf);
-            instanceId = allConf.getLong(
-                    CoreConstant.ADDAX_CORE_CONTAINER_JOB_ID);
-            taskGroupId = allConf.getInt(
-                    CoreConstant.ADDAX_CORE_CONTAINER_TASKGROUP_ID);
-            channelNumber = allConf.getInt(
-                    CoreConstant.ADDAX_CORE_CONTAINER_TASKGROUP_CHANNEL);
-        }
+        allConf.set(CoreConstant.CORE_CONTAINER_JOB_MODE, "standalone");
+        container = new JobContainer(allConf);
+        instanceId = allConf.getLong(CoreConstant.CORE_CONTAINER_JOB_ID, 0);
 
-        //缺省打开perfTrace
-        boolean traceEnable = allConf.getBool(CoreConstant.ADDAX_CORE_CONTAINER_TRACE_ENABLE,
-                false);
-        boolean perfReportEnable = allConf.getBool(CoreConstant.ADDAX_CORE_REPORT_ADDAX_PERFLOG,
-                false);
 
-        //standlone模式的datax shell任务不进行汇报
-        if (instanceId == -1) {
-            perfReportEnable = false;
-        }
-
-        int priority = 0;
-
-        Configuration jobInfoConfig = allConf.getConfiguration(CoreConstant.ADDAX_JOB_JOBINFO);
+        Configuration jobInfoConfig = allConf.getConfiguration(CoreConstant.JOB_JOB_INFO);
         //初始化PerfTrace
-        PerfTrace perfTrace = PerfTrace.getInstance(isJob, instanceId, taskGroupId, priority, traceEnable);
-        perfTrace.setJobInfo(jobInfoConfig, perfReportEnable, channelNumber);
+        PerfTrace perfTrace = PerfTrace.getInstance(true, instanceId, -1, 0, false);
+        perfTrace.setJobInfo(jobInfoConfig, false, channelNumber);
         container.start();
     }
 
@@ -137,8 +109,8 @@ public class Engine
     {
         Options options = new Options();
         options.addOption("job", true, "Job config.");
-        options.addOption("jobid", true, "Job unique id.");
-        options.addOption("mode", true, "Job runtime mode.");
+//        options.addOption("jobid", true, "Job unique id.");
+//        options.addOption("mode", true, "Job runtime mode.");
 
         try {
             DefaultParser parser = new DefaultParser();
@@ -148,9 +120,9 @@ public class Engine
 
             Configuration configuration = ConfigParser.parse(jobPath);
             // jobid 默认值为-1
-            configuration.set(CoreConstant.ADDAX_CORE_CONTAINER_JOB_ID, -1);
+            configuration.set(CoreConstant.CORE_CONTAINER_JOB_ID, -1);
             // 默认运行模式
-            configuration.set(CoreConstant.ADDAX_CORE_CONTAINER_JOB_MODE, "standalone");
+            configuration.set(CoreConstant.CORE_CONTAINER_JOB_MODE, "standalone");
 
             //打印vmInfo
             VMInfo vmInfo = VMInfo.getVmInfo();
@@ -180,19 +152,21 @@ public class Engine
             final Properties properties = new Properties();
             properties.load(Engine.class.getClassLoader().getResourceAsStream("project.properties"));
             return properties.getProperty("version");
-        } catch (IOException e) {
+        }
+        catch (IOException e) {
             return null;
         }
     }
 
     public static void main(String[] args)
     {
-        LOG.info("DataX version {}", Engine.getVersion());
+        LOG.info("Addax version {}", Engine.getVersion());
         int exitCode = 0;
         if (args.length < 2) {
             LOG.error("need a job file");
             System.exit(1);
         }
+
         try {
             Engine.entry(args);
         }
@@ -203,7 +177,8 @@ public class Engine
                 FrameworkErrorCode tempErrorCode = (FrameworkErrorCode) errorCode;
                 exitCode = tempErrorCode.toExitValue();
                 System.exit(exitCode);
-            } else {
+            }
+            else {
                 System.exit(99);
             }
         }

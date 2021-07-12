@@ -130,9 +130,9 @@ def result_analyse():
 
     for idx in ADDAX_JOBDICT:
         item = ADDAX_JOBDICT[idx]
-        item['uuid'] = idx;
+        item['uuid'] = idx
         item['cost'] = item['done'] - item['wake']
-        tasklist.append(item);
+        tasklist.append(item)
 
         if (not (item['host'] in hostsmap)):
             hostsmap[item['host']] = 1

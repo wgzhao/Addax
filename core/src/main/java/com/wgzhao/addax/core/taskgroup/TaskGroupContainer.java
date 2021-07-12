@@ -94,14 +94,14 @@ public class TaskGroupContainer
         initCommunicator(configuration);
 
         this.jobId = this.configuration.getLong(
-                CoreConstant.ADDAX_CORE_CONTAINER_JOB_ID);
+                CoreConstant.CORE_CONTAINER_JOB_ID);
         this.taskGroupId = this.configuration.getInt(
-                CoreConstant.ADDAX_CORE_CONTAINER_TASKGROUP_ID);
+                CoreConstant.CORE_CONTAINER_TASK_GROUP_ID);
 
         this.channelClazz = this.configuration.getString(
-                CoreConstant.ADDAX_CORE_TRANSPORT_CHANNEL_CLASS);
+                CoreConstant.CORE_TRANSPORT_CHANNEL_CLASS);
         this.taskCollectorClass = this.configuration.getString(
-                CoreConstant.ADDAX_CORE_STATISTICS_COLLECTOR_PLUGIN_TASKCLASS);
+                CoreConstant.CORE_STATISTICS_COLLECTOR_PLUGIN_TASK_CLASS);
     }
 
     private void initCommunicator(Configuration configuration)
@@ -126,33 +126,24 @@ public class TaskGroupContainer
 
             // 状态check时间间隔，较短，可以把任务及时分发到对应channel中
             int sleepIntervalInMillSec = this.configuration.getInt(
-                    CoreConstant.ADDAX_CORE_CONTAINER_TASKGROUP_SLEEPINTERVAL, 100);
+                    CoreConstant.CORE_CONTAINER_TASK_GROUP_SLEEP_INTERVAL, 100);
 
             // 状态汇报时间间隔，稍长，避免大量汇报
-            long reportIntervalInMillSec = this.configuration.getLong(
-                    CoreConstant.ADDAX_CORE_CONTAINER_TASKGROUP_REPORTINTERVAL,
-                    10000);
-
-            // 2分钟汇报一次性能统计
+            long reportIntervalInMillSec = this.configuration.getLong(CoreConstant.CORE_CONTAINER_TASK_GROUP_REPORT_INTERVAL, 10000);
 
             // 获取channel数目
-            int channelNumber = this.configuration.getInt(
-                    CoreConstant.ADDAX_CORE_CONTAINER_TASKGROUP_CHANNEL);
+            int channelNumber = this.configuration.getInt(CoreConstant.CORE_CONTAINER_TASK_GROUP_CHANNEL);
 
-            int taskMaxRetryTimes = this.configuration.getInt(
-                    CoreConstant.ADDAX_CORE_CONTAINER_TASK_FAILOVER_MAXRETRYTIMES, 1);
+            int taskMaxRetryTimes = this.configuration.getInt(CoreConstant.CORE_CONTAINER_TASK_FAIL_OVER_MAX_RETRY_TIMES, 1);
 
-            long taskRetryIntervalInMsec = this.configuration.getLong(
-                    CoreConstant.ADDAX_CORE_CONTAINER_TASK_FAILOVER_RETRYINTERVALINMSEC, 10000);
+            long taskRetryIntervalInMsec = this.configuration.getLong(CoreConstant.CORE_CONTAINER_TASK_FAIL_OVER_RETRY_INTERVAL_IN_MSEC, 10000);
 
-            long taskMaxWaitInMsec = this.configuration.getLong(CoreConstant.ADDAX_CORE_CONTAINER_TASK_FAILOVER_MAXWAITINMSEC, 60000);
+            long taskMaxWaitInMsec = this.configuration.getLong(CoreConstant.CORE_CONTAINER_TASK_FAIL_OVER_MAX_WAIT_IN_MSEC, 60000);
 
-            List<Configuration> taskConfigs = this.configuration
-                    .getListConfiguration(CoreConstant.ADDAX_JOB_CONTENT);
+            List<Configuration> taskConfigs = this.configuration.getListConfiguration(CoreConstant.JOB_CONTENT);
 
             if (LOG.isDebugEnabled()) {
-                LOG.debug("taskGroup[{}]'s task configs[{}]", this.taskGroupId,
-                        JSON.toJSONString(taskConfigs));
+                LOG.debug("taskGroup[{}]'s task configs[{}]", this.taskGroupId, JSON.toJSONString(taskConfigs));
             }
 
             int taskCountInThisTaskGroup = taskConfigs.size();

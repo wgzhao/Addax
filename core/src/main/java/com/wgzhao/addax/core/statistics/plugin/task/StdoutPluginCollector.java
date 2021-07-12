@@ -53,7 +53,7 @@ public class StdoutPluginCollector
         super(configuration, communication, type);
         maxLogNum = new AtomicInteger(
                 configuration.getInt(
-                        CoreConstant.ADDAX_CORE_STATISTICS_COLLECTOR_PLUGIN_MAXDIRTYNUM,
+                        CoreConstant.CORE_STATISTICS_COLLECTOR_PLUGIN_MAX_DIRTY_NUMBER,
                         DEFAULT_MAX_DIRTYNUM));
     }
 

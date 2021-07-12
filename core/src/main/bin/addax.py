@@ -48,8 +48,7 @@ DEFAULT_JVM = "-Xms64m -Xmx2g -XX:+HeapDumpOnOutOfMemoryError -XX:HeapDumpPath={
 DEFAULT_PROPERTY_CONF = "%s -Dlogback.statusListenerClass=ch.qos.logback.core.status.NopStatusListener \
                         -Djava.security.egd=file:///dev/urandom -Daddax.home=%s -Dlogback.configurationFile=%s " % \
                         (CODING, ADDAX_HOME, LOGBACK_FILE)
-ENGINE_COMMAND = "java -server ${jvm} %s -classpath %s  ${params} com.wgzhao.addax.core.Engine \
-                -mode ${mode} -jobid ${jobid} -job ${job}" % \
+ENGINE_COMMAND = "java -server ${jvm} %s -classpath %s  ${params} com.wgzhao.addax.core.Engine -job ${job}" % \
                  (DEFAULT_PROPERTY_CONF, CLASS_PATH)
 REMOTE_DEBUG_CONFIG = "-Xdebug -Xrunjdwp:transport=dt_socket,server=y,address=9999"
 
@@ -88,92 +87,24 @@ def getOptionParser():
     parser.add_option("-v", "--version", action="store_true",
                       help="Print version and exit")
 
-    prodEnvOptionGroup = OptionGroup(parser, "Product Env Options",
-                                     "Normal user use these options to set jvm parameters, job runtime mode etc. "
-                                     "Make sure these options can be used in Product Env.")
-    prodEnvOptionGroup.add_option("-j", "--jvm", metavar="<jvm parameters>", dest="jvmParameters", action="store",
+    parser.add_option("-j", "--jvm", metavar="<jvm parameters>", dest="jvmParameters", action="store",
                                   help="Set jvm parameters if necessary.")
-    prodEnvOptionGroup.add_option("--jobid", metavar="<job unique id>", dest="jobid", action="store", default="-1",
-                                  help="Set job unique id when running by Distribute/Local Mode.")
-    prodEnvOptionGroup.add_option("-m", "--mode", metavar="<job runtime mode>",
-                                  action="store", default="standalone",
-                                  help="Set job runtime mode such as: standalone, local, distribute. "
-                                       "Default mode is standalone.")
-    prodEnvOptionGroup.add_option("-p", "--params", metavar="<parameter used in job config>",
+    parser.add_option("-p", "--params", metavar="<parameter used in job config>",
                                   action="store", dest="params",
                                   help='Set job parameter, eg: the source tableName you want to set it by command, '
                                        'then you can use like this: -p"-DtableName=your-table-name", '
-                                       'if you have mutiple parameters: -p"-DtableName=your-table-name -DcolumnName=your-column-name".'
+                                       'if you have multiple parameters: -p"-DtableName=your-table-name -DcolumnName=your-column-name".'
                                        'Note: you should config in you job tableName with ${tableName}.')
-    prodEnvOptionGroup.add_option("-r", "--reader", metavar="<parameter used in view job config[reader] template>",
-                                  action="store", dest="reader", type="string",
-                                  help='View job config[reader] template, eg: mysqlreader,streamreader')
-    prodEnvOptionGroup.add_option("-w", "--writer", metavar="<parameter used in view job config[writer] template>",
-                                  action="store", dest="writer", type="string",
-                                  help='View job config[writer] template, eg: mysqlwriter,streamwriter')
-    prodEnvOptionGroup.add_option("-l", "--logdir", metavar="<log directory>",
+    parser.add_option("-l", "--logdir", metavar="<log directory>",
                                   action="store", dest="logdir", type="string",
                                   help="the directory which log writes to",
                                   default=ADDAX_HOME + os.sep + 'log')
-    parser.add_option_group(prodEnvOptionGroup)
 
-    devEnvOptionGroup = OptionGroup(parser, "Develop/Debug Options",
-                                    "Developer use these options to trace more details of DataX.")
-    devEnvOptionGroup.add_option("-d", "--debug", dest="remoteDebug", action="store_true",
+    parser.add_option("-d", "--debug", dest="remoteDebug", action="store_true",
                                  help="Set to remote debug mode.")
-    devEnvOptionGroup.add_option("--loglevel", metavar="<log level>", dest="loglevel", action="store",
+    parser.add_option("--loglevel", metavar="<log level>", dest="loglevel", action="store",
                                  default="info", help="Set log level such as: debug, info, all etc.")
-    parser.add_option_group(devEnvOptionGroup)
     return parser
-
-
-def generateJobConfigTemplate(reader, writer):
-    readerRef = "Please refer to the document:\n\thttps://addax.readthedocs.io/zh_CN/latest/reader/{}.html\n".format(
-        reader)
-    writerRef = "Please refer to the document:\n\thttps://addax.readthedocs.io/zh_CN/latest/writer/{}.html\n".format(
-        writer)
-    print(readerRef, writerRef)
-    jobGuid = 'Please save the following configuration as a json file and  use\n     python {ADDAX_HOME}/bin/addax.py {JSON_FILE_NAME}.json \nto run the job.\n'
-    print(jobGuid)
-    jobTemplate = {
-        "job": {
-            "setting": {
-                "speed": {
-                    "channel": ""
-                }
-            },
-            "content": [
-                {
-                    "reader": {},
-                    "writer": {}
-                }
-            ]
-        }
-    }
-    readerTemplatePath = os.path.join(
-        ADDAX_HOME, "plugin", "reader", reader, "plugin_job_template.json")
-    writerTemplatePath = os.path.join(
-        ADDAX_HOME, "plugin", "writer", writer, "plugin_job_template.json")
-    readerPar = None
-    writerPar = None
-    try:
-        readerPar = readPluginTemplate(readerTemplatePath)
-    except Exception as e:
-        print("Read reader[%s] template error: can\'t find file %s" % (
-            reader, readerTemplatePath))
-    try:
-        writerPar = readPluginTemplate(writerTemplatePath)
-    except Exception as e:
-        print("Read writer[{}] template error: : can\'t find file {}: {}".format(
-            writer, writerTemplatePath, e))
-    jobTemplate['job']['content'][0]['reader'] = readerPar
-    jobTemplate['job']['content'][0]['writer'] = writerPar
-    print(json.dumps(jobTemplate, indent=4, sort_keys=True))
-
-
-def readPluginTemplate(plugin):
-    with open(plugin, 'r') as f:
-        return json.load(f)
 
 
 def isUrl(path):
@@ -201,9 +132,6 @@ def buildStartCommand(options, args):
         tempJVMCommand = tempJVMCommand + " " + \
             ("-Dloglevel=%s" % (options.loglevel))
 
-    if options.mode:
-        commandMap["mode"] = options.mode
-
     # jobResource may be url , or local file(ralative, absolution)
     jobResource = args[0]
     if not isUrl(jobResource):
@@ -221,9 +149,6 @@ def buildStartCommand(options, args):
     if options.params:
         jobParams = jobParams + " " + options.params
 
-    if options.jobid:
-        commandMap["jobid"] = options.jobid
-
     commandMap["jvm"] = tempJVMCommand
     commandMap["params"] = jobParams
     commandMap["job"] = jobResource
@@ -237,9 +162,6 @@ if __name__ == "__main__":
         print(ADDAX_VERSION)
         sys.exit(0)
 
-    if options.reader is not None and options.writer is not None:
-        generateJobConfigTemplate(options.reader, options.writer)
-        sys.exit(RET_STATE['OK'])
     if len(args) != 1:
         parser.print_help()
         sys.exit(RET_STATE['FAIL'])

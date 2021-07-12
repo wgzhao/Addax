@@ -54,7 +54,7 @@ public class TransformerRegistry
     public static void loadTransformerFromLocalStorage(List<String> transformers)
     {
 
-        String[] paths = new File(CoreConstant.ADDAX_STORAGE_TRANSFORMER_HOME).list();
+        String[] paths = new File(CoreConstant.STORAGE_TRANSFORMER_HOME).list();
         if (null == paths) {
             return;
         }
@@ -74,7 +74,7 @@ public class TransformerRegistry
 
     public static void loadTransformer(String each)
     {
-        String transformerPath = CoreConstant.ADDAX_STORAGE_TRANSFORMER_HOME + File.separator + each;
+        String transformerPath = CoreConstant.STORAGE_TRANSFORMER_HOME + File.separator + each;
         Configuration transformerConfiguration;
         try {
             transformerConfiguration = loadTransFormerConfig(transformerPath);

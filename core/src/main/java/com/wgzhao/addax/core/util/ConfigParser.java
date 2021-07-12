@@ -51,18 +51,18 @@ public final class ConfigParser
         Configuration configuration = ConfigParser.parseJobConfig(jobPath);
 
         configuration.merge(
-                ConfigParser.parseCoreConfig(CoreConstant.ADDAX_CONF_PATH),
+                ConfigParser.parseCoreConfig(CoreConstant.CONF_PATH),
                 false);
         String readerPluginName = configuration.getString(
-                CoreConstant.ADDAX_JOB_CONTENT_READER_NAME);
+                CoreConstant.JOB_CONTENT_READER_NAME);
         String writerPluginName = configuration.getString(
-                CoreConstant.ADDAX_JOB_CONTENT_WRITER_NAME);
+                CoreConstant.JOB_CONTENT_WRITER_NAME);
 
         String preHandlerName = configuration.getString(
-                CoreConstant.ADDAX_JOB_PREHANDLER_PLUGINNAME);
+                CoreConstant.JOB_PRE_HANDLER_PLUGIN_NAME);
 
         String postHandlerName = configuration.getString(
-                CoreConstant.ADDAX_JOB_POSTHANDLER_PLUGINNAME);
+                CoreConstant.JOB_POST_HANDLER_PLUGIN_NAME);
 
         Set<String> pluginList = new HashSet<>();
         pluginList.add(readerPluginName);
@@ -114,9 +114,9 @@ public final class ConfigParser
 
         if (isJobResourceFromHttp) {
             //设置httpclient的 HTTP_TIMEOUT_INMILLIONSECONDS
-            Configuration coreConfig = ConfigParser.parseCoreConfig(CoreConstant.ADDAX_CONF_PATH);
+            Configuration coreConfig = ConfigParser.parseCoreConfig(CoreConstant.CONF_PATH);
             int httpTimeOutInMillionSeconds = coreConfig.getInt(
-                    CoreConstant.ADDAX_CORE_DATAXSERVER_TIMEOUT, 5000);
+                    CoreConstant.CORE_SERVER_TIMEOUT_SEC, 5) * 1000;
             HttpClientUtil.setHttpTimeoutInMillionSeconds(httpTimeOutInMillionSeconds);
 
             HttpClientUtil httpClientUtil = new HttpClientUtil();
@@ -158,7 +158,7 @@ public final class ConfigParser
         Set<String> replicaCheckPluginSet = new HashSet<>();
         int complete = 0;
         for (String each : ConfigParser
-                .getDirAsList(CoreConstant.ADDAX_PLUGIN_READER_HOME)) {
+                .getDirAsList(CoreConstant.PLUGIN_READER_HOME)) {
             Configuration eachReaderConfig = ConfigParser.parseOnePluginConfig(each,
                     "reader", replicaCheckPluginSet, wantPluginNames);
             if (eachReaderConfig != null) {
@@ -168,7 +168,7 @@ public final class ConfigParser
         }
 
         for (String each : ConfigParser
-                .getDirAsList(CoreConstant.ADDAX_PLUGIN_WRITER_HOME)) {
+                .getDirAsList(CoreConstant.PLUGIN_WRITER_HOME)) {
             Configuration eachWriterConfig = ConfigParser.parseOnePluginConfig(each,
                     "writer", replicaCheckPluginSet, wantPluginNames);
             if (eachWriterConfig != null) {
