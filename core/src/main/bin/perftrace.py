@@ -15,8 +15,6 @@ import signal
 import time
 import subprocess
 from optparse import OptionParser
-reload(sys)
-sys.setdefaultencoding('utf8')
 
 ##begin cli & help logic
 def getOptionParser():
@@ -93,7 +91,7 @@ def printCopyright():
     ADDAX_VERSION = 'UNKNOWN_ADDAX_VERSION'
     print('''
 DataX Util Tools ({}), From Alibaba !
-Copyright (C) 2010-2016, Alibaba Group. All Rights Reserved.''').format(ADDAX_VERSION)
+Copyright (C) 2010-2016, Alibaba Group. All Rights Reserved.'''.format(ADDAX_VERSION))
     sys.stdout.flush()
 
 
@@ -315,7 +313,7 @@ def convert(options, args):
             traceJobJson = readJobJsonFromRemote(options.file)
         else:
             traceJobJson = readJobJsonFromLocal(options.file)
-        traceJobDict = parseJson(traceJobJson, '{} content'.format(options.file)
+        traceJobDict = parseJson(traceJobJson, '{} content'.format(options.file))
         attributeNotNone(traceJobDict, ['job'])
         attributeNotNone(traceJobDict['job'], ['content'])
         attributeNotNone(traceJobDict['job']['content'][0], ['reader', 'writer'])
@@ -376,7 +374,7 @@ if __name__ == "__main__":
     dataxJobPath = os.path.join(os.getcwd(), "perftrace-" + str(uuid.uuid1()))
     jobConfigOk = True
     if os.path.exists(dataxJobPath):
-        print("file already exists, truncate and rewrite it? {}".format(dataxJobPath)
+        print("file already exists, truncate and rewrite it? {}".format(dataxJobPath))
         if yesNoChoice():
             jobConfigOk = True
         else:
@@ -388,11 +386,11 @@ if __name__ == "__main__":
 
 
     print("trace environments:")
-    print("dataxJobPath:  {}").formatdataxJobPath)
+    print("dataxJobPath:  {}".format(dataxJobPath))
     dataxHomePath = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-    print("dataxHomePath: {}".format(dataxHomePath)
+    print("dataxHomePath: {}".format(dataxHomePath))
 
-    dataxCommand = "{} {}".format(os.path.join(dataxHomePath, "bin", "datax.py"), dataxJobPath)
+    dataxCommand = "{} {}".format(os.path.join(dataxHomePath, "bin", "addax.py"), dataxJobPath)
     print("dataxCommand:  {}".format(dataxCommand))
 
     returncode = fork(dataxCommand, True)

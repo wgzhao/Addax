@@ -58,11 +58,11 @@ public abstract class Channel
     {
         //channel的queue里默认record为1万条。原来为512条
         int capacity = configuration.getInt(
-                CoreConstant.ADDAX_CORE_TRANSPORT_CHANNEL_CAPACITY, 2048);
+                CoreConstant.CORE_TRANSPORT_CHANNEL_CAPACITY, 2048);
         long byteSpeed = configuration.getLong(
-                CoreConstant.ADDAX_CORE_TRANSPORT_CHANNEL_SPEED_BYTE, 1024 * 1024L);
+                CoreConstant.CORE_TRANSPORT_CHANNEL_SPEED_BYTE, 1024 * 1024L);
         long recordSpeed = configuration.getLong(
-                CoreConstant.ADDAX_CORE_TRANSPORT_CHANNEL_SPEED_RECORD, 10000L);
+                CoreConstant.CORE_TRANSPORT_CHANNEL_SPEED_RECORD, 10000L);
 
         if (capacity <= 0) {
             throw new IllegalArgumentException(String.format(
@@ -80,15 +80,15 @@ public abstract class Channel
         }
 
         this.taskGroupId = configuration.getInt(
-                CoreConstant.ADDAX_CORE_CONTAINER_TASKGROUP_ID);
+                CoreConstant.CORE_CONTAINER_TASK_GROUP_ID);
         this.capacity = capacity;
         this.byteSpeed = byteSpeed;
         this.recordSpeed = recordSpeed;
         this.flowControlInterval = configuration.getLong(
-                CoreConstant.ADDAX_CORE_TRANSPORT_CHANNEL_FLOWCONTROLINTERVAL, 1000);
+                CoreConstant.CORE_TRANSPORT_CHANNEL_FLOW_CONTROL_INTERVAL, 1000);
         //channel的queue默认大小为8M，原来为64M
         this.byteCapacity = configuration.getInt(
-                CoreConstant.ADDAX_CORE_TRANSPORT_CHANNEL_CAPACITY_BYTE, 8 * 1024 * 1024);
+                CoreConstant.CORE_TRANSPORT_CHANNEL_CAPACITY_BYTE, 8 * 1024 * 1024);
         this.configuration = configuration;
     }
 

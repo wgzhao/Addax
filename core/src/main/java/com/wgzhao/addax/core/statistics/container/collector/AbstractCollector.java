@@ -53,7 +53,7 @@ public abstract class AbstractCollector
     {
         for (Configuration config : taskGroupConfigurationList) {
             int taskGroupId = config.getInt(
-                    CoreConstant.ADDAX_CORE_CONTAINER_TASKGROUP_ID);
+                    CoreConstant.CORE_CONTAINER_TASK_GROUP_ID);
             LocalTGCommunicationManager.registerTaskGroupCommunication(taskGroupId, new Communication());
         }
     }

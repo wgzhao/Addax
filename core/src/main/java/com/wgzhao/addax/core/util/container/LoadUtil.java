@@ -70,7 +70,7 @@ public class LoadUtil
          * 具体pluginName，故使用pluginType.pluginName作为key放置在该map中
          */
         Long jobId = pluginConfigs.getLong(
-                CoreConstant.ADDAX_CORE_CONTAINER_JOB_ID);
+                CoreConstant.CORE_CONTAINER_JOB_ID);
         if (jobId == -1) {
             jobId = (long) 0;
         }

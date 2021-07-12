@@ -71,7 +71,7 @@ public class TransformerUtil
         /*
          * 延迟load 第三方插件的function，并按需load
          */
-        LOG.info(String.format(" user config tranformers [%s], loading...", functionNames));
+        LOG.info(String.format(" user config transformers [%s], loading...", functionNames));
         TransformerRegistry.loadTransformerFromLocalStorage(functionNames);
 
         int i = 0;
@@ -92,7 +92,7 @@ public class TransformerUtil
              * groovy function仅仅只有code
              */
             if (!"dx_groovy".equals(functionName) && !"dx_fackGroovy".equals(functionName)) {
-                Integer columnIndex = configuration.getInt(CoreConstant.TRANSFORMER_PARAMETER_COLUMNINDEX);
+                Integer columnIndex = configuration.getInt(CoreConstant.TRANSFORMER_PARAMETER_COLUMN_INDEX);
 
                 if (columnIndex == null) {
                     throw AddaxException.asAddaxException(TransformerErrorCode.TRANSFORMER_ILLEGAL_PARAMETER,
@@ -115,7 +115,7 @@ public class TransformerUtil
                 transformerExecutionParas.setCode(code);
 
                 List<String> extraPackage = configuration.getList(
-                        CoreConstant.TRANSFORMER_PARAMETER_EXTRAPACKAGE,
+                        CoreConstant.TRANSFORMER_PARAMETER_EXTRA_PACKAGE,
                         String.class);
                 if (extraPackage != null && !extraPackage.isEmpty()) {
                     transformerExecutionParas.setExtraPackage(extraPackage);

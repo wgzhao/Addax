@@ -44,14 +44,14 @@ public class JobReport
 
     private JobReport() {}
 
-    public static CloseableHttpAsyncClient getHttpClient()
+    public static CloseableHttpAsyncClient getHttpClient(int timeout)
     {
         if (client == null) {
             synchronized (JobReport.class) {
                 if (client == null) {
                     RequestConfig requestConfig = RequestConfig.custom()
-                            .setConnectTimeout(2000)//连接超时,连接建立时间,三次握手完成时间
-                            .setSocketTimeout(2000)//请求超时,数据传输过程中数据包之间间隔的最大时间
+                            .setConnectTimeout(timeout)//连接超时,连接建立时间,三次握手完成时间
+                            .setSocketTimeout(timeout)//请求超时,数据传输过程中数据包之间间隔的最大时间
                             .setConnectionRequestTimeout(20000)//使用连接池来管理连接,从连接池获取连接的超时时间
                             .build();
 

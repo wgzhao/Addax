@@ -55,7 +55,7 @@ public class RecordExchanger
         try {
             RecordExchanger.RECORD_CLASS = (Class<? extends Record>) Class
                     .forName(configuration.getString(
-                            CoreConstant.ADDAX_CORE_TRANSPORT_RECORD_CLASS,
+                            CoreConstant.CORE_TRANSPORT_RECORD_CLASS,
                             "com.wgzhao.addax.core.transport.record.DefaultRecord"));
         }
         catch (ClassNotFoundException e) {

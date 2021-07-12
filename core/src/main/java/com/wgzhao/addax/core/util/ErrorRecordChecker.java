@@ -44,8 +44,8 @@ public final class ErrorRecordChecker
 
     public ErrorRecordChecker(Configuration configuration)
     {
-        this(configuration.getLong(CoreConstant.ADDAX_JOB_SETTING_ERRORLIMIT_RECORD),
-                configuration.getDouble(CoreConstant.ADDAX_JOB_SETTING_ERRORLIMIT_PERCENT));
+        this(configuration.getLong(CoreConstant.JOB_SETTING_ERROR_LIMIT_RECORD),
+                configuration.getDouble(CoreConstant.JOB_SETTING_ERROR_LIMIT_PERCENTAGE));
     }
 
     public ErrorRecordChecker(Long rec, Double percentage)
