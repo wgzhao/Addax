@@ -10,6 +10,7 @@
     </parent>
 
     <artifactId>elasticsearchwriter</artifactId>
+    <name>elasticsearch-writer</name>
     <packaging>jar</packaging>
 
     <dependencies>

@@ -9,7 +9,7 @@
     </parent>
 
     <artifactId>clickhousewriter</artifactId>
-    <name>clickhousewriter</name>
+    <name>clickhouse-writer</name>
     <packaging>jar</packaging>
 
     <dependencies>
@@ -28,7 +28,7 @@
 
         <dependency>
             <groupId>com.wgzhao.addax</groupId>
-            <artifactId>plugin-rdbms-util</artifactId>
+            <artifactId>addax-rdbms</artifactId>
             <version>${project.version}</version>
         </dependency>
 

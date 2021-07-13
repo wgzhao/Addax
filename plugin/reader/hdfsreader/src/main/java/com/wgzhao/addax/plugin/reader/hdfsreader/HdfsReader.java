@@ -23,7 +23,7 @@ import com.wgzhao.addax.common.exception.AddaxException;
 import com.wgzhao.addax.common.plugin.RecordSender;
 import com.wgzhao.addax.common.spi.Reader;
 import com.wgzhao.addax.common.util.Configuration;
-import com.wgzhao.addax.plugin.storage.reader.StorageReaderUtil;
+import com.wgzhao.addax.storage.reader.StorageReaderUtil;
 import org.apache.commons.io.Charsets;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -34,11 +34,11 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 
-import static com.wgzhao.addax.plugin.storage.reader.Key.COLUMN;
-import static com.wgzhao.addax.plugin.storage.reader.Key.ENCODING;
-import static com.wgzhao.addax.plugin.storage.reader.Key.INDEX;
-import static com.wgzhao.addax.plugin.storage.reader.Key.TYPE;
-import static com.wgzhao.addax.plugin.storage.reader.Key.VALUE;
+import static com.wgzhao.addax.storage.reader.Key.COLUMN;
+import static com.wgzhao.addax.storage.reader.Key.ENCODING;
+import static com.wgzhao.addax.storage.reader.Key.INDEX;
+import static com.wgzhao.addax.storage.reader.Key.TYPE;
+import static com.wgzhao.addax.storage.reader.Key.VALUE;
 
 public class HdfsReader
         extends Reader

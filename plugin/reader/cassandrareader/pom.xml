@@ -9,7 +9,7 @@
     </parent>
 
     <artifactId>cassandrareader</artifactId>
-    <name>cassandrareader</name>
+    <name>cassandra-reader</name>
     <packaging>jar</packaging>
 
     <dependencies>

@@ -20,10 +20,10 @@
 package com.wgzhao.addax.plugin.writer.greenplumwriter;
 
 import com.wgzhao.addax.common.exception.AddaxException;
-import com.wgzhao.addax.plugin.rdbms.util.DBUtil;
-import com.wgzhao.addax.plugin.rdbms.util.DBUtilErrorCode;
-import com.wgzhao.addax.plugin.rdbms.util.DataBaseType;
-import com.wgzhao.addax.plugin.rdbms.writer.util.WriterUtil;
+import com.wgzhao.addax.rdbms.util.DBUtil;
+import com.wgzhao.addax.rdbms.util.DBUtilErrorCode;
+import com.wgzhao.addax.rdbms.util.DataBaseType;
+import com.wgzhao.addax.rdbms.writer.util.WriterUtil;
 import org.postgresql.copy.CopyManager;
 import org.postgresql.core.BaseConnection;
 import org.postgresql.util.PSQLException;

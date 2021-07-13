@@ -7,7 +7,7 @@
         <relativePath>../../../pom.xml</relativePath>
     </parent>
     <artifactId>httpreader</artifactId>
-    <name>httpreader</name>
+    <name>http-reader</name>
     <description>HTTPReader提供了读取指定HTTP服务接口的功能，并对返回的JSON内容进行解析</description>
     <packaging>jar</packaging>
 

@@ -11,6 +11,7 @@
     </parent>
 
     <artifactId>hbase20xsqlreader</artifactId>
+    <name>hbase20xsql-reader</name>
     <packaging>jar</packaging>
 
     <properties>
@@ -27,7 +28,7 @@
 
         <dependency>
             <groupId>com.wgzhao.addax</groupId>
-            <artifactId>plugin-rdbms-util</artifactId>
+            <artifactId>addax-rdbms</artifactId>
             <version>${project.version}</version>
             <scope>compile</scope>
         </dependency>

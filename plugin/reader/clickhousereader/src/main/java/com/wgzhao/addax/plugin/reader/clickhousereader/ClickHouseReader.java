@@ -22,9 +22,9 @@ package com.wgzhao.addax.plugin.reader.clickhousereader;
 import com.wgzhao.addax.common.plugin.RecordSender;
 import com.wgzhao.addax.common.spi.Reader;
 import com.wgzhao.addax.common.util.Configuration;
-import com.wgzhao.addax.plugin.rdbms.reader.CommonRdbmsReader;
-import com.wgzhao.addax.plugin.rdbms.reader.Constant;
-import com.wgzhao.addax.plugin.rdbms.util.DataBaseType;
+import com.wgzhao.addax.rdbms.reader.CommonRdbmsReader;
+import com.wgzhao.addax.rdbms.reader.Constant;
+import com.wgzhao.addax.rdbms.util.DataBaseType;
 
 import java.util.List;
 

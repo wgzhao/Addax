@@ -8,7 +8,7 @@
         <relativePath>../../../pom.xml</relativePath>
     </parent>
     <artifactId>elasticsearchreader</artifactId>
-    <name>elasticsearchreader</name>
+    <name>elasticsearch-reader</name>
     <description>Retrieve data from ElasticSearch</description>
     <packaging>jar</packaging>
 

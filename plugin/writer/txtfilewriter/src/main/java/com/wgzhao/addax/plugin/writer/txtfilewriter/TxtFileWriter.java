@@ -23,7 +23,7 @@ import com.wgzhao.addax.common.exception.AddaxException;
 import com.wgzhao.addax.common.plugin.RecordReceiver;
 import com.wgzhao.addax.common.spi.Writer;
 import com.wgzhao.addax.common.util.Configuration;
-import com.wgzhao.addax.plugin.storage.writer.StorageWriterUtil;
+import com.wgzhao.addax.storage.writer.StorageWriterUtil;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.io.filefilter.PrefixFileFilter;
@@ -43,10 +43,10 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Set;
 
-import static com.wgzhao.addax.plugin.storage.writer.Key.DATE_FORMAT;
-import static com.wgzhao.addax.plugin.storage.writer.Key.FILE_NAME;
-import static com.wgzhao.addax.plugin.storage.writer.Key.FORMAT;
-import static com.wgzhao.addax.plugin.storage.writer.Key.WRITE_MODE;
+import static com.wgzhao.addax.storage.writer.Key.DATE_FORMAT;
+import static com.wgzhao.addax.storage.writer.Key.FILE_NAME;
+import static com.wgzhao.addax.storage.writer.Key.FORMAT;
+import static com.wgzhao.addax.storage.writer.Key.WRITE_MODE;
 
 /**
  * Created by haiwei.luo on 14-9-17.

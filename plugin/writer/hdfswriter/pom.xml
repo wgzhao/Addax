@@ -11,7 +11,7 @@
     </parent>
 
     <artifactId>hdfswriter</artifactId>
-    <name>hdfswriter</name>
+    <name>hdfs-writer</name>
     <description>HdfsWriter提供了写入HDFS功能。</description>
     <packaging>jar</packaging>
 
@@ -35,7 +35,7 @@
 
         <dependency>
             <groupId>com.wgzhao.addax</groupId>
-            <artifactId>plugin-storage-util</artifactId>
+            <artifactId>addax-storage</artifactId>
             <version>${project.version}</version>
             <exclusions>
                 <exclusion>

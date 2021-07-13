@@ -7,7 +7,7 @@
         <relativePath>../../../pom.xml</relativePath>
     </parent>
     <artifactId>mysqlwriter</artifactId>
-    <name>mysqlwriter</name>
+    <name>mysql-writer</name>
     <packaging>jar</packaging>
 
     <dependencies>
@@ -24,7 +24,7 @@
         </dependency>
         <dependency>
             <groupId>com.wgzhao.addax</groupId>
-            <artifactId>plugin-rdbms-util</artifactId>
+            <artifactId>addax-rdbms</artifactId>
             <version>${project.version}</version>
         </dependency>
 
