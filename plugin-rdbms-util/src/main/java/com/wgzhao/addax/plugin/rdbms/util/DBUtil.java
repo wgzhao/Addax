@@ -283,8 +283,6 @@ public final class DBUtil {
             url = url.replace("inceptor2", "hive2");
             bds.setUrl(url);
             bds.setDriverClassName("org.apache.hive.jdbc.HiveDriver");
-        } else {
-            bds.setDriverClassName(dataBaseType.getDriverClassName());
         }
         try {
             bds.setMinIdle(2);
@@ -655,14 +653,12 @@ public final class DBUtil {
     public static void loadDriverClass(String pluginType, String pluginName) {
         try {
             String pluginJsonPath = StringUtils.join(
-                    new String[]{System.getProperty("datax.home"), "plugin",
+                    new String[]{System.getProperty("addax.home"), "plugin",
                             pluginType,
                             String.format("%s%s", pluginName, pluginType),
                             "plugin.json"}, File.separator);
-            Configuration configuration = Configuration.from(new File(
-                    pluginJsonPath));
-            List<String> drivers = configuration.getList("drivers",
-                    String.class);
+            Configuration configuration = Configuration.from(new File(pluginJsonPath));
+            List<String> drivers = configuration.getList("drivers", String.class);
             for (String driver : drivers) {
                 Class.forName(driver);
             }
