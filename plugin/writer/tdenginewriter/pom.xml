@@ -7,7 +7,7 @@
         <relativePath>../../../pom.xml</relativePath>
     </parent>
     <artifactId>tdenginewriter</artifactId>
-    <name>tdenginewriter</name>
+    <name>tdengine-writer</name>
     <packaging>jar</packaging>
 
     <dependencies>
@@ -24,7 +24,7 @@
         </dependency>
         <dependency>
             <groupId>com.wgzhao.addax</groupId>
-            <artifactId>plugin-rdbms-util</artifactId>
+            <artifactId>addax-rdbms</artifactId>
             <version>${project.version}</version>
         </dependency>
 

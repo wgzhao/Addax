@@ -21,8 +21,8 @@ package com.wgzhao.addax.plugin.reader.hbase20xsqlreader;
 
 import com.wgzhao.addax.common.exception.AddaxException;
 import com.wgzhao.addax.common.util.Configuration;
-import com.wgzhao.addax.plugin.rdbms.util.DBUtilErrorCode;
-import com.wgzhao.addax.plugin.rdbms.util.RdbmsRangeSplitWrap;
+import com.wgzhao.addax.rdbms.util.DBUtilErrorCode;
+import com.wgzhao.addax.rdbms.util.RdbmsRangeSplitWrap;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.apache.commons.lang3.tuple.Pair;

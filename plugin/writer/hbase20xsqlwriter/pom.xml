@@ -9,6 +9,7 @@
     </parent>
 
     <artifactId>hbase20xsqlwriter</artifactId>
+    <name>hbase20xsql-writer</name>
     <packaging>jar</packaging>
 
     <properties>

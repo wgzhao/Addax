@@ -9,7 +9,7 @@
     </parent>
 
     <artifactId>kudureader</artifactId>
-    <name>kudu reader plugin</name>
+    <name>kudu-reader</name>
     <packaging>jar</packaging>
 
     <dependencies>
@@ -28,7 +28,7 @@
 
         <dependency>
             <groupId>com.wgzhao.addax</groupId>
-            <artifactId>plugin-storage-util</artifactId>
+            <artifactId>addax-storage</artifactId>
             <version>${project.version}</version>
         </dependency>
 

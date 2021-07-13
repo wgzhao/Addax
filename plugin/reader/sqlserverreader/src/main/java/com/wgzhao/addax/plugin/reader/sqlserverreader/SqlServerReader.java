@@ -23,13 +23,13 @@ import com.wgzhao.addax.common.exception.AddaxException;
 import com.wgzhao.addax.common.plugin.RecordSender;
 import com.wgzhao.addax.common.spi.Reader;
 import com.wgzhao.addax.common.util.Configuration;
-import com.wgzhao.addax.plugin.rdbms.reader.CommonRdbmsReader;
-import com.wgzhao.addax.plugin.rdbms.util.DBUtilErrorCode;
-import com.wgzhao.addax.plugin.rdbms.util.DataBaseType;
+import com.wgzhao.addax.rdbms.reader.CommonRdbmsReader;
+import com.wgzhao.addax.rdbms.util.DBUtilErrorCode;
+import com.wgzhao.addax.rdbms.util.DataBaseType;
 
 import java.util.List;
 
-import static com.wgzhao.addax.plugin.rdbms.reader.Constant.FETCH_SIZE;
+import static com.wgzhao.addax.rdbms.reader.Constant.FETCH_SIZE;
 
 public class SqlServerReader
         extends Reader

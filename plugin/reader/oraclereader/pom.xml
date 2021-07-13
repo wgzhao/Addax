@@ -9,7 +9,7 @@
     </parent>
 
     <artifactId>oraclereader</artifactId>
-    <name>oraclereader</name>
+    <name>oracle-reader</name>
     <description>read data from Oracle Database</description>
     <packaging>jar</packaging>
 
@@ -29,7 +29,7 @@
 
         <dependency>
             <groupId>com.wgzhao.addax</groupId>
-            <artifactId>plugin-rdbms-util</artifactId>
+            <artifactId>addax-rdbms</artifactId>
             <version>${project.version}</version>
             <scope>compile</scope>
         </dependency>

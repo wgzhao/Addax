@@ -8,7 +8,7 @@
     </parent>
 
     <artifactId>dbffilewriter</artifactId>
-    <name>dbffilewriter</name>
+    <name>dbffile-writer</name>
     <description>DbfFileWriter提供了本地写入dbf功能，建议开发、测试环境使用。</description>
     <packaging>jar</packaging>
 

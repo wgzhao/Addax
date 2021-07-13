@@ -10,7 +10,7 @@
     </parent>
 
     <artifactId>streamreader</artifactId>
-    <name>streamreader</name>
+    <name>stream-reader</name>
     <packaging>jar</packaging>
 
     <dependencies>

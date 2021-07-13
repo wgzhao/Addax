@@ -20,7 +20,7 @@
 package com.wgzhao.addax.plugin.reader.ftpreader;
 
 import com.wgzhao.addax.common.exception.AddaxException;
-import com.wgzhao.addax.plugin.storage.reader.StorageReaderUtil;
+import com.wgzhao.addax.storage.reader.StorageReaderUtil;
 import com.jcraft.jsch.ChannelSftp;
 import com.jcraft.jsch.ChannelSftp.LsEntry;
 import com.jcraft.jsch.JSch;

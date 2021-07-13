@@ -9,7 +9,7 @@
     </parent>
 
     <artifactId>sqlserverwriter</artifactId>
-    <name>sqlserverwriter</name>
+    <name>sqlserver-writer</name>
     <description>writer data into sqlserver database</description>
     <packaging>jar</packaging>
 
@@ -28,7 +28,7 @@
 
         <dependency>
             <groupId>com.wgzhao.addax</groupId>
-            <artifactId>plugin-rdbms-util</artifactId>
+            <artifactId>addax-rdbms</artifactId>
             <version>${project.version}</version>
         </dependency>
 

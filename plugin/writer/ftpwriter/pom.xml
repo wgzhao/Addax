@@ -7,7 +7,7 @@
         <relativePath>../../../pom.xml</relativePath>
     </parent>
     <artifactId>ftpwriter</artifactId>
-    <name>ftpwriter</name>
+    <name>ftp-writer</name>
     <description>FtpWriter提供了写数据到指定ftp服务器文件功能。</description>
     <packaging>jar</packaging>
 
@@ -27,7 +27,7 @@
 
         <dependency>
             <groupId>com.wgzhao.addax</groupId>
-            <artifactId>plugin-storage-util</artifactId>
+            <artifactId>addax-storage</artifactId>
             <version>${project.version}</version>
         </dependency>
 

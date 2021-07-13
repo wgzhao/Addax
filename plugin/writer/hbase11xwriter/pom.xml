@@ -9,7 +9,7 @@
     </parent>
 
     <artifactId>hbase11xwriter</artifactId>
-    <name>hbase11xwriter</name>
+    <name>hbase11x-writer</name>
     <packaging>jar</packaging>
 
     <properties>

@@ -10,6 +10,7 @@
     </parent>
 
     <artifactId>redisreader</artifactId>
+    <name>redis-reader</name>
     <description>Redis Reader</description>
     <packaging>jar</packaging>
 
