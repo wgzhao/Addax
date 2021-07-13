@@ -25,7 +25,7 @@
             <outputDirectory>addax-${project.version}</outputDirectory>
         </fileSet>
         <fileSet>
-            <directory>transformer/target/</directory>
+            <directory>lib/transformer/target/</directory>
             <includes>
                 <include>addax-transformer-${project.version}.jar</include>
             </includes>

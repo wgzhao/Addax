@@ -8,7 +8,7 @@
         <relativePath>../../../pom.xml</relativePath>
     </parent>
     <artifactId>mysqlreader</artifactId>
-    <name>mysqlreader</name>
+    <name>mysql-reader</name>
     <packaging>jar</packaging>
 
     <dependencies>
@@ -26,7 +26,7 @@
 
         <dependency>
             <groupId>com.wgzhao.addax</groupId>
-            <artifactId>plugin-rdbms-util</artifactId>
+            <artifactId>addax-rdbms</artifactId>
             <version>${project.version}</version>
         </dependency>
 

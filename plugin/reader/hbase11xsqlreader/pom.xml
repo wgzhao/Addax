@@ -7,7 +7,7 @@
         <relativePath>../../../pom.xml</relativePath>
     </parent>
     <artifactId>hbase11xsqlreader</artifactId>
-    <name>hbase11xsqlreader</name>
+    <name>hbase11xsql-reader</name>
     <packaging>jar</packaging>
 
     <dependencies>

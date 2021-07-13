@@ -11,7 +11,7 @@
     </parent>
 
     <artifactId>postgresqlreader</artifactId>
-    <name>postgresqlreader</name>
+    <name>postgresql-reader</name>
     <packaging>jar</packaging>
 
     <dependencies>
@@ -29,7 +29,7 @@
 
         <dependency>
             <groupId>com.wgzhao.addax</groupId>
-            <artifactId>plugin-rdbms-util</artifactId>
+            <artifactId>addax-rdbms</artifactId>
             <version>${project.version}</version>
         </dependency>
 

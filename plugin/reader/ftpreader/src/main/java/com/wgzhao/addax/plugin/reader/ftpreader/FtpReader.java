@@ -23,7 +23,7 @@ import com.wgzhao.addax.common.exception.AddaxException;
 import com.wgzhao.addax.common.plugin.RecordSender;
 import com.wgzhao.addax.common.spi.Reader;
 import com.wgzhao.addax.common.util.Configuration;
-import com.wgzhao.addax.plugin.storage.reader.StorageReaderUtil;
+import com.wgzhao.addax.storage.reader.StorageReaderUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

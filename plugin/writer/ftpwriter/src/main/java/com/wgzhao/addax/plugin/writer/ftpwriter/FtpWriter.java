@@ -24,7 +24,7 @@ import com.wgzhao.addax.common.plugin.RecordReceiver;
 import com.wgzhao.addax.common.spi.Writer;
 import com.wgzhao.addax.common.util.Configuration;
 import com.wgzhao.addax.common.util.RetryUtil;
-import com.wgzhao.addax.plugin.storage.writer.StorageWriterUtil;
+import com.wgzhao.addax.storage.writer.StorageWriterUtil;
 import com.wgzhao.addax.plugin.writer.ftpwriter.util.Constant;
 import com.wgzhao.addax.plugin.writer.ftpwriter.util.IFtpHelper;
 import com.wgzhao.addax.plugin.writer.ftpwriter.util.SftpHelperImpl;
@@ -40,9 +40,9 @@ import java.util.List;
 import java.util.Set;
 import java.util.concurrent.Callable;
 
-import static com.wgzhao.addax.plugin.storage.writer.Key.FILE_NAME;
-import static com.wgzhao.addax.plugin.storage.writer.Key.SUFFIX;
-import static com.wgzhao.addax.plugin.storage.writer.Key.WRITE_MODE;
+import static com.wgzhao.addax.storage.writer.Key.FILE_NAME;
+import static com.wgzhao.addax.storage.writer.Key.SUFFIX;
+import static com.wgzhao.addax.storage.writer.Key.WRITE_MODE;
 
 public class FtpWriter
         extends Writer

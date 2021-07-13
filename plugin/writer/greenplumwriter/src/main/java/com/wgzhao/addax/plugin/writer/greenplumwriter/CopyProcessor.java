@@ -22,7 +22,7 @@ package com.wgzhao.addax.plugin.writer.greenplumwriter;
 import com.wgzhao.addax.common.element.Column;
 import com.wgzhao.addax.common.element.Record;
 import com.wgzhao.addax.common.exception.AddaxException;
-import com.wgzhao.addax.plugin.rdbms.util.DBUtilErrorCode;
+import com.wgzhao.addax.rdbms.util.DBUtilErrorCode;
 import org.apache.commons.lang3.tuple.Triple;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

@@ -19,9 +19,9 @@
 
 package com.wgzhao.addax.plugin.reader.sqlserverreader;
 
-import com.wgzhao.addax.plugin.rdbms.reader.CommonRdbmsReader;
-import com.wgzhao.addax.plugin.rdbms.util.DBUtil;
-import com.wgzhao.addax.plugin.rdbms.util.DataBaseType;
+import com.wgzhao.addax.rdbms.reader.CommonRdbmsReader;
+import com.wgzhao.addax.rdbms.util.DBUtil;
+import com.wgzhao.addax.rdbms.util.DataBaseType;
 
 public class SqlServerRdbmsReader
         extends CommonRdbmsReader

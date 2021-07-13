@@ -77,9 +77,9 @@
         <!-- common support module -->
         <module>common</module>
         <module>core</module>
-        <module>plugin-rdbms-util</module>
-        <module>plugin-storage-util</module>
-        <module>transformer</module>
+        <module>lib/addax-rdbms</module>
+        <module>lib/addax-storage</module>
+        <module>lib/addax-transformer</module>
 
         <!-- reader -->
         <module>plugin/reader/cassandrareader</module>

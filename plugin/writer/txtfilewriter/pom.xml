@@ -10,7 +10,7 @@
     </parent>
 
     <artifactId>txtfilewriter</artifactId>
-    <name>txtfilewriter</name>
+    <name>txtfile-writer</name>
     <description>TxtFileWriter提供了本地写入TEXT功能，建议开发、测试环境使用。</description>
     <packaging>jar</packaging>
 
@@ -29,7 +29,7 @@
 
         <dependency>
             <groupId>com.wgzhao.addax</groupId>
-            <artifactId>plugin-storage-util</artifactId>
+            <artifactId>addax-storage</artifactId>
             <version>${project.version}</version>
         </dependency>
 

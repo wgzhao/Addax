@@ -34,8 +34,8 @@ import com.wgzhao.addax.common.exception.AddaxException;
 import com.wgzhao.addax.common.plugin.RecordSender;
 import com.wgzhao.addax.common.plugin.TaskPluginCollector;
 import com.wgzhao.addax.common.util.Configuration;
-import com.wgzhao.addax.plugin.storage.reader.StorageReaderErrorCode;
-import com.wgzhao.addax.plugin.storage.reader.StorageReaderUtil;
+import com.wgzhao.addax.storage.reader.StorageReaderErrorCode;
+import com.wgzhao.addax.storage.reader.StorageReaderUtil;
 import org.apache.avro.Conversions;
 import org.apache.avro.Schema;
 import org.apache.avro.generic.GenericData;
@@ -85,8 +85,8 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import static com.wgzhao.addax.plugin.storage.reader.Key.COLUMN;
-import static com.wgzhao.addax.plugin.storage.reader.Key.NULL_FORMAT;
+import static com.wgzhao.addax.storage.reader.Key.COLUMN;
+import static com.wgzhao.addax.storage.reader.Key.NULL_FORMAT;
 
 /**
  * Created by mingya.wmy on 2015/8/12.

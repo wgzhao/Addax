@@ -23,7 +23,7 @@ import com.wgzhao.addax.common.exception.AddaxException;
 import com.wgzhao.addax.common.plugin.RecordReceiver;
 import com.wgzhao.addax.common.spi.Writer;
 import com.wgzhao.addax.common.util.Configuration;
-import com.wgzhao.addax.plugin.storage.writer.Constant;
+import com.wgzhao.addax.storage.writer.Constant;
 import org.apache.commons.io.Charsets;
 import org.apache.commons.io.IOUtils;
 import org.apache.hadoop.fs.Path;

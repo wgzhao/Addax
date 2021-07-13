@@ -10,7 +10,7 @@
     </parent>
 
     <artifactId>streamwriter</artifactId>
-    <name>streamwriter</name>
+    <name>stream-writer</name>
     <packaging>jar</packaging>
 
     <dependencies>

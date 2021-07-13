@@ -11,6 +11,7 @@
     </parent>
 
     <artifactId>mongodbwriter</artifactId>
+    <name>mongodb-writer</name>
     <packaging>jar</packaging>
 
     <dependencies>
@@ -29,13 +30,13 @@
 
         <dependency>
             <groupId>com.wgzhao.addax</groupId>
-            <artifactId>plugin-rdbms-util</artifactId>
+            <artifactId>addax-rdbms</artifactId>
             <version>${project.version}</version>
         </dependency>
 
         <dependency>
             <groupId>com.wgzhao.addax</groupId>
-            <artifactId>plugin-storage-util</artifactId>
+            <artifactId>addax-storage</artifactId>
             <version>${project.version}</version>
         </dependency>
 
