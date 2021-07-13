@@ -19,7 +19,7 @@
 
 package com.wgzhao.addax.plugin.reader.dbffilereader;
 
-import com.linuxense.javadbf.DBFField;
+import com.linuxense.javadbf.DBFDataType;
 import com.linuxense.javadbf.DBFReader;
 import com.linuxense.javadbf.DBFRow;
 import com.wgzhao.addax.common.element.ColumnEntry;
@@ -30,7 +30,6 @@ import com.wgzhao.addax.common.util.ColumnUtil;
 import com.wgzhao.addax.common.util.Configuration;
 import com.wgzhao.addax.common.util.RecordUtil;
 import org.apache.commons.io.Charsets;
-import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -38,13 +37,11 @@ import org.slf4j.LoggerFactory;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
-import java.io.UnsupportedEncodingException;
 import java.nio.charset.Charset;
 import java.nio.charset.UnsupportedCharsetException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -181,8 +178,7 @@ public class DbfFileReader
             // warn:make sure this regex string
             // warn:no need trim
             for (String eachPath : this.path) {
-                String regexString = eachPath.replace("*", ".*").replace("?",
-                        ".?");
+                String regexString = eachPath.replace("*", ".*").replace("?", ".?");
                 Pattern pattern = Pattern.compile(regexString);
                 this.pattern.put(eachPath, pattern);
             }
@@ -232,7 +228,7 @@ public class DbfFileReader
         // validate the path, path must be a absolute path
         private List<String> buildSourceTargets()
         {
-            // for eath path
+            // for each path
             Set<String> toBeReadFiles = new HashSet<>();
             for (String eachPath : this.path) {
                 LOG.info("parse path {}", eachPath);
@@ -253,12 +249,12 @@ public class DbfFileReader
                     this.isRegexPath.put(eachPath, false);
                     parentDirectory = eachPath;
                 }
-                this.buildSourceTargetsEathPath(eachPath, parentDirectory, toBeReadFiles);
+                this.buildSourceTargetsEachPath(eachPath, parentDirectory, toBeReadFiles);
             }
             return Arrays.asList(toBeReadFiles.toArray(new String[0]));
         }
 
-        private void buildSourceTargetsEathPath(String regexPath,
+        private void buildSourceTargetsEachPath(String regexPath,
                 String parentDirectory, Set<String> toBeReadFiles)
         {
             // 检测目录是否存在，错误情况更明确
@@ -382,33 +378,36 @@ public class DbfFileReader
         @Override
         public void startRead(RecordSender recordSender)
         {
-            LOG.debug("start read dbf files...");
+            LOG.debug("begin reading dbf files...");
+            String encode = readerSliceConfig.getString(Key.ENCODING);
+            String nullFormat = readerSliceConfig.getString(Key.NULL_FORMAT);
+            List<ColumnEntry> column = ColumnUtil.getListColumnEntry(readerSliceConfig, Key.COLUMN);
+            if (column == null || column.isEmpty()) {
+                // get column description from dbf file
+                column = getColumnInfo(this.sourceFiles.get(0), encode);
+            }
+            if (column == null) {
+                throw AddaxException.asAddaxException(
+                        DbfFileReaderErrorCode.RUNTIME_EXCEPTION,
+                        "无法从指定的DBF文件(" + this.sourceFiles.get(0) + ")获取字段信息"
+                );
+            }
+            int colNum = column.size();
+            DBFRow row;
             for (String fileName : this.sourceFiles) {
-                LOG.info("reading file : [{}]", fileName);
-
-                String encode = readerSliceConfig.getString(Key.ENCODING);
-                String nullFormat = readerSliceConfig.getString(Key.NULL_FORMAT);
-
+                LOG.info("begin reading file : [{}]", fileName);
                 try (DBFReader reader = new DBFReader(new FileInputStream(fileName), Charset.forName(encode))) {
-
-
-                    List<ColumnEntry> column = ColumnUtil.getListColumnEntry(readerSliceConfig, Key.COLUMN);
-
-                    assert column != null;
-                    int colNum = column.isEmpty() ? reader.getFieldCount() : column.size();
-                    DBFRow row;
                     while ((row = reader.nextRow()) != null) {
                         String[] sourceLine = new String[colNum];
                         for (int i = 0; i < colNum; i++) {
                             // constant value ?
-                            if (column.get(i).getValue() != null) {
+                            if (column.get(i) != null && column.get(i).getValue() != null) {
                                 sourceLine[i] = column.get(i).getValue();
-                                continue;
-                            }
-                            if (row.getString(i)!= null && "date".equalsIgnoreCase(column.get(i).getType())) {
+                            } else if (row.getString(i) != null && "date".equalsIgnoreCase(column.get(i).getType())) {
                                 // DBase's date type does not include time part
-                                sourceLine[i] =  new SimpleDateFormat("yyyy-MM-dd").format(row.getDate(i));
-                            } else {
+                                sourceLine[i] = new SimpleDateFormat("yyyy-MM-dd").format(row.getDate(i));
+                            }
+                            else {
                                 sourceLine[i] = row.getString(i);
                             }
                         }
@@ -419,7 +418,65 @@ public class DbfFileReader
                     e.printStackTrace();
                 }
             }
-            LOG.debug("end read dbf files...");
+            LOG.debug("end reading dbf files...");
+        }
+
+        /**
+         * get column description from dbf file
+         *
+         * @param fpath dbf file path
+         * @param encoding the dbf file encoding
+         * @return list of column entry
+         */
+        private List<ColumnEntry> getColumnInfo(String fpath, String encoding)
+        {
+            List<ColumnEntry> column = new ArrayList<>();
+            DBFDataType type;
+            try (DBFReader reader = new DBFReader(new FileInputStream(fpath), Charset.forName(encoding))) {
+                for (int i = 0; i < reader.getFieldCount(); i++) {
+                    ColumnEntry columnEntry = new ColumnEntry();
+                    columnEntry.setIndex(i);
+                    type = reader.getField(i).getType();
+                    switch (type) {
+                        case DATE:
+                            columnEntry.setType("date");
+                            break;
+                        case FLOATING_POINT:
+                        case NUMERIC:
+                        case DOUBLE:
+                            columnEntry.setType("double");
+                            break;
+                        case LOGICAL:
+                            columnEntry.setType("boolean");
+                            break;
+                        case MEMO:
+                        case BINARY:
+                        case BLOB:
+                            columnEntry.setType("bytes");
+                            break;
+                        case CURRENCY:
+                            columnEntry.setType("decimal");
+                            break;
+                        case LONG:
+                        case AUTOINCREMENT:
+                            columnEntry.setType("long");
+                            break;
+                        case TIMESTAMP:
+                        case TIMESTAMP_DBASE7:
+                            columnEntry.setType("timestamp");
+                            break;
+                        default:
+                            columnEntry.setType("string");
+                            break;
+                    }
+                    column.add(columnEntry);
+                }
+                return column;
+            }
+            catch (FileNotFoundException e) {
+                e.printStackTrace();
+                return null;
+            }
         }
     }
 }
