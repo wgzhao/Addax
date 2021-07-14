@@ -79,16 +79,16 @@ public class EsReader
              * 最佳实践：如果 Job 中有需要进行数据同步之前的处理，可以在此处完成，如果没有必要则可以直接去掉。
              */
             ESClient esClient = new ESClient();
-            esClient.createClient(Key.getEndpoint(conf),
-                    Key.getAccessID(conf),
-                    Key.getAccessKey(conf),
+            esClient.createClient(ESKey.getEndpoint(conf),
+                    ESKey.getAccessID(conf),
+                    ESKey.getAccessKey(conf),
                     false,
                     300000,
                     false,
                     false);
 
-            String indexName = Key.getIndexName(conf);
-            String typeName = Key.getTypeName(conf);
+            String indexName = ESKey.getIndexName(conf);
+            String typeName = ESKey.getTypeName(conf);
             log.info("index:[{}], type:[{}]", indexName, typeName);
             try {
                 boolean isIndicesExists = esClient.indicesExists(indexName);
@@ -112,10 +112,10 @@ public class EsReader
         public List<Configuration> split(int adviceNumber)
         {
             List<Configuration> configurations = new ArrayList<>();
-            List<Object> search = conf.getList(Key.SEARCH_KEY, Object.class);
+            List<Object> search = conf.getList(ESKey.SEARCH_KEY, Object.class);
             for (Object query : search) {
                 Configuration clone = conf.clone();
-                clone.set(Key.SEARCH_KEY, query);
+                clone.set(ESKey.SEARCH_KEY, query);
                 configurations.add(clone);
             }
             return configurations;
@@ -154,13 +154,13 @@ public class EsReader
         @Override
         public void prepare()
         {
-            esClient.createClient(Key.getEndpoint(conf),
-                    Key.getAccessID(conf),
-                    Key.getAccessKey(conf),
-                    Key.isMultiThread(conf),
-                    Key.getTimeout(conf),
-                    Key.isCompression(conf),
-                    Key.isDiscovery(conf));
+            esClient.createClient(ESKey.getEndpoint(conf),
+                    ESKey.getAccessID(conf),
+                    ESKey.getAccessKey(conf),
+                    ESKey.isMultiThread(conf),
+                    ESKey.getTimeout(conf),
+                    ESKey.isCompression(conf),
+                    ESKey.isDiscovery(conf));
         }
 
         @Override
@@ -169,14 +169,14 @@ public class EsReader
             this.conf = getPluginJobConf();
             this.esClient = new ESClient();
             this.gson = new GsonBuilder().registerTypeAdapterFactory(MapTypeAdapter.FACTORY).create();
-            this.index = Key.getIndexName(conf);
-            this.type = Key.getTypeName(conf);
-            this.searchType = Key.getSearchType(conf);
-            this.headers = Key.getHeaders(conf);
-            this.query = Key.getQuery(conf);
-            this.scroll = Key.getScroll(conf);
-            this.filter = Key.getFilter(conf);
-            this.column = Key.getColumn(conf);
+            this.index = ESKey.getIndexName(conf);
+            this.type = ESKey.getTypeName(conf);
+            this.searchType = ESKey.getSearchType(conf);
+            this.headers = ESKey.getHeaders(conf);
+            this.query = ESKey.getQuery(conf);
+            this.scroll = ESKey.getScroll(conf);
+            this.filter = ESKey.getFilter(conf);
+            this.column = ESKey.getColumn(conf);
             if (column == null || column.isEmpty()) {
                 throw AddaxException.asAddaxException(ESReaderErrorCode.COLUMN_CANT_BE_EMPTY, "column必须配置");
             }

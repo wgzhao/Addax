@@ -27,8 +27,8 @@ import com.wgzhao.addax.rdbms.util.DBUtil;
 import com.wgzhao.addax.rdbms.util.DBUtilErrorCode;
 import com.wgzhao.addax.rdbms.util.DataBaseType;
 import com.wgzhao.addax.rdbms.util.RdbmsException;
-import com.wgzhao.addax.rdbms.writer.Constant;
-import com.wgzhao.addax.rdbms.writer.Key;
+import com.wgzhao.addax.common.base.Constant;
+import com.wgzhao.addax.common.base.Key;
 import com.alibaba.druid.sql.parser.ParserException;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
@@ -75,8 +75,7 @@ public final class WriterUtil
         List<String> preSqls = simplifiedConf.getList(Key.PRE_SQL, String.class);
         List<String> postSqls = simplifiedConf.getList(Key.POST_SQL, String.class);
 
-        List<Object> conns = simplifiedConf.getList(Constant.CONN_MARK,
-                Object.class);
+        List<Object> conns = simplifiedConf.getList(Key.CONNECTION, Object.class);
 
         for (Object conn : conns) {
             Configuration sliceConfig = simplifiedConf.clone();
@@ -85,7 +84,7 @@ public final class WriterUtil
             jdbcUrl = connConf.getString(Key.JDBC_URL);
             sliceConfig.set(Key.JDBC_URL, jdbcUrl);
 
-            sliceConfig.remove(Constant.CONN_MARK);
+            sliceConfig.remove(Key.CONNECTION);
 
             List<String> tables = connConf.getList(Key.TABLE, String.class);
 
@@ -298,7 +297,7 @@ public final class WriterUtil
 
     public static void preCheckPrePareSQL(Configuration originalConfig, DataBaseType type)
     {
-        List<Object> conns = originalConfig.getList(Constant.CONN_MARK, Object.class);
+        List<Object> conns = originalConfig.getList(Key.CONNECTION, Object.class);
         Configuration connConf = Configuration.from(conns.get(0).toString());
         String table = connConf.getList(Key.TABLE, String.class).get(0);
 
@@ -323,7 +322,7 @@ public final class WriterUtil
 
     public static void preCheckPostSQL(Configuration originalConfig, DataBaseType type)
     {
-        List<Object> conns = originalConfig.getList(Constant.CONN_MARK, Object.class);
+        List<Object> conns = originalConfig.getList(Key.CONNECTION, Object.class);
         Configuration connConf = Configuration.from(conns.get(0).toString());
         String table = connConf.getList(Key.TABLE, String.class).get(0);
 

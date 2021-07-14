@@ -97,7 +97,7 @@ public class CopyWorker
         byte[] data;
         try {
             while (true) {
-                data = queue.poll(Constant.TIME_OUT_MS, TimeUnit.MILLISECONDS);
+                data = queue.poll(GPConstant.TIME_OUT_MS, TimeUnit.MILLISECONDS);
 
                 if (data == null && !task.moreData()) {
                     break;
@@ -169,13 +169,13 @@ public class CopyWorker
     private void changeCsvSizelimit(Connection conn)
     {
         List<String> sqls = new ArrayList<>();
-        sqls.add("set gp_max_csv_line_length = " + Constant.MAX_CSV_SIZE);
+        sqls.add("set gp_max_csv_line_length = " + GPConstant.MAX_CSV_SIZE);
 
         try {
             WriterUtil.executeSqls(conn, sqls, task.getJdbcUrl(), DataBaseType.PostgreSQL);
         }
         catch (Exception e) {
-            LOG.warn("Cannot set gp_max_csv_line_length to {}", Constant.MAX_CSV_SIZE);
+            LOG.warn("Cannot set gp_max_csv_line_length to {}", GPConstant.MAX_CSV_SIZE);
         }
     }
 }

@@ -19,6 +19,7 @@
 
 package com.wgzhao.addax.plugin.reader.hdfsreader;
 
+import com.wgzhao.addax.common.base.Key;
 import com.wgzhao.addax.common.exception.AddaxException;
 import com.wgzhao.addax.common.plugin.RecordSender;
 import com.wgzhao.addax.common.spi.Reader;
@@ -34,11 +35,11 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 
-import static com.wgzhao.addax.storage.reader.Key.COLUMN;
-import static com.wgzhao.addax.storage.reader.Key.ENCODING;
-import static com.wgzhao.addax.storage.reader.Key.INDEX;
-import static com.wgzhao.addax.storage.reader.Key.TYPE;
-import static com.wgzhao.addax.storage.reader.Key.VALUE;
+import static com.wgzhao.addax.common.base.Key.COLUMN;
+import static com.wgzhao.addax.common.base.Key.ENCODING;
+import static com.wgzhao.addax.common.base.Key.INDEX;
+import static com.wgzhao.addax.common.base.Key.TYPE;
+import static com.wgzhao.addax.common.base.Key.VALUE;
 
 public class HdfsReader
         extends Reader
@@ -58,8 +59,7 @@ public class HdfsReader
     public static class Job
             extends Reader.Job
     {
-        private static final Logger LOG = LoggerFactory
-                .getLogger(Job.class);
+        private static final Logger LOG = LoggerFactory.getLogger(Job.class);
 
         private Configuration readerOriginConfig = null;
         private HashSet<String> sourceFiles;
@@ -103,9 +103,9 @@ public class HdfsReader
                 }
             }
 
-            specifiedFileType = this.readerOriginConfig.getNecessaryValue(Key.FILETYPE, HdfsReaderErrorCode.REQUIRED_VALUE).toUpperCase();
-            if (!Constant.SUPPORT_FILE_TYPE.contains(specifiedFileType)) {
-                String message = "HdfsReader插件目前支持 " + Constant.SUPPORT_FILE_TYPE + "几种格式的文件,请将fileType选项的值配置为以上各种的一种";
+            specifiedFileType = this.readerOriginConfig.getNecessaryValue(Key.FILE_TYPE, HdfsReaderErrorCode.REQUIRED_VALUE).toUpperCase();
+            if (!HdfsConstant.SUPPORT_FILE_TYPE.contains(specifiedFileType)) {
+                String message = "HdfsReader插件目前支持 " + HdfsConstant.SUPPORT_FILE_TYPE + "几种格式的文件,请将fileType选项的值配置为以上各种的一种";
                 throw AddaxException.asAddaxException(HdfsReaderErrorCode.FILE_TYPE_ERROR, message);
             }
 
@@ -134,8 +134,8 @@ public class HdfsReader
             // validate the Columns
             validateColumns();
 
-            if (this.specifiedFileType.equals(Constant.TEXT)
-                    || this.specifiedFileType.equals(Constant.CSV)) {
+            if (this.specifiedFileType.equals(HdfsConstant.TEXT)
+                    || this.specifiedFileType.equals(HdfsConstant.CSV)) {
                 //compress校验
                 StorageReaderUtil.validateCompress(this.readerOriginConfig);
                 StorageReaderUtil.validateCsvReaderConfig(this.readerOriginConfig);
@@ -210,7 +210,7 @@ public class HdfsReader
             List<List<String>> splitedSourceFiles = this.splitSourceFiles(new ArrayList<>(this.sourceFiles), splitNumber);
             for (List<String> files : splitedSourceFiles) {
                 Configuration splitedConfig = this.readerOriginConfig.clone();
-                splitedConfig.set(Constant.SOURCE_FILES, files);
+                splitedConfig.set(HdfsConstant.SOURCE_FILES, files);
                 readerSplitConfigs.add(splitedConfig);
             }
 
@@ -261,8 +261,8 @@ public class HdfsReader
         {
 
             this.taskConfig = getPluginJobConf();
-            this.sourceFiles = this.taskConfig.getList(Constant.SOURCE_FILES, String.class);
-            this.specifiedFileType = this.taskConfig.getNecessaryValue(Key.FILETYPE, HdfsReaderErrorCode.REQUIRED_VALUE);
+            this.sourceFiles = this.taskConfig.getList(HdfsConstant.SOURCE_FILES, String.class);
+            this.specifiedFileType = this.taskConfig.getNecessaryValue(Key.FILE_TYPE, HdfsReaderErrorCode.REQUIRED_VALUE);
             this.dfsUtil = new DFSUtil(this.taskConfig);
         }
 
@@ -280,26 +280,26 @@ public class HdfsReader
             for (String sourceFile : this.sourceFiles) {
                 LOG.info("reading file : [{}]", sourceFile);
 
-                if (specifiedFileType.equalsIgnoreCase(Constant.TEXT)
-                        || specifiedFileType.equalsIgnoreCase(Constant.CSV)) {
+                if (specifiedFileType.equalsIgnoreCase(HdfsConstant.TEXT)
+                        || specifiedFileType.equalsIgnoreCase(HdfsConstant.CSV)) {
 
                     InputStream inputStream = dfsUtil.getInputStream(sourceFile);
                     StorageReaderUtil.readFromStream(inputStream, sourceFile, this.taskConfig,
                             recordSender, this.getTaskPluginCollector());
                 }
-                else if (specifiedFileType.equalsIgnoreCase(Constant.ORC)) {
+                else if (specifiedFileType.equalsIgnoreCase(HdfsConstant.ORC)) {
 
                     dfsUtil.orcFileStartRead(sourceFile, this.taskConfig, recordSender, this.getTaskPluginCollector());
                 }
-                else if (specifiedFileType.equalsIgnoreCase(Constant.SEQ)) {
+                else if (specifiedFileType.equalsIgnoreCase(HdfsConstant.SEQ)) {
 
                     dfsUtil.sequenceFileStartRead(sourceFile, this.taskConfig, recordSender, this.getTaskPluginCollector());
                 }
-                else if (specifiedFileType.equalsIgnoreCase(Constant.RC)) {
+                else if (specifiedFileType.equalsIgnoreCase(HdfsConstant.RC)) {
 
                     dfsUtil.rcFileStartRead(sourceFile, this.taskConfig, recordSender, this.getTaskPluginCollector());
                 }
-                else if (specifiedFileType.equalsIgnoreCase(Constant.PARQUET)) {
+                else if (specifiedFileType.equalsIgnoreCase(HdfsConstant.PARQUET)) {
                     dfsUtil.parquetFileStartRead(sourceFile, this.taskConfig, recordSender, this.getTaskPluginCollector());
                 }
                 else {

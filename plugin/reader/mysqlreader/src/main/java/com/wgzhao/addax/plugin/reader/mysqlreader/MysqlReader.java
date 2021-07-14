@@ -19,11 +19,11 @@
 
 package com.wgzhao.addax.plugin.reader.mysqlreader;
 
+import com.wgzhao.addax.common.base.Key;
 import com.wgzhao.addax.common.plugin.RecordSender;
 import com.wgzhao.addax.common.spi.Reader;
 import com.wgzhao.addax.common.util.Configuration;
 import com.wgzhao.addax.rdbms.reader.CommonRdbmsReader;
-import com.wgzhao.addax.rdbms.reader.Constant;
 import com.wgzhao.addax.rdbms.util.DataBaseType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -50,12 +50,12 @@ public class MysqlReader
         {
             this.originalConfig = getPluginJobConf();
 
-            Integer userConfigedFetchSize = this.originalConfig.getInt(Constant.FETCH_SIZE);
+            Integer userConfigedFetchSize = this.originalConfig.getInt(Key.FETCH_SIZE);
             if (userConfigedFetchSize != null) {
                 LOG.warn("对 mysqlreader 不需要配置 fetchSize, mysqlreader 将会忽略这项配置. 如果您不想再看到此警告,请去除fetchSize 配置.");
             }
 
-            this.originalConfig.set(Constant.FETCH_SIZE, Integer.MIN_VALUE);
+            this.originalConfig.set(Key.FETCH_SIZE, Integer.MIN_VALUE);
 
             this.commonRdbmsReaderJob = new CommonRdbmsReader.Job(DATABASE_TYPE);
             this.originalConfig = this.commonRdbmsReaderJob.init(this.originalConfig);
@@ -106,7 +106,7 @@ public class MysqlReader
         @Override
         public void startRead(RecordSender recordSender)
         {
-            int fetchSize = this.readerSliceConfig.getInt(Constant.FETCH_SIZE);
+            int fetchSize = this.readerSliceConfig.getInt(Key.FETCH_SIZE);
 
             this.commonRdbmsReaderTask.startRead(this.readerSliceConfig, recordSender, getTaskPluginCollector(), fetchSize);
         }

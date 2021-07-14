@@ -19,11 +19,12 @@
 
 package com.wgzhao.addax.plugin.writer.hdfswriter;
 
+import com.wgzhao.addax.common.base.Key;
 import com.wgzhao.addax.common.exception.AddaxException;
 import com.wgzhao.addax.common.plugin.RecordReceiver;
 import com.wgzhao.addax.common.spi.Writer;
 import com.wgzhao.addax.common.util.Configuration;
-import com.wgzhao.addax.storage.writer.Constant;
+import com.wgzhao.addax.common.base.Constant;
 import org.apache.commons.io.Charsets;
 import org.apache.commons.io.IOUtils;
 import org.apache.hadoop.fs.Path;
@@ -57,8 +58,8 @@ public class HdfsWriter
         private String writeMode;
         private String compress;
         private HdfsHelper hdfsHelper = null;
-        private static final int DECIMAL_DEFAULT_PRECISION = 38;
-        private static final int DECIMAL_DEFAULT_SCALE = 10;
+
+        public static final Set<String> SUPPORT_FORMAT = new HashSet<>(Arrays.asList("ORC", "PARQUET", "TEXT"));
 
         @Override
         public void init()
@@ -76,8 +77,8 @@ public class HdfsWriter
             this.defaultFS = this.writerSliceConfig.getNecessaryValue(Key.DEFAULT_FS, HdfsWriterErrorCode.REQUIRED_VALUE);
             //fileType check
             String fileType = this.writerSliceConfig.getNecessaryValue(Key.FILE_TYPE, HdfsWriterErrorCode.REQUIRED_VALUE).toUpperCase();
-            if (!Key.SUPPORT_FORMAT.contains(fileType)) {
-                String message = String.format("[%s] 文件格式不支持， HdfsWriter插件目前仅支持 %s, ", fileType, Key.SUPPORT_FORMAT);
+            if (!SUPPORT_FORMAT.contains(fileType)) {
+                String message = String.format("[%s] 文件格式不支持， HdfsWriter插件目前仅支持 %s, ", fileType, SUPPORT_FORMAT);
                 throw AddaxException.asAddaxException(HdfsWriterErrorCode.ILLEGAL_VALUE, message);
             }
             //path
@@ -121,8 +122,7 @@ public class HdfsWriter
             //writeMode check
             this.writeMode = this.writerSliceConfig.getNecessaryValue(Key.WRITE_MODE, HdfsWriterErrorCode.REQUIRED_VALUE);
             writeMode = writeMode.toLowerCase().trim();
-            Set<String> supportedWriteModes = new HashSet<>(Arrays.asList("append", "nonconflict", "overwrite"));
-            if (!supportedWriteModes.contains(writeMode)) {
+            if (!Constant.SUPPORTED_WRITE_MODE.contains(writeMode)) {
                 throw AddaxException.asAddaxException(HdfsWriterErrorCode.ILLEGAL_VALUE,
                         String.format("仅支持append, nonConflict,overwrite三种模式, 不支持您配置的 writeMode 模式 : [%s]",
                                 writeMode));
@@ -213,7 +213,7 @@ public class HdfsWriter
                     LOG.info("由于您配置了writeMode append, 写入前不做清理工作, [{}] 目录下写入相应文件名前缀 [{}] 的文件",
                             path, fileName);
                 }
-                else if ("nonconflict".equalsIgnoreCase(writeMode) && isExistFile) {
+                else if ("nonConflict".equalsIgnoreCase(writeMode) && isExistFile) {
                     LOG.info("由于您配置了writeMode nonConflict, 开始检查 [{}] 下面的内容", path);
                     List<String> allFiles = new ArrayList<>();
                     for (Path eachFile : existFilePaths) {
@@ -395,7 +395,7 @@ public class HdfsWriter
         private static int getDecimalprec(String type)
         {
             if (!type.contains("(")) {
-                return DECIMAL_DEFAULT_PRECISION;
+                return Constant.DEFAULT_DECIMAL_PRECISION;
             }
             else {
                 String regEx = "[^0-9]";
@@ -421,7 +421,7 @@ public class HdfsWriter
         private static int getDecimalscale(String type)
         {
             if (! type.contains("(")) {
-                return DECIMAL_DEFAULT_SCALE;
+                return Constant.DEFAULT_DECIMAL_SCALE;
             }
             if (!type.contains(",")) {
                 return 0;

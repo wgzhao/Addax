@@ -94,13 +94,13 @@ public class CopyWriterTask
         return "COPY " + tableName + "(" +
                 constructColumnNameList(columnList) +
                 ") FROM STDIN WITH DELIMITER '" +
-                Constant.DELIMTER + "' NULL '' CSV QUOTE '" + Constant.QUOTE_CHAR  + "' ESCAPE E'" + Constant.ESCAPE + Constant.ESCAPE + "';";
+                GPConstant.DELIMITER + "' NULL '' CSV QUOTE '" + GPConstant.QUOTE_CHAR  + "' ESCAPE E'" + GPConstant.ESCAPE + GPConstant.ESCAPE + "';";
     }
 
     private void send(Record record, LinkedBlockingQueue<Record> queue)
             throws InterruptedException, ExecutionException
     {
-        while (!queue.offer(record, Constant.TIME_OUT_MS, TimeUnit.MILLISECONDS)) {
+        while (!queue.offer(record, GPConstant.TIME_OUT_MS, TimeUnit.MILLISECONDS)) {
             LOG.debug("Record queue is full, increase num_copy_processor for performance.");
             Future<Long> result = cs.poll();
 
@@ -125,9 +125,9 @@ public class CopyWriterTask
             TaskPluginCollector taskPluginCollector)
     {
         this.writerSliceConfig = writerSliceConfig;
-        int queueSize = writerSliceConfig.getInt(Key.QUEUE_SIZE, Constant.COPY_QUEUE_SIZE);
-        int numProcessor = writerSliceConfig.getInt(Key.NUM_PROCESS, Constant.NUM_COPY_PROCESSOR);
-        int numWriter = writerSliceConfig.getInt(Key.NUM_WRITER, Constant.NUM_COPY_WRITER);
+        int queueSize = writerSliceConfig.getInt(GPKey.QUEUE_SIZE, GPConstant.COPY_QUEUE_SIZE);
+        int numProcessor = writerSliceConfig.getInt(GPKey.NUM_PROCESS, GPConstant.NUM_COPY_PROCESSOR);
+        int numWriter = writerSliceConfig.getInt(GPKey.NUM_WRITER, GPConstant.NUM_COPY_WRITER);
 
         String sql = getCopySql(this.table, this.columns);
         LinkedBlockingQueue<Record> recordQueue = new LinkedBlockingQueue<>(queueSize);

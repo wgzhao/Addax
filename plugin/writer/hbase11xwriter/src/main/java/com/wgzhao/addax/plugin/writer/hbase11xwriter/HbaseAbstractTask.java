@@ -19,6 +19,8 @@
 
 package com.wgzhao.addax.plugin.writer.hbase11xwriter;
 
+import com.wgzhao.addax.common.base.HBaseConstant;
+import com.wgzhao.addax.common.base.HBaseKey;
 import com.wgzhao.addax.common.element.Column;
 import com.wgzhao.addax.common.element.Record;
 import com.wgzhao.addax.common.exception.AddaxException;
@@ -55,12 +57,12 @@ public abstract class HbaseAbstractTask
     {
         //this.htable = Hbase11xHelper.getTable(configuration)
         this.bufferedMutator = Hbase11xHelper.getBufferedMutator(configuration);
-        this.columns = configuration.getListConfiguration(Key.COLUMN);
-        this.rowkeyColumn = configuration.getListConfiguration(Key.ROWKEY_COLUMN);
-        this.versionColumn = configuration.getConfiguration(Key.VERSION_COLUMN);
-        this.encoding = configuration.getString(Key.ENCODING, Constant.DEFAULT_ENCODING);
-        this.nullMode = NullModeType.getByTypeName(configuration.getString(Key.NULL_MODE, Constant.DEFAULT_NULL_MODE));
-        this.walFlag = configuration.getBool(Key.WAL_FLAG, false);
+        this.columns = configuration.getListConfiguration(HBaseKey.COLUMN);
+        this.rowkeyColumn = configuration.getListConfiguration(HBaseKey.ROW_KEY_COLUMN);
+        this.versionColumn = configuration.getConfiguration(HBaseKey.VERSION_COLUMN);
+        this.encoding = configuration.getString(HBaseKey.ENCODING, HBaseConstant.DEFAULT_ENCODING);
+        this.nullMode = NullModeType.getByTypeName(configuration.getString(HBaseKey.NULL_MODE, HBaseConstant.DEFAULT_NULL_MODE));
+        this.walFlag = configuration.getBool(HBaseKey.WAL_FLAG, false);
     }
 
     public void startWriter(RecordReceiver lineReceiver, TaskPluginCollector taskPluginCollector)

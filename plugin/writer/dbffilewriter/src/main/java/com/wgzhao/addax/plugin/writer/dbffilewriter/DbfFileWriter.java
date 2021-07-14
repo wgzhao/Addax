@@ -22,6 +22,8 @@ package com.wgzhao.addax.plugin.writer.dbffilewriter;
 import com.linuxense.javadbf.DBFDataType;
 import com.linuxense.javadbf.DBFField;
 import com.linuxense.javadbf.DBFWriter;
+import com.wgzhao.addax.common.base.Constant;
+import com.wgzhao.addax.common.base.Key;
 import com.wgzhao.addax.common.element.Column;
 import com.wgzhao.addax.common.element.Record;
 import com.wgzhao.addax.common.exception.AddaxException;
@@ -214,7 +216,7 @@ public class DbfFileWriter
             List<Configuration> columns = this.writerSliceConfig.getListConfiguration(Key.COLUMN);
             for (Configuration column: columns) {
                 if ( "numeric".equalsIgnoreCase(column.getString(Key.TYPE)) &&
-                        (column.getString(Key.LENGTH, null) == null || column.getString(Key.SCALE, null) == null))
+                        (column.getString(Key.PRECISION, null) == null || column.getString(Key.SCALE, null) == null))
                 {
                     throw AddaxException.asAddaxException(
                             DbfFileWriterErrorCode.CONFIG_INVALID_EXCEPTION,

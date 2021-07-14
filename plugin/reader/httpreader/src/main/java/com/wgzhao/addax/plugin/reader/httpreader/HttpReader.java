@@ -122,19 +122,19 @@ public class HttpReader
         public void init()
         {
             this.readerSliceConfig = this.getPluginJobConf();
-            this.username = readerSliceConfig.getString(Key.USERNAME, null);
-            this.password = readerSliceConfig.getString(Key.PASSWORD, null);
+            this.username = readerSliceConfig.getString(HttpKey.USERNAME, null);
+            this.password = readerSliceConfig.getString(HttpKey.PASSWORD, null);
             Configuration conn =
-                    readerSliceConfig.getListConfiguration(Key.CONNECTION).get(0);
-            uriBuilder = new URIBuilder(URI.create(conn.getString(Key.URL)));
+                    readerSliceConfig.getListConfiguration(HttpKey.CONNECTION).get(0);
+            uriBuilder = new URIBuilder(URI.create(conn.getString(HttpKey.URL)));
 
-            if (conn.getString(Key.PROXY, null) != null) {
+            if (conn.getString(HttpKey.PROXY, null) != null) {
                 // set proxy
-                createProxy(conn.getConfiguration(Key.PROXY));
+                createProxy(conn.getConfiguration(HttpKey.PROXY));
             }
 
             Map<String, Object> requestParams =
-                    readerSliceConfig.getMap(Key.REQUEST_PARAMETERS, new HashMap<>());
+                    readerSliceConfig.getMap(HttpKey.REQUEST_PARAMETERS, new HashMap<>());
             requestParams.forEach((k, v) -> uriBuilder.setParameter(k, v.toString()));
         }
 
@@ -147,7 +147,7 @@ public class HttpReader
         @Override
         public void startRead(RecordSender recordSender)
         {
-            String method = readerSliceConfig.getString(Key.METHOD, "get");
+            String method = readerSliceConfig.getString(HttpKey.METHOD, "get");
             CloseableHttpResponse response;
             try {
                 response = createCloseableHttpResponse(method);
@@ -158,7 +158,7 @@ public class HttpReader
                 }
                 HttpEntity entity = response.getEntity();
 
-                String encoding = readerSliceConfig.getString(Key.ENCODING, null);
+                String encoding = readerSliceConfig.getString(HttpKey.ENCODING, null);
                 Charset charset;
                 if (encoding != null) {
                     charset = Charset.forName(encoding);
@@ -169,7 +169,7 @@ public class HttpReader
 
                 String json = EntityUtils.toString(entity, charset);
                 JSONArray jsonArray = null;
-                String key = readerSliceConfig.get(Key.RESULT_KEY, null);
+                String key = readerSliceConfig.get(HttpKey.RESULT_KEY, null);
                 Object object;
                 if (key != null) {
                     object = JSON.parseObject(json).get(key);
@@ -193,11 +193,11 @@ public class HttpReader
                     return;
                 }
 
-                List<String> columns = readerSliceConfig.getList(Key.COLUMN, String.class);
+                List<String> columns = readerSliceConfig.getList(HttpKey.COLUMN, String.class);
                 if (columns == null || columns.isEmpty()) {
                     throw AddaxException.asAddaxException(
                             HttpReaderErrorCode.REQUIRED_VALUE,
-                            "The parameter [" + Key.COLUMN + "] is not set."
+                            "The parameter [" + HttpKey.COLUMN + "] is not set."
                     );
                 }
                 Record record;
@@ -243,8 +243,8 @@ public class HttpReader
 
         private void createProxy(Configuration proxyConf)
         {
-            String host = proxyConf.getString(Key.HOST);
-            this.proxyAuth = proxyConf.getString(Key.AUTH);
+            String host = proxyConf.getString(HttpKey.HOST);
+            this.proxyAuth = proxyConf.getString(HttpKey.AUTH);
             URI uri = URI.create(host);
             this.context = HttpClientContext.create();
             this.context.setAttribute("proxy", uri);
@@ -255,7 +255,7 @@ public class HttpReader
         private CloseableHttpResponse createCloseableHttpResponse(String method)
                 throws URISyntaxException, IOException
         {
-            Map<String, Object> headers = readerSliceConfig.getMap(Key.HEADERS, new HashMap<>());
+            Map<String, Object> headers = readerSliceConfig.getMap(HttpKey.HEADERS, new HashMap<>());
             CloseableHttpClient httpClient;
             CloseableHttpResponse response;
 

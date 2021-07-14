@@ -65,19 +65,19 @@ public class KuduWriterTask
     public KuduWriterTask(Configuration configuration)
     {
         this.configuration = configuration;
-        columns = configuration.getListConfiguration(Key.COLUMN);
+        columns = configuration.getListConfiguration(KuduKey.COLUMN);
         columnLists = KuduHelper.getColumnLists(columns);
         pool = KuduHelper.createRowAddThreadPool(columnLists.size());
 
-        this.encoding = configuration.getString(Key.ENCODING);
-        this.batchSize = configuration.getDouble(Key.WRITE_BATCH_SIZE);
-        this.isUpsert = !"insert".equalsIgnoreCase(configuration.getString(Key.WRITE_MODE));
-        this.isSkipFail = configuration.getBool(Key.SKIP_FAIL);
-        long mutationBufferSpace = configuration.getLong(Key.MUTATION_BUFFER_SPACE);
+        this.encoding = configuration.getString(KuduKey.ENCODING);
+        this.batchSize = configuration.getDouble(KuduKey.WRITE_BATCH_SIZE);
+        this.isUpsert = !"insert".equalsIgnoreCase(configuration.getString(KuduKey.WRITE_MODE));
+        this.isSkipFail = configuration.getBool(KuduKey.SKIP_FAIL);
+        long mutationBufferSpace = configuration.getLong(KuduKey.MUTATION_BUFFER_SPACE);
 
         this.kuduClient = KuduHelper.getKuduClient(configuration);
         this.table = KuduHelper.getKuduTable(this.kuduClient,
-                configuration.getString(Key.KUDU_TABLE_NAME));
+                configuration.getString(KuduKey.KUDU_TABLE_NAME));
 
         this.session = kuduClient.newSession();
         session.setFlushMode(SessionConfiguration.FlushMode.MANUAL_FLUSH);
@@ -90,7 +90,7 @@ public class KuduWriterTask
     {
         LOG.info("kuduwriter begin to write!");
         Record record;
-        List<Configuration> columns = configuration.getListConfiguration(Key.COLUMN);
+        List<Configuration> columns = configuration.getListConfiguration(KuduKey.COLUMN);
         List<String> columnNames = KuduHelper.getColumnNames(columns);
         while ((record = lineReceiver.getFromReader()) != null) {
             if (record.getColumnNumber() != columns.size()) {
@@ -116,7 +116,7 @@ public class KuduWriterTask
                     row.setNull(name);
                     continue;
                 }
-                Type type = Type.getTypeForName(columns.get(i).getString(Key.TYPE));
+                Type type = Type.getTypeForName(columns.get(i).getString(KuduKey.TYPE));
                 switch (type) {
                     case INT8:
                     case INT16:

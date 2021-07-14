@@ -73,26 +73,26 @@ public class ESWriter
              * 最佳实践：如果 Job 中有需要进行数据同步之前的处理，可以在此处完成，如果没有必要则可以直接去掉。
              */
             ESClient esClient = new ESClient();
-            esClient.createClient(Key.getEndpoint(conf),
-                    Key.getAccessID(conf),
-                    Key.getAccessKey(conf),
-                    Key.isMultiThread(conf),
-                    Key.getTimeout(conf),
-                    Key.isCompression(conf),
-                    Key.isDiscovery(conf));
+            esClient.createClient(ESKey.getEndpoint(conf),
+                    ESKey.getAccessID(conf),
+                    ESKey.getAccessKey(conf),
+                    ESKey.isMultiThread(conf),
+                    ESKey.getTimeout(conf),
+                    ESKey.isCompression(conf),
+                    ESKey.isDiscovery(conf));
 
-            String indexName = Key.getIndexName(conf);
-            String typeName = Key.getTypeName(conf);
-            boolean dynamic = Key.getDynamic(conf);
+            String indexName = ESKey.getIndexName(conf);
+            String typeName = ESKey.getTypeName(conf);
+            boolean dynamic = ESKey.getDynamic(conf);
             String mappings = genMappings(typeName);
             String settings = JSON.toJSONString(
-                    Key.getSettings(conf)
+                    ESKey.getSettings(conf)
             );
             log.info("index:[{}], type:[{}], mappings:[{}]", indexName, typeName, mappings);
 
             try {
                 boolean isIndicesExists = esClient.indicesExists(indexName);
-                if (Key.isCleanup(this.conf) && isIndicesExists) {
+                if (ESKey.isCleanup(this.conf) && isIndicesExists) {
                     esClient.deleteIndex(indexName);
                 }
                 // 强制创建,内部自动忽略已存在的情况
@@ -128,7 +128,7 @@ public class ESWriter
 
                     ESColumn columnItem = new ESColumn();
 
-                    if (colName.equals(Key.PRIMARY_KEY_COLUMN_NAME)) {
+                    if (colName.equals(ESKey.PRIMARY_KEY_COLUMN_NAME)) {
                         // 兼容已有版本
                         colType = ESFieldType.ID;
                         colTypeStr = "id";
@@ -219,18 +219,18 @@ public class ESWriter
         public void post()
         {
             ESClient esClient = new ESClient();
-            esClient.createClient(Key.getEndpoint(conf),
-                    Key.getAccessID(conf),
-                    Key.getAccessKey(conf),
+            esClient.createClient(ESKey.getEndpoint(conf),
+                    ESKey.getAccessID(conf),
+                    ESKey.getAccessKey(conf),
                     false,
                     300000,
                     false,
                     false);
-            String alias = Key.getAlias(conf);
+            String alias = ESKey.getAlias(conf);
             if (!"".equals(alias)) {
-                log.info(String.format("alias [%s] to [%s]", alias, Key.getIndexName(conf)));
+                log.info(String.format("alias [%s] to [%s]", alias, ESKey.getIndexName(conf)));
                 try {
-                    esClient.alias(Key.getIndexName(conf), alias, Key.isNeedCleanAlias(conf));
+                    esClient.alias(ESKey.getIndexName(conf), alias, ESKey.isNeedCleanAlias(conf));
                 }
                 catch (IOException e) {
                     throw AddaxException.asAddaxException(ESWriterErrorCode.ES_ALIAS_MODIFY, e);
@@ -265,12 +265,12 @@ public class ESWriter
         public void init()
         {
             this.conf = super.getPluginJobConf();
-            index = Key.getIndexName(conf);
-            type = Key.getTypeName(conf);
+            index = ESKey.getIndexName(conf);
+            type = ESKey.getTypeName(conf);
 
-            trySize = Key.getTrySize(conf);
-            batchSize = Key.getBatchSize(conf);
-            splitter = Key.getSplitter(conf);
+            trySize = ESKey.getTrySize(conf);
+            batchSize = ESKey.getBatchSize(conf);
+            splitter = ESKey.getSplitter(conf);
             columnList = JSON.parseObject(this.conf.getString(WRITE_COLUMNS), new TypeReference<List<ESColumn>>()
             {
             });
@@ -287,13 +287,13 @@ public class ESWriter
         @Override
         public void prepare()
         {
-            esClient.createClient(Key.getEndpoint(conf),
-                    Key.getAccessID(conf),
-                    Key.getAccessKey(conf),
-                    Key.isMultiThread(conf),
-                    Key.getTimeout(conf),
-                    Key.isCompression(conf),
-                    Key.isDiscovery(conf));
+            esClient.createClient(ESKey.getEndpoint(conf),
+                    ESKey.getAccessID(conf),
+                    ESKey.getAccessKey(conf),
+                    ESKey.isMultiThread(conf),
+                    ESKey.getTimeout(conf),
+                    ESKey.isCompression(conf),
+                    ESKey.isDiscovery(conf));
         }
 
         @Override
@@ -458,7 +458,7 @@ public class ESWriter
                                 }
                                 else {
                                     // 如果用户选择不忽略解析错误,则抛异常,默认为忽略
-                                    if (!Key.isIgnoreParseError(conf)) {
+                                    if (!ESKey.isIgnoreParseError(conf)) {
                                         throw AddaxException.asAddaxException(ESWriterErrorCode.ES_INDEX_INSERT, String.format("status:[%d], error: %s, config not ignoreParseError so throw this error", item.status, item.error));
                                     }
                                 }
@@ -485,7 +485,7 @@ public class ESWriter
                 }, trySize, 60000L, true);
             }
             catch (Exception e) {
-                if (Key.isIgnoreWriteError(this.conf)) {
+                if (ESKey.isIgnoreWriteError(this.conf)) {
                     log.warn(String.format("重试[%d]次写入失败，忽略该错误，继续写入!", trySize));
                 }
                 else {

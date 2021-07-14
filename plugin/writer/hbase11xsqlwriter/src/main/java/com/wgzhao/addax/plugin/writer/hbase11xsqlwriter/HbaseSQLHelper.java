@@ -19,11 +19,14 @@
 
 package com.wgzhao.addax.plugin.writer.hbase11xsqlwriter;
 
+import com.wgzhao.addax.common.base.HBaseConstant;
+import com.wgzhao.addax.common.base.HBaseKey;
 import com.wgzhao.addax.common.exception.AddaxException;
 import com.wgzhao.addax.common.util.Configuration;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.TypeReference;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.hadoop.hbase.HConstants;
 import org.apache.hadoop.hbase.TableName;
 import org.apache.hadoop.hbase.client.Admin;
 import org.apache.hadoop.hbase.util.Pair;
@@ -81,21 +84,21 @@ public class HbaseSQLHelper
      * 因为hbase使用的配置名称 xxx.xxxx.xxx会被{@link Configuration#from(String)}识别成json路径，
      * 而不是一个完整的配置项，所以，hbase的配置必须通过直接调用json API进行解析。
      *
-     * @param hbaseCfgString 配置中{@link Key#HBASE_CONFIG}的值
+     * @param hbaseCfgString 配置中{@link HBaseKey#HBASE_CONFIG}的值
      * @return 返回2个string，第一个是zk quorum,第二个是znode
      */
     public static Pair<String, String> getHbaseConfig(String hbaseCfgString)
     {
         assert hbaseCfgString != null;
         Map<String, String> hbaseConfigMap = JSON.parseObject(hbaseCfgString, new TypeReference<Map<String, String>>() {});
-        String zkQuorum = hbaseConfigMap.get(Key.HBASE_ZK_QUORUM);
+        String zkQuorum = hbaseConfigMap.get(HConstants.ZOOKEEPER_QUORUM);
         // 如果没有提供Zookeeper端口，则使用默认端口
         if (!zkQuorum.contains(":")) {
             zkQuorum = zkQuorum + ":2181";
         }
-        String znode = hbaseConfigMap.get(Key.HBASE_ZNODE_PARENT);
+        String znode = hbaseConfigMap.get(HConstants.ZOOKEEPER_ZNODE_PARENT);
         if (znode == null || znode.isEmpty()) {
-            znode = Constant.DEFAULT_ZNODE;
+            znode = HBaseConstant.DEFAULT_ZNODE;
         }
         return new Pair<>(zkQuorum, znode);
     }

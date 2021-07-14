@@ -19,6 +19,8 @@
 
 package com.wgzhao.addax.plugin.reader.hbase20xreader;
 
+import com.wgzhao.addax.common.base.HBaseConstant;
+import com.wgzhao.addax.common.base.HBaseKey;
 import com.wgzhao.addax.common.element.LongColumn;
 import com.wgzhao.addax.common.util.Configuration;
 import com.wgzhao.addax.common.element.Record;
@@ -48,8 +50,8 @@ public abstract class MultiVersionTask
     {
         super(configuration);
 
-        this.maxVersion = configuration.getInt(Key.MAX_VERSION);
-        this.column = configuration.getList(Key.COLUMN, Map.class);
+        this.maxVersion = configuration.getInt(HBaseKey.MAX_VERSION);
+        this.column = configuration.getList(HBaseKey.COLUMN, Map.class);
         this.familyQualifierMap = Hbase20xHelper.parseColumnOfMultiversionMode(this.column);
     }
 
@@ -90,12 +92,12 @@ public abstract class MultiVersionTask
         byte[] cfAndQualifierName = Bytes.add(CellUtil.cloneFamily(cell), MultiVersionTask.colonByte, CellUtil.cloneQualifier(cell));
         byte[] columnValue = CellUtil.cloneValue(cell);
 
-        ColumnType rawRowkeyType = ColumnType.getByTypeName(familyQualifierMap.get(Constant.ROWKEY_FLAG).get(Key.TYPE));
+        ColumnType rawRowkeyType = ColumnType.getByTypeName(familyQualifierMap.get(HBaseConstant.ROWKEY_FLAG).get(HBaseKey.TYPE));
         String familyQualifier = new String(cfAndQualifierName, StandardCharsets.UTF_8);
-        ColumnType columnValueType = ColumnType.getByTypeName(familyQualifierMap.get(familyQualifier).get(Key.TYPE));
-        String columnValueFormat = familyQualifierMap.get(familyQualifier).get(Key.FORMAT);
+        ColumnType columnValueType = ColumnType.getByTypeName(familyQualifierMap.get(familyQualifier).get(HBaseKey.TYPE));
+        String columnValueFormat = familyQualifierMap.get(familyQualifier).get(HBaseKey.FORMAT);
         if (StringUtils.isBlank(columnValueFormat)) {
-            columnValueFormat = Constant.DEFAULT_DATA_FORMAT;
+            columnValueFormat = HBaseConstant.DEFAULT_DATE_FORMAT;
         }
 
         record.addColumn(convertBytesToAssignType(rawRowkeyType, rawRowkey, columnValueFormat));

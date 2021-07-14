@@ -21,8 +21,8 @@
 
 package com.wgzhao.addax.rdbms.reader.util;
 
-import com.wgzhao.addax.rdbms.reader.Constant;
-import com.wgzhao.addax.rdbms.reader.Key;
+import com.wgzhao.addax.common.base.Constant;
+import com.wgzhao.addax.common.base.Key;
 import com.wgzhao.addax.rdbms.util.DataBaseType;
 import com.wgzhao.addax.common.constant.CommonConstant;
 import com.wgzhao.addax.common.util.Configuration;
@@ -40,8 +40,8 @@ public final class ReaderSplitUtil
     public static List<Configuration> doSplit(
             Configuration originalSliceConfig, int adviceNumber)
     {
-        boolean isTableMode = originalSliceConfig.getBool(Constant.IS_TABLE_MODE);
-        boolean isUserSpecifyEachTableSplitSize = originalSliceConfig.getInt(Constant.EACH_TABLE_SPLIT_SIZE, -1) != -1;
+        boolean isTableMode = originalSliceConfig.getBool(Key.IS_TABLE_MODE);
+        boolean isUserSpecifyEachTableSplitSize = originalSliceConfig.getInt(Key.EACH_TABLE_SPLIT_SIZE, -1) != -1;
         int eachTableShouldSplittedNumber = -1;
         if (isTableMode) {
             // adviceNumber这里是channel数量大小, 即datax并发task数量
@@ -53,14 +53,14 @@ public final class ReaderSplitUtil
                         adviceNumber, originalSliceConfig.getInt(Constant.TABLE_NUMBER_MARK));
             }
             else {
-                eachTableShouldSplittedNumber = originalSliceConfig.getInt(Constant.EACH_TABLE_SPLIT_SIZE, -1);
+                eachTableShouldSplittedNumber = originalSliceConfig.getInt(Key.EACH_TABLE_SPLIT_SIZE, -1);
             }
         }
 
         String column = originalSliceConfig.getString(Key.COLUMN);
         String where = originalSliceConfig.getString(Key.WHERE, null);
 
-        List<Object> conns = originalSliceConfig.getList(Constant.CONN_MARK, Object.class);
+        List<Object> conns = originalSliceConfig.getList(Key.CONNECTION, Object.class);
 
         List<Configuration> splittedConfigs = new ArrayList<>();
 
@@ -74,7 +74,7 @@ public final class ReaderSplitUtil
             // 抽取 jdbcUrl 中的 ip/port 进行资源使用的打标，以提供给 core 做有意义的 shuffle 操作
             sliceConfig.set(CommonConstant.LOAD_BALANCE_RESOURCE_MARK, DataBaseType.parseIpFromJdbcUrl(jdbcUrl));
 
-            sliceConfig.remove(Constant.CONN_MARK);
+            sliceConfig.remove(Key.CONNECTION);
             int tableSplitNumber = eachTableShouldSplittedNumber;
             Configuration tempSlice;
 
@@ -137,13 +137,13 @@ public final class ReaderSplitUtil
     public static Configuration doPreCheckSplit(Configuration originalSliceConfig)
     {
         Configuration queryConfig = originalSliceConfig.clone();
-        boolean isTableMode = originalSliceConfig.getBool(Constant.IS_TABLE_MODE);
+        boolean isTableMode = originalSliceConfig.getBool(Key.IS_TABLE_MODE);
 
         String splitPK = originalSliceConfig.getString(Key.SPLIT_PK);
         String column = originalSliceConfig.getString(Key.COLUMN);
         String where = originalSliceConfig.getString(Key.WHERE, null);
 
-        List<Object> conns = queryConfig.getList(Constant.CONN_MARK, Object.class);
+        List<Object> conns = queryConfig.getList(Key.CONNECTION, Object.class);
 
         for (int i = 0, len = conns.size(); i < len; i++) {
             Configuration connConf = Configuration.from(conns.get(i).toString());

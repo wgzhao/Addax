@@ -52,11 +52,11 @@ public class CassandraReader
         {
             this.jobConfig = super.getPluginJobConf();
             this.jobConfig = super.getPluginJobConf();
-            String username = jobConfig.getString(Key.USERNAME);
-            String password = jobConfig.getString(Key.PASSWORD);
-            String hosts = jobConfig.getString(Key.HOST);
-            Integer port = jobConfig.getInt(Key.PORT, 9042);
-            boolean useSSL = jobConfig.getBool(Key.USESSL);
+            String username = jobConfig.getString(MyKey.USERNAME);
+            String password = jobConfig.getString(MyKey.PASSWORD);
+            String hosts = jobConfig.getString(MyKey.HOST);
+            Integer port = jobConfig.getInt(MyKey.PORT, 9042);
+            boolean useSSL = jobConfig.getBool(MyKey.USESSL);
 
             if ((username != null) && !username.isEmpty()) {
                 Cluster.Builder clusterBuilder = Cluster.builder().withCredentials(username, password)
@@ -98,13 +98,13 @@ public class CassandraReader
         public void init()
         {
             Configuration taskConfig = super.getPluginJobConf();
-            String username = taskConfig.getString(Key.USERNAME);
-            String password = taskConfig.getString(Key.PASSWORD);
-            String hosts = taskConfig.getString(Key.HOST);
-            Integer port = taskConfig.getInt(Key.PORT);
-            boolean useSSL = taskConfig.getBool(Key.USESSL);
-            String keyspace = taskConfig.getString(Key.KEYSPACE);
-            List<String> columnMeta = taskConfig.getList(Key.COLUMN, String.class);
+            String username = taskConfig.getString(MyKey.USERNAME);
+            String password = taskConfig.getString(MyKey.PASSWORD);
+            String hosts = taskConfig.getString(MyKey.HOST);
+            Integer port = taskConfig.getInt(MyKey.PORT);
+            boolean useSSL = taskConfig.getBool(MyKey.USESSL);
+            String keyspace = taskConfig.getString(MyKey.KEYSPACE);
+            List<String> columnMeta = taskConfig.getList(MyKey.COLUMN, String.class);
             columnNumber = columnMeta.size();
 
             Cluster cluster;
@@ -121,7 +121,7 @@ public class CassandraReader
                         .addContactPoints(hosts.split(",")).build();
             }
             session = cluster.connect(keyspace);
-            String cl = taskConfig.getString(Key.CONSITANCY_LEVEL);
+            String cl = taskConfig.getString(MyKey.CONSITANCY_LEVEL);
             if (cl != null && !cl.isEmpty()) {
                 consistencyLevel = ConsistencyLevel.valueOf(cl);
             }

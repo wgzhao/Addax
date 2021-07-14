@@ -29,7 +29,8 @@ import com.wgzhao.addax.rdbms.util.DataBaseType;
 
 import java.util.List;
 
-import static com.wgzhao.addax.rdbms.reader.Constant.FETCH_SIZE;
+import static com.wgzhao.addax.common.base.Constant.DEFAULT_FETCH_SIZE;
+import static com.wgzhao.addax.common.base.Key.FETCH_SIZE;
 
 public class PostgresqlReader
         extends Reader
@@ -47,8 +48,7 @@ public class PostgresqlReader
         public void init()
         {
             this.originalConfig = super.getPluginJobConf();
-            int fetchSize = this.originalConfig.getInt(FETCH_SIZE,
-                    Constant.DEFAULT_FETCH_SIZE);
+            int fetchSize = this.originalConfig.getInt(FETCH_SIZE, DEFAULT_FETCH_SIZE);
             if (fetchSize < 1) {
                 throw AddaxException.asAddaxException(DBUtilErrorCode.REQUIRED_VALUE,
                         String.format("您配置的fetchSize有误，根据DataX的设计，fetchSize : [%d] 设置值不能小于 1.", fetchSize));

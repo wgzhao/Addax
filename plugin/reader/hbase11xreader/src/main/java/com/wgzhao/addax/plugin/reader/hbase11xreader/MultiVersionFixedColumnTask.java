@@ -19,6 +19,7 @@
 
 package com.wgzhao.addax.plugin.reader.hbase11xreader;
 
+import com.wgzhao.addax.common.base.HBaseKey;
 import com.wgzhao.addax.common.util.Configuration;
 import org.apache.hadoop.hbase.client.Scan;
 import org.apache.hadoop.hbase.util.Bytes;
@@ -38,7 +39,7 @@ public class MultiVersionFixedColumnTask
     public void initScan(Scan scan)
     {
         for (Map<String, String> aColumn : column) {
-            String columnName = aColumn.get(Key.NAME);
+            String columnName = aColumn.get(HBaseKey.NAME);
             if (!Hbase11xHelper.isRowkeyColumn(columnName)) {
                 String[] cfAndQualifier = columnName.split(":");
                 scan.addColumn(Bytes.toBytes(cfAndQualifier[0].trim()), Bytes.toBytes(cfAndQualifier[1].trim()));

@@ -21,6 +21,8 @@
 
 package com.wgzhao.addax.rdbms.writer;
 
+import com.wgzhao.addax.common.base.Constant;
+import com.wgzhao.addax.common.base.Key;
 import com.wgzhao.addax.rdbms.util.DataBaseType;
 import com.wgzhao.addax.rdbms.writer.util.OriginalConfPretreatmentUtil;
 import com.wgzhao.addax.rdbms.writer.util.WriterUtil;
@@ -90,8 +92,7 @@ public class CommonRdbmsWriter
             /*检查insert 跟delete权限*/
             String username = originalConfig.getString(Key.USERNAME);
             String password = originalConfig.getString(Key.PASSWORD);
-            List<Object> connections = originalConfig.getList(Constant.CONN_MARK,
-                    Object.class);
+            List<Object> connections = originalConfig.getList(Key.CONNECTION, Object.class);
 
             for (Object connection : connections) {
                 Configuration connConf = Configuration.from(connection.toString());
@@ -120,8 +121,7 @@ public class CommonRdbmsWriter
                 String username = originalConfig.getString(Key.USERNAME);
                 String password = originalConfig.getString(Key.PASSWORD);
 
-                List<Object> conns = originalConfig.getList(Constant.CONN_MARK,
-                        Object.class);
+                List<Object> conns = originalConfig.getList(Key.CONNECTION, Object.class);
                 Configuration connConf = Configuration.from(conns.get(0)
                         .toString());
 
@@ -137,7 +137,7 @@ public class CommonRdbmsWriter
                 List<String> renderedPreSqls = WriterUtil.renderPreOrPostSqls(
                         preSqls, table);
 
-                originalConfig.remove(Constant.CONN_MARK);
+                originalConfig.remove(Key.CONNECTION);
                 if (!renderedPreSqls.isEmpty()) {
                     // 说明有 preSql 配置，则此处删除掉
                     originalConfig.remove(Key.PRE_SQL);

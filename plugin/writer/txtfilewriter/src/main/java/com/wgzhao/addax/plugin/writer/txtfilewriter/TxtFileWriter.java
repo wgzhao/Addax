@@ -19,6 +19,7 @@
 
 package com.wgzhao.addax.plugin.writer.txtfilewriter;
 
+import com.wgzhao.addax.common.base.Key;
 import com.wgzhao.addax.common.exception.AddaxException;
 import com.wgzhao.addax.common.plugin.RecordReceiver;
 import com.wgzhao.addax.common.spi.Writer;
@@ -43,10 +44,11 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Set;
 
-import static com.wgzhao.addax.storage.writer.Key.DATE_FORMAT;
-import static com.wgzhao.addax.storage.writer.Key.FILE_NAME;
-import static com.wgzhao.addax.storage.writer.Key.FORMAT;
-import static com.wgzhao.addax.storage.writer.Key.WRITE_MODE;
+import static com.wgzhao.addax.common.base.Key.DATE_FORMAT;
+import static com.wgzhao.addax.common.base.Key.FILE_NAME;
+import static com.wgzhao.addax.common.base.Key.FORMAT;
+import static com.wgzhao.addax.common.base.Key.WRITE_MODE;
+import static com.wgzhao.addax.common.base.Key.PATH;
 
 /**
  * Created by haiwei.luo on 14-9-17.
@@ -81,7 +83,7 @@ public class TxtFileWriter
         {
             this.writerSliceConfig.getNecessaryValue(FILE_NAME, TxtFileWriterErrorCode.REQUIRED_VALUE);
 
-            String path = this.writerSliceConfig.getNecessaryValue(Key.PATH, TxtFileWriterErrorCode.REQUIRED_VALUE);
+            String path = this.writerSliceConfig.getNecessaryValue(PATH, TxtFileWriterErrorCode.REQUIRED_VALUE);
 
             try {
                 // warn: 这里用户需要配一个目录

@@ -29,7 +29,7 @@ import com.wgzhao.addax.rdbms.util.DataBaseType;
 
 import java.util.List;
 
-import static com.wgzhao.addax.rdbms.reader.Constant.FETCH_SIZE;
+import static com.wgzhao.addax.common.base.Key.FETCH_SIZE;
 
 public class SqlServerReader
         extends Reader

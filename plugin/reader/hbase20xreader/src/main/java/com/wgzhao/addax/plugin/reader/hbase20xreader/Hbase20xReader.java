@@ -19,6 +19,7 @@
 
 package com.wgzhao.addax.plugin.reader.hbase20xreader;
 
+import com.wgzhao.addax.common.base.HBaseKey;
 import com.wgzhao.addax.common.element.Record;
 import com.wgzhao.addax.common.exception.AddaxException;
 import com.wgzhao.addax.common.plugin.RecordSender;
@@ -71,7 +72,7 @@ public class Hbase20xReader
         public void init()
         {
             Configuration taskConfig = super.getPluginJobConf();
-            String mode = taskConfig.getString(Key.MODE);
+            String mode = taskConfig.getString(HBaseKey.MODE);
             ModeType modeType = ModeType.getByTypeName(mode);
 
             switch (modeType) {

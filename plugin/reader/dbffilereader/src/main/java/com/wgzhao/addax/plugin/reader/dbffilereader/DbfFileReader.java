@@ -22,6 +22,8 @@ package com.wgzhao.addax.plugin.reader.dbffilereader;
 import com.linuxense.javadbf.DBFDataType;
 import com.linuxense.javadbf.DBFReader;
 import com.linuxense.javadbf.DBFRow;
+import com.wgzhao.addax.common.base.Constant;
+import com.wgzhao.addax.common.base.Key;
 import com.wgzhao.addax.common.element.ColumnEntry;
 import com.wgzhao.addax.common.exception.AddaxException;
 import com.wgzhao.addax.common.plugin.RecordSender;
@@ -93,8 +95,7 @@ public class DbfFileReader
         private void validateParameter()
         {
             // Compatible with the old version, path is a string before
-            String pathInString = this.originConfig.getNecessaryValue(Key.PATH,
-                    DbfFileReaderErrorCode.REQUIRED_VALUE);
+            String pathInString = this.originConfig.getNecessaryValue(Key.PATH, DbfFileReaderErrorCode.REQUIRED_VALUE);
             if (isBlank(pathInString)) {
                 throw AddaxException.asAddaxException(
                         DbfFileReaderErrorCode.REQUIRED_VALUE,
@@ -113,9 +114,9 @@ public class DbfFileReader
                 }
             }
 
-            String encoding = this.originConfig.getString(Key.ENCODING, Key.DEFAULT_ENCODING);
+            String encoding = this.originConfig.getString(Key.ENCODING, Constant.DEFAULT_ENCODING);
             if (isBlank(encoding)) {
-                this.originConfig.set(Key.ENCODING, Key.DEFAULT_ENCODING);
+                this.originConfig.set(Key.ENCODING, Constant.DEFAULT_ENCODING);
             }
             else {
                 try {
@@ -218,7 +219,7 @@ public class DbfFileReader
             List<List<String>> splitedSourceFiles = this.splitSourceFiles(this.sourceFiles, splitNumber);
             for (List<String> files : splitedSourceFiles) {
                 Configuration splitedConfig = this.originConfig.clone();
-                splitedConfig.set(Constant.SOURCE_FILES, files);
+                splitedConfig.set(Key.SOURCE_FILES, files);
                 readerSplitConfigs.add(splitedConfig);
             }
             LOG.debug("split() ok and end...");
@@ -353,8 +354,7 @@ public class DbfFileReader
         public void init()
         {
             this.readerSliceConfig = this.getPluginJobConf();
-            this.sourceFiles = this.readerSliceConfig.getList(
-                    Constant.SOURCE_FILES, String.class);
+            this.sourceFiles = this.readerSliceConfig.getList(Key.SOURCE_FILES, String.class);
         }
 
         @Override
