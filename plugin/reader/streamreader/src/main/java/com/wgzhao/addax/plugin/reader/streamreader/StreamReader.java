@@ -35,12 +35,15 @@ import com.wgzhao.addax.common.util.Configuration;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.apache.commons.lang3.RandomUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.time.DateUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -77,6 +80,7 @@ public class StreamReader
         private static final Logger LOG = LoggerFactory.getLogger(Job.class);
         private Pattern mixupFunctionPattern;
         private Configuration originalConfig;
+        private static final List<String> validUnits = Arrays.asList("d", "day", "M", "month", "y", "year", "h", "hour", "m", "minute", "s", "second", "w", "week");
 
         @Override
         public void init()
@@ -146,23 +150,31 @@ public class StreamReader
             originalConfig.set(Key.COLUMN, dealedColumns);
         }
 
+        /**
+         * 支持随机函数, demo如下:
+         * LONG: random 0, 10 0到10之间的随机数字
+         * STRING: random 0, 10 0到10长度之间的随机字符串
+         * BOOL: random 0, 10 false 和 true出现的比率
+         * DOUBLE: random 0, 10 0到10之间的随机浮点数
+         * DATE: random 2014-07-07 00:00:00, 2016-07-07 00:00:00 开始时间-&gt;结束时间之间的随机时间，
+         * 日期格式默认(不支持逗号)yyyy-MM-dd HH:mm:ss
+         * BYTES: random 0, 10 0到10长度之间的随机字符串获取其UTF-8编码的二进制串
+         * 配置了混淆函数后，可不配置value
+         * 2者都没有配置
+         * 支持递增函数，当前仅支持整数类型，demo如下
+         * LONG: incr 100 从100开始，每次加1
+         * LONG: incr 0, 1 从0开始，每次加1
+         * LONG: incr 1, 10 从 1 开始，每次加10
+         * LONG: incr 1000, 1 从 1000开始，每次加-1，允许出现负数
+         * DATE: incr &lt;date from&gt; &lt;interval&gt; &lt;unit&gt;
+         * date from : 指定开始日期，必填
+         * interval: 隔间周期，默认为1，负数则递减 选填
+         * unit: 间隔单位，默认为day，可设置为 d/day, m/month, y/year
+         *
+         * @param eachColumnConfig see {@link Configuration}
+         */
         private void parseMixupFunctions(Configuration eachColumnConfig)
         {
-            // 支持随机函数, demo如下:
-            // LONG: random 0, 10 0到10之间的随机数字
-            // STRING: random 0, 10 0到10长度之间的随机字符串
-            // BOOL: random 0, 10 false 和 true出现的比率
-            // DOUBLE: random 0, 10 0到10之间的随机浮点数
-            // DATE: random 2014-07-07 00:00:00, 2016-07-07 00:00:00 开始时间->结束时间之间的随机时间，
-            // 日期格式默认(不支持逗号)yyyy-MM-dd HH:mm:ss
-            // BYTES: random 0, 10 0到10长度之间的随机字符串获取其UTF-8编码的二进制串
-            // 配置了混淆函数后，可不配置value
-            // 2者都没有配置
-            // 支持递增函数，当前仅支持整数类型，demo如下
-            // LONG: incr 100 从100开始，每次加1
-            // LONG: incr 0, 1 从0开始，每次加1
-            // LONG: incr 1, 10 从 1 开始，每次加10
-            // LONG: incr 1000, 1 从 1000开始，每次加-1，允许出现负数
             String columnValue = eachColumnConfig.getString(Constant.VALUE);
             String columnMixup = eachColumnConfig.getString(Constant.RANDOM);
             String columnIncr = eachColumnConfig.getString(Constant.INCR);
@@ -172,27 +184,54 @@ public class StreamReader
             }
             if (StringUtils.isNotBlank(columnIncr)) {
                 // 类型判断
-                if (!"long".equalsIgnoreCase(eachColumnConfig.getString(Constant.TYPE))) {
+                String dType = eachColumnConfig.getString(Constant.TYPE).toLowerCase();
+                if ("long".equals(dType)) {
+                    //  columnValue is valid number ?
+                    if (!columnIncr.contains(",")) {
+                        // setup the default step value
+                        columnIncr = columnIncr + ",1";
+                        eachColumnConfig.set(Constant.INCR, columnIncr);
+                    }
+                    // validate value
+                    try {
+                        Long.parseLong(columnIncr.split(",")[0].trim());
+                        Long.parseLong(columnIncr.split(",")[1].trim());
+                    }
+                    catch (NumberFormatException e) {
+                        throw AddaxException.asAddaxException(
+                                StreamReaderErrorCode.ILLEGAL_VALUE,
+                                columnValue + " 不是合法的数字字符串"
+                        );
+                    }
+                }
+                else if ("date".equals(dType)) {
+                    String[] fields = columnIncr.split(",");
+                    if (fields.length == 1) {
+                        eachColumnConfig.set(Constant.INCR, columnIncr.trim() + ",1,d");
+                    }
+                    else if (fields.length == 2) {
+                        try {
+                            Integer.parseInt(fields[1]);
+                        } catch (NumberFormatException e) {
+                            throw AddaxException.asAddaxException(
+                                    StreamReaderErrorCode.ILLEGAL_VALUE,
+                                    "The second field must be numeric, value [" + fields[1] + "] is not valid"
+                            );
+                        }
+                        eachColumnConfig.set(Constant.INCR, fields[0].trim() + "," + fields[1].trim() + ",d");
+                    }
+                    else {
+                        String unit = fields[2].charAt(0) + "";
+                        // validate unit
+                        validateDateIncrUnit(unit);
+                        // normalize unit to 1-char
+                        eachColumnConfig.set(Constant.INCR, fields[0].trim() + "," + fields[1].trim() + "," + unit);
+                    }
+                }
+                else {
                     throw AddaxException.asAddaxException(
                             StreamReaderErrorCode.NOT_SUPPORT_TYPE,
-                            "递增序列当前仅支持整数类型(long)"
-                    );
-                }
-                //  columnValue is valid number ?
-                if (!columnIncr.contains(",")) {
-                    // setup the default step value
-                    columnIncr = columnIncr + ",1";
-                    eachColumnConfig.set(Constant.INCR, columnIncr);
-                }
-                // validate value
-                try {
-                    Long.parseLong(columnIncr.split(",")[0].trim());
-                    Long.parseLong(columnIncr.split(",")[1].trim());
-                }
-                catch (NumberFormatException e) {
-                    throw AddaxException.asAddaxException(
-                            StreamReaderErrorCode.ILLEGAL_VALUE,
-                            columnValue + " 不是合法的数字字符串"
+                            "递增序列当前仅支持整数类型(long)和日期类型(date)"
                     );
                 }
                 this.originalConfig.set(Constant.HAVE_INCR_FUNCTION, true);
@@ -268,6 +307,35 @@ public class StreamReader
             }
         }
 
+        /**
+         * valid the unit
+         * current support unit are the following:
+         *  1. d/day
+         *  2. M/month
+         *  3. y/year
+         *  4. h/hour
+         *  5. m/minute
+         *  6. s/second
+         *  7. w/week
+         * @param unit the date interval unit
+         */
+        private void validateDateIncrUnit(String unit)
+        {
+            boolean isOK = true;
+            if ( unit.length() == 1 ) {
+                if (! validUnits.contains(unit)) {
+                    isOK = false;
+                }
+            }  else if (! validUnits.contains(unit.toLowerCase())) {
+                isOK = false;
+            }
+            if (!isOK) {
+                throw AddaxException.asAddaxException(
+                        StreamReaderErrorCode.ILLEGAL_VALUE,
+                        unit + " is NOT valid interval unit，for more details, please refer to the documentation");
+            }
+        }
+
         @Override
         public void prepare()
         {
@@ -309,7 +377,7 @@ public class StreamReader
         private boolean haveIncrFunction;
 
         // 递增字段字段，用于存储当前的递增值
-        private static final Map<Integer, Long> incrMap = new HashMap<>();
+        private static final Map<Integer, Object> incrMap = new HashMap<>();
 
         @Override
         public void init()
@@ -358,7 +426,6 @@ public class StreamReader
         {
             String columnValue = eachColumnConfig.getString(Constant.VALUE);
             if ("null".equals(columnValue)) {
-                columnValue = null;
                 return null;
             }
             Type columnType = Type.valueOf(eachColumnConfig.getString(Constant.TYPE).toUpperCase());
@@ -404,12 +471,38 @@ public class StreamReader
                 }
             }
             else if (isIncr) {
-                //get initial value and step
-                long currVal = Long.parseLong(columnIncr.split(",")[0]);
-                long step = Long.parseLong(columnIncr.split(",")[1]);
-                currVal = incrMap.getOrDefault(columnIndex, currVal);
-                incrMap.put(columnIndex, currVal + step);
-                return new LongColumn(currVal);
+                Object currVal;
+                long step;
+                if (columnType == Type.LONG) {
+                    //get initial value and step
+                    currVal = Long.parseLong(columnIncr.split(",")[0]);
+                    step = Long.parseLong(columnIncr.split(",")[1]);
+                    currVal = incrMap.getOrDefault(columnIndex, currVal);
+                    incrMap.put(columnIndex, (long) currVal + step);
+                    return new LongColumn((long) currVal);
+                } else if (columnType == Type.DATE) {
+                    String[] fields = columnIncr.split(",");
+                    currVal = incrMap.getOrDefault(columnIndex, null);
+                    if (currVal == null) {
+                        String datePattern = eachColumnConfig.getString(Constant.DATE_FORMAT_MARK, "yyyy-MM-dd");
+                        SimpleDateFormat sdf = new SimpleDateFormat(datePattern);
+                        try {
+                            currVal = sdf.parse(fields[0]);
+                        } catch (java.text.ParseException e) {
+                            throw AddaxException.asAddaxException(
+                                    StreamReaderErrorCode.ILLEGAL_VALUE,
+                                    String.format("can not parse date value [%s] with date format [%s]", fields[0], datePattern)
+                            );
+                        }
+                    }
+                    incrMap.put(columnIndex, dateIncrement((Date) currVal, Integer.parseInt(fields[1]), fields[2]));
+                    return new DateColumn((Date)currVal);
+                } else {
+                    throw AddaxException.asAddaxException(
+                            StreamReaderErrorCode.NOT_SUPPORT_TYPE,
+                            columnType + " can not support for increment"
+                    );
+                }
             }
             else {
                 switch (columnType) {
@@ -433,6 +526,35 @@ public class StreamReader
                         throw new Exception(String.format("不支持类型[%s]",
                                 columnType.name()));
                 }
+            }
+        }
+
+        /**
+         * calculate next date via interval
+         * @param curDate current date
+         * @param step interval
+         * @param unit unit
+         * @return next date
+         */
+        private Date dateIncrement(Date curDate, int step, String unit)
+        {
+            switch(unit) {
+                case "d":
+                    return DateUtils.addDays(curDate, step);
+                case "M":
+                    return DateUtils.addMonths(curDate, step);
+                case "y":
+                    return DateUtils.addYears(curDate, step);
+                case "w":
+                    return DateUtils.addWeeks(curDate, step);
+                case "h":
+                    return DateUtils.addHours(curDate, step);
+                case "m":
+                    return DateUtils.addMinutes(curDate, step);
+                case "s":
+                    return DateUtils.addSeconds(curDate, step);
+                default:
+                    return DateUtils.addDays(curDate, step);
             }
         }
 
