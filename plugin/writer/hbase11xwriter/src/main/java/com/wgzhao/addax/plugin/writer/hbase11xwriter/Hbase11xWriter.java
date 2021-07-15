@@ -19,6 +19,7 @@
 
 package com.wgzhao.addax.plugin.writer.hbase11xwriter;
 
+import com.wgzhao.addax.common.base.HBaseKey;
 import com.wgzhao.addax.common.exception.AddaxException;
 import com.wgzhao.addax.common.plugin.RecordReceiver;
 import com.wgzhao.addax.common.spi.Writer;
@@ -49,7 +50,7 @@ public class Hbase11xWriter
         @Override
         public void prepare()
         {
-            boolean truncate = originConfig.getBool(Key.TRUNCATE, false);
+            boolean truncate = originConfig.getBool(HBaseKey.TRUNCATE, false);
             if (truncate) {
                 Hbase11xHelper.truncateTable(this.originConfig);
             }
@@ -81,7 +82,7 @@ public class Hbase11xWriter
         public void init()
         {
             Configuration taskConfig = super.getPluginJobConf();
-            String mode = taskConfig.getString(Key.MODE);
+            String mode = taskConfig.getString(HBaseKey.MODE);
             ModeType modeType = ModeType.getByTypeName(mode);
 
             if (modeType == ModeType.NORMAL) {

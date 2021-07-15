@@ -63,7 +63,7 @@ public class CopyProcessor
         Record record;
 
         while (true) {
-            record = queueIn.poll(Constant.TIME_OUT_MS, TimeUnit.MILLISECONDS);
+            record = queueIn.poll(GPConstant.TIME_OUT_MS, TimeUnit.MILLISECONDS);
 
             if (record == null && !task.moreRecord()) {
                 break;
@@ -81,9 +81,9 @@ public class CopyProcessor
 
             byte[] data = serializeRecord(record);
 
-            if (data.length > Constant.MAX_CSV_SIZE) {
+            if (data.length > GPConstant.MAX_CSV_SIZE) {
                 String s = new String(data).substring(0, 100) + "...";
-                LOG.warn("数据元组超过 {} 字节长度限制被忽略。{}", s, Constant.MAX_CSV_SIZE);
+                LOG.warn("数据元组超过 {} 字节长度限制被忽略。{}", s, GPConstant.MAX_CSV_SIZE);
             }
             else {
                 queueOut.put(data);
@@ -110,9 +110,9 @@ public class CopyProcessor
                 case 0x00:
                     LOG.warn("字符串中发现非法字符 0x00，已经将其删除");
                     continue;
-                case Constant.QUOTE_CHAR:
-                case Constant.ESCAPE:
-                    sb.append(Constant.ESCAPE);
+                case GPConstant.QUOTE_CHAR:
+                case GPConstant.ESCAPE:
+                    sb.append(GPConstant.ESCAPE);
                     break;
                 default:
                     break;
@@ -134,9 +134,9 @@ public class CopyProcessor
         StringBuilder sb = new StringBuilder();
 
         for (byte datum : data) {
-            if (datum == Constant.ESCAPE) {
-                sb.append(Constant.ESCAPE);
-                sb.append(Constant.ESCAPE);
+            if (datum == GPConstant.ESCAPE) {
+                sb.append(GPConstant.ESCAPE);
+                sb.append(GPConstant.ESCAPE);
             }
             else if (datum < 0x20 || datum > 0x7e) {
                 byte b = datum;
@@ -175,9 +175,9 @@ public class CopyProcessor
                     String data = column.asString();
 
                     if (data != null) {
-                        sb.append(Constant.QUOTE_CHAR);
+                        sb.append(GPConstant.QUOTE_CHAR);
                         sb.append(escapeString(data));
-                        sb.append(Constant.QUOTE_CHAR);
+                        sb.append(GPConstant.QUOTE_CHAR);
                     }
 
                     break;
@@ -208,10 +208,10 @@ public class CopyProcessor
             }
 
             if (i + 1 < this.columnNumber) {
-                sb.append(Constant.DELIMTER);
+                sb.append(GPConstant.DELIMITER);
             }
         }
-        sb.append(Constant.NEWLINE);
+        sb.append(GPConstant.NEWLINE);
         return sb.toString().getBytes(StandardCharsets.UTF_8);
     }
 }

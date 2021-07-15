@@ -19,6 +19,8 @@
 
 package com.wgzhao.addax.plugin.writer.hbase20xsqlwriter;
 
+import com.wgzhao.addax.common.base.HBaseConstant;
+import com.wgzhao.addax.common.base.HBaseKey;
 import com.wgzhao.addax.common.element.Column;
 import com.wgzhao.addax.common.element.Record;
 import com.wgzhao.addax.common.exception.AddaxException;
@@ -101,15 +103,15 @@ public class HBase20xSQLWriterTask
             connection = HBase20xSQLHelper.getJdbcConnection(configuration);
             connection.setAutoCommit(false);
         }
-        nullModeType = NullModeType.getByTypeName(configuration.getString(Key.NULLMODE, Constant.DEFAULT_NULL_MODE));
-        batchSize = configuration.getInt(Key.BATCHSIZE, Constant.DEFAULT_BATCH_ROW_COUNT);
-        String schema = configuration.getString(Key.SCHEMA);
-        String tableName = configuration.getNecessaryValue(Key.TABLE, HBase20xSQLWriterErrorCode.REQUIRED_VALUE);
+        nullModeType = NullModeType.getByTypeName(configuration.getString(HBaseKey.NULL_MODE, HBaseConstant.DEFAULT_NULL_MODE));
+        batchSize = configuration.getInt(HBaseKey.BATCH_SIZE, HBaseConstant.DEFAULT_BATCH_ROW_COUNT);
+        String schema = configuration.getString(HBaseKey.SCHEMA);
+        String tableName = configuration.getNecessaryValue(HBaseKey.TABLE, HBase20xSQLWriterErrorCode.REQUIRED_VALUE);
         fullTableName = "\"" + tableName + "\"";
         if (schema != null && !schema.isEmpty()) {
             fullTableName = "\"" + schema + "\".\"" + tableName + "\"";
         }
-        columns = configuration.getList(Key.COLUMN, String.class);
+        columns = configuration.getList(HBaseKey.COLUMN, String.class);
         if (pstmt == null) {
             // 一个Task的生命周期中只使用一个PreparedStatement对象
             pstmt = createPreparedStatement();
@@ -315,22 +317,22 @@ public class HBase20xSQLWriterTask
                     break;
 
                 case Types.TINYINT:
-                case Constant.TYPE_UNSIGNED_TINYINT:
+                case HBaseConstant.TYPE_UNSIGNED_TINYINT:
                     pstmt.setByte(pos, col.asLong().byteValue());
                     break;
 
                 case Types.SMALLINT:
-                case Constant.TYPE_UNSIGNED_SMALLINT:
+                case HBaseConstant.TYPE_UNSIGNED_SMALLINT:
                     pstmt.setShort(pos, col.asLong().shortValue());
                     break;
 
                 case Types.INTEGER:
-                case Constant.TYPE_UNSIGNED_INTEGER:
+                case HBaseConstant.TYPE_UNSIGNED_INTEGER:
                     pstmt.setInt(pos, col.asLong().intValue());
                     break;
 
                 case Types.BIGINT:
-                case Constant.TYPE_UNSIGNED_LONG:
+                case HBaseConstant.TYPE_UNSIGNED_LONG:
                     pstmt.setLong(pos, col.asLong());
                     break;
 
@@ -347,17 +349,17 @@ public class HBase20xSQLWriterTask
                     break;
 
                 case Types.DATE:
-                case Constant.TYPE_UNSIGNED_DATE:
+                case HBaseConstant.TYPE_UNSIGNED_DATE:
                     pstmt.setDate(pos, new Date(col.asDate().getTime()));
                     break;
 
                 case Types.TIME:
-                case Constant.TYPE_UNSIGNED_TIME:
+                case HBaseConstant.TYPE_UNSIGNED_TIME:
                     pstmt.setTime(pos, new Time(col.asDate().getTime()));
                     break;
 
                 case Types.TIMESTAMP:
-                case Constant.TYPE_UNSIGNED_TIMESTAMP:
+                case HBaseConstant.TYPE_UNSIGNED_TIMESTAMP:
                     pstmt.setTimestamp(pos, new Timestamp(col.asDate().getTime()));
                     break;
 
@@ -406,19 +408,19 @@ public class HBase20xSQLWriterTask
                 return false;
 
             case Types.TINYINT:
-            case Constant.TYPE_UNSIGNED_TINYINT:
+            case HBaseConstant.TYPE_UNSIGNED_TINYINT:
                 return (byte) 0;
 
             case Types.SMALLINT:
-            case Constant.TYPE_UNSIGNED_SMALLINT:
+            case HBaseConstant.TYPE_UNSIGNED_SMALLINT:
                 return (short) 0;
 
             case Types.INTEGER:
-            case Constant.TYPE_UNSIGNED_INTEGER:
+            case HBaseConstant.TYPE_UNSIGNED_INTEGER:
                 return 0;
 
             case Types.BIGINT:
-            case Constant.TYPE_UNSIGNED_LONG:
+            case HBaseConstant.TYPE_UNSIGNED_LONG:
                 return (long) 0;
 
             case Types.FLOAT:
@@ -431,15 +433,15 @@ public class HBase20xSQLWriterTask
                 return new BigDecimal(0);
 
             case Types.DATE:
-            case Constant.TYPE_UNSIGNED_DATE:
+            case HBaseConstant.TYPE_UNSIGNED_DATE:
                 return new Date(0);
 
             case Types.TIME:
-            case Constant.TYPE_UNSIGNED_TIME:
+            case HBaseConstant.TYPE_UNSIGNED_TIME:
                 return new Time(0);
 
             case Types.TIMESTAMP:
-            case Constant.TYPE_UNSIGNED_TIMESTAMP:
+            case HBaseConstant.TYPE_UNSIGNED_TIMESTAMP:
                 return new Timestamp(0);
 
             case Types.BINARY:

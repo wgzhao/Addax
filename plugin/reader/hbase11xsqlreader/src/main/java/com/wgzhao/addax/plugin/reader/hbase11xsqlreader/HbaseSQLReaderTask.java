@@ -19,6 +19,7 @@
 
 package com.wgzhao.addax.plugin.reader.hbase11xsqlreader;
 
+import com.wgzhao.addax.common.base.HBaseKey;
 import com.wgzhao.addax.common.element.BoolColumn;
 import com.wgzhao.addax.common.element.BytesColumn;
 import com.wgzhao.addax.common.element.Column;
@@ -103,7 +104,7 @@ public class HbaseSQLReaderTask
                     HbaseSQLReaderErrorCode.GET_PHOENIX_CONNECTIONINFO_ERROR, "获取表的列出问题，重试，若还有问题请检查hbase集群状态," + e.getMessage());
         }
         this.phoenixInputFormat = new PhoenixInputFormat<PhoenixRecordWritable>();
-        String splitBase64Str = this.readerConfig.getOriginalConfig().getString(Key.SPLIT_KEY);
+        String splitBase64Str = this.readerConfig.getOriginalConfig().getString(HBaseKey.SPLIT_KEY);
         byte[] splitBytes = org.apache.commons.codec.binary.Base64.decodeBase64(splitBase64Str);
         TaskAttemptID attemptId = new TaskAttemptID();
         org.apache.hadoop.conf.Configuration conf = HbaseSQLHelper.generatePhoenixConf(this.readerConfig);

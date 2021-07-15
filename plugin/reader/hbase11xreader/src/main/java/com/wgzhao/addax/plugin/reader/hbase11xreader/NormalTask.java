@@ -19,6 +19,7 @@
 
 package com.wgzhao.addax.plugin.reader.hbase11xreader;
 
+import com.wgzhao.addax.common.base.HBaseKey;
 import com.wgzhao.addax.common.element.Column;
 import com.wgzhao.addax.common.element.StringColumn;
 import com.wgzhao.addax.common.util.Configuration;
@@ -39,7 +40,7 @@ public class NormalTask
     public NormalTask(Configuration configuration)
     {
         super(configuration);
-        this.column = configuration.getList(Key.COLUMN, Map.class);
+        this.column = configuration.getList(HBaseKey.COLUMN, Map.class);
         this.hbaseColumnCells = Hbase11xHelper.parseColumnOfNormalMode(this.column);
     }
 

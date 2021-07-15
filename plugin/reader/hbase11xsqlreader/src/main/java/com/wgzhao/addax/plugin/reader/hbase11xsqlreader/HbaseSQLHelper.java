@@ -19,6 +19,7 @@
 
 package com.wgzhao.addax.plugin.reader.hbase11xsqlreader;
 
+import com.wgzhao.addax.common.base.HBaseKey;
 import com.wgzhao.addax.common.exception.AddaxException;
 import com.wgzhao.addax.common.util.Configuration;
 import com.alibaba.fastjson.JSON;
@@ -112,7 +113,7 @@ public class HbaseSQLHelper
     {
         PhoenixInputFormat inputFormat = new PhoenixInputFormat<PhoenixRecordWritable>();
         org.apache.hadoop.conf.Configuration conf = generatePhoenixConf(readerConfig);
-        JobID jobId = new JobID(Key.MOCK_JOBID_IDENTIFIER, Key.MOCK_JOBID);
+        JobID jobId = new JobID(HBaseKey.MOCK_JOBID_IDENTIFIER, HBaseKey.MOCK_JOBID);
         JobContextImpl jobContext = new JobContextImpl(conf, jobId);
         List<Configuration> resultConfigurations = new ArrayList<>();
         List<InputSplit> rawSplits;
@@ -124,7 +125,7 @@ public class HbaseSQLHelper
 
                 byte[] splitSer = HadoopSerializationUtil.serialize((PhoenixInputSplit) split);
                 String splitBase64Str = org.apache.commons.codec.binary.Base64.encodeBase64String(splitSer);
-                cfg.set(Key.SPLIT_KEY, splitBase64Str);
+                cfg.set(HBaseKey.SPLIT_KEY, splitBase64Str);
                 resultConfigurations.add(cfg);
             }
         }
@@ -151,8 +152,8 @@ public class HbaseSQLHelper
         Map<String, String> hbaseConfigMap = JSON.parseObject(hbaseCfgString, new TypeReference<Map<String, String>>()
         {
         });
-        String zkQuorum = hbaseConfigMap.get(Key.HBASE_ZK_QUORUM);
-        String znode = hbaseConfigMap.get(Key.HBASE_ZNODE_PARENT);
+        String zkQuorum = hbaseConfigMap.get(HConstants.ZOOKEEPER_QUORUM);
+        String znode = hbaseConfigMap.get(HConstants.ZOOKEEPER_ZNODE_PARENT);
         if (znode == null) {
             znode = "";
         }

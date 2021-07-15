@@ -21,6 +21,8 @@
 
 package com.wgzhao.addax.rdbms.writer.util;
 
+import com.wgzhao.addax.common.base.Constant;
+import com.wgzhao.addax.common.base.Key;
 import com.wgzhao.addax.rdbms.util.TableExpandUtil;
 import com.wgzhao.addax.common.exception.AddaxException;
 import com.wgzhao.addax.common.util.Configuration;
@@ -30,8 +32,6 @@ import com.wgzhao.addax.rdbms.util.DBUtil;
 import com.wgzhao.addax.rdbms.util.DBUtilErrorCode;
 import com.wgzhao.addax.rdbms.util.DataBaseType;
 import com.wgzhao.addax.rdbms.util.JdbcConnectionFactory;
-import com.wgzhao.addax.rdbms.writer.Constant;
-import com.wgzhao.addax.rdbms.writer.Key;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -82,7 +82,7 @@ public final class OriginalConfPretreatmentUtil
 
     public static void simplifyConf(Configuration originalConfig)
     {
-        List<Object> connections = originalConfig.getList(Constant.CONN_MARK,
+        List<Object> connections = originalConfig.getList(Key.CONNECTION,
                 Object.class);
 
         int tableNum = 0;
@@ -101,7 +101,7 @@ public final class OriginalConfPretreatmentUtil
             }
 
             jdbcUrl = dataBaseType.appendJDBCSuffixForWriter(jdbcUrl);
-            originalConfig.set(String.format("%s[%d].%s", Constant.CONN_MARK, i, Key.JDBC_URL),
+            originalConfig.set(String.format("%s[%d].%s", Key.CONNECTION, i, Key.JDBC_URL),
                     jdbcUrl);
 
             List<String> tables = connConf.getList(Key.TABLE, String.class);
@@ -121,7 +121,7 @@ public final class OriginalConfPretreatmentUtil
 
             tableNum += expandedTables.size();
 
-            originalConfig.set(String.format("%s[%d].%s", Constant.CONN_MARK,
+            originalConfig.set(String.format("%s[%d].%s", Key.CONNECTION,
                     i, Key.TABLE), expandedTables);
         }
 
@@ -136,7 +136,7 @@ public final class OriginalConfPretreatmentUtil
                     "您的配置文件中的列配置信息有误. 因为您未配置写入数据库表的列名称，DataX获取不到列信息. 请检查您的配置并作出修改.");
         }
         else {
-            boolean isPreCheck = originalConfig.getBool(Key.DRYRUN, false);
+            boolean isPreCheck = originalConfig.getBool(Key.DRY_RUN, false);
             List<String> allColumns;
             if (isPreCheck) {
                 allColumns = DBUtil.getTableColumnsByConn(dataBaseType, connectionFactory.getConnecttionWithoutRetry(), oneTable);
@@ -173,12 +173,12 @@ public final class OriginalConfPretreatmentUtil
     public static void dealColumnConf(Configuration originalConfig)
     {
         String jdbcUrl = originalConfig.getString(String.format("%s[0].%s",
-                Constant.CONN_MARK, Key.JDBC_URL));
+                Key.CONNECTION, Key.JDBC_URL));
 
         String username = originalConfig.getString(Key.USERNAME);
         String password = originalConfig.getString(Key.PASSWORD);
         String oneTable = originalConfig.getString(String.format(
-                "%s[0].%s[0]", Constant.CONN_MARK, Key.TABLE));
+                "%s[0].%s[0]", Key.CONNECTION, Key.TABLE));
 
         JdbcConnectionFactory jdbcConnectionFactory = new JdbcConnectionFactory(dataBaseType, jdbcUrl, username, password);
         dealColumnConf(originalConfig, jdbcConnectionFactory, oneTable);
@@ -188,8 +188,7 @@ public final class OriginalConfPretreatmentUtil
     {
         List<String> columns = originalConfig.getList(Key.COLUMN, String.class);
 
-        String jdbcUrl = originalConfig.getString(String.format("%s[0].%s",
-                Constant.CONN_MARK, Key.JDBC_URL));
+        String jdbcUrl = originalConfig.getString(String.format("%s[0].%s", Key.CONNECTION, Key.JDBC_URL));
 
         // 默认为：insert 方式
         String writeMode = originalConfig.getString(Key.WRITE_MODE, "INSERT");

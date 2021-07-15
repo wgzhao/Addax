@@ -21,6 +21,8 @@
 
 package com.wgzhao.addax.rdbms.reader;
 
+import com.wgzhao.addax.common.base.Constant;
+import com.wgzhao.addax.common.base.Key;
 import com.wgzhao.addax.rdbms.util.DataBaseType;
 import com.wgzhao.addax.common.element.BoolColumn;
 import com.wgzhao.addax.common.element.BytesColumn;
@@ -83,8 +85,8 @@ public class CommonRdbmsReader
                     if (splitPK != null) {
                         LOG.info("Try to use `" + splitPK + "` as primary key to split");
                         originalConfig.set(Key.SPLIT_PK, splitPK);
-                        if (originalConfig.getInt(Constant.EACH_TABLE_SPLIT_SIZE, -1) == -1) {
-                            originalConfig.set(Constant.EACH_TABLE_SPLIT_SIZE, 5);
+                        if (originalConfig.getInt(Key.EACH_TABLE_SPLIT_SIZE, -1) == -1) {
+                            originalConfig.set(Key.EACH_TABLE_SPLIT_SIZE, Constant.DEFAULT_EACH_TABLE_SPLIT_SIZE);
                         }
                     }
 
@@ -98,7 +100,7 @@ public class CommonRdbmsReader
             /* 检查每个表是否有读权限，以及querySql跟splik Key是否正确 */
             Configuration queryConf = ReaderSplitUtil.doPreCheckSplit(originalConfig);
             String splitPK = queryConf.getString(Key.SPLIT_PK);
-            List<Object> connList = queryConf.getList(Constant.CONN_MARK, Object.class);
+            List<Object> connList = queryConf.getList(Key.CONNECTION, Object.class);
             String username = queryConf.getString(Key.USERNAME);
             String password = queryConf.getString(Key.PASSWORD);
             ExecutorService exec;

@@ -21,6 +21,8 @@ package com.wgzhao.addax.plugin.reader.txtfilereader;
 
 import com.alibaba.fastjson.JSON;
 import com.csvreader.CsvReader;
+import com.wgzhao.addax.common.base.Constant;
+import com.wgzhao.addax.common.base.Key;
 import com.wgzhao.addax.common.element.BoolColumn;
 import com.wgzhao.addax.common.element.BytesColumn;
 import com.wgzhao.addax.common.element.Column;
@@ -245,7 +247,7 @@ public class TxtFileReader
                     this.sourceFiles, splitNumber);
             for (List<String> files : splitedSourceFiles) {
                 Configuration splitedConfig = this.originConfig.clone();
-                splitedConfig.set(Constant.SOURCE_FILES, files);
+                splitedConfig.set(Key.SOURCE_FILES, files);
                 readerSplitConfigs.add(splitedConfig);
             }
             LOG.debug("split() ok and end...");
@@ -408,7 +410,7 @@ public class TxtFileReader
         public void init()
         {
             this.readerSliceConfig = this.getPluginJobConf();
-            this.sourceFiles = this.readerSliceConfig.getList(Constant.SOURCE_FILES, String.class);
+            this.sourceFiles = this.readerSliceConfig.getList(Key.SOURCE_FILES, String.class);
             this.column = readerSliceConfig.getListConfiguration(Key.COLUMN);
             // handle ["*"] -> [], null
             if (null != column && 1 == column.size() && "\"*\"".equals(column.get(0).toString())) {

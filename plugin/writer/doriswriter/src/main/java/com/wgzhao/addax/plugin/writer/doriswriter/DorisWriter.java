@@ -19,6 +19,7 @@
 
 package com.wgzhao.addax.plugin.writer.doriswriter;
 
+import com.wgzhao.addax.common.base.Key;
 import com.wgzhao.addax.common.plugin.RecordReceiver;
 import com.wgzhao.addax.common.spi.Writer;
 import com.wgzhao.addax.common.util.Configuration;

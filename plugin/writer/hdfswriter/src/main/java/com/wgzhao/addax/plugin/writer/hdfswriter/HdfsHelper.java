@@ -22,6 +22,7 @@ package com.wgzhao.addax.plugin.writer.hdfswriter;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.google.common.collect.Lists;
+import com.wgzhao.addax.common.base.Key;
 import com.wgzhao.addax.common.element.Column;
 import com.wgzhao.addax.common.element.Record;
 import com.wgzhao.addax.common.exception.AddaxException;

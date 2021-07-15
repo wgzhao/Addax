@@ -23,8 +23,8 @@ package com.wgzhao.addax.rdbms.reader.util;
 
 import com.wgzhao.addax.rdbms.util.DataBaseType;
 import com.wgzhao.addax.common.util.Configuration;
-import com.wgzhao.addax.rdbms.reader.Constant;
-import com.wgzhao.addax.rdbms.reader.Key;
+import com.wgzhao.addax.common.base.Constant;
+import com.wgzhao.addax.common.base.Key;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

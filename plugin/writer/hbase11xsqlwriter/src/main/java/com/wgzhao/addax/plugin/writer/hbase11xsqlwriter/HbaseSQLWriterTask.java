@@ -19,6 +19,7 @@
 
 package com.wgzhao.addax.plugin.writer.hbase11xsqlwriter;
 
+import com.wgzhao.addax.common.base.HBaseConstant;
 import com.wgzhao.addax.common.element.Column;
 import com.wgzhao.addax.common.element.Record;
 import com.wgzhao.addax.common.exception.AddaxException;
@@ -286,22 +287,22 @@ public class HbaseSQLWriterTask
                     break;
 
                 case Types.TINYINT:
-                case Constant.TYPE_UNSIGNED_TINYINT:
+                case HBaseConstant.TYPE_UNSIGNED_TINYINT:
                     ps.setByte(pos, col.asLong().byteValue());
                     break;
 
                 case Types.SMALLINT:
-                case Constant.TYPE_UNSIGNED_SMALLINT:
+                case HBaseConstant.TYPE_UNSIGNED_SMALLINT:
                     ps.setShort(pos, col.asLong().shortValue());
                     break;
 
                 case Types.INTEGER:
-                case Constant.TYPE_UNSIGNED_INTEGER:
+                case HBaseConstant.TYPE_UNSIGNED_INTEGER:
                     ps.setInt(pos, col.asLong().intValue());
                     break;
 
                 case Types.BIGINT:
-                case Constant.TYPE_UNSIGNED_LONG:
+                case HBaseConstant.TYPE_UNSIGNED_LONG:
                     ps.setLong(pos, col.asLong());
                     break;
 
@@ -318,17 +319,17 @@ public class HbaseSQLWriterTask
                     break;
 
                 case Types.DATE:
-                case Constant.TYPE_UNSIGNED_DATE:
+                case HBaseConstant.TYPE_UNSIGNED_DATE:
                     ps.setDate(pos, new java.sql.Date(col.asDate().getTime()));
                     break;
 
                 case Types.TIME:
-                case Constant.TYPE_UNSIGNED_TIME:
+                case HBaseConstant.TYPE_UNSIGNED_TIME:
                     ps.setTime(pos, new java.sql.Time(col.asDate().getTime()));
                     break;
 
                 case Types.TIMESTAMP:
-                case Constant.TYPE_UNSIGNED_TIMESTAMP:
+                case HBaseConstant.TYPE_UNSIGNED_TIMESTAMP:
                     ps.setTimestamp(pos, new java.sql.Timestamp(col.asDate().getTime()));
                     break;
 
@@ -377,19 +378,19 @@ public class HbaseSQLWriterTask
                 return false;
 
             case Types.TINYINT:
-            case Constant.TYPE_UNSIGNED_TINYINT:
+            case HBaseConstant.TYPE_UNSIGNED_TINYINT:
                 return (byte) 0;
 
             case Types.SMALLINT:
-            case Constant.TYPE_UNSIGNED_SMALLINT:
+            case HBaseConstant.TYPE_UNSIGNED_SMALLINT:
                 return (short) 0;
 
             case Types.INTEGER:
-            case Constant.TYPE_UNSIGNED_INTEGER:
+            case HBaseConstant.TYPE_UNSIGNED_INTEGER:
                 return 0;
 
             case Types.BIGINT:
-            case Constant.TYPE_UNSIGNED_LONG:
+            case HBaseConstant.TYPE_UNSIGNED_LONG:
                 return (long) 0;
 
             case Types.FLOAT:
@@ -402,15 +403,15 @@ public class HbaseSQLWriterTask
                 return new BigDecimal(0);
 
             case Types.DATE:
-            case Constant.TYPE_UNSIGNED_DATE:
+            case HBaseConstant.TYPE_UNSIGNED_DATE:
                 return new java.sql.Date(0);
 
             case Types.TIME:
-            case Constant.TYPE_UNSIGNED_TIME:
+            case HBaseConstant.TYPE_UNSIGNED_TIME:
                 return new java.sql.Time(0);
 
             case Types.TIMESTAMP:
-            case Constant.TYPE_UNSIGNED_TIMESTAMP:
+            case HBaseConstant.TYPE_UNSIGNED_TIMESTAMP:
                 return new java.sql.Timestamp(0);
 
             case Types.BINARY:

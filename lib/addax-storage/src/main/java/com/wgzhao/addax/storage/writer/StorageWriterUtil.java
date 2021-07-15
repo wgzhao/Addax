@@ -21,6 +21,8 @@
 
 package com.wgzhao.addax.storage.writer;
 
+import com.wgzhao.addax.common.base.Constant;
+import com.wgzhao.addax.common.base.Key;
 import com.wgzhao.addax.common.element.Column;
 import com.wgzhao.addax.common.element.DateColumn;
 import com.wgzhao.addax.common.element.Record;
@@ -138,14 +140,11 @@ public class StorageWriterUtil
         }
 
         // fileFormat check
-        String fileFormat = writerConfiguration.getString(Key.FILE_FORMAT,
-                Constant.FILE_FORMAT_TEXT);
-        if (!Constant.FILE_FORMAT_CSV.equals(fileFormat)
-                && !Constant.FILE_FORMAT_TEXT.equals(fileFormat)) {
+        String fileFormat = writerConfiguration.getString(Key.FILE_FORMAT, Constant.DEFAULT_FILE_FORMAT);
+        if (! Constant.SUPPORTED_FILE_FORMAT.contains(fileFormat)) {
             throw AddaxException.asAddaxException(
-                    StorageWriterErrorCode.ILLEGAL_VALUE, String
-                            .format("您配置的fileFormat [%s]错误, 支持csv, text两种.",
-                                    fileFormat));
+                    StorageWriterErrorCode.ILLEGAL_VALUE,
+                    String.format("您配置的fileFormat [%s]错误, 支持[%s]两种.", fileFormat, Constant.SUPPORTED_FILE_FORMAT));
         }
     }
 
@@ -289,8 +288,7 @@ public class StorageWriterUtil
         }
 
         // warn: default false
-        String fileFormat = config.getString(Key.FILE_FORMAT,
-                Constant.FILE_FORMAT_TEXT);
+        String fileFormat = config.getString(Key.FILE_FORMAT, Constant.DEFAULT_FILE_FORMAT);
 
         String delimiterInStr = config.getString(Key.FIELD_DELIMITER);
         if (null != delimiterInStr && 1 != delimiterInStr.length()) {

@@ -19,6 +19,7 @@
 
 package com.wgzhao.addax.plugin.reader.hbase11xreader;
 
+import com.wgzhao.addax.common.base.HBaseKey;
 import com.wgzhao.addax.common.util.Configuration;
 import org.apache.hadoop.hbase.client.Scan;
 import org.apache.hadoop.hbase.util.Bytes;
@@ -34,7 +35,7 @@ public class MultiVersionDynamicColumnTask
     {
         super(configuration);
 
-        this.columnFamilies = configuration.getList(Key.COLUMN_FAMILY, String.class);
+        this.columnFamilies = configuration.getList(HBaseKey.COLUMN_FAMILY, String.class);
     }
 
     @Override

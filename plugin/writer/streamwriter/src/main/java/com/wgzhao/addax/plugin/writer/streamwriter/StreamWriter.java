@@ -75,8 +75,8 @@ public class StreamWriter
         {
             this.originalConfig = getPluginJobConf();
 
-            String path = this.originalConfig.getString(Key.PATH, null);
-            String fileName = this.originalConfig.getString(Key.FILE_NAME, null);
+            String path = this.originalConfig.getString(StreamKey.PATH, null);
+            String fileName = this.originalConfig.getString(StreamKey.FILE_NAME, null);
 
             if (StringUtils.isNoneBlank(path) && StringUtils.isNoneBlank(fileName)) {
                 validateParameter(path, fileName);
@@ -180,13 +180,13 @@ public class StreamWriter
             Configuration writerSliceConfig = getPluginJobConf();
 
             this.fieldDelimiter = writerSliceConfig.getString(
-                    Key.FIELD_DELIMITER, "\t");
-            this.print = writerSliceConfig.getBool(Key.PRINT, true);
+                    StreamKey.FIELD_DELIMITER, "\t");
+            this.print = writerSliceConfig.getBool(StreamKey.PRINT, true);
 
-            this.path = writerSliceConfig.getString(Key.PATH, null);
-            this.fileName = writerSliceConfig.getString(Key.FILE_NAME, null);
-            this.recordNumBeforSleep = writerSliceConfig.getLong(Key.RECORD_NUM_BEFORE_SLEEP, 0);
-            this.sleepTime = writerSliceConfig.getLong(Key.SLEEP_TIME, 0);
+            this.path = writerSliceConfig.getString(StreamKey.PATH, null);
+            this.fileName = writerSliceConfig.getString(StreamKey.FILE_NAME, null);
+            this.recordNumBeforSleep = writerSliceConfig.getLong(StreamKey.RECORD_NUM_BEFORE_SLEEP, 0);
+            this.sleepTime = writerSliceConfig.getLong(StreamKey.SLEEP_TIME, 0);
             if (recordNumBeforSleep < 0) {
                 throw AddaxException.asAddaxException(StreamWriterErrorCode.CONFIG_INVALID_EXCEPTION, "recordNumber 不能为负值");
             }

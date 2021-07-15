@@ -60,15 +60,15 @@ public class InfluxDBReaderTask
 
     public InfluxDBReaderTask(Configuration configuration)
     {
-        List<Object> connList = configuration.getList(Key.CONNECTION);
+        List<Object> connList = configuration.getList(InfluxDBKey.CONNECTION);
         Configuration conn = Configuration.from(connList.get(0).toString());
-        this.querySql = configuration.getString(Key.QUERY_SQL, null);
-        this.database = conn.getString(Key.DATABASE);
-        this.endpoint = conn.getString(Key.ENDPOINT);
-        this.username = configuration.getString(Key.USERNAME);
-        this.password = configuration.getString(Key.PASSWORD, null);
-        this.connTimeout = configuration.getInt(Key.CONNECT_TIMEOUT_SECONDS, CONNECT_TIMEOUT_SECONDS_DEFAULT) * 1000;
-        this.socketTimeout = configuration.getInt(Key.SOCKET_TIMEOUT_SECONDS, SOCKET_TIMEOUT_SECONDS_DEFAULT) * 1000;
+        this.querySql = configuration.getString(InfluxDBKey.QUERY_SQL, null);
+        this.database = conn.getString(InfluxDBKey.DATABASE);
+        this.endpoint = conn.getString(InfluxDBKey.ENDPOINT);
+        this.username = configuration.getString(InfluxDBKey.USERNAME);
+        this.password = configuration.getString(InfluxDBKey.PASSWORD, null);
+        this.connTimeout = configuration.getInt(InfluxDBKey.CONNECT_TIMEOUT_SECONDS, CONNECT_TIMEOUT_SECONDS_DEFAULT) * 1000;
+        this.socketTimeout = configuration.getInt(InfluxDBKey.SOCKET_TIMEOUT_SECONDS, SOCKET_TIMEOUT_SECONDS_DEFAULT) * 1000;
     }
 
     public void post()

@@ -19,11 +19,11 @@
 
 package com.wgzhao.addax.plugin.reader.clickhousereader;
 
+import com.wgzhao.addax.common.base.Key;
 import com.wgzhao.addax.common.plugin.RecordSender;
 import com.wgzhao.addax.common.spi.Reader;
 import com.wgzhao.addax.common.util.Configuration;
 import com.wgzhao.addax.rdbms.reader.CommonRdbmsReader;
-import com.wgzhao.addax.rdbms.reader.Constant;
 import com.wgzhao.addax.rdbms.util.DataBaseType;
 
 import java.util.List;
@@ -45,7 +45,7 @@ public class ClickHouseReader
         public void init()
         {
             this.originalConfig = super.getPluginJobConf();
-            this.originalConfig.set(Constant.FETCH_SIZE, Integer.MIN_VALUE);
+            this.originalConfig.set(Key.FETCH_SIZE, Integer.MIN_VALUE);
 
             this.commonRdbmsReaderJob = new CommonRdbmsReader.Job(DATABASE_TYPE);
             this.originalConfig = this.commonRdbmsReaderJob.init(this.originalConfig);
@@ -95,7 +95,7 @@ public class ClickHouseReader
         @Override
         public void startRead(RecordSender recordSender)
         {
-            int fetchSize = this.readerSliceConfig.getInt(Constant.FETCH_SIZE);
+            int fetchSize = this.readerSliceConfig.getInt(Key.FETCH_SIZE);
 
             this.commonRdbmsReaderTask.startRead(this.readerSliceConfig, recordSender,
                     super.getTaskPluginCollector(), fetchSize);

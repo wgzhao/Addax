@@ -19,6 +19,8 @@
 
 package com.wgzhao.addax.plugin.writer.hbase11xsqlwriter;
 
+import com.wgzhao.addax.common.base.HBaseConstant;
+import com.wgzhao.addax.common.base.HBaseKey;
 import com.wgzhao.addax.common.exception.AddaxException;
 import com.wgzhao.addax.common.util.Configuration;
 import com.google.common.base.Strings;
@@ -86,15 +88,15 @@ public class HbaseSQLWriterConfig
         parseTableConfig(cfg, dataxCfg);
 
         // 3. 解析其他配置
-        cfg.nullMode = NullModeType.getByTypeName(dataxCfg.getString(Key.NULL_MODE, Constant.DEFAULT_NULL_MODE));
-        cfg.batchSize = dataxCfg.getInt(Key.BATCH_SIZE, Constant.DEFAULT_BATCH_ROW_COUNT);
-        cfg.truncate = dataxCfg.getBool(Key.TRUNCATE, Constant.DEFAULT_TRUNCATE);
-        cfg.isThinClient = dataxCfg.getBool(Key.THIN_CLIENT, Constant.DEFAULT_USE_THIN_CLIENT);
+        cfg.nullMode = NullModeType.getByTypeName(dataxCfg.getString(HBaseKey.NULL_MODE, HBaseConstant.DEFAULT_NULL_MODE));
+        cfg.batchSize = dataxCfg.getInt(HBaseKey.BATCH_SIZE, HBaseConstant.DEFAULT_BATCH_ROW_COUNT);
+        cfg.truncate = dataxCfg.getBool(HBaseKey.TRUNCATE, HBaseConstant.DEFAULT_TRUNCATE);
+        cfg.isThinClient = dataxCfg.getBool(HBaseKey.THIN_CLIENT, HBaseConstant.DEFAULT_USE_THIN_CLIENT);
 
         // 4. 解析kerberos 配置
-        cfg.haveKerberos = dataxCfg.getBool(Key.HAVE_KERBEROS, Constant.DEFAULT_HAVE_KERBEROS);
-        cfg.kerberosPrincipal = dataxCfg.getString(Key.KERBEROS_PRINCIPAL, Constant.DEFAULT_KERBEROS_PRINCIPAL);
-        cfg.kerberosKeytabFilePath = dataxCfg.getString(Key.KERBEROS_KEYTAB_FILE_PATH, Constant.DEFAULT_KERBEROS_KEYTAB_FILE_PATH);
+        cfg.haveKerberos = dataxCfg.getBool(HBaseKey.HAVE_KERBEROS, HBaseConstant.DEFAULT_HAVE_KERBEROS);
+        cfg.kerberosPrincipal = dataxCfg.getString(HBaseKey.KERBEROS_PRINCIPAL, HBaseConstant.DEFAULT_KERBEROS_PRINCIPAL);
+        cfg.kerberosKeytabFilePath = dataxCfg.getString(HBaseKey.KERBEROS_KEYTAB_FILE_PATH, HBaseConstant.DEFAULT_KERBEROS_KEYTAB_FILE_PATH);
 
         // 4. 打印解析出来的配置
         LOG.debug("HBase SQL writer config parsed: {}", cfg);
@@ -105,7 +107,7 @@ public class HbaseSQLWriterConfig
     private static void parseClusterConfig(HbaseSQLWriterConfig cfg, Configuration dataxCfg)
     {
         // 获取hbase集群的连接信息字符串
-        String hbaseCfg = dataxCfg.getString(Key.HBASE_CONFIG);
+        String hbaseCfg = dataxCfg.getString(HBaseKey.HBASE_CONFIG);
         if (StringUtils.isBlank(hbaseCfg)) {
             // 集群配置必须存在且不为空
             throw AddaxException.asAddaxException(
@@ -113,12 +115,12 @@ public class HbaseSQLWriterConfig
                     "读 Hbase 时需要配置hbaseConfig，其内容为 Hbase 连接信息，请联系 Hbase PE 获取该信息.");
         }
 
-        if (dataxCfg.getBool(Key.THIN_CLIENT, Constant.DEFAULT_USE_THIN_CLIENT)) {
+        if (dataxCfg.getBool(HBaseKey.THIN_CLIENT, HBaseConstant.DEFAULT_USE_THIN_CLIENT)) {
             Map<String, String> thinConnectConfig = HbaseSQLHelper.getThinConnectConfig(hbaseCfg);
-            String thinConnectStr = thinConnectConfig.get(Key.HBASE_THIN_CONNECT_URL);
-            cfg.namespace = thinConnectConfig.get(Key.HBASE_THIN_CONNECT_NAMESPACE);
-            cfg.username = thinConnectConfig.get(Key.HBASE_THIN_CONNECT_USERNAME);
-            cfg.password = thinConnectConfig.get(Key.HBASE_THIN_CONNECT_PASSWORD);
+            String thinConnectStr = thinConnectConfig.get(HBaseKey.HBASE_THIN_CONNECT_URL);
+            cfg.namespace = thinConnectConfig.get(HBaseKey.HBASE_THIN_CONNECT_NAMESPACE);
+            cfg.username = thinConnectConfig.get(HBaseKey.HBASE_THIN_CONNECT_USERNAME);
+            cfg.password = thinConnectConfig.get(HBaseKey.HBASE_THIN_CONNECT_PASSWORD);
             if (Strings.isNullOrEmpty(thinConnectStr)) {
                 throw AddaxException.asAddaxException(
                         HbaseSQLWriterErrorCode.ILLEGAL_VALUE,
@@ -165,7 +167,7 @@ public class HbaseSQLWriterConfig
     private static void parseTableConfig(HbaseSQLWriterConfig cfg, Configuration dataxCfg)
     {
         // 解析并检查表名
-        cfg.tableName = dataxCfg.getString(Key.TABLE);
+        cfg.tableName = dataxCfg.getString(HBaseKey.TABLE);
 
         if (cfg.tableName == null || cfg.tableName.isEmpty()) {
             throw AddaxException.asAddaxException(
@@ -181,7 +183,7 @@ public class HbaseSQLWriterConfig
         }
 
         // 解析列配置
-        cfg.columns = dataxCfg.getList(Key.COLUMN, String.class);
+        cfg.columns = dataxCfg.getList(HBaseKey.COLUMN, String.class);
         if (cfg.columns == null || cfg.columns.isEmpty()) {
             throw AddaxException.asAddaxException(
                     HbaseSQLWriterErrorCode.ILLEGAL_VALUE, "HBase的columns配置不能为空,请添加目标表的列名配置.");

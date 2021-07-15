@@ -19,6 +19,7 @@
 
 package com.wgzhao.addax.plugin.writer.doriswriter;
 
+import com.wgzhao.addax.common.base.Key;
 import com.wgzhao.addax.common.element.Record;
 import com.wgzhao.addax.common.exception.AddaxException;
 import com.wgzhao.addax.common.plugin.RecordReceiver;

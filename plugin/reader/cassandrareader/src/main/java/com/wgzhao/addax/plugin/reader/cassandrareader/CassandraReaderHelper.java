@@ -455,7 +455,7 @@ public class CassandraReaderHelper
             splittedConfigs.add(jobConfig);
             return splittedConfigs;
         }
-        String where = jobConfig.getString(Key.WHERE);
+        String where = jobConfig.getString(MyKey.WHERE);
         if (where != null && where.toLowerCase().contains("token(")) {
             splittedConfigs.add(jobConfig);
             return splittedConfigs;
@@ -473,8 +473,8 @@ public class CassandraReaderHelper
                     r = maxToken.toBigInteger();
                 }
                 Configuration taskConfig = jobConfig.clone();
-                taskConfig.set(Key.MIN_TOKEN, l.toString());
-                taskConfig.set(Key.MAX_TOKEN, r.toString());
+                taskConfig.set(MyKey.MIN_TOKEN, l.toString());
+                taskConfig.set(MyKey.MAX_TOKEN, r.toString());
                 splittedConfigs.add(taskConfig);
             }
         }
@@ -490,8 +490,8 @@ public class CassandraReaderHelper
                     r = maxToken.longValue();
                 }
                 Configuration taskConfig = jobConfig.clone();
-                taskConfig.set(Key.MIN_TOKEN, String.valueOf(l));
-                taskConfig.set(Key.MAX_TOKEN, String.valueOf(r));
+                taskConfig.set(MyKey.MIN_TOKEN, String.valueOf(l));
+                taskConfig.set(MyKey.MAX_TOKEN, String.valueOf(r));
                 splittedConfigs.add(taskConfig);
             }
         }
@@ -503,9 +503,9 @@ public class CassandraReaderHelper
 
     public static String getQueryString(Configuration taskConfig, Cluster cluster)
     {
-        List<String> columnMeta = taskConfig.getList(Key.COLUMN, String.class);
-        String keyspace = taskConfig.getString(Key.KEYSPACE);
-        String table = taskConfig.getString(Key.TABLE);
+        List<String> columnMeta = taskConfig.getList(MyKey.COLUMN, String.class);
+        String keyspace = taskConfig.getString(MyKey.KEYSPACE);
+        String table = taskConfig.getString(MyKey.TABLE);
 
         StringBuilder columns = new StringBuilder();
         for (String column : columnMeta) {
@@ -516,12 +516,12 @@ public class CassandraReaderHelper
         }
 
         StringBuilder where = new StringBuilder();
-        String whereString = taskConfig.getString(Key.WHERE);
+        String whereString = taskConfig.getString(MyKey.WHERE);
         if (whereString != null && !whereString.isEmpty()) {
             where.append(whereString);
         }
-        String minToken = taskConfig.getString(Key.MIN_TOKEN);
-        String maxToken = taskConfig.getString(Key.MAX_TOKEN);
+        String minToken = taskConfig.getString(MyKey.MIN_TOKEN);
+        String maxToken = taskConfig.getString(MyKey.MAX_TOKEN);
         if (minToken != null || maxToken != null) {
             LOG.info("range:" + minToken + "~" + maxToken);
             List<ColumnMetadata> pks = cluster.getMetadata().getKeyspace(keyspace).getTable(table).getPartitionKey();
@@ -547,7 +547,7 @@ public class CassandraReaderHelper
             }
         }
 
-        boolean allowFiltering = taskConfig.getBool(Key.ALLOW_FILTERING, false);
+        boolean allowFiltering = taskConfig.getBool(MyKey.ALLOW_FILTERING, false);
 
         StringBuilder select = new StringBuilder();
         select.append("SELECT ").append(columns.toString()).append(" FROM ").append(table);
@@ -563,13 +563,13 @@ public class CassandraReaderHelper
 
     public static void checkConfig(Configuration jobConfig, Cluster cluster)
     {
-        ensureStringExists(jobConfig, Key.HOST);
-        ensureStringExists(jobConfig, Key.KEYSPACE);
-        ensureStringExists(jobConfig, Key.TABLE);
-        ensureExists(jobConfig, Key.COLUMN);
+        ensureStringExists(jobConfig, MyKey.HOST);
+        ensureStringExists(jobConfig, MyKey.KEYSPACE);
+        ensureStringExists(jobConfig, MyKey.TABLE);
+        ensureExists(jobConfig, MyKey.COLUMN);
 
         ///keyspace,table是否存在
-        String keyspace = jobConfig.getString(Key.KEYSPACE);
+        String keyspace = jobConfig.getString(MyKey.KEYSPACE);
         if (cluster.getMetadata().getKeyspace(keyspace) == null) {
             throw AddaxException
                     .asAddaxException(
@@ -578,7 +578,7 @@ public class CassandraReaderHelper
                                     "配置信息有错误.keyspace'%s'不存在 .",
                                     keyspace));
         }
-        String table = jobConfig.getString(Key.TABLE);
+        String table = jobConfig.getString(MyKey.TABLE);
         TableMetadata tableMetadata = cluster.getMetadata().getKeyspace(keyspace).getTable(table);
         if (tableMetadata == null) {
             throw AddaxException
@@ -588,17 +588,17 @@ public class CassandraReaderHelper
                                     "配置信息有错误.表'%s'不存在 .",
                                     table));
         }
-        List<String> columns = jobConfig.getList(Key.COLUMN, String.class);
+        List<String> columns = jobConfig.getList(MyKey.COLUMN, String.class);
         for (String name : columns) {
             if (name == null || name.isEmpty()) {
                 throw AddaxException
                         .asAddaxException(
                                 CassandraReaderErrorCode.CONF_ERROR,
                                 String.format(
-                                        "配置信息有错误.列信息中需要包含'%s'字段 .", Key.COLUMN_NAME));
+                                        "配置信息有错误.列信息中需要包含'%s'字段 .", MyKey.COLUMN_NAME));
             }
-            if (name.startsWith(Key.WRITE_TIME)) {
-                String colName = name.substring(Key.WRITE_TIME.length(), name.length() - 1);
+            if (name.startsWith(MyKey.WRITE_TIME)) {
+                String colName = name.substring(MyKey.WRITE_TIME.length(), name.length() - 1);
                 ColumnMetadata col = tableMetadata.getColumn(colName);
                 if (col == null) {
                     throw AddaxException

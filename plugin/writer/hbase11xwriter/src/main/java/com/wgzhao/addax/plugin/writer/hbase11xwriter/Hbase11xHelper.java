@@ -19,6 +19,8 @@
 
 package com.wgzhao.addax.plugin.writer.hbase11xwriter;
 
+import com.wgzhao.addax.common.base.HBaseConstant;
+import com.wgzhao.addax.common.base.HBaseKey;
 import com.wgzhao.addax.common.exception.AddaxException;
 import com.wgzhao.addax.common.util.Configuration;
 import com.alibaba.fastjson.JSON;
@@ -90,9 +92,9 @@ public class Hbase11xHelper
 
     public static Table getTable(Configuration configuration)
     {
-        String hbaseConfig = configuration.getString(Key.HBASE_CONFIG);
-        String userTable = configuration.getString(Key.TABLE);
-        long writeBufferSize = configuration.getLong(Key.WRITE_BUFFER_SIZE, Constant.DEFAULT_WRITE_BUFFER_SIZE);
+        String hbaseConfig = configuration.getString(HBaseKey.HBASE_CONFIG);
+        String userTable = configuration.getString(HBaseKey.TABLE);
+        long writeBufferSize = configuration.getLong(HBaseKey.WRITE_BUFFER_SIZE, HBaseConstant.DEFAULT_WRITE_BUFFER_SIZE);
         org.apache.hadoop.hbase.client.Connection hConnection = Hbase11xHelper.getHbaseConnection(hbaseConfig);
         TableName hTableName = TableName.valueOf(userTable);
         org.apache.hadoop.hbase.client.Admin admin = null;
@@ -115,9 +117,9 @@ public class Hbase11xHelper
 
     public static BufferedMutator getBufferedMutator(Configuration configuration)
     {
-        String hbaseConfig = configuration.getString(Key.HBASE_CONFIG);
-        String userTable = configuration.getString(Key.TABLE);
-        long writeBufferSize = configuration.getLong(Key.WRITE_BUFFER_SIZE, Constant.DEFAULT_WRITE_BUFFER_SIZE);
+        String hbaseConfig = configuration.getString(HBaseKey.HBASE_CONFIG);
+        String userTable = configuration.getString(HBaseKey.TABLE);
+        long writeBufferSize = configuration.getLong(HBaseKey.WRITE_BUFFER_SIZE, HBaseConstant.DEFAULT_WRITE_BUFFER_SIZE);
         org.apache.hadoop.conf.Configuration hConfiguration = Hbase11xHelper.getHbaseConfiguration(hbaseConfig);
         org.apache.hadoop.hbase.client.Connection hConnection = Hbase11xHelper.getHbaseConnection(hbaseConfig);
         TableName hTableName = TableName.valueOf(userTable);
@@ -143,7 +145,7 @@ public class Hbase11xHelper
 
     public static void deleteTable(Configuration configuration)
     {
-        String userTable = configuration.getString(Key.TABLE);
+        String userTable = configuration.getString(HBaseKey.TABLE);
         LOG.info("HBasWriter begins to delete table {} .", userTable);
         Scan scan = new Scan();
         org.apache.hadoop.hbase.client.Table hTable = Hbase11xHelper.getTable(configuration);
@@ -162,8 +164,8 @@ public class Hbase11xHelper
 
     public static void truncateTable(Configuration configuration)
     {
-        String hbaseConfig = configuration.getString(Key.HBASE_CONFIG);
-        String userTable = configuration.getString(Key.TABLE);
+        String hbaseConfig = configuration.getString(HBaseKey.HBASE_CONFIG);
+        String userTable = configuration.getString(HBaseKey.TABLE);
         LOG.info("HBasWriter begins to truncate table {} .", userTable);
         TableName hTableName = TableName.valueOf(userTable);
         org.apache.hadoop.hbase.client.Connection hConnection = Hbase11xHelper.getHbaseConnection(hbaseConfig);
@@ -250,26 +252,26 @@ public class Hbase11xHelper
 
     public static void validateParameter(Configuration originalConfig)
     {
-        originalConfig.getNecessaryValue(Key.HBASE_CONFIG, Hbase11xWriterErrorCode.REQUIRED_VALUE);
-        originalConfig.getNecessaryValue(Key.TABLE, Hbase11xWriterErrorCode.REQUIRED_VALUE);
+        originalConfig.getNecessaryValue(HBaseKey.HBASE_CONFIG, Hbase11xWriterErrorCode.REQUIRED_VALUE);
+        originalConfig.getNecessaryValue(HBaseKey.TABLE, Hbase11xWriterErrorCode.REQUIRED_VALUE);
 
         Hbase11xHelper.validateMode(originalConfig);
 
-        String encoding = originalConfig.getString(Key.ENCODING, Constant.DEFAULT_ENCODING);
+        String encoding = originalConfig.getString(HBaseKey.ENCODING, HBaseConstant.DEFAULT_ENCODING);
         if (!Charset.isSupported(encoding)) {
             throw AddaxException.asAddaxException(Hbase11xWriterErrorCode.ILLEGAL_VALUE, String.format("Hbasewriter 不支持您所配置的编码:[%s]", encoding));
         }
-        originalConfig.set(Key.ENCODING, encoding);
+        originalConfig.set(HBaseKey.ENCODING, encoding);
 
-        Boolean walFlag = originalConfig.getBool(Key.WAL_FLAG, false);
-        originalConfig.set(Key.WAL_FLAG, walFlag);
-        long writeBufferSize = originalConfig.getLong(Key.WRITE_BUFFER_SIZE, Constant.DEFAULT_WRITE_BUFFER_SIZE);
-        originalConfig.set(Key.WRITE_BUFFER_SIZE, writeBufferSize);
+        Boolean walFlag = originalConfig.getBool(HBaseKey.WAL_FLAG, false);
+        originalConfig.set(HBaseKey.WAL_FLAG, walFlag);
+        long writeBufferSize = originalConfig.getLong(HBaseKey.WRITE_BUFFER_SIZE, HBaseConstant.DEFAULT_WRITE_BUFFER_SIZE);
+        originalConfig.set(HBaseKey.WRITE_BUFFER_SIZE, writeBufferSize);
     }
 
     private static void validateMode(Configuration originalConfig)
     {
-        String mode = originalConfig.getNecessaryValue(Key.MODE, Hbase11xWriterErrorCode.REQUIRED_VALUE);
+        String mode = originalConfig.getNecessaryValue(HBaseKey.MODE, Hbase11xWriterErrorCode.REQUIRED_VALUE);
         ModeType modeType = ModeType.getByTypeName(mode);
         if (modeType == ModeType.NORMAL) {
             validateRowkeyColumn(originalConfig);
@@ -284,14 +286,14 @@ public class Hbase11xHelper
 
     private static void validateColumn(Configuration originalConfig)
     {
-        List<Configuration> columns = originalConfig.getListConfiguration(Key.COLUMN);
+        List<Configuration> columns = originalConfig.getListConfiguration(HBaseKey.COLUMN);
         if (columns == null || columns.isEmpty()) {
             throw AddaxException.asAddaxException(Hbase11xWriterErrorCode.REQUIRED_VALUE, "column为必填项，其形式为：column:[{\"index\": 0,\"name\": \"cf0:column0\",\"type\": \"string\"},{\"index\": 1,\"name\": \"cf1:column1\",\"type\": \"long\"}]");
         }
         for (Configuration aColumn : columns) {
-            Integer index = aColumn.getInt(Key.INDEX);
-            String type = aColumn.getNecessaryValue(Key.TYPE, Hbase11xWriterErrorCode.REQUIRED_VALUE);
-            String name = aColumn.getNecessaryValue(Key.NAME, Hbase11xWriterErrorCode.REQUIRED_VALUE);
+            Integer index = aColumn.getInt(HBaseKey.INDEX);
+            String type = aColumn.getNecessaryValue(HBaseKey.TYPE, Hbase11xWriterErrorCode.REQUIRED_VALUE);
+            String name = aColumn.getNecessaryValue(HBaseKey.NAME, Hbase11xWriterErrorCode.REQUIRED_VALUE);
             ColumnType.getByTypeName(type);
             if (name.split(":").length != 2) {
                 throw AddaxException.asAddaxException(Hbase11xWriterErrorCode.ILLEGAL_VALUE, String.format("您column配置项中name配置的列格式[%s]不正确，name应该配置为 列族:列名  的形式, 如 {\"index\": 1,\"name\": \"cf1:q1\",\"type\": \"long\"}", name));
@@ -304,14 +306,14 @@ public class Hbase11xHelper
 
     private static void validateRowkeyColumn(Configuration originalConfig)
     {
-        List<Configuration> rowkeyColumn = originalConfig.getListConfiguration(Key.ROWKEY_COLUMN);
+        List<Configuration> rowkeyColumn = originalConfig.getListConfiguration(HBaseKey.ROW_KEY_COLUMN);
         if (rowkeyColumn == null || rowkeyColumn.isEmpty()) {
             throw AddaxException.asAddaxException(Hbase11xWriterErrorCode.REQUIRED_VALUE, "rowkeyColumn为必填项，其形式为：rowkeyColumn:[{\"index\": 0,\"type\": \"string\"},{\"index\": -1,\"type\": \"string\",\"value\": \"_\"}]");
         }
         int rowkeyColumnSize = rowkeyColumn.size();
         for (Configuration aRowkeyColumn : rowkeyColumn) {
-            Integer index = aRowkeyColumn.getInt(Key.INDEX);
-            String type = aRowkeyColumn.getNecessaryValue(Key.TYPE, Hbase11xWriterErrorCode.REQUIRED_VALUE);
+            Integer index = aRowkeyColumn.getInt(HBaseKey.INDEX);
+            String type = aRowkeyColumn.getNecessaryValue(HBaseKey.TYPE, Hbase11xWriterErrorCode.REQUIRED_VALUE);
             ColumnType.getByTypeName(type);
             if (index == null) {
                 throw AddaxException.asAddaxException(Hbase11xWriterErrorCode.REQUIRED_VALUE, "rowkeyColumn配置项中index为必填项");
@@ -321,23 +323,23 @@ public class Hbase11xHelper
                 throw AddaxException.asAddaxException(Hbase11xWriterErrorCode.ILLEGAL_VALUE, "rowkeyColumn配置项不能全为常量列,至少指定一个rowkey列");
             }
             if (index == -1) {
-                aRowkeyColumn.getNecessaryValue(Key.VALUE, Hbase11xWriterErrorCode.REQUIRED_VALUE);
+                aRowkeyColumn.getNecessaryValue(HBaseKey.VALUE, Hbase11xWriterErrorCode.REQUIRED_VALUE);
             }
         }
     }
 
     private static void validateVersionColumn(Configuration originalConfig)
     {
-        Configuration versionColumn = originalConfig.getConfiguration(Key.VERSION_COLUMN);
+        Configuration versionColumn = originalConfig.getConfiguration(HBaseKey.VERSION_COLUMN);
         //为null,表示用当前时间;指定列,需要index
         if (versionColumn != null) {
-            Integer index = versionColumn.getInt(Key.INDEX);
+            Integer index = versionColumn.getInt(HBaseKey.INDEX);
             if (index == null) {
                 throw AddaxException.asAddaxException(Hbase11xWriterErrorCode.REQUIRED_VALUE, "versionColumn配置项中index为必填项");
             }
             if (index == -1) {
                 //指定时间,需要index=-1,value
-                versionColumn.getNecessaryValue(Key.VALUE, Hbase11xWriterErrorCode.REQUIRED_VALUE);
+                versionColumn.getNecessaryValue(HBaseKey.VALUE, Hbase11xWriterErrorCode.REQUIRED_VALUE);
             }
             else if (index < 0) {
                 throw AddaxException.asAddaxException(Hbase11xWriterErrorCode.ILLEGAL_VALUE, "您versionColumn配置项中index配置不正确,只能取-1或者非负数");

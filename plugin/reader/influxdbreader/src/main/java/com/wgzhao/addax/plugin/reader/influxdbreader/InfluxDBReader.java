@@ -52,10 +52,10 @@ public class InfluxDBReader
         public void preCheck()
         {
             init();
-            originalConfig.getNecessaryValue(Key.ENDPOINT, InfluxDBReaderErrorCode.REQUIRED_VALUE);
-            List<String> columns = originalConfig.getList(Key.COLUMN, String.class);
-            String querySql = originalConfig.getString(Key.QUERY_SQL, null);
-            String database = originalConfig.getString(Key.DATABASE, null);
+            originalConfig.getNecessaryValue(InfluxDBKey.ENDPOINT, InfluxDBReaderErrorCode.REQUIRED_VALUE);
+            List<String> columns = originalConfig.getList(InfluxDBKey.COLUMN, String.class);
+            String querySql = originalConfig.getString(InfluxDBKey.QUERY_SQL, null);
+            String database = originalConfig.getString(InfluxDBKey.DATABASE, null);
             if (StringUtils.isAllBlank(querySql,database)) {
                 throw AddaxException.asAddaxException(
                         InfluxDBReaderErrorCode.REQUIRED_VALUE,
@@ -65,7 +65,7 @@ public class InfluxDBReader
             if (columns == null || columns.isEmpty()) {
                 throw AddaxException.asAddaxException(
                         InfluxDBReaderErrorCode.REQUIRED_VALUE,
-                        "The parameter [" + Key.COLUMN + "] is not set.");
+                        "The parameter [" + InfluxDBKey.COLUMN + "] is not set.");
             }
         }
 

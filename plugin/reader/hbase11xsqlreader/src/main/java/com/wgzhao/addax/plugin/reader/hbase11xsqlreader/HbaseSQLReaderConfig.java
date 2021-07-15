@@ -19,6 +19,8 @@
 
 package com.wgzhao.addax.plugin.reader.hbase11xsqlreader;
 
+import com.wgzhao.addax.common.base.HBaseKey;
+import com.wgzhao.addax.common.base.Key;
 import com.wgzhao.addax.common.exception.AddaxException;
 import com.wgzhao.addax.common.util.Configuration;
 import org.apache.commons.lang3.StringUtils;
@@ -72,7 +74,7 @@ public class HbaseSQLReaderConfig
     private static void parseClusterConfig(HbaseSQLReaderConfig cfg, Configuration dataxCfg)
     {
         // 获取hbase集群的连接信息字符串
-        String hbaseCfg = dataxCfg.getString(Key.HBASE_CONFIG);
+        String hbaseCfg = dataxCfg.getString(HBaseKey.HBASE_CONFIG);
         if (StringUtils.isBlank(hbaseCfg)) {
             // 集群配置必须存在且不为空
             throw AddaxException.asAddaxException(
@@ -137,7 +139,7 @@ public class HbaseSQLReaderConfig
     }
 
     /**
-     * @return 获取原始的datax配置
+     * @return 获取原始的 addax 配置
      */
     public Configuration getOriginalConfig()
     {
