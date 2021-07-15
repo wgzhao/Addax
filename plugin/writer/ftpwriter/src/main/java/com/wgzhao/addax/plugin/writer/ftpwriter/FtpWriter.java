@@ -25,7 +25,6 @@ import com.wgzhao.addax.common.spi.Writer;
 import com.wgzhao.addax.common.util.Configuration;
 import com.wgzhao.addax.common.util.RetryUtil;
 import com.wgzhao.addax.storage.writer.StorageWriterUtil;
-import com.wgzhao.addax.plugin.writer.ftpwriter.util.Constant;
 import com.wgzhao.addax.plugin.writer.ftpwriter.util.IFtpHelper;
 import com.wgzhao.addax.plugin.writer.ftpwriter.util.SftpHelperImpl;
 import com.wgzhao.addax.plugin.writer.ftpwriter.util.StandardFtpHelperImpl;
@@ -40,9 +39,9 @@ import java.util.List;
 import java.util.Set;
 import java.util.concurrent.Callable;
 
-import static com.wgzhao.addax.storage.writer.Key.FILE_NAME;
-import static com.wgzhao.addax.storage.writer.Key.SUFFIX;
-import static com.wgzhao.addax.storage.writer.Key.WRITE_MODE;
+import static com.wgzhao.addax.common.base.Key.FILE_NAME;
+import static com.wgzhao.addax.common.base.Key.SUFFIX;
+import static com.wgzhao.addax.common.base.Key.WRITE_MODE;
 
 public class FtpWriter
         extends Writer
@@ -51,6 +50,10 @@ public class FtpWriter
             extends Writer.Job
     {
         private static final Logger LOG = LoggerFactory.getLogger(Job.class);
+
+        private static final int DEFAULT_FTP_PORT = 21;
+        private static final int DEFAULT_SFTP_PORT = 22;
+        private static final int DEFAULT_TIMEOUT = 60000;
 
         private Configuration writerSliceConfig = null;
         private Set<String> allFileExists = null;
@@ -89,38 +92,26 @@ public class FtpWriter
 
         private void validateParameter()
         {
-            this.writerSliceConfig
-                    .getNecessaryValue(
-                            FILE_NAME,
-                            FtpWriterErrorCode.REQUIRED_VALUE);
-            String path = this.writerSliceConfig.getNecessaryValue(Key.PATH,
-                    FtpWriterErrorCode.REQUIRED_VALUE);
+            this.writerSliceConfig.getNecessaryValue(FILE_NAME, FtpWriterErrorCode.REQUIRED_VALUE);
+            String path = this.writerSliceConfig.getNecessaryValue(FtpKey.PATH, FtpWriterErrorCode.REQUIRED_VALUE);
             if (!path.startsWith("/")) {
                 String message = String.format("请检查参数path:%s,需要配置为绝对路径", path);
                 LOG.error(message);
-                throw AddaxException.asAddaxException(
-                        FtpWriterErrorCode.ILLEGAL_VALUE, message);
+                throw AddaxException.asAddaxException(FtpWriterErrorCode.ILLEGAL_VALUE, message);
             }
 
-            this.host = this.writerSliceConfig.getNecessaryValue(Key.HOST,
-                    FtpWriterErrorCode.REQUIRED_VALUE);
-            this.username = this.writerSliceConfig.getNecessaryValue(
-                    Key.USERNAME, FtpWriterErrorCode.REQUIRED_VALUE);
-            this.password = this.writerSliceConfig.getNecessaryValue(
-                    Key.PASSWORD, FtpWriterErrorCode.REQUIRED_VALUE);
-            this.timeout = this.writerSliceConfig.getInt(Key.TIMEOUT,
-                    Constant.DEFAULT_TIMEOUT);
+            this.host = this.writerSliceConfig.getNecessaryValue(FtpKey.HOST, FtpWriterErrorCode.REQUIRED_VALUE);
+            this.username = this.writerSliceConfig.getNecessaryValue(FtpKey.USERNAME, FtpWriterErrorCode.REQUIRED_VALUE);
+            this.password = this.writerSliceConfig.getNecessaryValue(FtpKey.PASSWORD, FtpWriterErrorCode.REQUIRED_VALUE);
+            this.timeout = this.writerSliceConfig.getInt(FtpKey.TIMEOUT, DEFAULT_TIMEOUT);
 
-            String protocol = this.writerSliceConfig.getNecessaryValue(
-                    Key.PROTOCOL, FtpWriterErrorCode.REQUIRED_VALUE);
+            String protocol = this.writerSliceConfig.getNecessaryValue(FtpKey.PROTOCOL, FtpWriterErrorCode.REQUIRED_VALUE);
             if ("sftp".equalsIgnoreCase(protocol)) {
-                this.port = this.writerSliceConfig.getInt(Key.PORT,
-                        Constant.DEFAULT_SFTP_PORT);
+                this.port = this.writerSliceConfig.getInt(FtpKey.PORT, DEFAULT_SFTP_PORT);
                 this.ftpHelper = new SftpHelperImpl();
             }
             else if ("ftp".equalsIgnoreCase(protocol)) {
-                this.port = this.writerSliceConfig.getInt(Key.PORT,
-                        Constant.DEFAULT_FTP_PORT);
+                this.port = this.writerSliceConfig.getInt(FtpKey.PORT, DEFAULT_FTP_PORT);
                 this.ftpHelper = new StandardFtpHelperImpl();
             }
             else {
@@ -129,13 +120,13 @@ public class FtpWriter
                                 "仅支持 ftp和sftp 传输协议 , 不支持您配置的传输协议: [%s]",
                                 protocol));
             }
-            this.writerSliceConfig.set(Key.PORT, this.port);
+            this.writerSliceConfig.set(FtpKey.PORT, this.port);
         }
 
         @Override
         public void prepare()
         {
-            String path = this.writerSliceConfig.getString(Key.PATH);
+            String path = this.writerSliceConfig.getString(FtpKey.PATH);
             // warn: 这里用户需要配一个目录
             this.ftpHelper.mkDirRecursive(path);
 
@@ -226,6 +217,7 @@ public class FtpWriter
             extends Writer.Task
     {
         private static final Logger LOG = LoggerFactory.getLogger(Task.class);
+        private static final int DEFAULT_TIMEOUT = 60000;
 
         private Configuration writerSliceConfig;
 
@@ -245,19 +237,18 @@ public class FtpWriter
         public void init()
         {
             this.writerSliceConfig = this.getPluginJobConf();
-            this.path = this.writerSliceConfig.getString(Key.PATH);
+            this.path = this.writerSliceConfig.getString(FtpKey.PATH);
             this.fileName = this.writerSliceConfig
                     .getString(FILE_NAME);
             this.suffix = this.writerSliceConfig
                     .getString(SUFFIX);
 
-            this.host = this.writerSliceConfig.getString(Key.HOST);
-            this.port = this.writerSliceConfig.getInt(Key.PORT);
-            this.username = this.writerSliceConfig.getString(Key.USERNAME);
-            this.password = this.writerSliceConfig.getString(Key.PASSWORD);
-            this.timeout = this.writerSliceConfig.getInt(Key.TIMEOUT,
-                    Constant.DEFAULT_TIMEOUT);
-            String protocol = this.writerSliceConfig.getString(Key.PROTOCOL);
+            this.host = this.writerSliceConfig.getString(FtpKey.HOST);
+            this.port = this.writerSliceConfig.getInt(FtpKey.PORT);
+            this.username = this.writerSliceConfig.getString(FtpKey.USERNAME);
+            this.password = this.writerSliceConfig.getString(FtpKey.PASSWORD);
+            this.timeout = this.writerSliceConfig.getInt(FtpKey.TIMEOUT, DEFAULT_TIMEOUT);
+            String protocol = this.writerSliceConfig.getString(FtpKey.PROTOCOL);
 
             if ("sftp".equalsIgnoreCase(protocol)) {
                 this.ftpHelper = new SftpHelperImpl();

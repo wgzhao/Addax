@@ -19,6 +19,7 @@
 
 package com.wgzhao.addax.plugin.reader.ftpreader;
 
+import com.wgzhao.addax.common.base.Key;
 import com.wgzhao.addax.common.exception.AddaxException;
 import com.wgzhao.addax.common.plugin.RecordSender;
 import com.wgzhao.addax.common.spi.Reader;
@@ -69,12 +70,12 @@ public class FtpReader
 
             if ("sftp".equals(protocol)) {
                 //sftp协议
-                this.port = originConfig.getInt(Key.PORT, Constant.DEFAULT_SFTP_PORT);
+                this.port = originConfig.getInt(FtpKey.PORT, FtpConstant.DEFAULT_SFTP_PORT);
                 this.ftpHelper = new SftpHelper();
             }
             else if ("ftp".equals(protocol)) {
                 // ftp 协议
-                this.port = originConfig.getInt(Key.PORT, Constant.DEFAULT_FTP_PORT);
+                this.port = originConfig.getInt(FtpKey.PORT, FtpConstant.DEFAULT_FTP_PORT);
                 this.ftpHelper = new StandardFtpHelper();
             }
             ftpHelper.loginFtpServer(host, username, password, port, timeout, connectPattern);
@@ -82,27 +83,27 @@ public class FtpReader
 
         private void validateParameter()
         {
-            this.protocol = this.originConfig.getNecessaryValue(Key.PROTOCOL, FtpReaderErrorCode.REQUIRED_VALUE);
+            this.protocol = this.originConfig.getNecessaryValue(FtpKey.PROTOCOL, FtpReaderErrorCode.REQUIRED_VALUE);
             boolean ptrotocolTag = "ftp".equals(this.protocol) || "sftp".equals(this.protocol);
             if (!ptrotocolTag) {
                 throw AddaxException.asAddaxException(FtpReaderErrorCode.ILLEGAL_VALUE,
                         String.format("仅支持 ftp和sftp 传输协议 , 不支持您配置的传输协议: [%s]", protocol));
             }
-            this.host = this.originConfig.getNecessaryValue(Key.HOST, FtpReaderErrorCode.REQUIRED_VALUE);
-            this.username = this.originConfig.getNecessaryValue(Key.USERNAME, FtpReaderErrorCode.REQUIRED_VALUE);
-            this.password = this.originConfig.getNecessaryValue(Key.PASSWORD, FtpReaderErrorCode.REQUIRED_VALUE);
-            this.timeout = originConfig.getInt(Key.TIMEOUT, Constant.DEFAULT_TIMEOUT);
-            this.maxTraversalLevel = originConfig.getInt(Key.MAXTRAVERSALLEVEL, Constant.DEFAULT_MAX_TRAVERSAL_LEVEL);
+            this.host = this.originConfig.getNecessaryValue(FtpKey.HOST, FtpReaderErrorCode.REQUIRED_VALUE);
+            this.username = this.originConfig.getNecessaryValue(FtpKey.USERNAME, FtpReaderErrorCode.REQUIRED_VALUE);
+            this.password = this.originConfig.getNecessaryValue(FtpKey.PASSWORD, FtpReaderErrorCode.REQUIRED_VALUE);
+            this.timeout = originConfig.getInt(FtpKey.TIME_OUT, FtpConstant.DEFAULT_TIMEOUT);
+            this.maxTraversalLevel = originConfig.getInt(FtpKey.MAX_TRAVERSAL_LEVEL, FtpConstant.DEFAULT_MAX_TRAVERSAL_LEVEL);
 
             // only support connect pattern
-            this.connectPattern = this.originConfig.getUnnecessaryValue(Key.CONNECTPATTERN, Constant.DEFAULT_FTP_CONNECT_PATTERN);
+            this.connectPattern = this.originConfig.getUnnecessaryValue(FtpKey.CONNECT_PATTERN, FtpConstant.DEFAULT_FTP_CONNECT_PATTERN);
             boolean connectPatternTag = "PORT".equals(connectPattern) || "PASV".equals(connectPattern);
             if (!connectPatternTag) {
                 throw AddaxException.asAddaxException(FtpReaderErrorCode.ILLEGAL_VALUE,
                         String.format("不支持您配置的ftp传输模式: [%s]", connectPattern));
             }
             else {
-                this.originConfig.set(Key.CONNECTPATTERN, connectPattern);
+                this.originConfig.set(FtpKey.CONNECT_PATTERN, connectPattern);
             }
 
             //path check
@@ -174,7 +175,7 @@ public class FtpReader
             List<List<String>> splitedSourceFiles = this.splitSourceFiles(new ArrayList(this.sourceFiles), splitNumber);
             for (List<String> files : splitedSourceFiles) {
                 Configuration splitedConfig = this.originConfig.clone();
-                splitedConfig.set(Constant.SOURCE_FILES, files);
+                splitedConfig.set(FtpKey.SOURCE_FILES, files);
                 readerSplitConfigs.add(splitedConfig);
             }
             LOG.debug("split() ok and end...");
@@ -218,23 +219,23 @@ public class FtpReader
         {//连接重试
             /* for ftp connection */
             this.readerSliceConfig = this.getPluginJobConf();
-            this.host = readerSliceConfig.getString(Key.HOST);
-            String protocol = readerSliceConfig.getString(Key.PROTOCOL);
-            this.username = readerSliceConfig.getString(Key.USERNAME);
-            String password = readerSliceConfig.getString(Key.PASSWORD);
-            int timeout = readerSliceConfig.getInt(Key.TIMEOUT, Constant.DEFAULT_TIMEOUT);
+            this.host = readerSliceConfig.getString(FtpKey.HOST);
+            String protocol = readerSliceConfig.getString(FtpKey.PROTOCOL);
+            this.username = readerSliceConfig.getString(FtpKey.USERNAME);
+            String password = readerSliceConfig.getString(FtpKey.PASSWORD);
+            int timeout = readerSliceConfig.getInt(FtpKey.TIME_OUT, FtpConstant.DEFAULT_TIMEOUT);
 
-            this.sourceFiles = this.readerSliceConfig.getList(Constant.SOURCE_FILES, String.class);
+            this.sourceFiles = this.readerSliceConfig.getList(FtpKey.SOURCE_FILES, String.class);
 
             if ("sftp".equals(protocol)) {
                 //sftp协议
-                this.port = readerSliceConfig.getInt(Key.PORT, Constant.DEFAULT_SFTP_PORT);
+                this.port = readerSliceConfig.getInt(FtpKey.PORT, FtpConstant.DEFAULT_SFTP_PORT);
                 this.ftpHelper = new SftpHelper();
             }
             else if ("ftp".equals(protocol)) {
                 // ftp 协议
-                this.port = readerSliceConfig.getInt(Key.PORT, Constant.DEFAULT_FTP_PORT);
-                this.connectPattern = readerSliceConfig.getString(Key.CONNECTPATTERN, Constant.DEFAULT_FTP_CONNECT_PATTERN);// 默认为被动模式
+                this.port = readerSliceConfig.getInt(FtpKey.PORT, FtpConstant.DEFAULT_FTP_PORT);
+                this.connectPattern = readerSliceConfig.getString(FtpKey.CONNECT_PATTERN, FtpConstant.DEFAULT_FTP_CONNECT_PATTERN);// 默认为被动模式
                 this.ftpHelper = new StandardFtpHelper();
             }
             ftpHelper.loginFtpServer(host, username, password, port, timeout, connectPattern);

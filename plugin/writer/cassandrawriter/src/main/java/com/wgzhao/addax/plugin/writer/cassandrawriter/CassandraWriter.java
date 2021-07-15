@@ -188,21 +188,21 @@ public class CassandraWriter
         public void init()
         {
             Configuration taskConfig = super.getPluginJobConf();
-            String username = taskConfig.getString(Key.USERNAME);
-            String password = taskConfig.getString(Key.PASSWORD);
-            String hosts = taskConfig.getString(Key.HOST);
-            Integer port = taskConfig.getInt(Key.PORT, 9042);
-            boolean useSSL = taskConfig.getBool(Key.USESSL);
-            String keyspace = taskConfig.getString(Key.KEYSPACE);
-            String table = taskConfig.getString(Key.TABLE);
-            batchSize = taskConfig.getLong(Key.BATCH_SIZE, 1);
-            List<String> columnMeta = taskConfig.getList(Key.COLUMN, String.class);
+            String username = taskConfig.getString(CassandraKey.USERNAME);
+            String password = taskConfig.getString(CassandraKey.PASSWORD);
+            String hosts = taskConfig.getString(CassandraKey.HOST);
+            Integer port = taskConfig.getInt(CassandraKey.PORT, 9042);
+            boolean useSSL = taskConfig.getBool(CassandraKey.USESSL);
+            String keyspace = taskConfig.getString(CassandraKey.KEYSPACE);
+            String table = taskConfig.getString(CassandraKey.TABLE);
+            batchSize = taskConfig.getLong(CassandraKey.BATCH_SIZE, 1);
+            List<String> columnMeta = taskConfig.getList(CassandraKey.COLUMN, String.class);
             columnTypes = new ArrayList<>(columnMeta.size());
             columnNumber = columnMeta.size();
-            asyncWrite = taskConfig.getBool(Key.ASYNC_WRITE, false);
+            asyncWrite = taskConfig.getBool(CassandraKey.ASYNC_WRITE, false);
 
-            int connectionsPerHost = taskConfig.getInt(Key.CONNECTIONS_PER_HOST, 8);
-            int maxPendingPerConnection = taskConfig.getInt(Key.MAX_PENDING_CONNECTION, 128);
+            int connectionsPerHost = taskConfig.getInt(CassandraKey.CONNECTIONS_PER_HOST, 8);
+            int maxPendingPerConnection = taskConfig.getInt(CassandraKey.MAX_PENDING_CONNECTION, 128);
             PoolingOptions poolingOpts = new PoolingOptions()
                     .setConnectionsPerHost(HostDistance.LOCAL, connectionsPerHost, connectionsPerHost)
                     .setMaxRequestsPerConnection(HostDistance.LOCAL, maxPendingPerConnection)
@@ -225,7 +225,7 @@ public class CassandraWriter
 
             Insert insertStmt = QueryBuilder.insertInto(table);
             for (String colunmnName : columnMeta) {
-                if (colunmnName.toLowerCase().equals(Key.WRITE_TIME)) {
+                if (colunmnName.toLowerCase().equals(CassandraKey.WRITE_TIME)) {
                     if (writeTimeCol != -1) {
                         throw AddaxException
                                 .asAddaxException(
@@ -250,7 +250,7 @@ public class CassandraWriter
             if (writeTimeCol != -1) {
                 insertStmt.using(timestamp(QueryBuilder.bindMarker()));
             }
-            String cl = taskConfig.getString(Key.CONSITANCY_LEVEL);
+            String cl = taskConfig.getString(CassandraKey.CONSITANCY_LEVEL);
             if (cl != null && !cl.isEmpty()) {
                 insertStmt.setConsistencyLevel(ConsistencyLevel.valueOf(cl));
             }

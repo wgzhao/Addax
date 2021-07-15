@@ -19,6 +19,8 @@
 
 package com.wgzhao.addax.plugin.reader.hbase20xsqlreader;
 
+import com.wgzhao.addax.common.base.HBaseConstant;
+import com.wgzhao.addax.common.base.HBaseKey;
 import com.wgzhao.addax.common.exception.AddaxException;
 import com.wgzhao.addax.common.util.Configuration;
 import com.wgzhao.addax.rdbms.util.DBUtilErrorCode;
@@ -68,11 +70,11 @@ public class HBase20SQLReaderHelper
         }
         columnBuilder.setLength(columnBuilder.length() - 1);
         if (StringUtils.isBlank(where)) {
-            querySql = String.format(Constant.QUERY_SQL_TEMPLATE_WITHOUT_WHERE,
+            querySql = String.format(HBaseConstant.QUERY_SQL_TEMPLATE_WITHOUT_WHERE,
                     columnBuilder.toString(), table);
         }
         else {
-            querySql = String.format(Constant.QUERY_SQL_TEMPLATE, columnBuilder.toString(),
+            querySql = String.format(HBaseConstant.QUERY_SQL_TEMPLATE, columnBuilder.toString(),
                     table, where);
         }
         return querySql;
@@ -119,18 +121,18 @@ public class HBase20SQLReaderHelper
     public void validateParameter()
     {
         // queryserver地址必须配置
-        String queryServerAddress = configuration.getNecessaryValue(Key.QUERYSERVER_ADDRESS,
+        String queryServerAddress = configuration.getNecessaryValue(HBaseKey.QUERY_SERVER_ADDRESS,
                 HBase20xSQLReaderErrorCode.REQUIRED_VALUE);
-        String serialization = configuration.getString(Key.SERIALIZATION_NAME, Constant.DEFAULT_SERIALIZATION);
+        String serialization = configuration.getString(HBaseKey.SERIALIZATION_NAME, HBaseConstant.DEFAULT_SERIALIZATION);
         connection = getConnection(queryServerAddress, serialization);
 
         //判断querySql是否配置，如果配置则table配置可为空，否则table必须配置
-        querySql = configuration.getList(Key.QUERY_SQL, String.class);
+        querySql = configuration.getList(HBaseKey.QUERY_SQL, String.class);
         if (querySql == null || querySql.isEmpty()) {
             LOG.info("Split according to splitKey or split points.");
 
-            String schema = configuration.getString(Key.SCHEMA, null);
-            String tableName = configuration.getNecessaryValue(Key.TABLE, HBase20xSQLReaderErrorCode.REQUIRED_VALUE);
+            String schema = configuration.getString(HBaseKey.SCHEMA, null);
+            String tableName = configuration.getNecessaryValue(HBaseKey.TABLE, HBase20xSQLReaderErrorCode.REQUIRED_VALUE);
             if (schema != null && !schema.isEmpty()) {
                 fullTableName = "\"" + schema + "\".\"" + tableName + "\"";
             }
@@ -138,9 +140,9 @@ public class HBase20SQLReaderHelper
                 fullTableName = "\"" + tableName + "\"";
             }
             // 如果列名未配置，默认读取全部列*
-            columnNames = configuration.getList(Key.COLUMN, String.class);
-            splitKey = configuration.getString(Key.SPLIT_KEY, null);
-            splitPoints = configuration.getList(Key.SPLIT_POINT);
+            columnNames = configuration.getList(HBaseKey.COLUMN, String.class);
+            splitKey = configuration.getString(HBaseKey.SPLIT_KEY, null);
+            splitPoints = configuration.getList(HBaseKey.SPLIT_POINT);
             checkTable(schema, tableName);
             dealWhere();
         }
@@ -152,11 +154,11 @@ public class HBase20SQLReaderHelper
 
     public Connection getConnection(String queryServerAddress, String serialization)
     {
-        String url = String.format(Constant.CONNECT_STRING_TEMPLATE, queryServerAddress, serialization);
+        String url = String.format(HBaseConstant.CONNECT_STRING_TEMPLATE, queryServerAddress, serialization);
         LOG.debug("Connecting to QueryServer [{}] ...", url);
         Connection conn;
         try {
-            Class.forName(Constant.CONNECT_DRIVER_STRING);
+            Class.forName(HBaseConstant.CONNECT_DRIVER_STRING);
             conn = DriverManager.getConnection(url);
             conn.setAutoCommit(false);
         }
@@ -180,7 +182,7 @@ public class HBase20SQLReaderHelper
         ResultSet resultSet = null;
         try {
             statement = connection.createStatement();
-            String selectSql = String.format(Constant.SELECT_COLUMNS_TEMPLATE, tableName);
+            String selectSql = String.format(HBaseConstant.SELECT_COLUMNS_TEMPLATE, tableName);
 
             // 处理schema不为空情况
             if (schema == null || schema.isEmpty()) {
@@ -211,7 +213,7 @@ public class HBase20SQLReaderHelper
             }
             else {
                 columnNames = allColumnName;
-                configuration.set(Key.COLUMN, allColumnName);
+                configuration.set(HBaseKey.COLUMN, allColumnName);
             }
             if (splitKey != null && !primaryColumnNames.contains(splitKey)) {
                 // 切分列必须是主键列，否则会严重影响读取性能
@@ -248,13 +250,13 @@ public class HBase20SQLReaderHelper
 
     public void dealWhere()
     {
-        String where = configuration.getString(Key.WHERE, null);
+        String where = configuration.getString(HBaseKey.WHERE, null);
         if (StringUtils.isNotBlank(where)) {
             String whereImprove = where.trim();
             if (whereImprove.endsWith(";") || whereImprove.endsWith("；")) {
                 whereImprove = whereImprove.substring(0, whereImprove.length() - 1);
             }
-            configuration.set(Key.WHERE, whereImprove);
+            configuration.set(HBaseKey.WHERE, whereImprove);
         }
     }
 
@@ -268,7 +270,7 @@ public class HBase20SQLReaderHelper
     {
         List<Configuration> pluginParams = new ArrayList<>();
         List<String> rangeList;
-        String where = configuration.getString(Key.WHERE);
+        String where = configuration.getString(HBaseKey.WHERE);
         boolean hasWhere = StringUtils.isNotBlank(where);
         if (querySql == null || querySql.isEmpty()) {
             // 如果splitPoints为空，则根据splitKey自动切分，不过这种切分方式无法保证数据均分，且只支持整形和字符型列
@@ -285,10 +287,10 @@ public class HBase20SQLReaderHelper
                     pluginParams.add(configuration);
                     return pluginParams;
                 }
-                boolean isStringType = Constant.PK_TYPE_STRING.equals(configuration
-                        .getString(Constant.PK_TYPE));
-                boolean isLongType = Constant.PK_TYPE_LONG.equals(configuration
-                        .getString(Constant.PK_TYPE));
+                boolean isStringType = HBaseConstant.PK_TYPE_STRING.equals(configuration
+                        .getString(HBaseConstant.PK_TYPE));
+                boolean isLongType = HBaseConstant.PK_TYPE_LONG.equals(configuration
+                        .getString(HBaseConstant.PK_TYPE));
                 if (isStringType) {
                     rangeList = RdbmsRangeSplitWrap.splitAndWrap(
                             String.valueOf(minMaxPK.getLeft()),
@@ -320,7 +322,7 @@ public class HBase20SQLReaderHelper
                     tempQuerySql = buildQuerySql(columnNames, fullTableName, where)
                             + (hasWhere ? " and " : " where ") + range;
                     LOG.info("Query SQL: {}", tempQuerySql);
-                    tempConfig.set(Constant.QUERY_SQL_PER_SPLIT, tempQuerySql);
+                    tempConfig.set(HBaseConstant.QUERY_SQL_PER_SPLIT, tempQuerySql);
                     pluginParams.add(tempConfig);
                 }
             }
@@ -330,7 +332,7 @@ public class HBase20SQLReaderHelper
                         + (hasWhere ? " and " : " where ")
                         + String.format(" %s IS NOT NULL", splitKey);
                 LOG.info("Query SQL: {}", tempQuerySql);
-                tempConfig.set(Constant.QUERY_SQL_PER_SPLIT, tempQuerySql);
+                tempConfig.set(HBaseConstant.QUERY_SQL_PER_SPLIT, tempQuerySql);
                 pluginParams.add(tempConfig);
             }
         }
@@ -338,7 +340,7 @@ public class HBase20SQLReaderHelper
             // 指定querySql不需要切分
             for (String sql : querySql) {
                 Configuration tempConfig = configuration.clone();
-                tempConfig.set(Constant.QUERY_SQL_PER_SPLIT, sql);
+                tempConfig.set(HBaseConstant.QUERY_SQL_PER_SPLIT, sql);
                 pluginParams.add(tempConfig);
             }
         }
@@ -347,7 +349,7 @@ public class HBase20SQLReaderHelper
 
     private List<String> buildSplitRange()
     {
-        String getSplitKeyTypeSQL = String.format(Constant.QUERY_COLUMN_TYPE_TEMPLATE, splitKey, fullTableName);
+        String getSplitKeyTypeSQL = String.format(HBaseConstant.QUERY_COLUMN_TYPE_TEMPLATE, splitKey, fullTableName);
         Statement statement = null;
         ResultSet resultSet = null;
         List<String> splitConditions = new ArrayList<>();
@@ -408,8 +410,8 @@ public class HBase20SQLReaderHelper
 
     private Pair<Object, Object> getPkRange(Configuration configuration)
     {
-        String pkRangeSQL = String.format(Constant.QUERY_MIN_MAX_TEMPLATE, splitKey, splitKey, fullTableName);
-        String where = configuration.getString(Key.WHERE);
+        String pkRangeSQL = String.format(HBaseConstant.QUERY_MIN_MAX_TEMPLATE, splitKey, splitKey, fullTableName);
+        String where = configuration.getString(HBaseKey.WHERE);
         if (StringUtils.isNotBlank(where)) {
             pkRangeSQL = String.format("%s WHERE (%s AND %s IS NOT NULL)",
                     pkRangeSQL, where, splitKey);
@@ -425,7 +427,7 @@ public class HBase20SQLReaderHelper
 
             if (isPKTypeValid(rsMetaData)) {
                 if (isStringType(rsMetaData.getColumnType(1))) {
-                    configuration.set(Constant.PK_TYPE, Constant.PK_TYPE_STRING);
+                    configuration.set(HBaseConstant.PK_TYPE, HBaseConstant.PK_TYPE_STRING);
 
                     if (resultSet.next()) {
                         minMaxPK = new ImmutablePair<>(
@@ -433,7 +435,7 @@ public class HBase20SQLReaderHelper
                     }
                 }
                 else if (isLongType(rsMetaData.getColumnType(1))) {
-                    configuration.set(Constant.PK_TYPE, Constant.PK_TYPE_LONG);
+                    configuration.set(HBaseConstant.PK_TYPE, HBaseConstant.PK_TYPE_LONG);
 
                     if (resultSet.next()) {
                         minMaxPK = new ImmutablePair<>(

@@ -30,13 +30,15 @@ import org.slf4j.LoggerFactory;
 import java.io.IOException;
 import java.util.List;
 
+import static com.wgzhao.addax.common.base.Constant.DEFAULT_FILE_FORMAT;
+
 public class TextCsvWriterManager
 {
     public static Writer produceUnstructuredWriter(
             String fileFormat, char fieldDelimiter, java.io.Writer writer)
     {
         // warn: false means plain text(old way), true means strict csv format
-        if (Constant.FILE_FORMAT_TEXT.equals(fileFormat)) {
+        if (DEFAULT_FILE_FORMAT.equals(fileFormat)) {
             return new TextWriterImpl(writer, fieldDelimiter);
         }
         else {

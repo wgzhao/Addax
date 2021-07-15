@@ -20,6 +20,7 @@
 package com.wgzhao.addax.plugin.reader.streamreader;
 
 import com.alibaba.fastjson.JSONObject;
+import com.wgzhao.addax.common.base.Key;
 import com.wgzhao.addax.common.element.BoolColumn;
 import com.wgzhao.addax.common.element.BytesColumn;
 import com.wgzhao.addax.common.element.Column;
@@ -43,7 +44,6 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -87,7 +87,7 @@ public class StreamReader
         {
             this.originalConfig = getPluginJobConf();
             // warn: 忽略大小写
-            this.mixupFunctionPattern = Pattern.compile(Constant.MIXUP_FUNCTION_PATTERN,
+            this.mixupFunctionPattern = Pattern.compile(StreamConstant.MIXUP_FUNCTION_PATTERN,
                     Pattern.CASE_INSENSITIVE);
             dealColumn(this.originalConfig);
 
@@ -123,19 +123,17 @@ public class StreamReader
                             String.format("解析混淆函数失败[%s]", e.getMessage()), e);
                 }
 
-                String typeName = eachColumnConfig.getString(Constant.TYPE);
+                String typeName = eachColumnConfig.getString(Key.TYPE);
                 if (StringUtils.isBlank(typeName)) {
                     // empty typeName will be set to default type: string
-                    eachColumnConfig.set(Constant.TYPE, Type.STRING);
+                    eachColumnConfig.set(Key.TYPE, Type.STRING);
                 }
                 else {
                     if (Type.DATE.name().equalsIgnoreCase(typeName)) {
                         boolean notAssignDateFormat = StringUtils
-                                .isBlank(eachColumnConfig
-                                        .getString(Constant.DATE_FORMAT_MARK));
+                                .isBlank(eachColumnConfig.getString(Key.DATE_FORMAT));
                         if (notAssignDateFormat) {
-                            eachColumnConfig.set(Constant.DATE_FORMAT_MARK,
-                                    Constant.DEFAULT_DATE_FORMAT);
+                            eachColumnConfig.set(Key.DATE_FORMAT, StreamConstant.DEFAULT_DATE_FORMAT);
                         }
                     }
                     if (!Type.isTypeIllegal(typeName)) {
@@ -175,22 +173,21 @@ public class StreamReader
          */
         private void parseMixupFunctions(Configuration eachColumnConfig)
         {
-            String columnValue = eachColumnConfig.getString(Constant.VALUE);
-            String columnMixup = eachColumnConfig.getString(Constant.RANDOM);
-            String columnIncr = eachColumnConfig.getString(Constant.INCR);
+            String columnValue = eachColumnConfig.getString(Key.VALUE);
+            String columnMixup = eachColumnConfig.getString(StreamConstant.RANDOM);
+            String columnIncr = eachColumnConfig.getString(StreamConstant.INCR);
             if (StringUtils.isBlank(columnMixup) && StringUtils.isBlank(columnIncr)) {
-                eachColumnConfig.getNecessaryValue(Constant.VALUE,
-                        StreamReaderErrorCode.REQUIRED_VALUE);
+                eachColumnConfig.getNecessaryValue(Key.VALUE, StreamReaderErrorCode.REQUIRED_VALUE);
             }
             if (StringUtils.isNotBlank(columnIncr)) {
                 // 类型判断
-                String dType = eachColumnConfig.getString(Constant.TYPE).toLowerCase();
+                String dType = eachColumnConfig.getString(Key.TYPE).toLowerCase();
                 if ("long".equals(dType)) {
                     //  columnValue is valid number ?
                     if (!columnIncr.contains(",")) {
                         // setup the default step value
                         columnIncr = columnIncr + ",1";
-                        eachColumnConfig.set(Constant.INCR, columnIncr);
+                        eachColumnConfig.set(StreamConstant.INCR, columnIncr);
                     }
                     // validate value
                     try {
@@ -207,7 +204,7 @@ public class StreamReader
                 else if ("date".equals(dType)) {
                     String[] fields = columnIncr.split(",");
                     if (fields.length == 1) {
-                        eachColumnConfig.set(Constant.INCR, columnIncr.trim() + ",1,d");
+                        eachColumnConfig.set(StreamConstant.INCR, columnIncr.trim() + ",1,d");
                     }
                     else if (fields.length == 2) {
                         try {
@@ -218,14 +215,14 @@ public class StreamReader
                                     "The second field must be numeric, value [" + fields[1] + "] is not valid"
                             );
                         }
-                        eachColumnConfig.set(Constant.INCR, fields[0].trim() + "," + fields[1].trim() + ",d");
+                        eachColumnConfig.set(StreamConstant.INCR, fields[0].trim() + "," + fields[1].trim() + ",d");
                     }
                     else {
                         String unit = fields[2].charAt(0) + "";
                         // validate unit
                         validateDateIncrUnit(unit);
                         // normalize unit to 1-char
-                        eachColumnConfig.set(Constant.INCR, fields[0].trim() + "," + fields[1].trim() + "," + unit);
+                        eachColumnConfig.set(StreamConstant.INCR, fields[0].trim() + "," + fields[1].trim() + "," + unit);
                     }
                 }
                 else {
@@ -234,17 +231,17 @@ public class StreamReader
                             "递增序列当前仅支持整数类型(long)和日期类型(date)"
                     );
                 }
-                this.originalConfig.set(Constant.HAVE_INCR_FUNCTION, true);
+                this.originalConfig.set(StreamConstant.HAVE_INCR_FUNCTION, true);
             }
             // 三者都有配置
             if ((StringUtils.isNotBlank(columnMixup) || StringUtils.isNotBlank(columnIncr)) && StringUtils.isNotBlank(columnValue)) {
                 LOG.warn("您配置了streamreader常量列(value:{})和随机混淆列(random:{})或递增列(incr:{}), 常量列优先",
                         columnValue, columnMixup, columnIncr);
                 if (StringUtils.isNotBlank(columnMixup)) {
-                    eachColumnConfig.remove(Constant.RANDOM);
+                    eachColumnConfig.remove(StreamConstant.RANDOM);
                 }
                 if (StringUtils.isNotBlank(columnIncr)) {
-                    eachColumnConfig.remove(Constant.INCR);
+                    eachColumnConfig.remove(StreamConstant.INCR);
                 }
             }
             if (StringUtils.isNotBlank(columnMixup)) {
@@ -260,14 +257,12 @@ public class StreamReader
                                 String.format("random混淆函数不合法[%s], 混淆函数random的参数不能为空:%s, %s",
                                         columnMixup, param1, param2));
                     }
-                    String typeName = eachColumnConfig.getString(Constant.TYPE);
+                    String typeName = eachColumnConfig.getString(Key.TYPE);
                     if (Type.DATE.name().equalsIgnoreCase(typeName)) {
-                        String dateFormat = eachColumnConfig.getString(Constant.DATE_FORMAT_MARK,
-                                Constant.DEFAULT_DATE_FORMAT);
+                        String dateFormat = eachColumnConfig.getString(Key.DATE_FORMAT, StreamConstant.DEFAULT_DATE_FORMAT);
                         try {
                             SimpleDateFormat format = new SimpleDateFormat(
-                                    eachColumnConfig.getString(Constant.DATE_FORMAT_MARK,
-                                            Constant.DEFAULT_DATE_FORMAT));
+                                    eachColumnConfig.getString(Key.DATE_FORMAT, StreamConstant.DEFAULT_DATE_FORMAT));
                             //warn: do no concern int -> long
                             param1Int = format.parse(param1).getTime();//milliseconds
                             param2Int = format.parse(param2).getTime();//milliseconds
@@ -295,15 +290,15 @@ public class StreamReader
                                 String.format("random混淆函数不合法[%s], 混淆函数random的参数需要第一个小于等于第二个:%s, %s",
                                         columnMixup, param1, param2));
                     }
-                    eachColumnConfig.set(Constant.MIXUP_FUNCTION_PARAM1, param1Int);
-                    eachColumnConfig.set(Constant.MIXUP_FUNCTION_PARAM2, param2Int);
+                    eachColumnConfig.set(StreamConstant.MIXUP_FUNCTION_PARAM1, param1Int);
+                    eachColumnConfig.set(StreamConstant.MIXUP_FUNCTION_PARAM2, param2Int);
                 }
                 else {
                     throw AddaxException.asAddaxException(
                             StreamReaderErrorCode.ILLEGAL_VALUE,
                             String.format("random混淆函数不合法[%s], 需要为param1, param2形式", columnMixup));
                 }
-                this.originalConfig.set(Constant.HAVE_MIXUP_FUNCTION, true);
+                this.originalConfig.set(StreamConstant.HAVE_MIXUP_FUNCTION, true);
             }
         }
 
@@ -386,8 +381,8 @@ public class StreamReader
             this.columns = readerSliceConfig.getList(Key.COLUMN, String.class);
 
             this.sliceRecordCount = readerSliceConfig.getLong(Key.SLICE_RECORD_COUNT);
-            this.haveMixupFunction = readerSliceConfig.getBool(Constant.HAVE_MIXUP_FUNCTION, false);
-            this.haveIncrFunction = readerSliceConfig.getBool(Constant.HAVE_INCR_FUNCTION, false);
+            this.haveMixupFunction = readerSliceConfig.getBool(StreamConstant.HAVE_MIXUP_FUNCTION, false);
+            this.haveIncrFunction = readerSliceConfig.getBool(StreamConstant.HAVE_INCR_FUNCTION, false);
         }
 
         @Override
@@ -424,15 +419,15 @@ public class StreamReader
         private Column buildOneColumn(Configuration eachColumnConfig, int columnIndex)
                 throws Exception
         {
-            String columnValue = eachColumnConfig.getString(Constant.VALUE);
+            String columnValue = eachColumnConfig.getString(Key.VALUE);
             if ("null".equals(columnValue)) {
                 return null;
             }
-            Type columnType = Type.valueOf(eachColumnConfig.getString(Constant.TYPE).toUpperCase());
-            String columnMixup = eachColumnConfig.getString(Constant.RANDOM);
-            String columnIncr = eachColumnConfig.getString(Constant.INCR);
-            long param1Int = eachColumnConfig.getLong(Constant.MIXUP_FUNCTION_PARAM1, 0L);
-            long param2Int = eachColumnConfig.getLong(Constant.MIXUP_FUNCTION_PARAM2, 1L);
+            Type columnType = Type.valueOf(eachColumnConfig.getString(Key.TYPE).toUpperCase());
+            String columnMixup = eachColumnConfig.getString(StreamConstant.RANDOM);
+            String columnIncr = eachColumnConfig.getString(StreamConstant.INCR);
+            long param1Int = eachColumnConfig.getLong(StreamConstant.MIXUP_FUNCTION_PARAM1, 0L);
+            long param2Int = eachColumnConfig.getLong(StreamConstant.MIXUP_FUNCTION_PARAM2, 1L);
             boolean isColumnMixup = StringUtils.isNotBlank(columnMixup);
             boolean isIncr = StringUtils.isNotBlank(columnIncr);
             if (isColumnMixup) {
@@ -484,7 +479,7 @@ public class StreamReader
                     String[] fields = columnIncr.split(",");
                     currVal = incrMap.getOrDefault(columnIndex, null);
                     if (currVal == null) {
-                        String datePattern = eachColumnConfig.getString(Constant.DATE_FORMAT_MARK, "yyyy-MM-dd");
+                        String datePattern = eachColumnConfig.getString(Key.DATE_FORMAT, StreamConstant.DEFAULT_DATE_FORMAT);
                         SimpleDateFormat sdf = new SimpleDateFormat(datePattern);
                         try {
                             currVal = sdf.parse(fields[0]);
@@ -513,9 +508,7 @@ public class StreamReader
                     case DOUBLE:
                         return new DoubleColumn(columnValue);
                     case DATE:
-                        SimpleDateFormat format = new SimpleDateFormat(
-                                eachColumnConfig.getString(Constant.DATE_FORMAT_MARK,
-                                        Constant.DEFAULT_DATE_FORMAT));
+                        SimpleDateFormat format = new SimpleDateFormat(eachColumnConfig.getString(Key.DATE_FORMAT, StreamConstant.DEFAULT_DATE_FORMAT));
                         return new DateColumn(format.parse(columnValue));
                     case BOOL:
                         return new BoolColumn("true".equalsIgnoreCase(columnValue));

@@ -26,8 +26,8 @@ import com.wgzhao.addax.rdbms.util.TableExpandUtil;
 import com.wgzhao.addax.common.exception.AddaxException;
 import com.wgzhao.addax.common.util.Configuration;
 import com.wgzhao.addax.common.util.ListUtil;
-import com.wgzhao.addax.rdbms.reader.Constant;
-import com.wgzhao.addax.rdbms.reader.Key;
+import com.wgzhao.addax.common.base.Constant;
+import com.wgzhao.addax.common.base.Key;
 import com.wgzhao.addax.rdbms.util.DBUtil;
 import com.wgzhao.addax.rdbms.util.DBUtilErrorCode;
 import org.apache.commons.lang3.StringUtils;
@@ -85,7 +85,7 @@ public final class OriginalConfPretreatmentUtil
     private static void simplifyConf(Configuration originalConfig)
     {
         boolean isTableMode = recognizeTableOrQuerySqlMode(originalConfig);
-        originalConfig.set(Constant.IS_TABLE_MODE, isTableMode);
+        originalConfig.set(Key.IS_TABLE_MODE, isTableMode);
 
         dealJdbcAndTable(originalConfig);
 
@@ -96,11 +96,10 @@ public final class OriginalConfPretreatmentUtil
     {
         String username = originalConfig.getString(Key.USERNAME);
         String password = originalConfig.getString(Key.PASSWORD);
-        boolean isTableMode = originalConfig.getBool(Constant.IS_TABLE_MODE);
-        boolean isPreCheck = originalConfig.getBool(Key.DRYRUN, false);
+        boolean isTableMode = originalConfig.getBool(Key.IS_TABLE_MODE);
+        boolean isPreCheck = originalConfig.getBool(Key.DRY_RUN, false);
 
-        List<Object> conns = originalConfig.getList(Constant.CONN_MARK,
-                Object.class);
+        List<Object> conns = originalConfig.getList(Key.CONNECTION, Object.class);
         List<String> preSql = originalConfig.getList(Key.PRE_SQL, String.class);
 
         int tableNum = 0;
@@ -128,7 +127,7 @@ public final class OriginalConfPretreatmentUtil
             jdbcUrl = dataBaseType.appendJDBCSuffixForReader(jdbcUrl);
 
             // 回写到connection[i].jdbcUrl
-            originalConfig.set(String.format("%s[%d].%s", Constant.CONN_MARK,
+            originalConfig.set(String.format("%s[%d].%s", Key.CONNECTION,
                     i, Key.JDBC_URL), jdbcUrl);
 
             LOG.info("Available jdbcUrl:{}.", jdbcUrl);
@@ -149,7 +148,7 @@ public final class OriginalConfPretreatmentUtil
                 tableNum += expandedTables.size();
 
                 originalConfig.set(String.format("%s[%d].%s",
-                        Constant.CONN_MARK, i, Key.TABLE), expandedTables);
+                        Key.CONNECTION, i, Key.TABLE), expandedTables);
             }
         }
 
@@ -158,7 +157,7 @@ public final class OriginalConfPretreatmentUtil
 
     private static void dealColumnConf(Configuration originalConfig)
     {
-        boolean isTableMode = originalConfig.getBool(Constant.IS_TABLE_MODE);
+        boolean isTableMode = originalConfig.getBool(Key.IS_TABLE_MODE);
 
         List<String> userConfiguredColumns = originalConfig.getList(Key.COLUMN,
                 String.class);
@@ -180,13 +179,13 @@ public final class OriginalConfPretreatmentUtil
                 }
                 else {
                     String jdbcUrl = originalConfig.getString(String.format(
-                            "%s[0].%s", Constant.CONN_MARK, Key.JDBC_URL));
+                            "%s[0].%s", Key.CONNECTION, Key.JDBC_URL));
 
                     String username = originalConfig.getString(Key.USERNAME);
                     String password = originalConfig.getString(Key.PASSWORD);
 
                     String tableName = originalConfig.getString(String.format(
-                            "%s[0].%s[0]", Constant.CONN_MARK, Key.TABLE));
+                            "%s[0].%s[0]", Key.CONNECTION, Key.TABLE));
 
                     List<String> allColumns = DBUtil.getTableColumns(
                             dataBaseType, jdbcUrl, username, password,
@@ -243,8 +242,7 @@ public final class OriginalConfPretreatmentUtil
     private static boolean recognizeTableOrQuerySqlMode(
             Configuration originalConfig)
     {
-        List<Object> conns = originalConfig.getList(Constant.CONN_MARK,
-                Object.class);
+        List<Object> conns = originalConfig.getList(Key.CONNECTION, Object.class);
 
         List<Boolean> tableModeFlags = new ArrayList<>();
         List<Boolean> querySqlModeFlags = new ArrayList<>();
@@ -274,7 +272,7 @@ public final class OriginalConfPretreatmentUtil
             else if (isTableMode && isQuerySqlMode) {
                 // table 和 querySql 二者均配置
                 throw AddaxException.asAddaxException(DBUtilErrorCode.TABLE_QUERYSQL_MIXED,
-                        "您的配置凌乱了. 因为datax不能同时既配置table又配置querySql.请检查您的配置并作出修改.");
+                        "您的配置凌乱了. 因为addax不能同时既配置table又配置querySql.请检查您的配置并作出修改.");
             }
         }
 

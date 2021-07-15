@@ -19,11 +19,11 @@
 
 package com.wgzhao.addax.plugin.reader.tdenginereader;
 
+import com.wgzhao.addax.common.base.Key;
 import com.wgzhao.addax.common.plugin.RecordSender;
 import com.wgzhao.addax.common.spi.Reader;
 import com.wgzhao.addax.common.util.Configuration;
 import com.wgzhao.addax.rdbms.reader.CommonRdbmsReader;
-import com.wgzhao.addax.rdbms.reader.Constant;
 import com.wgzhao.addax.rdbms.util.DataBaseType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -98,7 +98,7 @@ public class TDengineReader
         public void startRead(RecordSender recordSender)
         {
             // TDengine does not support fetch size
-            int fetchSize = this.readerSliceConfig.getInt(Constant.FETCH_SIZE);
+            int fetchSize = this.readerSliceConfig.getInt(Key.FETCH_SIZE);
             this.commonRdbmsReaderTask.startRead(this.readerSliceConfig, recordSender, getTaskPluginCollector(), fetchSize);
         }
 

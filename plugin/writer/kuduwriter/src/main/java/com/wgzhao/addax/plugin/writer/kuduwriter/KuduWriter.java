@@ -48,25 +48,25 @@ public class KuduWriter
 
         private void validateParameter()
         {
-            config.getNecessaryValue(Key.KUDU_TABLE_NAME, KuduWriterErrorCode.REQUIRED_VALUE);
-            config.getNecessaryValue(Key.KUDU_MASTER_ADDRESSES, KuduWriterErrorCode.REQUIRED_VALUE);
-            config.getNecessaryValue(Key.KUDU_TABLE_NAME, KuduWriterErrorCode.REQUIRED_VALUE);
+            config.getNecessaryValue(KuduKey.KUDU_TABLE_NAME, KuduWriterErrorCode.REQUIRED_VALUE);
+            config.getNecessaryValue(KuduKey.KUDU_MASTER_ADDRESSES, KuduWriterErrorCode.REQUIRED_VALUE);
+            config.getNecessaryValue(KuduKey.KUDU_TABLE_NAME, KuduWriterErrorCode.REQUIRED_VALUE);
 
             // column check
-            List<Configuration> columns = this.config.getListConfiguration(Key.COLUMN);
+            List<Configuration> columns = this.config.getListConfiguration(KuduKey.COLUMN);
             if (null == columns || columns.isEmpty()) {
                 throw AddaxException.asAddaxException(
                         KuduWriterErrorCode.REQUIRED_VALUE, "您需要指定 columns"
                 );
             } else {
                 for (Configuration eachColumnConf : columns) {
-                    eachColumnConf.getNecessaryValue(Key.NAME, KuduWriterErrorCode.REQUIRED_VALUE);
-                    eachColumnConf.getNecessaryValue(Key.TYPE, KuduWriterErrorCode.REQUIRED_VALUE);
+                    eachColumnConf.getNecessaryValue(KuduKey.NAME, KuduWriterErrorCode.REQUIRED_VALUE);
+                    eachColumnConf.getNecessaryValue(KuduKey.TYPE, KuduWriterErrorCode.REQUIRED_VALUE);
                 }
             }
             // writeMode check
-            this.writeMode = this.config.getString(Key.WRITE_MODE, Constant.INSERT_MODE);
-            this.config.set(Key.WRITE_MODE, this.writeMode);
+            this.writeMode = this.config.getString(KuduKey.WRITE_MODE, KuduConstant.INSERT_MODE);
+            this.config.set(KuduKey.WRITE_MODE, this.writeMode);
 
             // timeout
 
@@ -74,7 +74,7 @@ public class KuduWriter
         @Override
         public void prepare()
         {
-            Boolean truncate = config.getBool(Key.TRUNCATE, false);
+            Boolean truncate = config.getBool(KuduKey.TRUNCATE, false);
             if (truncate) {
                 KuduHelper.truncateTable(this.config);
             }

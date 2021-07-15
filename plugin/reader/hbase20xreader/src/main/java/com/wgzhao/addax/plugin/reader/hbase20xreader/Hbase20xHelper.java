@@ -19,6 +19,8 @@
 
 package com.wgzhao.addax.plugin.reader.hbase20xreader;
 
+import com.wgzhao.addax.common.base.HBaseConstant;
+import com.wgzhao.addax.common.base.HBaseKey;
 import com.wgzhao.addax.common.exception.AddaxException;
 import com.wgzhao.addax.common.util.Configuration;
 import com.alibaba.fastjson.JSON;
@@ -84,8 +86,8 @@ public class Hbase20xHelper
 
     public static Table getTable(Configuration configuration)
     {
-        String hbaseConfig = configuration.getString(Key.HBASE_CONFIG);
-        String userTable = configuration.getString(Key.TABLE);
+        String hbaseConfig = configuration.getString(HBaseKey.HBASE_CONFIG);
+        String userTable = configuration.getString(HBaseKey.TABLE);
         org.apache.hadoop.hbase.client.Connection hConnection = Hbase20xHelper.getHbaseConnection(hbaseConfig);
         TableName hTableName = TableName.valueOf(userTable);
         org.apache.hadoop.hbase.client.Admin admin = null;
@@ -105,8 +107,8 @@ public class Hbase20xHelper
 
     public static RegionLocator getRegionLocator(Configuration configuration)
     {
-        String hbaseConfig = configuration.getString(Key.HBASE_CONFIG);
-        String userTable = configuration.getString(Key.TABLE);
+        String hbaseConfig = configuration.getString(HBaseKey.HBASE_CONFIG);
+        String userTable = configuration.getString(HBaseKey.TABLE);
         org.apache.hadoop.hbase.client.Connection hConnection = Hbase20xHelper.getHbaseConnection(hbaseConfig);
         TableName hTableName = TableName.valueOf(userTable);
         org.apache.hadoop.hbase.client.Admin admin = null;
@@ -198,24 +200,24 @@ public class Hbase20xHelper
 
     public static byte[] convertUserStartRowkey(Configuration configuration)
     {
-        String startRowkey = configuration.getString(Key.START_ROWKEY);
+        String startRowkey = configuration.getString(HBaseKey.START_ROW_KEY);
         if (StringUtils.isBlank(startRowkey)) {
             return HConstants.EMPTY_BYTE_ARRAY;
         }
         else {
-            boolean isBinaryRowkey = configuration.getBool(Key.IS_BINARY_ROWKEY);
+            boolean isBinaryRowkey = configuration.getBool(HBaseKey.IS_BINARY_ROW_KEY);
             return Hbase20xHelper.stringToBytes(startRowkey, isBinaryRowkey);
         }
     }
 
     public static byte[] convertUserEndRowkey(Configuration configuration)
     {
-        String endRowkey = configuration.getString(Key.END_ROWKEY);
+        String endRowkey = configuration.getString(HBaseKey.END_ROW_KEY);
         if (StringUtils.isBlank(endRowkey)) {
             return HConstants.EMPTY_BYTE_ARRAY;
         }
         else {
-            boolean isBinaryRowkey = configuration.getBool(Key.IS_BINARY_ROWKEY);
+            boolean isBinaryRowkey = configuration.getBool(HBaseKey.IS_BINARY_ROW_KEY);
             return Hbase20xHelper.stringToBytes(endRowkey, isBinaryRowkey);
         }
     }
@@ -229,7 +231,7 @@ public class Hbase20xHelper
      */
     public static byte[] convertInnerStartRowkey(Configuration configuration)
     {
-        String startRowkey = configuration.getString(Key.START_ROWKEY);
+        String startRowkey = configuration.getString(HBaseKey.START_ROW_KEY);
         if (StringUtils.isBlank(startRowkey)) {
             return HConstants.EMPTY_BYTE_ARRAY;
         }
@@ -239,7 +241,7 @@ public class Hbase20xHelper
 
     public static byte[] convertInnerEndRowkey(Configuration configuration)
     {
-        String endRowkey = configuration.getString(Key.END_ROWKEY);
+        String endRowkey = configuration.getString(HBaseKey.END_ROW_KEY);
         if (StringUtils.isBlank(endRowkey)) {
             return HConstants.EMPTY_BYTE_ARRAY;
         }
@@ -259,7 +261,7 @@ public class Hbase20xHelper
 
     public static boolean isRowkeyColumn(String columnName)
     {
-        return Constant.ROWKEY_FLAG.equalsIgnoreCase(columnName);
+        return HBaseConstant.ROWKEY_FLAG.equalsIgnoreCase(columnName);
     }
 
     /**
@@ -275,15 +277,15 @@ public class Hbase20xHelper
         HbaseColumnCell oneColumnCell;
 
         for (Map<String, String> aColumn : column) {
-            ColumnType type = ColumnType.getByTypeName(aColumn.get(Key.TYPE));
-            String columnName = aColumn.get(Key.NAME);
-            String columnValue = aColumn.get(Key.VALUE);
-            String dateformat = aColumn.get(Key.FORMAT);
+            ColumnType type = ColumnType.getByTypeName(aColumn.get(HBaseKey.TYPE));
+            String columnName = aColumn.get(HBaseKey.NAME);
+            String columnValue = aColumn.get(HBaseKey.VALUE);
+            String dateformat = aColumn.get(HBaseKey.FORMAT);
 
             if (type == ColumnType.DATE) {
 
                 if (dateformat == null) {
-                    dateformat = Constant.DEFAULT_DATA_FORMAT;
+                    dateformat = HBaseConstant.DEFAULT_DATE_FORMAT;
                 }
                 Validate.isTrue(StringUtils.isNotBlank(columnName)
                         || StringUtils.isNotBlank(columnValue),
@@ -320,9 +322,9 @@ public class Hbase20xHelper
 
         HashMap<String, HashMap<String, String>> familyQualifierMap = new HashMap<>();
         for (Map<String, String> aColumn : column) {
-            String type = aColumn.get(Key.TYPE);
-            String columnName = aColumn.get(Key.NAME);
-            String dateformat = aColumn.get(Key.FORMAT);
+            String type = aColumn.get(HBaseKey.TYPE);
+            String columnName = aColumn.get(HBaseKey.NAME);
+            String dateformat = aColumn.get(HBaseKey.FORMAT);
 
             ColumnType.getByTypeName(type);
             Validate.isTrue(StringUtils.isNotBlank(columnName), "Hbasereader 中，column 需要配置列名称name,格式为 列族:列名，您的配置为空,请检查并修改.");
@@ -340,8 +342,8 @@ public class Hbase20xHelper
             }
 
             HashMap<String, String> typeAndFormat = new HashMap<String, String>();
-            typeAndFormat.put(Key.TYPE, type);
-            typeAndFormat.put(Key.FORMAT, dateformat);
+            typeAndFormat.put(HBaseKey.TYPE, type);
+            typeAndFormat.put(HBaseKey.FORMAT, dateformat);
             familyQualifierMap.put(familyQualifier, typeAndFormat);
         }
         return familyQualifierMap;
@@ -418,8 +420,8 @@ public class Hbase20xHelper
 
             String thisEndKey = getEndKey(endRowkeyByte, regionEndKey);
 
-            p.set(Key.START_ROWKEY, thisStartKey);
-            p.set(Key.END_ROWKEY, thisEndKey);
+            p.set(HBaseKey.START_ROW_KEY, thisStartKey);
+            p.set(HBaseKey.END_ROW_KEY, thisEndKey);
 
             LOG.debug("startRowkey:[{}], endRowkey:[{}] .", thisStartKey, thisEndKey);
 
@@ -476,45 +478,45 @@ public class Hbase20xHelper
 
     public static void validateParameter(Configuration originalConfig)
     {
-        originalConfig.getNecessaryValue(Key.HBASE_CONFIG, Hbase20xReaderErrorCode.REQUIRED_VALUE);
-        originalConfig.getNecessaryValue(Key.TABLE, Hbase20xReaderErrorCode.REQUIRED_VALUE);
+        originalConfig.getNecessaryValue(HBaseKey.HBASE_CONFIG, Hbase20xReaderErrorCode.REQUIRED_VALUE);
+        originalConfig.getNecessaryValue(HBaseKey.TABLE, Hbase20xReaderErrorCode.REQUIRED_VALUE);
 
         Hbase20xHelper.validateMode(originalConfig);
 
         //非必选参数处理
-        String encoding = originalConfig.getString(Key.ENCODING, Constant.DEFAULT_ENCODING);
+        String encoding = originalConfig.getString(HBaseKey.ENCODING, HBaseConstant.DEFAULT_ENCODING);
         if (!Charset.isSupported(encoding)) {
             throw AddaxException.asAddaxException(Hbase20xReaderErrorCode.ILLEGAL_VALUE, String.format("Hbasereader 不支持您所配置的编码:[%s]", encoding));
         }
-        originalConfig.set(Key.ENCODING, encoding);
+        originalConfig.set(HBaseKey.ENCODING, encoding);
         // 处理 range 的配置
-        String startRowkey = originalConfig.getString(Constant.RANGE + "." + Key.START_ROWKEY);
+        String startRowkey = originalConfig.getString(HBaseConstant.RANGE + "." + HBaseKey.START_ROW_KEY);
 
         //此处判断需要谨慎：如果有 key range.startRowkey 但是没有值，得到的 startRowkey 是空字符串，而不是 null
         if (startRowkey != null && startRowkey.length() != 0) {
-            originalConfig.set(Key.START_ROWKEY, startRowkey);
+            originalConfig.set(HBaseKey.START_ROW_KEY, startRowkey);
         }
 
-        String endRowkey = originalConfig.getString(Constant.RANGE + "." + Key.END_ROWKEY);
+        String endRowkey = originalConfig.getString(HBaseConstant.RANGE + "." + HBaseKey.END_ROW_KEY);
         //此处判断需要谨慎：如果有 key range.endRowkey 但是没有值，得到的 endRowkey 是空字符串，而不是 null
         if (endRowkey != null && endRowkey.length() != 0) {
-            originalConfig.set(Key.END_ROWKEY, endRowkey);
+            originalConfig.set(HBaseKey.END_ROW_KEY, endRowkey);
         }
-        Boolean isBinaryRowkey = originalConfig.getBool(Constant.RANGE + "." + Key.IS_BINARY_ROWKEY, false);
-        originalConfig.set(Key.IS_BINARY_ROWKEY, isBinaryRowkey);
+        Boolean isBinaryRowkey = originalConfig.getBool(HBaseConstant.RANGE + "." + HBaseKey.IS_BINARY_ROW_KEY, false);
+        originalConfig.set(HBaseKey.IS_BINARY_ROW_KEY, isBinaryRowkey);
 
         //scan cache
-        int scanCacheSize = originalConfig.getInt(Key.SCAN_CACHE_SIZE, Constant.DEFAULT_SCAN_CACHE_SIZE);
-        originalConfig.set(Key.SCAN_CACHE_SIZE, scanCacheSize);
+        int scanCacheSize = originalConfig.getInt(HBaseKey.SCAN_CACHE_SIZE, HBaseConstant.DEFAULT_SCAN_CACHE_SIZE);
+        originalConfig.set(HBaseKey.SCAN_CACHE_SIZE, scanCacheSize);
 
-        int scanBatchSize = originalConfig.getInt(Key.SCAN_BATCH_SIZE, Constant.DEFAULT_SCAN_BATCH_SIZE);
-        originalConfig.set(Key.SCAN_BATCH_SIZE, scanBatchSize);
+        int scanBatchSize = originalConfig.getInt(HBaseKey.SCAN_BATCH_SIZE, HBaseConstant.DEFAULT_SCAN_BATCH_SIZE);
+        originalConfig.set(HBaseKey.SCAN_BATCH_SIZE, scanBatchSize);
     }
 
     private static void validateMode(Configuration originalConfig)
     {
-        String mode = originalConfig.getNecessaryValue(Key.MODE, Hbase20xReaderErrorCode.REQUIRED_VALUE);
-        List<Map> column = originalConfig.getList(Key.COLUMN, Map.class);
+        String mode = originalConfig.getNecessaryValue(HBaseKey.MODE, Hbase20xReaderErrorCode.REQUIRED_VALUE);
+        List<Map> column = originalConfig.getList(HBaseKey.COLUMN, Map.class);
         if (column == null || column.isEmpty()) {
             throw AddaxException.asAddaxException(Hbase20xReaderErrorCode.REQUIRED_VALUE,
                     "您配置的column为空,Hbase必须配置 column，其形式为：column:[{\"name\": \"cf0:column0\",\"type\": \"string\"},{\"name\": \"cf1:column1\",\"type\": \"long\"}]");
@@ -523,7 +525,7 @@ public class Hbase20xHelper
         switch (modeType) {
             case NORMAL: {
                 // normal 模式不需要配置 maxVersion，需要配置 column，并且 column 格式为 Map 风格
-                String maxVersion = originalConfig.getString(Key.MAX_VERSION);
+                String maxVersion = originalConfig.getString(HBaseKey.MAX_VERSION);
                 Validate.isTrue(maxVersion == null, "您配置的是 normal 模式读取 hbase 中的数据，所以不能配置无关项：maxVersion");
                 // 通过 parse 进行 column 格式的进一步检查
                 Hbase20xHelper.parseColumnOfNormalMode(column);
@@ -545,7 +547,7 @@ public class Hbase20xHelper
     // 检查 maxVersion 是否存在，并且值是否合法
     private static void checkMaxVersion(Configuration configuration, String mode)
     {
-        Integer maxVersion = configuration.getInt(Key.MAX_VERSION);
+        Integer maxVersion = configuration.getInt(HBaseKey.MAX_VERSION);
         Validate.notNull(maxVersion, String.format("您配置的是 %s 模式读取 hbase 中的数据，所以必须配置：maxVersion", mode));
         boolean isMaxVersionValid = maxVersion == -1 || maxVersion > 1;
         Validate.isTrue(isMaxVersionValid, String.format("您配置的是 %s 模式读取 hbase 中的数据，但是配置的 maxVersion 值错误. maxVersion规定：-1为读取全部版本，不能配置为0或者1（因为0或者1，我们认为用户是想用 normal 模式读取数据，而非 %s 模式读取，二者差别大），大于1则表示读取最新的对应个数的版本", mode, mode));

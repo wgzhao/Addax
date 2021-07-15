@@ -77,13 +77,13 @@ public class InfluxDBWriterTask
 
     public InfluxDBWriterTask(Configuration configuration)
     {
-        List<Object> connList = configuration.getList(Key.CONNECTION);
+        List<Object> connList = configuration.getList(InfluxDBKey.CONNECTION);
         Configuration conn = Configuration.from(connList.get(0).toString());
-        this.endpoint = conn.getString(Key.ENDPOINT);
-        this.table = conn.getString(Key.TABLE);
-        this.database = conn.getString(Key.DATABASE);
+        this.endpoint = conn.getString(InfluxDBKey.ENDPOINT);
+        this.table = conn.getString(InfluxDBKey.TABLE);
+        this.database = conn.getString(InfluxDBKey.DATABASE);
 
-        List<Configuration>  columns = configuration.getListConfiguration(Key.COLUMN);
+        List<Configuration>  columns = configuration.getListConfiguration(InfluxDBKey.COLUMN);
         this.columnNumber = columns.size();
         boolean foundTimeColumn = false;
         for(Configuration column : columns) {
@@ -112,14 +112,14 @@ public class InfluxDBWriterTask
             LOG.warn("your column config not have time");
         }
 
-        this.username = configuration.getString(Key.USERNAME);
-        this.password = configuration.getString(Key.PASSWORD, null);
-        this.connTimeout = configuration.getInt(Key.CONNECT_TIMEOUT_SECONDS, CONNECT_TIMEOUT_SECONDS_DEFAULT);
-        this.readTimeout = configuration.getInt(Key.READ_TIMEOUT_SECONDS, READ_TIMEOUT_SECONDS_DEFAULT);
-        this.writeTimeout = configuration.getInt(Key.WRITE_TIMEOUT_SECONDS, WRITE_TIMEOUT_SECONDS_DEFAULT);
-        this.batchSize = configuration.getInt(Key.BATCH_SIZE, 1024);
-        this.postSqls = configuration.getList(Key.POST_SQL, String.class);
-        this.retentionPolicy = configuration.getConfiguration(Key.RETENTION_POLICY);
+        this.username = configuration.getString(InfluxDBKey.USERNAME);
+        this.password = configuration.getString(InfluxDBKey.PASSWORD, null);
+        this.connTimeout = configuration.getInt(InfluxDBKey.CONNECT_TIMEOUT_SECONDS, CONNECT_TIMEOUT_SECONDS_DEFAULT);
+        this.readTimeout = configuration.getInt(InfluxDBKey.READ_TIMEOUT_SECONDS, READ_TIMEOUT_SECONDS_DEFAULT);
+        this.writeTimeout = configuration.getInt(InfluxDBKey.WRITE_TIMEOUT_SECONDS, WRITE_TIMEOUT_SECONDS_DEFAULT);
+        this.batchSize = configuration.getInt(InfluxDBKey.BATCH_SIZE, 1024);
+        this.postSqls = configuration.getList(InfluxDBKey.POST_SQL, String.class);
+        this.retentionPolicy = configuration.getConfiguration(InfluxDBKey.RETENTION_POLICY);
     }
 
     public void init()
@@ -136,9 +136,9 @@ public class InfluxDBWriterTask
         LOG.info("ping influxdb: {} with username: {}, pong:{}", endpoint, username, pong.toString());
         if (this.retentionPolicy != null) {
             //create cutom retention policy
-            String rpName = this.retentionPolicy.getString(Key.RP_NAME, "rp");
-            String duration = this.retentionPolicy.getString(Key.RP_DURATION, "1d");
-            int replication = this.retentionPolicy.getInt(Key.RP_REPLICATION, 1);
+            String rpName = this.retentionPolicy.getString(InfluxDBKey.RP_NAME, "rp");
+            String duration = this.retentionPolicy.getString(InfluxDBKey.RP_DURATION, "1d");
+            int replication = this.retentionPolicy.getInt(InfluxDBKey.RP_REPLICATION, 1);
             influxDB.query(new Query("CREATE RETENTION POLICY " + rpName
                     + " ON " + database + " DURATION " + duration + " REPLICATION " + replication ));
             influxDB.setRetentionPolicy(rpName);

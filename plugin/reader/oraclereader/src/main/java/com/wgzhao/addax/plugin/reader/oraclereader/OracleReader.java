@@ -24,7 +24,7 @@ import com.wgzhao.addax.common.plugin.RecordSender;
 import com.wgzhao.addax.common.spi.Reader;
 import com.wgzhao.addax.common.util.Configuration;
 import com.wgzhao.addax.rdbms.reader.CommonRdbmsReader;
-import com.wgzhao.addax.rdbms.reader.Key;
+import com.wgzhao.addax.common.base.Key;
 import com.wgzhao.addax.rdbms.reader.util.HintUtil;
 import com.wgzhao.addax.rdbms.util.DBUtilErrorCode;
 import com.wgzhao.addax.rdbms.util.DataBaseType;
@@ -32,8 +32,9 @@ import org.apache.commons.lang3.StringUtils;
 
 import java.util.List;
 
-import static com.wgzhao.addax.rdbms.reader.Constant.FETCH_SIZE;
-import static com.wgzhao.addax.rdbms.reader.Constant.IS_TABLE_MODE;
+import static com.wgzhao.addax.common.base.Constant.DEFAULT_FETCH_SIZE;
+import static com.wgzhao.addax.common.base.Key.FETCH_SIZE;
+import static com.wgzhao.addax.common.base.Key.IS_TABLE_MODE;
 
 public class OracleReader
         extends Reader
@@ -90,9 +91,7 @@ public class OracleReader
 
         private void dealFetchSize(Configuration originalConfig)
         {
-            int fetchSize = originalConfig.getInt(
-                    FETCH_SIZE,
-                    Constant.DEFAULT_FETCH_SIZE);
+            int fetchSize = originalConfig.getInt(FETCH_SIZE, DEFAULT_FETCH_SIZE);
             if (fetchSize < 1) {
                 throw AddaxException
                         .asAddaxException(DBUtilErrorCode.REQUIRED_VALUE,

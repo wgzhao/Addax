@@ -21,6 +21,7 @@ package com.wgzhao.addax.plugin.reader.hdfsreader;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
+import com.wgzhao.addax.common.base.Key;
 import com.wgzhao.addax.common.element.BoolColumn;
 import com.wgzhao.addax.common.element.BytesColumn;
 import com.wgzhao.addax.common.element.Column;
@@ -85,8 +86,8 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import static com.wgzhao.addax.storage.reader.Key.COLUMN;
-import static com.wgzhao.addax.storage.reader.Key.NULL_FORMAT;
+import static com.wgzhao.addax.common.base.Key.COLUMN;
+import static com.wgzhao.addax.common.base.Key.NULL_FORMAT;
 
 /**
  * Created by mingya.wmy on 2015/8/12.
@@ -679,27 +680,27 @@ public class DFSUtil
         Path file = new Path(filepath);
 
         try (FileSystem fs = FileSystem.get(hadoopConf); FSDataInputStream in = fs.open(file)) {
-            if (StringUtils.equalsIgnoreCase(specifiedFileType, Constant.ORC)) {
+            if (StringUtils.equalsIgnoreCase(specifiedFileType, HdfsConstant.ORC)) {
                 return isORCFile(file, fs, in);
             }
-            else if (StringUtils.equalsIgnoreCase(specifiedFileType, Constant.RC)) {
+            else if (StringUtils.equalsIgnoreCase(specifiedFileType, HdfsConstant.RC)) {
                 return isRCFile(filepath, in);
             }
-            else if (StringUtils.equalsIgnoreCase(specifiedFileType, Constant.SEQ)) {
+            else if (StringUtils.equalsIgnoreCase(specifiedFileType, HdfsConstant.SEQ)) {
 
                 return isSequenceFile(file, in);
             }
-            else if (StringUtils.equalsIgnoreCase(specifiedFileType, Constant.PARQUET)) {
+            else if (StringUtils.equalsIgnoreCase(specifiedFileType, HdfsConstant.PARQUET)) {
                 return isParquetFile(file, in);
             }
-            else if (StringUtils.equalsIgnoreCase(specifiedFileType, Constant.CSV)
-                    || StringUtils.equalsIgnoreCase(specifiedFileType, Constant.TEXT)) {
+            else if (StringUtils.equalsIgnoreCase(specifiedFileType, HdfsConstant.CSV)
+                    || StringUtils.equalsIgnoreCase(specifiedFileType, HdfsConstant.TEXT)) {
                 return true;
             }
         }
         catch (Exception e) {
             String message = String.format("检查文件[%s]类型失败，目前支持 %s 格式的文件," +
-                    "请检查您文件类型和文件是否正确。", filepath, Constant.SUPPORT_FILE_TYPE);
+                    "请检查您文件类型和文件是否正确。", filepath, HdfsConstant.SUPPORT_FILE_TYPE);
             LOG.error(message);
             throw AddaxException.asAddaxException(HdfsReaderErrorCode.READ_FILE_ERROR, message, e);
         }

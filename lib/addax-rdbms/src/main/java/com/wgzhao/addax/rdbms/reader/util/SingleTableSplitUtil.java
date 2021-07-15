@@ -25,8 +25,8 @@ import com.alibaba.fastjson.JSON;
 import com.wgzhao.addax.rdbms.util.DataBaseType;
 import com.wgzhao.addax.common.exception.AddaxException;
 import com.wgzhao.addax.common.util.Configuration;
-import com.wgzhao.addax.rdbms.reader.Constant;
-import com.wgzhao.addax.rdbms.reader.Key;
+import com.wgzhao.addax.common.base.Constant;
+import com.wgzhao.addax.common.base.Key;
 import com.wgzhao.addax.rdbms.util.DBUtil;
 import com.wgzhao.addax.rdbms.util.DBUtilErrorCode;
 import com.wgzhao.addax.rdbms.util.RdbmsException;
@@ -166,7 +166,7 @@ public class SingleTableSplitUtil
     {
         String pkRangeSQL = genPKRangeSQL(configuration);
 
-        int fetchSize = configuration.getInt(Constant.FETCH_SIZE);
+        int fetchSize = configuration.getInt(Key.FETCH_SIZE);
         String jdbcURL = configuration.getString(Key.JDBC_URL);
         String username = configuration.getString(Key.USERNAME);
         String password = configuration.getString(Key.PASSWORD);
@@ -361,7 +361,7 @@ public class SingleTableSplitUtil
         String splitSql = String.format(sampleSqlTemplate, splitPK, table,
                 percentage, whereSql, adviceNum, splitPK);
 
-        int fetchSize = configuration.getInt(Constant.FETCH_SIZE, 32);
+        int fetchSize = configuration.getInt(Key.FETCH_SIZE, 32);
         String jdbcURL = configuration.getString(Key.JDBC_URL);
         String username = configuration.getString(Key.USERNAME);
         String password = configuration.getString(Key.PASSWORD);
@@ -378,8 +378,7 @@ public class SingleTableSplitUtil
                 throw RdbmsException.asQueryException(dataBaseType, e,
                         splitSql, table, username);
             }
-            configuration
-                    .set(Constant.PK_TYPE, Constant.PK_TYPE_MONTECARLO);
+            configuration.set(Constant.PK_TYPE, Constant.PK_TYPE_MONTE_CARLO);
             ResultSetMetaData rsMetaData = rs.getMetaData();
             while (DBUtil.asyncResultSetNext(rs)) {
                 ImmutablePair<Object, Integer> eachPoint = new ImmutablePair<>(

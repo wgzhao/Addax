@@ -19,7 +19,9 @@
 
 package com.wgzhao.addax.plugin.writer.mongodbwriter;
 
-public class KeyConstant
+import com.wgzhao.addax.common.base.Key;
+
+public class KeyConstant extends Key
 {
     /**
      * mongodb 的 host 地址

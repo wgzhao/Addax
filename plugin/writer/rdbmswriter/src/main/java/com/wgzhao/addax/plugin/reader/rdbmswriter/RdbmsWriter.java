@@ -19,6 +19,7 @@
 
 package com.wgzhao.addax.plugin.reader.rdbmswriter;
 
+import com.wgzhao.addax.common.base.Key;
 import com.wgzhao.addax.common.exception.AddaxException;
 import com.wgzhao.addax.common.plugin.RecordReceiver;
 import com.wgzhao.addax.common.spi.Writer;
@@ -27,7 +28,6 @@ import com.wgzhao.addax.rdbms.util.DBUtil;
 import com.wgzhao.addax.rdbms.util.DBUtilErrorCode;
 import com.wgzhao.addax.rdbms.util.DataBaseType;
 import com.wgzhao.addax.rdbms.writer.CommonRdbmsWriter;
-import com.wgzhao.addax.rdbms.writer.Key;
 
 import java.util.List;
 

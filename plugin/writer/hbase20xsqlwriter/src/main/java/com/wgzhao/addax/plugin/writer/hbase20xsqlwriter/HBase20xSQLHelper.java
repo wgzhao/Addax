@@ -19,6 +19,8 @@
 
 package com.wgzhao.addax.plugin.writer.hbase20xsqlwriter;
 
+import com.wgzhao.addax.common.base.HBaseConstant;
+import com.wgzhao.addax.common.base.HBaseKey;
 import com.wgzhao.addax.common.exception.AddaxException;
 import com.wgzhao.addax.common.util.Configuration;
 import org.slf4j.Logger;
@@ -56,22 +58,22 @@ public class HBase20xSQLHelper
     public static void validateParameter(Configuration originalConfig)
     {
         // 表名和queryserver地址必须配置，否则抛异常
-        String tableName = originalConfig.getNecessaryValue(Key.TABLE, HBase20xSQLWriterErrorCode.REQUIRED_VALUE);
-        String queryServerAddress = originalConfig.getNecessaryValue(Key.QUERYSERVER_ADDRESS, HBase20xSQLWriterErrorCode.REQUIRED_VALUE);
+        String tableName = originalConfig.getNecessaryValue(HBaseKey.TABLE, HBase20xSQLWriterErrorCode.REQUIRED_VALUE);
+        String queryServerAddress = originalConfig.getNecessaryValue(HBaseKey.QUERY_SERVER_ADDRESS, HBase20xSQLWriterErrorCode.REQUIRED_VALUE);
 
         // 序列化格式，可不配置，默认PROTOBUF
-        String serialization = originalConfig.getString(Key.SERIALIZATION_NAME, Constant.DEFAULT_SERIALIZATION);
+        String serialization = originalConfig.getString(HBaseKey.SERIALIZATION_NAME, HBaseConstant.DEFAULT_SERIALIZATION);
 
         String connStr = getConnectionUrl(queryServerAddress, serialization);
         // 校验jdbc连接是否正常
         Connection conn = getThinClientConnection(connStr);
 
-        List<String> columnNames = originalConfig.getList(Key.COLUMN, String.class);
+        List<String> columnNames = originalConfig.getList(HBaseKey.COLUMN, String.class);
         if (columnNames == null || columnNames.isEmpty()) {
             throw AddaxException.asAddaxException(
                     HBase20xSQLWriterErrorCode.ILLEGAL_VALUE, "HBase的columns配置不能为空,请添加目标表的列名配置.");
         }
-        String schema = originalConfig.getString(Key.SCHEMA);
+        String schema = originalConfig.getString(HBaseKey.SCHEMA);
         // 检查表以及配置列是否存在
         checkTable(conn, schema, tableName, columnNames);
     }
@@ -98,9 +100,9 @@ public class HBase20xSQLHelper
 
     public static Connection getJdbcConnection(Configuration conf)
     {
-        String queryServerAddress = conf.getNecessaryValue(Key.QUERYSERVER_ADDRESS, HBase20xSQLWriterErrorCode.REQUIRED_VALUE);
+        String queryServerAddress = conf.getNecessaryValue(HBaseKey.QUERY_SERVER_ADDRESS, HBase20xSQLWriterErrorCode.REQUIRED_VALUE);
         // 序列化格式，可不配置，默认PROTOBUF
-        String serialization = conf.getString(Key.SERIALIZATION_NAME, "PROTOBUF");
+        String serialization = conf.getString(HBaseKey.SERIALIZATION_NAME, "PROTOBUF");
         String connStr = getConnectionUrl(queryServerAddress, serialization);
         return getThinClientConnection(connStr);
     }

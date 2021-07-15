@@ -19,6 +19,8 @@
 
 package com.wgzhao.addax.plugin.reader.hbase11xreader;
 
+import com.wgzhao.addax.common.base.HBaseConstant;
+import com.wgzhao.addax.common.base.HBaseKey;
 import com.wgzhao.addax.common.element.BoolColumn;
 import com.wgzhao.addax.common.element.Column;
 import com.wgzhao.addax.common.element.DateColumn;
@@ -63,11 +65,11 @@ public abstract class HbaseAbstractTask
 
         this.htable = Hbase11xHelper.getTable(configuration);
 
-        this.encoding = configuration.getString(Key.ENCODING, Constant.DEFAULT_ENCODING);
+        this.encoding = configuration.getString(HBaseKey.ENCODING, HBaseConstant.DEFAULT_ENCODING);
         this.startKey = Hbase11xHelper.convertInnerStartRowkey(configuration);
         this.endKey = Hbase11xHelper.convertInnerEndRowkey(configuration);
-        this.scanCacheSize = configuration.getInt(Key.SCAN_CACHE_SIZE, Constant.DEFAULT_SCAN_CACHE_SIZE);
-        this.scanBatchSize = configuration.getInt(Key.SCAN_BATCH_SIZE, Constant.DEFAULT_SCAN_BATCH_SIZE);
+        this.scanCacheSize = configuration.getInt(HBaseKey.SCAN_CACHE_SIZE, HBaseConstant.DEFAULT_SCAN_CACHE_SIZE);
+        this.scanBatchSize = configuration.getInt(HBaseKey.SCAN_BATCH_SIZE, HBaseConstant.DEFAULT_SCAN_BATCH_SIZE);
     }
 
     public abstract boolean fetchLine(Record record)

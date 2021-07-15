@@ -56,14 +56,14 @@ public class KuduHelper
     public static KuduClient getKuduClient(Configuration configuration)
     {
         try {
-            String masterAddress = (String) configuration.get(Key.KUDU_MASTER_ADDRESSES);
+            String masterAddress = (String) configuration.get(KuduKey.KUDU_MASTER_ADDRESSES);
             return new KuduClient.KuduClientBuilder(masterAddress)
                     .defaultAdminOperationTimeoutMs(
                             Long.parseLong(configuration.getString(
-                                    Key.KUDU_ADMIN_TIMEOUT, "60")) * 1000L)
+                                    KuduKey.KUDU_ADMIN_TIMEOUT, "60")) * 1000L)
                     .defaultOperationTimeoutMs(
                             Long.parseLong(configuration.getString(
-                                    Key.KUDU_SESSION_TIMEOUT, "100"))* 1000L)
+                                    KuduKey.KUDU_SESSION_TIMEOUT, "100"))* 1000L)
                     .build();
         }
         catch (Exception e) {
@@ -128,8 +128,8 @@ public class KuduHelper
 
     public static boolean isTableExists(Configuration configuration)
     {
-        String tableName = configuration.getString(Key.KUDU_TABLE_NAME);
-        String kuduConfig = configuration.getString(Key.KUDU_CONFIG);
+        String tableName = configuration.getString(KuduKey.KUDU_TABLE_NAME);
+        String kuduConfig = configuration.getString(KuduKey.KUDU_CONFIG);
         KuduClient kuduClient =KuduHelper.getKuduClient(configuration);
         try {
             return kuduClient.tableExists(tableName);
@@ -156,7 +156,7 @@ public class KuduHelper
 
     public static Schema getSchema(Configuration configuration)
     {
-        List<Configuration> columns = configuration.getListConfiguration(Key.COLUMN);
+        List<Configuration> columns = configuration.getListConfiguration(KuduKey.COLUMN);
         List<ColumnSchema> columnSchemas = new ArrayList<>();
         Schema schema = null;
         if (columns == null || columns.isEmpty()) {
@@ -166,15 +166,15 @@ public class KuduHelper
         try {
             for (Configuration column : columns) {
 
-                String type = "BIGINT".equalsIgnoreCase(column.getNecessaryValue(Key.TYPE, KuduWriterErrorCode.REQUIRED_VALUE)) ||
-                        "LONG".equalsIgnoreCase(column.getNecessaryValue(Key.TYPE, KuduWriterErrorCode.REQUIRED_VALUE)) ?
-                        "INT64" : "INT".equalsIgnoreCase(column.getNecessaryValue(Key.TYPE, KuduWriterErrorCode.REQUIRED_VALUE)) ?
-                        "INT32" : column.getNecessaryValue(Key.TYPE, KuduWriterErrorCode.REQUIRED_VALUE).toUpperCase();
-                String name = column.getNecessaryValue(Key.NAME, KuduWriterErrorCode.REQUIRED_VALUE);
-                Boolean key = column.getBool(Key.PRIMARYKEY, false);
-                String encoding = column.getString(Key.ENCODING, Constant.ENCODING).toUpperCase();
-                String compression = column.getString(Key.COMPRESSION, Constant.COMPRESSION).toUpperCase();
-                String comment = column.getString(Key.COMMENT, "");
+                String type = "BIGINT".equalsIgnoreCase(column.getNecessaryValue(KuduKey.TYPE, KuduWriterErrorCode.REQUIRED_VALUE)) ||
+                        "LONG".equalsIgnoreCase(column.getNecessaryValue(KuduKey.TYPE, KuduWriterErrorCode.REQUIRED_VALUE)) ?
+                        "INT64" : "INT".equalsIgnoreCase(column.getNecessaryValue(KuduKey.TYPE, KuduWriterErrorCode.REQUIRED_VALUE)) ?
+                        "INT32" : column.getNecessaryValue(KuduKey.TYPE, KuduWriterErrorCode.REQUIRED_VALUE).toUpperCase();
+                String name = column.getNecessaryValue(KuduKey.NAME, KuduWriterErrorCode.REQUIRED_VALUE);
+                Boolean key = column.getBool(KuduKey.PRIMARYKEY, false);
+                String encoding = column.getString(KuduKey.ENCODING, KuduConstant.ENCODING).toUpperCase();
+                String compression = column.getString(KuduKey.COMPRESSION, KuduConstant.COMPRESSION).toUpperCase();
+                String comment = column.getString(KuduKey.COMMENT, "");
 
                 columnSchemas.add(new ColumnSchema.ColumnSchemaBuilder(name, Type.getTypeForName(type))
                         .key(key)
@@ -196,7 +196,7 @@ public class KuduHelper
         int i = 0;
         while (i < columns.size()) {
             Configuration col = columns.get(i);
-            if (!col.getBool(Key.PRIMARYKEY, false)) {
+            if (!col.getBool(KuduKey.PRIMARYKEY, false)) {
                 break;
             }
             i++;
@@ -208,14 +208,14 @@ public class KuduHelper
             CreateTableOptions tableOptions,
             Schema schema)
     {
-        Configuration partition = configuration.getConfiguration(Key.PARTITION);
+        Configuration partition = configuration.getConfiguration(KuduKey.PARTITION);
         if (partition == null) {
             ColumnSchema columnSchema = schema.getColumns().get(0);
             tableOptions.addHashPartitions(Collections.singletonList(columnSchema.getName()), 3);
             return;
         }
         //range分区
-        Map<String, Object> range = partition.getMap(Key.RANGE);
+        Map<String, Object> range = partition.getMap(KuduKey.RANGE);
         if (range != null && !range.isEmpty()) {
             Set<Map.Entry<String, Object>> rangeColums = range.entrySet();
             for (Map.Entry<String, Object> rangeColum : rangeColums) {
@@ -228,8 +228,8 @@ public class KuduHelper
                 }
                 while (iterator.hasNext()) {
                     JSONObject lowerAndUpper = (JSONObject) iterator.next();
-                    String lowerValue = lowerAndUpper.getString(Key.LOWER);
-                    String upperValue = lowerAndUpper.getString(Key.UPPER);
+                    String lowerValue = lowerAndUpper.getString(KuduKey.LOWER);
+                    String upperValue = lowerAndUpper.getString(KuduKey.UPPER);
                     if (StringUtils.isBlank(lowerValue) || StringUtils.isBlank(upperValue)) {
                         throw AddaxException.asAddaxException(KuduWriterErrorCode.REQUIRED_VALUE,
                                 "\"lower\" or \"upper\" is empty, please check the configuration parameters.");
@@ -245,10 +245,10 @@ public class KuduHelper
         }
 
         // 设置Hash分区
-        Configuration hash = partition.getConfiguration(Key.HASH);
+        Configuration hash = partition.getConfiguration(KuduKey.HASH);
         if (hash != null) {
-            List<String> hashColums = hash.getList(Key.COLUMN, String.class);
-            Integer hashPartitionNum = configuration.getInt(Key.HASH_NUM, 3);
+            List<String> hashColums = hash.getList(KuduKey.COLUMN, String.class);
+            Integer hashPartitionNum = configuration.getInt(KuduKey.HASH_NUM, 3);
             tableOptions.addHashPartitions(hashColums, hashPartitionNum);
             LOG.info("Set hash partition complete!");
         }
@@ -258,32 +258,32 @@ public class KuduHelper
     {
         LOG.info("Start validating parameters！");
         // configuration.getNecessaryValue(Key.KUDU_CONFIG, KuduWriterErrorCode.REQUIRED_VALUE);
-        configuration.getNecessaryValue(Key.KUDU_TABLE_NAME, KuduWriterErrorCode.REQUIRED_VALUE);
-        configuration.getNecessaryValue(Key.KUDU_MASTER_ADDRESSES, KuduWriterErrorCode.REQUIRED_VALUE);
+        configuration.getNecessaryValue(KuduKey.KUDU_TABLE_NAME, KuduWriterErrorCode.REQUIRED_VALUE);
+        configuration.getNecessaryValue(KuduKey.KUDU_MASTER_ADDRESSES, KuduWriterErrorCode.REQUIRED_VALUE);
 //        String encoding = configuration.getString(Key.ENCODING, Constant.DEFAULT_ENCODING);
 //        if (!Charset.isSupported(encoding)) {
 //            throw DataXException.asAddaxException(KuduWriterErrorCode.ILLEGAL_VALUE,
 //                    String.format("Encoding is not supported:[%s] .", encoding));
 //        }
 //        configuration.set(Key.ENCODING, encoding);
-        String insertMode = configuration.getString(Key.WRITE_MODE, Constant.INSERT_MODE);
+        String insertMode = configuration.getString(KuduKey.WRITE_MODE, KuduConstant.INSERT_MODE);
         try {
             InsertModeType.getByTypeName(insertMode);
         }
         catch (Exception e) {
-            insertMode = Constant.INSERT_MODE;
+            insertMode = KuduConstant.INSERT_MODE;
         }
-        configuration.set(Key.WRITE_MODE, insertMode);
+        configuration.set(KuduKey.WRITE_MODE, insertMode);
 
-        Long writeBufferSize = configuration.getLong(Key.WRITE_BATCH_SIZE, Constant.DEFAULT_WRITE_BATCH_SIZE);
-        configuration.set(Key.WRITE_BATCH_SIZE, writeBufferSize);
+        Long writeBufferSize = configuration.getLong(KuduKey.WRITE_BATCH_SIZE, KuduConstant.DEFAULT_WRITE_BATCH_SIZE);
+        configuration.set(KuduKey.WRITE_BATCH_SIZE, writeBufferSize);
 
-        Long mutationBufferSpace = configuration.getLong(Key.MUTATION_BUFFER_SPACE, Constant.DEFAULT_MUTATION_BUFFER_SPACE);
-        configuration.set(Key.MUTATION_BUFFER_SPACE, mutationBufferSpace);
+        Long mutationBufferSpace = configuration.getLong(KuduKey.MUTATION_BUFFER_SPACE, KuduConstant.DEFAULT_MUTATION_BUFFER_SPACE);
+        configuration.set(KuduKey.MUTATION_BUFFER_SPACE, mutationBufferSpace);
 
-        Boolean isSkipFail = configuration.getBool(Key.SKIP_FAIL, false);
-        configuration.set(Key.SKIP_FAIL, isSkipFail);
-        List<Configuration> columns = configuration.getListConfiguration(Key.COLUMN);
+        Boolean isSkipFail = configuration.getBool(KuduKey.SKIP_FAIL, false);
+        configuration.set(KuduKey.SKIP_FAIL, isSkipFail);
+        List<Configuration> columns = configuration.getListConfiguration(KuduKey.COLUMN);
         List<Configuration> goalColumns = new ArrayList<>();
         //column参数验证
         int indexFlag = 0;
@@ -291,10 +291,10 @@ public class KuduHelper
         int primaryKeyFlag = 0;
         for (int i = 0; i < columns.size(); i++) {
             Configuration col = columns.get(i);
-            String index = col.getString(Key.INDEX);
+            String index = col.getString(KuduKey.INDEX);
             if (index == null) {
                 index = String.valueOf(i);
-                col.set(Key.INDEX, index);
+                col.set(KuduKey.INDEX, index);
                 indexFlag++;
             }
 //            if (primaryKey != col.getBool(Key.PRIMARYKEY, false)) {
@@ -311,7 +311,7 @@ public class KuduHelper
 //            throw DataXException.asAddaxException(KuduWriterErrorCode.ILLEGAL_VALUE,
 //                    "\"primaryKey\" must be written in the front！");
 //        }
-        configuration.set(Key.COLUMN, goalColumns);
+        configuration.set(KuduKey.COLUMN, goalColumns);
 //        LOG.info("------------------------------------");
 //        LOG.info(configuration.toString());
 //        LOG.info("------------------------------------");
@@ -320,8 +320,8 @@ public class KuduHelper
 
     public static void truncateTable(Configuration configuration)
     {
-        String kuduConfig = configuration.getString(Key.KUDU_CONFIG);
-        String userTable = configuration.getString(Key.KUDU_TABLE_NAME);
+        String kuduConfig = configuration.getString(KuduKey.KUDU_CONFIG);
+        String userTable = configuration.getString(KuduKey.KUDU_TABLE_NAME);
         LOG.info(String.format("Because you have configured truncate is true,KuduWriter begins to truncate table %s .", userTable));
         KuduClient kuduClient = KuduHelper.getKuduClient(configuration);
 
@@ -343,7 +343,7 @@ public class KuduHelper
 {
     List<String> columnNames = Lists.newArrayList();
     for (Configuration eachColumnConf : columns) {
-        columnNames.add(eachColumnConf.getString(Key.NAME));
+        columnNames.add(eachColumnConf.getString(KuduKey.NAME));
     }
     return columnNames;
 }

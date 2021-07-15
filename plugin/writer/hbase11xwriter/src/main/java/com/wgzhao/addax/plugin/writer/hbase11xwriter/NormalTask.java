@@ -19,6 +19,7 @@
 
 package com.wgzhao.addax.plugin.writer.hbase11xwriter;
 
+import com.wgzhao.addax.common.base.HBaseKey;
 import com.wgzhao.addax.common.element.DoubleColumn;
 import com.wgzhao.addax.common.element.LongColumn;
 import com.wgzhao.addax.common.element.Record;
@@ -63,10 +64,10 @@ public class NormalTask
             put = new Put(rowkey, timestamp);
         }
         for (Configuration aColumn : columns) {
-            Integer index = aColumn.getInt(Key.INDEX);
-            String type = aColumn.getString(Key.TYPE);
+            Integer index = aColumn.getInt(HBaseKey.INDEX);
+            String type = aColumn.getString(HBaseKey.TYPE);
             ColumnType columnType = ColumnType.getByTypeName(type);
-            String name = aColumn.getString(Key.NAME);
+            String name = aColumn.getString(HBaseKey.NAME);
             String promptInfo = "Hbasewriter 中，column 的列配置格式应该是：列族:列名. 您配置的列错误：" + name;
             String[] cfAndQualifier = name.split(":");
             Validate.isTrue(cfAndQualifier != null && cfAndQualifier.length == 2
@@ -91,11 +92,11 @@ public class NormalTask
     {
         byte[] rowkeyBuffer = {};
         for (Configuration aRowkeyColumn : rowkeyColumn) {
-            Integer index = aRowkeyColumn.getInt(Key.INDEX);
-            String type = aRowkeyColumn.getString(Key.TYPE);
+            Integer index = aRowkeyColumn.getInt(HBaseKey.INDEX);
+            String type = aRowkeyColumn.getString(HBaseKey.TYPE);
             ColumnType columnType = ColumnType.getByTypeName(type);
             if (index == -1) {
-                String value = aRowkeyColumn.getString(Key.VALUE);
+                String value = aRowkeyColumn.getString(HBaseKey.VALUE);
                 rowkeyBuffer = Bytes.add(rowkeyBuffer, getValueByte(columnType, value));
             }
             else {
@@ -111,11 +112,11 @@ public class NormalTask
 
     public long getVersion(Record record)
     {
-        int index = versionColumn.getInt(Key.INDEX);
+        int index = versionColumn.getInt(HBaseKey.INDEX);
         long timestamp;
         if (index == -1) {
             //指定时间作为版本
-            timestamp = versionColumn.getLong(Key.VALUE);
+            timestamp = versionColumn.getLong(HBaseKey.VALUE);
             if (timestamp < 0) {
                 throw AddaxException.asAddaxException(Hbase11xWriterErrorCode.CONSTRUCT_VERSION_ERROR, "您指定的版本非法!");
             }

@@ -19,6 +19,8 @@
 
 package com.wgzhao.addax.plugin.reader.hbase20xsqlreader;
 
+import com.wgzhao.addax.common.base.HBaseConstant;
+import com.wgzhao.addax.common.base.HBaseKey;
 import com.wgzhao.addax.common.element.BoolColumn;
 import com.wgzhao.addax.common.element.BytesColumn;
 import com.wgzhao.addax.common.element.Column;
@@ -62,11 +64,11 @@ public class HBase20xSQLReaderTask
 
     public void readRecord(RecordSender recordSender)
     {
-        String querySql = readerConfig.getString(Constant.QUERY_SQL_PER_SPLIT);
+        String querySql = readerConfig.getString(HBaseConstant.QUERY_SQL_PER_SPLIT);
         LOG.info("Begin to read record by Sql: [{}].", querySql);
         HBase20SQLReaderHelper helper = new HBase20SQLReaderHelper(readerConfig);
-        Connection conn = helper.getConnection(readerConfig.getString(Key.QUERYSERVER_ADDRESS),
-                readerConfig.getString(Key.SERIALIZATION_NAME, Constant.DEFAULT_SERIALIZATION));
+        Connection conn = helper.getConnection(readerConfig.getString(HBaseKey.QUERY_SERVER_ADDRESS),
+                readerConfig.getString(HBaseKey.SERIALIZATION_NAME, HBaseConstant.DEFAULT_SERIALIZATION));
         Statement statement = null;
         ResultSet resultSet = null;
         try {

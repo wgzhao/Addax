@@ -29,7 +29,8 @@ import com.wgzhao.addax.rdbms.util.DataBaseType;
 
 import java.util.List;
 
-import static com.wgzhao.addax.rdbms.reader.Constant.FETCH_SIZE;
+import static com.wgzhao.addax.common.base.Constant.DEFAULT_FETCH_SIZE;
+import static com.wgzhao.addax.common.base.Key.FETCH_SIZE;
 
 public class RdbmsReader
         extends Reader
@@ -47,7 +48,7 @@ public class RdbmsReader
         public void init()
         {
             this.originalConfig = getPluginJobConf();
-            int fetchSize = this.originalConfig.getInt(FETCH_SIZE, Constant.DEFAULT_FETCH_SIZE);
+            int fetchSize = this.originalConfig.getInt(FETCH_SIZE, DEFAULT_FETCH_SIZE);
             if (fetchSize < 1) {
                 throw AddaxException
                         .asAddaxException(
@@ -65,8 +66,7 @@ public class RdbmsReader
         @Override
         public List<Configuration> split(int adviceNumber)
         {
-            return this.commonRdbmsReaderMaster.split(this.originalConfig,
-                    adviceNumber);
+            return this.commonRdbmsReaderMaster.split(this.originalConfig, adviceNumber);
         }
 
         @Override
@@ -93,19 +93,16 @@ public class RdbmsReader
         public void init()
         {
             this.readerSliceConfig = getPluginJobConf();
-            this.commonRdbmsReaderSlave = new SubCommonRdbmsReader.Task(
-                    DATABASE_TYPE);
+            this.commonRdbmsReaderSlave = new SubCommonRdbmsReader.Task(DATABASE_TYPE);
             this.commonRdbmsReaderSlave.init(this.readerSliceConfig);
         }
 
         @Override
         public void startRead(RecordSender recordSender)
         {
-            int fetchSize = this.readerSliceConfig
-                    .getInt(FETCH_SIZE);
+            int fetchSize = this.readerSliceConfig.getInt(FETCH_SIZE);
 
-            this.commonRdbmsReaderSlave.startRead(this.readerSliceConfig,
-                    recordSender, getTaskPluginCollector(), fetchSize);
+            this.commonRdbmsReaderSlave.startRead(this.readerSliceConfig, recordSender, getTaskPluginCollector(), fetchSize);
         }
 
         @Override

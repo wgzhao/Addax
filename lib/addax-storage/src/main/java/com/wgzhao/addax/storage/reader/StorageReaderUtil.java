@@ -21,6 +21,11 @@
 
 package com.wgzhao.addax.storage.reader;
 
+import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.TypeReference;
+import com.csvreader.CsvReader;
+import com.wgzhao.addax.common.base.Constant;
+import com.wgzhao.addax.common.base.Key;
 import com.wgzhao.addax.common.constant.Type;
 import com.wgzhao.addax.common.element.BoolColumn;
 import com.wgzhao.addax.common.element.Column;
@@ -35,9 +40,6 @@ import com.wgzhao.addax.common.plugin.RecordSender;
 import com.wgzhao.addax.common.plugin.TaskPluginCollector;
 import com.wgzhao.addax.common.util.ColumnUtil;
 import com.wgzhao.addax.common.util.Configuration;
-import com.alibaba.fastjson.JSON;
-import com.alibaba.fastjson.TypeReference;
-import com.csvreader.CsvReader;
 import io.airlift.compress.snappy.SnappyCodec;
 import io.airlift.compress.snappy.SnappyFramedInputStream;
 import org.anarres.lzo.LzoDecompressor1x_safe;
@@ -270,11 +272,7 @@ public class StorageReaderUtil
             throw AddaxException.asAddaxException(
                     StorageReaderErrorCode.RUNTIME_EXCEPTION,
                     "运行时错误, 请联系我们", e);
-        }/* catch (ArchiveException e) {
-			throw DataXException.asAddaxException(
-					StorageReaderErrorCode.READ_FILE_IO_ERROR,
-					String.format("压缩文件流读取错误 : [%s]", context), e);
-		} */
+        }
         catch (IOException e) {
             throw AddaxException.asAddaxException(
                     StorageReaderErrorCode.READ_FILE_IO_ERROR,
@@ -720,7 +718,6 @@ public class StorageReaderUtil
     /**
      * 获取含有通配符路径的父目录，目前只支持在最后一级目录使用通配符*或者
      *
-     *
      * @param regexPath path
      * @return String
      */
@@ -755,5 +752,4 @@ public class StorageReaderUtil
                     JSON.toJSONString(csvReader), JSON.toJSONString(StorageReaderUtil.csvReaderConfigMap));
         }
     }
-
 }
