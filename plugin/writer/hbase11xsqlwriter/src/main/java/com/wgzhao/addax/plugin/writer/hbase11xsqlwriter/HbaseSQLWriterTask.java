@@ -26,7 +26,6 @@ import com.wgzhao.addax.common.exception.AddaxException;
 import com.wgzhao.addax.common.plugin.RecordReceiver;
 import com.wgzhao.addax.common.plugin.TaskPluginCollector;
 import com.wgzhao.addax.common.util.Configuration;
-import com.google.common.collect.Lists;
 import org.apache.phoenix.schema.PTable;
 import org.apache.phoenix.schema.types.PDataType;
 import org.slf4j.Logger;
@@ -37,7 +36,9 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.sql.Types;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 /**
@@ -50,7 +51,7 @@ public class HbaseSQLWriterTask
     private TaskPluginCollector taskPluginCollector;
     private Connection connection = null;
     private PreparedStatement ps = null;
-    // 需要向hbsae写入的列的数量,即用户配置的column参数中列的个数。时间戳不包含在内
+    // 需要向 hbase 写入的列的数量,即用户配置的column参数中列的个数。时间戳不包含在内
     private int numberOfColumnsToWrite;
     // 期待从源头表的Record中拿到多少列
     private int numberOfColumnsToRead;
@@ -70,13 +71,13 @@ public class HbaseSQLWriterTask
             // 准备阶段
             prepare();
 
-            List<Record> buffer = Lists.newArrayListWithExpectedSize(cfg.getBatchSize());
+            List<Record> buffer = new ArrayList<>(cfg.getBatchSize());
             while ((record = lineReceiver.getFromReader()) != null) {
                 // 校验列数量是否符合预期
                 if (record.getColumnNumber() != numberOfColumnsToRead) {
                     throw AddaxException.asAddaxException(HbaseSQLWriterErrorCode.ILLEGAL_VALUE,
-                            "数据源给出的列数量[" + record.getColumnNumber() + "]与您配置中的列数量[" + numberOfColumnsToRead +
-                                    "]不同, 请检查您的配置 或者 联系 Hbase 管理员.");
+                            "The number of fields(" + record.getColumnNumber()
+                                    + ") in the source and the number of fields(" + numberOfColumnsToRead + ") you configured in 'column' are not the same.");
                 }
 
                 buffer.add(record);
@@ -124,7 +125,7 @@ public class HbaseSQLWriterTask
             }
             catch (SQLException e) {
                 // 不会出错
-                LOG.error("Failed closing PreparedStatement", e);
+                LOG.error("Failed to close PreparedStatement", e);
             }
         }
         if (connection != null) {
@@ -133,7 +134,7 @@ public class HbaseSQLWriterTask
             }
             catch (SQLException e) {
                 // 不会出错
-                LOG.error("Failed closing Connection", e);
+                LOG.error("Failed to close Connection", e);
             }
         }
     }
@@ -155,7 +156,7 @@ public class HbaseSQLWriterTask
             connection.commit();
         }
         catch (SQLException e) {
-            LOG.error("Failed batch committing {} records", records.size(), e);
+            LOG.error("Failed to batch commit {} records", records.size(), e);
 
             // 批量提交失败，则一行行重试，以确定那一行出错
             connection.rollback();
@@ -179,7 +180,7 @@ public class HbaseSQLWriterTask
             }
             catch (SQLException e) {
                 //出错了，记录脏数据
-                LOG.error("Failed writing hbase", e);
+                LOG.error("Failed to write hbase", e);
                 this.taskPluginCollector.collectDirtyRecord(r, e);
             }
         }
@@ -192,45 +193,14 @@ public class HbaseSQLWriterTask
             throws SQLException
     {
         // 生成列名集合，列之间用逗号分隔： col1,col2,col3,...
-        StringBuilder columnNamesBuilder = new StringBuilder();
-        if (cfg.isThinClient()) {
-            for (String col : cfg.getColumns()) {
-                // thin 客户端不使用双引号
-                columnNamesBuilder.append(col);
-                columnNamesBuilder.append(",");
-            }
-        }
-        else {
-            for (String col : cfg.getColumns()) {
-                // 列名使用双引号，则不自动转换为全大写，而是保留用户配置的大小写
-                columnNamesBuilder.append("\"");
-                columnNamesBuilder.append(col);
-                columnNamesBuilder.append("\"");
-                columnNamesBuilder.append(",");
-            }
-        }
-        columnNamesBuilder.setLength(columnNamesBuilder.length() - 1);   // 移除末尾多余的逗号
-        String columnNames = columnNamesBuilder.toString();
+        String columnNames = String.join(",", cfg.getColumns());
+
         numberOfColumnsToWrite = cfg.getColumns().size();
         numberOfColumnsToRead = numberOfColumnsToWrite;   // 开始的时候，要读的列数娱要写的列数相等
 
         // 生成UPSERT模板
         String tableName = cfg.getTableName();
-        StringBuilder upsertBuilder;
-        if (cfg.isThinClient()) {
-            upsertBuilder = new StringBuilder("upsert into " + tableName + " (" + columnNames + " ) values (");
-        }
-        else {
-            // 表名使用双引号，则不自动转换为全大写，而是保留用户配置的大小写
-            upsertBuilder = new StringBuilder("upsert into \"" + tableName + "\" (" + columnNames + " ) values (");
-        }
-        for (int i = 0; i < cfg.getColumns().size(); i++) {
-            upsertBuilder.append("?,");
-        }
-        upsertBuilder.setLength(upsertBuilder.length() - 1);  // 移除末尾多余的逗号
-        upsertBuilder.append(")");
-
-        String sql = upsertBuilder.toString();
+        String sql = String.format("UPSERT INTO %s ( %s ) VALUES ( %s )", tableName, columnNames, String.join(",", Collections.nCopies(cfg.getColumns().size(), "?")));
         PreparedStatement ps = connection.prepareStatement(sql);
         LOG.debug("SQL template generated: {}", sql);
         return ps;
@@ -335,7 +305,7 @@ public class HbaseSQLWriterTask
 
                 default:
                     throw AddaxException.asAddaxException(HbaseSQLWriterErrorCode.ILLEGAL_VALUE,
-                            "不支持您配置的列类型:" + sqlType + ", 请检查您的配置 或者 联系 Hbase 管理员.");
+                            "The data type " + sqlType + "is unsupported.");
             } // end switch
         }
         else {
@@ -355,8 +325,7 @@ public class HbaseSQLWriterTask
                 default:
                     // nullMode的合法性在初始化配置的时候已经校验过，这里一定不会出错
                     throw AddaxException.asAddaxException(HbaseSQLWriterErrorCode.ILLEGAL_VALUE,
-                            "Hbasewriter 不支持该 nullMode 类型: " + cfg.getNullMode() +
-                                    ", 目前支持的 nullMode 类型是:" + Arrays.asList(NullModeType.values()));
+                            "The nullMode type " + cfg.getNullMode() + " is unsupported, here are available nullMode:" + Arrays.asList(NullModeType.values()));
             }
         }
     }
@@ -371,6 +340,7 @@ public class HbaseSQLWriterTask
     private Object getEmptyValue(int sqlType)
     {
         switch (sqlType) {
+            case Types.CHAR:
             case Types.VARCHAR:
                 return "";
 
@@ -420,7 +390,7 @@ public class HbaseSQLWriterTask
 
             default:
                 throw AddaxException.asAddaxException(HbaseSQLWriterErrorCode.ILLEGAL_VALUE,
-                        "不支持您配置的列类型:" + sqlType + ", 请检查您的配置 或者 联系 Hbase 管理员.");
+                        "The data type " + sqlType + " is unsupported yet.");
         }
     }
 }
