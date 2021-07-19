@@ -25,6 +25,7 @@ import com.wgzhao.addax.common.exception.AddaxException;
 import com.wgzhao.addax.common.util.Configuration;
 import com.google.common.base.Strings;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.hadoop.hbase.HConstants;
 import org.apache.hadoop.hbase.TableName;
 import org.apache.hadoop.hbase.util.Pair;
 import org.slf4j.Logger;
@@ -72,31 +73,31 @@ public class HbaseSQLWriterConfig
     }
 
     /**
-     * @param dataxCfg datax configuration json
+     * @param jobConf configuration json
      * @return hbase writer class
      */
-    public static HbaseSQLWriterConfig parse(Configuration dataxCfg)
+    public static HbaseSQLWriterConfig parse(Configuration jobConf)
     {
-        assert dataxCfg != null;
+        assert jobConf != null;
         HbaseSQLWriterConfig cfg = new HbaseSQLWriterConfig();
-        cfg.originalConfig = dataxCfg;
+        cfg.originalConfig = jobConf;
 
         // 1. 解析集群配置
-        parseClusterConfig(cfg, dataxCfg);
+        parseClusterConfig(cfg, jobConf);
 
         // 2. 解析列配置
-        parseTableConfig(cfg, dataxCfg);
+        parseTableConfig(cfg, jobConf);
 
         // 3. 解析其他配置
-        cfg.nullMode = NullModeType.getByTypeName(dataxCfg.getString(HBaseKey.NULL_MODE, HBaseConstant.DEFAULT_NULL_MODE));
-        cfg.batchSize = dataxCfg.getInt(HBaseKey.BATCH_SIZE, HBaseConstant.DEFAULT_BATCH_ROW_COUNT);
-        cfg.truncate = dataxCfg.getBool(HBaseKey.TRUNCATE, HBaseConstant.DEFAULT_TRUNCATE);
-        cfg.isThinClient = dataxCfg.getBool(HBaseKey.THIN_CLIENT, HBaseConstant.DEFAULT_USE_THIN_CLIENT);
+        cfg.nullMode = NullModeType.getByTypeName(jobConf.getString(HBaseKey.NULL_MODE, HBaseConstant.DEFAULT_NULL_MODE));
+        cfg.batchSize = jobConf.getInt(HBaseKey.BATCH_SIZE, HBaseConstant.DEFAULT_BATCH_ROW_COUNT);
+        cfg.truncate = jobConf.getBool(HBaseKey.TRUNCATE, HBaseConstant.DEFAULT_TRUNCATE);
+        cfg.isThinClient = jobConf.getBool(HBaseKey.THIN_CLIENT, HBaseConstant.DEFAULT_USE_THIN_CLIENT);
 
         // 4. 解析kerberos 配置
-        cfg.haveKerberos = dataxCfg.getBool(HBaseKey.HAVE_KERBEROS, HBaseConstant.DEFAULT_HAVE_KERBEROS);
-        cfg.kerberosPrincipal = dataxCfg.getString(HBaseKey.KERBEROS_PRINCIPAL, HBaseConstant.DEFAULT_KERBEROS_PRINCIPAL);
-        cfg.kerberosKeytabFilePath = dataxCfg.getString(HBaseKey.KERBEROS_KEYTAB_FILE_PATH, HBaseConstant.DEFAULT_KERBEROS_KEYTAB_FILE_PATH);
+        cfg.haveKerberos = jobConf.getBool(HBaseKey.HAVE_KERBEROS, HBaseConstant.DEFAULT_HAVE_KERBEROS);
+        cfg.kerberosPrincipal = jobConf.getString(HBaseKey.KERBEROS_PRINCIPAL, HBaseConstant.DEFAULT_KERBEROS_PRINCIPAL);
+        cfg.kerberosKeytabFilePath = jobConf.getString(HBaseKey.KERBEROS_KEYTAB_FILE_PATH, HBaseConstant.DEFAULT_KERBEROS_KEYTAB_FILE_PATH);
 
         // 4. 打印解析出来的配置
         LOG.debug("HBase SQL writer config parsed: {}", cfg);
@@ -112,7 +113,8 @@ public class HbaseSQLWriterConfig
             // 集群配置必须存在且不为空
             throw AddaxException.asAddaxException(
                     HbaseSQLWriterErrorCode.REQUIRED_VALUE,
-                    "读 Hbase 时需要配置hbaseConfig，其内容为 Hbase 连接信息，请联系 Hbase PE 获取该信息.");
+                    String.format("%s must be configured with the following:  %s and  %s",
+                            HBaseKey.HBASE_CONFIG, HConstants.ZOOKEEPER_QUORUM, HConstants.ZOOKEEPER_ZNODE_PARENT));
         }
 
         if (dataxCfg.getBool(HBaseKey.THIN_CLIENT, HBaseConstant.DEFAULT_USE_THIN_CLIENT)) {
@@ -124,13 +126,12 @@ public class HbaseSQLWriterConfig
             if (Strings.isNullOrEmpty(thinConnectStr)) {
                 throw AddaxException.asAddaxException(
                         HbaseSQLWriterErrorCode.ILLEGAL_VALUE,
-                        "thinClient=true的轻客户端模式下HBase的hbase.thin.connect.url配置不能为空，请联系HBase PE获取该信息.");
+                        "You must configure 'hbase.thin.connect.url' if your want use thinClient mode");
             }
             if (Strings.isNullOrEmpty(cfg.namespace) || Strings.isNullOrEmpty(cfg.username) || Strings
                     .isNullOrEmpty(cfg.password)) {
                 throw AddaxException.asAddaxException(HbaseSQLWriterErrorCode.ILLEGAL_VALUE,
-                        "thinClient=true的轻客户端模式下HBase的hbase.thin.connect.namespce|username|password配置不能为空，请联系HBase "
-                                + "PE获取该信息.");
+                        "The items 'hbase.thin.connect.namespace|username|password' must be configured if you want to use thinClient mode");
             }
             cfg.connectionString = thinConnectStr;
         }
@@ -144,34 +145,29 @@ public class HbaseSQLWriterConfig
                 // 解析hbase配置错误
                 throw AddaxException.asAddaxException(
                         HbaseSQLWriterErrorCode.REQUIRED_VALUE,
-                        "解析hbaseConfig出错，请确认您配置的hbaseConfig为合法的json数据格式，内容正确.");
+                        "Failed to parse hbaseConfig，please check it.");
             }
             String zkQuorum = zkCfg.getFirst();
             String znode = zkCfg.getSecond();
-            if (zkQuorum == null || zkQuorum.isEmpty()) {
+            if (zkQuorum == null || zkQuorum.isEmpty() || znode == null || znode.isEmpty()) {
                 throw AddaxException.asAddaxException(
                         HbaseSQLWriterErrorCode.ILLEGAL_VALUE,
-                        "HBase的hbase.zookeeper.quorum配置不能为空，请联系HBase PE获取该信息.");
-            }
-            if (znode == null || znode.isEmpty()) {
-                throw AddaxException.asAddaxException(
-                        HbaseSQLWriterErrorCode.ILLEGAL_VALUE,
-                        "HBase的zookeeper.znode.parent配置不能为空，请联系HBase PE获取该信息.");
+                        "The items hbase.zookeeper.quorum/zookeeper.znode.parent must be configured");
             }
 
-            // 生成sql使用的连接字符串， 格式： jdbc:phoenix:zk_quorum:[:port]:/znode_parent
+            // 生成sql使用的连接字符串， 格式： jdbc:phoenix:zk_quorum[:port]:/znode_parent[:principal:keytab]
             cfg.connectionString = "jdbc:phoenix:" + zkQuorum + ":" + znode;
         }
     }
 
-    private static void parseTableConfig(HbaseSQLWriterConfig cfg, Configuration dataxCfg)
+    private static void parseTableConfig(HbaseSQLWriterConfig cfg, Configuration jobConf)
     {
         // 解析并检查表名
-        cfg.tableName = dataxCfg.getString(HBaseKey.TABLE);
+        cfg.tableName = jobConf.getString(HBaseKey.TABLE);
 
         if (cfg.tableName == null || cfg.tableName.isEmpty()) {
             throw AddaxException.asAddaxException(
-                    HbaseSQLWriterErrorCode.ILLEGAL_VALUE, "HBase的tableName配置不能为空,请检查并修改配置.");
+                    HbaseSQLWriterErrorCode.ILLEGAL_VALUE, "The item tableName must be configured.");
         }
         try {
             TableName.valueOf(cfg.tableName);
@@ -179,19 +175,19 @@ public class HbaseSQLWriterConfig
         catch (Exception e) {
             throw AddaxException.asAddaxException(
                     HbaseSQLWriterErrorCode.ILLEGAL_VALUE,
-                    "您配置的tableName(" + cfg.tableName + ")含有非法字符，请检查您的配置 或者 联系 Hbase 管理员.");
+                    "The table " +  cfg.tableName + " you configured has illegal symbols.");
         }
 
         // 解析列配置
-        cfg.columns = dataxCfg.getList(HBaseKey.COLUMN, String.class);
+        cfg.columns = jobConf.getList(HBaseKey.COLUMN, String.class);
         if (cfg.columns == null || cfg.columns.isEmpty()) {
             throw AddaxException.asAddaxException(
-                    HbaseSQLWriterErrorCode.ILLEGAL_VALUE, "HBase的columns配置不能为空,请添加目标表的列名配置.");
+                    HbaseSQLWriterErrorCode.ILLEGAL_VALUE, "The item columns must be configured and can not be empty.");
         }
     }
 
     /**
-     * @return 获取原始的datax配置
+     * @return 获取原始配置
      */
     public Configuration getOriginalConfig()
     {

@@ -1,0 +1,15 @@
+{
+  "name": "hbase11xsqlwriter",
+  "parameter": {
+    "column": [],
+    "haveKerberos": false,
+    "kerberosPrincipal": "",
+    "kerberosKeytabFilePath": "",
+    "batchSize": "100",
+    "nullMode": "skip",
+    "hbaseConfig": {
+      "hbase.zookeeper.quorum": "",
+      "zookeeper.znode.parent": ""
+    }
+  }
+}
