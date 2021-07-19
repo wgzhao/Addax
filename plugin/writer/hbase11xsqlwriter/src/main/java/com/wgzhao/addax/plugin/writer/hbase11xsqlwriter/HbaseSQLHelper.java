@@ -129,11 +129,11 @@ public class HbaseSQLHelper
         }
         catch (SQLException e) {
             throw AddaxException.asAddaxException(HbaseSQLWriterErrorCode.GET_HBASE_CONNECTION_ERROR,
-                    "无法获取目的表" + cfg.getTableName() + "的元数据信息，表可能不是SQL表或表名配置错误，请检查您的配置 或者 联系 HBase 管理员.", e);
+                    "Unable to get the metadata of table " + cfg.getTableName(), e);
         }
-
+        List<String> columnNames = cfg.getColumns();
         try {
-            List<String> columnNames = cfg.getColumns();
+
             for (String colName : columnNames) {
                 schema.getColumnForColumnName(colName);
             }
@@ -141,12 +141,12 @@ public class HbaseSQLHelper
         catch (ColumnNotFoundException e) {
             // 用户配置的列名在元数据中不存在
             throw AddaxException.asAddaxException(HbaseSQLWriterErrorCode.ILLEGAL_VALUE,
-                    "您配置的列" + e.getColumnName() + "在目的表" + cfg.getTableName() + "的元数据中不存在，请检查您的配置 或者 联系 HBase 管理员.", e);
+                    "The column '" + e.getColumnName() + "' your configured does not exists in the target table "  + cfg.getTableName(), e);
         }
         catch (SQLException e) {
             // 列名有二义性或者其他问题
             throw AddaxException.asAddaxException(HbaseSQLWriterErrorCode.ILLEGAL_VALUE,
-                    "目的表" + cfg.getTableName() + "的列信息校验失败，请检查您的配置 或者 联系 HBase 管理员.", e);
+                    "The column validation of target table " + cfg.getTableName() + "has got failure", e);
         }
     }
 
@@ -181,7 +181,7 @@ public class HbaseSQLHelper
         }
         catch (Throwable e) {
             throw AddaxException.asAddaxException(HbaseSQLWriterErrorCode.GET_HBASE_CONNECTION_ERROR,
-                    "无法连接hbase集群，配置不正确或目标集群不可用，请检查配置和集群状态 或者 联系 HBase 管理员.", e);
+                    "Unable to connect to hbase cluster, please check the configuration and cluster status ", e);
         }
         LOG.debug("Connected to HBase cluster successfully.");
         return conn;
@@ -195,7 +195,7 @@ public class HbaseSQLHelper
                 UserGroupInformation.loginUserFromKeytab(kerberosPrincipal, kerberosKeytabFilePath);
             }
             catch (Exception e) {
-                String message = String.format("kerberos认证失败,请确定kerberosKeytabFilePath[%s]和kerberosPrincipal[%s]填写正确",
+                String message = String.format("Kerberos authentication failed, please make sure that kerberosKeytabFilePath[%s] and kerberosPrincipal[%s] are correct",
                         kerberosKeytabFilePath, kerberosPrincipal);
                 LOG.error(message);
                 throw AddaxException.asAddaxException(HbaseSQLWriterErrorCode.KERBEROS_LOGIN_ERROR, e);
@@ -223,14 +223,14 @@ public class HbaseSQLHelper
         }
         catch (Exception e) {
             throw AddaxException.asAddaxException(HbaseSQLWriterErrorCode.GET_HBASE_CONNECTION_ERROR,
-                    "无法连接配置的namespace, 请检查配置 或者 联系 HBase 管理员.", e);
+                    "Can not connection to the namespace.", e);
         }
     }
 
     /**
      * 获取一张表的元数据信息
      *
-     * @param conn hbsae sql的jdbc连接
+     * @param conn hbase sql的jdbc连接
      * @param fullTableName 目标表的完整表名
      * @return 表的元数据 {@link PTable}
      * @throws SQLException sql exception
@@ -250,7 +250,7 @@ public class HbaseSQLHelper
      *
      * @param conn phoenix connection
      * @param namespace hbase table's namespace
-     * @param fullTableName hbase full-qualtity table name
+     * @param fullTableName hbase full-quality table name
      * @param isThinClient 是否使用thin client
      * @return 表的元数据 {@link PTable}
      * @throws SQLException exception
@@ -332,7 +332,7 @@ public class HbaseSQLHelper
         catch (Throwable t) {
             // 清空表失败
             throw AddaxException.asAddaxException(HbaseSQLWriterErrorCode.TRUNCATE_HBASE_ERROR,
-                    "清空目的表" + tableName + "失败，请联系 HBase 管理员.", t);
+                    "Failed to truncate " + tableName + ".", t);
         }
         finally {
             if (admin != null) {
@@ -374,7 +374,7 @@ public class HbaseSQLHelper
         }
         catch (SQLException | IOException t) {
             throw AddaxException.asAddaxException(HbaseSQLWriterErrorCode.TRUNCATE_HBASE_ERROR,
-                    "表" + tableName + "状态检查未通过，请检查您的集群和表状态 或者 联系 Hbase 管理员.", t);
+                    "The table " + tableName + "status check failed, please check the HBase cluster status.", t);
         }
         finally {
             if (admin != null) {
@@ -388,15 +388,15 @@ public class HbaseSQLHelper
     {
         if (!admin.tableExists(tableName)) {
             throw AddaxException.asAddaxException(HbaseSQLWriterErrorCode.ILLEGAL_VALUE,
-                    "HBase目的表" + tableName + "不存在, 请检查您的配置 或者 联系 Hbase 管理员.");
+                    "The hbase table " + tableName + "doest not exists.");
         }
         if (!admin.isTableAvailable(tableName)) {
             throw AddaxException.asAddaxException(HbaseSQLWriterErrorCode.ILLEGAL_VALUE,
-                    "HBase目的表" + tableName + "不可用, 请检查您的配置 或者 联系 Hbase 管理员.");
+                    "The hbase table" + tableName + "is unavailable.");
         }
         if (admin.isTableDisabled(tableName)) {
             throw AddaxException.asAddaxException(HbaseSQLWriterErrorCode.ILLEGAL_VALUE,
-                    "HBase目的表" + tableName + "不可用, 请检查您的配置 或者 联系 Hbase 管理员.");
+                    "The hbase table " + tableName + "is disabled at current, please enable it before using");
         }
         LOG.info("table {} exists", tableName);
     }
