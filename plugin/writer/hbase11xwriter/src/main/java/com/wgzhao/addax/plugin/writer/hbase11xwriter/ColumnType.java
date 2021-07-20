@@ -48,7 +48,7 @@ public enum ColumnType
     {
         if (StringUtils.isBlank(typeName)) {
             throw AddaxException.asAddaxException(Hbase11xWriterErrorCode.ILLEGAL_VALUE,
-                    String.format("Hbasewriter 不支持该类型:%s, 目前支持的类型是:%s", typeName, Arrays.asList(values())));
+                    String.format("The data type %s is unsupported, the currently supported data types: %s", typeName, Arrays.asList(values())));
         }
         for (ColumnType columnType : values()) {
             if (StringUtils.equalsIgnoreCase(columnType.typeName, typeName.trim())) {
@@ -57,7 +57,7 @@ public enum ColumnType
         }
 
         throw AddaxException.asAddaxException(Hbase11xWriterErrorCode.ILLEGAL_VALUE,
-                String.format("Hbasewriter 不支持该类型:%s, 目前支持的类型是:%s", typeName, Arrays.asList(values())));
+                String.format("The data type %s is unsupported, the currently supported data types: %s", typeName, Arrays.asList(values())));
     }
 
     @Override

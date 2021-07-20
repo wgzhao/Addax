@@ -89,7 +89,7 @@ public class Hbase11xWriter
                 this.hbaseTaskProxy = new NormalTask(taskConfig);
             }
             else {
-                throw AddaxException.asAddaxException(Hbase11xWriterErrorCode.ILLEGAL_VALUE, "Hbasereader 不支持此类模式:" + modeType);
+                throw AddaxException.asAddaxException(Hbase11xWriterErrorCode.ILLEGAL_VALUE, "The mode " + modeType + "is unsupported");
             }
         }
 

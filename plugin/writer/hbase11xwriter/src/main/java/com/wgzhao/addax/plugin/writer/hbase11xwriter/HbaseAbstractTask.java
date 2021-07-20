@@ -56,13 +56,13 @@ public abstract class HbaseAbstractTask
     public HbaseAbstractTask(Configuration configuration)
     {
         //this.htable = Hbase11xHelper.getTable(configuration)
-        this.bufferedMutator = Hbase11xHelper.getBufferedMutator(configuration);
         this.columns = configuration.getListConfiguration(HBaseKey.COLUMN);
         this.rowkeyColumn = configuration.getListConfiguration(HBaseKey.ROW_KEY_COLUMN);
         this.versionColumn = configuration.getConfiguration(HBaseKey.VERSION_COLUMN);
         this.encoding = configuration.getString(HBaseKey.ENCODING, HBaseConstant.DEFAULT_ENCODING);
         this.nullMode = NullModeType.getByTypeName(configuration.getString(HBaseKey.NULL_MODE, HBaseConstant.DEFAULT_NULL_MODE));
         this.walFlag = configuration.getBool(HBaseKey.WAL_FLAG, false);
+        this.bufferedMutator = Hbase11xHelper.getBufferedMutator(configuration);
     }
 
     public void startWriter(RecordReceiver lineReceiver, TaskPluginCollector taskPluginCollector)
@@ -79,12 +79,11 @@ public abstract class HbaseAbstractTask
                     continue;
                 }
                 try {
-                    //this.htable.put(put)
                     this.bufferedMutator.mutate(put);
                 }
                 catch (IllegalArgumentException e) {
                     if (e.getMessage().equals("No columns to insert") && nullMode.equals(NullModeType.SKIP)) {
-                        LOG.info(String.format("record is empty, 您配置nullMode为[skip],将会忽略这条记录,record[%s]", record.toString()));
+                        LOG.info("The record is empty, it will ignore because the item nullMode is configured as skip. record[{}]", record);
                     }
                     else {
                         taskPluginCollector.collectDirtyRecord(record, e);
@@ -96,7 +95,6 @@ public abstract class HbaseAbstractTask
             throw AddaxException.asAddaxException(Hbase11xWriterErrorCode.PUT_HBASE_ERROR, e);
         }
         finally {
-            //Hbase11xHelper.closeTable(this.htable)
             Hbase11xHelper.closeBufferedMutator(this.bufferedMutator);
         }
     }
@@ -105,7 +103,6 @@ public abstract class HbaseAbstractTask
 
     public void close()
     {
-        //Hbase11xHelper.closeTable(this);
         Hbase11xHelper.closeBufferedMutator(this.bufferedMutator);
     }
 
@@ -136,7 +133,7 @@ public abstract class HbaseAbstractTask
                     bytes = this.getValueByte(columnType, column.asString());
                     break;
                 default:
-                    throw AddaxException.asAddaxException(Hbase11xWriterErrorCode.ILLEGAL_VALUE, "HbaseWriter列不支持您配置的列类型:" + columnType);
+                    throw AddaxException.asAddaxException(Hbase11xWriterErrorCode.ILLEGAL_VALUE, "The data type " + columnType + "is unsupported");
             }
         }
         else {
@@ -148,7 +145,7 @@ public abstract class HbaseAbstractTask
                     bytes = HConstants.EMPTY_BYTE_ARRAY;
                     break;
                 default:
-                    throw AddaxException.asAddaxException(Hbase11xWriterErrorCode.ILLEGAL_VALUE, "HbaseWriter nullMode不支持您配置的类型,只支持skip或者empty");
+                    throw AddaxException.asAddaxException(Hbase11xWriterErrorCode.ILLEGAL_VALUE, "The item nullMode must be configured either skip or empty");
             }
         }
         return bytes;
@@ -181,7 +178,7 @@ public abstract class HbaseAbstractTask
                     bytes = value.getBytes(Charset.forName(encoding));
                     break;
                 default:
-                    throw AddaxException.asAddaxException(Hbase11xWriterErrorCode.ILLEGAL_VALUE, "HbaseWriter列不支持您配置的列类型:" + columnType);
+                    throw AddaxException.asAddaxException(Hbase11xWriterErrorCode.ILLEGAL_VALUE, "The data type " + columnType + "is unsupported");
             }
         }
         else {

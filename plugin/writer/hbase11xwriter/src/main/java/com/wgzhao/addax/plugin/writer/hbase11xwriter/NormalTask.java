@@ -68,21 +68,17 @@ public class NormalTask
             String type = aColumn.getString(HBaseKey.TYPE);
             ColumnType columnType = ColumnType.getByTypeName(type);
             String name = aColumn.getString(HBaseKey.NAME);
-            String promptInfo = "Hbasewriter 中，column 的列配置格式应该是：列族:列名. 您配置的列错误：" + name;
+            String promptInfo = "The name[" + name + "] of column should be cf:qualifier";
             String[] cfAndQualifier = name.split(":");
-            Validate.isTrue(cfAndQualifier != null && cfAndQualifier.length == 2
-                    && StringUtils.isNotBlank(cfAndQualifier[0])
-                    && StringUtils.isNotBlank(cfAndQualifier[1]), promptInfo);
+            Validate.isTrue(cfAndQualifier.length == 2 && StringUtils.isNotBlank(cfAndQualifier[0]) && StringUtils.isNotBlank(cfAndQualifier[1]), promptInfo);
             if (index >= record.getColumnNumber()) {
-                throw AddaxException.asAddaxException(Hbase11xWriterErrorCode.ILLEGAL_VALUE, String.format("您的column配置项中中index值超出范围,根据reader端配置,index的值小于%s,而您配置的值为%s，请检查并修改.", record.getColumnNumber(), index));
+                throw AddaxException.asAddaxException(Hbase11xWriterErrorCode.ILLEGAL_VALUE,
+                        String.format("The field[index] of column is out-range, it should be less than %s. actually got %s.", record.getColumnNumber(), index));
             }
             byte[] columnBytes = getColumnByte(columnType, record.getColumn(index));
             //columnBytes 为null忽略这列
             if (null != columnBytes) {
-                put.addColumn(Bytes.toBytes(
-                        cfAndQualifier[0]),
-                        Bytes.toBytes(cfAndQualifier[1]),
-                        columnBytes);
+                put.addColumn(Bytes.toBytes(cfAndQualifier[0]), Bytes.toBytes(cfAndQualifier[1]), columnBytes);
             }
         }
         return put;
@@ -101,7 +97,8 @@ public class NormalTask
             }
             else {
                 if (index >= record.getColumnNumber()) {
-                    throw AddaxException.asAddaxException(Hbase11xWriterErrorCode.CONSTRUCT_ROWKEY_ERROR, String.format("您的rowkeyColumn配置项中中index值超出范围,根据reader端配置,index的值小于%s,而您配置的值为%s，请检查并修改.", record.getColumnNumber(), index));
+                    throw AddaxException.asAddaxException(Hbase11xWriterErrorCode.CONSTRUCT_ROWKEY_ERROR,
+                            String.format("The field[index] of rowkeyColumn is out-range, it should be less than %s. actually got %s.", record.getColumnNumber(), index));
                 }
                 byte[] value = getColumnByte(columnType, record.getColumn(index));
                 rowkeyBuffer = Bytes.add(rowkeyBuffer, value);
@@ -118,18 +115,19 @@ public class NormalTask
             //指定时间作为版本
             timestamp = versionColumn.getLong(HBaseKey.VALUE);
             if (timestamp < 0) {
-                throw AddaxException.asAddaxException(Hbase11xWriterErrorCode.CONSTRUCT_VERSION_ERROR, "您指定的版本非法!");
+                throw AddaxException.asAddaxException(Hbase11xWriterErrorCode.CONSTRUCT_VERSION_ERROR, "Illegal timestamp version");
             }
         }
         else {
             //指定列作为版本,long/doubleColumn直接record.aslong, 其它类型尝试用yyyy-MM-dd HH:mm:ss,yyyy-MM-dd HH:mm:ss SSS去format
             if (index >= record.getColumnNumber()) {
-                throw AddaxException.asAddaxException(Hbase11xWriterErrorCode.CONSTRUCT_VERSION_ERROR, String.format("您的versionColumn配置项中中index值超出范围,根据reader端配置,index的值小于%s,而您配置的值为%s，请检查并修改.", record.getColumnNumber(), index));
+                throw AddaxException.asAddaxException(Hbase11xWriterErrorCode.CONSTRUCT_VERSION_ERROR,
+                        String.format("The field[index] of versionColumn is out-range, it should be less than %s. actually got %s.", record.getColumnNumber(), index));
             }
             if (record.getColumn(index).getRawData() == null) {
-                throw AddaxException.asAddaxException(Hbase11xWriterErrorCode.CONSTRUCT_VERSION_ERROR, "您指定的版本为空!");
+                throw AddaxException.asAddaxException(Hbase11xWriterErrorCode.CONSTRUCT_VERSION_ERROR, "The version is empty");
             }
-            SimpleDateFormat dfSenconds = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+            SimpleDateFormat dfSeconds = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
             SimpleDateFormat dfMs = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss SSS");
             if (record.getColumn(index) instanceof LongColumn || record.getColumn(index) instanceof DoubleColumn) {
                 timestamp = record.getColumn(index).asLong();
@@ -141,10 +139,10 @@ public class NormalTask
                 }
                 catch (ParseException e) {
                     try {
-                        date = dfSenconds.parse(record.getColumn(index).asString());
+                        date = dfSeconds.parse(record.getColumn(index).asString());
                     }
                     catch (ParseException e1) {
-                        LOG.info(String.format("您指定第[%s]列作为hbase写入版本,但在尝试用yyyy-MM-dd HH:mm:ss 和 yyyy-MM-dd HH:mm:ss SSS 去解析为Date时均出错,请检查并修改", index));
+                        LOG.info(String.format("The value of version %s can not parsed as Date type with 'yyyy-MM-dd HH:mm:ss' and 'yyyy-MM-dd HH:mm:ss SSS' format", index));
                         throw AddaxException.asAddaxException(Hbase11xWriterErrorCode.CONSTRUCT_VERSION_ERROR, e1);
                     }
                 }
