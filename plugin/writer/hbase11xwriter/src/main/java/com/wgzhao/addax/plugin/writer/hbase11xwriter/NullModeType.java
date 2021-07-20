@@ -43,6 +43,6 @@ public enum NullModeType
             }
         }
         throw AddaxException.asAddaxException(Hbase11xWriterErrorCode.ILLEGAL_VALUE,
-                String.format("Hbasewriter 不支持该 nullMode 类型:%s, 目前支持的 nullMode 类型是:%s", modeName, Arrays.asList(values())));
+                String.format("The nullMode %s is unsupported. %s are supported at current", modeName, Arrays.asList(values())));
     }
 }

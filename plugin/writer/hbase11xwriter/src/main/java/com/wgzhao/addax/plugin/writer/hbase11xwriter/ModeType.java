@@ -43,6 +43,6 @@ public enum ModeType
             }
         }
         throw AddaxException.asAddaxException(Hbase11xWriterErrorCode.ILLEGAL_VALUE,
-                String.format("Hbasewriter 不支持该 mode 类型:%s, 目前支持的 mode 类型是:%s", modeName, Arrays.asList(values())));
+                String.format("The mode %s is unsupported. %s are supported yet.", modeName, Arrays.asList(values())));
     }
 }

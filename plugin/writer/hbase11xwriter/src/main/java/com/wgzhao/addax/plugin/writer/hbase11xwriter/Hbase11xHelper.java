@@ -19,12 +19,13 @@
 
 package com.wgzhao.addax.plugin.writer.hbase11xwriter;
 
-import com.wgzhao.addax.common.base.HBaseConstant;
-import com.wgzhao.addax.common.base.HBaseKey;
-import com.wgzhao.addax.common.exception.AddaxException;
-import com.wgzhao.addax.common.util.Configuration;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.TypeReference;
+import com.wgzhao.addax.common.base.HBaseConstant;
+import com.wgzhao.addax.common.base.HBaseKey;
+import com.wgzhao.addax.common.base.Key;
+import com.wgzhao.addax.common.exception.AddaxException;
+import com.wgzhao.addax.common.util.Configuration;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.Validate;
 import org.apache.hadoop.hbase.HBaseConfiguration;
@@ -34,12 +35,9 @@ import org.apache.hadoop.hbase.client.BufferedMutator;
 import org.apache.hadoop.hbase.client.BufferedMutatorParams;
 import org.apache.hadoop.hbase.client.Connection;
 import org.apache.hadoop.hbase.client.ConnectionFactory;
-import org.apache.hadoop.hbase.client.Delete;
 import org.apache.hadoop.hbase.client.HTable;
-import org.apache.hadoop.hbase.client.Result;
-import org.apache.hadoop.hbase.client.ResultScanner;
-import org.apache.hadoop.hbase.client.Scan;
 import org.apache.hadoop.hbase.client.Table;
+import org.apache.hadoop.security.UserGroupInformation;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -58,19 +56,19 @@ public class Hbase11xHelper
     public static org.apache.hadoop.conf.Configuration getHbaseConfiguration(String hbaseConfig)
     {
         if (StringUtils.isBlank(hbaseConfig)) {
-            throw AddaxException.asAddaxException(Hbase11xWriterErrorCode.REQUIRED_VALUE, "读 Hbase 时需要配置hbaseConfig，其内容为 Hbase 连接信息，请联系 Hbase PE 获取该信息.");
+            throw AddaxException.asAddaxException(Hbase11xWriterErrorCode.REQUIRED_VALUE, "The item hbaseConfig must be configured.");
         }
         org.apache.hadoop.conf.Configuration hConfiguration = HBaseConfiguration.create();
         try {
             Map<String, String> hbaseConfigMap = JSON.parseObject(hbaseConfig, new TypeReference<Map<String, String>>() {});
             // 用户配置的 key-value 对 来表示 hbaseConfig
-            Validate.isTrue(hbaseConfigMap != null, "hbaseConfig不能为空Map结构!");
+            Validate.isTrue(hbaseConfigMap != null, "The item hbaseConfig must be not empty.");
             for (Map.Entry<String, String> entry : hbaseConfigMap.entrySet()) {
                 hConfiguration.set(entry.getKey(), entry.getValue());
             }
         }
         catch (Exception e) {
-            throw AddaxException.asAddaxException(Hbase11xWriterErrorCode.GET_HBASE_CONNECTION_ERROR, e);
+            throw AddaxException.asAddaxException(Hbase11xWriterErrorCode.HBASE_CONNECTION_ERROR, e);
         }
         return hConfiguration;
     }
@@ -85,7 +83,7 @@ public class Hbase11xHelper
         }
         catch (Exception e) {
             Hbase11xHelper.closeConnection(hConnection);
-            throw AddaxException.asAddaxException(Hbase11xWriterErrorCode.GET_HBASE_CONNECTION_ERROR, e);
+            throw AddaxException.asAddaxException(Hbase11xWriterErrorCode.HBASE_CONNECTION_ERROR, e);
         }
         return hConnection;
     }
@@ -110,7 +108,7 @@ public class Hbase11xHelper
             Hbase11xHelper.closeTable(hTable);
             Hbase11xHelper.closeAdmin(admin);
             Hbase11xHelper.closeConnection(hConnection);
-            throw AddaxException.asAddaxException(Hbase11xWriterErrorCode.GET_HBASE_TABLE_ERROR, e);
+            throw AddaxException.asAddaxException(Hbase11xWriterErrorCode.HBASE_TABLE_ERROR, e);
         }
         return hTable;
     }
@@ -143,30 +141,11 @@ public class Hbase11xHelper
         return bufferedMutator;
     }
 
-    public static void deleteTable(Configuration configuration)
-    {
-        String userTable = configuration.getString(HBaseKey.TABLE);
-        LOG.info("HBasWriter begins to delete table {} .", userTable);
-        Scan scan = new Scan();
-        org.apache.hadoop.hbase.client.Table hTable = Hbase11xHelper.getTable(configuration);
-        try (ResultScanner scanner = hTable.getScanner(scan)) {
-            for (Result rr = scanner.next(); rr != null; rr = scanner.next()) {
-                hTable.delete(new Delete(rr.getRow()));
-            }
-        }
-        catch (Exception e) {
-            throw AddaxException.asAddaxException(Hbase11xWriterErrorCode.DELETE_HBASE_ERROR, e);
-        }
-        finally {
-            Hbase11xHelper.closeTable(hTable);
-        }
-    }
-
     public static void truncateTable(Configuration configuration)
     {
         String hbaseConfig = configuration.getString(HBaseKey.HBASE_CONFIG);
         String userTable = configuration.getString(HBaseKey.TABLE);
-        LOG.info("HBasWriter begins to truncate table {} .", userTable);
+        LOG.info("Begin truncating table {} .", userTable);
         TableName hTableName = TableName.valueOf(userTable);
         org.apache.hadoop.hbase.client.Connection hConnection = Hbase11xHelper.getHbaseConnection(hbaseConfig);
         org.apache.hadoop.hbase.client.Admin admin = null;
@@ -237,16 +216,13 @@ public class Hbase11xHelper
             throws IOException
     {
         if (!admin.tableExists(hTableName)) {
-            throw AddaxException.asAddaxException(Hbase11xWriterErrorCode.ILLEGAL_VALUE, "HBase源头表" + hTableName.toString()
-                    + "不存在, 请检查您的配置 或者 联系 Hbase 管理员.");
+            throw AddaxException.asAddaxException(Hbase11xWriterErrorCode.ILLEGAL_VALUE, "The table " + hTableName.toString() + "DOES NOT exists.");
         }
         if (!admin.isTableAvailable(hTableName)) {
-            throw AddaxException.asAddaxException(Hbase11xWriterErrorCode.ILLEGAL_VALUE, "HBase源头表" + hTableName.toString()
-                    + " 不可用, 请检查您的配置 或者 联系 Hbase 管理员.");
+            throw AddaxException.asAddaxException(Hbase11xWriterErrorCode.ILLEGAL_VALUE, "The table " + hTableName.toString() + " is unavailable.");
         }
         if (admin.isTableDisabled(hTableName)) {
-            throw AddaxException.asAddaxException(Hbase11xWriterErrorCode.ILLEGAL_VALUE, "HBase源头表" + hTableName.toString()
-                    + "is disabled, 请检查您的配置 或者 联系 Hbase 管理员.");
+            throw AddaxException.asAddaxException(Hbase11xWriterErrorCode.ILLEGAL_VALUE, "The table " + hTableName.toString() + "is disabled,");
         }
     }
 
@@ -259,10 +235,16 @@ public class Hbase11xHelper
 
         String encoding = originalConfig.getString(HBaseKey.ENCODING, HBaseConstant.DEFAULT_ENCODING);
         if (!Charset.isSupported(encoding)) {
-            throw AddaxException.asAddaxException(Hbase11xWriterErrorCode.ILLEGAL_VALUE, String.format("Hbasewriter 不支持您所配置的编码:[%s]", encoding));
+            throw AddaxException.asAddaxException(Hbase11xWriterErrorCode.ILLEGAL_VALUE, "The encoding[" + encoding + "] is unsupported ");
         }
         originalConfig.set(HBaseKey.ENCODING, encoding);
 
+        // validate kerberos login
+        if (originalConfig.getBool(Key.HAVE_KERBEROS, false)) {
+            String principal = originalConfig.getNecessaryValue(Key.KERBEROS_PRINCIPAL, Hbase11xWriterErrorCode.REQUIRED_VALUE);
+            String keytab = originalConfig.getNecessaryValue(Key.KERBEROS_KEYTAB_FILE_PATH, Hbase11xWriterErrorCode.REQUIRED_VALUE);
+            kerberosAuthentication(principal, keytab);
+        }
         Boolean walFlag = originalConfig.getBool(HBaseKey.WAL_FLAG, false);
         originalConfig.set(HBaseKey.WAL_FLAG, walFlag);
         long writeBufferSize = originalConfig.getLong(HBaseKey.WRITE_BUFFER_SIZE, HBaseConstant.DEFAULT_WRITE_BUFFER_SIZE);
@@ -279,8 +261,7 @@ public class Hbase11xHelper
             validateVersionColumn(originalConfig);
         }
         else {
-            throw AddaxException.asAddaxException(Hbase11xWriterErrorCode.ILLEGAL_VALUE,
-                    String.format("Hbase11xWriter不支持该 mode 类型:%s", mode));
+            throw AddaxException.asAddaxException(Hbase11xWriterErrorCode.ILLEGAL_VALUE, "The mode " + mode + "is unsupported");
         }
     }
 
@@ -288,7 +269,9 @@ public class Hbase11xHelper
     {
         List<Configuration> columns = originalConfig.getListConfiguration(HBaseKey.COLUMN);
         if (columns == null || columns.isEmpty()) {
-            throw AddaxException.asAddaxException(Hbase11xWriterErrorCode.REQUIRED_VALUE, "column为必填项，其形式为：column:[{\"index\": 0,\"name\": \"cf0:column0\",\"type\": \"string\"},{\"index\": 1,\"name\": \"cf1:column1\",\"type\": \"long\"}]");
+            throw AddaxException.asAddaxException(Hbase11xWriterErrorCode.REQUIRED_VALUE,
+                    "The item column must be configured, the form is 'column:[{\"index\": 0,\"name\": \"cf0:column0\",\"type\": " +
+                            "\"string\"},{\"index\": 1,\"name\": \"cf1:column1\",\"type\": \"long\"}]'");
         }
         for (Configuration aColumn : columns) {
             Integer index = aColumn.getInt(HBaseKey.INDEX);
@@ -296,10 +279,11 @@ public class Hbase11xHelper
             String name = aColumn.getNecessaryValue(HBaseKey.NAME, Hbase11xWriterErrorCode.REQUIRED_VALUE);
             ColumnType.getByTypeName(type);
             if (name.split(":").length != 2) {
-                throw AddaxException.asAddaxException(Hbase11xWriterErrorCode.ILLEGAL_VALUE, String.format("您column配置项中name配置的列格式[%s]不正确，name应该配置为 列族:列名  的形式, 如 {\"index\": 1,\"name\": \"cf1:q1\",\"type\": \"long\"}", name));
+                throw AddaxException.asAddaxException(Hbase11xWriterErrorCode.ILLEGAL_VALUE,
+                        String.format("The field's name[%s] is not valid, it must be configured as cf:qualifier", name));
             }
             if (index == null || index < 0) {
-                throw AddaxException.asAddaxException(Hbase11xWriterErrorCode.ILLEGAL_VALUE, "您的column配置项不正确,配置项中中index为必填项,且为非负数，请检查并修改.");
+                throw AddaxException.asAddaxException(Hbase11xWriterErrorCode.ILLEGAL_VALUE, "The index of name is not valid, it must be non-negative number");
             }
         }
     }
@@ -308,7 +292,8 @@ public class Hbase11xHelper
     {
         List<Configuration> rowkeyColumn = originalConfig.getListConfiguration(HBaseKey.ROW_KEY_COLUMN);
         if (rowkeyColumn == null || rowkeyColumn.isEmpty()) {
-            throw AddaxException.asAddaxException(Hbase11xWriterErrorCode.REQUIRED_VALUE, "rowkeyColumn为必填项，其形式为：rowkeyColumn:[{\"index\": 0,\"type\": \"string\"},{\"index\": -1,\"type\": \"string\",\"value\": \"_\"}]");
+            throw AddaxException.asAddaxException(Hbase11xWriterErrorCode.REQUIRED_VALUE,
+                    "The item rowkeyColumn is required，such as rowkeyColumn:[{\"index\": 0,\"type\": \"string\"},{\"index\": -1,\"type\": \"string\",\"value\": \"_\"}]");
         }
         int rowkeyColumnSize = rowkeyColumn.size();
         for (Configuration aRowkeyColumn : rowkeyColumn) {
@@ -316,11 +301,12 @@ public class Hbase11xHelper
             String type = aRowkeyColumn.getNecessaryValue(HBaseKey.TYPE, Hbase11xWriterErrorCode.REQUIRED_VALUE);
             ColumnType.getByTypeName(type);
             if (index == null) {
-                throw AddaxException.asAddaxException(Hbase11xWriterErrorCode.REQUIRED_VALUE, "rowkeyColumn配置项中index为必填项");
+                throw AddaxException.asAddaxException(Hbase11xWriterErrorCode.REQUIRED_VALUE, "The index of rowkeyColumn is required");
             }
             //不能只有-1列,即rowkey连接串
             if (rowkeyColumnSize == 1 && index == -1) {
-                throw AddaxException.asAddaxException(Hbase11xWriterErrorCode.ILLEGAL_VALUE, "rowkeyColumn配置项不能全为常量列,至少指定一个rowkey列");
+                throw AddaxException.asAddaxException(Hbase11xWriterErrorCode.ILLEGAL_VALUE,
+                        "The item rowkeyColumn can not all be constant, it must be specify more than one rowkey column");
             }
             if (index == -1) {
                 aRowkeyColumn.getNecessaryValue(HBaseKey.VALUE, Hbase11xWriterErrorCode.REQUIRED_VALUE);
@@ -335,15 +321,32 @@ public class Hbase11xHelper
         if (versionColumn != null) {
             Integer index = versionColumn.getInt(HBaseKey.INDEX);
             if (index == null) {
-                throw AddaxException.asAddaxException(Hbase11xWriterErrorCode.REQUIRED_VALUE, "versionColumn配置项中index为必填项");
+                throw AddaxException.asAddaxException(Hbase11xWriterErrorCode.REQUIRED_VALUE, "The field[index] of versionColumn is required.");
             }
             if (index == -1) {
                 //指定时间,需要index=-1,value
                 versionColumn.getNecessaryValue(HBaseKey.VALUE, Hbase11xWriterErrorCode.REQUIRED_VALUE);
             }
             else if (index < 0) {
-                throw AddaxException.asAddaxException(Hbase11xWriterErrorCode.ILLEGAL_VALUE, "您versionColumn配置项中index配置不正确,只能取-1或者非负数");
+                throw AddaxException.asAddaxException(Hbase11xWriterErrorCode.ILLEGAL_VALUE, "The field[index] of versionColumn must be either -1 or non-negative number");
             }
+        }
+    }
+
+    public static void kerberosAuthentication(String kerberosPrincipal, String kerberosKeytabFilePath)
+    {
+        LOG.debug("Try to login in with principal[{}] and keytab[{}]", kerberosPrincipal, kerberosKeytabFilePath);
+        org.apache.hadoop.conf.Configuration hadoopConf = new org.apache.hadoop.conf.Configuration();
+        hadoopConf.set("hadoop.security.authentication", "Kerberos");
+        UserGroupInformation.setConfiguration(hadoopConf);
+        try {
+            UserGroupInformation.loginUserFromKeytab(kerberosPrincipal, kerberosKeytabFilePath);
+        }
+        catch (IOException e) {
+            String message = String.format("Kerberos authentication failed, please make sure that kerberosKeytabFilePath[%s] and kerberosPrincipal[%s] are correct",
+                    kerberosKeytabFilePath, kerberosPrincipal);
+            LOG.error(message);
+            throw AddaxException.asAddaxException(Hbase11xWriterErrorCode.KERBEROS_LOGIN_ERROR, e);
         }
     }
 }
