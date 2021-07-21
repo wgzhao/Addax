@@ -30,9 +30,9 @@
         </dependency>
 
         <dependency>
-            <groupId>com.aliyun.phoenix</groupId>
-            <artifactId>ali-phoenix-shaded-thin-client</artifactId>
-            <version>${phoenix.version}</version>
+            <groupId>org.apache.phoenix</groupId>
+            <artifactId>phoenix-client-hbase-2.1</artifactId>
+            <version>5.1.2</version>
         </dependency>
 
     </dependencies>
