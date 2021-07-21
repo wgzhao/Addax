@@ -81,7 +81,7 @@ public class MongoDBReader
             String userName = originalConfig.getString(KeyConstant.MONGO_USER_NAME, originalConfig.getString(KeyConstant.MONGO_USERNAME));
             String password = originalConfig.getString(KeyConstant.MONGO_USER_PASSWORD, originalConfig.getString(KeyConstant.MONGO_PASSWORD));
             String database = originalConfig.getString(KeyConstant.MONGO_DB_NAME, originalConfig.getString(KeyConstant.MONGO_DATABASE));
-            String authDb = originalConfig.getString(KeyConstant.MONGO_AUTHDB, database);
+            String authDb = originalConfig.getString(KeyConstant.MONGO_AUTH_DB, database);
             if (!isNullOrEmpty((userName)) && !isNullOrEmpty((password))) {
                 this.mongoClient = MongoUtil.initCredentialMongoClient(originalConfig, userName, password, authDb);
             }
@@ -234,7 +234,7 @@ public class MongoDBReader
             String userName = readerSliceConfig.getString(KeyConstant.MONGO_USER_NAME, readerSliceConfig.getString(KeyConstant.MONGO_USERNAME));
             String password = readerSliceConfig.getString(KeyConstant.MONGO_USER_PASSWORD, readerSliceConfig.getString(KeyConstant.MONGO_PASSWORD));
             this.database = readerSliceConfig.getString(KeyConstant.MONGO_DB_NAME, readerSliceConfig.getString(KeyConstant.MONGO_DATABASE));
-            String authDb = readerSliceConfig.getString(KeyConstant.MONGO_AUTHDB, this.database);
+            String authDb = readerSliceConfig.getString(KeyConstant.MONGO_AUTH_DB, this.database);
             if (!isNullOrEmpty((userName)) && !isNullOrEmpty((password))) {
                 mongoClient = MongoUtil.initCredentialMongoClient(readerSliceConfig, userName, password, authDb);
             }
@@ -251,7 +251,7 @@ public class MongoDBReader
             this.mongodbColumnMeta = JSON.parseArray(readerSliceConfig.getString(KeyConstant.MONGO_COLUMN));
             this.lowerBound = readerSliceConfig.get(KeyConstant.LOWER_BOUND);
             this.upperBound = readerSliceConfig.get(KeyConstant.UPPER_BOUND);
-            this.isObjectId = readerSliceConfig.getBool(KeyConstant.IS_OBJECTID);
+            this.isObjectId = readerSliceConfig.getBool(KeyConstant.IS_OBJECT_ID);
         }
 
         @Override

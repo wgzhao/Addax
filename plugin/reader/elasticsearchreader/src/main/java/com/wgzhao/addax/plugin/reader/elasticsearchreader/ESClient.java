@@ -178,11 +178,11 @@ public class ESClient
         return jsonObject.has("items");
     }
 
-    public boolean alias(String indexname, String aliasname, boolean needClean)
+    public boolean alias(String indexName, String aliasName, boolean needClean)
             throws IOException
     {
-        GetAliases getAliases = new GetAliases.Builder().addIndex(aliasname).build();
-        AliasMapping addAliasMapping = new AddAliasMapping.Builder(indexname, aliasname).build();
+        GetAliases getAliases = new GetAliases.Builder().addIndex(aliasName).build();
+        AliasMapping addAliasMapping = new AddAliasMapping.Builder(indexName, aliasName).build();
         JestResult rst = jestClient.execute(getAliases);
         log.info(rst.getJsonString());
         List<AliasMapping> list = new ArrayList<>();
@@ -190,11 +190,11 @@ public class ESClient
             JsonParser jp = new JsonParser();
             JsonObject jo = (JsonObject) jp.parse(rst.getJsonString());
             for (Map.Entry<String, JsonElement> entry : jo.entrySet()) {
-                String tindex = entry.getKey();
-                if (indexname.equals(tindex)) {
+                String index = entry.getKey();
+                if (indexName.equals(index)) {
                     continue;
                 }
-                AliasMapping m = new RemoveAliasMapping.Builder(tindex, aliasname).build();
+                AliasMapping m = new RemoveAliasMapping.Builder(index, aliasName).build();
                 String s = new Gson().toJson(m.getData());
                 log.info(s);
                 if (needClean) {

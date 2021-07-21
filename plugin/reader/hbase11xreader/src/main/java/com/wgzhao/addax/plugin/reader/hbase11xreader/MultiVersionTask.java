@@ -52,7 +52,7 @@ public abstract class MultiVersionTask
         super(configuration);
         this.maxVersion = configuration.getInt(HBaseKey.MAX_VERSION);
         this.column = configuration.getList(HBaseKey.COLUMN, Map.class);
-        this.familyQualifierMap = Hbase11xHelper.parseColumnOfMultiversionMode(this.column);
+        this.familyQualifierMap = Hbase11xHelper.parseColumnOfMultiVersionMode(this.column);
 
         MultiVersionTask.COLON_BYTE = ":".getBytes(StandardCharsets.UTF_8);
     }

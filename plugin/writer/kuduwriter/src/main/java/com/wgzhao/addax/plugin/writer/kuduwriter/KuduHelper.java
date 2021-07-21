@@ -171,7 +171,7 @@ public class KuduHelper
                         "INT64" : "INT".equalsIgnoreCase(column.getNecessaryValue(KuduKey.TYPE, KuduWriterErrorCode.REQUIRED_VALUE)) ?
                         "INT32" : column.getNecessaryValue(KuduKey.TYPE, KuduWriterErrorCode.REQUIRED_VALUE).toUpperCase();
                 String name = column.getNecessaryValue(KuduKey.NAME, KuduWriterErrorCode.REQUIRED_VALUE);
-                Boolean key = column.getBool(KuduKey.PRIMARYKEY, false);
+                Boolean key = column.getBool(KuduKey.PRIMARY_KEY, false);
                 String encoding = column.getString(KuduKey.ENCODING, KuduConstant.ENCODING).toUpperCase();
                 String compression = column.getString(KuduKey.COMPRESSION, KuduConstant.COMPRESSION).toUpperCase();
                 String comment = column.getString(KuduKey.COMMENT, "");
@@ -196,7 +196,7 @@ public class KuduHelper
         int i = 0;
         while (i < columns.size()) {
             Configuration col = columns.get(i);
-            if (!col.getBool(KuduKey.PRIMARYKEY, false)) {
+            if (!col.getBool(KuduKey.PRIMARY_KEY, false)) {
                 break;
             }
             i++;
@@ -217,12 +217,12 @@ public class KuduHelper
         //range分区
         Map<String, Object> range = partition.getMap(KuduKey.RANGE);
         if (range != null && !range.isEmpty()) {
-            Set<Map.Entry<String, Object>> rangeColums = range.entrySet();
-            for (Map.Entry<String, Object> rangeColum : rangeColums) {
-                JSONArray lowerAndUppers = (JSONArray) rangeColum.getValue();
+            Set<Map.Entry<String, Object>> rangeColumns = range.entrySet();
+            for (Map.Entry<String, Object> rangeColumn : rangeColumns) {
+                JSONArray lowerAndUppers = (JSONArray) rangeColumn.getValue();
                 Iterator<Object> iterator = lowerAndUppers.iterator();
-                String colum = rangeColum.getKey();
-                if (StringUtils.isBlank(colum)) {
+                String column = rangeColumn.getKey();
+                if (StringUtils.isBlank(column)) {
                     throw AddaxException.asAddaxException(KuduWriterErrorCode.REQUIRED_VALUE,
                             "range partition column is empty, please check the configuration parameters.");
                 }
@@ -236,8 +236,8 @@ public class KuduHelper
                     }
                     PartialRow lower = schema.newPartialRow();
                     PartialRow upper = schema.newPartialRow();
-                    lower.addString(colum, lowerValue);
-                    upper.addString(colum, upperValue);
+                    lower.addString(column, lowerValue);
+                    upper.addString(column, upperValue);
                     tableOptions.addRangePartition(lower, upper);
                 }
             }
@@ -247,9 +247,9 @@ public class KuduHelper
         // 设置Hash分区
         Configuration hash = partition.getConfiguration(KuduKey.HASH);
         if (hash != null) {
-            List<String> hashColums = hash.getList(KuduKey.COLUMN, String.class);
+            List<String> hashColumns = hash.getList(KuduKey.COLUMN, String.class);
             Integer hashPartitionNum = configuration.getInt(KuduKey.HASH_NUM, 3);
-            tableOptions.addHashPartitions(hashColums, hashPartitionNum);
+            tableOptions.addHashPartitions(hashColumns, hashPartitionNum);
             LOG.info("Set hash partition complete!");
         }
     }
@@ -297,8 +297,8 @@ public class KuduHelper
                 col.set(KuduKey.INDEX, index);
                 indexFlag++;
             }
-//            if (primaryKey != col.getBool(Key.PRIMARYKEY, false)) {
-//                primaryKey = col.getBool(Key.PRIMARYKEY, false);
+//            if (primaryKey != col.getBool(Key.PRIMARY_KEY, false)) {
+//                primaryKey = col.getBool(Key.PRIMARY_KEY, false);
 //                primaryKeyFlag++;
 //            }
             goalColumns.add(col);

@@ -1,10 +1,10 @@
-# Addax插件开发宝典
+# Addax 插件开发宝典
 
-本文面向Addax插件开发人员，尝试尽可能全面地阐述开发一个Addax插件所经过的历程，力求消除开发者的困惑，让插件开发变得简单。
+本文面向 Adda x插件开发人员，尝试尽可能全面地阐述开发一个 Addax 插件所经过的历程，力求消除开发者的困惑，让插件开发变得简单。
 
 ## `Addax` 为什么要使用插件机制
 
-从设计之初，`Addax` 就把异构数据源同步作为自身的使命，为了应对不同数据源的差异、同时提供一致的同步原语和扩展能力，`Addax` 自然而然地采用了 `框架` + `插件` 的模式：
+从设计之初，`Addax` 就把异构数据源同步作为自身的使命，为了应对不同数据源的差异、同时提供一致地同步原语和扩展能力，`Addax` 自然而然地采用了 `框架` + `插件` 的模式：
 
 - 插件只需关心数据的读取或者写入本身。
 - 而同步的共性问题，比如：类型转换、性能、统计，则交由框架来处理。
@@ -113,9 +113,9 @@ public class SomeReader
 `Job`接口功能如下：
 
 - `init`: Job对象初始化工作，测试可以通过`super.getPluginJobConf()`获取与本插件相关的配置。读插件获得配置中`reader`部分，写插件获得`writer`部分。
-- `prepare`: 全局准备工作，比如odpswriter清空目标表。
+- `prepare`: 全局准备工作，比如 mysql 清空目标表。
 - `split`: 拆分`Task`。参数`adviceNumber`框架建议的拆分数，一般是运行时所配置的并发度。值返回的是`Task`的配置列表。
-- `post`: 全局的后置工作，比如mysqlwriter同步完影子表后的rename操作。
+- `post`: 全局的后置工作，比如 mysql writer 同步完影子表后的rename操作。
 - `destroy`: Job对象自身的销毁工作。
 
 `Task` 接口功能如下：
@@ -167,13 +167,14 @@ public class SomeReader
 `Addax` 使用 `assembly` 打包，打包命令如下：
 
 ```bash
-mvn clean package -DskipTests assembly:single
+mvn clean package 
+mvn package assembly:single
 ```
 
-`Addax`插件需要遵循统一的目录结构：
+`Addax` 插件需要遵循统一的目录结构：
 
 ```ini
-${DATAX_HOME}
+${ADDAX_HOME}
 |-- bin
 |   `-- addax.py
 |-- conf
@@ -198,10 +199,10 @@ ${DATAX_HOME}
         `-- odpswriter
 ```
 
-- `${DATAX_HOME}/bin`:  可执行程序目录。
-- `${DATAX_HOME}/conf`:  框架配置目录。
-- `${DATAX_HOME}/lib`:  框架依赖库目录。
-- `${DATAX_HOME}/plugin`:  插件目录。
+- `${ADDAX_HOME}/bin`:  可执行程序目录。
+- `${ADDAX_HOME}/conf`:  框架配置目录。
+- `${ADDAX_HOME}/lib`:  框架依赖库目录。
+- `${ADDAX_HOME}/plugin`:  插件目录。
 
 插件目录分为`reader`和`writer`子目录，读写插件分别存放。插件目录规范如下：
 
@@ -270,7 +271,7 @@ ${DATAX_HOME}
 
 **配置中`job.content.reader.parameter`的value部分会传给`Reader.Job`；`job.content.writer.parameter`的value部分会传给`Writer.Job`** ，`Reader.Job`和`Writer.Job`可以通过`super.getPluginJobConf()`来获取。
 
-`Addax`框架支持对特定的配置项进行RSA加密，例子中以`*`开头的项目便是加密后的值。 **配置项加密解密过程对插件是透明，插件仍然以不带`*`的key来查询配置和操作配置项** 。
+`Addax` 框架支持对特定的配置项进行RSA加密，例子中以`*`开头的项目便是加密后的值。 **配置项加密解密过程对插件透明，插件仍然以不带`*`的key来查询配置和操作配置项** 。
 
 #### 如何设计配置参数
 
@@ -312,7 +313,7 @@ ${DATAX_HOME}
   }
   ```
 
-### 如何使用`Configuration`类
+### 如何使用 `Configuration` 类
 
 为了简化对json的操作，`Addax`提供了简单的DSL配合`Configuration`类使用。
 

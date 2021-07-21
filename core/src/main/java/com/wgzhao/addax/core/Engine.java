@@ -109,8 +109,6 @@ public class Engine
     {
         Options options = new Options();
         options.addOption("job", true, "Job config.");
-//        options.addOption("jobid", true, "Job unique id.");
-//        options.addOption("mode", true, "Job runtime mode.");
 
         try {
             DefaultParser parser = new DefaultParser();
@@ -119,7 +117,7 @@ public class Engine
             String jobPath = cl.getOptionValue("job");
 
             Configuration configuration = ConfigParser.parse(jobPath);
-            // jobid 默认值为-1
+            // job id 默认值为-1
             configuration.set(CoreConstant.CORE_CONTAINER_JOB_ID, -1);
             // 默认运行模式
             configuration.set(CoreConstant.CORE_CONTAINER_JOB_MODE, "standalone");

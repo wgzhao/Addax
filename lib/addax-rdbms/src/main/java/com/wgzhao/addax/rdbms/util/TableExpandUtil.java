@@ -40,7 +40,7 @@ public final class TableExpandUtil
 
     /**
      * Split the table string(Usually contains names of some tables) to a List
-     * that is formated. example: table[0-32] will be splitted into `table0`,
+     * that is format. example: table[0-32] will be split into `table0`,
      * `table1`, `table2`, ... ,`table32` in {@link List}
      *
      * @param tables a string contains table name(one or many).
@@ -48,7 +48,7 @@ public final class TableExpandUtil
      */
     public static List<String> splitTables(String tables)
     {
-        List<String> splittedTables = new ArrayList<>();
+        List<String> splitTables = new ArrayList<>();
 
         String[] tableArrays = tables.split(",");
 
@@ -57,7 +57,7 @@ public final class TableExpandUtil
             Matcher matcher = pattern.matcher(tableArray.trim());
             if (!matcher.matches()) {
                 tableName = tableArray.trim();
-                splittedTables.add(tableName);
+                splitTables.add(tableName);
             }
             else {
                 String start = matcher.group(3).trim();
@@ -83,19 +83,19 @@ public final class TableExpandUtil
                                 + String.format("%d", k)
                                 + matcher.group(5).trim();
                     }
-                    splittedTables.add(tableName);
+                    splitTables.add(tableName);
                 }
             }
         }
-        return splittedTables;
+        return splitTables;
     }
 
     public static List<String> expandTableConf(List<String> tables)
     {
         List<String> parsedTables = new ArrayList<>();
         for (String table : tables) {
-            List<String> splittedTables = splitTables(table);
-            parsedTables.addAll(splittedTables);
+            List<String> splitTables = splitTables(table);
+            parsedTables.addAll(splitTables);
         }
 
         return parsedTables;

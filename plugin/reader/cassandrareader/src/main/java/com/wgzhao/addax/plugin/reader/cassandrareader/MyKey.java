@@ -29,14 +29,14 @@ public class MyKey extends Key
 
     public final static String HOST = "host";
     public final static String PORT = "port";
-    public final static String USESSL = "useSSL";
+    public final static String USE_SSL = "useSSL";
 
     public final static String KEYSPACE = "keyspace";
     public final static String TABLE = "table";
     public final static String COLUMN = "column";
     public final static String WHERE = "where";
     public final static String ALLOW_FILTERING = "allowFiltering";
-    public final static String CONSITANCY_LEVEL = "consistancyLevel";
+    public final static String CONSISTENCY_LEVEL = "consistencyLevel";
     public final static String MIN_TOKEN = "minToken";
     public final static String MAX_TOKEN = "maxToken";
 

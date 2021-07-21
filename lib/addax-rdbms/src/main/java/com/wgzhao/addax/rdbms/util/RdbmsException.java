@@ -67,11 +67,11 @@ public class RdbmsException
             return DBUtilErrorCode.MYSQL_CONN_DB_ERROR;
         }
 
-        if (e.contains(Constant.MYSQL_CONNEXP)) {
+        if (e.contains(Constant.MYSQL_CONNECT_EXP)) {
             return DBUtilErrorCode.MYSQL_CONN_IPPORT_ERROR;
         }
 
-        if (e.contains(Constant.MYSQL_ACCDENIED)) {
+        if (e.contains(Constant.MYSQL_ACCENTED)) {
             return DBUtilErrorCode.MYSQL_CONN_USERPWD_ERROR;
         }
 
@@ -84,11 +84,11 @@ public class RdbmsException
             return DBUtilErrorCode.ORACLE_CONN_DB_ERROR;
         }
 
-        if (e.contains(Constant.ORACLE_CONNEXP)) {
+        if (e.contains(Constant.ORACLE_CONNECT_EXP)) {
             return DBUtilErrorCode.ORACLE_CONN_IPPORT_ERROR;
         }
 
-        if (e.contains(Constant.ORACLE_ACCDENIED)) {
+        if (e.contains(Constant.ORACLE_ACCEDED)) {
             return DBUtilErrorCode.ORACLE_CONN_USERPWD_ERROR;
         }
 

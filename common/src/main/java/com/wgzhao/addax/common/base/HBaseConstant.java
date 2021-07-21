@@ -50,7 +50,7 @@ public final class HBaseConstant extends Constant
     public static final int DEFAULT_BATCH_ROW_COUNT = 256;   // 默认一次写256行
     public static final boolean DEFAULT_TRUNCATE = false;    // 默认开始的时候不清空表
     public static final boolean DEFAULT_USE_THIN_CLIENT = false;    // 默认不用thin客户端
-    public static final boolean DEFAULT_HAVE_KERBEROS = false; //默认不启用kerbreos
+    public static final boolean DEFAULT_HAVE_KERBEROS = false; //默认不启用 kerberos
     public static final String DEFAULT_KERBEROS_KEYTAB_FILE_PATH = null;
     public static final String DEFAULT_KERBEROS_PRINCIPAL = null;
 

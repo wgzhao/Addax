@@ -50,7 +50,7 @@ public final class ESKey
             return ActionType.UPDATE;
         }
         else {
-            return ActionType.UNKONW;
+            return ActionType.UNKNOWN;
         }
     }
 
@@ -130,7 +130,7 @@ public final class ESKey
 
     public static boolean isHighSpeedMode(Configuration conf)
     {
-        return "highspeed".equals(conf.getString("mode", ""));
+        return "high speed".equals(conf.getString("mode", ""));
     }
 
     public static String getAlias(Configuration conf)
@@ -161,7 +161,7 @@ public final class ESKey
 
     public enum ActionType
     {
-        UNKONW,
+        UNKNOWN,
         INDEX,
         CREATE,
         DELETE,

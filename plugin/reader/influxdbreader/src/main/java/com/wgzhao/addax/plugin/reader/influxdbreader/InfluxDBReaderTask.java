@@ -136,7 +136,7 @@ public class InfluxDBReaderTask
 
             }else if(resultsMap.containsKey("error")){
                 throw AddaxException.asAddaxException(
-                        InfluxDBReaderErrorCode.ILLEGAL_VALUE, "Error occured in data sets！", null);
+                        InfluxDBReaderErrorCode.ILLEGAL_VALUE, "Error occurred in data sets！", null);
             }
 
         } catch (Exception e) {

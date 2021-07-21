@@ -359,13 +359,13 @@ public class HttpReader
                 return null;
             }
 
-            InetSocketAddress socksaddr = new InetSocketAddress(uri.getHost(), uri.getPort());
+            InetSocketAddress socksAddress = new InetSocketAddress(uri.getHost(), uri.getPort());
             String proxyType = uri.getScheme();
             if (proxyType.startsWith("socks")) {
-                proxy = new Proxy(Proxy.Type.SOCKS, socksaddr);
+                proxy = new Proxy(Proxy.Type.SOCKS, socksAddress);
             }
             else if (proxyType.startsWith("http")) {
-                proxy = new Proxy(Proxy.Type.HTTP, socksaddr);
+                proxy = new Proxy(Proxy.Type.HTTP, socksAddress);
             }
             if (proxy == null) {
                 return null;

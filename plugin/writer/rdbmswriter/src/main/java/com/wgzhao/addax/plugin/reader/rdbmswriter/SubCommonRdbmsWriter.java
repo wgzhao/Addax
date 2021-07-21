@@ -52,12 +52,12 @@ public class SubCommonRdbmsWriter
         @Override
         protected PreparedStatement fillPreparedStatementColumnType(
                 PreparedStatement preparedStatement, int columnIndex,
-                int columnSqltype, Column column)
+                int columnSqlType, Column column)
                 throws SQLException
         {
             java.util.Date utilDate;
             try {
-                switch (columnSqltype) {
+                switch (columnSqlType) {
                     case Types.CHAR:
                     case Types.NCHAR:
                     case Types.CLOB:

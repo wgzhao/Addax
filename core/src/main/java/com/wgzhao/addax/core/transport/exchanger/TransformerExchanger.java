@@ -45,7 +45,7 @@ public abstract class TransformerExchanger
     private final List<TransformerExecution> transformerExecs;
     private final ClassLoaderSwapper classLoaderSwapper = ClassLoaderSwapper
             .newCurrentThreadClassLoaderSwapper();
-    private long totalExaustedTime = 0;
+    private long totalExhaustedTime = 0;
     private long totalFilterRecords = 0;
     private long totalSuccessRecords = 0;
     private long totalFailedRecords = 0;
@@ -70,7 +70,7 @@ public abstract class TransformerExchanger
 
         Record result = record;
 
-        long diffExaustedTime = 0;
+        long diffExhaustedTime = 0;
         String errorMsg = null;
         boolean failed = false;
         for (TransformerExecution transformerInfoExec : transformerExecs) {
@@ -99,7 +99,7 @@ public abstract class TransformerExchanger
             try {
                 result = transformerInfoExec
                         .getTransformer()
-                        .evaluate(result, transformerInfoExec.gettContext(),
+                        .evaluate(result, transformerInfoExec.getContext(),
                                 transformerInfoExec.getFinalParas());
             }
             catch (Exception e) {
@@ -128,10 +128,10 @@ public abstract class TransformerExchanger
             }
 
             long diff = System.nanoTime() - startTs;
-            diffExaustedTime += diff;
+            diffExhaustedTime += diff;
         }
 
-        totalExaustedTime += diffExaustedTime;
+        totalExhaustedTime += diffExhaustedTime;
 
         if (failed) {
             totalFailedRecords++;
@@ -152,13 +152,13 @@ public abstract class TransformerExchanger
          * 暂时不统计。
          */
 //        if (transformers.size() > 1) {
-//            for (ransformerInfoExec transformerInfoExec : transformers) {
+//            for (transformerInfoExec transformerInfoExec : transformers) {
 //                currentCommunication.setLongCounter(CommunicationTool.TRANSFORMER_NAME_PREFIX + transformerInfoExec.getTransformerName(), transformerInfoExec.getExaustedTime());
 //            }
 //        }
         currentCommunication.setLongCounter(CommunicationTool.TRANSFORMER_SUCCEED_RECORDS, totalSuccessRecords);
         currentCommunication.setLongCounter(CommunicationTool.TRANSFORMER_FAILED_RECORDS, totalFailedRecords);
         currentCommunication.setLongCounter(CommunicationTool.TRANSFORMER_FILTER_RECORDS, totalFilterRecords);
-        currentCommunication.setLongCounter(CommunicationTool.TRANSFORMER_USED_TIME, totalExaustedTime);
+        currentCommunication.setLongCounter(CommunicationTool.TRANSFORMER_USED_TIME, totalExhaustedTime);
     }
 }

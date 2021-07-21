@@ -273,7 +273,7 @@ public class StorageWriterUtil
     }
 
     private static void doWriteToStream(RecordReceiver lineReceiver,
-            BufferedWriter writer, String contex, Configuration config,
+            BufferedWriter writer, String context, Configuration config,
             TaskPluginCollector taskPluginCollector)
             throws IOException
     {

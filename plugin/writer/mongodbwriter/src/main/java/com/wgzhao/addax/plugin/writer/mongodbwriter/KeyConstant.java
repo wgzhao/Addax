@@ -111,7 +111,7 @@ public class KeyConstant extends Key
     /**
      * 判断一个值是否为true
      *
-     * @param value string of judege
+     * @param value string of judge
      * @return boolean
      */
     public static boolean isValueTrue(String value)

@@ -87,7 +87,7 @@ public class GroovyTransformer
             if (!(t instanceof Transformer)) {
                 throw AddaxException.asAddaxException(
                         TransformerErrorCode.TRANSFORMER_GROOVY_INIT_EXCEPTION,
-                        "datax bug! contact askdatax");
+                        "Addax bug! ");
             }
             this.groovyTransformer = (Transformer) t;
         }

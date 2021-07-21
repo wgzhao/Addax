@@ -66,7 +66,7 @@ public class CopyWorker
         this.pipeIn = new PipedInputStream(pipeOut);
         this.sql = copySql;
         LOG.info("copy sql: {}", this.sql);
-        changeCsvSizelimit(connection);
+        changeCsvSizeLimit(connection);
 
         this.copyResult = new FutureTask<>(() -> {
             try {
@@ -166,7 +166,7 @@ public class CopyWorker
         }
     }
 
-    private void changeCsvSizelimit(Connection conn)
+    private void changeCsvSizeLimit(Connection conn)
     {
         List<String> sqls = new ArrayList<>();
         sqls.add("set gp_max_csv_line_length = " + GPConstant.MAX_CSV_SIZE);

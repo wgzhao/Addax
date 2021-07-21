@@ -163,9 +163,9 @@ public class CopyProcessor
         Column column;
         for (int i = 0; i < this.columnNumber; i++) {
             column = record.getColumn(i);
-            int columnSqltype = this.resultSetMetaData.getMiddle().get(i);
+            int columnSqlType = this.resultSetMetaData.getMiddle().get(i);
 
-            switch (columnSqltype) {
+            switch (columnSqlType) {
                 case Types.CHAR:
                 case Types.NCHAR:
                 case Types.VARCHAR:

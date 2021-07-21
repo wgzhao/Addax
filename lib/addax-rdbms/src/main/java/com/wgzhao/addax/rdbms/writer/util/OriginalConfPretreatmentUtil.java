@@ -139,10 +139,10 @@ public final class OriginalConfPretreatmentUtil
             boolean isPreCheck = originalConfig.getBool(Key.DRY_RUN, false);
             List<String> allColumns;
             if (isPreCheck) {
-                allColumns = DBUtil.getTableColumnsByConn(dataBaseType, connectionFactory.getConnecttionWithoutRetry(), oneTable);
+                allColumns = DBUtil.getTableColumnsByConn(dataBaseType, connectionFactory.getConnectionWithoutRetry(), oneTable);
             }
             else {
-                allColumns = DBUtil.getTableColumnsByConn(dataBaseType, connectionFactory.getConnecttion(), oneTable);
+                allColumns = DBUtil.getTableColumnsByConn(dataBaseType, connectionFactory.getConnection(), oneTable);
             }
 
             LOG.info("table:[{}] all columns:[{}].", oneTable,
@@ -163,7 +163,7 @@ public final class OriginalConfPretreatmentUtil
                 // 确保用户配置的 column 不重复
                 ListUtil.makeSureNoValueDuplicate(userConfiguredColumns, false);
                 // 检查列是否都为数据库表中正确的列（通过执行一次 select column from table 进行判断）
-                java.sql.Connection connection = connectionFactory.getConnecttion();
+                java.sql.Connection connection = connectionFactory.getConnection();
                 DBUtil.getColumnMetaData(connection, oneTable, StringUtils.join(userConfiguredColumns, ","));
                 DBUtil.closeDBResources(null, null, connection);
             }

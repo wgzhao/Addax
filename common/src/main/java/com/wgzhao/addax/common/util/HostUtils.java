@@ -44,9 +44,9 @@ public class HostUtils
         String ip = UNKNOWN;
         String hostname = UNKNOWN;
         try {
-            InetAddress addr = InetAddress.getLocalHost();
-            ip = addr.getHostAddress();
-            hostname = addr.getHostName();
+            InetAddress inetAddress = InetAddress.getLocalHost();
+            ip = inetAddress.getHostAddress();
+            hostname = inetAddress.getHostName();
         }
         catch (UnknownHostException e) {
             log.error("Can't find out address: {}", e.getMessage());
