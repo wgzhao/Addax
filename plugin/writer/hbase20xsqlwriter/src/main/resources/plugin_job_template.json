@@ -1,9 +1,12 @@
 {
   "name": "hbase20xsqlwriter",
   "parameter": {
-    "queryServerAddress": "",
+    "queryServerAddress": "jdbc:phoenix[:thin]:<pointer>",
     "table": "",
     "serialization": "PROTOBUF",
+    "haveKerberos": false,
+    "kerberosPrincipal": "",
+    "kerberosKeytabFilePath": "",
     "column": [
     ],
     "batchSize": "100",
