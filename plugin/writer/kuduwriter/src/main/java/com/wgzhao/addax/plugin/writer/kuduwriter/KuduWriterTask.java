@@ -149,7 +149,7 @@ public class KuduWriterTask
                         break;
                     default:
                         throw AddaxException.asAddaxException(
-                                KuduWriterErrorCode.ILLEGAL_VALUE, "unsupport data type " + type
+                                KuduWriterErrorCode.ILLEGAL_VALUE, "The data type " + type + "is unsupported"
                         );
                 }
             } // end a row

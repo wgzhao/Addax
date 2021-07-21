@@ -132,8 +132,8 @@ public class CassandraWriterHelper
                 if (b.length < 2) {
                     return InetAddress.getByName(s);
                 }
-                byte[] addr = InetAddress.getByName(b[1]).getAddress();
-                return InetAddress.getByAddress(b[0], addr);
+                byte[] address = InetAddress.getByName(b[1]).getAddress();
+                return InetAddress.getByAddress(b[0], address);
 
             case DURATION:
                 return Duration.from(s);

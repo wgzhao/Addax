@@ -58,7 +58,7 @@ public class HbaseSQLHelper
 {
     private static final Logger LOG = LoggerFactory.getLogger(HbaseSQLHelper.class);
 
-    public static  ThinClientPTable ptable;
+    public static  ThinClientPTable pTable;
     public static final org.apache.hadoop.conf.Configuration hadoopConf = new org.apache.hadoop.conf.Configuration();
     // Kerberos
     private static boolean haveKerberos = false;
@@ -69,7 +69,7 @@ public class HbaseSQLHelper
     private HbaseSQLHelper() {}
 
     /**
-     * 将datax的配置解析成sql writer的配置
+     * 将 addax 的配置解析成sql writer的配置
      *
      * @param cfg configuration
      * @return HbaseSQLWriterConfig class
@@ -81,7 +81,7 @@ public class HbaseSQLHelper
 
     /**
      * 将hbase config字符串解析成zk quorum和znode。
-     * 因为hbase使用的配置名称 xxx.xxxx.xxx会被{@link Configuration#from(String)}识别成json路径，
+     * 因为hbase使用的配置名称 xxx.xxx.xxx会被{@link Configuration#from(String)}识别成json路径，
      * 而不是一个完整的配置项，所以，hbase的配置必须通过直接调用json API进行解析。
      *
      * @param hbaseCfgString 配置中{@link HBaseKey#HBASE_CONFIG}的值
@@ -264,14 +264,14 @@ public class HbaseSQLHelper
             return getTableSchema(conn, fullTableName);
         }
         else {
-            if (ptable == null) {
+            if (pTable == null) {
                 try (ResultSet result = conn.getMetaData().getColumns(null, namespace, fullTableName, null)) {
                     ThinClientPTable retTable = new ThinClientPTable();
                     retTable.setColTypeMap(parseColType(result));
-                    ptable = retTable;
+                    pTable = retTable;
                 }
             }
-            return ptable;
+            return pTable;
         }
     }
 

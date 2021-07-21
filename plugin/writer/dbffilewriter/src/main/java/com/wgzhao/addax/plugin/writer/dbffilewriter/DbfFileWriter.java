@@ -162,7 +162,7 @@ public class DbfFileWriter
             }
             else if ("nonConflict".equals(writeMode)) {
                 LOG.info("由于您配置了writeMode nonConflict, 开始检查 [{}] 下面的内容", path);
-                // warn: check two times about exists, mkdirs
+                // warn: check two times about exists, mkdir
                 File dir = new File(path);
                 try {
                     if (dir.exists()) {

@@ -83,7 +83,7 @@ public class TDengineWriter
             this.commonRdbmsWriterTask = new CommonRdbmsWriter.Task(DATABASE_TYPE)
             {
                 @Override
-                protected PreparedStatement fillPreparedStatementColumnType(PreparedStatement preparedStatement, int columnIndex, int columnSqltype, Column column)
+                protected PreparedStatement fillPreparedStatementColumnType(PreparedStatement preparedStatement, int columnIndex, int columnSqlType, Column column)
                         throws SQLException
                 {
                     if (column.getRawData() == null) {
@@ -109,7 +109,7 @@ public class TDengineWriter
 
                         case "TIMESTAMP":
                             // TDengine timestamp min values is 1500000000000, means 2017-07-14 10:40:00.0
-                            // so if timestamp less than ths min value ,it will occure timestamp out of range
+                            // so if timestamp less than ths min value ,it will occurred timestamp out of range
                             if (columnIndex == 0 && column.asLong() < 1500000000000L) {
                               throw AddaxException.asAddaxException(DBUtilErrorCode.WRITE_DATA_ERROR,
                                       "TDengine 能写入的时间戳最小时间为 '2017-07-14 10:40:00.0', 当前要求写入的时间为 " +

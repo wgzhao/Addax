@@ -37,12 +37,12 @@ public class MultiVersionTask
     public Put convertRecordToPut(Record record)
     {
         if (record.getColumnNumber() != 4) {
-            // multiversion 模式下源头读取字段列数为4元组(rowkey,column,timestamp,value),目的端需告诉[]
+            // multi-version 模式下源头读取字段列数为4元组(rowkey,column,timestamp,value),目的端需告诉[]
             throw AddaxException
                     .asAddaxException(
                             Hbase11xWriterErrorCode.ILLEGAL_VALUE,
                             String.format(
-                                    "The record should be a tuple of (rowkey,column,timestamp,value) in multiversion mode. actually get %s",
+                                    "The record should be a tuple of (rowkey,column,timestamp,value) in multi-version mode. actually get %s",
                                     record.getColumnNumber()));
         }
         Put put = null;

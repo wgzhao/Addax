@@ -206,8 +206,8 @@ public class TxtFileReader
             for (String eachPath : this.path) {
                 String regexString = eachPath.replace("*", ".*").replace("?",
                         ".?");
-                Pattern patt = Pattern.compile(regexString);
-                this.pattern.put(eachPath, patt);
+                Pattern pattern = Pattern.compile(regexString);
+                this.pattern.put(eachPath, pattern);
             }
             this.sourceFiles = this.buildSourceTargets();
 
@@ -257,7 +257,7 @@ public class TxtFileReader
         // validate the path, path must be a absolute path
         private List<String> buildSourceTargets()
         {
-            // for eath path
+            // for each path
             Set<String> toBeReadFiles = new HashSet<>();
             for (String eachPath : this.path) {
                 int endMark;
@@ -280,13 +280,13 @@ public class TxtFileReader
                     this.isRegexPath.put(eachPath, false);
                     parentDirectory = eachPath;
                 }
-                this.buildSourceTargetsEathPath(eachPath, parentDirectory,
+                this.buildSourceTargetsEachPath(eachPath, parentDirectory,
                         toBeReadFiles);
             }
             return Arrays.asList(toBeReadFiles.toArray(new String[0]));
         }
 
-        private void buildSourceTargetsEathPath(String regexPath,
+        private void buildSourceTargetsEachPath(String regexPath,
                 String parentDirectory, Set<String> toBeReadFiles)
         {
             // 检测目录是否存在，错误情况更明确
@@ -508,7 +508,7 @@ public class TxtFileReader
                 // TODO lineDelimiter
                 if (skipHeader) {
                     String fetchLine = reader.readLine();
-                    LOG.info("Header line {} has been skiped.",
+                    LOG.info("Header line {} has been skipped.",
                             fetchLine);
                 }
                 csvReader = new CsvReader(reader);

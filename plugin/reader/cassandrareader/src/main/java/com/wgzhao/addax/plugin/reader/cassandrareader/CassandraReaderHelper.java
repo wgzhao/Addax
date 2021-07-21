@@ -450,15 +450,15 @@ public class CassandraReaderHelper
 
     public static List<Configuration> splitJob(int adviceNumber, Configuration jobConfig, Cluster cluster)
     {
-        List<Configuration> splittedConfigs = new ArrayList<Configuration>();
+        List<Configuration> splitConfigs = new ArrayList<Configuration>();
         if (adviceNumber <= 1) {
-            splittedConfigs.add(jobConfig);
-            return splittedConfigs;
+            splitConfigs.add(jobConfig);
+            return splitConfigs;
         }
         String where = jobConfig.getString(MyKey.WHERE);
         if (where != null && where.toLowerCase().contains("token(")) {
-            splittedConfigs.add(jobConfig);
-            return splittedConfigs;
+            splitConfigs.add(jobConfig);
+            return splitConfigs;
         }
         String partitioner = cluster.getMetadata().getPartitioner();
         if (partitioner.endsWith("RandomPartitioner")) {
@@ -475,7 +475,7 @@ public class CassandraReaderHelper
                 Configuration taskConfig = jobConfig.clone();
                 taskConfig.set(MyKey.MIN_TOKEN, l.toString());
                 taskConfig.set(MyKey.MAX_TOKEN, r.toString());
-                splittedConfigs.add(taskConfig);
+                splitConfigs.add(taskConfig);
             }
         }
         else if (partitioner.endsWith("Murmur3Partitioner")) {
@@ -492,13 +492,13 @@ public class CassandraReaderHelper
                 Configuration taskConfig = jobConfig.clone();
                 taskConfig.set(MyKey.MIN_TOKEN, String.valueOf(l));
                 taskConfig.set(MyKey.MAX_TOKEN, String.valueOf(r));
-                splittedConfigs.add(taskConfig);
+                splitConfigs.add(taskConfig);
             }
         }
         else {
-            splittedConfigs.add(jobConfig);
+            splitConfigs.add(jobConfig);
         }
-        return splittedConfigs;
+        return splitConfigs;
     }
 
     public static String getQueryString(Configuration taskConfig, Cluster cluster)

@@ -50,8 +50,8 @@ public class MysqlReader
         {
             this.originalConfig = getPluginJobConf();
 
-            Integer userConfigedFetchSize = this.originalConfig.getInt(Key.FETCH_SIZE);
-            if (userConfigedFetchSize != null) {
+            Integer userConfiguredFetchSize = this.originalConfig.getInt(Key.FETCH_SIZE);
+            if (userConfiguredFetchSize != null) {
                 LOG.warn("对 mysqlreader 不需要配置 fetchSize, mysqlreader 将会忽略这项配置. 如果您不想再看到此警告,请去除fetchSize 配置.");
             }
 

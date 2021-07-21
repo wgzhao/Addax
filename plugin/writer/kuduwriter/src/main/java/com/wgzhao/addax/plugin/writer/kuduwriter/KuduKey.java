@@ -33,7 +33,7 @@ public class KuduKey
     public static final String NAME = "name";
     public static final String TYPE = "type";
     public static final String INDEX = "index";
-    public static final String PRIMARYKEY = "primaryKey";
+    public static final String PRIMARY_KEY = "primaryKey";
     public static final String COMPRESSION = "compress";
     public static final String COMMENT = "comment";
     public final static String ENCODING = "encoding";

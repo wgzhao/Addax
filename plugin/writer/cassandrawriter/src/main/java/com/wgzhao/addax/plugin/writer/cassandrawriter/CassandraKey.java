@@ -28,12 +28,12 @@ public final class CassandraKey extends Key
 {
     public final static String HOST = "host";
     public final static String PORT = "port";
-    public final static String USESSL = "useSSL";
+    public final static String USE_SSL = "useSSL";
 
     public final static String KEYSPACE = "keyspace";
     public final static String WRITE_TIME = "writetime()";
     public final static String ASYNC_WRITE = "asyncWrite";
-    public final static String CONSITANCY_LEVEL = "consistancyLevel";
+    public final static String CONSISTENCY_LEVEL = "consistencyLevel";
     public final static String CONNECTIONS_PER_HOST = "connectionsPerHost";
     public final static String MAX_PENDING_CONNECTION = "maxPendingPerConnection";
 }

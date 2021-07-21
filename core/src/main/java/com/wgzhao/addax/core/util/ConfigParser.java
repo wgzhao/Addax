@@ -113,7 +113,7 @@ public final class ConfigParser
         boolean isJobResourceFromHttp = jobResource.trim().toLowerCase().startsWith("http");
 
         if (isJobResourceFromHttp) {
-            //设置httpclient的 HTTP_TIMEOUT_INMILLIONSECONDS
+            //设置httpclient的 HTTP_TIMEOUT_IN_MILLION_SECONDS
             Configuration coreConfig = ConfigParser.parseCoreConfig(CoreConstant.CONF_PATH);
             int httpTimeOutInMillionSeconds = coreConfig.getInt(
                     CoreConstant.CORE_SERVER_TIMEOUT_SEC, 5) * 1000;

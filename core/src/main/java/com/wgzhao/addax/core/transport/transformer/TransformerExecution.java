@@ -59,7 +59,7 @@ public class TransformerExecution
             return;
         }
         /*
-         * 其他function，按照columnIndex和para的顺序，如果columnIndex为空，跳过conlumnIndex
+         * 其他function，按照columnIndex和para的顺序，如果columnIndex为空，跳过columnIndex
          */
         if (transformerExecutionParas.getColumnIndex() != null) {
             if (transformerExecutionParas.getParas() != null) {
@@ -88,7 +88,7 @@ public class TransformerExecution
         return finalParas;
     }
 
-    public long getExaustedTime()
+    public long getExhaustedTime()
     {
         /*
          * 以下是动态统计信息，暂时未用
@@ -144,8 +144,8 @@ public class TransformerExecution
         return transformerInfo.getTransformer();
     }
 
-    public Map<String, Object> gettContext()
+    public Map<String, Object> getContext()
     {
-        return transformerExecutionParas.gettContext();
+        return transformerExecutionParas.getContext();
     }
 }

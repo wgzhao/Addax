@@ -26,9 +26,9 @@ import com.wgzhao.addax.common.spi.ErrorCode;
  */
 public enum KuduReaderErrorCode implements ErrorCode {
 
-    ILLEGAL_VALUE("ILLEGAL_PARAMETER_VALUE","参数不合法"),
-    ILLEGAL_ADDRESS("ILLEGAL_ADDRESS","不合法的Kudu Master Addresses"),
-    UNEXCEPT_EXCEPTION("UNEXCEPT_EXCEPTION","未知异常");
+    ILLEGAL_VALUE("Illegal parameter value","参数不合法"),
+    ILLEGAL_ADDRESS("Illegal address","不合法的Kudu Master Addresses"),
+    UNKNOWN_EXCEPTION("Unknown exception","未知异常");
 
     private final String code;
 

@@ -62,7 +62,7 @@ public class KeyConstant
      */
     public static final String MONGO_DB_NAME = "dbName";
     public static final String MONGO_DATABASE = "database";
-    public static final String MONGO_AUTHDB = "authDb";
+    public static final String MONGO_AUTH_DB = "authDb";
     /**
      * mongodb 集合名
      */
@@ -94,7 +94,7 @@ public class KeyConstant
 
     public static final String LOWER_BOUND = "lowerBound";
     public static final String UPPER_BOUND = "upperBound";
-    public static final String IS_OBJECTID = "isObjectId";
+    public static final String IS_OBJECT_ID = "isObjectId";
 
     /*
      * 批量获取的记录数
@@ -108,7 +108,7 @@ public class KeyConstant
      * MongoDB的错误码
      */
     public static final int MONGO_UNAUTHORIZED_ERR_CODE = 13;
-    public static final int MONGO_ILLEGALOP_ERR_CODE = 20;
+    public static final int MONGO_ILLEGAL_OP_ERR_CODE = 20;
     public static final int MONGO_COMMAND_NOT_FOUND_CODE = 59;
 
     private KeyConstant() {}

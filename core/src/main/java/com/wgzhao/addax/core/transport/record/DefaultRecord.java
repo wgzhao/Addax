@@ -39,7 +39,7 @@ public class DefaultRecord
         implements Record
 {
 
-    private static final int RECORD_AVERGAE_COLUMN_NUMBER = 16;
+    private static final int RECORD_AVERAGE_COLUMN_NUMBER = 16;
 
     private final List<Column> columns;
 
@@ -50,7 +50,7 @@ public class DefaultRecord
 
     public DefaultRecord()
     {
-        this.columns = new ArrayList<>(RECORD_AVERGAE_COLUMN_NUMBER);
+        this.columns = new ArrayList<>(RECORD_AVERAGE_COLUMN_NUMBER);
     }
 
     @Override

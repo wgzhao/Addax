@@ -43,7 +43,7 @@ public class ConfigurationValidate
         jobValidate(allConfig);
     }
 
-    private static void coreValidate(Configuration allconfig)
+    private static void coreValidate(Configuration allConfig)
     {
     }
 

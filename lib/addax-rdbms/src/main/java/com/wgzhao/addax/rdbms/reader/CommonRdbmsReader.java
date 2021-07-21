@@ -97,7 +97,7 @@ public class CommonRdbmsReader
 
         public void preCheck(Configuration originalConfig, DataBaseType dataBaseType)
         {
-            /* 检查每个表是否有读权限，以及querySql跟splik Key是否正确 */
+            /* 检查每个表是否有读权限，以及querySql跟split Key是否正确 */
             Configuration queryConf = ReaderSplitUtil.doPreCheckSplit(originalConfig);
             String splitPK = queryConf.getString(Key.SPLIT_PK);
             List<Object> connList = queryConf.getList(Key.CONNECTION, Object.class);
@@ -177,10 +177,10 @@ public class CommonRdbmsReader
             this(dataBaseType, -1, -1);
         }
 
-        public Task(DataBaseType dataBaseType, int taskGropuId, int taskId)
+        public Task(DataBaseType dataBaseType, int taskGroupId, int taskId)
         {
             this.dataBaseType = dataBaseType;
-            this.taskGroupId = taskGropuId;
+            this.taskGroupId = taskGroupId;
             this.taskId = taskId;
         }
 
@@ -314,7 +314,7 @@ public class CommonRdbmsReader
 
                         case Types.DOUBLE:
                             if ("money".equalsIgnoreCase(metaData.getColumnTypeName(i))) {
-                                // remove currency nonation($) and currency formatting nonation(,)
+                                // remove currency notation($) and currency formatting notation(,)
                                 // TODO process it more elegantly
                                 record.addColumn(new DoubleColumn(rs.getString(i).substring(1).replace(",", "")));
                             }
@@ -416,7 +416,7 @@ public class CommonRdbmsReader
                         default:
                             throw AddaxException.asAddaxException(DBUtilErrorCode.UNSUPPORTED_TYPE,
                                     String.format("您的配置文件中的列配置信息有误. 因为DataX 不支持数据库读取这种字段类型. " + "字段名:[%s], 字段类型:[%s], "
-                                                    + "字段类型名称:[%s], 字段Java类型:[%s]. " + "请尝试使用数据库函数将其转换datax支持的类型 或者不同步该字段 .",
+                                                    + "字段类型名称:[%s], 字段Java类型:[%s]. " + "请尝试使用数据库函数将其转换支持的类型 或者不同步该字段 .",
                                             metaData.getColumnName(i), metaData.getColumnType(i),
                                             metaData.getColumnTypeName(i), metaData.getColumnClassName(i)));
                     }

@@ -136,7 +136,7 @@ public class Hbase11xHelper
             Hbase11xHelper.closeBufferedMutator(bufferedMutator);
             Hbase11xHelper.closeAdmin(admin);
             Hbase11xHelper.closeConnection(hConnection);
-            throw AddaxException.asAddaxException(Hbase11xWriterErrorCode.GET_HBASE_BUFFEREDMUTATOR_ERROR, e);
+            throw AddaxException.asAddaxException(Hbase11xWriterErrorCode.GET_HBASE_BUFFERED_MUTATOR_ERROR, e);
         }
         return bufferedMutator;
     }
@@ -196,7 +196,7 @@ public class Hbase11xHelper
             }
         }
         catch (IOException e) {
-            throw AddaxException.asAddaxException(Hbase11xWriterErrorCode.CLOSE_HBASE_BUFFEREDMUTATOR_ERROR, e);
+            throw AddaxException.asAddaxException(Hbase11xWriterErrorCode.CLOSE_HBASE_BUFFERED_MUTATOR_ERROR, e);
         }
     }
 

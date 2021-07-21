@@ -170,7 +170,7 @@ public class RedisReader
                             }
                         }
                         else {
-                            LOG.warn("non-keyvalue type not support yet");
+                            LOG.warn("The type is unsupported yet");
                         }
                     });
                     r.open();

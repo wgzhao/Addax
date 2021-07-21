@@ -323,7 +323,7 @@ public class StorageReaderUtil
             // TODO lineDelimiter
             if (skipHeader) {
                 String fetchLine = reader.readLine();
-                LOG.info("Header line {} has been skiped.",
+                LOG.info("Header line {} has been skipped.",
                         fetchLine);
             }
             csvReader = new CsvReader(reader);

@@ -171,8 +171,8 @@ public class JsonReader
             for (String eachPath : this.path) {
                 String regexString = eachPath.replace("*", ".*").replace("?",
                         ".?");
-                Pattern patt = Pattern.compile(regexString);
-                this.pattern.put(eachPath, patt);
+                Pattern pattern = Pattern.compile(regexString);
+                this.pattern.put(eachPath, pattern);
                 this.sourceFiles = this.buildSourceTargets();
             }
 
@@ -222,7 +222,7 @@ public class JsonReader
         // validate the path, path must be a absolute path
         private List<String> buildSourceTargets()
         {
-            // for eath path
+            // for each path
             Set<String> toBeReadFiles = new HashSet<>();
             for (String eachPath : this.path) {
                 int endMark;
@@ -245,13 +245,13 @@ public class JsonReader
                     this.isRegexPath.put(eachPath, false);
                     parentDirectory = eachPath;
                 }
-                this.buildSourceTargetsEathPath(eachPath, parentDirectory,
+                this.buildSourceTargetsEachPath(eachPath, parentDirectory,
                         toBeReadFiles);
             }
             return Arrays.asList(toBeReadFiles.toArray(new String[0]));
         }
 
-        private void buildSourceTargetsEathPath(String regexPath,
+        private void buildSourceTargetsEachPath(String regexPath,
                 String parentDirectory, Set<String> toBeReadFiles)
         {
             // 检测目录是否存在，错误情况更明确
@@ -447,7 +447,7 @@ public class JsonReader
                     }
                     break;
                 case DATE:
-                    try { //直接利用datax支持的处理日期数据
+                    try { //直接利用支持的处理日期数据
                         if (StringUtils.isNotBlank(columnFormat)) {
                             // 用户自己配置的格式转换, 脏数据行为出现变化
                             DateFormat format = new SimpleDateFormat(columnFormat);

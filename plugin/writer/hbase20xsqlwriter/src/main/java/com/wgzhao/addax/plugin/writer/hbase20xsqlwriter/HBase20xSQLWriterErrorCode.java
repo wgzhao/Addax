@@ -29,7 +29,7 @@ public enum HBase20xSQLWriterErrorCode
     GET_QUERYSERVER_CONNECTION_ERROR("Hbasewriter-02", "获取QueryServer连接时出错."),
     GET_HBASE_TABLE_ERROR("Hbasewriter-03", "获取 Hbase table时出错."),
     CLOSE_HBASE_CONNECTION_ERROR("Hbasewriter-04", "关闭Hbase连接时出错."),
-    GET_TABLE_COLUMNTYPE_ERROR("Hbasewriter-05", "获取表列类型时出错."),
+    GET_TABLE_COLUMN_TYPE_ERROR("Hbasewriter-05", "获取表列类型时出错."),
     PUT_HBASE_ERROR("Hbasewriter-07", "写入hbase时发生IO异常."),
     KERBEROS_LOGIN_ERROR("HbaseWriter-08", "Kerberos authentication failed.");
     ;

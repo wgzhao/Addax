@@ -29,7 +29,7 @@ public enum Hbase20xReaderErrorCode
 {
     REQUIRED_VALUE("Hbase20xReader-00", "您缺失了必须填写的参数值."),
     ILLEGAL_VALUE("Hbase20xReader-01", "您填写的参数值不合法."),
-    PREPAR_READ_ERROR("HbaseReader-02", "准备读取 Hbase 时出错."),
+    PREPARE_READ_ERROR("HbaseReader-02", "准备读取 Hbase 时出错."),
     SPLIT_ERROR("HbaseReader-03", "切分 Hbase 表时出错."),
     GET_HBASE_CONNECTION_ERROR("HbaseReader-04", "获取Hbase连接时出错."),
     GET_HBASE_TABLE_ERROR("HbaseReader-05", "初始化 Hbase 抽取表时出错."),

@@ -94,7 +94,7 @@ public class Hbase20xReader
                 this.hbaseTaskProxy.prepare();
             }
             catch (Exception e) {
-                throw AddaxException.asAddaxException(Hbase20xReaderErrorCode.PREPAR_READ_ERROR, e);
+                throw AddaxException.asAddaxException(Hbase20xReaderErrorCode.PREPARE_READ_ERROR, e);
             }
         }
 

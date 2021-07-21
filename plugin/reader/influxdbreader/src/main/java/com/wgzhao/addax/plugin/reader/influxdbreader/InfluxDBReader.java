@@ -59,7 +59,7 @@ public class InfluxDBReader
             if (StringUtils.isAllBlank(querySql,database)) {
                 throw AddaxException.asAddaxException(
                         InfluxDBReaderErrorCode.REQUIRED_VALUE,
-                        "One of database or querysql must be specified"
+                        "One of database or querySql must be specified"
                 );
             }
             if (columns == null || columns.isEmpty()) {
@@ -73,9 +73,9 @@ public class InfluxDBReader
         public List<Configuration> split(int adviceNumber)
         {
             Configuration readerSliceConfig = super.getPluginJobConf();
-            List<Configuration> splittedConfigs = new ArrayList<>();
-            splittedConfigs.add(readerSliceConfig);
-            return splittedConfigs;
+            List<Configuration> splitConfigs = new ArrayList<>();
+            splitConfigs.add(readerSliceConfig);
+            return splitConfigs;
         }
 
         @Override

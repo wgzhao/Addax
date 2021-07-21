@@ -306,7 +306,7 @@ public class HdfsReader
 
                     String message = "HdfsReader插件目前支持ORC, TEXT, CSV, SEQUENCE, RC五种格式的文件," +
                             "请将fileType选项的值配置为ORC, TEXT, CSV, SEQUENCE 或者 RC";
-                    throw AddaxException.asAddaxException(HdfsReaderErrorCode.FILE_TYPE_UNSUPPORT, message);
+                    throw AddaxException.asAddaxException(HdfsReaderErrorCode.FILE_TYPE_UNSUPPORTED, message);
                 }
 
                 if (recordSender != null) {

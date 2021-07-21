@@ -192,7 +192,7 @@ public class CassandraWriter
             String password = taskConfig.getString(CassandraKey.PASSWORD);
             String hosts = taskConfig.getString(CassandraKey.HOST);
             Integer port = taskConfig.getInt(CassandraKey.PORT, 9042);
-            boolean useSSL = taskConfig.getBool(CassandraKey.USESSL);
+            boolean useSSL = taskConfig.getBool(CassandraKey.USE_SSL);
             String keyspace = taskConfig.getString(CassandraKey.KEYSPACE);
             String table = taskConfig.getString(CassandraKey.TABLE);
             batchSize = taskConfig.getLong(CassandraKey.BATCH_SIZE, 1);
@@ -250,7 +250,7 @@ public class CassandraWriter
             if (writeTimeCol != -1) {
                 insertStmt.using(timestamp(QueryBuilder.bindMarker()));
             }
-            String cl = taskConfig.getString(CassandraKey.CONSITANCY_LEVEL);
+            String cl = taskConfig.getString(CassandraKey.CONSISTENCY_LEVEL);
             if (cl != null && !cl.isEmpty()) {
                 insertStmt.setConsistencyLevel(ConsistencyLevel.valueOf(cl));
             }

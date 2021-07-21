@@ -136,9 +136,9 @@ public class TaskGroupContainer
 
             int taskMaxRetryTimes = this.configuration.getInt(CoreConstant.CORE_CONTAINER_TASK_FAIL_OVER_MAX_RETRY_TIMES, 1);
 
-            long taskRetryIntervalInMsec = this.configuration.getLong(CoreConstant.CORE_CONTAINER_TASK_FAIL_OVER_RETRY_INTERVAL_IN_MSEC, 10000);
+            long taskRetryIntervalInMs = this.configuration.getLong(CoreConstant.CORE_CONTAINER_TASK_FAIL_OVER_RETRY_INTERVAL_IN_MSEC, 10000);
 
-            long taskMaxWaitInMsec = this.configuration.getLong(CoreConstant.CORE_CONTAINER_TASK_FAIL_OVER_MAX_WAIT_IN_MSEC, 60000);
+            long taskMaxWaitInMs = this.configuration.getLong(CoreConstant.CORE_CONTAINER_TASK_FAIL_OVER_MAX_WAIT_IN_MSEC, 60000);
 
             List<Configuration> taskConfigs = this.configuration.getListConfiguration(CoreConstant.JOB_CONTENT);
 
@@ -230,11 +230,11 @@ public class TaskGroupContainer
                         attemptCount = lastExecutor.getAttemptCount() + 1;
                         long now = System.currentTimeMillis();
                         long failedTime = lastExecutor.getTimeStamp();
-                        if (now - failedTime < taskRetryIntervalInMsec) {  //未到等待时间，继续留在队列
+                        if (now - failedTime < taskRetryIntervalInMs) {  //未到等待时间，继续留在队列
                             continue;
                         }
                         if (!lastExecutor.isShutdown()) { //上次失败的task仍未结束
-                            if (now - failedTime > taskMaxWaitInMsec) {
+                            if (now - failedTime > taskMaxWaitInMs) {
                                 markCommunicationFailed(taskId);
                                 reportTaskGroupCommunication(lastTaskGroupContainerCommunication, taskCountInThisTaskGroup);
                                 throw AddaxException.asAddaxException(CommonErrorCode.WAIT_TIME_EXCEED, "task failover等待超时");
@@ -380,7 +380,7 @@ public class TaskGroupContainer
     {
         try {
 
-            // 移除根据JOBID做的一些标记 防止内存溢出
+            // 移除根据JOB ID做的一些标记 防止内存溢出
             LoadUtil.getConfigurationSet().remove(this.jobId);
             Iterator<Map.Entry<Integer, Communication>> it =
                     LocalTGCommunicationManager.getTaskGroupCommunicationMap().entrySet().iterator();

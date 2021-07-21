@@ -143,7 +143,7 @@ public class KuduReader
             }
             catch (KuduException ex) {
                 throw AddaxException.asAddaxException(
-                        KuduReaderErrorCode.UNEXCEPT_EXCEPTION,
+                        KuduReaderErrorCode.UNKNOWN_EXCEPTION,
                         ex.getMessage()
                 );
             }
@@ -185,7 +185,7 @@ public class KuduReader
                 }
                 catch (KuduException ex) {
                     throw AddaxException.asAddaxException(
-                            KuduReaderErrorCode.UNEXCEPT_EXCEPTION,
+                            KuduReaderErrorCode.UNKNOWN_EXCEPTION,
                             ex.getMessage()
                     );
                 }
@@ -261,7 +261,7 @@ public class KuduReader
             }
             catch (KuduException ex) {
                 throw AddaxException.asAddaxException(
-                        KuduReaderErrorCode.UNEXCEPT_EXCEPTION,
+                        KuduReaderErrorCode.UNKNOWN_EXCEPTION,
                         ex.getMessage()
                 );
             }
@@ -292,7 +292,7 @@ public class KuduReader
             }
             catch (KuduException ex) {
                 throw AddaxException.asAddaxException(
-                        KuduReaderErrorCode.UNEXCEPT_EXCEPTION,
+                        KuduReaderErrorCode.UNKNOWN_EXCEPTION,
                         ex.getMessage()
                 );
             }

@@ -90,7 +90,7 @@ public class HBase20xSQLReaderTask
                 Record record = recordSender.createRecord();
                 rsNextUsedTime += (System.nanoTime() - lastTime);
                 for (int i = 1; i <= columnNum; i++) {
-                    Column column = this.convertPhoenixValueToDataxColumn(meta.getColumnType(i), resultSet.getObject(i));
+                    Column column = this.convertPhoenixValueToAddaxColumn(meta.getColumnType(i), resultSet.getObject(i));
                     record.addColumn(column);
                 }
                 lastTime = System.nanoTime();
@@ -108,7 +108,7 @@ public class HBase20xSQLReaderTask
         }
     }
 
-    private Column convertPhoenixValueToDataxColumn(int sqlType, Object value)
+    private Column convertPhoenixValueToAddaxColumn(int sqlType, Object value)
     {
         Column column;
         switch (sqlType) {

@@ -67,7 +67,7 @@ public final class RetryUtil
      * @param sleepTimeInMilliSecond 运行失败后休眠对应时间再重试
      * @param exponential 休眠时间是否指数递增
      * @param <T> 返回值类型
-     * @param retryExceptionClasss 出现指定的异常类型时才进行重试
+     * @param retryExceptionClass 出现指定的异常类型时才进行重试
      * @return 经过重试的callable的执行结果
      * @throws Exception 运行异常
      */
@@ -75,11 +75,11 @@ public final class RetryUtil
             int retryTimes,
             long sleepTimeInMilliSecond,
             boolean exponential,
-            List<Class<?>> retryExceptionClasss)
+            List<Class<?>> retryExceptionClass)
             throws Exception
     {
         Retry retry = new Retry();
-        return retry.doRetry(callable, retryTimes, sleepTimeInMilliSecond, exponential, retryExceptionClasss);
+        return retry.doRetry(callable, retryTimes, sleepTimeInMilliSecond, exponential, retryExceptionClass);
     }
 
     /**
@@ -128,7 +128,7 @@ public final class RetryUtil
     private static class Retry
     {
 
-        public <T> T doRetry(Callable<T> callable, int retryTimes, long sleepTimeInMilliSecond, boolean exponential, List<Class<?>> retryExceptionClasss)
+        public <T> T doRetry(Callable<T> callable, int retryTimes, long sleepTimeInMilliSecond, boolean exponential, List<Class<?>> retryExceptionClass)
                 throws Exception
         {
 
@@ -138,7 +138,7 @@ public final class RetryUtil
 
             if (retryTimes < 1) {
                 throw new IllegalArgumentException(String.format(
-                        "系统编程错误, 入参retrytime[%d]不能小于1 !", retryTimes));
+                        "系统编程错误, 入参retryTime[%d]不能小于1 !", retryTimes));
             }
 
             Exception saveException = null;
@@ -152,9 +152,9 @@ public final class RetryUtil
                         LOG.error(String.format("Exception when calling callable, 异常Msg:%s", saveException.getMessage()), saveException);
                     }
 
-                    if (null != retryExceptionClasss && !retryExceptionClasss.isEmpty()) {
+                    if (null != retryExceptionClass && !retryExceptionClass.isEmpty()) {
                         boolean needRetry = false;
-                        for (Class<?> eachExceptionClass : retryExceptionClasss) {
+                        for (Class<?> eachExceptionClass : retryExceptionClass) {
                             if (eachExceptionClass == e.getClass()) {
                                 needRetry = true;
                                 break;

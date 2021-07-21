@@ -26,9 +26,9 @@ public enum HBase20xSQLReaderErrorCode
 {
     REQUIRED_VALUE("Hbasewriter-00", "您缺失了必须填写的参数值."),
     ILLEGAL_VALUE("Hbasewriter-01", "您填写的参数值不合法."),
-    GET_QUERYSERVER_CONNECTION_ERROR("Hbasewriter-02", "获取QueryServer连接时出错."),
+    GET_QUERY_SERVER_CONNECTION_ERROR("Hbasewriter-02", "获取QueryServer连接时出错."),
     GET_PHOENIX_TABLE_ERROR("Hbasewriter-03", "获取 Phoenix table时出错."),
-    GET_TABLE_COLUMNTYPE_ERROR("Hbasewriter-05", "获取表列类型时出错."),
+    GET_TABLE_COLUMN_TYPE_ERROR("Hbasewriter-05", "获取表列类型时出错."),
     CLOSE_PHOENIX_CONNECTION_ERROR("Hbasewriter-06", "关闭JDBC连接时时出错."),
     ILLEGAL_SPLIT_PK("Hbasewriter-07", "非法splitKey配置."),
     PHOENIX_COLUMN_TYPE_CONVERT_ERROR("Hbasewriter-08", "phoenix的列类型转换错误."),

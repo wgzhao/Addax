@@ -84,8 +84,8 @@ public class FtpReader
         private void validateParameter()
         {
             this.protocol = this.originConfig.getNecessaryValue(FtpKey.PROTOCOL, FtpReaderErrorCode.REQUIRED_VALUE);
-            boolean ptrotocolTag = "ftp".equals(this.protocol) || "sftp".equals(this.protocol);
-            if (!ptrotocolTag) {
+            boolean protocolTag = "ftp".equals(this.protocol) || "sftp".equals(this.protocol);
+            if (!protocolTag) {
                 throw AddaxException.asAddaxException(FtpReaderErrorCode.ILLEGAL_VALUE,
                         String.format("仅支持 ftp和sftp 传输协议 , 不支持您配置的传输协议: [%s]", protocol));
             }

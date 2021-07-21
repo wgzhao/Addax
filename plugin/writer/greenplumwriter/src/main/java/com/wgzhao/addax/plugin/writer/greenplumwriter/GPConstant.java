@@ -33,7 +33,7 @@ public class GPConstant
 
     public static final char ESCAPE = '\\';
 
-    // 因为 GPDB 服务端 对 COPY FROM 的 CSV 格式做了这样的限制，如果单个元组大于4 MB，只能使用 insert
+    // 因为 GP DB 服务端 对 COPY FROM 的 CSV 格式做了这样的限制，如果单个元组大于4 MB，只能使用 insert
     public static final int MAX_CSV_SIZE = 4194304;
 
     //  线程异步队列大小，增大此参数增加内存消耗，提升性能

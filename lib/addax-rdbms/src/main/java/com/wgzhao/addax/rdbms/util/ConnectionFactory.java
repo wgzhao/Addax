@@ -29,9 +29,9 @@ import java.sql.Connection;
 public interface ConnectionFactory
 {
 
-    Connection getConnecttion();
+    Connection getConnection();
 
-    Connection getConnecttionWithoutRetry();
+    Connection getConnectionWithoutRetry();
 
     String getConnectionInfo();
 }
