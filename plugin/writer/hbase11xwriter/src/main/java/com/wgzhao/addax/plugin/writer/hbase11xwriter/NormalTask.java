@@ -119,7 +119,7 @@ public class NormalTask
             }
         }
         else {
-            //指定列作为版本,long/doubleColumn直接record.aslong, 其它类型尝试用yyyy-MM-dd HH:mm:ss,yyyy-MM-dd HH:mm:ss SSS去format
+            //指定列作为版本,long/doubleColumn直接record.asLong, 其它类型尝试用yyyy-MM-dd HH:mm:ss,yyyy-MM-dd HH:mm:ss SSS去format
             if (index >= record.getColumnNumber()) {
                 throw AddaxException.asAddaxException(Hbase11xWriterErrorCode.CONSTRUCT_VERSION_ERROR,
                         String.format("The field[index] of versionColumn is out-range, it should be less than %s. actually got %s.", record.getColumnNumber(), index));

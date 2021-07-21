@@ -153,7 +153,7 @@ public class TxtFileWriter
             }
             else if ("nonConflict".equals(writeMode)) {
                 LOG.info("由于您配置了writeMode nonConflict, 开始检查 [{}] 下面的内容", path);
-                // warn: check two times about exists, mkdirs
+                // warn: check two times about exists, mkdir
                 if (dir.exists()) {
                     if (!dir.canRead()) {
                         throw AddaxException.asAddaxException(TxtFileWriterErrorCode.SECURITY_NOT_ENOUGH, String.format("您没有权限查看目录 : [%s]", path));
@@ -254,8 +254,8 @@ public class TxtFileWriter
             OutputStream outputStream = null;
             try {
                 File newFile = new File(fileFullPath);
-                boolean isSucess = newFile.createNewFile();
-                assert isSucess;
+                boolean isSuccess = newFile.createNewFile();
+                assert isSuccess;
                 outputStream = new FileOutputStream(newFile);
                 StorageWriterUtil.writeToStream(lineReceiver, outputStream, this.writerSliceConfig, this.fileName, this.getTaskPluginCollector());
             }

@@ -39,8 +39,8 @@ public enum Hbase11xWriterErrorCode
     TRUNCATE_HBASE_ERROR("Hbasewriter-09", "Exception occurred while truncating table"),
     CONSTRUCT_ROWKEY_ERROR("Hbasewriter-10", "Failed to create rowkey."),
     CONSTRUCT_VERSION_ERROR("Hbasewriter-11", "Failed to put version."),
-    GET_HBASE_BUFFEREDMUTATOR_ERROR("Hbasewriter-12", "Failed to get the BufferedMutator."),
-    CLOSE_HBASE_BUFFEREDMUTATOR_ERROR("Hbasewriter-13", "Failed to close BufferedMutator handler."),
+    GET_HBASE_BUFFERED_MUTATOR_ERROR("Hbasewriter-12", "Failed to get the BufferedMutator."),
+    CLOSE_HBASE_BUFFERED_MUTATOR_ERROR("Hbasewriter-13", "Failed to close BufferedMutator handler."),
     KERBEROS_LOGIN_ERROR("Hbasewriter-14", "Kerberos authentication failed.")
     ;
     private final String code;

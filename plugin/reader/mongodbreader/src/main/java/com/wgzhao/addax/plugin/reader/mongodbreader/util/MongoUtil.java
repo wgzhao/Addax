@@ -58,7 +58,7 @@ public class MongoUtil
             throw AddaxException.asAddaxException(MongoDBReaderErrorCode.ILLEGAL_VALUE, "不合法参数");
         }
         catch (Exception e) {
-            throw AddaxException.asAddaxException(MongoDBReaderErrorCode.UNEXCEPT_EXCEPTION, "未知异常");
+            throw AddaxException.asAddaxException(MongoDBReaderErrorCode.UNKNOWN_EXCEPTION, "未知异常");
         }
     }
 
@@ -80,7 +80,7 @@ public class MongoUtil
             throw AddaxException.asAddaxException(MongoDBReaderErrorCode.ILLEGAL_VALUE, "不合法参数");
         }
         catch (Exception e) {
-            throw AddaxException.asAddaxException(MongoDBReaderErrorCode.UNEXCEPT_EXCEPTION, "未知异常");
+            throw AddaxException.asAddaxException(MongoDBReaderErrorCode.UNKNOWN_EXCEPTION, "未知异常");
         }
     }
 

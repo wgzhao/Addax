@@ -66,7 +66,7 @@ public class CollectionSplitUtil
             Configuration conf = originalSliceConfig.clone();
             conf.set(KeyConstant.LOWER_BOUND, range.lowerBound);
             conf.set(KeyConstant.UPPER_BOUND, range.upperBound);
-            conf.set(KeyConstant.IS_OBJECTID, isObjectId);
+            conf.set(KeyConstant.IS_OBJECT_ID, isObjectId);
             confList.add(conf);
         }
         return confList;
@@ -122,7 +122,7 @@ public class CollectionSplitUtil
         }
         catch (MongoCommandException e) {
             if (e.getErrorCode() == KeyConstant.MONGO_UNAUTHORIZED_ERR_CODE ||
-                    e.getErrorCode() == KeyConstant.MONGO_ILLEGALOP_ERR_CODE ||
+                    e.getErrorCode() == KeyConstant.MONGO_ILLEGAL_OP_ERR_CODE ||
                     e.getErrorCode() == KeyConstant.MONGO_COMMAND_NOT_FOUND_CODE) {
                 supportSplitVector = false;
             }

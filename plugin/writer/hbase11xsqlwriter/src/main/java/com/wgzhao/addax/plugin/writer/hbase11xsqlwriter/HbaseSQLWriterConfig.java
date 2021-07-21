@@ -105,10 +105,10 @@ public class HbaseSQLWriterConfig
         return cfg;
     }
 
-    private static void parseClusterConfig(HbaseSQLWriterConfig cfg, Configuration dataxCfg)
+    private static void parseClusterConfig(HbaseSQLWriterConfig cfg, Configuration jobConf)
     {
         // 获取hbase集群的连接信息字符串
-        String hbaseCfg = dataxCfg.getString(HBaseKey.HBASE_CONFIG);
+        String hbaseCfg = jobConf.getString(HBaseKey.HBASE_CONFIG);
         if (StringUtils.isBlank(hbaseCfg)) {
             // 集群配置必须存在且不为空
             throw AddaxException.asAddaxException(
@@ -117,7 +117,7 @@ public class HbaseSQLWriterConfig
                             HBaseKey.HBASE_CONFIG, HConstants.ZOOKEEPER_QUORUM, HConstants.ZOOKEEPER_ZNODE_PARENT));
         }
 
-        if (dataxCfg.getBool(HBaseKey.THIN_CLIENT, HBaseConstant.DEFAULT_USE_THIN_CLIENT)) {
+        if (jobConf.getBool(HBaseKey.THIN_CLIENT, HBaseConstant.DEFAULT_USE_THIN_CLIENT)) {
             Map<String, String> thinConnectConfig = HbaseSQLHelper.getThinConnectConfig(hbaseCfg);
             String thinConnectStr = thinConnectConfig.get(HBaseKey.HBASE_THIN_CONNECT_URL);
             cfg.namespace = thinConnectConfig.get(HBaseKey.HBASE_THIN_CONNECT_NAMESPACE);

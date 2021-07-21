@@ -34,7 +34,7 @@ public enum JsonReaderErrorCode
     READ_FILE_IO_ERROR("JsonFilereader-07", "您配置的文件在读取时出现IO异常."),
     SECURITY_NOT_ENOUGH("JsonFilereader-08", "您缺少权限执行相应的文件操作."),
     CONFIG_INVALID_EXCEPTION("JsonFilereader-09", "您的参数配置错误."),
-    NOT_SUPPORT_TYPE("JsonFilereaderr-10", "您配置的列类型暂不支持."),
+    NOT_SUPPORT_TYPE("JsonFilereader-10", "您配置的列类型暂不支持."),
     EMPTY_DIR_EXCEPTION("JsonFilereader-11", "您尝试读取的文件目录为空."),
     ;
 

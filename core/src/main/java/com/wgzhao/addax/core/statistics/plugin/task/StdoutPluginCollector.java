@@ -43,7 +43,7 @@ public class StdoutPluginCollector
     private static final Logger LOG = LoggerFactory
             .getLogger(StdoutPluginCollector.class);
 
-    private static final int DEFAULT_MAX_DIRTYNUM = 128;
+    private static final int DEFAULT_MAX_DIRTY_NUM = 128;
     private final AtomicInteger currentLogNum = new AtomicInteger(0);
     private AtomicInteger maxLogNum = new AtomicInteger(0);
 
@@ -54,7 +54,7 @@ public class StdoutPluginCollector
         maxLogNum = new AtomicInteger(
                 configuration.getInt(
                         CoreConstant.CORE_STATISTICS_COLLECTOR_PLUGIN_MAX_DIRTY_NUMBER,
-                        DEFAULT_MAX_DIRTYNUM));
+                        DEFAULT_MAX_DIRTY_NUM));
     }
 
     private String formatDirty(final Record dirty, final Throwable t,

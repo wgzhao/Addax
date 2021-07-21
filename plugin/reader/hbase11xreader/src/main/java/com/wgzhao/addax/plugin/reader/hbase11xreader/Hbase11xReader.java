@@ -94,7 +94,7 @@ public class Hbase11xReader
                 this.hbaseTaskProxy.prepare();
             }
             catch (Exception e) {
-                throw AddaxException.asAddaxException(Hbase11xReaderErrorCode.PREPAR_READ_ERROR, e);
+                throw AddaxException.asAddaxException(Hbase11xReaderErrorCode.PREPARE_READ_ERROR, e);
             }
         }
 

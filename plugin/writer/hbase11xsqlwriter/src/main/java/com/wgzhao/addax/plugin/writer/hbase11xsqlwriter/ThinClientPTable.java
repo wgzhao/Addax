@@ -136,13 +136,13 @@ public class ThinClientPTable
     }
 
     @Override
-    public PColumn getColumnForColumnName(String colname)
+    public PColumn getColumnForColumnName(String colName)
             throws ColumnNotFoundException
     {
-        if (!colMap.containsKey(colname)) {
-            throw new ColumnNotFoundException("Col " + colname + " not found");
+        if (!colMap.containsKey(colName)) {
+            throw new ColumnNotFoundException("Col " + colName + " not found");
         }
-        return colMap.get(colname);
+        return colMap.get(colName);
     }
 
     @Override

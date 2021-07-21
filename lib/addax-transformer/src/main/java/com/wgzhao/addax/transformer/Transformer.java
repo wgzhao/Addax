@@ -27,7 +27,7 @@ import com.wgzhao.addax.common.element.Record;
  */
 public abstract class Transformer
 {
-    //transformerName的唯一性在datax中检查，或者提交到插件中心检查。
+    //transformerName的唯一性在 addax 中检查，或者提交到插件中心检查。
     private String transformerName;
 
     public String getTransformerName()

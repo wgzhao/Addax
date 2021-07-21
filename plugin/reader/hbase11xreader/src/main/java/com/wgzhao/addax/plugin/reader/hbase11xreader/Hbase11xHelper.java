@@ -320,7 +320,7 @@ public class Hbase11xHelper
     }
 
     //将多竖表column变成<familyQualifier,<>>形式
-    public static HashMap<String, HashMap<String, String>> parseColumnOfMultiversionMode(List<Map> column)
+    public static HashMap<String, HashMap<String, String>> parseColumnOfMultiVersionMode(List<Map> column)
     {
 
         HashMap<String, HashMap<String, String>> familyQualifierMap = new HashMap<>();
@@ -404,13 +404,13 @@ public class Hbase11xHelper
             }
 
             // 如果当前的region不是最后一个region，
-            // 用户配置的userStartKey大于等于region的endkey,则这个region不应该含在内
+            // 用户配置的userStartKey大于等于region的end key,则这个region不应该含在内
             if ((Bytes.compareTo(regionEndKey, HConstants.EMPTY_BYTE_ARRAY) != 0)
                     && (Bytes.compareTo(startRowkeyByte, regionEndKey) >= 0)) {
                 continue;
             }
 
-            // 如果用户配置的userEndKey小于等于 region的startkey,则这个region不应该含在内
+            // 如果用户配置的userEndKey小于等于 region的start key,则这个region不应该含在内
             // 注意如果用户指定的userEndKey为"",则次判断应该不成立。userEndKey为""表示取得最大的region
             if (endRowkeyByte.length != 0
                     && (Bytes.compareTo(endRowkeyByte, regionStartKey) <= 0)) {
@@ -537,7 +537,7 @@ public class Hbase11xHelper
                 // multiVersionFixedColumn 模式需要配置 maxVersion
                 checkMaxVersion(originalConfig, mode);
 
-                Hbase11xHelper.parseColumnOfMultiversionMode(column);
+                Hbase11xHelper.parseColumnOfMultiVersionMode(column);
                 break;
             }
             default:

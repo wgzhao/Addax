@@ -316,7 +316,7 @@ public class ESWriter
             }
 
             String msg = String.format("task end, write size :%d", total);
-            getTaskPluginCollector().collectMessage("writesize", String.valueOf(total));
+            getTaskPluginCollector().collectMessage("writeSize", String.valueOf(total));
             log.info(msg);
             esClient.closeJestClient();
         }
@@ -346,7 +346,7 @@ public class ESWriter
         private long doBatchInsert(final List<Record> writerBuffer)
         {
             Map<String, Object> data = null;
-            final Bulk.Builder bulkaction = new Bulk.Builder().defaultIndex(this.index).defaultType(this.type);
+            final Bulk.Builder bulkAction = new Bulk.Builder().defaultIndex(this.index).defaultType(this.type);
             for (Record record : writerBuffer) {
                 data = new HashMap<>();
                 String id = null;
@@ -427,10 +427,10 @@ public class ESWriter
 
                 if (id == null) {
                     //id = UUID.randomUUID().toString()
-                    bulkaction.addAction(new Index.Builder(data).build());
+                    bulkAction.addAction(new Index.Builder(data).build());
                 }
                 else {
-                    bulkaction.addAction(new Index.Builder(data).id(id).build());
+                    bulkAction.addAction(new Index.Builder(data).id(id).build());
                 }
             }
 
@@ -441,7 +441,7 @@ public class ESWriter
                     public Integer call()
                             throws Exception
                     {
-                        JestResult jestResult = esClient.bulkInsert(bulkaction, 1);
+                        JestResult jestResult = esClient.bulkInsert(bulkAction, 1);
                         if (jestResult.isSucceeded()) {
                             return writerBuffer.size();
                         }

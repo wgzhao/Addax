@@ -51,7 +51,7 @@ public abstract class HbaseAbstractTask
     private final byte[] startKey;
     private final byte[] endKey;
 
-    protected Table htable;
+    protected Table hTable;
     protected String encoding;
     protected int scanCacheSize;
     protected int scanBatchSize;
@@ -63,7 +63,7 @@ public abstract class HbaseAbstractTask
     public HbaseAbstractTask(Configuration configuration)
     {
 
-        this.htable = Hbase11xHelper.getTable(configuration);
+        this.hTable = Hbase11xHelper.getTable(configuration);
 
         this.encoding = configuration.getString(HBaseKey.ENCODING, HBaseConstant.DEFAULT_ENCODING);
         this.startKey = Hbase11xHelper.convertInnerStartRowkey(configuration);
@@ -86,7 +86,7 @@ public abstract class HbaseAbstractTask
         this.scan.withStartRow(startKey);
         this.scan.withStopRow(endKey);
         LOG.info("The task set startRowkey=[{}], endRowkey=[{}].", Bytes.toStringBinary(this.startKey), Bytes.toStringBinary(this.endKey));
-        //scan的Caching Batch全部留在hconfig中每次从服务器端读取的行数，设置默认值未256
+        //scan的Caching Batch全部留在hConfig中每次从服务器端读取的行数，设置默认值未256
         this.scan.setCaching(this.scanCacheSize);
         //设置获取记录的列个数，hbase默认无限制，也就是返回所有的列,这里默认是100
         this.scan.setBatch(this.scanBatchSize);
@@ -94,13 +94,13 @@ public abstract class HbaseAbstractTask
         this.scan.setCacheBlocks(false);
         initScan(this.scan);
 
-        this.resultScanner = this.htable.getScanner(this.scan);
+        this.resultScanner = this.hTable.getScanner(this.scan);
     }
 
     public void close()
     {
         Hbase11xHelper.closeResultScanner(this.resultScanner);
-        Hbase11xHelper.closeTable(this.htable);
+        Hbase11xHelper.closeTable(this.hTable);
     }
 
     protected Result getNextHbaseRow()
@@ -114,7 +114,7 @@ public abstract class HbaseAbstractTask
             if (lastResult != null) {
                 this.scan.withStopRow(lastResult.getRow());
             }
-            resultScanner = this.htable.getScanner(scan);
+            resultScanner = this.hTable.getScanner(scan);
             result = resultScanner.next();
             if (lastResult != null && Bytes.equals(lastResult.getRow(), result.getRow())) {
                 result = resultScanner.next();

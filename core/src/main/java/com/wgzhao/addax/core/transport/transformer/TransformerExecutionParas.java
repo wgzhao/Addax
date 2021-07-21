@@ -59,7 +59,7 @@ public class TransformerExecutionParas
         this.paras = paras;
     }
 
-    public Map<String, Object> gettContext()
+    public Map<String, Object> getContext()
     {
         return tContext;
     }

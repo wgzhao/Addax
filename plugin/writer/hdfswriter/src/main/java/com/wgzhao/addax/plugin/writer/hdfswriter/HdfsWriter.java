@@ -109,8 +109,8 @@ public class HdfsWriter
                     if (eachColumnConf.getString(Key.TYPE).toUpperCase().startsWith("DECIMAL")) {
                         String type = eachColumnConf.getString(Key.TYPE);
                         eachColumnConf.set(Key.TYPE, "decimal");
-                        eachColumnConf.set(Key.PRECISION, getDecimalprec(type));
-                        eachColumnConf.set(Key.SCALE, getDecimalscale(type));
+                        eachColumnConf.set(Key.PRECISION, getDecimalPrecision(type));
+                        eachColumnConf.set(Key.SCALE, getDecimalScale(type));
                         columns.set(i, eachColumnConf);
                         rewriteFlag = true;
                     }
@@ -392,7 +392,7 @@ public class HdfsWriter
          * @param type decimal type including precision and scale (if present)
          * @return decimal precision
          */
-        private static int getDecimalprec(String type)
+        private static int getDecimalPrecision(String type)
         {
             if (!type.contains("(")) {
                 return Constant.DEFAULT_DECIMAL_PRECISION;
@@ -408,7 +408,7 @@ public class HdfsWriter
         /**
          * get decimal type scale
          * if precision is not present, return DECIMAL_DEFAULT_SCALE
-         * if precision is present and not speicify scale, return 0
+         * if precision is present and not specify scale, return 0
          * example:
          * <pre>
          *  decimal -&gt; 10
@@ -418,7 +418,7 @@ public class HdfsWriter
          * @param type decimal type string, including precision and scale (if present)
          * @return decimal scale
          */
-        private static int getDecimalscale(String type)
+        private static int getDecimalScale(String type)
         {
             if (! type.contains("(")) {
                 return Constant.DEFAULT_DECIMAL_SCALE;

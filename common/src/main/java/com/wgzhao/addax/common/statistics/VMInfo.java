@@ -36,7 +36,6 @@ import java.util.Map;
  */
 public class VMInfo
 {
-    public static final Object lock = new Object();
     static final long MB = 1024L * 1024L;
     static final long GB = 1024 * 1024 * 1024L;
     private static final Logger LOG = LoggerFactory.getLogger(VMInfo.class);
@@ -61,7 +60,7 @@ public class VMInfo
     private final PhyOSStatus startPhyOSStatus;
     private final ProcessCpuStatus processCpuStatus = new ProcessCpuStatus();
     private final ProcessGCStatus processGCStatus = new ProcessGCStatus();
-    private final ProcessMemoryStatus processMomoryStatus = new ProcessMemoryStatus();
+    private final ProcessMemoryStatus processMemoryStatus = new ProcessMemoryStatus();
     //ms
     private long lastUpTime = 0;
     //nano
@@ -104,7 +103,7 @@ public class VMInfo
                 memoryStatus.name = pool.getName();
                 memoryStatus.initSize = pool.getUsage().getInit();
                 memoryStatus.maxSize = pool.getUsage().getMax();
-                processMomoryStatus.memoryStatusMap.put(pool.getName(), memoryStatus);
+                processMemoryStatus.memoryStatusMap.put(pool.getName(), memoryStatus);
             }
         }
     }
@@ -148,8 +147,8 @@ public class VMInfo
                 + "\tjvmInfo:\t" + jvmInfo + "\n"
                 + "\tcpu num:\t" + totalProcessorCount + "\n\n"
                 + startPhyOSStatus.toString() + "\n"
-                + processGCStatus.toString() + "\n"
-                + processMomoryStatus.toString() + "\n";
+                + processGCStatus + "\n"
+                + processMemoryStatus + "\n";
     }
 
     public String totalString()
@@ -194,11 +193,11 @@ public class VMInfo
             if (memoryPoolMXBeanList != null && !memoryPoolMXBeanList.isEmpty()) {
                 for (MemoryPoolMXBean pool : memoryPoolMXBeanList) {
 
-                    MemoryStatus memoryStatus = processMomoryStatus.memoryStatusMap.get(pool.getName());
+                    MemoryStatus memoryStatus = processMemoryStatus.memoryStatusMap.get(pool.getName());
                     if (memoryStatus == null) {
                         memoryStatus = new MemoryStatus();
                         memoryStatus.name = pool.getName();
-                        processMomoryStatus.memoryStatusMap.put(pool.getName(), memoryStatus);
+                        processMemoryStatus.memoryStatusMap.put(pool.getName(), memoryStatus);
                     }
                     memoryStatus.commitedSize = pool.getUsage().getCommitted();
                     memoryStatus.setMaxMinUsedSize(pool.getUsage().getUsed());
@@ -208,7 +207,7 @@ public class VMInfo
             }
 
             if (print) {
-                LOG.info(processCpuStatus.getDeltaString() + processMomoryStatus.getDeltaString() + processGCStatus.getDeltaString());
+                LOG.info(processCpuStatus.getDeltaString() + processMemoryStatus.getDeltaString() + processGCStatus.getDeltaString());
             }
         }
         catch (Exception e) {
@@ -311,7 +310,7 @@ public class VMInfo
                         ms.name, String.format("%,.2f", (float) ms.usedSize / MB) + "MB",
                         String.format("%,.2f", ms.percent) + "%",
                         String.format("%,.2f", (float) ms.maxUsedSize / MB) + "MB",
-                        String.format("%,.2f", ms.maxpercent) + "%"));
+                        String.format("%,.2f", ms.maxPercent) + "%"));
             }
             return sb.toString();
         }
@@ -367,7 +366,7 @@ public class VMInfo
         long usedSize;
         float percent;
         long maxUsedSize = -1;
-        float maxpercent = 0;
+        float maxPercent = 0;
 
         void setMaxMinUsedSize(long curUsedSize)
         {
@@ -379,8 +378,8 @@ public class VMInfo
 
         void setMaxMinPercent(float curPercent)
         {
-            if (maxpercent < curPercent) {
-                maxpercent = curPercent;
+            if (maxPercent < curPercent) {
+                maxPercent = curPercent;
             }
             this.percent = curPercent;
         }

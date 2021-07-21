@@ -171,7 +171,7 @@ public class StreamWriter
         private String path;
         private String fileName;
 
-        private long recordNumBeforSleep;
+        private long recordNumBeforeSleep;
         private long sleepTime;
 
         @Override
@@ -185,9 +185,9 @@ public class StreamWriter
 
             this.path = writerSliceConfig.getString(StreamKey.PATH, null);
             this.fileName = writerSliceConfig.getString(StreamKey.FILE_NAME, null);
-            this.recordNumBeforSleep = writerSliceConfig.getLong(StreamKey.RECORD_NUM_BEFORE_SLEEP, 0);
+            this.recordNumBeforeSleep = writerSliceConfig.getLong(StreamKey.RECORD_NUM_BEFORE_SLEEP, 0);
             this.sleepTime = writerSliceConfig.getLong(StreamKey.SLEEP_TIME, 0);
-            if (recordNumBeforSleep < 0) {
+            if (recordNumBeforeSleep < 0) {
                 throw AddaxException.asAddaxException(StreamWriterErrorCode.CONFIG_INVALID_EXCEPTION, "recordNumber 不能为负值");
             }
             if (sleepTime < 0) {
@@ -206,7 +206,7 @@ public class StreamWriter
         {
 
             if (StringUtils.isNoneBlank(path) && StringUtils.isNoneBlank(fileName)) {
-                writeToFile(recordReceiver, path, fileName, recordNumBeforSleep, sleepTime);
+                writeToFile(recordReceiver, path, fileName, recordNumBeforeSleep, sleepTime);
             }
             else if (this.print) {
                 try {
@@ -226,7 +226,7 @@ public class StreamWriter
         }
 
         private void writeToFile(RecordReceiver recordReceiver, String path, String fileName,
-                long recordNumBeforSleep, long sleepTime)
+                long recordNumBeforeSleep, long sleepTime)
         {
 
             LOG.info("begin do write...");
@@ -246,8 +246,8 @@ public class StreamWriter
                 Record record;
                 int count = 0;
                 while ((record = recordReceiver.getFromReader()) != null) {
-                    if (recordNumBeforSleep > 0 && sleepTime > 0 && count == recordNumBeforSleep) {
-                        LOG.info("StreamWriter start to sleep ... recordNumBeforSleep={},sleepTime={}", recordNumBeforSleep, sleepTime);
+                    if (recordNumBeforeSleep > 0 && sleepTime > 0 && count == recordNumBeforeSleep) {
+                        LOG.info("StreamWriter start to sleep ... recordNumBeforeSleep={},sleepTime={}", recordNumBeforeSleep, sleepTime);
                         Thread.sleep(sleepTime * 1000L);
                     }
                     writer.write(recordToString(record));

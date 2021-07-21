@@ -44,9 +44,9 @@ public class SqlServerRdbmsReader
             super(dataBaseType);
         }
 
-        public Task(DataBaseType dataBaseType, int taskGropuId, int taskId)
+        public Task(DataBaseType dataBaseType, int taskGroupId, int taskId)
         {
-            super(dataBaseType, taskGropuId, taskId);
+            super(dataBaseType, taskGroupId, taskId);
         }
     }
 

@@ -100,7 +100,7 @@ public class FilterTransformer
                 return doLess(record, value, column, true);
             }
             else {
-                throw new RuntimeException("dx_filter can't suport code:" + code);
+                throw new RuntimeException("dx_filter code:" + code + " is unsupported");
             }
         }
         catch (Exception e) {
@@ -383,8 +383,8 @@ public class FilterTransformer
 
     private Record doLike(Record record, String value, Column column)
     {
-        String orivalue = column.asString();
-        if (orivalue != null && orivalue.matches(value)) {
+        String originalValue = column.asString();
+        if (originalValue != null && originalValue.matches(value)) {
             return null;
         }
         else {
@@ -394,8 +394,8 @@ public class FilterTransformer
 
     private Record doNotLike(Record record, String value, Column column)
     {
-        String orivalue = column.asString();
-        if (orivalue != null && orivalue.matches(value)) {
+        String originalValue = column.asString();
+        if (originalValue != null && originalValue.matches(value)) {
             return record;
         }
         else {

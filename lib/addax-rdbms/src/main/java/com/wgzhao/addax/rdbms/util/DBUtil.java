@@ -221,7 +221,7 @@ public final class DBUtil {
     public static Connection getConnection(DataBaseType dataBaseType,
                                            String jdbcUrl, String username, String password) {
 
-        return getConnection(dataBaseType, jdbcUrl, username, password, String.valueOf(Constant.SOCKET_TIMEOUT_INSECOND * 1000));
+        return getConnection(dataBaseType, jdbcUrl, username, password, String.valueOf(Constant.SOCKET_TIMEOUT_SECOND * 1000));
     }
 
     public static Connection getConnection(DataBaseType dataBaseType,
@@ -253,7 +253,7 @@ public final class DBUtil {
     public static Connection getConnectionWithoutRetry(DataBaseType dataBaseType,
                                                        String jdbcUrl, String username, String password) {
         return getConnectionWithoutRetry(dataBaseType, jdbcUrl, username,
-                password, String.valueOf(Constant.SOCKET_TIMEOUT_INSECOND * 1000));
+                password, String.valueOf(Constant.SOCKET_TIMEOUT_SECOND * 1000));
     }
 
     public static Connection getConnectionWithoutRetry(DataBaseType dataBaseType,
@@ -264,7 +264,7 @@ public final class DBUtil {
 
     private static synchronized Connection connect(DataBaseType dataBaseType,
                                                    String url, String user, String pass) {
-        return connect(dataBaseType, url, user, pass, String.valueOf(Constant.SOCKET_TIMEOUT_INSECOND * 1000));
+        return connect(dataBaseType, url, user, pass, String.valueOf(Constant.SOCKET_TIMEOUT_SECOND * 1000));
     }
 
     private static synchronized Connection connect(DataBaseType dataBaseType,
@@ -328,7 +328,7 @@ public final class DBUtil {
     public static ResultSet query(Connection conn, String sql, int fetchSize)
             throws SQLException {
         // 默认3600 s 的query Timeout
-        return query(conn, sql, fetchSize, Constant.SOCKET_TIMEOUT_INSECOND);
+        return query(conn, sql, fetchSize, Constant.SOCKET_TIMEOUT_SECOND);
     }
 
     /**
@@ -545,7 +545,7 @@ public final class DBUtil {
         try (Statement stmt = conn.createStatement(ResultSet.TYPE_FORWARD_ONLY,
                 ResultSet.CONCUR_READ_ONLY)) {
             //默认3600 seconds
-            stmt.setQueryTimeout(Constant.SOCKET_TIMEOUT_INSECOND);
+            stmt.setQueryTimeout(Constant.SOCKET_TIMEOUT_SECOND);
             return query(stmt, sql);
         }
     }

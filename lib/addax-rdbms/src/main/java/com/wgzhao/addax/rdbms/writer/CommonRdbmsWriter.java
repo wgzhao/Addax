@@ -487,14 +487,14 @@ public class CommonRdbmsWriter
                 throws SQLException
         {
             for (int i = 0; i < record.getColumnNumber(); i++) {
-                int columnSqltype = this.resultSetMetaData.getMiddle().get(i);
+                int columnSqlType = this.resultSetMetaData.getMiddle().get(i);
                 preparedStatement = fillPreparedStatementColumnType(preparedStatement, i+1,
-                        columnSqltype, record.getColumn(i));
+                        columnSqlType, record.getColumn(i));
             }
             return preparedStatement;
         }
 
-        protected PreparedStatement fillPreparedStatementColumnType(PreparedStatement preparedStatement, int columnIndex, int columnSqltype, Column column)
+        protected PreparedStatement fillPreparedStatementColumnType(PreparedStatement preparedStatement, int columnIndex, int columnSqlType, Column column)
                 throws SQLException
         {
             if (column == null || column.getRawData() == null) {
@@ -502,7 +502,7 @@ public class CommonRdbmsWriter
                 return preparedStatement;
             }
             java.util.Date utilDate;
-            switch (columnSqltype) {
+            switch (columnSqlType) {
                 case Types.CHAR:
                 case Types.NCHAR:
                 case Types.CLOB:
@@ -585,7 +585,7 @@ public class CommonRdbmsWriter
                     }
                     // Bug: java.sql.Time does not have sufficient precision for new MySQL Time columns
                     // https://bugs.openjdk.java.net/browse/JDK-8186415
-                    // TODO: set time with Fractinal Seconds
+                    // TODO: set time with Fractional Seconds
                     preparedStatement.setTime(columnIndex, sqlTime);
                     break;
 

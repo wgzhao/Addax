@@ -43,7 +43,7 @@ public class TransformerRegistry
 {
 
     private static final Logger LOG = LoggerFactory.getLogger(TransformerRegistry.class);
-    private static final Map<String, TransformerInfo> registedTransformer = new HashMap<>();
+    private static final Map<String, TransformerInfo> registeredTransformer = new HashMap<>();
 
     public static void loadTransformerFromLocalStorage()
     {
@@ -95,7 +95,7 @@ public class TransformerRegistry
         String funName = transformerConfiguration.getString("name");
         if (!each.equals(funName)) {
             LOG.warn("transformer({}) name not match transformer.json config name[{}], " +
-                            "will ignore json's name, path = {}, config = {}",
+                            "will ignore json  name, path = {}, config = {}",
                     each, funName, transformerPath, transformerConfiguration.beautify());
         }
 
@@ -104,18 +104,18 @@ public class TransformerRegistry
             Object transformer = transformerClass.newInstance();
             if (ComplexTransformer.class.isAssignableFrom(transformer.getClass())) {
                 ((ComplexTransformer) transformer).setTransformerName(each);
-                registComplexTransformer((ComplexTransformer) transformer, jarLoader, false);
+                registryComplexTransformer((ComplexTransformer) transformer, jarLoader, false);
             }
             else if (Transformer.class.isAssignableFrom(transformer.getClass())) {
                 ((Transformer) transformer).setTransformerName(each);
-                registTransformer((Transformer) transformer, jarLoader, false);
+                registryTransformer((Transformer) transformer, jarLoader, false);
             }
             else {
                 LOG.error("load Transformer class({}) error, path = {}", className, transformerPath);
             }
         }
         catch (Exception e) {
-            //错误funciton跳过
+            //error, skip function
             LOG.error("skip transformer({}),load Transformer class error, path = {} ", each, transformerPath, e);
         }
     }
@@ -132,44 +132,44 @@ public class TransformerRegistry
         // todo 再尝试从disk读取
         //}
 
-        return registedTransformer.get(transformerName);
+        return registeredTransformer.get(transformerName);
     }
 
-    public static synchronized void registTransformer(Transformer transformer)
+    public static synchronized void registryTransformer(Transformer transformer)
     {
-        registTransformer(transformer, null, true);
+        registryTransformer(transformer, null, true);
     }
 
-    public static synchronized void registTransformer(Transformer transformer,
+    public static synchronized void registryTransformer(Transformer transformer,
             ClassLoader classLoader, boolean isNative)
     {
 
         checkName(transformer.getTransformerName(), isNative);
 
-        if (registedTransformer.containsKey(transformer.getTransformerName())) {
+        if (registeredTransformer.containsKey(transformer.getTransformerName())) {
             throw AddaxException.asAddaxException(
                     TransformerErrorCode.TRANSFORMER_DUPLICATE_ERROR,
                     " name=" + transformer.getTransformerName());
         }
 
-        registedTransformer.put(transformer.getTransformerName(),
+        registeredTransformer.put(transformer.getTransformerName(),
                 buildTransformerInfo(new ComplexTransformerProxy(transformer),
                         isNative, classLoader));
     }
 
-    public static synchronized void registComplexTransformer(ComplexTransformer complexTransformer,
+    public static synchronized void registryComplexTransformer(ComplexTransformer complexTransformer,
             ClassLoader classLoader, boolean isNative)
     {
 
         checkName(complexTransformer.getTransformerName(), isNative);
 
-        if (registedTransformer.containsKey(complexTransformer.getTransformerName())) {
+        if (registeredTransformer.containsKey(complexTransformer.getTransformerName())) {
             throw AddaxException.asAddaxException(
                     TransformerErrorCode.TRANSFORMER_DUPLICATE_ERROR,
                     " name=" + complexTransformer.getTransformerName());
         }
 
-        registedTransformer.put(complexTransformer.getTransformerName(),
+        registeredTransformer.put(complexTransformer.getTransformerName(),
                 buildTransformerInfo(complexTransformer, isNative, classLoader));
     }
 
@@ -204,9 +204,9 @@ public class TransformerRegistry
         return transformerInfo;
     }
 
-    public static List<String> getAllSuportTransformer()
+    public static List<String> getAllSupportTransformer()
     {
-        return new ArrayList<>(registedTransformer.keySet());
+        return new ArrayList<>(registeredTransformer.keySet());
     }
 
     static {
@@ -214,11 +214,11 @@ public class TransformerRegistry
          * add native transformer
          * local storage and from server will be delay load.
          */
-        registTransformer(new FilterTransformer());
-        registTransformer(new GroovyTransformer());
-        registTransformer(new MapTransformer());
-        registTransformer(new PadTransformer());
-        registTransformer(new ReplaceTransformer());
-        registTransformer(new SubstrTransformer());
+        registryTransformer(new FilterTransformer());
+        registryTransformer(new GroovyTransformer());
+        registryTransformer(new MapTransformer());
+        registryTransformer(new PadTransformer());
+        registryTransformer(new ReplaceTransformer());
+        registryTransformer(new SubstrTransformer());
     }
 }

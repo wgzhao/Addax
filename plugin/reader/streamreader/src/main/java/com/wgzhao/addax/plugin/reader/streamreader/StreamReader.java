@@ -112,7 +112,7 @@ public class StreamReader
                         "没有设置参数[column].");
             }
 
-            List<String> dealedColumns = new ArrayList<>();
+            List<String> dealColumns = new ArrayList<>();
             for (JSONObject eachColumn : columns) {
                 Configuration eachColumnConfig = Configuration.from(eachColumn);
                 try {
@@ -142,10 +142,10 @@ public class StreamReader
                                 String.format("不支持类型[%s]", typeName));
                     }
                 }
-                dealedColumns.add(eachColumnConfig.toJSON());
+                dealColumns.add(eachColumnConfig.toJSON());
             }
 
-            originalConfig.set(Key.COLUMN, dealedColumns);
+            originalConfig.set(Key.COLUMN, dealColumns);
         }
 
         /**

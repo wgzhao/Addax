@@ -52,7 +52,7 @@ public class StandardFtpHelper
             // 登录
             ftpClient.login(username, password);
             // 不需要写死ftp server的OS TYPE,FTPClient getSystemType()方法会自动识别
-            // ftpClient.configure(new FTPClientConfig(FTPClientConfig.SYST_UNIX))
+            // ftpClient.configure(new FTPClientConfig(FTPClientConfig.SYS_UNIX))
             ftpClient.setConnectTimeout(timeout);
             ftpClient.setDataTimeout(timeout);
             if ("PASV".equals(connectMode)) {

@@ -56,7 +56,7 @@ public class CassandraReader
             String password = jobConfig.getString(MyKey.PASSWORD);
             String hosts = jobConfig.getString(MyKey.HOST);
             Integer port = jobConfig.getInt(MyKey.PORT, 9042);
-            boolean useSSL = jobConfig.getBool(MyKey.USESSL);
+            boolean useSSL = jobConfig.getBool(MyKey.USE_SSL);
 
             if ((username != null) && !username.isEmpty()) {
                 Cluster.Builder clusterBuilder = Cluster.builder().withCredentials(username, password)
@@ -102,7 +102,7 @@ public class CassandraReader
             String password = taskConfig.getString(MyKey.PASSWORD);
             String hosts = taskConfig.getString(MyKey.HOST);
             Integer port = taskConfig.getInt(MyKey.PORT);
-            boolean useSSL = taskConfig.getBool(MyKey.USESSL);
+            boolean useSSL = taskConfig.getBool(MyKey.USE_SSL);
             String keyspace = taskConfig.getString(MyKey.KEYSPACE);
             List<String> columnMeta = taskConfig.getList(MyKey.COLUMN, String.class);
             columnNumber = columnMeta.size();
@@ -121,7 +121,7 @@ public class CassandraReader
                         .addContactPoints(hosts.split(",")).build();
             }
             session = cluster.connect(keyspace);
-            String cl = taskConfig.getString(MyKey.CONSITANCY_LEVEL);
+            String cl = taskConfig.getString(MyKey.CONSISTENCY_LEVEL);
             if (cl != null && !cl.isEmpty()) {
                 consistencyLevel = ConsistencyLevel.valueOf(cl);
             }

@@ -44,7 +44,7 @@ public class HttpClientUtil
     private static CredentialsProvider provider;
     private static HttpClientUtil clientUtil;
     //构建httpclient的时候一定要设置这两个参数。淘宝很多生产故障都由此引起
-    private static int HTTP_TIMEOUT_INMILLIONSECONDS = 5000;
+    private static int HTTP_TIMEOUT_MILLISECONDS = 5000;
     private CloseableHttpClient httpClient;
 
     public HttpClientUtil()
@@ -54,7 +54,7 @@ public class HttpClientUtil
 
     public static void setHttpTimeoutInMillionSeconds(int httpTimeoutInMillionSeconds)
     {
-        HTTP_TIMEOUT_INMILLIONSECONDS = httpTimeoutInMillionSeconds;
+        HTTP_TIMEOUT_MILLISECONDS = httpTimeoutInMillionSeconds;
     }
 
     public static HttpGet getGetRequest()
@@ -72,9 +72,9 @@ public class HttpClientUtil
     {
         RequestConfig requestConfig = RequestConfig
                 .custom()
-                .setSocketTimeout(HTTP_TIMEOUT_INMILLIONSECONDS)
-                .setConnectTimeout(HTTP_TIMEOUT_INMILLIONSECONDS)
-                .setConnectionRequestTimeout(HTTP_TIMEOUT_INMILLIONSECONDS)
+                .setSocketTimeout(HTTP_TIMEOUT_MILLISECONDS)
+                .setConnectTimeout(HTTP_TIMEOUT_MILLISECONDS)
+                .setConnectionRequestTimeout(HTTP_TIMEOUT_MILLISECONDS)
                 .build();
 
         if (null == provider) {
@@ -112,7 +112,7 @@ public class HttpClientUtil
             throws Exception
     {
         HttpResponse response;
-        String entiStr;
+        String entityStr;
         response = httpClient.execute(httpRequestBase);
 
         if (response.getStatusLine().getStatusCode() != HttpStatus.SC_OK) {
@@ -126,14 +126,14 @@ public class HttpClientUtil
         else {
             HttpEntity entity = response.getEntity();
             if (entity != null) {
-                entiStr = EntityUtils.toString(entity, Consts.UTF_8);
+                entityStr = EntityUtils.toString(entity, Consts.UTF_8);
             }
             else {
                 throw new Exception("Response Entity Is Null");
             }
         }
 
-        return entiStr;
+        return entityStr;
     }
 
     public String executeAndGetWithFailedRetry(HttpRequestBase httpRequestBase,
@@ -148,7 +148,7 @@ public class HttpClientUtil
                 }
                 return result;
             }, retryTimes, retryInterval, true,
-                    HTTP_TIMEOUT_INMILLIONSECONDS + 1000, asyncExecutor);
+                    HTTP_TIMEOUT_MILLISECONDS + 1000, asyncExecutor);
         }
         catch (Exception e) {
             throw AddaxException.asAddaxException(FrameworkErrorCode.RUNTIME_ERROR, e);

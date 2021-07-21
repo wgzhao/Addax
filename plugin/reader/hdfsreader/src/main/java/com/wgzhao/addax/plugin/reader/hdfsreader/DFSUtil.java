@@ -94,7 +94,7 @@ import static com.wgzhao.addax.common.base.Key.NULL_FORMAT;
  */
 public class DFSUtil
 {
-    public static final String HDFS_DEFAULTFS_KEY = "fs.defaultFS";
+    public static final String HDFS_DEFAULT_KEY = "fs.defaultFS";
     public static final String HADOOP_SECURITY_AUTHENTICATION_KEY = "hadoop.security.authentication";
     private static final Logger LOG = LoggerFactory.getLogger(DFSUtil.class);
     private static final int DIRECTORY_SIZE_GUESS = 16 * 1024;
@@ -118,7 +118,7 @@ public class DFSUtil
                 hadoopConf.set(each, hadoopSiteParamsAsJsonObject.getString(each));
             }
         }
-        hadoopConf.set(HDFS_DEFAULTFS_KEY, taskConfig.getString(Key.DEFAULT_FS));
+        hadoopConf.set(HDFS_DEFAULT_KEY, taskConfig.getString(Key.DEFAULT_FS));
 
         //是否有Kerberos认证
         this.haveKerberos = taskConfig.getBool(Key.HAVE_KERBEROS, false);
@@ -256,7 +256,7 @@ public class DFSUtil
                     , filePath, this.specifiedFileType);
             LOG.error(message);
             throw AddaxException.asAddaxException(
-                    HdfsReaderErrorCode.FILE_TYPE_UNSUPPORT, message);
+                    HdfsReaderErrorCode.FILE_TYPE_UNSUPPORTED, message);
         }
     }
 
@@ -299,7 +299,7 @@ public class DFSUtil
         catch (Exception e) {
             String message = String.format("SequenceFile.Reader读取文件[%s]时出错", sourceSequenceFilePath);
             LOG.error(message);
-            throw AddaxException.asAddaxException(HdfsReaderErrorCode.READ_SEQUENCEFILE_ERROR, message, e);
+            throw AddaxException.asAddaxException(HdfsReaderErrorCode.READ_SEQUENCE_FILE_ERROR, message, e);
         }
     }
 
@@ -779,8 +779,7 @@ public class DFSUtil
             in.readFully(magic);
 
             if (Arrays.equals(magic, originalMagic)) {
-                byte vers = in.readByte();
-                if (vers != ORIGINAL_MAGIC_VERSION_WITH_METADATA) {
+                if (in.readByte() != ORIGINAL_MAGIC_VERSION_WITH_METADATA) {
                     return false;
                 }
                 version = ORIGINAL_VERSION;

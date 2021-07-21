@@ -184,7 +184,7 @@ public class HBase20xSQLWriterTask
             }
         }
         catch (SQLException e) {
-            throw AddaxException.asAddaxException(HBase20xSQLWriterErrorCode.GET_TABLE_COLUMNTYPE_ERROR,
+            throw AddaxException.asAddaxException(HBase20xSQLWriterErrorCode.GET_TABLE_COLUMN_TYPE_ERROR,
                     "获取表" + fullTableName + "列类型失败，请检查配置和服务状态或者联系HBase管理员.", e);
         }
         finally {

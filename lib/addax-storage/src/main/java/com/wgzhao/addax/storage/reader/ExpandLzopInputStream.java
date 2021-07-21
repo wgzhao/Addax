@@ -169,7 +169,7 @@ public class ExpandLzopInputStream
      * first word read.
      *
      * @param buf bytes including integer
-     * @param len the lenght of bytes buffer
+     * @param len the length of bytes buffer
      * @return integer
      * @throws IOException read exception
      */

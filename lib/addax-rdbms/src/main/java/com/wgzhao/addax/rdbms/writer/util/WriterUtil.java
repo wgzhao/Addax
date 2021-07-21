@@ -165,7 +165,7 @@ public final class WriterUtil
                 writeDataSqlTemplate = "INSERT INTO %s (" +
                         StringUtils.join(columnHolders, ",") +
                         ") VALUES(" + StringUtils.join(valueHolders, ",") +
-                        ")" + onConFlictDoString(writeMode, columnHolders);
+                        ")" + onConflictDoString(writeMode, columnHolders);
             }
             else {
                 throw AddaxException.asAddaxException(DBUtilErrorCode.ILLEGAL_VALUE,
@@ -186,7 +186,7 @@ public final class WriterUtil
         return writeDataSqlTemplate;
     }
 
-    private static String onConFlictDoString(String writeMode, List<String> columnHolders)
+    private static String onConflictDoString(String writeMode, List<String> columnHolders)
     {
         String conflict = writeMode.replace("update", "");
         StringBuilder sb = new StringBuilder();

@@ -25,7 +25,7 @@ package com.wgzhao.addax.plugin.writer.elasticsearchwriter;
 public class ESColumn
 {
 
-    private String name;//: "appkey",
+    private String name;//: "app key",
 
     private String type;//": "TEXT",
 
