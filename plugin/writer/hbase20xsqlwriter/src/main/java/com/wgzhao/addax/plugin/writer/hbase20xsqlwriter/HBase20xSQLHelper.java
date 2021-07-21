@@ -23,6 +23,7 @@ import com.wgzhao.addax.common.base.HBaseConstant;
 import com.wgzhao.addax.common.base.HBaseKey;
 import com.wgzhao.addax.common.exception.AddaxException;
 import com.wgzhao.addax.common.util.Configuration;
+import org.apache.hadoop.security.UserGroupInformation;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -36,14 +37,11 @@ import java.util.List;
 
 public class HBase20xSQLHelper
 {
-    /*
-     * phoenix瘦客户端连接前缀
-     */
-    public static final String CONNECT_STRING_PREFIX = "jdbc:phoenix:thin:";
-    /*
-     * phoenix驱动名
-     */
-    public static final String CONNECT_DRIVER_STRING = "org.apache.phoenix.queryserver.client.Driver";
+
+    // phoenix thin driver name
+    public static final String PHOENIX_JDBC_THIN_DRIVER = "org.apache.phoenix.queryserver.client.Driver";
+    // phoenix jdbc driver name
+    public static final String PHOENIX_JDBC_THICK_DRIVER = "org.apache.phoenix.jdbc.PhoenixDriver";
     /*
      * 从系统表查找配置表信息
      */
@@ -60,13 +58,31 @@ public class HBase20xSQLHelper
         // 表名和queryserver地址必须配置，否则抛异常
         String tableName = originalConfig.getNecessaryValue(HBaseKey.TABLE, HBase20xSQLWriterErrorCode.REQUIRED_VALUE);
         String queryServerAddress = originalConfig.getNecessaryValue(HBaseKey.QUERY_SERVER_ADDRESS, HBase20xSQLWriterErrorCode.REQUIRED_VALUE);
-
+        boolean isThinMode = queryServerAddress.contains(":thin:");
         // 序列化格式，可不配置，默认PROTOBUF
         String serialization = originalConfig.getString(HBaseKey.SERIALIZATION_NAME, HBaseConstant.DEFAULT_SERIALIZATION);
-
-        String connStr = getConnectionUrl(queryServerAddress, serialization);
+        String connStr = queryServerAddress;
+        if (isThinMode) {
+            connStr = connStr + ";serialization=" + serialization;
+        }
+        // check kerberos
+        if (originalConfig.getBool(HBaseKey.HAVE_KERBEROS, false)) {
+            String principal = originalConfig.getNecessaryValue(HBaseKey.KERBEROS_PRINCIPAL, HBase20xSQLWriterErrorCode.REQUIRED_VALUE);
+            String keytab = originalConfig.getNecessaryValue(HBaseKey.KERBEROS_KEYTAB_FILE_PATH, HBase20xSQLWriterErrorCode.REQUIRED_VALUE);
+            kerberosAuthentication(principal, keytab);
+            if (isThinMode) {
+                connStr = connStr + "authentication=SPENGO;principal=" + principal + ";keytab=" + keytab;
+            } else {
+                connStr = connStr + ":" + principal + ":" + keytab;
+            }
+        }
         // 校验jdbc连接是否正常
-        Connection conn = getThinClientConnection(connStr);
+        Connection conn;
+        if (queryServerAddress.contains(":thin:")) {
+             conn = getClientConnection(connStr, PHOENIX_JDBC_THIN_DRIVER);
+        } else {
+            conn = getClientConnection(connStr, PHOENIX_JDBC_THICK_DRIVER);
+        }
 
         List<String> columnNames = originalConfig.getList(HBaseKey.COLUMN, String.class);
         if (columnNames == null || columnNames.isEmpty()) {
@@ -76,17 +92,19 @@ public class HBase20xSQLHelper
         String schema = originalConfig.getString(HBaseKey.SCHEMA);
         // 检查表以及配置列是否存在
         checkTable(conn, schema, tableName, columnNames);
+        // rewrite queryServerAddress with extra properties
+        originalConfig.set(HBaseKey.QUERY_SERVER_ADDRESS, connStr);
     }
 
     /*
      * 获取JDBC连接，轻量级连接，使用完后必须显式close
      */
-    public static Connection getThinClientConnection(String connStr)
+    public static Connection getClientConnection(String connStr, String driverName)
     {
         LOG.debug("Connecting to QueryServer [{}] ...", connStr);
         Connection conn;
         try {
-            Class.forName(CONNECT_DRIVER_STRING);
+            Class.forName(driverName);
             conn = DriverManager.getConnection(connStr);
             conn.setAutoCommit(false);
         }
@@ -101,16 +119,11 @@ public class HBase20xSQLHelper
     public static Connection getJdbcConnection(Configuration conf)
     {
         String queryServerAddress = conf.getNecessaryValue(HBaseKey.QUERY_SERVER_ADDRESS, HBase20xSQLWriterErrorCode.REQUIRED_VALUE);
-        // 序列化格式，可不配置，默认PROTOBUF
-        String serialization = conf.getString(HBaseKey.SERIALIZATION_NAME, "PROTOBUF");
-        String connStr = getConnectionUrl(queryServerAddress, serialization);
-        return getThinClientConnection(connStr);
-    }
-
-    public static String getConnectionUrl(String queryServerAddress, String serialization)
-    {
-        String urlFmt = CONNECT_STRING_PREFIX + "url=%s;serialization=%s";
-        return String.format(urlFmt, queryServerAddress, serialization);
+        if (queryServerAddress.contains(":thin:")) {
+            return getClientConnection(queryServerAddress, PHOENIX_JDBC_THIN_DRIVER);
+        } else {
+            return getClientConnection(queryServerAddress, PHOENIX_JDBC_THICK_DRIVER);
+        }
     }
 
     public static void checkTable(Connection conn, String schema, String tableName, List<String> columnNames)
@@ -126,7 +139,7 @@ public class HBase20xSQLHelper
                 allColumns.add(rs.getString(1));
             }
             else {
-                LOG.error("表 {} 不存在，请检查表名是否正确或是否已创建. {}", tableName , HBase20xSQLWriterErrorCode.GET_HBASE_TABLE_ERROR);
+                LOG.error("表 {} 不存在，请检查表名是否正确或是否已创建. {}", tableName, HBase20xSQLWriterErrorCode.GET_HBASE_TABLE_ERROR);
                 throw AddaxException.asAddaxException(HBase20xSQLWriterErrorCode.GET_HBASE_TABLE_ERROR,
                         tableName + "表不存在，请检查表名是否正确或是否已创建.");
             }
@@ -174,6 +187,28 @@ public class HBase20xSQLHelper
         }
         catch (SQLException e) {
             LOG.warn("数据库连接关闭异常. {}", HBase20xSQLWriterErrorCode.CLOSE_HBASE_CONNECTION_ERROR);
+        }
+    }
+
+    /**
+     * Try to authentication with kerberos
+     *
+     * @param kerberosPrincipal the principal to Kerberos
+     * @param kerberosKeytabFilePath the keytab filepath
+     */
+    private static void kerberosAuthentication(String kerberosPrincipal, String kerberosKeytabFilePath)
+    {
+        org.apache.hadoop.conf.Configuration hadoopConf = new org.apache.hadoop.conf.Configuration();
+        hadoopConf.set("hadoop.security.authentication", "Kerberos");
+        UserGroupInformation.setConfiguration(hadoopConf);
+        try {
+            UserGroupInformation.loginUserFromKeytab(kerberosPrincipal, kerberosKeytabFilePath);
+        }
+        catch (Exception e) {
+            String message = String.format("Kerberos authentication failed, please make sure that kerberosKeytabFilePath[%s] and kerberosPrincipal[%s] are correct",
+                    kerberosKeytabFilePath, kerberosPrincipal);
+            LOG.error(message);
+            throw AddaxException.asAddaxException(HBase20xSQLWriterErrorCode.KERBEROS_LOGIN_ERROR, e);
         }
     }
 }

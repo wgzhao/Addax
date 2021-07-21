@@ -27,7 +27,6 @@ import com.wgzhao.addax.common.exception.AddaxException;
 import com.wgzhao.addax.common.plugin.RecordReceiver;
 import com.wgzhao.addax.common.plugin.TaskPluginCollector;
 import com.wgzhao.addax.common.util.Configuration;
-import com.google.common.collect.Lists;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -41,6 +40,7 @@ import java.sql.Statement;
 import java.sql.Time;
 import java.sql.Timestamp;
 import java.sql.Types;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
@@ -54,7 +54,7 @@ public class HBase20xSQLWriterTask
     private Connection connection = null;
     private PreparedStatement pstmt = null;
 
-    // 需要向hbsae写入的列的数量,即用户配置的column参数中列的个数。时间戳不包含在内
+    // 需要向 hbase 写入的列的数量,即用户配置的column参数中列的个数。时间戳不包含在内
     private int numberOfColumnsToWrite;
     // 期待从源头表的Record中拿到多少列
     private int numberOfColumnsToRead;
@@ -94,7 +94,7 @@ public class HBase20xSQLWriterTask
     /**
      * 初始化JDBC操作对象及列类型
      *
-     * @throws SQLException sql exeception
+     * @throws SQLException sql exception
      */
     private void initialize()
             throws SQLException
@@ -122,7 +122,7 @@ public class HBase20xSQLWriterTask
     /**
      * 生成sql模板，并根据模板创建PreparedStatement
      * @return A {@link PreparedStatement}
-     * @throws SQLException if occured
+     * @throws SQLException if occurred
      */
     private PreparedStatement createPreparedStatement()
             throws SQLException
@@ -198,12 +198,12 @@ public class HBase20xSQLWriterTask
      * 从接收器中获取每条记录，写入Phoenix
      *
      * @param lineReceiver record
-     * @throws SQLException sql exeception
+     * @throws SQLException sql exception
      */
     private void writeData(RecordReceiver lineReceiver)
             throws SQLException
     {
-        List<Record> buffer = Lists.newArrayListWithExpectedSize(batchSize);
+        List<Record> buffer = new ArrayList<>(batchSize);
         Record record;
         while ((record = lineReceiver.getFromReader()) != null) {
             // 校验列数量是否符合预期
@@ -230,8 +230,8 @@ public class HBase20xSQLWriterTask
     /**
      * 批量提交一组数据，如果失败，则尝试一行行提交，如果仍然失败，抛错给用户
      *
-     * @param records list of recrod
-     * @throws SQLException sql exeception
+     * @param records list of record
+     * @throws SQLException sql exception
      */
     private void doBatchUpsert(List<Record> records)
             throws SQLException
