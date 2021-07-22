@@ -155,6 +155,28 @@ TxtFileReader实现了从本地文件读取数据并转为Addax协议的功能�
 
 对于用户指定Column信息，type必须填写，index/value必须选择其一。
 
+从 `4.0.1` 开始，表示字段除了使用 `index` 来指定字段的顺序外，还支持 `name` 方式，这需要所读取的文件的都包含了文件头，插件会尝试将指定的 `name` 去匹配从文件读取的文件头，
+然后得到对应的 `index` 值，并回写到 配置文件中。同时，`index` 和 `name` 可以在不同的列上进行混合使用，比如下面这样：
+
+```json
+[
+  {
+    "type": "long",
+    "index": 0
+  },
+  {
+    "name": "region",
+    "type": "string"
+  },
+  {
+    "type": "string",
+    "value": "alibaba"
+  }
+]
+```
+
+注： 这种方式以为这在准备阶段就要尝试读取文件，因为会有一定的性能损失，如非必要，不建议配置 `name` 方式。
+
 #### csvReaderConfig
 
 读取CSV类型文件参数配置，Map类型。读取CSV类型文件使用的CsvReader进行读取，会有很多配置，不配置则使用默认值。

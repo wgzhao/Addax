@@ -37,9 +37,6 @@ import com.wgzhao.addax.common.plugin.TaskPluginCollector;
 import com.wgzhao.addax.common.spi.Reader;
 import com.wgzhao.addax.common.util.Configuration;
 import org.apache.commons.beanutils.BeanUtils;
-import org.apache.commons.compress.compressors.CompressorException;
-import org.apache.commons.compress.compressors.CompressorInputStream;
-import org.apache.commons.compress.compressors.CompressorStreamFactory;
 import org.apache.commons.io.Charsets;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.BooleanUtils;
@@ -47,14 +44,10 @@ import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.BufferedInputStream;
 import java.io.BufferedReader;
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.io.UnsupportedEncodingException;
 import java.nio.charset.StandardCharsets;
 import java.nio.charset.UnsupportedCharsetException;
@@ -81,16 +74,11 @@ public class TxtFileReader
         private static final Logger LOG = LoggerFactory.getLogger(Job.class);
 
         private Configuration originConfig = null;
-
         private List<String> path = null;
-
         private List<String> sourceFiles;
-
         private Map<String, Pattern> pattern;
-
         private Map<String, Boolean> isRegexPath;
-
-        private String encoding;
+        private boolean needReadColumnName = false;
 
         @Override
         public void init()
@@ -122,7 +110,7 @@ public class TxtFileReader
                 }
             }
 
-            this.encoding = this.originConfig.getString(Key.ENCODING, Constant.DEFAULT_ENCODING);
+            String encoding = this.originConfig.getString(Key.ENCODING, Constant.DEFAULT_ENCODING);
             if (StringUtils.isBlank(encoding)) {
                 this.originConfig.set(Key.ENCODING, Constant.DEFAULT_ENCODING);
             }
@@ -144,9 +132,18 @@ public class TxtFileReader
                             e);
                 }
             }
+            // check delimiter
+            String delimiterInStr = this.originConfig.getString(Key.FIELD_DELIMITER, Constant.DEFAULT_FIELD_DELIMITER + "");
+            if (null != delimiterInStr && 1 != delimiterInStr.length()) {
+                throw AddaxException.asAddaxException(
+                        TxtFileReaderErrorCode.ILLEGAL_VALUE,
+                        String.format("仅仅支持单字符切分, 您配置的切分为 : [%s]", delimiterInStr));
+            }
 
-            // column: 1. index type 2.value type 3.when type is Date, may have
-            // format
+            // column consists of two parts, an index or name or value, and a type.
+            // If index is specified, it means that the corresponding values are obtained in delimited order;
+            // If name is specified, it means that the first line of the file is the header and the order of the fields is located by the name specified in the header;
+            // If value is specified, it means that it is a constant
             List<Configuration> columns = this.originConfig.getListConfiguration(Key.COLUMN);
             // handle ["*"]
             if (null != columns && 1 == columns.size()) {
@@ -159,25 +156,21 @@ public class TxtFileReader
 
             if (null != columns && !columns.isEmpty()) {
                 for (Configuration eachColumnConf : columns) {
-                    eachColumnConf
-                            .getNecessaryValue(
-                                    Key.TYPE,
-                                    TxtFileReaderErrorCode.REQUIRED_VALUE);
-                    Integer columnIndex = eachColumnConf
-                            .getInt(Key.INDEX);
-                    String columnValue = eachColumnConf
-                            .getString(Key.VALUE);
+                    eachColumnConf.getNecessaryValue(Key.TYPE, TxtFileReaderErrorCode.REQUIRED_VALUE);
+                    Integer columnIndex = eachColumnConf.getInt(Key.INDEX);
+                    String columnValue = eachColumnConf.getString(Key.VALUE);
+                    String columnName = eachColumnConf.getString(Key.NAME);
 
-                    if (null == columnIndex && null == columnValue) {
+                    if (null == columnIndex && null == columnValue && null == columnName) {
                         throw AddaxException.asAddaxException(
                                 TxtFileReaderErrorCode.NO_INDEX_VALUE,
-                                "由于您配置了type, 则至少需要配置 index 或 value");
+                                "You must configure one of index or name or value");
                     }
 
-                    if (null != columnIndex && null != columnValue) {
+                    if (null != columnIndex && null != columnValue && null != columnName) {
                         throw AddaxException.asAddaxException(
                                 TxtFileReaderErrorCode.MIXED_INDEX_VALUE,
-                                "您混合配置了index, value, 每一列同时仅能选择其中一种");
+                                "You both configure index, value, or name, you can ONLY specify the one each column");
                     }
                     if (null != columnIndex && columnIndex < 0) {
                         throw AddaxException.asAddaxException(
@@ -185,15 +178,11 @@ public class TxtFileReader
                                         .format("index需要大于等于0, 您配置的index为[%s]",
                                                 columnIndex));
                     }
+                    if (null != columnName) {
+                        // need get file header line , delay to prepare stage
+                        needReadColumnName = true;
+                    }
                 }
-            }
-
-            String delimiterInStr = this.originConfig.getString(Key.FIELD_DELIMITER);
-            // warn: if have, length must be one
-            if (null != delimiterInStr && 1 != delimiterInStr.length()) {
-                throw AddaxException.asAddaxException(
-                        TxtFileReaderErrorCode.ILLEGAL_VALUE,
-                        String.format("仅仅支持单字符切分, 您配置的切分为 : [%s]", delimiterInStr));
             }
         }
 
@@ -210,7 +199,9 @@ public class TxtFileReader
                 this.pattern.put(eachPath, pattern);
             }
             this.sourceFiles = this.buildSourceTargets();
-
+            if (needReadColumnName) {
+                convertColumnNameToIndex(this.sourceFiles.get(0));
+            }
             LOG.info("您即将读取的文件数为: [{}]", this.sourceFiles.size());
         }
 
@@ -384,6 +375,44 @@ public class TxtFileReader
             }
             return splitedList;
         }
+
+        private int getIndexByName(String name, String[] allNames) {
+            for (int i=0; i< allNames.length; i++) {
+                if (allNames[i].equalsIgnoreCase(name)) {
+                    return i;
+                }
+            }
+            throw AddaxException.asAddaxException(
+                    TxtFileReaderErrorCode.ILLEGAL_VALUE,
+                    "The name '" + name + "' DOES NOT exists in file header: " + Arrays.toString(allNames)
+            );
+        }
+        private void convertColumnNameToIndex(String fileName)
+        {
+            String encoding = this.originConfig.getString(Key.ENCODING, Constant.DEFAULT_ENCODING);
+            int bufferSize = this.originConfig.getInt(Key.BUFFER_SIZE, Constant.DEFAULT_BUFFER_SIZE);
+            String delimiter = this.originConfig.getString(Key.FIELD_DELIMITER, Constant.DEFAULT_FIELD_DELIMITER + "");
+            List<Configuration> columns = this.originConfig.getListConfiguration(Key.COLUMN);
+            BufferedReader reader = FileHelper.readCompressFile(fileName, encoding, bufferSize);
+            try {
+                String fetchLine = reader.readLine();
+                String[] columnNames = fetchLine.split(delimiter);
+                int index;
+                for (Configuration column : columns) {
+                    if (column.getString(Key.NAME) != null ) {
+                        index = getIndexByName(column.getString(Key.NAME), columnNames);
+                        column.set(Key.INDEX, index);
+                    }
+                }
+                this.originConfig.set(Key.COLUMN, columns);
+            }
+            catch (IOException e) {
+                e.printStackTrace();
+            }
+            finally {
+                IOUtils.closeQuietly(reader, null);
+            }
+        }
     }
 
     public static class Task
@@ -456,43 +485,13 @@ public class TxtFileReader
         public void startRead(RecordSender recordSender)
         {
             LOG.debug("start read source files...");
-            BufferedReader reader = null;
-            InputStream inputStream;
+            BufferedReader reader;
             for (String fileName : this.sourceFiles) {
                 LOG.info("reading file : [{}]", fileName);
-                try {
-                    inputStream = new FileInputStream(fileName);
-                }
-                catch (FileNotFoundException e) {
-                    // warn: sock 文件无法read,能影响所有文件的传输,需要用户自己保证
-                    throw AddaxException.asAddaxException(
-                            TxtFileReaderErrorCode.OPEN_FILE_ERROR, String.format("找不到待读取的文件 : [%s]", fileName));
-                }
-                try {
-                    String compressType = FileHelper.getCompressType(fileName);
-                    if (compressType != null) {
-                        if ("zip".equals(compressType)) {
-                            ZipCycleInputStream zis = new ZipCycleInputStream(inputStream);
-                            reader = new BufferedReader(new InputStreamReader(zis, encoding), bufferSize);
-                        }
-                        else {
-                            BufferedInputStream bis = new BufferedInputStream(inputStream);
-                            CompressorInputStream input = new CompressorStreamFactory().createCompressorInputStream(bis);
-                            reader = new BufferedReader(new InputStreamReader(input, encoding), bufferSize);
-                        }
-                    }
-                    else {
-                        reader = new BufferedReader(new InputStreamReader(inputStream, encoding), bufferSize);
-                    }
-                    doReadFromStream(reader, fileName, readerSliceConfig, recordSender, getTaskPluginCollector());
-                    recordSender.flush();
-                }
-                catch (CompressorException | IOException e) {
-                    e.printStackTrace();
-                }
-                finally {
-                    IOUtils.closeQuietly(reader, null);
-                }
+                reader = FileHelper.readCompressFile(fileName, encoding, bufferSize);
+                doReadFromStream(reader, fileName, readerSliceConfig, recordSender, getTaskPluginCollector());
+                recordSender.flush();
+                IOUtils.closeQuietly(reader, null);
             }
             LOG.debug("end read source files...");
         }
@@ -612,7 +611,7 @@ public class TxtFileReader
                         if (columnValue.equals(nullFormat)) {
                             columnValue = null;
                         }
-                        String errorTemplate =  "类型转换错误, 无法将[%s] 转换为[%s]";
+                        String errorTemplate = "类型转换错误, 无法将[%s] 转换为[%s]";
                         switch (type) {
                             case STRING:
                                 columnGenerated = new StringColumn(columnValue);
