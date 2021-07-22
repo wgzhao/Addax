@@ -191,7 +191,7 @@ The `job` subdirectory contains many sample jobs, of which `job.json` can be use
 
 ```shell
 cd target/addax/addax-<version>
-python bin/addax.py job/job.json
+bin/addax.sh job/job.json
 ```
 
 The output of the above command is roughly as follows.
@@ -200,7 +200,7 @@ The output of the above command is roughly as follows.
 <summary>Click to expand</summary>
 
 ```
- bin/addax.py job/job.json
+ bin/addax.sh job/job.json
 
 Addax (addax-V3), From Alibaba !
 Copyright (C) 2010-2017, Alibaba Group. All Rights Reserved.
@@ -351,7 +351,7 @@ Addax	19890604	1989-06-04 00:00:00	true	test
 ## runtime requirements
 
 - JDK 1.8+
-- Python 2.7+ / Python 3.7+
+- Python 2.7+ / Python 3.7+ (Windows)
 
 ## documentation
 
