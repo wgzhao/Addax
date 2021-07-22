@@ -170,7 +170,7 @@ mvn clean package
 
 ```shell
 cd target/addax/addax-<version>
-python bin/addax.py job/job.json
+bin/addax.sh job/job.json
 ```
 
 上述命令的输出大致如下：
@@ -178,7 +178,7 @@ python bin/addax.py job/job.json
 <summary>点击展开</summary>
 
 ```
- bin/addax.py job/job.json
+ bin/addax.sh job/job.json
 
 Addax (addax-V3), From Alibaba !
 Copyright (C) 2010-2017, Alibaba Group. All Rights Reserved.
@@ -330,7 +330,7 @@ Addax	19890604	1989-06-04 00:00:00	true	test
 ## 运行要求
 
 - JDK 1.8+
-- Python 2.7+ / Python 3.7+
+- Python 2.7+ / Python 3.7+ (Windows)
 
 ## 文档
 
