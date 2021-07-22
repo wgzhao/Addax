@@ -19,14 +19,23 @@
 
 package com.wgzhao.addax.plugin.reader.txtfilereader;
 
+import com.wgzhao.addax.common.exception.AddaxException;
+import org.apache.commons.compress.compressors.CompressorException;
+import org.apache.commons.compress.compressors.CompressorInputStream;
+import org.apache.commons.compress.compressors.CompressorStreamFactory;
+
+import java.io.BufferedInputStream;
+import java.io.BufferedReader;
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.util.HashMap;
 
 public class FileHelper
 {
-    public static final HashMap<String, String> mFileTypes = new HashMap<String, String>();
+    public static final HashMap<String, String> mFileTypes = new HashMap<>();
 
     static {
         // images
@@ -43,7 +52,8 @@ public class FileHelper
         mFileTypes.put("7573", "tar");
     }
 
-    private static String bytesToHexString(byte[] src) {
+    private static String bytesToHexString(byte[] src)
+    {
         StringBuilder builder = new StringBuilder();
         if (src == null || src.length <= 0) {
             return null;
@@ -63,7 +73,7 @@ public class FileHelper
     public static String getCompressType(String filePath)
             throws IOException
     {
-        FileInputStream fis =  new FileInputStream(filePath);
+        FileInputStream fis = new FileInputStream(filePath);
         return getCompressType(fis);
     }
 
@@ -73,5 +83,43 @@ public class FileHelper
         byte[] b = new byte[2];
         inputStream.read(b, 0, b.length);
         return mFileTypes.getOrDefault(bytesToHexString(b), null);
+    }
+
+    public static BufferedReader readCompressFile(String fileName, String encoding, int bufferSize)
+    {
+        BufferedReader reader;
+        FileInputStream inputStream;
+        try {
+            inputStream = new FileInputStream(fileName);
+        }
+        catch (FileNotFoundException e) {
+            // warn: sock 文件无法read,能影响所有文件的传输,需要用户自己保证
+            throw AddaxException.asAddaxException(
+                    TxtFileReaderErrorCode.OPEN_FILE_ERROR, String.format("找不到待读取的文件 : [%s]", fileName));
+        }
+        try {
+            String compressType = FileHelper.getCompressType(fileName);
+            if (compressType != null) {
+                if ("zip".equals(compressType)) {
+                    ZipCycleInputStream zis = new ZipCycleInputStream(inputStream);
+                    reader = new BufferedReader(new InputStreamReader(zis, encoding), bufferSize);
+                }
+                else {
+                    BufferedInputStream bis = new BufferedInputStream(inputStream);
+                    CompressorInputStream input = new CompressorStreamFactory().createCompressorInputStream(bis);
+                    reader = new BufferedReader(new InputStreamReader(input, encoding), bufferSize);
+                }
+            }
+            else {
+                reader = new BufferedReader(new InputStreamReader(inputStream, encoding), bufferSize);
+            }
+            return reader;
+        }
+        catch (CompressorException | IOException e) {
+            throw AddaxException.asAddaxException(
+                    TxtFileReaderErrorCode.READ_FILE_IO_ERROR,
+                    e.getMessage()
+            );
+        }
     }
 }
