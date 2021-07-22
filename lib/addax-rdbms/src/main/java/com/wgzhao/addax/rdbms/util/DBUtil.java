@@ -285,6 +285,8 @@ public final class DBUtil {
             url = url.replace("inceptor2", "hive2");
             bds.setUrl(url);
             bds.setDriverClassName("org.apache.hive.jdbc.HiveDriver");
+        } else {
+            bds.setDriverClassName(dataBaseType.getDriverClassName());
         }
         try {
             bds.setMinIdle(2);
@@ -295,26 +297,6 @@ public final class DBUtil {
             throw RdbmsException.asConnException(dataBaseType, e, user, null);
         }
     }
-
-
-//    private static synchronized Connection connect(DataBaseType dataBaseType,
-//                                                   String url, Properties prop) {
-//
-//        try {
-//            if (url.contains("inceptor2")) {
-//                LOG.warn("inteptor2 must be process specially");
-//                url = url.replace("inceptor2", "hive2");
-//                Class.forName("org.apache.hive.jdbc.HiveDriver");
-//                return DriverManager.getConnection(url, prop.getProperty("user"), prop.getProperty("password"));
-//            } else {
-//                Class.forName(dataBaseType.getDriverClassName());
-//                DriverManager.setLoginTimeout(Constant.TIMEOUT_SECONDS);
-//                return DriverManager.getConnection(url, prop);
-//            }
-//        } catch (Exception e) {
-//            throw RdbmsException.asConnException(dataBaseType, e, prop.getProperty("user"), null);
-//        }
-//    }
 
     /**
      * a wrapped method to execute select-like sql statement .
