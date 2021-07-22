@@ -154,8 +154,15 @@ def buildStartCommand(options, args):
     commandMap["job"] = jobResource
     return Template(ENGINE_COMMAND).substitute(**commandMap)
 
+def deprecated_warning():
+    print("==================== DEPRECATED WARNING ========================")
+    print("addax.py is deprecated, It's going to be removed in future release.")
+    print("As a replacement, you can use addax.sh to run job")
+    print("==================== DEPRECATED WARNING ========================")
+    print()
 
 if __name__ == "__main__":
+    deprecated_warning()
     parser = getOptionParser()
     options, args = parser.parse_args(sys.argv[1:])
     if options.version:
