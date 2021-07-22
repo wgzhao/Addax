@@ -105,7 +105,7 @@ add support for almost basic data type, and some complex data type.
 
 | database/filesystem | reader | writer | plugin(reader/writer)                   | memo                                                                                       |
 | ------------------- | ------ | ------ | --------------------------------------- | ------------------------------------------------------------------------------------------ |
-| Cassander           | YES    | YES    | cassandrareader/cassandrawriter         |                                                                                            |
+| Cassandra           | YES    | YES    | cassandrareader/cassandrawriter         |                                                                                            |
 | ClickHouse          | YES    | YES    | clickhousereader/clickhousewriter       |                                                                                            |
 | DB2                 | YES    | YES    | rbdmsreader/rdbmswriter                 | not fully tested                                                                           |
 | DBF                 | YES    | YES    | dbffilereader/dbffilewriter             |                                                                                            |
