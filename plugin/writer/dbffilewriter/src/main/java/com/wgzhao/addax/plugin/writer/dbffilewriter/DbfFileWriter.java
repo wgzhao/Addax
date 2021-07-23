@@ -216,7 +216,7 @@ public class DbfFileWriter
             List<Configuration> columns = this.writerSliceConfig.getListConfiguration(Key.COLUMN);
             for (Configuration column: columns) {
                 if ( "numeric".equalsIgnoreCase(column.getString(Key.TYPE)) &&
-                        (column.getString(Key.PRECISION, null) == null || column.getString(Key.SCALE, null) == null))
+                        (column.getString(Key.LENGTH, null) == null || column.getString(Key.SCALE, null) == null))
                 {
                     throw AddaxException.asAddaxException(
                             DbfFileWriterErrorCode.CONFIG_INVALID_EXCEPTION,
