@@ -88,7 +88,7 @@ function parse_job_file {
 function gen_log_file {
     # ---------------- combine log file name
     job_name=$(basename $JOB_FILE)
-    job_escaped_name=$(echo ${jobname%\.*} | tr '.' '_')
+    job_escaped_name=$(echo ${job_name%\.*} | tr '.' '_')
     curr_time=$(date +"%Y%m%d_%H%M%S")
     pid=$$
     LOG_FILE="addax_${job_escaped_name}_${curr_time}_${pid}.log"
@@ -172,8 +172,9 @@ fi
 
 JOB_FILE=${1}
 parse_job_file
+gen_log_file
 
-# combile command
+# combine command
 cmd="${ENGINE_COMMAND} ${CUST_JVM} -Dloglevel=${LOG_LEVEL} -Daddax.log=${LOG_DIR} -Dlog.file.name=${LOG_FILE}"
 
 if [ ${DEBUG} -eq 1 ]; then
