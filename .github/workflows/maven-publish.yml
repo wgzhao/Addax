@@ -42,13 +42,13 @@ jobs:
       - name: Build with Maven
         run: mvn -B package -Dgpg.skip --file pom.xml
 
-      - name: Configure GPG Key
-        run: |
-          mkdir -p ~/.gnupg/
-          echo "$GPG_SIGNING_KEY" | base64 --decode > ~/.gnupg/private.key
-          gpg --import ~/.gnupg/private.key
-        env:
-          GPG_SIGNING_KEY: ${{ secrets.GPG_SIGNING_KEY }}
+#      - name: Configure GPG Key
+#        run: |
+#          mkdir -p ~/.gnupg/
+#          echo "$GPG_SIGNING_KEY" | base64 --decode > ~/.gnupg/private.key
+#          gpg --import ~/.gnupg/private.key
+#        env:
+#          GPG_SIGNING_KEY: ${{ secrets.GPG_SIGNING_KEY }}
 
       - name: Publish to GitHub Packages Apache Maven
         run: mvn deploy -Dgpg.skip -s $GITHUB_WORKSPACE/settings.xml
