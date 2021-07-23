@@ -10,6 +10,41 @@ RDBMSWriter 插件支持从传统 RDBMS 读取数据。这是一个通用关系�
 - ClickHouse Writer
 - SQLServer Writer
 
+注意，对于 Addax 已经提供了专门的数据库写入插件的，推荐使用专用插件，如果你需要写入的数据库没有专门插件，则考虑使用该通用插件。
+在使用之前，还需要执行以下操作才可以正常运行，否则运行会出现异常。
+
+## 配置驱动
+
+假定你需要写入 IBM DB2 的数据，因为没有提供专门的读取插件，所以我们可以使用该插件来实现，在使用之前，需要执行下面两个操作：
+
+1. 下载对应的 JDBC 驱动，并拷贝到 `plugin/writer/rdbmswriter/libs` 目录
+2. 修改 `plugin/writer/rdbmswriter/plugin.json` 文件，找到 `drivers` 一项，填写正确的 JDBC 驱动名，比如 DB2 的驱动名为 `com.ibm.db2.jcc.DB2Driver`，类似这样：
+    ```json
+   {
+    "name": "rdbmswriter",
+    "class": "com.wgzhao.addax.plugin.reader.rdbmswriter.RdbmsWriter",
+    "description": "",
+    "developer": "alibaba",
+    "drivers": ["com.ibm.db2.jcc.DB2Driver"]
+    } 
+   ```
+
+以下列出常见的数据库以及对应的驱动名称
+
+- [Apache Impala](http://impala.apache.org/): `com.cloudera.impala.jdbc41.Driver`
+- [Enterprise DB](https://www.enterprisedb.com/): `com.edb.Driver`
+- [PrestoDB](https://prestodb.io/): `com.facebook.presto.jdbc.PrestoDriver`
+- [IBM DB2](https://www.ibm.com/analytics/db2): `com.ibm.db2.jcc.DB2Driver`
+- [MySQL](https://www.mysql.com): `com.mysql.cj.jdbc.Driver`
+- [Sybase Server](https://www.sap.com/products/sybase-ase.html): `com.sybase.jdbc3.jdbc.SybDriver`
+- [TDengine](https://www.taosdata.com/cn/): `com.taosdata.jdbc.TSDBDriver`
+- [达梦数据库](https://www.dameng.com/): `dm.jdbc.driver.DmDriver`
+- [星环Inceptor](http://transwarp.io/): `io.transwarp.jdbc.InceptorDriver`
+- [TrinoDB](https://trino.io): `io.trino.jdbc.TrinoDriver`
+- [PrestoSQL](https://trino.io): `io.prestosql.jdbc.PrestoDriver`
+- [Oracle DB](https://www.oracle.com/database/): `oracle.jdbc.OracleDriver`
+- [PostgreSQL](https://postgresql.org): `org.postgresql.Drive`
+
 ## 配置说明
 
 配置一个写入RDBMS的作业。

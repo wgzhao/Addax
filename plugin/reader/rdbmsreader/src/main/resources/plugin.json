@@ -1,21 +1,7 @@
 {
   "name": "rdbmsreader",
   "class": "com.wgzhao.addax.plugin.reader.rdbmsreader.RdbmsReader",
-  "description": "useScene: prod. mechanism: Jdbc connection using the database, execute select sql, retrieve data from the ResultSet. warn: The more you know about the database, the less problems you encounter.",
+  "description": "general RDBMS reader plugin",
   "developer": "alibaba",
-  "drivers": [
-    "com.cloudera.impala.jdbc41.Driver",
-    "com.edb.Driver",
-    "com.facebook.presto.jdbc.PrestoDriver",
-    "com.ibm.db2.jcc.DB2Driver",
-    "com.mysql.cj.jdbc.Driver",
-    "com.sybase.jdbc3.jdbc.SybDriver",
-    "com.taosdata.jdbc.TSDBDriver",
-    "dm.jdbc.driver.DmDriver",
-    "io.transwarp.jdbc.InceptorDriver",
-    "io.trino.jdbc.TrinoDriver",
-    "io.prestosql.jdbc.PrestoDriver",
-    "oracle.jdbc.OracleDriver",
-    "org.postgresql.Driver"
-  ]
+  "drivers": []
 }
