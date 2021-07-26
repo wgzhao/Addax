@@ -9,14 +9,9 @@
     </parent>
 
     <artifactId>hbase11xsqlwriter</artifactId>
+    <name>hbase11xsql-writer</name>
     <description>HBase writer via Phoenix</description>
     <packaging>jar</packaging>
-
-    <properties>
-        <phoenix.version>4.14.3-HBase-1.4</phoenix.version>
-        <commons-codec.version>1.15</commons-codec.version>
-        <protobuf.version>2.5.0</protobuf.version>
-    </properties>
 
     <dependencies>
         <dependency>
@@ -24,6 +19,36 @@
             <artifactId>addax-common</artifactId>
             <version>${project.version}</version>
             <scope>compile</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>com.alibaba</groupId>
+            <artifactId>fastjson</artifactId>
+            <version>${fastjson.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>com.google.guava</groupId>
+            <artifactId>guava</artifactId>
+            <version>${guava.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.apache.commons</groupId>
+            <artifactId>commons-lang3</artifactId>
+            <version>${commons.lang3.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.apache.hadoop</groupId>
+            <artifactId>hadoop-common</artifactId>
+            <version>2.7.4</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.apache.hbase</groupId>
+            <artifactId>hbase-common</artifactId>
+            <version>1.4.13</version>
         </dependency>
 
         <dependency>
@@ -35,13 +60,19 @@
         <dependency>
             <groupId>org.apache.phoenix</groupId>
             <artifactId>phoenix-core</artifactId>
-            <version>${phoenix.version}</version>
+            <version>${phoenix1.version}</version>
             <exclusions>
                 <exclusion>
                     <artifactId>jdk.tools</artifactId>
                     <groupId>jdk.tools</groupId>
                 </exclusion>
             </exclusions>
+        </dependency>
+
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-api</artifactId>
+            <version>${slf4j.version}</version>
         </dependency>
 
     </dependencies>
