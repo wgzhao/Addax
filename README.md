@@ -134,6 +134,13 @@ add support for almost basic data type, and some complex data type.
 
 ## quick started
 
+### Use docker image
+
+```shell
+docker pull wgzhao/addax:latest
+docker run -ti --rm --name addax wgzhao/addax:latest /opt/addax/bin/addax.sh /opt/addax/job/job.json
+```
+
 ### Do not want to compile?
 
 If you are too lazy to compile or cannot compile because of your environment, you can download the corresponding version from the following link
