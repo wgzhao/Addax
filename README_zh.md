@@ -114,6 +114,13 @@
 
 ## 快速开始
 
+### 使用 Docker 镜像
+
+```shell
+docker pull wgzhao/addax:latest
+docker run -ti --rm --name addax wgzhao/addax:latest /opt/addax/bin/addax.sh /opt/addax/job/job.json
+```
+
 ### 不想编译
 
 如果你懒得编译或者因为环境无法编译，可以从以下链接下载对应的版本

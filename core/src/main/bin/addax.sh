@@ -101,8 +101,8 @@ function gen_log_file {
 
 # OS detect
 os=$(uname -s)
-
-if [ "x${os}" = "xDarwin" ]; then
+has_get_opt=$(which getopt 2>/dev/null)
+if [ "x${os}" = "xDarwin" -o "x${has_get_opt}" = "x" ]; then
     while getopts 'hj:p:l:vdL:' option; do
         case "$option" in
         h) usage ;;
