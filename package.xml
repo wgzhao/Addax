@@ -58,7 +58,7 @@
             <outputDirectory>addax-${project.version}</outputDirectory>
         </fileSet>
         <fileSet>
-            <directory>plugin/reader/elastichsearchreader/target/dbffilereader-${project.version}/</directory>
+            <directory>plugin/reader/elastichsearchreader/target/elastichsearchreader-${project.version}/</directory>
             <includes>
                 <include>**/*.*</include>
             </includes>
