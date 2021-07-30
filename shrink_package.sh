@@ -32,11 +32,9 @@ do
     plugin_dir=$(dirname $jar)
     file_name=$(basename $jar)
     # 1. move it to shared folder
-    /usr/bin/mv -f ${jar} shared/
+    /bin/mv -f ${jar} shared/
     # 2. create symbol link
-    cd ${plugin_dir}
-    ln -sf ../../../../shared/${file_name} $file_name
-    cd -
+    ( cd ${plugin_dir} && ln -sf ../../../../shared/${file_name} $file_name )
 done
 
 # create archive package
