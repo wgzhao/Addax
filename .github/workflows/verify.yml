@@ -1,0 +1,51 @@
+# This is a basic workflow to help you get started with Actions
+
+name: CI
+
+# Controls when the workflow will run
+on:
+  # Triggers the workflow on push or pull request events but only for the master branch
+  push:
+    branches: [ master ]
+  pull_request:
+    branches: [ master ]
+
+  # Allows you to run this workflow manually from the Actions tab
+  workflow_dispatch:
+
+# A workflow run is made up of one or more jobs that can run sequentially or in parallel
+jobs:
+  verify:
+    name: verify pull request
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Setup Java JDK
+        uses: actions/setup-java@v2.1.0
+        with:
+          # The Java version to set up. Takes a whole or semver Java version. See examples of supported syntax in README file
+          java-version: 1.8
+          # Java distribution. See the list of supported distributions in README file
+          distribution: adopt
+          # The package type (jdk, jre, jdk+fx, jre+fx)
+          java-package: jdk # optional, default is jdk
+          # The architecture of the package
+          architecture: x64 # optional, default is x64
+          # Path to where the compressed JDK is located
+          # Set this option if you want the action to check for the latest available version that satisfies the version spec
+          check-latest: true # optional
+          # ID of the distributionManagement repository in the pom.xml file. Default is `github`
+          server-id: github # optional, default is github
+          # Environment variable name for the username for authentication to the Apache Maven repository. Default is $GITHUB_ACTOR
+          server-username: GITHUB_ACTOR # optional, default is GITHUB_ACTOR
+          # Environment variable name for password or token for authentication to the Apache Maven repository. Default is $GITHUB_TOKEN
+          server-password: GITHUB_TOKEN # optional, default is GITHUB_TOKEN
+          # Path to where the settings.xml file will be written. Default is ~/.m2.
+          # Overwrite the settings.xml file if it exists. Default is "true".
+          overwrite-settings: true # optional, default is true
+          # GPG private key to import. Default is empty string.
+          # Environment variable name for the GPG private key passphrase. Default is $GPG_PASSPHRASE.
+          gpg-passphrase: $GPG_PASSPHRASE # optional
+      - name: run_verify
+      - run:
+          mvn --file pom.xml verify
