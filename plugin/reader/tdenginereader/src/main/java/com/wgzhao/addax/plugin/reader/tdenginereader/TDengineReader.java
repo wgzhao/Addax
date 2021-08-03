@@ -19,16 +19,16 @@
 
 package com.wgzhao.addax.plugin.reader.tdenginereader;
 
-import com.wgzhao.addax.common.base.Key;
 import com.wgzhao.addax.common.plugin.RecordSender;
 import com.wgzhao.addax.common.spi.Reader;
 import com.wgzhao.addax.common.util.Configuration;
 import com.wgzhao.addax.rdbms.reader.CommonRdbmsReader;
 import com.wgzhao.addax.rdbms.util.DataBaseType;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.util.List;
+
+import static com.wgzhao.addax.common.base.Constant.DEFAULT_FETCH_SIZE;
+import static com.wgzhao.addax.common.base.Key.FETCH_SIZE;
 
 public class TDengineReader
         extends Reader
@@ -39,7 +39,6 @@ public class TDengineReader
     public static class Job
             extends Reader.Job
     {
-        private static final Logger LOG = LoggerFactory.getLogger(Job.class);
 
         private Configuration originalConfig = null;
         private CommonRdbmsReader.Job commonRdbmsReaderJob;
@@ -98,7 +97,7 @@ public class TDengineReader
         public void startRead(RecordSender recordSender)
         {
             // TDengine does not support fetch size
-            int fetchSize = this.readerSliceConfig.getInt(Key.FETCH_SIZE);
+            int fetchSize = this.readerSliceConfig.getInt(FETCH_SIZE, DEFAULT_FETCH_SIZE);
             this.commonRdbmsReaderTask.startRead(this.readerSliceConfig, recordSender, getTaskPluginCollector(), fetchSize);
         }
 
