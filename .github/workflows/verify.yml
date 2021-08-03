@@ -45,5 +45,5 @@ jobs:
           # Environment variable name for the GPG private key passphrase. Default is $GPG_PASSPHRASE.
           gpg-passphrase: $GPG_PASSPHRASE # optional
       - name: run_verify
-      - run:
+        run:
           mvn --file pom.xml verify
