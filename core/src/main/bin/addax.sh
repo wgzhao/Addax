@@ -175,7 +175,7 @@ parse_job_file
 gen_log_file
 
 # combine command
-cmd="${ENGINE_COMMAND} ${CUST_JVM} -Dloglevel=${LOG_LEVEL} -Daddax.log=${LOG_DIR} -Dlog.file.name=${LOG_FILE}"
+cmd="${ENGINE_COMMAND} ${CUST_JVM} ${PARAMS} -Dloglevel=${LOG_LEVEL} -Daddax.log=${LOG_DIR} -Dlog.file.name=${LOG_FILE}"
 
 if [ ${DEBUG} -eq 1 ]; then
     cmd="${cmd} ${REMOTE_DEBUG_CONFIG}"
