@@ -158,7 +158,13 @@ public class Engine
 
     public static void main(String[] args)
     {
-        LOG.info("Addax version {}", Engine.getVersion());
+        System.out.println("\n  ___      _     _            \n" +
+                " / _ \\    | |   | |           \n" +
+                "/ /_\\ \\ __| | __| | __ ___  __\n" +
+                "|  _  |/ _` |/ _` |/ _` \\ \\/ /\n" +
+                "| | | | (_| | (_| | (_| |>  < \n" +
+                "\\_| |_/\\__,_|\\__,_|\\__,_/_/\\_\\\n");
+        System.out.println(":: Addax version ::    (v" + Engine.getVersion() + ")\n");
         int exitCode = 0;
         if (args.length < 2) {
             LOG.error("need a job file");
