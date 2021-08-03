@@ -18,6 +18,7 @@
 #  * under the License.
 #  */
 #
+echo "Begin shrinking package..."
 target="$(dirname $0)/target"
 [ -d ${target} ] || exit 1
 TMPDIR=$(ls -d -w1 target/addax/addax-*)
@@ -31,6 +32,7 @@ for jar in $(find  plugin/*/*/libs -type f -name *.jar)
 do
     plugin_dir=$(dirname $jar)
     file_name=$(basename $jar)
+    echo "\t shrinking ${file_name}"
     # 1. move it to shared folder
     /bin/mv -f ${jar} shared/
     # 2. create symbol link
@@ -42,6 +44,8 @@ cd ..
 # should be in target/addax/
 # get archive name including version
 archive_name=$(basename $TMPDIR)
+echo "Create archived package"
 tar -czf "${archive_name}.tar.gz" ${archive_name}/*
+echo "The archive package is at: ${target}/addax/${archive_name}.tar.gz"
 exit $?
 
