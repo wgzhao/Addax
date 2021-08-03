@@ -15,15 +15,6 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      -
-        name: Import GPG key
-        id: import_gpg
-        uses: crazy-max/ghaction-import-gpg@v3
-        with:
-          gpg-private-key: ${{ secrets.GPG_SIGNING_KEY }}
-          passphrase: ${{ secrets.GPG_PASS_PHRASE }}
-          git-user-signingkey: false
-          git-commit-gpgsign: false
 
       - uses: actions/checkout@v2
       - name: Set up JDK 1.8
