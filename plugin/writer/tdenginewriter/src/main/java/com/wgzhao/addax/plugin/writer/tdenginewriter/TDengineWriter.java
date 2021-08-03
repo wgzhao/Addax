@@ -16,26 +16,22 @@ import java.time.Instant;
 import java.util.List;
 
 public class TDengineWriter
-        extends Writer
-{
+        extends Writer {
     private static final DataBaseType DATABASE_TYPE = DataBaseType.TDengine;
 
     public static class Job
-            extends Writer.Job
-    {
+            extends Writer.Job {
         private Configuration originalConfig = null;
         private CommonRdbmsWriter.Job commonRdbmsWriterJob;
 
         @Override
-        public void preCheck()
-        {
+        public void preCheck() {
             this.init();
             this.commonRdbmsWriterJob.writerPreCheck(this.originalConfig, DATABASE_TYPE);
         }
 
         @Override
-        public void init()
-        {
+        public void init() {
             this.originalConfig = super.getPluginJobConf();
             this.commonRdbmsWriterJob = new CommonRdbmsWriter.Job(DATABASE_TYPE);
             this.commonRdbmsWriterJob.init(this.originalConfig);
@@ -43,84 +39,69 @@ public class TDengineWriter
 
         // 一般来说，是需要推迟到 task 中进行pre 的执行（单表情况例外）
         @Override
-        public void prepare()
-        {
+        public void prepare() {
             //实跑先不支持 权限 检验
 //            this.commonRdbmsWriterJob.privilegeValid(this.originalConfig, DATABASE_TYPE)
             this.commonRdbmsWriterJob.prepare(this.originalConfig);
         }
 
         @Override
-        public List<Configuration> split(int mandatoryNumber)
-        {
+        public List<Configuration> split(int mandatoryNumber) {
             return this.commonRdbmsWriterJob.split(this.originalConfig, mandatoryNumber);
         }
 
         // 一般来说，是需要推迟到 task 中进行post 的执行（单表情况例外）
         @Override
-        public void post()
-        {
+        public void post() {
             this.commonRdbmsWriterJob.post(this.originalConfig);
         }
 
         @Override
-        public void destroy()
-        {
+        public void destroy() {
             this.commonRdbmsWriterJob.destroy(this.originalConfig);
         }
     }
 
     public static class Task
-            extends Writer.Task
-    {
+            extends Writer.Task {
         private Configuration writerSliceConfig;
         private CommonRdbmsWriter.Task commonRdbmsWriterTask;
 
         @Override
-        public void init()
-        {
+        public void init() {
             this.writerSliceConfig = super.getPluginJobConf();
-            this.commonRdbmsWriterTask = new CommonRdbmsWriter.Task(DATABASE_TYPE)
-            {
+            this.commonRdbmsWriterTask = new CommonRdbmsWriter.Task(DATABASE_TYPE) {
                 @Override
                 protected PreparedStatement fillPreparedStatementColumnType(PreparedStatement preparedStatement, int columnIndex, int columnSqlType, Column column)
-                        throws SQLException
-                {
+                        throws SQLException {
                     if (column.getRawData() == null) {
-                        preparedStatement.setObject(columnIndex + 1, null);
+                        preparedStatement.setObject(columnIndex, null);
                         return preparedStatement;
                     }
-                    switch (this.resultSetMetaData.getRight().get(columnIndex)) {
+                    switch (this.resultSetMetaData.getRight().get(columnIndex - 1)) {
                         case "BOOL":
-                            preparedStatement.setBoolean(columnIndex+1, column.asBoolean());
+                            preparedStatement.setBoolean(columnIndex, column.asBoolean());
                             break;
 
                         case "SMALLINT":
                         case "TINYINT":
                         case "INT":
                         case "BIGINT":
-                            preparedStatement.setLong(columnIndex + 1, column.asLong());
+                            preparedStatement.setLong(columnIndex, column.asLong());
                             break;
 
                         case "REAL":
                         case "DOUBLE":
-                            preparedStatement.setDouble(columnIndex+1, column.asDouble());
+                            preparedStatement.setDouble(columnIndex, column.asDouble());
                             break;
 
                         case "TIMESTAMP":
-                            // TDengine timestamp min values is 1500000000000, means 2017-07-14 10:40:00.0
-                            // so if timestamp less than ths min value ,it will occurred timestamp out of range
-                            if (columnIndex == 0 && column.asLong() < 1500000000000L) {
-                              throw AddaxException.asAddaxException(DBUtilErrorCode.WRITE_DATA_ERROR,
-                                      "TDengine 能写入的时间戳最小时间为 '2017-07-14 10:40:00.0', 当前要求写入的时间为 " +
-                                              Timestamp.from(Instant.ofEpochMilli(column.asLong())));
-                            }
-                            preparedStatement.setObject(columnIndex + 1, column.asLong());
+                            preparedStatement.setObject(columnIndex, column.asLong());
                             break;
 
                         case "BINARY":
                         case "NCHAR":
-                            preparedStatement.setString(columnIndex + 1, column.asString());
+                            preparedStatement.setString(columnIndex, column.asString());
                             break;
 
                         default:
@@ -141,25 +122,21 @@ public class TDengineWriter
         }
 
         @Override
-        public void prepare()
-        {
+        public void prepare() {
             this.commonRdbmsWriterTask.prepare(this.writerSliceConfig);
         }
 
-        public void startWrite(RecordReceiver recordReceiver)
-        {
+        public void startWrite(RecordReceiver recordReceiver) {
             this.commonRdbmsWriterTask.startWrite(recordReceiver, writerSliceConfig, getTaskPluginCollector());
         }
 
         @Override
-        public void post()
-        {
+        public void post() {
             this.commonRdbmsWriterTask.post(this.writerSliceConfig);
         }
 
         @Override
-        public void destroy()
-        {
+        public void destroy() {
             this.commonRdbmsWriterTask.destroy(this.writerSliceConfig);
         }
     }
