@@ -109,7 +109,7 @@ public class GroovyTransformer
         }
         sb.append("import static com.wgzhao.addax.core.transport.transformer.GroovyTransformerStaticUtil.*;");
         sb.append("import com.wgzhao.addax.common.element.*;");
-        sb.append("import com.wgzhao.addax.common.exception.DataXException;");
+        sb.append("import com.wgzhao.addax.common.exception.AddaxException;");
         sb.append("import com.wgzhao.addax.transformer.Transformer;");
         sb.append("import java.util.*;");
         sb.append("public class RULE extends Transformer").append("{");
