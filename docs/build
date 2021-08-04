@@ -20,5 +20,5 @@
 #
 
 set -eux
-pip3.7 install -r requirements.txt
+pip3 install -r requirements.txt
 sphinx-build -j auto -b html -a  src/main/sphinx target/html
