@@ -87,40 +87,40 @@ public class TDengineWriter
                         throws SQLException
                 {
                     if (column.getRawData() == null) {
-                        preparedStatement.setObject(columnIndex + 1, null);
+                        preparedStatement.setObject(columnIndex, null);
                         return preparedStatement;
                     }
-                    switch (this.resultSetMetaData.getRight().get(columnIndex)) {
+                    switch (this.resultSetMetaData.getRight().get(columnIndex-1)) {
                         case "BOOL":
-                            preparedStatement.setBoolean(columnIndex+1, column.asBoolean());
+                            preparedStatement.setBoolean(columnIndex, column.asBoolean());
                             break;
 
                         case "SMALLINT":
                         case "TINYINT":
                         case "INT":
                         case "BIGINT":
-                            preparedStatement.setLong(columnIndex + 1, column.asLong());
+                            preparedStatement.setLong(columnIndex, column.asLong());
                             break;
 
                         case "REAL":
                         case "DOUBLE":
-                            preparedStatement.setDouble(columnIndex+1, column.asDouble());
+                            preparedStatement.setDouble(columnIndex, column.asDouble());
                             break;
 
                         case "TIMESTAMP":
                             // TDengine timestamp min values is 1500000000000, means 2017-07-14 10:40:00.0
                             // so if timestamp less than ths min value ,it will occurred timestamp out of range
-                            if (columnIndex == 0 && column.asLong() < 1500000000000L) {
+                            if (columnIndex == 1 && column.asLong() < 1500000000000L) {
                               throw AddaxException.asAddaxException(DBUtilErrorCode.WRITE_DATA_ERROR,
                                       "TDengine 能写入的时间戳最小时间为 '2017-07-14 10:40:00.0', 当前要求写入的时间为 " +
                                               Timestamp.from(Instant.ofEpochMilli(column.asLong())));
                             }
-                            preparedStatement.setObject(columnIndex + 1, column.asLong());
+                            preparedStatement.setObject(columnIndex, column.asLong());
                             break;
 
                         case "BINARY":
                         case "NCHAR":
-                            preparedStatement.setString(columnIndex + 1, column.asString());
+                            preparedStatement.setString(columnIndex, column.asString());
                             break;
 
                         default:
