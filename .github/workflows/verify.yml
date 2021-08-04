@@ -44,6 +44,6 @@ jobs:
           # GPG private key to import. Default is empty string.
           # Environment variable name for the GPG private key passphrase. Default is $GPG_PASSPHRASE.
           gpg-passphrase: $GPG_PASSPHRASE # optional
-      - name: run_verify
+      - name: Maven Verify
         run:
-          mvn --file pom.xml verify
+          mvn verify
