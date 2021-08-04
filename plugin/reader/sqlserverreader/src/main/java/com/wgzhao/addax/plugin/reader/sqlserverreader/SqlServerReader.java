@@ -30,12 +30,12 @@ import com.wgzhao.addax.rdbms.util.DataBaseType;
 import java.util.List;
 
 import static com.wgzhao.addax.common.base.Key.FETCH_SIZE;
+import static com.wgzhao.addax.common.base.Constant.DEFAULT_FETCH_SIZE;
 
 public class SqlServerReader
         extends Reader
 {
 
-    public static final int DEFAULT_FETCH_SIZE = 1024;
     private static final DataBaseType DATABASE_TYPE = DataBaseType.SQLServer;
 
     public static class Job
@@ -49,29 +49,22 @@ public class SqlServerReader
         public void init()
         {
             this.originalConfig = getPluginJobConf();
-            int fetchSize = this.originalConfig.getInt(
-                    FETCH_SIZE,
-                    DEFAULT_FETCH_SIZE);
+            int fetchSize = this.originalConfig.getInt(FETCH_SIZE, DEFAULT_FETCH_SIZE);
             if (fetchSize < 1) {
                 throw AddaxException
                         .asAddaxException(DBUtilErrorCode.REQUIRED_VALUE,
-                                String.format("您配置的fetchSize有误，根据DataX的设计，fetchSize : [%d] 设置值不能小于 1.",
-                                        fetchSize));
+                                String.format("您配置的fetchSize有误，根据DataX的设计，fetchSize : [%d] 设置值不能小于 1.", fetchSize));
             }
-            this.originalConfig.set(
-                    FETCH_SIZE,
-                    fetchSize);
+            this.originalConfig.set(FETCH_SIZE, fetchSize);
 
-            this.commonRdbmsReaderJob = new SqlServerRdbmsReader.Job(
-                    DATABASE_TYPE);
+            this.commonRdbmsReaderJob = new CommonRdbmsReader.Job(DATABASE_TYPE);
             this.originalConfig = this.commonRdbmsReaderJob.init(this.originalConfig);
         }
 
         @Override
         public List<Configuration> split(int adviceNumber)
         {
-            return this.commonRdbmsReaderJob.split(this.originalConfig,
-                    adviceNumber);
+            return this.commonRdbmsReaderJob.split(this.originalConfig, adviceNumber);
         }
 
         @Override
@@ -98,19 +91,16 @@ public class SqlServerReader
         public void init()
         {
             this.readerSliceConfig = getPluginJobConf();
-            this.commonRdbmsReaderTask = new SqlServerRdbmsReader.Task(
-                    DATABASE_TYPE, getTaskGroupId(), getTaskId());
+            this.commonRdbmsReaderTask = new CommonRdbmsReader.Task(DATABASE_TYPE, getTaskGroupId(), getTaskId());
             this.commonRdbmsReaderTask.init(this.readerSliceConfig);
         }
 
         @Override
         public void startRead(RecordSender recordSender)
         {
-            int fetchSize = this.readerSliceConfig
-                    .getInt(FETCH_SIZE);
+            int fetchSize = this.readerSliceConfig.getInt(FETCH_SIZE);
 
-            this.commonRdbmsReaderTask.startRead(this.readerSliceConfig,
-                    recordSender, getTaskPluginCollector(), fetchSize);
+            this.commonRdbmsReaderTask.startRead(this.readerSliceConfig, recordSender, getTaskPluginCollector(), fetchSize);
         }
 
         @Override
