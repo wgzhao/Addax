@@ -22,7 +22,7 @@ jobs:
         uses: actions/setup-java@v2.1.0
         with:
           # The Java version to set up. Takes a whole or semver Java version. See examples of supported syntax in README file
-          java-version: 1.8
+          java-version: 8.0.222+10.1
           # Java distribution. See the list of supported distributions in README file
           distribution: adopt
           # The package type (jdk, jre, jdk+fx, jre+fx)
