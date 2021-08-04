@@ -1,5 +1,5 @@
 <p align="center">
-    <img alt="Addax Logo" src="https://github.com/wgzhao/Addax/blob/master/docs/images/logo.png?raw=true" width="205" />
+    <img alt="Addax Logo" src="https://github.com/wgzhao/Addax/blob/master/docs/src/main/sphinx/images/logo.png?raw=true" width="205" />
 </p>
 <p align="center">DataX 是一个支持主流数据库的通用数据采集工具</p>
 <p align="center"><a href="https://addax.readthedocs.io">使用文档</a> 详细描述了如何安装部署和每个采集插件的使用方法 </p>
