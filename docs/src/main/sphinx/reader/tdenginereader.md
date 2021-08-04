@@ -163,6 +163,23 @@ java.library.path:/usr/java/packages/lib/amd64:/usr/lib64:/lib64:/lib:/usr/lib
 | where           |    否    | string | 无     | 针对表的筛选条件 |
 | querySql        |    否    | list | 无     | 使用自定义的SQL而不是指定表来获取数据，当配置了这一项之后，Addax系统就会忽略 `table`，`column`这些配置项 |
 
+### 使用 JDBC-RESTful 接口
+
+如果不想依赖本地库，或者没有权限，则可以使用 `JDBC-RESTful` 接口来写入表，相比 JDBC-JNI 而言，配置区别是：
+
+- driverClass 指定为 `com.taosdata.jdbc.rs.RestfulDriver`
+- jdbcUrl 以 `jdbc:TAOS-RS://` 开头；
+- 使用 `6041` 作为连接端口
+
+所以上述配置中的` connection` 应该修改为如下：
+
+```json
+"connection": [{
+  "querySql":["select * from test.meters where ts <'2017-07-14 10:40:02' and  loc='beijing' limit 100"],
+  "jdbcUrl": ["jdbc:TAOS-RS://127.0.0.1:6041/test"],
+  "driver":"com.taosdata.jdbc.rs.RestfulDriver"
+}]
+```
 
 ## 类型转换
 

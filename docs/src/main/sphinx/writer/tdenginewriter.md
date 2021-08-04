@@ -5,7 +5,8 @@ TDengineWriter 插件实现了将数据写入到涛思公司的 [TDengine](https
 
 ## 前置条件
 
-考虑到性能问题，该插件使用了 TDengine 的 JDBC-JNI 驱动， 该驱动直接调用客户端 API（libtaos.so 或 taos.dll）将写入和查询请求发送到taosd 实例。因此在使用之前需要配置好动态库链接文件。
+考虑到性能问题，该插件使用了 TDengine 的 JDBC-JNI 驱动， 该驱动直接调用客户端 API（`libtaos.so` 或 `taos.dll`）将写入和查询请求发送到 `taosd` 实例。
+因此在使用之前需要配置好动态库链接文件。
 
 首先将 `plugin/writer/tdenginewriter/libs/libtaos.so.2.0.16.0` 拷贝到 `/usr/lib64` 目录，然后执行下面的命令创建软链接
 
@@ -210,6 +211,23 @@ INSERT INTO %s (ts,name,file_size,file_date,flag_open,memo) VALUES(?,?,?,?,?,?)
 | postSql        |   否      | list | 无    | 数据写入完成后执行的sql语句，例如加上某一个时间戳|
 | batchSize       |    否    | int | 1024   | 定义了插件和数据库服务器端每次批量数据获取条数，调高该值可能导致 Addax 出现OOM或者目标数据库事务提交失败导致挂起 |
 
+### 使用 JDBC-RESTful 接口
+
+如果不想依赖本地库，或者没有权限，则可以使用 `JDBC-RESTful` 接口来写入表，相比 JDBC-JNI 而言，配置区别是：
+
+- driverClass 指定为 `com.taosdata.jdbc.rs.RestfulDriver`
+- jdbcUrl 以 `jdbc:TAOS-RS://` 开头；
+- 使用 `6041` 作为连接端口
+
+所以上述配置中的` connection` 应该修改为如下：
+
+```json
+"connection": [{
+  "jdbcUrl":"jdbc:TAOS-RS://127.0.0.1:6041/test",
+  "table":["addax_test"],
+  "driver":"com.taosdata.jdbc.rs.RestfulDriver"
+}]
+```
 
 ## 类型转换
 
