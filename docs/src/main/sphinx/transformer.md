@@ -262,6 +262,207 @@ String code3="Column column = record.getColumn(1);\n"+
 }
 ```
 
+## 自定义函数
+
+如果自带的函数不满足数据转换要求，我们可以在 `transformer` 编写满足 `groovy` 规范要求的代码，下面给出一个完整的例子
+
+```json
+{
+  "job": {
+    "setting": {
+      "speed": {
+        "byte": -1,
+        "channel": 1
+      },
+      "errorLimit": {
+        "record": 0,
+        "percentage": 0.02
+      }
+    },
+    "content": [
+      {
+        "reader": {
+          "name": "streamreader",
+          "parameter": {
+            "column": [
+              {
+                "value": "Addax",
+                "type": "string"
+              },
+              {
+                "incr": "1",
+                "type": "long"
+              },
+              {
+                "incr": "1989/06/04 00:00:01,-1",
+                "type": "date",
+                "dateFormat": "yyyy/MM/dd hh:mm:ss"
+              },
+              {
+                "value": true,
+                "type": "bool"
+              },
+              {
+                "value": "test",
+                "type": "bytes"
+              }
+            ],
+            "sliceRecordCount": 10
+          }
+        },
+        "writer": {
+          "name": "streamwriter",
+          "parameter": {
+            "print": true,
+            "column": [
+              "col1"
+            ],
+            "encoding": "UTF-8"
+          }
+        },
+        "transformer": [
+          {
+            "name":"dx_groovy",
+            "description":"Add string 'Header_' to the first column value;Double the value of the second field",
+            "parameter": {
+              "code": "record.setColumn(0, new StringColumn('Header_' + record.getColumn(0).asString()));record.setColumn(1, new LongColumn(record.getColumn(1).asLong() * 2));return record;"
+            }
+          }
+        ]
+      }
+    ]
+  }
+}
+```
+
+上述　`transformer` 代码针对每条记录的前面两个字段做了修改，对第一个字段的字符串，在字符串前面增加 `Header_` 字符；
+第二个整数字段值进行倍增处理。最后执行的结果如下：
+
+```
+$ bin/addax.sh job/transformer_demo.json 
+
+  ___      _     _            
+ / _ \    | |   | |           
+/ /_\ \ __| | __| | __ ___  __
+|  _  |/ _` |/ _` |/ _` \ \/ /
+| | | | (_| | (_| | (_| |>  < 
+\_| |_/\__,_|\__,_|\__,_/_/\_\
+
+:: Addax version ::    (v4.0.2-SNAPSHOT)
+
+2021-08-04 15:45:56.421 [        main] INFO  VMInfo               - VMInfo# operatingSystem class => com.sun.management.internal.OperatingSystemImpl
+2021-08-04 15:45:56.443 [        main] INFO  Engine               - 
+{
+        "content":[
+                {
+                        "reader":{
+                                "parameter":{
+                                        "column":[
+                                                {
+                                                        "type":"string",
+                                                        "value":"Addax"
+                                                },
+                                                {
+                                                        "incr":"1",
+                                                        "type":"long"
+                                                },
+                                                {
+                                                        "incr":"1989/06/04 00:00:01,-1",
+                                                        "dateFormat":"yyyy/MM/dd hh:mm:ss",
+                                                        "type":"date"
+                                                },
+                                                {
+                                                        "type":"bool",
+                                                        "value":true
+                                                },
+                                                {
+                                                        "type":"bytes",
+                                                        "value":"test"
+                                                }
+                                        ],
+                                        "sliceRecordCount":10
+                                },
+                                "name":"streamreader"
+                        },
+                        "transformer":[
+                                {
+                                        "parameter":{
+                                                "code":"record.setColumn(0, new StringColumn('Header_' + record.getColumn(0).asString()));record.setColumn(1, new LongColumn(record.getColumn(1).asLong() * 2));return record;"
+                                        },
+                                        "name":"dx_groovy",
+                                        "description":"Add string 'Header_' to the first column value;Double the value of the second field"
+                                }
+                        ],
+                        "writer":{
+                                "parameter":{
+                                        "print":true,
+                                        "column":[
+                                                "col1"
+                                        ],
+                                        "encoding":"UTF-8"
+                                },
+                                "name":"streamwriter"
+                        }
+                }
+        ],
+        "setting":{
+                "errorLimit":{
+                        "record":0,
+                        "percentage":0.02
+                },
+                "speed":{
+                        "byte":-1,
+                        "channel":1
+                }
+        }
+}
+
+2021-08-04 15:45:56.458 [        main] INFO  PerfTrace            - PerfTrace traceId=job_-1, isEnable=false, priority=0
+2021-08-04 15:45:56.459 [        main] INFO  JobContainer         - Addax jobContainer starts job.
+2021-08-04 15:45:56.460 [        main] INFO  JobContainer         - Set jobId = 0
+2021-08-04 15:45:56.470 [       job-0] INFO  JobContainer         - Addax Reader.Job [streamreader] do prepare work .
+2021-08-04 15:45:56.471 [       job-0] INFO  JobContainer         - Addax Writer.Job [streamwriter] do prepare work .
+2021-08-04 15:45:56.471 [       job-0] INFO  JobContainer         - Job set Channel-Number to 1 channels.
+2021-08-04 15:45:56.472 [       job-0] INFO  JobContainer         - Addax Reader.Job [streamreader] splits to [1] tasks.
+2021-08-04 15:45:56.472 [       job-0] INFO  JobContainer         - Addax Writer.Job [streamwriter] splits to [1] tasks.
+2021-08-04 15:45:56.498 [       job-0] INFO  JobContainer         - Scheduler starts [1] taskGroups.
+2021-08-04 15:45:56.505 [ taskGroup-0] INFO  TaskGroupContainer   - taskGroupId=[0] start [1] channels for [1] tasks.
+2021-08-04 15:45:56.517 [ taskGroup-0] INFO  Channel              - Channel set byte_speed_limit to -1, No bps activated.
+2021-08-04 15:45:56.517 [ taskGroup-0] INFO  Channel              - Channel set record_speed_limit to -1, No tps activated.
+2021-08-04 15:45:56.520 [ taskGroup-0] INFO  TransformerUtil      -  user config transformers [[dx_groovy]], loading...
+2021-08-04 15:45:56.531 [ taskGroup-0] INFO  TransformerUtil      -  1 of transformer init success. name=dx_groovy, isNative=true parameter = {"code":"record.setColumn(0, new StringColumn('Header_' + record.getColumn(0).asString()));record.setColumn(1, new LongColumn(record.getColumn(1).asLong() * 2));return record;"}
+
+Header_Addax    2       1989-06-04 00:00:01     true    test
+Header_Addax    4       1989-06-03 00:00:01     true    test
+Header_Addax    6       1989-06-02 00:00:01     true    test
+Header_Addax    8       1989-06-01 00:00:01     true    test
+Header_Addax    10      1989-05-31 00:00:01     true    test
+Header_Addax    12      1989-05-30 00:00:01     true    test
+Header_Addax    14      1989-05-29 00:00:01     true    test
+Header_Addax    16      1989-05-28 00:00:01     true    test
+Header_Addax    18      1989-05-27 00:00:01     true    test
+Header_Addax    20      1989-05-26 00:00:01     true    test
+
+2021-08-04 15:45:59.515 [       job-0] INFO  AbstractScheduler    - Scheduler accomplished all tasks.
+2021-08-04 15:45:59.517 [       job-0] INFO  JobContainer         - Addax Writer.Job [streamwriter] do post work.
+2021-08-04 15:45:59.518 [       job-0] INFO  JobContainer         - Addax Reader.Job [streamreader] do post work.
+2021-08-04 15:45:59.521 [       job-0] INFO  JobContainer         - PerfTrace not enable!
+2021-08-04 15:45:59.524 [       job-0] INFO  StandAloneJobContainerCommunicator - Total 10 records, 330 bytes | Speed 110B/s, 3 records/s | Error 0 records, 0 bytes |  All Task WaitWriterTime 0.000s |  All Task WaitReaderTime 0.000s | Transformer Success 10 records | Transformer Error 0 records | Transformer Filter 0 records | Transformer usedTime 0.383s | Percentage 100.00%
+2021-08-04 15:45:59.527 [       job-0] INFO  JobContainer         - 
+任务启动时刻                    : 2021-08-04 15:45:56
+任务结束时刻                    : 2021-08-04 15:45:59
+任务总计耗时                    :                  3s
+任务平均流量                    :              110B/s
+记录写入速度                    :              3rec/s
+读出记录总数                    :                  10
+读写失败总数                    :                   0
+
+2021-08-04 15:45:59.528 [       job-0] INFO  JobContainer         - 
+Transformer成功记录总数         :                  10
+Transformer失败记录总数         :                   0
+Transformer过滤记录总数         :                   0
+```
+
 ## 计量和脏数据
 
 Transform过程涉及到数据的转换，可能造成数据的增加或减少，因此更加需要精确度量，包括：
