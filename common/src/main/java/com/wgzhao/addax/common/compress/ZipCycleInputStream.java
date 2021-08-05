@@ -17,7 +17,7 @@
  * under the License.
  */
 
-package com.wgzhao.addax.plugin.reader.txtfilereader;
+package com.wgzhao.addax.common.compress;
 
 import java.io.IOException;
 import java.io.InputStream;
