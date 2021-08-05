@@ -45,10 +45,11 @@ import java.util.Objects;
 import java.util.Set;
 
 import static com.wgzhao.addax.common.base.Key.DATE_FORMAT;
+import static com.wgzhao.addax.common.base.Key.FILE_FORMAT;
 import static com.wgzhao.addax.common.base.Key.FILE_NAME;
 import static com.wgzhao.addax.common.base.Key.FORMAT;
-import static com.wgzhao.addax.common.base.Key.WRITE_MODE;
 import static com.wgzhao.addax.common.base.Key.PATH;
+import static com.wgzhao.addax.common.base.Key.WRITE_MODE;
 
 /**
  * Created by haiwei.luo on 14-9-17.
@@ -96,12 +97,14 @@ public class TxtFileWriter
                 if (!dir.exists()) {
                     boolean createdOk = dir.mkdirs();
                     if (!createdOk) {
-                        throw AddaxException.asAddaxException(TxtFileWriterErrorCode.CONFIG_INVALID_EXCEPTION, String.format("您指定的文件路径 : [%s] 创建失败.", path));
+                        throw AddaxException.asAddaxException(TxtFileWriterErrorCode.CONFIG_INVALID_EXCEPTION,
+                                String.format("您指定的文件路径 : [%s] 创建失败.", path));
                     }
                 }
             }
             catch (SecurityException se) {
-                throw AddaxException.asAddaxException(TxtFileWriterErrorCode.SECURITY_NOT_ENOUGH, String.format("您没有权限创建文件路径 : [%s] ", path), se);
+                throw AddaxException.asAddaxException(TxtFileWriterErrorCode.SECURITY_NOT_ENOUGH,
+                        String.format("您没有权限创建文件路径 : [%s] ", path), se);
             }
         }
 
@@ -115,15 +118,18 @@ public class TxtFileWriter
             File dir = new File(path);
             //path is exists or not ?
             if (!dir.exists()) {
-                throw AddaxException.asAddaxException(TxtFileWriterErrorCode.PATH_NOT_VALID, String.format("您配置的路径 [%s] 不存在", path));
+                throw AddaxException.asAddaxException(TxtFileWriterErrorCode.PATH_NOT_VALID,
+                        String.format("您配置的路径 [%s] 不存在", path));
             }
             // path is directory or not ?
             if (!dir.isDirectory()) {
-                throw AddaxException.asAddaxException(TxtFileWriterErrorCode.PAHT_NOT_DIR, String.format("您配置的路径 [%s] 不是文件夹", path));
+                throw AddaxException.asAddaxException(TxtFileWriterErrorCode.PAHT_NOT_DIR,
+                        String.format("您配置的路径 [%s] 不是文件夹", path));
             }
             // path can writer it ?
             if (!dir.canWrite()) {
-                throw AddaxException.asAddaxException(TxtFileWriterErrorCode.WRITE_FILE_ERROR, String.format("您配置的路径 [%s] 没有写入权限", path));
+                throw AddaxException.asAddaxException(TxtFileWriterErrorCode.WRITE_FILE_ERROR,
+                        String.format("您配置的路径 [%s] 没有写入权限", path));
             }
             // truncate option handler
             if ("truncate".equals(writeMode)) {
@@ -139,13 +145,16 @@ public class TxtFileWriter
                     }
                 }
                 catch (NullPointerException npe) {
-                    throw AddaxException.asAddaxException(TxtFileWriterErrorCode.WRITE_FILE_ERROR, String.format("您配置的目录清空时出现空指针异常 : [%s]", path), npe);
+                    throw AddaxException.asAddaxException(TxtFileWriterErrorCode.WRITE_FILE_ERROR,
+                            String.format("您配置的目录清空时出现空指针异常 : [%s]", path), npe);
                 }
                 catch (IllegalArgumentException iae) {
-                    throw AddaxException.asAddaxException(TxtFileWriterErrorCode.SECURITY_NOT_ENOUGH, String.format("您配置的目录参数异常 : [%s]", path));
+                    throw AddaxException.asAddaxException(TxtFileWriterErrorCode.SECURITY_NOT_ENOUGH,
+                            String.format("您配置的目录参数异常 : [%s]", path));
                 }
                 catch (IOException e) {
-                    throw AddaxException.asAddaxException(TxtFileWriterErrorCode.WRITE_FILE_ERROR, String.format("无法清空目录 : [%s]", path), e);
+                    throw AddaxException.asAddaxException(TxtFileWriterErrorCode.WRITE_FILE_ERROR,
+                            String.format("无法清空目录 : [%s]", path), e);
                 }
             }
             else if ("append".equals(writeMode)) {
@@ -156,7 +165,8 @@ public class TxtFileWriter
                 // warn: check two times about exists, mkdir
                 if (dir.exists()) {
                     if (!dir.canRead()) {
-                        throw AddaxException.asAddaxException(TxtFileWriterErrorCode.SECURITY_NOT_ENOUGH, String.format("您没有权限查看目录 : [%s]", path));
+                        throw AddaxException.asAddaxException(TxtFileWriterErrorCode.SECURITY_NOT_ENOUGH,
+                                String.format("您没有权限查看目录 : [%s]", path));
                     }
                     // fileName is not null
                     FilenameFilter filter = new PrefixFileFilter(fileName);
@@ -168,13 +178,15 @@ public class TxtFileWriter
                             allFiles.add(eachFile.getName());
                         }
                         LOG.error("冲突文件列表为: [{}]", StringUtils.join(allFiles, ","));
-                        throw AddaxException.asAddaxException(TxtFileWriterErrorCode.ILLEGAL_VALUE, String.format("您配置的path: [%s] 目录不为空, 下面存在其他文件或文件夹.", path));
+                        throw AddaxException.asAddaxException(TxtFileWriterErrorCode.ILLEGAL_VALUE,
+                                String.format("您配置的path: [%s] 目录不为空, 下面存在其他文件或文件夹.", path));
                     }
                 }
                 else {
                     boolean createdOk = dir.mkdirs();
                     if (!createdOk) {
-                        throw AddaxException.asAddaxException(TxtFileWriterErrorCode.CONFIG_INVALID_EXCEPTION, String.format("您指定的文件路径 : [%s] 创建失败.", path));
+                        throw AddaxException.asAddaxException(TxtFileWriterErrorCode.CONFIG_INVALID_EXCEPTION,
+                                String.format("您指定的文件路径 : [%s] 创建失败.", path));
                     }
                 }
             }
@@ -207,7 +219,8 @@ public class TxtFileWriter
                 allFiles = new HashSet<>(Arrays.asList(Objects.requireNonNull(dir.list())));
             }
             catch (SecurityException se) {
-                throw AddaxException.asAddaxException(TxtFileWriterErrorCode.SECURITY_NOT_ENOUGH, String.format("您没有权限查看目录 : [%s]", path));
+                throw AddaxException.asAddaxException(TxtFileWriterErrorCode.SECURITY_NOT_ENOUGH,
+                        String.format("您没有权限查看目录 : [%s]", path));
             }
             return StorageWriterUtil.split(writerSliceConfig, allFiles, mandatoryNumber);
         }
@@ -221,6 +234,7 @@ public class TxtFileWriter
         private Configuration writerSliceConfig;
         private String path;
         private String fileName;
+        private String fileFormat;
         // add correspond compress suffix if compress is present
         private String suffix;
 
@@ -228,8 +242,9 @@ public class TxtFileWriter
         public void init()
         {
             this.writerSliceConfig = this.getPluginJobConf();
-            this.path = this.writerSliceConfig.getString(Key.PATH);
+            this.path = this.writerSliceConfig.getString(PATH);
             this.fileName = this.writerSliceConfig.getString(FILE_NAME);
+            this.fileFormat = this.writerSliceConfig.getString(FILE_FORMAT, "txt");
         }
 
         @Override
@@ -242,6 +257,10 @@ public class TxtFileWriter
             else if ("bzip2".equalsIgnoreCase(compress) || "bzip".equalsIgnoreCase(compress)) {
                 suffix = ".bz2";
             }
+            else if ("zip".equalsIgnoreCase(compress)) {
+                suffix = ".zip";
+            }
+            this.fileName = this.fileName + "." + this.fileFormat;
         }
 
         @Override
@@ -257,13 +276,16 @@ public class TxtFileWriter
                 boolean isSuccess = newFile.createNewFile();
                 assert isSuccess;
                 outputStream = new FileOutputStream(newFile);
-                StorageWriterUtil.writeToStream(lineReceiver, outputStream, this.writerSliceConfig, this.fileName, this.getTaskPluginCollector());
+                StorageWriterUtil.writeToStream(lineReceiver, outputStream, this.writerSliceConfig, this.fileName,
+                        this.getTaskPluginCollector());
             }
             catch (SecurityException se) {
-                throw AddaxException.asAddaxException(TxtFileWriterErrorCode.SECURITY_NOT_ENOUGH, String.format("您没有权限创建文件  : [%s]", this.fileName));
+                throw AddaxException.asAddaxException(TxtFileWriterErrorCode.SECURITY_NOT_ENOUGH,
+                        String.format("您没有权限创建文件  : [%s]", this.fileName));
             }
             catch (IOException ioe) {
-                throw AddaxException.asAddaxException(TxtFileWriterErrorCode.WRITE_FILE_IO_ERROR, String.format("无法创建待写文件 : [%s]", this.fileName), ioe);
+                throw AddaxException.asAddaxException(TxtFileWriterErrorCode.WRITE_FILE_IO_ERROR,
+                        String.format("无法创建待写文件 : [%s]", this.fileName), ioe);
             }
             finally {
                 IOUtils.closeQuietly(outputStream, null);

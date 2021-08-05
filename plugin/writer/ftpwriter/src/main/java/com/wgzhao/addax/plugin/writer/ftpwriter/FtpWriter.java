@@ -19,6 +19,7 @@
 
 package com.wgzhao.addax.plugin.writer.ftpwriter;
 
+import com.wgzhao.addax.common.base.Key;
 import com.wgzhao.addax.common.exception.AddaxException;
 import com.wgzhao.addax.common.plugin.RecordReceiver;
 import com.wgzhao.addax.common.spi.Writer;
@@ -39,6 +40,10 @@ import java.util.List;
 import java.util.Set;
 import java.util.concurrent.Callable;
 
+import static com.wgzhao.addax.common.base.Constant.DEFAULT_ENCODING;
+import static com.wgzhao.addax.common.base.Key.COMPRESS;
+import static com.wgzhao.addax.common.base.Key.ENCODING;
+import static com.wgzhao.addax.common.base.Key.FILE_FORMAT;
 import static com.wgzhao.addax.common.base.Key.FILE_NAME;
 import static com.wgzhao.addax.common.base.Key.SUFFIX;
 import static com.wgzhao.addax.common.base.Key.WRITE_MODE;
@@ -130,23 +135,18 @@ public class FtpWriter
             // warn: 这里用户需要配一个目录
             this.ftpHelper.mkDirRecursive(path);
 
-            String fileName = this.writerSliceConfig
-                    .getString(FILE_NAME);
-            String writeMode = this.writerSliceConfig
-                    .getString(WRITE_MODE);
+            String fileName = this.writerSliceConfig.getString(FILE_NAME);
+            String writeMode = this.writerSliceConfig.getString(WRITE_MODE);
 
-            Set<String> allFilesInDir = this.ftpHelper.getAllFilesInDir(path,
-                    fileName);
+            Set<String> allFilesInDir = this.ftpHelper.getAllFilesInDir(path, fileName);
             this.allFileExists = allFilesInDir;
 
             // truncate option handler
             if ("truncate".equals(writeMode)) {
-                LOG.info("由于您配置了writeMode truncate, 开始清理 [{}] 下面以 [{}] 开头的内容",
-                        path, fileName);
+                LOG.info("由于您配置了writeMode truncate, 开始清理 [{}] 下面以 [{}] 开头的内容", path, fileName);
                 Set<String> fullFileNameToDelete = new HashSet<>();
                 for (String each : allFilesInDir) {
-                    fullFileNameToDelete.add(StorageWriterUtil
-                            .buildFilePath(path, each, null));
+                    fullFileNameToDelete.add(StorageWriterUtil.buildFilePath(path, each, null));
                 }
                 LOG.info("删除目录path:[{}] 下指定前缀fileName:[{}] 文件列表如下: [{}]", path,
                         fileName,
@@ -164,23 +164,18 @@ public class FtpWriter
             else if ("nonConflict".equals(writeMode)) {
                 LOG.info("由于您配置了writeMode nonConflict, 开始检查 [{}] 下面的内容", path);
                 if (!allFilesInDir.isEmpty()) {
-                    LOG.info("目录path:[{}] 下指定前缀fileName:[{}] 冲突文件列表如下: [{}]",
-                            path, fileName,
+                    LOG.info("目录path:[{}] 下指定前缀fileName:[{}] 冲突文件列表如下: [{}]", path, fileName,
                             StringUtils.join(allFilesInDir.iterator(), ", "));
-                    throw AddaxException
-                            .asAddaxException(
+                    throw AddaxException.asAddaxException(
                                     FtpWriterErrorCode.ILLEGAL_VALUE,
-                                    String.format(
-                                            "您配置的path: [%s] 目录不为空, 下面存在其他文件或文件夹.",
-                                            path));
+                                    String.format( "您配置的path: [%s] 目录不为空, 下面存在其他文件或文件夹.", path));
                 }
             }
             else {
                 throw AddaxException
                         .asAddaxException(
                                 FtpWriterErrorCode.ILLEGAL_VALUE,
-                                String.format(
-                                        "仅支持 truncate, append, nonConflict 三种模式, 不支持您配置的 writeMode 模式 : [%s]",
+                                String.format("仅支持 truncate, append, nonConflict 三种模式, 不支持您配置的 writeMode 模式 : [%s]",
                                         writeMode));
             }
         }
@@ -198,8 +193,7 @@ public class FtpWriter
                 this.ftpHelper.logoutFtpServer();
             }
             catch (Exception e) {
-                String message = String
-                        .format("关闭与ftp服务器连接失败, host:%s, username:%s, port:%s, errorMessage:%s",
+                String message = String.format("关闭与ftp服务器连接失败, host:%s, username:%s, port:%s, errorMessage:%s",
                                 host, username, port, e.getMessage());
                 LOG.error(message, e);
             }
@@ -208,8 +202,7 @@ public class FtpWriter
         @Override
         public List<Configuration> split(int mandatoryNumber)
         {
-            return StorageWriterUtil.split(this.writerSliceConfig,
-                    this.allFileExists, mandatoryNumber);
+            return StorageWriterUtil.split(this.writerSliceConfig, this.allFileExists, mandatoryNumber);
         }
     }
 
@@ -230,6 +223,8 @@ public class FtpWriter
         private String username;
         private String password;
         private int timeout;
+        private String encoding;
+        private String compress;
 
         private IFtpHelper ftpHelper = null;
 
@@ -238,10 +233,8 @@ public class FtpWriter
         {
             this.writerSliceConfig = this.getPluginJobConf();
             this.path = this.writerSliceConfig.getString(FtpKey.PATH);
-            this.fileName = this.writerSliceConfig
-                    .getString(FILE_NAME);
-            this.suffix = this.writerSliceConfig
-                    .getString(SUFFIX);
+            this.fileName = this.writerSliceConfig.getString(FILE_NAME) + "." + this.writerSliceConfig.getString(FILE_FORMAT,"txt");
+            this.suffix = this.writerSliceConfig.getString(SUFFIX);
 
             this.host = this.writerSliceConfig.getString(FtpKey.HOST);
             this.port = this.writerSliceConfig.getInt(FtpKey.PORT);
@@ -264,8 +257,7 @@ public class FtpWriter
                 }, 3, 4000, true);
             }
             catch (Exception e) {
-                String message = String
-                        .format("与ftp服务器建立连接失败, host:%s, username:%s, port:%s, errorMessage:%s",
+                String message = String.format("与ftp服务器建立连接失败, host:%s, username:%s, port:%s, errorMessage:%s",
                                 host, username, port, e.getMessage());
                 LOG.error(message);
                 throw AddaxException.asAddaxException(
@@ -276,22 +268,26 @@ public class FtpWriter
         @Override
         public void prepare()
         {
-            //
+            this.encoding = writerSliceConfig.getString(ENCODING, DEFAULT_ENCODING);
+            // handle blank encoding
+            if (StringUtils.isBlank(encoding)) {
+                LOG.warn("您配置的encoding为[{}], 使用默认值[{}]", encoding, DEFAULT_ENCODING);
+                encoding = DEFAULT_ENCODING;
+            }
+            this.compress = writerSliceConfig.getString(COMPRESS);
         }
 
         @Override
         public void startWrite(RecordReceiver lineReceiver)
         {
             LOG.info("begin do write...");
-            String fileFullPath = StorageWriterUtil.buildFilePath(
-                    this.path, this.fileName, this.suffix);
+            String fileFullPath = StorageWriterUtil.buildFilePath(this.path, this.fileName, this.suffix);
             LOG.info(String.format("write to file : [%s]", fileFullPath));
 
             OutputStream outputStream = null;
             try {
                 outputStream = this.ftpHelper.getOutputStream(fileFullPath);
-                StorageWriterUtil.writeToStream(lineReceiver,
-                        outputStream, this.writerSliceConfig, this.fileName,
+                StorageWriterUtil.writeToStream(lineReceiver, outputStream, this.writerSliceConfig, this.fileName,
                         this.getTaskPluginCollector());
             }
             catch (Exception e) {
@@ -318,8 +314,7 @@ public class FtpWriter
                 this.ftpHelper.logoutFtpServer();
             }
             catch (Exception e) {
-                String message = String
-                        .format("关闭与ftp服务器连接失败, host:%s, username:%s, port:%s, errorMessage:%s",
+                String message = String.format("关闭与ftp服务器连接失败, host:%s, username:%s, port:%s, errorMessage:%s",
                                 host, username, port, e.getMessage());
                 LOG.error(message, e);
             }
