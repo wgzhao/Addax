@@ -181,7 +181,7 @@ public class HttpReader
                 // 否则是一个array
                 if (object instanceof JSONArray) {
                     // 有空值的情况下, toString会过滤掉，所以不能简单的使用 object.toString()方式
-                    // https://github.com/wgzhao/DataX/issues/171
+                    // https://github.com/wgzhao/Addax/issues/171
                     jsonArray = JSON.parseArray(JSONObject.toJSONString(object, SerializerFeature.WriteMapNullValue));
                 }
                 else if (object instanceof JSONObject) {

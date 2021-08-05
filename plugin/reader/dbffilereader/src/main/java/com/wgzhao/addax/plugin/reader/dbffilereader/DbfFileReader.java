@@ -299,7 +299,7 @@ public class DbfFileReader
                         }
                     }
                     else {
-                        // warn: 对于没有权限的文件，是直接throw DataXException
+                        // warn: 对于没有权限的文件，是直接throw AddaxException
                         String message = String.format("您没有权限查看目录 : [%s]", directory);
                         LOG.error(message);
                         throw AddaxException.asAddaxException(DbfFileReaderErrorCode.SECURITY_NOT_ENOUGH, message);

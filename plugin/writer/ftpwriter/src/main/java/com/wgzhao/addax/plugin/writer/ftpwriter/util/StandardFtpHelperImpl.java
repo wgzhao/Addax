@@ -125,8 +125,6 @@ public class StandardFtpHelperImpl
                                 "与ftp服务器断开连接失败, errorMessage:%s",
                                 e.getMessage());
                         LOG.error(message);
-//                        throw DataXException.asAddaxException(
-//                                FtpWriterErrorCode.FAIL_DISCONNECT, message, e);
                     }
                 }
                 this.ftpClient = null;

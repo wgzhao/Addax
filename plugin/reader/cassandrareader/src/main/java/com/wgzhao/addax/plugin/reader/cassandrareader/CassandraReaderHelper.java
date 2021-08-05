@@ -419,7 +419,7 @@ public class CassandraReaderHelper
                                     .asAddaxException(
                                             CassandraReaderErrorCode.CONF_ERROR,
                                             String.format(
-                                                    "您的配置文件中的列配置信息有误. 因为DataX 不支持数据库读取这种字段类型. 字段名:[%s], "
+                                                    "您的配置文件中的列配置信息有误. 不支持数据库读取这种字段类型. 字段名:[%s], "
                                                             + "字段类型:[%s]. ",
                                                     metaData.getName(i),
                                                     metaData.getType(i)));
@@ -430,7 +430,7 @@ public class CassandraReaderHelper
                             .asAddaxException(
                                     CassandraReaderErrorCode.CONF_ERROR,
                                     String.format(
-                                            "您的配置文件中的列配置信息有误. 因为DataX 不支持数据库读取这种字段类型. 字段名:[%s], "
+                                            "您的配置文件中的列配置信息有误. 不支持数据库读取这种字段类型. 字段名:[%s], "
                                                     + "字段类型:[%s]. ",
                                             metaData.getName(i),
                                             metaData.getType(i)));

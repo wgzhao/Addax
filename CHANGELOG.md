@@ -25,7 +25,7 @@
 
 * Fixed job template file
 * Add timeout configure items
-* Use native influxDB API instead of influxdb-java ([\#153](https://github.com/wgzhao/DataX/issues/153))
+* Use native influxDB API instead of influxdb-java ([\#153](https://github.com/wgzhao/Addax/issues/153))
 
 ### InfluxDB Writer
 
@@ -33,26 +33,26 @@
 
 ### Textfile Reader
 
-* Add support for more compress format ([\#154](https://github.com/wgzhao/DataX/issues/154))
+* Add support for more compress format ([\#154](https://github.com/wgzhao/Addax/issues/154))
 
 
 ## 3.2.2
 
 ### General Changes
 
-* Add support for Elasticsearch reader ([\#121](https://github.com/wgzhao/DataX/pull/121))
-* Add support for TDengine reader and writer ([\#124](https://github.com/wgzhao/DataX/pull/124))
-* Add Support for DorisDB writer ([\#131](https://github.com/wgzhao/DataX/pull/131))
+* Add support for Elasticsearch reader ([\#121](https://github.com/wgzhao/Addax/pull/121))
+* Add support for TDengine reader and writer ([\#124](https://github.com/wgzhao/Addax/pull/124))
+* Add Support for DorisDB writer ([\#131](https://github.com/wgzhao/Addax/pull/131))
 * Documentation streamreader and streamwriter
 
 ### InfluxDB Writer
 
-* Add support more than one channel setup ([\#130](https://github.com/wgzhao/DataX/pull/130))
+* Add support more than one channel setup ([\#130](https://github.com/wgzhao/Addax/pull/130))
 
 
 ### HDFS Writer
 
-* Fixed: unknown host exception when writing parquet file ([\#135](https://github.com/wgzhao/DataX/pull/135))
+* Fixed: unknown host exception when writing parquet file ([\#135](https://github.com/wgzhao/Addax/pull/135))
 
 ## 3.2.1
 
@@ -72,11 +72,11 @@ This is draft version
 
 ### RDBMS Reader
 
-* Allow specify jdbc driver class name ([\#164c](https://github.com/wgzhao/DataX/commit/164cdeae521e4be1f9eb441b6a00e26efea933e4))
+* Allow specify jdbc driver class name ([\#164c](https://github.com/wgzhao/Addax/commit/164cdeae521e4be1f9eb441b6a00e26efea933e4))
 
 ### RDBMS Writer
 
-* Allow specify jdbc driver class name ([\#164c](https://github.com/wgzhao/DataX/commit/164cdeae521e4be1f9eb441b6a00e26efea933e4))
+* Allow specify jdbc driver class name ([\#164c](https://github.com/wgzhao/Addax/commit/164cdeae521e4be1f9eb441b6a00e26efea933e4))
 
 ## 3.1.9
 
@@ -137,7 +137,7 @@ This is draft version
 
 ### Oracle writer
 
-* Fixed incorrect column cuased by duplicate variable initialization ([\#92](https://github.com/wgzhao/DataX/issues/92))
+* Fixed incorrect column cuased by duplicate variable initialization ([\#92](https://github.com/wgzhao/Addax/issues/92))
 
 ### Transformer
 
@@ -152,15 +152,15 @@ This is draft version
 
 ### Redis writer
 
-* Fixed incorrect target packaging folder ([\#81](https://github.com/wgzhao/DataX/issues/81))
+* Fixed incorrect target packaging folder ([\#81](https://github.com/wgzhao/Addax/issues/81))
 
 ### Oracle writer
 
-* Add support for `merge into` statement via configuring `wirteMode` item ([\#82](https://github.com/wgzhao/DataX/issues/81))
+* Add support for `merge into` statement via configuring `wirteMode` item ([\#82](https://github.com/wgzhao/Addax/issues/81))
 
 ### PostgreSQL writer
 
-* Add support for `insert into ... on conflict` statement via configuring `wirteMode` item ([\#82](https://github.com/wgzhao/DataX/issues/81))
+* Add support for `insert into ... on conflict` statement via configuring `wirteMode` item ([\#82](https://github.com/wgzhao/Addax/issues/81))
 
 ## 3.1.5
 
@@ -180,15 +180,15 @@ This is draft version
 
 ### Elasticsearch writer
 
-* Fixed missing dependency jars ([\#68](https://github.com/wgzhao/DataX/issues/68))
+* Fixed missing dependency jars ([\#68](https://github.com/wgzhao/Addax/issues/68))
 
 ### HDFS reader
 
-* Fix read failure when the filetype is text ([\#66](https://github.com/wgzhao/DataX/issues/66), [\#68](https://github.com/wgzhao/DataX/issues/68))
+* Fix read failure when the filetype is text ([\#66](https://github.com/wgzhao/Addax/issues/66), [\#68](https://github.com/wgzhao/Addax/issues/68))
 
 ## 3.1.4
 
-This is an emergency fix version to fix a serious problem in a previous release ( [\#62](https://github.com/wgzhao/DataX/issues/62)).
+This is an emergency fix version to fix a serious problem in a previous release ( [\#62](https://github.com/wgzhao/Addax/issues/62)).
 
 ## 3.1.3
 

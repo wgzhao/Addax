@@ -12,11 +12,6 @@
 # limitations under the License.
 #
 
-#
-# Presto documentation build configuration file
-#
-# This file is execfile()d with the current directory set to its containing dir.
-#
 
 import os
 import sys

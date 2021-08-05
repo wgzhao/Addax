@@ -94,7 +94,7 @@ public class HbaseSQLWriterTask
             }
         }
         catch (Throwable t) {
-            // 确保所有异常都转化为DataXException
+            // 确保所有异常都转化为 AddaxException
             throw AddaxException.asAddaxException(HbaseSQLWriterErrorCode.PUT_HBASE_ERROR, t);
         }
         finally {

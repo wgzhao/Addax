@@ -56,7 +56,7 @@ public class TestOrcFile
         if (file.exists()) {
             file.delete();
         }
-        byte[] image = IOUtils.toByteArray(TestOrcFile.class.getResourceAsStream("/datax_logo.png"));
+        byte[] image = IOUtils.toByteArray(TestOrcFile.class.getResourceAsStream("/addax_logo.png"));
 
         Writer writer = OrcFile.createWriter(new Path(filePath),
                 OrcFile.writerOptions(new Configuration()).setSchema(schema));

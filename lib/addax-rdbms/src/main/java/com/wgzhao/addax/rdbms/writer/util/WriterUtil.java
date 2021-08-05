@@ -145,7 +145,7 @@ public final class WriterUtil
 
         if (!isWriteModeLegal) {
             throw AddaxException.asAddaxException(DBUtilErrorCode.ILLEGAL_VALUE,
-                    String.format("您所配置的 writeMode:%s 错误. 因为DataX 目前仅支持replace,update 或 insert 方式. 请检查您的配置并作出修改.", writeMode));
+                    String.format("您所配置的 writeMode:%s 错误. 目前仅支持replace,update 或 insert 方式. 请检查您的配置并作出修改.", writeMode));
         }
         String writeDataSqlTemplate;
         if (forceUseUpdate || mode.startsWith("update")) {

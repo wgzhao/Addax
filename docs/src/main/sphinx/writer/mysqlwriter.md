@@ -103,7 +103,7 @@ col5 binary
 执行以下命令进行数据采集
 
 ```shell
-bin/addax.py job/stream2mysql.json
+bin/addax.sh job/stream2mysql.json
 ```
 
 ## 参数说明

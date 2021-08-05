@@ -124,7 +124,7 @@ VALUES (2E18,
 执行以下命令进行数据采集
 
 ```shell
-bin/addax.py job/mysql2stream.json
+bin/addax.sh job/mysql2stream.json
 ```
 
 ## 参数说明

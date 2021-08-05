@@ -82,7 +82,7 @@ public final class DBUtil {
                         }
                     }
                 }
-                throw new Exception("DataX无法连接对应的数据库，可能原因是：1) 配置的ip/port/database/jdbc错误，无法连接。" +
+                throw new Exception("无法连接对应的数据库，可能原因是：1) 配置的ip/port/database/jdbc错误，无法连接。" +
                         "2) 配置的username/password错误，鉴权失败。请和DBA确认该数据库的连接信息是否正确。");
             }, 3, 1000L, true);
         } catch (Exception e) {
@@ -210,7 +210,6 @@ public final class DBUtil {
      * <p>
      * if connecting failed, try to connect for MAX_TRY_TIMES times
      * <p>
-     * NOTE: In DataX, we don't need connection pool in fact
      *
      * @param dataBaseType database type.
      * @param jdbcUrl      java jdbc url.
@@ -242,7 +241,6 @@ public final class DBUtil {
      * <p>
      * if connecting failed, try to connect for MAX_TRY_TIMES times
      * <p>
-     * NOTE: In DataX, we don't need connection pool in fact
      *
      * @param dataBaseType The database's type
      * @param jdbcUrl      jdbc url

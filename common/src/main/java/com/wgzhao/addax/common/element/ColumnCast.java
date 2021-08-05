@@ -208,7 +208,7 @@ class DateCast
             default:
                 throw AddaxException
                         .asAddaxException(CommonErrorCode.CONVERT_NOT_SUPPORT,
-                                "时间类型出现不支持类型，目前仅支持DATE/TIME/DATETIME。该类型属于编程错误，请反馈给DataX开发团队 .");
+                                "时间类型出现不支持类型，目前仅支持DATE/TIME/DATETIME。该类型属于编程错误.");
         }
     }
 }

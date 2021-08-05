@@ -213,7 +213,7 @@ HttpReader 插件实现了读取Restful API 数据的能力
 执行以下命令，进行采集
 
 ```shell
-bin/addax.py job/httpreader2stream.json
+bin/addax.sh job/httpreader2stream.json
 ```
 
 上述命令的输出结果大致如下：

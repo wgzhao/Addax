@@ -1,11 +1,11 @@
 <p align="center">
     <img alt="Addax Logo" src="https://github.com/wgzhao/Addax/blob/master/docs/src/main/sphinx/images/logo.png?raw=true" width="205" />
 </p>
-<p align="center">Addax is an open source univeral ETL tool</p>
+<p align="center">Addax is an open source universal ETL tool</p>
 <p align="center"><a href="https://addax.readthedocs.io">Documentation</a> detailed description of how to install and deploy and how to use each collection plugin </p>
 <p align="center">
    <a href="https://github.com/wgzhao/Addax/workflows/Maven%20Package/badge.svg">
-       <img src="https://github.com/wgzhao/DataX/workflows/Maven%20Package/badge.svg" alt="Maven Package" />
+       <img src="https://github.com/wgzhao/Addax/workflows/Maven%20Package/badge.svg" alt="Maven Package" />
    </a>
    <a href="https://addax.readthedocs.io/zh_CN/latest/?badge=latest">
        <img src="https://readthedocs.org/projects/addax/badge/?version=latest" alt="Documentation Status" />

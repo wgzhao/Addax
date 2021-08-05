@@ -85,7 +85,7 @@ PROPERTIES("replication_num" = "1");
 执行下面的命令
 
 ```shell
-bin/addax.py job/stream2doris.json
+bin/addax.sh job/stream2doris.json
 ```
 
 输出类似如下：

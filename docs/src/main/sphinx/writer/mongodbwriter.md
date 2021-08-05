@@ -6,7 +6,7 @@ MongoDBWriter 插件利用 MongoDB 的java客户端MongoClient进行MongoDB的�
 
 ## 2 实现原理
 
-MongoDBWriter通过Datax框架获取Reader生成的数据，然后将Datax支持的类型通过逐一判断转换成MongoDB支持的类型。其中一个值得指出的点就是Datax本身不支持数组类型，但是MongoDB支持数组类型，并且数组类型的索引还是蛮强大的。为了使用MongoDB的数组类型，则可以通过参数的特殊配置，将字符串可以转换成MongoDB中的数组。类型转换之后，就可以依托于Datax框架并行的写入MongoDB。
+MongoDBWriter通过 addax 框架获取Reader生成的数据，然后将 Addax 支持的类型通过逐一判断转换成MongoDB支持的类型。其中一个值得指出的点就是 Addax 本身不支持数组类型，但是MongoDB支持数组类型，并且数组类型的索引还是蛮强大的。为了使用MongoDB的数组类型，则可以通过参数的特殊配置，将字符串可以转换成MongoDB中的数组。类型转换之后，就可以依托于 addax 框架并行的写入MongoDB。
 
 ## 3 功能说明
 
@@ -176,10 +176,10 @@ MongoDBWriter通过Datax框架获取Reader生成的数据，然后将Datax支持
 
 | 配置项         | 是否必须 | 默认值 | 描述                                                                                                                  |
 | :------------- | :------: | ------ | ------------------------------------------------------------------------------------------------------------------ |
-| address        |    是    | 无     | MongoDB的数据地址信息，因为MonogDB可能是个集群，则ip端口信息需要以Json数组的形式给出                                           |
+| address        |    是    | 无     | MongoDB的数据地址信息，因为MongoDB可能是个集群，则ip端口信息需要以Json数组的形式给出                                           |
 | userName       |    否    | 无     | MongoDB的用户名                                                                                                         |
 | userPassword   |    否    | 无     | MongoDB的密码                                                                                                            |
-| collectionName |    是    | 无     | MonogoDB的集合名                                                                                                        |
+| collectionName |    是    | 无     | MongoDB的集合名                                                                                                        |
 | column         |    是    | 无     | MongoDB的文档列名                                                                                                      |
 | name           |    是    | 无     | Column的名字                                                                                                          |
 | type           |    否    | 无     | Column的类型                                                                                                          |

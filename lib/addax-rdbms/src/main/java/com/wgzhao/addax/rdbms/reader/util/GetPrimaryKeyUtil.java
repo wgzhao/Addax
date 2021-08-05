@@ -88,7 +88,7 @@ public class GetPrimaryKeyUtil
                 // TODO select the appropriate column instead of the first column based
                 // on the datatype - giving preference to numerics over other types.
                 LOG.warn("The table " + table + " "
-                        + "contains a multi-column primary key. DataX will default to "
+                        + "contains a multi-column primary key. Addax will default to "
                         + "the column " + columns.get(0) + " only for this job.");
             }
             return columns.get(0);

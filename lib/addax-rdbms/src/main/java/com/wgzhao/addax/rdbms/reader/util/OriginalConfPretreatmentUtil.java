@@ -141,8 +141,8 @@ public final class OriginalConfPretreatmentUtil
 
                 if (expandedTables.isEmpty()) {
                     throw AddaxException.asAddaxException(
-                            DBUtilErrorCode.ILLEGAL_VALUE, String.format("您所配置的读取数据库表:%s 不正确. 因为DataX根据您的配置找不到这张表. 请检查您的配置并作出修改." +
-                                    "请先了解 DataX 配置.", StringUtils.join(tables, ",")));
+                            DBUtilErrorCode.ILLEGAL_VALUE, String.format("您所配置的读取数据库表:%s 不正确. 因为根据您的配置找不到这张表. 请检查您的配置并作出修改." +
+                                    "请先了解配置.", StringUtils.join(tables, ",")));
                 }
 
                 tableNum += expandedTables.size();

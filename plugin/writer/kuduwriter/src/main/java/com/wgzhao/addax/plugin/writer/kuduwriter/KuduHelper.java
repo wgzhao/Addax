@@ -260,12 +260,6 @@ public class KuduHelper
         // configuration.getNecessaryValue(Key.KUDU_CONFIG, KuduWriterErrorCode.REQUIRED_VALUE);
         configuration.getNecessaryValue(KuduKey.KUDU_TABLE_NAME, KuduWriterErrorCode.REQUIRED_VALUE);
         configuration.getNecessaryValue(KuduKey.KUDU_MASTER_ADDRESSES, KuduWriterErrorCode.REQUIRED_VALUE);
-//        String encoding = configuration.getString(Key.ENCODING, Constant.DEFAULT_ENCODING);
-//        if (!Charset.isSupported(encoding)) {
-//            throw DataXException.asAddaxException(KuduWriterErrorCode.ILLEGAL_VALUE,
-//                    String.format("Encoding is not supported:[%s] .", encoding));
-//        }
-//        configuration.set(Key.ENCODING, encoding);
         String insertMode = configuration.getString(KuduKey.WRITE_MODE, KuduConstant.INSERT_MODE);
         try {
             InsertModeType.getByTypeName(insertMode);
@@ -308,7 +302,7 @@ public class KuduHelper
                     "\"index\" either has values for all of them, or all of them are null!");
         }
 //        if (primaryKeyFlag > 1) {
-//            throw DataXException.asAddaxException(KuduWriterErrorCode.ILLEGAL_VALUE,
+//            throw AddaxException.asAddaxException(KuduWriterErrorCode.ILLEGAL_VALUE,
 //                    "\"primaryKey\" must be written in the front！");
 //        }
         configuration.set(KuduKey.COLUMN, goalColumns);

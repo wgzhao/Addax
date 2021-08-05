@@ -13,7 +13,7 @@ HBase20xsqlwriter实现了向hbase中的SQL表(phoenix)批量导入数据的功�
 ### 1.2 限制
 
 1. 要求版本为Phoenix5.x及HBase2.x
-2. 仅支持通过Phoenix QeuryServer导入数据，因此您Phoenix必须启动QueryServer服务才能使用本插件
+2. 仅支持通过Phoenix QueryServer导入数据，因此您Phoenix必须启动QueryServer服务才能使用本插件
 3. 不支持清空已有表数据
 4. 仅支持通过phoenix创建的表，不支持原生HBase表
 5. 不支持带时间戳的数据导入
