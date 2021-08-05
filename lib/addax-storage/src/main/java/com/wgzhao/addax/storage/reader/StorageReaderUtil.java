@@ -26,6 +26,8 @@ import com.alibaba.fastjson.TypeReference;
 import com.csvreader.CsvReader;
 import com.wgzhao.addax.common.base.Constant;
 import com.wgzhao.addax.common.base.Key;
+import com.wgzhao.addax.common.compress.ExpandLzopInputStream;
+import com.wgzhao.addax.common.compress.ZipCycleInputStream;
 import com.wgzhao.addax.common.constant.Type;
 import com.wgzhao.addax.common.element.BoolColumn;
 import com.wgzhao.addax.common.element.Column;
@@ -170,86 +172,30 @@ public class StorageReaderUtil
                             lzoInputStream, encoding));
                 }
                 else if ("lzo".equalsIgnoreCase(compress)) {
-                    LzoInputStream lzopInputStream = new ExpandLzopInputStream(
-                            inputStream);
-                    reader = new BufferedReader(new InputStreamReader(
-                            lzopInputStream, encoding));
+                    LzoInputStream lzopInputStream = new ExpandLzopInputStream( inputStream);
+                    reader = new BufferedReader(new InputStreamReader(lzopInputStream, encoding));
                 }
                 else if ("gzip".equalsIgnoreCase(compress)) {
-                    CompressorInputStream compressorInputStream = new GzipCompressorInputStream(
-                            inputStream);
-                    reader = new BufferedReader(new InputStreamReader(
-                            compressorInputStream, encoding), bufferSize);
+                    CompressorInputStream compressorInputStream = new GzipCompressorInputStream(inputStream);
+                    reader = new BufferedReader(new InputStreamReader(compressorInputStream, encoding), bufferSize);
                 }
                 else if ("bzip2".equalsIgnoreCase(compress)) {
-                    CompressorInputStream compressorInputStream = new BZip2CompressorInputStream(
-                            inputStream);
-                    reader = new BufferedReader(new InputStreamReader(
-                            compressorInputStream, encoding), bufferSize);
+                    CompressorInputStream compressorInputStream = new BZip2CompressorInputStream(inputStream);
+                    reader = new BufferedReader(new InputStreamReader(compressorInputStream, encoding), bufferSize);
                 }
                 else if ("hadoop-snappy".equalsIgnoreCase(compress)) {
                     CompressionCodec snappyCodec = new SnappyCodec();
-                    InputStream snappyInputStream = snappyCodec.createInputStream(
-                            inputStream);
+                    InputStream snappyInputStream = snappyCodec.createInputStream(inputStream);
+                    reader = new BufferedReader(new InputStreamReader(snappyInputStream, encoding));
+                }
+                else if ("framing-snappy".equalsIgnoreCase(compress)) {
+                    InputStream snappyInputStream = new SnappyFramedInputStream(inputStream);
                     reader = new BufferedReader(new InputStreamReader(
                             snappyInputStream, encoding));
                 }
-                else if ("framing-snappy".equalsIgnoreCase(compress)) {
-                    InputStream snappyInputStream = new SnappyFramedInputStream(
-                            inputStream);
-                    reader = new BufferedReader(new InputStreamReader(
-                            snappyInputStream, encoding));
-                }/* else if ("lzma".equalsIgnoreCase(compress)) {
-					CompressorInputStream compressorInputStream = new LZMACompressorInputStream(
-							inputStream);
-					reader = new BufferedReader(new InputStreamReader(
-							compressorInputStream, encoding));
-				} *//*else if ("pack200".equalsIgnoreCase(compress)) {
-					CompressorInputStream compressorInputStream = new Pack200CompressorInputStream(
-							inputStream);
-					reader = new BufferedReader(new InputStreamReader(
-							compressorInputStream, encoding));
-				} *//*else if ("xz".equalsIgnoreCase(compress)) {
-					CompressorInputStream compressorInputStream = new XZCompressorInputStream(
-							inputStream);
-					reader = new BufferedReader(new InputStreamReader(
-							compressorInputStream, encoding));
-				} else if ("ar".equalsIgnoreCase(compress)) {
-					ArArchiveInputStream arArchiveInputStream = new ArArchiveInputStream(
-							inputStream);
-					reader = new BufferedReader(new InputStreamReader(
-							arArchiveInputStream, encoding));
-				} else if ("arj".equalsIgnoreCase(compress)) {
-					ArjArchiveInputStream arjArchiveInputStream = new ArjArchiveInputStream(
-							inputStream);
-					reader = new BufferedReader(new InputStreamReader(
-							arjArchiveInputStream, encoding));
-				} else if ("cpio".equalsIgnoreCase(compress)) {
-					CpioArchiveInputStream cpioArchiveInputStream = new CpioArchiveInputStream(
-							inputStream);
-					reader = new BufferedReader(new InputStreamReader(
-							cpioArchiveInputStream, encoding));
-				} else if ("dump".equalsIgnoreCase(compress)) {
-					DumpArchiveInputStream dumpArchiveInputStream = new DumpArchiveInputStream(
-							inputStream);
-					reader = new BufferedReader(new InputStreamReader(
-							dumpArchiveInputStream, encoding));
-				} else if ("jar".equalsIgnoreCase(compress)) {
-					JarArchiveInputStream jarArchiveInputStream = new JarArchiveInputStream(
-							inputStream);
-					reader = new BufferedReader(new InputStreamReader(
-							jarArchiveInputStream, encoding));
-				} else if ("tar".equalsIgnoreCase(compress)) {
-					TarArchiveInputStream tarArchiveInputStream = new TarArchiveInputStream(
-							inputStream);
-					reader = new BufferedReader(new InputStreamReader(
-							tarArchiveInputStream, encoding));
-				}*/
                 else if ("zip".equalsIgnoreCase(compress)) {
-                    ZipCycleInputStream zipCycleInputStream = new ZipCycleInputStream(
-                            inputStream);
-                    reader = new BufferedReader(new InputStreamReader(
-                            zipCycleInputStream, encoding), bufferSize);
+                    ZipCycleInputStream zipCycleInputStream = new ZipCycleInputStream(inputStream);
+                    reader = new BufferedReader(new InputStreamReader(zipCycleInputStream, encoding), bufferSize);
                 }
                 else {
                     throw AddaxException
@@ -314,8 +260,7 @@ public class StorageReaderUtil
         // warn: Configuration -> List<ColumnEntry> for performance
         // List<Configuration> column = readerSliceConfig
         // .getListConfiguration(Key.COLUMN);
-        List<ColumnEntry> column = StorageReaderUtil
-                .getListColumnEntry(readerSliceConfig, Key.COLUMN);
+        List<ColumnEntry> column = StorageReaderUtil.getListColumnEntry(readerSliceConfig, Key.COLUMN);
         CsvReader csvReader = null;
 
         // every line logic

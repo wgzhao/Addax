@@ -53,12 +53,6 @@
         </dependency>
 
         <dependency>
-            <groupId>org.anarres.lzo</groupId>
-            <artifactId>lzo-core</artifactId>
-            <version>1.0.6</version>
-        </dependency>
-
-        <dependency>
             <groupId>org.apache.commons</groupId>
             <artifactId>commons-compress</artifactId>
             <version>1.21</version>
