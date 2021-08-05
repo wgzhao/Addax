@@ -44,10 +44,10 @@ public final class ReaderSplitUtil
         boolean isUserSpecifyEachTableSplitSize = originalSliceConfig.getInt(Key.EACH_TABLE_SPLIT_SIZE, -1) != -1;
         int eachTableShouldSplittedNumber = -1;
         if (isTableMode) {
-            // adviceNumber这里是channel数量大小, 即datax并发task数量
+            // adviceNumber这里是channel数量大小, 即addax并发task数量
             // eachTableShouldSplittedNumber是单表应该切分的份数, 向上取整可能和adviceNumber没有比例关系了已经
             if (!isUserSpecifyEachTableSplitSize) {
-                // adviceNumber这里是channel数量大小, 即datax并发task数量
+                // adviceNumber这里是channel数量大小, 即addax并发task数量
                 // eachTableShouldSplittedNumber是单表应该切分的份数, 向上取整可能和adviceNumber没有比例关系了已经
                 eachTableShouldSplittedNumber = calculateEachTableShouldSplittedNumber(
                         adviceNumber, originalSliceConfig.getInt(Constant.TABLE_NUMBER_MARK));

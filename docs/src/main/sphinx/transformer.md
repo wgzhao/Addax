@@ -105,10 +105,9 @@ Record 数据类型
 注意：
 
 - `dx_groovy` 只能调用一次。不能多次调用。
-- `groovy code` 中支持 `java.lang`, `java.util` 的包，可直接引用的对象有 `record`，以及element下的各种column（BoolColumn.class,BytesColumn.class,DateColumn.class,DoubleColumn.class,LongColumn.clas-
-  tringColumn.class）。不支持其他包，如果用户有需要用到其他包，可设置extraPackage，注意extraPackage不支持第三方jar包。
+- `groovy code` 中支持 `java.lang`, `java.util` 的包，可直接引用的对象有 `record`，以及element下的各种column（BoolColumn.class,BytesColumn.class,DateColumn.class,DoubleColumn.class,LongColumn.class,StringColumn.class）。不支持其他包，如果用户有需要用到其他包，可设置extraPackage，注意extraPackage不支持第三方jar包。
 - `groovy code` 中，返回更新过的 `Record`（比如record.setColumn(columnIndex, new StringColumn(newValue));），或者null。返回null表示过滤此行。
-- 用户可以直接调用静态的Util方式（GroovyTransformerStaticUtil
+- 用户可以直接调用静态的Util方式（GroovyTransformerStaticUtil)
 
 举例:
 

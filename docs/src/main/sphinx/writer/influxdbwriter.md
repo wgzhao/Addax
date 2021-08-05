@@ -92,7 +92,7 @@ influx --execute "CREATE DATABASE addax"
 执行下面的命令进行数据采集
 
 ```bash
-bin/addax.py job/stream2kudu.json
+bin/addax.sh job/stream2kudu.json
 ```
 
 ##  参数说明
@@ -114,7 +114,7 @@ bin/addax.py job/stream2kudu.json
 
 ### column
 
-InfluxDB 作为时许数据库，需要每条记录都有时间戳字段，因此这里会把 `column` 配置的第一个字段默认当作时间戳
+InfluxDB 作为时序数据库，需要每条记录都有时间戳字段，因此这里会把 `column` 配置的第一个字段默认当作时间戳
 
 ### retentionPolicy
 

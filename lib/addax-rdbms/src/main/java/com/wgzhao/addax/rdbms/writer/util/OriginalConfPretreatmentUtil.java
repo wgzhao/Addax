@@ -108,7 +108,7 @@ public final class OriginalConfPretreatmentUtil
 
             if (null == tables || tables.isEmpty()) {
                 throw AddaxException.asAddaxException(DBUtilErrorCode.REQUIRED_VALUE,
-                        "您未配置写入数据库表的表名称. 根据配置DataX找不到您配置的表. 请检查您的配置并作出修改.");
+                        "您未配置写入数据库表的表名称. 根据配置找不到您配置的表. 请检查您的配置并作出修改.");
             }
 
             // 对每一个connection 上配置的table 项进行解析
@@ -116,7 +116,7 @@ public final class OriginalConfPretreatmentUtil
 
             if (expandedTables.isEmpty()) {
                 throw AddaxException.asAddaxException(DBUtilErrorCode.CONF_ERROR,
-                        "您配置的写入数据库表名称错误. DataX找不到您配置的表，请检查您的配置并作出修改.");
+                        "您配置的写入数据库表名称错误. 找不到您配置的表，请检查您的配置并作出修改.");
             }
 
             tableNum += expandedTables.size();
@@ -133,7 +133,7 @@ public final class OriginalConfPretreatmentUtil
         List<String> userConfiguredColumns = originalConfig.getList(Key.COLUMN, String.class);
         if (null == userConfiguredColumns || userConfiguredColumns.isEmpty()) {
             throw AddaxException.asAddaxException(DBUtilErrorCode.ILLEGAL_VALUE,
-                    "您的配置文件中的列配置信息有误. 因为您未配置写入数据库表的列名称，DataX获取不到列信息. 请检查您的配置并作出修改.");
+                    "您的配置文件中的列配置信息有误. 因为您未配置写入数据库表的列名称，获取不到列信息. 请检查您的配置并作出修改.");
         }
         else {
             boolean isPreCheck = originalConfig.getBool(Key.DRY_RUN, false);
@@ -200,7 +200,7 @@ public final class OriginalConfPretreatmentUtil
 
         String writeDataSqlTemplate = WriterUtil.getWriteTemplate(columns, valueHolders, writeMode, dataBaseType, false);
 
-        LOG.info("Write data [\n{}\n], which jdbcUrl like:[{}]", writeDataSqlTemplate, jdbcUrl);
+        LOG.info("Write data [{}], which jdbcUrl [{}]", writeDataSqlTemplate, jdbcUrl);
 
         originalConfig.set(Constant.INSERT_OR_REPLACE_TEMPLATE_MARK, writeDataSqlTemplate);
     }

@@ -121,7 +121,7 @@ ElasticSearchReader 插件实现了从 [Elasticsearch](https://www.elastic.co/cn
 执行下面的命令进行采集
 
 ```shell
-bin/addax.py job/es2stream.json
+bin/addax.sh job/es2stream.json
 ```
 
 其输出结果类似如下（输出记录数有删减)

@@ -1,7 +1,7 @@
 {
   "type": "record",
-  "name": "dataxTest",
-  "aliases": ["datax","parquet"],
+  "name": "Test",
+  "aliases": ["addax","parquet"],
   "fields" : [
     {"name": "col1", "type": ["null", "long"]},
     {"name": "col2", "type": ["null", "int"]},

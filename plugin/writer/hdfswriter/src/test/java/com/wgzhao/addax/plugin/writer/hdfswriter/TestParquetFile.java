@@ -43,7 +43,7 @@ import java.sql.Timestamp;
 
 public class TestParquetFile
 {
-    private static String filePath = "/tmp/datax_test.parquet";
+    private static String filePath = "/tmp/test.parquet";
     Schema.Parser parser = new Schema.Parser().setValidate(true);
     CompressionCodecName compress = CompressionCodecName.SNAPPY;
     Schema schema = null;
@@ -58,7 +58,7 @@ public class TestParquetFile
     private byte[] load_file()
     {
         try {
-            return IOUtils.toByteArray(TestOrcFile.class.getResourceAsStream("/datax_logo.png"));
+            return IOUtils.toByteArray(TestOrcFile.class.getResourceAsStream("/addax_logo.png"));
         }
         catch (IOException e) {
             e.printStackTrace();

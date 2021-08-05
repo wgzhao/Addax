@@ -653,7 +653,7 @@ public class CommonRdbmsWriter
                             .asAddaxException(
                                     DBUtilErrorCode.UNSUPPORTED_TYPE,
                                     String.format(
-                                            "您的配置文件中的列配置信息有误. 因为DataX 不支持数据库写入这种字段类型. 字段名:[%s], " +
+                                            "您的配置文件中的列配置信息有误. 不支持数据库写入这种字段类型. 字段名:[%s], " +
                                                     "字段SQL类型编号:[%d], 字段Java类型:[%s]. 请修改表中该字段的类型或者不同步该字段.",
                                             this.resultSetMetaData.getLeft().get(columnIndex),
                                             this.resultSetMetaData.getMiddle().get(columnIndex),

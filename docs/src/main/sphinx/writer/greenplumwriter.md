@@ -59,7 +59,7 @@ TRUE,
 创建需要插入的表的语句如下:
 
 ```sql
-create table gp_test ( like addax_tbl);
+create table gp_test like addax_tbl;
 ```
 
 ### 任务配置
@@ -134,7 +134,7 @@ create table gp_test ( like addax_tbl);
 执行以下命令进行数据采集
 
 ```shell
-bin/addax.py job/pg2gp.json
+bin/addax.sh job/pg2gp.json
 ```
 
 ## 参数说明

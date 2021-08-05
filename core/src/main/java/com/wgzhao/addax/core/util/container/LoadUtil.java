@@ -96,8 +96,7 @@ public class LoadUtil
         if (null == pluginConf) {
             throw AddaxException.asAddaxException(
                     FrameworkErrorCode.PLUGIN_INSTALL_ERROR,
-                    String.format("DataX不能找到插件[%s]的配置.",
-                            pluginName));
+                    String.format("不能找到插件[%s]的配置.", pluginName));
         }
 
         return pluginConf;
@@ -121,8 +120,7 @@ public class LoadUtil
         catch (Exception e) {
             throw AddaxException.asAddaxException(
                     FrameworkErrorCode.RUNTIME_ERROR,
-                    String.format("DataX找到plugin[%s]的Job配置.",
-                            pluginName), e);
+                    String.format("找到plugin[%s]的Job配置.", pluginName), e);
         }
     }
 
@@ -143,8 +141,7 @@ public class LoadUtil
         }
         catch (Exception e) {
             throw AddaxException.asAddaxException(FrameworkErrorCode.RUNTIME_ERROR,
-                    String.format("DataX不能找plugin[%s]的Task配置.",
-                            pluginName), e);
+                    String.format("不能找plugin[%s]的Task配置.", pluginName), e);
         }
     }
 
@@ -200,13 +197,10 @@ public class LoadUtil
             if (StringUtils.isBlank(pluginPath)) {
                 throw AddaxException.asAddaxException(
                         FrameworkErrorCode.RUNTIME_ERROR,
-                        String.format(
-                                "%s插件[%s]路径非法!",
-                                pluginType, pluginName));
+                        String.format("%s插件[%s]路径非法!", pluginType, pluginName));
             }
             jarLoader = new JarLoader(new String[] {pluginPath});
-            jarLoaderCenter.put(generatePluginKey(pluginType, pluginName),
-                    jarLoader);
+            jarLoaderCenter.put(generatePluginKey(pluginType, pluginName), jarLoader);
         }
 
         return jarLoader;

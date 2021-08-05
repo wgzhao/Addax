@@ -65,7 +65,7 @@ insert into addax_tbl values(
 创建需要插入的表的语句如下:
 
 ```sql
-create table addax_tbl1 ( like addax_tbl);
+create table addax_tbl1 like addax_tbl;
 ```
 
 ### 任务配置
@@ -138,7 +138,7 @@ create table addax_tbl1 ( like addax_tbl);
 执行以下命令进行数据采集
 
 ```shell
-bin/addax.py job/pg2pg.json
+bin/addax.sh job/pg2pg.json
 ```
 
 ## 参数说明

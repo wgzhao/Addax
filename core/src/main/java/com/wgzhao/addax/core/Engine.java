@@ -45,7 +45,7 @@ import java.util.Properties;
 import java.util.Set;
 
 /**
- * Engine是DataX入口类，该类负责初始化Job或者Task的运行容器，并运行插件的Job或者Task逻辑
+ * Engine是 Addax 入口类，该类负责初始化Job或者Task的运行容器，并运行插件的Job或者Task逻辑
  */
 public class Engine
 {

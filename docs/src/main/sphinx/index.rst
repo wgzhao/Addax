@@ -10,7 +10,7 @@
     writer
     transformer
     statsreport
-    dataxPluginDev
+    addaxPluginDev
 
 .. toctree::
     :titlesonly:

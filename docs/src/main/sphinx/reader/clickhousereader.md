@@ -110,7 +110,7 @@ insert into ck_addax values(
 执行以下命令进行数据采集
 
 ```shell
-bin/addax.py job/clickhouse2stream.json
+bin/addax.sh job/clickhouse2stream.json
 ```
 
 其输出信息如下（删除了非关键信息)

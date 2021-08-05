@@ -32,7 +32,6 @@ for jar in $(find  plugin/*/*/libs -type f -name *.jar)
 do
     plugin_dir=$(dirname $jar)
     file_name=$(basename $jar)
-    echo "\t shrinking ${file_name}"
     # 1. move it to shared folder
     /bin/mv -f ${jar} shared/
     # 2. create symbol link

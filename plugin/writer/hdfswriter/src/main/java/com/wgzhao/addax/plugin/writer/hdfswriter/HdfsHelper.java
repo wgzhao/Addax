@@ -176,7 +176,7 @@ public class HdfsHelper
                                         .asAddaxException(
                                                 HdfsWriterErrorCode.ILLEGAL_VALUE,
                                                 String.format(
-                                                        "您的配置文件中的列配置信息有误. 因为DataX 不支持数据库写入这种字段类型. 字段名:[%s], 字段类型:[%s]. 请修改表中该字段的类型或者不同步该字段.",
+                                                        "您的配置文件中的列配置信息有误. 不支持数据库写入这种字段类型. 字段名:[%s], 字段类型:[%s]. 请修改表中该字段的类型或者不同步该字段.",
                                                         columnsConfiguration.get(i).getString(Key.NAME),
                                                         columnsConfiguration.get(i).getString(Key.TYPE)));
                         }
@@ -256,7 +256,7 @@ public class HdfsHelper
                                         .asAddaxException(
                                                 HdfsWriterErrorCode.ILLEGAL_VALUE,
                                                 String.format(
-                                                        "您的配置文件中的列配置信息有误. 因为DataX 不支持数据库写入这种字段类型. 字段名:[%s], 字段类型:[%s]. 请修改表中该字段的类型或者不同步该字段.",
+                                                        "您的配置文件中的列配置信息有误. 不支持数据库写入这种字段类型. 字段名:[%s], 字段类型:[%s]. 请修改表中该字段的类型或者不同步该字段.",
                                                         columnsConfiguration.get(i).getString(Key.NAME),
                                                         columnsConfiguration.get(i).getString(Key.TYPE)));
                         }
@@ -397,7 +397,6 @@ public class HdfsHelper
 
     /*
      * 根据标志来删除特定文件
-     * @link(https://gitlab.ds.cfzq.com/grp_ds/datax/-/issues/8)
      * delDotFile: 是否删除点(.)开头的文件, true: 表示仅删除点开头的文件， false 表示不删除点开头的文件
      *
      */
@@ -675,7 +674,7 @@ public class HdfsHelper
             }
             fields.add(new Schema.Field(fieldName, Schema.createUnion(unionList), null, (Object) null));
         }
-        Schema schema = Schema.createRecord("datax", null, "parquet", false);
+        Schema schema = Schema.createRecord("addax", null, "parquet", false);
         schema.setFields(fields);
         return schema;
     }
@@ -736,7 +735,7 @@ public class HdfsHelper
                                 .asAddaxException(
                                         HdfsWriterErrorCode.ILLEGAL_VALUE,
                                         String.format(
-                                                "您的配置文件中的列配置信息有误. 因为DataX 不支持数据库写入这种字段类型. 字段名:[%s], 字段类型:[%s]. 请修改表中该字段的类型或者不同步该字段.",
+                                                "您的配置文件中的列配置信息有误. 不支持数据库写入这种字段类型. 字段名:[%s], 字段类型:[%s]. 请修改表中该字段的类型或者不同步该字段.",
                                                 eachColumnConf.getString(Key.NAME),
                                                 eachColumnConf.getString(Key.TYPE)));
                 }

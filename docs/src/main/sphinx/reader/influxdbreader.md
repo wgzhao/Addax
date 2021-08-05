@@ -72,7 +72,7 @@ influx -import -path=NOAA_data.txt -precision=s -database=NOAA_water_database
 执行下面的命令进行数据采集
 
 ```bash
-bin/addax.py job/influxdb2stream.json
+bin/addax.sh job/influxdb2stream.json
 ```
 
 ##  参数说明

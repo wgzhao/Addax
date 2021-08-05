@@ -107,7 +107,7 @@ values (999988887777,
 执行以下命令进行数据采集
 
 ```shell
-bin/addax.py job/postgres2stream.json
+bin/addax.sh job/postgres2stream.json
 ```
 
 其输出信息如下（删除了非关键信息)

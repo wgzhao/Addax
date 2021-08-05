@@ -2,7 +2,7 @@
 
 KuduReader 插件利用 Kudu 的java客户端KuduClient进行Kudu的读操作。
 
-KuduReader通过Datax框架从Kudu并行的读取数据，通过主控的JOB程序按照指定的规则对Kudu中的数据进行分片，并行读取，然后将Kudu支持的类型通过逐一判断转换成Datax支持的类型。
+KuduReader通过Addax框架从Kudu并行的读取数据，通过主控的JOB程序按照指定的规则对Kudu中的数据进行分片，并行读取，然后将Kudu支持的类型通过逐一判断转换成Addax支持的类型。
 
 ## 示例
 
@@ -88,7 +88,7 @@ values
 执行下面的命令进行采集
 
 ```shell
-bin/addax.py job/kudu2stream.json
+bin/addax.sh job/kudu2stream.json
 ```
 
 输出结果类似如下（删除了不必需要的内容)

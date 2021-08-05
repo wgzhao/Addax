@@ -134,7 +134,7 @@ HdfsWriter提供向HDFS文件系统指定路径中写入 `TEXTFile` ， `ORCFile
 
 #### defaultFS
 
-Hadoop hdfs文件系统namenode节点地址。格式：`hdfs://ip:port` ；例如：`hdfs://127.0.0.1:9000` , 如果启用了HA，则为 servicename 模式，比如 `hdfs://sandbox`
+Hadoop hdfs文件系统 namenode 节点地址。格式：`hdfs://ip:port` ；例如：`hdfs://127.0.0.1:9000` , 如果启用了HA，则为 servicename 模式，比如 `hdfs://sandbox`
 
 #### fileType
 
