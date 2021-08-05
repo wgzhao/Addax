@@ -21,8 +21,10 @@
 
 package com.wgzhao.addax.storage.writer;
 
+import com.google.common.collect.Sets;
 import com.wgzhao.addax.common.base.Constant;
 import com.wgzhao.addax.common.base.Key;
+import com.wgzhao.addax.common.compress.ZipCycleOutputStream;
 import com.wgzhao.addax.common.element.Column;
 import com.wgzhao.addax.common.element.DateColumn;
 import com.wgzhao.addax.common.element.Record;
@@ -30,7 +32,6 @@ import com.wgzhao.addax.common.exception.AddaxException;
 import com.wgzhao.addax.common.plugin.RecordReceiver;
 import com.wgzhao.addax.common.plugin.TaskPluginCollector;
 import com.wgzhao.addax.common.util.Configuration;
-import com.google.common.collect.Sets;
 import org.apache.commons.compress.compressors.CompressorOutputStream;
 import org.apache.commons.compress.compressors.bzip2.BZip2CompressorOutputStream;
 import org.apache.commons.compress.compressors.gzip.GzipCompressorOutputStream;
@@ -55,8 +56,9 @@ import java.util.UUID;
 
 public class StorageWriterUtil
 {
-    private static final Logger LOG = LoggerFactory
-            .getLogger(StorageWriterUtil.class);
+    private static final Logger LOG = LoggerFactory.getLogger(StorageWriterUtil.class);
+    private static final Set<String> supportedCompress = Sets.newHashSet("gzip", "bzip2", "zip");
+    private static final Set<String> supportedWriteModes = Sets.newHashSet("truncate", "append", "nonConflict");
 
     private StorageWriterUtil()
     {
@@ -69,19 +71,15 @@ public class StorageWriterUtil
     public static void validateParameter(Configuration writerConfiguration)
     {
         // writeMode check
-        String writeMode = writerConfiguration.getNecessaryValue(
-                Key.WRITE_MODE,
-                StorageWriterErrorCode.REQUIRED_VALUE);
+        String writeMode = writerConfiguration.getNecessaryValue(Key.WRITE_MODE, StorageWriterErrorCode.REQUIRED_VALUE);
         writeMode = writeMode.trim();
-        Set<String> supportedWriteModes = Sets.newHashSet("truncate", "append",
-                "nonConflict");
         if (!supportedWriteModes.contains(writeMode)) {
             throw AddaxException
                     .asAddaxException(
                             StorageWriterErrorCode.ILLEGAL_VALUE,
                             String.format(
-                                    "仅支持 truncate, append, nonConflict 三种模式, 不支持您配置的 writeMode 模式 : [%s]",
-                                    writeMode));
+                                    "'%s' is unsupported, supported write mode: [%s]",
+                                    writeMode, StringUtils.join(supportedWriteModes, ",")));
         }
         writerConfiguration.set(Key.WRITE_MODE, writeMode);
 
@@ -89,8 +87,7 @@ public class StorageWriterUtil
         String encoding = writerConfiguration.getString(Key.ENCODING);
         if (StringUtils.isBlank(encoding)) {
             // like "  ", null
-            LOG.warn(String.format("您的encoding配置为空, 将使用默认值[%s]",
-                    Constant.DEFAULT_ENCODING));
+            LOG.warn(String.format("您的encoding配置为空, 将使用默认值[%s]", Constant.DEFAULT_ENCODING));
             writerConfiguration.set(Key.ENCODING, Constant.DEFAULT_ENCODING);
         }
         else {
@@ -112,11 +109,10 @@ public class StorageWriterUtil
             writerConfiguration.set(Key.COMPRESS, null);
         }
         else {
-            Set<String> supportedCompress = Sets.newHashSet("gzip", "bzip2");
             if (!supportedCompress.contains(compress.toLowerCase().trim())) {
                 String message = String.format(
-                        "仅支持 [%s] 文件压缩格式 , 不支持您配置的文件压缩格式: [%s]",
-                        StringUtils.join(supportedCompress, ","), compress);
+                        "'%s' is unsupported, supported compress format: [%s] ",
+                        compress, StringUtils.join(supportedCompress, ","));
                 throw AddaxException.asAddaxException(
                         StorageWriterErrorCode.ILLEGAL_VALUE,
                         String.format(message, compress));
@@ -141,7 +137,7 @@ public class StorageWriterUtil
 
         // fileFormat check
         String fileFormat = writerConfiguration.getString(Key.FILE_FORMAT, Constant.DEFAULT_FILE_FORMAT);
-        if (! Constant.SUPPORTED_FILE_FORMAT.contains(fileFormat)) {
+        if (!Constant.SUPPORTED_FILE_FORMAT.contains(fileFormat)) {
             throw AddaxException.asAddaxException(
                     StorageWriterErrorCode.ILLEGAL_VALUE,
                     String.format("您配置的fileFormat [%s]错误, 支持[%s]两种.", fileFormat, Constant.SUPPORTED_FILE_FORMAT));
@@ -169,8 +165,7 @@ public class StorageWriterUtil
             }
             allFileExists.add(fullFileName);
             splitedTaskConfig.set(Key.FILE_NAME, fullFileName);
-            LOG.info(String
-                    .format("splited write file name:[%s]", fullFileName));
+            LOG.info(String.format("splited write file name:[%s]", fullFileName));
             writerSplitConfigs.add(splitedTaskConfig);
         }
         LOG.info("end do split.");
@@ -183,12 +178,10 @@ public class StorageWriterUtil
         boolean isEndWithSeparator = false;
         switch (IOUtils.DIR_SEPARATOR) {
             case IOUtils.DIR_SEPARATOR_UNIX:
-                isEndWithSeparator = path.endsWith(String
-                        .valueOf(IOUtils.DIR_SEPARATOR));
+                isEndWithSeparator = path.endsWith(String.valueOf(IOUtils.DIR_SEPARATOR));
                 break;
             case IOUtils.DIR_SEPARATOR_WINDOWS:
-                isEndWithSeparator = path.endsWith(String
-                        .valueOf(IOUtils.DIR_SEPARATOR_WINDOWS));
+                isEndWithSeparator = path.endsWith(String.valueOf(IOUtils.DIR_SEPARATOR_WINDOWS));
                 break;
             default:
                 break;
@@ -206,15 +199,13 @@ public class StorageWriterUtil
     }
 
     public static void writeToStream(RecordReceiver lineReceiver,
-            OutputStream outputStream, Configuration config, String context,
+            OutputStream outputStream, Configuration config, String fileName,
             TaskPluginCollector taskPluginCollector)
     {
-        String encoding = config.getString(Key.ENCODING,
-                Constant.DEFAULT_ENCODING);
+        String encoding = config.getString(Key.ENCODING, Constant.DEFAULT_ENCODING);
         // handle blank encoding
         if (StringUtils.isBlank(encoding)) {
-            LOG.warn("您配置的encoding为[{}], 使用默认值[{}]", encoding,
-                    Constant.DEFAULT_ENCODING);
+            LOG.warn("您配置的encoding为[{}], 使用默认值[{}]", encoding, Constant.DEFAULT_ENCODING);
             encoding = Constant.DEFAULT_ENCODING;
         }
         String compress = config.getString(Key.COMPRESS);
@@ -223,33 +214,30 @@ public class StorageWriterUtil
         // compress logic
         try {
             if (null == compress) {
-                writer = new BufferedWriter(new OutputStreamWriter(
-                        outputStream, encoding));
+                writer = new BufferedWriter(new OutputStreamWriter(outputStream, encoding));
             }
             else {
                 if ("gzip".equalsIgnoreCase(compress)) {
-                    CompressorOutputStream compressorOutputStream = new GzipCompressorOutputStream(
-                            outputStream);
-                    writer = new BufferedWriter(new OutputStreamWriter(
-                            compressorOutputStream, encoding));
+                    CompressorOutputStream compressorOutputStream = new GzipCompressorOutputStream(outputStream);
+                    writer = new BufferedWriter(new OutputStreamWriter(compressorOutputStream, encoding));
                 }
                 else if ("bzip2".equalsIgnoreCase(compress)) {
-                    CompressorOutputStream compressorOutputStream = new BZip2CompressorOutputStream(
-                            outputStream);
-                    writer = new BufferedWriter(new OutputStreamWriter(
-                            compressorOutputStream, encoding));
+                    CompressorOutputStream compressorOutputStream = new BZip2CompressorOutputStream(outputStream);
+                    writer = new BufferedWriter(new OutputStreamWriter(compressorOutputStream, encoding));
+                }
+                else if ("zip".equals(compress)) {
+                    ZipCycleOutputStream zis = new ZipCycleOutputStream(outputStream, fileName);
+                    writer = new BufferedWriter(new OutputStreamWriter(zis, encoding));
                 }
                 else {
                     throw AddaxException
                             .asAddaxException(
                                     StorageWriterErrorCode.ILLEGAL_VALUE,
-                                    String.format(
-                                            "仅支持 gzip, bzip2 文件压缩格式 , 不支持您配置的文件压缩格式: [%s]",
-                                            compress));
+                                    String.format("'%s' is supported, supported compress format: [%s]",
+                                            compress, StringUtils.join(supportedCompress, ",")));
                 }
             }
-            StorageWriterUtil.doWriteToStream(lineReceiver, writer,
-                    context, config, taskPluginCollector);
+            StorageWriterUtil.doWriteToStream(lineReceiver, writer, fileName, config, taskPluginCollector);
         }
         catch (UnsupportedEncodingException uee) {
             throw AddaxException
@@ -265,7 +253,7 @@ public class StorageWriterUtil
         catch (IOException e) {
             throw AddaxException.asAddaxException(
                     StorageWriterErrorCode.WRITE_FILE_IO_ERROR,
-                    String.format("流写入错误 : [%s]", context), e);
+                    String.format("流写入错误 : [%s]", fileName), e);
         }
         finally {
             IOUtils.closeQuietly(writer, null);
@@ -349,8 +337,7 @@ public class StorageWriterUtil
                         }
                         else {
                             if (null != dateParse) {
-                                splitedRows.add(dateParse.format(column
-                                        .asDate()));
+                                splitedRows.add(dateParse.format(column.asDate()));
                             }
                             else {
                                 splitedRows.add(column.asString());
