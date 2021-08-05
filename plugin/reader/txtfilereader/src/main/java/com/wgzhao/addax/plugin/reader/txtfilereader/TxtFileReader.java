@@ -128,8 +128,7 @@ public class TxtFileReader
                 catch (Exception e) {
                     throw AddaxException.asAddaxException(
                             TxtFileReaderErrorCode.CONFIG_INVALID_EXCEPTION,
-                            String.format("编码配置异常, 请联系我们: %s", e.getMessage()),
-                            e);
+                            String.format("编码配置异常, 请联系我们: %s", e.getMessage()), e);
                 }
             }
             // check delimiter
@@ -175,8 +174,7 @@ public class TxtFileReader
                     if (null != columnIndex && columnIndex < 0) {
                         throw AddaxException.asAddaxException(
                                 TxtFileReaderErrorCode.ILLEGAL_VALUE, String
-                                        .format("index需要大于等于0, 您配置的index为[%s]",
-                                                columnIndex));
+                                        .format("index需要大于等于0, 您配置的index为[%s]", columnIndex));
                     }
                     if (null != columnName) {
                         // need get file header line , delay to prepare stage
@@ -193,8 +191,7 @@ public class TxtFileReader
             // warn:make sure this regex string
             // warn:no need trim
             for (String eachPath : this.path) {
-                String regexString = eachPath.replace("*", ".*").replace("?",
-                        ".?");
+                String regexString = eachPath.replace("*", ".*").replace("?",".?");
                 Pattern pattern = Pattern.compile(regexString);
                 this.pattern.put(eachPath, pattern);
             }
@@ -253,8 +250,7 @@ public class TxtFileReader
             for (String eachPath : this.path) {
                 int endMark;
                 for (endMark = 0; endMark < eachPath.length(); endMark++) {
-                    if ('*' == eachPath.charAt(endMark)
-                            || '?' == eachPath.charAt(endMark)) {
+                    if ('*' == eachPath.charAt(endMark) || '?' == eachPath.charAt(endMark)) {
                         this.isRegexPath.put(eachPath, true);
                         break;
                     }
@@ -262,10 +258,8 @@ public class TxtFileReader
 
                 String parentDirectory;
                 if (BooleanUtils.isTrue(this.isRegexPath.get(eachPath))) {
-                    int lastDirSeparator = eachPath.substring(0, endMark)
-                            .lastIndexOf(IOUtils.DIR_SEPARATOR);
-                    parentDirectory = eachPath.substring(0,
-                            lastDirSeparator + 1);
+                    int lastDirSeparator = eachPath.substring(0, endMark).lastIndexOf(IOUtils.DIR_SEPARATOR);
+                    parentDirectory = eachPath.substring(0, lastDirSeparator + 1);
                 }
                 else {
                     this.isRegexPath.put(eachPath, false);
@@ -285,16 +279,14 @@ public class TxtFileReader
                 File dir = new File(parentDirectory);
                 boolean isExists = dir.exists();
                 if (!isExists) {
-                    String message = String.format("您设定的目录不存在 : [%s]",
-                            parentDirectory);
+                    String message = String.format("您设定的目录不存在 : [%s]", parentDirectory);
                     LOG.error(message);
                     throw AddaxException.asAddaxException(
                             TxtFileReaderErrorCode.FILE_NOT_EXISTS, message);
                 }
             }
             catch (SecurityException se) {
-                String message = String.format("您没有权限查看目录 : [%s]",
-                        parentDirectory);
+                String message = String.format("您没有权限查看目录 : [%s]", parentDirectory);
                 LOG.error(message);
                 throw AddaxException.asAddaxException(
                         TxtFileReaderErrorCode.SECURITY_NOT_ENOUGH, message);
@@ -311,8 +303,7 @@ public class TxtFileReader
             if (!directory.isDirectory()) {
                 if (this.isTargetFile(regexPath, directory.getAbsolutePath())) {
                     toBeReadFiles.add(parentDirectory);
-                    LOG.info("add file [{}] as a candidate to be read.",
-                            parentDirectory);
+                    LOG.info("add file [{}] as a candidate to be read.", parentDirectory);
                 }
             }
             else {
@@ -322,28 +313,20 @@ public class TxtFileReader
                     File[] files = directory.listFiles();
                     if (null != files) {
                         for (File subFileNames : files) {
-                            directoryRover(regexPath,
-                                    subFileNames.getAbsolutePath(),
-                                    toBeReadFiles);
+                            directoryRover(regexPath, subFileNames.getAbsolutePath(), toBeReadFiles);
                         }
                     }
                     else {
                         // warn: 对于没有权限的文件，是直接throw AddaxException
-                        String message = String.format("您没有权限查看目录 : [%s]",
-                                directory);
+                        String message = String.format("您没有权限查看目录 : [%s]", directory);
                         LOG.error(message);
-                        throw AddaxException.asAddaxException(
-                                TxtFileReaderErrorCode.SECURITY_NOT_ENOUGH,
-                                message);
+                        throw AddaxException.asAddaxException(TxtFileReaderErrorCode.SECURITY_NOT_ENOUGH, message);
                     }
                 }
                 catch (SecurityException e) {
-                    String message = String.format("您没有权限查看目录 : [%s]",
-                            directory);
+                    String message = String.format("您没有权限查看目录 : [%s]", directory);
                     LOG.error(message);
-                    throw AddaxException.asAddaxException(
-                            TxtFileReaderErrorCode.SECURITY_NOT_ENOUGH,
-                            message, e);
+                    throw AddaxException.asAddaxException(TxtFileReaderErrorCode.SECURITY_NOT_ENOUGH, message, e);
                 }
             }
         }
@@ -507,8 +490,7 @@ public class TxtFileReader
                 // TODO lineDelimiter
                 if (skipHeader) {
                     String fetchLine = reader.readLine();
-                    LOG.info("Header line {} has been skipped.",
-                            fetchLine);
+                    LOG.info("Header line {} has been skipped.", fetchLine);
                 }
                 csvReader = new CsvReader(reader);
                 csvReader.setDelimiter(fieldDelimiter);
@@ -622,8 +604,7 @@ public class TxtFileReader
                                 }
                                 catch (Exception e) {
                                     throw new IllegalArgumentException(String.format(
-                                            errorTemplate, columnValue,
-                                            "LONG"));
+                                            errorTemplate, columnValue, "LONG"));
                                 }
                                 break;
                             case DOUBLE:
@@ -632,8 +613,7 @@ public class TxtFileReader
                                 }
                                 catch (Exception e) {
                                     throw new IllegalArgumentException(String.format(
-                                            errorTemplate, columnValue,
-                                            "DOUBLE"));
+                                            errorTemplate, columnValue, "DOUBLE"));
                                 }
                                 break;
                             case BOOL:
@@ -642,8 +622,7 @@ public class TxtFileReader
                                 }
                                 catch (Exception e) {
                                     throw new IllegalArgumentException(String.format(
-                                            errorTemplate, columnValue,
-                                            "BOOLEAN"));
+                                            errorTemplate, columnValue, "BOOLEAN"));
                                 }
 
                                 break;
@@ -661,16 +640,12 @@ public class TxtFileReader
                                         }
                                         else {
                                             // 框架尝试转换
-                                            columnGenerated = new DateColumn(
-                                                    new StringColumn(columnValue)
-                                                            .asDate());
+                                            columnGenerated = new DateColumn(new StringColumn(columnValue).asDate());
                                         }
                                     }
                                 }
                                 catch (Exception e) {
-                                    throw new IllegalArgumentException(String.format(
-                                            errorTemplate, columnValue,
-                                            "DATE"));
+                                    throw new IllegalArgumentException(String.format(errorTemplate, columnValue,"DATE"));
                                 }
                                 break;
                             case BYTES:
@@ -682,13 +657,9 @@ public class TxtFileReader
                                 }
                                 break;
                             default:
-                                String errorMessage = String.format(
-                                        "您配置的列类型暂不支持 : [%s]", columnType);
+                                String errorMessage = String.format("您配置的列类型暂不支持 : [%s]", columnType);
                                 LOG.error(errorMessage);
-                                throw AddaxException
-                                        .asAddaxException(
-                                                TxtFileReaderErrorCode.NOT_SUPPORT_TYPE,
-                                                errorMessage);
+                                throw AddaxException.asAddaxException(TxtFileReaderErrorCode.NOT_SUPPORT_TYPE, errorMessage);
                         }
 
                         record.addColumn(columnGenerated);
@@ -696,8 +667,7 @@ public class TxtFileReader
                     recordSender.sendToWriter(record);
                 }
                 catch (IllegalArgumentException | IndexOutOfBoundsException iae) {
-                    taskPluginCollector
-                            .collectDirtyRecord(record, iae.getMessage());
+                    taskPluginCollector.collectDirtyRecord(record, iae.getMessage());
                 }
                 catch (Exception e) {
                     if (e instanceof AddaxException) {
@@ -728,7 +698,8 @@ public class TxtFileReader
                     LOG.debug("csvReaderConfig设置成功,设置后CsvReader: {}", JSON.toJSONString(csvReader));
                 }
                 catch (Exception e) {
-                    LOG.warn("WARN!!!!忽略csvReaderConfig配置!通过BeanUtils.populate配置您的csvReaderConfig发生异常,您配置的值为: {};请检查您的配置!CsvReader使用默认值[{}]",
+                    LOG.warn("WARN!!!!忽略csvReaderConfig配置!通过BeanUtils.populate配置您的csvReaderConfig发生异常,您配置的值为: {};" +
+                                    "请检查您的配置!CsvReader使用默认值[{}]",
                             JSON.toJSONString(csvReaderConfigMap), JSON.toJSONString(csvReader));
                 }
             }

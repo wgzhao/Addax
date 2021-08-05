@@ -31,7 +31,7 @@
  * 其值,于是继承了LzopInputStream的类,重新定义了LZO_LIBRARY_VERSION的值。
  *
  */
-package com.wgzhao.addax.storage.reader;
+package com.wgzhao.addax.common.compress;
 
 import org.anarres.lzo.LzoVersion;
 import org.anarres.lzo.LzopConstants;

@@ -19,6 +19,7 @@
 
 package com.wgzhao.addax.plugin.reader.txtfilereader;
 
+import com.wgzhao.addax.common.compress.ZipCycleInputStream;
 import com.wgzhao.addax.common.exception.AddaxException;
 import org.apache.commons.compress.compressors.CompressorException;
 import org.apache.commons.compress.compressors.CompressorInputStream;
