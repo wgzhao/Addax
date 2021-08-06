@@ -19,21 +19,21 @@
 
 package com.wgzhao.addax.plugin.writer.ftpwriter;
 
-import com.wgzhao.addax.common.base.Key;
 import com.wgzhao.addax.common.exception.AddaxException;
 import com.wgzhao.addax.common.plugin.RecordReceiver;
 import com.wgzhao.addax.common.spi.Writer;
 import com.wgzhao.addax.common.util.Configuration;
 import com.wgzhao.addax.common.util.RetryUtil;
-import com.wgzhao.addax.storage.writer.StorageWriterUtil;
 import com.wgzhao.addax.plugin.writer.ftpwriter.util.IFtpHelper;
 import com.wgzhao.addax.plugin.writer.ftpwriter.util.SftpHelperImpl;
 import com.wgzhao.addax.plugin.writer.ftpwriter.util.StandardFtpHelperImpl;
+import com.wgzhao.addax.storage.writer.StorageWriterUtil;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.File;
 import java.io.OutputStream;
 import java.util.HashSet;
 import java.util.List;
@@ -59,12 +59,14 @@ public class FtpWriter
         private static final int DEFAULT_FTP_PORT = 21;
         private static final int DEFAULT_SFTP_PORT = 22;
         private static final int DEFAULT_TIMEOUT = 60000;
+        private static final String DEFAULT_PRIVATE_KEY = "~/.ssh/id_rsa";
 
         private Configuration writerSliceConfig = null;
         private Set<String> allFileExists = null;
 
         private String host;
         private int port;
+        private String protocol;
         private String username;
         private String password;
         private int timeout;
@@ -76,19 +78,19 @@ public class FtpWriter
         {
             this.writerSliceConfig = this.getPluginJobConf();
             this.validateParameter();
-            StorageWriterUtil
-                    .validateParameter(this.writerSliceConfig);
+            StorageWriterUtil.validateParameter(this.writerSliceConfig);
+            String keyPath = this.writerSliceConfig.getString(FtpKey.KEY_PATH, null);
+            String keyPass = this.writerSliceConfig.getString(FtpKey.KEY_PASS, null);
+
             try {
                 RetryUtil.executeWithRetry((Callable<Void>) () -> {
-                    ftpHelper.loginFtpServer(host, username, password,
-                            port, timeout);
+                    ftpHelper.loginFtpServer(host, port, username, password, keyPath, keyPass, timeout);
                     return null;
                 }, 3, 4000, true);
             }
             catch (Exception e) {
-                String message = String
-                        .format("与ftp服务器建立连接失败, host:%s, username:%s, port:%s, errorMessage:%s",
-                                host, username, port, e.getMessage());
+                String message = String.format("Failed to connect %s://%s@%s:%s , errorMessage:%s",
+                        protocol, username, host, port, e.getMessage());
                 LOG.error(message);
                 throw AddaxException.asAddaxException(
                         FtpWriterErrorCode.FAIL_LOGIN, message, e);
@@ -107,23 +109,48 @@ public class FtpWriter
 
             this.host = this.writerSliceConfig.getNecessaryValue(FtpKey.HOST, FtpWriterErrorCode.REQUIRED_VALUE);
             this.username = this.writerSliceConfig.getNecessaryValue(FtpKey.USERNAME, FtpWriterErrorCode.REQUIRED_VALUE);
-            this.password = this.writerSliceConfig.getNecessaryValue(FtpKey.PASSWORD, FtpWriterErrorCode.REQUIRED_VALUE);
+            this.password = this.writerSliceConfig.getString(FtpKey.PASSWORD, null);
             this.timeout = this.writerSliceConfig.getInt(FtpKey.TIMEOUT, DEFAULT_TIMEOUT);
 
-            String protocol = this.writerSliceConfig.getNecessaryValue(FtpKey.PROTOCOL, FtpWriterErrorCode.REQUIRED_VALUE);
+            this.protocol = this.writerSliceConfig.getString(FtpKey.PROTOCOL, "ftp");
+            if (!("ftp".equalsIgnoreCase(protocol) || "sftp".equalsIgnoreCase(protocol))) {
+                throw AddaxException.asAddaxException(FtpWriterErrorCode.ILLEGAL_VALUE,
+                        protocol + " is unsupported, supported protocol are ftp and sftp");
+            }
+            this.writerSliceConfig.set(FtpKey.PROTOCOL, protocol);
             if ("sftp".equalsIgnoreCase(protocol)) {
                 this.port = this.writerSliceConfig.getInt(FtpKey.PORT, DEFAULT_SFTP_PORT);
                 this.ftpHelper = new SftpHelperImpl();
+                // use ssh private key or not ?
+                boolean useKey = this.writerSliceConfig.getBool(FtpKey.USE_KEY, false);
+                if (useKey) {
+                    String privateKey = this.writerSliceConfig.getString(FtpKey.KEY_PATH, DEFAULT_PRIVATE_KEY);
+                    // check privateKey does exits or not
+                    if (privateKey.startsWith("~")) {
+                        // expand home directory
+                        privateKey = privateKey.replaceFirst("^~", System.getProperty("user.home"));
+                        // does it exists?
+                        boolean isFile = new File(privateKey).isFile();
+                        if (isFile) {
+                            this.writerSliceConfig.set(FtpKey.KEY_PATH, privateKey);
+                        }
+                        else {
+                            String msg = "You have configured to use the key, but neither the configured key file nor the default file(" +
+                                    DEFAULT_PRIVATE_KEY + " exists";
+                            throw AddaxException.asAddaxException(FtpWriterErrorCode.ILLEGAL_VALUE, msg);
+                        }
+                    }
+                }
             }
             else if ("ftp".equalsIgnoreCase(protocol)) {
                 this.port = this.writerSliceConfig.getInt(FtpKey.PORT, DEFAULT_FTP_PORT);
+                // login with private key is unavailable for ftp protocol, disable it.
+                this.writerSliceConfig.set(FtpKey.KEY_PATH, null);
                 this.ftpHelper = new StandardFtpHelperImpl();
             }
             else {
                 throw AddaxException.asAddaxException(
-                        FtpWriterErrorCode.ILLEGAL_VALUE, String.format(
-                                "仅支持 ftp和sftp 传输协议 , 不支持您配置的传输协议: [%s]",
-                                protocol));
+                        FtpWriterErrorCode.ILLEGAL_VALUE, protocol + " is unsupported, supported protocol are ftp and sftp");
             }
             this.writerSliceConfig.set(FtpKey.PORT, this.port);
         }
@@ -156,7 +183,7 @@ public class FtpWriter
             }
             else if ("append".equals(writeMode)) {
                 LOG.info("由于您配置了writeMode append, 写入前不做清理工作, [{}] 目录下写入相应文件名前缀  [{}] 的文件",
-                                path, fileName);
+                        path, fileName);
                 LOG.info("目录path:[{}] 下已经存在的指定前缀fileName:[{}] 文件列表如下: [{}]",
                         path, fileName,
                         StringUtils.join(allFilesInDir.iterator(), ", "));
@@ -167,8 +194,8 @@ public class FtpWriter
                     LOG.info("目录path:[{}] 下指定前缀fileName:[{}] 冲突文件列表如下: [{}]", path, fileName,
                             StringUtils.join(allFilesInDir.iterator(), ", "));
                     throw AddaxException.asAddaxException(
-                                    FtpWriterErrorCode.ILLEGAL_VALUE,
-                                    String.format( "您配置的path: [%s] 目录不为空, 下面存在其他文件或文件夹.", path));
+                            FtpWriterErrorCode.ILLEGAL_VALUE,
+                            String.format("您配置的path: [%s] 目录不为空, 下面存在其他文件或文件夹.", path));
                 }
             }
             else {
@@ -193,8 +220,7 @@ public class FtpWriter
                 this.ftpHelper.logoutFtpServer();
             }
             catch (Exception e) {
-                String message = String.format("关闭与ftp服务器连接失败, host:%s, username:%s, port:%s, errorMessage:%s",
-                                host, username, port, e.getMessage());
+                String message = String.format("Failed to disconnect server %s:%s, errorMessage:%s", host, port, e.getMessage());
                 LOG.error(message, e);
             }
         }
@@ -223,9 +249,7 @@ public class FtpWriter
         private String username;
         private String password;
         private int timeout;
-        private String encoding;
         private String compress;
-
         private IFtpHelper ftpHelper = null;
 
         @Override
@@ -233,14 +257,37 @@ public class FtpWriter
         {
             this.writerSliceConfig = this.getPluginJobConf();
             this.path = this.writerSliceConfig.getString(FtpKey.PATH);
-            this.fileName = this.writerSliceConfig.getString(FILE_NAME) + "." + this.writerSliceConfig.getString(FILE_FORMAT,"txt");
+            StringBuilder realFileName = new StringBuilder();
+            realFileName.append(this.writerSliceConfig.getString(FILE_NAME));
+            String fileFormat = this.writerSliceConfig.getString(FILE_FORMAT, "txt");
             this.suffix = this.writerSliceConfig.getString(SUFFIX);
-
+            if (this.suffix != null) {
+                realFileName.append(".").append(suffix);
+            }
+            else {
+                realFileName.append(".").append(fileFormat);
+            }
+            this.compress = this.writerSliceConfig.getString(COMPRESS, null);
+            if (this.compress != null) {
+                if ("zip".equalsIgnoreCase(this.compress)) {
+                    this.suffix = ".zip";
+                }
+                else if ("gzip".equalsIgnoreCase(this.compress)) {
+                    this.suffix = ".gz";
+                }
+                else if ("bzip2".equalsIgnoreCase(this.compress) || "bzip".equalsIgnoreCase(this.compress)) {
+                    this.suffix = ".bz2";
+                }
+            }
+            this.fileName = realFileName.toString();
             this.host = this.writerSliceConfig.getString(FtpKey.HOST);
             this.port = this.writerSliceConfig.getInt(FtpKey.PORT);
             this.username = this.writerSliceConfig.getString(FtpKey.USERNAME);
             this.password = this.writerSliceConfig.getString(FtpKey.PASSWORD);
             this.timeout = this.writerSliceConfig.getInt(FtpKey.TIMEOUT, DEFAULT_TIMEOUT);
+
+            String keyPath = this.writerSliceConfig.getString(FtpKey.KEY_PATH, null);
+            String keyPass = this.writerSliceConfig.getString(FtpKey.KEY_PASS, null);
             String protocol = this.writerSliceConfig.getString(FtpKey.PROTOCOL);
 
             if ("sftp".equalsIgnoreCase(protocol)) {
@@ -251,14 +298,13 @@ public class FtpWriter
             }
             try {
                 RetryUtil.executeWithRetry((Callable<Void>) () -> {
-                    ftpHelper.loginFtpServer(host, username, password,
-                            port, timeout);
+                    ftpHelper.loginFtpServer(host, port, username, password, keyPath, keyPass, timeout);
                     return null;
                 }, 3, 4000, true);
             }
             catch (Exception e) {
                 String message = String.format("与ftp服务器建立连接失败, host:%s, username:%s, port:%s, errorMessage:%s",
-                                host, username, port, e.getMessage());
+                        host, username, port, e.getMessage());
                 LOG.error(message);
                 throw AddaxException.asAddaxException(
                         FtpWriterErrorCode.FAIL_LOGIN, message, e);
@@ -268,7 +314,7 @@ public class FtpWriter
         @Override
         public void prepare()
         {
-            this.encoding = writerSliceConfig.getString(ENCODING, DEFAULT_ENCODING);
+            String encoding = writerSliceConfig.getString(ENCODING, DEFAULT_ENCODING);
             // handle blank encoding
             if (StringUtils.isBlank(encoding)) {
                 LOG.warn("您配置的encoding为[{}], 使用默认值[{}]", encoding, DEFAULT_ENCODING);
@@ -315,7 +361,7 @@ public class FtpWriter
             }
             catch (Exception e) {
                 String message = String.format("关闭与ftp服务器连接失败, host:%s, username:%s, port:%s, errorMessage:%s",
-                                host, username, port, e.getMessage());
+                        host, username, port, e.getMessage());
                 LOG.error(message, e);
             }
         }

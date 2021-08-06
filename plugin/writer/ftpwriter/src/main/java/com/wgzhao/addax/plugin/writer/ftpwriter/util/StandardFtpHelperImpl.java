@@ -41,13 +41,11 @@ import java.util.Set;
 public class StandardFtpHelperImpl
         implements IFtpHelper
 {
-    private static final Logger LOG = LoggerFactory
-            .getLogger(StandardFtpHelperImpl.class);
+    private static final Logger LOG = LoggerFactory.getLogger(StandardFtpHelperImpl.class);
     FTPClient ftpClient = null;
 
     @Override
-    public void loginFtpServer(String host, String username, String password,
-            int port, int timeout)
+    public void loginFtpServer(String host, int port, String username, String password, String keyPath, String keyPass, int timeout)
     {
         this.ftpClient = new FTPClient();
         try {
