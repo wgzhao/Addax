@@ -4,6 +4,9 @@
 <p align="center">DataX 是一个支持主流数据库的通用数据采集工具</p>
 <p align="center"><a href="https://addax.readthedocs.io">使用文档</a> 详细描述了如何安装部署和每个采集插件的使用方法 </p>
 <p align="center">
+   <a href="https://github.com/wgzhao/addax/release">
+      <img src="https://img.shields.io/github/release/wgzhao/addax.svg" alt="relase version"/>
+    </a>
    <a href="https://github.com/wgzhao/Addax/workflows/Maven%20Package/badge.svg">
        <img src="https://github.com/wgzhao/Addax/workflows/Maven%20Package/badge.svg" alt="Maven Package" />
    </a>
@@ -15,15 +18,10 @@
 
 # 该项目正在从 DataX 更名为 Addax
 
-该项目从[DataX](https://github.com/alibaba/datax) 而来，经过了精简和改造，说明如下
+该项目从 [DataX](https://github.com/alibaba/datax) 而来，经过了精简和改造，说明如下
 
-## 当前稳定版
-
-`4.0.2`
-
-注： 从 `4.0.0` 版本开始，启用新的项目名称 `Addax`, 因此它和以前的版本均不兼容
-
-注： 从 `3.2.1` 版本开始，包类名已经更改，因此不再兼容 `3.1.x` 版本
+从 `4.0.0` 版本开始，启用新的项目名称 `Addax`, 因此它和以前的版本均不兼容  
+从 `3.2.1` 版本开始，包类名已经更改，因此不再兼容 `3.1.x` 版本
 
 ## 功能差别说明
 
