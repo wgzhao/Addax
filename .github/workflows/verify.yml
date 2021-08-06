@@ -23,11 +23,5 @@ jobs:
         with:
           java-version: '8'
           distribution: 'adopt'
-      - name: Setup Maven
-        # You may pin to the exact commit or the version.
-        uses: stCarolas/setup-maven@v4.1
-        with:
-          # Version Spec of the version to use.  Examples: 10.x, 10.15.1, >=10.15.0
-          maven-version: 3.5.4 # optional, default is 3.5.4
       - name: Build with Maven
-        run: mvn --batch-mode --update-snapshots -Dgpg.skip verify
+        run: ./mvnw  -B -V -T C1 -DskipTests -Dgpg.skip -pl '!:docs' verify
