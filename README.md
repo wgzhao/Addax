@@ -4,6 +4,9 @@
 <p align="center">Addax is an open source universal ETL tool</p>
 <p align="center"><a href="https://addax.readthedocs.io">Documentation</a> detailed description of how to install and deploy and how to use each collection plugin </p>
 <p align="center">
+   <a href="https://github.com/wgzhao/addax/release">
+      <img src="https://img.shields.io/github/release/wgzhao/addax.svg" alt="relase version"/>
+    </a>
    <a href="https://github.com/wgzhao/Addax/workflows/Maven%20Package/badge.svg">
        <img src="https://github.com/wgzhao/Addax/workflows/Maven%20Package/badge.svg" alt="Maven Package" />
    </a>
@@ -17,13 +20,9 @@ English | [简体中文](README_zh.md)
 
 # I'm changing DataX to Addax
 
-## current stable version
+We will use new brand `addax` since `4.0.0` and therefore no longer compatible with prior versions.
 
-`4.0.2`
-
-Note: We will use new brand `addax` since `4.0.0` and therefore no longer compatible with prior versions.
-
-Note: As of `3.2.1`, the package class names have been changed and are therefore no longer compatible with `3.1.x` versions.
+As of `3.2.1`, the package class names have been changed and are therefore no longer compatible with `3.1.x` versions.
 
 The project, originally from Ali's [DataX]((https://github.com/alibaba/datax)), has been streamlined and adapted, as described below
 
