@@ -12,10 +12,6 @@
     <name>hbase20xsql-writer</name>
     <packaging>jar</packaging>
 
-    <properties>
-        <phoenix.version>5.1.0-HBase-2.0.0.2</phoenix.version>
-    </properties>
-
     <dependencies>
         <dependency>
             <groupId>com.wgzhao.addax</groupId>
