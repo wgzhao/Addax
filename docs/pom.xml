@@ -5,7 +5,7 @@
     <groupId>com.wgzhao.addax</groupId>
     <artifactId>addax-docs</artifactId>
     <name>addax-docs</name>
-    <version>4.0.2-SNAPSHOT</version>
+    <version>4.0.2</version>
     <packaging>pom</packaging>
 
     <build>
