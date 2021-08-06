@@ -19,7 +19,7 @@ English | [简体中文](README_zh.md)
 
 ## current stable version
 
-`4.0.1`
+`4.0.2`
 
 Note: We will use new brand `addax` since `4.0.0` and therefore no longer compatible with prior versions.
 
@@ -147,6 +147,7 @@ If you are too lazy to compile or cannot compile because of your environment, yo
 
 | version | download                                                   | md5                              |
 | ------- | ---------------------------------------------------------- | -------------------------------- |
+| 4.0.2   | https://www.aliyundrive.com/s/U5uotY7vVAY                  | cd3a3d6d0c79cbd3bcd259ebb47acbc5 |
 | 4.0.1   | https://www.aliyundrive.com/s/BwbUJr21baH                  | 8f1963e8ce5e5f880a29a503399413a6 |
 | 4.0.0   | https://pan.baidu.com/s/1qmV6ed3CYpACIp29JCIDgQ code: 559q | b9b759da228f3bc656965d20357dcb2a |
 | 3.2.5   | https://pan.baidu.com/s/14_MnbtRUtJlvQh8tTKv6fg code: 1jdr | 43ddd0186ccbaf1f1bfee0aac22da935 |
@@ -167,6 +168,7 @@ If you are too lazy to compile or cannot compile because of your environment, yo
 1. Starting from version `4.0.1`, the uploaded binary files have been switched from `Baidu Net Disk` to `Aliyun Drive`, and the download speed should be greatly improved
 2. Starting from version `3.2.3`, in order to reduce the installation package size, the built-in package only includes `streamreader` and `streamwriter` plug-ins, 
 other plug-ins need to be downloaded separately, the download shared directory list is as the following.
+3. Because Aliyun drive does not support the sharing of compressed files currently, So, I add a .jpg suffix for each binary file, you need to remove this suffix before you can use them   
 
 ### plugins download
 

@@ -19,7 +19,7 @@
 
 ## 当前稳定版
 
-`4.0.0`
+`4.0.2`
 
 注： 从 `4.0.0` 版本开始，启用新的项目名称 `Addax`, 因此它和以前的版本均不兼容
 
@@ -127,7 +127,8 @@ docker run -ti --rm --name addax wgzhao/addax:latest /opt/addax/bin/addax.sh /op
 
 | 版本  | 连接地址                                                     | md5值                            |
 | ----- | ------------------------------------------------------------| -------------------------------- |
-| 4.0.1 | https://www.aliyundrive.com/s/BwbUJr21baH                 | 8f1963e8ce5e5f880a29a503399413a6 |
+| 4.0.2   | https://www.aliyundrive.com/s/U5uotY7vVAY                 | cd3a3d6d0c79cbd3bcd259ebb47acbc5 |
+| 4.0.1 | https://www.aliyundrive.com/s/BwbUJr21baH                   | 8f1963e8ce5e5f880a29a503399413a6 |
 | 4.0.0 | https://pan.baidu.com/s/1qmV6ed3CYpACIp29JCIDgQ 提取码: 559q | b9b759da228f3bc656965d20357dcb2a |
 | 3.2.5 | https://pan.baidu.com/s/14_MnbtRUtJlvQh8tTKv6fg 提取码: 1jdr | 43ddd0186ccbaf1f1bfee0aac22da935 |
 | 3.2.4 | https://pan.baidu.com/s/1VaOlAOTqGX4WwRtI5ewPeg 提取码: i127 | 2d16125385b88405481e12bf4a8fd715 |
@@ -146,6 +147,7 @@ docker run -ti --rm --name addax wgzhao/addax:latest /opt/addax/bin/addax.sh /op
 注： 
 1. 从4.0.1版本开始，上传的二进制文件从百度网盘切换到了阿里云网盘，下载速度应该会有很大的提升
 2. 从 3.2.3 版本开始，为了减少安装包大小，编译好的压缩包仅包括 `streamreader` 和 `streamwriter` 两个插件，其他插件则需要单独下载，下载共享目录列表如下：
+3. 因为阿里云盘暂时不支持压缩文件的分享，所以上述提供下载的二进制版本文件我添加了 `.jgp` 后缀，下载后可以删除这个后缀。
 
 预编译插件下载地址一览表
 
