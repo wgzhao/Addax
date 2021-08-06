@@ -182,15 +182,15 @@ other plug-ins need to be downloaded separately, the download shared directory l
 ```shell
 git clone https://github.com/wgzhao/addax.git addax
 cd addax
-mvn clean package
-mvn package assembly:single
+./mvnw clean package -pl '!:docs'
+./mvnw package assembly:single
 ```
 
 If you want to compile the doc, you can execute the following instructions.
 
 ```shell
 cd docs
-mvn clean package
+../mvnw clean package
 ```
 
 After successful compilation and packaging, a `addax-<version>` folder will be created in the `target/datax` directory of the project directory, where `<version` indicates the version.

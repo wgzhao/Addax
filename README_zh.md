@@ -161,15 +161,15 @@ docker run -ti --rm --name addax wgzhao/addax:latest /opt/addax/bin/addax.sh /op
 ```shell
 git clone https://github.com/wgzhao/addax.git addax
 cd addax
-mvn clean package
-mvn package assembly:single
+./mvnw clean package -pl '!:docs'
+./mvnw package assembly:single
 ```
 
 如果需要编译文档，请执行下面的命令
 
 ```shell
 cd docs
-mvn clean package
+../mvnw clean package
 ```
 
 编译打包成功后，会在项目目录的`target/addax` 目录下创建一个 `addax-<version>`的 文件夹，其中 `<version>` 表示版本。
