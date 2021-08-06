@@ -28,4 +28,9 @@ public final class FtpKey extends Key
     public static final String PORT = "port";
     public static final String TIMEOUT = "timeout";
 
+    public static final String USE_KEY = "useKey";
+    // ssh private key
+    public static final String KEY_PATH = "keyPath";
+    // ssh private key passphrase
+    public static final String KEY_PASS = "keyPass";
 }

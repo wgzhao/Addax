@@ -25,8 +25,18 @@ import java.util.Set;
 public interface IFtpHelper
 {
 
-    //使用被动方式
-    void loginFtpServer(String host, String username, String password, int port, int timeout);
+    /**
+     *
+     * @param host the host to connect to
+     * @param port the port to connect
+     * @param username username to connect
+     * @param password password for username
+     * @param keyPath private key, only for sftp protocol
+     * @param keyPass the passphrase of private key
+     * @param timeout the connect timeout microseconds
+     */
+    void loginFtpServer(String host, int port, String username, String password, String keyPath, String keyPass, int timeout);
+
 
     void logoutFtpServer();
 

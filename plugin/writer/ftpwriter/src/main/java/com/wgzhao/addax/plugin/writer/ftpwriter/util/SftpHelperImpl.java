@@ -19,8 +19,6 @@
 
 package com.wgzhao.addax.plugin.writer.ftpwriter.util;
 
-import com.wgzhao.addax.common.exception.AddaxException;
-import com.wgzhao.addax.plugin.writer.ftpwriter.FtpWriterErrorCode;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.serializer.SerializerFeature;
 import com.jcraft.jsch.ChannelSftp;
@@ -30,6 +28,8 @@ import com.jcraft.jsch.JSchException;
 import com.jcraft.jsch.Session;
 import com.jcraft.jsch.SftpATTRS;
 import com.jcraft.jsch.SftpException;
+import com.wgzhao.addax.common.exception.AddaxException;
+import com.wgzhao.addax.plugin.writer.ftpwriter.FtpWriterErrorCode;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
@@ -45,23 +45,34 @@ import java.util.Vector;
 public class SftpHelperImpl
         implements IFtpHelper
 {
-    private static final Logger LOG = LoggerFactory
-            .getLogger(SftpHelperImpl.class);
+    private static final Logger LOG = LoggerFactory.getLogger(SftpHelperImpl.class);
 
     private Session session = null;
     private ChannelSftp channelSftp = null;
 
+
     @Override
-    public void loginFtpServer(String host, String username, String password,
-            int port, int timeout)
+    public void loginFtpServer(String host,  int port, String username, String password, String keyPath, String keyPass, int timeout)
     {
         JSch jsch = new JSch();
+        if (keyPath != null) {
+            try {
+                if (keyPass != null) {
+                    jsch.addIdentity(keyPath, keyPass);
+                }
+                else {
+                    jsch.addIdentity(keyPath);
+                }
+            }
+            catch (JSchException e) {
+                throw AddaxException.asAddaxException(FtpWriterErrorCode.ILLEGAL_VALUE, "Failed to use private key", e);
+            }
+        }
         try {
             this.session = jsch.getSession(username, host, port);
             if (this.session == null) {
-                throw AddaxException
-                        .asAddaxException(FtpWriterErrorCode.FAIL_LOGIN,
-                                "创建ftp连接this.session失败,无法通过sftp与服务器建立链接，请检查主机名和用户名是否正确.");
+                throw AddaxException.asAddaxException(FtpWriterErrorCode.FAIL_LOGIN,
+                        String.format("Failed to connect %s:%s via sftp protocol", host, port));
             }
 
             this.session.setPassword(password);
@@ -76,39 +87,9 @@ public class SftpHelperImpl
             this.channelSftp.connect();
         }
         catch (JSchException e) {
-            if (null != e.getCause()) {
-                String cause = e.getCause().toString();
-                String unknownHostException = "java.net.UnknownHostException: "
-                        + host;
-                String illegalArgumentException = "java.lang.IllegalArgumentException: port out of range:"
-                        + port;
-                String wrongPort = "java.net.ConnectException: Connection refused";
-                if (unknownHostException.equals(cause)) {
-                    String message = String
-                            .format("请确认ftp服务器地址是否正确，无法连接到地址为: [%s] 的ftp服务器, errorMessage:%s",
-                                    host, e.getMessage());
-                    LOG.error(message);
-                    throw AddaxException.asAddaxException(
-                            FtpWriterErrorCode.FAIL_LOGIN, message, e);
-                }
-                else if (illegalArgumentException.equals(cause)
-                        || wrongPort.equals(cause)) {
-                    String message = String.format(
-                            "请确认连接ftp服务器端口是否正确，错误的端口: [%s], errorMessage:%s",
-                            port, e.getMessage());
-                    LOG.error(message);
-                    throw AddaxException.asAddaxException(
-                            FtpWriterErrorCode.FAIL_LOGIN, message, e);
-                }
-            }
-            else {
-                String message = String
-                        .format("与ftp服务器建立连接失败,请检查主机、用户名、密码是否正确, host:%s, port:%s, username:%s, errorMessage:%s",
-                                host, port, username, e.getMessage());
-                LOG.error(message);
-                throw AddaxException.asAddaxException(
-                        FtpWriterErrorCode.FAIL_LOGIN, message);
-            }
+            String message = String.format("Failed to connect %s:%s because: %s", host, port, e.getMessage());
+            LOG.error(message);
+            throw AddaxException.asAddaxException(FtpWriterErrorCode.FAIL_LOGIN, message, e);
         }
     }
 
@@ -135,10 +116,8 @@ public class SftpHelperImpl
             isDirExist = sftpATTRS.isDir();
         }
         catch (SftpException e) {
-            if (e.getMessage().toLowerCase().equals("no such file")) {
-                LOG.warn(String.format(
-                        "您的配置项path:[%s]不存在，将尝试进行目录创建, errorMessage:%s",
-                        directoryPath, e.getMessage()), e);
+            if (e.getMessage().equalsIgnoreCase("no such file")) {
+                LOG.warn("The directory {} does not exists, try to create it", directoryPath);
                 isDirExist = false;
             }
         }
@@ -148,14 +127,8 @@ public class SftpHelperImpl
                 this.channelSftp.mkdir(directoryPath);
             }
             catch (SftpException e) {
-                String message = String
-                        .format("创建目录:%s时发生I/O异常,请确认与ftp服务器的连接正常,拥有目录创建权限, errorMessage:%s",
-                                directoryPath, e.getMessage());
-                LOG.error(message, e);
-                throw AddaxException
-                        .asAddaxException(
-                                FtpWriterErrorCode.COMMAND_FTP_IO_EXCEPTION,
-                                message, e);
+                LOG.error("IOException occurred while create folder {}, {}", directoryPath, e);
+                throw AddaxException.asAddaxException(FtpWriterErrorCode.COMMAND_FTP_IO_EXCEPTION, e);
             }
         }
     }
@@ -170,10 +143,8 @@ public class SftpHelperImpl
             isDirExist = sftpATTRS.isDir();
         }
         catch (SftpException e) {
-            if (e.getMessage().toLowerCase().equals("no such file")) {
-                LOG.warn(String.format(
-                        "您的配置项path:[%s]不存在，将尝试进行目录创建, errorMessage:%s",
-                        directoryPath, e.getMessage()), e);
+            if (e.getMessage().equalsIgnoreCase("no such file")) {
+                LOG.warn("The directory {} does not exists, try to create it", directoryPath);
                 isDirExist = false;
             }
         }
@@ -182,7 +153,6 @@ public class SftpHelperImpl
             dirPath.append(IOUtils.DIR_SEPARATOR_UNIX);
             String[] dirSplit = StringUtils.split(directoryPath, IOUtils.DIR_SEPARATOR_UNIX);
             try {
-                // ftp server不支持递归创建目录,只能一级一级创建
                 for (String dirName : dirSplit) {
                     dirPath.append(dirName);
                     mkDirSingleHierarchy(dirPath.toString());
@@ -190,19 +160,13 @@ public class SftpHelperImpl
                 }
             }
             catch (SftpException e) {
-                String message = String
-                        .format("创建目录:%s时发生I/O异常,请确认与ftp服务器的连接正常,拥有目录创建权限, errorMessage:%s",
-                                directoryPath, e.getMessage());
-                LOG.error(message, e);
-                throw AddaxException
-                        .asAddaxException(
-                                FtpWriterErrorCode.COMMAND_FTP_IO_EXCEPTION,
-                                message, e);
+                LOG.error("IOException occurred while create folder {}, {}", directoryPath, e);
+                throw AddaxException.asAddaxException(FtpWriterErrorCode.COMMAND_FTP_IO_EXCEPTION, e);
             }
         }
     }
 
-    public boolean mkDirSingleHierarchy(String directoryPath)
+    public void mkDirSingleHierarchy(String directoryPath)
             throws SftpException
     {
         boolean isDirExist = false;
@@ -211,17 +175,13 @@ public class SftpHelperImpl
             isDirExist = sftpATTRS.isDir();
         }
         catch (SftpException e) {
-            if (!isDirExist) {
-                LOG.info(String.format("正在逐级创建目录 [%s]", directoryPath));
-                this.channelSftp.mkdir(directoryPath);
-                return true;
-            }
+            LOG.info(String.format("正在逐级创建目录 [%s]", directoryPath));
+            this.channelSftp.mkdir(directoryPath);
         }
         if (!isDirExist) {
             LOG.info(String.format("正在逐级创建目录 [%s]", directoryPath));
             this.channelSftp.mkdir(directoryPath);
         }
-        return true;
     }
 
     @Override
@@ -233,8 +193,7 @@ public class SftpHelperImpl
                     StringUtils.lastIndexOf(filePath, IOUtils.DIR_SEPARATOR));
             this.channelSftp.cd(parentDir);
             this.printWorkingDirectory();
-            OutputStream writeOutputStream = this.channelSftp.put(filePath,
-                    ChannelSftp.APPEND);
+            OutputStream writeOutputStream = this.channelSftp.put(filePath, ChannelSftp.APPEND);
             String message = String.format(
                     "打开FTP文件[%s]获取写出流时出错,请确认文件%s有权限创建，有权限写出等", filePath,
                     filePath);

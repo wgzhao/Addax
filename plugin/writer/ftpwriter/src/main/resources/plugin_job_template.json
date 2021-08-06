@@ -18,6 +18,9 @@
       "nullFormat": "",
       "dateFormat": "",
       "fileFormat": "",
+      "useKey": "true",
+      "keyPath": "~/.ssh/id_rsa",
+      "keyPass": "",
       "header": []
     }
   }
