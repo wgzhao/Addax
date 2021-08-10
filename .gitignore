@@ -31,3 +31,4 @@ __pycache__/
 .classpath
 .settings
 .project
+*.secret
