@@ -48,9 +48,9 @@ jobs:
           distribution: 'adopt'
           server-id: github # Value of the distributionManagement/repository/id field of the pom.xml
           settings-path: ${{ github.workspace }} # location for the settings.xml file
-      - run: mvn deploy -pl ":dbffilereader" -am
+      - run: mvn -B -V -T C1 -DskipTests deploy -pl '!:addax-docs'
 
       - name: Publish to GitHub Packages Apache Maven
-        run: mvn deploy -s $GITHUB_WORKSPACE/settings.xml
+        run: mvn -B -V -T C1 -DskipTests deploy -s $GITHUB_WORKSPACE/settings.xml
         env:
           GITHUB_TOKEN: ${{ github.token }}
