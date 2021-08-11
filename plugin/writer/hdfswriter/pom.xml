@@ -80,44 +80,20 @@
                 </exclusion>
             </exclusions>
         </dependency>
+
         <dependency>
             <groupId>org.xerial.snappy</groupId>
             <artifactId>snappy-java</artifactId>
             <version>1.1.8.4</version>
         </dependency>
-<!--        <dependency>-->
-<!--            <groupId>org.apache.avro</groupId>-->
-<!--            <artifactId>avro</artifactId>-->
-<!--            <version>1.10.1</version>-->
-<!--            <exclusions>-->
-<!--                <exclusion>-->
-<!--                    <groupId>slf4j-api</groupId>-->
-<!--                    <artifactId>org.slf4j</artifactId>-->
-<!--                </exclusion>-->
-<!--            </exclusions>-->
-<!--        </dependency>-->
 
-<!--        <dependency>-->
-<!--            <groupId>org.apache.parquet</groupId>-->
-<!--            <artifactId>parquet-avro</artifactId>-->
-<!--            <version>1.11.1</version>-->
-<!--            <exclusions>-->
-<!--                <exclusion>-->
-<!--                    <groupId>com.google.guava</groupId>-->
-<!--                    <artifactId>guava</artifactId>-->
-<!--                </exclusion>-->
-<!--                <exclusion>-->
-<!--                    <groupId>slf4j-api</groupId>-->
-<!--                    <artifactId>org.slf4j</artifactId>-->
-<!--                </exclusion>-->
-<!--            </exclusions>-->
-<!--        </dependency>-->
         <dependency>
             <groupId>org.junit.jupiter</groupId>
             <artifactId>junit-jupiter-api</artifactId>
             <version>5.7.2</version>
             <scope>test</scope>
         </dependency>
+
     </dependencies>
     <build>
         <plugins>
