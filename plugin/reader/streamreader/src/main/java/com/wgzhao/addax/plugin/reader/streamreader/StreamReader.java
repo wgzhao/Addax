@@ -40,6 +40,7 @@ import org.apache.commons.lang3.time.DateUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.math.BigDecimal;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -154,6 +155,7 @@ public class StreamReader
          * STRING: random 0, 10 0到10长度之间的随机字符串
          * BOOL: random 0, 10 false 和 true出现的比率
          * DOUBLE: random 0, 10 0到10之间的随机浮点数
+         * DOUBLE: random 0, 10, 2 0到10之间的随机浮点数，小数位为2位
          * DATE: random 2014-07-07 00:00:00, 2016-07-07 00:00:00 开始时间-&gt;结束时间之间的随机时间，
          * 日期格式默认(不支持逗号)yyyy-MM-dd HH:mm:ss
          * BYTES: random 0, 10 0到10长度之间的随机字符串获取其UTF-8编码的二进制串
@@ -174,9 +176,9 @@ public class StreamReader
         private void parseMixupFunctions(Configuration eachColumnConfig)
         {
             String columnValue = eachColumnConfig.getString(Key.VALUE);
-            String columnMixup = eachColumnConfig.getString(StreamConstant.RANDOM);
+            String columnRandom = eachColumnConfig.getString(StreamConstant.RANDOM);
             String columnIncr = eachColumnConfig.getString(StreamConstant.INCR);
-            if (StringUtils.isBlank(columnMixup) && StringUtils.isBlank(columnIncr)) {
+            if (StringUtils.isBlank(columnRandom) && StringUtils.isBlank(columnIncr)) {
                 eachColumnConfig.getNecessaryValue(Key.VALUE, StreamReaderErrorCode.REQUIRED_VALUE);
             }
             if (StringUtils.isNotBlank(columnIncr)) {
@@ -234,69 +236,73 @@ public class StreamReader
                 this.originalConfig.set(StreamConstant.HAVE_INCR_FUNCTION, true);
             }
             // 三者都有配置
-            if ((StringUtils.isNotBlank(columnMixup) || StringUtils.isNotBlank(columnIncr)) && StringUtils.isNotBlank(columnValue)) {
+            if ((StringUtils.isNotBlank(columnRandom) || StringUtils.isNotBlank(columnIncr)) && StringUtils.isNotBlank(columnValue)) {
                 LOG.warn("您配置了streamreader常量列(value:{})和随机混淆列(random:{})或递增列(incr:{}), 常量列优先",
-                        columnValue, columnMixup, columnIncr);
-                if (StringUtils.isNotBlank(columnMixup)) {
+                        columnValue, columnRandom, columnIncr);
+                if (StringUtils.isNotBlank(columnRandom)) {
                     eachColumnConfig.remove(StreamConstant.RANDOM);
                 }
                 if (StringUtils.isNotBlank(columnIncr)) {
                     eachColumnConfig.remove(StreamConstant.INCR);
                 }
             }
-            if (StringUtils.isNotBlank(columnMixup)) {
-                Matcher matcher = this.mixupFunctionPattern.matcher(columnMixup);
-                if (matcher.matches()) {
-                    String param1 = matcher.group(1);
-                    long param1Int;
-                    String param2 = matcher.group(2);
-                    long param2Int;
-                    if (StringUtils.isBlank(param1) && StringUtils.isBlank(param2)) {
-                        throw AddaxException.asAddaxException(
-                                StreamReaderErrorCode.ILLEGAL_VALUE,
-                                String.format("random混淆函数不合法[%s], 混淆函数random的参数不能为空:%s, %s",
-                                        columnMixup, param1, param2));
-                    }
-                    String typeName = eachColumnConfig.getString(Key.TYPE);
-                    if (Type.DATE.name().equalsIgnoreCase(typeName)) {
-                        String dateFormat = eachColumnConfig.getString(Key.DATE_FORMAT, StreamConstant.DEFAULT_DATE_FORMAT);
-                        try {
-                            SimpleDateFormat format = new SimpleDateFormat(
-                                    eachColumnConfig.getString(Key.DATE_FORMAT, StreamConstant.DEFAULT_DATE_FORMAT));
-                            //warn: do no concern int -> long
-                            param1Int = format.parse(param1).getTime();//milliseconds
-                            param2Int = format.parse(param2).getTime();//milliseconds
-                        }
-                        catch (ParseException e) {
-                            throw AddaxException.asAddaxException(
-                                    StreamReaderErrorCode.ILLEGAL_VALUE,
-                                    String.format("dateFormat参数[%s]和混淆函数random的参数不匹配，解析错误:%s, %s",
-                                            dateFormat, param1, param2), e);
-                        }
-                    }
-                    else {
-                        param1Int = Integer.parseInt(param1);
-                        param2Int = Integer.parseInt(param2);
-                    }
-                    if (param1Int < 0 || param2Int < 0) {
-                        throw AddaxException.asAddaxException(
-                                StreamReaderErrorCode.ILLEGAL_VALUE,
-                                String.format("random混淆函数不合法[%s], 混淆函数random的参数不能为负数:%s, %s",
-                                        columnMixup, param1, param2));
-                    }
-                    if (!Type.BOOL.name().equalsIgnoreCase(typeName) && param1Int > param2Int) {
-                        throw AddaxException.asAddaxException(
-                                StreamReaderErrorCode.ILLEGAL_VALUE,
-                                String.format("random混淆函数不合法[%s], 混淆函数random的参数需要第一个小于等于第二个:%s, %s",
-                                        columnMixup, param1, param2));
-                    }
-                    eachColumnConfig.set(StreamConstant.MIXUP_FUNCTION_PARAM1, param1Int);
-                    eachColumnConfig.set(StreamConstant.MIXUP_FUNCTION_PARAM2, param2Int);
-                }
-                else {
+            if (StringUtils.isNotBlank(columnRandom)) {
+                String[] split = columnRandom.split(",");
+                if (split.length < 2) {
                     throw AddaxException.asAddaxException(
                             StreamReaderErrorCode.ILLEGAL_VALUE,
-                            String.format("random混淆函数不合法[%s], 需要为param1, param2形式", columnMixup));
+                            String.format("Illegal random value [%s], supported random value like 'minVal, MaxVal[,scale]'",
+                                    columnRandom));
+                }
+                String param1 = split[0];
+                long param1Int;
+                String param2 = split[1];
+                long param2Int;
+                if (StringUtils.isBlank(param1) && StringUtils.isBlank(param2)) {
+                    throw AddaxException.asAddaxException(
+                            StreamReaderErrorCode.ILLEGAL_VALUE,
+                            String.format("random混淆函数不合法[%s], 混淆函数random的参数不能为空:%s, %s",
+                                    columnRandom, param1, param2));
+                }
+
+                String typeName = eachColumnConfig.getString(Key.TYPE);
+                if (Type.DATE.name().equalsIgnoreCase(typeName)) {
+                    String dateFormat = eachColumnConfig.getString(Key.DATE_FORMAT, StreamConstant.DEFAULT_DATE_FORMAT);
+                    try {
+                        SimpleDateFormat format = new SimpleDateFormat(
+                                eachColumnConfig.getString(Key.DATE_FORMAT, StreamConstant.DEFAULT_DATE_FORMAT));
+                        //warn: do no concern int -> long
+                        param1Int = format.parse(param1).getTime();//milliseconds
+                        param2Int = format.parse(param2).getTime();//milliseconds
+                    }
+                    catch (ParseException e) {
+                        throw AddaxException.asAddaxException(
+                                StreamReaderErrorCode.ILLEGAL_VALUE,
+                                String.format("dateFormat参数[%s]和混淆函数random的参数不匹配，解析错误:%s, %s",
+                                        dateFormat, param1, param2), e);
+                    }
+                }
+                else {
+                    param1Int = Integer.parseInt(param1);
+                    param2Int = Integer.parseInt(param2);
+                }
+                if (param1Int < 0 || param2Int < 0) {
+                    throw AddaxException.asAddaxException(
+                            StreamReaderErrorCode.ILLEGAL_VALUE,
+                            String.format("random混淆函数不合法[%s], 混淆函数random的参数不能为负数:%s, %s",
+                                    columnRandom, param1, param2));
+                }
+                if (!Type.BOOL.name().equalsIgnoreCase(typeName) && param1Int > param2Int) {
+                    throw AddaxException.asAddaxException(
+                            StreamReaderErrorCode.ILLEGAL_VALUE,
+                            String.format("random混淆函数不合法[%s], 混淆函数random的参数需要第一个小于等于第二个:%s, %s",
+                                    columnRandom, param1, param2));
+                }
+                eachColumnConfig.set(StreamConstant.MIXUP_FUNCTION_PARAM1, param1Int);
+                eachColumnConfig.set(StreamConstant.MIXUP_FUNCTION_PARAM2, param2Int);
+                if (split.length == 3) {
+                    int scale = Integer.parseInt(split[2].trim());
+                    eachColumnConfig.set(StreamConstant.MIXUP_FUNCTION_SCALE, scale);
                 }
                 this.originalConfig.set(StreamConstant.HAVE_MIXUP_FUNCTION, true);
             }
@@ -424,11 +430,12 @@ public class StreamReader
                 return null;
             }
             Type columnType = Type.valueOf(eachColumnConfig.getString(Key.TYPE).toUpperCase());
-            String columnMixup = eachColumnConfig.getString(StreamConstant.RANDOM);
+            String columnRandom = eachColumnConfig.getString(StreamConstant.RANDOM);
             String columnIncr = eachColumnConfig.getString(StreamConstant.INCR);
             long param1Int = eachColumnConfig.getLong(StreamConstant.MIXUP_FUNCTION_PARAM1, 0L);
             long param2Int = eachColumnConfig.getLong(StreamConstant.MIXUP_FUNCTION_PARAM2, 1L);
-            boolean isColumnMixup = StringUtils.isNotBlank(columnMixup);
+            int  scale = eachColumnConfig.getInt(StreamConstant.MIXUP_FUNCTION_SCALE, -1);
+            boolean isColumnMixup = StringUtils.isNotBlank(columnRandom);
             boolean isIncr = StringUtils.isNotBlank(columnIncr);
             if (isColumnMixup) {
                 switch (columnType) {
@@ -438,7 +445,14 @@ public class StreamReader
                     case LONG:
                         return new LongColumn(RandomUtils.nextLong(param1Int, param2Int + 1));
                     case DOUBLE:
-                        return new DoubleColumn(RandomUtils.nextDouble(param1Int, param2Int + 1));
+                        // specify fixed scale or not ?
+                        if (scale > 0) {
+                            BigDecimal b = BigDecimal.valueOf(RandomUtils.nextDouble(param1Int, param2Int + 1))
+                                    .setScale(scale, BigDecimal.ROUND_HALF_UP);
+                            return new DoubleColumn(b.doubleValue());
+                        } else {
+                            return new DoubleColumn(RandomUtils.nextDouble(param1Int, param2Int + 1));
+                        }
                     case DATE:
                         return new DateColumn(new Date(RandomUtils.nextLong(param1Int, param2Int + 1)));
                     case BOOL:

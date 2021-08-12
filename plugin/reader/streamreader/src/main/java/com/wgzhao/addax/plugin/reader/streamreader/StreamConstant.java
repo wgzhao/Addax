@@ -34,7 +34,7 @@ public final class StreamConstant extends Constant
     public static final String MIXUP_FUNCTION_PATTERN = "\\s*(.*)\\s*,\\s*(.*)\\s*";
     public static final String MIXUP_FUNCTION_PARAM1 = "mixupParam1";
     public static final String MIXUP_FUNCTION_PARAM2 = "mixupParam2";
-
+    public static final String MIXUP_FUNCTION_SCALE = "scale";
     public static final String HAVE_INCR_FUNCTION = "hasIncrFunction";
 
     private StreamConstant() {}
