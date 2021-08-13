@@ -1,0 +1,10 @@
+{
+  "name": "datareader",
+  "class": "com.wgzhao.addax.plugin.reader.datareader.DataReader",
+  "description": {
+    "useScene": "generate fake data for populating database",
+    "mechanism": "",
+    "warn": ""
+  },
+  "developer": "wgzhao"
+}
