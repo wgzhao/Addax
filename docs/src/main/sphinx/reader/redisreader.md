@@ -87,5 +87,5 @@ RedisReader 提供了读取Redis RDB 的能力。在底层实现上获取本地R
 ## 5 约束限制
 
 1. 不支持直接读取任何不支持sync命令的redis server，如果需要请备份的rdb文件进行读取。
-2. 如果是原生redis cluster集群，请填写所有master节点的tcp地址，redisreader插件会自动dump 所有节点的rdb文件。
+2. 如果是原生redis cluster集群，请填写所有master节点的tcp地址，`redisreader` 插件会自动dump 所有节点的rdb文件。
 3. 仅解析 `String` 数据类型，其他复合类型(`Sets`, `List` 等会忽略)

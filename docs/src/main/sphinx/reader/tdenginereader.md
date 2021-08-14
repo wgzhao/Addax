@@ -1,7 +1,6 @@
-# TDengineReader 
+# TDengineReader
 
-TDengineReader 插件实现了从涛思公司的 [TDengine](https://www.taosdata.com/cn/) 读取数据。在底层实现上，TDengineReader 通过JDBC JNI 驱动连接远程 TDengine 数据库，
-并执行相应的sql语句将数据从 TDengine 库中批量获。
+TDengineReader 插件实现了从涛思公司的 [TDengine](https://www.taosdata.com/cn/) 读取数据。在底层实现上，TDengineReader 通过JDBC JNI 驱动连接远程 TDengine 数据库， 并执行相应的sql语句将数据从 TDengine 库中批量获。
 
 不同于其他关系型数据库，TDengine 不支持FetchSize
 
@@ -159,7 +158,7 @@ java.library.path:/usr/java/packages/lib/amd64:/usr/lib64:/lib64:/lib:/usr/lib
 | username        |    是    | string | 无     | 数据源的用户名 |
 | password        |    否    | string | 无     | 数据源指定用户名的密码 |
 | table           |    是    | list | 无     | 所选取的需要同步的表名,使用JSON数据格式，当配置为多张表时，用户自己需保证多张表是同一表结构 |
-| column          |    是    | list | 无     |  所配置的表中需要同步的列名集合，详细描述[rdbmreader](rdbmsreader.md) ｜
+| column          |    是    | list | 无     |  所配置的表中需要同步的列名集合，详细描述[rdbmreader](rdbmsreader) |
 | where           |    否    | string | 无     | 针对表的筛选条件 |
 | querySql        |    否    | list | 无     | 使用自定义的SQL而不是指定表来获取数据，当配置了这一项之后，Addax系统就会忽略 `table`，`column`这些配置项 |
 
@@ -174,11 +173,13 @@ java.library.path:/usr/java/packages/lib/amd64:/usr/lib64:/lib64:/lib:/usr/lib
 所以上述配置中的` connection` 应该修改为如下：
 
 ```json
-"connection": [{
-  "querySql":["select * from test.meters where ts <'2017-07-14 10:40:02' and  loc='beijing' limit 100"],
-  "jdbcUrl": ["jdbc:TAOS-RS://127.0.0.1:6041/test"],
-  "driver":"com.taosdata.jdbc.rs.RestfulDriver"
-}]
+"connection": [
+{
+"querySql":["select * from test.meters where ts <'2017-07-14 10:40:02' and  loc='beijing' limit 100"],
+"jdbcUrl": ["jdbc:TAOS-RS://127.0.0.1:6041/test"],
+"driver": "com.taosdata.jdbc.rs.RestfulDriver"
+}
+]
 ```
 
 ## 类型转换

@@ -168,7 +168,7 @@ bin/addax.sh job/stream2doris.json
 | username        |    是    | string | 无     | HTTP 签名验证帐号 |
 | password        |    否    | string | 无     | HTTP 签名验证密码 |
 | table           |    是    | string | 无     | 所选取的需要同步的表名|
-| column          |    否    | list | 无     |  所配置的表中需要同步的列名集合，详细描述见[rdbmswriter](rdbmswriter.md) ｜
+| column          |    否    | list | 无     |  所配置的表中需要同步的列名集合，详细描述见[rdbmswriter](rdbmswriter) ｜
 | batchSize       |    否    | int | 1024   | 定义了插件和数据库服务器端每次批量数据获取条数，调高该值可能导致 Addax 出现OOM或者目标数据库事务提交失败导致挂起 |
 
 ### column

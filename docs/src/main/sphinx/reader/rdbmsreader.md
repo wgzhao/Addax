@@ -10,8 +10,7 @@ RDBMSReader 插件支持从传统 RDBMS 读取数据。这是一个通用关系�
 - ClickHouse Reader
 - SQLServer Reader
 
-注意，对于 Addax 已经提供了专门的数据库读取插件的，推荐使用专用插件，如果你需要读取的数据库没有专门插件，则考虑使用该通用插件。
-在使用之前，还需要执行以下操作才可以正常运行，否则运行会出现异常。
+注意，对于 Addax 已经提供了专门的数据库读取插件的，推荐使用专用插件，如果你需要读取的数据库没有专门插件，则考虑使用该通用插件。 在使用之前，还需要执行以下操作才可以正常运行，否则运行会出现异常。
 
 ## 配置驱动
 
@@ -134,10 +133,9 @@ RDBMSReader 插件支持从传统 RDBMS 读取数据。这是一个通用关系�
 | Presto | socks    | socksProxy   | `socksProxy=192.168.1.101:1081` |
 | Presto | http     | httpProxy   | `httpProxy=192.168.1.101:3128` |
 
-### driver 
+### driver
 
-大部分情况下，一个数据库的JDBC驱动是固定的，但有些因为版本的不同，所建议的驱动类名不同，比如 MySQL。
-新的 MySQL JDBC 驱动类型推荐使用 `com.mysql.cj.jdbc.Driver` 而不是以前的 `com.mysql.jdbc.Drver`。如果想要使用就的驱动名称，则可以配置 `driver` 配置项。
+大部分情况下，一个数据库的JDBC驱动是固定的，但有些因为版本的不同，所建议的驱动类名不同，比如 MySQL。 新的 MySQL JDBC 驱动类型推荐使用 `com.mysql.cj.jdbc.Driver` 而不是以前的 `com.mysql.jdbc.Drver`。如果想要使用就的驱动名称，则可以配置 `driver` 配置项。
 
 #### column
 
@@ -174,8 +172,7 @@ splitPk如果不填写，将视作用户不对单表进行切分，RDBMSReader �
 
 #### autoPk
 
-从 `3.2.6` 版本开始，支持自动获取表主键或唯一索引，如果设置为 `true` ，RdbmsReader 将尝试通过查询数据库的元数据信息获取指定表的主键字段或唯一索引字段，如果获取可用于分隔的
-字段不止一个，则默认取第一个。后续将会考虑优先取整数类型。
+从 `3.2.6` 版本开始，支持自动获取表主键或唯一索引，如果设置为 `true` ，RdbmsReader 将尝试通过查询数据库的元数据信息获取指定表的主键字段或唯一索引字段，如果获取可用于分隔的 字段不止一个，则默认取第一个。后续将会考虑优先取整数类型。
 
 该特性目前支持的数据库有：
 
@@ -197,7 +194,6 @@ splitPk如果不填写，将视作用户不对单表进行切分，RDBMSReader �
 | Date     |date, datetime, timestamp, time    |
 | Boolean  |bit, bool   |
 | Bytes    |tinyblob, mediumblob, blob, longblob, varbinary    |
-
 
 ## 4. 当前支持的数据库
 

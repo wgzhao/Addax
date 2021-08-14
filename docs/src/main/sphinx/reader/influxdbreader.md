@@ -75,7 +75,7 @@ influx -import -path=NOAA_data.txt -precision=s -database=NOAA_water_database
 bin/addax.sh job/influxdb2stream.json
 ```
 
-##  参数说明
+## 参数说明
 
 | 配置项          | 是否必须 |  数据类型   |默认值 |         描述   |
 | :-------------- | :------: | ------ |-------|-------------- |
@@ -84,17 +84,16 @@ bin/addax.sh job/influxdb2stream.json
 | password        |    否    | string | 无     | 数据源指定用户名的密码 |
 | database        |  是      | string |  无      | 数据源指定的数据库  |
 | table           |    是    | string |无     | 所选取的需要同步的表名 |
-| column          |    是    | list  | 无     |  所配置的表中需要同步的列名集合，详细描述[rdbmreader](rdbmsreader.md) ｜
+| column          |    是    | list  | 无     |  所配置的表中需要同步的列名集合，详细描述见 [rdbmreader](rdbmsreader) |
 | connTimeout     |    否    | int   | 15     | 设置连接超时值，单位为秒     |
 | readTimeout     |    否    | int   | 20     | 设置读取超时值，单位为秒     |
 | writeTimeout    |    否    | int   | 20     | 设置写入超时值，单位为秒     |
 | where           |    否    | 无     | 针对表的筛选条件 |
 | querySql        |    否    | 无     | 使用自定义的SQL而不是指定表来获取数据，当配置了这一项之后，Addax系统就会忽略 `table`，`column`这些配置项 |
 
-##  类型转换
+## 类型转换
 
 当前实现是将所有字段当作字符串处理
-
 
 ## 限制
 

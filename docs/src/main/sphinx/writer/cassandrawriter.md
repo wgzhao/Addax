@@ -123,7 +123,7 @@ CassandraWriter插件实现了向Cassandra写入数据。在底层实现上，Ca
 | keyspace                |    是    | 无           | 需要同步的表所在的keyspace                                                                                                  |
 | table                   |    是    | 无           | 所选取的需要同步的表                                                                                                        |
 | column                  |    是    | 无           | 所配置的表中需要同步的列集合,内容可以是列的名称或 `writetime()`。如果将列名配置为 `writetime()`，会将这一列的内容作为时间戳 |
-| consistancyLevel        |    否    | LOCAL_QUORUM | 数据一致性级别, 可选 `ONE|QUORUM|LOCAL_QUORUM|EACH_QUORUM|ALL|ANY|TWO|THREE|LOCAL_ONE`                                      |
+| consistancyLevel        |    否    | LOCAL_QUORUM | 数据一致性级别, 可选 `ONE, QUORUM, LOCAL_QUORUM, EACH_QUORUM, ALL, ANY, TWO, THREE, LOCAL_ONE`                                 |
 | batchSize               |    否    | 1            | 一次批量提交(UNLOGGED BATCH)的记录数大小（条数）                                                                            |
 
 ### 3.3 类型转换
