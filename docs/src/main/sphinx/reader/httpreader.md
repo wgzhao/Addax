@@ -1,6 +1,6 @@
-# HttpReader
+# Http Reader
 
-HttpReader 插件实现了读取Restful API 数据的能力
+HttpReader 插件实现了读取 Restful API 数据的能力
 
 ## 示例
 
@@ -307,7 +307,7 @@ bin/addax.sh job/httpreader2stream.json
 读写失败总数                    :                   0
 ```
 
-### 参数说明
+## 参数说明
 
 | 配置项    | 是否必须 | 数据类型 | 默认值 | 说明                                                        |
 | --------- | :------: | :------: | :----: | ----------------------------------------------------------- |
@@ -346,7 +346,7 @@ bin/addax.sh job/httpreader2stream.json
 
 `host` 是代理地址，包含代理类型，目前仅支持 `http` 代理和 `socks`(V4, V5均可) 代理。 如果代理需要认证，则可以配置  `auth` , 它由 用户名和密码组成，两者之间用冒号(:) 隔开。
 
-### 限制说明
+## 限制说明
 
 1. 返回的结果必须是JSON类型
 2. 当前所有key的值均当作字符串类型

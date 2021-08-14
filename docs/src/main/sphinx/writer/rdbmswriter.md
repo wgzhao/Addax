@@ -4,13 +4,13 @@ RDBMSWriter 插件支持从传统 RDBMS 读取数据。这是一个通用关系�
 
 同时 RDBMS Writer 又是其他关系型数据库读取插件的的基础类。以下读取插件均依赖该插件
 
-- Oracle Writer
-- MySQL Writer
-- PostgreSQL Writer
-- ClickHouse Writer
-- SQLServer Writer
+- [Oracle Writer](oraclewriter)
+- [MySQL Writer](mysqlwriter)
+- [PostgreSQL Writer](postgresqlwriter)
+- [ClickHouse Writer](clickhousewriter)
+- [SQLServer Writer](sqlserverwriter)
 
-注意，对于 Addax 已经提供了专门的数据库写入插件的，推荐使用专用插件，如果你需要写入的数据库没有专门插件，则考虑使用该通用插件。
+注意,  如果已经提供了专门的数据库写入插件的，推荐使用专用插件，如果你需要写入的数据库没有专门插件，则考虑使用该通用插件。
 在使用之前，还需要执行以下操作才可以正常运行，否则运行会出现异常。
 
 ## 配置驱动
@@ -116,7 +116,7 @@ RDBMSWriter 插件支持从传统 RDBMS 读取数据。这是一个通用关系�
 }
 ```
 
-### 3.2 参数说明
+## 参数说明
 
 | 配置项          | 是否必须  | 数据类型 | 默认值 |         描述   |
 | :--------------| :------: | ------ |-------|--------------- |
@@ -130,7 +130,7 @@ RDBMSWriter 插件支持从传统 RDBMS 读取数据。这是一个通用关系�
 | postSql         |   否     | array | 无    | 执行数据同步任务之后执行的sql语句，目前只允许执行一条SQL语句，例如加上某一个时间戳|
 | batchSize       |    否    | int  | 1024   | 定义了插件和数据库服务器端每次批量数据获取条数，调高该值可能导致 Addax 出现OOM或者目标数据库事务提交失败导致挂起 |
 
-#### column
+### column
 
 所配置的表中需要同步的列名集合，使用JSON的数组描述字段信息。用户使用 `*` 代表默认使用所有列配置，例如 `["*"]`。
 

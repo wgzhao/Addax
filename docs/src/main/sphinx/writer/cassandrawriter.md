@@ -1,18 +1,10 @@
-# CassandraWriter 插件文档
+# Cassandra Writer
 
-## 1 快速介绍
 
-CassandraWriter插件实现了向Cassandra写入数据。在底层实现上，CassandraWriter通过datastax的java driver连接Cassandra实例，并执行相应的cql语句将数据写入cassandra中。
+CassandraWriter 插件用于向 [Cassandra](https://cassandra.apache.org) 写入数据。
 
-## 2 实现原理
 
-简而言之，CassandraWriter通过java driver连接到Cassandra实例，并根据用户配置的信息生成INSERT CQL语句，然后发送到Cassandra。
-
-对于用户配置Table、Column的信息，CassandraReader将其拼接为CQL语句发送到Cassandra。
-
-## 3 功能说明
-
-### 3.1 配置样例
+## 配置样例
 
 配置一个从内存产生到Cassandra导入的作业:
 
@@ -109,7 +101,7 @@ CassandraWriter插件实现了向Cassandra写入数据。在底层实现上，Ca
 }
 ```
 
-### 3.2 参数说明
+## 参数说明
 
 | 配置项                  | 是否必须 | 默认值       | 描述                                                                                                                        |
 | :---------------------- | :------: | ------------ | --------------------------------------------------------------------------------------------------------------------------- |
@@ -126,11 +118,7 @@ CassandraWriter插件实现了向Cassandra写入数据。在底层实现上，Ca
 | consistancyLevel        |    否    | LOCAL_QUORUM | 数据一致性级别, 可选 `ONE, QUORUM, LOCAL_QUORUM, EACH_QUORUM, ALL, ANY, TWO, THREE, LOCAL_ONE`                                 |
 | batchSize               |    否    | 1            | 一次批量提交(UNLOGGED BATCH)的记录数大小（条数）                                                                            |
 
-### 3.3 类型转换
-
-目前CassandraReader支持除counter和Custom类型之外的所有类型。
-
-下面列出CassandraReader针对Cassandra类型转换列表:
+## 类型转换
 
 | Addax 内部类型 | Cassandra 数据类型                                                     |
 | -------------- | ---------------------------------------------------------------------- |
@@ -143,9 +131,9 @@ CassandraWriter插件实现了向Cassandra写入数据。在底层实现上，Ca
 
 请注意:
 
-目前不支持counter类型和custom类型。
+目前不支持 `counter` 类型和 `custom` 类型。
 
-## 4 约束限制
+## 约束限制
 
 ### batchSize
 

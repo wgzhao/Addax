@@ -1,10 +1,8 @@
-# FtpWriter
+# Ftp Writer
 
-FtpWriter 提供了向远程FTP 或SFTP 服务写入文件的能力，当前仅支持写入文本文件。
+FtpWriter 提供了向远程 FTP/SFTP 服务写入文件的能力，当前仅支持写入文本文件。
 
-## 示例
-
-### 配置样例
+## 配置样例
 
 ```json
 {
@@ -52,11 +50,11 @@ FtpWriter 提供了向远程FTP 或SFTP 服务写入文件的能力，当前仅�
 
 | 配置项            | 是否必须 | 默认值 | 描述                                                                                                                |
 | :---------------- | :------: | ------ | ------------------------------------------------------------------------------------------------------------------- |
-| protocol          |    是    | ftp     | ftp/sftp 服务器协议，目前支持传输协议有ftp和sftp                                                                          |
+| protocol          |    是    | `ftp`     | ftp/sftp 服务器协议，目前支持传输协议有ftp和sftp                                                                          |
 | host              |    是    | 无     | ftp/sftp 服务器地址                                                                                                       |
 | port              |    否    | 22/21  | 若传输协议是sftp协议，默认值是22；若传输协议是标准ftp协议，默认值是21                                               |
-| timeout           |    否    | 60000  | 连接ftp服务器连接超时时间，单位毫秒(ms)                                                                             |
-| connectPattern    |    否    | PASV   | 连接模式，仅支持 `PORT`, `PASV` 模式。该参数只在传输协议是标准ftp协议时使用 ｜                                      |
+| timeout           |    否    | `60000`  | 连接ftp服务器连接超时时间，单位毫秒(ms)                                                                             |
+| connectPattern    |    否    | `PASV`   | 连接模式，仅支持 `PORT`, `PASV` 模式。该参数只在传输协议是标准ftp协议时使用 ｜                                      |
 | username          |    是    | 无     | ftp/sftp 服务器访问用户名                                                                                                 |
 | password          |    是    | 无     | ftp/sftp 服务器访问密码                                                                                                   |
 | useKey            |    否    | false  | 是否使用私钥登录，仅针对 sftp 登录有效 |
@@ -67,9 +65,9 @@ FtpWriter 提供了向远程FTP 或SFTP 服务写入文件的能力，当前仅�
 | writeMode         |    是    | 无     | FtpWriter写入前数据清理处理模式，支持 `truncate`, `append`, `nonConflict` ，详见下文                                |
 | fieldDelimiter    |    是    | `,`    | 描述：读取的字段分隔符                                                                                              |
 | compress          |    否    | 无     | 文本压缩类型，暂不支持                                                                                              |
-| encoding          |    否    | utf-8  | 读取文件的编码配置                                                                                                  |
+| encoding          |    否    | `utf-8`  | 读取文件的编码配置                                                                                                  |
 | dateFormat        |    否    | 无     | 日期类型的数据序列化到文件中时的格式，例如 `"dateFormat": "yyyy-MM-dd"`                                             |
-| fileFormat        |    否    | text   | 文件写出的格式，包括csv, text两种，                                                                                 |
+| fileFormat        |    否    | `text`   | 文件写出的格式，包括csv, text两种，                                                                                 |
 | header            |    否    | 无     | text写出时的表头，示例 `['id', 'name', 'age']`                                                                      |
 | nullFormat        |    否    | `\N`   | 定义哪些字符串可以表示为null                                                                                        |
 | maxTraversalLevel |    否    | 100    | 允许遍历文件夹的最大层数                                                                                            |
@@ -99,10 +97,3 @@ FTP文件本身不提供数据类型，该类型是 Addax FtpWriter 定义：
 | String         | String -> 字符串序列化表示  |
 | Boolean        | Boolean -> 字符串序列化表示 |
 | Date           | Date -> 字符串序列化表示    |
-
-其中：
-
-- Long 是指FTP文件文本中使用整形的字符串表示形式，例如 `19901219`。
-- Double 是指FTP文件文本中使用Double的字符串表示形式，例如 `3.1415`。
-- Boolean 是指FTP文件文本中使用Boolean的字符串表示形式，例如 `true`、`false`。不区分大小写。
-- Date 是指FTP文件文本中使用Date的字符串表示形式，例如 `2014-12-31 12:13:14`，Date可以指定format格式。

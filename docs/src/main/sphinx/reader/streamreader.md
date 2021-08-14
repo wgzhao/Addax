@@ -1,4 +1,4 @@
-# StreamReader
+# Stream Reader
 
 StreamReader 是一个从内存读取数据的插件， 他主要用来快速生成期望的数据并对写入插件进行测试
 
@@ -48,14 +48,14 @@ StreamReader 是一个从内存读取数据的插件， 他主要用来快速生
 
 目前 StreamReader 支持的输出数据类型全部列在上面，分别是：
 
-- string 字符类型
-- date 日期类型
-- long 所有整型类型
-- double 所有浮点数
-- bool 布尔类型
-- bytes 字节类型
+- `string` 字符类型
+- `date` 日期类型
+- `long` 所有整型类型
+- `double` 所有浮点数
+- `bool` 布尔类型
+- `bytes` 字节类型
 
-其中 date 类型还支持 `dateFormat` 配置，用来指定输入的日期的格式，默认为 `yyyy-MM-dd HH:mm:ss`。比如你的输入可以这样：
+其中 `date` 类型还支持 `dateFormat` 配置，用来指定输入的日期的格式，默认为 `yyyy-MM-dd HH:mm:ss`。比如你的输入可以这样：
 
 ```json
 {
@@ -80,7 +80,7 @@ StreamReader 还支持随机输入功能，比如我们要随机得到0-10之间
 
 ```json
 {
-  "random","0,100",
+  "random": "0,100",
   "type": "double"
 }
 ```
@@ -120,6 +120,7 @@ StreamReader 还支持递增函数，比如我们要得到一个从1开始，每
 如果需要获得一个递减的数列，则把第二个参数的步长（上例中的5）改为负数即可。步长默认值为1。
 
 递增还支持日期类型( `4.0.1` 版本引入)，比如下面的配置：
+
 ```json
 {
   "incr": "1989-06-04 09:01:02,2,d",

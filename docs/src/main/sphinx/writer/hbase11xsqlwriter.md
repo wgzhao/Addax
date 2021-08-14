@@ -1,28 +1,12 @@
-# HBase11xsqlwriter 插件文档
+# HBase11xsql Writer
 
-## 1. 快速介绍
+HBase11xsqlwriter 插件利用 [Phoniex](https://phoenix.apache.org)， 用于向 HBase 1.x 版本的数据库写入数据。
 
-HBase11xsqlwriter 实现了向hbase中的SQL表(phoenix)批量导入数据的功能。Phoenix因为对rowkey做了数据编码，所以，直接使用HBaseAPI进行写入会面临手工数据转换的问题，麻烦且易错。本插件提供了单间的SQL表的数据导入方式。
+如果你希望通过调用原生接口写入数据，则需要使用[HBase11xWriter](hbase11xwriter) 插件
 
-在底层实现上，通过Phoenix的JDBC驱动，执行UPSERT语句向hbase写入数据。
+如果 HBase 是 2.X 版本，则需要使用 [HBase20xsqlwriter](hbase20xsqlwriter) 插件
 
-### 1.1 支持的功能
-
-支持带索引的表的数据导入，可以同步更新所有的索引表
-
-### 1.2 限制
-
-- 仅支持1.x系列的hbase
-- 仅支持通过phoenix创建的表，不支持原生HBase表
-- 不支持带时间戳的数据导入
-
-## 2. 实现原理
-
-通过Phoenix的JDBC驱动，执行UPSERT语句向表中批量写入数据。因为使用上层接口，所以，可以同步更新索引表。
-
-## 3. 配置说明
-
-### 3.1 配置样例
+## 配置样例
 
 ```json
 {
@@ -88,7 +72,7 @@ HBase11xsqlwriter 实现了向hbase中的SQL表(phoenix)批量导入数据的功
 }
 ```
 
-### 3.2 参数说明
+##  参数说明
 
 | 配置项                 | 是否必须 | 默认值 | 描述                                                                                                          |
 | :--------------------- | :------: | ------ | ----------------------------------------------------------------------------------------------------------|
@@ -100,6 +84,7 @@ HBase11xsqlwriter 实现了向hbase中的SQL表(phoenix)批量导入数据的功
 | haveKerberos           |    否    | false  | 是否启用Kerberos认证, true 表示启用, false 表示不启用                                                               |
 | kerberosPrincipal      |    否    | null   | kerberos 凭证信息，仅当 `havekerberos` 启用后有效                                                                   |
 | kerberosKeytabFilePath |    否    | null   | kerberos 凭证文件的绝对路径，仅当 `havekerberos` 启用后有效                                                         |
+
 
 注意：启用kerberos认证后，程序需要知道`hbase-site.xml` 所在的路径，一种办法是运行执行在环境变量 `CLASSPATH` 中增加该文件的所在路径。
 

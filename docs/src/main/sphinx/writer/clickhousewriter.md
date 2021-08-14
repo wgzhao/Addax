@@ -1,6 +1,6 @@
-# ClickHouseWriter
+# ClickHouse Writer
 
-ClickHouseWriter 插件实现了写入数据ClickHouse。在底层实现上，ClickHouseWriter 通过 JDBC 连接远程 ClickHouse 数据库，并执行相应的 `insert into ....` 语句将数据插入到ClickHouse库中。
+ClickHouseWriter 插件用于了向 [ClickHouse](https://clickhouse.tech) 写入数据。 
 
 ## 示例
 

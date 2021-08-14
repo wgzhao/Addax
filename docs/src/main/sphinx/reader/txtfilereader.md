@@ -1,36 +1,8 @@
-# Addax TxtFileReader 说明
+# TxtFile Reader
 
-## 1 快速介绍
+TxtFileReader 提供了读取本地文件系统数据存储的能力。
 
-TxtFileReader提供了读取本地文件系统数据存储的能力。在底层实现上，TxtFileReader获取本地文件数据，并转换为Addax传输协议传递给Writer。
-
-**本地文件内容存放的是一张逻辑意义上的二维表，例如CSV格式的文本信息。**
-
-## 2 功能与限制
-
-TxtFileReader实现了从本地文件读取数据并转为Addax协议的功能，本地文件本身是无结构化数据存储，对于Addax而言，TxtFileReader实现上类比OSSReader，有诸多相似之处。目前TxtFileReader支持功能如下：
-
-1. 支持且仅支持读取TXT的文件，且要求TXT中schema为一张二维表。
-
-2. 支持类CSV格式文件，自定义分隔符。
-
-3. 支持多种类型数据读取(使用String表示)，支持列裁剪，支持列常量
-
-4. 支持递归读取、支持文件名过滤。
-
-5. 支持文本压缩，且自动猜测压缩格式
-
-6. 多个File可以支持并发读取。
-
-我们暂时不能做到：
-
-1. 单个File支持多线程并发读取，这里涉及到单个File内部切分算法。二期考虑支持。
-
-2. 单个File在压缩情况下，从技术上无法支持多线程并发读取。
-
-## 3 功能说明
-
-### 3.1 配置样例
+##  配置样例
 
 ```json
 {
@@ -91,18 +63,18 @@ TxtFileReader实现了从本地文件读取数据并转为Addax协议的功能�
 }
 ```
 
-### 3.2 参数说明
+## 参数说明
 
 | 配置项            | 是否必须 | 默认值         | 描述                                                                   |
 | :---------------- | :------: | -------------- | --------------------------------------------------------------------|
 | path            |    是    | 无             | 本地文件系统的路径信息，注意这里可以支持填写多个路径,详细描述见下文                |
-| column            |    是    | 默认String类型 | 读取字段列表，type指定源数据的类型，详见下文                                 |
+| column            |    是    | 无 | 读取字段列表，type指定源数据的类型，详见下文                                 |
 | fieldDelimiter    |    是    | `,`            | 描述：读取的字段分隔符                                                  |
 | encoding          |    否    | utf-8          | 读取文件的编码配置                                                     |
 | skipHeader        |    否    | false          | 类CSV格式文件可能存在表头为标题情况，需要跳过。默认不跳过                    |
 | csvReaderConfig   |    否    | 无             | 读取CSV类型文件参数配置，Map类型。不配置则使用默认值,详见下文 |
 
-#### path
+### path
 
 本地文件系统的路径信息，注意这里可以支持填写多个路径。
 
@@ -124,7 +96,7 @@ TxtFileReader实现了从本地文件读取数据并转为Addax协议的功能�
 - XZ
 - Compress
 
-#### column
+### column
 
 读取字段列表，type指定源数据的类型，index指定当前列来自于文本第几列(以0开始)，value指定当前类型为常量，不从源头文件读取数据，而是根据value值自动生成对应的列。 
 
@@ -177,7 +149,7 @@ TxtFileReader实现了从本地文件读取数据并转为Addax协议的功能�
 
 注： 这种方式以为这在准备阶段就要尝试读取文件，因为会有一定的性能损失，如非必要，不建议配置 `name` 方式。
 
-#### csvReaderConfig
+### csvReaderConfig
 
 读取CSV类型文件参数配置，Map类型。读取CSV类型文件使用的CsvReader进行读取，会有很多配置，不配置则使用默认值。
 
@@ -210,22 +182,14 @@ boolean skipEmptyRecords = true;//是否跳过空行
 boolean captureRawRecord = true;
 ```
 
-### 3.3 类型转换
+## 类型转换
 
-本地文件本身不提供数据类型，该类型是Addax TxtFileReader定义：
 
 | Addax 内部类型| 本地文件 数据类型    |
 | -------- | -----  |
-|
 | Long     |Long |
 | Double   |Double|
 | String   |String|
 | Boolean  |Boolean |
 | Date     |Date |
 
-其中：
-
-- Long 是指本地文件文本中使用整形的字符串表示形式，例如"19901219"。
-- Double 是指本地文件文本中使用Double的字符串表示形式，例如"3.1415"。
-- Boolean 是指本地文件文本中使用Boolean的字符串表示形式，例如"true"、"false"。不区分大小写。
-- Date 是指本地文件文本中使用Date的字符串表示形式，例如"2014-12-31"，Date可以指定format格式。

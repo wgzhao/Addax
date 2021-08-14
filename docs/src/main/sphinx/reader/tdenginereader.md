@@ -1,12 +1,10 @@
-# TDengineReader
+# TDengine Reader
 
-TDengineReader 插件实现了从涛思公司的 [TDengine](https://www.taosdata.com/cn/) 读取数据。在底层实现上，TDengineReader 通过JDBC JNI 驱动连接远程 TDengine 数据库， 并执行相应的sql语句将数据从 TDengine 库中批量获。
-
-不同于其他关系型数据库，TDengine 不支持FetchSize
+TDengineReader 插件用于从涛思公司的 [TDengine](https://www.taosdata.com/cn/) 读取数据。
 
 ## 前置条件
 
-考虑到性能问题，该插件使用了 TDengine 的 JDBC-JNI 驱动， 该驱动直接调用客户端 API（libtaos.so 或 taos.dll）将写入和查询请求发送到taosd 实例。因此在使用之前需要配置好动态库链接文件。
+考虑到性能问题，该插件使用了 TDengine 的 JDBC-JNI 驱动， 该驱动直接调用客户端 API（`libtaos.so` 或 `taos.dll`）将写入和查询请求发送到 taosd 实例。因此在使用之前需要配置好动态库链接文件。
 
 首先将 `plugin/reader/tdenginereader/libs/libtaos.so.2.0.16.0` 拷贝到 `/usr/lib64` 目录，然后执行下面的命令创建软链接
 
@@ -17,7 +15,7 @@ ln -sf /usr/lib64/libtaos.so.1 /usr/lib64/libtaos.so
 
 ## 示例
 
-TDengine 数据自带了一个演示数据库 [taosdemo](https://www.taosdata.com/cn/getting-started/)，我们从演示数据库读取部分数据并打印到终端
+TDengine 数据自带了一个演示数据库 [taosdemo](https://www.taosdata.com/cn/getting-started/) , 我们从演示数据库读取部分数据并打印到终端
 
 以下是配置文件
 
@@ -189,8 +187,6 @@ java.library.path:/usr/java/packages/lib/amd64:/usr/lib64:/lib64:/lib:/usr/lib
 ```
 
 ## 类型转换
-
-目前 TDenginereader 支持 TDengine 所有类型，具体如下
 
 | Addax 内部类型| TDengine 数据类型    |
 | -------- | -----  |

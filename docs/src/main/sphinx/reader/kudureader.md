@@ -1,10 +1,9 @@
-# KuduReader
+# Kudu Reader
 
 KuduReader 插件利用 Kudu 的java客户端KuduClient进行Kudu的读操作。
 
-KuduReader通过Addax框架从Kudu并行的读取数据，通过主控的JOB程序按照指定的规则对Kudu中的数据进行分片，并行读取，然后将Kudu支持的类型通过逐一判断转换成Addax支持的类型。
 
-## 示例
+## 配置示例
 
 我们通过 [Trino](https://trino.io)  的 `kudu connector` 连接 kudu 服务，然后进行表创建以及数据插入
 

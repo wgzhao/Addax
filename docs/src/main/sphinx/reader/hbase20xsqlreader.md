@@ -1,16 +1,8 @@
-# hbase20xsqlreader 插件文档
+# hbase20xsql Reader
 
-## 1 快速介绍
+hbase20xsqlreade r插件实现了从Phoenix(HBase SQL)读取数据，对应版本为 HBase2.X 和 Phoenix5.X。
 
-hbase20xsqlreader插件实现了从Phoenix(HBase SQL)读取数据，对应版本为HBase2.X和Phoenix5.X。
-
-## 2 实现原理
-
-简而言之，hbase20xsqlreader通过Phoenix轻客户端去连接Phoenix QueryServer，并根据用户配置信息生成查询SELECT 语句，然后发送到QueryServer读取HBase数据，并将返回结果使用Addax自定义的数据类型拼装为抽象的数据集，最终传递给下游Writer处理。
-
-## 3 功能说明
-
-### 3.1 配置样例
+## 配置样例
 
 配置一个从Phoenix同步抽取数据到本地的作业:
 
@@ -51,7 +43,7 @@ hbase20xsqlreader插件实现了从Phoenix(HBase SQL)读取数据，对应版本
 }
 ```
 
-### 3.2 参数说明
+## 参数说明
 
 | 配置项             | 是否必须 | 默认值   | 描述                                                                                          |
 | :----------------- | :------: | -------- | --------------------------------------------------------------------------------------- |
@@ -65,11 +57,10 @@ hbase20xsqlreader插件实现了从Phoenix(HBase SQL)读取数据，对应版本
 | where              |    否    | 无       | 支持对表查询增加过滤条件，每个切分都会携带该过滤条件                                          |
 | querySql           |    否    | 无       | 支持指定多个查询语句，但查询列类型和数目必须保持一致                                          |
 
-### 3.3 类型转换
+## 类型转换
 
-目前hbase20xsqlreader支持大部分Phoenix类型，但也存在部分个别类型没有支持的情况，请注意检查你的类型。
+目前支持大部分 Phoenix 类型，但也存在部分个别类型没有支持的情况，请注意检查你的类型。
 
-下面列出MysqlReader针对Mysql类型转换列表:
 
 | Addax 内部类型 | Phoenix 数据类型                   |
 | -------------- | ---------------------------------- |
@@ -80,9 +71,9 @@ hbase20xsqlreader插件实现了从Phoenix(HBase SQL)读取数据，对应版本
 | Double         | FLOAT, DECIMAL, DOUBLE,            |
 | Date           | DATE, TIME, TIMESTAMP              |
 
-## 4 约束限制
+## 约束限制
 
 - 切分表时切分列仅支持单个列，且该列必须是表主键
-- 不设置splitPoint默认使用自动切分，此时切分列仅支持整形和字符型
-- 表名和SCHEMA名及列名大小写敏感，请与Phoenix表实际大小写保持一致
-- 仅支持通过Phoenix QeuryServer读取数据，因此您的Phoenix必须启动QueryServer服务才能使用本插件
+- 不设置 `splitPoint` 默认使用自动切分，此时切分列仅支持整形和字符型
+- 表名和 `SCHEMA` 名及列名大小写敏感，请与 Phoenix 表实际大小写保持一致
+- 仅支持通过 Phoenix QueryServer 读取数据，因此您的 Phoenix 必须启动 QueryServer 服务才能使用本插件

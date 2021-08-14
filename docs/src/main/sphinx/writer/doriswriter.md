@@ -1,9 +1,10 @@
-# DorisWriter
+# Doris Writer
 
-DorisWriter 插件实现了以流式方式加载数据到 [Doris](http://doris.incubator.apache.org/master/zh-CN/) ，其实现上是通过访问 Doris http 连接(8030)，然后通过 [stream load](http://doris.incubator.apache.org/master/zh-CN/administrator-guide/load-data/stream-load-manual.html)
+DorisWriter 插件用于向 [Doris](http://doris.incubator.apache.org/master/zh-CN/) 数据库以流式方式写入数据。
+其实现上是通过访问 Doris http 连接(8030)，然后通过 [stream load](http://doris.incubator.apache.org/master/zh-CN/administrator-guide/load-data/stream-load-manual.html)
 加载数据到数据中，相比 `insert into` 方式效率要高不少，也是官方推荐的生产环境下的数据加载方式。
 
-Doris 是一个兼容 MySQL 协议的数据库后端，因此读取 Doris 可以使用 [MySQLReader](../reader/mysqlreader) 进行访问。 
+Doris 是一个兼容 MySQL 协议的数据库后端，因此 Doris 读取可以使用 [MySQLReader](../reader/mysqlreader) 进行访问。 
 
 ## 示例
 

@@ -1,4 +1,4 @@
-# InfluxDBReader
+# InfluxDB Reader
 
 InfluxDBReader 插件实现了从 [InfluxDB](https://www.influxdata.com) 读取数据。底层实现上，是通过调用 InfluQL 语言查询表，然后获得返回数据。
 

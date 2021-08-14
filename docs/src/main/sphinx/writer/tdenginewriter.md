@@ -1,4 +1,4 @@
-# TDengineWriter
+# TDengine Writer
 
 TDengineWriter 插件实现了将数据写入到涛思公司的 [TDengine](https://www.taosdata.com/cn/) 数据库系统。在底层实现上，TDengineWriter 通过JDBC JNI 驱动连接远程 TDengine 数据库，
 并执行相应的sql语句将数据批量写入 TDengine 库中。
