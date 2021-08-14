@@ -4,13 +4,13 @@ RDBMSReader 插件支持从传统 RDBMS 读取数据。这是一个通用关系�
 
 同时 RDBMS Reader 又是其他关系型数据库读取插件的的基础类。以下读取插件均依赖该插件
 
-- Oracle Reader
-- MySQL Reader
-- PostgreSQL Reader
-- ClickHouse Reader
-- SQLServer Reader
+- [Oracle Reader](oraclereader)
+- [MySQL Reader](mysqlreader)
+- [PostgreSQL Reader](postgresqlreader)
+- [ClickHouse Reader](clickhousereader)
+- [SQLServer Reader](sqlserverreader)
 
-注意，对于 Addax 已经提供了专门的数据库读取插件的，推荐使用专用插件，如果你需要读取的数据库没有专门插件，则考虑使用该通用插件。 在使用之前，还需要执行以下操作才可以正常运行，否则运行会出现异常。
+注意， 如果已经提供了专门的数据库读取插件的，推荐使用专用插件，如果你需要读取的数据库没有专门插件，则考虑使用该通用插件。 在使用之前，还需要执行以下操作才可以正常运行，否则运行会出现异常。
 
 ## 配置驱动
 
@@ -23,7 +23,7 @@ RDBMSReader 插件支持从传统 RDBMS 读取数据。这是一个通用关系�
     "name": "rdbmsreader",
     "class": "com.wgzhao.addax.plugin.reader.rdbmsreader.RdbmsReader",
     "description": "",
-    "developer": "alibaba",
+    "developer": "wgzhao",
     "drivers": ["com.ibm.db2.jcc.DB2Driver"]
     } 
    ```
@@ -101,8 +101,6 @@ RDBMSReader 插件支持从传统 RDBMS 读取数据。这是一个通用关系�
 
 ## 参数说明
 
-`parameter` 配置项支持以下配置
-
 | 配置项          | 是否必须  | 数据类型 | 默认值 |         描述   |
 | :--------------| :------: | ------ |--------|------------- |
 | jdbcUrl         |    是    |  array    | 无     | 对端数据库的JDBC连接信息，jdbcUrl按照RDBMS官方规范，并可以填写连接附件控制信息 |
@@ -162,17 +160,17 @@ Column必须显示填写，不允许为空！
 
 #### splitPk
 
-RdbmsReader 进行数据抽取时，如果指定splitPk，表示用户希望使用splitPk代表的字段进行数据分片，Addax 因此会启动并发任务进行数据同步，这样可以大大提供数据同步的效能。
+如果指定 `splitPk`，表示用户希望使用 `splitPk` 代表的字段进行数据分片，因此会启动并发任务进行数据同步，这样可以大大提供数据同步的效能。
 
-推荐 splitPk 用户使用表主键，因为表主键通常情况下比较均匀，因此切分出来的分片也不容易出现数据热点。
+推荐 `splitPk` 用户使用表主键，因为表主键通常情况下比较均匀，因此切分出来的分片也不容易出现数据热点。
 
-目前 splitPk 仅支持整形、字符串型数据(ASCII类型) 切分，不支持浮点、日期等其他类型。 如果用户指定其他非支持类型，RDBMSReader 将报错！
+目前 `splitPk` 仅支持整形、字符串型数据(ASCII类型) 切分，不支持浮点、日期等其他类型。 如果用户指定其他非支持类型，RDBMSReader 将报错！
 
-splitPk如果不填写，将视作用户不对单表进行切分，RDBMSReader 使用单通道同步全量数据。
+`splitPk` 如果不填写，将视作用户不对单表进行切分，而使用单通道同步全量数据。
 
 #### autoPk
 
-从 `3.2.6` 版本开始，支持自动获取表主键或唯一索引，如果设置为 `true` ，RdbmsReader 将尝试通过查询数据库的元数据信息获取指定表的主键字段或唯一索引字段，如果获取可用于分隔的 字段不止一个，则默认取第一个。后续将会考虑优先取整数类型。
+从 `3.2.6` 版本开始，支持自动获取表主键或唯一索引，如果设置为 `true` ，将尝试通过查询数据库的元数据信息获取指定表的主键字段或唯一索引字段，如果获取可用于分隔的 字段不止一个，则默认取第一个。
 
 该特性目前支持的数据库有：
 
@@ -182,9 +180,8 @@ splitPk如果不填写，将视作用户不对单表进行切分，RDBMSReader �
 - PostgreSQL
 - SQL Server
 
-### 3.3 类型转换
+## 类型转换
 
-目前 RDBMSReader 支持大部分通用得关系数据库类型如数字、字符等，但也存在部分个别类型没有支持的情况，请注意检查你的类型，根据具体的数据库做选择。
 
 | Addax 内部类型| RDBMS 数据类型    |
 | -------- | -----  |
@@ -195,7 +192,7 @@ splitPk如果不填写，将视作用户不对单表进行切分，RDBMSReader �
 | Boolean  |bit, bool   |
 | Bytes    |tinyblob, mediumblob, blob, longblob, varbinary    |
 
-## 4. 当前支持的数据库
+## 当前支持的数据库
 
 - [PrestoSQL](https://prestosql.io)
 - [TDH Inceptor2](http://transwarp.io/transwarp/)

@@ -6,60 +6,60 @@ ElasticSearchReader 插件实现了从 [Elasticsearch](https://www.elastic.co/cn
 
 假定要获取的索引内容如下
 
-```
+```json
 {
-"took": 14,
-"timed_out": false,
-"_shards": {
-"total": 1,
-"successful": 1,
-"skipped": 0,
-"failed": 0
-},
-"hits": {
-"total": 2,
-"max_score": 1,
-"hits": [
-{
-"_index": "test-1",
-"_type": "default",
-"_id": "38",
-"_score": 1,
-"_source": {
-"col_date": "2017-05-25T11:22:33.000+08:00",
-"col_integer": 19890604,
-"col_keyword": "hello world",
-"col_ip": "1.1.1.1",
-"col_text": "long text",
-"col_double": 19890604,
-"col_long": 19890604,
-"col_geo_point": "41.12,-71.34"
-}
-},
-{
-"_index": "test-1",
-"_type": "default",
-"_id": "103",
-"_score": 1,
-"_source": {
-"col_date": "2017-05-25T11:22:33.000+08:00",
-"col_integer": 19890604,
-"col_keyword": "hello world",
-"col_ip": "1.1.1.1",
-"col_text": "long text",
-"col_double": 19890604,
-"col_long": 19890604,
-"col_geo_point": "41.12,-71.34"
-}
-}
-]
-}
+  "took": 14,
+  "timed_out": false,
+  "_shards": {
+    "total": 1,
+    "successful": 1,
+    "skipped": 0,
+    "failed": 0
+  },
+  "hits": {
+    "total": 2,
+    "max_score": 1,
+    "hits": [
+      {
+        "_index": "test-1",
+        "_type": "default",
+        "_id": "38",
+        "_score": 1,
+        "_source": {
+          "col_date": "2017-05-25T11:22:33.000+08:00",
+          "col_integer": 19890604,
+          "col_keyword": "hello world",
+          "col_ip": "1.1.1.1",
+          "col_text": "long text",
+          "col_double": 19890604,
+          "col_long": 19890604,
+          "col_geo_point": "41.12,-71.34"
+        }
+      },
+      {
+        "_index": "test-1",
+        "_type": "default",
+        "_id": "103",
+        "_score": 1,
+        "_source": {
+          "col_date": "2017-05-25T11:22:33.000+08:00",
+          "col_integer": 19890604,
+          "col_keyword": "hello world",
+          "col_ip": "1.1.1.1",
+          "col_text": "long text",
+          "col_double": 19890604,
+          "col_long": 19890604,
+          "col_geo_point": "41.12,-71.34"
+        }
+      }
+    ]
+  }
 }
 ```
 
 配置一个从 Elasticsearch 读取数据并打印到终端的任务
 
-```
+```json
 {
   "job": {
     "setting": {
@@ -74,8 +74,8 @@ ElasticSearchReader 插件实现了从 [Elasticsearch](https://www.elastic.co/cn
           "name": "elasticsearchreader",
           "parameter": {
             "endpoint": "http://127.0.0.1:9200",
-            "accessId":"",
-            "accesskey":"",
+            "accessId": "",
+            "accesskey": "",
             "index": "test-1",
             "type": "default",
             "searchType": "dfs_query_then_fetch",
@@ -98,8 +98,15 @@ ElasticSearchReader 插件实现了从 [Elasticsearch](https://www.elastic.co/cn
                 }
               }
             ],
-            "column": ["col_ip", "col_double", "col_long","col_integer",
-              "col_keyword", "col_text","col_geo_point","col_date"
+            "column": [
+              "col_ip",
+              "col_double",
+              "col_long",
+              "col_integer",
+              "col_keyword",
+              "col_text",
+              "col_geo_point",
+              "col_date"
             ]
           }
         },

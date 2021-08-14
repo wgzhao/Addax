@@ -1,8 +1,7 @@
-# KuduWriter 
+# Kudu Writer 
 
 KuduWriter 插件实现了将数据写入到 [kudu](https://kudu.apache.org) 的能力，当前是通过调用原生RPC接口来实现的。
 后期希望通过 [impala](https://impala.apache.org) 接口实现，从而增加更多的功能。
-
 
 ## 示例
 

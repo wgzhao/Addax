@@ -1,12 +1,6 @@
-# MysqlReader
+# Mysql Reader
 
-MysqlReader插件实现了从Mysql读取数据。在底层实现上，MysqlReader通过JDBC连接远程Mysql数据库，并执行相应的sql语句将数据从mysql库中SELECT出来。
-
-不同于其他关系型数据库，MysqlReader不支持FetchSize
-
-MysqlReader通过JDBC连接器连接到远程的Mysql数据库，并根据用户配置的信息生成查询SELECT SQL语句，然后发送到远程Mysql数据库，并将该SQL执行返回结果使用Addax自定义的数据类型拼装为抽象的数据集，并传递给下游Writer处理。
-
-对于用户配置Table、Column、Where的信息，MysqlReader将其拼接为SQL语句发送到Mysql数据库；对于用户配置querySql信息，MysqlReader直接将其发送到Mysql数据库。
+MysqlReader 插件实现了从Mysql读取数据
 
 ## 示例
 
@@ -181,7 +175,7 @@ bin/addax.sh job/mysql2stream.json
 * `year` Addax视作为字符串类型
 * `bit` Addax属于未定义行为
 
-### 3.4 数据库编码问题
+### 数据库编码问题
 
 Mysql本身的编码设置非常灵活，包括指定编码到库、表、字段级别，甚至可以均不同编码。优先级从高到低为字段、表、库、实例。我们不推荐数据库用户设置如此混乱的编码，最好在库级别就统一到UTF-8。
 

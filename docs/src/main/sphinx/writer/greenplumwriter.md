@@ -1,4 +1,4 @@
-# GreenplumWriter
+# Greenplum Writer
 
 GreenplumWriter 插件使用 `copy from` 语法 将数据写入 [Greenplum](https://greenplum.org) 数据库。
 
@@ -167,10 +167,6 @@ bin/addax.sh job/pg2gp.json
 | numWriter      | 否       | 1     | 写入数据库的并发数 | 
 
 ### 类型转换
-
-目前 GreenplumWriter 支持大部分 Greenplum 数据类型，但也存在部分没有支持的情况，请注意检查你的类型。
-
-下面列出 GreenplumWriter 针对 Greenplum 类型转换列表:
 
 | Addax 内部类型| Greenplum 数据类型    |
 | -------- | -----  |

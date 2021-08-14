@@ -1,8 +1,6 @@
-# PostgresqlWriter
+# Postgresql Writer
 
-PostgresqlWriter插件实现了写入数据到 PostgreSQL主库目的表的功能。在底层实现上，PostgresqlWriter通过JDBC连接远程 PostgreSQL 数据库，并执行相应的 insert into ... sql 语句将数据写入 PostgreSQL，内部会分批次提交入库。
-
-PostgresqlWriter面向ETL开发工程师，他们使用PostgresqlWriter从数仓导入数据到PostgreSQL。同时 PostgresqlWriter亦可以作为数据迁移工具为DBA等用户提供服务。
+PostgresqlWriter插件实现了写入数据到 [PostgreSQL](https://postgresql.org) 数据库库表的功能。
 
 ## 示例
 

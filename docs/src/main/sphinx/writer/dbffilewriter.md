@@ -1,14 +1,8 @@
-# DbfFileWriter 插件文档
+# DbfFile Writer
 
-## 1 快速介绍
+DbfFileWriter提供了向本地文件写入类dbf格式的一个或者多个表文件。
 
-DbfFileWriter提供了向本地文件写入类dbf格式的一个或者多个表文件。DbfFileWriter服务的用户主要在于Addax开发、测试同学。
-
-写入本地文件内容存放的是一张dbf表，例如dbf格式的文件信息。
-
-## 2 功能说明
-
-### 2.1 配置样例
+## 配置样例
 
 ```json
 {
@@ -90,7 +84,7 @@ DbfFileWriter提供了向本地文件写入类dbf格式的一个或者多个表�
 }
 ```
 
-### 3.2 参数说明
+## 参数说明
 
 | 配置项           | 是否必须 | 默认值       |    描述    |
 | :--------------- | :------: | ------------ |-------------|
@@ -102,7 +96,7 @@ DbfFileWriter提供了向本地文件写入类dbf格式的一个或者多个表�
 | nullFormat   |    否    | `\N`         | 定义哪个字符串可以表示为null, |
 | dateFormat |  否   |  无  |  日期类型的数据序列化到文件中时的格式，例如 `"dateFormat": "yyyy-MM-dd"` |
 
-#### writeMode
+### writeMode
 
 DbfFileWriter写入前数据清理处理模式：
 
@@ -110,7 +104,7 @@ DbfFileWriter写入前数据清理处理模式：
 - append，写入前不做任何处理，Addax DbfFileWriter直接使用filename写入，并保证文件名不冲突。
 - nonConflict，如果目录下有fileName前缀的文件，直接报错。
 
-### 3.3 类型转换
+## 类型转换
 
 当前该插件支持写入的类型以及对应关系如下：
 
@@ -124,6 +118,6 @@ DbfFileWriter写入前数据清理处理模式：
 
 其中：
 
-- numeric 是指本地文件中使用数字类型表示形式，例如"19901219",整形小数位数为0。
-- logical 是指本地文件文本中使用Boolean的表示形式，例如"true"、"false"。
-- Date 是指本地文件文本中使用Date表示形式，例如"2014-12-31"，Date是JAVA语言的DATE类型。
+- numeric 是指本地文件中使用数字类型表示形式，例如 `19901219` ,整形小数位数为 `0`。
+- logical 是指本地文件文本中使用Boolean的表示形式，例如 `true`、`false`。
+- Date 是指本地文件文本中使用Date表示形式，例如 `2014-12-31`，Date 是JAVA语言的 Date 类型。

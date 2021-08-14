@@ -1,12 +1,9 @@
-# MongoDBReader 插件文档
+# MongoDB Reader
 
-## 1 快速介绍
+MongoDBReader 插件利用 MongoDB 的java客户端MongoClient进行MongoDB的读操作。
 
-MongoDBReader 插件利用 MongoDB 的java客户端MongoClient进行MongoDB的读操作。最新版本的Mongo已经将DB锁的粒度从DB级别降低到document级别，配合上MongoDB强大的索引功能，基本可以达到高性能的读取MongoDB的需求。
 
-## 2 功能说明
-
-### 2.1 配置样例
+## 配置样例
 
 该示例从MongoDB中读一张表并打印到终端
 
@@ -106,20 +103,20 @@ MongoDBReader 插件利用 MongoDB 的java客户端MongoClient进行MongoDB的�
 }
 ```
 
-## 3 参数说明
+## 参数说明
 
 | 配置项         | 是否必须 | 默认值 | 描述                                                                                 |
 | :------------- | :------: | ------ | ------------------------------------------------------------------------------------ |
-| address        |    是    | 无     | MongoDB的数据地址信息，因为MonogDB可能是个集群，则ip端口信息需要以Json数组的形式给出 |
+| address        |    是    | 无     | MongoDB的数据地址信息，因为 MonogDB 可能是个集群，则ip端口信息需要以Json数组的形式给出 |
 | userName       |    否    | 无     | MongoDB的用户名                                                                      |
 | userPassword   |    否    | 无     | MongoDB的密码                                                                        |
-| collectionName |    是    | 无     | MonogoDB的集合名                                                                     |
+| collectionName |    是    | 无     | MongoDB的集合名                                                                     |
 | column         |    是    | 无     | MongoDB的文档列名                                                                    |
 | name           |    是    | 无     | Column的名字                                                                         |
 | type           |    否    | 无     | Column的类型                                                                         |
 | splitter       |    否    | 无     | 指定 MongoDB数组转为字符串的分隔符                                                   |
 
-## 4 类型转换
+## 类型转换
 
 | Addax 内部类型 | MongoDB 数据类型 |
 | -------------- | ---------------- |

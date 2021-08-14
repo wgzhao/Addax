@@ -1,18 +1,8 @@
-# SqlServerReader 插件文档
+# SqlServer Reader
 
-## 1 快速介绍
+SqlServerReader插件用于从从SqlServer读取数据。
 
-SqlServerReader插件实现了从SqlServer读取数据。在底层实现上，SqlServerReader通过JDBC连接远程SqlServer数据库，并执行相应的sql语句将数据从SqlServer库中SELECT出来。
-
-## 2 实现原理
-
-简而言之，SqlServerReader通过JDBC连接器连接到远程的SqlServer数据库，并根据用户配置的信息生成查询SELECT SQL语句并发送到远程SqlServer数据库，并将该SQL执行返回结果使用Addax自定义的数据类型拼装为抽象的数据集，并传递给下游Writer处理。
-
-对于用户配置Table、Column、Where的信息，SqlServerReader将其拼接为SQL语句发送到SqlServer数据库；对于用户配置querySql信息，SqlServer直接将其发送到SqlServer数据库。
-
-## 3 功能说明
-
-### 3.1 配置样例
+## 配置样例
 
 配置一个从SqlServer数据库同步抽取数据到本地的作业:
 
@@ -61,7 +51,7 @@ SqlServerReader插件实现了从SqlServer读取数据。在底层实现上，Sq
 }
 ```
 
-### 3.2 参数说明
+## 参数说明
 
 | 配置项          | 是否必须 | 默认值 |         描述   |
 | :-------------- | :------: | ------ |------------- |
@@ -76,11 +66,7 @@ SqlServerReader插件实现了从SqlServer读取数据。在底层实现上，Sq
 | querySql        |    否    | 无     | 使用自定义的SQL而不是指定表来获取数据，当配置了这一项之后，Addax系统就会忽略 `table`，`column`这些配置项 |
 | fetchSize       |    否    | 1024   |  定义了插件和数据库服务器端每次批量数据获取条数，调高该值可能导致 Addax 出现OOM |
 
-### 3.3 类型转换
-
-目前SqlServerReader支持大部分SqlServer类型，但也存在部分个别类型没有支持的情况，请注意检查你的类型。
-
-下面列出SqlServerReader针对SqlServer类型转换列表:
+## 类型转换
 
 | Addax 内部类型| SqlServer 数据类型    |
 | -------- | -----  |

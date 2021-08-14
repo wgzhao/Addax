@@ -1,16 +1,8 @@
-# MongoDBWriter 插件文档
+# MongoDB Writer
 
-## 1 快速介绍
+MongoDBWriter 插件用于向 [MongoDB](https://mongodb.com) 写入数据。
 
-MongoDBWriter 插件利用 MongoDB 的java客户端MongoClient进行MongoDB的写操作。最新版本的Mongo已经将DB锁的粒度从DB级别降低到document级别，配合上MongoDB强大的索引功能，基本可以满足数据源向MongoDB写入数据的需求，针对数据更新的需求，通过配置业务主键的方式也可以实现。
-
-## 2 实现原理
-
-MongoDBWriter通过 addax 框架获取Reader生成的数据，然后将 Addax 支持的类型通过逐一判断转换成MongoDB支持的类型。其中一个值得指出的点就是 Addax 本身不支持数组类型，但是MongoDB支持数组类型，并且数组类型的索引还是蛮强大的。为了使用MongoDB的数组类型，则可以通过参数的特殊配置，将字符串可以转换成MongoDB中的数组。类型转换之后，就可以依托于 addax 框架并行的写入MongoDB。
-
-## 3 功能说明
-
-### 3.1 配置样例
+## 配置样例
 
 该示例将流式数据写入到 MongoDB 表中
 
@@ -172,7 +164,7 @@ MongoDBWriter通过 addax 框架获取Reader生成的数据，然后将 Addax �
 }
 ```
 
-### 3.2 参数说明
+## 参数说明
 
 | 配置项         | 是否必须 | 默认值 | 描述                                                                                                                  |
 | :------------- | :------: | ------ | ------------------------------------------------------------------------------------------------------------------ |
@@ -188,7 +180,7 @@ MongoDBWriter通过 addax 框架获取Reader生成的数据，然后将 Addax �
 | isUpsert       |    否    | 无     | 当设置为true时，表示针对相同的upsertKey做更新操作                                                                         |
 | upsertKey      |    否    | 无     | upsertKey指定了没行记录的业务主键。用来做更新时使用                                                                       |
 
-## 4 类型转换
+##  类型转换
 
 | Addax 内部类型 | MongoDB 数据类型 |
 | -------------- | ---------------- |

@@ -1,27 +1,8 @@
-# JsonFileReader 插件文档
+# JsonFile Reader
 
-## 1 快速介绍
+JsonFileReader 提供了读取本地文件系统数据存储的能力。
 
-JsonFileReader 提供了读取本地文件系统数据存储的能力。在底层实现上，JsonFileReader获取本地文件数据，使用Jayway JsonPath抽取Json字符串，并转换为Addax传输协议传递给Writer。
-
-## 2 功能与限制
-
-JsonFileReader实现了从本地文件读取数据并转为Addax协议的功能，本地文件是可以是Json数据格式的集合，对于Addax而言，JsonFileReader实现上类比TxtFileReader，有诸多相似之处。目前JsonFileReader支持功能如下：
-
-1. 支持且仅支持读取TXT的文件，且要求TXT中s内容必须符合json
-2. 支持列常量和Json的Key为空值
-3. 支持递归读取、支持文件名过滤
-4. 多个File可以支持并发读取
-
-我们暂时不能做到：
-
-1. 单个File支持多线程并发读取，这里涉及到单个File内部切分算法。
-2. 单个File在压缩情况下，从技术上无法支持多线程并发读取。
-3. 暂不支持读取压缩文件和日期类型的自定义日期
-
-## 3 功能说明
-
-### 3.1 配置样例
+### 配置样例
 
 ```json
 {
@@ -100,17 +81,17 @@ JsonFileReader实现了从本地文件读取数据并转为Addax协议的功能�
 }
 ```
 
-### 3.2 参数说明
+## 参数说明
 
 | 配置项            | 是否必须 | 默认值         | 描述                                                                   |
 | :---------------- | :------: | -------------- | --------------------------------------------------------------------|
 | path            |    是    | 无             | 本地文件系统的路径信息，注意这里可以支持填写多个路径,详细描述见下文                |
-| column            |    是    | 默认String类型 | 读取字段列表，type指定源数据的类型，详见下文                                 |
+| column            |    是    | 无 | 读取字段列表，type指定源数据的类型，详见下文                                 |
 | fieldDelimiter    |    是    | `,`            | 描述：读取的字段分隔符                                                  |
 | compress          |    否    | 无             | 文本压缩类型，默认不填写意味着没有压缩。支持压缩类型为zip、gzip、bzip2       |
 | encoding          |    否    | utf-8          | 读取文件的编码配置                                                     |
 
-#### path
+### path
 
 本地文件系统的路径信息，注意这里可以支持填写多个路径
 
@@ -120,15 +101,14 @@ JsonFileReader实现了从本地文件读取数据并转为Addax协议的功能�
 
 特别需要注意的是，如果Path指定的路径下没有符合匹配的文件抽取，Addax将报错。
 
-#### column
+### column
 
 读取字段列表，type指定源数据的类型，index指定当前列来自于json的指定，语法为 [Jayway JsonPath](https://github.com/json-path/JsonPath) 的语法，value指定当前类型为常量，不从源头文件读取数据，而是根据value值自动生成对应的列。 用户必须指定Column字段信息
 
 对于用户指定Column信息，type必须填写，index/value必须选择其一
 
-### 3.3 类型转换
+## 类型转换
 
-本地文件本身不提供数据类型，该类型是Addax JsonFileReade定义：
 
 | Addax 内部类型| 本地文件 数据类型    |
 | -------- | -----  |

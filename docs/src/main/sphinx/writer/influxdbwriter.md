@@ -1,4 +1,4 @@
-# InfluxDBWriter
+# InfluxDB Writer
 
 InfluxDBWriter 插件实现了将数据写入 [InfluxDB](https://www.influxdata.com) 读取数据的功能。
 底层实现上，是通过调用 InfluQL 语言接口，构建插入语句，然后进行数据插入。

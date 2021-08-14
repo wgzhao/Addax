@@ -1,10 +1,10 @@
-# Addax 插件开发宝典
+# Addax 插件开发简明指南
 
-本文面向 Adda x插件开发人员，尝试尽可能全面地阐述开发一个 Addax 插件所经过的历程，力求消除开发者的困惑，让插件开发变得简单。
+本指南主要面向那些需要开发符合自己需求的 Addax 插件开发人员。
 
-## `Addax` 为什么要使用插件机制
+## 插件机制
 
-从设计之初，`Addax` 就把异构数据源同步作为自身的使命，为了应对不同数据源的差异、同时提供一致地同步原语和扩展能力，`Addax` 自然而然地采用了 `框架` + `插件` 的模式：
+`Addax` 为了应对不同数据源的差异、同时提供一致地同步原语和扩展能力，采用了 `框架` + `插件` 的模式：
 
 - 插件只需关心数据的读取或者写入本身。
 - 而同步的共性问题，比如：类型转换、性能、统计，则交由框架来处理。
@@ -26,7 +26,7 @@
 - `JobContainer`:  `Job` 执行器，负责`Job`全局拆分、调度、前置语句和后置语句等工作的工作单元。类似Yarn中的JobTracker
 - `TaskGroupContainer`: `TaskGroup` 执行器，负责执行一组 `Task` 的工作单元，类似Yarn中的TaskTracker。
 
-简而言之， **`Job`拆分成`Task`，在分别在框架提供的容器中执行，插件只需要实现 `Job` 和 `Task` 两部分逻辑**。
+简而言之， `Job`拆分成`Task`，在分别在框架提供的容器中执行，插件只需要实现 `Job` 和 `Task` 两部分逻辑。
 
 ### 物理执行模型
 
@@ -223,40 +223,63 @@ ${ADDAX_HOME}
 ```json
 {
   "job": {
+    "setting": {
+      "speed": {
+        "byte": -1,
+        "channel": 1
+      }
+    },
     "content": [
       {
         "reader": {
-          "name": "odpsreader",
-          "parameter": {
-            "accessKey": "",
-            "accessId": "",
-            "column": [
-              ""
-            ],
-            "isCompress": "",
-            "odpsServer": "",
-            "partition": [
-              ""
-            ],
-            "project": "",
-            "table": "",
-            "tunnelServer": ""
-          }
-        },
-        "writer": {
-          "name": "oraclewriter",
+          "name": "mysqlreader",
           "parameter": {
             "username": "",
             "password": "",
             "column": [
-              "*"
+              "c_datetime",
+              "c_timestamp",
+              "c_enum",
+              "c_set",
+              "c_varbinary",
+              "c_longblob",
+              "c_mediumblob"
             ],
             "connection": [
               {
-                "jdbcUrl": "",
                 "table": [
-                  ""
+                  "datax_reader"
+                ],
+                "jdbcUrl": [
+                  "jdbc:mysql://localhost:3306/test?serverTimezone=Asia/Chongqing"
                 ]
+              }
+            ]
+          }
+        },
+        "writer": {
+          "name": "postgresqlwriter",
+          "parameter": {
+            "username": "",
+            "password": "",
+            "preSql": [
+              "truncate table @table"
+            ],
+            "column": [
+              "c_datetime",
+              "c_timestamp",
+              "c_enum",
+              "c_set",
+              "c_varbinary",
+              "c_longblob",
+              "c_mediumblob"
+            ],
+            "connection": [
+              {
+                "table": [
+                  "tbl_from_mysql"
+                ],
+                "jdbcUrl": "jdbc:postgresql://localhost:5432/wgzhao"
               }
             ]
           }
@@ -389,7 +412,8 @@ public interface Record
 
 因为`Record`是一个接口，`Reader`插件首先调用`RecordSender.createRecord()`创建一个`Record`实例，然后把`Column`一个个添加到`Record`中。
 
-`Writer` 插件调用`RecordReceiver.getFromReader()`方法获取`Record`，然后把`Column`遍历出来，写入目标存储中。当`Reader`尚未退出，传输还在进行时，如果暂时没有数据`RecordReceiver.getFromReader()`方法会阻塞直到有数据。如果传输已经结束，会返回`null`，`Writer`
+`Writer` 插件调用`RecordReceiver.getFromReader()`方法获取`Record`，然后把`Column`遍历出来，写入目标存储中。当`Reader`尚未退出，传输还在进行时，如果暂时没有数据`RecordReceiver.getFromReader()`方法会阻塞直到有数据。如果传输已经结束，会返回`null`
+，`Writer`
 插件可以据此判断是否结束`startWrite`方法。
 
 `Column` 的构造和操作，我们在《类型转换》一节介绍。
@@ -441,11 +465,12 @@ Addax的内部类型在实现上会选用不同的java类型：
 
 1. Reader读到不支持的类型、不合法的值。
 2. 不支持的类型转换，比如：`Bytes`转换为`Date`。
-3. 写入目标端失败，比如：写mysql整型长度超长。
+3. 写入目标端失败，比如：写 MySQL 整型长度超长。
 
 ### 如何处理脏数据
 
-在`Reader.Task`和`Writer.Task`中，功过`AbstractTaskPlugin.getPluginCollector()`可以拿到一个`TaskPluginCollector`，它提供了一系列`collectDirtyRecord`的方法。当脏数据出现时，只需要调用合适的`collectDirtyRecord`方法，把被认为是脏数据的`Record`传入即可。
+在`Reader.Task`和`Writer.Task`中，功过`AbstractTaskPlugin.getPluginCollector()`可以拿到一个`TaskPluginCollector`，它提供了一系列`collectDirtyRecord`的方法。当脏数据出现时，只需要调用合适的`collectDirtyRecord`
+方法，把被认为是脏数据的`Record`传入即可。
 
 用户可以在任务的配置中指定脏数据限制条数或者百分比限制，当脏数据超出限制时，框架会结束同步任务，退出。插件需要保证脏数据都被收集到，其他工作交给框架就好。
 

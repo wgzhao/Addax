@@ -1,12 +1,6 @@
-# MysqlWriter 
+# Mysql Writer 
 
-MysqlWriter 插件实现了写入数据到 Mysql 主库的目的表的功能。在底层实现上， MysqlWriter 通过 JDBC 连接远程 Mysql 数据库，并执行相应的 insert into ... 或者 ( replace into ...) 的 sql 语句将数据写入 Mysql，内部会分批次提交入库，需要数据库本身采用 innodb 引擎。
-
-MysqlWriter 面向ETL开发工程师，他们使用 MysqlWriter 从数仓导入数据到 Mysql。同时 MysqlWriter 亦可以作为数据迁移工具为DBA等用户提供服务。
-
-MysqlWriter 通过 Addax 框架获取 Reader 生成的协议数据，根据你配置的 `writeMode` 生成 `insert into...`(当主键/唯一性索引冲突时会写不进去冲突的行)
-或者 `replace into...`(没有遇到主键/唯一性索引冲突时，与 insert into 行为一致，冲突时会用新行替换原有行所有字段) 的语句写入数据到 Mysql。出于性能考虑，采用了 `PreparedStatement + Batch`，并且设置了：`rewriteBatchedStatements=true`，将数据缓冲到线程上下文 Buffer 中，当 Buffer
-累计到预定阈值时，才发起写入请求。
+MysqlWriter 插件实现了写入数据到 Mysql 主库的目的表的功能。
 
 ## 示例
 
@@ -124,7 +118,7 @@ bin/addax.sh job/stream2mysql.json
 
 ### driver
 
-当前 Addax 采用的 MySQL JDBC 驱动为 8.0 以上版本，驱动类名使用的 `com.mysql.cj.jdbc.Driver`，而不是 `com.mysql.jdbc.Driver`。
+当前采用的 MySQL JDBC 驱动为 8.0 以上版本，驱动类名使用的 `com.mysql.cj.jdbc.Driver`，而不是 `com.mysql.jdbc.Driver`。
 如果你需要采集的 MySQL 服务低于 `5.6`，需要使用到 `Connector/J 5.1` 驱动，则可以采取下面的步骤：
 
 **替换插件内置的驱动**
@@ -140,10 +134,6 @@ bin/addax.sh job/stream2mysql.json
 在你的 json 文件类，配置 `"driver": "com.mysql.jdbc.Driver"`
 
 ## 类型转换
-
-目前 MysqlWriter 支持大部分 Mysql 类型，但也存在部分个别类型没有支持的情况，请注意检查你的类型。
-
-下面列出 MysqlWriter 针对 Mysql 类型转换列表:
 
 | Addax 内部类型| Mysql 数据类型    |
 | -------- | -----  |

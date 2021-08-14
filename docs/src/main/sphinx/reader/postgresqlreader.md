@@ -1,6 +1,6 @@
-# PostgresqlReader
+# Postgresql Reader
 
-PostgresqlReader插件实现了从PostgreSQL读取数据。在底层实现上，PostgresqlReader通过JDBC连接远程PostgreSQL数据库，并执行相应的sql语句将数据从PostgreSQL库中SELECT出来。
+PostgresqlReader 插件用于从 [PostgreSQL](https://postgresql.org) 读取数据
 
 ## 示例
 
@@ -12,29 +12,16 @@ create table if not exists addax_tbl
     c_bigint
     bigint,
     c_bit
-    bit
-(
-    3
-),
+    bit(3),
     c_bool boolean,
     c_byte bytea,
-    c_char char
-(
-    10
-),
-    c_varchar varchar
-(
-    20
-),
+    c_char char(10),
+    c_varchar varchar(20),
     c_date date,
     c_double float8,
     c_int integer,
     c_json json,
-    c_number decimal
-(
-    8,
-    3
-),
+    c_number decimal(8, 3),
     c_real real,
     c_small smallint,
     c_text text,
@@ -46,6 +33,7 @@ create table if not exists addax_tbl
     c_cidr cidr,
     c_macaddr macaddr
     );
+
 insert into addax_tbl
 values (999988887777,
         B '101',
@@ -196,9 +184,6 @@ bin/addax.sh job/postgres2stream.json
 
 ## 类型转换
 
-目前PostgresqlReader支持大部分PostgreSQL类型，但也存在部分个别类型没有支持的情况，请注意检查你的类型。
-
-下面列出PostgresqlReader针对PostgreSQL类型转换列表:
 
 | Addax 内部类型 | PostgreSQL 数据类型                          |
 | -------------- | -------------------------------------------- |

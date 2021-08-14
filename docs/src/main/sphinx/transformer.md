@@ -1,6 +1,6 @@
-# Transformer 插件文档
+# Transformer
 
-## Transformer定义
+## Transformer 定义
 
 在数据同步、传输过程中，存在用户对于数据传输进行特殊定制化的需求场景，包括裁剪列、转换列等工作，可以借助ETL的T过程实现(Transformer)。Addax包含了完成的E(Extract)、T(Transformer)、L(Load)支持。
 
@@ -37,10 +37,8 @@
 
 举例：
 
-```
-dx_pad(1,"l","4","A"), 如果column 1 的值为 xyz=> Axyz， 值为 xyzzzzz => xyzz
-dx_pad(1,"r","4","A"), 如果column 1 的值为 xyz=> xyzA， 值为 xyzzzzz => xyzz
-```
+- `dx_pad(1,"l","4","A")`: 如果 `column 1` 的值为 `xyz=> Axyz`， 则转换后的值为 `xyzzzzz => xyzz`
+- `dx_pad(1,"r","4","A")`, 如果 `column 1` 的值为 `xyz=> xyzA`， 值为 `xyzzzzz => xyzz`
 
 ### dx_replace
 
@@ -57,10 +55,8 @@ dx_pad(1,"r","4","A"), 如果column 1 的值为 xyz=> xyzA， 值为 xyzzzzz => 
 
 举例：
 
-```
-dx_replace(1,"2","4","****")  column 1的value为“addaxTest”=>"da****est"
-dx_replace(1,"5","10","****")  column 1的value为“addaxTest”=>"data****"
-```
+- `dx_replace(1,"2","4","****")`:  如果 `column 1` 的值为 `addaxTest`, 则转换为 `da****est`
+- `dx_replace(1,"5","10","****")`  如果 `column 1` 的值为 `addaxTest` 则转换为 `data****`
 
 ### dx_filter
 
@@ -82,10 +78,8 @@ dx_replace(1,"5","10","****")  column 1的value为“addaxTest”=>"data****"
 
 举例
 
-```
-dx_filter(1,"like","dataTest")  
-dx_filter(1,">=","10")  
-```
+- `dx_filter(1,"like","dataTest")`  
+- `dx_filter(1,">=","10")`
 
 关联filter暂不支持，即多个字段的联合判断，函参太过复杂，用户难以使用。
 
@@ -105,7 +99,9 @@ Record 数据类型
 注意：
 
 - `dx_groovy` 只能调用一次。不能多次调用。
-- `groovy code` 中支持 `java.lang`, `java.util` 的包，可直接引用的对象有 `record`，以及element下的各种column（BoolColumn.class,BytesColumn.class,DateColumn.class,DoubleColumn.class,LongColumn.class,StringColumn.class）。不支持其他包，如果用户有需要用到其他包，可设置extraPackage，注意extraPackage不支持第三方jar包。
+- `groovy code` 中支持 `java.lang`, `java.util` 的包，可直接引用的对象有 `record`
+  ，以及element下的各种column（BoolColumn.class,BytesColumn.class,DateColumn.class,DoubleColumn.class,LongColumn.class,StringColumn.class）。
+  不支持其他包，如果用户有需要用到其他包，可设置extraPackage，注意extraPackage不支持第三方jar包。
 - `groovy code` 中，返回更新过的 `Record`（比如record.setColumn(columnIndex, new StringColumn(newValue));），或者null。返回null表示过滤此行。
 - 用户可以直接调用静态的Util方式（GroovyTransformerStaticUtil)
 
@@ -113,7 +109,7 @@ Record 数据类型
 
 groovy 实现的 subStr
 
-```java
+```
 String code="Column column = record.getColumn(1);\n"+
         " String oriValue = column.asString();\n"+
         " String newValue = oriValue.substring(0, 3);\n"+
@@ -124,7 +120,7 @@ String code="Column column = record.getColumn(1);\n"+
 
 groovy 实现的Replace
 
-```java
+```
 String code2="Column column = record.getColumn(1);\n"+
         " String oriValue = column.asString();\n"+
         " String newValue = \"****\" + oriValue.substring(3, oriValue.length());\n"+
@@ -134,7 +130,7 @@ String code2="Column column = record.getColumn(1);\n"+
 
 groovy 实现的Pad
 
-```java
+```
 String code3="Column column = record.getColumn(1);\n"+
         " String oriValue = column.asString();\n"+
         " String padString = \"12345\";\n"+
@@ -321,8 +317,8 @@ String code3="Column column = record.getColumn(1);\n"+
         },
         "transformer": [
           {
-            "name":"dx_groovy",
-            "description":"Add string 'Header_' to the first column value;Double the value of the second field",
+            "name": "dx_groovy",
+            "description": "Add string 'Header_' to the first column value;Double the value of the second field",
             "parameter": {
               "code": "record.setColumn(0, new StringColumn('Header_' + record.getColumn(0).asString()));record.setColumn(1, new LongColumn(record.getColumn(1).asLong() * 2));return record;"
             }
@@ -334,7 +330,7 @@ String code3="Column column = record.getColumn(1);\n"+
 }
 ```
 
-上述　`transformer` 代码针对每条记录的前面两个字段做了修改，对第一个字段的字符串，在字符串前面增加 `Header_` 字符；
+上述 `transformer` 代码针对每条记录的前面两个字段做了修改，对第一个字段的字符串，在字符串前面增加 `Header_` 字符； 
 第二个整数字段值进行倍增处理。最后执行的结果如下：
 
 ```
@@ -351,70 +347,8 @@ $ bin/addax.sh job/transformer_demo.json
 
 2021-08-04 15:45:56.421 [        main] INFO  VMInfo               - VMInfo# operatingSystem class => com.sun.management.internal.OperatingSystemImpl
 2021-08-04 15:45:56.443 [        main] INFO  Engine               - 
-{
-        "content":[
-                {
-                        "reader":{
-                                "parameter":{
-                                        "column":[
-                                                {
-                                                        "type":"string",
-                                                        "value":"Addax"
-                                                },
-                                                {
-                                                        "incr":"1",
-                                                        "type":"long"
-                                                },
-                                                {
-                                                        "incr":"1989/06/04 00:00:01,-1",
-                                                        "dateFormat":"yyyy/MM/dd hh:mm:ss",
-                                                        "type":"date"
-                                                },
-                                                {
-                                                        "type":"bool",
-                                                        "value":true
-                                                },
-                                                {
-                                                        "type":"bytes",
-                                                        "value":"test"
-                                                }
-                                        ],
-                                        "sliceRecordCount":10
-                                },
-                                "name":"streamreader"
-                        },
-                        "transformer":[
-                                {
-                                        "parameter":{
-                                                "code":"record.setColumn(0, new StringColumn('Header_' + record.getColumn(0).asString()));record.setColumn(1, new LongColumn(record.getColumn(1).asLong() * 2));return record;"
-                                        },
-                                        "name":"dx_groovy",
-                                        "description":"Add string 'Header_' to the first column value;Double the value of the second field"
-                                }
-                        ],
-                        "writer":{
-                                "parameter":{
-                                        "print":true,
-                                        "column":[
-                                                "col1"
-                                        ],
-                                        "encoding":"UTF-8"
-                                },
-                                "name":"streamwriter"
-                        }
-                }
-        ],
-        "setting":{
-                "errorLimit":{
-                        "record":0,
-                        "percentage":0.02
-                },
-                "speed":{
-                        "byte":-1,
-                        "channel":1
-                }
-        }
-}
+
+.....
 
 2021-08-04 15:45:56.458 [        main] INFO  PerfTrace            - PerfTrace traceId=job_-1, isEnable=false, priority=0
 2021-08-04 15:45:56.459 [        main] INFO  JobContainer         - Addax jobContainer starts job.
@@ -429,7 +363,8 @@ $ bin/addax.sh job/transformer_demo.json
 2021-08-04 15:45:56.517 [ taskGroup-0] INFO  Channel              - Channel set byte_speed_limit to -1, No bps activated.
 2021-08-04 15:45:56.517 [ taskGroup-0] INFO  Channel              - Channel set record_speed_limit to -1, No tps activated.
 2021-08-04 15:45:56.520 [ taskGroup-0] INFO  TransformerUtil      -  user config transformers [[dx_groovy]], loading...
-2021-08-04 15:45:56.531 [ taskGroup-0] INFO  TransformerUtil      -  1 of transformer init success. name=dx_groovy, isNative=true parameter = {"code":"record.setColumn(0, new StringColumn('Header_' + record.getColumn(0).asString()));record.setColumn(1, new LongColumn(record.getColumn(1).asLong() * 2));return record;"}
+2021-08-04 15:45:56.531 [ taskGroup-0] INFO  TransformerUtil      -  1 of transformer init success. name=dx_groovy, isNative=true parameter = 
+  {"code":"record.setColumn(0, new StringColumn('Header_' + record.getColumn(0).asString()));record.setColumn(1, new LongColumn(record.getColumn(1).asLong() * 2));return record;"}
 
 Header_Addax    2       1989-06-04 00:00:01     true    test
 Header_Addax    4       1989-06-03 00:00:01     true    test
@@ -446,7 +381,9 @@ Header_Addax    20      1989-05-26 00:00:01     true    test
 2021-08-04 15:45:59.517 [       job-0] INFO  JobContainer         - Addax Writer.Job [streamwriter] do post work.
 2021-08-04 15:45:59.518 [       job-0] INFO  JobContainer         - Addax Reader.Job [streamreader] do post work.
 2021-08-04 15:45:59.521 [       job-0] INFO  JobContainer         - PerfTrace not enable!
-2021-08-04 15:45:59.524 [       job-0] INFO  StandAloneJobContainerCommunicator - Total 10 records, 330 bytes | Speed 110B/s, 3 records/s | Error 0 records, 0 bytes |  All Task WaitWriterTime 0.000s |  All Task WaitReaderTime 0.000s | Transformer Success 10 records | Transformer Error 0 records | Transformer Filter 0 records | Transformer usedTime 0.383s | Percentage 100.00%
+2021-08-04 15:45:59.524 [       job-0] INFO  StandAloneJobContainerCommunicator - Total 10 records, 330 bytes | Speed 110B/s, 3 records/s | Error 0 records, 0 bytes |  
+  All Task WaitWriterTime 0.000s |  All Task WaitReaderTime 0.000s | Transformer Success 10 records | Transformer Error 0 records | Transformer Filter 0 records 
+  | Transformer usedTime 0.383s | Percentage 100.00%
 2021-08-04 15:45:59.527 [       job-0] INFO  JobContainer         - 
 任务启动时刻                    : 2021-08-04 15:45:56
 任务结束时刻                    : 2021-08-04 15:45:59
