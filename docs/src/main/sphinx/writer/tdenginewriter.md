@@ -222,11 +222,17 @@ INSERT INTO %s (ts,name,file_size,file_date,flag_open,memo) VALUES(?,?,?,?,?,?)
 所以上述配置中的` connection` 应该修改为如下：
 
 ```json
-"connection": [{
-  "jdbcUrl":"jdbc:TAOS-RS://127.0.0.1:6041/test",
-  "table":["addax_test"],
-  "driver":"com.taosdata.jdbc.rs.RestfulDriver"
-}]
+{
+  "connection": [
+    {
+      "jdbcUrl": "jdbc:TAOS-RS://127.0.0.1:6041/test",
+      "table": [
+        "addax_test"
+      ],
+      "driver": "com.taosdata.jdbc.rs.RestfulDriver"
+    }
+  ]
+}
 ```
 
 ## 类型转换

@@ -159,21 +159,28 @@ Hadoop hdfs文件系统namenode节点地址，如果 hdfs 配置了 HA 模式，
 默认情况下，用户可以全部按照String类型读取数据，配置如下：
 
 ```json
-"column": ["*"]
+{
+  "column": [
+    "*"
+  ]
+}
 ```
 
 用户可以指定Column字段信息，配置如下：
 
 ```json
-{
-  "type": "long",
-  "index": 0
-  //从本地文件文本第一列获取int字段
-},
-{
-"type": "string",
-"value": "alibaba"  //HdfsReader内部生成alibaba的字符串字段作为当前字段
-}
+[
+  {
+    "type": "long",
+    "index": 0,
+    "description": "从本地文件文本第一列获取int字段"
+  },
+  {
+    "type": "string",
+    "value": "addax",
+    "description": "HdfsReader内部生成alibaba的字符串字段作为当前字段"
+  }
+]
 ```
 
 对于用户指定Column信息，type必须填写，index/value必须选择其一。
@@ -234,10 +241,12 @@ format，addax目前只支持最主流的两种：hadoop-snappy（hadoop上的sn
 常见配置：
 
 ```json
-"csvReaderConfig": {
-"safetySwitch": false,
-"skipEmptyRecords": false,
-"useTextQualifier": false
+{
+  "csvReaderConfig": {
+    "safetySwitch": false,
+    "skipEmptyRecords": false,
+    "useTextQualifier": false
+  }
 }
 ```
 
@@ -285,16 +294,20 @@ string类型。HdfsReader提供了类型转换的建议表如下：
 
 特别提醒：
 
-* Hive支持的数据类型 TIMESTAMP 可以精确到纳秒级别，所以 textfile、orcfile 中 TIMESTAMP 存放的数据类似于 `2015-08-21 22:40:47.397898389`，如果转换的类型配置为Addax的Date，转换之后会导致纳秒部分丢失，所以如果需要保留纳秒部分的数据，请配置转换类型为Addax的String类型。
+* Hive支持的数据类型 TIMESTAMP 可以精确到纳秒级别，所以 textfile、orcfile 中 TIMESTAMP 存放的数据类似于 `2015-08-21 22:40:47.397898389`
+  ，如果转换的类型配置为Addax的Date，转换之后会导致纳秒部分丢失，所以如果需要保留纳秒部分的数据，请配置转换类型为Addax的String类型。
 
 ### 3.4 按分区读取
 
-Hive在建表的时候，可以指定分区partition，例如创建分区partition(day="20150820",hour="09")，对应的hdfs文件系统中，相应的表的目录下则会多出/20150820和/09两个目录，且/20150820是/09的父目录。了解了分区都会列成相应的目录结构，在按照某个分区读取某个表所有数据时，则只需配置好json中path的值即可。
+Hive在建表的时候，可以指定分区partition，例如创建分区partition(day="20150820",hour="09")
+，对应的hdfs文件系统中，相应的表的目录下则会多出/20150820和/09两个目录，且/20150820是/09的父目录。了解了分区都会列成相应的目录结构，在按照某个分区读取某个表所有数据时，则只需配置好json中path的值即可。
 
 比如需要读取表名叫mytable01下分区day为20150820这一天的所有数据，则配置如下：
 
 ```json
-"path": "/user/hive/warehouse/mytable01/20150820/*"
+{
+  "path": "/user/hive/warehouse/mytable01/20150820/*"
+}
 ```
 
 ## 5 约束限制
@@ -308,10 +321,12 @@ Hive在建表的时候，可以指定分区partition，例如创建分区partiti
 需要在json的reader里增加如下配置
 
  ```json
- "csvReaderConfig": {
-"safetySwitch": false,
-"skipEmptyRecords": false,
-"useTextQualifier": false
+{
+  "csvReaderConfig": {
+    "safetySwitch": false,
+    "skipEmptyRecords": false,
+    "useTextQualifier": false
+  }
 }
  ```
 

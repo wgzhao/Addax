@@ -94,28 +94,34 @@
 默认情况下，用户可以全部按照String类型读取数据，配置如下：
 
 ```json
-"column": ["*"]
+{
+  "column": [
+    "*"
+  ]
+}
 ```
 
 用户可以指定Column字段信息，配置如下：
 
 ```json
-{
-  "type": "long",
-  "index": 0
-},
-{
-"type": "string",
-"value": "alibaba"
-}
+[
+  {
+    "type": "long",
+    "index": 0
+  },
+  {
+    "type": "string",
+    "value": "addax"
+  }
+]
 ```
 
-`index: 0` 表示从本地DBF文件第一列获取int字段
-`value: alibaba` 表示从dbfFileReader内部生成alibaba的字符串字段作为当前字段 对于用户指定Column信息，type必须填写，index/value必须选择其一。
+`"index": 0` 表示从本地DBF文件第一列获取int字段
+`"value": "addax"` 表示从 dbfFileReader 内部生成 `addax` 的字符串字段作为当前字段 对于用户指定Column信息，type必须填写，index/value必须选择其一。
 
 ### 支持的数据类型
 
-本地文件本身提供数据类型，该类型是Addax dbfFileReader定义：
+本地文件本身提供数据类型，该类型是 Addax dbfFileReader定义：
 
 | Addax 内部类型| 本地文件 数据类型    |
 | -------- | -----  |

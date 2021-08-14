@@ -207,12 +207,14 @@ hdfswriter写入时的字段分隔符， 需要用户保证与创建的Hive表�
 `hadoopConfig` 里可以配置与 Hadoop 相关的一些高级参数，比如HA的配置
 
 ```json
-"hadoopConfig":{
-"dfs.nameservices": "testDfs",
-"dfs.ha.namenodes.testDfs": "nn01,nn02",
-"dfs.namenode.rpc-address.testDfs.namenode1": "192.168.1.1",
-"dfs.namenode.rpc-address.testDfs.namenode2": "192.168.1.2",
-"dfs.client.failover.proxy.provider.testDfs": "org.apache.hadoop.hdfs.server.namenode.ha.ConfiguredFailoverProxyProvider"
+{
+   "hadoopConfig": {
+      "dfs.nameservices": "testDfs",
+      "dfs.ha.namenodes.testDfs": "nn01,nn02",
+      "dfs.namenode.rpc-address.testDfs.namenode1": "192.168.1.1",
+      "dfs.namenode.rpc-address.testDfs.namenode2": "192.168.1.2",
+      "dfs.client.failover.proxy.provider.testDfs": "org.apache.hadoop.hdfs.server.namenode.ha.ConfiguredFailoverProxyProvider"
+   }
 }
 ```
 

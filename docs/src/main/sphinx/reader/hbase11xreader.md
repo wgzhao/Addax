@@ -282,17 +282,18 @@ ROW                                   COLUMN+CELL
 name指定读取的hbase列，除了rowkey外，必须为 列族:列名 的格式，type指定源数据的类型，format指定日期类型的格式，value指定当前类型为常量，不从hbase读取数据，而是根据value值自动生成对应的列。配置格式如下：
 
 ```json
-"column":
-[
-    {
-        "name": "rowkey",
-        "type": "string"
-    },
-    {
-        "value": "test",
-        "type": "string"
-    }
-]
+{
+ "column": [
+  {
+   "name": "rowkey",
+   "type": "string"
+  },
+  {
+   "value": "test",
+   "type": "string"
+  }
+ ]
+}
 ```
 
 normal 模式下，对于用户指定Column信息，type必须填写，name/value必须选择其一。    
@@ -302,16 +303,18 @@ normal 模式下，对于用户指定Column信息，type必须填写，name/valu
 name指定读取的hbase列，除了rowkey外，必须为 列族:列名 的格式，type指定源数据的类型，format指定日期类型的格式 。multiVersionFixedColumn模式下不支持常量列。配置格式如下：
 
 ```json
-"column": [
-    {
-        "name": "rowkey",
-        "type": "string"
-    },
-    {
-        "name": "info: age",
-        "type": "string"
-    }
-]
+{
+ "column": [
+  {
+   "name": "rowkey",
+   "type": "string"
+  },
+  {
+   "name": "info: age",
+   "type": "string"
+  }
+ ]
+}
 ```
 
 #### range
@@ -325,10 +328,12 @@ name指定读取的hbase列，除了rowkey外，必须为 列族:列名 的格�
 配置格式如下：
 
 ```json
-"range": {
+{
+ "range": {
   "startRowkey": "aaa",
   "endRowkey": "ccc",
-  "isBinaryRowkey":false
+  "isBinaryRowkey": false
+ }
 }
 ```
 
@@ -340,7 +345,7 @@ name指定读取的hbase列，除了rowkey外，必须为 列族:列名 的格�
 | -------------- | ------------------- |
 | Long           | int, short ,long    |
 | Double         | float, double       |
-| String         | string,binarystring |
+| String         | string, binarystring |
 | Date           | date                |
 | Boolean        | boolean             |
 

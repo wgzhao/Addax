@@ -120,11 +120,12 @@ OracleWriter 通过 Addax 框架获取 Reader 生成的协议数据，根据你�
 描述：设置oracle连接时的session信息，格式示例如下：
 
 ```json
-"session":[
+{
+  "session": [
     "alter session set nls_date_format = 'dd.mm.yyyy hh24:mi:ss';"
     "alter session set NLS_LANG = 'AMERICAN';"
-]
-
+  ]
+}
 ```
 
 ### 3.3 类型转换
