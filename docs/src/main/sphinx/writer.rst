@@ -13,7 +13,7 @@
     Doris Writer                    <writer/doriswriter>
     ElasticSearch Writer            <writer/elasticsearchwriter>
     FTP Writer                      <writer/ftpwriter>
-    Greenplum Reader                <reader/greenlumreader>
+    Greenplum Writer                <writer/greenplumwriter>
     HBase 1.x Writer                <writer/hbase11xwriter>
     HBase 1.x Writer with Phoenix   <writer/hbase11xsqlwriter>
     HBase 2.0 Writer with Phoenix   <writer/hbase20xsqlwriter>

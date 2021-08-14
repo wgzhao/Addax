@@ -133,21 +133,28 @@ FtpReader实现了从远程FTP文件读取数据并转为Addax协议的功能，
 默认情况下，用户可以全部按照String类型读取数据，配置如下：
 
 ```json
-    "column": ["*"]
+{
+  "column": [
+    "*"
+  ]
+}
 ```
 
 用户可以指定Column字段信息，配置如下：
 
 ```json
-{
-  "type": "long",
-  "index": 0
-  //从远程FTP文件文本第一列获取int字段
-},
-{
-"type": "string",
-"value": "alibaba"  //从FtpReader内部生成alibaba的字符串字段作为当前字段
-}
+[
+  {
+    "type": "long",
+    "index": 0,
+    "description": "从远程FTP文件文本第一列获取int字段"
+  },
+  {
+    "type": "string",
+    "value": "addax",
+    "description": "从FtpReader内部生成alibaba的字符串字段作为当前字段"
+  }
+]
 ```
 
 对于用户指定Column信息，type必须填写，index/value必须选择其一。
@@ -157,10 +164,12 @@ FtpReader实现了从远程FTP文件读取数据并转为Addax协议的功能，
 常见配置：
 
 ```json
-"csvReaderConfig":{
-"safetySwitch": false,
-"skipEmptyRecords": false,
-"useTextQualifier": false
+{
+  "csvReaderConfig": {
+    "safetySwitch": false,
+    "skipEmptyRecords": false,
+    "useTextQualifier": false
+  }
 }
 ```
 

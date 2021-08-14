@@ -82,12 +82,14 @@ OracleReader插件实现了从Oracle读取数据。在底层实现上，OracleRe
 控制写入数据的时间格式，时区等的配置，如果表中有时间字段，配置该值以明确告知写入 oracle 的时间格式。通常配置的参数为：`NLS_DATE_FORMAT`,`NLS_TIME_FORMAT`。其配置的值为 `json` 格式，例如：
 
 ```json
-"session": [
-"alter session set NLS_DATE_FORMAT='yyyy-mm-dd hh24:mi:ss'",
-"alter session set NLS_TIMESTAMP_FORMAT='yyyy-mm-dd hh24:mi:ss'",
-"alter session set NLS_TIMESTAMP_TZ_FORMAT='yyyy-mm-dd hh24:mi:ss'",
-"alter session set TIME_ZONE='Asia/Chongqing'"
-]
+{
+  "session": [
+    "alter session set NLS_DATE_FORMAT='yyyy-mm-dd hh24:mi:ss'",
+    "alter session set NLS_TIMESTAMP_FORMAT='yyyy-mm-dd hh24:mi:ss'",
+    "alter session set NLS_TIMESTAMP_TZ_FORMAT='yyyy-mm-dd hh24:mi:ss'",
+    "alter session set TIME_ZONE='Asia/Chongqing'"
+  ]
+}
 ```
 
 注意 `&quot;`是 `"` 的转义字符串

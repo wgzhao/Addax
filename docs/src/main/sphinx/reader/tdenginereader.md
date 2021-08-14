@@ -173,13 +173,19 @@ java.library.path:/usr/java/packages/lib/amd64:/usr/lib64:/lib64:/lib:/usr/lib
 所以上述配置中的` connection` 应该修改为如下：
 
 ```json
-"connection": [
 {
-"querySql":["select * from test.meters where ts <'2017-07-14 10:40:02' and  loc='beijing' limit 100"],
-"jdbcUrl": ["jdbc:TAOS-RS://127.0.0.1:6041/test"],
-"driver": "com.taosdata.jdbc.rs.RestfulDriver"
+  "connection": [
+    {
+      "querySql": [
+        "select * from test.meters where ts <'2017-07-14 10:40:02' and  loc='beijing' limit 100"
+      ],
+      "jdbcUrl": [
+        "jdbc:TAOS-RS://127.0.0.1:6041/test"
+      ],
+      "driver": "com.taosdata.jdbc.rs.RestfulDriver"
+    }
+  ]
 }
-]
 ```
 
 ## 类型转换
