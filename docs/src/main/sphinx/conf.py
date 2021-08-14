@@ -86,7 +86,7 @@ release = version
 
 exclude_patterns = ['_build']
 
-highlight_language = 'sql'
+highlight_language = 'default'
 
 # default_role = 'backquote'
 
@@ -97,12 +97,26 @@ html_theme = 'sphinx_rtd_theme'
 
 html_title = '%s %s Documentation' % (project, release)
 
-html_logo = 'images/addax-logo.png'
+
+
+html_logo = 'images/logo.png'
 
 html_add_permalinks = '#'
 html_show_copyright = False
 html_show_sphinx = False
 
+
 # html_sidebars = {
 #     "**": ['logo-text.html', 'globaltoc.html', 'localtoc.html', 'searchbox.html']
 # }
+
+html_theme_options = {
+    'logo_only': True,
+    'style_nav_header_background': '#ffffff',
+}
+# These folders are copied to the documentation's HTML output
+html_static_path = ['_static']
+html_favicon = 'images/favicon.ico'
+html_css_files = [
+    'css/addax.css', 'css/pygments.css'
+]
