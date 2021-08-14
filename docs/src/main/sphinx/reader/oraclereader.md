@@ -65,11 +65,11 @@ OracleReader插件实现了从Oracle读取数据。在底层实现上，OracleRe
 
 | 配置项    | 是否必须 | 默认值 | 描述                                                                                                                                                                        |
 | :-------- | :------: | ------ | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| jdbcUrl   |    是    | 无     | 对端数据库的JDBC连接信息，jdbcUrl按照RDBMS官方规范，并可以填写连接[附件控制信息](http://www.oracle.com/technetwork/database/enterprise-edition/documentation/index.html) ｜ |
+| jdbcUrl   |    是    | 无     | 对端数据库的JDBC连接信息，jdbcUrl按照RDBMS官方规范，并可以填写连接[附件控制信息](http://www.oracle.com/technetwork/database/enterprise-edition/documentation/index.html) |
 | username  |    是    | 无     | 数据源的用户名                                                                                                                                                              |
 | password  |    否    | 无     | 数据源指定用户名的密码                                                                                                                                                      |
 | table     |    是    | 无     | 所选取的需要同步的表名,使用JSON数据格式，当配置为多张表时，用户自己需保证多张表是同一表结构                                                                                 |
-| column    |    是    | 无     | 所配置的表中需要同步的列名集合，详细描述见[rdbmsreader](rdbmsreader.md)                                                                                                     |
+| column    |    是    | 无     | 所配置的表中需要同步的列名集合，详细描述见 [rdbmsreader](rdbmsreader)                                                                                                     |
 | splitPk   |    否    | 无     | 使用splitPk代表的字段进行数据分片，Addax因此会启动并发任务进行数据同步，这样可以大大提供数据同步的效能                                                                      |
 | autoPk    |    否    | false | 是否自动猜测分片主键，`3.2.6` 版本引入 |
 | where     |    否    | 无     | 针对表的筛选条件                                                                                                                                                            |
@@ -98,14 +98,16 @@ OracleReader插件实现了从Oracle读取数据。在底层实现上，OracleRe
 
 下面列出OracleReader针对Oracle类型转换列表:
 
-| Addax 内部类型 | Oracle 数据类型                                                                                                                                                                                               |
-| -------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Long           | NUMBER, INTEGER, INT, SMALLINT                                                                                                                                                                                |
-| Double         | NUMERIC, DECIMAL, FLOAT, DOUBLE PRECISION, REAL                                                                                                                                                               |
-| String         | LONG ,CHAR, NCHAR, VARCHAR, VARCHAR2, NVARCHAR2, CLOB, NCLOB, CHARACTER, CHARACTER VARYING, CHAR VARYING, NATIONAL CHARACTER, NATIONAL CHAR, NATIONAL CHARACTER VARYING, NATIONAL CHAR VARYING, NCHAR VARYING |
-| Date           | TIMESTAMP, DATE                                                                                                                                                                                               |
-| Boolean        | bit, bool                                                                                                                                                                                                     |
-| Bytes          | BLOB, BFILE, RAW, LONG RAW                                                                                                                                                                                    |
+| Addax 内部类型 | Oracle 数据类型                                                                              |
+| -------------- | ------------------------------------------------------------------------------------------ |
+| Long           | NUMBER, INTEGER, INT, SMALLINT                                                             |
+| Double         | NUMERIC, DECIMAL, FLOAT, DOUBLE PRECISION, REAL                                            |
+| String         | LONG ,CHAR, NCHAR, VARCHAR, VARCHAR2, NVARCHAR2, CLOB, NCLOB, CHARACTER
+| String         | CHARACTER VARYING, CHAR VARYING, NATIONAL CHARACTER, NATIONAL CHAR, NATIONAL CHARACTER VARYING |
+| String         | NATIONAL CHAR VARYING, NCHAR VARYING |
+| Date           | TIMESTAMP, DATE                                                            |
+| Boolean        | bit, bool                                                                  |
+| Bytes          | BLOB, BFILE, RAW, LONG RAW                                                 |
 
 请注意: 除上述罗列字段类型外，其他类型均不支持
 

@@ -87,12 +87,12 @@ OracleWriter 通过 Addax 框架获取 Reader 生成的协议数据，根据你�
 
 | 配置项    | 是否必须 | 默认值 | 描述                                                                                                                                                                        |
 | :-------- | :------: | ------ | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| jdbcUrl   |    是    | 无     | 对端数据库的JDBC连接信息，jdbcUrl按照RDBMS官方规范，并可以填写连接[附件控制信息](http://www.oracle.com/technetwork/database/enterprise-edition/documentation/index.html)  |
+| jdbcUrl   |    是    | 无     | 对端数据库的JDBC连接信息，jdbcUrl按照RDBMS官方规范，并可以填写连接 [附件控制信息](http://www.oracle.com/technetwork/database/enterprise-edition/documentation/index.html)  |
 | username  |    是    | 无     | 数据源的用户名                                                                                                                                                              |
 | password  |    否    | 无     | 数据源指定用户名的密码                                                                                                                                                      |
 | writeMode |    否    | insert | 写入方式，支持 insert， update，详见下文 |
 | table     |    是    | 无     | 所选取的需要同步的表名,使用JSON数据格式，当配置为多张表时，用户自己需保证多张表是同一表结构                                                                                 |
-| column    |    是    | 无     | 所配置的表中需要同步的列名集合，详细描述[rdbmswriter](rdbmswriter.md) ｜                                                                                                    |
+| column    |    是    | 无     | 所配置的表中需要同步的列名集合，详细描述见 [rdbmswriter](rdbmswriter) |                                                                                                    |
 | preSql    |    否    | 无     | 执行数据同步任务之前率先执行的sql语句，目前只允许执行一条SQL语句，例如清除旧数据,涉及到的表可用 `@table`表示                                                                |
 | postSql   |    否    | 无     | 执行数据同步任务之后执行的sql语句，目前只允许执行一条SQL语句，例如加上某一个时间戳                                                                                          |
 | batchSize |    否    | 1024   | 定义了插件和数据库服务器端每次批量数据获取条数，调高该值可能导致 Addax 出现OOM或者目标数据库事务提交失败导致挂起                                                            |
@@ -129,7 +129,7 @@ OracleWriter 通过 Addax 框架获取 Reader 生成的协议数据，根据你�
 
 ### 3.3 类型转换
 
-类似 [OracleReader](../reader/oraclereader.md) ，目前 OracleWriter 支持大部分 Oracle 类型，但也存在部分个别类型没有支持的情况，请注意检查你的类型。
+类似 [OracleReader](../reader/oraclereader) ，目前 OracleWriter 支持大部分 Oracle 类型，但也存在部分个别类型没有支持的情况，请注意检查你的类型。
 
 下面列出 OracleWriter 针对 Oracle 类型转换列表:
 
@@ -139,5 +139,5 @@ OracleWriter 通过 Addax 框架获取 Reader 生成的协议数据，根据你�
 | Double         | NUMERIC,DECIMAL,FLOAT,DOUBLE PRECISION,REAL                                                                                                                                                    |
 | String         | LONG,CHAR,NCHAR,VARCHAR,VARCHAR2,NVARCHAR2,CLOB,NCLOB,CHARACTER,CHARACTER VARYING,CHAR VARYING,NATIONAL CHARACTER,NATIONAL CHAR,NATIONAL CHARACTER VARYING,NATIONAL CHAR VARYING,NCHAR VARYING |
 | Date           | TIMESTAMP,DATE                                                                                                                                                                                 |
-| Boolean        | bit, bool                                                                                                                                                                                      |
+| Boolean        | BIT, BOOL                                                                                                                                                                                      |
 | Bytes          | BLOB,BFILE,RAW,LONG RAW                                                                                                                                                                        |

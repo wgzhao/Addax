@@ -10,7 +10,7 @@ TxtFileWriter提供了向本地文件写入类CSV格式的一个或者多个表�
 
 TxtFileWriter实现了从Addax协议转为本地TXT文件功能，本地文件本身是无结构化数据存储，TxtFileWriter如下几个方面约定:
 
-1. 支持且仅支持写入 TXT的文件，且要求TXT中shema为一张二维表。
+1. 支持且仅支持写入 TXT的文件，且要求TXT中schema为一张二维表。
 2. 支持类CSV格式文件，自定义分隔符。
 3. 支持文本压缩，现有压缩格式为gzip、bzip2。
 6. 支持多线程写入，每个线程写入不同子文件。

@@ -69,8 +69,8 @@ SqlServerReader插件实现了从SqlServer读取数据。在底层实现上，Sq
 | username        |    是    | 无     | 数据源的用户名 |
 | password        |    否    | 无     | 数据源指定用户名的密码 |
 | table           |    是    | 无     | 所选取的需要同步的表名,使用JSON数据格式，当配置为多张表时，用户自己需保证多张表是同一表结构 |
-| column          |    是    | 无     |  所配置的表中需要同步的列名集合，详细描述见[rdbmsreader](rdbmsreader.md) |
-| splitPk         |    否    | 无     | 使用splitPk代表的字段进行数据分片，详细描述见[rdbms](rdbmsreader.md)|
+| column          |    是    | 无     |  所配置的表中需要同步的列名集合，详细描述见 [rdbmsreader](rdbmsreader) |
+| splitPk         |    否    | 无     | 使用splitPk代表的字段进行数据分片，详细描述见 [rdbmsreader](rdbmsreader)|
 | autoPk          |    否    | false | 是否自动猜测分片主键，`3.2.6` 版本引入 |
 | where           |    否    | 无     | 针对表的筛选条件 |
 | querySql        |    否    | 无     | 使用自定义的SQL而不是指定表来获取数据，当配置了这一项之后，Addax系统就会忽略 `table`，`column`这些配置项 |

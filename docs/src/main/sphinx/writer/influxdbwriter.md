@@ -119,7 +119,7 @@ InfluxDB 作为时序数据库，需要每条记录都有时间戳字段，因�
 ### retentionPolicy
 
 设定数据库的 `Retention Policy` 策略，依据给定的配置，在指定数据库上创建一条 `Retention Policy` 信息。
-有关 `Retention Policy` 更详细的信息，可以参考[官方文档](https://docs.influxdata.com/influxdb/v1.8/query_language/manage-database/#create-retention-policies-with-create-retention-policy)
+有关 `Retention Policy` 更详细的信息，可以参考 [官方文档](https://docs.influxdata.com/influxdb/v1.8/query_language/manage-database/#create-retention-policies-with-create-retention-policy)
 
 ##  类型转换
 
