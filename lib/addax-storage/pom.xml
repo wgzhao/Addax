@@ -67,7 +67,6 @@
             <groupId>io.prestosql.hadoop</groupId>
             <artifactId>hadoop-apache</artifactId>
             <version>${hadoop.version}</version>
-            <scope>provided</scope>
         </dependency>
 
     </dependencies>

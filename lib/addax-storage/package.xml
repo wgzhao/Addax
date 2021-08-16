@@ -13,6 +13,17 @@
             <includes>
                 <include>${project.artifactId}-${project.version}.jar</include>
             </includes>
+            <outputDirectory>lib</outputDirectory>
         </fileSet>
     </fileSets>
+    <dependencySets>
+        <dependencySet>
+            <useProjectArtifact>false</useProjectArtifact>
+            <outputDirectory>lib</outputDirectory>
+            <scope>runtime</scope>
+            <excludes>
+                <exclude>com.wgzhao.addax:addax-common</exclude>
+            </excludes>
+        </dependencySet>
+    </dependencySets>
 </assembly>
