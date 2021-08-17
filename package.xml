@@ -24,9 +24,25 @@
             <outputDirectory>addax-${project.version}</outputDirectory>
         </fileSet>
         <fileSet>
-            <directory>lib/transformer/target/</directory>
+            <directory>lib/transformer/target/addax/lib/</directory>
             <includes>
-                <include>addax-transformer-${project.version}.jar</include>
+                <include>*.*</include>
+            </includes>
+            <fileMode>0644</fileMode>
+            <outputDirectory>addax-${project.version}/lib</outputDirectory>
+        </fileSet>
+        <fileSet>
+            <directory>lib/addax-rdbms/target/addax/lib/</directory>
+            <includes>
+                <include>*.*</include>
+            </includes>
+            <fileMode>0644</fileMode>
+            <outputDirectory>addax-${project.version}/lib</outputDirectory>
+        </fileSet>
+        <fileSet>
+            <directory>lib/addax-storage/target/addax/lib/</directory>
+            <includes>
+                <include>*.*</include>
             </includes>
             <fileMode>0644</fileMode>
             <outputDirectory>addax-${project.version}/lib</outputDirectory>
