@@ -17,14 +17,14 @@
  * under the License.
  */
 
-package com.wgzhao.addax.plugin.reader.dbffilereader;
+package com.wgzhao.addax.plugin.reader.dbfreader;
 
 import com.wgzhao.addax.common.spi.ErrorCode;
 
 /**
  * Created by zhongtian.hu on 19-8-8.
  */
-public enum DbfFileReaderErrorCode
+public enum DbfReaderErrorCode
         implements ErrorCode
 {
     REQUIRED_VALUE("DbfFileReader-00", "您缺失了必须填写的参数值."),
@@ -44,7 +44,7 @@ public enum DbfFileReaderErrorCode
     private final String code;
     private final String description;
 
-    private DbfFileReaderErrorCode(String code, String description)
+    private DbfReaderErrorCode(String code, String description)
     {
         this.code = code;
         this.description = description;

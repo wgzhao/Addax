@@ -65,7 +65,7 @@
             <outputDirectory>addax-${project.version}</outputDirectory>
         </fileSet>
         <fileSet>
-            <directory>plugin/reader/dbffilereader/target/dbffilereader-${project.version}/</directory>
+            <directory>plugin/reader/dbfreader/target/dbfreader-${project.version}/</directory>
             <includes>
                 <include>**/*.*</include>
             </includes>

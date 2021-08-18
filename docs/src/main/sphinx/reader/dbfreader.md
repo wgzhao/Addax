@@ -1,6 +1,6 @@
-# DbfFile Reader
+# Dbf Reader
 
-`DbfFileReader` 插件支持读取DBF格式文件
+`DbfReader` 插件支持读取DBF格式文件
 
 ## 配置说明
 
@@ -18,7 +18,7 @@
     "content": [
       {
         "reader": {
-          "name": "dbffilereader",
+          "name": "dbfreader",
           "parameter": {
             "column": [
               {

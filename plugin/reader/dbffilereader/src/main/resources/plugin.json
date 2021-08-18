@@ -1,6 +1,0 @@
-{
-  "name": "dbffilereader",
-  "class": "com.wgzhao.addax.plugin.reader.dbffilereader.DbfFileReader",
-  "description": "reader from dbf file",
-  "developer": "wgzhao"
-}

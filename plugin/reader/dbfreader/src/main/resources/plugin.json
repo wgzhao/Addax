@@ -1,0 +1,6 @@
+{
+  "name": "dbfreader",
+  "class": "com.wgzhao.addax.plugin.reader.dbfreader.DbfReader",
+  "description": "reader from dbf file",
+  "developer": "wgzhao"
+}

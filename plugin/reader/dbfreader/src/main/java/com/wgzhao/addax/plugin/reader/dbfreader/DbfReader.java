@@ -17,7 +17,7 @@
  * under the License.
  */
 
-package com.wgzhao.addax.plugin.reader.dbffilereader;
+package com.wgzhao.addax.plugin.reader.dbfreader;
 
 import com.linuxense.javadbf.DBFDataType;
 import com.linuxense.javadbf.DBFReader;
@@ -50,7 +50,7 @@ import java.util.regex.Pattern;
 /**
  * Created by zhongtian.hu on 19-8-8.
  */
-public class DbfFileReader
+public class DbfReader
         extends Reader
 {
     public static class Job
@@ -92,10 +92,10 @@ public class DbfFileReader
         private void validateParameter()
         {
             // Compatible with the old version, path is a string before
-            String pathInString = this.originConfig.getNecessaryValue(Key.PATH, DbfFileReaderErrorCode.REQUIRED_VALUE);
+            String pathInString = this.originConfig.getNecessaryValue(Key.PATH, DbfReaderErrorCode.REQUIRED_VALUE);
             if (isBlank(pathInString)) {
                 throw AddaxException.asAddaxException(
-                        DbfFileReaderErrorCode.REQUIRED_VALUE,
+                        DbfReaderErrorCode.REQUIRED_VALUE,
                         "您需要指定待读取的源目录或文件");
             }
             if (!pathInString.startsWith("[") && !pathInString.endsWith("]")) {
@@ -106,7 +106,7 @@ public class DbfFileReader
                 path = this.originConfig.getList(Key.PATH, String.class);
                 if (null == path || path.isEmpty()) {
                     throw AddaxException.asAddaxException(
-                            DbfFileReaderErrorCode.REQUIRED_VALUE,
+                            DbfReaderErrorCode.REQUIRED_VALUE,
                             "您需要指定待读取的源目录或文件");
                 }
             }
@@ -151,7 +151,7 @@ public class DbfFileReader
             int splitNumber = this.sourceFiles.size();
             if (0 == splitNumber) {
                 throw AddaxException.asAddaxException(
-                        DbfFileReaderErrorCode.EMPTY_DIR_EXCEPTION,
+                        DbfReaderErrorCode.EMPTY_DIR_EXCEPTION,
                         String.format("未能找到待读取的文件,请确认您的配置项path: %s", this.originConfig.getString(Key.PATH)));
             }
 
@@ -204,13 +204,13 @@ public class DbfFileReader
                 if (!isExists) {
                     String message = String.format("您设定的目录不存在 : [%s]", parentDirectory);
                     LOG.error(message);
-                    throw AddaxException.asAddaxException(DbfFileReaderErrorCode.FILE_NOT_EXISTS, message);
+                    throw AddaxException.asAddaxException(DbfReaderErrorCode.FILE_NOT_EXISTS, message);
                 }
             }
             catch (SecurityException se) {
                 String message = String.format("您没有权限查看目录 : [%s]", parentDirectory);
                 LOG.error(message);
-                throw AddaxException.asAddaxException(DbfFileReaderErrorCode.SECURITY_NOT_ENOUGH, message);
+                throw AddaxException.asAddaxException(DbfReaderErrorCode.SECURITY_NOT_ENOUGH, message);
             }
 
             directoryRover(regexPath, parentDirectory, toBeReadFiles);
@@ -241,13 +241,13 @@ public class DbfFileReader
                         // warn: 对于没有权限的文件，是直接throw AddaxException
                         String message = String.format("您没有权限查看目录 : [%s]", directory);
                         LOG.error(message);
-                        throw AddaxException.asAddaxException(DbfFileReaderErrorCode.SECURITY_NOT_ENOUGH, message);
+                        throw AddaxException.asAddaxException(DbfReaderErrorCode.SECURITY_NOT_ENOUGH, message);
                     }
                 }
                 catch (SecurityException e) {
                     String message = String.format("您没有权限查看目录 : [%s]", directory);
                     LOG.error(message);
-                    throw AddaxException.asAddaxException(DbfFileReaderErrorCode.SECURITY_NOT_ENOUGH, message, e);
+                    throw AddaxException.asAddaxException(DbfReaderErrorCode.SECURITY_NOT_ENOUGH, message, e);
                 }
             }
         }
@@ -327,7 +327,7 @@ public class DbfFileReader
             }
             if (column == null) {
                 throw AddaxException.asAddaxException(
-                        DbfFileReaderErrorCode.RUNTIME_EXCEPTION,
+                        DbfReaderErrorCode.RUNTIME_EXCEPTION,
                         "无法从指定的DBF文件(" + this.sourceFiles.get(0) + ")获取字段信息"
                 );
             }
