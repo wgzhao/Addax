@@ -17,14 +17,14 @@
  * under the License.
  */
 
-package com.wgzhao.addax.plugin.writer.dbffilewriter;
+package com.wgzhao.addax.plugin.writer.dbfwriter;
 
 import com.wgzhao.addax.common.spi.ErrorCode;
 
 /**
  * Created by haiwei.luo on 14-9-17.
  */
-public enum DbfFileWriterErrorCode
+public enum DbfWriterErrorCode
         implements ErrorCode
 {
 
@@ -38,7 +38,7 @@ public enum DbfFileWriterErrorCode
     private final String code;
     private final String description;
 
-    DbfFileWriterErrorCode(String code, String description)
+    DbfWriterErrorCode(String code, String description)
     {
         this.code = code;
         this.description = description;

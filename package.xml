@@ -259,7 +259,7 @@
             <outputDirectory>addax-${project.version}</outputDirectory>
         </fileSet>
         <fileSet>
-            <directory>plugin/writer/dbffilewriter/target/dbffilewriter-${project.version}/</directory>
+            <directory>plugin/writer/dbfwriter/target/dbfwriter-${project.version}/</directory>
             <includes>
                 <include>**/*.*</include>
             </includes>

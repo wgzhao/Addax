@@ -107,7 +107,7 @@ add support for almost basic data type, and some complex data type.
 | Cassandra           | YES    | YES    | cassandrareader/cassandrawriter         |                                                                                            |
 | ClickHouse          | YES    | YES    | clickhousereader/clickhousewriter       |                                                                                            |
 | DB2                 | YES    | YES    | rbdmsreader/rdbmswriter                 | not fully tested                                                                           |
-| DBF                 | YES    | YES    | dbfreader/dbffilewriter                 |                                                                                            |
+| DBF                 | YES    | YES    | dbfreader/dbfwriter                 |                                                                                            |
 | ElasticSearch       | YES    | YES    | elasticsearchreader/elasticsearchwriter | originally from [@Kestrong](https://github.com/Kestrong/addax-elasticsearch)               |
 | FTP                 | YES    | YES    | ftpreader/ftpwriter                     |                                                                                            |
 | HBase 1.x           | YES    | YES    | hbase11xreader/hbase11xwriter           | use HBASE API                                                                              |

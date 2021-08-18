@@ -1,0 +1,6 @@
+{
+  "name": "dbfwriter",
+  "class": "com.wgzhao.addax.plugin.writer.dbfwriter.DbfWriter",
+  "description": "write a dbf file",
+  "developer": "wgzhao"
+}
