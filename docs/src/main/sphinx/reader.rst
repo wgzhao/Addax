@@ -10,7 +10,7 @@
     Cassandra Reader                <reader/cassandrareader>
     ClickHouse Reader               <reader/clickhousereader>
     Data reader                     <reader/datareader>
-    DBF reader                      <reader/dbffilereader>
+    DBF reader                      <reader/dbfreader>
     ElasticSearch Reader            <reader/elasticsearchreader>
     FTP reader                      <reader/ftpreader>
     HBase 1.x Reader                <reader/hbase11xreader>
