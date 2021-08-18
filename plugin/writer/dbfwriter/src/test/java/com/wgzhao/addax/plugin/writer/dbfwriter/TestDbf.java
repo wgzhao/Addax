@@ -19,7 +19,7 @@
  *
  */
 
-package com.wgzhao.addax.plugin.writer.dbffilewriter;
+package com.wgzhao.addax.plugin.writer.dbfwriter;
 
 import com.linuxense.javadbf.DBFDataType;
 import com.linuxense.javadbf.DBFField;

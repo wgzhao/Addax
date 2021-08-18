@@ -17,12 +17,11 @@
  * under the License.
  */
 
-package com.wgzhao.addax.plugin.writer.dbffilewriter;
+package com.wgzhao.addax.plugin.writer.dbfwriter;
 
 import com.linuxense.javadbf.DBFDataType;
 import com.linuxense.javadbf.DBFField;
 import com.linuxense.javadbf.DBFWriter;
-import com.wgzhao.addax.common.base.Constant;
 import com.wgzhao.addax.common.base.Key;
 import com.wgzhao.addax.common.element.Column;
 import com.wgzhao.addax.common.element.Record;
@@ -55,7 +54,7 @@ import java.util.UUID;
 /**
  * Created by haiwei.luo on 14-9-17.
  */
-public class DbfFileWriter
+public class DbfWriter
         extends Writer
 {
     public static class Job
@@ -83,30 +82,30 @@ public class DbfFileWriter
 
         private void validateParameter()
         {
-            this.writerSliceConfig.getNecessaryValue(Key.FILE_NAME, DbfFileWriterErrorCode.REQUIRED_VALUE);
+            this.writerSliceConfig.getNecessaryValue(Key.FILE_NAME, DbfWriterErrorCode.REQUIRED_VALUE);
 
-            String path = this.writerSliceConfig.getNecessaryValue(Key.PATH, DbfFileWriterErrorCode.REQUIRED_VALUE);
+            String path = this.writerSliceConfig.getNecessaryValue(Key.PATH, DbfWriterErrorCode.REQUIRED_VALUE);
 
             try {
                 // warn: 这里用户需要配一个目录
                 File dir = new File(path);
                 if (dir.isFile()) {
                     throw AddaxException.asAddaxException(
-                                    DbfFileWriterErrorCode.ILLEGAL_VALUE,
+                                    DbfWriterErrorCode.ILLEGAL_VALUE,
                                     String.format("您配置的path: [%s] 不是一个合法的目录, 请您注意文件重名, 不合法目录名等情况.", path));
                 }
                 if (!dir.exists()) {
                     boolean createdOk = dir.mkdirs();
                     if (!createdOk) {
                         throw AddaxException.asAddaxException(
-                                        DbfFileWriterErrorCode.CONFIG_INVALID_EXCEPTION,
+                                        DbfWriterErrorCode.CONFIG_INVALID_EXCEPTION,
                                         String.format("您指定的文件路径 : [%s] 创建失败.", path));
                     }
                 }
             }
             catch (SecurityException se) {
                 throw AddaxException.asAddaxException(
-                        DbfFileWriterErrorCode.SECURITY_NOT_ENOUGH,
+                        DbfWriterErrorCode.SECURITY_NOT_ENOUGH,
                         String.format("您没有权限创建文件路径 : [%s] ", path), se);
             }
         }
@@ -138,22 +137,22 @@ public class DbfFileWriter
                 catch (NullPointerException npe) {
                     throw AddaxException
                             .asAddaxException(
-                                    DbfFileWriterErrorCode.WRITE_FILE_ERROR,
+                                    DbfWriterErrorCode.WRITE_FILE_ERROR,
                                     String.format("您配置的目录清空时出现空指针异常 : [%s]", path), npe);
                 }
                 catch (IllegalArgumentException iae) {
                     throw AddaxException.asAddaxException(
-                            DbfFileWriterErrorCode.SECURITY_NOT_ENOUGH,
+                            DbfWriterErrorCode.SECURITY_NOT_ENOUGH,
                             String.format("您配置的目录参数异常 : [%s]", path));
                 }
                 catch (SecurityException se) {
                     throw AddaxException.asAddaxException(
-                            DbfFileWriterErrorCode.SECURITY_NOT_ENOUGH,
+                            DbfWriterErrorCode.SECURITY_NOT_ENOUGH,
                             String.format("您没有权限查看目录 : [%s]", path));
                 }
                 catch (IOException e) {
                     throw AddaxException.asAddaxException(
-                            DbfFileWriterErrorCode.WRITE_FILE_ERROR,
+                            DbfWriterErrorCode.WRITE_FILE_ERROR,
                             String.format("无法清空目录 : [%s]", path), e);
                 }
             }
@@ -169,7 +168,7 @@ public class DbfFileWriter
                         if (dir.isFile()) {
                             throw AddaxException
                                     .asAddaxException(
-                                            DbfFileWriterErrorCode.ILLEGAL_VALUE,
+                                            DbfWriterErrorCode.ILLEGAL_VALUE,
                                             String.format("您配置的path: [%s] 不是一个合法的目录, 请您注意文件重名, 不合法目录名等情况.", path));
                         }
                         // fileName is not null
@@ -185,7 +184,7 @@ public class DbfFileWriter
                                     StringUtils.join(allFiles, ","));
                             throw AddaxException
                                     .asAddaxException(
-                                            DbfFileWriterErrorCode.ILLEGAL_VALUE,
+                                            DbfWriterErrorCode.ILLEGAL_VALUE,
                                             String.format("您配置的path: [%s] 目录不为空, 下面存在其他文件或文件夹.", path));
                         }
                     }
@@ -194,21 +193,21 @@ public class DbfFileWriter
                         if (!createdOk) {
                             throw AddaxException
                                     .asAddaxException(
-                                            DbfFileWriterErrorCode.CONFIG_INVALID_EXCEPTION,
+                                            DbfWriterErrorCode.CONFIG_INVALID_EXCEPTION,
                                             String.format("您指定的文件路径 : [%s] 创建失败.", path));
                         }
                     }
                 }
                 catch (SecurityException se) {
                     throw AddaxException.asAddaxException(
-                            DbfFileWriterErrorCode.SECURITY_NOT_ENOUGH,
+                            DbfWriterErrorCode.SECURITY_NOT_ENOUGH,
                             String.format("您没有权限查看目录 : [%s]", path));
                 }
             }
             else {
                 throw AddaxException
                         .asAddaxException(
-                                DbfFileWriterErrorCode.ILLEGAL_VALUE,
+                                DbfWriterErrorCode.ILLEGAL_VALUE,
                                 String.format("仅支持 truncate, append, nonConflict 三种模式, 不支持您配置的 writeMode 模式 : [%s]", writeMode));
             }
 
@@ -219,7 +218,7 @@ public class DbfFileWriter
                         (column.getString(Key.LENGTH, null) == null || column.getString(Key.SCALE, null) == null))
                 {
                     throw AddaxException.asAddaxException(
-                            DbfFileWriterErrorCode.CONFIG_INVALID_EXCEPTION,
+                            DbfWriterErrorCode.CONFIG_INVALID_EXCEPTION,
                             String.format("numeric 类型必须配置 %s 和 %s 项", Key.LENGTH, Key.SCALE)
                     );
                 }
@@ -227,7 +226,7 @@ public class DbfFileWriter
                 if ("char".equalsIgnoreCase(column.getString(Key.TYPE)) && column.getString(Key.LENGTH, null) == null)
                 {
                     throw AddaxException.asAddaxException(
-                            DbfFileWriterErrorCode.CONFIG_INVALID_EXCEPTION,
+                            DbfWriterErrorCode.CONFIG_INVALID_EXCEPTION,
                             String.format("char 类型必须配置 %s 项", Key.LENGTH)
                     );
                 }
@@ -262,7 +261,7 @@ public class DbfFileWriter
             }
             catch (SecurityException se) {
                 throw AddaxException.asAddaxException(
-                        DbfFileWriterErrorCode.SECURITY_NOT_ENOUGH,
+                        DbfWriterErrorCode.SECURITY_NOT_ENOUGH,
                         String.format("您没有权限查看目录 : [%s]", path));
             }
 
@@ -401,7 +400,7 @@ public class DbfFileWriter
             }
             catch (SecurityException se) {
                 throw AddaxException.asAddaxException(
-                        DbfFileWriterErrorCode.SECURITY_NOT_ENOUGH,
+                        DbfWriterErrorCode.SECURITY_NOT_ENOUGH,
                         String.format("您没有权限创建文件  : [%s]", this.fileName));
             }
             LOG.info("end write");

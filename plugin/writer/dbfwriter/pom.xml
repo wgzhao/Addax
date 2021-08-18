@@ -7,9 +7,9 @@
         <relativePath>../../../pom.xml</relativePath>
     </parent>
 
-    <artifactId>dbffilewriter</artifactId>
-    <name>dbffile-writer</name>
-    <description>DbfFileWriter提供了本地写入dbf功能，建议开发、测试环境使用。</description>
+    <artifactId>dbfwriter</artifactId>
+    <name>dbf-writer</name>
+    <description>DbfWriter 提供了本地写入dbf功能</description>
     <packaging>jar</packaging>
 
     <dependencies>
