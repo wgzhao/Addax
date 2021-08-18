@@ -49,6 +49,8 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentMap;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -378,7 +380,7 @@ public class StreamReader
         private boolean haveIncrFunction;
 
         // 递增字段字段，用于存储当前的递增值
-        private static final Map<Integer, Object> incrMap = new HashMap<>();
+        private static final Map<Integer, Object> incrMap = new ConcurrentHashMap<>(8);
 
         @Override
         public void init()
