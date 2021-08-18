@@ -22,16 +22,13 @@ package com.wgzhao.addax.plugin.reader.dbffilereader;
 import com.linuxense.javadbf.DBFDataType;
 import com.linuxense.javadbf.DBFReader;
 import com.linuxense.javadbf.DBFRow;
-import com.wgzhao.addax.common.base.Constant;
 import com.wgzhao.addax.common.base.Key;
 import com.wgzhao.addax.common.element.ColumnEntry;
 import com.wgzhao.addax.common.exception.AddaxException;
 import com.wgzhao.addax.common.plugin.RecordSender;
 import com.wgzhao.addax.common.spi.Reader;
-import com.wgzhao.addax.common.util.ColumnUtil;
 import com.wgzhao.addax.common.util.Configuration;
-import com.wgzhao.addax.common.util.RecordUtil;
-import org.apache.commons.io.Charsets;
+import com.wgzhao.addax.storage.reader.StorageReaderUtil;
 import org.apache.commons.io.IOUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -40,7 +37,6 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.nio.charset.Charset;
-import java.nio.charset.UnsupportedCharsetException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -89,6 +85,7 @@ public class DbfFileReader
             this.originConfig = this.getPluginJobConf();
             this.pattern = new HashMap<>();
             this.isRegexPath = new HashMap<>();
+            StorageReaderUtil.validateParameter(this.originConfig);
             this.validateParameter();
         }
 
@@ -111,63 +108,6 @@ public class DbfFileReader
                     throw AddaxException.asAddaxException(
                             DbfFileReaderErrorCode.REQUIRED_VALUE,
                             "您需要指定待读取的源目录或文件");
-                }
-            }
-
-            String encoding = this.originConfig.getString(Key.ENCODING, Constant.DEFAULT_ENCODING);
-            if (isBlank(encoding)) {
-                this.originConfig.set(Key.ENCODING, Constant.DEFAULT_ENCODING);
-            }
-            else {
-                try {
-                    encoding = encoding.trim();
-                    this.originConfig.set(Key.ENCODING, encoding);
-                    Charsets.toCharset(encoding);
-                }
-                catch (UnsupportedCharsetException uce) {
-                    throw AddaxException.asAddaxException(
-                            DbfFileReaderErrorCode.ILLEGAL_VALUE,
-                            String.format("不支持您配置的编码格式 : [%s]", encoding), uce);
-                }
-                catch (Exception e) {
-                    throw AddaxException.asAddaxException(
-                            DbfFileReaderErrorCode.CONFIG_INVALID_EXCEPTION,
-                            String.format("编码配置异常, 请联系我们: %s", e.getMessage()),
-                            e);
-                }
-            }
-            // 检测是column 是否为 ["*"] 若是则填为空
-            List<Configuration> column = this.originConfig.getListConfiguration(Key.COLUMN);
-            if (null != column && 1 == column.size() && ("\"*\"".equals(column.get(0).toString())
-                    || "'*'".equals(column.get(0).toString()))) {
-                originConfig.set(Key.COLUMN, new ArrayList<String>());
-            }
-            else {
-                // column: 1. index type 2.value type 3.when type is Data, may have format
-                List<Configuration> columns = this.originConfig.getListConfiguration(Key.COLUMN);
-
-                if (null == columns || columns.isEmpty()) {
-                    throw AddaxException.asAddaxException(
-                            DbfFileReaderErrorCode.CONFIG_INVALID_EXCEPTION,
-                            "您需要指定 columns");
-                }
-
-                for (Configuration eachColumnConf : columns) {
-                    eachColumnConf.getNecessaryValue(Key.TYPE, DbfFileReaderErrorCode.REQUIRED_VALUE);
-                    Integer columnIndex = eachColumnConf.getInt(Key.INDEX);
-                    String columnValue = eachColumnConf.getString(Key.VALUE);
-
-                    if (null == columnIndex && null == columnValue) {
-                        throw AddaxException.asAddaxException(
-                                DbfFileReaderErrorCode.NO_INDEX_VALUE,
-                                "由于您配置了type, 则至少需要配置 index 或 value");
-                    }
-
-                    if (null != columnIndex && null != columnValue) {
-                        throw AddaxException.asAddaxException(
-                                DbfFileReaderErrorCode.MIXED_INDEX_VALUE,
-                                "您混合配置了index, value, 每一列同时仅能选择其中一种");
-                    }
                 }
             }
         }
@@ -211,9 +151,8 @@ public class DbfFileReader
             int splitNumber = this.sourceFiles.size();
             if (0 == splitNumber) {
                 throw AddaxException.asAddaxException(
-                        DbfFileReaderErrorCode.EMPTY_DIR_EXCEPTION, String
-                                .format("未能找到待读取的文件,请确认您的配置项path: %s",
-                                        this.originConfig.getString(Key.PATH)));
+                        DbfFileReaderErrorCode.EMPTY_DIR_EXCEPTION,
+                        String.format("未能找到待读取的文件,请确认您的配置项path: %s", this.originConfig.getString(Key.PATH)));
             }
 
             List<List<String>> splitedSourceFiles = this.splitSourceFiles(this.sourceFiles, splitNumber);
@@ -381,7 +320,7 @@ public class DbfFileReader
             LOG.debug("begin reading dbf files...");
             String encode = readerSliceConfig.getString(Key.ENCODING);
             String nullFormat = readerSliceConfig.getString(Key.NULL_FORMAT);
-            List<ColumnEntry> column = ColumnUtil.getListColumnEntry(readerSliceConfig, Key.COLUMN);
+            List<ColumnEntry> column = StorageReaderUtil.getListColumnEntry(readerSliceConfig, Key.COLUMN);
             if (column == null || column.isEmpty()) {
                 // get column description from dbf file
                 column = getColumnInfo(this.sourceFiles.get(0), encode);
@@ -411,7 +350,7 @@ public class DbfFileReader
                                 sourceLine[i] = row.getString(i);
                             }
                         }
-                        RecordUtil.transportOneRecord(recordSender, column, sourceLine, nullFormat, this.getTaskPluginCollector());
+                        StorageReaderUtil.transportOneRecord(recordSender, column, sourceLine, nullFormat, this.getTaskPluginCollector());
                     }
                 }
                 catch (FileNotFoundException e) {
@@ -441,8 +380,14 @@ public class DbfFileReader
                         case DATE:
                             columnEntry.setType("date");
                             break;
-                        case FLOATING_POINT:
                         case NUMERIC:
+                            if (reader.getField(i).getDecimalCount() > 0) {
+                                columnEntry.setType("double");
+                            } else {
+                                columnEntry.setType("long");
+                            }
+                            break;
+                        case FLOATING_POINT:
                         case DOUBLE:
                             columnEntry.setType("double");
                             break;
@@ -452,6 +397,9 @@ public class DbfFileReader
                         case MEMO:
                         case BINARY:
                         case BLOB:
+                        case GENERAL_OLE:
+                        case PICTURE:
+                        case VARBINARY:
                             columnEntry.setType("bytes");
                             break;
                         case CURRENCY:

@@ -22,6 +22,7 @@
 package com.wgzhao.addax.storage.reader;
 
 import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONObject;
 import com.alibaba.fastjson.TypeReference;
 import com.csvreader.CsvReader;
 import com.wgzhao.addax.common.base.Constant;
@@ -40,7 +41,6 @@ import com.wgzhao.addax.common.element.StringColumn;
 import com.wgzhao.addax.common.exception.AddaxException;
 import com.wgzhao.addax.common.plugin.RecordSender;
 import com.wgzhao.addax.common.plugin.TaskPluginCollector;
-import com.wgzhao.addax.common.util.ColumnUtil;
 import com.wgzhao.addax.common.util.Configuration;
 import io.airlift.compress.snappy.SnappyCodec;
 import io.airlift.compress.snappy.SnappyFramedInputStream;
@@ -62,10 +62,11 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.io.StringReader;
 import java.io.UnsupportedEncodingException;
 import java.nio.charset.UnsupportedCharsetException;
 import java.text.DateFormat;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -74,36 +75,12 @@ public class StorageReaderUtil
 {
     private static final Logger LOG = LoggerFactory.getLogger(StorageReaderUtil.class);
     public static HashMap<String, Object> csvReaderConfigMap;
+    public static final List<String> SUPPORTED_COMPRESSES =
+            Arrays.asList("gzip", "bzip2", "zip", "lzo", "lzo_deflate", "hadoop-snappy", "framing-snappy");
 
     private StorageReaderUtil()
     {
 
-    }
-
-    /**
-     * @param inputLine 输入待分隔字符串
-     * @param delimiter 字符串分割符
-     * @return 分隔符分隔后的字符串数组，出现异常时返回为null 支持转义，即数据中可包含分隔符
-     */
-    public static String[] splitOneLine(String inputLine, char delimiter)
-    {
-        String[] splitedResult = null;
-        if (null != inputLine) {
-            try {
-                CsvReader csvReader = new CsvReader(new StringReader(inputLine));
-                csvReader.setDelimiter(delimiter);
-
-                setCsvReaderConfig(csvReader);
-
-                if (csvReader.readRecord()) {
-                    splitedResult = csvReader.getValues();
-                }
-            }
-            catch (IOException e) {
-                // nothing to do
-            }
-        }
-        return splitedResult;
     }
 
     public static String[] splitBufferedReader(CsvReader csvReader)
@@ -116,18 +93,6 @@ public class StorageReaderUtil
         return splitedResult;
     }
 
-    /**
-     * 不支持转义
-     *
-     * @param inputLine 要分割的字符串
-     * @param delimiter 分割字符
-     * @return 分隔符分隔后的字符串数，
-     */
-    public static String[] splitOneLine(String inputLine, String delimiter)
-    {
-        return StringUtils.split(inputLine, delimiter);
-    }
-
     public static void readFromStream(InputStream inputStream, String context,
             Configuration readerSliceConfig, RecordSender recordSender,
             TaskPluginCollector taskPluginCollector)
@@ -136,43 +101,35 @@ public class StorageReaderUtil
         if (StringUtils.isBlank(compress)) {
             compress = null;
         }
-        String encoding = readerSliceConfig.getString(Key.ENCODING,
-                Constant.DEFAULT_ENCODING);
+        String encoding = readerSliceConfig.getString(Key.ENCODING, Constant.DEFAULT_ENCODING);
         // handle blank encoding
         if (StringUtils.isBlank(encoding)) {
             encoding = Constant.DEFAULT_ENCODING;
-            LOG.warn("您配置的encoding为[{}], 使用默认值[{}]", encoding,
-                    Constant.DEFAULT_ENCODING);
+            LOG.warn("您配置的encoding为[{}], 使用默认值[{}]", encoding, Constant.DEFAULT_ENCODING);
         }
 
         List<Configuration> column = readerSliceConfig
                 .getListConfiguration(Key.COLUMN);
         // handle ["*"] -> [], null
-        if (null != column && 1 == column.size()
-                && "\"*\"".equals(column.get(0).toString())) {
+        if (null != column && 1 == column.size() && "\"*\"".equals(column.get(0).toString())) {
             readerSliceConfig.set(Key.COLUMN, null);
-            column = null;
         }
 
         BufferedReader reader = null;
-        int bufferSize = readerSliceConfig.getInt(Key.BUFFER_SIZE,
-                Constant.DEFAULT_BUFFER_SIZE);
+        int bufferSize = readerSliceConfig.getInt(Key.BUFFER_SIZE, Constant.DEFAULT_BUFFER_SIZE);
 
         // compress logic
         try {
             if (null == compress) {
-                reader = new BufferedReader(new InputStreamReader(inputStream,
-                        encoding), bufferSize);
+                reader = new BufferedReader(new InputStreamReader(inputStream, encoding), bufferSize);
             }
             else {
                 if ("lzo_deflate".equalsIgnoreCase(compress)) {
-                    LzoInputStream lzoInputStream = new LzoInputStream(
-                            inputStream, new LzoDecompressor1x_safe());
-                    reader = new BufferedReader(new InputStreamReader(
-                            lzoInputStream, encoding));
+                    LzoInputStream lzoInputStream = new LzoInputStream(inputStream, new LzoDecompressor1x_safe());
+                    reader = new BufferedReader(new InputStreamReader(lzoInputStream, encoding));
                 }
                 else if ("lzo".equalsIgnoreCase(compress)) {
-                    LzoInputStream lzopInputStream = new ExpandLzopInputStream( inputStream);
+                    LzoInputStream lzopInputStream = new ExpandLzopInputStream(inputStream);
                     reader = new BufferedReader(new InputStreamReader(lzopInputStream, encoding));
                 }
                 else if ("gzip".equalsIgnoreCase(compress)) {
@@ -190,23 +147,14 @@ public class StorageReaderUtil
                 }
                 else if ("framing-snappy".equalsIgnoreCase(compress)) {
                     InputStream snappyInputStream = new SnappyFramedInputStream(inputStream);
-                    reader = new BufferedReader(new InputStreamReader(
-                            snappyInputStream, encoding));
+                    reader = new BufferedReader(new InputStreamReader(snappyInputStream, encoding));
                 }
                 else if ("zip".equalsIgnoreCase(compress)) {
                     ZipCycleInputStream zipCycleInputStream = new ZipCycleInputStream(inputStream);
                     reader = new BufferedReader(new InputStreamReader(zipCycleInputStream, encoding), bufferSize);
                 }
-                else {
-                    throw AddaxException
-                            .asAddaxException(
-                                    StorageReaderErrorCode.ILLEGAL_VALUE,
-                                    String.format("仅支持 gzip, bzip2, zip, lzo, lzo_deflate, hadoop-snappy, framing-snappy" +
-                                            "文件压缩格式 , 不支持您配置的文件压缩格式: [%s]", compress));
-                }
             }
-            StorageReaderUtil.doReadFromStream(reader, context,
-                    readerSliceConfig, recordSender, taskPluginCollector);
+            StorageReaderUtil.doReadFromStream(reader, context, readerSliceConfig, recordSender, taskPluginCollector);
         }
         catch (UnsupportedEncodingException uee) {
             throw AddaxException
@@ -216,13 +164,11 @@ public class StorageReaderUtil
         }
         catch (NullPointerException e) {
             throw AddaxException.asAddaxException(
-                    StorageReaderErrorCode.RUNTIME_EXCEPTION,
-                    "运行时错误, 请联系我们", e);
+                    StorageReaderErrorCode.RUNTIME_EXCEPTION, "运行时错误, 请联系我们", e);
         }
         catch (IOException e) {
             throw AddaxException.asAddaxException(
-                    StorageReaderErrorCode.READ_FILE_IO_ERROR,
-                    String.format("流读取错误 : [%s]", context), e);
+                    StorageReaderErrorCode.READ_FILE_IO_ERROR, String.format("流读取错误 : [%s]", context), e);
         }
         finally {
             IOUtils.closeQuietly(reader, null);
@@ -244,16 +190,13 @@ public class StorageReaderUtil
                     String.format("仅仅支持单字符切分, 您配置的切分为 : [%s]", delimiterInStr));
         }
         if (null == delimiterInStr) {
-            LOG.warn("您没有配置列分隔符, 使用默认值[{}]",
-                    Constant.DEFAULT_FIELD_DELIMITER);
+            LOG.warn("您没有配置列分隔符, 使用默认值[{}]", Constant.DEFAULT_FIELD_DELIMITER);
         }
 
         // warn: default value ',', fieldDelimiter could be \n(lineDelimiter)
         // for no fieldDelimiter
-        fieldDelimiter = readerSliceConfig.getChar(Key.FIELD_DELIMITER,
-                Constant.DEFAULT_FIELD_DELIMITER);
-        Boolean skipHeader = readerSliceConfig.getBool(Key.SKIP_HEADER,
-                Constant.DEFAULT_SKIP_HEADER);
+        fieldDelimiter = readerSliceConfig.getChar(Key.FIELD_DELIMITER, Constant.DEFAULT_FIELD_DELIMITER);
+        Boolean skipHeader = readerSliceConfig.getBool(Key.SKIP_HEADER, Constant.DEFAULT_SKIP_HEADER);
         // warn: no default value '\N'
         String nullFormat = readerSliceConfig.getString(Key.NULL_FORMAT);
 
@@ -277,32 +220,26 @@ public class StorageReaderUtil
             setCsvReaderConfig(csvReader);
 
             String[] parseRows;
-            while ((parseRows = StorageReaderUtil
-                    .splitBufferedReader(csvReader)) != null) {
-                StorageReaderUtil.transportOneRecord(recordSender,
-                        column, parseRows, nullFormat, taskPluginCollector);
+            while ((parseRows = StorageReaderUtil.splitBufferedReader(csvReader)) != null) {
+                StorageReaderUtil.transportOneRecord(recordSender, column, parseRows, nullFormat, taskPluginCollector);
             }
         }
         catch (UnsupportedEncodingException uee) {
-            throw AddaxException
-                    .asAddaxException(
-                            StorageReaderErrorCode.OPEN_FILE_WITH_CHARSET_ERROR,
-                            String.format("不支持的编码格式 : [%s]", encoding), uee);
+            throw AddaxException.asAddaxException(
+                    StorageReaderErrorCode.OPEN_FILE_WITH_CHARSET_ERROR,
+                    String.format("不支持的编码格式 : [%s]", encoding), uee);
         }
         catch (FileNotFoundException fnfe) {
             throw AddaxException.asAddaxException(
-                    StorageReaderErrorCode.FILE_NOT_EXISTS,
-                    String.format("无法找到文件 : [%s]", context), fnfe);
+                    StorageReaderErrorCode.FILE_NOT_EXISTS, String.format("无法找到文件 : [%s]", context), fnfe);
         }
         catch (IOException ioe) {
             throw AddaxException.asAddaxException(
-                    StorageReaderErrorCode.READ_FILE_IO_ERROR,
-                    String.format("读取文件错误 : [%s]", context), ioe);
+                    StorageReaderErrorCode.READ_FILE_IO_ERROR, String.format("读取文件错误 : [%s]", context), ioe);
         }
         catch (Exception e) {
             throw AddaxException.asAddaxException(
-                    StorageReaderErrorCode.RUNTIME_EXCEPTION,
-                    String.format("运行时异常 : %s", e.getMessage()), e);
+                    StorageReaderErrorCode.RUNTIME_EXCEPTION, String.format("运行时异常 : %s", e.getMessage()), e);
         }
         finally {
             csvReader.close();
@@ -315,32 +252,27 @@ public class StorageReaderUtil
             TaskPluginCollector taskPluginCollector,
             String line)
     {
-        List<ColumnEntry> column = StorageReaderUtil
-                .getListColumnEntry(configuration, Key.COLUMN);
+        List<ColumnEntry> column = StorageReaderUtil.getListColumnEntry(configuration, Key.COLUMN);
         // 注意: nullFormat 没有默认值
         String nullFormat = configuration.getString(Key.NULL_FORMAT);
         String delimiterInStr = configuration.getString(Key.FIELD_DELIMITER);
         if (null != delimiterInStr && 1 != delimiterInStr.length()) {
             throw AddaxException.asAddaxException(
-                    StorageReaderErrorCode.ILLEGAL_VALUE,
-                    String.format("仅仅支持单字符切分, 您配置的切分为 : [%s]", delimiterInStr));
+                    StorageReaderErrorCode.ILLEGAL_VALUE, String.format("仅仅支持单字符切分, 您配置的切分为 : [%s]", delimiterInStr));
         }
         if (null == delimiterInStr) {
-            LOG.warn(String.format("您没有配置列分隔符, 使用默认值[%s]",
-                    Constant.DEFAULT_FIELD_DELIMITER));
+            LOG.warn(String.format("您没有配置列分隔符, 使用默认值[%s]", Constant.DEFAULT_FIELD_DELIMITER));
         }
         // warn: default value ',', fieldDelimiter could be \n(lineDelimiter)
         // for no fieldDelimiter
-        Character fieldDelimiter = configuration.getChar(Key.FIELD_DELIMITER,
-                Constant.DEFAULT_FIELD_DELIMITER);
+        Character fieldDelimiter = configuration.getChar(Key.FIELD_DELIMITER, Constant.DEFAULT_FIELD_DELIMITER);
 
         String[] sourceLine = StringUtils.split(line, fieldDelimiter);
 
         return transportOneRecord(recordSender, column, sourceLine, nullFormat, taskPluginCollector);
     }
 
-    public static Record transportOneRecord(RecordSender recordSender,
-            List<ColumnEntry> columnConfigs, String[] sourceLine,
+    public static Record transportOneRecord(RecordSender recordSender, List<ColumnEntry> columnConfigs, String[] sourceLine,
             String nullFormat, TaskPluginCollector taskPluginCollector)
     {
         Record record = recordSender.createRecord();
@@ -370,29 +302,22 @@ public class StorageReaderUtil
                     String columnValue;
 
                     if (null == columnIndex && null == columnConst) {
-                        throw AddaxException
-                                .asAddaxException(
-                                        StorageReaderErrorCode.NO_INDEX_VALUE,
-                                        "由于您配置了type, 则至少需要配置 index 或 value");
+                        throw AddaxException.asAddaxException(
+                                StorageReaderErrorCode.NO_INDEX_VALUE, "由于您配置了type, 则至少需要配置 index 或 value");
                     }
 
                     if (null != columnIndex && null != columnConst) {
-                        throw AddaxException
-                                .asAddaxException(
-                                        StorageReaderErrorCode.MIXED_INDEX_VALUE,
-                                        "您混合配置了index, value, 每一列同时仅能选择其中一种");
+                        throw AddaxException.asAddaxException(
+                                StorageReaderErrorCode.MIXED_INDEX_VALUE, "您混合配置了index, value, 每一列同时仅能选择其中一种");
                     }
 
                     if (null != columnIndex) {
                         if (columnIndex >= sourceLine.length) {
-                            String message = String
-                                    .format("您尝试读取的列越界,源文件该行有 [%s] 列,您尝试读取第 [%s] 列, 数据详情[%s]",
-                                            sourceLine.length, columnIndex + 1,
-                                            StringUtils.join(sourceLine, ","));
+                            String message = String.format("您尝试读取的列越界,源文件该行有 [%s] 列,您尝试读取第 [%s] 列, 数据详情[%s]",
+                                    sourceLine.length, columnIndex + 1, StringUtils.join(sourceLine, ","));
                             LOG.warn(message);
                             throw new IndexOutOfBoundsException(message);
                         }
-
                         columnValue = sourceLine[columnIndex];
                     }
                     else {
@@ -400,7 +325,7 @@ public class StorageReaderUtil
                     }
                     Type type = Type.valueOf(columnType.toUpperCase());
                     // it's all ok if nullFormat is null
-                    if (columnValue.equals(nullFormat)) {
+                    if (columnValue == null || columnValue.equals(nullFormat)) {
                         columnValue = null;
                     }
                     String errorTemplate = "类型转换错误, 无法将[%s] 转换为[%s]";
@@ -413,9 +338,7 @@ public class StorageReaderUtil
                                 columnGenerated = new LongColumn(columnValue);
                             }
                             catch (Exception e) {
-                                throw new IllegalArgumentException(String.format(
-                                        errorTemplate, columnValue,
-                                        "LONG"));
+                                throw new IllegalArgumentException(String.format(errorTemplate, columnValue, "LONG"));
                             }
                             break;
                         case DOUBLE:
@@ -423,9 +346,7 @@ public class StorageReaderUtil
                                 columnGenerated = new DoubleColumn(columnValue);
                             }
                             catch (Exception e) {
-                                throw new IllegalArgumentException(String.format(
-                                        errorTemplate, columnValue,
-                                        "DOUBLE"));
+                                throw new IllegalArgumentException(String.format(errorTemplate, columnValue, "DOUBLE"));
                             }
                             break;
                         case BOOLEAN:
@@ -433,11 +354,8 @@ public class StorageReaderUtil
                                 columnGenerated = new BoolColumn(columnValue);
                             }
                             catch (Exception e) {
-                                throw new IllegalArgumentException(String.format(
-                                        errorTemplate, columnValue,
-                                        "BOOLEAN"));
+                                throw new IllegalArgumentException(String.format(errorTemplate, columnValue, "BOOLEAN"));
                             }
-
                             break;
                         case DATE:
                             try {
@@ -449,46 +367,32 @@ public class StorageReaderUtil
                                     String formatString = columnConfig.getFormat();
                                     if (StringUtils.isNotBlank(formatString)) {
                                         // 用户自己配置的格式转换, 脏数据行为出现变化
-                                        DateFormat format = columnConfig
-                                                .getDateFormat();
-                                        columnGenerated = new DateColumn(
-                                                format.parse(columnValue));
+                                        DateFormat format = columnConfig.getDateFormat();
+                                        columnGenerated = new DateColumn(format.parse(columnValue));
                                     }
                                     else {
                                         // 框架尝试转换
-                                        columnGenerated = new DateColumn(
-                                                new StringColumn(columnValue)
-                                                        .asDate());
+                                        columnGenerated = new DateColumn(new StringColumn(columnValue).asDate());
                                     }
                                 }
                             }
                             catch (Exception e) {
-                                throw new IllegalArgumentException(String.format(
-                                        errorTemplate, columnValue,
-                                        "DATE"));
+                                throw new IllegalArgumentException(String.format(errorTemplate, columnValue, "DATE"));
                             }
                             break;
                         default:
-                            String errorMessage = String.format(
-                                    "您配置的列类型暂不支持 : [%s]", columnType);
+                            String errorMessage = String.format("您配置的列类型暂不支持 : [%s]", columnType);
                             LOG.error(errorMessage);
-                            throw AddaxException
-                                    .asAddaxException(
-                                            StorageReaderErrorCode.NOT_SUPPORT_TYPE,
-                                            errorMessage);
+                            throw AddaxException.asAddaxException(StorageReaderErrorCode.NOT_SUPPORT_TYPE, errorMessage);
                     }
 
                     record.addColumn(columnGenerated);
                 }
                 recordSender.sendToWriter(record);
             }
-            catch (IllegalArgumentException iae) {
-                taskPluginCollector
-                        .collectDirtyRecord(record, iae.getMessage());
-            }
-            catch (IndexOutOfBoundsException ioe) {
-                taskPluginCollector
-                        .collectDirtyRecord(record, ioe.getMessage());
+            catch (IllegalArgumentException | IndexOutOfBoundsException iae) {
+                LOG.error(iae.getMessage());
+                taskPluginCollector.collectDirtyRecord(record, iae.getMessage());
             }
             catch (Exception e) {
                 if (e instanceof AddaxException) {
@@ -504,7 +408,15 @@ public class StorageReaderUtil
 
     public static List<ColumnEntry> getListColumnEntry(Configuration configuration, final String path)
     {
-        return ColumnUtil.getListColumnEntry(configuration, path);
+        List<JSONObject> lists = configuration.getList(path, JSONObject.class);
+        if (lists == null) {
+            return null;
+        }
+        List<ColumnEntry> result = new ArrayList<ColumnEntry>();
+        for (final JSONObject object : lists) {
+            result.add(JSON.parseObject(object.toJSONString(), ColumnEntry.class));
+        }
+        return result;
     }
 
     /**
@@ -553,13 +465,9 @@ public class StorageReaderUtil
                 .getUnnecessaryValue(Key.COMPRESS, null);
         if (StringUtils.isNotBlank(compress)) {
             compress = compress.toLowerCase().trim();
-            boolean compressTag = "gzip".equals(compress) || "bzip2".equals(compress) || "zip".equals(compress)
-                    || "lzo".equals(compress) || "lzo_deflate".equals(compress) || "hadoop-snappy".equals(compress)
-                    || "framing-snappy".equals(compress);
-            if (!compressTag) {
+            if (!SUPPORTED_COMPRESSES.contains(compress)) {
                 throw AddaxException.asAddaxException(StorageReaderErrorCode.ILLEGAL_VALUE,
-                        String.format("仅支持 gzip, bzip2, zip, lzo, lzo_deflate, hadoop-snappy, framing-snappy " +
-                                "文件压缩格式, 不支持您配置的文件压缩格式: [%s]", compress));
+                        String.format("%s is unsupported, all supported compression are %s ", compress, SUPPORTED_COMPRESSES));
             }
         }
         else {
@@ -572,7 +480,7 @@ public class StorageReaderUtil
     public static void validateFieldDelimiter(Configuration readerConfiguration)
     {
         //fieldDelimiter check
-        String delimiterInStr = readerConfiguration.getString(Key.FIELD_DELIMITER, null);
+        String delimiterInStr = readerConfiguration.getString(Key.FIELD_DELIMITER, ",");
         if (null == delimiterInStr) {
             throw AddaxException.asAddaxException(StorageReaderErrorCode.REQUIRED_VALUE,
                     String.format("您提供配置文件有误，[%s]是必填参数.",
@@ -589,8 +497,7 @@ public class StorageReaderUtil
     {
         // column: 1. index type 2.value type 3.when type is Date, may have
         // format
-        List<Configuration> columns = readerConfiguration
-                .getListConfiguration(Key.COLUMN);
+        List<Configuration> columns = readerConfiguration.getListConfiguration(Key.COLUMN);
         if (null == columns || columns.isEmpty()) {
             throw AddaxException.asAddaxException(StorageReaderErrorCode.REQUIRED_VALUE, "您需要指定 columns");
         }
@@ -611,16 +518,16 @@ public class StorageReaderUtil
 
                 if (null == columnIndex && null == columnValue) {
                     throw AddaxException.asAddaxException(StorageReaderErrorCode.NO_INDEX_VALUE,
-                            "由于您配置了type, 则至少需要配置 index 或 value");
+                            "You must configure one of index or name or value");
                 }
 
                 if (null != columnIndex && null != columnValue) {
                     throw AddaxException.asAddaxException(StorageReaderErrorCode.MIXED_INDEX_VALUE,
-                            "您混合配置了index, value, 每一列同时仅能选择其中一种");
+                            "You both configure index, value, or name, you can ONLY specify the one each column");
                 }
                 if (null != columnIndex && columnIndex < 0) {
                     throw AddaxException.asAddaxException(StorageReaderErrorCode.ILLEGAL_VALUE,
-                            String.format("index需要大于等于0, 您配置的index为[%s]", columnIndex));
+                            String.format("The value of index must be greater than 0, %s is illegal", columnIndex));
                 }
             }
         }
