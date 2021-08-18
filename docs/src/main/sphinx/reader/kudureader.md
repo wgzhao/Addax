@@ -12,13 +12,13 @@ KuduReader 插件利用 Kudu 的java客户端KuduClient进行Kudu的读操作。
 ```sql
 CREATE TABLE kudu.default.users (
   user_id int WITH (primary_key = true),
-  user_name varchar,
-  age int,
-  salary double,
-  longtitue decimal(18,6),
-  latitude decimal(18,6),
-  p decimal(21,20),
-  mtime timestamp
+  user_name varchar with (nullable=true),
+  age int with (nullable=true),
+  salary double with (nullable=true),
+  longtitue decimal(18,6) with (nullable=true),
+  latitude decimal(18,6) with (nullable=true),
+  p decimal(21,20) with (nullable=true),
+  mtime timestamp with (nullable=true)
 ) WITH (
   partition_by_hash_columns = ARRAY['user_id'],
   partition_by_hash_buckets = 2
@@ -107,7 +107,8 @@ bin/addax.sh job/kudu2stream.json
 					"lowerBound":1,
 					"splitPk":"user_id",
 					"table":"users",
-					"scanTimeout":10
+					"scanTimeout":10,
+					"column":[]
 				},
 				"name":"kudureader"
 			},
@@ -145,8 +146,8 @@ bin/addax.sh job/kudu2stream.json
 
 ## 参数说明
 
-| 配置项    | 是否必须 |  类型      |默认值 | 描述                                                                                                                                   |
-| :-------- | :------: | ------ | -----|------------------------------------------------------------------------------------------------------------------------------|
+| 配置项    | 是否必须 |  类型      |默认值 | 描述                                            |
+| :-------- | :------: | ------ | -----|------------------------------------------------|
 | masterAddress | 必须 | string  |  无  | Kudu Master集群RPC地址,多个地址用逗号(,)分隔 |
 | table | 必须  |  string | 无 | kudu 表名 |
 | splitPk | 否 |  string | 无  | 并行读取数据分片字段 |
@@ -154,6 +155,7 @@ bin/addax.sh job/kudu2stream.json
 | upperBound | 否 | string | 无 | 并行读取数据分片范围上界 |
 | readTimeout | 否 | int  | 10 | 读取数据超时(秒) |
 | scanTimeout | 否  | int | 20  | 数据扫描请求超时(秒) |
+| column      | 否  | list | 无 | 指定要获取的字段，多个字段用逗号分隔，比如 `"column":["user_id","user_name","age"]` |
 
 ## 类型转换
 

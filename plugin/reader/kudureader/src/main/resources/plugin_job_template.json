@@ -7,6 +7,9 @@
         "lowerBound": "min",
         "upperBound": "max",
         "ReadTimeoutMs": 30000,
-        "scanRequestTimeout": 30000
+        "scanRequestTimeout": 30000,
+        "columns": [
+            "col1", "col2", "col3"
+        ]
     }
 }
