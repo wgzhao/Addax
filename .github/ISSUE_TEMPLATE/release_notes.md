@@ -8,14 +8,13 @@ assignees: wgzhao
 
 ## General
 
-
 ## Reader plugins
 
 ### cassandra reader
 
 ### clickhouse reader
 
-### dbffile reader
+### dbf reader
 
 ### elasticsearch reader
 
@@ -59,14 +58,13 @@ assignees: wgzhao
 
 ### txtfile reader
 
-
 ## Writer plugins
 
 ### cassandra writer
 
 ### clickhouse writer
 
-### dbffile writer
+### dbf writer
 
 ### doris writer
 
