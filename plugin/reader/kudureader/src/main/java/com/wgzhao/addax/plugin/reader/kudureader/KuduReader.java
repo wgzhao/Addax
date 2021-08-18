@@ -45,6 +45,8 @@ import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
 
+import static com.wgzhao.addax.common.base.Key.COLUMN;
+
 /**
  * Kudu reader plugin
  */
@@ -133,11 +135,13 @@ public class KuduReader
         private String upperBound;
 
         private Long scanRequestTimeout;
+        private List<String> columns;
+        private boolean specifyColumn = false;
 
         @Override
         public void startRead(RecordSender recordSender)
         {
-            KuduTable kuduTable = null;
+            KuduTable kuduTable;
             try {
                 kuduTable = kuduClient.openTable(tableName);
             }
@@ -167,16 +171,28 @@ public class KuduReader
                         KuduPredicate.ComparisonOp.LESS_EQUAL,
                         Integer.parseInt(upperBound)
                 );
-                kuduScanner = kuduScannerBuilder
+                kuduScannerBuilder
                         .addPredicate(lowerBoundPredicate)
-                        .addPredicate(upperBoundPredicate)
-                        .build();
-            }
-            else {
-                kuduScanner = kuduScannerBuilder.build();
+                        .addPredicate(upperBoundPredicate);
+                if (specifyColumn) {
+                    // judge specific column exists or not
+
+                    for (String column: columns) {
+                        if (!schema.hasColumn(column)) {
+                            throw AddaxException.asAddaxException(
+                                    KuduReaderErrorCode.ILLEGAL_VALUE,
+                                    "column '" + column + "' does not exists in the table '" + tableName + "'"
+                            );
+                        }
+                    }
+                    kuduScannerBuilder.setProjectedColumnNames(columns);
+                }
             }
 
-            List<ColumnSchema> columnSchemas = schema.getColumns();
+            kuduScanner = kuduScannerBuilder.build();
+
+//            List<ColumnSchema> columnSchemas = schema.getColumns();
+            List<ColumnSchema> columnSchemas = kuduScanner.getProjectionSchema().getColumns();
 
             while (kuduScanner.hasMoreRows()) {
                 RowResultIterator rows;
@@ -282,6 +298,10 @@ public class KuduReader
             lowerBound = readerSliceConfig.getString(KuduKey.SPLIT_LOWER_BOUND);
             upperBound = readerSliceConfig.getString(KuduKey.SPLIT_UPPER_BOUND);
             splitKey = readerSliceConfig.getString(KuduKey.SPLIT_KEY);
+            columns = readerSliceConfig.getList(COLUMN, String.class);
+            if (! columns.isEmpty()) {
+                specifyColumn = columns.size() != 1 || (!"*".equals(columns.get(0)) && !"\"*\"".equals(columns.get(0)));
+            }
         }
 
         @Override
