@@ -373,7 +373,7 @@ public class DbfFileWriter
                     Column column;
                     for (int i = 0; i < columns.size(); i++) {
                         column = record.getColumn(i);
-                        if (column != null && null != column.getRawData()) {
+                        if (column != null && null != column.getRawData() && "null" != column.getRawData()) {
                             String colData = column.getRawData().toString();
                             switch (columns.get(i).getString(Key.TYPE)) {
                                 case "numeric":
