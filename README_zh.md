@@ -81,6 +81,8 @@
 
 ## 支持的数据库一览表
 
+![supported databases](docs/src/main/sphinx/images/supported_databases.png)
+
 | 数据库或文件系统    | 读取  | 写入   | 插件名称(reader/writer)                  | 备注                                                                                 |
 | ---------------- | ---- | ------ | ---------------------------------------| ------------------------------------------------------------------------------------ |
 | Cassandra        | 支持 | 支持   | cassandrareader/cassandrawriter         |                                                                                      |
