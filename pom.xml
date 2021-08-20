@@ -194,10 +194,10 @@
 
     <build>
         <plugins>
-        <!--    <plugin>
+        <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-enforcer-plugin</artifactId>
-                <version>3.0.0-M3</version>
+                <version>3.0.0</version>
                 <configuration>
                     <rules>
                         <compound implementation="com.github.ferstl.maven.pomenforcers.CompoundPedanticEnforcer">
@@ -212,14 +212,20 @@
                             <dependencyManagementOrderBy>groupId,artifactId</dependencyManagementOrderBy>
                             <dependencyManagementGroupIdPriorities>com.wgzhao</dependencyManagementGroupIdPriorities>
                         </compound>
-                        <requireUpperBoundDeps>
-                            <excludes combine.children="append">
-                                <exclude>org.codehaus.plexus:plexus-utils</exclude>
-                                <exclude>com.google.guava:guava</exclude>
-                                <exclude>com.fasterxml.jackson.core:jackson-core</exclude>
-                                <exclude>com.google.j2objc:j2objc-annotations</exclude>
+                        <bannedPlugins>
+                            <!-- will only display a warning but does not fail the build. -->
+                            <level>WARN</level>
+                            <excludes>
+                                <exclude>org.apache.maven.plugins:maven-verifier-plugin</exclude>
                             </excludes>
-                        </requireUpperBoundDeps>
+                            <message>Please consider using the maven-invoker-plugin (http://maven.apache.org/plugins/maven-invoker-plugin/)!</message>
+                        </bannedPlugins>
+                        <requireMavenVersion>
+                            <version>(3.5.4,)</version>
+                        </requireMavenVersion>
+                        <requireJavaVersion>
+                            <version>1.8</version>
+                        </requireJavaVersion>
                     </rules>
                 </configuration>
                 <dependencies>
@@ -229,7 +235,7 @@
                         <version>2.0.0</version>
                     </dependency>
                 </dependencies>
-            </plugin>-->
+            </plugin>
 
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
