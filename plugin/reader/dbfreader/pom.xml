@@ -19,6 +19,12 @@
         </dependency>
 
         <dependency>
+            <groupId>com.wgzhao.addax</groupId>
+            <artifactId>addax-storage</artifactId>
+            <version>4.0.3-SNAPSHOT</version>
+        </dependency>
+
+        <dependency>
             <groupId>com.github.albfernandez</groupId>
             <artifactId>javadbf</artifactId>
             <version>1.13.1</version>
@@ -35,12 +41,7 @@
             <artifactId>slf4j-api</artifactId>
             <version>${slf4j.version}</version>
         </dependency>
-        <dependency>
-            <groupId>com.wgzhao.addax</groupId>
-            <artifactId>addax-storage</artifactId>
-            <version>4.0.3-SNAPSHOT</version>
-            <scope>compile</scope>
-        </dependency>
+
     </dependencies>
 
     <build>
