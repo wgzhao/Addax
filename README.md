@@ -26,81 +26,10 @@ As of `3.2.1`, the package class names have been changed and are therefore no lo
 
 The project, originally from Ali's [DataX]((https://github.com/alibaba/datax)), has been streamlined and adapted, as described below
 
-## Description of functional differences
-
-### Removed
-
-Deleted databases that were restricted to Ali internal databases that were not available in 
-non-Ali groups and were therefore deleted outright, including:
-
-- ADS
-- DRDS
-- OCS
-- ODPS
-- OSS
-- OTS
-
-### Added
-
-Added some plug-ins, which currently include
-
-#### reader plugin
-
-1. clickhousereader
-2. dbffilereader
-3. hbase20xreader
-4. jsonfilereader
-5. kudureader
-6. influxdbreader
-7. httpreader
-8. elastichsearchreader
-9. tdenginereader
-
-#### writer plugin
-
-1. dbffilewrite
-2. greenplumwriter
-3. kuduwriter
-4. influxdbwriter
-5. tdenginewriter
-
-### Some plug-in enhancements are listed below
-
-#### rdbms-ralative plugins
-
-add support for almost basic data type, and some complex data type.
-
-#### hdfswriter
-
-1. Add support for Decimal data type.
-2. Add support for writing Parquet files.
-3. Add support for writing with the overwrite mode.
-4. Add support for more compression algorithm.
-5. The temporary directory location is changed to a hidden directory under the current write directory, which solves the problem of automatic partition increase caused by the previous parallelism with the write directory.
-6. In overwrite mode, the file deletion mechanism has been improved to reduce the time window when the corresponding table query is empty
-
-#### hdfsreader
-
-1. Add support for reading Parquet files.
-2. Add support for more compression algorithm.
-
-#### hbasex11sqlwrite
-
-1. Add support for Kerberos authentication.
-
-#### oraclewriter
-
-1. Add support for `merge into` statement.
-
-#### postgresqlwriter
-
-1. Add support for `insert into ... on conflict` statement.
-
-#### rdbmsreader/rdbmswriter
-
-1. Add support TDH Inceptor, Trino query engine
 
 ## Supported databases
+
+![supported databases](docs/src/main/sphinx/images/supported_databases.png)
 
 | database/filesystem | reader | writer | plugin(reader/writer)                   | memo                                                                                       |
 | ------------------- | ------ | ------ | --------------------------------------- | ------------------------------------------------------------------------------------------ |
