@@ -28,6 +28,7 @@ import com.wgzhao.addax.common.util.Configuration;
 import com.wgzhao.addax.storage.reader.StorageReaderUtil;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.BooleanUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -55,7 +56,7 @@ public class TxtFileReader
         private static final Logger LOG = LoggerFactory.getLogger(Job.class);
 
         private Configuration originConfig = null;
-        private final List<String> path = null;
+        private List<String> path = null;
         private List<String> sourceFiles;
         private Map<String, Pattern> pattern;
         private Map<String, Boolean> isRegexPath;
@@ -74,6 +75,22 @@ public class TxtFileReader
         public void prepare()
         {
             LOG.debug("prepare() begin...");
+            // Compatible with the old version, path is a string before
+            String pathInString = this.originConfig.getNecessaryValue(Key.PATH, TxtFileReaderErrorCode.REQUIRED_VALUE);
+            if (StringUtils.isBlank(pathInString)) {
+                throw AddaxException.asAddaxException(TxtFileReaderErrorCode.REQUIRED_VALUE, "the path is required");
+            }
+            if (!pathInString.startsWith("[") && !pathInString.endsWith("]")) {
+                path = new ArrayList<>();
+                path.add(pathInString);
+            }
+            else {
+                path = this.originConfig.getList(Key.PATH, String.class);
+                if (null == path || path.isEmpty()) {
+                    throw AddaxException.asAddaxException(TxtFileReaderErrorCode.REQUIRED_VALUE, "the path is required");
+                }
+            }
+
             // warn:make sure this regex string
             // warn:no need trim
             for (String eachPath : this.path) {
@@ -93,7 +110,7 @@ public class TxtFileReader
             if (needReadColumnName) {
                 convertColumnNameToIndex(this.sourceFiles.get(0));
             }
-            LOG.info("您即将读取的文件数为: [{}]", this.sourceFiles.size());
+            LOG.info("The number of files to read is: [{}]", this.sourceFiles.size());
         }
 
         @Override
