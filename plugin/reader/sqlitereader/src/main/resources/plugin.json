@@ -1,0 +1,6 @@
+{
+  "name": "sqlitereader",
+  "class": "com.wgzhao.addax.plugin.reader.sqlitereader.SqliteReader",
+  "description": "read sqlite file via jdbc protocol",
+  "developer": "wgzhao"
+}

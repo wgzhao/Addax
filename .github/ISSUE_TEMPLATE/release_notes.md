@@ -50,6 +50,8 @@ assignees: wgzhao
 
 ### redis reader
 
+### sqlite reader
+
 ### sqlserver reader
 
 ### stream reader

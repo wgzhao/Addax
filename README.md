@@ -55,6 +55,7 @@ The project, originally from Ali's [DataX]((https://github.com/alibaba/datax)), 
 | PostgreSQL          | YES    | YES    | postgresqlreader/postgresqlwriter       |                                                                                            |
 | Trino               | YES    | YES    | rdbmsreader/rdbmswriter                 | [trino( formerly PrestoSQL)](https://trino.io)                                             |
 | Redis               | YES    | YES    | redisreader/rediswriter                 |                                                                                            |
+| SQLite              | YES    | NO     | sqlitereader                            | |
 | SQL Server          | YES    | YES    | sqlserverreader/sqlserverwriter         |                                                                                            |
 | TDengine            | YES    | YES    | tdenginereader/tdenginewriter           | [TDengine](https://www.taosdata.com/cn/)                                                   |
 | TDH Inceptor2       | YES    | YES    | rdbmsreader/rdbmswriter                 | [Transwarp TDH](http://transwarp.cn/transwarp/product-TDH.html?categoryId=18) 5.1 or later |
