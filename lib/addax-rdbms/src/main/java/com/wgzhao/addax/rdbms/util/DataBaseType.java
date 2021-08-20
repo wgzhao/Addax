@@ -36,6 +36,7 @@ public enum DataBaseType
     Oracle("oracle", "oracle.jdbc.OracleDriver"),
     Presto("presto", "io.prestosql.jdbc.PrestoDriver"),
     ClickHouse("clickhouse", "ru.yandex.clickhouse.ClickHouseDriver"),
+    SQLite("sqlite", "org.sqlite.JDBC"),
     SQLServer("sqlserver", "com.microsoft.sqlserver.jdbc.SQLServerDriver"),
     PostgreSQL("postgresql", "org.postgresql.Driver"),
     RDBMS("rdbms", "com.wgzhao.addax.plugin.rdbms.util.DataBaseType"),

@@ -28,6 +28,7 @@
     PostgreSQL Reader               <reader/postgresqlreader>
     RDBMS Reader                    <reader/rdbmsreader>
     Redis Reader                    <reader/redisreader>
+    SQLite Reader                   <reader/sqlitereader>
     SQLServer Reader                <reader/sqlserverreader>
     Stream  Reader                  <reader/streamreader>
     TDengine Reader                 <reader/tdenginereader>

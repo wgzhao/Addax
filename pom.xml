@@ -104,6 +104,7 @@
         <module>plugin/reader/postgresqlreader</module>
         <module>plugin/reader/rdbmsreader</module>
         <module>plugin/reader/redisreader</module>
+        <module>plugin/reader/sqlitereader</module>
         <module>plugin/reader/sqlserverreader</module>
         <module>plugin/reader/streamreader</module>
         <module>plugin/reader/tdenginereader</module>
