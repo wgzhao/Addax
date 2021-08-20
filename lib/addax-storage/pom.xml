@@ -47,6 +47,12 @@
         </dependency>
 
         <dependency>
+            <groupId>io.prestosql.hadoop</groupId>
+            <artifactId>hadoop-apache</artifactId>
+            <version>${hadoop.version}</version>
+        </dependency>
+
+        <dependency>
             <groupId>net.sourceforge.javacsv</groupId>
             <artifactId>javacsv</artifactId>
             <version>2.0</version>
@@ -61,12 +67,6 @@
         <dependency>
             <groupId>org.slf4j</groupId>
             <artifactId>slf4j-api</artifactId>
-        </dependency>
-
-        <dependency>
-            <groupId>io.prestosql.hadoop</groupId>
-            <artifactId>hadoop-apache</artifactId>
-            <version>${hadoop.version}</version>
         </dependency>
 
     </dependencies>
