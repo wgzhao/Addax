@@ -130,6 +130,7 @@
         <module>plugin/writer/postgresqlwriter</module>
         <module>plugin/writer/rdbmswriter</module>
         <module>plugin/writer/rediswriter</module>
+        <module>plugin/writer/sqlitewriter</module>
         <module>plugin/writer/sqlserverwriter</module>
         <module>plugin/writer/streamwriter</module>
         <module>plugin/writer/tdenginewriter</module>

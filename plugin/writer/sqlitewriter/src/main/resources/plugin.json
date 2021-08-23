@@ -1,0 +1,6 @@
+{
+  "name": "sqlitewriter",
+  "class": "com.wgzhao.addax.plugin.writer.sqlitewriter.SqliteWriter",
+  "description": "write a sqlite db file",
+  "developer": "wgzhao"
+}
