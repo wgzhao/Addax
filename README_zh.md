@@ -5,7 +5,7 @@
 <p align="center"><a href="https://addax.readthedocs.io">使用文档</a> 详细描述了如何安装部署和每个采集插件的使用方法 </p>
 <p align="center">
    <a href="https://github.com/wgzhao/addax/release">
-      <img src="https://img.shields.io/github/release/wgzhao/addax.svg" alt="relase version"/>
+      <img src="https://img.shields.io/github/release/wgzhao/addax.svg" alt="release version"/>
     </a>
    <a href="https://github.com/wgzhao/Addax/workflows/Maven%20Package/badge.svg">
        <img src="https://github.com/wgzhao/Addax/workflows/Maven%20Package/badge.svg" alt="Maven Package" />
