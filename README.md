@@ -18,7 +18,6 @@
 
 English | [简体中文](README_zh.md)
 
-
 The project, originally from Ali's [DataX]((https://github.com/alibaba/datax)), has been streamlined and adapted, as described below
 
 ## Supported databases
@@ -282,6 +281,7 @@ Addax	19890604	1989-06-04 00:00:00	true	test
 
 </details>
 
+[Here](core/src/main/job) are some job configuration examples
 
 ## runtime requirements
 

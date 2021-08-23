@@ -6,6 +6,8 @@
     :titlesonly:
 
     introduction
+    quickstart
+    setupJob
     reader
     writer
     transformer
