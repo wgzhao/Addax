@@ -100,6 +100,8 @@ assignees: wgzhao
 
 ### redis writer
 
+### sqlite writer
+
 ### sqlserver writer
 
 ### stream writer
