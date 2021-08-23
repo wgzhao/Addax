@@ -1,0 +1,14 @@
+{
+  "name": "sqlitewriter",
+  "parameter": {
+    "writeMode": "",
+    "column": [],
+    "preSql": [],
+    "connection": [
+      {
+        "jdbcUrl": "",
+        "table": []
+      }
+    ]
+  }
+}
