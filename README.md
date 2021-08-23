@@ -18,14 +18,8 @@
 
 English | [简体中文](README_zh.md)
 
-# I'm changing DataX to Addax
-
-We will use new brand `addax` since `4.0.0` and therefore no longer compatible with prior versions.
-
-As of `3.2.1`, the package class names have been changed and are therefore no longer compatible with `3.1.x` versions.
 
 The project, originally from Ali's [DataX]((https://github.com/alibaba/datax)), has been streamlined and adapted, as described below
-
 
 ## Supported databases
 
@@ -55,7 +49,7 @@ The project, originally from Ali's [DataX]((https://github.com/alibaba/datax)), 
 | PostgreSQL          | YES    | YES    | postgresqlreader/postgresqlwriter       |                                                                                            |
 | Trino               | YES    | YES    | rdbmsreader/rdbmswriter                 | [trino( formerly PrestoSQL)](https://trino.io)                                             |
 | Redis               | YES    | YES    | redisreader/rediswriter                 |                                                                                            |
-| SQLite              | YES    | NO     | sqlitereader                            | |
+| SQLite              | YES    | YES    | sqlitereader/sqlitewriter               | |
 | SQL Server          | YES    | YES    | sqlserverreader/sqlserverwriter         |                                                                                            |
 | TDengine            | YES    | YES    | tdenginereader/tdenginewriter           | [TDengine](https://www.taosdata.com/cn/)                                                   |
 | TDH Inceptor2       | YES    | YES    | rdbmsreader/rdbmswriter                 | [Transwarp TDH](http://transwarp.cn/transwarp/product-TDH.html?categoryId=18) 5.1 or later |

@@ -107,7 +107,7 @@
 | PostgreSQL       | 支持 | 支持   | postgresqlreader/postgresqlwriter       |                                                                                      |
 | PrestoSQL        | 支持 | 支持   | rdbmsreader/rdbmswriter                 | [trino(原PrestoSQL)](https://trino.io) 310以上                                       |
 | Redis            | 支持 | 支持   | redisreader/rediswriter                 |                                                                                      |
-| SQLite           | 支持 | 不支持  | sqlitereader                            | |
+| SQLite           | 支持 | 支持   | sqlitereader/sqlitewriter               | |
 | SQL Server       | 支持 | 支持   | sqlserverreader/sqlserverwriter         |                                                                                      |
 | TDengine         | 支持 | 支持   | tdenginereader/tdenginewriter           | 支持 [TDengine](https://www.taosdata.com/cn/) 数据库读写                             |
 | TDH Inceptor2    | 支持 | 支持   | rdbmsreader/rdbmswriter                 | [星环 TDH](http://transwarp.cn/transwarp/product-TDH.html?categoryId=18) 5.1以上版本 |
