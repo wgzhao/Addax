@@ -236,7 +236,7 @@ public class TxtFileWriter
         private String fileName;
         private String fileFormat;
         // add correspond compress suffix if compress is present
-        private String suffix;
+        private String suffix = "";
 
         @Override
         public void init()
