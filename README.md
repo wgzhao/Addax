@@ -54,7 +54,7 @@ The project, originally from Ali's [DataX]((https://github.com/alibaba/datax)), 
 | TDH Inceptor2       | YES    | YES    | rdbmsreader/rdbmswriter                 | [Transwarp TDH](http://transwarp.cn/transwarp/product-TDH.html?categoryId=18) 5.1 or later |
 | TEXT                | YES    | YES    | textfilereader/textfilewriter           |                                                                                            |
 
-## quick started
+## Quick Started
 
 ### Use docker image
 
@@ -92,7 +92,7 @@ If you are too lazy to compile or cannot compile because of your environment, yo
 other plug-ins need to be downloaded separately, the download shared directory list is as the following.
 3. Because Aliyun drive does not support the sharing of compressed files currently, So, I add a .jpg suffix for each binary file, you need to remove this suffix before you can use them   
 
-### plugins download
+### Plugins download
 
 | version | download link                                              |
 | ------- | ---------------------------------------------------------- |
@@ -101,7 +101,7 @@ other plug-ins need to be downloaded separately, the download shared directory l
 | 3.2.4   | https://pan.baidu.com/s/1gPJlJh66bGQUSUR-2mNOQw code: 7c4j |
 | 3.2.3   | https://pan.baidu.com/s/1g4z3Pqc_BxKstkiYjWXopQ code: 2fip |
 
-### compile and package
+### Compile and Package
 
 ```shell
 git clone https://github.com/wgzhao/addax.git addax
@@ -119,7 +119,7 @@ mvn clean package
 
 After successful compilation and packaging, a `addax-<version>` folder will be created in the `target/datax` directory of the project directory, where `<version` indicates the version.
 
-### begin your first job
+### Begin your first task
 
 The `job` subdirectory contains many sample jobs, of which `job.json` can be used as a smoke-out test and executed as follows
 
@@ -283,12 +283,12 @@ Addax	19890604	1989-06-04 00:00:00	true	test
 
 [Here](core/src/main/job) are some job configuration examples
 
-## runtime requirements
+## Runtime Requirements
 
 - JDK 1.8+
 - Python 2.7+ / Python 3.7+ (Windows)
 
-## documentation
+## Documentation
 
 - [online](https://addax.readthedocs.io)
 - [project](docs/src/main/sphinx/index.rst)
