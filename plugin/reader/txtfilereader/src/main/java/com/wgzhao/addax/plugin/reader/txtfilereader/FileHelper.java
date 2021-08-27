@@ -107,7 +107,7 @@ public class FileHelper
                 }
                 else {
                     BufferedInputStream bis = new BufferedInputStream(inputStream);
-                    CompressorInputStream input = new CompressorStreamFactory().createCompressorInputStream(bis);
+                    CompressorInputStream input = new CompressorStreamFactory().createCompressorInputStream(compressType, bis, true);
                     reader = new BufferedReader(new InputStreamReader(input, encoding), bufferSize);
                 }
             }
