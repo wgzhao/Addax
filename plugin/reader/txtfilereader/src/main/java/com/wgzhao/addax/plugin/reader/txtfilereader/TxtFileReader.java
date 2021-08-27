@@ -34,6 +34,8 @@ import org.slf4j.LoggerFactory;
 
 import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -316,9 +318,6 @@ public class TxtFileReader
 
         private Configuration readerSliceConfig;
         private List<String> sourceFiles;
-        private String encoding;
-        private int bufferSize;
-
 
         @Override
         public void init()
@@ -326,8 +325,6 @@ public class TxtFileReader
             this.readerSliceConfig = this.getPluginJobConf();
             this.sourceFiles = this.readerSliceConfig.getList(Key.SOURCE_FILES, String.class);
 
-            this.encoding = this.readerSliceConfig.getString(Key.ENCODING);
-            this.bufferSize = readerSliceConfig.getInt(Key.BUFFER_SIZE, Constant.DEFAULT_BUFFER_SIZE);
         }
 
         @Override
@@ -352,13 +349,19 @@ public class TxtFileReader
         public void startRead(RecordSender recordSender)
         {
             LOG.debug("start read source files...");
-            BufferedReader reader;
+            FileInputStream inputStream;
             for (String fileName : this.sourceFiles) {
                 LOG.info("reading file : [{}]", fileName);
-                reader = FileHelper.readCompressFile(fileName, encoding, bufferSize);
-                StorageReaderUtil.doReadFromStream(reader, fileName, readerSliceConfig, recordSender, getTaskPluginCollector());
-                recordSender.flush();
-                IOUtils.closeQuietly(reader, null);
+                try {
+                    inputStream = new FileInputStream(fileName);
+                }
+                catch (FileNotFoundException e) {
+                    throw AddaxException.asAddaxException(
+                            TxtFileReaderErrorCode.OPEN_FILE_ERROR,
+                            "Open file '" + fileName + "' failure"
+                    );
+                }
+                StorageReaderUtil.readFromStream(inputStream, fileName, readerSliceConfig, recordSender, getTaskPluginCollector());
             }
             LOG.debug("end read source files...");
         }
