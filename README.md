@@ -69,6 +69,7 @@ If you are too lazy to compile or cannot compile because of your environment, yo
 
 | version | download                                                   | md5                              |
 | ------- | ---------------------------------------------------------- | -------------------------------- |
+| 4.0.3   | https://www.aliyundrive.com/s/8CRAfMBbwfm                  | 19766c2577b46bd5b22d63a502f5f5dd |
 | 4.0.2   | https://www.aliyundrive.com/s/U5uotY7vVAY                  | cd3a3d6d0c79cbd3bcd259ebb47acbc5 |
 | 4.0.1   | https://www.aliyundrive.com/s/BwbUJr21baH                  | 8f1963e8ce5e5f880a29a503399413a6 |
 | 4.0.0   | https://pan.baidu.com/s/1qmV6ed3CYpACIp29JCIDgQ code: 559q | b9b759da228f3bc656965d20357dcb2a |

@@ -128,7 +128,8 @@ docker run -ti --rm --name addax wgzhao/addax:latest /opt/addax/bin/addax.sh /op
 
 | 版本  | 连接地址                                                     | md5值                            |
 | ----- | ------------------------------------------------------------| -------------------------------- |
-| 4.0.2   | https://www.aliyundrive.com/s/U5uotY7vVAY                 | cd3a3d6d0c79cbd3bcd259ebb47acbc5 |
+| 4.0.3 | https://www.aliyundrive.com/s/8CRAfMBbwfm                   | 19766c2577b46bd5b22d63a502f5f5dd |
+| 4.0.2 | https://www.aliyundrive.com/s/U5uotY7vVAY                   | cd3a3d6d0c79cbd3bcd259ebb47acbc5 |
 | 4.0.1 | https://www.aliyundrive.com/s/BwbUJr21baH                   | 8f1963e8ce5e5f880a29a503399413a6 |
 | 4.0.0 | https://pan.baidu.com/s/1qmV6ed3CYpACIp29JCIDgQ 提取码: 559q | b9b759da228f3bc656965d20357dcb2a |
 | 3.2.5 | https://pan.baidu.com/s/14_MnbtRUtJlvQh8tTKv6fg 提取码: 1jdr | 43ddd0186ccbaf1f1bfee0aac22da935 |
