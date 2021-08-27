@@ -133,7 +133,7 @@ public class StorageReaderUtil
                     reader = new BufferedReader(new InputStreamReader(lzopInputStream, encoding));
                 }
                 else if ("gzip".equalsIgnoreCase(compress)) {
-                    CompressorInputStream compressorInputStream = new GzipCompressorInputStream(inputStream);
+                    CompressorInputStream compressorInputStream = new GzipCompressorInputStream(inputStream, true);
                     reader = new BufferedReader(new InputStreamReader(compressorInputStream, encoding), bufferSize);
                 }
                 else if ("bzip2".equalsIgnoreCase(compress)) {
