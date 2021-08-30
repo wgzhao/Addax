@@ -5,7 +5,7 @@ name: Maven Package
 
 on:
   release:
-    types: [created]
+    types: [ created ]
   push:
     tags:
       - '*'
@@ -39,6 +39,18 @@ jobs:
               "id": "ossrh",
               "username": "${{ secrets.OSSRH_USERNAME }}",
               "password": "${{ secrets.OSSRH_PASSWORD }}"
+              },
+              {
+              "id": "github",
+              "url": "https://maven.pkg.github.com/wgzhao/dbfreader",
+              "releases": {
+                "enabled": "true"
+              },
+              "snapshots": {
+                "enabled": "false"
+              },
+              "username": "wgzhao",
+              "password": "${{ github.token }}"
               }
             ]
       - name: Set up JDK
@@ -48,9 +60,8 @@ jobs:
           distribution: 'adopt'
           server-id: github # Value of the distributionManagement/repository/id field of the pom.xml
           settings-path: ${{ github.workspace }} # location for the settings.xml file
-      - run: mvn -B -V -T C1 -DskipTests deploy -pl '!:addax-docs'
+      - run: mvn -B -V -T C1 -DskipTests deploy -pl '!:addax-docs' -Possrh
 
       - name: Publish to GitHub Packages Apache Maven
-        run: mvn -B -V -T C1 -DskipTests deploy -s $GITHUB_WORKSPACE/settings.xml
-        env:
-          GITHUB_TOKEN: ${{ github.token }}
+        run: mvn -B -V -T C1 -DskipTests deploy -s $GITHUB_WORKSPACE/settings.xml -Pgithub
+
