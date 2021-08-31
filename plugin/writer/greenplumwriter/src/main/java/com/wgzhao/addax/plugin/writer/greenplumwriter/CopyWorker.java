@@ -70,7 +70,8 @@ public class CopyWorker
 
         this.copyResult = new FutureTask<>(() -> {
             try {
-                CopyManager mgr = new CopyManager((BaseConnection) connection);
+//                CopyManager mgr = new CopyManager((BaseConnection) connection);
+                CopyManager mgr = new CopyManager(connection.unwrap(BaseConnection.class));
                 return mgr.copyIn(sql, pipeIn);
             }
             finally {
@@ -114,7 +115,7 @@ public class CopyWorker
         }
         catch (Exception e) {
             try {
-                ((BaseConnection) connection).cancelQuery();
+                connection.unwrap(BaseConnection.class).cancelQuery();
             }
             catch (SQLException ignore) {
                 // ignore if failed to cancel query
