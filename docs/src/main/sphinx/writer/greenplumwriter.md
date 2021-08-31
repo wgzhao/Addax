@@ -1,6 +1,6 @@
 # Greenplum Writer
 
-GreenplumWriter 插件使用 `copy from` 语法 将数据写入 [Greenplum](https://greenplum.org) 数据库。
+GreenplumWriter 插件使用 `COPY FROM` 语法 将数据写入 [Greenplum](https://greenplum.org) 数据库。
 
 ## 示例
 
@@ -12,29 +12,16 @@ create table if not exists addax_tbl
     c_bigint
     bigint,
     c_bit
-    bit
-(
-    3
-),
+    bit(3),
     c_bool boolean,
     c_byte bytea,
-    c_char char
-(
-    10
-),
-    c_varchar varchar
-(
-    20
-),
+    c_char char(10),
+    c_varchar varchar(20),
     c_date date,
     c_double float8,
     c_int integer,
     c_json json,
-    c_number decimal
-(
-    8,
-    3
-),
+    c_number decimal(8, 3),
     c_real real,
     c_small smallint,
     c_text text,
@@ -116,9 +103,6 @@ create table gp_test like addax_tbl;
           "parameter": {
             "username": "wgzhao",
             "password": "wgzhao",
-            "queueSize": 5,
-            "numProc": 2,
-            "numWriter": 1,
             "column": [
               "*"
             ],
@@ -162,9 +146,7 @@ bin/addax.sh job/pg2gp.json
 | column          |    是    | 无     |  所配置的表中需要同步的列名集合，详细描述见 [rdbmswriter](rdbmswriter) |
 | preSql         |    否    | 无     | 执行数据同步任务之前率先执行的sql语句，目前只允许执行一条SQL语句，例如清除旧数据,涉及到的表可用 `@table`表示 |
 | postSql        |   否      | 无    | 执行数据同步任务之后执行的sql语句，目前只允许执行一条SQL语句，例如加上某一个时间戳|
-| queueSize      | 否       | 1000   | 线程队列大小，增大此参数增加内存消耗，提升性能 |
-| numProc        | 否       | 4     | 用于进行格式化数据的线程数 |
-| numWriter      | 否       | 1     | 写入数据库的并发数 | 
+| batchSize      |   否      | 1024  | 一次写入的记录数，这里表示 `COPY FROM` 指令后接收的记录数
 
 ### 类型转换
 
