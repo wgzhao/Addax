@@ -24,35 +24,35 @@ The project, originally from Ali's [DataX]((https://github.com/alibaba/datax)), 
 
 ![supported databases](docs/src/main/sphinx/images/supported_databases.png)
 
-| database/filesystem | reader | writer | plugin(reader/writer)                   | memo                                                                                       |
-| ------------------- | ------ | ------ | --------------------------------------- | ------------------------------------------------------------------------------------------ |
-| Cassandra           | YES    | YES    | cassandrareader/cassandrawriter         |                                                                                            |
-| ClickHouse          | YES    | YES    | clickhousereader/clickhousewriter       |                                                                                            |
-| DB2                 | YES    | YES    | rbdmsreader/rdbmswriter                 | not fully tested                                                                           |
-| DBF                 | YES    | YES    | dbfreader/dbfwriter                     |                                                                                            |
-| ElasticSearch       | YES    | YES    | elasticsearchreader/elasticsearchwriter | originally from [@Kestrong](https://github.com/Kestrong/addax-elasticsearch)               |
-| FTP                 | YES    | YES    | ftpreader/ftpwriter                     |                                                                                            |
-| HBase 1.x           | YES    | YES    | hbase11xreader/hbase11xwriter           | use HBASE API                                                                              |
-| HBase 1.x           | YES    | YES    | hbase11xsqlreader/hbase11xsqlwriter     | use Phoenix[Phoenix](https://phoenix.apache.org)                                           |
-| HBase 2.x           | YES    | NO     | hbase20xreader                          | use HBase API                                                                              |
-| HBase 2.x           | YES    | YES    | hbase20xsqlreader/hbase20xsqlwriter     | via [Phoenix](https://phoenix.apache.org)                                                  |
-| HDFS                | YES    | YES    | hdfsreader/hdfswriter                   | support HDFS 2.0 or later                                                                  |
-| HTTP                | YES    | NO     | httpreader                              | support RestFul API                                                                        |
-| Greenplum           | YES    | YES    | postgresqlreader/greenplumwriter        |                                                                                            |
-| InfluxDB            | YES    | YES    | influxdbreader/influxdbwriter           | ONLY support  InfluxDB 1.x                                                                 |
-| json                | YES    | NO     | jsonfilereader                          |                                                                                            |
-| kudu                | YES    | YES    | kudureader/kuduwriter                   |                                                                                            |
-| MongoDB             | YES    | YES    | mongodbreader/mongodbwriter             |                                                                                            |
-| MySQL/MariaDB       | YES    | YES    | mysqlreader/mysqlwriter                 |                                                                                            |
-| Oracle              | YES    | YES    | oraclereader/oraclewriter               |                                                                                            |
-| PostgreSQL          | YES    | YES    | postgresqlreader/postgresqlwriter       |                                                                                            |
-| Trino               | YES    | YES    | rdbmsreader/rdbmswriter                 | [trino( formerly PrestoSQL)](https://trino.io)                                             |
-| Redis               | YES    | YES    | redisreader/rediswriter                 |                                                                                            |
-| SQLite              | YES    | YES    | sqlitereader/sqlitewriter               | |
-| SQL Server          | YES    | YES    | sqlserverreader/sqlserverwriter         |                                                                                            |
-| TDengine            | YES    | YES    | tdenginereader/tdenginewriter           | [TDengine](https://www.taosdata.com/cn/)                                                   |
-| TDH Inceptor2       | YES    | YES    | rdbmsreader/rdbmswriter                 | [Transwarp TDH](http://transwarp.cn/transwarp/product-TDH.html?categoryId=18) 5.1 or later |
-| TEXT                | YES    | YES    | textfilereader/textfilewriter           |                                                                                            |
+| database/filesystem | reader | writer | plugin(reader/writer)                   | memo                                                                          |
+| ------------------- | ------ | ------ | --------------------------------------- | ------------------------------------------------------------------------------|
+| Cassandra           | YES    | YES    | cassandrareader/cassandrawriter         |                                                                               |
+| ClickHouse          | YES    | YES    | clickhousereader/clickhousewriter       |                                                                               |
+| DB2                 | YES    | YES    | rbdmsreader/rdbmswriter                 | not fully tested                                                              |
+| DBF                 | YES    | YES    | dbfreader/dbfwriter                     |                                                                               |
+| ElasticSearch       | YES    | YES    | elasticsearchreader/elasticsearchwriter | originally from [@Kestrong](https://github.com/Kestrong/datax-elasticsearch)  |
+| FTP                 | YES    | YES    | ftpreader/ftpwriter                     |                                                                               |
+| HBase 1.x           | YES    | YES    | hbase11xreader/hbase11xwriter           | use HBASE API                                                                 |
+| HBase 1.x           | YES    | YES    | hbase11xsqlreader/hbase11xsqlwriter     | use Phoenix[Phoenix](https://phoenix.apache.org)                              |
+| HBase 2.x           | YES    | NO     | hbase20xreader                          | use HBase API                                                                 |
+| HBase 2.x           | YES    | YES    | hbase20xsqlreader/hbase20xsqlwriter     | via [Phoenix](https://phoenix.apache.org)                                     |
+| HDFS                | YES    | YES    | hdfsreader/hdfswriter                   | support HDFS 2.0 or later                                                     |
+| HTTP                | YES    | NO     | httpreader                              | support RestFul API                                                           |
+| Greenplum           | YES    | YES    | postgresqlreader/greenplumwriter        |                                                                               |
+| InfluxDB            | YES    | YES    | influxdbreader/influxdbwriter           | ONLY support InfluxDB 1.x                                                     |
+| json                | YES    | NO     | jsonfilereader                          |                                                                               |
+| kudu                | YES    | YES    | kudureader/kuduwriter                   |                                                                               |
+| MongoDB             | YES    | YES    | mongodbreader/mongodbwriter             |                                                                               |
+| MySQL/MariaDB       | YES    | YES    | mysqlreader/mysqlwriter                 |                                                                               |
+| Oracle              | YES    | YES    | oraclereader/oraclewriter               |                                                                               |
+| PostgreSQL          | YES    | YES    | postgresqlreader/postgresqlwriter       |                                                                               |
+| Trino               | YES    | YES    | rdbmsreader/rdbmswriter                 | [trino](https://trino.io)                                                     |
+| Redis               | YES    | YES    | redisreader/rediswriter                 |                                                                               |
+| SQLite              | YES    | YES    | sqlitereader/sqlitewriter               |                                                                               |
+| SQL Server          | YES    | YES    | sqlserverreader/sqlserverwriter         |                                                                               |
+| TDengine            | YES    | YES    | tdenginereader/tdenginewriter           | [TDengine](https://www.taosdata.com/cn/)                                      |
+| TDH Inceptor2       | YES    | YES    | rdbmsreader/rdbmswriter                 | [Transwarp TDH](http://transwarp.cn/) 5.1 or later                            |
+| TEXT                | YES    | YES    | textfilereader/textfilewriter           |                                                                               |
 
 ## Quick Started
 

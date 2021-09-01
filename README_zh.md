@@ -15,103 +15,41 @@
    </a>
 </p>
 
-
-# 该项目正在从 DataX 更名为 Addax
-
-该项目从 [DataX](https://github.com/alibaba/datax) 而来，经过了精简和改造，说明如下
-
-从 `4.0.0` 版本开始，启用新的项目名称 `Addax`, 因此它和以前的版本均不兼容  
-从 `3.2.1` 版本开始，包类名已经更改，因此不再兼容 `3.1.x` 版本
-
-## 功能差别说明
-
-### 精简
-
-删除了仅限于阿里内部的数据库，这些数据库在非阿里集团无法使用，因此直接删除，包括：
-
-- ADS
-- DRDS
-- OCS
-- ODPS
-- OSS
-- OTS
-
-### 增加
-
-增加了部分插件，目前包括
-
-#### reader plugin
-
-1. clickhousereader
-2. dbffilereader
-3. hbase20xreader
-4. jsonfilereader
-5. kudureader
-6. influxdbreader
-7. httpreader
-8. elastichsearchreader
-9. tdenginereader
-
-#### writer plugin
-
-1. dbffilewrite
-2. greenplumwriter
-3. kuduwriter
-4. influxdbwriter
-5. tdenginewriter
-
-### 部分插件增强功能，罗列如下
-
-- 关系型数据库 增加了几乎所有基本数据类型和一部分复杂类型的支持
-- hdfswriter 增加了对 Decimal 数据类型格式的支持
-- hdfswriter 增加了对 Parquet 文件格式的支持
-- hdfswrite 增加了目录覆盖模式
-- hdfswriter 增加了更多的文件压缩格式支持
-- hdfswriter 的临时目录位置改动为当前写入目录下的隐藏目录，解决了之前和写入目录平行导致的自动增加分区的问题
-- hdfswriter 在覆盖模式下，改进了文件删除机制，减少了对应表查询为空的时间窗口
-- hdfsreader 增加了对 Parquet 文件格式的支持
-- hdfsreader 增加了更多的文件压缩格式支持
-- hbasex11sqlwrite 增加了 Kerberos 支持
-- oraclewriter 增加对 `merge into` 语法支持(感谢 @weihebu 提供的建议和参考)
-- postgresqlwriter 增加 `insert into ... on conflict` 语法支持 (感谢 @weihebu 提供的建议和参考)
-- rdbmsreader/rdbmswriter 增加了TDH Inceptor， Trino 查询引擎支持
-- 尽可能减少了本地jar包的依赖，转为从maven仓库获取
-- 绝大部分依赖包升级到了最新稳定版本，减少了潜在漏洞
-- 不同插件下的相同依赖包做了版本统一
+该项目原始代码来自阿里开源的 [DataX](https://github.com/alibaba/datax) ，但经过了大幅修改，详细情况可参考[与DataX的主要区别](difference.md)
 
 ## 支持的数据库一览表
 
 ![supported databases](docs/src/main/sphinx/images/supported_databases.png)
 
-| 数据库或文件系统    | 读取  | 写入   | 插件名称(reader/writer)                  | 备注                                                                                 |
-| ---------------- | ---- | ------ | ---------------------------------------| ------------------------------------------------------------------------------------ |
-| Cassandra        | 支持 | 支持   | cassandrareader/cassandrawriter         |                                                                                      |
-| ClickHouse       | 支持 | 支持   | clickhousereader/clickhousewriter       |                                                                                      |
-| DB2              | 支持 | 支持   | rbdmsreader/rdbmswriter                 | 理论上支持，但未实际测试                                                             |
-| DBF              | 支持 | 支持   | dbfreader/dbfwriter                     |                                                                                      |
-| ElasticSearch    | 支持 | 支持   | elasticsearchreader/elasticsearchwriter | 原始代码来自[@Kestrong](https://github.com/Kestrong/addax-elasticsearch)             |
-| FTP              | 支持 | 支持   | ftpreader/ftpwriter                     |                                                                                      |
-| HBase 1.x        | 支持 | 支持   | hbase11xreader/hbase11xwriter           | 直接操作HBase                                                                        |
-| HBase 1.x        | 支持 | 支持   | hbase11xsqlreader/hbase11xsqlwriter     | 通过[Phoenix](https://phoenix.apache.org)操作HBase                                   |
-| HBase 2.x        | 支持 | 不支持 | hbase20xreader                          | 直接操作HBase                                                                        |
-| HBase 2.x        | 支持 | 支持   | hbase20xsqlreader/hbase20xsqlwriter     | 通过[Phoenix](https://phoenix.apache.org)操作HBase                                   |
-| HDFS             | 支持 | 支持   | hdfsreader/hdfswriter                   | HDFS 2.x 以上版本                                                                    |
-| HTTP             | 支持 | 不支持 | httpreader                              | 仅支持返回值为JSON类型的接口                                                         |
-| Greenplum        | 支持 | 支持   | postgresqlreader/greenplumwriter        |                                                                                      |
-| InfluxDB         | 支持 | 支持   | influxdbreader/influxdbwriter           | 仅支持1.x版本，2.0及以上暂不支持                                                     |
-| json             | 支持 | 不支持 | jsonfilereader                          |                                                                                      |
-| kudu             | 支持 | 支持   | kudureader/kuduwriter                   | 通过原生接口，计划更新Impala连接                                                     |
-| MongoDB          | 支持 | 支持   | mongodbreader/mongodbwriter             |                                                                                      |
-| MySQL/MariaDB    | 支持 | 支持   | mysqlreader/mysqlwriter                 |                                                                                      |
-| Oracle           | 支持 | 支持   | oraclereader/oraclewriter               |                                                                                      |
-| PostgreSQL       | 支持 | 支持   | postgresqlreader/postgresqlwriter       |                                                                                      |
-| PrestoSQL        | 支持 | 支持   | rdbmsreader/rdbmswriter                 | [trino(原PrestoSQL)](https://trino.io) 310以上                                       |
-| Redis            | 支持 | 支持   | redisreader/rediswriter                 |                                                                                      |
-| SQLite           | 支持 | 支持   | sqlitereader/sqlitewriter               | |
-| SQL Server       | 支持 | 支持   | sqlserverreader/sqlserverwriter         |                                                                                      |
-| TDengine         | 支持 | 支持   | tdenginereader/tdenginewriter           | 支持 [TDengine](https://www.taosdata.com/cn/) 数据库读写                             |
-| TDH Inceptor2    | 支持 | 支持   | rdbmsreader/rdbmswriter                 | [星环 TDH](http://transwarp.cn/transwarp/product-TDH.html?categoryId=18) 5.1以上版本 |
-| TEXT             | 支持 | 支持   | textfilereader/textfilewriter           |                                                                                      |
+| 数据库或文件系统 | 读取 | 写入   | 插件名称(reader/writer)                 | 备注                                                                     |
+| ---------------- | ---- | ------ | --------------------------------------- | --------------------------------------------------------------------- |
+| Cassandra        | 支持 | 支持   | cassandrareader/cassandrawriter         |                                                                          |
+| ClickHouse       | 支持 | 支持   | clickhousereader/clickhousewriter       |                                                                          |
+| DB2              | 支持 | 支持   | rbdmsreader/rdbmswriter                 | 理论上支持，但未实际测试                                                    |
+| DBF              | 支持 | 支持   | dbfreader/dbfwriter                     |                                                                          |
+| ElasticSearch    | 支持 | 支持   | elasticsearchreader/elasticsearchwriter | 原始代码来自[@Kestrong](https://github.com/Kestrong/datax-elasticsearch) |
+| FTP              | 支持 | 支持   | ftpreader/ftpwriter                     |                                                                          |
+| HBase 1.x        | 支持 | 支持   | hbase11xreader/hbase11xwriter           | 直接操作HBase                                                            |
+| HBase 1.x        | 支持 | 支持   | hbase11xsqlreader/hbase11xsqlwriter     | 通过[Phoenix](https://phoenix.apache.org)操作HBase                       |
+| HBase 2.x        | 支持 | 不支持 | hbase20xreader                          | 直接操作HBase                                                            |
+| HBase 2.x        | 支持 | 支持   | hbase20xsqlreader/hbase20xsqlwriter     | 通过[Phoenix](https://phoenix.apache.org)操作HBase                       |
+| HDFS             | 支持 | 支持   | hdfsreader/hdfswriter                   | HDFS 2.x 以上版本                                                        |
+| HTTP             | 支持 | 不支持 | httpreader                              | 仅支持返回值为JSON类型的接口                                             |
+| Greenplum        | 支持 | 支持   | postgresqlreader/greenplumwriter        |                                                                          |
+| InfluxDB         | 支持 | 支持   | influxdbreader/influxdbwriter           | 仅支持1.x版本，2.0及以上暂不支持                                         |
+| json             | 支持 | 不支持 | jsonfilereader                          |                                                                          |
+| kudu             | 支持 | 支持   | kudureader/kuduwriter                   | 通过原生接口，计划更新Impala连接                                         |
+| MongoDB          | 支持 | 支持   | mongodbreader/mongodbwriter             |                                                                          |
+| MySQL/MariaDB    | 支持 | 支持   | mysqlreader/mysqlwriter                 |                                                                          |
+| Oracle           | 支持 | 支持   | oraclereader/oraclewriter               |                                                                          |
+| PostgreSQL       | 支持 | 支持   | postgresqlreader/postgresqlwriter       |                                                                          |
+| PrestoSQL        | 支持 | 支持   | rdbmsreader/rdbmswriter                 | [trino](https://trino.io) 310以上                                        |
+| Redis            | 支持 | 支持   | redisreader/rediswriter                 |                                                                          |
+| SQLite           | 支持 | 支持   | sqlitereader/sqlitewriter               |                                                                          |
+| SQL Server       | 支持 | 支持   | sqlserverreader/sqlserverwriter         |                                                                          |
+| TDengine         | 支持 | 支持   | tdenginereader/tdenginewriter           | 支持 [TDengine](https://www.taosdata.com/cn/) 数据库读写                 |
+| TDH Inceptor2    | 支持 | 支持   | rdbmsreader/rdbmswriter                 | [星环 TDH](http://transwarp.cn/) 5.1以上版本                             |
+| TEXT             | 支持 | 支持   | textfilereader/textfilewriter           |                                                                          |
 
 ## 快速开始
 
@@ -127,10 +65,10 @@ docker run -ti --rm --name addax wgzhao/addax:latest /opt/addax/bin/addax.sh /op
 如果你懒得编译或者因为环境无法编译，可以从以下链接下载对应的版本
 
 | 版本  | 连接地址                                                     | md5值                            |
-| ----- | ------------------------------------------------------------| -------------------------------- |
-| 4.0.3 | https://www.aliyundrive.com/s/8CRAfMBbwfm                   | 19766c2577b46bd5b22d63a502f5f5dd |
-| 4.0.2 | https://www.aliyundrive.com/s/U5uotY7vVAY                   | cd3a3d6d0c79cbd3bcd259ebb47acbc5 |
-| 4.0.1 | https://www.aliyundrive.com/s/BwbUJr21baH                   | 8f1963e8ce5e5f880a29a503399413a6 |
+| ----- | ------------------------------------------------------------ | -------------------------------- |
+| 4.0.3 | https://www.aliyundrive.com/s/8CRAfMBbwfm                    | 19766c2577b46bd5b22d63a502f5f5dd |
+| 4.0.2 | https://www.aliyundrive.com/s/U5uotY7vVAY                    | cd3a3d6d0c79cbd3bcd259ebb47acbc5 |
+| 4.0.1 | https://www.aliyundrive.com/s/BwbUJr21baH                    | 8f1963e8ce5e5f880a29a503399413a6 |
 | 4.0.0 | https://pan.baidu.com/s/1qmV6ed3CYpACIp29JCIDgQ 提取码: 559q | b9b759da228f3bc656965d20357dcb2a |
 | 3.2.5 | https://pan.baidu.com/s/14_MnbtRUtJlvQh8tTKv6fg 提取码: 1jdr | 43ddd0186ccbaf1f1bfee0aac22da935 |
 | 3.2.4 | https://pan.baidu.com/s/1VaOlAOTqGX4WwRtI5ewPeg 提取码: i127 | 2d16125385b88405481e12bf4a8fd715 |
@@ -146,15 +84,16 @@ docker run -ti --rm --name addax wgzhao/addax:latest /opt/addax/bin/addax.sh /op
 | 3.1.2 | https://pan.baidu.com/s/1zFqv8E6iJX549zdSZDQgiQ 提取码: 7jdk | 3674711fc9b68fad3086f3c8526a3427 |
 | 3.1.1 | https://pan.baidu.com/s/1GwmFA7-hPkd6GKiZEvUKXg 提取码: 1inn | 0fa4e7902420704b2e814fef098f40ae |
 
-注： 
+注：
+
 1. 从4.0.1版本开始，上传的二进制文件从百度网盘切换到了阿里云网盘，下载速度应该会有很大的提升
 2. 从 3.2.3 版本开始，为了减少安装包大小，编译好的压缩包仅包括 `streamreader` 和 `streamwriter` 两个插件，其他插件则需要单独下载，下载共享目录列表如下：
 3. 因为阿里云盘暂时不支持压缩文件的分享，所以上述提供下载的二进制版本文件我添加了 `.jgp` 后缀，下载后可以删除这个后缀。
 
 预编译插件下载地址一览表
 
-| 版本  | 插件下载地址                                                  |
-| ----- | ------------------------------------------------------------|
+| 版本  | 插件下载地址                                                 |
+| ----- | ------------------------------------------------------------ |
 | 4.0.0 | https://pan.baidu.com/s/1gLWiw2I7W_4-KBiA1CCg2g 提取码: hxag |
 | 3.2.5 | https://pan.baidu.com/s/1VMqPAYeL_kirCjOVAdvoAg 提取码: hda9 |
 | 3.2.4 | https://pan.baidu.com/s/1gPJlJh66bGQUSUR-2mNOQw 提取码: 7c4j |
@@ -364,9 +303,16 @@ Addax	19890604	1989-06-04 00:00:00	true	test
 * 如果有涵盖你的情况的断言，就使用Airlift的`Assertions`类，而不是手工写断言。随着时间的推移，我们可能会转移到更流畅的断言，如AssertJ。
 * 在编写Git提交信息时，请遵循这些[指南]（https://chris.beams.io/posts/git-commit/）。
 
-## License
+## 版本兼容性说明
 
-This software is free to use under the Apache License [Apache license](/license.txt).
+- 从 `4.0.0` 版本开始，启用新的项目名称 `Addax`, 因此它和以前的版本均不兼容  
+- 从 `3.2.1` 版本开始，包类名已经更改，因此不再兼容 `3.1.x` 版本
+
+## 代码授权许可
+
+该软件在遵守 [Apache license](/license.txt) 下可自由免费使用
+
+## 赞助
 
 ![JetBrains](./jetbrains.png)
 
