@@ -3,12 +3,10 @@
   "parameter": {
     "username": "",
     "password": "",
-    "queueSize": 1000,
-    "numProc": 4,
-    "numWriter": 1,
     "column": [
       "*"
     ],
+    "batchSize": "1024",
     "preSql": [],
     "connection": [
       {

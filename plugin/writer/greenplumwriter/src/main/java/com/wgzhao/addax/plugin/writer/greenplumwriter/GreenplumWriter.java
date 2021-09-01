@@ -100,8 +100,7 @@ public class GreenplumWriter
 
         public void startWrite(RecordReceiver recordReceiver)
         {
-            this.commonRdbmsWriterTask.startWrite(recordReceiver, this.writerSliceConfig,
-                    super.getTaskPluginCollector());
+            this.commonRdbmsWriterTask.startWrite(recordReceiver, this.writerSliceConfig, super.getTaskPluginCollector());
         }
 
         @Override
