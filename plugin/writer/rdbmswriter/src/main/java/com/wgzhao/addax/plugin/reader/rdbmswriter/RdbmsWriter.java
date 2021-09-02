@@ -28,8 +28,11 @@ import com.wgzhao.addax.rdbms.util.DBUtil;
 import com.wgzhao.addax.rdbms.util.DBUtilErrorCode;
 import com.wgzhao.addax.rdbms.util.DataBaseType;
 import com.wgzhao.addax.rdbms.writer.CommonRdbmsWriter;
+import org.apache.commons.lang3.StringUtils;
 
 import java.util.List;
+
+import static com.wgzhao.addax.common.base.Key.JDBC_DRIVER;
 
 public class RdbmsWriter
         extends Writer
@@ -57,9 +60,11 @@ public class RdbmsWriter
                                         "写入模式(writeMode)配置有误. 因为不支持配置参数项 writeMode: %s, 仅使用insert sql 插入数据. 请检查您的配置并作出修改.",
                                         writeMode));
             }
-
-            this.commonRdbmsWriterMaster = new SubCommonRdbmsWriter.Job(
-                    DATABASE_TYPE);
+            String jdbcDriver = this.originalConfig.getString(JDBC_DRIVER, null);
+            if (jdbcDriver == null || StringUtils.isBlank(jdbcDriver)) {
+                throw AddaxException.asAddaxException(DBUtilErrorCode.REQUIRED_VALUE, "config 'driver' is required and must not be empty");
+            }
+            this.commonRdbmsWriterMaster = new SubCommonRdbmsWriter.Job(DATABASE_TYPE);
             this.commonRdbmsWriterMaster.init(this.originalConfig);
         }
 
