@@ -13,6 +13,7 @@
     transformer
     statsreport
     addaxPluginDev
+    debug
 
 .. toctree::
     :titlesonly:
