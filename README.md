@@ -31,6 +31,7 @@ The project, originally from Ali's [DataX]((https://github.com/alibaba/datax)), 
 | DB2                 | YES    | YES    | rbdmsreader/rdbmswriter                 | not fully tested                                                              |
 | DBF                 | YES    | YES    | dbfreader/dbfwriter                     |                                                                               |
 | ElasticSearch       | YES    | YES    | elasticsearchreader/elasticsearchwriter | originally from [@Kestrong](https://github.com/Kestrong/datax-elasticsearch)  |
+| Excel               | YES    | NO     | excelreader                             |                                                                               |
 | FTP                 | YES    | YES    | ftpreader/ftpwriter                     |                                                                               |
 | HBase 1.x           | YES    | YES    | hbase11xreader/hbase11xwriter           | use HBASE API                                                                 |
 | HBase 1.x           | YES    | YES    | hbase11xsqlreader/hbase11xsqlwriter     | use Phoenix[Phoenix](https://phoenix.apache.org)                              |

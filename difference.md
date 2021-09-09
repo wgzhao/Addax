@@ -22,15 +22,16 @@
 1. clickhousereader
 2. datareader
 3. dbffilereader
-4. hbase20xreader
-5. jsonfilereader
-6. kudureader
-7. influxdbreader
-8. httpreader
-9. elastichsearchreader
-10. redisreader
-11. sqlitereader
-12. tdenginereader
+4. excelreader
+5. hbase20xreader
+6. jsonfilereader
+7. kudureader
+8. influxdbreader
+9. httpreader
+10. elastichsearchreader
+11. redisreader
+12. sqlitereader
+13. tdenginereader
 
 ### writer plugin
 

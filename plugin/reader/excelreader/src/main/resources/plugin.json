@@ -1,0 +1,6 @@
+{
+  "name": "excelreader",
+  "class": "com.wgzhao.addax.plugin.reader.excelreader.ExcelReader",
+  "description": "Retrieve data from Microsoft Excel Application",
+  "developer": "wgzhao"
+}

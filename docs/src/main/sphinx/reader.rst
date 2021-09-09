@@ -12,6 +12,7 @@
     Data reader                     <reader/datareader>
     DBF reader                      <reader/dbfreader>
     ElasticSearch Reader            <reader/elasticsearchreader>
+    Excel Reader                    <reader/excelreader>
     FTP reader                      <reader/ftpreader>
     HBase 1.x Reader                <reader/hbase11xreader>
     HBase 2.x Reader                <reader/hbase20xreader>
