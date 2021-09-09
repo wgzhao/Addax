@@ -89,6 +89,14 @@
             <outputDirectory>addax-${project.version}</outputDirectory>
         </fileSet>
         <fileSet>
+            <directory>plugin/reader/excelreader/target/excelreader-${project.version}/</directory>
+            <includes>
+                <include>**/*.*</include>
+            </includes>
+            <fileMode>0644</fileMode>
+            <outputDirectory>addax-${project.version}</outputDirectory>
+        </fileSet>
+        <fileSet>
             <directory>plugin/reader/ftpreader/target/ftpreader-${project.version}/</directory>
             <includes>
                 <include>**/*.*</include>

@@ -88,6 +88,7 @@
         <module>plugin/reader/datareader</module>
         <module>plugin/reader/dbfreader</module>
         <module>plugin/reader/elasticsearchreader</module>
+        <module>plugin/reader/excelreader</module>
         <module>plugin/reader/ftpreader</module>
         <module>plugin/reader/hbase11xreader</module>
         <module>plugin/reader/hbase11xsqlreader</module>
