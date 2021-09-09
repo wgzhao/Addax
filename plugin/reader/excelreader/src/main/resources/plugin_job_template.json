@@ -1,0 +1,8 @@
+{
+  "name": "excelreader",
+  "parameter": {
+    "path": [],
+    "header": false,
+    "skipRows": 0
+  }
+}
