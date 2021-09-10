@@ -1,0 +1,6 @@
+{
+  "name": "excelwriter",
+  "class": "com.wgzhao.addax.plugin.writer.excelwriter.ExcelWriter",
+  "description": "Write data to Microsoft Excel file",
+  "developer": "wgzhao"
+}
