@@ -299,6 +299,14 @@
             <outputDirectory>addax-${project.version}</outputDirectory>
         </fileSet>
         <fileSet>
+            <directory>plugin/writer/excelwriter/target/excelwriter-${project.version}/</directory>
+            <includes>
+                <include>**/*.*</include>
+            </includes>
+            <fileMode>0644</fileMode>
+            <outputDirectory>addax-${project.version}</outputDirectory>
+        </fileSet>
+        <fileSet>
             <directory>plugin/writer/ftpwriter/target/ftpwriter-${project.version}/</directory>
             <includes>
                 <include>**/*.*</include>

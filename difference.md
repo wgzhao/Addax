@@ -37,12 +37,13 @@
 
 1. dbffilewrite
 2. doriswriter
-3. greenplumwriter
-4. kuduwriter
-5. influxdbwriter
-6. rediswriter
-7. sqlitewriter
-8. tdenginewriter
+3. excelwriter
+4. greenplumwriter
+5. kuduwriter
+6. influxdbwriter
+7. rediswriter
+8. sqlitewriter
+9. tdenginewriter
 
 ### 部分插件增强功能，罗列如下
 

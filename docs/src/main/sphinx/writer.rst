@@ -12,6 +12,7 @@
     DBF Writer                      <writer/dbfwriter>
     Doris Writer                    <writer/doriswriter>
     ElasticSearch Writer            <writer/elasticsearchwriter>
+    Excel Writer                    <writer/excelwriter>
     FTP Writer                      <writer/ftpwriter>
     Greenplum Writer                <writer/greenplumwriter>
     HBase 1.x Writer                <writer/hbase11xwriter>
