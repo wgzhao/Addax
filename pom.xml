@@ -117,6 +117,7 @@
         <module>plugin/writer/dbfwriter</module>
         <module>plugin/writer/doriswriter</module>
         <module>plugin/writer/elasticsearchwriter</module>
+        <module>plugin/writer/excelwriter</module>
         <module>plugin/writer/ftpwriter</module>
         <module>plugin/writer/greenplumwriter</module>
         <module>plugin/writer/hbase11xsqlwriter</module>
