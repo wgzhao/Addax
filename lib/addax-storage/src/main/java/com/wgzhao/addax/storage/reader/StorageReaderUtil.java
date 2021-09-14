@@ -63,7 +63,6 @@ import java.io.UnsupportedEncodingException;
 import java.nio.charset.UnsupportedCharsetException;
 import java.text.DateFormat;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 
@@ -301,6 +300,10 @@ public class StorageReaderUtil
                     if (columnValue == null || columnValue.equals(nullFormat)) {
                         columnValue = null;
                     }
+                    if (columnValue == null) {
+                        record.addColumn(null);
+                        continue;
+                    }
                     String errorTemplate = "Cast %s to %s failure";
                     switch (type) {
                         case STRING:
@@ -332,20 +335,15 @@ public class StorageReaderUtil
                             break;
                         case DATE:
                             try {
-                                if (columnValue == null) {
-                                    columnGenerated = new DateColumn((Date) null);
+                                String formatString = columnConfig.getFormat();
+                                if (StringUtils.isNotBlank(formatString)) {
+                                    // 用户自己配置的格式转换, 脏数据行为出现变化
+                                    DateFormat format = columnConfig.getDateFormat();
+                                    columnGenerated = new DateColumn(format.parse(columnValue));
                                 }
                                 else {
-                                    String formatString = columnConfig.getFormat();
-                                    if (StringUtils.isNotBlank(formatString)) {
-                                        // 用户自己配置的格式转换, 脏数据行为出现变化
-                                        DateFormat format = columnConfig.getDateFormat();
-                                        columnGenerated = new DateColumn(format.parse(columnValue));
-                                    }
-                                    else {
-                                        // 框架尝试转换
-                                        columnGenerated = new DateColumn(new StringColumn(columnValue).asDate());
-                                    }
+                                    // 框架尝试转换
+                                    columnGenerated = new DateColumn(new StringColumn(columnValue).asDate());
                                 }
                             }
                             catch (Exception e) {
@@ -433,7 +431,7 @@ public class StorageReaderUtil
     {
         String compress = readerConfiguration.getUnnecessaryValue(Key.COMPRESS, "").toLowerCase();
         if ("gzip".equals(compress)) {
-           compress = "gz";
+            compress = "gz";
         }
         readerConfiguration.set(Key.COMPRESS, compress);
     }
