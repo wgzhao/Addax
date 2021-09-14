@@ -23,9 +23,6 @@ package com.wgzhao.addax.rdbms.writer;
 
 import com.wgzhao.addax.common.base.Constant;
 import com.wgzhao.addax.common.base.Key;
-import com.wgzhao.addax.rdbms.util.DataBaseType;
-import com.wgzhao.addax.rdbms.writer.util.OriginalConfPretreatmentUtil;
-import com.wgzhao.addax.rdbms.writer.util.WriterUtil;
 import com.wgzhao.addax.common.element.Column;
 import com.wgzhao.addax.common.element.Record;
 import com.wgzhao.addax.common.exception.AddaxException;
@@ -34,7 +31,10 @@ import com.wgzhao.addax.common.plugin.TaskPluginCollector;
 import com.wgzhao.addax.common.util.Configuration;
 import com.wgzhao.addax.rdbms.util.DBUtil;
 import com.wgzhao.addax.rdbms.util.DBUtilErrorCode;
+import com.wgzhao.addax.rdbms.util.DataBaseType;
 import com.wgzhao.addax.rdbms.util.RdbmsException;
+import com.wgzhao.addax.rdbms.writer.util.OriginalConfPretreatmentUtil;
+import com.wgzhao.addax.rdbms.writer.util.WriterUtil;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.tuple.Triple;
 import org.slf4j.Logger;
@@ -44,10 +44,13 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.sql.Types;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
 import java.util.List;
+
+import static com.wgzhao.addax.common.base.Constant.DEFAULT_DATE_FORMAT;
 
 public class CommonRdbmsWriter
 {
@@ -488,7 +491,7 @@ public class CommonRdbmsWriter
         {
             for (int i = 0; i < record.getColumnNumber(); i++) {
                 int columnSqlType = this.resultSetMetaData.getMiddle().get(i);
-                preparedStatement = fillPreparedStatementColumnType(preparedStatement, i+1,
+                preparedStatement = fillPreparedStatementColumnType(preparedStatement, i + 1,
                         columnSqlType, record.getColumn(i));
             }
             return preparedStatement;
@@ -550,17 +553,19 @@ public class CommonRdbmsWriter
                         utilDate = column.asDate();
                     }
                     catch (AddaxException e) {
-                        throw new SQLException(String.format(
-                                "Date 类型转换错误：[%s]", column));
+                        throw new SQLException(String.format("Date 类型转换错误：[%s]", column));
                     }
                     if (utilDate == null) {
-                            throw new SQLException(String.format(
-                                    "无法将解析 Date 类型数据：[%s]", column));
+                        throw new SQLException(String.format("无法将解析 Date 类型数据：[%s]", column));
                     }
                     java.sql.Date sqlDate = new java.sql.Date(utilDate.getTime());
-
-                    if ("year"
-                            .equalsIgnoreCase(this.resultSetMetaData.getRight().get(columnIndex - 1))) {
+                    if (this.dataBaseType == DataBaseType.SQLite) {
+                        // SQLite does not have a storage class set aside for storing dates and/or times.
+                        // Instead, the built-in Date And Time Functions of SQLite are capable of storing dates and times as
+                        // TEXT, REAL, or INTEGER values: https://www.sqlite.org/datatype3.html
+                        preparedStatement.setString(columnIndex, new SimpleDateFormat(DEFAULT_DATE_FORMAT).format(sqlDate));
+                    }
+                    else if ("year".equalsIgnoreCase(this.resultSetMetaData.getRight().get(columnIndex - 1))) {
                         Calendar cal = Calendar.getInstance();
                         cal.setTime(sqlDate);
                         preparedStatement.setInt(columnIndex, cal.get(Calendar.YEAR));
@@ -594,19 +599,20 @@ public class CommonRdbmsWriter
                         // ClickHouse DateTime(timezone)
                         // TODO 含时区，当作Timestamp处理会有时区的差异
                         preparedStatement.setString(columnIndex, column.asString());
-                    } else {
-                    java.sql.Timestamp sqlTimestamp = null;
-                    try {
-                        utilDate = column.asDate();
                     }
-                    catch (AddaxException e) {
-                        throw new SQLException(String.format(
-                                "TIMESTAMP 类型转换错误：[%s]", column));
-                    }
+                    else {
+                        java.sql.Timestamp sqlTimestamp = null;
+                        try {
+                            utilDate = column.asDate();
+                        }
+                        catch (AddaxException e) {
+                            throw new SQLException(String.format(
+                                    "TIMESTAMP 类型转换错误：[%s]", column));
+                        }
 
-                    if (null != utilDate) {
-                        sqlTimestamp = new java.sql.Timestamp(utilDate.getTime());
-                    }
+                        if (null != utilDate) {
+                            sqlTimestamp = new java.sql.Timestamp(utilDate.getTime());
+                        }
                         preparedStatement.setTimestamp(columnIndex, sqlTimestamp);
                     }
                     break;
@@ -631,9 +637,9 @@ public class CommonRdbmsWriter
                     break;
 
                 case Types.OTHER:
-                    String dType = this.resultSetMetaData.getRight().get(columnIndex-1);
+                    String dType = this.resultSetMetaData.getRight().get(columnIndex - 1);
                     LOG.debug("database-specific data type, column name: {}, column type: {}",
-                            this.resultSetMetaData.getLeft().get(columnIndex-1),
+                            this.resultSetMetaData.getLeft().get(columnIndex - 1),
                             dType);
                     if ("image".equals(dType)) {
                         preparedStatement.setBytes(columnIndex, column.asBytes());
