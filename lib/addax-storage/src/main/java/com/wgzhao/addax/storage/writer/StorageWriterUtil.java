@@ -319,10 +319,10 @@ public class StorageWriterUtil
             DateFormat dateParse, TaskPluginCollector taskPluginCollector,
             Writer writer)
     {
-        // warn: default is null
-        if (null == nullFormat) {
-            nullFormat = "null";
-        }
+//        // warn: default is null
+//        if (null == nullFormat) {
+//            nullFormat = "null";
+//        }
         try {
             List<String> splitedRows = new ArrayList<>();
             int recordLength = record.getColumnNumber();
@@ -330,7 +330,12 @@ public class StorageWriterUtil
                 Column column;
                 for (int i = 0; i < recordLength; i++) {
                     column = record.getColumn(i);
-                    if (null != column.getRawData()) {
+                    if (null == column || null == column.getRawData() || column.asString().equals(nullFormat)) {
+                        // warn: it's all ok if nullFormat is null
+                        splitedRows.add(nullFormat);
+                    }
+                    else {
+                        // warn: it's all ok if nullFormat is null
                         boolean isDateColumn = column instanceof DateColumn;
                         if (!isDateColumn) {
                             splitedRows.add(column.asString());
@@ -343,10 +348,6 @@ public class StorageWriterUtil
                                 splitedRows.add(column.asString());
                             }
                         }
-                    }
-                    else {
-                        // warn: it's all ok if nullFormat is null
-                        splitedRows.add(nullFormat);
                     }
                 }
             }
