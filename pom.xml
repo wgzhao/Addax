@@ -77,7 +77,6 @@
         <!-- common support module -->
         <module>common</module>
         <module>core</module>
-        <module>docs</module>
         <module>lib/addax-rdbms</module>
         <module>lib/addax-storage</module>
         <module>lib/addax-transformer</module>

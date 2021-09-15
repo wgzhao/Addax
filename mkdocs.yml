@@ -1,6 +1,6 @@
 site_name: Addax Documentation
 site_description: Addax is an open source universal ETL tool that supports most of those RDBMS and NoSQLs on the planet
-site_url: https://wgzhao.github.io/addax
+site_url: https://wgzhao.github.io/Addax/
 repo_name: wgzhao/addax
 repo_url: https://github.com/wgzhao/Addax.git
 edit_uri: ""
@@ -25,8 +25,7 @@ theme:
   features:
     - navigation.expand
     - navigation.instant
-    # - navigation.indexes
-
+     - navigation.indexes
 
 nav:
   - index.md
