@@ -42,7 +42,7 @@ jobs:
               },
               {
               "id": "github",
-              "url": "https://maven.pkg.github.com/wgzhao/dbfreader",
+              "url": "https://maven.pkg.github.com/wgzhao/addax",
               "releases": {
                 "enabled": "true"
               },
@@ -60,7 +60,7 @@ jobs:
           distribution: 'adopt'
           server-id: github # Value of the distributionManagement/repository/id field of the pom.xml
           settings-path: ${{ github.workspace }} # location for the settings.xml file
-      - run: mvn -B -V -T C1 -DskipTests deploy -pl '!:addax-docs' -Possrh
+      - run: mvn -B -V -T C1 -DskipTests deploy -Possrh
 
       - name: Publish to GitHub Packages Apache Maven
         run: mvn -B -V -T C1 -DskipTests deploy -s $GITHUB_WORKSPACE/settings.xml -Pgithub

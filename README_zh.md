@@ -1,8 +1,8 @@
 <p align="center">
-    <img alt="Addax Logo" src="https://github.com/wgzhao/Addax/blob/master/docs/src/main/sphinx/images/logo.png?raw=true" width="205" />
+    <img alt="Addax Logo" src="https://github.com/wgzhao/Addax/blob/master/docs/images/logo.png?raw=true" width="205" />
 </p>
-<p align="center">DataX 是一个支持主流数据库的通用数据采集工具</p>
-<p align="center"><a href="https://addax.readthedocs.io">使用文档</a> 详细描述了如何安装部署和每个采集插件的使用方法 </p>
+<p align="center">Addax 是一个支持主流数据库的通用数据采集工具</p>
+<p align="center"><a href="https://wgzhao.github.io/Addax">使用文档</a> 详细描述了如何安装部署和每个采集插件的使用方法 </p>
 <p align="center">
    <a href="https://github.com/wgzhao/addax/release">
       <img src="https://img.shields.io/github/release/wgzhao/addax.svg" alt="release version"/>
@@ -10,16 +10,13 @@
    <a href="https://github.com/wgzhao/Addax/workflows/Maven%20Package/badge.svg">
        <img src="https://github.com/wgzhao/Addax/workflows/Maven%20Package/badge.svg" alt="Maven Package" />
    </a>
-   <a href="https://addax.readthedocs.io/zh_CN/latest/?badge=latest">
-       <img src="https://readthedocs.org/projects/addax/badge/?version=latest" alt="Documentation Status" />
-   </a>
 </p>
 
 该项目原始代码来自阿里开源的 [DataX](https://github.com/alibaba/datax) ，但经过了大幅修改，详细情况可参考[与DataX的主要区别](difference.md)
 
 ## 支持的数据库一览表
 
-![supported databases](docs/src/main/sphinx/images/supported_databases.png)
+![supported databases](docs/images/supported_databases.png)
 
 | 数据库或文件系统 | 读取 | 写入   | 插件名称(reader/writer)                 | 备注                                                                     |
 | ---------------- | ---- | ------ | --------------------------------------- | --------------------------------------------------------------------- |
