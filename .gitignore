@@ -32,3 +32,4 @@ __pycache__/
 .settings
 .project
 *.secret
+site
