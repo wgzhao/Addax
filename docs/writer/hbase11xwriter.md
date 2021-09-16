@@ -1,124 +1,15 @@
-# Hbase11X Writer 
+# HBase11X Writer
 
 HbaseWriter 插件实现了从向Hbase中写取数据。在底层实现上，HbaseWriter 通过 HBase 的 Java 客户端连接远程 HBase 服务，并通过 put 方式写入Hbase。
 
-如果 HBase 是 2.X 版本，则需要使用 [HBase20xsqlwriter](hbase20xsqlwriter) 插件
+如果 HBase 是 2.X 版本，则需要使用 [HBase20xsqlwriter](../hbase20xsqlwriter) 插件
 
 ## 配置样例
 
 配置一个从本地写入hbase1.1.x的作业：
 
 ```json
-{
-  "job": {
-    "setting": {
-      "speed": {
-        "channel": 5,
-        "bytes": -1
-      }
-    },
-    "content": [
-      {
-        "reader": {
-          "name": "txtfilereader",
-          "parameter": {
-            "path": "/tmp/normal.txt",
-            "charset": "UTF-8",
-            "column": [
-              {
-                "index": 0,
-                "type": "String"
-              },
-              {
-                "index": 1,
-                "type": "string"
-              },
-              {
-                "index": 2,
-                "type": "string"
-              },
-              {
-                "index": 3,
-                "type": "string"
-              },
-              {
-                "index": 4,
-                "type": "string"
-              },
-              {
-                "index": 5,
-                "type": "string"
-              },
-              {
-                "index": 6,
-                "type": "string"
-              }
-            ],
-            "fieldDelimiter": ","
-          }
-        },
-        "writer": {
-          "name": "hbase11xwriter",
-          "parameter": {
-            "hbaseConfig": {
-              "hbase.zookeeper.quorum": "***"
-            },
-            "table": "writer",
-            "mode": "normal",
-            "rowkeyColumn": [
-              {
-                "index": 0,
-                "type": "string"
-              },
-              {
-                "index": -1,
-                "type": "string",
-                "value": "_"
-              }
-            ],
-            "column": [
-              {
-                "index": 1,
-                "name": "cf1:q1",
-                "type": "string"
-              },
-              {
-                "index": 2,
-                "name": "cf1:q2",
-                "type": "string"
-              },
-              {
-                "index": 3,
-                "name": "cf1:q3",
-                "type": "string"
-              },
-              {
-                "index": 4,
-                "name": "cf2:q1",
-                "type": "string"
-              },
-              {
-                "index": 5,
-                "name": "cf2:q2",
-                "type": "string"
-              },
-              {
-                "index": 6,
-                "name": "cf2:q3",
-                "type": "string"
-              }
-            ],
-            "versionColumn": {
-              "index": -1,
-              "value": "123456789"
-            },
-            "encoding": "utf-8"
-          }
-        }
-      }
-    ]
-  }
-}
+--8<-- "jobs/hbase11xwriter.json"
 ```
 
 ## 参数说明
@@ -128,7 +19,7 @@ HbaseWriter 插件实现了从向Hbase中写取数据。在底层实现上，Hba
 | hbaseConfig     |    是    | 无     | 连接  HBase 集群需要的配置信息,JSON格式, `hbase.zookeeper.quorum` 为必填项，其他 HBase client的配置为可选项                             |
 | mode            |    是    | 无     | 写入 HBase 的模式，目前仅支持 `normal` 模式                                                                                         |
 | table           |    是    | 无     |  HBase 表名（大小写敏感）                                                                                                 |
-| encoding        |    否    | UTF-8  | 编码方式，`UTF-8 `或是 `GBK`，用于对二进制存储的 `HBase byte[]` 转为 String 时的编码                                                  |
+| encoding        |    否    | UTF-8  | 编码方式，`UTF-8` 或是 `GBK`，用于对二进制存储的 `HBase byte[]` 转为 String 时的编码                                                  |
 | column          |    是    | 无     | 要写入的字段，`normal` 模式与  `multiVersionFixedColumn` 模式下必填项, 详细说明见下文                                              |
 | rowkeyColumn    |    是    | 无     | 要写入的 `rowkey` 列, 详细说明见下文                                                                                           |
 | versionColumn   |    否    | 无     | 指定写入的时间戳。支持：当前时间、指定时间列，指定时间，三者选一,详见下文                                                    |

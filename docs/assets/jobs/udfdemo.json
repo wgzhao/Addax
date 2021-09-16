@@ -1,0 +1,99 @@
+{
+  "job": {
+    "setting": {
+      "speed": {
+        "channel": 1
+      }
+    },
+    "content": [
+      {
+        "reader": {
+          "name": "streamreader",
+          "parameter": {
+            "column": [
+              {
+                "value": "My name is xxxx",
+                "type": "string"
+              },
+              {
+                "value": "password is Passw0rd",
+                "type": "string"
+              },
+              {
+                "value": 19890604,
+                "type": "long"
+              },
+              {
+                "value": "1989-06-04 00:00:00",
+                "type": "date"
+              },
+              {
+                "value": true,
+                "type": "bool"
+              },
+              {
+                "value": "test",
+                "type": "bytes"
+              },
+              {
+                "random": "0,10",
+                "type": "long"
+              }
+            ],
+            "sliceRecordCount": 10
+          }
+        },
+        "writer": {
+          "name": "streamwriter",
+          "parameter": {
+            "print": true,
+            "encoding": "UTF-8"
+          }
+        },
+        "transformer": [
+          {
+            "name": "dx_replace",
+            "parameter": {
+              "columnIndex": 0,
+              "paras": [
+                "11",
+                "6",
+                "wgzhao"
+              ]
+            }
+          },
+          {
+            "name": "dx_substr",
+            "parameter": {
+              "columnIndex": 1,
+              "paras": [
+                "0",
+                "12"
+              ]
+            }
+          },
+          {
+            "name": "dx_map",
+            "parameter": {
+              "columnIndex": 2,
+              "paras": [
+                "^",
+                "2"
+              ]
+            }
+          },
+          {
+            "name": "dx_filter",
+            "parameter": {
+              "columnIndex": 6,
+              "paras": [
+                "<",
+                "5"
+              ]
+            }
+          }
+        ]
+      }
+    ]
+  }
+}

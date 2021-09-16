@@ -6,69 +6,11 @@ FtpReader 提供了读取远程 FTP/SFTP 文件系统数据存储的能力。
 
 ### 配置样例
 
-```json
-{
-  "job": {
-    "setting": {
-      "speed": {
-        "channel": 2,
-        "bytes": -1
-      }
-    },
-    "content": [
-      {
-        "reader": {
-          "name": "ftpreader",
-          "parameter": {
-            "protocol": "sftp",
-            "host": "127.0.0.1",
-            "port": 22,
-            "username": "xx",
-            "password": "xxx",
-            "path": [
-              "/var/pub/ftpReaderTest/data"
-            ],
-            "column": [
-              {
-                "index": 0,
-                "type": "long"
-              },
-              {
-                "index": 1,
-                "type": "boolean"
-              },
-              {
-                "index": 2,
-                "type": "double"
-              },
-              {
-                "index": 3,
-                "type": "string"
-              },
-              {
-                "index": 4,
-                "type": "date",
-                "format": "yyyy.MM.dd"
-              }
-            ],
-            "encoding": "UTF-8",
-            "fieldDelimiter": ","
-          }
-        },
-        "writer": {
-          "name": "ftpWriter",
-          "parameter": {
-            "path": "/var/ftp/FtpWriter/result",
-            "fileName": "shihf",
-            "writeMode": "truncate",
-            "format": "yyyy-MM-dd"
-          }
-        }
-      }
-    ]
-  }
-}
-```
+=== "job/ftp2stream.json"
+
+  ```json
+  --8<-- "jobs/ftpreader.json"
+  ```
 
 ### 参数说明
 
@@ -185,7 +127,6 @@ boolean captureRawRecord = true;
 - Date 是指远程FTP文件文本中使用Date的字符串表示形式，例如"2014-12-31"，Date可以指定format格式。
 
 ## 限制
-
 
 1. 单个File支持多线程并发读取，这里涉及到单个File内部切分算法
 2. 单个File在压缩情况下，从技术上无法支持多线程并发读取。

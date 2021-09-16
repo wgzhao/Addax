@@ -1,87 +1,11 @@
-# Dbf Writer
+# DBF Writer
 
 DbfWriter 提供了向本地文件写入类dbf格式的一个或者多个表文件。
 
 ## 配置样例
 
 ```json
-{
-  "job": {
-    "setting": {
-      "speed": {
-        "bytes": -1,
-        "channel": 1
-      }
-    },
-    "content": [
-      {
-        "reader": {
-          "name": "streamreader",
-          "parameter": {
-            "column": [
-              {
-                "value": "Addax",
-                "type": "string"
-              },
-              {
-                "value": 19880808,
-                "type": "long"
-              },
-              {
-                "value": "1989-06-04 00:00:00",
-                "type": "date"
-              },
-              {
-                "value": true,
-                "type": "bool"
-              },
-              {
-                "value": "中文测试",
-                "type": "string"
-              }
-            ],
-            "sliceRecordCount": 10
-          }
-        },
-        "writer": {
-          "name": "dbfwriter",
-          "parameter": {
-            "column": [
-              {
-                "name": "col1",
-                "type": "char",
-                "length": 100
-              },
-              {
-                "name": "col2",
-                "type": "numeric",
-                "length": 18,
-                "scale": 0
-              },
-              {
-                "name": "col3",
-                "type": "date"
-              },
-              {
-                "name": "col4",
-                "type": "logical"
-              },
-              {
-                "name": "col5",
-                "type": "char",
-                "length": 100
-              }
-            ],
-            "fileName": "test.dbf",
-            "path": "/tmp/out",
-            "writeMode": "truncate",
-            "encoding": "GBK"
-          }
-        }
-      }
-    ]
-  }
-}
+--8<-- "jobs/dbfwriter.json"
 ```
 
 ## 参数说明

@@ -32,68 +32,11 @@ create table test.addax_test (
 
 以下是配置文件
 
-```json
-{
-  "job": {
-    "setting": {
-      "speed": {
-        "channel": 1,
-        "bytes": -1
-      }
-    },
-    "content": [
-      {
-        "reader": {
-          "name": "streamreader",
-          "parameter": {
-            "column" : [
-              {
-                "random":"2017-08-01 00:01:02,2020-01-01 12:13:14",
-                "type": "date"
-              },
-              {
-                "value": "Addax",
-                "type": "string"
-              },
-              {
-                "value": 19880808,
-                "type": "long"
-              },
-              {
-                "value": "1988-08-08 08:08:08",
-                "type": "date"
-              },
-              {
-                "value": true,
-                "type": "bool"
-              },
-              {
-                "value": "test",
-                "type": "bytes"
-              }
-            ],
-            "sliceRecordCount": 1000
-          }
-        },
-        "writer": {
-          "name": "tdenginewriter",
-          "parameter": {
-            "username": "root",
-            "password": "taosdata",
-            "column": ["ts", "name", "file_size", "file_date", "flag_open", "memo" ],
-            "connection": [
-              {
-                "jdbcUrl": "jdbc:TAOS://127.0.0.1:6030/test",
-                "table": [ "addax_test"]
-              }
-            ]
-          }
-        }
-      }
-    ]
-  }
-}
-```
+=== "job/stream2tdengine.json"
+
+  ```json
+  --8<-- "jobs/tdenginewriter.json"
+  ```
 
 将上述配置文件保存为   `job/stream2tdengine.json`
 
@@ -108,94 +51,7 @@ bin/addax.sh job/tdengine2stream.json
 命令输出类似如下：
 
 ```
-2021-02-20 15:52:07.691 [main] INFO  VMInfo - VMInfo# operatingSystem class => sun.management.OperatingSystemImpl
-2021-02-20 15:52:07.748 [main] INFO  Engine -
-{
-	"content":[
-		{
-			"reader":{
-				"parameter":{
-					"column":[
-						{
-							"random":"2017-08-01 00:01:02,2020-01-01 12:13:14",
-							"type":"date"
-						},
-						{
-							"type":"string",
-							"value":"Addax"
-						},
-						{
-							"type":"long",
-							"value":19880808
-						},
-						{
-							"type":"date",
-							"value":"1988-08-08 08:08:08"
-						},
-						{
-							"type":"bool",
-							"value":true
-						},
-						{
-							"type":"bytes",
-							"value":"test"
-						}
-					],
-					"sliceRecordCount":1000
-				},
-				"name":"streamreader"
-			},
-			"writer":{
-				"parameter":{
-					"password":"*****",
-					"column":[
-						"ts",
-						"name",
-						"file_size",
-						"file_date",
-						"flag_open",
-						"memo"
-					],
-					"connection":[
-						{
-							"jdbcUrl":"jdbc:TAOS://127.0.0.1:6030/test",
-							"table":[
-								"addax_test"
-							]
-						}
-					],
-					"username":"root",
-					"preSql":[]
-				},
-				"name":"tdenginewriter"
-			}
-		}
-	],
-	"setting":{
-		"speed":{
-			"bytes":-1,
-			"channel":1
-		}
-	}
-}
-
-2021-02-20 15:52:07.786 [main] INFO  PerfTrace - PerfTrace traceId=job_-1, isEnable=false, priority=0
-2021-02-20 15:52:07.787 [main] INFO  JobContainer - Addax jobContainer starts job.
-2021-02-20 15:52:07.789 [main] INFO  JobContainer - Set jobId = 0
-java.library.path:/usr/java/packages/lib/amd64:/usr/lib64:/lib64:/lib:/usr/lib
-2021-02-20 15:52:08.048 [job-0] INFO  OriginalConfPretreatmentUtil - table:[addax_test] all columns:[ts,name,file_size,file_date,flag_open,memo].
-2021-02-20 15:52:08.056 [job-0] INFO  OriginalConfPretreatmentUtil - Write data [
-INSERT INTO %s (ts,name,file_size,file_date,flag_open,memo) VALUES(?,?,?,?,?,?)
-], which jdbcUrl like:[jdbc:TAOS://127.0.0.1:6030/test]
-
-2021-02-20 15:52:11.158 [job-0] INFO  JobContainer -
-任务启动时刻                    : 2021-02-20 15:52:07
-任务结束时刻                    : 2021-02-20 15:52:11
-任务总计耗时                    :                  3s
-任务平均流量                    :           11.07KB/s
-记录写入速度                    :            333rec/s
-读出记录总数                    :                1000
-读写失败总数                    :                   0
+--8<-- "output/tdenginewriter.txt"
 ```
 
 ## 参数说明
@@ -206,7 +62,7 @@ INSERT INTO %s (ts,name,file_size,file_date,flag_open,memo) VALUES(?,?,?,?,?,?)
 | username        |    是    | string | 无     | 数据源的用户名 |
 | password        |    否    | string | 无     | 数据源指定用户名的密码 |
 | table           |    是    | list | 无     | 所选取的需要同步的表名,使用JSON数据格式，当配置为多张表时，用户自己需保证多张表是同一表结构 |
-| column          |    是    | list | 无     |  所配置的表中需要同步的列名集合，详细描述见 [rdbmswriter](rdbmswriter) |
+| column          |    是    | list | 无     |  所配置的表中需要同步的列名集合，详细描述见 [rdbmswriter](../rdbmswriter) |
 | preSql         |    否    | list  | 无     | 数据写入钱先执行的sql语句，例如清除旧数据,如果 Sql 中有你需要操作到的表名称，可用 `@table` 表示 |
 | postSql        |   否      | list | 无    | 数据写入完成后执行的sql语句，例如加上某一个时间戳|
 | batchSize       |    否    | int | 1024   | 定义了插件和数据库服务器端每次批量数据获取条数，调高该值可能导致 Addax 出现OOM或者目标数据库事务提交失败导致挂起 |
@@ -219,7 +75,7 @@ INSERT INTO %s (ts,name,file_size,file_date,flag_open,memo) VALUES(?,?,?,?,?,?)
 - jdbcUrl 以 `jdbc:TAOS-RS://` 开头；
 - 使用 `6041` 作为连接端口
 
-所以上述配置中的` connection` 应该修改为如下：
+所以上述配置中的 `connection` 应该修改为如下：
 
 ```json
 {
@@ -254,4 +110,3 @@ TDengine 2.0.16
 
 - TDengine JDBC-JNI 驱动和动态库版本要求一一匹配，因此如果你的数据版本并不是 `2.0.16`，则需要同时替换动态库和插件目录中的JDBC驱动
 - TDengine 的时序字段（timestamp）默认最小值为 `1500000000000`，即 `2017-07-14 10:40:00.0`，如果你写入的时许时间戳小于该值，则会报错
-

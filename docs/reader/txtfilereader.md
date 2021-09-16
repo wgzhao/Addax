@@ -2,66 +2,13 @@
 
 TxtFileReader 提供了读取本地文件系统数据存储的能力。
 
-##  配置样例
+## 配置样例
 
-```json
-{
-  "job": {
-    "setting": {
-      "speed": {
-        "channel": 2,
-        "bytes": -1
-      }
-    },
-    "content": [
-      {
-        "reader": {
-          "name": "txtfilereader",
-          "parameter": {
-            "path": [
-              "/tmp/data"
-            ],
-            "encoding": "UTF-8",
-            "column": [
-              {
-                "index": 0,
-                "type": "long"
-              },
-              {
-                "index": 1,
-                "type": "boolean"
-              },
-              {
-                "index": 2,
-                "type": "double"
-              },
-              {
-                "index": 3,
-                "type": "string"
-              },
-              {
-                "index": 4,
-                "type": "date",
-                "format": "yyyy.MM.dd"
-              }
-            ],
-            "fieldDelimiter": ","
-          }
-        },
-        "writer": {
-          "name": "txtfilewriter",
-          "parameter": {
-            "path": "/tmp/result",
-            "fileName": "txt_",
-            "writeMode": "truncate",
-            "format": "yyyy-MM-dd"
-          }
-        }
-      }
-    ]
-  }
-}
-```
+=== "job/txtfile2stream.json"
+
+  ```json
+  --8<-- "jobs/txtreader.json"
+  ```
 
 ## 参数说明
 
@@ -183,7 +130,6 @@ boolean captureRawRecord = true;
 ```
 
 ## 类型转换
-
 
 | Addax 内部类型| 本地文件 数据类型    |
 | -------- | -----  |

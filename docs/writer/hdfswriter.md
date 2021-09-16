@@ -5,82 +5,7 @@ HdfsWriter 提供向HDFS文件系统指定路径中写入 `TEXTFile` ， `ORCFil
 ## 配置样例
 
 ```json
-{
-  "job": {
-    "setting": {
-      "speed": {
-        "channel": 2,
-        "bytes": -1
-      }
-    },
-    "content": [
-      {
-        "reader": {
-          "name": "streamreader",
-          "parameter": {
-            "column": [
-              {
-                "value": "Addax",
-                "type": "string"
-              },
-              {
-                "value": 19890604,
-                "type": "long"
-              },
-              {
-                "value": "1989-06-04 00:00:00",
-                "type": "date"
-              },
-              {
-                "value": true,
-                "type": "bool"
-              },
-              {
-                "value": "test",
-                "type": "bytes"
-              }
-            ],
-            "sliceRecordCount": 1000
-          },
-          "writer": {
-            "name": "hdfswriter",
-            "parameter": {
-              "defaultFS": "hdfs://xxx:port",
-              "fileType": "orc",
-              "path": "/user/hive/warehouse/writerorc.db/orcfull",
-              "fileName": "xxxx",
-              "column": [
-                {
-                  "name": "col1",
-                  "type": "string"
-                },
-                {
-                  "name": "col2",
-                  "type": "int"
-                },
-                {
-                  "name": "col3",
-                  "type": "string"
-                },
-                {
-                  "name": "col4",
-                  "type": "boolean"
-                },
-                {
-                  "name": "col5",
-                  "type": "string"
-                }
-              ],
-              "writeMode": "overwrite",
-              "fieldDelimiter": "\u0001",
-              "compress": "SNAPPY"
-            }
-          }
-        }
-      }
-    ]
-  }
-}
+--8<-- "jobs/hdfswriter.json"
 ```
 
 ## 参数说明
@@ -101,7 +26,6 @@ HdfsWriter 提供向HDFS文件系统指定路径中写入 `TEXTFile` ， `ORCFil
 | kerberosPrincipal      |    否    | 无         | 用于 Kerberos 认证的凭证主体, 比如 `addax/node1@WGZHAO.COM`
 | compress               |    否    | 无         | 文件的压缩格式 | 
 | hadoopConfig           |    否    | 无         | 里可以配置与 Hadoop 相关的一些高级参数，比如HA的配置 |
-
 
 ### path
 
@@ -187,7 +111,6 @@ Hadoop hdfs文件系统 namenode 节点地址。格式：`hdfs://ip:port` ；例
 
 这里的 `cluster` 表示 HDFS 配置成HA时的名字，也是 `defaultFS` 配置项中的名字 如果实际环境中的名字不是 `cluster` ，则上述配置中所有写有 `cluster` 都需要替换
 
-
 #### haveKerberos
 
 是否有Kerberos认证，默认 `false`, 如果用户配置true，则配置项 `kerberosKeytabFilePath`，`kerberosPrincipal` 为必填。
@@ -211,8 +134,6 @@ Kerberos认证 keytab文件路径，绝对路径
 | Date     | DATE,TIMESTAMP |
 | Bytes    | BINARY |
 
-
 ## 功能与限制
 
 1. 目前不支持：`binary`、`arrays`、`maps`、`structs`、`union类型`
-

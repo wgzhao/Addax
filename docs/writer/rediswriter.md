@@ -5,47 +5,7 @@ RedisWrite 提供了还原Redis dump命令的能力，并写入到目标Redis。
 ## 配置样例
 
 ```json
-{
-  "job": {
-    "content": [
-      {
-        "reader": {
-          "name": "redisreader",
-          "parameter": {
-            "connection": [
-              {
-                "uri": "file:///root/dump.rdb",
-                "uri": "http://localhost/dump.rdb",
-                "uri": "tcp://127.0.0.1:7001",
-                "uri": "tcp://127.0.0.1:7002",
-                "uri": "tcp://127.0.0.1:7003"
-              }
-            ]
-          }
-        },
-        "writer": {
-          "name": "rediswriter",
-          "parameter": {
-            "connection": [
-              {
-                "uri": "tcp://127.0.0.1:6379",
-                "auth": "123456"
-              }
-            ],
-            "redisCluster": false,
-            "flushDB": false
-          }
-        }
-      }
-    ],
-    "setting": {
-      "speed": {
-        "channel": 1,
-        "bytes": -1
-      }
-    }
-  }
-}
+--8<-- "jobs/rediswriter.json"
 ```
 
 ## 参数说明
@@ -59,4 +19,3 @@ RedisWrite 提供了还原Redis dump命令的能力，并写入到目标Redis。
 | timeout      |    否    | 60000  | 每次执行最大超时时间, 单位毫秒(ms)                                                                       |
 | include      |    否    | 无     | 要包含的 key, 支持正则表达式                                                                             |
 | exclude      |    否    | 无     | 要排除的 key,支持正则表达式                                                                              |
-

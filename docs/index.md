@@ -2,7 +2,7 @@
 
 ## 概览
 
-Addax 是一个异构数据源离线同步工具（最初来源于阿里的 [DataX](https://github.com/alibaba/datax) ，致力于实现包括关系型数据库(MySQL、Oracle等)、HDFS、Hive、HBase、FTP等各种异构数据源之间稳定高效的数据同步功能。
+Addax 是一个异构数据源离线同步工具，最初来源于阿里的 [DataX](https://github.com/alibaba/datax) ，致力于实现包括关系型数据库(MySQL、Oracle等)、HDFS、Hive、HBase、FTP等各种异构数据源之间稳定高效的数据同步功能。
 
 ![addax_why_new](images/addax_why_new.png)
 
@@ -20,13 +20,13 @@ Addax本身作为离线数据同步框架，采用 Framework + plugin 架构构�
 
 Addax Framework提供了简单的接口与插件交互，提供简单的插件接入机制，只需要任意加上一种插件，就能无缝对接其他数据源。
 
-##  核心架构
+## 核心架构
 
 本小节按一个Addax作业生命周期的时序图，从整体架构设计非常简要说明各个模块相互关系。
 
 ![addax_arch](images/addax_arch.png)
 
-### 核心模块介绍：
+### 核心模块介绍
 
 1. Addax 完成单个数据同步的作业，我们称之为Job，Adda x接受到一个 Job 之后，将启动一个进程来完成整个作业同步过程。Addax Job模块是单个作业的中枢管理节点，承担了数据清理、子任务切分(将单一作业计算转化为多个子 Task)、TaskGroup 管理等功能。
 2. Addax Job 启动后，会根据不同的源端切分策略，将 Job 切分成多个小的 Task (子任务)，以便于并发执行。Task 便是 Addax 作业的最小单元，每一个 Task 都会负责一部分数据的同步工作。
@@ -34,7 +34,7 @@ Addax Framework提供了简单的接口与插件交互，提供简单的插件�
 4. 每一个 Task 都由 TaskGroup 负责启动，Task 启动后，会固定启动 `Reader—>Channel—>Writer` 的线程来完成任务同步工作。
 5. Addax 作业运行起来之后， Job 监控并等待多个 TaskGroup 模块任务完成，等待所有 TaskGroup 任务完成后 Job 成功退出。否则，异常退出，进程退出值非0
 
-### 调度流程：
+### 调度流程
 
 举例来说，用户提交了一个作业，并且配置了 20 个并发，目的是将一个100张分表的mysql数据同步到oracle里面。 调度决策思路是：
 
@@ -85,4 +85,3 @@ Addax Framework提供了简单的接口与插件交互，提供简单的插件�
 
 作业是极易受外部因素的干扰，网络闪断、数据源不稳定等因素很容易让同步到一半的作业报错停止。因此稳定性是 Addax 的基本要求，在 Addax 的设计中，重点完善了框架和插件的稳定性。
 目前 Addax 可以做到线程级别、作业级别多层次局部/全局的重试，保证用户的作业稳定运行。
-

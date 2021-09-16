@@ -2,106 +2,15 @@
 
 MongoDBReader 插件利用 MongoDB 的java客户端MongoClient进行MongoDB的读操作。
 
-
 ## 配置样例
 
 该示例从MongoDB中读一张表并打印到终端
 
-```json
-{
-  "job": {
-    "setting": {
-      "speed": {
-        "channel": 2,
-        "bytes": -1
-      }
-    },
-    "content": [
-      {
-        "reader": {
-          "name": "mongodbreader",
-          "parameter": {
-            "address": [
-              "127.0.0.1:32768"
-            ],
-            "userName": "",
-            "userPassword": "",
-            "dbName": "tag_per_data",
-            "collectionName": "tag_data",
-            "column": [
-              {
-                "name": "unique_id",
-                "type": "string"
-              },
-              {
-                "name": "sid",
-                "type": "string"
-              },
-              {
-                "name": "user_id",
-                "type": "string"
-              },
-              {
-                "name": "auction_id",
-                "type": "string"
-              },
-              {
-                "name": "content_type",
-                "type": "string"
-              },
-              {
-                "name": "pool_type",
-                "type": "string"
-              },
-              {
-                "name": "frontcat_id",
-                "type": "Array",
-                "spliter": ""
-              },
-              {
-                "name": "categoryid",
-                "type": "Array",
-                "spliter": ""
-              },
-              {
-                "name": "gmt_create",
-                "type": "string"
-              },
-              {
-                "name": "taglist",
-                "type": "Array",
-                "spliter": " "
-              },
-              {
-                "name": "property",
-                "type": "string"
-              },
-              {
-                "name": "scorea",
-                "type": "int"
-              },
-              {
-                "name": "scoreb",
-                "type": "int"
-              },
-              {
-                "name": "scorec",
-                "type": "int"
-              }
-            ]
-          }
-        },
-        "writer": {
-          "name": "streamwriter",
-          "parameter": {
-            "print": "true"
-          }
-        }
-      }
-    ]
-  }
-}
-```
+=== "job/mongo2stream.json"
+
+  ```json
+  --8<-- "jobs/mongoreader.json"
+  ```
 
 ## 参数说明
 

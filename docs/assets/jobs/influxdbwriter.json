@@ -1,0 +1,64 @@
+{
+  "job": {
+    "setting": {
+      "speed": {
+        "channel": 1,
+        "bytes": -1
+      }
+    },
+    "content": [
+      {
+        "reader": {
+          "name": "streamreader",
+          "parameter": {
+            "column": [
+              {
+                "random":"2001-01-01 00:00:00, 2016-07-07 23:59:59",
+                "type":"date"
+              },
+              {
+                "random": "1,1000",
+                "type": "long"
+              },
+              {
+                "random": "1,10",
+                "type": "string"
+              },
+              {
+                "random": "1000,50000",
+                "type": "double"
+              }
+            ],
+            "sliceRecordCount": 10
+          }
+        },
+        "writer": {
+          "name": "influxdbwriter",
+          "parameter": {
+            "connection": [
+              {
+                "endpoint": "http://localhost:8086",
+                "database": "addax",
+                "table": "addax_tbl"
+              }
+            ],
+            "connTimeout": 15,
+            "readTimeout": 20,
+            "writeTimeout": 20,
+            "username": "influx",
+            "password": "influx123",
+            "column": [
+              {"name":"time", "type":"timestamp"},
+              {"name":"user_id","type":"int"},
+              {"name":"user_name", "type":"string"},
+              {"name":"salary", "type":"double"}
+            ],
+            "preSql": ["delete from addax_tbl"],
+            "batchSize": 1024,
+            "retentionPolicy": {"name":"one_day_only", "duration": "1d", "replication":1}
+          }
+        }
+      }
+    ]
+  }
+}

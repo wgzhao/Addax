@@ -1,4 +1,4 @@
-# Addax 插件开发简明指南
+# 插件开发
 
 本指南主要面向那些需要开发符合自己需求的 Addax 插件开发人员。
 
@@ -195,8 +195,8 @@ ${ADDAX_HOME}
         |   |   `-- mysql-writer-plugin-dependencies.jar
         |   |-- mysqlwriter-0.0.1-SNAPSHOT.jar
         |   `-- plugin.json
-        |-- oceanbasewriter
-        `-- odpswriter
+        |-- oraclewriter
+        `-- postgresqlwriter
 ```
 
 - `${ADDAX_HOME}/bin`:  可执行程序目录。
@@ -214,89 +214,25 @@ ${ADDAX_HOME}
 
 注意：
 
-**插件的目录名字必须和 `plugin.json` 中定义的插件名称一致。**
+!!! 特别注意
+
+  插件的目录名字必须和 `plugin.json` 中定义的插件名称一致。
 
 ## 配置文件
 
 `Addax` 使用 `json` 作为配置文件的格式。一个典型的 `Addax` 任务配置如下：
 
 ```json
-{
-  "job": {
-    "setting": {
-      "speed": {
-        "byte": -1,
-        "channel": 1
-      }
-    },
-    "content": [
-      {
-        "reader": {
-          "name": "mysqlreader",
-          "parameter": {
-            "username": "",
-            "password": "",
-            "column": [
-              "c_datetime",
-              "c_timestamp",
-              "c_enum",
-              "c_set",
-              "c_varbinary",
-              "c_longblob",
-              "c_mediumblob"
-            ],
-            "connection": [
-              {
-                "table": [
-                  "datax_reader"
-                ],
-                "jdbcUrl": [
-                  "jdbc:mysql://localhost:3306/test?serverTimezone=Asia/Chongqing"
-                ]
-              }
-            ]
-          }
-        },
-        "writer": {
-          "name": "postgresqlwriter",
-          "parameter": {
-            "username": "",
-            "password": "",
-            "preSql": [
-              "truncate table @table"
-            ],
-            "column": [
-              "c_datetime",
-              "c_timestamp",
-              "c_enum",
-              "c_set",
-              "c_varbinary",
-              "c_longblob",
-              "c_mediumblob"
-            ],
-            "connection": [
-              {
-                "table": [
-                  "tbl_from_mysql"
-                ],
-                "jdbcUrl": "jdbc:postgresql://localhost:5432/wgzhao"
-              }
-            ]
-          }
-        }
-      }
-    ]
-  }
-}
+--8<-- "jobs/pgwriter.json"
 ```
 
 `Addax` 框架有 `core.json` 配置文件，指定了框架的默认行为。任务的配置里头可以指定框架中已经存在的配置项，而且具有更高的优先级，会覆盖 `core.json` 中的默认值。
 
-**配置中`job.content.reader.parameter`的value部分会传给`Reader.Job`；`job.content.writer.parameter`的value部分会传给`Writer.Job`** ，`Reader.Job`和`Writer.Job`可以通过`super.getPluginJobConf()`来获取。
+配置中`job.content.reader.parameter`的value部分会传给`Reader.Job`；`job.content.writer.parameter`的value部分会传给`Writer.Job`** ，`Reader.Job`和`Writer.Job`可以通过`super.getPluginJobConf()`来获取。
 
 `Addax` 框架支持对特定的配置项进行RSA加密，例子中以`*`开头的项目便是加密后的值。 **配置项加密解密过程对插件透明，插件仍然以不带`*`的key来查询配置和操作配置项** 。
 
-#### 如何设计配置参数
+### 如何设计配置参数
 
 > 配置文件的设计是插件开发的第一步！
 
@@ -305,8 +241,8 @@ ${ADDAX_HOME}
 - 驼峰命名：所有配置项采用驼峰命名法，首字母小写，单词首字母大写。
 - 正交原则：配置项必须正交，功能没有重复，没有潜规则。
 - 富类型：合理使用json的类型，减少无谓的处理逻辑，减少出错的可能。
-    - 使用正确的数据类型。比如，bool类型的值使用 `true`/`false`，而非 `"yes"`/`"true"`/`0` 等。
-    - 合理使用集合类型，比如，用数组替代有分隔符的字符串。
+  - 使用正确的数据类型。比如，bool类型的值使用 `true`/`false`，而非 `"yes"`/`"true"`/`0` 等。
+  - 合理使用集合类型，比如，用数组替代有分隔符的字符串。
 - 类似通用：遵守同一类型的插件的习惯，比如关系型数据库的 `connection` 参数都是如下结构：
 
   ```json

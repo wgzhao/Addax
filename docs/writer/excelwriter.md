@@ -7,56 +7,7 @@
 我们假定从内存读取数据，并写入到 Excel 文件中
 
 ```json
-{
-  "job": {
-    "setting": {
-      "speed": {
-        "byte": -1,
-        "channel": 1
-      }
-    },
-    "content": [
-      {
-        "reader": {
-          "name": "streamreader",
-          "parameter": {
-            "column": [
-              {
-                "value": "DataX",
-                "type": "string"
-              },
-              {
-                "value": 19890604,
-                "type": "long"
-              },
-              {
-                "value": "1989-06-04 11:22:33",
-                "type": "date"
-              },
-              {
-                "value": true,
-                "type": "bool"
-              },
-              {
-                "value": "test",
-                "type": "bytes"
-              }
-            ],
-            "sliceRecordCount": 1000
-          }
-        },
-        "writer": {
-          "name": "excelwriter",
-          "parameter": {
-            "path": "/tmp/out",
-            "fileName": "test",
-            "header":["str", "长度", "日期", "是否为真", "字节类型"]
-          }
-        }
-      }
-    ]
-  }
-}
+--8<-- "jobs/excelwriter.json"
 ```
 
 讲上述内容保存为 `job/stream2excel.json`
@@ -73,99 +24,7 @@ bin/addax.sh job/stream2excel.sh
 <summary>点击展开</summary>
 
 ```shell
-
-  ___      _     _
- / _ \    | |   | |
-/ /_\ \ __| | __| | __ ___  __
-|  _  |/ _` |/ _` |/ _` \ \/ /
-| | | | (_| | (_| | (_| |>  <
-\_| |_/\__,_|\__,_|\__,_/_/\_\
-
-:: Addax version ::    (v4.0.3-SNAPSHOT)
-
-2021-09-10 22:16:38.247 [        main] INFO  VMInfo               - VMInfo# operatingSystem class => sun.management.OperatingSystemImpl
-2021-09-10 22:16:38.269 [        main] INFO  Engine               -
-{
-	"content":[
-		{
-			"reader":{
-				"parameter":{
-					"column":[
-						{
-							"type":"string",
-							"value":"DataX"
-						},
-						{
-							"type":"long",
-							"value":19890604
-						},
-						{
-							"type":"date",
-							"value":"1989-06-04 11:22:33"
-						},
-						{
-							"type":"bool",
-							"value":true
-						},
-						{
-							"type":"bytes",
-							"value":"test"
-						}
-					],
-					"sliceRecordCount":1000
-				},
-				"name":"streamreader"
-			},
-			"writer":{
-				"parameter":{
-					"path":"/tmp/out",
-					"fileName":"test",
-					"header":[
-						"str",
-						"长度",
-						"日期",
-						"是否为真",
-						"字节类型"
-					],
-					"writeMode":"truncate"
-				},
-				"name":"excelwriter"
-			}
-		}
-	],
-	"setting":{
-		"speed":{
-			"byte":-1,
-			"channel":1
-		}
-	}
-}
-
-2021-09-10 22:16:38.287 [        main] INFO  PerfTrace            - PerfTrace traceId=job_-1, isEnable=false, priority=0
-2021-09-10 22:16:38.287 [        main] INFO  JobContainer         - Addax jobContainer starts job.
-2021-09-10 22:16:38.289 [        main] INFO  JobContainer         - Set jobId = 0
-2021-09-10 22:16:38.303 [       job-0] INFO  JobContainer         - Addax Reader.Job [streamreader] do prepare work .
-2021-09-10 22:16:38.304 [       job-0] INFO  JobContainer         - Addax Writer.Job [excelwriter] do prepare work .
-2021-09-10 22:16:38.304 [       job-0] INFO  JobContainer         - Job set Channel-Number to 1 channels.
-2021-09-10 22:16:38.304 [       job-0] INFO  JobContainer         - Addax Reader.Job [streamreader] splits to [1] tasks.
-2021-09-10 22:16:38.305 [       job-0] INFO  JobContainer         - Addax Writer.Job [excelwriter] splits to [1] tasks.
-2021-09-10 22:16:38.325 [       job-0] INFO  JobContainer         - Scheduler starts [1] taskGroups.
-2021-09-10 22:16:38.332 [ taskGroup-0] INFO  TaskGroupContainer   - taskGroupId=[0] start [1] channels for [1] tasks.
-2021-09-10 22:16:38.335 [ taskGroup-0] INFO  Channel              - Channel set byte_speed_limit to -1, No bps activated.
-2021-09-10 22:16:38.336 [ taskGroup-0] INFO  Channel              - Channel set record_speed_limit to -1, No tps activated.
-2021-09-10 22:16:41.345 [       job-0] INFO  AbstractScheduler    - Scheduler accomplished all tasks.
-2021-09-10 22:16:41.346 [       job-0] INFO  JobContainer         - Addax Writer.Job [excelwriter] do post work.
-2021-09-10 22:16:41.346 [       job-0] INFO  JobContainer         - Addax Reader.Job [streamreader] do post work.
-2021-09-10 22:16:41.348 [       job-0] INFO  JobContainer         - PerfTrace not enable!
-2021-09-10 22:16:41.349 [       job-0] INFO  StandAloneJobContainerCommunicator - Total 1000 records, 26000 bytes | Speed 8.46KB/s, 333 records/s | Error 0 records, 0 bytes |  All Task WaitWriterTime 0.528s |  All Task WaitReaderTime 0.000s | Percentage 100.00%
-2021-09-10 22:16:41.350 [       job-0] INFO  JobContainer         -
-任务启动时刻                    : 2021-09-10 22:16:38
-任务结束时刻                    : 2021-09-10 22:16:41
-任务总计耗时                    :                  3s
-任务平均流量                    :            8.46KB/s
-记录写入速度                    :            333rec/s
-读出记录总数                    :                1000
-读写失败总数                    :                   0
+--8<-- "output/excelwriter.txt"
 ```
 </details>
 

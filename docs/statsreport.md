@@ -9,7 +9,7 @@
 1. 支付http协议，JSON格式。
 2. 接口地址配置在 `core.json` 文件下的 `core.addaxServer.address` 下。
 3. 异步发送。
-4. 需要引入` httpclient-4.5.2.jar`, `httpcore-4.4.5.jar`, `httpcore-nio-4.4.5.jar`, `httpasyncclient-4.1.2.jar` 相关jar包
+4. 需要引入`httpclient-4.5.2.jar`, `httpcore-4.4.5.jar`, `httpcore-nio-4.4.5.jar`, `httpasyncclient-4.1.2.jar` 相关jar包
 
 ## 功能说明
 
@@ -43,6 +43,6 @@
 
 `jobName` 的设置规则如下:
 
-1. 在命令行通过传递 `-P-DjobName=xxxx` 方式指定,否则
+1. 在命令行通过传递 `-P"-DjobName=xxxx"` 方式指定,否则
 2. 配置文件的 `writer.parameters.path` 值按 `/` 分割后取第2，3列用点(.)拼接而成，其含义是为库名及表名,否则
 3. 否则设置为 `jobName`

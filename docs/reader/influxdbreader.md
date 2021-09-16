@@ -23,49 +23,11 @@ influx -import -path=NOAA_data.txt -precision=s -database=NOAA_water_database
 
 创建 `job/influxdb2stream.json` 文件，内容如下：
 
-```json
-{
-  "job": {
-    "content": [
-      {
-        "reader": {
-          "name": "influxdbreader",
-          "parameter": {
-            "column": [
-              "*"
-            ],
-            "connection": [
-              {
-                "endpoint": "http://localhost:8086",
-                "database": "NOAA_water_database",
-                "table": "h2o_feet",
-                "where": "1=1"
-              }
-            ],
-            "connTimeout": 15,
-            "readTimeout": 20,
-            "writeTimeout": 20,
-            "username": "influx",
-            "password": "influx123"
-          }
-        },
-        "writer": {
-          "name": "streamwriter",
-          "parameter": {
-            "print": "true"
-          }
-        }
-      }
-    ],
-    "setting": {
-      "speed": {
-        "bytes": -1,
-        "channel": 1
-      }
-    }
-  }
-}
-```
+=== "job/influxdb2stream.json"
+
+  ```json
+  --8<-- "jobs/influxdbreader.json"
+  ```
 
 ### 运行
 
@@ -84,7 +46,7 @@ bin/addax.sh job/influxdb2stream.json
 | password        |    否    | string | 无     | 数据源指定用户名的密码 |
 | database        |  是      | string |  无      | 数据源指定的数据库  |
 | table           |    是    | string |无     | 所选取的需要同步的表名 |
-| column          |    是    | list  | 无     |  所配置的表中需要同步的列名集合，详细描述见 [rdbmreader](rdbmsreader) |
+| column          |    是    | list  | 无     |  所配置的表中需要同步的列名集合，详细描述见 [rdbmreader](../rdbmsreader) |
 | connTimeout     |    否    | int   | 15     | 设置连接超时值，单位为秒     |
 | readTimeout     |    否    | int   | 20     | 设置读取超时值，单位为秒     |
 | writeTimeout    |    否    | int   | 20     | 设置写入超时值，单位为秒     |

@@ -2,66 +2,12 @@
 
 HBase20xsqlwriter 插件利用 Phoenix 向 HBase 2.x 写入数据。
 
-如果 HBase 是 1.X 版本，则可以使用 [HBase11xsqlWriter](hbase11xsqlwriter) 或[HBase11xWriter](hbase11xwriter) 插件
+如果 HBase 是 1.X 版本，则可以使用 [HBase11xsqlWriter](../hbase11xsqlwriter) 或[HBase11xWriter](../hbase11xwriter) 插件
 
 ## 配置样例
 
 ```json
-{
-  "job": {
-    "content": [
-      {
-        "reader": {
-          "name": "txtfilereader",
-          "parameter": {
-            "path": "/tmp/normal.txt",
-            "charset": "UTF-8",
-            "column": [
-              {
-                "index": 0,
-                "type": "String"
-              },
-              {
-                "index": 1,
-                "type": "string"
-              },
-              {
-                "index": 2,
-                "type": "string"
-              },
-              {
-                "index": 3,
-                "type": "string"
-              }
-            ],
-            "fieldDelimiter": ","
-          }
-        },
-        "writer": {
-          "name": "hbase20xsqlwriter",
-          "parameter": {
-            "batchSize": "100",
-            "column": [
-              "UID",
-              "TS",
-              "EVENTID",
-              "CONTENT"
-            ],
-            "queryServerAddress": "http://127.0.0.1:8765",
-            "nullMode": "skip",
-            "table": "TEST_TBL"
-          }
-        }
-      }
-    ],
-    "setting": {
-      "speed": {
-        "channel": 5,
-        "bytes": -1
-      }
-    }
-  }
-}
+--8<-- "jobs/hbase20xsqlwriter.json"
 ```
 
 ## 参数说明

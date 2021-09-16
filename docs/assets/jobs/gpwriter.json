@@ -1,0 +1,55 @@
+{
+  "job": {
+    "setting": {
+      "speed": {
+        "channel": 1,
+        "bytes": -1
+      }
+    },
+    "content": [
+      {
+        "reader": {
+          "name": "postgresqlreader",
+          "parameter": {
+            "username": "wgzhao",
+            "password": "wgzhao",
+            "column": [
+              "*"
+            ],
+            "connection": [
+              {
+                "table": [
+                  "addax_tbl"
+                ],
+                "jdbcUrl": [
+                  "jdbc:postgresql://localhost:5432/wgzhao"
+                ]
+              }
+            ]
+          }
+        },
+        "writer": {
+          "name": "greenplumwriter",
+          "parameter": {
+            "username": "wgzhao",
+            "password": "wgzhao",
+            "column": [
+              "*"
+            ],
+            "preSql": [
+              "truncate table @table"
+            ],
+            "connection": [
+              {
+                "jdbcUrl": "jdbc:postgresql://localhost:5432/wgzhao",
+                "table": [
+                  "gp_test"
+                ]
+              }
+            ]
+          }
+        }
+      }
+    ]
+  }
+}

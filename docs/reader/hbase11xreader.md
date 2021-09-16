@@ -97,152 +97,19 @@ ROW                                   COLUMN+CELL
 
 ### 配置样例
 
-配置一个从 HBase 抽取数据到本地的作业:（normal 模式）
+配置一个从 HBase 抽取数据到本地的作业，分别为标准模式和多版本模式
 
-```json
-{
-  "job": {
-    "setting": {
-      "speed": {
-        "channel": 1
-      }
-    },
-    "content": [
-      {
-        "reader": {
-          "name": "hbase11xreader",
-          "parameter": {
-            "hbaseConfig": {
-              "hbase.zookeeper.quorum": "xxxf"
-            },
-            "table": "users",
-            "encoding": "utf-8",
-            "mode": "normal",
-            "column": [
-              {
-                "name": "rowkey",
-                "type": "string"
-              },
-              {
-                "name": "info: age",
-                "type": "string"
-              },
-              {
-                "name": "info: birthday",
-                "type": "date",
-                "format": "yyyy-MM-dd"
-              },
-              {
-                "name": "info: company",
-                "type": "string"
-              },
-              {
-                "name": "address: country",
-                "type": "string"
-              },
-              {
-                "name": "address: province",
-                "type": "string"
-              },
-              {
-                "name": "address: city",
-                "type": "string"
-              }
-            ],
-            "range": {
-              "startRowkey": "",
-              "endRowkey": "",
-              "isBinaryRowkey": true
-            }
-          }
-        },
-        "writer": {
-          "name": "txtfilewriter",
-          "parameter": {
-            "path": "/Users/shf/workplace/addax_test/hbase11xreader/result",
-            "fileName": "qiran",
-            "writeMode": "truncate"
-          }
-        }
-      }
-    ]
-  }
-}
-```
+=== "job/hbase11x2stream_normal.json"
 
-配置一个从 HBase 抽取数据到本地的作业:（ multiVersionFixedColumn 模式）
+    ```json
+    --8<-- "jobs/hbase11xreader_normal.json"
+    ```
 
-```json
-{
-  "job": {
-    "setting": {
-      "speed": {
-        "channel": 1,
-        "bytes": -1
-      }
-    },
-    "content": [
-      {
-        "reader": {
-          "name": "hbase11xreader",
-          "parameter": {
-            "hbaseConfig": {
-              "hbase.zookeeper.quorum": "127.0.0.1:2181"
-            },
-            "table": "users",
-            "encoding": "utf-8",
-            "mode": "multiVersionFixedColumn",
-            "maxVersion": "-1",
-            "column": [
-              {
-                "name": "rowkey",
-                "type": "string"
-              },
-              {
-                "name": "info: age",
-                "type": "string"
-              },
-              {
-                "name": "info: birthday",
-                "type": "date",
-                "format": "yyyy-MM-dd"
-              },
-              {
-                "name": "info: company",
-                "type": "string"
-              },
-              {
-                "name": "address: contry",
-                "type": "string"
-              },
-              {
-                "name": "address: province",
-                "type": "string"
-              },
-              {
-                "name": "address: city",
-                "type": "string"
-              }
-            ],
-            "range": {
-              "startRowkey": "",
-              "endRowkey": ""
-            }
-          }
-        },
-        "writer": {
-          "name": "txtfilewriter",
-          "parameter": {
-            "path": "/Users/shf/workplace/addax_test/hbase11xreader/result",
-            "fileName": "qiran",
-            "writeMode": "truncate"
-          }
-        }
-      }
-    ]
-  }
-}
-```
+=== "job/hbase11x2srtream_version.json"
+
+    ```json
+    --8<-- "jobs/hbase11xreader_version.json"
+    ```
 
 ## 参数说明
 
@@ -262,7 +129,7 @@ ROW                                   COLUMN+CELL
 
 描述：要读取的hbase字段，normal 模式与multiVersionFixedColumn 模式下必填项。
 
-#### normal 模式
+### normal 模式
 
 `name` 指定读取的 hbase 列，除了 `rowkey` 外，必须为 `列族:列名` 的格式，`type` 指定源数据的类型，`format`指定日期类型的格式，
 `value` 指定当前类型为常量，不从 hbase 读取数据，而是根据 `value`  值自动生成对应的列。配置格式如下：
@@ -284,7 +151,7 @@ ROW                                   COLUMN+CELL
 
 normal 模式下，对于用户指定Column信息，type必须填写，name/value必须选择其一。
 
-#### multiVersionFixedColumn 模式
+### multiVersionFixedColumn 模式
 
 `name` 指定读取的 hbase 列，除了 `rowkey` 外，必须为 `列族:列名` 的格式，`type` 指定源数据的类型，`format`指定日期类型的格式 。
 multiVersionFixedColumn 模式下不支持常量列。配置格式如下：

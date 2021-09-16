@@ -1,0 +1,86 @@
+2021-01-20 09:07:41.864 [main] INFO  VMInfo - VMInfo# operatingSystem class => com.sun.management.internal.OperatingSystemImpl
+2021-01-20 09:07:41.877 [main] INFO  Engine - the machine info  =>
+
+	osInfo: 	Mac OS X x86_64 10.15.1
+	jvmInfo:	AdoptOpenJDK 14 14.0.2+12
+	cpu num:	8
+
+	totalPhysicalMemory:	-0.00G
+	freePhysicalMemory:	-0.00G
+	maxFileDescriptorCount:	-1
+	currentOpenFileDescriptorCount:	-1
+
+	GC Names	[G1 Young Generation, G1 Old Generation]
+
+	MEMORY_NAME                    | allocation_size                | init_size
+	CodeHeap 'profiled nmethods'   | 117.21MB                       | 2.44MB
+	G1 Old Gen                     | 2,048.00MB                     | 39.00MB
+	G1 Survivor Space              | -0.00MB                        | 0.00MB
+	CodeHeap 'non-profiled nmethods' | 117.21MB                       | 2.44MB
+	Compressed Class Space         | 1,024.00MB                     | 0.00MB
+	Metaspace                      | -0.00MB                        | 0.00MB
+	G1 Eden Space                  | -0.00MB                        | 25.00MB
+	CodeHeap 'non-nmethods'        | 5.57MB                         | 2.44MB
+
+
+2021-01-20 09:07:41.903 [main] INFO  Engine -
+{
+	"content":[
+		{
+			"reader":{
+				"parameter":{
+					"reqParams":{
+						"CURR_DATE":"2021-01-18",
+						"DEPT":"9700"
+					},
+					"method":"GET",
+					"column":[
+						"CURR_DATE",
+						"DEPT",
+						"TOTAL_MANAGED_MARKET_VALUE",
+						"TOTAL_MANAGED_MARKET_VALUE_GROWTH"
+					],
+					"resultKey":"result",
+					"connection":[
+						{
+							"url":"http://127.0.0.1:9090/mock/17/LDJSC/ASSET"
+						}
+					]
+				},
+				"name":"httpreader"
+			},
+			"writer":{
+				"parameter":{
+					"print":"true"
+				},
+				"name":"streamwriter"
+			}
+		}
+	],
+	"setting":{
+		"speed":{
+			"bytes":-1,
+			"channel":1
+		}
+	}
+}
+
+2021-01-20 09:07:41.926 [main] INFO  PerfTrace - PerfTrace traceId=job_-1, isEnable=false, priority=0
+2021-01-20 09:07:41.927 [main] INFO  JobContainer - Addax jobContainer starts job.
+2021-01-20 09:07:41.928 [main] INFO  JobContainer - Set jobId = 0
+2021-01-20 09:07:42.002 [taskGroup-0] INFO  TaskGroupContainer - taskGroup[0] taskId[0] attemptCount[1] is started
+
+2019-08-30	9700	1539.85	-14.78
+2019-10-01	9700	1531.71	47.66
+2020-12-03	9700	1574.38	7.34
+2020-11-31	9700	1528.13	41.62
+2019-03-01	9700	1554.28	-9.29
+
+2021-01-20 09:07:45.006 [job-0] INFO  JobContainer -
+任务启动时刻                    : 2021-01-20 09:07:41
+任务结束时刻                    : 2021-01-20 09:07:44
+任务总计耗时                    :                  3s
+任务平均流量                    :               42B/s
+记录写入速度                    :              1rec/s
+读出记录总数                    :                   5
+读写失败总数                    :                   0

@@ -1,0 +1,43 @@
+{
+  "job": {
+    "setting": {
+      "speed": {
+        "channel": 3
+      },
+      "errorLimit": {
+        "record": 0,
+        "percentage": 0.02
+      }
+    },
+    "content": [
+      {
+        "reader": {
+          "name": "sqlitereader",
+          "parameter": {
+            "username": "fakeuser",
+            "password": "",
+            "column": [
+              "*"
+            ],
+            "connection": [
+              {
+                "jdbcUrl": [
+                  "jdbc:sqlite:/tmp/test.sqlite3"
+                ],
+                "table": [
+                  "test"
+                ]
+              }
+            ]
+          }
+        },
+        "writer": {
+          "name": "streamwriter",
+          "parameter": {
+            "print": true
+          }
+        }
+      }
+    ]
+  }
+}
