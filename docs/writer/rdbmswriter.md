@@ -19,15 +19,16 @@ RDBMSWriter 插件支持从传统 RDBMS 读取数据。这是一个通用关系�
 
 1. 下载对应的 JDBC 驱动，并拷贝到 `plugin/writer/rdbmswriter/libs` 目录
 2. 修改 `plugin/writer/rdbmswriter/plugin.json` 文件，找到 `drivers` 一项，填写正确的 JDBC 驱动名，比如 DB2 的驱动名为 `com.ibm.db2.jcc.DB2Driver`，类似这样：
+
     ```json
-   {
-    "name": "rdbmswriter",
-    "class": "com.wgzhao.addax.plugin.reader.rdbmswriter.RdbmsWriter",
-    "description": "",
-    "developer": "alibaba",
-    "drivers": ["com.ibm.db2.jcc.DB2Driver"]
-    } 
-   ```
+    {
+      "name": "rdbmswriter",
+      "class": "com.wgzhao.addax.plugin.reader.rdbmswriter.RdbmsWriter",
+      "description": "",
+      "developer": "alibaba",
+      "drivers": ["com.ibm.db2.jcc.DB2Driver"]
+      } 
+    ```
 
 以下列出常见的数据库以及对应的驱动名称
 
@@ -50,70 +51,7 @@ RDBMSWriter 插件支持从传统 RDBMS 读取数据。这是一个通用关系�
 配置一个写入RDBMS的作业。
 
 ```json
-{
-  "job": {
-    "setting": {
-      "speed": {
-        "channel": 1,
-        "bytes": -1
-      }
-    },
-    "content": [
-      {
-        "reader": {
-          "name": "streamreader",
-          "parameter": {
-            "column": [
-              {
-                "value": "Addax",
-                "type": "string"
-              },
-              {
-                "value": 19880808,
-                "type": "long"
-              },
-              {
-                "value": "1988-08-08 08:08:08",
-                "type": "date"
-              },
-              {
-                "value": true,
-                "type": "bool"
-              },
-              {
-                "value": "test",
-                "type": "bytes"
-              }
-            ],
-            "sliceRecordCount": 1000
-          }
-        },
-        "writer": {
-          "name": "rdbmswriter",
-          "parameter": {
-            "connection": [
-              {
-                "jdbcUrl": "jdbc:dm://ip:port/database",
-                "driver": "",
-                "table": [
-                  "table"
-                ]
-              }
-            ],
-            "username": "username",
-            "password": "password",
-            "column": [
-              "*"
-            ],
-            "preSql": [
-              "delete from XXX;"
-            ]
-          }
-        }
-      }
-    ]
-  }
-}
+--8<-- "jobs/rdbmswriter.json"
 ```
 
 ## 参数说明

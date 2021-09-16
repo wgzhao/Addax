@@ -2,67 +2,12 @@
 
 JsonFileReader 提供了读取本地文件系统数据存储的能力。
 
-### 配置样例
+## 配置样例
+
+=== "job/json2stream.json"
 
 ```json
-{
-  "job": {
-    "setting": {
-      "speed": {
-        "channel": 1,
-        "bytes": -1
-      }
-    },
-    "content": [
-      {
-        "writer": {
-          "name": "streamwriter",
-          "parameter": {
-            "print": "true"
-          }
-        },
-        "reader": {
-          "name": "jsonfilereader",
-          "parameter": {
-            "path": [
-              "/tmp/test*.json"
-            ],
-            "column": [
-              {
-                "index": "$.id",
-                "type": "long"
-              },
-              {
-                "index": "$.name",
-                "type": "string"
-              },
-              {
-                "index": "$.age",
-                "type": "long"
-              },
-              {
-                "index": "$.score.math",
-                "type": "double"
-              },
-              {
-                "index": "$.score.english",
-                "type": "double"
-              },
-              {
-                "index": "$.pubdate",
-                "type": "date"
-              },
-              {
-                "type": "string",
-                "value": "constant string"
-              }
-            ]
-          }
-        }
-      }
-    ]
-  }
-}
+--8<-- "jobs/jsonreader.json"
 ```
 
 其中 `/tmp/test*.json` 为同一个 json 文件的多个复制，内容如下：
@@ -108,7 +53,6 @@ JsonFileReader 提供了读取本地文件系统数据存储的能力。
 对于用户指定Column信息，type必须填写，index/value必须选择其一
 
 ## 类型转换
-
 
 | Addax 内部类型| 本地文件 数据类型    |
 | -------- | -----  |

@@ -12,7 +12,6 @@
    </a>
 </p>
 
-
 English | [简体中文](README_zh.md)
 
 The project, originally from Ali's [DataX]((https://github.com/alibaba/datax)), has been streamlined and adapted, as described below
@@ -21,36 +20,42 @@ The project, originally from Ali's [DataX]((https://github.com/alibaba/datax)), 
 
 ![supported databases](docs/images/supported_databases.png)
 
-| database/filesystem | reader | writer | plugin(reader/writer)                   | memo                                                                          |
-| ------------------- | ------ | ------ | --------------------------------------- | ------------------------------------------------------------------------------|
-| Cassandra           | YES    | YES    | cassandrareader/cassandrawriter         |                                                                               |
-| ClickHouse          | YES    | YES    | clickhousereader/clickhousewriter       |                                                                               |
-| DB2                 | YES    | YES    | rbdmsreader/rdbmswriter                 | not fully tested                                                              |
-| DBF                 | YES    | YES    | dbfreader/dbfwriter                     |                                                                               |
-| ElasticSearch       | YES    | YES    | elasticsearchreader/elasticsearchwriter | originally from [@Kestrong](https://github.com/Kestrong/datax-elasticsearch)  |
-| Excel               | YES    | YES    | excelreader/excelwriter                 |                                                                               |
-| FTP                 | YES    | YES    | ftpreader/ftpwriter                     |                                                                               |
-| HBase 1.x           | YES    | YES    | hbase11xreader/hbase11xwriter           | use HBASE API                                                                 |
-| HBase 1.x           | YES    | YES    | hbase11xsqlreader/hbase11xsqlwriter     | use Phoenix[Phoenix](https://phoenix.apache.org)                              |
-| HBase 2.x           | YES    | NO     | hbase20xreader                          | use HBase API                                                                 |
-| HBase 2.x           | YES    | YES    | hbase20xsqlreader/hbase20xsqlwriter     | via [Phoenix](https://phoenix.apache.org)                                     |
-| HDFS                | YES    | YES    | hdfsreader/hdfswriter                   | support HDFS 2.0 or later                                                     |
-| HTTP                | YES    | NO     | httpreader                              | support RestFul API                                                           |
-| Greenplum           | YES    | YES    | postgresqlreader/greenplumwriter        |                                                                               |
-| InfluxDB            | YES    | YES    | influxdbreader/influxdbwriter           | ONLY support InfluxDB 1.x                                                     |
-| json                | YES    | NO     | jsonfilereader                          |                                                                               |
-| kudu                | YES    | YES    | kudureader/kuduwriter                   |                                                                               |
-| MongoDB             | YES    | YES    | mongodbreader/mongodbwriter             |                                                                               |
-| MySQL/MariaDB       | YES    | YES    | mysqlreader/mysqlwriter                 |                                                                               |
-| Oracle              | YES    | YES    | oraclereader/oraclewriter               |                                                                               |
-| PostgreSQL          | YES    | YES    | postgresqlreader/postgresqlwriter       |                                                                               |
-| Trino               | YES    | YES    | rdbmsreader/rdbmswriter                 | [trino](https://trino.io)                                                     |
-| Redis               | YES    | YES    | redisreader/rediswriter                 |                                                                               |
-| SQLite              | YES    | YES    | sqlitereader/sqlitewriter               |                                                                               |
-| SQL Server          | YES    | YES    | sqlserverreader/sqlserverwriter         |                                                                               |
-| TDengine            | YES    | YES    | tdenginereader/tdenginewriter           | [TDengine](https://www.taosdata.com/cn/)                                      |
-| TDH Inceptor2       | YES    | YES    | rdbmsreader/rdbmswriter                 | [Transwarp TDH](http://transwarp.cn/) 5.1 or later                            |
-| TEXT                | YES    | YES    | textfilereader/textfilewriter           |                                                                               |
+| database/filesystem | reader | writer | plugin(reader/writer)                   | memo                            |
+| ------------------- | ------ | ------ | --------------------------------------- | ------------------------------- |
+| Cassandra           | YES    | YES    | cassandrareader/cassandrawriter         |                                 |
+| ClickHouse          | YES    | YES    | clickhousereader/clickhousewriter       |                                 |
+| DB2                 | YES    | YES    | rbdmsreader/rdbmswriter                 | not fully tested                |
+| DBF                 | YES    | YES    | dbfreader/dbfwriter                     |                                 |
+| ElasticSearch       | YES    | YES    | elasticsearchreader/elasticsearchwriter | originally from [@Kestrong][1]  |
+| Excel               | YES    | YES    | excelreader/excelwriter                 |                                 |
+| FTP                 | YES    | YES    | ftpreader/ftpwriter                     |                                 |
+| HBase 1.x           | YES    | YES    | hbase11xreader/hbase11xwriter           | use HBASE API                   |
+| HBase 1.x           | YES    | YES    | hbase11xsqlreader/hbase11xsqlwriter     | use Phoenix[Phoenix][2]         |
+| HBase 2.x           | YES    | NO     | hbase20xreader                          | use HBase API                   |
+| HBase 2.x           | YES    | YES    | hbase20xsqlreader/hbase20xsqlwriter     | via [Phoenix][2]                |
+| HDFS                | YES    | YES    | hdfsreader/hdfswriter                   | support HDFS 2.0 or later       |
+| HTTP                | YES    | NO     | httpreader                              | support RestFul API             |
+| Greenplum           | YES    | YES    | postgresqlreader/greenplumwriter        |                                 |
+| InfluxDB            | YES    | YES    | influxdbreader/influxdbwriter           | ONLY support InfluxDB 1.x       |
+| json                | YES    | NO     | jsonfilereader                          |                                 |
+| kudu                | YES    | YES    | kudureader/kuduwriter                   |                                 |
+| MongoDB             | YES    | YES    | mongodbreader/mongodbwriter             |                                 |
+| MySQL/MariaDB       | YES    | YES    | mysqlreader/mysqlwriter                 |                                 |
+| Oracle              | YES    | YES    | oraclereader/oraclewriter               |                                 |
+| PostgreSQL          | YES    | YES    | postgresqlreader/postgresqlwriter       |                                 |
+| Trino               | YES    | YES    | rdbmsreader/rdbmswriter                 | [trino][3]                      |
+| Redis               | YES    | YES    | redisreader/rediswriter                 |                                 |
+| SQLite              | YES    | YES    | sqlitereader/sqlitewriter               |                                 |
+| SQL Server          | YES    | YES    | sqlserverreader/sqlserverwriter         |                                 |
+| TDengine            | YES    | YES    | tdenginereader/tdenginewriter           | [TDengine][4]                   |
+| TDH Inceptor2       | YES    | YES    | rdbmsreader/rdbmswriter                 | [Transwarp TDH][5] 5.1 or later |
+| TEXT                | YES    | YES    | textfilereader/textfilewriter           |                                 |
+
+[1]: https://github.com/Kestrong/datax-elasticsearch
+[2]: https://phoenix.apache.org
+[3]: https://trino.io
+[4]: https://www.taosdata.com/cn/
+[5]: http://transwarp.cn/
 
 ## Quick Started
 
@@ -85,9 +90,10 @@ If you are too lazy to compile or cannot compile because of your environment, yo
 | 3.1.2   | https://pan.baidu.com/s/1zFqv8E6iJX549zdSZDQgiQ code: 7jdk | 3674711fc9b68fad3086f3c8526a3427 |
 | 3.1.1   | https://pan.baidu.com/s/1GwmFA7-hPkd6GKiZEvUKXg code: 1inn | 0fa4e7902420704b2e814fef098f40ae |
 
-**Note**: 
+**Note**:
+
 1. Starting from version `4.0.1`, the uploaded binary files have been switched from `Baidu Net Disk` to `Aliyun Drive`, and the download speed should be greatly improved
-2. Starting from version `3.2.3`, in order to reduce the installation package size, the built-in package only includes `streamreader` and `streamwriter` plug-ins, 
+2. Starting from version `3.2.3`, in order to reduce the installation package size, the built-in package only includes `streamreader` and `streamwriter` plug-ins,
 other plug-ins need to be downloaded separately, the download shared directory list is as the following.
 3. Because Aliyun drive does not support the sharing of compressed files currently, So, I add a .jpg suffix for each binary file, you need to remove this suffix before you can use them   
 
@@ -95,7 +101,7 @@ other plug-ins need to be downloaded separately, the download shared directory l
 
 | version | download link                                              |
 | ------- | ---------------------------------------------------------- |
-| 4.0.0   | https://pan.baidu.com/s/1gLWiw2I7W_4-KBiA1CCg2g code: hxag | 
+| 4.0.0   | https://pan.baidu.com/s/1gLWiw2I7W_4-KBiA1CCg2g code: hxag |
 | 3.2.5   | https://pan.baidu.com/s/1VMqPAYeL_kirCjOVAdvoAg code: hda9 |
 | 3.2.4   | https://pan.baidu.com/s/1gPJlJh66bGQUSUR-2mNOQw code: 7c4j |
 | 3.2.3   | https://pan.baidu.com/s/1g4z3Pqc_BxKstkiYjWXopQ code: 2fip |
@@ -105,7 +111,7 @@ other plug-ins need to be downloaded separately, the download shared directory l
 ```shell
 git clone https://github.com/wgzhao/addax.git addax
 cd addax
-mvn clean package -pl '!:addax-docs'
+mvn clean package
 mvn package assembly:single
 ```
 
@@ -132,37 +138,21 @@ The output of the above command is roughly as follows.
 <details>
 <summary>Click to expand</summary>
 
-```
- bin/addax.sh job/job.json
-
-Addax (addax-V3), From Alibaba !
-Copyright (C) 2010-2017, Alibaba Group. All Rights Reserved.
+```shell
+$ bin/addax.sh job/job.json
 
 
-2020-09-23 19:51:30.990 [main] INFO  VMInfo - VMInfo# operatingSystem class => sun.management.OperatingSystemImpl
-2020-09-23 19:51:30.997 [main] INFO  Engine - the machine info  =>
+  ___      _     _
+ / _ \    | |   | |
+/ /_\ \ __| | __| | __ ___  __
+|  _  |/ _` |/ _` |/ _` \ \/ /
+| | | | (_| | (_| | (_| |>  <
+\_| |_/\__,_|\__,_|\__,_/_/\_\
 
-	osInfo:	Oracle Corporation 1.8 25.181-b13
-	jvmInfo:	Mac OS X x86_64 10.15.6
-	cpu num:	4
+:: Addax version ::    (v4.0.3)
 
-	totalPhysicalMemory:	-0.00G
-	freePhysicalMemory:	-0.00G
-	maxFileDescriptorCount:	-1
-	currentOpenFileDescriptorCount:	-1
-
-	GC Names	[PS MarkSweep, PS Scavenge]
-
-	MEMORY_NAME                    | allocation_size                | init_size
-	PS Eden Space                  | 677.50MB                       | 16.00MB
-	Code Cache                     | 240.00MB                       | 2.44MB
-	Compressed Class Space         | 1,024.00MB                     | 0.00MB
-	PS Survivor Space              | 2.50MB                         | 2.50MB
-	PS Old Gen                     | 1,365.50MB                     | 43.00MB
-	Metaspace                      | -0.00MB                        | 0.00MB
-
-
-2020-09-23 19:51:31.009 [main] INFO  Engine -
+2021-09-16 11:03:20.328 [        main] INFO  VMInfo               - VMInfo# operatingSystem class => sun.management.OperatingSystemImpl
+2021-09-16 11:03:20.347 [        main] INFO  Engine               -
 {
 	"content":[
 		{
@@ -171,7 +161,7 @@ Copyright (C) 2010-2017, Alibaba Group. All Rights Reserved.
 					"column":[
 						{
 							"type":"string",
-							"value":"DataX"
+							"value":"addax"
 						},
 						{
 							"type":"long",
@@ -218,69 +208,46 @@ Copyright (C) 2010-2017, Alibaba Group. All Rights Reserved.
 	}
 }
 
-2020-09-23 19:51:31.068 [main] WARN  Engine - prioriy set to 0, because NumberFormatException, the value is: null
-2020-09-23 19:51:31.069 [main] INFO  PerfTrace - PerfTrace traceId=job_-1, isEnable=false, priority=0
-2020-09-23 19:51:31.069 [main] INFO  JobContainer - Addax jobContainer starts job.
-2020-09-23 19:51:31.070 [main] INFO  JobContainer - Set jobId = 0
-2020-09-23 19:51:31.082 [job-0] INFO  JobContainer - jobContainer starts to do prepare ...
-2020-09-23 19:51:31.082 [job-0] INFO  JobContainer - Addax Reader.Job [streamreader] do prepare work .
-2020-09-23 19:51:31.083 [job-0] INFO  JobContainer - Addax Writer.Job [streamwriter] do prepare work .
-2020-09-23 19:51:31.083 [job-0] INFO  JobContainer - jobContainer starts to do split ...
-2020-09-23 19:51:31.083 [job-0] INFO  JobContainer - Job set Channel-Number to 1 channels.
-2020-09-23 19:51:31.083 [job-0] INFO  JobContainer - Addax Reader.Job [streamreader] splits to [1] tasks.
-2020-09-23 19:51:31.084 [job-0] INFO  JobContainer - Addax Writer.Job [streamwriter] splits to [1] tasks.
-2020-09-23 19:51:31.102 [job-0] INFO  JobContainer - jobContainer starts to do schedule ...
-2020-09-23 19:51:31.111 [job-0] INFO  JobContainer - Scheduler starts [1] taskGroups.
-2020-09-23 19:51:31.117 [taskGroup-0] INFO  TaskGroupContainer - taskGroupId=[0] start [1] channels for [1] tasks.
-2020-09-23 19:51:31.119 [taskGroup-0] INFO  Channel - Channel set byte_speed_limit to -1, No bps activated.
-2020-09-23 19:51:31.120 [taskGroup-0] INFO  Channel - Channel set record_speed_limit to -1, No tps activated.
-2020-09-23 19:51:31.129 [taskGroup-0] INFO  TaskGroupContainer - taskGroup[0] taskId[0] attemptCount[1] is started
-Addax	19890604	1989-06-04 00:00:00	true	test
-Addax	19890604	1989-06-04 00:00:00	true	test
-Addax	19890604	1989-06-04 00:00:00	true	test
-Addax	19890604	1989-06-04 00:00:00	true	test
-Addax	19890604	1989-06-04 00:00:00	true	test
-Addax	19890604	1989-06-04 00:00:00	true	test
-Addax	19890604	1989-06-04 00:00:00	true	test
-Addax	19890604	1989-06-04 00:00:00	true	test
-Addax	19890604	1989-06-04 00:00:00	true	test
-Addax	19890604	1989-06-04 00:00:00	true	test
-2020-09-23 19:51:31.231 [taskGroup-0] INFO  TaskGroupContainer - taskGroup[0] taskId[0] is successful, used[103]ms
-2020-09-23 19:51:31.232 [taskGroup-0] INFO  TaskGroupContainer - taskGroup[0] completed it's tasks.
-2020-09-23 19:51:41.129 [job-0] INFO  StandAloneJobContainerCommunicator - Total 10 records, 260 bytes | Speed 26B/s, 1 records/s | Error 0 records, 0 bytes |  All Task WaitWriterTime 0.000s |  All Task WaitReaderTime 0.000s | Percentage 100.00%
-2020-09-23 19:51:41.130 [job-0] INFO  AbstractScheduler - Scheduler accomplished all tasks.
-2020-09-23 19:51:41.130 [job-0] INFO  JobContainer - Addax Writer.Job [streamwriter] do post work.
-2020-09-23 19:51:41.130 [job-0] INFO  JobContainer - Addax Reader.Job [streamreader] do post work.
-2020-09-23 19:51:41.130 [job-0] INFO  JobContainer - Addax jobId [0] completed successfully.
-2020-09-23 19:51:41.130 [job-0] INFO  JobContainer - invokeHooks begin
-2020-09-23 19:51:41.130 [job-0] INFO  JobContainer - report url not found
-2020-09-23 19:51:41.133 [job-0] INFO  JobContainer -
-	 [total cpu info] =>
-		averageCpu                     | maxDeltaCpu                    | minDeltaCpu
-		-1.00%                         | -1.00%                         | -1.00%
-
-
-	 [total gc info] =>
-		 NAME                 | totalGCCount       | maxDeltaGCCount    | minDeltaGCCount    | totalGCTime        | maxDeltaGCTime     | minDeltaGCTime
-		 PS MarkSweep         | 0                  | 0                  | 0                  | 0.000s             | 0.000s             | 0.000s
-		 PS Scavenge          | 2                  | 2                  | 2                  | 0.006s             | 0.006s             | 0.006s
-
-2020-09-23 19:51:41.133 [job-0] INFO  JobContainer - PerfTrace not enable!
-2020-09-23 19:51:41.133 [job-0] INFO  StandAloneJobContainerCommunicator - Total 10 records, 260 bytes | Speed 26B/s, 1 records/s | Error 0 records, 0 bytes |  All Task WaitWriterTime 0.000s |  All Task WaitReaderTime 0.000s | Percentage 100.00%
-2020-09-23 19:51:41.134 [job-0] INFO  JobContainer - Total 10 records, 260 bytes | Speed 26B/s, 1 records/s | Error 0 records, 0 bytes |  All Task WaitWriterTime 0.000s |  All Task WaitReaderTime 0.000s | Percentage 100.00%
-2020-09-23 19:51:41.134 [job-0] INFO  JobContainer -
-任务启动时刻                    : 2020-09-23 19:51:31
-任务结束时刻                    : 2020-09-23 19:51:41
-任务总计耗时                    :                 10s
-任务平均流量                    :               26B/s
-记录写入速度                    :              1rec/s
+2021-09-16 11:03:20.367 [        main] INFO  PerfTrace            - PerfTrace traceId=job_-1, isEnable=false, priority=0
+2021-09-16 11:03:20.367 [        main] INFO  JobContainer         - Addax jobContainer starts job.
+2021-09-16 11:03:20.368 [        main] INFO  JobContainer         - Set jobId = 0
+2021-09-16 11:03:20.382 [       job-0] INFO  JobContainer         - Addax Reader.Job [streamreader] do prepare work .
+2021-09-16 11:03:20.382 [       job-0] INFO  JobContainer         - Addax Writer.Job [streamwriter] do prepare work .
+2021-09-16 11:03:20.383 [       job-0] INFO  JobContainer         - Job set Channel-Number to 1 channels.
+2021-09-16 11:03:20.383 [       job-0] INFO  JobContainer         - Addax Reader.Job [streamreader] splits to [1] tasks.
+2021-09-16 11:03:20.383 [       job-0] INFO  JobContainer         - Addax Writer.Job [streamwriter] splits to [1] tasks.
+2021-09-16 11:03:20.405 [       job-0] INFO  JobContainer         - Scheduler starts [1] taskGroups.
+2021-09-16 11:03:20.412 [ taskGroup-0] INFO  TaskGroupContainer   - taskGroupId=[0] start [1] channels for [1] tasks.
+2021-09-16 11:03:20.415 [ taskGroup-0] INFO  Channel              - Channel set byte_speed_limit to -1, No bps activated.
+2021-09-16 11:03:20.415 [ taskGroup-0] INFO  Channel              - Channel set record_speed_limit to -1, No tps activated.
+addax	19890604	1989-06-04 00:00:00	true	test
+addax	19890604	1989-06-04 00:00:00	true	test
+addax	19890604	1989-06-04 00:00:00	true	test
+addax	19890604	1989-06-04 00:00:00	true	test
+addax	19890604	1989-06-04 00:00:00	true	test
+addax	19890604	1989-06-04 00:00:00	true	test
+addax	19890604	1989-06-04 00:00:00	true	test
+addax	19890604	1989-06-04 00:00:00	true	test
+addax	19890604	1989-06-04 00:00:00	true	test
+addax	19890604	1989-06-04 00:00:00	true	test
+2021-09-16 11:03:23.428 [       job-0] INFO  AbstractScheduler    - Scheduler accomplished all tasks.
+2021-09-16 11:03:23.428 [       job-0] INFO  JobContainer         - Addax Writer.Job [streamwriter] do post work.
+2021-09-16 11:03:23.428 [       job-0] INFO  JobContainer         - Addax Reader.Job [streamreader] do post work.
+2021-09-16 11:03:23.430 [       job-0] INFO  JobContainer         - PerfTrace not enable!
+2021-09-16 11:03:23.431 [       job-0] INFO  StandAloneJobContainerCommunicator - Total 10 records, 260 bytes | Speed 86B/s, 3 records/s | Error 0 records, 0 bytes |  All Task WaitWriterTime 0.000s |  All Task WaitReaderTime 0.000s | Percentage 100.00%
+2021-09-16 11:03:23.432 [       job-0] INFO  JobContainer         -
+任务启动时刻                    : 2021-09-16 11:03:20
+任务结束时刻                    : 2021-09-16 11:03:23
+任务总计耗时                    :                  3s
+任务平均流量                    :               86B/s
+记录写入速度                    :              3rec/s
 读出记录总数                    :                  10
 读写失败总数                    :                   0
 ```
 
 </details>
 
-[Here](core/src/main/job) are some job configuration examples
+[Here](core/src/main/job) and [Here](docs/assets/jobs) provides all kinds of job configuration examples
 
 ## Runtime Requirements
 

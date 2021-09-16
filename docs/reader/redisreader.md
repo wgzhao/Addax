@@ -5,56 +5,7 @@ RedisReader 插件用于读取 [Redis RDB](https://redis.io) 数据
 ## 配置样例
 
 ```json
-{
-  "job": {
-    "content": [
-      {
-        "reader": {
-          "name": "redisreader",
-          "parameter": {
-            "connection": [
-              {
-                "uri": "file:///root/dump.rdb",
-                "uri": "http://localhost/dump.rdb",
-                "uri": "tcp://127.0.0.1:7001",
-                "uri": "tcp://127.0.0.1:7002",
-                "uri": "tcp://127.0.0.1:7003",
-                "auth": "password"
-              }
-            ],
-            "include": [
-              "^user"
-            ],
-            "exclude": [
-              "^password"
-            ],
-            "db": [
-              0,
-              1
-            ]
-          }
-        },
-        "writer": {
-          "name": "rediswriter",
-          "parameter": {
-            "connection": [
-              {
-                "uri": "tcp://127.0.0.1:6379",
-                "auth": "123456"
-              }
-            ],
-            "timeout": 60000
-          }
-        }
-      }
-    ],
-    "setting": {
-      "speed": {
-        "channel": 1
-      }
-    }
-  }
-}
+--8<-- "jobs/redisreader.json"
 ```
 
 ## 参数说明

@@ -1,10 +1,12 @@
 site_name: Addax Documentation
 site_description: Addax is an open source universal ETL tool that supports most of those RDBMS and NoSQLs on the planet
 site_url: https://wgzhao.github.io/Addax/
+site_author: Steven Zhao
 repo_name: wgzhao/addax
 repo_url: https://github.com/wgzhao/Addax.git
 edit_uri: ""
 
+copyright: Copyright &copy; 2019 - 2021 Steven Zhao
 theme:
   name: material
   language: zh
@@ -23,9 +25,20 @@ theme:
         icon: material/toggle-switch
         name: Switch to light mode
   features:
-    - navigation.expand
+    # - navigation.expand
     - navigation.instant
-     - navigation.indexes
+    - navigation.indexes
+    - content.code.annotate
+    - content.tabs.link
+    # - header.autohide
+    # - navigation.sections
+    # - navigation.tabs
+    # - navigation.tabs.sticky
+    - navigation.top
+    - navigation.tracking
+    - search.highlight
+    - search.share
+    - search.suggest
 
 nav:
   - index.md
@@ -100,3 +113,38 @@ extra:
     - icon: fontawesome/brands/github
       link: https://github.com/wgzhao
 
+# Extentions
+markdown_extensions:
+  - admonition
+  - abbr
+  - attr_list
+  - def_list
+  - footnotes
+  - meta
+  - md_in_html
+  - toc:
+      permalink: true
+  - pymdownx.arithmatex:
+      generic: true
+  - pymdownx.betterem:
+      smart_enable: all
+  - pymdownx.caret
+  - pymdownx.details
+  - pymdownx.highlight
+  - pymdownx.inlinehilite
+  - pymdownx.keys
+  - pymdownx.magiclink:
+      repo_url_shorthand: true
+      user: wgzhao
+      repo: addax
+  - pymdownx.mark
+  - pymdownx.smartsymbols
+  - pymdownx.superfences
+  - pymdownx.snippets:
+      base_path: 
+        - docs/assets
+      check_paths: false
+  - pymdownx.tabbed
+  - pymdownx.tasklist:
+      custom_checkbox: true
+  - pymdownx.tilde

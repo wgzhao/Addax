@@ -1,0 +1,39 @@
+{
+  "job": {
+    "setting": {
+      "speed": {
+        "channel": 2,
+        "bytes": -1
+      }
+    },
+    "content": [
+      {
+        "reader": {},
+        "writer": {
+          "name": "ftpwriter",
+          "parameter": {
+            "protocol": "sftp",
+            "host": "***",
+            "port": 22,
+            "username": "xxx",
+            "password": "xxx",
+            "timeout": "60000",
+            "connectPattern": "PASV",
+            "path": "/tmp/data/",
+            "fileName": "test",
+            "writeMode": "truncate|append|nonConflict",
+            "fieldDelimiter": ",",
+            "encoding": "UTF-8",
+            "nullFormat": "null",
+            "dateFormat": "yyyy-MM-dd",
+            "fileFormat": "csv",
+            "useKey": false,
+            "keyPath": "",
+            "keyPass": "",
+            "header": []
+          }
+        }
+      }
+    ]
+  }
+}

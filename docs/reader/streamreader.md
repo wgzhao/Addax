@@ -5,41 +5,7 @@ StreamReader 是一个从内存读取数据的插件， 他主要用来快速生
 一个完整的 StreamReader 配置文件如下：
 
 ```json
-{
-  "reader": {
-    "name": "streamreader",
-    "parameter": {
-      "column": [
-        {
-          "value": "unique_id",
-          "type": "string"
-        },
-        {
-          "value": "1989-06-04 08:12:13",
-          "type": "date",
-          "dateFormat": "yyyy-MM-dd HH:mm:ss"
-        },
-        {
-          "value": 1984,
-          "type": "long"
-        },
-        {
-          "value": 1989.64,
-          "type": "double"
-        },
-        {
-          "value": true,
-          "type": "bool"
-        },
-        {
-          "value": "a long text",
-          "type": "bytes"
-        }
-      ],
-      "sliceRecordCount": 10
-    }
-  }
-}
+--8<-- "jobs/streamreader.json"
 ```
 
 上述配置文件将会生成 10条记录（假定channel为1），每条记录的内容如下：
@@ -133,13 +99,12 @@ StreamReader 还支持递增函数，比如我们要得到一个从1开始，每
 - 开始日期：正确的日期字符串，默认格式为 `yyyy-MM-dd hh:mm:ss`，如果时间格式不同，则需要配置 `dateFormat` 来指定日期格式，这是必填项
 - 步长：每次需要增加的长度，默认为1，如果希望是递减，则填写负数，这是可选项
 - 步长单位：按什么时间单位进行递增/递减，默认为按天（day），这是可选项，可选的单位有
-    - d/day
-    - M/month
-    - y/year
-    - h/hour
-    - m/minute
-    - s/second
-    - w/week
-    
-配置项 `sliceRecordCount` 用来指定要生成的数据条数，如果指定的 `channel`，则实际生成的记录数为 `sliceRecordCount * channel`
+  - d/day
+  - M/month
+  - y/year
+  - h/hour
+  - m/minute
+  - s/second
+  - w/week
 
+配置项 `sliceRecordCount` 用来指定要生成的数据条数，如果指定的 `channel`，则实际生成的记录数为 `sliceRecordCount * channel`

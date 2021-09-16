@@ -12,61 +12,11 @@
 
 我们假定本地部署的 `Addax` 在 `/opt/app/addax/4.0.3` 文件夹下。其 `job` 目录下有这样的一个 `job.json` 配置文件，内容如下：
 
-```json
- "job": {
-    "setting": {
-      "speed": {
-        "byte": -1,
-        "channel": 5
-      },
-      "errorLimit": {
-        "record": 0,
-        "percentage": 0.02
-      }
-    },
-    "content": [
-      {
-        "reader": {
-          "name": "streamreader",
-          "parameter": {
-            "column": [
-              { "incr":"1,10", "type":"long"},
-              {
-                "value": "DataX",
-                "type": "string"
-              },
-              {
-                "value": 19890604,
-                "type": "long"
-              },
-              {
-                "value": "1989-06-04 00:00:00",
-                "type": "date"
-              },
-              {
-                "value": true,
-                "type": "bool"
-              },
-              {
-                "incr": "10,1",
-                "type": "long"
-              }
-            ],
-            "sliceRecordCount": 2
-          }
-        },
-        "writer": {
-          "name": "streamwriter",
-          "parameter": {
-            "print": true,
-            "encoding": "UTF-8"
-          }
-        }
-      }
-    ]
-  }
-}
-```
+=== "job/job.json"
+
+  ```json
+  --8<-- "jobs/quickstart.json"
+  ```
 
 上述 job 文件运行没有符合我们的预期，猜测是 `streamreader` 这个插件的 `parseMixupFunctions` 函数有问题，我想调试看具体问题在哪里。
 

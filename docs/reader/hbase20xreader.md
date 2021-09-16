@@ -104,153 +104,19 @@ ROW                                   COLUMN+CELL
 | xiaoming | info:birthday    | 1457082186830 | 1987-06-17 |
 | xiaoming | info:company     | 1457082189826 | alibaba    |
 
-配置一个从 HBase 抽取数据到本地的作业:（normal 模式）
+配置一个从 HBase 抽取数据到本地的作业，分别为标准模式和多版本模式
 
-```json
-{
-  "job": {
-    "setting": {
-      "speed": {
-        "channel": 1,
-        "bytes": -1
-      }
-    },
-    "content": [
-      {
-        "reader": {
-          "name": "hbase11xreader",
-          "parameter": {
-            "hbaseConfig": {
-              "hbase.zookeeper.quorum": "xxxf"
-            },
-            "table": "users",
-            "encoding": "utf-8",
-            "mode": "normal",
-            "column": [
-              {
-                "name": "rowkey",
-                "type": "string"
-              },
-              {
-                "name": "info: age",
-                "type": "string"
-              },
-              {
-                "name": "info: birthday",
-                "type": "date",
-                "format": "yyyy-MM-dd"
-              },
-              {
-                "name": "info: company",
-                "type": "string"
-              },
-              {
-                "name": "address: country",
-                "type": "string"
-              },
-              {
-                "name": "address: province",
-                "type": "string"
-              },
-              {
-                "name": "address: city",
-                "type": "string"
-              }
-            ],
-            "range": {
-              "startRowkey": "",
-              "endRowkey": "",
-              "isBinaryRowkey": true
-            }
-          }
-        },
-        "writer": {
-          "name": "txtfilewriter",
-          "parameter": {
-            "path": "/Users/shf/workplace/addax_test/hbase11xreader/result",
-            "fileName": "qiran",
-            "writeMode": "truncate"
-          }
-        }
-      }
-    ]
-  }
-}
-```
+=== "hbase20x2stream_normal.json"
 
-配置一个从 HBase 抽取数据到本地的作业:（ multiVersionFixedColumn 模式）
+    ```json
+    --8<-- "jobs/hbase20xreader_normal.json"
+    ```
 
-```json
-{
-  "job": {
-    "setting": {
-      "speed": {
-        "channel": 1,
-        "bytes": -1
-      }
-    },
-    "content": [
-      {
-        "reader": {
-          "name": "hbase11xreader",
-          "parameter": {
-            "hbaseConfig": {
-              "hbase.zookeeper.quorum": "xxx"
-            },
-            "table": "users",
-            "encoding": "utf-8",
-            "mode": "multiVersionFixedColumn",
-            "maxVersion": "-1",
-            "column": [
-              {
-                "name": "rowkey",
-                "type": "string"
-              },
-              {
-                "name": "info: age",
-                "type": "string"
-              },
-              {
-                "name": "info: birthday",
-                "type": "date",
-                "format": "yyyy-MM-dd"
-              },
-              {
-                "name": "info: company",
-                "type": "string"
-              },
-              {
-                "name": "address: contry",
-                "type": "string"
-              },
-              {
-                "name": "address: province",
-                "type": "string"
-              },
-              {
-                "name": "address: city",
-                "type": "string"
-              }
-            ],
-            "range": {
-              "startRowkey": "",
-              "endRowkey": ""
-            }
-          }
-        },
-        "writer": {
-          "name": "txtfilewriter",
-          "parameter": {
-            "path": "/Users/shf/workplace/addax_test/hbase11xreader/result",
-            "fileName": "qiran",
-            "writeMode": "truncate"
-          }
-        }
-      }
-    ]
-  }
-}
-```
+=== "hbase20x2stream_version.json"
+
+    ```json
+    --8<-- "jobs/hbase20xreader_version.json"
+    ```
 
 ## 参数说明
 

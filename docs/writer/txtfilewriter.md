@@ -5,62 +5,7 @@ TxtFileWriter提供了向本地文件写入类CSV格式的一个或者多个表�
 ## 配置样例
 
 ```json
-{
-  "job": {
-    "setting": {
-      "speed": {
-        "channel": 2,
-        "bytes": -1
-      }
-    },
-    "content": [
-      {
-        "reader": {
-          "name": "txtfilereader",
-          "parameter": {
-            "path": [
-              "/tmp/data"
-            ],
-            "encoding": "UTF-8",
-            "column": [
-              {
-                "index": 0,
-                "type": "long"
-              },
-              {
-                "index": 1,
-                "type": "boolean"
-              },
-              {
-                "index": 2,
-                "type": "double"
-              },
-              {
-                "index": 3,
-                "type": "string"
-              },
-              {
-                "index": 4,
-                "type": "date",
-                "format": "yyyy.MM.dd"
-              }
-            ],
-            "fieldDelimiter": ","
-          }
-        },
-        "writer": {
-          "name": "txtfilewriter",
-          "parameter": {
-            "path": "/tmp/result",
-            "fileName": "luohw",
-            "writeMode": "truncate",
-            "dateFormat": "yyyy-MM-dd"
-          }
-        }
-      }
-    ]
-  }
-}
+--8<-- "jobs/txtwriter.json"
 ```
 
 ## 参数说明

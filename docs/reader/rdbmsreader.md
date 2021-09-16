@@ -18,15 +18,16 @@ RDBMSReader 插件支持从传统 RDBMS 读取数据。这是一个通用关系�
 
 1. 下载对应的 JDBC 驱动，并拷贝到 `plugin/reader/rdbmsreader/libs` 目录
 2. 修改 `plugin/reader/rdbmsreader/plugin.json` 文件，找到 `drivers` 一项，填写正确的 JDBC 驱动名，比如 DB2 的驱动名为 `com.ibm.db2.jcc.DB2Driver`，类似这样：
+   
     ```json
-   {
-    "name": "rdbmsreader",
-    "class": "com.wgzhao.addax.plugin.reader.rdbmsreader.RdbmsReader",
-    "description": "",
-    "developer": "wgzhao",
-    "drivers": ["com.ibm.db2.jcc.DB2Driver"]
-    } 
-   ```
+    {
+      "name": "rdbmsreader",
+      "class": "com.wgzhao.addax.plugin.reader.rdbmsreader.RdbmsReader",
+      "description": "",
+      "developer": "wgzhao",
+      "drivers": ["com.ibm.db2.jcc.DB2Driver"]
+      } 
+    ```
 
 以下列出常见的数据库以及对应的驱动名称
 
@@ -48,56 +49,11 @@ RDBMSReader 插件支持从传统 RDBMS 读取数据。这是一个通用关系�
 
 以下配置展示了如何从 Presto 数据库读取数据到终端
 
-```json
-{
-  "job": {
-    "setting": {
-      "speed": {
-        "byte": 1048576,
-        "channel": 1
-      },
-      "errorLimit": {
-        "record": 0,
-        "percentage": 0.02
-      }
-    },
-    "content": [
-      {
-        "reader": {
-          "name": "rdbmsreader",
-          "parameter": {
-            "username": "hive",
-            "password": "",
-            "column": [
-              "*"
-            ],
-            "connection": [
-              {
-                "table": [
-                  "default.table"
-                ],
-                "jdbcUrl": [
-                  "jdbc:presto://127.0.0.1:8080/hive"
-                ],
-                "driver": ""
-              }
-            ],
-            "fetchSize": 1024,
-            "where": "1 = 1"
-          }
-        },
-        "writer": {
-          "name": "streamwriter",
-          "parameter": {
-            "print": true
-          }
-        }
-      }
-    ]
-  }
-}
+=== "job/rdbms2stream.json"
 
-```
+  ```json
+  --8<-- "jobs/rdbmsreader.json"
+  ```
 
 ## 参数说明
 
@@ -181,7 +137,6 @@ Column必须显示填写，不允许为空！
 - SQL Server
 
 ## 类型转换
-
 
 | Addax 内部类型 | RDBMS 数据类型                                                |
 | -------------- | ------------------------------------------------------------- |

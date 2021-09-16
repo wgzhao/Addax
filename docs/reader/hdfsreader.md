@@ -23,58 +23,10 @@ HdfsReade r提供了读取分布式文件系统数据存储的能力。
 8. 目前插件中Hive版本为 `3.1.1`，Hadoop版本为`3.1.1`, 在Hadoop `2.7.x`, Hadoop `3.1.x` 和Hive `2.x`, hive `3.1.x` 测试环境中写入正常；其它版本理论上都支持，但在生产环境使用前，请进一步测试；
 9. 支持`kerberos` 认证
 
-
 ## 配置样例
 
 ```json
-{
-  "job": {
-    "setting": {
-      "speed": {
-        "channel": 3,
-        "bytes": -1
-      }
-    },
-    "content": [
-      {
-        "reader": {
-          "name": "hdfsreader",
-          "parameter": {
-            "path": "/user/hive/warehouse/mytable01/*",
-            "defaultFS": "hdfs://xxx:port",
-            "column": [
-              {
-                "index": 0,
-                "type": "long"
-              },
-              {
-                "index": 1,
-                "type": "boolean"
-              },
-              {
-                "type": "string",
-                "value": "hello"
-              },
-              {
-                "index": 2,
-                "type": "double"
-              }
-            ],
-            "fileType": "orc",
-            "encoding": "UTF-8",
-            "fieldDelimiter": ","
-          }
-        },
-        "writer": {
-          "name": "streamwriter",
-          "parameter": {
-            "print": true
-          }
-        }
-      }
-    ]
-  }
-}
+--8<-- "jobs/hdfsreader.json"
 ```
 
 ## 配置项说明
@@ -88,10 +40,10 @@ HdfsReade r提供了读取分布式文件系统数据存储的能力。
 | fieldDelimiter         |    否    | `,`        | 指定文本文件的字段分隔符，二进制文件不需要指定该项 |
 | encoding               |    否    | `utf-8`    | 读取文件的编码配置， 目前仅支持 `utf-8` |
 | nullFormat             |    否    | 无         | 自定义哪些字符可以表示为空,例如如果用户配置: `"\\N"` ，那么如果源头数据是 `"\N"` ，视作 `null` 字段 |
-| haveKerberos           |    否    | 无         | 是否启用 Kerberos 认证，如果启用，则需要同时配置 `kerberosKeytabFilePath`，`kerberosPrincipal`  | 
+| haveKerberos           |    否    | 无         | 是否启用 Kerberos 认证，如果启用，则需要同时配置 `kerberosKeytabFilePath`，`kerberosPrincipal`  |
 | kerberosKeytabFilePath |    否    | 无         | 用于 Kerberos 认证的凭证文件路径, 比如 `/your/path/addax.service.keytab` |
 | kerberosPrincipal      |    否    | 无         | 用于 Kerberos 认证的凭证主体, 比如 `addax/node1@WGZHAO.COM`
-| compress               |    否    | 无         | 指定要读取的文件的压缩格式 | 
+| compress               |    否    | 无         | 指定要读取的文件的压缩格式 |
 | hadoopConfig           |    否    | 无         | 里可以配置与 Hadoop 相关的一些高级参数，比如HA的配置 |
 
 ### path
@@ -160,7 +112,6 @@ HdfsReade r提供了读取分布式文件系统数据存储的能力。
 
 对于用户指定Column信息，type必须填写，index/value必须选择其一。
 
-
 ### compress
 
 当fileType（文件类型）为csv下的文件压缩方式，目前仅支持 gzip、bz2、zip、lzo、lzo_deflate、hadoop-snappy、framing-snappy压缩；
@@ -203,7 +154,7 @@ format，addax目前只支持最主流的两种：hadoop-snappy（hadoop上的sn
 
 所有配置项及默认值,配置时 csvReaderConfig 的map中请 **严格按照以下字段名字进行配置**：
 
-```
+```ini
 boolean caseSensitive = true;
 char textQualifier = 34;
 boolean trimWhitespace = true;
@@ -231,32 +182,31 @@ boolean captureRawRecord = true;
 
 其中：
 
-* Long 是指Hdfs文件文本中使用整形的字符串表示形式，例如 `123456789`
-* Double 是指Hdfs文件文本中使用Double的字符串表示形式，例如 `3.1415`
-* Boolean 是指Hdfs文件文本中使用Boolean的字符串表示形式，例如 `true`、`false`。不区分大小写。
-* Date 是指Hdfs文件文本中使用Date的字符串表示形式，例如 `2014-12-31`
-* Bytes 是指HDFS文件中使用二进制存储的内容，比如一张图片的数据
+- Long 是指Hdfs文件文本中使用整形的字符串表示形式，例如 `123456789`
+- Double 是指Hdfs文件文本中使用Double的字符串表示形式，例如 `3.1415`
+- Boolean 是指Hdfs文件文本中使用Boolean的字符串表示形式，例如 `true`、`false`。不区分大小写。
+- Date 是指Hdfs文件文本中使用Date的字符串表示形式，例如 `2014-12-31`
+- Bytes 是指HDFS文件中使用二进制存储的内容，比如一张图片的数据
 
 特别提醒：
 
-* Hive支持的数据类型 TIMESTAMP 可以精确到纳秒级别，所以 `textfile`、`orcfile` 中 `TIMESTAMP` 存放的数据类似于 `2015-08-21 22:40:47.397898389`，
+- Hive支持的数据类型 TIMESTAMP 可以精确到纳秒级别，所以 `textfile`、`orcfile` 中 `TIMESTAMP` 存放的数据类似于 `2015-08-21 22:40:47.397898389`，
   如果转换的类型配置为Addax的Date，转换之后会导致纳秒部分丢失，所以如果需要保留纳秒部分的数据，请配置转换类型为 `String` 类型。
   
-
 ##  FAQ
 
 Q: 如果报java.io.IOException: Maximum column length of 100,000 exceeded in column...异常信息，说明数据源column字段长度超过了100000字符。
 
 A: 需要在json的reader里增加如下配置
 
- ```json
-{
-  "csvReaderConfig": {
-    "safetySwitch": false,
-    "skipEmptyRecords": false,
-    "useTextQualifier": false
+  ```json
+  {
+    "csvReaderConfig": {
+      "safetySwitch": false,
+      "skipEmptyRecords": false,
+      "useTextQualifier": false
+    }
   }
-}
- ```
+  ```
 
 `safetySwitch = false`  表示单列长度不限制100000字符

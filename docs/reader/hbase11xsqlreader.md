@@ -1,6 +1,5 @@
 # hbase11xsql reader 
 
-
 hbase11xsqlreader 插件实现了从Phoenix(HBase SQL)读取数据, 支持的 HBase 版本为 1.x
 
 ## 配置样例
@@ -44,7 +43,7 @@ hbase11xsqlreader 插件实现了从Phoenix(HBase SQL)读取数据, 支持的 HB
 
 ## 参数说明
 
-| 配置项      | 是否必须 | 默认值 | 描述                                                                           
+| 配置项      | 是否必须 | 默认值 | 描述                                                                           |
 | :---------- | :------: | ------ | --------------------------------------------------------------------------- |
 | hbaseConfig |    是    | 无     | 需要通过 Phoenix 客户端去连接 hbase 集群，因此这里需要填写对应 hbase 集群的 `zkurl`地址 |
 | table       |    是    | 无     | 指定 Phoenix 中的表名,如果有 namespace，该值设置为 `namespace.tablename`          |
