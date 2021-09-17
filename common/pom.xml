@@ -3,7 +3,7 @@
     <parent>
         <groupId>com.wgzhao.addax</groupId>
         <artifactId>addax-all</artifactId>
-        <version>4.0.4</version>
+        <version>4.0.5-SNAPSHOT</version>
     </parent>
 
     <artifactId>addax-common</artifactId>
