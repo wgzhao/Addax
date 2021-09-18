@@ -121,7 +121,6 @@ public class HdfsWriter
             }
             //writeMode check
             this.writeMode = this.writerSliceConfig.getNecessaryValue(Key.WRITE_MODE, HdfsWriterErrorCode.REQUIRED_VALUE);
-            writeMode = writeMode.toLowerCase().trim();
             if (!Constant.SUPPORTED_WRITE_MODE.contains(writeMode)) {
                 throw AddaxException.asAddaxException(HdfsWriterErrorCode.ILLEGAL_VALUE,
                         String.format("仅支持append, nonConflict,overwrite三种模式, 不支持您配置的 writeMode 模式 : [%s]",
@@ -209,11 +208,11 @@ public class HdfsWriter
                 Path[] existFilePaths = hdfsHelper.hdfsDirList(path);
 
                 boolean isExistFile = existFilePaths.length > 0;
-                if ("append".equalsIgnoreCase(writeMode)) {
+                if ("append".equals(writeMode)) {
                     LOG.info("由于您配置了writeMode append, 写入前不做清理工作, [{}] 目录下写入相应文件名前缀 [{}] 的文件",
                             path, fileName);
                 }
-                else if ("nonConflict".equalsIgnoreCase(writeMode) && isExistFile) {
+                else if ("nonConflict".equals(writeMode) && isExistFile) {
                     LOG.info("由于您配置了writeMode nonConflict, 开始检查 [{}] 下面的内容", path);
                     List<String> allFiles = new ArrayList<>();
                     for (Path eachFile : existFilePaths) {
