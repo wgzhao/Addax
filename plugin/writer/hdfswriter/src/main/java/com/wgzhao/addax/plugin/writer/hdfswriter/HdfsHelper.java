@@ -214,7 +214,7 @@ public class HdfsHelper
                 column = record.getColumn(i);
                 String colname = columnsConfiguration.get(i).getString(Key.NAME);
                 String typename = columnsConfiguration.get(i).getString(Key.TYPE).toUpperCase();
-                if (column.getRawData() == null) {
+                if (null == column || column.getRawData() == null) {
                     builder.set(colname, null);
                 }
                 else {
