@@ -136,7 +136,7 @@ public class ExcelHelper
                         break;
                     case ERROR:
                         // #VALUE!
-                        record.addColumn(null);
+                        record.addColumn(new StringColumn());
                         break;
                     case BLANK:
                         // empty cell

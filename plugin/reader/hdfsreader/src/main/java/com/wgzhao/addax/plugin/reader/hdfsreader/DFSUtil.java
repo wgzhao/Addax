@@ -400,7 +400,7 @@ public class DFSUtil
                             columnGenerated = new StringColumn(column.getValue());
                         }
                         else {
-                            columnGenerated = null;
+                            columnGenerated = new StringColumn();
                         }
                         record.addColumn(columnGenerated);
                         continue;
@@ -410,7 +410,7 @@ public class DFSUtil
                     ColumnVector col = rowBatch.cols[i];
                     Type type = Type.valueOf(columnType);
                     if (col.isNull[row]) {
-                        record.addColumn(null);
+                        record.addColumn(new StringColumn(null));
                         continue;
                     }
                     switch (type) {
@@ -437,7 +437,7 @@ public class DFSUtil
                         default:
                             // type is string or other
                             String v = ((BytesColumnVector) col).toString(row);
-                            columnGenerated = v.equals(nullFormat) ? null : new StringColumn(v);
+                            columnGenerated = v.equals(nullFormat) ? new StringColumn() : new StringColumn(v);
                             break;
                     }
                     record.addColumn(columnGenerated);
@@ -499,8 +499,7 @@ public class DFSUtil
                 }
             }
             while (gRecord != null) {
-                transportOneRecord(column, gRecord, schema, recordSender, taskPluginCollector, isReadAllColumns, nullFormat
-                );
+                transportOneRecord(column, gRecord, schema, recordSender, taskPluginCollector, isReadAllColumns, nullFormat);
                 gRecord = reader.read();
             }
         }
@@ -534,7 +533,7 @@ public class DFSUtil
                         columnValue = gRecord.get(columnIndex).toString();
                     }
                     else {
-                        record.addColumn(null);
+                        record.addColumn(new StringColumn(null));
                         continue;
                     }
                 }
@@ -568,7 +567,11 @@ public class DFSUtil
                             columnGenerated = new DoubleColumn(columnValue);
                             break;
                         case DECIMAL:
-                            columnGenerated = new DoubleColumn(new BigDecimal(columnValue).setScale(scale, BigDecimal.ROUND_HALF_UP));
+                            if (null == columnValue) {
+                                columnGenerated = new DoubleColumn((Double) null);
+                            } else {
+                                columnGenerated = new DoubleColumn(new BigDecimal(columnValue).setScale(scale, BigDecimal.ROUND_HALF_UP));
+                            }
                             break;
                         case BOOLEAN:
                             columnGenerated = new BoolColumn(columnValue);
@@ -588,15 +591,13 @@ public class DFSUtil
                                 }
                                 else {
                                     // 框架尝试转换
-                                    columnGenerated = new DateColumn(
-                                            new StringColumn(columnValue)
-                                                    .asDate());
+                                    columnGenerated = new DateColumn(new StringColumn(columnValue).asDate());
                                 }
                             }
                             break;
                         case TIMESTAMP:
                             if (null == columnValue) {
-                                columnGenerated = null;
+                                columnGenerated = new DateColumn();
                             }
                             else {
                                 columnGenerated = new DateColumn(Long.parseLong(columnValue) * 1000);
