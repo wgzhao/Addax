@@ -16,48 +16,13 @@ English | [简体中文](README_zh.md)
 
 The project, originally from Ali's [DataX]((https://github.com/alibaba/datax)), has been streamlined and adapted, as described below
 
-## Supported databases
+## Supported Data Sources
+
+Addax supports more than 20 SQL and NoSQL [data sources](support_data_sources.md). It can also be extended to support more.
 
 ![supported databases](docs/images/supported_databases.png)
 
-| database/filesystem | reader | writer | plugin(reader/writer)                   | memo                            |
-| ------------------- | ------ | ------ | --------------------------------------- | ------------------------------- |
-| Cassandra           | YES    | YES    | cassandrareader/cassandrawriter         |                                 |
-| ClickHouse          | YES    | YES    | clickhousereader/clickhousewriter       |                                 |
-| DB2                 | YES    | YES    | rbdmsreader/rdbmswriter                 | not fully tested                |
-| DBF                 | YES    | YES    | dbfreader/dbfwriter                     |                                 |
-| ElasticSearch       | YES    | YES    | elasticsearchreader/elasticsearchwriter | originally from [@Kestrong][1]  |
-| Excel               | YES    | YES    | excelreader/excelwriter                 |                                 |
-| FTP                 | YES    | YES    | ftpreader/ftpwriter                     |                                 |
-| HBase 1.x           | YES    | YES    | hbase11xreader/hbase11xwriter           | use HBASE API                   |
-| HBase 1.x           | YES    | YES    | hbase11xsqlreader/hbase11xsqlwriter     | use Phoenix[Phoenix][2]         |
-| HBase 2.x           | YES    | NO     | hbase20xreader                          | use HBase API                   |
-| HBase 2.x           | YES    | YES    | hbase20xsqlreader/hbase20xsqlwriter     | via [Phoenix][2]                |
-| HDFS                | YES    | YES    | hdfsreader/hdfswriter                   | support HDFS 2.0 or later       |
-| HTTP                | YES    | NO     | httpreader                              | support RestFul API             |
-| Greenplum           | YES    | YES    | postgresqlreader/greenplumwriter        |                                 |
-| InfluxDB            | YES    | YES    | influxdbreader/influxdbwriter           | ONLY support InfluxDB 1.x       |
-| json                | YES    | NO     | jsonfilereader                          |                                 |
-| kudu                | YES    | YES    | kudureader/kuduwriter                   |                                 |
-| MongoDB             | YES    | YES    | mongodbreader/mongodbwriter             |                                 |
-| MySQL/MariaDB       | YES    | YES    | mysqlreader/mysqlwriter                 |                                 |
-| Oracle              | YES    | YES    | oraclereader/oraclewriter               |                                 |
-| PostgreSQL          | YES    | YES    | postgresqlreader/postgresqlwriter       |                                 |
-| Trino               | YES    | YES    | rdbmsreader/rdbmswriter                 | [trino][3]                      |
-| Redis               | YES    | YES    | redisreader/rediswriter                 |                                 |
-| SQLite              | YES    | YES    | sqlitereader/sqlitewriter               |                                 |
-| SQL Server          | YES    | YES    | sqlserverreader/sqlserverwriter         |                                 |
-| TDengine            | YES    | YES    | tdenginereader/tdenginewriter           | [TDengine][4]                   |
-| TDH Inceptor2       | YES    | YES    | rdbmsreader/rdbmswriter                 | [Transwarp TDH][5] 5.1 or later |
-| TEXT                | YES    | YES    | textfilereader/textfilewriter           |                                 |
-
-[1]: https://github.com/Kestrong/datax-elasticsearch
-[2]: https://phoenix.apache.org
-[3]: https://trino.io
-[4]: https://www.taosdata.com/cn/
-[5]: http://transwarp.cn/
-
-## Quick Started
+## Getting Started
 
 ### Use docker image
 
@@ -68,43 +33,7 @@ docker run -ti --rm --name addax wgzhao/addax:latest /opt/addax/bin/addax.sh /op
 
 ### Do not want to compile?
 
-If you are too lazy to compile or cannot compile because of your environment, you can download the corresponding version from the following link
-
-| version | download                                                   | md5                              |
-| ------- | ---------------------------------------------------------- | -------------------------------- |
-| 4.0.3   | https://www.aliyundrive.com/s/8CRAfMBbwfm                  | 19766c2577b46bd5b22d63a502f5f5dd |
-| 4.0.2   | https://www.aliyundrive.com/s/U5uotY7vVAY                  | cd3a3d6d0c79cbd3bcd259ebb47acbc5 |
-| 4.0.1   | https://www.aliyundrive.com/s/BwbUJr21baH                  | 8f1963e8ce5e5f880a29a503399413a6 |
-| 4.0.0   | https://pan.baidu.com/s/1qmV6ed3CYpACIp29JCIDgQ code: 559q | b9b759da228f3bc656965d20357dcb2a |
-| 3.2.5   | https://pan.baidu.com/s/14_MnbtRUtJlvQh8tTKv6fg code: 1jdr | 43ddd0186ccbaf1f1bfee0aac22da935 |
-| 3.2.4   | https://pan.baidu.com/s/1VaOlAOTqGX4WwRtI5ewPeg code: i127 | 2d16125385b88405481e12bf4a8fd715 |
-| 3.2.3   | https://pan.baidu.com/s/1ajjnSittf6u7rjXhJ7_3Aw code: qxry | ad47b0d840bf21de1668b9310a9782cf |
-| 3.2.2   | https://pan.baidu.com/s/1TQyaERnIk9EQRDULfQE69w code: jh31 | b04d2563adb36457b85e48c318757ea3 |
-| 3.2.1   | https://pan.baidu.com/s/1as6sL09HlxAN8b2pZ1DttQ code: hwgx | ecda4a961b032c75718502caf54246a8 |
-| 3.1.9   | https://pan.baidu.com/s/1GYpehEvB-W3qnqilhskXFw code: q4wv | 48c4104294cd9bb0c749efc50b32b4dd |
-| 3.1.8   | https://pan.baidu.com/s/1jv-tb-11grYaUnsgnEhDzw code: 2dnf | ef110ae1ea31e1761dc25d6930300485 |
-| 3.1.7   | https://pan.baidu.com/s/1CE5I8V5TNptdOp6GLid3Jg code: v5u3 | fecca6c4a32f2bf7246fdef8bc2912fe |
-| 3.1.6   | https://pan.baidu.com/s/1Ldg10E3qWkbUT44rkH19og code: 4av4 | f6aea7e0ce4b9ec83554e9c6d6ab3cb6 |
-| 3.1.5   | https://pan.baidu.com/s/1yY_lJqulE6hKqktoQbbGmQ code: 2r4p | 9ae27c1c434a097f67a17bb704f70731 |
-| 3.1.4   | https://pan.baidu.com/s/1_plsvzD_GrWN-HffPBtz-g code: kpjn | 7aca526fe7f6f0f54dc467f6ca1647b1 |
-| 3.1.2   | https://pan.baidu.com/s/1zFqv8E6iJX549zdSZDQgiQ code: 7jdk | 3674711fc9b68fad3086f3c8526a3427 |
-| 3.1.1   | https://pan.baidu.com/s/1GwmFA7-hPkd6GKiZEvUKXg code: 1inn | 0fa4e7902420704b2e814fef098f40ae |
-
-**Note**:
-
-1. Starting from version `4.0.1`, the uploaded binary files have been switched from `Baidu Net Disk` to `Aliyun Drive`, and the download speed should be greatly improved
-2. Starting from version `3.2.3`, in order to reduce the installation package size, the built-in package only includes `streamreader` and `streamwriter` plug-ins,
-other plug-ins need to be downloaded separately, the download shared directory list is as the following.
-3. Because Aliyun drive does not support the sharing of compressed files currently, So, I add a .jpg suffix for each binary file, you need to remove this suffix before you can use them   
-
-### Plugins download
-
-| version | download link                                              |
-| ------- | ---------------------------------------------------------- |
-| 4.0.0   | https://pan.baidu.com/s/1gLWiw2I7W_4-KBiA1CCg2g code: hxag |
-| 3.2.5   | https://pan.baidu.com/s/1VMqPAYeL_kirCjOVAdvoAg code: hda9 |
-| 3.2.4   | https://pan.baidu.com/s/1gPJlJh66bGQUSUR-2mNOQw code: 7c4j |
-| 3.2.3   | https://pan.baidu.com/s/1g4z3Pqc_BxKstkiYjWXopQ code: 2fip |
+If you are too lazy to compile or cannot compile because of your environment, you can download the corresponding version from the [release](https://github.com/wgzhao/Addax/releases) page
 
 ### Compile and Package
 
@@ -256,8 +185,8 @@ addax	19890604	1989-06-04 00:00:00	true	test
 
 ## Documentation
 
-- [online](https://addax.readthedocs.io)
-- [project](docs/src/main/sphinx/index.rst)
+- [online](https://wgzhao.github.io/Addax/)
+- [project](docs/index.md)
 
 ## Code Style
 
