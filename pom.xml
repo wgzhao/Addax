@@ -59,7 +59,7 @@
         <mssql.jdbc.version>9.2.1.jre8</mssql.jdbc.version>
         <oracle.jdbc.version>19.7.0.0</oracle.jdbc.version>
         <phoenix1.version>4.14.3-HBase-1.4</phoenix1.version>
-        <postgresql.jdbc.version>42.2.23</postgresql.jdbc.version>
+        <postgresql.jdbc.version>42.2.24</postgresql.jdbc.version>
         <taos.jdbc.version>2.0.34</taos.jdbc.version>
         <trino.jdbc.version>351</trino.jdbc.version>
 
