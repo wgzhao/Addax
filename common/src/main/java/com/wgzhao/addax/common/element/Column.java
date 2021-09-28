@@ -23,6 +23,7 @@ import com.alibaba.fastjson.JSON;
 
 import java.math.BigDecimal;
 import java.math.BigInteger;
+import java.sql.Timestamp;
 import java.util.Date;
 
 public abstract class Column
@@ -86,6 +87,8 @@ public abstract class Column
 
     public abstract BigInteger asBigInteger();
 
+    public abstract Timestamp asTimestamp();
+
     @Override
     public String toString()
     {
@@ -94,6 +97,6 @@ public abstract class Column
 
     public enum Type
     {
-        BAD, NULL, INT, LONG, DOUBLE, STRING, BOOL, DATE, BYTES, ARRAY, JAVA_OBJECT
+        BAD, NULL, INT, LONG, DOUBLE, STRING, BOOL, DATE, BYTES, ARRAY, JAVA_OBJECT, TIMESTAMP
     }
 }

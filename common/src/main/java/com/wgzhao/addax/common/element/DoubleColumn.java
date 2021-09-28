@@ -24,6 +24,7 @@ import com.wgzhao.addax.common.exception.AddaxException;
 
 import java.math.BigDecimal;
 import java.math.BigInteger;
+import java.sql.Timestamp;
 import java.util.Date;
 
 public class DoubleColumn
@@ -178,6 +179,13 @@ public class DoubleColumn
     {
         throw AddaxException.asAddaxException(
                 CommonErrorCode.CONVERT_NOT_SUPPORT, "Double类型无法转为Bytes类型 .");
+    }
+
+    @Override
+    public Timestamp asTimestamp()
+    {
+        throw AddaxException.asAddaxException(
+                CommonErrorCode.CONVERT_NOT_SUPPORT, "Double类型无法转为Timestamp .");
     }
 
     private void validate( String data)
