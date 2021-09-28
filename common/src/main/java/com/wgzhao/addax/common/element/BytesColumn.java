@@ -25,6 +25,7 @@ import org.apache.commons.lang3.ArrayUtils;
 
 import java.math.BigDecimal;
 import java.math.BigInteger;
+import java.sql.Timestamp;
 import java.util.Date;
 
 /**
@@ -91,6 +92,13 @@ public class BytesColumn
     {
         throw AddaxException.asAddaxException(
                 CommonErrorCode.CONVERT_NOT_SUPPORT, "Bytes类型不能转为BigInteger .");
+    }
+
+    @Override
+    public Timestamp asTimestamp()
+    {
+        throw AddaxException.asAddaxException(
+                CommonErrorCode.CONVERT_NOT_SUPPORT, "Bytes类型不能转为Timestamp .");
     }
 
     @Override

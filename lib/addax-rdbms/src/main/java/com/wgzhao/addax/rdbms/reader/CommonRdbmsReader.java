@@ -23,6 +23,7 @@ package com.wgzhao.addax.rdbms.reader;
 
 import com.wgzhao.addax.common.base.Constant;
 import com.wgzhao.addax.common.base.Key;
+import com.wgzhao.addax.common.element.TimestampColumn;
 import com.wgzhao.addax.rdbms.util.DataBaseType;
 import com.wgzhao.addax.common.element.BoolColumn;
 import com.wgzhao.addax.common.element.BytesColumn;
@@ -345,7 +346,7 @@ public class CommonRdbmsReader
                                 record.addColumn(new StringColumn(rs.getString(i)));
                             }
                             else {
-                                record.addColumn(new DateColumn(rs.getTimestamp(i)));
+                                record.addColumn(new TimestampColumn(rs.getTimestamp(i)));
                             }
                             break;
 

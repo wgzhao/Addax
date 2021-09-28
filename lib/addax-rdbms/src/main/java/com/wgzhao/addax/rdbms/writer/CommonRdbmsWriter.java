@@ -601,19 +601,7 @@ public class CommonRdbmsWriter
                         preparedStatement.setString(columnIndex, column.asString());
                     }
                     else {
-                        java.sql.Timestamp sqlTimestamp = null;
-                        try {
-                            utilDate = column.asDate();
-                        }
-                        catch (AddaxException e) {
-                            throw new SQLException(String.format(
-                                    "TIMESTAMP 类型转换错误：[%s]", column));
-                        }
-
-                        if (null != utilDate) {
-                            sqlTimestamp = new java.sql.Timestamp(utilDate.getTime());
-                        }
-                        preparedStatement.setTimestamp(columnIndex, sqlTimestamp);
+                        preparedStatement.setTimestamp(columnIndex, column.asTimestamp(), Calendar.getInstance());
                     }
                     break;
 
