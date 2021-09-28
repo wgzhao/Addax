@@ -24,6 +24,7 @@ import com.wgzhao.addax.common.exception.AddaxException;
 
 import java.math.BigDecimal;
 import java.math.BigInteger;
+import java.sql.Timestamp;
 import java.util.Date;
 
 /**
@@ -129,6 +130,13 @@ public class BoolColumn
     {
         throw AddaxException.asAddaxException(
                 CommonErrorCode.CONVERT_NOT_SUPPORT, "Boolean类型不能转为Bytes .");
+    }
+
+    @Override
+    public Timestamp asTimestamp()
+    {
+        throw AddaxException.asAddaxException(
+                CommonErrorCode.CONVERT_NOT_SUPPORT, "Boolean类型不能转为Timestamp .");
     }
 
     private void validate(final String data)

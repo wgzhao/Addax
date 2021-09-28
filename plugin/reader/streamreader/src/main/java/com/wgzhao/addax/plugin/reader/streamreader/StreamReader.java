@@ -29,6 +29,7 @@ import com.wgzhao.addax.common.element.DoubleColumn;
 import com.wgzhao.addax.common.element.LongColumn;
 import com.wgzhao.addax.common.element.Record;
 import com.wgzhao.addax.common.element.StringColumn;
+import com.wgzhao.addax.common.element.TimestampColumn;
 import com.wgzhao.addax.common.exception.AddaxException;
 import com.wgzhao.addax.common.plugin.RecordSender;
 import com.wgzhao.addax.common.spi.Reader;
@@ -46,12 +47,9 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ConcurrentMap;
-import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class StreamReader
@@ -60,7 +58,7 @@ public class StreamReader
 
     private enum Type
     {
-        STRING, LONG, BOOL, DOUBLE, DATE, BYTES,
+        STRING, LONG, BOOL, DOUBLE, DATE, BYTES, TIMESTAMP,
         ;
 
         private static boolean isTypeIllegal(String typeString)
@@ -476,6 +474,8 @@ public class StreamReader
                     case BYTES:
                         return new BytesColumn(RandomStringUtils.randomAlphanumeric((int)
                                 RandomUtils.nextLong(param1Int, param2Int + 1)).getBytes());
+                    case TIMESTAMP:
+                        return new TimestampColumn(RandomUtils.nextLong(1_100_000_000_000L, 2_100_000_000_000L));
                     default:
                         // in fact,never to be here
                         throw new Exception(String.format("不支持类型[%s]", columnType.name()));
@@ -530,6 +530,8 @@ public class StreamReader
                         return new BoolColumn("true".equalsIgnoreCase(columnValue));
                     case BYTES:
                         return new BytesColumn(columnValue.getBytes());
+                    case TIMESTAMP:
+                        return new TimestampColumn(columnValue);
                     default:
                         // in fact,never to be here
                         throw new Exception(String.format("不支持类型[%s]",

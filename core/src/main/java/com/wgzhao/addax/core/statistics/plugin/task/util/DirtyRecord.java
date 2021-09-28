@@ -27,6 +27,7 @@ import com.alibaba.fastjson.JSON;
 
 import java.math.BigDecimal;
 import java.math.BigInteger;
+import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -186,5 +187,12 @@ class DirtyColumn
     {
         throw AddaxException.asAddaxException(FrameworkErrorCode.RUNTIME_ERROR,
                NOT_SUPPORT_METHOD);
+    }
+
+    @Override
+    public Timestamp asTimestamp()
+    {
+        throw AddaxException.asAddaxException(FrameworkErrorCode.RUNTIME_ERROR,
+                NOT_SUPPORT_METHOD);
     }
 }

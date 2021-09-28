@@ -24,6 +24,7 @@ import com.wgzhao.addax.common.exception.AddaxException;
 
 import java.math.BigDecimal;
 import java.math.BigInteger;
+import java.sql.Timestamp;
 import java.util.Date;
 
 /**
@@ -82,6 +83,15 @@ public class StringColumn
                     CommonErrorCode.CONVERT_NOT_SUPPORT, String.format(
                             "String[\"%s\"]不能转为BigInteger .", this.asString()));
         }
+    }
+
+    @Override
+    public Timestamp asTimestamp()
+    {
+        if (null == this.getRawData()) {
+            return null;
+        }
+        return Timestamp.valueOf((String) this.getRawData());
     }
 
     @Override

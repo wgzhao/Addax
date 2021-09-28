@@ -25,6 +25,7 @@ import org.apache.commons.lang3.math.NumberUtils;
 
 import java.math.BigDecimal;
 import java.math.BigInteger;
+import java.sql.Timestamp;
 import java.util.Date;
 
 public class LongColumn
@@ -95,6 +96,15 @@ public class LongColumn
         }
 
         return (BigInteger) this.getRawData();
+    }
+
+    @Override
+    public Timestamp asTimestamp()
+    {
+        if (null == this.getRawData()) {
+            return null;
+        }
+        return new Timestamp((Long) this.getRawData());
     }
 
     @Override
