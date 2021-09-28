@@ -16,44 +16,9 @@
 
 ## 支持的数据库一览表
 
+Addax 支持超过 20 种[关系型和非关系型数据库](support_data_sources.md)，通过简单的配置，还可以快速增加更多的数据源支持。 
+
 ![supported databases](docs/images/supported_databases.png)
-
-| 数据库或文件系统 | 读取 | 写入   | 插件名称(reader/writer)                 | 备注                             |
-| ---------------- | ---- | ------ | --------------------------------------- | -------------------------------- |
-| Cassandra        | 支持 | 支持   | cassandrareader/cassandrawriter         |                                  |
-| ClickHouse       | 支持 | 支持   | clickhousereader/clickhousewriter       |                                  |
-| DB2              | 支持 | 支持   | rbdmsreader/rdbmswriter                 | 理论上支持，但未实际测试         |
-| DBF              | 支持 | 支持   | dbfreader/dbfwriter                     |                                  |
-| ElasticSearch    | 支持 | 支持   | elasticsearchreader/elasticsearchwriter | 原始代码来自[@Kestrong][1]       |
-| Excel            | 支持 | 不支持 | excelreader/excelwriter                 |                                  |
-| FTP              | 支持 | 支持   | ftpreader/ftpwriter                     |                                  |
-| HBase 1.x        | 支持 | 支持   | hbase11xreader/hbase11xwriter           | 直接操作HBase                    |
-| HBase 1.x        | 支持 | 支持   | hbase11xsqlreader/hbase11xsqlwriter     | 通过[Phoenix][2] 操作HBase       |
-| HBase 2.x        | 支持 | 不支持 | hbase20xreader                          | 直接操作HBase                    |
-| HBase 2.x        | 支持 | 支持   | hbase20xsqlreader/hbase20xsqlwriter     | 通过[Phoenix][2] 操作HBase       |
-| HDFS             | 支持 | 支持   | hdfsreader/hdfswriter                   | HDFS 2.x 以上版本                |
-| HTTP             | 支持 | 不支持 | httpreader                              | 仅支持返回值为JSON类型的接口     |
-| Greenplum        | 支持 | 支持   | postgresqlreader/greenplumwriter        |                                  |
-| InfluxDB         | 支持 | 支持   | influxdbreader/influxdbwriter           | 仅支持1.x版本，2.0及以上暂不支持 |
-| json             | 支持 | 不支持 | jsonfilereader                          |                                  |
-| kudu             | 支持 | 支持   | kudureader/kuduwriter                   | 通过原生接口，计划更新Impala连接 |
-| MongoDB          | 支持 | 支持   | mongodbreader/mongodbwriter             |                                  |
-| MySQL/MariaDB    | 支持 | 支持   | mysqlreader/mysqlwriter                 |                                  |
-| Oracle           | 支持 | 支持   | oraclereader/oraclewriter               |                                  |
-| PostgreSQL       | 支持 | 支持   | postgresqlreader/postgresqlwriter       |                                  |
-| PrestoSQL        | 支持 | 支持   | rdbmsreader/rdbmswriter                 | [trino][3] 310以上               |
-| Redis            | 支持 | 支持   | redisreader/rediswriter                 |                                  |
-| SQLite           | 支持 | 支持   | sqlitereader/sqlitewriter               |                                  |
-| SQL Server       | 支持 | 支持   | sqlserverreader/sqlserverwriter         |                                  |
-| TDengine         | 支持 | 支持   | tdenginereader/tdenginewriter           | 支持 [TDengine][4] 数据库读写    |
-| TDH Inceptor2    | 支持 | 支持   | rdbmsreader/rdbmswriter                 | [星环 TDH][5] 5.1以上版本        |
-| TEXT             | 支持 | 支持   | textfilereader/textfilewriter           |                                  |
-
-[1]: https://github.com/Kestrong/datax-elasticsearch
-[2]: https://phoenix.apache.org
-[3]: https://trino.io
-[4]: https://www.taosdata.com/cn/
-[5]: http://transwarp.cn/
 
 ## 快速开始
 
@@ -66,42 +31,7 @@ docker run -ti --rm --name addax wgzhao/addax:latest /opt/addax/bin/addax.sh /op
 
 ### 不想编译
 
-如果你懒得编译或者因为环境无法编译，可以从以下链接下载对应的版本
-
-| 版本  | 连接地址                                                     | md5值                            |
-| ----- | ------------------------------------------------------------ | -------------------------------- |
-| 4.0.3 | https://www.aliyundrive.com/s/8CRAfMBbwfm                    | 19766c2577b46bd5b22d63a502f5f5dd |
-| 4.0.2 | https://www.aliyundrive.com/s/U5uotY7vVAY                    | cd3a3d6d0c79cbd3bcd259ebb47acbc5 |
-| 4.0.1 | https://www.aliyundrive.com/s/BwbUJr21baH                    | 8f1963e8ce5e5f880a29a503399413a6 |
-| 4.0.0 | https://pan.baidu.com/s/1qmV6ed3CYpACIp29JCIDgQ 提取码: 559q | b9b759da228f3bc656965d20357dcb2a |
-| 3.2.5 | https://pan.baidu.com/s/14_MnbtRUtJlvQh8tTKv6fg 提取码: 1jdr | 43ddd0186ccbaf1f1bfee0aac22da935 |
-| 3.2.4 | https://pan.baidu.com/s/1VaOlAOTqGX4WwRtI5ewPeg 提取码: i127 | 2d16125385b88405481e12bf4a8fd715 |
-| 3.2.3 | https://pan.baidu.com/s/1ajjnSittf6u7rjXhJ7_3Aw 提取码: qxry | ad47b0d840bf21de1668b9310a9782cf |
-| 3.2.2 | https://pan.baidu.com/s/1TQyaERnIk9EQRDULfQE69w 提取码: jh31 | b04d2563adb36457b85e48c318757ea3 |
-| 3.2.1 | https://pan.baidu.com/s/1as6sL09HlxAN8b2pZ1DttQ 提取码: hwgx | ecda4a961b032c75718502caf54246a8 |
-| 3.1.9 | https://pan.baidu.com/s/1GYpehEvB-W3qnqilhskXFw 提取码: q4wv | 48c4104294cd9bb0c749efc50b32b4dd |
-| 3.1.8 | https://pan.baidu.com/s/1jv-tb-11grYaUnsgnEhDzw 提取码: 2dnf | ef110ae1ea31e1761dc25d6930300485 |
-| 3.1.7 | https://pan.baidu.com/s/1CE5I8V5TNptdOp6GLid3Jg 提取码: v5u3 | fecca6c4a32f2bf7246fdef8bc2912fe |
-| 3.1.6 | https://pan.baidu.com/s/1Ldg10E3qWkbUT44rkH19og 提取码: 4av4 | f6aea7e0ce4b9ec83554e9c6d6ab3cb6 |
-| 3.1.5 | https://pan.baidu.com/s/1yY_lJqulE6hKqktoQbbGmQ 提取码: 2r4p | 9ae27c1c434a097f67a17bb704f70731 |
-| 3.1.4 | https://pan.baidu.com/s/1_plsvzD_GrWN-HffPBtz-g 提取码: kpjn | 7aca526fe7f6f0f54dc467f6ca1647b1 |
-| 3.1.2 | https://pan.baidu.com/s/1zFqv8E6iJX549zdSZDQgiQ 提取码: 7jdk | 3674711fc9b68fad3086f3c8526a3427 |
-| 3.1.1 | https://pan.baidu.com/s/1GwmFA7-hPkd6GKiZEvUKXg 提取码: 1inn | 0fa4e7902420704b2e814fef098f40ae |
-
-注：
-
-1. 从4.0.1版本开始，上传的二进制文件从百度网盘切换到了阿里云网盘，下载速度应该会有很大的提升
-2. 从 3.2.3 版本开始，为了减少安装包大小，编译好的压缩包仅包括 `streamreader` 和 `streamwriter` 两个插件，其他插件则需要单独下载，下载共享目录列表如下：
-3. 因为阿里云盘暂时不支持压缩文件的分享，所以上述提供下载的二进制版本文件我添加了 `.jgp` 后缀，下载后可以删除这个后缀。
-
-预编译插件下载地址一览表
-
-| 版本  | 插件下载地址                                                 |
-| ----- | ------------------------------------------------------------ |
-| 4.0.0 | https://pan.baidu.com/s/1gLWiw2I7W_4-KBiA1CCg2g 提取码: hxag |
-| 3.2.5 | https://pan.baidu.com/s/1VMqPAYeL_kirCjOVAdvoAg 提取码: hda9 |
-| 3.2.4 | https://pan.baidu.com/s/1gPJlJh66bGQUSUR-2mNOQw 提取码: 7c4j |
-| 3.2.3 | https://pan.baidu.com/s/1g4z3Pqc_BxKstkiYjWXopQ 提取码: 2fip |
+你可以直接从[发布页面](https://github.com/wgzhao/Addax/releases)下载需要的版本可
 
 ### 编译及打包
 
@@ -251,8 +181,8 @@ addax	19890604	1989-06-04 00:00:00	true	test
 
 ## 文档
 
-- [在线文档](https://addax.readthedocs.io)
-- [项目内文档](docs/src/main/sphinx/index.rst)
+- [在线文档](https://wgzhao.github.io/Addax/)
+- [项目内文档](docs/index.md)
 
 ## 代码风格
 
