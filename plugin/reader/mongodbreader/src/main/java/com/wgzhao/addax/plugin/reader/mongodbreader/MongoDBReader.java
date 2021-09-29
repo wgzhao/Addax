@@ -179,7 +179,7 @@ public class MongoDBReader
                     }
                     if (tempCol == null) {
                         //continue; 这个不能直接continue会导致record到目的端错位
-                        record.addColumn(new StringColumn(null));
+                        record.addColumn(new StringColumn());
                     }
                     else if (tempCol instanceof Double) {
                         record.addColumn(new DoubleColumn((Double) tempCol));

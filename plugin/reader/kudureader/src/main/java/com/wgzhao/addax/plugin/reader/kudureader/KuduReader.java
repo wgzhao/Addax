@@ -283,7 +283,7 @@ public class KuduReader
 
                     for (ColumnSchema columnSchema : columnSchemas) {
                         if (result.isNull(columnSchema.getName())) {
-                            record.addColumn(new StringColumn(null));
+                            record.addColumn(new StringColumn());
                             continue;
                         }
 

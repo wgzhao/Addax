@@ -298,12 +298,10 @@ public class StorageReaderUtil
                     Type type = Type.valueOf(columnType.toUpperCase());
                     // it's all ok if nullFormat is null
                     if (columnValue == null || columnValue.equals(nullFormat)) {
-                        columnValue = null;
-                    }
-                    if (columnValue == null) {
-                        record.addColumn(null);
+                        record.addColumn(new StringColumn());
                         continue;
                     }
+
                     String errorTemplate = "Cast %s to %s failure";
                     switch (type) {
                         case STRING:

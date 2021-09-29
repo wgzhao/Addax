@@ -427,7 +427,7 @@ public class StreamReader
         {
             String columnValue = eachColumnConfig.getString(Key.VALUE);
             if ("null".equals(columnValue)) {
-                return null;
+                return new StringColumn();
             }
             Type columnType = Type.valueOf(eachColumnConfig.getString(Key.TYPE).toUpperCase());
             String columnRandom = eachColumnConfig.getString(StreamConstant.RANDOM);

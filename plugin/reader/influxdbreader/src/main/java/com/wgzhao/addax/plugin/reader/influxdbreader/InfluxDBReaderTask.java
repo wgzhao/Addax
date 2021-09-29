@@ -47,7 +47,7 @@ public class InfluxDBReaderTask
     private static final Logger LOG = LoggerFactory.getLogger(InfluxDBReaderTask.class);
 
     private static final int CONNECT_TIMEOUT_SECONDS_DEFAULT = 15;
-    private static  final int SOCKET_TIMEOUT_SECONDS_DEFAULT = 20;
+    private static final int SOCKET_TIMEOUT_SECONDS_DEFAULT = 20;
 
     private String querySql;
     private final String database;
@@ -85,29 +85,29 @@ public class InfluxDBReaderTask
     {
         LOG.info("connect influxdb: {} with username: {}", endpoint, username);
 
-        String tail="/query";
-        String enc="utf-8";
-        String result= "";
+        String tail = "/query";
+        String enc = "utf-8";
+        String result;
         try {
-            String url=endpoint+tail
-                    +"?db=" + URLEncoder.encode(database,enc) ;
-            if(!"".equals(username)){
-                url+="&u=" + URLEncoder.encode(username,enc);
+            String url = endpoint + tail + "?db=" + URLEncoder.encode(database, enc);
+            if (!"".equals(username)) {
+                url += "&u=" + URLEncoder.encode(username, enc);
             }
-            if(!"".equals(password)){
-                url+="&p=" + URLEncoder.encode(password,enc) ;
+            if (!"".equals(password)) {
+                url += "&p=" + URLEncoder.encode(password, enc);
             }
-            if(querySql.contains("#lastMinute#")){
+            if (querySql.contains("#lastMinute#")) {
                 this.querySql = querySql.replace("#lastMinute#", getLastMinute());
             }
-            url+="&q=" + URLEncoder.encode(querySql,enc);
+            url += "&q=" + URLEncoder.encode(querySql, enc);
             result = get(url);
-        } catch (Exception e) {
+        }
+        catch (Exception e) {
             throw AddaxException.asAddaxException(
                     InfluxDBReaderErrorCode.ILLEGAL_VALUE, "Failed to get data point！", e);
         }
 
-        if(StringUtils.isBlank(result)){
+        if (StringUtils.isBlank(result)) {
             throw AddaxException.asAddaxException(
                     InfluxDBReaderErrorCode.ILLEGAL_VALUE, "Get nothing!", null);
         }
@@ -115,37 +115,40 @@ public class InfluxDBReaderTask
             JSONObject jsonObject = JSONObject.parseObject(result);
             JSONArray results = (JSONArray) jsonObject.get("results");
             JSONObject resultsMap = (JSONObject) results.get(0);
-            if(resultsMap.containsKey("series")){
-                JSONArray series= (JSONArray) resultsMap.get("series");
+            if (resultsMap.containsKey("series")) {
+                JSONArray series = (JSONArray) resultsMap.get("series");
                 JSONObject seriesMap = (JSONObject) series.get(0);
-                if(seriesMap.containsKey("values")){
+                if (seriesMap.containsKey("values")) {
                     JSONArray values = (JSONArray) seriesMap.get("values");
-                    for (Object row:values) {
+                    for (Object row : values) {
                         JSONArray rowArray = (JSONArray) row;
                         Record record = recordSender.createRecord();
-                        for (Object s:rowArray) {
-                            if(null!=s){
+                        for (Object s : rowArray) {
+                            if (null != s) {
                                 record.addColumn(new StringColumn(s.toString()));
-                            }else {
-                                record.addColumn(new StringColumn(null));
+                            }
+                            else {
+                                record.addColumn(new StringColumn());
                             }
                         }
                         recordSender.sendToWriter(record);
                     }
                 }
-
-            }else if(resultsMap.containsKey("error")){
+            }
+            else if (resultsMap.containsKey("error")) {
                 throw AddaxException.asAddaxException(
                         InfluxDBReaderErrorCode.ILLEGAL_VALUE, "Error occurred in data sets！", null);
             }
-
-        } catch (Exception e) {
+        }
+        catch (Exception e) {
             throw AddaxException.asAddaxException(
                     InfluxDBReaderErrorCode.ILLEGAL_VALUE, "Failed to send data", e);
         }
     }
 
-    public String get(String url) throws Exception {
+    public String get(String url)
+            throws Exception
+    {
         Content content = Request.Get(url)
                 .connectTimeout(this.connTimeout)
                 .socketTimeout(this.socketTimeout)
@@ -157,21 +160,29 @@ public class InfluxDBReaderTask
         return content.asString(StandardCharsets.UTF_8);
     }
 
-    private String post(String url, Map<String, Object> params) throws Exception {
+    private String post(String url, Map<String, Object> params)
+            throws Exception
+    {
         return post(url, JSON.toJSONString(params), this.connTimeout, this.socketTimeout);
     }
 
-    private String post(String url, String params) throws Exception {
-        return post(url, params, this.connTimeout , this.socketTimeout);
+    private String post(String url, String params)
+            throws Exception
+    {
+        return post(url, params, this.connTimeout, this.socketTimeout);
     }
 
     private String post(String url, Map<String, Object> params,
-            int connectTimeoutInMill, int socketTimeoutInMill) throws Exception {
+            int connectTimeoutInMill, int socketTimeoutInMill)
+            throws Exception
+    {
         return post(url, JSON.toJSONString(params), connectTimeoutInMill, socketTimeoutInMill);
     }
 
     private String post(String url, String params,
-            int connectTimeoutInMill, int socketTimeoutInMill) throws Exception {
+            int connectTimeoutInMill, int socketTimeoutInMill)
+            throws Exception
+    {
         Content content = Request.Post(url)
                 .connectTimeout(connectTimeoutInMill)
                 .socketTimeout(socketTimeoutInMill)
@@ -185,9 +196,9 @@ public class InfluxDBReaderTask
         return content.asString(StandardCharsets.UTF_8);
     }
 
-    private String getLastMinute(){
-        long lastMinuteMilli= LocalDateTime.now().plusMinutes(-1).toInstant(ZoneOffset.of("+8")).toEpochMilli();
+    private String getLastMinute()
+    {
+        long lastMinuteMilli = LocalDateTime.now().plusMinutes(-1).toInstant(ZoneOffset.of("+8")).toEpochMilli();
         return String.valueOf(lastMinuteMilli);
     }
-
 }
