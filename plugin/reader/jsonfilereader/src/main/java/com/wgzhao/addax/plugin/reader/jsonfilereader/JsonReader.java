@@ -252,8 +252,7 @@ public class JsonReader
             return Arrays.asList(toBeReadFiles.toArray(new String[0]));
         }
 
-        private void buildSourceTargetsEachPath(String regexPath,
-                String parentDirectory, Set<String> toBeReadFiles)
+        private void buildSourceTargetsEachPath(String regexPath, String parentDirectory, Set<String> toBeReadFiles)
         {
             // 检测目录是否存在，错误情况更明确
             try {
@@ -277,8 +276,7 @@ public class JsonReader
             directoryRover(regexPath, parentDirectory, toBeReadFiles);
         }
 
-        private void directoryRover(String regexPath, String parentDirectory,
-                Set<String> toBeReadFiles)
+        private void directoryRover(String regexPath, String parentDirectory, Set<String> toBeReadFiles)
         {
             File directory = new File(parentDirectory);
             // is a normal file
@@ -364,7 +362,6 @@ public class JsonReader
         private String compressType;
         private String encoding;
 
-
         @Override
         public void init()
         {
@@ -384,14 +381,10 @@ public class JsonReader
 //            JSONArray objects = JSON.parseArray(json);
             String tempValue;
             for (Configuration eachColumnConf : columns) {
-                String columnIndex = eachColumnConf
-                        .getString(Key.INDEX);
-                String columnType = eachColumnConf
-                        .getString(Key.TYPE);
-                String columnFormat = eachColumnConf
-                        .getString(Key.FORMAT);
-                String columnValue = eachColumnConf
-                        .getString(Key.VALUE);
+                String columnIndex = eachColumnConf.getString(Key.INDEX);
+                String columnType = eachColumnConf.getString(Key.TYPE);
+                String columnFormat = eachColumnConf.getString(Key.FORMAT);
+                String columnValue = eachColumnConf.getString(Key.VALUE);
                 // 这里是为了支持常量Value 现在需要考虑做容错，如果json里面没有的解析路径置为null
                 if (null != columnValue) {
                     tempValue = columnValue;
@@ -433,8 +426,7 @@ public class JsonReader
                         columnGenerated = new BoolColumn(columnValue);
                     }
                     catch (Exception e) {
-                        throw new IllegalArgumentException(String.format(
-                                errorTemplate, columnValue, "BOOLEAN"));
+                        throw new IllegalArgumentException(String.format(errorTemplate, columnValue, "BOOLEAN"));
                     }
                     break;
                 case LONG:
@@ -443,8 +435,7 @@ public class JsonReader
                     }
                     catch (Exception e) {
                         LOG.error(e.getMessage());
-                        throw new IllegalArgumentException(String.format(
-                                errorTemplate, columnValue, "LONG"));
+                        throw new IllegalArgumentException(String.format(errorTemplate, columnValue, "LONG"));
                     }
                     break;
                 case DATE:
@@ -452,29 +443,21 @@ public class JsonReader
                         if (StringUtils.isNotBlank(columnFormat)) {
                             // 用户自己配置的格式转换, 脏数据行为出现变化
                             DateFormat format = new SimpleDateFormat(columnFormat);
-                            columnGenerated = new DateColumn(
-                                    format.parse(columnValue));
+                            columnGenerated = new DateColumn(format.parse(columnValue));
                         }
                         else {
                             // 框架尝试转换
-                            columnGenerated = new DateColumn(
-                                    new StringColumn(columnValue)
-                                            .asDate());
+                            columnGenerated = new DateColumn(new StringColumn(columnValue).asDate());
                         }
                     }
                     catch (Exception e) {
-                        throw new IllegalArgumentException(String.format(
-                                errorTemplate, columnValue, "DATE"));
+                        throw new IllegalArgumentException(String.format(errorTemplate, columnValue, "DATE"));
                     }
                     break;
                 default:
-                    String errorMessage = String.format(
-                            "您配置的列类型暂不支持 : [%s]", type);
+                    String errorMessage = String.format("您配置的列类型暂不支持 : [%s]", type);
                     LOG.error(errorMessage);
-                    throw AddaxException
-                            .asAddaxException(
-                                    JsonReaderErrorCode.NOT_SUPPORT_TYPE,
-                                    errorMessage);
+                    throw AddaxException.asAddaxException(JsonReaderErrorCode.NOT_SUPPORT_TYPE, errorMessage);
             }
             return columnGenerated;
         }

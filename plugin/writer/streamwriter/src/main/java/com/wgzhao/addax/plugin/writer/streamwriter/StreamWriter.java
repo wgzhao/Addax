@@ -283,7 +283,7 @@ public class StreamWriter
             StringBuilder sb = new StringBuilder();
             for (int i = 0; i < recordLength; i++) {
                 column = record.getColumn(i);
-                if (column != null ){
+                if (column != null && column.getRawData() != null){
                     sb.append(column.asString());
                 }
                 sb.append(fieldDelimiter);

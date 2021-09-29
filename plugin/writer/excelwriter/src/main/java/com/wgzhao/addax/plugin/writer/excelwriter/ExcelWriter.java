@@ -142,7 +142,7 @@ public class ExcelWriter
                 for(int i=0; i< recordLength; i++) {
                     cell = row.createCell(i);
                     column = record.getColumn(i);
-                    if (column == null) {
+                    if (column == null || column.getRawData() == null) {
                         cell.setBlank();
                         continue;
                     }

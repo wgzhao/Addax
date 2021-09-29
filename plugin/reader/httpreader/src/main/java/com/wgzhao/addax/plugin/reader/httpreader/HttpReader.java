@@ -224,7 +224,7 @@ public class HttpReader
                     for (String k : columns) {
                         Object v = JSONPath.eval(jsonObject, k);
                         if (v == null) {
-                            record.addColumn(new StringColumn(null));
+                            record.addColumn(new StringColumn());
                         }
                         else {
                             record.addColumn(new StringColumn(v.toString()));
