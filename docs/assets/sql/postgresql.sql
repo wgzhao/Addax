@@ -1,9 +1,7 @@
 create table if not exists addax_tbl
 (
-    c_bigint
-    bigint,
-    c_bit
-    bit(3),
+    c_bigint bigint,
+    c_bit bit(3),
     c_bool boolean,
     c_byte bytea,
     c_char char(10),
@@ -27,7 +25,7 @@ create table if not exists addax_tbl
 
 insert into addax_tbl
 values (999988887777,
-        B '101',
+        b'101',
         TRUE,
         '\xDEADBEEF',
         'hello',

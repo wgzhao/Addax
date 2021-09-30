@@ -20,14 +20,20 @@
 package com.wgzhao.addax.plugin.writer.sqlitewriter;
 
 import com.wgzhao.addax.common.base.Key;
+import com.wgzhao.addax.common.element.Column;
 import com.wgzhao.addax.common.plugin.RecordReceiver;
 import com.wgzhao.addax.common.spi.Writer;
 import com.wgzhao.addax.common.util.Configuration;
 import com.wgzhao.addax.rdbms.util.DataBaseType;
 import com.wgzhao.addax.rdbms.writer.CommonRdbmsWriter;
 
+import java.sql.PreparedStatement;
+import java.sql.SQLException;
+import java.sql.Types;
+import java.text.SimpleDateFormat;
 import java.util.List;
 
+import static com.wgzhao.addax.common.base.Constant.DEFAULT_DATE_FORMAT;
 import static com.wgzhao.addax.common.base.Key.PASSWORD;
 import static com.wgzhao.addax.common.base.Key.USERNAME;
 
@@ -96,7 +102,27 @@ public class SqliteWriter
         public void init()
         {
             this.writerSliceConfig = super.getPluginJobConf();
-            this.commonRdbmsWriterTask = new CommonRdbmsWriter.Task(DATABASE_TYPE);
+            this.commonRdbmsWriterTask = new CommonRdbmsWriter.Task(DATABASE_TYPE) {
+                @Override
+                protected PreparedStatement fillPreparedStatementColumnType(PreparedStatement preparedStatement, int columnIndex,
+                        int columnSqlType, Column column)
+                        throws SQLException
+                {
+                    if (column == null || column.getRawData() == null) {
+                        preparedStatement.setObject(columnIndex, null);
+                        return preparedStatement;
+                    }
+                    if (columnSqlType == Types.DATE) {
+                        // SQLite does not have a storage class set aside for storing dates and/or times.
+                        // Instead, the built-in Date And Time Functions of SQLite are capable of storing dates and times as
+                        // TEXT, REAL, or INTEGER values: https://www.sqlite.org/datatype3.html
+                        SimpleDateFormat sdf = new SimpleDateFormat(DEFAULT_DATE_FORMAT);
+                        preparedStatement.setString(columnIndex, sdf.format(column.asDate()));
+                        return preparedStatement;
+                    }
+                    return super.fillPreparedStatementColumnType(preparedStatement, columnIndex, columnSqlType, column);
+                }
+            };
             this.commonRdbmsWriterTask.init(this.writerSliceConfig);
         }
 
@@ -106,11 +132,9 @@ public class SqliteWriter
             this.commonRdbmsWriterTask.prepare(this.writerSliceConfig);
         }
 
-        //TODO 改用连接池，确保每次获取的连接都是可用的（注意：连接可能需要每次都初始化其 session）
         public void startWrite(RecordReceiver recordReceiver)
         {
-            this.commonRdbmsWriterTask.startWrite(recordReceiver, this.writerSliceConfig,
-                    super.getTaskPluginCollector());
+            this.commonRdbmsWriterTask.startWrite(recordReceiver, this.writerSliceConfig, super.getTaskPluginCollector());
         }
 
         @Override
@@ -123,13 +147,6 @@ public class SqliteWriter
         public void destroy()
         {
             this.commonRdbmsWriterTask.destroy(this.writerSliceConfig);
-        }
-
-        @Override
-        public boolean supportFailOver()
-        {
-            String writeMode = writerSliceConfig.getString(Key.WRITE_MODE);
-            return "replace".equalsIgnoreCase(writeMode);
         }
     }
 }

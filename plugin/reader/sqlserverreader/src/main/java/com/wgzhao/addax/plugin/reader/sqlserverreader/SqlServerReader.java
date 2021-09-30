@@ -19,6 +19,9 @@
 
 package com.wgzhao.addax.plugin.reader.sqlserverreader;
 
+import com.wgzhao.addax.common.element.BytesColumn;
+import com.wgzhao.addax.common.element.Column;
+import com.wgzhao.addax.common.element.TimestampColumn;
 import com.wgzhao.addax.common.exception.AddaxException;
 import com.wgzhao.addax.common.plugin.RecordSender;
 import com.wgzhao.addax.common.spi.Reader;
@@ -27,6 +30,11 @@ import com.wgzhao.addax.rdbms.reader.CommonRdbmsReader;
 import com.wgzhao.addax.rdbms.util.DBUtilErrorCode;
 import com.wgzhao.addax.rdbms.util.DataBaseType;
 
+import java.io.UnsupportedEncodingException;
+import java.sql.ResultSet;
+import java.sql.ResultSetMetaData;
+import java.sql.SQLException;
+import java.sql.Types;
 import java.util.List;
 
 import static com.wgzhao.addax.common.base.Key.FETCH_SIZE;
@@ -91,7 +99,22 @@ public class SqlServerReader
         public void init()
         {
             this.readerSliceConfig = getPluginJobConf();
-            this.commonRdbmsReaderTask = new CommonRdbmsReader.Task(DATABASE_TYPE, getTaskGroupId(), getTaskId());
+            this.commonRdbmsReaderTask = new CommonRdbmsReader.Task(DATABASE_TYPE, getTaskGroupId(), getTaskId())
+            {
+                @Override
+                protected Column createColumn(ResultSet rs, ResultSetMetaData metaData, int i)
+                        throws SQLException, UnsupportedEncodingException
+                {
+                    if (metaData.getColumnType(i) == -151) {
+                        // 兼容老的SQLServer版本的datetime数据类型
+                        return new TimestampColumn(rs.getTimestamp(i));
+                    }
+                    if (metaData.getColumnType(i) == Types.OTHER && "image".equals(metaData.getColumnTypeName(i))) {
+                        return new BytesColumn(rs.getBytes(i));
+                    }
+                    return super.createColumn(rs, metaData, i);
+                }
+            };
             this.commonRdbmsReaderTask.init(this.readerSliceConfig);
         }
 

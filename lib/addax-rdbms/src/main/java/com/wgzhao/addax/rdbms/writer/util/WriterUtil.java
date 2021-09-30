@@ -47,8 +47,7 @@ public final class WriterUtil
 
     private WriterUtil() {}
 
-    public static List<Configuration> doSplit(Configuration simplifiedConf,
-            int adviceNumber)
+    public static List<Configuration> doSplit(Configuration simplifiedConf, int adviceNumber)
     {
 
         List<Configuration> splitResultConfigs = new ArrayList<>();
@@ -120,20 +119,15 @@ public final class WriterUtil
 
     public static void executeSqls(Connection conn, List<String> sqls, String basicMessage, DataBaseType dataBaseType)
     {
-        Statement stmt = null;
         String currentSql = null;
-        try {
-            stmt = conn.createStatement();
+        try (Statement stmt = conn.createStatement()){
             for (String sql : sqls) {
                 currentSql = sql;
-                DBUtil.executeSqlWithoutResultSet(stmt, sql);
+                stmt.execute(sql);
             }
         }
         catch (Exception e) {
-            throw RdbmsException.asQueryException(dataBaseType, e, currentSql, null, null);
-        }
-        finally {
-            DBUtil.closeDBResources(null, stmt, null);
+            throw RdbmsException.asQueryException(e, currentSql);
         }
     }
 
@@ -141,6 +135,8 @@ public final class WriterUtil
             String writeMode, DataBaseType dataBaseType, boolean forceUseUpdate)
     {
         String mode = writeMode.trim().toLowerCase();
+        String columns = StringUtils.join(columnHolders, ",");
+        String placeHolders = StringUtils.join(valueHolders, ",");
         boolean isWriteModeLegal = mode.startsWith("insert") || mode.startsWith("replace") || mode.startsWith("update");
 
         if (!isWriteModeLegal) {
@@ -150,22 +146,16 @@ public final class WriterUtil
         String writeDataSqlTemplate;
         if (forceUseUpdate || mode.startsWith("update")) {
             if (dataBaseType == DataBaseType.MySql) {
-                writeDataSqlTemplate = "INSERT INTO %s (" + StringUtils.join(columnHolders, ",") +
-                        ") VALUES(" + StringUtils.join(valueHolders, ",") +
-                        ")" +
-                        onDuplicateKeyUpdateString(columnHolders);
+                writeDataSqlTemplate = "INSERT INTO %s (" + columns + ") VALUES(" + placeHolders + ")" +
+                        doMysqlUpdate(columnHolders);
             }
             else if (dataBaseType == DataBaseType.Oracle) {
-                writeDataSqlTemplate = onMergeIntoDoString(writeMode, columnHolders, valueHolders) + "INSERT (" +
-                        StringUtils.join(columnHolders, ",") +
-                        ") VALUES(" + StringUtils.join(valueHolders, ",") +
-                        ")";
+                writeDataSqlTemplate = doOracleUpdate(writeMode, columnHolders, valueHolders) +
+                        "INSERT (" + columns + ") VALUES ( " + placeHolders + " )";
             }
             else if (dataBaseType == DataBaseType.PostgreSQL) {
-                writeDataSqlTemplate = "INSERT INTO %s (" +
-                        StringUtils.join(columnHolders, ",") +
-                        ") VALUES(" + StringUtils.join(valueHolders, ",") +
-                        ")" + onConflictDoString(writeMode, columnHolders);
+                writeDataSqlTemplate = "INSERT INTO %s (" + columns + ") VALUES ( " + placeHolders + " )" +
+                        doPostgresqlUpdate(writeMode, columnHolders);
             }
             else {
                 throw AddaxException.asAddaxException(DBUtilErrorCode.ILLEGAL_VALUE,
@@ -177,16 +167,14 @@ public final class WriterUtil
             if (mode.startsWith("update")) {
                 writeMode = "replace";
             }
-            writeDataSqlTemplate = writeMode +
-                    " INTO %s (" + StringUtils.join(columnHolders, ",") +
-                    ") VALUES(" + StringUtils.join(valueHolders, ",") +
-                    ")";
+            writeDataSqlTemplate = writeMode + " INTO %s ( " + columns + ") VALUES ( " + placeHolders + " )";
         }
 
         return writeDataSqlTemplate;
     }
 
-    private static String onConflictDoString(String writeMode, List<String> columnHolders)
+
+    private static String doPostgresqlUpdate(String writeMode, List<String> columnHolders)
     {
         String conflict = writeMode.replace("update", "");
         StringBuilder sb = new StringBuilder();
@@ -212,7 +200,7 @@ public final class WriterUtil
         return sb.toString();
     }
 
-    public static String onDuplicateKeyUpdateString(List<String> columnHolders)
+    public static String doMysqlUpdate(List<String> columnHolders)
     {
         if (columnHolders == null || columnHolders.isEmpty()) {
             return "";
@@ -236,7 +224,7 @@ public final class WriterUtil
         return sb.toString();
     }
 
-    public static String onMergeIntoDoString(String merge, List<String> columnHolders, List<String> valueHolders)
+    public static String doOracleUpdate(String merge, List<String> columnHolders, List<String> valueHolders)
     {
         String[] sArray = getStrings(merge);
         StringBuilder sb = new StringBuilder();
@@ -301,20 +289,17 @@ public final class WriterUtil
         Configuration connConf = Configuration.from(conns.get(0).toString());
         String table = connConf.getList(Key.TABLE, String.class).get(0);
 
-        List<String> preSqls = originalConfig.getList(Key.PRE_SQL,
-                String.class);
-        List<String> renderedPreSqls = WriterUtil.renderPreOrPostSqls(
-                preSqls, table);
+        List<String> preSqls = originalConfig.getList(Key.PRE_SQL, String.class);
+        List<String> renderedPreSqls = WriterUtil.renderPreOrPostSqls(preSqls, table);
 
         if (!renderedPreSqls.isEmpty()) {
-            LOG.info("Begin to preCheck preSqls:[{}].",
-                    StringUtils.join(renderedPreSqls, ";"));
+            LOG.info("Begin to preCheck preSqls:[{}].", StringUtils.join(renderedPreSqls, ";"));
             for (String sql : renderedPreSqls) {
                 try {
                     DBUtil.sqlValid(sql, type);
                 }
                 catch (ParserException e) {
-                    throw RdbmsException.asPreSQLParserException(type, e, sql);
+                    throw RdbmsException.asPreSQLParserException(e, sql);
                 }
             }
         }
@@ -326,21 +311,12 @@ public final class WriterUtil
         Configuration connConf = Configuration.from(conns.get(0).toString());
         String table = connConf.getList(Key.TABLE, String.class).get(0);
 
-        List<String> postSqls = originalConfig.getList(Key.POST_SQL,
-                String.class);
-        List<String> renderedPostSqls = WriterUtil.renderPreOrPostSqls(
-                postSqls, table);
+        List<String> postSqls = originalConfig.getList(Key.POST_SQL, String.class);
+        List<String> renderedPostSqls = WriterUtil.renderPreOrPostSqls(postSqls, table);
         if (!renderedPostSqls.isEmpty()) {
-
-            LOG.info("Begin to preCheck postSqls:[{}].",
-                    StringUtils.join(renderedPostSqls, ";"));
+            LOG.info("Begin to preCheck postSqls:[{}].", StringUtils.join(renderedPostSqls, ";"));
             for (String sql : renderedPostSqls) {
-                try {
-                    DBUtil.sqlValid(sql, type);
-                }
-                catch (ParserException e) {
-                    throw RdbmsException.asPostSQLParserException(type, e, sql);
-                }
+                DBUtil.sqlValid(sql, type);
             }
         }
     }

@@ -21,13 +21,13 @@
 
 package com.wgzhao.addax.rdbms.reader.util;
 
-import com.wgzhao.addax.rdbms.util.DataBaseType;
+import com.alibaba.druid.sql.parser.ParserException;
+import com.wgzhao.addax.common.base.Key;
 import com.wgzhao.addax.common.exception.AddaxException;
 import com.wgzhao.addax.common.util.Configuration;
-import com.wgzhao.addax.common.base.Key;
 import com.wgzhao.addax.rdbms.util.DBUtil;
+import com.wgzhao.addax.rdbms.util.DataBaseType;
 import com.wgzhao.addax.rdbms.util.RdbmsException;
-import com.alibaba.druid.sql.parser.ParserException;
 
 import java.sql.Connection;
 import java.sql.ResultSet;
@@ -46,11 +46,7 @@ public class PreCheckTask
     private final Configuration connection;
     private final DataBaseType dataBaseType;
 
-    public PreCheckTask(String userName,
-            String password,
-            Configuration connection,
-            DataBaseType dataBaseType,
-            String splitPkId)
+    public PreCheckTask(String userName, String password, Configuration connection, DataBaseType dataBaseType, String splitPkId)
     {
         this.connection = connection;
         this.userName = userName;
@@ -67,8 +63,7 @@ public class PreCheckTask
         List<Object> querySqls = this.connection.getList(Key.QUERY_SQL, Object.class);
         List<Object> splitPkSqls = this.connection.getList(Key.SPLIT_PK_SQL, Object.class);
         List<Object> tables = this.connection.getList(Key.TABLE, Object.class);
-        Connection conn = DBUtil.getConnectionWithoutRetry(this.dataBaseType, jdbcUrl,
-                this.userName, password);
+        Connection conn = DBUtil.getConnectionWithoutRetry(this.dataBaseType, jdbcUrl, this.userName, password);
         int fetchSize = 1;
         if (DataBaseType.MySql == dataBaseType) {
             fetchSize = Integer.MIN_VALUE;
@@ -93,10 +88,10 @@ public class PreCheckTask
                     }
                 }
                 catch (ParserException e) {
-                    throw RdbmsException.asSqlParserException(this.dataBaseType, e, querySql);
+                    throw RdbmsException.asSqlParserException(e, querySql);
                 }
                 catch (Exception e) {
-                    throw RdbmsException.asQueryException(this.dataBaseType, e, querySql, table, userName);
+                    throw RdbmsException.asQueryException(e, querySql);
                 }
                 finally {
                     DBUtil.closeDBResources(rs, null, null);
@@ -107,18 +102,18 @@ public class PreCheckTask
                         splitPkSql = splitPkSqls.get(i).toString();
                         DBUtil.sqlValid(splitPkSql, dataBaseType);
                         if (i == 0) {
-                            SingleTableSplitUtil.precheckSplitPk(conn, splitPkSql, fetchSize, table, userName);
+                            SingleTableSplitUtil.preCheckSplitPk(conn, splitPkSql, fetchSize, table, userName);
                         }
                     }
                 }
                 catch (ParserException e) {
-                    throw RdbmsException.asSqlParserException(this.dataBaseType, e, splitPkSql);
+                    throw RdbmsException.asSqlParserException(e, splitPkSql);
                 }
                 catch (AddaxException e) {
                     throw e;
                 }
                 catch (Exception e) {
-                    throw RdbmsException.asSplitPKException(this.dataBaseType, e, splitPkSql, this.splitPkId.trim());
+                    throw RdbmsException.asSplitPKException(e, splitPkSql, splitPkId.trim());
                 }
             }
         }

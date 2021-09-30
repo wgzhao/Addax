@@ -20,6 +20,8 @@
 package com.wgzhao.addax.plugin.reader.mysqlreader;
 
 import com.wgzhao.addax.common.base.Key;
+import com.wgzhao.addax.common.element.Column;
+import com.wgzhao.addax.common.element.LongColumn;
 import com.wgzhao.addax.common.plugin.RecordSender;
 import com.wgzhao.addax.common.spi.Reader;
 import com.wgzhao.addax.common.util.Configuration;
@@ -28,6 +30,11 @@ import com.wgzhao.addax.rdbms.util.DataBaseType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.UnsupportedEncodingException;
+import java.sql.ResultSet;
+import java.sql.ResultSetMetaData;
+import java.sql.SQLException;
+import java.sql.Types;
 import java.util.List;
 
 public class MysqlReader
@@ -99,7 +106,17 @@ public class MysqlReader
         public void init()
         {
             this.readerSliceConfig = getPluginJobConf();
-            this.commonRdbmsReaderTask = new CommonRdbmsReader.Task(DATABASE_TYPE, getTaskGroupId(), getTaskId());
+            this.commonRdbmsReaderTask = new CommonRdbmsReader.Task(DATABASE_TYPE, getTaskGroupId(), getTaskId()) {
+                @Override
+                protected Column createColumn(ResultSet rs, ResultSetMetaData metaData, int i)
+                        throws SQLException, UnsupportedEncodingException
+                {
+                    if (metaData.getColumnType(i) == Types.DATE && "YEAR".equals(metaData.getColumnTypeName(i))) {
+                        return new LongColumn(rs.getLong(i));
+                    }
+                    return super.createColumn(rs, metaData, i);
+                }
+            };
             this.commonRdbmsReaderTask.init(this.readerSliceConfig);
         }
 

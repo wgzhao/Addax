@@ -21,8 +21,6 @@
 
 package com.wgzhao.addax.rdbms.util;
 
-import com.wgzhao.addax.common.exception.AddaxException;
-
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -51,7 +49,7 @@ public enum DataBaseType
     private static final Pattern jdbcUrlPattern = Pattern.compile("jdbc:\\w+:(?:thin:url=|//|thin:@|)([\\w\\d.,]+).*");
 
     private String driverClassName;
-    private String typeName;
+    private final String typeName;
 
     DataBaseType(String typeName, String driverClassName)
     {
@@ -75,7 +73,7 @@ public enum DataBaseType
      */
     public static String parseIpFromJdbcUrl(String jdbcUrl)
     {
-        Matcher  matcher = jdbcUrlPattern.matcher(jdbcUrl);
+        Matcher matcher = jdbcUrlPattern.matcher(jdbcUrl);
         if (matcher.matches()) {
             return matcher.group(1);
         }
@@ -95,7 +93,8 @@ public enum DataBaseType
                 suffix = "yearIsDateType=false&zeroDateTimeBehavior=convertToNull&tinyInt1isBit=false&rewriteBatchedStatements=true";
             }
             else {
-                suffix = "yearIsDateType=false&zeroDateTimeBehavior=CONVERT_TO_NULL&tinyInt1isBit=false&rewriteBatchedStatements=true&useSSL=false";
+                suffix = "yearIsDateType=false&zeroDateTimeBehavior=CONVERT_TO_NULL&tinyInt1isBit=false&rewriteBatchedStatements=true" +
+                        "&useSSL=false";
             }
             if (jdbc.contains("?")) {
                 return jdbc + "&" + suffix;
@@ -127,76 +126,13 @@ public enum DataBaseType
         return jdbc;
     }
 
-    public String formatPk(String splitPk)
-    {
-        String result = splitPk;
-
-        String result1 = splitPk.substring(1, splitPk.length() - 1).toLowerCase();
-        switch (this) {
-            case MySql:
-            case Oracle:
-                if (splitPk.startsWith("`") && splitPk.endsWith("`")) {
-                    result = result1;
-                }
-                break;
-            case SQLServer:
-                if (splitPk.startsWith("[") && splitPk.endsWith("]")) {
-                    result = result1;
-                }
-                break;
-            case DB2:
-            case PostgreSQL:
-                break;
-            default:
-                throw AddaxException.asAddaxException(DBUtilErrorCode.UNSUPPORTED_TYPE, "unsupported database type.");
-        }
-
-        return result;
-    }
-
-    public String quoteColumnName(String columnName)
-    {
-        if (this == MySql || this == Hive) {
-            return "`" + columnName.replace("`", "``") + "`";
-        }
-        if (this == Presto || this == Trino || this == Oracle) {
-            return "\"" + columnName + "\"";
-        }
-        if (this == SQLServer) {
-            return "[" + columnName + "]";
-        }
-        return columnName;
-    }
-
-    public String quoteTableName(String tableName)
-    {
-        if (this == MySql || this == Hive) {
-            return "`" + tableName.replace("`", "``") + "`";
-        }
-        if (this == Presto || this == Trino || this == Oracle) {
-            return "\"" + tableName + "\"";
-        }
-        return tableName;
-    }
-
     public String getTypeName()
     {
         return typeName;
-    }
-
-    public void setTypeName(String typeName)
-    {
-        this.typeName = typeName;
-    }
-
-    public String getDriveClassName()
-    {
-        return driverClassName;
     }
 
     public void setDriverClassName(String driverClassName)
     {
         this.driverClassName = driverClassName;
     }
-
 }

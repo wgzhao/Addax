@@ -53,45 +53,40 @@ public class OracleWriter
         {
             this.originalConfig = getPluginJobConf();
 
-            String writeMode = this.originalConfig.getString(Key.WRITE_MODE);
+            String writeMode = originalConfig.getString(Key.WRITE_MODE);
             if (null != writeMode) {
-                if (!"insert".equalsIgnoreCase(writeMode)
-                        && !writeMode.startsWith("update"))   {
-                throw AddaxException.asAddaxException(
-                        DBUtilErrorCode.CONF_ERROR,
-                        String.format("写入模式(writeMode)配置错误. Oracle仅支持insert, update两种模式. %s 不支持",
-                                        writeMode));
-            }
+                if (!"insert".equalsIgnoreCase(writeMode) && !writeMode.startsWith("update")) {
+                    throw AddaxException.asAddaxException(DBUtilErrorCode.CONF_ERROR,
+                            String.format("写入模式(writeMode)配置错误. Oracle仅支持insert, update两种模式. %s 不支持", writeMode));
+                }
             }
 
-            this.commonRdbmsWriterJob = new CommonRdbmsWriter.Job(
-                    DATABASE_TYPE);
-            this.commonRdbmsWriterJob.init(this.originalConfig);
+            commonRdbmsWriterJob = new CommonRdbmsWriter.Job(DATABASE_TYPE);
+            commonRdbmsWriterJob.init(originalConfig);
         }
 
         @Override
         public void prepare()
         {
-            this.commonRdbmsWriterJob.prepare(this.originalConfig);
+            commonRdbmsWriterJob.prepare(originalConfig);
         }
 
         @Override
         public List<Configuration> split(int mandatoryNumber)
         {
-            return this.commonRdbmsWriterJob.split(this.originalConfig,
-                    mandatoryNumber);
+            return commonRdbmsWriterJob.split(originalConfig, mandatoryNumber);
         }
 
         @Override
         public void post()
         {
-            this.commonRdbmsWriterJob.post(this.originalConfig);
+            commonRdbmsWriterJob.post(originalConfig);
         }
 
         @Override
         public void destroy()
         {
-            this.commonRdbmsWriterJob.destroy(this.originalConfig);
+            commonRdbmsWriterJob.destroy(originalConfig);
         }
     }
 
@@ -106,31 +101,30 @@ public class OracleWriter
         {
             this.writerSliceConfig = getPluginJobConf();
             this.commonRdbmsWriterTask = new CommonRdbmsWriter.Task(DATABASE_TYPE);
-            this.commonRdbmsWriterTask.init(this.writerSliceConfig);
+            commonRdbmsWriterTask.init(writerSliceConfig);
         }
 
         @Override
         public void prepare()
         {
-            this.commonRdbmsWriterTask.prepare(this.writerSliceConfig);
+            commonRdbmsWriterTask.prepare(writerSliceConfig);
         }
 
         public void startWrite(RecordReceiver recordReceiver)
         {
-            this.commonRdbmsWriterTask.startWrite(recordReceiver,
-                    this.writerSliceConfig, getTaskPluginCollector());
+            commonRdbmsWriterTask.startWrite(recordReceiver, writerSliceConfig, getTaskPluginCollector());
         }
 
         @Override
         public void post()
         {
-            this.commonRdbmsWriterTask.post(this.writerSliceConfig);
+            commonRdbmsWriterTask.post(writerSliceConfig);
         }
 
         @Override
         public void destroy()
         {
-            this.commonRdbmsWriterTask.destroy(this.writerSliceConfig);
+            commonRdbmsWriterTask.destroy(writerSliceConfig);
         }
     }
 }

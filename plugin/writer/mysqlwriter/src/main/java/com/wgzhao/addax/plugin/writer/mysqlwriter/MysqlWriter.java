@@ -20,13 +20,21 @@
 package com.wgzhao.addax.plugin.writer.mysqlwriter;
 
 import com.wgzhao.addax.common.base.Key;
+import com.wgzhao.addax.common.element.Column;
 import com.wgzhao.addax.common.plugin.RecordReceiver;
 import com.wgzhao.addax.common.spi.Writer;
 import com.wgzhao.addax.common.util.Configuration;
 import com.wgzhao.addax.rdbms.util.DataBaseType;
 import com.wgzhao.addax.rdbms.writer.CommonRdbmsWriter;
 
+import java.sql.PreparedStatement;
+import java.sql.SQLException;
+import java.sql.Types;
+import java.text.SimpleDateFormat;
+import java.time.LocalDate;
 import java.util.List;
+
+import static com.wgzhao.addax.common.base.Constant.DEFAULT_DATE_FORMAT;
 
 public class MysqlWriter
         extends Writer
@@ -93,7 +101,34 @@ public class MysqlWriter
         public void init()
         {
             this.writerSliceConfig = super.getPluginJobConf();
-            this.commonRdbmsWriterTask = new CommonRdbmsWriter.Task(DATABASE_TYPE);
+            this.commonRdbmsWriterTask = new CommonRdbmsWriter.Task(DATABASE_TYPE) {
+
+                @Override
+                protected PreparedStatement fillPreparedStatementColumnType(PreparedStatement preparedStatement, int columnIndex,
+                        int columnSqlType, Column column)
+                        throws SQLException
+                {
+                    if (column == null || column.getRawData() == null) {
+                        preparedStatement.setObject(columnIndex, null);
+                        return preparedStatement;
+                    }
+                    if (columnSqlType == Types.BIT) {
+                        // BIT(1) -> java.lang.Boolean
+                        if (column.getType() == Column.Type.BOOL) {
+                            preparedStatement.setBoolean(columnIndex, column.asBoolean());
+                        } else {
+                            // BIT ( > 1) -> byte[]
+                            preparedStatement.setObject(columnIndex, Integer.valueOf(column.asString(), 2));
+                        }
+                        return preparedStatement;
+                    }
+                    if (columnSqlType == Types.DATE && "YEAR".equals(this.resultSetMetaData.getColumnTypeName(columnIndex))) {
+                        preparedStatement.setLong(columnIndex, column.asLong());
+                        return preparedStatement;
+                    }
+                    return super.fillPreparedStatementColumnType(preparedStatement, columnIndex, columnSqlType, column);
+                }
+            };
             this.commonRdbmsWriterTask.init(this.writerSliceConfig);
         }
 

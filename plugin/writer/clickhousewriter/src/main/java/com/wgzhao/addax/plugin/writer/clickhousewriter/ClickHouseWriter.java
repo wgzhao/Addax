@@ -19,13 +19,19 @@
 
 package com.wgzhao.addax.plugin.writer.clickhousewriter;
 
+import com.wgzhao.addax.common.element.Column;
 import com.wgzhao.addax.common.plugin.RecordReceiver;
 import com.wgzhao.addax.common.spi.Writer;
 import com.wgzhao.addax.common.util.Configuration;
 import com.wgzhao.addax.rdbms.util.DataBaseType;
 import com.wgzhao.addax.rdbms.writer.CommonRdbmsWriter;
 
+import java.sql.PreparedStatement;
+import java.sql.SQLException;
+import java.sql.Types;
+import java.util.Calendar;
 import java.util.List;
+import java.util.TimeZone;
 
 public class ClickHouseWriter
         extends Writer
@@ -83,7 +89,38 @@ public class ClickHouseWriter
         {
             this.writerSliceConfig = super.getPluginJobConf();
 
-            this.commonRdbmsWriterSlave = new CommonRdbmsWriter.Task(DATABASE_TYPE);
+            this.commonRdbmsWriterSlave = new CommonRdbmsWriter.Task(DATABASE_TYPE)
+            {
+                @Override
+                protected PreparedStatement fillPreparedStatementColumnType(PreparedStatement preparedStatement, int columnIndex,
+                        int columnSqlType, Column column)
+                        throws SQLException
+                {
+                    if (column == null || column.getRawData() == null) {
+                        preparedStatement.setObject(columnIndex, null);
+                        return preparedStatement;
+                    }
+
+                    if (columnSqlType == Types.TIMESTAMP) {
+                        String tz;
+                        String columnTypeName = this.resultSetMetaData.getColumnTypeName(columnIndex);
+                        if (columnTypeName.startsWith("DateTime64(") && columnTypeName.contains(",")) {
+                            tz = columnTypeName.substring(15, columnTypeName.length() - 2);
+                            preparedStatement.setTimestamp(columnIndex, column.asTimestamp(), Calendar.getInstance(TimeZone.getTimeZone(tz)));
+                        }
+                        else if (columnTypeName.startsWith("DateTime(")) {
+                            tz = columnTypeName.substring(10, columnTypeName.length() - 2);
+                            preparedStatement.setTimestamp(columnIndex, column.asTimestamp(), Calendar.getInstance(TimeZone.getTimeZone(tz)));
+                        }
+                        else {
+                            preparedStatement.setString(columnIndex, column.asString());
+                        }
+                        return preparedStatement;
+                    }
+
+                    return super.fillPreparedStatementColumnType(preparedStatement, columnIndex, columnSqlType, column);
+                }
+            };
 
             this.commonRdbmsWriterSlave.init(this.writerSliceConfig);
         }
