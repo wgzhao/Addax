@@ -34,6 +34,8 @@ import java.net.UnknownHostException;
 import java.nio.charset.StandardCharsets;
 import java.util.HashSet;
 
+import static org.apache.commons.net.ftp.FTP.BINARY_FILE_TYPE;
+
 public class StandardFtpHelper
         extends FtpHelper
 {
@@ -74,6 +76,8 @@ public class StandardFtpHelper
             //设置命令传输编码
             String fileEncoding = System.getProperty("file.encoding");
             ftpClient.setControlEncoding(fileEncoding);
+            // always use binary transfer model
+            ftpClient.setFileType(BINARY_FILE_TYPE);
         }
         catch (UnknownHostException e) {
             String message = String.format("请确认ftp服务器地址是否正确，无法连接到地址为: [%s] 的ftp服务器", host);
