@@ -19,10 +19,10 @@
 
 package com.wgzhao.addax.plugin.writer.ftpwriter.util;
 
-import com.wgzhao.addax.common.exception.AddaxException;
-import com.wgzhao.addax.plugin.writer.ftpwriter.FtpWriterErrorCode;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.serializer.SerializerFeature;
+import com.wgzhao.addax.common.exception.AddaxException;
+import com.wgzhao.addax.plugin.writer.ftpwriter.FtpWriterErrorCode;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.net.ftp.FTPClient;
@@ -37,6 +37,8 @@ import java.io.OutputStream;
 import java.net.UnknownHostException;
 import java.util.HashSet;
 import java.util.Set;
+
+import static org.apache.commons.net.ftp.FTP.BINARY_FILE_TYPE;
 
 public class StandardFtpHelperImpl
         implements IFtpHelper
@@ -62,6 +64,8 @@ public class StandardFtpHelperImpl
 
             this.ftpClient.enterRemotePassiveMode();
             this.ftpClient.enterLocalPassiveMode();
+            // Always use binary transfer mode
+            this.ftpClient.setFileType(BINARY_FILE_TYPE);
             int reply = this.ftpClient.getReplyCode();
             if (!FTPReply.isPositiveCompletion(reply)) {
                 this.ftpClient.disconnect();
