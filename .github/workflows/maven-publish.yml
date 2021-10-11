@@ -31,7 +31,7 @@ jobs:
         with:
           maven-version: 3.5.4
       - name: Generate settings.xml for Maven Builds
-        uses: whelk-io/maven-settings-xml-action@v18
+        uses: whelk-io/maven-settings-xml-action@v20
         with:
           servers: >
             [
