@@ -33,7 +33,7 @@
         <commons.cli.version>1.4</commons.cli.version>
         <druid.version>1.2.6</druid.version>
         <fastjson.version>1.2.78</fastjson.version>
-        <guava.version>29.0-jre</guava.version>
+        <guava.version>31.0.1-jre</guava.version>
         <groovy.version>2.4.21</groovy.version>
         <diamond.version>3.7.3</diamond.version>
         <httpclient.version>4.5.13</httpclient.version>
