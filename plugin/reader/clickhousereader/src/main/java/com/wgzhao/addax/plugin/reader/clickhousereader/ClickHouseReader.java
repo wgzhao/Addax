@@ -20,13 +20,25 @@
 package com.wgzhao.addax.plugin.reader.clickhousereader;
 
 import com.wgzhao.addax.common.base.Key;
+import com.wgzhao.addax.common.element.BytesColumn;
+import com.wgzhao.addax.common.element.Column;
+import com.wgzhao.addax.common.element.DateColumn;
+import com.wgzhao.addax.common.element.StringColumn;
+import com.wgzhao.addax.common.element.TimestampColumn;
 import com.wgzhao.addax.common.plugin.RecordSender;
 import com.wgzhao.addax.common.spi.Reader;
 import com.wgzhao.addax.common.util.Configuration;
 import com.wgzhao.addax.rdbms.reader.CommonRdbmsReader;
 import com.wgzhao.addax.rdbms.util.DataBaseType;
 
+import java.io.UnsupportedEncodingException;
+import java.sql.ResultSet;
+import java.sql.ResultSetMetaData;
+import java.sql.SQLException;
+import java.sql.Types;
+import java.util.Calendar;
 import java.util.List;
+import java.util.TimeZone;
 
 public class ClickHouseReader
         extends Reader
@@ -88,7 +100,31 @@ public class ClickHouseReader
         public void init()
         {
             this.readerSliceConfig = super.getPluginJobConf();
-            this.commonRdbmsReaderTask = new CommonRdbmsReader.Task(DATABASE_TYPE, super.getTaskGroupId(), super.getTaskId());
+            this.commonRdbmsReaderTask = new CommonRdbmsReader.Task(DATABASE_TYPE, super.getTaskGroupId(), super.getTaskId())
+            {
+                @Override
+                protected Column createColumn(ResultSet rs, ResultSetMetaData metaData, int i)
+                        throws SQLException, UnsupportedEncodingException
+                {
+                    int dataType = metaData.getColumnType(i);
+                    if (dataType == Types.TIMESTAMP) {
+                        return new TimestampColumn(rs.getTimestamp(i, Calendar.getInstance()));
+                    }
+                    else if (dataType == Types.OTHER) {
+                        String tz = "Asia/Chongqing";
+                        // database-specific type, convert it to string as default
+                        String dType = metaData.getColumnTypeName(i);
+                        if (dType.startsWith("DateTime")) {
+                            return new TimestampColumn(rs.getTimestamp(i));
+                        } else {
+                            return new StringColumn(rs.getObject(i).toString());
+                        }
+                    }
+                    else {
+                        return super.createColumn(rs, metaData, i);
+                    }
+                }
+            };
             this.commonRdbmsReaderTask.init(this.readerSliceConfig);
         }
 

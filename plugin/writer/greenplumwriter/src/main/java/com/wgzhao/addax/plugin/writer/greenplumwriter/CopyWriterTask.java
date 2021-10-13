@@ -39,6 +39,7 @@ import org.slf4j.LoggerFactory;
 import java.io.ByteArrayInputStream;
 import java.nio.charset.StandardCharsets;
 import java.sql.Connection;
+import java.sql.SQLException;
 import java.sql.Types;
 import java.util.ArrayList;
 import java.util.List;
@@ -243,12 +244,13 @@ public class CopyWriterTask
     }
 
     protected String serializeRecord(Record record)
+            throws SQLException
     {
         StringBuilder sb = new StringBuilder();
         Column column;
         for (int i = 0; i < this.columnNumber; i++) {
             column = record.getColumn(i);
-            int columnSqlType = this.resultSetMetaData.getMiddle().get(i);
+            int columnSqlType = this.resultSetMetaData.getColumnType(i+1);
 
             switch (columnSqlType) {
                 case Types.CHAR:

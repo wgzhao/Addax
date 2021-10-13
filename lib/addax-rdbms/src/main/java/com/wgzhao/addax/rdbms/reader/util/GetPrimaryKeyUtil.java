@@ -67,7 +67,7 @@ public class GetPrimaryKeyUtil
         try (Connection connection = DBUtil.getConnection(dataBaseType, jdbc_url, username, password)) {
             sql = getPrimaryKeyQuery(schema, table, username);
             if (sql == null) {
-                LOG.debug("NOT support current database yet ");
+                LOG.debug("The current database is unsupported yet.");
                 return null;
             }
             LOG.debug("query primary sql: [{}]", sql);
@@ -79,7 +79,7 @@ public class GetPrimaryKeyUtil
             }
             if (columns.isEmpty()) {
                 // Table has no primary key
-                LOG.debug("table {} has no primary key", table);
+                LOG.debug("The table {} has no primary key", table);
                 return null;
             }
 
@@ -88,8 +88,8 @@ public class GetPrimaryKeyUtil
                 // TODO select the appropriate column instead of the first column based
                 // on the datatype - giving preference to numerics over other types.
                 LOG.warn("The table " + table + " "
-                        + "contains a multi-column primary key. Addax will default to "
-                        + "the column " + columns.get(0) + " only for this job.");
+                        + "contains a multi-column primary key. Addax will take"
+                        + "the column " + columns.get(0) + " as primary key for this job by default");
             }
             return columns.get(0);
         }

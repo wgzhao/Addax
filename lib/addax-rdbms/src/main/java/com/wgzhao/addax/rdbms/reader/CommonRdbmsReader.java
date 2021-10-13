@@ -23,15 +23,15 @@ package com.wgzhao.addax.rdbms.reader;
 
 import com.wgzhao.addax.common.base.Constant;
 import com.wgzhao.addax.common.base.Key;
-import com.wgzhao.addax.common.element.TimestampColumn;
-import com.wgzhao.addax.rdbms.util.DataBaseType;
 import com.wgzhao.addax.common.element.BoolColumn;
 import com.wgzhao.addax.common.element.BytesColumn;
+import com.wgzhao.addax.common.element.Column;
 import com.wgzhao.addax.common.element.DateColumn;
 import com.wgzhao.addax.common.element.DoubleColumn;
 import com.wgzhao.addax.common.element.LongColumn;
 import com.wgzhao.addax.common.element.Record;
 import com.wgzhao.addax.common.element.StringColumn;
+import com.wgzhao.addax.common.element.TimestampColumn;
 import com.wgzhao.addax.common.exception.AddaxException;
 import com.wgzhao.addax.common.plugin.RecordSender;
 import com.wgzhao.addax.common.plugin.TaskPluginCollector;
@@ -45,14 +45,17 @@ import com.wgzhao.addax.rdbms.reader.util.ReaderSplitUtil;
 import com.wgzhao.addax.rdbms.reader.util.SingleTableSplitUtil;
 import com.wgzhao.addax.rdbms.util.DBUtil;
 import com.wgzhao.addax.rdbms.util.DBUtilErrorCode;
+import com.wgzhao.addax.rdbms.util.DataBaseType;
 import com.wgzhao.addax.rdbms.util.RdbmsException;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.UnsupportedEncodingException;
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
+import java.sql.SQLException;
 import java.sql.Types;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -81,16 +84,15 @@ public class CommonRdbmsReader
 
             OriginalConfPretreatmentUtil.doPretreatment(originalConfig);
             if (originalConfig.getString(Key.SPLIT_PK) == null && originalConfig.getBool(Key.AUTO_PK, false)) {
-                    LOG.info("Does not configure splitPk, try to guess");
-                    String splitPK = GetPrimaryKeyUtil.getPrimaryKey(originalConfig);
-                    if (splitPK != null) {
-                        LOG.info("Try to use `" + splitPK + "` as primary key to split");
-                        originalConfig.set(Key.SPLIT_PK, splitPK);
-                        if (originalConfig.getInt(Key.EACH_TABLE_SPLIT_SIZE, -1) == -1) {
-                            originalConfig.set(Key.EACH_TABLE_SPLIT_SIZE, Constant.DEFAULT_EACH_TABLE_SPLIT_SIZE);
-                        }
+                LOG.info("Does not configure splitPk, try to guess");
+                String splitPK = GetPrimaryKeyUtil.getPrimaryKey(originalConfig);
+                if (splitPK != null) {
+                    LOG.info("Try to use `" + splitPK + "` as primary key to split");
+                    originalConfig.set(Key.SPLIT_PK, splitPK);
+                    if (originalConfig.getInt(Key.EACH_TABLE_SPLIT_SIZE, -1) == -1) {
+                        originalConfig.set(Key.EACH_TABLE_SPLIT_SIZE, Constant.DEFAULT_EACH_TABLE_SPLIT_SIZE);
                     }
-
+                }
             }
             LOG.debug("After job init(), job config now is:[\n{}\n]", originalConfig.toJSON());
             return originalConfig;
@@ -233,8 +235,7 @@ public class CommonRdbmsReader
                 long lastTime = System.nanoTime();
                 while (rs.next()) {
                     rsNextUsedTime += (System.nanoTime() - lastTime);
-                    this.transportOneRecord(recordSender, rs, metaData, columnNumber, mandatoryEncoding,
-                            taskPluginCollector);
+                    transportOneRecord(recordSender, rs, metaData, columnNumber, taskPluginCollector);
                     lastTime = System.nanoTime();
                 }
 
@@ -243,7 +244,7 @@ public class CommonRdbmsReader
                 LOG.info("Finished read record by Sql: [{}\n] {}.", querySql, basicMsg);
             }
             catch (Exception e) {
-                throw RdbmsException.asQueryException(this.dataBaseType, e, querySql, table, username);
+                throw RdbmsException.asQueryException(e, querySql);
             }
             finally {
                 DBUtil.closeDBResources(null, conn);
@@ -261,166 +262,111 @@ public class CommonRdbmsReader
         }
 
         protected void transportOneRecord(RecordSender recordSender, ResultSet rs, ResultSetMetaData metaData,
-                int columnNumber, String mandatoryEncoding, TaskPluginCollector taskPluginCollector)
+                int columnNumber, TaskPluginCollector taskPluginCollector)
         {
-            Record record = buildRecord(recordSender, rs, metaData, columnNumber, mandatoryEncoding,
-                    taskPluginCollector);
+            Record record = buildRecord(recordSender, rs, metaData, columnNumber, taskPluginCollector);
             recordSender.sendToWriter(record);
         }
 
-        protected Record buildRecord(RecordSender recordSender, ResultSet rs, ResultSetMetaData metaData,
-                int columnNumber, String mandatoryEncoding, TaskPluginCollector taskPluginCollector)
+        protected Column createColumn(ResultSet rs, ResultSetMetaData metaData, int i)
+                throws SQLException, UnsupportedEncodingException
+        {
+            switch (metaData.getColumnType(i)) {
+                case Types.CHAR:
+                case Types.NCHAR:
+                case Types.VARCHAR:
+                case Types.LONGVARCHAR:
+                case Types.NVARCHAR:
+                case Types.LONGNVARCHAR:
+                    String rawData;
+                    if (StringUtils.isBlank(mandatoryEncoding)) {
+                        rawData = rs.getString(i);
+                    }
+                    else {
+                        rawData = new String((rs.getBytes(i) == null ? EMPTY_CHAR_ARRAY : rs.getBytes(i)), mandatoryEncoding);
+                    }
+                    return new StringColumn(rawData);
+
+                case Types.CLOB:
+                case Types.NCLOB:
+                    return new StringColumn(rs.getString(i));
+
+                case Types.SMALLINT:
+                case Types.TINYINT:
+                case Types.INTEGER:
+                case Types.BIGINT:
+                    return new LongColumn(rs.getString(i));
+
+                case Types.NUMERIC:
+                case Types.DECIMAL:
+                case Types.FLOAT:
+                case Types.REAL:
+                case Types.DOUBLE:
+                    return new DoubleColumn(rs.getString(i));
+
+                case Types.TIME:
+                    return new DateColumn(rs.getTime(i));
+
+                case Types.DATE:
+                    return new DateColumn(rs.getDate(i));
+
+                case Types.TIMESTAMP:
+                    return new TimestampColumn(rs.getTimestamp(i));
+
+                case Types.BINARY:
+                case Types.VARBINARY:
+                case Types.BLOB:
+                case Types.LONGVARBINARY:
+                    return new BytesColumn(rs.getBytes(i));
+
+                case Types.BOOLEAN:
+                    return new BoolColumn(rs.getBoolean(i));
+
+                case Types.BIT:
+                    // bit(1) -> Types.BIT 可使用BoolColumn
+                    // bit(>1) -> Types.VARBINARY 可使用BytesColumn
+                    if (metaData.getPrecision(i) == 1) {
+                        return new BoolColumn(rs.getBoolean(i));
+                    }
+                    else {
+                        return new BytesColumn(rs.getBytes(i));
+                    }
+
+                case Types.NULL:
+                    String stringData = null;
+                    if (rs.getObject(i) != null) {
+                        stringData = rs.getObject(i).toString();
+                    }
+                    return new StringColumn(stringData);
+
+                case Types.ARRAY:
+                    return new StringColumn(rs.getArray(i).toString());
+
+                case Types.JAVA_OBJECT:
+
+                case Types.OTHER:
+                    return new StringColumn(rs.getObject(i).toString());
+
+                case Types.SQLXML:
+                    return new StringColumn(rs.getSQLXML(i).getString());
+
+                default:
+                    throw AddaxException.asAddaxException(DBUtilErrorCode.UNSUPPORTED_TYPE,
+                            String.format("您的配置文件中的列配置信息有误. 不支持数据库读取这种字段类型. " + "字段名:[%s], 字段类型:[%s], "
+                                            + "字段类型名称:[%s], 字段Java类型:[%s]. " + "请尝试使用数据库函数将其转换支持的类型 或者不同步该字段 .",
+                                    metaData.getColumnName(i), metaData.getColumnType(i),
+                                    metaData.getColumnTypeName(i), metaData.getColumnClassName(i)));
+            }
+        }
+
+        protected Record buildRecord(RecordSender recordSender, ResultSet rs, ResultSetMetaData metaData, int columnNumber,
+                TaskPluginCollector taskPluginCollector)
         {
             Record record = recordSender.createRecord();
 
             try {
                 for (int i = 1; i <= columnNumber; i++) {
-                    switch (metaData.getColumnType(i)) {
-
-                        case Types.CHAR:
-                        case Types.NCHAR:
-                        case Types.VARCHAR:
-                        case Types.LONGVARCHAR:
-                        case Types.NVARCHAR:
-                        case Types.LONGNVARCHAR:
-                            String rawData;
-                            if (StringUtils.isBlank(mandatoryEncoding)) {
-                                rawData = rs.getString(i);
-                            }
-                            else {
-                                rawData = new String((rs.getBytes(i) == null ? EMPTY_CHAR_ARRAY : rs.getBytes(i)),
-                                        mandatoryEncoding);
-                            }
-                            record.addColumn(new StringColumn(rawData));
-                            break;
-
-                        case Types.CLOB:
-                        case Types.NCLOB:
-                            record.addColumn(new StringColumn(rs.getString(i)));
-                            break;
-
-                        case Types.SMALLINT:
-                        case Types.TINYINT:
-                        case Types.INTEGER:
-                        case Types.BIGINT:
-                            record.addColumn(new LongColumn(rs.getString(i)));
-                            break;
-
-                        case Types.NUMERIC:
-                        case Types.DECIMAL:
-                        case Types.FLOAT:
-                        case Types.REAL:
-                            record.addColumn(new DoubleColumn(rs.getString(i)));
-                            break;
-
-                        case Types.DOUBLE:
-                            if ("money".equalsIgnoreCase(metaData.getColumnTypeName(i))) {
-                                // remove currency notation($) and currency formatting notation(,)
-                                // TODO process it more elegantly
-                                record.addColumn(new DoubleColumn(rs.getString(i).substring(1).replace(",", "")));
-                            }
-                            else {
-                                record.addColumn(new DoubleColumn(rs.getString(i)));
-                            }
-                            break;
-
-                        case Types.TIME:
-                            record.addColumn(new DateColumn(rs.getTime(i)));
-                            break;
-
-                        // for mysql bug, see http://bugs.mysql.com/bug.php?id=35115
-                        case Types.DATE:
-                            if ("year".equalsIgnoreCase(metaData.getColumnTypeName(i))) {
-                                record.addColumn(new LongColumn(rs.getInt(i)));
-                            }
-                            else {
-                                record.addColumn(new DateColumn(rs.getDate(i)));
-                            }
-                            break;
-
-                        case Types.TIMESTAMP:
-                        case -151: // 兼容老的SQLServer版本的datetime数据类型
-                            if (metaData.getColumnTypeName(i).startsWith("DateTime(")) {
-                                // clickhouse DateTime(zoneinfo)
-                                // TODO 含时区，当作Timestamp处理会有时区的差异
-                                record.addColumn(new StringColumn(rs.getString(i)));
-                            }
-                            else {
-                                record.addColumn(new TimestampColumn(rs.getTimestamp(i)));
-                            }
-                            break;
-
-                        case Types.BINARY:
-                        case Types.VARBINARY:
-                        case Types.BLOB:
-                        case Types.LONGVARBINARY:
-                            record.addColumn(new BytesColumn(rs.getBytes(i)));
-                            break;
-
-                        case Types.BOOLEAN:
-                            record.addColumn(new BoolColumn(rs.getBoolean(i)));
-                            break;
-                        case Types.BIT:
-                            // bit(1) -> Types.BIT 可使用BoolColumn
-                            // bit(>1) -> Types.VARBINARY 可使用BytesColumn
-                            if (metaData.getPrecision(i) == 1) {
-                                record.addColumn(new BoolColumn(rs.getBoolean(i)));
-                            }
-                            else {
-                                record.addColumn(new BytesColumn(rs.getBytes(i)));
-                            }
-                            break;
-
-                        case Types.NULL:
-                            String stringData = null;
-                            if (rs.getObject(i) != null) {
-                                stringData = rs.getObject(i).toString();
-                            }
-                            record.addColumn(new StringColumn(stringData));
-                            break;
-
-                        case Types.ARRAY:
-                            record.addColumn(new StringColumn(rs.getArray(i).toString()));
-                            break;
-
-                        case Types.JAVA_OBJECT:
-                            record.addColumn(new StringColumn(rs.getObject(i).toString()));
-                            break;
-
-                        case Types.SQLXML:
-                            record.addColumn(new StringColumn(rs.getSQLXML(i).getString()));
-                            break;
-
-                        case Types.OTHER:
-                            // database-specific type, convert it to string as default
-                            String dType = metaData.getColumnTypeName(i);
-                            LOG.debug("data-specific data type , column name: {}, column type:{}"
-                                    , metaData.getColumnName(i), dType);
-                            if ("image".equals(dType)) {
-                                record.addColumn(new BytesColumn(rs.getBytes(i)));
-                            }
-                            else if (dType.startsWith("DateTime64")) {
-                                // ClickHouse DateTime64(zoneinfo)
-                                if (dType.contains(",")) {
-                                    // TODO 含时区，当作Timestamp处理会有时区的差异
-                                    record.addColumn(new StringColumn(rs.getString(i)));
-                                }
-                                else {
-                                    record.addColumn(new DateColumn(rs.getTimestamp(i)));
-                                }
-                            }
-                            else {
-                                record.addColumn(new StringColumn(rs.getObject(i).toString()));
-                            }
-                            break;
-
-                        default:
-                            throw AddaxException.asAddaxException(DBUtilErrorCode.UNSUPPORTED_TYPE,
-                                    String.format("您的配置文件中的列配置信息有误. 不支持数据库读取这种字段类型. " + "字段名:[%s], 字段类型:[%s], "
-                                                    + "字段类型名称:[%s], 字段Java类型:[%s]. " + "请尝试使用数据库函数将其转换支持的类型 或者不同步该字段 .",
-                                            metaData.getColumnName(i), metaData.getColumnType(i),
-                                            metaData.getColumnTypeName(i), metaData.getColumnClassName(i)));
-                    }
+                    record.addColumn(createColumn(rs, metaData, i));
                 }
             }
             catch (Exception e) {

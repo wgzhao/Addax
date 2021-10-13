@@ -31,8 +31,7 @@ public final class TableExpandUtil
 
     // schema.table[0-2]more
     // 1 2 3 4 5
-    public static Pattern pattern = Pattern
-            .compile("(\\w+\\.)?(\\w+)\\[(\\d+)-(\\d+)\\](.*)");
+    public static Pattern pattern = Pattern.compile("(\\w+\\.)?(\\w+)\\[(\\d+)-(\\d+)\\](.*)");
 
     private TableExpandUtil()
     {
