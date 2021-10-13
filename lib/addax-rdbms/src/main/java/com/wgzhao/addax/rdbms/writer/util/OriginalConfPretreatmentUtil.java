@@ -37,12 +37,12 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 public final class OriginalConfPretreatmentUtil
 {
-    private static final Logger LOG = LoggerFactory
-            .getLogger(OriginalConfPretreatmentUtil.class);
+    private static final Logger LOG = LoggerFactory.getLogger(OriginalConfPretreatmentUtil.class);
 
     public static DataBaseType dataBaseType;
 
@@ -53,9 +53,8 @@ public final class OriginalConfPretreatmentUtil
         // 检查 username 配置（必填）
         originalConfig.getNecessaryValue(Key.USERNAME, DBUtilErrorCode.REQUIRED_VALUE);
 
-        /*
-         * 有些数据库没有密码，因此密码不再作为必选项
-         */
+
+        // 有些数据库没有密码，因此密码不再作为必选项
         if (originalConfig.getString(Key.PASSWORD) == null ) {
             originalConfig.set(Key.PASSWORD, "");
         }
@@ -101,8 +100,7 @@ public final class OriginalConfPretreatmentUtil
             }
 
             jdbcUrl = dataBaseType.appendJDBCSuffixForWriter(jdbcUrl);
-            originalConfig.set(String.format("%s[%d].%s", Key.CONNECTION, i, Key.JDBC_URL),
-                    jdbcUrl);
+            originalConfig.set(String.format("%s[%d].%s", Key.CONNECTION, i, Key.JDBC_URL), jdbcUrl);
 
             List<String> tables = connConf.getList(Key.TABLE, String.class);
 
@@ -121,8 +119,7 @@ public final class OriginalConfPretreatmentUtil
 
             tableNum += expandedTables.size();
 
-            originalConfig.set(String.format("%s[%d].%s", Key.CONNECTION,
-                    i, Key.TABLE), expandedTables);
+            originalConfig.set(String.format("%s[%d].%s", Key.CONNECTION, i, Key.TABLE), expandedTables);
         }
 
         originalConfig.set(Constant.TABLE_NUMBER_MARK, tableNum);
@@ -139,25 +136,25 @@ public final class OriginalConfPretreatmentUtil
             boolean isPreCheck = originalConfig.getBool(Key.DRY_RUN, false);
             List<String> allColumns;
             if (isPreCheck) {
-                allColumns = DBUtil.getTableColumnsByConn(dataBaseType, connectionFactory.getConnectionWithoutRetry(), oneTable);
+                allColumns = DBUtil.getTableColumnsByConn(connectionFactory.getConnectionWithoutRetry(), oneTable);
             }
             else {
-                allColumns = DBUtil.getTableColumnsByConn(dataBaseType, connectionFactory.getConnection(), oneTable);
+                allColumns = DBUtil.getTableColumnsByConn(connectionFactory.getConnection(), oneTable);
             }
 
-            LOG.info("table:[{}] all columns:[{}].", oneTable,
-                    StringUtils.join(allColumns, ","));
+            LOG.info("table:[{}] all columns:[{}].", oneTable, StringUtils.join(allColumns, ","));
 
             if (1 == userConfiguredColumns.size() && "*".equals(userConfiguredColumns.get(0))) {
-                LOG.warn("您的配置文件中的列配置信息存在风险. 因为您配置的写入数据库表的列为*，当您的表字段个数、类型有变动时，可能影响任务正确性甚至会运行出错。请检查您的配置并作出修改.");
+                LOG.warn("您的配置文件中的列配置信息存在风险. 因为您配置的写入数据库表的列为*，当您的表字段个数、类型有变动时，" +
+                        "可能影响任务正确性甚至会运行出错。请检查您的配置并作出修改.");
 
                 // 回填其值，需要以 String 的方式转交后续处理
                 originalConfig.set(Key.COLUMN, allColumns);
             }
             else if (userConfiguredColumns.size() > allColumns.size()) {
                 throw AddaxException.asAddaxException(DBUtilErrorCode.ILLEGAL_VALUE,
-                        String.format("您的配置文件中的列配置信息有误. 因为您所配置的写入数据库表的字段个数:%s 大于目的表的总字段总个数:%s. 请检查您的配置并作出修改.",
-                                userConfiguredColumns.size(), allColumns.size()));
+                        String.format("您的配置文件中的列配置信息有误. 因为您所配置的写入数据库表的字段个数:%s 大于目的表的总字段总个数:%s. " +
+                                        "请检查您的配置并作出修改.", userConfiguredColumns.size(), allColumns.size()));
             }
             else {
                 // 确保用户配置的 column 不重复
@@ -172,13 +169,10 @@ public final class OriginalConfPretreatmentUtil
 
     public static void dealColumnConf(Configuration originalConfig)
     {
-        String jdbcUrl = originalConfig.getString(String.format("%s[0].%s",
-                Key.CONNECTION, Key.JDBC_URL));
-
+        String jdbcUrl = originalConfig.getString(String.format("%s[0].%s", Key.CONNECTION, Key.JDBC_URL));
         String username = originalConfig.getString(Key.USERNAME);
         String password = originalConfig.getString(Key.PASSWORD);
-        String oneTable = originalConfig.getString(String.format(
-                "%s[0].%s[0]", Key.CONNECTION, Key.TABLE));
+        String oneTable = originalConfig.getString(String.format("%s[0].%s[0]", Key.CONNECTION, Key.TABLE));
 
         JdbcConnectionFactory jdbcConnectionFactory = new JdbcConnectionFactory(dataBaseType, jdbcUrl, username, password);
         dealColumnConf(originalConfig, jdbcConnectionFactory, oneTable);

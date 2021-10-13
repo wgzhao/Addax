@@ -50,7 +50,7 @@
 
         <!-- jdbc driver version -->
         <cassandra.jdbc.version>3.11.0</cassandra.jdbc.version>
-        <clickhouse.jdbc.version>0.2.5</clickhouse.jdbc.version>
+        <clickhouse.jdbc.version>0.3.0</clickhouse.jdbc.version>
         <hive.version>3.1.2-1</hive.version>
         <influxdbClient.version>2.22</influxdbClient.version>
         <hadoop.version>3.2.0-9</hadoop.version>

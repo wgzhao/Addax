@@ -75,7 +75,7 @@ public final class RdbmsRangeSplitWrap
 
         List<String> result = new ArrayList<>();
 
-        //TODO  change to  stringbuilder.append(..)
+        //TODO  change to  stringBuilder.append(..)
         if (2 == rangeResult.length) {
             result.add(String.format(" (%s%s%s <= %s AND %s <= %s%s%s) ", quote, quoteConstantValue(rangeResult[0], dataBaseType),
                     quote, columnName, columnName, quote, quoteConstantValue(rangeResult[1], dataBaseType), quote));

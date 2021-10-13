@@ -20,6 +20,7 @@
 package com.wgzhao.addax.plugin.writer.postgresqlwriter;
 
 import com.wgzhao.addax.common.base.Key;
+import com.wgzhao.addax.common.element.Column;
 import com.wgzhao.addax.common.exception.AddaxException;
 import com.wgzhao.addax.common.plugin.RecordReceiver;
 import com.wgzhao.addax.common.spi.Writer;
@@ -28,6 +29,9 @@ import com.wgzhao.addax.rdbms.util.DBUtilErrorCode;
 import com.wgzhao.addax.rdbms.util.DataBaseType;
 import com.wgzhao.addax.rdbms.writer.CommonRdbmsWriter;
 
+import java.sql.PreparedStatement;
+import java.sql.SQLException;
+import java.sql.Types;
 import java.util.List;
 
 public class PostgresqlWriter
@@ -103,17 +107,46 @@ public class PostgresqlWriter
                 public String calcValueHolder(String columnType)
                 {
                     if ("serial".equalsIgnoreCase(columnType)) {
-                        return "?::int";
+                        return "?::INT";
                     }
                     else if ("bit".equalsIgnoreCase(columnType)) {
-                        return "?::bit varying";
+                        return "?::BIT VARYING";
                     }
                     else if ("bigserial".equalsIgnoreCase(columnType)) {
-                        return "?::bigint";
+                        return "?::BIGINT";
                     }
-                    return "?::" + columnType;
+                    else if ("xml".equalsIgnoreCase(columnType)) {
+                        return "?::XML";
+                    }
+                    else if ("money".equalsIgnoreCase(columnType)) {
+                        return "?::NUMERIC::MONEY";
+                    }
+                    return super.calcValueHolder(columnType);
+                }
+
+                @Override
+                protected PreparedStatement fillPreparedStatementColumnType(PreparedStatement preparedStatement, int columnIndex, int columnSqlType, Column column)
+                        throws SQLException
+                {
+                    if (column == null || column.getRawData() == null) {
+                        preparedStatement.setObject(columnIndex, null);
+                        return preparedStatement;
+                    }
+
+                    if (columnSqlType == Types.BIT) {
+                        if (this.resultSetMetaData.getPrecision(columnIndex) == 1) {
+                            preparedStatement.setBoolean(columnIndex, column.asBoolean());
+                        }
+                        else {
+                            preparedStatement.setObject(columnIndex, column.asString(), Types.OTHER);
+                        }
+                        return preparedStatement;
+                    }
+
+                    return super.fillPreparedStatementColumnType(preparedStatement, columnIndex, columnSqlType, column);
                 }
             };
+
             this.commonRdbmsWriterSlave.init(this.writerSliceConfig);
         }
 

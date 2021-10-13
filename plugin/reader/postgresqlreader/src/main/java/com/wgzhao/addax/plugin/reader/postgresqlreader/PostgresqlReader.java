@@ -19,6 +19,8 @@
 
 package com.wgzhao.addax.plugin.reader.postgresqlreader;
 
+import com.wgzhao.addax.common.element.Column;
+import com.wgzhao.addax.common.element.DoubleColumn;
 import com.wgzhao.addax.common.exception.AddaxException;
 import com.wgzhao.addax.common.plugin.RecordSender;
 import com.wgzhao.addax.common.spi.Reader;
@@ -27,6 +29,11 @@ import com.wgzhao.addax.rdbms.reader.CommonRdbmsReader;
 import com.wgzhao.addax.rdbms.util.DBUtilErrorCode;
 import com.wgzhao.addax.rdbms.util.DataBaseType;
 
+import java.io.UnsupportedEncodingException;
+import java.sql.ResultSet;
+import java.sql.ResultSetMetaData;
+import java.sql.SQLException;
+import java.sql.Types;
 import java.util.List;
 
 import static com.wgzhao.addax.common.base.Constant.DEFAULT_FETCH_SIZE;
@@ -89,7 +96,20 @@ public class PostgresqlReader
         public void init()
         {
             this.readerSliceConfig = super.getPluginJobConf();
-            this.commonRdbmsReaderSlave = new CommonRdbmsReader.Task(DATABASE_TYPE, super.getTaskGroupId(), super.getTaskId());
+            this.commonRdbmsReaderSlave = new CommonRdbmsReader.Task(DATABASE_TYPE, super.getTaskGroupId(), super.getTaskId())
+            {
+                @Override
+                protected Column createColumn(ResultSet rs, ResultSetMetaData metaData, int i)
+                        throws SQLException, UnsupportedEncodingException
+                {
+                    if (metaData.getColumnType(i) == Types.DOUBLE && metaData.isCurrency(i)) {
+                        // money type has currency symbol( etc $) and thousands separator(,)
+                        return new DoubleColumn(Double.valueOf(rs.getString(i).substring(1).replace(",","")));
+                    }
+                    return super.createColumn(rs, metaData, i);
+                }
+
+            };
             this.commonRdbmsReaderSlave.init(this.readerSliceConfig);
         }
 

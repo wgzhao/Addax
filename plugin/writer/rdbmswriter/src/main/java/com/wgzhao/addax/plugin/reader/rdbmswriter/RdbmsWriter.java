@@ -43,7 +43,7 @@ public class RdbmsWriter
             extends Writer.Job
     {
         private Configuration originalConfig = null;
-        private CommonRdbmsWriter.Job commonRdbmsWriterMaster;
+        private CommonRdbmsWriter.Job commonRdbmsWriterJob;
 
         @Override
         public void init()
@@ -53,44 +53,42 @@ public class RdbmsWriter
             // warn：not like mysql, only support insert mode, don't use
             String writeMode = this.originalConfig.getString(Key.WRITE_MODE);
             if (null != writeMode) {
-                throw AddaxException
-                        .asAddaxException(
-                                DBUtilErrorCode.CONF_ERROR,
-                                String.format(
-                                        "写入模式(writeMode)配置有误. 因为不支持配置参数项 writeMode: %s, 仅使用insert sql 插入数据. 请检查您的配置并作出修改.",
-                                        writeMode));
+                throw AddaxException.asAddaxException(
+                        DBUtilErrorCode.CONF_ERROR,
+                        String.format(
+                                "写入模式(writeMode)配置有误. 因为不支持配置参数项 writeMode: %s, 仅使用insert sql 插入数据. 请检查您的配置并作出修改.",
+                                writeMode));
             }
             String jdbcDriver = this.originalConfig.getString(JDBC_DRIVER, null);
             if (jdbcDriver == null || StringUtils.isBlank(jdbcDriver)) {
                 throw AddaxException.asAddaxException(DBUtilErrorCode.REQUIRED_VALUE, "config 'driver' is required and must not be empty");
             }
-            this.commonRdbmsWriterMaster = new SubCommonRdbmsWriter.Job(DATABASE_TYPE);
-            this.commonRdbmsWriterMaster.init(this.originalConfig);
+            this.commonRdbmsWriterJob = new CommonRdbmsWriter.Job(DATABASE_TYPE);
+            this.commonRdbmsWriterJob.init(this.originalConfig);
         }
 
         @Override
         public void prepare()
         {
-            this.commonRdbmsWriterMaster.prepare(this.originalConfig);
+            this.commonRdbmsWriterJob.prepare(this.originalConfig);
         }
 
         @Override
         public List<Configuration> split(int mandatoryNumber)
         {
-            return this.commonRdbmsWriterMaster.split(this.originalConfig,
-                    mandatoryNumber);
+            return this.commonRdbmsWriterJob.split(this.originalConfig, mandatoryNumber);
         }
 
         @Override
         public void post()
         {
-            this.commonRdbmsWriterMaster.post(this.originalConfig);
+            this.commonRdbmsWriterJob.post(this.originalConfig);
         }
 
         @Override
         public void destroy()
         {
-            this.commonRdbmsWriterMaster.destroy(this.originalConfig);
+            this.commonRdbmsWriterJob.destroy(this.originalConfig);
         }
     }
 
@@ -98,39 +96,38 @@ public class RdbmsWriter
             extends Writer.Task
     {
         private Configuration writerSliceConfig;
-        private CommonRdbmsWriter.Task commonRdbmsWriterSlave;
+        private CommonRdbmsWriter.Task commonRdbmsWriterTask;
 
         @Override
         public void init()
         {
             this.writerSliceConfig = super.getPluginJobConf();
-            this.commonRdbmsWriterSlave = new SubCommonRdbmsWriter.Task(
-                    DATABASE_TYPE);
-            this.commonRdbmsWriterSlave.init(this.writerSliceConfig);
+            this.commonRdbmsWriterTask = new CommonRdbmsWriter.Task(DATABASE_TYPE);
+            this.commonRdbmsWriterTask.init(this.writerSliceConfig);
         }
 
         @Override
         public void prepare()
         {
-            this.commonRdbmsWriterSlave.prepare(this.writerSliceConfig);
+            this.commonRdbmsWriterTask.prepare(this.writerSliceConfig);
         }
 
         public void startWrite(RecordReceiver recordReceiver)
         {
-            this.commonRdbmsWriterSlave.startWrite(recordReceiver,
+            this.commonRdbmsWriterTask.startWrite(recordReceiver,
                     this.writerSliceConfig, super.getTaskPluginCollector());
         }
 
         @Override
         public void post()
         {
-            this.commonRdbmsWriterSlave.post(this.writerSliceConfig);
+            this.commonRdbmsWriterTask.post(this.writerSliceConfig);
         }
 
         @Override
         public void destroy()
         {
-            this.commonRdbmsWriterSlave.destroy(this.writerSliceConfig);
+            this.commonRdbmsWriterTask.destroy(this.writerSliceConfig);
         }
     }
 

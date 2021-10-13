@@ -80,63 +80,7 @@ public class TDengineWriter
         public void init()
         {
             this.writerSliceConfig = super.getPluginJobConf();
-            this.commonRdbmsWriterTask = new CommonRdbmsWriter.Task(DATABASE_TYPE)
-            {
-                @Override
-                protected PreparedStatement fillPreparedStatementColumnType(PreparedStatement preparedStatement, int columnIndex, int columnSqlType, Column column)
-                        throws SQLException
-                {
-                    if (column.getRawData() == null) {
-                        preparedStatement.setObject(columnIndex, null);
-                        return preparedStatement;
-                    }
-                    switch (this.resultSetMetaData.getRight().get(columnIndex-1)) {
-                        case "BOOL":
-                            preparedStatement.setBoolean(columnIndex, column.asBoolean());
-                            break;
-
-                        case "SMALLINT":
-                        case "TINYINT":
-                        case "INT":
-                        case "BIGINT":
-                            preparedStatement.setLong(columnIndex, column.asLong());
-                            break;
-
-                        case "REAL":
-                        case "DOUBLE":
-                            preparedStatement.setDouble(columnIndex, column.asDouble());
-                            break;
-
-                        case "TIMESTAMP":
-                            // TDengine timestamp min values is 1500000000000, means 2017-07-14 10:40:00.0
-                            // so if timestamp less than ths min value ,it will occurred timestamp out of range
-                            if (columnIndex == 1 && column.asLong() < 1500000000000L) {
-                              throw AddaxException.asAddaxException(DBUtilErrorCode.WRITE_DATA_ERROR,
-                                      "TDengine 能写入的时间戳最小时间为 '2017-07-14 10:40:00.0', 当前要求写入的时间为 " +
-                                              Timestamp.from(Instant.ofEpochMilli(column.asLong())));
-                            }
-                            preparedStatement.setObject(columnIndex, column.asLong());
-                            break;
-
-                        case "BINARY":
-                        case "NCHAR":
-                            preparedStatement.setString(columnIndex, column.asString());
-                            break;
-
-                        default:
-                            throw AddaxException
-                                    .asAddaxException(
-                                            DBUtilErrorCode.UNSUPPORTED_TYPE,
-                                            String.format(
-                                                    "您的配置文件中的列配置信息有误. 不支持数据库写入这种字段类型. 字段名:[%s], " +
-                                                            "字段SQL类型编号:[%d], 字段Java类型:[%s]. 请修改表中该字段的类型或者不同步该字段.",
-                                                    this.resultSetMetaData.getLeft().get(columnIndex),
-                                                    this.resultSetMetaData.getMiddle().get(columnIndex),
-                                                    this.resultSetMetaData.getRight().get(columnIndex)));
-                    }
-                    return preparedStatement;
-                }
-            };
+            this.commonRdbmsWriterTask = new CommonRdbmsWriter.Task(DATABASE_TYPE);
             this.commonRdbmsWriterTask.init(this.writerSliceConfig);
         }
 
