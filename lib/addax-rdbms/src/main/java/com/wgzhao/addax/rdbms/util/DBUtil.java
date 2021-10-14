@@ -277,6 +277,7 @@ public final class DBUtil
             bds.setDriverClassName("org.apache.hive.jdbc.HiveDriver");
         }
         else {
+            LOG.debug("Connect database with driver {}", dataBaseType.getDriverClassName());
             bds.setDriverClassName(dataBaseType.getDriverClassName());
         }
         try {

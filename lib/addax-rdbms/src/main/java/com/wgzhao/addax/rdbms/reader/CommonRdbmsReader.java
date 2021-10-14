@@ -94,6 +94,7 @@ public class CommonRdbmsReader
                     }
                 }
             }
+
             LOG.debug("After job init(), job config now is:[\n{}\n]", originalConfig.toJSON());
             return originalConfig;
         }
