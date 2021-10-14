@@ -53,42 +53,42 @@ public class RdbmsWriter
             // warn：not like mysql, only support insert mode, don't use
             String writeMode = this.originalConfig.getString(Key.WRITE_MODE);
             if (null != writeMode) {
-                throw AddaxException.asAddaxException(
-                        DBUtilErrorCode.CONF_ERROR,
-                        String.format(
-                                "写入模式(writeMode)配置有误. 因为不支持配置参数项 writeMode: %s, 仅使用insert sql 插入数据. 请检查您的配置并作出修改.",
+                throw AddaxException.asAddaxException(DBUtilErrorCode.CONF_ERROR,
+                        String.format("写入模式(writeMode)配置有误. 因为不支持配置参数项 writeMode: %s, 仅使用insert sql 插入数据. 请检查您的配置并作出修改.",
                                 writeMode));
             }
             String jdbcDriver = this.originalConfig.getString(JDBC_DRIVER, null);
             if (jdbcDriver == null || StringUtils.isBlank(jdbcDriver)) {
                 throw AddaxException.asAddaxException(DBUtilErrorCode.REQUIRED_VALUE, "config 'driver' is required and must not be empty");
             }
+            // use special jdbc driver class
+            DATABASE_TYPE.setDriverClassName(jdbcDriver);
             this.commonRdbmsWriterJob = new CommonRdbmsWriter.Job(DATABASE_TYPE);
-            this.commonRdbmsWriterJob.init(this.originalConfig);
+            commonRdbmsWriterJob.init(originalConfig);
         }
 
         @Override
         public void prepare()
         {
-            this.commonRdbmsWriterJob.prepare(this.originalConfig);
+            commonRdbmsWriterJob.prepare(originalConfig);
         }
 
         @Override
         public List<Configuration> split(int mandatoryNumber)
         {
-            return this.commonRdbmsWriterJob.split(this.originalConfig, mandatoryNumber);
+            return commonRdbmsWriterJob.split(originalConfig, mandatoryNumber);
         }
 
         @Override
         public void post()
         {
-            this.commonRdbmsWriterJob.post(this.originalConfig);
+            commonRdbmsWriterJob.post(originalConfig);
         }
 
         @Override
         public void destroy()
         {
-            this.commonRdbmsWriterJob.destroy(this.originalConfig);
+            commonRdbmsWriterJob.destroy(originalConfig);
         }
     }
 
@@ -103,31 +103,30 @@ public class RdbmsWriter
         {
             this.writerSliceConfig = super.getPluginJobConf();
             this.commonRdbmsWriterTask = new CommonRdbmsWriter.Task(DATABASE_TYPE);
-            this.commonRdbmsWriterTask.init(this.writerSliceConfig);
+            commonRdbmsWriterTask.init(writerSliceConfig);
         }
 
         @Override
         public void prepare()
         {
-            this.commonRdbmsWriterTask.prepare(this.writerSliceConfig);
+            commonRdbmsWriterTask.prepare(writerSliceConfig);
         }
 
         public void startWrite(RecordReceiver recordReceiver)
         {
-            this.commonRdbmsWriterTask.startWrite(recordReceiver,
-                    this.writerSliceConfig, super.getTaskPluginCollector());
+            this.commonRdbmsWriterTask.startWrite(recordReceiver, writerSliceConfig, super.getTaskPluginCollector());
         }
 
         @Override
         public void post()
         {
-            this.commonRdbmsWriterTask.post(this.writerSliceConfig);
+            commonRdbmsWriterTask.post(writerSliceConfig);
         }
 
         @Override
         public void destroy()
         {
-            this.commonRdbmsWriterTask.destroy(this.writerSliceConfig);
+            commonRdbmsWriterTask.destroy(writerSliceConfig);
         }
     }
 
