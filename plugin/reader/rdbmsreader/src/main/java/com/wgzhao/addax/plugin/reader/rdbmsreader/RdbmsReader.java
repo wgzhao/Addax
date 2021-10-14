@@ -21,7 +21,6 @@ package com.wgzhao.addax.plugin.reader.rdbmsreader;
 
 import com.wgzhao.addax.common.exception.AddaxException;
 import com.wgzhao.addax.common.plugin.RecordSender;
-import com.wgzhao.addax.common.spi.ErrorCode;
 import com.wgzhao.addax.common.spi.Reader;
 import com.wgzhao.addax.common.util.Configuration;
 import com.wgzhao.addax.rdbms.reader.CommonRdbmsReader;
@@ -53,18 +52,17 @@ public class RdbmsReader
             this.originalConfig = getPluginJobConf();
             int fetchSize = this.originalConfig.getInt(FETCH_SIZE, DEFAULT_FETCH_SIZE);
             if (fetchSize < 1) {
-                throw AddaxException
-                        .asAddaxException(
-                                DBUtilErrorCode.REQUIRED_VALUE,
-                                String.format(
-                                        "您配置的fetchSize有误，fetchSize : [%d] 设置值不能小于 1.",
-                                        fetchSize));
+                throw AddaxException.asAddaxException(
+                        DBUtilErrorCode.REQUIRED_VALUE,
+                        String.format("您配置的fetchSize有误，fetchSize : [%d] 设置值不能小于 1.", fetchSize));
             }
             this.originalConfig.set(FETCH_SIZE, fetchSize);
             String jdbcDriver = this.originalConfig.getString(JDBC_DRIVER, null);
             if (jdbcDriver == null || StringUtils.isBlank(jdbcDriver)) {
                 throw AddaxException.asAddaxException(DBUtilErrorCode.REQUIRED_VALUE, "config 'driver' is required and must not be empty");
             }
+            // use custom jdbc driver
+            DATABASE_TYPE.setDriverClassName(jdbcDriver);
             this.commonRdbmsReaderMaster = new SubCommonRdbmsReader.Job(DATABASE_TYPE);
             this.originalConfig = this.commonRdbmsReaderMaster.init(this.originalConfig);
         }
