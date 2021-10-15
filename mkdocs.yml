@@ -25,15 +25,10 @@ theme:
         icon: material/toggle-switch
         name: Switch to light mode
   features:
-    # - navigation.expand
     - navigation.instant
     - navigation.indexes
     - content.code.annotate
     - content.tabs.link
-    # - header.autohide
-    # - navigation.sections
-    # - navigation.tabs
-    # - navigation.tabs.sticky
     - navigation.top
     - navigation.tracking
     - search.highlight
@@ -114,7 +109,7 @@ extra:
     - icon: fontawesome/brands/github
       link: https://github.com/wgzhao
 
-# Extentions
+# Extensions
 markdown_extensions:
   - admonition
   - abbr
