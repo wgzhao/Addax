@@ -17,20 +17,20 @@
  * under the License.
  */
 
-package com.wgzhao.addax.plugin.reader.influxdbreader;
+package com.wgzhao.addax.plugin.reader.influxdb2reader;
 
 import com.wgzhao.addax.common.spi.ErrorCode;
 
-public enum InfluxDBReaderErrorCode
+public enum InfluxDB2ReaderErrorCode
         implements ErrorCode
 {
-    REQUIRED_VALUE("InfluxDBReader-00", "缺失必要的值"),
-    ILLEGAL_VALUE("InfluxDBReader-01", "值非法");
+    REQUIRED_VALUE("InfluxDB2Reader-00", "Missing mandatory configuration items"),
+    MISSING_COLUMN("InfluxDB2Reader-01", "Column does not exist");
 
     private final String code;
     private final String description;
 
-    InfluxDBReaderErrorCode(String code, String description)
+    InfluxDB2ReaderErrorCode(String code, String description)
     {
         this.code = code;
         this.description = description;
@@ -51,7 +51,6 @@ public enum InfluxDBReaderErrorCode
     @Override
     public String toString()
     {
-        return String.format("Code:[%s], Description:[%s]. ", this.code,
-                this.description);
+        return String.format("Code:[%s], Description:[%s]. ", this.code, this.description);
     }
 }

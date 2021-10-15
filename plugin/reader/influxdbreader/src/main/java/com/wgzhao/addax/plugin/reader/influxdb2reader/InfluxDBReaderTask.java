@@ -17,7 +17,7 @@
  * under the License.
  */
 
-package com.wgzhao.addax.plugin.reader.influxdbreader;
+package com.wgzhao.addax.plugin.reader.influxdb2reader;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;

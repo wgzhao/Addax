@@ -1,0 +1,17 @@
+{
+  "name": "influxdb2reader",
+  "parameter": {
+    "column": ["*"],
+    "connection": [
+      {
+        "endpoint": "",
+        "table": "",
+        "org": "",
+        "bucket": ""
+      }
+    ],
+    "token": "",
+    "range": ["-15h", "-2h"],
+    "limit": 10
+  }
+}
