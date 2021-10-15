@@ -42,7 +42,7 @@ HdfsReade r提供了读取分布式文件系统数据存储的能力。
 | nullFormat             |    否    | 无         | 自定义哪些字符可以表示为空,例如如果用户配置: `"\\N"` ，那么如果源头数据是 `"\N"` ，视作 `null` 字段 |
 | haveKerberos           |    否    | 无         | 是否启用 Kerberos 认证，如果启用，则需要同时配置 `kerberosKeytabFilePath`，`kerberosPrincipal`  |
 | kerberosKeytabFilePath |    否    | 无         | 用于 Kerberos 认证的凭证文件路径, 比如 `/your/path/addax.service.keytab` |
-| kerberosPrincipal      |    否    | 无         | 用于 Kerberos 认证的凭证主体, 比如 `addax/node1@WGZHAO.COM`
+| kerberosPrincipal      |    否    | 无         | 用于 Kerberos 认证的凭证主体, 比如 `addax/node1@WGZHAO.COM` |
 | compress               |    否    | 无         | 指定要读取的文件的压缩格式 |
 | hadoopConfig           |    否    | 无         | 里可以配置与 Hadoop 相关的一些高级参数，比如HA的配置 |
 

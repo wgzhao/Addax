@@ -1,0 +1,18 @@
+{
+  "name": "hivereader",
+  "parameter": {
+    "username": "",
+    "password": "",
+    "column": [],
+    "connection": [
+      {
+        "jdbcUrl": [],
+        "table": []
+      }
+    ],
+    "where": "",
+    "haveKerberos": false,
+    "kerberosKeytabFilePath": "",
+    "kerberosPrincipal": ""
+  }
+}
