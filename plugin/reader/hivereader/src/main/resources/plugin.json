@@ -1,0 +1,6 @@
+{
+  "name": "hivereader",
+  "class": "com.wgzhao.addax.plugin.reader.hivereader.HiveReader",
+  "description": "Retrieve data from Hive via jdbc",
+  "developer": "wgzhao"
+}
