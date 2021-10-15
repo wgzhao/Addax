@@ -57,6 +57,7 @@ nav:
     - reader/hbase20xreader.md
     - reader/hbase20xsqlreader.md
     - reader/hdfsreader.md
+    - reader/hivereader.md
     - reader/httpreader.md
     - reader/influxdbreader.md
     - reader/jsonfilereader.md

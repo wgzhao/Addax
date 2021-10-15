@@ -1,7 +1,7 @@
 Addax supports the following Data Sources:
 
-| database/filesystem | read | write | plugin(reader/writer)                   | memo                            |
-| ------------------- | ------ | ------ | --------------------------------------- | ------------------------------- |
+| database/filesystem | read   |  write | plugin(reader/writer)                  | memo                            |
+| ------------------- | ------ | ------ | -------------------------------------- | ------------------------------- |
 | Cassandra           | ✓      | ✓     | cassandrareader/cassandrawriter         |                                 |
 | ClickHouse          | ✓      | ✓     | clickhousereader/clickhousewriter       |                                 |
 | DB2                 | ✓      | ✓     | rbdmsreader/rdbmswriter                 | not fully tested                |
@@ -11,13 +11,14 @@ Addax supports the following Data Sources:
 | FTP                 | ✓      | ✓     | ftpreader/ftpwriter                     |                                 |
 | HBase 1.x(API)      | ✓      | ✓     | hbase11xreader/hbase11xwriter           | use HBASE API                   |
 | HBase 1.x(SQL)      | ✓      | ✓     | hbase11xsqlreader/hbase11xsqlwriter     | use Phoenix[Phoenix][2]         |
-| HBase 2.x(API)      | ✓      |      | hbase20xreader                          | use HBase API                   |
+| HBase 2.x(API)      | ✓      | x     | hbase20xreader                          | use HBase API                   |
 | HBase 2.x(SQL0      | ✓      | ✓     | hbase20xsqlreader/hbase20xsqlwriter     | via [Phoenix][2]                |
 | HDFS                | ✓      | ✓     | hdfsreader/hdfswriter                   | support HDFS 2.0 or later       |
-| HTTP                | ✓      |      | httpreader                              | support RestFul API             |
+| Hive                | ✓      | x     | hivereader                              |                                 |
+| HTTP                | ✓      | x     | httpreader                              | support RestFul API             |
 | Greenplum           | ✓      | ✓     | postgresqlreader/greenplumwriter        |                                 |
 | InfluxDB            | ✓      | ✓     | influxdbreader/influxdbwriter           | ONLY support InfluxDB 1.x       |
-| json                | ✓      |     | jsonfilereader                          |                                 |
+| json                | ✓      | x     | jsonfilereader                          |                                 |
 | kudu                | ✓      | ✓     | kudureader/kuduwriter                   |                                 |
 | MongoDB             | ✓      | ✓     | mongodbreader/mongodbwriter             |                                 |
 | MySQL/MariaDB       | ✓      | ✓     | mysqlreader/mysqlwriter                 |                                 |
