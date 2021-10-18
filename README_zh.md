@@ -4,7 +4,7 @@
 <p align="center">Addax 是一个支持主流数据库的通用数据采集工具</p>
 <p align="center"><a href="https://wgzhao.github.io/Addax">使用文档</a> 详细描述了如何安装部署和每个采集插件的使用方法 </p>
 <p align="center">
-   <a href="https://github.com/wgzhao/addax/release">
+   <a href="https://github.com/wgzhao/Addax/releases">
       <img src="https://img.shields.io/github/release/wgzhao/addax.svg" alt="release version"/>
     </a>
    <a href="https://github.com/wgzhao/Addax/workflows/Maven%20Package/badge.svg">
