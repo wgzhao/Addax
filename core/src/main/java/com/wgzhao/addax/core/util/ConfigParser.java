@@ -30,11 +30,14 @@ import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.io.IOException;
+import java.lang.reflect.Field;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 public final class ConfigParser
@@ -50,19 +53,16 @@ public final class ConfigParser
     {
         Configuration configuration = ConfigParser.parseJobConfig(jobPath);
 
-        configuration.merge(
-                ConfigParser.parseCoreConfig(CoreConstant.CONF_PATH),
-                false);
-        String readerPluginName = configuration.getString(
-                CoreConstant.JOB_CONTENT_READER_NAME);
-        String writerPluginName = configuration.getString(
-                CoreConstant.JOB_CONTENT_WRITER_NAME);
+        //validate job json
+        validateJob(configuration);
 
-        String preHandlerName = configuration.getString(
-                CoreConstant.JOB_PRE_HANDLER_PLUGIN_NAME);
+        configuration.merge(ConfigParser.parseCoreConfig(CoreConstant.CONF_PATH), false);
+        String readerPluginName = configuration.getString(CoreConstant.JOB_CONTENT_READER_NAME);
+        String writerPluginName = configuration.getString(CoreConstant.JOB_CONTENT_WRITER_NAME);
 
-        String postHandlerName = configuration.getString(
-                CoreConstant.JOB_POST_HANDLER_PLUGIN_NAME);
+        String preHandlerName = configuration.getString(CoreConstant.JOB_PRE_HANDLER_PLUGIN_NAME);
+
+        String postHandlerName = configuration.getString(CoreConstant.JOB_POST_HANDLER_PLUGIN_NAME);
 
         Set<String> pluginList = new HashSet<>();
         pluginList.add(readerPluginName);
@@ -115,8 +115,7 @@ public final class ConfigParser
         if (isJobResourceFromHttp) {
             //设置httpclient的 HTTP_TIMEOUT_IN_MILLION_SECONDS
             Configuration coreConfig = ConfigParser.parseCoreConfig(CoreConstant.CONF_PATH);
-            int httpTimeOutInMillionSeconds = coreConfig.getInt(
-                    CoreConstant.CORE_SERVER_TIMEOUT_SEC, 5) * 1000;
+            int httpTimeOutInMillionSeconds = coreConfig.getInt(CoreConstant.CORE_SERVER_TIMEOUT_SEC, 5) * 1000;
             HttpClientUtil.setHttpTimeoutInMillionSeconds(httpTimeOutInMillionSeconds);
 
             HttpClientUtil httpClientUtil = new HttpClientUtil();
@@ -235,5 +234,50 @@ public final class ConfigParser
         }
 
         return result;
+    }
+
+    private static void validateJob(Configuration conf)
+    {
+        final List<Map> content = conf.getList(CoreConstant.JOB_CONTENT, Map.class);
+
+        if (content== null || content.isEmpty()) {
+            throw AddaxException.asAddaxException(FrameworkErrorCode.JOB_ERROR,
+                    "The configuration item '" + CoreConstant.JOB_CONTENT +  "' is required");
+        }
+
+        if (content.size() > 1) {
+            throw AddaxException.asAddaxException(FrameworkErrorCode.JOB_ERROR,
+                    "The configuration item '" + CoreConstant.JOB_CONTENT +  "' ONLY  include ONE sub-item ");
+        }
+
+        if (null == conf.get(CoreConstant.JOB_CONTENT_READER) ) {
+            throw AddaxException.asAddaxException(FrameworkErrorCode.JOB_ERROR,
+                    "The configuration item '" + CoreConstant.JOB_CONTENT_READER +  "' is required");
+        }
+
+        if (null ==  conf.get(CoreConstant.JOB_CONTENT_WRITER)) {
+            throw AddaxException.asAddaxException(FrameworkErrorCode.JOB_ERROR,
+                    "The configuration item '" + CoreConstant.JOB_CONTENT_WRITER +  "' is required");
+        }
+
+        if ( null == conf.get(CoreConstant.JOB_CONTENT_READER_NAME)) {
+            throw AddaxException.asAddaxException(FrameworkErrorCode.JOB_ERROR,
+                    "The configuration item '" + CoreConstant.JOB_CONTENT_READER_NAME + "' is required");
+        }
+
+        if (null == conf.get(CoreConstant.JOB_CONTENT_READER_PARAMETER)) {
+            throw AddaxException.asAddaxException(FrameworkErrorCode.JOB_ERROR,
+                    "The configuration item '" + CoreConstant.JOB_CONTENT_READER_PARAMETER + "' is required");
+        }
+
+        if ( null == conf.get(CoreConstant.JOB_CONTENT_WRITER_NAME)) {
+            throw AddaxException.asAddaxException(FrameworkErrorCode.JOB_ERROR,
+                    "The configuration item '" + CoreConstant.JOB_CONTENT_READER_NAME + "' is required");
+        }
+
+        if (null == conf.get(CoreConstant.JOB_CONTENT_WRITER_PARAMETER)) {
+            throw AddaxException.asAddaxException(FrameworkErrorCode.JOB_ERROR,
+                    "The configuration item '" + CoreConstant.JOB_CONTENT_READER_PARAMETER + "' is required");
+        }
     }
 }

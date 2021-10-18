@@ -80,9 +80,13 @@ public class CoreConstant
 
     public static final String JOB_CONTENT_READER_NAME = "job.content[0].reader.name";
 
+    public static final String JOB_CONTENT_READER = "job.content[0].reader";
+
     public static final String JOB_CONTENT_READER_PARAMETER = "job.content[0].reader.parameter";
 
     public static final String JOB_CONTENT_WRITER_NAME = "job.content[0].writer.name";
+
+    public static final String JOB_CONTENT_WRITER = "job.content[0].writer";
 
     public static final String JOB_CONTENT_WRITER_PARAMETER = "job.content[0].writer.parameter";
 
@@ -116,7 +120,7 @@ public class CoreConstant
 
     public static final String JOB_CONTENT_WRITER_PATH = "job.content[0].writer.parameter.path";
     // ----------------------------- 局部使用的变量
-    public static final String JOB_WRITER = "reader";
+    public static final String JOB_WRITER = " ";
 
     public static final String JOB_READER = "reader";
 
