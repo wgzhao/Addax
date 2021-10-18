@@ -12,12 +12,13 @@ Addax supports the following Data Sources:
 | HBase 1.x(API)      | ✓      | ✓     | hbase11xreader/hbase11xwriter           | use HBASE API                   |
 | HBase 1.x(SQL)      | ✓      | ✓     | hbase11xsqlreader/hbase11xsqlwriter     | use Phoenix[Phoenix][2]         |
 | HBase 2.x(API)      | ✓      | x     | hbase20xreader                          | use HBase API                   |
-| HBase 2.x(SQL0      | ✓      | ✓     | hbase20xsqlreader/hbase20xsqlwriter     | via [Phoenix][2]                |
+| HBase 2.x(SQL)      | ✓      | ✓     | hbase20xsqlreader/hbase20xsqlwriter     | via [Phoenix][2]                |
 | HDFS                | ✓      | ✓     | hdfsreader/hdfswriter                   | support HDFS 2.0 or later       |
 | Hive                | ✓      | x     | hivereader                              |                                 |
 | HTTP                | ✓      | x     | httpreader                              | support RestFul API             |
 | Greenplum           | ✓      | ✓     | postgresqlreader/greenplumwriter        |                                 |
 | InfluxDB            | ✓      | ✓     | influxdbreader/influxdbwriter           | ONLY support InfluxDB 1.x       |
+| InfluxDB2           | ✓      | ✓     | influxdb2reader/influxdb2writer         | ONLY InfluxDB 2.0 or later      |
 | json                | ✓      | x     | jsonfilereader                          |                                 |
 | kudu                | ✓      | ✓     | kudureader/kuduwriter                   |                                 |
 | MongoDB             | ✓      | ✓     | mongodbreader/mongodbwriter             |                                 |
