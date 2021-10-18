@@ -4,7 +4,7 @@
 <p align="center">Addax is an open source universal ETL tool</p>
 <p align="center"><a href="https://wgzhao.github.io/Addax">Documentation</a> detailed description of how to install and deploy and how to use each collection plugin </p>
 <p align="center">
-   <a href="https://github.com/wgzhao/addax/release">
+   <a href="https://github.com/wgzhao/Addax/releases">
       <img src="https://img.shields.io/github/release/wgzhao/addax.svg" alt="release version"/>
     </a>
    <a href="https://github.com/wgzhao/Addax/workflows/Maven%20Package/badge.svg">
