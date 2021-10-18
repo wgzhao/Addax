@@ -135,6 +135,7 @@ public class HbaseSQLHelper
      *
      * @param table 表名
      * @param columns 字段
+     * @param url jdbc url
      */
     private void generateQuerySql(String table, List<String> columns, String url)
     {

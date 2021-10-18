@@ -408,6 +408,7 @@ public class KuduReader
          * </pre>
          *
          * @param where List of configuration, each element like <code>{"field":"age", "op": "&gt;", "value": 1}</code>
+         * @param schema kudu schema
          * @return list of {@link KuduPredicate}
          */
         private List<KuduPredicate> processWhere(List<Configuration> where, Schema schema)
