@@ -17,7 +17,7 @@
  * under the License.
  */
 
-package com.wgzhao.addax.plugin.reader.influxdbreader;
+package com.wgzhao.addax.plugin.reader.influxdb2reader;
 
 import com.wgzhao.addax.common.exception.AddaxException;
 import com.wgzhao.addax.common.plugin.RecordSender;

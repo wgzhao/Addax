@@ -1,0 +1,6 @@
+{
+  "name": "influxdb2writer",
+  "class": "com.wgzhao.addax.plugin.writer.influxdb2writer.InfluxDB2Writer",
+  "description": "write data to InfluxDB table, support InfluxDB 1.8 , 2.0 or later",
+  "developer": "wgzhao"
+}
