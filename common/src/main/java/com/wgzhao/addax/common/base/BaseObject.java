@@ -36,6 +36,9 @@ public class BaseObject
     @Override
     public boolean equals(Object object)
     {
+        if (getClass() != object.getClass()){
+            return false;
+        }
         return EqualsBuilder.reflectionEquals(this, object, false);
     }
 
