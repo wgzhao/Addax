@@ -55,6 +55,7 @@ nav:
     - reader/hivereader.md
     - reader/httpreader.md
     - reader/influxdbreader.md
+    - reader/influxdb2reader.md
     - reader/jsonfilereader.md
     - reader/kudureader.md
     - reader/mongodbreader.md
@@ -83,6 +84,7 @@ nav:
     - writer/hbase20xsqlwriter.md
     - writer/hdfswriter.md
     - writer/influxdbwriter.md
+    - writer/influxdb2writer.md
     - writer/kuduwriter.md
     - writer/mongodbwriter.md
     - writer/mysqlwriter.md

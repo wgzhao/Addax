@@ -97,6 +97,7 @@
         <module>plugin/reader/hivereader</module>
         <module>plugin/reader/httpreader</module>
         <module>plugin/reader/influxdbreader</module>
+        <module>plugin/reader/influxdb2reader</module>
         <module>plugin/reader/kudureader</module>
         <module>plugin/reader/jsonfilereader</module>
         <module>plugin/reader/mongodbreader</module>
@@ -125,6 +126,7 @@
         <module>plugin/writer/hbase20xsqlwriter</module>
         <module>plugin/writer/hdfswriter</module>
         <module>plugin/writer/influxdbwriter</module>
+        <module>plugin/writer/influxdb2writer</module>
         <module>plugin/writer/kuduwriter</module>
         <module>plugin/writer/mongodbwriter</module>
         <module>plugin/writer/mysqlwriter</module>

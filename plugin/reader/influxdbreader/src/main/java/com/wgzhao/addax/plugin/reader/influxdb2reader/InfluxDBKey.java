@@ -1,4 +1,4 @@
-package com.wgzhao.addax.plugin.reader.influxdbreader;
+package com.wgzhao.addax.plugin.reader.influxdb2reader;
 
 import com.wgzhao.addax.common.base.Key;
 

@@ -1,0 +1,6 @@
+{
+  "name": "influxdb2reader",
+  "class": "com.wgzhao.addax.plugin.reader.influxdb2reader.InfluxDB2Reader",
+  "description": "read from InfluxDB table, support InfluxDB 1.8 , 2.0 or later",
+  "developer": "wgzhao"
+}
