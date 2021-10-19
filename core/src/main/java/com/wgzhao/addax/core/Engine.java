@@ -19,6 +19,7 @@
 
 package com.wgzhao.addax.core;
 
+import com.alibaba.fastjson.JSON;
 import com.wgzhao.addax.common.element.ColumnCast;
 import com.wgzhao.addax.common.exception.AddaxException;
 import com.wgzhao.addax.common.spi.ErrorCode;
@@ -31,16 +32,22 @@ import com.wgzhao.addax.core.util.ConfigurationValidate;
 import com.wgzhao.addax.core.util.FrameworkErrorCode;
 import com.wgzhao.addax.core.util.container.CoreConstant;
 import com.wgzhao.addax.core.util.container.LoadUtil;
+import jdk.nashorn.internal.parser.JSONParser;
 import jdk.nashorn.internal.runtime.ParserException;
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.DefaultParser;
 import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
+import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.util.Properties;
 import java.util.Set;
 
@@ -115,8 +122,8 @@ public class Engine
             CommandLine cl = parser.parse(options, args);
 
             String jobPath = cl.getOptionValue("job");
-
             Configuration configuration = ConfigParser.parse(jobPath);
+
             // job id 默认值为-1
             configuration.set(CoreConstant.CORE_CONTAINER_JOB_ID, -1);
             // 默认运行模式
