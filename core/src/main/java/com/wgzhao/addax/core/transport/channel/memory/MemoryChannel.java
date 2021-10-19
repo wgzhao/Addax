@@ -111,8 +111,7 @@ public class MemoryChannel
             notEmpty.signalAll();
         }
         catch (InterruptedException e) {
-            throw AddaxException.asAddaxException(
-                    FrameworkErrorCode.RUNTIME_ERROR, e);
+            throw AddaxException.asAddaxException(FrameworkErrorCode.RUNTIME_ERROR, e);
         }
         finally {
             lock.unlock();
@@ -152,8 +151,7 @@ public class MemoryChannel
             notInsufficient.signalAll();
         }
         catch (InterruptedException e) {
-            throw AddaxException.asAddaxException(
-                    FrameworkErrorCode.RUNTIME_ERROR, e);
+            throw AddaxException.asAddaxException(FrameworkErrorCode.RUNTIME_ERROR, e);
         }
         finally {
             lock.unlock();

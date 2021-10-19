@@ -21,13 +21,12 @@
 
 package com.wgzhao.addax.common.base;
 
-public final class HBaseKey extends Key
+public final class HBaseKey
+        extends Key
 {
 
     private HBaseKey() {}
 
-    public static final String MOCK_JOBID_IDENTIFIER = "phoenixreader";
-    public static final int MOCK_JOBID = 1;
     public static final String HBASE_CONFIG = "hbaseConfig";
 
     /**

@@ -34,8 +34,7 @@ public final class ClassUtil
      * @return T
      */
     @SuppressWarnings({"rawtypes", "unchecked"})
-    public static <T> T instantiate(String className, Class<T> t,
-            Object... args)
+    public static <T> T instantiate(String className, Class<T> t, Object... args)
     {
         try {
             Constructor constructor = Class.forName(className)

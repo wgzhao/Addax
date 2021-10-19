@@ -50,19 +50,13 @@ public final class ConfigParser
     {
         Configuration configuration = ConfigParser.parseJobConfig(jobPath);
 
-        configuration.merge(
-                ConfigParser.parseCoreConfig(CoreConstant.CONF_PATH),
-                false);
-        String readerPluginName = configuration.getString(
-                CoreConstant.JOB_CONTENT_READER_NAME);
-        String writerPluginName = configuration.getString(
-                CoreConstant.JOB_CONTENT_WRITER_NAME);
+        configuration.merge(ConfigParser.parseCoreConfig(CoreConstant.CONF_PATH), false);
+        String readerPluginName = configuration.getString(CoreConstant.JOB_CONTENT_READER_NAME);
+        String writerPluginName = configuration.getString(CoreConstant.JOB_CONTENT_WRITER_NAME);
 
-        String preHandlerName = configuration.getString(
-                CoreConstant.JOB_PRE_HANDLER_PLUGIN_NAME);
+        String preHandlerName = configuration.getString(CoreConstant.JOB_PRE_HANDLER_PLUGIN_NAME);
 
-        String postHandlerName = configuration.getString(
-                CoreConstant.JOB_POST_HANDLER_PLUGIN_NAME);
+        String postHandlerName = configuration.getString(CoreConstant.JOB_POST_HANDLER_PLUGIN_NAME);
 
         Set<String> pluginList = new HashSet<>();
         pluginList.add(readerPluginName);
@@ -75,21 +69,18 @@ public final class ConfigParser
             pluginList.add(postHandlerName);
         }
         try {
-            configuration.merge(parsePluginConfig(new ArrayList<>(pluginList)),
-                    false);
+            configuration.merge(parsePluginConfig(new ArrayList<>(pluginList)), false);
         }
         catch (Exception e) {
             //吞掉异常，保持log干净。这里message足够。
-            LOG.warn(String.format("插件[%s,%s]加载失败，1s后重试... Exception:%s ",
-                    readerPluginName, writerPluginName, e.getMessage()));
+            LOG.warn(String.format("插件[%s,%s]加载失败，1s后重试... Exception:%s ", readerPluginName, writerPluginName, e.getMessage()));
             try {
                 Thread.sleep(1000);
             }
             catch (InterruptedException e1) {
                 //
             }
-            configuration.merge(parsePluginConfig(new ArrayList<>(pluginList)),
-                    false);
+            configuration.merge(parsePluginConfig(new ArrayList<>(pluginList)), false);
         }
 
         return configuration;
@@ -115,8 +106,7 @@ public final class ConfigParser
         if (isJobResourceFromHttp) {
             //设置httpclient的 HTTP_TIMEOUT_IN_MILLION_SECONDS
             Configuration coreConfig = ConfigParser.parseCoreConfig(CoreConstant.CONF_PATH);
-            int httpTimeOutInMillionSeconds = coreConfig.getInt(
-                    CoreConstant.CORE_SERVER_TIMEOUT_SEC, 5) * 1000;
+            int httpTimeOutInMillionSeconds = coreConfig.getInt(CoreConstant.CORE_SERVER_TIMEOUT_SEC, 5) * 1000;
             HttpClientUtil.setHttpTimeoutInMillionSeconds(httpTimeOutInMillionSeconds);
 
             HttpClientUtil httpClientUtil = new HttpClientUtil();
@@ -125,12 +115,10 @@ public final class ConfigParser
                 HttpGet httpGet = HttpClientUtil.getGetRequest();
                 httpGet.setURI(url.toURI());
 
-                jobContent = httpClientUtil.executeAndGetWithFailedRetry(
-                        httpGet, 1, 1000L);
+                jobContent = httpClientUtil.executeAndGetWithFailedRetry(httpGet, 1, 1000L);
             }
             catch (Exception e) {
-                throw AddaxException.asAddaxException(FrameworkErrorCode.CONFIG_ERROR,
-                        "获取作业配置信息失败:" + jobResource, e);
+                throw AddaxException.asAddaxException(FrameworkErrorCode.CONFIG_ERROR, "获取作业配置信息失败:" + jobResource, e);
             }
         }
         else {
@@ -139,14 +127,12 @@ public final class ConfigParser
                 jobContent = FileUtils.readFileToString(new File(jobResource), StandardCharsets.UTF_8);
             }
             catch (IOException e) {
-                throw AddaxException.asAddaxException(FrameworkErrorCode.CONFIG_ERROR,
-                        "获取作业配置信息失败:" + jobResource, e);
+                throw AddaxException.asAddaxException(FrameworkErrorCode.CONFIG_ERROR, "获取作业配置信息失败:" + jobResource, e);
             }
         }
 
         if (jobContent == null) {
-            throw AddaxException.asAddaxException(FrameworkErrorCode.CONFIG_ERROR,
-                    "获取作业配置信息失败:" + jobResource);
+            throw AddaxException.asAddaxException(FrameworkErrorCode.CONFIG_ERROR, "获取作业配置信息失败:" + jobResource);
         }
         return jobContent;
     }
@@ -157,37 +143,30 @@ public final class ConfigParser
 
         Set<String> replicaCheckPluginSet = new HashSet<>();
         int complete = 0;
-        for (String each : ConfigParser
-                .getDirAsList(CoreConstant.PLUGIN_READER_HOME)) {
-            Configuration eachReaderConfig = ConfigParser.parseOnePluginConfig(each,
-                    "reader", replicaCheckPluginSet, wantPluginNames);
+        for (String each : ConfigParser.getDirAsList(CoreConstant.PLUGIN_READER_HOME)) {
+            Configuration eachReaderConfig = ConfigParser.parseOnePluginConfig(each, "reader", replicaCheckPluginSet, wantPluginNames);
             if (eachReaderConfig != null) {
                 configuration.merge(eachReaderConfig, true);
                 complete += 1;
             }
         }
 
-        for (String each : ConfigParser
-                .getDirAsList(CoreConstant.PLUGIN_WRITER_HOME)) {
-            Configuration eachWriterConfig = ConfigParser.parseOnePluginConfig(each,
-                    "writer", replicaCheckPluginSet, wantPluginNames);
+        for (String each : ConfigParser.getDirAsList(CoreConstant.PLUGIN_WRITER_HOME)) {
+            Configuration eachWriterConfig = ConfigParser.parseOnePluginConfig(each, "writer", replicaCheckPluginSet, wantPluginNames);
             if (eachWriterConfig != null) {
                 configuration.merge(eachWriterConfig, true);
                 complete += 1;
             }
         }
 
-        if (wantPluginNames != null && !wantPluginNames.isEmpty()
-                && wantPluginNames.size() != complete) {
-            throw AddaxException.asAddaxException(FrameworkErrorCode.PLUGIN_INIT_ERROR,
-                    "插件加载失败，未完成指定插件加载:" + wantPluginNames);
+        if (wantPluginNames != null && !wantPluginNames.isEmpty() && wantPluginNames.size() != complete) {
+            throw AddaxException.asAddaxException(FrameworkErrorCode.PLUGIN_INIT_ERROR, "插件加载失败，未完成指定插件加载:" + wantPluginNames);
         }
 
         return configuration;
     }
 
-    public static Configuration parseOnePluginConfig(String path, String type,
-            Set<String> pluginSet, List<String> wantPluginNames)
+    public static Configuration parseOnePluginConfig(String path, String type, Set<String> pluginSet, List<String> wantPluginNames)
     {
         String filePath = path + File.separator + "plugin.json";
         Configuration configuration = Configuration.from(new File(filePath));
@@ -214,9 +193,7 @@ public final class ConfigParser
 
         Configuration result = Configuration.newDefault();
 
-        result.set(
-                String.format("plugin.%s.%s", type, pluginName),
-                configuration.getInternal());
+        result.set(String.format("plugin.%s.%s", type, pluginName), configuration.getInternal());
 
         return result;
     }

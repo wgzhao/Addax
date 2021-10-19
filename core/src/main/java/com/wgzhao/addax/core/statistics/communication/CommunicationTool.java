@@ -79,10 +79,8 @@ public final class CommunicationTool
 
         long timeInterval = now.getTimestamp() - old.getTimestamp();
         long sec = timeInterval <= 1000 ? 1 : timeInterval / 1000;
-        long bytesSpeed = (totalReadBytes
-                - getTotalReadBytes(old)) / sec;
-        long recordsSpeed = (totalReadRecords
-                - getTotalReadRecords(old)) / sec;
+        long bytesSpeed = (totalReadBytes - getTotalReadBytes(old)) / sec;
+        long recordsSpeed = (totalReadRecords - getTotalReadRecords(old)) / sec;
 
         now.setLongCounter(BYTE_SPEED, bytesSpeed < 0 ? 0 : bytesSpeed);
         now.setLongCounter(RECORD_SPEED, recordsSpeed < 0 ? 0 : recordsSpeed);
@@ -98,38 +96,32 @@ public final class CommunicationTool
     public static long getTotalReadRecords(Communication communication)
     {
 
-        return communication.getLongCounter(READ_SUCCEED_RECORDS) +
-                communication.getLongCounter(READ_FAILED_RECORDS);
+        return communication.getLongCounter(READ_SUCCEED_RECORDS) + communication.getLongCounter(READ_FAILED_RECORDS);
     }
 
     public static long getTotalReadBytes(Communication communication)
     {
-        return communication.getLongCounter(READ_SUCCEED_BYTES) +
-                communication.getLongCounter(READ_FAILED_BYTES);
+        return communication.getLongCounter(READ_SUCCEED_BYTES) + communication.getLongCounter(READ_FAILED_BYTES);
     }
 
     public static long getTotalErrorRecords(Communication communication)
     {
-        return communication.getLongCounter(READ_FAILED_RECORDS) +
-                communication.getLongCounter(WRITE_FAILED_RECORDS);
+        return communication.getLongCounter(READ_FAILED_RECORDS) + communication.getLongCounter(WRITE_FAILED_RECORDS);
     }
 
     public static long getTotalErrorBytes(Communication communication)
     {
-        return communication.getLongCounter(READ_FAILED_BYTES) +
-                communication.getLongCounter(WRITE_FAILED_BYTES);
+        return communication.getLongCounter(READ_FAILED_BYTES) + communication.getLongCounter(WRITE_FAILED_BYTES);
     }
 
     public static long getWriteSucceedRecords(Communication communication)
     {
-        return communication.getLongCounter(WRITE_RECEIVED_RECORDS) -
-                communication.getLongCounter(WRITE_FAILED_RECORDS);
+        return communication.getLongCounter(WRITE_RECEIVED_RECORDS) - communication.getLongCounter(WRITE_FAILED_RECORDS);
     }
 
     public static long getWriteSucceedBytes(Communication communication)
     {
-        return communication.getLongCounter(WRITE_RECEIVED_BYTES) -
-                communication.getLongCounter(WRITE_FAILED_BYTES);
+        return communication.getLongCounter(WRITE_RECEIVED_BYTES) - communication.getLongCounter(WRITE_FAILED_BYTES);
     }
 
     public static class Stringify
@@ -180,23 +172,17 @@ public final class CommunicationTool
 
         private static String getTotal(Communication communication)
         {
-            return String.format("%d records, %d bytes",
-                    communication.getLongCounter(TOTAL_READ_RECORDS),
-                    communication.getLongCounter(TOTAL_READ_BYTES));
+            return String.format("%d records, %d bytes", communication.getLongCounter(TOTAL_READ_RECORDS), communication.getLongCounter(TOTAL_READ_BYTES));
         }
 
         private static String getSpeed(Communication communication)
         {
-            return String.format("%s/s, %d records/s",
-                    StrUtil.stringify(communication.getLongCounter(BYTE_SPEED)),
-                    communication.getLongCounter(RECORD_SPEED));
+            return String.format("%s/s, %d records/s", StrUtil.stringify(communication.getLongCounter(BYTE_SPEED)), communication.getLongCounter(RECORD_SPEED));
         }
 
         private static String getError(Communication communication)
         {
-            return String.format("%d records, %d bytes",
-                    communication.getLongCounter(TOTAL_ERROR_RECORDS),
-                    communication.getLongCounter(TOTAL_ERROR_BYTES));
+            return String.format("%d records, %d bytes", communication.getLongCounter(TOTAL_ERROR_RECORDS), communication.getLongCounter(TOTAL_ERROR_BYTES));
         }
 
         private static String getPercentage(Communication communication)

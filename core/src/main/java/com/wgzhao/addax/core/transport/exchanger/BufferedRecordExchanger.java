@@ -60,8 +60,7 @@ public class BufferedRecordExchanger
         this.pluginCollector = pluginCollector;
         Configuration configuration = channel.getConfiguration();
 
-        this.bufferSize = configuration
-                .getInt(CoreConstant.CORE_TRANSPORT_EXCHANGER_BUFFER_SIZE, 32);
+        this.bufferSize = configuration.getInt(CoreConstant.CORE_TRANSPORT_EXCHANGER_BUFFER_SIZE, 32);
         this.buffer = new ArrayList<>(bufferSize);
 
         //channel的queue默认大小为8M，原来为64M
@@ -75,8 +74,7 @@ public class BufferedRecordExchanger
                             "com.wgzhao.addax.core.transport.record.DefaultRecord")));
         }
         catch (Exception e) {
-            throw AddaxException.asAddaxException(
-                    FrameworkErrorCode.CONFIG_ERROR, e);
+            throw AddaxException.asAddaxException(FrameworkErrorCode.CONFIG_ERROR, e);
         }
     }
 
@@ -87,8 +85,7 @@ public class BufferedRecordExchanger
             return BufferedRecordExchanger.recordClass.newInstance();
         }
         catch (Exception e) {
-            throw AddaxException.asAddaxException(
-                    FrameworkErrorCode.CONFIG_ERROR, e);
+            throw AddaxException.asAddaxException(FrameworkErrorCode.CONFIG_ERROR, e);
         }
     }
 
