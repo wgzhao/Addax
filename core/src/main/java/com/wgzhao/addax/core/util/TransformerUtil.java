@@ -100,8 +100,7 @@ public class TransformerUtil
                 }
 
                 transformerExecutionParas.setColumnIndex(columnIndex);
-                List<String> paras = configuration.getList(CoreConstant.TRANSFORMER_PARAMETER_PARAS,
-                        String.class);
+                List<String> paras = configuration.getList(CoreConstant.TRANSFORMER_PARAMETER_PARAS, String.class);
                 if (paras != null && !paras.isEmpty()) {
                     transformerExecutionParas.setParas(paras.toArray(new String[0]));
                 }
@@ -114,15 +113,12 @@ public class TransformerUtil
                 }
                 transformerExecutionParas.setCode(code);
 
-                List<String> extraPackage = configuration.getList(
-                        CoreConstant.TRANSFORMER_PARAMETER_EXTRA_PACKAGE,
-                        String.class);
+                List<String> extraPackage = configuration.getList(CoreConstant.TRANSFORMER_PARAMETER_EXTRA_PACKAGE, String.class);
                 if (extraPackage != null && !extraPackage.isEmpty()) {
                     transformerExecutionParas.setExtraPackage(extraPackage);
                 }
             }
-            transformerExecutionParas.settContext(
-                    configuration.getMap(CoreConstant.TRANSFORMER_PARAMETER_CONTEXT)
+            transformerExecutionParas.settContext(configuration.getMap(CoreConstant.TRANSFORMER_PARAMETER_CONTEXT)
             );
 
             TransformerExecution transformerExecution = new TransformerExecution(transformerInfo,

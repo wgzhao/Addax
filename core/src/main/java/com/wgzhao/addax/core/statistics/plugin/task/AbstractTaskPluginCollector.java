@@ -36,8 +36,7 @@ import org.slf4j.LoggerFactory;
 public abstract class AbstractTaskPluginCollector
         extends TaskPluginCollector
 {
-    private static final Logger LOG = LoggerFactory
-            .getLogger(AbstractTaskPluginCollector.class);
+    private static final Logger LOG = LoggerFactory.getLogger(AbstractTaskPluginCollector.class);
 
     private final Communication communication;
 
@@ -45,8 +44,7 @@ public abstract class AbstractTaskPluginCollector
 
     private final PluginType pluginType;
 
-    public AbstractTaskPluginCollector(Configuration conf, Communication communication,
-            PluginType type)
+    public AbstractTaskPluginCollector(Configuration conf, Communication communication, PluginType type)
     {
         this.configuration = conf;
         this.communication = communication;
@@ -75,8 +73,7 @@ public abstract class AbstractTaskPluginCollector
     }
 
     @Override
-    public void collectDirtyRecord(Record dirtyRecord, Throwable t,
-            String errorMessage)
+    public void collectDirtyRecord(Record dirtyRecord, Throwable t, String errorMessage)
     {
 
         if (null == dirtyRecord) {
@@ -85,21 +82,15 @@ public abstract class AbstractTaskPluginCollector
         }
 
         if (this.pluginType == PluginType.READER) {
-            this.communication.increaseCounter(
-                    CommunicationTool.READ_FAILED_RECORDS, 1);
-            this.communication.increaseCounter(
-                    CommunicationTool.READ_FAILED_BYTES, dirtyRecord.getByteSize());
+            this.communication.increaseCounter(CommunicationTool.READ_FAILED_RECORDS, 1);
+            this.communication.increaseCounter(CommunicationTool.READ_FAILED_BYTES, dirtyRecord.getByteSize());
         }
         else if (this.pluginType.equals(PluginType.WRITER)) {
-            this.communication.increaseCounter(
-                    CommunicationTool.WRITE_FAILED_RECORDS, 1);
-            this.communication.increaseCounter(
-                    CommunicationTool.WRITE_FAILED_BYTES, dirtyRecord.getByteSize());
+            this.communication.increaseCounter(CommunicationTool.WRITE_FAILED_RECORDS, 1);
+            this.communication.increaseCounter(CommunicationTool.WRITE_FAILED_BYTES, dirtyRecord.getByteSize());
         }
         else {
-            throw AddaxException.asAddaxException(
-                    FrameworkErrorCode.RUNTIME_ERROR,
-                    String.format("不知道的插件类型[%s].", this.pluginType));
+            throw AddaxException.asAddaxException(FrameworkErrorCode.RUNTIME_ERROR, String.format("不知道的插件类型[%s].", this.pluginType));
         }
     }
 }

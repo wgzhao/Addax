@@ -43,8 +43,7 @@ public abstract class TransformerExchanger
     protected final int taskId;
     protected final Communication currentCommunication;
     private final List<TransformerExecution> transformerExecs;
-    private final ClassLoaderSwapper classLoaderSwapper = ClassLoaderSwapper
-            .newCurrentThreadClassLoaderSwapper();
+    private final ClassLoaderSwapper classLoaderSwapper = ClassLoaderSwapper.newCurrentThreadClassLoaderSwapper();
     private long totalExhaustedTime = 0;
     private long totalFilterRecords = 0;
     private long totalSuccessRecords = 0;
