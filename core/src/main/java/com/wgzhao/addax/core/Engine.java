@@ -19,7 +19,6 @@
 
 package com.wgzhao.addax.core;
 
-import com.alibaba.fastjson.JSON;
 import com.wgzhao.addax.common.element.ColumnCast;
 import com.wgzhao.addax.common.exception.AddaxException;
 import com.wgzhao.addax.common.spi.ErrorCode;
@@ -32,22 +31,14 @@ import com.wgzhao.addax.core.util.ConfigurationValidate;
 import com.wgzhao.addax.core.util.FrameworkErrorCode;
 import com.wgzhao.addax.core.util.container.CoreConstant;
 import com.wgzhao.addax.core.util.container.LoadUtil;
-import jdk.nashorn.internal.parser.JSONParser;
-import jdk.nashorn.internal.runtime.ParserException;
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.DefaultParser;
 import org.apache.commons.cli.Options;
-import org.apache.commons.cli.ParseException;
-import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.nio.charset.StandardCharsets;
 import java.util.Properties;
 import java.util.Set;
 
@@ -77,7 +68,6 @@ public class Engine
         allConf.set(CoreConstant.CORE_CONTAINER_JOB_MODE, "standalone");
         container = new JobContainer(allConf);
         instanceId = allConf.getLong(CoreConstant.CORE_CONTAINER_JOB_ID, 0);
-
 
         Configuration jobInfoConfig = allConf.getConfiguration(CoreConstant.JOB_JOB_INFO);
         //初始化PerfTrace
@@ -113,42 +103,35 @@ public class Engine
     }
 
     public static void entry(String[] args)
+            throws Throwable
     {
         Options options = new Options();
         options.addOption("job", true, "Job config.");
 
-        try {
-            DefaultParser parser = new DefaultParser();
-            CommandLine cl = parser.parse(options, args);
+        DefaultParser parser = new DefaultParser();
+        CommandLine cl = parser.parse(options, args);
 
-            String jobPath = cl.getOptionValue("job");
-            Configuration configuration = ConfigParser.parse(jobPath);
+        String jobPath = cl.getOptionValue("job");
+        Configuration configuration = ConfigParser.parse(jobPath);
 
-            // job id 默认值为-1
-            configuration.set(CoreConstant.CORE_CONTAINER_JOB_ID, -1);
-            // 默认运行模式
-            configuration.set(CoreConstant.CORE_CONTAINER_JOB_MODE, "standalone");
+        // job id 默认值为-1
+        configuration.set(CoreConstant.CORE_CONTAINER_JOB_ID, -1);
+        // 默认运行模式
+        configuration.set(CoreConstant.CORE_CONTAINER_JOB_MODE, "standalone");
 
-            //打印vmInfo
-            VMInfo vmInfo = VMInfo.getVmInfo();
-            if (vmInfo != null) {
-                LOG.debug(vmInfo.toString());
-            }
-
-            LOG.info("\n{}\n", Engine.filterJobConfiguration(configuration));
-
-            LOG.debug(configuration.toJSON());
-
-            ConfigurationValidate.doValidate(configuration);
-            Engine engine = new Engine();
-            engine.start(configuration);
+        //打印vmInfo
+        VMInfo vmInfo = VMInfo.getVmInfo();
+        if (vmInfo != null) {
+            LOG.debug(vmInfo.toString());
         }
-        catch (ParseException e) {
-            throw new ParserException(e.getMessage());
-        }
-        catch (AddaxException e) {
-            throw new AddaxException(e.getErrorCode(), e.getMessage());
-        }
+
+        LOG.info("\n{}\n", Engine.filterJobConfiguration(configuration));
+
+        LOG.debug(configuration.toJSON());
+
+        ConfigurationValidate.doValidate(configuration);
+        Engine engine = new Engine();
+        engine.start(configuration);
     }
 
     public static String getVersion()
@@ -181,17 +164,18 @@ public class Engine
         try {
             Engine.entry(args);
         }
-        catch (AddaxException e) {
-            ErrorCode errorCode = e.getErrorCode();
-            LOG.error(e.getMessage());
-            if (errorCode instanceof FrameworkErrorCode) {
-                FrameworkErrorCode tempErrorCode = (FrameworkErrorCode) errorCode;
-                exitCode = tempErrorCode.toExitValue();
-                System.exit(exitCode);
+        catch (Throwable e) {
+            exitCode = 2;
+            e.printStackTrace();
+            if (e instanceof AddaxException) {
+                AddaxException tempException = (AddaxException) e;
+                ErrorCode errorCode = tempException.getErrorCode();
+                if (errorCode instanceof FrameworkErrorCode) {
+                    FrameworkErrorCode tempErrorCode = (FrameworkErrorCode) errorCode;
+                    exitCode = tempErrorCode.toExitValue();
+                }
             }
-            else {
-                System.exit(99);
-            }
+            System.exit(exitCode);
         }
         System.exit(exitCode);
     }
