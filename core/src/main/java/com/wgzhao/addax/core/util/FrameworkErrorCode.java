@@ -31,6 +31,7 @@ public enum FrameworkErrorCode
     ARGUMENT_ERROR("Framework-01", "Addax 引擎运行错误，该问题通常是由于内部编程错误引起，请联系Addax 开发团队解决 ."),
     RUNTIME_ERROR("Framework-02", "Addax 引擎运行过程出错，具体原因请参看Addax 运行结束时的错误诊断信息  ."),
     CONFIG_ERROR("Framework-03", "Addax 引擎配置错误，该问题通常是由于Addax 安装错误引起，请联系您的运维解决 ."),
+    JOB_ERROR("Framework-04", "job 配置文件错误，通常是由于不正确的配置项导致的，要特别仔细检查括号匹配位置是否正确."),
 
     PLUGIN_INSTALL_ERROR("Framework-10", "Addax 插件安装错误, 该问题通常是由于Addax 安装错误引起，请联系您的运维解决 ."),
     PLUGIN_INIT_ERROR("Framework-12", "Addax 插件初始化错误, 该问题通常是由于Addax 安装错误引起，请联系您的运维解决 ."),
