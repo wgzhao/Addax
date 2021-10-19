@@ -102,8 +102,6 @@ public class CoreConstant
 
     public static final String JOB_SETTING_SPEED_CHANNEL = "job.setting.speed.channel";
 
-    public static final String JOB_SETTING_ERROR_LIMIT = "job.setting.errorLimit";
-
     public static final String JOB_SETTING_ERROR_LIMIT_RECORD = "job.setting.errorLimit.record";
 
     public static final String JOB_SETTING_ERROR_LIMIT_PERCENTAGE = "job.setting.errorLimit.percentage";

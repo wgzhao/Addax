@@ -22,23 +22,21 @@ package com.wgzhao.addax.core.util;
 import com.wgzhao.addax.common.exception.AddaxException;
 import com.wgzhao.addax.common.util.Configuration;
 import com.wgzhao.addax.core.util.container.CoreConstant;
+import java.io.File;
+import java.io.IOException;
+import java.net.URL;
+import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.http.client.methods.HttpGet;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.File;
-import java.io.IOException;
-import java.lang.reflect.Field;
-import java.net.URL;
-import java.nio.charset.StandardCharsets;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
 
 public final class ConfigParser
 {
@@ -75,21 +73,18 @@ public final class ConfigParser
             pluginList.add(postHandlerName);
         }
         try {
-            configuration.merge(parsePluginConfig(new ArrayList<>(pluginList)),
-                    false);
+            configuration.merge(parsePluginConfig(new ArrayList<>(pluginList)), false);
         }
         catch (Exception e) {
             //吞掉异常，保持log干净。这里message足够。
-            LOG.warn(String.format("插件[%s,%s]加载失败，1s后重试... Exception:%s ",
-                    readerPluginName, writerPluginName, e.getMessage()));
+            LOG.warn(String.format("插件[%s,%s]加载失败，1s后重试... Exception:%s ", readerPluginName, writerPluginName, e.getMessage()));
             try {
                 Thread.sleep(1000);
             }
             catch (InterruptedException e1) {
                 //
             }
-            configuration.merge(parsePluginConfig(new ArrayList<>(pluginList)),
-                    false);
+            configuration.merge(parsePluginConfig(new ArrayList<>(pluginList)), false);
         }
 
         return configuration;
@@ -124,12 +119,10 @@ public final class ConfigParser
                 HttpGet httpGet = HttpClientUtil.getGetRequest();
                 httpGet.setURI(url.toURI());
 
-                jobContent = httpClientUtil.executeAndGetWithFailedRetry(
-                        httpGet, 1, 1000L);
+                jobContent = httpClientUtil.executeAndGetWithFailedRetry(httpGet, 1, 1000L);
             }
             catch (Exception e) {
-                throw AddaxException.asAddaxException(FrameworkErrorCode.CONFIG_ERROR,
-                        "获取作业配置信息失败:" + jobResource, e);
+                throw AddaxException.asAddaxException(FrameworkErrorCode.CONFIG_ERROR, "获取作业配置信息失败:" + jobResource, e);
             }
         }
         else {
@@ -138,14 +131,12 @@ public final class ConfigParser
                 jobContent = FileUtils.readFileToString(new File(jobResource), StandardCharsets.UTF_8);
             }
             catch (IOException e) {
-                throw AddaxException.asAddaxException(FrameworkErrorCode.CONFIG_ERROR,
-                        "获取作业配置信息失败:" + jobResource, e);
+                throw AddaxException.asAddaxException(FrameworkErrorCode.CONFIG_ERROR, "获取作业配置信息失败:" + jobResource, e);
             }
         }
 
         if (jobContent == null) {
-            throw AddaxException.asAddaxException(FrameworkErrorCode.CONFIG_ERROR,
-                    "获取作业配置信息失败:" + jobResource);
+            throw AddaxException.asAddaxException(FrameworkErrorCode.CONFIG_ERROR, "获取作业配置信息失败:" + jobResource);
         }
         return jobContent;
     }
@@ -156,37 +147,30 @@ public final class ConfigParser
 
         Set<String> replicaCheckPluginSet = new HashSet<>();
         int complete = 0;
-        for (String each : ConfigParser
-                .getDirAsList(CoreConstant.PLUGIN_READER_HOME)) {
-            Configuration eachReaderConfig = ConfigParser.parseOnePluginConfig(each,
-                    "reader", replicaCheckPluginSet, wantPluginNames);
+        for (String each : ConfigParser.getDirAsList(CoreConstant.PLUGIN_READER_HOME)) {
+            Configuration eachReaderConfig = ConfigParser.parseOnePluginConfig(each, "reader", replicaCheckPluginSet, wantPluginNames);
             if (eachReaderConfig != null) {
                 configuration.merge(eachReaderConfig, true);
                 complete += 1;
             }
         }
 
-        for (String each : ConfigParser
-                .getDirAsList(CoreConstant.PLUGIN_WRITER_HOME)) {
-            Configuration eachWriterConfig = ConfigParser.parseOnePluginConfig(each,
-                    "writer", replicaCheckPluginSet, wantPluginNames);
+        for (String each : ConfigParser.getDirAsList(CoreConstant.PLUGIN_WRITER_HOME)) {
+            Configuration eachWriterConfig = ConfigParser.parseOnePluginConfig(each, "writer", replicaCheckPluginSet, wantPluginNames);
             if (eachWriterConfig != null) {
                 configuration.merge(eachWriterConfig, true);
                 complete += 1;
             }
         }
 
-        if (wantPluginNames != null && !wantPluginNames.isEmpty()
-                && wantPluginNames.size() != complete) {
-            throw AddaxException.asAddaxException(FrameworkErrorCode.PLUGIN_INIT_ERROR,
-                    "插件加载失败，未完成指定插件加载:" + wantPluginNames);
+        if (wantPluginNames != null && !wantPluginNames.isEmpty() && wantPluginNames.size() != complete) {
+            throw AddaxException.asAddaxException(FrameworkErrorCode.PLUGIN_INIT_ERROR, "插件加载失败，未完成指定插件加载:" + wantPluginNames);
         }
 
         return configuration;
     }
 
-    public static Configuration parseOnePluginConfig(String path, String type,
-            Set<String> pluginSet, List<String> wantPluginNames)
+    public static Configuration parseOnePluginConfig(String path, String type, Set<String> pluginSet, List<String> wantPluginNames)
     {
         String filePath = path + File.separator + "plugin.json";
         Configuration configuration = Configuration.from(new File(filePath));
@@ -213,9 +197,7 @@ public final class ConfigParser
 
         Configuration result = Configuration.newDefault();
 
-        result.set(
-                String.format("plugin.%s.%s", type, pluginName),
-                configuration.getInternal());
+        result.set(String.format("plugin.%s.%s", type, pluginName), configuration.getInternal());
 
         return result;
     }

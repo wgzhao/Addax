@@ -41,8 +41,7 @@ public class StrUtil
 
     private static final DecimalFormat df = new DecimalFormat("0.00");
 
-    private static final Pattern VARIABLE_PATTERN = Pattern
-            .compile("(\\$)\\{?(\\w+)\\}?");
+    private static final Pattern VARIABLE_PATTERN = Pattern.compile("(\\$)\\{?(\\w+)\\}?");
 
     private static String systemEncoding = System.getProperty("file.encoding");
 

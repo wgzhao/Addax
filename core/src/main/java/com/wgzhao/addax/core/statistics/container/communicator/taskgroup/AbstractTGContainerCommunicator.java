@@ -51,11 +51,9 @@ public abstract class AbstractTGContainerCommunicator
     public AbstractTGContainerCommunicator(Configuration configuration)
     {
         super(configuration);
-        this.jobId = configuration.getInt(
-                CoreConstant.CORE_CONTAINER_JOB_ID);
+        this.jobId = configuration.getInt(CoreConstant.CORE_CONTAINER_JOB_ID);
         super.setCollector(new ProcessInnerCollector(this.jobId));
-        this.taskGroupId = configuration.getInt(
-                CoreConstant.CORE_CONTAINER_TASK_GROUP_ID);
+        this.taskGroupId = configuration.getInt(CoreConstant.CORE_CONTAINER_TASK_GROUP_ID);
     }
 
     @Override
@@ -76,8 +74,7 @@ public abstract class AbstractTGContainerCommunicator
         Communication communication = new Communication();
         communication.setState(State.SUCCEEDED);
 
-        for (Communication taskCommunication :
-                super.getCollector().getTaskCommunicationMap().values()) {
+        for (Communication taskCommunication : super.getCollector().getTaskCommunicationMap().values()) {
             communication.mergeStateFrom(taskCommunication);
         }
 

@@ -19,9 +19,10 @@
 
 package com.wgzhao.addax.core.taskgroup;
 
+import com.alibaba.fastjson.JSON;
 import com.wgzhao.addax.common.constant.PluginType;
-import com.wgzhao.addax.common.exception.CommonErrorCode;
 import com.wgzhao.addax.common.exception.AddaxException;
+import com.wgzhao.addax.common.exception.CommonErrorCode;
 import com.wgzhao.addax.common.plugin.RecordSender;
 import com.wgzhao.addax.common.plugin.TaskPluginCollector;
 import com.wgzhao.addax.common.statistics.PerfRecord;
@@ -47,7 +48,6 @@ import com.wgzhao.addax.core.util.FrameworkErrorCode;
 import com.wgzhao.addax.core.util.TransformerUtil;
 import com.wgzhao.addax.core.util.container.CoreConstant;
 import com.wgzhao.addax.core.util.container.LoadUtil;
-import com.alibaba.fastjson.JSON;
 import org.apache.commons.lang3.Validate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -62,8 +62,7 @@ import java.util.Map;
 public class TaskGroupContainer
         extends AbstractContainer
 {
-    private static final Logger LOG = LoggerFactory
-            .getLogger(TaskGroupContainer.class);
+    private static final Logger LOG = LoggerFactory.getLogger(TaskGroupContainer.class);
 
     /**
      * 当前taskGroup所属jobId
@@ -93,15 +92,10 @@ public class TaskGroupContainer
 
         initCommunicator(configuration);
 
-        this.jobId = this.configuration.getLong(
-                CoreConstant.CORE_CONTAINER_JOB_ID);
-        this.taskGroupId = this.configuration.getInt(
-                CoreConstant.CORE_CONTAINER_TASK_GROUP_ID);
-
-        this.channelClazz = this.configuration.getString(
-                CoreConstant.CORE_TRANSPORT_CHANNEL_CLASS);
-        this.taskCollectorClass = this.configuration.getString(
-                CoreConstant.CORE_STATISTICS_COLLECTOR_PLUGIN_TASK_CLASS);
+        this.jobId = this.configuration.getLong(CoreConstant.CORE_CONTAINER_JOB_ID);
+        this.taskGroupId = this.configuration.getInt(CoreConstant.CORE_CONTAINER_TASK_GROUP_ID);
+        this.channelClazz = this.configuration.getString(CoreConstant.CORE_TRANSPORT_CHANNEL_CLASS);
+        this.taskCollectorClass = this.configuration.getString(CoreConstant.CORE_STATISTICS_COLLECTOR_PLUGIN_TASK_CLASS);
     }
 
     private void initCommunicator(Configuration configuration)
@@ -125,8 +119,7 @@ public class TaskGroupContainer
         try {
 
             // 状态check时间间隔，较短，可以把任务及时分发到对应channel中
-            int sleepIntervalInMillSec = this.configuration.getInt(
-                    CoreConstant.CORE_CONTAINER_TASK_GROUP_SLEEP_INTERVAL, 100);
+            int sleepIntervalInMillSec = this.configuration.getInt(CoreConstant.CORE_CONTAINER_TASK_GROUP_SLEEP_INTERVAL, 100);
 
             // 状态汇报时间间隔，稍长，避免大量汇报
             long reportIntervalInMillSec = this.configuration.getLong(CoreConstant.CORE_CONTAINER_TASK_GROUP_REPORT_INTERVAL, 10000);
@@ -147,8 +140,7 @@ public class TaskGroupContainer
             }
 
             int taskCountInThisTaskGroup = taskConfigs.size();
-            LOG.info("taskGroupId=[{}] start [{}] channels for [{}] tasks.",
-                    this.taskGroupId, channelNumber, taskCountInThisTaskGroup);
+            LOG.info("taskGroupId=[{}] start [{}] channels for [{}] tasks.", this.taskGroupId, channelNumber, taskCountInThisTaskGroup);
 
             this.containerCommunicator.registerCommunication(taskConfigs);
 
@@ -212,11 +204,9 @@ public class TaskGroupContainer
 
                 // 2.发现该taskGroup下taskExecutor的总状态失败则汇报错误
                 if (failedOrKilled) {
-                    lastTaskGroupContainerCommunication = reportTaskGroupCommunication(
-                            lastTaskGroupContainerCommunication, taskCountInThisTaskGroup);
+                    lastTaskGroupContainerCommunication = reportTaskGroupCommunication(lastTaskGroupContainerCommunication, taskCountInThisTaskGroup);
 
-                    throw AddaxException.asAddaxException(
-                            FrameworkErrorCode.PLUGIN_RUNTIME_ERROR, lastTaskGroupContainerCommunication.getThrowable());
+                    throw AddaxException.asAddaxException(FrameworkErrorCode.PLUGIN_RUNTIME_ERROR, lastTaskGroupContainerCommunication.getThrowable());
                 }
 
                 //3.有任务未执行，且正在运行的任务数小于最大通道限制
@@ -268,8 +258,7 @@ public class TaskGroupContainer
                 //4.任务列表为空，executor已结束, 搜集状态为success--->成功
                 if (taskQueue.isEmpty() && isAllTaskDone(runTasks) && containerCommunicator.collectState() == State.SUCCEEDED) {
                     // 成功的情况下，也需要汇报一次。否则在任务结束非常快的情况下，采集的信息将会不准确
-                    lastTaskGroupContainerCommunication = reportTaskGroupCommunication(
-                            lastTaskGroupContainerCommunication, taskCountInThisTaskGroup);
+                    lastTaskGroupContainerCommunication = reportTaskGroupCommunication(lastTaskGroupContainerCommunication, taskCountInThisTaskGroup);
 
                     LOG.debug("taskGroup[{}] completed it's tasks.", this.taskGroupId);
                     break;
@@ -278,8 +267,7 @@ public class TaskGroupContainer
                 // 5.如果当前时间已经超出汇报时间的interval，那么我们需要马上汇报
                 long now = System.currentTimeMillis();
                 if (now - lastReportTimeStamp > reportIntervalInMillSec) {
-                    lastTaskGroupContainerCommunication = reportTaskGroupCommunication(
-                            lastTaskGroupContainerCommunication, taskCountInThisTaskGroup);
+                    lastTaskGroupContainerCommunication = reportTaskGroupCommunication(lastTaskGroupContainerCommunication, taskCountInThisTaskGroup);
 
                     lastReportTimeStamp = now;
 
@@ -382,8 +370,7 @@ public class TaskGroupContainer
 
             // 移除根据JOB ID做的一些标记 防止内存溢出
             LoadUtil.getConfigurationSet().remove(this.jobId);
-            Iterator<Map.Entry<Integer, Communication>> it =
-                    LocalTGCommunicationManager.getTaskGroupCommunicationMap().entrySet().iterator();
+            Iterator<Map.Entry<Integer, Communication>> it = LocalTGCommunicationManager.getTaskGroupCommunicationMap().entrySet().iterator();
             while (it.hasNext()) {
                 Map.Entry<Integer, Communication> entry = it.next();
                 String strJobId = String.valueOf(this.jobId);
@@ -462,27 +449,19 @@ public class TaskGroupContainer
              * 生成writerThread
              */
             writerRunner = (WriterRunner) generateRunner(PluginType.WRITER);
-            this.writerThread = new Thread(writerRunner,
-                    String.format("%d-%d-%d-writer",
-                            jobId, taskGroupId, this.taskId));
+            this.writerThread = new Thread(writerRunner, String.format("%d-%d-%d-writer", jobId, taskGroupId, this.taskId));
             //通过设置thread的contextClassLoader，即可实现同步和主程序不通的加载器
-            this.writerThread.setContextClassLoader(LoadUtil.getJarLoader(
-                    PluginType.WRITER, this.taskConfig.getString(
-                            CoreConstant.JOB_WRITER_NAME), getJobId()));
+            this.writerThread.setContextClassLoader(LoadUtil.getJarLoader(PluginType.WRITER, this.taskConfig.getString(CoreConstant.JOB_WRITER_NAME), getJobId()));
 
             /*
              * 生成readerThread
              */
             readerRunner = (ReaderRunner) generateRunner(PluginType.READER, transformerInfoExecs);
-            this.readerThread = new Thread(readerRunner,
-                    String.format("%d-%d-%d-reader",
-                            jobId, taskGroupId, this.taskId));
+            this.readerThread = new Thread(readerRunner, String.format("%d-%d-%d-reader", jobId, taskGroupId, this.taskId));
             /*
              * 通过设置thread的contextClassLoader，即可实现同步和主程序不同的加载器
              */
-            this.readerThread.setContextClassLoader(LoadUtil.getJarLoader(
-                    PluginType.READER, this.taskConfig.getString(
-                            CoreConstant.JOB_READER_NAME), getJobId()));
+            this.readerThread.setContextClassLoader(LoadUtil.getJarLoader(PluginType.READER, this.taskConfig.getString(CoreConstant.JOB_READER_NAME), getJobId()));
         }
 
         public void doStart()
@@ -491,9 +470,7 @@ public class TaskGroupContainer
 
             // reader没有起来，writer不可能结束
             if (!this.writerThread.isAlive() || this.taskCommunication.getState() == State.FAILED) {
-                throw AddaxException.asAddaxException(
-                        FrameworkErrorCode.RUNTIME_ERROR,
-                        this.taskCommunication.getThrowable());
+                throw AddaxException.asAddaxException(FrameworkErrorCode.RUNTIME_ERROR, this.taskCommunication.getThrowable());
             }
 
             this.readerThread.start();
@@ -501,9 +478,7 @@ public class TaskGroupContainer
             // 这里reader可能很快结束
             if (!this.readerThread.isAlive() && this.taskCommunication.getState() == State.FAILED) {
                 // 这里有可能出现Reader线上启动即挂情况 对于这类情况 需要立刻抛出异常
-                throw AddaxException.asAddaxException(
-                        FrameworkErrorCode.RUNTIME_ERROR,
-                        this.taskCommunication.getThrowable());
+                throw AddaxException.asAddaxException(FrameworkErrorCode.RUNTIME_ERROR, this.taskCommunication.getThrowable());
             }
         }
 
@@ -519,15 +494,10 @@ public class TaskGroupContainer
 
             switch (pluginType) {
                 case READER:
-                    newRunner = LoadUtil.loadPluginRunner(pluginType,
-                            this.taskConfig.getString(CoreConstant.JOB_READER_NAME), getJobId());
-                    newRunner.setJobConf(this.taskConfig.getConfiguration(
-                            CoreConstant.JOB_READER_PARAMETER));
+                    newRunner = LoadUtil.loadPluginRunner(pluginType, this.taskConfig.getString(CoreConstant.JOB_READER_NAME), getJobId());
+                    newRunner.setJobConf(this.taskConfig.getConfiguration(CoreConstant.JOB_READER_PARAMETER));
 
-                    pluginCollector = ClassUtil.instantiate(
-                            taskCollectorClass, AbstractTaskPluginCollector.class,
-                            configuration, this.taskCommunication,
-                            PluginType.READER);
+                    pluginCollector = ClassUtil.instantiate(taskCollectorClass, AbstractTaskPluginCollector.class, configuration, this.taskCommunication, PluginType.READER);
 
                     RecordSender recordSender;
                     if (transformerInfoExecs != null && !transformerInfoExecs.isEmpty()) {
@@ -545,17 +515,11 @@ public class TaskGroupContainer
                     newRunner.setTaskPluginCollector(pluginCollector);
                     break;
                 case WRITER:
-                    newRunner = LoadUtil.loadPluginRunner(pluginType,
-                            this.taskConfig.getString(CoreConstant.JOB_WRITER_NAME), getJobId());
-                    newRunner.setJobConf(this.taskConfig
-                            .getConfiguration(CoreConstant.JOB_WRITER_PARAMETER));
+                    newRunner = LoadUtil.loadPluginRunner(pluginType, this.taskConfig.getString(CoreConstant.JOB_WRITER_NAME), getJobId());
+                    newRunner.setJobConf(this.taskConfig.getConfiguration(CoreConstant.JOB_WRITER_PARAMETER));
 
-                    pluginCollector = ClassUtil.instantiate(
-                            taskCollectorClass, AbstractTaskPluginCollector.class,
-                            configuration, this.taskCommunication,
-                            PluginType.WRITER);
-                    ((WriterRunner) newRunner).setRecordReceiver(new BufferedRecordExchanger(
-                            this.channel, pluginCollector));
+                    pluginCollector = ClassUtil.instantiate(taskCollectorClass, AbstractTaskPluginCollector.class, configuration, this.taskCommunication, PluginType.WRITER);
+                    ((WriterRunner) newRunner).setRecordReceiver(new BufferedRecordExchanger(this.channel, pluginCollector));
                     /*
                      * 设置taskPlugin的collector，用来处理脏数据和job/task通信
                      */

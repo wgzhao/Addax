@@ -40,25 +40,21 @@ import java.util.concurrent.atomic.AtomicInteger;
 public class StdoutPluginCollector
         extends AbstractTaskPluginCollector
 {
-    private static final Logger LOG = LoggerFactory
-            .getLogger(StdoutPluginCollector.class);
+    private static final Logger LOG = LoggerFactory.getLogger(StdoutPluginCollector.class);
 
     private static final int DEFAULT_MAX_DIRTY_NUM = 128;
     private final AtomicInteger currentLogNum = new AtomicInteger(0);
     private AtomicInteger maxLogNum = new AtomicInteger(0);
 
-    public StdoutPluginCollector(Configuration configuration, Communication communication,
-            PluginType type)
+    public StdoutPluginCollector(Configuration configuration, Communication communication, PluginType type)
     {
         super(configuration, communication, type);
-        maxLogNum = new AtomicInteger(
-                configuration.getInt(
+        maxLogNum = new AtomicInteger(configuration.getInt(
                         CoreConstant.CORE_STATISTICS_COLLECTOR_PLUGIN_MAX_DIRTY_NUMBER,
                         DEFAULT_MAX_DIRTY_NUM));
     }
 
-    private String formatDirty(final Record dirty, final Throwable t,
-            final String msg)
+    private String formatDirty(final Record dirty, final Throwable t, final String msg)
     {
         Map<String, Object> msgGroup = new HashMap<>();
 
@@ -70,16 +66,14 @@ public class StdoutPluginCollector
             msgGroup.put("exception", t.getMessage());
         }
         if (null != dirty) {
-            msgGroup.put("record", DirtyRecord.asDirtyRecord(dirty)
-                    .getColumns());
+            msgGroup.put("record", DirtyRecord.asDirtyRecord(dirty).getColumns());
         }
 
         return JSON.toJSONString(msgGroup);
     }
 
     @Override
-    public void collectDirtyRecord(Record dirtyRecord, Throwable t,
-            String errorMessage)
+    public void collectDirtyRecord(Record dirtyRecord, Throwable t, String errorMessage)
     {
         int logNum = currentLogNum.getAndIncrement();
         if (logNum == 0 && t != null) {
