@@ -95,9 +95,111 @@ function gen_log_file {
     # --------------- end combine
 }
 
+# ---------------------------- generate job template file ---------------
+
+function sub_main() {
+    shift
+    if [ $# -lt 1 ]; then
+        sub_help
+    fi
+    # ---------- parse gen options -------------
+    echo "$*"
+    while getopts 'r:w:l:h' option; do
+        case "$option" in
+        r) READER=${OPTARG} ;;
+        w) WRITER=${OPTARG} ;;
+        l) TYPE=${OPTARG} ;;
+        *) sub_help ;;
+        esac
+    done
+
+    if [ "x$READER" = "x" -o "x$WRITER" = "x" ]; then
+        echo "-r/-w required a argument"
+        exit 2
+    fi
+}
+
+function sub_help() {
+    echo "Usage: $0 gen [options]"
+    echo "Options:"
+    echo -e "\t -r specify reader plugin name"
+    echo -e "\t -w specify writer plugin name"
+    echo -e "\t -l [r|w] list all reader/writer plugin names"
+    echo -e "\t -h Print Usage and exit"
+    exit 0
+}
+
+function list_all_plugin_names() {
+    echo  "Reader Plugins:"
+    for i in plugin/reader/*
+    do
+        echo " $(basename ${i})"
+    done
+    echo 
+    echo "Reader Plugins:"
+    for i in plugin/writer/*
+    do
+        echo  "  $(basename ${i})"
+    done
+}
+
 # ------------------------------------ main -----------------------------
 
 [ $# -eq 0 ] && usage
+
+if [ "$1" = "gen" ]; then
+
+    shift 1
+    LIST_PLUGINS=0
+    while getopts 'r:w:lh' option; do
+        case "$option" in
+        r) READER=${OPTARG} ;;
+        w) WRITER=${OPTARG} ;;
+        l) LIST_PLUGINS=1 ;;
+        *) sub_help ;;
+        esac
+    done
+    if [ ${LIST_PLUGINS} -eq 1 ]; then
+        list_all_plugin_names
+        exit 0
+    fi
+
+    if [ "x${READER}" == "x" -o "x${WRITER}" == "x" ]; then
+        echo "-r/-w required a argument"
+        exit 2
+    fi
+    # specified reader plugin is exists or not ?
+    if [ ! -f plugin/reader/${READER}/plugin_job_template.json ]; then
+        echo "Reader plugin ${READER} DOES NOT exists. "
+        exit 3
+    fi
+    reader_content=$(cat plugin/reader/${READER}/plugin_job_template.json)
+    if [ ! -f plugin/writer/${WRITER}/plugin_job_template.json ]; then
+        echo  "Reader plugin ${WRITER} DOES NOT exists. "
+        exit 3
+    fi
+    writer_content=$(cat plugin/writer/${WRITER}/plugin_job_template.json)
+    #combine reader and writer plugin
+    cat - <<-EOF
+    {
+      "job" :{
+        "setting": {
+           "speed": {
+              "byte": -1,
+              "channel": 1
+            }
+        },
+        "content": [{
+            "reader": 
+                $reader_content ,
+            "writer": 
+                $writer_content
+        }]
+      }
+    }
+EOF
+    exit 0
+fi
 
 # OS detect
 os=$(uname -s)
