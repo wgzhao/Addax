@@ -4,23 +4,19 @@
     "username": "username",
     "password": "password",
     "column": [
-      "col1",
-      "col2",
-      "col3"
+      "*"
     ],
     "connection": [
       {
         "jdbcUrl": "jdbc:clickhouse://<host>:<port>[/<database>]",
         "table": [
-          "table1",
-          "table2"
+          "table1"
         ]
       }
     ],
     "preSql": [],
     "postSql": [],
     "batchSize": 65536,
-    "batchByteSize": 134217728,
     "dryRun": false,
     "writeMode": "insert"
   }

@@ -5,9 +5,17 @@
     "password": "",
     "connection": [
       {
-        "table": [],
-        "jdbcUrl": []
+        "table": [
+          "table"
+        ],
+        "jdbcUrl": [
+          "jdbc:sqlserver://localhost:3433;DatabaseName=dbname"
+        ]
       }
-    ]
+    ],
+    "where": "1=1",
+    "autoPk": false,
+    "fetchSize": 2048,
+    "splitPk": ""
   }
 }

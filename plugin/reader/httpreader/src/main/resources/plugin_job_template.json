@@ -3,29 +3,24 @@
   "parameter": {
     "connection": [
       {
-        "url": "",
+        "url": "http://127.0.0.1:9090/mock/17/LDJSC/ASSET",
         "proxy": {
-          "host": "socks5://127.0.0.1:8080",
-          "auth": "username:password"
+          "host": "http://127.0.0.1:3128",
+          "auth": "user:pass"
         }
       }
     ],
-    "username": "",
-    "password": "",
-    "token": "",
-    "method": "post",
-    "resultKey": "",
     "reqParams": {
-      "key1": "value1",
-      "key2": "value2"
+      "CURR_DATE":"2021-01-18",
+      "DEPT":"9700"
     },
+    "resultKey":"result",
+    "method": "GET",
+    "column": ["CURR_DATE","DEPT","TOTAL_MANAGED_MARKET_VALUE","TOTAL_MANAGED_MARKET_VALUE_GROWTH"],
+    "username": "user",
+    "password": "passw0rd",
     "headers": {
-      "key1": "value1",
-      "key2": "value2"
-    },
-    "encoding": "",
-    "column": [
-      "*"
-    ]
+      "X-Powered-by": "Addax"
+    }
   }
 }

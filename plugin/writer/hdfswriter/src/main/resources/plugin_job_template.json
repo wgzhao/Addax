@@ -1,13 +1,44 @@
 {
   "name": "hdfswriter",
   "parameter": {
-    "defaultFS": "",
-    "fileType": "",
-    "path": "",
-    "fileName": "",
-    "column": [],
-    "writeMode": "",
-    "fieldDelimiter": "",
-    "compress": ""
+    "defaultFS": "hdfs://cluster",
+    "fileType": "orc",
+    "path": "/user/hive/warehouse/writerorc.db/orcfull",
+    "fileName": "xxxx",
+    "column": [
+      {
+        "name": "col1",
+        "type": "string"
+      },
+      {
+        "name": "col2",
+        "type": "int"
+      },
+      {
+        "name": "col3",
+        "type": "string"
+      },
+      {
+        "name": "col4",
+        "type": "boolean"
+      },
+      {
+        "name": "col5",
+        "type": "string"
+      }
+    ],
+    "writeMode": "overwrite",
+    "fieldDelimiter": "\u0001",
+    "compress": "SNAPPY",
+    "haveKerberos": "true",
+    "kerberosPrincipal": "hive@CFZQ.COM",
+    "kerberosKeytabFilePath": "/etc/security/keytabs/hive.headless.keytab",
+    "hadoopConfig":{
+      "dfs.nameservices": "cluster",
+      "dfs.ha.namenodes.cluster": "nn1,nn2",
+      "dfs.namenode.rpc-address.cluster.nn1": "node1:8020",
+      "dfs.namenode.rpc-address.cluster.nn2": "node2:8020",
+      "dfs.client.failover.proxy.provider.cluster": "org.apache.hadoop.hdfs.server.namenode.ha.ConfiguredFailoverProxyProvider"
+    }
   }
 }

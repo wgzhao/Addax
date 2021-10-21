@@ -5,6 +5,9 @@
       "hbase.zookeeper.quorum": "node1,node2,node3",
       "zookeeper.znode.paren": "/hbase-unsecure"
     },
+    "haveKerberos": "true",
+    "kerberosPrincipal": "hbase@EXAMPLE.COM",
+    "kerberosKeytabFilePath": "/etc/security/keytabs/hbase.headless.keytab",
     "table": "TABLE1",
     "column": [
       "ID",

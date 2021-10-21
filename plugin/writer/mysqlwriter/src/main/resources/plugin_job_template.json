@@ -1,16 +1,25 @@
 {
   "name": "mysqlwriter",
   "parameter": {
-    "username": "",
+    "writeMode": "insert",
+    "username": "root",
     "password": "",
-    "writeMode": "",
-    "column": [],
-    "session": [],
-    "preSql": [],
+    "column": [
+      "*"
+    ],
+    "session": [
+      "set session sql_mode='ANSI'"
+    ],
+    "preSql": [
+      "delete from @table"
+    ],
     "connection": [
       {
-        "jdbcUrl": "",
-        "table": []
+        "jdbcUrl": "jdbc:mysql://127.0.0.1:3306/test?useSSL=false&serverTimezone=GMT%2B8",
+        "table": [
+          "addax_tbl"
+        ],
+        "driver": "com.mysql.jdbc.Driver"
       }
     ]
   }
