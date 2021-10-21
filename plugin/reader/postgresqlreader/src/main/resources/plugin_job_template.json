@@ -1,13 +1,24 @@
 {
   "name": "postgresqlreader",
   "parameter": {
-    "username": "",
-    "password": "",
+    "username": "pgtest",
+    "password": "pgtest",
+    "column": [
+      "*"
+    ],
     "connection": [
       {
-        "table": [],
-        "jdbcUrl": []
+        "table": [
+          "addax_tbl"
+        ],
+        "jdbcUrl": [
+          "jdbc:postgresql://127.0.0.1:5432/pgtest"
+        ]
       }
-    ]
+    ],
+    "where": "",
+    "autoPk": false,
+    "fetchSize": 2048,
+    "splitPk": ""
   }
 }

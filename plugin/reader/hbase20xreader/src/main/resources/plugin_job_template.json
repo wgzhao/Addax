@@ -1,7 +1,10 @@
 {
   "name": "hbase20xreader",
   "parameter": {
-    "hbaseConfig": {},
+    "hbaseConfig": {
+      "hbase.zookeeper.quorum": "node1,node2,node3",
+      "zookeeper.znode.paren": "/hbase-unsecure"
+    },
     "table": "",
     "encoding": "",
     "mode": "",

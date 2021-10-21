@@ -1,17 +1,40 @@
 {
   "name": "elasticsearchreader",
   "parameter": {
-    "endpoint": "",
-    "index": "",
-    "type": "",
+    "endpoint": "http://127.0.0.1:9200",
+    "accessId": "",
+    "accesskey": "",
+    "index": "test-1",
+    "type": "default",
     "searchType": "dfs_query_then_fetch",
     "headers": {},
     "scroll": "3m",
     "search": [
       {
-        "size": 100
+        "query": {
+          "match": {
+            "col_ip": "1.1.1.1"
+          }
+        },
+        "aggregations": {
+          "top_10_states": {
+            "terms": {
+              "field": "col_date",
+              "size": 10
+            }
+          }
+        }
       }
     ],
-    "column": []
+    "column": [
+      "col_ip",
+      "col_double",
+      "col_long",
+      "col_integer",
+      "col_keyword",
+      "col_text",
+      "col_geo_point",
+      "col_date"
+    ]
   }
 }

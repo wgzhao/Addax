@@ -1,11 +1,47 @@
 {
   "name": "hbase11xreader",
   "parameter": {
-    "hbaseConfig": {},
-    "table": "",
-    "encoding": "",
-    "mode": "",
-    "column": [],
+    "hbaseConfig": {
+      "hbase.zookeeper.quorum": "node01,node02,node03",
+      "zookeeper.znode.parent": "/hbase-secure"
+    },
+    "haveKerberos": "true",
+    "kerberosPrincipal": "hbase@EXAMPLE.COM",
+    "kerberosKeytabFilePath": "/etc/security/keytabs/hbase.headless.keytab",
+    "table": "users",
+    "encoding": "utf-8",
+    "mode": "normal",
+    "column": [
+      {
+        "name": "rowkey",
+        "type": "string"
+      },
+      {
+        "name": "info: age",
+        "type": "string"
+      },
+      {
+        "name": "info: birthday",
+        "type": "date",
+        "format": "yyyy-MM-dd"
+      },
+      {
+        "name": "info: company",
+        "type": "string"
+      },
+      {
+        "name": "address: country",
+        "type": "string"
+      },
+      {
+        "name": "address: province",
+        "type": "string"
+      },
+      {
+        "name": "address: city",
+        "type": "string"
+      }
+    ],
     "range": {
       "startRowkey": "",
       "endRowkey": "",

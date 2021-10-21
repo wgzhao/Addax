@@ -1,13 +1,19 @@
 {
   "name": "sqlitewriter",
   "parameter": {
-    "writeMode": "",
-    "column": [],
-    "preSql": [],
+    "writeMode": "insert",
+    "column": [
+      "*"
+    ],
+    "preSql": [
+      "delete from @table"
+    ],
     "connection": [
       {
-        "jdbcUrl": "",
-        "table": []
+        "jdbcUrl": "jdbc:sqlite://tmp/writer.sqlite3",
+        "table": [
+          "addax_tbl"
+        ]
       }
     ]
   }

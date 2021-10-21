@@ -3,11 +3,15 @@
   "parameter": {
     "username": "",
     "password": "",
-    "column": [],
+    "column": ["*"],
     "connection": [
       {
-        "jdbcUrl": [],
-        "table": []
+        "jdbcUrl": [
+          "jdbc:sqlite:/tmp/test.sqlite3"
+        ],
+        "table": [
+          "test"
+        ]
       }
     ],
     "where": ""

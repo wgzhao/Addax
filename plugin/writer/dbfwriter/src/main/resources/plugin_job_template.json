@@ -1,11 +1,35 @@
 {
-  "name": "dbffilewriter",
+  "name": "dbfwriter",
   "parameter": {
-    "path": "",
-    "fileName": "",
-    "writeMode": "",
-    "fieldDelimiter": "",
-    "dateFormat": "",
-    "encoding": ""
+    "column": [
+      {
+        "name": "col1",
+        "type": "char",
+        "length": 100
+      },
+      {
+        "name": "col2",
+        "type": "numeric",
+        "length": 18,
+        "scale": 0
+      },
+      {
+        "name": "col3",
+        "type": "date"
+      },
+      {
+        "name": "col4",
+        "type": "logical"
+      },
+      {
+        "name": "col5",
+        "type": "char",
+        "length": 100
+      }
+    ],
+    "fileName": "test.dbf",
+    "path": "/tmp/out",
+    "writeMode": "truncate",
+    "encoding": "GBK"
   }
 }

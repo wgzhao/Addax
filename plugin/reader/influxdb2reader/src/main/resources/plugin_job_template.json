@@ -1,17 +1,19 @@
 {
   "name": "influxdb2reader",
   "parameter": {
-    "column": ["*"],
+    "column": [
+      "location", "height", "wet"
+    ],
     "connection": [
       {
-        "endpoint": "",
-        "table": "",
-        "org": "",
-        "bucket": ""
+        "endpoint": "http://localhost:8086",
+        "bucket":"test",
+        "table": ["temperature"],
+        "org": "com.wgzhao"
       }
     ],
-    "token": "",
-    "range": ["-15h", "-2h"],
+    "token":"YOUR_SECURE_TOKEN",
+    "range": ["-1h", "-5m"],
     "limit": 10
   }
 }

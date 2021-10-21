@@ -1,23 +1,43 @@
 {
   "name": "influxdbwriter",
   "parameter": {
-    "username": "",
-    "password": "",
-    "column": [],
     "connection": [
       {
-        "endpoint": "",
-        "database": "",
-        "table": ""
+        "endpoint": "http://localhost:8086",
+        "database": "addax",
+        "table": "addax_tbl"
       }
     ],
     "connTimeout": 15,
     "readTimeout": 20,
     "writeTimeout": 20,
-    "batchSize": "",
+    "username": "influx",
+    "password": "influx123",
+    "column": [
+      {
+        "name": "time",
+        "type": "timestamp"
+      },
+      {
+        "name": "user_id",
+        "type": "int"
+      },
+      {
+        "name": "user_name",
+        "type": "string"
+      },
+      {
+        "name": "salary",
+        "type": "double"
+      }
+    ],
+    "preSql": [
+      "delete from addax_tbl"
+    ],
+    "batchSize": 1024,
     "retentionPolicy": {
-      "name": "",
-      "duration": "",
+      "name": "one_day_only",
+      "duration": "1d",
       "replication": 1
     }
   }

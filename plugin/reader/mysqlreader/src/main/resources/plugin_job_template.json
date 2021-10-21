@@ -1,13 +1,20 @@
 {
   "name": "mysqlreader",
   "parameter": {
-    "username": "",
-    "password": "",
-    "column": [],
+    "username": "root",
+    "password": "root",
+    "column": [
+      "*"
+    ],
     "connection": [
       {
-        "jdbcUrl": [],
-        "table": []
+        "table": [
+          "addax_reader"
+        ],
+        "jdbcUrl": [
+          "jdbc:mysql://127.0.0.1:3306/test"
+        ],
+        "driver": "com.mysql.jdbc.Driver"
       }
     ],
     "where": ""

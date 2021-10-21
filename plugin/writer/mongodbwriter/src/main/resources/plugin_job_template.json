@@ -1,15 +1,35 @@
 {
   "name": "mongodbwriter",
   "parameter": {
-    "address": [],
+    "address": [
+      "127.0.0.1:32768"
+    ],
     "userName": "",
     "userPassword": "",
-    "dbName": "",
-    "collectionName": "",
-    "column": [],
+    "dbName": "tag_per_data",
+    "collectionName": "tag_data",
+    "column": [
+      {
+        "name": "unique_id",
+        "type": "string"
+      },
+      {
+        "name": "frontcat_id",
+        "type": "Array",
+        "splitter": " "
+      },
+      {
+        "name": "property",
+        "type": "string"
+      },
+      {
+        "name": "score",
+        "type": "int"
+      }
+    ],
     "upsertInfo": {
-      "isUpsert": "",
-      "upsertKey": ""
+      "isUpsert": "true",
+      "upsertKey": "unique_id"
     }
   }
 }

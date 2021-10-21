@@ -1,27 +1,22 @@
 {
   "name": "kuduwriter",
   "parameter": {
-    "masterAddress": "***",
+    "masterAddress": "127.0.0.1:7051,127.0.0.1:7151,127.0.0.1:7251",
     "timeout": 60,
-    "sessionTimeout": 60,
-    "table": "",
-    "replicaCount": 3,
-    "truncate": false,
+    "table": "users",
     "writeMode": "upsert",
     "column": [
       {
-        "index": 0,
-        "name": "c1",
-        "type": "string",
-        "primaryKey": true
+        "name": "user_id",
+        "type": "int8"
       },
       {
-        "index": 1,
-        "name": "c2",
-        "type": "string",
-        "compress": "DEFAULT_COMPRESSION",
-        "encoding": "AUTO_ENCODING",
-        "comment": "注解xxxx"
+        "name": "user_name",
+        "type": "string"
+      },
+      {
+        "name": "salary",
+        "type": "double"
       }
     ],
     "batchSize": 1024,

@@ -11,6 +11,9 @@
         "driver": ""
       }
     ],
-    "where": ""
+    "where": "1=1",
+    "autoPk": false,
+    "fetchSize": 2048,
+    "splitPk": ""
   }
 }

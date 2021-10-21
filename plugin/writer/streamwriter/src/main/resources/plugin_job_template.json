@@ -1,7 +1,7 @@
 {
   "name": "streamwriter",
   "parameter": {
-    "encoding": "",
+    "encoding": "utf-8",
     "print": true
   }
 }

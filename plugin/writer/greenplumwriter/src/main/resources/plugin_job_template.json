@@ -7,11 +7,11 @@
       "*"
     ],
     "batchSize": "1024",
-    "preSql": [],
+    "preSql": ["truncate table @table"],
     "connection": [
       {
-        "jdbcUrl": "",
-        "table": []
+        "jdbcUrl": "jdbc:postgresql://localhost:5432/wgzhao",
+        "table": ["gp_test"]
       }
     ],
     "postSql": []
