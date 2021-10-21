@@ -1,18 +1,24 @@
 {
   "name": "hivereader",
   "parameter": {
-    "username": "",
+    "column": [
+      "*"
+    ],
+    "username": "hive",
     "password": "",
-    "column": [],
     "connection": [
       {
-        "jdbcUrl": [],
-        "table": []
+        "jdbcUrl": [
+          "jdbc:hive2://localhost:10000/default;principal=hive/_HOST@EXAMPLE.COM"
+        ],
+        "table": [
+          "hive_reader"
+        ]
       }
     ],
-    "where": "",
-    "haveKerberos": false,
-    "kerberosKeytabFilePath": "",
-    "kerberosPrincipal": ""
+    "where": "logdate='20211013'" ,
+    "haveKerberos": true,
+    "kerberosKeytabFilePath": "/etc/security/keytabs/hive.headless.keytab",
+    "kerberosPrincipal": "hive@EXAMPLE.COM"
   }
 }

@@ -1,9 +1,35 @@
 {
-  "name": "dbffilereader",
+  "name": "dbfreader",
   "parameter": {
-    "path": [],
-    "encoding": "",
-    "column": [],
-    "fieldDelimiter": ""
+    "column": [
+      {
+        "index": 0,
+        "type": "string"
+      },
+      {
+        "index": 1,
+        "type": "long"
+      },
+      {
+        "index": 2,
+        "type": "string"
+      },
+      {
+        "index": 3,
+        "type": "boolean"
+      },
+      {
+        "index": 4,
+        "type": "string"
+      },
+      {
+        "value": "dbf",
+        "type": "string"
+      }
+    ],
+    "path": [
+      "/tmp/out"
+    ],
+    "encoding": "GBK"
   }
 }

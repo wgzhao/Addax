@@ -1,10 +1,9 @@
 {
   "name": "txtfilewriter",
   "parameter": {
-    "path": "",
-    "fileName": "",
-    "writeMode": "",
-    "fieldDelimiter": "",
-    "dateFormat": ""
+    "path": "/tmp/result",
+    "fileName": "test",
+    "writeMode": "truncate",
+    "dateFormat": "yyyy-MM-dd"
   }
 }

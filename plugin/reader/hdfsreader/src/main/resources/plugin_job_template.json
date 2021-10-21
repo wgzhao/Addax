@@ -1,9 +1,29 @@
 {
   "name": "hdfsreader",
   "parameter": {
-    "path": "",
-    "defaultFS": "",
-    "column": [],
+    "path": "/user/hive/warehouse/mytable01/",
+    "defaultFS": "hdfs://cluster",
+    "haveKerberos": "true",
+    "kerberosPrincipal": "hive@EXAMPLE.COM",
+    "kerberosKeytabFilePath": "/etc/security/keytabs/hive.headless.keytab",
+    "column": [
+      {
+        "index": 0,
+        "type": "long"
+      },
+      {
+        "index": 1,
+        "type": "boolean"
+      },
+      {
+        "type": "string",
+        "value": "hello"
+      },
+      {
+        "index": 2,
+        "type": "double"
+      }
+    ],
     "fileType": "orc",
     "encoding": "UTF-8",
     "fieldDelimiter": ","

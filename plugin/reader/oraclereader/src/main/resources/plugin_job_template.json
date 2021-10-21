@@ -1,14 +1,31 @@
 {
   "name": "oraclereader",
   "parameter": {
-    "username": "",
-    "password": "",
-    "column": [],
+    "username": "root",
+    "password": "root",
+    "column": [
+      "id",
+      "name"
+    ],
+    "splitPk": "db_id",
     "connection": [
       {
-        "table": [],
-        "jdbcUrl": []
+        "table": [
+          "table"
+        ],
+        "jdbcUrl": [
+          "jdbc:oracle:thin:@<HOST_NAME>:PORT:<DATABASE_NAME>"
+        ]
       }
-    ]
+    ],
+    "where": "",
+    "session": [
+      "alter session set NLS_DATE_FORMAT='yyyy-mm-dd hh24:mi:ss'",
+      "alter session set NLS_TIMESTAMP_FORMAT='yyyy-mm-dd hh24:mi:ss'",
+      "alter session set NLS_TIMESTAMP_TZ_FORMAT='yyyy-mm-dd hh24:mi:ss'",
+      "alter session set TIME_ZONE='Asia/Chongqing'"
+    ],
+    "autoPk": false,
+    "fetchSize": 2048
   }
 }

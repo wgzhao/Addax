@@ -1,17 +1,24 @@
 {
   "name": "cassandrawriter",
   "parameter": {
-    "username": "",
-    "password": "",
-    "host": "",
-    "port": "",
+    "host": "localhost",
+    "port": 9042,
     "useSSL": false,
-    "keyspace": "",
-    "table": "",
+    "keyspace": "stresscql",
+    "table": "dst",
+    "batchSize": 10,
     "column": [
-      "c1",
-      "c2",
-      "c3"
+      "name",
+      "choice",
+      "date",
+      "address",
+      "dbl",
+      "lval",
+      "fval",
+      "ival",
+      "uid",
+      "value",
+      "listval"
     ]
   }
 }

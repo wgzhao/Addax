@@ -1,26 +1,71 @@
 {
   "name": "datareader",
   "parameter": {
-    "sliceRecordCount": "",
     "column": [
       {
-        "value": "1,100",
+        "value": "1,100,",
         "rule": "random",
-        "type": "long"
+        "type": "double"
       },
       {
-        "rule": "address",
+        "value": "DataX",
         "type": "string"
       },
       {
-        "value": "1,2",
+        "value": "1",
         "rule": "incr",
         "type": "long"
       },
       {
-        "value": "constant string",
-        "type": "string"
+        "value": "1989/06/04 00:00:01,-1",
+        "rule": "incr",
+        "type": "date",
+        "dateFormat": "yyyy/MM/dd hh:mm:ss"
+      },
+      {
+        "value": "test",
+        "type": "bytes"
+      },
+      {
+        "rule": "address"
+      },
+      {
+        "rule": "bank"
+      },
+      {
+        "rule": "company"
+      },
+      {
+        "rule": "creditCard"
+      },
+      {
+        "rule": "debitCard"
+      },
+      {
+        "rule": "idCard"
+      },
+      {
+        "rule": "lat"
+      },
+      {
+        "rule": "lng"
+      },
+      {
+        "rule": "name"
+      },
+      {
+        "rule": "job"
+      },
+      {
+        "rule": "phone"
+      },
+      {
+        "rule": "stockCode"
+      },
+      {
+        "rule": "stockAccount"
       }
-    ]
+    ],
+    "sliceRecordCount": 10
   }
 }
