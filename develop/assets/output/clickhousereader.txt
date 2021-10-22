@@ -1,0 +1,54 @@
+021-01-06 14:39:35.742 [main] INFO  VMInfo - VMInfo# operatingSystem class => com.sun.management.internal.OperatingSystemImpl
+
+2021-01-06 14:39:35.767 [main] INFO  Engine -
+{
+	"content":[
+		{
+			"reader":{
+				"parameter":{
+					"column":[
+						"*"
+					],
+					"connection":[
+						{
+							"jdbcUrl":[
+								"jdbc:clickhouse://127.0.0.1:8123/"
+							],
+							"table":[
+								"ck_addax"
+							]
+						}
+					],
+					"username":"default"
+				},
+				"name":"clickhousereader"
+			},
+			"writer":{
+				"parameter":{
+					"print":true
+				},
+				"name":"streamwriter"
+			}
+		}
+	],
+	"setting":{
+		"errorLimit":{
+			"record":0,
+			"percentage":0.02
+		},
+		"speed":{
+			"channel":3
+		}
+	}
+}
+
+127	-32768	2147483647	-9223372036854775808	255	65535	4294967295	18446744073709551615	1	1	1234567891234567891234567891.1234567891Hello String	2c:16:db:a3:3a:4f	
+5f042a36-5b0c-4f71-adfd-4df4fca1b863	2021-01-01	2021-01-01 00:00:00	2021-01-01 00:00:00	hello
+
+任务启动时刻                    : 2021-01-06 14:39:35
+任务结束时刻                    : 2021-01-06 14:39:39
+任务总计耗时                    :                  3s
+任务平均流量                    :               77B/s
+记录写入速度                    :              0rec/s
+读出记录总数                    :                   1
+读写失败总数                    :                   0
