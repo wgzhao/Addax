@@ -18,12 +18,12 @@ jobs:
           git config --global user.name Docs deploy
           git config --global user.email docs@dummy.bot.com
       - name: build docs
-        run: mike deploy current latest
+        run: mike deploy develop latest
       - name: Create redirect form old docs
         run: |
           git checkout gh-pages
           test -f 404.html && echo "Redirect already set" && exit 0
-          git checkout master -- docs/404.html
+          git checkout master -- 404.html
           git add 404.html
           git commit -m "chore: set docs redirect" --no-verify
           git push origin gh-pages -f
