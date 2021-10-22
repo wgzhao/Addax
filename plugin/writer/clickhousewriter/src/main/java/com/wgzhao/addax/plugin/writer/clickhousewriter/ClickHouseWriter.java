@@ -103,7 +103,7 @@ public class ClickHouseWriter
 
                     if (columnSqlType == Types.TIMESTAMP) {
                         String tz;
-                        String columnTypeName = this.resultSetMetaData.getColumnTypeName(columnIndex);
+                        String columnTypeName = (String) this.resultSetMetaData.get(columnIndex).get("typeName");
                         if (columnTypeName.startsWith("DateTime64(") && columnTypeName.contains(",")) {
                             tz = columnTypeName.substring(15, columnTypeName.length() - 2);
                             preparedStatement.setTimestamp(columnIndex, column.asTimestamp(), Calendar.getInstance(TimeZone.getTimeZone(tz)));

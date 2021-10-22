@@ -244,13 +244,12 @@ public class CopyWriterTask
     }
 
     protected String serializeRecord(Record record)
-            throws SQLException
     {
         StringBuilder sb = new StringBuilder();
         Column column;
         for (int i = 0; i < this.columnNumber; i++) {
             column = record.getColumn(i);
-            int columnSqlType = this.resultSetMetaData.getColumnType(i+1);
+            int columnSqlType = (int) this.resultSetMetaData.get(i+1).get("type");
 
             switch (columnSqlType) {
                 case Types.CHAR:

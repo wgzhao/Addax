@@ -40,7 +40,9 @@ import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
@@ -381,16 +383,11 @@ public final class DBUtil
     {
         List<String> columns = new ArrayList<>();
 
-        try {
-            ResultSetMetaData rsMetaData = getColumnMetaData(conn, tableName, "*");
-            for (int i = 1, len = rsMetaData.getColumnCount(); i <= len; i++) {
-                columns.add(rsMetaData.getColumnName(i));
-            }
-            return columns;
+        List<Map> rsMetaData = getColumnMetaData(conn, tableName, "*");
+        for (int i = 1, len = rsMetaData.size(); i < len; i++) {
+            columns.add(rsMetaData.get(i).get("name").toString());
         }
-        catch (SQLException e) {
-            throw RdbmsException.asQueryException(e, null);
-        }
+        return columns;
     }
 
     /**
@@ -399,10 +396,13 @@ public final class DBUtil
      * @param conn database connection
      * @param tableName The table name
      * @param column table column
-     * @return {@link ResultSetMetaData}
+     * @return {@link List}
      */
-    public static ResultSetMetaData getColumnMetaData(Connection conn, String tableName, String column)
+    public static List<Map> getColumnMetaData(Connection conn, String tableName, String column)
     {
+        List<Map> result = new ArrayList<>();
+        // skip index 0, compliant with jdbc resultSet and resultMetaData
+        result.add(null);
         try  {
             Statement statement = conn.createStatement();
             String queryColumnSql;
@@ -413,13 +413,26 @@ public final class DBUtil
             else {
                 queryColumnSql = "SELECT " + column + " FROM " + tableName + " WHERE 1 = 2";
             }
-            return statement.executeQuery(queryColumnSql).getMetaData();
+            ResultSetMetaData metaData = statement.executeQuery(queryColumnSql).getMetaData();
+            for (int i=1; i<=metaData.getColumnCount(); i++) {
+                Map<String, Object> map = new HashMap<>();
+                map.put("name", metaData.getColumnName(i));
+                map.put("type", metaData.getColumnType(i));
+                map.put("label", metaData.getColumnLabel(i));
+                map.put("typeName", metaData.getColumnTypeName(i));
+                map.put("precision", metaData.getPrecision(i));
+                map.put("scale", metaData.getScale(i));
+                result.add(map);
+            }
+            statement.close();
+            return result;
         }
         catch (SQLException e) {
             throw AddaxException.asAddaxException(DBUtilErrorCode.GET_COLUMN_INFO_FAILED,
                     String.format("获取表:%s 的字段的元信息时失败. 请联系 DBA 核查该库、表信息.", tableName), e);
         }
     }
+
 
     public static boolean testConnWithoutRetry(DataBaseType dataBaseType, String url, String user, String pass)
     {
