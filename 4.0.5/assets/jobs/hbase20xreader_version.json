@@ -1,0 +1,69 @@
+{
+  "job": {
+    "setting": {
+      "speed": {
+        "channel": 1,
+        "bytes": -1
+      }
+    },
+    "content": [
+      {
+        "reader": {
+          "name": "hbase11xreader",
+          "parameter": {
+            "hbaseConfig": {
+              "hbase.zookeeper.quorum": "xxx"
+            },
+            "table": "users",
+            "encoding": "utf-8",
+            "mode": "multiVersionFixedColumn",
+            "maxVersion": "-1",
+            "column": [
+              {
+                "name": "rowkey",
+                "type": "string"
+              },
+              {
+                "name": "info: age",
+                "type": "string"
+              },
+              {
+                "name": "info: birthday",
+                "type": "date",
+                "format": "yyyy-MM-dd"
+              },
+              {
+                "name": "info: company",
+                "type": "string"
+              },
+              {
+                "name": "address: contry",
+                "type": "string"
+              },
+              {
+                "name": "address: province",
+                "type": "string"
+              },
+              {
+                "name": "address: city",
+                "type": "string"
+              }
+            ],
+            "range": {
+              "startRowkey": "",
+              "endRowkey": ""
+            }
+          }
+        },
+        "writer": {
+          "name": "txtfilewriter",
+          "parameter": {
+            "path": "/Users/shf/workplace/addax_test/hbase11xreader/result",
+            "fileName": "qiran",
+            "writeMode": "truncate"
+          }
+        }
+      }
+    ]
+  }
+}
