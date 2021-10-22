@@ -1,0 +1,24 @@
+name: mkdoc-release
+on:
+  push:
+    tags:
+      - '*'
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions/setup-python@v2
+        with:
+          python-version: 3.x
+      - run: pip install mkdocs-material mike
+      - name: build docs
+        run: mike deploy $(git describe --abbrev=0 --tags)
+      - name: Create redirect form old docs
+        run: |
+          git checkout gh-pages
+          test -f 404.html && echo "Redirect already set" && exit 0
+          git checkout master -- docs/404.html
+          git add 404.html
+          git commit -m "chore: set docs redirect" --no-verify
+          git push origin gh-pages -f
