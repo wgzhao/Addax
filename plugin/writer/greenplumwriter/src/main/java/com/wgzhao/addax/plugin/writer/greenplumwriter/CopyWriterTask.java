@@ -39,7 +39,6 @@ import org.slf4j.LoggerFactory;
 import java.io.ByteArrayInputStream;
 import java.nio.charset.StandardCharsets;
 import java.sql.Connection;
-import java.sql.SQLException;
 import java.sql.Types;
 import java.util.ArrayList;
 import java.util.List;
@@ -52,10 +51,6 @@ public class CopyWriterTask
 {
     private static final Logger LOG = LoggerFactory.getLogger(CopyWriterTask.class);
     private Configuration writerSliceConfig = null;
-//    private volatile boolean stopProcessor = false;
-//    private volatile boolean stopWriter = false;
-
-//    private CompletionService<Long> cs = null;
 
     public CopyWriterTask()
     {
@@ -100,68 +95,28 @@ public class CopyWriterTask
                 GPConstant.DELIMITER + "' NULL '' CSV QUOTE '" + GPConstant.QUOTE_CHAR + "' ESCAPE E'" + GPConstant.ESCAPE + GPConstant.ESCAPE + "';";
     }
 
-//    private void send(Record record, LinkedBlockingQueue<Record> queue)
-//            throws InterruptedException, ExecutionException
-//    {
-//        while (!queue.offer(record, GPConstant.TIME_OUT_MS, TimeUnit.MILLISECONDS)) {
-//            LOG.debug("Record queue is full, increase num_copy_processor for performance.");
-//            Future<Long> result = cs.poll();
-//
-//            if (result != null) {
-//                result.get();
-//            }
-//        }
-//    }
-
-//    public boolean moreRecord()
-//    {
-//        return !stopProcessor;
-//    }
-
-//    public boolean moreData()
-//    {
-//        return !stopWriter;
-//    }
-
     @Override
     public void startWrite(RecordReceiver recordReceiver, Configuration writerSliceConfig,
             TaskPluginCollector taskPluginCollector)
     {
         this.writerSliceConfig = writerSliceConfig;
-//        int queueSize = writerSliceConfig.getInt(GPKey.QUEUE_SIZE, GPConstant.COPY_QUEUE_SIZE);
-//        int numProcessor = writerSliceConfig.getInt(GPKey.NUM_PROCESS, GPConstant.NUM_COPY_PROCESSOR);
-//        int numWriter = writerSliceConfig.getInt(GPKey.NUM_WRITER, GPConstant.NUM_COPY_WRITER);
         int batchSize = writerSliceConfig.getInt(BATCH_SIZE, DEFAULT_BATCH_SIZE);
         Record record;
         int numRecord = 0;
         StringBuilder multiRecords = new StringBuilder();
         String sql = getCopySql(this.table, this.columns);
         LOG.info("Write data with [{}]", sql);
-//        LinkedBlockingQueue<Record> recordQueue = new LinkedBlockingQueue<>(queueSize);
-//        LinkedBlockingQueue<byte[]> dataQueue = new LinkedBlockingQueue<>(queueSize);
-//        ExecutorService threadPool;
-
-//        threadPool = Executors.newFixedThreadPool(numProcessor + numWriter);
-//        cs = new ExecutorCompletionService<>(threadPool);
         Connection connection = createConnection();
         changeCsvSizeLimit(connection);
 
         try {
             CopyManager mgr = connection.unwrap(PGConnection.class).getCopyAPI();
             this.resultSetMetaData = DBUtil.getColumnMetaData(connection, this.table, constructColumnNameList(this.columns));
-//            for (int i = 0; i < numProcessor; i++) {
-//                cs.submit(new CopyProcessor(this, this.columnNumber, resultSetMetaData, recordQueue, dataQueue));
-//            }
-//
-//            for (int i = 0; i < numWriter; i++) {
-//                cs.submit(new CopyWorker(this, sql, dataQueue));
-//            }
 
             while ((record = recordReceiver.getFromReader()) != null) {
                 multiRecords.append(serializeRecord(record));
                 numRecord++;
                 if (numRecord % batchSize == 0) {
-//                    reader.unread(multiRecords.toString().toCharArray());
                     mgr.copyIn(sql, new ByteArrayInputStream(multiRecords.toString().getBytes(StandardCharsets.UTF_8)));
                     multiRecords.delete(0, multiRecords.length());
                 }
@@ -249,7 +204,7 @@ public class CopyWriterTask
         Column column;
         for (int i = 0; i < this.columnNumber; i++) {
             column = record.getColumn(i);
-            int columnSqlType = (int) this.resultSetMetaData.get(i+1).get("type");
+            int columnSqlType = (int) this.resultSetMetaData.get(i + 1).get("type");
 
             switch (columnSqlType) {
                 case Types.CHAR:
