@@ -22,7 +22,7 @@ jobs:
         run: |
           git checkout gh-pages
           test -f 404.html && echo "Redirect already set" && exit 0
-          git checkout master -- docs/404.html
+          git checkout master -- 404.html
           git add 404.html
           git commit -m "chore: set docs redirect" --no-verify
           git push origin gh-pages -f
