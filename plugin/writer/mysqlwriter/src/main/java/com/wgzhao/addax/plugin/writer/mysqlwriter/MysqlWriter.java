@@ -122,7 +122,7 @@ public class MysqlWriter
                         }
                         return preparedStatement;
                     }
-                    if (columnSqlType == Types.DATE && "YEAR".equals(this.resultSetMetaData.getColumnTypeName(columnIndex))) {
+                    if (columnSqlType == Types.DATE && "YEAR".equals(this.resultSetMetaData.get(columnIndex).get("typeName"))) {
                         preparedStatement.setLong(columnIndex, column.asLong());
                         return preparedStatement;
                     }

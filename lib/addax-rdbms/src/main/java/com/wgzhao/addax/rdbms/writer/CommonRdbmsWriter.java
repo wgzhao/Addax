@@ -42,13 +42,13 @@ import org.slf4j.LoggerFactory;
 import java.math.BigDecimal;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
-import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
 import java.sql.Types;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
 import java.util.List;
+import java.util.Map;
 
 public class CommonRdbmsWriter
 {
@@ -210,7 +210,7 @@ public class CommonRdbmsWriter
         protected String writeRecordSql;
         protected String writeMode;
         protected boolean emptyAsNull;
-        protected ResultSetMetaData resultSetMetaData;
+        protected List<Map> resultSetMetaData;
 
         public Task(DataBaseType dataBaseType)
         {
@@ -451,7 +451,7 @@ public class CommonRdbmsWriter
                 throws SQLException
         {
             for (int i = 1, len = record.getColumnNumber(); i <= len; i++) {
-                int columnSqlType = this.resultSetMetaData.getColumnType(i);
+                int columnSqlType = (int) this.resultSetMetaData.get(i).get("type");
                 preparedStatement = fillPreparedStatementColumnType(preparedStatement, i, columnSqlType, record.getColumn(i - 1));
             }
             return preparedStatement;
@@ -492,7 +492,7 @@ public class CommonRdbmsWriter
 
                 case Types.NUMERIC:
                 case Types.DECIMAL:
-                    if (this.resultSetMetaData.getScale(columnIndex) == 0) {
+                    if ((int) this.resultSetMetaData.get(columnIndex).get("scale") == 0) {
                         preparedStatement.setLong(columnIndex, column.asLong());
                     }
                     else {
@@ -546,7 +546,7 @@ public class CommonRdbmsWriter
                 // warn: bit(1) -> Types.BIT 可使用setBoolean
                 // warn: bit(>1) -> Types.VARBINARY 可使用setBytes
                 case Types.BIT:
-                    if (this.resultSetMetaData.getPrecision(columnIndex) == 1) {
+                    if ((int) this.resultSetMetaData.get(columnIndex).get("precision") == 1) {
                         preparedStatement.setBoolean(columnIndex, column.asBoolean());
                     }
                     else {
@@ -559,30 +559,23 @@ public class CommonRdbmsWriter
                     break;
 
                 default:
+                    Map map = this.resultSetMetaData.get(columnIndex);
                     throw AddaxException.asAddaxException(
                             DBUtilErrorCode.UNSUPPORTED_TYPE,
                             String.format(
                                     "您的配置文件中的列配置信息有误. 不支持数据库写入这种字段类型. 字段名:[%s], " +
-                                            "字段SQL类型编号:[%d], 字段Java类型:[%s]. 请修改表中该字段的类型或者不同步该字段.",
-                                    this.resultSetMetaData.getColumnName(columnIndex),
-                                    this.resultSetMetaData.getColumnType(columnIndex),
-                                    this.resultSetMetaData.getColumnTypeName(columnIndex)));
+                                            "字段SQL类型编号:[%s], 字段Java类型:[%s]. 请修改表中该字段的类型或者不同步该字段.",
+                                    map.get("name"), map.get("type"), map.get("typeName")));
             }
             return preparedStatement;
         }
 
         private void calcWriteRecordSql()
         {
-
             List<String> valueHolders = new ArrayList<>(columnNumber);
-            try {
-                for (int i = 1; i <= columnNumber; i++) {
-                    String type = resultSetMetaData.getColumnTypeName(i);
-                    valueHolders.add(calcValueHolder(type));
-                }
-            }
-            catch (SQLException e) {
-                throw AddaxException.asAddaxException(DBUtilErrorCode.GET_COLUMN_INFO_FAILED, e);
+            for (int i = 1; i <= columnNumber; i++) {
+                String type = resultSetMetaData.get(i).get("typeName").toString();
+                valueHolders.add(calcValueHolder(type));
             }
 
             insertOrReplaceTemplate = WriterUtil.getWriteTemplate(columns, valueHolders, writeMode, dataBaseType, false);

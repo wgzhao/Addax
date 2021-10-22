@@ -134,7 +134,7 @@ public class PostgresqlWriter
                     }
 
                     if (columnSqlType == Types.BIT) {
-                        if (this.resultSetMetaData.getPrecision(columnIndex) == 1) {
+                        if ( (int) this.resultSetMetaData.get(columnIndex).get("precision") == 1) {
                             preparedStatement.setBoolean(columnIndex, column.asBoolean());
                         }
                         else {
