@@ -18,6 +18,8 @@ assignees: wgzhao
 
 ### elasticsearch reader
 
+### excelreader
+
 ### ftp reader
 
 ### hbase11x reader
@@ -30,9 +32,13 @@ assignees: wgzhao
 
 ### hdfs reader
 
+### hive reader
+
 ### http reader
 
 ### influxdb reader
+
+### influxdb2 reader
 
 ### jsonfile reader
 
@@ -72,6 +78,8 @@ assignees: wgzhao
 
 ### elasticsearch writer
 
+### excel writer
+
 ### ftp writer
 
 ### greenplum writer
@@ -85,6 +93,8 @@ assignees: wgzhao
 ### hdfs writer
 
 ### influxdb writer
+
+### influxdb2 writer
 
 ### kudu writer
 
