@@ -58,10 +58,7 @@ jobs:
         with:
           java-version: '8'
           distribution: 'adopt'
-          server-id: github # Value of the distributionManagement/repository/id field of the pom.xml
+          server-id: ossrh # Value of the distributionManagement/repository/id field of the pom.xml
           settings-path: ${{ github.workspace }} # location for the settings.xml file
       - run: mvn -B -V -T C1 -DskipTests deploy -Possrh
-
-      - name: Publish to GitHub Packages Apache Maven
-        run: mvn -B -V -T C1 -DskipTests deploy -s $GITHUB_WORKSPACE/settings.xml -Pgithub
 
