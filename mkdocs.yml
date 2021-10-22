@@ -3,7 +3,7 @@ site_description: Addax is an open source universal ETL tool that supports most 
 site_url: https://wgzhao.github.io/Addax/
 site_author: Steven Zhao
 repo_name: wgzhao/addax
-repo_url: https://github.com/wgzhao/Addax.git
+repo_url: https://github.com/wgzhao/Addax
 edit_uri: ""
 
 copyright: Copyright &copy; 2019 - 2021 Steven Zhao
