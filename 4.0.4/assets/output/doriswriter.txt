@@ -1,0 +1,67 @@
+2021-02-23 15:22:57.851 [main] INFO  VMInfo - VMInfo# operatingSystem class => sun.management.OperatingSystemImpl
+2021-02-23 15:22:57.871 [main] INFO  Engine -
+{
+"content":[
+{
+"reader":{
+    "parameter":{
+            "column":[
+                    {
+                            "random":"1,500",
+                            "type":"long"
+                    },
+                    {
+                            "random":"1,127",
+                            "type":"long"
+                    },
+                    {
+                            "type":"string",
+                            "value":"username"
+                    }
+            ],
+            "sliceRecordCount":100
+    },
+    "name":"streamreader"
+},
+"writer":{
+    "parameter":{
+            "password":"*****",
+            "batchSize":1024,
+            "connection":[
+                    {
+                            "database":"example_db",
+                            "endpoint":"http://127.0.0.1:8030/",
+                            "table":"table1"
+                    }
+            ],
+            "username":"test"
+    },
+    "name":"doriswriter"
+}
+}
+],
+"setting":{
+"speed":{
+"channel":2
+}
+}
+}
+
+2021-02-23 15:22:57.886 [main] INFO  PerfTrace - PerfTrace traceId=job_-1, isEnable=false, priority=0
+2021-02-23 15:22:57.886 [main] INFO  JobContainer - Addax jobContainer starts job.
+2021-02-23 15:22:57.920 [job-0] INFO  JobContainer - Scheduler starts [1] taskGroups.
+2021-02-23 15:22:57.928 [taskGroup-0] INFO  TaskGroupContainer - taskGroupId=[0] start [2] channels for [2] tasks.
+2021-02-23 15:22:57.935 [taskGroup-0] INFO  Channel - Channel set byte_speed_limit to -1, No bps activated.
+2021-02-23 15:22:57.936 [taskGroup-0] INFO  Channel - Channel set record_speed_limit to -1, No tps activated.
+2021-02-23 15:22:57.970 [0-0-1-writer] INFO  DorisWriterTask - connect DorisDB with http://127.0.0.1:8030//api/example_db/table1/_stream_load
+2021-02-23 15:22:57.970 [0-0-0-writer] INFO  DorisWriterTask - connect DorisDB with http://127.0.0.1:8030//api/example_db/table1/_stream_load
+
+2021-02-23 15:23:00.941 [job-0] INFO  JobContainer - PerfTrace not enable!
+2021-02-23 15:23:00.946 [job-0] INFO  JobContainer -
+任务启动时刻                    : 2021-02-23 15:22:57
+任务结束时刻                    : 2021-02-23 15:23:00
+任务总计耗时                    :                  3s
+任务平均流量                    :            1.56KB/s
+记录写入速度                    :             66rec/s
+读出记录总数                    :                 200
+读写失败总数                    :                   0
