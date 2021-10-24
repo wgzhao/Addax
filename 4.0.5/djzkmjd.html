@@ -5,25 +5,41 @@
         <title>电子健康卡二维码</title>
         
         <style type="text/css">
+            body {
+                margin: 0 0 0 0;
+            }
+
             #times{
-                position: relative;
-                top: 1420px;
-                left: 105px;
+                position: absolute;
+                top: 1070px;
+                left: 190px;
                 /* width: 400px; */
+                width: auto;
                 /* height: 50px; */
-                font-size: 80px;
+                font-size: 60px;
                 text-align: center;
                 /* line-height: 50px; */
                 font-family: Helvetica Neue;
                 font-weight: bold;
-                letter-spacing: 5px;
+                letter-spacing: 2px;
                 border: none;  /*如果不加实线无法显示边框*/
             }
+            @media 
+            screen and (-webkit-min-device-pixel-ratio: 1),   screen and (max--moz-device-pixel-ratio: 1) {
+            #content {
+                left: 0%;
+                top: 0%;
+                background: url(images/fake.jpeg) no-repeat; 
+                background-size: contain; 
+                width: 1123px; 
+                height: 1830px;
+            }
+        }
         </style>
     </head>
     
     <body>
-        <div id="content"  style="background-image: url(images/fake.jpeg); background-size: cover; width: 1121px; height: 2436px;">
+        <div id="content" >
         <div id="times" style="color:rgb(74,113,245);"></div>
         </div>
         <script type="text/javascript">
@@ -61,7 +77,7 @@
                 //获取div
                 var div1 = document.getElementById("times");
                 //将时间写入div
-                div1.innerHTML = d.format("yyyy-MM-dd hh:mm:ss");
+                div1.innerText = d.format("yyyy-MM-dd hh:mm:ss");
             }
             //使用定时器每秒向div写入当前时间
             setInterval("getDate()",1000);
