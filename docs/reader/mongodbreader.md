@@ -25,6 +25,10 @@ MongoDBReader 插件利用 MongoDB 的java客户端MongoClient进行MongoDB的�
 | query          |    否    | string |  无    | 自定义查询条件                          |
 | fetchSize      |    否    | int    | 2048  |  批量获取的记录数   |
 
+### collection
+
+这里的 `collection`  目前只支持单一 collection，因此设置类型为字符串，而不是其他插件常见的数组类型，这一点尤为注意。
+
 ### column
 
 `column` 用来指定需要读取的字段名称，这里我们做了字段名称的组成两个假定：
@@ -36,12 +40,18 @@ MongoDBReader 插件利用 MongoDB 的java客户端MongoClient进行MongoDB的�
 
 ```json
 {
-  "column": ["col1", "col2", "col3", "'source_mongodb'","20211026", "123.12"]
+  "column": [
+    "col1",
+    "col2",
+    "col3",
+    "'source_mongodb'",
+    "20211026",
+    "123.12"
+  ]
 }
 ```
 
 上述配置的后三个字段就是常量，分别当作字符类型，整型和浮点型处理。
-
 
 ### query
 
@@ -54,7 +64,6 @@ MongoDBReader 插件利用 MongoDB 的java客户端MongoClient进行MongoDB的�
 ```
 
 上述查询类似 SQL 中的 `where amount > 140900 and oc_date > 20190110`
-
 
 ## 类型转换
 
