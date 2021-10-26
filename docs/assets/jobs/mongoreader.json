@@ -12,72 +12,27 @@
           "name": "mongodbreader",
           "parameter": {
             "address": [
-              "127.0.0.1:32768"
+              "127.0.0.1:27017"
             ],
-            "userName": "",
-            "userPassword": "",
-            "dbName": "tag_per_data",
-            "collectionName": "tag_data",
+            "username": "",
+            "password": "",
+            "database": "tag_per_data",
+            "collection": "tag_data",
             "column": [
-              {
-                "name": "unique_id",
-                "type": "string"
-              },
-              {
-                "name": "sid",
-                "type": "string"
-              },
-              {
-                "name": "user_id",
-                "type": "string"
-              },
-              {
-                "name": "auction_id",
-                "type": "string"
-              },
-              {
-                "name": "content_type",
-                "type": "string"
-              },
-              {
-                "name": "pool_type",
-                "type": "string"
-              },
-              {
-                "name": "frontcat_id",
-                "type": "Array",
-                "spliter": ""
-              },
-              {
-                "name": "categoryid",
-                "type": "Array",
-                "spliter": ""
-              },
-              {
-                "name": "gmt_create",
-                "type": "string"
-              },
-              {
-                "name": "taglist",
-                "type": "Array",
-                "spliter": " "
-              },
-              {
-                "name": "property",
-                "type": "string"
-              },
-              {
-                "name": "scorea",
-                "type": "int"
-              },
-              {
-                "name": "scoreb",
-                "type": "int"
-              },
-              {
-                "name": "scorec",
-                "type": "int"
-              }
+              "unique_id",
+              "sid",
+              "user_id",
+              "auction_id",
+              "content_type",
+              "pool_type",
+              "frontcat_id",
+              "catagoryid",
+              "gmt_create",
+              "taglist",
+              "property",
+              "scorea",
+              "scoreb",
+              "scorec"
             ]
           }
         },

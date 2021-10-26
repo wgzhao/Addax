@@ -19,14 +19,14 @@
 
 package com.wgzhao.addax.plugin.reader.mongodbreader.util;
 
-import com.wgzhao.addax.common.exception.AddaxException;
-import com.wgzhao.addax.common.util.Configuration;
-import com.wgzhao.addax.plugin.reader.mongodbreader.KeyConstant;
-import com.wgzhao.addax.plugin.reader.mongodbreader.MongoDBReaderErrorCode;
 import com.mongodb.MongoClient;
 import com.mongodb.MongoCommandException;
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoDatabase;
+import com.wgzhao.addax.common.exception.AddaxException;
+import com.wgzhao.addax.common.util.Configuration;
+import com.wgzhao.addax.plugin.reader.mongodbreader.KeyConstant;
+import com.wgzhao.addax.plugin.reader.mongodbreader.MongoDBReaderErrorCode;
 import org.bson.Document;
 import org.bson.types.ObjectId;
 
@@ -34,11 +34,8 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-/**
- * Created by jianying.wcj on 2015/3/19 0019.
- * Modified by mingyan.zc on 2016/6/13.
- * Modified by mingyan.zc on 2017/7/5.
- */
+import static com.wgzhao.addax.common.base.Key.DATABASE;
+
 public class CollectionSplitUtil
 {
 
@@ -50,7 +47,7 @@ public class CollectionSplitUtil
 
         List<Configuration> confList = new ArrayList<>();
 
-        String dbName = originalSliceConfig.getString(KeyConstant.MONGO_DB_NAME, originalSliceConfig.getString(KeyConstant.MONGO_DATABASE));
+        String dbName = originalSliceConfig.getString(DATABASE);
 
         String collName = originalSliceConfig.getString(KeyConstant.MONGO_COLLECTION_NAME);
 

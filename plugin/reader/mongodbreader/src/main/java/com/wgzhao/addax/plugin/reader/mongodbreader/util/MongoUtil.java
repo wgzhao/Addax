@@ -19,6 +19,7 @@
 
 package com.wgzhao.addax.plugin.reader.mongodbreader.util;
 
+import com.mongodb.MongoClientOptions;
 import com.wgzhao.addax.common.exception.AddaxException;
 import com.wgzhao.addax.common.util.Configuration;
 import com.wgzhao.addax.plugin.reader.mongodbreader.KeyConstant;
@@ -29,6 +30,7 @@ import com.mongodb.ServerAddress;
 
 import java.net.UnknownHostException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 

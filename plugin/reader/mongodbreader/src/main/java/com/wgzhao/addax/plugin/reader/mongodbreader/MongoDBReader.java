@@ -19,9 +19,6 @@
 
 package com.wgzhao.addax.plugin.reader.mongodbreader;
 
-import com.alibaba.fastjson.JSON;
-import com.alibaba.fastjson.JSONArray;
-import com.alibaba.fastjson.JSONObject;
 import com.mongodb.MongoClient;
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoCursor;
@@ -41,16 +38,17 @@ import com.wgzhao.addax.plugin.reader.mongodbreader.util.MongoUtil;
 import org.bson.Document;
 import org.bson.types.ObjectId;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 
-/**
- * Created by jianying.wcj on 2015/3/19 0019.
- * Modified by mingyan.zc on 2016/6/13.
- * Modified by mingyan.zc on 2017/7/5.
- */
+import static com.wgzhao.addax.common.base.Constant.DEFAULT_FETCH_SIZE;
+import static com.wgzhao.addax.common.base.Key.COLUMN;
+import static com.wgzhao.addax.common.base.Key.DATABASE;
+import static com.wgzhao.addax.common.base.Key.FETCH_SIZE;
+import static com.wgzhao.addax.common.base.Key.PASSWORD;
+import static com.wgzhao.addax.common.base.Key.USERNAME;
+
 public class MongoDBReader
         extends Reader
 {
@@ -78,10 +76,16 @@ public class MongoDBReader
         public void init()
         {
             this.originalConfig = getPluginJobConf();
-            String userName = originalConfig.getString(KeyConstant.MONGO_USER_NAME, originalConfig.getString(KeyConstant.MONGO_USERNAME));
-            String password = originalConfig.getString(KeyConstant.MONGO_USER_PASSWORD, originalConfig.getString(KeyConstant.MONGO_PASSWORD));
-            String database = originalConfig.getString(KeyConstant.MONGO_DB_NAME, originalConfig.getString(KeyConstant.MONGO_DATABASE));
+            // check required configuration
+            String userName = originalConfig.getNecessaryValue(USERNAME, MongoDBReaderErrorCode.REQUIRED_VALUE);
+            String password = originalConfig.getString(PASSWORD);
+            String database = originalConfig.getNecessaryValue(DATABASE, MongoDBReaderErrorCode.REQUIRED_VALUE);
             String authDb = originalConfig.getString(KeyConstant.MONGO_AUTH_DB, database);
+            List<String> columns = originalConfig.getList(COLUMN, String.class);
+            if (columns == null || (columns.size() == 1 && "*".equals(columns.get(0)))) {
+                throw AddaxException.asAddaxException(MongoDBReaderErrorCode.ILLEGAL_VALUE,
+                        "The configuration column must be required and DOES NOT support \"*\" yet");
+            }
             if (!isNullOrEmpty((userName)) && !isNullOrEmpty((password))) {
                 this.mongoClient = MongoUtil.initCredentialMongoClient(originalConfig, userName, password, authDb);
             }
@@ -108,10 +112,11 @@ public class MongoDBReader
 
         private String query = null;
 
-        private JSONArray mongodbColumnMeta = null;
+        private List<String> mongodbColumnMeta = null;
         private Object lowerBound = null;
         private Object upperBound = null;
         private boolean isObjectId = true;
+        private int fetchSize;
 
         private boolean isNullOrEmpty(String obj)
         {
@@ -149,39 +154,25 @@ public class MongoDBReader
                 Document queryFilter = Document.parse(query);
                 filter = new Document("$and", Arrays.asList(filter, queryFilter));
             }
-            dbCursor = col.find(filter).iterator();
+            dbCursor = col.find(filter).batchSize(fetchSize).iterator();
             Document item;
-            if (mongodbColumnMeta.size() == 1 && mongodbColumnMeta.get(0) == "*") {
-                item = dbCursor.next();
-                mongodbColumnMeta = JSON.parseArray(item.toJson());
-            }
+
             while (dbCursor.hasNext()) {
                 item = dbCursor.next();
                 Record record = recordSender.createRecord();
 
-                for (Object o : mongodbColumnMeta) {
-                    JSONObject column = (JSONObject) o;
-                    Object tempCol = item.get(column.getString(KeyConstant.COLUMN_NAME));
-                    if (tempCol == null && KeyConstant.isDocumentType(column.getString(KeyConstant.COLUMN_TYPE))) {
-                        String[] name = column.getString(KeyConstant.COLUMN_NAME).split("\\.");
-                        if (name.length > 1) {
-                            Object obj;
-                            Document nestedDocument = item;
-                            for (String str : name) {
-                                obj = nestedDocument.get(str);
-                                if (obj instanceof Document) {
-                                    nestedDocument = (Document) obj;
-                                }
-                            }
-
-                            tempCol = nestedDocument.get(name[name.length - 1]);
-                        }
-                    }
-                    if (tempCol == null) {
-                        //continue; 这个不能直接continue会导致record到目的端错位
+                for (String column : mongodbColumnMeta) {
+                    if (!item.containsKey(column)) {
                         record.addColumn(new StringColumn());
+                        continue;
                     }
-                    else if (tempCol instanceof Double) {
+                    Object tempCol = item.get(column);
+                    if (tempCol == null) {
+                        record.addColumn(new StringColumn());
+                        continue;
+                    }
+
+                    if (tempCol instanceof Double) {
                         record.addColumn(new DoubleColumn((Double) tempCol));
                     }
                     else if (tempCol instanceof Boolean) {
@@ -197,30 +188,10 @@ public class MongoDBReader
                         record.addColumn(new LongColumn((Long) tempCol));
                     }
                     else if (tempCol instanceof Document) {
-                        if (KeyConstant.isJsonType(column.getString(KeyConstant.COLUMN_TYPE))) {
-                            record.addColumn(new StringColumn(((Document) tempCol).toJson()));
-                        }
-                        else {
-                            record.addColumn(new StringColumn(tempCol.toString()));
-                        }
+                        record.addColumn(new StringColumn(((Document) tempCol).toJson()));
                     }
                     else {
-                        if (KeyConstant.isArrayType(column.getString(KeyConstant.COLUMN_TYPE))) {
-                            String splitter = column.getString(KeyConstant.COLUMN_SPLITTER);
-                            if (isNullOrEmpty((splitter))) {
-                                throw AddaxException.asAddaxException(MongoDBReaderErrorCode.ILLEGAL_VALUE,
-                                        MongoDBReaderErrorCode.ILLEGAL_VALUE.getDescription());
-                            }
-                            else {
-                                ArrayList<String> array = (ArrayList) tempCol;
-                                //String tempArrayStr = Joiner.on(splitter).join(array)
-                                String tempArrayStr = String.join(splitter, array);
-                                record.addColumn(new StringColumn(tempArrayStr));
-                            }
-                        }
-                        else {
-                            record.addColumn(new StringColumn(tempCol.toString()));
-                        }
+                        record.addColumn(new StringColumn(tempCol.toString()));
                     }
                 }
                 recordSender.sendToWriter(record);
@@ -231,9 +202,10 @@ public class MongoDBReader
         public void init()
         {
             Configuration readerSliceConfig = getPluginJobConf();
-            String userName = readerSliceConfig.getString(KeyConstant.MONGO_USER_NAME, readerSliceConfig.getString(KeyConstant.MONGO_USERNAME));
-            String password = readerSliceConfig.getString(KeyConstant.MONGO_USER_PASSWORD, readerSliceConfig.getString(KeyConstant.MONGO_PASSWORD));
-            this.database = readerSliceConfig.getString(KeyConstant.MONGO_DB_NAME, readerSliceConfig.getString(KeyConstant.MONGO_DATABASE));
+            String userName = readerSliceConfig.getString(USERNAME);
+            String password = readerSliceConfig.getString(PASSWORD);
+            this.database = readerSliceConfig.getString(DATABASE);
+            fetchSize = readerSliceConfig.getInt(FETCH_SIZE, DEFAULT_FETCH_SIZE);
             String authDb = readerSliceConfig.getString(KeyConstant.MONGO_AUTH_DB, this.database);
             if (!isNullOrEmpty((userName)) && !isNullOrEmpty((password))) {
                 mongoClient = MongoUtil.initCredentialMongoClient(readerSliceConfig, userName, password, authDb);
@@ -244,11 +216,7 @@ public class MongoDBReader
 
             this.collection = readerSliceConfig.getString(KeyConstant.MONGO_COLLECTION_NAME);
             this.query = readerSliceConfig.getString(KeyConstant.MONGO_QUERY);
-            List<String> column = readerSliceConfig.getList(KeyConstant.MONGO_COLUMN, String.class);
-            if (column.size() == 1 && "*".equals(column.get(0))) {
-                // TODO get all columns from record
-            }
-            this.mongodbColumnMeta = JSON.parseArray(readerSliceConfig.getString(KeyConstant.MONGO_COLUMN));
+            this.mongodbColumnMeta = readerSliceConfig.getList(COLUMN, String.class);
             this.lowerBound = readerSliceConfig.get(KeyConstant.LOWER_BOUND);
             this.upperBound = readerSliceConfig.get(KeyConstant.UPPER_BOUND);
             this.isObjectId = readerSliceConfig.getBool(KeyConstant.IS_OBJECT_ID);
