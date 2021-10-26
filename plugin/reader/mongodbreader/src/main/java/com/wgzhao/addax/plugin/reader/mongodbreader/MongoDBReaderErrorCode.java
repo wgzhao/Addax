@@ -30,7 +30,8 @@ public enum MongoDBReaderErrorCode
 
     ILLEGAL_VALUE("ILLEGAL_PARAMETER_VALUE", "参数不合法"),
     ILLEGAL_ADDRESS("ILLEGAL_ADDRESS", "不合法的Mongo地址"),
-    UNKNOWN_EXCEPTION("UNKNOWN_EXCEPTION", "未知异常");
+    UNKNOWN_EXCEPTION("UNKNOWN_EXCEPTION", "未知异常"),
+    REQUIRED_VALUE("REQUIRED_VALUE_EXCEPTION","Missing required parameters");
 
     private final String code;
 
