@@ -44,6 +44,7 @@ import java.util.List;
 
 import static com.wgzhao.addax.common.base.Constant.DEFAULT_FETCH_SIZE;
 import static com.wgzhao.addax.common.base.Key.COLUMN;
+import static com.wgzhao.addax.common.base.Key.CONNECTION;
 import static com.wgzhao.addax.common.base.Key.DATABASE;
 import static com.wgzhao.addax.common.base.Key.FETCH_SIZE;
 import static com.wgzhao.addax.common.base.Key.PASSWORD;
@@ -79,18 +80,20 @@ public class MongoDBReader
             // check required configuration
             String userName = originalConfig.getNecessaryValue(USERNAME, MongoDBReaderErrorCode.REQUIRED_VALUE);
             String password = originalConfig.getString(PASSWORD);
-            String database = originalConfig.getNecessaryValue(DATABASE, MongoDBReaderErrorCode.REQUIRED_VALUE);
-            String authDb = originalConfig.getString(KeyConstant.MONGO_AUTH_DB, database);
+            Configuration connConf = Configuration.from(originalConfig.getList(CONNECTION, Object.class).get(0).toString());
+            String database = connConf.getNecessaryValue(DATABASE, MongoDBReaderErrorCode.REQUIRED_VALUE);
+            String authDb = connConf.getString(KeyConstant.MONGO_AUTH_DB, database);
+            List<Object> addressList = connConf.getList(KeyConstant.MONGO_ADDRESS, Object.class);
             List<String> columns = originalConfig.getList(COLUMN, String.class);
             if (columns == null || (columns.size() == 1 && "*".equals(columns.get(0)))) {
                 throw AddaxException.asAddaxException(MongoDBReaderErrorCode.ILLEGAL_VALUE,
                         "The configuration column must be required and DOES NOT support \"*\" yet");
             }
             if (!isNullOrEmpty((userName)) && !isNullOrEmpty((password))) {
-                this.mongoClient = MongoUtil.initCredentialMongoClient(originalConfig, userName, password, authDb);
+                this.mongoClient = MongoUtil.initCredentialMongoClient(addressList, userName, password, authDb);
             }
             else {
-                this.mongoClient = MongoUtil.initMongoClient(originalConfig);
+                this.mongoClient = MongoUtil.initMongoClient(addressList);
             }
         }
 
@@ -162,6 +165,25 @@ public class MongoDBReader
                 Record record = recordSender.createRecord();
 
                 for (String column : mongodbColumnMeta) {
+                    // assume: The field name CANNOT all consist of numbers
+                    // TODO more elegant solution
+                    if (column.startsWith("'")) {
+                        record.addColumn(new StringColumn(column.replace("'", "")));
+                        continue;
+                    }
+                    try {
+                        Double a = Double.parseDouble(column);
+                        if (column.contains(".")) {
+                            record.addColumn(new DoubleColumn(a));
+                        }
+                        else {
+                            record.addColumn(new LongColumn(Long.parseLong(column)));
+                        }
+                        continue;
+                    }
+                    catch (NumberFormatException ignore) {
+
+                    }
                     if (!item.containsKey(column)) {
                         record.addColumn(new StringColumn());
                         continue;
@@ -204,22 +226,24 @@ public class MongoDBReader
             Configuration readerSliceConfig = getPluginJobConf();
             String userName = readerSliceConfig.getString(USERNAME);
             String password = readerSliceConfig.getString(PASSWORD);
-            this.database = readerSliceConfig.getString(DATABASE);
-            fetchSize = readerSliceConfig.getInt(FETCH_SIZE, DEFAULT_FETCH_SIZE);
-            String authDb = readerSliceConfig.getString(KeyConstant.MONGO_AUTH_DB, this.database);
-            if (!isNullOrEmpty((userName)) && !isNullOrEmpty((password))) {
-                mongoClient = MongoUtil.initCredentialMongoClient(readerSliceConfig, userName, password, authDb);
-            }
-            else {
-                mongoClient = MongoUtil.initMongoClient(readerSliceConfig);
-            }
-
-            this.collection = readerSliceConfig.getString(KeyConstant.MONGO_COLLECTION_NAME);
+            this.fetchSize = readerSliceConfig.getInt(FETCH_SIZE, DEFAULT_FETCH_SIZE);
             this.query = readerSliceConfig.getString(KeyConstant.MONGO_QUERY);
             this.mongodbColumnMeta = readerSliceConfig.getList(COLUMN, String.class);
             this.lowerBound = readerSliceConfig.get(KeyConstant.LOWER_BOUND);
             this.upperBound = readerSliceConfig.get(KeyConstant.UPPER_BOUND);
             this.isObjectId = readerSliceConfig.getBool(KeyConstant.IS_OBJECT_ID);
+
+            Configuration connConf = Configuration.from(readerSliceConfig.getList(CONNECTION, Object.class).get(0).toString());
+            this.database = connConf.getString(DATABASE);
+            this.collection = connConf.getString(KeyConstant.MONGO_COLLECTION_NAME);
+            String authDb = connConf.getString(KeyConstant.MONGO_AUTH_DB, this.database);
+            List<Object> addressList = connConf.getList(KeyConstant.MONGO_ADDRESS, Object.class);
+            if (!isNullOrEmpty((userName)) && !isNullOrEmpty((password))) {
+                this.mongoClient = MongoUtil.initCredentialMongoClient(addressList, userName, password, authDb);
+            }
+            else {
+                this.mongoClient = MongoUtil.initMongoClient(addressList);
+            }
         }
 
         @Override
@@ -227,5 +251,11 @@ public class MongoDBReader
         {
             //
         }
+    }
+
+    public static void main(String[] args)
+    {
+        String a = "12";
+        System.out.println(Double.parseDouble(a));
     }
 }

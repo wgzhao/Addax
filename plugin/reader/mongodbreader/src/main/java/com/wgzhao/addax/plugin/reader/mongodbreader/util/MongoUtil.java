@@ -43,10 +43,9 @@ public class MongoUtil
 
     private MongoUtil() {}
 
-    public static MongoClient initMongoClient(Configuration conf)
+    public static MongoClient initMongoClient(List<Object> addressList)
     {
 
-        List<Object> addressList = conf.getList(KeyConstant.MONGO_ADDRESS);
         if (addressList == null || addressList.isEmpty()) {
             throw AddaxException.asAddaxException(MongoDBReaderErrorCode.ILLEGAL_VALUE, "不合法参数");
         }
@@ -64,10 +63,9 @@ public class MongoUtil
         }
     }
 
-    public static MongoClient initCredentialMongoClient(Configuration conf, String userName, String password, String database)
+    public static MongoClient initCredentialMongoClient(List<Object> addressList, String userName, String password, String database)
     {
 
-        List<Object> addressList = conf.getList(KeyConstant.MONGO_ADDRESS);
         if (!isHostPortPattern(addressList)) {
             throw AddaxException.asAddaxException(MongoDBReaderErrorCode.ILLEGAL_VALUE, "不合法参数");
         }

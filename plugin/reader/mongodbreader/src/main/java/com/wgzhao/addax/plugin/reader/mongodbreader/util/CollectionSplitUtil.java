@@ -34,6 +34,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+import static com.wgzhao.addax.common.base.Key.CONNECTION;
 import static com.wgzhao.addax.common.base.Key.DATABASE;
 
 public class CollectionSplitUtil
@@ -41,15 +42,15 @@ public class CollectionSplitUtil
 
     private CollectionSplitUtil() {}
 
-    public static List<Configuration> doSplit(
-            Configuration originalSliceConfig, int adviceNumber, MongoClient mongoClient)
+    public static List<Configuration> doSplit(Configuration originalSliceConfig, int adviceNumber, MongoClient mongoClient)
     {
 
         List<Configuration> confList = new ArrayList<>();
 
-        String dbName = originalSliceConfig.getString(DATABASE);
+        Configuration connConf = Configuration.from(originalSliceConfig.getList(CONNECTION, Object.class).get(0).toString());
+        String dbName = connConf.getString(DATABASE);
 
-        String collName = originalSliceConfig.getString(KeyConstant.MONGO_COLLECTION_NAME);
+        String collName = connConf.getString(KeyConstant.MONGO_COLLECTION_NAME);
 
         if (null == dbName || dbName.isEmpty() || null == collName || collName.isEmpty() || mongoClient == null) {
             throw AddaxException.asAddaxException(MongoDBReaderErrorCode.ILLEGAL_VALUE,

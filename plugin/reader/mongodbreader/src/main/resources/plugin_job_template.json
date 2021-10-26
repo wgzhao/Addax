@@ -1,14 +1,16 @@
 {
   "name": "mongodbreader",
   "parameter": {
-    "address": [
-      "127.0.0.1:32768"
-    ],
     "username": "",
     "password": "",
-    "database": "tag_per_data",
-    "authDb": "admin",
-    "collection": "tag_data",
+    "connection": [
+      {
+        "address": ["127.0.0.1:32768"],
+        "database": "tag_per_data",
+        "authDb": "admin",
+        "collection": "tag_data"
+      }
+    ],
     "column": [
       "unique_id",
       "sid",

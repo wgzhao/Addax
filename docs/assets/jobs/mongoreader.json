@@ -2,7 +2,7 @@
   "job": {
     "setting": {
       "speed": {
-        "channel": 2,
+        "channel": 1,
         "bytes": -1
       }
     },
@@ -11,13 +11,18 @@
         "reader": {
           "name": "mongodbreader",
           "parameter": {
-            "address": [
-              "127.0.0.1:27017"
+            "connection": [
+              {
+                "address": [
+                  "127.0.0.1:27017"
+                ],
+                "database": "tag_per_data",
+                "collection": "tag_data",
+                "authDb": "admin"
+              }
             ],
             "username": "",
             "password": "",
-            "database": "tag_per_data",
-            "collection": "tag_data",
             "column": [
               "unique_id",
               "sid",
