@@ -121,6 +121,9 @@ public class PostgresqlWriter
                     else if ("money".equalsIgnoreCase(columnType)) {
                         return "?::NUMERIC::MONEY";
                     }
+                    else if ("bool".equalsIgnoreCase(columnType)) {
+                        return "?::BOOLEAN";
+                    }
                     return super.calcValueHolder(columnType);
                 }
 
@@ -134,12 +137,13 @@ public class PostgresqlWriter
                     }
 
                     if (columnSqlType == Types.BIT) {
-                        if ( (int) this.resultSetMetaData.get(columnIndex).get("precision") == 1) {
-                            preparedStatement.setBoolean(columnIndex, column.asBoolean());
+                        String v;
+                        if (column.getType() == Column.Type.BOOL) {
+                           v =  column.asBoolean() ? "1" : "0";
+                        } else {
+                            v = bytes2Binary(column.asBytes());
                         }
-                        else {
-                            preparedStatement.setObject(columnIndex, column.asString(), Types.OTHER);
-                        }
+                        preparedStatement.setString(columnIndex, v);
                         return preparedStatement;
                     }
 
@@ -148,6 +152,15 @@ public class PostgresqlWriter
             };
 
             this.commonRdbmsWriterSlave.init(this.writerSliceConfig);
+        }
+
+        private String bytes2Binary(byte[] bytes)
+        {
+            StringBuilder sb = new StringBuilder();
+            for (byte b : bytes) {
+                sb.append(String.format("%8s", Integer.toBinaryString(b & 0xFF)).replace(' ', '0'));
+            }
+            return sb.toString();
         }
 
         @Override
