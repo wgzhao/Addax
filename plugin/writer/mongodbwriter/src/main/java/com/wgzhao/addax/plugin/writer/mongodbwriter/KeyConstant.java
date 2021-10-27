@@ -21,7 +21,8 @@ package com.wgzhao.addax.plugin.writer.mongodbwriter;
 
 import com.wgzhao.addax.common.base.Key;
 
-public class KeyConstant extends Key
+public class KeyConstant
+        extends Key
 {
     /**
      * mongodb 的 host 地址
@@ -35,26 +36,12 @@ public class KeyConstant extends Key
      * ObjectId类型
      */
     public static final String OBJECT_ID_TYPE = "objectid";
-    /**
-     * mongodb 的用户名
-     */
-    public static final String MONGO_USER_NAME = "userName";
-    /**
-     * mongodb 密码
-     */
-    public static final String MONGO_USER_PASSWORD = "userPassword";
-    /**
-     * mongodb 数据库名
-     */
-    public static final String MONGO_DB_NAME = "dbName";
+
     /**
      * mongodb 集合名
      */
-    public static final String MONGO_COLLECTION_NAME = "collectionName";
-    /**
-     * mongodb 的列
-     */
-    public static final String MONGO_COLUMN = "column";
+    public static final String MONGO_COLLECTION_NAME = "collection";
+
     /**
      * 每个列的名字
      */
@@ -71,10 +58,7 @@ public class KeyConstant extends Key
      * 列分隔符
      */
     public static final String COLUMN_SPLITTER = "splitter";
-    /**
-     * 数据更新列信息
-     */
-    public static final String WRITE_MODE = "writeMode";
+
     /**
      * 有相同的记录是否覆盖，默认为false
      */

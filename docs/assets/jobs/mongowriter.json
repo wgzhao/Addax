@@ -75,13 +75,18 @@
         "writer": {
           "name": "mongodbwriter",
           "parameter": {
-            "address": [
-              "127.0.0.1:32768"
+            "connection": [
+              {
+                "address": [
+                  "127.0.0.1:27017"
+                ],
+                "database": "my_database",
+                "collection": "addax_writer",
+                "authDb": "my_database"
+              }
             ],
-            "userName": "",
-            "userPassword": "",
-            "dbName": "tag_per_data",
-            "collectionName": "tag_data",
+            "username": "my_user",
+            "password": "password123",
             "column": [
               {
                 "name": "unique_id",
@@ -143,10 +148,7 @@
                 "type": "int"
               }
             ],
-            "upsertInfo": {
-              "isUpsert": "true",
-              "upsertKey": "unique_id"
-            }
+            "writeMode": "insert"
           }
         }
       }
