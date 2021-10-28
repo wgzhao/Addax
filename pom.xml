@@ -15,15 +15,15 @@
     <licenses>
         <license>
             <name>Apache License</name>
-            <url>https://github.com/wgzhao/Addax/blob/master/license.txt</url>
+            <url>https://github.com/wgzhao/action_test/blob/master/license.txt</url>
             <distribution>repo</distribution>
         </license>
     </licenses>
 
     <scm>
-        <connection>scm:git:https://github.com/wgzhao/addax.git</connection>
-        <developerConnection>scm:git:git@github.com:wgzhao/addax.git</developerConnection>
-        <url>https://github.com.wgzhao.addax</url>
+        <connection>scm:git:https://github.com/wgzhao/action_test.git</connection>
+        <developerConnection>scm:git:git@github.com:wgzhao/action_test.git</developerConnection>
+        <url>https://github.com.wgzhao.action_test</url>
         <tag>HEAD</tag>
     </scm>
 
