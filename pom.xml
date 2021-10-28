@@ -4,7 +4,7 @@
 
     <groupId>com.wgzhao.addax</groupId>
     <artifactId>addax-all</artifactId>
-    <version>4.0.6-SNAPSHOT</version>
+    <version>4.0.7-SNAPSHOT</version>
 
     <name>addax-all</name>
     <description>Addax generic ETL tool</description>
@@ -51,9 +51,9 @@
         <!-- jdbc driver version -->
         <cassandra.jdbc.version>3.11.0</cassandra.jdbc.version>
         <clickhouse.jdbc.version>0.3.0</clickhouse.jdbc.version>
-        <hive.version>3.1.2-1</hive.version>
+        <hive.version>3.1.2-16</hive.version>
         <influxdbClient.version>2.22</influxdbClient.version>
-        <hadoop.version>3.2.0-9</hadoop.version>
+        <hadoop.version>3.2.0-14</hadoop.version>
         <mongodb.jdbc.version>3.12.9</mongodb.jdbc.version>
         <mysql.jdbc.version>8.0.16</mysql.jdbc.version>
         <mssql.jdbc.version>9.2.1.jre8</mssql.jdbc.version>

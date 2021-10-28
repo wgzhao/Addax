@@ -4,8 +4,6 @@
 name: Maven Package
 
 on:
-  release:
-    types: [ created ]
   push:
     tags:
       - '*'
@@ -17,48 +15,87 @@ jobs:
       packages: write
 
     steps:
+
       - uses: actions/checkout@v2
-      - name: Import GPG key
-        id: import_gpg
-        uses: crazy-max/ghaction-import-gpg@v4
-        with:
-          gpg_private_key: ${{ secrets.GPG_PRIVATE_KEY }}
-          passphrase: ${{ secrets.GPG_PASS_PHRASE }}
-          git-user-signingkey: true
-          git-commit-gpgsign: true
-      - name: Set up Maven
+
+      - name: version
+        id: version
+        run: echo "::set-output name=version::$(git describe --tags --abbrev=1)"
+      # - name: 1. Import GPG key
+      #   id: import_gpg
+      #   uses: crazy-max/ghaction-import-gpg@v4
+      #   with:
+      #     gpg_private_key: ${{ secrets.GPG_PRIVATE_KEY }}
+      #     passphrase: ${{ secrets.GPG_PASS_PHRASE }}
+      #     git-user-signingkey: true
+      #     git-commit-gpgsign: true
+
+      - name: 2. Set up Maven
         uses: stCarolas/setup-maven@v4
         with:
-          maven-version: 3.5.4
-      - name: Generate settings.xml for Maven Builds
-        uses: whelk-io/maven-settings-xml-action@v20
-        with:
-          servers: >
-            [
-              {
-              "id": "ossrh",
-              "username": "${{ secrets.OSSRH_USERNAME }}",
-              "password": "${{ secrets.OSSRH_PASSWORD }}"
-              },
-              {
-              "id": "github",
-              "url": "https://maven.pkg.github.com/wgzhao/addax",
-              "releases": {
-                "enabled": "true"
-              },
-              "snapshots": {
-                "enabled": "false"
-              },
-              "username": "wgzhao",
-              "password": "${{ github.token }}"
-              }
-            ]
-      - name: Set up JDK
+          maven-version: 3.6.3
+
+      # - name: 3. Generate settings.xml for Maven Builds
+      #   uses: whelk-io/maven-settings-xml-action@v20
+      #   with:
+      #     servers: >
+      #       [
+      #         {
+      #         "id": "ossrh",
+      #         "username": "${{ secrets.OSSRH_USERNAME }}",
+      #         "password": "${{ secrets.OSSRH_PASSWORD }}"
+      #         },
+      #         {
+      #         "id": "github",
+      #         "url": "https://maven.pkg.github.com/wgzhao/addax",
+      #         "releases": {
+      #           "enabled": "true"
+      #         },
+      #         "snapshots": {
+      #           "enabled": "false"
+      #         },
+      #         "username": "wgzhao",
+      #         "password": "${{ github.token }}"
+      #         }
+      #       ]
+
+      - name: 4. Set up JDK
         uses: actions/setup-java@v2.3.1
         with:
           java-version: '8'
           distribution: 'adopt'
           server-id: ossrh # Value of the distributionManagement/repository/id field of the pom.xml
           settings-path: ${{ github.workspace }} # location for the settings.xml file
-      - run: mvn -B -V -T C1 -DskipTests deploy -Possrh
 
+      - name: 5. Build and packaging
+        run: |
+          mvn -B -V -T C1 -DskipTests clean package
+          mvn package assembly:single
+          bash shrink_package.sh
+
+      - name: 6. Calucate SHA256SUM
+        run: |
+          cd target/addax
+          sha256sum addax-${{ steps.version.outputs.version }}.tar.gz > addax-${{ steps.version.outputs.version }}.tar.gz.sha256sum.asc
+
+      - name: 7. Create release page
+        uses: actions/create-release@v1
+        id: create_release
+        with:
+          draft: false
+          prerelease: false
+          release_name: ${{ steps.version.outputs.version }}
+          tag_name: ${{ github.ref }}
+          body_path: CHANGELOG.md
+        env:
+          GITHUB_TOKEN: ${{ secrets.TOKEN }}
+
+      - name: 8. Upload to GitHub
+        uses: softprops/action-gh-release@v1
+        if: startsWith(github.ref, 'refs/tags/')
+        with:
+          files: |
+            target/addax/addax-${{ steps.version.outputs.version }}.tar.gz
+            target/addax/addax-${{ steps.version.outputs.version }}.tar.gz.sha256sum.asc
+        env:
+          GITHUB_TOKEN: ${{ secrets.TOKEN }}

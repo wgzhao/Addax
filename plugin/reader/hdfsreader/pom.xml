@@ -6,7 +6,7 @@
     <parent>
         <groupId>com.wgzhao.addax</groupId>
         <artifactId>addax-all</artifactId>
-        <version>4.0.6-SNAPSHOT</version>
+        <version>4.0.7-SNAPSHOT</version>
         <relativePath>../../../pom.xml</relativePath>
     </parent>
 
@@ -34,7 +34,7 @@
         </dependency>
 
         <dependency>
-            <groupId>io.prestosql.hadoop</groupId>
+            <groupId>io.trino.hadoop</groupId>
             <artifactId>hadoop-apache</artifactId>
             <version>${hadoop.version}</version>
             <exclusions>
@@ -50,7 +50,13 @@
         </dependency>
 
         <dependency>
-            <groupId>io.prestosql.hive</groupId>
+            <groupId>com.google.guava</groupId>
+            <artifactId>guava</artifactId>
+            <version>${guava.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>io.trino.hive</groupId>
             <artifactId>hive-apache</artifactId>
             <version>${hive.version}</version>
             <exclusions>
@@ -62,36 +68,21 @@
                     <groupId>com.google.guava</groupId>
                     <artifactId>guava</artifactId>
                 </exclusion>
+                <exclusion>
+                    <groupId>org.apache.avro</groupId>
+                    <artifactId>parquet-avro</artifactId>
+                </exclusion>
             </exclusions>
         </dependency>
 
         <dependency>
-            <groupId>org.apache.avro</groupId>
-            <artifactId>avro</artifactId>
-            <version>1.10.2</version>
-            <exclusions>
-                <exclusion>
-                    <groupId>slf4j-api</groupId>
-                    <artifactId>org.slf4j</artifactId>
-                </exclusion>
-            </exclusions>
+            <groupId>org.xerial.snappy</groupId>
+            <artifactId>snappy-java</artifactId>
+            <version>1.1.8.4</version>
         </dependency>
-        <dependency>
-            <groupId>org.apache.parquet</groupId>
-            <artifactId>parquet-avro</artifactId>
-            <version>1.12.2</version>
-            <exclusions>
-                <exclusion>
-                    <groupId>com.google.guava</groupId>
-                    <artifactId>guava</artifactId>
-                </exclusion>
-                <exclusion>
-                    <groupId>slf4j-api</groupId>
-                    <artifactId>org.slf4j</artifactId>
-                </exclusion>
-            </exclusions>
-        </dependency>
+
     </dependencies>
+
     <build>
         <plugins>
             <plugin>
