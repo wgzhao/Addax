@@ -1,0 +1,68 @@
+# This workflow will build a package using Maven and then publish it to GitHub packages when a release is created
+# For more information see: https://github.com/actions/setup-java/blob/main/docs/advanced-usage.md#apache-maven-with-a-settings-path
+
+name: Maven Package
+
+on:
+  release:
+    types: [ created ]
+  push:
+    tags:
+      - '*'
+      
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+
+    steps:
+      - name: Set up Maven
+        uses: stCarolas/setup-maven@v4
+        with:
+          maven-version: 3.5.4
+      - name: Generate settings.xml for Maven Builds
+        uses: whelk-io/maven-settings-xml-action@v20
+        with:
+          servers: >
+            [
+              {
+              "id": "ossrh",
+              "username": "${{ secrets.OSSRH_USERNAME }}",
+              "password": "${{ secrets.OSSRH_PASSWORD }}"
+              },
+              {
+              "id": "github",
+              "url": "https://maven.pkg.github.com/wgzhao/addax",
+              "releases": {
+                "enabled": "true"
+              },
+              "snapshots": {
+                "enabled": "false"
+              },
+              "username": "wgzhao",
+              "password": "${{ github.token }}"
+              }
+            ]
+      - name: Set up JDK
+        uses: actions/setup-java@v2.3.1
+        with:
+          java-version: '8'
+          distribution: 'adopt'
+          server-id: ossrh # Value of the distributionManagement/repository/id field of the pom.xml
+          settings-path: ${{ github.workspace }} # location for the settings.xml file
+      - name: create release package
+        run: |
+           mvn -B -V -T C1 -DskipTests clean package
+           mvn package assembly:single
+           bash shrink_package.sh
+      - name: SHA256SUM
+        run: sha256sum target/addax/addax-*.tar.gz
+
+      - uses: actions/upload-artifact@v2
+        with:
+          name: addax-release
+          path: target/addax/addax-*.tar.gz
+            
+

@@ -1,0 +1,76 @@
+{
+  "job": {
+    "content": [
+      {
+        "reader": {
+          "name": "oraclereader",
+          "parameter": {
+            "column": [
+              "BRANCH_NO",
+              "2.3",
+              "BRANCH_NAME",
+              "DW_CLT_DATE"
+            ],
+            "connection": [
+              {
+                "jdbcUrl": [
+                  "jdbc:oracle:thin:@127.0.0.1:1521/stage"
+                ],
+                "table": [
+                  "STGUF.ALLBRANCH"
+                ]
+              }
+            ],
+            "password": "password",
+            "username": "oracle",
+            "where": "branch_no = '1211'",
+            "session": [
+              "alter session set NLS_DATE_FORMAT='yyyy/mm/dd hh24:mi:ss'",
+              "alter session set NLS_TIMESTAMP_FORMAT='yyyy/mm/dd hh24:mi:ss'",
+              "alter session set NLS_TIMESTAMP_TZ_FORMAT='yyyy-mm-dd hh24:mi:ss'",
+              "alter session set TIME_ZONE='Asia/Chongqing'"
+            ]
+          }
+        },
+        "writer": {
+          "name": "dbffilewriter",
+          "parameter": {
+            "column": [
+              {
+                "name": "col1",
+                "type": "numeric",
+                "length": 10,
+                "scal": 0
+              },
+              {
+                "name": "col2",
+                "type": "numeric",
+                "length": 10,
+                "scal": 2
+              },
+              {
+                "name": "col3",
+                "type": "char",
+                "length": 250
+              },
+              {
+                "name": "col4",
+                "type": "date"
+              }
+            ],
+            "fileName": "allbranch.dbf",
+            "path": "/tmp/out",
+            "writeMode": "truncate"
+          }
+        }
+      }
+    ],
+    "setting": {
+      "speed": {
+        "batchSize": 20480,
+        "bytes": -1,
+        "channel": 10
+      }
+    }
+  }
+}

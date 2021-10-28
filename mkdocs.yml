@@ -1,0 +1,148 @@
+site_name: Addax Documentation
+site_description: Addax is an open source universal ETL tool that supports most of those RDBMS and NoSQLs on the planet
+site_url: https://wgzhao.github.io/Addax/
+site_author: Steven Zhao
+repo_name: wgzhao/addax
+repo_url: https://github.com/wgzhao/Addax
+edit_uri: ""
+
+copyright: Copyright &copy; 2019 - 2021 Steven Zhao
+theme:
+  name: material
+  language: zh
+  logo: images/logo.png
+  favicon: images/favicon.ico
+  icon:
+    repo: fontawesome/brands/github
+  palette:
+    # - primary: blue
+    - scheme: default
+      toggle:
+        icon: material/toggle-switch-off-outline
+        name: Switch to dark mode
+    - scheme: slate
+      toggle:
+        icon: material/toggle-switch
+        name: Switch to light mode
+  features:
+    - navigation.instant
+    - navigation.indexes
+    - content.code.annotate
+    - content.tabs.link
+    - navigation.top
+    - navigation.tracking
+    - search.highlight
+    - search.share
+    - search.suggest
+
+nav:
+  - index.md
+  - quickstart.md
+  - setupJob.md
+  - 读取插件:
+    - reader/cassandrareader.md
+    - reader/clickhousereader.md
+    - reader/datareader.md
+    - reader/dbfreader.md
+    - reader/elasticsearchreader.md
+    - reader/excelreader.md
+    - reader/ftpreader.md
+    - reader/hbase11xreader.md
+    - reader/hbase11xsqlreader.md
+    - reader/hbase20xreader.md
+    - reader/hbase20xsqlreader.md
+    - reader/hdfsreader.md
+    - reader/hivereader.md
+    - reader/httpreader.md
+    - reader/influxdbreader.md
+    - reader/influxdb2reader.md
+    - reader/jsonfilereader.md
+    - reader/kudureader.md
+    - reader/mongodbreader.md
+    - reader/mysqlreader.md
+    - reader/oraclereader.md
+    - reader/postgresqlreader.md
+    - reader/rdbmsreader.md
+    - reader/redisreader.md
+    - reader/sqlitereader.md
+    - reader/sqlserverreader.md
+    - reader/streamreader.md
+    - reader/tdenginereader.md
+    - reader/txtfilereader.md
+
+  - 写入插件:
+    - writer/cassandrawriter.md
+    - writer/clickhousewriter.md
+    - writer/dbfwriter.md
+    - writer/doriswriter.md
+    - writer/elasticsearchwriter.md
+    - writer/excelwriter.md
+    - writer/ftpwriter.md
+    - writer/greenplumwriter.md
+    - writer/hbase11xsqlwriter.md
+    - writer/hbase11xwriter.md
+    - writer/hbase20xsqlwriter.md
+    - writer/hdfswriter.md
+    - writer/influxdbwriter.md
+    - writer/influxdb2writer.md
+    - writer/kuduwriter.md
+    - writer/mongodbwriter.md
+    - writer/mysqlwriter.md
+    - writer/oraclewriter.md
+    - writer/postgresqlwriter.md
+    - writer/rdbmswriter.md
+    - writer/rediswriter.md
+    - writer/sqlitewriter.md
+    - writer/sqlserverwriter.md
+    - writer/streamwriter.md
+    - writer/tdenginewriter.md
+    - writer/txtfilewriter.md
+  - debug.md
+  - statsreport.md
+  - transformer.md
+  - plugin_development.md
+  
+extra:
+  version:
+    provider: mike
+  social:
+    - icon: fontawesome/brands/twitter
+      link: https://twitter.com/mlsx
+    - icon: fontawesome/brands/github
+      link: https://github.com/wgzhao
+
+# Extensions
+markdown_extensions:
+  - admonition
+  - abbr
+  - attr_list
+  - def_list
+  - footnotes
+  - meta
+  - md_in_html
+  - toc:
+      permalink: true
+  - pymdownx.arithmatex:
+      generic: true
+  - pymdownx.betterem:
+      smart_enable: all
+  - pymdownx.caret
+  - pymdownx.details
+  - pymdownx.highlight
+  - pymdownx.inlinehilite
+  - pymdownx.keys
+  - pymdownx.magiclink:
+      repo_url_shorthand: true
+      user: wgzhao
+      repo: addax
+  - pymdownx.mark
+  - pymdownx.smartsymbols
+  - pymdownx.superfences
+  - pymdownx.snippets:
+      base_path: 
+        - docs/assets
+      check_paths: false
+  - pymdownx.tabbed
+  - pymdownx.tasklist:
+      custom_checkbox: true
+  - pymdownx.tilde

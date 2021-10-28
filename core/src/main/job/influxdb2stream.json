@@ -1,0 +1,37 @@
+{
+  "job": {
+    "content": [
+      {
+        "reader": {
+          "name": "influxdbreader",
+          "parameter": {
+            "column": [
+              "*"
+            ],
+            "connection": [
+              {
+                "endpoint": "http://localhost:8086",
+                "database": "NOAA_water_database",
+                "table": "h2o_feet"
+              }
+            ],
+            "username": "influx",
+            "password": "influx123"
+          }
+        },
+        "writer": {
+          "name": "streamwriter",
+          "parameter": {
+            "print": "true"
+          }
+        }
+      }
+    ],
+    "setting": {
+      "speed": {
+        "bytes": -1,
+        "channel": 1
+      }
+    }
+  }
+}

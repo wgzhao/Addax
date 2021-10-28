@@ -1,0 +1,77 @@
+{
+  "job": {
+    "setting": {
+      "speed": {
+        "byte": -1,
+        "channel": 1
+      }
+    },
+    "content": [
+      {
+        "reader": {
+          "name": "streamreader",
+          "parameter": {
+            "column": [
+              {
+                "value": "addax",
+                "type": "string"
+              },
+              {
+                "value": 19890604,
+                "type": "long"
+              },
+              {
+                "value": "1989-06-04 00:00:00",
+                "type": "date"
+              },
+              {
+                "value": true,
+                "type": "bool"
+              },
+              {
+                "value": "test",
+                "type": "bytes"
+              }
+            ],
+            "sliceRecordCount": 1000
+          }
+        },
+        "writer": {
+          "name": "hdfswriter",
+          "parameter": {
+            "column": [
+              {
+                "name": "col1",
+                "type": "string"
+              },
+              {
+                "name": "col2",
+                "type": "int"
+              },
+              {
+                "name": "col3",
+                "type": "timestamp"
+              },
+              {
+                "name": "col4",
+                "type": "boolean"
+              },
+              {
+                "name": "col5",
+                "type": "string"
+              }
+            ],
+            "defaultFS": "hdfs://localhost:8020",
+            "path": "/tmp/out_orc",
+            "fileType": "orc",
+            "fieldDelimiter": "\u0001",
+            "compress": "SNAPPY",
+            "fileName": "test",
+            "writeMode": "overwrite",
+            "encoding": "UTF-8"
+          }
+        }
+      }
+    ]
+  }
+}

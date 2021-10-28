@@ -1,0 +1,62 @@
+{
+  "job": {
+    "content": [
+      {
+        "reader": {
+          "name": "streamreader",
+          "parameter": {
+            "column": [
+              {
+                "value": 1989060419890604.198906041,
+                "type": "double"
+              },
+              {
+                "value": "sssaaaa",
+                "type": "string"
+              }
+            ],
+            "sliceRecordCount": 100
+          }
+        },
+        "writer": {
+          "name": "hdfswriter",
+          "parameter": {
+            "column": [
+              {
+                "name": "col1",
+                "type": "decimal(38.9)"
+              },
+              {
+                "name": "col2",
+                "type": "string"
+              }
+            ],
+            "compress": "SNAPPY",
+            "defaultFS": "hdfs://sandbox",
+            "fieldDelimiter": "\t",
+            "fileName": "par",
+            "fileType": "par",
+            "path": "/tmp/addax_orc",
+            "writeMode": "overwrite",
+            "haveKerberos": "true",
+            "kerberosKeytabFilePath": "/etc/security/keytabs/hive.headless.keytab",
+            "kerberosPrincipal": "hive@SANDBOX.COM",
+            "hadoopConfig": {
+              "dfs.nameservices": "sandbox",
+              "dfs.ha.namenodes.sandbox": "nn1,nn2",
+              "dfs.namenode.rpc-address.sandbox.nn1": "hdp1.sandbox.com:8020",
+              "dfs.namenode.rpc-address.sandbox.nn2": "hdp2.sandbox.com:8020",
+              "dfs.client.failover.proxy.provider.sandbox": "org.apache.hadoop.hdfs.server.namenode.ha.ConfiguredFailoverProxyProvider"
+            }
+          }
+        }
+      }
+    ],
+    "setting": {
+      "speed": {
+        "bytes": -1,
+        "channel": 1
+      }
+    }
+  }
+}
