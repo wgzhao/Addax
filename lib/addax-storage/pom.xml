@@ -47,7 +47,7 @@
         </dependency>
 
         <dependency>
-            <groupId>io.prestosql.hadoop</groupId>
+            <groupId>io.trino.hadoop</groupId>
             <artifactId>hadoop-apache</artifactId>
             <version>${hadoop.version}</version>
         </dependency>

@@ -50,7 +50,7 @@
         </dependency>
 
         <dependency>
-            <groupId>io.prestosql.hadoop</groupId>
+            <groupId>io.trino.hadoop</groupId>
             <artifactId>hadoop-apache</artifactId>
             <version>${hadoop.version}</version>
             <exclusions>
@@ -66,7 +66,7 @@
         </dependency>
 
         <dependency>
-            <groupId>io.prestosql.hive</groupId>
+            <groupId>io.trino.hive</groupId>
             <artifactId>hive-apache</artifactId>
             <version>${hive.version}</version>
             <exclusions>
