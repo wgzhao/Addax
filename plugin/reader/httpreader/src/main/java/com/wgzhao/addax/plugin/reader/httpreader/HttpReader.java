@@ -112,11 +112,9 @@ public class HttpReader
     {
         private Configuration readerSliceConfig = null;
         private URIBuilder uriBuilder;
-        private HttpHost proxy = null;
-        private HttpClientContext context = null;
+        private final HttpClientContext context = HttpClientContext.create();
         private String username;
         private String password;
-        private String proxyAuth;
 
         @Override
         public void init()
@@ -124,8 +122,7 @@ public class HttpReader
             this.readerSliceConfig = this.getPluginJobConf();
             this.username = readerSliceConfig.getString(HttpKey.USERNAME, null);
             this.password = readerSliceConfig.getString(HttpKey.PASSWORD, null);
-            Configuration conn =
-                    readerSliceConfig.getListConfiguration(HttpKey.CONNECTION).get(0);
+            Configuration conn = readerSliceConfig.getListConfiguration(HttpKey.CONNECTION).get(0);
             uriBuilder = new URIBuilder(URI.create(conn.getString(HttpKey.URL)));
 
             if (conn.getString(HttpKey.PROXY, null) != null) {
@@ -133,8 +130,7 @@ public class HttpReader
                 createProxy(conn.getConfiguration(HttpKey.PROXY));
             }
 
-            Map<String, Object> requestParams =
-                    readerSliceConfig.getMap(HttpKey.REQUEST_PARAMETERS, new HashMap<>());
+            Map<String, Object> requestParams = readerSliceConfig.getMap(HttpKey.REQUEST_PARAMETERS, new HashMap<>());
             requestParams.forEach((k, v) -> uriBuilder.setParameter(k, v.toString()));
         }
 
@@ -244,12 +240,8 @@ public class HttpReader
         private void createProxy(Configuration proxyConf)
         {
             String host = proxyConf.getString(HttpKey.HOST);
-            this.proxyAuth = proxyConf.getString(HttpKey.AUTH);
             URI uri = URI.create(host);
-            this.context = HttpClientContext.create();
             this.context.setAttribute("proxy", uri);
-
-
         }
 
         private CloseableHttpResponse createCloseableHttpResponse(String method)
@@ -282,37 +274,27 @@ public class HttpReader
         private CloseableHttpClient createCloseableHttpClient()
         {
             HttpClientBuilder httpClientBuilder = HttpClients.custom();
-            CredentialsProvider provider = null;
-
-            Registry<ConnectionSocketFactory> reg = RegistryBuilder
-                    .<ConnectionSocketFactory>create()
-                    .register("http", new MyConnectionSocketFactory())
-                    .register("https", new MyConnectionSocketFactory())
-                    .build();
-            PoolingHttpClientConnectionManager cm = new PoolingHttpClientConnectionManager(reg);
-            httpClientBuilder.setConnectionManager(cm);
+            if (context.getAttribute("proxy") != null) {
+                Registry<ConnectionSocketFactory> reg = RegistryBuilder
+                        .<ConnectionSocketFactory>create()
+                        .register("http", new MyConnectionSocketFactory())
+                        .register("https", new MyConnectionSocketFactory())
+                        .build();
+                PoolingHttpClientConnectionManager cm = new PoolingHttpClientConnectionManager(reg);
+                httpClientBuilder.setConnectionManager(cm);
+            }
             if (this.password != null) {
-                httpClientBuilder = HttpClientBuilder.create();
                 // setup BasicAuth
-                provider = new BasicCredentialsProvider();
+                CredentialsProvider provider = new BasicCredentialsProvider();
                 // Create the authentication scope
-                HttpHost target = new HttpHost(uriBuilder.getHost(), uriBuilder.getPort());
+                HttpHost target = new HttpHost(uriBuilder.getHost(), uriBuilder.getPort(), uriBuilder.getScheme());
                 AuthScope scope = new AuthScope(target);
                 // Create credential pair
                 UsernamePasswordCredentials credentials = new UsernamePasswordCredentials(this.username, this.password);
                 // Inject the credentials
                 provider.setCredentials(scope, credentials);
                 // Set the default credentials provider
-            }
-
-            if (this.proxyAuth != null) {
-                String[] up = this.proxyAuth.split(":");
-                System.setProperty("java.net.socks.username", up[0]);
-                System.setProperty("http.proxyUser", up[0]);
-                if (up.length == 2) {
-                    System.setProperty("java.net.socks.password", up[1]);
-                    System.setProperty("http.proxyPassword", up[1]);
-                }
+                httpClientBuilder.setDefaultCredentialsProvider(provider);
             }
 
             httpClientBuilder.setSSLSocketFactory(ignoreSSLErrors());
@@ -333,7 +315,7 @@ public class HttpReader
                 // if you don't want to further weaken the security, you don't have to include this.
                 HostnameVerifier allowAllHosts = new NoopHostnameVerifier();
 
-                // create an SSL Socket Factory to use the SSLContext with the trust self signed certificate strategy
+                // create an SSL Socket Factory to use the SSLContext with the trust self-signed certificate strategy
                 // and allow all hosts verifier.
                 return new SSLConnectionSocketFactory(sslContext, allowAllHosts);
             }
@@ -351,7 +333,6 @@ public class HttpReader
 
         @Override
         public Socket createSocket(final HttpContext context)
-                throws IOException
         {
             Proxy proxy = null;
             URI uri = (URI) context.getAttribute("proxy");
@@ -369,7 +350,8 @@ public class HttpReader
             }
             if (proxy == null) {
                 return null;
-            } else {
+            }
+            else {
                 return new Socket(proxy);
             }
         }
