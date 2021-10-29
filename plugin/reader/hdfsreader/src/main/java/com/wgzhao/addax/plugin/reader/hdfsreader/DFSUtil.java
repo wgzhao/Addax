@@ -21,6 +21,8 @@ package com.wgzhao.addax.plugin.reader.hdfsreader;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
+import com.google.common.primitives.Ints;
+import com.google.common.primitives.Longs;
 import com.wgzhao.addax.common.base.Key;
 import com.wgzhao.addax.common.element.BoolColumn;
 import com.wgzhao.addax.common.element.BytesColumn;
@@ -71,6 +73,7 @@ import org.apache.parquet.avro.AvroParquetReader;
 import org.apache.parquet.example.data.Group;
 import org.apache.parquet.hadoop.ParquetReader;
 import org.apache.parquet.hadoop.example.GroupReadSupport;
+import org.apache.parquet.io.api.Binary;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -85,6 +88,7 @@ import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.concurrent.TimeUnit;
 
 import static com.wgzhao.addax.common.base.Key.COLUMN;
 import static com.wgzhao.addax.common.base.Key.NULL_FORMAT;
@@ -94,6 +98,12 @@ import static com.wgzhao.addax.common.base.Key.NULL_FORMAT;
  */
 public class DFSUtil
 {
+
+    // the offset of julian, 2440588 is 1970/1/1
+    private static final int JULIAN_EPOCH_OFFSET_DAYS = 2440588;
+    private static final long MILLIS_IN_DAY = TimeUnit.DAYS.toMillis(1);
+    private static final long NANOS_PER_MILLISECOND = TimeUnit.MILLISECONDS.toNanos(1);
+
     public static final String HDFS_DEFAULT_KEY = "fs.defaultFS";
     public static final String HADOOP_SECURITY_AUTHENTICATION_KEY = "hadoop.security.authentication";
     private static final Logger LOG = LoggerFactory.getLogger(DFSUtil.class);
@@ -463,6 +473,7 @@ public class DFSUtil
         boolean isReadAllColumns = null == column || column.isEmpty();
         // 判断是否读取所有列
 
+        hadoopConf.set("parquet.avro.readInt96AsFixed", "true");
         JobConf conf = new JobConf(hadoopConf);
 
         GenericData decimalSupport = new GenericData();
@@ -492,7 +503,8 @@ public class DFSUtil
                     stype = type.getProp("logicalType") != null ? type.getProp("logicalType") : type.getType().getName();
                     if (stype.startsWith("timestamp")) {
                         columnEntry.setType("timestamp");
-                    } else{
+                    }
+                    else {
                         columnEntry.setType(stype);
                     }
                     column.add(columnEntry);
@@ -569,7 +581,8 @@ public class DFSUtil
                         case DECIMAL:
                             if (null == columnValue) {
                                 columnGenerated = new DoubleColumn((Double) null);
-                            } else {
+                            }
+                            else {
                                 columnGenerated = new DoubleColumn(new BigDecimal(columnValue).setScale(scale, BigDecimal.ROUND_HALF_UP));
                             }
                             break;
@@ -598,6 +611,12 @@ public class DFSUtil
                         case TIMESTAMP:
                             if (null == columnValue) {
                                 columnGenerated = new DateColumn();
+                            }
+                            else if (columnValue.startsWith("[")) {
+                                // INT96 https://github.com/apache/parquet-mr/pull/901
+                                GenericData.Fixed fixed = (GenericData.Fixed) gRecord.get(columnIndex);
+                                Date date = new Date(getTimestampMills(fixed.bytes()));
+                                columnGenerated = new DateColumn(date);
                             }
                             else {
                                 columnGenerated = new DateColumn(Long.parseLong(columnValue) * 1000);
@@ -766,7 +785,7 @@ public class DFSUtil
         // the version that was included with the original magic, which is mapped
         // into ORIGINAL_VERSION
         final byte ORIGINAL_MAGIC_VERSION_WITH_METADATA = 6;
-        // All of the versions should be place in this list.
+        // All the versions should be place in this list.
         final int ORIGINAL_VERSION = 0;  // version with SEQ
         // version with RCF
         // final int NEW_MAGIC_VERSION = 1
@@ -855,6 +874,37 @@ public class DFSUtil
             LOG.info("检查文件类型: [{}] 不是Parquet File.", file);
         }
         return false;
+    }
+
+    /**
+     * Returns GMT's timestamp from binary encoded parquet timestamp (12 bytes - julian date + time of day nanos).
+     *
+     * @param timestampBinary INT96 parquet timestamp
+     * @return timestamp in millis, GMT timezone
+     */
+    public static long getTimestampMillis(Binary timestampBinary)
+    {
+        if (timestampBinary.length() != 12) {
+            return 0;
+        }
+        byte[] bytes = timestampBinary.getBytes();
+
+        return getTimestampMills(bytes);
+    }
+
+    public static long getTimestampMills(byte[] bytes)
+    {
+        assert bytes.length == 12;
+        // little endian encoding - need to invert byte order
+        long timeOfDayNanos = Longs.fromBytes(bytes[7], bytes[6], bytes[5], bytes[4], bytes[3], bytes[2], bytes[1], bytes[0]);
+        int julianDay = Ints.fromBytes(bytes[11], bytes[10], bytes[9], bytes[8]);
+
+        return julianDayToMillis(julianDay) + (timeOfDayNanos / NANOS_PER_MILLISECOND);
+    }
+
+    private static long julianDayToMillis(int julianDay)
+    {
+        return (julianDay - JULIAN_EPOCH_OFFSET_DAYS) * MILLIS_IN_DAY;
     }
 
     private enum Type
