@@ -205,15 +205,7 @@ public class HttpReader
                         columns.add(obj.toString());
                     }
                 }
-                // first, check key exists or not ?
-                for (String k : columns) {
-                    if (!jsonObject.containsKey(k)) {
-                        throw AddaxException.asAddaxException(
-                                HttpReaderErrorCode.ILLEGAL_VALUE,
-                                "您尝试从结果中获取key为 '" + k + "'的结果，但实际结果中不存在该key值"
-                        );
-                    }
-                }
+
                 for (int i = 0; i < jsonArray.size(); i++) {
                     jsonObject = jsonArray.getJSONObject(i);
                     record = recordSender.createRecord();
