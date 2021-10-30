@@ -21,12 +21,14 @@ package com.wgzhao.addax.plugin.writer.streamwriter;
 
 import com.wgzhao.addax.common.base.Key;
 
-public final class StreamKey extends Key
+public final class StreamKey
+        extends Key
 {
     public static final String FIELD_DELIMITER = "fieldDelimiter";
     public static final String PRINT = "print";
     public static final String RECORD_NUM_BEFORE_SLEEP = "recordNumBeforeSleep";
     public static final String SLEEP_TIME = "sleepTime";
+    public static final String NULL_FLAG = "NULL";
 
     private StreamKey() {}
 }
