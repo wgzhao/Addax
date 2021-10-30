@@ -160,9 +160,8 @@ public class StreamWriter
     public static class Task
             extends Writer.Task
     {
-        private static final Logger LOG = LoggerFactory
-                .getLogger(Task.class);
-
+        private static final Logger LOG = LoggerFactory.getLogger(Task.class);
+        private static final String NULL_FLAG = "NULL";
         private static final String NEWLINE_FLAG = System.getProperty("line.separator", "\n");
 
         private String fieldDelimiter;
@@ -174,19 +173,21 @@ public class StreamWriter
         private long recordNumBeforeSleep;
         private long sleepTime;
 
+        private String nullFormat;
+
         @Override
         public void init()
         {
             Configuration writerSliceConfig = getPluginJobConf();
 
-            this.fieldDelimiter = writerSliceConfig.getString(
-                    StreamKey.FIELD_DELIMITER, "\t");
+            this.fieldDelimiter = writerSliceConfig.getString(StreamKey.FIELD_DELIMITER, "\t");
             this.print = writerSliceConfig.getBool(StreamKey.PRINT, true);
 
             this.path = writerSliceConfig.getString(StreamKey.PATH, null);
             this.fileName = writerSliceConfig.getString(StreamKey.FILE_NAME, null);
             this.recordNumBeforeSleep = writerSliceConfig.getLong(StreamKey.RECORD_NUM_BEFORE_SLEEP, 0);
             this.sleepTime = writerSliceConfig.getLong(StreamKey.SLEEP_TIME, 0);
+            this.nullFormat = writerSliceConfig.getString(StreamKey.NULL_FORMAT, NULL_FLAG);
             if (recordNumBeforeSleep < 0) {
                 throw AddaxException.asAddaxException(StreamWriterErrorCode.CONFIG_INVALID_EXCEPTION, "recordNumber 不能为负值");
             }
@@ -210,8 +211,7 @@ public class StreamWriter
             }
             else if (this.print) {
                 try {
-                    BufferedWriter writer = new BufferedWriter(
-                            new OutputStreamWriter(System.out, StandardCharsets.UTF_8));
+                    BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(System.out, StandardCharsets.UTF_8));
 
                     Record record;
                     while ((record = recordReceiver.getFromReader()) != null) {
@@ -283,8 +283,12 @@ public class StreamWriter
             StringBuilder sb = new StringBuilder();
             for (int i = 0; i < recordLength; i++) {
                 column = record.getColumn(i);
-                if (column != null && column.getRawData() != null){
+                if (column != null && column.getRawData() != null) {
                     sb.append(column.asString());
+                }
+                else {
+                    // use NULL FLAG to replace null value
+                    sb.append(nullFormat);
                 }
                 sb.append(fieldDelimiter);
             }

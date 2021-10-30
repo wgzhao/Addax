@@ -9,12 +9,15 @@ StreamWriter 是一个将数据写入内存的插件，一般用来将获取到�
   "name": "streamwriter",
   "parameter": {
     "encoding": "UTF-8",
-    "print": true
+    "print": true,
+    "nullFormat": "NULL"
   }
 }
 ```
 
-上述配置会将获取的数据直接打印到终端。 该插件也支持将数据写入到文件，配置如下：
+上述配置会将获取的数据直接打印到终端。 其中 `nullFormat` 用来指定当值为空时，如何在终端表示，默认是字符串 `NULL`, 如果不想打印空值，可以将其设置为 `""`。
+
+该插件也支持将数据写入到文件，配置如下：
 
 ```json
 {
