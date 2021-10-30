@@ -92,6 +92,78 @@ bin/addax.sh job/httpreader2stream.json
 
 `host` 是代理地址，包含代理类型，目前仅支持 `http` 代理和 `socks`(V4, V5均可) 代理。 如果代理需要认证，则可以配置  `auth` , 它由 用户名和密码组成，两者之间用冒号(:) 隔开。
 
+### column
+
+`column` 除了直接指定 key 之外，还允许用 JSON Xpath 风格来指定需要获取的 key 值，假定你要读取的 JSON 文件如下：
+
+```json
+{
+  "result": [
+    {
+      "CURR_DATE": "2019-12-09",
+      "DEPT": {
+        "ID": "9700"
+      },
+      "KK": [
+        {
+          "COL1": 1
+        },
+        {
+          "COL2": 2
+        }
+      ]
+    },
+    {
+      "CURR_DATE": "2021-11-09",
+      "DEPT": {
+        "ID": "6500"
+      },
+      "KK": [
+        {
+          "COL1": 3
+        },
+        {
+          "COL2": 4
+        }
+      ]
+    }
+  ]
+}
+```
+
+我们希望把 `CURR_DATE`, `ID`, `COL1`, `COL2` 当作四个字段读取，那么你的 `column` 可以这样配置：
+
+```json
+{
+  "column": ["CURR_DATE","DEPT.ID", "KK[0].COL1", "KK[1].COL2"]
+}
+```
+
+其执行结果如下：
+
+```shell
+...
+2021-10-30 14:01:50.273 [ taskGroup-0] INFO  Channel              - Channel set record_speed_limit to -1, No tps activated.
+
+2019-12-09	9700	1	2
+2021-11-09	6500	3	4
+
+2021-10-30 14:01:53.283 [       job-0] INFO  AbstractScheduler    - Scheduler accomplished all tasks.
+2021-10-30 14:01:53.284 [       job-0] INFO  JobContainer         - Addax Writer.Job [streamwriter] do post work.
+2021-10-30 14:01:53.284 [       job-0] INFO  JobContainer         - Addax Reader.Job [httpreader] do post work.
+2021-10-30 14:01:53.286 [       job-0] INFO  JobContainer         - PerfTrace not enable!
+2021-10-30 14:01:53.289 [       job-0] INFO  JobContainer         -
+任务启动时刻                    : 2021-10-30 14:01:50
+任务结束时刻                    : 2021-10-30 14:01:53
+任务总计耗时                    :                  3s
+任务平均流量                    :               10B/s
+记录写入速度                    :              0rec/s
+读出记录总数                    :                   2
+读写失败总数                    :                   0
+```
+
+注意： 如果你指定了不存在的 Key，则直接返回为 NULL 值。
+
 ## 限制说明
 
 1. 返回的结果必须是JSON类型
