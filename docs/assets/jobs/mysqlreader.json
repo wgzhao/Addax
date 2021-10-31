@@ -6,36 +6,34 @@
         "bytes": -1
       }
     },
-    "content": [
-      {
-        "reader": {
-          "name": "mysqlreader",
-          "parameter": {
-            "username": "root",
-            "password": "root",
-            "column": [
-              "*"
-            ],
-            "connection": [
-              {
-                "table": [
-                  "addax_reader"
-                ],
-                "jdbcUrl": [
-                  "jdbc:mysql://127.0.0.1:3306/test"
-                ],
-                "driver": "com.mysql.jdbc.Driver"
-              }
-            ]
-          }
-        },
-        "writer": {
-          "name": "streamwriter",
-          "parameter": {
-            "print": true
-          }
+    "content": {
+      "reader": {
+        "name": "mysqlreader",
+        "parameter": {
+          "username": "root",
+          "password": "root",
+          "column": [
+            "*"
+          ],
+          "connection": [
+            {
+              "table": [
+                "addax_reader"
+              ],
+              "jdbcUrl": [
+                "jdbc:mysql://127.0.0.1:3306/test"
+              ],
+              "driver": "com.mysql.jdbc.Driver"
+            }
+          ]
+        }
+      },
+      "writer": {
+        "name": "streamwriter",
+        "parameter": {
+          "print": true
         }
       }
-    ]
+    }
   }
 }

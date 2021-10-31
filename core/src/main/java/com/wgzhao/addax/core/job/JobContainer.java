@@ -421,7 +421,7 @@ public class JobContainer
             long globalLimitedByteSpeed = this.configuration.getInt(CoreConstant.JOB_SETTING_SPEED_BYTE, 10 * 1024 * 1024);
 
             // 在byte流控情况下，单个Channel流量最大值必须设置，否则报错！
-            Long channelLimitedByteSpeed = this.configuration.getLong(CoreConstant.CORE_TRANSPORT_CHANNEL_SPEED_BYTE);
+            Long channelLimitedByteSpeed = this.configuration.getLong(CoreConstant.CORE_TRANSPORT_CHANNEL_SPEED_BYTE,-1);
             if (channelLimitedByteSpeed == null || channelLimitedByteSpeed <= 0) {
                 throw AddaxException.asAddaxException(
                         FrameworkErrorCode.CONFIG_ERROR,
@@ -455,14 +455,20 @@ public class JobContainer
             return;
         }
 
-        boolean isChannelLimit = (this.configuration.getInt(CoreConstant.JOB_SETTING_SPEED_CHANNEL, 0) > 0);
-        if (isChannelLimit) {
-            this.needChannelNumber = this.configuration.getInt(CoreConstant.JOB_SETTING_SPEED_CHANNEL);
-            LOG.info("Job set Channel-Number to {} channels.", this.needChannelNumber);
-            return;
+        this.needChannelNumber = this.configuration.getInt(CoreConstant.JOB_SETTING_SPEED_CHANNEL, 1);
+        if (this.needChannelNumber <= 0) {
+            this.needChannelNumber = 1;
         }
+        LOG.info("Job set Channel-Number to {} channel(s).", this.needChannelNumber);
+//        return;
+//        boolean isChannelLimit = (this.configuration.getInt(CoreConstant.JOB_SETTING_SPEED_CHANNEL, 1) > 0);
+//        if (isChannelLimit) {
+//            this.needChannelNumber = this.configuration.getInt(CoreConstant.JOB_SETTING_SPEED_CHANNEL, 1);
+//            LOG.info("Job set Channel-Number to {} channels.", this.needChannelNumber);
+//            return;
+//        }
 
-        throw AddaxException.asAddaxException(FrameworkErrorCode.CONFIG_ERROR, "Job运行速度必须设置");
+//        throw AddaxException.asAddaxException(FrameworkErrorCode.CONFIG_ERROR, "Job运行速度必须设置");
     }
 
     /*

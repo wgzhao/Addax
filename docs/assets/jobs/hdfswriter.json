@@ -6,71 +6,69 @@
         "bytes": -1
       }
     },
-    "content": [
-      {
-        "reader": {
-          "name": "streamreader",
+    "content": {
+      "reader": {
+        "name": "streamreader",
+        "parameter": {
+          "column": [
+            {
+              "value": "Addax",
+              "type": "string"
+            },
+            {
+              "value": 19890604,
+              "type": "long"
+            },
+            {
+              "value": "1989-06-04 00:00:00",
+              "type": "date"
+            },
+            {
+              "value": true,
+              "type": "bool"
+            },
+            {
+              "value": "test",
+              "type": "bytes"
+            }
+          ],
+          "sliceRecordCount": 1000
+        },
+        "writer": {
+          "name": "hdfswriter",
           "parameter": {
+            "defaultFS": "hdfs://xxx:port",
+            "fileType": "orc",
+            "path": "/user/hive/warehouse/writerorc.db/orcfull",
+            "fileName": "xxxx",
             "column": [
               {
-                "value": "Addax",
+                "name": "col1",
                 "type": "string"
               },
               {
-                "value": 19890604,
-                "type": "long"
+                "name": "col2",
+                "type": "int"
               },
               {
-                "value": "1989-06-04 00:00:00",
-                "type": "date"
+                "name": "col3",
+                "type": "string"
               },
               {
-                "value": true,
-                "type": "bool"
+                "name": "col4",
+                "type": "boolean"
               },
               {
-                "value": "test",
-                "type": "bytes"
+                "name": "col5",
+                "type": "string"
               }
             ],
-            "sliceRecordCount": 1000
-          },
-          "writer": {
-            "name": "hdfswriter",
-            "parameter": {
-              "defaultFS": "hdfs://xxx:port",
-              "fileType": "orc",
-              "path": "/user/hive/warehouse/writerorc.db/orcfull",
-              "fileName": "xxxx",
-              "column": [
-                {
-                  "name": "col1",
-                  "type": "string"
-                },
-                {
-                  "name": "col2",
-                  "type": "int"
-                },
-                {
-                  "name": "col3",
-                  "type": "string"
-                },
-                {
-                  "name": "col4",
-                  "type": "boolean"
-                },
-                {
-                  "name": "col5",
-                  "type": "string"
-                }
-              ],
-              "writeMode": "overwrite",
-              "fieldDelimiter": "\u0001",
-              "compress": "SNAPPY"
-            }
+            "writeMode": "overwrite",
+            "fieldDelimiter": "\u0001",
+            "compress": "SNAPPY"
           }
         }
       }
-    ]
+    }
   }
 }

@@ -6,41 +6,44 @@
         "bytes": -1
       }
     },
-    "content": [
-      {
-        "reader": {
-          "name": "httpreader",
-          "parameter": {
-            "connection": [
-              {
-                "url": "http://127.0.0.1:9090/mock/17/LDJSC/ASSET",
-                "proxy": {
-                    "host": "http://127.0.0.1:3128",
-                    "auth": "user:pass"
-                }
+    "content": {
+      "reader": {
+        "name": "httpreader",
+        "parameter": {
+          "connection": [
+            {
+              "url": "http://127.0.0.1:9090/mock/17/LDJSC/ASSET",
+              "proxy": {
+                "host": "http://127.0.0.1:3128",
+                "auth": "user:pass"
               }
-            ],
-            "reqParams": {
-              "CURR_DATE":"2021-01-18",
-              "DEPT":"9700"
-            },
-            "resultKey":"result",
-            "method": "GET",
-            "column": ["CURR_DATE","DEPT","TOTAL_MANAGED_MARKET_VALUE","TOTAL_MANAGED_MARKET_VALUE_GROWTH"],
-            "username": "user",
-            "password": "passw0rd",
-            "headers": {
-                "X-Powered-by": "Addax"
             }
-          }
-        },
-        "writer": {
-          "name": "streamwriter",
-          "parameter": {
-            "print": "true"
+          ],
+          "reqParams": {
+            "CURR_DATE": "2021-01-18",
+            "DEPT": "9700"
+          },
+          "resultKey": "result",
+          "method": "GET",
+          "column": [
+            "CURR_DATE",
+            "DEPT",
+            "TOTAL_MANAGED_MARKET_VALUE",
+            "TOTAL_MANAGED_MARKET_VALUE_GROWTH"
+          ],
+          "username": "user",
+          "password": "passw0rd",
+          "headers": {
+            "X-Powered-by": "Addax"
           }
         }
+      },
+      "writer": {
+        "name": "streamwriter",
+        "parameter": {
+          "print": "true"
+        }
       }
-    ]
+    }
   }
 }

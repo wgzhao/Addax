@@ -17,8 +17,7 @@ fi
 CLASS_PATH=".:/etc/hbase/conf:${ADDAX_HOME}/lib/*"
 LOGBACK_FILE="${ADDAX_HOME}/conf/logback.xml"
 DEFAULT_JVM="-Xms64m -Xmx2g -XX:+HeapDumpOnOutOfMemoryError -XX:HeapDumpPath=${ADDAX_HOME}"
-DEFAULT_PROPERTY_CONF="-Dfile.encoding=UTF-8 -Dlogback.statusListenerClass=ch.qos.logback.core.status.NopStatusListener \
-                        -Djava.security.egd=file:///dev/urandom -Daddax.home=${ADDAX_HOME} \
+DEFAULT_PROPERTY_CONF="-Dfile.encoding=UTF-8 -Djava.security.egd=file:///dev/urandom -Daddax.home=${ADDAX_HOME} \
                         -Dlogback.configurationFile=${LOGBACK_FILE} "
 ENGINE_COMMAND="java -server ${DEFAULT_JVM} ${DEFAULT_PROPERTY_CONF} -classpath ${CLASS_PATH}  "
 REMOTE_DEBUG_CONFIG="-Xdebug -Xrunjdwp:transport=dt_socket,server=y,address=0.0.0.0:9999"
@@ -40,8 +39,8 @@ function usage {
     Options:
     -h, --help                  This help text
     -v, --version               Show version number and quit
-    -j, --jvm <jvm parameters>  Set extral java jvm parameters if necessary.
-    -p, --params <parameter>    Set job parameter, eg: the item 'tableName' which you want to specifyt by command, 
+    -j, --jvm <jvm parameters>  Set extra java jvm parameters if necessary.
+    -p, --params <parameter>    Set job parameter, eg: the item 'tableName' which you want to specify by command,
                                 you can use pass -p"-DtableName=your-table-name".
                                 If you want to multiple parameters, you can pass
                                 -p"-DtableName=your-table-name -DcolumnName=your-column-name".

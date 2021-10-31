@@ -21,7 +21,6 @@
     },
     "transport": {
       "channel": {
-        "class": "com.wgzhao.addax.core.transport.channel.memory.MemoryChannel",
         "speed": {
           "byte": -1,
           "record": -1
@@ -29,10 +28,6 @@
         "flowControlInterval": 20,
         "capacity": 512,
         "byteCapacity": 67108864
-      },
-      "exchanger": {
-        "class": "com.wgzhao.addax.core.plugin.BufferedRecordExchanger",
-        "bufferSize": 32
       }
     },
     "container": {
@@ -42,17 +37,6 @@
       },
       "taskGroup": {
         "channel": 5
-      },
-      "trace": {
-        "enable": "false"
-      }
-    },
-    "statistics": {
-      "collector": {
-        "plugin": {
-          "taskClass": "com.wgzhao.addax.core.statistics.plugin.task.StdoutPluginCollector",
-          "maxDirtyNumber": 10
-        }
       }
     }
   }

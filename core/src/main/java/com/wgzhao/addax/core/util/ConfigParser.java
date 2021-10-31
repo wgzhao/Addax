@@ -51,6 +51,8 @@ public final class ConfigParser
     {
         Configuration configuration = ConfigParser.parseJobConfig(jobPath);
 
+        // Upgrade the new job format to the old one
+        configuration = upgradeJobConfig(configuration);
         //validate job json
         validateJob(configuration);
 
@@ -87,6 +89,26 @@ public final class ConfigParser
             configuration.merge(parsePluginConfig(new ArrayList<>(pluginList)), false);
         }
 
+        return configuration;
+    }
+
+    /**
+     * Upgrade the new job format to the old one
+     * 1. the content of job.json is a map instead of list of map
+     * @param configuration {@link Configuration}
+     * @return {@link Configuration}
+     */
+    private static Configuration upgradeJobConfig(Configuration configuration)
+    {
+        String content = configuration.getString("job.content");
+        if (content.startsWith("[")) {
+            // get the first element
+            List<Map> contentList = configuration.getList(CoreConstant.JOB_CONTENT, Map.class);
+            if (contentList!= null && contentList.size() > 0) {
+                configuration.set("job.content", contentList.get(0));
+                return configuration;
+            }
+        }
         return configuration;
     }
 
@@ -220,16 +242,11 @@ public final class ConfigParser
 
     private static void validateJob(Configuration conf)
     {
-        final List<Map> content = conf.getList(CoreConstant.JOB_CONTENT, Map.class);
+        final Map content = conf.getMap(CoreConstant.JOB_CONTENT);
 
         if (content== null || content.isEmpty()) {
             throw AddaxException.asAddaxException(FrameworkErrorCode.JOB_ERROR,
                     "The configuration item '" + CoreConstant.JOB_CONTENT +  "' is required");
-        }
-
-        if (content.size() > 1) {
-            throw AddaxException.asAddaxException(FrameworkErrorCode.JOB_ERROR,
-                    "The configuration item '" + CoreConstant.JOB_CONTENT +  "' ONLY  include ONE sub-item ");
         }
 
         if (null == conf.get(CoreConstant.JOB_CONTENT_READER) ) {

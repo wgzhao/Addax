@@ -30,8 +30,8 @@ public class CoreConstant
 {
     // --------------------------- 全局使用的变量(最好按照逻辑顺序，调整下成员变量顺序)
     // --------------------------------
-    public static final String JOB_CONTENT_WRITER_PARAMETER_JOB_ID = "job.content[0].writer.parameter.jobid";
-    public static final String JOB_CONTENT_READER_PARAMETER_JOB_ID = "job.content[0].reader.parameter.jobid";
+    public static final String JOB_CONTENT_WRITER_PARAMETER_JOB_ID = "job.content.writer.parameter.jobid";
+    public static final String JOB_CONTENT_READER_PARAMETER_JOB_ID = "job.content.reader.parameter.jobid";
     public static final String CORE_CONTAINER_TASK_GROUP_CHANNEL = "core.container.taskGroup.channel";
 
     public static final String CORE_CONTAINER_JOB_ID = "core.container.job.id";
@@ -78,23 +78,23 @@ public class CoreConstant
 
     public static final String CORE_STATISTICS_COLLECTOR_PLUGIN_MAX_DIRTY_NUMBER = "core.statistics.collector.plugin.maxDirtyNumber";
 
-    public static final String JOB_CONTENT_READER_NAME = "job.content[0].reader.name";
+    public static final String JOB_CONTENT_READER_NAME = "job.content.reader.name";
 
-    public static final String JOB_CONTENT_READER = "job.content[0].reader";
+    public static final String JOB_CONTENT_READER = "job.content.reader";
 
-    public static final String JOB_CONTENT_READER_PARAMETER = "job.content[0].reader.parameter";
+    public static final String JOB_CONTENT_READER_PARAMETER = "job.content.reader.parameter";
 
-    public static final String JOB_CONTENT_WRITER_NAME = "job.content[0].writer.name";
+    public static final String JOB_CONTENT_WRITER_NAME = "job.content.writer.name";
 
-    public static final String JOB_CONTENT_WRITER = "job.content[0].writer";
+    public static final String JOB_CONTENT_WRITER = "job.content.writer";
 
-    public static final String JOB_CONTENT_WRITER_PARAMETER = "job.content[0].writer.parameter";
+    public static final String JOB_CONTENT_WRITER_PARAMETER = "job.content.writer.parameter";
 
     public static final String JOB_JOB_INFO = "job.jobInfo";
 
     public static final String JOB_CONTENT = "job.content";
 
-    public static final String JOB_CONTENT_TRANSFORMER = "job.content[0].transformer";
+    public static final String JOB_CONTENT_TRANSFORMER = "job.content.transformer";
 
     public static final String JOB_SETTING_SPEED_BYTE = "job.setting.speed.byte";
 
@@ -116,7 +116,7 @@ public class CoreConstant
 
     public static final String JOB_POST_HANDLER_PLUGIN_NAME = "job.postHandler.pluginName";
 
-    public static final String JOB_CONTENT_WRITER_PATH = "job.content[0].writer.parameter.path";
+    public static final String JOB_CONTENT_WRITER_PATH = "job.content.writer.parameter.path";
     // ----------------------------- 局部使用的变量
     public static final String JOB_WRITER = " ";
 

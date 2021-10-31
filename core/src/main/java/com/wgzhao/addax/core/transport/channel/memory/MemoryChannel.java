@@ -56,7 +56,7 @@ public class MemoryChannel
     {
         super(configuration);
         this.queue = new ArrayBlockingQueue<>(this.getCapacity());
-        this.bufferSize = configuration.getInt(CoreConstant.CORE_TRANSPORT_EXCHANGER_BUFFER_SIZE);
+        this.bufferSize = configuration.getInt(CoreConstant.CORE_TRANSPORT_EXCHANGER_BUFFER_SIZE, 32);
 
         lock = new ReentrantLock();
         notInsufficient = lock.newCondition();
