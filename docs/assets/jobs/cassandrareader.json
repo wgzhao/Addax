@@ -6,50 +6,48 @@
         "bytes": -1
       }
     },
-    "content": [
-      {
-        "reader": {
-          "name": "cassandrareader",
-          "parameter": {
-            "host": "localhost",
-            "port": 9042,
-            "useSSL": false,
-            "keyspace": "test",
-            "table": "addax_src",
-            "column": [
-              "textCol",
-              "blobCol",
-              "writetime(blobCol)",
-              "boolCol",
-              "smallintCol",
-              "tinyintCol",
-              "intCol",
-              "bigintCol",
-              "varintCol",
-              "floatCol",
-              "doubleCol",
-              "decimalCol",
-              "dateCol",
-              "timeCol",
-              "timeStampCol",
-              "uuidCol",
-              "inetCol",
-              "durationCol",
-              "listCol",
-              "mapCol",
-              "setCol",
-              "tupleCol",
-              "udtCol"
-            ]
-          }
-        },
-        "writer": {
-          "name": "streamwriter",
-          "parameter": {
-            "print": true
-          }
+    "content": {
+      "reader": {
+        "name": "cassandrareader",
+        "parameter": {
+          "host": "localhost",
+          "port": 9042,
+          "useSSL": false,
+          "keyspace": "test",
+          "table": "addax_src",
+          "column": [
+            "textCol",
+            "blobCol",
+            "writetime(blobCol)",
+            "boolCol",
+            "smallintCol",
+            "tinyintCol",
+            "intCol",
+            "bigintCol",
+            "varintCol",
+            "floatCol",
+            "doubleCol",
+            "decimalCol",
+            "dateCol",
+            "timeCol",
+            "timeStampCol",
+            "uuidCol",
+            "inetCol",
+            "durationCol",
+            "listCol",
+            "mapCol",
+            "setCol",
+            "tupleCol",
+            "udtCol"
+          ]
+        }
+      },
+      "writer": {
+        "name": "streamwriter",
+        "parameter": {
+          "print": true
         }
       }
-    ]
+    }
   }
 }

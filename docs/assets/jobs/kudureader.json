@@ -9,27 +9,25 @@
         "percentage": 0.02
       }
     },
-    "content": [
-      {
-        "reader": {
-          "name": "kudureader",
-          "parameter": {
-            "masterAddress": "localhost:7051,localhost:7151,localhost:7251",
-            "table": "users",
-            "splitPk": "user_id",
-            "lowerBound": 1,
-            "upperBound": 100,
-            "readTimeout": 5,
-            "scanTimeout": 10
-          }
-        },
-        "writer": {
-          "name": "streamwriter",
-          "parameter": {
-            "print": true
-          }
+    "content": {
+      "reader": {
+        "name": "kudureader",
+        "parameter": {
+          "masterAddress": "localhost:7051,localhost:7151,localhost:7251",
+          "table": "users",
+          "splitPk": "user_id",
+          "lowerBound": 1,
+          "upperBound": 100,
+          "readTimeout": 5,
+          "scanTimeout": 10
+        }
+      },
+      "writer": {
+        "name": "streamwriter",
+        "parameter": {
+          "print": true
         }
       }
-    ]
+    }
   }
 }

@@ -65,8 +65,7 @@ public class BufferedRecordTransformerExchanger
         this.channel = channel;
         Configuration configuration = channel.getConfiguration();
 
-        this.bufferSize = configuration
-                .getInt(CoreConstant.CORE_TRANSPORT_EXCHANGER_BUFFER_SIZE);
+        this.bufferSize = configuration.getInt(CoreConstant.CORE_TRANSPORT_EXCHANGER_BUFFER_SIZE, 32);
         this.buffer = new ArrayList<>(bufferSize);
 
         //channel的queue默认大小为8M，原来为64M

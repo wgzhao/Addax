@@ -36,10 +36,12 @@ import com.wgzhao.addax.core.statistics.communication.CommunicationTool;
 import com.wgzhao.addax.core.statistics.communication.LocalTGCommunicationManager;
 import com.wgzhao.addax.core.statistics.container.communicator.taskgroup.StandaloneTGContainerCommunicator;
 import com.wgzhao.addax.core.statistics.plugin.task.AbstractTaskPluginCollector;
+import com.wgzhao.addax.core.statistics.plugin.task.StdoutPluginCollector;
 import com.wgzhao.addax.core.taskgroup.runner.AbstractRunner;
 import com.wgzhao.addax.core.taskgroup.runner.ReaderRunner;
 import com.wgzhao.addax.core.taskgroup.runner.WriterRunner;
 import com.wgzhao.addax.core.transport.channel.Channel;
+import com.wgzhao.addax.core.transport.channel.memory.MemoryChannel;
 import com.wgzhao.addax.core.transport.exchanger.BufferedRecordExchanger;
 import com.wgzhao.addax.core.transport.exchanger.BufferedRecordTransformerExchanger;
 import com.wgzhao.addax.core.transport.transformer.TransformerExecution;
@@ -94,8 +96,8 @@ public class TaskGroupContainer
 
         this.jobId = this.configuration.getLong(CoreConstant.CORE_CONTAINER_JOB_ID);
         this.taskGroupId = this.configuration.getInt(CoreConstant.CORE_CONTAINER_TASK_GROUP_ID);
-        this.channelClazz = this.configuration.getString(CoreConstant.CORE_TRANSPORT_CHANNEL_CLASS);
-        this.taskCollectorClass = this.configuration.getString(CoreConstant.CORE_STATISTICS_COLLECTOR_PLUGIN_TASK_CLASS);
+        this.channelClazz = this.configuration.getString(CoreConstant.CORE_TRANSPORT_CHANNEL_CLASS, MemoryChannel.class.getName());
+        this.taskCollectorClass = this.configuration.getString(CoreConstant.CORE_STATISTICS_COLLECTOR_PLUGIN_TASK_CLASS, StdoutPluginCollector.class.getName());
     }
 
     private void initCommunicator(Configuration configuration)
@@ -125,7 +127,7 @@ public class TaskGroupContainer
             long reportIntervalInMillSec = this.configuration.getLong(CoreConstant.CORE_CONTAINER_TASK_GROUP_REPORT_INTERVAL, 10000);
 
             // 获取channel数目
-            int channelNumber = this.configuration.getInt(CoreConstant.CORE_CONTAINER_TASK_GROUP_CHANNEL);
+            int channelNumber = this.configuration.getInt(CoreConstant.CORE_CONTAINER_TASK_GROUP_CHANNEL, 1);
 
             int taskMaxRetryTimes = this.configuration.getInt(CoreConstant.CORE_CONTAINER_TASK_FAIL_OVER_MAX_RETRY_TIMES, 1);
 
