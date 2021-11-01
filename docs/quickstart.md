@@ -20,7 +20,7 @@
     git clone https://github.com/wgzhao/addax.git
     cd addax
     git checkout 4.0.2
-    mvn clean package -pl '!:addax-docs'
+    mvn clean package 
     mvn package assembly:single
     cd target/addax/addax-4.0.2
     ```

@@ -2,7 +2,7 @@
 
 2021-01-06 14:39:35.767 [main] INFO  Engine -
 {
-	"content":[
+	"content":
 		{
 			"reader":{
 				"parameter":{
@@ -29,8 +29,7 @@
 				},
 				"name":"streamwriter"
 			}
-		}
-	],
+	},
 	"setting":{
 		"errorLimit":{
 			"record":0,
