@@ -11,7 +11,7 @@
 2021-09-10 22:16:38.247 [        main] INFO  VMInfo               - VMInfo# operatingSystem class => sun.management.OperatingSystemImpl
 2021-09-10 22:16:38.269 [        main] INFO  Engine               -
 {
-	"content":[
+	"content":
 		{
 			"reader":{
 				"parameter":{
@@ -56,8 +56,7 @@
 				},
 				"name":"excelwriter"
 			}
-		}
-	],
+		},
 	"setting":{
 		"speed":{
 			"byte":-1,

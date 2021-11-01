@@ -25,7 +25,7 @@
 
 2021-01-20 09:07:41.903 [main] INFO  Engine -
 {
-	"content":[
+	"content":
 		{
 			"reader":{
 				"parameter":{
@@ -55,8 +55,7 @@
 				},
 				"name":"streamwriter"
 			}
-		}
-	],
+	},
 	"setting":{
 		"speed":{
 			"bytes":-1,

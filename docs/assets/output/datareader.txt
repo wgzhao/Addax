@@ -12,7 +12,7 @@ $ bin/addax.sh job/datareader2stream.json
 2021-08-13 17:02:00.888 [        main] INFO  VMInfo               - VMInfo# operatingSystem class => com.sun.management.internal.OperatingSystemImpl
 2021-08-13 17:02:00.910 [        main] INFO  Engine               -
 {
-	"content":[
+	"content":
 		{
 			"reader":{
 				"parameter":{
@@ -93,8 +93,7 @@ $ bin/addax.sh job/datareader2stream.json
 				},
 				"name":"streamwriter"
 			}
-		}
-	],
+	},
 	"setting":{
 		"errorLimit":{
 			"record":0,

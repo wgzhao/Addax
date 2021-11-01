@@ -10,7 +10,7 @@
 2021-08-23 13:45:17.199 [        main] INFO  VMInfo               - VMInfo# operatingSystem class => com.sun.management.internal.OperatingSystemImpl
 2021-08-23 13:45:17.223 [        main] INFO  Engine               -
 {
-	"content":[
+	"content":
 		{
 			"reader":{
 				"parameter":{
@@ -43,17 +43,6 @@
 				"name":"streamwriter"
 			}
 		}
-	],
-	"setting":{
-		"errorLimit":{
-			"record":0,
-			"percentage":0.02
-		},
-		"speed":{
-			"byte":-1,
-			"channel":1
-		}
-	}
 }
 
 2021-08-23 13:45:17.238 [        main] INFO  PerfTrace            - PerfTrace traceId=job_-1, isEnable=false, priority=0
