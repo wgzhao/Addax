@@ -436,7 +436,7 @@ public class JobContainer
         boolean isRecordLimit = (this.configuration.getInt(CoreConstant.JOB_SETTING_SPEED_RECORD, 0)) > 0;
         if (isRecordLimit) {
             long globalLimitedRecordSpeed = this.configuration.getInt(CoreConstant.JOB_SETTING_SPEED_RECORD, 100000);
-            Long channelLimitedRecordSpeed = this.configuration.getLong(CoreConstant.CORE_TRANSPORT_CHANNEL_SPEED_RECORD);
+            Long channelLimitedRecordSpeed = this.configuration.getLong(CoreConstant.CORE_TRANSPORT_CHANNEL_SPEED_RECORD, -1);
             if (channelLimitedRecordSpeed == null || channelLimitedRecordSpeed <= 0) {
                 throw AddaxException.asAddaxException(FrameworkErrorCode.CONFIG_ERROR,
                         "在有总tps限速条件下，单个channel的tps值不能为空，也不能为非正数");
