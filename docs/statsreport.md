@@ -9,7 +9,7 @@
 1. 支付http协议，JSON格式。
 2. 接口地址配置在 `core.json` 文件下的 `core.addaxServer.address` 下。
 3. 异步发送。
-4. 需要引入`httpclient-4.5.2.jar`, `httpcore-4.4.5.jar`, `httpcore-nio-4.4.5.jar`, `httpasyncclient-4.1.2.jar` 相关jar包
+4. 需要引入 `httpclient-4.5.2.jar`, `httpcore-4.4.5.jar`, `httpcore-nio-4.4.5.jar`, `httpasyncclient-4.1.2.jar` 相关jar包
 
 ## 功能说明
 

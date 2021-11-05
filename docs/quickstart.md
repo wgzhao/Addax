@@ -2,28 +2,27 @@
 
 ## 安装 Addax
 
-如果你不想编译，你可以执行下面的命令，直接从下载已经编译好的二进制文件
+### 一键安装
 
-=== "直接下载二进制"
+如果你不想编译，你可以执行下面的命令，一键安装（当前仅支持 Linux 和 macOS ）
 
-    ``` shell
-    curl -sS -o addax-4.0.2.tar.gz \ 
-      https://github.com/wgzhao/Addax/releases/download/4.0.2/addax-4.0.2.tar.gz`
+``` shell
+/bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/wgzhao/Addax/master/install.sh)"
+```
 
-    tar -xzf addax-4.0.2.tar.gz
-    cd addax-4.0.2
-    ```
+如果是 macOS ，默认安装在 `/usr/local/addax` 目录下， 如果是 Linux， 则安装在 `/opt/addax` 目录下
 
-=== "源代码编译"
+### 源代码编译安装
 
-    ``` shell
-    git clone https://github.com/wgzhao/addax.git
-    cd addax
-    git checkout 4.0.2
-    mvn clean package 
-    mvn package assembly:single
-    cd target/addax/addax-4.0.2
-    ```
+你可以选择从源代码编译安装，基本操作如下：
+
+``` shell
+git clone https://github.com/wgzhao/addax.git
+cd addax
+mvn clean package 
+mvn package assembly:single
+cd target/addax/addax-<version>
+```
 
 ## 开始第一个采集任务
 
