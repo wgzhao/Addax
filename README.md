@@ -31,9 +31,13 @@ docker pull wgzhao/addax:latest
 docker run -ti --rm --name addax wgzhao/addax:latest /opt/addax/bin/addax.sh /opt/addax/job/job.json
 ```
 
-### Do not want to compile?
+### Use install script
 
-If you are too lazy to compile or cannot compile because of your environment, you can download the corresponding version from the [release](https://github.com/wgzhao/Addax/releases) page
+```shell
+/bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/wgzhao/Addax/master/install.sh)"
+```
+
+This script installs Addax to its preferred prefix (/usr/local for macOS Intel, /opt/addax for Apple Silicon and /opt/addax/ for Linux)
 
 ### Compile and Package
 
@@ -44,13 +48,6 @@ mvn clean package
 mvn package assembly:single
 ```
 
-If you want to compile the doc, you can execute the following instructions.
-
-```shell
-cd docs
-mvn clean package
-```
-
 After successful compilation and packaging, a `addax-<version>` folder will be created in the `target/datax` directory of the project directory, where `<version` indicates the version.
 
 ### Begin your first task
@@ -58,7 +55,6 @@ After successful compilation and packaging, a `addax-<version>` folder will be c
 The `job` subdirectory contains many sample jobs, of which `job.json` can be used as a smoke-out test and executed as follows
 
 ```shell
-cd target/addax/addax-<version>
 bin/addax.sh job/job.json
 ```
 

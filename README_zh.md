@@ -29,9 +29,12 @@ docker pull wgzhao/addax:latest
 docker run -ti --rm --name addax wgzhao/addax:latest /opt/addax/bin/addax.sh /opt/addax/job/job.json
 ```
 
-### 不想编译
+### 使用一键安装脚本
 
-你可以直接从[发布页面](https://github.com/wgzhao/Addax/releases)下载需要的版本可
+```shell
+/bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/wgzhao/Addax/master/install.sh)"
+```
+上述脚本会将 Addax 安装到预设的目录( 对于 macOS Intel 而言，目录为 `/usr/local`,  Apple Silicon 以及 Linux 系统则为 `/opt/addax`)
 
 ### 编译及打包
 
@@ -42,13 +45,6 @@ mvn clean package -pl '!:addax-docs'
 mvn package assembly:single
 ```
 
-如果需要编译文档，请执行下面的命令
-
-```shell
-cd docs
-mvn clean package
-```
-
 编译打包成功后，会在项目目录的`target/addax` 目录下创建一个 `addax-<version>`的 文件夹，其中 `<version>` 表示版本。
 
 ### 开始第一个任务
@@ -56,7 +52,6 @@ mvn clean package
 `job` 子目录包含了大量的任务样本，其中 `job.json` 可以作为冒烟测试，执行如下
 
 ```shell
-cd target/addax/addax-<version>
 bin/addax.sh job/job.json
 ```
 
