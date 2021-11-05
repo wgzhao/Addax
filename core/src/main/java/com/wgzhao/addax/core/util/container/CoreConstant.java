@@ -36,8 +36,6 @@ public class CoreConstant
 
     public static final String CORE_CONTAINER_JOB_ID = "core.container.job.id";
 
-    public static final String CORE_CONTAINER_JOB_MODE = "core.container.job.mode";
-
     public static final String CORE_CONTAINER_JOB_REPORT_INTERVAL = "core.container.job.reportInterval";
 
     public static final String CORE_CONTAINER_JOB_SLEEP_INTERVAL = "core.container.job.sleepInterval";

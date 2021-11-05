@@ -65,7 +65,6 @@ public class Engine
         int channelNumber = 0;
         AbstractContainer container;
         long instanceId;
-        allConf.set(CoreConstant.CORE_CONTAINER_JOB_MODE, "standalone");
         container = new JobContainer(allConf);
         instanceId = allConf.getLong(CoreConstant.CORE_CONTAINER_JOB_ID, 0);
 
@@ -117,8 +116,6 @@ public class Engine
 
         // job id 默认值为-1
         configuration.set(CoreConstant.CORE_CONTAINER_JOB_ID, -1);
-        // 默认运行模式
-        configuration.set(CoreConstant.CORE_CONTAINER_JOB_MODE, "standalone");
 
         //打印vmInfo
         VMInfo vmInfo = VMInfo.getVmInfo();
