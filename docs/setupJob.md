@@ -6,12 +6,11 @@
 {
   "job": {
     "settings": {},
-    "content":
-      {
-        "reader": {},
-        "writer": {},
-        "transformer": []
-      }
+    "content": {
+      "reader": {},
+      "writer": {},
+      "transformer": []
+    }
   }
 }
 ```
@@ -78,18 +77,18 @@
 `settings` 可配置的内容如下：
 
 ```json
-}
-"setting": {
-      "speed": {
-        "byte": -1, 
-        "record": 100,
-        "channel": 1,
-      },
-      "errorLimit": {
-        "record": 0,
-        "percentage": 0.02
-      }
+{
+  "setting": {
+    "speed": {
+      "byte": -1,
+      "record": 100,
+      "channel": 1
+    },
+    "errorLimit": {
+      "record": 0,
+      "percentage": 0.02
     }
+  }
 }
 ```
 
@@ -109,7 +108,7 @@
 
 ### `speed.channel`
 
-设置通道数，该通道路确定了每个任务的线程数，目前一个channel对应5个线程，比如设置 `channel` 为 3， 则有 `3 * 5 + 1 =  16` 个线程，其中一个线程为统计线程。
+设置通道数，该通道路确定了每个任务的线程数，目前一个channel对应5个线程，比如设置 `channel` 为 3， 则有 `3 * 5 + 1 = 16` 个线程，其中一个线程为统计线程。
 
 ## `errorLimit`
 

@@ -20,29 +20,19 @@
 
 插件开发者不用关心太多，基本只需要关注特定系统读和写，以及自己的代码在逻辑上是怎样被执行的，哪一个方法是在什么时候被调用的。在此之前，需要明确以下概念：
 
-- `Job`: `Job` 是Addax用以描述从一个源头到一个目的端的同步作业，是Addax数据同步的最小业务单元。比如：从一张mysql的表同步到odps的一个表的特定分区。
-- `Task`: `Task` 是为最大化而把 `Job` 拆分得到的最小执行单元。比如：读一张有1024个分表的mysql分库分表的 `Job`，拆分成1024个读 `Task`，用若干个并发执行。
-- `TaskGroup`:  描述的是一组 `Task` 集合。在同一个`TaskGroupContainer`执行下的`Task`集合称之为 `TaskGroup`
-- `JobContainer`:  `Job` 执行器，负责`Job`全局拆分、调度、前置语句和后置语句等工作的工作单元。类似Yarn中的JobTracker
-- `TaskGroupContainer`: `TaskGroup` 执行器，负责执行一组 `Task` 的工作单元，类似Yarn中的TaskTracker。
+- `Job`: 用以描述从一个源头到一个目的端的同步作业，是数据同步的最小业务单元。比如：从一张 MySQL 的表同步到 PostgreSQL 的一个表。
+- `Task`: 为最性能大化而把 `Job` 拆分得到的最小执行单元。比如：读一张有 1024 个分表的 MySQL 分库分表的 `Job`，拆分成 1024 个读 `Task`，用若干个并发执行。
+- `TaskGroup`: 一组 `Task` 集合。在同一个 `TaskGroupContainer` 执行下的 `Task` 集合称之为 `TaskGroup`
+- `JobContainer`:  `Job` 执行器，负责 `Job` 全局拆分、调度、前置语句和后置语句等工作的工作单元。类似 [Yarn][1] 中的 JobTracker
+- `TaskGroupContainer`: `TaskGroup` 执行器，负责执行一组 `Task` 的工作单元，类似 [Yarn][1] 中的 TaskTracker。
 
-简而言之， `Job`拆分成`Task`，在分别在框架提供的容器中执行，插件只需要实现 `Job` 和 `Task` 两部分逻辑。
-
-### 物理执行模型
-
-框架为插件提供物理上的执行能力（线程）。`Addax` 框架有三种运行模式：
-
-- `Standalone`: 单进程运行，没有外部依赖。
-- `Local`: 单进程运行，统计信息、错误信息汇报到集中存储。
-- `Distrubuted`: 分布式多进程运行，依赖 `Addax Service` 服务。
-
-当然，上述三种模式对插件的编写而言没有什么区别，你只需要避开一些小错误，插件就能够在单机/分布式之间无缝切换了。 当 `JobContainer` 和 `TaskGroupContainer` 运行在同一个进程内时，就是单机模式（`Standalone`和`Local`）；当它们分布在不同的进程中执行时，就是分布式（`Distributed`）模式。
+简而言之， `Job`拆分成`Task`，分别在框架提供的容器中执行，插件只需要实现 `Job` 和 `Task` 两部分逻辑。
 
 ## 编程接口
 
 那么，`Job` 和 `Task` 的逻辑应是怎么对应到具体的代码中的？
 
-首先，插件的入口类必须扩展 `Reader` 或 `Writer` 抽象类，并且实现分别实现 `Job` 和 `Task` 两个内部抽象类，`Job` 和 `Task` 的实现必须是 **内部类** 的形式，原因见 **加载原理** 一节。以Reader为例：
+首先，插件的入口类必须扩展 `Reader` 或 `Writer` 抽象类，并且实现分别实现 `Job` 和 `Task` 两个内部抽象类，`Job` 和 `Task` 的实现必须是 **内部类** 的形式，原因见 **加载原理** 一节。以 `Reader` 为例：
 
 ```java
 public class SomeReader
@@ -110,41 +100,39 @@ public class SomeReader
 }
 ```
 
-`Job`接口功能如下：
+`Job` 接口功能如下：
 
-- `init`: Job对象初始化工作，测试可以通过`super.getPluginJobConf()`获取与本插件相关的配置。读插件获得配置中`reader`部分，写插件获得`writer`部分。
-- `prepare`: 全局准备工作，比如 mysql 清空目标表。
-- `split`: 拆分`Task`。参数`adviceNumber`框架建议的拆分数，一般是运行时所配置的并发度。值返回的是`Task`的配置列表。
-- `post`: 全局的后置工作，比如 mysql writer 同步完影子表后的rename操作。
+- `init`: Job对象初始化工作，此时可以通过 `super.getPluginJobConf()` 获取与本插件相关的配置。读插件获得配置中 `reader` 部分，写插件获得 `writer` 部分。
+- `prepare`: 全局准备工作，比如 MySQL 清空目标表。
+- `split`: 拆分 `Task`。参数 `adviceNumber` 框架建议的拆分数，一般是运行时所配置的并发度。值返回的是 `Task` 的配置列表。
+- `post`: 全局的后置工作，比如 MySQL writer 同步完影子表后的 `rename` 操作。
 - `destroy`: Job对象自身的销毁工作。
 
 `Task` 接口功能如下：
 
-- `init`：Task对象的初始化。此时可以通过`super.getPluginJobConf()`获取与本`Task`相关的配置。这里的配置是`Job`的`split`方法返回的配置列表中的其中一个。
+- `init`：Task 对象的初始化。此时可以通过 `super.getPluginJobConf()` 获取与本 `Task` 相关的配置。这里的配置是 `Job#split` 方法返回的配置列表中的其中一个。
 - `prepare`：局部的准备工作。
-- `startRead`: 从数据源读数据，写入到`RecordSender`中。`RecordSender`会把数据写入连接Reader和Writer的缓存队列。
-- `startWrite`：从`RecordReceiver`中读取数据，写入目标数据源。`RecordReceiver`中的数据来自Reader和Writer之间的缓存队列。
+- `startRead`: 从数据源读数据，写入到 `RecordSender` 中。`RecordSender` 会把数据写入连接 `Reader` 和 `Writer` 的缓存队列。
+- `startWrite`：从 `RecordReceiver` 中读取数据，写入目标数据源。`RecordReceiver` 中的数据来自 `Reader` 和 `Writer` 之间的缓存队列。
 - `post`: 局部的后置工作。
-- `destroy`: Task象自身的销毁工作。
+- `destroy`: Task 对象自身的销毁工作。
 
 需要注意的是：
 
-- `Job`和`Task`之间一定不能有共享变量，因为分布式运行时不能保证共享变量会被正确初始化。两者之间只能通过配置文件进行依赖。
-- `prepare`和`post`在`Job`和`Task`中都存在，插件需要根据实际情况确定在什么地方执行操作。
+- `Job` 和 `Task` 之间一定不能有共享变量，因为分布式运行时不能保证共享变量会被正确初始化。两者之间只能通过配置文件进行依赖。
+- `prepare` 和 `post` 在 `Job` 和 `Task` 中都存在，插件需要根据实际情况确定在什么地方执行操作。
 
 框架按照如下的顺序执行 `Job` 和 `Task` 的接口：
 
 ![AddaxReaderWriter](images/plugin_dev_guide_1.png)
 
-上图中，黄色表示`Job`部分的执行阶段，蓝色表示`Task`部分的执行阶段，绿色表示框架执行阶段。
+上图中，黄色表示 `Job` 部分的执行阶段，蓝色表示 `Task` 部分的执行阶段，绿色表示框架执行阶段。
 
 相关类关系如下：
 
 ![Addax](images/plugin_dev_guide_2.png)
 
 ### 插件定义
-
-代码写好了，有没有想过框架是怎么找到插件的入口类的？框架是如何加载插件的呢？
 
 在每个插件的项目中，都有一个`plugin.json`文件，这个文件定义了插件的相关信息，包括入口类。例如：
 
@@ -158,7 +146,7 @@ public class SomeReader
 ```
 
 - `name`: 插件名称，大小写敏感。框架根据用户在配置文件中指定的名称来搜寻插件。 **十分重要** 。
-- `class`: 入口类的全限定名称，框架通过反射穿件入口类的实例。**十分重要** 。
+- `class`: 入口类的全限定名称，框架通过反射创建入口类的实例。**十分重要** 。
 - `description`: 描述信息。
 - `developer`: 开发人员。
 
@@ -175,48 +163,57 @@ mvn package assembly:single
 
 ```ini
 ${ADDAX_HOME}
-|-- bin
-|   `-- addax.py
-|-- conf
-|   |-- core.json
-|   `-- logback.xml
-|-- lib
-|   `-- addax-core-dependencies.jar
-`-- plugin
-    |-- reader
-    |   `-- mysqlreader
-    |       |-- libs
-    |       |   `-- mysql-reader-plugin-dependencies.jar
-    |       |-- mysqlreader-0.0.1-SNAPSHOT.jar
-    |       `-- plugin.json
-    `-- writer
-        |-- mysqlwriter
-        |   |-- libs
-        |   |   `-- mysql-writer-plugin-dependencies.jar
-        |   |-- mysqlwriter-0.0.1-SNAPSHOT.jar
-        |   `-- plugin.json
-        |-- oraclewriter
-        `-- postgresqlwriter
+├── bin
+│     ├── addax.sh
+├── conf
+│     ├── core.json
+│     └── logback.xml
+├── job
+├── lib
+│     ├── addax-common-4.0.5.jar
+│     ├── addax-core-4.0.7-SNAPSHOT.jar
+│     ├── addax-rdbms-4.0.5.jar
+│     ├── addax-storage-4.0.5.jar
+│     ├── addax-transformer-4.0.5.jar
+│     ├── aircompressor-0.21.jar
+│     ├── annotations-2.0.3.jar
+│     ├── checker-qual-2.11.1.jar
+│     ├── commons-beanutils-1.9.4.jar
+├── log
+├── plugin
+│     ├── reader
+│     │     ├── cassandrareader
+│     │     │     ├── cassandrareader-4.0.5.jar
+│     │     │     ├── libs
+│     │     │     │     ├── <symbol link to shared folder>
+│     │     │     ├── plugin.json
+│     │     │     └── plugin_job_template.json
+│     └── writer
+│         ├── cassandrawriter
+│         │     ├── cassandrawriter-4.0.5.jar
+│         │     ├── libs
+│         │     │     ├── <symbol link to shared folder>
+│         │     ├── plugin.json
+│         │     └── plugin_job_template.json
 ```
 
-- `${ADDAX_HOME}/bin`:  可执行程序目录。
-- `${ADDAX_HOME}/conf`:  框架配置目录。
-- `${ADDAX_HOME}/lib`:  框架依赖库目录。
-- `${ADDAX_HOME}/plugin`:  插件目录。
+- `${ADDAX_HOME}/bin`:  可执行程序目录
+- `${ADDAX_HOME}/conf`:  框架配置目录
+- `${ADDAX_HOME}/lib`:  框架依赖库目录
+- `${ADDAX_HOME}/shared`: 插件依赖目录
+- `${ADDAX_HOME}/plugin`:  插件目录
 
-插件目录分为`reader`和`writer`子目录，读写插件分别存放。插件目录规范如下：
+插件目录分为 `reader` 和 `writer` 子目录，读写插件分别存放。插件目录规范如下：
 
-- `${PLUGIN_HOME}/libs`: 插件的依赖库。
+- `${PLUGIN_HOME}/libs`: 插件的依赖库，为了减少程序包大小，这些依赖包都是指向 `shared` 目录的符号链接
 - `${PLUGIN_HOME}/plugin-name-version.jar`: 插件本身的jar。
 - `${PLUGIN_HOME}/plugin.json`: 插件描述文件。
 
-尽管框架加载插件时，会把 `${PLUGIN_HOME}` 下所有的jar放到 `classpath`，但还是推荐依赖库的jar和插件本身的jar分开存放。
+尽管框架加载插件时，会把 `${PLUGIN_HOME}` 下所有的 jar 包添加到 `classpath` 环境变量中，但还是推荐依赖库的jar和插件本身的jar分开存放。
 
-注意：
+!!! 特别提醒
 
-!!! 特别注意
-
-  插件的目录名字必须和 `plugin.json` 中定义的插件名称一致。
+    插件的目录名字必须和 `plugin.json` 中定义的插件名称一致。
 
 ## 配置文件
 
@@ -228,21 +225,20 @@ ${ADDAX_HOME}
 
 `Addax` 框架有 `core.json` 配置文件，指定了框架的默认行为。任务的配置里头可以指定框架中已经存在的配置项，而且具有更高的优先级，会覆盖 `core.json` 中的默认值。
 
-配置中`job.content.reader.parameter`的value部分会传给`Reader.Job`；`job.content.writer.parameter`的value部分会传给`Writer.Job`** ，`Reader.Job`和`Writer.Job`可以通过`super.getPluginJobConf()`来获取。
-
-`Addax` 框架支持对特定的配置项进行RSA加密，例子中以`*`开头的项目便是加密后的值。 **配置项加密解密过程对插件透明，插件仍然以不带`*`的key来查询配置和操作配置项** 。
+配置中`job.content.reader.parameter` 的 `value` 部分会传给 `Reader.Job`；`job.content.writer.parameter` 的 `value` 部分会传给`Writer.Job` ，
+`Reader.Job` 和 `Writer.Job` 可以通过 `super.getPluginJobConf()` 来获取。
 
 ### 如何设计配置参数
 
 > 配置文件的设计是插件开发的第一步！
 
-任务配置中`reader`和`writer`下`parameter`部分是插件的配置参数，插件的配置参数应当遵循以下原则：
+任务配置中 `reader` 和 `writer` 下 `parameter` 部分是插件的配置参数，插件的配置参数应当遵循以下原则：
 
-- 驼峰命名：所有配置项采用驼峰命名法，首字母小写，单词首字母大写。
+- 驼峰命名：所有配置项采用小驼峰命名法，首字母小写。
 - 正交原则：配置项必须正交，功能没有重复，没有潜规则。
 - 富类型：合理使用json的类型，减少无谓的处理逻辑，减少出错的可能。
-  - 使用正确的数据类型。比如，bool类型的值使用 `true`/`false`，而非 `"yes"`/`"true"`/`0` 等。
-  - 合理使用集合类型，比如，用数组替代有分隔符的字符串。
+    - 使用正确的数据类型。比如，`bool` 类型的值使用 `true`/`false`，而非 `"yes"`/`"true"`/`0` 等。
+    - 合理使用集合类型，比如，用数组替代有分隔符的字符串。
 - 类似通用：遵守同一类型的插件的习惯，比如关系型数据库的 `connection` 参数都是如下结构：
 
   ```json
@@ -274,12 +270,12 @@ ${ADDAX_HOME}
 
 ### 如何使用 `Configuration` 类
 
-为了简化对json的操作，`Addax`提供了简单的DSL配合`Configuration`类使用。
+为了简化对 `json` 的操作，`Addax` 提供了简单的 DSL 配合 `Configuration` 类使用。
 
-`Configuration`提供了常见的`get`, `带类型get`，`带默认值get`，`set`等读写配置项的操作，以及`clone`, `toJSON`等方法。配置项读写操作都需要传入一个`path`做为参数，这个`path`就是`Addax`定义的DSL。语法有两条：
+`Configuration` 提供了常见的 `get`, `带类型get`，`带默认值get`，`set` 等读写配置项的操作，以及 `clone`, `toJSON` 等方法。配置项读写操作都需要传入一个 `path` 做为参数， 这个 `path` 就是 `Addax` 定义的 DSL。语法有两条：
 
-1. 子map用`.key`表示，`path`的第一个点省略。
-2. 数组元素用`[index]`表示。
+1. 子map用 `.key` 表示，`path` 的第一个点省略。
+2. 数组元素用 `[index]` 表示。
 
 比如操作如下json：
 
@@ -303,7 +299,7 @@ ${ADDAX_HOME}
 }
 ```
 
-比如调用`configuration.get(path)`方法，当path为如下值的时候得到的结果为：
+比如调用 `configuration.get(path)` 方法，当path为如下值的时候得到的结果为：
 
 - `x`：`4`
 - `a.b.c`：`2`
@@ -311,17 +307,17 @@ ${ADDAX_HOME}
 - `a.b.f[0]`：`1`
 - `a.b.f[2].g`：`true`
 
-注意，因为插件看到的配置只是整个配置的一部分。使用`Configuration`对象时，需要注意当前的根路径是什么。
+注意，因为插件看到的配置只是整个配置的一部分。使用 `Configuration` 对象时，需要注意当前的根路径是什么。
 
-更多`Configuration`的操作请参考`ConfigurationTest.java`。
+更多 `Configuration` 的操作请参考 [Configuration.java][2] 。
 
 ## 插件数据传输
 
-跟一般的 `生产者-消费者` 模式一样，`Reader` 插件和 `Writer` 插件之间也是通过 `channel` 来实现数据的传输的。`channel` 可以是内存的，也可能是持久化的，插件不必关心。插件通过`RecordSender`往`channel`写入数据，通过`RecordReceiver`从`channel`读取数据。
+跟一般的 `生产者-消费者` 模式一样，`Reader` 插件和 `Writer` 插件之间也是通过 `channel` 来实现数据的传输的。`channel` 可以是内存的，也可能是持久化的，插件不必关心。 插件通过 `RecordSender` 往 `channel` 写入数据，通过 `RecordReceiver` 从 `channel`  读取数据。
 
 `channel` 中的一条数据为一个 `Record` 的对象，`Record` 中可以放多个 `Column` 对象，这可以简单理解为数据库中的记录和列。
 
-`Record`有如下方法：
+`Record` 有如下方法：
 
 ```java
 public interface Record
@@ -346,28 +342,26 @@ public interface Record
 }
 ```
 
-因为`Record`是一个接口，`Reader`插件首先调用`RecordSender.createRecord()`创建一个`Record`实例，然后把`Column`一个个添加到`Record`中。
+因为 `Record` 是一个接口，`Reader` 插件首先调用 `RecordSender.createRecord()` 创建一个 `Record` 实例，然后把 `Column` 一个个添加到 `Record` 中。
 
-`Writer` 插件调用`RecordReceiver.getFromReader()`方法获取`Record`，然后把`Column`遍历出来，写入目标存储中。当`Reader`尚未退出，传输还在进行时，如果暂时没有数据`RecordReceiver.getFromReader()`方法会阻塞直到有数据。如果传输已经结束，会返回`null`
-，`Writer`
-插件可以据此判断是否结束`startWrite`方法。
-
-`Column` 的构造和操作，我们在《类型转换》一节介绍。
+`Writer` 插件调用 `RecordReceiver.getFromReader()` 方法获取 `Record`，然后把 `Column` 遍历出来，写入目标存储中。当 `Reader` 尚未退出，传输还在进行时，如果暂时没有数据 `RecordReceiver.getFromReader()` 方法会阻塞直到有数据。
+如果传输已经结束，会返回`null`，`Writer` 插件可以据此判断是否结束 `startWrite` 方法。
 
 ## 类型转换
 
-为了规范源端和目的端类型转换操作，保证数据不失真，Addax支持六种内部数据类型：
+为了规范源端和目的端类型转换操作，保证数据不失真，Addax 支持六种内部数据类型：
 
 - `Long`：定点数(Int、Short、Long、BigInteger等)。
 - `Double`：浮点数(Float、Double、BigDecimal(无限精度)等)。
 - `String`：字符串类型，底层不限长，使用通用字符集(Unicode)。
 - `Date`：日期类型。
+- `Timestamp`: 时间戳
 - `Bool`：布尔值。
 - `Bytes`：二进制，可以存放诸如MP3等非结构化数据。
 
-对应地，有`DateColumn`、`LongColumn`、`DoubleColumn`、`BytesColumn`、`StringColumn`和`BoolColumn`六种`Column`的实现。
+对应地，有 `DateColumn`、`LongColumn`、`DoubleColumn`、`BytesColumn`、`StringColumn` 、`BoolColumn` 和 `TimestampColumn` 七种 `Column` 的实现。
 
-`Column`除了提供数据相关的方法外，还提供一系列以`as`开头的数据类型转换转换方法。
+`Column` 除了提供数据相关的方法外，还提供一系列以 `as` 开头的数据类型转换转换方法。
 
 ![Columns](images/plugin_dev_guide_3.png)
 
@@ -376,6 +370,7 @@ Addax的内部类型在实现上会选用不同的java类型：
 | 内部类型 | 实现类型 | 备注 |
 | ----- | -------- | ----- |
 | Date  | java.util.Date |     |
+| Timestamp | java.sql.Timestamp | 可以精确到纳秒 | 
 | Long  | java.math.BigInteger|  使用无限精度的大整数，保证不失真   |
 | Double| java.lang.String| 用String表示，保证不失真 |
 | Bytes | byte[]|  |
@@ -400,19 +395,23 @@ Addax的内部类型在实现上会选用不同的java类型：
 目前主要有三类脏数据：
 
 1. Reader读到不支持的类型、不合法的值。
-2. 不支持的类型转换，比如：`Bytes`转换为`Date`。
+2. 不支持的类型转换，比如：`Bytes` 转换为 `Date`。
 3. 写入目标端失败，比如：写 MySQL 整型长度超长。
 
 ### 如何处理脏数据
 
-在`Reader.Task`和`Writer.Task`中，功过`AbstractTaskPlugin.getPluginCollector()`可以拿到一个`TaskPluginCollector`，它提供了一系列`collectDirtyRecord`的方法。当脏数据出现时，只需要调用合适的`collectDirtyRecord`
-方法，把被认为是脏数据的`Record`传入即可。
+在 `Reader.Task` 和 `Writer.Task` 中，通过 `AbstractTaskPlugin.getPluginCollector()` 可以拿到一个 `TaskPluginCollector`，它提供了一系列 `collectDirtyRecord` 的方法。 当脏数据出现时，只需要调用合适的 `collectDirtyRecord`
+方法，把被认为是脏数据的 `Record` 传入即可。
 
 用户可以在任务的配置中指定脏数据限制条数或者百分比限制，当脏数据超出限制时，框架会结束同步任务，退出。插件需要保证脏数据都被收集到，其他工作交给框架就好。
 
 ## 加载原理
 
-1. 框架扫描`plugin/reader`和`plugin/writer`目录，加载每个插件的`plugin.json`文件。
-2. 以`plugin.json`文件中`name`为key，索引所有的插件配置。如果发现重名的插件，框架会异常退出。
-3. 用户在插件中在`reader`/`writer`配置的`name`字段指定插件名字。框架根据插件的类型（`reader`/`writer`）和插件名称去插件的路径下扫描所有的jar，加入`classpath`。
-4. 根据插件配置中定义的入口类，框架通过反射实例化对应的`Job`和`Task`对象。
+1. 框架扫描 `plugin/reader` 和 `plugin/writer `目录，加载每个插件的 `plugin.json` 文件。
+2. 以 `plugin.json` 文件中 `name` 为 key，索引所有的插件配置。如果发现重名的插件，框架会异常退出。
+3. 用户在插件中在 `reader`/`writer` 配置的 `name` 字段指定插件名字。框架根据插件的类型（`reader`/`writer`）和插件名称去插件的路径下扫描所有的jar，加入 `classpath`。
+4. 根据插件配置中定义的入口类，框架通过反射实例化对应的 `Job` 和 `Task` 对象。
+
+[1]: https://hadoop.apache.org/docs/stable/hadoop-yarn/hadoop-yarn-site/YARN.html
+
+[2]: https://github.com/wgzhao/Addax/blob/master/common/src/main/java/com/wgzhao/addax/common/util/Configuration.java
