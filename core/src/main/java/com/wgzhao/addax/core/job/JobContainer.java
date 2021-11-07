@@ -421,7 +421,7 @@ public class JobContainer
             long globalLimitedByteSpeed = this.configuration.getInt(CoreConstant.JOB_SETTING_SPEED_BYTE, 10 * 1024 * 1024);
 
             // 在byte流控情况下，单个Channel流量最大值必须设置，否则报错！
-            Long channelLimitedByteSpeed = this.configuration.getLong(CoreConstant.CORE_TRANSPORT_CHANNEL_SPEED_BYTE,-1);
+            Long channelLimitedByteSpeed = this.configuration.getLong(CoreConstant.CORE_TRANSPORT_CHANNEL_SPEED_BYTE, -1);
             if (channelLimitedByteSpeed == null || channelLimitedByteSpeed <= 0) {
                 throw AddaxException.asAddaxException(
                         FrameworkErrorCode.CONFIG_ERROR,
@@ -460,15 +460,6 @@ public class JobContainer
             this.needChannelNumber = 1;
         }
         LOG.info("Job set Channel-Number to {} channel(s).", this.needChannelNumber);
-//        return;
-//        boolean isChannelLimit = (this.configuration.getInt(CoreConstant.JOB_SETTING_SPEED_CHANNEL, 1) > 0);
-//        if (isChannelLimit) {
-//            this.needChannelNumber = this.configuration.getInt(CoreConstant.JOB_SETTING_SPEED_CHANNEL, 1);
-//            LOG.info("Job set Channel-Number to {} channels.", this.needChannelNumber);
-//            return;
-//        }
-
-//        throw AddaxException.asAddaxException(FrameworkErrorCode.CONFIG_ERROR, "Job运行速度必须设置");
     }
 
     /*
@@ -819,12 +810,14 @@ public class JobContainer
         resultLog.put("totalReadRecords", CommunicationTool.getTotalReadRecords(communication));
         resultLog.put("totalErrorRecords", CommunicationTool.getTotalErrorRecords(communication));
         resultLog.put("jobName", jobName);
+        resultLog.put("jobContent", userConf.getString("jobContent.internal.job"));
 
         String jsonStr = JSON.toJSONString(resultLog);
 
         CloseableHttpAsyncClient httpClient = JobReport.getHttpClient(requestTimeoutSecs * 1000);
 
         LOG.debug("jobResultReportUrl: {}", jobResultReportUrl);
+        LOG.debug("report contents: {}", jsonStr);
         HttpPost postBody = JobReport.getPostBody(jobResultReportUrl, jsonStr, ContentType.APPLICATION_JSON);
 
         //回调
