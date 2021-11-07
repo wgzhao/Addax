@@ -24,7 +24,10 @@
   "byteSpeedPerSecond": 33,
   "recordSpeedPerSecond": 1,
   "totalReadRecords": 6,
-  "totalErrorRecords": 0
+  "totalErrorRecords": 0,
+  "jobContent": {
+    ...
+  }
 }
 ```
 
@@ -33,13 +36,14 @@
 | 参数                 | 描述               | 必选 | 默认值 |
 |----------------------|-------------------|----|------|
 | jobName              | 任务名             | 是   | jobName    |
-| startTimeStamp       | 任务执行的开始时间 | 是   | 无     |
-| endTimeStamp         | 任务执行的结束时间 | 是   | 无     |
+| startTimeStamp       | 任务执行的开始时间   | 是   | 无     |
+| endTimeStamp         | 任务执行的结束时间   | 是   | 无     |
 | totalCosts           | 任务总计耗时       | 是   | 无     |
 | byteSpeedPerSecond   | 任务平均流量       | 是   | 无     |
 | recordSpeedPerSecond | 记录写入速度       | 是   | 无     |
 | totalReadRecords     | 读出记录总数       | 是   | 0      |
 | totalErrorRecords    | 读写失败总数       | 是   | 0      |
+| jobContent           | 本次任务的json文件 | 是   | 无     |
 
 `jobName` 的设置规则如下:
 
