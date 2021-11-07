@@ -16,8 +16,9 @@
     }
   },
   "core": {
-    "addaxServer": {
-      "address": ""
+    "server": {
+      "address": "",
+      "timeout": 5
     },
     "transport": {
       "channel": {
