@@ -57,11 +57,11 @@ public class HBase20xSQLHelper
     {
         // 表名和queryserver地址必须配置，否则抛异常
         String tableName = originalConfig.getNecessaryValue(HBaseKey.TABLE, HBase20xSQLWriterErrorCode.REQUIRED_VALUE);
-        String queryServerAddress = originalConfig.getNecessaryValue(HBaseKey.QUERY_SERVER_ADDRESS, HBase20xSQLWriterErrorCode.REQUIRED_VALUE);
-        boolean isThinMode = queryServerAddress.contains(":thin:");
+        String jdbcUrl = originalConfig.getNecessaryValue(HBaseKey.JDBC_URL, HBase20xSQLWriterErrorCode.REQUIRED_VALUE);
+        boolean isThinMode = jdbcUrl.contains(":thin:");
         // 序列化格式，可不配置，默认PROTOBUF
         String serialization = originalConfig.getString(HBaseKey.SERIALIZATION_NAME, HBaseConstant.DEFAULT_SERIALIZATION);
-        String connStr = queryServerAddress;
+        String connStr = jdbcUrl;
         if (isThinMode) {
             connStr = connStr + ";serialization=" + serialization;
         }
@@ -78,7 +78,7 @@ public class HBase20xSQLHelper
         }
         // 校验jdbc连接是否正常
         Connection conn;
-        if (queryServerAddress.contains(":thin:")) {
+        if (jdbcUrl.contains(":thin:")) {
              conn = getClientConnection(connStr, PHOENIX_JDBC_THIN_DRIVER);
         } else {
             conn = getClientConnection(connStr, PHOENIX_JDBC_THICK_DRIVER);
