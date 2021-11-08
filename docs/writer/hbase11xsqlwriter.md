@@ -27,4 +27,4 @@ HBase11xsqlwriter 插件利用 [Phoniex](https://phoenix.apache.org)， 用于�
 
 注意：启用kerberos认证后，程序需要知道`hbase-site.xml` 所在的路径，一种办法是运行执行在环境变量 `CLASSPATH` 中增加该文件的所在路径。
 
-另外一个解决办法是修改 `addax.sh` 中的 `CLASS_PATH` 变量，增加 `hbase-site.xml` 的路径
+另外一个解决办法是将 `hbase-site.xml` 文件拷贝到插件的 `libs` 目录里。 
