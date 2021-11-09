@@ -185,11 +185,11 @@ addax	19890604	1989-06-04 00:00:00	true	test
 
 * 在文档源文件中按字母顺序排列章节（包括目录文件和其他常规文档文件）。一般来说，如果周围的代码中已经存在这样的排序，就按字母顺序排列方法/变量/部分。
 * 在适当的时候，使用Java 8的流API。然而，请注意，流的实现并不是很好，所以避免在内循环或其他对性能敏感的部分使用它。
-* 在抛出异常时对错误进行分类。例如，AddaxException需要一个错误代码作为参数，`AddaxException(RdbmsReaderErrorCode)`。这种分类可以让你生成报告，这样你就可以监控各种故障的频率。
+* 在抛出异常时对错误进行分类。例如，AddaxException 使用错误代码和错误消息作为参数，`AddaxException(REQUIRE_VALUE, "lack of required item")`。这种分类可以让你生成报告，这样你就可以监控各种故障。
 * 确保所有文件都有适当的许可证头；你可以通过运行`mvn license:format`生成许可证。
-* 考虑使用字符串格式化（使用Java`Formatter`类的printf风格格式化）：`format("Session property %s is invalid: %s", name, value)`（注意，`format()`应该总是静态导入）。有时，如果你只需要附加一些东西，可以考虑使用`+`运算符。
+* 考虑使用字符串格式化（使用Java`Formatter`类的printf风格）：`format("Session property %s is invalid: %s", name, value)`（注意，`format()`应该总是静态导入）。有时，如果你只需要附加一些东西，可以考虑使用`+`运算符。
 * 除了琐碎的表达式，避免使用三元操作符。
-* 如果有涵盖你的情况的断言，就使用Airlift的`Assertions`类，而不是手工写断言。随着时间的推移，我们可能会转移到更流畅的断言，如AssertJ。
+* 如果有涵盖你的情况的断言，就使用Airlift的`Assertions`类，而不是手工写断言。
 * 在编写Git提交信息时，请遵循这些[指南]（https://chris.beams.io/posts/git-commit/）。
 
 ## 版本兼容性说明

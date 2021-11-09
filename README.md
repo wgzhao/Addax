@@ -190,11 +190,11 @@ We recommend you use IntelliJ as your IDE. The code style template for the proje
 
 * Alphabetize sections in the documentation source files (both in table of contents files and other regular documentation files). In general, alphabetize methods/variables/sections if such ordering already exists in the surrounding code.
 * When appropriate, use the Java 8 stream API. However, note that the stream implementation does not perform well so avoid using it in inner loops or otherwise performance sensitive sections.
-* Categorize errors when throwing exceptions. For example, PrestoException takes an error code as an argument, `PrestoException(HIVE_TOO_MANY_OPEN_PARTITIONS)`. This categorization lets you generate reports so you can monitor the frequency of various failures.
+* Categorize errors when throwing exceptions. For example, AddaxException takes an error code and error message as arguments, `AddaxException(REQUIRE_VALUE, "lack of required item")`. This categorization lets you generate reports, so you can monitor the frequency of various failures.
 * Ensure that all files have the appropriate license header; you can generate the license by running `mvn license:format`.
 * Consider using String formatting (printf style formatting using the Java `Formatter` class): `format("Session property %s is invalid: %s", name, value)` (note that `format()` should always be statically imported). Sometimes, if you only need to append something, consider using the `+` operator.
 * Avoid using the ternary operator except for trivial expressions.
-* Use an assertion from Airlift's `Assertions` class if there is one that covers your case rather than writing the assertion by hand. Over time we may move over to more fluent assertions like AssertJ.
+* Use an assertion from Airlift's `Assertions` class if there is one that covers your case rather than writing the assertion by hand. Over time, we may move over to more fluent assertions like AssertJ.
 * When writing a Git commit message, follow these [guidelines](https://chris.beams.io/posts/git-commit/).
 
 ## License
