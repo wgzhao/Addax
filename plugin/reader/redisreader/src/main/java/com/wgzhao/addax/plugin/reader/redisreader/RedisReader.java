@@ -19,12 +19,6 @@
 
 package com.wgzhao.addax.plugin.reader.redisreader;
 
-import com.wgzhao.addax.common.element.BytesColumn;
-import com.wgzhao.addax.common.element.LongColumn;
-import com.wgzhao.addax.common.element.Record;
-import com.wgzhao.addax.common.plugin.RecordSender;
-import com.wgzhao.addax.common.spi.Reader;
-import com.wgzhao.addax.common.util.Configuration;
 import com.moilioncircle.redis.replicator.FileType;
 import com.moilioncircle.redis.replicator.RedisReplicator;
 import com.moilioncircle.redis.replicator.Replicator;
@@ -33,6 +27,14 @@ import com.moilioncircle.redis.replicator.event.PreRdbSyncEvent;
 import com.moilioncircle.redis.replicator.io.RawByteListener;
 import com.moilioncircle.redis.replicator.rdb.datatype.KeyStringValueString;
 import com.moilioncircle.redis.replicator.rdb.skip.SkipRdbVisitor;
+import com.wgzhao.addax.common.element.BytesColumn;
+import com.wgzhao.addax.common.element.LongColumn;
+import com.wgzhao.addax.common.element.Record;
+import com.wgzhao.addax.common.exception.AddaxException;
+import com.wgzhao.addax.common.plugin.RecordSender;
+import com.wgzhao.addax.common.spi.Reader;
+import com.wgzhao.addax.common.util.Configuration;
+import com.wgzhao.addax.plugin.reader.redisreader.impl.SentinelReplicator;
 import org.apache.http.HttpEntity;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpGet;
@@ -40,6 +42,7 @@ import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClientBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import redis.clients.jedis.HostAndPort;
 
 import java.io.BufferedOutputStream;
 import java.io.File;
@@ -59,6 +62,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.StringJoiner;
 import java.util.TreeMap;
 import java.util.UUID;
 import java.util.regex.Pattern;
@@ -82,6 +86,51 @@ import static com.moilioncircle.redis.replicator.Constants.RDB_TYPE_ZSET_ZIPLIST
 public class RedisReader
         extends Reader
 {
+    public static class Job
+            extends Reader.Job
+    {
+        private Configuration conf;
+
+        @Override
+        public void init()
+        {
+            this.conf = getPluginJobConf();
+            validateParam();
+        }
+
+        private void validateParam()
+        {
+            List<Object> connections = conf.getList("connection");
+            for (Object connection : connections) {
+                Configuration conConf = Configuration.from(connection.toString());
+                String uri = conConf.getString(RedisKey.URI);
+                if (uri == null || uri.isEmpty()) {
+                    throw AddaxException.asAddaxException(RedisErrorCode.REQUIRED_VALUE, "uri is null or empty");
+                }
+                if (!(uri.startsWith("tcp") || uri.startsWith("file") || uri.startsWith("http") || uri.startsWith("https"))) {
+                    throw AddaxException.asAddaxException(RedisErrorCode.ILLEGAL_VALUE, "uri is not start with tcp, file, http or https");
+                }
+                String mode = conConf.getString(RedisKey.MODE, "standalone");
+                if ("sentinel".equalsIgnoreCase(mode)) {
+                    // required other items
+                    conConf.getNecessaryValue(RedisKey.MASTER_NAME, RedisErrorCode.REQUIRED_VALUE);
+                }
+            }
+        }
+
+        @Override
+        public void destroy()
+        {
+
+        }
+
+        @Override
+        public List<Configuration> split(int adviceNumber)
+        {
+            // ignore adviceNumber
+            return Collections.singletonList(conf);
+        }
+    }
 
     public static class Task
             extends Reader.Task
@@ -124,19 +173,16 @@ public class RedisReader
             List<Object> connections = pluginJobConf.getList("connection");
             try {
                 for (Object obj : connections) {
-                    Map connection = (Map) obj;
-                    URI uri = URI.create(connection.get("uri").toString());
+                    Configuration connection = Configuration.from(obj.toString());
+                    String uri = connection.getString(RedisKey.URI);
+                    String mode = connection.getString(RedisKey.MODE, "standalone");
+                    String masterName = connection.getString(RedisKey.MASTER_NAME, null);
                     File file = new File(UUID.randomUUID() + ".rdb");
-                    if ("http".equals(uri.getScheme())) {
-                        this.download(uri, file);
+                    if (uri.startsWith("http") || uri.startsWith("https")) {
+                        this.download(new URI(uri), file);
                     }
-                    else if ("tcp".equals(uri.getScheme())) {
-                        String auth = "";
-                        if (connection.get("auth") != null) {
-                            auth = "?authPassword=" + connection.get("auth");
-                        }
-
-                        this.dump(uri.toString().replace("tcp://", "redis://") + auth, file);
+                    else if (uri.startsWith("tcp")) {
+                        this.dump(uriToHosts(uri), mode, connection.getString(RedisKey.AUTH), masterName, file);
                     }
                     else {
                         file = new File(uri);
@@ -285,14 +331,17 @@ public class RedisReader
         /**
          * 通过sync命令远程下载redis server rdb文件
          *
-         * @param uri uri
+         * @param hosts list of {@link HostAndPort}
+         * @param mode redis running mode, cluster, master/slave, sentinel or cluster
+         * @param masterName master name for sentinel mode
          * @param outFile file which dump to
          * @throws IOException file not found
          * @throws URISyntaxException uri parser error
          */
-        private void dump(String uri, File outFile)
+        private void dump(List<HostAndPort> hosts, String mode, String auth, String masterName, File outFile)
                 throws IOException, URISyntaxException
         {
+            LOG.info("mode = {}", mode);
             OutputStream out = new BufferedOutputStream(new FileOutputStream(outFile));
             RawByteListener rawByteListener = rawBytes -> {
                 try {
@@ -302,7 +351,28 @@ public class RedisReader
                     throw new RuntimeException(e.getMessage(), e);
                 }
             };
-            Replicator replicator = new RedisReplicator(uri);
+            com.moilioncircle.redis.replicator.Configuration conf = com.moilioncircle.redis.replicator.Configuration.defaultSetting();
+            if (null != auth && !auth.isEmpty()) {
+                if (auth.contains(":")) {
+                    String[] auths = auth.split(":");
+                    conf.setAuthUser(auths[0]);
+                    conf.setAuthPassword(auths[1]);
+                }
+                else {
+                    conf.setAuthPassword(auth);
+                }
+            }
+            Replicator replicator;
+            if ("sentinel".equalsIgnoreCase(mode)) {
+                // convert uri to hosts
+                replicator = new SentinelReplicator(hosts, masterName, conf);
+            }
+            else {
+                // defaults to standalone
+                StringJoiner hostJoiner = new StringJoiner(",");
+                hosts.forEach(k -> hostJoiner.add("redis://" + k.getHost() + ":" + k.getPort()));
+                replicator = new RedisReplicator(hostJoiner.toString());
+            }
             replicator.setRdbVisitor(new SkipRdbVisitor(replicator));
             replicator.addEventListener((replicator1, event) -> {
                 if (event instanceof PreRdbSyncEvent) {
@@ -322,6 +392,21 @@ public class RedisReader
                 }
             });
             replicator.open();
+        }
+
+        private List<HostAndPort> uriToHosts(String uris)
+        {
+            List<HostAndPort> result = new ArrayList<>();
+            try {
+                for (String uri : uris.split(",")) {
+                    URI u = new URI(uri);
+                    result.add(new HostAndPort(u.getHost(), u.getPort()));
+                }
+            }
+            catch (URISyntaxException e) {
+                e.printStackTrace();
+            }
+            return result;
         }
 
         /**
@@ -403,29 +488,6 @@ public class RedisReader
                 default:
                     return "other";
             }
-        }
-    }
-
-    public static class Job
-            extends Reader.Job
-    {
-
-        @Override
-        public List<Configuration> split(int adviceNumber)
-        {
-            return Collections.singletonList(super.getPluginJobConf());
-        }
-
-        @Override
-        public void init()
-        {
-            //
-        }
-
-        @Override
-        public void destroy()
-        {
-            //
         }
     }
 }
