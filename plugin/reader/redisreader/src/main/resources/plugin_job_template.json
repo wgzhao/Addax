@@ -4,7 +4,9 @@
     "connection": [
       {
         "uri": "tcp://127.0.0.1:6379",
-        "auth": ""
+        "auth": "",
+        "mode": "sentinel|master/slave|standalone|cluster",
+        "masterName": "mymaster"
       },
       {
         "uri": "file:///data/dump.rdb"
