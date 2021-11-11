@@ -201,8 +201,6 @@ addax	19890604	1989-06-04 00:00:00	true	test
 
 该软件在遵守 [Apache license](/license.txt) 下可自由免费使用
 
-## 赞助
+## 特别感谢
 
-![JetBrains](./jetbrains.png)
-
-该项目开发工具由 [JetBrains](https://jb.gg/OpenSource) 提供赞助
+特别感谢 [JetBrains](https://jb.gg/OpenSource) 对本项目提供开发工具赞助
