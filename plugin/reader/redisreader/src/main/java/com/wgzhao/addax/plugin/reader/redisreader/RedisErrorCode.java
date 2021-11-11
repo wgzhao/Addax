@@ -16,14 +16,41 @@
  * limitations under the License.
  */
 
-package com.wgzhao.addax.plugin.reader.redisreader.impl;
+package com.wgzhao.addax.plugin.reader.redisreader;
 
-import redis.clients.jedis.HostAndPort;
+import com.wgzhao.addax.common.spi.ErrorCode;
 
-public interface SentinelListener
+public enum RedisErrorCode
+        implements ErrorCode
 {
+    REQUIRED_VALUE("RedisReader-00","The required item is missing"),
+    ILLEGAL_VALUE("RedisReader-02","The value is illegal");
 
-    void onClose(Sentinel sentinel);
+    private final String code;
 
-    void onSwitch(Sentinel sentinel, HostAndPort host);
+    private final String describe;
+
+    RedisErrorCode(String code, String describe)
+    {
+        this.code = code;
+        this.describe = describe;
+    }
+
+    @Override
+    public String getCode()
+    {
+        return this.code;
+    }
+
+    @Override
+    public String getDescription()
+    {
+        return this.describe;
+    }
+
+    @Override
+    public String toString()
+    {
+        return String.format("Code:[%s], Describe:[%s]", this.code, this.describe);
+    }
 }

@@ -21,15 +21,15 @@ package com.wgzhao.addax.plugin.reader.redisreader.impl;
 import java.io.Closeable;
 import java.io.IOException;
 
-/**
- * @author Leon Chen
- * @since 3.1.1
- */
-public interface Sentinel extends Closeable {
+public interface Sentinel
+        extends Closeable
+{
 
-    void open() throws IOException;
+    void open()
+            throws IOException;
 
-    void close() throws IOException;
+    void close()
+            throws IOException;
 
     boolean addSentinelListener(SentinelListener listener);
 

@@ -16,14 +16,15 @@
  * limitations under the License.
  */
 
-package com.wgzhao.addax.plugin.reader.redisreader.impl;
+package com.wgzhao.addax.plugin.reader.redisreader;
 
-import redis.clients.jedis.HostAndPort;
+import com.wgzhao.addax.common.base.Key;
 
-public interface SentinelListener
+public class RedisKey
+    extends Key
 {
-
-    void onClose(Sentinel sentinel);
-
-    void onSwitch(Sentinel sentinel, HostAndPort host);
+    public static final String URI = "uri";
+    public static final String MODE = "mode";
+    public static final String AUTH = "auth";
+    public static final String MASTER_NAME  = "masterName";
 }

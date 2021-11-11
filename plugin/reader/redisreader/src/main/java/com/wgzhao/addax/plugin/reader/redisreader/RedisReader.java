@@ -30,6 +30,7 @@ import com.moilioncircle.redis.replicator.rdb.skip.SkipRdbVisitor;
 import com.wgzhao.addax.common.element.BytesColumn;
 import com.wgzhao.addax.common.element.LongColumn;
 import com.wgzhao.addax.common.element.Record;
+import com.wgzhao.addax.common.exception.AddaxException;
 import com.wgzhao.addax.common.plugin.RecordSender;
 import com.wgzhao.addax.common.spi.Reader;
 import com.wgzhao.addax.common.util.Configuration;
@@ -85,6 +86,51 @@ import static com.moilioncircle.redis.replicator.Constants.RDB_TYPE_ZSET_ZIPLIST
 public class RedisReader
         extends Reader
 {
+    public static class Job
+            extends Reader.Job
+    {
+        private Configuration conf;
+
+        @Override
+        public void init()
+        {
+            this.conf = getPluginJobConf();
+            validateParam();
+        }
+
+        private void validateParam()
+        {
+            List<Object> connections = conf.getList("connection");
+            for (Object connection : connections) {
+                Configuration conConf = Configuration.from(connection.toString());
+                String uri = conConf.getString(RedisKey.URI);
+                if (uri == null || uri.isEmpty()) {
+                    throw AddaxException.asAddaxException(RedisErrorCode.REQUIRED_VALUE, "uri is null or empty");
+                }
+                if (!(uri.startsWith("tcp") || uri.startsWith("file") || uri.startsWith("http") || uri.startsWith("https"))) {
+                    throw AddaxException.asAddaxException(RedisErrorCode.ILLEGAL_VALUE, "uri is not start with tcp, file, http or https");
+                }
+                String mode = conConf.getString(RedisKey.MODE, "standalone");
+                if ("sentinel".equalsIgnoreCase(mode)) {
+                    // required other items
+                    conConf.getNecessaryValue(RedisKey.MASTER_NAME, RedisErrorCode.REQUIRED_VALUE);
+                }
+            }
+        }
+
+        @Override
+        public void destroy()
+        {
+
+        }
+
+        @Override
+        public List<Configuration> split(int adviceNumber)
+        {
+            // ignore adviceNumber
+            return Collections.singletonList(conf);
+        }
+    }
 
     public static class Task
             extends Reader.Task
@@ -128,15 +174,15 @@ public class RedisReader
             try {
                 for (Object obj : connections) {
                     Configuration connection = Configuration.from(obj.toString());
-                    String uri = connection.getString("uri");
-                    String mode = connection.getString("mode", "standalone");
-                    String masterName = connection.getString("masterName", null);
+                    String uri = connection.getString(RedisKey.URI);
+                    String mode = connection.getString(RedisKey.MODE, "standalone");
+                    String masterName = connection.getString(RedisKey.MASTER_NAME, null);
                     File file = new File(UUID.randomUUID() + ".rdb");
                     if (uri.startsWith("http") || uri.startsWith("https")) {
                         this.download(new URI(uri), file);
                     }
                     else if (uri.startsWith("tcp")) {
-                        this.dump(uriToHosts(uri), mode, connection.getString("auth"), masterName, file);
+                        this.dump(uriToHosts(uri), mode, connection.getString(RedisKey.AUTH), masterName, file);
                     }
                     else {
                         file = new File(uri);
@@ -442,29 +488,6 @@ public class RedisReader
                 default:
                     return "other";
             }
-        }
-    }
-
-    public static class Job
-            extends Reader.Job
-    {
-
-        @Override
-        public List<Configuration> split(int adviceNumber)
-        {
-            return Collections.singletonList(super.getPluginJobConf());
-        }
-
-        @Override
-        public void init()
-        {
-            //
-        }
-
-        @Override
-        public void destroy()
-        {
-            //
         }
     }
 }
