@@ -201,6 +201,6 @@ We recommend you use IntelliJ as your IDE. The code style template for the proje
 
 This software is free to use under the Apache License [Apache license](/LICENSE).
 
-![JetBrains](./jetbrains.png)
+## Special Thanks
 
-This project is supported by [JetBrains](https://jb.gg/OpenSource)
+Special thanks to [JetBrains](https://jb.gg/OpenSource) for his supports to this project.
