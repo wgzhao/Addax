@@ -19,6 +19,7 @@
           "column": [
             "*"
           ],
+          "driver": "",
           "connection": [
             {
               "table": [
@@ -26,8 +27,7 @@
               ],
               "jdbcUrl": [
                 "jdbc:presto://127.0.0.1:8080/hive"
-              ],
-              "driver": ""
+              ]
             }
           ],
           "fetchSize": 1024,
