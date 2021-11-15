@@ -31,6 +31,7 @@ import org.apache.commons.lang3.StringUtils;
 import java.util.List;
 
 import static com.wgzhao.addax.common.base.Constant.DEFAULT_FETCH_SIZE;
+import static com.wgzhao.addax.common.base.Key.CONNECTION;
 import static com.wgzhao.addax.common.base.Key.FETCH_SIZE;
 import static com.wgzhao.addax.common.base.Key.JDBC_DRIVER;
 
@@ -57,9 +58,19 @@ public class RdbmsReader
                         String.format("您配置的fetchSize有误，fetchSize : [%d] 设置值不能小于 1.", fetchSize));
             }
             this.originalConfig.set(FETCH_SIZE, fetchSize);
+            List<Object> conns = this.originalConfig.getList(CONNECTION);
+            if (conns == null || conns.isEmpty()) {
+                throw AddaxException.asAddaxException(DBUtilErrorCode.REQUIRED_VALUE, "config 'connection' is required and must not be " +
+                        "empty");
+            }
             String jdbcDriver = this.originalConfig.getString(JDBC_DRIVER, null);
             if (jdbcDriver == null || StringUtils.isBlank(jdbcDriver)) {
-                throw AddaxException.asAddaxException(DBUtilErrorCode.REQUIRED_VALUE, "config 'driver' is required and must not be empty");
+                // maybe driver item inside connection item
+                Configuration conConf = Configuration.from(conns.get(0).toString());
+                jdbcDriver = conConf.getString(JDBC_DRIVER);
+                if (jdbcDriver == null || StringUtils.isBlank(jdbcDriver)) {
+                    throw AddaxException.asAddaxException(DBUtilErrorCode.REQUIRED_VALUE, "config 'driver' is required and must not be empty");
+                }
             }
             // use custom jdbc driver
             DATABASE_TYPE.setDriverClassName(jdbcDriver);
