@@ -110,8 +110,10 @@ public class KuduWriterTask
                     case INT8:
                     case INT16:
                     case INT32:
-                    case INT64:
                         row.addInt(name, Integer.parseInt(column.asString()));
+                        break;
+                    case INT64:
+                        row.addLong(name, Long.parseLong(column.asString()));
                         break;
                     case FLOAT:
                     case DOUBLE:
@@ -133,7 +135,8 @@ public class KuduWriterTask
                         row.addTimestamp(name, new Timestamp(column.asLong()));
                         break;
                     case DATE:
-                        row.addDate(name, (Date) new java.util.Date(column.asDate().getTime()));
+                        // Kudu take date as string
+                        row.addString(name, column.asString());
                         break;
                     default:
                         throw AddaxException.asAddaxException(
