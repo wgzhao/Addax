@@ -286,4 +286,4 @@ fi
 cmd="${cmd} com.wgzhao.addax.core.Engine -job ${JOB_FILE} "
 
 # run it
-${cmd}
+bash -c "${cmd}"
