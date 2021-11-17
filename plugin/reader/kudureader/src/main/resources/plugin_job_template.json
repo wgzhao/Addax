@@ -1,8 +1,8 @@
 {
     "name": "kudureader",
     "parameter": {
-        "masterAddresses": "127.0.0.1:7051",
-        "tableName": "test",
+        "masterAddress": "127.0.0.1:7051",
+        "table": "test",
         "splitKey": "",
         "lowerBound": "min",
         "upperBound": "max",
