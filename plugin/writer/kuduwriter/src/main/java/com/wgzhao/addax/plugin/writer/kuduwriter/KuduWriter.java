@@ -23,6 +23,7 @@ import com.wgzhao.addax.common.exception.AddaxException;
 import com.wgzhao.addax.common.plugin.RecordReceiver;
 import com.wgzhao.addax.common.spi.Writer;
 import com.wgzhao.addax.common.util.Configuration;
+import org.apache.kudu.Schema;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -48,22 +49,33 @@ public class KuduWriter
 
         private void validateParameter()
         {
-            config.getNecessaryValue(KuduKey.KUDU_TABLE_NAME, KuduWriterErrorCode.REQUIRED_VALUE);
-            config.getNecessaryValue(KuduKey.KUDU_MASTER_ADDRESSES, KuduWriterErrorCode.REQUIRED_VALUE);
-            config.getNecessaryValue(KuduKey.KUDU_TABLE_NAME, KuduWriterErrorCode.REQUIRED_VALUE);
+            String tableName = config.getNecessaryValue(KuduKey.KUDU_TABLE_NAME, KuduWriterErrorCode.REQUIRED_VALUE);
+            String masterAdddress = config.getNecessaryValue(KuduKey.KUDU_MASTER_ADDRESSES, KuduWriterErrorCode.REQUIRED_VALUE);
+//            String config.getNecessaryValue(KuduKey.KUDU_TABLE_NAME, KuduWriterErrorCode.REQUIRED_VALUE);
+            // check table exists or not
+            if (!KuduHelper.isTableExists(config)) {
+                throw AddaxException.asAddaxException(KuduWriterErrorCode.TABLE_NOT_EXISTS, "table '" + tableName + "' does not exists");
+            }
 
             // column check
-            List<Configuration> columns = this.config.getListConfiguration(KuduKey.COLUMN);
+            List<String> columns = this.config.getList(KuduKey.COLUMN, String.class);
             if (null == columns || columns.isEmpty()) {
                 throw AddaxException.asAddaxException(
                         KuduWriterErrorCode.REQUIRED_VALUE, "您需要指定 columns"
                 );
-            } else {
-                for (Configuration eachColumnConf : columns) {
-                    eachColumnConf.getNecessaryValue(KuduKey.NAME, KuduWriterErrorCode.REQUIRED_VALUE);
-                    eachColumnConf.getNecessaryValue(KuduKey.TYPE, KuduWriterErrorCode.REQUIRED_VALUE);
+            }
+
+            if (columns.size() == 1 && "*".equals(columns.get(0))) {
+                throw AddaxException.asAddaxException(KuduWriterErrorCode.ILLEGAL_VALUE, "Must explicit specify column name");
+            }
+            // check column exists or not
+            final Schema schema = KuduHelper.getSchema(config);
+            for (String column : columns) {
+                if (schema.getColumn(column) != null) {
+                    throw AddaxException.asAddaxException(KuduWriterErrorCode.COLUMN_NOT_EXISTS, "column '" + column + "' does not exists");
                 }
             }
+
             // writeMode check
             this.writeMode = this.config.getString(KuduKey.WRITE_MODE, KuduConstant.INSERT_MODE);
             this.config.set(KuduKey.WRITE_MODE, this.writeMode);
@@ -71,6 +83,7 @@ public class KuduWriter
             // timeout
 
         }
+
         @Override
         public void prepare()
         {
