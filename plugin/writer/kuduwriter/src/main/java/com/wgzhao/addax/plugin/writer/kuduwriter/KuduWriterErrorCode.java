@@ -34,8 +34,9 @@ public enum KuduWriterErrorCode
     DELETE_KUDU_ERROR("Kuduwriter-08", "An exception occurred while delete Kudu table."),
     CREATE_KUDU_TABLE_ERROR("Kuduwriter-09", "Error creating Kudu table."),
     PARAMETER_NUM_ERROR("Kuduwriter-10", "The number of parameters does not match."),
-    TABLE_NOT_EXISTS("Kuduwriter-11", "The table you specified does not exists yet");
-
+    TABLE_NOT_EXISTS("Kuduwriter-11", "The table you specified does not exists yet"),
+    COLUMN_NOT_EXISTS("Kuduwriter-12", "the column doest not exists");
+    
     private final String code;
     private final String description;
 

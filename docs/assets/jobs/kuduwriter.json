@@ -34,20 +34,7 @@
           "timeout": 60,
           "table": "users",
           "writeMode": "upsert",
-          "column": [
-            {
-              "name": "user_id",
-              "type": "int8"
-            },
-            {
-              "name": "user_name",
-              "type": "string"
-            },
-            {
-              "name": "salary",
-              "type": "double"
-            }
-          ],
+          "column": [ "user_id", "user_name", "salary"],
           "batchSize": 1024,
           "bufferSize": 2048,
           "skipFail": false,
