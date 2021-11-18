@@ -18,7 +18,10 @@
               "database": "example_db",
               "endpoint": "http://127.0.0.1:8030/"
             }
-          ]
+          ],
+          "loadProps": {},
+          "lineDelimiter": "\n",
+          "format": "csv"
         }
       },
       "reader": {
