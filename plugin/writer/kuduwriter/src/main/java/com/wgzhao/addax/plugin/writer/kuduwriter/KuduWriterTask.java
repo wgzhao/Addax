@@ -26,6 +26,7 @@ import com.wgzhao.addax.common.plugin.RecordReceiver;
 import com.wgzhao.addax.common.plugin.TaskPluginCollector;
 import com.wgzhao.addax.common.spi.Writer;
 import com.wgzhao.addax.common.util.Configuration;
+import org.apache.kudu.Schema;
 import org.apache.kudu.Type;
 import org.apache.kudu.client.Insert;
 import org.apache.kudu.client.KuduClient;
@@ -38,39 +39,38 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.math.BigDecimal;
-import java.sql.Date;
 import java.sql.Timestamp;
 import java.util.List;
-import java.util.Map;
-import java.util.concurrent.ThreadPoolExecutor;
+
+import static com.wgzhao.addax.common.base.Constant.DEFAULT_BATCH_SIZE;
 
 public class KuduWriterTask
         extends Writer
 {
     private static final Logger LOG = LoggerFactory.getLogger(KuduWriterTask.class);
-    public KuduClient kuduClient;
     public KuduSession session;
     private final Double batchSize;
-    List<Configuration> columns;
+    private final List<String> columns;
     private final Boolean isUpsert;
     private final Boolean isSkipFail;
     private final KuduTable table;
-//    private final Configuration configuration;
+    private final KuduHelper kuduHelper;
 
     public KuduWriterTask(Configuration configuration)
     {
-//        this.configuration = configuration;
-        this.columns = configuration.getListConfiguration(KuduKey.COLUMN);
 
-        this.batchSize = configuration.getDouble(KuduKey.WRITE_BATCH_SIZE);
+        String masterAddress = configuration.getString(KuduKey.KUDU_MASTER_ADDRESSES);
+        this.kuduHelper = new KuduHelper(masterAddress, configuration.getLong(KuduKey.KUDU_TIMEOUT));
+        this.columns = configuration.getList(KuduKey.COLUMN, String.class);
+
+        this.batchSize = configuration.getDouble(KuduKey.BATCH_SIZE, DEFAULT_BATCH_SIZE);
         this.isUpsert = !"insert".equalsIgnoreCase(configuration.getString(KuduKey.WRITE_MODE));
         this.isSkipFail = configuration.getBool(KuduKey.SKIP_FAIL);
         long mutationBufferSpace = configuration.getLong(KuduKey.MUTATION_BUFFER_SPACE);
 
-        this.kuduClient = KuduHelper.getKuduClient(configuration);
-        this.table = KuduHelper.getKuduTable(this.kuduClient, configuration.getString(KuduKey.KUDU_TABLE_NAME));
+        this.table = kuduHelper.getKuduTable(configuration.getString(KuduKey.TABLE));
 
-        this.session = kuduClient.newSession();
+        this.session = kuduHelper.getSession();
         session.setFlushMode(SessionConfiguration.FlushMode.MANUAL_FLUSH);
         session.setMutationBufferSpace((int) mutationBufferSpace);
     }
@@ -80,7 +80,8 @@ public class KuduWriterTask
         LOG.info("Begin to write");
         Record record;
         int commit = 0;
-        List<String> columnNames = KuduHelper.getColumnNames(columns);
+        final Schema schema = this.table.getSchema();
+//        List<String> columnNames = KuduHelper.getColumnNames(columns);
         while ((record = lineReceiver.getFromReader()) != null) {
             if (record.getColumnNumber() != columns.size()) {
                 throw AddaxException.asAddaxException(KuduWriterErrorCode.PARAMETER_NUM_ERROR,
@@ -100,12 +101,12 @@ public class KuduWriterTask
             }
             for (int i = 0; i < record.getColumnNumber(); i++) {
                 Column column = record.getColumn(i);
-                String name = columnNames.get(i);
-                if (column.getRawData() == null) {
+                String name = columns.get(i);
+                Type type = schema.getColumn(name).getType();
+                if (column == null || column.getRawData() == null) {
                     row.setNull(name);
                     continue;
                 }
-                Type type = Type.getTypeForName(columns.get(i).getString(KuduKey.TYPE));
                 switch (type) {
                     case INT8:
                     case INT16:
@@ -183,5 +184,9 @@ public class KuduWriterTask
                 throw AddaxException.asAddaxException(KuduWriterErrorCode.PUT_KUDU_ERROR, e.getMessage());
             }
         }
+    }
+
+    public void close() {
+        kuduHelper.closeClient();
     }
 }
