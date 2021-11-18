@@ -42,33 +42,35 @@ import java.math.BigDecimal;
 import java.sql.Timestamp;
 import java.util.List;
 
+import static com.wgzhao.addax.common.base.Constant.DEFAULT_BATCH_SIZE;
+
 public class KuduWriterTask
         extends Writer
 {
     private static final Logger LOG = LoggerFactory.getLogger(KuduWriterTask.class);
-    public KuduClient kuduClient;
     public KuduSession session;
     private final Double batchSize;
     private final List<String> columns;
     private final Boolean isUpsert;
     private final Boolean isSkipFail;
     private final KuduTable table;
-//    private final Configuration configuration;
+    private final KuduHelper kuduHelper;
 
     public KuduWriterTask(Configuration configuration)
     {
-//        this.configuration = configuration;
+
+        String masterAddress = configuration.getString(KuduKey.KUDU_MASTER_ADDRESSES);
+        this.kuduHelper = new KuduHelper(masterAddress, configuration.getLong(KuduKey.KUDU_TIMEOUT));
         this.columns = configuration.getList(KuduKey.COLUMN, String.class);
 
-        this.batchSize = configuration.getDouble(KuduKey.WRITE_BATCH_SIZE);
+        this.batchSize = configuration.getDouble(KuduKey.BATCH_SIZE, DEFAULT_BATCH_SIZE);
         this.isUpsert = !"insert".equalsIgnoreCase(configuration.getString(KuduKey.WRITE_MODE));
         this.isSkipFail = configuration.getBool(KuduKey.SKIP_FAIL);
         long mutationBufferSpace = configuration.getLong(KuduKey.MUTATION_BUFFER_SPACE);
 
-        this.kuduClient = KuduHelper.getKuduClient(configuration);
-        this.table = KuduHelper.getKuduTable(this.kuduClient, configuration.getString(KuduKey.KUDU_TABLE_NAME));
+        this.table = kuduHelper.getKuduTable(configuration.getString(KuduKey.TABLE));
 
-        this.session = kuduClient.newSession();
+        this.session = kuduHelper.getSession();
         session.setFlushMode(SessionConfiguration.FlushMode.MANUAL_FLUSH);
         session.setMutationBufferSpace((int) mutationBufferSpace);
     }
@@ -182,5 +184,9 @@ public class KuduWriterTask
                 throw AddaxException.asAddaxException(KuduWriterErrorCode.PUT_KUDU_ERROR, e.getMessage());
             }
         }
+    }
+
+    public void close() {
+        kuduHelper.closeClient();
     }
 }

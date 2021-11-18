@@ -37,8 +37,12 @@ public class KuduWriter
             extends Writer.Job
     {
         private static final Logger LOG = LoggerFactory.getLogger(Job.class);
+
+        private static final String INSERT_MODE = "upsert";
+
+        private static final int DEFAULT_TIME_OUT = 100;
+
         private Configuration config = null;
-        private String writeMode;
 
         @Override
         public void init()
@@ -49,11 +53,16 @@ public class KuduWriter
 
         private void validateParameter()
         {
-            String tableName = config.getNecessaryValue(KuduKey.KUDU_TABLE_NAME, KuduWriterErrorCode.REQUIRED_VALUE);
-            String masterAdddress = config.getNecessaryValue(KuduKey.KUDU_MASTER_ADDRESSES, KuduWriterErrorCode.REQUIRED_VALUE);
-//            String config.getNecessaryValue(KuduKey.KUDU_TABLE_NAME, KuduWriterErrorCode.REQUIRED_VALUE);
+            String tableName = config.getNecessaryValue(KuduKey.TABLE, KuduWriterErrorCode.REQUIRED_VALUE);
+            String masterAddress = config.getNecessaryValue(KuduKey.KUDU_MASTER_ADDRESSES, KuduWriterErrorCode.REQUIRED_VALUE);
+            long timeout = config.getInt(KuduKey.KUDU_TIMEOUT, DEFAULT_TIME_OUT) * 1000L;
+            // write back default value with ms unit
+            this.config.set(KuduKey.KUDU_TIMEOUT, timeout);
+
+            LOG.info("Try to connect kudu with {}", masterAddress);
+            KuduHelper kuduHelper = new KuduHelper(masterAddress, timeout);
             // check table exists or not
-            if (!KuduHelper.isTableExists(config)) {
+            if (!kuduHelper.isTableExists(tableName)) {
                 throw AddaxException.asAddaxException(KuduWriterErrorCode.TABLE_NOT_EXISTS, "table '" + tableName + "' does not exists");
             }
 
@@ -61,43 +70,28 @@ public class KuduWriter
             List<String> columns = this.config.getList(KuduKey.COLUMN, String.class);
             if (null == columns || columns.isEmpty()) {
                 throw AddaxException.asAddaxException(
-                        KuduWriterErrorCode.REQUIRED_VALUE, "您需要指定 columns"
+                        KuduWriterErrorCode.REQUIRED_VALUE, "the configuration 'column' must be specified"
                 );
             }
 
             if (columns.size() == 1 && "*".equals(columns.get(0))) {
-                throw AddaxException.asAddaxException(KuduWriterErrorCode.ILLEGAL_VALUE, "Must explicit specify column name");
+                // get all columns
+                LOG.info("Take the columns of table '{}' as writing columns", tableName);
+                columns = kuduHelper.getAllColumns(tableName);
+                this.config.set(KuduKey.COLUMN, columns);
             }
-            // check column exists or not
-            final Schema schema = KuduHelper.getSchema(config);
-            for (String column : columns) {
-                if (schema.getColumn(column) != null) {
-                    throw AddaxException.asAddaxException(KuduWriterErrorCode.COLUMN_NOT_EXISTS, "column '" + column + "' does not exists");
+            else {
+                // check column exists or not
+                final Schema schema = kuduHelper.getSchema(tableName);
+                for (String column : columns) {
+                    if (schema.getColumn(column) == null) {
+                        throw AddaxException.asAddaxException(KuduWriterErrorCode.COLUMN_NOT_EXISTS, "column '" + column + "' does not exists");
+                    }
                 }
             }
-
             // writeMode check
-            this.writeMode = this.config.getString(KuduKey.WRITE_MODE, KuduConstant.INSERT_MODE);
-            this.config.set(KuduKey.WRITE_MODE, this.writeMode);
-
-            // timeout
-
-        }
-
-        @Override
-        public void prepare()
-        {
-            Boolean truncate = config.getBool(KuduKey.TRUNCATE, false);
-            if (truncate) {
-                KuduHelper.truncateTable(this.config);
-            }
-
-            if (!KuduHelper.isTableExists(config)) {
-                //KuduHelper.createTable(config);
-                // we DO NOT create table
-                throw AddaxException.asAddaxException(KuduWriterErrorCode.TABLE_NOT_EXISTS,
-                        KuduWriterErrorCode.TABLE_NOT_EXISTS.getDescription());
-            }
+            String writeMode = this.config.getString(KuduKey.WRITE_MODE, INSERT_MODE);
+            this.config.set(KuduKey.WRITE_MODE, writeMode);
         }
 
         @Override
@@ -122,14 +116,13 @@ public class KuduWriter
             extends Writer.Task
     {
         private static final Logger LOG = LoggerFactory.getLogger(Job.class);
-        private Configuration taskConfig;
         private KuduWriterTask kuduTaskProxy;
 
         @Override
         public void init()
         {
-            this.taskConfig = getPluginJobConf();
-            this.kuduTaskProxy = new KuduWriterTask(this.taskConfig);
+            Configuration taskConfig = getPluginJobConf();
+            this.kuduTaskProxy = new KuduWriterTask(taskConfig);
         }
 
         @Override
@@ -149,7 +142,7 @@ public class KuduWriter
             catch (Exception e) {
                 LOG.warn("The \"kudu session\" was not stopped gracefully !");
             }
-            KuduHelper.closeClient(kuduTaskProxy.kuduClient);
+            kuduTaskProxy.close();
         }
     }
 }
