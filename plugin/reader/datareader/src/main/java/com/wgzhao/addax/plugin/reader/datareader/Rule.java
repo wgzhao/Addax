@@ -40,5 +40,6 @@ public enum Rule
     PHONE,
     RANDOM,
     STOCK_ACCOUNT,
-    STOCK_CODE
+    STOCK_CODE,
+    UUID
 }
