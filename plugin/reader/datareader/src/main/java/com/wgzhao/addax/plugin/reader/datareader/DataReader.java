@@ -59,6 +59,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 
 import static com.wgzhao.addax.common.base.Constant.DEFAULT_DATE_FORMAT;
 import static com.wgzhao.addax.common.base.Key.COLUMN;
@@ -569,6 +570,8 @@ public class DataReader
                     return new StringColumn(StockUtil.nextStockAccount());
                 case NAME:
                     return new StringColumn(PersonUtil.nextName());
+                case UUID:
+                    return new StringColumn(UUID.randomUUID().toString());
                 default:
                     throw AddaxException.asAddaxException(DataReaderErrorCode.ILLEGAL_VALUE,
                             columnRule + " is unsupported");
