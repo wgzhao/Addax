@@ -166,18 +166,16 @@ public class JsonReader
         @Override
         public void prepare()
         {
-            LOG.debug("prepare() begin...");
+            LOG.debug("begin to prepare...");
             // warn:make sure this regex string
             // warn:no need trim
             for (String eachPath : this.path) {
-                String regexString = eachPath.replace("*", ".*").replace("?",
-                        ".?");
+                String regexString = eachPath.replace("*", ".*").replace("?", ".?");
                 Pattern pattern = Pattern.compile(regexString);
                 this.pattern.put(eachPath, pattern);
                 this.sourceFiles = this.buildSourceTargets();
             }
-
-            LOG.info("您即将读取的文件数为: [{}]", this.sourceFiles.size());
+            LOG.info("The number of files you will read: [{}]", this.sourceFiles.size());
         }
 
         @Override
@@ -196,7 +194,7 @@ public class JsonReader
         @Override
         public List<Configuration> split(int adviceNumber)
         {
-            LOG.debug("split() begin...");
+            LOG.debug("begin to split...");
             List<Configuration> readerSplitConfigs = new ArrayList<>();
 
             // warn:每个slice拖且仅拖一个文件,
@@ -204,9 +202,8 @@ public class JsonReader
             int splitNumber = this.sourceFiles.size();
             if (0 == splitNumber) {
                 throw AddaxException.asAddaxException(
-                        JsonReaderErrorCode.EMPTY_DIR_EXCEPTION, String
-                                .format("未能找到待读取的文件,请确认您的配置项path: %s",
-                                        this.originConfig.getString(Key.PATH)));
+                        JsonReaderErrorCode.EMPTY_DIR_EXCEPTION,
+                        String.format("NOT find any file in your path: %s", originConfig.getString(Key.PATH)));
             }
 
             List<List<String>> splitedSourceFiles = this.splitSourceFiles(
@@ -216,11 +213,11 @@ public class JsonReader
                 splitedConfig.set(Key.SOURCE_FILES, files);
                 readerSplitConfigs.add(splitedConfig);
             }
-            LOG.debug("split() ok and end...");
+            LOG.debug("end split ...");
             return readerSplitConfigs;
         }
 
-        // validate the path, path must be a absolute path
+        // validate the path, path must be an absolute path
         private List<String> buildSourceTargets()
         {
             // for each path
@@ -228,8 +225,7 @@ public class JsonReader
             for (String eachPath : this.path) {
                 int endMark;
                 for (endMark = 0; endMark < eachPath.length(); endMark++) {
-                    if ('*' == eachPath.charAt(endMark)
-                            || '?' == eachPath.charAt(endMark)) {
+                    if ('*' == eachPath.charAt(endMark) || '?' == eachPath.charAt(endMark)) {
                         this.isRegexPath.put(eachPath, true);
                         break;
                     }
@@ -237,10 +233,8 @@ public class JsonReader
 
                 String parentDirectory;
                 if (BooleanUtils.isTrue(this.isRegexPath.get(eachPath))) {
-                    int lastDirSeparator = eachPath.substring(0, endMark)
-                            .lastIndexOf(IOUtils.DIR_SEPARATOR);
-                    parentDirectory = eachPath.substring(0,
-                            lastDirSeparator + 1);
+                    int lastDirSeparator = eachPath.substring(0, endMark).lastIndexOf(IOUtils.DIR_SEPARATOR);
+                    parentDirectory = eachPath.substring(0, lastDirSeparator + 1);
                 }
                 else {
                     this.isRegexPath.put(eachPath, false);
@@ -259,18 +253,16 @@ public class JsonReader
                 File dir = new File(parentDirectory);
                 boolean isExists = dir.exists();
                 if (!isExists) {
-                    String message = String.format("您设定的目录不存在 : [%s]",
-                            parentDirectory);
+                    String message = String.format("The directory %s DOES NOT exists", parentDirectory);
                     LOG.error(message);
                     throw AddaxException.asAddaxException(
                             JsonReaderErrorCode.FILE_NOT_EXISTS, message);
                 }
             }
             catch (SecurityException se) {
-                String message = String.format("您没有权限查看目录 : [%s]", parentDirectory);
+                String message = String.format("Permission denied: %s", parentDirectory);
                 LOG.error(message);
-                throw AddaxException.asAddaxException(
-                        JsonReaderErrorCode.SECURITY_NOT_ENOUGH, message);
+                throw AddaxException.asAddaxException(JsonReaderErrorCode.SECURITY_NOT_ENOUGH, message);
             }
 
             directoryRover(regexPath, parentDirectory, toBeReadFiles);
@@ -283,7 +275,7 @@ public class JsonReader
             if (!directory.isDirectory()) {
                 if (this.isTargetFile(regexPath, directory.getAbsolutePath())) {
                     toBeReadFiles.add(parentDirectory);
-                    LOG.info("add file [{}] as a candidate to be read.", parentDirectory);
+                    LOG.info("Add file [{}] as a candidate to be read.", parentDirectory);
                 }
             }
             else {
@@ -300,21 +292,15 @@ public class JsonReader
                     }
                     else {
                         // warn: 对于没有权限的文件，是直接throw AddaxException
-                        String message = String.format("您没有权限查看目录 : [%s]",
-                                directory);
+                        String message = String.format("Permission denied: %s", directory);
                         LOG.error(message);
-                        throw AddaxException.asAddaxException(
-                                JsonReaderErrorCode.SECURITY_NOT_ENOUGH,
-                                message);
+                        throw AddaxException.asAddaxException(JsonReaderErrorCode.SECURITY_NOT_ENOUGH, message);
                     }
                 }
                 catch (SecurityException e) {
-                    String message = String.format("您没有权限查看目录 : [%s]",
-                            directory);
+                    String message = String.format("Permission denied: %s", directory);
                     LOG.error(message);
-                    throw AddaxException.asAddaxException(
-                            JsonReaderErrorCode.SECURITY_NOT_ENOUGH,
-                            message, e);
+                    throw AddaxException.asAddaxException(JsonReaderErrorCode.SECURITY_NOT_ENOUGH, message, e);
                 }
             }
         }
@@ -367,8 +353,7 @@ public class JsonReader
         {
             Configuration readerSliceConfig = this.getPluginJobConf();
             this.sourceFiles = readerSliceConfig.getList(Key.SOURCE_FILES, String.class);
-            this.columns = readerSliceConfig
-                    .getListConfiguration(Key.COLUMN);
+            this.columns = readerSliceConfig.getListConfiguration(Key.COLUMN);
             this.compressType = readerSliceConfig.getString(Key.COMPRESS, null);
             this.encoding = readerSliceConfig.getString(Key.ENCODING, "utf-8");
         }
@@ -378,11 +363,10 @@ public class JsonReader
         {
             List<Column> splitLine = new ArrayList<>();
             DocumentContext document = JsonPath.parse(json);
-//            JSONArray objects = JSON.parseArray(json);
             String tempValue;
             for (Configuration eachColumnConf : columns) {
                 String columnIndex = eachColumnConf.getString(Key.INDEX);
-                String columnType = eachColumnConf.getString(Key.TYPE);
+                String columnType = eachColumnConf.getString(Key.TYPE).toLowerCase();
                 String columnFormat = eachColumnConf.getString(Key.FORMAT);
                 String columnValue = eachColumnConf.getString(Key.VALUE);
                 // 这里是为了支持常量Value 现在需要考虑做容错，如果json里面没有的解析路径置为null
@@ -407,7 +391,7 @@ public class JsonReader
         private Column getColumn(String type, String columnValue, String columnFormat)
         {
             Column columnGenerated;
-            String errorTemplate = " 类型转换错误, 无法将[%s] 转换为[%s]";
+            String errorTemplate = "Type cast error, can not cast %s to %s";
             switch (type) {
                 case STRING:
                     columnGenerated = new StringColumn(columnValue);
@@ -417,8 +401,7 @@ public class JsonReader
                         columnGenerated = new DoubleColumn(columnValue);
                     }
                     catch (Exception e) {
-                        throw new IllegalArgumentException(String.format(
-                                errorTemplate, columnValue, "DOUBLE"));
+                        throw new IllegalArgumentException(String.format(errorTemplate, columnValue, "DOUBLE"));
                     }
                     break;
                 case BOOLEAN:
@@ -455,7 +438,7 @@ public class JsonReader
                     }
                     break;
                 default:
-                    String errorMessage = String.format("您配置的列类型暂不支持 : [%s]", type);
+                    String errorMessage = String.format("The type %s is unsupported", type);
                     LOG.error(errorMessage);
                     throw AddaxException.asAddaxException(JsonReaderErrorCode.NOT_SUPPORT_TYPE, errorMessage);
             }
@@ -493,7 +476,7 @@ public class JsonReader
         @Override
         public void startRead(RecordSender recordSender)
         {
-            LOG.debug("start read source files...");
+            LOG.debug("begin to read source files...");
             FileInputStream fileInputStream;
             BufferedReader reader = null;
             for (String fileName : this.sourceFiles) {
@@ -503,11 +486,9 @@ public class JsonReader
                 }
                 catch (FileNotFoundException e) {
                     // warn: sock 文件无法read,能影响所有文件的传输,需要用户自己保证
-                    String message = String
-                            .format("找不到待读取的文件 : [%s]", fileName);
+                    String message = String.format("The file %s not found", fileName);
                     LOG.error(message);
-                    throw AddaxException.asAddaxException(
-                            JsonReaderErrorCode.OPEN_FILE_ERROR, message);
+                    throw AddaxException.asAddaxException(JsonReaderErrorCode.OPEN_FILE_ERROR, message);
                 }
                 try {
                     if (compressType != null) {
@@ -540,17 +521,15 @@ public class JsonReader
                 }
                 catch (IOException e) {
                     // warn: 有可能本地无法读取文件
-                    String message = String
-                            .format("无法读取文件 : [%s]", fileName);
+                    String message = String.format("Failed to open file %s", fileName);
                     LOG.error(message);
-                    throw AddaxException.asAddaxException(
-                            JsonReaderErrorCode.READ_FILE_IO_ERROR, message);
+                    throw AddaxException.asAddaxException(JsonReaderErrorCode.READ_FILE_IO_ERROR, message);
                 }
                 finally {
                     IOUtils.closeQuietly(reader, null);
                 }
             }
-            LOG.debug("end read source files...");
+            LOG.debug("end reading source files...");
         }
     }
 }
