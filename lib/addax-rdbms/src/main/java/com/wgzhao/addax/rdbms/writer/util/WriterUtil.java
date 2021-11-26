@@ -21,15 +21,15 @@
 
 package com.wgzhao.addax.rdbms.writer.util;
 
+import com.alibaba.druid.sql.parser.ParserException;
+import com.wgzhao.addax.common.base.Constant;
+import com.wgzhao.addax.common.base.Key;
 import com.wgzhao.addax.common.exception.AddaxException;
 import com.wgzhao.addax.common.util.Configuration;
 import com.wgzhao.addax.rdbms.util.DBUtil;
 import com.wgzhao.addax.rdbms.util.DBUtilErrorCode;
 import com.wgzhao.addax.rdbms.util.DataBaseType;
 import com.wgzhao.addax.rdbms.util.RdbmsException;
-import com.wgzhao.addax.common.base.Constant;
-import com.wgzhao.addax.common.base.Key;
-import com.alibaba.druid.sql.parser.ParserException;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -74,12 +74,12 @@ public final class WriterUtil
         List<String> preSqls = simplifiedConf.getList(Key.PRE_SQL, String.class);
         List<String> postSqls = simplifiedConf.getList(Key.POST_SQL, String.class);
 
-        List<Object> conns = simplifiedConf.getList(Key.CONNECTION, Object.class);
+        List<Configuration> connections = simplifiedConf.getListConfiguration(Key.CONNECTION);
 
-        for (Object conn : conns) {
+        for (Configuration connConf : connections) {
             Configuration sliceConfig = simplifiedConf.clone();
 
-            Configuration connConf = Configuration.from(conn.toString());
+//            Configuration connConf = Configuration.from(conn.toString());
             jdbcUrl = connConf.getString(Key.JDBC_URL);
             sliceConfig.set(Key.JDBC_URL, jdbcUrl);
 
@@ -120,7 +120,7 @@ public final class WriterUtil
     public static void executeSqls(Connection conn, List<String> sqls, String basicMessage, DataBaseType dataBaseType)
     {
         String currentSql = null;
-        try (Statement stmt = conn.createStatement()){
+        try (Statement stmt = conn.createStatement()) {
             for (String sql : sqls) {
                 currentSql = sql;
                 stmt.execute(sql);
@@ -173,7 +173,6 @@ public final class WriterUtil
         return writeDataSqlTemplate;
     }
 
-
     private static String doPostgresqlUpdate(String writeMode, List<String> columnHolders)
     {
         String conflict = writeMode.replace("update", "");
@@ -190,7 +189,8 @@ public final class WriterUtil
         for (String column : columnHolders) {
             if (!first) {
                 sb.append(",");
-            } else {
+            }
+            else {
                 first = false;
             }
             sb.append(column);
@@ -285,8 +285,7 @@ public final class WriterUtil
 
     public static void preCheckPrePareSQL(Configuration originalConfig, DataBaseType type)
     {
-        List<Object> conns = originalConfig.getList(Key.CONNECTION, Object.class);
-        Configuration connConf = Configuration.from(conns.get(0).toString());
+        Configuration connConf = originalConfig.getListConfiguration(Key.CONNECTION).get(0);
         String table = connConf.getList(Key.TABLE, String.class).get(0);
 
         List<String> preSqls = originalConfig.getList(Key.PRE_SQL, String.class);
@@ -307,8 +306,7 @@ public final class WriterUtil
 
     public static void preCheckPostSQL(Configuration originalConfig, DataBaseType type)
     {
-        List<Object> conns = originalConfig.getList(Key.CONNECTION, Object.class);
-        Configuration connConf = Configuration.from(conns.get(0).toString());
+        Configuration connConf = originalConfig.getListConfiguration(Key.CONNECTION).get(0);
         String table = connConf.getList(Key.TABLE, String.class).get(0);
 
         List<String> postSqls = originalConfig.getList(Key.POST_SQL, String.class);

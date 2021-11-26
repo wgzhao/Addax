@@ -34,6 +34,12 @@
         </dependency>
 
         <dependency>
+            <groupId>com.google.guava</groupId>
+            <artifactId>guava</artifactId>
+            <version>${guava.version}</version>
+        </dependency>
+
+        <dependency>
             <groupId>io.trino.hadoop</groupId>
             <artifactId>hadoop-apache</artifactId>
             <version>${hadoop.version}</version>
@@ -47,12 +53,6 @@
                     <artifactId>guava</artifactId>
                 </exclusion>
             </exclusions>
-        </dependency>
-
-        <dependency>
-            <groupId>com.google.guava</groupId>
-            <artifactId>guava</artifactId>
-            <version>${guava.version}</version>
         </dependency>
 
         <dependency>
@@ -74,7 +74,7 @@
                 </exclusion>
             </exclusions>
         </dependency>
-
+        
         <dependency>
             <groupId>org.xerial.snappy</groupId>
             <artifactId>snappy-java</artifactId>

@@ -65,13 +65,13 @@ class CsvWriterImpl
     }
 
     @Override
-    public void writeOneRecord(List<String> splitedRows)
+    public void writeOneRecord(List<String> splitRows)
             throws IOException
     {
-        if (splitedRows.isEmpty()) {
+        if (splitRows.isEmpty()) {
             LOG.info("Found one record line which is empty.");
         }
-        this.csvWriter.writeRecord(splitedRows
+        this.csvWriter.writeRecord(splitRows
                 .toArray(new String[0]));
     }
 
@@ -104,14 +104,14 @@ class TextWriterImpl
     }
 
     @Override
-    public void writeOneRecord(List<String> splitedRows)
+    public void writeOneRecord(List<String> splitRows)
             throws IOException
     {
-        if (splitedRows.isEmpty()) {
+        if (splitRows.isEmpty()) {
             LOG.info("Found one record line which is empty.");
         }
         this.textWriter.write(String.format("%s%s",
-                StringUtils.join(splitedRows, this.fieldDelimiter),
+                StringUtils.join(splitRows, this.fieldDelimiter),
                 IOUtils.LINE_SEPARATOR_UNIX));
     }
 

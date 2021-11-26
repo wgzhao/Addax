@@ -210,7 +210,7 @@ public class CommonRdbmsWriter
         protected String writeRecordSql;
         protected String writeMode;
         protected boolean emptyAsNull;
-        protected List<Map> resultSetMetaData;
+        protected List<Map<String, Object>> resultSetMetaData;
 
         public Task(DataBaseType dataBaseType)
         {

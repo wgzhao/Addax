@@ -79,11 +79,11 @@ public class StorageReaderUtil
     public static String[] splitBufferedReader(CsvReader csvReader)
             throws IOException
     {
-        String[] splitedResult = null;
+        String[] splitResult = null;
         if (csvReader.readRecord()) {
-            splitedResult = csvReader.getValues();
+            splitResult = csvReader.getValues();
         }
-        return splitedResult;
+        return splitResult;
     }
 
     public static void readFromStream(InputStream inputStream, String fileName,
@@ -110,7 +110,7 @@ public class StorageReaderUtil
 
         // compress logic
         try {
-            if (compress == null || "".equals(compress) ) {
+            if (compress == null || "".equals(compress)) {
                 reader = new BufferedReader(new InputStreamReader(inputStream, encoding), bufferSize);
             }
             else {
@@ -137,8 +137,8 @@ public class StorageReaderUtil
         }
         catch (UnsupportedEncodingException uee) {
             throw AddaxException.asAddaxException(
-                            StorageReaderErrorCode.OPEN_FILE_WITH_CHARSET_ERROR,
-                            String.format("%s is unsupported", encoding), uee);
+                    StorageReaderErrorCode.OPEN_FILE_WITH_CHARSET_ERROR,
+                    String.format("%s is unsupported", encoding), uee);
         }
         catch (NullPointerException e) {
             throw AddaxException.asAddaxException(
@@ -286,7 +286,7 @@ public class StorageReaderUtil
                     if (null != columnIndex) {
                         if (columnIndex >= sourceLine.length) {
                             String message = String.format("The column index %s you try to read is out of range(%s): %s",
-                                    columnIndex + 1, sourceLine.length,  StringUtils.join(sourceLine, ","));
+                                    columnIndex + 1, sourceLine.length, StringUtils.join(sourceLine, ","));
                             LOG.warn(message);
                             throw new IndexOutOfBoundsException(message);
                         }
