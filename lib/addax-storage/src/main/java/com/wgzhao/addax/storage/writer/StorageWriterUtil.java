@@ -155,7 +155,7 @@ public class StorageWriterUtil
         String fileSuffix;
         for (int i = 0; i < mandatoryNumber; i++) {
             // handle same file name
-            Configuration splitedTaskConfig = writerSliceConfig.clone();
+            Configuration splitTaskConfig = writerSliceConfig.clone();
             String fullFileName;
             fileSuffix = UUID.randomUUID().toString().replace('-', '_');
             fullFileName = String.format("%s__%s", filePrefix, fileSuffix);
@@ -164,9 +164,9 @@ public class StorageWriterUtil
                 fullFileName = String.format("%s__%s", filePrefix, fileSuffix);
             }
             allFileExists.add(fullFileName);
-            splitedTaskConfig.set(Key.FILE_NAME, fullFileName);
-            LOG.info(String.format("splited write file name:[%s]", fullFileName));
-            writerSplitConfigs.add(splitedTaskConfig);
+            splitTaskConfig.set(Key.FILE_NAME, fullFileName);
+            LOG.info(String.format("split write file name:[%s]", fullFileName));
+            writerSplitConfigs.add(splitTaskConfig);
         }
         LOG.info("end do split.");
         return writerSplitConfigs;
@@ -324,7 +324,7 @@ public class StorageWriterUtil
 //            nullFormat = "null";
 //        }
         try {
-            List<String> splitedRows = new ArrayList<>();
+            List<String> splitRows = new ArrayList<>();
             int recordLength = record.getColumnNumber();
             if (0 != recordLength) {
                 Column column;
@@ -332,26 +332,26 @@ public class StorageWriterUtil
                     column = record.getColumn(i);
                     if (null == column || null == column.getRawData() || column.asString().equals(nullFormat)) {
                         // warn: it's all ok if nullFormat is null
-                        splitedRows.add(nullFormat);
+                        splitRows.add(nullFormat);
                     }
                     else {
                         // warn: it's all ok if nullFormat is null
                         boolean isDateColumn = column instanceof DateColumn;
                         if (!isDateColumn) {
-                            splitedRows.add(column.asString());
+                            splitRows.add(column.asString());
                         }
                         else {
                             if (null != dateParse) {
-                                splitedRows.add(dateParse.format(column.asDate()));
+                                splitRows.add(dateParse.format(column.asDate()));
                             }
                             else {
-                                splitedRows.add(column.asString());
+                                splitRows.add(column.asString());
                             }
                         }
                     }
                 }
             }
-            writer.writeOneRecord(splitedRows);
+            writer.writeOneRecord(splitRows);
         }
         catch (Exception e) {
             // warn: dirty data

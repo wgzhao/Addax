@@ -383,7 +383,7 @@ public final class DBUtil
     {
         List<String> columns = new ArrayList<>();
 
-        List<Map> rsMetaData = getColumnMetaData(conn, tableName, "*");
+        List<Map<String, Object>> rsMetaData = getColumnMetaData(conn, tableName, "*");
         for (int i = 1, len = rsMetaData.size(); i < len; i++) {
             columns.add(rsMetaData.get(i).get("name").toString());
         }
@@ -398,15 +398,15 @@ public final class DBUtil
      * @param column table column
      * @return {@link List}
      */
-    public static List<Map> getColumnMetaData(Connection conn, String tableName, String column)
+    public static List<Map<String, Object>> getColumnMetaData(Connection conn, String tableName, String column)
     {
-        List<Map> result = new ArrayList<>();
+        List<Map<String, Object>> result = new ArrayList<>();
         // skip index 0, compliant with jdbc resultSet and resultMetaData
         result.add(null);
-        try  {
+        try {
             Statement statement = conn.createStatement();
             String queryColumnSql;
-            if ( DataBaseType.TDengine.getDriverClassName().equals(conn.getMetaData().getDriverName())) {
+            if (DataBaseType.TDengine.getDriverClassName().equals(conn.getMetaData().getDriverName())) {
                 // TDengine does not support 1=2 clause
                 queryColumnSql = "SELECT " + column + " FROM " + tableName + " LIMIT 0";
             }
@@ -414,7 +414,7 @@ public final class DBUtil
                 queryColumnSql = "SELECT " + column + " FROM " + tableName + " WHERE 1 = 2";
             }
             ResultSetMetaData metaData = statement.executeQuery(queryColumnSql).getMetaData();
-            for (int i=1; i<=metaData.getColumnCount(); i++) {
+            for (int i = 1; i <= metaData.getColumnCount(); i++) {
                 Map<String, Object> map = new HashMap<>();
                 map.put("name", metaData.getColumnName(i));
                 map.put("type", metaData.getColumnType(i));
@@ -432,7 +432,6 @@ public final class DBUtil
                     String.format("获取表:%s 的字段的元信息时失败. 请联系 DBA 核查该库、表信息.", tableName), e);
         }
     }
-
 
     public static boolean testConnWithoutRetry(DataBaseType dataBaseType, String url, String user, String pass)
     {

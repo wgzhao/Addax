@@ -23,7 +23,6 @@ package com.wgzhao.addax.rdbms.writer.util;
 
 import com.wgzhao.addax.common.base.Constant;
 import com.wgzhao.addax.common.base.Key;
-import com.wgzhao.addax.rdbms.util.TableExpandUtil;
 import com.wgzhao.addax.common.exception.AddaxException;
 import com.wgzhao.addax.common.util.Configuration;
 import com.wgzhao.addax.common.util.ListUtil;
@@ -32,12 +31,12 @@ import com.wgzhao.addax.rdbms.util.DBUtil;
 import com.wgzhao.addax.rdbms.util.DBUtilErrorCode;
 import com.wgzhao.addax.rdbms.util.DataBaseType;
 import com.wgzhao.addax.rdbms.util.JdbcConnectionFactory;
+import com.wgzhao.addax.rdbms.util.TableExpandUtil;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 public final class OriginalConfPretreatmentUtil
@@ -53,9 +52,8 @@ public final class OriginalConfPretreatmentUtil
         // 检查 username 配置（必填）
         originalConfig.getNecessaryValue(Key.USERNAME, DBUtilErrorCode.REQUIRED_VALUE);
 
-
         // 有些数据库没有密码，因此密码不再作为必选项
-        if (originalConfig.getString(Key.PASSWORD) == null ) {
+        if (originalConfig.getString(Key.PASSWORD) == null) {
             originalConfig.set(Key.PASSWORD, "");
         }
         doCheckBatchSize(originalConfig);
@@ -81,16 +79,14 @@ public final class OriginalConfPretreatmentUtil
 
     public static void simplifyConf(Configuration originalConfig)
     {
-        List<Object> connections = originalConfig.getList(Key.CONNECTION,
-                Object.class);
-
+        List<Configuration> connections = originalConfig.getListConfiguration(Key.CONNECTION);
         int tableNum = 0;
 
         for (int i = 0, len = connections.size(); i < len; i++) {
-            Configuration connConf = Configuration.from(connections.get(i).toString());
+            Configuration connConf = connections.get(i);
             // 是否配置的定制的驱动名称
             String driverClass = connConf.getString(Key.JDBC_DRIVER, null);
-            if (driverClass != null && ! driverClass.isEmpty()) {
+            if (driverClass != null && !driverClass.isEmpty()) {
                 LOG.warn("use specified driver class: {}", driverClass);
                 dataBaseType.setDriverClassName(driverClass);
             }
@@ -154,7 +150,7 @@ public final class OriginalConfPretreatmentUtil
             else if (userConfiguredColumns.size() > allColumns.size()) {
                 throw AddaxException.asAddaxException(DBUtilErrorCode.ILLEGAL_VALUE,
                         String.format("您的配置文件中的列配置信息有误. 因为您所配置的写入数据库表的字段个数:%s 大于目的表的总字段总个数:%s. " +
-                                        "请检查您的配置并作出修改.", userConfiguredColumns.size(), allColumns.size()));
+                                "请检查您的配置并作出修改.", userConfiguredColumns.size(), allColumns.size()));
             }
             else {
                 // 确保用户配置的 column 不重复

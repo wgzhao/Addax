@@ -350,14 +350,14 @@ public class SingleTableSplitUtil
         Connection conn = DBUtil.getConnection(dataBaseType, jdbcURL, username, password);
         LOG.info("split pk [sql={}] is running... ", splitSql);
         ResultSet rs = null;
-        List<Pair<Object, Integer>> splitedRange = new ArrayList<>();
+        List<Pair<Object, Integer>> splitRange = new ArrayList<>();
         try {
             rs = DBUtil.query(conn, splitSql, fetchSize);
             configuration.set(Constant.PK_TYPE, Constant.PK_TYPE_MONTE_CARLO);
             ResultSetMetaData rsMetaData = rs.getMetaData();
             while (DBUtil.asyncResultSetNext(rs)) {
                 ImmutablePair<Object, Integer> eachPoint = new ImmutablePair<>(rs.getObject(1), rsMetaData.getColumnType(1));
-                splitedRange.add(eachPoint);
+                splitRange.add(eachPoint);
             }
         }
         catch (AddaxException e) {
@@ -370,31 +370,31 @@ public class SingleTableSplitUtil
             DBUtil.closeDBResources(rs, null, null);
         }
 
-        LOG.debug(JSON.toJSONString(splitedRange));
+        LOG.debug(JSON.toJSONString(splitRange));
         List<String> rangeSql = new ArrayList<>();
-        int splitedRangeSize = splitedRange.size();
-        // warn: splitedRangeSize may be 0 or 1，切分规则为IS NULL以及 IS NOT NULL
+        int splitRangeSize = splitRange.size();
+        // warn: splitRangeSize may be 0 or 1，切分规则为IS NULL以及 IS NOT NULL
         // demo: Parameter rangeResult can not be null and its length can not <2. detail:rangeResult=[24999930].
-        if (splitedRangeSize >= 2) {
+        if (splitRangeSize >= 2) {
             // warn: oracle Number is long type here
-            if (isLongType(splitedRange.get(0).getRight())) {
-                BigInteger[] integerPoints = new BigInteger[splitedRange.size()];
-                for (int i = 0; i < splitedRangeSize; i++) {
-                    integerPoints[i] = new BigInteger(splitedRange.get(i).getLeft().toString());
+            if (isLongType(splitRange.get(0).getRight())) {
+                BigInteger[] integerPoints = new BigInteger[splitRange.size()];
+                for (int i = 0; i < splitRangeSize; i++) {
+                    integerPoints[i] = new BigInteger(splitRange.get(i).getLeft().toString());
                 }
                 rangeSql.addAll(RdbmsRangeSplitWrap.wrapRange(integerPoints, splitPK));
-                // its ok if splitedRangeSize is 1
-                rangeSql.add(RdbmsRangeSplitWrap.wrapFirstLastPoint(integerPoints[0], integerPoints[splitedRangeSize - 1], splitPK));
+                // it's ok if splitRangeSize is 1
+                rangeSql.add(RdbmsRangeSplitWrap.wrapFirstLastPoint(integerPoints[0], integerPoints[splitRangeSize - 1], splitPK));
             }
-            else if (isStringType(splitedRange.get(0).getRight())) {
+            else if (isStringType(splitRange.get(0).getRight())) {
                 // warn: treated as string type
-                String[] stringPoints = new String[splitedRange.size()];
-                for (int i = 0; i < splitedRangeSize; i++) {
-                    stringPoints[i] = splitedRange.get(i).getLeft().toString();
+                String[] stringPoints = new String[splitRange.size()];
+                for (int i = 0; i < splitRangeSize; i++) {
+                    stringPoints[i] = splitRange.get(i).getLeft().toString();
                 }
                 rangeSql.addAll(RdbmsRangeSplitWrap.wrapRange(stringPoints, splitPK, "'", dataBaseType));
-                // its ok if splitedRangeSize is 1
-                rangeSql.add(RdbmsRangeSplitWrap.wrapFirstLastPoint(stringPoints[0], stringPoints[splitedRangeSize - 1],
+                // it's ok if splitRangeSize is 1
+                rangeSql.add(RdbmsRangeSplitWrap.wrapFirstLastPoint(stringPoints[0], stringPoints[splitRangeSize - 1],
                         splitPK, "'", dataBaseType));
             }
             else {

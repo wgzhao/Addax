@@ -29,7 +29,7 @@ public interface Writer
         extends Closeable
 {
 
-    void writeOneRecord(List<String> splitedRows)
+    void writeOneRecord(List<String> splitRows)
             throws IOException;
 
     void flush()
