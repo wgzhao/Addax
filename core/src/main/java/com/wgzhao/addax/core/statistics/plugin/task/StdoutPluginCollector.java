@@ -19,13 +19,13 @@
 
 package com.wgzhao.addax.core.statistics.plugin.task;
 
+import com.alibaba.fastjson.JSON;
 import com.wgzhao.addax.common.constant.PluginType;
 import com.wgzhao.addax.common.element.Record;
 import com.wgzhao.addax.common.util.Configuration;
 import com.wgzhao.addax.core.statistics.communication.Communication;
 import com.wgzhao.addax.core.statistics.plugin.task.util.DirtyRecord;
 import com.wgzhao.addax.core.util.container.CoreConstant;
-import com.alibaba.fastjson.JSON;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -50,8 +50,8 @@ public class StdoutPluginCollector
     {
         super(configuration, communication, type);
         maxLogNum = new AtomicInteger(configuration.getInt(
-                        CoreConstant.CORE_STATISTICS_COLLECTOR_PLUGIN_MAX_DIRTY_NUMBER,
-                        DEFAULT_MAX_DIRTY_NUM));
+                CoreConstant.CORE_STATISTICS_COLLECTOR_PLUGIN_MAX_DIRTY_NUMBER,
+                DEFAULT_MAX_DIRTY_NUM));
     }
 
     private String formatDirty(final Record dirty, final Throwable t, final String msg)
@@ -80,7 +80,7 @@ public class StdoutPluginCollector
             LOG.error("", t);
         }
         if (maxLogNum.intValue() < 0 || currentLogNum.intValue() < maxLogNum.intValue()) {
-            LOG.error("脏数据: {}%n", this.formatDirty(dirtyRecord, t, errorMessage));
+            LOG.error("dirty data: {}", this.formatDirty(dirtyRecord, t, errorMessage));
         }
 
         super.collectDirtyRecord(dirtyRecord, t, errorMessage);
