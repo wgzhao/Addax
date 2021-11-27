@@ -285,10 +285,8 @@ public class StorageReaderUtil
 
                     if (null != columnIndex) {
                         if (columnIndex >= sourceLine.length) {
-                            String message = String.format("The column index %s you try to read is out of range(%s): %s",
-                                    columnIndex + 1, sourceLine.length, StringUtils.join(sourceLine, ","));
-                            LOG.warn(message);
-                            throw new IndexOutOfBoundsException(message);
+                            throw new IndexOutOfBoundsException(String.format("The column index %s you try to read is out of range(%s): [%s]",
+                                    columnIndex + 1, sourceLine.length, StringUtils.join(sourceLine, ",")));
                         }
                         columnValue = sourceLine[columnIndex];
                     }
@@ -301,38 +299,21 @@ public class StorageReaderUtil
                         record.addColumn(new StringColumn());
                         continue;
                     }
-
-                    String errorTemplate = "Cast %s to %s failure";
-                    switch (type) {
-                        case STRING:
-                            columnGenerated = new StringColumn(columnValue);
-                            break;
-                        case LONG:
-                            try {
+                    try {
+                        switch (type) {
+                            case STRING:
+                                columnGenerated = new StringColumn(columnValue);
+                                break;
+                            case LONG:
                                 columnGenerated = new LongColumn(columnValue);
-                            }
-                            catch (Exception e) {
-                                throw new IllegalArgumentException(String.format(errorTemplate, columnValue, "LONG"));
-                            }
-                            break;
-                        case DOUBLE:
-                            try {
+                                break;
+                            case DOUBLE:
                                 columnGenerated = new DoubleColumn(columnValue);
-                            }
-                            catch (Exception e) {
-                                throw new IllegalArgumentException(String.format(errorTemplate, columnValue, "DOUBLE"));
-                            }
-                            break;
-                        case BOOLEAN:
-                            try {
+                                break;
+                            case BOOLEAN:
                                 columnGenerated = new BoolColumn(columnValue);
-                            }
-                            catch (Exception e) {
-                                throw new IllegalArgumentException(String.format(errorTemplate, columnValue, "BOOLEAN"));
-                            }
-                            break;
-                        case DATE:
-                            try {
+                                break;
+                            case DATE:
                                 String formatString = columnConfig.getFormat();
                                 if (StringUtils.isNotBlank(formatString)) {
                                     // 用户自己配置的格式转换, 脏数据行为出现变化
@@ -343,15 +324,15 @@ public class StorageReaderUtil
                                     // 框架尝试转换
                                     columnGenerated = new DateColumn(new StringColumn(columnValue).asDate());
                                 }
-                            }
-                            catch (Exception e) {
-                                throw new IllegalArgumentException(String.format(errorTemplate, columnValue, "DATE"));
-                            }
-                            break;
-                        default:
-                            String errorMessage = String.format("The column type '%s' is unsupported", columnType);
-                            LOG.error(errorMessage);
-                            throw AddaxException.asAddaxException(StorageReaderErrorCode.NOT_SUPPORT_TYPE, errorMessage);
+                                break;
+                            default:
+                                String errorMessage = String.format("The column type '%s' is unsupported", columnType);
+                                LOG.error(errorMessage);
+                                throw AddaxException.asAddaxException(StorageReaderErrorCode.NOT_SUPPORT_TYPE, errorMessage);
+                        }
+                    }
+                    catch (Exception e) {
+                        throw new IllegalArgumentException(String.format("Cast value '%s' to type '%s' failure", columnValue, type.name()));
                     }
 
                     record.addColumn(columnGenerated);
