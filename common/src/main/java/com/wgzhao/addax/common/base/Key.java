@@ -86,7 +86,7 @@ public class Key
     public static final String DATE_FORMAT = "dateFormat";
     // The file format will be read or write. string type
     public static final String FORMAT = "format";
-    // Specify how to handle existing data if present, can choose append, overwrite, nonconflict, string type
+    // Specify how to handle existing data if present, can choose to append, overwrite, nonconflict, string type
     public static final String WRITE_MODE = "writeMode";
     // The data path of reading or writing, string type
     public static final String PATH = "path";
@@ -98,7 +98,7 @@ public class Key
     public static final String SOURCE_FILES = "sourceFiles";
     // The file format will be read from or write to, it used on txtfilewriter/txtfilereader plugin. string type
     public static final String FILE_FORMAT = "fileFormat";
-    // The hadoop HDFS defaultFS name, it require on hdfsreader/hdfswriter plugins. string type
+    // The hadoop HDFS defaultFS name, it requires on hdfsreader/hdfswriter plugins. string type
     public static final String DEFAULT_FS = "defaultFS";
     // The file type will be read from or write to hadoop hdfs, such as ORC, Parquet, Text etc. string type.
     public static final String FILE_TYPE = "fileType";
