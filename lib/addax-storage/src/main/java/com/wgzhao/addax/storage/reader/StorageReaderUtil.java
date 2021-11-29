@@ -27,6 +27,7 @@ import com.alibaba.fastjson.TypeReference;
 import com.csvreader.CsvReader;
 import com.wgzhao.addax.common.base.Constant;
 import com.wgzhao.addax.common.base.Key;
+import com.wgzhao.addax.common.compress.ExpandLzopInputStream;
 import com.wgzhao.addax.common.compress.ZipCycleInputStream;
 import com.wgzhao.addax.common.constant.Type;
 import com.wgzhao.addax.common.element.BoolColumn;
@@ -126,6 +127,10 @@ public class StorageReaderUtil
                 else if ("zip".equalsIgnoreCase(compress)) {
                     ZipCycleInputStream zipCycleInputStream = new ZipCycleInputStream(inputStream);
                     reader = new BufferedReader(new InputStreamReader(zipCycleInputStream, encoding), bufferSize);
+                }
+                else if("lzo".equalsIgnoreCase(compress)) {
+                    ExpandLzopInputStream expandLzopInputStream = new ExpandLzopInputStream(inputStream);
+                    reader = new BufferedReader(new InputStreamReader(expandLzopInputStream, encoding), bufferSize);
                 }
                 else {
                     // common-compress supports almost compress alg
