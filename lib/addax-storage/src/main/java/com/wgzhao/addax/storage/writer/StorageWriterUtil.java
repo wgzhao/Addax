@@ -31,7 +31,10 @@ import com.wgzhao.addax.common.exception.AddaxException;
 import com.wgzhao.addax.common.plugin.RecordReceiver;
 import com.wgzhao.addax.common.plugin.TaskPluginCollector;
 import com.wgzhao.addax.common.util.Configuration;
+import com.wgzhao.addax.storage.reader.StorageReaderErrorCode;
+import org.apache.commons.compress.compressors.CompressorException;
 import org.apache.commons.compress.compressors.CompressorOutputStream;
+import org.apache.commons.compress.compressors.CompressorStreamFactory;
 import org.apache.commons.compress.compressors.bzip2.BZip2CompressorOutputStream;
 import org.apache.commons.compress.compressors.gzip.GzipCompressorOutputStream;
 import org.apache.commons.io.Charsets;
@@ -57,8 +60,8 @@ import java.util.UUID;
 public class StorageWriterUtil
 {
     private static final Logger LOG = LoggerFactory.getLogger(StorageWriterUtil.class);
-    private static final Set<String> supportedCompress = new HashSet<>(Arrays.asList("gzip", "bzip2", "zip"));
-    private static final Set<String> supportedWriteModes = new HashSet<>(Arrays.asList("truncate", "append", "nonConflict"));
+    //    private static final Set<String> supportedCompress = new HashSet<>(Arrays.asList("gzip", "bzip2", "zip"));
+    private static final Set<String> supportedWriteModes = new HashSet<>(Arrays.asList("truncate", "append", "nonConflict", "overwrite"));
 
     private StorageWriterUtil()
     {
@@ -108,16 +111,16 @@ public class StorageWriterUtil
         if (StringUtils.isBlank(compress)) {
             writerConfiguration.set(Key.COMPRESS, null);
         }
-        else {
-            if (!supportedCompress.contains(compress.toLowerCase().trim())) {
-                String message = String.format(
-                        "'%s' is unsupported, supported compress format: [%s] ",
-                        compress, StringUtils.join(supportedCompress, ","));
-                throw AddaxException.asAddaxException(
-                        StorageWriterErrorCode.ILLEGAL_VALUE,
-                        String.format(message, compress));
-            }
-        }
+//        else {
+//            if (!supportedCompress.contains(compress.toLowerCase().trim())) {
+//                String message = String.format(
+//                        "'%s' is unsupported, supported compress format: [%s] ",
+//                        compress, StringUtils.join(supportedCompress, ","));
+//                throw AddaxException.asAddaxException(
+//                        StorageWriterErrorCode.ILLEGAL_VALUE,
+//                        String.format(message, compress));
+//            }
+//        }
 
         // fieldDelimiter check
         String delimiterInStr = writerConfiguration
@@ -217,24 +220,21 @@ public class StorageWriterUtil
                 writer = new BufferedWriter(new OutputStreamWriter(outputStream, encoding));
             }
             else {
+                //normalize compress name
                 if ("gzip".equalsIgnoreCase(compress)) {
-                    CompressorOutputStream compressorOutputStream = new GzipCompressorOutputStream(outputStream);
-                    writer = new BufferedWriter(new OutputStreamWriter(compressorOutputStream, encoding));
+                    compress = "gz";
+                } else if ("bz2".equalsIgnoreCase(compress)) {
+                    compress = "bzip2";
                 }
-                else if ("bzip2".equalsIgnoreCase(compress)) {
-                    CompressorOutputStream compressorOutputStream = new BZip2CompressorOutputStream(outputStream);
-                    writer = new BufferedWriter(new OutputStreamWriter(compressorOutputStream, encoding));
-                }
-                else if ("zip".equals(compress)) {
+
+                if ("zip".equals(compress)) {
                     ZipCycleOutputStream zis = new ZipCycleOutputStream(outputStream, fileName);
                     writer = new BufferedWriter(new OutputStreamWriter(zis, encoding));
                 }
                 else {
-                    throw AddaxException
-                            .asAddaxException(
-                                    StorageWriterErrorCode.ILLEGAL_VALUE,
-                                    String.format("'%s' is supported, supported compress format: [%s]",
-                                            compress, StringUtils.join(supportedCompress, ",")));
+                    CompressorOutputStream compressorOutputStream = new CompressorStreamFactory().createCompressorOutputStream(compress,
+                            outputStream);
+                    writer = new BufferedWriter(new OutputStreamWriter(compressorOutputStream, encoding));
                 }
             }
             StorageWriterUtil.doWriteToStream(lineReceiver, writer, fileName, config, taskPluginCollector);
@@ -249,6 +249,12 @@ public class StorageWriterUtil
             throw AddaxException.asAddaxException(
                     StorageWriterErrorCode.RUNTIME_EXCEPTION,
                     "运行时错误, 请联系我们", e);
+        }
+        catch (CompressorException e) {
+            throw AddaxException.asAddaxException(
+                    StorageReaderErrorCode.ILLEGAL_VALUE,
+                    "The compress algorithm '" + compress + "' is unsupported yet"
+            );
         }
         catch (IOException e) {
             throw AddaxException.asAddaxException(

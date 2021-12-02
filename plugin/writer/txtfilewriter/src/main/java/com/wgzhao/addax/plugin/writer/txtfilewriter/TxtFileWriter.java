@@ -259,6 +259,8 @@ public class TxtFileWriter
             }
             else if ("zip".equalsIgnoreCase(compress)) {
                 suffix = ".zip";
+            } else if (!compress.isEmpty()) {
+                suffix = "." + compress;
             }
             this.fileName = this.fileName + "." + this.fileFormat;
         }

@@ -42,8 +42,6 @@ import com.wgzhao.addax.common.exception.AddaxException;
 import com.wgzhao.addax.common.plugin.RecordSender;
 import com.wgzhao.addax.common.plugin.TaskPluginCollector;
 import com.wgzhao.addax.common.util.Configuration;
-import io.airlift.compress.snappy.SnappyCodec;
-import io.airlift.compress.snappy.SnappyFramedInputStream;
 import org.apache.commons.beanutils.BeanUtils;
 import org.apache.commons.compress.compressors.CompressorException;
 import org.apache.commons.compress.compressors.CompressorInputStream;
@@ -51,7 +49,6 @@ import org.apache.commons.compress.compressors.CompressorStreamFactory;
 import org.apache.commons.io.Charsets;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.hadoop.io.compress.CompressionCodec;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -115,26 +112,19 @@ public class StorageReaderUtil
                 reader = new BufferedReader(new InputStreamReader(inputStream, encoding), bufferSize);
             }
             else {
-                if ("hadoop-snappy".equalsIgnoreCase(compress)) {
-                    CompressionCodec snappyCodec = new SnappyCodec();
-                    InputStream snappyInputStream = snappyCodec.createInputStream(inputStream);
-                    reader = new BufferedReader(new InputStreamReader(snappyInputStream, encoding));
-                }
-                else if ("framing-snappy".equalsIgnoreCase(compress)) {
-                    InputStream snappyInputStream = new SnappyFramedInputStream(inputStream);
-                    reader = new BufferedReader(new InputStreamReader(snappyInputStream, encoding));
-                }
-                else if ("zip".equalsIgnoreCase(compress)) {
+                if ("zip".equalsIgnoreCase(compress)) {
                     ZipCycleInputStream zipCycleInputStream = new ZipCycleInputStream(inputStream);
                     reader = new BufferedReader(new InputStreamReader(zipCycleInputStream, encoding), bufferSize);
                 }
-                else if("lzo".equalsIgnoreCase(compress)) {
+                else if ("lzo".equalsIgnoreCase(compress)) {
                     ExpandLzopInputStream expandLzopInputStream = new ExpandLzopInputStream(inputStream);
                     reader = new BufferedReader(new InputStreamReader(expandLzopInputStream, encoding), bufferSize);
                 }
                 else {
+                    // detect compress type
+                    String compressType = CompressorStreamFactory.detect(inputStream);
                     // common-compress supports almost compress alg
-                    CompressorInputStream input = new CompressorStreamFactory().createCompressorInputStream(compress, inputStream, true);
+                    CompressorInputStream input = new CompressorStreamFactory().createCompressorInputStream(compressType, inputStream, true);
                     reader = new BufferedReader(new InputStreamReader(input, encoding), bufferSize);
                 }
             }
@@ -156,7 +146,7 @@ public class StorageReaderUtil
         catch (CompressorException e) {
             throw AddaxException.asAddaxException(
                     StorageReaderErrorCode.ILLEGAL_VALUE,
-                    "The compress '" + compress + "' is supported"
+                    "The compress algorithm'" + compress + "' is unsupported yet"
             );
         }
         finally {
