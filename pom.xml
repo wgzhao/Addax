@@ -46,7 +46,7 @@
         <groovy.version>3.0.9</groovy.version>
         <fluent.hc.version>4.5.13</fluent.hc.version>
         <hadoop.common.version>3.2.2</hadoop.common.version>
-        <hbase1.version>1.4.13</hbase1.version>
+        <hbase1.version>2.4.8</hbase1.version>
         <hbase2.version>2.2.5</hbase2.version>
         <hive.version>3.1.2-16</hive.version>
         <httpclient.version>4.5.13</httpclient.version>
