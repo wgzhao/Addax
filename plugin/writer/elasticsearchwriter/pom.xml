@@ -30,13 +30,13 @@
         <dependency>
             <groupId>io.searchbox</groupId>
             <artifactId>jest</artifactId>
-            <version>6.3.1</version>
+            <version>${jest.version}</version>
         </dependency>
 
         <dependency>
             <groupId>io.searchbox</groupId>
             <artifactId>jest-common</artifactId>
-            <version>6.3.1</version>
+            <version>${jest.version}</version>
         </dependency>
 
         <dependency>

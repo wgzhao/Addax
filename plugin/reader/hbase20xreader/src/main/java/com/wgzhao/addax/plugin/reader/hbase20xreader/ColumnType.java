@@ -20,7 +20,7 @@
 package com.wgzhao.addax.plugin.reader.hbase20xreader;
 
 import com.wgzhao.addax.common.exception.AddaxException;
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 
 import java.util.Arrays;
 

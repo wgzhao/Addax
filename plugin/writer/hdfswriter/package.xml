@@ -31,6 +31,8 @@
             <scope>runtime</scope>
             <excludes>
                 <exclude>com.wgzhao.addax:*</exclude>
+                <exclude>io.trino.hadoop:*</exclude>
+                <exclude>org.apache.commons:*</exclude>
             </excludes>
         </dependencySet>
     </dependencySets>

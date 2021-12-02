@@ -21,7 +21,6 @@
 
 package com.wgzhao.addax.storage.writer;
 
-import com.google.common.collect.Sets;
 import com.wgzhao.addax.common.base.Constant;
 import com.wgzhao.addax.common.base.Key;
 import com.wgzhao.addax.common.compress.ZipCycleOutputStream;
@@ -49,6 +48,7 @@ import java.io.UnsupportedEncodingException;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -57,8 +57,8 @@ import java.util.UUID;
 public class StorageWriterUtil
 {
     private static final Logger LOG = LoggerFactory.getLogger(StorageWriterUtil.class);
-    private static final Set<String> supportedCompress = Sets.newHashSet("gzip", "bzip2", "zip");
-    private static final Set<String> supportedWriteModes = Sets.newHashSet("truncate", "append", "nonConflict");
+    private static final Set<String> supportedCompress = new HashSet<>(Arrays.asList("gzip", "bzip2", "zip"));
+    private static final Set<String> supportedWriteModes = new HashSet<>(Arrays.asList("truncate", "append", "nonConflict"));
 
     private StorageWriterUtil()
     {
@@ -122,7 +122,7 @@ public class StorageWriterUtil
         // fieldDelimiter check
         String delimiterInStr = writerConfiguration
                 .getString(Key.FIELD_DELIMITER);
-        // warn: if have, length must be one
+        // warn: if it has, length must be one
         if (null != delimiterInStr && 1 != delimiterInStr.length()) {
             throw AddaxException.asAddaxException(
                     StorageWriterErrorCode.ILLEGAL_VALUE,

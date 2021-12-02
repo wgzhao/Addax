@@ -12,11 +12,6 @@
     <name>hbase11x-writer</name>
     <packaging>jar</packaging>
 
-    <properties>
-        <hbase.version>1.4.12</hbase.version>
-        <commons-codec.version>1.8</commons-codec.version>
-    </properties>
-
     <dependencies>
 
         <dependency>
@@ -46,7 +41,7 @@
         <dependency>
             <groupId>org.apache.hbase</groupId>
             <artifactId>hbase-client</artifactId>
-            <version>${hbase.version}</version>
+            <version>${hbase1.version}</version>
             <exclusions>
                 <exclusion>
                     <artifactId>jdk.tools</artifactId>
@@ -58,7 +53,7 @@
         <dependency>
             <groupId>org.apache.hbase</groupId>
             <artifactId>hbase-common</artifactId>
-            <version>${hbase.version}</version>
+            <version>${hbase1.version}</version>
         </dependency>
 
     </dependencies>

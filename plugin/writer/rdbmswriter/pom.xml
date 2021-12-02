@@ -33,22 +33,6 @@
             <version>${project.version}</version>
         </dependency>
 
-        <!-- <dependency>
-            <groupId>com.dm</groupId>
-            <artifactId>dm</artifactId>
-            <version>16</version>
-        </dependency>
-        <dependency>
-            <groupId>com.sybase</groupId>
-            <artifactId>jconn3</artifactId>
-            <version>1.0.0</version>
-        </dependency>
-        <dependency>
-            <groupId>ppas</groupId>
-            <artifactId>ppas</artifactId>
-            <version>16</version>
-        </dependency> -->
-
     </dependencies>
 
     <build>

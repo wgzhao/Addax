@@ -119,19 +119,4 @@ public class TimestampColumn
         throw AddaxException.asAddaxException(
                 CommonErrorCode.CONVERT_NOT_SUPPORT, "Timestamp类型不能转为BigInteger .");
     }
-
-    public static void main(String[] args)
-            throws SQLException
-    {
-        String s = "2021-09-27 11:12:13.123456";
-        Connection connection = DriverManager.getConnection("jdbc:mysql://10.60.172.153:3306/test", "wbuser", "wbuser123");
-        Statement statement = connection.createStatement();
-        statement.executeQuery("truncate table addax_write");
-        PreparedStatement preparedStatement = connection.prepareStatement("insert into addax_write values(?)");
-        Column column = new TimestampColumn(s);
-        preparedStatement.setTimestamp(1, column.asTimestamp());
-        preparedStatement.execute();
-        preparedStatement.close();
-        connection.close();
-    }
 }
