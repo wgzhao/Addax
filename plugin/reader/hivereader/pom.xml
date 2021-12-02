@@ -8,7 +8,7 @@
         <relativePath>../../../pom.xml</relativePath>
     </parent>
     <artifactId>hivereader</artifactId>
-    <name>mysql-reader</name>
+    <name>hive-reader</name>
     <packaging>jar</packaging>
 
     <dependencies>
