@@ -24,7 +24,6 @@ package com.wgzhao.addax.storage.reader;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.alibaba.fastjson.TypeReference;
-import com.csvreader.CsvReader;
 import com.wgzhao.addax.common.base.Constant;
 import com.wgzhao.addax.common.base.Key;
 import com.wgzhao.addax.common.compress.ExpandLzopInputStream;
@@ -44,10 +43,12 @@ import com.wgzhao.addax.common.plugin.TaskPluginCollector;
 import com.wgzhao.addax.common.util.Configuration;
 import io.airlift.compress.snappy.SnappyCodec;
 import io.airlift.compress.snappy.SnappyFramedInputStream;
-import org.apache.commons.beanutils.BeanUtils;
 import org.apache.commons.compress.compressors.CompressorException;
 import org.apache.commons.compress.compressors.CompressorInputStream;
 import org.apache.commons.compress.compressors.CompressorStreamFactory;
+import org.apache.commons.csv.CSVFormat;
+import org.apache.commons.csv.CSVParser;
+import org.apache.commons.csv.CSVRecord;
 import org.apache.commons.io.Charsets;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -66,6 +67,7 @@ import java.text.DateFormat;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Objects;
 
 public class StorageReaderUtil
 {
@@ -77,14 +79,9 @@ public class StorageReaderUtil
 
     }
 
-    public static String[] splitBufferedReader(CsvReader csvReader)
-            throws IOException
+    public static String[] splitBufferedReader(CSVRecord csvRecord)
     {
-        String[] splitResult = null;
-        if (csvReader.readRecord()) {
-            splitResult = csvReader.getValues();
-        }
-        return splitResult;
+        return csvRecord.toList().toArray(new String[csvRecord.size()]);
     }
 
     public static void readFromStream(InputStream inputStream, String fileName,
@@ -128,7 +125,7 @@ public class StorageReaderUtil
                     ZipCycleInputStream zipCycleInputStream = new ZipCycleInputStream(inputStream);
                     reader = new BufferedReader(new InputStreamReader(zipCycleInputStream, encoding), bufferSize);
                 }
-                else if("lzo".equalsIgnoreCase(compress)) {
+                else if ("lzo".equalsIgnoreCase(compress)) {
                     ExpandLzopInputStream expandLzopInputStream = new ExpandLzopInputStream(inputStream);
                     reader = new BufferedReader(new InputStreamReader(expandLzopInputStream, encoding), bufferSize);
                 }
@@ -168,6 +165,7 @@ public class StorageReaderUtil
             Configuration readerSliceConfig, RecordSender recordSender,
             TaskPluginCollector taskPluginCollector)
     {
+        CSVFormat.Builder csvFormatBuilder = CSVFormat.DEFAULT.builder();
         String encoding = readerSliceConfig.getString(Key.ENCODING, Constant.DEFAULT_ENCODING);
         Character fieldDelimiter;
         String delimiterInStr = readerSliceConfig
@@ -183,30 +181,20 @@ public class StorageReaderUtil
 
         // warn: default value ',', fieldDelimiter could be \n(lineDelimiter) for no fieldDelimiter
         fieldDelimiter = readerSliceConfig.getChar(Key.FIELD_DELIMITER, Constant.DEFAULT_FIELD_DELIMITER);
-        Boolean skipHeader = readerSliceConfig.getBool(Key.SKIP_HEADER, Constant.DEFAULT_SKIP_HEADER);
+        csvFormatBuilder.setDelimiter(fieldDelimiter);
         // warn: no default value '\N'
         String nullFormat = readerSliceConfig.getString(Key.NULL_FORMAT);
-
+        csvFormatBuilder.setNullString(nullFormat);
+        Boolean skipHeader = readerSliceConfig.getBool(Key.SKIP_HEADER, Constant.DEFAULT_SKIP_HEADER);
+        csvFormatBuilder.setSkipHeaderRecord(skipHeader);
         List<ColumnEntry> column = StorageReaderUtil.getListColumnEntry(readerSliceConfig, Key.COLUMN);
-        CsvReader csvReader = null;
 
         // every line logic
         try {
-            // TODO lineDelimiter
-            if (skipHeader) {
-                String fetchLine = reader.readLine();
-                LOG.info("Header line {} has been skipped.",
-                        fetchLine);
-            }
-            csvReader = new CsvReader(reader);
-            csvReader.setDelimiter(fieldDelimiter);
-
-            setCsvReaderConfig(csvReader);
-
-            String[] parseRows;
-            while ((parseRows = StorageReaderUtil.splitBufferedReader(csvReader)) != null) {
-                StorageReaderUtil.transportOneRecord(recordSender, column, parseRows, nullFormat, taskPluginCollector);
-            }
+            CSVParser csvParser = new CSVParser(reader, csvFormatBuilder.build());
+            csvParser.stream().filter(Objects::nonNull).forEach(csvRecord ->
+                    StorageReaderUtil.transportOneRecord(recordSender, column, csvRecord.toList().toArray(new String[0]), nullFormat, taskPluginCollector)
+            );
         }
         catch (UnsupportedEncodingException uee) {
             throw AddaxException.asAddaxException(
@@ -226,9 +214,7 @@ public class StorageReaderUtil
                     StorageReaderErrorCode.RUNTIME_EXCEPTION, e);
         }
         finally {
-            if (csvReader != null) {
-                csvReader.close();
-            }
+
             IOUtils.closeQuietly(reader, null);
         }
     }
@@ -506,25 +492,5 @@ public class StorageReaderUtil
                             regexPath));
         }
         return parentPath;
-    }
-
-    public static void setCsvReaderConfig(CsvReader csvReader)
-    {
-        if (null != StorageReaderUtil.csvReaderConfigMap && !StorageReaderUtil.csvReaderConfigMap.isEmpty()) {
-            try {
-                BeanUtils.populate(csvReader, StorageReaderUtil.csvReaderConfigMap);
-                LOG.info("csvReaderConfig has configured, current CsvReader: {}", JSON.toJSONString(csvReader));
-            }
-            catch (Exception e) {
-                LOG.warn("The configure item [{}] is illegal, use default CsvReader [{}]",
-                        JSON.toJSONString(StorageReaderUtil.csvReaderConfigMap), JSON.toJSONString(csvReader));
-            }
-        }
-        else {
-            //默认关闭安全模式, 放开10W字节的限制
-            csvReader.setSafetySwitch(false);
-            LOG.info("The configure item [{}] is illegal, use default CsvReader [{}]",
-                    JSON.toJSONString(csvReader), JSON.toJSONString(StorageReaderUtil.csvReaderConfigMap));
-        }
     }
 }
