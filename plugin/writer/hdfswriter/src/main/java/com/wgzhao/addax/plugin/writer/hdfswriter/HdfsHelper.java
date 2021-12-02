@@ -21,7 +21,6 @@ package com.wgzhao.addax.plugin.writer.hdfswriter;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
-import com.google.common.collect.Lists;
 import com.wgzhao.addax.common.base.Key;
 import com.wgzhao.addax.common.element.Column;
 import com.wgzhao.addax.common.element.Record;
@@ -119,7 +118,7 @@ public class HdfsHelper
 
         MutablePair<List<Object>, Boolean> transportResult = new MutablePair<>();
         transportResult.setRight(false);
-        List<Object> recordList = Lists.newArrayList();
+        List<Object> recordList = new ArrayList<>();
         int recordLength = record.getColumnNumber();
         if (0 != recordLength) {
             Column column;

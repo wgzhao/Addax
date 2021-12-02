@@ -28,30 +28,54 @@
 
     <properties>
         <!-- basic components -->
-        <commons.lang3.version>3.12.0</commons.lang3.version>
+        <aircompressor.version>0.21</aircompressor.version>
+        <commons.beanutils.version>1.9.4</commons.beanutils.version>
         <commons.configuration.version>1.10</commons.configuration.version>
+        <commons.codec.version>1.15</commons.codec.version>
+        <commons.compress.version>1.21</commons.compress.version>
         <commons.cli.version>1.5.0</commons.cli.version>
+        <commons.io.version>2.11.0</commons.io.version>
+        <commons.lang3.version>3.12.0</commons.lang3.version>
+        <commons.logging.version>1.2</commons.logging.version>
+        <commons.net.version>3.8.0</commons.net.version>
+        <diamond.version>3.7.3</diamond.version>
         <druid.version>1.2.6</druid.version>
         <fastjson.version>1.2.76</fastjson.version>
+        <findbugs.version>3.0.1</findbugs.version>
         <guava.version>29.0-jre</guava.version>
-        <groovy.version>2.4.21</groovy.version>
-        <diamond.version>3.7.3</diamond.version>
+        <groovy.version>3.0.9</groovy.version>
+        <fluent.hc.version>4.5.13</fluent.hc.version>
+        <hadoop.common.version>3.2.2</hadoop.common.version>
+        <hbase1.version>1.4.13</hbase1.version>
+        <hbase2.version>2.2.5</hbase2.version>
+        <hive.version>3.1.2-16</hive.version>
         <httpclient.version>4.5.13</httpclient.version>
-        <!--slf4j 1.7.28 和 logback.classic 1.2.3 是好基友 -->
-        <slf4j.version>1.7.32</slf4j.version>
+        <httpcore.version>4.4.14</httpcore.version>
+        <httpasync.version>4.1.4</httpasync.version>
+        <influxdb.client.version>3.3.0</influxdb.client.version>
         <logback.version>1.2.6</logback.version>
-        <commons.io.version>2.11.0</commons.io.version>
-        <commons.codec.version>1.9</commons.codec.version>
+        <javacsv.version>2.0</javacsv.version>
+        <javadbf.version>1.13.2</javadbf.version>
+        <jest.version>6.3.1</jest.version>
         <junit.version>4.13</junit.version>
         <joda.time.version>2.10.13</joda.time.version>
-        <swift.version>1.0.0</swift.version>
         <jackson.version>2.9.9</jackson.version>
+        <jedis.version>3.7.0</jedis.version>
+        <jsch.version>0.1.55</jsch.version>
+        <kudu.version>1.15.0</kudu.version>
         <mockito.version>2.0.2-beta</mockito.version>
+        <ognl.version>3.2.21</ognl.version>
+        <poi.version>5.1.0</poi.version>
+        <redis.replicator.version>3.5.5</redis.replicator.version>
+        <slf4j.version>1.7.32</slf4j.version>
+        <snappy.version>1.1.8.4</snappy.version>
+        <swift.version>1.0.0</swift.version>
+        <zookeeper.version>3.6.0</zookeeper.version>
 
         <!-- jdbc driver version -->
         <cassandra.jdbc.version>3.11.0</cassandra.jdbc.version>
         <clickhouse.jdbc.version>0.3.1-patch</clickhouse.jdbc.version>
-        <hive.version>3.1.2-16</hive.version>
+        <hive.jdbc.version>3.1.2</hive.jdbc.version>
         <influxdbClient.version>2.22</influxdbClient.version>
         <hadoop.version>3.2.0-14</hadoop.version>
         <mongodb.jdbc.version>3.12.9</mongodb.jdbc.version>
@@ -59,9 +83,14 @@
         <mssql.jdbc.version>9.2.1.jre8</mssql.jdbc.version>
         <oracle.jdbc.version>19.7.0.0</oracle.jdbc.version>
         <phoenix1.version>4.14.3-HBase-1.4</phoenix1.version>
+        <phoenix2.version>5.1.2</phoenix2.version>
         <postgresql.jdbc.version>42.2.24</postgresql.jdbc.version>
+        <sqlite.jdbc.version>3.36.0.3</sqlite.jdbc.version>
         <taos.jdbc.version>2.0.35</taos.jdbc.version>
         <trino.jdbc.version>351</trino.jdbc.version>
+
+        <!-- for test -->
+        <junit.version>5.8.1</junit.version>
 
         <!-- maven configuration -->
         <project.sourceEncoding>UTF-8</project.sourceEncoding>
@@ -200,7 +229,20 @@
 
     <build>
         <plugins>
-        <plugin>
+            <plugin>
+                <groupId>com.github.spotbugs</groupId>
+                <artifactId>spotbugs-maven-plugin</artifactId>
+                <version>4.4.2.2</version>
+<!--                <dependencies>-->
+<!--                    &lt;!&ndash; overwrite dependency on spotbugs if you want to specify the version of spotbugs &ndash;&gt;-->
+<!--                    <dependency>-->
+<!--                        <groupId>com.github.spotbugs</groupId>-->
+<!--                        <artifactId>spotbugs</artifactId>-->
+<!--                        <version>4.5.0</version>-->
+<!--                    </dependency>-->
+<!--                </dependencies>-->
+            </plugin>
+            <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-enforcer-plugin</artifactId>
                 <version>3.0.0</version>

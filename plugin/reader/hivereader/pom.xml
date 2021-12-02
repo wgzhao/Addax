@@ -8,7 +8,7 @@
         <relativePath>../../../pom.xml</relativePath>
     </parent>
     <artifactId>hivereader</artifactId>
-    <name>mysql-reader</name>
+    <name>hive-reader</name>
     <packaging>jar</packaging>
 
     <dependencies>
@@ -31,9 +31,15 @@
         </dependency>
 
         <dependency>
+            <groupId>org.apache.hadoop</groupId>
+            <artifactId>hadoop-common</artifactId>
+            <version>${hadoop.common.version}</version>
+        </dependency>
+
+        <dependency>
             <groupId>org.apache.hive</groupId>
             <artifactId>hive-jdbc</artifactId>
-            <version>3.1.2</version>
+            <version>${hive.jdbc.version}</version>
         </dependency>
 
     </dependencies>
