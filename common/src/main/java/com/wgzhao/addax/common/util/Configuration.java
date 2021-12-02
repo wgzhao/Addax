@@ -519,12 +519,13 @@ public class Configuration
 
         List<T> result = new ArrayList<>();
 
-        List<Object> origin = new ArrayList<>();
+        List<Object> origin;
         try {
             origin = object;
         }
         catch (ClassCastException e) {
             // .warn("{} 转为 List 时发生了异常，默认将此值添加到 List 中", String.valueOf(object))
+            origin = new ArrayList<>();
             origin.add(String.valueOf(object));
         }
 

@@ -10,10 +10,6 @@
     <name>hbase20x-reader</name>
     <packaging>jar</packaging>
 
-    <properties>
-        <hbase.version>2.2.5</hbase.version>
-    </properties>
-
     <dependencies>
 
         <dependency>
@@ -24,12 +20,12 @@
         <dependency>
             <groupId>commons-logging</groupId>
             <artifactId>commons-logging</artifactId>
-            <version>1.2</version>
+            <version>${commons.logging.version}</version>
         </dependency>
         <dependency>
             <groupId>org.apache.hadoop</groupId>
             <artifactId>hadoop-common</artifactId>
-            <version>3.1.0</version>
+            <version>${hadoop.common.version}</version>
             <exclusions>
                 <exclusion>
                     <groupId>jdk.tools</groupId>
@@ -53,7 +49,7 @@
         <dependency>
             <groupId>org.apache.hbase</groupId>
             <artifactId>hbase-client</artifactId>
-            <version>${hbase.version}</version>
+            <version>${hbase2.version}</version>
             <exclusions>
                 <exclusion>
                     <groupId>jdk.tools</groupId>
@@ -77,13 +73,13 @@
         <dependency>
             <groupId>org.apache.hbase</groupId>
             <artifactId>hbase-common</artifactId>
-            <version>${hbase.version}</version>
+            <version>${hbase2.version}</version>
         </dependency>
 
         <dependency>
             <groupId>org.apache.zookeeper</groupId>
             <artifactId>zookeeper</artifactId>
-            <version>3.5.6</version>
+            <version>${zookeeper.version}</version>
             <scope>runtime</scope>
         </dependency>
 

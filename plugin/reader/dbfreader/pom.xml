@@ -21,7 +21,7 @@
         <dependency>
             <groupId>com.wgzhao.addax</groupId>
             <artifactId>addax-storage</artifactId>
-            <version>4.0.8-SNAPSHOT</version>
+            <version>${project.version}</version>
         </dependency>
 
         <dependency>

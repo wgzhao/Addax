@@ -30,7 +30,7 @@
         <dependency>
             <groupId>com.moilioncircle</groupId>
             <artifactId>redis-replicator</artifactId>
-            <version>3.5.5</version>
+            <version>${redis.replicator.version}</version>
             <exclusions>
                 <exclusion>
                     <groupId>org.slf4j</groupId>
@@ -42,7 +42,7 @@
         <dependency>
             <groupId>org.apache.httpcomponents</groupId>
             <artifactId>httpclient</artifactId>
-            <version>4.5.13</version>
+            <version>${httpclient.version}</version>
         </dependency>
 
         <dependency>
@@ -54,7 +54,7 @@
         <dependency>
             <groupId>redis.clients</groupId>
             <artifactId>jedis</artifactId>
-            <version>3.7.0</version>
+            <version>${jedis.version}</version>
             <exclusions>
                 <exclusion>
                     <groupId>org.slf4j</groupId>
