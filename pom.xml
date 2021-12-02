@@ -48,7 +48,7 @@
         <hadoop.common.version>3.2.2</hadoop.common.version>
         <hbase1.version>1.4.13</hbase1.version>
         <hbase2.version>2.2.5</hbase2.version>
-        <hive.version>3.1.2-16</hive.version>
+        <hive.version>3.1.2-17</hive.version>
         <httpclient.version>4.5.13</httpclient.version>
         <httpcore.version>4.4.14</httpcore.version>
         <httpasync.version>4.1.4</httpasync.version>
