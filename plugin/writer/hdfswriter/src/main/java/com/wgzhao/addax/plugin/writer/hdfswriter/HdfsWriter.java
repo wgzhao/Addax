@@ -127,7 +127,7 @@ public class HdfsWriter
             this.writeMode = this.writerSliceConfig.getNecessaryValue(Key.WRITE_MODE, HdfsWriterErrorCode.REQUIRED_VALUE);
             if (!Constant.SUPPORTED_WRITE_MODE.contains(writeMode)) {
                 throw AddaxException.asAddaxException(HdfsWriterErrorCode.ILLEGAL_VALUE,
-                        String.format("仅支持append, nonConflict,overwrite三种模式, 不支持您配置的 writeMode 模式 : [%s]",
+                        String.format("仅支持append, nonConflict, overwrite三种模式, 不支持您配置的 writeMode 模式 : [%s]",
                                 writeMode));
             }
             this.writerSliceConfig.set(Key.WRITE_MODE, writeMode);
@@ -201,11 +201,10 @@ public class HdfsWriter
         public void prepare()
         {
             //若路径已经存在，检查path是否是目录
-            if (hdfsHelper.isPathexists(path)) {
+            if (hdfsHelper.isPathExists(path)) {
                 if (!hdfsHelper.isPathDir(path)) {
                     throw AddaxException.asAddaxException(HdfsWriterErrorCode.ILLEGAL_VALUE,
-                            String.format("您配置的path: [%s] 不是一个合法的目录, 请您注意文件重名, 不合法目录名等情况.",
-                                    path));
+                            String.format("您配置的path: [%s] 不是一个合法的目录, 请您注意文件重名, 不合法目录名等情况.", path));
                 }
 
                 //根据writeMode对目录下文件进行处理
@@ -213,8 +212,7 @@ public class HdfsWriter
 
                 boolean isExistFile = existFilePaths.length > 0;
                 if ("append".equals(writeMode)) {
-                    LOG.info("由于您配置了writeMode append, 写入前不做清理工作, [{}] 目录下写入相应文件名前缀 [{}] 的文件",
-                            path, fileName);
+                    LOG.info("由于您配置了writeMode append, 写入前不做清理工作, [{}] 目录下写入相应文件名前缀 [{}] 的文件", path, fileName);
                 }
                 else if ("nonConflict".equals(writeMode) && isExistFile) {
                     LOG.info("由于您配置了writeMode nonConflict, 开始检查 [{}] 下面的内容", path);
@@ -261,7 +259,7 @@ public class HdfsWriter
             Set<String> allFiles = new HashSet<>();
 
             //获取该路径下的所有已有文件列表
-            if (hdfsHelper.isPathexists(path)) {
+            if (hdfsHelper.isPathExists(path)) {
                 for (Path p : hdfsHelper.hdfsDirList(path)) {
                     allFiles.add(p.toString());
                 }
@@ -284,20 +282,21 @@ public class HdfsWriter
             this.path = endStorePath;
             String suffix = FileHelper.getCompressFileSuffix(this.compress);
             String fileType = this.writerSliceConfig.getString(Key.FILE_TYPE, "txt").toLowerCase();
+            String randomChars = "0123456789abcdefghmnpqrstuvwxyz";
             for (int i = 0; i < mandatoryNumber; i++) {
                 // handle same file name
                 Configuration splitedTaskConfig = this.writerSliceConfig.clone();
                 String fullFileName;
                 String endFullFileName;
 
-                SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd-HH-mm-ss-SSS");
+                SimpleDateFormat dateFormat = new SimpleDateFormat("yyyyMMdd-HHmmss-SSS");
                 // like 2021-12-03-14-33-29-237-6587fddb
-                fileSuffix = dateFormat.format(new Date()) + "-" + RandomStringUtils.random(8,"0123456789abcdef");
+                fileSuffix = dateFormat.format(new Date()) + "-" + RandomStringUtils.random(8, randomChars);
                 fullFileName = String.format("%s%s%s__%s.%s%s", defaultFS, storePath, filePrefix, fileSuffix, fileType, suffix);
-                endFullFileName = String.format("%s%s%s__%s.%s%s", defaultFS, endStorePath, filePrefix, fileSuffix, fileType,suffix);
+                endFullFileName = String.format("%s%s%s__%s.%s%s", defaultFS, endStorePath, filePrefix, fileSuffix, fileType, suffix);
 
                 while (allFiles.contains(endFullFileName)) {
-                    fileSuffix = dateFormat.format(new Date()) + "-" + RandomStringUtils.random(8,"0123456789abcdef");
+                    fileSuffix = dateFormat.format(new Date()) + "-" + RandomStringUtils.random(8, randomChars);
                     fullFileName = String.format("%s%s%s__%s.%s%s", defaultFS, storePath, filePrefix, fileSuffix, fileType, suffix);
                     endFullFileName = String.format("%s%s%s__%s.%s%s", defaultFS, endStorePath, filePrefix, fileSuffix, fileType, suffix);
                 }
@@ -346,12 +345,10 @@ public class HdfsWriter
             boolean isEndWithSeparator = false;
             switch (IOUtils.DIR_SEPARATOR) {
                 case IOUtils.DIR_SEPARATOR_UNIX:
-                    isEndWithSeparator = userPath.endsWith(String
-                            .valueOf(IOUtils.DIR_SEPARATOR));
+                    isEndWithSeparator = userPath.endsWith(String.valueOf(IOUtils.DIR_SEPARATOR));
                     break;
                 case IOUtils.DIR_SEPARATOR_WINDOWS:
-                    isEndWithSeparator = userPath.endsWith(String
-                            .valueOf(IOUtils.DIR_SEPARATOR_WINDOWS));
+                    isEndWithSeparator = userPath.endsWith(String.valueOf(IOUtils.DIR_SEPARATOR_WINDOWS));
                     break;
                 default:
                     break;
@@ -367,7 +364,7 @@ public class HdfsWriter
             else {
                 tmpFilePath = String.format(pattern, userPath.substring(0, userPath.length() - 1), tmpSuffix, IOUtils.DIR_SEPARATOR);
             }
-            while (hdfsHelper.isPathexists(tmpFilePath)) {
+            while (hdfsHelper.isPathExists(tmpFilePath)) {
                 tmpSuffix = UUID.randomUUID().toString().replace('-', '_');
                 if (!isEndWithSeparator) {
                     tmpFilePath = String.format(pattern, userPath, tmpSuffix, IOUtils.DIR_SEPARATOR);

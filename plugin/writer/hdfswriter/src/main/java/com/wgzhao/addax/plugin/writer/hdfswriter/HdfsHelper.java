@@ -50,10 +50,7 @@ import org.apache.hadoop.hive.ql.exec.vector.VectorizedRowBatch;
 import org.apache.hadoop.hive.serde2.io.HiveDecimalWritable;
 import org.apache.hadoop.io.NullWritable;
 import org.apache.hadoop.io.Text;
-import org.apache.hadoop.io.compress.BZip2Codec;
 import org.apache.hadoop.io.compress.CompressionCodec;
-import org.apache.hadoop.io.compress.GzipCodec;
-import org.apache.hadoop.io.compress.SnappyCodec;
 import org.apache.hadoop.mapred.FileOutputFormat;
 import org.apache.hadoop.mapred.JobConf;
 import org.apache.hadoop.mapred.JobContext;
@@ -366,7 +363,7 @@ public class HdfsHelper
         return files;
     }
 
-    public boolean isPathexists(String filePath)
+    public boolean isPathExists(String filePath)
     {
         Path path = new Path(filePath);
         boolean exist;
@@ -434,7 +431,7 @@ public class HdfsHelper
     {
         LOG.info("start delete tmp dir [{}] .", path);
         try {
-            if (isPathexists(path.toString())) {
+            if (isPathExists(path.toString())) {
                 fileSystem.delete(path, true);
             }
         }
@@ -798,32 +795,5 @@ public class HdfsHelper
             deleteDir(path.getParent());
             throw AddaxException.asAddaxException(HdfsWriterErrorCode.Write_FILE_IO_ERROR, e);
         }
-    }
-
-    public static void main(String[] args)
-            throws IOException
-    {
-        org.apache.hadoop.conf.Configuration hadoopConf = new org.apache.hadoop.conf.Configuration();
-        hadoopConf.set(HDFS_DEFAULT_FS_KEY, "hdfs://10.60.172.154:8020");
-
-        FileSystem fileSystem = FileSystem.get(hadoopConf);
-        String fileName = "/tmp/test.txt";
-        Path outputPath = new Path(fileName);
-        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyyMMddHHmm");
-        String attempt = "attempt_" + dateFormat.format(new Date()) + "_0001_m_000000_0";
-        hadoopConf.set(JobContext.TASK_ATTEMPT_ID, attempt);
-        hadoopConf.set("mapreduce.output.basename", "test__");
-        JobConf conf = new JobConf(hadoopConf);
-        conf.set("mapreduce.output.basename", "test__");
-        FileOutputFormat.setOutputPath(conf, outputPath);
-        FileOutputFormat.setWorkOutputPath(conf, outputPath);
-
-        FileOutputFormat.setOutputCompressorClass(conf, BZip2Codec.class);
-
-        RecordWriter<NullWritable, Text> writer = new TextOutputFormat<NullWritable, Text>().getRecordWriter(fileSystem, conf, outputPath.toString(), Reporter.NULL);
-        writer.write(NullWritable.get(), new Text("hello\n"));
-        writer.write(NullWritable.get(), new Text("world\n"));
-
-        writer.close(Reporter.NULL);
     }
 }
