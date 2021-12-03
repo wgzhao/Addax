@@ -37,6 +37,8 @@ import org.apache.commons.compress.compressors.CompressorOutputStream;
 import org.apache.commons.compress.compressors.CompressorStreamFactory;
 import org.apache.commons.compress.compressors.bzip2.BZip2CompressorOutputStream;
 import org.apache.commons.compress.compressors.gzip.GzipCompressorOutputStream;
+import org.apache.commons.csv.CSVFormat;
+import org.apache.commons.csv.CSVPrinter;
 import org.apache.commons.io.Charsets;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -123,8 +125,7 @@ public class StorageWriterUtil
 //        }
 
         // fieldDelimiter check
-        String delimiterInStr = writerConfiguration
-                .getString(Key.FIELD_DELIMITER);
+        String delimiterInStr = writerConfiguration.getString(Key.FIELD_DELIMITER);
         // warn: if it has, length must be one
         if (null != delimiterInStr && 1 != delimiterInStr.length()) {
             throw AddaxException.asAddaxException(
@@ -132,10 +133,8 @@ public class StorageWriterUtil
                     String.format("仅仅支持单字符切分, 您配置的切分为 : [%s]", delimiterInStr));
         }
         if (null == delimiterInStr) {
-            LOG.warn(String.format("您没有配置列分隔符, 使用默认值[%s]",
-                    Constant.DEFAULT_FIELD_DELIMITER));
-            writerConfiguration.set(Key.FIELD_DELIMITER,
-                    Constant.DEFAULT_FIELD_DELIMITER);
+            LOG.warn(String.format("您没有配置列分隔符, 使用默认值[%s]", Constant.DEFAULT_FIELD_DELIMITER));
+            writerConfiguration.set(Key.FIELD_DELIMITER, Constant.DEFAULT_FIELD_DELIMITER);
         }
 
         // fileFormat check
@@ -271,9 +270,10 @@ public class StorageWriterUtil
             TaskPluginCollector taskPluginCollector)
             throws IOException
     {
-
+        CSVFormat.Builder csvBuilder = CSVFormat.DEFAULT.builder();
+        csvBuilder.setRecordSeparator(IOUtils.LINE_SEPARATOR_UNIX);
         String nullFormat = config.getString(Key.NULL_FORMAT);
-
+        csvBuilder.setNullString(nullFormat);
         // 兼容format & dataFormat
         String dateFormat = config.getString(Key.DATE_FORMAT);
         DateFormat dateParse = null; // warn: 可能不兼容
@@ -296,39 +296,30 @@ public class StorageWriterUtil
         }
 
         // warn: fieldDelimiter could not be '' for no fieldDelimiter
-        char fieldDelimiter = config.getChar(Key.FIELD_DELIMITER,
-                Constant.DEFAULT_FIELD_DELIMITER);
-
-        Writer unstructuredWriter = TextCsvWriterManager
-                .produceUnstructuredWriter(fileFormat, fieldDelimiter, writer);
+        char fieldDelimiter = config.getChar(Key.FIELD_DELIMITER, Constant.DEFAULT_FIELD_DELIMITER);
+        csvBuilder.setDelimiter(fieldDelimiter);
 
         List<String> headers = config.getList(Key.HEADER, String.class);
         if (null != headers && !headers.isEmpty()) {
-            unstructuredWriter.writeOneRecord(headers);
+//            unstructuredWriter.writeOneRecord(headers);
+            csvBuilder.setHeader(headers.toArray(new String[0]));
         }
 
         Record record;
+        CSVPrinter csvPrinter = new CSVPrinter(writer, csvBuilder.build());
         while ((record = lineReceiver.getFromReader()) != null) {
-            StorageWriterUtil.transportOneRecord(record,
-                    nullFormat, dateParse, taskPluginCollector,
-                    unstructuredWriter);
+            final List<String> result = recordToList(record, nullFormat, dateParse, taskPluginCollector);
+            if (result != null) {
+                csvPrinter.printRecord(result);
+            }
         }
 
         // warn:由调用方控制流的关闭
         // IOUtils.closeQuietly(unstructuredWriter);
     }
 
-    /*
-     * 异常表示脏数据
-     */
-    public static void transportOneRecord(Record record, String nullFormat,
-            DateFormat dateParse, TaskPluginCollector taskPluginCollector,
-            Writer writer)
+    public static List<String> recordToList(Record record, String nullFormat, DateFormat dateParse, TaskPluginCollector taskPluginCollector)
     {
-//        // warn: default is null
-//        if (null == nullFormat) {
-//            nullFormat = "null";
-//        }
         try {
             List<String> splitRows = new ArrayList<>();
             int recordLength = record.getColumnNumber();
@@ -357,11 +348,12 @@ public class StorageWriterUtil
                     }
                 }
             }
-            writer.writeOneRecord(splitRows);
+            return splitRows;
         }
         catch (Exception e) {
             // warn: dirty data
             taskPluginCollector.collectDirtyRecord(record, e);
+            return null;
         }
     }
 }
