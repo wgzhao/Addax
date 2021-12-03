@@ -35,8 +35,6 @@ import com.wgzhao.addax.storage.reader.StorageReaderErrorCode;
 import org.apache.commons.compress.compressors.CompressorException;
 import org.apache.commons.compress.compressors.CompressorOutputStream;
 import org.apache.commons.compress.compressors.CompressorStreamFactory;
-import org.apache.commons.compress.compressors.bzip2.BZip2CompressorOutputStream;
-import org.apache.commons.compress.compressors.gzip.GzipCompressorOutputStream;
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVPrinter;
 import org.apache.commons.io.Charsets;
@@ -62,7 +60,6 @@ import java.util.UUID;
 public class StorageWriterUtil
 {
     private static final Logger LOG = LoggerFactory.getLogger(StorageWriterUtil.class);
-    //    private static final Set<String> supportedCompress = new HashSet<>(Arrays.asList("gzip", "bzip2", "zip"));
     private static final Set<String> supportedWriteModes = new HashSet<>(Arrays.asList("truncate", "append", "nonConflict", "overwrite"));
 
     private StorageWriterUtil()
@@ -113,16 +110,6 @@ public class StorageWriterUtil
         if (StringUtils.isBlank(compress)) {
             writerConfiguration.set(Key.COMPRESS, null);
         }
-//        else {
-//            if (!supportedCompress.contains(compress.toLowerCase().trim())) {
-//                String message = String.format(
-//                        "'%s' is unsupported, supported compress format: [%s] ",
-//                        compress, StringUtils.join(supportedCompress, ","));
-//                throw AddaxException.asAddaxException(
-//                        StorageWriterErrorCode.ILLEGAL_VALUE,
-//                        String.format(message, compress));
-//            }
-//        }
 
         // fieldDelimiter check
         String delimiterInStr = writerConfiguration.getString(Key.FIELD_DELIMITER);

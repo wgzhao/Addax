@@ -50,7 +50,10 @@ import org.apache.hadoop.hive.ql.exec.vector.VectorizedRowBatch;
 import org.apache.hadoop.hive.serde2.io.HiveDecimalWritable;
 import org.apache.hadoop.io.NullWritable;
 import org.apache.hadoop.io.Text;
+import org.apache.hadoop.io.compress.BZip2Codec;
 import org.apache.hadoop.io.compress.CompressionCodec;
+import org.apache.hadoop.io.compress.GzipCodec;
+import org.apache.hadoop.io.compress.SnappyCodec;
 import org.apache.hadoop.mapred.FileOutputFormat;
 import org.apache.hadoop.mapred.JobConf;
 import org.apache.hadoop.mapred.JobContext;
@@ -506,16 +509,18 @@ public class HdfsHelper
 
         SimpleDateFormat dateFormat = new SimpleDateFormat("yyyyMMddHHmm");
         String attempt = "attempt_" + dateFormat.format(new Date()) + "_0001_m_000000_0";
-        Path outputPath = new Path(fileName);
         conf.set(JobContext.TASK_ATTEMPT_ID, attempt);
-        FileOutputFormat.setOutputPath(conf, outputPath);
-        FileOutputFormat.setWorkOutputPath(conf, outputPath);
         if (!"NONE".equals(compress)) {
+            // fileName must remove suffix, because the FileOutputFormat will add suffix
+            fileName = fileName.substring(0, fileName.lastIndexOf("."));
             Class<? extends CompressionCodec> codecClass = getCompressCodec(compress);
             if (null != codecClass) {
                 FileOutputFormat.setOutputCompressorClass(conf, codecClass);
             }
         }
+        Path outputPath = new Path(fileName);
+        FileOutputFormat.setOutputPath(conf, outputPath);
+        FileOutputFormat.setWorkOutputPath(conf, outputPath);
         try {
             RecordWriter<NullWritable, Text> writer = new TextOutputFormat<NullWritable, Text>().getRecordWriter(fileSystem, conf, outputPath.toString(), Reporter.NULL);
             Record record;
@@ -795,47 +800,30 @@ public class HdfsHelper
         }
     }
 
-    /**
-     * 根据不同压缩算法，返回对应的文件名后缀(包含点(.))
-     *
-     * @param compress 压缩算法名称字符串，传递过来应该是大写
-     * @return file suffix
-     */
-    public String getCompressFileSuffix(String compress)
+    public static void main(String[] args)
+            throws IOException
     {
-        if (compress == null ) {
-            return null;
-        }
+        org.apache.hadoop.conf.Configuration hadoopConf = new org.apache.hadoop.conf.Configuration();
+        hadoopConf.set(HDFS_DEFAULT_FS_KEY, "hdfs://10.60.172.154:8020");
 
-        String suffix = null;
+        FileSystem fileSystem = FileSystem.get(hadoopConf);
+        String fileName = "/tmp/test.txt";
+        Path outputPath = new Path(fileName);
+        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyyMMddHHmm");
+        String attempt = "attempt_" + dateFormat.format(new Date()) + "_0001_m_000000_0";
+        hadoopConf.set(JobContext.TASK_ATTEMPT_ID, attempt);
+        hadoopConf.set("mapreduce.output.basename", "test__");
+        JobConf conf = new JobConf(hadoopConf);
+        conf.set("mapreduce.output.basename", "test__");
+        FileOutputFormat.setOutputPath(conf, outputPath);
+        FileOutputFormat.setWorkOutputPath(conf, outputPath);
 
-        switch(compress) {
-            case "SNAPPY":
-                suffix =  ".snappy";
-                break;
-            case "BZIP2":
-            case "BZIP":
-                suffix =  ".bz2";
-                break;
-            case "LZO":
-                suffix =  ".lzo";
-                break;
-            case "GZIP":
-                suffix = ".gz";
-                break;
-            case "LZ4":
-                suffix = ".lz4";
-                break;
-            case "ZLIB":
-            case "DEFLATE":
-                suffix = ".deflate";
-                break;
-            case "ZSTD":
-                suffix = ".zstd";
-                break;
-            default:
-                break;
-        }
-        return suffix;
+        FileOutputFormat.setOutputCompressorClass(conf, BZip2Codec.class);
+
+        RecordWriter<NullWritable, Text> writer = new TextOutputFormat<NullWritable, Text>().getRecordWriter(fileSystem, conf, outputPath.toString(), Reporter.NULL);
+        writer.write(NullWritable.get(), new Text("hello\n"));
+        writer.write(NullWritable.get(), new Text("world\n"));
+
+        writer.close(Reporter.NULL);
     }
 }

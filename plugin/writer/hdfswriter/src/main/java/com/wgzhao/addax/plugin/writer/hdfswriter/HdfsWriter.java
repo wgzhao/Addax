@@ -19,22 +19,26 @@
 
 package com.wgzhao.addax.plugin.writer.hdfswriter;
 
+import com.wgzhao.addax.common.base.Constant;
 import com.wgzhao.addax.common.base.Key;
 import com.wgzhao.addax.common.exception.AddaxException;
 import com.wgzhao.addax.common.plugin.RecordReceiver;
 import com.wgzhao.addax.common.spi.Writer;
 import com.wgzhao.addax.common.util.Configuration;
-import com.wgzhao.addax.common.base.Constant;
+import com.wgzhao.addax.storage.util.FileHelper;
 import org.apache.commons.io.Charsets;
 import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang3.RandomStringUtils;
 import org.apache.hadoop.fs.Path;
 import org.apache.orc.CompressionKind;
 import org.apache.parquet.hadoop.metadata.CompressionCodecName;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -102,8 +106,8 @@ public class HdfsWriter
             }
             else {
                 boolean rewriteFlag = false;
-                for (int i=0; i<columns.size(); i++) {
-                    Configuration eachColumnConf = columns.get(i) ;
+                for (int i = 0; i < columns.size(); i++) {
+                    Configuration eachColumnConf = columns.get(i);
                     eachColumnConf.getNecessaryValue(Key.NAME, HdfsWriterErrorCode.COLUMN_REQUIRED_VALUE);
                     eachColumnConf.getNecessaryValue(Key.TYPE, HdfsWriterErrorCode.COLUMN_REQUIRED_VALUE);
                     if (eachColumnConf.getString(Key.TYPE).toUpperCase().startsWith("DECIMAL")) {
@@ -134,7 +138,7 @@ public class HdfsWriter
                         String.format("您提供配置文件有误，[%s]是必填参数.", Key.FIELD_DELIMITER));
             }
             else if (1 != fieldDelimiter.length()) {
-                // warn: if have, length must be one
+                // warn: if it has, length must be one
                 throw AddaxException.asAddaxException(HdfsWriterErrorCode.ILLEGAL_VALUE,
                         String.format("仅仅支持单字符切分, 您配置的切分为 : [%s]", fieldDelimiter));
             }
@@ -258,7 +262,7 @@ public class HdfsWriter
 
             //获取该路径下的所有已有文件列表
             if (hdfsHelper.isPathexists(path)) {
-                for (Path p: hdfsHelper.hdfsDirList(path)) {
+                for (Path p : hdfsHelper.hdfsDirList(path)) {
                     allFiles.add(p.toString());
                 }
             }
@@ -278,27 +282,24 @@ public class HdfsWriter
                 endStorePath = endStorePath.replace('\\', '/');
             }
             this.path = endStorePath;
-            String suffix = hdfsHelper.getCompressFileSuffix(this.compress);
+            String suffix = FileHelper.getCompressFileSuffix(this.compress);
+            String fileType = this.writerSliceConfig.getString(Key.FILE_TYPE, "txt").toLowerCase();
             for (int i = 0; i < mandatoryNumber; i++) {
                 // handle same file name
-
                 Configuration splitedTaskConfig = this.writerSliceConfig.clone();
                 String fullFileName;
                 String endFullFileName;
 
-                fileSuffix = UUID.randomUUID().toString().replace('-', '_');
-                if (suffix != null) {
-                    fullFileName = String.format("%s%s%s__%s%s", defaultFS, storePath, filePrefix, fileSuffix, suffix);
-                    endFullFileName = String.format("%s%s%s__%s%s", defaultFS, endStorePath, filePrefix, fileSuffix, suffix);
-                } else {
-                    fullFileName = String.format("%s%s%s__%s", defaultFS, storePath, filePrefix, fileSuffix);
-                    endFullFileName = String.format("%s%s%s__%s", defaultFS, endStorePath, filePrefix, fileSuffix);
-                }
+                SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd-HH-mm-ss-SSS");
+                // like 2021-12-03-14-33-29-237-6587fddb
+                fileSuffix = dateFormat.format(new Date()) + "-" + RandomStringUtils.random(8,"0123456789abcdef");
+                fullFileName = String.format("%s%s%s__%s.%s%s", defaultFS, storePath, filePrefix, fileSuffix, fileType, suffix);
+                endFullFileName = String.format("%s%s%s__%s.%s%s", defaultFS, endStorePath, filePrefix, fileSuffix, fileType,suffix);
 
                 while (allFiles.contains(endFullFileName)) {
-                    fileSuffix = UUID.randomUUID().toString().replace('-', '_');
-                    fullFileName = String.format("%s%s%s__%s", defaultFS, storePath, filePrefix, fileSuffix);
-                    endFullFileName = String.format("%s%s%s__%s", defaultFS, endStorePath, filePrefix, fileSuffix);
+                    fileSuffix = dateFormat.format(new Date()) + "-" + RandomStringUtils.random(8,"0123456789abcdef");
+                    fullFileName = String.format("%s%s%s__%s.%s%s", defaultFS, storePath, filePrefix, fileSuffix, fileType, suffix);
+                    endFullFileName = String.format("%s%s%s__%s.%s%s", defaultFS, endStorePath, filePrefix, fileSuffix, fileType, suffix);
                 }
                 allFiles.add(endFullFileName);
                 this.tmpFiles.add(fullFileName);
@@ -319,12 +320,10 @@ public class HdfsWriter
             boolean isEndWithSeparator = false;
             switch (IOUtils.DIR_SEPARATOR) {
                 case IOUtils.DIR_SEPARATOR_UNIX:
-                    isEndWithSeparator = this.path.endsWith(String
-                            .valueOf(IOUtils.DIR_SEPARATOR));
+                    isEndWithSeparator = this.path.endsWith(String.valueOf(IOUtils.DIR_SEPARATOR));
                     break;
                 case IOUtils.DIR_SEPARATOR_WINDOWS:
-                    isEndWithSeparator = this.path.endsWith(String
-                            .valueOf(IOUtils.DIR_SEPARATOR_WINDOWS));
+                    isEndWithSeparator = this.path.endsWith(String.valueOf(IOUtils.DIR_SEPARATOR_WINDOWS));
                     break;
                 default:
                     break;
@@ -388,6 +387,7 @@ public class HdfsWriter
          *  decimal -&gt; 38
          *  decimal(10) -&gt; 10
          *  </pre>
+         *
          * @param type decimal type including precision and scale (if present)
          * @return decimal precision
          */
@@ -414,12 +414,13 @@ public class HdfsWriter
          *  decimal(8) -&gt; 0
          *  decimal(8,2) -&gt; 2
          *  </pre>
+         *
          * @param type decimal type string, including precision and scale (if present)
          * @return decimal scale
          */
         private static int getDecimalScale(String type)
         {
-            if (! type.contains("(")) {
+            if (!type.contains("(")) {
                 return Constant.DEFAULT_DECIMAL_SCALE;
             }
             if (!type.contains(",")) {
