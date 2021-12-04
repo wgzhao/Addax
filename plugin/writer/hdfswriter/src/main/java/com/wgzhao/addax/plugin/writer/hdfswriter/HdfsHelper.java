@@ -363,7 +363,7 @@ public class HdfsHelper
         return files;
     }
 
-    public boolean isPathexists(String filePath)
+    public boolean isPathExists(String filePath)
     {
         Path path = new Path(filePath);
         boolean exist;
@@ -431,7 +431,7 @@ public class HdfsHelper
     {
         LOG.info("start delete tmp dir [{}] .", path);
         try {
-            if (isPathexists(path.toString())) {
+            if (isPathExists(path.toString())) {
                 fileSystem.delete(path, true);
             }
         }
@@ -506,16 +506,18 @@ public class HdfsHelper
 
         SimpleDateFormat dateFormat = new SimpleDateFormat("yyyyMMddHHmm");
         String attempt = "attempt_" + dateFormat.format(new Date()) + "_0001_m_000000_0";
-        Path outputPath = new Path(fileName);
         conf.set(JobContext.TASK_ATTEMPT_ID, attempt);
-        FileOutputFormat.setOutputPath(conf, outputPath);
-        FileOutputFormat.setWorkOutputPath(conf, outputPath);
         if (!"NONE".equals(compress)) {
+            // fileName must remove suffix, because the FileOutputFormat will add suffix
+            fileName = fileName.substring(0, fileName.lastIndexOf("."));
             Class<? extends CompressionCodec> codecClass = getCompressCodec(compress);
             if (null != codecClass) {
                 FileOutputFormat.setOutputCompressorClass(conf, codecClass);
             }
         }
+        Path outputPath = new Path(fileName);
+        FileOutputFormat.setOutputPath(conf, outputPath);
+        FileOutputFormat.setWorkOutputPath(conf, outputPath);
         try {
             RecordWriter<NullWritable, Text> writer = new TextOutputFormat<NullWritable, Text>().getRecordWriter(fileSystem, conf, outputPath.toString(), Reporter.NULL);
             Record record;
@@ -793,49 +795,5 @@ public class HdfsHelper
             deleteDir(path.getParent());
             throw AddaxException.asAddaxException(HdfsWriterErrorCode.Write_FILE_IO_ERROR, e);
         }
-    }
-
-    /**
-     * 根据不同压缩算法，返回对应的文件名后缀(包含点(.))
-     *
-     * @param compress 压缩算法名称字符串，传递过来应该是大写
-     * @return file suffix
-     */
-    public String getCompressFileSuffix(String compress)
-    {
-        if (compress == null ) {
-            return null;
-        }
-
-        String suffix = null;
-
-        switch(compress) {
-            case "SNAPPY":
-                suffix =  ".snappy";
-                break;
-            case "BZIP2":
-            case "BZIP":
-                suffix =  ".bz2";
-                break;
-            case "LZO":
-                suffix =  ".lzo";
-                break;
-            case "GZIP":
-                suffix = ".gz";
-                break;
-            case "LZ4":
-                suffix = ".lz4";
-                break;
-            case "ZLIB":
-            case "DEFLATE":
-                suffix = ".deflate";
-                break;
-            case "ZSTD":
-                suffix = ".zstd";
-                break;
-            default:
-                break;
-        }
-        return suffix;
     }
 }

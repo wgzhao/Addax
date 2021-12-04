@@ -31,9 +31,13 @@ import com.wgzhao.addax.common.exception.AddaxException;
 import com.wgzhao.addax.common.plugin.RecordReceiver;
 import com.wgzhao.addax.common.plugin.TaskPluginCollector;
 import com.wgzhao.addax.common.util.Configuration;
+import com.wgzhao.addax.storage.reader.StorageReaderErrorCode;
+import com.wgzhao.addax.storage.util.FileHelper;
+import org.apache.commons.compress.compressors.CompressorException;
 import org.apache.commons.compress.compressors.CompressorOutputStream;
-import org.apache.commons.compress.compressors.bzip2.BZip2CompressorOutputStream;
-import org.apache.commons.compress.compressors.gzip.GzipCompressorOutputStream;
+import org.apache.commons.compress.compressors.CompressorStreamFactory;
+import org.apache.commons.csv.CSVFormat;
+import org.apache.commons.csv.CSVPrinter;
 import org.apache.commons.io.Charsets;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -49,16 +53,15 @@ import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-import java.util.UUID;
 
 public class StorageWriterUtil
 {
     private static final Logger LOG = LoggerFactory.getLogger(StorageWriterUtil.class);
-    private static final Set<String> supportedCompress = new HashSet<>(Arrays.asList("gzip", "bzip2", "zip"));
-    private static final Set<String> supportedWriteModes = new HashSet<>(Arrays.asList("truncate", "append", "nonConflict"));
+    private static final Set<String> supportedWriteModes = new HashSet<>(Arrays.asList("truncate", "append", "nonConflict", "overwrite"));
 
     private StorageWriterUtil()
     {
@@ -108,20 +111,9 @@ public class StorageWriterUtil
         if (StringUtils.isBlank(compress)) {
             writerConfiguration.set(Key.COMPRESS, null);
         }
-        else {
-            if (!supportedCompress.contains(compress.toLowerCase().trim())) {
-                String message = String.format(
-                        "'%s' is unsupported, supported compress format: [%s] ",
-                        compress, StringUtils.join(supportedCompress, ","));
-                throw AddaxException.asAddaxException(
-                        StorageWriterErrorCode.ILLEGAL_VALUE,
-                        String.format(message, compress));
-            }
-        }
 
         // fieldDelimiter check
-        String delimiterInStr = writerConfiguration
-                .getString(Key.FIELD_DELIMITER);
+        String delimiterInStr = writerConfiguration.getString(Key.FIELD_DELIMITER);
         // warn: if it has, length must be one
         if (null != delimiterInStr && 1 != delimiterInStr.length()) {
             throw AddaxException.asAddaxException(
@@ -129,10 +121,8 @@ public class StorageWriterUtil
                     String.format("仅仅支持单字符切分, 您配置的切分为 : [%s]", delimiterInStr));
         }
         if (null == delimiterInStr) {
-            LOG.warn(String.format("您没有配置列分隔符, 使用默认值[%s]",
-                    Constant.DEFAULT_FIELD_DELIMITER));
-            writerConfiguration.set(Key.FIELD_DELIMITER,
-                    Constant.DEFAULT_FIELD_DELIMITER);
+            LOG.warn(String.format("您没有配置列分隔符, 使用默认值[%s]", Constant.DEFAULT_FIELD_DELIMITER));
+            writerConfiguration.set(Key.FIELD_DELIMITER, Constant.DEFAULT_FIELD_DELIMITER);
         }
 
         // fileFormat check
@@ -144,24 +134,24 @@ public class StorageWriterUtil
         }
     }
 
-    public static List<Configuration> split(Configuration writerSliceConfig,
-            Set<String> originAllFileExists, int mandatoryNumber)
+    public static List<Configuration> split(Configuration writerSliceConfig, Set<String> originAllFileExists, int mandatoryNumber)
     {
         LOG.info("begin do split...");
+        if (mandatoryNumber == 1) {
+            return Collections.singletonList(writerSliceConfig);
+        }
+
         Set<String> allFileExists = new HashSet<>(originAllFileExists);
         List<Configuration> writerSplitConfigs = new ArrayList<>();
         String filePrefix = writerSliceConfig.getString(Key.FILE_NAME);
 
-        String fileSuffix;
         for (int i = 0; i < mandatoryNumber; i++) {
             // handle same file name
             Configuration splitTaskConfig = writerSliceConfig.clone();
             String fullFileName;
-            fileSuffix = UUID.randomUUID().toString().replace('-', '_');
-            fullFileName = String.format("%s__%s", filePrefix, fileSuffix);
+            fullFileName = String.format("%s__%s", filePrefix, FileHelper.generateFileMiddleName());
             while (allFileExists.contains(fullFileName)) {
-                fileSuffix = UUID.randomUUID().toString().replace('-', '_');
-                fullFileName = String.format("%s__%s", filePrefix, fileSuffix);
+                fullFileName = String.format("%s__%s", filePrefix, FileHelper.generateFileMiddleName());
             }
             allFileExists.add(fullFileName);
             splitTaskConfig.set(Key.FILE_NAME, fullFileName);
@@ -172,8 +162,7 @@ public class StorageWriterUtil
         return writerSplitConfigs;
     }
 
-    public static String buildFilePath(String path, String fileName,
-            String suffix)
+    public static String buildFilePath(String path, String fileName, String suffix)
     {
         boolean isEndWithSeparator = false;
         switch (IOUtils.DIR_SEPARATOR) {
@@ -217,24 +206,22 @@ public class StorageWriterUtil
                 writer = new BufferedWriter(new OutputStreamWriter(outputStream, encoding));
             }
             else {
+                //normalize compress name
                 if ("gzip".equalsIgnoreCase(compress)) {
-                    CompressorOutputStream compressorOutputStream = new GzipCompressorOutputStream(outputStream);
-                    writer = new BufferedWriter(new OutputStreamWriter(compressorOutputStream, encoding));
+                    compress = "gz";
                 }
-                else if ("bzip2".equalsIgnoreCase(compress)) {
-                    CompressorOutputStream compressorOutputStream = new BZip2CompressorOutputStream(outputStream);
-                    writer = new BufferedWriter(new OutputStreamWriter(compressorOutputStream, encoding));
+                else if ("bz2".equalsIgnoreCase(compress)) {
+                    compress = "bzip2";
                 }
-                else if ("zip".equals(compress)) {
+
+                if ("zip".equals(compress)) {
                     ZipCycleOutputStream zis = new ZipCycleOutputStream(outputStream, fileName);
                     writer = new BufferedWriter(new OutputStreamWriter(zis, encoding));
                 }
                 else {
-                    throw AddaxException
-                            .asAddaxException(
-                                    StorageWriterErrorCode.ILLEGAL_VALUE,
-                                    String.format("'%s' is supported, supported compress format: [%s]",
-                                            compress, StringUtils.join(supportedCompress, ",")));
+                    CompressorOutputStream compressorOutputStream = new CompressorStreamFactory().createCompressorOutputStream(compress,
+                            outputStream);
+                    writer = new BufferedWriter(new OutputStreamWriter(compressorOutputStream, encoding));
                 }
             }
             StorageWriterUtil.doWriteToStream(lineReceiver, writer, fileName, config, taskPluginCollector);
@@ -249,6 +236,12 @@ public class StorageWriterUtil
             throw AddaxException.asAddaxException(
                     StorageWriterErrorCode.RUNTIME_EXCEPTION,
                     "运行时错误, 请联系我们", e);
+        }
+        catch (CompressorException e) {
+            throw AddaxException.asAddaxException(
+                    StorageReaderErrorCode.ILLEGAL_VALUE,
+                    "The compress algorithm '" + compress + "' is unsupported yet"
+            );
         }
         catch (IOException e) {
             throw AddaxException.asAddaxException(
@@ -265,9 +258,10 @@ public class StorageWriterUtil
             TaskPluginCollector taskPluginCollector)
             throws IOException
     {
-
+        CSVFormat.Builder csvBuilder = CSVFormat.DEFAULT.builder();
+        csvBuilder.setRecordSeparator(IOUtils.LINE_SEPARATOR_UNIX);
         String nullFormat = config.getString(Key.NULL_FORMAT);
-
+        csvBuilder.setNullString(nullFormat);
         // 兼容format & dataFormat
         String dateFormat = config.getString(Key.DATE_FORMAT);
         DateFormat dateParse = null; // warn: 可能不兼容
@@ -290,39 +284,30 @@ public class StorageWriterUtil
         }
 
         // warn: fieldDelimiter could not be '' for no fieldDelimiter
-        char fieldDelimiter = config.getChar(Key.FIELD_DELIMITER,
-                Constant.DEFAULT_FIELD_DELIMITER);
-
-        Writer unstructuredWriter = TextCsvWriterManager
-                .produceUnstructuredWriter(fileFormat, fieldDelimiter, writer);
+        char fieldDelimiter = config.getChar(Key.FIELD_DELIMITER, Constant.DEFAULT_FIELD_DELIMITER);
+        csvBuilder.setDelimiter(fieldDelimiter);
 
         List<String> headers = config.getList(Key.HEADER, String.class);
         if (null != headers && !headers.isEmpty()) {
-            unstructuredWriter.writeOneRecord(headers);
+//            unstructuredWriter.writeOneRecord(headers);
+            csvBuilder.setHeader(headers.toArray(new String[0]));
         }
 
         Record record;
+        CSVPrinter csvPrinter = new CSVPrinter(writer, csvBuilder.build());
         while ((record = lineReceiver.getFromReader()) != null) {
-            StorageWriterUtil.transportOneRecord(record,
-                    nullFormat, dateParse, taskPluginCollector,
-                    unstructuredWriter);
+            final List<String> result = recordToList(record, nullFormat, dateParse, taskPluginCollector);
+            if (result != null) {
+                csvPrinter.printRecord(result);
+            }
         }
 
         // warn:由调用方控制流的关闭
         // IOUtils.closeQuietly(unstructuredWriter);
     }
 
-    /*
-     * 异常表示脏数据
-     */
-    public static void transportOneRecord(Record record, String nullFormat,
-            DateFormat dateParse, TaskPluginCollector taskPluginCollector,
-            Writer writer)
+    public static List<String> recordToList(Record record, String nullFormat, DateFormat dateParse, TaskPluginCollector taskPluginCollector)
     {
-//        // warn: default is null
-//        if (null == nullFormat) {
-//            nullFormat = "null";
-//        }
         try {
             List<String> splitRows = new ArrayList<>();
             int recordLength = record.getColumnNumber();
@@ -351,11 +336,12 @@ public class StorageWriterUtil
                     }
                 }
             }
-            writer.writeOneRecord(splitRows);
+            return splitRows;
         }
         catch (Exception e) {
             // warn: dirty data
             taskPluginCollector.collectDirtyRecord(record, e);
+            return null;
         }
     }
 }

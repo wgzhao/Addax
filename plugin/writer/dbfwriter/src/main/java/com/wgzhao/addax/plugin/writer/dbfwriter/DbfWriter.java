@@ -29,8 +29,9 @@ import com.wgzhao.addax.common.exception.AddaxException;
 import com.wgzhao.addax.common.plugin.RecordReceiver;
 import com.wgzhao.addax.common.spi.Writer;
 import com.wgzhao.addax.common.util.Configuration;
+import com.wgzhao.addax.storage.util.FileHelper;
+import com.wgzhao.addax.storage.writer.StorageWriterUtil;
 import org.apache.commons.io.FileUtils;
-import org.apache.commons.io.IOUtils;
 import org.apache.commons.io.filefilter.PrefixFileFilter;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
@@ -42,14 +43,12 @@ import java.io.IOException;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Objects;
 import java.util.Set;
-import java.util.UUID;
-
-
 
 /**
  * Created by haiwei.luo on 14-9-17.
@@ -91,15 +90,15 @@ public class DbfWriter
                 File dir = new File(path);
                 if (dir.isFile()) {
                     throw AddaxException.asAddaxException(
-                                    DbfWriterErrorCode.ILLEGAL_VALUE,
-                                    String.format("您配置的path: [%s] 不是一个合法的目录, 请您注意文件重名, 不合法目录名等情况.", path));
+                            DbfWriterErrorCode.ILLEGAL_VALUE,
+                            String.format("您配置的path: [%s] 不是一个合法的目录, 请您注意文件重名, 不合法目录名等情况.", path));
                 }
                 if (!dir.exists()) {
                     boolean createdOk = dir.mkdirs();
                     if (!createdOk) {
                         throw AddaxException.asAddaxException(
-                                        DbfWriterErrorCode.CONFIG_INVALID_EXCEPTION,
-                                        String.format("您指定的文件路径 : [%s] 创建失败.", path));
+                                DbfWriterErrorCode.CONFIG_INVALID_EXCEPTION,
+                                String.format("您指定的文件路径 : [%s] 创建失败.", path));
                     }
                 }
             }
@@ -213,18 +212,16 @@ public class DbfWriter
 
             // check column configuration is valid or not
             List<Configuration> columns = this.writerSliceConfig.getListConfiguration(Key.COLUMN);
-            for (Configuration column: columns) {
-                if ( "numeric".equalsIgnoreCase(column.getString(Key.TYPE)) &&
-                        (column.getString(Key.LENGTH, null) == null || column.getString(Key.SCALE, null) == null))
-                {
+            for (Configuration column : columns) {
+                if ("numeric".equalsIgnoreCase(column.getString(Key.TYPE)) &&
+                        (column.getString(Key.LENGTH, null) == null || column.getString(Key.SCALE, null) == null)) {
                     throw AddaxException.asAddaxException(
                             DbfWriterErrorCode.CONFIG_INVALID_EXCEPTION,
                             String.format("numeric 类型必须配置 %s 和 %s 项", Key.LENGTH, Key.SCALE)
                     );
                 }
 
-                if ("char".equalsIgnoreCase(column.getString(Key.TYPE)) && column.getString(Key.LENGTH, null) == null)
-                {
+                if ("char".equalsIgnoreCase(column.getString(Key.TYPE)) && column.getString(Key.LENGTH, null) == null) {
                     throw AddaxException.asAddaxException(
                             DbfWriterErrorCode.CONFIG_INVALID_EXCEPTION,
                             String.format("char 类型必须配置 %s 项", Key.LENGTH)
@@ -249,8 +246,13 @@ public class DbfWriter
         public List<Configuration> split(int mandatoryNumber)
         {
             LOG.info("begin do split...");
+
+            if (mandatoryNumber == 1) {
+                return Collections.singletonList(this.writerSliceConfig);
+            }
+
             List<Configuration> writerSplitConfigs = new ArrayList<>();
-            String filePrefix = this.writerSliceConfig.getString(Key.FILE_NAME);
+            String filePrefix = this.writerSliceConfig.getString(Key.FILE_NAME).split("\\.")[0];
 
             Set<String> allFiles;
             String path = null;
@@ -265,32 +267,25 @@ public class DbfWriter
                         String.format("您没有权限查看目录 : [%s]", path));
             }
 
-            String fileSuffix;
             for (int i = 0; i < mandatoryNumber; i++) {
                 // handle same file name
 
-                Configuration splitedTaskConfig = this.writerSliceConfig.clone();
+                Configuration splitTaskConfig = this.writerSliceConfig.clone();
 
                 String fullFileName;
-                if (mandatoryNumber > 1) {
-                    fileSuffix = UUID.randomUUID().toString().replace('-', '_');
-                    fullFileName = String.format("%s__%s", filePrefix, fileSuffix);
-                    while (allFiles.contains(fullFileName)) {
-                        fileSuffix = UUID.randomUUID().toString().replace('-', '_');
-                        fullFileName = String.format("%s__%s", filePrefix,
-                                fileSuffix);
-                    }
+
+                fullFileName = String.format("%s__%s.dbf", filePrefix, FileHelper.generateFileMiddleName());
+                while (allFiles.contains(fullFileName)) {
+                    fullFileName = String.format("%s__%s.dbf", filePrefix, FileHelper.generateFileMiddleName());
                 }
-                else {
-                    fullFileName = filePrefix;
-                }
+
                 allFiles.add(fullFileName);
 
-                splitedTaskConfig.set(Key.FILE_NAME, fullFileName);
+                splitTaskConfig.set(Key.FILE_NAME, fullFileName);
 
                 LOG.info("split write file name:[{}]", fullFileName);
 
-                writerSplitConfigs.add(splitedTaskConfig);
+                writerSplitConfigs.add(splitTaskConfig);
             }
             LOG.info("end do split.");
             return writerSplitConfigs;
@@ -313,7 +308,9 @@ public class DbfWriter
         {
             this.writerSliceConfig = this.getPluginJobConf();
             this.path = this.writerSliceConfig.getString(Key.PATH);
-            this.fileName = this.writerSliceConfig.getString(Key.FILE_NAME);
+            // remove file suffix
+            this.fileName = this.writerSliceConfig.getString(Key.FILE_NAME).split("\\.")[0];
+            writerSliceConfig.set(Key.FILE_NAME, this.fileName);
         }
 
         @Override
@@ -326,7 +323,8 @@ public class DbfWriter
         public void startWrite(RecordReceiver lineReceiver)
         {
             LOG.info("begin to write...");
-            String fileFullPath = this.buildFilePath();
+            String fileSuffix = ".dbf";
+            String fileFullPath = StorageWriterUtil.buildFilePath(path, fileName, fileSuffix);
             LOG.info("write to file : [{}]", fileFullPath);
             List<Configuration> columns = this.writerSliceConfig.getListConfiguration(Key.COLUMN);
             DBFWriter writer;
@@ -383,7 +381,7 @@ public class DbfWriter
                                     rowData[i] = colData;
                                     break;
                                 case "date":
-                                    rowData[i] =new Date(Long.parseLong(colData));
+                                    rowData[i] = new Date(Long.parseLong(colData));
                                     break;
                                 case "logical":
                                     rowData[i] = Boolean.parseBoolean(colData);
@@ -404,25 +402,6 @@ public class DbfWriter
                         String.format("您没有权限创建文件  : [%s]", this.fileName));
             }
             LOG.info("end write");
-        }
-
-        private String buildFilePath()
-        {
-            boolean isEndWithSeparator = false;
-            switch (IOUtils.DIR_SEPARATOR) {
-                case IOUtils.DIR_SEPARATOR_UNIX:
-                    isEndWithSeparator = this.path.endsWith(String.valueOf(IOUtils.DIR_SEPARATOR));
-                    break;
-                case IOUtils.DIR_SEPARATOR_WINDOWS:
-                    isEndWithSeparator = this.path.endsWith(String.valueOf(IOUtils.DIR_SEPARATOR_WINDOWS));
-                    break;
-                default:
-                    break;
-            }
-            if (!isEndWithSeparator) {
-                this.path = this.path + IOUtils.DIR_SEPARATOR;
-            }
-            return String.format("%s%s", this.path, this.fileName);
         }
 
         @Override

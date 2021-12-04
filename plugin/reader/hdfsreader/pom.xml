@@ -37,6 +37,7 @@
             <groupId>com.google.guava</groupId>
             <artifactId>guava</artifactId>
             <version>${guava.version}</version>
+            <scope>compile</scope>
         </dependency>
 
         <dependency>
@@ -73,13 +74,6 @@
                     <artifactId>parquet-avro</artifactId>
                 </exclusion>
             </exclusions>
-        </dependency>
-
-
-        <dependency>
-            <groupId>org.apache.commons</groupId>
-            <artifactId>commons-compress</artifactId>
-            <version>${commons.compress.version}</version>
         </dependency>
 
         <dependency>
