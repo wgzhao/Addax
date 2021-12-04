@@ -117,22 +117,8 @@ public class TxtFileWriter
             String fileName = this.writerSliceConfig.getString(FILE_NAME);
             String writeMode = this.writerSliceConfig.getString(WRITE_MODE);
 
+            assert FileHelper.checkDirectoryWritable(path);
             File dir = new File(path);
-            //path is exists or not ?
-            if (!dir.exists()) {
-                throw AddaxException.asAddaxException(TxtFileWriterErrorCode.PATH_NOT_VALID,
-                        String.format("您配置的路径 [%s] 不存在", path));
-            }
-            // path is directory or not ?
-            if (!dir.isDirectory()) {
-                throw AddaxException.asAddaxException(TxtFileWriterErrorCode.PAHT_NOT_DIR,
-                        String.format("您配置的路径 [%s] 不是文件夹", path));
-            }
-            // path can writer it ?
-            if (!dir.canWrite()) {
-                throw AddaxException.asAddaxException(TxtFileWriterErrorCode.WRITE_FILE_ERROR,
-                        String.format("您配置的路径 [%s] 没有写入权限", path));
-            }
             // truncate option handler
             if ("truncate".equalsIgnoreCase(writeMode) || "overwrite".equalsIgnoreCase(writeMode)) {
                 LOG.info("由于您配置了writeMode truncate/overwrite, 开始清理 [{}] 下面以 [{}] 开头的内容", path, fileName);
@@ -266,10 +252,10 @@ public class TxtFileWriter
             LOG.info("write to file : [{}]", fileFullPath);
 
             OutputStream outputStream = null;
+
             try {
                 File newFile = new File(fileFullPath);
-                boolean isSuccess = newFile.createNewFile();
-                assert isSuccess;
+                assert newFile.createNewFile();
                 outputStream = new FileOutputStream(newFile);
                 StorageWriterUtil.writeToStream(lineReceiver, outputStream, this.writerSliceConfig, this.fileName,
                         this.getTaskPluginCollector());

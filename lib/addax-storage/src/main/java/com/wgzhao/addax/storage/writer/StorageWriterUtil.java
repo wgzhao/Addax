@@ -209,7 +209,8 @@ public class StorageWriterUtil
                 //normalize compress name
                 if ("gzip".equalsIgnoreCase(compress)) {
                     compress = "gz";
-                } else if ("bz2".equalsIgnoreCase(compress)) {
+                }
+                else if ("bz2".equalsIgnoreCase(compress)) {
                     compress = "bzip2";
                 }
 

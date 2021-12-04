@@ -27,20 +27,15 @@ import com.wgzhao.addax.common.exception.AddaxException;
 import com.wgzhao.addax.common.plugin.RecordSender;
 import com.wgzhao.addax.common.spi.Reader;
 import com.wgzhao.addax.common.util.Configuration;
-import org.apache.commons.io.IOUtils;
-import org.apache.commons.lang3.BooleanUtils;
+import com.wgzhao.addax.storage.util.FileHelper;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.File;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.regex.Pattern;
 
 public class ExcelReader
@@ -78,14 +73,8 @@ public class ExcelReader
                 }
             }
 
-            // warn:make sure this regex string
-            // warn:no need trim
-            for (String eachPath : this.path) {
-                String regexString = eachPath.replace("*", ".*").replace("?", ".?");
-                Pattern pattern = Pattern.compile(regexString);
-                this.pattern.put(eachPath, pattern);
-            }
-            this.sourceFiles = this.buildSourceTargets();
+//            this.sourceFiles = this.buildSourceTargets();
+            this.sourceFiles = FileHelper.buildSourceTargets(path);
             LOG.info("The number of files to read is: [{}]", this.sourceFiles.size());
         }
 
@@ -110,128 +99,14 @@ public class ExcelReader
                         "Nothing found in the directory " + this.originConfig.getString(Key.PATH) + ". Please check it");
             }
 
-            List<List<String>> splitedSourceFiles = this.splitSourceFiles(
-                    this.sourceFiles, splitNumber);
-            for (List<String> files : splitedSourceFiles) {
-                Configuration splitedConfig = this.originConfig.clone();
-                splitedConfig.set(Key.SOURCE_FILES, files);
-                readerSplitConfigs.add(splitedConfig);
+            List<List<String>> splitSourceFiles = FileHelper.splitSourceFiles(this.sourceFiles, splitNumber);
+            for (List<String> files : splitSourceFiles) {
+                Configuration splitConfig = this.originConfig.clone();
+                splitConfig.set(Key.SOURCE_FILES, files);
+                readerSplitConfigs.add(splitConfig);
             }
             LOG.debug("Split finished...");
             return readerSplitConfigs;
-        }
-
-        // validate the path, path must be a absolute path
-        private List<String> buildSourceTargets()
-        {
-            // for each path
-            Set<String> toBeReadFiles = new HashSet<>();
-            for (String eachPath : this.path) {
-                int endMark;
-                for (endMark = 0; endMark < eachPath.length(); endMark++) {
-                    if ('*' == eachPath.charAt(endMark) || '?' == eachPath.charAt(endMark)) {
-                        this.isRegexPath.put(eachPath, true);
-                        break;
-                    }
-                }
-
-                String parentDirectory;
-                if (BooleanUtils.isTrue(this.isRegexPath.get(eachPath))) {
-                    int lastDirSeparator = eachPath.substring(0, endMark).lastIndexOf(IOUtils.DIR_SEPARATOR);
-                    parentDirectory = eachPath.substring(0, lastDirSeparator + 1);
-                }
-                else {
-                    this.isRegexPath.put(eachPath, false);
-                    parentDirectory = eachPath;
-                }
-                this.buildSourceTargetsEachPath(eachPath, parentDirectory, toBeReadFiles);
-            }
-            return Arrays.asList(toBeReadFiles.toArray(new String[0]));
-        }
-
-        private void buildSourceTargetsEachPath(String regexPath, String parentDirectory, Set<String> toBeReadFiles)
-        {
-            // 检测目录是否存在，错误情况更明确
-            try {
-                File dir = new File(parentDirectory);
-                boolean isExists = dir.exists();
-                if (!isExists) {
-                    throw AddaxException.asAddaxException(ExcelReaderErrorCode.FILE_NOT_EXISTS,
-                            parentDirectory + ": No such file or directory");
-                }
-            }
-            catch (SecurityException se) {
-                throw AddaxException.asAddaxException(ExcelReaderErrorCode.SECURITY_NOT_ENOUGH,
-                        "Permission denied for directory: " + parentDirectory);
-            }
-
-            directoryRover(regexPath, parentDirectory, toBeReadFiles);
-        }
-
-        private void directoryRover(String regexPath, String parentDirectory, Set<String> toBeReadFiles)
-        {
-            File directory = new File(parentDirectory);
-            // is a normal file
-            if (!directory.isDirectory()) {
-                if (this.isTargetFile(regexPath, directory.getAbsolutePath())) {
-                    if (parentDirectory.endsWith(".xlsx") || parentDirectory.endsWith(".xls")) {
-                        toBeReadFiles.add(parentDirectory);
-                    } else {
-                        LOG.warn("File {} is not valid Excel file, ignore it", parentDirectory);
-                    }
-                    LOG.info("add file [{}] as a candidate to be read.", parentDirectory);
-                }
-            }
-            else {
-                // 是目录
-                try {
-                    // warn:对于没有权限的目录,listFiles 返回null，而不是抛出SecurityException
-                    File[] files = directory.listFiles();
-                    if (null != files) {
-                        for (File subFileNames : files) {
-                            directoryRover(regexPath, subFileNames.getAbsolutePath(), toBeReadFiles);
-                        }
-                    }
-                    else {
-                        // warn: 对于没有权限的文件，是直接throw AddaxException
-                        String message = String.format("您没有权限查看目录 : [%s]", directory);
-                        LOG.error(message);
-                        throw AddaxException.asAddaxException(ExcelReaderErrorCode.SECURITY_NOT_ENOUGH, message);
-                    }
-                }
-                catch (SecurityException e) {
-                    String message = String.format("您没有权限查看目录 : [%s]", directory);
-                    LOG.error(message);
-                    throw AddaxException.asAddaxException(ExcelReaderErrorCode.SECURITY_NOT_ENOUGH, message, e);
-                }
-            }
-        }
-
-        private <T> List<List<T>> splitSourceFiles(final List<T> sourceList,
-                int adviceNumber)
-        {
-            List<List<T>> splitedList = new ArrayList<>();
-            int averageLength = sourceList.size() / adviceNumber;
-            averageLength = averageLength == 0 ? 1 : averageLength;
-
-            for (int begin = 0, end; begin < sourceList.size(); begin = end) {
-                end = begin + averageLength;
-                if (end > sourceList.size()) {
-                    end = sourceList.size();
-                }
-                splitedList.add(sourceList.subList(begin, end));
-            }
-            return splitedList;
-        }
-
-        private boolean isTargetFile(String regexPath, String absoluteFilePath)
-        {
-            if (this.isRegexPath.get(regexPath)) {
-                return this.pattern.get(regexPath).matcher(absoluteFilePath).matches();
-            }
-            else {
-                return true;
-            }
         }
     }
 

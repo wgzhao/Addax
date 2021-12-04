@@ -138,7 +138,7 @@ public class HdfsReader
                     || this.specifiedFileType.equals(HdfsConstant.CSV)) {
                 //compress校验
                 StorageReaderUtil.validateCompress(this.readerOriginConfig);
-                StorageReaderUtil.validateCsvReaderConfig(this.readerOriginConfig);
+//                StorageReaderUtil.validateCsvReaderConfig(this.readerOriginConfig);
             }
         }
 

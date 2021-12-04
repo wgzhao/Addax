@@ -23,7 +23,6 @@ package com.wgzhao.addax.storage.reader;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
-import com.alibaba.fastjson.TypeReference;
 import com.wgzhao.addax.common.base.Constant;
 import com.wgzhao.addax.common.base.Key;
 import com.wgzhao.addax.common.compress.ExpandLzopInputStream;
@@ -41,14 +40,11 @@ import com.wgzhao.addax.common.exception.AddaxException;
 import com.wgzhao.addax.common.plugin.RecordSender;
 import com.wgzhao.addax.common.plugin.TaskPluginCollector;
 import com.wgzhao.addax.common.util.Configuration;
-import io.airlift.compress.snappy.SnappyCodec;
-import io.airlift.compress.snappy.SnappyFramedInputStream;
 import org.apache.commons.compress.compressors.CompressorException;
 import org.apache.commons.compress.compressors.CompressorInputStream;
 import org.apache.commons.compress.compressors.CompressorStreamFactory;
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVParser;
-import org.apache.commons.csv.CSVRecord;
 import org.apache.commons.io.Charsets;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -76,11 +72,6 @@ public class StorageReaderUtil
     private StorageReaderUtil()
     {
 
-    }
-
-    public static String[] splitBufferedReader(CSVRecord csvRecord)
-    {
-        return csvRecord.toList().toArray(new String[csvRecord.size()]);
     }
 
     public static void readFromStream(InputStream inputStream, String fileName,
@@ -361,7 +352,7 @@ public class StorageReaderUtil
         validateEncoding(readerConfiguration);
 
         //only support compress types
-        validateCompress(readerConfiguration);
+//        validateCompress(readerConfiguration);
 
         //fieldDelimiter check
         validateFieldDelimiter(readerConfiguration);
@@ -450,19 +441,6 @@ public class StorageReaderUtil
                     throw AddaxException.asAddaxException(StorageReaderErrorCode.ILLEGAL_VALUE,
                             String.format("The value of index must be greater than 0, %s is illegal", columnIndex));
                 }
-            }
-        }
-    }
-
-    public static void validateCsvReaderConfig(Configuration readerConfiguration)
-    {
-        String csvReaderConfig = readerConfiguration.getString(Key.CSV_READER_CONFIG);
-        if (StringUtils.isNotBlank(csvReaderConfig)) {
-            try {
-                StorageReaderUtil.csvReaderConfigMap = JSON.parseObject(csvReaderConfig, new TypeReference<HashMap<String, Object>>() {});
-            }
-            catch (Exception e) {
-                LOG.info("WARN!!!!忽略csvReaderConfig配置! 配置错误,值只能为空或者为Map结构,您配置的值为: {}", csvReaderConfig);
             }
         }
     }
