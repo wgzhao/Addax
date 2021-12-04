@@ -60,14 +60,12 @@ import java.io.UnsupportedEncodingException;
 import java.nio.charset.UnsupportedCharsetException;
 import java.text.DateFormat;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Objects;
 
 public class StorageReaderUtil
 {
     private static final Logger LOG = LoggerFactory.getLogger(StorageReaderUtil.class);
-    public static HashMap<String, Object> csvReaderConfigMap;
 
     private StorageReaderUtil()
     {
@@ -98,7 +96,7 @@ public class StorageReaderUtil
 
         // compress logic
         try {
-            if (compress == null || "".equals(compress)) {
+            if (compress == null || "".equals(compress) || "none".equalsIgnoreCase(compress)) {
                 reader = new BufferedReader(new InputStreamReader(inputStream, encoding), bufferSize);
             }
             else {
@@ -111,10 +109,8 @@ public class StorageReaderUtil
                     reader = new BufferedReader(new InputStreamReader(expandLzopInputStream, encoding), bufferSize);
                 }
                 else {
-                    // detect compress type
-                    String compressType = CompressorStreamFactory.detect(inputStream);
                     // common-compress supports almost compress alg
-                    CompressorInputStream input = new CompressorStreamFactory().createCompressorInputStream(compressType, inputStream, true);
+                    CompressorInputStream input = new CompressorStreamFactory().createCompressorInputStream(compress.toUpperCase(), inputStream, true);
                     reader = new BufferedReader(new InputStreamReader(input, encoding), bufferSize);
                 }
             }

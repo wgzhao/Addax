@@ -32,6 +32,7 @@ import com.wgzhao.addax.common.plugin.RecordReceiver;
 import com.wgzhao.addax.common.plugin.TaskPluginCollector;
 import com.wgzhao.addax.common.util.Configuration;
 import com.wgzhao.addax.storage.reader.StorageReaderErrorCode;
+import com.wgzhao.addax.storage.util.FileHelper;
 import org.apache.commons.compress.compressors.CompressorException;
 import org.apache.commons.compress.compressors.CompressorOutputStream;
 import org.apache.commons.compress.compressors.CompressorStreamFactory;
@@ -52,10 +53,10 @@ import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-import java.util.UUID;
 
 public class StorageWriterUtil
 {
@@ -133,24 +134,24 @@ public class StorageWriterUtil
         }
     }
 
-    public static List<Configuration> split(Configuration writerSliceConfig,
-            Set<String> originAllFileExists, int mandatoryNumber)
+    public static List<Configuration> split(Configuration writerSliceConfig, Set<String> originAllFileExists, int mandatoryNumber)
     {
         LOG.info("begin do split...");
+        if (mandatoryNumber == 1) {
+            return Collections.singletonList(writerSliceConfig);
+        }
+
         Set<String> allFileExists = new HashSet<>(originAllFileExists);
         List<Configuration> writerSplitConfigs = new ArrayList<>();
         String filePrefix = writerSliceConfig.getString(Key.FILE_NAME);
 
-        String fileSuffix;
         for (int i = 0; i < mandatoryNumber; i++) {
             // handle same file name
             Configuration splitTaskConfig = writerSliceConfig.clone();
             String fullFileName;
-            fileSuffix = UUID.randomUUID().toString().replace('-', '_');
-            fullFileName = String.format("%s__%s", filePrefix, fileSuffix);
+            fullFileName = String.format("%s__%s", filePrefix, FileHelper.generateFileMiddleName());
             while (allFileExists.contains(fullFileName)) {
-                fileSuffix = UUID.randomUUID().toString().replace('-', '_');
-                fullFileName = String.format("%s__%s", filePrefix, fileSuffix);
+                fullFileName = String.format("%s__%s", filePrefix, FileHelper.generateFileMiddleName());
             }
             allFileExists.add(fullFileName);
             splitTaskConfig.set(Key.FILE_NAME, fullFileName);
@@ -161,8 +162,7 @@ public class StorageWriterUtil
         return writerSplitConfigs;
     }
 
-    public static String buildFilePath(String path, String fileName,
-            String suffix)
+    public static String buildFilePath(String path, String fileName, String suffix)
     {
         boolean isEndWithSeparator = false;
         switch (IOUtils.DIR_SEPARATOR) {

@@ -38,10 +38,7 @@ import java.io.FileNotFoundException;
 import java.nio.charset.Charset;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
-import java.util.regex.Pattern;
 
 /**
  * Created by zhongtian.hu on 19-8-8.
@@ -60,10 +57,6 @@ public class DbfReader
 
         private List<String> sourceFiles;
 
-        private Map<String, Pattern> pattern;
-
-        private Map<String, Boolean> isRegexPath;
-
         private boolean isBlank(Object object)
         {
             if (null == object) {
@@ -79,8 +72,6 @@ public class DbfReader
         public void init()
         {
             this.originConfig = this.getPluginJobConf();
-            this.pattern = new HashMap<>();
-            this.isRegexPath = new HashMap<>();
             StorageReaderUtil.validateParameter(this.originConfig);
             this.validateParameter();
         }

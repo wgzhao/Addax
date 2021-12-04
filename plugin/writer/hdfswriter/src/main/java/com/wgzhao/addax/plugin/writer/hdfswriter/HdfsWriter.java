@@ -28,17 +28,15 @@ import com.wgzhao.addax.common.util.Configuration;
 import com.wgzhao.addax.storage.util.FileHelper;
 import org.apache.commons.io.Charsets;
 import org.apache.commons.io.IOUtils;
-import org.apache.commons.lang3.RandomStringUtils;
 import org.apache.hadoop.fs.Path;
 import org.apache.orc.CompressionKind;
 import org.apache.parquet.hadoop.metadata.CompressionCodecName;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Date;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -253,6 +251,9 @@ public class HdfsWriter
         public List<Configuration> split(int mandatoryNumber)
         {
             LOG.info("begin splitting ...");
+            if (mandatoryNumber == 1) {
+                return Collections.singletonList(this.writerSliceConfig);
+            }
             List<Configuration> writerSplitConfigs = new ArrayList<>();
             String filePrefix = fileName;
 
@@ -265,7 +266,6 @@ public class HdfsWriter
                 }
             }
 
-            String fileSuffix;
             //临时存放路径
             String storePath = buildTmpFilePath(this.path);
             if (storePath != null && storePath.contains("/")) {
@@ -282,33 +282,28 @@ public class HdfsWriter
             this.path = endStorePath;
             String suffix = FileHelper.getCompressFileSuffix(this.compress);
             String fileType = this.writerSliceConfig.getString(Key.FILE_TYPE, "txt").toLowerCase();
-            String randomChars = "0123456789abcdefghmnpqrstuvwxyz";
             for (int i = 0; i < mandatoryNumber; i++) {
                 // handle same file name
-                Configuration splitedTaskConfig = this.writerSliceConfig.clone();
+                Configuration splitTaskConfig = this.writerSliceConfig.clone();
                 String fullFileName;
                 String endFullFileName;
 
-                SimpleDateFormat dateFormat = new SimpleDateFormat("yyyyMMdd-HHmmss-SSS");
-                // like 2021-12-03-14-33-29-237-6587fddb
-                fileSuffix = dateFormat.format(new Date()) + "-" + RandomStringUtils.random(8, randomChars);
-                fullFileName = String.format("%s%s%s__%s.%s%s", defaultFS, storePath, filePrefix, fileSuffix, fileType, suffix);
-                endFullFileName = String.format("%s%s%s__%s.%s%s", defaultFS, endStorePath, filePrefix, fileSuffix, fileType, suffix);
+                fullFileName = String.format("%s%s%s__%s.%s%s", defaultFS, storePath, filePrefix, FileHelper.generateFileMiddleName(), fileType, suffix);
+                endFullFileName = String.format("%s%s%s__%s.%s%s", defaultFS, endStorePath, filePrefix, FileHelper.generateFileMiddleName(), fileType, suffix);
 
                 while (allFiles.contains(endFullFileName)) {
-                    fileSuffix = dateFormat.format(new Date()) + "-" + RandomStringUtils.random(8, randomChars);
-                    fullFileName = String.format("%s%s%s__%s.%s%s", defaultFS, storePath, filePrefix, fileSuffix, fileType, suffix);
-                    endFullFileName = String.format("%s%s%s__%s.%s%s", defaultFS, endStorePath, filePrefix, fileSuffix, fileType, suffix);
+                    fullFileName = String.format("%s%s%s__%s.%s%s", defaultFS, storePath, filePrefix, FileHelper.generateFileMiddleName(), fileType, suffix);
+                    endFullFileName = String.format("%s%s%s__%s.%s%s", defaultFS, endStorePath, filePrefix, FileHelper.generateFileMiddleName(), fileType, suffix);
                 }
                 allFiles.add(endFullFileName);
                 this.tmpFiles.add(fullFileName);
                 this.endFiles.add(endFullFileName);
 
-                splitedTaskConfig.set(Key.FILE_NAME, fullFileName);
+                splitTaskConfig.set(Key.FILE_NAME, fullFileName);
 
                 LOG.info("split wrote file name:[{}]", fullFileName);
 
-                writerSplitConfigs.add(splitedTaskConfig);
+                writerSplitConfigs.add(splitTaskConfig);
             }
             LOG.info("end splitting.");
             return writerSplitConfigs;

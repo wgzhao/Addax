@@ -25,6 +25,7 @@ import org.apache.commons.compress.compressors.CompressorException;
 import org.apache.commons.compress.compressors.CompressorInputStream;
 import org.apache.commons.compress.compressors.CompressorStreamFactory;
 import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang3.RandomStringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -36,9 +37,11 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -281,7 +284,7 @@ public class FileHelper
             }
 
             String parentDirectory;
-            if (isRegexPath.get(eachPath)) {
+            if (!isRegexPath.isEmpty() && isRegexPath.get(eachPath)) {
                 int lastDirSeparator = eachPath.substring(0, endMark).lastIndexOf(IOUtils.DIR_SEPARATOR);
                 parentDirectory = eachPath.substring(0, lastDirSeparator + 1);
             }
@@ -310,12 +313,7 @@ public class FileHelper
         // is a normal file
         if (!directory.isDirectory()) {
             if (isTargetFile(patterns, isRegexPath, regexPath, directory.getAbsolutePath())) {
-                if (parentDirectory.endsWith(".xlsx") || parentDirectory.endsWith(".xls")) {
-                    toBeReadFiles.add(parentDirectory);
-                }
-                else {
-                    LOG.warn("File {} is not valid Excel file, ignore it", parentDirectory);
-                }
+                toBeReadFiles.add(parentDirectory);
                 LOG.info("add file [{}] as a candidate to be read.", parentDirectory);
             }
         }
@@ -358,6 +356,14 @@ public class FileHelper
             splitedList.add(sourceList.subList(begin, end));
         }
         return splitedList;
+    }
+
+    public static String generateFileMiddleName()
+    {
+        String randomChars = "0123456789abcdefghmnpqrstuvwxyz";
+        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyyMMdd_HHmmss_SSS");
+        // like 2021-12-03-14-33-29-237-6587fddb
+        return dateFormat.format(new Date()) + "_" + RandomStringUtils.random(8, randomChars);
     }
 
 //    private static String bytesToHexString(byte[] src)

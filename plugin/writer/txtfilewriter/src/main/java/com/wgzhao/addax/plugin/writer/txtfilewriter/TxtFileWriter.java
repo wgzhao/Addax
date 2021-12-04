@@ -248,7 +248,7 @@ public class TxtFileWriter
         public void startWrite(RecordReceiver lineReceiver)
         {
             LOG.info("begin do write...");
-            String fileFullPath = this.buildFilePath();
+            String fileFullPath = StorageWriterUtil.buildFilePath(this.path, this.fileName, this.suffix);
             LOG.info("write to file : [{}]", fileFullPath);
 
             OutputStream outputStream = null;
@@ -272,25 +272,6 @@ public class TxtFileWriter
                 IOUtils.closeQuietly(outputStream, null);
             }
             LOG.info("end do write");
-        }
-
-        private String buildFilePath()
-        {
-            boolean isEndWithSeparator = false;
-            switch (IOUtils.DIR_SEPARATOR) {
-                case IOUtils.DIR_SEPARATOR_UNIX:
-                    isEndWithSeparator = this.path.endsWith(String.valueOf(IOUtils.DIR_SEPARATOR));
-                    break;
-                case IOUtils.DIR_SEPARATOR_WINDOWS:
-                    isEndWithSeparator = this.path.endsWith(String.valueOf(IOUtils.DIR_SEPARATOR_WINDOWS));
-                    break;
-                default:
-                    break;
-            }
-            if (!isEndWithSeparator) {
-                this.path = this.path + IOUtils.DIR_SEPARATOR;
-            }
-            return String.format("%s%s%s", this.path, this.fileName, this.suffix);
         }
 
         @Override
