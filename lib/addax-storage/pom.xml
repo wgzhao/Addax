@@ -58,13 +58,7 @@
             <artifactId>aircompressor</artifactId>
             <version>${aircompressor.version}</version>
         </dependency>
-
-        <dependency>
-            <groupId>io.trino.hadoop</groupId>
-            <artifactId>hadoop-apache</artifactId>
-            <version>${hadoop.version}</version>
-        </dependency>
-
+        
         <dependency>
             <groupId>org.apache.commons</groupId>
             <artifactId>commons-csv</artifactId>

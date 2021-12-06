@@ -18,7 +18,7 @@ HdfsWriter 提供向HDFS文件系统指定路径中写入 `TEXTFile` ， `ORCFil
 | fileName               |    是    | 无        | 要写入的文件名，用于当作前缀
 | column                 |    是    | 无        | 写入的字段列表 |
 | writeMode              |    是    | 无        | 写入模式，支持 `append`, `overwrite`, `nonConflict` | 
-| fieldDelimiter         |    否    | `,`        | 指定文本文件的字段分隔符，二进制文件不需要指定该项 |
+| fieldDelimiter         |    否    | `,`        | 指定文本文件（即`fileType` 指定为 `text`)的字段分隔符，二进制文件不需要指定该项 |
 | encoding               |    否    | `utf-8`    | 文件的编码配置， 目前仅支持 `utf-8` |
 | nullFormat             |    否    | 无         | 自定义哪些字符可以表示为空,例如如果用户配置: `"\\N"` ，那么如果源头数据是 `"\N"` ，视作 `null` 字段 |
 | haveKerberos           |    否    | 无         | 是否启用 Kerberos 认证，如果启用，则需要同时配置 `kerberosKeytabFilePath`，`kerberosPrincipal`  | 
@@ -29,14 +29,12 @@ HdfsWriter 提供向HDFS文件系统指定路径中写入 `TEXTFile` ， `ORCFil
 
 ### path
 
-存储到 Hadoop hdfs文件系统的路径信息，HdfsWriter 会根据并发配置在 `Path` 目录下写入多个文件。为与hive表关联，请填写hive表在hdfs上的存储路径。 
-例：Hive上设置的数据仓库的存储路径为：`/user/hive/warehouse/` ，已建立数据库：`test`，表：`hello`；
-则对应的存储路径为：`/user/hive/warehouse/test.db/hello` (如果建表时指定了`location` 属性，则依据该属性的路径)
+存储到 Hadoop hdfs文件系统的路径信息，HdfsWriter 会根据并发配置在 `Path` 目录下写入多个文件。为与hive表关联，请填写hive表在hdfs上的存储路径。 例：Hive上设置的数据仓库的存储路径为：`/user/hive/warehouse/`
+，已建立数据库：`test`，表：`hello`； 则对应的存储路径为：`/user/hive/warehouse/test.db/hello` (如果建表时指定了`location` 属性，则依据该属性的路径)
 
 ### defaultFS
 
-Hadoop hdfs文件系统 namenode 节点地址。格式：`hdfs://ip:port` ；例如：`hdfs://127.0.0.1:9000` , 
-如果启用了HA，则为 servicename 模式，比如 `hdfs://sandbox`
+Hadoop hdfs文件系统 namenode 节点地址。格式：`hdfs://ip:port` ；例如：`hdfs://127.0.0.1:9000` , 如果启用了HA，则为 servicename 模式，比如 `hdfs://sandbox`
 
 ### fileType
 
@@ -48,7 +46,6 @@ Hadoop hdfs文件系统 namenode 节点地址。格式：`hdfs://ip:port` ；例
 - rc 表示 Rcfile 文件格式
 - seq 表示sequence file文件格式
 - csv 表示普通hdfs文件格式（逻辑二维表）
-
 
 ### column
 
