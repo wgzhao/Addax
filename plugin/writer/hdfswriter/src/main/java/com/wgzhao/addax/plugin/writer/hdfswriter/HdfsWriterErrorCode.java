@@ -37,7 +37,10 @@ public enum HdfsWriterErrorCode
     CONNECT_HDFS_IO_ERROR("HdfsWriter-06", "与HDFS建立连接时出现IO异常."),
     COLUMN_REQUIRED_VALUE("HdfsWriter-07", "您column配置中缺失了必须填写的参数值."),
     HDFS_RENAME_FILE_ERROR("HdfsWriter-08", "将文件移动到配置路径失败."),
-    KERBEROS_LOGIN_ERROR("HdfsWriter-09", "KERBEROS认证失败");
+    KERBEROS_LOGIN_ERROR("HdfsWriter-09", "KERBEROS认证失败"),
+    FILE_NOT_FOUND("HdfsWriter-10", "文件或目录不存在."),
+    IO_ERROR("HdfsWriter-11", "IO异常."),
+    ;
 
     private final String code;
     private final String description;
