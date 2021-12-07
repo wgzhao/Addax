@@ -19,6 +19,8 @@
 
 package com.wgzhao.addax.plugin.reader.hdfsreader;
 
+import com.wgzhao.addax.common.base.Constant;
+
 import java.util.Arrays;
 import java.util.List;
 
@@ -26,6 +28,7 @@ import java.util.List;
  * Created by mingya.wmy on 2015/8/14.
  */
 public class HdfsConstant
+        extends Constant
 {
 
     public static final String SOURCE_FILES = "sourceFiles";
@@ -35,6 +38,10 @@ public class HdfsConstant
     public static final String SEQ = "SEQ";
     public static final String RC = "RC";
     public static final String PARQUET = "PARQUET";
-    protected static final List<String> SUPPORT_FILE_TYPE = Arrays.asList(HdfsConstant.CSV, HdfsConstant.ORC, HdfsConstant.RC, HdfsConstant.SEQ, HdfsConstant.TEXT, HdfsConstant.PARQUET);
+    public static final String HDFS_DEFAULT_KEY = "fs.defaultFS";
+    public static final String HADOOP_SECURITY_AUTHENTICATION_KEY = "hadoop.security.authentication";
+    protected static final List<String> SUPPORT_FILE_TYPE =
+            Arrays.asList(HdfsConstant.CSV, HdfsConstant.ORC, HdfsConstant.RC, HdfsConstant.SEQ, HdfsConstant.TEXT, HdfsConstant.PARQUET);
+
     private HdfsConstant() {}
 }
