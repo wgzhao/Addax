@@ -31,6 +31,8 @@ import com.wgzhao.addax.common.exception.AddaxException;
 import com.wgzhao.addax.common.plugin.RecordSender;
 import com.wgzhao.addax.common.spi.Reader;
 import com.wgzhao.addax.common.util.Configuration;
+import org.apache.commons.collections.BinaryHeap;
+import org.apache.commons.logging.Log;
 import org.apache.kudu.ColumnSchema;
 import org.apache.kudu.Schema;
 import org.apache.kudu.Type;
@@ -41,16 +43,21 @@ import org.apache.kudu.client.KuduScanner;
 import org.apache.kudu.client.KuduTable;
 import org.apache.kudu.client.RowResult;
 import org.apache.kudu.client.RowResultIterator;
+import org.junit.Test;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.math.BigDecimal;
 import java.nio.charset.StandardCharsets;
 import java.sql.Date;
 import java.sql.Timestamp;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 import static com.wgzhao.addax.common.base.Key.COLUMN;
 import static com.wgzhao.addax.common.base.Key.WHERE;
@@ -61,6 +68,7 @@ import static com.wgzhao.addax.common.base.Key.WHERE;
 public class KuduReader
         extends Reader
 {
+    private static final Logger LOG = LoggerFactory.getLogger(KuduReader.class);
 
     public static class Job
             extends Reader.Job
@@ -73,8 +81,9 @@ public class KuduReader
 
         private String upperBound;
         // match where clause such as age > 18
-        private static final String PATTERN_FOR_WHERE = "^(\\w+)\\s+(=|>|>=|<|<=)\\s+(.*)$";
+        private static final String PATTERN_FOR_WHERE = "^(\\w+)\\s+(in|=|>|>=|<|<=)\\s+(.*)$";
         private static final Pattern pattern = Pattern.compile(PATTERN_FOR_WHERE);
+        Pattern patternValue = Pattern.compile("(?<=\\()[^\\)]+");
         private static final Map<String, KuduPredicate.ComparisonOp> KUDU_OPERATORS = ImmutableMap.of(
                 "=", KuduPredicate.ComparisonOp.EQUAL,
                 ">", KuduPredicate.ComparisonOp.GREATER,
@@ -82,8 +91,7 @@ public class KuduReader
                 "<", KuduPredicate.ComparisonOp.LESS,
                 "<=", KuduPredicate.ComparisonOp.LESS_EQUAL
         );
-
-        @Override
+            @Override
         public List<Configuration> split(int adviceNumber)
         {
             List<Configuration> confList = new ArrayList<>();
@@ -120,23 +128,25 @@ public class KuduReader
 
             return confList;
         }
-
+        @Test
         @Override
         public void prepare()
         {
-            List<String> where = this.originalConfig.getList(WHERE, String.class);
+            String condition = this.originalConfig.getString(WHERE,"").replace("AND","and");
+            List<String> where = new ArrayList<>(Arrays.asList(condition.split(" and ")));;
             if (where != null && !where.isEmpty()) {
                 List<Configuration> result = new ArrayList<>();
                 Matcher matcher;
 
                 for (String w : where) {
+                    w=w.trim();
                     matcher = pattern.matcher(w);
                     while (matcher.find()) {
                         if (matcher.groupCount() == 3) {
-                            if (KUDU_OPERATORS.containsKey(matcher.group(2))) {
+                            if (KUDU_OPERATORS.containsKey(matcher.group(2)) || "in".equals(matcher.group(2))) {
                                 Configuration conf = Configuration.from(
                                         String.format("{\"field\": \"%s\", \"op\": \"%s\", \"value\": \"%s\"}",
-                                                matcher.group(1).trim(), matcher.group(2).trim(), matcher.group(3).trim()));
+                                                matcher.group(1).trim(), matcher.group(2).trim(), matcher.group(3).trim().replace("'","")));
                                 result.add(conf);
                             }
                             else {
@@ -237,19 +247,21 @@ public class KuduReader
                 kuduScannerBuilder
                         .addPredicate(lowerBoundPredicate)
                         .addPredicate(upperBoundPredicate);
-                if (specifyColumn) {
-                    // judge specific column exists or not
 
-                    for (String column : columns) {
-                        if (!schema.hasColumn(column)) {
-                            throw AddaxException.asAddaxException(
-                                    KuduReaderErrorCode.ILLEGAL_VALUE,
-                                    "column '" + column + "' does not exists in the table '" + tableName + "'"
-                            );
-                        }
+            }
+
+            if (specifyColumn) {
+                // judge specific column exists or not
+
+                for (String column : columns) {
+                    if (!schema.hasColumn(column)) {
+                        throw AddaxException.asAddaxException(
+                                KuduReaderErrorCode.ILLEGAL_VALUE,
+                                "column '" + column + "' does not exists in the table '" + tableName + "'"
+                        );
                     }
-                    kuduScannerBuilder.setProjectedColumnNames(columns);
                 }
+                kuduScannerBuilder.setProjectedColumnNames(columns);
             }
 
             if (!where.isEmpty()) {
@@ -311,16 +323,19 @@ public class KuduReader
                                 record.addColumn(new BoolColumn(result.getBoolean(columnSchema.getName())));
                                 break;
                             case FLOAT:
-                                record.addColumn(new DoubleColumn(result.getFloat(columnSchema.getName())));
+                                Float flt=result.getFloat(columnSchema.getName());
+                                record.addColumn(new StringColumn(flt.toString()));
                                 break;
                             case DOUBLE:
-                                record.addColumn(new DoubleColumn(result.getDouble(columnSchema.getName())));
+                                Double dob = result.getDouble(columnSchema.getName());
+                                record.addColumn(new StringColumn(dob.toString()));
                                 break;
                             case UNIXTIME_MICROS:
                                 record.addColumn(new DateColumn(result.getTimestamp(columnSchema.getName())));
                                 break;
                             case DECIMAL:
-                                record.addColumn(new DoubleColumn(result.getDecimal(columnSchema.getName())));
+                                BigDecimal decimal=result.getDecimal(columnSchema.getName());
+                                record.addColumn(new StringColumn(decimal.toString()));
                                 break;
                             default:
                                 isDirtyRecord = true;
@@ -418,8 +433,7 @@ public class KuduReader
             KuduPredicate.ComparisonOp op;
             KuduPredicate predicate;
             for (Configuration conf : where) {
-                field = conf.getString("field");
-                op = KUDU_OPERATORS.get(conf.getString("op"));
+                field = conf.getString("field").toLowerCase();
                 if (!schema.hasColumn(field)) {
                     throw AddaxException.asAddaxException(
                             KuduReaderErrorCode.ILLEGAL_VALUE,
@@ -429,45 +443,109 @@ public class KuduReader
                 ColumnSchema column = schema.getColumn(field);
                 String value = conf.getString("value");
 
-                switch (column.getType()) {
-                    case INT8:
-                    case INT16:
-                    case INT32:
-                    case INT64:
-                        predicate = KuduPredicate.newComparisonPredicate(column, op, Long.parseLong(value));
-                        break;
-                    case BOOL:
-                        predicate = KuduPredicate.newComparisonPredicate(column, op, Boolean.valueOf(value));
-                        break;
-                    case STRING:
-                    case VARCHAR:
-                        predicate = KuduPredicate.newComparisonPredicate(column, op, value);
-                        break;
-                    case DATE:
-                        predicate = KuduPredicate.newComparisonPredicate(column, op, Date.valueOf(value));
-                        break;
-                    case FLOAT:
-                        predicate = KuduPredicate.newComparisonPredicate(column, op, Float.valueOf(value));
-                        break;
-                    case DOUBLE:
-                        predicate = KuduPredicate.newComparisonPredicate(column, op, Double.valueOf(value));
-                        break;
-                    case DECIMAL:
-                        predicate = KuduPredicate.newComparisonPredicate(column, op, new BigDecimal(value));
-                        break;
-                    case BINARY:
-                        predicate = KuduPredicate.newComparisonPredicate(column, op, value.getBytes(StandardCharsets.UTF_8));
-                        break;
-                    case UNIXTIME_MICROS:
-                        predicate = KuduPredicate.newComparisonPredicate(column, op, Timestamp.valueOf(value));
-                        break;
-                    default:
-                        throw new IllegalStateException("Unexpected type: " + column.getType());
+                if("in".equals(conf.getString("op"))){
+                    List<String> vals =findValue(value);
+                    customPredicate.add(addInCondition(column,vals));
+
+                }else{
+                    op = KUDU_OPERATORS.get(conf.getString("op"));
+                    customPredicate.add(addCondition(column,op,value));
                 }
-                customPredicate.add(predicate);
             }
             return customPredicate;
         }
+
+        /**
+         * in 条件，解析括号内的值
+         * @param value where条件
+         * @return list where解析结果
+         */
+        public List<String> findValue(String value) {
+            Pattern pattern = Pattern.compile("(?<=\\()[^\\)]+");
+            Matcher matcher = pattern.matcher(value);
+            matcher.find();
+            String[] str =matcher.group().split(",");
+            List<String> list=new ArrayList<>(Arrays.asList(str));
+
+             return list;
+        }
+
+        /**
+         * in条件查询，目前支持String
+         * @param column 列名
+         * @param value 查询条件值
+         * @return KuduPredicate
+         */
+        public KuduPredicate addInCondition(ColumnSchema column,List<String> value){
+            List val;
+            switch (column.getType()) {
+                case INT8:
+                case INT16:
+                case INT32:
+                case INT64:
+                     val= value.stream().map(Long::parseLong).collect(Collectors.toList());
+                    break;
+                case STRING:
+                case VARCHAR:
+                    val =value;
+                    break;
+                case FLOAT:
+                    val= value.stream().map(Float::parseFloat).collect(Collectors.toList());
+                    break;
+                case DOUBLE:
+                    val= value.stream().map(Double::parseDouble).collect(Collectors.toList());
+                    break;
+                default:
+                    throw new IllegalStateException("Unexpected type: " + column.getType());
+            }
+            LOG.info("添加 in 条件查询,字段:"+column.getName() +"类型："+column.getType() + ",条件值："+value.toString());
+            return   KuduPredicate.newInListPredicate(column, val);
+        }
+
+        public KuduPredicate addCondition(ColumnSchema column,KuduPredicate.ComparisonOp op,String value){
+            KuduPredicate predicate;
+
+            switch (column.getType()) {
+                case INT8:
+                case INT16:
+                case INT32:
+                case INT64:
+                    predicate = KuduPredicate.newComparisonPredicate(column, op, Long.parseLong(value));
+                    break;
+                case BOOL:
+                    predicate = KuduPredicate.newComparisonPredicate(column, op, Boolean.valueOf(value));
+                    break;
+                case STRING:
+                case VARCHAR:
+                    predicate = KuduPredicate.newComparisonPredicate(column, op, value);
+                    break;
+                case DATE:
+                    predicate = KuduPredicate.newComparisonPredicate(column, op, Date.valueOf(value));
+                    break;
+                case FLOAT:
+                    predicate = KuduPredicate.newComparisonPredicate(column, op, Float.valueOf(value));
+                    break;
+                case DOUBLE:
+                    predicate = KuduPredicate.newComparisonPredicate(column, op, Double.valueOf(value));
+                    break;
+                case DECIMAL:
+                    predicate = KuduPredicate.newComparisonPredicate(column, op, new BigDecimal(value));
+                    break;
+                case BINARY:
+                    predicate = KuduPredicate.newComparisonPredicate(column, op, value.getBytes(StandardCharsets.UTF_8));
+                    break;
+                case UNIXTIME_MICROS:
+                    predicate = KuduPredicate.newComparisonPredicate(column, op, Timestamp.valueOf(value));
+                    break;
+                default:
+                    throw new IllegalStateException("Unexpected type: " + column.getType());
+            }
+            LOG.info("添加条件查询,字段:"+column.getName() +"类型："+column.getType() + ",条件值："+value);
+            return  predicate;
+
+        }
+
+
 
         @Override
         public void destroy()
@@ -482,5 +560,6 @@ public class KuduReader
                 );
             }
         }
+
     }
 }

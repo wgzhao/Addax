@@ -4,7 +4,7 @@
     <parent>
         <artifactId>addax-all</artifactId>
         <groupId>com.wgzhao.addax</groupId>
-        <version>4.0.8-SNAPSHOT</version>
+        <version>4.0.7-SNAPSHOT</version>
         <relativePath>../../../pom.xml</relativePath>
     </parent>
 
@@ -47,6 +47,12 @@
         <dependency>
             <groupId>org.slf4j</groupId>
             <artifactId>slf4j-api</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+            <version>4.13.1</version>
+            <scope>compile</scope>
         </dependency>
 
     </dependencies>
