@@ -8,7 +8,7 @@
     </parent>
     <artifactId>jsonfilereader</artifactId>
     <name>jsonfile-reader</name>
-    <description>jsonfilereader提供了本地读取JSON功能，并可以根据用户配置的类型进行类型转换，建议开发、测试环境使用。</description>
+    <description>json file reader 提供了本地读取JSON功能，并可以根据用户配置的类型进行类型转换，建议开发、测试环境使用。</description>
     <packaging>jar</packaging>
 
     <dependencies>
@@ -21,6 +21,13 @@
                     <groupId>org.slf4j</groupId>
                 </exclusion>
             </exclusions>
+        </dependency>
+
+        <dependency>
+            <groupId>com.wgzhao.addax</groupId>
+            <artifactId>addax-storage</artifactId>
+            <version>${project.version}</version>
+            <scope>compile</scope>
         </dependency>
 
         <dependency>
@@ -39,6 +46,7 @@
             <groupId>org.slf4j</groupId>
             <artifactId>slf4j-api</artifactId>
         </dependency>
+
     </dependencies>
     <build>
         <plugins>

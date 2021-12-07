@@ -51,13 +51,13 @@
         <dependency>
             <groupId>com.influxdb</groupId>
             <artifactId>influxdb-client-java</artifactId>
-            <version>3.3.0</version>
+            <version>${influxdb.client.version}</version>
         </dependency>
 
         <dependency>
             <groupId>org.apache.httpcomponents</groupId>
             <artifactId>fluent-hc</artifactId>
-            <version>4.5.13</version>
+            <version>${fluent.hc.version}</version>
         </dependency>
     </dependencies>
     <build>

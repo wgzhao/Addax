@@ -26,16 +26,22 @@
         </dependency>
 
         <dependency>
+            <groupId>com.wgzhao.addax</groupId>
+            <artifactId>addax-storage</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+
+        <dependency>
             <groupId>org.apache.poi</groupId>
             <artifactId>poi</artifactId>
-            <version>5.1.0</version>
+            <version>${poi.version}</version>
         </dependency>
+
         <dependency>
             <groupId>org.apache.poi</groupId>
             <artifactId>poi-ooxml</artifactId>
-            <version>5.0.0</version>
+            <version>${poi.version}</version>
         </dependency>
-
     </dependencies>
 
     <build>

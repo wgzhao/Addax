@@ -19,20 +19,22 @@
 
 package com.wgzhao.addax.plugin.writer.hdfswriter;
 
+import com.wgzhao.addax.common.base.Constant;
 import com.wgzhao.addax.common.base.Key;
 import com.wgzhao.addax.common.exception.AddaxException;
 import com.wgzhao.addax.common.plugin.RecordReceiver;
 import com.wgzhao.addax.common.spi.Writer;
 import com.wgzhao.addax.common.util.Configuration;
-import com.wgzhao.addax.common.base.Constant;
+import com.wgzhao.addax.storage.util.FileHelper;
 import org.apache.commons.io.Charsets;
-import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.hadoop.fs.Path;
 import org.apache.orc.CompressionKind;
 import org.apache.parquet.hadoop.metadata.CompressionCodecName;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
@@ -41,6 +43,7 @@ import java.util.Set;
 import java.util.UUID;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 public class HdfsWriter
         extends Writer
@@ -49,14 +52,14 @@ public class HdfsWriter
             extends Writer.Job
     {
         private static final Logger LOG = LoggerFactory.getLogger(Job.class);
-        private final HashSet<String> tmpFiles = new HashSet<>();//临时文件全路径
-        private final HashSet<String> endFiles = new HashSet<>();//最终文件全路径
+
+        // 写入文件的临时目录，完成写入后，该目录需要删除
+        private String tmpStorePath;
         private Configuration writerSliceConfig = null;
         private String defaultFS;
         private String path;
         private String fileName;
         private String writeMode;
-        private String compress;
         private HdfsHelper hdfsHelper = null;
 
         public static final Set<String> SUPPORT_FORMAT = new HashSet<>(Arrays.asList("ORC", "PARQUET", "TEXT"));
@@ -102,8 +105,8 @@ public class HdfsWriter
             }
             else {
                 boolean rewriteFlag = false;
-                for (int i=0; i<columns.size(); i++) {
-                    Configuration eachColumnConf = columns.get(i) ;
+                for (int i = 0; i < columns.size(); i++) {
+                    Configuration eachColumnConf = columns.get(i);
                     eachColumnConf.getNecessaryValue(Key.NAME, HdfsWriterErrorCode.COLUMN_REQUIRED_VALUE);
                     eachColumnConf.getNecessaryValue(Key.TYPE, HdfsWriterErrorCode.COLUMN_REQUIRED_VALUE);
                     if (eachColumnConf.getString(Key.TYPE).toUpperCase().startsWith("DECIMAL")) {
@@ -123,23 +126,26 @@ public class HdfsWriter
             this.writeMode = this.writerSliceConfig.getNecessaryValue(Key.WRITE_MODE, HdfsWriterErrorCode.REQUIRED_VALUE);
             if (!Constant.SUPPORTED_WRITE_MODE.contains(writeMode)) {
                 throw AddaxException.asAddaxException(HdfsWriterErrorCode.ILLEGAL_VALUE,
-                        String.format("仅支持append, nonConflict,overwrite三种模式, 不支持您配置的 writeMode 模式 : [%s]",
+                        String.format("仅支持append, nonConflict, overwrite三种模式, 不支持您配置的 writeMode 模式 : [%s]",
                                 writeMode));
             }
-            this.writerSliceConfig.set(Key.WRITE_MODE, writeMode);
-            //fieldDelimiter check
-            String fieldDelimiter = this.writerSliceConfig.getString(Key.FIELD_DELIMITER, null);
-            if (null == fieldDelimiter) {
-                throw AddaxException.asAddaxException(HdfsWriterErrorCode.REQUIRED_VALUE,
-                        String.format("您提供配置文件有误，[%s]是必填参数.", Key.FIELD_DELIMITER));
+            if ("TEXT".equals(fileType)) {
+                //fieldDelimiter check
+                String fieldDelimiter = this.writerSliceConfig.getString(Key.FIELD_DELIMITER, null);
+                if (StringUtils.isEmpty(fieldDelimiter)) {
+                    throw AddaxException.asAddaxException(HdfsWriterErrorCode.REQUIRED_VALUE,
+                            String.format("写TEXT格式文件，必须提供有效的[%s] 参数.", Key.FIELD_DELIMITER));
+                }
+
+                if (1 != fieldDelimiter.length()) {
+                    // warn: if it has, length must be one
+                    throw AddaxException.asAddaxException(HdfsWriterErrorCode.ILLEGAL_VALUE,
+                            String.format("仅仅支持单字符切分, 您配置的切分为 : [%s]", fieldDelimiter));
+                }
             }
-            else if (1 != fieldDelimiter.length()) {
-                // warn: if have, length must be one
-                throw AddaxException.asAddaxException(HdfsWriterErrorCode.ILLEGAL_VALUE,
-                        String.format("仅仅支持单字符切分, 您配置的切分为 : [%s]", fieldDelimiter));
-            }
+
             //compress check
-            this.compress = this.writerSliceConfig.getString(Key.COMPRESS, "NONE").toUpperCase().trim();
+            String compress = this.writerSliceConfig.getString(Key.COMPRESS, "NONE").toUpperCase().trim();
             if ("ORC".equals(fileType)) {
                 try {
                     CompressionKind.valueOf(compress);
@@ -162,15 +168,6 @@ public class HdfsWriter
                     throw AddaxException.asAddaxException(HdfsWriterErrorCode.ILLEGAL_VALUE,
                             String.format("目前PARQUET 格式仅支持 %s 压缩, 不支持您配置的 compress 模式 : [%s]",
                                     Arrays.toString(CompressionCodecName.values()), compress));
-                }
-            }
-            if ("TEXT".equals(fileType)) {
-                // SNAPPY需要动态库的支持，暂时放弃
-                Set<String> textCompress = new HashSet<>(Arrays.asList("NONE", "GZIP", "BZIP2"));
-                if (!textCompress.contains(compress.toUpperCase().trim())) {
-                    throw AddaxException.asAddaxException(HdfsWriterErrorCode.ILLEGAL_VALUE,
-                            String.format("目前TEXT 格式仅支持 %s 压缩，不支持您配置的 compress 模式 : [%s]",
-                                    textCompress, compress));
                 }
             }
 
@@ -196,49 +193,47 @@ public class HdfsWriter
         @Override
         public void prepare()
         {
+            //临时存放路径
+            this.tmpStorePath = buildTmpFilePath(path);
+
             //若路径已经存在，检查path是否是目录
-            if (hdfsHelper.isPathexists(path)) {
+            if (hdfsHelper.isPathExists(path)) {
                 if (!hdfsHelper.isPathDir(path)) {
                     throw AddaxException.asAddaxException(HdfsWriterErrorCode.ILLEGAL_VALUE,
-                            String.format("您配置的path: [%s] 不是一个合法的目录, 请您注意文件重名, 不合法目录名等情况.",
-                                    path));
+                            String.format("您配置的path: [%s] 不是一个合法的目录, 请您注意文件重名, 不合法目录名等情况.", path));
                 }
 
                 //根据writeMode对目录下文件进行处理
+                // 写入之前，当前目录下已有的文件，根据writeMode判断是否覆盖
                 Path[] existFilePaths = hdfsHelper.hdfsDirList(path);
 
                 boolean isExistFile = existFilePaths.length > 0;
                 if ("append".equals(writeMode)) {
-                    LOG.info("由于您配置了writeMode append, 写入前不做清理工作, [{}] 目录下写入相应文件名前缀 [{}] 的文件",
-                            path, fileName);
+                    LOG.info("由于您配置了writeMode = append, 写入前不做清理工作, [{}] 目录下写入相应文件名前缀 [{}] 的文件", path, fileName);
                 }
                 else if ("nonConflict".equals(writeMode) && isExistFile) {
-                    LOG.info("由于您配置了writeMode nonConflict, 开始检查 [{}] 下面的内容", path);
-                    List<String> allFiles = new ArrayList<>();
-                    for (Path eachFile : existFilePaths) {
-                        allFiles.add(eachFile.toString());
-                    }
-                    LOG.error("冲突文件列表为: [{}]", String.join(",", allFiles));
                     throw AddaxException.asAddaxException(HdfsWriterErrorCode.ILLEGAL_VALUE,
-                            String.format("由于您配置了writeMode nonConflict,但您配置的path: [%s] 目录不为空, 下面存在其他文件或文件夹.", path));
+                            String.format("由于您配置了writeMode= nonConflict,但您配置的 path: [%s] 目录不为空, 下面存在其他文件或文件夹: %s",
+                                    path, String.join(",", Arrays.stream(existFilePaths).map(Path::getName).collect(Collectors.toSet()))));
                 }
             }
             else {
                 throw AddaxException.asAddaxException(HdfsWriterErrorCode.ILLEGAL_VALUE,
-                        String.format("您配置的path: [%s] 不存在, 请先在hive端创建对应的数据库和表.", path));
+                        String.format("您配置的path: [%s] 不存在, 请先创建目录.", path));
             }
         }
 
         @Override
         public void post()
         {
-            Path[] existFilePaths = hdfsHelper.hdfsDirList(path);
             if ("overwrite".equals(writeMode)) {
-                hdfsHelper.deleteFiles(existFilePaths, false);
+                hdfsHelper.deleteFilesFromDir(new Path(path));
             }
-            hdfsHelper.renameFile(this.tmpFiles, this.endFiles);
+
+            hdfsHelper.moveFilesToDest(new Path(this.tmpStorePath), new Path(this.path));
+
             // 删除临时目录
-            hdfsHelper.deleteFiles(existFilePaths, true);
+            hdfsHelper.deleteDir(new Path(tmpStorePath));
         }
 
         @Override
@@ -251,133 +246,58 @@ public class HdfsWriter
         public List<Configuration> split(int mandatoryNumber)
         {
             LOG.info("begin splitting ...");
+
             List<Configuration> writerSplitConfigs = new ArrayList<>();
             String filePrefix = fileName;
 
-            Set<String> allFiles = new HashSet<>();
-
             //获取该路径下的所有已有文件列表
-            if (hdfsHelper.isPathexists(path)) {
-                for (Path p: hdfsHelper.hdfsDirList(path)) {
-                    allFiles.add(p.toString());
-                }
-            }
+            Set<String> allFiles = Arrays.stream(hdfsHelper.hdfsDirList(path)).map(Path::toString).collect(Collectors.toSet());
 
-            String fileSuffix;
-            //临时存放路径
-            String storePath = buildTmpFilePath(this.path);
-            if (storePath != null && storePath.contains("/")) {
-                //由于在window上调试获取的路径为转义字符代表的斜杠
-                //故出现被认为是文件名称的一部分，使得获取父目录存在问题
-                //最终影响到直接删除更高一层的目录，导致Hive数据出现问题。
-                storePath = storePath.replace('\\', '/');
-            }
-            //最终存放路径
-            String endStorePath = buildFilePath();
-            if (endStorePath != null && endStorePath.contains("/")) {
-                endStorePath = endStorePath.replace('\\', '/');
-            }
-            this.path = endStorePath;
-            String suffix = hdfsHelper.getCompressFileSuffix(this.compress);
+            String fileType = this.writerSliceConfig.getString(Key.FILE_TYPE, "txt").toLowerCase();
+            String tmpFullFileName;
+            String endFullFileName;
             for (int i = 0; i < mandatoryNumber; i++) {
                 // handle same file name
+                Configuration splitTaskConfig = this.writerSliceConfig.clone();
+                tmpFullFileName = String.format("%s/%s_%s.%s", tmpStorePath, filePrefix, FileHelper.generateFileMiddleName(), fileType);
+                endFullFileName = String.format("%s/%s_%s.%s", path, filePrefix, FileHelper.generateFileMiddleName(), fileType);
 
-                Configuration splitedTaskConfig = this.writerSliceConfig.clone();
-                String fullFileName;
-                String endFullFileName;
-
-                fileSuffix = UUID.randomUUID().toString().replace('-', '_');
-                if (suffix != null) {
-                    fullFileName = String.format("%s%s%s__%s%s", defaultFS, storePath, filePrefix, fileSuffix, suffix);
-                    endFullFileName = String.format("%s%s%s__%s%s", defaultFS, endStorePath, filePrefix, fileSuffix, suffix);
-                } else {
-                    fullFileName = String.format("%s%s%s__%s", defaultFS, storePath, filePrefix, fileSuffix);
-                    endFullFileName = String.format("%s%s%s__%s", defaultFS, endStorePath, filePrefix, fileSuffix);
-                }
-
+                // 如果文件已经存在，则重新生成文件名
                 while (allFiles.contains(endFullFileName)) {
-                    fileSuffix = UUID.randomUUID().toString().replace('-', '_');
-                    fullFileName = String.format("%s%s%s__%s", defaultFS, storePath, filePrefix, fileSuffix);
-                    endFullFileName = String.format("%s%s%s__%s", defaultFS, endStorePath, filePrefix, fileSuffix);
+                    tmpFullFileName = String.format("%s/%s_%s.%s", tmpStorePath, filePrefix, FileHelper.generateFileMiddleName(), fileType);
+                    endFullFileName = String.format("%s/%s_%s.%s", path, filePrefix, FileHelper.generateFileMiddleName(), fileType);
                 }
                 allFiles.add(endFullFileName);
-                this.tmpFiles.add(fullFileName);
-                this.endFiles.add(endFullFileName);
 
-                splitedTaskConfig.set(Key.FILE_NAME, fullFileName);
+                splitTaskConfig.set(Key.FILE_NAME, tmpFullFileName);
 
-                LOG.info("split wrote file name:[{}]", fullFileName);
+                LOG.info("split wrote file name:[{}]", tmpFullFileName);
 
-                writerSplitConfigs.add(splitedTaskConfig);
+                writerSplitConfigs.add(splitTaskConfig);
             }
             LOG.info("end splitting.");
             return writerSplitConfigs;
         }
 
-        private String buildFilePath()
-        {
-            boolean isEndWithSeparator = false;
-            switch (IOUtils.DIR_SEPARATOR) {
-                case IOUtils.DIR_SEPARATOR_UNIX:
-                    isEndWithSeparator = this.path.endsWith(String
-                            .valueOf(IOUtils.DIR_SEPARATOR));
-                    break;
-                case IOUtils.DIR_SEPARATOR_WINDOWS:
-                    isEndWithSeparator = this.path.endsWith(String
-                            .valueOf(IOUtils.DIR_SEPARATOR_WINDOWS));
-                    break;
-                default:
-                    break;
-            }
-            if (!isEndWithSeparator) {
-                this.path = this.path + IOUtils.DIR_SEPARATOR;
-            }
-            return this.path;
-        }
-
         /**
          * 创建临时目录
+         * 在给定目录的下，创建一个已点开头，uuid为名字的文件夹，用于临时存储写入的文件
          *
          * @param userPath hdfs path
-         * @return string
+         * @return temporary path
          */
         private String buildTmpFilePath(String userPath)
         {
-            // 把临时文件直接放置到/tmp目录下，避免删除老文件，移动文件等打来的逻辑复杂化
-            boolean isEndWithSeparator = false;
-            switch (IOUtils.DIR_SEPARATOR) {
-                case IOUtils.DIR_SEPARATOR_UNIX:
-                    isEndWithSeparator = userPath.endsWith(String
-                            .valueOf(IOUtils.DIR_SEPARATOR));
-                    break;
-                case IOUtils.DIR_SEPARATOR_WINDOWS:
-                    isEndWithSeparator = userPath.endsWith(String
-                            .valueOf(IOUtils.DIR_SEPARATOR_WINDOWS));
-                    break;
-                default:
-                    break;
-            }
-            String tmpSuffix;
-            tmpSuffix = UUID.randomUUID().toString().replace('-', '_');
-            //临时目录
+            String tmpDir;
             String tmpFilePath;
-            String pattern = "%s/.%s%s";
-            if (!isEndWithSeparator) {
-                tmpFilePath = String.format(pattern, userPath, tmpSuffix, IOUtils.DIR_SEPARATOR);
-            }
-            else {
-                tmpFilePath = String.format(pattern, userPath.substring(0, userPath.length() - 1), tmpSuffix, IOUtils.DIR_SEPARATOR);
-            }
-            while (hdfsHelper.isPathexists(tmpFilePath)) {
-                tmpSuffix = UUID.randomUUID().toString().replace('-', '_');
-                if (!isEndWithSeparator) {
-                    tmpFilePath = String.format(pattern, userPath, tmpSuffix, IOUtils.DIR_SEPARATOR);
-                }
-                else {
-                    tmpFilePath = String.format(pattern, userPath.substring(0, userPath.length() - 1), tmpSuffix, IOUtils.DIR_SEPARATOR);
+
+            while (true) {
+                tmpDir = "." + UUID.randomUUID().toString().replace('-', '_');
+                tmpFilePath = Paths.get(userPath, tmpDir).toString();
+                if (!hdfsHelper.isPathExists(tmpFilePath)) {
+                    return tmpFilePath;
                 }
             }
-            return tmpFilePath;
         }
 
         /**
@@ -388,6 +308,7 @@ public class HdfsWriter
          *  decimal -&gt; 38
          *  decimal(10) -&gt; 10
          *  </pre>
+         *
          * @param type decimal type including precision and scale (if present)
          * @return decimal precision
          */
@@ -414,12 +335,13 @@ public class HdfsWriter
          *  decimal(8) -&gt; 0
          *  decimal(8,2) -&gt; 2
          *  </pre>
+         *
          * @param type decimal type string, including precision and scale (if present)
          * @return decimal scale
          */
         private static int getDecimalScale(String type)
         {
-            if (! type.contains("(")) {
+            if (!type.contains("(")) {
                 return Constant.DEFAULT_DECIMAL_SCALE;
             }
             if (!type.contains(",")) {
@@ -453,7 +375,7 @@ public class HdfsWriter
 
             hdfsHelper = new HdfsHelper();
             hdfsHelper.getFileSystem(defaultFS, writerSliceConfig);
-            //得当的已经是绝对路径，eg：hdfs://10.101.204.12:9000/user/hive/warehouse/writer.db/text/test.snappy
+            //得当的已经是绝对路径，eg：/user/hive/warehouse/writer.db/text/test.snappy
             this.fileName = this.writerSliceConfig.getString(Key.FILE_NAME);
         }
 
@@ -469,15 +391,15 @@ public class HdfsWriter
             LOG.info("write to file : [{}]", this.fileName);
             if ("TEXT".equals(fileType)) {
                 //写TEXT FILE
-                hdfsHelper.textFileStartWrite(lineReceiver, this.writerSliceConfig, this.fileName, this.getTaskPluginCollector());
+                hdfsHelper.textFileStartWrite(lineReceiver, writerSliceConfig, fileName, getTaskPluginCollector());
             }
             else if ("ORC".equals(fileType)) {
                 //写ORC FILE
-                hdfsHelper.orcFileStartWrite(lineReceiver, this.writerSliceConfig, this.fileName, this.getTaskPluginCollector());
+                hdfsHelper.orcFileStartWrite(lineReceiver, writerSliceConfig, fileName, getTaskPluginCollector());
             }
             else if ("PARQUET".equals(fileType)) {
                 //写Parquet FILE
-                hdfsHelper.parquetFileStartWrite(lineReceiver, this.writerSliceConfig, this.fileName, this.getTaskPluginCollector());
+                hdfsHelper.parquetFileStartWrite(lineReceiver, writerSliceConfig, fileName, getTaskPluginCollector());
             }
 
             LOG.info("end do write");

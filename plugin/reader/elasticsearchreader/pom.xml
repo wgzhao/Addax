@@ -28,26 +28,26 @@
         <dependency>
             <groupId>io.searchbox</groupId>
             <artifactId>jest</artifactId>
-            <version>6.3.1</version>
+            <version>${jest.version}</version>
         </dependency>
 
         <dependency>
             <groupId>io.searchbox</groupId>
             <artifactId>jest-common</artifactId>
-            <version>6.3.1</version>
+            <version>${jest.version}</version>
         </dependency>
 
         <dependency>
             <groupId>joda-time</groupId>
             <artifactId>joda-time</artifactId>
-            <version>2.10.13</version>
+            <version>${joda.time.version}</version>
         </dependency>
 
         <!-- https://mvnrepository.com/artifact/ognl/ognl -->
         <dependency>
             <groupId>ognl</groupId>
             <artifactId>ognl</artifactId>
-            <version>3.2.21</version>
+            <version>${ognl.version}</version>
         </dependency>
 
     </dependencies>

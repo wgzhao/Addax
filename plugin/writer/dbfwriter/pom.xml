@@ -21,9 +21,15 @@
         </dependency>
 
         <dependency>
+            <groupId>com.wgzhao.addax</groupId>
+            <artifactId>addax-storage</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+
+        <dependency>
             <groupId>com.github.albfernandez</groupId>
             <artifactId>javadbf</artifactId>
-            <version>1.13.2</version>
+            <version>${javadbf.version}</version>
         </dependency>
 
         <dependency>
@@ -32,10 +38,10 @@
         </dependency>
 
         <dependency>
-        <groupId>org.junit.jupiter</groupId>
-        <artifactId>junit-jupiter-api</artifactId>
-        <version>5.8.1</version>
-        <scope>test</scope>
+            <groupId>org.junit.jupiter</groupId>
+            <artifactId>junit-jupiter-api</artifactId>
+            <version>5.8.1</version>
+            <scope>test</scope>
         </dependency>
 
     </dependencies>

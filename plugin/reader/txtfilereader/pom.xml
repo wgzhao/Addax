@@ -36,13 +36,13 @@
         <dependency>
             <groupId>commons-beanutils</groupId>
             <artifactId>commons-beanutils</artifactId>
-            <version>1.9.4</version>
+            <version>${commons.beanutils.version}</version>
         </dependency>
 
         <dependency>
             <groupId>net.sourceforge.javacsv</groupId>
             <artifactId>javacsv</artifactId>
-            <version>2.0</version>
+            <version>${javacsv.version}</version>
         </dependency>
 
         <dependency>

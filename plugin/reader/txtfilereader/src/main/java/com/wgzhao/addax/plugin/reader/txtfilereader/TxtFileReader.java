@@ -26,25 +26,19 @@ import com.wgzhao.addax.common.plugin.RecordSender;
 import com.wgzhao.addax.common.spi.Reader;
 import com.wgzhao.addax.common.util.Configuration;
 import com.wgzhao.addax.storage.reader.StorageReaderUtil;
+import com.wgzhao.addax.storage.util.FileHelper;
 import org.apache.commons.io.IOUtils;
-import org.apache.commons.lang3.BooleanUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.BufferedReader;
-import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.regex.Pattern;
 
 /**
  * Created by haiwei.luo on 14-9-20.
@@ -58,18 +52,13 @@ public class TxtFileReader
         private static final Logger LOG = LoggerFactory.getLogger(Job.class);
 
         private Configuration originConfig = null;
-        private List<String> path = null;
         private List<String> sourceFiles;
-        private Map<String, Pattern> pattern;
-        private Map<String, Boolean> isRegexPath;
         private boolean needReadColumnName = false;
 
         @Override
         public void init()
         {
             this.originConfig = this.getPluginJobConf();
-            this.pattern = new HashMap<>();
-            this.isRegexPath = new HashMap<>();
             StorageReaderUtil.validateParameter(this.originConfig);
         }
 
@@ -82,6 +71,7 @@ public class TxtFileReader
             if (StringUtils.isBlank(pathInString)) {
                 throw AddaxException.asAddaxException(TxtFileReaderErrorCode.REQUIRED_VALUE, "the path is required");
             }
+            List<String> path;
             if (!pathInString.startsWith("[") && !pathInString.endsWith("]")) {
                 path = new ArrayList<>();
                 path.add(pathInString);
@@ -93,17 +83,11 @@ public class TxtFileReader
                 }
             }
 
-            // warn:make sure this regex string
-            // warn:no need trim
-            for (String eachPath : this.path) {
-                String regexString = eachPath.replace("*", ".*").replace("?",".?");
-                Pattern pattern = Pattern.compile(regexString);
-                this.pattern.put(eachPath, pattern);
-            }
-            this.sourceFiles = this.buildSourceTargets();
+            this.sourceFiles = FileHelper.buildSourceTargets(path);
+
             List<Configuration> columns = this.originConfig.getListConfiguration(Key.COLUMN);
-            if (null != columns && ! columns.isEmpty()) {
-                for(Configuration eachColumnConf : columns) {
+            if (null != columns && !columns.isEmpty()) {
+                for (Configuration eachColumnConf : columns) {
                     if (null != eachColumnConf.getString(Key.NAME)) {
                         needReadColumnName = true;
                     }
@@ -144,136 +128,19 @@ public class TxtFileReader
                                         this.originConfig.getString(Key.PATH)));
             }
 
-            List<List<String>> splitedSourceFiles = this.splitSourceFiles(
-                    this.sourceFiles, splitNumber);
-            for (List<String> files : splitedSourceFiles) {
-                Configuration splitedConfig = this.originConfig.clone();
-                splitedConfig.set(Key.SOURCE_FILES, files);
-                readerSplitConfigs.add(splitedConfig);
+            List<List<String>> splitSourceFiles = FileHelper.splitSourceFiles(this.sourceFiles, splitNumber);
+            for (List<String> files : splitSourceFiles) {
+                Configuration splitConfig = this.originConfig.clone();
+                splitConfig.set(Key.SOURCE_FILES, files);
+                readerSplitConfigs.add(splitConfig);
             }
             LOG.debug("split() ok and end...");
             return readerSplitConfigs;
         }
 
-        // validate the path, path must be a absolute path
-        private List<String> buildSourceTargets()
+        private int getIndexByName(String name, String[] allNames)
         {
-            // for each path
-            Set<String> toBeReadFiles = new HashSet<>();
-            for (String eachPath : this.path) {
-                int endMark;
-                for (endMark = 0; endMark < eachPath.length(); endMark++) {
-                    if ('*' == eachPath.charAt(endMark) || '?' == eachPath.charAt(endMark)) {
-                        this.isRegexPath.put(eachPath, true);
-                        break;
-                    }
-                }
-
-                String parentDirectory;
-                if (BooleanUtils.isTrue(this.isRegexPath.get(eachPath))) {
-                    int lastDirSeparator = eachPath.substring(0, endMark).lastIndexOf(IOUtils.DIR_SEPARATOR);
-                    parentDirectory = eachPath.substring(0, lastDirSeparator + 1);
-                }
-                else {
-                    this.isRegexPath.put(eachPath, false);
-                    parentDirectory = eachPath;
-                }
-                this.buildSourceTargetsEachPath(eachPath, parentDirectory,
-                        toBeReadFiles);
-            }
-            return Arrays.asList(toBeReadFiles.toArray(new String[0]));
-        }
-
-        private void buildSourceTargetsEachPath(String regexPath,
-                String parentDirectory, Set<String> toBeReadFiles)
-        {
-            // 检测目录是否存在，错误情况更明确
-            try {
-                File dir = new File(parentDirectory);
-                boolean isExists = dir.exists();
-                if (!isExists) {
-                    String message = String.format("您设定的目录不存在 : [%s]", parentDirectory);
-                    LOG.error(message);
-                    throw AddaxException.asAddaxException(
-                            TxtFileReaderErrorCode.FILE_NOT_EXISTS, message);
-                }
-            }
-            catch (SecurityException se) {
-                String message = String.format("您没有权限查看目录 : [%s]", parentDirectory);
-                LOG.error(message);
-                throw AddaxException.asAddaxException(
-                        TxtFileReaderErrorCode.SECURITY_NOT_ENOUGH, message);
-            }
-
-            directoryRover(regexPath, parentDirectory, toBeReadFiles);
-        }
-
-        private void directoryRover(String regexPath, String parentDirectory,
-                Set<String> toBeReadFiles)
-        {
-            File directory = new File(parentDirectory);
-            // is a normal file
-            if (!directory.isDirectory()) {
-                if (this.isTargetFile(regexPath, directory.getAbsolutePath())) {
-                    toBeReadFiles.add(parentDirectory);
-                    LOG.info("add file [{}] as a candidate to be read.", parentDirectory);
-                }
-            }
-            else {
-                // 是目录
-                try {
-                    // warn:对于没有权限的目录,listFiles 返回null，而不是抛出SecurityException
-                    File[] files = directory.listFiles();
-                    if (null != files) {
-                        for (File subFileNames : files) {
-                            directoryRover(regexPath, subFileNames.getAbsolutePath(), toBeReadFiles);
-                        }
-                    }
-                    else {
-                        // warn: 对于没有权限的文件，是直接throw AddaxException
-                        String message = String.format("您没有权限查看目录 : [%s]", directory);
-                        LOG.error(message);
-                        throw AddaxException.asAddaxException(TxtFileReaderErrorCode.SECURITY_NOT_ENOUGH, message);
-                    }
-                }
-                catch (SecurityException e) {
-                    String message = String.format("您没有权限查看目录 : [%s]", directory);
-                    LOG.error(message);
-                    throw AddaxException.asAddaxException(TxtFileReaderErrorCode.SECURITY_NOT_ENOUGH, message, e);
-                }
-            }
-        }
-
-        // 正则过滤
-        private boolean isTargetFile(String regexPath, String absoluteFilePath)
-        {
-            if (this.isRegexPath.get(regexPath)) {
-                return this.pattern.get(regexPath).matcher(absoluteFilePath).matches();
-            }
-            else {
-                return true;
-            }
-        }
-
-        private <T> List<List<T>> splitSourceFiles(final List<T> sourceList,
-                int adviceNumber)
-        {
-            List<List<T>> splitedList = new ArrayList<>();
-            int averageLength = sourceList.size() / adviceNumber;
-            averageLength = averageLength == 0 ? 1 : averageLength;
-
-            for (int begin = 0, end; begin < sourceList.size(); begin = end) {
-                end = begin + averageLength;
-                if (end > sourceList.size()) {
-                    end = sourceList.size();
-                }
-                splitedList.add(sourceList.subList(begin, end));
-            }
-            return splitedList;
-        }
-
-        private int getIndexByName(String name, String[] allNames) {
-            for (int i=0; i< allNames.length; i++) {
+            for (int i = 0; i < allNames.length; i++) {
                 if (allNames[i].equalsIgnoreCase(name)) {
                     return i;
                 }
@@ -283,6 +150,7 @@ public class TxtFileReader
                     "The name '" + name + "' DOES NOT exists in file header: " + Arrays.toString(allNames)
             );
         }
+
         private void convertColumnNameToIndex(String fileName)
         {
             String encoding = this.originConfig.getString(Key.ENCODING, Constant.DEFAULT_ENCODING);
@@ -295,7 +163,7 @@ public class TxtFileReader
                 String[] columnNames = fetchLine.split(delimiter);
                 int index;
                 for (Configuration column : columns) {
-                    if (column.getString(Key.NAME) != null ) {
+                    if (column.getString(Key.NAME) != null) {
                         index = getIndexByName(column.getString(Key.NAME), columnNames);
                         column.set(Key.INDEX, index);
                     }
@@ -324,7 +192,6 @@ public class TxtFileReader
         {
             this.readerSliceConfig = this.getPluginJobConf();
             this.sourceFiles = this.readerSliceConfig.getList(Key.SOURCE_FILES, String.class);
-
         }
 
         @Override

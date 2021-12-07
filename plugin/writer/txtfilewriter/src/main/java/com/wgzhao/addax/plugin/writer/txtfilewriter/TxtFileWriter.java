@@ -24,6 +24,7 @@ import com.wgzhao.addax.common.exception.AddaxException;
 import com.wgzhao.addax.common.plugin.RecordReceiver;
 import com.wgzhao.addax.common.spi.Writer;
 import com.wgzhao.addax.common.util.Configuration;
+import com.wgzhao.addax.storage.util.FileHelper;
 import com.wgzhao.addax.storage.writer.StorageWriterUtil;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
@@ -44,6 +45,7 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Set;
 
+import static com.wgzhao.addax.common.base.Key.COMPRESS;
 import static com.wgzhao.addax.common.base.Key.DATE_FORMAT;
 import static com.wgzhao.addax.common.base.Key.FILE_FORMAT;
 import static com.wgzhao.addax.common.base.Key.FILE_NAME;
@@ -115,25 +117,11 @@ public class TxtFileWriter
             String fileName = this.writerSliceConfig.getString(FILE_NAME);
             String writeMode = this.writerSliceConfig.getString(WRITE_MODE);
 
+            assert FileHelper.checkDirectoryWritable(path);
             File dir = new File(path);
-            //path is exists or not ?
-            if (!dir.exists()) {
-                throw AddaxException.asAddaxException(TxtFileWriterErrorCode.PATH_NOT_VALID,
-                        String.format("您配置的路径 [%s] 不存在", path));
-            }
-            // path is directory or not ?
-            if (!dir.isDirectory()) {
-                throw AddaxException.asAddaxException(TxtFileWriterErrorCode.PAHT_NOT_DIR,
-                        String.format("您配置的路径 [%s] 不是文件夹", path));
-            }
-            // path can writer it ?
-            if (!dir.canWrite()) {
-                throw AddaxException.asAddaxException(TxtFileWriterErrorCode.WRITE_FILE_ERROR,
-                        String.format("您配置的路径 [%s] 没有写入权限", path));
-            }
             // truncate option handler
-            if ("truncate".equals(writeMode)) {
-                LOG.info("由于您配置了writeMode truncate, 开始清理 [{}] 下面以 [{}] 开头的内容", path, fileName);
+            if ("truncate".equalsIgnoreCase(writeMode) || "overwrite".equalsIgnoreCase(writeMode)) {
+                LOG.info("由于您配置了writeMode truncate/overwrite, 开始清理 [{}] 下面以 [{}] 开头的内容", path, fileName);
                 // warn:需要判断文件是否存在，不存在时，不能删除
                 try {
                     FilenameFilter filter = new PrefixFileFilter(fileName);
@@ -250,16 +238,9 @@ public class TxtFileWriter
         @Override
         public void prepare()
         {
-            String compress = this.writerSliceConfig.getString("compress");
-            if ("gzip".equalsIgnoreCase(compress)) {
-                suffix = ".gz";
-            }
-            else if ("bzip2".equalsIgnoreCase(compress) || "bzip".equalsIgnoreCase(compress)) {
-                suffix = ".bz2";
-            }
-            else if ("zip".equalsIgnoreCase(compress)) {
-                suffix = ".zip";
-            }
+            String compress = this.writerSliceConfig.getString(COMPRESS);
+            suffix = FileHelper.getCompressFileSuffix(compress);
+
             this.fileName = this.fileName + "." + this.fileFormat;
         }
 
@@ -267,14 +248,14 @@ public class TxtFileWriter
         public void startWrite(RecordReceiver lineReceiver)
         {
             LOG.info("begin do write...");
-            String fileFullPath = this.buildFilePath();
+            String fileFullPath = StorageWriterUtil.buildFilePath(this.path, this.fileName, this.suffix);
             LOG.info("write to file : [{}]", fileFullPath);
 
             OutputStream outputStream = null;
+
             try {
                 File newFile = new File(fileFullPath);
-                boolean isSuccess = newFile.createNewFile();
-                assert isSuccess;
+                assert newFile.createNewFile();
                 outputStream = new FileOutputStream(newFile);
                 StorageWriterUtil.writeToStream(lineReceiver, outputStream, this.writerSliceConfig, this.fileName,
                         this.getTaskPluginCollector());
@@ -291,25 +272,6 @@ public class TxtFileWriter
                 IOUtils.closeQuietly(outputStream, null);
             }
             LOG.info("end do write");
-        }
-
-        private String buildFilePath()
-        {
-            boolean isEndWithSeparator = false;
-            switch (IOUtils.DIR_SEPARATOR) {
-                case IOUtils.DIR_SEPARATOR_UNIX:
-                    isEndWithSeparator = this.path.endsWith(String.valueOf(IOUtils.DIR_SEPARATOR));
-                    break;
-                case IOUtils.DIR_SEPARATOR_WINDOWS:
-                    isEndWithSeparator = this.path.endsWith(String.valueOf(IOUtils.DIR_SEPARATOR_WINDOWS));
-                    break;
-                default:
-                    break;
-            }
-            if (!isEndWithSeparator) {
-                this.path = this.path + IOUtils.DIR_SEPARATOR;
-            }
-            return String.format("%s%s%s", this.path, this.fileName, this.suffix);
         }
 
         @Override

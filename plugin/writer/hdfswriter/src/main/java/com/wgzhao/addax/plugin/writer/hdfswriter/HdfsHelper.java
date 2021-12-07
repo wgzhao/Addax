@@ -21,7 +21,7 @@ package com.wgzhao.addax.plugin.writer.hdfswriter;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
-import com.google.common.collect.Lists;
+import com.wgzhao.addax.common.base.Constant;
 import com.wgzhao.addax.common.base.Key;
 import com.wgzhao.addax.common.element.Column;
 import com.wgzhao.addax.common.element.Record;
@@ -39,7 +39,9 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.tuple.MutablePair;
 import org.apache.hadoop.fs.FileStatus;
 import org.apache.hadoop.fs.FileSystem;
+import org.apache.hadoop.fs.LocatedFileStatus;
 import org.apache.hadoop.fs.Path;
+import org.apache.hadoop.fs.RemoteIterator;
 import org.apache.hadoop.hive.common.type.HiveDecimal;
 import org.apache.hadoop.hive.ql.exec.vector.BytesColumnVector;
 import org.apache.hadoop.hive.ql.exec.vector.ColumnVector;
@@ -70,19 +72,17 @@ import org.apache.parquet.hadoop.metadata.CompressionCodecName;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.math.BigDecimal;
 import java.nio.charset.StandardCharsets;
 import java.sql.Timestamp;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Date;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 import java.util.StringJoiner;
-import java.util.stream.Collectors;
 
 public class HdfsHelper
 {
@@ -96,8 +96,6 @@ public class HdfsHelper
     private boolean haveKerberos = false;
     private String kerberosKeytabFilePath;
     private String kerberosPrincipal;
-    private static final int DECIMAL_DEFAULT_PRECISION = 38;
-    private static final int DECIMAL_DEFAULT_SCALE = 10;
 
     public static MutablePair<Text, Boolean> transportOneRecord(
             Record record, char fieldDelimiter, List<Configuration> columnsConfiguration, TaskPluginCollector taskPluginCollector)
@@ -119,7 +117,7 @@ public class HdfsHelper
 
         MutablePair<List<Object>, Boolean> transportResult = new MutablePair<>();
         transportResult.setRight(false);
-        List<Object> recordList = Lists.newArrayList();
+        List<Object> recordList = new ArrayList<>();
         int recordLength = record.getColumnNumber();
         if (0 != recordLength) {
             Column column;
@@ -212,10 +210,10 @@ public class HdfsHelper
             Column column;
             for (int i = 0; i < recordLength; i++) {
                 column = record.getColumn(i);
-                String colname = columnsConfiguration.get(i).getString(Key.NAME);
+                String colName = columnsConfiguration.get(i).getString(Key.NAME);
                 String typename = columnsConfiguration.get(i).getString(Key.TYPE).toUpperCase();
                 if (null == column || column.getRawData() == null) {
-                    builder.set(colname, null);
+                    builder.set(colName, null);
                 }
                 else {
                     String rowData = column.getRawData().toString();
@@ -225,31 +223,31 @@ public class HdfsHelper
                         switch (columnType) {
                             case INT:
                             case INTEGER:
-                                builder.set(colname, Integer.valueOf(rowData));
+                                builder.set(colName, Integer.valueOf(rowData));
                                 break;
                             case LONG:
-                                builder.set(colname, column.asLong());
+                                builder.set(colName, column.asLong());
                                 break;
                             case FLOAT:
-                                builder.set(colname, Float.valueOf(rowData));
+                                builder.set(colName, Float.valueOf(rowData));
                                 break;
                             case DOUBLE:
-                                builder.set(colname, column.asDouble());
+                                builder.set(colName, column.asDouble());
                                 break;
                             case STRING:
-                                builder.set(colname, column.asString());
+                                builder.set(colName, column.asString());
                                 break;
                             case DECIMAL:
-                                builder.set(colname, new BigDecimal(column.asString()).setScale(columnsConfiguration.get(i).getInt(Key.SCALE), BigDecimal.ROUND_HALF_UP));
+                                builder.set(colName, new BigDecimal(column.asString()).setScale(columnsConfiguration.get(i).getInt(Key.SCALE), BigDecimal.ROUND_HALF_UP));
                                 break;
                             case BOOLEAN:
-                                builder.set(colname, column.asBoolean());
+                                builder.set(colName, column.asBoolean());
                                 break;
                             case BINARY:
-                                builder.set(colname, column.asBytes());
+                                builder.set(colName, column.asBytes());
                                 break;
                             case TIMESTAMP:
-                                builder.set(colname, column.asLong() / 1000);
+                                builder.set(colName, column.asLong() / 1000);
                                 break;
                             default:
                                 throw AddaxException
@@ -364,7 +362,7 @@ public class HdfsHelper
         return files;
     }
 
-    public boolean isPathexists(String filePath)
+    public boolean isPathExists(String filePath)
     {
         Path path = new Path(filePath);
         boolean exist;
@@ -395,36 +393,20 @@ public class HdfsHelper
         return isDir;
     }
 
-    /*
-     * 根据标志来删除特定文件
-     * delDotFile: 是否删除点(.)开头的文件, true: 表示仅删除点开头的文件， false 表示不删除点开头的文件
-     *
-     */
-    public void deleteFiles(Path[] paths, boolean delDotFile)
+    public void deleteFilesFromDir(Path dir)
     {
-        List<Path> needDelPaths;
-        if (delDotFile) {
-            LOG.info("ONLY delete files that starts with a dot (.)");
-            needDelPaths = Arrays.stream(paths).filter(x -> x.getName().startsWith(".")).collect(Collectors.toList());
-        }
-        else {
-            LOG.info("Delete all files that DO NOT start with a dot (.) in specified path");
-            needDelPaths = Arrays.stream(paths).filter(x -> !x.getName().startsWith(".")).collect(Collectors.toList());
-        }
-        deleteFiles(needDelPaths);
-    }
-
-    public void deleteFiles(List<Path> paths)
-    {
-        for (Path path : paths) {
-            LOG.info("delete file [{}].", path);
-            try {
-                fileSystem.delete(path, true);
+        try {
+            final RemoteIterator<LocatedFileStatus> files = fileSystem.listFiles(dir, false);
+            while (files.hasNext()) {
+                final LocatedFileStatus next = files.next();
+                fileSystem.deleteOnExit(next.getPath());
             }
-            catch (IOException e) {
-                LOG.error("IO exception occurred when deleting file [{}], please check your network", path);
-                throw AddaxException.asAddaxException(HdfsWriterErrorCode.CONNECT_HDFS_IO_ERROR, e);
-            }
+        }
+        catch (FileNotFoundException fileNotFoundException) {
+            throw new AddaxException(HdfsWriterErrorCode.FILE_NOT_FOUND, fileNotFoundException.getMessage());
+        }
+        catch (IOException ioException) {
+            throw new AddaxException(HdfsWriterErrorCode.IO_ERROR, ioException.getMessage());
         }
     }
 
@@ -432,7 +414,7 @@ public class HdfsHelper
     {
         LOG.info("start delete tmp dir [{}] .", path);
         try {
-            if (isPathexists(path.toString())) {
+            if (isPathExists(path.toString())) {
                 fileSystem.delete(path, true);
             }
         }
@@ -443,46 +425,27 @@ public class HdfsHelper
         LOG.info("finish delete tmp dir [{}] .", path);
     }
 
-    public void renameFile(Set<String> tmpFiles, Set<String> endFiles)
+    /**
+     * move all files in sourceDir to targetDir
+     *
+     * @param sourceDir the source directory
+     * @param targetDir the target directory
+     */
+    public void moveFilesToDest(Path sourceDir, Path targetDir)
     {
-        Path tmpFilesParent = null;
-        if (tmpFiles.size() != endFiles.size()) {
-            String message = "临时目录下文件名个数与目标文件名个数不一致!";
-            LOG.error(message);
-            throw AddaxException.asAddaxException(HdfsWriterErrorCode.HDFS_RENAME_FILE_ERROR, message);
-        }
-        else {
-            try {
-                for (Iterator<String> it1 = tmpFiles.iterator(), it2 = endFiles.iterator(); it1.hasNext() && it2.hasNext(); ) {
-                    String srcFile = it1.next();
-                    String dstFile = it2.next();
-                    Path srcFilePah = new Path(srcFile);
-                    Path dstFilePah = new Path(dstFile);
-                    if (tmpFilesParent == null) {
-                        tmpFilesParent = srcFilePah.getParent();
-                    }
-                    LOG.info("start rename file [{}] to file [{}].", srcFile, dstFile);
-                    boolean renameTag;
-                    long fileLen = fileSystem.getFileStatus(srcFilePah).getLen();
-                    if (fileLen > 0) {
-                        renameTag = fileSystem.rename(srcFilePah, dstFilePah);
-                        if (!renameTag) {
-                            String message = String.format("重命名文件[%s]失败,请检查您的网络是否正常！", srcFile);
-                            LOG.error(message);
-                            throw AddaxException.asAddaxException(HdfsWriterErrorCode.HDFS_RENAME_FILE_ERROR, message);
-                        }
-                        LOG.info("finish rename file.");
-                    }
-                    else {
-                        LOG.info("文件［{}］内容为空,请检查写入是否正常！", srcFile);
-                    }
+        try {
+            final FileStatus[] fileStatuses = fileSystem.listStatus(sourceDir);
+            for (FileStatus file : fileStatuses) {
+                if (file.isFile() && file.getLen() > 0) {
+                    LOG.info("start move file [{}] to dir [{}].", file.getPath(), targetDir.getName());
+                    fileSystem.rename(file.getPath(), new Path(targetDir, file.getPath().getName()));
                 }
             }
-            catch (Exception e) {
-                LOG.error("重命名文件时发生异常,请检查您的网络是否正常！");
-                throw AddaxException.asAddaxException(HdfsWriterErrorCode.CONNECT_HDFS_IO_ERROR, e);
-            }
         }
+        catch (IOException e) {
+            throw AddaxException.asAddaxException(HdfsWriterErrorCode.IO_ERROR, e);
+        }
+        LOG.info("finish move file(s).");
     }
 
     //关闭FileSystem
@@ -497,7 +460,7 @@ public class HdfsHelper
         }
     }
 
-    // 写textfile类型文件
+    // 写text file类型文件
     public void textFileStartWrite(RecordReceiver lineReceiver, Configuration config, String fileName,
             TaskPluginCollector taskPluginCollector)
     {
@@ -507,18 +470,21 @@ public class HdfsHelper
 
         SimpleDateFormat dateFormat = new SimpleDateFormat("yyyyMMddHHmm");
         String attempt = "attempt_" + dateFormat.format(new Date()) + "_0001_m_000000_0";
-        Path outputPath = new Path(fileName);
         conf.set(JobContext.TASK_ATTEMPT_ID, attempt);
-        FileOutputFormat.setOutputPath(conf, outputPath);
-        FileOutputFormat.setWorkOutputPath(conf, outputPath);
         if (!"NONE".equals(compress)) {
+            // fileName must remove suffix, because the FileOutputFormat will add suffix
+            fileName = fileName.substring(0, fileName.lastIndexOf("."));
             Class<? extends CompressionCodec> codecClass = getCompressCodec(compress);
             if (null != codecClass) {
                 FileOutputFormat.setOutputCompressorClass(conf, codecClass);
             }
         }
+        Path outputPath = new Path(fileName);
+        FileOutputFormat.setOutputPath(conf, outputPath);
+        FileOutputFormat.setWorkOutputPath(conf, outputPath);
         try {
-            RecordWriter<NullWritable, Text> writer = new TextOutputFormat<NullWritable, Text>().getRecordWriter(fileSystem, conf, outputPath.toString(), Reporter.NULL);
+            RecordWriter<NullWritable, Text> writer = new TextOutputFormat<NullWritable, Text>()
+                    .getRecordWriter(fileSystem, conf, outputPath.toString(), Reporter.NULL);
             Record record;
             while ((record = lineReceiver.getFromReader()) != null) {
                 MutablePair<Text, Boolean> transportResult = transportOneRecord(record, fieldDelimiter, columns, taskPluginCollector);
@@ -569,7 +535,7 @@ public class HdfsHelper
     }
 
     /*
-     * 写Parquetfile类型文件
+     * 写Parquet file类型文件
      * 一个parquet文件的schema类似如下：
      * {
      *    "type":	"record",
@@ -610,7 +576,7 @@ public class HdfsHelper
 
         try (ParquetWriter<GenericRecord> writer = AvroParquetWriter
                 .<GenericRecord>builder(path)
-                .withRowGroupSize(ParquetWriter.DEFAULT_BLOCK_SIZE)
+                .withRowGroupSize((long) ParquetWriter.DEFAULT_BLOCK_SIZE)
                 .withPageSize(ParquetWriter.DEFAULT_PAGE_SIZE)
                 .withSchema(schema)
                 .withConf(hadoopConf)
@@ -648,7 +614,9 @@ public class HdfsHelper
             unionList.add(Schema.create(Schema.Type.NULL));
             switch (type) {
                 case "DECIMAL":
-                    Schema dec = LogicalTypes.decimal(column.getInt(Key.PRECISION, DECIMAL_DEFAULT_PRECISION), column.getInt(Key.SCALE, DECIMAL_DEFAULT_SCALE))
+                    Schema dec = LogicalTypes
+                            .decimal(column.getInt(Key.PRECISION, Constant.DEFAULT_DECIMAL_PRECISION),
+                                    column.getInt(Key.SCALE, Constant.DEFAULT_DECIMAL_SCALE))
                             .addToSchema(Schema.createFixed(fieldName, null, null, 16));
                     unionList.add(dec);
                     break;
@@ -668,18 +636,19 @@ public class HdfsHelper
                     unionList.add(Schema.create(Schema.Type.BYTES));
                     break;
                 default:
-                    // primi
+                    // other types
                     unionList.add(Schema.create(Schema.Type.valueOf(type)));
                     break;
             }
-            fields.add(new Schema.Field(fieldName, Schema.createUnion(unionList), null, (Object) null));
+            fields.add(new Schema.Field(fieldName, Schema.createUnion(unionList), null, null));
         }
         Schema schema = Schema.createRecord("addax", null, "parquet", false);
         schema.setFields(fields);
         return schema;
     }
 
-    private void setRow(VectorizedRowBatch batch, int row, Record record, List<Configuration> columns, TaskPluginCollector taskPluginCollector)
+    private void setRow(VectorizedRowBatch batch, int row, Record record, List<Configuration> columns,
+            TaskPluginCollector taskPluginCollector)
     {
         for (int i = 0; i < columns.size(); i++) {
             Configuration eachColumnConf = columns.get(i);
@@ -714,7 +683,8 @@ public class HdfsHelper
                         break;
                     case DECIMAL:
                         HiveDecimalWritable hdw = new HiveDecimalWritable();
-                        hdw.set(HiveDecimal.create(record.getColumn(i).asBigDecimal()).setScale(eachColumnConf.getInt(Key.SCALE), HiveDecimal.ROUND_HALF_UP));
+                        hdw.set(HiveDecimal.create(record.getColumn(i).asBigDecimal())
+                                .setScale(eachColumnConf.getInt(Key.SCALE), HiveDecimal.ROUND_HALF_UP));
                         ((DecimalColumnVector) col).set(row, hdw);
                         break;
                     case TIMESTAMP:
@@ -734,8 +704,8 @@ public class HdfsHelper
                         throw AddaxException
                                 .asAddaxException(
                                         HdfsWriterErrorCode.ILLEGAL_VALUE,
-                                        String.format(
-                                                "您的配置文件中的列配置信息有误. 不支持数据库写入这种字段类型. 字段名:[%s], 字段类型:[%s]. 请修改表中该字段的类型或者不同步该字段.",
+                                        String.format("您的配置文件中的列配置信息有误. 不支持数据库写入这种字段类型. 字段名:[%s], 字段类型:[%s]. " +
+                                                        "请修改表中该字段的类型或者不同步该字段.",
                                                 eachColumnConf.getString(Key.NAME),
                                                 eachColumnConf.getString(Key.TYPE)));
                 }
@@ -743,8 +713,9 @@ public class HdfsHelper
             catch (Exception e) {
                 taskPluginCollector.collectDirtyRecord(record, e.getMessage());
                 throw AddaxException.asAddaxException(HdfsWriterErrorCode.ILLEGAL_VALUE,
-                        String.format("设置Orc数据行失败，源列类型: %s, 目的原始类型:%s, 目的列Hive类型: %s, 字段名称: %s, 源值: %s, 错误根源：\n %s",
-                                record.getColumn(i).getType(), columnType, eachColumnConf.getString(Key.TYPE), eachColumnConf.getString(Key.NAME),
+                        String.format("设置Orc数据行失败，源列类型: %s, 目的原始类型:%s, 目的列Hive类型: %s, 字段名称: %s, 源值: %s, 错误根源:%n%s",
+                                record.getColumn(i).getType(), columnType, eachColumnConf.getString(Key.TYPE),
+                                eachColumnConf.getString(Key.NAME),
                                 record.getColumn(i).getRawData(), e));
             }
         }
@@ -762,7 +733,8 @@ public class HdfsHelper
         for (Configuration column : columns) {
             if ("decimal".equals(column.getString(Key.TYPE))) {
                 joiner.add(String.format("%s:%s(%s,%s)", column.getString(Key.NAME), "decimal",
-                        column.getInt(Key.PRECISION, DECIMAL_DEFAULT_PRECISION), column.getInt(Key.SCALE, DECIMAL_DEFAULT_SCALE)));
+                        column.getInt(Key.PRECISION, Constant.DEFAULT_DECIMAL_PRECISION),
+                        column.getInt(Key.SCALE, Constant.DEFAULT_DECIMAL_SCALE)));
             }
             else {
                 joiner.add(String.format("%s:%s", column.getString(Key.NAME), column.getString(Key.TYPE)));
@@ -794,49 +766,5 @@ public class HdfsHelper
             deleteDir(path.getParent());
             throw AddaxException.asAddaxException(HdfsWriterErrorCode.Write_FILE_IO_ERROR, e);
         }
-    }
-
-    /**
-     * 根据不同压缩算法，返回对应的文件名后缀(包含点(.))
-     *
-     * @param compress 压缩算法名称字符串，传递过来应该是大写
-     * @return file suffix
-     */
-    public String getCompressFileSuffix(String compress)
-    {
-        if (compress == null ) {
-            return null;
-        }
-
-        String suffix = null;
-
-        switch(compress) {
-            case "SNAPPY":
-                suffix =  ".snappy";
-                break;
-            case "BZIP2":
-            case "BZIP":
-                suffix =  ".bz2";
-                break;
-            case "LZO":
-                suffix =  ".lzo";
-                break;
-            case "GZIP":
-                suffix = ".gz";
-                break;
-            case "LZ4":
-                suffix = ".lz4";
-                break;
-            case "ZLIB":
-            case "DEFLATE":
-                suffix = ".deflate";
-                break;
-            case "ZSTD":
-                suffix = ".zstd";
-                break;
-            default:
-                break;
-        }
-        return suffix;
     }
 }
