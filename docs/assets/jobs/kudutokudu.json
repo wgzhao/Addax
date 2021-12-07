@@ -1,0 +1,43 @@
+{
+  "job": {
+    "setting": {
+      "speed": {
+        "channel": 3
+      },
+      "errorLimit": {
+        "record": 0,
+        "percentage": 0.02
+      }
+    },
+    "content": {
+      "reader": {
+        "name": "kudureader",
+        "parameter": {
+          "masterAddress": "10.110.37.210:7051,10.110.37.221:7051,10.110.37.222:7051",
+          "table": "impala::temp.datax_kudu_test1",
+          "splitPk": "userid",
+          "lowerBound": 1,
+          "upperBound": 100000000,
+          "readTimeout": 5,
+          "scanTimeout": 10,
+          "column": ["userid","db1","username","time"],
+          "where": "userid <= 1000000"
+        }
+      },
+      "writer": {
+        "name": "kuduwriter",
+        "parameter": {
+          "masterAddress": "10.110.37.210:7051,10.110.37.221:7051,10.110.37.222:7051",
+          "timeout": 60,
+          "table": "impala::temp.datax_kudu_test3",
+          "writeMode": "upsert",
+          "column": [ "userid","db1","username", "time"],
+          "batchSize": 1024,
+          "bufferSize": 2048,
+          "skipFail": true,
+          "encoding": "UTF-8"
+        }
+      }
+    }
+  }
+}
