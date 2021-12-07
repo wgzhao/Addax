@@ -73,6 +73,7 @@ import org.apache.parquet.avro.AvroParquetReader;
 import org.apache.parquet.example.data.Group;
 import org.apache.parquet.hadoop.ParquetReader;
 import org.apache.parquet.hadoop.example.GroupReadSupport;
+import org.apache.parquet.hadoop.util.HadoopInputFile;
 import org.apache.parquet.io.api.Binary;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -80,6 +81,7 @@ import org.slf4j.LoggerFactory;
 import java.io.IOException;
 import java.io.InputStream;
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.nio.ByteBuffer;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -98,15 +100,13 @@ import static com.wgzhao.addax.common.base.Key.NULL_FORMAT;
  */
 public class DFSUtil
 {
+    private static final Logger LOG = LoggerFactory.getLogger(DFSUtil.class);
 
     // the offset of julian, 2440588 is 1970/1/1
     private static final int JULIAN_EPOCH_OFFSET_DAYS = 2440588;
     private static final long MILLIS_IN_DAY = TimeUnit.DAYS.toMillis(1);
     private static final long NANOS_PER_MILLISECOND = TimeUnit.MILLISECONDS.toNanos(1);
 
-    public static final String HDFS_DEFAULT_KEY = "fs.defaultFS";
-    public static final String HADOOP_SECURITY_AUTHENTICATION_KEY = "hadoop.security.authentication";
-    private static final Logger LOG = LoggerFactory.getLogger(DFSUtil.class);
     private static final int DIRECTORY_SIZE_GUESS = 16 * 1024;
     private final org.apache.hadoop.conf.Configuration hadoopConf;
     private final boolean haveKerberos;
@@ -128,14 +128,14 @@ public class DFSUtil
                 hadoopConf.set(each, hadoopSiteParamsAsJsonObject.getString(each));
             }
         }
-        hadoopConf.set(HDFS_DEFAULT_KEY, taskConfig.getString(Key.DEFAULT_FS));
+        hadoopConf.set(HdfsConstant.HDFS_DEFAULT_KEY, taskConfig.getString(Key.DEFAULT_FS));
 
         //是否有Kerberos认证
         this.haveKerberos = taskConfig.getBool(Key.HAVE_KERBEROS, false);
         if (haveKerberos) {
             this.kerberosKeytabFilePath = taskConfig.getString(Key.KERBEROS_KEYTAB_FILE_PATH);
             this.kerberosPrincipal = taskConfig.getString(Key.KERBEROS_PRINCIPAL);
-            this.hadoopConf.set(HADOOP_SECURITY_AUTHENTICATION_KEY, "kerberos");
+            this.hadoopConf.set(HdfsConstant.HADOOP_SECURITY_AUTHENTICATION_KEY, "kerberos");
         }
         this.kerberosAuthentication(this.kerberosPrincipal, this.kerberosKeytabFilePath);
 
@@ -144,8 +144,8 @@ public class DFSUtil
 
     private void kerberosAuthentication(String kerberosPrincipal, String kerberosKeytabFilePath)
     {
-        if (haveKerberos && StringUtils.isNotBlank(this.kerberosPrincipal) && StringUtils.isNotBlank(this.kerberosKeytabFilePath)) {
-            UserGroupInformation.setConfiguration(this.hadoopConf);
+        if (haveKerberos && StringUtils.isNotBlank(kerberosPrincipal) && StringUtils.isNotBlank(kerberosKeytabFilePath)) {
+            UserGroupInformation.setConfiguration(hadoopConf);
             try {
                 UserGroupInformation.loginUserFromKeytab(kerberosPrincipal, kerberosKeytabFilePath);
             }
@@ -301,8 +301,7 @@ public class DFSUtil
             Text value = new Text();
             while (reader.next(key, value)) {
                 if (StringUtils.isNotBlank(value.toString())) {
-                    StorageReaderUtil.transportOneRecord(recordSender,
-                            readerSliceConfig, taskPluginCollector, value.toString());
+                    StorageReaderUtil.transportOneRecord(recordSender, readerSliceConfig, taskPluginCollector, value.toString());
                 }
             }
         }
@@ -316,7 +315,7 @@ public class DFSUtil
     public void rcFileStartRead(String sourceRcFilePath, Configuration readerSliceConfig,
             RecordSender recordSender, TaskPluginCollector taskPluginCollector)
     {
-        LOG.info("Start Read rcfile [{}].", sourceRcFilePath);
+        LOG.info("Start Read rc-file [{}].", sourceRcFilePath);
         List<ColumnEntry> column = StorageReaderUtil
                 .getListColumnEntry(readerSliceConfig, COLUMN);
         // warn: no default value '\N'
@@ -364,7 +363,7 @@ public class DFSUtil
     public void orcFileStartRead(String sourceOrcFilePath, Configuration readerSliceConfig,
             RecordSender recordSender, TaskPluginCollector taskPluginCollector)
     {
-        LOG.info("Start Read orcfile [{}].", sourceOrcFilePath);
+        LOG.info("Start Read orc-file [{}].", sourceOrcFilePath);
         List<ColumnEntry> column = StorageReaderUtil.getListColumnEntry(readerSliceConfig, COLUMN);
         String nullFormat = readerSliceConfig.getString(NULL_FORMAT);
 
@@ -389,14 +388,15 @@ public class DFSUtil
             }
         }
         catch (Exception e) {
-            String message = String.format("从orcfile文件路径[%s]中读取数据发生异常，请联系系统管理员。"
+            String message = String.format("从orc-file文件路径[%s]中读取数据发生异常，请联系系统管理员。"
                     , sourceOrcFilePath);
             LOG.error(message);
             throw AddaxException.asAddaxException(HdfsReaderErrorCode.READ_FILE_ERROR, message);
         }
     }
 
-    private void transportOrcRecord(VectorizedRowBatch rowBatch, List<ColumnEntry> columns, RecordSender recordSender, TaskPluginCollector taskPluginCollector, String nullFormat)
+    private void transportOrcRecord(VectorizedRowBatch rowBatch, List<ColumnEntry> columns, RecordSender recordSender,
+            TaskPluginCollector taskPluginCollector, String nullFormat)
     {
         Record record;
         for (int row = 0; row < rowBatch.size; row++) {
@@ -463,15 +463,13 @@ public class DFSUtil
         }
     }
 
-    public void parquetFileStartRead(String sourceParquestFilePath, Configuration readerSliceConfig,
+    public void parquetFileStartRead(String sourceParquetFilePath, Configuration readerSliceConfig,
             RecordSender recordSender, TaskPluginCollector taskPluginCollector)
     {
-        LOG.info("Start Read orcfile [{}].", sourceParquestFilePath);
+        LOG.info("Start Read orc-file [{}].", sourceParquetFilePath);
         List<ColumnEntry> column = StorageReaderUtil.getListColumnEntry(readerSliceConfig, COLUMN);
         String nullFormat = readerSliceConfig.getString(NULL_FORMAT);
-        Path parquetFilePath = new Path(sourceParquestFilePath);
-        boolean isReadAllColumns = null == column || column.isEmpty();
-        // 判断是否读取所有列
+        Path parquetFilePath = new Path(sourceParquetFilePath);
 
         hadoopConf.set("parquet.avro.readInt96AsFixed", "true");
         JobConf conf = new JobConf(hadoopConf);
@@ -479,7 +477,7 @@ public class DFSUtil
         GenericData decimalSupport = new GenericData();
         decimalSupport.addLogicalTypeConversion(new Conversions.DecimalConversion());
         try (ParquetReader<GenericData.Record> reader = AvroParquetReader
-                .<GenericData.Record>builder(parquetFilePath)
+                .<GenericData.Record>builder(HadoopInputFile.fromPath(parquetFilePath, hadoopConf))
                 .withDataModel(decimalSupport)
                 .withConf(conf)
                 .build()) {
@@ -488,7 +486,7 @@ public class DFSUtil
 
             if (null == column || column.isEmpty()) {
                 column = new ArrayList<>(schema.getFields().size());
-                String stype;
+                String sType;
                 // 用户没有填写具体的字段信息，需要从parquet文件构建
                 for (int i = 0; i < schema.getFields().size(); i++) {
                     ColumnEntry columnEntry = new ColumnEntry();
@@ -500,24 +498,24 @@ public class DFSUtil
                     else {
                         type = schema.getFields().get(i).schema();
                     }
-                    stype = type.getProp("logicalType") != null ? type.getProp("logicalType") : type.getType().getName();
-                    if (stype.startsWith("timestamp")) {
+                    sType = type.getProp("logicalType") != null ? type.getProp("logicalType") : type.getType().getName();
+                    if (sType.startsWith("timestamp")) {
                         columnEntry.setType("timestamp");
                     }
                     else {
-                        columnEntry.setType(stype);
+                        columnEntry.setType(sType);
                     }
                     column.add(columnEntry);
                 }
             }
             while (gRecord != null) {
-                transportOneRecord(column, gRecord, schema, recordSender, taskPluginCollector, isReadAllColumns, nullFormat);
+                transportOneRecord(column, gRecord, recordSender, taskPluginCollector, nullFormat);
                 gRecord = reader.read();
             }
         }
         catch (IOException e) {
-            String message = String.format("从parquetfile文件路径[%s]中读取数据发生异常，请联系系统管理员。"
-                    , sourceParquestFilePath);
+            String message = String.format("从parquet file文件路径[%s]中读取数据发生异常，请联系系统管理员。"
+                    , sourceParquetFilePath);
             LOG.error(message);
             throw AddaxException.asAddaxException(HdfsReaderErrorCode.READ_FILE_ERROR, message);
         }
@@ -528,8 +526,8 @@ public class DFSUtil
      *
      *
      */
-    private void transportOneRecord(List<ColumnEntry> columnConfigs, GenericData.Record gRecord, Schema schema, RecordSender recordSender,
-            TaskPluginCollector taskPluginCollector, boolean isReadAllColumns, String nullFormat)
+    private void transportOneRecord(List<ColumnEntry> columnConfigs, GenericData.Record gRecord, RecordSender recordSender,
+            TaskPluginCollector taskPluginCollector, String nullFormat)
     {
         Record record = recordSender.createRecord();
         Column columnGenerated;
@@ -583,7 +581,7 @@ public class DFSUtil
                                 columnGenerated = new DoubleColumn((Double) null);
                             }
                             else {
-                                columnGenerated = new DoubleColumn(new BigDecimal(columnValue).setScale(scale, BigDecimal.ROUND_HALF_UP));
+                                columnGenerated = new DoubleColumn(new BigDecimal(columnValue).setScale(scale, RoundingMode.HALF_UP));
                             }
                             break;
                         case BOOLEAN:
@@ -626,13 +624,9 @@ public class DFSUtil
                             columnGenerated = new BytesColumn(((ByteBuffer) gRecord.get(columnIndex)).array());
                             break;
                         default:
-                            String errorMessage = String.format(
-                                    "您配置的列类型暂不支持 : [%s]", columnType);
+                            String errorMessage = String.format("您配置的列类型暂不支持 : [%s]", columnType);
                             LOG.error(errorMessage);
-                            throw AddaxException
-                                    .asAddaxException(
-                                            StorageReaderErrorCode.NOT_SUPPORT_TYPE,
-                                            errorMessage);
+                            throw AddaxException.asAddaxException(StorageReaderErrorCode.NOT_SUPPORT_TYPE, errorMessage);
                     }
                 }
                 catch (Exception e) {
@@ -645,8 +639,7 @@ public class DFSUtil
             recordSender.sendToWriter(record);
         }
         catch (IllegalArgumentException | IndexOutOfBoundsException iae) {
-            taskPluginCollector
-                    .collectDirtyRecord(record, iae.getMessage());
+            taskPluginCollector.collectDirtyRecord(record, iae.getMessage());
         }
         catch (Exception e) {
             if (e instanceof AddaxException) {
@@ -655,11 +648,6 @@ public class DFSUtil
             // 每一种转换失败都是脏数据处理,包括数字格式 & 日期格式
             taskPluginCollector.collectDirtyRecord(record, e.getMessage());
         }
-    }
-
-    private int getAllColumnsCount(String filePath)
-    {
-        return getOrcSchema(filePath).getChildren().size();
     }
 
     private TypeDescription getOrcSchema(String filePath)
@@ -671,27 +659,9 @@ public class DFSUtil
             return reader.getSchema();
         }
         catch (IOException e) {
-            String message = "读取orcfile column列数失败，请联系系统管理员";
+            String message = "读取orc-file column列数失败，请联系系统管理员";
             throw AddaxException.asAddaxException(HdfsReaderErrorCode.READ_FILE_ERROR, message);
         }
-    }
-
-    private int getMaxIndex(List<ColumnEntry> columnConfigs)
-    {
-        int maxIndex = -1;
-        for (ColumnEntry columnConfig : columnConfigs) {
-            Integer columnIndex = columnConfig.getIndex();
-            if (columnIndex != null && columnIndex < 0) {
-                String message = String.format("您column中配置的index不能小于0，请修改为正确的index,column配置:%s",
-                        JSON.toJSONString(columnConfigs));
-                LOG.error(message);
-                throw AddaxException.asAddaxException(HdfsReaderErrorCode.CONFIG_INVALID_EXCEPTION, message);
-            }
-            else if (columnIndex != null && columnIndex > maxIndex) {
-                maxIndex = columnIndex;
-            }
-        }
-        return maxIndex;
     }
 
     public boolean checkHdfsFileType(String filepath, String specifiedFileType)
@@ -711,7 +681,7 @@ public class DFSUtil
                 return isSequenceFile(file, in);
             }
             else if (StringUtils.equalsIgnoreCase(specifiedFileType, HdfsConstant.PARQUET)) {
-                return isParquetFile(file, in);
+                return isParquetFile(file);
             }
             else if (StringUtils.equalsIgnoreCase(specifiedFileType, HdfsConstant.CSV)
                     || StringUtils.equalsIgnoreCase(specifiedFileType, HdfsConstant.TEXT)) {
@@ -820,8 +790,7 @@ public class DFSUtil
                 try {
                     Class<?> keyCls = hadoopConf.getClassByName(Text.readString(in));
                     Class<?> valCls = hadoopConf.getClassByName(Text.readString(in));
-                    if (!keyCls.equals(RCFile.KeyBuffer.class)
-                            || !valCls.equals(RCFile.ValueBuffer.class)) {
+                    if (!keyCls.equals(RCFile.KeyBuffer.class) || !valCls.equals(RCFile.ValueBuffer.class)) {
                         return false;
                     }
                 }
@@ -860,7 +829,7 @@ public class DFSUtil
     }
 
     //判断是否为parquet
-    private boolean isParquetFile(Path file, FSDataInputStream in)
+    private boolean isParquetFile(Path file)
     {
         try {
             GroupReadSupport readSupport = new GroupReadSupport();
