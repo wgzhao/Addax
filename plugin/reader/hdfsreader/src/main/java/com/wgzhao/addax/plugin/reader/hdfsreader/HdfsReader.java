@@ -25,6 +25,7 @@ import com.wgzhao.addax.common.plugin.RecordSender;
 import com.wgzhao.addax.common.spi.Reader;
 import com.wgzhao.addax.common.util.Configuration;
 import com.wgzhao.addax.storage.reader.StorageReaderUtil;
+import com.wgzhao.addax.storage.util.FileHelper;
 import org.apache.commons.io.Charsets;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -32,6 +33,7 @@ import org.slf4j.LoggerFactory;
 import java.io.InputStream;
 import java.nio.charset.UnsupportedCharsetException;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 
@@ -73,24 +75,22 @@ public class HdfsReader
 
             LOG.info("init() begin...");
             this.readerOriginConfig = getPluginJobConf();
-            this.validate();
-            dfsUtil = new DFSUtil(this.readerOriginConfig);
+            validate();
+            dfsUtil = new DFSUtil(readerOriginConfig);
             LOG.info("init() ok and end...");
         }
 
         public void validate()
         {
-            this.readerOriginConfig.getNecessaryValue(Key.DEFAULT_FS,
-                    HdfsReaderErrorCode.DEFAULT_FS_NOT_FIND_ERROR);
+            readerOriginConfig.getNecessaryValue(Key.DEFAULT_FS, HdfsReaderErrorCode.DEFAULT_FS_NOT_FIND_ERROR);
 
             // path check
-            String pathInString = this.readerOriginConfig.getNecessaryValue(Key.PATH, HdfsReaderErrorCode.REQUIRED_VALUE);
+            String pathInString = readerOriginConfig.getNecessaryValue(Key.PATH, HdfsReaderErrorCode.REQUIRED_VALUE);
             if (!pathInString.startsWith("[") && !pathInString.endsWith("]")) {
-                path = new ArrayList<>();
-                path.add(pathInString);
+                path = Collections.singletonList(pathInString);
             }
             else {
-                path = this.readerOriginConfig.getList(Key.PATH, String.class);
+                path = readerOriginConfig.getList(Key.PATH, String.class);
                 if (null == path || path.isEmpty()) {
                     throw AddaxException.asAddaxException(HdfsReaderErrorCode.REQUIRED_VALUE, "您需要指定待读取的源目录或文件");
                 }
@@ -103,9 +103,9 @@ public class HdfsReader
                 }
             }
 
-            specifiedFileType = this.readerOriginConfig.getNecessaryValue(Key.FILE_TYPE, HdfsReaderErrorCode.REQUIRED_VALUE).toUpperCase();
+            specifiedFileType = readerOriginConfig.getNecessaryValue(Key.FILE_TYPE, HdfsReaderErrorCode.REQUIRED_VALUE).toUpperCase();
             if (!HdfsConstant.SUPPORT_FILE_TYPE.contains(specifiedFileType)) {
-                String message = "HdfsReader插件目前支持 " + HdfsConstant.SUPPORT_FILE_TYPE + "几种格式的文件,请将fileType选项的值配置为以上各种的一种";
+                String message = "HdfsReader插件目前支持 " + HdfsConstant.SUPPORT_FILE_TYPE + " 几种格式的文件";
                 throw AddaxException.asAddaxException(HdfsReaderErrorCode.FILE_TYPE_ERROR, message);
             }
 
@@ -125,20 +125,20 @@ public class HdfsReader
                         String.format("运行配置异常 : %s", e.getMessage()), e);
             }
             //check Kerberos
-            boolean haveKerberos = this.readerOriginConfig.getBool(Key.HAVE_KERBEROS, false);
+            boolean haveKerberos = readerOriginConfig.getBool(Key.HAVE_KERBEROS, false);
             if (haveKerberos) {
-                this.readerOriginConfig.getNecessaryValue(Key.KERBEROS_KEYTAB_FILE_PATH, HdfsReaderErrorCode.REQUIRED_VALUE);
-                this.readerOriginConfig.getNecessaryValue(Key.KERBEROS_PRINCIPAL, HdfsReaderErrorCode.REQUIRED_VALUE);
+                readerOriginConfig.getNecessaryValue(Key.KERBEROS_KEYTAB_FILE_PATH, HdfsReaderErrorCode.REQUIRED_VALUE);
+                readerOriginConfig.getNecessaryValue(Key.KERBEROS_PRINCIPAL, HdfsReaderErrorCode.REQUIRED_VALUE);
             }
 
             // validate the Columns
             validateColumns();
 
-            if (this.specifiedFileType.equals(HdfsConstant.TEXT)
-                    || this.specifiedFileType.equals(HdfsConstant.CSV)) {
-                //compress校验
-                StorageReaderUtil.validateCompress(this.readerOriginConfig);
-//                StorageReaderUtil.validateCsvReaderConfig(this.readerOriginConfig);
+            // validate compress
+            String compress = readerOriginConfig.getString(Key.COMPRESS, "NONE");
+            if ("gzip".equalsIgnoreCase(compress)) {
+                // correct to gz
+                readerOriginConfig.set(Key.COMPRESS, "gz");
             }
         }
 
@@ -146,24 +146,17 @@ public class HdfsReader
         {
 
             // 检测是column 是否为 ["*"] 若是则填为空
-            List<Configuration> column = this.readerOriginConfig
-                    .getListConfiguration(COLUMN);
-            if (null != column
-                    && 1 == column.size()
-                    && ("\"*\"".equals(column.get(0).toString()) || "'*'"
-                    .equals(column.get(0).toString()))) {
-                readerOriginConfig
-                        .set(COLUMN, new ArrayList<String>());
+            List<Configuration> column = this.readerOriginConfig.getListConfiguration(COLUMN);
+            if (null != column && 1 == column.size()
+                    && ("\"*\"".equals(column.get(0).toString()) || "'*'".equals(column.get(0).toString()))) {
+                readerOriginConfig.set(COLUMN, new ArrayList<String>());
             }
             else {
-                // column: 1. index type 2.value type 3.when type is Data, may have format
-                List<Configuration> columns = this.readerOriginConfig
-                        .getListConfiguration(COLUMN);
+                // column: 1. index type 2.value type 3.when type is Data, may be has dateFormat value
+                List<Configuration> columns = readerOriginConfig.getListConfiguration(COLUMN);
 
                 if (null == columns || columns.isEmpty()) {
-                    throw AddaxException.asAddaxException(
-                            HdfsReaderErrorCode.CONFIG_INVALID_EXCEPTION,
-                            "您需要指定 columns");
+                    throw AddaxException.asAddaxException(HdfsReaderErrorCode.CONFIG_INVALID_EXCEPTION, "您需要指定 columns");
                 }
 
                 for (Configuration eachColumnConf : columns) {
@@ -174,12 +167,11 @@ public class HdfsReader
                     if (null == columnIndex && null == columnValue) {
                         throw AddaxException.asAddaxException(
                                 HdfsReaderErrorCode.NO_INDEX_VALUE,
-                                "由于您配置了type, 则至少需要配置 index 或 value");
+                                "由于您配置了type, 则至少需要配置 index 或 value, 当前配置为：" + eachColumnConf);
                     }
 
                     if (null != columnIndex && null != columnValue) {
-                        throw AddaxException.asAddaxException(
-                                HdfsReaderErrorCode.MIXED_INDEX_VALUE,
+                        throw AddaxException.asAddaxException(HdfsReaderErrorCode.MIXED_INDEX_VALUE,
                                 "您混合配置了index, value, 每一列同时仅能选择其中一种");
                     }
                 }
@@ -191,7 +183,7 @@ public class HdfsReader
         {
             LOG.info("prepare(), start to getAllFiles...");
             this.sourceFiles = (HashSet<String>) dfsUtil.getAllFiles(path, specifiedFileType);
-            LOG.info("您即将读取的文件数为: [{}], 列表为: [{}]", this.sourceFiles.size(), this.sourceFiles);
+            LOG.info("您即将读取的文件数为: [{}], 列表为: [{}]", sourceFiles.size(), sourceFiles);
         }
 
         @Override
@@ -201,36 +193,20 @@ public class HdfsReader
             LOG.info("split() begin...");
             List<Configuration> readerSplitConfigs = new ArrayList<>();
             // warn:每个slice拖且仅拖一个文件,
-            int splitNumber = this.sourceFiles.size();
+            int splitNumber = sourceFiles.size();
             if (0 == splitNumber) {
                 throw AddaxException.asAddaxException(HdfsReaderErrorCode.EMPTY_DIR_EXCEPTION,
-                        String.format("未能找到待读取的文件,请确认您的配置项path: %s", this.readerOriginConfig.getString(Key.PATH)));
+                        String.format("未能找到待读取的文件,请确认您的配置项path: %s", readerOriginConfig.getString(Key.PATH)));
             }
 
-            List<List<String>> splitedSourceFiles = this.splitSourceFiles(new ArrayList<>(this.sourceFiles), splitNumber);
-            for (List<String> files : splitedSourceFiles) {
-                Configuration splitedConfig = this.readerOriginConfig.clone();
-                splitedConfig.set(HdfsConstant.SOURCE_FILES, files);
-                readerSplitConfigs.add(splitedConfig);
+            List<List<String>> splitSourceFiles = FileHelper.splitSourceFiles(new ArrayList<>(sourceFiles), splitNumber);
+            for (List<String> files : splitSourceFiles) {
+                Configuration splitConfig = readerOriginConfig.clone();
+                splitConfig.set(HdfsConstant.SOURCE_FILES, files);
+                readerSplitConfigs.add(splitConfig);
             }
 
             return readerSplitConfigs;
-        }
-
-        private <T> List<List<T>> splitSourceFiles(List<T> sourceList, int adviceNumber)
-        {
-            List<List<T>> splitedList = new ArrayList<>();
-            int averageLength = sourceList.size() / adviceNumber;
-            averageLength = averageLength == 0 ? 1 : averageLength;
-
-            for (int begin = 0, end; begin < sourceList.size(); begin = end) {
-                end = begin + averageLength;
-                if (end > sourceList.size()) {
-                    end = sourceList.size();
-                }
-                splitedList.add(sourceList.subList(begin, end));
-            }
-            return splitedList;
         }
 
         @Override
@@ -261,9 +237,9 @@ public class HdfsReader
         {
 
             this.taskConfig = getPluginJobConf();
-            this.sourceFiles = this.taskConfig.getList(HdfsConstant.SOURCE_FILES, String.class);
-            this.specifiedFileType = this.taskConfig.getNecessaryValue(Key.FILE_TYPE, HdfsReaderErrorCode.REQUIRED_VALUE);
-            this.dfsUtil = new DFSUtil(this.taskConfig);
+            this.sourceFiles = taskConfig.getList(HdfsConstant.SOURCE_FILES, String.class);
+            this.specifiedFileType = taskConfig.getNecessaryValue(Key.FILE_TYPE, HdfsReaderErrorCode.REQUIRED_VALUE);
+            this.dfsUtil = new DFSUtil(taskConfig);
         }
 
         @Override
@@ -280,30 +256,26 @@ public class HdfsReader
             for (String sourceFile : this.sourceFiles) {
                 LOG.info("reading file : [{}]", sourceFile);
 
-                if (specifiedFileType.equalsIgnoreCase(HdfsConstant.TEXT)
-                        || specifiedFileType.equalsIgnoreCase(HdfsConstant.CSV)) {
-
+                if (specifiedFileType.equalsIgnoreCase(HdfsConstant.TEXT) || specifiedFileType.equalsIgnoreCase(HdfsConstant.CSV)) {
                     InputStream inputStream = dfsUtil.getInputStream(sourceFile);
-                    StorageReaderUtil.readFromStream(inputStream, sourceFile, this.taskConfig,
-                            recordSender, this.getTaskPluginCollector());
+                    StorageReaderUtil.readFromStream(inputStream, sourceFile, taskConfig, recordSender, getTaskPluginCollector());
                 }
                 else if (specifiedFileType.equalsIgnoreCase(HdfsConstant.ORC)) {
 
-                    dfsUtil.orcFileStartRead(sourceFile, this.taskConfig, recordSender, this.getTaskPluginCollector());
+                    dfsUtil.orcFileStartRead(sourceFile, taskConfig, recordSender, getTaskPluginCollector());
                 }
                 else if (specifiedFileType.equalsIgnoreCase(HdfsConstant.SEQ)) {
 
-                    dfsUtil.sequenceFileStartRead(sourceFile, this.taskConfig, recordSender, this.getTaskPluginCollector());
+                    dfsUtil.sequenceFileStartRead(sourceFile, taskConfig, recordSender, getTaskPluginCollector());
                 }
                 else if (specifiedFileType.equalsIgnoreCase(HdfsConstant.RC)) {
 
-                    dfsUtil.rcFileStartRead(sourceFile, this.taskConfig, recordSender, this.getTaskPluginCollector());
+                    dfsUtil.rcFileStartRead(sourceFile, taskConfig, recordSender, getTaskPluginCollector());
                 }
                 else if (specifiedFileType.equalsIgnoreCase(HdfsConstant.PARQUET)) {
-                    dfsUtil.parquetFileStartRead(sourceFile, this.taskConfig, recordSender, this.getTaskPluginCollector());
+                    dfsUtil.parquetFileStartRead(sourceFile, taskConfig, recordSender, getTaskPluginCollector());
                 }
                 else {
-
                     String message = "HdfsReader插件目前支持ORC, TEXT, CSV, SEQUENCE, RC五种格式的文件," +
                             "请将fileType选项的值配置为ORC, TEXT, CSV, SEQUENCE 或者 RC";
                     throw AddaxException.asAddaxException(HdfsReaderErrorCode.FILE_TYPE_UNSUPPORTED, message);
