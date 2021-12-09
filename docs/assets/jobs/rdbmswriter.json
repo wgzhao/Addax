@@ -41,7 +41,6 @@
           "connection": [
             {
               "jdbcUrl": "jdbc:dm://ip:port/database",
-              "driver": "",
               "table": [
                 "table"
               ]
@@ -49,6 +48,7 @@
           ],
           "username": "username",
           "password": "password",
+          "driver": "dm.jdbc.driver.DmDriver",
           "column": [
             "*"
           ],
