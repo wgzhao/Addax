@@ -1,0 +1,38 @@
+{
+  "job": {
+    "setting": {
+      "speed": {
+        "channel": 3
+      },
+      "errorLimit": {
+        "record": 0,
+        "percentage": 0.02
+      }
+    },
+    "content": {
+      "reader": {
+        "name": "tdenginereader",
+        "parameter": {
+          "username": "root",
+          "password": "taosdata",
+          "connection": [
+            {
+              "jdbcUrl": [
+                "jdbc:TAOS://127.0.0.1:6030/test"
+              ],
+              "querySql": [
+                "select * from test.meters where ts <'2017-07-14 10:40:02' and  loc='beijing' limit 10"
+              ]
+            }
+          ]
+        }
+      },
+      "writer": {
+        "name": "streamwriter",
+        "parameter": {
+          "print": true
+        }
+      }
+    }
+  }
+}
