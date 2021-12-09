@@ -1,0 +1,88 @@
+2021-02-20 15:52:07.691 [main] INFO  VMInfo - VMInfo# operatingSystem class => sun.management.OperatingSystemImpl
+2021-02-20 15:52:07.748 [main] INFO  Engine -
+{
+	"content":[
+		{
+			"reader":{
+				"parameter":{
+					"column":[
+						{
+							"random":"2017-08-01 00:01:02,2020-01-01 12:13:14",
+							"type":"date"
+						},
+						{
+							"type":"string",
+							"value":"Addax"
+						},
+						{
+							"type":"long",
+							"value":19880808
+						},
+						{
+							"type":"date",
+							"value":"1988-08-08 08:08:08"
+						},
+						{
+							"type":"bool",
+							"value":true
+						},
+						{
+							"type":"bytes",
+							"value":"test"
+						}
+					],
+					"sliceRecordCount":1000
+				},
+				"name":"streamreader"
+			},
+			"writer":{
+				"parameter":{
+					"password":"*****",
+					"column":[
+						"ts",
+						"name",
+						"file_size",
+						"file_date",
+						"flag_open",
+						"memo"
+					],
+					"connection":[
+						{
+							"jdbcUrl":"jdbc:TAOS://127.0.0.1:6030/test",
+							"table":[
+								"addax_test"
+							]
+						}
+					],
+					"username":"root",
+					"preSql":[]
+				},
+				"name":"tdenginewriter"
+			}
+		}
+	],
+	"setting":{
+		"speed":{
+			"bytes":-1,
+			"channel":1
+		}
+	}
+}
+
+2021-02-20 15:52:07.786 [main] INFO  PerfTrace - PerfTrace traceId=job_-1, isEnable=false, priority=0
+2021-02-20 15:52:07.787 [main] INFO  JobContainer - Addax jobContainer starts job.
+2021-02-20 15:52:07.789 [main] INFO  JobContainer - Set jobId = 0
+java.library.path:/usr/java/packages/lib/amd64:/usr/lib64:/lib64:/lib:/usr/lib
+2021-02-20 15:52:08.048 [job-0] INFO  OriginalConfPretreatmentUtil - table:[addax_test] all columns:[ts,name,file_size,file_date,flag_open,memo].
+2021-02-20 15:52:08.056 [job-0] INFO  OriginalConfPretreatmentUtil - Write data [
+INSERT INTO %s (ts,name,file_size,file_date,flag_open,memo) VALUES(?,?,?,?,?,?)
+], which jdbcUrl like:[jdbc:TAOS://127.0.0.1:6030/test]
+
+2021-02-20 15:52:11.158 [job-0] INFO  JobContainer -
+任务启动时刻                    : 2021-02-20 15:52:07
+任务结束时刻                    : 2021-02-20 15:52:11
+任务总计耗时                    :                  3s
+任务平均流量                    :           11.07KB/s
+记录写入速度                    :            333rec/s
+读出记录总数                    :                1000
+读写失败总数                    :                   0

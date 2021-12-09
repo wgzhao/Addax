@@ -1,0 +1,96 @@
+{
+  "job": {
+    "setting": {
+      "speed": {
+        "byte": -1,
+        "channel": 1
+      },
+      "errorLimit": {
+        "record": 0,
+        "percentage": 0.02
+      }
+    },
+    "content": [
+      {
+        "reader": {
+          "name": "datareader",
+          "parameter": {
+            "column": [
+              {
+                "value": "1,100,",
+                "rule": "random",
+                "type": "double"
+              },
+              {
+                "value": "DataX",
+                "type": "string"
+              },
+              {
+                "value": "1",
+                "rule": "incr",
+                "type": "long"
+              },
+              {
+                "value": "1989/06/04 00:00:01,-1",
+                "rule": "incr",
+                "type": "date",
+                "dateFormat": "yyyy/MM/dd hh:mm:ss"
+              },
+              {
+                "value": "test",
+                "type": "bytes"
+              },
+              {
+                "rule": "address"
+              },
+              {
+                "rule": "bank"
+              },
+              {
+                "rule": "company"
+              },
+              {
+                "rule": "creditCard"
+              },
+              {
+                "rule": "debitCard"
+              },
+              {
+                "rule": "idCard"
+              },
+              {
+                "rule": "lat"
+              },
+              {
+                "rule": "lng"
+              },
+              {
+                "rule": "name"
+              },
+              {
+                "rule": "job"
+              },
+              {
+                "rule": "phone"
+              },
+              {
+                "rule": "stockCode"
+              },
+              {
+                "rule": "stockAccount"
+              }
+            ],
+            "sliceRecordCount": 10
+          }
+        },
+        "writer": {
+          "name": "streamwriter",
+          "parameter": {
+            "print": true,
+            "encoding": "UTF-8"
+          }
+        }
+      }
+    ]
+  }
+}
