@@ -5,64 +5,62 @@
         "channel": 1
       }
     },
-    "content": [
-      {
-        "reader": {
-          "name": "hbase11xreader",
-          "parameter": {
-            "hbaseConfig": {
-              "hbase.zookeeper.quorum": "xxxf"
+    "content": {
+      "reader": {
+        "name": "hbase11xreader",
+        "parameter": {
+          "hbaseConfig": {
+            "hbase.zookeeper.quorum": "xxxf"
+          },
+          "table": "users",
+          "encoding": "utf-8",
+          "mode": "normal",
+          "column": [
+            {
+              "name": "rowkey",
+              "type": "string"
             },
-            "table": "users",
-            "encoding": "utf-8",
-            "mode": "normal",
-            "column": [
-              {
-                "name": "rowkey",
-                "type": "string"
-              },
-              {
-                "name": "info: age",
-                "type": "string"
-              },
-              {
-                "name": "info: birthday",
-                "type": "date",
-                "format": "yyyy-MM-dd"
-              },
-              {
-                "name": "info: company",
-                "type": "string"
-              },
-              {
-                "name": "address: country",
-                "type": "string"
-              },
-              {
-                "name": "address: province",
-                "type": "string"
-              },
-              {
-                "name": "address: city",
-                "type": "string"
-              }
-            ],
-            "range": {
-              "startRowkey": "",
-              "endRowkey": "",
-              "isBinaryRowkey": true
+            {
+              "name": "info: age",
+              "type": "string"
+            },
+            {
+              "name": "info: birthday",
+              "type": "date",
+              "format": "yyyy-MM-dd"
+            },
+            {
+              "name": "info: company",
+              "type": "string"
+            },
+            {
+              "name": "address: country",
+              "type": "string"
+            },
+            {
+              "name": "address: province",
+              "type": "string"
+            },
+            {
+              "name": "address: city",
+              "type": "string"
             }
-          }
-        },
-        "writer": {
-          "name": "txtfilewriter",
-          "parameter": {
-            "path": "/Users/shf/workplace/addax_test/hbase11xreader/result",
-            "fileName": "qiran",
-            "writeMode": "truncate"
+          ],
+          "range": {
+            "startRowkey": "",
+            "endRowkey": "",
+            "isBinaryRowkey": true
           }
         }
+      },
+      "writer": {
+        "name": "txtfilewriter",
+        "parameter": {
+          "path": "/Users/shf/workplace/addax_test/hbase11xreader/result",
+          "fileName": "qiran",
+          "writeMode": "truncate"
+        }
       }
-    ]
+    }
   }
 }

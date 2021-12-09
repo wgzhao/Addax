@@ -16,7 +16,7 @@
         <link rel="canonical" href="https://wgzhao.github.io/Addax/develop/writer/kuduwriter/">
       
       <link rel="icon" href="../../images/favicon.ico">
-      <meta name="generator" content="mkdocs-1.2.3, mkdocs-material-7.3.4">
+      <meta name="generator" content="mkdocs-1.2.3, mkdocs-material-7.3.3">
     
     
       
@@ -24,7 +24,7 @@
       
     
     
-      <link rel="stylesheet" href="../../assets/stylesheets/main.db9e7362.min.css">
+      <link rel="stylesheet" href="../../assets/stylesheets/main.5143246d.min.css">
       
         
         <link rel="stylesheet" href="../../assets/stylesheets/palette.3f5d1f46.min.css">
@@ -1139,8 +1139,8 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#_5" class="md-nav__link">
-    已知限制
+  <a href="#column" class="md-nav__link">
+    column
   </a>
   
 </li>
@@ -1441,8 +1441,8 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#_5" class="md-nav__link">
-    已知限制
+  <a href="#column" class="md-nav__link">
+    column
   </a>
   
 </li>
@@ -1488,48 +1488,42 @@
         <span class="nt">&quot;bytes&quot;</span><span class="p">:</span> <span class="mi">-1</span>
       <span class="p">}</span>
     <span class="p">},</span>
-    <span class="nt">&quot;content&quot;</span><span class="p">:</span> <span class="p">[</span>
-      <span class="p">{</span>
-        <span class="nt">&quot;reader&quot;</span><span class="p">:</span> <span class="p">{</span>
-          <span class="nt">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;streamreader&quot;</span><span class="p">,</span>
-          <span class="nt">&quot;parameter&quot;</span><span class="p">:</span> <span class="p">{</span>
-            <span class="nt">&quot;column&quot;</span><span class="p">:</span> <span class="p">[</span>
-              <span class="p">{</span>
-                <span class="nt">&quot;random&quot;</span><span class="p">:</span> <span class="s2">&quot;1,1000&quot;</span><span class="p">,</span>
-                <span class="nt">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;long&quot;</span>
-              <span class="p">},</span>
-              <span class="p">{</span>
-                <span class="nt">&quot;random&quot;</span><span class="p">:</span> <span class="s2">&quot;1,10&quot;</span><span class="p">,</span>
-                <span class="nt">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;string&quot;</span>
-              <span class="p">},</span>
-              <span class="p">{</span>
-                <span class="nt">&quot;random&quot;</span><span class="p">:</span> <span class="s2">&quot;1000,50000&quot;</span><span class="p">,</span>
-                <span class="nt">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;double&quot;</span>
-              <span class="p">}</span>
-            <span class="p">],</span>
-            <span class="nt">&quot;sliceRecordCount&quot;</span><span class="p">:</span> <span class="mi">1000</span>
-          <span class="p">}</span>
-        <span class="p">},</span>
-        <span class="nt">&quot;writer&quot;</span><span class="p">:</span> <span class="p">{</span>
-          <span class="nt">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;kuduwriter&quot;</span><span class="p">,</span>
-          <span class="nt">&quot;parameter&quot;</span><span class="p">:</span> <span class="p">{</span>
-            <span class="nt">&quot;masterAddress&quot;</span><span class="p">:</span> <span class="s2">&quot;127.0.0.1:7051,127.0.0.1:7151,127.0.0.1:7251&quot;</span><span class="p">,</span>
-            <span class="nt">&quot;timeout&quot;</span><span class="p">:</span> <span class="mi">60</span><span class="p">,</span>
-            <span class="nt">&quot;table&quot;</span><span class="p">:</span> <span class="s2">&quot;users&quot;</span><span class="p">,</span>
-            <span class="nt">&quot;writeMode&quot;</span><span class="p">:</span> <span class="s2">&quot;upsert&quot;</span><span class="p">,</span>
-            <span class="nt">&quot;column&quot;</span><span class="p">:</span> <span class="p">[</span>
-              <span class="p">{</span><span class="nt">&quot;name&quot;</span><span class="p">:</span><span class="s2">&quot;user_id&quot;</span><span class="p">,</span><span class="nt">&quot;type&quot;</span><span class="p">:</span><span class="s2">&quot;int8&quot;</span><span class="p">},</span>
-              <span class="p">{</span><span class="nt">&quot;name&quot;</span><span class="p">:</span><span class="s2">&quot;user_name&quot;</span><span class="p">,</span> <span class="nt">&quot;type&quot;</span><span class="p">:</span><span class="s2">&quot;string&quot;</span><span class="p">},</span>
-              <span class="p">{</span><span class="nt">&quot;name&quot;</span><span class="p">:</span><span class="s2">&quot;salary&quot;</span><span class="p">,</span> <span class="nt">&quot;type&quot;</span><span class="p">:</span><span class="s2">&quot;double&quot;</span><span class="p">}</span>
-            <span class="p">],</span>
-            <span class="nt">&quot;batchSize&quot;</span><span class="p">:</span> <span class="mi">1024</span><span class="p">,</span>
-            <span class="nt">&quot;bufferSize&quot;</span><span class="p">:</span> <span class="mi">2048</span><span class="p">,</span>
-            <span class="nt">&quot;skipFail&quot;</span><span class="p">:</span> <span class="kc">false</span><span class="p">,</span>
-            <span class="nt">&quot;encoding&quot;</span><span class="p">:</span> <span class="s2">&quot;UTF-8&quot;</span>
-          <span class="p">}</span>
+    <span class="nt">&quot;content&quot;</span><span class="p">:</span> <span class="p">{</span>
+      <span class="nt">&quot;reader&quot;</span><span class="p">:</span> <span class="p">{</span>
+        <span class="nt">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;streamreader&quot;</span><span class="p">,</span>
+        <span class="nt">&quot;parameter&quot;</span><span class="p">:</span> <span class="p">{</span>
+          <span class="nt">&quot;column&quot;</span><span class="p">:</span> <span class="p">[</span>
+            <span class="p">{</span>
+              <span class="nt">&quot;random&quot;</span><span class="p">:</span> <span class="s2">&quot;1,1000&quot;</span><span class="p">,</span>
+              <span class="nt">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;long&quot;</span>
+            <span class="p">},</span>
+            <span class="p">{</span>
+              <span class="nt">&quot;random&quot;</span><span class="p">:</span> <span class="s2">&quot;1,10&quot;</span><span class="p">,</span>
+              <span class="nt">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;string&quot;</span>
+            <span class="p">},</span>
+            <span class="p">{</span>
+              <span class="nt">&quot;random&quot;</span><span class="p">:</span> <span class="s2">&quot;1000,50000&quot;</span><span class="p">,</span>
+              <span class="nt">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;double&quot;</span>
+            <span class="p">}</span>
+          <span class="p">],</span>
+          <span class="nt">&quot;sliceRecordCount&quot;</span><span class="p">:</span> <span class="mi">1000</span>
+        <span class="p">}</span>
+      <span class="p">},</span>
+      <span class="nt">&quot;writer&quot;</span><span class="p">:</span> <span class="p">{</span>
+        <span class="nt">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;kuduwriter&quot;</span><span class="p">,</span>
+        <span class="nt">&quot;parameter&quot;</span><span class="p">:</span> <span class="p">{</span>
+          <span class="nt">&quot;masterAddress&quot;</span><span class="p">:</span> <span class="s2">&quot;127.0.0.1:7051,127.0.0.1:7151,127.0.0.1:7251&quot;</span><span class="p">,</span>
+          <span class="nt">&quot;timeout&quot;</span><span class="p">:</span> <span class="mi">60</span><span class="p">,</span>
+          <span class="nt">&quot;table&quot;</span><span class="p">:</span> <span class="s2">&quot;users&quot;</span><span class="p">,</span>
+          <span class="nt">&quot;writeMode&quot;</span><span class="p">:</span> <span class="s2">&quot;upsert&quot;</span><span class="p">,</span>
+          <span class="nt">&quot;column&quot;</span><span class="p">:</span> <span class="p">[</span> <span class="s2">&quot;user_id&quot;</span><span class="p">,</span> <span class="s2">&quot;user_name&quot;</span><span class="p">,</span> <span class="s2">&quot;salary&quot;</span><span class="p">],</span>
+          <span class="nt">&quot;batchSize&quot;</span><span class="p">:</span> <span class="mi">1024</span><span class="p">,</span>
+          <span class="nt">&quot;bufferSize&quot;</span><span class="p">:</span> <span class="mi">2048</span><span class="p">,</span>
+          <span class="nt">&quot;skipFail&quot;</span><span class="p">:</span> <span class="kc">false</span><span class="p">,</span>
+          <span class="nt">&quot;encoding&quot;</span><span class="p">:</span> <span class="s2">&quot;UTF-8&quot;</span>
         <span class="p">}</span>
       <span class="p">}</span>
-    <span class="p">]</span>
+    <span class="p">}</span>
   <span class="p">}</span>
 <span class="p">}</span>
 </code></pre></div>
@@ -1574,8 +1568,8 @@
 <td align="left">timeout</td>
 <td align="center">否</td>
 <td>int</td>
-<td>60</td>
-<td>写入数据超时时间(秒)</td>
+<td>100</td>
+<td>写入数据超时时间(秒), 0 表示不受限制</td>
 </tr>
 <tr>
 <td align="left">column</td>
@@ -1593,10 +1587,8 @@
 </tr>
 </tbody>
 </table>
-<h2 id="_5">已知限制<a class="headerlink" href="#_5" title="Permanent link">&para;</a></h2>
-<ol>
-<li>暂时不支持 <code>truncate table</code></li>
-</ol>
+<h2 id="column">column<a class="headerlink" href="#column" title="Permanent link">&para;</a></h2>
+<p><code>column</code> 可以直接指定要写入的列，如同上述例子，也可以设置 <code>["*"]</code> 来表示写入所有列。</p>
                 
               
               
@@ -1703,7 +1695,7 @@
     <script id="__config" type="application/json">{"base": "../..", "features": ["navigation.instant", "navigation.indexes", "content.code.annotate", "content.tabs.link", "navigation.top", "navigation.tracking", "search.highlight", "search.share", "search.suggest"], "translations": {"clipboard.copy": "\u590d\u5236", "clipboard.copied": "\u5df2\u590d\u5236", "search.config.lang": "ja", "search.config.pipeline": "trimmer, stemmer", "search.config.separator": "[\\uff0c\\u3002]+", "search.placeholder": "\u641c\u7d22", "search.result.placeholder": "\u952e\u5165\u4ee5\u5f00\u59cb\u641c\u7d22", "search.result.none": "\u6ca1\u6709\u627e\u5230\u7b26\u5408\u6761\u4ef6\u7684\u7ed3\u679c", "search.result.one": "\u627e\u5230 1 \u4e2a\u7b26\u5408\u6761\u4ef6\u7684\u7ed3\u679c", "search.result.other": "# \u4e2a\u7b26\u5408\u6761\u4ef6\u7684\u7ed3\u679c", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.term.missing": "Missing", "select.version.title": "Select version"}, "search": "../../assets/javascripts/workers/search.8397ff9e.min.js", "version": {"provider": "mike"}}</script>
     
     
-      <script src="../../assets/javascripts/bundle.1e84347e.min.js"></script>
+      <script src="../../assets/javascripts/bundle.f89c2efe.min.js"></script>
       
     
   </body>

@@ -1,7 +1,7 @@
 2021-02-19 13:38:15.860 [main] INFO  VMInfo - VMInfo# operatingSystem class => com.sun.management.internal.OperatingSystemImpl
 2021-02-19 13:38:15.895 [main] INFO  Engine -
 {
-	"content":[
+	"content":
 		{
 			"reader":{
 				"parameter":{
@@ -50,8 +50,7 @@
 				},
 				"name":"streamwriter"
 			}
-		}
-	],
+		},
 	"setting":{
 		"errorLimit":{
 			"record":0,

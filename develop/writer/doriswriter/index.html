@@ -16,7 +16,7 @@
         <link rel="canonical" href="https://wgzhao.github.io/Addax/develop/writer/doriswriter/">
       
       <link rel="icon" href="../../images/favicon.ico">
-      <meta name="generator" content="mkdocs-1.2.3, mkdocs-material-7.3.4">
+      <meta name="generator" content="mkdocs-1.2.3, mkdocs-material-7.3.3">
     
     
       
@@ -24,7 +24,7 @@
       
     
     
-      <link rel="stylesheet" href="../../assets/stylesheets/main.db9e7362.min.css">
+      <link rel="stylesheet" href="../../assets/stylesheets/main.5143246d.min.css">
       
         
         <link rel="stylesheet" href="../../assets/stylesheets/palette.3f5d1f46.min.css">
@@ -955,7 +955,14 @@
     参数说明
   </a>
   
-    <nav class="md-nav" aria-label="参数说明">
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#endpoint" class="md-nav__link">
+    endpoint
+  </a>
+  
+    <nav class="md-nav" aria-label="endpoint">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
@@ -1390,7 +1397,14 @@
     参数说明
   </a>
   
-    <nav class="md-nav" aria-label="参数说明">
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#endpoint" class="md-nav__link">
+    endpoint
+  </a>
+  
+    <nav class="md-nav" aria-label="endpoint">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
@@ -1419,21 +1433,21 @@
                 
                 
                 <h1 id="doris-writer">Doris Writer<a class="headerlink" href="#doris-writer" title="Permanent link">&para;</a></h1>
-<p>DorisWriter 插件用于向 <a href="http://doris.incubator.apache.org/master/zh-CN/">Doris</a> 数据库以流式方式写入数据。
-其实现上是通过访问 Doris http 连接(8030)，然后通过 <a href="http://doris.incubator.apache.org/master/zh-CN/administrator-guide/load-data/stream-load-manual.html">stream load</a>
+<p>DorisWriter 插件用于向 <a href="http://doris.incubator.apache.org/master/zh-CN/">Doris</a> 数据库以流式方式写入数据。 其实现上是通过访问 Doris http 连接(8030)
+，然后通过 <a href="http://doris.incubator.apache.org/master/zh-CN/administrator-guide/load-data/stream-load-manual.html">stream load</a>
 加载数据到数据中，相比 <code>insert into</code> 方式效率要高不少，也是官方推荐的生产环境下的数据加载方式。</p>
-<p>Doris 是一个兼容 MySQL 协议的数据库后端，因此 Doris 读取可以使用 <a href="../../reader/mysqlreader">MySQLReader</a> 进行访问。 </p>
+<p>Doris 是一个兼容 MySQL 协议的数据库后端，因此 Doris 读取可以使用 <a href="../../reader/mysqlreader">MySQLReader</a> 进行访问。</p>
 <h2 id="_1">示例<a class="headerlink" href="#_1" title="Permanent link">&para;</a></h2>
 <p>假定要写入的表的建表语句如下：</p>
-<div class="highlight"><pre><span></span><code><span class="k">CREATE</span> <span class="k">DATABASE</span> <span class="n">example_db</span><span class="p">;</span>
+<div class="highlight"><pre><span></span><code><span class="k">CREATE</span>
+<span class="k">DATABASE</span> <span class="n">example_db</span><span class="p">;</span>
 <span class="k">CREATE</span> <span class="k">TABLE</span> <span class="n">example_db</span><span class="p">.</span><span class="n">table1</span>
 <span class="p">(</span>
-    <span class="n">siteid</span> <span class="nb">INT</span> <span class="k">DEFAULT</span> <span class="s1">&#39;10&#39;</span><span class="p">,</span>
+    <span class="n">siteid</span>   <span class="nb">INT</span>         <span class="k">DEFAULT</span> <span class="s1">&#39;10&#39;</span><span class="p">,</span>
     <span class="n">citycode</span> <span class="nb">SMALLINT</span><span class="p">,</span>
     <span class="n">username</span> <span class="nb">VARCHAR</span><span class="p">(</span><span class="mi">32</span><span class="p">)</span> <span class="k">DEFAULT</span> <span class="s1">&#39;&#39;</span><span class="p">,</span>
-    <span class="n">pv</span> <span class="nb">BIGINT</span> <span class="k">SUM</span> <span class="k">DEFAULT</span> <span class="s1">&#39;0&#39;</span>
-<span class="p">)</span>
-<span class="k">AGGREGATE</span> <span class="k">KEY</span><span class="p">(</span><span class="n">siteid</span><span class="p">,</span> <span class="n">citycode</span><span class="p">,</span> <span class="n">username</span><span class="p">)</span>
+    <span class="n">pv</span>       <span class="nb">BIGINT</span> <span class="k">SUM</span> <span class="k">DEFAULT</span> <span class="s1">&#39;0&#39;</span>
+<span class="p">)</span> <span class="k">AGGREGATE</span> <span class="k">KEY</span><span class="p">(</span><span class="n">siteid</span><span class="p">,</span> <span class="n">citycode</span><span class="p">,</span> <span class="n">username</span><span class="p">)</span>
 <span class="n">DISTRIBUTED</span> <span class="k">BY</span> <span class="n">HASH</span><span class="p">(</span><span class="n">siteid</span><span class="p">)</span> <span class="n">BUCKETS</span> <span class="mi">10</span>
 <span class="n">PROPERTIES</span><span class="p">(</span><span class="ss">&quot;replication_num&quot;</span> <span class="o">=</span> <span class="ss">&quot;1&quot;</span><span class="p">);</span>
 </code></pre></div>
@@ -1445,49 +1459,50 @@
         <span class="nt">&quot;channel&quot;</span><span class="p">:</span> <span class="mi">2</span>
       <span class="p">}</span>
     <span class="p">},</span>
-    <span class="nt">&quot;content&quot;</span><span class="p">:</span> <span class="p">[</span>
-      <span class="p">{</span>
-        <span class="nt">&quot;writer&quot;</span><span class="p">:</span> <span class="p">{</span>
-          <span class="nt">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;doriswriter&quot;</span><span class="p">,</span>
-          <span class="nt">&quot;parameter&quot;</span><span class="p">:</span> <span class="p">{</span>
-            <span class="nt">&quot;username&quot;</span><span class="p">:</span> <span class="s2">&quot;test&quot;</span><span class="p">,</span>
-            <span class="nt">&quot;password&quot;</span><span class="p">:</span> <span class="s2">&quot;123456&quot;</span><span class="p">,</span>
-            <span class="nt">&quot;batchSize&quot;</span><span class="p">:</span> <span class="mi">1024</span><span class="p">,</span>
-            <span class="nt">&quot;connection&quot;</span><span class="p">:</span> <span class="p">[</span>
-              <span class="p">{</span>
-                <span class="nt">&quot;table&quot;</span><span class="p">:</span> <span class="s2">&quot;table1&quot;</span><span class="p">,</span>
-                <span class="nt">&quot;database&quot;</span><span class="p">:</span> <span class="s2">&quot;example_db&quot;</span><span class="p">,</span>
-                <span class="nt">&quot;endpoint&quot;</span><span class="p">:</span> <span class="s2">&quot;http://127.0.0.1:8030/&quot;</span>
-              <span class="p">}</span>
-            <span class="p">]</span>
-          <span class="p">}</span>
-        <span class="p">},</span>
-        <span class="nt">&quot;reader&quot;</span><span class="p">:</span> <span class="p">{</span>
-          <span class="nt">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;streamreader&quot;</span><span class="p">,</span>
-          <span class="nt">&quot;parameter&quot;</span><span class="p">:</span> <span class="p">{</span>
-            <span class="nt">&quot;column&quot;</span><span class="p">:</span> <span class="p">[</span>
-              <span class="p">{</span>
-                <span class="nt">&quot;random&quot;</span><span class="p">:</span> <span class="s2">&quot;1,500&quot;</span><span class="p">,</span>
-                <span class="nt">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;long&quot;</span>
-              <span class="p">},</span>
-              <span class="p">{</span>
-                <span class="nt">&quot;random&quot;</span><span class="p">:</span> <span class="s2">&quot;1,127&quot;</span><span class="p">,</span>
-                <span class="nt">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;long&quot;</span>
-              <span class="p">},</span>
-              <span class="p">{</span>
-                <span class="nt">&quot;value&quot;</span><span class="p">:</span> <span class="s2">&quot;this is a text&quot;</span><span class="p">,</span>
-                <span class="nt">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;string&quot;</span>
-              <span class="p">},</span>
-              <span class="p">{</span>
-                <span class="nt">&quot;random&quot;</span><span class="p">:</span> <span class="s2">&quot;5,200&quot;</span><span class="p">,</span>
-                <span class="nt">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;long&quot;</span>
-              <span class="p">}</span>
-            <span class="p">],</span>
-            <span class="nt">&quot;sliceRecordCount&quot;</span><span class="p">:</span> <span class="mi">100</span>
-          <span class="p">}</span>
+    <span class="nt">&quot;content&quot;</span><span class="p">:</span> <span class="p">{</span>
+      <span class="nt">&quot;writer&quot;</span><span class="p">:</span> <span class="p">{</span>
+        <span class="nt">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;doriswriter&quot;</span><span class="p">,</span>
+        <span class="nt">&quot;parameter&quot;</span><span class="p">:</span> <span class="p">{</span>
+          <span class="nt">&quot;username&quot;</span><span class="p">:</span> <span class="s2">&quot;test&quot;</span><span class="p">,</span>
+          <span class="nt">&quot;password&quot;</span><span class="p">:</span> <span class="s2">&quot;123456&quot;</span><span class="p">,</span>
+          <span class="nt">&quot;batchSize&quot;</span><span class="p">:</span> <span class="mi">1024</span><span class="p">,</span>
+          <span class="nt">&quot;connection&quot;</span><span class="p">:</span> <span class="p">[</span>
+            <span class="p">{</span>
+              <span class="nt">&quot;table&quot;</span><span class="p">:</span> <span class="s2">&quot;table1&quot;</span><span class="p">,</span>
+              <span class="nt">&quot;database&quot;</span><span class="p">:</span> <span class="s2">&quot;example_db&quot;</span><span class="p">,</span>
+              <span class="nt">&quot;endpoint&quot;</span><span class="p">:</span> <span class="s2">&quot;http://127.0.0.1:8030/&quot;</span>
+            <span class="p">}</span>
+          <span class="p">],</span>
+          <span class="nt">&quot;loadProps&quot;</span><span class="p">:</span> <span class="p">{},</span>
+          <span class="nt">&quot;lineDelimiter&quot;</span><span class="p">:</span> <span class="s2">&quot;\n&quot;</span><span class="p">,</span>
+          <span class="nt">&quot;format&quot;</span><span class="p">:</span> <span class="s2">&quot;csv&quot;</span>
+        <span class="p">}</span>
+      <span class="p">},</span>
+      <span class="nt">&quot;reader&quot;</span><span class="p">:</span> <span class="p">{</span>
+        <span class="nt">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;streamreader&quot;</span><span class="p">,</span>
+        <span class="nt">&quot;parameter&quot;</span><span class="p">:</span> <span class="p">{</span>
+          <span class="nt">&quot;column&quot;</span><span class="p">:</span> <span class="p">[</span>
+            <span class="p">{</span>
+              <span class="nt">&quot;random&quot;</span><span class="p">:</span> <span class="s2">&quot;1,500&quot;</span><span class="p">,</span>
+              <span class="nt">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;long&quot;</span>
+            <span class="p">},</span>
+            <span class="p">{</span>
+              <span class="nt">&quot;random&quot;</span><span class="p">:</span> <span class="s2">&quot;1,127&quot;</span><span class="p">,</span>
+              <span class="nt">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;long&quot;</span>
+            <span class="p">},</span>
+            <span class="p">{</span>
+              <span class="nt">&quot;value&quot;</span><span class="p">:</span> <span class="s2">&quot;this is a text&quot;</span><span class="p">,</span>
+              <span class="nt">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;string&quot;</span>
+            <span class="p">},</span>
+            <span class="p">{</span>
+              <span class="nt">&quot;random&quot;</span><span class="p">:</span> <span class="s2">&quot;5,200&quot;</span><span class="p">,</span>
+              <span class="nt">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;long&quot;</span>
+            <span class="p">}</span>
+          <span class="p">],</span>
+          <span class="nt">&quot;sliceRecordCount&quot;</span><span class="p">:</span> <span class="mi">100</span>
         <span class="p">}</span>
       <span class="p">}</span>
-    <span class="p">]</span>
+    <span class="p">}</span>
   <span class="p">}</span>
 <span class="p">}</span>
 </code></pre></div>
@@ -1499,8 +1514,7 @@
 <div class="highlight"><pre><span></span><code>2021-02-23 15:22:57.851 [main] INFO  VMInfo - VMInfo# operatingSystem class =&gt; sun.management.OperatingSystemImpl
 2021-02-23 15:22:57.871 [main] INFO  Engine -
 {
-&quot;content&quot;:[
-{
+&quot;content&quot;:{
 &quot;reader&quot;:{
     &quot;parameter&quot;:{
             &quot;column&quot;:[
@@ -1535,9 +1549,8 @@
             &quot;username&quot;:&quot;test&quot;
     },
     &quot;name&quot;:&quot;doriswriter&quot;
-}
-}
-],
+ }
+},
 &quot;setting&quot;:{
 &quot;speed&quot;:{
 &quot;channel&quot;:2
@@ -1618,13 +1631,46 @@
 <td>1024</td>
 <td>定义了插件和数据库服务器端每次批量数据获取条数，调高该值可能导致 Addax 出现OOM或者目标数据库事务提交失败导致挂起</td>
 </tr>
+<tr>
+<td align="left">lineDelimiter</td>
+<td align="center">否</td>
+<td>string</td>
+<td><code>\n</code></td>
+<td>每行的的分隔符,支持多个字节, 例如 <code>\x02\x03</code></td>
+</tr>
+<tr>
+<td align="left">format</td>
+<td align="center">否</td>
+<td>string</td>
+<td><code>csv</code></td>
+<td>导入数据的格式, 可以使是 json 或者 csv</td>
+</tr>
+<tr>
+<td align="left">loadProps</td>
+<td align="center">否</td>
+<td>map</td>
+<td><code>csv</code></td>
+<td>streamLoad 的请求参数，详情参照<a href="https://doris.apache.org/master/zh-CN/administrator-guide/load-data/load-json-format.html#stream-load">StreamLoad介绍页面</a></td>
+</tr>
+<tr>
+<td align="left">connectTimeout</td>
+<td align="center">否</td>
+<td>int</td>
+<td>-1</td>
+<td>StreamLoad单次请求的超时时间, 单位毫秒(ms)</td>
+</tr>
 </tbody>
 </table>
+<h2 id="endpoint">endpoint<a class="headerlink" href="#endpoint" title="Permanent link">&para;</a></h2>
+<p><code>endpoint</code> 只是的任意一个 BE 的主机名及 <code>webserver_port</code> 端口，官方文档描述也可以填写 FE 主机名和 <code>http_port</code> 端口，但实际测试一直处于连接拒绝状态。</p>
 <h3 id="column">column<a class="headerlink" href="#column" title="Permanent link">&para;</a></h3>
-<p>该插件中的 <code>column</code> 不是必须项，如果没有配置该项，或者配置为 <code>["*"]</code> ， 则按照 reader 插件获取的字段值进行顺序拼装。
-否则可以按照如下方式指定需要插入的字段</p>
+<p>该插件中的 <code>column</code> 不是必须项，如果没有配置该项，或者配置为 <code>["*"]</code> ， 则按照 reader 插件获取的字段值进行顺序拼装。 否则可以按照如下方式指定需要插入的字段</p>
 <div class="highlight"><pre><span></span><code><span class="p">{</span>
-  <span class="nt">&quot;column&quot;</span><span class="p">:</span> <span class="p">[</span><span class="s2">&quot;siteid&quot;</span><span class="p">,</span><span class="s2">&quot;citycode&quot;</span><span class="p">,</span><span class="s2">&quot;username&quot;</span><span class="p">]</span>
+  <span class="nt">&quot;column&quot;</span><span class="p">:</span> <span class="p">[</span>
+    <span class="s2">&quot;siteid&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;citycode&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;username&quot;</span>
+  <span class="p">]</span>
 <span class="p">}</span>
 </code></pre></div>
                 
@@ -1733,7 +1779,7 @@
     <script id="__config" type="application/json">{"base": "../..", "features": ["navigation.instant", "navigation.indexes", "content.code.annotate", "content.tabs.link", "navigation.top", "navigation.tracking", "search.highlight", "search.share", "search.suggest"], "translations": {"clipboard.copy": "\u590d\u5236", "clipboard.copied": "\u5df2\u590d\u5236", "search.config.lang": "ja", "search.config.pipeline": "trimmer, stemmer", "search.config.separator": "[\\uff0c\\u3002]+", "search.placeholder": "\u641c\u7d22", "search.result.placeholder": "\u952e\u5165\u4ee5\u5f00\u59cb\u641c\u7d22", "search.result.none": "\u6ca1\u6709\u627e\u5230\u7b26\u5408\u6761\u4ef6\u7684\u7ed3\u679c", "search.result.one": "\u627e\u5230 1 \u4e2a\u7b26\u5408\u6761\u4ef6\u7684\u7ed3\u679c", "search.result.other": "# \u4e2a\u7b26\u5408\u6761\u4ef6\u7684\u7ed3\u679c", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.term.missing": "Missing", "select.version.title": "Select version"}, "search": "../../assets/javascripts/workers/search.8397ff9e.min.js", "version": {"provider": "mike"}}</script>
     
     
-      <script src="../../assets/javascripts/bundle.1e84347e.min.js"></script>
+      <script src="../../assets/javascripts/bundle.f89c2efe.min.js"></script>
       
     
   </body>

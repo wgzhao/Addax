@@ -1,48 +1,34 @@
 {
-  "job": {
-    "setting": {
-      "speed": {
-        "byte": -1,
-        "channel": 1
-      },
-      "errorLimit": {
-        "record": 0,
-        "percentage": 0.02
+  "content": {
+    "reader": {
+      "name": "streamreader",
+      "parameter": {
+        "column": [
+          {
+            "value": "addax",
+            "type": "string"
+          },
+          {
+            "value": 19890604,
+            "type": "long"
+          },
+          {
+            "value": "1989-06-04 00:00:00",
+            "type": "date"
+          },
+          {
+            "value": true,
+            "type": "bool"
+          }
+        ],
+        "sliceRecordCount": 10
       }
     },
-    "content": [
-      {
-        "reader": {
-          "name": "streamreader",
-          "parameter": {
-            "column": [
-              {
-                "value": "addax",
-                "type": "string"
-              },
-              {
-                "value": 19890604,
-                "type": "long"
-              },
-              {
-                "value": "1989-06-04 00:00:00",
-                "type": "date"
-              },
-              {
-                "value": true,
-                "type": "bool"
-              }
-            ],
-            "sliceRecordCount": 10
-          }
-        },
-        "writer": {
-          "name": "streamwriter",
-          "parameter": {
-            "print": true
-          }
-        }
+    "writer": {
+      "name": "streamwriter",
+      "parameter": {
+        "print": true
       }
-    ]
+    }
   }
 }

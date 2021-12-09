@@ -6,37 +6,35 @@
         "channel": 1
       }
     },
-    "content": [
-      {
-        "reader": {
-          "name": "sqlserverreader",
-          "parameter": {
-            "username": "root",
-            "password": "root",
-            "column": [
-              "*"
-            ],
-            "splitPk": "db_id",
-            "connection": [
-              {
-                "table": [
-                  "table"
-                ],
-                "jdbcUrl": [
-                  "jdbc:sqlserver://localhost:3433;DatabaseName=dbname"
-                ]
-              }
-            ]
-          }
-        },
-        "writer": {
-          "name": "streamwriter",
-          "parameter": {
-            "print": true,
-            "encoding": "UTF-8"
-          }
+    "content": {
+      "reader": {
+        "name": "sqlserverreader",
+        "parameter": {
+          "username": "root",
+          "password": "root",
+          "column": [
+            "*"
+          ],
+          "splitPk": "db_id",
+          "connection": [
+            {
+              "table": [
+                "table"
+              ],
+              "jdbcUrl": [
+                "jdbc:sqlserver://localhost:3433;DatabaseName=dbname"
+              ]
+            }
+          ]
+        }
+      },
+      "writer": {
+        "name": "streamwriter",
+        "parameter": {
+          "print": true,
+          "encoding": "UTF-8"
         }
       }
-    ]
+    }
   }
 }

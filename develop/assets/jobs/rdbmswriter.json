@@ -36,28 +36,24 @@
         }
       },
       "writer": {
-        "name": "mysqlwriter",
+        "name": "rdbmswriter",
         "parameter": {
-          "writeMode": "insert",
-          "username": "root",
-          "password": "",
+          "connection": [
+            {
+              "jdbcUrl": "jdbc:dm://ip:port/database",
+              "table": [
+                "table"
+              ]
+            }
+          ],
+          "username": "username",
+          "password": "password",
+          "driver": "dm.jdbc.driver.DmDriver",
           "column": [
             "*"
           ],
-          "session": [
-            "set session sql_mode='ANSI'"
-          ],
           "preSql": [
-            "delete from @table"
-          ],
-          "connection": [
-            {
-              "jdbcUrl": "jdbc:mysql://127.0.0.1:3306/test?useSSL=false",
-              "table": [
-                "addax_tbl"
-              ],
-              "driver": "com.mysql.jdbc.Driver"
-            }
+            "delete from XXX;"
           ]
         }
       }

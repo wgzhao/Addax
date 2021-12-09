@@ -16,7 +16,7 @@
         <link rel="canonical" href="https://wgzhao.github.io/Addax/develop/writer/hbase20xsqlwriter/">
       
       <link rel="icon" href="../../images/favicon.ico">
-      <meta name="generator" content="mkdocs-1.2.3, mkdocs-material-7.3.4">
+      <meta name="generator" content="mkdocs-1.2.3, mkdocs-material-7.3.3">
     
     
       
@@ -24,7 +24,7 @@
       
     
     
-      <link rel="stylesheet" href="../../assets/stylesheets/main.db9e7362.min.css">
+      <link rel="stylesheet" href="../../assets/stylesheets/main.5143246d.min.css">
       
         
         <link rel="stylesheet" href="../../assets/stylesheets/palette.3f5d1f46.min.css">
@@ -1053,6 +1053,19 @@
     参数说明
   </a>
   
+    <nav class="md-nav" aria-label="参数说明">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#jdbcurl" class="md-nav__link">
+    jdbcUrl
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
 </li>
       
     </ul>
@@ -1377,6 +1390,19 @@
     参数说明
   </a>
   
+    <nav class="md-nav" aria-label="参数说明">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#jdbcurl" class="md-nav__link">
+    jdbcUrl
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
 </li>
       
     </ul>
@@ -1398,51 +1424,49 @@
 <h2 id="_1">配置样例<a class="headerlink" href="#_1" title="Permanent link">&para;</a></h2>
 <div class="highlight"><pre><span></span><code><span class="p">{</span>
   <span class="nt">&quot;job&quot;</span><span class="p">:</span> <span class="p">{</span>
-    <span class="nt">&quot;content&quot;</span><span class="p">:</span> <span class="p">[</span>
-      <span class="p">{</span>
-        <span class="nt">&quot;reader&quot;</span><span class="p">:</span> <span class="p">{</span>
-          <span class="nt">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;txtfilereader&quot;</span><span class="p">,</span>
-          <span class="nt">&quot;parameter&quot;</span><span class="p">:</span> <span class="p">{</span>
-            <span class="nt">&quot;path&quot;</span><span class="p">:</span> <span class="s2">&quot;/tmp/normal.txt&quot;</span><span class="p">,</span>
-            <span class="nt">&quot;charset&quot;</span><span class="p">:</span> <span class="s2">&quot;UTF-8&quot;</span><span class="p">,</span>
-            <span class="nt">&quot;column&quot;</span><span class="p">:</span> <span class="p">[</span>
-              <span class="p">{</span>
-                <span class="nt">&quot;index&quot;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span>
-                <span class="nt">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;String&quot;</span>
-              <span class="p">},</span>
-              <span class="p">{</span>
-                <span class="nt">&quot;index&quot;</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span>
-                <span class="nt">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;string&quot;</span>
-              <span class="p">},</span>
-              <span class="p">{</span>
-                <span class="nt">&quot;index&quot;</span><span class="p">:</span> <span class="mi">2</span><span class="p">,</span>
-                <span class="nt">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;string&quot;</span>
-              <span class="p">},</span>
-              <span class="p">{</span>
-                <span class="nt">&quot;index&quot;</span><span class="p">:</span> <span class="mi">3</span><span class="p">,</span>
-                <span class="nt">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;string&quot;</span>
-              <span class="p">}</span>
-            <span class="p">],</span>
-            <span class="nt">&quot;fieldDelimiter&quot;</span><span class="p">:</span> <span class="s2">&quot;,&quot;</span>
-          <span class="p">}</span>
-        <span class="p">},</span>
-        <span class="nt">&quot;writer&quot;</span><span class="p">:</span> <span class="p">{</span>
-          <span class="nt">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;hbase20xsqlwriter&quot;</span><span class="p">,</span>
-          <span class="nt">&quot;parameter&quot;</span><span class="p">:</span> <span class="p">{</span>
-            <span class="nt">&quot;batchSize&quot;</span><span class="p">:</span> <span class="s2">&quot;100&quot;</span><span class="p">,</span>
-            <span class="nt">&quot;column&quot;</span><span class="p">:</span> <span class="p">[</span>
-              <span class="s2">&quot;UID&quot;</span><span class="p">,</span>
-              <span class="s2">&quot;TS&quot;</span><span class="p">,</span>
-              <span class="s2">&quot;EVENTID&quot;</span><span class="p">,</span>
-              <span class="s2">&quot;CONTENT&quot;</span>
-            <span class="p">],</span>
-            <span class="nt">&quot;queryServerAddress&quot;</span><span class="p">:</span> <span class="s2">&quot;http://127.0.0.1:8765&quot;</span><span class="p">,</span>
-            <span class="nt">&quot;nullMode&quot;</span><span class="p">:</span> <span class="s2">&quot;skip&quot;</span><span class="p">,</span>
-            <span class="nt">&quot;table&quot;</span><span class="p">:</span> <span class="s2">&quot;TEST_TBL&quot;</span>
-          <span class="p">}</span>
+    <span class="nt">&quot;content&quot;</span><span class="p">:</span> <span class="p">{</span>
+      <span class="nt">&quot;reader&quot;</span><span class="p">:</span> <span class="p">{</span>
+        <span class="nt">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;txtfilereader&quot;</span><span class="p">,</span>
+        <span class="nt">&quot;parameter&quot;</span><span class="p">:</span> <span class="p">{</span>
+          <span class="nt">&quot;path&quot;</span><span class="p">:</span> <span class="s2">&quot;/tmp/normal.txt&quot;</span><span class="p">,</span>
+          <span class="nt">&quot;charset&quot;</span><span class="p">:</span> <span class="s2">&quot;UTF-8&quot;</span><span class="p">,</span>
+          <span class="nt">&quot;column&quot;</span><span class="p">:</span> <span class="p">[</span>
+            <span class="p">{</span>
+              <span class="nt">&quot;index&quot;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span>
+              <span class="nt">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;String&quot;</span>
+            <span class="p">},</span>
+            <span class="p">{</span>
+              <span class="nt">&quot;index&quot;</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span>
+              <span class="nt">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;string&quot;</span>
+            <span class="p">},</span>
+            <span class="p">{</span>
+              <span class="nt">&quot;index&quot;</span><span class="p">:</span> <span class="mi">2</span><span class="p">,</span>
+              <span class="nt">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;string&quot;</span>
+            <span class="p">},</span>
+            <span class="p">{</span>
+              <span class="nt">&quot;index&quot;</span><span class="p">:</span> <span class="mi">3</span><span class="p">,</span>
+              <span class="nt">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;string&quot;</span>
+            <span class="p">}</span>
+          <span class="p">],</span>
+          <span class="nt">&quot;fieldDelimiter&quot;</span><span class="p">:</span> <span class="s2">&quot;,&quot;</span>
+        <span class="p">}</span>
+      <span class="p">},</span>
+      <span class="nt">&quot;writer&quot;</span><span class="p">:</span> <span class="p">{</span>
+        <span class="nt">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;hbase20xsqlwriter&quot;</span><span class="p">,</span>
+        <span class="nt">&quot;parameter&quot;</span><span class="p">:</span> <span class="p">{</span>
+          <span class="nt">&quot;batchSize&quot;</span><span class="p">:</span> <span class="s2">&quot;100&quot;</span><span class="p">,</span>
+          <span class="nt">&quot;column&quot;</span><span class="p">:</span> <span class="p">[</span>
+            <span class="s2">&quot;UID&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;TS&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;EVENTID&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;CONTENT&quot;</span>
+          <span class="p">],</span>
+          <span class="nt">&quot;queryServerAddress&quot;</span><span class="p">:</span> <span class="s2">&quot;http://127.0.0.1:8765&quot;</span><span class="p">,</span>
+          <span class="nt">&quot;nullMode&quot;</span><span class="p">:</span> <span class="s2">&quot;skip&quot;</span><span class="p">,</span>
+          <span class="nt">&quot;table&quot;</span><span class="p">:</span> <span class="s2">&quot;TEST_TBL&quot;</span>
         <span class="p">}</span>
       <span class="p">}</span>
-    <span class="p">],</span>
+    <span class="p">},</span>
     <span class="nt">&quot;setting&quot;</span><span class="p">:</span> <span class="p">{</span>
       <span class="nt">&quot;speed&quot;</span><span class="p">:</span> <span class="p">{</span>
         <span class="nt">&quot;channel&quot;</span><span class="p">:</span> <span class="mi">5</span><span class="p">,</span>
@@ -1464,16 +1488,10 @@
 </thead>
 <tbody>
 <tr>
-<td align="left">queryServerAddress</td>
+<td align="left">jdbcUrl</td>
 <td align="center">是</td>
 <td>无</td>
-<td>Phoenix QueryServer 地址, 该插件通过 PQS 进行连接</td>
-</tr>
-<tr>
-<td align="left">serialization</td>
-<td align="center">否</td>
-<td>PROTOBUF</td>
-<td>QueryServer使用的序列化协议</td>
+<td>Phoenix 连接地址</td>
 </tr>
 <tr>
 <td align="left">table</td>
@@ -1505,8 +1523,49 @@
 <td>skip</td>
 <td>读取的null值时，如何处理, <code>skip</code> 表示不向hbase写这列；<code>empty</code>：写入 <code>HConstants.EMPTY_BYTE_ARRAY</code>，即<code>new byte [0]</code></td>
 </tr>
+<tr>
+<td align="left">haveKerberos</td>
+<td align="center">否</td>
+<td>false</td>
+<td>是否启用Kerberos认证, true 表示启用, false 表示不启用</td>
+</tr>
+<tr>
+<td align="left">kerberosPrincipal</td>
+<td align="center">否</td>
+<td>null</td>
+<td>kerberos 凭证信息，仅当 <code>havekerberos</code> 启用后有效</td>
+</tr>
+<tr>
+<td align="left">kerberosKeytabFilePath</td>
+<td align="center">否</td>
+<td>null</td>
+<td>kerberos 凭证文件的绝对路径，仅当 <code>havekerberos</code> 启用后有效</td>
+</tr>
 </tbody>
 </table>
+<h3 id="jdbcurl">jdbcUrl<a class="headerlink" href="#jdbcurl" title="Permanent link">&para;</a></h3>
+<p><code>queryServerAddress</code> 是满足 Phoenix 链接的地址，具体格式和要求可以参考<a href="http://phoenix.apache.org/index.html">官方文档</a> ，其 jdbc 连接串格式如下：</p>
+<div class="highlight"><pre><span></span><code><span class="nl">jdbc:</span><span class="n">phoenix</span> <span class="o">[</span> <span class="p">:</span><span class="o">&lt;</span><span class="n">zookeeper</span> <span class="n">quorum</span><span class="o">&gt;</span> <span class="o">[</span> <span class="p">:</span><span class="o">&lt;</span><span class="n">port</span> <span class="n">number</span><span class="o">&gt;</span> <span class="o">[</span> <span class="p">:</span><span class="o">&lt;</span><span class="n">root</span> <span class="n">node</span><span class="o">&gt;</span> <span class="o">[</span> <span class="p">:</span><span class="o">&lt;</span><span class="n">principal</span><span class="o">&gt;</span> <span class="o">[</span> <span class="p">:</span><span class="o">&lt;</span><span class="n">keytab</span> <span class="n">file</span><span class="o">&gt;</span> <span class="o">]</span> <span class="o">]</span> <span class="o">]</span> <span class="o">]</span> <span class="o">]</span> 
+</code></pre></div>
+<ul>
+<li>zookeeper quorum: zookeeper 集群地址，多个地址用逗号分隔，如：<code>node1,node2,node3</code></li>
+<li>port number: zookeeper 集群端口，默认为 2181</li>
+<li>root node: zookeeper 集群根节点，默认为 <code>/hbase</code>，启用 kerberos 后，默认为 <code>/hbase-secure</code></li>
+<li>principal: kerberos 凭证信息，仅当 <code>havekerberos</code> 启用后有效</li>
+<li>keytab file: kerberos 凭证文件的绝对路径，仅当 <code>havekerberos</code> 启用后有效</li>
+</ul>
+<p>如果你希望通过连接 Phoenix Query Server (a.k.a PQS) ，则 JDBC 连接串如下：</p>
+<div class="highlight"><pre><span></span><code><span class="nl">jdbc:</span><span class="n">phoenix</span><span class="p">:</span><span class="n">thin</span><span class="p">:</span><span class="n">url</span><span class="o">=&lt;</span><span class="n">scheme</span><span class="o">&gt;</span><span class="p">:</span><span class="c1">//&lt;server-hostname&gt;:&lt;port&gt;[;option=value...]</span>
+</code></pre></div>
+<ul>
+<li>schema: 传输协议，<code>http</code> 或 <code>https</code>，默认为 <code>http</code></li>
+<li>server-hostname: Phoenix Query Server 地址，如：<code>node1</code></li>
+<li>port: Phoenix Query Server 端口，默认为 8765</li>
+<li>option: 可选参数，可以是多个，用逗号分隔，如：<code>option1=value1,option2=value2</code></li>
+</ul>
+<p>更详细的描述，可以参考<a href="https://phoenix.apache.org/documentation/queryserver/connect.html">官方文档</a></p>
+<p>注意：启用kerberos认证后，程序需要知道<code>hbase-site.xml</code> 所在的路径，一种办法是运行执行在环境变量 <code>CLASSPATH</code> 中增加该文件的所在路径。</p>
+<p>另外一个解决办法是将 <code>hbase-site.xml</code> 文件拷贝到插件的 <code>libs</code> 目录里。</p>
                 
               
               
@@ -1613,7 +1672,7 @@
     <script id="__config" type="application/json">{"base": "../..", "features": ["navigation.instant", "navigation.indexes", "content.code.annotate", "content.tabs.link", "navigation.top", "navigation.tracking", "search.highlight", "search.share", "search.suggest"], "translations": {"clipboard.copy": "\u590d\u5236", "clipboard.copied": "\u5df2\u590d\u5236", "search.config.lang": "ja", "search.config.pipeline": "trimmer, stemmer", "search.config.separator": "[\\uff0c\\u3002]+", "search.placeholder": "\u641c\u7d22", "search.result.placeholder": "\u952e\u5165\u4ee5\u5f00\u59cb\u641c\u7d22", "search.result.none": "\u6ca1\u6709\u627e\u5230\u7b26\u5408\u6761\u4ef6\u7684\u7ed3\u679c", "search.result.one": "\u627e\u5230 1 \u4e2a\u7b26\u5408\u6761\u4ef6\u7684\u7ed3\u679c", "search.result.other": "# \u4e2a\u7b26\u5408\u6761\u4ef6\u7684\u7ed3\u679c", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.term.missing": "Missing", "select.version.title": "Select version"}, "search": "../../assets/javascripts/workers/search.8397ff9e.min.js", "version": {"provider": "mike"}}</script>
     
     
-      <script src="../../assets/javascripts/bundle.1e84347e.min.js"></script>
+      <script src="../../assets/javascripts/bundle.f89c2efe.min.js"></script>
       
     
   </body>

@@ -16,7 +16,7 @@
         <link rel="canonical" href="https://wgzhao.github.io/Addax/develop/quickstart/">
       
       <link rel="icon" href="../images/favicon.ico">
-      <meta name="generator" content="mkdocs-1.2.3, mkdocs-material-7.3.4">
+      <meta name="generator" content="mkdocs-1.2.3, mkdocs-material-7.3.3">
     
     
       
@@ -24,7 +24,7 @@
       
     
     
-      <link rel="stylesheet" href="../assets/stylesheets/main.db9e7362.min.css">
+      <link rel="stylesheet" href="../assets/stylesheets/main.5143246d.min.css">
       
         
         <link rel="stylesheet" href="../assets/stylesheets/palette.3f5d1f46.min.css">
@@ -294,10 +294,30 @@
     安装 Addax
   </a>
   
+    <nav class="md-nav" aria-label="安装 Addax">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#_2" class="md-nav__link">
+    一键安装
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#_3" class="md-nav__link">
+    源代码编译安装
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
 </li>
       
         <li class="md-nav__item">
-  <a href="#_2" class="md-nav__link">
+  <a href="#_4" class="md-nav__link">
     开始第一个采集任务
   </a>
   
@@ -1368,10 +1388,30 @@
     安装 Addax
   </a>
   
+    <nav class="md-nav" aria-label="安装 Addax">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#_2" class="md-nav__link">
+    一键安装
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#_3" class="md-nav__link">
+    源代码编译安装
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
 </li>
       
         <li class="md-nav__item">
-  <a href="#_2" class="md-nav__link">
+  <a href="#_4" class="md-nav__link">
     开始第一个采集任务
   </a>
   
@@ -1392,74 +1432,54 @@
                 
                 <h1 id="_1">快速使用<a class="headerlink" href="#_1" title="Permanent link">&para;</a></h1>
 <h2 id="addax">安装 Addax<a class="headerlink" href="#addax" title="Permanent link">&para;</a></h2>
-<p>如果你不想编译，你可以执行下面的命令，直接从下载已经编译好的二进制文件</p>
-<div class="tabbed-set" data-tabs="1:2"><input checked="checked" id="__tabbed_1_1" name="__tabbed_1" type="radio" /><label for="__tabbed_1_1">直接下载二进制</label><div class="tabbed-content">
-<div class="highlight"><pre><span></span><code>curl -sS -o addax-4.0.2.tar.gz <span class="se">\ </span>
-  https://github.com/wgzhao/Addax/releases/download/4.0.2/addax-4.0.2.tar.gz<span class="sb">`</span>
-
-tar -xzf addax-4.0.2.tar.gz
-<span class="nb">cd</span> addax-4.0.2
+<h3 id="_2">一键安装<a class="headerlink" href="#_2" title="Permanent link">&para;</a></h3>
+<p>如果你不想编译，你可以执行下面的命令，一键安装（当前仅支持 Linux 和 macOS ）</p>
+<div class="highlight"><pre><span></span><code>/bin/bash -c <span class="s2">&quot;</span><span class="k">$(</span>curl -fsSL https://raw.githubusercontent.com/wgzhao/Addax/master/install.sh<span class="k">)</span><span class="s2">&quot;</span>
 </code></pre></div>
-</div>
-<input id="__tabbed_1_2" name="__tabbed_1" type="radio" /><label for="__tabbed_1_2">源代码编译</label><div class="tabbed-content">
+<p>如果是 macOS ，默认安装在 <code>/usr/local/addax</code> 目录下， 如果是 Linux， 则安装在 <code>/opt/addax</code> 目录下</p>
+<h3 id="_3">源代码编译安装<a class="headerlink" href="#_3" title="Permanent link">&para;</a></h3>
+<p>你可以选择从源代码编译安装，基本操作如下：</p>
 <div class="highlight"><pre><span></span><code>git clone https://github.com/wgzhao/addax.git
 <span class="nb">cd</span> addax
-git checkout <span class="m">4</span>.0.2
-mvn clean package -pl <span class="s1">&#39;!:addax-docs&#39;</span>
+mvn clean package 
 mvn package assembly:single
-<span class="nb">cd</span> target/addax/addax-4.0.2
+<span class="nb">cd</span> target/addax/addax-&lt;version&gt;
 </code></pre></div>
-</div>
-</div>
-<h2 id="_2">开始第一个采集任务<a class="headerlink" href="#_2" title="Permanent link">&para;</a></h2>
+<h2 id="_4">开始第一个采集任务<a class="headerlink" href="#_4" title="Permanent link">&para;</a></h2>
 <p>要使用 <code>Addax</code> 进行数据采集，只需要编写一个任务采集文件，该文件为 JSON 格式，以下是一个简单的配置文件，该任务的目的是从内存读取读取指定内容的数据，并将其打印出来，文件保存在 <code>job/test.json</code> 中</p>
-<div class="tabbed-set" data-tabs="2:1"><input checked="checked" id="__tabbed_2_1" name="__tabbed_2" type="radio" /><label for="__tabbed_2_1">job/test.json</label><div class="tabbed-content">
+<div class="tabbed-set" data-tabs="1:1"><input checked="checked" id="__tabbed_1_1" name="__tabbed_1" type="radio" /><label for="__tabbed_1_1">job/test.json</label><div class="tabbed-content">
 <div class="highlight"><pre><span></span><code><span class="p">{</span>
-  <span class="nt">&quot;job&quot;</span><span class="p">:</span> <span class="p">{</span>
-    <span class="nt">&quot;setting&quot;</span><span class="p">:</span> <span class="p">{</span>
-      <span class="nt">&quot;speed&quot;</span><span class="p">:</span> <span class="p">{</span>
-        <span class="nt">&quot;byte&quot;</span><span class="p">:</span> <span class="mi">-1</span><span class="p">,</span>
-        <span class="nt">&quot;channel&quot;</span><span class="p">:</span> <span class="mi">1</span>
-      <span class="p">},</span>
-      <span class="nt">&quot;errorLimit&quot;</span><span class="p">:</span> <span class="p">{</span>
-        <span class="nt">&quot;record&quot;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span>
-        <span class="nt">&quot;percentage&quot;</span><span class="p">:</span> <span class="mf">0.02</span>
+  <span class="nt">&quot;content&quot;</span><span class="p">:</span> <span class="p">{</span>
+    <span class="nt">&quot;reader&quot;</span><span class="p">:</span> <span class="p">{</span>
+      <span class="nt">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;streamreader&quot;</span><span class="p">,</span>
+      <span class="nt">&quot;parameter&quot;</span><span class="p">:</span> <span class="p">{</span>
+        <span class="nt">&quot;column&quot;</span><span class="p">:</span> <span class="p">[</span>
+          <span class="p">{</span>
+            <span class="nt">&quot;value&quot;</span><span class="p">:</span> <span class="s2">&quot;addax&quot;</span><span class="p">,</span>
+            <span class="nt">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;string&quot;</span>
+          <span class="p">},</span>
+          <span class="p">{</span>
+            <span class="nt">&quot;value&quot;</span><span class="p">:</span> <span class="mi">19890604</span><span class="p">,</span>
+            <span class="nt">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;long&quot;</span>
+          <span class="p">},</span>
+          <span class="p">{</span>
+            <span class="nt">&quot;value&quot;</span><span class="p">:</span> <span class="s2">&quot;1989-06-04 00:00:00&quot;</span><span class="p">,</span>
+            <span class="nt">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;date&quot;</span>
+          <span class="p">},</span>
+          <span class="p">{</span>
+            <span class="nt">&quot;value&quot;</span><span class="p">:</span> <span class="kc">true</span><span class="p">,</span>
+            <span class="nt">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;bool&quot;</span>
+          <span class="p">}</span>
+        <span class="p">],</span>
+        <span class="nt">&quot;sliceRecordCount&quot;</span><span class="p">:</span> <span class="mi">10</span>
       <span class="p">}</span>
     <span class="p">},</span>
-    <span class="nt">&quot;content&quot;</span><span class="p">:</span> <span class="p">[</span>
-      <span class="p">{</span>
-        <span class="nt">&quot;reader&quot;</span><span class="p">:</span> <span class="p">{</span>
-          <span class="nt">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;streamreader&quot;</span><span class="p">,</span>
-          <span class="nt">&quot;parameter&quot;</span><span class="p">:</span> <span class="p">{</span>
-            <span class="nt">&quot;column&quot;</span><span class="p">:</span> <span class="p">[</span>
-              <span class="p">{</span>
-                <span class="nt">&quot;value&quot;</span><span class="p">:</span> <span class="s2">&quot;addax&quot;</span><span class="p">,</span>
-                <span class="nt">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;string&quot;</span>
-              <span class="p">},</span>
-              <span class="p">{</span>
-                <span class="nt">&quot;value&quot;</span><span class="p">:</span> <span class="mi">19890604</span><span class="p">,</span>
-                <span class="nt">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;long&quot;</span>
-              <span class="p">},</span>
-              <span class="p">{</span>
-                <span class="nt">&quot;value&quot;</span><span class="p">:</span> <span class="s2">&quot;1989-06-04 00:00:00&quot;</span><span class="p">,</span>
-                <span class="nt">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;date&quot;</span>
-              <span class="p">},</span>
-              <span class="p">{</span>
-                <span class="nt">&quot;value&quot;</span><span class="p">:</span> <span class="kc">true</span><span class="p">,</span>
-                <span class="nt">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;bool&quot;</span>
-              <span class="p">}</span>
-            <span class="p">],</span>
-            <span class="nt">&quot;sliceRecordCount&quot;</span><span class="p">:</span> <span class="mi">10</span>
-          <span class="p">}</span>
-        <span class="p">},</span>
-        <span class="nt">&quot;writer&quot;</span><span class="p">:</span> <span class="p">{</span>
-          <span class="nt">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;streamwriter&quot;</span><span class="p">,</span>
-          <span class="nt">&quot;parameter&quot;</span><span class="p">:</span> <span class="p">{</span>
-            <span class="nt">&quot;print&quot;</span><span class="p">:</span> <span class="kc">true</span>
-          <span class="p">}</span>
-        <span class="p">}</span>
+    <span class="nt">&quot;writer&quot;</span><span class="p">:</span> <span class="p">{</span>
+      <span class="nt">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;streamwriter&quot;</span><span class="p">,</span>
+      <span class="nt">&quot;parameter&quot;</span><span class="p">:</span> <span class="p">{</span>
+        <span class="nt">&quot;print&quot;</span><span class="p">:</span> <span class="kc">true</span>
       <span class="p">}</span>
-    <span class="p">]</span>
+    <span class="p">}</span>
   <span class="p">}</span>
 <span class="p">}</span>
 </code></pre></div>
@@ -1482,7 +1502,7 @@ mvn package assembly:single
 <span class="m">2021</span>-08-23 <span class="m">13</span>:45:17.199 <span class="o">[</span>        main<span class="o">]</span> INFO  VMInfo               - VMInfo# operatingSystem <span class="nv">class</span> <span class="o">=</span>&gt; com.sun.management.internal.OperatingSystemImpl
 <span class="m">2021</span>-08-23 <span class="m">13</span>:45:17.223 <span class="o">[</span>        main<span class="o">]</span> INFO  Engine               -
 <span class="o">{</span>
-    <span class="s2">&quot;content&quot;</span>:<span class="o">[</span>
+    <span class="s2">&quot;content&quot;</span>:
         <span class="o">{</span>
             <span class="s2">&quot;reader&quot;</span>:<span class="o">{</span>
                 <span class="s2">&quot;parameter&quot;</span>:<span class="o">{</span>
@@ -1515,17 +1535,6 @@ mvn package assembly:single
                 <span class="s2">&quot;name&quot;</span>:<span class="s2">&quot;streamwriter&quot;</span>
             <span class="o">}</span>
         <span class="o">}</span>
-    <span class="o">]</span>,
-    <span class="s2">&quot;setting&quot;</span>:<span class="o">{</span>
-        <span class="s2">&quot;errorLimit&quot;</span>:<span class="o">{</span>
-            <span class="s2">&quot;record&quot;</span>:0,
-            <span class="s2">&quot;percentage&quot;</span>:0.02
-        <span class="o">}</span>,
-        <span class="s2">&quot;speed&quot;</span>:<span class="o">{</span>
-            <span class="s2">&quot;byte&quot;</span>:-1,
-            <span class="s2">&quot;channel&quot;</span>:1
-        <span class="o">}</span>
-    <span class="o">}</span>
 <span class="o">}</span>
 
 <span class="m">2021</span>-08-23 <span class="m">13</span>:45:17.238 <span class="o">[</span>        main<span class="o">]</span> INFO  PerfTrace            - PerfTrace <span class="nv">traceId</span><span class="o">=</span>job_-1, <span class="nv">isEnable</span><span class="o">=</span>false, <span class="nv">priority</span><span class="o">=</span><span class="m">0</span>
@@ -1670,7 +1679,7 @@ addax   <span class="m">19890604</span>    <span class="m">1989</span>-06-04 <sp
     <script id="__config" type="application/json">{"base": "..", "features": ["navigation.instant", "navigation.indexes", "content.code.annotate", "content.tabs.link", "navigation.top", "navigation.tracking", "search.highlight", "search.share", "search.suggest"], "translations": {"clipboard.copy": "\u590d\u5236", "clipboard.copied": "\u5df2\u590d\u5236", "search.config.lang": "ja", "search.config.pipeline": "trimmer, stemmer", "search.config.separator": "[\\uff0c\\u3002]+", "search.placeholder": "\u641c\u7d22", "search.result.placeholder": "\u952e\u5165\u4ee5\u5f00\u59cb\u641c\u7d22", "search.result.none": "\u6ca1\u6709\u627e\u5230\u7b26\u5408\u6761\u4ef6\u7684\u7ed3\u679c", "search.result.one": "\u627e\u5230 1 \u4e2a\u7b26\u5408\u6761\u4ef6\u7684\u7ed3\u679c", "search.result.other": "# \u4e2a\u7b26\u5408\u6761\u4ef6\u7684\u7ed3\u679c", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.term.missing": "Missing", "select.version.title": "Select version"}, "search": "../assets/javascripts/workers/search.8397ff9e.min.js", "version": {"provider": "mike"}}</script>
     
     
-      <script src="../assets/javascripts/bundle.1e84347e.min.js"></script>
+      <script src="../assets/javascripts/bundle.f89c2efe.min.js"></script>
       
     
   </body>

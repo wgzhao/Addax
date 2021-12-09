@@ -6,59 +6,57 @@
         "bytes": -1
       }
     },
-    "content": [
-      {
-        "reader": {
-          "name": "streamreader",
-          "parameter": {
-            "column": [
-              {
-                "value": "Addax",
-                "type": "string"
-              },
-              {
-                "value": 19880808,
-                "type": "long"
-              },
-              {
-                "value": "1988-08-08 08:08:08",
-                "type": "date"
-              },
-              {
-                "value": true,
-                "type": "bool"
-              },
-              {
-                "value": "test",
-                "type": "bytes"
-              }
-            ],
-            "sliceRecordCount": 1000
-          }
-        },
-        "writer": {
-          "name": "oraclewriter",
-          "parameter": {
-            "username": "root",
-            "password": "root",
-            "column": [
-              "id",
-              "name"
-            ],
-            "preSql": [
-              "delete from test"
-            ],
-            "connection": [
-              {
-                "jdbcUrl": "jdbc:oracle:thin:@[HOST_NAME]:PORT:[DATABASE_NAME]",
-                "table": [
-                  "test"
-                ]
-              }
-            ]
-          }
+    "content": {
+      "reader": {
+        "name": "streamreader",
+        "parameter": {
+          "column": [
+            {
+              "value": "Addax",
+              "type": "string"
+            },
+            {
+              "value": 19880808,
+              "type": "long"
+            },
+            {
+              "value": "1988-08-08 08:08:08",
+              "type": "date"
+            },
+            {
+              "value": true,
+              "type": "bool"
+            },
+            {
+              "value": "test",
+              "type": "bytes"
+            }
+          ],
+          "sliceRecordCount": 1000
+        }
+      },
+      "writer": {
+        "name": "oraclewriter",
+        "parameter": {
+          "username": "root",
+          "password": "root",
+          "column": [
+            "id",
+            "name"
+          ],
+          "preSql": [
+            "delete from test"
+          ],
+          "connection": [
+            {
+              "jdbcUrl": "jdbc:oracle:thin:@[HOST_NAME]:PORT:[DATABASE_NAME]",
+              "table": [
+                "test"
+              ]
+            }
+          ]
         }
       }
-    ]
+    }
   }
 }

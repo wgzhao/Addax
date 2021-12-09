@@ -16,7 +16,7 @@
         <link rel="canonical" href="https://wgzhao.github.io/Addax/develop/transformer/">
       
       <link rel="icon" href="../images/favicon.ico">
-      <meta name="generator" content="mkdocs-1.2.3, mkdocs-material-7.3.4">
+      <meta name="generator" content="mkdocs-1.2.3, mkdocs-material-7.3.3">
     
     
       
@@ -24,7 +24,7 @@
       
     
     
-      <link rel="stylesheet" href="../assets/stylesheets/main.db9e7362.min.css">
+      <link rel="stylesheet" href="../assets/stylesheets/main.5143246d.min.css">
       
         
         <link rel="stylesheet" href="../assets/stylesheets/palette.3f5d1f46.min.css">
@@ -1658,96 +1658,94 @@
         <span class="nt">&quot;channel&quot;</span><span class="p">:</span> <span class="mi">1</span>
       <span class="p">}</span>
     <span class="p">},</span>
-    <span class="nt">&quot;content&quot;</span><span class="p">:</span> <span class="p">[</span>
-      <span class="p">{</span>
-        <span class="nt">&quot;reader&quot;</span><span class="p">:</span> <span class="p">{</span>
-          <span class="nt">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;streamreader&quot;</span><span class="p">,</span>
+    <span class="nt">&quot;content&quot;</span><span class="p">:</span> <span class="p">{</span>
+      <span class="nt">&quot;reader&quot;</span><span class="p">:</span> <span class="p">{</span>
+        <span class="nt">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;streamreader&quot;</span><span class="p">,</span>
+        <span class="nt">&quot;parameter&quot;</span><span class="p">:</span> <span class="p">{</span>
+          <span class="nt">&quot;column&quot;</span><span class="p">:</span> <span class="p">[</span>
+            <span class="p">{</span>
+              <span class="nt">&quot;value&quot;</span><span class="p">:</span> <span class="s2">&quot;My name is xxxx&quot;</span><span class="p">,</span>
+              <span class="nt">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;string&quot;</span>
+            <span class="p">},</span>
+            <span class="p">{</span>
+              <span class="nt">&quot;value&quot;</span><span class="p">:</span> <span class="s2">&quot;password is Passw0rd&quot;</span><span class="p">,</span>
+              <span class="nt">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;string&quot;</span>
+            <span class="p">},</span>
+            <span class="p">{</span>
+              <span class="nt">&quot;value&quot;</span><span class="p">:</span> <span class="mi">19890604</span><span class="p">,</span>
+              <span class="nt">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;long&quot;</span>
+            <span class="p">},</span>
+            <span class="p">{</span>
+              <span class="nt">&quot;value&quot;</span><span class="p">:</span> <span class="s2">&quot;1989-06-04 00:00:00&quot;</span><span class="p">,</span>
+              <span class="nt">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;date&quot;</span>
+            <span class="p">},</span>
+            <span class="p">{</span>
+              <span class="nt">&quot;value&quot;</span><span class="p">:</span> <span class="kc">true</span><span class="p">,</span>
+              <span class="nt">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;bool&quot;</span>
+            <span class="p">},</span>
+            <span class="p">{</span>
+              <span class="nt">&quot;value&quot;</span><span class="p">:</span> <span class="s2">&quot;test&quot;</span><span class="p">,</span>
+              <span class="nt">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;bytes&quot;</span>
+            <span class="p">},</span>
+            <span class="p">{</span>
+              <span class="nt">&quot;random&quot;</span><span class="p">:</span> <span class="s2">&quot;0,10&quot;</span><span class="p">,</span>
+              <span class="nt">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;long&quot;</span>
+            <span class="p">}</span>
+          <span class="p">],</span>
+          <span class="nt">&quot;sliceRecordCount&quot;</span><span class="p">:</span> <span class="mi">10</span>
+        <span class="p">}</span>
+      <span class="p">},</span>
+      <span class="nt">&quot;writer&quot;</span><span class="p">:</span> <span class="p">{</span>
+        <span class="nt">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;streamwriter&quot;</span><span class="p">,</span>
+        <span class="nt">&quot;parameter&quot;</span><span class="p">:</span> <span class="p">{</span>
+          <span class="nt">&quot;print&quot;</span><span class="p">:</span> <span class="kc">true</span><span class="p">,</span>
+          <span class="nt">&quot;encoding&quot;</span><span class="p">:</span> <span class="s2">&quot;UTF-8&quot;</span>
+        <span class="p">}</span>
+      <span class="p">},</span>
+      <span class="nt">&quot;transformer&quot;</span><span class="p">:</span> <span class="p">[</span>
+        <span class="p">{</span>
+          <span class="nt">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;dx_replace&quot;</span><span class="p">,</span>
           <span class="nt">&quot;parameter&quot;</span><span class="p">:</span> <span class="p">{</span>
-            <span class="nt">&quot;column&quot;</span><span class="p">:</span> <span class="p">[</span>
-              <span class="p">{</span>
-                <span class="nt">&quot;value&quot;</span><span class="p">:</span> <span class="s2">&quot;My name is xxxx&quot;</span><span class="p">,</span>
-                <span class="nt">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;string&quot;</span>
-              <span class="p">},</span>
-              <span class="p">{</span>
-                <span class="nt">&quot;value&quot;</span><span class="p">:</span> <span class="s2">&quot;password is Passw0rd&quot;</span><span class="p">,</span>
-                <span class="nt">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;string&quot;</span>
-              <span class="p">},</span>
-              <span class="p">{</span>
-                <span class="nt">&quot;value&quot;</span><span class="p">:</span> <span class="mi">19890604</span><span class="p">,</span>
-                <span class="nt">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;long&quot;</span>
-              <span class="p">},</span>
-              <span class="p">{</span>
-                <span class="nt">&quot;value&quot;</span><span class="p">:</span> <span class="s2">&quot;1989-06-04 00:00:00&quot;</span><span class="p">,</span>
-                <span class="nt">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;date&quot;</span>
-              <span class="p">},</span>
-              <span class="p">{</span>
-                <span class="nt">&quot;value&quot;</span><span class="p">:</span> <span class="kc">true</span><span class="p">,</span>
-                <span class="nt">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;bool&quot;</span>
-              <span class="p">},</span>
-              <span class="p">{</span>
-                <span class="nt">&quot;value&quot;</span><span class="p">:</span> <span class="s2">&quot;test&quot;</span><span class="p">,</span>
-                <span class="nt">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;bytes&quot;</span>
-              <span class="p">},</span>
-              <span class="p">{</span>
-                <span class="nt">&quot;random&quot;</span><span class="p">:</span> <span class="s2">&quot;0,10&quot;</span><span class="p">,</span>
-                <span class="nt">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;long&quot;</span>
-              <span class="p">}</span>
-            <span class="p">],</span>
-            <span class="nt">&quot;sliceRecordCount&quot;</span><span class="p">:</span> <span class="mi">10</span>
+            <span class="nt">&quot;columnIndex&quot;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span>
+            <span class="nt">&quot;paras&quot;</span><span class="p">:</span> <span class="p">[</span>
+              <span class="s2">&quot;11&quot;</span><span class="p">,</span>
+              <span class="s2">&quot;6&quot;</span><span class="p">,</span>
+              <span class="s2">&quot;wgzhao&quot;</span>
+            <span class="p">]</span>
           <span class="p">}</span>
         <span class="p">},</span>
-        <span class="nt">&quot;writer&quot;</span><span class="p">:</span> <span class="p">{</span>
-          <span class="nt">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;streamwriter&quot;</span><span class="p">,</span>
+        <span class="p">{</span>
+          <span class="nt">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;dx_substr&quot;</span><span class="p">,</span>
           <span class="nt">&quot;parameter&quot;</span><span class="p">:</span> <span class="p">{</span>
-            <span class="nt">&quot;print&quot;</span><span class="p">:</span> <span class="kc">true</span><span class="p">,</span>
-            <span class="nt">&quot;encoding&quot;</span><span class="p">:</span> <span class="s2">&quot;UTF-8&quot;</span>
+            <span class="nt">&quot;columnIndex&quot;</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span>
+            <span class="nt">&quot;paras&quot;</span><span class="p">:</span> <span class="p">[</span>
+              <span class="s2">&quot;0&quot;</span><span class="p">,</span>
+              <span class="s2">&quot;12&quot;</span>
+            <span class="p">]</span>
           <span class="p">}</span>
         <span class="p">},</span>
-        <span class="nt">&quot;transformer&quot;</span><span class="p">:</span> <span class="p">[</span>
-          <span class="p">{</span>
-            <span class="nt">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;dx_replace&quot;</span><span class="p">,</span>
-            <span class="nt">&quot;parameter&quot;</span><span class="p">:</span> <span class="p">{</span>
-              <span class="nt">&quot;columnIndex&quot;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span>
-              <span class="nt">&quot;paras&quot;</span><span class="p">:</span> <span class="p">[</span>
-                <span class="s2">&quot;11&quot;</span><span class="p">,</span>
-                <span class="s2">&quot;6&quot;</span><span class="p">,</span>
-                <span class="s2">&quot;wgzhao&quot;</span>
-              <span class="p">]</span>
-            <span class="p">}</span>
-          <span class="p">},</span>
-          <span class="p">{</span>
-            <span class="nt">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;dx_substr&quot;</span><span class="p">,</span>
-            <span class="nt">&quot;parameter&quot;</span><span class="p">:</span> <span class="p">{</span>
-              <span class="nt">&quot;columnIndex&quot;</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span>
-              <span class="nt">&quot;paras&quot;</span><span class="p">:</span> <span class="p">[</span>
-                <span class="s2">&quot;0&quot;</span><span class="p">,</span>
-                <span class="s2">&quot;12&quot;</span>
-              <span class="p">]</span>
-            <span class="p">}</span>
-          <span class="p">},</span>
-          <span class="p">{</span>
-            <span class="nt">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;dx_map&quot;</span><span class="p">,</span>
-            <span class="nt">&quot;parameter&quot;</span><span class="p">:</span> <span class="p">{</span>
-              <span class="nt">&quot;columnIndex&quot;</span><span class="p">:</span> <span class="mi">2</span><span class="p">,</span>
-              <span class="nt">&quot;paras&quot;</span><span class="p">:</span> <span class="p">[</span>
-                <span class="s2">&quot;^&quot;</span><span class="p">,</span>
-                <span class="s2">&quot;2&quot;</span>
-              <span class="p">]</span>
-            <span class="p">}</span>
-          <span class="p">},</span>
-          <span class="p">{</span>
-            <span class="nt">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;dx_filter&quot;</span><span class="p">,</span>
-            <span class="nt">&quot;parameter&quot;</span><span class="p">:</span> <span class="p">{</span>
-              <span class="nt">&quot;columnIndex&quot;</span><span class="p">:</span> <span class="mi">6</span><span class="p">,</span>
-              <span class="nt">&quot;paras&quot;</span><span class="p">:</span> <span class="p">[</span>
-                <span class="s2">&quot;&lt;&quot;</span><span class="p">,</span>
-                <span class="s2">&quot;5&quot;</span>
-              <span class="p">]</span>
-            <span class="p">}</span>
+        <span class="p">{</span>
+          <span class="nt">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;dx_map&quot;</span><span class="p">,</span>
+          <span class="nt">&quot;parameter&quot;</span><span class="p">:</span> <span class="p">{</span>
+            <span class="nt">&quot;columnIndex&quot;</span><span class="p">:</span> <span class="mi">2</span><span class="p">,</span>
+            <span class="nt">&quot;paras&quot;</span><span class="p">:</span> <span class="p">[</span>
+              <span class="s2">&quot;^&quot;</span><span class="p">,</span>
+              <span class="s2">&quot;2&quot;</span>
+            <span class="p">]</span>
           <span class="p">}</span>
-        <span class="p">]</span>
-      <span class="p">}</span>
-    <span class="p">]</span>
+        <span class="p">},</span>
+        <span class="p">{</span>
+          <span class="nt">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;dx_filter&quot;</span><span class="p">,</span>
+          <span class="nt">&quot;parameter&quot;</span><span class="p">:</span> <span class="p">{</span>
+            <span class="nt">&quot;columnIndex&quot;</span><span class="p">:</span> <span class="mi">6</span><span class="p">,</span>
+            <span class="nt">&quot;paras&quot;</span><span class="p">:</span> <span class="p">[</span>
+              <span class="s2">&quot;&lt;&quot;</span><span class="p">,</span>
+              <span class="s2">&quot;5&quot;</span>
+            <span class="p">]</span>
+          <span class="p">}</span>
+        <span class="p">}</span>
+      <span class="p">]</span>
+    <span class="p">}</span>
   <span class="p">}</span>
 <span class="p">}</span>
 </code></pre></div>
@@ -1831,7 +1829,7 @@ Transformer过滤记录总数         :                   <span class="m">0</spa
 <li>目前只提供了所有Transform的计量（成功，失败，过滤的count，以及transform的消耗时间）。</li>
 </ul>
 <p>涉及到运行过程的计量数据展现定义如下：</p>
-<div class="highlight"><pre><span></span><code>Total <span class="m">1000000</span> records, <span class="m">22000000</span> bytes <span class="p">|</span> Transform <span class="m">100000</span> records<span class="o">(</span><span class="k">in</span><span class="o">)</span>, <span class="m">10000</span> records<span class="o">(</span>out<span class="o">)</span> <span class="p">|</span> Speed <span class="m">2</span>.10MB/s, <span class="m">100000</span> records/s <span class="p">|</span> Error <span class="m">0</span> records, <span class="m">0</span> bytes <span class="p">|</span> Percentage <span class="m">100</span>.00%
+<div class="highlight"><pre><span></span><code>Total <span class="m">1000000</span> records, <span class="m">22000000</span> bytes <span class="p">|</span> Transform <span class="m">100000</span> records<span class="o">(</span>in<span class="o">)</span>, <span class="m">10000</span> records<span class="o">(</span>out<span class="o">)</span> <span class="p">|</span> Speed <span class="m">2</span>.10MB/s, <span class="m">100000</span> records/s <span class="p">|</span> Error <span class="m">0</span> records, <span class="m">0</span> bytes <span class="p">|</span> Percentage <span class="m">100</span>.00%
 </code></pre></div>
 <p>注意，这里主要记录转换的输入输出，需要检测数据输入输出的记录数量变化。</p>
 <p>涉及到最终作业的计量数据展现定义如下：</p>
@@ -1952,7 +1950,7 @@ Transformer过滤记录总数         :                   <span class="m">0</spa
     <script id="__config" type="application/json">{"base": "..", "features": ["navigation.instant", "navigation.indexes", "content.code.annotate", "content.tabs.link", "navigation.top", "navigation.tracking", "search.highlight", "search.share", "search.suggest"], "translations": {"clipboard.copy": "\u590d\u5236", "clipboard.copied": "\u5df2\u590d\u5236", "search.config.lang": "ja", "search.config.pipeline": "trimmer, stemmer", "search.config.separator": "[\\uff0c\\u3002]+", "search.placeholder": "\u641c\u7d22", "search.result.placeholder": "\u952e\u5165\u4ee5\u5f00\u59cb\u641c\u7d22", "search.result.none": "\u6ca1\u6709\u627e\u5230\u7b26\u5408\u6761\u4ef6\u7684\u7ed3\u679c", "search.result.one": "\u627e\u5230 1 \u4e2a\u7b26\u5408\u6761\u4ef6\u7684\u7ed3\u679c", "search.result.other": "# \u4e2a\u7b26\u5408\u6761\u4ef6\u7684\u7ed3\u679c", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.term.missing": "Missing", "select.version.title": "Select version"}, "search": "../assets/javascripts/workers/search.8397ff9e.min.js", "version": {"provider": "mike"}}</script>
     
     
-      <script src="../assets/javascripts/bundle.1e84347e.min.js"></script>
+      <script src="../assets/javascripts/bundle.f89c2efe.min.js"></script>
       
     
   </body>

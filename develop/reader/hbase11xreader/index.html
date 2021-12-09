@@ -16,7 +16,7 @@
         <link rel="canonical" href="https://wgzhao.github.io/Addax/develop/reader/hbase11xreader/">
       
       <link rel="icon" href="../../images/favicon.ico">
-      <meta name="generator" content="mkdocs-1.2.3, mkdocs-material-7.3.4">
+      <meta name="generator" content="mkdocs-1.2.3, mkdocs-material-7.3.3">
     
     
       
@@ -24,7 +24,7 @@
       
     
     
-      <link rel="stylesheet" href="../../assets/stylesheets/main.db9e7362.min.css">
+      <link rel="stylesheet" href="../../assets/stylesheets/main.5143246d.min.css">
       
         
         <link rel="stylesheet" href="../../assets/stylesheets/palette.3f5d1f46.min.css">
@@ -1614,7 +1614,7 @@ ROW           COLUMN+CELL
  xiaoming     <span class="nv">column</span><span class="o">=</span>info:age, <span class="nv">timestamp</span><span class="o">=</span><span class="m">1457082218735</span>, <span class="nv">value</span><span class="o">=</span><span class="m">29</span>
  xiaoming     <span class="nv">column</span><span class="o">=</span>info:birthday, <span class="nv">timestamp</span><span class="o">=</span><span class="m">1457082186830</span>, <span class="nv">value</span><span class="o">=</span><span class="m">1987</span>-06-17
  xiaoming     <span class="nv">column</span><span class="o">=</span>info:company, <span class="nv">timestamp</span><span class="o">=</span><span class="m">1457082189826</span>, <span class="nv">value</span><span class="o">=</span>alibaba
-<span class="m">2</span> row<span class="o">(</span>s<span class="o">)</span> <span class="k">in</span> <span class="m">0</span>.0580 seconds
+<span class="m">2</span> row<span class="o">(</span>s<span class="o">)</span> in <span class="m">0</span>.0580 seconds
 </code></pre></div>
 <p>读取后数据</p>
 <table>
@@ -1668,7 +1668,7 @@ ROW                                   COLUMN+CELL
  xiaoming                             <span class="nv">column</span><span class="o">=</span>info:age, <span class="nv">timestamp</span><span class="o">=</span><span class="m">1457082178630</span>, <span class="nv">value</span><span class="o">=</span><span class="m">24</span>
  xiaoming                             <span class="nv">column</span><span class="o">=</span>info:birthday, <span class="nv">timestamp</span><span class="o">=</span><span class="m">1457082186830</span>, <span class="nv">value</span><span class="o">=</span><span class="m">1987</span>-06-17
  xiaoming                             <span class="nv">column</span><span class="o">=</span>info:company, <span class="nv">timestamp</span><span class="o">=</span><span class="m">1457082189826</span>, <span class="nv">value</span><span class="o">=</span>alibaba
-<span class="m">2</span> row<span class="o">(</span>s<span class="o">)</span> <span class="k">in</span> <span class="m">0</span>.0260 seconds
+<span class="m">2</span> row<span class="o">(</span>s<span class="o">)</span> in <span class="m">0</span>.0260 seconds
 </code></pre></div>
 <p>读取后数据(4列)</p>
 <table>
@@ -1771,65 +1771,63 @@ ROW                                   COLUMN+CELL
         <span class="nt">&quot;channel&quot;</span><span class="p">:</span> <span class="mi">1</span>
       <span class="p">}</span>
     <span class="p">},</span>
-    <span class="nt">&quot;content&quot;</span><span class="p">:</span> <span class="p">[</span>
-      <span class="p">{</span>
-        <span class="nt">&quot;reader&quot;</span><span class="p">:</span> <span class="p">{</span>
-          <span class="nt">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;hbase11xreader&quot;</span><span class="p">,</span>
-          <span class="nt">&quot;parameter&quot;</span><span class="p">:</span> <span class="p">{</span>
-            <span class="nt">&quot;hbaseConfig&quot;</span><span class="p">:</span> <span class="p">{</span>
-              <span class="nt">&quot;hbase.zookeeper.quorum&quot;</span><span class="p">:</span> <span class="s2">&quot;xxxf&quot;</span>
+    <span class="nt">&quot;content&quot;</span><span class="p">:</span> <span class="p">{</span>
+      <span class="nt">&quot;reader&quot;</span><span class="p">:</span> <span class="p">{</span>
+        <span class="nt">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;hbase11xreader&quot;</span><span class="p">,</span>
+        <span class="nt">&quot;parameter&quot;</span><span class="p">:</span> <span class="p">{</span>
+          <span class="nt">&quot;hbaseConfig&quot;</span><span class="p">:</span> <span class="p">{</span>
+            <span class="nt">&quot;hbase.zookeeper.quorum&quot;</span><span class="p">:</span> <span class="s2">&quot;xxxf&quot;</span>
+          <span class="p">},</span>
+          <span class="nt">&quot;table&quot;</span><span class="p">:</span> <span class="s2">&quot;users&quot;</span><span class="p">,</span>
+          <span class="nt">&quot;encoding&quot;</span><span class="p">:</span> <span class="s2">&quot;utf-8&quot;</span><span class="p">,</span>
+          <span class="nt">&quot;mode&quot;</span><span class="p">:</span> <span class="s2">&quot;normal&quot;</span><span class="p">,</span>
+          <span class="nt">&quot;column&quot;</span><span class="p">:</span> <span class="p">[</span>
+            <span class="p">{</span>
+              <span class="nt">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;rowkey&quot;</span><span class="p">,</span>
+              <span class="nt">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;string&quot;</span>
             <span class="p">},</span>
-            <span class="nt">&quot;table&quot;</span><span class="p">:</span> <span class="s2">&quot;users&quot;</span><span class="p">,</span>
-            <span class="nt">&quot;encoding&quot;</span><span class="p">:</span> <span class="s2">&quot;utf-8&quot;</span><span class="p">,</span>
-            <span class="nt">&quot;mode&quot;</span><span class="p">:</span> <span class="s2">&quot;normal&quot;</span><span class="p">,</span>
-            <span class="nt">&quot;column&quot;</span><span class="p">:</span> <span class="p">[</span>
-              <span class="p">{</span>
-                <span class="nt">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;rowkey&quot;</span><span class="p">,</span>
-                <span class="nt">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;string&quot;</span>
-              <span class="p">},</span>
-              <span class="p">{</span>
-                <span class="nt">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;info: age&quot;</span><span class="p">,</span>
-                <span class="nt">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;string&quot;</span>
-              <span class="p">},</span>
-              <span class="p">{</span>
-                <span class="nt">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;info: birthday&quot;</span><span class="p">,</span>
-                <span class="nt">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;date&quot;</span><span class="p">,</span>
-                <span class="nt">&quot;format&quot;</span><span class="p">:</span> <span class="s2">&quot;yyyy-MM-dd&quot;</span>
-              <span class="p">},</span>
-              <span class="p">{</span>
-                <span class="nt">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;info: company&quot;</span><span class="p">,</span>
-                <span class="nt">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;string&quot;</span>
-              <span class="p">},</span>
-              <span class="p">{</span>
-                <span class="nt">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;address: country&quot;</span><span class="p">,</span>
-                <span class="nt">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;string&quot;</span>
-              <span class="p">},</span>
-              <span class="p">{</span>
-                <span class="nt">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;address: province&quot;</span><span class="p">,</span>
-                <span class="nt">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;string&quot;</span>
-              <span class="p">},</span>
-              <span class="p">{</span>
-                <span class="nt">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;address: city&quot;</span><span class="p">,</span>
-                <span class="nt">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;string&quot;</span>
-              <span class="p">}</span>
-            <span class="p">],</span>
-            <span class="nt">&quot;range&quot;</span><span class="p">:</span> <span class="p">{</span>
-              <span class="nt">&quot;startRowkey&quot;</span><span class="p">:</span> <span class="s2">&quot;&quot;</span><span class="p">,</span>
-              <span class="nt">&quot;endRowkey&quot;</span><span class="p">:</span> <span class="s2">&quot;&quot;</span><span class="p">,</span>
-              <span class="nt">&quot;isBinaryRowkey&quot;</span><span class="p">:</span> <span class="kc">true</span>
+            <span class="p">{</span>
+              <span class="nt">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;info: age&quot;</span><span class="p">,</span>
+              <span class="nt">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;string&quot;</span>
+            <span class="p">},</span>
+            <span class="p">{</span>
+              <span class="nt">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;info: birthday&quot;</span><span class="p">,</span>
+              <span class="nt">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;date&quot;</span><span class="p">,</span>
+              <span class="nt">&quot;format&quot;</span><span class="p">:</span> <span class="s2">&quot;yyyy-MM-dd&quot;</span>
+            <span class="p">},</span>
+            <span class="p">{</span>
+              <span class="nt">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;info: company&quot;</span><span class="p">,</span>
+              <span class="nt">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;string&quot;</span>
+            <span class="p">},</span>
+            <span class="p">{</span>
+              <span class="nt">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;address: country&quot;</span><span class="p">,</span>
+              <span class="nt">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;string&quot;</span>
+            <span class="p">},</span>
+            <span class="p">{</span>
+              <span class="nt">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;address: province&quot;</span><span class="p">,</span>
+              <span class="nt">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;string&quot;</span>
+            <span class="p">},</span>
+            <span class="p">{</span>
+              <span class="nt">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;address: city&quot;</span><span class="p">,</span>
+              <span class="nt">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;string&quot;</span>
             <span class="p">}</span>
-          <span class="p">}</span>
-        <span class="p">},</span>
-        <span class="nt">&quot;writer&quot;</span><span class="p">:</span> <span class="p">{</span>
-          <span class="nt">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;txtfilewriter&quot;</span><span class="p">,</span>
-          <span class="nt">&quot;parameter&quot;</span><span class="p">:</span> <span class="p">{</span>
-            <span class="nt">&quot;path&quot;</span><span class="p">:</span> <span class="s2">&quot;/Users/shf/workplace/addax_test/hbase11xreader/result&quot;</span><span class="p">,</span>
-            <span class="nt">&quot;fileName&quot;</span><span class="p">:</span> <span class="s2">&quot;qiran&quot;</span><span class="p">,</span>
-            <span class="nt">&quot;writeMode&quot;</span><span class="p">:</span> <span class="s2">&quot;truncate&quot;</span>
+          <span class="p">],</span>
+          <span class="nt">&quot;range&quot;</span><span class="p">:</span> <span class="p">{</span>
+            <span class="nt">&quot;startRowkey&quot;</span><span class="p">:</span> <span class="s2">&quot;&quot;</span><span class="p">,</span>
+            <span class="nt">&quot;endRowkey&quot;</span><span class="p">:</span> <span class="s2">&quot;&quot;</span><span class="p">,</span>
+            <span class="nt">&quot;isBinaryRowkey&quot;</span><span class="p">:</span> <span class="kc">true</span>
           <span class="p">}</span>
         <span class="p">}</span>
+      <span class="p">},</span>
+      <span class="nt">&quot;writer&quot;</span><span class="p">:</span> <span class="p">{</span>
+        <span class="nt">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;txtfilewriter&quot;</span><span class="p">,</span>
+        <span class="nt">&quot;parameter&quot;</span><span class="p">:</span> <span class="p">{</span>
+          <span class="nt">&quot;path&quot;</span><span class="p">:</span> <span class="s2">&quot;/Users/shf/workplace/addax_test/hbase11xreader/result&quot;</span><span class="p">,</span>
+          <span class="nt">&quot;fileName&quot;</span><span class="p">:</span> <span class="s2">&quot;qiran&quot;</span><span class="p">,</span>
+          <span class="nt">&quot;writeMode&quot;</span><span class="p">:</span> <span class="s2">&quot;truncate&quot;</span>
+        <span class="p">}</span>
       <span class="p">}</span>
-    <span class="p">]</span>
+    <span class="p">}</span>
   <span class="p">}</span>
 <span class="p">}</span>
 </code></pre></div>
@@ -1843,65 +1841,63 @@ ROW                                   COLUMN+CELL
         <span class="nt">&quot;bytes&quot;</span><span class="p">:</span> <span class="mi">-1</span>
       <span class="p">}</span>
     <span class="p">},</span>
-    <span class="nt">&quot;content&quot;</span><span class="p">:</span> <span class="p">[</span>
-      <span class="p">{</span>
-        <span class="nt">&quot;reader&quot;</span><span class="p">:</span> <span class="p">{</span>
-          <span class="nt">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;hbase11xreader&quot;</span><span class="p">,</span>
-          <span class="nt">&quot;parameter&quot;</span><span class="p">:</span> <span class="p">{</span>
-            <span class="nt">&quot;hbaseConfig&quot;</span><span class="p">:</span> <span class="p">{</span>
-              <span class="nt">&quot;hbase.zookeeper.quorum&quot;</span><span class="p">:</span> <span class="s2">&quot;127.0.0.1:2181&quot;</span>
+    <span class="nt">&quot;content&quot;</span><span class="p">:</span> <span class="p">{</span>
+      <span class="nt">&quot;reader&quot;</span><span class="p">:</span> <span class="p">{</span>
+        <span class="nt">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;hbase11xreader&quot;</span><span class="p">,</span>
+        <span class="nt">&quot;parameter&quot;</span><span class="p">:</span> <span class="p">{</span>
+          <span class="nt">&quot;hbaseConfig&quot;</span><span class="p">:</span> <span class="p">{</span>
+            <span class="nt">&quot;hbase.zookeeper.quorum&quot;</span><span class="p">:</span> <span class="s2">&quot;127.0.0.1:2181&quot;</span>
+          <span class="p">},</span>
+          <span class="nt">&quot;table&quot;</span><span class="p">:</span> <span class="s2">&quot;users&quot;</span><span class="p">,</span>
+          <span class="nt">&quot;encoding&quot;</span><span class="p">:</span> <span class="s2">&quot;utf-8&quot;</span><span class="p">,</span>
+          <span class="nt">&quot;mode&quot;</span><span class="p">:</span> <span class="s2">&quot;multiVersionFixedColumn&quot;</span><span class="p">,</span>
+          <span class="nt">&quot;maxVersion&quot;</span><span class="p">:</span> <span class="s2">&quot;-1&quot;</span><span class="p">,</span>
+          <span class="nt">&quot;column&quot;</span><span class="p">:</span> <span class="p">[</span>
+            <span class="p">{</span>
+              <span class="nt">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;rowkey&quot;</span><span class="p">,</span>
+              <span class="nt">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;string&quot;</span>
             <span class="p">},</span>
-            <span class="nt">&quot;table&quot;</span><span class="p">:</span> <span class="s2">&quot;users&quot;</span><span class="p">,</span>
-            <span class="nt">&quot;encoding&quot;</span><span class="p">:</span> <span class="s2">&quot;utf-8&quot;</span><span class="p">,</span>
-            <span class="nt">&quot;mode&quot;</span><span class="p">:</span> <span class="s2">&quot;multiVersionFixedColumn&quot;</span><span class="p">,</span>
-            <span class="nt">&quot;maxVersion&quot;</span><span class="p">:</span> <span class="s2">&quot;-1&quot;</span><span class="p">,</span>
-            <span class="nt">&quot;column&quot;</span><span class="p">:</span> <span class="p">[</span>
-              <span class="p">{</span>
-                <span class="nt">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;rowkey&quot;</span><span class="p">,</span>
-                <span class="nt">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;string&quot;</span>
-              <span class="p">},</span>
-              <span class="p">{</span>
-                <span class="nt">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;info: age&quot;</span><span class="p">,</span>
-                <span class="nt">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;string&quot;</span>
-              <span class="p">},</span>
-              <span class="p">{</span>
-                <span class="nt">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;info: birthday&quot;</span><span class="p">,</span>
-                <span class="nt">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;date&quot;</span><span class="p">,</span>
-                <span class="nt">&quot;format&quot;</span><span class="p">:</span> <span class="s2">&quot;yyyy-MM-dd&quot;</span>
-              <span class="p">},</span>
-              <span class="p">{</span>
-                <span class="nt">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;info: company&quot;</span><span class="p">,</span>
-                <span class="nt">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;string&quot;</span>
-              <span class="p">},</span>
-              <span class="p">{</span>
-                <span class="nt">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;address: contry&quot;</span><span class="p">,</span>
-                <span class="nt">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;string&quot;</span>
-              <span class="p">},</span>
-              <span class="p">{</span>
-                <span class="nt">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;address: province&quot;</span><span class="p">,</span>
-                <span class="nt">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;string&quot;</span>
-              <span class="p">},</span>
-              <span class="p">{</span>
-                <span class="nt">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;address: city&quot;</span><span class="p">,</span>
-                <span class="nt">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;string&quot;</span>
-              <span class="p">}</span>
-            <span class="p">],</span>
-            <span class="nt">&quot;range&quot;</span><span class="p">:</span> <span class="p">{</span>
-              <span class="nt">&quot;startRowkey&quot;</span><span class="p">:</span> <span class="s2">&quot;&quot;</span><span class="p">,</span>
-              <span class="nt">&quot;endRowkey&quot;</span><span class="p">:</span> <span class="s2">&quot;&quot;</span>
+            <span class="p">{</span>
+              <span class="nt">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;info: age&quot;</span><span class="p">,</span>
+              <span class="nt">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;string&quot;</span>
+            <span class="p">},</span>
+            <span class="p">{</span>
+              <span class="nt">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;info: birthday&quot;</span><span class="p">,</span>
+              <span class="nt">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;date&quot;</span><span class="p">,</span>
+              <span class="nt">&quot;format&quot;</span><span class="p">:</span> <span class="s2">&quot;yyyy-MM-dd&quot;</span>
+            <span class="p">},</span>
+            <span class="p">{</span>
+              <span class="nt">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;info: company&quot;</span><span class="p">,</span>
+              <span class="nt">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;string&quot;</span>
+            <span class="p">},</span>
+            <span class="p">{</span>
+              <span class="nt">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;address: contry&quot;</span><span class="p">,</span>
+              <span class="nt">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;string&quot;</span>
+            <span class="p">},</span>
+            <span class="p">{</span>
+              <span class="nt">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;address: province&quot;</span><span class="p">,</span>
+              <span class="nt">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;string&quot;</span>
+            <span class="p">},</span>
+            <span class="p">{</span>
+              <span class="nt">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;address: city&quot;</span><span class="p">,</span>
+              <span class="nt">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;string&quot;</span>
             <span class="p">}</span>
-          <span class="p">}</span>
-        <span class="p">},</span>
-        <span class="nt">&quot;writer&quot;</span><span class="p">:</span> <span class="p">{</span>
-          <span class="nt">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;txtfilewriter&quot;</span><span class="p">,</span>
-          <span class="nt">&quot;parameter&quot;</span><span class="p">:</span> <span class="p">{</span>
-            <span class="nt">&quot;path&quot;</span><span class="p">:</span> <span class="s2">&quot;/Users/shf/workplace/addax_test/hbase11xreader/result&quot;</span><span class="p">,</span>
-            <span class="nt">&quot;fileName&quot;</span><span class="p">:</span> <span class="s2">&quot;qiran&quot;</span><span class="p">,</span>
-            <span class="nt">&quot;writeMode&quot;</span><span class="p">:</span> <span class="s2">&quot;truncate&quot;</span>
+          <span class="p">],</span>
+          <span class="nt">&quot;range&quot;</span><span class="p">:</span> <span class="p">{</span>
+            <span class="nt">&quot;startRowkey&quot;</span><span class="p">:</span> <span class="s2">&quot;&quot;</span><span class="p">,</span>
+            <span class="nt">&quot;endRowkey&quot;</span><span class="p">:</span> <span class="s2">&quot;&quot;</span>
           <span class="p">}</span>
         <span class="p">}</span>
+      <span class="p">},</span>
+      <span class="nt">&quot;writer&quot;</span><span class="p">:</span> <span class="p">{</span>
+        <span class="nt">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;txtfilewriter&quot;</span><span class="p">,</span>
+        <span class="nt">&quot;parameter&quot;</span><span class="p">:</span> <span class="p">{</span>
+          <span class="nt">&quot;path&quot;</span><span class="p">:</span> <span class="s2">&quot;/Users/shf/workplace/addax_test/hbase11xreader/result&quot;</span><span class="p">,</span>
+          <span class="nt">&quot;fileName&quot;</span><span class="p">:</span> <span class="s2">&quot;qiran&quot;</span><span class="p">,</span>
+          <span class="nt">&quot;writeMode&quot;</span><span class="p">:</span> <span class="s2">&quot;truncate&quot;</span>
+        <span class="p">}</span>
       <span class="p">}</span>
-    <span class="p">]</span>
+    <span class="p">}</span>
   <span class="p">}</span>
 <span class="p">}</span>
 </code></pre></div>
@@ -2171,7 +2167,7 @@ multiVersionFixedColumn 模式下不支持常量列。配置格式如下：</p>
     <script id="__config" type="application/json">{"base": "../..", "features": ["navigation.instant", "navigation.indexes", "content.code.annotate", "content.tabs.link", "navigation.top", "navigation.tracking", "search.highlight", "search.share", "search.suggest"], "translations": {"clipboard.copy": "\u590d\u5236", "clipboard.copied": "\u5df2\u590d\u5236", "search.config.lang": "ja", "search.config.pipeline": "trimmer, stemmer", "search.config.separator": "[\\uff0c\\u3002]+", "search.placeholder": "\u641c\u7d22", "search.result.placeholder": "\u952e\u5165\u4ee5\u5f00\u59cb\u641c\u7d22", "search.result.none": "\u6ca1\u6709\u627e\u5230\u7b26\u5408\u6761\u4ef6\u7684\u7ed3\u679c", "search.result.one": "\u627e\u5230 1 \u4e2a\u7b26\u5408\u6761\u4ef6\u7684\u7ed3\u679c", "search.result.other": "# \u4e2a\u7b26\u5408\u6761\u4ef6\u7684\u7ed3\u679c", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.term.missing": "Missing", "select.version.title": "Select version"}, "search": "../../assets/javascripts/workers/search.8397ff9e.min.js", "version": {"provider": "mike"}}</script>
     
     
-      <script src="../../assets/javascripts/bundle.1e84347e.min.js"></script>
+      <script src="../../assets/javascripts/bundle.f89c2efe.min.js"></script>
       
     
   </body>

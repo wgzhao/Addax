@@ -16,7 +16,7 @@
         <link rel="canonical" href="https://wgzhao.github.io/Addax/develop/setupJob/">
       
       <link rel="icon" href="../images/favicon.ico">
-      <meta name="generator" content="mkdocs-1.2.3, mkdocs-material-7.3.4">
+      <meta name="generator" content="mkdocs-1.2.3, mkdocs-material-7.3.3">
     
     
       
@@ -24,7 +24,7 @@
       
     
     
-      <link rel="stylesheet" href="../assets/stylesheets/main.db9e7362.min.css">
+      <link rel="stylesheet" href="../assets/stylesheets/main.5143246d.min.css">
       
         
         <link rel="stylesheet" href="../assets/stylesheets/palette.3f5d1f46.min.css">
@@ -315,6 +315,74 @@
   <a href="#writer" class="md-nav__link">
     writer 配置项
   </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#settings" class="md-nav__link">
+    settings 配置项
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#speed" class="md-nav__link">
+    speed
+  </a>
+  
+    <nav class="md-nav" aria-label="speed">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#speedbyte" class="md-nav__link">
+    speed.byte
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#speedrecord" class="md-nav__link">
+    speed.record
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#speedchannel" class="md-nav__link">
+    speed.channel
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#errorlimit" class="md-nav__link">
+    errorLimit
+  </a>
+  
+    <nav class="md-nav" aria-label="errorLimit">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#errorlimitrecord" class="md-nav__link">
+    errorLimit.record
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#errorlimitpercentage" class="md-nav__link">
+    errorLimit.percentage
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
   
 </li>
       
@@ -1377,6 +1445,74 @@
   
 </li>
       
+        <li class="md-nav__item">
+  <a href="#settings" class="md-nav__link">
+    settings 配置项
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#speed" class="md-nav__link">
+    speed
+  </a>
+  
+    <nav class="md-nav" aria-label="speed">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#speedbyte" class="md-nav__link">
+    speed.byte
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#speedrecord" class="md-nav__link">
+    speed.record
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#speedchannel" class="md-nav__link">
+    speed.channel
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#errorlimit" class="md-nav__link">
+    errorLimit
+  </a>
+  
+    <nav class="md-nav" aria-label="errorLimit">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#errorlimitrecord" class="md-nav__link">
+    errorLimit.record
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#errorlimitpercentage" class="md-nav__link">
+    errorLimit.percentage
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
     </ul>
   
 </nav>
@@ -1394,25 +1530,24 @@
 <p>一个采集任务就是一个 JSON 格式配置文件，该配置文件的模板如下：</p>
 <div class="highlight"><pre><span></span><code><span class="p">{</span>
   <span class="nt">&quot;job&quot;</span><span class="p">:</span> <span class="p">{</span>
-    <span class="nt">&quot;settings&quot;</span><span class="p">:</span> <span class="p">{}</span>
-    <span class="nt">&quot;content&quot;</span><span class="p">:</span> <span class="p">[</span>
-      <span class="p">{</span>
-        <span class="nt">&quot;reader&quot;</span><span class="p">:</span> <span class="p">{},</span>
-        <span class="nt">&quot;writer&quot;</span><span class="p">:</span> <span class="p">{}</span>
-        <span class="nt">&quot;transformer&quot;</span><span class="p">:</span> <span class="p">[]</span>
-      <span class="p">}</span>
-    <span class="p">]</span>
+    <span class="nt">&quot;settings&quot;</span><span class="p">:</span> <span class="p">{},</span>
+    <span class="nt">&quot;content&quot;</span><span class="p">:</span> <span class="p">{</span>
+      <span class="nt">&quot;reader&quot;</span><span class="p">:</span> <span class="p">{},</span>
+      <span class="nt">&quot;writer&quot;</span><span class="p">:</span> <span class="p">{},</span>
+      <span class="nt">&quot;transformer&quot;</span><span class="p">:</span> <span class="p">[]</span>
+    <span class="p">}</span>
   <span class="p">}</span>
 <span class="p">}</span>
 </code></pre></div>
 <p>任务配置由 key 为 <code>job</code> 的字典组成，其字典元素由三部分组成：</p>
 <ul>
+<li><code>settings</code>:  用来定义本次任务的一些控制参数，比如指定多少线程，最大错误率，最大错误记录条数等，这是可选配置。</li>
 <li><code>reader</code>: 用来配置数据读取所需要的相关信息，这是必填内容</li>
 <li><code>writer</code>: 用来配置写入数据所需要的相关信息，这是必填内容</li>
-<li><code>transformer</code>: 数据转换规则，如果需要对读取的数据在写入之前做一些变换，可以配置该项，否则可以不配置。</li>
+<li><code>transformer</code>: 数据转换规则，如果需要对读取的数据在写入之前做一些变换，可以配置该项，否则可以不配置</li>
 </ul>
 <h2 id="reader">reader 配置项<a class="headerlink" href="#reader" title="Permanent link">&para;</a></h2>
-<p><code>reader</code> 配置项依据不同的 reader 插件而有所些微不同，但大部分的配置大同小异，特别是针对关系型数据库而言，其基本配置如下：</p>
+<p><code>reader</code> 配置项依据不同的 reader 插件而有些微不同，但大部分的配置大同小异，特别是针对关系型数据库而言，其基本配置如下：</p>
 <div class="highlight"><pre><span></span><code><span class="p">{</span>
   <span class="nt">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;mysqlreader&quot;</span><span class="p">,</span>
   <span class="nt">&quot;parameter&quot;</span><span class="p">:</span> <span class="p">{</span>
@@ -1451,6 +1586,38 @@
 <span class="p">}</span>
 </code></pre></div>
 <p>同样的，这里的 <code>name</code> 也是唯一的，每个插件更详细的配置可以参考写入插件章节的各插件内容</p>
+<h2 id="settings">settings 配置项<a class="headerlink" href="#settings" title="Permanent link">&para;</a></h2>
+<p><code>settings</code> 可配置的内容如下：</p>
+<div class="highlight"><pre><span></span><code><span class="p">{</span>
+  <span class="nt">&quot;setting&quot;</span><span class="p">:</span> <span class="p">{</span>
+    <span class="nt">&quot;speed&quot;</span><span class="p">:</span> <span class="p">{</span>
+      <span class="nt">&quot;byte&quot;</span><span class="p">:</span> <span class="mi">-1</span><span class="p">,</span>
+      <span class="nt">&quot;record&quot;</span><span class="p">:</span> <span class="mi">100</span><span class="p">,</span>
+      <span class="nt">&quot;channel&quot;</span><span class="p">:</span> <span class="mi">1</span>
+    <span class="p">},</span>
+    <span class="nt">&quot;errorLimit&quot;</span><span class="p">:</span> <span class="p">{</span>
+      <span class="nt">&quot;record&quot;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span>
+      <span class="nt">&quot;percentage&quot;</span><span class="p">:</span> <span class="mf">0.02</span>
+    <span class="p">}</span>
+  <span class="p">}</span>
+<span class="p">}</span>
+</code></pre></div>
+<p>解释如下：</p>
+<h2 id="speed"><code>speed</code><a class="headerlink" href="#speed" title="Permanent link">&para;</a></h2>
+<p>顾名思义，这里是用来做流控的配置项，可以从网络传输速度，每秒的记录数以及线程数上做控制，分别描述如下：</p>
+<h3 id="speedbyte"><code>speed.byte</code><a class="headerlink" href="#speedbyte" title="Permanent link">&para;</a></h3>
+<p>设置每秒可获取的字节数(Bps)，一般是为了防止执行任务时将整个带宽跑满，从而影响到其他服务。如果不做限制，可设置为  <code>-1</code></p>
+<h3 id="speedrecord"><code>speed.record</code><a class="headerlink" href="#speedrecord" title="Permanent link">&para;</a></h3>
+<p>设置记录每秒可获取的最大记录条数，该参数需要和 <code>speed.byte</code> 配合使用</p>
+<h3 id="speedchannel"><code>speed.channel</code><a class="headerlink" href="#speedchannel" title="Permanent link">&para;</a></h3>
+<p>设置通道数，该通道路确定了每个任务的线程数，目前一个channel对应5个线程，比如设置 <code>channel</code> 为 3， 则有 <code>3 * 5 + 1 = 16</code> 个线程，其中一个线程为统计线程。</p>
+<h2 id="errorlimit"><code>errorLimit</code><a class="headerlink" href="#errorlimit" title="Permanent link">&para;</a></h2>
+<p><code>errorLimit</code> 用来配置在数据写入报错时的行为，具体如下</p>
+<h3 id="errorlimitrecord"><code>errorLimit.record</code><a class="headerlink" href="#errorlimitrecord" title="Permanent link">&para;</a></h3>
+<p>允许错误的记录条数，如果超过这个数，则认为本次任务失败，否则认为成功</p>
+<h3 id="errorlimitpercentage"><code>errorLimit.percentage</code><a class="headerlink" href="#errorlimitpercentage" title="Permanent link">&para;</a></h3>
+<p>允许错误记录的比率，超过这个比率，则认为本次任务失败，否则认为成功</p>
+<p>注意，上述参数在 <code>conf/core.json</code> 配置文件均有默认配置，用来控制全局的设置。</p>
                 
               
               
@@ -1557,7 +1724,7 @@
     <script id="__config" type="application/json">{"base": "..", "features": ["navigation.instant", "navigation.indexes", "content.code.annotate", "content.tabs.link", "navigation.top", "navigation.tracking", "search.highlight", "search.share", "search.suggest"], "translations": {"clipboard.copy": "\u590d\u5236", "clipboard.copied": "\u5df2\u590d\u5236", "search.config.lang": "ja", "search.config.pipeline": "trimmer, stemmer", "search.config.separator": "[\\uff0c\\u3002]+", "search.placeholder": "\u641c\u7d22", "search.result.placeholder": "\u952e\u5165\u4ee5\u5f00\u59cb\u641c\u7d22", "search.result.none": "\u6ca1\u6709\u627e\u5230\u7b26\u5408\u6761\u4ef6\u7684\u7ed3\u679c", "search.result.one": "\u627e\u5230 1 \u4e2a\u7b26\u5408\u6761\u4ef6\u7684\u7ed3\u679c", "search.result.other": "# \u4e2a\u7b26\u5408\u6761\u4ef6\u7684\u7ed3\u679c", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.term.missing": "Missing", "select.version.title": "Select version"}, "search": "../assets/javascripts/workers/search.8397ff9e.min.js", "version": {"provider": "mike"}}</script>
     
     
-      <script src="../assets/javascripts/bundle.1e84347e.min.js"></script>
+      <script src="../assets/javascripts/bundle.f89c2efe.min.js"></script>
       
     
   </body>

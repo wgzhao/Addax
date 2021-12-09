@@ -1,36 +1,34 @@
 {
   "job": {
-    "content": [
-      {
-        "reader": {
-          "name": "influxdbreader",
-          "parameter": {
-            "column": [
-              "*"
-            ],
-            "connection": [
-              {
-                "endpoint": "http://localhost:8086",
-                "database": "NOAA_water_database",
-                "table": "h2o_feet",
-                "where": "1=1"
-              }
-            ],
-            "connTimeout": 15,
-            "readTimeout": 20,
-            "writeTimeout": 20,
-            "username": "influx",
-            "password": "influx123"
-          }
-        },
-        "writer": {
-          "name": "streamwriter",
-          "parameter": {
-            "print": "true"
-          }
+    "content": {
+      "reader": {
+        "name": "influxdbreader",
+        "parameter": {
+          "column": [
+            "*"
+          ],
+          "connection": [
+            {
+              "endpoint": "http://localhost:8086",
+              "database": "NOAA_water_database",
+              "table": "h2o_feet",
+              "where": "1=1"
+            }
+          ],
+          "connTimeout": 15,
+          "readTimeout": 20,
+          "writeTimeout": 20,
+          "username": "influx",
+          "password": "influx123"
+        }
+      },
+      "writer": {
+        "name": "streamwriter",
+        "parameter": {
+          "print": "true"
         }
       }
-    ],
+    },
     "setting": {
       "speed": {
         "bytes": -1,

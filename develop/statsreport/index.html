@@ -16,7 +16,7 @@
         <link rel="canonical" href="https://wgzhao.github.io/Addax/develop/statsreport/">
       
       <link rel="icon" href="../images/favicon.ico">
-      <meta name="generator" content="mkdocs-1.2.3, mkdocs-material-7.3.4">
+      <meta name="generator" content="mkdocs-1.2.3, mkdocs-material-7.3.3">
     
     
       
@@ -24,7 +24,7 @@
       
     
     
-      <link rel="stylesheet" href="../assets/stylesheets/main.db9e7362.min.css">
+      <link rel="stylesheet" href="../assets/stylesheets/main.5143246d.min.css">
       
         
         <link rel="stylesheet" href="../assets/stylesheets/palette.3f5d1f46.min.css">
@@ -1452,7 +1452,7 @@
 <li>支付http协议，JSON格式。</li>
 <li>接口地址配置在 <code>core.json</code> 文件下的 <code>core.addaxServer.address</code> 下。</li>
 <li>异步发送。</li>
-<li>需要引入<code>httpclient-4.5.2.jar</code>, <code>httpcore-4.4.5.jar</code>, <code>httpcore-nio-4.4.5.jar</code>, <code>httpasyncclient-4.1.2.jar</code> 相关jar包</li>
+<li>需要引入 <code>httpclient-4.5.2.jar</code>, <code>httpcore-4.4.5.jar</code>, <code>httpcore-nio-4.4.5.jar</code>, <code>httpasyncclient-4.1.2.jar</code> 相关jar包</li>
 </ol>
 <h2 id="_4">功能说明<a class="headerlink" href="#_4" title="Permanent link">&para;</a></h2>
 <h3 id="_5">配置样例<a class="headerlink" href="#_5" title="Permanent link">&para;</a></h3>
@@ -1464,7 +1464,10 @@
   <span class="nt">&quot;byteSpeedPerSecond&quot;</span><span class="p">:</span> <span class="mi">33</span><span class="p">,</span>
   <span class="nt">&quot;recordSpeedPerSecond&quot;</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span>
   <span class="nt">&quot;totalReadRecords&quot;</span><span class="p">:</span> <span class="mi">6</span><span class="p">,</span>
-  <span class="nt">&quot;totalErrorRecords&quot;</span><span class="p">:</span> <span class="mi">0</span>
+  <span class="nt">&quot;totalErrorRecords&quot;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span>
+  <span class="nt">&quot;jobContent&quot;</span><span class="p">:</span> <span class="p">{</span>
+    <span class="err">...</span>
+  <span class="p">}</span>
 <span class="p">}</span>
 </code></pre></div>
 <h3 id="_6">参数说明<a class="headerlink" href="#_6" title="Permanent link">&para;</a></h3>
@@ -1525,6 +1528,12 @@
 <td>读写失败总数</td>
 <td>是</td>
 <td>0</td>
+</tr>
+<tr>
+<td>jobContent</td>
+<td>本次任务的json文件</td>
+<td>是</td>
+<td>无</td>
 </tr>
 </tbody>
 </table>
@@ -1640,7 +1649,7 @@
     <script id="__config" type="application/json">{"base": "..", "features": ["navigation.instant", "navigation.indexes", "content.code.annotate", "content.tabs.link", "navigation.top", "navigation.tracking", "search.highlight", "search.share", "search.suggest"], "translations": {"clipboard.copy": "\u590d\u5236", "clipboard.copied": "\u5df2\u590d\u5236", "search.config.lang": "ja", "search.config.pipeline": "trimmer, stemmer", "search.config.separator": "[\\uff0c\\u3002]+", "search.placeholder": "\u641c\u7d22", "search.result.placeholder": "\u952e\u5165\u4ee5\u5f00\u59cb\u641c\u7d22", "search.result.none": "\u6ca1\u6709\u627e\u5230\u7b26\u5408\u6761\u4ef6\u7684\u7ed3\u679c", "search.result.one": "\u627e\u5230 1 \u4e2a\u7b26\u5408\u6761\u4ef6\u7684\u7ed3\u679c", "search.result.other": "# \u4e2a\u7b26\u5408\u6761\u4ef6\u7684\u7ed3\u679c", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.term.missing": "Missing", "select.version.title": "Select version"}, "search": "../assets/javascripts/workers/search.8397ff9e.min.js", "version": {"provider": "mike"}}</script>
     
     
-      <script src="../assets/javascripts/bundle.1e84347e.min.js"></script>
+      <script src="../assets/javascripts/bundle.f89c2efe.min.js"></script>
       
     
   </body>

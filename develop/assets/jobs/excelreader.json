@@ -6,23 +6,23 @@
         "bytes": -1
       }
     },
-    "content": [
-      {
-        "reader": {
-          "name": "excelreader",
-          "parameter": {
-            "path": ["/tmp/in"],
-            "header": true,
-            "skipRows": 0
-          }
-        },
-        "writer": {
-          "parameter": {
-            "print": true
-          },
-          "name": "streamwriter"
+    "content": {
+      "reader": {
+        "name": "excelreader",
+        "parameter": {
+          "path": [
+            "/tmp/in"
+          ],
+          "header": true,
+          "skipRows": 0
         }
+      },
+      "writer": {
+        "parameter": {
+          "print": true
+        },
+        "name": "streamwriter"
       }
-    ]
+    }
   }
 }

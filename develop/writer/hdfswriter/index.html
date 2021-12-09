@@ -16,7 +16,7 @@
         <link rel="canonical" href="https://wgzhao.github.io/Addax/develop/writer/hdfswriter/">
       
       <link rel="icon" href="../../images/favicon.ico">
-      <meta name="generator" content="mkdocs-1.2.3, mkdocs-material-7.3.4">
+      <meta name="generator" content="mkdocs-1.2.3, mkdocs-material-7.3.3">
     
     
       
@@ -24,7 +24,7 @@
       
     
     
-      <link rel="stylesheet" href="../../assets/stylesheets/main.db9e7362.min.css">
+      <link rel="stylesheet" href="../../assets/stylesheets/main.5143246d.min.css">
       
         
         <link rel="stylesheet" href="../../assets/stylesheets/palette.3f5d1f46.min.css">
@@ -1607,72 +1607,70 @@
         <span class="nt">&quot;bytes&quot;</span><span class="p">:</span> <span class="mi">-1</span>
       <span class="p">}</span>
     <span class="p">},</span>
-    <span class="nt">&quot;content&quot;</span><span class="p">:</span> <span class="p">[</span>
-      <span class="p">{</span>
-        <span class="nt">&quot;reader&quot;</span><span class="p">:</span> <span class="p">{</span>
-          <span class="nt">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;streamreader&quot;</span><span class="p">,</span>
+    <span class="nt">&quot;content&quot;</span><span class="p">:</span> <span class="p">{</span>
+      <span class="nt">&quot;reader&quot;</span><span class="p">:</span> <span class="p">{</span>
+        <span class="nt">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;streamreader&quot;</span><span class="p">,</span>
+        <span class="nt">&quot;parameter&quot;</span><span class="p">:</span> <span class="p">{</span>
+          <span class="nt">&quot;column&quot;</span><span class="p">:</span> <span class="p">[</span>
+            <span class="p">{</span>
+              <span class="nt">&quot;value&quot;</span><span class="p">:</span> <span class="s2">&quot;Addax&quot;</span><span class="p">,</span>
+              <span class="nt">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;string&quot;</span>
+            <span class="p">},</span>
+            <span class="p">{</span>
+              <span class="nt">&quot;value&quot;</span><span class="p">:</span> <span class="mi">19890604</span><span class="p">,</span>
+              <span class="nt">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;long&quot;</span>
+            <span class="p">},</span>
+            <span class="p">{</span>
+              <span class="nt">&quot;value&quot;</span><span class="p">:</span> <span class="s2">&quot;1989-06-04 00:00:00&quot;</span><span class="p">,</span>
+              <span class="nt">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;date&quot;</span>
+            <span class="p">},</span>
+            <span class="p">{</span>
+              <span class="nt">&quot;value&quot;</span><span class="p">:</span> <span class="kc">true</span><span class="p">,</span>
+              <span class="nt">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;bool&quot;</span>
+            <span class="p">},</span>
+            <span class="p">{</span>
+              <span class="nt">&quot;value&quot;</span><span class="p">:</span> <span class="s2">&quot;test&quot;</span><span class="p">,</span>
+              <span class="nt">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;bytes&quot;</span>
+            <span class="p">}</span>
+          <span class="p">],</span>
+          <span class="nt">&quot;sliceRecordCount&quot;</span><span class="p">:</span> <span class="mi">1000</span>
+        <span class="p">},</span>
+        <span class="nt">&quot;writer&quot;</span><span class="p">:</span> <span class="p">{</span>
+          <span class="nt">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;hdfswriter&quot;</span><span class="p">,</span>
           <span class="nt">&quot;parameter&quot;</span><span class="p">:</span> <span class="p">{</span>
+            <span class="nt">&quot;defaultFS&quot;</span><span class="p">:</span> <span class="s2">&quot;hdfs://xxx:port&quot;</span><span class="p">,</span>
+            <span class="nt">&quot;fileType&quot;</span><span class="p">:</span> <span class="s2">&quot;orc&quot;</span><span class="p">,</span>
+            <span class="nt">&quot;path&quot;</span><span class="p">:</span> <span class="s2">&quot;/user/hive/warehouse/writerorc.db/orcfull&quot;</span><span class="p">,</span>
+            <span class="nt">&quot;fileName&quot;</span><span class="p">:</span> <span class="s2">&quot;xxxx&quot;</span><span class="p">,</span>
             <span class="nt">&quot;column&quot;</span><span class="p">:</span> <span class="p">[</span>
               <span class="p">{</span>
-                <span class="nt">&quot;value&quot;</span><span class="p">:</span> <span class="s2">&quot;Addax&quot;</span><span class="p">,</span>
+                <span class="nt">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;col1&quot;</span><span class="p">,</span>
                 <span class="nt">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;string&quot;</span>
               <span class="p">},</span>
               <span class="p">{</span>
-                <span class="nt">&quot;value&quot;</span><span class="p">:</span> <span class="mi">19890604</span><span class="p">,</span>
-                <span class="nt">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;long&quot;</span>
+                <span class="nt">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;col2&quot;</span><span class="p">,</span>
+                <span class="nt">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;int&quot;</span>
               <span class="p">},</span>
               <span class="p">{</span>
-                <span class="nt">&quot;value&quot;</span><span class="p">:</span> <span class="s2">&quot;1989-06-04 00:00:00&quot;</span><span class="p">,</span>
-                <span class="nt">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;date&quot;</span>
+                <span class="nt">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;col3&quot;</span><span class="p">,</span>
+                <span class="nt">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;string&quot;</span>
               <span class="p">},</span>
               <span class="p">{</span>
-                <span class="nt">&quot;value&quot;</span><span class="p">:</span> <span class="kc">true</span><span class="p">,</span>
-                <span class="nt">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;bool&quot;</span>
+                <span class="nt">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;col4&quot;</span><span class="p">,</span>
+                <span class="nt">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;boolean&quot;</span>
               <span class="p">},</span>
               <span class="p">{</span>
-                <span class="nt">&quot;value&quot;</span><span class="p">:</span> <span class="s2">&quot;test&quot;</span><span class="p">,</span>
-                <span class="nt">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;bytes&quot;</span>
+                <span class="nt">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;col5&quot;</span><span class="p">,</span>
+                <span class="nt">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;string&quot;</span>
               <span class="p">}</span>
             <span class="p">],</span>
-            <span class="nt">&quot;sliceRecordCount&quot;</span><span class="p">:</span> <span class="mi">1000</span>
-          <span class="p">},</span>
-          <span class="nt">&quot;writer&quot;</span><span class="p">:</span> <span class="p">{</span>
-            <span class="nt">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;hdfswriter&quot;</span><span class="p">,</span>
-            <span class="nt">&quot;parameter&quot;</span><span class="p">:</span> <span class="p">{</span>
-              <span class="nt">&quot;defaultFS&quot;</span><span class="p">:</span> <span class="s2">&quot;hdfs://xxx:port&quot;</span><span class="p">,</span>
-              <span class="nt">&quot;fileType&quot;</span><span class="p">:</span> <span class="s2">&quot;orc&quot;</span><span class="p">,</span>
-              <span class="nt">&quot;path&quot;</span><span class="p">:</span> <span class="s2">&quot;/user/hive/warehouse/writerorc.db/orcfull&quot;</span><span class="p">,</span>
-              <span class="nt">&quot;fileName&quot;</span><span class="p">:</span> <span class="s2">&quot;xxxx&quot;</span><span class="p">,</span>
-              <span class="nt">&quot;column&quot;</span><span class="p">:</span> <span class="p">[</span>
-                <span class="p">{</span>
-                  <span class="nt">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;col1&quot;</span><span class="p">,</span>
-                  <span class="nt">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;string&quot;</span>
-                <span class="p">},</span>
-                <span class="p">{</span>
-                  <span class="nt">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;col2&quot;</span><span class="p">,</span>
-                  <span class="nt">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;int&quot;</span>
-                <span class="p">},</span>
-                <span class="p">{</span>
-                  <span class="nt">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;col3&quot;</span><span class="p">,</span>
-                  <span class="nt">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;string&quot;</span>
-                <span class="p">},</span>
-                <span class="p">{</span>
-                  <span class="nt">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;col4&quot;</span><span class="p">,</span>
-                  <span class="nt">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;boolean&quot;</span>
-                <span class="p">},</span>
-                <span class="p">{</span>
-                  <span class="nt">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;col5&quot;</span><span class="p">,</span>
-                  <span class="nt">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;string&quot;</span>
-                <span class="p">}</span>
-              <span class="p">],</span>
-              <span class="nt">&quot;writeMode&quot;</span><span class="p">:</span> <span class="s2">&quot;overwrite&quot;</span><span class="p">,</span>
-              <span class="nt">&quot;fieldDelimiter&quot;</span><span class="p">:</span> <span class="s2">&quot;\u0001&quot;</span><span class="p">,</span>
-              <span class="nt">&quot;compress&quot;</span><span class="p">:</span> <span class="s2">&quot;SNAPPY&quot;</span>
-            <span class="p">}</span>
+            <span class="nt">&quot;writeMode&quot;</span><span class="p">:</span> <span class="s2">&quot;overwrite&quot;</span><span class="p">,</span>
+            <span class="nt">&quot;fieldDelimiter&quot;</span><span class="p">:</span> <span class="s2">&quot;\u0001&quot;</span><span class="p">,</span>
+            <span class="nt">&quot;compress&quot;</span><span class="p">:</span> <span class="s2">&quot;SNAPPY&quot;</span>
           <span class="p">}</span>
         <span class="p">}</span>
       <span class="p">}</span>
-    <span class="p">]</span>
+    <span class="p">}</span>
   <span class="p">}</span>
 <span class="p">}</span>
 </code></pre></div>
@@ -1727,7 +1725,7 @@
 <td align="left">fieldDelimiter</td>
 <td align="center">否</td>
 <td><code>,</code></td>
-<td>指定文本文件的字段分隔符，二进制文件不需要指定该项</td>
+<td>指定文本文件（即<code>fileType</code> 指定为 <code>text</code>)的字段分隔符，二进制文件不需要指定该项</td>
 </tr>
 <tr>
 <td align="left">encoding</td>
@@ -1774,12 +1772,10 @@
 </tbody>
 </table>
 <h3 id="path">path<a class="headerlink" href="#path" title="Permanent link">&para;</a></h3>
-<p>存储到 Hadoop hdfs文件系统的路径信息，HdfsWriter 会根据并发配置在 <code>Path</code> 目录下写入多个文件。为与hive表关联，请填写hive表在hdfs上的存储路径。 
-例：Hive上设置的数据仓库的存储路径为：<code>/user/hive/warehouse/</code> ，已建立数据库：<code>test</code>，表：<code>hello</code>；
-则对应的存储路径为：<code>/user/hive/warehouse/test.db/hello</code> (如果建表时指定了<code>location</code> 属性，则依据该属性的路径)</p>
+<p>存储到 Hadoop hdfs文件系统的路径信息，HdfsWriter 会根据并发配置在 <code>Path</code> 目录下写入多个文件。为与hive表关联，请填写hive表在hdfs上的存储路径。 例：Hive上设置的数据仓库的存储路径为：<code>/user/hive/warehouse/</code>
+，已建立数据库：<code>test</code>，表：<code>hello</code>； 则对应的存储路径为：<code>/user/hive/warehouse/test.db/hello</code> (如果建表时指定了<code>location</code> 属性，则依据该属性的路径)</p>
 <h3 id="defaultfs">defaultFS<a class="headerlink" href="#defaultfs" title="Permanent link">&para;</a></h3>
-<p>Hadoop hdfs文件系统 namenode 节点地址。格式：<code>hdfs://ip:port</code> ；例如：<code>hdfs://127.0.0.1:9000</code> , 
-如果启用了HA，则为 servicename 模式，比如 <code>hdfs://sandbox</code></p>
+<p>Hadoop hdfs文件系统 namenode 节点地址。格式：<code>hdfs://ip:port</code> ；例如：<code>hdfs://127.0.0.1:9000</code> , 如果启用了HA，则为 servicename 模式，比如 <code>hdfs://sandbox</code></p>
 <h3 id="filetype">fileType<a class="headerlink" href="#filetype" title="Permanent link">&para;</a></h3>
 <p>描述：文件的类型，目前只支持用户配置为</p>
 <ul>
@@ -1989,7 +1985,7 @@
     <script id="__config" type="application/json">{"base": "../..", "features": ["navigation.instant", "navigation.indexes", "content.code.annotate", "content.tabs.link", "navigation.top", "navigation.tracking", "search.highlight", "search.share", "search.suggest"], "translations": {"clipboard.copy": "\u590d\u5236", "clipboard.copied": "\u5df2\u590d\u5236", "search.config.lang": "ja", "search.config.pipeline": "trimmer, stemmer", "search.config.separator": "[\\uff0c\\u3002]+", "search.placeholder": "\u641c\u7d22", "search.result.placeholder": "\u952e\u5165\u4ee5\u5f00\u59cb\u641c\u7d22", "search.result.none": "\u6ca1\u6709\u627e\u5230\u7b26\u5408\u6761\u4ef6\u7684\u7ed3\u679c", "search.result.one": "\u627e\u5230 1 \u4e2a\u7b26\u5408\u6761\u4ef6\u7684\u7ed3\u679c", "search.result.other": "# \u4e2a\u7b26\u5408\u6761\u4ef6\u7684\u7ed3\u679c", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.term.missing": "Missing", "select.version.title": "Select version"}, "search": "../../assets/javascripts/workers/search.8397ff9e.min.js", "version": {"provider": "mike"}}</script>
     
     
-      <script src="../../assets/javascripts/bundle.1e84347e.min.js"></script>
+      <script src="../../assets/javascripts/bundle.f89c2efe.min.js"></script>
       
     
   </body>

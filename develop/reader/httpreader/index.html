@@ -16,7 +16,7 @@
         <link rel="canonical" href="https://wgzhao.github.io/Addax/develop/reader/httpreader/">
       
       <link rel="icon" href="../../images/favicon.ico">
-      <meta name="generator" content="mkdocs-1.2.3, mkdocs-material-7.3.4">
+      <meta name="generator" content="mkdocs-1.2.3, mkdocs-material-7.3.3">
     
     
       
@@ -24,7 +24,7 @@
       
     
     
-      <link rel="stylesheet" href="../../assets/stylesheets/main.db9e7362.min.css">
+      <link rel="stylesheet" href="../../assets/stylesheets/main.5143246d.min.css">
       
         
         <link rel="stylesheet" href="../../assets/stylesheets/palette.3f5d1f46.min.css">
@@ -634,6 +634,13 @@
           <li class="md-nav__item">
   <a href="#proxy" class="md-nav__link">
     proxy
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#column" class="md-nav__link">
+    column
   </a>
   
 </li>
@@ -1461,6 +1468,13 @@
   
 </li>
         
+          <li class="md-nav__item">
+  <a href="#column" class="md-nav__link">
+    column
+  </a>
+  
+</li>
+        
       </ul>
     </nav>
   
@@ -1658,42 +1672,45 @@
         <span class="nt">&quot;bytes&quot;</span><span class="p">:</span> <span class="mi">-1</span>
       <span class="p">}</span>
     <span class="p">},</span>
-    <span class="nt">&quot;content&quot;</span><span class="p">:</span> <span class="p">[</span>
-      <span class="p">{</span>
-        <span class="nt">&quot;reader&quot;</span><span class="p">:</span> <span class="p">{</span>
-          <span class="nt">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;httpreader&quot;</span><span class="p">,</span>
-          <span class="nt">&quot;parameter&quot;</span><span class="p">:</span> <span class="p">{</span>
-            <span class="nt">&quot;connection&quot;</span><span class="p">:</span> <span class="p">[</span>
-              <span class="p">{</span>
-                <span class="nt">&quot;url&quot;</span><span class="p">:</span> <span class="s2">&quot;http://127.0.0.1:9090/mock/17/LDJSC/ASSET&quot;</span><span class="p">,</span>
-                <span class="nt">&quot;proxy&quot;</span><span class="p">:</span> <span class="p">{</span>
-                    <span class="nt">&quot;host&quot;</span><span class="p">:</span> <span class="s2">&quot;http://127.0.0.1:3128&quot;</span><span class="p">,</span>
-                    <span class="nt">&quot;auth&quot;</span><span class="p">:</span> <span class="s2">&quot;user:pass&quot;</span>
-                <span class="p">}</span>
+    <span class="nt">&quot;content&quot;</span><span class="p">:</span> <span class="p">{</span>
+      <span class="nt">&quot;reader&quot;</span><span class="p">:</span> <span class="p">{</span>
+        <span class="nt">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;httpreader&quot;</span><span class="p">,</span>
+        <span class="nt">&quot;parameter&quot;</span><span class="p">:</span> <span class="p">{</span>
+          <span class="nt">&quot;connection&quot;</span><span class="p">:</span> <span class="p">[</span>
+            <span class="p">{</span>
+              <span class="nt">&quot;url&quot;</span><span class="p">:</span> <span class="s2">&quot;http://127.0.0.1:9090/mock/17/LDJSC/ASSET&quot;</span><span class="p">,</span>
+              <span class="nt">&quot;proxy&quot;</span><span class="p">:</span> <span class="p">{</span>
+                <span class="nt">&quot;host&quot;</span><span class="p">:</span> <span class="s2">&quot;http://127.0.0.1:3128&quot;</span><span class="p">,</span>
+                <span class="nt">&quot;auth&quot;</span><span class="p">:</span> <span class="s2">&quot;user:pass&quot;</span>
               <span class="p">}</span>
-            <span class="p">],</span>
-            <span class="nt">&quot;reqParams&quot;</span><span class="p">:</span> <span class="p">{</span>
-              <span class="nt">&quot;CURR_DATE&quot;</span><span class="p">:</span><span class="s2">&quot;2021-01-18&quot;</span><span class="p">,</span>
-              <span class="nt">&quot;DEPT&quot;</span><span class="p">:</span><span class="s2">&quot;9700&quot;</span>
-            <span class="p">},</span>
-            <span class="nt">&quot;resultKey&quot;</span><span class="p">:</span><span class="s2">&quot;result&quot;</span><span class="p">,</span>
-            <span class="nt">&quot;method&quot;</span><span class="p">:</span> <span class="s2">&quot;GET&quot;</span><span class="p">,</span>
-            <span class="nt">&quot;column&quot;</span><span class="p">:</span> <span class="p">[</span><span class="s2">&quot;CURR_DATE&quot;</span><span class="p">,</span><span class="s2">&quot;DEPT&quot;</span><span class="p">,</span><span class="s2">&quot;TOTAL_MANAGED_MARKET_VALUE&quot;</span><span class="p">,</span><span class="s2">&quot;TOTAL_MANAGED_MARKET_VALUE_GROWTH&quot;</span><span class="p">],</span>
-            <span class="nt">&quot;username&quot;</span><span class="p">:</span> <span class="s2">&quot;user&quot;</span><span class="p">,</span>
-            <span class="nt">&quot;password&quot;</span><span class="p">:</span> <span class="s2">&quot;passw0rd&quot;</span><span class="p">,</span>
-            <span class="nt">&quot;headers&quot;</span><span class="p">:</span> <span class="p">{</span>
-                <span class="nt">&quot;X-Powered-by&quot;</span><span class="p">:</span> <span class="s2">&quot;Addax&quot;</span>
             <span class="p">}</span>
-          <span class="p">}</span>
-        <span class="p">},</span>
-        <span class="nt">&quot;writer&quot;</span><span class="p">:</span> <span class="p">{</span>
-          <span class="nt">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;streamwriter&quot;</span><span class="p">,</span>
-          <span class="nt">&quot;parameter&quot;</span><span class="p">:</span> <span class="p">{</span>
-            <span class="nt">&quot;print&quot;</span><span class="p">:</span> <span class="s2">&quot;true&quot;</span>
+          <span class="p">],</span>
+          <span class="nt">&quot;reqParams&quot;</span><span class="p">:</span> <span class="p">{</span>
+            <span class="nt">&quot;CURR_DATE&quot;</span><span class="p">:</span> <span class="s2">&quot;2021-01-18&quot;</span><span class="p">,</span>
+            <span class="nt">&quot;DEPT&quot;</span><span class="p">:</span> <span class="s2">&quot;9700&quot;</span>
+          <span class="p">},</span>
+          <span class="nt">&quot;resultKey&quot;</span><span class="p">:</span> <span class="s2">&quot;result&quot;</span><span class="p">,</span>
+          <span class="nt">&quot;method&quot;</span><span class="p">:</span> <span class="s2">&quot;GET&quot;</span><span class="p">,</span>
+          <span class="nt">&quot;column&quot;</span><span class="p">:</span> <span class="p">[</span>
+            <span class="s2">&quot;CURR_DATE&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;DEPT&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;TOTAL_MANAGED_MARKET_VALUE&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;TOTAL_MANAGED_MARKET_VALUE_GROWTH&quot;</span>
+          <span class="p">],</span>
+          <span class="nt">&quot;username&quot;</span><span class="p">:</span> <span class="s2">&quot;user&quot;</span><span class="p">,</span>
+          <span class="nt">&quot;password&quot;</span><span class="p">:</span> <span class="s2">&quot;passw0rd&quot;</span><span class="p">,</span>
+          <span class="nt">&quot;headers&quot;</span><span class="p">:</span> <span class="p">{</span>
+            <span class="nt">&quot;X-Powered-by&quot;</span><span class="p">:</span> <span class="s2">&quot;Addax&quot;</span>
           <span class="p">}</span>
         <span class="p">}</span>
+      <span class="p">},</span>
+      <span class="nt">&quot;writer&quot;</span><span class="p">:</span> <span class="p">{</span>
+        <span class="nt">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;streamwriter&quot;</span><span class="p">,</span>
+        <span class="nt">&quot;parameter&quot;</span><span class="p">:</span> <span class="p">{</span>
+          <span class="nt">&quot;print&quot;</span><span class="p">:</span> <span class="s2">&quot;true&quot;</span>
+        <span class="p">}</span>
       <span class="p">}</span>
-    <span class="p">]</span>
+    <span class="p">}</span>
   <span class="p">}</span>
 <span class="p">}</span>
 </code></pre></div>
@@ -1730,7 +1747,7 @@
 
 2021-01-20 09:07:41.903 [main] INFO  Engine -
 {
-    &quot;content&quot;:[
+    &quot;content&quot;:
         {
             &quot;reader&quot;:{
                 &quot;parameter&quot;:{
@@ -1760,8 +1777,7 @@
                 },
                 &quot;name&quot;:&quot;streamwriter&quot;
             }
-        }
-    ],
+    },
     &quot;setting&quot;:{
         &quot;speed&quot;:{
             &quot;bytes&quot;:-1,
@@ -1885,6 +1901,67 @@
 <span class="p">}</span>
 </code></pre></div>
 <p><code>host</code> 是代理地址，包含代理类型，目前仅支持 <code>http</code> 代理和 <code>socks</code>(V4, V5均可) 代理。 如果代理需要认证，则可以配置  <code>auth</code> , 它由 用户名和密码组成，两者之间用冒号(:) 隔开。</p>
+<h3 id="column">column<a class="headerlink" href="#column" title="Permanent link">&para;</a></h3>
+<p><code>column</code> 除了直接指定 key 之外，还允许用 JSON Xpath 风格来指定需要获取的 key 值，假定你要读取的 JSON 文件如下：</p>
+<div class="highlight"><pre><span></span><code><span class="p">{</span>
+  <span class="nt">&quot;result&quot;</span><span class="p">:</span> <span class="p">[</span>
+    <span class="p">{</span>
+      <span class="nt">&quot;CURR_DATE&quot;</span><span class="p">:</span> <span class="s2">&quot;2019-12-09&quot;</span><span class="p">,</span>
+      <span class="nt">&quot;DEPT&quot;</span><span class="p">:</span> <span class="p">{</span>
+        <span class="nt">&quot;ID&quot;</span><span class="p">:</span> <span class="s2">&quot;9700&quot;</span>
+      <span class="p">},</span>
+      <span class="nt">&quot;KK&quot;</span><span class="p">:</span> <span class="p">[</span>
+        <span class="p">{</span>
+          <span class="nt">&quot;COL1&quot;</span><span class="p">:</span> <span class="mi">1</span>
+        <span class="p">},</span>
+        <span class="p">{</span>
+          <span class="nt">&quot;COL2&quot;</span><span class="p">:</span> <span class="mi">2</span>
+        <span class="p">}</span>
+      <span class="p">]</span>
+    <span class="p">},</span>
+    <span class="p">{</span>
+      <span class="nt">&quot;CURR_DATE&quot;</span><span class="p">:</span> <span class="s2">&quot;2021-11-09&quot;</span><span class="p">,</span>
+      <span class="nt">&quot;DEPT&quot;</span><span class="p">:</span> <span class="p">{</span>
+        <span class="nt">&quot;ID&quot;</span><span class="p">:</span> <span class="s2">&quot;6500&quot;</span>
+      <span class="p">},</span>
+      <span class="nt">&quot;KK&quot;</span><span class="p">:</span> <span class="p">[</span>
+        <span class="p">{</span>
+          <span class="nt">&quot;COL1&quot;</span><span class="p">:</span> <span class="mi">3</span>
+        <span class="p">},</span>
+        <span class="p">{</span>
+          <span class="nt">&quot;COL2&quot;</span><span class="p">:</span> <span class="mi">4</span>
+        <span class="p">}</span>
+      <span class="p">]</span>
+    <span class="p">}</span>
+  <span class="p">]</span>
+<span class="p">}</span>
+</code></pre></div>
+<p>我们希望把 <code>CURR_DATE</code>, <code>ID</code>, <code>COL1</code>, <code>COL2</code> 当作四个字段读取，那么你的 <code>column</code> 可以这样配置：</p>
+<div class="highlight"><pre><span></span><code><span class="p">{</span>
+  <span class="nt">&quot;column&quot;</span><span class="p">:</span> <span class="p">[</span><span class="s2">&quot;CURR_DATE&quot;</span><span class="p">,</span><span class="s2">&quot;DEPT.ID&quot;</span><span class="p">,</span> <span class="s2">&quot;KK[0].COL1&quot;</span><span class="p">,</span> <span class="s2">&quot;KK[1].COL2&quot;</span><span class="p">]</span>
+<span class="p">}</span>
+</code></pre></div>
+<p>其执行结果如下：</p>
+<div class="highlight"><pre><span></span><code>...
+<span class="m">2021</span>-10-30 <span class="m">14</span>:01:50.273 <span class="o">[</span> taskGroup-0<span class="o">]</span> INFO  Channel              - Channel <span class="nb">set</span> record_speed_limit to -1, No tps activated.
+
+<span class="m">2019</span>-12-09  <span class="m">9700</span>    <span class="m">1</span>   <span class="m">2</span>
+<span class="m">2021</span>-11-09  <span class="m">6500</span>    <span class="m">3</span>   <span class="m">4</span>
+
+<span class="m">2021</span>-10-30 <span class="m">14</span>:01:53.283 <span class="o">[</span>       job-0<span class="o">]</span> INFO  AbstractScheduler    - Scheduler accomplished all tasks.
+<span class="m">2021</span>-10-30 <span class="m">14</span>:01:53.284 <span class="o">[</span>       job-0<span class="o">]</span> INFO  JobContainer         - Addax Writer.Job <span class="o">[</span>streamwriter<span class="o">]</span> <span class="k">do</span> post work.
+<span class="m">2021</span>-10-30 <span class="m">14</span>:01:53.284 <span class="o">[</span>       job-0<span class="o">]</span> INFO  JobContainer         - Addax Reader.Job <span class="o">[</span>httpreader<span class="o">]</span> <span class="k">do</span> post work.
+<span class="m">2021</span>-10-30 <span class="m">14</span>:01:53.286 <span class="o">[</span>       job-0<span class="o">]</span> INFO  JobContainer         - PerfTrace not enable!
+<span class="m">2021</span>-10-30 <span class="m">14</span>:01:53.289 <span class="o">[</span>       job-0<span class="o">]</span> INFO  JobContainer         -
+任务启动时刻                    : <span class="m">2021</span>-10-30 <span class="m">14</span>:01:50
+任务结束时刻                    : <span class="m">2021</span>-10-30 <span class="m">14</span>:01:53
+任务总计耗时                    :                  3s
+任务平均流量                    :               10B/s
+记录写入速度                    :              0rec/s
+读出记录总数                    :                   <span class="m">2</span>
+读写失败总数                    :                   <span class="m">0</span>
+</code></pre></div>
+<p>注意： 如果你指定了不存在的 Key，则直接返回为 NULL 值。</p>
 <h2 id="_6">限制说明<a class="headerlink" href="#_6" title="Permanent link">&para;</a></h2>
 <ol>
 <li>返回的结果必须是JSON类型</li>
@@ -1999,7 +2076,7 @@
     <script id="__config" type="application/json">{"base": "../..", "features": ["navigation.instant", "navigation.indexes", "content.code.annotate", "content.tabs.link", "navigation.top", "navigation.tracking", "search.highlight", "search.share", "search.suggest"], "translations": {"clipboard.copy": "\u590d\u5236", "clipboard.copied": "\u5df2\u590d\u5236", "search.config.lang": "ja", "search.config.pipeline": "trimmer, stemmer", "search.config.separator": "[\\uff0c\\u3002]+", "search.placeholder": "\u641c\u7d22", "search.result.placeholder": "\u952e\u5165\u4ee5\u5f00\u59cb\u641c\u7d22", "search.result.none": "\u6ca1\u6709\u627e\u5230\u7b26\u5408\u6761\u4ef6\u7684\u7ed3\u679c", "search.result.one": "\u627e\u5230 1 \u4e2a\u7b26\u5408\u6761\u4ef6\u7684\u7ed3\u679c", "search.result.other": "# \u4e2a\u7b26\u5408\u6761\u4ef6\u7684\u7ed3\u679c", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.term.missing": "Missing", "select.version.title": "Select version"}, "search": "../../assets/javascripts/workers/search.8397ff9e.min.js", "version": {"provider": "mike"}}</script>
     
     
-      <script src="../../assets/javascripts/bundle.1e84347e.min.js"></script>
+      <script src="../../assets/javascripts/bundle.f89c2efe.min.js"></script>
       
     
   </body>

@@ -1,8 +1,7 @@
 2021-02-23 15:22:57.851 [main] INFO  VMInfo - VMInfo# operatingSystem class => sun.management.OperatingSystemImpl
 2021-02-23 15:22:57.871 [main] INFO  Engine -
 {
-"content":[
-{
+"content":{
 "reader":{
     "parameter":{
             "column":[
@@ -37,9 +36,8 @@
             "username":"test"
     },
     "name":"doriswriter"
-}
-}
-],
+ }
+},
 "setting":{
 "speed":{
 "channel":2

@@ -16,7 +16,7 @@
         <link rel="canonical" href="https://wgzhao.github.io/Addax/develop/reader/mongodbreader/">
       
       <link rel="icon" href="../../images/favicon.ico">
-      <meta name="generator" content="mkdocs-1.2.3, mkdocs-material-7.3.4">
+      <meta name="generator" content="mkdocs-1.2.3, mkdocs-material-7.3.3">
     
     
       
@@ -24,7 +24,7 @@
       
     
     
-      <link rel="stylesheet" href="../../assets/stylesheets/main.db9e7362.min.css">
+      <link rel="stylesheet" href="../../assets/stylesheets/main.5143246d.min.css">
       
         
         <link rel="stylesheet" href="../../assets/stylesheets/palette.3f5d1f46.min.css">
@@ -670,6 +670,33 @@
   <a href="#_2" class="md-nav__link">
     参数说明
   </a>
+  
+    <nav class="md-nav" aria-label="参数说明">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#collection" class="md-nav__link">
+    collection
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#column" class="md-nav__link">
+    column
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#query" class="md-nav__link">
+    query
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
   
 </li>
       
@@ -1384,6 +1411,33 @@
     参数说明
   </a>
   
+    <nav class="md-nav" aria-label="参数说明">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#collection" class="md-nav__link">
+    collection
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#column" class="md-nav__link">
+    column
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#query" class="md-nav__link">
+    query
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
 </li>
       
         <li class="md-nav__item">
@@ -1416,93 +1470,51 @@
   <span class="nt">&quot;job&quot;</span><span class="p">:</span> <span class="p">{</span>
     <span class="nt">&quot;setting&quot;</span><span class="p">:</span> <span class="p">{</span>
       <span class="nt">&quot;speed&quot;</span><span class="p">:</span> <span class="p">{</span>
-        <span class="nt">&quot;channel&quot;</span><span class="p">:</span> <span class="mi">2</span><span class="p">,</span>
+        <span class="nt">&quot;channel&quot;</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span>
         <span class="nt">&quot;bytes&quot;</span><span class="p">:</span> <span class="mi">-1</span>
       <span class="p">}</span>
     <span class="p">},</span>
-    <span class="nt">&quot;content&quot;</span><span class="p">:</span> <span class="p">[</span>
-      <span class="p">{</span>
-        <span class="nt">&quot;reader&quot;</span><span class="p">:</span> <span class="p">{</span>
-          <span class="nt">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;mongodbreader&quot;</span><span class="p">,</span>
-          <span class="nt">&quot;parameter&quot;</span><span class="p">:</span> <span class="p">{</span>
-            <span class="nt">&quot;address&quot;</span><span class="p">:</span> <span class="p">[</span>
-              <span class="s2">&quot;127.0.0.1:32768&quot;</span>
-            <span class="p">],</span>
-            <span class="nt">&quot;userName&quot;</span><span class="p">:</span> <span class="s2">&quot;&quot;</span><span class="p">,</span>
-            <span class="nt">&quot;userPassword&quot;</span><span class="p">:</span> <span class="s2">&quot;&quot;</span><span class="p">,</span>
-            <span class="nt">&quot;dbName&quot;</span><span class="p">:</span> <span class="s2">&quot;tag_per_data&quot;</span><span class="p">,</span>
-            <span class="nt">&quot;collectionName&quot;</span><span class="p">:</span> <span class="s2">&quot;tag_data&quot;</span><span class="p">,</span>
-            <span class="nt">&quot;column&quot;</span><span class="p">:</span> <span class="p">[</span>
-              <span class="p">{</span>
-                <span class="nt">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;unique_id&quot;</span><span class="p">,</span>
-                <span class="nt">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;string&quot;</span>
-              <span class="p">},</span>
-              <span class="p">{</span>
-                <span class="nt">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;sid&quot;</span><span class="p">,</span>
-                <span class="nt">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;string&quot;</span>
-              <span class="p">},</span>
-              <span class="p">{</span>
-                <span class="nt">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;user_id&quot;</span><span class="p">,</span>
-                <span class="nt">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;string&quot;</span>
-              <span class="p">},</span>
-              <span class="p">{</span>
-                <span class="nt">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;auction_id&quot;</span><span class="p">,</span>
-                <span class="nt">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;string&quot;</span>
-              <span class="p">},</span>
-              <span class="p">{</span>
-                <span class="nt">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;content_type&quot;</span><span class="p">,</span>
-                <span class="nt">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;string&quot;</span>
-              <span class="p">},</span>
-              <span class="p">{</span>
-                <span class="nt">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;pool_type&quot;</span><span class="p">,</span>
-                <span class="nt">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;string&quot;</span>
-              <span class="p">},</span>
-              <span class="p">{</span>
-                <span class="nt">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;frontcat_id&quot;</span><span class="p">,</span>
-                <span class="nt">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;Array&quot;</span><span class="p">,</span>
-                <span class="nt">&quot;spliter&quot;</span><span class="p">:</span> <span class="s2">&quot;&quot;</span>
-              <span class="p">},</span>
-              <span class="p">{</span>
-                <span class="nt">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;categoryid&quot;</span><span class="p">,</span>
-                <span class="nt">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;Array&quot;</span><span class="p">,</span>
-                <span class="nt">&quot;spliter&quot;</span><span class="p">:</span> <span class="s2">&quot;&quot;</span>
-              <span class="p">},</span>
-              <span class="p">{</span>
-                <span class="nt">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;gmt_create&quot;</span><span class="p">,</span>
-                <span class="nt">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;string&quot;</span>
-              <span class="p">},</span>
-              <span class="p">{</span>
-                <span class="nt">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;taglist&quot;</span><span class="p">,</span>
-                <span class="nt">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;Array&quot;</span><span class="p">,</span>
-                <span class="nt">&quot;spliter&quot;</span><span class="p">:</span> <span class="s2">&quot; &quot;</span>
-              <span class="p">},</span>
-              <span class="p">{</span>
-                <span class="nt">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;property&quot;</span><span class="p">,</span>
-                <span class="nt">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;string&quot;</span>
-              <span class="p">},</span>
-              <span class="p">{</span>
-                <span class="nt">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;scorea&quot;</span><span class="p">,</span>
-                <span class="nt">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;int&quot;</span>
-              <span class="p">},</span>
-              <span class="p">{</span>
-                <span class="nt">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;scoreb&quot;</span><span class="p">,</span>
-                <span class="nt">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;int&quot;</span>
-              <span class="p">},</span>
-              <span class="p">{</span>
-                <span class="nt">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;scorec&quot;</span><span class="p">,</span>
-                <span class="nt">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;int&quot;</span>
-              <span class="p">}</span>
-            <span class="p">]</span>
-          <span class="p">}</span>
-        <span class="p">},</span>
-        <span class="nt">&quot;writer&quot;</span><span class="p">:</span> <span class="p">{</span>
-          <span class="nt">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;streamwriter&quot;</span><span class="p">,</span>
-          <span class="nt">&quot;parameter&quot;</span><span class="p">:</span> <span class="p">{</span>
-            <span class="nt">&quot;print&quot;</span><span class="p">:</span> <span class="s2">&quot;true&quot;</span>
-          <span class="p">}</span>
+    <span class="nt">&quot;content&quot;</span><span class="p">:</span> <span class="p">{</span>
+      <span class="nt">&quot;reader&quot;</span><span class="p">:</span> <span class="p">{</span>
+        <span class="nt">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;mongodbreader&quot;</span><span class="p">,</span>
+        <span class="nt">&quot;parameter&quot;</span><span class="p">:</span> <span class="p">{</span>
+          <span class="nt">&quot;connection&quot;</span><span class="p">:</span> <span class="p">[</span>
+            <span class="p">{</span>
+              <span class="nt">&quot;address&quot;</span><span class="p">:</span> <span class="p">[</span>
+                <span class="s2">&quot;127.0.0.1:27017&quot;</span>
+              <span class="p">],</span>
+              <span class="nt">&quot;database&quot;</span><span class="p">:</span> <span class="s2">&quot;tag_per_data&quot;</span><span class="p">,</span>
+              <span class="nt">&quot;collection&quot;</span><span class="p">:</span> <span class="s2">&quot;tag_data&quot;</span><span class="p">,</span>
+              <span class="nt">&quot;authDb&quot;</span><span class="p">:</span> <span class="s2">&quot;admin&quot;</span>
+            <span class="p">}</span>
+          <span class="p">],</span>
+          <span class="nt">&quot;username&quot;</span><span class="p">:</span> <span class="s2">&quot;&quot;</span><span class="p">,</span>
+          <span class="nt">&quot;password&quot;</span><span class="p">:</span> <span class="s2">&quot;&quot;</span><span class="p">,</span>
+          <span class="nt">&quot;column&quot;</span><span class="p">:</span> <span class="p">[</span>
+            <span class="s2">&quot;unique_id&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;sid&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;user_id&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;auction_id&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;content_type&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;pool_type&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;frontcat_id&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;catagoryid&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;gmt_create&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;taglist&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;property&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;scorea&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;scoreb&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;scorec&quot;</span>
+          <span class="p">]</span>
+        <span class="p">}</span>
+      <span class="p">},</span>
+      <span class="nt">&quot;writer&quot;</span><span class="p">:</span> <span class="p">{</span>
+        <span class="nt">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;streamwriter&quot;</span><span class="p">,</span>
+        <span class="nt">&quot;parameter&quot;</span><span class="p">:</span> <span class="p">{</span>
+          <span class="nt">&quot;print&quot;</span><span class="p">:</span> <span class="s2">&quot;true&quot;</span>
         <span class="p">}</span>
       <span class="p">}</span>
-    <span class="p">]</span>
+    <span class="p">}</span>
   <span class="p">}</span>
 <span class="p">}</span>
 </code></pre></div>
@@ -1512,6 +1524,7 @@
 <tr>
 <th align="left">配置项</th>
 <th align="center">是否必须</th>
+<th>类型</th>
 <th>默认值</th>
 <th>描述</th>
 </tr>
@@ -1520,53 +1533,89 @@
 <tr>
 <td align="left">address</td>
 <td align="center">是</td>
+<td>list</td>
 <td>无</td>
-<td>MongoDB的数据地址信息，因为 MonogDB 可能是个集群，则ip端口信息需要以Json数组的形式给出</td>
+<td>MongoDB 的数据地址信息，因为 MongoDB 可能是个集群，则 IP 及端口信息需要以 JSON 数组的形式给出</td>
 </tr>
 <tr>
-<td align="left">userName</td>
+<td align="left">username</td>
 <td align="center">否</td>
+<td>string</td>
 <td>无</td>
-<td>MongoDB的用户名</td>
+<td>MongoDB 用户名</td>
 </tr>
 <tr>
-<td align="left">userPassword</td>
+<td align="left">password</td>
 <td align="center">否</td>
+<td>string</td>
 <td>无</td>
-<td>MongoDB的密码</td>
+<td>MongoDB 密码</td>
 </tr>
 <tr>
-<td align="left">collectionName</td>
+<td align="left">database</td>
 <td align="center">是</td>
+<td>string</td>
 <td>无</td>
-<td>MongoDB的集合名</td>
+<td>MongoDB 数据库</td>
+</tr>
+<tr>
+<td align="left">collection</td>
+<td align="center">是</td>
+<td>string</td>
+<td>无</td>
+<td>MongoDB 的集合名</td>
 </tr>
 <tr>
 <td align="left">column</td>
 <td align="center">是</td>
+<td>list</td>
 <td>无</td>
-<td>MongoDB的文档列名</td>
+<td>MongoDB 的文档列名，不支持 <code>["*"]</code> 获取所有列方式</td>
 </tr>
 <tr>
-<td align="left">name</td>
-<td align="center">是</td>
-<td>无</td>
-<td>Column的名字</td>
-</tr>
-<tr>
-<td align="left">type</td>
+<td align="left">query</td>
 <td align="center">否</td>
+<td>string</td>
 <td>无</td>
-<td>Column的类型</td>
+<td>自定义查询条件</td>
 </tr>
 <tr>
-<td align="left">splitter</td>
+<td align="left">fetchSize</td>
 <td align="center">否</td>
-<td>无</td>
-<td>指定 MongoDB数组转为字符串的分隔符</td>
+<td>int</td>
+<td>2048</td>
+<td>批量获取的记录数</td>
 </tr>
 </tbody>
 </table>
+<h3 id="collection">collection<a class="headerlink" href="#collection" title="Permanent link">&para;</a></h3>
+<p>这里的 <code>collection</code>  目前只支持单一 collection，因此设置类型为字符串，而不是其他插件常见的数组类型，这一点尤为注意。</p>
+<h3 id="column">column<a class="headerlink" href="#column" title="Permanent link">&para;</a></h3>
+<p><code>column</code> 用来指定需要读取的字段名称，这里我们做了字段名称的组成两个假定：</p>
+<ul>
+<li>不可能用单引号开头(<code>'</code>)</li>
+<li>不可能全部由数字和点(<code>.</code>)  组成</li>
+</ul>
+<p>基于以上假定，我们可以在简化 <code>column</code> 配置的同时，还可以指定一些常量作为补充字段，比如一般采集一张表，我们需要增加采集时间，采集源等常量，那么可以这样配置</p>
+<div class="highlight"><pre><span></span><code><span class="p">{</span>
+  <span class="nt">&quot;column&quot;</span><span class="p">:</span> <span class="p">[</span>
+    <span class="s2">&quot;col1&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;col2&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;col3&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;&#39;source_mongodb&#39;&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;20211026&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;123.12&quot;</span>
+  <span class="p">]</span>
+<span class="p">}</span>
+</code></pre></div>
+<p>上述配置的后三个字段就是常量，分别当作字符类型，整型和浮点型处理。</p>
+<h3 id="query">query<a class="headerlink" href="#query" title="Permanent link">&para;</a></h3>
+<p><code>query</code> 是只符合 MongoDB 查询格式的 BSON 字符串，比如：</p>
+<div class="highlight"><pre><span></span><code><span class="p">{</span>
+  <span class="nt">&quot;query&quot;</span><span class="p">:</span> <span class="s2">&quot;{amount: {$gt: 140900}, oc_date: {$gt: 20190110}}&quot;</span>
+<span class="p">}</span>
+</code></pre></div>
+<p>上述查询类似 SQL 中的 <code>where amount &gt; 140900 and oc_date &gt; 20190110</code></p>
 <h2 id="_3">类型转换<a class="headerlink" href="#_3" title="Permanent link">&para;</a></h2>
 <table>
 <thead>
@@ -1708,7 +1757,7 @@
     <script id="__config" type="application/json">{"base": "../..", "features": ["navigation.instant", "navigation.indexes", "content.code.annotate", "content.tabs.link", "navigation.top", "navigation.tracking", "search.highlight", "search.share", "search.suggest"], "translations": {"clipboard.copy": "\u590d\u5236", "clipboard.copied": "\u5df2\u590d\u5236", "search.config.lang": "ja", "search.config.pipeline": "trimmer, stemmer", "search.config.separator": "[\\uff0c\\u3002]+", "search.placeholder": "\u641c\u7d22", "search.result.placeholder": "\u952e\u5165\u4ee5\u5f00\u59cb\u641c\u7d22", "search.result.none": "\u6ca1\u6709\u627e\u5230\u7b26\u5408\u6761\u4ef6\u7684\u7ed3\u679c", "search.result.one": "\u627e\u5230 1 \u4e2a\u7b26\u5408\u6761\u4ef6\u7684\u7ed3\u679c", "search.result.other": "# \u4e2a\u7b26\u5408\u6761\u4ef6\u7684\u7ed3\u679c", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.term.missing": "Missing", "select.version.title": "Select version"}, "search": "../../assets/javascripts/workers/search.8397ff9e.min.js", "version": {"provider": "mike"}}</script>
     
     
-      <script src="../../assets/javascripts/bundle.1e84347e.min.js"></script>
+      <script src="../../assets/javascripts/bundle.f89c2efe.min.js"></script>
       
     
   </body>

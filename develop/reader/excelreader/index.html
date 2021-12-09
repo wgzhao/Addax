@@ -16,7 +16,7 @@
         <link rel="canonical" href="https://wgzhao.github.io/Addax/develop/reader/excelreader/">
       
       <link rel="icon" href="../../images/favicon.ico">
-      <meta name="generator" content="mkdocs-1.2.3, mkdocs-material-7.3.4">
+      <meta name="generator" content="mkdocs-1.2.3, mkdocs-material-7.3.3">
     
     
       
@@ -24,7 +24,7 @@
       
     
     
-      <link rel="stylesheet" href="../../assets/stylesheets/main.db9e7362.min.css">
+      <link rel="stylesheet" href="../../assets/stylesheets/main.5143246d.min.css">
       
         
         <link rel="stylesheet" href="../../assets/stylesheets/palette.3f5d1f46.min.css">
@@ -1525,24 +1525,24 @@
         <span class="nt">&quot;bytes&quot;</span><span class="p">:</span> <span class="mi">-1</span>
       <span class="p">}</span>
     <span class="p">},</span>
-    <span class="nt">&quot;content&quot;</span><span class="p">:</span> <span class="p">[</span>
-      <span class="p">{</span>
-        <span class="nt">&quot;reader&quot;</span><span class="p">:</span> <span class="p">{</span>
-          <span class="nt">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;excelreader&quot;</span><span class="p">,</span>
-          <span class="nt">&quot;parameter&quot;</span><span class="p">:</span> <span class="p">{</span>
-            <span class="nt">&quot;path&quot;</span><span class="p">:</span> <span class="p">[</span><span class="s2">&quot;/tmp/in&quot;</span><span class="p">],</span>
-            <span class="nt">&quot;header&quot;</span><span class="p">:</span> <span class="kc">true</span><span class="p">,</span>
-            <span class="nt">&quot;skipRows&quot;</span><span class="p">:</span> <span class="mi">0</span>
-          <span class="p">}</span>
-        <span class="p">},</span>
-        <span class="nt">&quot;writer&quot;</span><span class="p">:</span> <span class="p">{</span>
-          <span class="nt">&quot;parameter&quot;</span><span class="p">:</span> <span class="p">{</span>
-            <span class="nt">&quot;print&quot;</span><span class="p">:</span> <span class="kc">true</span>
-          <span class="p">},</span>
-          <span class="nt">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;streamwriter&quot;</span>
+    <span class="nt">&quot;content&quot;</span><span class="p">:</span> <span class="p">{</span>
+      <span class="nt">&quot;reader&quot;</span><span class="p">:</span> <span class="p">{</span>
+        <span class="nt">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;excelreader&quot;</span><span class="p">,</span>
+        <span class="nt">&quot;parameter&quot;</span><span class="p">:</span> <span class="p">{</span>
+          <span class="nt">&quot;path&quot;</span><span class="p">:</span> <span class="p">[</span>
+            <span class="s2">&quot;/tmp/in&quot;</span>
+          <span class="p">],</span>
+          <span class="nt">&quot;header&quot;</span><span class="p">:</span> <span class="kc">true</span><span class="p">,</span>
+          <span class="nt">&quot;skipRows&quot;</span><span class="p">:</span> <span class="mi">0</span>
         <span class="p">}</span>
+      <span class="p">},</span>
+      <span class="nt">&quot;writer&quot;</span><span class="p">:</span> <span class="p">{</span>
+        <span class="nt">&quot;parameter&quot;</span><span class="p">:</span> <span class="p">{</span>
+          <span class="nt">&quot;print&quot;</span><span class="p">:</span> <span class="kc">true</span>
+        <span class="p">},</span>
+        <span class="nt">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;streamwriter&quot;</span>
       <span class="p">}</span>
-    <span class="p">]</span>
+    <span class="p">}</span>
   <span class="p">}</span>
 <span class="p">}</span>
 </code></pre></div>
@@ -1567,7 +1567,7 @@
 <span class="m">2021</span>-09-09 <span class="m">14</span>:43:42.579 <span class="o">[</span>        main<span class="o">]</span> INFO  VMInfo               - VMInfo# operatingSystem <span class="nv">class</span> <span class="o">=</span>&gt; sun.management.OperatingSystemImpl
 <span class="m">2021</span>-09-09 <span class="m">14</span>:43:42.621 <span class="o">[</span>        main<span class="o">]</span> INFO  Engine               -
 <span class="o">{</span>
-    <span class="s2">&quot;content&quot;</span>:<span class="o">[</span>
+    <span class="s2">&quot;content&quot;</span>:
         <span class="o">{</span>
             <span class="s2">&quot;reader&quot;</span>:<span class="o">{</span>
                 <span class="s2">&quot;parameter&quot;</span>:<span class="o">{</span>
@@ -1602,8 +1602,7 @@
                 <span class="o">}</span>,
                 <span class="s2">&quot;name&quot;</span>:<span class="s2">&quot;streamwriter&quot;</span>
             <span class="o">}</span>
-        <span class="o">}</span>
-    <span class="o">]</span>,
+        <span class="o">}</span>,
     <span class="s2">&quot;setting&quot;</span>:<span class="o">{</span>
         <span class="s2">&quot;speed&quot;</span>:<span class="o">{</span>
             <span class="s2">&quot;bytes&quot;</span>:-1,
@@ -1874,7 +1873,7 @@
     <script id="__config" type="application/json">{"base": "../..", "features": ["navigation.instant", "navigation.indexes", "content.code.annotate", "content.tabs.link", "navigation.top", "navigation.tracking", "search.highlight", "search.share", "search.suggest"], "translations": {"clipboard.copy": "\u590d\u5236", "clipboard.copied": "\u5df2\u590d\u5236", "search.config.lang": "ja", "search.config.pipeline": "trimmer, stemmer", "search.config.separator": "[\\uff0c\\u3002]+", "search.placeholder": "\u641c\u7d22", "search.result.placeholder": "\u952e\u5165\u4ee5\u5f00\u59cb\u641c\u7d22", "search.result.none": "\u6ca1\u6709\u627e\u5230\u7b26\u5408\u6761\u4ef6\u7684\u7ed3\u679c", "search.result.one": "\u627e\u5230 1 \u4e2a\u7b26\u5408\u6761\u4ef6\u7684\u7ed3\u679c", "search.result.other": "# \u4e2a\u7b26\u5408\u6761\u4ef6\u7684\u7ed3\u679c", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.term.missing": "Missing", "select.version.title": "Select version"}, "search": "../../assets/javascripts/workers/search.8397ff9e.min.js", "version": {"provider": "mike"}}</script>
     
     
-      <script src="../../assets/javascripts/bundle.1e84347e.min.js"></script>
+      <script src="../../assets/javascripts/bundle.f89c2efe.min.js"></script>
       
     
   </body>

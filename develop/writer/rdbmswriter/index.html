@@ -16,7 +16,7 @@
         <link rel="canonical" href="https://wgzhao.github.io/Addax/develop/writer/rdbmswriter/">
       
       <link rel="icon" href="../../images/favicon.ico">
-      <meta name="generator" content="mkdocs-1.2.3, mkdocs-material-7.3.4">
+      <meta name="generator" content="mkdocs-1.2.3, mkdocs-material-7.3.3">
     
     
       
@@ -24,7 +24,7 @@
       
     
     
-      <link rel="stylesheet" href="../../assets/stylesheets/main.db9e7362.min.css">
+      <link rel="stylesheet" href="../../assets/stylesheets/main.5143246d.min.css">
       
         
         <link rel="stylesheet" href="../../assets/stylesheets/palette.3f5d1f46.min.css">
@@ -1470,23 +1470,12 @@
 <li><a href="clickhousewriter">ClickHouse Writer</a></li>
 <li><a href="sqlserverwriter">SQLServer Writer</a></li>
 </ul>
-<p>注意,  如果已经提供了专门的数据库写入插件的，推荐使用专用插件，如果你需要写入的数据库没有专门插件，则考虑使用该通用插件。
-在使用之前，还需要执行以下操作才可以正常运行，否则运行会出现异常。</p>
+<p>注意, 如果已经提供了专门的数据库写入插件的，推荐使用专用插件，如果你需要写入的数据库没有专门插件，则考虑使用该通用插件。 在使用之前，还需要执行以下操作才可以正常运行，否则运行会出现异常。</p>
 <h2 id="_1">配置驱动<a class="headerlink" href="#_1" title="Permanent link">&para;</a></h2>
 <p>假定你需要写入 IBM DB2 的数据，因为没有提供专门的读取插件，所以我们可以使用该插件来实现，在使用之前，需要执行下面两个操作：</p>
 <ol>
 <li>下载对应的 JDBC 驱动，并拷贝到 <code>plugin/writer/rdbmswriter/libs</code> 目录</li>
-<li>
-<p>修改 <code>plugin/writer/rdbmswriter/plugin.json</code> 文件，找到 <code>drivers</code> 一项，填写正确的 JDBC 驱动名，比如 DB2 的驱动名为 <code>com.ibm.db2.jcc.DB2Driver</code>，类似这样：</p>
-<div class="highlight"><pre><span></span><code><span class="p">{</span>
-  <span class="nt">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;rdbmswriter&quot;</span><span class="p">,</span>
-  <span class="nt">&quot;class&quot;</span><span class="p">:</span> <span class="s2">&quot;com.wgzhao.addax.plugin.reader.rdbmswriter.RdbmsWriter&quot;</span><span class="p">,</span>
-  <span class="nt">&quot;description&quot;</span><span class="p">:</span> <span class="s2">&quot;&quot;</span><span class="p">,</span>
-  <span class="nt">&quot;developer&quot;</span><span class="p">:</span> <span class="s2">&quot;alibaba&quot;</span><span class="p">,</span>
-  <span class="nt">&quot;drivers&quot;</span><span class="p">:</span> <span class="p">[</span><span class="s2">&quot;com.ibm.db2.jcc.DB2Driver&quot;</span><span class="p">]</span>
-  <span class="p">}</span> 
-</code></pre></div>
-</li>
+<li>修改任务配置文件，找到 <code>driver</code> 一项，填写正确的 JDBC 驱动名，比如 DB2 的驱动名为 <code>com.ibm.db2.jcc.DB2Driver</code></li>
 </ol>
 <p>以下列出常见的数据库以及对应的驱动名称</p>
 <ul>
@@ -1506,7 +1495,68 @@
 </ul>
 <h2 id="_2">配置说明<a class="headerlink" href="#_2" title="Permanent link">&para;</a></h2>
 <p>配置一个写入RDBMS的作业。</p>
-<div class="highlight"><pre><span></span><code>
+<div class="highlight"><pre><span></span><code><span class="p">{</span>
+  <span class="nt">&quot;job&quot;</span><span class="p">:</span> <span class="p">{</span>
+    <span class="nt">&quot;setting&quot;</span><span class="p">:</span> <span class="p">{</span>
+      <span class="nt">&quot;speed&quot;</span><span class="p">:</span> <span class="p">{</span>
+        <span class="nt">&quot;channel&quot;</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span>
+        <span class="nt">&quot;bytes&quot;</span><span class="p">:</span> <span class="mi">-1</span>
+      <span class="p">}</span>
+    <span class="p">},</span>
+    <span class="nt">&quot;content&quot;</span><span class="p">:</span> <span class="p">{</span>
+      <span class="nt">&quot;reader&quot;</span><span class="p">:</span> <span class="p">{</span>
+        <span class="nt">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;streamreader&quot;</span><span class="p">,</span>
+        <span class="nt">&quot;parameter&quot;</span><span class="p">:</span> <span class="p">{</span>
+          <span class="nt">&quot;column&quot;</span><span class="p">:</span> <span class="p">[</span>
+            <span class="p">{</span>
+              <span class="nt">&quot;value&quot;</span><span class="p">:</span> <span class="s2">&quot;Addax&quot;</span><span class="p">,</span>
+              <span class="nt">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;string&quot;</span>
+            <span class="p">},</span>
+            <span class="p">{</span>
+              <span class="nt">&quot;value&quot;</span><span class="p">:</span> <span class="mi">19880808</span><span class="p">,</span>
+              <span class="nt">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;long&quot;</span>
+            <span class="p">},</span>
+            <span class="p">{</span>
+              <span class="nt">&quot;value&quot;</span><span class="p">:</span> <span class="s2">&quot;1988-08-08 08:08:08&quot;</span><span class="p">,</span>
+              <span class="nt">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;date&quot;</span>
+            <span class="p">},</span>
+            <span class="p">{</span>
+              <span class="nt">&quot;value&quot;</span><span class="p">:</span> <span class="kc">true</span><span class="p">,</span>
+              <span class="nt">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;bool&quot;</span>
+            <span class="p">},</span>
+            <span class="p">{</span>
+              <span class="nt">&quot;value&quot;</span><span class="p">:</span> <span class="s2">&quot;test&quot;</span><span class="p">,</span>
+              <span class="nt">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;bytes&quot;</span>
+            <span class="p">}</span>
+          <span class="p">],</span>
+          <span class="nt">&quot;sliceRecordCount&quot;</span><span class="p">:</span> <span class="mi">1000</span>
+        <span class="p">}</span>
+      <span class="p">},</span>
+      <span class="nt">&quot;writer&quot;</span><span class="p">:</span> <span class="p">{</span>
+        <span class="nt">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;rdbmswriter&quot;</span><span class="p">,</span>
+        <span class="nt">&quot;parameter&quot;</span><span class="p">:</span> <span class="p">{</span>
+          <span class="nt">&quot;connection&quot;</span><span class="p">:</span> <span class="p">[</span>
+            <span class="p">{</span>
+              <span class="nt">&quot;jdbcUrl&quot;</span><span class="p">:</span> <span class="s2">&quot;jdbc:dm://ip:port/database&quot;</span><span class="p">,</span>
+              <span class="nt">&quot;table&quot;</span><span class="p">:</span> <span class="p">[</span>
+                <span class="s2">&quot;table&quot;</span>
+              <span class="p">]</span>
+            <span class="p">}</span>
+          <span class="p">],</span>
+          <span class="nt">&quot;username&quot;</span><span class="p">:</span> <span class="s2">&quot;username&quot;</span><span class="p">,</span>
+          <span class="nt">&quot;password&quot;</span><span class="p">:</span> <span class="s2">&quot;password&quot;</span><span class="p">,</span>
+          <span class="nt">&quot;driver&quot;</span><span class="p">:</span> <span class="s2">&quot;dm.jdbc.driver.DmDriver&quot;</span><span class="p">,</span>
+          <span class="nt">&quot;column&quot;</span><span class="p">:</span> <span class="p">[</span>
+            <span class="s2">&quot;*&quot;</span>
+          <span class="p">],</span>
+          <span class="nt">&quot;preSql&quot;</span><span class="p">:</span> <span class="p">[</span>
+            <span class="s2">&quot;delete from XXX;&quot;</span>
+          <span class="p">]</span>
+        <span class="p">}</span>
+      <span class="p">}</span>
+    <span class="p">}</span>
+  <span class="p">}</span>
+<span class="p">}</span>
 </code></pre></div>
 <h2 id="_3">参数说明<a class="headerlink" href="#_3" title="Permanent link">&para;</a></h2>
 <table>
@@ -1603,8 +1653,8 @@
 </ul>
 <p>Column必须显示填写，不允许为空！</p>
 <h3 id="jdbcurl">jdbcUrl<a class="headerlink" href="#jdbcurl" title="Permanent link">&para;</a></h3>
-<p><code>jdbcUrl</code> 配置除了配置必要的信息外，我们还可以在增加每种特定驱动的特定配置属性，这里特别提到我们可以利用配置属性对代理的支持从而实现通过代理访问数据库的功能。 
-比如对于 PrestoSQL 数据库的 JDBC 驱动而言，支持 <code>socksProxy</code> 参数，比如一个可能的 <code>jdbcUrl</code> 为</p>
+<p><code>jdbcUrl</code> 配置除了配置必要的信息外，我们还可以在增加每种特定驱动的特定配置属性，这里特别提到我们可以利用配置属性对代理的支持从而实现通过代理访问数据库的功能。 比如对于 PrestoSQL 数据库的 JDBC 驱动而言，支持 <code>socksProxy</code>
+参数，比如一个可能的 <code>jdbcUrl</code> 为</p>
 <p><code>jdbc:presto://127.0.0.1:8080/hive?socksProxy=192.168.1.101:1081</code></p>
 <p>大部分关系型数据库的 JDBC 驱动支持 <code>socksProxyHost,socksProxyPort</code> 参数来支持代理访问。也有一些特别的情况。</p>
 <p>以下是各类数据库 JDBC 驱动所支持的代理类型以及配置方式</p>
@@ -1639,8 +1689,8 @@
 </tbody>
 </table>
 <h3 id="driver">driver<a class="headerlink" href="#driver" title="Permanent link">&para;</a></h3>
-<p>大部分情况下，一个数据库的JDBC驱动是固定的，但有些因为版本的不同，所建议的驱动类名不同，比如 MySQL。
-新的 MySQL JDBC 驱动类型推荐使用 <code>com.mysql.cj.jdbc.Driver</code> 而不是以前的 <code>com.mysql.jdbc.Drver</code>。如果想要使用就的驱动名称，则可以配置 <code>driver</code> 配置项。</p>
+<p>大部分情况下，一个数据库的JDBC驱动是固定的，但有些因为版本的不同，所建议的驱动类名不同，比如 MySQL。 新的 MySQL JDBC 驱动类型推荐使用 <code>com.mysql.cj.jdbc.Driver</code> 而不是以前的 <code>com.mysql.jdbc.Drver</code>
+。如果想要使用就的驱动名称，则可以配置 <code>driver</code> 配置项。</p>
                 
               
               
@@ -1747,7 +1797,7 @@
     <script id="__config" type="application/json">{"base": "../..", "features": ["navigation.instant", "navigation.indexes", "content.code.annotate", "content.tabs.link", "navigation.top", "navigation.tracking", "search.highlight", "search.share", "search.suggest"], "translations": {"clipboard.copy": "\u590d\u5236", "clipboard.copied": "\u5df2\u590d\u5236", "search.config.lang": "ja", "search.config.pipeline": "trimmer, stemmer", "search.config.separator": "[\\uff0c\\u3002]+", "search.placeholder": "\u641c\u7d22", "search.result.placeholder": "\u952e\u5165\u4ee5\u5f00\u59cb\u641c\u7d22", "search.result.none": "\u6ca1\u6709\u627e\u5230\u7b26\u5408\u6761\u4ef6\u7684\u7ed3\u679c", "search.result.one": "\u627e\u5230 1 \u4e2a\u7b26\u5408\u6761\u4ef6\u7684\u7ed3\u679c", "search.result.other": "# \u4e2a\u7b26\u5408\u6761\u4ef6\u7684\u7ed3\u679c", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.term.missing": "Missing", "select.version.title": "Select version"}, "search": "../../assets/javascripts/workers/search.8397ff9e.min.js", "version": {"provider": "mike"}}</script>
     
     
-      <script src="../../assets/javascripts/bundle.1e84347e.min.js"></script>
+      <script src="../../assets/javascripts/bundle.f89c2efe.min.js"></script>
       
     
   </body>

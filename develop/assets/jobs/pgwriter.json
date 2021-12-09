@@ -6,51 +6,49 @@
         "channel": 1
       }
     },
-    "content": [
-      {
-        "reader": {
-          "name": "postgresqlreader",
-          "parameter": {
-            "username": "pgtest",
-            "password": "pgtest",
-            "column": [
-              "*"
-            ],
-            "connection": [
-              {
-                "table": [
-                  "addax_tbl"
-                ],
-                "jdbcUrl": [
-                  "jdbc:postgresql://localhost:5432/pgtest"
-                ]
-              }
-            ]
-          }
-        },
-        "writer": {
-          "name": "postgresqlwriter",
-          "parameter": {
-            "column": [
-              "*"
-            ],
-            "preSql": [
-              "truncate table @table"
-            ],
-            "connection": [
-              {
-                "jdbcUrl": "jdbc:postgresql://127.0.0.1:5432/pgtest",
-                "table": [
-                  "addax_tbl1"
-                ]
-              }
-            ],
-            "username": "pgtest",
-            "password": "pgtest",
-            "writeMode": "insert"
-          }
+    "content": {
+      "reader": {
+        "name": "postgresqlreader",
+        "parameter": {
+          "username": "pgtest",
+          "password": "pgtest",
+          "column": [
+            "*"
+          ],
+          "connection": [
+            {
+              "table": [
+                "addax_tbl"
+              ],
+              "jdbcUrl": [
+                "jdbc:postgresql://localhost:5432/pgtest"
+              ]
+            }
+          ]
+        }
+      },
+      "writer": {
+        "name": "postgresqlwriter",
+        "parameter": {
+          "column": [
+            "*"
+          ],
+          "preSql": [
+            "truncate table @table"
+          ],
+          "connection": [
+            {
+              "jdbcUrl": "jdbc:postgresql://127.0.0.1:5432/pgtest",
+              "table": [
+                "addax_tbl1"
+              ]
+            }
+          ],
+          "username": "pgtest",
+          "password": "pgtest",
+          "writeMode": "insert"
         }
       }
-    ]
+    }
   }
 }

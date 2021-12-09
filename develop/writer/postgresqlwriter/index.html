@@ -16,7 +16,7 @@
         <link rel="canonical" href="https://wgzhao.github.io/Addax/develop/writer/postgresqlwriter/">
       
       <link rel="icon" href="../../images/favicon.ico">
-      <meta name="generator" content="mkdocs-1.2.3, mkdocs-material-7.3.4">
+      <meta name="generator" content="mkdocs-1.2.3, mkdocs-material-7.3.3">
     
     
       
@@ -24,7 +24,7 @@
       
     
     
-      <link rel="stylesheet" href="../../assets/stylesheets/main.db9e7362.min.css">
+      <link rel="stylesheet" href="../../assets/stylesheets/main.5143246d.min.css">
       
         
         <link rel="stylesheet" href="../../assets/stylesheets/palette.3f5d1f46.min.css">
@@ -1569,52 +1569,50 @@
         <span class="nt">&quot;channel&quot;</span><span class="p">:</span> <span class="mi">1</span>
       <span class="p">}</span>
     <span class="p">},</span>
-    <span class="nt">&quot;content&quot;</span><span class="p">:</span> <span class="p">[</span>
-      <span class="p">{</span>
-        <span class="nt">&quot;reader&quot;</span><span class="p">:</span> <span class="p">{</span>
-          <span class="nt">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;postgresqlreader&quot;</span><span class="p">,</span>
-          <span class="nt">&quot;parameter&quot;</span><span class="p">:</span> <span class="p">{</span>
-            <span class="nt">&quot;username&quot;</span><span class="p">:</span> <span class="s2">&quot;pgtest&quot;</span><span class="p">,</span>
-            <span class="nt">&quot;password&quot;</span><span class="p">:</span> <span class="s2">&quot;pgtest&quot;</span><span class="p">,</span>
-            <span class="nt">&quot;column&quot;</span><span class="p">:</span> <span class="p">[</span>
-              <span class="s2">&quot;*&quot;</span>
-            <span class="p">],</span>
-            <span class="nt">&quot;connection&quot;</span><span class="p">:</span> <span class="p">[</span>
-              <span class="p">{</span>
-                <span class="nt">&quot;table&quot;</span><span class="p">:</span> <span class="p">[</span>
-                  <span class="s2">&quot;addax_tbl&quot;</span>
-                <span class="p">],</span>
-                <span class="nt">&quot;jdbcUrl&quot;</span><span class="p">:</span> <span class="p">[</span>
-                  <span class="s2">&quot;jdbc:postgresql://localhost:5432/pgtest&quot;</span>
-                <span class="p">]</span>
-              <span class="p">}</span>
-            <span class="p">]</span>
-          <span class="p">}</span>
-        <span class="p">},</span>
-        <span class="nt">&quot;writer&quot;</span><span class="p">:</span> <span class="p">{</span>
-          <span class="nt">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;postgresqlwriter&quot;</span><span class="p">,</span>
-          <span class="nt">&quot;parameter&quot;</span><span class="p">:</span> <span class="p">{</span>
-            <span class="nt">&quot;column&quot;</span><span class="p">:</span> <span class="p">[</span>
-              <span class="s2">&quot;*&quot;</span>
-            <span class="p">],</span>
-            <span class="nt">&quot;preSql&quot;</span><span class="p">:</span> <span class="p">[</span>
-              <span class="s2">&quot;truncate table @table&quot;</span>
-            <span class="p">],</span>
-            <span class="nt">&quot;connection&quot;</span><span class="p">:</span> <span class="p">[</span>
-              <span class="p">{</span>
-                <span class="nt">&quot;jdbcUrl&quot;</span><span class="p">:</span> <span class="s2">&quot;jdbc:postgresql://127.0.0.1:5432/pgtest&quot;</span><span class="p">,</span>
-                <span class="nt">&quot;table&quot;</span><span class="p">:</span> <span class="p">[</span>
-                  <span class="s2">&quot;addax_tbl1&quot;</span>
-                <span class="p">]</span>
-              <span class="p">}</span>
-            <span class="p">],</span>
-            <span class="nt">&quot;username&quot;</span><span class="p">:</span> <span class="s2">&quot;pgtest&quot;</span><span class="p">,</span>
-            <span class="nt">&quot;password&quot;</span><span class="p">:</span> <span class="s2">&quot;pgtest&quot;</span><span class="p">,</span>
-            <span class="nt">&quot;writeMode&quot;</span><span class="p">:</span> <span class="s2">&quot;insert&quot;</span>
-          <span class="p">}</span>
+    <span class="nt">&quot;content&quot;</span><span class="p">:</span> <span class="p">{</span>
+      <span class="nt">&quot;reader&quot;</span><span class="p">:</span> <span class="p">{</span>
+        <span class="nt">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;postgresqlreader&quot;</span><span class="p">,</span>
+        <span class="nt">&quot;parameter&quot;</span><span class="p">:</span> <span class="p">{</span>
+          <span class="nt">&quot;username&quot;</span><span class="p">:</span> <span class="s2">&quot;pgtest&quot;</span><span class="p">,</span>
+          <span class="nt">&quot;password&quot;</span><span class="p">:</span> <span class="s2">&quot;pgtest&quot;</span><span class="p">,</span>
+          <span class="nt">&quot;column&quot;</span><span class="p">:</span> <span class="p">[</span>
+            <span class="s2">&quot;*&quot;</span>
+          <span class="p">],</span>
+          <span class="nt">&quot;connection&quot;</span><span class="p">:</span> <span class="p">[</span>
+            <span class="p">{</span>
+              <span class="nt">&quot;table&quot;</span><span class="p">:</span> <span class="p">[</span>
+                <span class="s2">&quot;addax_tbl&quot;</span>
+              <span class="p">],</span>
+              <span class="nt">&quot;jdbcUrl&quot;</span><span class="p">:</span> <span class="p">[</span>
+                <span class="s2">&quot;jdbc:postgresql://localhost:5432/pgtest&quot;</span>
+              <span class="p">]</span>
+            <span class="p">}</span>
+          <span class="p">]</span>
+        <span class="p">}</span>
+      <span class="p">},</span>
+      <span class="nt">&quot;writer&quot;</span><span class="p">:</span> <span class="p">{</span>
+        <span class="nt">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;postgresqlwriter&quot;</span><span class="p">,</span>
+        <span class="nt">&quot;parameter&quot;</span><span class="p">:</span> <span class="p">{</span>
+          <span class="nt">&quot;column&quot;</span><span class="p">:</span> <span class="p">[</span>
+            <span class="s2">&quot;*&quot;</span>
+          <span class="p">],</span>
+          <span class="nt">&quot;preSql&quot;</span><span class="p">:</span> <span class="p">[</span>
+            <span class="s2">&quot;truncate table @table&quot;</span>
+          <span class="p">],</span>
+          <span class="nt">&quot;connection&quot;</span><span class="p">:</span> <span class="p">[</span>
+            <span class="p">{</span>
+              <span class="nt">&quot;jdbcUrl&quot;</span><span class="p">:</span> <span class="s2">&quot;jdbc:postgresql://127.0.0.1:5432/pgtest&quot;</span><span class="p">,</span>
+              <span class="nt">&quot;table&quot;</span><span class="p">:</span> <span class="p">[</span>
+                <span class="s2">&quot;addax_tbl1&quot;</span>
+              <span class="p">]</span>
+            <span class="p">}</span>
+          <span class="p">],</span>
+          <span class="nt">&quot;username&quot;</span><span class="p">:</span> <span class="s2">&quot;pgtest&quot;</span><span class="p">,</span>
+          <span class="nt">&quot;password&quot;</span><span class="p">:</span> <span class="s2">&quot;pgtest&quot;</span><span class="p">,</span>
+          <span class="nt">&quot;writeMode&quot;</span><span class="p">:</span> <span class="s2">&quot;insert&quot;</span>
         <span class="p">}</span>
       <span class="p">}</span>
-    <span class="p">]</span>
+    <span class="p">}</span>
   <span class="p">}</span>
 <span class="p">}</span>
 </code></pre></div>
@@ -1692,10 +1690,10 @@
 </table>
 <h3 id="writemode">writeMode<a class="headerlink" href="#writemode" title="Permanent link">&para;</a></h3>
 <p>默认情况下， 采取 <code>insert into</code> 语法写入 postgresql 表，如果你希望采取主键存在时更新，不存在则写入的方式， 可以使用 <code>update</code> 模式。假定表的主键为 <code>id</code> ,则 <code>writeMode</code> 配置方法如下：</p>
-<div class="highlight"><pre><span></span><code><span class="nt">&quot;writeMode&quot;</span><span class="p">:</span> <span class="s2">&quot;update(id)&quot;</span>
+<div class="highlight"><pre><span></span><code><span class="s2">&quot;writeMode&quot;</span><span class="err">:</span> <span class="s2">&quot;update(id)&quot;</span>
 </code></pre></div>
 <p>如果是联合唯一索引，则配置方法如下：</p>
-<div class="highlight"><pre><span></span><code><span class="nt">&quot;writeMode&quot;</span><span class="p">:</span> <span class="s2">&quot;update(col1, col2)&quot;</span>
+<div class="highlight"><pre><span></span><code><span class="s2">&quot;writeMode&quot;</span><span class="err">:</span> <span class="s2">&quot;update(col1, col2)&quot;</span>
 </code></pre></div>
 <p>注： <code>update</code> 模式在 <code>3.1.6</code> 版本首次增加，之前版本并不支持。</p>
 <h2 id="_6">类型转换<a class="headerlink" href="#_6" title="Permanent link">&para;</a></h2>
@@ -1843,7 +1841,7 @@
     <script id="__config" type="application/json">{"base": "../..", "features": ["navigation.instant", "navigation.indexes", "content.code.annotate", "content.tabs.link", "navigation.top", "navigation.tracking", "search.highlight", "search.share", "search.suggest"], "translations": {"clipboard.copy": "\u590d\u5236", "clipboard.copied": "\u5df2\u590d\u5236", "search.config.lang": "ja", "search.config.pipeline": "trimmer, stemmer", "search.config.separator": "[\\uff0c\\u3002]+", "search.placeholder": "\u641c\u7d22", "search.result.placeholder": "\u952e\u5165\u4ee5\u5f00\u59cb\u641c\u7d22", "search.result.none": "\u6ca1\u6709\u627e\u5230\u7b26\u5408\u6761\u4ef6\u7684\u7ed3\u679c", "search.result.one": "\u627e\u5230 1 \u4e2a\u7b26\u5408\u6761\u4ef6\u7684\u7ed3\u679c", "search.result.other": "# \u4e2a\u7b26\u5408\u6761\u4ef6\u7684\u7ed3\u679c", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.term.missing": "Missing", "select.version.title": "Select version"}, "search": "../../assets/javascripts/workers/search.8397ff9e.min.js", "version": {"provider": "mike"}}</script>
     
     
-      <script src="../../assets/javascripts/bundle.1e84347e.min.js"></script>
+      <script src="../../assets/javascripts/bundle.f89c2efe.min.js"></script>
       
     
   </body>

@@ -10,7 +10,7 @@
 2021-09-09 14:43:42.579 [        main] INFO  VMInfo               - VMInfo# operatingSystem class => sun.management.OperatingSystemImpl
 2021-09-09 14:43:42.621 [        main] INFO  Engine               -
 {
-	"content":[
+	"content":
 		{
 			"reader":{
 				"parameter":{
@@ -45,8 +45,7 @@
 				},
 				"name":"streamwriter"
 			}
-		}
-	],
+		},
 	"setting":{
 		"speed":{
 			"bytes":-1,
