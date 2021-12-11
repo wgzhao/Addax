@@ -54,11 +54,9 @@ public class SqliteReader
             this.originalConfig = this.commonRdbmsReaderJob.init(this.originalConfig);
         }
 
-
         @Override
-        public void preCheck()
+        public void prepare()
         {
-            init();
             this.commonRdbmsReaderJob.preCheck(this.originalConfig, DATABASE_TYPE);
         }
 

@@ -20,9 +20,7 @@
 package com.wgzhao.addax.plugin.reader.clickhousereader;
 
 import com.wgzhao.addax.common.base.Key;
-import com.wgzhao.addax.common.element.BytesColumn;
 import com.wgzhao.addax.common.element.Column;
-import com.wgzhao.addax.common.element.DateColumn;
 import com.wgzhao.addax.common.element.StringColumn;
 import com.wgzhao.addax.common.element.TimestampColumn;
 import com.wgzhao.addax.common.plugin.RecordSender;
@@ -38,7 +36,6 @@ import java.sql.SQLException;
 import java.sql.Types;
 import java.util.Calendar;
 import java.util.List;
-import java.util.TimeZone;
 
 public class ClickHouseReader
         extends Reader
@@ -66,7 +63,6 @@ public class ClickHouseReader
         @Override
         public void preCheck()
         {
-            init();
             this.commonRdbmsReaderJob.preCheck(this.originalConfig, DATABASE_TYPE);
         }
 
@@ -116,7 +112,8 @@ public class ClickHouseReader
                         String dType = metaData.getColumnTypeName(i);
                         if (dType.startsWith("DateTime")) {
                             return new TimestampColumn(rs.getTimestamp(i));
-                        } else {
+                        }
+                        else {
                             return new StringColumn(rs.getObject(i).toString());
                         }
                     }
