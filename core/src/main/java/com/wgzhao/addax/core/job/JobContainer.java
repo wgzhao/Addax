@@ -119,6 +119,7 @@ public class JobContainer
             isDryRun = configuration.getBool(CoreConstant.JOB_SETTING_DRY_RUN, false);
             if (isDryRun) {
                 LOG.info("jobContainer starts to do preCheck ...");
+                this.init();
                 this.preCheck();
             }
             else {
@@ -128,6 +129,8 @@ public class JobContainer
 
                 LOG.debug("jobContainer starts to do init ...");
                 this.init();
+                LOG.debug("jobContainer starts to do preCheck ...");
+                this.preCheck();
                 LOG.debug("jobContainer starts to do prepare ...");
                 this.prepare();
                 LOG.debug("jobContainer starts to do split ...");

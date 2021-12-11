@@ -55,7 +55,6 @@ public class TDengineReader
         @Override
         public void preCheck()
         {
-            init();
             this.commonRdbmsReaderJob.preCheck(this.originalConfig, DATABASE_TYPE);
         }
 

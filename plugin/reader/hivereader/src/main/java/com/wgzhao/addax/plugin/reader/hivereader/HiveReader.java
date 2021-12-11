@@ -19,7 +19,6 @@
 
 package com.wgzhao.addax.plugin.reader.hivereader;
 
-import com.wgzhao.addax.common.base.Key;
 import com.wgzhao.addax.common.exception.AddaxException;
 import com.wgzhao.addax.common.plugin.RecordSender;
 import com.wgzhao.addax.common.spi.Reader;
@@ -58,8 +57,6 @@ public class HiveReader
         {
             this.originalConfig = getPluginJobConf();
 
-//            this.originalConfig.set(Key.FETCH_SIZE, Integer.MIN_VALUE);
-
             boolean haveKerberos = originalConfig.getBool(HAVE_KERBEROS, false);
             if (haveKerberos) {
                 LOG.info("Try to login Hadoop via kerberos");
@@ -76,7 +73,6 @@ public class HiveReader
         @Override
         public void preCheck()
         {
-            init();
             this.commonRdbmsReaderJob.preCheck(originalConfig, DATABASE_TYPE);
         }
 
