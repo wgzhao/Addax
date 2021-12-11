@@ -125,11 +125,11 @@ public class FtpWriter
                 boolean useKey = this.writerSliceConfig.getBool(FtpKey.USE_KEY, false);
                 if (useKey) {
                     String privateKey = this.writerSliceConfig.getString(FtpKey.KEY_PATH, DEFAULT_PRIVATE_KEY);
-                    // check privateKey does exits or not
+                    // check privateKey does exist or not
                     if (privateKey.startsWith("~")) {
                         // expand home directory
                         privateKey = privateKey.replaceFirst("^~", System.getProperty("user.home"));
-                        // does it exists?
+                        // does it exist?
                         boolean isFile = new File(privateKey).isFile();
                         if (isFile) {
                             this.writerSliceConfig.set(FtpKey.KEY_PATH, privateKey);
@@ -318,7 +318,7 @@ public class FtpWriter
             // handle blank encoding
             if (StringUtils.isBlank(encoding)) {
                 LOG.warn("您配置的encoding为[{}], 使用默认值[{}]", encoding, DEFAULT_ENCODING);
-                encoding = DEFAULT_ENCODING;
+                writerSliceConfig.set(ENCODING, DEFAULT_ENCODING);
             }
             this.compress = writerSliceConfig.getString(COMPRESS);
         }
@@ -327,14 +327,13 @@ public class FtpWriter
         public void startWrite(RecordReceiver lineReceiver)
         {
             LOG.info("begin do write...");
-            String fileFullPath = StorageWriterUtil.buildFilePath(this.path, this.fileName, this.suffix);
+            String fileFullPath = StorageWriterUtil.buildFilePath(path, fileName, suffix);
             LOG.info(String.format("write to file : [%s]", fileFullPath));
 
             OutputStream outputStream = null;
             try {
-                outputStream = this.ftpHelper.getOutputStream(fileFullPath);
-                StorageWriterUtil.writeToStream(lineReceiver, outputStream, this.writerSliceConfig, this.fileName,
-                        this.getTaskPluginCollector());
+                outputStream = ftpHelper.getOutputStream(fileFullPath);
+                StorageWriterUtil.writeToStream(lineReceiver, outputStream, writerSliceConfig, fileName, getTaskPluginCollector());
             }
             catch (Exception e) {
                 throw AddaxException.asAddaxException(

@@ -26,17 +26,15 @@ public interface IFtpHelper
 {
 
     /**
-     *
      * @param host the host to connect to
      * @param port the port to connect
      * @param username username to connect
      * @param password password for username
      * @param keyPath private key, only for sftp protocol
      * @param keyPass the passphrase of private key
-     * @param timeout the connect timeout microseconds
+     * @param timeout to connect timeout microseconds
      */
     void loginFtpServer(String host, int port, String username, String password, String keyPath, String keyPass, int timeout);
-
 
     void logoutFtpServer();
 
