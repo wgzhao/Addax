@@ -41,5 +41,6 @@ public enum Rule
     RANDOM,
     STOCK_ACCOUNT,
     STOCK_CODE,
-    UUID
+    UUID,
+    ZIP_CODE
 }

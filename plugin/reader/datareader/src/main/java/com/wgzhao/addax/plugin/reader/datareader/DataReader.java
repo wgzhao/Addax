@@ -572,6 +572,8 @@ public class DataReader
                     return new StringColumn(PersonUtil.nextName());
                 case UUID:
                     return new StringColumn(UUID.randomUUID().toString());
+                case ZIP_CODE:
+                    return new LongColumn(RandomUtils.nextLong(1000000, 699000));
                 default:
                     throw AddaxException.asAddaxException(DataReaderErrorCode.ILLEGAL_VALUE,
                             columnRule + " is unsupported");
