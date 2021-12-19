@@ -54,7 +54,7 @@
         <httpcore.version>4.4.14</httpcore.version>
         <httpasync.version>4.1.4</httpasync.version>
         <influxdb.client.version>3.3.0</influxdb.client.version>
-        <logback.version>1.2.7</logback.version>
+        <logback.version>1.2.9</logback.version>
         <javacsv.version>2.0</javacsv.version>
         <javadbf.version>1.13.2</javadbf.version>
         <jest.version>6.3.1</jest.version>
