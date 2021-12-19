@@ -54,7 +54,7 @@
         <httpcore.version>4.4.14</httpcore.version>
         <httpasync.version>4.1.4</httpasync.version>
         <influxdb.client.version>3.3.0</influxdb.client.version>
-        <logback.version>1.2.7</logback.version>
+        <logback.version>1.2.9</logback.version>
         <javacsv.version>2.0</javacsv.version>
         <javadbf.version>1.13.2</javadbf.version>
         <jest.version>6.3.1</jest.version>
@@ -83,7 +83,7 @@
         <hadoop.version>3.2.0-14</hadoop.version>
         <mongodb.jdbc.version>3.12.9</mongodb.jdbc.version>
         <mysql.jdbc.version>8.0.16</mysql.jdbc.version>
-        <mssql.jdbc.version>9.2.1.jre8</mssql.jdbc.version>
+        <mssql.jdbc.version>10.1.0.jre8-preview</mssql.jdbc.version>
         <oracle.jdbc.version>19.7.0.0</oracle.jdbc.version>
         <phoenix1.version>4.14.3-HBase-1.4</phoenix1.version>
         <phoenix2.version>5.1.2</phoenix2.version>
