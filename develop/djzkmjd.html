@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8" />
+        <title>电子健康卡二维码</title>
+        
+        <style type="text/css">
+            #times{
+                position: relative;
+                /*top: 1420px;*/
+                top: 1180px;
+                left: 105px;
+                /* width: 400px; */
+                /* height: 50px; */
+                font-size: 80px;
+                text-align: center;
+                /* line-height: 50px; */
+                font-family: Helvetica Neue;
+                font-weight: bold;
+                letter-spacing: 4px;
+                border: none;  /*如果不加实线无法显示边框*/
+            }
+        </style>
+    </head>
+    
+    <body>
+        <div id="content"  style="background-image: url(images/fake.jpeg); background-size: cover; width: 1121px; height: 2436px;">
+        <div id="times" style="color:rgb(74,113,245);"></div>
+        </div>
+        <script type="text/javascript">
+        Date.prototype.format = function(fmt){
+            var o = {
+                "M+" : this.getMonth()+1,                 //月份
+                "d+" : this.getDate(),                    //日
+                "h+" : this.getHours(),                   //小时
+                "m+" : this.getMinutes(),                 //分
+                "s+" : this.getSeconds(),                 //秒
+                "q+" : Math.floor((this.getMonth()+3)/3), //季度
+                "S"  : this.getMilliseconds()             //毫秒
+            };
+
+            if(/(y+)/.test(fmt)){
+                fmt=fmt.replace(RegExp.$1, (this.getFullYear()+"").substr(4 - RegExp.$1.length));
+            }
+                    
+            for(var k in o){
+                if(new RegExp("("+ k +")").test(fmt)){
+                fmt = fmt.replace(
+                    RegExp.$1, (RegExp.$1.length==1) ? (o[k]) : (("00"+ o[k]).substr((""+ o[k]).length)));  
+                }       
+            }
+
+            return fmt;
+            }
+
+            //得到时间并写入div
+            function getDate(){
+                //获取当前时间
+                var d = new Date();
+                //格式化为本地时间格式
+                var date1 = d.toLocaleDateString();
+                //获取div
+                var div1 = document.getElementById("times");
+                //将时间写入div
+                div1.innerHTML = d.format("yyyy-MM-dd hh:mm:ss");
+            }
+            //使用定时器每秒向div写入当前时间
+            setInterval("getDate()",1000);
+        </script>
+    </body>
+</html>
