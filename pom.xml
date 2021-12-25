@@ -73,7 +73,7 @@
         <swift.version>1.0.0</swift.version>
         <xz.version>1.9</xz.version>
         <zookeeper.version>3.6.0</zookeeper.version>
-        <zstd.version>1.5.0-4</zstd.version>
+        <zstd.version>1.5.1-1</zstd.version>
 
         <!-- jdbc driver version -->
         <cassandra.jdbc.version>3.11.0</cassandra.jdbc.version>
@@ -87,7 +87,7 @@
         <oracle.jdbc.version>19.7.0.0</oracle.jdbc.version>
         <phoenix1.version>4.14.3-HBase-1.4</phoenix1.version>
         <phoenix2.version>5.1.2</phoenix2.version>
-        <postgresql.jdbc.version>42.2.24</postgresql.jdbc.version>
+        <postgresql.jdbc.version>42.3.1</postgresql.jdbc.version>
         <sqlite.jdbc.version>3.36.0.3</sqlite.jdbc.version>
         <taos.jdbc.version>2.0.35</taos.jdbc.version>
         <trino.jdbc.version>351</trino.jdbc.version>
