@@ -736,6 +736,9 @@ public class HdfsHelper
                         column.getInt(Key.PRECISION, Constant.DEFAULT_DECIMAL_PRECISION),
                         column.getInt(Key.SCALE, Constant.DEFAULT_DECIMAL_SCALE)));
             }
+            else if ("date".equalsIgnoreCase(column.getString(Key.TYPE))) {
+                joiner.add(String.format("%s:bigint", column.getString(Key.NAME)));
+            }
             else {
                 joiner.add(String.format("%s:%s", column.getString(Key.NAME), column.getString(Key.TYPE)));
             }
