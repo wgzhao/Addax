@@ -19,8 +19,8 @@
 
 package com.wgzhao.addax.common.element;
 
-import com.wgzhao.addax.common.exception.CommonErrorCode;
 import com.wgzhao.addax.common.exception.AddaxException;
+import com.wgzhao.addax.common.exception.CommonErrorCode;
 import org.apache.commons.lang3.math.NumberUtils;
 
 import java.math.BigDecimal;
@@ -46,8 +46,7 @@ public class LongColumn
         }
 
         try {
-            BigInteger rawData = NumberUtils.createBigDecimal(data)
-                    .toBigInteger();
+            BigInteger rawData = NumberUtils.createBigDecimal(data).toBigInteger();
             super.setRawData(rawData);
 
 			/*
@@ -101,10 +100,14 @@ public class LongColumn
     @Override
     public Timestamp asTimestamp()
     {
-        if (null == this.getRawData()) {
-            return null;
+        if (this.getRawData() instanceof BigInteger) {
+            BigInteger b = (BigInteger) this.getRawData();
+            long l = b.longValue();
+            return new Timestamp(l);
         }
-        return new Timestamp((Long) this.getRawData());
+        else {
+            return new Timestamp((Long) this.getRawData());
+        }
     }
 
     @Override
