@@ -426,9 +426,11 @@ public class DFSUtil
                     switch (type) {
                         case INT:
                         case LONG:
-                        case DATE:
                         case BOOLEAN:
                             columnGenerated = new LongColumn(((LongColumnVector) col).vector[row]);
+                            break;
+                        case DATE:
+                            columnGenerated = new DateColumn(new Date(((LongColumnVector) col).vector[row]));
                             break;
                         case DOUBLE:
                             columnGenerated = new DoubleColumn(((DoubleColumnVector) col).vector[row]);
