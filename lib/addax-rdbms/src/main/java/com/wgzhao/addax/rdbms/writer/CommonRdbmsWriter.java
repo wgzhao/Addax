@@ -364,9 +364,12 @@ public class CommonRdbmsWriter
         protected void doBatchInsert(Connection connection, List<Record> buffer)
                 throws SQLException
         {
+            boolean supportTransaction = this.dataBaseType != DataBaseType.ClickHouse;
             PreparedStatement preparedStatement = null;
             try {
-                connection.setAutoCommit(false);
+                if(supportTransaction){
+                    connection.setAutoCommit(false);
+                }
                 preparedStatement = connection.prepareStatement(writeRecordSql);
                 if (this.dataBaseType == DataBaseType.Oracle && !"insert".equalsIgnoreCase(writeMode)) {
                     String merge = this.writeMode;
@@ -400,11 +403,15 @@ public class CommonRdbmsWriter
                     }
                 }
                 preparedStatement.executeBatch();
-                connection.commit();
+                if(supportTransaction) {
+                    connection.commit();
+                }
             }
             catch (SQLException e) {
                 LOG.warn("回滚此次写入, 采用每次写入一行方式提交. 因为: {}", e.getMessage());
-                connection.rollback();
+                if(supportTransaction) {
+                    connection.rollback();
+                }
                 doOneInsert(connection, buffer);
             }
             catch (Exception e) {
@@ -420,7 +427,10 @@ public class CommonRdbmsWriter
         {
             PreparedStatement preparedStatement = null;
             try {
-                connection.setAutoCommit(true);
+                boolean supportTransaction = this.dataBaseType != DataBaseType.ClickHouse;
+                if(supportTransaction){
+                    connection.setAutoCommit(true);
+                }
                 preparedStatement = connection.prepareStatement(writeRecordSql);
 
                 for (Record record : buffer) {
