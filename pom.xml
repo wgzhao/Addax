@@ -77,7 +77,7 @@
 
         <!-- jdbc driver version -->
         <cassandra.jdbc.version>3.11.0</cassandra.jdbc.version>
-        <clickhouse.jdbc.version>0.3.1-patch</clickhouse.jdbc.version>
+        <clickhouse.jdbc.version>0.3.0</clickhouse.jdbc.version>
         <hive.jdbc.version>3.1.2</hive.jdbc.version>
         <influxdbClient.version>2.22</influxdbClient.version>
         <hadoop.version>3.2.0-14</hadoop.version>
