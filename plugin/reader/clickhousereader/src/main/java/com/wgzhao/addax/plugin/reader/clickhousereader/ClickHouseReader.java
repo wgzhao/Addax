@@ -33,9 +33,12 @@ import java.io.UnsupportedEncodingException;
 import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
+import java.sql.Timestamp;
 import java.sql.Types;
-import java.util.Calendar;
+import java.time.LocalDateTime;
 import java.util.List;
+
+import static com.wgzhao.addax.common.base.Constant.DEFAULT_FETCH_SIZE;
 
 public class ClickHouseReader
         extends Reader
@@ -54,7 +57,7 @@ public class ClickHouseReader
         public void init()
         {
             this.originalConfig = super.getPluginJobConf();
-            this.originalConfig.set(Key.FETCH_SIZE, Integer.MIN_VALUE);
+            this.originalConfig.set(Key.FETCH_SIZE, DEFAULT_FETCH_SIZE);
 
             this.commonRdbmsReaderJob = new CommonRdbmsReader.Job(DATABASE_TYPE);
             this.originalConfig = this.commonRdbmsReaderJob.init(this.originalConfig);
@@ -103,15 +106,17 @@ public class ClickHouseReader
                         throws SQLException, UnsupportedEncodingException
                 {
                     int dataType = metaData.getColumnType(i);
+                    // Please to use java.time.LocalDateTime or java.time.OffsetDateTime instead of java.sql.Timestamp,
+                    // and java.time.LocalDate instead of java.sql.Date.
+                    // references https://github.com/ClickHouse/clickhouse-jdbc/tree/master/clickhouse-jdbc
                     if (dataType == Types.TIMESTAMP) {
-                        return new TimestampColumn(rs.getTimestamp(i, Calendar.getInstance()));
+                        return new TimestampColumn(Timestamp.valueOf((LocalDateTime) rs.getObject(i)));
                     }
                     else if (dataType == Types.OTHER) {
-                        String tz = "Asia/Chongqing";
                         // database-specific type, convert it to string as default
                         String dType = metaData.getColumnTypeName(i);
                         if (dType.startsWith("DateTime")) {
-                            return new TimestampColumn(rs.getTimestamp(i));
+                            return new TimestampColumn(Timestamp.valueOf((LocalDateTime) rs.getObject(i)));
                         }
                         else {
                             return new StringColumn(rs.getObject(i).toString());
