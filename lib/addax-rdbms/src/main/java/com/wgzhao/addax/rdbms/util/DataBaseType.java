@@ -33,7 +33,7 @@ public enum DataBaseType
     Hive("hive2", "org.apache.hive.jdbc.HiveDriver"),
     Oracle("oracle", "oracle.jdbc.OracleDriver"),
     Presto("presto", "io.prestosql.jdbc.PrestoDriver"),
-    ClickHouse("clickhouse", "ru.yandex.clickhouse.ClickHouseDriver"),
+    ClickHouse("clickhouse", "com.clickhouse.jdbc.ClickHouseDriver"),
     SQLite("sqlite", "org.sqlite.JDBC"),
     SQLServer("sqlserver", "com.microsoft.sqlserver.jdbc.SQLServerDriver"),
     PostgreSQL("postgresql", "org.postgresql.Driver"),
