@@ -1,0 +1,50 @@
+{
+  "job": {
+    "setting": {
+      "speed": {
+        "channel": 1
+      }
+    },
+    "content": {
+      "writer": {
+        "name": "clickhousewriter",
+        "parameter": {
+          "username": "default",
+          "column": [
+            "*"
+          ],
+          "connection": [
+            {
+              "table": [
+                "ck_addax_writer"
+              ],
+              "jdbcUrl": "jdbc:clickhouse://127.0.0.1:8123/default"
+            }
+          ],
+          "preSql": [
+            "alter table @table delete where 1=1"
+          ]
+        }
+      },
+      "reader": {
+        "name": "clickhousereader",
+        "parameter": {
+          "username": "default",
+          "column": [
+            "*"
+          ],
+          "connection": [
+            {
+              "jdbcUrl": [
+                "jdbc:clickhouse://127.0.0.1:8123/"
+              ],
+              "table": [
+                "ck_addax"
+              ]
+            }
+          ]
+        }
+      }
+    }
+  }
+}
