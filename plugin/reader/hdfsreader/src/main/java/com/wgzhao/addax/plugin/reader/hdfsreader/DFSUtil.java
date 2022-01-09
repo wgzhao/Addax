@@ -427,6 +427,7 @@ public class DFSUtil
                         case INT:
                         case LONG:
                         case BOOLEAN:
+                        case BIGINT:
                             columnGenerated = new LongColumn(((LongColumnVector) col).vector[row]);
                             break;
                         case DATE:
@@ -511,7 +512,7 @@ public class DFSUtil
                 }
             }
             while (gRecord != null) {
-                transportOneRecord(column, gRecord, recordSender, taskPluginCollector, nullFormat);
+                transportParquetRecord(column, gRecord, recordSender, taskPluginCollector, nullFormat);
                 gRecord = reader.read();
             }
         }
@@ -528,7 +529,7 @@ public class DFSUtil
      *
      *
      */
-    private void transportOneRecord(List<ColumnEntry> columnConfigs, GenericData.Record gRecord, RecordSender recordSender,
+    private void transportParquetRecord(List<ColumnEntry> columnConfigs, GenericData.Record gRecord, RecordSender recordSender,
             TaskPluginCollector taskPluginCollector, String nullFormat)
     {
         Record record = recordSender.createRecord();
@@ -880,6 +881,6 @@ public class DFSUtil
 
     private enum Type
     {
-        INT, STRING, LONG, BOOLEAN, DOUBLE, DATE, BINARY, TIMESTAMP, DECIMAL,
+        INT, BIGINT, STRING, LONG, BOOLEAN, DOUBLE, DATE, BINARY, TIMESTAMP, DECIMAL,
     }
 }
