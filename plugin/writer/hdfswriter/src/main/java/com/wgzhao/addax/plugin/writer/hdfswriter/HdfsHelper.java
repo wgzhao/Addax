@@ -615,8 +615,8 @@ public class HdfsHelper
             switch (type) {
                 case "DECIMAL":
                     Schema dec = LogicalTypes
-                            .decimal(column.getInt(Key.PRECISION, Constant.DEFAULT_DECIMAL_PRECISION),
-                                    column.getInt(Key.SCALE, Constant.DEFAULT_DECIMAL_SCALE))
+                            .decimal(column.getInt(Key.PRECISION, Constant.DEFAULT_DECIMAL_MAX_PRECISION),
+                                    column.getInt(Key.SCALE, Constant.DEFAULT_DECIMAL_MAX_SCALE))
                             .addToSchema(Schema.createFixed(fieldName, null, null, 16));
                     unionList.add(dec);
                     break;
@@ -733,8 +733,8 @@ public class HdfsHelper
         for (Configuration column : columns) {
             if ("decimal".equals(column.getString(Key.TYPE))) {
                 joiner.add(String.format("%s:%s(%s,%s)", column.getString(Key.NAME), "decimal",
-                        column.getInt(Key.PRECISION, Constant.DEFAULT_DECIMAL_PRECISION),
-                        column.getInt(Key.SCALE, Constant.DEFAULT_DECIMAL_SCALE)));
+                        column.getInt(Key.PRECISION, Constant.DEFAULT_DECIMAL_MAX_PRECISION),
+                        column.getInt(Key.SCALE, Constant.DEFAULT_DECIMAL_MAX_SCALE)));
             }
             else if ("date".equalsIgnoreCase(column.getString(Key.TYPE))) {
                 joiner.add(String.format("%s:bigint", column.getString(Key.NAME)));

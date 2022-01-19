@@ -315,7 +315,7 @@ public class HdfsWriter
         private static int getDecimalPrecision(String type)
         {
             if (!type.contains("(")) {
-                return Constant.DEFAULT_DECIMAL_PRECISION;
+                return Constant.DEFAULT_DECIMAL_MAX_PRECISION;
             }
             else {
                 String regEx = "[^0-9]";
@@ -342,7 +342,7 @@ public class HdfsWriter
         private static int getDecimalScale(String type)
         {
             if (!type.contains("(")) {
-                return Constant.DEFAULT_DECIMAL_SCALE;
+                return Constant.DEFAULT_DECIMAL_MAX_SCALE;
             }
             if (!type.contains(",")) {
                 return 0;
