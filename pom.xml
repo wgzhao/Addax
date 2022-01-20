@@ -89,7 +89,7 @@
         <phoenix2.version>5.1.2</phoenix2.version>
         <postgresql.jdbc.version>42.3.1</postgresql.jdbc.version>
         <sqlite.jdbc.version>3.36.0.3</sqlite.jdbc.version>
-        <taos.jdbc.version>2.0.35</taos.jdbc.version>
+        <taos.jdbc.version>2.0.36</taos.jdbc.version>
         <trino.jdbc.version>351</trino.jdbc.version>
 
         <!-- for test -->
