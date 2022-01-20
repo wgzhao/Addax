@@ -157,6 +157,10 @@ public final class WriterUtil
                 writeDataSqlTemplate = "INSERT INTO %s (" + columns + ") VALUES ( " + placeHolders + " )" +
                         doPostgresqlUpdate(writeMode, columnHolders);
             }
+            else if (dataBaseType == DataBaseType.SQLServer) {
+                writeDataSqlTemplate = doSqlServerUpdate(writeMode, columnHolders, valueHolders) +
+                        "INSERT (" + columns + ") VALUES ( " + placeHolders + " )";
+            }
             else {
                 throw AddaxException.asAddaxException(DBUtilErrorCode.ILLEGAL_VALUE,
                         String.format("当前数据库不支持 writeMode:%s 模式.", writeMode));
@@ -267,6 +271,66 @@ public final class WriterUtil
         }
 
         sb.append(" FROM DUAL ) TMP ON (");
+        sb.append(str);
+        sb.append(" ) WHEN MATCHED THEN UPDATE SET ");
+        sb.append(update);
+        sb.append(" WHEN NOT MATCHED THEN ");
+        return sb.toString();
+    }
+
+    /*
+    Merge Into Table As a
+    Using (Select id,update_time From Other) as b  on a.id=b.id
+    When Matched then
+        update set a.update_time=b.update_time
+    When Not Matched then
+        Insert(id,update_time) values(b.id,b.update_time);
+        {@link #510}
+     */
+    public static String doSqlServerUpdate(String merge, List<String> columnHolders, List<String> valueHolders)
+    {
+        String[] sArray = getStrings(merge);
+        StringBuilder sb = new StringBuilder();
+        sb.append("MERGE INTO %s A USING ( SELECT ");
+
+        boolean first = true;
+        boolean first1 = true;
+        StringBuilder str = new StringBuilder();
+        StringBuilder update = new StringBuilder();
+        for (int i = 0; i < columnHolders.size(); i++) {
+            String columnHolder = columnHolders.get(i);
+            if (Arrays.asList(sArray).contains(columnHolder)) {
+                if (!first) {
+                    sb.append(",");
+                    str.append(" AND ");
+                }
+                else {
+                    first = false;
+                }
+                str.append("TMP.").append(columnHolder);
+                sb.append(valueHolders.get(i));
+                str.append(" = ");
+                sb.append(" AS ");
+                str.append("A.").append(columnHolder);
+                sb.append(columnHolder);
+            }
+        }
+
+        for (int i = 0; i < columnHolders.size(); i++) {
+            if (!Arrays.asList(sArray).contains(columnHolders.get(i))) {
+                if (!first1) {
+                    update.append(",");
+                }
+                else {
+                    first1 = false;
+                }
+                update.append(columnHolders.get(i));
+                update.append(" = ");
+                update.append(valueHolders.get(i));
+            }
+        }
+
+        sb.append(" FROM Other ) TMP ON (");
         sb.append(str);
         sb.append(" ) WHEN MATCHED THEN UPDATE SET ");
         sb.append(update);
