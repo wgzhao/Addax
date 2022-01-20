@@ -9,12 +9,12 @@
     <name>addax-all</name>
     <description>Addax generic ETL tool</description>
     <packaging>pom</packaging>
-    <url>https://addax.readthedocs.io</url>
+    <url>https://wgzhao.github.io/Addax</url>
 
     <licenses>
         <license>
             <name>Apache License</name>
-            <url>https://github.com/wgzhao/Addax/blob/master/license.txt</url>
+            <url>https://raw.githubusercontent.com/wgzhao/Addax/master/LICENSE</url>
             <distribution>repo</distribution>
         </license>
     </licenses>
