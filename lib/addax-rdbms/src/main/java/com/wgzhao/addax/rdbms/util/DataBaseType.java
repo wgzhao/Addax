@@ -21,6 +21,7 @@
 
 package com.wgzhao.addax.rdbms.util;
 
+import java.util.TimeZone;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -88,14 +89,16 @@ public enum DataBaseType
     public String appendJDBCSuffixForReader(String jdbc)
     {
         if (this == MySql) {
-            String suffix;
-            if ("com.mysql.jdbc.Driver".equals(this.driverClassName)) {
-                suffix = "yearIsDateType=false&zeroDateTimeBehavior=convertToNull&tinyInt1isBit=false&rewriteBatchedStatements=true";
+            String suffix = "yearIsDateType=false&zeroDateTimeBehavior=convertToNull&tinyInt1isBit=false&rewriteBatchedStatements=true";
+            // take timezone
+            if (!jdbc.contains("serverTimezone")) {
+                int offsetHours = TimeZone.getDefault().getRawOffset() / 3600000;
+                suffix += "&serverTimezone=GMT" + (offsetHours < 0 ? "-" : "%2B") + offsetHours;
             }
-            else {
-                suffix = "yearIsDateType=false&zeroDateTimeBehavior=CONVERT_TO_NULL&tinyInt1isBit=false&rewriteBatchedStatements=true" +
-                        "&useSSL=false";
+            if (!"com.mysql.jdbc.Driver".equals(this.driverClassName)) {
+                suffix += "&useSSL=false";
             }
+
             if (jdbc.contains("?")) {
                 return jdbc + "&" + suffix;
             }
