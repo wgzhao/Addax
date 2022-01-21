@@ -22,7 +22,7 @@
     <scm>
         <connection>scm:git:https://github.com/wgzhao/addax.git</connection>
         <developerConnection>scm:git:git@github.com:wgzhao/addax.git</developerConnection>
-        <url>https://github.com.wgzhao.addax</url>
+        <url>https://github.com/wgzhao/addax</url>
         <tag>HEAD</tag>
     </scm>
 
