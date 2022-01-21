@@ -22,7 +22,7 @@
     <scm>
         <connection>scm:git:https://github.com/wgzhao/addax.git</connection>
         <developerConnection>scm:git:git@github.com:wgzhao/addax.git</developerConnection>
-        <url>https://github.com.wgzhao.addax</url>
+        <url>https://github.com/wgzhao/addax</url>
         <tag>HEAD</tag>
     </scm>
 
@@ -89,7 +89,7 @@
         <phoenix2.version>5.1.2</phoenix2.version>
         <postgresql.jdbc.version>42.3.1</postgresql.jdbc.version>
         <sqlite.jdbc.version>3.36.0.3</sqlite.jdbc.version>
-        <taos.jdbc.version>2.0.35</taos.jdbc.version>
+        <taos.jdbc.version>2.0.36</taos.jdbc.version>
         <trino.jdbc.version>351</trino.jdbc.version>
 
         <!-- for test -->
