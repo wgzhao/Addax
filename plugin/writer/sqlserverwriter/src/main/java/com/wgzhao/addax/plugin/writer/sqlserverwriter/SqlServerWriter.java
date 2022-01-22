@@ -46,15 +46,12 @@ public class SqlServerWriter
         {
             this.originalConfig = getPluginJobConf();
 
-            // warn：not like mysql, sqlserver only support insert mode
             String writeMode = this.originalConfig.getString(Key.WRITE_MODE);
             if (null != writeMode) {
-                throw AddaxException
-                        .asAddaxException(
-                                DBUtilErrorCode.CONF_ERROR,
-                                String.format(
-                                        "写入模式(writeMode)配置错误. 因为sqlserver不支持配置项 writeMode: %s, sqlserver只能使用insert sql 插入数据. 请检查您的配置并作出修改",
-                                        writeMode));
+                if (!"insert".equalsIgnoreCase(writeMode) && !writeMode.startsWith("update")) {
+                    throw AddaxException.asAddaxException(DBUtilErrorCode.CONF_ERROR,
+                            String.format("The writeMode '%s' is illegal, Only insert, update are supported.", writeMode));
+                }
             }
 
             this.commonRdbmsWriterJob = new CommonRdbmsWriter.Job(DATABASE_TYPE);
@@ -70,8 +67,7 @@ public class SqlServerWriter
         @Override
         public List<Configuration> split(int mandatoryNumber)
         {
-            return this.commonRdbmsWriterJob.split(this.originalConfig,
-                    mandatoryNumber);
+            return this.commonRdbmsWriterJob.split(this.originalConfig, mandatoryNumber);
         }
 
         @Override
@@ -97,8 +93,8 @@ public class SqlServerWriter
         public void init()
         {
             this.writerSliceConfig = getPluginJobConf();
-            this.commonRdbmsWriterTask = new CommonRdbmsWriter.Task(
-                    DATABASE_TYPE);
+            this.commonRdbmsWriterTask = new CommonRdbmsWriter.Task(DATABASE_TYPE);
+
             this.commonRdbmsWriterTask.init(this.writerSliceConfig);
         }
 
