@@ -61,7 +61,7 @@
         <junit.version>5.8.2</junit.version>
         <joda.time.version>2.10.13</joda.time.version>
         <jackson.version>2.9.9</jackson.version>
-        <jedis.version>3.7.0</jedis.version>
+        <jedis.version>4.1.1</jedis.version>
         <jsch.version>0.1.55</jsch.version>
         <kudu.version>1.15.0</kudu.version>
         <mockito.version>2.0.2-beta</mockito.version>
