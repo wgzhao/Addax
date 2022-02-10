@@ -79,6 +79,7 @@ import java.nio.charset.StandardCharsets;
 import java.sql.Timestamp;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Base64;
 import java.util.Date;
 import java.util.List;
 import java.util.Set;
@@ -693,7 +694,14 @@ public class HdfsHelper
                     case STRING:
                     case VARCHAR:
                     case CHAR:
-                        byte[] buffer = record.getColumn(i).getRawData().toString().getBytes(StandardCharsets.UTF_8);
+                        byte[] buffer;
+                        if (record.getColumn(i).getType() == Column.Type.BYTES) {
+                            //convert bytes to base64 string
+                            buffer = Base64.getEncoder().encode((byte[]) record.getColumn(i).getRawData());
+                        }
+                        else {
+                            buffer = record.getColumn(i).getRawData().toString().getBytes(StandardCharsets.UTF_8);
+                        }
                         ((BytesColumnVector) col).setRef(row, buffer, 0, buffer.length);
                         break;
                     case BINARY:
