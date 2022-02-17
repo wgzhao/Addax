@@ -19,6 +19,7 @@
 
 package com.wgzhao.addax.plugin.reader.rdbmsreader;
 
+import com.wgzhao.addax.common.base.Key;
 import com.wgzhao.addax.common.exception.AddaxException;
 import com.wgzhao.addax.common.plugin.RecordSender;
 import com.wgzhao.addax.common.spi.Reader;
@@ -28,6 +29,7 @@ import com.wgzhao.addax.rdbms.util.DBUtilErrorCode;
 import com.wgzhao.addax.rdbms.util.DataBaseType;
 import org.apache.commons.lang3.StringUtils;
 
+import java.util.Arrays;
 import java.util.List;
 
 import static com.wgzhao.addax.common.base.Constant.DEFAULT_FETCH_SIZE;
@@ -58,22 +60,23 @@ public class RdbmsReader
                         String.format("您配置的fetchSize有误，fetchSize : [%d] 设置值不能小于 1.", fetchSize));
             }
             this.originalConfig.set(FETCH_SIZE, fetchSize);
-            List<Object> conns = this.originalConfig.getList(CONNECTION);
-            if (conns == null || conns.isEmpty()) {
+            Configuration connection = this.originalConfig.getListConfiguration(CONNECTION).get(0);
+            if (connection == null) {
                 throw AddaxException.asAddaxException(DBUtilErrorCode.REQUIRED_VALUE, "config 'connection' is required and must not be " +
                         "empty");
             }
             String jdbcDriver = this.originalConfig.getString(JDBC_DRIVER, null);
             if (jdbcDriver == null || StringUtils.isBlank(jdbcDriver)) {
-                // maybe driver item inside connection item
-                Configuration conConf = Configuration.from(conns.get(0).toString());
-                jdbcDriver = conConf.getString(JDBC_DRIVER);
-                if (jdbcDriver == null || StringUtils.isBlank(jdbcDriver)) {
-                    throw AddaxException.asAddaxException(DBUtilErrorCode.REQUIRED_VALUE, "config 'driver' is required and must not be empty");
-                }
+                // guess jdbc driver name from jdbc url if not set
+                final String jdbcType = connection.getList(Key.JDBC_URL).get(0).toString().split(":")[1];
+                Arrays.stream(DataBaseType.values()).filter(
+                        dataBaseType -> dataBaseType.getTypeName().equals(jdbcType)).findFirst().ifPresent(dataBaseType ->
+                        DATABASE_TYPE.setDriverClassName(dataBaseType.getDriverClassName()));
             }
-            // use custom jdbc driver
-            DATABASE_TYPE.setDriverClassName(jdbcDriver);
+            else {
+                // use custom jdbc driver
+                DATABASE_TYPE.setDriverClassName(jdbcDriver);
+            }
             this.commonRdbmsReaderMaster = new SubCommonRdbmsReader.Job(DATABASE_TYPE);
             this.originalConfig = this.commonRdbmsReaderMaster.init(this.originalConfig);
         }
