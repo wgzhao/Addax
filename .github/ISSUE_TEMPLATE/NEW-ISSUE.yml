@@ -1,7 +1,7 @@
 name: Bug Report
 description: BUG 提交
 title: "[Bug]: "
-labels: ["bug", "triage"]
+labels: [ "bug", "triage" ]
 assignees:
   - wgzhao
 body:
@@ -32,7 +32,9 @@ body:
       label: Version
       description: What version of our software are you running? （当前您使用的版本，这对于定位问题很重要，请选择正确的版本）
       options:
-        - 4.0.6 (Default)
+        - 4.0.8 (Default)
+        - 4.0.7
+        - 4.0.6
         - 4.0.5
         - 4.0.4
         - 4.0.3
@@ -66,7 +68,7 @@ body:
       description: What version of Java JDK are you running? (发现问题时, 使用的JDK 什么版本)
       placeholder: "Oracle JDK 1.8.0_231"
       value: "Oracle JDK 1.8.0"
-     
+
   - type: textarea
     id: logs
     attributes:

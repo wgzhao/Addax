@@ -30,11 +30,7 @@ import com.wgzhao.addax.rdbms.writer.CommonRdbmsWriter;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.sql.Types;
-import java.text.SimpleDateFormat;
-import java.time.LocalDate;
 import java.util.List;
-
-import static com.wgzhao.addax.common.base.Constant.DEFAULT_DATE_FORMAT;
 
 public class MysqlWriter
         extends Writer
@@ -50,7 +46,6 @@ public class MysqlWriter
         @Override
         public void preCheck()
         {
-            this.init();
             this.commonRdbmsWriterJob.writerPreCheck(this.originalConfig, DATABASE_TYPE);
         }
 
@@ -101,7 +96,8 @@ public class MysqlWriter
         public void init()
         {
             this.writerSliceConfig = super.getPluginJobConf();
-            this.commonRdbmsWriterTask = new CommonRdbmsWriter.Task(DATABASE_TYPE) {
+            this.commonRdbmsWriterTask = new CommonRdbmsWriter.Task(DATABASE_TYPE)
+            {
 
                 @Override
                 protected PreparedStatement fillPreparedStatementColumnType(PreparedStatement preparedStatement, int columnIndex,
@@ -116,7 +112,8 @@ public class MysqlWriter
                         // BIT(1) -> java.lang.Boolean
                         if (column.getType() == Column.Type.BOOL) {
                             preparedStatement.setBoolean(columnIndex, column.asBoolean());
-                        } else {
+                        }
+                        else {
                             // BIT ( > 1) -> byte[]
                             preparedStatement.setObject(columnIndex, Integer.valueOf(column.asString(), 2));
                         }

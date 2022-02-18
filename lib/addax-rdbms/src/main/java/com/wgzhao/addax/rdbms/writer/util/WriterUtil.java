@@ -150,12 +150,16 @@ public final class WriterUtil
                         doMysqlUpdate(columnHolders);
             }
             else if (dataBaseType == DataBaseType.Oracle) {
-                writeDataSqlTemplate = doOracleUpdate(writeMode, columnHolders, valueHolders) +
+                writeDataSqlTemplate = doOracleOrSqlServerUpdate(writeMode, columnHolders, valueHolders, dataBaseType) +
                         "INSERT (" + columns + ") VALUES ( " + placeHolders + " )";
             }
             else if (dataBaseType == DataBaseType.PostgreSQL) {
                 writeDataSqlTemplate = "INSERT INTO %s (" + columns + ") VALUES ( " + placeHolders + " )" +
                         doPostgresqlUpdate(writeMode, columnHolders);
+            }
+            else if (dataBaseType == DataBaseType.SQLServer) {
+                writeDataSqlTemplate = doOracleOrSqlServerUpdate(writeMode, columnHolders, valueHolders, dataBaseType) +
+                        "INSERT (" + columns + ") VALUES ( " + placeHolders + " );";
             }
             else {
                 throw AddaxException.asAddaxException(DBUtilErrorCode.ILLEGAL_VALUE,
@@ -224,7 +228,7 @@ public final class WriterUtil
         return sb.toString();
     }
 
-    public static String doOracleUpdate(String merge, List<String> columnHolders, List<String> valueHolders)
+    public static String doOracleOrSqlServerUpdate(String merge, List<String> columnHolders, List<String> valueHolders, DataBaseType dataBaseType)
     {
         String[] sArray = getStrings(merge);
         StringBuilder sb = new StringBuilder();
@@ -234,7 +238,8 @@ public final class WriterUtil
         boolean first1 = true;
         StringBuilder str = new StringBuilder();
         StringBuilder update = new StringBuilder();
-        for (String columnHolder : columnHolders) {
+        for (int i = 0; i < columnHolders.size(); i++) {
+            String columnHolder = columnHolders.get(i);
             if (Arrays.asList(sArray).contains(columnHolder)) {
                 if (!first) {
                     sb.append(",");
@@ -244,7 +249,7 @@ public final class WriterUtil
                     first = false;
                 }
                 str.append("TMP.").append(columnHolder);
-                sb.append("?");
+                sb.append(valueHolders.get(i));
                 str.append(" = ");
                 sb.append(" AS ");
                 str.append("A.").append(columnHolder);
@@ -252,21 +257,26 @@ public final class WriterUtil
             }
         }
 
-        for (String columnHolder : columnHolders) {
-            if (!Arrays.asList(sArray).contains(columnHolder)) {
+        for (int i = 0; i < columnHolders.size(); i++) {
+            if (!Arrays.asList(sArray).contains(columnHolders.get(i))) {
                 if (!first1) {
                     update.append(",");
                 }
                 else {
                     first1 = false;
                 }
-                update.append(columnHolder);
+                update.append(columnHolders.get(i));
                 update.append(" = ");
-                update.append("?");
+                update.append(valueHolders.get(i));
             }
         }
 
-        sb.append(" FROM DUAL ) TMP ON (");
+        if (dataBaseType == DataBaseType.Oracle) {
+            sb.append(" FROM DUAL ) TMP ON (");
+        }
+        else {
+            sb.append(" ) TMP ON (");
+        }
         sb.append(str);
         sb.append(" ) WHEN MATCHED THEN UPDATE SET ");
         sb.append(update);

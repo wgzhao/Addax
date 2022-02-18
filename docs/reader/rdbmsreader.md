@@ -14,20 +14,8 @@ RDBMSReader 插件支持从传统 RDBMS 读取数据。这是一个通用关系�
 
 ## 配置驱动
 
-假定你需要读取 IBM DB2 的数据，因为没有提供专门的读取插件，所以我们可以使用该插件来实现，在使用之前，需要执行下面两个操作：
-
-1. 下载对应的 JDBC 驱动，并拷贝到 `plugin/reader/rdbmsreader/libs` 目录
-2. 修改 `plugin/reader/rdbmsreader/plugin.json` 文件，找到 `drivers` 一项，填写正确的 JDBC 驱动名，比如 DB2 的驱动名为 `com.ibm.db2.jcc.DB2Driver`，类似这样：
-   
-    ```json
-    {
-      "name": "rdbmsreader",
-      "class": "com.wgzhao.addax.plugin.reader.rdbmsreader.RdbmsReader",
-      "description": "",
-      "developer": "wgzhao",
-      "drivers": ["com.ibm.db2.jcc.DB2Driver"]
-      } 
-    ```
+假定你需要读取 IBM DB2 的数据，因为没有提供专门的读取插件，所以我们可以使用该插件来实现，在使用之前，需要下载对应的 JDBC 驱动，并拷贝到 `plugin/reader/rdbmsreader/libs` 目录。
+如果你的驱动类名比较特殊，则需要在任务配置文件中找到 `driver` 一项，填写正确的 JDBC 驱动名，比如 DB2 的驱动名为 `com.ibm.db2.jcc.DB2Driver`。如果不填写，则插件会自动猜测驱动名。
 
 以下列出常见的数据库以及对应的驱动名称
 
@@ -60,7 +48,7 @@ RDBMSReader 插件支持从传统 RDBMS 读取数据。这是一个通用关系�
 | 配置项    | 是否必须 | 数据类型 | 默认值 | 描述                                                                        |
 | :-------- | :------: | -------- | ------ | -------------------------------------------------------------------------------------------------------------------- |
 | jdbcUrl   |    是    | array    | 无     | 对端数据库的JDBC连接信息，jdbcUrl按照RDBMS官方规范，并可以填写连接附件控制信息          |
-| driver    |    是    | string   | 无     | 自定义驱动类名，解决兼容性问题，详见下面描述                                            |
+| driver    |    否    | string   | 无     | 自定义驱动类名，解决兼容性问题，详见下面描述                                            |
 | username  |    是    | string   | 无     | 数据源的用户名                                                                      |
 | password  |    否    | string   | 无     | 数据源指定用户名的密码                                                               |
 | table     |    是    | array    | 无     | 所选取的需要同步的表名,使用JSON数据格式，当配置为多张表时，用户自己需保证多张表是同一表结构    |
@@ -73,7 +61,8 @@ RDBMSReader 插件支持从传统 RDBMS 读取数据。这是一个通用关系�
 
 ### jdbcUrl
 
-`jdbcUrl` 配置除了配置必要的信息外，我们还可以在增加每种特定驱动的特定配置属性，这里特别提到我们可以利用配置属性对代理的支持从而实现通过代理访问数据库的功能。 比如对于 PrestoSQL 数据库的 JDBC 驱动而言，支持 `socksProxy` 参数，于是上述配置的 `jdbcUrl` 可以修改为
+`jdbcUrl` 配置除了配置必要的信息外，我们还可以在增加每种特定驱动的特定配置属性，这里特别提到我们可以利用配置属性对代理的支持从而实现通过代理访问数据库的功能。 比如对于 PrestoSQL 数据库的 JDBC 驱动而言，支持 `socksProxy`
+参数，于是上述配置的 `jdbcUrl` 可以修改为
 
 `jdbc:presto://127.0.0.1:8080/hive?socksProxy=192.168.1.101:1081`
 
@@ -89,7 +78,8 @@ RDBMSReader 插件支持从传统 RDBMS 读取数据。这是一个通用关系�
 
 ### driver
 
-大部分情况下，一个数据库的JDBC驱动是固定的，但有些因为版本的不同，所建议的驱动类名不同，比如 MySQL。 新的 MySQL JDBC 驱动类型推荐使用 `com.mysql.cj.jdbc.Driver` 而不是以前的 `com.mysql.jdbc.Drver`。如果想要使用就的驱动名称，则可以配置 `driver` 配置项。
+大部分情况下，一个数据库的JDBC驱动是固定的，但有些因为版本的不同，所建议的驱动类名不同，比如 MySQL。 新的 MySQL JDBC 驱动类型推荐使用 `com.mysql.cj.jdbc.Driver` 而不是以前的 `com.mysql.jdbc.Drver`
+。如果想要使用就的驱动名称，则可以配置 `driver` 配置项。否则插件会自动依据 `jdbcUrl` 中的字符串来猜测驱动名称.
 
 #### column
 

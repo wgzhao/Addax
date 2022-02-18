@@ -46,8 +46,7 @@ public class MysqlReader
     public static class Job
             extends Reader.Job
     {
-        private static final Logger LOG = LoggerFactory
-                .getLogger(Job.class);
+        private static final Logger LOG = LoggerFactory.getLogger(Job.class);
 
         private Configuration originalConfig = null;
         private CommonRdbmsReader.Job commonRdbmsReaderJob;
@@ -68,11 +67,9 @@ public class MysqlReader
             this.originalConfig = this.commonRdbmsReaderJob.init(this.originalConfig);
         }
 
-
         @Override
         public void preCheck()
         {
-            init();
             this.commonRdbmsReaderJob.preCheck(this.originalConfig, DATABASE_TYPE);
         }
 
@@ -106,7 +103,8 @@ public class MysqlReader
         public void init()
         {
             this.readerSliceConfig = getPluginJobConf();
-            this.commonRdbmsReaderTask = new CommonRdbmsReader.Task(DATABASE_TYPE, getTaskGroupId(), getTaskId()) {
+            this.commonRdbmsReaderTask = new CommonRdbmsReader.Task(DATABASE_TYPE, getTaskGroupId(), getTaskId())
+            {
                 @Override
                 protected Column createColumn(ResultSet rs, ResultSetMetaData metaData, int i)
                         throws SQLException, UnsupportedEncodingException
