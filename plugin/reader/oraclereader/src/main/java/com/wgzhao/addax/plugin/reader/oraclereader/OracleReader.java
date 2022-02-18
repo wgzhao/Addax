@@ -19,12 +19,12 @@
 
 package com.wgzhao.addax.plugin.reader.oraclereader;
 
+import com.wgzhao.addax.common.base.Key;
 import com.wgzhao.addax.common.exception.AddaxException;
 import com.wgzhao.addax.common.plugin.RecordSender;
 import com.wgzhao.addax.common.spi.Reader;
 import com.wgzhao.addax.common.util.Configuration;
 import com.wgzhao.addax.rdbms.reader.CommonRdbmsReader;
-import com.wgzhao.addax.common.base.Key;
 import com.wgzhao.addax.rdbms.reader.util.HintUtil;
 import com.wgzhao.addax.rdbms.util.DBUtilErrorCode;
 import com.wgzhao.addax.rdbms.util.DataBaseType;
@@ -66,7 +66,6 @@ public class OracleReader
         @Override
         public void preCheck()
         {
-            init();
             this.commonRdbmsReaderJob.preCheck(this.originalConfig, DATABASE_TYPE);
         }
 
@@ -98,9 +97,7 @@ public class OracleReader
                                 String.format("您配置的 fetchSize 有误，fetchSize:[%d] 值不能小于 1.",
                                         fetchSize));
             }
-            originalConfig.set(
-                    FETCH_SIZE,
-                    fetchSize);
+            originalConfig.set(FETCH_SIZE, fetchSize);
         }
 
         private void dealHint(Configuration originalConfig)

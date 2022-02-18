@@ -38,6 +38,7 @@ import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
+import java.sql.SQLFeatureNotSupportedException;
 import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -322,12 +323,19 @@ public final class DBUtil
     public static ResultSet query(Connection conn, String sql, int fetchSize, int queryTimeout)
             throws SQLException
     {
-        // make sure autocommit is off
-        conn.setAutoCommit(false);
+
         Statement stmt;
+        try {
+            // make sure autocommit is off
+            conn.setAutoCommit(false);
+        }
+        catch (SQLFeatureNotSupportedException ignore) {
+            LOG.warn("current database does not support AUTO_COMMIT property");
+        }
         try {
             stmt = conn.createStatement(ResultSet.TYPE_FORWARD_ONLY, ResultSet.CONCUR_READ_ONLY); //NOSONAR
         }
+
         catch (SQLException ignore) {
             // some database does not support TYPE_FORWARD_ONLY/CONCUR_READ_ONLY
             LOG.warn("current database does not support TYPE_FORWARD_ONLY/CONCUR_READ_ONLY");

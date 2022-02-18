@@ -116,7 +116,7 @@ public class CoreConstant
 
     public static final String JOB_CONTENT_WRITER_PATH = "job.content.writer.parameter.path";
     // ----------------------------- 局部使用的变量
-    public static final String JOB_WRITER = " ";
+    public static final String JOB_WRITER = "writer";
 
     public static final String JOB_READER = "reader";
 
@@ -138,24 +138,18 @@ public class CoreConstant
 
     public static final String TASK_ID = "taskId";
 
-
     // ----------------------------- 环境变量 ---------------------------------
 
     public static final String HOME = System.getProperty("addax.home");
 
-    public static final String CONF_PATH = StringUtils.join(new String[] {
-            HOME, "conf", "core.json"}, File.separator);
+    public static final String CONF_PATH = StringUtils.join(new String[] {HOME, "conf", "core.json"}, File.separator);
 
-    public static final String PLUGIN_HOME = StringUtils.join(new String[] {
-            HOME, "plugin"}, File.separator);
+    public static final String PLUGIN_HOME = StringUtils.join(new String[] {HOME, "plugin"}, File.separator);
 
-    public static final String PLUGIN_READER_HOME = StringUtils.join(
-            new String[] {PLUGIN_HOME, "reader"}, File.separator);
+    public static final String PLUGIN_READER_HOME = StringUtils.join(new String[] {PLUGIN_HOME, "reader"}, File.separator);
 
-    public static final String PLUGIN_WRITER_HOME = StringUtils.join(
-            new String[] {PLUGIN_HOME, "writer"}, File.separator);
+    public static final String PLUGIN_WRITER_HOME = StringUtils.join(new String[] {PLUGIN_HOME, "writer"}, File.separator);
 
-    public static final String STORAGE_TRANSFORMER_HOME = StringUtils.join(
-            new String[] {HOME, "local_storage", "transformer"}, File.separator);
-
+    public static final String STORAGE_TRANSFORMER_HOME = StringUtils.join(new String[] {HOME, "local_storage",
+            "transformer"}, File.separator);
 }

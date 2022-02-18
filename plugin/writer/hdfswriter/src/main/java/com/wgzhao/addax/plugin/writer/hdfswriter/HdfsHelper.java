@@ -79,6 +79,7 @@ import java.nio.charset.StandardCharsets;
 import java.sql.Timestamp;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Base64;
 import java.util.Date;
 import java.util.List;
 import java.util.Set;
@@ -615,8 +616,8 @@ public class HdfsHelper
             switch (type) {
                 case "DECIMAL":
                     Schema dec = LogicalTypes
-                            .decimal(column.getInt(Key.PRECISION, Constant.DEFAULT_DECIMAL_PRECISION),
-                                    column.getInt(Key.SCALE, Constant.DEFAULT_DECIMAL_SCALE))
+                            .decimal(column.getInt(Key.PRECISION, Constant.DEFAULT_DECIMAL_MAX_PRECISION),
+                                    column.getInt(Key.SCALE, Constant.DEFAULT_DECIMAL_MAX_SCALE))
                             .addToSchema(Schema.createFixed(fieldName, null, null, 16));
                     unionList.add(dec);
                     break;
@@ -693,7 +694,14 @@ public class HdfsHelper
                     case STRING:
                     case VARCHAR:
                     case CHAR:
-                        byte[] buffer = record.getColumn(i).getRawData().toString().getBytes(StandardCharsets.UTF_8);
+                        byte[] buffer;
+                        if (record.getColumn(i).getType() == Column.Type.BYTES) {
+                            //convert bytes to base64 string
+                            buffer = Base64.getEncoder().encode((byte[]) record.getColumn(i).getRawData());
+                        }
+                        else {
+                            buffer = record.getColumn(i).getRawData().toString().getBytes(StandardCharsets.UTF_8);
+                        }
                         ((BytesColumnVector) col).setRef(row, buffer, 0, buffer.length);
                         break;
                     case BINARY:
@@ -733,8 +741,11 @@ public class HdfsHelper
         for (Configuration column : columns) {
             if ("decimal".equals(column.getString(Key.TYPE))) {
                 joiner.add(String.format("%s:%s(%s,%s)", column.getString(Key.NAME), "decimal",
-                        column.getInt(Key.PRECISION, Constant.DEFAULT_DECIMAL_PRECISION),
-                        column.getInt(Key.SCALE, Constant.DEFAULT_DECIMAL_SCALE)));
+                        column.getInt(Key.PRECISION, Constant.DEFAULT_DECIMAL_MAX_PRECISION),
+                        column.getInt(Key.SCALE, Constant.DEFAULT_DECIMAL_MAX_SCALE)));
+            }
+            else if ("date".equalsIgnoreCase(column.getString(Key.TYPE))) {
+                joiner.add(String.format("%s:bigint", column.getString(Key.NAME)));
             }
             else {
                 joiner.add(String.format("%s:%s", column.getString(Key.NAME), column.getString(Key.TYPE)));

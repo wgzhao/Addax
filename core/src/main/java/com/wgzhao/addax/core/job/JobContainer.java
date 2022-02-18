@@ -119,6 +119,7 @@ public class JobContainer
             isDryRun = configuration.getBool(CoreConstant.JOB_SETTING_DRY_RUN, false);
             if (isDryRun) {
                 LOG.info("jobContainer starts to do preCheck ...");
+                this.init();
                 this.preCheck();
             }
             else {

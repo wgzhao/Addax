@@ -10,25 +10,14 @@ RDBMSWriter 插件支持从传统 RDBMS 读取数据。这是一个通用关系�
 - [ClickHouse Writer](clickhousewriter)
 - [SQLServer Writer](sqlserverwriter)
 
-注意,  如果已经提供了专门的数据库写入插件的，推荐使用专用插件，如果你需要写入的数据库没有专门插件，则考虑使用该通用插件。
-在使用之前，还需要执行以下操作才可以正常运行，否则运行会出现异常。
+注意, 如果已经提供了专门的数据库写入插件的，推荐使用专用插件，如果你需要写入的数据库没有专门插件，则考虑使用该通用插件。 在使用之前，还需要执行以下操作才可以正常运行，否则运行会出现异常。
 
 ## 配置驱动
 
 假定你需要写入 IBM DB2 的数据，因为没有提供专门的读取插件，所以我们可以使用该插件来实现，在使用之前，需要执行下面两个操作：
 
 1. 下载对应的 JDBC 驱动，并拷贝到 `plugin/writer/rdbmswriter/libs` 目录
-2. 修改 `plugin/writer/rdbmswriter/plugin.json` 文件，找到 `drivers` 一项，填写正确的 JDBC 驱动名，比如 DB2 的驱动名为 `com.ibm.db2.jcc.DB2Driver`，类似这样：
-
-    ```json
-    {
-      "name": "rdbmswriter",
-      "class": "com.wgzhao.addax.plugin.reader.rdbmswriter.RdbmsWriter",
-      "description": "",
-      "developer": "alibaba",
-      "drivers": ["com.ibm.db2.jcc.DB2Driver"]
-      } 
-    ```
+2. 修改任务配置文件，找到 `driver` 一项，填写正确的 JDBC 驱动名，比如 DB2 的驱动名为 `com.ibm.db2.jcc.DB2Driver`
 
 以下列出常见的数据库以及对应的驱动名称
 
@@ -93,8 +82,8 @@ Column必须显示填写，不允许为空！
 
 ### jdbcUrl
 
-`jdbcUrl` 配置除了配置必要的信息外，我们还可以在增加每种特定驱动的特定配置属性，这里特别提到我们可以利用配置属性对代理的支持从而实现通过代理访问数据库的功能。 
-比如对于 PrestoSQL 数据库的 JDBC 驱动而言，支持 `socksProxy` 参数，比如一个可能的 `jdbcUrl` 为
+`jdbcUrl` 配置除了配置必要的信息外，我们还可以在增加每种特定驱动的特定配置属性，这里特别提到我们可以利用配置属性对代理的支持从而实现通过代理访问数据库的功能。 比如对于 PrestoSQL 数据库的 JDBC 驱动而言，支持 `socksProxy`
+参数，比如一个可能的 `jdbcUrl` 为
 
 `jdbc:presto://127.0.0.1:8080/hive?socksProxy=192.168.1.101:1081`
 
@@ -110,5 +99,5 @@ Column必须显示填写，不允许为空！
 
 ### driver
 
-大部分情况下，一个数据库的JDBC驱动是固定的，但有些因为版本的不同，所建议的驱动类名不同，比如 MySQL。
-新的 MySQL JDBC 驱动类型推荐使用 `com.mysql.cj.jdbc.Driver` 而不是以前的 `com.mysql.jdbc.Drver`。如果想要使用就的驱动名称，则可以配置 `driver` 配置项。
+大部分情况下，一个数据库的JDBC驱动是固定的，但有些因为版本的不同，所建议的驱动类名不同，比如 MySQL。 新的 MySQL JDBC 驱动类型推荐使用 `com.mysql.cj.jdbc.Driver` 而不是以前的 `com.mysql.jdbc.Drver`
+。如果想要使用就的驱动名称，则可以配置 `driver` 配置项。
