@@ -143,13 +143,14 @@
         <module>plugin/reader/streamreader</module>
         <module>plugin/reader/tdenginereader</module>
         <module>plugin/reader/txtfilereader</module>-->
-
+       <!-- <module>plugin/reader/hivereader</module>-->
+        <module>plugin/reader/clickhousereader</module>
         <module>plugin/reader/txtfilereader</module>
         <module>plugin/reader/kudureader</module>
         <module>plugin/writer/kuduwriter</module>
         <module>plugin/writer/starrockswriter</module>
         <module>plugin/writer/txtfilewriter</module>
-
+        <module>plugin/writer/hdfswriter</module>
         <!-- writer -->
      <!--   <module>plugin/writer/cassandrawriter</module>
         <module>plugin/writer/clickhousewriter</module>
@@ -297,6 +298,7 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-release-plugin</artifactId>
+                <version>3.0.0-M1</version>
                 <configuration>
                     <preparationGoals>clean verify -DskipTests</preparationGoals>
                     <tagNameFormat>@{project.version}</tagNameFormat>
@@ -305,6 +307,7 @@
             </plugin>
 
             <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-assembly-plugin</artifactId>
                 <version>3.3.0</version>
                 <configuration>

@@ -97,16 +97,16 @@ public class KuduReader
             List<Configuration> confList = new ArrayList<>();
 
             if ((splitKey != null) && (!"min".equals(lowerBound)) && (!"max".equals(upperBound))) {
-                int iLowerBound = Integer.parseInt(this.lowerBound);
-                int iUpperBound = Integer.parseInt(this.upperBound);
-                int range = (iUpperBound - iLowerBound) + 1;
+                long iLowerBound = Long.parseLong(this.lowerBound);
+                long iUpperBound = Long.parseLong(this.upperBound);
+                long range = (iUpperBound - iLowerBound) + 1;
                 int limit = (int) Math.ceil((double) range / (double) adviceNumber);
                 int offset;
                 for (int page = 0; page < adviceNumber; ++page) {
                     offset = page * limit;
                     Configuration conf = originalConfig.clone();
-                    int possibleLowerBound = (iLowerBound + offset);
-                    int possibleUpperBound = (iLowerBound + offset + limit - 1);
+                    long possibleLowerBound = (iLowerBound + offset);
+                    long possibleUpperBound = (iLowerBound + offset + limit - 1);
                     if (possibleLowerBound > iUpperBound) {
                         possibleLowerBound = 0;
                         possibleUpperBound = 0;
@@ -237,12 +237,12 @@ public class KuduReader
                 KuduPredicate lowerBoundPredicate = KuduPredicate.newComparisonPredicate(
                         schema.getColumn(splitKey),
                         KuduPredicate.ComparisonOp.GREATER_EQUAL,
-                        Integer.parseInt(lowerBound)
+                        Long.parseLong(lowerBound)
                 );
                 KuduPredicate upperBoundPredicate = KuduPredicate.newComparisonPredicate(
                         schema.getColumn(splitKey),
                         KuduPredicate.ComparisonOp.LESS_EQUAL,
-                        Integer.parseInt(upperBound)
+                        Long.parseLong(upperBound)
                 );
                 kuduScannerBuilder
                         .addPredicate(lowerBoundPredicate)

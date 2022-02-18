@@ -17,7 +17,7 @@
           "table": "users",
           "splitPk": "user_id",
           "lowerBound": 1,
-          "upperBound": 100,
+          "upperBound": 2,
           "readTimeout": 5,
           "scanTimeout": 10
         }

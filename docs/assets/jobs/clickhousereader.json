@@ -26,7 +26,8 @@
               ],
               "jdbcUrl": [
                 "jdbc:clickhouse://127.0.0.1:8123/default"
-              ]
+              ],
+              "where": "EVENT_TIME>='2022-01-01 00:00:00.000' and EVENT_TIME<'2022-01-11 00:00:00.000'"
             }
           ]
         }

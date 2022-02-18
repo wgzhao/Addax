@@ -37,7 +37,7 @@
         <dependency>
             <groupId>com.github.luben</groupId>
             <artifactId>zstd-jni</artifactId>
-            <version>${zstd.version}</version>
+            <version>1.5.0-4</version>
             <scope>runtime</scope>
         </dependency>
 
@@ -56,19 +56,19 @@
         <dependency>
             <groupId>io.airlift</groupId>
             <artifactId>aircompressor</artifactId>
-            <version>${aircompressor.version}</version>
+            <version>0.21</version>
         </dependency>
         
         <dependency>
             <groupId>org.apache.commons</groupId>
             <artifactId>commons-csv</artifactId>
-            <version>${commons.csv.version}</version>
+            <version>1.9.0</version>
         </dependency>
 
         <dependency>
             <groupId>org.apache.commons</groupId>
             <artifactId>commons-compress</artifactId>
-            <version>${commons.compress.version}</version>
+            <version>1.21</version>
         </dependency>
 
         <dependency>
@@ -81,7 +81,7 @@
         <dependency>
             <groupId>org.tukaani</groupId>
             <artifactId>xz</artifactId>
-            <version>${xz.version}</version>
+            <version>1.9</version>
             <scope>runtime</scope>
         </dependency>
 

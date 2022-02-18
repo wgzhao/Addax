@@ -1,0 +1,855 @@
+{
+  "job": {
+    "content": [
+      {
+        "reader": {
+          "name": "kudureader",
+          "parameter": {
+            "column": [
+              {
+                "name": "glass_id",
+                "type": "STRING"
+              },
+              {
+                "name": "step_id",
+                "type": "STRING"
+              },
+              {
+                "name": "glass_start_time",
+                "type": "BIGINT"
+              },
+              {
+                "name": "defect_seq_no",
+                "type": "STRING"
+              },
+              {
+                "name": "product_id",
+                "type": "STRING"
+              },
+              {
+                "name": "lot_id",
+                "type": "STRING"
+              },
+              {
+                "name": "equip_id",
+                "type": "STRING"
+              },
+              {
+                "name": "chip_id",
+                "type": "STRING"
+              },
+              {
+                "name": "chip_no",
+                "type": "STRING"
+              },
+              {
+                "name": "defect_code",
+                "type": "STRING"
+              },
+              {
+                "name": "product_type",
+                "type": "STRING"
+              },
+              {
+                "name": "product_group",
+                "type": "STRING"
+              },
+              {
+                "name": "owner_type",
+                "type": "STRING"
+              },
+              {
+                "name": "owner_code",
+                "type": "STRING"
+              },
+              {
+                "name": "line_id",
+                "type": "STRING"
+              },
+              {
+                "name": "unit_id",
+                "type": "STRING"
+              },
+              {
+                "name": "pp_id",
+                "type": "STRING"
+              },
+              {
+                "name": "recipe_name",
+                "type": "STRING"
+              },
+              {
+                "name": "recipe_id",
+                "type": "STRING"
+              },
+              {
+                "name": "cst_id",
+                "type": "STRING"
+              },
+              {
+                "name": "glass_judge",
+                "type": "STRING"
+              },
+              {
+                "name": "slot_id",
+                "type": "STRING"
+              },
+              {
+                "name": "thickness",
+                "type": "STRING"
+              },
+              {
+                "name": "operator_id",
+                "type": "STRING"
+              },
+              {
+                "name": "group_id",
+                "type": "STRING"
+              },
+              {
+                "name": "glass_main_defect_code",
+                "type": "STRING"
+              },
+              {
+                "name": "glass_id_image_name",
+                "type": "STRING"
+              },
+              {
+                "name": "sample_condition",
+                "type": "STRING"
+              },
+              {
+                "name": "op_comment",
+                "type": "STRING"
+              },
+              {
+                "name": "eng_comment",
+                "type": "STRING"
+              },
+              {
+                "name": "product_sequence",
+                "type": "STRING"
+              },
+              {
+                "name": "standard_inspect_sequence",
+                "type": "STRING"
+              },
+              {
+                "name": "actual_inspect_sequence",
+                "type": "STRING"
+              },
+              {
+                "name": "engineer_id",
+                "type": "STRING"
+              },
+              {
+                "name": "pre_process_id",
+                "type": "STRING"
+              },
+              {
+                "name": "process_waiting_time",
+                "type": "STRING"
+              },
+              {
+                "name": "glass_reject_code",
+                "type": "STRING"
+              },
+              {
+                "name": "glass_seal_dp_eq_no",
+                "type": "STRING"
+              },
+              {
+                "name": "glass_id_decode",
+                "type": "STRING"
+              },
+              {
+                "name": "image_data",
+                "type": "STRING"
+              },
+              {
+                "name": "mark_type",
+                "type": "STRING"
+              },
+              {
+                "name": "stage",
+                "type": "STRING"
+              },
+              {
+                "name": "inspect_mode",
+                "type": "STRING"
+              },
+              {
+                "name": "defect_type",
+                "type": "STRING"
+              },
+              {
+                "name": "defect_pixel_count",
+                "type": "STRING"
+              },
+              {
+                "name": "common_or_not",
+                "type": "STRING"
+              },
+              {
+                "name": "image_mura_data",
+                "type": "STRING"
+              },
+              {
+                "name": "defect_size",
+                "type": "STRING"
+              },
+              {
+                "name": "peak_bright",
+                "type": "STRING"
+              },
+              {
+                "name": "light_type",
+                "type": "STRING"
+              },
+              {
+                "name": "defect_judge",
+                "type": "STRING"
+              },
+              {
+                "name": "engineer_confirm",
+                "type": "STRING"
+              },
+              {
+                "name": "seal_au_defect_name",
+                "type": "STRING"
+              },
+              {
+                "name": "combine_oper_coder",
+                "type": "STRING"
+              },
+              {
+                "name": "combine_eqp_type",
+                "type": "STRING"
+              },
+              {
+                "name": "color",
+                "type": "STRING"
+              },
+              {
+                "name": "defect_name",
+                "type": "STRING"
+              },
+              {
+                "name": "inline_flag",
+                "type": "STRING"
+              },
+              {
+                "name": "stack",
+                "type": "STRING"
+              },
+              {
+                "name": "defect_size_flag",
+                "type": "STRING"
+              },
+              {
+                "name": "camera_resolution",
+                "type": "STRING"
+              },
+              {
+                "name": "gray_image_data",
+                "type": "STRING"
+              },
+              {
+                "name": "before_repair_image_name",
+                "type": "STRING"
+              },
+              {
+                "name": "after_repair_image_name",
+                "type": "STRING"
+              },
+              {
+                "name": "scan_slice",
+                "type": "STRING"
+              },
+              {
+                "name": "review_head",
+                "type": "STRING"
+              },
+              {
+                "name": "mask_defect_flag",
+                "type": "STRING"
+              },
+              {
+                "name": "common_defect_flag",
+                "type": "STRING"
+              },
+              {
+                "name": "inspection_type",
+                "type": "STRING"
+              },
+              {
+                "name": "judge_result",
+                "type": "STRING"
+              },
+              {
+                "name": "review",
+                "type": "STRING"
+              },
+              {
+                "name": "1890_repair_flag",
+                "type": "STRING"
+              },
+              {
+                "name": "3890_repair_flag",
+                "type": "STRING"
+              },
+              {
+                "name": "t300_repair_flag",
+                "type": "STRING"
+              },
+              {
+                "name": "t400_repair_flag",
+                "type": "STRING"
+              },
+              {
+                "name": "ink_repair",
+                "type": "STRING"
+              },
+              {
+                "name": "auto_repair",
+                "type": "STRING"
+              },
+              {
+                "name": "defect_scrap",
+                "type": "STRING"
+              },
+              {
+                "name": "defect_rework",
+                "type": "STRING"
+              },
+              {
+                "name": "ldl_select",
+                "type": "STRING"
+              },
+              {
+                "name": "position_change",
+                "type": "STRING"
+              },
+              {
+                "name": "is_manual",
+                "type": "STRING"
+              },
+              {
+                "name": "panel_grade",
+                "type": "STRING"
+              },
+              {
+                "name": "pattern_name",
+                "type": "STRING"
+              },
+              {
+                "name": "flr_to_nrp",
+                "type": "STRING"
+              },
+              {
+                "name": "lcvd_to_loi2",
+                "type": "STRING"
+              },
+              {
+                "name": "archive1",
+                "type": "STRING"
+              },
+              {
+                "name": "archive2",
+                "type": "STRING"
+              },
+              {
+                "name": "archive3",
+                "type": "STRING"
+              },
+              {
+                "name": "archive4",
+                "type": "STRING"
+              },
+              {
+                "name": "archive5",
+                "type": "STRING"
+              },
+              {
+                "name": "archive6",
+                "type": "STRING"
+              },
+              {
+                "name": "archive7",
+                "type": "STRING"
+              },
+              {
+                "name": "archive8",
+                "type": "STRING"
+              },
+              {
+                "name": "archive9",
+                "type": "STRING"
+              },
+              {
+                "name": "archive10",
+                "type": "STRING"
+              },
+              {
+                "name": "defect_verify_judge",
+                "type": "STRING"
+              },
+              {
+                "name": "defect_process_id",
+                "type": "STRING"
+              },
+              {
+                "name": "item1",
+                "type": "STRING"
+              },
+              {
+                "name": "item2",
+                "type": "STRING"
+              },
+              {
+                "name": "item3",
+                "type": "STRING"
+              },
+              {
+                "name": "item4",
+                "type": "STRING"
+              },
+              {
+                "name": "item5",
+                "type": "STRING"
+              },
+              {
+                "name": "item6",
+                "type": "STRING"
+              },
+              {
+                "name": "item7",
+                "type": "STRING"
+              },
+              {
+                "name": "item8",
+                "type": "STRING"
+              },
+              {
+                "name": "item9",
+                "type": "STRING"
+              },
+              {
+                "name": "item10",
+                "type": "STRING"
+              },
+              {
+                "name": "process_time",
+                "type": "DOUBLE"
+              },
+              {
+                "name": "total_panel_count",
+                "type": "DOUBLE"
+              },
+              {
+                "name": "ok_panel_count",
+                "type": "DOUBLE"
+              },
+              {
+                "name": "ng_panel_count",
+                "type": "DOUBLE"
+              },
+              {
+                "name": "total_defect_count",
+                "type": "DOUBLE"
+              },
+              {
+                "name": "photo_quantity",
+                "type": "DOUBLE"
+              },
+              {
+                "name": "total_point_defect_cnt",
+                "type": "DOUBLE"
+              },
+              {
+                "name": "small_size_defect_count",
+                "type": "DOUBLE"
+              },
+              {
+                "name": "middle_size_defect_count",
+                "type": "DOUBLE"
+              },
+              {
+                "name": "large_size_defect_count",
+                "type": "DOUBLE"
+              },
+              {
+                "name": "over_size_defect_count",
+                "type": "DOUBLE"
+              },
+              {
+                "name": "glass_id_shift_x",
+                "type": "DOUBLE"
+              },
+              {
+                "name": "glass_id_shift_y",
+                "type": "DOUBLE"
+              },
+              {
+                "name": "glass_id_shift_theta",
+                "type": "DOUBLE"
+              },
+              {
+                "name": "x1_glass",
+                "type": "DOUBLE"
+              },
+              {
+                "name": "y1_glass",
+                "type": "DOUBLE"
+              },
+              {
+                "name": "x2_glass",
+                "type": "DOUBLE"
+              },
+              {
+                "name": "y2_glass",
+                "type": "DOUBLE"
+              },
+              {
+                "name": "x3_glass",
+                "type": "DOUBLE"
+              },
+              {
+                "name": "y3_glass",
+                "type": "DOUBLE"
+              },
+              {
+                "name": "x1_panel",
+                "type": "DOUBLE"
+              },
+              {
+                "name": "y1_panel",
+                "type": "DOUBLE"
+              },
+              {
+                "name": "x2_panel",
+                "type": "DOUBLE"
+              },
+              {
+                "name": "y2_panel",
+                "type": "DOUBLE"
+              },
+              {
+                "name": "x3_panel",
+                "type": "DOUBLE"
+              },
+              {
+                "name": "y3_panel",
+                "type": "DOUBLE"
+              },
+              {
+                "name": "data1",
+                "type": "DOUBLE"
+              },
+              {
+                "name": "gate1",
+                "type": "DOUBLE"
+              },
+              {
+                "name": "data2",
+                "type": "DOUBLE"
+              },
+              {
+                "name": "gate2",
+                "type": "DOUBLE"
+              },
+              {
+                "name": "data3",
+                "type": "DOUBLE"
+              },
+              {
+                "name": "gate3",
+                "type": "DOUBLE"
+              },
+              {
+                "name": "data4",
+                "type": "DOUBLE"
+              },
+              {
+                "name": "gate4",
+                "type": "DOUBLE"
+              },
+              {
+                "name": "gray_level",
+                "type": "DOUBLE"
+              },
+              {
+                "name": "average_gray_level",
+                "type": "DOUBLE"
+              },
+              {
+                "name": "defect_length_x",
+                "type": "DOUBLE"
+              },
+              {
+                "name": "defect_length_y",
+                "type": "DOUBLE"
+              },
+              {
+                "name": "goa_defect_position",
+                "type": "DOUBLE"
+              },
+              {
+                "name": "ccd_no",
+                "type": "DOUBLE"
+              },
+              {
+                "name": "laser_numbers_of_times",
+                "type": "DOUBLE"
+              },
+              {
+                "name": "laser_power",
+                "type": "DOUBLE"
+              },
+              {
+                "name": "tape_numbers_of_times",
+                "type": "DOUBLE"
+              },
+              {
+                "name": "tape_offset",
+                "type": "DOUBLE"
+              },
+              {
+                "name": "ink_numbers_of_times",
+                "type": "DOUBLE"
+              },
+              {
+                "name": "before_polish_height",
+                "type": "DOUBLE"
+              },
+              {
+                "name": "after_polish_height",
+                "type": "DOUBLE"
+              },
+              {
+                "name": "repair_tact_time",
+                "type": "DOUBLE"
+              },
+              {
+                "name": "adc",
+                "type": "DOUBLE"
+              },
+              {
+                "name": "rtir",
+                "type": "DOUBLE"
+              },
+              {
+                "name": "repair_review",
+                "type": "DOUBLE"
+              },
+              {
+                "name": "each_pattern_inspection_time",
+                "type": "DOUBLE"
+              },
+              {
+                "name": "length_x",
+                "type": "DOUBLE"
+              },
+              {
+                "name": "length_y",
+                "type": "DOUBLE"
+              },
+              {
+                "name": "particle_sum",
+                "type": "DOUBLE"
+              },
+              {
+                "name": "num_archive1",
+                "type": "DOUBLE"
+              },
+              {
+                "name": "num_archive2",
+                "type": "DOUBLE"
+              },
+              {
+                "name": "num_archive3",
+                "type": "DOUBLE"
+              },
+              {
+                "name": "num_archive4",
+                "type": "DOUBLE"
+              },
+              {
+                "name": "num_archive5",
+                "type": "DOUBLE"
+              },
+              {
+                "name": "num_archive6",
+                "type": "DOUBLE"
+              },
+              {
+                "name": "num_archive7",
+                "type": "DOUBLE"
+              },
+              {
+                "name": "num_archive8",
+                "type": "DOUBLE"
+              },
+              {
+                "name": "num_archive9",
+                "type": "DOUBLE"
+              },
+              {
+                "name": "num_archive10",
+                "type": "DOUBLE"
+              },
+              {
+                "name": "num_item1",
+                "type": "DOUBLE"
+              },
+              {
+                "name": "num_item2",
+                "type": "DOUBLE"
+              },
+              {
+                "name": "num_item3",
+                "type": "DOUBLE"
+              },
+              {
+                "name": "num_item4",
+                "type": "DOUBLE"
+              },
+              {
+                "name": "num_item5",
+                "type": "DOUBLE"
+              },
+              {
+                "name": "num_item6",
+                "type": "DOUBLE"
+              },
+              {
+                "name": "num_item7",
+                "type": "DOUBLE"
+              },
+              {
+                "name": "num_item8",
+                "type": "DOUBLE"
+              },
+              {
+                "name": "num_item9",
+                "type": "DOUBLE"
+              },
+              {
+                "name": "num_item10",
+                "type": "DOUBLE"
+              },
+              {
+                "name": "process_start_time",
+                "type": "BIGINT"
+              },
+              {
+                "name": "track_in_time",
+                "type": "BIGINT"
+              },
+              {
+                "name": "track_out_time",
+                "type": "BIGINT"
+              },
+              {
+                "name": "update_time",
+                "type": "BIGINT"
+              },
+              {
+                "name": "cell_zone",
+                "type": "STRING"
+              },
+              {
+                "name": "depo_type",
+                "type": "STRING"
+              },
+              {
+                "name": "depo_shape",
+                "type": "STRING"
+              },
+              {
+                "name": "defect_voltage",
+                "type": "DOUBLE"
+              },
+              {
+                "name": "defect_site_voltage",
+                "type": "DOUBLE"
+              },
+              {
+                "name": "defect_value",
+                "type": "DOUBLE"
+              },
+              {
+                "name": "depo_length",
+                "type": "DOUBLE"
+              },
+              {
+                "name": "rejudge_code",
+                "type": "STRING"
+              },
+              {
+                "name": "rejudge_comment",
+                "type": "STRING"
+              },
+              {
+                "name": "rejudge_userid",
+                "type": "STRING"
+              },
+              {
+                "name": "rejudge_time",
+                "type": "BIGINT"
+              },
+              {
+                "name": "rejudge_flag",
+                "type": "STRING"
+              },
+              {
+                "name": "rejudge_endtime",
+                "type": "BIGINT"
+              },
+              {
+                "type": "STRING",
+                "value": "2022-01-24 17:05:00"
+              }
+            ],
+            "masterAddress": "172.25.6.25:7051,172.25.6.24:7051,172.25.6.23:7051",
+            "table": "impala::p7edasys.array_defect_t",
+            "readMode": "read_latest",
+            "operationTimeout": 30000,
+            "adminOperationTimeout": 30000,
+            "queryTimeout": 30000,
+            "batchSizeBytes": 104857600,
+	    "where": "glass_start_time >= 20220101000000  and glass_start_time < 20220127000000"
+          }
+        },
+        "writer": {
+          "name": "starrockswriter",
+          "parameter": {
+            "username": "root",
+            "password": "",
+            "database": "example_db",
+            "table": "edat7_array_defect",
+            "column": [
+              "*"
+            ],
+            "preSql": [],
+            "postSql": [],
+            "jdbcUrl": "jdbc:mysql://10.110.37.223:9030/",
+            "loadUrl": [
+              "10.110.37.223:18030"
+            ],
+            "loadProps": {}
+          }
+        }
+      }
+    ],
+    "setting": {
+      "restore": {
+        "isStream": false
+      },
+      "speed": {
+        "channel": 6
+      }
+    }
+  }
+}
+

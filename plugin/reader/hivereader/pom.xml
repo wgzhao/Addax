@@ -4,7 +4,7 @@
     <parent>
         <groupId>com.wgzhao.addax</groupId>
         <artifactId>addax-all</artifactId>
-        <version>4.0.8-SNAPSHOT</version>
+        <version>4.0.7-SNAPSHOT</version>
         <relativePath>../../../pom.xml</relativePath>
     </parent>
     <artifactId>hivereader</artifactId>
@@ -33,7 +33,9 @@
         <dependency>
             <groupId>org.apache.hadoop</groupId>
             <artifactId>hadoop-common</artifactId>
-            <version>${hadoop.common.version}</version>
+            <!--<version>${hadoop.common.version}</version>-->
+            <version>3.2.2</version>
+
         </dependency>
 
         <dependency>

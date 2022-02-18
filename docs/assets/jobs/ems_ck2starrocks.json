@@ -1,0 +1,69 @@
+{
+  "job": {
+    "setting": {
+      "speed": {
+        "channel": 10
+      }
+    },
+    "content": [
+      {
+        "writer": {
+          "name": "starrockswriter",
+          "parameter": {
+            "username": "root",
+            "password": "",
+            "database": "app",
+            "table": "i_f_iot_platform_data4ems_bak",
+            "column": [
+              "EVENT_TIME_RAW",
+              "EVENT_TIME",
+              "SOURCE_ID",
+              "PARAM_NAME",
+              "PARAM_VALUE",
+              "UPDATE_TIME"
+            ],
+            "preSql": [],
+            "postSql": [],
+            "jdbcUrl": "jdbc:mysql://172.25.5.103:9030,172.25.5.104:9030,172.25.5.105:9030?app",
+            "loadUrl": [
+              "172.25.5.103:8030",
+              "172.25.5.104:8030",
+              "172.25.5.105:8030"
+            ],
+            "loadProps": {
+              "column_separator": "\\x01",
+              "row_delimiter": "\\x02"
+            }
+          }
+        },
+        "reader": {
+          "name": "clickhousereader",
+          "parameter": {
+            "username": "bdetl",
+            "password": "etl$20190718",
+            "splitPk": "EVENT_TIME_RAW",
+            "column": [
+              "EVENT_TIME_RAW",
+              "EVENT_TIME",
+              "SOURCE_ID",
+              "PARAM_NAME",
+              "PARAM_VALUE",
+              "UPDATE_TIME"
+            ],
+            "where": "EVENT_TIME>='2022-01-01 00:00:00.000' and EVENT_TIME<'2022-01-11 00:00:00.000'",
+            "connection": [
+              {
+                "jdbcUrl": [
+                  "jdbc:clickhouse://10.108.240.250:8123/pid?connect_timeout_with_failover_secure_ms=500000ms"
+                ],
+                "table": [
+                  "i_f_iot_platform_data4ems"
+                ]
+              }
+            ]
+          }
+        }
+      }
+    ]
+  }
+}

@@ -278,7 +278,7 @@ public class StorageReaderUtil
                                 columnGenerated = new LongColumn(columnValue);
                                 break;
                             case DOUBLE:
-                                columnGenerated = new DoubleColumn(columnValue);
+                                columnGenerated = new DoubleColumn(columnValue.length()==0?null:columnValue);
                                 break;
                             case BOOLEAN:
                                 columnGenerated = new BoolColumn(columnValue);
