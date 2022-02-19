@@ -577,7 +577,7 @@ public class HdfsHelper
 
         try (ParquetWriter<GenericRecord> writer = AvroParquetWriter
                 .<GenericRecord>builder(path)
-                .withRowGroupSize((long) ParquetWriter.DEFAULT_BLOCK_SIZE)
+                .withRowGroupSize(ParquetWriter.DEFAULT_BLOCK_SIZE)
                 .withPageSize(ParquetWriter.DEFAULT_PAGE_SIZE)
                 .withSchema(schema)
                 .withConf(hadoopConf)

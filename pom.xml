@@ -29,6 +29,7 @@
     <properties>
         <!-- basic components -->
         <aircompressor.version>0.21</aircompressor.version>
+        <avro.version>1.10.0</avro.version>
         <commons.beanutils.version>1.9.4</commons.beanutils.version>
         <commons.configuration.version>1.10</commons.configuration.version>
         <commons.codec.version>1.15</commons.codec.version>
@@ -49,7 +50,7 @@
         <hadoop.common.version>3.2.2</hadoop.common.version>
         <hbase1.version>1.4.13</hbase1.version>
         <hbase2.version>2.2.5</hbase2.version>
-        <hive.version>3.1.2-16</hive.version>
+        <hive.version>3.1.2</hive.version>
         <httpclient.version>4.5.13</httpclient.version>
         <httpcore.version>4.4.15</httpcore.version>
         <httpasync.version>4.1.5</httpasync.version>
@@ -64,8 +65,11 @@
         <jedis.version>3.7.0</jedis.version>
         <jsch.version>0.1.55</jsch.version>
         <kudu.version>1.15.0</kudu.version>
+        <mapreduce.version>3.2.1</mapreduce.version>
         <mockito.version>2.0.2-beta</mockito.version>
         <ognl.version>3.2.21</ognl.version>
+        <orc.version>1.7.3</orc.version>
+        <parquet.version>1.10.0</parquet.version>
         <poi.version>5.1.0</poi.version>
         <redis.replicator.version>3.5.5</redis.replicator.version>
         <slf4j.version>1.7.32</slf4j.version>
@@ -80,7 +84,7 @@
         <clickhouse.jdbc.version>0.3.2</clickhouse.jdbc.version>
         <hive.jdbc.version>3.1.2</hive.jdbc.version>
         <influxdbClient.version>2.22</influxdbClient.version>
-        <hadoop.version>3.2.0-14</hadoop.version>
+        <hadoop.version>3.1.2</hadoop.version>
         <mongodb.jdbc.version>3.12.9</mongodb.jdbc.version>
         <mysql.jdbc.version>8.0.16</mysql.jdbc.version>
         <mssql.jdbc.version>9.2.1.jre8</mssql.jdbc.version>

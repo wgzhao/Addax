@@ -52,7 +52,6 @@ public class TestParquetFile
             throws IOException
     {
         schema = parser.parse(TestParquetFile.class.getResourceAsStream("/parquet_schema.asvo"));
-
     }
 
     private byte[] load_file()
@@ -109,7 +108,7 @@ public class TestParquetFile
     public void testParquetRead()
     {
         File file = new File(filePath);
-        if (! file.exists()) {
+        if (!file.exists()) {
             testParquetWrite();
         }
         Path parquetFilePath = new Path(filePath);
@@ -124,29 +123,20 @@ public class TestParquetFile
             Schema schema = gRecord.getSchema();
             String stype;
             Schema type;
-            for (Schema.Field field: schema.getFields()) {
+            for (Schema.Field field : schema.getFields()) {
                 if (field.schema().getType() == Schema.Type.UNION) {
                     type = field.schema().getTypes().get(1);
-                } else {
+                }
+                else {
                     type = field.schema();
                 }
-                stype = type.getProp("logicalType") != null ? type.getProp("logicalType"): type.getType().getName();
-//                schema.getField("col5").schema().getTypes().get(1).getProp("logicalType")
-//                if (type.getLogicalType() != null || type.getType() == Schema.Type.FIXED) {
-//                    stype = type.getLogicalType().getName();
-//                } else {
-//                    stype = type.getProp("logicalType") != null ? type.getProp("logicalType"): type.getType().getName();
-//                }
+                stype = type.getProp("logicalType") != null ? type.getProp("logicalType") : type.getType().getName();
                 System.out.println("name: " + field.name() + "\t type: " + stype);
             }
             System.out.println();
             while (gRecord != null) {
-                byte[] buffer = ((ByteBuffer)gRecord.get(6)).array();
+                byte[] buffer = ((ByteBuffer) gRecord.get(6)).array();
                 System.out.println(buffer.length);
-//                for ( int i=0; i<schema.getFields().size(); i++) {
-//                    System.out.print(gRecord.get(i).toString() + "\t");
-//                }
-//                System.out.println();
                 gRecord = reader.read();
             }
         }
