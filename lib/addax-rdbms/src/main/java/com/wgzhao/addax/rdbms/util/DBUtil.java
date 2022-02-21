@@ -52,7 +52,7 @@ import java.util.concurrent.TimeUnit;
 public final class DBUtil
 {
     private static final Logger LOG = LoggerFactory.getLogger(DBUtil.class);
-    private static final int DEFAULT_SOCKET_TIMEOUT_SEC = 300;
+    private static final int DEFAULT_SOCKET_TIMEOUT_SEC = 2 * 60 * 60;
 
     private static final ThreadLocal<ExecutorService> rsExecutors = ThreadLocal.withInitial(() -> Executors.newFixedThreadPool(1, new ThreadFactoryBuilder()
             .setNameFormat("rsExecutors-%d")
