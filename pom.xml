@@ -199,6 +199,7 @@
                 <module>plugin/writer/hdfswriter</module>
                 <module>plugin/writer/influxdbwriter</module>
                 <module>plugin/writer/influxdb2writer</module>
+                <module>plugin/writer/kafkawriter</module>
                 <module>plugin/writer/kuduwriter</module>
                 <module>plugin/writer/mongodbwriter</module>
                 <module>plugin/writer/mysqlwriter</module>
