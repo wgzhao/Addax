@@ -44,6 +44,7 @@
 7. rediswriter
 8. sqlitewriter
 9. tdenginewriter
+10. kafkawriter
 
 ### 部分插件增强功能，罗列如下
 
