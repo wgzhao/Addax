@@ -80,7 +80,7 @@
         <zstd.version>1.5.1-1</zstd.version>
 
         <!-- jdbc driver version -->
-        <cassandra.jdbc.version>3.11.0</cassandra.jdbc.version>
+        <cassandra.jdbc.version>3.11.1</cassandra.jdbc.version>
         <clickhouse.jdbc.version>0.3.2</clickhouse.jdbc.version>
         <hive.jdbc.version>3.1.2</hive.jdbc.version>
         <influxdbClient.version>2.22</influxdbClient.version>
@@ -352,7 +352,7 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-site-plugin</artifactId>
-                <version>3.9.1</version>
+                <version>3.11.0</version>
             </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
