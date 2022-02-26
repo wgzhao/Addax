@@ -8,5 +8,4 @@ public class KafkaKey
     public final static String BROKER_LIST = "brokerList";
     public final static String TOPIC = "topic";
     public final static String PROPERTIES = "properties";
-    public final static String PARTITIONS = "partitions";
 }
