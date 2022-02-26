@@ -1,0 +1,6 @@
+{
+  "name": "kafkawriter",
+  "class": "com.wgzhao.addax.plugin.writer.kafkawriter.KafkaWriter",
+  "description": "Use it to import data from any relational database into Apache Kafka topics.",
+  "developer": "wgzhao"
+}
