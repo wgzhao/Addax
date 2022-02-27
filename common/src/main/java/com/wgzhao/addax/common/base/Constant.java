@@ -61,6 +61,8 @@ public class Constant
     public static final String TABLE_NAME_PLACEHOLDER = "@table";
     public static final String TABLE_NUMBER_MARK = "tableNumber";
 
+    public static final String ENC_PASSWORD_PREFIX = "${enc:";
+
     public static final Set<String> SUPPORTED_WRITE_MODE = new HashSet<>(Arrays.asList("append", "nonConflict", "overwrite", "truncate"));
     public static final Set<String> SUPPORTED_FILE_FORMAT = new HashSet<>(Arrays.asList("csv", "text"));
 }
