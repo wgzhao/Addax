@@ -23,6 +23,8 @@ import com.mongodb.MongoClient;
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoCursor;
 import com.mongodb.client.MongoDatabase;
+import com.wgzhao.addax.common.base.Constant;
+import com.wgzhao.addax.common.base.Key;
 import com.wgzhao.addax.common.element.BoolColumn;
 import com.wgzhao.addax.common.element.DateColumn;
 import com.wgzhao.addax.common.element.DoubleColumn;
@@ -33,6 +35,7 @@ import com.wgzhao.addax.common.exception.AddaxException;
 import com.wgzhao.addax.common.plugin.RecordSender;
 import com.wgzhao.addax.common.spi.Reader;
 import com.wgzhao.addax.common.util.Configuration;
+import com.wgzhao.addax.common.util.EncryptUtil;
 import com.wgzhao.addax.plugin.reader.mongodbreader.util.CollectionSplitUtil;
 import com.wgzhao.addax.plugin.reader.mongodbreader.util.MongoUtil;
 import org.bson.Document;
@@ -80,6 +83,11 @@ public class MongoDBReader
             // check required configuration
             String userName = originalConfig.getNecessaryValue(USERNAME, MongoDBReaderErrorCode.REQUIRED_VALUE);
             String password = originalConfig.getString(PASSWORD);
+            if (password != null && password.startsWith(Constant.ENC_PASSWORD_PREFIX)) {
+                // encrypted password, need to decrypt
+                password = EncryptUtil.decrypt(password.substring(6, password.length() - 1));
+                originalConfig.set(Key.PASSWORD, password);
+            }
             Configuration connConf = Configuration.from(originalConfig.getList(CONNECTION, Object.class).get(0).toString());
             String database = connConf.getNecessaryValue(DATABASE, MongoDBReaderErrorCode.REQUIRED_VALUE);
             String authDb = connConf.getString(KeyConstant.MONGO_AUTH_DB, database);
@@ -226,6 +234,10 @@ public class MongoDBReader
             Configuration readerSliceConfig = getPluginJobConf();
             String userName = readerSliceConfig.getString(USERNAME);
             String password = readerSliceConfig.getString(PASSWORD);
+            if (password != null && password.startsWith(Constant.ENC_PASSWORD_PREFIX)) {
+                // encrypted password, need to decrypt
+                password = EncryptUtil.decrypt(password.substring(6, password.length() - 1));
+            }
             this.fetchSize = readerSliceConfig.getInt(FETCH_SIZE, DEFAULT_FETCH_SIZE);
             this.query = readerSliceConfig.getString(KeyConstant.MONGO_QUERY);
             this.mongodbColumnMeta = readerSliceConfig.getList(COLUMN, String.class);
