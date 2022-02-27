@@ -25,6 +25,7 @@ import com.wgzhao.addax.common.base.Constant;
 import com.wgzhao.addax.common.base.Key;
 import com.wgzhao.addax.common.exception.AddaxException;
 import com.wgzhao.addax.common.util.Configuration;
+import com.wgzhao.addax.common.util.EncryptUtil;
 import com.wgzhao.addax.common.util.ListUtil;
 import com.wgzhao.addax.rdbms.util.ConnectionFactory;
 import com.wgzhao.addax.rdbms.util.DBUtil;
@@ -55,6 +56,12 @@ public final class OriginalConfPretreatmentUtil
         // 有些数据库没有密码，因此密码不再作为必选项
         if (originalConfig.getString(Key.PASSWORD) == null) {
             originalConfig.set(Key.PASSWORD, "");
+        }
+        else if (originalConfig.getString(Key.PASSWORD).startsWith(Constant.ENC_PASSWORD_PREFIX)) {
+            // encrypted password, need to decrypt
+            String pass = originalConfig.getString(Key.PASSWORD);
+            String decryptPassword = EncryptUtil.decrypt(pass.substring(6, pass.length() - 1));
+            originalConfig.set(Key.PASSWORD, decryptPassword);
         }
         doCheckBatchSize(originalConfig);
 
