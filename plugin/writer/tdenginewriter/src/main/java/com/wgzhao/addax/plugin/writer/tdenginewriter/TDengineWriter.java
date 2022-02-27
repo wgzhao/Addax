@@ -1,110 +1,129 @@
 package com.wgzhao.addax.plugin.writer.tdenginewriter;
 
-import com.wgzhao.addax.common.element.Column;
+import com.wgzhao.addax.common.base.Key;
 import com.wgzhao.addax.common.exception.AddaxException;
 import com.wgzhao.addax.common.plugin.RecordReceiver;
 import com.wgzhao.addax.common.spi.Writer;
 import com.wgzhao.addax.common.util.Configuration;
-import com.wgzhao.addax.rdbms.util.DBUtilErrorCode;
-import com.wgzhao.addax.rdbms.util.DataBaseType;
-import com.wgzhao.addax.rdbms.writer.CommonRdbmsWriter;
+import org.apache.commons.lang3.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-import java.sql.PreparedStatement;
-import java.sql.SQLException;
-import java.sql.Timestamp;
-import java.time.Instant;
+import java.util.ArrayList;
 import java.util.List;
 
 public class TDengineWriter
         extends Writer
 {
-    private static final DataBaseType DATABASE_TYPE = DataBaseType.TDengine;
+    private static final String PEER_PLUGIN_NAME = "peerPluginName";
 
     public static class Job
             extends Writer.Job
     {
-        private Configuration originalConfig = null;
-        private CommonRdbmsWriter.Job commonRdbmsWriterJob;
 
-        @Override
-        public void preCheck()
-        {
-            this.init();
-            this.commonRdbmsWriterJob.writerPreCheck(this.originalConfig, DATABASE_TYPE);
-        }
+        private Configuration originalConfig;
+        private static final Logger LOG = LoggerFactory.getLogger(Job.class);
 
         @Override
         public void init()
         {
             this.originalConfig = super.getPluginJobConf();
-            this.commonRdbmsWriterJob = new CommonRdbmsWriter.Job(DATABASE_TYPE);
-            this.commonRdbmsWriterJob.init(this.originalConfig);
-        }
+            this.originalConfig.set(PEER_PLUGIN_NAME, getPeerPluginName());
 
-        // 一般来说，是需要推迟到 task 中进行pre 的执行（单表情况例外）
-        @Override
-        public void prepare()
-        {
-            //实跑先不支持 权限 检验
-//            this.commonRdbmsWriterJob.privilegeValid(this.originalConfig, DATABASE_TYPE)
-            this.commonRdbmsWriterJob.prepare(this.originalConfig);
-        }
+            // check user
+            String user = this.originalConfig.getString(Key.USERNAME);
+            if (StringUtils.isBlank(user)) {
+                throw AddaxException.asAddaxException(TDengineWriterErrorCode.REQUIRED_VALUE, "The parameter ["
+                        + Key.USERNAME + "] is not set.");
+            }
 
-        @Override
-        public List<Configuration> split(int mandatoryNumber)
-        {
-            return this.commonRdbmsWriterJob.split(this.originalConfig, mandatoryNumber);
-        }
+            // check password
+            String password = this.originalConfig.getString(Key.PASSWORD);
+            if (StringUtils.isBlank(password)) {
+                throw AddaxException.asAddaxException(TDengineWriterErrorCode.REQUIRED_VALUE, "The parameter ["
+                        + Key.PASSWORD + "] is not set.");
+            }
 
-        // 一般来说，是需要推迟到 task 中进行post 的执行（单表情况例外）
-        @Override
-        public void post()
-        {
-            this.commonRdbmsWriterJob.post(this.originalConfig);
+            // check connection
+            List<Object> connection = this.originalConfig.getList(Key.CONNECTION);
+            if (connection == null || connection.isEmpty()) {
+                throw AddaxException.asAddaxException(TDengineWriterErrorCode.REQUIRED_VALUE, "The parameter ["
+                        + Key.CONNECTION + "] is not set.");
+            }
+            if (connection.size() > 1) {
+                LOG.warn("connection.size is " + connection.size() + " and only connection[0] will be used.");
+            }
+            Configuration conn = Configuration.from(connection.get(0).toString());
+            String jdbcUrl = conn.getString(Key.JDBC_URL);
+            if (StringUtils.isBlank(jdbcUrl)) {
+                throw AddaxException.asAddaxException(TDengineWriterErrorCode.REQUIRED_VALUE, "The parameter ["
+                        + Key.JDBC_URL + "] of connection is not set.");
+            }
+
+            // check column
         }
 
         @Override
         public void destroy()
         {
-            this.commonRdbmsWriterJob.destroy(this.originalConfig);
+
+        }
+
+        @Override
+        public List<Configuration> split(int mandatoryNumber)
+        {
+            List<Configuration> writerSplitConfigs = new ArrayList<>();
+
+            List<Object> conns = this.originalConfig.getList(Key.CONNECTION);
+            for (int i = 0; i < mandatoryNumber; i++) {
+                Configuration clone = this.originalConfig.clone();
+                Configuration conf = Configuration.from(conns.get(0).toString());
+                String jdbcUrl = conf.getString(Key.JDBC_URL);
+                clone.set(Key.JDBC_URL, jdbcUrl);
+                clone.set(Key.TABLE, conf.getList(Key.TABLE));
+                clone.remove(Key.CONNECTION);
+                writerSplitConfigs.add(clone);
+            }
+
+            return writerSplitConfigs;
         }
     }
 
     public static class Task
             extends Writer.Task
     {
+        private static final Logger LOG = LoggerFactory.getLogger(Task.class);
+
         private Configuration writerSliceConfig;
-        private CommonRdbmsWriter.Task commonRdbmsWriterTask;
 
         @Override
         public void init()
         {
-            this.writerSliceConfig = super.getPluginJobConf();
-            this.commonRdbmsWriterTask = new CommonRdbmsWriter.Task(DATABASE_TYPE);
-            this.commonRdbmsWriterTask.init(this.writerSliceConfig);
-        }
-
-        @Override
-        public void prepare()
-        {
-            this.commonRdbmsWriterTask.prepare(this.writerSliceConfig);
-        }
-
-        public void startWrite(RecordReceiver recordReceiver)
-        {
-            this.commonRdbmsWriterTask.startWrite(recordReceiver, writerSliceConfig, getTaskPluginCollector());
-        }
-
-        @Override
-        public void post()
-        {
-            this.commonRdbmsWriterTask.post(this.writerSliceConfig);
+            this.writerSliceConfig = getPluginJobConf();
         }
 
         @Override
         public void destroy()
         {
-            this.commonRdbmsWriterTask.destroy(this.writerSliceConfig);
+
+        }
+
+        @Override
+        public void startWrite(RecordReceiver lineReceiver)
+        {
+            String peerPluginName = this.writerSliceConfig.getString(PEER_PLUGIN_NAME);
+            LOG.debug("start to handle record from: " + peerPluginName);
+
+            DataHandler handler;
+            if (peerPluginName.equals("opentsdbreader")) {
+                handler = new OpentsdbDataHandler(this.writerSliceConfig);
+            }
+            else {
+                handler = new DefaultDataHandler(this.writerSliceConfig);
+            }
+
+            long records = handler.handle(lineReceiver, getTaskPluginCollector());
+            LOG.debug("handle data finished, records: " + records);
         }
     }
 }
