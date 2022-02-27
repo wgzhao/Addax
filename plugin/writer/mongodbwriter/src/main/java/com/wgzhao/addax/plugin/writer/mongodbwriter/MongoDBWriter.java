@@ -28,7 +28,7 @@ import com.mongodb.client.MongoDatabase;
 import com.mongodb.client.model.BulkWriteOptions;
 import com.mongodb.client.model.ReplaceOneModel;
 import com.mongodb.client.model.ReplaceOptions;
-import com.mongodb.client.model.UpdateOptions;
+import com.wgzhao.addax.common.base.Constant;
 import com.wgzhao.addax.common.element.BoolColumn;
 import com.wgzhao.addax.common.element.BytesColumn;
 import com.wgzhao.addax.common.element.Column;
@@ -41,6 +41,7 @@ import com.wgzhao.addax.common.exception.AddaxException;
 import com.wgzhao.addax.common.plugin.RecordReceiver;
 import com.wgzhao.addax.common.spi.Writer;
 import com.wgzhao.addax.common.util.Configuration;
+import com.wgzhao.addax.common.util.EncryptUtil;
 import com.wgzhao.addax.plugin.writer.mongodbwriter.util.MongoUtil;
 import org.apache.commons.lang3.StringUtils;
 import org.bson.Document;
@@ -104,6 +105,10 @@ public class MongoDBWriter
             String collection = connConf.getNecessaryValue(KeyConstant.MONGO_COLLECTION_NAME, MongoDBWriterErrorCode.REQUIRED_VALUE);
             String username = connConf.getString(USERNAME);
             String password = connConf.getString(PASSWORD);
+            if (password != null && password.startsWith(Constant.ENC_PASSWORD_PREFIX)) {
+                // encrypted password, need to decrypt
+                password = EncryptUtil.decrypt(password.substring(6, password.length() - 1));
+            }
             MongoClient mongoClient;
             if (StringUtils.isEmpty((username)) || StringUtils.isEmpty((password))) {
                 mongoClient = MongoUtil.initMongoClient(address);
@@ -186,6 +191,10 @@ public class MongoDBWriter
             Configuration writerSliceConfig = this.getPluginJobConf();
             String userName = writerSliceConfig.getString(USERNAME);
             String password = writerSliceConfig.getString(PASSWORD);
+            if (password != null && password.startsWith(Constant.ENC_PASSWORD_PREFIX)) {
+                // encrypted password, need to decrypt
+                password = EncryptUtil.decrypt(password.substring(6, password.length() - 1));
+            }
             Configuration connConf = Configuration.from(writerSliceConfig.getList(CONNECTION, Object.class).get(0).toString());
             this.database = connConf.getString(DATABASE);
             List<Object> addressList = connConf.getList(KeyConstant.MONGO_ADDRESS, Object.class);
