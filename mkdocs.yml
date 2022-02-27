@@ -40,68 +40,70 @@ nav:
   - quickstart.md
   - setupJob.md
   - 读取插件:
-    - reader/cassandrareader.md
-    - reader/clickhousereader.md
-    - reader/datareader.md
-    - reader/dbfreader.md
-    - reader/elasticsearchreader.md
-    - reader/excelreader.md
-    - reader/ftpreader.md
-    - reader/hbase11xreader.md
-    - reader/hbase11xsqlreader.md
-    - reader/hbase20xreader.md
-    - reader/hbase20xsqlreader.md
-    - reader/hdfsreader.md
-    - reader/hivereader.md
-    - reader/httpreader.md
-    - reader/influxdbreader.md
-    - reader/influxdb2reader.md
-    - reader/jsonfilereader.md
-    - reader/kudureader.md
-    - reader/mongodbreader.md
-    - reader/mysqlreader.md
-    - reader/oraclereader.md
-    - reader/postgresqlreader.md
-    - reader/rdbmsreader.md
-    - reader/redisreader.md
-    - reader/sqlitereader.md
-    - reader/sqlserverreader.md
-    - reader/streamreader.md
-    - reader/tdenginereader.md
-    - reader/txtfilereader.md
+      - reader/cassandrareader.md
+      - reader/clickhousereader.md
+      - reader/datareader.md
+      - reader/dbfreader.md
+      - reader/elasticsearchreader.md
+      - reader/excelreader.md
+      - reader/ftpreader.md
+      - reader/hbase11xreader.md
+      - reader/hbase11xsqlreader.md
+      - reader/hbase20xreader.md
+      - reader/hbase20xsqlreader.md
+      - reader/hdfsreader.md
+      - reader/hivereader.md
+      - reader/httpreader.md
+      - reader/influxdbreader.md
+      - reader/influxdb2reader.md
+      - reader/jsonfilereader.md
+      - reader/kudureader.md
+      - reader/mongodbreader.md
+      - reader/mysqlreader.md
+      - reader/oraclereader.md
+      - reader/postgresqlreader.md
+      - reader/rdbmsreader.md
+      - reader/redisreader.md
+      - reader/sqlitereader.md
+      - reader/sqlserverreader.md
+      - reader/streamreader.md
+      - reader/tdenginereader.md
+      - reader/txtfilereader.md
 
   - 写入插件:
-    - writer/cassandrawriter.md
-    - writer/clickhousewriter.md
-    - writer/dbfwriter.md
-    - writer/doriswriter.md
-    - writer/elasticsearchwriter.md
-    - writer/excelwriter.md
-    - writer/ftpwriter.md
-    - writer/greenplumwriter.md
-    - writer/hbase11xsqlwriter.md
-    - writer/hbase11xwriter.md
-    - writer/hbase20xsqlwriter.md
-    - writer/hdfswriter.md
-    - writer/influxdbwriter.md
-    - writer/influxdb2writer.md
-    - writer/kuduwriter.md
-    - writer/mongodbwriter.md
-    - writer/mysqlwriter.md
-    - writer/oraclewriter.md
-    - writer/postgresqlwriter.md
-    - writer/rdbmswriter.md
-    - writer/rediswriter.md
-    - writer/sqlitewriter.md
-    - writer/sqlserverwriter.md
-    - writer/streamwriter.md
-    - writer/tdenginewriter.md
-    - writer/txtfilewriter.md
+      - writer/cassandrawriter.md
+      - writer/clickhousewriter.md
+      - writer/dbfwriter.md
+      - writer/doriswriter.md
+      - writer/elasticsearchwriter.md
+      - writer/excelwriter.md
+      - writer/ftpwriter.md
+      - writer/greenplumwriter.md
+      - writer/hbase11xsqlwriter.md
+      - writer/hbase11xwriter.md
+      - writer/hbase20xsqlwriter.md
+      - writer/hdfswriter.md
+      - writer/influxdbwriter.md
+      - writer/influxdb2writer.md
+      - writer/kafkawriter.md
+      - writer/kuduwriter.md
+      - writer/mongodbwriter.md
+      - writer/mysqlwriter.md
+      - writer/oraclewriter.md
+      - writer/postgresqlwriter.md
+      - writer/rdbmswriter.md
+      - writer/rediswriter.md
+      - writer/sqlitewriter.md
+      - writer/sqlserverwriter.md
+      - writer/streamwriter.md
+      - writer/tdenginewriter.md
+      - writer/txtfilewriter.md
   - debug.md
+  - encrypt_password.md
   - statsreport.md
   - transformer.md
   - plugin_development.md
-  
+
 extra:
   version:
     provider: mike
@@ -138,12 +140,12 @@ markdown_extensions:
   - pymdownx.mark
   - pymdownx.smartsymbols
   - pymdownx.superfences:
-     custom_fences:
-       - name: mermaid
-         class: mermaid
-         format: !!python/name:pymdownx.superfences.fence_code_format
+      custom_fences:
+        - name: mermaid
+          class: mermaid
+          format: !!python/name:pymdownx.superfences.fence_code_format
   - pymdownx.snippets:
-      base_path: 
+      base_path:
         - docs/assets
       check_paths: false
   - pymdownx.tabbed
