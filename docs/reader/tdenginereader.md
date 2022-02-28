@@ -52,6 +52,18 @@ bin/addax.sh job/tdengine2stream.json
 | column          |    是    | list | 无     |  所配置的表中需要同步的列名集合，详细描述[rdbmreader](../rdbmsreader) |
 | where           |    否    | string | 无     | 针对表的筛选条件 |
 | querySql        |    否    | list | 无     | 使用自定义的SQL而不是指定表来获取数据，当配置了这一项之后，Addax系统就会忽略 `table`，`column`这些配置项 |
+| beginDateTime   |    是    | string | 无    | 数据的开始时间，Job迁移从 `begineDateTime` 到 `endDateTime` 的数据，格式为 `yyyy-MM-dd HH:mm:ss` |
+| endDateTime     |    是    | string | 无    | 数据的结束时间，Job迁移从 `begineDateTime` 到 `endDateTime` 的数据，格式为 `yyyy-MM-dd HH:mm:ss` |
+| splitInterval   |    是    | string | 无   | 按照 `splitInterval` 来划分 `task`, 每 `splitInterval` 创建一个 `task` |
+
+### splitInterval
+
+用来划分 `task`。 例如，`20d` 代表按照每 20 天的数据划分为 1 个 `task`。 可以配置的时间
+
+- `d`（天）
+- `h`（小时）
+- `m`（分钟）
+- `s`（秒）
 
 ### 使用 JDBC-RESTful 接口
 

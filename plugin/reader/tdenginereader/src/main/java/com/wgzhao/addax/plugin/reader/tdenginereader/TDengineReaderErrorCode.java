@@ -24,7 +24,9 @@ import com.wgzhao.addax.common.spi.ErrorCode;
 public enum TDengineReaderErrorCode
         implements ErrorCode
 {
-    ;
+    REQUIRED_VALUE("TDengineReader-00", "Missing required value"),
+    ILLEGAL_VALUE("TDengineReader-01", "Illegal value"),
+    CONNECTION_FAILED("TDengineReader-02", "Connection failure");
 
     private final String code;
     private final String description;
@@ -50,7 +52,6 @@ public enum TDengineReaderErrorCode
     @Override
     public String toString()
     {
-        return String.format("Code:[%s], Description:[%s]. ", this.code,
-                this.description);
+        return String.format("Code:[%s], Description:[%s]. ", this.code, this.description);
     }
 }
