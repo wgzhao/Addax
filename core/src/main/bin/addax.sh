@@ -65,7 +65,7 @@ function print_version {
 
 function parse_job_file {
     # check the job file is local file or url ?
-    if [[ "${JOB_FILE}" == "http*" ]]; then
+    if [[ "${JOB_FILE}" == http* ]]; then
         # download it first
         TMPDIR=$(mktemp -d /tmp/addax.XXXXXX)
         (cd $TMPDIR && curl -sS ${JOB_FILE})
