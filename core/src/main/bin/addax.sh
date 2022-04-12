@@ -68,7 +68,7 @@ function parse_job_file {
     if [[ "${JOB_FILE}" == http* ]]; then
         # download it first
         TMPDIR=$(mktemp -d /tmp/addax.XXXXXX)
-        (cd $TMPDIR && curl -sS ${JOB_FILE})
+        (cd $TMPDIR && curl -ksSO ${JOB_FILE})
         JOB_FILE=$(ls -w1 ${TMPDIR}/*)
     fi
 
