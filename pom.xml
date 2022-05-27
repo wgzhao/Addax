@@ -42,7 +42,7 @@
         <commons.net.version>3.8.0</commons.net.version>
         <diamond.version>3.7.3</diamond.version>
         <druid.version>1.2.6</druid.version>
-        <fastjson.version>1.2.76</fastjson.version>
+        <fastjson.version>1.2.83</fastjson.version>
         <findbugs.version>3.0.1</findbugs.version>
         <guava.version>29.0-jre</guava.version>
         <groovy.version>3.0.9</groovy.version>
