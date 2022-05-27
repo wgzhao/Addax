@@ -699,6 +699,16 @@ public class HdfsHelper
                             //convert bytes to base64 string
                             buffer = Base64.getEncoder().encode((byte[]) record.getColumn(i).getRawData());
                         }
+                        else if (record.getColumn(i).getType() == Column.Type.DATE)
+                        {
+                            SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+                            buffer = sdf.format(record.getColumn(i).asDate()).getBytes(StandardCharsets.UTF_8);
+                        }
+                        else if (record.getColumn(i).getType() == Column.Type.TIMESTAMP)
+                        {
+                            SimpleDateFormat sdf = new SimpleDateFormat(Constant.DEFAULT_DATE_FORMAT);
+                            buffer = sdf.format(record.getColumn(i).asDate()).getBytes(StandardCharsets.UTF_8);
+                        }
                         else {
                             buffer = record.getColumn(i).getRawData().toString().getBytes(StandardCharsets.UTF_8);
                         }
