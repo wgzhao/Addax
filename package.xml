@@ -404,6 +404,17 @@
             <outputDirectory>addax-${project.version}</outputDirectory>
         </fileSet>
         <fileSet>
+            <directory>plugin/writer/kafkawriter/target/kafkawriter-${project.version}/</directory>
+            <includes>
+                <include>**/*.*</include>
+            </includes>
+            <excludes>
+                <exclude>**/addax-common*.jar</exclude>
+            </excludes>
+            <fileMode>0644</fileMode>
+            <outputDirectory>addax-${project.version}</outputDirectory>
+        </fileSet>
+        <fileSet>
             <directory>plugin/writer/kuduwriter/target/kuduwriter-${project.version}/</directory>
             <includes>
                 <include>**/*.*</include>
