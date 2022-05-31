@@ -67,8 +67,7 @@ public final class StarRocksWriterUtil
             stmt = conn.createStatement();
             for (String sql : sqls) {
                 currentSql = sql;
-                DBUtil.query(conn, sql);
-//                DBUtil.executeSqlWithoutResultSet(stmt, sql);
+                stmt.execute(sql);
             }
         }
         catch (Exception e) {
