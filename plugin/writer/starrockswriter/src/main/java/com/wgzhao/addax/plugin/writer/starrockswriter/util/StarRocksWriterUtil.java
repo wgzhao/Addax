@@ -2,6 +2,7 @@ package com.wgzhao.addax.plugin.writer.starrockswriter.util;
 
 import com.alibaba.druid.sql.parser.ParserException;
 import com.google.common.base.Strings;
+import com.google.common.collect.ImmutableList;
 import com.wgzhao.addax.common.base.Constant;
 import com.wgzhao.addax.plugin.writer.starrockswriter.StarRocksWriterOptions;
 import com.wgzhao.addax.rdbms.util.DBUtil;
@@ -47,10 +48,10 @@ public final class StarRocksWriterUtil
 
     public static List<String> renderPreOrPostSqls(List<String> preOrPostSqls, String tableName)
     {
-        if (null == preOrPostSqls) {
-            return Collections.emptyList();
-        }
         List<String> renderedSqls = new ArrayList<>();
+        if ( null == preOrPostSqls ) {
+            return renderedSqls;
+        }
         for (String sql : preOrPostSqls) {
             if (!Strings.isNullOrEmpty(sql)) {
                 renderedSqls.add(sql.replace(Constant.TABLE_NAME_PLACEHOLDER, tableName));

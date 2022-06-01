@@ -22,6 +22,7 @@ import java.io.IOException;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.nio.ByteBuffer;
+import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.Map;
@@ -234,7 +235,7 @@ public class StarRocksStreamLoadVisitor
     {
         String auth = username + ":" + password;
         byte[] encodedAuth = Base64.encodeBase64(auth.getBytes(StandardCharsets.UTF_8));
-        return new StringBuilder("Basic ").append(new String(encodedAuth)).toString();
+        return "Basic " + new String(encodedAuth, Charset.defaultCharset());
     }
 
     private HttpEntity getHttpEntity(CloseableHttpResponse resp)
