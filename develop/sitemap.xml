@@ -1,313 +1,328 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
     <url>
-         <loc>https://wgzhao.github.io/Addax/develop/</loc>
-         <lastmod>2021-12-09</lastmod>
+         <loc>https://wgzhao.github.io/Addax/</loc>
+         <lastmod>2022-06-02</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
-         <loc>https://wgzhao.github.io/Addax/develop/debug/</loc>
-         <lastmod>2021-12-09</lastmod>
+         <loc>https://wgzhao.github.io/Addax/debug/</loc>
+         <lastmod>2022-06-02</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
-         <loc>https://wgzhao.github.io/Addax/develop/plugin_development/</loc>
-         <lastmod>2021-12-09</lastmod>
+         <loc>https://wgzhao.github.io/Addax/encrypt_password/</loc>
+         <lastmod>2022-06-02</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
-         <loc>https://wgzhao.github.io/Addax/develop/quickstart/</loc>
-         <lastmod>2021-12-09</lastmod>
+         <loc>https://wgzhao.github.io/Addax/plugin_development/</loc>
+         <lastmod>2022-06-02</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
-         <loc>https://wgzhao.github.io/Addax/develop/setupJob/</loc>
-         <lastmod>2021-12-09</lastmod>
+         <loc>https://wgzhao.github.io/Addax/quickstart/</loc>
+         <lastmod>2022-06-02</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
-         <loc>https://wgzhao.github.io/Addax/develop/statsreport/</loc>
-         <lastmod>2021-12-09</lastmod>
+         <loc>https://wgzhao.github.io/Addax/setupJob/</loc>
+         <lastmod>2022-06-02</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
-         <loc>https://wgzhao.github.io/Addax/develop/transformer/</loc>
-         <lastmod>2021-12-09</lastmod>
+         <loc>https://wgzhao.github.io/Addax/statsreport/</loc>
+         <lastmod>2022-06-02</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
-         <loc>https://wgzhao.github.io/Addax/develop/reader/cassandrareader/</loc>
-         <lastmod>2021-12-09</lastmod>
+         <loc>https://wgzhao.github.io/Addax/transformer/</loc>
+         <lastmod>2022-06-02</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
-         <loc>https://wgzhao.github.io/Addax/develop/reader/clickhousereader/</loc>
-         <lastmod>2021-12-09</lastmod>
+         <loc>https://wgzhao.github.io/Addax/reader/cassandrareader/</loc>
+         <lastmod>2022-06-02</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
-         <loc>https://wgzhao.github.io/Addax/develop/reader/datareader/</loc>
-         <lastmod>2021-12-09</lastmod>
+         <loc>https://wgzhao.github.io/Addax/reader/clickhousereader/</loc>
+         <lastmod>2022-06-02</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
-         <loc>https://wgzhao.github.io/Addax/develop/reader/dbfreader/</loc>
-         <lastmod>2021-12-09</lastmod>
+         <loc>https://wgzhao.github.io/Addax/reader/datareader/</loc>
+         <lastmod>2022-06-02</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
-         <loc>https://wgzhao.github.io/Addax/develop/reader/elasticsearchreader/</loc>
-         <lastmod>2021-12-09</lastmod>
+         <loc>https://wgzhao.github.io/Addax/reader/dbfreader/</loc>
+         <lastmod>2022-06-02</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
-         <loc>https://wgzhao.github.io/Addax/develop/reader/excelreader/</loc>
-         <lastmod>2021-12-09</lastmod>
+         <loc>https://wgzhao.github.io/Addax/reader/elasticsearchreader/</loc>
+         <lastmod>2022-06-02</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
-         <loc>https://wgzhao.github.io/Addax/develop/reader/ftpreader/</loc>
-         <lastmod>2021-12-09</lastmod>
+         <loc>https://wgzhao.github.io/Addax/reader/excelreader/</loc>
+         <lastmod>2022-06-02</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
-         <loc>https://wgzhao.github.io/Addax/develop/reader/hbase11xreader/</loc>
-         <lastmod>2021-12-09</lastmod>
+         <loc>https://wgzhao.github.io/Addax/reader/ftpreader/</loc>
+         <lastmod>2022-06-02</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
-         <loc>https://wgzhao.github.io/Addax/develop/reader/hbase11xsqlreader/</loc>
-         <lastmod>2021-12-09</lastmod>
+         <loc>https://wgzhao.github.io/Addax/reader/hbase11xreader/</loc>
+         <lastmod>2022-06-02</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
-         <loc>https://wgzhao.github.io/Addax/develop/reader/hbase20xreader/</loc>
-         <lastmod>2021-12-09</lastmod>
+         <loc>https://wgzhao.github.io/Addax/reader/hbase11xsqlreader/</loc>
+         <lastmod>2022-06-02</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
-         <loc>https://wgzhao.github.io/Addax/develop/reader/hbase20xsqlreader/</loc>
-         <lastmod>2021-12-09</lastmod>
+         <loc>https://wgzhao.github.io/Addax/reader/hbase20xreader/</loc>
+         <lastmod>2022-06-02</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
-         <loc>https://wgzhao.github.io/Addax/develop/reader/hdfsreader/</loc>
-         <lastmod>2021-12-09</lastmod>
+         <loc>https://wgzhao.github.io/Addax/reader/hbase20xsqlreader/</loc>
+         <lastmod>2022-06-02</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
-         <loc>https://wgzhao.github.io/Addax/develop/reader/hivereader/</loc>
-         <lastmod>2021-12-09</lastmod>
+         <loc>https://wgzhao.github.io/Addax/reader/hdfsreader/</loc>
+         <lastmod>2022-06-02</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
-         <loc>https://wgzhao.github.io/Addax/develop/reader/httpreader/</loc>
-         <lastmod>2021-12-09</lastmod>
+         <loc>https://wgzhao.github.io/Addax/reader/hivereader/</loc>
+         <lastmod>2022-06-02</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
-         <loc>https://wgzhao.github.io/Addax/develop/reader/influxdb2reader/</loc>
-         <lastmod>2021-12-09</lastmod>
+         <loc>https://wgzhao.github.io/Addax/reader/httpreader/</loc>
+         <lastmod>2022-06-02</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
-         <loc>https://wgzhao.github.io/Addax/develop/reader/influxdbreader/</loc>
-         <lastmod>2021-12-09</lastmod>
+         <loc>https://wgzhao.github.io/Addax/reader/influxdb2reader/</loc>
+         <lastmod>2022-06-02</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
-         <loc>https://wgzhao.github.io/Addax/develop/reader/jsonfilereader/</loc>
-         <lastmod>2021-12-09</lastmod>
+         <loc>https://wgzhao.github.io/Addax/reader/influxdbreader/</loc>
+         <lastmod>2022-06-02</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
-         <loc>https://wgzhao.github.io/Addax/develop/reader/kudureader/</loc>
-         <lastmod>2021-12-09</lastmod>
+         <loc>https://wgzhao.github.io/Addax/reader/jsonfilereader/</loc>
+         <lastmod>2022-06-02</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
-         <loc>https://wgzhao.github.io/Addax/develop/reader/mongodbreader/</loc>
-         <lastmod>2021-12-09</lastmod>
+         <loc>https://wgzhao.github.io/Addax/reader/kudureader/</loc>
+         <lastmod>2022-06-02</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
-         <loc>https://wgzhao.github.io/Addax/develop/reader/mysqlreader/</loc>
-         <lastmod>2021-12-09</lastmod>
+         <loc>https://wgzhao.github.io/Addax/reader/mongodbreader/</loc>
+         <lastmod>2022-06-02</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
-         <loc>https://wgzhao.github.io/Addax/develop/reader/oraclereader/</loc>
-         <lastmod>2021-12-09</lastmod>
+         <loc>https://wgzhao.github.io/Addax/reader/mysqlreader/</loc>
+         <lastmod>2022-06-02</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
-         <loc>https://wgzhao.github.io/Addax/develop/reader/postgresqlreader/</loc>
-         <lastmod>2021-12-09</lastmod>
+         <loc>https://wgzhao.github.io/Addax/reader/oraclereader/</loc>
+         <lastmod>2022-06-02</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
-         <loc>https://wgzhao.github.io/Addax/develop/reader/rdbmsreader/</loc>
-         <lastmod>2021-12-09</lastmod>
+         <loc>https://wgzhao.github.io/Addax/reader/postgresqlreader/</loc>
+         <lastmod>2022-06-02</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
-         <loc>https://wgzhao.github.io/Addax/develop/reader/redisreader/</loc>
-         <lastmod>2021-12-09</lastmod>
+         <loc>https://wgzhao.github.io/Addax/reader/rdbmsreader/</loc>
+         <lastmod>2022-06-02</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
-         <loc>https://wgzhao.github.io/Addax/develop/reader/sqlitereader/</loc>
-         <lastmod>2021-12-09</lastmod>
+         <loc>https://wgzhao.github.io/Addax/reader/redisreader/</loc>
+         <lastmod>2022-06-02</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
-         <loc>https://wgzhao.github.io/Addax/develop/reader/sqlserverreader/</loc>
-         <lastmod>2021-12-09</lastmod>
+         <loc>https://wgzhao.github.io/Addax/reader/sqlitereader/</loc>
+         <lastmod>2022-06-02</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
-         <loc>https://wgzhao.github.io/Addax/develop/reader/streamreader/</loc>
-         <lastmod>2021-12-09</lastmod>
+         <loc>https://wgzhao.github.io/Addax/reader/sqlserverreader/</loc>
+         <lastmod>2022-06-02</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
-         <loc>https://wgzhao.github.io/Addax/develop/reader/tdenginereader/</loc>
-         <lastmod>2021-12-09</lastmod>
+         <loc>https://wgzhao.github.io/Addax/reader/streamreader/</loc>
+         <lastmod>2022-06-02</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
-         <loc>https://wgzhao.github.io/Addax/develop/reader/txtfilereader/</loc>
-         <lastmod>2021-12-09</lastmod>
+         <loc>https://wgzhao.github.io/Addax/reader/tdenginereader/</loc>
+         <lastmod>2022-06-02</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
-         <loc>https://wgzhao.github.io/Addax/develop/writer/cassandrawriter/</loc>
-         <lastmod>2021-12-09</lastmod>
+         <loc>https://wgzhao.github.io/Addax/reader/txtfilereader/</loc>
+         <lastmod>2022-06-02</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
-         <loc>https://wgzhao.github.io/Addax/develop/writer/clickhousewriter/</loc>
-         <lastmod>2021-12-09</lastmod>
+         <loc>https://wgzhao.github.io/Addax/writer/cassandrawriter/</loc>
+         <lastmod>2022-06-02</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
-         <loc>https://wgzhao.github.io/Addax/develop/writer/dbfwriter/</loc>
-         <lastmod>2021-12-09</lastmod>
+         <loc>https://wgzhao.github.io/Addax/writer/clickhousewriter/</loc>
+         <lastmod>2022-06-02</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
-         <loc>https://wgzhao.github.io/Addax/develop/writer/doriswriter/</loc>
-         <lastmod>2021-12-09</lastmod>
+         <loc>https://wgzhao.github.io/Addax/writer/dbfwriter/</loc>
+         <lastmod>2022-06-02</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
-         <loc>https://wgzhao.github.io/Addax/develop/writer/elasticsearchwriter/</loc>
-         <lastmod>2021-12-09</lastmod>
+         <loc>https://wgzhao.github.io/Addax/writer/doriswriter/</loc>
+         <lastmod>2022-06-02</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
-         <loc>https://wgzhao.github.io/Addax/develop/writer/excelwriter/</loc>
-         <lastmod>2021-12-09</lastmod>
+         <loc>https://wgzhao.github.io/Addax/writer/elasticsearchwriter/</loc>
+         <lastmod>2022-06-02</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
-         <loc>https://wgzhao.github.io/Addax/develop/writer/ftpwriter/</loc>
-         <lastmod>2021-12-09</lastmod>
+         <loc>https://wgzhao.github.io/Addax/writer/excelwriter/</loc>
+         <lastmod>2022-06-02</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
-         <loc>https://wgzhao.github.io/Addax/develop/writer/greenplumwriter/</loc>
-         <lastmod>2021-12-09</lastmod>
+         <loc>https://wgzhao.github.io/Addax/writer/ftpwriter/</loc>
+         <lastmod>2022-06-02</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
-         <loc>https://wgzhao.github.io/Addax/develop/writer/hbase11xsqlwriter/</loc>
-         <lastmod>2021-12-09</lastmod>
+         <loc>https://wgzhao.github.io/Addax/writer/greenplumwriter/</loc>
+         <lastmod>2022-06-02</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
-         <loc>https://wgzhao.github.io/Addax/develop/writer/hbase11xwriter/</loc>
-         <lastmod>2021-12-09</lastmod>
+         <loc>https://wgzhao.github.io/Addax/writer/hbase11xsqlwriter/</loc>
+         <lastmod>2022-06-02</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
-         <loc>https://wgzhao.github.io/Addax/develop/writer/hbase20xsqlwriter/</loc>
-         <lastmod>2021-12-09</lastmod>
+         <loc>https://wgzhao.github.io/Addax/writer/hbase11xwriter/</loc>
+         <lastmod>2022-06-02</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
-         <loc>https://wgzhao.github.io/Addax/develop/writer/hdfswriter/</loc>
-         <lastmod>2021-12-09</lastmod>
+         <loc>https://wgzhao.github.io/Addax/writer/hbase20xsqlwriter/</loc>
+         <lastmod>2022-06-02</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
-         <loc>https://wgzhao.github.io/Addax/develop/writer/influxdb2writer/</loc>
-         <lastmod>2021-12-09</lastmod>
+         <loc>https://wgzhao.github.io/Addax/writer/hdfswriter/</loc>
+         <lastmod>2022-06-02</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
-         <loc>https://wgzhao.github.io/Addax/develop/writer/influxdbwriter/</loc>
-         <lastmod>2021-12-09</lastmod>
+         <loc>https://wgzhao.github.io/Addax/writer/influxdb2writer/</loc>
+         <lastmod>2022-06-02</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
-         <loc>https://wgzhao.github.io/Addax/develop/writer/kuduwriter/</loc>
-         <lastmod>2021-12-09</lastmod>
+         <loc>https://wgzhao.github.io/Addax/writer/influxdbwriter/</loc>
+         <lastmod>2022-06-02</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
-         <loc>https://wgzhao.github.io/Addax/develop/writer/mongodbwriter/</loc>
-         <lastmod>2021-12-09</lastmod>
+         <loc>https://wgzhao.github.io/Addax/writer/kafkawriter/</loc>
+         <lastmod>2022-06-02</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
-         <loc>https://wgzhao.github.io/Addax/develop/writer/mysqlwriter/</loc>
-         <lastmod>2021-12-09</lastmod>
+         <loc>https://wgzhao.github.io/Addax/writer/kuduwriter/</loc>
+         <lastmod>2022-06-02</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
-         <loc>https://wgzhao.github.io/Addax/develop/writer/oraclewriter/</loc>
-         <lastmod>2021-12-09</lastmod>
+         <loc>https://wgzhao.github.io/Addax/writer/mongodbwriter/</loc>
+         <lastmod>2022-06-02</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
-         <loc>https://wgzhao.github.io/Addax/develop/writer/postgresqlwriter/</loc>
-         <lastmod>2021-12-09</lastmod>
+         <loc>https://wgzhao.github.io/Addax/writer/mysqlwriter/</loc>
+         <lastmod>2022-06-02</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
-         <loc>https://wgzhao.github.io/Addax/develop/writer/rdbmswriter/</loc>
-         <lastmod>2021-12-09</lastmod>
+         <loc>https://wgzhao.github.io/Addax/writer/oraclewriter/</loc>
+         <lastmod>2022-06-02</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
-         <loc>https://wgzhao.github.io/Addax/develop/writer/rediswriter/</loc>
-         <lastmod>2021-12-09</lastmod>
+         <loc>https://wgzhao.github.io/Addax/writer/postgresqlwriter/</loc>
+         <lastmod>2022-06-02</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
-         <loc>https://wgzhao.github.io/Addax/develop/writer/sqlitewriter/</loc>
-         <lastmod>2021-12-09</lastmod>
+         <loc>https://wgzhao.github.io/Addax/writer/rdbmswriter/</loc>
+         <lastmod>2022-06-02</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
-         <loc>https://wgzhao.github.io/Addax/develop/writer/sqlserverwriter/</loc>
-         <lastmod>2021-12-09</lastmod>
+         <loc>https://wgzhao.github.io/Addax/writer/rediswriter/</loc>
+         <lastmod>2022-06-02</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
-         <loc>https://wgzhao.github.io/Addax/develop/writer/streamwriter/</loc>
-         <lastmod>2021-12-09</lastmod>
+         <loc>https://wgzhao.github.io/Addax/writer/sqlitewriter/</loc>
+         <lastmod>2022-06-02</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
-         <loc>https://wgzhao.github.io/Addax/develop/writer/tdenginewriter/</loc>
-         <lastmod>2021-12-09</lastmod>
+         <loc>https://wgzhao.github.io/Addax/writer/sqlserverwriter/</loc>
+         <lastmod>2022-06-02</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
-         <loc>https://wgzhao.github.io/Addax/develop/writer/txtfilewriter/</loc>
-         <lastmod>2021-12-09</lastmod>
+         <loc>https://wgzhao.github.io/Addax/writer/starrockswriter/</loc>
+         <lastmod>2022-06-02</lastmod>
+         <changefreq>daily</changefreq>
+    </url>
+    <url>
+         <loc>https://wgzhao.github.io/Addax/writer/streamwriter/</loc>
+         <lastmod>2022-06-02</lastmod>
+         <changefreq>daily</changefreq>
+    </url>
+    <url>
+         <loc>https://wgzhao.github.io/Addax/writer/tdenginewriter/</loc>
+         <lastmod>2022-06-02</lastmod>
+         <changefreq>daily</changefreq>
+    </url>
+    <url>
+         <loc>https://wgzhao.github.io/Addax/writer/txtfilewriter/</loc>
+         <lastmod>2022-06-02</lastmod>
          <changefreq>daily</changefreq>
     </url>
 </urlset>

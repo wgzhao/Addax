@@ -13,7 +13,7 @@
         <meta name="author" content="Steven Zhao">
       
       
-        <link rel="canonical" href="https://wgzhao.github.io/Addax/develop/reader/rdbmsreader/">
+        <link rel="canonical" href="https://wgzhao.github.io/Addax/reader/rdbmsreader/">
       
       <link rel="icon" href="../../images/favicon.ico">
       <meta name="generator" content="mkdocs-1.2.3, mkdocs-material-7.3.3">
@@ -964,6 +964,10 @@
         
           
         
+          
+        
+          
+        
       
       
         <label class="md-nav__link" for="__nav_5">
@@ -1180,6 +1184,20 @@
   
   
     <li class="md-nav__item">
+      <a href="../../writer/kafkawriter/" class="md-nav__link">
+        Kafka Writer
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
       <a href="../../writer/kuduwriter/" class="md-nav__link">
         Kudu Writer
       </a>
@@ -1306,6 +1324,20 @@
   
   
     <li class="md-nav__item">
+      <a href="../../writer/starrockswriter/" class="md-nav__link">
+        StarRocksWriter
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
       <a href="../../writer/streamwriter/" class="md-nav__link">
         Stream Writer
       </a>
@@ -1358,6 +1390,21 @@
     <li class="md-nav__item">
       <a href="../../debug/" class="md-nav__link">
         如何调试项目
+      </a>
+    </li>
+  
+
+    
+      
+      
+      
+
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../encrypt_password/" class="md-nav__link">
+        加密配置文件的中密码
       </a>
     </li>
   
@@ -1540,11 +1587,8 @@
 </ul>
 <p>注意， 如果已经提供了专门的数据库读取插件的，推荐使用专用插件，如果你需要读取的数据库没有专门插件，则考虑使用该通用插件。 在使用之前，还需要执行以下操作才可以正常运行，否则运行会出现异常。</p>
 <h2 id="_1">配置驱动<a class="headerlink" href="#_1" title="Permanent link">&para;</a></h2>
-<p>假定你需要读取 IBM DB2 的数据，因为没有提供专门的读取插件，所以我们可以使用该插件来实现，在使用之前，需要执行下面两个操作：</p>
-<ol>
-<li>下载对应的 JDBC 驱动，并拷贝到 <code>plugin/reader/rdbmsreader/libs</code> 目录</li>
-<li>修改任务配置文件，找到 <code>driver</code> 一项，填写正确的 JDBC 驱动名，比如 DB2 的驱动名为 <code>com.ibm.db2.jcc.DB2Driver</code>：</li>
-</ol>
+<p>假定你需要读取 IBM DB2 的数据，因为没有提供专门的读取插件，所以我们可以使用该插件来实现，在使用之前，需要下载对应的 JDBC 驱动，并拷贝到 <code>plugin/reader/rdbmsreader/libs</code> 目录。
+如果你的驱动类名比较特殊，则需要在任务配置文件中找到 <code>driver</code> 一项，填写正确的 JDBC 驱动名，比如 DB2 的驱动名为 <code>com.ibm.db2.jcc.DB2Driver</code>。如果不填写，则插件会自动猜测驱动名。</p>
 <p>以下列出常见的数据库以及对应的驱动名称</p>
 <ul>
 <li><a href="http://impala.apache.org/">Apache Impala</a>: <code>com.cloudera.impala.jdbc41.Driver</code></li>
@@ -1632,7 +1676,7 @@
 </tr>
 <tr>
 <td align="left">driver</td>
-<td align="center">是</td>
+<td align="center">否</td>
 <td>string</td>
 <td>无</td>
 <td>自定义驱动类名，解决兼容性问题，详见下面描述</td>
@@ -1740,7 +1784,7 @@
 </table>
 <h3 id="driver">driver<a class="headerlink" href="#driver" title="Permanent link">&para;</a></h3>
 <p>大部分情况下，一个数据库的JDBC驱动是固定的，但有些因为版本的不同，所建议的驱动类名不同，比如 MySQL。 新的 MySQL JDBC 驱动类型推荐使用 <code>com.mysql.cj.jdbc.Driver</code> 而不是以前的 <code>com.mysql.jdbc.Drver</code>
-。如果想要使用就的驱动名称，则可以配置 <code>driver</code> 配置项。</p>
+。如果想要使用就的驱动名称，则可以配置 <code>driver</code> 配置项。否则插件会自动依据 <code>jdbcUrl</code> 中的字符串来猜测驱动名称.</p>
 <h4 id="column">column<a class="headerlink" href="#column" title="Permanent link">&para;</a></h4>
 <p>所配置的表中需要同步的列名集合，使用JSON的数组描述字段信息。用户使用 <code>*</code> 代表默认使用所有列配置，例如 <code>["*"]</code>。</p>
 <p>支持列裁剪，即列可以挑选部分列进行导出。</p>

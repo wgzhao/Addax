@@ -15,6 +15,9 @@
         "parameter": {
           "username": "root",
           "password": "taosdata",
+          "beginDateTime": "2017-07-14 10:40:00",
+          "endDateTime": "2017-08-14 10:40:00",
+          "splitInterval": "1d",
           "connection": [
             {
               "jdbcUrl": [

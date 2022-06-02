@@ -13,14 +13,14 @@
         <meta name="author" content="Steven Zhao">
       
       
-        <link rel="canonical" href="https://wgzhao.github.io/Addax/writer/hdfswriter/">
+        <link rel="canonical" href="https://wgzhao.github.io/Addax/writer/kafkawriter/">
       
       <link rel="icon" href="../../images/favicon.ico">
       <meta name="generator" content="mkdocs-1.2.3, mkdocs-material-7.3.3">
     
     
       
-        <title>Hdfs Writer - Addax Documentation</title>
+        <title>Kafka Writer - Addax Documentation</title>
       
     
     
@@ -71,7 +71,7 @@
     <div data-md-component="skip">
       
         
-        <a href="#hdfs-writer" class="md-skip">
+        <a href="#kafka-writer" class="md-skip">
           跳转至
         </a>
       
@@ -102,7 +102,7 @@
         <div class="md-header__topic" data-md-component="header-topic">
           <span class="md-ellipsis">
             
-              Hdfs Writer
+              Kafka Writer
             
           </span>
         </div>
@@ -1025,160 +1025,11 @@
               
   
   
-    
   
-  
-    <li class="md-nav__item md-nav__item--active">
-      
-      <input class="md-nav__toggle md-toggle" data-md-toggle="toc" type="checkbox" id="__toc">
-      
-      
-        
-      
-      
-        <label class="md-nav__link md-nav__link--active" for="__toc">
-          Hdfs Writer
-          <span class="md-nav__icon md-icon"></span>
-        </label>
-      
-      <a href="./" class="md-nav__link md-nav__link--active">
+    <li class="md-nav__item">
+      <a href="../hdfswriter/" class="md-nav__link">
         Hdfs Writer
       </a>
-      
-        
-<nav class="md-nav md-nav--secondary" aria-label="目录">
-  
-  
-  
-    
-  
-  
-    <label class="md-nav__title" for="__toc">
-      <span class="md-nav__icon md-icon"></span>
-      目录
-    </label>
-    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
-      
-        <li class="md-nav__item">
-  <a href="#_1" class="md-nav__link">
-    配置样例
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#_2" class="md-nav__link">
-    参数说明
-  </a>
-  
-    <nav class="md-nav" aria-label="参数说明">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#path" class="md-nav__link">
-    path
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#defaultfs" class="md-nav__link">
-    defaultFS
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#filetype" class="md-nav__link">
-    fileType
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#column" class="md-nav__link">
-    column
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#writemode" class="md-nav__link">
-    writeMode
-  </a>
-  
-    <nav class="md-nav" aria-label="writeMode">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#compress" class="md-nav__link">
-    compress
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#hadoopconfig" class="md-nav__link">
-    hadoopConfig
-  </a>
-  
-    <nav class="md-nav" aria-label="hadoopConfig">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#havekerberos" class="md-nav__link">
-    haveKerberos
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#kerberoskeytabfilepath" class="md-nav__link">
-    kerberosKeytabFilePath
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#kerberosprincipal" class="md-nav__link">
-    kerberosPrincipal
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#_3" class="md-nav__link">
-    类型转换
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#_4" class="md-nav__link">
-    功能与限制
-  </a>
-  
-</li>
-      
-    </ul>
-  
-</nav>
-      
     </li>
   
 
@@ -1216,11 +1067,85 @@
               
   
   
+    
   
-    <li class="md-nav__item">
-      <a href="../kafkawriter/" class="md-nav__link">
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" data-md-toggle="toc" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          Kafka Writer
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
         Kafka Writer
       </a>
+      
+        
+<nav class="md-nav md-nav--secondary" aria-label="目录">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      目录
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#_1" class="md-nav__link">
+    示例
+  </a>
+  
+    <nav class="md-nav" aria-label="示例">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#_2" class="md-nav__link">
+    创建任务文件
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#_3" class="md-nav__link">
+    运行
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_4" class="md-nav__link">
+    参数说明
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_5" class="md-nav__link">
+    限制
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
     </li>
   
 
@@ -1516,116 +1441,41 @@
       
         <li class="md-nav__item">
   <a href="#_1" class="md-nav__link">
-    配置样例
+    示例
   </a>
   
-</li>
-      
-        <li class="md-nav__item">
+    <nav class="md-nav" aria-label="示例">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
   <a href="#_2" class="md-nav__link">
-    参数说明
-  </a>
-  
-    <nav class="md-nav" aria-label="参数说明">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#path" class="md-nav__link">
-    path
+    创建任务文件
   </a>
   
 </li>
         
           <li class="md-nav__item">
-  <a href="#defaultfs" class="md-nav__link">
-    defaultFS
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#filetype" class="md-nav__link">
-    fileType
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#column" class="md-nav__link">
-    column
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#writemode" class="md-nav__link">
-    writeMode
-  </a>
-  
-    <nav class="md-nav" aria-label="writeMode">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#compress" class="md-nav__link">
-    compress
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#hadoopconfig" class="md-nav__link">
-    hadoopConfig
-  </a>
-  
-    <nav class="md-nav" aria-label="hadoopConfig">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#havekerberos" class="md-nav__link">
-    haveKerberos
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#kerberoskeytabfilepath" class="md-nav__link">
-    kerberosKeytabFilePath
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#kerberosprincipal" class="md-nav__link">
-    kerberosPrincipal
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
-</li>
-      
-        <li class="md-nav__item">
   <a href="#_3" class="md-nav__link">
-    类型转换
+    运行
   </a>
+  
+</li>
+        
+      </ul>
+    </nav>
   
 </li>
       
         <li class="md-nav__item">
   <a href="#_4" class="md-nav__link">
-    功能与限制
+    参数说明
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_5" class="md-nav__link">
+    限制
   </a>
   
 </li>
@@ -1643,288 +1493,289 @@
               
                 
                 
-                <h1 id="hdfs-writer">Hdfs Writer<a class="headerlink" href="#hdfs-writer" title="Permanent link">&para;</a></h1>
-<p>HdfsWriter 提供向HDFS文件系统指定路径中写入 <code>TEXTFile</code> ， <code>ORCFile</code> , <code>PARQUET</code> 等格式文件的能力， 文件内容可与 hive 中表关联。</p>
-<h2 id="_1">配置样例<a class="headerlink" href="#_1" title="Permanent link">&para;</a></h2>
+                <h1 id="kafka-writer">Kafka Writer<a class="headerlink" href="#kafka-writer" title="Permanent link">&para;</a></h1>
+<p>KafkaWriter 插件实现了将数据以 json 格式写入 Kafka 的功能。 该插件在 <code>4.0.9</code> 版本中引入。</p>
+<h2 id="_1">示例<a class="headerlink" href="#_1" title="Permanent link">&para;</a></h2>
+<p>以下配置演示了如何从内存读取数据并写入到 kafka 的指定 topic 中。</p>
+<h3 id="_2">创建任务文件<a class="headerlink" href="#_2" title="Permanent link">&para;</a></h3>
+<p>首先创建一个任务文件  <code>stream2kafka.json</code> , 内容如下：</p>
 <div class="highlight"><pre><span></span><code><span class="p">{</span>
   <span class="nt">&quot;job&quot;</span><span class="p">:</span> <span class="p">{</span>
     <span class="nt">&quot;setting&quot;</span><span class="p">:</span> <span class="p">{</span>
-      <span class="nt">&quot;speed&quot;</span><span class="p">:</span> <span class="p">{</span>
-        <span class="nt">&quot;channel&quot;</span><span class="p">:</span> <span class="mi">2</span><span class="p">,</span>
-        <span class="nt">&quot;bytes&quot;</span><span class="p">:</span> <span class="mi">-1</span>
-      <span class="p">}</span>
+        <span class="nt">&quot;speed&quot;</span><span class="p">:</span> <span class="p">{</span>
+            <span class="nt">&quot;channel&quot;</span><span class="p">:</span> <span class="mi">1</span>
+        <span class="p">}</span>
     <span class="p">},</span>
-    <span class="nt">&quot;content&quot;</span><span class="p">:</span> <span class="p">{</span>
-      <span class="nt">&quot;reader&quot;</span><span class="p">:</span> <span class="p">{</span>
-        <span class="nt">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;streamreader&quot;</span><span class="p">,</span>
-        <span class="nt">&quot;parameter&quot;</span><span class="p">:</span> <span class="p">{</span>
-          <span class="nt">&quot;column&quot;</span><span class="p">:</span> <span class="p">[</span>
-            <span class="p">{</span>
-              <span class="nt">&quot;value&quot;</span><span class="p">:</span> <span class="s2">&quot;Addax&quot;</span><span class="p">,</span>
-              <span class="nt">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;string&quot;</span>
-            <span class="p">},</span>
-            <span class="p">{</span>
-              <span class="nt">&quot;value&quot;</span><span class="p">:</span> <span class="mi">19890604</span><span class="p">,</span>
-              <span class="nt">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;long&quot;</span>
-            <span class="p">},</span>
-            <span class="p">{</span>
-              <span class="nt">&quot;value&quot;</span><span class="p">:</span> <span class="s2">&quot;1989-06-04 00:00:00&quot;</span><span class="p">,</span>
-              <span class="nt">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;date&quot;</span>
-            <span class="p">},</span>
-            <span class="p">{</span>
-              <span class="nt">&quot;value&quot;</span><span class="p">:</span> <span class="kc">true</span><span class="p">,</span>
-              <span class="nt">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;bool&quot;</span>
-            <span class="p">},</span>
-            <span class="p">{</span>
-              <span class="nt">&quot;value&quot;</span><span class="p">:</span> <span class="s2">&quot;test&quot;</span><span class="p">,</span>
-              <span class="nt">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;bytes&quot;</span>
+    <span class="nt">&quot;content&quot;</span><span class="p">:</span> <span class="p">[</span>
+      <span class="p">{</span>
+        <span class="nt">&quot;reader&quot;</span><span class="p">:</span> <span class="p">{</span>
+            <span class="nt">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;streamreader&quot;</span><span class="p">,</span>
+            <span class="nt">&quot;parameter&quot;</span><span class="p">:</span> <span class="p">{</span>
+              <span class="nt">&quot;column&quot;</span><span class="p">:</span> <span class="p">[</span>
+                    <span class="p">{</span><span class="nt">&quot;random&quot;</span><span class="p">:</span> <span class="s2">&quot;10,1000&quot;</span><span class="p">,</span> <span class="nt">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;long&quot;</span><span class="p">},</span>
+                    <span class="p">{</span><span class="nt">&quot;value&quot;</span><span class="p">:</span> <span class="s2">&quot;1.1.1.1&quot;</span><span class="p">,</span> <span class="nt">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;string&quot;</span><span class="p">},</span>
+                    <span class="p">{</span><span class="nt">&quot;value&quot;</span><span class="p">:</span> <span class="mf">19890604.0</span><span class="p">,</span> <span class="nt">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;double&quot;</span><span class="p">},</span>
+                    <span class="p">{</span><span class="nt">&quot;value&quot;</span><span class="p">:</span> <span class="mi">19890604</span><span class="p">,</span> <span class="nt">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;long&quot;</span><span class="p">},</span>
+                    <span class="p">{</span><span class="nt">&quot;value&quot;</span><span class="p">:</span> <span class="mi">19890604</span><span class="p">,</span> <span class="nt">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;long&quot;</span><span class="p">},</span>
+                    <span class="p">{</span><span class="nt">&quot;value&quot;</span><span class="p">:</span> <span class="s2">&quot;hello world&quot;</span><span class="p">,</span> <span class="nt">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;string&quot;</span><span class="p">},</span>
+                    <span class="p">{</span><span class="nt">&quot;value&quot;</span><span class="p">:</span> <span class="s2">&quot;long text&quot;</span><span class="p">,</span> <span class="nt">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;string&quot;</span><span class="p">},</span>
+                    <span class="p">{</span><span class="nt">&quot;value&quot;</span><span class="p">:</span> <span class="s2">&quot;41.12,-71.34&quot;</span><span class="p">,</span> <span class="nt">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;string&quot;</span><span class="p">},</span>
+                    <span class="p">{</span><span class="nt">&quot;value&quot;</span><span class="p">:</span> <span class="s2">&quot;2017-05-25 11:22:33&quot;</span><span class="p">,</span> <span class="nt">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;string&quot;</span><span class="p">}</span>
+                    <span class="p">],</span>
+            <span class="nt">&quot;sliceRecordCount&quot;</span><span class="p">:</span> <span class="mi">100</span>
             <span class="p">}</span>
-          <span class="p">],</span>
-          <span class="nt">&quot;sliceRecordCount&quot;</span><span class="p">:</span> <span class="mi">1000</span>
         <span class="p">},</span>
         <span class="nt">&quot;writer&quot;</span><span class="p">:</span> <span class="p">{</span>
-          <span class="nt">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;hdfswriter&quot;</span><span class="p">,</span>
+          <span class="nt">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;kafkawriter&quot;</span><span class="p">,</span>
           <span class="nt">&quot;parameter&quot;</span><span class="p">:</span> <span class="p">{</span>
-            <span class="nt">&quot;defaultFS&quot;</span><span class="p">:</span> <span class="s2">&quot;hdfs://xxx:port&quot;</span><span class="p">,</span>
-            <span class="nt">&quot;fileType&quot;</span><span class="p">:</span> <span class="s2">&quot;orc&quot;</span><span class="p">,</span>
-            <span class="nt">&quot;path&quot;</span><span class="p">:</span> <span class="s2">&quot;/user/hive/warehouse/writerorc.db/orcfull&quot;</span><span class="p">,</span>
-            <span class="nt">&quot;fileName&quot;</span><span class="p">:</span> <span class="s2">&quot;xxxx&quot;</span><span class="p">,</span>
-            <span class="nt">&quot;column&quot;</span><span class="p">:</span> <span class="p">[</span>
-              <span class="p">{</span>
-                <span class="nt">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;col1&quot;</span><span class="p">,</span>
-                <span class="nt">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;string&quot;</span>
-              <span class="p">},</span>
-              <span class="p">{</span>
-                <span class="nt">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;col2&quot;</span><span class="p">,</span>
-                <span class="nt">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;int&quot;</span>
-              <span class="p">},</span>
-              <span class="p">{</span>
-                <span class="nt">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;col3&quot;</span><span class="p">,</span>
-                <span class="nt">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;string&quot;</span>
-              <span class="p">},</span>
-              <span class="p">{</span>
-                <span class="nt">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;col4&quot;</span><span class="p">,</span>
-                <span class="nt">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;boolean&quot;</span>
-              <span class="p">},</span>
-              <span class="p">{</span>
-                <span class="nt">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;col5&quot;</span><span class="p">,</span>
-                <span class="nt">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;string&quot;</span>
-              <span class="p">}</span>
-            <span class="p">],</span>
-            <span class="nt">&quot;writeMode&quot;</span><span class="p">:</span> <span class="s2">&quot;overwrite&quot;</span><span class="p">,</span>
-            <span class="nt">&quot;fieldDelimiter&quot;</span><span class="p">:</span> <span class="s2">&quot;\u0001&quot;</span><span class="p">,</span>
-            <span class="nt">&quot;compress&quot;</span><span class="p">:</span> <span class="s2">&quot;SNAPPY&quot;</span>
+            <span class="nt">&quot;brokerList&quot;</span><span class="p">:</span> <span class="s2">&quot;localhost:9092&quot;</span><span class="p">,</span>
+            <span class="nt">&quot;topic&quot;</span><span class="p">:</span> <span class="s2">&quot;test-1&quot;</span><span class="p">,</span>
+            <span class="nt">&quot;partitions&quot;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span>
+            <span class="nt">&quot;batchSize&quot;</span><span class="p">:</span> <span class="mi">1000</span><span class="p">,</span>
+            <span class="nt">&quot;column&quot;</span><span class="p">:</span> <span class="p">[</span><span class="s2">&quot;col1&quot;</span><span class="p">,</span> <span class="s2">&quot;col2&quot;</span><span class="p">,</span><span class="s2">&quot;col3&quot;</span><span class="p">,</span><span class="s2">&quot;col4&quot;</span><span class="p">,</span><span class="s2">&quot;col5&quot;</span><span class="p">,</span> <span class="s2">&quot;col6&quot;</span><span class="p">,</span> <span class="s2">&quot;col7&quot;</span><span class="p">,</span> <span class="s2">&quot;col8&quot;</span><span class="p">,</span> <span class="s2">&quot;col9&quot;</span><span class="p">]</span>
           <span class="p">}</span>
         <span class="p">}</span>
       <span class="p">}</span>
-    <span class="p">}</span>
+    <span class="p">]</span>
   <span class="p">}</span>
 <span class="p">}</span>
 </code></pre></div>
-<h2 id="_2">参数说明<a class="headerlink" href="#_2" title="Permanent link">&para;</a></h2>
+<h3 id="_3">运行<a class="headerlink" href="#_3" title="Permanent link">&para;</a></h3>
+<p>执行  <code>bin/addax.sh stream2kafka.json</code> 命令，获得类似下面的输出：</p>
+<div class="highlight"><pre><span></span><code><span class="m">2022</span>-02-26 <span class="m">21</span>:59:22.975 <span class="o">[</span>        main<span class="o">]</span> INFO  VMInfo               - VMInfo# operatingSystem <span class="nv">class</span> <span class="o">=</span>&gt; sun.management.OperatingSystemImpl
+<span class="m">2022</span>-02-26 <span class="m">21</span>:59:22.985 <span class="o">[</span>        main<span class="o">]</span> INFO  Engine               - 
+<span class="o">{</span>
+    <span class="s2">&quot;content&quot;</span>:<span class="o">{</span>
+        <span class="s2">&quot;reader&quot;</span>:<span class="o">{</span>
+            <span class="s2">&quot;parameter&quot;</span>:<span class="o">{</span>
+                <span class="s2">&quot;column&quot;</span>:<span class="o">[</span>
+                    <span class="o">{</span>
+                        <span class="s2">&quot;random&quot;</span>:<span class="s2">&quot;10,1000&quot;</span>,
+                        <span class="s2">&quot;type&quot;</span>:<span class="s2">&quot;long&quot;</span>
+                    <span class="o">}</span>,
+                    <span class="o">{</span>
+                        <span class="s2">&quot;type&quot;</span>:<span class="s2">&quot;string&quot;</span>,
+                        <span class="s2">&quot;value&quot;</span>:<span class="s2">&quot;1.1.1.1&quot;</span>
+                    <span class="o">}</span>,
+                    <span class="o">{</span>
+                        <span class="s2">&quot;type&quot;</span>:<span class="s2">&quot;double&quot;</span>,
+                        <span class="s2">&quot;value&quot;</span>:19890604.0
+                    <span class="o">}</span>,
+                    <span class="o">{</span>
+                        <span class="s2">&quot;type&quot;</span>:<span class="s2">&quot;long&quot;</span>,
+                        <span class="s2">&quot;value&quot;</span>:19890604
+                    <span class="o">}</span>,
+                    <span class="o">{</span>
+                        <span class="s2">&quot;type&quot;</span>:<span class="s2">&quot;long&quot;</span>,
+                        <span class="s2">&quot;value&quot;</span>:19890604
+                    <span class="o">}</span>,
+                    <span class="o">{</span>
+                        <span class="s2">&quot;type&quot;</span>:<span class="s2">&quot;string&quot;</span>,
+                        <span class="s2">&quot;value&quot;</span>:<span class="s2">&quot;hello world&quot;</span>
+                    <span class="o">}</span>,
+                    <span class="o">{</span>
+                        <span class="s2">&quot;type&quot;</span>:<span class="s2">&quot;string&quot;</span>,
+                        <span class="s2">&quot;value&quot;</span>:<span class="s2">&quot;long text&quot;</span>
+                    <span class="o">}</span>,
+                    <span class="o">{</span>
+                        <span class="s2">&quot;type&quot;</span>:<span class="s2">&quot;string&quot;</span>,
+                        <span class="s2">&quot;value&quot;</span>:<span class="s2">&quot;41.12,-71.34&quot;</span>
+                    <span class="o">}</span>,
+                    <span class="o">{</span>
+                        <span class="s2">&quot;type&quot;</span>:<span class="s2">&quot;string&quot;</span>,
+                        <span class="s2">&quot;value&quot;</span>:<span class="s2">&quot;2017-05-25 11:22:33&quot;</span>
+                    <span class="o">}</span>
+                <span class="o">]</span>,
+                <span class="s2">&quot;sliceRecordCount&quot;</span>:100
+            <span class="o">}</span>,
+            <span class="s2">&quot;name&quot;</span>:<span class="s2">&quot;streamreader&quot;</span>
+        <span class="o">}</span>,
+        <span class="s2">&quot;writer&quot;</span>:<span class="o">{</span>
+            <span class="s2">&quot;parameter&quot;</span>:<span class="o">{</span>
+                <span class="s2">&quot;partitions&quot;</span>:0,
+                <span class="s2">&quot;column&quot;</span>:<span class="o">[</span>
+                    <span class="s2">&quot;col1&quot;</span>,
+                    <span class="s2">&quot;col2&quot;</span>,
+                    <span class="s2">&quot;col3&quot;</span>,
+                    <span class="s2">&quot;col4&quot;</span>,
+                    <span class="s2">&quot;col5&quot;</span>,
+                    <span class="s2">&quot;col6&quot;</span>,
+                    <span class="s2">&quot;col7&quot;</span>,
+                    <span class="s2">&quot;col8&quot;</span>,
+                    <span class="s2">&quot;col9&quot;</span>
+                <span class="o">]</span>,
+                <span class="s2">&quot;topic&quot;</span>:<span class="s2">&quot;test-1&quot;</span>,
+                <span class="s2">&quot;batchSize&quot;</span>:1000,
+                <span class="s2">&quot;brokerList&quot;</span>:<span class="s2">&quot;localhost:9092&quot;</span>
+            <span class="o">}</span>,
+            <span class="s2">&quot;name&quot;</span>:<span class="s2">&quot;kafkawriter&quot;</span>
+        <span class="o">}</span>
+    <span class="o">}</span>,
+    <span class="s2">&quot;setting&quot;</span>:<span class="o">{</span>
+        <span class="s2">&quot;speed&quot;</span>:<span class="o">{</span>
+            <span class="s2">&quot;channel&quot;</span>:1
+        <span class="o">}</span>
+    <span class="o">}</span>
+<span class="o">}</span>
+
+<span class="m">2022</span>-02-26 <span class="m">21</span>:59:23.002 <span class="o">[</span>        main<span class="o">]</span> INFO  PerfTrace            - PerfTrace <span class="nv">traceId</span><span class="o">=</span>job_-1, <span class="nv">isEnable</span><span class="o">=</span>false, <span class="nv">priority</span><span class="o">=</span><span class="m">0</span>
+<span class="m">2022</span>-02-26 <span class="m">21</span>:59:23.003 <span class="o">[</span>        main<span class="o">]</span> INFO  JobContainer         - Addax jobContainer starts job.
+<span class="m">2022</span>-02-26 <span class="m">21</span>:59:23.004 <span class="o">[</span>        main<span class="o">]</span> INFO  JobContainer         - Set <span class="nv">jobId</span> <span class="o">=</span> <span class="m">0</span>
+<span class="m">2022</span>-02-26 <span class="m">21</span>:59:23.017 <span class="o">[</span>       job-0<span class="o">]</span> INFO  JobContainer         - Addax Reader.Job <span class="o">[</span>streamreader<span class="o">]</span> <span class="k">do</span> prepare work .
+<span class="m">2022</span>-02-26 <span class="m">21</span>:59:23.017 <span class="o">[</span>       job-0<span class="o">]</span> INFO  JobContainer         - Addax Writer.Job <span class="o">[</span>kafkawriter<span class="o">]</span> <span class="k">do</span> prepare work .
+<span class="m">2022</span>-02-26 <span class="m">21</span>:59:23.017 <span class="o">[</span>       job-0<span class="o">]</span> INFO  JobContainer         - Job <span class="nb">set</span> Channel-Number to <span class="m">1</span> channel<span class="o">(</span>s<span class="o">)</span>.
+<span class="m">2022</span>-02-26 <span class="m">21</span>:59:23.018 <span class="o">[</span>       job-0<span class="o">]</span> INFO  JobContainer         - Addax Reader.Job <span class="o">[</span>streamreader<span class="o">]</span> splits to <span class="o">[</span><span class="m">1</span><span class="o">]</span> tasks.
+<span class="m">2022</span>-02-26 <span class="m">21</span>:59:23.019 <span class="o">[</span>       job-0<span class="o">]</span> INFO  JobContainer         - Addax Writer.Job <span class="o">[</span>kafkawriter<span class="o">]</span> splits to <span class="o">[</span><span class="m">1</span><span class="o">]</span> tasks.
+<span class="m">2022</span>-02-26 <span class="m">21</span>:59:23.039 <span class="o">[</span>       job-0<span class="o">]</span> INFO  JobContainer         - Scheduler starts <span class="o">[</span><span class="m">1</span><span class="o">]</span> taskGroups.
+<span class="m">2022</span>-02-26 <span class="m">21</span>:59:23.047 <span class="o">[</span> taskGroup-0<span class="o">]</span> INFO  TaskGroupContainer   - <span class="nv">taskGroupId</span><span class="o">=[</span><span class="m">0</span><span class="o">]</span> start <span class="o">[</span><span class="m">1</span><span class="o">]</span> channels <span class="k">for</span> <span class="o">[</span><span class="m">1</span><span class="o">]</span> tasks.
+<span class="m">2022</span>-02-26 <span class="m">21</span>:59:23.050 <span class="o">[</span> taskGroup-0<span class="o">]</span> INFO  Channel              - Channel <span class="nb">set</span> byte_speed_limit to -1, No bps activated.
+<span class="m">2022</span>-02-26 <span class="m">21</span>:59:23.050 <span class="o">[</span> taskGroup-0<span class="o">]</span> INFO  Channel              - Channel <span class="nb">set</span> record_speed_limit to -1, No tps activated.
+<span class="m">2022</span>-02-26 <span class="m">21</span>:59:23.082 <span class="o">[</span><span class="m">0</span>-0-0-writer<span class="o">]</span> INFO  ProducerConfig       - ProducerConfig values: 
+    <span class="nv">acks</span> <span class="o">=</span> <span class="m">1</span>
+    batch.size <span class="o">=</span> <span class="m">1000</span>
+    bootstrap.servers <span class="o">=</span> <span class="o">[</span>localhost:9092<span class="o">]</span>
+    buffer.memory <span class="o">=</span> <span class="m">33554432</span>
+    client.id <span class="o">=</span> addax-kafka-writer
+    compression.type <span class="o">=</span> none
+    connections.max.idle.ms <span class="o">=</span> <span class="m">540000</span>
+    enable.idempotence <span class="o">=</span> <span class="nb">false</span>
+    interceptor.classes <span class="o">=</span> <span class="o">[]</span>
+    key.serializer <span class="o">=</span> class org.apache.kafka.common.serialization.StringSerializer
+    linger.ms <span class="o">=</span> <span class="m">0</span>
+    max.block.ms <span class="o">=</span> <span class="m">60000</span>
+    max.in.flight.requests.per.connection <span class="o">=</span> <span class="m">5</span>
+    max.request.size <span class="o">=</span> <span class="m">1048576</span>
+    metadata.max.age.ms <span class="o">=</span> <span class="m">300000</span>
+    metric.reporters <span class="o">=</span> <span class="o">[]</span>
+    metrics.num.samples <span class="o">=</span> <span class="m">2</span>
+    metrics.recording.level <span class="o">=</span> INFO
+    metrics.sample.window.ms <span class="o">=</span> <span class="m">30000</span>
+    partitioner.class <span class="o">=</span> class org.apache.kafka.clients.producer.internals.DefaultPartitioner
+    receive.buffer.bytes <span class="o">=</span> <span class="m">32768</span>
+    reconnect.backoff.max.ms <span class="o">=</span> <span class="m">1000</span>
+    reconnect.backoff.ms <span class="o">=</span> <span class="m">50</span>
+    request.timeout.ms <span class="o">=</span> <span class="m">30000</span>
+    <span class="nv">retries</span> <span class="o">=</span> <span class="m">0</span>
+    retry.backoff.ms <span class="o">=</span> <span class="m">100</span>
+    sasl.client.callback.handler.class <span class="o">=</span> null
+    sasl.jaas.config <span class="o">=</span> null
+    sasl.kerberos.kinit.cmd <span class="o">=</span> /usr/bin/kinit
+    sasl.kerberos.min.time.before.relogin <span class="o">=</span> <span class="m">60000</span>
+    sasl.kerberos.service.name <span class="o">=</span> null
+    sasl.kerberos.ticket.renew.jitter <span class="o">=</span> <span class="m">0</span>.05
+    sasl.kerberos.ticket.renew.window.factor <span class="o">=</span> <span class="m">0</span>.8
+    sasl.login.callback.handler.class <span class="o">=</span> null
+    sasl.login.class <span class="o">=</span> null
+    sasl.login.refresh.buffer.seconds <span class="o">=</span> <span class="m">300</span>
+    sasl.login.refresh.min.period.seconds <span class="o">=</span> <span class="m">60</span>
+    sasl.login.refresh.window.factor <span class="o">=</span> <span class="m">0</span>.8
+    sasl.login.refresh.window.jitter <span class="o">=</span> <span class="m">0</span>.05
+    sasl.mechanism <span class="o">=</span> GSSAPI
+    security.protocol <span class="o">=</span> PLAINTEXT
+    send.buffer.bytes <span class="o">=</span> <span class="m">131072</span>
+    ssl.cipher.suites <span class="o">=</span> null
+    ssl.enabled.protocols <span class="o">=</span> <span class="o">[</span>TLSv1.2, TLSv1.1, TLSv1<span class="o">]</span>
+    ssl.endpoint.identification.algorithm <span class="o">=</span> https
+    ssl.key.password <span class="o">=</span> null
+    ssl.keymanager.algorithm <span class="o">=</span> SunX509
+    ssl.keystore.location <span class="o">=</span> null
+    ssl.keystore.password <span class="o">=</span> null
+    ssl.keystore.type <span class="o">=</span> JKS
+    ssl.protocol <span class="o">=</span> TLS
+    ssl.provider <span class="o">=</span> null
+    ssl.secure.random.implementation <span class="o">=</span> null
+    ssl.trustmanager.algorithm <span class="o">=</span> PKIX
+    ssl.truststore.location <span class="o">=</span> null
+    ssl.truststore.password <span class="o">=</span> null
+    ssl.truststore.type <span class="o">=</span> JKS
+    transaction.timeout.ms <span class="o">=</span> <span class="m">60000</span>
+    transactional.id <span class="o">=</span> null
+    value.serializer <span class="o">=</span> class org.apache.kafka.common.serialization.StringSerializer
+
+<span class="m">2022</span>-02-26 <span class="m">21</span>:59:23.412 <span class="o">[</span><span class="m">0</span>-0-0-writer<span class="o">]</span> INFO  AppInfoParser        - Kafka version : <span class="m">2</span>.0.0
+<span class="m">2022</span>-02-26 <span class="m">21</span>:59:23.413 <span class="o">[</span><span class="m">0</span>-0-0-writer<span class="o">]</span> INFO  AppInfoParser        - Kafka commitId : 3402a8361b734732
+<span class="m">2022</span>-02-26 <span class="m">21</span>:59:23.534 <span class="o">[</span>kafka-producer-network-thread <span class="p">|</span> addax-kafka-writer<span class="o">]</span> INFO  Metadata             - Cluster ID: xPAQZFNDTp6y63nZO4LACA
+<span class="m">2022</span>-02-26 <span class="m">21</span>:59:26.061 <span class="o">[</span>       job-0<span class="o">]</span> INFO  AbstractScheduler    - Scheduler accomplished all tasks.
+<span class="m">2022</span>-02-26 <span class="m">21</span>:59:26.062 <span class="o">[</span>       job-0<span class="o">]</span> INFO  JobContainer         - Addax Writer.Job <span class="o">[</span>kafkawriter<span class="o">]</span> <span class="k">do</span> post work.
+<span class="m">2022</span>-02-26 <span class="m">21</span>:59:26.062 <span class="o">[</span>       job-0<span class="o">]</span> INFO  JobContainer         - Addax Reader.Job <span class="o">[</span>streamreader<span class="o">]</span> <span class="k">do</span> post work.
+<span class="m">2022</span>-02-26 <span class="m">21</span>:59:26.063 <span class="o">[</span>       job-0<span class="o">]</span> INFO  JobContainer         - PerfTrace not enable!
+<span class="m">2022</span>-02-26 <span class="m">21</span>:59:26.064 <span class="o">[</span>       job-0<span class="o">]</span> INFO  StandAloneJobContainerCommunicator - Total <span class="m">100</span> records, <span class="m">9200</span> bytes <span class="p">|</span> Speed <span class="m">2</span>.99KB/s, <span class="m">33</span> records/s <span class="p">|</span> Error <span class="m">0</span> records, <span class="m">0</span> bytes <span class="p">|</span>  All Task WaitWriterTime <span class="m">0</span>.000s <span class="p">|</span>  All Task WaitReaderTime <span class="m">0</span>.000s <span class="p">|</span> Percentage <span class="m">100</span>.00%
+<span class="m">2022</span>-02-26 <span class="m">21</span>:59:26.065 <span class="o">[</span>       job-0<span class="o">]</span> INFO  JobContainer         - 
+任务启动时刻                    : <span class="m">2022</span>-02-26 <span class="m">21</span>:59:23
+任务结束时刻                    : <span class="m">2022</span>-02-26 <span class="m">21</span>:59:26
+任务总计耗时                    :                  3s
+任务平均流量                    :            <span class="m">2</span>.99KB/s
+记录写入速度                    :             33rec/s
+读出记录总数                    :                 <span class="m">100</span>
+读写失败总数                    :                   <span class="m">0</span>
+</code></pre></div>
+<p>我们使用 kafka 自带的 <code>kafka-console-consumer.sh</code> 尝试读取数据，输出如下：</p>
+<div class="highlight"><pre><span></span><code>$ bin/kafka-console-consumer.sh --bootstrap-server localhost:9092 --topic test-1 --from-beginning
+
+<span class="o">{</span><span class="s2">&quot;col8&quot;</span>:<span class="s2">&quot;41.12,-71.34&quot;</span>,<span class="s2">&quot;col9&quot;</span>:<span class="s2">&quot;2017-05-25 11:22:33&quot;</span>,<span class="s2">&quot;col6&quot;</span>:<span class="s2">&quot;hello world&quot;</span>,<span class="s2">&quot;col7&quot;</span>:<span class="s2">&quot;long text&quot;</span>,<span class="s2">&quot;col4&quot;</span>:19890604,<span class="s2">&quot;col5&quot;</span>:19890604,<span class="s2">&quot;col2&quot;</span>:<span class="s2">&quot;1.1.1.1&quot;</span>,<span class="s2">&quot;col3&quot;</span>:1.9890604E7,<span class="s2">&quot;col1&quot;</span>:916<span class="o">}</span>
+<span class="o">{</span><span class="s2">&quot;col8&quot;</span>:<span class="s2">&quot;41.12,-71.34&quot;</span>,<span class="s2">&quot;col9&quot;</span>:<span class="s2">&quot;2017-05-25 11:22:33&quot;</span>,<span class="s2">&quot;col6&quot;</span>:<span class="s2">&quot;hello world&quot;</span>,<span class="s2">&quot;col7&quot;</span>:<span class="s2">&quot;long text&quot;</span>,<span class="s2">&quot;col4&quot;</span>:19890604,<span class="s2">&quot;col5&quot;</span>:19890604,<span class="s2">&quot;col2&quot;</span>:<span class="s2">&quot;1.1.1.1&quot;</span>,<span class="s2">&quot;col3&quot;</span>:1.9890604E7,<span class="s2">&quot;col1&quot;</span>:572<span class="o">}</span>
+<span class="o">{</span><span class="s2">&quot;col8&quot;</span>:<span class="s2">&quot;41.12,-71.34&quot;</span>,<span class="s2">&quot;col9&quot;</span>:<span class="s2">&quot;2017-05-25 11:22:33&quot;</span>,<span class="s2">&quot;col6&quot;</span>:<span class="s2">&quot;hello world&quot;</span>,<span class="s2">&quot;col7&quot;</span>:<span class="s2">&quot;long text&quot;</span>,<span class="s2">&quot;col4&quot;</span>:19890604,<span class="s2">&quot;col5&quot;</span>:19890604,<span class="s2">&quot;col2&quot;</span>:<span class="s2">&quot;1.1.1.1&quot;</span>,<span class="s2">&quot;col3&quot;</span>:1.9890604E7,<span class="s2">&quot;col1&quot;</span>:88<span class="o">}</span>
+<span class="o">{</span><span class="s2">&quot;col8&quot;</span>:<span class="s2">&quot;41.12,-71.34&quot;</span>,<span class="s2">&quot;col9&quot;</span>:<span class="s2">&quot;2017-05-25 11:22:33&quot;</span>,<span class="s2">&quot;col6&quot;</span>:<span class="s2">&quot;hello world&quot;</span>,<span class="s2">&quot;col7&quot;</span>:<span class="s2">&quot;long text&quot;</span>,<span class="s2">&quot;col4&quot;</span>:19890604,<span class="s2">&quot;col5&quot;</span>:19890604,<span class="s2">&quot;col2&quot;</span>:<span class="s2">&quot;1.1.1.1&quot;</span>,<span class="s2">&quot;col3&quot;</span>:1.9890604E7,<span class="s2">&quot;col1&quot;</span>:33<span class="o">}</span>
+<span class="o">{</span><span class="s2">&quot;col8&quot;</span>:<span class="s2">&quot;41.12,-71.34&quot;</span>,<span class="s2">&quot;col9&quot;</span>:<span class="s2">&quot;2017-05-25 11:22:33&quot;</span>,<span class="s2">&quot;col6&quot;</span>:<span class="s2">&quot;hello world&quot;</span>,<span class="s2">&quot;col7&quot;</span>:<span class="s2">&quot;long text&quot;</span>,<span class="s2">&quot;col4&quot;</span>:19890604,<span class="s2">&quot;col5&quot;</span>:19890604,<span class="s2">&quot;col2&quot;</span>:<span class="s2">&quot;1.1.1.1&quot;</span>,<span class="s2">&quot;col3&quot;</span>:1.9890604E7,<span class="s2">&quot;col1&quot;</span>:697<span class="o">}</span>
+<span class="o">{</span><span class="s2">&quot;col8&quot;</span>:<span class="s2">&quot;41.12,-71.34&quot;</span>,<span class="s2">&quot;col9&quot;</span>:<span class="s2">&quot;2017-05-25 11:22:33&quot;</span>,<span class="s2">&quot;col6&quot;</span>:<span class="s2">&quot;hello world&quot;</span>,<span class="s2">&quot;col7&quot;</span>:<span class="s2">&quot;long text&quot;</span>,<span class="s2">&quot;col4&quot;</span>:19890604,<span class="s2">&quot;col5&quot;</span>:19890604,<span class="s2">&quot;col2&quot;</span>:<span class="s2">&quot;1.1.1.1&quot;</span>,<span class="s2">&quot;col3&quot;</span>:1.9890604E7,<span class="s2">&quot;col1&quot;</span>:381<span class="o">}</span>
+<span class="o">{</span><span class="s2">&quot;col8&quot;</span>:<span class="s2">&quot;41.12,-71.34&quot;</span>,<span class="s2">&quot;col9&quot;</span>:<span class="s2">&quot;2017-05-25 11:22:33&quot;</span>,<span class="s2">&quot;col6&quot;</span>:<span class="s2">&quot;hello world&quot;</span>,<span class="s2">&quot;col7&quot;</span>:<span class="s2">&quot;long text&quot;</span>,<span class="s2">&quot;col4&quot;</span>:19890604,<span class="s2">&quot;col5&quot;</span>:19890604,<span class="s2">&quot;col2&quot;</span>:<span class="s2">&quot;1.1.1.1&quot;</span>,<span class="s2">&quot;col3&quot;</span>:1.9890604E7,<span class="s2">&quot;col1&quot;</span>:304<span class="o">}</span>
+<span class="o">{</span><span class="s2">&quot;col8&quot;</span>:<span class="s2">&quot;41.12,-71.34&quot;</span>,<span class="s2">&quot;col9&quot;</span>:<span class="s2">&quot;2017-05-25 11:22:33&quot;</span>,<span class="s2">&quot;col6&quot;</span>:<span class="s2">&quot;hello world&quot;</span>,<span class="s2">&quot;col7&quot;</span>:<span class="s2">&quot;long text&quot;</span>,<span class="s2">&quot;col4&quot;</span>:19890604,<span class="s2">&quot;col5&quot;</span>:19890604,<span class="s2">&quot;col2&quot;</span>:<span class="s2">&quot;1.1.1.1&quot;</span>,<span class="s2">&quot;col3&quot;</span>:1.9890604E7,<span class="s2">&quot;col1&quot;</span>:103<span class="o">}</span>
+<span class="o">{</span><span class="s2">&quot;col8&quot;</span>:<span class="s2">&quot;41.12,-71.34&quot;</span>,<span class="s2">&quot;col9&quot;</span>:<span class="s2">&quot;2017-05-25 11:22:33&quot;</span>,<span class="s2">&quot;col6&quot;</span>:<span class="s2">&quot;hello world&quot;</span>,<span class="s2">&quot;col7&quot;</span>:<span class="s2">&quot;long text&quot;</span>,<span class="s2">&quot;col4&quot;</span>:19890604,<span class="s2">&quot;col5&quot;</span>:19890604,<span class="s2">&quot;col2&quot;</span>:<span class="s2">&quot;1.1.1.1&quot;</span>,<span class="s2">&quot;col3&quot;</span>:1.9890604E7,<span class="s2">&quot;col1&quot;</span>:967<span class="o">}</span>
+<span class="o">{</span><span class="s2">&quot;col8&quot;</span>:<span class="s2">&quot;41.12,-71.34&quot;</span>,<span class="s2">&quot;col9&quot;</span>:<span class="s2">&quot;2017-05-25 11:22:33&quot;</span>,<span class="s2">&quot;col6&quot;</span>:<span class="s2">&quot;hello world&quot;</span>,<span class="s2">&quot;col7&quot;</span>:<span class="s2">&quot;long text&quot;</span>,<span class="s2">&quot;col4&quot;</span>:19890604,<span class="s2">&quot;col5&quot;</span>:19890604,<span class="s2">&quot;col2&quot;</span>:<span class="s2">&quot;1.1.1.1&quot;</span>,<span class="s2">&quot;col3&quot;</span>:1.9890604E7,<span class="s2">&quot;col1&quot;</span>:147<span class="o">}</span>
+</code></pre></div>
+<h2 id="_4">参数说明<a class="headerlink" href="#_4" title="Permanent link">&para;</a></h2>
 <table>
 <thead>
 <tr>
 <th align="left">配置项</th>
 <th align="center">是否必须</th>
+<th>数据类型</th>
 <th>默认值</th>
-<th>说明</th>
+<th>描述</th>
 </tr>
 </thead>
 <tbody>
 <tr>
-<td align="left">path</td>
+<td align="left">brokerList</td>
 <td align="center">是</td>
+<td>string</td>
 <td>无</td>
-<td>要读取的文件路径</td>
+<td>连接 kafka 服务的 broker 配置，类似 <code>localhost:9092</code> ，多个 broker之间用逗号(<code>,</code>)分隔</td>
 </tr>
 <tr>
-<td align="left">defaultFS</td>
+<td align="left">topic</td>
 <td align="center">是</td>
+<td>string</td>
 <td>无</td>
-<td>Hadoop hdfs 文件系统 <code>NAMENODE</code> 节点地址，如果配置了 HA 模式，则为 <code>defaultFS</code> 的值</td>
+<td>要写入的 topic</td>
 </tr>
 <tr>
-<td align="left">fileType</td>
-<td align="center">是</td>
-<td>无</td>
-<td>文件的类型</td>
-</tr>
-<tr>
-<td align="left">fileName</td>
-<td align="center">是</td>
-<td>无</td>
-<td>要写入的文件名，用于当作前缀</td>
+<td align="left">batchSize</td>
+<td align="center">否</td>
+<td>int</td>
+<td>1204</td>
+<td>设置 Kafka 的 <code>batch.size</code> 参数</td>
 </tr>
 <tr>
 <td align="left">column</td>
 <td align="center">是</td>
+<td>list</td>
 <td>无</td>
-<td>写入的字段列表</td>
+<td>所配置的表中需要同步的列名集合，不允许为 <code>*</code></td>
 </tr>
 <tr>
-<td align="left">writeMode</td>
-<td align="center">是</td>
+<td align="left">properties</td>
+<td align="center">否</td>
+<td>dict</td>
 <td>无</td>
-<td>写入模式，支持 <code>append</code>, <code>overwrite</code>, <code>nonConflict</code></td>
-</tr>
-<tr>
-<td align="left">fieldDelimiter</td>
-<td align="center">否</td>
-<td><code>,</code></td>
-<td>指定文本文件（即<code>fileType</code> 指定为 <code>text</code>)的字段分隔符，二进制文件不需要指定该项</td>
-</tr>
-<tr>
-<td align="left">encoding</td>
-<td align="center">否</td>
-<td><code>utf-8</code></td>
-<td>文件的编码配置， 目前仅支持 <code>utf-8</code></td>
-</tr>
-<tr>
-<td align="left">nullFormat</td>
-<td align="center">否</td>
-<td>无</td>
-<td>自定义哪些字符可以表示为空,例如如果用户配置: <code>"\\N"</code> ，那么如果源头数据是 <code>"\N"</code> ，视作 <code>null</code> 字段</td>
-</tr>
-<tr>
-<td align="left">haveKerberos</td>
-<td align="center">否</td>
-<td>无</td>
-<td>是否启用 Kerberos 认证，如果启用，则需要同时配置 <code>kerberosKeytabFilePath</code>，<code>kerberosPrincipal</code></td>
-</tr>
-<tr>
-<td align="left">kerberosKeytabFilePath</td>
-<td align="center">否</td>
-<td>无</td>
-<td>用于 Kerberos 认证的凭证文件路径, 比如 <code>/your/path/addax.service.keytab</code></td>
-</tr>
-<tr>
-<td align="left">kerberosPrincipal</td>
-<td align="center">否</td>
-<td>无</td>
-<td>用于 Kerberos 认证的凭证主体, 比如 <code>addax/node1@WGZHAO.COM</code></td>
-</tr>
-<tr>
-<td align="left">compress</td>
-<td align="center">否</td>
-<td>无</td>
-<td>文件的压缩格式</td>
-</tr>
-<tr>
-<td align="left">hadoopConfig</td>
-<td align="center">否</td>
-<td>无</td>
-<td>里可以配置与 Hadoop 相关的一些高级参数，比如HA的配置</td>
+<td>需要设置的其他 kafka 连接参数</td>
 </tr>
 </tbody>
 </table>
-<h3 id="path">path<a class="headerlink" href="#path" title="Permanent link">&para;</a></h3>
-<p>存储到 Hadoop hdfs文件系统的路径信息，HdfsWriter 会根据并发配置在 <code>Path</code> 目录下写入多个文件。为与hive表关联，请填写hive表在hdfs上的存储路径。 例：Hive上设置的数据仓库的存储路径为：<code>/user/hive/warehouse/</code>
-，已建立数据库：<code>test</code>，表：<code>hello</code>； 则对应的存储路径为：<code>/user/hive/warehouse/test.db/hello</code> (如果建表时指定了<code>location</code> 属性，则依据该属性的路径)</p>
-<h3 id="defaultfs">defaultFS<a class="headerlink" href="#defaultfs" title="Permanent link">&para;</a></h3>
-<p>Hadoop hdfs文件系统 namenode 节点地址。格式：<code>hdfs://ip:port</code> ；例如：<code>hdfs://127.0.0.1:9000</code> , 如果启用了HA，则为 servicename 模式，比如 <code>hdfs://sandbox</code></p>
-<h3 id="filetype">fileType<a class="headerlink" href="#filetype" title="Permanent link">&para;</a></h3>
-<p>描述：文件的类型，目前只支持用户配置为</p>
-<ul>
-<li>text 表示 Text file文件格式</li>
-<li>orc 表示 OrcFile文件格式</li>
-<li>parquet 表示 Parquet 文件格式</li>
-<li>rc 表示 Rcfile 文件格式</li>
-<li>seq 表示sequence file文件格式</li>
-<li>csv 表示普通hdfs文件格式（逻辑二维表）</li>
-</ul>
-<h3 id="column">column<a class="headerlink" href="#column" title="Permanent link">&para;</a></h3>
-<p>写入数据的字段，不支持对部分列写入。为与hive中表关联，需要指定表中所有字段名和字段类型， 其中：<code>name</code> 指定字段名，<code>type</code> 指定字段类型。</p>
-<p>用户可以指定 <code>column</code> 字段信息，配置如下：</p>
-<div class="highlight"><pre><span></span><code><span class="p">{</span>
-  <span class="nt">&quot;column&quot;</span><span class="p">:</span> <span class="p">[</span>
-    <span class="p">{</span>
-      <span class="nt">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;userName&quot;</span><span class="p">,</span>
-      <span class="nt">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;string&quot;</span>
-    <span class="p">},</span>
-    <span class="p">{</span>
-      <span class="nt">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;age&quot;</span><span class="p">,</span>
-      <span class="nt">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;long&quot;</span>
-    <span class="p">},</span>
-    <span class="p">{</span>
-      <span class="nt">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;salary&quot;</span><span class="p">,</span>
-      <span class="nt">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;decimal(8,2)&quot;</span>
-    <span class="p">}</span>
-  <span class="p">]</span>
-<span class="p">}</span>
-</code></pre></div>
-<p>对于数据类型是 <code>decimal</code> 类型的，需要注意：</p>
+<h2 id="_5">限制<a class="headerlink" href="#_5" title="Permanent link">&para;</a></h2>
 <ol>
-<li>如果没有指定精度和小数位，则使用默认的 <code>decimal(38,10)</code> 表示</li>
-<li>如果仅指定了精度但未指定小数位，则小数位用0表示，即 <code>decimal(p,0)</code></li>
-<li>如果都指定，则使用指定的规格，即 <code>decimal(p,s)</code></li>
-</ol>
-<h3 id="writemode">writeMode<a class="headerlink" href="#writemode" title="Permanent link">&para;</a></h3>
-<p>写入前数据清理处理模式：</p>
-<ul>
-<li>append，写入前不做任何处理，直接使用 <code>filename</code> 写入，并保证文件名不冲突。</li>
-<li>overwrite 如果写入目录存在数据，则先删除，后写入</li>
-<li>nonConflict，如果目录下有 <code>fileName</code> 前缀的文件，直接报错。</li>
-</ul>
-<h4 id="compress">compress<a class="headerlink" href="#compress" title="Permanent link">&para;</a></h4>
-<p>描述：hdfs文件压缩类型，默认不填写意味着没有压缩。其中：text类型文件支持压缩类型有gzip、bzip2;orc类型文件支持的压缩类型有NONE、SNAPPY（需要用户安装SnappyCodec）</p>
-<h3 id="hadoopconfig">hadoopConfig<a class="headerlink" href="#hadoopconfig" title="Permanent link">&para;</a></h3>
-<p><code>hadoopConfig</code> 里可以配置与 Hadoop 相关的一些高级参数，比如HA的配置</p>
-<div class="highlight"><pre><span></span><code><span class="p">{</span>
-  <span class="nt">&quot;hadoopConfig&quot;</span><span class="p">:</span> <span class="p">{</span>
-    <span class="nt">&quot;dfs.nameservices&quot;</span><span class="p">:</span> <span class="s2">&quot;cluster&quot;</span><span class="p">,</span>
-    <span class="nt">&quot;dfs.ha.namenodes.cluster&quot;</span><span class="p">:</span> <span class="s2">&quot;nn1,nn2&quot;</span><span class="p">,</span>
-    <span class="nt">&quot;dfs.namenode.rpc-address.cluster.nn1&quot;</span><span class="p">:</span> <span class="s2">&quot;node1.example.com:8020&quot;</span><span class="p">,</span>
-    <span class="nt">&quot;dfs.namenode.rpc-address.cluster.nn2&quot;</span><span class="p">:</span> <span class="s2">&quot;node2.example.com:8020&quot;</span><span class="p">,</span>
-    <span class="nt">&quot;dfs.client.failover.proxy.provider.cluster&quot;</span><span class="p">:</span> <span class="s2">&quot;org.apache.hadoop.hdfs.server.namenode.ha.ConfiguredFailoverProxyProvider&quot;</span>
-  <span class="p">}</span>
-<span class="p">}</span>
-</code></pre></div>
-<p>这里的 <code>cluster</code> 表示 HDFS 配置成HA时的名字，也是 <code>defaultFS</code> 配置项中的名字 如果实际环境中的名字不是 <code>cluster</code> ，则上述配置中所有写有 <code>cluster</code> 都需要替换</p>
-<h4 id="havekerberos">haveKerberos<a class="headerlink" href="#havekerberos" title="Permanent link">&para;</a></h4>
-<p>是否有Kerberos认证，默认 <code>false</code>, 如果用户配置true，则配置项 <code>kerberosKeytabFilePath</code>，<code>kerberosPrincipal</code> 为必填。</p>
-<h4 id="kerberoskeytabfilepath">kerberosKeytabFilePath<a class="headerlink" href="#kerberoskeytabfilepath" title="Permanent link">&para;</a></h4>
-<p>Kerberos认证 keytab文件路径，绝对路径</p>
-<h4 id="kerberosprincipal">kerberosPrincipal<a class="headerlink" href="#kerberosprincipal" title="Permanent link">&para;</a></h4>
-<p>描述：Kerberos认证Principal名，如 <code>xxxx/hadoopclient@xxx.xxx</code></p>
-<h2 id="_3">类型转换<a class="headerlink" href="#_3" title="Permanent link">&para;</a></h2>
-<table>
-<thead>
-<tr>
-<th>Addax 内部类型</th>
-<th>HIVE 数据类型</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>Long</td>
-<td>TINYINT,SMALLINT,INT,INTEGER,BIGINT</td>
-</tr>
-<tr>
-<td>Double</td>
-<td>FLOAT,DOUBLE,DECIMAL</td>
-</tr>
-<tr>
-<td>String</td>
-<td>STRING,VARCHAR,CHAR</td>
-</tr>
-<tr>
-<td>Boolean</td>
-<td>BOOLEAN</td>
-</tr>
-<tr>
-<td>Date</td>
-<td>DATE,TIMESTAMP</td>
-</tr>
-<tr>
-<td>Bytes</td>
-<td>BINARY</td>
-</tr>
-</tbody>
-</table>
-<h2 id="_4">功能与限制<a class="headerlink" href="#_4" title="Permanent link">&para;</a></h2>
-<ol>
-<li>目前不支持：<code>binary</code>、<code>arrays</code>、<code>maps</code>、<code>structs</code>、<code>union类型</code></li>
+<li>仅支持 Kafka <code>1.0</code> 及以上版本，低于该版本的无法确定是否能写入</li>
+<li>当前不支持启用了 <code>kerberos</code> 认证的 kafka 服务</li>
 </ol>
                 
               
@@ -1950,7 +1801,7 @@
     <nav class="md-footer__inner md-grid" aria-label="Footer">
       
         
-        <a href="../hbase20xsqlwriter/" class="md-footer__link md-footer__link--prev" aria-label="上一页: HBase20xsql Writer" rel="prev">
+        <a href="../influxdb2writer/" class="md-footer__link md-footer__link--prev" aria-label="上一页: InfluxDB2 Writer" rel="prev">
           <div class="md-footer__button md-icon">
             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11h12z"/></svg>
           </div>
@@ -1959,20 +1810,20 @@
               <span class="md-footer__direction">
                 上一页
               </span>
-              HBase20xsql Writer
+              InfluxDB2 Writer
             </div>
           </div>
         </a>
       
       
         
-        <a href="../influxdbwriter/" class="md-footer__link md-footer__link--next" aria-label="下一页: InfluxDB Writer" rel="next">
+        <a href="../kuduwriter/" class="md-footer__link md-footer__link--next" aria-label="下一页: Kudu Writer" rel="next">
           <div class="md-footer__title">
             <div class="md-ellipsis">
               <span class="md-footer__direction">
                 下一页
               </span>
-              InfluxDB Writer
+              Kudu Writer
             </div>
           </div>
           <div class="md-footer__button md-icon">
