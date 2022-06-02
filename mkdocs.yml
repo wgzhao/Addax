@@ -95,6 +95,7 @@ nav:
       - writer/rediswriter.md
       - writer/sqlitewriter.md
       - writer/sqlserverwriter.md
+      - writer/starrockswriter.md
       - writer/streamwriter.md
       - writer/tdenginewriter.md
       - writer/txtfilewriter.md
