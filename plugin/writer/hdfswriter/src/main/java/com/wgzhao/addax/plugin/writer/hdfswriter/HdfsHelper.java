@@ -689,7 +689,7 @@ public class HdfsHelper
                         ((DecimalColumnVector) col).set(row, hdw);
                         break;
                     case TIMESTAMP:
-                        ((TimestampColumnVector) col).set(row, java.sql.Timestamp.valueOf(record.getColumn(i).asString()));
+                        ((TimestampColumnVector) col).set(row, record.getColumn(i).asTimestamp());
                         break;
                     case STRING:
                     case VARCHAR:
@@ -699,13 +699,11 @@ public class HdfsHelper
                             //convert bytes to base64 string
                             buffer = Base64.getEncoder().encode((byte[]) record.getColumn(i).getRawData());
                         }
-                        else if (record.getColumn(i).getType() == Column.Type.DATE)
-                        {
+                        else if (record.getColumn(i).getType() == Column.Type.DATE) {
                             SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
                             buffer = sdf.format(record.getColumn(i).asDate()).getBytes(StandardCharsets.UTF_8);
                         }
-                        else if (record.getColumn(i).getType() == Column.Type.TIMESTAMP)
-                        {
+                        else if (record.getColumn(i).getType() == Column.Type.TIMESTAMP) {
                             SimpleDateFormat sdf = new SimpleDateFormat(Constant.DEFAULT_DATE_FORMAT);
                             buffer = sdf.format(record.getColumn(i).asDate()).getBytes(StandardCharsets.UTF_8);
                         }
