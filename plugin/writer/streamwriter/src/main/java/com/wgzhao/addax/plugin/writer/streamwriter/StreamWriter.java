@@ -37,6 +37,9 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.nio.charset.StandardCharsets;
+import java.time.Instant;
+import java.time.ZoneId;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -284,7 +287,14 @@ public class StreamWriter
             for (int i = 0; i < recordLength; i++) {
                 column = record.getColumn(i);
                 if (column != null && column.getRawData() != null) {
-                    sb.append(column.asString());
+                    if (column.getType() == Column.Type.TIMESTAMP) {
+                        // timestamp always use UTC timezone
+                        Instant instant = Instant.ofEpochMilli(column.asLong());
+                        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss").withZone(ZoneId.of("UTC"));
+                        sb.append(formatter.format(instant));
+                    } else {
+                        sb.append(column.asString());
+                    }
                 }
                 else {
                     // use NULL FLAG to replace null value
