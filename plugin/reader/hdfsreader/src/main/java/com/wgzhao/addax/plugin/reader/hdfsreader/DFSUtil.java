@@ -33,6 +33,7 @@ import com.wgzhao.addax.common.element.DoubleColumn;
 import com.wgzhao.addax.common.element.LongColumn;
 import com.wgzhao.addax.common.element.Record;
 import com.wgzhao.addax.common.element.StringColumn;
+import com.wgzhao.addax.common.element.TimestampColumn;
 import com.wgzhao.addax.common.exception.AddaxException;
 import com.wgzhao.addax.common.plugin.RecordSender;
 import com.wgzhao.addax.common.plugin.TaskPluginCollector;
@@ -445,7 +446,8 @@ public class DFSUtil
                             columnGenerated = new BytesColumn(val);
                             break;
                         case TIMESTAMP:
-                            columnGenerated = new DateColumn(((TimestampColumnVector) col).getTime(row));
+//                            columnGenerated = new DateColumn(((TimestampColumnVector) col).getTime(row));
+                            columnGenerated = new TimestampColumn(((TimestampColumnVector) col).getTime(row));
                             break;
                         default:
                             // type is string or other
