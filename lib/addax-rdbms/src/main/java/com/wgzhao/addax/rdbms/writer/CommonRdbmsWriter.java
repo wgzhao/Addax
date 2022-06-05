@@ -46,7 +46,6 @@ import java.sql.SQLException;
 import java.sql.Types;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Calendar;
 import java.util.List;
 import java.util.Map;
 
@@ -535,7 +534,7 @@ public class CommonRdbmsWriter
                     break;
 
                 case Types.TIMESTAMP:
-                    preparedStatement.setTimestamp(columnIndex, column.asTimestamp(), Calendar.getInstance());
+                    preparedStatement.setTimestamp(columnIndex, column.asTimestamp());
                     break;
 
                 case Types.BINARY:
