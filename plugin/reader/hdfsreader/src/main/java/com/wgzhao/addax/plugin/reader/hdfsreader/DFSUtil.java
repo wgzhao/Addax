@@ -446,7 +446,7 @@ public class DFSUtil
                             columnGenerated = new BytesColumn(val);
                             break;
                         case TIMESTAMP:
-//                            columnGenerated = new DateColumn(((TimestampColumnVector) col).getTime(row));
+                            // FIXME: incorrect timezone value
                             columnGenerated = new TimestampColumn(((TimestampColumnVector) col).getTime(row));
                             break;
                         default:
