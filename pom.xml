@@ -70,14 +70,14 @@
         <ognl.version>3.3.2</ognl.version>
         <orc.version>1.7.3</orc.version>
         <parquet.version>1.10.0</parquet.version>
-        <poi.version>5.2.0</poi.version>
+        <poi.version>5.2.2</poi.version>
         <redis.replicator.version>3.5.5</redis.replicator.version>
         <slf4j.version>1.7.32</slf4j.version>
         <snappy.version>1.1.8.4</snappy.version>
         <swift.version>1.0.0</swift.version>
         <xz.version>1.9</xz.version>
         <zookeeper.version>3.6.0</zookeeper.version>
-        <zstd.version>1.5.1-1</zstd.version>
+        <zstd.version>1.5.2-3</zstd.version>
 
         <!-- jdbc driver version -->
         <cassandra.jdbc.version>3.11.0</cassandra.jdbc.version>
