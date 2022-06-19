@@ -114,6 +114,8 @@ assignees: wgzhao
 
 ### sqlserver writer
 
+### starrockswriter
+
 ### stream writer
 
 ### tdengine writer
