@@ -58,6 +58,7 @@ import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
 import java.sql.Types;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Collection;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
@@ -312,7 +313,7 @@ public class CommonRdbmsReader
                     return new DateColumn(rs.getDate(i));
 
                 case Types.TIMESTAMP:
-                    return new TimestampColumn(rs.getTimestamp(i));
+                    return new TimestampColumn(rs.getTimestamp(i, Calendar.getInstance()));
 
                 case Types.BINARY:
                 case Types.VARBINARY:
