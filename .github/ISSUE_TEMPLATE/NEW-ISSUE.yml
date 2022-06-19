@@ -32,7 +32,8 @@ body:
       label: Version
       description: What version of our software are you running? （当前您使用的版本，这对于定位问题很重要，请选择正确的版本）
       options:
-        - 4.0.8 (Default)
+        - 4.0.9 (Default)
+        - 4.0.8
         - 4.0.7
         - 4.0.6
         - 4.0.5
@@ -74,4 +75,4 @@ body:
     attributes:
       label: Relevant log output
       description: Please copy and paste any relevant log output. This will be automatically formatted into code, so no need for backticks. (请完整的贴出任务输出结果）
-      render: shell
+      render: shell-script
