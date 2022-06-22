@@ -85,10 +85,10 @@
         <hive.jdbc.version>3.1.2</hive.jdbc.version>
         <influxdbClient.version>2.22</influxdbClient.version>
         <hadoop.version>3.1.2</hadoop.version>
-        <mongodb.jdbc.version>3.12.9</mongodb.jdbc.version>
+        <mongodb.jdbc.version>3.12.11</mongodb.jdbc.version>
         <mysql.jdbc.version>8.0.28</mysql.jdbc.version>
         <mssql.jdbc.version>9.2.1.jre8</mssql.jdbc.version>
-        <oracle.jdbc.version>19.7.0.0</oracle.jdbc.version>
+        <oracle.jdbc.version>21.6.0.0.1</oracle.jdbc.version>
         <phoenix1.version>4.14.3-HBase-1.4</phoenix1.version>
         <phoenix2.version>5.1.2</phoenix2.version>
         <postgresql.jdbc.version>42.3.1</postgresql.jdbc.version>
@@ -290,7 +290,7 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-enforcer-plugin</artifactId>
-                <version>3.0.0</version>
+                <version>3.1.0</version>
                 <configuration>
                     <rules>
                         <compound implementation="com.github.ferstl.maven.pomenforcers.CompoundPedanticEnforcer">
