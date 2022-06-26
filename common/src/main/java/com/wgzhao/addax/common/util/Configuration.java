@@ -19,11 +19,11 @@
 
 package com.wgzhao.addax.common.util;
 
+import com.alibaba.fastjson2.JSONWriter;
 import com.wgzhao.addax.common.exception.CommonErrorCode;
 import com.wgzhao.addax.common.exception.AddaxException;
 import com.wgzhao.addax.common.spi.ErrorCode;
-import com.alibaba.fastjson.JSON;
-import com.alibaba.fastjson.serializer.SerializerFeature;
+import com.alibaba.fastjson2.JSON;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.CharUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -657,8 +657,7 @@ public class Configuration
      */
     public String beautify()
     {
-        return JSON.toJSONString(this.getInternal(),
-                SerializerFeature.PrettyFormat);
+        return JSON.toJSONString(this.getInternal(), JSONWriter.Feature.PrettyFormat);
     }
 
     /**

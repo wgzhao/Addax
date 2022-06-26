@@ -31,7 +31,7 @@
         <dependency>
             <groupId>com.alibaba</groupId>
             <artifactId>fastjson</artifactId>
-            <version>${fastjson.version}</version>
+            <version>${fastjson2.version}</version>
         </dependency>
 
         <dependency>
@@ -58,7 +58,7 @@
             <artifactId>aircompressor</artifactId>
             <version>${aircompressor.version}</version>
         </dependency>
-        
+
         <dependency>
             <groupId>org.apache.commons</groupId>
             <artifactId>commons-csv</artifactId>
