@@ -42,7 +42,7 @@
         <commons.net.version>3.8.0</commons.net.version>
         <diamond.version>3.7.3</diamond.version>
         <druid.version>1.2.6</druid.version>
-        <fastjson.version>1.2.83</fastjson.version>
+        <fastjson2.version>2.0.8</fastjson2.version>
         <findbugs.version>3.0.1</findbugs.version>
         <guava.version>29.0-jre</guava.version>
         <groovy.version>3.0.9</groovy.version>
@@ -64,7 +64,7 @@
         <jackson.version>2.9.9</jackson.version>
         <jedis.version>3.7.0</jedis.version>
         <jsch.version>0.1.55</jsch.version>
-        <kudu.version>1.15.0</kudu.version>
+        <kudu.version>1.16.0</kudu.version>
         <mapreduce.version>3.2.1</mapreduce.version>
         <mockito.version>2.0.2-beta</mockito.version>
         <ognl.version>3.3.2</ognl.version>
@@ -260,7 +260,7 @@
             <dependency>
                 <groupId>com.alibaba</groupId>
                 <artifactId>fastjson</artifactId>
-                <version>${fastjson.version}</version>
+                <version>${fastjson2.version}</version>
             </dependency>
 
             <dependency>
