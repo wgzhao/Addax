@@ -19,11 +19,11 @@
 
 package com.wgzhao.addax.plugin.reader.httpreader;
 
-import com.alibaba.fastjson.JSON;
-import com.alibaba.fastjson.JSONArray;
-import com.alibaba.fastjson.JSONObject;
-import com.alibaba.fastjson.JSONPath;
-import com.alibaba.fastjson.serializer.SerializerFeature;
+import com.alibaba.fastjson2.JSON;
+import com.alibaba.fastjson2.JSONArray;
+import com.alibaba.fastjson2.JSONObject;
+import com.alibaba.fastjson2.JSONPath;
+import com.alibaba.fastjson2.JSONWriter;
 import com.wgzhao.addax.common.element.Record;
 import com.wgzhao.addax.common.element.StringColumn;
 import com.wgzhao.addax.common.exception.AddaxException;
@@ -74,6 +74,7 @@ import java.security.KeyManagementException;
 import java.security.KeyStoreException;
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -178,7 +179,7 @@ public class HttpReader
                 if (object instanceof JSONArray) {
                     // 有空值的情况下, toString会过滤掉，所以不能简单的使用 object.toString()方式
                     // https://github.com/wgzhao/Addax/issues/171
-                    jsonArray = JSON.parseArray(JSONObject.toJSONString(object, SerializerFeature.WriteMapNullValue));
+                    jsonArray = JSON.parseArray(JSONObject.toJSONString(object, JSONWriter.Feature.WriteMapNullValue));
                 }
                 else if (object instanceof JSONObject) {
                     jsonArray = new JSONArray();
@@ -201,9 +202,7 @@ public class HttpReader
                 if (columns.size() == 1 && "*".equals(columns.get(0))) {
                     // 没有给定key的情况下，提取JSON的第一层key作为字段处理
                     columns.remove(0);
-                    for (Object obj : JSONPath.keySet(jsonObject, "/")) {
-                        columns.add(obj.toString());
-                    }
+                    columns.addAll((Collection<String>) JSONPath.eval(jsonObject, "$.e.keySet()"));
                 }
 
                 for (int i = 0; i < jsonArray.size(); i++) {

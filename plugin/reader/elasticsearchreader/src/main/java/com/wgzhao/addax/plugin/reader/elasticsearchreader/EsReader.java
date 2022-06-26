@@ -19,7 +19,7 @@
 
 package com.wgzhao.addax.plugin.reader.elasticsearchreader;
 
-import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson2.JSON;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonElement;

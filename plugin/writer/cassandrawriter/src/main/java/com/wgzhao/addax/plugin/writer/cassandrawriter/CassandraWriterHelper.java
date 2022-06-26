@@ -21,9 +21,9 @@ package com.wgzhao.addax.plugin.writer.cassandrawriter;
 
 import com.wgzhao.addax.common.element.Column;
 import com.wgzhao.addax.common.exception.AddaxException;
-import com.alibaba.fastjson.JSON;
-import com.alibaba.fastjson.JSONArray;
-import com.alibaba.fastjson.JSONObject;
+import com.alibaba.fastjson2.JSON;
+import com.alibaba.fastjson2.JSONArray;
+import com.alibaba.fastjson2.JSONObject;
 import com.datastax.driver.core.BoundStatement;
 import com.datastax.driver.core.CodecRegistry;
 import com.datastax.driver.core.DataType;
@@ -218,7 +218,7 @@ public class CassandraWriterHelper
 
             case MAP: {
                 Map<Object, Object> m = new HashMap<>();
-                for (JSONObject.Entry<String, Object> e : ((JSONObject) jsonObject).entrySet()) {
+                for (Map.Entry<String, Object> e : ((JSONObject) jsonObject).entrySet()) {
                     Object k = parseFromString(e.getKey(), type.getTypeArguments().get(0));
                     Object v = parseFromJson(e.getValue(), type.getTypeArguments().get(1));
                     m.put(k, v);
@@ -247,7 +247,7 @@ public class CassandraWriterHelper
             case UDT: {
                 UDTValue t = ((UserType) type).newValue();
                 UserType userType = t.getType();
-                for (JSONObject.Entry<String, Object> e : ((JSONObject) jsonObject).entrySet()) {
+                for (Map.Entry<String, Object> e : ((JSONObject) jsonObject).entrySet()) {
                     DataType eleType = userType.getFieldType(e.getKey());
                     t.set(e.getKey(), parseFromJson(e.getValue(), eleType), registry.codecFor(eleType).getJavaType());
                 }

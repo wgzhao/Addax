@@ -19,8 +19,8 @@
 
 package com.wgzhao.addax.plugin.writer.ftpwriter.util;
 
-import com.alibaba.fastjson.JSON;
-import com.alibaba.fastjson.serializer.SerializerFeature;
+import com.alibaba.fastjson2.JSON;
+import com.alibaba.fastjson2.JSONWriter;
 import com.jcraft.jsch.ChannelSftp;
 import com.jcraft.jsch.ChannelSftp.LsEntry;
 import com.jcraft.jsch.JSch;
@@ -234,7 +234,7 @@ public class SftpHelperImpl
             @SuppressWarnings("rawtypes")
             Vector allFiles = this.channelSftp.ls(dir);
             LOG.debug(String.format("ls: %s", JSON.toJSONString(allFiles,
-                    SerializerFeature.UseSingleQuotes)));
+                    JSONWriter.Feature.UseSingleQuotes)));
             for (Object allFile : allFiles) {
                 LsEntry le = (LsEntry) allFile;
                 String strName = le.getFilename();

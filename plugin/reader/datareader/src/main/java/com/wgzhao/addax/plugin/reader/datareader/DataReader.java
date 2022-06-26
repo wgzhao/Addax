@@ -19,7 +19,7 @@
 
 package com.wgzhao.addax.plugin.reader.datareader;
 
-import com.alibaba.fastjson.JSONObject;
+import com.alibaba.fastjson2.JSONObject;
 import com.google.common.base.CaseFormat;
 import com.wgzhao.addax.common.base.Key;
 import com.wgzhao.addax.common.element.BoolColumn;
