@@ -19,8 +19,8 @@
 
 package com.wgzhao.addax.plugin.writer.ftpwriter.util;
 
-import com.alibaba.fastjson.JSON;
-import com.alibaba.fastjson.serializer.SerializerFeature;
+import com.alibaba.fastjson2.JSON;
+import com.alibaba.fastjson2.JSONWriter;
 import com.wgzhao.addax.common.exception.AddaxException;
 import com.wgzhao.addax.plugin.writer.ftpwriter.FtpWriterErrorCode;
 import org.apache.commons.io.IOUtils;
@@ -279,7 +279,7 @@ public class StandardFtpHelperImpl
             FTPFile[] fs = this.ftpClient.listFiles(dir);
             // LOG.debug(JSON.toJSONString(this.ftpClient.listNames(dir)));
             LOG.debug(String.format("ls: %s",
-                    JSON.toJSONString(fs, SerializerFeature.UseSingleQuotes)));
+                    JSON.toJSONString(fs, JSONWriter.Feature.UseSingleQuotes)));
             for (FTPFile ff : fs) {
                 String strName = ff.getName();
                 if (strName.startsWith(prefixFileName)) {
