@@ -64,7 +64,7 @@
         <jackson.version>2.9.9</jackson.version>
         <jedis.version>3.7.0</jedis.version>
         <jsch.version>0.1.55</jsch.version>
-        <kudu.version>1.15.0</kudu.version>
+        <kudu.version>1.16.0</kudu.version>
         <mapreduce.version>3.2.1</mapreduce.version>
         <mockito.version>2.0.2-beta</mockito.version>
         <ognl.version>3.3.2</ognl.version>
