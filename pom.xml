@@ -54,13 +54,13 @@
         <httpclient.version>4.5.13</httpclient.version>
         <httpcore.version>4.4.15</httpcore.version>
         <httpasync.version>4.1.5</httpasync.version>
-        <influxdb.client.version>3.3.0</influxdb.client.version>
+        <influxdb.client.version>6.3.0</influxdb.client.version>
         <logback.version>1.2.10</logback.version>
         <javacsv.version>2.0</javacsv.version>
         <javadbf.version>1.13.2</javadbf.version>
         <jest.version>6.3.1</jest.version>
         <junit.version>5.8.2</junit.version>
-        <joda.time.version>2.10.13</joda.time.version>
+        <joda.time.version>2.10.14</joda.time.version>
         <jackson.version>2.9.9</jackson.version>
         <jedis.version>3.7.0</jedis.version>
         <jsch.version>0.1.55</jsch.version>
