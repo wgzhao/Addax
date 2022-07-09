@@ -1,43 +1,46 @@
 package com.wgzhao.addax.plugin.reader.s3reader;
 
 import com.wgzhao.addax.common.spi.ErrorCode;
+import org.omg.CORBA.OBJECT_NOT_EXIST;
 
-public enum S3ReaderErrorCode implements ErrorCode
+public enum S3ReaderErrorCode
+        implements ErrorCode
 {
-    // TODO: 修改错误码类型
-    RUNTIME_EXCEPTION("S3Reader-00", "运行时异常"),
-    S3_EXCEPTION("S3FileReader-01", "S3配置异常"),
-    CONFIG_INVALID_EXCEPTION("S3FileReader-02", "参数配置错误"),
-    NOT_SUPPORT_TYPE("S3Reader-03", "不支持的类型"),
-    CAST_VALUE_TYPE_ERROR("S3FileReader-04", "无法完成指定类型的转换"),
-    SECURITY_EXCEPTION("S3Reader-05", "缺少权限"),
-    ILLEGAL_VALUE("S3Reader-06", "值错误"),
-    REQUIRED_VALUE("S3Reader-07", "必选项"),
-    NO_INDEX_VALUE("S3Reader-08","没有 Index" ),
-    MIXED_INDEX_VALUE("S3Reader-09","index 和 value 混合" ),
-    EMPTY_BUCKET_EXCEPTION("S3Reader-10", "您尝试读取的Bucket为空");
+    S3_EXCEPTION("S3FileReader-01", "Exception occurred when reading configure"),
+    CONFIG_INVALID_EXCEPTION("S3FileReader-02", "Invalid configure"),
+    NOT_SUPPORT_TYPE("S3Reader-03", "Non-supported type"),
+    SECURITY_EXCEPTION("S3Reader-05", "Permission denied"),
+    ILLEGAL_VALUE("S3Reader-06", "Illegal value"),
+    REQUIRED_VALUE("S3Reader-07", "Missing required value"),
+    NO_INDEX_VALUE("S3Reader-08", "Missing index"),
+    MIXED_INDEX_VALUE("S3Reader-09", "Mix index and value"),
+    EMPTY_BUCKET_EXCEPTION("S3Reader-10", "Empty bucket"),
+    OBJECT_NOT_EXIST("S3Reader-11", "Object does not exists");
 
     private final String code;
     private final String description;
 
-    private S3ReaderErrorCode(String code, String description) {
+    S3ReaderErrorCode(String code, String description)
+    {
         this.code = code;
         this.description = description;
     }
 
     @Override
-    public String getCode() {
+    public String getCode()
+    {
         return this.code;
     }
 
     @Override
-    public String getDescription() {
+    public String getDescription()
+    {
         return this.description;
     }
 
     @Override
-    public String toString() {
-        return String.format("Code:[%s], Description:[%s].", this.code,
-                this.description);
+    public String toString()
+    {
+        return String.format("Code:[%s], Description:[%s].", this.code, this.description);
     }
 }

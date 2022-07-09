@@ -8,11 +8,9 @@ public class S3Key extends Key
 
     public static final String ENDPOINT = "endpoint";
 
-    public static final String ACCESSID = "accessId";
+    public static final String ACCESS_ID = "accessId";
 
-    public static final String ACCESSKEY = "accessKey";
-
-    public static final String ENCODING = "encoding";
+    public static final String ACCESS_KEY = "accessKey";
 
     public static final String BUCKET = "bucket";
 
