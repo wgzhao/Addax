@@ -1,0 +1,10 @@
+{
+  "name": "s3reader",
+  "class": "com.wgzhao.addax.plugin.reader.s3reader.S3Reader",
+  "description": {
+    "useScene": "retrieve object from Amazon S3 service",
+    "mechanism": "",
+    "warn": ""
+  },
+  "developer": "wgzhao"
+}
