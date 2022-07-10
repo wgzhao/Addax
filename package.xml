@@ -225,6 +225,14 @@
             <outputDirectory>addax-${project.version}</outputDirectory>
         </fileSet>
         <fileSet>
+            <directory>plugin/reader/rdbmsreader/target/rdbmsreader-${project.version}/</directory>
+            <includes>
+                <include>**/*.*</include>
+            </includes>
+            <fileMode>0644</fileMode>
+            <outputDirectory>addax-${project.version}</outputDirectory>
+        </fileSet>
+        <fileSet>
             <directory>plugin/reader/redisreader/target/redisreader-${project.version}/</directory>
             <includes>
                 <include>**/*.*</include>
@@ -233,7 +241,7 @@
             <outputDirectory>addax-${project.version}</outputDirectory>
         </fileSet>
         <fileSet>
-            <directory>plugin/reader/rdbmsreader/target/rdbmsreader-${project.version}/</directory>
+            <directory>plugin/reader/s3reader/target/s3reader-${project.version}/</directory>
             <includes>
                 <include>**/*.*</include>
             </includes>
