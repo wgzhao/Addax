@@ -194,7 +194,7 @@ public class S3Reader
 
         private List<String> getRemoteObjects(String parentDir)
         {
-
+            LOG.debug("find objects in {}", parentDir);
             List<String> remoteObjects = new ArrayList<>();
             S3Client client = S3Util.initS3Client(readerOriginConfig);
 
