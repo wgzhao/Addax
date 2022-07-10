@@ -356,15 +356,19 @@ public class ESWriter
                     ESFieldType columnType = typeList.get(i);
                     //如果是数组类型，那它传入的必是字符串类型
                     if (columnList.get(i).isArray() != null && columnList.get(i).isArray()) {
-                        String[] dataList = column.asString().split(splitter);
-                        if (!columnType.equals(ESFieldType.DATE)) {
-                            data.put(columnName, dataList);
-                        }
-                        else {
-                            for (int pos = 0; pos < dataList.length; pos++) {
-                                dataList[pos] = getDateStr(columnList.get(i), column);
+                        if (null == column.asString()) {
+                            data.put(columnName, null);
+                        } else {
+                            String[] dataList = column.asString().split(splitter);
+                            if (!columnType.equals(ESFieldType.DATE)) {
+                                data.put(columnName, dataList);
                             }
-                            data.put(columnName, dataList);
+                            else {
+                                for (int pos = 0; pos < dataList.length; pos++) {
+                                    dataList[pos] = getDateStr(columnList.get(i), column);
+                                }
+                                data.put(columnName, dataList);
+                            }
                         }
                     }
                     else {
