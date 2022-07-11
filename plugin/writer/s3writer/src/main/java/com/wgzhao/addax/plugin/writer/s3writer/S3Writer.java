@@ -140,13 +140,12 @@ public class S3Writer
         }
 
         /**
-         * find all objects which starts with objectName and return
+         * find all objects in given bucket
          *
          * @param bucket the S3 bucket name
-         * @param objectName the object prefix will be found
          * @return {@link List}
          */
-        private List<S3Object> listObjects(String bucket, String objectName)
+        private List<S3Object> listObjects(String bucket)
         {
             ListObjectsRequest listObjects = ListObjectsRequest
                     .builder()
@@ -165,7 +164,7 @@ public class S3Writer
          */
         private void deleteBucketObjects(String bucket, String objectName)
         {
-            List<S3Object> objects = listObjects(bucket, objectName);
+            List<S3Object> objects = listObjects(bucket);
             ArrayList<ObjectIdentifier> toDelete = new ArrayList<>();
             for (S3Object obj : objects) {
                 if (obj.key().startsWith(objectName)) {
