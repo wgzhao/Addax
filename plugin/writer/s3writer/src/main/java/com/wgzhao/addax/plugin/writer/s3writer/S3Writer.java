@@ -37,6 +37,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.StringJoiner;
 import java.util.UUID;
+import java.util.function.Consumer;
 
 public class S3Writer
         extends Writer
@@ -140,12 +141,13 @@ public class S3Writer
         }
 
         /**
-         * find all objects in given bucket
+         * find all objects which starts with objectName and return
          *
          * @param bucket the S3 bucket name
+         * @param objectName the object prefix will be found
          * @return {@link List}
          */
-        private List<S3Object> listObjects(String bucket)
+        private List<S3Object> listObjects(String bucket, String objectName)
         {
             ListObjectsRequest listObjects = ListObjectsRequest
                     .builder()
@@ -153,7 +155,15 @@ public class S3Writer
                     .build();
 
             ListObjectsResponse res = s3Client.listObjects(listObjects);
-            return res.contents();
+
+            List<S3Object> objects = res.contents();
+            List<S3Object> result = new ArrayList<>();
+            for (S3Object obj : objects) {
+                if (obj.key().startsWith(objectName)) {
+                    result.add(obj);
+                }
+            }
+            return result;
         }
 
         /**
@@ -164,15 +174,12 @@ public class S3Writer
          */
         private void deleteBucketObjects(String bucket, String objectName)
         {
-            List<S3Object> objects = listObjects(bucket);
+            List<S3Object> objects = listObjects(bucket, objectName);
             ArrayList<ObjectIdentifier> toDelete = new ArrayList<>();
-            for (S3Object obj : objects) {
-                if (obj.key().startsWith(objectName)) {
-                    LOG.info("delete matched object {}", obj.key());
+            if ( !objects.isEmpty()) {
+                for (S3Object obj : objects) {
                     toDelete.add(ObjectIdentifier.builder().key(obj.key()).build());
                 }
-            }
-            if (!toDelete.isEmpty()) {
                 try {
                     DeleteObjectsRequest dor = DeleteObjectsRequest.builder()
                             .bucket(bucket)
