@@ -25,7 +25,7 @@ Addax supports the following Data Sources:
 | MySQL/MariaDB       | ✓      | ✓     | mysqlreader/mysqlwriter                 |                                 |
 | Oracle              | ✓      | ✓     | oraclereader/oraclewriter               |                                 |
 | PostgreSQL          | ✓      | ✓     | postgresqlreader/postgresqlwriter       |                                 |
-| AWS S3              | ✓      | x     | s3reader                                | [AWS S3][6], [MinIO][7]
+| AWS S3              | ✓      | ✓     | s3reader/s3writer                       | [AWS S3][6], [MinIO][7]
 | Trino               | ✓      | ✓     | rdbmsreader/rdbmswriter                 | [trino][3]                      |
 | Redis               | ✓      | ✓     | redisreader/rediswriter                 |                                 |
 | SQLite              | ✓      | ✓     | sqlitereader/sqlitewriter               |                                 |
