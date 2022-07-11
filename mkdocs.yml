@@ -64,6 +64,7 @@ nav:
       - reader/postgresqlreader.md
       - reader/rdbmsreader.md
       - reader/redisreader.md
+      - reader/s3reader.md
       - reader/sqlitereader.md
       - reader/sqlserverreader.md
       - reader/streamreader.md
@@ -93,6 +94,7 @@ nav:
       - writer/postgresqlwriter.md
       - writer/rdbmswriter.md
       - writer/rediswriter.md
+      - writer/s3writer.md
       - writer/sqlitewriter.md
       - writer/sqlserverwriter.md
       - writer/starrockswriter.md

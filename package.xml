@@ -482,6 +482,14 @@
             <outputDirectory>addax-${project.version}</outputDirectory>
         </fileSet>
         <fileSet>
+            <directory>plugin/writer/s3writer/target/s3writer-${project.version}/</directory>
+            <includes>
+                <include>**/*.*</include>
+            </includes>
+            <fileMode>0644</fileMode>
+            <outputDirectory>addax-${project.version}</outputDirectory>
+        </fileSet>
+        <fileSet>
             <directory>plugin/writer/sqlitewriter/target/sqlitewriter-${project.version}/</directory>
             <includes>
                 <include>**/*.*</include>

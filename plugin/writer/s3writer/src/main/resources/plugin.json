@@ -1,0 +1,6 @@
+{
+  "name": "s3writer",
+  "class": "com.wgzhao.addax.plugin.writer.s3writer.S3Writer",
+  "description": "write data to Amazon AWS S3 service",
+  "developer": "wgzhao"
+}

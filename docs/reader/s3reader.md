@@ -29,6 +29,7 @@ html) 编写。
 | fieldDelimiter | 否 | string | `,` |  读取的字段分隔符，仅支持单字符 |
 | compress | 否  | string | 无 | 文件压缩格式，默认不压缩 |
 | encoding | 否  | string | `utf8` | 文件编码格式 |
+| writeMode | 否 | string | `nonConflict` |
 
 ### object
 
