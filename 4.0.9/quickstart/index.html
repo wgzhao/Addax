@@ -1500,6 +1500,7 @@ mvn package assembly:single
 <p>要使用 <code>Addax</code> 进行数据采集，只需要编写一个任务采集文件，该文件为 JSON 格式，以下是一个简单的配置文件，该任务的目的是从内存读取读取指定内容的数据，并将其打印出来，文件保存在 <code>job/test.json</code> 中</p>
 <div class="tabbed-set" data-tabs="1:1"><input checked="checked" id="__tabbed_1_1" name="__tabbed_1" type="radio" /><label for="__tabbed_1_1">job/test.json</label><div class="tabbed-content">
 <div class="highlight"><pre><span></span><code><span class="p">{</span><span class="w"></span>
+<span class="w">  </span><span class="nt">&quot;job&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
 <span class="w">  </span><span class="nt">&quot;content&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
 <span class="w">    </span><span class="nt">&quot;reader&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
 <span class="w">      </span><span class="nt">&quot;name&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;streamreader&quot;</span><span class="p">,</span><span class="w"></span>
@@ -1532,6 +1533,7 @@ mvn package assembly:single
 <span class="w">      </span><span class="p">}</span><span class="w"></span>
 <span class="w">    </span><span class="p">}</span><span class="w"></span>
 <span class="w">  </span><span class="p">}</span><span class="w"></span>
+<span class="p">}</span><span class="w"></span>
 <span class="p">}</span><span class="w"></span>
 </code></pre></div>
 </div>
