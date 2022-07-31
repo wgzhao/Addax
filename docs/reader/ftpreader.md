@@ -26,7 +26,7 @@ FtpReader 提供了读取远程 FTP/SFTP 文件系统数据存储的能力。
 | path              |    是    | 无             | 远程FTP文件系统的路径信息，注意这里可以支持填写多个路径，详细描述见下        |
 | column            |    是    | 默认String类型 | 读取字段列表，type指定源数据的类型，详见下文                                 |
 | fieldDelimiter    |    是    | `,`            | 描述：读取的字段分隔符                                                  |
-| compress          |    否    | 无             | 文本压缩类型，默认不填写意味着没有压缩。支持压缩类型为zip、gzip、bzip2       |
+| compress          |    否    | 无             | 文本压缩类型，默认不填写意味着没有压缩。支持压缩类型为 `zip`、`gz`、`bzip2`       |
 | encoding          |    否    | utf-8          | 读取文件的编码配置                                                     |
 | skipHeader        |    否    | false          | 类CSV格式文件可能存在表头为标题情况，需要跳过。默认不跳过                    |
 | nullFormat        |    否    | `\N`           | 定义哪些字符串可以表示为null                                             |
