@@ -21,6 +21,8 @@ package com.wgzhao.addax.plugin.writer.hdfswriter;
 
 import com.alibaba.fastjson2.JSON;
 import com.alibaba.fastjson2.JSONObject;
+import com.google.common.base.Splitter;
+import com.google.common.collect.Iterables;
 import com.wgzhao.addax.common.base.Constant;
 import com.wgzhao.addax.common.base.Key;
 import com.wgzhao.addax.common.element.Column;
@@ -83,6 +85,7 @@ import java.util.ArrayList;
 import java.util.Base64;
 import java.util.Date;
 import java.util.List;
+import java.util.Objects;
 import java.util.Set;
 import java.util.StringJoiner;
 
@@ -295,6 +298,12 @@ public class HdfsHelper
             this.kerberosKeytabFilePath = taskConfig.getString(Key.KERBEROS_KEYTAB_FILE_PATH);
             this.kerberosPrincipal = taskConfig.getString(Key.KERBEROS_PRINCIPAL);
             hadoopConf.set(HADOOP_SECURITY_AUTHENTICATION_KEY, "kerberos");
+            // fix Failed to specify server's Kerberos principal name
+            if (Objects.equals(hadoopConf.get("dfs.namenode.kerberos.principal", ""), "")) {
+                // get REALM
+                String serverPrincipal = "nn/_HOST@" + Iterables.get(Splitter.on('@').split(this.kerberosPrincipal), 1);
+                hadoopConf.set("dfs.namenode.kerberos.principal", serverPrincipal);
+            }
         }
         this.kerberosAuthentication(this.kerberosPrincipal, this.kerberosKeytabFilePath);
         conf = new JobConf(hadoopConf);
