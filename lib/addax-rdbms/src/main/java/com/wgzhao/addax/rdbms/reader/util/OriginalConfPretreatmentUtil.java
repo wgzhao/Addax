@@ -143,7 +143,7 @@ public final class OriginalConfPretreatmentUtil
                 // 对每一个connection 上配置的table 项进行解析(已对表名称进行了 ` 处理的)
                 List<String> tables = connConf.getList(Key.TABLE, String.class);
 
-                List<String> expandedTables = TableExpandUtil.expandTableConf(tables);
+                List<String> expandedTables = TableExpandUtil.expandTableConf(dataBaseType, tables);
 
                 if (expandedTables.isEmpty()) {
                     throw AddaxException.asAddaxException(
@@ -201,7 +201,7 @@ public final class OriginalConfPretreatmentUtil
                                     "您的配置文件中的列配置信息有误. 因为根据您的配置，数据库表的列中存在多个*. 请检查您的配置并作出修改. ");
                         }
 
-                        quotedColumns.add(column);
+                        quotedColumns.add(dataBaseType.quoteColumnName(column));
                     }
 
                     originalConfig.set(Key.COLUMN_LIST, quotedColumns);
