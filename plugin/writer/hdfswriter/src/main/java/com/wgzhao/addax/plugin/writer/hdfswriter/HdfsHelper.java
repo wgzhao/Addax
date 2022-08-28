@@ -78,6 +78,7 @@ import java.math.BigDecimal;
 import java.nio.charset.StandardCharsets;
 import java.sql.Timestamp;
 import java.text.SimpleDateFormat;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Base64;
 import java.util.Date;
@@ -648,6 +649,14 @@ public class HdfsHelper
         return schema;
     }
 
+    /**
+     * write an orc record
+     * @param batch {@link VectorizedRowBatch}
+     * @param row row number
+     * @param record {@link Record}
+     * @param columns table columns, {@link List}
+     * @param taskPluginCollector {@link TaskPluginCollector}
+     */
     private void setRow(VectorizedRowBatch batch, int row, Record record, List<Configuration> columns,
             TaskPluginCollector taskPluginCollector)
     {
@@ -675,8 +684,10 @@ public class HdfsHelper
                     case INT:
                     case BIGINT:
                     case BOOLEAN:
-                    case DATE:
                         ((LongColumnVector) col).vector[row] = record.getColumn(i).asLong();
+                        break;
+                    case DATE:
+                        ((LongColumnVector) col).vector[row] = LocalDate.parse(record.getColumn(i).asString()).toEpochDay();
                         break;
                     case FLOAT:
                     case DOUBLE:
@@ -751,9 +762,6 @@ public class HdfsHelper
                 joiner.add(String.format("%s:%s(%s,%s)", column.getString(Key.NAME), "decimal",
                         column.getInt(Key.PRECISION, Constant.DEFAULT_DECIMAL_MAX_PRECISION),
                         column.getInt(Key.SCALE, Constant.DEFAULT_DECIMAL_MAX_SCALE)));
-            }
-            else if ("date".equalsIgnoreCase(column.getString(Key.TYPE))) {
-                joiner.add(String.format("%s:bigint", column.getString(Key.NAME)));
             }
             else {
                 joiner.add(String.format("%s:%s", column.getString(Key.NAME), column.getString(Key.TYPE)));
