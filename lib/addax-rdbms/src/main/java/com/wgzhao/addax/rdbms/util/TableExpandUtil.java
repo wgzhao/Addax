@@ -21,6 +21,8 @@
 
 package com.wgzhao.addax.rdbms.util;
 
+import javax.xml.crypto.Data;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Matcher;
@@ -89,12 +91,17 @@ public final class TableExpandUtil
         return splitTables;
     }
 
-    public static List<String> expandTableConf(List<String> tables)
+    public static List<String> expandTableConf(DataBaseType dataBaseType, List<String> tables)
     {
         List<String> parsedTables = new ArrayList<>();
         for (String table : tables) {
-            List<String> splitTables = splitTables(table);
-            parsedTables.addAll(splitTables);
+            if (table.startsWith("[") && dataBaseType == DataBaseType.SQLServer) {
+                //SQLServer allow the table or column name include comma(,), then quote with [
+                parsedTables.add(table);
+            } else {
+                List<String> splitTables = splitTables(table);
+                parsedTables.addAll(splitTables);
+            }
         }
 
         return parsedTables;

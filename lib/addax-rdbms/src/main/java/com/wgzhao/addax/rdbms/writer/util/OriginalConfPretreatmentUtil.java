@@ -113,7 +113,7 @@ public final class OriginalConfPretreatmentUtil
             }
 
             // 对每一个connection 上配置的table 项进行解析
-            List<String> expandedTables = TableExpandUtil.expandTableConf(tables);
+            List<String> expandedTables = TableExpandUtil.expandTableConf(dataBaseType, tables);
 
             if (expandedTables.isEmpty()) {
                 throw AddaxException.asAddaxException(DBUtilErrorCode.CONF_ERROR,

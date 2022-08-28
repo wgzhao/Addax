@@ -129,6 +129,25 @@ public enum DataBaseType
         return jdbc;
     }
 
+    public String quoteColumnName(String columnName)
+    {
+        if (this == MySql || this == Hive) {
+            return "`" + columnName.replace("`", "``") + "`";
+        }
+        if (this == Presto || this == Trino || this == Oracle) {
+            return columnName.startsWith("\"") ? columnName: "\"" + columnName + "\"";
+        }
+        if (this == SQLServer) {
+            return columnName.startsWith("[") ? columnName: "[" + columnName + "]";
+        }
+        return columnName;
+    }
+
+    public String quoteTableName(String tableName)
+    {
+        return quoteColumnName(tableName);
+    }
+
     public String getTypeName()
     {
         return typeName;
