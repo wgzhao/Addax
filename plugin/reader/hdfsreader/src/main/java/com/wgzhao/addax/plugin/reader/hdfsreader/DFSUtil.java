@@ -90,6 +90,7 @@ import java.util.Arrays;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Objects;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
@@ -137,6 +138,12 @@ public class DFSUtil
             this.kerberosKeytabFilePath = taskConfig.getString(Key.KERBEROS_KEYTAB_FILE_PATH);
             this.kerberosPrincipal = taskConfig.getString(Key.KERBEROS_PRINCIPAL);
             this.hadoopConf.set(HdfsConstant.HADOOP_SECURITY_AUTHENTICATION_KEY, "kerberos");
+            // fix Failed to specify server's Kerberos principal name
+            if (Objects.equals(hadoopConf.get("dfs.namenode.kerberos.principal", ""), "")) {
+                // get REALM
+                String serverPrincipal = "nn/_HOST@" + this.kerberosPrincipal.split("@")[1];
+                hadoopConf.set("dfs.namenode.kerberos.principal", serverPrincipal);
+            }
         }
         this.kerberosAuthentication(this.kerberosPrincipal, this.kerberosKeytabFilePath);
 
