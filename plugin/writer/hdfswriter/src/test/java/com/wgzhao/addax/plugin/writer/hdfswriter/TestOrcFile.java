@@ -40,6 +40,7 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.sql.Timestamp;
+import java.time.LocalDate;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
@@ -51,7 +52,7 @@ public class TestOrcFile
     public void TestOrcWrite()
             throws IOException
     {
-        TypeDescription schema = TypeDescription.fromString("struct<x:int,y:string,z:timestamp,b:binary,d:decimal(38,12)>");
+        TypeDescription schema = TypeDescription.fromString("struct<x:int,y:string,z:timestamp,b:binary,d:decimal(38,12),e:date>");
         File file = new File(filePath);
         if (file.exists()) {
             file.delete();
@@ -66,11 +67,14 @@ public class TestOrcFile
         TimestampColumnVector z = (TimestampColumnVector) batch.cols[2];
         BytesColumnVector b = (BytesColumnVector) batch.cols[3];
         DecimalColumnVector d = (DecimalColumnVector) batch.cols[4];
+        LongColumnVector e = (LongColumnVector) batch.cols[5];
+
         x.noNulls = false;
         y.noNulls = false;
         z.noNulls = false;
         b.noNulls = false;
         d.noNulls = false;
+        e.noNulls = false;
         int row ;
 
         // test non-null data
@@ -79,6 +83,7 @@ public class TestOrcFile
         y.setVal(row, "hello".getBytes(StandardCharsets.UTF_8));
         z.set(row, Timestamp.valueOf("2020-10-12 17:15:14"));
         b.setRef(row, image, 0, image.length);
+        e.vector[row] = LocalDate.parse("2022-08-22").toEpochDay();
         // test long type with null
         row = batch.size++;
         x.isNull[row] = true;
