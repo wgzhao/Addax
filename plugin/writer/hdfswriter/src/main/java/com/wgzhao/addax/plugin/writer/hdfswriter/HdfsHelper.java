@@ -21,6 +21,8 @@ package com.wgzhao.addax.plugin.writer.hdfswriter;
 
 import com.alibaba.fastjson2.JSON;
 import com.alibaba.fastjson2.JSONObject;
+import com.google.common.base.Splitter;
+import com.google.common.collect.Iterables;
 import com.wgzhao.addax.common.base.Constant;
 import com.wgzhao.addax.common.base.Key;
 import com.wgzhao.addax.common.element.Column;

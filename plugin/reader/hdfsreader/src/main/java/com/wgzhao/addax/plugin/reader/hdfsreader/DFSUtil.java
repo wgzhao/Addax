@@ -21,6 +21,8 @@ package com.wgzhao.addax.plugin.reader.hdfsreader;
 
 import com.alibaba.fastjson2.JSON;
 import com.alibaba.fastjson2.JSONObject;
+import com.google.common.base.Splitter;
+import com.google.common.collect.Iterables;
 import com.google.common.primitives.Ints;
 import com.google.common.primitives.Longs;
 import com.wgzhao.addax.common.base.Key;
@@ -141,7 +143,7 @@ public class DFSUtil
             // fix Failed to specify server's Kerberos principal name
             if (Objects.equals(hadoopConf.get("dfs.namenode.kerberos.principal", ""), "")) {
                 // get REALM
-                String serverPrincipal = "nn/_HOST@" + this.kerberosPrincipal.split("@")[1];
+                String serverPrincipal = "nn/_HOST@" + Iterables.get(Splitter.on('@').split(this.kerberosPrincipal), 1);
                 hadoopConf.set("dfs.namenode.kerberos.principal", serverPrincipal);
             }
         }
