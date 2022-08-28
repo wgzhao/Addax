@@ -147,7 +147,7 @@ public class DFSUtil
         }
         this.kerberosAuthentication(this.kerberosPrincipal, this.kerberosKeytabFilePath);
 
-        LOG.info("hadoopConfig details:{}", JSON.toJSONString(this.hadoopConf));
+        LOG.debug("hadoopConfig details:{}", JSON.toJSONString(this.hadoopConf));
     }
 
     private void kerberosAuthentication(String kerberosPrincipal, String kerberosKeytabFilePath)
