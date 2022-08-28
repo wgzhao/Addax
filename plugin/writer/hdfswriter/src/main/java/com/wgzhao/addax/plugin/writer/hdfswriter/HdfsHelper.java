@@ -299,7 +299,7 @@ public class HdfsHelper
             // fix Failed to specify server's Kerberos principal name
             if (Objects.equals(hadoopConf.get("dfs.namenode.kerberos.principal", ""), "")) {
                 // get REALM
-                String serverPrincipal = "nn/_HOST@" + this.kerberosPrincipal.split("@")[1];
+                String serverPrincipal = "nn/_HOST@" + Iterables.get(Splitter.on('@').split(this.kerberosPrincipal), 1);
                 hadoopConf.set("dfs.namenode.kerberos.principal", serverPrincipal);
             }
         }
