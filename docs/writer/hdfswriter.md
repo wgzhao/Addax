@@ -10,22 +10,23 @@ HdfsWriter 提供向HDFS文件系统指定路径中写入 `TEXTFile` ， `ORCFil
 
 ## 参数说明
 
-| 配置项                 | 是否必须 | 默认值              |   说明          |
-| :--------------------- | :------: | -------- |-------------------------  |
+| 配置项                 | 是否必须 | 默认值              | 说明                                                      |
+| :--------------------- | :------: | -------- |----------------------------------------------------------------|
 | path                   |    是    | 无        | 要读取的文件路径
 | defaultFS              |    是    | 无        | Hadoop hdfs 文件系统 `NAMENODE` 节点地址，如果配置了 HA 模式，则为 `defaultFS` 的值 |
-| fileType               |    是    | 无        | 文件的类型 |
+| fileType               |    是    | 无        | 文件的类型                                                          |
 | fileName               |    是    | 无        | 要写入的文件名，用于当作前缀
-| column                 |    是    | 无        | 写入的字段列表 |
-| writeMode              |    是    | 无        | 写入模式，支持 `append`, `overwrite`, `nonConflict` | 
-| fieldDelimiter         |    否    | `,`        | 指定文本文件（即`fileType` 指定为 `text`)的字段分隔符，二进制文件不需要指定该项 |
-| encoding               |    否    | `utf-8`    | 文件的编码配置， 目前仅支持 `utf-8` |
+| column                 |    是    | 无        | 写入的字段列表                                                        |
+| writeMode              |    是    | 无        | 写入模式，支持 `append`, `overwrite`, `nonConflict`                   |
+| skipTrash              |    否    | false     | 是否跳过垃圾回收站，和 `writeMode` 配置相关详见下面描述                             |
+| fieldDelimiter         |    否    | `,`        | 指定文本文件（即`fileType` 指定为 `text`)的字段分隔符，二进制文件不需要指定该项              |
+| encoding               |    否    | `utf-8`    | 文件的编码配置， 目前仅支持 `utf-8`                                         |
 | nullFormat             |    否    | 无         | 自定义哪些字符可以表示为空,例如如果用户配置: `"\\N"` ，那么如果源头数据是 `"\N"` ，视作 `null` 字段 |
-| haveKerberos           |    否    | 无         | 是否启用 Kerberos 认证，如果启用，则需要同时配置 `kerberosKeytabFilePath`，`kerberosPrincipal`  | 
-| kerberosKeytabFilePath |    否    | 无         | 用于 Kerberos 认证的凭证文件路径, 比如 `/your/path/addax.service.keytab` |
+| haveKerberos           |    否    | 无         | 是否启用 Kerberos 认证，如果启用，则需要同时配置 `kerberosKeytabFilePath`，`kerberosPrincipal` |
+| kerberosKeytabFilePath |    否    | 无         | 用于 Kerberos 认证的凭证文件路径, 比如 `/your/path/addax.service.keytab`    |
 | kerberosPrincipal      |    否    | 无         | 用于 Kerberos 认证的凭证主体, 比如 `addax/node1@WGZHAO.COM`
-| compress               |    否    | 无         | 文件的压缩格式 | 
-| hadoopConfig           |    否    | 无         | 里可以配置与 Hadoop 相关的一些高级参数，比如HA的配置 |
+| compress               |    否    | 无         | 文件的压缩格式                                                        |
+| hadoopConfig           |    否    | 无         | 里可以配置与 Hadoop 相关的一些高级参数，比如HA的配置                                |
 
 ### path
 
@@ -85,6 +86,13 @@ Hadoop hdfs文件系统 namenode 节点地址。格式：`hdfs://ip:port` ；例
 - append，写入前不做任何处理，直接使用 `filename` 写入，并保证文件名不冲突。
 - overwrite 如果写入目录存在数据，则先删除，后写入
 - nonConflict，如果目录下有 `fileName` 前缀的文件，直接报错。
+
+### skipTrash
+
+当 `writeMode` 为 `overwrite` 模式时，当前要删除的文件或文件夹是否进入回收站，默认为进回收站，仅当配置为 `true` 时为直接删除。
+刚功能的实现方式为获取 Hadoop HDFS 的  `fs.trash.interval` 参数，如果该参数没有设置，或设置为0时，会在删除时，设置该参数为 10080 ，表示 7 天。
+这样，进入回收站的文件会保留7天。
+修改删除的默认行为是为了给因为错误的采集而导致删除的数据有挽回的机会。
 
 #### compress
 
