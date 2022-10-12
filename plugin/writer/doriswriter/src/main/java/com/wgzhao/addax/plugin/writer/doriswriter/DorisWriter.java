@@ -82,14 +82,14 @@ public class DorisWriter
     public static class Task
             extends Writer.Task
     {
-        private DorisWriterTask DorisWriterTask;
+        private DorisWriterTask dorisWriterTask;
 
         @Override
         public void init()
         {
             Configuration writerSliceConfig = getPluginJobConf();
-            this.DorisWriterTask = new DorisWriterTask(writerSliceConfig);
-            this.DorisWriterTask.init();
+            this.dorisWriterTask = new DorisWriterTask(writerSliceConfig);
+            this.dorisWriterTask.init();
         }
 
         @Override
@@ -100,7 +100,7 @@ public class DorisWriter
 
         public void startWrite(RecordReceiver recordReceiver)
         {
-            this.DorisWriterTask.startWrite(recordReceiver, getTaskPluginCollector());
+            this.dorisWriterTask.startWrite(recordReceiver, getTaskPluginCollector());
         }
 
         @Override
