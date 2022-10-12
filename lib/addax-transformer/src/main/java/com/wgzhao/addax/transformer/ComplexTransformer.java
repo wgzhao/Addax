@@ -23,10 +23,6 @@ import com.wgzhao.addax.common.element.Record;
 
 import java.util.Map;
 
-/**
- * no comments.
- * Created by liqiang on 16/3/3.
- */
 public abstract class ComplexTransformer
 {
     //transformerName的唯一性在 addax 中检查，或者提交到插件中心检查。
@@ -43,6 +39,7 @@ public abstract class ComplexTransformer
     }
 
     /**
+     * abstract class
      * @param record 行记录，UDF进行record的处理后，更新相应的record
      * @param tContext transformer运行的配置项
      * @param paras transformer函数参数

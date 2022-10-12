@@ -22,7 +22,7 @@ package com.wgzhao.addax.common.exception;
 import com.wgzhao.addax.common.spi.ErrorCode;
 
 /**
- *
+ * general Column Error code
  */
 public enum ColumnErrorCode
         implements ErrorCode
