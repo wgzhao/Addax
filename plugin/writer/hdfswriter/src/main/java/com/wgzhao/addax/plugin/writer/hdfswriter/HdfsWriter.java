@@ -53,6 +53,8 @@ public class HdfsWriter
     {
         private static final Logger LOG = LoggerFactory.getLogger(Job.class);
 
+        private static final String SKIP_TRASH = "skipTrash";
+
         // 写入文件的临时目录，完成写入后，该目录需要删除
         private String tmpStorePath;
         private Configuration writerSliceConfig = null;
@@ -61,6 +63,9 @@ public class HdfsWriter
         private String fileName;
         private String writeMode;
         private HdfsHelper hdfsHelper = null;
+
+        // option bypasses trash, if enabled, and immediately deletes
+        private boolean skipTrash = false;
 
         public static final Set<String> SUPPORT_FORMAT = new HashSet<>(Arrays.asList("ORC", "PARQUET", "TEXT"));
 
@@ -188,6 +193,9 @@ public class HdfsWriter
                 throw AddaxException.asAddaxException(HdfsWriterErrorCode.ILLEGAL_VALUE,
                         String.format("不支持您配置的编码格式:[%s]", encoding), e);
             }
+
+            // trash
+            this.skipTrash = this.writerSliceConfig.getBool(SKIP_TRASH, false);
         }
 
         @Override
@@ -227,7 +235,7 @@ public class HdfsWriter
         public void post()
         {
             if ("overwrite".equals(writeMode)) {
-                hdfsHelper.deleteFilesFromDir(new Path(path));
+                hdfsHelper.deleteFilesFromDir(new Path(path), this.skipTrash);
             }
 
             hdfsHelper.moveFilesToDest(new Path(this.tmpStorePath), new Path(this.path));
