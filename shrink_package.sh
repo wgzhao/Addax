@@ -39,7 +39,7 @@ do
 done
 
 # create archive package
-cd ..
+cd target/addax
 # should be in target/addax/
 # get archive name including version
 archive_name=$(basename $TMPDIR)
