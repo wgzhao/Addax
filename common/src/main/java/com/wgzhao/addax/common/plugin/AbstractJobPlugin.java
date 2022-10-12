@@ -27,15 +27,13 @@ public abstract class AbstractJobPlugin
 {
     private JobPluginCollector jobPluginCollector;
 
-    /**
-     * @return the jobPluginCollector
-     */
     public JobPluginCollector getJobPluginCollector()
     {
         return jobPluginCollector;
     }
 
     /**
+     * Set JobPluginCollector class
      * @param jobPluginCollector the jobPluginCollector to set
      */
     public void setJobPluginCollector(

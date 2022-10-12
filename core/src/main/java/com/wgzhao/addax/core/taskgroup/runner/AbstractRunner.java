@@ -109,17 +109,11 @@ public abstract class AbstractRunner
         this.runnerCommunication.setThrowable(throwable);
     }
 
-    /**
-     * @return the taskGroupId
-     */
     public int getTaskGroupId()
     {
         return taskGroupId;
     }
 
-    /**
-     * @param taskGroupId the taskGroupId to set
-     */
     public void setTaskGroupId(int taskGroupId)
     {
         this.taskGroupId = taskGroupId;

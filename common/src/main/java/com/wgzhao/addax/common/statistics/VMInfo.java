@@ -109,6 +109,7 @@ public class VMInfo
     }
 
     /**
+     * static method, get vm information and returns
      * @return null or vmInfo. null is something error, job no care it.
      */
     public static synchronized VMInfo getVmInfo()
