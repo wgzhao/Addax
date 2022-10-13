@@ -33,7 +33,7 @@ public enum State
     SUCCEEDED(70),
     ;
 
-    int value;
+    private final int value;
 
     State(int value)
     {
