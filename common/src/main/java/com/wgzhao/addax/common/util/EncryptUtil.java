@@ -55,7 +55,7 @@ public class EncryptUtil
             ivSpec = new IvParameterSpec(iv);
             pbeCipher = Cipher.getInstance("AES/CBC/PKCS5Padding");
             SecretKeyFactory keyFactory = SecretKeyFactory.getInstance("PBKDF2WithHmacSHA512");
-            PBEKeySpec keySpec = new PBEKeySpec(SECRET_KEY.toCharArray(), SALT.getBytes(), iterationCount, keyLength);
+            PBEKeySpec keySpec = new PBEKeySpec(SECRET_KEY.toCharArray(), SALT.getBytes(StandardCharsets.UTF_8), iterationCount, keyLength);
             SecretKey keyTmp = keyFactory.generateSecret(keySpec);
             secSpec = new SecretKeySpec(keyTmp.getEncoded(), "AES");
         }
