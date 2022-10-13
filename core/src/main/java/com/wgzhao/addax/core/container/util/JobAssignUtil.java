@@ -25,6 +25,7 @@ import com.wgzhao.addax.core.util.container.CoreConstant;
 import org.apache.commons.lang3.Validate;
 import org.apache.commons.lang3.StringUtils;
 
+import java.security.SecureRandom;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.LinkedHashMap;
@@ -77,7 +78,7 @@ public final class JobAssignUtil
                         CommonConstant.LOAD_BALANCE_RESOURCE_MARK, "aFakeResourceMarkForLoadBalance");
             }
             // 是为了避免某些插件没有设置 资源标识 而进行了一次随机打乱操作
-            Collections.shuffle(contentConfig, new Random(System.currentTimeMillis()));
+            Collections.shuffle(contentConfig, new SecureRandom());
         }
 
         LinkedHashMap<String, List<Integer>> resourceMarkAndTaskIdMap = parseAndGetResourceMarkAndTaskIdMap(contentConfig);
