@@ -9,6 +9,7 @@ import org.apache.http.client.config.RequestConfig;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPut;
+import org.apache.http.client.utils.URIBuilder;
 import org.apache.http.entity.ByteArrayEntity;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.DefaultRedirectStrategy;
@@ -20,6 +21,7 @@ import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.net.HttpURLConnection;
+import java.net.URISyntaxException;
 import java.net.URL;
 import java.nio.ByteBuffer;
 import java.nio.charset.Charset;
@@ -154,7 +156,9 @@ public class StarRocksStreamLoadVisitor
                 break;
             }
             try (CloseableHttpClient httpclient = HttpClients.createDefault()) {
-                HttpGet httpGet = new HttpGet(new StringBuilder(host).append("/api/").append(writerOptions.getDatabase()).append("/get_load_state?label=").append(label).toString());
+                URIBuilder uriBuilder = new URIBuilder(host + "/api/" + writerOptions.getDatabase() + "/get_load_state");
+                uriBuilder.addParameter("label", label);
+                HttpGet httpGet = new HttpGet(uriBuilder.build().toString());
                 httpGet.setHeader("Authorization", getBasicAuthHeader(writerOptions.getUsername(), writerOptions.getPassword()));
                 httpGet.setHeader("Connection", "close");
 
@@ -186,6 +190,8 @@ public class StarRocksStreamLoadVisitor
                                     "label[%s] state[%s]\n", label, labelState), null);
                     }
                 }
+            } catch (URISyntaxException e) {
+                throw new RuntimeException(e);
             }
         }
     }
