@@ -57,10 +57,12 @@ public class HostUtils
                 if (process.waitFor() == 0) {
                     ip = new String(IOUtils.toByteArray(process.getInputStream()), StandardCharsets.UTF_8);
                 }
+                process.destroy();
                 process = Runtime.getRuntime().exec("hostname");
                 if (process.waitFor() == 0) {
                     hostname = (new String(IOUtils.toByteArray(process.getInputStream()), StandardCharsets.UTF_8)).trim();
                 }
+                process.destroy();
             }
             catch (Exception e) {
                 log.warn("get hostname failed {}", e.getMessage());
