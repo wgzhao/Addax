@@ -57,7 +57,6 @@ import org.slf4j.LoggerFactory;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
@@ -324,7 +323,7 @@ public class TaskGroupContainer
 
     private List<Configuration> buildRemainTasks(List<Configuration> configurations)
     {
-        return new LinkedList<>(configurations);
+        return new ArrayList<>(configurations);
     }
 
     private TaskExecutor removeTask(List<TaskExecutor> taskList, int taskId)

@@ -34,10 +34,7 @@ import org.influxdb.dto.Query;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Vector;
+import java.util.*;
 import java.util.concurrent.TimeUnit;
 
 public class InfluxDBWriterTask
@@ -57,7 +54,7 @@ public class InfluxDBWriterTask
         public String type;
         public boolean isTime;
     }
-    protected Vector<PointColumnDefine> columns = new Vector<>();
+    protected List<PointColumnDefine> columns = new ArrayList<>();
 
     private final int columnNumber;
     private final int batchSize;
@@ -106,7 +103,7 @@ public class InfluxDBWriterTask
                 columnDefine.type = type.toUpperCase();
             }
 
-            this.columns.addElement(columnDefine);
+            this.columns.add(columnDefine);
         }
         if (!foundTimeColumn) {
             LOG.warn("your column config not have time");
@@ -135,7 +132,7 @@ public class InfluxDBWriterTask
         Pong pong = influxDB.ping();
         LOG.info("ping influxdb: {} with username: {}, pong:{}", endpoint, username, pong.toString());
         if (this.retentionPolicy != null) {
-            //create cutom retention policy
+            //create custom retention policy
             String rpName = this.retentionPolicy.getString(InfluxDBKey.RP_NAME, "rp");
             String duration = this.retentionPolicy.getString(InfluxDBKey.RP_DURATION, "1d");
             int replication = this.retentionPolicy.getInt(InfluxDBKey.RP_REPLICATION, 1);
