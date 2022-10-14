@@ -383,7 +383,7 @@ public class TaskGroupContainer
             }
         }
         catch (Exception e) {
-            e.printStackTrace();
+            LOG.error("Unknown checked exception occurred: ", e);
         }
     }
 

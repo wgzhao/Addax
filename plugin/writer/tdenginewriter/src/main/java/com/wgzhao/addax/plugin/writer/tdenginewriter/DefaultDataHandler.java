@@ -83,7 +83,7 @@ public class DefaultDataHandler
             Class.forName("com.taosdata.jdbc.rs.RestfulDriver");
         }
         catch (ClassNotFoundException e) {
-            e.printStackTrace();
+           LOG.error(e.getMessage());
         }
     }
 
