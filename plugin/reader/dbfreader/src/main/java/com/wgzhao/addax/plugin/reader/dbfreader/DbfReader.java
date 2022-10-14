@@ -221,7 +221,7 @@ public class DbfReader
                     }
                 }
                 catch (FileNotFoundException e) {
-                    e.printStackTrace();
+                    LOG.error("FileNotFoundException occurred: ", e);
                 }
             }
             LOG.debug("end reading dbf files...");
