@@ -49,7 +49,7 @@ public enum DataBaseType
 
     private static final Pattern jdbcUrlPattern = Pattern.compile("jdbc:\\w+:(?:thin:url=|//|thin:@|)([\\w\\d.,]+).*");
 
-    private String driverClassName;
+    private final String driverClassName;
     private final String typeName;
 
     DataBaseType(String typeName, String driverClassName)
