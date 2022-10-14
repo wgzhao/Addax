@@ -29,10 +29,8 @@ import java.security.SecureRandom;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.LinkedHashMap;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-import java.util.Random;
 
 public final class JobAssignUtil
 {
@@ -124,12 +122,12 @@ public final class JobAssignUtil
             int taskId = aTaskConfig.getInt(CoreConstant.TASK_ID);
             // 把 readerResourceMark 加到 readerResourceMarkAndTaskIdMap 中
             String readerResourceMark = aTaskConfig.getString(CoreConstant.JOB_READER_PARAMETER + "." + CommonConstant.LOAD_BALANCE_RESOURCE_MARK);
-            readerResourceMarkAndTaskIdMap.computeIfAbsent(readerResourceMark, k -> new LinkedList<>());
+            readerResourceMarkAndTaskIdMap.computeIfAbsent(readerResourceMark, k -> new ArrayList<>());
             readerResourceMarkAndTaskIdMap.get(readerResourceMark).add(taskId);
 
             // 把 writerResourceMark 加到 writerResourceMarkAndTaskIdMap 中
             String writerResourceMark = aTaskConfig.getString(CoreConstant.JOB_WRITER_PARAMETER + "." + CommonConstant.LOAD_BALANCE_RESOURCE_MARK);
-            writerResourceMarkAndTaskIdMap.computeIfAbsent(writerResourceMark, k -> new LinkedList<>());
+            writerResourceMarkAndTaskIdMap.computeIfAbsent(writerResourceMark, k -> new ArrayList<>());
             writerResourceMarkAndTaskIdMap.get(writerResourceMark).add(taskId);
         }
 
@@ -172,11 +170,11 @@ public final class JobAssignUtil
         Configuration taskGroupTemplate = jobConfiguration.clone();
         taskGroupTemplate.remove(CoreConstant.JOB_CONTENT);
 
-        List<Configuration> result = new LinkedList<>();
+        List<Configuration> result = new ArrayList<>();
 
         List<List<Configuration>> taskGroupConfigList = new ArrayList<>(taskGroupNumber);
         for (int i = 0; i < taskGroupNumber; i++) {
-            taskGroupConfigList.add(new LinkedList<>());
+            taskGroupConfigList.add(new ArrayList<>());
         }
 
         int mapValueMaxLength = -1;
