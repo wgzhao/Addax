@@ -23,7 +23,7 @@ package com.wgzhao.addax.plugin.reader.datareader.util;
 
 import org.apache.commons.lang3.RandomStringUtils;
 
-import java.util.Random;
+import java.security.SecureRandom;
 
 /**
  * generate bank info
@@ -32,7 +32,7 @@ import java.util.Random;
  */
 public class BankUtil
 {
-    private static final Random RANDOM = new Random();
+    private static final SecureRandom RANDOM = new SecureRandom();
 
     private static final String[] BANKS = {
             "北京银行", "天津银行", "沧州银行", "承德银行", "廊坊银行", "秦皇岛商行", "河北银行", "唐山商行", "张家口商行", "邢台商行", "保定商行",
