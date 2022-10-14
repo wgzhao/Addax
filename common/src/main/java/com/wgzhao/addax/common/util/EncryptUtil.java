@@ -28,6 +28,9 @@
 
 package com.wgzhao.addax.common.util;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import javax.crypto.Cipher;
 import javax.crypto.SecretKey;
 import javax.crypto.SecretKeyFactory;
@@ -42,6 +45,8 @@ public class EncryptUtil
 {
     private static final String SECRET_KEY = "F3M0PxSWod6cyCejYUkpccU9gMsWwgrM";
     private static final String SALT = "G2PuhRinJqKKFcBUT4eMaK3FKMx9iGmx";
+
+    private static final Logger logger = LoggerFactory.getLogger(EncryptUtil.class);
 
     private static final byte[] iv = {1, 1, 4, 5, 1, 5, 0, 6, 0, 1, 8, 9, 6, 4, 0, 0};
     private static IvParameterSpec ivSpec;
@@ -60,7 +65,7 @@ public class EncryptUtil
             secSpec = new SecretKeySpec(keyTmp.getEncoded(), "AES");
         }
         catch (Exception e) {
-            e.printStackTrace();
+            logger.error("Unknown checked exception occurred: ", e);
         }
     }
 

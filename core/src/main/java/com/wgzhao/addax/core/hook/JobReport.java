@@ -30,6 +30,8 @@ import org.apache.http.impl.nio.reactor.DefaultConnectingIOReactor;
 import org.apache.http.impl.nio.reactor.IOReactorConfig;
 import org.apache.http.nio.reactor.ConnectingIOReactor;
 import org.apache.http.nio.reactor.IOReactorException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * 将统计上报到指定的接口上
@@ -41,6 +43,8 @@ public class JobReport
 {
 
     private static CloseableHttpAsyncClient client = null;
+
+    private static final Logger logger = LoggerFactory.getLogger(JobReport.class);
 
     private JobReport() {}
 
@@ -66,7 +70,7 @@ public class JobReport
                         ioReactor = new DefaultConnectingIOReactor(ioReactorConfig);
                     }
                     catch (IOReactorException e) {
-                        e.printStackTrace();
+                        logger.error(e.getMessage());
                     }
                     assert ioReactor != null;
                     PoolingNHttpClientConnectionManager connManager = new PoolingNHttpClientConnectionManager(ioReactor);

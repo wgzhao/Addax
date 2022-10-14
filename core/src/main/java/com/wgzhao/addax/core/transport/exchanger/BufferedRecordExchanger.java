@@ -31,6 +31,8 @@ import com.wgzhao.addax.core.transport.record.TerminateRecord;
 import com.wgzhao.addax.core.util.FrameworkErrorCode;
 import com.wgzhao.addax.core.util.container.CoreConstant;
 import org.apache.commons.lang3.Validate;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -46,6 +48,8 @@ public class BufferedRecordExchanger
     private final List<Record> buffer;
     private final AtomicInteger memoryBytes = new AtomicInteger(0);
     private final TaskPluginCollector pluginCollector;
+
+    private static final Logger logger = LoggerFactory.getLogger(BufferedRecordExchanger.class);
     private int bufferSize;
     private int bufferIndex = 0;
     private volatile boolean shutdown = false;
@@ -164,7 +168,7 @@ public class BufferedRecordExchanger
             channel.clear();
         }
         catch (Throwable t) {
-            t.printStackTrace();
+            logger.error(t.getMessage());
         }
     }
 
