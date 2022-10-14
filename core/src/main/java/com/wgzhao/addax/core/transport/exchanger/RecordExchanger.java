@@ -78,7 +78,7 @@ public class RecordExchanger
     public Record createRecord()
     {
         try {
-            return RECORD_CLASS.newInstance();
+            return RECORD_CLASS.getConstructor().newInstance();
         }
         catch (Exception e) {
             throw AddaxException.asAddaxException(

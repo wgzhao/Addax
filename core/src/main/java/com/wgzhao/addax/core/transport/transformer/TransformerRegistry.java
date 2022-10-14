@@ -102,7 +102,7 @@ public class TransformerRegistry
 
         try (JarLoader jarLoader = new JarLoader(new String[] {transformerPath})) {
             Class<?> transformerClass = jarLoader.loadClass(className);
-            Object transformer = transformerClass.newInstance();
+            Object transformer = transformerClass.getConstructor().newInstance();
             if (ComplexTransformer.class.isAssignableFrom(transformer.getClass())) {
                 ((ComplexTransformer) transformer).setTransformerName(each);
                 registryComplexTransformer((ComplexTransformer) transformer, jarLoader, false);
