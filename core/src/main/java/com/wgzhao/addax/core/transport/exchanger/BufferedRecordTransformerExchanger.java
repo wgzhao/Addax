@@ -88,7 +88,7 @@ public class BufferedRecordTransformerExchanger
     public Record createRecord()
     {
         try {
-            return BufferedRecordTransformerExchanger.RECORD_CLASS.newInstance();
+            return BufferedRecordTransformerExchanger.RECORD_CLASS.getConstructor().newInstance();
         }
         catch (Exception e) {
             throw AddaxException.asAddaxException(

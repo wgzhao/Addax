@@ -83,7 +83,7 @@ public class GroovyTransformer
         }
 
         try {
-            Object t = groovyClass.newInstance();
+            Object t = groovyClass.getConstructor().newInstance();
             if (!(t instanceof Transformer)) {
                 throw AddaxException.asAddaxException(
                         TransformerErrorCode.TRANSFORMER_GROOVY_INIT_EXCEPTION,

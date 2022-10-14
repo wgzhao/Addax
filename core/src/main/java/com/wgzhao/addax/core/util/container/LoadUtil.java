@@ -102,7 +102,7 @@ public class LoadUtil
         Class<? extends AbstractPlugin> clazz = LoadUtil.loadPluginClass(pluginType, pluginName, ContainerType.Job, jobId);
 
         try {
-            AbstractJobPlugin jobPlugin = (AbstractJobPlugin) clazz.newInstance();
+            AbstractJobPlugin jobPlugin = (AbstractJobPlugin) clazz.getConstructor().newInstance();
             jobPlugin.setPluginConf(getPluginConf(pluginType, pluginName, jobId));
             return jobPlugin;
         }
@@ -121,7 +121,7 @@ public class LoadUtil
         Class<? extends AbstractPlugin> clazz = LoadUtil.loadPluginClass(pluginType, pluginName, ContainerType.Task, jobId);
 
         try {
-            AbstractTaskPlugin taskPlugin = (AbstractTaskPlugin) clazz.newInstance();
+            AbstractTaskPlugin taskPlugin = (AbstractTaskPlugin) clazz.getConstructor().newInstance();
             taskPlugin.setPluginConf(getPluginConf(pluginType, pluginName, jobId));
             return taskPlugin;
         }

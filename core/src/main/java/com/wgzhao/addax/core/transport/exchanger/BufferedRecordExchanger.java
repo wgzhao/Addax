@@ -82,7 +82,7 @@ public class BufferedRecordExchanger
     public Record createRecord()
     {
         try {
-            return BufferedRecordExchanger.recordClass.newInstance();
+            return BufferedRecordExchanger.recordClass.getConstructor().newInstance();
         }
         catch (Exception e) {
             throw AddaxException.asAddaxException(FrameworkErrorCode.CONFIG_ERROR, e);
