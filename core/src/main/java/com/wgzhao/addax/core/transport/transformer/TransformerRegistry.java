@@ -25,6 +25,7 @@ import com.wgzhao.addax.core.util.container.CoreConstant;
 import com.wgzhao.addax.core.util.container.JarLoader;
 import com.wgzhao.addax.transformer.ComplexTransformer;
 import com.wgzhao.addax.transformer.Transformer;
+import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -122,7 +123,7 @@ public class TransformerRegistry
 
     private static Configuration loadTransFormerConfig(String transformerPath)
     {
-        return Configuration.from(new File(transformerPath + File.separator + "transformer.json"));
+        return Configuration.from(new File(FilenameUtils.getPath(transformerPath) + File.separator + "transformer.json"));
     }
 
     public static TransformerInfo getTransformer(String transformerName)
