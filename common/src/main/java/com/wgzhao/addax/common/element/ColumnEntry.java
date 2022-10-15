@@ -19,7 +19,6 @@
 
 package com.wgzhao.addax.common.element;
 
-import com.alibaba.fastjson2.JSON;
 import org.apache.commons.lang3.StringUtils;
 
 import java.text.DateFormat;
@@ -32,11 +31,6 @@ public class ColumnEntry
     private String value;
     private String format;
     private DateFormat dateParse;
-
-    public static String toJSONString(ColumnEntry columnEntry)
-    {
-        return JSON.toJSONString(columnEntry);
-    }
 
     public Integer getIndex()
     {
@@ -86,8 +80,4 @@ public class ColumnEntry
         return this.dateParse;
     }
 
-    public String toJSONString()
-    {
-        return ColumnEntry.toJSONString(this);
-    }
 }
