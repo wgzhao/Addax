@@ -39,6 +39,7 @@ import javax.crypto.spec.PBEKeySpec;
 import javax.crypto.spec.SecretKeySpec;
 
 import java.nio.charset.StandardCharsets;
+import java.security.SecureRandom;
 import java.util.Base64;
 
 public class EncryptUtil
@@ -48,7 +49,6 @@ public class EncryptUtil
 
     private static final Logger logger = LoggerFactory.getLogger(EncryptUtil.class);
 
-    private static final byte[] iv = {1, 1, 4, 5, 1, 5, 0, 6, 0, 1, 8, 9, 6, 4, 0, 0};
     private static IvParameterSpec ivSpec;
     private static SecretKeySpec secSpec;
     private static Cipher pbeCipher;
@@ -57,6 +57,8 @@ public class EncryptUtil
         try {
             final int iterationCount = 40000;
             final int keyLength = 128;
+            byte[] iv = new byte[16];
+            new SecureRandom().nextBytes(iv);
             ivSpec = new IvParameterSpec(iv);
             pbeCipher = Cipher.getInstance("AES/GCM/NoPadding");
             SecretKeyFactory keyFactory = SecretKeyFactory.getInstance("PBKDF2WithHmacSHA512");
