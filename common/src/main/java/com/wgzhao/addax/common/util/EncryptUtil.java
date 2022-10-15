@@ -58,7 +58,7 @@ public class EncryptUtil
             final int iterationCount = 40000;
             final int keyLength = 128;
             ivSpec = new IvParameterSpec(iv);
-            pbeCipher = Cipher.getInstance("AES/CBC/PKCS5Padding");
+            pbeCipher = Cipher.getInstance("AES/GCM/NoPadding");
             SecretKeyFactory keyFactory = SecretKeyFactory.getInstance("PBKDF2WithHmacSHA512");
             PBEKeySpec keySpec = new PBEKeySpec(SECRET_KEY.toCharArray(), SALT.getBytes(StandardCharsets.UTF_8), iterationCount, keyLength);
             SecretKey keyTmp = keyFactory.generateSecret(keySpec);
