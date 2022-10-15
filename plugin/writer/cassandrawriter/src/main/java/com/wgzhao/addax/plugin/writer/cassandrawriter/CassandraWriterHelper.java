@@ -253,8 +253,9 @@ public class CassandraWriterHelper
                 }
                 return t;
             }
+            default:
+                return null;
         }
-        return null;
     }
 
     public static void setupColumn(BoundStatement ps, int pos, DataType sqlType, Column col)
