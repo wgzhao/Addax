@@ -24,7 +24,7 @@ target="$(dirname $0)/target"
 TMPDIR=$(ls -d -w1 target/addax/addax-*)
 [ -n "$TMPDIR" ] || exit 2
 
-cd ${TMPDIR}
+cd ${TMPDIR} || exit 3
 # should be in target/addax/addax-<version>
 [ -d shared ] || mkdir shared
 

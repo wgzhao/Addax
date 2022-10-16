@@ -134,7 +134,7 @@ function list_all_plugin_names() {
     do
         echo " $(basename ${i})"
     done
-    echo 
+    echo
     echo "Reader Plugins:"
     for i in plugin/writer/*
     do
@@ -189,9 +189,9 @@ if [ "$1" = "gen" ]; then
             }
         },
         "content": [{
-            "reader": 
+            "reader":
                 $reader_content ,
-            "writer": 
+            "writer":
                 $writer_content
         }]
       }
@@ -203,7 +203,7 @@ fi
 # OS detect
 os=$(uname -s)
 has_get_opt=$(which getopt 2>/dev/null)
-if [ "x${os}" = "xDarwin" -o "x${has_get_opt}" = "x" ]; then
+if [ "${os}" = "Darwin" -o -z "${has_get_opt}" ]; then
     while getopts 'hj:p:l:vdL:' option; do
         case "$option" in
         h) usage ;;
