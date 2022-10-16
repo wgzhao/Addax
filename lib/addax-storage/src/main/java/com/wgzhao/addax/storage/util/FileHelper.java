@@ -100,10 +100,15 @@ public class FileHelper
     {
         try {
             InputStream inputStream = new FileInputStream(fileName);
-            return getFileCompressType(inputStream);
+            String fileType =  getFileCompressType(inputStream);
+            inputStream.close();
+            return fileType;
         }
         catch (FileNotFoundException e) {
             throw new RuntimeException("File not found: " + fileName, e);
+        }
+        catch (IOException e) {
+            throw new RuntimeException("close file failed: ", e);
         }
     }
 
