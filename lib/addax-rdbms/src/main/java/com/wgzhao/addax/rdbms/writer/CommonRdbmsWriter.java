@@ -451,6 +451,7 @@ public class CommonRdbmsWriter
         protected PreparedStatement fillPreparedStatement(PreparedStatement preparedStatement, Record record)
                 throws SQLException
         {
+            LOG.debug("Record info: {}", record);
             for (int i = 1, len = record.getColumnNumber(); i <= len; i++) {
                 int columnSqlType = (int) this.resultSetMetaData.get(i).get("type");
                 preparedStatement = fillPreparedStatementColumnType(preparedStatement, i, columnSqlType, record.getColumn(i - 1));
