@@ -32,6 +32,7 @@
 11. redisreader
 12. sqlitereader
 13. tdenginereader
+14. kafkareader
 
 ### writer plugin
 

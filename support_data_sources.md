@@ -20,6 +20,7 @@ Addax supports the following Data Sources:
 | InfluxDB            | ✓      | ✓     | influxdbreader/influxdbwriter           | ONLY support InfluxDB 1.x       |
 | InfluxDB2           | ✓      | ✓     | influxdb2reader/influxdb2writer         | ONLY InfluxDB 2.0 or later      |
 | json                | ✓      | x     | jsonfilereader                          |                                 |
+| Kafka               | ✓      | ✓     | kafkareader/kafkawriter                 |                                 |
 | kudu                | ✓      | ✓     | kudureader/kuduwriter                   |                                 |
 | MongoDB             | ✓      | ✓     | mongodbreader/mongodbwriter             |                                 |
 | MySQL/MariaDB       | ✓      | ✓     | mysqlreader/mysqlwriter                 |                                 |
