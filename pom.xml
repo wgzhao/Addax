@@ -170,6 +170,7 @@
                 <module>plugin/reader/httpreader</module>
                 <module>plugin/reader/influxdbreader</module>
                 <module>plugin/reader/influxdb2reader</module>
+                <module>plugin/reader/kafkareader</module>
                 <module>plugin/reader/kudureader</module>
                 <module>plugin/reader/jsonfilereader</module>
                 <module>plugin/reader/mongodbreader</module>

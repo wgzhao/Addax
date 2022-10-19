@@ -1,0 +1,6 @@
+{
+  "name": "kafkareader",
+  "class": "com.wgzhao.addax.plugin.reader.kafkareader.KafkaReader",
+  "description": "read specified kafka topic",
+  "developer": "wgzhao"
+}
