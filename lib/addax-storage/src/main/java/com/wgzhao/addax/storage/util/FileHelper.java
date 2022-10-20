@@ -24,6 +24,7 @@ import com.wgzhao.addax.common.compress.ZipCycleInputStream;
 import org.apache.commons.compress.compressors.CompressorException;
 import org.apache.commons.compress.compressors.CompressorInputStream;
 import org.apache.commons.compress.compressors.CompressorStreamFactory;
+import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.slf4j.Logger;
@@ -46,6 +47,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
 import java.util.regex.Pattern;
 
@@ -99,7 +101,7 @@ public class FileHelper
     public static String getFileCompressType(String fileName)
     {
         try {
-            InputStream inputStream = new FileInputStream(fileName);
+            InputStream inputStream = new FileInputStream(FilenameUtils.getFullPath(fileName));
             String fileType =  getFileCompressType(inputStream);
             inputStream.close();
             return fileType;
@@ -148,7 +150,7 @@ public class FileHelper
     {
         FileInputStream inputStream;
         try {
-            inputStream = new FileInputStream(fileName);
+            inputStream = new FileInputStream(FilenameUtils.getFullPath(fileName));
         }
         catch (FileNotFoundException e) {
             // warn: sock 文件无法read,能影响所有文件的传输,需要用户自己保证
@@ -197,7 +199,7 @@ public class FileHelper
 
     private static boolean checkFilePermission(String fileName, String permission)
     {
-        File file = new File(fileName);
+        File file = new File(FilenameUtils.getFullPath(fileName));
         if (!file.exists()) {
             throw new RuntimeException("file not exists: " + fileName);
         }
@@ -215,7 +217,7 @@ public class FileHelper
 
     private static boolean checkDirPermission(String directory, String permission)
     {
-        File file = new File(directory);
+        File file = new File(FilenameUtils.getFullPath(directory));
         if (!file.exists()) {
             throw new RuntimeException("directory not exists: " + directory);
         }
@@ -233,14 +235,14 @@ public class FileHelper
 
     public static List<String> getAllFiles(String directory)
     {
-        File file = new File(directory);
+        File file = new File(FilenameUtils.getFullPath(directory));
         if (!file.exists()) {
             return Collections.emptyList();
         }
         if (!file.isDirectory()) {
             return Collections.emptyList();
         }
-        return Arrays.asList(file.list());
+        return Arrays.asList(Objects.requireNonNull(file.list()));
     }
 
     public static List<String> getAllFiles(List<String> directories)
