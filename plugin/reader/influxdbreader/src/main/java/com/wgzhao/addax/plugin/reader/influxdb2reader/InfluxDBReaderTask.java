@@ -196,6 +196,7 @@ public class InfluxDBReaderTask
         return content.asString(StandardCharsets.UTF_8);
     }
 
+    @SuppressWarnings("JavaTimeDefaultTimeZone")
     private String getLastMinute()
     {
         long lastMinuteMilli = LocalDateTime.now().plusMinutes(-1).toInstant(ZoneOffset.of("+8")).toEpochMilli();
