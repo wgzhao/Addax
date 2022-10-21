@@ -45,7 +45,6 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.sql.Types;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 public class SingleTableSplitUtil
@@ -330,7 +329,7 @@ public class SingleTableSplitUtil
             throw new IllegalArgumentException(String.format("切分份数不能小于1. 此处:adviceNum=[%s].", adviceNum));
         }
         else if (adviceNum == 1) {
-            return Collections.emptyList();
+            return new ArrayList<>();
         }
         String whereSql = String.format("%s IS NOT NULL", splitPK);
         if (StringUtils.isNotBlank(where)) {

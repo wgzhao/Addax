@@ -53,7 +53,6 @@ import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -136,13 +135,15 @@ public class StorageWriterUtil
 
     public static List<Configuration> split(Configuration writerSliceConfig, Set<String> originAllFileExists, int mandatoryNumber)
     {
+        List<Configuration> writerSplitConfigs = new ArrayList<>();
         LOG.info("begin do split...");
         if (mandatoryNumber == 1) {
-            return Collections.singletonList(writerSliceConfig);
+            writerSplitConfigs.add(writerSliceConfig);
+            return writerSplitConfigs;
         }
 
         Set<String> allFileExists = new HashSet<>(originAllFileExists);
-        List<Configuration> writerSplitConfigs = new ArrayList<>();
+
         String filePrefix = writerSliceConfig.getString(Key.FILE_NAME);
 
         for (int i = 0; i < mandatoryNumber; i++) {

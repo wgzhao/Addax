@@ -38,7 +38,6 @@ import java.sql.Connection;
 import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
 
 public final class WriterUtil
@@ -103,7 +102,7 @@ public final class WriterUtil
     public static List<String> renderPreOrPostSqls(List<String> preOrPostSqls, String tableName)
     {
         if (null == preOrPostSqls) {
-            return Collections.emptyList();
+            return new ArrayList<>();
         }
 
         List<String> renderedSqls = new ArrayList<>();
