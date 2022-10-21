@@ -43,7 +43,6 @@ import java.util.concurrent.ConcurrentHashMap;
  */
 public class LoadUtil
 {
-    private static final String pluginTypeNameFormat = "plugin.%s.%s";
     private final static Map<Long, Configuration> configurationSet = new ConcurrentHashMap<>();
 
     /*
@@ -78,7 +77,7 @@ public class LoadUtil
 
     private static String generatePluginKey(PluginType pluginType, String pluginName)
     {
-        return String.format(pluginTypeNameFormat, pluginType.toString(), pluginName);
+        return String.format("plugin.%s.%s", pluginType.toString(), pluginName);
     }
 
     private static Configuration getPluginConf(PluginType pluginType, String pluginName, Long jobId)
