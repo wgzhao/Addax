@@ -43,7 +43,6 @@ import java.io.IOException;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
@@ -245,13 +244,14 @@ public class DbfWriter
         @Override
         public List<Configuration> split(int mandatoryNumber)
         {
+            List<Configuration> writerSplitConfigs = new ArrayList<>();
             LOG.info("begin do split...");
-
             if (mandatoryNumber == 1) {
-                return Collections.singletonList(this.writerSliceConfig);
+                writerSplitConfigs.add(this.writerSliceConfig);
+                return writerSplitConfigs;
             }
 
-            List<Configuration> writerSplitConfigs = new ArrayList<>();
+
             String filePrefix = this.writerSliceConfig.getString(Key.FILE_NAME).split("\\.")[0];
 
             Set<String> allFiles;

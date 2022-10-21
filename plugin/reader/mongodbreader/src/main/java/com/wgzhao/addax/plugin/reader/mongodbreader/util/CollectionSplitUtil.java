@@ -31,7 +31,6 @@ import org.bson.Document;
 import org.bson.types.ObjectId;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 import static com.wgzhao.addax.common.base.Key.CONNECTION;
@@ -91,7 +90,8 @@ public class CollectionSplitUtil
             Range range = new Range();
             range.lowerBound = "min";
             range.upperBound = "max";
-            return Collections.singletonList(range);
+            rangeList.add(range);
+            return rangeList;
         }
 
         Document result = database.runCommand(new Document("collStats", collName));

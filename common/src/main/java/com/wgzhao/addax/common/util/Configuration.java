@@ -19,11 +19,11 @@
 
 package com.wgzhao.addax.common.util;
 
-import com.alibaba.fastjson2.JSONWriter;
-import com.wgzhao.addax.common.exception.CommonErrorCode;
-import com.wgzhao.addax.common.exception.AddaxException;
-import com.wgzhao.addax.common.spi.ErrorCode;
 import com.alibaba.fastjson2.JSON;
+import com.alibaba.fastjson2.JSONWriter;
+import com.wgzhao.addax.common.exception.AddaxException;
+import com.wgzhao.addax.common.exception.CommonErrorCode;
+import com.wgzhao.addax.common.spi.ErrorCode;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.CharUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -37,7 +37,6 @@ import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -514,7 +513,7 @@ public class Configuration
     {
         List<Object> object = this.get(path, List.class);
         if (null == object) {
-            return Collections.emptyList();
+            return new ArrayList<>();
         }
 
         List<T> result = new ArrayList<>();
@@ -584,7 +583,7 @@ public class Configuration
     {
         List<Object> lists = getList(path);
         if (lists == null) {
-            return Collections.emptyList();
+            return new ArrayList<>();
         }
 
         List<Configuration> result = new ArrayList<>();
