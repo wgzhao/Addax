@@ -57,6 +57,7 @@ nav:
       - reader/influxdbreader.md
       - reader/influxdb2reader.md
       - reader/jsonfilereader.md
+      - reader/kafkareader.md
       - reader/kudureader.md
       - reader/mongodbreader.md
       - reader/mysqlreader.md
