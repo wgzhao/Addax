@@ -24,22 +24,23 @@ target="$(dirname $0)/target"
 TMPDIR=$(ls -d -w1 target/addax/addax-*)
 [ -n "$TMPDIR" ] || exit 2
 
-cd ${TMPDIR} || exit 3
-# should be in target/addax/addax-<version>
-[ -d shared ] || mkdir shared
+(
+    cd ${TMPDIR} || exit 3
+    # should be in target/addax/addax-<version>
+    [ -d shared ] || mkdir shared
 
-for jar in $(find  plugin/*/*/libs -type f -name *.jar)
-do
-    plugin_dir=$(dirname $jar)
-    file_name=$(basename $jar)
-    # 1. move it to shared folder
-    /bin/mv -f ${jar} shared/
-    # 2. create symbol link
-    ( cd ${plugin_dir} && ln -sf ../../../../shared/${file_name} $file_name )
-done
-
+    for jar in $(find  plugin/*/*/libs -type f -name *.jar)
+    do
+        plugin_dir=$(dirname $jar)
+        file_name=$(basename $jar)
+        # 1. move it to shared folder
+        /bin/mv -f ${jar} shared/
+        # 2. create symbol link
+        ( cd ${plugin_dir} && ln -sf ../../../../shared/${file_name} $file_name )
+    done
+)
 # create archive package
-cd target/addax
+cd ${target}/addax
 # should be in target/addax/
 # get archive name including version
 archive_name=$(basename $TMPDIR)
