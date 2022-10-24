@@ -42,6 +42,8 @@ assignees: wgzhao
 
 ### jsonfile reader
 
+### kafkareader
+
 ### kudu reader
 
 ### mongodb reader
@@ -95,6 +97,8 @@ assignees: wgzhao
 ### influxdb writer
 
 ### influxdb2 writer
+
+### kafkawriter
 
 ### kudu writer
 
