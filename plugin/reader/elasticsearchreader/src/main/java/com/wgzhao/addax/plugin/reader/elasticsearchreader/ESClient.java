@@ -122,12 +122,16 @@ public class ESClient
             String index,
             String type,
             String scroll,
-            Map<String, Object> headers)
+            Map<String, Object> headers,
+            List<String> columns)
             throws IOException
     {
         Search.Builder searchBuilder = new Search.Builder(query)
                 .setSearchType(searchType)
                 .addIndex(index).addType(type).setHeader(headers);
+        for (String column: columns) {
+            searchBuilder.addSourceIncludePattern(column);
+        }
         if (StringUtils.isNotBlank(scroll)) {
             searchBuilder.setParameter("scroll", scroll);
         }

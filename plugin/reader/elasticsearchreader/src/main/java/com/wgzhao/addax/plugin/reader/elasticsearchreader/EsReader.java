@@ -195,7 +195,7 @@ public class EsReader
             queryPerfRecord.start();
             SearchResult searchResult;
             try {
-                searchResult = esClient.search(query, searchType, index, type, scroll, headers);
+                searchResult = esClient.search(query, searchType, index, type, scroll, headers, this.column);
             }
             catch (Exception e) {
                 throw AddaxException.asAddaxException(ESReaderErrorCode.ES_SEARCH_ERROR, e);
@@ -307,9 +307,9 @@ public class EsReader
                 Record record = recordSender.createRecord();
                 boolean hasDirty = false;
                 StringBuilder sb = new StringBuilder();
-                for (Map.Entry<String, Object> entry : recordMap.entrySet()) {
+                for (String col: column) {
                     try {
-                        Object o = recordMap.get(entry.getKey());
+                        Object o = recordMap.get(col);
                         record.addColumn(getColumn(o));
                     }
                     catch (Exception e) {
