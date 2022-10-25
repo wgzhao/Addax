@@ -83,7 +83,7 @@
         <cassandra.jdbc.version>3.11.0</cassandra.jdbc.version>
         <clickhouse.jdbc.version>0.3.2</clickhouse.jdbc.version>
         <hive.jdbc.version>3.1.2</hive.jdbc.version>
-        <influxdbClient.version>2.22</influxdbClient.version>
+        <influxdbClient.version>2.23</influxdbClient.version>
         <hadoop.version>3.1.2</hadoop.version>
         <mongodb.jdbc.version>3.12.11</mongodb.jdbc.version>
         <mysql.jdbc.version>8.0.28</mysql.jdbc.version>
