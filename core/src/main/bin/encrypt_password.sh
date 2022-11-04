@@ -30,4 +30,11 @@ if [ $# -ne 1 ]; then
   exit 1
 fi
 
-java -cp ${ADDAX_HOME}/lib/addax-common-*.jar com.wgzhao.addax.common.util.EncryptUtil $1
+cd ${ADDAX_HOME}
+commjar=$(ls lib/addax-common-*.jar lib/slf4j-*.jar lib/logback*.jar |tr '\t' ':')
+for jar in ${commjar[@]}
+do
+   classpath=${classpath}:$jar
+done
+java -cp $classpath com.wgzhao.addax.common.util.EncryptUtil $1
+#java -cp ${ADDAX_HOME}/lib/addax-common-*.jar:${ADDAX_HOME}/lib/slf4j-api-*.jar com.wgzhao.addax.common.util.EncryptUtil $1
