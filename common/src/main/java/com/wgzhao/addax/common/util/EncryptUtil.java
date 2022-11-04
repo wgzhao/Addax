@@ -34,6 +34,7 @@ import org.slf4j.LoggerFactory;
 import javax.crypto.Cipher;
 import javax.crypto.SecretKey;
 import javax.crypto.SecretKeyFactory;
+import javax.crypto.spec.GCMParameterSpec;
 import javax.crypto.spec.IvParameterSpec;
 import javax.crypto.spec.PBEKeySpec;
 import javax.crypto.spec.SecretKeySpec;
@@ -74,7 +75,8 @@ public class EncryptUtil
     public static String encrypt(String password)
     {
         try {
-            pbeCipher.init(Cipher.ENCRYPT_MODE, secSpec, ivSpec);
+            GCMParameterSpec params = new GCMParameterSpec(128, ivSpec.getIV(), 0, 12);
+            pbeCipher.init(Cipher.ENCRYPT_MODE, secSpec, params);
             byte[] cryptoText = pbeCipher.doFinal(password.getBytes(StandardCharsets.UTF_8));
             return base64Encode(cryptoText);
         }
@@ -91,7 +93,8 @@ public class EncryptUtil
     public static String decrypt(String encrypted)
     {
         try {
-            pbeCipher.init(Cipher.DECRYPT_MODE, secSpec, ivSpec);
+            GCMParameterSpec params = new GCMParameterSpec(128, ivSpec.getIV(), 0, 12);
+            pbeCipher.init(Cipher.DECRYPT_MODE, secSpec, params);
             return new String(pbeCipher.doFinal(base64Decode(encrypted)), StandardCharsets.UTF_8);
         }
         catch (Exception e) {
