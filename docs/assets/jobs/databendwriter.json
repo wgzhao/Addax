@@ -1,0 +1,55 @@
+{
+  "job": {
+    "setting": {
+      "speed": {
+        "channel": 2
+      }
+    },
+    "content": {
+      "writer": {
+        "name": "databendwriter",
+        "parameter": {
+          "username": "u1",
+          "password": "123",
+          "batchSize": 1024,
+	      "batchByteSize": 33554432,
+          "column": ["*"],
+          "connection": [
+            {
+              "table": "table1",
+              "database": "example_db",
+              "endpoint": "http://127.0.0.1:8000/"
+            }
+          ],
+          "lineDelimiter": "\n",
+          "fieldDelimiter": "\t",
+          "format": "tsv"
+        }
+      },
+      "reader": {
+        "name": "streamreader",
+        "parameter": {
+          "column": [
+            {
+              "random": "1,500",
+              "type": "long"
+            },
+            {
+              "random": "1,127",
+              "type": "long"
+            },
+            {
+              "value": "this is a text",
+              "type": "string"
+            },
+            {
+              "random": "5,200",
+              "type": "long"
+            }
+          ],
+          "sliceRecordCount": 100
+        }
+      }
+    }
+  }
+}

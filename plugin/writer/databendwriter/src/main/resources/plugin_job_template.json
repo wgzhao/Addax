@@ -1,0 +1,15 @@
+{
+  "name": "databendwriter",
+  "parameter": {
+    "username": "test",
+    "password": "123456",
+    "batchSize": 1024,
+    "connection": [
+      {
+        "table": "table1",
+        "database": "example_db",
+        "endpoint": "http://127.0.0.1:8000/"
+      }
+    ]
+  }
+}
