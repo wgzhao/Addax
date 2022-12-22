@@ -1,10 +1,12 @@
-package com.wgzhao.addax.plugin.writer.databendwriter;
+package com.wgzhao.addax.plugin.writer.databendwriter.row;
 
 import com.google.common.base.Strings;
 
 import java.io.StringWriter;
 
-public class DatabendDelimiterParser {
+public class DatabendDelimiterParser
+{
+
     private static final String HEX_STRING = "0123456789ABCDEF";
 
     public static String parse(String sp, String dSp)

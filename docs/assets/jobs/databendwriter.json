@@ -9,21 +9,21 @@
       "writer": {
         "name": "databendwriter",
         "parameter": {
+          "preSql": [
+            "truncate table @table"
+          ],
+          "postSql": [
+          ],
           "username": "u1",
           "password": "123",
-          "batchSize": 1024,
-	      "batchByteSize": 33554432,
+          "database": "example_db",
+          "table": "table1",
+          "jdbcUrl": "jdbc:mysql://127.0.0.1:3307/example_db",
+          "loadUrl": ["127.0.0.1:8000","127.0.0.1:8000"],
+          "field_delimiter": "\\x01",
+          "line_delimiter": "\\x02",
           "column": ["*"],
-          "connection": [
-            {
-              "table": "table1",
-              "database": "example_db",
-              "endpoint": "http://127.0.0.1:8000/"
-            }
-          ],
-          "lineDelimiter": "\n",
-          "fieldDelimiter": "\t",
-          "format": "tsv"
+          "format": "csv"
         }
       },
       "reader": {
