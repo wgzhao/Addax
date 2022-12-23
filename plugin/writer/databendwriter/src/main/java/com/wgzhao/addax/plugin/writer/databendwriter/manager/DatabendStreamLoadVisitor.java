@@ -9,9 +9,13 @@ import org.apache.http.HttpRequest;
 import org.apache.http.HttpResponse;
 import org.apache.http.ProtocolException;
 import org.apache.http.client.config.RequestConfig;
-import org.apache.http.client.methods.*;
+import org.apache.http.client.methods.CloseableHttpResponse;
+import org.apache.http.client.methods.HttpGet;
+import org.apache.http.client.methods.HttpHead;
+import org.apache.http.client.methods.HttpPut;
+import org.apache.http.client.methods.HttpUriRequest;
+import org.apache.http.client.methods.RequestBuilder;
 import org.apache.http.entity.ContentType;
-
 import org.apache.http.entity.mime.HttpMultipartMode;
 import org.apache.http.entity.mime.MultipartEntityBuilder;
 import org.apache.http.impl.client.CloseableHttpClient;
@@ -67,12 +71,14 @@ public class DatabendStreamLoadVisitor
         }
         if (!loadResult.get(keyStatus).equals("SUCCESS")) {
             throw new IOException("Failed to flush data to databend.\n" + JSON.toJSONString(loadResult));
-        } else {
+        }
+        else {
             List<String> hostList = writerOptions.getLoadUrlList();
             System.out.printf("\npos is %s\n", pos);
             if (pos > hostList.size()) {
                 pos = 0;
-            } else {
+            }
+            else {
                 pos += 1;
             }
         }
@@ -172,12 +178,14 @@ public class DatabendStreamLoadVisitor
                 if (cols.size() == 1 && "*".equals(cols.get(0))) {
                     String insert = String.format("insert into %s.%s file_format = (type = 'CSV' field_delimiter = '%s' record_delimiter = '%s') ", database, table, field_delimiter, line_delimiter);
                     httpPut.setHeader("insert_sql", insert);
-                } else {
+                }
+                else {
                     String columns = "(" + String.join(",", cols) + ")";
                     String insert = String.format("insert into %s.%s %s file_format = (type = 'CSV' field_delimiter = '%s' record_delimiter = '%s') ", database, table, columns, field_delimiter, line_delimiter);
                     httpPut.setHeader("insert_sql", insert);
                 }
-            } else {
+            }
+            else {
                 throw new IOException("COLUMN is null or empty");
             }
 

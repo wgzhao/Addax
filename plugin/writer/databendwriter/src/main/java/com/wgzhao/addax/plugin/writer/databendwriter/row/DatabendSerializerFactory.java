@@ -2,8 +2,6 @@ package com.wgzhao.addax.plugin.writer.databendwriter.row;
 
 import com.wgzhao.addax.plugin.writer.databendwriter.DatabendWriterOptions;
 
-import java.util.Map;
-
 public class DatabendSerializerFactory
 {
 

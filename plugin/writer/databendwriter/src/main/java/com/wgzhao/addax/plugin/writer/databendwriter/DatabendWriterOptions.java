@@ -6,7 +6,6 @@ import com.wgzhao.addax.rdbms.util.DBUtilErrorCode;
 
 import java.io.Serializable;
 import java.util.List;
-import java.util.Map;
 import java.util.stream.Collectors;
 
 public class DatabendWriterOptions
@@ -38,9 +37,10 @@ public class DatabendWriterOptions
     private static final String KEY_LINE_DELIMITER = "line_delimiter";
     private static final String KEY_FLUSH_QUEUE_LENGTH = "flushQueueLength";
     private final Configuration options;
-    private List<String> infoCchemaColumns;
     private final List<String> userSetColumns;
+    private List<String> infoCchemaColumns;
     private boolean isWildcardColumn;
+
     public DatabendWriterOptions(Configuration options)
     {
         this.options = options;

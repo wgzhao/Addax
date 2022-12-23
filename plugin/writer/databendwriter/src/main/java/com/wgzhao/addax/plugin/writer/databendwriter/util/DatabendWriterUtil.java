@@ -24,7 +24,7 @@ public final class DatabendWriterUtil
     public static List<String> renderPreOrPostSqls(List<String> preOrPostSqls, String tableName)
     {
         List<String> renderedSqls = new ArrayList<>();
-        if ( null == preOrPostSqls ) {
+        if (null == preOrPostSqls) {
             return renderedSqls;
         }
         for (String sql : preOrPostSqls) {

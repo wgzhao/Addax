@@ -1,14 +1,14 @@
 {
-    "name": "databendwriter",
-    "parameter": {
-        "username": "",
-        "password": "",
-        "database": "",
-        "table": "",
-        "column": [],
-        "preSql": [],
-        "postSql": [], 
-        "jdbcUrl": "",
-        "loadUrl": []
-    }
+  "name": "databendwriter",
+  "parameter": {
+    "username": "",
+    "password": "",
+    "database": "",
+    "table": "",
+    "column": [],
+    "preSql": [],
+    "postSql": [],
+    "jdbcUrl": "",
+    "loadUrl": []
+  }
 }

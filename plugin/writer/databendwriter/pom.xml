@@ -1,39 +1,39 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
-	<modelVersion>4.0.0</modelVersion>
-	<parent>
-		<groupId>com.wgzhao.addax</groupId>
-		<artifactId>addax-all</artifactId>
-		<version>4.0.11-SNAPSHOT</version>
+<project xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://maven.apache.org/POM/4.0.0" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    <parent>
+        <groupId>com.wgzhao.addax</groupId>
+        <artifactId>addax-all</artifactId>
+        <version>4.0.11-SNAPSHOT</version>
         <relativePath>../../../pom.xml</relativePath>
-	</parent>
+    </parent>
 
-	<artifactId>databendwriter</artifactId>
-	<name>databend-writer</name>
-	<packaging>jar</packaging>
+    <artifactId>databendwriter</artifactId>
+    <name>databend-writer</name>
+    <packaging>jar</packaging>
 
-	<dependencies>
-		<dependency>
-			<groupId>com.wgzhao.addax</groupId>
-			<artifactId>addax-common</artifactId>
-			<version>${project.version}</version>
-			<exclusions>
-				<exclusion>
-					<artifactId>slf4j-log4j12</artifactId>
-					<groupId>org.slf4j</groupId>
-				</exclusion>
-			</exclusions>
-		</dependency>
-		<dependency>
-			<groupId>org.slf4j</groupId>
-			<artifactId>slf4j-api</artifactId>
-		</dependency>
+    <dependencies>
+        <dependency>
+            <groupId>com.wgzhao.addax</groupId>
+            <artifactId>addax-common</artifactId>
+            <version>${project.version}</version>
+            <exclusions>
+                <exclusion>
+                    <artifactId>slf4j-log4j12</artifactId>
+                    <groupId>org.slf4j</groupId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-api</artifactId>
+        </dependency>
 
-		<dependency>
-			<groupId>com.wgzhao.addax</groupId>
-			<artifactId>addax-rdbms</artifactId>
-			<version>${project.version}</version>
-		</dependency>
-		<dependency>
+        <dependency>
+            <groupId>com.wgzhao.addax</groupId>
+            <artifactId>addax-rdbms</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
             <groupId>commons-codec</groupId>
             <artifactId>commons-codec</artifactId>
             <version>${commons.codec.version}</version>
@@ -63,7 +63,7 @@
             <artifactId>fastjson</artifactId>
             <version>${fastjson2.version}</version>
         </dependency>
-		<dependency>
+        <dependency>
             <groupId>mysql</groupId>
             <artifactId>mysql-connector-java</artifactId>
             <version>${mysql.jdbc.version}</version>

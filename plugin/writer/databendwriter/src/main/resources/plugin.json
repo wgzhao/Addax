@@ -1,6 +1,6 @@
 {
-    "name": "databendwriter",
-    "class": "com.wgzhao.addax.plugin.writer.databendwriter.DatabendWriter",
-    "description": "writer data into Databend",
-    "developer": "databend"
+  "name": "databendwriter",
+  "class": "com.wgzhao.addax.plugin.writer.databendwriter.DatabendWriter",
+  "description": "writer data into Databend",
+  "developer": "databend"
 }

@@ -5,9 +5,9 @@ import java.util.List;
 public class DatabendFlushTuple
 {
 
-    private String label;
     private final Long bytes;
     private final List<byte[]> rows;
+    private String label;
 
     public DatabendFlushTuple(String label, Long bytes, List<byte[]> rows)
     {
