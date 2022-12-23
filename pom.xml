@@ -190,6 +190,7 @@
                 <module>plugin/writer/cassandrawriter</module>
                 <module>plugin/writer/clickhousewriter</module>
                 <module>plugin/writer/dbfwriter</module>
+                <module>plugin/writer/databendwriter</module>
                 <module>plugin/writer/doriswriter</module>
                 <module>plugin/writer/elasticsearchwriter</module>
                 <module>plugin/writer/excelwriter</module>

@@ -77,6 +77,7 @@ nav:
       - writer/clickhousewriter.md
       - writer/dbfwriter.md
       - writer/doriswriter.md
+      - writer/databendwriter.md
       - writer/elasticsearchwriter.md
       - writer/excelwriter.md
       - writer/ftpwriter.md
