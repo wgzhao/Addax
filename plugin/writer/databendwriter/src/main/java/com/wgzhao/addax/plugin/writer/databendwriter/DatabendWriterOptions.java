@@ -33,8 +33,8 @@ public class DatabendWriterOptions
     private static final String KEY_MAX_BATCH_SIZE = "maxBatchSize";
     private static final String KEY_FLUSH_INTERVAL = "flushInterval";
     private static final String KEY_LOAD_URL = "loadUrl";
-    private static final String KEY_FIELD_DELIMITER = "field_delimiter";
-    private static final String KEY_LINE_DELIMITER = "line_delimiter";
+    private static final String KEY_FIELD_DELIMITER = "fieldDelimiter";
+    private static final String KEY_LINE_DELIMITER = "lineDelimiter";
     private static final String KEY_FLUSH_QUEUE_LENGTH = "flushQueueLength";
     private final Configuration options;
     private final List<String> userSetColumns;
@@ -165,7 +165,7 @@ public class DatabendWriterOptions
         for (String host : urlList) {
             if (host.split(":").length < 2) {
                 throw AddaxException.asAddaxException(DBUtilErrorCode.CONF_ERROR,
-                        "loadUrl 格式错误，请输入 `query_ip:query_http_port;query_ip:query_http_port`。");
+                        "loadUrl format incorrect, please enter `query_ip:query_http_port;query_ip:query_http_port`.");
             }
         }
     }

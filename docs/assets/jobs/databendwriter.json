@@ -20,8 +20,8 @@
           "table": "table1",
           "jdbcUrl": "jdbc:mysql://127.0.0.1:3307/example_db",
           "loadUrl": ["127.0.0.1:8000","127.0.0.1:8000"],
-          "field_delimiter": "\\x01",
-          "line_delimiter": "\\x02",
+          "fieldDelimiter": "\\x01",
+          "lineDelimiter": "\\x02",
           "column": ["*"],
           "format": "csv"
         }

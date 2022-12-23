@@ -74,7 +74,6 @@ public class DatabendStreamLoadVisitor
         }
         else {
             List<String> hostList = writerOptions.getLoadUrlList();
-            System.out.printf("\npos is %s\n", pos);
             if (pos > hostList.size()) {
                 pos = 0;
             }
@@ -88,11 +87,8 @@ public class DatabendStreamLoadVisitor
     {
         List<String> hostList = writerOptions.getLoadUrlList();
         long tmp = pos + hostList.size();
-        System.out.printf("pos is %s, tmp is [%s]", pos, tmp);
         for (; pos < tmp; pos++) {
             int a = (int) (pos % hostList.size());
-            System.out.printf("{pos %% hostList.size()} is [%s], pos is %s", a, pos);
-            System.out.printf("\nhostList.get(a) is [%s]\n", hostList.get(a));
             String host = new StringBuilder("http://").append(hostList.get((int) (pos % hostList.size()))).toString();
             if (tryHttpConnection(host)) {
                 LOG.debug(String.format("Host [%s] can be connected, will use it", host));
