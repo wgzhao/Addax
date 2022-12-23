@@ -4,6 +4,7 @@ Addax supports the following Data Sources:
 | ------------------- | ------ | ------ | -------------------------------------- | ------------------------------- |
 | Cassandra           | ✓      | ✓     | cassandrareader/cassandrawriter         |                                 |
 | ClickHouse          | ✓      | ✓     | clickhousereader/clickhousewriter       |                                 |
+| Databend            | x      | ✓     | databendwriter                          | support [Databend][8]            |
 | DB2                 | ✓      | ✓     | rbdmsreader/rdbmswriter                 | not fully tested                |
 | DBF                 | ✓      | ✓     | dbfreader/dbfwriter                     |                                 |
 | ElasticSearch       | ✓      | ✓     | elasticsearchreader/elasticsearchwriter | originally from [@Kestrong][1]  |
@@ -42,3 +43,4 @@ Addax supports the following Data Sources:
 [5]: http://transwarp.cn/
 [6]: https://aws.amazon.com/s3
 [7]: https://min.io/
+[8]: https://databend.rs

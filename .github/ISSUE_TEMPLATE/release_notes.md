@@ -74,6 +74,8 @@ assignees: wgzhao
 
 ### clickhouse writer
 
+### databend writer
+
 ### dbf writer
 
 ### doris writer
