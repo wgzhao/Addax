@@ -1,0 +1,67 @@
+{
+  "job": {
+    "setting": {
+      "speed": {
+        "channel": 1,
+        "bytes": -1
+      }
+    },
+    "content": {
+      "reader": {
+        "name": "streamreader",
+        "parameter": {
+          "column": [
+            {
+              "random": "2017-08-01 00:01:02,2020-01-01 12:13:14",
+              "type": "date"
+            },
+            {
+              "value": "Addax",
+              "type": "string"
+            },
+            {
+              "value": 19880808,
+              "type": "long"
+            },
+            {
+              "value": "1988-08-08 08:08:08",
+              "type": "date"
+            },
+            {
+              "value": true,
+              "type": "bool"
+            },
+            {
+              "value": "test",
+              "type": "bytes"
+            }
+          ],
+          "sliceRecordCount": 1000
+        }
+      },
+      "writer": {
+        "name": "tdenginewriter",
+        "parameter": {
+          "username": "root",
+          "password": "taosdata",
+          "column": [
+            "ts",
+            "name",
+            "file_size",
+            "file_date",
+            "flag_open",
+            "memo"
+          ],
+          "connection": [
+            {
+              "jdbcUrl": "jdbc:TAOS://127.0.0.1:6030/test",
+              "table": [
+                "addax_test"
+              ]
+            }
+          ]
+        }
+      }
+    }
+  }
+}
