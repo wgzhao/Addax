@@ -26,6 +26,7 @@ SqlServerReader插件用于从从SqlServer读取数据。
 | where           |    否    | 无     | 针对表的筛选条件 |
 | querySql        |    否    | 无     | 使用自定义的SQL而不是指定表来获取数据，当配置了这一项之后，Addax系统就会忽略 `table`，`column`这些配置项 |
 | fetchSize       |    否    | 1024   |  定义了插件和数据库服务器端每次批量数据获取条数，调高该值可能导致 Addax 出现OOM |
+| session         |    否    | 无     | 针对本地连接,修改会话配置                                                |
 
 ## 类型转换
 
@@ -33,7 +34,7 @@ SqlServerReader插件用于从从SqlServer读取数据。
 | -------- | -----  |
 | Long     |bigint, int, smallint, tinyint|
 | Double   |float, decimal, real, numeric|
-|String  |char,nchar,ntext,nvarchar,text,varchar,nvarchar(MAX),varchar(MAX)|
+| String   |char,nchar,ntext,nvarchar,text,varchar,nvarchar(MAX),varchar(MAX)|
 | Date     |date, datetime, time    |
 | Boolean  |bit|
 | Bytes    |binary,varbinary,varbinary(MAX),timestamp, image|
