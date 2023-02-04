@@ -332,6 +332,7 @@ public class CassandraReaderHelper
                             record.addColumn(new LongColumn(rs.getInt(i)));
                             break;
 
+                        case COUNTER:
                         case BIGINT:
                             record.addColumn(new LongColumn(rs.getLong(i)));
                             break;
