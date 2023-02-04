@@ -28,7 +28,7 @@
 | column           |    是    | 无           | 所配置的表中需要同步的列集合,其中的元素可以指定列的名称或 `writetime(column_name)`，后一种形式会读取`column_name`列的时间戳而不是数据 |
 | where            |    否    | 无           | 数据筛选条件的 `cql` 表达式 |
 | allowFiltering   |    否    | 无           | 是否在服务端过滤数据，详细描述参考官方文档的[相关描述][1] |
-| consistancyLevel |    否    | LOCAL_QUORUM | 数据一致性级别, 可选 `ONE, QUORUM, LOCAL_QUORUM, EACH_QUORUM, ALL, ANY, TWO, THREE, LOCAL_ONE`  
+| consistencyLevel |    否    | LOCAL_QUORUM | 数据一致性级别, 可选 `ONE, QUORUM, LOCAL_QUORUM, EACH_QUORUM, ALL, ANY, TWO, THREE, LOCAL_ONE`
 
 [1]: https://cassandra.apache.org/doc/latest/cql/dml.html#allowing-filtering
 
@@ -40,7 +40,7 @@
 
 | Addax 内部类型 | Cassandra 数据类型                                                     |
 | -------------- | ---------------------------------------------------------------------- |
-| Long           | int, tinyint, smallint,varint,bigint,time                              |
+| Long           | int, tinyint, smallint,varint,bigint,time,counter                      |
 | Double         | float, double, decimal                                                 |
 | String         | ascii,varchar, text,uuid,timeuuid,duration,list,map,set,tuple,udt,inet |
 | Date           | date, timestamp                                                        |
