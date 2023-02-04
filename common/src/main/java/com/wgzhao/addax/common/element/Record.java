@@ -19,13 +19,14 @@
 
 package com.wgzhao.addax.common.element;
 
+import java.util.Map;
+
 /**
  * Created by jingxing on 14-8-24.
  */
 
 public interface Record
 {
-
     void addColumn(Column column);
 
     void setColumn(int i, final Column column);
@@ -40,4 +41,8 @@ public interface Record
     int getByteSize();
 
     int getMemorySize();
+
+    public void setMeta(Map<String, String> meta);
+
+    public Map<String, String> getMeta();
 }

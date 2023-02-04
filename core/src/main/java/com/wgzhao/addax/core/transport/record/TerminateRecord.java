@@ -22,6 +22,8 @@ package com.wgzhao.addax.core.transport.record;
 import com.wgzhao.addax.common.element.Column;
 import com.wgzhao.addax.common.element.Record;
 
+import java.util.Map;
+
 /**
  * 作为标示 生产者已经完成生产的标志
  */
@@ -29,6 +31,8 @@ public class TerminateRecord
         implements Record
 {
     private static final TerminateRecord SINGLE = new TerminateRecord();
+
+    private Map<String, String> meta;
 
     private TerminateRecord()
     {
@@ -67,6 +71,18 @@ public class TerminateRecord
     public int getMemorySize()
     {
         return 0;
+    }
+
+    @Override
+    public void setMeta(Map<String, String> meta)
+    {
+        this.meta = meta;
+    }
+
+    @Override
+    public Map<String, String> getMeta()
+    {
+        return this.meta;
     }
 
     @Override

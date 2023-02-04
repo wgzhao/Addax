@@ -48,6 +48,8 @@ public class DefaultRecord
     // 首先是Record本身需要的内存
     private int memorySize = ClassSize.DEFAULT_RECORD_HEAD;
 
+    private Map<String, String> meta;
+
     public DefaultRecord()
     {
         this.columns = new ArrayList<>(RECORD_AVERAGE_COLUMN_NUMBER);
@@ -109,6 +111,18 @@ public class DefaultRecord
     public int getMemorySize()
     {
         return memorySize;
+    }
+
+    @Override
+    public void setMeta(Map<String, String> meta)
+    {
+        this.meta = meta;
+    }
+
+    @Override
+    public Map<String, String> getMeta()
+    {
+        return this.meta;
     }
 
     private void decrByteSize(Column column)
