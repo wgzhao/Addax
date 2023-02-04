@@ -31,6 +31,7 @@ import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 
 public class DirtyRecord
         implements Record
@@ -39,12 +40,15 @@ public class DirtyRecord
 
     private static final String NOT_SUPPORT_METHOD = "该方法不支持!";
 
+    private Map<String, String> meta;
+
     public static DirtyRecord asDirtyRecord(final Record record)
     {
         DirtyRecord result = new DirtyRecord();
         for (int i = 0; i < record.getColumnNumber(); i++) {
             result.addColumn(record.getColumn(i));
         }
+        result.setMeta(record.getMeta());
 
         return result;
     }
@@ -89,6 +93,18 @@ public class DirtyRecord
     public int getMemorySize()
     {
         throw AddaxException.asAddaxException(FrameworkErrorCode.RUNTIME_ERROR, NOT_SUPPORT_METHOD);
+    }
+
+    @Override
+    public void setMeta(Map<String, String> meta)
+    {
+        this.meta = meta;
+    }
+
+    @Override
+    public Map<String, String> getMeta()
+    {
+        return this.meta;
     }
 
     public List<Column> getColumns()
