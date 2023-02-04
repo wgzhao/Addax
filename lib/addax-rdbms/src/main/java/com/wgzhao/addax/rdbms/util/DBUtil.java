@@ -507,6 +507,7 @@ public final class DBUtil
         switch (databaseType) {
             case Oracle:
             case MySql:
+            case SQLServer:
                 sessionConfig = config.getList(Key.SESSION, new ArrayList<>(), String.class);
                 DBUtil.doDealWithSessionConfig(conn, sessionConfig, message);
                 break;
