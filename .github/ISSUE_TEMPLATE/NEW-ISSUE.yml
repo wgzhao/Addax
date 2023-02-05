@@ -9,14 +9,6 @@ body:
     attributes:
       value: |
         Thanks for taking the time to fill out this bug report! （感谢您提交发现的 bug）
-  - type: input
-    id: contact
-    attributes:
-      label: Contact Details（联系人）
-      description: How can we get in touch with you if we need more info? （如若方便，请填写您的邮箱，方便联系到您，如不方便，可不填写）
-      placeholder: ex. email@example.com
-    validations:
-      required: false
   - type: textarea
     id: what-happened
     attributes:
