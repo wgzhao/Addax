@@ -2,6 +2,12 @@
 
 本指南主要面向那些需要开发符合自己需求的 Addax 插件开发人员。
 
+## Addax 流程
+
+Addax 运行一个任务的大致流程如下：
+
+![addax-flowchart](./images/addax-flowchart.png)
+
 ## 插件机制
 
 `Addax` 为了应对不同数据源的差异、同时提供一致地同步原语和扩展能力，采用了 `框架` + `插件` 的模式：
@@ -155,7 +161,7 @@ public class SomeReader
 `Addax` 使用 `assembly` 打包，打包命令如下：
 
 ```bash
-mvn clean package 
+mvn clean package
 mvn package assembly:single
 ```
 
@@ -370,7 +376,7 @@ Addax的内部类型在实现上会选用不同的java类型：
 | 内部类型 | 实现类型 | 备注 |
 | ----- | -------- | ----- |
 | Date  | java.util.Date |     |
-| Timestamp | java.sql.Timestamp | 可以精确到纳秒 | 
+| Timestamp | java.sql.Timestamp | 可以精确到纳秒 |
 | Long  | java.math.BigInteger|  使用无限精度的大整数，保证不失真   |
 | Double| java.lang.String| 用String表示，保证不失真 |
 | Bytes | byte[]|  |
