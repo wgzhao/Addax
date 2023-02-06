@@ -8,6 +8,27 @@ Addax 运行一个任务的大致流程如下：
 
 ![addax-flowchart](./images/addax-flowchart.png)
 
+启动步骤为：
+
+1. 解析配置，包括 `job.json`、`core.json`、`plugin.json` 三个配置
+2. 设置 `jobId` 到 `configuration` 当中
+3. 启动 Engine，通过 `Engine.start()` 进入启动程序
+4. 设置 `RUNTIME_MODE` 到 `configuration` 当中
+5. 通过 JobContainer 的 `start()` 方法启动
+6. 依次执行 job 的 `preHandler()`、`init()`、`prepare()`、`split()`、`schedule()`、`post()`、`postHandle()` 等方法。
+7. `init()` 方法涉及到根据 configuration 来初始化 reader 和 writer 插件，这里涉及到 jar 包热加载以及调用插件 `init()` 操作方法，同时设置 reader 和 writer 的 configuration 信息
+8. `prepare()` 方法涉及到初始化 reader 和 writer 插件的初始化，通过调用插件的 `prepare()` 方法实现，每个插件都有自己的 jarLoader，通过集成 `URLClassloader` 实现而来
+9. `split()` 方法通过 `adjustChannelNumber()` 方法调整 channel 个数，同时执行 reader 和 writer 最细粒度的切分，需要注意的是，writer 的切分结果要参照 reader
+   的切分结果，达到切分后数目相等，才能满足 1：1 的通道模型
+10. channel 的计数主要是根据 byte 和 record 的限速来实现的，在 `split()` 的函数中第一步就是计算 channel 的大小
+11. `split()` 方法 reader 插件会根据 channel 的值进行拆分，但是有些 reader 插件可能不会参考 channel 的值，writer 插件会完全根据 reader 的插件 1:1 进行返回
+12. `split()` 方法内部的 `mergeReaderAndWriterTaskConfigs()` 负责合并 reader、writer、以及 transformer 三者关系，生成 task 的配置，并且重写 `job.content` 的配置
+13. `schedule()` 方法根据 `split()` 拆分生成的 task 配置分配生成 taskGroup 对象，根据 task 的数量和单个 taskGroup 支持的 task 数量进行配置，两者相除就可以得出 taskGroup 的数量
+14. `schedule()` 内部通过 AbstractScheduler 的 `schedule()` 执行，继续执行` startAllTaskGroup()` 方法创建所有的 TaskGroupContainer 组织相关的
+    task，TaskGroupContainerRunner 负责运行 TaskGroupContainer 执行分配的 task。scheduler的具体实现类为 `ProcessInnerScheduler`。
+15. `taskGroupContainerExecutorService` 启动固定的线程池用以执行 `TaskGroupContainerRunner` 对象，TaskGroupContainerRunner 的 `run()` 方法调用 `taskGroupContainer.
+start()` 方法，针对每个 channel 创建一个 TaskExecutor，通过 `taskExecutor.doStart()` 启动任务。
+
 ## 插件机制
 
 `Addax` 为了应对不同数据源的差异、同时提供一致地同步原语和扩展能力，采用了 `框架` + `插件` 的模式：
