@@ -45,7 +45,7 @@ jobs:
         # Prefix the list here with "+" to use these queries and those in the config file.
         # queries: ./path/to/local/query, your-org/your-repo/queries@main
     - name: Setup Java JDK
-      uses: actions/setup-java@v3.9.0
+      uses: actions/setup-java@v3.10.0
       with:
         # The Java version to make available on the path. Takes a whole or semver Java version, or 1.x syntax (e.g. 1.8 => Java 8.x). Early access versions can be specified in the form of e.g. 14-ea, 14.0.0-ea, or 14.0.0-ea.28
         java-version: 1.8
@@ -59,7 +59,7 @@ jobs:
         # Environment variable name for password or token for authentication to the Apache Maven repository. Default is $GITHUB_TOKEN
         # Path to where the settings.xml file will be written. Default is ~/.m2.
         # GPG private key to import. Default is empty string.
-      
+
     # Autobuild attempts to build any compiled languages  (C/C++, C#, or Java).
     # If this step fails, then you should remove it and run the build manually (see below)
     - name: Autobuild

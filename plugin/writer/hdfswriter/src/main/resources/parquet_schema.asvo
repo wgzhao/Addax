@@ -8,7 +8,7 @@
     {"name": "col3", "type": ["null", "string"]},
     {"name": "col4", "type": ["null", {"type": "fixed", "logicalType": "decimal", "name": "col4", "precision": 38, "scale":  10, "size": 16}]},
     {"name": "col5", "type": ["null", {"type": "int", "logicalType":"date"}]},
-    {"name": "col6", "type": ["null", {"type": "long", "logicalType": "timestamp"}]},
+    {"name": "col6", "type": ["null", {"type": "fixed", "name":"INT96", "logicalType":"timestamp", "size": 12}]},
     {"name": "col7", "type": ["null", {"type": "bytes", "logicalType": "binary"}]}
   ]
 }
