@@ -51,7 +51,7 @@
         <hbase1.version>1.4.13</hbase1.version>
         <hbase2.version>2.2.5</hbase2.version>
         <hive.version>3.1.2</hive.version>
-        <httpclient.version>4.5.13</httpclient.version>
+        <httpclient.version>4.5.14</httpclient.version>
         <httpcore.version>4.4.15</httpcore.version>
         <httpasync.version>4.1.5</httpasync.version>
         <influxdb.client.version>6.3.0</influxdb.client.version>
@@ -77,7 +77,7 @@
         <swift.version>1.0.0</swift.version>
         <xz.version>1.9</xz.version>
         <zookeeper.version>3.6.0</zookeeper.version>
-        <zstd.version>1.5.2-5</zstd.version>
+        <zstd.version>1.5.4-1</zstd.version>
 
         <!-- jdbc driver version -->
         <cassandra.jdbc.version>3.11.0</cassandra.jdbc.version>
@@ -85,7 +85,7 @@
         <hive.jdbc.version>3.1.2</hive.jdbc.version>
         <influxdbClient.version>2.23</influxdbClient.version>
         <hadoop.version>3.1.2</hadoop.version>
-        <mongodb.jdbc.version>3.12.11</mongodb.jdbc.version>
+        <mongodb.jdbc.version>3.12.12</mongodb.jdbc.version>
         <mysql.jdbc.version>8.0.28</mysql.jdbc.version>
         <mssql.jdbc.version>9.2.1.jre8</mssql.jdbc.version>
         <oracle.jdbc.version>19.7.0.0</oracle.jdbc.version>
