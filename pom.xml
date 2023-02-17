@@ -69,7 +69,7 @@
         <kudu.version>1.16.0</kudu.version>
         <mapreduce.version>3.2.1</mapreduce.version>
         <mockito.version>2.0.2-beta</mockito.version>
-        <ognl.version>3.3.2</ognl.version>
+        <ognl.version>3.3.4</ognl.version>
         <orc.version>1.8.0</orc.version>
         <parquet.version>1.10.0</parquet.version>
         <poi.version>5.2.3</poi.version>
