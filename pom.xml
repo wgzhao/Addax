@@ -47,7 +47,7 @@
         <findbugs.version>3.0.1</findbugs.version>
         <guava.version>29.0-jre</guava.version>
         <groovy.version>3.0.9</groovy.version>
-        <fluent.hc.version>4.5.13</fluent.hc.version>
+        <fluent.hc.version>4.5.14</fluent.hc.version>
         <hadoop.common.version>3.2.2</hadoop.common.version>
         <hbase1.version>1.4.13</hbase1.version>
         <hbase2.version>2.2.5</hbase2.version>
