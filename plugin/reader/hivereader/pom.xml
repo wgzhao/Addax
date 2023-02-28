@@ -4,7 +4,7 @@
     <parent>
         <groupId>com.wgzhao.addax</groupId>
         <artifactId>addax-all</artifactId>
-        <version>4.0.12-SNAPSHOT</version>
+        <version>4.0.12</version>
         <relativePath>../../../pom.xml</relativePath>
     </parent>
     <artifactId>hivereader</artifactId>
