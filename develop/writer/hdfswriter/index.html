@@ -1195,33 +1195,6 @@
     hadoopConfig
   </a>
   
-    <nav class="md-nav" aria-label="hadoopConfig">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#havekerberos" class="md-nav__link">
-    haveKerberos
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#kerberoskeytabfilepath" class="md-nav__link">
-    kerberosKeytabFilePath
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#kerberosprincipal" class="md-nav__link">
-    kerberosPrincipal
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
 </li>
         
       </ul>
@@ -1672,33 +1645,6 @@
     hadoopConfig
   </a>
   
-    <nav class="md-nav" aria-label="hadoopConfig">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#havekerberos" class="md-nav__link">
-    haveKerberos
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#kerberoskeytabfilepath" class="md-nav__link">
-    kerberosKeytabFilePath
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#kerberosprincipal" class="md-nav__link">
-    kerberosPrincipal
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
 </li>
         
       </ul>
@@ -1888,7 +1834,7 @@
 <td align="left">haveKerberos</td>
 <td align="center">否</td>
 <td>无</td>
-<td>是否启用 Kerberos 认证，如果启用，则需要同时配置 <code>kerberosKeytabFilePath</code>，<code>kerberosPrincipal</code></td>
+<td>是否启用 Kerberos 认证，如果启用，则需要同时配置以下两项</td>
 </tr>
 <tr>
 <td align="left">kerberosKeytabFilePath</td>
@@ -1906,7 +1852,7 @@
 <td align="left">compress</td>
 <td align="center">否</td>
 <td>无</td>
-<td>文件的压缩格式</td>
+<td>文件的压缩格式，详见下文</td>
 </tr>
 <tr>
 <td align="left">hadoopConfig</td>
@@ -1965,12 +1911,15 @@
 <li>nonConflict，如果目录下有 <code>fileName</code> 前缀的文件，直接报错。</li>
 </ul>
 <h3 id="skiptrash">skipTrash<a class="headerlink" href="#skiptrash" title="Permanent link">&para;</a></h3>
-<p>当 <code>writeMode</code> 为 <code>overwrite</code> 模式时，当前要删除的文件或文件夹是否进入回收站，默认为进回收站，仅当配置为 <code>true</code> 时为直接删除。
-刚功能的实现方式为获取 Hadoop HDFS 的  <code>fs.trash.interval</code> 参数，如果该参数没有设置，或设置为0时，会在删除时，设置该参数为 10080 ，表示 7 天。
-这样，进入回收站的文件会保留7天。
-修改删除的默认行为是为了给因为错误的采集而导致删除的数据有挽回的机会。</p>
+<p>当 <code>writeMode</code> 为 <code>overwrite</code> 模式时，当前要删除的文件或文件夹是否进入回收站，默认为进回收站，仅当配置为 <code>true</code> 时为直接删除。</p>
+<p>该功能的实现方式为获取 Hadoop HDFS 的  <code>fs.trash.interval</code> 参数，如果该参数没有设置，或设置为0时，会在删除时，设置该参数为 10080 ，表示 7 天。</p>
+<p>这样，进入回收站的文件会保留7天。</p>
+<p>修改删除的默认行为是为了给因为错误的采集而导致删除的数据有挽回的机会。</p>
 <h4 id="compress">compress<a class="headerlink" href="#compress" title="Permanent link">&para;</a></h4>
-<p>描述：hdfs文件压缩类型，默认不填写意味着没有压缩。其中：text类型文件支持压缩类型有gzip、bzip2;orc类型文件支持的压缩类型有NONE、SNAPPY（需要用户安装SnappyCodec）</p>
+<p>当 fileType（文件类型）为 csv 下的文件压缩方式，目前仅支持 gzip、bz2、zip、lzo、lzo_deflate、hadoop-snappy、framing-snappy 压缩；
+值得注意的是，lzo 存在两种压缩格式：lzo 和 lzo_deflate，用户在配置的时候需要留心，不要配错了；</p>
+<p>另外，由于 snappy 目前没有统一的 stream format，addax 目前只支持最主流的两种：hadoop-snappy（hadoop 上的 snappy stream format）
+和 framing-snappy（google 建议的 snappy stream format）;</p>
 <h3 id="hadoopconfig">hadoopConfig<a class="headerlink" href="#hadoopconfig" title="Permanent link">&para;</a></h3>
 <p><code>hadoopConfig</code> 里可以配置与 Hadoop 相关的一些高级参数，比如HA的配置</p>
 <div class="highlight"><pre><span></span><code><span class="p">{</span>
@@ -1984,12 +1933,6 @@
 <span class="p">}</span>
 </code></pre></div>
 <p>这里的 <code>cluster</code> 表示 HDFS 配置成HA时的名字，也是 <code>defaultFS</code> 配置项中的名字 如果实际环境中的名字不是 <code>cluster</code> ，则上述配置中所有写有 <code>cluster</code> 都需要替换</p>
-<h4 id="havekerberos">haveKerberos<a class="headerlink" href="#havekerberos" title="Permanent link">&para;</a></h4>
-<p>是否有Kerberos认证，默认 <code>false</code>, 如果用户配置true，则配置项 <code>kerberosKeytabFilePath</code>，<code>kerberosPrincipal</code> 为必填。</p>
-<h4 id="kerberoskeytabfilepath">kerberosKeytabFilePath<a class="headerlink" href="#kerberoskeytabfilepath" title="Permanent link">&para;</a></h4>
-<p>Kerberos认证 keytab文件路径，绝对路径</p>
-<h4 id="kerberosprincipal">kerberosPrincipal<a class="headerlink" href="#kerberosprincipal" title="Permanent link">&para;</a></h4>
-<p>描述：Kerberos认证Principal名，如 <code>xxxx/hadoopclient@xxx.xxx</code></p>
 <h2 id="_3">类型转换<a class="headerlink" href="#_3" title="Permanent link">&para;</a></h2>
 <table>
 <thead>
@@ -2027,7 +1970,7 @@
 </table>
 <h2 id="_4">功能与限制<a class="headerlink" href="#_4" title="Permanent link">&para;</a></h2>
 <ol>
-<li>目前不支持：<code>binary</code>、<code>arrays</code>、<code>maps</code>、<code>structs</code>、<code>union类型</code></li>
+<li>目前不支持：<code>binary</code>、<code>arrays</code>、<code>maps</code>、<code>structs</code>、<code>union</code> 类型</li>
 </ol>
 
 

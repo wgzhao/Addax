@@ -1313,6 +1313,19 @@
     参数说明
   </a>
   
+    <nav class="md-nav" aria-label="参数说明">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#writemode" class="md-nav__link">
+    writeMode
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
 </li>
       
         <li class="md-nav__item">
@@ -1533,6 +1546,19 @@
     参数说明
   </a>
   
+    <nav class="md-nav" aria-label="参数说明">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#writemode" class="md-nav__link">
+    writeMode
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
 </li>
       
         <li class="md-nav__item">
@@ -1558,10 +1584,10 @@
 
 
 <h1 id="sqlite-writer">SQLite Writer<a class="headerlink" href="#sqlite-writer" title="Permanent link">&para;</a></h1>
-<p>SQLiteWriter 插件实现了写入数据到 SQLite 数据库的功能。</p>
+<p>SQLiteWriter 插件实现了写入数据到 <a href="https://sqlite.org/index.html">SQLite</a> 数据库的功能。</p>
 <h2 id="_1">示例<a class="headerlink" href="#_1" title="Permanent link">&para;</a></h2>
 <p>假定要写入的表如下：</p>
-<div class="highlight"><pre><span></span><code><span class="k">create</span><span class="w"> </span><span class="k">table</span><span class="w"> </span><span class="n">addax_tbl</span><span class="w"> </span>
+<div class="highlight"><pre><span></span><code><span class="k">create</span><span class="w"> </span><span class="k">table</span><span class="w"> </span><span class="n">addax_tbl</span>
 <span class="p">(</span>
 <span class="n">col1</span><span class="w"> </span><span class="nb">varchar</span><span class="p">(</span><span class="mi">20</span><span class="p">)</span><span class="w"> </span><span class="p">,</span>
 <span class="n">col2</span><span class="w"> </span><span class="nb">int</span><span class="p">(</span><span class="mi">4</span><span class="p">),</span>
@@ -1634,7 +1660,7 @@
 <span class="w">  </span><span class="p">}</span>
 <span class="p">}</span>
 </code></pre></div>
-<p>将上述配置文件保存为  <code>job/stream2sqlite.json</code></p>
+<p>将上述配置文件保存为 <code>job/stream2sqlite.json</code></p>
 <h3 id="_2">执行采集命令<a class="headerlink" href="#_2" title="Permanent link">&para;</a></h3>
 <p>执行以下命令进行数据采集</p>
 <div class="highlight"><pre><span></span><code>bin/addax.sh<span class="w"> </span>job/stream2sqlite.json
@@ -1656,7 +1682,7 @@
 <td align="center">是</td>
 <td>list</td>
 <td>无</td>
-<td>对端数据库的JDBC连接信息，jdbcUrl按照RDBMS官方规范</td>
+<td>对端数据库的 JDBC 连接信息，jdbcUrl 按照 RDBMS 官方规范</td>
 </tr>
 <tr>
 <td align="left">driver</td>
@@ -1670,7 +1696,7 @@
 <td align="center">是</td>
 <td>list</td>
 <td>无</td>
-<td>所选取的需要同步的表名,使用JSON数据格式，当配置为多张表时，用户自己需保证多张表是同一表结构</td>
+<td>所选取的需要同步的表名,使用 JSON 数据格式，当配置为多张表时，用户自己需保证多张表是同一表结构</td>
 </tr>
 <tr>
 <td align="left">column</td>
@@ -1684,39 +1710,45 @@
 <td align="center">否</td>
 <td>list</td>
 <td>空</td>
-<td>Addax在获取连接时，执行session指定的SQL语句，修改当前connection session属性</td>
+<td>Addax 在获取连接时，执行 session 指定的 SQL 语句，修改当前 connection session 属性</td>
 </tr>
 <tr>
 <td align="left">preSql</td>
 <td align="center">否</td>
 <td>list</td>
 <td>无</td>
-<td>数据写入钱先执行的sql语句，例如清除旧数据,如果 Sql 中有你需要操作到的表名称，可用 <code>@table</code> 表示</td>
+<td>数据写入钱先执行的 sql 语句，例如清除旧数据,如果 sql 中有你需要操作到的表名称，可用 <code>@table</code> 表示</td>
 </tr>
 <tr>
 <td align="left">postSql</td>
 <td align="center">否</td>
 <td>list</td>
 <td>无</td>
-<td>数据写入完成后执行的sql语句，例如加上某一个时间戳</td>
+<td>数据写入完成后执行的 sql 语句，例如加上某一个时间戳</td>
 </tr>
 <tr>
 <td align="left">writeMode</td>
 <td align="center">是</td>
 <td>string</td>
 <td>insert</td>
-<td>数据写入表的方式, <code>insert</code> 表示采用 <code>insert into</code> , <code>replace</code>表示采用<code>replace into</code>方式 <code>update</code> 表示采用 <code>ON DUPLICATE KEY UPDATE</code> 语句</td>
+<td>数据写入表的方式, 详见下文</td>
 </tr>
 <tr>
 <td align="left">batchSize</td>
 <td align="center">否</td>
 <td>int</td>
 <td>1024</td>
-<td>定义了插件和数据库服务器端每次批量数据获取条数，调高该值可能导致 Addax 出现OOM或者目标数据库事务提交失败导致挂起</td>
+<td>定义了插件和数据库服务器端每次批量数据获取条数</td>
 </tr>
 </tbody>
 </table>
 <p>注： 因为 SQLite 连接无需账号密码，因此其他数据库写入插件需要配置的 <code>username</code>, <code>password</code> 在这里不需要。</p>
+<h3 id="writemode">writeMode<a class="headerlink" href="#writemode" title="Permanent link">&para;</a></h3>
+<ul>
+<li><code>insert</code> 表示采用 <code>insert into</code></li>
+<li><code>replace</code>表示采用<code>replace into</code>方式</li>
+<li><code>update</code> 表示采用 <code>ON DUPLICATE KEY UPDATE</code> 语句</li>
+</ul>
 <h2 id="_4">类型转换<a class="headerlink" href="#_4" title="Permanent link">&para;</a></h2>
 <table>
 <thead>

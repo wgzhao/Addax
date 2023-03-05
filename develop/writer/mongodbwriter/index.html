@@ -1213,6 +1213,13 @@
 </li>
         
           <li class="md-nav__item">
+  <a href="#splitter" class="md-nav__link">
+    splitter
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#writemode" class="md-nav__link">
     writeMode
   </a>
@@ -1538,6 +1545,13 @@
 </li>
         
           <li class="md-nav__item">
+  <a href="#splitter" class="md-nav__link">
+    splitter
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#writemode" class="md-nav__link">
     writeMode
   </a>
@@ -1749,50 +1763,50 @@
 <td align="left">address</td>
 <td align="center">是</td>
 <td>list</td>
-<td></td>
-<td>无    MongoDB的数据地址信息，因为MongoDB可能是个集群，则ip端口信息需要以Json数组的形式给出</td>
+<td>无</td>
+<td>MongoDB 的数据地址信息</td>
 </tr>
 <tr>
 <td align="left">username</td>
 <td align="center">否</td>
 <td>string</td>
 <td>无</td>
-<td>MongoDB的用户名</td>
+<td>MongoDB 的用户名</td>
 </tr>
 <tr>
 <td align="left">password</td>
 <td align="center">否</td>
 <td>string</td>
 <td>无</td>
-<td>MongoDB的密码</td>
+<td>MongoDB 的密码</td>
 </tr>
 <tr>
 <td align="left">collection</td>
 <td align="center">是</td>
 <td>string</td>
 <td>无</td>
-<td>MongoDB的集合名</td>
+<td>MongoDB 的集合名</td>
 </tr>
 <tr>
 <td align="left">column</td>
 <td align="center">是</td>
 <td>list</td>
 <td>无</td>
-<td>MongoDB的文档列名</td>
+<td>MongoDB 的文档列名</td>
 </tr>
 <tr>
 <td align="left">splitter</td>
 <td align="center">否</td>
 <td>string</td>
 <td>无</td>
-<td>特殊分隔符，当且仅当要处理的字符串要用分隔符分隔为字符数组时，才使用这个参数，通过这个参数指定的分隔符，将字符串分隔存储到MongoDB的数组中</td>
+<td>特殊分隔符，详见下文</td>
 </tr>
 <tr>
 <td align="left">writeMode</td>
 <td align="center">否</td>
 <td>string</td>
 <td>insert</td>
-<td>指定了传输数据时更新的信息,支持 insert， update两种</td>
+<td>指定了传输数据时更新的信息,支持 insert， update 两种</td>
 </tr>
 <tr>
 <td align="left">batchSize</td>
@@ -1806,14 +1820,14 @@
 <td align="center">否</td>
 <td>string</td>
 <td>无</td>
-<td>当设置为true时，表示针对相同的upsertKey做更新操作</td>
+<td>当设置为 true 时，表示针对相同的 upsertKey 做更新操作</td>
 </tr>
 <tr>
 <td align="left">upsertKey</td>
 <td align="center">否</td>
 <td>string</td>
 <td>无</td>
-<td>upsertKey指定了没行记录的业务主键。用来做更新时使用</td>
+<td>upsertKey 指定了没行记录的业务主键。用来做更新时使用</td>
 </tr>
 </tbody>
 </table>
@@ -1837,6 +1851,8 @@
 <span class="w">  </span><span class="p">}</span>
 <span class="p">}</span>
 </code></pre></div>
+<h3 id="splitter">splitter<a class="headerlink" href="#splitter" title="Permanent link">&para;</a></h3>
+<p>当且仅当要处理的字符串要用分隔符分隔为字符数组时，才使用这个参数，通过这个参数指定的分隔符，将字符串分隔存储到 MongoDB 的数组中</p>
 <h3 id="writemode">writeMode<a class="headerlink" href="#writemode" title="Permanent link">&para;</a></h3>
 <p>不配置的情况下，默认采取直接插入记录的方式，如果希望实现插入更新（即记录存在则更新否则插入），可以指定为 <code>update</code> 模式，该模式下，必须同时更新的字段是哪个，比如：</p>
 <div class="highlight"><pre><span></span><code><span class="p">{</span>

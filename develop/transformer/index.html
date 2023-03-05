@@ -1658,18 +1658,13 @@
 <p>在数据同步、传输过程中，存在用户对于数据传输进行特殊定制化的需求场景，包括裁剪列、转换列等工作，可以借助ETL的T过程实现(Transformer)。Addax包含了完成的E(Extract)、T(Transformer)、L(Load)支持。</p>
 <h2 id="_2">运行模型<a class="headerlink" href="#_2" title="Permanent link">&para;</a></h2>
 <pre class="mermaid"><code>graph LR
-source(("source")):::s1
+source(("source"))
 subgraph fr["Addax Framework"]
-direction LR
-Reader:::s2 ==&gt; Transformer ==&gt;Writer:::s2
+    direction LR
+    Reader ==&gt; Transformer ==&gt;Writer
 end
 target(("target"))
-source ==&gt; fr ==&gt; target:::s1
-
-classDef s1 fill:#66bed5,stroke-width:0px;
-classDef s2 fill:#efef,stroke-width:0px;
-style Transformer fill:orange,stroke-width:0px;
-</code></pre>
+source ==&gt; fr ==&gt; target</code></pre>
 <h2 id="udf">UDF 函数<a class="headerlink" href="#udf" title="Permanent link">&para;</a></h2>
 <h3 id="dx_substr">dx_substr<a class="headerlink" href="#dx_substr" title="Permanent link">&para;</a></h3>
 <p><code>dx_substr(idx, pos, length) -&gt; str</code></p>

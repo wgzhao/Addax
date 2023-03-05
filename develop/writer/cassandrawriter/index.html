@@ -1574,7 +1574,7 @@
 <h1 id="cassandra-writer">Cassandra Writer<a class="headerlink" href="#cassandra-writer" title="Permanent link">&para;</a></h1>
 <p>CassandraWriter 插件用于向 <a href="https://cassandra.apache.org">Cassandra</a> 写入数据。</p>
 <h2 id="_1">配置样例<a class="headerlink" href="#_1" title="Permanent link">&para;</a></h2>
-<p>配置一个从内存产生到Cassandra导入的作业:</p>
+<p>配置一个从内存产生到 Cassandra 导入的作业:</p>
 <div class="tabbed-set" data-tabs="1:1"><input checked="checked" id="__tabbed_1_1" name="__tabbed_1" type="radio" /><label for="__tabbed_1_1">jobs/stream2cassandra.json</label><div class="tabbed-content"></div>
 </div>
 <div class="highlight"><pre><span></span><code><span class="p">{</span>
@@ -1681,13 +1681,13 @@
 <td align="left">host</td>
 <td align="center">是</td>
 <td>无</td>
-<td>Cassandra连接点的域名或ip，多个node之间用逗号分隔</td>
+<td>Cassandra 连接点的域名或 ip，多个 node 之间用逗号分隔</td>
 </tr>
 <tr>
 <td align="left">port</td>
 <td align="center">是</td>
 <td>9042</td>
-<td>Cassandra端口</td>
+<td>Cassandra 端口</td>
 </tr>
 <tr>
 <td align="left">username</td>
@@ -1705,7 +1705,7 @@
 <td align="left">useSSL</td>
 <td align="center">否</td>
 <td>false</td>
-<td>是否使用SSL连接</td>
+<td>是否使用 SSL 连接</td>
 </tr>
 <tr>
 <td align="left">connectionsPerHost</td>
@@ -1723,7 +1723,7 @@
 <td align="left">keyspace</td>
 <td align="center">是</td>
 <td>无</td>
-<td>需要同步的表所在的keyspace</td>
+<td>需要同步的表所在的 keyspace</td>
 </tr>
 <tr>
 <td align="left">table</td>
@@ -1791,9 +1791,9 @@
 <h2 id="_4">约束限制<a class="headerlink" href="#_4" title="Permanent link">&para;</a></h2>
 <h3 id="batchsize">batchSize<a class="headerlink" href="#batchsize" title="Permanent link">&para;</a></h3>
 <ol>
-<li>不能超过65535</li>
-<li>batch中的内容大小受到服务器端 <code>batch_size_fail_threshold_in_kb</code> 的限制。</li>
-<li>如果batch中的内容超过了 <code>batch_size_warn_threshold_in_kb</code> 的限制，会打出warn日志，但并不影响写入，忽略即可。</li>
+<li>不能超过 65535</li>
+<li>batch 中的内容大小受到服务器端 <code>batch_size_fail_threshold_in_kb</code> 的限制。</li>
+<li>如果 batch 中的内容超过了 <code>batch_size_warn_threshold_in_kb</code> 的限制，会打出 warn 日志，但并不影响写入，忽略即可。</li>
 <li>如果批量提交失败，会把这个批量的所有内容重新逐条写入一遍。</li>
 </ol>
 

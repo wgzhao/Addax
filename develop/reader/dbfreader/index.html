@@ -1572,7 +1572,7 @@
 
 
 <h1 id="dbf-reader">Dbf Reader<a class="headerlink" href="#dbf-reader" title="Permanent link">&para;</a></h1>
-<p><code>DbfReader</code> 插件支持读取DBF格式文件</p>
+<p><code>DbfReader</code> 插件支持读取 DBF 格式文件</p>
 <h2 id="_1">配置说明<a class="headerlink" href="#_1" title="Permanent link">&para;</a></h2>
 <p>以下是读取 DBF 文件后打印到终端的配置样例</p>
 <div class="tabbed-set" data-tabs="1:1"><input checked="checked" id="__tabbed_1_1" name="__tabbed_1" type="radio" /><label for="__tabbed_1_1">jobs/dbf2stream.json</label><div class="tabbed-content"></div>
@@ -1647,7 +1647,7 @@
 <td align="left">path</td>
 <td align="center">是</td>
 <td>无</td>
-<td>DBF文件路径，支持写多个路径，详细情况见下</td>
+<td>DBF 文件路径，支持写多个路径，详细情况见下</td>
 </tr>
 <tr>
 <td align="left">column</td>
@@ -1659,35 +1659,33 @@
 <td align="left">encoding</td>
 <td align="center">否</td>
 <td>GBK</td>
-<td>DBF文件编码，比如 <code>GBK</code>, <code>UTF-8</code></td>
+<td>DBF 文件编码，比如 <code>GBK</code>, <code>UTF-8</code></td>
 </tr>
 <tr>
 <td align="left">nullFormat</td>
 <td align="center">否</td>
 <td><code>\N</code></td>
-<td>定义哪个字符串可以表示为null,</td>
+<td>定义哪个字符串可以表示为 null,</td>
 </tr>
 </tbody>
 </table>
 <h3 id="path">path<a class="headerlink" href="#path" title="Permanent link">&para;</a></h3>
 <p>描述：本地文件系统的路径信息，注意这里可以支持填写多个路径。</p>
 <ul>
-<li>当指定单个本地文件，DbfFileReader暂时只能使用单线程进行数据抽取。二期考虑在非压缩文件情况下针对单个File可以进行多线程并发读取。</li>
-<li>当指定多个本地文件，DbfFileReader支持使用多线程进行数据抽取。线程并发数通过通道数指定。</li>
-<li>当指定通配符，DbfFileReader尝试遍历出多个文件信息。例如: 指定 <code>/*</code> 代表读取/目录下所有的文件，指定 <code>/foo/*</code> 代表读取 <code>foo</code> 目录下游所有的文件。 dbfFileReader目前只支持 <code>*</code> 作为文件通配符。</li>
+<li>当指定单个本地文件，DbfFileReader 暂时只能使用单线程进行数据抽取。二期考虑在非压缩文件情况下针对单个 File 可以进行多线程并发读取。</li>
+<li>当指定多个本地文件，DbfFileReader 支持使用多线程进行数据抽取。线程并发数通过通道数指定。</li>
+<li>当指定通配符，DbfFileReader 尝试遍历出多个文件信息。例如: 指定 <code>/*</code> 代表读取/目录下所有的文件，指定 <code>/foo/*</code> 代表读取 <code>foo</code> 目录下游所有的文件。 dbfFileReader 目前只支持 <code>*</code> 作为文件通配符。</li>
 </ul>
-<p>特别需要注意的是，Addax会将一个作业下同步的所有dbf File视作同一张数据表。用户必须自己保证所有的File能够适配同一套schema信息。读取文件用户必须保证为类dbf格式，并且提供给Addax权限可读。</p>
-<p>特别需要注意的是，如果Path指定的路径下没有符合匹配的文件抽取，Addax将报错。</p>
+<p>特别需要注意的是，Addax 会将一个作业下同步的所有 dbf File 视作同一张数据表。用户必须自己保证所有的 File 能够适配同一套 schema 信息。读取文件用户必须保证为类 dbf 格式，并且提供给 Addax 权限可读。</p>
+<p>特别需要注意的是，如果 Path 指定的路径下没有符合匹配的文件抽取，Addax 将报错。</p>
 <h3 id="column">column<a class="headerlink" href="#column" title="Permanent link">&para;</a></h3>
-<p>读取字段列表，<code>type</code> 指定源数据的类型，<code>name</code> 为字段名,长度最大8，<code>value</code> 指定当前类型为常量，不从源头文件读取数据，而是根据 <code>value</code> 值自动生成对应的列。</p>
+<p>读取字段列表，<code>type</code> 指定源数据的类型，<code>name</code> 为字段名,长度最大 8，<code>value</code> 指定当前类型为常量，不从源头文件读取数据，而是根据 <code>value</code> 值自动生成对应的列。</p>
 <p>默认情况下，用户可以全部按照 <code>String</code> 类型读取数据，配置如下：</p>
 <div class="highlight"><pre><span></span><code><span class="p">{</span>
-<span class="w">  </span><span class="nt">&quot;column&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span>
-<span class="w">    </span><span class="s2">&quot;*&quot;</span>
-<span class="w">  </span><span class="p">]</span>
+<span class="w">  </span><span class="nt">&quot;column&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="s2">&quot;*&quot;</span><span class="p">]</span>
 <span class="p">}</span>
 </code></pre></div>
-<p>用户可以指定Column字段信息，配置如下：</p>
+<p>用户可以指定 Column 字段信息，配置如下：</p>
 <div class="highlight"><pre><span></span><code><span class="p">[</span>
 <span class="w">  </span><span class="p">{</span>
 <span class="w">    </span><span class="nt">&quot;type&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;long&quot;</span><span class="p">,</span>
@@ -1699,10 +1697,12 @@
 <span class="w">  </span><span class="p">}</span>
 <span class="p">]</span>
 </code></pre></div>
-<p><code>"index": 0</code> 表示从本地DBF文件第一列获取int字段
-<code>"value": "addax"</code> 表示从 dbfFileReader 内部生成 <code>addax</code> 的字符串字段作为当前字段 对于用户指定 <code>column</code>信息，<code>type</code> 必须填写，<code>index</code> 和 <code>value</code> 必须选择其一。</p>
+<ul>
+<li><code>"index": 0</code> 表示从本地 DBF 文件第一列获取 int 字段</li>
+<li><code>"value": "addax"</code> 表示从 dbfFileReader 内部生成 <code>addax</code> 的字符串字段作为当前字段 对于用户指定 <code>column</code>信息，<code>type</code> 必须填写，<code>index</code> 和 <code>value</code> 必须选择其一。</li>
+</ul>
 <h3 id="_3">支持的数据类型<a class="headerlink" href="#_3" title="Permanent link">&para;</a></h3>
-<p>本地文件本身提供数据类型，该类型是 Addax dbfFileReader定义：</p>
+<p>本地文件本身提供数据类型，该类型是 Addax dbfFileReader 定义：</p>
 <table>
 <thead>
 <tr>
@@ -1736,9 +1736,9 @@
 <p>其中：</p>
 <ul>
 <li>Long 是指本地文件文本中使用整形的字符串表示形式，例如 <code>19901219</code>。</li>
-<li>Double 是指本地文件文本中使用Double的字符串表示形式，例如 <code>3.1415</code>。</li>
-<li>Boolean 是指本地文件文本中使用Boolean的字符串表示形式，例如 <code>true</code>、<code>false</code>。不区分大小写。</li>
-<li>Date 是指本地文件文本中使用Date的字符串表示形式，例如 <code>2014-12-31</code>，可以配置 <code>dateFormat</code> 指定格式。</li>
+<li>Double 是指本地文件文本中使用 Double 的字符串表示形式，例如 <code>3.1415</code>。</li>
+<li>Boolean 是指本地文件文本中使用 Boolean 的字符串表示形式，例如 <code>true</code>、<code>false</code>。不区分大小写。</li>
+<li>Date 是指本地文件文本中使用 Date 的字符串表示形式，例如 <code>2014-12-31</code>，可以配置 <code>dateFormat</code> 指定格式。</li>
 </ul>
 
 

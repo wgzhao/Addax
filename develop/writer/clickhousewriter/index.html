@@ -1584,7 +1584,7 @@
 
 
 <h1 id="clickhouse-writer">ClickHouse Writer<a class="headerlink" href="#clickhouse-writer" title="Permanent link">&para;</a></h1>
-<p>ClickHouseWriter 插件用于了向 <a href="https://clickhouse.tech">ClickHouse</a> 写入数据。 </p>
+<p>ClickHouseWriter 插件用于向 <a href="https://clickhouse.tech">ClickHouse</a> 写入数据。 </p>
 <h2 id="_1">示例<a class="headerlink" href="#_1" title="Permanent link">&para;</a></h2>
 <p>以下示例我们演示从 clickhouse 中读取一张表的内容，并写入到相同表结构的另外一张表中，用来测试插件所支持的数据结构</p>
 <h3 id="_2">表结构以数据<a class="headerlink" href="#_2" title="Permanent link">&para;</a></h3>
@@ -1700,6 +1700,7 @@
 <tr>
 <th align="left">配置项</th>
 <th align="center">是否必须</th>
+<th>数据类型</th>
 <th>默认值</th>
 <th>描述</th>
 </tr>
@@ -1708,38 +1709,44 @@
 <tr>
 <td align="left">jdbcUrl</td>
 <td align="center">是</td>
+<td>string</td>
 <td>无</td>
 <td>ClickHouse JDBC 连接信息 ,可按照官方规范填写连接附件控制信息。具体请参看<a href="https://github.com/yandex/clickhouse-jdbc">ClickHouse官方文档</a></td>
 </tr>
 <tr>
 <td align="left">username</td>
 <td align="center">是</td>
+<td>string</td>
 <td>无</td>
 <td>数据源的用户名</td>
 </tr>
 <tr>
 <td align="left">password</td>
 <td align="center">否</td>
+<td>string</td>
 <td>无</td>
 <td>数据源指定用户名的密码</td>
 </tr>
 <tr>
 <td align="left">table</td>
 <td align="center">是</td>
+<td><code>list[string]</code></td>
 <td>无</td>
 <td>所选取的需要同步的表 ,当配置为多张表时，用户自己需保证多张表是同一schema结构</td>
 </tr>
 <tr>
 <td align="left">column</td>
 <td align="center">是</td>
+<td><code>list[map]</code></td>
 <td>无</td>
 <td>所配置的表中需要同步的列名集合, 使用JSON的数组描述字段信息。用户使用 <code>*</code> 代表默认使用所有列配置，例如 <code>"['*']"</code></td>
 </tr>
 <tr>
 <td align="left">batchSize</td>
 <td align="center">否</td>
+<td>int</td>
 <td>2048</td>
-<td>每次批量数据的条数</td>
+<td>每次批量写入数据的条数</td>
 </tr>
 </tbody>
 </table>

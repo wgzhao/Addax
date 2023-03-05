@@ -1532,7 +1532,7 @@
 
 
 <h1 id="elasticsearch-writer">ElasticSearch Writer<a class="headerlink" href="#elasticsearch-writer" title="Permanent link">&para;</a></h1>
-<p>elasticsearchWriter 插件用于向 <a href="https://www.elastic.co/cn/elastic-stack/">ElasticSearch</a> 写入数据。其实现是通过 elasticsearch 的rest api接口， 批量把据写入elasticsearch</p>
+<p>elasticsearchWriter 插件用于向 <a href="https://www.elastic.co/cn/elastic-stack/">ElasticSearch</a> 写入数据。其实现是通过 elasticsearch 的 rest api 接口， 批量把据写入 elasticsearch</p>
 <h2 id="_1">配置样例<a class="headerlink" href="#_1" title="Permanent link">&para;</a></h2>
 <div class="tabbed-set" data-tabs="1:1"><input checked="checked" id="__tabbed_1_1" name="__tabbed_1" type="radio" /><label for="__tabbed_1_1">job/stream2es.json</label><div class="tabbed-content"></div>
 </div>
@@ -1693,31 +1693,31 @@
 <td align="left">endpoint</td>
 <td align="center">是</td>
 <td>无</td>
-<td>ElasticSearch的连接地址</td>
+<td>ElasticSearch 的连接地址</td>
 </tr>
 <tr>
 <td align="left">accessId</td>
 <td align="center">否</td>
 <td>空</td>
-<td>http auth中的user, 默认为空</td>
+<td>http auth 中的 user, 默认为空</td>
 </tr>
 <tr>
 <td align="left">accessKey</td>
 <td align="center">否</td>
 <td>空</td>
-<td>http auth中的password</td>
+<td>http auth 中的 password</td>
 </tr>
 <tr>
 <td align="left">index</td>
 <td align="center">是</td>
 <td>无</td>
-<td>index名</td>
+<td>index 名</td>
 </tr>
 <tr>
 <td align="left">type</td>
 <td align="center">否</td>
-<td>index名</td>
-<td>index的type名</td>
+<td>index 名</td>
+<td>index 的 type 名</td>
 </tr>
 <tr>
 <td align="left">cleanup</td>
@@ -1753,13 +1753,13 @@
 <td align="left">compression</td>
 <td align="center">否</td>
 <td>true</td>
-<td>否是开启http请求压缩</td>
+<td>否是开启 http 请求压缩</td>
 </tr>
 <tr>
 <td align="left">multiThread</td>
 <td align="center">否</td>
 <td>true</td>
-<td>是否开启多线程http请求</td>
+<td>是否开启多线程 http 请求</td>
 </tr>
 <tr>
 <td align="left">ignoreWriteError</td>
@@ -1789,13 +1789,13 @@
 <td align="left">settings</td>
 <td align="center">否</td>
 <td>无</td>
-<td>创建index时候的settings, 与elasticsearch官方相同</td>
+<td>创建 index 时候的 settings, 与 elasticsearch 官方相同</td>
 </tr>
 <tr>
 <td align="left">splitter</td>
 <td align="center">否</td>
 <td><code>,</code></td>
-<td>如果插入数据是array，就使用指定分隔符</td>
+<td>如果插入数据是 array，就使用指定分隔符</td>
 </tr>
 <tr>
 <td align="left">column</td>
@@ -1807,14 +1807,14 @@
 <td align="left">dynamic</td>
 <td align="center">否</td>
 <td>false</td>
-<td>不使用addax的mappings，使用es自己的自动mappings</td>
+<td>不使用 addax 的 mappings，使用 es 自己的自动 mappings</td>
 </tr>
 </tbody>
 </table>
 <h2 id="_3">约束限制<a class="headerlink" href="#_3" title="Permanent link">&para;</a></h2>
 <ul>
-<li>如果导入id，这样数据导入失败也会重试，重新导入也仅仅是覆盖，保证数据一致性</li>
-<li>如果不导入id，就是append_only模式，elasticsearch自动生成id，速度会提升20%左右，但数据无法修复，适合日志型数据(对数据精度要求不高的)</li>
+<li>如果导入 id，这样数据导入失败也会重试，重新导入也仅仅是覆盖，保证数据一致性</li>
+<li>如果不导入 id，就是 append_only 模式，elasticsearch 自动生成 id，速度会提升 20%左右，但数据无法修复，适合日志型数据(对数据精度要求不高的)</li>
 </ul>
 
 

@@ -1705,7 +1705,7 @@
 <span class="w">  </span><span class="p">}</span>
 <span class="p">}</span>
 </code></pre></div>
-<p>将上述配置文件保存为   <code>job/clickhouse2stream.json</code></p>
+<p>将上述配置文件保存为 <code>job/clickhouse2stream.json</code></p>
 <h3 id="_3">执行采集命令<a class="headerlink" href="#_3" title="Permanent link">&para;</a></h3>
 <p>执行以下命令进行数据采集</p>
 <div class="highlight"><pre><span></span><code>bin/addax.sh<span class="w"> </span>job/clickhouse2stream.json
@@ -1804,21 +1804,21 @@
 <td align="center">是</td>
 <td>array</td>
 <td>无</td>
-<td>所选取的需要同步的表 ,当配置为多张表时，用户自己需保证多张表是同一schema结构</td>
+<td>所选取的需要同步的表 ,当配置为多张表时，用户自己需保证多张表是同一 schema 结构</td>
 </tr>
 <tr>
 <td align="left">column</td>
 <td align="center">是</td>
 <td>array</td>
 <td>无</td>
-<td>所配置的表中需要同步的列名集合, 使用JSON的数组描述字段信息。用户使用 <code>*</code> 代表默认使用所有列配置，例如 <code>["*"]</code></td>
+<td>所配置的表中需要同步的列名集合, 使用 JSON 的数组描述字段信息。用户使用 <code>*</code> 代表默认使用所有列配置，例如 <code>["*"]</code></td>
 </tr>
 <tr>
 <td align="left">splitPk</td>
 <td align="center">否</td>
 <td>string</td>
 <td>无</td>
-<td>希望使用splitPk代表的字段进行数据分片,Addax因此会启动并发任务进行数据同步，这样可以大大提供数据同步的效能</td>
+<td>希望使用 splitPk 代表的字段进行数据分片,Addax 因此会启动并发任务进行数据同步，这样可以大大提供数据同步的效能</td>
 </tr>
 <tr>
 <td align="left">autoPk</td>
@@ -1839,13 +1839,13 @@
 <td align="center">否</td>
 <td>array</td>
 <td>无</td>
-<td>使用SQL查询而不是直接指定表的方式读取数据，当用户配置querySql时，ClickHouseReader直接忽略table、column、where条件的配置</td>
+<td>使用 SQL 查询而不是直接指定表的方式读取数据，当用户配置 querySql 时，ClickHouseReader 直接忽略 table、column、where 条件的配置</td>
 </tr>
 </tbody>
 </table>
 <h2 id="_5">支持的数据类型<a class="headerlink" href="#_5" title="Permanent link">&para;</a></h2>
-<p>目前ClickHouseReader支持大部分ClickHouse类型，但也存在部分个别类型没有支持的情况，请注意检查你的类型。</p>
-<p>下面列出ClickHouseReader针对ClickHouse类型转换列表:</p>
+<p>目前 ClickHouseReader 支持大部分 ClickHouse 类型，但也存在部分个别类型没有支持的情况，请注意检查你的类型。</p>
+<p>下面列出 ClickHouseReader 针对 ClickHouse 类型转换列表:</p>
 <table>
 <thead>
 <tr>
@@ -1881,7 +1881,7 @@
 </tbody>
 </table>
 <h2 id="_6">限制<a class="headerlink" href="#_6" title="Permanent link">&para;</a></h2>
-<p>除上述罗列字段类型外，其他类型均不支持，如Array、Nested等</p>
+<p>除上述罗列字段类型外，其他类型均不支持，如 Array、Nested 等</p>
 
 
 

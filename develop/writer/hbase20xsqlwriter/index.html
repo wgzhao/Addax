@@ -1639,7 +1639,7 @@
 <tr>
 <td align="left">column</td>
 <td align="center">否</td>
-<td>全部列</td>
+<td>无</td>
 <td>列名，大小写敏感，通常phoenix的列名都是**大写**, 数据类型无需填写,会自动获取列</td>
 </tr>
 <tr>
@@ -1670,7 +1670,7 @@
 </table>
 <h3 id="jdbcurl">jdbcUrl<a class="headerlink" href="#jdbcurl" title="Permanent link">&para;</a></h3>
 <p><code>queryServerAddress</code> 是满足 Phoenix 链接的地址，具体格式和要求可以参考<a href="http://phoenix.apache.org/index.html">官方文档</a> ，其 jdbc 连接串格式如下：</p>
-<div class="highlight"><pre><span></span><code><span class="nl">jdbc</span><span class="p">:</span><span class="n">phoenix</span><span class="w"> </span><span class="o">[</span><span class="w"> </span><span class="p">:</span><span class="o">&lt;</span><span class="n">zookeeper</span><span class="w"> </span><span class="n">quorum</span><span class="o">&gt;</span><span class="w"> </span><span class="o">[</span><span class="w"> </span><span class="p">:</span><span class="o">&lt;</span><span class="n">port</span><span class="w"> </span><span class="n">number</span><span class="o">&gt;</span><span class="w"> </span><span class="o">[</span><span class="w"> </span><span class="p">:</span><span class="o">&lt;</span><span class="n">root</span><span class="w"> </span><span class="n">node</span><span class="o">&gt;</span><span class="w"> </span><span class="o">[</span><span class="w"> </span><span class="p">:</span><span class="o">&lt;</span><span class="n">principal</span><span class="o">&gt;</span><span class="w"> </span><span class="o">[</span><span class="w"> </span><span class="p">:</span><span class="o">&lt;</span><span class="n">keytab</span><span class="w"> </span><span class="n">file</span><span class="o">&gt;</span><span class="w"> </span><span class="o">]</span><span class="w"> </span><span class="o">]</span><span class="w"> </span><span class="o">]</span><span class="w"> </span><span class="o">]</span><span class="w"> </span><span class="o">]</span><span class="w"> </span>
+<div class="highlight"><pre><span></span><code>jdbc:phoenix [ :&lt;zookeeper quorum&gt; [ :&lt;port number&gt; [ :&lt;root node&gt; [ :&lt;principal&gt; [ :&lt;keytab file&gt; ] ] ] ] ] 
 </code></pre></div>
 <ul>
 <li>zookeeper quorum: zookeeper 集群地址，多个地址用逗号分隔，如：<code>node1,node2,node3</code></li>
@@ -1680,7 +1680,7 @@
 <li>keytab file: kerberos 凭证文件的绝对路径，仅当 <code>havekerberos</code> 启用后有效</li>
 </ul>
 <p>如果你希望通过连接 Phoenix Query Server (a.k.a PQS) ，则 JDBC 连接串如下：</p>
-<div class="highlight"><pre><span></span><code><span class="nl">jdbc</span><span class="p">:</span><span class="n">phoenix</span><span class="p">:</span><span class="n">thin</span><span class="p">:</span><span class="n">url</span><span class="o">=&lt;</span><span class="n">scheme</span><span class="o">&gt;</span><span class="p">:</span><span class="c1">//&lt;server-hostname&gt;:&lt;port&gt;[;option=value...]</span>
+<div class="highlight"><pre><span></span><code>jdbc:phoenix:thin:url=&lt;scheme&gt;://&lt;server-hostname&gt;:&lt;port&gt;[;option=value...]
 </code></pre></div>
 <ul>
 <li>schema: 传输协议，<code>http</code> 或 <code>https</code>，默认为 <code>http</code></li>

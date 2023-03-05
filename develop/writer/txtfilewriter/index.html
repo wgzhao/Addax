@@ -1572,7 +1572,7 @@
 
 
 <h1 id="txtfile-writer">TxtFile Writer<a class="headerlink" href="#txtfile-writer" title="Permanent link">&para;</a></h1>
-<p>TxtFileWriter提供了向本地文件写入类CSV格式的一个或者多个表文件。</p>
+<p>TxtFileWriter 提供了向本地文件写入类 CSV 格式的一个或者多个表文件。</p>
 <h2 id="_1">配置样例<a class="headerlink" href="#_1" title="Permanent link">&para;</a></h2>
 <div class="highlight"><pre><span></span><code><span class="p">{</span>
 <span class="w">  </span><span class="nt">&quot;job&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
@@ -1644,7 +1644,7 @@
 <td align="left">path</td>
 <td align="center">是</td>
 <td>无</td>
-<td>本地文件系统的路径信息，写入Path目录下属多个文件</td>
+<td>本地文件系统的路径信息，写入 Path 目录下属多个文件</td>
 </tr>
 <tr>
 <td align="left">fileName</td>
@@ -1656,13 +1656,13 @@
 <td align="left">writeMode</td>
 <td align="center">是</td>
 <td>无</td>
-<td>FtpWriter写入前数据清理处理模式，支持 <code>truncate</code>, <code>append</code>, <code>nonConflict</code> ，详见下文</td>
+<td>FtpWriter 写入前数据清理处理模式，，详见下文</td>
 </tr>
 <tr>
 <td align="left">column</td>
 <td align="center">是</td>
-<td>默认String类型</td>
-<td>读取字段列表，type指定源数据的类型，详见下文</td>
+<td>无</td>
+<td>读取字段列表，type 指定源数据的类型，详见下文</td>
 </tr>
 <tr>
 <td align="left">fieldDelimiter</td>
@@ -1686,7 +1686,7 @@
 <td align="left">nullFormat</td>
 <td align="center">否</td>
 <td><code>\N</code></td>
-<td>定义哪些字符串可以表示为null</td>
+<td>定义哪些字符串可以表示为 null</td>
 </tr>
 <tr>
 <td align="left">dateFormat</td>
@@ -1698,25 +1698,26 @@
 <td align="left">fileFormat</td>
 <td align="center">否</td>
 <td>text</td>
-<td>文件写出的格式，包括csv, text两种, 详见下文</td>
+<td>文件写出的格式，包括 csv, text 两种, 详见下文</td>
 </tr>
 <tr>
 <td align="left">header</td>
 <td align="center">否</td>
 <td>无</td>
-<td>text写出时的表头，示例 <code>['id', 'name', 'age']</code></td>
+<td>text 写出时的表头，示例 <code>['id', 'name', 'age']</code></td>
 </tr>
 </tbody>
 </table>
 <h3 id="writemode">writeMode<a class="headerlink" href="#writemode" title="Permanent link">&para;</a></h3>
 <p>写入前数据清理处理模式：</p>
 <ul>
-<li>truncate，写入前清理目录下一fileName前缀的所有文件。</li>
-<li>append，写入前不做任何处理，直接使用filename写入，并保证文件名不冲突。</li>
-<li>nonConflict，如果目录下有fileName前缀的文件，直接报错。</li>
+<li>truncate，写入前清理目录下一 fileName 前缀的所有文件。</li>
+<li>append，写入前不做任何处理，直接使用 filename 写入，并保证文件名不冲突。</li>
+<li>nonConflict，如果目录下有 fileName 前缀的文件，直接报错。</li>
 </ul>
 <h3 id="fileformat">fileFormat<a class="headerlink" href="#fileformat" title="Permanent link">&para;</a></h3>
-<p>文件写出的格式，包括 csv 和 text 两种，csv是严格的csv格式，如果待写数据包括列分隔符，则会按照csv的转义语法转义，转义符号为双引号 <code>"</code>； text格式是用列分隔符简单分割待写数据，对于待写数据包括列分隔符情况下不做转义。</p>
+<p>文件写出的格式，包括 csv 和 text 两种，csv 是严格的 csv 格式，如果待写数据包括列分隔符，则会按照 csv 的转义语法转义，转义符号为双引号 <code>"</code>；
+text 格式是用列分隔符简单分割待写数据，对于待写数据包括列分隔符情况下不做转义。</p>
 <h2 id="_3">类型转换<a class="headerlink" href="#_3" title="Permanent link">&para;</a></h2>
 <table>
 <thead>

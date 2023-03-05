@@ -1724,7 +1724,7 @@ put<span class="w"> </span><span class="s1">&#39;users&#39;</span>,<span class="
 put<span class="w"> </span><span class="s1">&#39;users&#39;</span>,<span class="w"> </span><span class="s1">&#39;xiaoming&#39;</span>,<span class="w"> </span><span class="s1">&#39;info:company&#39;</span>,<span class="w">    </span><span class="s1">&#39;alibaba&#39;</span>
 </code></pre></div>
 <h4 id="normal">normal 模式<a class="headerlink" href="#normal" title="Permanent link">&para;</a></h4>
-<p>把HBase中的表，当成普通二维表（横表）进行读取,读取最新版本数据。如：</p>
+<p>把 HBase 中的表，当成普通二维表（横表）进行读取,读取最新版本数据。如：</p>
 <div class="highlight"><pre><span></span><code>hbase<span class="o">(</span>main<span class="o">)</span>:017:0&gt;<span class="w"> </span>scan<span class="w"> </span><span class="s1">&#39;users&#39;</span>
 ROW<span class="w">           </span>COLUMN+CELL
 <span class="w"> </span>lisi<span class="w">         </span><span class="nv">column</span><span class="o">=</span>address:city,<span class="w"> </span><span class="nv">timestamp</span><span class="o">=</span><span class="m">1457101972764</span>,<span class="w"> </span><span class="nv">value</span><span class="o">=</span>beijing
@@ -1776,26 +1776,26 @@ ROW<span class="w">           </span>COLUMN+CELL
 </tbody>
 </table>
 <h4 id="multiversionfixedcolumn">multiVersionFixedColumn 模式<a class="headerlink" href="#multiversionfixedcolumn" title="Permanent link">&para;</a></h4>
-<p>把HBase中的表，当成竖表进行读取。读出的每条记录一定是四列形式，依次为：<code>rowKey</code>，<code>family:qualifier</code>，<code>timestamp</code>，<code>value</code>。</p>
+<p>把 HBase 中的表，当成竖表进行读取。读出的每条记录一定是四列形式，依次为：<code>rowKey</code>，<code>family:qualifier</code>，<code>timestamp</code>，<code>value</code>。</p>
 <p>读取时需要明确指定要读取的列，把每一个 cell 中的值，作为一条记录（record），若有多个版本就有多条记录（record）。如：</p>
 <div class="highlight"><pre><span></span><code>hbase<span class="o">(</span>main<span class="o">)</span>:018:0&gt;<span class="w"> </span>scan<span class="w"> </span><span class="s1">&#39;users&#39;</span>,<span class="o">{</span><span class="nv">VERSIONS</span><span class="o">=</span>&gt;5<span class="o">}</span>
-ROW<span class="w">                                   </span>COLUMN+CELL
-<span class="w"> </span>lisi<span class="w">                                 </span><span class="nv">column</span><span class="o">=</span>address:city,<span class="w"> </span><span class="nv">timestamp</span><span class="o">=</span><span class="m">1457101972764</span>,<span class="w"> </span><span class="nv">value</span><span class="o">=</span>beijing
-<span class="w"> </span>lisi<span class="w">                                 </span><span class="nv">column</span><span class="o">=</span>address:contry,<span class="w"> </span><span class="nv">timestamp</span><span class="o">=</span><span class="m">1457102773908</span>,<span class="w"> </span><span class="nv">value</span><span class="o">=</span>china
-<span class="w"> </span>lisi<span class="w">                                 </span><span class="nv">column</span><span class="o">=</span>address:province,<span class="w"> </span><span class="nv">timestamp</span><span class="o">=</span><span class="m">1457101972736</span>,<span class="w"> </span><span class="nv">value</span><span class="o">=</span>beijing
-<span class="w"> </span>lisi<span class="w">                                 </span><span class="nv">column</span><span class="o">=</span>info:age,<span class="w"> </span><span class="nv">timestamp</span><span class="o">=</span><span class="m">1457101972548</span>,<span class="w"> </span><span class="nv">value</span><span class="o">=</span><span class="m">27</span>
-<span class="w"> </span>lisi<span class="w">                                 </span><span class="nv">column</span><span class="o">=</span>info:birthday,<span class="w"> </span><span class="nv">timestamp</span><span class="o">=</span><span class="m">1457101972604</span>,<span class="w"> </span><span class="nv">value</span><span class="o">=</span><span class="m">1987</span>-06-17
-<span class="w"> </span>lisi<span class="w">                                 </span><span class="nv">column</span><span class="o">=</span>info:company,<span class="w"> </span><span class="nv">timestamp</span><span class="o">=</span><span class="m">1457101972653</span>,<span class="w"> </span><span class="nv">value</span><span class="o">=</span>baidu
-<span class="w"> </span>xiaoming<span class="w">                             </span><span class="nv">column</span><span class="o">=</span>address:city,<span class="w"> </span><span class="nv">timestamp</span><span class="o">=</span><span class="m">1457082196082</span>,<span class="w"> </span><span class="nv">value</span><span class="o">=</span>hangzhou
-<span class="w"> </span>xiaoming<span class="w">                             </span><span class="nv">column</span><span class="o">=</span>address:contry,<span class="w"> </span><span class="nv">timestamp</span><span class="o">=</span><span class="m">1457082195729</span>,<span class="w"> </span><span class="nv">value</span><span class="o">=</span>china
-<span class="w"> </span>xiaoming<span class="w">                             </span><span class="nv">column</span><span class="o">=</span>address:province,<span class="w"> </span><span class="nv">timestamp</span><span class="o">=</span><span class="m">1457082195773</span>,<span class="w"> </span><span class="nv">value</span><span class="o">=</span>zhejiang
-<span class="w"> </span>xiaoming<span class="w">                             </span><span class="nv">column</span><span class="o">=</span>info:age,<span class="w"> </span><span class="nv">timestamp</span><span class="o">=</span><span class="m">1457082218735</span>,<span class="w"> </span><span class="nv">value</span><span class="o">=</span><span class="m">29</span>
-<span class="w"> </span>xiaoming<span class="w">                             </span><span class="nv">column</span><span class="o">=</span>info:age,<span class="w"> </span><span class="nv">timestamp</span><span class="o">=</span><span class="m">1457082178630</span>,<span class="w"> </span><span class="nv">value</span><span class="o">=</span><span class="m">24</span>
-<span class="w"> </span>xiaoming<span class="w">                             </span><span class="nv">column</span><span class="o">=</span>info:birthday,<span class="w"> </span><span class="nv">timestamp</span><span class="o">=</span><span class="m">1457082186830</span>,<span class="w"> </span><span class="nv">value</span><span class="o">=</span><span class="m">1987</span>-06-17
-<span class="w"> </span>xiaoming<span class="w">                             </span><span class="nv">column</span><span class="o">=</span>info:company,<span class="w"> </span><span class="nv">timestamp</span><span class="o">=</span><span class="m">1457082189826</span>,<span class="w"> </span><span class="nv">value</span><span class="o">=</span>alibaba
+ROW<span class="w">               </span>COLUMN+CELL
+<span class="w"> </span>lisi<span class="w">             </span><span class="nv">column</span><span class="o">=</span>address:city,<span class="w"> </span><span class="nv">timestamp</span><span class="o">=</span><span class="m">1457101972764</span>,<span class="w"> </span><span class="nv">value</span><span class="o">=</span>beijing
+<span class="w"> </span>lisi<span class="w">             </span><span class="nv">column</span><span class="o">=</span>address:contry,<span class="w"> </span><span class="nv">timestamp</span><span class="o">=</span><span class="m">1457102773908</span>,<span class="w"> </span><span class="nv">value</span><span class="o">=</span>china
+<span class="w"> </span>lisi<span class="w">             </span><span class="nv">column</span><span class="o">=</span>address:province,<span class="w"> </span><span class="nv">timestamp</span><span class="o">=</span><span class="m">1457101972736</span>,<span class="w"> </span><span class="nv">value</span><span class="o">=</span>beijing
+<span class="w"> </span>lisi<span class="w">             </span><span class="nv">column</span><span class="o">=</span>info:age,<span class="w"> </span><span class="nv">timestamp</span><span class="o">=</span><span class="m">1457101972548</span>,<span class="w"> </span><span class="nv">value</span><span class="o">=</span><span class="m">27</span>
+<span class="w"> </span>lisi<span class="w">             </span><span class="nv">column</span><span class="o">=</span>info:birthday,<span class="w"> </span><span class="nv">timestamp</span><span class="o">=</span><span class="m">1457101972604</span>,<span class="w"> </span><span class="nv">value</span><span class="o">=</span><span class="m">1987</span>-06-17
+<span class="w"> </span>lisi<span class="w">             </span><span class="nv">column</span><span class="o">=</span>info:company,<span class="w"> </span><span class="nv">timestamp</span><span class="o">=</span><span class="m">1457101972653</span>,<span class="w"> </span><span class="nv">value</span><span class="o">=</span>baidu
+<span class="w"> </span>xiaoming<span class="w">         </span><span class="nv">column</span><span class="o">=</span>address:city,<span class="w"> </span><span class="nv">timestamp</span><span class="o">=</span><span class="m">1457082196082</span>,<span class="w"> </span><span class="nv">value</span><span class="o">=</span>hangzhou
+<span class="w"> </span>xiaoming<span class="w">         </span><span class="nv">column</span><span class="o">=</span>address:contry,<span class="w"> </span><span class="nv">timestamp</span><span class="o">=</span><span class="m">1457082195729</span>,<span class="w"> </span><span class="nv">value</span><span class="o">=</span>china
+<span class="w"> </span>xiaoming<span class="w">         </span><span class="nv">column</span><span class="o">=</span>address:province,<span class="w"> </span><span class="nv">timestamp</span><span class="o">=</span><span class="m">1457082195773</span>,<span class="w"> </span><span class="nv">value</span><span class="o">=</span>zhejiang
+<span class="w"> </span>xiaoming<span class="w">         </span><span class="nv">column</span><span class="o">=</span>info:age,<span class="w"> </span><span class="nv">timestamp</span><span class="o">=</span><span class="m">1457082218735</span>,<span class="w"> </span><span class="nv">value</span><span class="o">=</span><span class="m">29</span>
+<span class="w"> </span>xiaoming<span class="w">         </span><span class="nv">column</span><span class="o">=</span>info:age,<span class="w"> </span><span class="nv">timestamp</span><span class="o">=</span><span class="m">1457082178630</span>,<span class="w"> </span><span class="nv">value</span><span class="o">=</span><span class="m">24</span>
+<span class="w"> </span>xiaoming<span class="w">         </span><span class="nv">column</span><span class="o">=</span>info:birthday,<span class="w"> </span><span class="nv">timestamp</span><span class="o">=</span><span class="m">1457082186830</span>,<span class="w"> </span><span class="nv">value</span><span class="o">=</span><span class="m">1987</span>-06-17
+<span class="w"> </span>xiaoming<span class="w">         </span><span class="nv">column</span><span class="o">=</span>info:company,<span class="w"> </span><span class="nv">timestamp</span><span class="o">=</span><span class="m">1457082189826</span>,<span class="w"> </span><span class="nv">value</span><span class="o">=</span>alibaba
 <span class="m">2</span><span class="w"> </span>row<span class="o">(</span>s<span class="o">)</span><span class="w"> </span><span class="k">in</span><span class="w"> </span><span class="m">0</span>.0260<span class="w"> </span>seconds
 </code></pre></div>
-<p>读取后数据(4列)</p>
+<p>读取后数据(4 列)</p>
 <table>
 <thead>
 <tr>
@@ -2043,13 +2043,13 @@ ROW<span class="w">                                   </span>COLUMN+CELL
 <td align="left">hbaseConfig</td>
 <td align="center">是</td>
 <td>无</td>
-<td>连接HBase集群需要的配置信息,  <code>hbase.zookeeper.quorum</code> 为必填项，其他 HBase client的配置为可选项</td>
+<td>连接 HBase 集群需要的配置信息, <code>hbase.zookeeper.quorum</code> 为必填项，其他 client 的配置为可选项</td>
 </tr>
 <tr>
 <td align="left">mode</td>
 <td align="center">是</td>
 <td>无</td>
-<td>读取hbase的模式，可填写 <code>normal</code> 或 <code>multiVersionFixedColumn</code></td>
+<td>读取 HBase 的模式，可填写 <code>normal</code> 或 <code>multiVersionFixedColumn</code></td>
 </tr>
 <tr>
 <td align="left">table</td>
@@ -2067,7 +2067,7 @@ ROW<span class="w">                                   </span>COLUMN+CELL
 <td align="left">column</td>
 <td align="center">是</td>
 <td>无</td>
-<td>要读取的hbase字段，normal 模式与 multiVersionFixedColumn 模式下必填项, 详细说明见下文</td>
+<td>要读取的 hbase 字段，normal 模式与 multiVersionFixedColumn 模式下必填项, 详细说明见下文</td>
 </tr>
 <tr>
 <td align="left">maxVersion</td>
@@ -2085,21 +2085,21 @@ ROW<span class="w">                                   </span>COLUMN+CELL
 <td align="left">scanCacheSize</td>
 <td align="center">否</td>
 <td>256</td>
-<td>Hbase client 每次从服务器端读取的行数</td>
+<td>HBase client 每次从服务器端读取的行数</td>
 </tr>
 <tr>
 <td align="left">scanBatchSize</td>
 <td align="center">否</td>
 <td>100</td>
-<td>Hbase client 每次从服务器端读取的列数</td>
+<td>HBase client 每次从服务器端读取的列数</td>
 </tr>
 </tbody>
 </table>
 <h3 id="column">column<a class="headerlink" href="#column" title="Permanent link">&para;</a></h3>
-<p>描述：要读取的hbase字段，normal 模式与multiVersionFixedColumn 模式下必填项。</p>
+<p>描述：要读取的 hbase 字段，normal 模式与 multiVersionFixedColumn 模式下必填项。</p>
 <h3 id="normal_1">normal 模式<a class="headerlink" href="#normal_1" title="Permanent link">&para;</a></h3>
 <p><code>name</code> 指定读取的 hbase 列，除了 <code>rowkey</code> 外，必须为 <code>列族:列名</code> 的格式，<code>type</code> 指定源数据的类型，<code>format</code>指定日期类型的格式，
-<code>value</code> 指定当前类型为常量，不从 hbase 读取数据，而是根据 <code>value</code>  值自动生成对应的列。配置格式如下：</p>
+<code>value</code> 指定当前类型为常量，不从 hbase 读取数据，而是根据 <code>value</code> 值自动生成对应的列。配置格式如下：</p>
 <div class="highlight"><pre><span></span><code><span class="p">{</span>
 <span class="w">  </span><span class="nt">&quot;column&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span>
 <span class="w">    </span><span class="p">{</span>
@@ -2113,7 +2113,7 @@ ROW<span class="w">                                   </span>COLUMN+CELL
 <span class="w">  </span><span class="p">]</span>
 <span class="p">}</span>
 </code></pre></div>
-<p>normal 模式下，对于用户指定Column信息，type必须填写，name/value必须选择其一。</p>
+<p>normal 模式下，对于用户指定 Column 信息，type 必须填写，name/value 必须选择其一。</p>
 <h3 id="multiversionfixedcolumn_1">multiVersionFixedColumn 模式<a class="headerlink" href="#multiversionfixedcolumn_1" title="Permanent link">&para;</a></h3>
 <p><code>name</code> 指定读取的 hbase 列，除了 <code>rowkey</code> 外，必须为 <code>列族:列名</code> 的格式，<code>type</code> 指定源数据的类型，<code>format</code>指定日期类型的格式 。
 multiVersionFixedColumn 模式下不支持常量列。配置格式如下：</p>
@@ -2135,7 +2135,7 @@ multiVersionFixedColumn 模式下不支持常量列。配置格式如下：</p>
 <ul>
 <li><code>startRowkey</code>：指定开始 <code>rowkey</code></li>
 <li><code>endRowkey</code> 指定结束 <code>rowkey</code></li>
-<li><code>isBinaryRowkey</code>：指定配置的 <code>startRowkey</code>和 <code>endRowkey</code> 转换为<code>byte[]</code>时的方式，默认值为false,若为true，则调用<code>Bytes.toBytesBinary(rowkey)</code>方法进行转换;若为false：则调用<code>Bytes.toBytes(rowkey)</code></li>
+<li><code>isBinaryRowkey</code>：指定配置的 <code>startRowkey</code>和 <code>endRowkey</code> 转换为<code>byte[]</code>时的方式，默认值为 false,若为 true，则调用<code>Bytes.toBytesBinary(rowkey)</code>方法进行转换;若为 false：则调用<code>Bytes.toBytes(rowkey)</code></li>
 </ul>
 <p>配置格式如下：</p>
 <div class="highlight"><pre><span></span><code><span class="p">{</span>
@@ -2147,7 +2147,7 @@ multiVersionFixedColumn 模式下不支持常量列。配置格式如下：</p>
 <span class="p">}</span>
 </code></pre></div>
 <h2 id="_5">类型转换<a class="headerlink" href="#_5" title="Permanent link">&para;</a></h2>
-<p>下面列出支持的读取HBase数据类型，HbaseReader 针对 HBase 类型转换列表:</p>
+<p>下面列出支持的读取 HBase 数据类型，HbaseReader 针对 HBase 类型转换列表:</p>
 <table>
 <thead>
 <tr>
@@ -2182,9 +2182,9 @@ multiVersionFixedColumn 模式下不支持常量列。配置格式如下：</p>
 <p><code>除上述罗列字段类型外，其他类型均不支持</code></p>
 <h2 id="_6">限制<a class="headerlink" href="#_6" title="Permanent link">&para;</a></h2>
 <ol>
-<li>目前不支持动态列的读取。考虑网络传输流量（支持动态列，需要先将hbase所有列的数据读取出来，再按规则进行过滤），现支持的两种读取模式中需要用户明确指定要读取的列。</li>
-<li>关于同步作业的切分：目前的切分方式是根据用户hbase表数据的region分布进行切分。即：在用户填写的 <code>[startrowkey，endrowkey］</code> 范围内，一个region会切分成一个task，单个region不进行切分。</li>
-<li>multiVersionFixedColumn模式下不支持增加常量列</li>
+<li>目前不支持动态列的读取。考虑网络传输流量（支持动态列，需要先将 hbase 所有列的数据读取出来，再按规则进行过滤），现支持的两种读取模式中需要用户明确指定要读取的列。</li>
+<li>关于同步作业的切分：目前的切分方式是根据用户 hbase 表数据的 region 分布进行切分。即：在用户填写的 <code>[startrowkey，endrowkey］</code> 范围内，一个 region 会切分成一个 task，单个 region 不进行切分。</li>
+<li>multiVersionFixedColumn 模式下不支持增加常量列</li>
 </ol>
 
 

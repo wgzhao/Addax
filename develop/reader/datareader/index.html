@@ -1891,7 +1891,7 @@
 <td>否</td>
 <td><code>yyyy-MM-dd HH:mm:ss</code></td>
 <td><code>yyyy/MM/dd HH:mm:ss</code></td>
-<td>日期格式，仅在<code>type</code> 为 <code>date</code> 时有效</td>
+<td>日期格式，仅在 <code>type</code> 为 <code>date</code> 时有效</td>
 </tr>
 </tbody>
 </table>
@@ -1917,14 +1917,14 @@
 <p>表示该字段的数据是一个长整形，数值从 1 开始，每次递增 2，也就是形成 1 开始，步长为 2 的递增数列。</p>
 <p>该字段更详细的配置规则和注意事项，可以参考 <a href="../streamreader">streamreader</a> 中的 <code>incr</code> 说明。</p>
 <h3 id="random">random<a class="headerlink" href="#random" title="Permanent link">&para;</a></h3>
-<p><code>random</code> 配置项的含义和 <code>streamreader</code> 插件中的 <code>random</code> 含义一致，表示这是一个递增的数据生产规则，比如</p>
+<p><code>random</code> 配置项的含义和 <a href="../streamreader"><code>streamreader</code></a> 插件中的 <code>random</code> 含义一致，表示这是一个递增的数据生产规则，比如</p>
 <div class="highlight"><pre><span></span><code><span class="p">{</span>
 <span class="w">  </span><span class="nt">&quot;value&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;1,10&quot;</span><span class="p">,</span>
 <span class="w">  </span><span class="nt">&quot;rule&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;random&quot;</span><span class="p">,</span>
 <span class="w">  </span><span class="nt">&quot;type&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;string&quot;</span>
 <span class="p">}</span>
 </code></pre></div>
-<p>表示该字段的数据是一个长度为 1 到 10 （1和10都包括）随机字符串。</p>
+<p>表示该字段的数据是一个长度为 1 到 10 （1 和 10 都包括）随机字符串。</p>
 <p>该字段更详细的配置规则和注意事项，可以参考 <a href="../streamreader">streamreader</a> 中的 <code>random</code> 说明。</p>
 <table>
 <thead>
@@ -1963,35 +1963,35 @@
 <td>随机生成一个信用卡卡号</td>
 <td><code>430405198908214042</code></td>
 <td>string</td>
-<td>16位</td>
+<td>16 位</td>
 </tr>
 <tr>
 <td><code>debitCard</code></td>
 <td>随机生成一个储蓄卡卡号</td>
 <td><code>6227894836568607</code></td>
 <td>string</td>
-<td>19位</td>
+<td>19 位</td>
 </tr>
 <tr>
 <td><code>idCard</code></td>
 <td>随机生成一个国内身份证号码</td>
 <td><code>350600198508222018</code></td>
 <td>string</td>
-<td>18位，负责校验规则，头6位编码满足行政区划要求</td>
+<td>18 位，负责校验规则，头 6 位编码满足行政区划要求</td>
 </tr>
 <tr>
 <td><code>lat</code></td>
 <td>随机生成维度数据</td>
 <td><code>48.6648764</code></td>
 <td>double</td>
-<td>固定7位小数 ，也可以用<code>latitude</code> 表示</td>
+<td>固定 7 位小数 ，也可以用<code>latitude</code> 表示</td>
 </tr>
 <tr>
 <td><code>lng</code></td>
 <td>随机生成经度数据</td>
 <td><code>120.6018163</code></td>
 <td>double</td>
-<td>固定7位小数，也可以使用<code>longitude</code> 表示</td>
+<td>固定 7 位小数，也可以使用<code>longitude</code> 表示</td>
 </tr>
 <tr>
 <td><code>name</code></td>
@@ -2016,14 +2016,14 @@
 </tr>
 <tr>
 <td><code>stockCode</code></td>
-<td>随机生成一个6位的股票代码</td>
+<td>随机生成一个 6 位的股票代码</td>
 <td><code>687461</code></td>
 <td>string</td>
 <td>前两位满足国内股票代码编号规范</td>
 </tr>
 <tr>
 <td><code>stockAccount</code></td>
-<td>随机生成一个10位的股票交易账户</td>
+<td>随机生成一个 10 位的股票交易账户</td>
 <td><code>0692522928</code></td>
 <td>string</td>
 <td>完全随机，不满足账户规范</td>

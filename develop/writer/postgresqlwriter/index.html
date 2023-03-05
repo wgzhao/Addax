@@ -1626,9 +1626,9 @@
 
 
 <h1 id="postgresql-writer">Postgresql Writer<a class="headerlink" href="#postgresql-writer" title="Permanent link">&para;</a></h1>
-<p>PostgresqlWriter插件实现了写入数据到 <a href="https://postgresql.org">PostgreSQL</a> 数据库库表的功能。</p>
+<p>PostgresqlWriter 插件实现了写入数据到 <a href="https://postgresql.org">PostgreSQL</a> 数据库库表的功能。</p>
 <h2 id="_1">示例<a class="headerlink" href="#_1" title="Permanent link">&para;</a></h2>
-<p>以下配置演示从postgresql指定的表读取数据，并插入到具有相同表结构的另外一张表中，用来测试该插件所支持的数据类型。</p>
+<p>以下配置演示从 postgresql 指定的表读取数据，并插入到具有相同表结构的另外一张表中，用来测试该插件所支持的数据类型。</p>
 <h3 id="_2">表结构信息<a class="headerlink" href="#_2" title="Permanent link">&para;</a></h3>
 <p>假定建表语句以及输入插入语句如下：</p>
 <div class="highlight"><pre><span></span><code><span class="k">create</span><span class="w"> </span><span class="k">table</span><span class="w"> </span><span class="k">if</span><span class="w"> </span><span class="k">not</span><span class="w"> </span><span class="k">exists</span><span class="w"> </span><span class="n">addax_tbl</span>
@@ -1741,7 +1741,7 @@
 <span class="w">  </span><span class="p">}</span>
 <span class="p">}</span>
 </code></pre></div>
-<p>将上述配置文件保存为  <code>job/pg2pg.json</code></p>
+<p>将上述配置文件保存为 <code>job/pg2pg.json</code></p>
 <h3 id="_4">执行采集命令<a class="headerlink" href="#_4" title="Permanent link">&para;</a></h3>
 <p>执行以下命令进行数据采集</p>
 <div class="highlight"><pre><span></span><code>bin/addax.sh<span class="w"> </span>job/pg2pg.json
@@ -1761,7 +1761,7 @@
 <td align="left">jdbcUrl</td>
 <td align="center">是</td>
 <td>无</td>
-<td>对端数据库的JDBC连接信息，jdbcUrl按照RDBMS官方规范，并可以填写连接 <a href="http://jdbc.postgresql.org/documentation/93/connect.html">附件控制信息</a></td>
+<td>对端数据库的 JDBC 连接信息，jdbcUrl 按照 RDBMS 官方规范，并可以填写连接 <a href="http://jdbc.postgresql.org/documentation/93/connect.html">附件控制信息</a></td>
 </tr>
 <tr>
 <td align="left">username</td>
@@ -1779,13 +1779,13 @@
 <td align="left">writeMode</td>
 <td align="center">否</td>
 <td>insert</td>
-<td>写入模式，支持insert, update 详见如下</td>
+<td>写入模式，支持 insert, update 详见如下</td>
 </tr>
 <tr>
 <td align="left">table</td>
 <td align="center">是</td>
 <td>无</td>
-<td>所选取的需要同步的表名,使用JSON数据格式，当配置为多张表时，用户自己需保证多张表是同一表结构</td>
+<td>所选取的需要同步的表名,使用 JSON 数据格式，当配置为多张表时，用户自己需保证多张表是同一表结构</td>
 </tr>
 <tr>
 <td align="left">column</td>
@@ -1797,19 +1797,19 @@
 <td align="left">preSql</td>
 <td align="center">否</td>
 <td>无</td>
-<td>执行数据同步任务之前率先执行的sql语句，目前只允许执行一条SQL语句，例如清除旧数据,涉及到的表可用 <code>@table</code>表示</td>
+<td>执行数据同步任务之前率先执行的 sql 语句，目前只允许执行一条 SQL 语句，例如清除旧数据,涉及到的表可用 <code>@table</code>表示</td>
 </tr>
 <tr>
 <td align="left">postSql</td>
 <td align="center">否</td>
 <td>无</td>
-<td>执行数据同步任务之后执行的sql语句，目前只允许执行一条SQL语句，例如加上某一个时间戳</td>
+<td>执行数据同步任务之后执行的 sql 语句，目前只允许执行一条 SQL 语句，例如加上某一个时间戳</td>
 </tr>
 <tr>
 <td align="left">batchSize</td>
 <td align="center">否</td>
 <td>1024</td>
-<td>定义了插件和数据库服务器端每次批量数据获取条数，调高该值可能导致 Addax 出现OOM或者目标数据库事务提交失败导致挂起</td>
+<td>定义了插件和数据库服务器端每次批量数据获取条数</td>
 </tr>
 </tbody>
 </table>
@@ -1822,8 +1822,8 @@
 </code></pre></div>
 <p>注： <code>update</code> 模式在 <code>3.1.6</code> 版本首次增加，之前版本并不支持。</p>
 <h2 id="_6">类型转换<a class="headerlink" href="#_6" title="Permanent link">&para;</a></h2>
-<p>目前 PostgresqlWriter支持大部分 PostgreSQL类型，但也存在部分没有支持的情况，请注意检查你的类型。</p>
-<p>下面列出 PostgresqlWriter针对 PostgreSQL类型转换列表:</p>
+<p>目前 PostgresqlWriter 支持大部分 PostgreSQL 类型，但也存在部分没有支持的情况，请注意检查你的类型。</p>
+<p>下面列出 PostgresqlWriter 针对 PostgreSQL 类型转换列表:</p>
 <table>
 <thead>
 <tr>

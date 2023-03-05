@@ -1546,9 +1546,9 @@
 
 
 <h1 id="hbase20xsql-reader">hbase20xsql Reader<a class="headerlink" href="#hbase20xsql-reader" title="Permanent link">&para;</a></h1>
-<p>hbase20xsqlreade r插件实现了从Phoenix(HBase SQL)读取数据，对应版本为 HBase2.X 和 Phoenix5.X。</p>
+<p>hbase20xsqlreade r 插件实现了从 <a href="https://phoenix.apache.org">Phoenix(HBase SQL)</a> 读取数据，对应版本为 HBase2.X 和 Phoenix5.X。</p>
 <h2 id="_1">配置样例<a class="headerlink" href="#_1" title="Permanent link">&para;</a></h2>
-<p>配置一个从Phoenix同步抽取数据到本地的作业:</p>
+<p>配置一个从 Phoenix 同步抽取数据到本地的作业:</p>
 <div class="highlight"><pre><span></span><code><span class="p">{</span>
 <span class="w">  </span><span class="nt">&quot;job&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
 <span class="w">    </span><span class="nt">&quot;content&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span>
@@ -1559,10 +1559,7 @@
 <span class="w">            </span><span class="nt">&quot;queryServerAddress&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;http://127.0.0.1:8765&quot;</span><span class="p">,</span>
 <span class="w">            </span><span class="nt">&quot;serialization&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;PROTOBUF&quot;</span><span class="p">,</span>
 <span class="w">            </span><span class="nt">&quot;table&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;TEST&quot;</span><span class="p">,</span>
-<span class="w">            </span><span class="nt">&quot;column&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span>
-<span class="w">              </span><span class="s2">&quot;ID&quot;</span><span class="p">,</span>
-<span class="w">              </span><span class="s2">&quot;NAME&quot;</span>
-<span class="w">            </span><span class="p">],</span>
+<span class="w">            </span><span class="nt">&quot;column&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="s2">&quot;ID&quot;</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;NAME&quot;</span><span class="p">],</span>
 <span class="w">            </span><span class="nt">&quot;splitKey&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;ID&quot;</span>
 <span class="w">          </span><span class="p">}</span>
 <span class="w">        </span><span class="p">},</span>
@@ -1605,7 +1602,7 @@
 <td align="left">serialization</td>
 <td align="center">否</td>
 <td>PROTOBUF</td>
-<td>QueryServer使用的序列化协议</td>
+<td>QueryServer 使用的序列化协议</td>
 </tr>
 <tr>
 <td align="left">table</td>
@@ -1617,13 +1614,13 @@
 <td align="left">schema</td>
 <td align="center">否</td>
 <td>无</td>
-<td>表所在的schema</td>
+<td>表所在的 schema</td>
 </tr>
 <tr>
 <td align="left">column</td>
 <td align="center">否</td>
 <td>全部列</td>
-<td>填写需要从phoenix表中读取的列名集合，使用JSON的数组描述字段信息，空值表示读取所有列</td>
+<td>填写需要从 phoenix 表中读取的列名集合，使用 JSON 的数组描述字段信息，空值表示读取所有列</td>
 </tr>
 <tr>
 <td align="left">splitKey</td>
@@ -1635,7 +1632,7 @@
 <td align="left">splitPoints</td>
 <td align="center">否</td>
 <td>无</td>
-<td>按照表的split进行切分</td>
+<td>按照表的 split 进行切分</td>
 </tr>
 <tr>
 <td align="left">where</td>

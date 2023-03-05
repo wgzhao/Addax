@@ -1632,7 +1632,7 @@
 <td align="center">是</td>
 <td>string</td>
 <td>无</td>
-<td>Databend query 节点的地址用于StreamLoad，可以为多个 query 地址，<code>query_ip:query_http_port</code>，从多个地址轮循写入</td>
+<td>Databend query 节点的地址用于 StreamLoad，可以为多个 query 地址，<code>query_ip:query_http_port</code>，从多个地址轮循写入</td>
 </tr>
 <tr>
 <td align="left">username</td>
@@ -1653,14 +1653,14 @@
 <td align="center">是</td>
 <td>string</td>
 <td>无</td>
-<td>Databend表的数据库名称</td>
+<td>Databend 表的数据库名称</td>
 </tr>
 <tr>
 <td align="left">table</td>
 <td align="center">是</td>
 <td>string</td>
 <td>无</td>
-<td>Databend表的表名称</td>
+<td>Databend 表的表名称</td>
 </tr>
 <tr>
 <td align="left">column</td>
@@ -1674,28 +1674,28 @@
 <td align="center">否</td>
 <td>int</td>
 <td>500000</td>
-<td>定义了插件和数据库服务器端每次批量数据获取条数，调高该值可能导致 Addax 出现OOM或者目标数据库事务提交失败导致挂起</td>
+<td>定义了插件和数据库服务器端每次批量数据获取条数，调高该值可能导致 OOM 或者目标数据库事务提交失败导致挂起</td>
 </tr>
 <tr>
 <td align="left">maxBatchSize</td>
 <td align="center">否</td>
 <td>int</td>
 <td>104857600</td>
-<td>单次StreamLoad导入的最大字节数</td>
+<td>单次 StreamLoad 导入的最大字节数</td>
 </tr>
 <tr>
 <td align="left">flushInterval</td>
 <td align="center">否</td>
 <td>int</td>
 <td>300000</td>
-<td>上一次StreamLoad结束至下一次开始的时间间隔（单位：ms)</td>
+<td>上一次 StreamLoad 结束至下一次开始的时间间隔（单位：ms)</td>
 </tr>
 <tr>
 <td align="left">endpoint</td>
 <td align="center">是</td>
 <td>string</td>
 <td>无</td>
-<td>Databend 的HTTP连接方式，只需要写到主机和端口即可，具体路径插件会自动拼装</td>
+<td>Databend 的 HTTP 连接方式，只需要写到主机和端口即可，具体路径插件会自动拼装</td>
 </tr>
 <tr>
 <td align="left">username</td>
@@ -1756,7 +1756,7 @@
 </tbody>
 </table>
 <h2 id="_3">类型转换<a class="headerlink" href="#_3" title="Permanent link">&para;</a></h2>
-<p>默认传入的数据均会被转为字符串，并以<code>\t</code>作为列分隔符，<code>\n</code>作为行分隔符，组成<code>csv</code>文件进行StreamLoad导入操作。</p>
+<p>默认传入的数据均会被转为字符串，并以<code>\t</code>作为列分隔符，<code>\n</code>作为行分隔符，组成<code>csv</code>文件进行 StreamLoad 导入操作。</p>
 
 
 

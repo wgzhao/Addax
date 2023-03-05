@@ -1665,9 +1665,9 @@
 
 <h1 id="addax">Addax 介绍<a class="headerlink" href="#addax" title="Permanent link">&para;</a></h1>
 <h2 id="_1">概览<a class="headerlink" href="#_1" title="Permanent link">&para;</a></h2>
-<p>Addax 是一个异构数据源离线同步工具，最初来源于阿里的 <a href="https://github.com/alibaba/datax">DataX</a> ，致力于实现包括关系型数据库(MySQL、Oracle等)、HDFS、Hive、HBase、FTP等各种异构数据源之间稳定高效的数据同步功能。</p>
+<p>Addax 是一个异构数据源离线同步工具，最初来源于阿里的 <a href="https://github.com/alibaba/datax">DataX</a> ，致力于实现包括关系型数据库(MySQL、Oracle 等)、HDFS、Hive、HBase、FTP 等各种异构数据源之间稳定高效的数据同步功能。</p>
 <p><img alt="addax why new" src="images/addax_why_new.png" /></p>
-<p>为了解决异构数据源同步问题，Addax将复杂的网状的同步链路变成了星型数据链路，Addax作为中间传输载体负责连接各种数据源。当需要接入一个新的数据源的时候，只需要将此数据源对接到Addax，便能跟已有的数据源做到无缝数据同步。</p>
+<p>为了解决异构数据源同步问题，Addax 将复杂的网状的同步链路变成了星型数据链路，Addax 作为中间传输载体负责连接各种数据源。当需要接入一个新的数据源的时候，只需要将此数据源对接到 Addax，便能跟已有的数据源做到无缝数据同步。</p>
 <h2 id="_2">框架设计<a class="headerlink" href="#_2" title="Permanent link">&para;</a></h2>
 <pre class="mermaid"><code>graph LR
 MySQL
@@ -1685,15 +1685,15 @@ end
 
 MySQL ==&gt; Addax ==&gt; HDFS
 </code></pre>
-<p>Addax本身作为离线数据同步框架，采用 Framework + plugin 架构构建。将数据源读取和写入抽象成为 Reader/Writer 插件，纳入到整个同步框架中。</p>
+<p>Addax 本身作为离线数据同步框架，采用 Framework + plugin 架构构建。将数据源读取和写入抽象成为 Reader/Writer 插件，纳入到整个同步框架中。</p>
 <ul>
-<li>Reader：Reader 为数据采集模块，负责采集数据源的数据，将数据发送给Framework。</li>
-<li>Writer： Writer 为数据写入模块，负责不断向Framework取数据，并将数据写入到目的端。</li>
-<li>Framework：Framework用于连接reader和writer，作为两者的数据传输通道，并处理缓冲，流控，并发，数据转换等核心技术问题。</li>
+<li>Reader：Reader 为数据采集模块，负责采集数据源的数据，将数据发送给 Framework。</li>
+<li>Writer： Writer 为数据写入模块，负责不断向 Framework 取数据，并将数据写入到目的端。</li>
+<li>Framework：Framework 用于连接 reader 和 writer，作为两者的数据传输通道，并处理缓冲，流控，并发，数据转换等核心技术问题。</li>
 </ul>
-<p>Addax Framework提供了简单的接口与插件交互，提供简单的插件接入机制，只需要任意加上一种插件，就能无缝对接其他数据源。</p>
+<p>Addax Framework 提供了简单的接口与插件交互，提供简单的插件接入机制，只需要任意加上一种插件，就能无缝对接其他数据源。</p>
 <h2 id="_3">核心架构<a class="headerlink" href="#_3" title="Permanent link">&para;</a></h2>
-<p>本小节按一个Addax作业生命周期的时序图，从整体架构设计非常简要说明各个模块相互关系。</p>
+<p>本小节按一个 Addax 作业生命周期的时序图，从整体架构设计非常简要说明各个模块相互关系。</p>
 <pre class="mermaid"><code>graph TB
 subgraph Job
 end
@@ -1745,18 +1745,18 @@ Job == split ==&gt; task
 task == Schedule ==&gt; taskgroup</code></pre>
 <h3 id="_4">核心模块介绍<a class="headerlink" href="#_4" title="Permanent link">&para;</a></h3>
 <ol>
-<li>Addax 完成单个数据同步的作业，我们称之为Job，Adda x接受到一个 Job 之后，将启动一个进程来完成整个作业同步过程。Addax Job模块是单个作业的中枢管理节点，承担了数据清理、子任务切分(将单一作业计算转化为多个子 Task)、TaskGroup 管理等功能。</li>
+<li>Addax 完成单个数据同步的作业，我们称之为 Job，Addax 接收到一个 Job 之后，将启动一个进程来完成整个作业同步过程。Addax Job 模块是单个作业的中枢管理节点，承担了数据清理、子任务切分(将单一作业计算转化为多个子 Task)、TaskGroup 管理等功能。</li>
 <li>Addax Job 启动后，会根据不同的源端切分策略，将 Job 切分成多个小的 Task (子任务)，以便于并发执行。Task 便是 Addax 作业的最小单元，每一个 Task 都会负责一部分数据的同步工作。</li>
-<li>切分多个 Task 之后，Addax Job 会调用 Scheduler 模块，根据配置的并发数据量，将拆分成的 Task 重新组合，组装成 TaskGroup(任务组)。每一个 TaskGroup 负责以一定的并发运行完毕分配好的所有 Task，默认单个任务组的并发数量为5。</li>
+<li>切分多个 Task 之后，Addax Job 会调用 Scheduler 模块，根据配置的并发数据量，将拆分成的 Task 重新组合，组装成 TaskGroup(任务组)。每一个 TaskGroup 负责以一定的并发运行完毕分配好的所有 Task，默认单个任务组的并发数量为 5。</li>
 <li>每一个 Task 都由 TaskGroup 负责启动，Task 启动后，会固定启动 <code>Reader—&gt;Channel—&gt;Writer</code> 的线程来完成任务同步工作。</li>
-<li>Addax 作业运行起来之后， Job 监控并等待多个 TaskGroup 模块任务完成，等待所有 TaskGroup 任务完成后 Job 成功退出。否则，异常退出，进程退出值非0</li>
+<li>Addax 作业运行起来之后， Job 监控并等待多个 TaskGroup 模块任务完成，等待所有 TaskGroup 任务完成后 Job 成功退出。否则，异常退出，进程退出值非 0</li>
 </ol>
 <h3 id="_5">调度流程<a class="headerlink" href="#_5" title="Permanent link">&para;</a></h3>
-<p>举例来说，用户提交了一个作业，并且配置了 20 个并发，目的是将一个100张分表的mysql数据同步到oracle里面。 调度决策思路是：</p>
+<p>举例来说，用户提交了一个作业，并且配置了 20 个并发，目的是将一个 100 张分表的 MySQL 数据同步到 Oracle 里面。 调度决策思路是：</p>
 <ol>
 <li>Addax Job 根据分库分表切分成了 100 个 Task。</li>
 <li>根据 20 个并发，计算共需要分配 <code>20/5 = 4</code> 个 TaskGroup。</li>
-<li>4 个 TaskGroup 平分切分好的 100 个 Task，每一个 TaskGroup 负责以5个并发共计运行25个 Task。</li>
+<li>4 个 TaskGroup 平分切分好的 100 个 Task，每一个 TaskGroup 负责以 5 个并发共计运行 25 个 Task。</li>
 </ol>
 <h2 id="_6">核心优势<a class="headerlink" href="#_6" title="Permanent link">&para;</a></h2>
 <h3 id="_7">可靠的数据质量监控<a class="headerlink" href="#_7" title="Permanent link">&para;</a></h3>
@@ -1771,7 +1771,7 @@ task == Schedule ==&gt; taskgroup</code></pre>
 <ul>
 <li>提供脏数据探测</li>
 </ul>
-<p>在大量数据的传输过程中，必定会由于各种原因导致很多数据传输报错(比如类型转换错误)，这种数据 Addax 认为就是脏数据。Addax 目前可以实现脏数据精确过滤、识别、采集、展示，为用户提供多种的脏数据处理模式，让用户准确把控数据质量大关！</p>
+<p>在大量数据的传输过程中，必定会由于各种原因导致很多数据传输报错(比如类型转换错误)，这种数据 Addax 认为就是脏数据。Addax 目前可以实现脏数据精确过滤、识别、采集、展示，为用户提供多种的脏数据处理模式，让用户准确把控数据质量关！</p>
 <h3 id="_8">丰富的数据转换功能<a class="headerlink" href="#_8" title="Permanent link">&para;</a></h3>
 <p>作为一个服务于大数据的 ETL 工具，除了提供数据快照搬迁功能之外，还提供了丰富数据转换的功能，让数据在传输过程中可以轻松完成数据脱敏，补全，过滤等数据转换功能，另外还提供了自动 <code>groovy</code> 函数，让用户自定义转换函数。详情请看 <a href="transformer">transformer</a> 详细介绍。</p>
 <h3 id="_9">精准的速度控制<a class="headerlink" href="#_9" title="Permanent link">&para;</a></h3>
@@ -1785,7 +1785,7 @@ task == Schedule ==&gt; taskgroup</code></pre>
 <span class="p">}</span>
 </code></pre></div>
 <h3 id="_10">强劲地同步性能<a class="headerlink" href="#_10" title="Permanent link">&para;</a></h3>
-<p>每一种读插件都有一种或多种切分策略，都能将作业合理切分成多个Task并行执行，单机多线程执行模型可以让速度随并发成线性增长。
+<p>每一种读插件都有一种或多种切分策略，都能将作业合理切分成多个 Task 并行执行，单机多线程执行模型可以让速度随并发成线性增长。
 在源端和目的端性能都足够的情况下，单个作业一定可以打满网卡。</p>
 <h3 id="_11">健壮的容错机制<a class="headerlink" href="#_11" title="Permanent link">&para;</a></h3>
 <p>作业是极易受外部因素的干扰，网络闪断、数据源不稳定等因素很容易让同步到一半的作业报错停止。因此稳定性是 Addax 的基本要求，在 Addax 的设计中，重点完善了框架和插件的稳定性。

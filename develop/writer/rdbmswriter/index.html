@@ -1778,8 +1778,8 @@
 </ul>
 <p>Column必须显示填写，不允许为空！</p>
 <h3 id="jdbcurl">jdbcUrl<a class="headerlink" href="#jdbcurl" title="Permanent link">&para;</a></h3>
-<p><code>jdbcUrl</code> 配置除了配置必要的信息外，我们还可以在增加每种特定驱动的特定配置属性，这里特别提到我们可以利用配置属性对代理的支持从而实现通过代理访问数据库的功能。 比如对于 PrestoSQL 数据库的 JDBC 驱动而言，支持 <code>socksProxy</code>
-参数，比如一个可能的 <code>jdbcUrl</code> 为</p>
+<p><code>jdbcUrl</code> 配置除了配置必要的信息外，我们还可以在增加每种特定驱动的特定配置属性，这里特别提到我们可以利用配置属性对代理的支持从而实现通过代理访问数据库的功能。 
+比如对于 PrestoSQL 数据库的 JDBC 驱动而言，支持 <code>socksProxy</code> 参数，比如一个可能的 <code>jdbcUrl</code> 为</p>
 <p><code>jdbc:presto://127.0.0.1:8080/hive?socksProxy=192.168.1.101:1081</code></p>
 <p>大部分关系型数据库的 JDBC 驱动支持 <code>socksProxyHost,socksProxyPort</code> 参数来支持代理访问。也有一些特别的情况。</p>
 <p>以下是各类数据库 JDBC 驱动所支持的代理类型以及配置方式</p>
@@ -1814,8 +1814,9 @@
 </tbody>
 </table>
 <h3 id="driver">driver<a class="headerlink" href="#driver" title="Permanent link">&para;</a></h3>
-<p>大部分情况下，一个数据库的JDBC驱动是固定的，但有些因为版本的不同，所建议的驱动类名不同，比如 MySQL。 新的 MySQL JDBC 驱动类型推荐使用 <code>com.mysql.cj.jdbc.Driver</code> 而不是以前的 <code>com.mysql.jdbc.Drver</code>
-。如果想要使用就的驱动名称，则可以配置 <code>driver</code> 配置项。</p>
+<p>大部分情况下，一个数据库的JDBC驱动是固定的，但有些因为版本的不同，所建议的驱动类名不同，比如 MySQL。 
+新的 MySQL JDBC 驱动类型推荐使用 <code>com.mysql.cj.jdbc.Driver</code> 而不是以前的 <code>com.mysql.jdbc.Drver</code>。
+如果想要使用就的驱动名称，则可以配置 <code>driver</code> 配置项。</p>
 
 
 

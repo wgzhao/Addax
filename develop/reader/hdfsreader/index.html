@@ -1668,8 +1668,8 @@
 
 
 <h1 id="hdfs-reader">HDFS Reader<a class="headerlink" href="#hdfs-reader" title="Permanent link">&para;</a></h1>
-<p>HdfsReade r提供了读取分布式文件系统数据存储的能力。</p>
-<p>目前HdfsReader支持的文件格式如下：</p>
+<p>HdfsReader 提供了读取分布式文件系统数据存储的能力。</p>
+<p>目前 HdfsReader 支持的文件格式如下：</p>
 <ul>
 <li>textfile（text）</li>
 <li>orcfile（orc）</li>
@@ -1680,14 +1680,14 @@
 </ul>
 <h2 id="_1">功能与限制<a class="headerlink" href="#_1" title="Permanent link">&para;</a></h2>
 <ol>
-<li>支持textfile、orcfile、parquet、rcfile、sequence file和csv格式的文件，且要求文件内容存放的是一张逻辑意义上的二维表。</li>
-<li>支持多种类型数据读取(使用String表示)，支持列裁剪，支持列常量</li>
+<li>支持 textfile、orcfile、parquet、rcfile、sequence file 和 csv 格式的文件，且要求文件内容存放的是一张逻辑意义上的二维表。</li>
+<li>支持多种类型数据读取(使用 String 表示)，支持列裁剪，支持列常量</li>
 <li>支持递归读取、支持正则表达式（<code>*</code>和 <code>?</code>）。</li>
-<li>支持常见的压缩算法，包括 GZIP， SNAPPY， ZLIB等。</li>
-<li>多个File可以支持并发读取。</li>
-<li>支持sequence file数据压缩，目前支持lzo压缩方式。</li>
-<li>csv类型支持压缩格式有：gzip、bz2、zip、lzo、lzo_deflate、snappy。</li>
-<li>目前插件中Hive版本为 <code>3.1.1</code>，Hadoop版本为<code>3.1.1</code>, 在Hadoop <code>2.7.x</code>, Hadoop <code>3.1.x</code> 和Hive <code>2.x</code>, hive <code>3.1.x</code> 测试环境中写入正常；其它版本理论上都支持，但在生产环境使用前，请进一步测试；</li>
+<li>支持常见的压缩算法，包括 GZIP， SNAPPY， ZLIB 等。</li>
+<li>多个 File 可以支持并发读取。</li>
+<li>支持 sequence file 数据压缩，目前支持 lzo 压缩方式。</li>
+<li>csv 类型支持压缩格式有：gzip、bz2、zip、lzo、lzo_deflate、snappy。</li>
+<li>目前插件中 Hive 版本为 <code>3.1.1</code>，Hadoop 版本为<code>3.1.1</code>, 在 Hadoop <code>2.7.x</code>, Hadoop <code>3.1.x</code> 和 Hive <code>2.x</code>, hive <code>3.1.x</code> 测试环境中写入正常；其它版本理论上都支持，但在生产环境使用前，请进一步测试；</li>
 <li>支持<code>kerberos</code> 认证</li>
 </ol>
 <h2 id="_2">配置样例<a class="headerlink" href="#_2" title="Permanent link">&para;</a></h2>
@@ -1759,7 +1759,7 @@
 <td align="left">defaultFS</td>
 <td align="center">是</td>
 <td>无</td>
-<td>Hadoop hdfs 文件系统 <code>NAMENODE</code> 节点地址，如果配置了 HA 模式，则为 <code>defaultFS</code> 的值</td>
+<td>HDFS <code>NAMENODE</code> 节点地址，如果配置了 HA 模式，则为 <code>defaultFS</code> 的值</td>
 </tr>
 <tr>
 <td align="left">fileType</td>
@@ -1789,25 +1789,25 @@
 <td align="left">nullFormat</td>
 <td align="center">否</td>
 <td>无</td>
-<td>自定义哪些字符可以表示为空,例如如果用户配置: <code>"\\N"</code> ，那么如果源头数据是 <code>"\N"</code> ，视作 <code>null</code> 字段</td>
+<td>自定义哪些字符可以表示为空，例如如果用户配置: <code>"\\N"</code> ，那么如果源头数据是 <code>"\N"</code> ，视作 <code>null</code> 字段</td>
 </tr>
 <tr>
 <td align="left">haveKerberos</td>
 <td align="center">否</td>
 <td>无</td>
-<td>是否启用 Kerberos 认证，如果启用，则需要同时配置 <code>kerberosKeytabFilePath</code>，<code>kerberosPrincipal</code></td>
+<td>是否启用 Kerberos 认证，如果启用，则需要同时配置下面两项</td>
 </tr>
 <tr>
 <td align="left">kerberosKeytabFilePath</td>
 <td align="center">否</td>
 <td>无</td>
-<td>用于 Kerberos 认证的凭证文件路径, 比如 <code>/your/path/addax.service.keytab</code></td>
+<td>Kerberos 认证的凭证文件路径, 比如 <code>/your/path/addax.service.keytab</code></td>
 </tr>
 <tr>
 <td align="left">kerberosPrincipal</td>
 <td align="center">否</td>
 <td>无</td>
-<td>用于 Kerberos 认证的凭证主体, 比如 <code>addax/node1@WGZHAO.COM</code></td>
+<td>Kerberos 认证的凭证主体, 比如 <code>addax/node1@WGZHAO.COM</code></td>
 </tr>
 <tr>
 <td align="left">compress</td>
@@ -1819,18 +1819,18 @@
 <td align="left">hadoopConfig</td>
 <td align="center">否</td>
 <td>无</td>
-<td>里可以配置与 Hadoop 相关的一些高级参数，比如HA的配置</td>
+<td>里可以配置与 Hadoop 相关的一些高级参数，比如 HA 的配置</td>
 </tr>
 </tbody>
 </table>
 <h3 id="path">path<a class="headerlink" href="#path" title="Permanent link">&para;</a></h3>
 <p>要读取的文件路径，如果要读取多个文件，可以使用正则表达式 <code>*</code>，注意这里可以支持填写多个路径：</p>
 <ol>
-<li>当指定单个Hdfs文件，HdfsReader暂时只能使用单线程进行数据抽取。二期考虑在非压缩文件情况下针对单个File可以进行多线程并发读取。</li>
-<li>当指定多个Hdfs文件，HdfsReader支持使用多线程进行数据抽取。线程并发数通过通道数指定。</li>
-<li>当指定通配符，HdfsReader尝试遍历出多个文件信息。例如: 指定 <code>/*</code> 代表读取 <code>/</code> 目录下所有的文件，指定 <code>/bazhen/*</code> 代表读取 bazhen 目录下游所有的文件。HdfsReader目前只支持 <code>*</code>和 <code>?</code> 作为文件通配符。</li>
+<li>当指定单个 Hdfs 文件，HdfsReader 暂时只能使用单线程进行数据抽取。二期考虑在非压缩文件情况下针对单个 File 可以进行多线程并发读取。</li>
+<li>当指定多个 Hdfs 文件，HdfsReader 支持使用多线程进行数据抽取。线程并发数通过通道数指定。</li>
+<li>当指定通配符，HdfsReader 尝试遍历出多个文件信息。例如: 指定 <code>/*</code> 代表读取 <code>/</code> 目录下所有的文件，指定 <code>/bazhen/*</code> 代表读取 bazhen 目录下游所有的文件。HdfsReader 目前只支持 <code>*</code>和 <code>?</code> 作为文件通配符。</li>
 </ol>
-<p>特别需要注意的是，Addax 会将一个作业下同步的所有的文件视作同一张数据表。用户必须自己保证所有的File能够适配同一套schema信息。并且提供给Addax权限可读。</p>
+<p>特别需要注意的是，Addax 会将一个作业下同步的所有的文件视作同一张数据表。用户必须自己保证所有的 File 能够适配同一套 schema 信息。并且提供给 Addax 权限可读。</p>
 <h3 id="filetype">fileType<a class="headerlink" href="#filetype" title="Permanent link">&para;</a></h3>
 <p>描述：文件的类型，目前只支持用户配置为</p>
 <ul>
@@ -1841,28 +1841,26 @@
 <li>csv 表示普通 hdfs 文件格式（逻辑二维表）</li>
 <li>parquet 表示 <code>parquet</code> 文件格式</li>
 </ul>
-<p>特别需要注意的是，HdfsReader能够自动识别文件是 <code>orcfile</code>、<code>textfile</code> 或者还是其它类型的文件，但该项是必填项，HdfsReader则会只读取用户配置的类型的文件，忽略路径下其他格式的文件</p>
-<p>另外需要注意的是，由于 <code>textfile</code> 和 <code>orcfile</code> 是两种完全不同的文件格式，所以HdfsReader对这两种文件的解析方式也存在差异，这种差异导致hive支持的复杂复合类型(比如map,array,struct,union)在转换为支持的String类型时，转换的结果格式略有差异，比如以map类型为例：</p>
+<p>特别需要注意的是，HdfsReader 能够自动识别文件是 <code>orcfile</code>、<code>textfile</code> 或者还是其它类型的文件，但该项是必填项，HdfsReader 则会只读取用户配置的类型的文件，忽略路径下其他格式的文件</p>
+<p>另外需要注意的是，由于 <code>textfile</code> 和 <code>orcfile</code> 是两种完全不同的文件格式，所以 HdfsReader 对这两种文件的解析方式也存在差异，这种差异导致 hive 支持的复杂复合类型(比如 map,array,struct,union)在转换为支持的 String 类型时，转换的结果格式略有差异，比如以 map 类型为例：</p>
 <ul>
 <li>
-<p><code>orcfile</code>: map类型转换成 string 类型后，结果为 <code>{job=80, team=60, person=70}</code></p>
+<p><code>orcfile</code>: map 类型转换成 string 类型后，结果为 <code>{job=80, team=60, person=70}</code></p>
 </li>
 <li>
-<p><code>textfile</code>: map类型转换成 string 类型后，结果为 <code>job:80,team:60,person:70</code></p>
+<p><code>textfile</code>: map 类型转换成 string 类型后，结果为 <code>job:80,team:60,person:70</code></p>
 </li>
 </ul>
-<p>从上面的转换结果可以看出，数据本身没有变化，但是表示的格式略有差异，所以如果用户配置的文件路径中要同步的字段在Hive中是复合类型的话，建议配置统一的文件格式。</p>
-<p>如果需要统一复合类型解析出来的格式，我们建议用户在hive客户端将 <code>textfile</code> 格式的表导成 <code>orcfile</code> 格式的表</p>
+<p>从上面的转换结果可以看出，数据本身没有变化，但是表示的格式略有差异，所以如果用户配置的文件路径中要同步的字段在 Hive 中是复合类型的话，建议配置统一的文件格式。</p>
+<p>如果需要统一复合类型解析出来的格式，我们建议用户在 hive 客户端将 <code>textfile</code> 格式的表导成 <code>orcfile</code> 格式的表</p>
 <h3 id="column">column<a class="headerlink" href="#column" title="Permanent link">&para;</a></h3>
-<p>读取字段列表，<code>type</code> 指定源数据的类型，<code>index</code> 指定当前列来自于文本第几列(以0开始)，<code>value</code> 指定当前类型为常量，不从源头文件读取数据，而是根据 <code>value</code> 值自动生成对应的列。</p>
-<p>默认情况下，用户可以全部按照String类型读取数据，配置如下：</p>
+<p>读取字段列表，<code>type</code> 指定源数据的类型，<code>index</code> 指定当前列来自于文本第几列(以 0 开始)，<code>value</code> 指定当前类型为常量，不从源头文件读取数据，而是根据 <code>value</code> 值自动生成对应的列。</p>
+<p>默认情况下，用户可以全部按照 String 类型读取数据，配置如下：</p>
 <div class="highlight"><pre><span></span><code><span class="p">{</span>
-<span class="w">  </span><span class="nt">&quot;column&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span>
-<span class="w">    </span><span class="s2">&quot;*&quot;</span>
-<span class="w">  </span><span class="p">]</span>
+<span class="w">  </span><span class="nt">&quot;column&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="s2">&quot;*&quot;</span><span class="p">]</span>
 <span class="p">}</span>
 </code></pre></div>
-<p>用户可以指定Column字段信息，配置如下：</p>
+<p>用户可以指定 Column 字段信息，配置如下：</p>
 <div class="highlight"><pre><span></span><code><span class="p">[</span>
 <span class="w">  </span><span class="p">{</span>
 <span class="w">    </span><span class="nt">&quot;type&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;long&quot;</span><span class="p">,</span>
@@ -1876,13 +1874,14 @@
 <span class="w">  </span><span class="p">}</span>
 <span class="p">]</span>
 </code></pre></div>
-<p>对于用户指定Column信息，type必须填写，index/value必须选择其一。</p>
+<p>对于用户指定 Column 信息，type 必须填写，index/value 必须选择其一。</p>
 <h3 id="compress">compress<a class="headerlink" href="#compress" title="Permanent link">&para;</a></h3>
-<p>当fileType（文件类型）为csv下的文件压缩方式，目前仅支持 gzip、bz2、zip、lzo、lzo_deflate、hadoop-snappy、framing-snappy压缩；
-值得注意的是，lzo存在两种压缩格式：lzo和lzo_deflate，用户在配置的时候需要留心，不要配错了；另外，由于snappy目前没有统一的stream
-format，addax目前只支持最主流的两种：hadoop-snappy（hadoop上的snappy stream format）和 framing-snappy（google建议的snappy stream format）;</p>
+<p>当 fileType（文件类型）为 csv 下的文件压缩方式，目前仅支持 gzip、bz2、zip、lzo、lzo_deflate、hadoop-snappy、framing-snappy 压缩；
+值得注意的是，lzo 存在两种压缩格式：lzo 和 lzo_deflate，用户在配置的时候需要留心，不要配错了；</p>
+<p>另外，由于 snappy 目前没有统一的 stream format，addax 目前只支持最主流的两种：hadoop-snappy（hadoop 上的 snappy stream format）
+和 framing-snappy（google 建议的 snappy stream format）;</p>
 <h3 id="hadoopconfig">hadoopConfig<a class="headerlink" href="#hadoopconfig" title="Permanent link">&para;</a></h3>
-<p><code>hadoopConfig</code> 里可以配置与 Hadoop 相关的一些高级参数，比如HA的配置</p>
+<p><code>hadoopConfig</code> 里可以配置与 Hadoop 相关的一些高级参数，比如 HA 的配置</p>
 <div class="highlight"><pre><span></span><code><span class="p">{</span>
 <span class="w">  </span><span class="nt">&quot;hadoopConfig&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
 <span class="w">    </span><span class="nt">&quot;dfs.nameservices&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;cluster&quot;</span><span class="p">,</span>
@@ -1893,9 +1892,9 @@ format，addax目前只支持最主流的两种：hadoop-snappy（hadoop上的sn
 <span class="w">  </span><span class="p">}</span>
 <span class="p">}</span>
 </code></pre></div>
-<p>这里的 <code>cluster</code> 表示 HDFS 配置成HA时的名字，也是 <code>defaultFS</code> 配置项中的名字 如果实际环境中的名字不是 <code>cluster</code> ，则上述配置中所有写有 <code>cluster</code> 都需要替换</p>
+<p>这里的 <code>cluster</code> 表示 HDFS 配置成 HA 时的名字，也是 <code>defaultFS</code> 配置项中的名字 如果实际环境中的名字不是 <code>cluster</code> ，则上述配置中所有写有 <code>cluster</code> 都需要替换</p>
 <h4 id="csvreaderconfig">csvReaderConfig<a class="headerlink" href="#csvreaderconfig" title="Permanent link">&para;</a></h4>
-<p>读取CSV类型文件参数配置，Map类型。读取CSV类型文件使用的CsvReader进行读取，会有很多配置，不配置则使用默认值。</p>
+<p>读取 CSV 类型文件参数配置，Map 类型。读取 CSV 类型文件使用的 CsvReader 进行读取，会有很多配置，不配置则使用默认值。</p>
 <p>常见配置：</p>
 <div class="highlight"><pre><span></span><code><span class="p">{</span>
 <span class="w">  </span><span class="nt">&quot;csvReaderConfig&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
@@ -1905,7 +1904,7 @@ format，addax目前只支持最主流的两种：hadoop-snappy（hadoop上的sn
 <span class="w">  </span><span class="p">}</span>
 <span class="p">}</span>
 </code></pre></div>
-<p>所有配置项及默认值,配置时 csvReaderConfig 的map中请 <strong>严格按照以下字段名字进行配置</strong>：</p>
+<p>所有配置项及默认值,配置时 csvReaderConfig 的 map 中请 <strong>严格按照以下字段名字进行配置</strong>：</p>
 <div class="highlight"><pre><span></span><code><span class="na">boolean caseSensitive</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">true</span><span class="c1">;</span>
 <span class="na">char textQualifier</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">34</span><span class="c1">;</span>
 <span class="na">boolean trimWhitespace</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">true</span><span class="c1">;</span>
@@ -1924,7 +1923,7 @@ format，addax目前只支持最主流的两种：hadoop-snappy（hadoop上的sn
 <thead>
 <tr>
 <th>Addax 内部类型</th>
-<th>Hive表 数据类型</th>
+<th>Hive 表 数据类型</th>
 </tr>
 </thead>
 <tbody>
@@ -1956,20 +1955,20 @@ format，addax目前只支持最主流的两种：hadoop-snappy（hadoop上的sn
 </table>
 <p>其中：</p>
 <ul>
-<li>Long 是指Hdfs文件文本中使用整形的字符串表示形式，例如 <code>123456789</code></li>
-<li>Double 是指Hdfs文件文本中使用Double的字符串表示形式，例如 <code>3.1415</code></li>
-<li>Boolean 是指Hdfs文件文本中使用Boolean的字符串表示形式，例如 <code>true</code>、<code>false</code>。不区分大小写。</li>
-<li>Date 是指Hdfs文件文本中使用Date的字符串表示形式，例如 <code>2014-12-31</code></li>
-<li>Bytes 是指HDFS文件中使用二进制存储的内容，比如一张图片的数据</li>
+<li>Long 是指 Hdfs 文件文本中使用整形的字符串表示形式，例如 <code>123456789</code></li>
+<li>Double 是指 Hdfs 文件文本中使用 Double 的字符串表示形式，例如 <code>3.1415</code></li>
+<li>Boolean 是指 Hdfs 文件文本中使用 Boolean 的字符串表示形式，例如 <code>true</code>、<code>false</code>。不区分大小写。</li>
+<li>Date 是指 Hdfs 文件文本中使用 Date 的字符串表示形式，例如 <code>2014-12-31</code></li>
+<li>Bytes 是指 HDFS 文件中使用二进制存储的内容，比如一张图片的数据</li>
 </ul>
 <p>特别提醒：</p>
 <ul>
-<li>Hive支持的数据类型 TIMESTAMP 可以精确到纳秒级别，所以 <code>textfile</code>、<code>orcfile</code> 中 <code>TIMESTAMP</code> 存放的数据类似于 <code>2015-08-21 22:40:47.397898389</code>，
-  如果转换的类型配置为Addax的Date，转换之后会导致纳秒部分丢失，所以如果需要保留纳秒部分的数据，请配置转换类型为 <code>String</code> 类型。</li>
+<li>Hive 支持的数据类型 TIMESTAMP 可以精确到纳秒级别，所以 <code>textfile</code>、<code>orcfile</code> 中 <code>TIMESTAMP</code> 存放的数据类似于 <code>2015-08-21 22:40:47.397898389</code>，
+  如果转换的类型配置为 Addax 的 Date，转换之后会导致纳秒部分丢失，所以如果需要保留纳秒部分的数据，请配置转换类型为 <code>String</code> 类型。</li>
 </ul>
 <h2 id="faq">FAQ<a class="headerlink" href="#faq" title="Permanent link">&para;</a></h2>
-<p>Q: 如果报java.io.IOException: Maximum column length of 100,000 exceeded in column...异常信息，说明数据源column字段长度超过了100000字符。</p>
-<p>A: 需要在json的reader里增加如下配置</p>
+<p>Q: 如果报 java.io.IOException: Maximum column length of 100,000 exceeded in column...异常信息，说明数据源 column 字段长度超过了 100000 字符。</p>
+<p>A: 需要在 json 的 reader 里增加如下配置</p>
 <div class="highlight"><pre><span></span><code><span class="p">{</span>
 <span class="w">  </span><span class="nt">&quot;csvReaderConfig&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
 <span class="w">    </span><span class="nt">&quot;safetySwitch&quot;</span><span class="p">:</span><span class="w"> </span><span class="kc">false</span><span class="p">,</span>
@@ -1978,7 +1977,7 @@ format，addax目前只支持最主流的两种：hadoop-snappy（hadoop上的sn
 <span class="w">  </span><span class="p">}</span>
 <span class="p">}</span>
 </code></pre></div>
-<p><code>safetySwitch = false</code>  表示单列长度不限制100000字符</p>
+<p><code>safetySwitch = false</code> 表示单列长度不限制 100000 字符</p>
 
 
 

@@ -1539,19 +1539,19 @@
 <td align="left">hbaseConfig</td>
 <td align="center">是</td>
 <td>无</td>
-<td>hbase集群地址，zk为必填项，格式：<code>ip1,ip2,ip3[:port]</code>，<code>znode</code> 是可选的，默认值是 <code>/hbase</code></td>
+<td>hbase 集群地址，zk 为必填项，格式：<code>ip1,ip2,ip3[:port]</code>，<code>znode</code> 是可选的，默认值是 <code>/hbase</code></td>
 </tr>
 <tr>
 <td align="left">table</td>
 <td align="center">是</td>
 <td>无</td>
-<td>要导入的表名，大小写敏感，通常phoenix表都是 <strong>大写</strong> 表名</td>
+<td>要导入的表名，大小写敏感，通常 phoenix 表都是 <strong>大写</strong> 表名</td>
 </tr>
 <tr>
 <td align="left">column</td>
 <td align="center">是</td>
 <td>无</td>
-<td>列名，大小写敏感，通常phoenix的列名都是 <strong>大写</strong> ,数据类型无需填写,会自动获取列</td>
+<td>列名，大小写敏感，通常 phoenix 的列名都是 <strong>大写</strong> ,数据类型无需填写,会自动获取列</td>
 </tr>
 <tr>
 <td align="left">batchSize</td>
@@ -1563,13 +1563,13 @@
 <td align="left">nullMode</td>
 <td align="center">否</td>
 <td>skip</td>
-<td>读取到的列值为null时，如何处理。支持 <code>skip</code>, <code>empty</code>,前者表示跳过该列,后者表示插入空值,数值类型为0,字符类型为<code>null</code></td>
+<td>读取到的列值为 null 时，如何处理。支持 <code>skip</code>, <code>empty</code>,前者表示跳过该列,后者表示插入空值,数值类型为 0,字符类型为<code>null</code></td>
 </tr>
 <tr>
 <td align="left">haveKerberos</td>
 <td align="center">否</td>
 <td>false</td>
-<td>是否启用Kerberos认证, true 表示启用, false 表示不启用</td>
+<td>是否启用 Kerberos 认证, true 表示启用, false 表示不启用</td>
 </tr>
 <tr>
 <td align="left">kerberosPrincipal</td>
@@ -1585,8 +1585,8 @@
 </tr>
 </tbody>
 </table>
-<p>注意：启用kerberos认证后，程序需要知道<code>hbase-site.xml</code> 所在的路径，一种办法是运行执行在环境变量 <code>CLASSPATH</code> 中增加该文件的所在路径。</p>
-<p>另外一个解决办法是将 <code>hbase-site.xml</code> 文件拷贝到插件的 <code>libs</code> 目录里。 </p>
+<p>注意：启用 kerberos 认证后，程序需要知道<code>hbase-site.xml</code> 所在的路径，一种办法是运行执行在环境变量 <code>CLASSPATH</code> 中增加该文件的所在路径。</p>
+<p>另外一个解决办法是将 <code>hbase-site.xml</code> 文件拷贝到插件的 <code>libs</code> 目录里。</p>
 
 
 

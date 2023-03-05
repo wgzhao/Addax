@@ -1640,7 +1640,7 @@
 
 
 <h1 id="influxdb-writer">InfluxDB Writer<a class="headerlink" href="#influxdb-writer" title="Permanent link">&para;</a></h1>
-<p>InfluxDBWriter 插件实现了将数据写入 <a href="https://www.influxdata.com">InfluxDB</a> 读取数据的功能。
+<p>InfluxDBWriter 插件实现了将数据写入 <a href="https://docs.influxdata.com/influxdb/v1.8/query_language/manage-database/#create-retention-policies-with-create-retention-policy">InfluxDB</a> 读取数据的功能。
 底层实现上，是通过调用 InfluQL 语言接口，构建插入语句，然后进行数据插入。</p>
 <h2 id="_1">示例<a class="headerlink" href="#_1" title="Permanent link">&para;</a></h2>
 <p>以下示例用来演示该插件从内存读取数据并写入到指定表</p>
@@ -1840,7 +1840,7 @@ influx<span class="w"> </span>--execute<span class="w"> </span><span class="s2">
 <p>InfluxDB 作为时序数据库，需要每条记录都有时间戳字段，因此这里会把 <code>column</code> 配置的第一个字段默认当作时间戳</p>
 <h3 id="retentionpolicy">retentionPolicy<a class="headerlink" href="#retentionpolicy" title="Permanent link">&para;</a></h3>
 <p>设定数据库的 <code>Retention Policy</code> 策略，依据给定的配置，在指定数据库上创建一条 <code>Retention Policy</code> 信息。
-有关 <code>Retention Policy</code> 更详细的信息，可以参考 <a href="https://docs.influxdata.com/influxdb/v1.8/query_language/manage-database/#create-retention-policies-with-create-retention-policy">官方文档</a></p>
+有关 <code>Retention Policy</code> 更详细的信息，可以参考 [官方文档][2]</p>
 <h2 id="_5">类型转换<a class="headerlink" href="#_5" title="Permanent link">&para;</a></h2>
 <p>当前支持 InfluxDB 的基本类型</p>
 <h2 id="_6">限制<a class="headerlink" href="#_6" title="Permanent link">&para;</a></h2>

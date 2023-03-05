@@ -1586,7 +1586,7 @@
 <h1 id="greenplum-writer">Greenplum Writer<a class="headerlink" href="#greenplum-writer" title="Permanent link">&para;</a></h1>
 <p>GreenplumWriter 插件使用 <code>COPY FROM</code> 语法 将数据写入 <a href="https://greenplum.org">Greenplum</a> 数据库。</p>
 <h2 id="_1">示例<a class="headerlink" href="#_1" title="Permanent link">&para;</a></h2>
-<p>以下配置演示从postgresql指定的表读取数据，并插入到具有相同表结构的另外一张表中，用来测试该插件所支持的数据类型。</p>
+<p>以下配置演示从 greenplum 指定的表读取数据，并插入到具有相同表结构的另外一张表中，用来测试该插件所支持的数据类型。</p>
 <div class="highlight"><pre><span></span><code><span class="k">create</span><span class="w"> </span><span class="k">table</span><span class="w"> </span><span class="k">if</span><span class="w"> </span><span class="k">not</span><span class="w"> </span><span class="k">exists</span><span class="w"> </span><span class="n">addax_tbl</span>
 <span class="p">(</span>
 <span class="w">    </span><span class="n">c_bigint</span>
@@ -1697,7 +1697,7 @@
 <span class="w">  </span><span class="p">}</span>
 <span class="p">}</span>
 </code></pre></div>
-<p>将上述配置文件保存为  <code>job/pg2gp.json</code></p>
+<p>将上述配置文件保存为 <code>job/pg2gp.json</code></p>
 <h3 id="_3">执行采集命令<a class="headerlink" href="#_3" title="Permanent link">&para;</a></h3>
 <p>执行以下命令进行数据采集</p>
 <div class="highlight"><pre><span></span><code>bin/addax.sh<span class="w"> </span>job/pg2gp.json
@@ -1717,7 +1717,7 @@
 <td align="left">jdbcUrl</td>
 <td align="center">是</td>
 <td>无</td>
-<td>对端数据库的JDBC连接信息，jdbcUrl按照RDBMS官方规范，并可以填写连接 <a href="http://jdbc.postgresql.org/documentation/93/connect.html">附件控制信息</a></td>
+<td>对端数据库的 JDBC 连接信息，jdbcUrl 按照 RDBMS 官方规范，并可以填写连接 <a href="http://jdbc.postgresql.org/documentation/93/connect.html">附件控制信息</a></td>
 </tr>
 <tr>
 <td align="left">username</td>
@@ -1735,7 +1735,7 @@
 <td align="left">table</td>
 <td align="center">是</td>
 <td>无</td>
-<td>所选取的需要同步的表名,使用JSON数据格式，当配置为多张表时，用户自己需保证多张表是同一表结构</td>
+<td>所选取的需要同步的表名,使用 JSON 数据格式，当配置为多张表时，用户自己需保证多张表是同一表结构</td>
 </tr>
 <tr>
 <td align="left">column</td>
@@ -1747,13 +1747,13 @@
 <td align="left">preSql</td>
 <td align="center">否</td>
 <td>无</td>
-<td>执行数据同步任务之前率先执行的sql语句，目前只允许执行一条SQL语句，例如清除旧数据,涉及到的表可用 <code>@table</code>表示</td>
+<td>执行数据同步任务之前率先执行的 sql 语句，目前只允许执行一条 SQL 语句，例如清除旧数据,涉及到的表可用 <code>@table</code>表示</td>
 </tr>
 <tr>
 <td align="left">postSql</td>
 <td align="center">否</td>
 <td>无</td>
-<td>执行数据同步任务之后执行的sql语句，目前只允许执行一条SQL语句，例如加上某一个时间戳</td>
+<td>执行数据同步任务之后执行的 sql 语句，目前只允许执行一条 SQL 语句，例如加上某一个时间戳</td>
 </tr>
 <tr>
 <td align="left">batchSize</td>

@@ -1626,7 +1626,7 @@
 
 
 <h1 id="tdengine-writer">TDengine Writer<a class="headerlink" href="#tdengine-writer" title="Permanent link">&para;</a></h1>
-<p>TDengineWriter 插件实现了将数据写入到涛思公司的 <a href="https://www.taosdata.com/cn/">TDengine</a> 数据库系统。在底层实现上，TDengineWriter 通过JDBC JNI 驱动连接远程 TDengine 数据库，
+<p>TDengineWriter 插件实现了将数据写入 <a href="https://www.taosdata.com/cn/">TDengine</a> 数据库系统。在底层实现上，TDengineWriter 通过JDBC JNI 驱动连接远程 TDengine 数据库，
 并执行相应的sql语句将数据批量写入 TDengine 库中。</p>
 <h2 id="_1">前置条件<a class="headerlink" href="#_1" title="Permanent link">&para;</a></h2>
 <p>考虑到性能问题，该插件使用了 TDengine 的 JDBC-JNI 驱动， 该驱动直接调用客户端 API（<code>libtaos.so</code> 或 <code>taos.dll</code>）将写入和查询请求发送到 <code>taosd</code> 实例。
@@ -1877,7 +1877,7 @@ INSERT INTO %s (ts,name,file_size,file_date,flag_open,memo) VALUES(?,?,?,?,?,?)
 <td align="center">否</td>
 <td>int</td>
 <td>1024</td>
-<td>定义了插件和数据库服务器端每次批量数据获取条数，调高该值可能导致 Addax 出现OOM或者目标数据库事务提交失败导致挂起</td>
+<td>定义了插件和数据库服务器端每次批量数据获取条数</td>
 </tr>
 </tbody>
 </table>
