@@ -4,14 +4,13 @@
 
 Addax 是一个异构数据源离线同步工具，最初来源于阿里的 [DataX](https://github.com/alibaba/datax) ，致力于实现包括关系型数据库(MySQL、Oracle等)、HDFS、Hive、HBase、FTP等各种异构数据源之间稳定高效的数据同步功能。
 
-![addax_why_new](images/addax_why_new.png)
+![addax why new](images/addax_why_new.png)
 
 为了解决异构数据源同步问题，Addax将复杂的网状的同步链路变成了星型数据链路，Addax作为中间传输载体负责连接各种数据源。当需要接入一个新的数据源的时候，只需要将此数据源对接到Addax，便能跟已有的数据源做到无缝数据同步。
 
 ## 框架设计
 
 ```mermaid
-%%{init: {"theme": "neutral"}}%%
 graph LR
 MySQL
 subgraph Addax
@@ -22,13 +21,12 @@ subgraph Addax
 	subgraph writer["Writer Plugin"]
 	hw["HDFSWriter"]
 	end
-	Framework:::f1
+	Framework
 	mr --> Framework --> writer
 end
 
-MySQL:::f1 ==> Addax ==> HDFS:::f1
+MySQL ==> Addax ==> HDFS
 
-classDef f1 fill:#62B3D4,stroke-width:0px;
 ```
 
 Addax本身作为离线数据同步框架，采用 Framework + plugin 架构构建。将数据源读取和写入抽象成为 Reader/Writer 插件，纳入到整个同步框架中。
@@ -44,7 +42,6 @@ Addax Framework提供了简单的接口与插件交互，提供简单的插件�
 本小节按一个Addax作业生命周期的时序图，从整体架构设计非常简要说明各个模块相互关系。
 
 ```mermaid
-%%{init: {"theme": "neutral"}}%%
 graph TB
 subgraph Job
 end
@@ -94,10 +91,6 @@ end
 
 Job == split ==> task
 task == Schedule ==> taskgroup
-
-style taskgroup fill:gray
-style task fill:#bbb
-
 ```
 
 
