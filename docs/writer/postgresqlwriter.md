@@ -1,10 +1,10 @@
 # Postgresql Writer
 
-PostgresqlWriter插件实现了写入数据到 [PostgreSQL](https://postgresql.org) 数据库库表的功能。
+PostgresqlWriter 插件实现了写入数据到 [PostgreSQL](https://postgresql.org) 数据库库表的功能。
 
 ## 示例
 
-以下配置演示从postgresql指定的表读取数据，并插入到具有相同表结构的另外一张表中，用来测试该插件所支持的数据类型。
+以下配置演示从 postgresql 指定的表读取数据，并插入到具有相同表结构的另外一张表中，用来测试该插件所支持的数据类型。
 
 ### 表结构信息
 
@@ -26,11 +26,11 @@ create table addax_tbl1 like addax_tbl;
 
 === "job/pg2pg.json"
 
-  ```json
-  --8<-- "jobs/pgwriter.json"
-  ```
+```json
+--8<-- "jobs/pgwriter.json"
+```
 
-将上述配置文件保存为  `job/pg2pg.json`
+将上述配置文件保存为 `job/pg2pg.json`
 
 ### 执行采集命令
 
@@ -44,15 +44,15 @@ bin/addax.sh job/pg2pg.json
 
 | 配置项    | 是否必须 | 默认值 | 描述                                                                                                             |
 | :-------- | :------: | ------ | ---------------------------------------------------------------------------------------------------------------- |
-| jdbcUrl   |    是    | 无     | 对端数据库的JDBC连接信息，jdbcUrl按照RDBMS官方规范，并可以填写连接 [附件控制信息][1]                             |
+| jdbcUrl   |    是    | 无     | 对端数据库的 JDBC 连接信息，jdbcUrl 按照 RDBMS 官方规范，并可以填写连接 [附件控制信息][1]                        |
 | username  |    是    | 无     | 数据源的用户名                                                                                                   |
 | password  |    否    | 无     | 数据源指定用户名的密码                                                                                           |
-| writeMode |    否    | insert | 写入模式，支持insert, update 详见如下                                                                            |
-| table     |    是    | 无     | 所选取的需要同步的表名,使用JSON数据格式，当配置为多张表时，用户自己需保证多张表是同一表结构                      |
+| writeMode |    否    | insert | 写入模式，支持 insert, update 详见如下                                                                           |
+| table     |    是    | 无     | 所选取的需要同步的表名,使用 JSON 数据格式，当配置为多张表时，用户自己需保证多张表是同一表结构                    |
 | column    |    是    | 无     | 所配置的表中需要同步的列名集合，详细描述见 [rdbmswriter](../rdbmswriter)                                         |
-| preSql    |    否    | 无     | 执行数据同步任务之前率先执行的sql语句，目前只允许执行一条SQL语句，例如清除旧数据,涉及到的表可用 `@table`表示     |
-| postSql   |    否    | 无     | 执行数据同步任务之后执行的sql语句，目前只允许执行一条SQL语句，例如加上某一个时间戳                               |
-| batchSize |    否    | 1024   | 定义了插件和数据库服务器端每次批量数据获取条数，调高该值可能导致 Addax 出现OOM或者目标数据库事务提交失败导致挂起 |
+| preSql    |    否    | 无     | 执行数据同步任务之前率先执行的 sql 语句，目前只允许执行一条 SQL 语句，例如清除旧数据,涉及到的表可用 `@table`表示 |
+| postSql   |    否    | 无     | 执行数据同步任务之后执行的 sql 语句，目前只允许执行一条 SQL 语句，例如加上某一个时间戳                           |
+| batchSize |    否    | 1024   | 定义了插件和数据库服务器端每次批量数据获取条数                                                                   |
 
 [1]: http://jdbc.postgresql.org/documentation/93/connect.html
 
@@ -74,9 +74,9 @@ bin/addax.sh job/pg2pg.json
 
 ## 类型转换
 
-目前 PostgresqlWriter支持大部分 PostgreSQL类型，但也存在部分没有支持的情况，请注意检查你的类型。
+目前 PostgresqlWriter 支持大部分 PostgreSQL 类型，但也存在部分没有支持的情况，请注意检查你的类型。
 
-下面列出 PostgresqlWriter针对 PostgreSQL类型转换列表:
+下面列出 PostgresqlWriter 针对 PostgreSQL 类型转换列表:
 
 | Addax 内部类型 | PostgreSQL 数据类型                                       |
 | -------------- | --------------------------------------------------------- |

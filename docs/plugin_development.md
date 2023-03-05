@@ -25,7 +25,7 @@ Addax 运行一个任务的大致流程如下：
 12. `split()` 方法内部的 `mergeReaderAndWriterTaskConfigs()` 负责合并 reader、writer、以及 transformer 三者关系，生成 task 的配置，并且重写 `job.content` 的配置
 13. `schedule()` 方法根据 `split()` 拆分生成的 task 配置分配生成 taskGroup 对象，根据 task 的数量和单个 taskGroup 支持的 task 数量进行配置，两者相除就可以得出 taskGroup 的数量
 14. `schedule()` 内部通过 AbstractScheduler 的 `schedule()` 执行，继续执行` startAllTaskGroup()` 方法创建所有的 TaskGroupContainer 组织相关的
-    task，TaskGroupContainerRunner 负责运行 TaskGroupContainer 执行分配的 task。scheduler的具体实现类为 `ProcessInnerScheduler`。
+    task，TaskGroupContainerRunner 负责运行 TaskGroupContainer 执行分配的 task。scheduler 的具体实现类为 `ProcessInnerScheduler`。
 15. `taskGroupContainerExecutorService` 启动固定的线程池用以执行 `TaskGroupContainerRunner` 对象，TaskGroupContainerRunner 的 `run()` 方法调用 `taskGroupContainer.
 start()` 方法，针对每个 channel 创建一个 TaskExecutor，通过 `taskExecutor.doStart()` 启动任务。
 
@@ -50,7 +50,7 @@ start()` 方法，针对每个 channel 创建一个 TaskExecutor，通过 `taskE
 - `Job`: 用以描述从一个源头到一个目的端的同步作业，是数据同步的最小业务单元。比如：从一张 MySQL 的表同步到 PostgreSQL 的一个表。
 - `Task`: 为最性能大化而把 `Job` 拆分得到的最小执行单元。比如：读一张有 1024 个分表的 MySQL 分库分表的 `Job`，拆分成 1024 个读 `Task`，用若干个并发执行。
 - `TaskGroup`: 一组 `Task` 集合。在同一个 `TaskGroupContainer` 执行下的 `Task` 集合称之为 `TaskGroup`
-- `JobContainer`:  `Job` 执行器，负责 `Job` 全局拆分、调度、前置语句和后置语句等工作的工作单元。类似 [Yarn][1] 中的 JobTracker
+- `JobContainer`: `Job` 执行器，负责 `Job` 全局拆分、调度、前置语句和后置语句等工作的工作单元。类似 [Yarn][1] 中的 JobTracker
 - `TaskGroupContainer`: `TaskGroup` 执行器，负责执行一组 `Task` 的工作单元，类似 [Yarn][1] 中的 TaskTracker。
 
 简而言之， `Job`拆分成`Task`，分别在框架提供的容器中执行，插件只需要实现 `Job` 和 `Task` 两部分逻辑。
@@ -129,11 +129,11 @@ public class SomeReader
 
 `Job` 接口功能如下：
 
-- `init`: Job对象初始化工作，此时可以通过 `super.getPluginJobConf()` 获取与本插件相关的配置。读插件获得配置中 `reader` 部分，写插件获得 `writer` 部分。
+- `init`: Job 对象初始化工作，此时可以通过 `super.getPluginJobConf()` 获取与本插件相关的配置。读插件获得配置中 `reader` 部分，写插件获得 `writer` 部分。
 - `prepare`: 全局准备工作，比如 MySQL 清空目标表。
 - `split`: 拆分 `Task`。参数 `adviceNumber` 框架建议的拆分数，一般是运行时所配置的并发度。值返回的是 `Task` 的配置列表。
 - `post`: 全局的后置工作，比如 MySQL writer 同步完影子表后的 `rename` 操作。
-- `destroy`: Job对象自身的销毁工作。
+- `destroy`: Job 对象自身的销毁工作。
 
 `Task` 接口功能如下：
 
@@ -189,7 +189,7 @@ classDiagram
 		+ getJobPluginCollector(): JobPluginCollector
 		+ setJobPluginCollector(JobPluginCollector)
 	}
-	
+
 	class AbstractTaskPlugin {
 		+ getTaskPluginCollector(): TaskPluginCollector
 		+ setTaskPluginCollector(TaskPluginCollector)
@@ -197,33 +197,31 @@ classDiagram
 	class Reader_Job {
 		+ split(init): List<<Configuration>>
 	}
-	
+
 	class Writer_Job {
 		+ split(init): List<<Configuration>>
 	}
-	
+
 	class Reader_Task {
 		+ startRead(RecordSender)
 	}
-	
+
 	class Writer_Task {
 		+ startWrite(RecordReceiver)
 	}
-	
+
 	AbstractJobPlugin <|-- Reader_Job
 	AbstractJobPlugin <|-- Writer_Job
-	
+
 	AbstractTaskPlugin <|-- Reader_Task
 	AbstractTaskPlugin <|-- Writer_Task
-	
+
 	AbstractPlugin <|-- AbstractJobPlugin
 	AbstractPlugin <|-- AbstractTaskPlugin
-	
+
 	Pluginable <|-- AbstractPlugin
-	
+
 ```
-
-
 
 ### 插件定义
 
@@ -290,19 +288,19 @@ ${ADDAX_HOME}
 │         │     └── plugin_job_template.json
 ```
 
-- `${ADDAX_HOME}/bin`:  可执行程序目录
-- `${ADDAX_HOME}/conf`:  框架配置目录
-- `${ADDAX_HOME}/lib`:  框架依赖库目录
+- `${ADDAX_HOME}/bin`: 可执行程序目录
+- `${ADDAX_HOME}/conf`: 框架配置目录
+- `${ADDAX_HOME}/lib`: 框架依赖库目录
 - `${ADDAX_HOME}/shared`: 插件依赖目录
-- `${ADDAX_HOME}/plugin`:  插件目录
+- `${ADDAX_HOME}/plugin`: 插件目录
 
 插件目录分为 `reader` 和 `writer` 子目录，读写插件分别存放。插件目录规范如下：
 
 - `${PLUGIN_HOME}/libs`: 插件的依赖库，为了减少程序包大小，这些依赖包都是指向 `shared` 目录的符号链接
-- `${PLUGIN_HOME}/plugin-name-version.jar`: 插件本身的jar。
+- `${PLUGIN_HOME}/plugin-name-version.jar`: 插件本身的 jar。
 - `${PLUGIN_HOME}/plugin.json`: 插件描述文件。
 
-尽管框架加载插件时，会把 `${PLUGIN_HOME}` 下所有的 jar 包添加到 `classpath` 环境变量中，但还是推荐依赖库的jar和插件本身的jar分开存放。
+尽管框架加载插件时，会把 `${PLUGIN_HOME}` 下所有的 jar 包添加到 `classpath` 环境变量中，但还是推荐依赖库的 jar 和插件本身的 jar 分开存放。
 
 !!! 特别提醒
 
@@ -329,29 +327,23 @@ ${ADDAX_HOME}
 
 - 驼峰命名：所有配置项采用小驼峰命名法，首字母小写。
 - 正交原则：配置项必须正交，功能没有重复，没有潜规则。
-- 富类型：合理使用json的类型，减少无谓的处理逻辑，减少出错的可能。
-    - 使用正确的数据类型。比如，`bool` 类型的值使用 `true`/`false`，而非 `"yes"`/`"true"`/`0` 等。
-    - 合理使用集合类型，比如，用数组替代有分隔符的字符串。
+- 富类型：合理使用 json 的类型，减少无谓的处理逻辑，减少出错的可能。
+  - 使用正确的数据类型。比如，`bool` 类型的值使用 `true`/`false`，而非 `"yes"`/`"true"`/`0` 等。
+  - 合理使用集合类型，比如，用数组替代有分隔符的字符串。
 - 类似通用：遵守同一类型的插件的习惯，比如关系型数据库的 `connection` 参数都是如下结构：
 
   ```json
   {
     "connection": [
       {
-        "table": [
-          "table_1",
-          "table_2"
-        ],
+        "table": ["table_1", "table_2"],
         "jdbcUrl": [
           "jdbc:mysql://127.0.0.1:3306/database_1",
           "jdbc:mysql://127.0.0.2:3306/database_1_slave"
         ]
       },
       {
-        "table": [
-          "table_3",
-          "table_4"
-        ],
+        "table": ["table_3", "table_4"],
         "jdbcUrl": [
           "jdbc:mysql://127.0.0.3:3306/database_2",
           "jdbc:mysql://127.0.0.4:3306/database_2_slave"
@@ -367,10 +359,10 @@ ${ADDAX_HOME}
 
 `Configuration` 提供了常见的 `get`, `带类型get`，`带默认值get`，`set` 等读写配置项的操作，以及 `clone`, `toJSON` 等方法。配置项读写操作都需要传入一个 `path` 做为参数， 这个 `path` 就是 `Addax` 定义的 DSL。语法有两条：
 
-1. 子map用 `.key` 表示，`path` 的第一个点省略。
+1. 子 map 用 `.key` 表示，`path` 的第一个点省略。
 2. 数组元素用 `[index]` 表示。
 
-比如操作如下json：
+比如操作如下 json：
 
 ```json
 {
@@ -392,7 +384,7 @@ ${ADDAX_HOME}
 }
 ```
 
-比如调用 `configuration.get(path)` 方法，当path为如下值的时候得到的结果为：
+比如调用 `configuration.get(path)` 方法，当 path 为如下值的时候得到的结果为：
 
 - `x`：`4`
 - `a.b.c`：`2`
@@ -406,7 +398,7 @@ ${ADDAX_HOME}
 
 ## 插件数据传输
 
-跟一般的 `生产者-消费者` 模式一样，`Reader` 插件和 `Writer` 插件之间也是通过 `channel` 来实现数据的传输的。`channel` 可以是内存的，也可能是持久化的，插件不必关心。 插件通过 `RecordSender` 往 `channel` 写入数据，通过 `RecordReceiver` 从 `channel`  读取数据。
+跟一般的 `生产者-消费者` 模式一样，`Reader` 插件和 `Writer` 插件之间也是通过 `channel` 来实现数据的传输的。`channel` 可以是内存的，也可能是持久化的，插件不必关心。 插件通过 `RecordSender` 往 `channel` 写入数据，通过 `RecordReceiver` 从 `channel` 读取数据。
 
 `channel` 中的一条数据为一个 `Record` 的对象，`Record` 中可以放多个 `Column` 对象，这可以简单理解为数据库中的记录和列。
 
@@ -444,13 +436,13 @@ public interface Record
 
 为了规范源端和目的端类型转换操作，保证数据不失真，Addax 支持六种内部数据类型：
 
-- `Long`：定点数(Int、Short、Long、BigInteger等)。
+- `Long`：定点数(Int、Short、Long、BigInteger 等)。
 - `Double`：浮点数(Float、Double、BigDecimal(无限精度)等)。
 - `String`：字符串类型，底层不限长，使用通用字符集(Unicode)。
 - `Date`：日期类型。
 - `Timestamp`: 时间戳
 - `Bool`：布尔值。
-- `Bytes`：二进制，可以存放诸如MP3等非结构化数据。
+- `Bytes`：二进制，可以存放诸如 MP3 等非结构化数据。
 
 对应地，有 `DateColumn`、`LongColumn`、`DoubleColumn`、`BytesColumn`、`StringColumn` 、`BoolColumn` 和 `TimestampColumn` 七种 `Column` 的实现。
 
@@ -483,28 +475,29 @@ Column <|-- Boolcolumn
 Column <|-- Bytescolumn
 ```
 
-Addax的内部类型在实现上会选用不同的java类型：
+Addax 的内部类型在实现上会选用不同的 java 类型：
 
-| 内部类型 | 实现类型 | 备注 |
-| ----- | -------- | ----- |
-| Date  | java.util.Date |     |
-| Timestamp | java.sql.Timestamp | 可以精确到纳秒 |
-| Long  | java.math.BigInteger|  使用无限精度的大整数，保证不失真   |
-| Double| java.lang.String| 用String表示，保证不失真 |
-| Bytes | byte[]|  |
-| String|  java.lang.String   |     |
-| Bool  | java.lang.Boolean   | |
+| 内部类型  | 实现类型             | 备注                             |
+| --------- | -------------------- | -------------------------------- |
+| Date      | java.util.Date       |                                  |
+| Timestamp | java.sql.Timestamp   | 可以精确到纳秒                   |
+| Long      | java.math.BigInteger | 使用无限精度的大整数，保证不失真 |
+| Double    | java.lang.String     | 用 String 表示，保证不失真       |
+| Bytes     | byte[]               |                                  |
+| String    | java.lang.String     |                                  |
+| Bool      | java.lang.Boolean    |                                  |
 
 类型之间相互转换的关系如下：
 
-| from/to     |   Date  |  Long  | Double | Bytes   | String | Bool   |
-| -----   | -------- | ----- | ------ | -------- | ----- |  ----- |
-| Date    |    -     |  使用毫秒时间戳  |   不支持  |    不支持      |   使用系统配置的date/time/datetime格式转换    |  不支持  |
-| Long    |  作为毫秒时间戳构造Date    |   -   | BigInteger转为BigDecimal，然后BigDecimal.doubleValue()       |    不支持      |  BigInteger.toString()    | 0为false，否则true   |
-| Double  |  不支持   | 内部String构造BigDecimal，然后BigDecimal.longValue()   |    -   |     不支持     |  直接返回内部String    |        |
-| Bytes   |  不支持   | 不支持 | 不支持  |    -     |  按照`common.column.encoding`配置的编码转换为String，默认`utf-8`  |  不支持  |
-| String  | 按照配置的date/time/datetime/extra格式解析 |  用String构造BigDecimal，然后取longValue()  |   用String构造BigDecimal，然后取doubleValue(),会正确处理`NaN`/`Infinity`/`-Infinity`  |   按照`common.column.encoding`配置的编码转换为byte[]，默认`utf-8`     |    -  |    "true"为`true`, "false"为`false`，大小写不敏感。其他字符串不支持    |
-| Bool    |    不支持  |  `true`为`1L`，否则`0L`     |        | `true`为`1.0`，否则`0.0`   |  不支持  |    -   |
+| from/to | Date                    | Long                     | Double                       | Bytes                        | String                     | Bool                                                |
+| ------- | ----------------------- | ------------------------ | ---------------------------- | ---------------------------- | -------------------------- | ---------------------------------------------------- |
+| Date    | -                       | 使用毫秒时间戳           | 不支持                       | 不支持                       | 按配置格式转换             | 不支持                                                     |
+| Long    | 作为毫秒时间戳构造 Date | -                        | `BigDecimal.doubleValue()`   | 不支持                       | `BigInteger.toString()`    | 0 为 `false`，其他为 `true`                             |
+| Double  | 不支持                  | `BigDecimal.longValue()` | -                            | 不支持                       | 直接返回内部 String        | 不支持                                                     |
+| Bytes   | 不支持                  | 不支持                   | 不支持                       | -                            | 按utf-8编码转换为 `byte[]` | 不支持                                                     |
+| String  | 按配置的 格式解析       | `BigDecimal.longValue`   | `BigDecimal.doubleValue`[^1] | 按 utf-8 编码[^2]转换为 `byte[]` | -                          | "true"为`true`, "false"为`false`，不区分大小写。其他不支持 |
+| Bool    | 不支持                  | `true`为`1L`，否则`0L`   | 不支持                       | `true`为`1.0`，否则`0.0`     | 不支持                     | -                                                          |
+
 
 ## 脏数据处理
 
@@ -512,7 +505,7 @@ Addax的内部类型在实现上会选用不同的java类型：
 
 目前主要有三类脏数据：
 
-1. Reader读到不支持的类型、不合法的值。
+1. Reader 读到不支持的类型、不合法的值。
 2. 不支持的类型转换，比如：`Bytes` 转换为 `Date`。
 3. 写入目标端失败，比如：写 MySQL 整型长度超长。
 
@@ -527,9 +520,11 @@ Addax的内部类型在实现上会选用不同的java类型：
 
 1. 框架扫描 `plugin/reader` 和 `plugin/writer `目录，加载每个插件的 `plugin.json` 文件。
 2. 以 `plugin.json` 文件中 `name` 为 key，索引所有的插件配置。如果发现重名的插件，框架会异常退出。
-3. 用户在插件中在 `reader`/`writer` 配置的 `name` 字段指定插件名字。框架根据插件的类型（`reader`/`writer`）和插件名称去插件的路径下扫描所有的jar，加入 `classpath`。
+3. 用户在插件中在 `reader`/`writer` 配置的 `name` 字段指定插件名字。框架根据插件的类型（`reader`/`writer`）和插件名称去插件的路径下扫描所有的 jar，加入 `classpath`。
 4. 根据插件配置中定义的入口类，框架通过反射实例化对应的 `Job` 和 `Task` 对象。
 
 [1]: https://hadoop.apache.org/docs/stable/hadoop-yarn/hadoop-yarn-site/YARN.html
-
 [2]: https://github.com/wgzhao/Addax/blob/master/common/src/main/java/com/wgzhao/addax/common/util/Configuration.java
+
+[^1]: 处理 `NaN`, `Infinity`, `-Infinity` 等数值
+[^2]: 除非另有指定编码格式

@@ -1,10 +1,10 @@
 # hbase20xsql Reader
 
-hbase20xsqlreade r插件实现了从Phoenix(HBase SQL)读取数据，对应版本为 HBase2.X 和 Phoenix5.X。
+hbase20xsqlreade r 插件实现了从 [Phoenix(HBase SQL)](https://phoenix.apache.org) 读取数据，对应版本为 HBase2.X 和 Phoenix5.X。
 
 ## 配置样例
 
-配置一个从Phoenix同步抽取数据到本地的作业:
+配置一个从 Phoenix 同步抽取数据到本地的作业:
 
 ```json
 {
@@ -17,10 +17,7 @@ hbase20xsqlreade r插件实现了从Phoenix(HBase SQL)读取数据，对应版�
             "queryServerAddress": "http://127.0.0.1:8765",
             "serialization": "PROTOBUF",
             "table": "TEST",
-            "column": [
-              "ID",
-              "NAME"
-            ],
+            "column": ["ID", "NAME"],
             "splitKey": "ID"
           }
         },
@@ -48,12 +45,12 @@ hbase20xsqlreade r插件实现了从Phoenix(HBase SQL)读取数据，对应版�
 | 配置项             | 是否必须 | 默认值   | 描述                                                                                          |
 | :----------------- | :------: | -------- | --------------------------------------------------------------------------------------------- |
 | queryServerAddress |    是    | 无       | Phoenix QueryServer 地址, 该插件通过 PQS 进行连接                                             |
-| serialization      |    否    | PROTOBUF | QueryServer使用的序列化协议                                                                   |
+| serialization      |    否    | PROTOBUF | QueryServer 使用的序列化协议                                                                  |
 | table              |    是    | 无       | 所要读取表名                                                                                  |
-| schema             |    否    | 无       | 表所在的schema                                                                                |
-| column             |    否    | 全部列   | 填写需要从phoenix表中读取的列名集合，使用JSON的数组描述字段信息，空值表示读取所有列           |
+| schema             |    否    | 无       | 表所在的 schema                                                                               |
+| column             |    否    | 全部列   | 填写需要从 phoenix 表中读取的列名集合，使用 JSON 的数组描述字段信息，空值表示读取所有列       |
 | splitKey           |    是    | 无       | 根据数据特征动态指定切分点，对表数据按照指定的列的最大、最小值进行切分,仅支持整型和字符串类型 |
-| splitPoints        |    否    | 无       | 按照表的split进行切分                                                                         |
+| splitPoints        |    否    | 无       | 按照表的 split 进行切分                                                                       |
 | where              |    否    | 无       | 支持对表查询增加过滤条件，每个切分都会携带该过滤条件                                          |
 | querySql           |    否    | 无       | 支持指定多个查询语句，但查询列类型和数目必须保持一致                                          |
 

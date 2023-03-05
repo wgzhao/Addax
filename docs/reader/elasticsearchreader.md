@@ -43,8 +43,8 @@ bin/addax.sh job/es2stream.json
 | type        |    否    | string  | index名                | elasticsearch中index的type名                       |
 | search      |    是    | list    | `[]`                   | json格式api搜索数据体                              |
 | column      |    是    | list    | 无                     | 需要读取的字段                                     |
-| timeout     |    否    | int     | 60                     | 客户端超时时间（单位：秒)                          |
-| discovery   |    否    | boolean | false                  | 启用节点发现将(轮询)并定期更新客户机中的服务器列表 |
+| timeout     |    否    | int     | 60                     | 客户端超时时间(单位：秒)                          |
+| discovery   |    否    | boolean | false                  | 启用节点发现(轮询)并定期更新客户机中的服务器列表 |
 | compression |    否    | boolean | true                   | http请求，开启压缩                                 |
 | multiThread |    否    | boolean | true                   | http请求，是否有多线程                             |
 | searchType  |    否    | string  | `dfs_query_then_fetch` | 搜索类型                                           |

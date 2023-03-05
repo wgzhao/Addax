@@ -15,20 +15,20 @@ html) 编写。
 
 ## 参数说明
 
-| 配置项    | 是否必须 | 数据类型 | 默认值 | 描述                                                                        |
-| :-------- | :------: | -------- | ------ | -------------------------------------------------------------------------------------------------------------------- |
-| endpoint | 是   | string | 无  |S3 Server的 EndPoint地址，例如 `s3.xx.amazonaws.com` |
-| region |  是   | string | 无 | S3 Server的 Region 地址，例如 `ap-southeast-1` |
-| accessId |  是   | string | 无  | 访问 ID |
-| accessKey |  是   | string | 无  | 访问 Key |
-| bucket |  是   | string | 无  | 要写入的 bucket |
-| object |  是   | string | 无 | 要写入的 object，注意事项见下 |
-| fieldDelimiter | 否 | char | `','` | 字段的分隔符 |
-| nullFormat  | 否  | char | `\N` | 当值为空时，用什么字符表示 |
-| header | 否  | list | 无 | 写入文件头信息，比如 `["id","title","url"]` |
-| maxFileSize | 否 | int | `10000*10` | 单个 object 的大小，单位为 MB |
-| encoding | 否  | string | `utf-8` | 文件编码格式 |
-| writeMode | 否 | string | `append` | 写入模式，详见 [hdfswriter](../hdfswriter) 中相关描述 |
+| 配置项         | 是否必须 | 数据类型 | 默认值     | 描述                                                  |
+| :------------- | :------: | -------- | ---------- | ----------------------------------------------------- |
+| endpoint       |    是    | string   | 无         | S3 Server的 EndPoint地址，例如 `s3.xx.amazonaws.com`  |
+| region         |    是    | string   | 无         | S3 Server的 Region 地址，例如 `ap-southeast-1`        |
+| accessId       |    是    | string   | 无         | 访问 ID                                               |
+| accessKey      |    是    | string   | 无         | 访问 Key                                              |
+| bucket         |    是    | string   | 无         | 要写入的 bucket                                       |
+| object         |    是    | string   | 无         | 要写入的 object，注意事项见下                         |
+| fieldDelimiter |    否    | char     | `','`      | 字段的分隔符                                          |
+| nullFormat     |    否    | char     | `\N`       | 当值为空时，用什么字符表示                            |
+| header         |    否    | list     | 无         | 写入文件头信息，比如 `["id","title","url"]`           |
+| maxFileSize    |    否    | int      | `10000*10` | 单个 object 的大小，单位为 MB                         |
+| encoding       |    否    | string   | `utf-8`    | 文件编码格式                                          |
+| writeMode      |    否    | string   | `append`   | 写入模式，详见 [hdfswriter](../hdfswriter) 中相关描述 |
 
 ### object
 

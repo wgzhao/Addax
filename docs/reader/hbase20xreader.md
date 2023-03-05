@@ -69,20 +69,20 @@ ROW           COLUMN+CELL
 
 ```shell
 hbase(main):018:0> scan 'users',{VERSIONS=>5}
-ROW                                   COLUMN+CELL
- lisi                                 column=address:city, timestamp=1457101972764, value=beijing
- lisi                                 column=address:contry, timestamp=1457102773908, value=china
- lisi                                 column=address:province, timestamp=1457101972736, value=beijing
- lisi                                 column=info:age, timestamp=1457101972548, value=27
- lisi                                 column=info:birthday, timestamp=1457101972604, value=1987-06-17
- lisi                                 column=info:company, timestamp=1457101972653, value=baidu
- xiaoming                             column=address:city, timestamp=1457082196082, value=hangzhou
- xiaoming                             column=address:contry, timestamp=1457082195729, value=china
- xiaoming                             column=address:province, timestamp=1457082195773, value=zhejiang
- xiaoming                             column=info:age, timestamp=1457082218735, value=29
- xiaoming                             column=info:age, timestamp=1457082178630, value=24
- xiaoming                             column=info:birthday, timestamp=1457082186830, value=1987-06-17
- xiaoming                             column=info:company, timestamp=1457082189826, value=alibaba
+ROW              COLUMN+CELL
+ lisi            column=address:city, timestamp=1457101972764, value=beijing
+ lisi            column=address:contry, timestamp=1457102773908, value=china
+ lisi            column=address:province, timestamp=1457101972736, value=beijing
+ lisi            column=info:age, timestamp=1457101972548, value=27
+ lisi            column=info:birthday, timestamp=1457101972604, value=1987-06-17
+ lisi            column=info:company, timestamp=1457101972653, value=baidu
+ xiaoming        column=address:city, timestamp=1457082196082, value=hangzhou
+ xiaoming        column=address:contry, timestamp=1457082195729, value=china
+ xiaoming        column=address:province, timestamp=1457082195773, value=zhejiang
+ xiaoming        column=info:age, timestamp=1457082218735, value=29
+ xiaoming        column=info:age, timestamp=1457082178630, value=24
+ xiaoming        column=info:birthday, timestamp=1457082186830, value=1987-06-17
+ xiaoming        column=info:company, timestamp=1457082189826, value=alibaba
 2 row(s) in 0.0260 seconds
 ```
 

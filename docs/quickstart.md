@@ -6,7 +6,7 @@
 
 如果你不想编译，你可以执行下面的命令，一键安装（当前仅支持 Linux 和 macOS ）
 
-``` shell
+```shell
 /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/wgzhao/Addax/master/install.sh)"
 ```
 
@@ -16,10 +16,10 @@
 
 你可以选择从源代码编译安装，基本操作如下：
 
-``` shell
+```shell
 git clone https://github.com/wgzhao/addax.git
 cd addax
-mvn clean package 
+mvn clean package
 mvn package assembly:single
 cd target/addax/addax-<version>
 ```
