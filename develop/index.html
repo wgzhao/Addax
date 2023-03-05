@@ -1664,7 +1664,24 @@
 <p><img alt="addax_why_new" src="images/addax_why_new.png" /></p>
 <p>为了解决异构数据源同步问题，Addax将复杂的网状的同步链路变成了星型数据链路，Addax作为中间传输载体负责连接各种数据源。当需要接入一个新的数据源的时候，只需要将此数据源对接到Addax，便能跟已有的数据源做到无缝数据同步。</p>
 <h2 id="_2">框架设计<a class="headerlink" href="#_2" title="Permanent link">&para;</a></h2>
-<p><img alt="addax_framework_new" src="images/addax-framework_new.png" /></p>
+<pre class="mermaid"><code>%%{init: {"theme": "neutral"}}%%
+graph LR
+MySQL
+subgraph Addax
+    direction LR
+    subgraph reader["Reader Plugin"]
+        mr["MySQLReader"]
+    end
+    subgraph writer["Writer Plugin"]
+    hw["HDFSWriter"]
+    end
+    Framework:::f1
+    mr --&gt; Framework --&gt; writer
+end
+
+MySQL:::f1 ==&gt; Addax ==&gt; HDFS:::f1
+
+classDef f1 fill:#62B3D4,stroke-width:0px;</code></pre>
 <p>Addax本身作为离线数据同步框架，采用 Framework + plugin 架构构建。将数据源读取和写入抽象成为 Reader/Writer 插件，纳入到整个同步框架中。</p>
 <ul>
 <li>Reader：Reader 为数据采集模块，负责采集数据源的数据，将数据发送给Framework。</li>
@@ -1674,7 +1691,60 @@
 <p>Addax Framework提供了简单的接口与插件交互，提供简单的插件接入机制，只需要任意加上一种插件，就能无缝对接其他数据源。</p>
 <h2 id="_3">核心架构<a class="headerlink" href="#_3" title="Permanent link">&para;</a></h2>
 <p>本小节按一个Addax作业生命周期的时序图，从整体架构设计非常简要说明各个模块相互关系。</p>
-<p><img alt="addax_arch" src="images/addax_arch.png" /></p>
+<pre class="mermaid"><code>%%{init: {"theme": "neutral"}}%%
+graph TB
+subgraph Job
+end
+subgraph task
+  direction TB
+  t1["Task"]
+  t2["Task"]
+  t3["Task"]
+  t4["Task"]
+  t5["Task"]
+  t6["Task"]
+end
+subgraph taskgroup[" "]
+    direction TB
+  subgraph tg1["TaskGroup"]
+    subgraph tg1_Task["Task"]
+      tg1_r["Reader"]
+      tg1_c["Channel"]
+      tg1_w["Writer"]
+    end
+    t7["Task"]
+    t8["Task"]
+  end
+
+  subgraph tg2["TaskGroup"]
+    subgraph tg2_Task["Task"]
+      direction LR
+      tg2_r["Reader"]
+      tg2_c["Channel"]
+      tg2_w["Writer"]
+    end
+    t9["Task"]
+    t10["Task"]
+  end
+
+  subgraph tg3["TaskGroup"]
+    direction LR
+    subgraph tg3_Task["Task"]
+      tg3_r["Reader"]
+      tg3_c["Channel"]
+      tg3_w["Writer"]
+    end
+    t11["Task"]
+    t12["Task"]
+  end
+end
+
+Job == split ==&gt; task
+task == Schedule ==&gt; taskgroup
+
+style taskgroup fill:gray
+style task fill:#bbb
+</code></pre>
 <h3 id="_4">核心模块介绍<a class="headerlink" href="#_4" title="Permanent link">&para;</a></h3>
 <ol>
 <li>Addax 完成单个数据同步的作业，我们称之为Job，Adda x接受到一个 Job 之后，将启动一个进程来完成整个作业同步过程。Addax Job模块是单个作业的中枢管理节点，承担了数据清理、子任务切分(将单一作业计算转化为多个子 Task)、TaskGroup 管理等功能。</li>

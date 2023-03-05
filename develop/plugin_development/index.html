@@ -1890,10 +1890,70 @@ start()</code> 方法，针对每个 channel 创建一个 TaskExecutor，通过 
 <li><code>prepare</code> 和 <code>post</code> 在 <code>Job</code> 和 <code>Task</code> 中都存在，插件需要根据实际情况确定在什么地方执行操作。</li>
 </ul>
 <p>框架按照如下的顺序执行 <code>Job</code> 和 <code>Task</code> 的接口：</p>
-<p><img alt="AddaxReaderWriter" src="../images/plugin_dev_guide_1.png" /></p>
-<p>上图中，黄色表示 <code>Job</code> 部分的执行阶段，蓝色表示 <code>Task</code> 部分的执行阶段，绿色表示框架执行阶段。</p>
+<pre class="mermaid"><code>stateDiagram-v2
+direction TB
+Init:::job --&gt; Prepare:::job
+Prepare --&gt; Split:::job
+Split --&gt; Schedule:::fw
+state Schedule {
+    direction LR
+    init\nprepare\nstartRead\npost\ndestroy1 --&gt; init\nprepare\nstartRead\npost\ndestroy : Channel
+}
+Schedule --&gt; Post:::job
+
+classDef job fill:yellow
+classDef fw fill:#c6fac4
+classDef ctask fill:blue</code></pre>
+<p>上图中，黄色表示 <code>Job</code> 部分的执行阶段，灰色表示 <code>Task</code> 部分的执行阶段，绿色表示框架执行阶段。</p>
 <p>相关类关系如下：</p>
-<p><img alt="Addax" src="../images/plugin_dev_guide_2.png" /></p>
+<pre class="mermaid"><code>%%{init: {"theme": "neutral"}}%%
+classDiagram
+    class Pluginable {
+    + init()
+    + destroy()
+    + others()
+    }
+    class AbstractPlugin {
+        + prepare()
+        + post()
+        + others()
+    }
+    class AbstractJobPlugin {
+        + getJobPluginCollector(): JobPluginCollector
+        + setJobPluginCollector(JobPluginCollector)
+    }
+
+    class AbstractTaskPlugin {
+        + getTaskPluginCollector(): TaskPluginCollector
+        + setTaskPluginCollector(TaskPluginCollector)
+    }
+    class Reader_Job {
+        + split(init): List&lt;&lt;Configuration&gt;&gt;
+    }
+
+    class Writer_Job {
+        + split(init): List&lt;&lt;Configuration&gt;&gt;
+    }
+
+    class Reader_Task {
+        + startRead(RecordSender)
+    }
+
+    class Writer_Task {
+        + startWrite(RecordReceiver)
+    }
+
+    AbstractJobPlugin &lt;|-- Reader_Job
+    AbstractJobPlugin &lt;|-- Writer_Job
+
+    AbstractTaskPlugin &lt;|-- Reader_Task
+    AbstractTaskPlugin &lt;|-- Writer_Task
+
+    AbstractPlugin &lt;|-- AbstractJobPlugin
+    AbstractPlugin &lt;|-- AbstractTaskPlugin
+
+    Pluginable &lt;|-- AbstractPlugin
+</code></pre>
 <h3 id="_6">插件定义<a class="headerlink" href="#_6" title="Permanent link">&para;</a></h3>
 <p>在每个插件的项目中，都有一个<code>plugin.json</code>文件，这个文件定义了插件的相关信息，包括入口类。例如：</p>
 <div class="highlight"><pre><span></span><code><span class="p">{</span><span class="w"></span>
@@ -2144,7 +2204,30 @@ mvn package assembly:single
 </ul>
 <p>对应地，有 <code>DateColumn</code>、<code>LongColumn</code>、<code>DoubleColumn</code>、<code>BytesColumn</code>、<code>StringColumn</code> 、<code>BoolColumn</code> 和 <code>TimestampColumn</code> 七种 <code>Column</code> 的实现。</p>
 <p><code>Column</code> 除了提供数据相关的方法外，还提供一系列以 <code>as</code> 开头的数据类型转换转换方法。</p>
-<p><img alt="Columns" src="../images/plugin_dev_guide_3.png" /></p>
+<pre class="mermaid"><code>%%{init: {"theme": "neutral"}}%%
+classDiagram
+direction TB
+class Column {
+    &lt;&lt;interface&gt;&gt;
+    - rawData: Object
+    - type: Type
+    + getRawData(): Object
+    + getType(): Type
+    + getByteSize(): init
+    + asLong(): Long
+    + asDouble(): Doule
+    + asString(): String
+    + asDate(): Date
+    + asBytes(): Bytes
+    + asBigDecimal(): BigDecimal
+    + asBoolean(): Boolean
+}
+Column &lt;|-- Stringcolumn
+Column &lt;|-- Doublecolumn
+Column &lt;|-- Longcolumn
+Column &lt;|-- Datecolumn
+Column &lt;|-- Boolcolumn
+Column &lt;|-- Bytescolumn</code></pre>
 <p>Addax的内部类型在实现上会选用不同的java类型：</p>
 <table>
 <thead>
