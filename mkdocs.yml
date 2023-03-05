@@ -6,7 +6,7 @@ repo_name: wgzhao/addax
 repo_url: https://github.com/wgzhao/Addax
 edit_uri: ""
 
-copyright: Copyright &copy; 2019 - 2021 Steven Zhao
+copyright: Copyright &copy; 2019 - 2023 Steven Zhao
 theme:
   name: material
   language: zh
@@ -16,11 +16,11 @@ theme:
     repo: fontawesome/brands/github
   palette:
     # - primary: blue
-    - scheme: default
+    - scheme: slate
       toggle:
         icon: material/toggle-switch-off-outline
         name: Switch to dark mode
-    - scheme: slate
+    - scheme: default
       toggle:
         icon: material/toggle-switch
         name: Switch to light mode
