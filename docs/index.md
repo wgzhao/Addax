@@ -10,7 +10,26 @@ Addax 是一个异构数据源离线同步工具，最初来源于阿里的 [Dat
 
 ## 框架设计
 
-![addax_framework_new](images/addax-framework_new.png)
+```mermaid
+%%{init: {"theme": "neutral"}}%%
+graph LR
+MySQL
+subgraph Addax
+	direction LR
+	subgraph reader["Reader Plugin"]
+		mr["MySQLReader"]
+	end
+	subgraph writer["Writer Plugin"]
+	hw["HDFSWriter"]
+	end
+	Framework:::f1
+	mr --> Framework --> writer
+end
+
+MySQL:::f1 ==> Addax ==> HDFS:::f1
+
+classDef f1 fill:#62B3D4,stroke-width:0px;
+```
 
 Addax本身作为离线数据同步框架，采用 Framework + plugin 架构构建。将数据源读取和写入抽象成为 Reader/Writer 插件，纳入到整个同步框架中。
 
@@ -24,7 +43,64 @@ Addax Framework提供了简单的接口与插件交互，提供简单的插件�
 
 本小节按一个Addax作业生命周期的时序图，从整体架构设计非常简要说明各个模块相互关系。
 
-![addax_arch](images/addax_arch.png)
+```mermaid
+%%{init: {"theme": "neutral"}}%%
+graph TB
+subgraph Job
+end
+subgraph task
+  direction TB
+  t1["Task"]
+  t2["Task"]
+  t3["Task"]
+  t4["Task"]
+  t5["Task"]
+  t6["Task"]
+end
+subgraph taskgroup[" "]
+	direction TB
+  subgraph tg1["TaskGroup"]
+    subgraph tg1_Task["Task"]
+      tg1_r["Reader"]
+      tg1_c["Channel"]
+      tg1_w["Writer"]
+    end
+    t7["Task"]
+    t8["Task"]
+  end
+
+  subgraph tg2["TaskGroup"]
+    subgraph tg2_Task["Task"]
+      direction LR
+      tg2_r["Reader"]
+      tg2_c["Channel"]
+      tg2_w["Writer"]
+    end
+    t9["Task"]
+    t10["Task"]
+  end
+
+  subgraph tg3["TaskGroup"]
+    direction LR
+    subgraph tg3_Task["Task"]
+      tg3_r["Reader"]
+      tg3_c["Channel"]
+      tg3_w["Writer"]
+    end
+    t11["Task"]
+    t12["Task"]
+  end
+end
+
+Job == split ==> task
+task == Schedule ==> taskgroup
+
+style taskgroup fill:gray
+style task fill:#bbb
+
+```
+
+
 
 ### 核心模块介绍
 
