@@ -112,7 +112,6 @@ boolean captureRawRecord = true;
 
 | Addax 内部类型 | 远程FTP文件 数据类型 |
 | -------------- | -------------------- |
-|                |
 | Long           | Long                 |
 | Double         | Double               |
 | String         | String               |

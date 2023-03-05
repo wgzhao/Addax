@@ -6,7 +6,23 @@
 
 ## 运行模型
 
-![image](images/transform-arch.png)
+```mermaid
+graph LR
+source(("source")):::s1
+subgraph fr["Addax Framework"]
+direction LR
+Reader:::s2 ==> Transformer ==>Writer:::s2
+end
+target(("target"))
+source ==> fr ==> target:::s1
+
+classDef s1 fill:#66bed5,stroke-width:0px;
+classDef s2 fill:#efef,stroke-width:0px;
+style Transformer fill:orange,stroke-width:0px;
+
+```
+
+
 
 ## UDF 函数
 

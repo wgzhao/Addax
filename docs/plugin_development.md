@@ -151,13 +151,79 @@ public class SomeReader
 
 框架按照如下的顺序执行 `Job` 和 `Task` 的接口：
 
-![AddaxReaderWriter](images/plugin_dev_guide_1.png)
+```mermaid
+stateDiagram-v2
+direction TB
+Init:::job --> Prepare:::job
+Prepare --> Split:::job
+Split --> Schedule:::fw
+state Schedule {
+	direction LR
+	init\nprepare\nstartRead\npost\ndestroy1 --> init\nprepare\nstartRead\npost\ndestroy : Channel
+}
+Schedule --> Post:::job
 
-上图中，黄色表示 `Job` 部分的执行阶段，蓝色表示 `Task` 部分的执行阶段，绿色表示框架执行阶段。
+classDef job fill:yellow
+classDef fw fill:#c6fac4
+classDef ctask fill:blue
+```
+
+上图中，黄色表示 `Job` 部分的执行阶段，灰色表示 `Task` 部分的执行阶段，绿色表示框架执行阶段。
 
 相关类关系如下：
 
-![Addax](images/plugin_dev_guide_2.png)
+```mermaid
+%%{init: {"theme": "neutral"}}%%
+classDiagram
+	class Pluginable {
+	+ init()
+	+ destroy()
+	+ others()
+	}
+	class AbstractPlugin {
+		+ prepare()
+		+ post()
+		+ others()
+	}
+	class AbstractJobPlugin {
+		+ getJobPluginCollector(): JobPluginCollector
+		+ setJobPluginCollector(JobPluginCollector)
+	}
+	
+	class AbstractTaskPlugin {
+		+ getTaskPluginCollector(): TaskPluginCollector
+		+ setTaskPluginCollector(TaskPluginCollector)
+	}
+	class Reader_Job {
+		+ split(init): List<<Configuration>>
+	}
+	
+	class Writer_Job {
+		+ split(init): List<<Configuration>>
+	}
+	
+	class Reader_Task {
+		+ startRead(RecordSender)
+	}
+	
+	class Writer_Task {
+		+ startWrite(RecordReceiver)
+	}
+	
+	AbstractJobPlugin <|-- Reader_Job
+	AbstractJobPlugin <|-- Writer_Job
+	
+	AbstractTaskPlugin <|-- Reader_Task
+	AbstractTaskPlugin <|-- Writer_Task
+	
+	AbstractPlugin <|-- AbstractJobPlugin
+	AbstractPlugin <|-- AbstractTaskPlugin
+	
+	Pluginable <|-- AbstractPlugin
+	
+```
+
+
 
 ### 插件定义
 
@@ -390,7 +456,32 @@ public interface Record
 
 `Column` 除了提供数据相关的方法外，还提供一系列以 `as` 开头的数据类型转换转换方法。
 
-![Columns](images/plugin_dev_guide_3.png)
+```mermaid
+%%{init: {"theme": "neutral"}}%%
+classDiagram
+direction TB
+class Column {
+	<<interface>>
+	- rawData: Object
+	- type: Type
+	+ getRawData(): Object
+	+ getType(): Type
+	+ getByteSize(): init
+	+ asLong(): Long
+	+ asDouble(): Doule
+	+ asString(): String
+	+ asDate(): Date
+	+ asBytes(): Bytes
+	+ asBigDecimal(): BigDecimal
+	+ asBoolean(): Boolean
+}
+Column <|-- Stringcolumn
+Column <|-- Doublecolumn
+Column <|-- Longcolumn
+Column <|-- Datecolumn
+Column <|-- Boolcolumn
+Column <|-- Bytescolumn
+```
 
 Addax的内部类型在实现上会选用不同的java类型：
 
