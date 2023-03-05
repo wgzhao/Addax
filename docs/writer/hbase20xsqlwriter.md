@@ -12,23 +12,23 @@ HBase20xsqlwriter 插件利用 Phoenix 向 HBase 2.x 写入数据。
 
 ## 参数说明
 
-| 配置项             | 是否必须 | 默认值   | 描述                                                                                          |
-| :----------------- | :------: | -------- | --------------------------------------------------------------------------------------- |
-| jdbcUrl           |    是    | 无       | Phoenix 连接地址                                              |
-| table              |    是    | 无       | 所要读取表名                                                                                  |
-| schema             |    否    | 无       | 表所在的schema                                                                                |
-| batchSize          | 否  | 256 | 一次批量写入的最大行数 |
-| column             |    否    | 全部列   | 列名，大小写敏感，通常phoenix的列名都是**大写**, 数据类型无需填写,会自动获取列          |
-| nullMode        |    否    | skip   | 读取的null值时，如何处理, `skip` 表示不向hbase写这列；`empty`：写入 `HConstants.EMPTY_BYTE_ARRAY`，即`new byte [0]`               |
+| 配置项                 | 是否必须 | 默认值 | 描述                                                                                                                |
+| :--------------------- | :------: | ------ | ------------------------------------------------------------------------------------------------------------------- |
+| jdbcUrl                |    是    | 无     | Phoenix 连接地址                                                                                                    |
+| table                  |    是    | 无     | 所要读取表名                                                                                                        |
+| schema                 |    否    | 无     | 表所在的schema                                                                                                      |
+| batchSize              |    否    | 256    | 一次批量写入的最大行数                                                                                              |
+| column                 |    否    | 无     | 列名，大小写敏感，通常phoenix的列名都是**大写**, 数据类型无需填写,会自动获取列                                      |
+| nullMode               |    否    | skip   | 读取的null值时，如何处理, `skip` 表示不向hbase写这列；`empty`：写入 `HConstants.EMPTY_BYTE_ARRAY`，即`new byte [0]` |
 | haveKerberos           |    否    | false  | 是否启用Kerberos认证, true 表示启用, false 表示不启用                                                               |
 | kerberosPrincipal      |    否    | null   | kerberos 凭证信息，仅当 `havekerberos` 启用后有效                                                                   |
-| kerberosKeytabFilePath |    否    | null   | kerberos 凭证文件的绝对路径，仅当 `havekerberos` 启用后有效 |
+| kerberosKeytabFilePath |    否    | null   | kerberos 凭证文件的绝对路径，仅当 `havekerberos` 启用后有效                                                         |
 
 ### jdbcUrl
 
 `queryServerAddress` 是满足 Phoenix 链接的地址，具体格式和要求可以参考[官方文档][1] ，其 jdbc 连接串格式如下：
 
-```java
+```
 jdbc:phoenix [ :<zookeeper quorum> [ :<port number> [ :<root node> [ :<principal> [ :<keytab file> ] ] ] ] ] 
 ```
 
@@ -40,7 +40,7 @@ jdbc:phoenix [ :<zookeeper quorum> [ :<port number> [ :<root node> [ :<principal
 
 如果你希望通过连接 Phoenix Query Server (a.k.a PQS) ，则 JDBC 连接串如下：
 
-```java
+```
 jdbc:phoenix:thin:url=<scheme>://<server-hostname>:<port>[;option=value...]
 ```
 

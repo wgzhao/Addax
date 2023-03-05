@@ -28,17 +28,17 @@ bin/addax.sh job/stream2influx2.json
 
 ## 参数说明
 
-| 配置项          | 是否必须 | 数据类型 | 默认值 | 描述                               |
-| :-------------- | :------: | -------- | ------ | ---------------------------------- |
-| endpoint        |    是    | string   | 无     | InfluxDB 连接串                    |
-| table           |    是    | string   | 无     | 要写入的表（指标）                 |
-| org             |    是    | string   | 无     | 指定 InfluxDB 的 org 名称 |
-| bucket          |    是    | string   | 无     | 指定 InfluxDB 的 bucket 名称 |
-| token           |    是    | string   | 无     | 访问数据库的 token |
-| column          |    是    | list     | 无     | 所配置的表中需要同步的列名集合     |
-| tag             |    否    | list     | 无     | 要指定的 tag    |
-| interval        |    否    | string   | ms     | 指定时间间隔，可以指定 `s`,`ms`,`us`, `ns` |
-| batchSize       |    否    | int      | 1024   | 批量写入的大小       |
+| 配置项    | 是否必须 | 数据类型 | 默认值 | 描述                                       |
+| :-------- | :------: | -------- | ------ | ------------------------------------------ |
+| endpoint  |    是    | string   | 无     | InfluxDB 连接串                            |
+| table     |    是    | string   | 无     | 要写入的表（指标）                         |
+| org       |    是    | string   | 无     | 指定 InfluxDB 的 org 名称                  |
+| bucket    |    是    | string   | 无     | 指定 InfluxDB 的 bucket 名称               |
+| token     |    是    | string   | 无     | 访问数据库的 token                         |
+| column    |    是    | list     | 无     | 所配置的表中需要同步的列名集合             |
+| tag       |    否    | list     | 无     | 要指定的 tag                               |
+| interval  |    否    | string   | ms     | 指定时间间隔，可以指定 `s`,`ms`,`us`, `ns` |
+| batchSize |    否    | int      | 1024   | 批量写入的大小                             |
 
 ### column
 

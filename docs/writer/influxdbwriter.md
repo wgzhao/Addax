@@ -1,6 +1,6 @@
 # InfluxDB Writer
 
-InfluxDBWriter 插件实现了将数据写入 [InfluxDB](https://www.influxdata.com) 读取数据的功能。
+InfluxDBWriter 插件实现了将数据写入 [InfluxDB][1] 读取数据的功能。
 底层实现上，是通过调用 InfluQL 语言接口，构建插入语句，然后进行数据插入。
 
 ## 示例
@@ -58,7 +58,7 @@ InfluxDB 作为时序数据库，需要每条记录都有时间戳字段，因�
 ### retentionPolicy
 
 设定数据库的 `Retention Policy` 策略，依据给定的配置，在指定数据库上创建一条 `Retention Policy` 信息。
-有关 `Retention Policy` 更详细的信息，可以参考 [官方文档](https://docs.influxdata.com/influxdb/v1.8/query_language/manage-database/#create-retention-policies-with-create-retention-policy)
+有关 `Retention Policy` 更详细的信息，可以参考 [官方文档][2]
 
 ## 类型转换
 
@@ -67,3 +67,6 @@ InfluxDB 作为时序数据库，需要每条记录都有时间戳字段，因�
 ## 限制
 
 1. 当前插件仅支持 1.x 版本，2.0 及以上并不支持
+
+[1]: https://www.influxdata.com
+[1]: https://docs.influxdata.com/influxdb/v1.8/query_language/manage-database/#create-retention-policies-with-create-retention-policy

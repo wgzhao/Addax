@@ -10,15 +10,15 @@ DbfWriter 提供了向本地文件写入类dbf格式的一个或者多个表文�
 
 ## 参数说明
 
-| 配置项           | 是否必须 | 默认值       |    描述    |
-| :--------------- | :------: | ------------ |-------------|
-| path             |    是    | 无           | DBF文件目录，注意这里是文件夹，不是文件 |
-| column           |    是    | 类型默认为String  | 所配置的表中需要同步的列集合, 是 `{type: value}` 或 `{type: index}` 的集合 |
-| fileName        | 是     | 无  | DbfFileWriter写入的文件名 |
-| writeMode       | 是     | 无  | DbfFileWriter写入前数据清理处理模式，支持 `truncate`, `append`, `nonConflict` 三种模式，详见如下 |
-| encoding            |    否    | UTF-8         | DBF文件编码，比如 `GBK`, `UTF-8` |
-| nullFormat   |    否    | `\N`         | 定义哪个字符串可以表示为null, |
-| dateFormat |  否   |  无  |  日期类型的数据序列化到文件中时的格式，例如 `"dateFormat": "yyyy-MM-dd"` |
+| 配置项     | 是否必须 | 默认值 | 描述                                                                                             |
+| :--------- | :------: | ------ | ------------------------------------------------------------------------------------------------ |
+| path       |    是    | 无     | DBF文件目录，注意这里是文件夹，不是文件                                                          |
+| column     |    是    | 无     | 所配置的表中需要同步的列集合, 是 `{type: value}` 或 `{type: index}` 的集合                       |
+| fileName   |    是    | 无     | DbfFileWriter写入的文件名                                                                        |
+| writeMode  |    是    | 无     | DbfFileWriter写入前数据清理处理模式，支持 `truncate`, `append`, `nonConflict` 三种模式，详见如下 |
+| encoding   |    否    | UTF-8  | DBF文件编码，比如 `GBK`, `UTF-8`                                                                 |
+| nullFormat |    否    | `\N`   | 定义哪个字符串可以表示为null,                                                                    |
+| dateFormat |    否    | 无     | 日期类型的数据序列化到文件中时的格式，例如 `"dateFormat": "yyyy-MM-dd"`                          |
 
 ### writeMode
 

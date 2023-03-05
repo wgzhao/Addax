@@ -1,6 +1,6 @@
 # Oracle Writer
 
-OracleWriter 插件实现了写入数据到 Oracle 主库的目的表的功能。
+OracleWriter 插件实现了写入数据到 Oracle 目的表的功能。
 
 ## 配置样例
 

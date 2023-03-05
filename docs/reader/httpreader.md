@@ -10,13 +10,13 @@ HttpReader 插件实现了读取 Restful API 数据的能力
 
 <http://127.0.0.1:9090/mock/17/LDJSC/ASSET>
 
-走 GET 请求，请求的参数有
+接口接受 GET 请求，请求的参数有
 
-| 参数名称 | 参数值示例 |
-|---------|----------|
+| 参数名称  | 参数值示例 |
+| --------- | ---------- |
 | CURR_DATE | 2021-01-17 |
-| DEPT | 9400 |
-| USERNAME | andi |
+| DEPT      | 9400       |
+| USERNAME  | andi       |
 
 以下是访问的数据样例，（实际返回数据略有不同）
 
@@ -32,9 +32,9 @@ HttpReader 插件实现了读取 Restful API 数据的能力
 
 === "job/httpreader2stream.json"
 
-  ```json
-  --8<-- "jobs/httpreader.json"
-  ```
+```json
+--8<-- "jobs/httpreader.json"
+```
 
 将上述内容保存为 `job/httpreader2stream.json` 文件。
 
@@ -54,17 +54,17 @@ bin/addax.sh job/httpreader2stream.json
 
 ## 参数说明
 
-| 配置项    | 是否必须 | 数据类型 | 默认值 | 说明                                                        |
-| --------- | :------: | :------: | :----: | ----------------------------------------------------------- |
-| url       |    是    |  string  |   无   | 要访问的HTTP地址                                            |
-| reqParams |    否    |   map    |   无   | 接口请求参数                                                |
-| resultKey |    否    |  string  |   无   | 要获取结果的那个key值，如果是获取整个返回值，则可以不用填写 |
-| method    |    否    |  string  |  get   | 请求模式，仅支持GET，POST两种，不区分大小写                 |
-| column    |    是    |   list   |   无   | 要获取的key，如果配置为 `"*"` ，则表示获取所有key的值       |
-| username  |    否    |   string |  无    | 接口请求需要的认证帐号（如有) |
-| password  |    否    |   string |  无    | 接口请求需要的密码（如有) |
-| proxy     |    否    |  map     | 无     | 代理地址,详见下面描述    |
-| headers   |    否    |  map     | 无     | 定制的请求头信息 |
+| 配置项    | 是否必须 | 数据类型 | 默认值 | 说明                                                          |
+| --------- | :------: | :------: | :----: | ------------------------------------------------------------- |
+| url       |    是    |  string  |   无   | 要访问的 HTTP 地址                                            |
+| reqParams |    否    |   map    |   无   | 接口请求参数                                                  |
+| resultKey |    否    |  string  |   无   | 要获取结果的那个 key 值，如果是获取整个返回值，则可以不用填写 |
+| method    |    否    |  string  |  get   | 请求模式，仅支持 GET，POST 两种，不区分大小写                 |
+| column    |    是    |   list   |   无   | 要获取的 key，如果配置为 `"*"` ，则表示获取所有 key 值        |
+| username  |    否    |  string  |   无   | 接口请求需要的认证帐号(如有)                                  |
+| password  |    否    |  string  |   无   | 接口请求需要的密码(如有)                                      |
+| proxy     |    否    |   map    |   无   | 代理地址,详见下面描述                                         |
+| headers   |    否    |   map    |   无   | 定制的请求头信息                                              |
 
 ### proxy
 
@@ -90,7 +90,7 @@ bin/addax.sh job/httpreader2stream.json
 }
 ```
 
-`host` 是代理地址，包含代理类型，目前仅支持 `http` 代理和 `socks`(V4, V5均可) 代理。 如果代理需要认证，则可以配置  `auth` , 它由 用户名和密码组成，两者之间用冒号(:) 隔开。
+`host` 是代理地址，包含代理类型，目前仅支持 `http` 代理和 `socks`(V4, V5 均可) 代理。 如果代理需要认证，则可以配置 `auth` , 它由用户名和密码组成，两者之间用冒号(`:`) 隔开。
 
 ### column
 
@@ -135,7 +135,7 @@ bin/addax.sh job/httpreader2stream.json
 
 ```json
 {
-  "column": ["CURR_DATE","DEPT.ID", "KK[0].COL1", "KK[1].COL2"]
+  "column": ["CURR_DATE", "DEPT.ID", "KK[0].COL1", "KK[1].COL2"]
 }
 ```
 
@@ -166,8 +166,8 @@ bin/addax.sh job/httpreader2stream.json
 
 ## 限制说明
 
-1. 返回的结果必须是JSON类型
-2. 当前所有key的值均当作字符串类型
-3. 暂不支持接口Token鉴权模式
+1. 返回的结果必须是 JSON 类型
+2. 当前所有 key 的值均当作字符串类型
+3. 暂不支持接口 Token 鉴权模式
 4. 暂不支持分页获取
 5. 代理仅支持 `http` 模式

@@ -1,6 +1,6 @@
 # hbase11xsql reader 
 
-hbase11xsqlreader 插件实现了从Phoenix(HBase SQL)读取数据, 支持的 HBase 版本为 1.x
+hbase11xsqlreader 插件实现了从 [Phoenix(HBase SQL)](https://phoenix.apache.org)读取数据, 支持的 HBase 版本为 1.x
 
 ## 配置样例
 

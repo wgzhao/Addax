@@ -1,6 +1,6 @@
 # ClickHouse Writer
 
-ClickHouseWriter 插件用于了向 [ClickHouse](https://clickhouse.tech) 写入数据。 
+ClickHouseWriter 插件用于向 [ClickHouse](https://clickhouse.tech) 写入数据。 
 
 ## 示例
 
@@ -42,13 +42,13 @@ bin/addax.sh job/clickhouse2clickhouse.json
 
 ## 参数说明
 
-| 配置项    | 是否必须 | 默认值 | 描述                                                                                                        |
-| :-------- | :------: | ------ | ------------------------------------------------------------------------------------------------------- |
-| jdbcUrl   |    是    | 无     | ClickHouse JDBC 连接信息 ,可按照官方规范填写连接附件控制信息。具体请参看[ClickHouse官方文档][1]                 |
-| username  |    是    | 无     | 数据源的用户名                                                                                                  |
-| password  |    否    | 无     | 数据源指定用户名的密码                                                                                          |
-| table     |    是    | 无     | 所选取的需要同步的表 ,当配置为多张表时，用户自己需保证多张表是同一schema结构                                    |
-| column    |    是    | 无     | 所配置的表中需要同步的列名集合, 使用JSON的数组描述字段信息。用户使用 `*` 代表默认使用所有列配置，例如 `"['*']"` |
-| batchSize |    否    | 2048   | 每次批量数据的条数                                                                                              |
+| 配置项    | 是否必须   | 数据类型 | 默认值 | 描述                                                                                                      |
+| :-------- | :------: | -------- | ------ | ----------------------------------------------------------------------------------------------------- |
+| jdbcUrl   |    是    | string   | 无     | ClickHouse JDBC 连接信息 ,可按照官方规范填写连接附件控制信息。具体请参看[ClickHouse官方文档][1]                 |
+| username  |    是    | string   | 无     | 数据源的用户名                                                                                          |
+| password  |    否    | string   | 无     | 数据源指定用户名的密码                                                                                    |
+| table     |    是    | `list[string]`     | 无     | 所选取的需要同步的表 ,当配置为多张表时，用户自己需保证多张表是同一schema结构                                    |
+| column    |    是    | `list[map]`      | 无     | 所配置的表中需要同步的列名集合, 使用JSON的数组描述字段信息。用户使用 `*` 代表默认使用所有列配置，例如 `"['*']"` |
+| batchSize |    否    | int      | 2048   | 每次批量写入数据的条数                                                                                   |
 
 [1]: https://github.com/yandex/clickhouse-jdbc

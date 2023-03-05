@@ -25,9 +25,9 @@ influx -import -path=NOAA_data.txt -precision=s -database=NOAA_water_database
 
 === "job/influxdb2stream.json"
 
-  ```json
-  --8<-- "jobs/influxdbreader.json"
-  ```
+```json
+--8<-- "jobs/influxdbreader.json"
+```
 
 ### 运行
 
@@ -39,19 +39,19 @@ bin/addax.sh job/influxdb2stream.json
 
 ## 参数说明
 
-| 配置项          | 是否必须 |  数据类型   |默认值 |         描述   |
-| :-------------- | :------: | ------ |-------|-------------- |
-| endpoint         |    是   | string | | 无     | InfluxDB 连接串 ｜
-| username        |    是    | string | 无     | 数据源的用户名 |
-| password        |    否    | string | 无     | 数据源指定用户名的密码 |
-| database        |  是      | string |  无      | 数据源指定的数据库  |
-| table           |    是    | string |无     | 所选取的需要同步的表名 |
-| column          |    是    | list  | 无     |  所配置的表中需要同步的列名集合，详细描述见 [rdbmreader](../rdbmsreader) |
-| connTimeout     |    否    | int   | 15     | 设置连接超时值，单位为秒     |
-| readTimeout     |    否    | int   | 20     | 设置读取超时值，单位为秒     |
-| writeTimeout    |    否    | int   | 20     | 设置写入超时值，单位为秒     |
-| where           |    否    | 无     | 针对表的筛选条件 |
-| querySql        |    否    | 无     | 使用自定义的SQL而不是指定表来获取数据，当配置了这一项之后，Addax系统就会忽略 `table`，`column`这些配置项 |
+| 配置项       | 是否必须 | 数据类型 | 默认值 | 描述                                                               |
+| :----------- | :------: | -------- | ------ | ------------------------------------------------------------------ |
+| endpoint     |    是    | string   | 无     | InfluxDB 连接串                                                    |
+| username     |    是    | string   | 无     | 数据源的用户名                                                     |
+| password     |    否    | string   | 无     | 数据源指定用户名的密码                                             |
+| database     |    是    | string   | 无     | 数据源指定的数据库                                                 |
+| table        |    是    | string   | 无     | 所选取的需要同步的表名                                             |
+| column       |    是    | list     | 无     | 所配置的表中需要同步的列名集合，详细描述见 [rdbmreader][1]         |
+| connTimeout  |    否    | int      | 15     | 设置连接超时值，单位为秒                                           |
+| readTimeout  |    否    | int      | 20     | 设置读取超时值，单位为秒                                           |
+| writeTimeout |    否    | int      | 20     | 设置写入超时值，单位为秒                                           |
+| where        |    否    | string   | 无     | 针对表的筛选条件                                                   |
+| querySql     |    否    | string   | 无     | 使用 SQL 查询获取数据，如配置该项，则 `table`，`column` 配置项无效 |
 
 ## 类型转换
 
@@ -60,3 +60,5 @@ bin/addax.sh job/influxdb2stream.json
 ## 限制
 
 1. 当前插件仅支持 1.x 版本，2.0 及以上并不支持
+
+[1]: ../rdbmsreader

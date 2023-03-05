@@ -8,18 +8,13 @@
 
 ```mermaid
 graph LR
-source(("source")):::s1
+source(("source"))
 subgraph fr["Addax Framework"]
-direction LR
-Reader:::s2 ==> Transformer ==>Writer:::s2
+    direction LR
+    Reader ==> Transformer ==>Writer
 end
 target(("target"))
-source ==> fr ==> target:::s1
-
-classDef s1 fill:#66bed5,stroke-width:0px;
-classDef s2 fill:#efef,stroke-width:0px;
-style Transformer fill:orange,stroke-width:0px;
-
+source ==> fr ==> target
 ```
 
 
