@@ -28,6 +28,12 @@ Addax 支持超过 20 种[关系型和非关系型数据库](support_data_source
 docker pull wgzhao/addax:latest
 docker run -ti --rm --name addax wgzhao/addax:latest /opt/addax/bin/addax.sh /opt/addax/job/job.json
 ```
+如果你只需要基本的插件，可以使用带有 `-lite` 结尾的镜像，它体积更小。
+
+```shell
+docker pull wgzhao/addax:4.0.12-lite
+docker run -ti --rm --name addax wgzhao/addax:4.0.12-lite /opt/addax/bin/addax.sh /opt/addax/job/job.json
+```
 
 ### 使用一键安装脚本
 
