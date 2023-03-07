@@ -8,7 +8,7 @@ RUN mkdir /root/.m2 && echo '<?xml version="1.0" encoding="UTF-8"?><settings xml
     ./shrink_package.sh && \
     rm -f target/addax/addax-*.tar.gz
 
-FROM  airdock/oraclejdk:1.8
+FROM openjdk:8u232-jre-stretch
 COPY --from=0  /src/target/addax/addax-* /opt/addax/
 
 WORKDIR /opt/addax
