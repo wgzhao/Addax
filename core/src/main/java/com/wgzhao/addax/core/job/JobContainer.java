@@ -476,7 +476,7 @@ public class JobContainer
         int taskNumber = this.configuration.getList(CoreConstant.JOB_CONTENT).size();
 
         this.needChannelNumber = Math.min(this.needChannelNumber, taskNumber);
-        PerfTrace.getInstance().setChannelNumber(needChannelNumber);
+//        PerfTrace.getInstance().setChannelNumber();
 
         /*
          * 通过获取配置信息得到每个taskGroup需要运行哪些tasks任务
