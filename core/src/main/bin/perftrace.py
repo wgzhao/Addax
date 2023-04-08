@@ -218,7 +218,7 @@ def renderDataXJson(paramsDict, readerOrWriter = 'reader', channel = 1):
         }
     }
     dataxTemplate['job']['setting']['speed']['channel'] = channel
-    dataxTemplateContent = dataxTemplate['job']['content'][0]
+    dataxTemplateContent = dataxTemplate['job']['content']
 
     pluginName = ''
     if paramsDict.get('datasourceType'):
@@ -316,34 +316,34 @@ def convert(options, args):
         traceJobDict = parseJson(traceJobJson, '{} content'.format(options.file))
         attributeNotNone(traceJobDict, ['job'])
         attributeNotNone(traceJobDict['job'], ['content'])
-        attributeNotNone(traceJobDict['job']['content'][0], ['reader', 'writer'])
-        attributeNotNone(traceJobDict['job']['content'][0]['reader'], ['name', 'parameter'])
-        attributeNotNone(traceJobDict['job']['content'][0]['writer'], ['name', 'parameter'])
+        attributeNotNone(traceJobDict['job']['content'], ['reader', 'writer'])
+        attributeNotNone(traceJobDict['job']['content']['reader'], ['name', 'parameter'])
+        attributeNotNone(traceJobDict['job']['content']['writer'], ['name', 'parameter'])
         if options.type == 'reader':
-            traceJobDict['job']['content'][0]['writer']['name'] = 'streamwriter'
+            traceJobDict['job']['content']['writer']['name'] = 'streamwriter'
             if options.reader:
                 traceReaderDict = parseJson(options.reader, 'reader config')
                 if traceReaderDict.get('writer-print') is not None:
-                    traceJobDict['job']['content'][0]['writer']['parameter']['print'] = traceReaderDict.get('writer-print')
+                    traceJobDict['job']['content']['writer']['parameter']['print'] = traceReaderDict.get('writer-print')
                 else:
-                    traceJobDict['job']['content'][0]['writer']['parameter']['print'] = 'false'
+                    traceJobDict['job']['content']['writer']['parameter']['print'] = 'false'
             else:
-                traceJobDict['job']['content'][0]['writer']['parameter']['print'] = 'false'
+                traceJobDict['job']['content']['writer']['parameter']['print'] = 'false'
         elif options.type == 'writer':
-            traceJobDict['job']['content'][0]['reader']['name'] = 'streamreader'
+            traceJobDict['job']['content']['reader']['name'] = 'streamreader'
             if options.writer:
                 traceWriterDict = parseJson(options.writer, 'writer config')
                 if traceWriterDict.get('reader-column'):
-                    traceJobDict['job']['content'][0]['reader']['parameter']['column'] = traceWriterDict['reader-column']
+                    traceJobDict['job']['content']['reader']['parameter']['column'] = traceWriterDict['reader-column']
                 if traceWriterDict.get('reader-sliceRecordCount'):
-                    traceJobDict['job']['content'][0]['reader']['parameter']['sliceRecordCount'] = traceWriterDict['reader-sliceRecordCount']
+                    traceJobDict['job']['content']['reader']['parameter']['sliceRecordCount'] = traceWriterDict['reader-sliceRecordCount']
             else:
-                columnSize = len(traceJobDict['job']['content'][0]['writer']['parameter']['column'])
+                columnSize = len(traceJobDict['job']['content']['writer']['parameter']['column'])
                 streamReaderColumn = []
                 for i in range(columnSize):
                     streamReaderColumn.append({"type": "long", "random": "2,10"})
-                traceJobDict['job']['content'][0]['reader']['parameter']['column'] = streamReaderColumn
-                traceJobDict['job']['content'][0]['reader']['parameter']['sliceRecordCount'] = 10000
+                traceJobDict['job']['content']['reader']['parameter']['column'] = streamReaderColumn
+                traceJobDict['job']['content']['reader']['parameter']['sliceRecordCount'] = 10000
         else:
             pass#do nothing
         return json.dumps(traceJobDict, indent = 4)
@@ -390,7 +390,7 @@ if __name__ == "__main__":
     dataxHomePath = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
     print("dataxHomePath: {}".format(dataxHomePath))
 
-    dataxCommand = "{} {}".format(os.path.join(dataxHomePath, "bin", "addax.py"), dataxJobPath)
+    dataxCommand = "{} {}".format(os.path.join(dataxHomePath, "bin", "addax.sh"), dataxJobPath)
     print("dataxCommand:  {}".format(dataxCommand))
 
     returncode = fork(dataxCommand, True)
