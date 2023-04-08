@@ -20,16 +20,12 @@
 package com.wgzhao.addax.common.statistics;
 
 import com.wgzhao.addax.common.util.Configuration;
-import com.wgzhao.addax.common.util.HostUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Comparator;
-import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -46,7 +42,7 @@ public class PerfTrace
 
     private static final Logger LOG = LoggerFactory.getLogger(PerfTrace.class);
     private static PerfTrace instance;
-    //jobid_jobversion,instanceid,taskid, src_mark, dst_mark,
+    //jobid_jobversion, instanceid, taskid, src_mark, dst_mark,
     private final Map<Integer, String> taskDetails = new ConcurrentHashMap<>();
     //PHASE => PerfRecord
     private final ConcurrentHashMap<PerfRecord.PHASE, SumPerfRecord4Print> perfRecordMaps4print = new ConcurrentHashMap<>();
@@ -58,29 +54,15 @@ public class PerfTrace
     private volatile boolean isJob;
     private long instId;
     private long jobId;
-    private long jobVersion;
-    private int taskGroupId;
-    private int channelNumber;
     private int batchSize = 500;
     private volatile boolean perfReportEnable = true;
-    private Configuration jobInfo;
-    private String cluster;
-    private String jobDomain;
-    private String srcType;
-    private String dstType;
-    private String srcGuid;
-    private String dstGuid;
-    private Date windowStart;
-    private Date windowEnd;
-    private Date jobStartTime;
 
-    private PerfTrace(boolean isJob, long jobId, int taskGroupId,  boolean enable)
+    private PerfTrace(boolean isJob, long jobId, int taskGroupId, boolean enable)
     {
         try {
             String perfTraceId = isJob ? "job_" + jobId : String.format("taskGroup_%s_%s", jobId, taskGroupId);
             this.enable = enable;
             this.isJob = isJob;
-            this.taskGroupId = taskGroupId;
             this.instId = jobId;
             LOG.info(String.format("PerfTrace traceId=%s, isEnable=%s", perfTraceId, this.enable));
         }
@@ -106,7 +88,7 @@ public class PerfTrace
         if (instance == null) {
             LOG.error("PerfTrace instance not be init! must have some error! ");
             instance = new PerfTrace(false, -1111, -1111, false);
-            }
+        }
         return instance;
     }
 
@@ -183,9 +165,9 @@ public class PerfTrace
                     }
                 }
                 else if (action == PerfRecord.ACTION.START && perfReportEnable && needReport(perfRecord)) {
-                        synchronized (needReportPool4NotEnd) {
-                            needReportPool4NotEnd.add(perfRecord);
-                        }
+                    synchronized (needReportPool4NotEnd) {
+                        needReportPool4NotEnd.add(perfRecord);
+                    }
                 }
             }
         }
@@ -226,7 +208,7 @@ public class PerfTrace
             return "PerfTrace not enable!";
         }
 
-        if (! totalEndReport.isEmpty() ) {
+        if (!totalEndReport.isEmpty()) {
             sumPerf4EndPrint(totalEndReport);
         }
 
@@ -271,16 +253,6 @@ public class PerfTrace
         return info.toString();
     }
 
-    public Set<PerfRecord> getNeedReportPool4NotEnd()
-    {
-        return needReportPool4NotEnd;
-    }
-
-    public Map<Integer, String> getTaskDetails()
-    {
-        return taskDetails;
-    }
-
     public boolean isEnable()
     {
         return enable;
@@ -291,60 +263,19 @@ public class PerfTrace
         return isJob;
     }
 
-    public void setJobInfo(Configuration jobInfo, boolean perfReportEnable, int channelNumber)
+    public void setJobInfo(Configuration jobInfo, boolean perfReportEnable)
     {
         try {
-            this.jobInfo = jobInfo;
             if (jobInfo != null && perfReportEnable) {
 
-                cluster = jobInfo.getString("cluster");
-
-                String srcDomain = jobInfo.getString("srcDomain", "null");
-                String dstDomain = jobInfo.getString("dstDomain", "null");
-                jobDomain = srcDomain + "|" + dstDomain;
-                srcType = jobInfo.getString("srcType");
-                dstType = jobInfo.getString("dstType");
-                srcGuid = jobInfo.getString("srcGuid");
-                dstGuid = jobInfo.getString("dstGuid");
-                windowStart = getWindow(jobInfo.getString("windowStart"), true);
-                windowEnd = getWindow(jobInfo.getString("windowEnd"), false);
                 String jobIdStr = jobInfo.getString("jobId");
                 jobId = StringUtils.isEmpty(jobIdStr) ? (long) -5 : Long.parseLong(jobIdStr);
-                String jobVersionStr = jobInfo.getString("jobVersion");
-                jobVersion = StringUtils.isEmpty(jobVersionStr) ? (long) -4 : Long.parseLong(jobVersionStr);
-                jobStartTime = new Date();
             }
             this.perfReportEnable = perfReportEnable;
-            this.channelNumber = channelNumber;
         }
         catch (Exception e) {
             this.perfReportEnable = false;
         }
-    }
-
-    private Date getWindow(String windowStr, boolean startWindow)
-    {
-        SimpleDateFormat sdf1 = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-        SimpleDateFormat sdf2 = new SimpleDateFormat("yyyy-MM-dd 00:00:00");
-        if (StringUtils.isNotEmpty(windowStr)) {
-            try {
-                return sdf1.parse(windowStr);
-            }
-            catch (ParseException e) {
-                // do nothing
-            }
-        }
-
-        if (startWindow) {
-            try {
-                return sdf2.parse(sdf2.format(new Date()));
-            }
-            catch (ParseException e1) {
-                //do nothing
-            }
-        }
-
-        return null;
     }
 
     public long getInstId()
@@ -352,76 +283,9 @@ public class PerfTrace
         return instId;
     }
 
-    public Configuration getJobInfo()
-    {
-        return jobInfo;
-    }
-
     public void setBatchSize(int batchSize)
     {
         this.batchSize = batchSize;
-    }
-
-    public synchronized JobStatisticsDto2 getReports(String mode)
-    {
-
-        try {
-            if (!enable || !perfReportEnable) {
-                return null;
-            }
-
-            if (("job".equalsIgnoreCase(mode) && !isJob) || "tg".equalsIgnoreCase(mode) && isJob) {
-                return null;
-            }
-
-            //每次将未完成的task的统计清空
-            SumPerf4Report sumPerf4Report4NotEnd = new SumPerf4Report();
-            Set<PerfRecord> needReportPool4NotEndTmp;
-            synchronized (needReportPool4NotEnd) {
-                needReportPool4NotEndTmp = new HashSet<>(needReportPool4NotEnd);
-            }
-
-            long curNanoTime = System.nanoTime();
-            for (PerfRecord perfRecord : needReportPool4NotEndTmp) {
-                sumPerf4Report4NotEnd.add(curNanoTime, perfRecord);
-            }
-
-            JobStatisticsDto2 jdo = new JobStatisticsDto2();
-            jdo.setInstId(this.instId);
-            if (isJob) {
-                jdo.setTaskGroupId(-6);
-            }
-            else {
-                jdo.setTaskGroupId(this.taskGroupId);
-            }
-            jdo.setJobId(this.jobId);
-            jdo.setJobVersion(this.jobVersion);
-            jdo.setWindowStart(this.windowStart);
-            jdo.setWindowEnd(this.windowEnd);
-            jdo.setJobStartTime(jobStartTime);
-            jdo.setJobRunTimeMs(System.currentTimeMillis() - jobStartTime.getTime());
-            jdo.setChannelNum(this.channelNumber);
-            jdo.setCluster(this.cluster);
-            jdo.setJobDomain(this.jobDomain);
-            jdo.setSrcType(this.srcType);
-            jdo.setDstType(this.dstType);
-            jdo.setSrcGuid(this.srcGuid);
-            jdo.setDstGuid(this.dstGuid);
-            jdo.setHostAddress(HostUtils.IP);
-
-            //sum
-            jdo.setTaskTotalTimeMs(sumPerf4Report4NotEnd.totalTaskRunTimeInMs + sumPerf4Report.totalTaskRunTimeInMs);
-            jdo.setOdpsBlockCloseTimeMs(sumPerf4Report4NotEnd.odpsCloseTimeInMs + sumPerf4Report.odpsCloseTimeInMs);
-            jdo.setSqlQueryTimeMs(sumPerf4Report4NotEnd.sqlQueryTimeInMs + sumPerf4Report.sqlQueryTimeInMs);
-            jdo.setResultNextTimeMs(sumPerf4Report4NotEnd.resultNextTimeInMs + sumPerf4Report.resultNextTimeInMs);
-
-            return jdo;
-        }
-        catch (Exception e) {
-            // do nothing
-        }
-
-        return null;
     }
 
     private void sumPerf4EndPrint(List<PerfRecord> totalEndReport)
@@ -436,11 +300,6 @@ public class PerfTrace
         }
 
         totalEndReport.clear();
-    }
-
-    public void setChannelNumber(int needChannelNumber)
-    {
-        this.channelNumber = needChannelNumber;
     }
 
     public static class SumPerf4Report
@@ -482,21 +341,6 @@ public class PerfTrace
             catch (Exception e) {
                 //do nothing
             }
-        }
-
-        public long getTotalTaskRunTimeInMs()
-        {
-            return totalTaskRunTimeInMs;
-        }
-
-        public long getOdpsCloseTimeInMs()
-        {
-            return odpsCloseTimeInMs;
-        }
-
-        public long getSqlQueryTimeInMs()
-        {
-            return sqlQueryTimeInMs;
         }
     }
 
@@ -560,11 +404,6 @@ public class PerfTrace
             return maxTaskGroupId;
         }
 
-        public long getSizesTotal()
-        {
-            return sizesTotal;
-        }
-
         public long getAverageRecords()
         {
             if (totalCount > 0) {
@@ -599,379 +438,6 @@ public class PerfTrace
         public int getMaxTGID4Records()
         {
             return maxTGID4Records;
-        }
-
-        public int getTotalCount()
-        {
-            return totalCount;
-        }
-    }
-
-    static class JobStatisticsDto2
-    {
-
-        private Long id;
-        private Date gmtCreate;
-        private Date gmtModified;
-        private Long instId;
-        private Long jobId;
-        private Long jobVersion;
-        private Integer taskGroupId;
-        private Date windowStart;
-        private Date windowEnd;
-        private Date jobStartTime;
-        private Date jobEndTime;
-        private Long jobRunTimeMs;
-        private Integer channelNum;
-        private String cluster;
-        private String jobDomain;
-        private String srcType;
-        private String dstType;
-        private String srcGuid;
-        private String dstGuid;
-        private Long records;
-        private Long bytes;
-        private Long speedRecord;
-        private Long speedByte;
-        private String stagePercent;
-        private Long errorRecord;
-        private Long errorBytes;
-        private Long waitReadTimeMs;
-        private Long waitWriteTimeMs;
-        private Long odpsBlockCloseTimeMs;
-        private Long sqlQueryTimeMs;
-        private Long resultNextTimeMs;
-        private Long taskTotalTimeMs;
-        private String hostAddress;
-
-        public Long getId()
-        {
-            return id;
-        }
-
-        public void setId(Long id)
-        {
-            this.id = id;
-        }
-
-        public Date getGmtCreate()
-        {
-            return gmtCreate;
-        }
-
-        public void setGmtCreate(Date gmtCreate)
-        {
-            this.gmtCreate = gmtCreate;
-        }
-
-        public Date getGmtModified()
-        {
-            return gmtModified;
-        }
-
-        public void setGmtModified(Date gmtModified)
-        {
-            this.gmtModified = gmtModified;
-        }
-
-        public Long getInstId()
-        {
-            return instId;
-        }
-
-        public void setInstId(Long instId)
-        {
-            this.instId = instId;
-        }
-
-        public Long getJobId()
-        {
-            return jobId;
-        }
-
-        public void setJobId(Long jobId)
-        {
-            this.jobId = jobId;
-        }
-
-        public Long getJobVersion()
-        {
-            return jobVersion;
-        }
-
-        public void setJobVersion(Long jobVersion)
-        {
-            this.jobVersion = jobVersion;
-        }
-
-        public Integer getTaskGroupId()
-        {
-            return taskGroupId;
-        }
-
-        public void setTaskGroupId(Integer taskGroupId)
-        {
-            this.taskGroupId = taskGroupId;
-        }
-
-        public Date getWindowStart()
-        {
-            return windowStart;
-        }
-
-        public void setWindowStart(Date windowStart)
-        {
-            this.windowStart = windowStart;
-        }
-
-        public Date getWindowEnd()
-        {
-            return windowEnd;
-        }
-
-        public void setWindowEnd(Date windowEnd)
-        {
-            this.windowEnd = windowEnd;
-        }
-
-        public Date getJobStartTime()
-        {
-            return jobStartTime;
-        }
-
-        public void setJobStartTime(Date jobStartTime)
-        {
-            this.jobStartTime = jobStartTime;
-        }
-
-        public Date getJobEndTime()
-        {
-            return jobEndTime;
-        }
-
-        public void setJobEndTime(Date jobEndTime)
-        {
-            this.jobEndTime = jobEndTime;
-        }
-
-        public Long getJobRunTimeMs()
-        {
-            return jobRunTimeMs;
-        }
-
-        public void setJobRunTimeMs(Long jobRunTimeMs)
-        {
-            this.jobRunTimeMs = jobRunTimeMs;
-        }
-
-        public Integer getChannelNum()
-        {
-            return channelNum;
-        }
-
-        public void setChannelNum(Integer channelNum)
-        {
-            this.channelNum = channelNum;
-        }
-
-        public String getCluster()
-        {
-            return cluster;
-        }
-
-        public void setCluster(String cluster)
-        {
-            this.cluster = cluster;
-        }
-
-        public String getJobDomain()
-        {
-            return jobDomain;
-        }
-
-        public void setJobDomain(String jobDomain)
-        {
-            this.jobDomain = jobDomain;
-        }
-
-        public String getSrcType()
-        {
-            return srcType;
-        }
-
-        public void setSrcType(String srcType)
-        {
-            this.srcType = srcType;
-        }
-
-        public String getDstType()
-        {
-            return dstType;
-        }
-
-        public void setDstType(String dstType)
-        {
-            this.dstType = dstType;
-        }
-
-        public String getSrcGuid()
-        {
-            return srcGuid;
-        }
-
-        public void setSrcGuid(String srcGuid)
-        {
-            this.srcGuid = srcGuid;
-        }
-
-        public String getDstGuid()
-        {
-            return dstGuid;
-        }
-
-        public void setDstGuid(String dstGuid)
-        {
-            this.dstGuid = dstGuid;
-        }
-
-        public Long getRecords()
-        {
-            return records;
-        }
-
-        public void setRecords(Long records)
-        {
-            this.records = records;
-        }
-
-        public Long getBytes()
-        {
-            return bytes;
-        }
-
-        public void setBytes(Long bytes)
-        {
-            this.bytes = bytes;
-        }
-
-        public Long getSpeedRecord()
-        {
-            return speedRecord;
-        }
-
-        public void setSpeedRecord(Long speedRecord)
-        {
-            this.speedRecord = speedRecord;
-        }
-
-        public Long getSpeedByte()
-        {
-            return speedByte;
-        }
-
-        public void setSpeedByte(Long speedByte)
-        {
-            this.speedByte = speedByte;
-        }
-
-        public String getStagePercent()
-        {
-            return stagePercent;
-        }
-
-        public void setStagePercent(String stagePercent)
-        {
-            this.stagePercent = stagePercent;
-        }
-
-        public Long getErrorRecord()
-        {
-            return errorRecord;
-        }
-
-        public void setErrorRecord(Long errorRecord)
-        {
-            this.errorRecord = errorRecord;
-        }
-
-        public Long getErrorBytes()
-        {
-            return errorBytes;
-        }
-
-        public void setErrorBytes(Long errorBytes)
-        {
-            this.errorBytes = errorBytes;
-        }
-
-        public Long getWaitReadTimeMs()
-        {
-            return waitReadTimeMs;
-        }
-
-        public void setWaitReadTimeMs(Long waitReadTimeMs)
-        {
-            this.waitReadTimeMs = waitReadTimeMs;
-        }
-
-        public Long getWaitWriteTimeMs()
-        {
-            return waitWriteTimeMs;
-        }
-
-        public void setWaitWriteTimeMs(Long waitWriteTimeMs)
-        {
-            this.waitWriteTimeMs = waitWriteTimeMs;
-        }
-
-        public Long getOdpsBlockCloseTimeMs()
-        {
-            return odpsBlockCloseTimeMs;
-        }
-
-        public void setOdpsBlockCloseTimeMs(Long odpsBlockCloseTimeMs)
-        {
-            this.odpsBlockCloseTimeMs = odpsBlockCloseTimeMs;
-        }
-
-        public Long getSqlQueryTimeMs()
-        {
-            return sqlQueryTimeMs;
-        }
-
-        public void setSqlQueryTimeMs(Long sqlQueryTimeMs)
-        {
-            this.sqlQueryTimeMs = sqlQueryTimeMs;
-        }
-
-        public Long getResultNextTimeMs()
-        {
-            return resultNextTimeMs;
-        }
-
-        public void setResultNextTimeMs(Long resultNextTimeMs)
-        {
-            this.resultNextTimeMs = resultNextTimeMs;
-        }
-
-        public Long getTaskTotalTimeMs()
-        {
-            return taskTotalTimeMs;
-        }
-
-        public void setTaskTotalTimeMs(Long taskTotalTimeMs)
-        {
-            this.taskTotalTimeMs = taskTotalTimeMs;
-        }
-
-        public String getHostAddress()
-        {
-            return hostAddress;
-        }
-
-        public void setHostAddress(String hostAddress)
-        {
-            this.hostAddress = hostAddress;
         }
     }
 }
