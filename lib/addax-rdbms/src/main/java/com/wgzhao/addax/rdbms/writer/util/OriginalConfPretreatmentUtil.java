@@ -37,6 +37,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.sql.Connection;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -162,10 +163,14 @@ public final class OriginalConfPretreatmentUtil
             else {
                 // 确保用户配置的 column 不重复
                 ListUtil.makeSureNoValueDuplicate(userConfiguredColumns, false);
-                // 检查列是否都为数据库表中正确的列（通过执行一次 select column from table 进行判断）
-                java.sql.Connection connection = connectionFactory.getConnection();
-                DBUtil.getColumnMetaData(connection, oneTable, StringUtils.join(userConfiguredColumns, ","));
-                DBUtil.closeDBResources(null, null, connection);
+                Connection connection = null;
+                try {
+                    // 检查列是否都为数据库表中正确的列（通过执行一次 select column from table 进行判断）
+                    connection = connectionFactory.getConnection();
+                    DBUtil.getColumnMetaData(connection, oneTable, StringUtils.join(userConfiguredColumns, ","));
+                } finally {
+                    DBUtil.closeDBResources(null, null, connection);
+                }
             }
         }
     }
