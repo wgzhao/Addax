@@ -44,6 +44,7 @@ import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
@@ -73,7 +74,7 @@ public class ESClient
 
         JestClientFactory factory = new JestClientFactory();
         HttpClientConfig.Builder httpClientConfig = new HttpClientConfig
-                .Builder(endpoint)
+                .Builder(Arrays.asList(endpoint.split(",")))
                 .multiThreaded(multiThread)
                 .connTimeout(30000)
                 .readTimeout(readTimeout)
