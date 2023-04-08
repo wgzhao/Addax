@@ -61,7 +61,6 @@ public class PerfTrace
     private long jobVersion;
     private int taskGroupId;
     private int channelNumber;
-    private int priority;
     private int batchSize = 500;
     private volatile boolean perfReportEnable = true;
     private Configuration jobInfo;
@@ -75,7 +74,7 @@ public class PerfTrace
     private Date windowEnd;
     private Date jobStartTime;
 
-    private PerfTrace(boolean isJob, long jobId, int taskGroupId, int priority, boolean enable)
+    private PerfTrace(boolean isJob, long jobId, int taskGroupId,  boolean enable)
     {
         try {
             String perfTraceId = isJob ? "job_" + jobId : String.format("taskGroup_%s_%s", jobId, taskGroupId);
@@ -83,8 +82,7 @@ public class PerfTrace
             this.isJob = isJob;
             this.taskGroupId = taskGroupId;
             this.instId = jobId;
-            this.priority = priority;
-            LOG.info(String.format("PerfTrace traceId=%s, isEnable=%s, priority=%s", perfTraceId, this.enable, this.priority));
+            LOG.info(String.format("PerfTrace traceId=%s, isEnable=%s", perfTraceId, this.enable));
         }
         catch (Exception e) {
             // do nothing
@@ -92,10 +90,10 @@ public class PerfTrace
         }
     }
 
-    public static synchronized PerfTrace getInstance(boolean isJob, long jobId, int taskGroupId, int priority, boolean enable)
+    public static synchronized PerfTrace getInstance(boolean isJob, long jobId, int taskGroupId, boolean enable)
     {
         if (instance == null) {
-            instance = new PerfTrace(isJob, jobId, taskGroupId, priority, enable);
+            instance = new PerfTrace(isJob, jobId, taskGroupId, enable);
         }
         return instance;
     }
@@ -107,7 +105,7 @@ public class PerfTrace
     {
         if (instance == null) {
             LOG.error("PerfTrace instance not be init! must have some error! ");
-            instance = new PerfTrace(false, -1111, -1111, 0, false);
+            instance = new PerfTrace(false, -1111, -1111, false);
             }
         return instance;
     }
@@ -402,7 +400,6 @@ public class PerfTrace
             jdo.setWindowEnd(this.windowEnd);
             jdo.setJobStartTime(jobStartTime);
             jdo.setJobRunTimeMs(System.currentTimeMillis() - jobStartTime.getTime());
-            jdo.setJobPriority(this.priority);
             jdo.setChannelNum(this.channelNumber);
             jdo.setCluster(this.cluster);
             jdo.setJobDomain(this.jobDomain);
@@ -625,7 +622,6 @@ public class PerfTrace
         private Date jobStartTime;
         private Date jobEndTime;
         private Long jobRunTimeMs;
-        private Integer jobPriority;
         private Integer channelNum;
         private String cluster;
         private String jobDomain;
@@ -766,16 +762,6 @@ public class PerfTrace
         public void setJobRunTimeMs(Long jobRunTimeMs)
         {
             this.jobRunTimeMs = jobRunTimeMs;
-        }
-
-        public Integer getJobPriority()
-        {
-            return jobPriority;
-        }
-
-        public void setJobPriority(Integer jobPriority)
-        {
-            this.jobPriority = jobPriority;
         }
 
         public Integer getChannelNum()
