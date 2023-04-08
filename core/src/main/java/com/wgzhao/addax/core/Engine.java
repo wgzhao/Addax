@@ -70,7 +70,7 @@ public class Engine
 
         Configuration jobInfoConfig = allConf.getConfiguration(CoreConstant.JOB_JOB_INFO);
         //初始化PerfTrace
-        PerfTrace perfTrace = PerfTrace.getInstance(true, instanceId, -1, 0, false);
+        PerfTrace perfTrace = PerfTrace.getInstance(true, instanceId, -1, false);
         perfTrace.setJobInfo(jobInfoConfig, false, channelNumber);
         container.start();
     }
