@@ -19,6 +19,8 @@
 
 package com.wgzhao.addax.plugin.reader.oraclereader;
 
+import com.alibaba.fastjson2.JSONArray;
+import com.alibaba.fastjson2.JSONObject;
 import com.wgzhao.addax.common.base.Key;
 import com.wgzhao.addax.common.exception.AddaxException;
 import com.wgzhao.addax.common.plugin.RecordSender;
@@ -29,7 +31,14 @@ import com.wgzhao.addax.rdbms.reader.util.HintUtil;
 import com.wgzhao.addax.rdbms.util.DBUtilErrorCode;
 import com.wgzhao.addax.rdbms.util.DataBaseType;
 import org.apache.commons.lang3.StringUtils;
+import java.sql.Struct;
+import oracle.spatial.geometry.JGeometry;
 
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.util.List;
 
 import static com.wgzhao.addax.common.base.Constant.DEFAULT_FETCH_SIZE;
@@ -148,6 +157,64 @@ public class OracleReader
         public void destroy()
         {
             this.commonRdbmsReaderTask.destroy(this.readerSliceConfig);
+        }
+    }
+
+    public static void main(String[] args)
+    {
+        String url = "jdbc:oracle:thin:@//localhost:1521/orcl";
+        String user = "your_username";
+        String password = "your_password";
+        Connection conn = null;
+        PreparedStatement stmt = null;
+        ResultSet rs = null;
+
+        try {
+            // 连接数据库
+            conn = DriverManager.getConnection(url, user, password);
+
+            // 准备查询语句
+            String sql = "SELECT id, name, geom FROM spatial_data";
+            stmt = conn.prepareStatement(sql);
+            rs = stmt.executeQuery();
+
+            // 遍历结果集
+            while (rs.next()) {
+                int id = rs.getInt("id");
+                String name = rs.getString("name");
+                Struct struct = (Struct) rs.getObject("geom");
+                JGeometry geom = JGeometry.load(struct);
+
+                // 将 JGeometry 对象转换为 JSON 格式
+                JSONObject json = new JSONObject();
+                json.put("type", geom.getTypeString());
+                JSONArray coordinates = new JSONArray();
+                double[] ordinates = geom.getOrdinatesArray();
+                for (int i = 0; i < ordinates.length; i += geom.getDimension()) {
+                    JSONArray point = new JSONArray();
+                    for (int j = 0; j < geom.getDimension(); j++) {
+                        point.add(ordinates[i + j]);
+                    }
+                    coordinates.add(point);
+                }
+                json.put("coordinates", coordinates);
+
+                // 打印 JSON 字符串
+                System.out.println("id: " + id);
+                System.out.println("name: " + name);
+                System.out.println("geom: " + json.toJSONString());
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        } finally {
+            // 关闭连接
+            try {
+                if (rs != null) rs.close();
+                if (stmt != null) stmt.close();
+                if (conn != null) conn.close();
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
         }
     }
 }

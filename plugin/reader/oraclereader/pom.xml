@@ -41,6 +41,13 @@
             <scope>runtime</scope>
         </dependency>
 
+        <dependency>
+            <groupId>oracle</groupId>
+            <artifactId>spatial</artifactId>
+            <scope>system</scope>
+            <version>1.0</version>
+            <systemPath>${project.basedir}/src/main/resources/sdoapi.jar</systemPath>
+        </dependency>
     </dependencies>
 
     <build>
