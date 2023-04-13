@@ -131,7 +131,7 @@ execute_sudo() {
 if [ -d "${ADDAX_REPOSITORY}" ]; then
   echo "Addax is already installed  to ${ADDAX_REPOSITORY}"
   echo "Do you want to re-installed, if you want, the install script will cleanup the ${ADDAX_REPOSITORY}"
-  read -p -r "Do you want to continue? [y/N] " response
+  read -r -p "Do you want to continue? [y/N] " response
   if response="$(echo "${response}" | tr '[:upper:]' '[:lower:]')"; then
     if [[ "${response}" != "y" ]]; then
       exit 1
