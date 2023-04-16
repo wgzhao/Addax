@@ -287,14 +287,7 @@ public class StreamWriter
             for (int i = 0; i < recordLength; i++) {
                 column = record.getColumn(i);
                 if (column != null && column.getRawData() != null) {
-                    if (column.getType() == Column.Type.TIMESTAMP) {
-                        // timestamp always use UTC timezone
-                        Instant instant = Instant.ofEpochMilli(column.asLong());
-                        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss").withZone(ZoneId.of("UTC"));
-                        sb.append(formatter.format(instant));
-                    } else {
-                        sb.append(column.asString());
-                    }
+                    sb.append(column.asString());
                 }
                 else {
                     // use NULL FLAG to replace null value
