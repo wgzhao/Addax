@@ -37,8 +37,7 @@
         <dependency>
             <groupId>com.oracle.database.jdbc</groupId>
             <artifactId>ojdbc8</artifactId>
-            <version>${oracle.jdbc.version}</version>
-            <scope>runtime</scope>
+            <version>18.3.0.0</version>
         </dependency>
 
         <dependency>
@@ -48,6 +47,12 @@
             <version>1.0</version>
             <systemPath>${project.basedir}/src/main/resources/sdoapi.jar</systemPath>
         </dependency>
+
+<!--        <dependency>-->
+<!--            <groupId>com.esri.geometry</groupId>-->
+<!--            <artifactId>esri-geometry-api</artifactId>-->
+<!--            <version>2.2.4</version>-->
+<!--        </dependency>-->
     </dependencies>
 
     <build>

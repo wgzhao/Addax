@@ -30,14 +30,15 @@ import com.wgzhao.addax.rdbms.reader.CommonRdbmsReader;
 import com.wgzhao.addax.rdbms.reader.util.HintUtil;
 import com.wgzhao.addax.rdbms.util.DBUtilErrorCode;
 import com.wgzhao.addax.rdbms.util.DataBaseType;
-import org.apache.commons.lang3.StringUtils;
-import java.sql.Struct;
 import oracle.spatial.geometry.JGeometry;
+import oracle.sql.STRUCT;
+import org.apache.commons.lang3.StringUtils;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
+import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
 import java.util.List;
 
@@ -161,60 +162,52 @@ public class OracleReader
     }
 
     public static void main(String[] args)
+            throws Exception
     {
-        String url = "jdbc:oracle:thin:@//localhost:1521/orcl";
-        String user = "your_username";
-        String password = "your_password";
+        String url = "jdbc:oracle:thin:@//10.90.70.11:13521/XE";
+        String user = "system";
+        String password = "oracle";
         Connection conn = null;
         PreparedStatement stmt = null;
         ResultSet rs = null;
 
-        try {
-            // 连接数据库
-            conn = DriverManager.getConnection(url, user, password);
+        // 连接数据库
+        conn = DriverManager.getConnection(url, user, password);
 
-            // 准备查询语句
-            String sql = "SELECT id, name, geom FROM spatial_data";
-            stmt = conn.prepareStatement(sql);
-            rs = stmt.executeQuery();
+        // 准备查询语句
+        String sql = "SELECT id, name, geo FROM hr.spatial_data";
+        stmt = conn.prepareStatement(sql);
+        rs = stmt.executeQuery();
+        JSONObject json = new JSONObject();
+        while (rs.next()) {
+            JGeometry geom = JGeometry.load(rs.getBytes("geo"));
+            // Convert JGeometry object to JSON object
+            JSONObject geomJson = new JSONObject();
+            geomJson.put("type", geom.getType());
+            geomJson.put("coordinates", geom.getJavaPoints());
 
-            // 遍历结果集
-            while (rs.next()) {
-                int id = rs.getInt("id");
-                String name = rs.getString("name");
-                Struct struct = (Struct) rs.getObject("geom");
-                JGeometry geom = JGeometry.load(struct);
+            // Add geometry JSON object to main JSON object
+            json.put("geometry", geomJson);
 
-                // 将 JGeometry 对象转换为 JSON 格式
-                JSONObject json = new JSONObject();
-                json.put("type", geom.getTypeString());
-                JSONArray coordinates = new JSONArray();
-                double[] ordinates = geom.getOrdinatesArray();
-                for (int i = 0; i < ordinates.length; i += geom.getDimension()) {
-                    JSONArray point = new JSONArray();
-                    for (int j = 0; j < geom.getDimension(); j++) {
-                        point.add(ordinates[i + j]);
-                    }
-                    coordinates.add(point);
-                }
-                json.put("coordinates", coordinates);
-
-                // 打印 JSON 字符串
-                System.out.println("id: " + id);
-                System.out.println("name: " + name);
-                System.out.println("geom: " + json.toJSONString());
-            }
-        } catch (SQLException e) {
-            e.printStackTrace();
-        } finally {
-            // 关闭连接
-            try {
-                if (rs != null) rs.close();
-                if (stmt != null) stmt.close();
-                if (conn != null) conn.close();
-            } catch (SQLException e) {
-                e.printStackTrace();
+            // Loop through remaining columns and add to main JSON object
+            ResultSetMetaData rsmd = rs.getMetaData();
+            int columnCount = rsmd.getColumnCount();
+            for (int i = 1; i <= columnCount; i++) {
+                String columnName = rsmd.getColumnName(i);
+                Object columnValue = rs.getObject(i);
+                json.put(columnName, columnValue);
             }
         }
+
+        // Convert JSON object to string
+        String jsonString = json.toJSONString();
+
+        // Close resources
+        rs.close();
+        stmt.close();
+        conn.close();
+
+        // Return JSON string
+        System.out.println(jsonString);
     }
 }
