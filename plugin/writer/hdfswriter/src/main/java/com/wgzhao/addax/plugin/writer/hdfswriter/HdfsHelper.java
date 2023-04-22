@@ -413,7 +413,8 @@ public class HdfsHelper
             if (skipTrash) {
                 while (files.hasNext()) {
                     final LocatedFileStatus next = files.next();
-                    fileSystem.deleteOnExit(next.getPath());
+                    LOG.info("delete file [{}]" , next.getPath());
+                    fileSystem.delete(next.getPath(), false);
                 }
             }
             else {
@@ -423,6 +424,7 @@ public class HdfsHelper
                 final Trash trash = new Trash(hadoopConf);
                 while (files.hasNext()) {
                     final LocatedFileStatus next = files.next();
+                    LOG.info("move file [{}] to Trash" , next.getPath());
                     trash.moveToTrash(next.getPath());
                 }
             }
