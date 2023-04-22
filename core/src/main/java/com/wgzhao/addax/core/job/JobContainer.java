@@ -33,7 +33,6 @@ import com.wgzhao.addax.common.util.StrUtil;
 import com.wgzhao.addax.core.AbstractContainer;
 import com.wgzhao.addax.core.Engine;
 import com.wgzhao.addax.core.container.util.JobAssignUtil;
-import com.wgzhao.addax.core.hook.JobReport;
 import com.wgzhao.addax.core.job.scheduler.AbstractScheduler;
 import com.wgzhao.addax.core.job.scheduler.processinner.StandAloneScheduler;
 import com.wgzhao.addax.core.statistics.communication.Communication;
@@ -48,11 +47,12 @@ import com.wgzhao.addax.core.util.container.CoreConstant;
 import com.wgzhao.addax.core.util.container.LoadUtil;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.http.HttpResponse;
+import org.apache.http.client.config.RequestConfig;
 import org.apache.http.client.methods.HttpPost;
-import org.apache.http.concurrent.FutureCallback;
 import org.apache.http.entity.ContentType;
-import org.apache.http.impl.nio.client.CloseableHttpAsyncClient;
-import org.apache.http.util.EntityUtils;
+import org.apache.http.entity.StringEntity;
+import org.apache.http.impl.client.CloseableHttpClient;
+import org.apache.http.impl.client.HttpClients;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -62,8 +62,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.Future;
 
 /*
  * Created by jingxing on 14-8-24.
@@ -175,8 +173,7 @@ public class JobContainer
             Communication reportCommunication = CommunicationTool.getReportCommunication(communication, tempComm, this.totalStage);
             super.getContainerCommunicator().report(reportCommunication);
 
-            throw AddaxException.asAddaxException(
-                    FrameworkErrorCode.RUNTIME_ERROR, e);
+            throw AddaxException.asAddaxException(FrameworkErrorCode.RUNTIME_ERROR, e);
         }
         finally {
             if (!isDryRun) {
@@ -213,20 +210,17 @@ public class JobContainer
 
     private void preCheckInit()
     {
-        this.jobId = this.configuration.getLong(
-                CoreConstant.CORE_CONTAINER_JOB_ID, -1);
+        this.jobId = this.configuration.getLong(CoreConstant.CORE_CONTAINER_JOB_ID, -1);
 
         if (this.jobId < 0) {
             LOG.info("Set jobId = 0");
             this.jobId = 0;
-            this.configuration.set(CoreConstant.CORE_CONTAINER_JOB_ID,
-                    this.jobId);
+            this.configuration.set(CoreConstant.CORE_CONTAINER_JOB_ID, this.jobId);
         }
 
         Thread.currentThread().setName("job-" + this.jobId);
 
-        JobPluginCollector jobPluginCollector = new DefaultJobPluginCollector(
-                this.getContainerCommunicator());
+        JobPluginCollector jobPluginCollector = new DefaultJobPluginCollector(this.getContainerCommunicator());
         this.jobReader = this.preCheckReaderInit(jobPluginCollector);
         this.jobWriter = this.preCheckWriterInit(jobPluginCollector);
     }
@@ -299,8 +293,7 @@ public class JobContainer
         if (this.jobId < 0) {
             LOG.info("Set jobId = 0");
             this.jobId = 0;
-            this.configuration.set(CoreConstant.CORE_CONTAINER_JOB_ID,
-                    this.jobId);
+            this.configuration.set(CoreConstant.CORE_CONTAINER_JOB_ID, this.jobId);
         }
 
         Thread.currentThread().setName("job-" + this.jobId);
@@ -319,8 +312,7 @@ public class JobContainer
 
     private void preHandle()
     {
-        String handlerPluginTypeStr = this.configuration.getString(
-                CoreConstant.JOB_PRE_HANDLER_PLUGIN_TYPE);
+        String handlerPluginTypeStr = this.configuration.getString(CoreConstant.JOB_PRE_HANDLER_PLUGIN_TYPE);
         if (!StringUtils.isNotEmpty(handlerPluginTypeStr)) {
             return;
         }
@@ -329,13 +321,10 @@ public class JobContainer
             handlerPluginType = PluginType.valueOf(handlerPluginTypeStr.toUpperCase());
         }
         catch (IllegalArgumentException e) {
-            throw AddaxException.asAddaxException(
-                    FrameworkErrorCode.CONFIG_ERROR,
-                    String.format("Job preHandler's pluginType(%s) set error, reason(%s)", handlerPluginTypeStr.toUpperCase(), e.getMessage()));
+            throw AddaxException.asAddaxException(FrameworkErrorCode.CONFIG_ERROR, String.format("Job preHandler's pluginType(%s) set error, reason(%s)", handlerPluginTypeStr.toUpperCase(), e.getMessage()));
         }
 
-        String handlerPluginName = this.configuration.getString(
-                CoreConstant.JOB_PRE_HANDLER_PLUGIN_NAME);
+        String handlerPluginName = this.configuration.getString(CoreConstant.JOB_PRE_HANDLER_PLUGIN_NAME);
 
         classLoaderSwapper.setCurrentThreadClassLoader(LoadUtil.getJarLoader(handlerPluginType, handlerPluginName, this.jobId));
 
@@ -362,9 +351,7 @@ public class JobContainer
             handlerPluginType = PluginType.valueOf(handlerPluginTypeStr.toUpperCase());
         }
         catch (IllegalArgumentException e) {
-            throw AddaxException.asAddaxException(
-                    FrameworkErrorCode.CONFIG_ERROR,
-                    String.format("Job postHandler's pluginType(%s) set error, reason(%s)", handlerPluginTypeStr.toUpperCase(), e.getMessage()));
+            throw AddaxException.asAddaxException(FrameworkErrorCode.CONFIG_ERROR, String.format("Job postHandler's pluginType(%s) set error, reason(%s)", handlerPluginTypeStr.toUpperCase(), e.getMessage()));
         }
 
         String handlerPluginName = this.configuration.getString(CoreConstant.JOB_POST_HANDLER_PLUGIN_NAME);
@@ -424,9 +411,7 @@ public class JobContainer
             // 在byte流控情况下，单个Channel流量最大值必须设置，否则报错！
             Long channelLimitedByteSpeed = this.configuration.getLong(CoreConstant.CORE_TRANSPORT_CHANNEL_SPEED_BYTE, -1);
             if (channelLimitedByteSpeed == null || channelLimitedByteSpeed <= 0) {
-                throw AddaxException.asAddaxException(
-                        FrameworkErrorCode.CONFIG_ERROR,
-                        "在有总bps限速条件下，单个channel的bps值不能为空，也不能为非正数");
+                throw AddaxException.asAddaxException(FrameworkErrorCode.CONFIG_ERROR, "在有总bps限速条件下，单个channel的bps值不能为空，也不能为非正数");
             }
 
             needChannelNumberByByte = (int) (globalLimitedByteSpeed / channelLimitedByteSpeed);
@@ -439,8 +424,7 @@ public class JobContainer
             long globalLimitedRecordSpeed = this.configuration.getInt(CoreConstant.JOB_SETTING_SPEED_RECORD, 100000);
             Long channelLimitedRecordSpeed = this.configuration.getLong(CoreConstant.CORE_TRANSPORT_CHANNEL_SPEED_RECORD, -1);
             if (channelLimitedRecordSpeed == null || channelLimitedRecordSpeed <= 0) {
-                throw AddaxException.asAddaxException(FrameworkErrorCode.CONFIG_ERROR,
-                        "在有总tps限速条件下，单个channel的tps值不能为空，也不能为非正数");
+                throw AddaxException.asAddaxException(FrameworkErrorCode.CONFIG_ERROR, "在有总tps限速条件下，单个channel的tps值不能为空，也不能为非正数");
             }
 
             needChannelNumberByRecord = (int) (globalLimitedRecordSpeed / channelLimitedRecordSpeed);
@@ -496,8 +480,7 @@ public class JobContainer
         catch (Exception e) {
             LOG.error("运行scheduler出错.");
             this.endTransferTimeStamp = System.currentTimeMillis();
-            throw AddaxException.asAddaxException(
-                    FrameworkErrorCode.RUNTIME_ERROR, e);
+            throw AddaxException.asAddaxException(FrameworkErrorCode.RUNTIME_ERROR, e);
         }
 
         /*
@@ -556,57 +539,78 @@ public class JobContainer
         long byteSpeedPerSecond = communication.getLongCounter(CommunicationTool.READ_SUCCEED_BYTES) / transferCosts;
         long recordSpeedPerSecond = communication.getLongCounter(CommunicationTool.READ_SUCCEED_RECORDS) / transferCosts;
 
+        long totalReadRecords = CommunicationTool.getTotalReadRecords(communication);
+        long totalErrorRecords = CommunicationTool.getTotalErrorRecords(communication);
+
         reportCommunication.setLongCounter(CommunicationTool.BYTE_SPEED, byteSpeedPerSecond);
         reportCommunication.setLongCounter(CommunicationTool.RECORD_SPEED, recordSpeedPerSecond);
 
         super.getContainerCommunicator().report(reportCommunication);
         LOG.debug(CommunicationTool.Stringify.getSnapshot(communication));
 
-        LOG.info(String.format(
-                "\n" + "%-26s: %-18s\n" + "%-26s: %-18s\n" + "%-26s: %19s\n"
-                        + "%-26s: %19s\n" + "%-26s: %19s\n" + "%-26s: %19s\n"
-                        + "%-26s: %19s\n",
-                "任务启动时刻",
-                dateFormat.format(startTimeStamp),
+        // check job run statistic upload server is present or not
+        String jobResultReportUrl = userConf.getString(CoreConstant.CORE_SERVER_ADDRESS);
+        if (StringUtils.isNotBlank(jobResultReportUrl)) {
+            String jobKey = "jobName";
+            // Get the job name, there are two ways to obtain it:
+            // 1. Pass it through the command line using -DjobName;
+            // 2. Analyze the log writing path of the writer plugin and splice the 2nd and 3rd directories
+            String jobContentWriterPath = userConf.getString(CoreConstant.JOB_CONTENT_WRITER_PATH);
+            int timeoutMills = userConf.getInt(CoreConstant.CORE_SERVER_TIMEOUT_SEC, 2) * 1000;
+            StringBuilder jobName = new StringBuilder();
+            if (System.getProperty(jobKey) != null) {
+                jobName.append(System.getProperty(jobKey));
+            }
+            else if (StringUtils.isNotBlank(jobContentWriterPath)) {
+                String[] pathArr = jobContentWriterPath.split("/");
 
-                "任务结束时刻",
-                dateFormat.format(endTimeStamp),
+                if (pathArr.length >= 4) {
+                    jobName.append(pathArr[2]).append(".").append(pathArr[3]);
+                }
+            }
+            else {
+                jobName.append(jobKey);
+            }
 
-                "任务总计耗时",
-                totalCosts + "s",
-                "任务平均流量",
-                StrUtil.stringify(byteSpeedPerSecond)
-                        + "/s",
-                "记录写入速度",
-                recordSpeedPerSecond
-                        + "rec/s", "读出记录总数",
-                CommunicationTool.getTotalReadRecords(communication),
-                "读写失败总数",
-                CommunicationTool.getTotalErrorRecords(communication)
-        ));
+            Map<String, Object> resultLog = new HashMap<>();
 
-        if (communication.getLongCounter(CommunicationTool.TRANSFORMER_SUCCEED_RECORDS) > 0
-                || communication.getLongCounter(CommunicationTool.TRANSFORMER_FAILED_RECORDS) > 0
-                || communication.getLongCounter(CommunicationTool.TRANSFORMER_FILTER_RECORDS) > 0) {
-            LOG.info(String.format(
-                    "\n" + "%-26s: %19s\n" + "%-26s: %19s\n" + "%-26s: %19s\n",
-                    "Transformer成功记录总数",
-                    communication.getLongCounter(CommunicationTool.TRANSFORMER_SUCCEED_RECORDS),
+            resultLog.put("startTimeStamp", startTimeStamp / 1000);
+            resultLog.put("endTimeStamp", endTimeStamp / 1000);
+            resultLog.put("totalCosts", totalCosts);
+            resultLog.put("byteSpeedPerSecond", byteSpeedPerSecond);
+            resultLog.put("recordSpeedPerSecond", recordSpeedPerSecond);
+            resultLog.put("totalReadRecords", totalReadRecords);
+            resultLog.put("totalErrorRecords", totalErrorRecords);
+            resultLog.put("jobName", jobName);
+            resultLog.put("jobContent", userConf.getString("jobContent.internal.job"));
 
-                    "Transformer失败记录总数",
-                    communication.getLongCounter(CommunicationTool.TRANSFORMER_FAILED_RECORDS),
+            String jsonStr = JSON.toJSONString(resultLog);
 
-                    "Transformer过滤记录总数",
-                    communication.getLongCounter(CommunicationTool.TRANSFORMER_FILTER_RECORDS)
-            ));
+            LOG.info("jobResultReportUrl: {}", jobResultReportUrl);
+            LOG.debug("report contents: {}", jsonStr);
+            postJobRunStatistic(jobResultReportUrl, timeoutMills, jsonStr);
+        }
+
+        LOG.info(String.format("\n" + "%-26s: %-18s\n" + "%-26s: %-18s\n" + "%-26s: %19s\n" + "%-26s: %19s\n" + "%-26s: %19s\n" + "%-26s: %19s\n" + "%-26s: %19s\n", "任务启动时刻", dateFormat.format(startTimeStamp),
+
+                "任务结束时刻", dateFormat.format(endTimeStamp),
+
+                "任务总计耗时", totalCosts + "s", "任务平均流量", StrUtil.stringify(byteSpeedPerSecond) + "/s", "记录写入速度", recordSpeedPerSecond + "rec" +
+                        "/s", "读出记录总数", totalErrorRecords, "读写失败总数", totalErrorRecords));
+
+        if (communication.getLongCounter(CommunicationTool.TRANSFORMER_SUCCEED_RECORDS) > 0 || communication.getLongCounter(CommunicationTool.TRANSFORMER_FAILED_RECORDS) > 0 || communication.getLongCounter(CommunicationTool.TRANSFORMER_FILTER_RECORDS) > 0) {
+            LOG.info(String.format("\n" + "%-26s: %19s\n" + "%-26s: %19s\n" + "%-26s: %19s\n", "Transformer成功记录总数", communication.getLongCounter(CommunicationTool.TRANSFORMER_SUCCEED_RECORDS),
+
+                    "Transformer失败记录总数", communication.getLongCounter(CommunicationTool.TRANSFORMER_FAILED_RECORDS),
+
+                    "Transformer过滤记录总数", communication.getLongCounter(CommunicationTool.TRANSFORMER_FILTER_RECORDS)));
         }
     }
 
     /*
      * reader job的初始化，返回Reader.Job
      */
-    private Reader.Job initJobReader(
-            JobPluginCollector jobPluginCollector)
+    private Reader.Job initJobReader(JobPluginCollector jobPluginCollector)
     {
         this.readerPluginName = this.configuration.getString(CoreConstant.JOB_CONTENT_READER_NAME);
         classLoaderSwapper.setCurrentThreadClassLoader(LoadUtil.getJarLoader(PluginType.READER, this.readerPluginName, this.jobId));
@@ -695,17 +699,10 @@ public class JobContainer
     /*
      * 按顺序整合reader和writer的配置，这里的顺序不能乱！ 输入是reader、writer级别的配置，输出是一个完整task的配置
      */
-    private List<Configuration> mergeReaderAndWriterTaskConfigs(
-            List<Configuration> readerTasksConfigs,
-            List<Configuration> writerTasksConfigs,
-            List<Configuration> transformerConfigs)
+    private List<Configuration> mergeReaderAndWriterTaskConfigs(List<Configuration> readerTasksConfigs, List<Configuration> writerTasksConfigs, List<Configuration> transformerConfigs)
     {
         if (readerTasksConfigs.size() != writerTasksConfigs.size()) {
-            throw AddaxException.asAddaxException(
-                    FrameworkErrorCode.PLUGIN_SPLIT_ERROR,
-                    String.format("reader切分的task数目[%d]不等于writer切分的task数目[%d].",
-                            readerTasksConfigs.size(), writerTasksConfigs.size())
-            );
+            throw AddaxException.asAddaxException(FrameworkErrorCode.PLUGIN_SPLIT_ERROR, String.format("reader切分的task数目[%d]不等于writer切分的task数目[%d].", readerTasksConfigs.size(), writerTasksConfigs.size()));
         }
 
         List<Configuration> contentConfigs = new ArrayList<>();
@@ -753,112 +750,41 @@ public class JobContainer
         errorLimit.checkPercentageLimit(communication);
     }
 
+    // post job run statistic to server if present
+    private void postJobRunStatistic(String url, int timeoutMills, String jsonStr)
+    {
+        LOG.info("upload job run statistic to [{}]", url);
+
+        RequestConfig requestConfig = RequestConfig.custom().setConnectTimeout(timeoutMills)
+                .setSocketTimeout(timeoutMills)
+                .setConnectionRequestTimeout(timeoutMills)
+                .build();
+
+        CloseableHttpClient httpClient = HttpClients.custom().setDefaultRequestConfig(requestConfig).build();
+
+        HttpPost post;
+        StringEntity entity;
+        post = new HttpPost(url);
+        entity = new StringEntity(jsonStr, ContentType.APPLICATION_JSON);
+        post.setEntity(entity);
+        try {
+            HttpResponse response = httpClient.execute(post);
+            if (response.getStatusLine().getStatusCode() == 200) {
+                LOG.info("uploading jobResult success");
+            }
+            else {
+                LOG.warn("uploading jobResult failed: {}", response.getEntity().toString());
+            }
+        }
+        catch (IOException e) {
+            LOG.warn("uploading jobResult failed with exception: {}", e.getMessage());
+        }
+    }
     /**
      * 调用外部hook
      */
     private void invokeHooks()
     {
-
-        String jobKey = "jobName";
-        LOG.debug("invokeHooks begin");
-
-        String jobResultReportUrl = userConf.getString(CoreConstant.CORE_SERVER_ADDRESS);
-        int requestTimeoutSecs = userConf.getInt(CoreConstant.CORE_SERVER_TIMEOUT_SEC, 2);
-
-        if (StringUtils.isBlank(jobResultReportUrl)) {
-            LOG.debug("report url not found");
-            return;
-        }
-
-        // 获得任务名称，两种方式获取，一种是命令行通过 -DjobName 传递；第二种是分析writer插件的写入路径，提取第2，3个目录拼接
-        String jobContentWriterPath = userConf.getString(CoreConstant.JOB_CONTENT_WRITER_PATH);
-        StringBuilder jobName = new StringBuilder();
-        if (System.getProperty(jobKey) != null) {
-            jobName.append(System.getProperty(jobKey));
-        }
-        else if (StringUtils.isNotBlank(jobContentWriterPath)) {
-            String[] pathArr = jobContentWriterPath.split("/");
-
-            if (pathArr.length >= 4) {
-                jobName.append(pathArr[2]).append(".").append(pathArr[3]);
-            }
-        }
-        else {
-            jobName.append(jobKey);
-        }
-        LOG.debug("jobName: {}", jobName);
-
-        if (0L == this.endTimeStamp) {
-            this.endTimeStamp = System.currentTimeMillis();
-        }
-
-        long totalCosts = (this.endTimeStamp - this.startTimeStamp) / 1000;
-        long transferCosts = (this.endTransferTimeStamp - this.startTransferTimeStamp) / 1000;
-
-        Communication communication = super.getContainerCommunicator().collect();
-
-        // 字节速率
-        long byteSpeedPerSecond = communication.getLongCounter(CommunicationTool.READ_SUCCEED_BYTES) / transferCosts;
-        long recordSpeedPerSecond = communication.getLongCounter(CommunicationTool.READ_SUCCEED_RECORDS) / transferCosts;
-
-        Map<String, Object> resultLog = new HashMap<>();
-
-        resultLog.put("startTimeStamp", startTimeStamp / 1000);
-        resultLog.put("endTimeStamp", endTimeStamp / 1000);
-        resultLog.put("totalCosts", totalCosts);
-        resultLog.put("byteSpeedPerSecond", byteSpeedPerSecond);
-        resultLog.put("recordSpeedPerSecond", recordSpeedPerSecond);
-        resultLog.put("totalReadRecords", CommunicationTool.getTotalReadRecords(communication));
-        resultLog.put("totalErrorRecords", CommunicationTool.getTotalErrorRecords(communication));
-        resultLog.put("jobName", jobName);
-        resultLog.put("jobContent", userConf.getString("jobContent.internal.job"));
-
-        String jsonStr = JSON.toJSONString(resultLog);
-
-        CloseableHttpAsyncClient httpClient = JobReport.getHttpClient(requestTimeoutSecs * 1000);
-
-        LOG.debug("jobResultReportUrl: {}", jobResultReportUrl);
-        LOG.debug("report contents: {}", jsonStr);
-        HttpPost postBody = JobReport.getPostBody(jobResultReportUrl, jsonStr, ContentType.APPLICATION_JSON);
-
-        //回调
-        FutureCallback<HttpResponse> callback = new FutureCallback<HttpResponse>()
-        {
-
-            public void completed(HttpResponse result)
-            {
-                LOG.debug("send jobResult completed, result: {}", result.getStatusLine());
-                String content;
-                try {
-                    content = EntityUtils.toString(result.getEntity(), "UTF-8");
-                    LOG.debug("report contents: {}", content);
-                }
-                catch (IOException e) {
-                    e.printStackTrace();
-                }
-            }
-
-            public void failed(Exception e)
-            {
-                e.printStackTrace();
-                LOG.warn("send jobResult failed");
-            }
-
-            public void cancelled()
-            {
-                LOG.warn("send jobResult cancelled");
-            }
-        };
-        //连接池执行
-        Future<HttpResponse> responseFuture = httpClient.execute(postBody, callback);
-
-        try {
-            responseFuture.get();
-        }
-        catch (InterruptedException | ExecutionException e) {
-            e.printStackTrace();
-            Thread.currentThread().interrupt();
-        }
-        LOG.debug("invokeHooks end");
+        //
     }
 }
