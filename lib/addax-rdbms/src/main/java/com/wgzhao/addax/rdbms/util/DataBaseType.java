@@ -24,6 +24,7 @@ package com.wgzhao.addax.rdbms.util;
 import java.util.TimeZone;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import static com.wgzhao.addax.common.base.Constant.SQL_RESERVED_WORDS;
 
 /**
  * refer:http://blog.csdn.net/ring0hx/article/details/6152528
@@ -132,20 +133,20 @@ public enum DataBaseType
     //TODO: only quote column whose name is reserved
     public String quoteColumnName(String columnName)
     {
+        // if the column is not reserved words , it's constant value
+        if (! SQL_RESERVED_WORDS.contains(columnName.toUpperCase())) {
+            return columnName;
+        }
+        if (this == MySql || this == Hive) {
+            return "`" + columnName.replace("`", "``") + "`";
+        }
+        if (this == Presto || this == Trino || this == Oracle) {
+            return columnName.startsWith("\"") ? columnName: "\"" + columnName + "\"";
+        }
+        if (this == SQLServer) {
+            return columnName.startsWith("[") ? columnName: "[" + columnName + "]";
+        }
         return columnName;
-//        if (columnName.startsWith("'")) {
-//            return columnName;
-//        }
-//        if (this == MySql || this == Hive) {
-//            return "`" + columnName.replace("`", "``") + "`";
-//        }
-//        if (this == Presto || this == Trino || this == Oracle) {
-//            return columnName.startsWith("\"") ? columnName: "\"" + columnName + "\"";
-//        }
-//        if (this == SQLServer) {
-//            return columnName.startsWith("[") ? columnName: "[" + columnName + "]";
-//        }
-//        return columnName;
     }
 
     public String quoteTableName(String tableName)
