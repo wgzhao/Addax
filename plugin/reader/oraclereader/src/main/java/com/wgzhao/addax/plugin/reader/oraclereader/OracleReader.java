@@ -19,7 +19,11 @@
 
 package com.wgzhao.addax.plugin.reader.oraclereader;
 
+import com.alibaba.fastjson2.JSONArray;
+import com.alibaba.fastjson2.JSONObject;
 import com.wgzhao.addax.common.base.Key;
+import com.wgzhao.addax.common.element.Column;
+import com.wgzhao.addax.common.element.StringColumn;
 import com.wgzhao.addax.common.exception.AddaxException;
 import com.wgzhao.addax.common.plugin.RecordSender;
 import com.wgzhao.addax.common.spi.Reader;
@@ -28,8 +32,14 @@ import com.wgzhao.addax.rdbms.reader.CommonRdbmsReader;
 import com.wgzhao.addax.rdbms.reader.util.HintUtil;
 import com.wgzhao.addax.rdbms.util.DBUtilErrorCode;
 import com.wgzhao.addax.rdbms.util.DataBaseType;
+import oracle.spatial.geometry.JGeometry;
 import org.apache.commons.lang3.StringUtils;
 
+import java.io.UnsupportedEncodingException;
+import java.sql.ResultSet;
+import java.sql.ResultSetMetaData;
+import java.sql.SQLException;
+import java.sql.Types;
 import java.util.List;
 
 import static com.wgzhao.addax.common.base.Constant.DEFAULT_FETCH_SIZE;
@@ -55,8 +65,7 @@ public class OracleReader
 
             dealFetchSize(this.originalConfig);
 
-            this.commonRdbmsReaderJob = new CommonRdbmsReader.Job(
-                    DATABASE_TYPE);
+            this.commonRdbmsReaderJob = new CommonRdbmsReader.Job(DATABASE_TYPE);
             this.originalConfig = this.commonRdbmsReaderJob.init(this.originalConfig);
 
             // 注意：要在 this.commonRdbmsReaderJob.init(this.originalConfig); 之后执行，这样可以直接快速判断是否是querySql 模式
@@ -72,8 +81,7 @@ public class OracleReader
         @Override
         public List<Configuration> split(int adviceNumber)
         {
-            return this.commonRdbmsReaderJob.split(this.originalConfig,
-                    adviceNumber);
+            return this.commonRdbmsReaderJob.split(this.originalConfig, adviceNumber);
         }
 
         @Override
@@ -92,10 +100,7 @@ public class OracleReader
         {
             int fetchSize = originalConfig.getInt(FETCH_SIZE, DEFAULT_FETCH_SIZE);
             if (fetchSize < 1) {
-                throw AddaxException
-                        .asAddaxException(DBUtilErrorCode.REQUIRED_VALUE,
-                                String.format("您配置的 fetchSize 有误，fetchSize:[%d] 值不能小于 1.",
-                                        fetchSize));
+                throw AddaxException.asAddaxException(DBUtilErrorCode.REQUIRED_VALUE, String.format("您配置的 fetchSize 有误，fetchSize:[%d] 值不能小于 1.", fetchSize));
             }
             originalConfig.set(FETCH_SIZE, fetchSize);
         }
@@ -124,8 +129,27 @@ public class OracleReader
         public void init()
         {
             this.readerSliceConfig = getPluginJobConf();
-            this.commonRdbmsReaderTask = new CommonRdbmsReader.Task(
-                    DATABASE_TYPE, getTaskGroupId(), getTaskId());
+            this.commonRdbmsReaderTask = new CommonRdbmsReader.Task(DATABASE_TYPE, getTaskGroupId(), getTaskId())
+            {
+                @Override
+                protected Column createColumn(ResultSet rs, ResultSetMetaData metaData, int i)
+                        throws SQLException, UnsupportedEncodingException
+                {
+                    int dataType = metaData.getColumnType(i);
+                    if (dataType == Types.STRUCT) {
+                        try {
+                            JGeometry geom = JGeometry.load(rs.getBytes(i));
+                            return new StringColumn(convertGeometryToJson(geom));
+                        }
+                        catch (Exception e) {
+                            throw new RuntimeException(e);
+                        }
+                    }
+                    else {
+                        return super.createColumn(rs, metaData, i);
+                    }
+                }
+            };
             this.commonRdbmsReaderTask.init(this.readerSliceConfig);
         }
 
@@ -134,8 +158,7 @@ public class OracleReader
         {
             int fetchSize = this.readerSliceConfig.getInt(FETCH_SIZE);
 
-            this.commonRdbmsReaderTask.startRead(this.readerSliceConfig,
-                    recordSender, getTaskPluginCollector(), fetchSize);
+            this.commonRdbmsReaderTask.startRead(this.readerSliceConfig, recordSender, getTaskPluginCollector(), fetchSize);
         }
 
         @Override
@@ -148,6 +171,30 @@ public class OracleReader
         public void destroy()
         {
             this.commonRdbmsReaderTask.destroy(this.readerSliceConfig);
+        }
+
+        private String convertGeometryToJson(JGeometry geometry)
+        {
+            // Get the type of the geometry object
+            JSONArray result = new JSONArray();
+            JGeometry[] geoElems = geometry.getElements();
+            for (JGeometry geoElem : geoElems) {
+                JSONObject json = new JSONObject();
+                JGeometry geom = geoElem;
+                json.put("sdo_gtype", geom.getType() + 2000);
+                json.put("sdo_srid", geom.getSRID());
+                double[] points = geom.getLabelPointXYZ();
+                JSONObject pointJson = new JSONObject();
+                pointJson.put("x", points[0]);
+                pointJson.put("y", points[1]);
+                pointJson.put("z", points[2]);
+                json.put("sdo_point", pointJson);
+                json.put("sdo_elem_info", geom.getElemInfo());
+                json.put("sdo_ordinates", geom.getOrdinatesArray());
+                result.add(json);
+            }
+            // Return the JSON string
+            return result.toString();
         }
     }
 }

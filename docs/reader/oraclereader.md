@@ -47,13 +47,31 @@ OracleReader 插件用于从Oracle读取数据
 
 注意 `&quot;`是 `"` 的转义字符串
 
+## 对 GEOMETRY 类型的支持
+
+从 Addax `4.0.13` 开始，实验性的支持 Oracle GEOMETRY 类型，该插件会把该类型的数据转为 JSON 数组字符串。
+
+假定你有这样的的表和数据
+
+```sql
+--8<-- "assets/sql/oracle_geom.sql
+```
+
+读取表该的数据的最后输出结果类似如下：
+
+```
+--8<-- "assets/output/oracle_geom_reader.txt
+```
+
+注意：该数据类型目前还处于实验支持阶段，作者对次数据类型的理解并不深刻，也未经过全面的测试，请勿直接在生产环境使用。
+
 ## 类型转换
 
-| Addax 内部类型 | Oracle 数据类型                                                                                |
-| -------------- | ---------------------------------------------------------------------------------------------- |
+| Addax 内部类型 | Oracle 数据类型                                                                                    |
+| -------------- |------------------------------------------------------------------------------------------------|
 | Long           | NUMBER, INTEGER, INT, SMALLINT                                                                 |
 | Double         | NUMERIC, DECIMAL, FLOAT, DOUBLE PRECISION, REAL                                                |
-| String         | LONG ,CHAR, NCHAR, VARCHAR, VARCHAR2, NVARCHAR2, CLOB, NCLOB, CHARACTER                        |
+| String         | LONG ,CHAR, NCHAR, VARCHAR, VARCHAR2, NVARCHAR2, CLOB, NCLOB, CHARACTER, STRUCT                |
 | String         | CHARACTER VARYING, CHAR VARYING, NATIONAL CHARACTER, NATIONAL CHAR, NATIONAL CHARACTER VARYING |
 | String         | NATIONAL CHAR VARYING, NCHAR VARYING                                                           |
 | Date           | TIMESTAMP, DATE                                                                                |
