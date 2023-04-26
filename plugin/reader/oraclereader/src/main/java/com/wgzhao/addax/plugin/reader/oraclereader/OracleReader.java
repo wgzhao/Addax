@@ -180,17 +180,16 @@ public class OracleReader
             JGeometry[] geoElems = geometry.getElements();
             for (JGeometry geoElem : geoElems) {
                 JSONObject json = new JSONObject();
-                JGeometry geom = geoElem;
-                json.put("sdo_gtype", geom.getType() + 2000);
-                json.put("sdo_srid", geom.getSRID());
-                double[] points = geom.getLabelPointXYZ();
+                json.put("sdo_gtype", geoElem.getType() + 2000);
+                json.put("sdo_srid", geoElem.getSRID());
+                double[] points = geoElem.getLabelPointXYZ();
                 JSONObject pointJson = new JSONObject();
                 pointJson.put("x", points[0]);
                 pointJson.put("y", points[1]);
                 pointJson.put("z", points[2]);
                 json.put("sdo_point", pointJson);
-                json.put("sdo_elem_info", geom.getElemInfo());
-                json.put("sdo_ordinates", geom.getOrdinatesArray());
+                json.put("sdo_elem_info", geoElem.getElemInfo());
+                json.put("sdo_ordinates", geoElem.getOrdinatesArray());
                 result.add(json);
             }
             // Return the JSON string
