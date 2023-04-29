@@ -65,12 +65,10 @@ public abstract class Channel
             throw new IllegalArgumentException(String.format("通道容量[%d]必须大于0.", capacity));
         }
 
-        synchronized (isFirstPrint) {
-            if (isFirstPrint) {
-                LOG.info("Channel set byte_speed_limit to " + byteSpeed + (byteSpeed <= 0 ? ", No bps activated." : "."));
-                LOG.info("Channel set record_speed_limit to " + recordSpeed + (recordSpeed <= 0 ? ", No tps activated." : "."));
-                isFirstPrint = false;
-            }
+        if (isFirstPrint) {
+            LOG.info("Channel set byte_speed_limit to " + byteSpeed + (byteSpeed <= 0 ? ", No bps activated." : "."));
+            LOG.info("Channel set record_speed_limit to " + recordSpeed + (recordSpeed <= 0 ? ", No tps activated." : "."));
+            isFirstPrint = false;
         }
 
         this.taskGroupId = configuration.getInt(CoreConstant.CORE_CONTAINER_TASK_GROUP_ID);
