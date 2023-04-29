@@ -42,11 +42,11 @@
         <commons.logging.version>1.2</commons.logging.version>
         <commons.net.version>3.9.0</commons.net.version>
         <diamond.version>3.7.3</diamond.version>
-        <druid.version>1.2.6</druid.version>
+        <druid.version>1.2.17</druid.version>
         <fastjson2.version>2.0.26</fastjson2.version>
         <findbugs.version>3.0.1</findbugs.version>
         <guava.version>29.0-jre</guava.version>
-        <groovy.version>3.0.16</groovy.version>
+        <groovy.version>3.0.17</groovy.version>
         <fluent.hc.version>4.5.14</fluent.hc.version>
         <hadoop.common.version>3.2.2</hadoop.common.version>
         <hbase1.version>1.4.13</hbase1.version>
@@ -62,7 +62,7 @@
         <javadbf.version>1.14.0</javadbf.version>
         <jest.version>6.3.1</jest.version>
         <junit.version>5.9.2</junit.version>
-        <joda.time.version>2.12.2</joda.time.version>
+        <joda.time.version>2.12.5</joda.time.version>
         <jackson.version>2.9.9</jackson.version>
         <jedis.version>3.7.0</jedis.version>
         <jsch.version>0.1.55</jsch.version>
