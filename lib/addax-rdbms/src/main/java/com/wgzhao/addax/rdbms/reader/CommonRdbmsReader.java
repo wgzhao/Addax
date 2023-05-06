@@ -207,11 +207,8 @@ public class CommonRdbmsReader
                 TaskPluginCollector taskPluginCollector, int fetchSize)
         {
             String querySql = readerSliceConfig.getString(Key.QUERY_SQL);
-            String table = readerSliceConfig.getString(Key.TABLE);
 
-            PerfTrace.getInstance().addTaskDetails(taskId, table + "," + basicMsg);
-
-            LOG.info("Begin to read record by Sql: [{}\n] {}.", querySql, basicMsg);
+            LOG.info("Begin to read record by Sql: [{}].", querySql);
             PerfRecord queryPerfRecord = new PerfRecord(taskGroupId, taskId, PerfRecord.PHASE.SQL_QUERY);
             queryPerfRecord.start();
 
@@ -243,7 +240,7 @@ public class CommonRdbmsReader
 
                 allResultPerfRecord.end(rsNextUsedTime);
                 // 目前大盘是依赖这个打印，而之前这个Finish read record是包含了sql查询和result next的全部时间
-                LOG.info("Finished read record by Sql: [{}\n] {}.", querySql, basicMsg);
+                LOG.info("Finished read record by Sql: [{}].", querySql);
             }
             catch (Exception e) {
                 throw RdbmsException.asQueryException(e, querySql);

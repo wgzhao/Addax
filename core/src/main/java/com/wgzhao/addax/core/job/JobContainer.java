@@ -190,8 +190,6 @@ public class JobContainer
                         vmInfo.getDelta(false);
                         LOG.debug(vmInfo.totalString());
                     }
-
-                    LOG.info(PerfTrace.getInstance().summarizeNoException());
                     this.logStatistics();
                 }
             }

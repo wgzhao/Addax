@@ -34,18 +34,14 @@ import java.util.Objects;
 public class PerfRecord
         implements Comparable<PerfRecord>
 {
-    private static final Logger perf = LoggerFactory.getLogger(PerfRecord.class);
     private static final String DATETIME_FORMAT = "yyyy-MM-dd HH:mm:ss";
     private final int taskGroupId;
     private final int taskId;
     private final PHASE phase;
-    private volatile ACTION action;
     private volatile Date startTime; //NOSONAR
-    private volatile long elapsedTimeInNs = -1;
+    private final long elapsedTimeInNs = -1;
     private volatile long count = 0;
     private volatile long size = 0;
-    private volatile long startTimeInNs;
-    private volatile boolean isReport = false;
 
     public PerfRecord(int taskGroupId, int taskId, PHASE phase)
     {
@@ -54,29 +50,8 @@ public class PerfRecord
         this.phase = phase;
     }
 
-    public static void addPerfRecord(int taskGroupId, int taskId, PHASE phase, long startTime, long elapsedTimeInNs)
-    {
-        if (PerfTrace.getInstance().isEnable()) {
-            PerfRecord perfRecord = new PerfRecord(taskGroupId, taskId, phase);
-            perfRecord.elapsedTimeInNs = elapsedTimeInNs;
-            perfRecord.action = ACTION.END;
-            perfRecord.startTime = new Date(startTime);
-            //在PerfTrace里注册
-            PerfTrace.getInstance().tracePerfRecord(perfRecord);
-            perf.info(perfRecord.toString());
-        }
-    }
-
     public void start()
     {
-        if (PerfTrace.getInstance().isEnable()) {
-            this.startTime = new Date();
-            this.startTimeInNs = System.nanoTime();
-            this.action = ACTION.START;
-            //在PerfTrace里注册
-            PerfTrace.getInstance().tracePerfRecord(this);
-            perf.info(toString());
-        }
     }
 
     public void addCount(long count)
@@ -91,29 +66,17 @@ public class PerfRecord
 
     public void end()
     {
-        if (PerfTrace.getInstance().isEnable()) {
-            this.elapsedTimeInNs = System.nanoTime() - startTimeInNs;
-            this.action = ACTION.END;
-            PerfTrace.getInstance().tracePerfRecord(this);
-            perf.info(toString());
-        }
     }
 
     public void end(long elapsedTimeInNs)
     {
-        if (PerfTrace.getInstance().isEnable()) {
-            this.elapsedTimeInNs = elapsedTimeInNs;
-            this.action = ACTION.END;
-            PerfTrace.getInstance().tracePerfRecord(this);
-            perf.info(toString());
-        }
     }
 
     @Override
     public String toString()
     {
-        return String.format("%s,%s,%s,%s,%s,%s,%s,%s,%s,%s"
-                , getInstId(), taskGroupId, taskId, phase, action,
+        return String.format("%s,%s,%s,%s,%s,%s,%s,%s,%s"
+                , getInstId(), taskGroupId, taskId, phase,
                 DateFormatUtils.format(startTime, DATETIME_FORMAT), elapsedTimeInNs, count, size, getHostIP());
     }
 
@@ -180,16 +143,6 @@ public class PerfRecord
         return phase;
     }
 
-    public ACTION getAction()
-    {
-        return action;
-    }
-
-    public long getElapsedTimeInNs()
-    {
-        return elapsedTimeInNs;
-    }
-
     public long getCount()
     {
         return count;
@@ -202,7 +155,7 @@ public class PerfRecord
 
     public long getInstId()
     {
-        return PerfTrace.getInstance().getInstId();
+        return 0;
     }
 
     public String getHostIP()
@@ -210,43 +163,6 @@ public class PerfRecord
         return HostUtils.IP;
     }
 
-    public String getHostName()
-    {
-        return HostUtils.HOSTNAME;
-    }
-
-    public Date getStartTime()
-    {
-        return startTime;
-    }
-
-    public long getStartTimeInMs()
-    {
-        return startTime.getTime();
-    }
-
-    public long getStartTimeInNs()
-    {
-        return startTimeInNs;
-    }
-
-    public String getDatetime()
-    {
-        if (startTime == null) {
-            return "null time";
-        }
-        return DateFormatUtils.format(startTime, DATETIME_FORMAT);
-    }
-
-    public boolean isReport()
-    {
-        return isReport;
-    }
-
-    public void setIsReport(boolean isReport)
-    {
-        this.isReport = isReport;
-    }
 
     public enum PHASE
     {
@@ -298,11 +214,5 @@ public class PerfRecord
         {
             return val;
         }
-    }
-
-    public enum ACTION
-    {
-        START,
-        END
     }
 }

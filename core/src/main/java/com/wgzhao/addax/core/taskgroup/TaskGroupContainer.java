@@ -194,9 +194,6 @@ public class TaskGroupContainer
                             long usedTime = System.currentTimeMillis() - taskStartTime;
                             LOG.debug("taskGroup[{}] taskId[{}] is successful, used[{}]ms",
                                     this.taskGroupId, taskId, usedTime);
-                            //usedTime*1000*1000 转换成PerfRecord记录的ns，这里主要是简单登记，进行最长任务的打印。因此增加特定静态方法
-                            PerfRecord.addPerfRecord(taskGroupId, taskId, PerfRecord.PHASE.TASK_TOTAL, taskStartTime,
-                                    usedTime * 1000L * 1000L);
                             taskStartTimeMap.remove(taskId);
                             taskConfigMap.remove(taskId);
                         }
@@ -295,19 +292,6 @@ public class TaskGroupContainer
 
             throw AddaxException.asAddaxException(
                     FrameworkErrorCode.RUNTIME_ERROR, e);
-        }
-        finally {
-            if (!PerfTrace.getInstance().isJob()) {
-                //最后打印cpu的平均消耗，GC的统计
-                VMInfo vmInfo = VMInfo.getVmInfo();
-                if (vmInfo != null) {
-                    vmInfo.getDelta(false);
-                    LOG.debug(vmInfo.totalString());
-                }
-
-                LOG.debug(PerfTrace.getInstance().summarizeNoException());
-                this.removeTaskGroup();//移除指定JobId中的统计Map
-            }
         }
     }
 
