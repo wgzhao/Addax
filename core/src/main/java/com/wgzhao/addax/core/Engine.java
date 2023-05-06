@@ -62,6 +62,7 @@ public class Engine
         LoadUtil.bind(allConf);
 
         //JobContainer会在schedule后再行进行设置和调整值
+        int channelNumber = 0;
         AbstractContainer container;
         long instanceId;
         container = new JobContainer(allConf);
@@ -70,7 +71,7 @@ public class Engine
         Configuration jobInfoConfig = allConf.getConfiguration(CoreConstant.JOB_JOB_INFO);
         //初始化PerfTrace
         PerfTrace perfTrace = PerfTrace.getInstance(true, instanceId, -1, false);
-        perfTrace.setJobInfo(jobInfoConfig, false);
+        perfTrace.setJobInfo(jobInfoConfig, false, channelNumber);
         container.start();
     }
 
