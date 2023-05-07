@@ -28,7 +28,6 @@ public class ProcessInnerCollector
 
     public ProcessInnerCollector()
     {
-//        super.setJobId(jobId);
     }
 
     @Override
