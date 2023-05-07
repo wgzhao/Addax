@@ -42,8 +42,7 @@ public class StandAloneJobContainerCommunicator
     public StandAloneJobContainerCommunicator(Configuration configuration)
     {
         super(configuration);
-        setCollector(new ProcessInnerCollector(configuration.getLong(
-                CoreConstant.CORE_CONTAINER_JOB_ID)));
+        setCollector(new ProcessInnerCollector());
         setReporter(new ProcessInnerReporter());
     }
 

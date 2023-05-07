@@ -26,9 +26,9 @@ public class ProcessInnerCollector
         extends AbstractCollector
 {
 
-    public ProcessInnerCollector(Long jobId)
+    public ProcessInnerCollector()
     {
-        super.setJobId(jobId);
+//        super.setJobId(jobId);
     }
 
     @Override

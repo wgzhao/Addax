@@ -65,8 +65,8 @@ public class Engine
         AbstractContainer container;
         container = new JobContainer(allConf);
         //初始化PerfTrace
-        PerfTrace perfTrace = PerfTrace.getInstance();
-//        perfTrace.setJobInfo(channelNumber);
+//        PerfTrace perfTrace = PerfTrace.getInstance();
+//        perfTrace.setJobInfo(0);
         container.start();
     }
 
@@ -110,7 +110,7 @@ public class Engine
         Configuration configuration = ConfigParser.parse(jobPath);
 
         // job id 默认值为-1
-        configuration.set(CoreConstant.CORE_CONTAINER_JOB_ID, -1);
+//        configuration.set(CoreConstant.CORE_CONTAINER_JOB_ID, -1);
 
         //打印vmInfo
         VMInfo vmInfo = VMInfo.getVmInfo();

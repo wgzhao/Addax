@@ -21,8 +21,6 @@ package com.wgzhao.addax.common.statistics;
 
 import com.wgzhao.addax.common.util.HostUtils;
 import org.apache.commons.lang3.time.DateFormatUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.util.Date;
 import java.util.Objects;
@@ -92,8 +90,7 @@ public class PerfRecord
     @Override
     public int hashCode()
     {
-        long jobId = getInstId();
-        int result = (int) (jobId ^ (jobId >>> 32));
+        int result = 0;
         result = 31 * result + taskGroupId;
         result = 31 * result + taskId;
         result = 31 * result + phase.toInt();

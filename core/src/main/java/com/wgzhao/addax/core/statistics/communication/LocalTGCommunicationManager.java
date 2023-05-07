@@ -42,14 +42,15 @@ public final class LocalTGCommunicationManager
         communication.setState(State.SUCCEEDED);
 
         for (Communication taskGroupCommunication : taskGroupCommunicationMap.values()) {
-            if (taskGroupCommunication.getJobId() == null) {
-                communication.mergeFrom(taskGroupCommunication);
-            }
-            if (taskGroupCommunication.getJobId() == null || jobId.equals(taskGroupCommunication.getJobId()))
-            {
-                //如JOB在正式启动后过段时间才会设置JobId所以这里把getJobId为空的也合并进去
-                communication.mergeFrom(taskGroupCommunication);        //因为如果为空就说明里面啥都没有合并了也不会影响什么
-            }
+            communication.mergeFrom(taskGroupCommunication);
+//            if (taskGroupCommunication.getJobId() == null) {
+//                communication.mergeFrom(taskGroupCommunication);
+//            }
+//            if (taskGroupCommunication.getJobId() == null || jobId.equals(taskGroupCommunication.getJobId()))
+//            {
+//                //如JOB在正式启动后过段时间才会设置JobId所以这里把getJobId为空的也合并进去
+//                communication.mergeFrom(taskGroupCommunication);        //因为如果为空就说明里面啥都没有合并了也不会影响什么
+//            }
         }
 
         return communication;

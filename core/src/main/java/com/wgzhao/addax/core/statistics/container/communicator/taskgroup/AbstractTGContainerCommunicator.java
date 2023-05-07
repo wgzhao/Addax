@@ -51,8 +51,8 @@ public abstract class AbstractTGContainerCommunicator
     public AbstractTGContainerCommunicator(Configuration configuration)
     {
         super(configuration);
-        this.jobId = configuration.getInt(CoreConstant.CORE_CONTAINER_JOB_ID);
-        super.setCollector(new ProcessInnerCollector(this.jobId));
+//        this.jobId = configuration.getInt(CoreConstant.CORE_CONTAINER_JOB_ID);
+        super.setCollector(new ProcessInnerCollector());
         this.taskGroupId = configuration.getInt(CoreConstant.CORE_CONTAINER_TASK_GROUP_ID);
     }
 
