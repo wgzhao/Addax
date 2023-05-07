@@ -189,7 +189,6 @@ public class EsReader
         @Override
         public void startRead(RecordSender recordSender)
         {
-            PerfTrace.getInstance().addTaskDetails(getTaskId(), index);
             //search
             PerfRecord queryPerfRecord = new PerfRecord(getTaskGroupId(), getTaskId(), PerfRecord.PHASE.SQL_QUERY);
             queryPerfRecord.start();

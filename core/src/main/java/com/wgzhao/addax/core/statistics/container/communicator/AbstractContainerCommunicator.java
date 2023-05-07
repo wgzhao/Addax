@@ -25,7 +25,6 @@ import com.wgzhao.addax.core.meta.State;
 import com.wgzhao.addax.core.statistics.communication.Communication;
 import com.wgzhao.addax.core.statistics.container.collector.AbstractCollector;
 import com.wgzhao.addax.core.statistics.container.report.AbstractReporter;
-import com.wgzhao.addax.core.util.container.CoreConstant;
 
 import java.util.List;
 import java.util.Map;
@@ -33,7 +32,6 @@ import java.util.Map;
 public abstract class AbstractContainerCommunicator
 {
     private final Configuration configuration;
-    private final Long jobId;
     private final VMInfo vmInfo = VMInfo.getVmInfo();
     private AbstractCollector collector;
     private AbstractReporter reporter;
@@ -42,7 +40,6 @@ public abstract class AbstractContainerCommunicator
     public AbstractContainerCommunicator(Configuration configuration)
     {
         this.configuration = configuration;
-        this.jobId = configuration.getLong(CoreConstant.CORE_CONTAINER_JOB_ID);
     }
 
     public Configuration getConfiguration()
@@ -68,11 +65,6 @@ public abstract class AbstractContainerCommunicator
     public void setReporter(AbstractReporter reporter)
     {
         this.reporter = reporter;
-    }
-
-    public Long getJobId()
-    {
-        return jobId;
     }
 
     public abstract void registerCommunication(List<Configuration> configurationList);

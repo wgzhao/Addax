@@ -26,7 +26,6 @@ import com.wgzhao.addax.core.statistics.communication.CommunicationTool;
 import com.wgzhao.addax.core.statistics.container.collector.ProcessInnerCollector;
 import com.wgzhao.addax.core.statistics.container.communicator.AbstractContainerCommunicator;
 import com.wgzhao.addax.core.statistics.container.report.ProcessInnerReporter;
-import com.wgzhao.addax.core.util.container.CoreConstant;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -42,8 +41,7 @@ public class StandAloneJobContainerCommunicator
     public StandAloneJobContainerCommunicator(Configuration configuration)
     {
         super(configuration);
-        setCollector(new ProcessInnerCollector(configuration.getLong(
-                CoreConstant.CORE_CONTAINER_JOB_ID)));
+        setCollector(new ProcessInnerCollector());
         setReporter(new ProcessInnerReporter());
     }
 
@@ -71,7 +69,7 @@ public class StandAloneJobContainerCommunicator
     @Override
     public void report(Communication communication)
     {
-        getReporter().reportJobCommunication(getJobId(), communication);
+        getReporter().reportJobCommunication(communication);
 
         LOG.info(CommunicationTool.Stringify.getSnapshot(communication));
         reportVmInfo();

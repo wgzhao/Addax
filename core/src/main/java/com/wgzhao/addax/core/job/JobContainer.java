@@ -80,7 +80,6 @@ public class JobContainer
 
     private final ClassLoaderSwapper classLoaderSwapper = ClassLoaderSwapper.newCurrentThreadClassLoaderSwapper();
     private final ErrorRecordChecker errorLimit;
-    private long jobId;
     private String readerPluginName;
     private String writerPluginName;
     /**
@@ -110,7 +109,7 @@ public class JobContainer
     @Override
     public void start()
     {
-        LOG.info("Addax jobContainer starts job.");
+        LOG.info("jobContainer starts job.");
 
         boolean hasException = false;
         boolean isDryRun = false;
@@ -141,7 +140,7 @@ public class JobContainer
                 LOG.debug("jobContainer starts to do postHandle ...");
                 this.postHandle();
 
-                LOG.debug("Addax jobId [{}] completed successfully.", this.jobId);
+                LOG.debug("jobContainer completed successfully.");
                 // disable hook function
                 this.invokeHooks();
             }
@@ -190,8 +189,6 @@ public class JobContainer
                         vmInfo.getDelta(false);
                         LOG.debug(vmInfo.totalString());
                     }
-
-                    LOG.info(PerfTrace.getInstance().summarizeNoException());
                     this.logStatistics();
                 }
             }
@@ -213,17 +210,7 @@ public class JobContainer
 
     private void preCheckInit()
     {
-        this.jobId = this.configuration.getLong(
-                CoreConstant.CORE_CONTAINER_JOB_ID, -1);
-
-        if (this.jobId < 0) {
-            LOG.info("Set jobId = 0");
-            this.jobId = 0;
-            this.configuration.set(CoreConstant.CORE_CONTAINER_JOB_ID,
-                    this.jobId);
-        }
-
-        Thread.currentThread().setName("job-" + this.jobId);
+        Thread.currentThread().setName("job-0");
 
         JobPluginCollector jobPluginCollector = new DefaultJobPluginCollector(
                 this.getContainerCommunicator());
@@ -234,9 +221,9 @@ public class JobContainer
     private Reader.Job preCheckReaderInit(JobPluginCollector jobPluginCollector)
     {
         this.readerPluginName = this.configuration.getString(CoreConstant.JOB_CONTENT_READER_NAME);
-        classLoaderSwapper.setCurrentThreadClassLoader(LoadUtil.getJarLoader(PluginType.READER, this.readerPluginName, this.jobId));
+        classLoaderSwapper.setCurrentThreadClassLoader(LoadUtil.getJarLoader(PluginType.READER, this.readerPluginName));
 
-        Reader.Job jobReader = (Reader.Job) LoadUtil.loadJobPlugin(PluginType.READER, this.readerPluginName, this.jobId);
+        Reader.Job jobReader = (Reader.Job) LoadUtil.loadJobPlugin(PluginType.READER, this.readerPluginName);
 
         this.configuration.set(CoreConstant.JOB_CONTENT_READER_PARAMETER + ".dryRun", true);
 
@@ -244,7 +231,6 @@ public class JobContainer
         jobReader.setPluginJobConf(this.configuration.getConfiguration(CoreConstant.JOB_CONTENT_READER_PARAMETER));
         // 设置reader的readerConfig
         jobReader.setPeerPluginJobConf(this.configuration.getConfiguration(CoreConstant.JOB_CONTENT_READER_PARAMETER));
-        this.configuration.set(CoreConstant.JOB_CONTENT_WRITER_PARAMETER + ".jobid", this.jobId);
         jobReader.setJobPluginCollector(jobPluginCollector);
 
         classLoaderSwapper.restoreCurrentThreadClassLoader();
@@ -254,9 +240,9 @@ public class JobContainer
     private Writer.Job preCheckWriterInit(JobPluginCollector jobPluginCollector)
     {
         this.writerPluginName = this.configuration.getString(CoreConstant.JOB_CONTENT_WRITER_NAME);
-        classLoaderSwapper.setCurrentThreadClassLoader(LoadUtil.getJarLoader(PluginType.WRITER, this.writerPluginName, this.jobId));
+        classLoaderSwapper.setCurrentThreadClassLoader(LoadUtil.getJarLoader(PluginType.WRITER, this.writerPluginName));
 
-        Writer.Job jobWriter = (Writer.Job) LoadUtil.loadJobPlugin(PluginType.WRITER, this.writerPluginName, this.jobId);
+        Writer.Job jobWriter = (Writer.Job) LoadUtil.loadJobPlugin(PluginType.WRITER, this.writerPluginName);
 
         this.configuration.set(CoreConstant.JOB_CONTENT_WRITER_PARAMETER + ".dryRun", true);
 
@@ -275,7 +261,7 @@ public class JobContainer
 
     private void preCheckReader()
     {
-        classLoaderSwapper.setCurrentThreadClassLoader(LoadUtil.getJarLoader(PluginType.READER, this.readerPluginName, this.jobId));
+        classLoaderSwapper.setCurrentThreadClassLoader(LoadUtil.getJarLoader(PluginType.READER, this.readerPluginName));
         LOG.info("Addax Reader.Job [{}] do preCheck work .", this.readerPluginName);
         this.jobReader.preCheck();
         classLoaderSwapper.restoreCurrentThreadClassLoader();
@@ -283,7 +269,7 @@ public class JobContainer
 
     private void preCheckWriter()
     {
-        classLoaderSwapper.setCurrentThreadClassLoader(LoadUtil.getJarLoader(PluginType.WRITER, this.writerPluginName, this.jobId));
+        classLoaderSwapper.setCurrentThreadClassLoader(LoadUtil.getJarLoader(PluginType.WRITER, this.writerPluginName));
         LOG.info("Addax Writer.Job [{}] do preCheck work .", this.writerPluginName);
         this.jobWriter.preCheck();
         classLoaderSwapper.restoreCurrentThreadClassLoader();
@@ -294,16 +280,7 @@ public class JobContainer
      */
     private void init()
     {
-        this.jobId = this.configuration.getLong(CoreConstant.CORE_CONTAINER_JOB_ID, -1);
-
-        if (this.jobId < 0) {
-            LOG.info("Set jobId = 0");
-            this.jobId = 0;
-            this.configuration.set(CoreConstant.CORE_CONTAINER_JOB_ID,
-                    this.jobId);
-        }
-
-        Thread.currentThread().setName("job-" + this.jobId);
+        Thread.currentThread().setName("job-0");
 
         JobPluginCollector jobPluginCollector = new DefaultJobPluginCollector(this.getContainerCommunicator());
         //必须先Reader ，后Writer
@@ -337,9 +314,9 @@ public class JobContainer
         String handlerPluginName = this.configuration.getString(
                 CoreConstant.JOB_PRE_HANDLER_PLUGIN_NAME);
 
-        classLoaderSwapper.setCurrentThreadClassLoader(LoadUtil.getJarLoader(handlerPluginType, handlerPluginName, this.jobId));
+        classLoaderSwapper.setCurrentThreadClassLoader(LoadUtil.getJarLoader(handlerPluginType, handlerPluginName));
 
-        AbstractJobPlugin handler = LoadUtil.loadJobPlugin(handlerPluginType, handlerPluginName, this.jobId);
+        AbstractJobPlugin handler = LoadUtil.loadJobPlugin(handlerPluginType, handlerPluginName);
 
         JobPluginCollector jobPluginCollector = new DefaultJobPluginCollector(this.getContainerCommunicator());
         handler.setJobPluginCollector(jobPluginCollector);
@@ -369,9 +346,9 @@ public class JobContainer
 
         String handlerPluginName = this.configuration.getString(CoreConstant.JOB_POST_HANDLER_PLUGIN_NAME);
 
-        classLoaderSwapper.setCurrentThreadClassLoader(LoadUtil.getJarLoader(handlerPluginType, handlerPluginName, this.jobId));
+        classLoaderSwapper.setCurrentThreadClassLoader(LoadUtil.getJarLoader(handlerPluginType, handlerPluginName));
 
-        AbstractJobPlugin handler = LoadUtil.loadJobPlugin(handlerPluginType, handlerPluginName, this.jobId);
+        AbstractJobPlugin handler = LoadUtil.loadJobPlugin(handlerPluginType, handlerPluginName);
 
         JobPluginCollector jobPluginCollector = new DefaultJobPluginCollector(this.getContainerCommunicator());
         handler.setJobPluginCollector(jobPluginCollector);
@@ -609,10 +586,10 @@ public class JobContainer
             JobPluginCollector jobPluginCollector)
     {
         this.readerPluginName = this.configuration.getString(CoreConstant.JOB_CONTENT_READER_NAME);
-        classLoaderSwapper.setCurrentThreadClassLoader(LoadUtil.getJarLoader(PluginType.READER, this.readerPluginName, this.jobId));
+        classLoaderSwapper.setCurrentThreadClassLoader(LoadUtil.getJarLoader(PluginType.READER, this.readerPluginName));
 
-        Reader.Job jobReader = (Reader.Job) LoadUtil.loadJobPlugin(PluginType.READER, this.readerPluginName, this.jobId);
-        this.configuration.set(CoreConstant.JOB_CONTENT_READER_PARAMETER_JOB_ID, this.jobId);
+        Reader.Job jobReader = (Reader.Job) LoadUtil.loadJobPlugin(PluginType.READER, this.readerPluginName);
+//        this.configuration.set(CoreConstant.JOB_CONTENT_READER_PARAMETER_JOB_ID);
         // 设置reader的jobConfig
         jobReader.setPluginJobConf(this.configuration.getConfiguration(CoreConstant.JOB_CONTENT_READER_PARAMETER));
 
@@ -632,10 +609,10 @@ public class JobContainer
     private Writer.Job initJobWriter(JobPluginCollector jobPluginCollector)
     {
         this.writerPluginName = this.configuration.getString(CoreConstant.JOB_CONTENT_WRITER_NAME);
-        classLoaderSwapper.setCurrentThreadClassLoader(LoadUtil.getJarLoader(PluginType.WRITER, this.writerPluginName, this.jobId));
+        classLoaderSwapper.setCurrentThreadClassLoader(LoadUtil.getJarLoader(PluginType.WRITER, this.writerPluginName));
 
-        Writer.Job jobWriter = (Writer.Job) LoadUtil.loadJobPlugin(PluginType.WRITER, this.writerPluginName, this.jobId);
-        this.configuration.set(CoreConstant.JOB_CONTENT_WRITER_PARAMETER_JOB_ID, this.jobId);
+        Writer.Job jobWriter = (Writer.Job) LoadUtil.loadJobPlugin(PluginType.WRITER, this.writerPluginName);
+//        this.configuration.set(CoreConstant.JOB_CONTENT_WRITER_PARAMETER_JOB_ID);
         // 设置writer的jobConfig
         jobWriter.setPluginJobConf(this.configuration.getConfiguration(CoreConstant.JOB_CONTENT_WRITER_PARAMETER));
 
@@ -652,7 +629,7 @@ public class JobContainer
 
     private void prepareJobReader()
     {
-        classLoaderSwapper.setCurrentThreadClassLoader(LoadUtil.getJarLoader(PluginType.READER, this.readerPluginName, this.jobId));
+        classLoaderSwapper.setCurrentThreadClassLoader(LoadUtil.getJarLoader(PluginType.READER, this.readerPluginName));
         LOG.info("Addax Reader.Job [{}] do prepare work .", this.readerPluginName);
         this.jobReader.prepare();
         classLoaderSwapper.restoreCurrentThreadClassLoader();
@@ -660,7 +637,7 @@ public class JobContainer
 
     private void prepareJobWriter()
     {
-        classLoaderSwapper.setCurrentThreadClassLoader(LoadUtil.getJarLoader(PluginType.WRITER, this.writerPluginName, this.jobId));
+        classLoaderSwapper.setCurrentThreadClassLoader(LoadUtil.getJarLoader(PluginType.WRITER, this.writerPluginName));
         LOG.info("Addax Writer.Job [{}] do prepare work .", this.writerPluginName);
         this.jobWriter.prepare();
         classLoaderSwapper.restoreCurrentThreadClassLoader();
@@ -668,7 +645,7 @@ public class JobContainer
 
     private List<Configuration> doReaderSplit(int adviceNumber)
     {
-        classLoaderSwapper.setCurrentThreadClassLoader(LoadUtil.getJarLoader(PluginType.READER, this.readerPluginName, this.jobId));
+        classLoaderSwapper.setCurrentThreadClassLoader(LoadUtil.getJarLoader(PluginType.READER, this.readerPluginName));
         List<Configuration> readerSlicesConfigs = this.jobReader.split(adviceNumber);
         if (readerSlicesConfigs == null || readerSlicesConfigs.isEmpty()) {
             throw AddaxException.asAddaxException(FrameworkErrorCode.PLUGIN_SPLIT_ERROR, "reader切分的task数目不能小于等于0");
@@ -680,7 +657,7 @@ public class JobContainer
 
     private List<Configuration> doWriterSplit(int readerTaskNumber)
     {
-        classLoaderSwapper.setCurrentThreadClassLoader(LoadUtil.getJarLoader(PluginType.WRITER, this.writerPluginName, this.jobId));
+        classLoaderSwapper.setCurrentThreadClassLoader(LoadUtil.getJarLoader(PluginType.WRITER, this.writerPluginName));
 
         List<Configuration> writerSlicesConfigs = this.jobWriter.split(readerTaskNumber);
         if (writerSlicesConfigs == null || writerSlicesConfigs.isEmpty()) {
@@ -729,7 +706,7 @@ public class JobContainer
 
     private void postJobReader()
     {
-        classLoaderSwapper.setCurrentThreadClassLoader(LoadUtil.getJarLoader(PluginType.READER, this.readerPluginName, this.jobId));
+        classLoaderSwapper.setCurrentThreadClassLoader(LoadUtil.getJarLoader(PluginType.READER, this.readerPluginName));
         LOG.info("Addax Reader.Job [{}] do post work.", this.readerPluginName);
         this.jobReader.post();
         classLoaderSwapper.restoreCurrentThreadClassLoader();
@@ -737,7 +714,7 @@ public class JobContainer
 
     private void postJobWriter()
     {
-        classLoaderSwapper.setCurrentThreadClassLoader(LoadUtil.getJarLoader(PluginType.WRITER, this.writerPluginName, this.jobId));
+        classLoaderSwapper.setCurrentThreadClassLoader(LoadUtil.getJarLoader(PluginType.WRITER, this.writerPluginName));
         LOG.info("Addax Writer.Job [{}] do post work.", this.writerPluginName);
         this.jobWriter.post();
         classLoaderSwapper.restoreCurrentThreadClassLoader();
