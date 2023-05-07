@@ -32,21 +32,9 @@ import java.util.concurrent.ConcurrentHashMap;
 public abstract class AbstractCollector
 {
     private final Map<Integer, Communication> taskCommunicationMap = new ConcurrentHashMap<>();
-    private Long jobId;
-
     public Map<Integer, Communication> getTaskCommunicationMap()
     {
         return taskCommunicationMap;
-    }
-
-    public Long getJobId()
-    {
-        return jobId;
-    }
-
-    public void setJobId(Long jobId)
-    {
-        this.jobId = jobId;
     }
 
     public void registerTGCommunication(List<Configuration> taskGroupConfigurationList)

@@ -37,9 +37,6 @@ import java.util.Map;
 public abstract class AbstractTGContainerCommunicator
         extends AbstractContainerCommunicator
 {
-
-    protected long jobId;
-
     /**
      * 由于taskGroupContainer是进程内部调度
      * 其registerCommunication()，getCommunication()，

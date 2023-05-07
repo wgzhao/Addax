@@ -22,14 +22,12 @@ package com.wgzhao.addax.core;
 import com.wgzhao.addax.common.element.ColumnCast;
 import com.wgzhao.addax.common.exception.AddaxException;
 import com.wgzhao.addax.common.spi.ErrorCode;
-import com.wgzhao.addax.common.statistics.PerfTrace;
 import com.wgzhao.addax.common.statistics.VMInfo;
 import com.wgzhao.addax.common.util.Configuration;
 import com.wgzhao.addax.core.job.JobContainer;
 import com.wgzhao.addax.core.util.ConfigParser;
 import com.wgzhao.addax.core.util.ConfigurationValidate;
 import com.wgzhao.addax.core.util.FrameworkErrorCode;
-import com.wgzhao.addax.core.util.container.CoreConstant;
 import com.wgzhao.addax.core.util.container.LoadUtil;
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.DefaultParser;
@@ -64,9 +62,7 @@ public class Engine
         //JobContainer会在schedule后再行进行设置和调整值
         AbstractContainer container;
         container = new JobContainer(allConf);
-        //初始化PerfTrace
-//        PerfTrace perfTrace = PerfTrace.getInstance();
-//        perfTrace.setJobInfo(0);
+
         container.start();
     }
 
@@ -108,9 +104,6 @@ public class Engine
 
         String jobPath = cl.getOptionValue("job");
         Configuration configuration = ConfigParser.parse(jobPath);
-
-        // job id 默认值为-1
-//        configuration.set(CoreConstant.CORE_CONTAINER_JOB_ID, -1);
 
         //打印vmInfo
         VMInfo vmInfo = VMInfo.getVmInfo();

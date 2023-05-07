@@ -32,10 +32,4 @@ public class StandAloneScheduler
     {
         super(containerCommunicator);
     }
-
-    @Override
-    protected boolean isJobKilling(Long jobId)
-    {
-        return false;
-    }
 }

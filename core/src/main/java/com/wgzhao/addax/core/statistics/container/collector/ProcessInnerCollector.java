@@ -34,6 +34,6 @@ public class ProcessInnerCollector
     @Override
     public Communication collectFromTaskGroup()
     {
-        return LocalTGCommunicationManager.getJobCommunication(this.getJobId());
+        return LocalTGCommunicationManager.getJobCommunication();
     }
 }
