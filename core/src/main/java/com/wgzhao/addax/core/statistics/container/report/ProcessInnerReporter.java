@@ -27,7 +27,7 @@ public class ProcessInnerReporter
 {
 
     @Override
-    public void reportJobCommunication(Long jobId, Communication communication)
+    public void reportJobCommunication(Communication communication)
     {
         // do nothing
     }

@@ -36,22 +36,15 @@ import java.util.List;
 
 public abstract class AbstractScheduler
 {
-    private static final Logger LOG = LoggerFactory
-            .getLogger(AbstractScheduler.class);
+    private static final Logger LOG = LoggerFactory.getLogger(AbstractScheduler.class);
 
     private final AbstractContainerCommunicator containerCommunicator;
-
-    private Long jobId;
 
     public AbstractScheduler(AbstractContainerCommunicator containerCommunicator)
     {
         this.containerCommunicator = containerCommunicator;
     }
 
-    public Long getJobId()
-    {
-        return jobId;
-    }
 
     public void schedule(List<Configuration> configurations)
     {
@@ -61,9 +54,6 @@ public abstract class AbstractScheduler
                 CoreConstant.CORE_CONTAINER_JOB_REPORT_INTERVAL, 30000);
         int jobSleepIntervalInMillSec = configurations.get(0).getInt(
                 CoreConstant.CORE_CONTAINER_JOB_SLEEP_INTERVAL, 10000);
-
-        this.jobId = configurations.get(0).getLong(
-                CoreConstant.CORE_CONTAINER_JOB_ID);
 
         ErrorRecordChecker errorLimit = new ErrorRecordChecker(configurations.get(0));
 
@@ -114,10 +104,7 @@ public abstract class AbstractScheduler
                     break;
                 }
 
-                if (isJobKilling(this.getJobId())) {
-                    dealKillingStat(this.containerCommunicator, totalTasks);
-                }
-                else if (nowJobContainerCommunication.getState() == State.FAILED) {
+                if (nowJobContainerCommunication.getState() == State.FAILED) {
                     dealFailedStat(this.containerCommunicator, nowJobContainerCommunication.getThrowable());
                 }
 
@@ -148,6 +135,4 @@ public abstract class AbstractScheduler
         }
         return totalTasks;
     }
-
-    protected abstract boolean isJobKilling(Long jobId);
 }

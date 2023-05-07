@@ -40,8 +40,6 @@ public class Communication
     // 所有的数值key-value对
 
     private Map<String, Number> counter;
-    private Long jobId;
-
     // 运行状态
     private State state;
 
@@ -299,15 +297,5 @@ public class Communication
     {
         return this.state == State.SUCCEEDED || this.state == State.FAILED
                 || this.state == State.KILLED;
-    }
-
-    public Long getJobId()
-    {
-        return jobId;
-    }
-
-    public void setJobId(Long jobId)
-    {
-        this.jobId = jobId;
     }
 }
