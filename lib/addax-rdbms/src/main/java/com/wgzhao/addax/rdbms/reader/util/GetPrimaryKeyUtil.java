@@ -158,15 +158,20 @@ public class GetPrimaryKeyUtil
                         + "  AND (ind.INDISPRIMARY OR ind.INDISUNIQUE)";
                 break;
             case SQLServer:
-                sql = "SELECT col.COLUMN_NAME, col.DATA_TYPE FROM INFORMATION_SCHEMA.TABLE_CONSTRAINTS tc, "
-                        + "  INFORMATION_SCHEMA.COLUMNS col, "
-                        + "  WHERE tc.TABLE_SCHEMA = kcu.TABLE_SCHEMA "
-                        + "  AND tc.TABLE_CATALOG = col.TABLE_CATALOG "
-                        + "  AND tc.TABLE_SCHEMA = col.TABLE_SCHEMA "
-                        + "  AND tc.TABLE_NAME = col.TABLE_NAME "
-                        + "  AND tc.TABLE_SCHEMA = (" + getSchema(schema) + ") "
-                        + "  AND tc.TABLE_NAME = '" + tableName + "' "
-                        + "  AND tc.CONSTRAINT_TYPE = 'PRIMARY KEY'";
+                sql = "SELECT  COL_NAME(ic.OBJECT_ID, ic.column_id) AS ColumnName, t.name AS DataType " +
+                        "FROM " +
+                        "    sys.indexes AS i " +
+                        "    INNER JOIN sys.index_columns AS ic ON i.OBJECT_ID = ic.OBJECT_ID " +
+                        "    AND i.index_id = ic.index_id " +
+                        "    INNER JOIN sys.columns AS c ON ic.OBJECT_ID = c.OBJECT_ID " +
+                        "    AND ic.column_id = c.column_id " +
+                        "    INNER JOIN sys.types AS t ON c.system_type_id = t.system_type_id " +
+                        "    AND c.user_type_id = t.user_type_id " +
+                        "WHERE " +
+                        "    OBJECT_NAME(ic.OBJECT_ID) = '" + tableName +  "' " +
+                        "    AND i.is_unique = 1 " +
+                        "    AND (SELECT COUNT(*) FROM sys.index_columns " +
+                        "        WHERE OBJECT_ID = i.OBJECT_ID  AND index_id = i.index_id ) = 1";
                 break;
             case ClickHouse:
                 sql = "SELECT name, type FROM system.columns "
