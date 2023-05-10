@@ -124,7 +124,7 @@ public final class RangeSplitUtil
     private static void checkIfBetweenRange(int value, int left, int right)
     {
         if (value < left || value > right) {
-            throw new IllegalArgumentException(String.format("parameter can not <[%s] or >[%s].",
+            throw new IllegalArgumentException(String.format("The value of parameter can not less than [%s] or greater than [%s].",
                     left, right));
         }
     }
@@ -140,7 +140,7 @@ public final class RangeSplitUtil
     public static BigInteger stringToBigInteger(String aString, int radix)
     {
         if (null == aString) {
-            throw new IllegalArgumentException("参数 bigInteger 不能为空.");
+            throw new IllegalArgumentException("The parameter bigInteger cannot be null.");
         }
 
         checkIfBetweenRange(radix, 1, 128);
@@ -154,7 +154,9 @@ public final class RangeSplitUtil
         for (int i = aString.length() - 1; i >= 0; i--) {
             tempChar = aString.charAt(i);
             if (tempChar >= 128) {
-                throw new IllegalArgumentException(String.format("根据字符串进行切分时仅支持 ASCII 字符串，而字符串:[%s]非 ASCII 字符串.", aString));
+                throw new IllegalArgumentException(
+                        String.format("When split by string, only ASCII chars are supported, " +
+                                "while the string: [%s] include  non-ASCII chars.", aString));
             }
             result = result.add(BigInteger.valueOf(tempChar).multiply(radixBigInteger.pow(k)));
             k++;
@@ -174,7 +176,7 @@ public final class RangeSplitUtil
     private static String bigIntegerToString(BigInteger bigInteger, int radix)
     {
         if (null == bigInteger) {
-            throw new IllegalArgumentException("参数 bigInteger 不能为空.");
+            throw new IllegalArgumentException("The parameter bigInteger cannot be null.");
         }
 
         checkIfBetweenRange(radix, 1, 128);
@@ -220,7 +222,9 @@ public final class RangeSplitUtil
     public static Pair<Character, Character> getMinAndMaxCharacter(String aString)
     {
         if (!isPureAscii(aString)) {
-            throw new IllegalArgumentException(String.format("根据字符串进行切分时仅支持 ASCII 字符串，而字符串:[%s]非 ASCII 字符串.", aString));
+            throw new IllegalArgumentException(
+                    String.format("When split by string, only ASCII chars are supported, " +
+                            "while the string: [%s] include  non-ASCII chars.", aString));
         }
 
         char min = aString.charAt(0);

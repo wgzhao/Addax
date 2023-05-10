@@ -133,12 +133,12 @@ public final class RetryUtil
         {
 
             if (null == callable) {
-                throw new IllegalArgumentException("系统编程错误, 入参callable不能为空 ! ");
+                throw new IllegalArgumentException("The parameter callable cannot be null.");
             }
 
             if (retryTimes < 1) {
                 throw new IllegalArgumentException(String.format(
-                        "系统编程错误, 入参retryTime[%d]不能小于1 !", retryTimes));
+                        "The value [%d] of parameter retryTime cannot less than 1", retryTimes));
             }
 
             Exception saveException = null;
@@ -149,7 +149,7 @@ public final class RetryUtil
                 catch (Exception e) {
                     saveException = e;
                     if (i == 0) {
-                        LOG.error(String.format("Exception when calling callable, 异常Msg:%s", saveException.getMessage()), saveException);
+                        LOG.error(String.format("Exception when calling callable, exception message:%s", saveException.getMessage()), saveException);
                     }
 
                     if (null != retryExceptionClass && !retryExceptionClass.isEmpty()) {
@@ -188,7 +188,8 @@ public final class RetryUtil
 
                         long realTimeSleep = System.currentTimeMillis() - startTime;
 
-                        LOG.error(String.format("Exception when calling callable, 即将尝试执行第%s次重试.本次重试计划等待[%s]ms,实际等待[%s]ms, 异常Msg:[%s]",
+                        LOG.error(String.format("Exception when calling callable, Attempt retry %d. This retry waits [%d]ms" +
+                                        ", actually waits [%d]ms, exception message: [%s].",
                                 i + 1, timeToSleep, realTimeSleep, e.getMessage()));
                     }
                 }
@@ -237,7 +238,7 @@ public final class RetryUtil
             finally {
                 if (!future.isDone()) {
                     future.cancel(true);
-                    LOG.warn("Try once task not done, cancel it, active count: {}", executor.getActiveCount());
+                    LOG.warn("A try-once task was not completed. Cancel it. Active count: {}.", executor.getActiveCount());
                 }
             }
         }
