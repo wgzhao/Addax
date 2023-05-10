@@ -52,7 +52,7 @@ public class GroovyTransformer
             if (paras.length < 1 || paras.length > 2) {
                 throw AddaxException.asAddaxException(
                         TransformerErrorCode.TRANSFORMER_ILLEGAL_PARAMETER,
-                        "dx_groovy paras must be 1 or 2 . now paras is: " + Arrays.asList(paras));
+                        "The dx_groovy parameters must be 1 or 2. The current parameter is: " + Arrays.asList(paras));
             }
             synchronized (this) {
 

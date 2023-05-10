@@ -57,7 +57,7 @@ public final class LocalTGCommunicationManager
      */
     public static Communication getTaskGroupCommunication(int taskGroupId)
     {
-        Validate.isTrue(taskGroupId >= 0, "taskGroupId不能小于0");
+        Validate.isTrue(taskGroupId >= 0, "The number of taskGroupId cannot be less than zero.");
 
         return taskGroupCommunicationMap.get(taskGroupId);
     }
@@ -65,9 +65,9 @@ public final class LocalTGCommunicationManager
     public static void updateTaskGroupCommunication(final int taskGroupId,
             final Communication communication)
     {
-        Validate.isTrue(taskGroupCommunicationMap.containsKey(
-                taskGroupId), String.format("taskGroupCommunicationMap中没有注册taskGroupId[%d]的Communication，" +
-                "无法更新该taskGroup的信息", taskGroupId));
+        Validate.isTrue(taskGroupCommunicationMap.containsKey(taskGroupId),
+                String.format("There is no communication registered for taskGroupId[%d] in taskGroupCommunicationMap," +
+                "Unable to update the information for this taskGroup", taskGroupId));
         taskGroupCommunicationMap.put(taskGroupId, communication);
     }
 

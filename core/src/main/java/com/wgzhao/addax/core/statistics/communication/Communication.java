@@ -34,19 +34,12 @@ public class Communication
         extends BaseObject
 {
 
-    // task给job的信息
+    // Message about the task is given to the job
     Map<String, List<String>> message;
-
-    // 所有的数值key-value对
-
     private Map<String, Number> counter;
-    // 运行状态
+    // Running status
     private State state;
-
-    // 异常记录
     private Throwable throwable;
-
-    // 记录的timestamp
     private long timestamp;
 
     public Communication()
@@ -168,7 +161,7 @@ public class Communication
 
     public synchronized void addMessage(String key, String value)
     {
-        Validate.isTrue(StringUtils.isNotBlank(key), "增加message的key不能为空");
+        Validate.isTrue(StringUtils.isNotBlank(key), "The key of the added message cannot be empty.");
         List<String> valueList = this.message.computeIfAbsent(key, k -> new ArrayList<>());
 
         valueList.add(value);
@@ -182,7 +175,7 @@ public class Communication
 
     public synchronized void setLongCounter(String key, long value)
     {
-        Validate.isTrue(StringUtils.isNotBlank(key), "设置counter的key不能为空");
+        Validate.isTrue(StringUtils.isNotBlank(key), "The key of setting counter can not be empty.");
         this.counter.put(key, value);
     }
 
@@ -195,13 +188,13 @@ public class Communication
 
     public synchronized void setDoubleCounter(String key, double value)
     {
-        Validate.isTrue(StringUtils.isNotBlank(key), "设置counter的key不能为空");
+        Validate.isTrue(StringUtils.isNotBlank(key), "The key of setting counter can not be empty.");
         this.counter.put(key, value);
     }
 
     public synchronized void increaseCounter(String key, long deltaValue)
     {
-        Validate.isTrue(StringUtils.isNotBlank(key), "增加counter的key不能为空");
+        Validate.isTrue(StringUtils.isNotBlank(key), "The key of the added counter can not be empty.");
 
         long value = this.getLongCounter(key);
 

@@ -55,7 +55,7 @@ public class FilterTransformer
 
         try {
             if (paras.length != 3) {
-                throw new RuntimeException("dx_filter paras must be 3");
+                throw new RuntimeException("The dx_filter parameters must be 3");
             }
 
             columnIndex = (Integer) paras[0];
@@ -63,7 +63,7 @@ public class FilterTransformer
             value = (String) paras[2];
 
             if (StringUtils.isEmpty(value)) {
-                throw new RuntimeException("dx_filter para 2 can't be null");
+                throw new RuntimeException("The second parameter of dx_filter cannot be null");
             }
         }
         catch (Exception e) {

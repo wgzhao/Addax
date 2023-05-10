@@ -100,11 +100,11 @@ public class BufferedRecordExchanger
             throw AddaxException.asAddaxException(CommonErrorCode.SHUT_DOWN_TASK, "");
         }
 
-        Validate.notNull(record, "record不能为空.");
+        Validate.notNull(record, "The record cannot be empty.");
 
         if (record.getMemorySize() > this.byteCapacity) {
             this.pluginCollector.collectDirtyRecord(record,
-                    new Exception(String.format("单条记录超过大小限制，当前限制为:%s", this.byteCapacity)));
+                    new Exception(String.format("A single record exceeds the size limit. The current limit is %d", this.byteCapacity)));
             return;
         }
 

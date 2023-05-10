@@ -71,7 +71,7 @@ public class TransformerUtil
         /*
          * 延迟load 第三方插件的function，并按需load
          */
-        LOG.info(String.format(" user config transformers [%s], loading...", functionNames));
+        LOG.info(String.format("Loading the  user config transformers [%s] ...", functionNames));
         TransformerRegistry.loadTransformerFromLocalStorage(functionNames);
 
         int i = 0;
@@ -96,7 +96,7 @@ public class TransformerUtil
 
                 if (columnIndex == null) {
                     throw AddaxException.asAddaxException(TransformerErrorCode.TRANSFORMER_ILLEGAL_PARAMETER,
-                            "columnIndex must be set by UDF:name=" + functionName);
+                            "columnIndex must be set by UDF: name=" + functionName);
                 }
 
                 transformerExecutionParas.setColumnIndex(columnIndex);
@@ -109,7 +109,7 @@ public class TransformerUtil
                 String code = configuration.getString(CoreConstant.TRANSFORMER_PARAMETER_CODE);
                 if (StringUtils.isEmpty(code)) {
                     throw AddaxException.asAddaxException(TransformerErrorCode.TRANSFORMER_ILLEGAL_PARAMETER,
-                            "groovy code must be set by UDF:name=" + functionName);
+                            "groovy code must be set by UDF: name=" + functionName);
                 }
                 transformerExecutionParas.setCode(code);
 

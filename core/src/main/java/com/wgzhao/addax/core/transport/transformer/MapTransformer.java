@@ -59,7 +59,7 @@ public class MapTransformer
 
         try {
             if (paras.length != 3) {
-                throw new RuntimeException("dx_map paras must be 3");
+                throw new RuntimeException("The dx_map parameters must be 3");
             }
 
             columnIndex = (Integer) paras[0];
