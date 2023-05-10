@@ -34,7 +34,7 @@ import java.util.List;
 public final class ListUtil
 {
 
-    private static final String ERROR_MESSAGE = "您提供的作业配置有误, List不能为空.";
+    private static final String ERROR_MESSAGE = "Invalid configuration, the List cannot be empty.";
 
     private ListUtil() {}
 

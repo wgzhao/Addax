@@ -31,6 +31,8 @@ public class DoubleColumn
         extends Column
 {
 
+    private final String errorTemplate = "Double type cannot be converted to %s.";
+
     public DoubleColumn( String data)
     {
         this(data, null == data ? 0 : data.length());
@@ -102,7 +104,7 @@ public class DoubleColumn
         catch (NumberFormatException e) {
             throw AddaxException.asAddaxException(
                     CommonErrorCode.CONVERT_NOT_SUPPORT,
-                    String.format("String[%s] 无法转换为Double类型 .",
+                    String.format("String[%s] cannot be converted to Double.",
                             this.getRawData()));
         }
     }
@@ -164,28 +166,28 @@ public class DoubleColumn
     public Boolean asBoolean()
     {
         throw AddaxException.asAddaxException(
-                CommonErrorCode.CONVERT_NOT_SUPPORT, "Double类型无法转为Bool .");
+                CommonErrorCode.CONVERT_NOT_SUPPORT, String.format(errorTemplate, "Boolean"));
     }
 
     @Override
     public Date asDate()
     {
         throw AddaxException.asAddaxException(
-                CommonErrorCode.CONVERT_NOT_SUPPORT, "Double类型无法转为Date类型 .");
+                CommonErrorCode.CONVERT_NOT_SUPPORT, String.format(errorTemplate, "Date"));
     }
 
     @Override
     public byte[] asBytes()
     {
         throw AddaxException.asAddaxException(
-                CommonErrorCode.CONVERT_NOT_SUPPORT, "Double类型无法转为Bytes类型 .");
+                CommonErrorCode.CONVERT_NOT_SUPPORT, String.format(errorTemplate, "Bytes"));
     }
 
     @Override
     public Timestamp asTimestamp()
     {
         throw AddaxException.asAddaxException(
-                CommonErrorCode.CONVERT_NOT_SUPPORT, "Double类型无法转为Timestamp .");
+                CommonErrorCode.CONVERT_NOT_SUPPORT, String.format(errorTemplate, "Timestamp"));
     }
 
     private void validate( String data)
@@ -205,7 +207,7 @@ public class DoubleColumn
         catch (Exception e) {
             throw AddaxException.asAddaxException(
                     CommonErrorCode.CONVERT_NOT_SUPPORT,
-                    String.format("String[%s]无法转为Double类型 .", data));
+                    String.format("String[%s] cannot be converted to Double.", data));
         }
     }
 }

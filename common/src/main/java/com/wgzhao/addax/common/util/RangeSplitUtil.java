@@ -71,12 +71,12 @@ public final class RangeSplitUtil
     {
         if (expectSliceNumber < 1) {
             throw new IllegalArgumentException(String.format(
-                    "切分份数不能小于1. 此处:expectSliceNumber=[%s].", expectSliceNumber));
+                    "The number of splits cannot be less than 1, expectSliceNumber = [%s].", expectSliceNumber));
         }
 
         if (null == left || null == right) {
             throw new IllegalArgumentException(String.format(
-                    "对 BigInteger 进行切分时，其左右区间不能为 null. 此处:left=[%s],right=[%s].", left, right));
+                    "The range [%s, %s] is invalid for BigInteger.", left, right));
         }
 
         if (left.compareTo(right) == 0) {

@@ -133,11 +133,11 @@ public class MathUtil
         }
 
         if (v2.compareTo(BigDecimal.ZERO) == 0) {
-            throw new IllegalArgumentException("除数不能为0");
+            throw new IllegalArgumentException("The divisor cannot be zero.");
         }
 
         if (scale < 0) {
-            throw new IllegalArgumentException("精确度不能小于0");
+            throw new IllegalArgumentException("The scale cannot be less than zero.");
         }
 
         return v1.divide(v2, scale, RoundingMode.HALF_UP);
@@ -160,7 +160,7 @@ public class MathUtil
         }
 
         if (v2.compareTo(BigDecimal.ZERO) == 0) {
-            throw new IllegalArgumentException("除数不能为0");
+            throw new IllegalArgumentException("The divisor cannot be zero.");
         }
 
         BigDecimal[] c = v1.divideAndRemainder(v2);

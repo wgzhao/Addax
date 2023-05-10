@@ -65,7 +65,7 @@ public class HostUtils
                 process.destroy();
             }
             catch (Exception e) {
-                log.warn("get hostname failed {}", e.getMessage());
+                log.warn("Failed to get hostname: {}", e.getMessage());
             }
         }
         IP = ip;

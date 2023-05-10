@@ -83,7 +83,8 @@ public class Configuration
         }
         catch (Exception e) {
             throw AddaxException.asAddaxException(CommonErrorCode.CONFIG_ERROR,
-                    String.format("配置信息错误. 您提供的配置信息不是合法的JSON格式: %s . 请按照标准json格式提供配置信息. ", e.getMessage()));
+                    String.format("The configuration is incorrect. The configuration you provided is " +
+                            "not in valid JSON format: %s.", e.getMessage()));
         }
     }
 
@@ -123,12 +124,12 @@ public class Configuration
         }
         catch (FileNotFoundException e) {
             throw AddaxException.asAddaxException(CommonErrorCode.CONFIG_ERROR,
-                    String.format("配置信息错误，您提供的配置文件[%s]不存在. 请检查您的配置文件.", file.getAbsolutePath()));
+                    String.format("No such file: %s", file.getAbsolutePath()));
         }
         catch (IOException e) {
             throw AddaxException.asAddaxException(
                     CommonErrorCode.CONFIG_ERROR,
-                    String.format("配置信息错误. 您提供配置文件[%s]读取失败，错误原因: %s. 请检查您的配置文件的权限设置.",
+                    String.format("Failed to read the configuration [%s], reason: %s.",
                             file.getAbsolutePath(), e));
         }
     }
@@ -143,7 +144,7 @@ public class Configuration
         }
         catch (IOException e) {
             throw AddaxException.asAddaxException(CommonErrorCode.CONFIG_ERROR,
-                    String.format("请检查您的配置文件. 您提供的配置文件读取失败，错误原因: %s. 请检查您的配置文件的权限设置.", e));
+                    String.format("Failed to read the configuration [%s], reason: %s.", e));
         }
     }
 
@@ -167,7 +168,7 @@ public class Configuration
     {
         if (StringUtils.isBlank(json)) {
             throw AddaxException.asAddaxException(CommonErrorCode.CONFIG_ERROR,
-                    "配置信息错误. 因为您提供的配置信息不是合法的JSON格式, JSON不能为空白. 请按照标准json格式提供配置信息. ");
+                    "The configure file is empty.");
         }
     }
 
@@ -181,7 +182,7 @@ public class Configuration
         String value = this.getString(key, null);
         if (StringUtils.isBlank(value)) {
             throw AddaxException.asAddaxException(errorCode,
-                    String.format("您提供配置文件有误，[%s]是必填参数，不允许为空或者留白 .", key));
+                    String.format("Illegal configuration, the item [%s] is required.", key));
         }
 
         return value;
@@ -294,7 +295,7 @@ public class Configuration
         catch (Exception e) {
             throw AddaxException.asAddaxException(
                     CommonErrorCode.CONFIG_ERROR,
-                    String.format("任务读取配置文件出错. 因为配置文件路径[%s] 值非法，期望是字符类型: %s. 请检查您的配置并作出修改.", path,
+                    String.format("Illegal configuration, cannot be converted to string for [%s], reason: %s.", path,
                             e.getMessage()));
         }
     }
@@ -338,7 +339,7 @@ public class Configuration
         }
         else {
             throw AddaxException.asAddaxException(CommonErrorCode.CONFIG_ERROR,
-                    String.format("您提供的配置信息有误，因为从[%s]获取的值[%s]无法转换为bool类型. 请检查源表的配置并且做出相应的修改.",
+                    String.format("Illegal configuration, the value [%s] of [%s] cannot be converted to bool type.",
                             path, result));
         }
     }
@@ -381,7 +382,7 @@ public class Configuration
         catch (Exception e) {
             throw AddaxException.asAddaxException(
                     CommonErrorCode.CONFIG_ERROR,
-                    String.format("任务读取配置文件出错. 配置文件路径[%s] 值非法, 期望是整数类型: %s. 请检查您的配置并作出修改.", path,
+                    String.format("Illegal configuration, the value [%s] of [%s] is expected integer type.", path,
                             e.getMessage()));
         }
     }
@@ -423,7 +424,7 @@ public class Configuration
         catch (Exception e) {
             throw AddaxException.asAddaxException(
                     CommonErrorCode.CONFIG_ERROR,
-                    String.format("任务读取配置文件出错. 配置文件路径[%s] 值非法, 期望是整数类型: %s. 请检查您的配置并作出修改.", path,
+                    String.format("Illegal configuration, the value [%s] of [%s] is expected integer/long type.", path,
                             e.getMessage()));
         }
     }
@@ -465,7 +466,7 @@ public class Configuration
         catch (Exception e) {
             throw AddaxException.asAddaxException(
                     CommonErrorCode.CONFIG_ERROR,
-                    String.format("任务读取配置文件出错. 配置文件路径[%s] 值非法, 期望是浮点类型: %s. 请检查您的配置并作出修改.", path,
+                    String.format("Illegal configuration, the value [%s] of [%s] is expected float type.", path,
                             e.getMessage()));
         }
     }
@@ -714,7 +715,7 @@ public class Configuration
         if (null == result) {
             throw AddaxException.asAddaxException(
                     CommonErrorCode.RUNTIME_ERROR,
-                    String.format("配置文件对应Key[%s]并不存在，该情况是代码编程错误.", path));
+                    String.format("Illegal configuration, the key [%s] does not exists.", path));
         }
 
         this.set(path, null);
@@ -848,7 +849,7 @@ public class Configuration
         }
 
         throw AddaxException.asAddaxException(CommonErrorCode.RUNTIME_ERROR,
-                String.format("值[%s]无法适配您提供[%s]， 该异常代表系统编程错误.",
+                String.format("Illegal value, cannot set value [%s] for key [%s]",
                         ToStringBuilder.reflectionToString(object), path));
     }
 
@@ -893,8 +894,7 @@ public class Configuration
     {
         if (null == paths) {
             throw AddaxException.asAddaxException(
-                    CommonErrorCode.RUNTIME_ERROR,
-                    "Path不能为null，该异常代表系统编程错误.");
+                    CommonErrorCode.RUNTIME_ERROR, "The Path cannot be null");
         }
 
         if (1 == paths.size() && StringUtils.isBlank(paths.get(0))) {
@@ -922,8 +922,7 @@ public class Configuration
             }
 
             throw AddaxException.asAddaxException(
-                    CommonErrorCode.RUNTIME_ERROR, String.format(
-                            "路径[%s]出现非法值类型[%s]，该异常代表系统编程错误. .",
+                    CommonErrorCode.RUNTIME_ERROR, String.format("the value [%s] of [%s] is illegal.",
                             StringUtils.join(paths, "."), path));
         }
 
@@ -1010,8 +1009,7 @@ public class Configuration
             return lists;
         }
 
-        throw AddaxException.asAddaxException(CommonErrorCode.RUNTIME_ERROR,
-                "该异常代表系统编程错误.");
+        throw AddaxException.asAddaxException(CommonErrorCode.RUNTIME_ERROR, "System internal error.");
     }
 
     private Object findObject(String path)
@@ -1041,14 +1039,13 @@ public class Configuration
         boolean isMap = (target instanceof Map);
         if (!isMap) {
             throw new IllegalArgumentException(String.format(
-                    "您提供的配置文件有误. 路径[%s]需要配置Json格式的Map对象，但该节点发现实际类型是[%s]. 请检查您的配置并作出修改.",
+                    "The item [%s] requires a Map object in json format, but the actual type is [%s].",
                     index, target.getClass().toString()));
         }
 
         Object result = ((Map<String, Object>) target).get(index);
         if (null == result) {
-            throw new IllegalArgumentException(String.format(
-                    "您提供的配置文件有误. 路径[%s]值为null，无法识别该配置. 请检查您的配置并作出修改.", index));
+            throw new IllegalArgumentException(String.format("The value of item [%s] is null.", index));
         }
 
         return result;
@@ -1060,7 +1057,7 @@ public class Configuration
         boolean isList = (target instanceof List);
         if (!isList) {
             throw new IllegalArgumentException(String.format(
-                    "您提供的配置文件有误. 路径[%s]需要配置Json格式的Map对象，但该节点发现实际类型是[%s]. 请检查您的配置并作出修改.",
+                    "The item [%s] requires a Map object in json format, but the actual type is [%s].",
                     each, target.getClass().toString()));
         }
 
@@ -1068,7 +1065,7 @@ public class Configuration
         if (!StringUtils.isNumeric(index)) {
             throw new IllegalArgumentException(
                     String.format(
-                            "系统编程错误，列表下标必须为数字类型，但该节点发现实际类型是[%s] ，该异常代表系统编程错误.",
+                            "The list subscript must be a numeric type, but the actual type is [%s].",
                             index));
         }
 
@@ -1117,14 +1114,13 @@ public class Configuration
     private void checkPath(String path)
     {
         if (null == path) {
-            throw new IllegalArgumentException(
-                    "系统编程错误, 该异常代表系统编程错误..");
+            throw new IllegalArgumentException("System internal error.");
         }
 
         for (String each : StringUtils.split(".")) {
             if (StringUtils.isBlank(each)) {
                 throw new IllegalArgumentException(String.format(
-                        "系统编程错误, 路径[%s]不合法, 路径层次之间不能出现空白字符 .", path));
+                        "The item [%s] is invalid, Blank characters should not  appear here.", path));
             }
         }
     }
