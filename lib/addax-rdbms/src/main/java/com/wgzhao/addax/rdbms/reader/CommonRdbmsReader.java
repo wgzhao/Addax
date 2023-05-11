@@ -85,10 +85,10 @@ public class CommonRdbmsReader
 
             OriginalConfPretreatmentUtil.doPretreatment(originalConfig);
             if (originalConfig.getString(Key.SPLIT_PK) == null && originalConfig.getBool(Key.AUTO_PK, false)) {
-                LOG.info("Does not configure splitPk, try to guess");
+                LOG.info("The primary key used for splitting is not configured, try to guess the primary key that can be split.");
                 String splitPK = GetPrimaryKeyUtil.getPrimaryKey(originalConfig);
                 if (splitPK != null) {
-                    LOG.info("Try to use `" + splitPK + "` as primary key to split");
+                    LOG.info("Try to use [{}] as primary key to split", splitPK);
                     originalConfig.set(Key.SPLIT_PK, splitPK);
                     if (originalConfig.getInt(Key.EACH_TABLE_SPLIT_SIZE, -1) == -1) {
                         originalConfig.set(Key.EACH_TABLE_SPLIT_SIZE, Constant.DEFAULT_EACH_TABLE_SPLIT_SIZE);
@@ -96,7 +96,7 @@ public class CommonRdbmsReader
                 }
             }
 
-            LOG.debug("After job init(), job config now is:[\n{}\n]", originalConfig.toJSON());
+            LOG.debug("After the job is initialized, the job configuration is now as follows::[\n{}\n]", originalConfig.toJSON());
             return originalConfig;
         }
 
@@ -208,13 +208,13 @@ public class CommonRdbmsReader
         {
             String querySql = readerSliceConfig.getString(Key.QUERY_SQL);
 
-            LOG.info("Begin to read record by Sql: [{}].", querySql);
+            LOG.info("Begin reading records by executing SQL query: [{}].", querySql);
             PerfRecord queryPerfRecord = new PerfRecord(taskGroupId, taskId, PerfRecord.PHASE.SQL_QUERY);
             queryPerfRecord.start();
 
             Connection conn = DBUtil.getConnection(this.dataBaseType, jdbcUrl, username, password);
 
-            // session config .etc related
+            // session config related
             DBUtil.dealWithSessionConfig(conn, readerSliceConfig, this.dataBaseType, basicMsg);
 
             int columnNumber;
@@ -240,7 +240,7 @@ public class CommonRdbmsReader
 
                 allResultPerfRecord.end(rsNextUsedTime);
                 // 目前大盘是依赖这个打印，而之前这个Finish read record是包含了sql查询和result next的全部时间
-                LOG.info("Finished read record by Sql: [{}].", querySql);
+                LOG.info("Finished reading records by executing SQL query: [{}].", querySql);
             }
             catch (Exception e) {
                 throw RdbmsException.asQueryException(e, querySql);
@@ -351,8 +351,10 @@ public class CommonRdbmsReader
 
                 default:
                     throw AddaxException.asAddaxException(DBUtilErrorCode.UNSUPPORTED_TYPE,
-                            String.format("您的配置文件中的列配置信息有误. 不支持数据库读取这种字段类型. " + "字段名:[%s], 字段类型:[%s], "
-                                            + "字段类型名称:[%s], 字段Java类型:[%s]. " + "请尝试使用数据库函数将其转换支持的类型 或者不同步该字段 .",
+                            String.format("The column configuration is incorrect, The database does not support reading this field type."
+                                            + "Field name:[%s], Field type:[%s], "
+                                            + "Field typename:[%s], Field java type:[%s]. Please try using database " +
+                                            "functions to convert it to a supported type or ignore the field.",
                                     metaData.getColumnName(i), metaData.getColumnType(i),
                                     metaData.getColumnTypeName(i), metaData.getColumnClassName(i)));
             }
@@ -370,9 +372,8 @@ public class CommonRdbmsReader
             }
             catch (Exception e) {
                 if (IS_DEBUG) {
-                    LOG.debug("read data " + record + " occur exception: " + e);
+                    LOG.debug("Exception occurred while reading {} : {}", record, e.getMessage());
                 }
-                // TODO 这里识别为脏数据靠谱吗？
                 taskPluginCollector.collectDirtyRecord(record, e);
                 if (e instanceof AddaxException) {
                     throw (AddaxException) e;
