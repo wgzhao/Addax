@@ -40,7 +40,7 @@ public class AddaxException
 
     private AddaxException(ErrorCode errorCode, String errorMessage, Throwable cause)
     {
-        super(errorCode.toString() + " - " + getMessage(errorMessage) + " - " + getMessage(cause), cause);
+        super(errorMessage, cause);
 
         this.errorCode = errorCode;
     }

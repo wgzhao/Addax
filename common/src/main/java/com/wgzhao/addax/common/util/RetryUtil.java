@@ -148,9 +148,9 @@ public final class RetryUtil
                 }
                 catch (Exception e) {
                     saveException = e;
-                    if (i == 0) {
-                        LOG.error(String.format("Exception when calling callable, exception message:%s", saveException.getMessage()), saveException);
-                    }
+//                    if (i == 0) {
+//                        LOG.error(String.format("Exception occurred while calling callable: %s", saveException.getMessage()), saveException);
+//                    }
 
                     if (null != retryExceptionClass && !retryExceptionClass.isEmpty()) {
                         boolean needRetry = false;
@@ -188,9 +188,9 @@ public final class RetryUtil
 
                         long realTimeSleep = System.currentTimeMillis() - startTime;
 
-                        LOG.error(String.format("Exception when calling callable, Attempt retry %d. This retry waits [%d]ms" +
-                                        ", actually waits [%d]ms, exception message: [%s].",
-                                i + 1, timeToSleep, realTimeSleep, e.getMessage()));
+                        LOG.error("Exception when calling callable, Attempt retry {}. This retry waits {}ms" +
+                                        ", actually waits {}ms, exception message: {}.",
+                                i + 1, timeToSleep, realTimeSleep, e.getMessage());
                     }
                 }
             }

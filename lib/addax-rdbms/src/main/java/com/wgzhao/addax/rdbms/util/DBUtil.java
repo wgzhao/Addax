@@ -66,7 +66,7 @@ public final class DBUtil
     public static String chooseJdbcUrl(DataBaseType dataBaseType, List<String> jdbcUrls, String username, String password, List<String> preSql)
     {
         if (null == jdbcUrls || jdbcUrls.isEmpty()) {
-            throw AddaxException.asAddaxException(DBUtilErrorCode.CONF_ERROR,
+            throw AddaxException.asAddaxException(DBUtilErrorCode.JDBC_NULL,
                     String.format("The configure item jdbcUrl [%s] cannot be empty.",
                             StringUtils.join(jdbcUrls, ",")));
         }
@@ -229,7 +229,7 @@ public final class DBUtil
         }
         catch (Exception e) {
             throw AddaxException.asAddaxException(DBUtilErrorCode.CONN_DB_ERROR,
-                    String.format("Failed to connect database with %s.", jdbcUrl), e);
+                    String.format("Failed to connect the database with [%s].", jdbcUrl), e);
         }
     }
 
@@ -446,7 +446,7 @@ public final class DBUtil
             return true;
         }
         catch (Exception e) {
-            LOG.error("Failed to connection with [{}]: {}.", url, e.getMessage());
+            LOG.error("Failed to connection the database with [{}]: {}.", url, e.getMessage());
         }
         return false;
     }

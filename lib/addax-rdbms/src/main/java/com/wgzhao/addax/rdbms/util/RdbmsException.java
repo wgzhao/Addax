@@ -37,7 +37,7 @@ public class RdbmsException
 
     public static AddaxException asConnException(Exception e)
     {
-        return asAddaxException(DBUtilErrorCode.CONN_DB_ERROR, " 具体错误信息为：" + e);
+        return asAddaxException(DBUtilErrorCode.CONN_DB_ERROR, e.getMessage());
     }
 
     public static AddaxException asQueryException(Exception e, String querySql)
