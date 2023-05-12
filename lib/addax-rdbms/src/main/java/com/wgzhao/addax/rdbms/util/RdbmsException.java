@@ -42,36 +42,37 @@ public class RdbmsException
 
     public static AddaxException asQueryException(Exception e, String querySql)
     {
-        return asAddaxException(DBUtilErrorCode.SQL_EXECUTE_FAIL, "执行的SQL为: " + querySql + " 具体错误信息为：" + e);
+        return asAddaxException(DBUtilErrorCode.SQL_EXECUTE_FAIL, e.getMessage());
     }
 
     public static AddaxException asSqlParserException(Exception e, String querySql)
     {
-        throw asAddaxException(DBUtilErrorCode.READ_RECORD_FAIL, "执行的SQL为:" + querySql + " 具体错误信息为：" + e);
+        throw asAddaxException(DBUtilErrorCode.READ_RECORD_FAIL, e.getMessage());
     }
 
     public static AddaxException asPreSQLParserException(Exception e, String querySql)
     {
-        throw asAddaxException(DBUtilErrorCode.READ_RECORD_FAIL, "执行的SQL为:" + querySql + " 具体错误信息为：" + e);
+        throw asAddaxException(DBUtilErrorCode.READ_RECORD_FAIL, e.getMessage());
     }
 
     public static AddaxException asPostSQLParserException(Exception e, String querySql)
     {
-        throw asAddaxException(DBUtilErrorCode.READ_RECORD_FAIL, "执行的SQL为:" + querySql + " 具体错误信息为：" + e);
+        throw asAddaxException(DBUtilErrorCode.READ_RECORD_FAIL, e.getMessage());
     }
 
     public static AddaxException asInsertPriException(String userName, String jdbcUrl)
     {
-        throw asAddaxException(DBUtilErrorCode.NO_INSERT_PRIVILEGE, "用户名为:" + userName + " jdbcURL为：" + jdbcUrl);
+        throw asAddaxException(DBUtilErrorCode.NO_INSERT_PRIVILEGE, "");
     }
 
     public static AddaxException asDeletePriException(String userName, String jdbcUrl)
     {
-        throw asAddaxException(DBUtilErrorCode.NO_DELETE_PRIVILEGE, "用户名为:" + userName + " jdbcURL为：" + jdbcUrl);
+        throw asAddaxException(DBUtilErrorCode.NO_DELETE_PRIVILEGE, "");
     }
 
     public static AddaxException asSplitPKException(Exception e, String splitSql, String splitPkID)
     {
-        return asAddaxException(DBUtilErrorCode.READ_RECORD_FAIL, "配置的SplitPK为: " + splitPkID + ", 执行的SQL为: " + splitSql + " 具体错误信息为：" + e);
+//        return asAddaxException(DBUtilErrorCode.READ_RECORD_FAIL, "配置的SplitPK为: " + splitPkID + ", 执行的SQL为: " + splitSql + " 具体错误信息为：" + e);
+        return asAddaxException(DBUtilErrorCode.READ_RECORD_FAIL, e.getMessage());
     }
 }

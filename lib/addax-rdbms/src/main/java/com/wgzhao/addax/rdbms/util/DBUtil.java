@@ -463,7 +463,7 @@ public final class DBUtil
             return true;
         }
         catch (Exception e) {
-            LOG.warn("Failed to connection with [{}]: {}.", url, e.getMessage());
+            LOG.warn("Failed to connection the database with [{}]: {}.", url, e.getMessage());
         }
         return false;
     }

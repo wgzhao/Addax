@@ -57,7 +57,7 @@ public class LongColumn
         catch (Exception e) {
             throw AddaxException.asAddaxException(
                     CommonErrorCode.CONVERT_NOT_SUPPORT,
-                    String.format("String[%s] cannot be converted to Long .", data));
+                    String.format("Cannot convert the string '%s' to Long.", data));
         }
     }
 

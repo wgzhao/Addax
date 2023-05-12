@@ -34,7 +34,7 @@ public class AddaxException
 
     public AddaxException(ErrorCode errorCode, String errorMessage)
     {
-        super(errorCode.toString() + " - " + errorMessage);
+        super(errorMessage);
         this.errorCode = errorCode;
     }
 
