@@ -48,8 +48,7 @@ public abstract class AbstractScheduler
 
     public void schedule(List<Configuration> configurations)
     {
-        Validate.notNull(configurations,
-                "scheduler配置不能为空");
+        Validate.notNull(configurations, "The scheduler configuration cannot be empty");
         int jobReportIntervalInMillSec = configurations.get(0).getInt(
                 CoreConstant.CORE_CONTAINER_JOB_REPORT_INTERVAL, 30000);
         int jobSleepIntervalInMillSec = configurations.get(0).getInt(
@@ -100,7 +99,7 @@ public abstract class AbstractScheduler
                 errorLimit.checkRecordLimit(nowJobContainerCommunication);
 
                 if (nowJobContainerCommunication.getState() == State.SUCCEEDED) {
-                    LOG.info("Scheduler accomplished all tasks.");
+                    LOG.info("The scheduler has completed all tasks.");
                     break;
                 }
 
@@ -113,7 +112,7 @@ public abstract class AbstractScheduler
         }
         catch (InterruptedException e) {
             // 以 failed 状态退出
-            LOG.error("捕获到InterruptedException异常!", e);
+            LOG.error("An InterruptedException was caught!", e);
 
             throw AddaxException.asAddaxException(
                     FrameworkErrorCode.RUNTIME_ERROR, e);

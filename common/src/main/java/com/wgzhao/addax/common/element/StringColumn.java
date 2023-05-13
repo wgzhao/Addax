@@ -35,6 +35,8 @@ public class StringColumn
         extends Column
 {
 
+    private final String errorTemplate = "String type cannot be converted to %s.";
+
     public StringColumn()
     {
         this(null);
@@ -62,7 +64,7 @@ public class StringColumn
                 || "-Infinity".equals(data)) {
             throw AddaxException.asAddaxException(
                     CommonErrorCode.CONVERT_NOT_SUPPORT,
-                    String.format("String[\"%s\"]属于Double特殊类型，不能转为其他类型 .", data));
+                    String.format("['%s'] belongs to the special Double type and cannot be converted to other type.", data));
         }
     }
 
@@ -81,7 +83,7 @@ public class StringColumn
         catch (Exception e) {
             throw AddaxException.asAddaxException(
                     CommonErrorCode.CONVERT_NOT_SUPPORT, String.format(
-                            "String[\"%s\"]不能转为BigInteger .", this.asString()));
+                            "['%s'] cannot be converted to BigInteger.", this.asString()));
         }
     }
 
@@ -110,8 +112,7 @@ public class StringColumn
         }
         catch (Exception e) {
             throw AddaxException.asAddaxException(
-                    CommonErrorCode.CONVERT_NOT_SUPPORT,
-                    String.format("String[\"%s\"]不能转为Long .", this.asString()));
+                    CommonErrorCode.CONVERT_NOT_SUPPORT, String.format(errorTemplate, "Long"));
         }
     }
 
@@ -129,8 +130,7 @@ public class StringColumn
         }
         catch (Exception e) {
             throw AddaxException.asAddaxException(
-                    CommonErrorCode.CONVERT_NOT_SUPPORT, String.format(
-                            "String [\"%s\"] 不能转为BigDecimal .", this.asString()));
+                    CommonErrorCode.CONVERT_NOT_SUPPORT, String.format(errorTemplate, "BigDecimal"));
         }
     }
 
@@ -176,8 +176,7 @@ public class StringColumn
         }
 
         throw AddaxException.asAddaxException(
-                CommonErrorCode.CONVERT_NOT_SUPPORT,
-                String.format("String[\"%s\"]不能转为Bool .", this.asString()));
+                CommonErrorCode.CONVERT_NOT_SUPPORT, String.format(errorTemplate, "Boolean"));
     }
 
     @Override
@@ -188,8 +187,7 @@ public class StringColumn
         }
         catch (Exception e) {
             throw AddaxException.asAddaxException(
-                    CommonErrorCode.CONVERT_NOT_SUPPORT,
-                    String.format("String[\"%s\"]不能转为Date .", this.asString()));
+                    CommonErrorCode.CONVERT_NOT_SUPPORT, String.format(errorTemplate, "Date"));
         }
     }
 
@@ -201,8 +199,7 @@ public class StringColumn
         }
         catch (Exception e) {
             throw AddaxException.asAddaxException(
-                    CommonErrorCode.CONVERT_NOT_SUPPORT,
-                    String.format("String[\"%s\"]不能转为Bytes .", this.asString()));
+                    CommonErrorCode.CONVERT_NOT_SUPPORT, String.format(errorTemplate, "Bytes"));
         }
     }
 }

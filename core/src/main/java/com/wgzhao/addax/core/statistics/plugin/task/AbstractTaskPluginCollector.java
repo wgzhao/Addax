@@ -77,7 +77,7 @@ public abstract class AbstractTaskPluginCollector
     {
 
         if (null == dirtyRecord) {
-            LOG.warn("脏数据record=null.");
+            LOG.warn("The dirty record is null.");
             return;
         }
 

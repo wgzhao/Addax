@@ -67,7 +67,7 @@ public class TransformerRegistry
                 }
             }
             catch (Exception e) {
-                LOG.error("skip transformer({}) loadTransformer has Exception({})",
+                LOG.error("Skip transformer [{}] LoadTransformer has encountered an exception [{}].",
                         each, e.getMessage(), e);
             }
         }
@@ -81,21 +81,21 @@ public class TransformerRegistry
             transformerConfiguration = loadTransFormerConfig(transformerPath);
         }
         catch (Exception e) {
-            LOG.error("skip transformer({}),load transformer.json error, path = {}, ",
+            LOG.error("Skip transformer[{}],load transformer.json error, path = {}, ",
                     each, transformerPath, e);
             return;
         }
 
         String className = transformerConfiguration.getString("class");
         if (StringUtils.isEmpty(className)) {
-            LOG.error("skip transformer({}),class not config, path = {}, config = {}",
+            LOG.error("Skip transformer[{}],class not config, path = {}, config = {}",
                     each, transformerPath, transformerConfiguration.beautify());
             return;
         }
 
         String funName = transformerConfiguration.getString("name");
         if (!each.equals(funName)) {
-            LOG.warn("transformer({}) name not match transformer.json config name[{}], " +
+            LOG.warn("The transformer[{}] name not match transformer.json config name[{}], " +
                             "will ignore json  name, path = {}, config = {}",
                     each, funName, transformerPath, transformerConfiguration.beautify());
         }
@@ -112,12 +112,12 @@ public class TransformerRegistry
                 registryTransformer((Transformer) transformer, jarLoader, false);
             }
             else {
-                LOG.error("load Transformer class({}) error, path = {}", className, transformerPath);
+                LOG.error("Load Transformer class[{}] error, path = {}", className, transformerPath);
             }
         }
         catch (Exception e) {
             //error, skip function
-            LOG.error("skip transformer({}),load Transformer class error, path = {} ", each, transformerPath, e);
+            LOG.error("Skip transformer({}),load Transformer class error, path = {} ", each, transformerPath, e);
         }
     }
 
@@ -128,11 +128,6 @@ public class TransformerRegistry
 
     public static TransformerInfo getTransformer(String transformerName)
     {
-
-        //if (result == null) {
-        // todo 再尝试从disk读取
-        //}
-
         return registeredTransformer.get(transformerName);
     }
 

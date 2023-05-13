@@ -50,7 +50,7 @@ public class PadTransformer
 
         try {
             if (paras.length != 4) {
-                throw new RuntimeException("dx_pad paras must be 4");
+                throw new RuntimeException("The dx_pad parameters must be 4");
             }
 
             columnIndex = (Integer) paras[0];
@@ -75,7 +75,8 @@ public class PadTransformer
             }
             String newValue;
             if (!"r".equalsIgnoreCase(padType) && !"l".equalsIgnoreCase(padType)) {
-                throw new RuntimeException(String.format("dx_pad first para(%s) support l or r", padType));
+                throw new RuntimeException(String.format("The first parameter of dx_pad must be either l or r, " +
+                        "The current parameter is %s", padType));
             }
             if (length <= oriValue.length()) {
                 newValue = oriValue.substring(0, length);

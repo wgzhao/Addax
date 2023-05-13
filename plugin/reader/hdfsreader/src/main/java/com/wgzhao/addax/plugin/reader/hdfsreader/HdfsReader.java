@@ -92,11 +92,11 @@ public class HdfsReader
             else {
                 path = readerOriginConfig.getList(Key.PATH, String.class);
                 if (null == path || path.isEmpty()) {
-                    throw AddaxException.asAddaxException(HdfsReaderErrorCode.REQUIRED_VALUE, "您需要指定待读取的源目录或文件");
+                    throw AddaxException.asAddaxException(HdfsReaderErrorCode.REQUIRED_VALUE, "The item path is required.");
                 }
                 for (String eachPath : path) {
                     if (!eachPath.startsWith("/")) {
-                        String message = String.format("请检查参数path:[%s],需要配置为绝对路径", eachPath);
+                        String message = String.format("The item path [%s] should be a absolute path.", eachPath);
                         LOG.error(message);
                         throw AddaxException.asAddaxException(HdfsReaderErrorCode.ILLEGAL_VALUE, message);
                     }
@@ -105,8 +105,8 @@ public class HdfsReader
 
             specifiedFileType = readerOriginConfig.getNecessaryValue(Key.FILE_TYPE, HdfsReaderErrorCode.REQUIRED_VALUE).toUpperCase();
             if (!HdfsConstant.SUPPORT_FILE_TYPE.contains(specifiedFileType)) {
-                String message = "HdfsReader插件目前支持 " + HdfsConstant.SUPPORT_FILE_TYPE + " 几种格式的文件";
-                throw AddaxException.asAddaxException(HdfsReaderErrorCode.FILE_TYPE_ERROR, message);
+                throw AddaxException.asAddaxException(HdfsReaderErrorCode.FILE_TYPE_ERROR,
+                        "The file type only supports " + HdfsConstant.SUPPORT_FILE_TYPE + " but not " + specifiedFileType);
             }
 
             String encoding = this.readerOriginConfig.getString(ENCODING, "UTF-8");
@@ -117,12 +117,11 @@ public class HdfsReader
             catch (UnsupportedCharsetException uce) {
                 throw AddaxException.asAddaxException(
                         HdfsReaderErrorCode.ILLEGAL_VALUE,
-                        String.format("不支持的编码格式 : [%s]", encoding), uce);
+                        "The encoding [" +  encoding + "] is unsupported.", uce);
             }
             catch (Exception e) {
                 throw AddaxException.asAddaxException(
-                        HdfsReaderErrorCode.ILLEGAL_VALUE,
-                        String.format("运行配置异常 : %s", e.getMessage()), e);
+                        HdfsReaderErrorCode.ILLEGAL_VALUE, "Exception occurred", e);
             }
             //check Kerberos
             boolean haveKerberos = readerOriginConfig.getBool(Key.HAVE_KERBEROS, false);
@@ -152,11 +151,12 @@ public class HdfsReader
                 readerOriginConfig.set(COLUMN, new ArrayList<String>());
             }
             else {
-                // column: 1. index type 2.value type 3.when type is Data, may be has dateFormat value
+                // column: 1. index type 2.value type 3.when type is Data, may be dateFormat value
                 List<Configuration> columns = readerOriginConfig.getListConfiguration(COLUMN);
 
                 if (null == columns || columns.isEmpty()) {
-                    throw AddaxException.asAddaxException(HdfsReaderErrorCode.CONFIG_INVALID_EXCEPTION, "您需要指定 columns");
+                    throw AddaxException.asAddaxException(HdfsReaderErrorCode.CONFIG_INVALID_EXCEPTION,
+                            "The item columns is required.");
                 }
 
                 for (Configuration eachColumnConf : columns) {
@@ -167,12 +167,12 @@ public class HdfsReader
                     if (null == columnIndex && null == columnValue) {
                         throw AddaxException.asAddaxException(
                                 HdfsReaderErrorCode.NO_INDEX_VALUE,
-                                "由于您配置了type, 则至少需要配置 index 或 value, 当前配置为：" + eachColumnConf);
+                                "The index or value must have one, both of them are null.");
                     }
 
                     if (null != columnIndex && null != columnValue) {
                         throw AddaxException.asAddaxException(HdfsReaderErrorCode.MIXED_INDEX_VALUE,
-                                "您混合配置了index, value, 每一列同时仅能选择其中一种");
+                                "The index and value must have one, can not have both.");
                     }
                 }
             }
@@ -183,7 +183,7 @@ public class HdfsReader
         {
             LOG.info("prepare(), start to getAllFiles...");
             this.sourceFiles = (HashSet<String>) dfsUtil.getAllFiles(path, specifiedFileType);
-            LOG.info("您即将读取的文件数为: [{}], 列表为: [{}]", sourceFiles.size(), sourceFiles);
+            LOG.info("It will reading #{} file(s), including [{}}.", sourceFiles.size(), sourceFiles);
         }
 
         @Override
@@ -196,7 +196,8 @@ public class HdfsReader
             int splitNumber = sourceFiles.size();
             if (0 == splitNumber) {
                 throw AddaxException.asAddaxException(HdfsReaderErrorCode.EMPTY_DIR_EXCEPTION,
-                        String.format("未能找到待读取的文件,请确认您的配置项path: %s", readerOriginConfig.getString(Key.PATH)));
+                        "Can not find any file in path : [" + readerOriginConfig.getString(Key.PATH) + "]");
+
             }
 
             List<List<String>> splitSourceFiles = FileHelper.splitSourceFiles(new ArrayList<>(sourceFiles), splitNumber);
@@ -252,9 +253,9 @@ public class HdfsReader
         public void startRead(RecordSender recordSender)
         {
 
-            LOG.info("read start");
+            LOG.info("Being to read.");
             for (String sourceFile : this.sourceFiles) {
-                LOG.info("reading file : [{}]", sourceFile);
+                LOG.info("Reading the file [{}]", sourceFile);
 
                 if (specifiedFileType.equalsIgnoreCase(HdfsConstant.TEXT) || specifiedFileType.equalsIgnoreCase(HdfsConstant.CSV)) {
                     InputStream inputStream = dfsUtil.getInputStream(sourceFile);
@@ -276,9 +277,9 @@ public class HdfsReader
                     dfsUtil.parquetFileStartRead(sourceFile, taskConfig, recordSender, getTaskPluginCollector());
                 }
                 else {
-                    String message = "HdfsReader插件目前支持ORC, TEXT, CSV, SEQUENCE, RC五种格式的文件," +
-                            "请将fileType选项的值配置为ORC, TEXT, CSV, SEQUENCE 或者 RC";
-                    throw AddaxException.asAddaxException(HdfsReaderErrorCode.FILE_TYPE_UNSUPPORTED, message);
+                    throw AddaxException.asAddaxException(HdfsReaderErrorCode.FILE_TYPE_UNSUPPORTED,
+                            "The specifiedFileType: [" + specifiedFileType + "] is unsupported. "
+                                    + "HdfsReader only support TEXT, CSV, ORC, SEQUENCE, RC, PARQUET now.");
                 }
 
                 if (recordSender != null) {
@@ -286,7 +287,7 @@ public class HdfsReader
                 }
             }
 
-            LOG.info("end read source files...");
+            LOG.info("Reading files finished.");
         }
 
         @Override

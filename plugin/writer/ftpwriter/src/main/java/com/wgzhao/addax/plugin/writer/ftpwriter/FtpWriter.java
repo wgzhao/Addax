@@ -102,7 +102,7 @@ public class FtpWriter
             this.writerSliceConfig.getNecessaryValue(FILE_NAME, FtpWriterErrorCode.REQUIRED_VALUE);
             String path = this.writerSliceConfig.getNecessaryValue(FtpKey.PATH, FtpWriterErrorCode.REQUIRED_VALUE);
             if (!path.startsWith("/")) {
-                String message = String.format("请检查参数path:%s,需要配置为绝对路径", path);
+                String message = String.format("The item path [%s] should be configured as absolute path.", path);
                 LOG.error(message);
                 throw AddaxException.asAddaxException(FtpWriterErrorCode.ILLEGAL_VALUE, message);
             }
@@ -170,28 +170,23 @@ public class FtpWriter
 
             // truncate option handler
             if ("truncate".equals(writeMode)) {
-                LOG.info("由于您配置了writeMode truncate, 开始清理 [{}] 下面以 [{}] 开头的内容", path, fileName);
+                LOG.info("The current writeMode is truncate, begin to cleanup all files with prefix [{}] under [{}].", fileName, path);
                 Set<String> fullFileNameToDelete = new HashSet<>();
                 for (String each : allFilesInDir) {
                     fullFileNameToDelete.add(StorageWriterUtil.buildFilePath(path, each, null));
                 }
-                LOG.info("删除目录path:[{}] 下指定前缀fileName:[{}] 文件列表如下: [{}]", path,
-                        fileName,
-                        StringUtils.join(fullFileNameToDelete.iterator(), ", "));
+                LOG.info("The following file(s) will be deleted: [{}].", StringUtils.join(fullFileNameToDelete.iterator(), ", "));
 
                 this.ftpHelper.deleteFiles(fullFileNameToDelete);
             }
             else if ("append".equals(writeMode)) {
-                LOG.info("由于您配置了writeMode append, 写入前不做清理工作, [{}] 目录下写入相应文件名前缀  [{}] 的文件",
-                        path, fileName);
-                LOG.info("目录path:[{}] 下已经存在的指定前缀fileName:[{}] 文件列表如下: [{}]",
-                        path, fileName,
-                        StringUtils.join(allFilesInDir.iterator(), ", "));
+                LOG.info("The current writeMode is append, no cleanup is performed. It will write file(s) with prefix [{}] under [{}].",
+                        fileName, path);
             }
             else if ("nonConflict".equals(writeMode)) {
-                LOG.info("由于您配置了writeMode nonConflict, 开始检查 [{}] 下面的内容", path);
+                LOG.info("The current writeMode is noConflict, begin to check directory [{}] is empty or not", path);
                 if (!allFilesInDir.isEmpty()) {
-                    LOG.info("目录path:[{}] 下指定前缀fileName:[{}] 冲突文件列表如下: [{}]", path, fileName,
+                    LOG.info("The directory [{}] includes the following files with prefix [{}]: [{}].", path, fileName,
                             StringUtils.join(allFilesInDir.iterator(), ", "));
                     throw AddaxException.asAddaxException(
                             FtpWriterErrorCode.ILLEGAL_VALUE,

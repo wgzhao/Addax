@@ -70,7 +70,7 @@ public class TaskMonitor
             return;
         }
         if (!tasks.containsKey(taskId)) {
-            LOG.warn("Unexpected: task id({}) is missing.", taskId);
+            LOG.warn("Unexpected: the task id[{}] is missing.", taskId);
             tasks.putIfAbsent(taskId, new TaskCommunication(taskId, communication));
         }
         else {

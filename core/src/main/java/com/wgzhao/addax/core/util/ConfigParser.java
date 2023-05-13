@@ -144,7 +144,7 @@ public final class ConfigParser
                 jobContent = httpClientUtil.executeAndGetWithFailedRetry(httpGet, 1, 1000L);
             }
             catch (Exception e) {
-                throw AddaxException.asAddaxException(FrameworkErrorCode.CONFIG_ERROR, "获取作业配置信息失败:" + jobResource, e);
+                throw AddaxException.asAddaxException(FrameworkErrorCode.CONFIG_ERROR, "Failed to obtain job configuration:" + jobResource, e);
             }
         }
         else {
@@ -153,12 +153,12 @@ public final class ConfigParser
                 jobContent = FileUtils.readFileToString(new File(jobResource), StandardCharsets.UTF_8);
             }
             catch (IOException e) {
-                throw AddaxException.asAddaxException(FrameworkErrorCode.CONFIG_ERROR, "获取作业配置信息失败:" + jobResource, e);
+                throw AddaxException.asAddaxException(FrameworkErrorCode.CONFIG_ERROR, "Failed to obtain job configuration:" + jobResource, e);
             }
         }
 
         if (jobContent == null) {
-            throw AddaxException.asAddaxException(FrameworkErrorCode.CONFIG_ERROR, "获取作业配置信息失败:" + jobResource);
+            throw AddaxException.asAddaxException(FrameworkErrorCode.CONFIG_ERROR, "Failed to obtain job configuration:" + jobResource);
         }
         return jobContent;
     }
@@ -186,7 +186,7 @@ public final class ConfigParser
         }
 
         if (wantPluginNames != null && !wantPluginNames.isEmpty() && wantPluginNames.size() != complete) {
-            throw AddaxException.asAddaxException(FrameworkErrorCode.PLUGIN_INIT_ERROR, "插件加载失败，未完成指定插件加载:" + wantPluginNames);
+            throw AddaxException.asAddaxException(FrameworkErrorCode.PLUGIN_INIT_ERROR, "Plugin loading failed. The specified plugin was not loaded:" + wantPluginNames);
         }
 
         return configuration;
@@ -204,7 +204,7 @@ public final class ConfigParser
         }
         else {
             throw AddaxException.asAddaxException(FrameworkErrorCode.PLUGIN_INIT_ERROR,
-                    "插件加载失败,存在重复插件:" + filePath);
+                    "Plugin loading failed due to duplicate plugins:" + filePath);
         }
 
         //不是想要的插件，返回null

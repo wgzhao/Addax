@@ -27,7 +27,7 @@ import java.util.regex.Pattern;
 import static com.wgzhao.addax.common.base.Constant.SQL_RESERVED_WORDS;
 
 /**
- * refer:http://blog.csdn.net/ring0hx/article/details/6152528
+ * refer:<a href="http://blog.csdn.net/ring0hx/article/details/6152528">...</a>
  */
 public enum DataBaseType
 {
@@ -130,7 +130,6 @@ public enum DataBaseType
         return jdbc;
     }
 
-    //TODO: only quote column whose name is reserved
     public String quoteColumnName(String columnName)
     {
         // if the column is not reserved words , it's constant value

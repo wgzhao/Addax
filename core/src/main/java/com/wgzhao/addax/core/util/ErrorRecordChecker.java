@@ -53,11 +53,12 @@ public final class ErrorRecordChecker
         percentageLimit = percentage;
 
         if (percentageLimit != null) {
-            Validate.isTrue(0.0 <= percentageLimit && percentageLimit <= 1.0, "脏数据百分比限制应该在[0.0, 1.0]之间");
+            Validate.isTrue(0.0 <= percentageLimit && percentageLimit <= 1.0,
+                    "The dirty data percentage limit should be between 0.0 and 1.0");
         }
 
         if (recordLimit != null) {
-            Validate.isTrue(recordLimit >= 0, "脏数据条数现在应该为非负整数");
+            Validate.isTrue(recordLimit >= 0, "The number of dirty data records now greater than zero");
 
             // errorRecord优先级高于errorPercentage.
             percentageLimit = null;
@@ -72,10 +73,11 @@ public final class ErrorRecordChecker
 
         long errorNumber = CommunicationTool.getTotalErrorRecords(communication);
         if (recordLimit < errorNumber) {
-            LOG.debug("Error-limit set to {}, error count check.", recordLimit);
+            LOG.debug("The error limit is set to {}%. The error counter was checked.", recordLimit);
             throw AddaxException.asAddaxException(
                     FrameworkErrorCode.PLUGIN_DIRTY_DATA_LIMIT_EXCEED,
-                    String.format("脏数据条数检查不通过，限制是[%d]条，但实际上捕获了[%d]条.",
+                    String.format("The number of dirty data records did not pass the check. " +
+                                    "The limit is [%d] records, but [%d] records were actually captured.",
                             recordLimit, errorNumber));
         }
     }
@@ -85,7 +87,7 @@ public final class ErrorRecordChecker
         if (percentageLimit == null) {
             return;
         }
-        LOG.debug("Error-limit set to {}, error percent check.", percentageLimit);
+        LOG.debug("The error limit is set to {}%. The error percentage was checked.", percentageLimit);
 
         long total = CommunicationTool.getTotalReadRecords(communication);
         long error = CommunicationTool.getTotalErrorRecords(communication);
@@ -93,7 +95,7 @@ public final class ErrorRecordChecker
         if (total > 0 && ((double) error / (double) total) > percentageLimit) {
             throw AddaxException.asAddaxException(
                     FrameworkErrorCode.PLUGIN_DIRTY_DATA_LIMIT_EXCEED,
-                    String.format("脏数据百分比检查不通过，限制是[%f]，但实际上捕获到[%f].",
+                    String.format("The dirty data percentage check failed. The limit is [%f], but [%f] was actually captured",
                             percentageLimit, ((double) error / (double) total)));
         }
     }

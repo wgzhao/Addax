@@ -53,18 +53,15 @@ import java.util.Set;
  * Created by haiwei.luo on 14-9-17.
  */
 public class DbfWriter
-        extends Writer
-{
+        extends Writer {
     public static class Job
-            extends Writer.Job
-    {
+            extends Writer.Job {
         private static final Logger LOG = LoggerFactory.getLogger(Job.class);
 
         private Configuration writerSliceConfig = null;
 
         @Override
-        public void init()
-        {
+        public void init() {
             this.writerSliceConfig = this.getPluginJobConf();
             this.validateParameter();
             String dateFormatOld = this.writerSliceConfig.getString(Key.FORMAT);
@@ -73,13 +70,12 @@ public class DbfWriter
                 this.writerSliceConfig.set(Key.DATE_FORMAT, dateFormatOld);
             }
             if (null != dateFormatOld) {
-                LOG.warn("您使用format配置日期格式化, 这是不推荐的行为, 请优先使用dateFormat配置项, 两项同时存在则使用dateFormat.");
+                LOG.warn("The item 'format' is deprecated. you can use 'dateFormat' to format date type.");
             }
             validateParameter();
         }
 
-        private void validateParameter()
-        {
+        private void validateParameter() {
             this.writerSliceConfig.getNecessaryValue(Key.FILE_NAME, DbfWriterErrorCode.REQUIRED_VALUE);
 
             String path = this.writerSliceConfig.getNecessaryValue(Key.PATH, DbfWriterErrorCode.REQUIRED_VALUE);
@@ -90,33 +86,32 @@ public class DbfWriter
                 if (dir.isFile()) {
                     throw AddaxException.asAddaxException(
                             DbfWriterErrorCode.ILLEGAL_VALUE,
-                            String.format("您配置的path: [%s] 不是一个合法的目录, 请您注意文件重名, 不合法目录名等情况.", path));
+                            String.format("The path [%s] you configured exists ,but it is file not directory.", path));
                 }
                 if (!dir.exists()) {
                     boolean createdOk = dir.mkdirs();
                     if (!createdOk) {
                         throw AddaxException.asAddaxException(
                                 DbfWriterErrorCode.CONFIG_INVALID_EXCEPTION,
-                                String.format("您指定的文件路径 : [%s] 创建失败.", path));
+                                String.format("Failed to create directory [%s].", path));
                     }
                 }
-            }
-            catch (SecurityException se) {
+            } catch (SecurityException se) {
                 throw AddaxException.asAddaxException(
                         DbfWriterErrorCode.SECURITY_NOT_ENOUGH,
-                        String.format("您没有权限创建文件路径 : [%s] ", path), se);
+                        String.format("Permission denied while creating directory [%s].", path), se);
             }
         }
 
         @Override
-        public void prepare()
-        {
+        public void prepare() {
             String path = this.writerSliceConfig.getString(Key.PATH);
             String fileName = this.writerSliceConfig.getString(Key.FILE_NAME);
             String writeMode = this.writerSliceConfig.getString(Key.WRITE_MODE);
             // truncate option handler
             if ("truncate".equals(writeMode)) {
-                LOG.info("由于您配置了writeMode truncate, 开始清理 [{}] 下面以 [{}] 开头的内容", path, fileName);
+                LOG.info("The current writeMode is 'truncate', begin to cleanup all files or sub-directories " +
+                        "with prefix is [{}] under [{}].", path, fileName);
                 File dir = new File(path);
                 // warn:需要判断文件是否存在，不存在时，不能删除
                 try {
@@ -126,48 +121,42 @@ public class DbfWriter
                         File[] filesWithFileNamePrefix = dir.listFiles(filter);
                         assert filesWithFileNamePrefix != null;
                         for (File eachFile : filesWithFileNamePrefix) {
-                            LOG.info("delete file [{}].", eachFile.getName());
+                            LOG.info("Delete file [{}].", eachFile.getName());
                             FileUtils.forceDelete(eachFile);
                         }
                         // FileUtils.cleanDirectory(dir)
                     }
-                }
-                catch (NullPointerException npe) {
+                } catch (NullPointerException npe) {
                     throw AddaxException
                             .asAddaxException(
                                     DbfWriterErrorCode.WRITE_FILE_ERROR,
-                                    String.format("您配置的目录清空时出现空指针异常 : [%s]", path), npe);
-                }
-                catch (IllegalArgumentException iae) {
+                                    String.format("NPE occurred whiling cleanup [%s].", path), npe);
+                } catch (IllegalArgumentException iae) {
                     throw AddaxException.asAddaxException(
                             DbfWriterErrorCode.SECURITY_NOT_ENOUGH,
-                            String.format("您配置的目录参数异常 : [%s]", path));
-                }
-                catch (SecurityException se) {
+                            String.format("IllegalArgumentException occurred cleanup [%s].", path));
+                } catch (SecurityException se) {
                     throw AddaxException.asAddaxException(
                             DbfWriterErrorCode.SECURITY_NOT_ENOUGH,
-                            String.format("您没有权限查看目录 : [%s]", path));
-                }
-                catch (IOException e) {
+                            String.format("Permission denied for cleaning up [%s]", path));
+                } catch (IOException e) {
                     throw AddaxException.asAddaxException(
                             DbfWriterErrorCode.WRITE_FILE_ERROR,
-                            String.format("无法清空目录 : [%s]", path), e);
+                            String.format("IO exception occurred while cleanup [%s]", path), e);
                 }
-            }
-            else if ("append".equals(writeMode)) {
-                LOG.info("由于您配置了writeMode append, 写入前不做清理工作, [{}] 目录下写入相应文件名前缀 [{}] 的文件", path, fileName);
-            }
-            else if ("nonConflict".equals(writeMode)) {
-                LOG.info("由于您配置了writeMode nonConflict, 开始检查 [{}] 下面的内容", path);
+            } else if ("append".equals(writeMode)) {
+                LOG.info("The current writeMode is append, no cleanup is performed before writing." +
+                        "It will write files with prefix [{}] under the directory [{}].", path, fileName);
+            } else if ("nonConflict".equals(writeMode)) {
+                LOG.info("The current writeMode is nonConflict, begin to check the directory [{}] is empty or not.", path);
                 // warn: check two times about exists, mkdir
                 File dir = new File(path);
                 try {
                     if (dir.exists()) {
                         if (dir.isFile()) {
-                            throw AddaxException
-                                    .asAddaxException(
-                                            DbfWriterErrorCode.ILLEGAL_VALUE,
-                                            String.format("您配置的path: [%s] 不是一个合法的目录, 请您注意文件重名, 不合法目录名等情况.", path));
+                            throw AddaxException.asAddaxException(
+                                    DbfWriterErrorCode.ILLEGAL_VALUE,
+                                    String.format("The path [%s] exists, but it is file not directory.", path));
                         }
                         // fileName is not null
                         FilenameFilter filter = new PrefixFileFilter(fileName);
@@ -178,35 +167,28 @@ public class DbfWriter
                             for (File eachFile : filesWithFileNamePrefix) {
                                 allFiles.add(eachFile.getName());
                             }
-                            LOG.error("冲突文件列表为: [{}]",
-                                    StringUtils.join(allFiles, ","));
-                            throw AddaxException
-                                    .asAddaxException(
-                                            DbfWriterErrorCode.ILLEGAL_VALUE,
-                                            String.format("您配置的path: [%s] 目录不为空, 下面存在其他文件或文件夹.", path));
+                            LOG.error("The following files are conflict: [{}]", StringUtils.join(allFiles, ","));
+                            throw AddaxException.asAddaxException(
+                                    DbfWriterErrorCode.ILLEGAL_VALUE,
+                                    String.format("The path [%s] is not empty.", path));
                         }
-                    }
-                    else {
+                    } else {
                         boolean createdOk = dir.mkdirs();
                         if (!createdOk) {
-                            throw AddaxException
-                                    .asAddaxException(
-                                            DbfWriterErrorCode.CONFIG_INVALID_EXCEPTION,
-                                            String.format("您指定的文件路径 : [%s] 创建失败.", path));
+                            throw AddaxException.asAddaxException(
+                                    DbfWriterErrorCode.CONFIG_INVALID_EXCEPTION,
+                                    String.format("Failed to create directory [%s].", path));
                         }
                     }
-                }
-                catch (SecurityException se) {
+                } catch (SecurityException se) {
                     throw AddaxException.asAddaxException(
                             DbfWriterErrorCode.SECURITY_NOT_ENOUGH,
-                            String.format("您没有权限查看目录 : [%s]", path));
+                            String.format("Permission denied for creating directory [%s]", path));
                 }
-            }
-            else {
-                throw AddaxException
-                        .asAddaxException(
-                                DbfWriterErrorCode.ILLEGAL_VALUE,
-                                String.format("仅支持 truncate, append, nonConflict 三种模式, 不支持您配置的 writeMode 模式 : [%s]", writeMode));
+            } else {
+                throw AddaxException.asAddaxException(
+                        DbfWriterErrorCode.ILLEGAL_VALUE,
+                        String.format("The item writeMode only supports truncate, append and nonConflict  the [%s] is not supported.", writeMode));
             }
 
             // check column configuration is valid or not
@@ -216,36 +198,33 @@ public class DbfWriter
                         (column.getString(Key.LENGTH, null) == null || column.getString(Key.SCALE, null) == null)) {
                     throw AddaxException.asAddaxException(
                             DbfWriterErrorCode.CONFIG_INVALID_EXCEPTION,
-                            String.format("numeric 类型必须配置 %s 和 %s 项", Key.LENGTH, Key.SCALE)
+                            String.format("The numeric type both require configured item %s and %s.", Key.LENGTH, Key.SCALE)
                     );
                 }
 
                 if ("char".equalsIgnoreCase(column.getString(Key.TYPE)) && column.getString(Key.LENGTH, null) == null) {
                     throw AddaxException.asAddaxException(
                             DbfWriterErrorCode.CONFIG_INVALID_EXCEPTION,
-                            String.format("char 类型必须配置 %s 项", Key.LENGTH)
+                            String.format("The char type require configured item %s.", Key.LENGTH)
                     );
                 }
             }
         }
 
         @Override
-        public void post()
-        {
+        public void post() {
             //
         }
 
         @Override
-        public void destroy()
-        {
+        public void destroy() {
             //
         }
 
         @Override
-        public List<Configuration> split(int mandatoryNumber)
-        {
+        public List<Configuration> split(int mandatoryNumber) {
             List<Configuration> writerSplitConfigs = new ArrayList<>();
-            LOG.info("begin do split...");
+            LOG.info("Begin doing split...");
             if (mandatoryNumber == 1) {
                 writerSplitConfigs.add(this.writerSliceConfig);
                 return writerSplitConfigs;
@@ -260,11 +239,10 @@ public class DbfWriter
                 path = this.writerSliceConfig.getString(Key.PATH);
                 File dir = new File(path);
                 allFiles = new HashSet<>(Arrays.asList(Objects.requireNonNull(dir.list())));
-            }
-            catch (SecurityException se) {
+            } catch (SecurityException se) {
                 throw AddaxException.asAddaxException(
                         DbfWriterErrorCode.SECURITY_NOT_ENOUGH,
-                        String.format("您没有权限查看目录 : [%s]", path));
+                        String.format("Permission denied for viewing directory [%s].", path));
             }
 
             for (int i = 0; i < mandatoryNumber; i++) {
@@ -283,18 +261,17 @@ public class DbfWriter
 
                 splitTaskConfig.set(Key.FILE_NAME, fullFileName);
 
-                LOG.info("split write file name:[{}]", fullFileName);
+                LOG.info("The split wrote files: [{}]", fullFileName);
 
                 writerSplitConfigs.add(splitTaskConfig);
             }
-            LOG.info("end do split.");
+            LOG.info("Finish split.");
             return writerSplitConfigs;
         }
     }
 
     public static class Task
-            extends Writer.Task
-    {
+            extends Writer.Task {
         private static final Logger LOG = LoggerFactory.getLogger(Task.class);
 
         private Configuration writerSliceConfig;
@@ -304,8 +281,7 @@ public class DbfWriter
         private String fileName;
 
         @Override
-        public void init()
-        {
+        public void init() {
             this.writerSliceConfig = this.getPluginJobConf();
             this.path = this.writerSliceConfig.getString(Key.PATH);
             // remove file suffix
@@ -314,18 +290,16 @@ public class DbfWriter
         }
 
         @Override
-        public void prepare()
-        {
+        public void prepare() {
             //
         }
 
         @Override
-        public void startWrite(RecordReceiver lineReceiver)
-        {
-            LOG.info("begin to write...");
+        public void startWrite(RecordReceiver lineReceiver) {
+            LOG.info("Begin to write...");
             String fileSuffix = ".dbf";
             String fileFullPath = StorageWriterUtil.buildFilePath(path, fileName, fileSuffix);
-            LOG.info("write to file : [{}]", fileFullPath);
+            LOG.info("Writing file: [{}]", fileFullPath);
             List<Configuration> columns = this.writerSliceConfig.getListConfiguration(Key.COLUMN);
             DBFWriter writer;
             try {
@@ -395,24 +369,21 @@ public class DbfWriter
                 }
 
                 writer.close();
-            }
-            catch (SecurityException se) {
+            } catch (SecurityException se) {
                 throw AddaxException.asAddaxException(
                         DbfWriterErrorCode.SECURITY_NOT_ENOUGH,
-                        String.format("您没有权限创建文件  : [%s]", this.fileName));
+                        String.format("Permission denied for create directory [%s].", this.fileName));
             }
-            LOG.info("end write");
+            LOG.info("Writing finished");
         }
 
         @Override
-        public void post()
-        {
+        public void post() {
             //
         }
 
         @Override
-        public void destroy()
-        {
+        public void destroy() {
             //
         }
     }

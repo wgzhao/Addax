@@ -60,18 +60,15 @@ public class TaskGroupContainer
         extends AbstractContainer
 {
     private static final Logger LOG = LoggerFactory.getLogger(TaskGroupContainer.class);
-    /**
-     * 当前taskGroupId
-     */
+
+     // The current taskGroupId
     private final int taskGroupId;
 
-    /**
-     * 使用的channel类
-     */
+     // The channel class used 使用的channel类
     private final String channelClazz;
 
     /**
-     * task收集器使用的类
+     * The task Collector class used
      */
     private final String taskCollectorClass;
 
@@ -121,11 +118,11 @@ public class TaskGroupContainer
             List<Configuration> taskConfigs = this.configuration.getListConfiguration(CoreConstant.JOB_CONTENT);
 
             if (LOG.isDebugEnabled()) {
-                LOG.debug("taskGroup[{}]'s task configs[{}]", this.taskGroupId, JSON.toJSONString(taskConfigs));
+                LOG.debug("The task configuration [{} for taskGroup[{}]", this.taskGroupId, JSON.toJSONString(taskConfigs));
             }
 
             int taskCountInThisTaskGroup = taskConfigs.size();
-            LOG.info("taskGroupId=[{}] start [{}] channels for [{}] tasks.", this.taskGroupId, channelNumber, taskCountInThisTaskGroup);
+            LOG.info("The taskGroupId=[{}] started [{}] channels for [{}] tasks.", this.taskGroupId, channelNumber, taskCountInThisTaskGroup);
 
             this.containerCommunicator.registerCommunication(taskConfigs);
 
@@ -176,7 +173,7 @@ public class TaskGroupContainer
                         Long taskStartTime = taskStartTimeMap.get(taskId);
                         if (taskStartTime != null) {
                             long usedTime = System.currentTimeMillis() - taskStartTime;
-                            LOG.debug("taskGroup[{}] taskId[{}] is successful, used[{}]ms",
+                            LOG.debug("TaskGroup[{}] TaskId[{}] succeeded, used [{}]ms",
                                     this.taskGroupId, taskId, usedTime);
                             taskStartTimeMap.remove(taskId);
                             taskConfigMap.remove(taskId);
@@ -209,15 +206,15 @@ public class TaskGroupContainer
                             if (now - failedTime > taskMaxWaitInMs) {
                                 markCommunicationFailed(taskId);
                                 reportTaskGroupCommunication(lastTaskGroupContainerCommunication, taskCountInThisTaskGroup);
-                                throw AddaxException.asAddaxException(CommonErrorCode.WAIT_TIME_EXCEED, "task failover等待超时");
+                                throw AddaxException.asAddaxException(CommonErrorCode.WAIT_TIME_EXCEED, "The task failover wait timed out.");
                             }
                             else {
-                                lastExecutor.shutdown(); //再次尝试关闭
+                                lastExecutor.shutdown(); //try to close again
                                 continue;
                             }
                         }
                         else {
-                            LOG.debug("taskGroup[{}] taskId[{}] attemptCount[{}] has already shutdown",
+                            LOG.debug("TaskGroup[{}] TaskId[{}] AttemptCount[{}] has already shutdown",
                                     this.taskGroupId, taskId, lastExecutor.getAttemptCount());
                         }
                     }
@@ -233,7 +230,7 @@ public class TaskGroupContainer
                     taskMonitor.registerTask(taskId, this.containerCommunicator.getCommunication(taskId));
 
                     taskFailedExecutorMap.remove(taskId);
-                    LOG.debug("taskGroup[{}] taskId[{}] attemptCount[{}] is started",
+                    LOG.debug("TaskGroup[{}] TaskId[{}] AttemptCount[{}] has started",
                             this.taskGroupId, taskId, attemptCount);
                 }
 
@@ -242,7 +239,7 @@ public class TaskGroupContainer
                     // 成功的情况下，也需要汇报一次。否则在任务结束非常快的情况下，采集的信息将会不准确
                     lastTaskGroupContainerCommunication = reportTaskGroupCommunication(lastTaskGroupContainerCommunication, taskCountInThisTaskGroup);
 
-                    LOG.debug("taskGroup[{}] completed it's tasks.", this.taskGroupId);
+                    LOG.debug("The taskGroup[{}] has completed it's tasks.", this.taskGroupId);
                     break;
                 }
 
@@ -369,7 +366,7 @@ public class TaskGroupContainer
             this.taskConfig = taskConf;
             Validate.isTrue(null != this.taskConfig.getConfiguration(CoreConstant.JOB_READER)
                             && null != this.taskConfig.getConfiguration(CoreConstant.JOB_WRITER),
-                    "[reader|writer]的插件参数不能为空!");
+                    "The plugin parameters for reader and(or) writer cannot be empty!");
 
             // 得到taskId
             this.taskId = this.taskConfig.getInt(CoreConstant.TASK_ID);
@@ -382,7 +379,7 @@ public class TaskGroupContainer
             this.taskCommunication = containerCommunicator
                     .getCommunication(taskId);
             Validate.notNull(this.taskCommunication,
-                    String.format("taskId[%d]的Communication没有注册过", taskId));
+                    String.format("Communication has not been registered for taskId[%d]", taskId));
             this.channel = ClassUtil.instantiate(channelClazz,
                     Channel.class, configuration);
             this.channel.setCommunication(this.taskCommunication);

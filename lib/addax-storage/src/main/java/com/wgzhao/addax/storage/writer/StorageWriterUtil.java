@@ -80,7 +80,7 @@ public class StorageWriterUtil
                     .asAddaxException(
                             StorageWriterErrorCode.ILLEGAL_VALUE,
                             String.format(
-                                    "'%s' is unsupported, supported write mode: [%s]",
+                                    "The writeMode [%s] is unsupported, it only supports [%s]",
                                     writeMode, StringUtils.join(supportedWriteModes, ",")));
         }
         writerConfiguration.set(Key.WRITE_MODE, writeMode);
@@ -89,7 +89,7 @@ public class StorageWriterUtil
         String encoding = writerConfiguration.getString(Key.ENCODING);
         if (StringUtils.isBlank(encoding)) {
             // like "  ", null
-            LOG.warn(String.format("您的encoding配置为空, 将使用默认值[%s]", Constant.DEFAULT_ENCODING));
+            LOG.warn(String.format("The item encoding is empty, uses [%s] as default.", Constant.DEFAULT_ENCODING));
             writerConfiguration.set(Key.ENCODING, Constant.DEFAULT_ENCODING);
         }
         else {
@@ -101,7 +101,7 @@ public class StorageWriterUtil
             catch (Exception e) {
                 throw AddaxException.asAddaxException(
                         StorageWriterErrorCode.ILLEGAL_VALUE,
-                        String.format("不支持您配置的编码格式:[%s]", encoding), e);
+                        String.format("The encoding [%s] is unsupported.", encoding), e);
             }
         }
 
@@ -117,10 +117,10 @@ public class StorageWriterUtil
         if (null != delimiterInStr && 1 != delimiterInStr.length()) {
             throw AddaxException.asAddaxException(
                     StorageWriterErrorCode.ILLEGAL_VALUE,
-                    String.format("仅仅支持单字符切分, 您配置的切分为 : [%s]", delimiterInStr));
+                    String.format("The delimiter only supports single character, [%s] is invalid.", delimiterInStr));
         }
         if (null == delimiterInStr) {
-            LOG.warn(String.format("您没有配置列分隔符, 使用默认值[%s]", Constant.DEFAULT_FIELD_DELIMITER));
+            LOG.warn(String.format("The item delimiter is empty, uses [%s] as default.", Constant.DEFAULT_FIELD_DELIMITER));
             writerConfiguration.set(Key.FIELD_DELIMITER, Constant.DEFAULT_FIELD_DELIMITER);
         }
 
@@ -129,14 +129,14 @@ public class StorageWriterUtil
         if (!Constant.SUPPORTED_FILE_FORMAT.contains(fileFormat)) {
             throw AddaxException.asAddaxException(
                     StorageWriterErrorCode.ILLEGAL_VALUE,
-                    String.format("您配置的fileFormat [%s]错误, 支持[%s]两种.", fileFormat, Constant.SUPPORTED_FILE_FORMAT));
+                    String.format("The fileFormat [%s] you configured is invalid, it only supports [%s].", fileFormat, Constant.SUPPORTED_FILE_FORMAT));
         }
     }
 
     public static List<Configuration> split(Configuration writerSliceConfig, Set<String> originAllFileExists, int mandatoryNumber)
     {
         List<Configuration> writerSplitConfigs = new ArrayList<>();
-        LOG.info("begin do split...");
+        LOG.info("Begin to split...");
         if (mandatoryNumber == 1) {
             writerSplitConfigs.add(writerSliceConfig);
             return writerSplitConfigs;
@@ -159,7 +159,7 @@ public class StorageWriterUtil
             LOG.info(String.format("split write file name:[%s]", fullFileName));
             writerSplitConfigs.add(splitTaskConfig);
         }
-        LOG.info("end do split.");
+        LOG.info("Finished split.");
         return writerSplitConfigs;
     }
 
@@ -195,7 +195,7 @@ public class StorageWriterUtil
         String encoding = config.getString(Key.ENCODING, Constant.DEFAULT_ENCODING);
         // handle blank encoding
         if (StringUtils.isBlank(encoding)) {
-            LOG.warn("您配置的encoding为[{}], 使用默认值[{}]", encoding, Constant.DEFAULT_ENCODING);
+            LOG.warn("The item encoding is empty, uses [{}] as default.", Constant.DEFAULT_ENCODING);
             encoding = Constant.DEFAULT_ENCODING;
         }
         String compress = config.getString(Key.COMPRESS);
@@ -231,23 +231,21 @@ public class StorageWriterUtil
             throw AddaxException
                     .asAddaxException(
                             StorageWriterErrorCode.WRITE_FILE_WITH_CHARSET_ERROR,
-                            String.format("不支持的编码格式 : [%s]", encoding), uee);
+                            String.format("The encoding [%s] is unsupported.", encoding), uee);
         }
         catch (NullPointerException e) {
-            throw AddaxException.asAddaxException(
-                    StorageWriterErrorCode.RUNTIME_EXCEPTION,
-                    "运行时错误, 请联系我们", e);
+            throw AddaxException.asAddaxException(StorageWriterErrorCode.RUNTIME_EXCEPTION, "NPE occurred", e);
         }
         catch (CompressorException e) {
             throw AddaxException.asAddaxException(
                     StorageReaderErrorCode.ILLEGAL_VALUE,
-                    "The compress algorithm '" + compress + "' is unsupported yet"
+                    "The compress algorithm [" + compress + "] is unsupported yet."
             );
         }
         catch (IOException e) {
             throw AddaxException.asAddaxException(
                     StorageWriterErrorCode.WRITE_FILE_IO_ERROR,
-                    String.format("流写入错误 : [%s]", fileName), e);
+                    String.format("IO exception occurred when writing [%s].", fileName), e);
         }
         finally {
             IOUtils.closeQuietly(writer, null);
@@ -277,10 +275,10 @@ public class StorageWriterUtil
         if (null != delimiterInStr && 1 != delimiterInStr.length()) {
             throw AddaxException.asAddaxException(
                     StorageWriterErrorCode.ILLEGAL_VALUE,
-                    String.format("仅仅支持单字符切分, 您配置的切分为 : [%s]", delimiterInStr));
+                    String.format("The item delimiter is only support single character, [%s] is invalid.", delimiterInStr));
         }
         if (null == delimiterInStr) {
-            LOG.warn(String.format("您没有配置列分隔符, 使用默认值[%s]",
+            LOG.warn(String.format("The item delimiter is empty, uses [%s] as default.",
                     Constant.DEFAULT_FIELD_DELIMITER));
         }
 

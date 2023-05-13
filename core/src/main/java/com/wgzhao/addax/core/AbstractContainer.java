@@ -35,7 +35,7 @@ public abstract class AbstractContainer
     public AbstractContainer(Configuration configuration)
     {
 
-        Validate.notNull(configuration, "Configuration can not be null.");
+        Validate.notNull(configuration, "The configuration cannot be null.");
 
         this.configuration = configuration;
     }

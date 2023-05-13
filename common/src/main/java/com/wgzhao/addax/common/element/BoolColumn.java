@@ -122,21 +122,21 @@ public class BoolColumn
     public Date asDate()
     {
         throw AddaxException.asAddaxException(
-                CommonErrorCode.CONVERT_NOT_SUPPORT, "Bool类型不能转为Date .");
+                CommonErrorCode.CONVERT_NOT_SUPPORT, "Bool type cannot be converted to Date.");
     }
 
     @Override
     public byte[] asBytes()
     {
         throw AddaxException.asAddaxException(
-                CommonErrorCode.CONVERT_NOT_SUPPORT, "Boolean类型不能转为Bytes .");
+                CommonErrorCode.CONVERT_NOT_SUPPORT, "Bool type cannot be converted to Bytes.");
     }
 
     @Override
     public Timestamp asTimestamp()
     {
         throw AddaxException.asAddaxException(
-                CommonErrorCode.CONVERT_NOT_SUPPORT, "Boolean类型不能转为Timestamp .");
+                CommonErrorCode.CONVERT_NOT_SUPPORT, "Bool type cannot be converted to Timestamp.");
     }
 
     private void validate(final String data)
@@ -151,6 +151,6 @@ public class BoolColumn
 
         throw AddaxException.asAddaxException(
                 CommonErrorCode.CONVERT_NOT_SUPPORT,
-                String.format("String[%s]不能转为Bool .", data));
+                String.format("String [%s] cannot be converted to Bool .", data));
     }
 }

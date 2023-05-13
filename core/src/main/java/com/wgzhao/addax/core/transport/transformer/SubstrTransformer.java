@@ -49,7 +49,7 @@ public class SubstrTransformer
 
         try {
             if (paras.length != 3) {
-                throw new RuntimeException("dx_substr argument number must be equal 3");
+                throw new RuntimeException("The dx_substr parameters must be 3");
             }
 
             columnIndex = (Integer) paras[0];
@@ -71,7 +71,7 @@ public class SubstrTransformer
             }
             String newValue;
             if (startIndex > oriValue.length()) {
-                throw new RuntimeException(String.format("dx_substr startIndex(%s) out of range" +
+                throw new RuntimeException(String.format("The dx_substr startIndex(%s) out of range" +
                         "(%s) of (%s)", startIndex, oriValue.length(), oriValue));
             }
             if (startIndex + length >= oriValue.length()) {

@@ -100,7 +100,8 @@ public class OracleReader
         {
             int fetchSize = originalConfig.getInt(FETCH_SIZE, DEFAULT_FETCH_SIZE);
             if (fetchSize < 1) {
-                throw AddaxException.asAddaxException(DBUtilErrorCode.REQUIRED_VALUE, String.format("您配置的 fetchSize 有误，fetchSize:[%d] 值不能小于 1.", fetchSize));
+                throw AddaxException.asAddaxException(DBUtilErrorCode.REQUIRED_VALUE,
+                        "The value of fetchSize [" + fetchSize + "] in OracleReader can not be less than 1.");
             }
             originalConfig.set(FETCH_SIZE, fetchSize);
         }
@@ -111,7 +112,8 @@ public class OracleReader
             if (StringUtils.isNotBlank(hint)) {
                 boolean isTableMode = originalConfig.getBool(IS_TABLE_MODE);
                 if (!isTableMode) {
-                    throw AddaxException.asAddaxException(OracleReaderErrorCode.HINT_ERROR, "当且仅当非 querySql 模式读取 oracle 时才能配置 HINT.");
+                    throw AddaxException.asAddaxException(OracleReaderErrorCode.HINT_ERROR,
+                            "Only querySql mode can configure HINT, please set isTableMode to false.");
                 }
                 HintUtil.initHintConf(DATABASE_TYPE, originalConfig);
             }

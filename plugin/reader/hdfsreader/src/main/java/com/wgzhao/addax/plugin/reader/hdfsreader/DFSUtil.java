@@ -196,7 +196,7 @@ public class DFSUtil
                 addSourceFileByType(filePath);
             }
             else {
-                LOG.warn("文件[{}]长度为0，将会跳过不作处理！", filePath);
+                LOG.warn("It will ignore file [{}] because it is empty.", filePath);
             }
         }
     }
@@ -224,9 +224,7 @@ public class DFSUtil
             }
         }
         catch (IOException e) {
-            String message = String.format("无法读取路径[%s]下的所有文件,请确认您的配置项fs.defaultFS, path的值是否正确，" +
-                    "是否有读写权限，网络是否已断开！", hdfsPath);
-            LOG.error(message);
+            LOG.error("IO exception occurred while reading file(s) under [{}].", hdfsPath);
             throw AddaxException.asAddaxException(HdfsReaderErrorCode.PATH_CONFIG_ERROR, e);
         }
     }
@@ -246,14 +244,14 @@ public class DFSUtil
         for (FileStatus f : stats) {
             // 判断是不是目录，如果是目录，递归调用
             if (f.isDirectory()) {
-                LOG.info("[{}] 是目录, 递归获取该目录下的文件", f.getPath());
+                LOG.info("The [{}] is directory, reading all files in the directory.", f.getPath());
                 getHDFSAllFilesNORegex(f.getPath().toString(), hdfs);
             }
             else if (f.isFile()) {
                 addSourceFileIfNotEmpty(f);
             }
             else {
-                String message = String.format("该路径[%s]文件类型既不是目录也不是文件，插件自动忽略。", f.getPath());
+                String message = String.format("The [%s] neither directory nor file,ignore it.", f.getPath());
                 LOG.info(message);
             }
         }
@@ -266,13 +264,11 @@ public class DFSUtil
         boolean isMatchedFileType = checkHdfsFileType(filePath, this.specifiedFileType);
 
         if (isMatchedFileType) {
-            String msg = String.format("[%s]是[%s]类型的文件, 将该文件加入source files列表", filePath, this.specifiedFileType);
-            LOG.info(msg);
+            LOG.info("The file [{}] format is [{}], add it to source files list.", filePath, this.specifiedFileType);
             sourceHDFSAllFilesList.add(filePath);
         }
         else {
-            String message = String.format("文件[%s]的类型与用户配置的fileType类型不一致，" +
-                            "请确认您配置的目录下面所有文件的类型均为[%s]"
+            String message = String.format("The file [%s] format is not the same of [%s] you configured."
                     , filePath, this.specifiedFileType);
             LOG.error(message);
             throw AddaxException.asAddaxException(
@@ -292,7 +288,7 @@ public class DFSUtil
             return inputStream;
         }
         catch (IOException e) {
-            String message = String.format("读取文件 : [%s] 时出错,请确认文件：[%s]存在且配置的用户有权限读取", filepath, filepath);
+            String message = String.format("IO exception occurred while reading the file [%s].", filepath);
             throw AddaxException.asAddaxException(HdfsReaderErrorCode.READ_FILE_ERROR, message, e);
         }
     }
@@ -300,7 +296,7 @@ public class DFSUtil
     public void sequenceFileStartRead(String sourceSequenceFilePath, Configuration readerSliceConfig,
             RecordSender recordSender, TaskPluginCollector taskPluginCollector)
     {
-        LOG.info("Start Read sequence file [{}].", sourceSequenceFilePath);
+        LOG.info("Begin to read the sequence file [{}].", sourceSequenceFilePath);
 
         Path seqFilePath = new Path(sourceSequenceFilePath);
         try (SequenceFile.Reader reader = new SequenceFile.Reader(this.hadoopConf,
@@ -316,7 +312,7 @@ public class DFSUtil
             }
         }
         catch (Exception e) {
-            String message = String.format("SequenceFile.Reader读取文件[%s]时出错", sourceSequenceFilePath);
+            String message = String.format("Exception occurred while reading the file [%s].", sourceSequenceFilePath);
             LOG.error(message);
             throw AddaxException.asAddaxException(HdfsReaderErrorCode.READ_SEQUENCE_FILE_ERROR, message, e);
         }
@@ -353,7 +349,7 @@ public class DFSUtil
             }
         }
         catch (IOException e) {
-            String message = String.format("读取文件[%s]时出错", sourceRcFilePath);
+            String message = String.format("IO exception occurred while reading the file [%s].", sourceRcFilePath);
             LOG.error(message);
             throw AddaxException.asAddaxException(HdfsReaderErrorCode.READ_RCFILE_ERROR, message, e);
         }
@@ -365,7 +361,7 @@ public class DFSUtil
                 }
             }
             catch (IOException e) {
-                LOG.warn(String.format("finally: 关闭RCFileRecordReader失败, %s", e.getMessage()));
+                LOG.warn(String.format("Failed to close RCFileRecordReader: %s", e.getMessage()));
             }
         }
     }
@@ -373,7 +369,7 @@ public class DFSUtil
     public void orcFileStartRead(String sourceOrcFilePath, Configuration readerSliceConfig,
             RecordSender recordSender, TaskPluginCollector taskPluginCollector)
     {
-        LOG.info("Start Read orc-file [{}].", sourceOrcFilePath);
+        LOG.info("Being to read the orc-file [{}].", sourceOrcFilePath);
         List<ColumnEntry> column = StorageReaderUtil.getListColumnEntry(readerSliceConfig, COLUMN);
         String nullFormat = readerSliceConfig.getString(NULL_FORMAT);
 
@@ -398,8 +394,7 @@ public class DFSUtil
             }
         }
         catch (Exception e) {
-            String message = String.format("从orc-file文件路径[%s]中读取数据发生异常，请联系系统管理员。"
-                    , sourceOrcFilePath);
+            String message = String.format("Exception occurred while reading the file [%s].", sourceOrcFilePath);
             LOG.error(message);
             throw AddaxException.asAddaxException(HdfsReaderErrorCode.READ_FILE_ERROR, message);
         }
@@ -480,7 +475,7 @@ public class DFSUtil
     public void parquetFileStartRead(String sourceParquetFilePath, Configuration readerSliceConfig,
             RecordSender recordSender, TaskPluginCollector taskPluginCollector)
     {
-        LOG.info("Start Read orc-file [{}].", sourceParquetFilePath);
+        LOG.info("Begin to read the parquet-file [{}].", sourceParquetFilePath);
         List<ColumnEntry> column = StorageReaderUtil.getListColumnEntry(readerSliceConfig, COLUMN);
         String nullFormat = readerSliceConfig.getString(NULL_FORMAT);
         Path parquetFilePath = new Path(sourceParquetFilePath);
@@ -528,8 +523,7 @@ public class DFSUtil
             }
         }
         catch (IOException e) {
-            String message = String.format("从parquet file文件路径[%s]中读取数据发生异常，请联系系统管理员。"
-                    , sourceParquetFilePath);
+            String message = String.format("IO exception occurred while reading the parquet-file [%s]", sourceParquetFilePath);
             LOG.error(message);
             throw AddaxException.asAddaxException(HdfsReaderErrorCode.READ_FILE_ERROR, message);
         }
@@ -638,7 +632,7 @@ public class DFSUtil
                             columnGenerated = new BytesColumn(((ByteBuffer) gRecord.get(columnIndex)).array());
                             break;
                         default:
-                            String errorMessage = String.format("您配置的列类型暂不支持 : [%s]", columnType);
+                            String errorMessage = String.format("The column type [%s] is unsupported.", columnType);
                             LOG.error(errorMessage);
                             throw AddaxException.asAddaxException(StorageReaderErrorCode.NOT_SUPPORT_TYPE, errorMessage);
                     }
@@ -673,8 +667,7 @@ public class DFSUtil
             return reader.getSchema();
         }
         catch (IOException e) {
-            String message = "读取orc-file column列数失败，请联系系统管理员";
-            throw AddaxException.asAddaxException(HdfsReaderErrorCode.READ_FILE_ERROR, message);
+            throw AddaxException.asAddaxException(HdfsReaderErrorCode.READ_FILE_ERROR, "IO exception occurred when reading orc file");
         }
     }
 
@@ -703,8 +696,8 @@ public class DFSUtil
             }
         }
         catch (Exception e) {
-            String message = String.format("检查文件[%s]类型失败，目前支持 %s 格式的文件," +
-                    "请检查您文件类型和文件是否正确。", filepath, HdfsConstant.SUPPORT_FILE_TYPE);
+            String message = String.format("Can not get the file format for [%s]，it only supports [%s].",
+                    filepath, HdfsConstant.SUPPORT_FILE_TYPE);
             LOG.error(message);
             throw AddaxException.asAddaxException(HdfsReaderErrorCode.READ_FILE_ERROR, message, e);
         }
@@ -753,7 +746,7 @@ public class DFSUtil
             }
         }
         catch (IOException e) {
-            LOG.info("检查文件类型: [{}] 不是ORC File.", file);
+            LOG.info("The file [{}] is not ORC file.", file);
         }
         return false;
     }
@@ -821,7 +814,7 @@ public class DFSUtil
             return true;
         }
         catch (IOException e) {
-            LOG.info("检查文件类型: [{}] 不是RC File.", filepath);
+            LOG.info("The file [{}] is not RC file.", filepath);
         }
         return false;
     }
@@ -837,7 +830,7 @@ public class DFSUtil
             return Arrays.equals(magic, seqMagic);
         }
         catch (IOException e) {
-            LOG.info("检查文件类型: [{}] 不是Sequence File.", filepath);
+            LOG.info("The file [{}] is not Sequence file.", filepath);
         }
         return false;
     }
@@ -854,7 +847,7 @@ public class DFSUtil
             }
         }
         catch (IOException e) {
-            LOG.info("检查文件类型: [{}] 不是Parquet File.", file);
+            LOG.info("The file [{}] is not parquet file.", file);
         }
         return false;
     }
