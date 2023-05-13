@@ -116,8 +116,8 @@ public class HttpClientUtil
         response = httpClient.execute(httpRequestBase);
 
         if (response.getStatusLine().getStatusCode() != HttpStatus.SC_OK) {
-            System.err.println("请求地址：" + httpRequestBase.getURI()
-                    + ", 请求方法：" + httpRequestBase.getMethod()
+            System.err.println("The request address：" + httpRequestBase.getURI()
+                    + ", The request method：" + httpRequestBase.getMethod()
                     + ",STATUS CODE = " + response.getStatusLine().getStatusCode());
             httpRequestBase.abort();
             throw new Exception("Response Status Code : "
@@ -144,7 +144,7 @@ public class HttpClientUtil
                 String result = executeAndGet(httpRequestBase);
                 if (result != null && result.startsWith("{\"result\":-1")) {
                     throw AddaxException.asAddaxException(
-                            FrameworkErrorCode.CALL_REMOTE_FAILED, "远程接口返回-1,将重试");
+                            FrameworkErrorCode.CALL_REMOTE_FAILED, "The return code is -1, try again.");
                 }
                 return result;
             }, retryTimes, retryInterval, true,

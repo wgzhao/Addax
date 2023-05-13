@@ -31,7 +31,6 @@ import java.util.Date;
 public class LongColumn
         extends Column
 {
-
     /**
      * 从整形字符串表示转为LongColumn，支持Java科学计数法
      * 如果data为浮点类型的字符串表示，数据将会失真，请使用DoubleColumn对接浮点字符串
@@ -58,7 +57,7 @@ public class LongColumn
         catch (Exception e) {
             throw AddaxException.asAddaxException(
                     CommonErrorCode.CONVERT_NOT_SUPPORT,
-                    String.format("String[%s]不能转为Long .", data));
+                    String.format("Cannot convert the string [%s] to Long.", data));
         }
     }
 
@@ -178,6 +177,6 @@ public class LongColumn
     public byte[] asBytes()
     {
         throw AddaxException.asAddaxException(
-                CommonErrorCode.CONVERT_NOT_SUPPORT, "Long类型不能转为Bytes .");
+                CommonErrorCode.CONVERT_NOT_SUPPORT, "Long type cannot be converted to Bytes.");
     }
 }

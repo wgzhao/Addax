@@ -66,8 +66,9 @@ import java.util.Map;
 /*
  * Created by jingxing on 14-8-24.
  * <p>
- * job实例运行在jobContainer容器中，它是所有任务的master，负责初始化、拆分、调度、运行、回收、监控和汇报
- * 但它并不做实际的数据同步操作
+ * The job instance runs in the jobContainer container, which is the master of all tasks.
+ * It is responsible for initialization, splitting, scheduling, running, recycling, monitoring and reporting,
+ * but it does not perform actual data synchronization operations.
  */
 public class JobContainer
         extends AbstractContainer
@@ -80,9 +81,6 @@ public class JobContainer
     private final ErrorRecordChecker errorLimit;
     private String readerPluginName;
     private String writerPluginName;
-    /**
-     * reader和writer jobContainer的实例
-     */
     private Reader.Job jobReader;
     private Writer.Job jobWriter;
     private Configuration userConf;
@@ -101,13 +99,13 @@ public class JobContainer
     }
 
     /*
-     * jobContainer主要负责的工作全部在start()里面，包括init、prepare、split、scheduler、
-     * post以及destroy和statistics
+     * The main work of the jobContainer is all done in the start() method，
+     * including init, prepare, split, scheduler,  post, destroy and statistics
      */
     @Override
     public void start()
     {
-        LOG.info("jobContainer starts job.");
+        LOG.info("The jobContainer begins to process the job.");
 
         boolean hasException = false;
         boolean isDryRun = false;
@@ -115,30 +113,30 @@ public class JobContainer
             this.startTimeStamp = System.currentTimeMillis();
             isDryRun = configuration.getBool(CoreConstant.JOB_SETTING_DRY_RUN, false);
             if (isDryRun) {
-                LOG.info("jobContainer starts to do preCheck ...");
+                LOG.info("The jobContainer begins to perform pre-check ...");
                 this.init();
                 this.preCheck();
             }
             else {
                 userConf = configuration.clone();
-                LOG.debug("jobContainer starts to do preHandle ...");
+                LOG.debug("The jobContainer begins to perform pre-handle ...");
                 this.preHandle();
 
-                LOG.debug("jobContainer starts to do init ...");
+                LOG.debug("The jobContainer begins to perform init ...");
                 this.init();
-                LOG.debug("jobContainer starts to do prepare ...");
+                LOG.debug("The jobContainer begins to perform prepare ...");
                 this.prepare();
-                LOG.debug("jobContainer starts to do split ...");
+                LOG.debug("The jobContainer begins to perform split ...");
                 this.totalStage = this.split();
-                LOG.debug("jobContainer starts to do schedule ...");
+                LOG.debug("The jobContainer begins to perform schedule ...");
                 this.schedule();
-                LOG.debug("jobContainer starts to do post ...");
+                LOG.debug("The jobContainer begins to perform post ...");
                 this.post();
 
-                LOG.debug("jobContainer starts to do postHandle ...");
+                LOG.debug("The jobContainer begins to perform postHandle ...");
                 this.postHandle();
 
-                LOG.debug("jobContainer completed successfully.");
+                LOG.debug("The jobContainer completed successfully.");
                 // disable hook function
                 this.invokeHooks();
             }
@@ -151,18 +149,16 @@ public class JobContainer
             hasException = true;
 
             if (super.getContainerCommunicator() == null) {
-                // 由于 containerCollector 是在 scheduler() 中初始化的，所以当在 scheduler() 之前出现异常时，需要在此处对 containerCollector 进行初始化
-
+                // Because the containerCollector is initialized in scheduler(),
+                // when an exception occurs before scheduler(), containerCollector needs to be initialized here.
                 AbstractContainerCommunicator tempContainerCollector;
                 // standalone
                 tempContainerCollector = new StandAloneJobContainerCommunicator(configuration);
-
                 super.setContainerCommunicator(tempContainerCollector);
             }
 
             Communication communication = super.getContainerCommunicator().collect();
-            // 汇报前的状态，不需要手动进行设置
-            // communication.setState(State.FAILED)
+
             communication.setThrowable(e);
             communication.setTimestamp(this.endTimeStamp);
 
@@ -181,7 +177,6 @@ public class JobContainer
                 this.destroy();
                 this.endTimeStamp = System.currentTimeMillis();
                 if (!hasException) {
-                    //最后打印cpu的平均消耗，GC的统计
                     VMInfo vmInfo = VMInfo.getVmInfo();
                     if (vmInfo != null) {
                         vmInfo.getDelta(false);
@@ -203,7 +198,7 @@ public class JobContainer
         }
         this.preCheckReader();
         this.preCheckWriter();
-        LOG.info("PreCheck通过");
+        LOG.info("Pre-check passed");
     }
 
     private void preCheckInit()
@@ -225,9 +220,8 @@ public class JobContainer
 
         this.configuration.set(CoreConstant.JOB_CONTENT_READER_PARAMETER + ".dryRun", true);
 
-        // 设置reader的jobConfig
+        // configure the jobConfig of reader
         jobReader.setPluginJobConf(this.configuration.getConfiguration(CoreConstant.JOB_CONTENT_READER_PARAMETER));
-        // 设置reader的readerConfig
         jobReader.setPeerPluginJobConf(this.configuration.getConfiguration(CoreConstant.JOB_CONTENT_READER_PARAMETER));
         jobReader.setJobPluginCollector(jobPluginCollector);
 
@@ -260,7 +254,7 @@ public class JobContainer
     private void preCheckReader()
     {
         classLoaderSwapper.setCurrentThreadClassLoader(LoadUtil.getJarLoader(PluginType.READER, this.readerPluginName));
-        LOG.info("Addax Reader.Job [{}] do preCheck work .", this.readerPluginName);
+        LOG.info("The Reader.Job [{}] perform pre-check work .", this.readerPluginName);
         this.jobReader.preCheck();
         classLoaderSwapper.restoreCurrentThreadClassLoader();
     }
@@ -268,7 +262,7 @@ public class JobContainer
     private void preCheckWriter()
     {
         classLoaderSwapper.setCurrentThreadClassLoader(LoadUtil.getJarLoader(PluginType.WRITER, this.writerPluginName));
-        LOG.info("Addax Writer.Job [{}] do preCheck work .", this.writerPluginName);
+        LOG.info("The Writer.Job [{}] perform pre-check work .", this.writerPluginName);
         this.jobWriter.preCheck();
         classLoaderSwapper.restoreCurrentThreadClassLoader();
     }
@@ -306,7 +300,7 @@ public class JobContainer
         catch (IllegalArgumentException e) {
             throw AddaxException.asAddaxException(
                     FrameworkErrorCode.CONFIG_ERROR,
-                    String.format("Job preHandler's pluginType(%s) set error, reason(%s)", handlerPluginTypeStr.toUpperCase(), e.getMessage()));
+                    String.format("The plugin type (%s) set for the pre-handler of job failed, reason: %s", handlerPluginTypeStr.toUpperCase(), e.getMessage()));
         }
 
         String handlerPluginName = this.configuration.getString(
@@ -339,7 +333,7 @@ public class JobContainer
         catch (IllegalArgumentException e) {
             throw AddaxException.asAddaxException(
                     FrameworkErrorCode.CONFIG_ERROR,
-                    String.format("Job postHandler's pluginType(%s) set error, reason(%s)", handlerPluginTypeStr.toUpperCase(), e.getMessage()));
+                    String.format("The plugin type (%s) set for the post-handler of job failed, reason: %s", handlerPluginTypeStr.toUpperCase(), e.getMessage()));
         }
 
         String handlerPluginName = this.configuration.getString(CoreConstant.JOB_POST_HANDLER_PLUGIN_NAME);
@@ -374,13 +368,13 @@ public class JobContainer
 
         List<Configuration> transformerList = this.configuration.getListConfiguration(CoreConstant.JOB_CONTENT_TRANSFORMER);
 
-        LOG.debug("transformer configuration:{} ", JSON.toJSONString(transformerList));
+        LOG.debug("The transformer configuration:{} ", JSON.toJSONString(transformerList));
         /*
          * 输入是reader和writer的parameter list，输出是content下面元素的list
          */
         List<Configuration> contentConfig = mergeReaderAndWriterTaskConfigs(readerTaskConfigs, writerTaskConfigs, transformerList);
 
-        LOG.debug("contentConfig configuration:{} ", JSON.toJSONString(contentConfig));
+        LOG.debug("The contentConfig configuration:{} ", JSON.toJSONString(contentConfig));
 
         this.configuration.set(CoreConstant.JOB_CONTENT, contentConfig);
 
@@ -401,7 +395,7 @@ public class JobContainer
             if (channelLimitedByteSpeed == null || channelLimitedByteSpeed <= 0) {
                 throw AddaxException.asAddaxException(
                         FrameworkErrorCode.CONFIG_ERROR,
-                        "在有总bps限速条件下，单个channel的bps值不能为空，也不能为非正数");
+                        "Under the condition of total bps limit, the bps value of a single channel cannot be empty or non-positive");
             }
 
             needChannelNumberByByte = (int) (globalLimitedByteSpeed / channelLimitedByteSpeed);
@@ -415,7 +409,7 @@ public class JobContainer
             Long channelLimitedRecordSpeed = this.configuration.getLong(CoreConstant.CORE_TRANSPORT_CHANNEL_SPEED_RECORD, -1);
             if (channelLimitedRecordSpeed == null || channelLimitedRecordSpeed <= 0) {
                 throw AddaxException.asAddaxException(FrameworkErrorCode.CONFIG_ERROR,
-                        "在有总tps限速条件下，单个channel的tps值不能为空，也不能为非正数");
+                        "Under the condition of total tps limit, the tps value of a single channel cannot be empty or non-positive");
             }
 
             needChannelNumberByRecord = (int) (globalLimitedRecordSpeed / channelLimitedRecordSpeed);
@@ -459,7 +453,7 @@ public class JobContainer
 
         List<Configuration> taskGroupConfigs = JobAssignUtil.assignFairly(this.configuration, this.needChannelNumber, channelsPerTaskGroup);
 
-        LOG.info("Scheduler starts [{}] taskGroups.", taskGroupConfigs.size());
+        LOG.info("The Scheduler launches [{}] taskGroup(s).", taskGroupConfigs.size());
 
         AbstractScheduler scheduler;
         try {
@@ -469,7 +463,7 @@ public class JobContainer
             this.endTransferTimeStamp = System.currentTimeMillis();
         }
         catch (Exception e) {
-            LOG.error("运行scheduler出错.");
+            LOG.error("The scheduler failed to run.");
             this.endTransferTimeStamp = System.currentTimeMillis();
             throw AddaxException.asAddaxException(
                     FrameworkErrorCode.RUNTIME_ERROR, e);
@@ -578,8 +572,8 @@ public class JobContainer
 
             String jsonStr = JSON.toJSONString(resultLog);
 
-            LOG.info("jobResultReportUrl: {}", jobResultReportUrl);
-            LOG.debug("report contents: {}", jsonStr);
+            LOG.info("The jobResultReportUrl: {}", jobResultReportUrl);
+            LOG.debug("The report contents: {}", jsonStr);
             postJobRunStatistic(jobResultReportUrl, timeoutMills, jsonStr);
         }
         LOG.info(String.format(
@@ -673,7 +667,7 @@ public class JobContainer
     private void prepareJobReader()
     {
         classLoaderSwapper.setCurrentThreadClassLoader(LoadUtil.getJarLoader(PluginType.READER, this.readerPluginName));
-        LOG.info("Addax Reader.Job [{}] do prepare work .", this.readerPluginName);
+        LOG.info("The Reader.Job [{}] perform prepare work .", this.readerPluginName);
         this.jobReader.prepare();
         classLoaderSwapper.restoreCurrentThreadClassLoader();
     }
@@ -681,7 +675,7 @@ public class JobContainer
     private void prepareJobWriter()
     {
         classLoaderSwapper.setCurrentThreadClassLoader(LoadUtil.getJarLoader(PluginType.WRITER, this.writerPluginName));
-        LOG.info("Addax Writer.Job [{}] do prepare work .", this.writerPluginName);
+        LOG.info("The Writer.Job [{}] perform prepare work .", this.writerPluginName);
         this.jobWriter.prepare();
         classLoaderSwapper.restoreCurrentThreadClassLoader();
     }
@@ -691,9 +685,10 @@ public class JobContainer
         classLoaderSwapper.setCurrentThreadClassLoader(LoadUtil.getJarLoader(PluginType.READER, this.readerPluginName));
         List<Configuration> readerSlicesConfigs = this.jobReader.split(adviceNumber);
         if (readerSlicesConfigs == null || readerSlicesConfigs.isEmpty()) {
-            throw AddaxException.asAddaxException(FrameworkErrorCode.PLUGIN_SPLIT_ERROR, "reader切分的task数目不能小于等于0");
+            throw AddaxException.asAddaxException(FrameworkErrorCode.PLUGIN_SPLIT_ERROR,
+                    "The number of tasks divided by the reader's job cannot be less than or equal to zero");
         }
-        LOG.info("Addax Reader.Job [{}] splits to [{}] tasks.", this.readerPluginName, readerSlicesConfigs.size());
+        LOG.info("The Reader.Job [{}] is divided into [{}] task(s).", this.readerPluginName, readerSlicesConfigs.size());
         classLoaderSwapper.restoreCurrentThreadClassLoader();
         return readerSlicesConfigs;
     }
@@ -704,9 +699,10 @@ public class JobContainer
 
         List<Configuration> writerSlicesConfigs = this.jobWriter.split(readerTaskNumber);
         if (writerSlicesConfigs == null || writerSlicesConfigs.isEmpty()) {
-            throw AddaxException.asAddaxException(FrameworkErrorCode.PLUGIN_SPLIT_ERROR, "writer切分的task不能小于等于0");
+            throw AddaxException.asAddaxException(FrameworkErrorCode.PLUGIN_SPLIT_ERROR,
+                    "The number of tasks divided by the writer's job cannot be less than or equal to zero");
         }
-        LOG.info("Addax Writer.Job [{}] splits to [{}] tasks.", this.writerPluginName, writerSlicesConfigs.size());
+        LOG.info("The Writer.Job [{}] is divided into [{}] task(s).", this.writerPluginName, writerSlicesConfigs.size());
         classLoaderSwapper.restoreCurrentThreadClassLoader();
 
         return writerSlicesConfigs;
@@ -723,7 +719,8 @@ public class JobContainer
         if (readerTasksConfigs.size() != writerTasksConfigs.size()) {
             throw AddaxException.asAddaxException(
                     FrameworkErrorCode.PLUGIN_SPLIT_ERROR,
-                    String.format("reader切分的task数目[%d]不等于writer切分的task数目[%d].",
+                    String.format("The number of tasks [%d] divided by the reader's job does not equal " +
+                                    "the number of tasks [%d] divided by the writer's job",
                             readerTasksConfigs.size(), writerTasksConfigs.size())
             );
         }
@@ -750,7 +747,7 @@ public class JobContainer
     private void postJobReader()
     {
         classLoaderSwapper.setCurrentThreadClassLoader(LoadUtil.getJarLoader(PluginType.READER, this.readerPluginName));
-        LOG.info("Addax Reader.Job [{}] do post work.", this.readerPluginName);
+        LOG.info("The Reader.Job [{}] perform post work.", this.readerPluginName);
         this.jobReader.post();
         classLoaderSwapper.restoreCurrentThreadClassLoader();
     }
@@ -758,7 +755,7 @@ public class JobContainer
     private void postJobWriter()
     {
         classLoaderSwapper.setCurrentThreadClassLoader(LoadUtil.getJarLoader(PluginType.WRITER, this.writerPluginName));
-        LOG.info("Addax Writer.Job [{}] do post work.", this.writerPluginName);
+        LOG.info("The Writer.Job [{}] perform post work.", this.writerPluginName);
         this.jobWriter.post();
         classLoaderSwapper.restoreCurrentThreadClassLoader();
     }
@@ -776,7 +773,7 @@ public class JobContainer
     // post job run statistic to server if present
     private void postJobRunStatistic(String url, int timeoutMills, String jsonStr)
     {
-        LOG.info("upload job run statistic to [{}]", url);
+        LOG.info("Upload the job run statistics to [{}]", url);
 
         RequestConfig requestConfig = RequestConfig.custom().setConnectTimeout(timeoutMills)
                 .setSocketTimeout(timeoutMills)
@@ -793,14 +790,14 @@ public class JobContainer
         try {
             HttpResponse response = httpClient.execute(post);
             if (response.getStatusLine().getStatusCode() == 200) {
-                LOG.info("uploading jobResult success");
+                LOG.info("The job results were uploaded successfully");
             }
             else {
-                LOG.warn("uploading jobResult failed: {}", response.getEntity().toString());
+                LOG.warn("Uploading the job results failed: {}", response.getEntity().toString());
             }
         }
         catch (IOException e) {
-            LOG.warn("uploading jobResult failed with exception: {}", e.getMessage());
+            LOG.warn("Uploading the job results failed with an exception: {}", e.getMessage());
         }
     }
 

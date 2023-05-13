@@ -69,8 +69,7 @@ public abstract class ProcessInnerScheduler
     {
         //通过进程退出返回码标示状态
         this.taskGroupContainerExecutorService.shutdownNow();
-        throw AddaxException.asAddaxException(FrameworkErrorCode.KILLED_EXIT_VALUE,
-                "job killed status");
+        throw AddaxException.asAddaxException(FrameworkErrorCode.KILLED_EXIT_VALUE, "The job was terminated");
     }
 
     private TaskGroupContainerRunner newTaskGroupContainerRunner(

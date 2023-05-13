@@ -62,12 +62,12 @@ public abstract class Channel
         long recordSpeed = configuration.getLong(CoreConstant.CORE_TRANSPORT_CHANNEL_SPEED_RECORD, 10000L);
 
         if (capacity <= 0) {
-            throw new IllegalArgumentException(String.format("通道容量[%d]必须大于0.", capacity));
+            throw new IllegalArgumentException(String.format("The channel capacity [%d] must be greater than 0.", capacity));
         }
 
         if (isFirstPrint) {
-            LOG.info("Channel set byte_speed_limit to " + byteSpeed + (byteSpeed <= 0 ? ", No bps activated." : "."));
-            LOG.info("Channel set record_speed_limit to " + recordSpeed + (recordSpeed <= 0 ? ", No tps activated." : "."));
+            LOG.info("The Channel set byte_speed_limit to " + byteSpeed + (byteSpeed <= 0 ? ", No bps activated." : "."));
+            LOG.info("The Channel set record_speed_limit to " + recordSpeed + (recordSpeed <= 0 ? ", No tps activated." : "."));
             isFirstPrint = false;
         }
 
@@ -114,14 +114,14 @@ public abstract class Channel
 
     public void push(Record r)
     {
-        Validate.notNull(r, "record不能为空.");
+        Validate.notNull(r, "The record cannot be empty.");
         this.doPush(r);
         this.statPush(1L, r.getByteSize());
     }
 
     public void pushTerminate(TerminateRecord r)
     {
-        Validate.notNull(r, "record不能为空.");
+        Validate.notNull(r, "The record cannot be empty.");
         this.doPush(r);
     }
 

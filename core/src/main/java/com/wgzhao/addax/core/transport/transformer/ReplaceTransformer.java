@@ -49,7 +49,7 @@ public class ReplaceTransformer
         String replaceString;
         try {
             if (paras.length != 4) {
-                throw new RuntimeException("dx_replace paras must be 4");
+                throw new RuntimeException("The dx_replace parameters must be 4");
             }
 
             columnIndex = (Integer) paras[0];
@@ -73,7 +73,7 @@ public class ReplaceTransformer
             }
             String newValue;
             if (startIndex > oriValue.length()) {
-                throw new RuntimeException(String.format("dx_replace startIndex(%s) out of range(%s)",
+                throw new RuntimeException(String.format("The dx_replace startIndex(%s) out of range(%s)",
                         startIndex, oriValue.length()));
             }
             if (startIndex + length >= oriValue.length()) {

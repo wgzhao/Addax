@@ -34,13 +34,13 @@ public class AddaxException
 
     public AddaxException(ErrorCode errorCode, String errorMessage)
     {
-        super(errorCode.toString() + " - " + errorMessage);
+        super(errorMessage);
         this.errorCode = errorCode;
     }
 
     private AddaxException(ErrorCode errorCode, String errorMessage, Throwable cause)
     {
-        super(errorCode.toString() + " - " + getMessage(errorMessage) + " - " + getMessage(cause), cause);
+        super(errorMessage, cause);
 
         this.errorCode = errorCode;
     }

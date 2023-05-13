@@ -110,7 +110,7 @@ public class FileHelper
             throw new RuntimeException("File not found: " + fileName, e);
         }
         catch (IOException e) {
-            throw new RuntimeException("close file failed: ", e);
+            throw new RuntimeException("Failed to close file: ", e);
         }
     }
 
@@ -173,7 +173,7 @@ public class FileHelper
             return new BufferedReader(new InputStreamReader(input, encoding), bufferSize);
         }
         catch (CompressorException | IOException e) {
-            throw new RuntimeException("read compress file error", e);
+            throw new RuntimeException("Failed to read compress file", e);
         }
     }
 
@@ -201,10 +201,10 @@ public class FileHelper
     {
         File file = new File(FilenameUtils.getFullPath(fileName));
         if (!file.exists()) {
-            throw new RuntimeException("file not exists: " + fileName);
+            throw new RuntimeException("The file [" + fileName + "] does not exists.");
         }
         if (!file.isFile()) {
-            throw new RuntimeException("not a file: " + fileName);
+            throw new RuntimeException("The [" + fileName + "] is not a file.");
         }
 
         if ("r".equalsIgnoreCase(permission)) {
@@ -219,10 +219,10 @@ public class FileHelper
     {
         File file = new File(FilenameUtils.getFullPath(directory));
         if (!file.exists()) {
-            throw new RuntimeException("directory not exists: " + directory);
+            throw new RuntimeException("The directory [" + directory + "] does not exists.");
         }
         if (!file.isDirectory()) {
-            throw new RuntimeException("not a directory: " + directory);
+            throw new RuntimeException("The [" + directory + "] is not a directory.");
         }
 
         if ("r".equalsIgnoreCase(permission)) {
@@ -321,7 +321,7 @@ public class FileHelper
         if (!directory.isDirectory()) {
             if (isTargetFile(patterns, isRegexPath, regexPath, directory.getAbsolutePath())) {
                 toBeReadFiles.add(parentDirectory);
-                LOG.info("add file [{}] as a candidate to be read.", parentDirectory);
+                LOG.info("Adding the file [{}] as a candidate to be read.", parentDirectory);
             }
         }
         else {
@@ -336,13 +336,13 @@ public class FileHelper
                 }
                 else {
                     // warn: 对于没有权限的文件，是直接throw AddaxException
-                    String message = String.format("您没有权限查看目录 : [%s]", directory);
+                    String message = String.format("Permission denied for reading directory [%s].", directory);
                     LOG.error(message);
                     throw new RuntimeException(message);
                 }
             }
             catch (SecurityException e) {
-                String message = String.format("您没有权限查看目录 : [%s]", directory);
+                String message = String.format("Permission denied for reading directory [%s].", directory);
                 LOG.error(message);
                 throw new RuntimeException(message);
             }

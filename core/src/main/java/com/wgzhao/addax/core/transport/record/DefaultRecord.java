@@ -75,7 +75,8 @@ public class DefaultRecord
     public void setColumn(int i, Column column)
     {
         if (i < 0) {
-            throw AddaxException.asAddaxException(FrameworkErrorCode.ARGUMENT_ERROR, "不能给index小于0的column设置值");
+            throw AddaxException.asAddaxException(FrameworkErrorCode.ARGUMENT_ERROR,
+                    "Cannot set a value for a column with an index less than 0");
         }
 
         if (i >= columns.size()) {

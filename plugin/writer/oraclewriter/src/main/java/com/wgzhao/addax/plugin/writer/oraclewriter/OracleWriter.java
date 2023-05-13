@@ -57,7 +57,7 @@ public class OracleWriter
             if (null != writeMode) {
                 if (!"insert".equalsIgnoreCase(writeMode) && !writeMode.startsWith("update")) {
                     throw AddaxException.asAddaxException(DBUtilErrorCode.CONF_ERROR,
-                            String.format("写入模式(writeMode)配置错误. Oracle仅支持insert, update两种模式. %s 不支持", writeMode));
+                            String.format("The item writeMode your configured [%s] is unsupported, it only supports insert and update mode.", writeMode));
                 }
             }
 

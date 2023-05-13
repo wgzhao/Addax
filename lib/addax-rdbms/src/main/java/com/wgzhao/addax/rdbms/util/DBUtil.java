@@ -66,8 +66,8 @@ public final class DBUtil
     public static String chooseJdbcUrl(DataBaseType dataBaseType, List<String> jdbcUrls, String username, String password, List<String> preSql)
     {
         if (null == jdbcUrls || jdbcUrls.isEmpty()) {
-            throw AddaxException.asAddaxException(DBUtilErrorCode.CONF_ERROR,
-                    String.format("您的jdbcUrl的配置信息有错, 因为jdbcUrl[%s]不能为空. 请检查您的配置并作出修改.",
+            throw AddaxException.asAddaxException(DBUtilErrorCode.JDBC_NULL,
+                    String.format("The configure item jdbcUrl [%s] cannot be empty.",
                             StringUtils.join(jdbcUrls, ",")));
         }
         try {
@@ -88,13 +88,12 @@ public final class DBUtil
                         }
                     }
                 }
-                throw new Exception("无法连接对应的数据库，可能原因是：1) 配置的ip/port/database/jdbc错误，无法连接。" +
-                        "2) 配置的username/password错误，鉴权失败。请和DBA确认该数据库的连接信息是否正确。");
+                throw new Exception("Unable to connect the database.");
             }, 3, 1000L, true);
         }
         catch (Exception e) {
             throw AddaxException.asAddaxException(DBUtilErrorCode.CONN_DB_ERROR,
-                    String.format("数据库连接失败. 因为根据您配置的连接信息,无法从:%s 中找到可连接的jdbcUrl. 请检查您的配置并作出修改.",
+                    String.format("Failed to connect the database, no connectable jdbcUrl can be found in [%s].",
                             StringUtils.join(jdbcUrls, ",")), e);
         }
     }
@@ -105,7 +104,7 @@ public final class DBUtil
         if (null == jdbcUrls || jdbcUrls.isEmpty()) {
             throw AddaxException.asAddaxException(
                     DBUtilErrorCode.CONF_ERROR,
-                    String.format("您的jdbcUrl的配置信息有错, 因为jdbcUrl[%s]不能为空. 请检查您的配置并作出修改.",
+                    String.format("The configure item jdbcUrl [%s] cannot be empty.",
                             StringUtils.join(jdbcUrls, ",")));
         }
 
@@ -123,7 +122,7 @@ public final class DBUtil
                     catch (Exception e) {
                         throw AddaxException.asAddaxException(
                                 DBUtilErrorCode.CONN_DB_ERROR,
-                                String.format("数据库连接失败. 因为根据您配置的连接信息,无法从:%s 中找到可连接的jdbcUrl. 请检查您的配置并作出修改.",
+                                String.format("Failed to connect the database, no connectable jdbcUrl can be found in [%s].",
                                         StringUtils.join(jdbcUrls, ",")), e);
                     }
                 }
@@ -134,7 +133,7 @@ public final class DBUtil
         }
         throw AddaxException.asAddaxException(
                 DBUtilErrorCode.CONN_DB_ERROR,
-                String.format("数据库连接失败. 因为根据您配置的连接信息,无法从:%s 中找到可连接的jdbcUrl. 请检查您的配置并作出修改.",
+                String.format("Failed to connect the database, no connectable jdbcUrl can be found in [%s].",
                         StringUtils.join(jdbcUrls, ",")));
     }
 
@@ -153,7 +152,7 @@ public final class DBUtil
             }
             catch (Exception e) {
                 hasInsertPrivilege = false;
-                LOG.warn("User [{}] 'insert' table[{}] failure, errorMessage:[{}]", userName, tableName, e.getMessage());
+                LOG.warn("Failed to insert into table [{}] with user [{}]: {}.", userName, tableName, e.getMessage());
             }
         }
 
@@ -176,7 +175,7 @@ public final class DBUtil
             }
             catch (Exception e) {
                 hasInsertPrivilege = false;
-                LOG.warn("User [{}] has no 'delete' privilege on table[{}], errorMessage:[{}]", userName, tableName, e.getMessage());
+                LOG.warn("Failed to delete from table [{}] with user [{}]: {}.", userName, tableName, e.getMessage());
             }
         }
 
@@ -230,7 +229,7 @@ public final class DBUtil
         }
         catch (Exception e) {
             throw AddaxException.asAddaxException(DBUtilErrorCode.CONN_DB_ERROR,
-                    String.format("数据库连接失败. 因为根据您配置的连接信息:%s获取数据库连接失败. 请检查您的配置并作出修改.", jdbcUrl), e);
+                    String.format("Failed to connect the database with [%s].", jdbcUrl), e);
         }
     }
 
@@ -280,7 +279,7 @@ public final class DBUtil
             bds.setDriverClassName("org.apache.hive.jdbc.HiveDriver");
         }
         else {
-            LOG.debug("Connect database with driver {}", dataBaseType.getDriverClassName());
+            LOG.debug("Connecting to database with driver {}", dataBaseType.getDriverClassName());
             bds.setDriverClassName(dataBaseType.getDriverClassName());
         }
         try {
@@ -330,7 +329,7 @@ public final class DBUtil
             conn.setAutoCommit(false);
         }
         catch (SQLFeatureNotSupportedException ignore) {
-            LOG.warn("current database does not support AUTO_COMMIT property");
+            LOG.warn("The current database does not support AUTO_COMMIT property");
         }
         try {
             stmt = conn.createStatement(ResultSet.TYPE_FORWARD_ONLY, ResultSet.CONCUR_READ_ONLY); //NOSONAR
@@ -338,7 +337,7 @@ public final class DBUtil
 
         catch (SQLException ignore) {
             // some database does not support TYPE_FORWARD_ONLY/CONCUR_READ_ONLY
-            LOG.warn("current database does not support TYPE_FORWARD_ONLY/CONCUR_READ_ONLY");
+            LOG.warn("The current database does not support TYPE_FORWARD_ONLY/CONCUR_READ_ONLY");
             stmt = conn.createStatement(); //NOSONAR
         }
         stmt.setFetchSize(fetchSize);
@@ -437,7 +436,7 @@ public final class DBUtil
         }
         catch (SQLException e) {
             throw AddaxException.asAddaxException(DBUtilErrorCode.GET_COLUMN_INFO_FAILED,
-                    String.format("获取表:%s 的字段的元信息时失败. 请联系 DBA 核查该库、表信息.", tableName), e);
+                    String.format("Failed to obtain the fields of table [%s].", tableName), e);
         }
     }
 
@@ -447,7 +446,7 @@ public final class DBUtil
             return true;
         }
         catch (Exception e) {
-            LOG.error("test connection of [{}] failed, for {}.", url, e.getMessage());
+            LOG.error("Failed to connection the database with [{}]: {}.", url, e.getMessage());
         }
         return false;
     }
@@ -457,14 +456,14 @@ public final class DBUtil
         try (Connection connection = connect(dataBaseType, url, user, pass)) {
             for (String pre : preSql) {
                 if (!doPreCheck(connection, pre)) {
-                    LOG.warn("doPreCheck failed.");
+                    LOG.warn("Failed to doPreCheck.");
                     return false;
                 }
             }
             return true;
         }
         catch (Exception e) {
-            LOG.warn("test connection of [{}] failed, for {}.", url, e.getMessage());
+            LOG.warn("Failed to connection the database with [{}]: {}.", url, e.getMessage());
         }
         return false;
     }
@@ -485,17 +484,17 @@ public final class DBUtil
             if (DBUtil.asyncResultSetNext(rs)) {
                 checkResult = rs.getInt(1);
                 if (DBUtil.asyncResultSetNext(rs)) {
-                    LOG.warn("pre check failed. It should return one result:0, pre:[{}].", pre);
+                    LOG.warn("Failed to pre-check with [{}]. It should return 0.", pre);
                     return false;
                 }
             }
             if (0 == checkResult) {
                 return true;
             }
-            LOG.warn("pre check failed. It should return one result:0, pre:[{}].", pre);
+            LOG.warn("Failed to pre-check with [{}]. It should return 0.", pre);
         }
         catch (Exception e) {
-            LOG.warn("pre check failed. pre:[{}], errorMessage:[{}].", pre, e.getMessage());
+            LOG.warn("Failed to pre-check with [{}], errorMessage: [{}].", pre, e.getMessage());
         }
         return false;
     }
@@ -528,17 +527,17 @@ public final class DBUtil
         }
         catch (SQLException e) {
             throw AddaxException.asAddaxException(DBUtilErrorCode.SET_SESSION_ERROR,
-                    String.format("session配置有误. 因为根据您的配置执行 session 设置失败. 上下文信息是:[%s]. 请检查您的配置并作出修改.", message), e);
+                    String.format("Failed to set session with [%s]", message), e);
         }
 
         for (String sessionSql : sessions) {
-            LOG.info("execute sql:[{}]", sessionSql);
+            LOG.info("Executing SQL:[{}]", sessionSql);
             try {
                 stmt.execute(sessionSql);
             }
             catch (SQLException e) {
                 throw AddaxException.asAddaxException(DBUtilErrorCode.SET_SESSION_ERROR,
-                        String.format("session配置有误. 因为根据您的配置执行 session 设置失败. 上下文信息是:[%s]. 请检查您的配置并作出修改.", message), e);
+                        String.format("Failed to set session with [%s].", message), e);
             }
         }
         DBUtil.closeDBResources(stmt, null);
@@ -568,7 +567,7 @@ public final class DBUtil
             return future.get(timeout, TimeUnit.SECONDS);
         }
         catch (Exception e) {
-            throw AddaxException.asAddaxException(DBUtilErrorCode.RS_ASYNC_ERROR, "异步获取ResultSet失败", e);
+            throw AddaxException.asAddaxException(DBUtilErrorCode.RS_ASYNC_ERROR, "Asynchronous retrieval of ResultSet failed.", e);
         }
     }
 
@@ -590,8 +589,8 @@ public final class DBUtil
         }
         catch (ClassNotFoundException e) {
             throw AddaxException.asAddaxException(DBUtilErrorCode.CONF_ERROR,
-                    "数据库驱动加载错误, 请确认libs目录有驱动jar包且plugin.json中drivers配置驱动类正确!",
-                    e);
+                    "Error loading database driver. Please confirm that the libs directory has the driver jar package "
+                            + "and the drivers configuration in plugin.json is correct.", e);
         }
     }
 }

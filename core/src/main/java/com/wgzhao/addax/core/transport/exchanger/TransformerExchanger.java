@@ -102,7 +102,7 @@ public abstract class TransformerExchanger
                                 transformerInfoExec.getFinalParas());
             }
             catch (Exception e) {
-                errorMsg = String.format("transformer(%s) has Exception(%s)",
+                errorMsg = String.format("The transformer(%s) has encountered an exception(%s)",
                         transformerInfoExec.getTransformerName(),
                         e.getMessage());
                 failed = true;
@@ -145,11 +145,8 @@ public abstract class TransformerExchanger
 
     public void doStat()
     {
-
-        /*
-         * todo 对于多个transformer时，各个transformer的单独统计进行显示。最后再汇总整个transformer的时间消耗.
-         * 暂时不统计。
-         */
+        // TODO: For multiple transformers, the individual statistics of each transformer are displayed.
+        //  Finally, the total time consumption of the entire transformer is summarized
 //        if (transformers.size() > 1) {
 //            for (transformerInfoExec transformerInfoExec : transformers) {
 //                currentCommunication.setLongCounter(CommunicationTool.TRANSFORMER_NAME_PREFIX + transformerInfoExec.getTransformerName(), transformerInfoExec.getExaustedTime());

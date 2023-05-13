@@ -82,7 +82,7 @@ public class StorageReaderUtil
         // handle blank encoding
         if (StringUtils.isBlank(encoding)) {
             encoding = Constant.DEFAULT_ENCODING;
-            LOG.warn("The encoding: '{}' is illegal, uses '{}' by default", encoding, Constant.DEFAULT_ENCODING);
+            LOG.warn("The encoding: [{}] is illegal, uses [{}] by default", encoding, Constant.DEFAULT_ENCODING);
         }
 
         List<Configuration> column = readerSliceConfig.getListConfiguration(Key.COLUMN);
@@ -127,12 +127,12 @@ public class StorageReaderUtil
         }
         catch (IOException e) {
             throw AddaxException.asAddaxException(
-                    StorageReaderErrorCode.READ_FILE_IO_ERROR, String.format("Read stream %s failure ", fileName), e);
+                    StorageReaderErrorCode.READ_FILE_IO_ERROR, String.format("Failed to read stream [%s].", fileName), e);
         }
         catch (CompressorException e) {
             throw AddaxException.asAddaxException(
                     StorageReaderErrorCode.ILLEGAL_VALUE,
-                    "The compress algorithm'" + compress + "' is unsupported yet"
+                    "The compress algorithm [" + compress + "] is unsupported yet"
             );
         }
         finally {
@@ -152,10 +152,10 @@ public class StorageReaderUtil
         if (null != delimiterInStr && 1 != delimiterInStr.length()) {
             throw AddaxException.asAddaxException(
                     StorageReaderErrorCode.ILLEGAL_VALUE,
-                    String.format("The delimiter ONLY has one char, '%s' is illegal", delimiterInStr));
+                    String.format("The delimiter ONLY has one char, [%s] is illegal", delimiterInStr));
         }
         if (null == delimiterInStr) {
-            LOG.warn("Use {} as delimiter by default", Constant.DEFAULT_FIELD_DELIMITER);
+            LOG.warn("Uses [{}] as delimiter by default", Constant.DEFAULT_FIELD_DELIMITER);
         }
 
         // warn: default value ',', fieldDelimiter could be \n(lineDelimiter) for no fieldDelimiter
@@ -178,15 +178,15 @@ public class StorageReaderUtil
         catch (UnsupportedEncodingException uee) {
             throw AddaxException.asAddaxException(
                     StorageReaderErrorCode.OPEN_FILE_WITH_CHARSET_ERROR,
-                    String.format("encoding: '%s' is unsupported", encoding), uee);
+                    String.format("The encoding: [%s] is unsupported", encoding), uee);
         }
         catch (FileNotFoundException fnfe) {
             throw AddaxException.asAddaxException(
-                    StorageReaderErrorCode.FILE_NOT_EXISTS, String.format("The file '%s' does not exists ", fileName), fnfe);
+                    StorageReaderErrorCode.FILE_NOT_EXISTS, String.format("The file [%s] does not exists ", fileName), fnfe);
         }
         catch (IOException ioe) {
             throw AddaxException.asAddaxException(
-                    StorageReaderErrorCode.READ_FILE_IO_ERROR, String.format("Read file '%s' failure ", fileName), ioe);
+                    StorageReaderErrorCode.READ_FILE_IO_ERROR, String.format("Failed to ead file [%s]", fileName), ioe);
         }
         catch (Exception e) {
             throw AddaxException.asAddaxException(
@@ -245,7 +245,7 @@ public class StorageReaderUtil
 
                     if (null == columnIndex && null == columnConst) {
                         throw AddaxException.asAddaxException(
-                                StorageReaderErrorCode.NO_INDEX_VALUE, "The index or type is required when type is present.");
+                                StorageReaderErrorCode.NO_INDEX_VALUE, "The index or constant is required when type is present.");
                     }
 
                     if (null != columnIndex && null != columnConst) {
@@ -255,7 +255,7 @@ public class StorageReaderUtil
 
                     if (null != columnIndex) {
                         if (columnIndex >= sourceLine.length) {
-                            throw new IndexOutOfBoundsException(String.format("The column index %s you try to read is out of range(%s): [%s]",
+                            throw new IndexOutOfBoundsException(String.format("The column index [%s] you try to read is out of range[%s]: [%s]",
                                     columnIndex + 1, sourceLine.length, StringUtils.join(sourceLine, ",")));
                         }
                         columnValue = sourceLine[columnIndex];
@@ -296,13 +296,13 @@ public class StorageReaderUtil
                                 }
                                 break;
                             default:
-                                String errorMessage = String.format("The column type '%s' is unsupported", columnType);
+                                String errorMessage = String.format("The column type [%s] is unsupported", columnType);
                                 LOG.error(errorMessage);
                                 throw AddaxException.asAddaxException(StorageReaderErrorCode.NOT_SUPPORT_TYPE, errorMessage);
                         }
                     }
                     catch (Exception e) {
-                        throw new IllegalArgumentException(String.format("Cast value '%s' to type '%s' failure", columnValue, type.name()));
+                        throw new IllegalArgumentException(String.format("Cast value [%s] to type [%s] failure", columnValue, type.name()));
                     }
 
                     record.addColumn(columnGenerated);
@@ -368,11 +368,11 @@ public class StorageReaderUtil
         }
         catch (UnsupportedCharsetException uce) {
             throw AddaxException.asAddaxException(StorageReaderErrorCode.ILLEGAL_VALUE,
-                    String.format("不支持您配置的编码格式 : [%s]", encoding), uce);
+                    String.format("The encoding [%s] is unsupported yet.", encoding), uce);
         }
         catch (Exception e) {
             throw AddaxException.asAddaxException(StorageReaderErrorCode.CONFIG_INVALID_EXCEPTION,
-                    String.format("编码配置异常, 请联系我们: %s", e.getMessage()), e);
+                    String.format("Exception occurred while applying encoding [%s].", e.getMessage()), e);
         }
     }
 
@@ -391,13 +391,13 @@ public class StorageReaderUtil
         String delimiterInStr = readerConfiguration.getString(Key.FIELD_DELIMITER, ",");
         if (null == delimiterInStr) {
             throw AddaxException.asAddaxException(StorageReaderErrorCode.REQUIRED_VALUE,
-                    String.format("您提供配置文件有误，[%s]是必填参数.",
+                    String.format("The item [%s] is required.",
                             Key.FIELD_DELIMITER));
         }
         else if (1 != delimiterInStr.length()) {
-            // warn: if have, length must be one
+            // warn: if it has, length must be one
             throw AddaxException.asAddaxException(StorageReaderErrorCode.ILLEGAL_VALUE,
-                    String.format("仅仅支持单字符切分, 您配置的切分为 : [%s]", delimiterInStr));
+                    String.format("The delimiter only support single character, [%s] is invalid.", delimiterInStr));
         }
     }
 
@@ -407,7 +407,7 @@ public class StorageReaderUtil
         // format
         List<Configuration> columns = readerConfiguration.getListConfiguration(Key.COLUMN);
         if (null == columns || columns.isEmpty()) {
-            throw AddaxException.asAddaxException(StorageReaderErrorCode.REQUIRED_VALUE, "您需要指定 columns");
+            throw AddaxException.asAddaxException(StorageReaderErrorCode.REQUIRED_VALUE, "The item columns is required.");
         }
         // handle ["*"]
         if (1 == columns.size()) {

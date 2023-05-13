@@ -86,18 +86,18 @@ public class HdfsWriter
             //fileType check
             String fileType = this.writerSliceConfig.getNecessaryValue(Key.FILE_TYPE, HdfsWriterErrorCode.REQUIRED_VALUE).toUpperCase();
             if (!SUPPORT_FORMAT.contains(fileType)) {
-                String message = String.format("[%s] 文件格式不支持， HdfsWriter插件目前仅支持 %s, ", fileType, SUPPORT_FORMAT);
+                String message = String.format("The file format [%s] is supported yet,  the plugin currently only supports: [%s].", fileType, SUPPORT_FORMAT);
                 throw AddaxException.asAddaxException(HdfsWriterErrorCode.ILLEGAL_VALUE, message);
             }
             //path
             this.path = this.writerSliceConfig.getNecessaryValue(Key.PATH, HdfsWriterErrorCode.REQUIRED_VALUE);
             if (!path.startsWith("/")) {
-                String message = String.format("请检查参数path:[%s],需要配置为绝对路径", path);
+                String message = String.format("The path [%s] must be configured as an absolute path.", path);
                 LOG.error(message);
                 throw AddaxException.asAddaxException(HdfsWriterErrorCode.ILLEGAL_VALUE, message);
             }
             if (path.contains("*") || path.contains("?")) {
-                String message = String.format("请检查参数path:[%s],不能包含*,?等特殊字符", path);
+                String message = String.format("The path [%s] cannot contain special characters like '*','?'.", path);
                 LOG.error(message);
                 throw AddaxException.asAddaxException(HdfsWriterErrorCode.ILLEGAL_VALUE, message);
             }
@@ -106,7 +106,7 @@ public class HdfsWriter
             //columns check
             List<Configuration> columns = this.writerSliceConfig.getListConfiguration(Key.COLUMN);
             if (null == columns || columns.isEmpty()) {
-                throw AddaxException.asAddaxException(HdfsWriterErrorCode.REQUIRED_VALUE, "您需要指定 columns");
+                throw AddaxException.asAddaxException(HdfsWriterErrorCode.REQUIRED_VALUE, "The item columns should be configured");
             }
             else {
                 boolean rewriteFlag = false;
@@ -131,7 +131,7 @@ public class HdfsWriter
             this.writeMode = this.writerSliceConfig.getNecessaryValue(Key.WRITE_MODE, HdfsWriterErrorCode.REQUIRED_VALUE);
             if (!Constant.SUPPORTED_WRITE_MODE.contains(writeMode)) {
                 throw AddaxException.asAddaxException(HdfsWriterErrorCode.ILLEGAL_VALUE,
-                        String.format("仅支持append, nonConflict, overwrite三种模式, 不支持您配置的 writeMode 模式 : [%s]",
+                        String.format("The item writeMode only supports append, noConflict and overwrite, [%s] is unsupported yet.",
                                 writeMode));
             }
             if ("TEXT".equals(fileType)) {
@@ -139,13 +139,13 @@ public class HdfsWriter
                 String fieldDelimiter = this.writerSliceConfig.getString(Key.FIELD_DELIMITER, null);
                 if (StringUtils.isEmpty(fieldDelimiter)) {
                     throw AddaxException.asAddaxException(HdfsWriterErrorCode.REQUIRED_VALUE,
-                            String.format("写TEXT格式文件，必须提供有效的[%s] 参数.", Key.FIELD_DELIMITER));
+                            String.format("The item [%s] should be configured and valid while write TEXT file.", Key.FIELD_DELIMITER));
                 }
 
                 if (1 != fieldDelimiter.length()) {
                     // warn: if it has, length must be one
                     throw AddaxException.asAddaxException(HdfsWriterErrorCode.ILLEGAL_VALUE,
-                            String.format("仅仅支持单字符切分, 您配置的切分为 : [%s]", fieldDelimiter));
+                            String.format("The field delimiter is only support single character, your configure: [%s]", fieldDelimiter));
                 }
             }
 
@@ -157,7 +157,7 @@ public class HdfsWriter
                 }
                 catch (IllegalArgumentException e) {
                     throw AddaxException.asAddaxException(HdfsWriterErrorCode.ILLEGAL_VALUE,
-                            String.format("目前ORC 格式仅支持 %s 压缩，不支持您配置的 compress 模式 : [%s]",
+                            String.format("The ORC format only supports [%s] compression. your configure [%s] is unsupported yet.",
                                     Arrays.toString(CompressionKind.values()), compress));
                 }
             }
@@ -171,7 +171,7 @@ public class HdfsWriter
                 }
                 catch (Exception e) {
                     throw AddaxException.asAddaxException(HdfsWriterErrorCode.ILLEGAL_VALUE,
-                            String.format("目前PARQUET 格式仅支持 %s 压缩, 不支持您配置的 compress 模式 : [%s]",
+                            String.format("The PARQUET format only supports [%s] compression. your configure [%s] is unsupported yet.",
                                     Arrays.toString(CompressionCodecName.values()), compress));
                 }
             }
@@ -191,7 +191,7 @@ public class HdfsWriter
             }
             catch (Exception e) {
                 throw AddaxException.asAddaxException(HdfsWriterErrorCode.ILLEGAL_VALUE,
-                        String.format("不支持您配置的编码格式:[%s]", encoding), e);
+                        String.format("The encoding [%s] is unsupported yet.", encoding), e);
             }
 
             // trash
@@ -208,7 +208,7 @@ public class HdfsWriter
             if (hdfsHelper.isPathExists(path)) {
                 if (!hdfsHelper.isPathDir(path)) {
                     throw AddaxException.asAddaxException(HdfsWriterErrorCode.ILLEGAL_VALUE,
-                            String.format("您配置的path: [%s] 不是一个合法的目录, 请您注意文件重名, 不合法目录名等情况.", path));
+                            String.format("The item path you configured [%s] is exists ,but it is not directory", path));
                 }
 
                 //根据writeMode对目录下文件进行处理
@@ -217,17 +217,18 @@ public class HdfsWriter
 
                 boolean isExistFile = existFilePaths.length > 0;
                 if ("append".equals(writeMode)) {
-                    LOG.info("由于您配置了writeMode = append, 写入前不做清理工作, [{}] 目录下写入相应文件名前缀 [{}] 的文件", path, fileName);
+                    LOG.info("The current writeMode is append, so no cleanup is performed before writing. " +
+                            "Files with the prefix [{}] are written under the [{}] directory.", fileName, path);
                 }
                 else if ("nonConflict".equals(writeMode) && isExistFile) {
                     throw AddaxException.asAddaxException(HdfsWriterErrorCode.ILLEGAL_VALUE,
-                            String.format("由于您配置了writeMode= nonConflict,但您配置的 path: [%s] 目录不为空, 下面存在其他文件或文件夹: %s",
+                            String.format("The current writeMode is nonConflict, but the directory [%s] is not empty, it includes sub-path(s): [%s]",
                                     path, String.join(",", Arrays.stream(existFilePaths).map(Path::getName).collect(Collectors.toSet()))));
                 }
             }
             else {
                 throw AddaxException.asAddaxException(HdfsWriterErrorCode.ILLEGAL_VALUE,
-                        String.format("您配置的path: [%s] 不存在, 请先创建目录.", path));
+                        String.format("The directory [%s]  does not exists. please create it first. ", path));
             }
         }
 
@@ -253,7 +254,7 @@ public class HdfsWriter
         @Override
         public List<Configuration> split(int mandatoryNumber)
         {
-            LOG.info("begin splitting ...");
+            LOG.info("Begin splitting ...");
 
             List<Configuration> writerSplitConfigs = new ArrayList<>();
             String filePrefix = fileName;
@@ -279,11 +280,11 @@ public class HdfsWriter
 
                 splitTaskConfig.set(Key.FILE_NAME, tmpFullFileName);
 
-                LOG.info("split wrote file name:[{}]", tmpFullFileName);
+                LOG.info("The split wrote files :[{}]", tmpFullFileName);
 
                 writerSplitConfigs.add(splitTaskConfig);
             }
-            LOG.info("end splitting.");
+            LOG.info("Finish splitting.");
             return writerSplitConfigs;
         }
 
@@ -396,7 +397,7 @@ public class HdfsWriter
         @Override
         public void startWrite(RecordReceiver lineReceiver)
         {
-            LOG.info("write to file : [{}]", this.fileName);
+            LOG.info("Begin to write file : [{}]", this.fileName);
             if ("TEXT".equals(fileType)) {
                 //写TEXT FILE
                 hdfsHelper.textFileStartWrite(lineReceiver, writerSliceConfig, fileName, getTaskPluginCollector());
@@ -410,7 +411,7 @@ public class HdfsWriter
                 hdfsHelper.parquetFileStartWrite(lineReceiver, writerSliceConfig, fileName, getTaskPluginCollector());
             }
 
-            LOG.info("end do write");
+            LOG.info("Finish write");
         }
 
         @Override

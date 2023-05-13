@@ -51,7 +51,7 @@ public final class OverFlowUtil
         if (isOverFlow) {
             throw AddaxException.asAddaxException(
                     CommonErrorCode.CONVERT_OVER_FLOW,
-                    String.format("[%s] 转为Long类型出现溢出 .", integer.toString()));
+                    String.format("An overflow occurred when converting [%s] to Long type.", integer));
         }
     }
 
@@ -77,7 +77,7 @@ public final class OverFlowUtil
         if (isOverFlow) {
             throw AddaxException.asAddaxException(
                     CommonErrorCode.CONVERT_OVER_FLOW,
-                    String.format("[%s]转为Double类型出现溢出 .",
+                    String.format("An overflow occurred when converting [%s] to Double type.",
                             decimal.toPlainString()));
         }
     }

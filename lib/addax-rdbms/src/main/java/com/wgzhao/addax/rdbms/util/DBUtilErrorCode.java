@@ -26,17 +26,17 @@ import com.wgzhao.addax.common.spi.ErrorCode;
 public enum DBUtilErrorCode
         implements ErrorCode
 {
-    JDBC_NULL("DBUtilErrorCode-20", "JDBC URL为空，请检查配置"),
-    CONF_ERROR("DBUtilErrorCode-00", "您的配置错误."),
-    CONN_DB_ERROR("DBUtilErrorCode-10", "连接数据库失败. 请检查您的账号、密码、数据库名称、IP、Port或者向 DBA 寻求帮助(注意网络环境)."),
-    GET_COLUMN_INFO_FAILED("DBUtilErrorCode-01", "获取表字段相关信息失败."),
-    UNSUPPORTED_TYPE("DBUtilErrorCode-12", "不支持的数据库类型. 请注意查看已经支持的数据库类型以及数据库版本."),
-    COLUMN_SPLIT_ERROR("DBUtilErrorCode-13", "根据主键进行切分失败."),
-    SET_SESSION_ERROR("DBUtilErrorCode-14", "设置 session 失败."),
-    RS_ASYNC_ERROR("DBUtilErrorCode-15", "异步获取ResultSet next失败."),
+    JDBC_NULL("db-1001", "JDBC URL为空，请检查配置"),
+    CONF_ERROR("db-1002", "您的配置错误."),
+    CONN_DB_ERROR("db-1003", "Failed to connect the database."),
+    GET_COLUMN_INFO_FAILED("db-2001", "获取表字段相关信息失败."),
+    UNSUPPORTED_TYPE("db-3001", "不支持的数据库类型. 请注意查看已经支持的数据库类型以及数据库版本."),
+    COLUMN_SPLIT_ERROR("db-4001", "根据主键进行切分失败."),
+    SET_SESSION_ERROR("db-5001", "设置 session 失败."),
+    RS_ASYNC_ERROR("db-5002", "异步获取ResultSet next失败."),
 
-    REQUIRED_VALUE("DBUtilErrorCode-03", "您缺失了必须填写的参数值."),
-    ILLEGAL_VALUE("DBUtilErrorCode-02", "您填写的参数值不合法."),
+    REQUIRED_VALUE("db-0001", "您缺失了必须填写的参数值."),
+    ILLEGAL_VALUE("db-0002", "您填写的参数值不合法."),
     ILLEGAL_SPLIT_PK("DBUtilErrorCode-04", "您填写的主键列不合法, 仅支持切分主键为一个,并且类型为整数或者字符串类型."),
     SPLIT_FAILED_ILLEGAL_SQL("DBUtilErrorCode-15", "尝试切分表时, 执行数据库 Sql 失败. 请检查您的配置 table/splitPk/where 并作出修改."),
     SQL_EXECUTE_FAIL("DBUtilErrorCode-06", "执行数据库 Sql 失败, 请检查您的配置的 column/table/where/querySql或者向 DBA 寻求帮助."),
@@ -77,6 +77,6 @@ public enum DBUtilErrorCode
     @Override
     public String toString()
     {
-        return String.format("Code:[%s], Description:[%s]. ", this.code, this.description);
+        return String.format("error code: %s", this.code);
     }
 }

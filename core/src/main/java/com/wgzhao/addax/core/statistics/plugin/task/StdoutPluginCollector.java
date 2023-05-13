@@ -80,7 +80,7 @@ public class StdoutPluginCollector
             LOG.error("", t);
         }
         if (maxLogNum.intValue() < 0 || currentLogNum.intValue() < maxLogNum.intValue()) {
-            LOG.error("dirty data: {}", this.formatDirty(dirtyRecord, t, errorMessage));
+            LOG.error("The dirty data: {}", this.formatDirty(dirtyRecord, t, errorMessage));
         }
 
         super.collectDirtyRecord(dirtyRecord, t, errorMessage);

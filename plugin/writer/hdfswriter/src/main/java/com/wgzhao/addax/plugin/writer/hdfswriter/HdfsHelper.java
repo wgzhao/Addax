@@ -91,8 +91,7 @@ import java.util.Objects;
 import java.util.Set;
 import java.util.StringJoiner;
 
-public class HdfsHelper
-{
+public class HdfsHelper {
     public static final Logger LOG = LoggerFactory.getLogger(HdfsHelper.class);
     public static final String HADOOP_SECURITY_AUTHENTICATION_KEY = "hadoop.security.authentication";
     public static final String HDFS_DEFAULT_FS_KEY = "fs.defaultFS";
@@ -105,8 +104,7 @@ public class HdfsHelper
     private String kerberosPrincipal;
 
     public static MutablePair<Text, Boolean> transportOneRecord(
-            Record record, char fieldDelimiter, List<Configuration> columnsConfiguration, TaskPluginCollector taskPluginCollector)
-    {
+            Record record, char fieldDelimiter, List<Configuration> columnsConfiguration, TaskPluginCollector taskPluginCollector) {
         MutablePair<List<Object>, Boolean> transportResultList = transportOneRecord(record, columnsConfiguration, taskPluginCollector);
         //保存<转换后的数据,是否是脏数据>
         MutablePair<Text, Boolean> transportResult = new MutablePair<>();
@@ -119,8 +117,7 @@ public class HdfsHelper
 
     public static MutablePair<List<Object>, Boolean> transportOneRecord(
             Record record, List<Configuration> columnsConfiguration,
-            TaskPluginCollector taskPluginCollector)
-    {
+            TaskPluginCollector taskPluginCollector) {
 
         MutablePair<List<Object>, Boolean> transportResult = new MutablePair<>();
         transportResult.setRight(false);
@@ -177,27 +174,25 @@ public class HdfsHelper
                                 recordList.add(column.asBytes());
                                 break;
                             default:
-                                throw AddaxException
-                                        .asAddaxException(
-                                                HdfsWriterErrorCode.ILLEGAL_VALUE,
-                                                String.format(
-                                                        "您的配置文件中的列配置信息有误. 不支持数据库写入这种字段类型. 字段名:[%s], 字段类型:[%s]. 请修改表中该字段的类型或者不同步该字段.",
-                                                        columnsConfiguration.get(i).getString(Key.NAME),
-                                                        columnsConfiguration.get(i).getString(Key.TYPE)));
+                                throw AddaxException.asAddaxException(
+                                        HdfsWriterErrorCode.ILLEGAL_VALUE,
+                                        String.format(
+                                                "The configuration is incorrect. The database does not support writing this type of field. " +
+                                                        "Field name: [%s], field type: [%s].",
+                                                columnsConfiguration.get(i).getString(Key.NAME),
+                                                columnsConfiguration.get(i).getString(Key.TYPE)));
                         }
-                    }
-                    catch (Exception e) {
+                    } catch (Exception e) {
                         // warn: 此处认为脏数据
                         e.printStackTrace();
                         String message = String.format(
-                                "字段类型转换错误：你目标字段为[%s]类型，实际字段值为[%s].",
+                                "Type conversion error：target field type: [%s], field value: [%s].",
                                 columnsConfiguration.get(i).getString(Key.TYPE), column.getRawData());
                         taskPluginCollector.collectDirtyRecord(record, message);
                         transportResult.setRight(true);
                         break;
                     }
-                }
-                else {
+                } else {
                     // warn: it's all ok if nullFormat is null
                     recordList.add(null);
                 }
@@ -209,8 +204,7 @@ public class HdfsHelper
 
     public static GenericRecord transportParRecord(
             Record record, List<Configuration> columnsConfiguration,
-            TaskPluginCollector taskPluginCollector, GenericRecordBuilder builder)
-    {
+            TaskPluginCollector taskPluginCollector, GenericRecordBuilder builder) {
 
         int recordLength = record.getColumnNumber();
         if (0 != recordLength) {
@@ -221,8 +215,7 @@ public class HdfsHelper
                 String typename = columnsConfiguration.get(i).getString(Key.TYPE).toUpperCase();
                 if (null == column || column.getRawData() == null) {
                     builder.set(colName, null);
-                }
-                else {
+                } else {
                     String rowData = column.getRawData().toString();
                     SupportHiveDataType columnType = SupportHiveDataType.valueOf(typename);
                     //根据writer端类型配置做类型转换
@@ -261,15 +254,15 @@ public class HdfsHelper
                                         .asAddaxException(
                                                 HdfsWriterErrorCode.ILLEGAL_VALUE,
                                                 String.format(
-                                                        "您的配置文件中的列配置信息有误. 不支持数据库写入这种字段类型. 字段名:[%s], 字段类型:[%s]. 请修改表中该字段的类型或者不同步该字段.",
+                                                        "The columns configuration is incorrect. the field type is unsupported." +
+                                                                "Field name:[%s], Field type:[%s].",
                                                         columnsConfiguration.get(i).getString(Key.NAME),
                                                         columnsConfiguration.get(i).getString(Key.TYPE)));
                         }
-                    }
-                    catch (Exception e) {
+                    } catch (Exception e) {
                         // warn: 此处认为脏数据
                         String message = String.format(
-                                "字段类型转换错误：目标字段为[%s]类型，实际字段值为[%s].",
+                                "Type conversion error for field. destination column type: [%s], actual column value: [%s].",
                                 columnsConfiguration.get(i).getString(Key.TYPE), column.getRawData());
                         taskPluginCollector.collectDirtyRecord(record, message);
                         break;
@@ -280,8 +273,7 @@ public class HdfsHelper
         return builder.build();
     }
 
-    public void getFileSystem(String defaultFS, Configuration taskConfig)
-    {
+    public void getFileSystem(String defaultFS, Configuration taskConfig) {
         hadoopConf = new org.apache.hadoop.conf.Configuration();
 
         Configuration hadoopSiteParams = taskConfig.getConfiguration(Key.HADOOP_CONFIG);
@@ -311,37 +303,31 @@ public class HdfsHelper
         conf = new JobConf(hadoopConf);
         try {
             fileSystem = FileSystem.get(conf);
-        }
-        catch (IOException e) {
-            String message = String.format("获取FileSystem时发生网络IO异常,请检查您的网络是否正常!HDFS地址：[message:defaultFS = %s]",
+        } catch (IOException e) {
+            String message = String.format("Network IO exception occurred while obtaining Filesystem with defaultFS: [%s]",
                     defaultFS);
             LOG.error(message);
             throw AddaxException.asAddaxException(HdfsWriterErrorCode.CONNECT_HDFS_IO_ERROR, e);
-        }
-        catch (Exception e) {
-            String message = String.format("获取FileSystem失败,请检查HDFS地址是否正确: [%s]",
-                    "message:defaultFS =" + defaultFS);
+        } catch (Exception e) {
+            String message = String.format("Failed to obtain Filesystem with defaultFS: [%s]", defaultFS);
             LOG.error(message);
             throw AddaxException.asAddaxException(HdfsWriterErrorCode.CONNECT_HDFS_IO_ERROR, e);
         }
 
         if (null == fileSystem) {
-            String message = String.format("获取FileSystem失败,请检查HDFS地址是否正确: [message:defaultFS = %s]",
-                    defaultFS);
+            String message = String.format("Failed to obtain Filesystem with defaultFS: [%s].", defaultFS);
             LOG.error(message);
             throw AddaxException.asAddaxException(HdfsWriterErrorCode.CONNECT_HDFS_IO_ERROR, message);
         }
     }
 
-    private void kerberosAuthentication(String kerberosPrincipal, String kerberosKeytabFilePath)
-    {
+    private void kerberosAuthentication(String kerberosPrincipal, String kerberosKeytabFilePath) {
         if (haveKerberos && StringUtils.isNotBlank(this.kerberosPrincipal) && StringUtils.isNotBlank(this.kerberosKeytabFilePath)) {
             UserGroupInformation.setConfiguration(this.hadoopConf);
             try {
                 UserGroupInformation.loginUserFromKeytab(kerberosPrincipal, kerberosKeytabFilePath);
-            }
-            catch (Exception e) {
-                String message = String.format("kerberos认证失败,请确定kerberosKeytabFilePath[%s]和kerberosPrincipal[%s]填写正确",
+            } catch (Exception e) {
+                String message = String.format("kerberos authentication failed, keytab file: [%s], principal: [%s]",
                         kerberosKeytabFilePath, kerberosPrincipal);
                 LOG.error(message);
                 throw AddaxException.asAddaxException(HdfsWriterErrorCode.KERBEROS_LOGIN_ERROR, e);
@@ -354,10 +340,9 @@ public class HdfsHelper
      *
      * @param dir 需要搜索的目录
      * @return 文件数组，文件是全路径，
-     * eg：hdfs://10.101.204.12:9000/user/hive/warehouse/writer.db/text/test.textfile
+     * eg：hdfs://10.101.204.12:9000/user/hive/warehouse/writer.db/text/test.txt
      */
-    public Path[] hdfsDirList(String dir)
-    {
+    public Path[] hdfsDirList(String dir) {
         Path path = new Path(dir);
         Path[] files;
         try {
@@ -366,90 +351,76 @@ public class HdfsHelper
             for (int i = 0; i < status.length; i++) {
                 files[i] = status[i].getPath();
             }
-        }
-        catch (IOException e) {
-            String message = String.format("获取目录[%s]文件列表时发生网络IO异常,请检查您的网络是否正常！", dir);
+        } catch (IOException e) {
+            String message = String.format("Network IO exception occurred while fetching file list for directory [%s]", dir);
             LOG.error(message);
             throw AddaxException.asAddaxException(HdfsWriterErrorCode.CONNECT_HDFS_IO_ERROR, e);
         }
         return files;
     }
 
-    public boolean isPathExists(String filePath)
-    {
+    public boolean isPathExists(String filePath) {
         Path path = new Path(filePath);
         boolean exist;
         try {
             exist = fileSystem.exists(path);
-        }
-        catch (IOException e) {
-            String message = String.format("判断文件路径[%s]是否存在时发生网络IO异常,请检查您的网络是否正常！",
-                    "message:filePath =" + filePath);
-            LOG.error(message);
+        } catch (IOException e) {
+            LOG.error("Network IO exception occurred while checking if file path [{}] exists", filePath);
             throw AddaxException.asAddaxException(HdfsWriterErrorCode.CONNECT_HDFS_IO_ERROR, e);
         }
         return exist;
     }
 
-    public boolean isPathDir(String filePath)
-    {
+    public boolean isPathDir(String filePath) {
         Path path = new Path(filePath);
         boolean isDir;
         try {
             isDir = fileSystem.getFileStatus(path).isDirectory();
-        }
-        catch (IOException e) {
-            String message = String.format("判断路径[%s]是否是目录时发生网络IO异常,请检查您的网络是否正常！", filePath);
-            LOG.error(message);
+        } catch (IOException e) {
+            LOG.error("Network IO exception occurred while checking if path [{}] is directory or not.", filePath);
             throw AddaxException.asAddaxException(HdfsWriterErrorCode.CONNECT_HDFS_IO_ERROR, e);
         }
         return isDir;
     }
 
-    public void deleteFilesFromDir(Path dir, boolean skipTrash)
-    {
+    public void deleteFilesFromDir(Path dir, boolean skipTrash) {
         try {
             final RemoteIterator<LocatedFileStatus> files = fileSystem.listFiles(dir, false);
             if (skipTrash) {
                 while (files.hasNext()) {
                     final LocatedFileStatus next = files.next();
-                    LOG.info("delete file [{}]" , next.getPath());
+                    LOG.info("Delete file [{}]", next.getPath());
                     fileSystem.delete(next.getPath(), false);
                 }
-            }
-            else {
+            } else {
                 if (hadoopConf.getInt(CommonConfigurationKeys.FS_TRASH_INTERVAL_KEY, 0) == 0) {
                     hadoopConf.set(CommonConfigurationKeys.FS_TRASH_INTERVAL_KEY, "10080"); // 7 days
                 }
                 final Trash trash = new Trash(hadoopConf);
                 while (files.hasNext()) {
                     final LocatedFileStatus next = files.next();
-                    LOG.info("move file [{}] to Trash" , next.getPath());
+                    LOG.info("Move file [{}] to Trash", next.getPath());
                     trash.moveToTrash(next.getPath());
                 }
             }
-        }
-        catch (FileNotFoundException fileNotFoundException) {
+        } catch (FileNotFoundException fileNotFoundException) {
             throw new AddaxException(HdfsWriterErrorCode.FILE_NOT_FOUND, fileNotFoundException.getMessage());
-        }
-        catch (IOException ioException) {
+        } catch (IOException ioException) {
             throw new AddaxException(HdfsWriterErrorCode.IO_ERROR, ioException.getMessage());
         }
     }
 
-    public void deleteDir(Path path)
-    {
-        LOG.info("start delete tmp dir [{}] .", path);
+    public void deleteDir(Path path) {
+        LOG.info("Begin to delete temporary dir [{}] .", path);
         try {
             if (isPathExists(path.toString())) {
                 fileSystem.delete(path, true);
             }
-        }
-        catch (Exception e) {
-            LOG.error("删除临时目录[{}]时发生IO异常,请检查您的网络是否正常！", path);
+        } catch (Exception e) {
+            LOG.error("IO exception occurred while delete temporary directory [{}].", path);
             throw AddaxException.asAddaxException(HdfsWriterErrorCode.CONNECT_HDFS_IO_ERROR, e);
         }
-        LOG.info("finish delete tmp dir [{}] .", path);
+        LOG.info("Finish deleting temporary dir [{}] .", path);
     }
 
     /**
@@ -458,39 +429,34 @@ public class HdfsHelper
      * @param sourceDir the source directory
      * @param targetDir the target directory
      */
-    public void moveFilesToDest(Path sourceDir, Path targetDir)
-    {
+    public void moveFilesToDest(Path sourceDir, Path targetDir) {
         try {
             final FileStatus[] fileStatuses = fileSystem.listStatus(sourceDir);
             for (FileStatus file : fileStatuses) {
                 if (file.isFile() && file.getLen() > 0) {
-                    LOG.info("start move file [{}] to dir [{}].", file.getPath(), targetDir.getName());
+                    LOG.info("Begin to move file from [{}] to [{}].", file.getPath(), targetDir.getName());
                     fileSystem.rename(file.getPath(), new Path(targetDir, file.getPath().getName()));
                 }
             }
-        }
-        catch (IOException e) {
+        } catch (IOException e) {
             throw AddaxException.asAddaxException(HdfsWriterErrorCode.IO_ERROR, e);
         }
-        LOG.info("finish move file(s).");
+        LOG.info("Finish move file(s).");
     }
 
     //关闭FileSystem
-    public void closeFileSystem()
-    {
+    public void closeFileSystem() {
         try {
             fileSystem.close();
-        }
-        catch (IOException e) {
-            LOG.error("关闭FileSystem时发生IO异常,请检查您的网络是否正常！");
+        } catch (IOException e) {
+            LOG.error("IO exception occurred while closing Filesystem.");
             throw AddaxException.asAddaxException(HdfsWriterErrorCode.CONNECT_HDFS_IO_ERROR, e);
         }
     }
 
     // 写text file类型文件
     public void textFileStartWrite(RecordReceiver lineReceiver, Configuration config, String fileName,
-            TaskPluginCollector taskPluginCollector)
-    {
+                                   TaskPluginCollector taskPluginCollector) {
         char fieldDelimiter = config.getChar(Key.FIELD_DELIMITER);
         List<Configuration> columns = config.getListConfiguration(Key.COLUMN);
         String compress = config.getString(Key.COMPRESS, "NONE").toUpperCase().trim();
@@ -520,9 +486,8 @@ public class HdfsHelper
                 }
             }
             writer.close(Reporter.NULL);
-        }
-        catch (Exception e) {
-            LOG.error("写文件文件[{}]时发生IO异常,请检查您的网络是否正常！", fileName);
+        } catch (Exception e) {
+            LOG.error("IO exception occurred while writing text file [{}]", fileName);
             Path path = new Path(fileName);
             deleteDir(path.getParent());
             throw AddaxException.asAddaxException(HdfsWriterErrorCode.Write_FILE_IO_ERROR, e);
@@ -530,8 +495,7 @@ public class HdfsHelper
     }
 
     // compress 已经转为大写
-    public Class<? extends CompressionCodec> getCompressCodec(String compress)
-    {
+    public Class<? extends CompressionCodec> getCompressCodec(String compress) {
         compress = compress.toUpperCase();
         Class<? extends CompressionCodec> codecClass;
         switch (compress) {
@@ -556,7 +520,7 @@ public class HdfsHelper
                 break;
             default:
                 throw AddaxException.asAddaxException(HdfsWriterErrorCode.ILLEGAL_VALUE,
-                        String.format("目前不支持您配置的 compress 模式 : [%s]", compress));
+                        String.format("The compress mode [%s} is unsupported yet.", compress));
         }
         return codecClass;
     }
@@ -583,8 +547,7 @@ public class HdfsHelper
      * "null" 表示该字段允许为空
      */
     public void parquetFileStartWrite(RecordReceiver lineReceiver, Configuration config, String fileName,
-            TaskPluginCollector taskPluginCollector)
-    {
+                                      TaskPluginCollector taskPluginCollector) {
 
         List<Configuration> columns = config.getListConfiguration(Key.COLUMN);
         String compress = config.getString(Key.COMPRESS, "UNCOMPRESSED").toUpperCase().trim();
@@ -595,7 +558,7 @@ public class HdfsHelper
         Schema schema = generateParquetSchema(columns);
 
         Path path = new Path(fileName);
-        LOG.info("write parquet file {}", fileName);
+        LOG.info("Begin to write parquet file [{}]", fileName);
         CompressionCodecName codecName = CompressionCodecName.fromConf(compress);
 
         GenericData decimalSupport = new GenericData();
@@ -620,16 +583,14 @@ public class HdfsHelper
                 GenericRecord transportResult = transportParRecord(record, columns, taskPluginCollector, builder);
                 writer.write(transportResult);
             }
-        }
-        catch (Exception e) {
-            LOG.error("写文件文件[{}]时发生IO异常,请检查您的网络是否正常！", fileName);
+        } catch (Exception e) {
+            LOG.error("IO exception occurred while writing file [{}].", fileName);
             deleteDir(path.getParent());
             throw AddaxException.asAddaxException(HdfsWriterErrorCode.Write_FILE_IO_ERROR, e);
         }
     }
 
-    private Schema generateParquetSchema(List<Configuration> columns)
-    {
+    private Schema generateParquetSchema(List<Configuration> columns) {
         List<Schema.Field> fields = new ArrayList<>();
         String fieldName;
         String type;
@@ -679,15 +640,14 @@ public class HdfsHelper
     /**
      * write an orc record
      *
-     * @param batch {@link VectorizedRowBatch}
-     * @param row row number
-     * @param record {@link Record}
-     * @param columns table columns, {@link List}
+     * @param batch               {@link VectorizedRowBatch}
+     * @param row                 row number
+     * @param record              {@link Record}
+     * @param columns             table columns, {@link List}
      * @param taskPluginCollector {@link TaskPluginCollector}
      */
     private void setRow(VectorizedRowBatch batch, int row, Record record, List<Configuration> columns,
-            TaskPluginCollector taskPluginCollector)
-    {
+                        TaskPluginCollector taskPluginCollector) {
         for (int i = 0; i < columns.size(); i++) {
             Configuration eachColumnConf = columns.get(i);
             String type = eachColumnConf.getString(Key.TYPE).trim().toUpperCase();
@@ -695,8 +655,7 @@ public class HdfsHelper
             ColumnVector col = batch.cols[i];
             if (type.startsWith("DECIMAL")) {
                 columnType = SupportHiveDataType.DECIMAL;
-            }
-            else {
+            } else {
                 columnType = SupportHiveDataType.valueOf(type);
             }
             if (record.getColumn(i) == null || record.getColumn(i).getRawData() == null) {
@@ -737,12 +696,10 @@ public class HdfsHelper
                         if (record.getColumn(i).getType() == Column.Type.BYTES) {
                             //convert bytes to base64 string
                             buffer = Base64.getEncoder().encode((byte[]) record.getColumn(i).getRawData());
-                        }
-                        else if (record.getColumn(i).getType() == Column.Type.DATE) {
+                        } else if (record.getColumn(i).getType() == Column.Type.DATE) {
                             SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
                             buffer = sdf.format(record.getColumn(i).asDate()).getBytes(StandardCharsets.UTF_8);
-                        }
-                        else {
+                        } else {
                             buffer = record.getColumn(i).getRawData().toString().getBytes(StandardCharsets.UTF_8);
                         }
                         ((BytesColumnVector) col).setRef(row, buffer, 0, buffer.length);
@@ -755,16 +712,15 @@ public class HdfsHelper
                         throw AddaxException
                                 .asAddaxException(
                                         HdfsWriterErrorCode.ILLEGAL_VALUE,
-                                        String.format("您的配置文件中的列配置信息有误. 不支持数据库写入这种字段类型. 字段名:[%s], 字段类型:[%s]. " +
-                                                        "请修改表中该字段的类型或者不同步该字段.",
+                                        String.format("The columns configuration is incorrect. the field type is unsupported yet. Field name: [%s], Field type name:[%s].",
                                                 eachColumnConf.getString(Key.NAME),
                                                 eachColumnConf.getString(Key.TYPE)));
                 }
-            }
-            catch (Exception e) {
+            } catch (Exception e) {
                 taskPluginCollector.collectDirtyRecord(record, e.getMessage());
                 throw AddaxException.asAddaxException(HdfsWriterErrorCode.ILLEGAL_VALUE,
-                        String.format("设置Orc数据行失败，源列类型: %s, 目的原始类型:%s, 目的列Hive类型: %s, 字段名称: %s, 源值: %s, 错误根源:%n%s",
+                        String.format("Failed to set ORC row, source field type: %s, destination field original type: %s, " +
+                                        "destination field hive type: %s, field name: %s, source field value: %s, root cause:%n%s",
                                 record.getColumn(i).getType(), columnType, eachColumnConf.getString(Key.TYPE),
                                 eachColumnConf.getString(Key.NAME),
                                 record.getColumn(i).getRawData(), e));
@@ -776,8 +732,7 @@ public class HdfsHelper
      * 写orcfile类型文件
      */
     public void orcFileStartWrite(RecordReceiver lineReceiver, Configuration config, String fileName,
-            TaskPluginCollector taskPluginCollector)
-    {
+                                  TaskPluginCollector taskPluginCollector) {
         List<Configuration> columns = config.getListConfiguration(Key.COLUMN);
         String compress = config.getString(Key.COMPRESS, "NONE").toUpperCase();
         StringJoiner joiner = new StringJoiner(",");
@@ -786,8 +741,7 @@ public class HdfsHelper
                 joiner.add(String.format("%s:%s(%s,%s)", column.getString(Key.NAME), "decimal",
                         column.getInt(Key.PRECISION, Constant.DEFAULT_DECIMAL_MAX_PRECISION),
                         column.getInt(Key.SCALE, Constant.DEFAULT_DECIMAL_MAX_SCALE)));
-            }
-            else {
+            } else {
                 joiner.add(String.format("%s:%s", column.getString(Key.NAME), column.getString(Key.TYPE)));
             }
         }
@@ -810,9 +764,8 @@ public class HdfsHelper
                 writer.addRowBatch(batch);
                 batch.reset();
             }
-        }
-        catch (IOException e) {
-            LOG.error("写文件文件[{}]时发生IO异常,请检查您的网络是否正常！", fileName);
+        } catch (IOException e) {
+            LOG.error("IO exception occurred while writing file [{}}.", fileName);
             Path path = new Path(fileName);
             deleteDir(path.getParent());
             throw AddaxException.asAddaxException(HdfsWriterErrorCode.Write_FILE_IO_ERROR, e);
