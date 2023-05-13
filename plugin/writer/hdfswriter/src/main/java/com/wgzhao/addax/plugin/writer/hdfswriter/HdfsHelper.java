@@ -420,7 +420,7 @@ public class HdfsHelper {
             LOG.error("IO exception occurred while delete temporary directory [{}].", path);
             throw AddaxException.asAddaxException(HdfsWriterErrorCode.CONNECT_HDFS_IO_ERROR, e);
         }
-        LOG.info("Finish delete temporary dir [{}] .", path);
+        LOG.info("Finish deleting temporary dir [{}] .", path);
     }
 
     /**
