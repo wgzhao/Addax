@@ -144,7 +144,7 @@ public class Configuration
         }
         catch (IOException e) {
             throw AddaxException.asAddaxException(CommonErrorCode.CONFIG_ERROR,
-                    String.format("Failed to read the configuration [%s], reason: %s.", e));
+                    String.format("Failed to read the configuration reason: %s.", e));
         }
     }
 
