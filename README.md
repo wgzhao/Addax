@@ -71,8 +71,6 @@ The output of the above command is roughly as follows.
 
 ```shell
 $ bin/addax.sh job/job.json
-
-
   ___      _     _
  / _ \    | |   | |
 / /_\ \ __| | __| | __ ___  __
@@ -80,100 +78,90 @@ $ bin/addax.sh job/job.json
 | | | | (_| | (_| | (_| |>  <
 \_| |_/\__,_|\__,_|\__,_/_/\_\
 
-:: Addax version ::    (v4.0.3)
+:: Addax version ::    (v4.0.13-SNAPSHOT)
 
-2021-09-16 11:03:20.328 [        main] INFO  VMInfo               - VMInfo# operatingSystem class => sun.management.OperatingSystemImpl
-2021-09-16 11:03:20.347 [        main] INFO  Engine               -
+2023-05-14 11:43:38.040 [        main] INFO  VMInfo               - VMInfo# operatingSystem class => sun.management.OperatingSystemImpl
+2023-05-14 11:43:38.062 [        main] INFO  Engine               -
 {
-	"content":[
-		{
-			"reader":{
-				"parameter":{
-					"column":[
-						{
-							"type":"string",
-							"value":"addax"
-						},
-						{
-							"type":"long",
-							"value":19890604
-						},
-						{
-							"type":"date",
-							"value":"1989-06-04 00:00:00"
-						},
-						{
-							"type":"bool",
-							"value":true
-						},
-						{
-							"type":"bytes",
-							"value":"test"
-						}
-					],
-					"sliceRecordCount":10
-				},
-				"name":"streamreader"
-			},
-			"writer":{
-				"parameter":{
-					"print":true,
-					"column":[
-						"col1"
-					],
-					"encoding":"UTF-8"
-				},
-				"name":"streamwriter"
-			}
-		}
-	],
 	"setting":{
-		"errorLimit":{
-			"record":0,
-			"percentage":0.02
-		},
 		"speed":{
 			"byte":-1,
-			"channel":1
+			"channel":1,
+			"record":-1
+		}
+	},
+	"content":{
+		"reader":{
+			"name":"streamreader",
+			"parameter":{
+				"sliceRecordCount":10,
+				"column":[
+					{
+						"value":"addax",
+						"type":"string"
+					},
+					{
+						"value":19890604,
+						"type":"long"
+					},
+					{
+						"value":"1989-06-04 11:22:33 123456",
+						"type":"date",
+						"dateFormat":"yyyy-MM-dd HH:mm:ss SSSSSS"
+					},
+					{
+						"value":true,
+						"type":"bool"
+					},
+					{
+						"value":"test",
+						"type":"bytes"
+					}
+				]
+			}
+		},
+		"writer":{
+			"name":"streamwriter",
+			"parameter":{
+				"print":true,
+				"encoding":"UTF-8"
+			}
 		}
 	}
 }
 
-2021-09-16 11:03:20.367 [        main] INFO  PerfTrace            - PerfTrace traceId=job_-1, isEnable=false, priority=0
-2021-09-16 11:03:20.367 [        main] INFO  JobContainer         - Addax jobContainer starts job.
-2021-09-16 11:03:20.368 [        main] INFO  JobContainer         - Set jobId = 0
-2021-09-16 11:03:20.382 [       job-0] INFO  JobContainer         - Addax Reader.Job [streamreader] do prepare work .
-2021-09-16 11:03:20.382 [       job-0] INFO  JobContainer         - Addax Writer.Job [streamwriter] do prepare work .
-2021-09-16 11:03:20.383 [       job-0] INFO  JobContainer         - Job set Channel-Number to 1 channels.
-2021-09-16 11:03:20.383 [       job-0] INFO  JobContainer         - Addax Reader.Job [streamreader] splits to [1] tasks.
-2021-09-16 11:03:20.383 [       job-0] INFO  JobContainer         - Addax Writer.Job [streamwriter] splits to [1] tasks.
-2021-09-16 11:03:20.405 [       job-0] INFO  JobContainer         - Scheduler starts [1] taskGroups.
-2021-09-16 11:03:20.412 [ taskGroup-0] INFO  TaskGroupContainer   - taskGroupId=[0] start [1] channels for [1] tasks.
-2021-09-16 11:03:20.415 [ taskGroup-0] INFO  Channel              - Channel set byte_speed_limit to -1, No bps activated.
-2021-09-16 11:03:20.415 [ taskGroup-0] INFO  Channel              - Channel set record_speed_limit to -1, No tps activated.
-addax	19890604	1989-06-04 00:00:00	true	test
-addax	19890604	1989-06-04 00:00:00	true	test
-addax	19890604	1989-06-04 00:00:00	true	test
-addax	19890604	1989-06-04 00:00:00	true	test
-addax	19890604	1989-06-04 00:00:00	true	test
-addax	19890604	1989-06-04 00:00:00	true	test
-addax	19890604	1989-06-04 00:00:00	true	test
-addax	19890604	1989-06-04 00:00:00	true	test
-addax	19890604	1989-06-04 00:00:00	true	test
-addax	19890604	1989-06-04 00:00:00	true	test
-2021-09-16 11:03:23.428 [       job-0] INFO  AbstractScheduler    - Scheduler accomplished all tasks.
-2021-09-16 11:03:23.428 [       job-0] INFO  JobContainer         - Addax Writer.Job [streamwriter] do post work.
-2021-09-16 11:03:23.428 [       job-0] INFO  JobContainer         - Addax Reader.Job [streamreader] do post work.
-2021-09-16 11:03:23.430 [       job-0] INFO  JobContainer         - PerfTrace not enable!
-2021-09-16 11:03:23.431 [       job-0] INFO  StandAloneJobContainerCommunicator - Total 10 records, 260 bytes | Speed 86B/s, 3 records/s | Error 0 records, 0 bytes |  All Task WaitWriterTime 0.000s |  All Task WaitReaderTime 0.000s | Percentage 100.00%
-2021-09-16 11:03:23.432 [       job-0] INFO  JobContainer         -
-任务启动时刻                    : 2021-09-16 11:03:20
-任务结束时刻                    : 2021-09-16 11:03:23
-任务总计耗时                    :                  3s
-任务平均流量                    :               86B/s
-记录写入速度                    :              3rec/s
-读出记录总数                    :                  10
-读写失败总数                    :                   0
+2023-05-14 11:43:38.092 [        main] INFO  JobContainer         - The jobContainer begins to process the job.
+2023-05-14 11:43:38.107 [       job-0] INFO  JobContainer         - The Reader.Job [streamreader] perform prepare work .
+2023-05-14 11:43:38.107 [       job-0] INFO  JobContainer         - The Writer.Job [streamwriter] perform prepare work .
+2023-05-14 11:43:38.108 [       job-0] INFO  JobContainer         - Job set Channel-Number to 1 channel(s).
+2023-05-14 11:43:38.108 [       job-0] INFO  JobContainer         - The Reader.Job [streamreader] is divided into [1] task(s).
+2023-05-14 11:43:38.108 [       job-0] INFO  JobContainer         - The Writer.Job [streamwriter] is divided into [1] task(s).
+2023-05-14 11:43:38.130 [       job-0] INFO  JobContainer         - The Scheduler launches [1] taskGroup(s).
+2023-05-14 11:43:38.138 [ taskGroup-0] INFO  TaskGroupContainer   - The taskGroupId=[0] started [1] channels for [1] tasks.
+2023-05-14 11:43:38.141 [ taskGroup-0] INFO  Channel              - The Channel set byte_speed_limit to -1, No bps activated.
+2023-05-14 11:43:38.141 [ taskGroup-0] INFO  Channel              - The Channel set record_speed_limit to -1, No tps activated.
+addax  19890604	1989-06-04 11:24:36	true	test
+addax  19890604	1989-06-04 11:24:36	true	test
+addax  19890604	1989-06-04 11:24:36	true	test
+addax  19890604	1989-06-04 11:24:36	true	test
+addax  19890604	1989-06-04 11:24:36	true	test
+addax  19890604	1989-06-04 11:24:36	true	test
+addax  19890604	1989-06-04 11:24:36	true	test
+addax  19890604	1989-06-04 11:24:36	true	test
+addax  19890604	1989-06-04 11:24:36	true	test
+addax  19890604	1989-06-04 11:24:36	true	test
+2023-05-14 11:43:41.157 [       job-0] INFO  AbstractScheduler    - The scheduler has completed all tasks.
+2023-05-14 11:43:41.158 [       job-0] INFO  JobContainer         - The Writer.Job [streamwriter] perform post work.
+2023-05-14 11:43:41.159 [       job-0] INFO  JobContainer         - The Reader.Job [streamreader] perform post work.
+2023-05-14 11:43:41.162 [       job-0] INFO  StandAloneJobContainerCommunicator - Total 10 records, 260 bytes | Speed 86B/s, 3 records/s | Error 0 records, 0 bytes |  All Task WaitWriterTime 0.000s |  All Task WaitReaderTime 0.000s | Percentage 100.00%
+2023-05-14 11:43:41.596 [       job-0] INFO  JobContainer         -
+Job start  at             : 2023-05-14 11:43:38
+Job end    at             : 2023-05-14 11:43:41
+Job took secs             :                  3ss
+Average   bps             :               86B/s
+Average   rps             :              3rec/s
+Number of rec             :                  10
+Failed record             :                   0
 ```
 
 </details>
