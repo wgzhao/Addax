@@ -1,4 +1,6 @@
-FROM maven:3.6-jdk-8
+# define an alias
+FROM maven:3.6-jdk-8 as build
+
 COPY . /src
 WORKDIR /src
 
@@ -9,9 +11,9 @@ RUN mkdir /root/.m2 && echo '<?xml version="1.0" encoding="UTF-8"?><settings xml
     rm -f target/addax/addax-*.tar.gz
 
 FROM openjdk:8u232-jre-stretch
-COPY --from=0  /src/target/addax/addax-* /opt/addax/
+COPY --from=build  /src/target/addax/addax-* /opt/addax/
 
 WORKDIR /opt/addax
 
 RUN chmod 755 /opt/addax/bin/*
-    
+
