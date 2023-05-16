@@ -74,7 +74,7 @@ public class SingleTableSplitUtil
             Pair<Object, Object> minMaxPK = getPkRange(configuration);
             if (null == minMaxPK) {
                 throw AddaxException.asAddaxException(DBUtilErrorCode.ILLEGAL_SPLIT_PK,
-                        "根据切分主键切分表失败. 支持切分主键为一个,并且类型为整数或者字符串类型. 请尝试使用其他的切分主键或者联系 DBA 进行处理.");
+                        "Primary key-based table splitting failed. The key type ONLY supports integer and string.");
             }
 
             configuration.set(Key.QUERY_SQL, buildQuerySql(column, table, where));
@@ -97,7 +97,7 @@ public class SingleTableSplitUtil
             }
             else {
                 throw AddaxException.asAddaxException(DBUtilErrorCode.ILLEGAL_SPLIT_PK,
-                        "您配置的切分主键(splitPk) 类型不支持. 仅支持切分主键为一个,并且类型为整数或者字符串类型. 请尝试使用其他的切分主键或者联系 DBA 进行处理.");
+                        "the splitPk[" + splitPkName + "] type is unsupported, it only support int and string");
             }
         }
         String tempQuerySql;
@@ -178,7 +178,7 @@ public class SingleTableSplitUtil
         Pair<Object, Object> minMaxPK = checkSplitPk(conn, pkRangeSQL, fetchSize, table, username, null);
         if (null == minMaxPK) {
             throw AddaxException.asAddaxException(DBUtilErrorCode.ILLEGAL_SPLIT_PK,
-                    "根据切分主键切分表失败. 仅支持切分主键为一个,并且类型为整数或者字符串类型. 请尝试使用其他的切分主键或者联系 DBA 进行处理.");
+                    "The split key should be single column, and the type is either integer or string.");
         }
     }
 
@@ -201,8 +201,7 @@ public class SingleTableSplitUtil
         ResultSet rs = null;
         Pair<Object, Object> minMaxPK = null;
         try {
-            String errorMsg = "您配置的切分主键(splitPk)有误. 因为您配置的切分主键(splitPk) 类型不支持. " +
-                    "仅支持切分主键为一个,并且类型为整数或者字符串类型. 请尝试使用其他的切分主键或者联系 DBA 进行处理.";
+            String errorMsg =  "the splitPk type is unsupported, it only support int and string";
             try {
                 rs = DBUtil.query(conn, pkRangeSQL, fetchSize);
             }
@@ -246,7 +245,7 @@ public class SingleTableSplitUtil
             throw e;
         }
         catch (Exception e) {
-            throw AddaxException.asAddaxException(DBUtilErrorCode.ILLEGAL_SPLIT_PK, "尝试切分表发生错误. 请检查您的配置并作出修改.", e);
+            throw AddaxException.asAddaxException(DBUtilErrorCode.ILLEGAL_SPLIT_PK, "Failed to split the table.", e);
         }
         finally {
             DBUtil.closeDBResources(rs, null, null);
@@ -270,13 +269,13 @@ public class SingleTableSplitUtil
         }
         catch (Exception e) {
             throw AddaxException.asAddaxException(DBUtilErrorCode.ILLEGAL_SPLIT_PK,
-                    "获取切分主键(splitPk)字段类型失败. 该错误通常是系统底层异常导致.");
+                    "Failed to obtain the type of split key.");
         }
         return ret;
     }
 
     // warn: Types.NUMERIC is used for oracle! because oracle use NUMBER to
-    // store INT, SMALLINT, INTEGER etc, and only oracle need to concern
+    // store INT, SMALLINT, INTEGER, and only oracle need to concern
     // Types.NUMERIC
     private static boolean isLongType(int type)
     {
@@ -326,7 +325,7 @@ public class SingleTableSplitUtil
     public static List<String> genSplitSqlForOracle(String splitPK, String table, String where, Configuration configuration, int adviceNum)
     {
         if (adviceNum < 1) {
-            throw new IllegalArgumentException(String.format("切分份数不能小于1. 此处:adviceNum=[%s].", adviceNum));
+            throw new IllegalArgumentException(String.format("The number of split should be greater than or equal 1, but it got %d.", adviceNum));
         }
         else if (adviceNum == 1) {
             return new ArrayList<>();
@@ -363,7 +362,7 @@ public class SingleTableSplitUtil
             throw e;
         }
         catch (Exception e) {
-            throw AddaxException.asAddaxException(DBUtilErrorCode.ILLEGAL_SPLIT_PK, "尝试切分表发生错误. 请检查您的配置并作出修改.", e);
+            throw AddaxException.asAddaxException(DBUtilErrorCode.ILLEGAL_SPLIT_PK, "Failed to split table by split key.", e);
         }
         finally {
             DBUtil.closeDBResources(rs, null, null);
@@ -398,7 +397,7 @@ public class SingleTableSplitUtil
             }
             else {
                 throw AddaxException.asAddaxException(DBUtilErrorCode.ILLEGAL_SPLIT_PK,
-                        "您配置的切分主键(splitPk)有误. 因为您配置的切分主键(splitPk) 类型不支持. 仅支持切分主键为一个,并且类型为整数或者字符串类型. 请尝试使用其他的切分主键或者联系 DBA 进行处理.");
+                        "the data type of split key is unsupported. it ONLY supports integer and string.");
             }
         }
         return rangeSql;
