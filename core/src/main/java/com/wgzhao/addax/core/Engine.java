@@ -141,7 +141,6 @@ public class Engine
                 "| | | | (_| | (_| | (_| |>  < \n" +
                 "\\_| |_/\\__,_|\\__,_|\\__,_/_/\\_\\\n");
         System.out.println(":: Addax version ::    (v" + Engine.getVersion() + ")\n");
-        int exitCode = 0;
         if (args.length < 2) {
             LOG.error("need a job file");
             System.exit(1);
@@ -151,18 +150,9 @@ public class Engine
             Engine.entry(args);
         }
         catch (Throwable e) {
-            exitCode = 2;
-            e.printStackTrace();
-            if (e instanceof AddaxException) {
-                AddaxException tempException = (AddaxException) e;
-                ErrorCode errorCode = tempException.getErrorCode();
-                if (errorCode instanceof FrameworkErrorCode) {
-                    FrameworkErrorCode tempErrorCode = (FrameworkErrorCode) errorCode;
-                    exitCode = tempErrorCode.toExitValue();
-                }
-            }
-            System.exit(exitCode);
+            LOG.error(e.getMessage());
+            System.exit(2);
         }
-        System.exit(exitCode);
+        System.exit(0);
     }
 }
