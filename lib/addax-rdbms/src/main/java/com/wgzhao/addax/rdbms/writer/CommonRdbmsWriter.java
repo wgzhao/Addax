@@ -304,7 +304,7 @@ public class CommonRdbmsWriter
                         throw AddaxException.asAddaxException(
                                 DBUtilErrorCode.CONF_ERROR,
                                 String.format(
-                                        "列配置信息有错误. 因为您配置的任务中，源头读取字段数:%s 与 目的表要写入的字段数:%s 不相等. 请检查您的配置并作出修改.",
+                                        "The item column number [%d] in source file not equals the column number [%d] in table.",
                                         record.getColumnNumber(),
                                         this.columnNumber));
                     }
@@ -404,7 +404,7 @@ public class CommonRdbmsWriter
                 connection.commit();
             }
             catch (SQLException e) {
-                LOG.warn("回滚此次写入, 采用每次写入一行方式提交. 因为: {}", e.getMessage());
+                LOG.warn("Rolling back the write, try to write one line at a time. because: {}", e.getMessage());
                 connection.rollback();
                 doOneInsert(connection, buffer);
             }
@@ -514,7 +514,7 @@ public class CommonRdbmsWriter
                         preparedStatement.setDate(columnIndex, new java.sql.Date(utilDate.getTime()));
                     }
                     catch (AddaxException e) {
-                        throw new SQLException(String.format("Date 类型转换错误：[%s]", column));
+                        throw new SQLException(String.format("Failed to convert the column [%s] to Date type.Date", column));
                     }
                     break;
 
@@ -525,7 +525,7 @@ public class CommonRdbmsWriter
                     }
                     catch (AddaxException e) {
                         throw new SQLException(String.format(
-                                "TIME 类型转换错误：[%s]", column));
+                                "Failed to convert the column [%s] to time type.", column));
                     }
 
                     if (null != utilDate) {
