@@ -78,7 +78,7 @@ public final class OriginalConfPretreatmentUtil
         int batchSize = originalConfig.getInt(Key.BATCH_SIZE, Constant.DEFAULT_BATCH_SIZE);
         if (batchSize < 1) {
             throw AddaxException.asAddaxException(DBUtilErrorCode.ILLEGAL_VALUE, String.format(
-                    "您的batchSize配置有误. 您所配置的写入数据库表的 batchSize:%s 不能小于1. 推荐配置范围为：[100-1000], 该值越大, 内存溢出可能性越大. 请检查您的配置并作出修改.",
+                    "The item batchSize [%s] must be greater than 1. recommended value range is [100,1000].",
                     batchSize));
         }
 
@@ -95,12 +95,12 @@ public final class OriginalConfPretreatmentUtil
             // 是否配置的定制的驱动名称
             String driverClass = connConf.getString(Key.JDBC_DRIVER, null);
             if (driverClass != null && !driverClass.isEmpty()) {
-                LOG.warn("use specified driver class: {}", driverClass);
+                LOG.warn("Use specified driver class [{}]", driverClass);
                 dataBaseType.setDriverClassName(driverClass);
             }
             String jdbcUrl = connConf.getString(Key.JDBC_URL);
             if (StringUtils.isBlank(jdbcUrl)) {
-                throw AddaxException.asAddaxException(DBUtilErrorCode.REQUIRED_VALUE, "您未配置的写入数据库表的 jdbcUrl.");
+                throw AddaxException.asAddaxException(DBUtilErrorCode.REQUIRED_VALUE, "The item jdbcUrl is required.");
             }
 
             jdbcUrl = dataBaseType.appendJDBCSuffixForWriter(jdbcUrl);
@@ -110,7 +110,7 @@ public final class OriginalConfPretreatmentUtil
 
             if (null == tables || tables.isEmpty()) {
                 throw AddaxException.asAddaxException(DBUtilErrorCode.REQUIRED_VALUE,
-                        "您未配置写入数据库表的表名称. 根据配置找不到您配置的表. 请检查您的配置并作出修改.");
+                        "The item table is required.");
             }
 
             // 对每一个connection 上配置的table 项进行解析
@@ -118,7 +118,7 @@ public final class OriginalConfPretreatmentUtil
 
             if (expandedTables.isEmpty()) {
                 throw AddaxException.asAddaxException(DBUtilErrorCode.CONF_ERROR,
-                        "您配置的写入数据库表名称错误. 找不到您配置的表，请检查您的配置并作出修改.");
+                        "The item table is required.");
             }
 
             tableNum += expandedTables.size();
@@ -134,7 +134,7 @@ public final class OriginalConfPretreatmentUtil
         List<String> userConfiguredColumns = originalConfig.getList(Key.COLUMN, String.class);
         if (null == userConfiguredColumns || userConfiguredColumns.isEmpty()) {
             throw AddaxException.asAddaxException(DBUtilErrorCode.ILLEGAL_VALUE,
-                    "您的配置文件中的列配置信息有误. 因为您未配置写入数据库表的列名称，获取不到列信息. 请检查您的配置并作出修改.");
+                    "The item column is required and can not be empty.");
         }
         else {
             boolean isPreCheck = originalConfig.getBool(Key.DRY_RUN, false);
@@ -146,19 +146,20 @@ public final class OriginalConfPretreatmentUtil
                 allColumns = DBUtil.getTableColumnsByConn(connectionFactory.getConnection(), oneTable);
             }
 
-            LOG.info("table:[{}] all columns:[{}].", oneTable, StringUtils.join(allColumns, ","));
+            LOG.info("The table [{}] has columns [{}].", oneTable, StringUtils.join(allColumns, ","));
 
             if (1 == userConfiguredColumns.size() && "*".equals(userConfiguredColumns.get(0))) {
-                LOG.warn("您的配置文件中的列配置信息存在风险. 因为您配置的写入数据库表的列为*，当您的表字段个数、类型有变动时，" +
-                        "可能影响任务正确性甚至会运行出错。请检查您的配置并作出修改.");
+                LOG.warn("There are some risks in the column configuration. Because you did not configure the columns " +
+                        "to read the database table, changes in the number and types of fields in your table may affect " +
+                        "the correctness of the task or even cause errors.");
 
                 // 回填其值，需要以 String 的方式转交后续处理
                 originalConfig.set(Key.COLUMN, allColumns);
             }
             else if (userConfiguredColumns.size() > allColumns.size()) {
                 throw AddaxException.asAddaxException(DBUtilErrorCode.ILLEGAL_VALUE,
-                        String.format("您的配置文件中的列配置信息有误. 因为您所配置的写入数据库表的字段个数:%s 大于目的表的总字段总个数:%s. " +
-                                "请检查您的配置并作出修改.", userConfiguredColumns.size(), allColumns.size()));
+                        String.format("The number of columns your configured [%d] are greater than the number of table columns [%d].",
+                                userConfiguredColumns.size(), allColumns.size()));
             }
             else {
                 // 确保用户配置的 column 不重复
@@ -202,7 +203,7 @@ public final class OriginalConfPretreatmentUtil
 
         String writeDataSqlTemplate = WriterUtil.getWriteTemplate(columns, valueHolders, writeMode, dataBaseType, false);
 
-        LOG.info("Write data [{}], which jdbcUrl [{}]", writeDataSqlTemplate, jdbcUrl);
+        LOG.info("Writing data using [{}].", writeDataSqlTemplate);
 
         originalConfig.set(Constant.INSERT_OR_REPLACE_TEMPLATE_MARK, writeDataSqlTemplate);
     }
