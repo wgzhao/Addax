@@ -27,8 +27,7 @@ import com.wgzhao.addax.core.statistics.communication.Communication;
 import com.wgzhao.addax.core.statistics.communication.CommunicationTool;
 import org.apache.commons.lang3.Validate;
 
-public abstract class AbstractRunner
-{
+public abstract class AbstractRunner {
     private AbstractTaskPlugin plugin;
 
     private Configuration jobConf;
@@ -39,51 +38,34 @@ public abstract class AbstractRunner
 
     private int taskId;
 
-    public AbstractRunner(AbstractTaskPlugin taskPlugin)
-    {
+    public AbstractRunner(AbstractTaskPlugin taskPlugin) {
         this.plugin = taskPlugin;
     }
 
-    public void destroy()
-    {
+    public void destroy() {
         if (this.plugin != null) {
             this.plugin.destroy();
         }
     }
 
-    public State getRunnerState()
-    {
-        return this.runnerCommunication.getState();
-    }
-
-    public AbstractTaskPlugin getPlugin()
-    {
+    public AbstractTaskPlugin getPlugin() {
         return plugin;
     }
 
-    public void setPlugin(AbstractTaskPlugin plugin)
-    {
+    public void setPlugin(AbstractTaskPlugin plugin) {
         this.plugin = plugin;
     }
 
-    public Configuration getJobConf()
-    {
-        return jobConf;
-    }
-
-    public void setJobConf(Configuration jobConf)
-    {
+    public void setJobConf(Configuration jobConf) {
         this.jobConf = jobConf;
         this.plugin.setPluginJobConf(jobConf);
     }
 
-    public void setTaskPluginCollector(TaskPluginCollector pluginCollector)
-    {
+    public void setTaskPluginCollector(TaskPluginCollector pluginCollector) {
         this.plugin.setTaskPluginCollector(pluginCollector);
     }
 
-    private void mark(State state)
-    {
+    private void mark(State state) {
         this.runnerCommunication.setState(state);
         if (state == State.SUCCEEDED) {
             // 对 stage + 1
@@ -92,52 +74,39 @@ public abstract class AbstractRunner
         }
     }
 
-    public void markRun()
-    {
-        mark(State.RUNNING);
-    }
-
-    public void markSuccess()
-    {
+    public void markSuccess() {
         mark(State.SUCCEEDED);
     }
 
-    public void markFail(final Throwable throwable)
-    {
+    public void markFail(final Throwable throwable) {
         mark(State.FAILED);
         this.runnerCommunication.setTimestamp(System.currentTimeMillis());
         this.runnerCommunication.setThrowable(throwable);
     }
 
-    public int getTaskGroupId()
-    {
+    public int getTaskGroupId() {
         return taskGroupId;
     }
 
-    public void setTaskGroupId(int taskGroupId)
-    {
+    public void setTaskGroupId(int taskGroupId) {
         this.taskGroupId = taskGroupId;
         this.plugin.setTaskGroupId(taskGroupId);
     }
 
-    public int getTaskId()
-    {
+    public int getTaskId() {
         return taskId;
     }
 
-    public void setTaskId(int taskId)
-    {
+    public void setTaskId(int taskId) {
         this.taskId = taskId;
         this.plugin.setTaskId(taskId);
     }
 
-    public Communication getRunnerCommunication()
-    {
+    public Communication getRunnerCommunication() {
         return runnerCommunication;
     }
 
-    public void setRunnerCommunication(final Communication runnerCommunication)
-    {
+    public void setRunnerCommunication(final Communication runnerCommunication) {
         Validate.notNull(runnerCommunication,
                 "插件的Communication不能为空");
         this.runnerCommunication = runnerCommunication;
