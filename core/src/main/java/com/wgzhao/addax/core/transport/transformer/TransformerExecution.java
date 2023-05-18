@@ -88,29 +88,6 @@ public class TransformerExecution
         return finalParas;
     }
 
-    public long getExhaustedTime()
-    {
-        /*
-         * 以下是动态统计信息，暂时未用
-         */
-        return 0;
-    }
-
-    public long getSuccessRecords()
-    {
-        return 0;
-    }
-
-    public long getFailedRecords()
-    {
-        return 0;
-    }
-
-    public long getFilterRecords()
-    {
-        return 0;
-    }
-
     public void setIsChecked(boolean isChecked)
     {
         this.isChecked = isChecked;

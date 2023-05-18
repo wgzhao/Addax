@@ -32,25 +32,21 @@ import java.util.concurrent.ConcurrentHashMap;
 /**
  * Created by liqiang on 15/7/23.
  */
-public class TaskMonitor
-{
+public class TaskMonitor {
 
     private static final Logger LOG = LoggerFactory.getLogger(TaskMonitor.class);
     private static final TaskMonitor instance = new TaskMonitor();
 
     private final ConcurrentHashMap<Integer, TaskCommunication> tasks = new ConcurrentHashMap<>();
 
-    private TaskMonitor()
-    {
+    private TaskMonitor() {
     }
 
-    public static TaskMonitor getInstance()
-    {
+    public static TaskMonitor getInstance() {
         return instance;
     }
 
-    public void registerTask(Integer taskId, Communication communication)
-    {
+    public void registerTask(Integer taskId, Communication communication) {
         //如果task已经finish，直接返回
         if (communication.isFinished()) {
             return;
@@ -58,13 +54,11 @@ public class TaskMonitor
         tasks.putIfAbsent(taskId, new TaskCommunication(taskId, communication));
     }
 
-    public void removeTask(Integer taskId)
-    {
+    public void removeTask(Integer taskId) {
         tasks.remove(taskId);
     }
 
-    public void report(Integer taskId, Communication communication)
-    {
+    public void report(Integer taskId, Communication communication) {
         //如果task已经finish，直接返回
         if (communication.isFinished()) {
             return;
@@ -72,19 +66,12 @@ public class TaskMonitor
         if (!tasks.containsKey(taskId)) {
             LOG.warn("Unexpected: the task id[{}] is missing.", taskId);
             tasks.putIfAbsent(taskId, new TaskCommunication(taskId, communication));
-        }
-        else {
+        } else {
             tasks.get(taskId).report(communication);
         }
     }
 
-    public TaskCommunication getTaskCommunication(Integer taskId)
-    {
-        return tasks.get(taskId);
-    }
-
-    public static class TaskCommunication
-    {
+    public static class TaskCommunication {
         private final Integer taskId;
         //记录最后更新的communication
         private long lastAllReadRecords;
@@ -92,57 +79,38 @@ public class TaskMonitor
         private long lastUpdateCommunicationTS;
         private long ttl;
 
-        private TaskCommunication(Integer taskId, Communication communication)
-        {
+        private TaskCommunication(Integer taskId, Communication communication) {
             this.taskId = taskId;
             lastAllReadRecords = CommunicationTool.getTotalReadRecords(communication);
             ttl = System.currentTimeMillis();
             lastUpdateCommunicationTS = ttl;
         }
 
-        public void report(Communication communication)
-        {
+        public void report(Communication communication) {
 
             ttl = System.currentTimeMillis();
             //采集的数量增长，则变更当前记录, 优先判断这个条件，因为目的是不卡住，而不是expired
             if (CommunicationTool.getTotalReadRecords(communication) > lastAllReadRecords) {
                 lastAllReadRecords = CommunicationTool.getTotalReadRecords(communication);
                 lastUpdateCommunicationTS = ttl;
-            }
-            else if (isExpired(lastUpdateCommunicationTS)) {
+            } else if (isExpired(lastUpdateCommunicationTS)) {
                 communication.setState(State.FAILED);
                 communication.setTimestamp(ttl);
                 communication.setThrowable(AddaxException.asAddaxException(CommonErrorCode.TASK_HUNG_EXPIRED,
-                        String.format("task(%s) hung expired [allReadRecord(%s), elapsed(%s)]",
-                                taskId, lastAllReadRecords, (ttl - lastUpdateCommunicationTS))));
+                        String.format("task(%s) hung expired [allReadRecord(%s), elapsed(%s)]", taskId,
+                                lastAllReadRecords, (ttl - lastUpdateCommunicationTS))));
             }
         }
 
-        private boolean isExpired(long lastUpdateCommunicationTS)
-        {
+        private boolean isExpired(long lastUpdateCommunicationTS) {
             //48 hours
             long expiredTime = 172800 * 1000L;
             return System.currentTimeMillis() - lastUpdateCommunicationTS > expiredTime;
         }
 
-        public Integer getTaskId()
-        {
+        public Integer getTaskId() {
             return taskId;
         }
 
-        public long getLastAllReadRecords()
-        {
-            return lastAllReadRecords;
-        }
-
-        public long getLastUpdateCommunicationTS()
-        {
-            return lastUpdateCommunicationTS;
-        }
-
-        public long getTtl()
-        {
-            return ttl;
-        }
     }
 }

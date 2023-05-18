@@ -35,27 +35,23 @@ import org.slf4j.LoggerFactory;
  */
 public class WriterRunner
         extends AbstractRunner
-        implements Runnable
-{
+        implements Runnable {
 
     private static final Logger LOG = LoggerFactory
             .getLogger(WriterRunner.class);
 
     private RecordReceiver recordReceiver;
 
-    public WriterRunner(AbstractTaskPlugin abstractTaskPlugin)
-    {
+    public WriterRunner(AbstractTaskPlugin abstractTaskPlugin) {
         super(abstractTaskPlugin);
     }
 
-    public void setRecordReceiver(RecordReceiver receiver)
-    {
+    public void setRecordReceiver(RecordReceiver receiver) {
         this.recordReceiver = receiver;
     }
 
     @Override
-    public void run()
-    {
+    public void run() {
         Validate.isTrue(this.recordReceiver != null);
 
         Writer.Task taskWriter = (Writer.Task) this.getPlugin();
@@ -91,12 +87,10 @@ public class WriterRunner
             postPerfRecord.end();
 
             super.markSuccess();
-        }
-        catch (Throwable e) {
+        } catch (Throwable e) {
             LOG.error("Writer Runner Received Exceptions:", e);
             super.markFail(e);
-        }
-        finally {
+        } finally {
             LOG.debug("task writer starts to do destroy ...");
             PerfRecord desPerfRecord = new PerfRecord(getTaskGroupId(), getTaskId(), PerfRecord.PHASE.WRITE_TASK_DESTROY);
             desPerfRecord.start();
@@ -106,14 +100,12 @@ public class WriterRunner
         }
     }
 
-    public boolean supportFailOver()
-    {
+    public boolean supportFailOver() {
         Writer.Task taskWriter = (Writer.Task) this.getPlugin();
         return taskWriter.supportFailOver();
     }
 
-    public void shutdown()
-    {
+    public void shutdown() {
         recordReceiver.shutdown();
     }
 }
