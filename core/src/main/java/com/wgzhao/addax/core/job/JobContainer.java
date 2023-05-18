@@ -578,7 +578,6 @@ public class JobContainer
         classLoaderSwapper.setCurrentThreadClassLoader(LoadUtil.getJarLoader(PluginType.READER, this.readerPluginName));
 
         Reader.Job jobReader = (Reader.Job) LoadUtil.loadJobPlugin(PluginType.READER, this.readerPluginName);
-//        this.configuration.set(CoreConstant.JOB_CONTENT_READER_PARAMETER_JOB_ID);
         // 设置reader的jobConfig
         jobReader.setPluginJobConf(this.configuration.getConfiguration(CoreConstant.JOB_CONTENT_READER_PARAMETER));
 
@@ -600,7 +599,6 @@ public class JobContainer
         classLoaderSwapper.setCurrentThreadClassLoader(LoadUtil.getJarLoader(PluginType.WRITER, this.writerPluginName));
 
         Writer.Job jobWriter = (Writer.Job) LoadUtil.loadJobPlugin(PluginType.WRITER, this.writerPluginName);
-//        this.configuration.set(CoreConstant.JOB_CONTENT_WRITER_PARAMETER_JOB_ID);
         // 设置writer的jobConfig
         jobWriter.setPluginJobConf(this.configuration.getConfiguration(CoreConstant.JOB_CONTENT_WRITER_PARAMETER));
 
