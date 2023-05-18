@@ -136,7 +136,7 @@ public final class OriginalConfPretreatmentUtil
             // 回写到connection[i].jdbcUrl
             originalConfig.set(String.format("%s[%d].%s", Key.CONNECTION, i, Key.JDBC_URL), jdbcUrl);
 
-            LOG.info("Available jdbcUrl:{}.", jdbcUrl);
+            LOG.info("Available jdbcUrl [{}].", jdbcUrl);
 
             if (isTableMode) {
                 // table 方式
@@ -147,8 +147,7 @@ public final class OriginalConfPretreatmentUtil
 
                 if (expandedTables.isEmpty()) {
                     throw AddaxException.asAddaxException(
-                            DBUtilErrorCode.ILLEGAL_VALUE, String.format("您所配置的读取数据库表:%s 不正确. 因为根据您的配置找不到这张表. 请检查您的配置并作出修改." +
-                                    "请先了解配置.", StringUtils.join(tables, ",")));
+                            DBUtilErrorCode.ILLEGAL_VALUE, String.format("Failed to obtain the table [%s].", StringUtils.join(tables, ",")));
                 }
 
                 tableNum += expandedTables.size();
@@ -169,15 +168,16 @@ public final class OriginalConfPretreatmentUtil
         if (isTableMode) {
             if (null == userConfiguredColumns
                     || userConfiguredColumns.isEmpty()) {
-                throw AddaxException.asAddaxException(DBUtilErrorCode.REQUIRED_VALUE, "您未配置读取数据库表的列信息. " +
-                        "正确的配置方式是给 column 配置上您需要读取的列名称,用英文逗号分隔. 例如: \"column\": [\"id\", \"name\"],请参考上述配置并作出修改.");
+                throw AddaxException.asAddaxException(DBUtilErrorCode.REQUIRED_VALUE, "The item column is required.");
             }
             else {
                 String splitPk = originalConfig.getString(Key.SPLIT_PK, null);
 
                 if (1 == userConfiguredColumns.size()
                         && "*".equals(userConfiguredColumns.get(0))) {
-                    LOG.warn("您的配置文件中的列配置存在一定的风险. 因为您未配置读取数据库表的列，当您的表字段个数、类型有变动时，可能影响任务正确性甚至会运行出错。请检查您的配置并作出修改.");
+                    LOG.warn("There are some risks in the column configuration. Because you did not configure the columns " +
+                            "to read the database table, changes in the number and types of fields in your table may affect " +
+                            "the correctness of the task or even cause errors.");
                     // 回填其值，需要以 String 的方式转交后续处理
                     originalConfig.set(Key.COLUMN, "*");
                 }
@@ -190,7 +190,7 @@ public final class OriginalConfPretreatmentUtil
                     String tableName = originalConfig.getString(String.format("%s[0].%s[0]", Key.CONNECTION, Key.TABLE));
 
                     List<String> allColumns = DBUtil.getTableColumns(dataBaseType, jdbcUrl, username, password, tableName);
-                    LOG.info("table:[{}] has columns:[{}].", tableName, StringUtils.join(allColumns, ","));
+                    LOG.info("The table [{}] has columns [{}].", tableName, StringUtils.join(allColumns, ","));
                     // warn:注意mysql表名区分大小写
                     allColumns = ListUtil.valueToLowerCase(allColumns);
                     List<String> quotedColumns = new ArrayList<>();
@@ -198,7 +198,7 @@ public final class OriginalConfPretreatmentUtil
                     for (String column : userConfiguredColumns) {
                         if ("*".equals(column)) {
                             throw AddaxException.asAddaxException(DBUtilErrorCode.ILLEGAL_VALUE,
-                                    "您的配置文件中的列配置信息有误. 因为根据您的配置，数据库表的列中存在多个*. 请检查您的配置并作出修改. ");
+                                    "The item column your configured is invalid, because it includes multiply asterisk('*').");
                         }
 
                         quotedColumns.add(dataBaseType.quoteColumnName(column));
@@ -208,7 +208,7 @@ public final class OriginalConfPretreatmentUtil
                     originalConfig.set(Key.COLUMN, StringUtils.join(quotedColumns, ","));
                     if (StringUtils.isNotBlank(splitPk) && !allColumns.contains(splitPk.toLowerCase())) {
                         throw AddaxException.asAddaxException(DBUtilErrorCode.ILLEGAL_SPLIT_PK,
-                                String.format("您的配置文件中的列配置信息有误. 因为根据您的配置，您读取的数据库表:%s 中没有主键名为:%s. 请检查您的配置并作出修改.", tableName, splitPk));
+                                String.format("The table [%s] has not the primary key [%s].", tableName, splitPk));
                     }
                 }
             }
@@ -216,21 +216,21 @@ public final class OriginalConfPretreatmentUtil
         else {
             // querySql模式，不希望配制 column，那样是混淆不清晰的
             if (null != userConfiguredColumns && !userConfiguredColumns.isEmpty()) {
-                LOG.warn("您的配置有误. 由于您读取数据库表采用了querySql的方式, 所以您不需要再配置 column. 如果您不想看到这条提醒，请移除您源头表中配置中的 column.");
+                LOG.warn("You configured both column and querySql, querySql will be preferred.");
                 originalConfig.remove(Key.COLUMN);
             }
 
             // querySql模式，不希望配制 where，那样是混淆不清晰的
             String where = originalConfig.getString(Key.WHERE, null);
             if (StringUtils.isNotBlank(where)) {
-                LOG.warn("您的配置有误. 由于您读取数据库表采用了querySql的方式, 所以您不需要再配置 where. 如果您不想看到这条提醒，请移除您源头表中配置中的 where.");
+                LOG.warn("You configured both querySql and where. the where will be ignored.");
                 originalConfig.remove(Key.WHERE);
             }
 
             // querySql模式，不希望配制 splitPk，那样是混淆不清晰的
             String splitPk = originalConfig.getString(Key.SPLIT_PK, null);
             if (StringUtils.isNotBlank(splitPk)) {
-                LOG.warn("您的配置有误. 由于您读取数据库表采用了querySql的方式, 所以您不需要再配置 splitPk. 如果您不想看到这条提醒，请移除您源头表中配置中的 splitPk.");
+                LOG.warn("You configured both querySql and splitPk. the splitPk will be ignored.");
                 originalConfig.remove(Key.SPLIT_PK);
             }
         }
@@ -263,19 +263,19 @@ public final class OriginalConfPretreatmentUtil
             if (!isTableMode && !isQuerySqlMode) {
                 // table 和 querySql 二者均未配置
                 throw AddaxException.asAddaxException(
-                        DBUtilErrorCode.TABLE_QUERY_SQL_MISSING, "您的配置有误. 因为table和querySql应该配置并且只能配置一个. 请检查您的配置并作出修改.");
+                        DBUtilErrorCode.TABLE_QUERY_SQL_MISSING, "You must configure either table or querySql.");
             }
             else if (isTableMode && isQuerySqlMode) {
                 // table 和 querySql 二者均配置
                 throw AddaxException.asAddaxException(DBUtilErrorCode.TABLE_QUERY_SQL_MIXED,
-                        "您的配置凌乱了. 因为addax不能同时既配置table又配置querySql.请检查您的配置并作出修改.");
+                        "You ca not configure both table and querySql at the same time.");
             }
         }
 
         // 混合配制 table 和 querySql
         if (!ListUtil.checkIfValueSame(tableModeFlags) || !ListUtil.checkIfValueSame(querySqlModeFlags)) {
             throw AddaxException.asAddaxException(DBUtilErrorCode.TABLE_QUERY_SQL_MIXED,
-                    "您配置凌乱了. 不能同时既配置table又配置querySql. 请检查您的配置并作出修改.");
+                    "You ca not configure both table and querySql at the same time.");
         }
 
         return tableModeFlags.get(0);
