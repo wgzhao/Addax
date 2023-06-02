@@ -19,6 +19,7 @@
 
 package com.wgzhao.addax.plugin.reader.sybasereader;
 
+import com.wgzhao.addax.common.base.Constant;
 import com.wgzhao.addax.common.base.Key;
 import com.wgzhao.addax.common.element.Column;
 import com.wgzhao.addax.common.element.LongColumn;
@@ -57,11 +58,10 @@ public class SybaseReader
             this.originalConfig = getPluginJobConf();
 
             Integer userConfiguredFetchSize = this.originalConfig.getInt(Key.FETCH_SIZE);
-            if (userConfiguredFetchSize != null) {
-                LOG.warn("The plugin(SybaseReader) not support fetchSize config, fetchSize will be forced to -1(ignore).");
+            if (userConfiguredFetchSize == null || userConfiguredFetchSize < 1) {
+                LOG.warn("The plugin(SybaseReader) need to setup fetchSize to improve performance.");
+                this.originalConfig.set(Key.FETCH_SIZE, Constant.DEFAULT_FETCH_SIZE);
             }
-
-            this.originalConfig.set(Key.FETCH_SIZE, Integer.MIN_VALUE);
 
             this.commonRdbmsReaderJob = new CommonRdbmsReader.Job(DATABASE_TYPE);
             this.originalConfig = this.commonRdbmsReaderJob.init(this.originalConfig);
