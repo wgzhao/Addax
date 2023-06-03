@@ -1,0 +1,21 @@
+{
+  "name": "sybasewriter",
+  "parameter": {
+    "username": "sa",
+    "password": "password",
+    "column": [
+      "*"
+    ],
+    "connection": [
+      {
+        "table": [
+          "addax_writer"
+        ],
+        "jdbcUrl": [
+          "jdbc:sybase:Tds:127.0.0.1:5000/test"
+        ]
+      }
+    ],
+    "where": ""
+  }
+}

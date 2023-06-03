@@ -1,0 +1,6 @@
+{
+  "name": "sybasewriter",
+  "class": "com.wgzhao.addax.plugin.writer.sybasewriter.SybaseWriter",
+  "description": "write to Sybase Database Server",
+  "developer": "wgzhao"
+}

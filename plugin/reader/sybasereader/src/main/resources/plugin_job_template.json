@@ -1,0 +1,21 @@
+{
+  "name": "sybasereader",
+  "parameter": {
+    "username": "root",
+    "password": "root",
+    "column": [
+      "*"
+    ],
+    "connection": [
+      {
+        "table": [
+          "addax_reader"
+        ],
+        "jdbcUrl": [
+          "jdbc:sybase://127.0.0.1:3306/test"
+        ]
+      }
+    ],
+    "where": ""
+  }
+}

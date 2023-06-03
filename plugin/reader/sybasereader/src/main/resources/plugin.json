@@ -1,0 +1,6 @@
+{
+  "name": "sybasereader",
+  "class": "com.wgzhao.addax.plugin.reader.sybasereader.SybaseReader",
+  "description": "Sybase Reader plugin",
+  "developer": "wgzhao"
+}

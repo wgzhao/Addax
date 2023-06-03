@@ -187,6 +187,7 @@
                 <module>plugin/reader/sqlitereader</module>
                 <module>plugin/reader/sqlserverreader</module>
                 <module>plugin/reader/streamreader</module>
+                <module>plugin/reader/sybasereader</module>
                 <module>plugin/reader/tdenginereader</module>
                 <module>plugin/reader/txtfilereader</module>
 
@@ -219,6 +220,7 @@
                 <module>plugin/writer/sqlserverwriter</module>
                 <module>plugin/writer/starrockswriter</module>
                 <module>plugin/writer/streamwriter</module>
+                <module>plugin/writer/sybasewriter</module>
                 <module>plugin/writer/tdenginewriter</module>
                 <module>plugin/writer/txtfilewriter</module>
             </modules>
