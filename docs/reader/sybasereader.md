@@ -1,4 +1,4 @@
-# MySQL Reader
+# Sybase Reader
 
 SybaseReader 插件实现了从 [Sybase][1] 读取数据
 
@@ -60,3 +60,6 @@ bin/addax.sh job/sybase2stream.json
 | Date       | date, datetime, time                                              |
 | Boolean    | bit                                                               |
 | Bytes      | binary,varbinary,varbinary(MAX),timestamp, image                  |
+
+
+[1]: https://www.sap.com/products/technology-platform/sql-anywhere.html
