@@ -46,7 +46,8 @@ public enum DataBaseType
     Impala("impala", "com.cloudera.impala.jdbc41.Driver"),
     //    TDengine("tdengine","com.taosdata.jdbc.rs.RestfulDriver"),
     TDengine("tdengine", "com.taosdata.jdbc.TSDBDriver"),
-    Trino("trino", "io.trino.jdbc.TrinoDriver");
+    Trino("trino", "io.trino.jdbc.TrinoDriver"),
+    Sybase("sybase", "com.sybase.jdbc4.jdbc.SybDriver");
 
     private static final Pattern jdbcUrlPattern = Pattern.compile("jdbc:\\w+:(?:thin:url=|//|thin:@|)([\\w\\d.,]+).*");
 

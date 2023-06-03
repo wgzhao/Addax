@@ -69,6 +69,7 @@ nav:
       - reader/sqlitereader.md
       - reader/sqlserverreader.md
       - reader/streamreader.md
+      - reader/sybasereader.md
       - reader/tdenginereader.md
       - reader/txtfilereader.md
 
