@@ -1,2 +1,33 @@
-<?xml version="1.0" encoding="utf-8"?><!-- Uploaded to: SVG Repo, www.svgrepo.com, Generator: SVG Repo Mixer Tools -->
-<svg width="800px" height="800px" viewBox="0 0 32 32" xmlns="http://www.w3.org/2000/svg"><title>file_type_excel2</title><path d="M28.781,4.405H18.651V2.018L2,4.588V27.115l16.651,2.868V26.445H28.781A1.162,1.162,0,0,0,30,25.349V5.5A1.162,1.162,0,0,0,28.781,4.405Zm.16,21.126H18.617L18.6,23.642h2.487v-2.2H18.581l-.012-1.3h2.518v-2.2H18.55l-.012-1.3h2.549v-2.2H18.53v-1.3h2.557v-2.2H18.53v-1.3h2.557v-2.2H18.53v-2H28.941Z" style="fill:#20744a;fill-rule:evenodd"/><rect x="22.487" y="7.439" width="4.323" height="2.2" style="fill:#20744a"/><rect x="22.487" y="10.94" width="4.323" height="2.2" style="fill:#20744a"/><rect x="22.487" y="14.441" width="4.323" height="2.2" style="fill:#20744a"/><rect x="22.487" y="17.942" width="4.323" height="2.2" style="fill:#20744a"/><rect x="22.487" y="21.443" width="4.323" height="2.2" style="fill:#20744a"/><polygon points="6.347 10.673 8.493 10.55 9.842 14.259 11.436 10.397 13.582 10.274 10.976 15.54 13.582 20.819 11.313 20.666 9.781 16.642 8.248 20.513 6.163 20.329 8.585 15.666 6.347 10.673" style="fill:#ffffff;fill-rule:evenodd"/></svg>
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<svg xmlns:xl="http://www.w3.org/1999/xlink" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:dc="http://purl.org/dc/elements/1.1/" viewBox="0 0 105 105" width="105" height="105">
+  <defs/>
+  <g id="Canvas_1" fill="none" stroke-dasharray="none" fill-opacity="1" stroke-opacity="1" stroke="none">
+    <title>Canvas 1</title>
+    <rect fill="white" x="0" y="0" width="105" height="105"/>
+    <g id="Canvas_1_Layer_1">
+      <title>Layer 1</title>
+      <g id="Graphic_2">
+        <path d="M 99.76582 10.04875 L 62.50189 10.04875 L 62.50189 1.268 L 1.25 10.721929 L 1.25 93.58911 L 62.50189 104.13925 L 62.50189 91.12446 L 99.76582 91.12446 C 102.11533 91.24349 104.11939 89.44164 104.25 87.09275 L 104.25 14.076786 C 104.11745 11.72936 102.11397 9.929678 99.76582 10.04875 Z M 100.35439 87.76225 L 62.37682 87.76225 L 62.314286 80.81343 L 71.46289 80.81343 L 71.46289 72.72057 L 62.24439 72.72057 L 62.20025 67.93843 L 71.46289 67.93843 L 71.46289 59.84557 L 62.13036 59.84557 L 62.086214 55.06343 L 71.46289 55.06343 L 71.46289 46.97057 L 62.056786 46.97057 L 62.056786 42.18843 L 71.46289 42.18843 L 71.46289 34.09557 L 62.056786 34.09557 L 62.056786 29.31343 L 71.46289 29.31343 L 71.46289 21.220571 L 62.056786 21.220571 L 62.056786 13.863429 L 100.35439 13.863429 Z" fill="#20744a"/>
+      </g>
+      <g id="Graphic_3">
+        <rect x="76.61289" y="21.209536" width="15.902464" height="8.092857" fill="#20744a"/>
+      </g>
+      <g id="Graphic_4">
+        <rect x="76.61289" y="34.088214" width="15.902464" height="8.092857" fill="#20744a"/>
+      </g>
+      <g id="Graphic_5">
+        <rect x="76.61289" y="46.966893" width="15.902464" height="8.092857" fill="#20744a"/>
+      </g>
+      <g id="Graphic_6">
+        <rect x="76.61289" y="59.84557" width="15.902464" height="8.092857" fill="#20744a"/>
+      </g>
+      <g id="Graphic_7">
+        <rect x="76.61289" y="72.72425" width="15.902464" height="8.092857" fill="#20744a"/>
+      </g>
+      <g id="Graphic_8">
+        <path d="M 17.24075 33.106036 L 25.134964 32.65357 L 30.097357 46.297393 L 35.961 32.09075 L 43.855214 31.638286 L 34.268857 51.00964 L 43.855214 70.42882 L 35.508536 69.866 L 29.872964 55.06343 L 24.233714 69.30318 L 16.563893 68.62632 L 25.473393 51.47314 Z" fill="white"/>
+      </g>
+    </g>
+  </g>
+</svg>
