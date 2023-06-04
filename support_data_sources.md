@@ -1,10 +1,10 @@
-Addax supports the following Data Sources:
+## Addax supports the following data sources:
 
-| database/filesystem | read | write | plugin(reader/writer)                   | memo                            |
-| ------------------- | ---- | ----- | --------------------------------------- | ------------------------------- |
+| database/filesystem | read | write | plugin(reader/writer)                 | memo                            |
+| ------------------- | ---- | ----- | --------------------------------------| ------------------------------- |
 | Cassandra           | ✓   | ✓    | cassandrareader/cassandrawriter         |                                 |
 | ClickHouse          | ✓   | ✓    | clickhousereader/clickhousewriter       |                                 |
-| Databend            | x    | ✓    | databendwriter                          | support [Databend][8]           |
+| Databend            | x   | ✓    | databendwriter                          | support [Databend][8]           |
 | DB2                 | ✓   | ✓    | rbdmsreader/rdbmswriter                 | not fully tested                |
 | DBF                 | ✓   | ✓    | dbfreader/dbfwriter                     |                                 |
 | ElasticSearch       | ✓   | ✓    | elasticsearchreader/elasticsearchwriter | originally from [@Kestrong][1]  |
@@ -12,15 +12,15 @@ Addax supports the following Data Sources:
 | FTP                 | ✓   | ✓    | ftpreader/ftpwriter                     |                                 |
 | HBase 1.x(API)      | ✓   | ✓    | hbase11xreader/hbase11xwriter           | use HBASE API                   |
 | HBase 1.x(SQL)      | ✓   | ✓    | hbase11xsqlreader/hbase11xsqlwriter     | use Phoenix[Phoenix][2]         |
-| HBase 2.x(API)      | ✓   | x     | hbase20xreader                          | use HBase API                   |
+| HBase 2.x(API)      | ✓   | x    | hbase20xreader                          | use HBase API                   |
 | HBase 2.x(SQL)      | ✓   | ✓    | hbase20xsqlreader/hbase20xsqlwriter     | via [Phoenix][2]                |
 | HDFS                | ✓   | ✓    | hdfsreader/hdfswriter                   | support HDFS 2.0 or later       |
-| Hive                | ✓   | x     | hivereader                              |                                 |
-| HTTP                | ✓   | x     | httpreader                              | support RestFul API             |
+| Hive                | ✓   | x    | hivereader                              |                                 |
+| HTTP                | ✓   | x    | httpreader                              | support RestFul API             |
 | Greenplum           | ✓   | ✓    | postgresqlreader/greenplumwriter        |                                 |
 | InfluxDB            | ✓   | ✓    | influxdbreader/influxdbwriter           | ONLY support InfluxDB 1.x       |
 | InfluxDB2           | ✓   | ✓    | influxdb2reader/influxdb2writer         | ONLY InfluxDB 2.0 or later      |
-| json                | ✓   | x     | jsonfilereader                          |                                 |
+| json                | ✓   | x    | jsonfilereader                          |                                 |
 | Kafka               | ✓   | ✓    | kafkareader/kafkawriter                 |                                 |
 | kudu                | ✓   | ✓    | kudureader/kuduwriter                   |                                 |
 | MongoDB             | ✓   | ✓    | mongodbreader/mongodbwriter             |                                 |
