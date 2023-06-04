@@ -1,0 +1,6 @@
+{
+  "name": "databendreader",
+  "class": "com.wgzhao.addax.plugin.reader.databendreader.DatabendReader",
+  "description": "Read from Databend server",
+  "developer": "wgzhao"
+}
