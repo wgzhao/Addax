@@ -1,7 +1,7 @@
 <p align="center">
     <img alt="Addax Logo" src="https://github.com/wgzhao/Addax/blob/master/docs/images/logo.png?raw=true" width="205" />
 </p>
-<p align="center">Addax is an open source universal ETL tool</p>
+<p align="center">Addax is a versatile open-source ETL tool</p>
 <p align="center"><a href="https://wgzhao.github.io/Addax">Documentation</a> detailed description of how to install and deploy and how to use each collection plugin </p>
 <p align="center">
    <a href="https://github.com/wgzhao/Addax/releases">
@@ -14,7 +14,7 @@
 
 English | [简体中文](README_zh.md)
 
-The project, originally from Ali's [DataX]((https://github.com/alibaba/datax)), has been streamlined and adapted, as described below
+The project, originally from Ali's [DataX](https://github.com/alibaba/datax), has been streamlined and adapted, as described below
 
 ## Supported Data Sources
 
