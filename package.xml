@@ -65,6 +65,14 @@
             <outputDirectory>addax-${project.version}</outputDirectory>
         </fileSet>
         <fileSet>
+            <directory>plugin/reader/databendreader/target/databendreader-${project.version}/</directory>
+            <includes>
+                <include>**/*.*</include>
+            </includes>
+            <fileMode>0644</fileMode>
+            <outputDirectory>addax-${project.version}</outputDirectory>
+        </fileSet>
+        <fileSet>
             <directory>plugin/reader/datareader/target/datareader-${project.version}/</directory>
             <includes>
                 <include>**/*.*</include>
@@ -281,7 +289,7 @@
             <outputDirectory>addax-${project.version}</outputDirectory>
         </fileSet>
         <fileSet>
-            <directory>plugin/reader/sybasereader/target/streamreader-${project.version}/</directory>
+            <directory>plugin/reader/sybasereader/target/sybasereader-${project.version}/</directory>
             <includes>
                 <include>**/*.*</include>
             </includes>
@@ -546,7 +554,7 @@
             <outputDirectory>addax-${project.version}</outputDirectory>
         </fileSet>
         <fileSet>
-            <directory>plugin/writer/sybasewriter/target/streamwriter-${project.version}/</directory>
+            <directory>plugin/writer/sybasewriter/target/sybasewriter-${project.version}/</directory>
             <includes>
                 <include>**/*.*</include>
             </includes>
