@@ -150,7 +150,8 @@ public class Engine
             Engine.entry(args);
         }
         catch (Throwable e) {
-            LOG.error(e.getMessage());
+            e.printStackTrace();
+            LOG.error(e.toString());
             System.exit(2);
         }
         System.exit(0);
