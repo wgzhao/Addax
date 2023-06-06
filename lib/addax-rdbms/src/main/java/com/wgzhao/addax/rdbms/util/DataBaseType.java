@@ -47,7 +47,8 @@ public enum DataBaseType
     //    TDengine("tdengine","com.taosdata.jdbc.rs.RestfulDriver"),
     TDengine("tdengine", "com.taosdata.jdbc.TSDBDriver"),
     Trino("trino", "io.trino.jdbc.TrinoDriver"),
-    Sybase("sybase", "com.sybase.jdbc4.jdbc.SybDriver");
+    Sybase("sybase", "com.sybase.jdbc4.jdbc.SybDriver"),
+    Databend("databend", "com.databend.jdbc.DatabendDriver");
 
     private static final Pattern jdbcUrlPattern = Pattern.compile("jdbc:\\w+:(?:thin:url=|//|thin:@|)([\\w\\d.,]+).*");
 

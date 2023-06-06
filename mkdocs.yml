@@ -42,6 +42,7 @@ nav:
   - 读取插件:
       - reader/cassandrareader.md
       - reader/clickhousereader.md
+      - reader/databendreader.md
       - reader/datareader.md
       - reader/dbfreader.md
       - reader/elasticsearchreader.md

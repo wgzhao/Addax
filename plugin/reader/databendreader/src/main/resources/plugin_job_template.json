@@ -1,0 +1,21 @@
+{
+  "name": "databend",
+  "parameter": {
+    "username": "root",
+    "password": "root",
+    "column": [
+      "*"
+    ],
+    "connection": [
+      {
+        "table": [
+          "addax_reader"
+        ],
+        "jdbcUrl": [
+          "jdbc:databend://127.0.0.1:8000/test"
+        ]
+      }
+    ],
+    "where": ""
+  }
+}

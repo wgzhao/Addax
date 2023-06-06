@@ -161,6 +161,7 @@
                 <!-- reader -->
                 <module>plugin/reader/cassandrareader</module>
                 <module>plugin/reader/clickhousereader</module>
+                <module>plugin/reader/databendreader</module>
                 <module>plugin/reader/datareader</module>
                 <module>plugin/reader/dbfreader</module>
                 <module>plugin/reader/elasticsearchreader</module>
