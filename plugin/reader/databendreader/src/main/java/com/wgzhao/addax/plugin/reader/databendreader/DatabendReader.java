@@ -89,6 +89,7 @@ public class DatabendReader
         public void init() {
             this.readerSliceConfig = getPluginJobConf();
             this.commonRdbmsReaderTask = new CommonRdbmsReader.Task(DATABASE_TYPE, getTaskGroupId(), getTaskId());
+            this.commonRdbmsReaderTask.init(this.readerSliceConfig);
         }
 
         @Override
