@@ -1,7 +1,6 @@
 package com.wgzhao.addax.plugin.reader.s3reader;
 
 import com.wgzhao.addax.common.spi.ErrorCode;
-import org.omg.CORBA.OBJECT_NOT_EXIST;
 
 public enum S3ReaderErrorCode
         implements ErrorCode
