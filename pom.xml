@@ -33,6 +33,7 @@
         <avro.version>1.10.0</avro.version>
         <commons.beanutils.version>1.9.4</commons.beanutils.version>
         <commons.configuration.version>1.10</commons.configuration.version>
+        <commons.collections.version>4.4</commons.collections.version>
         <commons.codec.version>1.15</commons.codec.version>
         <commons.compress.version>1.23.0</commons.compress.version>
         <commons.cli.version>1.5.0</commons.cli.version>
@@ -70,6 +71,7 @@
         <jsch.version>0.1.55</jsch.version>
         <kryo.version>5.5.0</kryo.version>
         <kudu.version>1.16.0</kudu.version>
+        <libthrift.version>0.13.0</libthrift.version>
         <mapreduce.version>3.2.1</mapreduce.version>
         <mockito.version>2.0.2-beta</mockito.version>
         <ognl.version>3.3.4</ognl.version>
@@ -81,6 +83,7 @@
         <slf4j.version>2.0.6</slf4j.version>
         <snappy.version>1.1.9.1</snappy.version>
         <swift.version>1.0.0</swift.version>
+        <woodstox.version>5.4.0</woodstox.version>
         <xz.version>1.9</xz.version>
         <zookeeper.version>3.6.0</zookeeper.version>
         <zstd.version>1.5.4-1</zstd.version>
