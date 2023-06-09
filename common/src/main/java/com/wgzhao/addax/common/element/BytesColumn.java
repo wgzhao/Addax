@@ -76,8 +76,13 @@ public class BytesColumn
     @Override
     public Long asLong()
     {
-        throw AddaxException.asAddaxException(
-                CommonErrorCode.CONVERT_NOT_SUPPORT, "Bytes type cannot converted to Long.");
+        long value = 0L;
+        for (byte b : this.asBytes()) {
+            // Shifting previous value 8 bits to right and
+            // add it with next value
+            value = (value << 8) + (b & 255);
+        }
+        return value;
     }
 
     @Override
