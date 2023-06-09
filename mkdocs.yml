@@ -119,7 +119,10 @@ extra:
       link: https://twitter.com/mlsx
     - icon: fontawesome/brands/github
       link: https://github.com/wgzhao
-
+  analytics:
+    provider: google
+    property:  G-J252L4LHDX
+ 
 # Extensions
 markdown_extensions:
   - admonition
