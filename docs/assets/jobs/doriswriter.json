@@ -16,7 +16,7 @@
             {
               "table": "table1",
               "database": "example_db",
-              "endpoint": "http://127.0.0.1:8030/"
+              "endpoint": ["http://127.0.0.1:8030/"]
             }
           ],
           "loadProps": {},
