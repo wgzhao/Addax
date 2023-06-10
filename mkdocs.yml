@@ -103,6 +103,7 @@ nav:
       - writer/sqlserverwriter.md
       - writer/starrockswriter.md
       - writer/streamwriter.md
+      - writer/sybasewriter.md
       - writer/tdenginewriter.md
       - writer/txtfilewriter.md
   - debug.md
