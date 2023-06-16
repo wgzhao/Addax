@@ -167,77 +167,34 @@ public final class ConfigParser
     {
         Configuration configuration = Configuration.newDefault();
 
-        Set<String> replicaCheckPluginSet = new HashSet<>();
         int complete = 0;
-        for (String each : ConfigParser.getDirAsList(CoreConstant.PLUGIN_READER_HOME)) {
-            Configuration eachReaderConfig = ConfigParser.parseOnePluginConfig(each, "reader", replicaCheckPluginSet, wantPluginNames);
-            if (eachReaderConfig != null) {
-                configuration.merge(eachReaderConfig, true);
-                complete += 1;
+        String pluginType;
+        String pluginPath;
+        for(String plugin: wantPluginNames) {
+            if (plugin.endsWith("reader")) {
+                pluginType = "reader";
+                pluginPath = CoreConstant.PLUGIN_READER_HOME + File.separator + plugin;
+            } else {
+                pluginType = "writer";
+                pluginPath = CoreConstant.PLUGIN_WRITER_HOME + File.separator + plugin;
             }
+
+            String filePath = pluginPath + File.separator + "plugin.json";
+            Configuration pluginConf = Configuration.from(new File(filePath));
+            if (StringUtils.isBlank(pluginConf.getString("path"))) {
+                pluginConf.set("path", pluginPath);
+            }
+            Configuration result = Configuration.newDefault();
+            result.set(String.format("plugin.%s.%s", pluginType, plugin), pluginConf.getInternal());
+            configuration.merge(result, true);
+            complete += 1;
         }
 
-        for (String each : ConfigParser.getDirAsList(CoreConstant.PLUGIN_WRITER_HOME)) {
-            Configuration eachWriterConfig = ConfigParser.parseOnePluginConfig(each, "writer", replicaCheckPluginSet, wantPluginNames);
-            if (eachWriterConfig != null) {
-                configuration.merge(eachWriterConfig, true);
-                complete += 1;
-            }
-        }
-
-        if (wantPluginNames != null && !wantPluginNames.isEmpty() && wantPluginNames.size() != complete) {
-            throw AddaxException.asAddaxException(FrameworkErrorCode.PLUGIN_INIT_ERROR, "Plugin loading failed. The specified plugin was not loaded:" + wantPluginNames);
+        if ( !wantPluginNames.isEmpty() && wantPluginNames.size() != complete) {
+            throw AddaxException.asAddaxException(FrameworkErrorCode.PLUGIN_INIT_ERROR, "Plugin loading failed. The specified plugin was not loaded: " + wantPluginNames);
         }
 
         return configuration;
-    }
-
-    public static Configuration parseOnePluginConfig(String path, String type, Set<String> pluginSet, List<String> wantPluginNames)
-    {
-        String filePath = path + File.separator + "plugin.json";
-        Configuration configuration = Configuration.from(new File(filePath));
-
-        String pluginPath = configuration.getString("path");
-        String pluginName = configuration.getString("name");
-        if (!pluginSet.contains(pluginName)) {
-            pluginSet.add(pluginName);
-        }
-        else {
-            throw AddaxException.asAddaxException(FrameworkErrorCode.PLUGIN_INIT_ERROR,
-                    "Plugin loading failed due to duplicate plugins:" + filePath);
-        }
-
-        //不是想要的插件，返回null
-        if (wantPluginNames != null && !wantPluginNames.isEmpty() && !wantPluginNames.contains(pluginName)) {
-            return null;
-        }
-
-        boolean isDefaultPath = StringUtils.isBlank(pluginPath);
-        if (isDefaultPath) {
-            configuration.set("path", path);
-        }
-
-        Configuration result = Configuration.newDefault();
-
-        result.set(String.format("plugin.%s.%s", type, pluginName), configuration.getInternal());
-
-        return result;
-    }
-
-    private static List<String> getDirAsList(String path)
-    {
-        List<String> result = new ArrayList<>();
-
-        String[] paths = new File(path).list();
-        if (null == paths) {
-            return result;
-        }
-
-        for (String each : paths) {
-            result.add(path + File.separator + each);
-        }
-
-        return result;
     }
 
     private static void validateJob(Configuration conf)
