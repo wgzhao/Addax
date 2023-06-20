@@ -50,7 +50,7 @@ public class JarLoader
 
     private static URL[] getURLs(String[] paths)
     {
-        Validate.isTrue(null != paths && 0 != paths.length, "jar包路径不能为空.");
+        Validate.isTrue(null != paths && 0 != paths.length, "The jar path can not be empty");
 
         List<String> dirs = new ArrayList<>();
         for (String path : paths) {
@@ -89,11 +89,12 @@ public class JarLoader
 
     private static List<URL> doGetURLs(final String path)
     {
-        Validate.isTrue(!StringUtils.isBlank(path), "jar包路径不能为空.");
+        Validate.isTrue(!StringUtils.isBlank(path), "The jar path can not be empty");
 
         File jarPath = new File(path);
 
-        Validate.isTrue(jarPath.exists() && jarPath.isDirectory(), "jar包路径必须存在且为目录.");
+        Validate.isTrue(jarPath.exists() && jarPath.isDirectory(),
+                "The jar package path must be exists and it's directory.jar");
 
         /* set filter */
         FileFilter jarFilter = pathname -> pathname.getName().endsWith(".jar");
@@ -108,7 +109,8 @@ public class JarLoader
                 jarURLs.add(allJar.toURI().toURL());
             }
             catch (Exception e) {
-                throw AddaxException.asAddaxException(FrameworkErrorCode.PLUGIN_INIT_ERROR, "系统加载jar包出错", e);
+                throw AddaxException.asAddaxException(FrameworkErrorCode.PLUGIN_INIT_ERROR,
+                        "Exception occurred when load the jar package.", e);
             }
         }
 
