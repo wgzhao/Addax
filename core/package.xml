@@ -21,17 +21,6 @@
             <fileMode>0755</fileMode>
             <outputDirectory>bin</outputDirectory>
         </fileSet>
-        <!-- for scripts -->
-        <!-- <fileSet>
-            <directory>src/main/script</directory>
-            <includes>
-                <include>*.*</include>
-            </includes>
-            <directoryMode>0775</directoryMode>
-            <fileMode>0644</fileMode>
-            <outputDirectory>/script</outputDirectory>
-        </fileSet> -->
-        <!-- for configs -->
         <fileSet>
             <directory>src/main/conf</directory>
             <includes>
