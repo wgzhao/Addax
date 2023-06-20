@@ -20,14 +20,11 @@
 package com.wgzhao.addax.core;
 
 import com.wgzhao.addax.common.element.ColumnCast;
-import com.wgzhao.addax.common.exception.AddaxException;
-import com.wgzhao.addax.common.spi.ErrorCode;
 import com.wgzhao.addax.common.statistics.VMInfo;
 import com.wgzhao.addax.common.util.Configuration;
 import com.wgzhao.addax.core.job.JobContainer;
 import com.wgzhao.addax.core.util.ConfigParser;
 import com.wgzhao.addax.core.util.ConfigurationValidate;
-import com.wgzhao.addax.core.util.FrameworkErrorCode;
 import com.wgzhao.addax.core.util.container.LoadUtil;
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.DefaultParser;
@@ -43,13 +40,11 @@ import java.util.Set;
 /**
  * Engine是 Addax 入口类，该类负责初始化Job或者Task的运行容器，并运行插件的Job或者Task逻辑
  */
-public class Engine
-{
+public class Engine {
     private static final Logger LOG = LoggerFactory.getLogger(Engine.class);
 
     /* check job model (job/task) first */
-    public void start(Configuration allConf)
-    {
+    public void start(Configuration allConf) {
 
         // 绑定column转换信息
         ColumnCast.bind(allConf);
@@ -67,8 +62,7 @@ public class Engine
     }
 
     // 注意屏蔽敏感信息
-    public static String filterJobConfiguration(final Configuration configuration)
-    {
+    public static String filterJobConfiguration(final Configuration configuration) {
         Configuration jobConfWithSetting = configuration.getConfiguration("job").clone();
 
         Configuration jobContent = jobConfWithSetting.getConfiguration("content");
@@ -80,8 +74,7 @@ public class Engine
         return jobConfWithSetting.beautify();
     }
 
-    public static void filterSensitiveConfiguration(Configuration configuration)
-    {
+    public static void filterSensitiveConfiguration(Configuration configuration) {
         Set<String> keys = configuration.getKeys();
         for (String key : keys) {
             boolean isSensitive = StringUtils.endsWithIgnoreCase(key, "password")
@@ -94,8 +87,7 @@ public class Engine
     }
 
     public static void entry(String[] args)
-            throws Throwable
-    {
+            throws Throwable {
         Options options = new Options();
         options.addOption("job", true, "Job config.");
 
@@ -120,20 +112,17 @@ public class Engine
         engine.start(configuration);
     }
 
-    public static String getVersion()
-    {
+    public static String getVersion() {
         try {
             final Properties properties = new Properties();
             properties.load(Engine.class.getClassLoader().getResourceAsStream("project.properties"));
             return properties.getProperty("version");
-        }
-        catch (IOException e) {
+        } catch (IOException e) {
             return null;
         }
     }
 
-    public static void main(String[] args)
-    {
+    public static void main(String[] args) {
         System.out.println("\n  ___      _     _            \n" +
                 " / _ \\    | |   | |           \n" +
                 "/ /_\\ \\ __| | __| | __ ___  __\n" +
@@ -148,8 +137,7 @@ public class Engine
 
         try {
             Engine.entry(args);
-        }
-        catch (Throwable e) {
+        } catch (Throwable e) {
             e.printStackTrace();
             LOG.error(e.toString());
             System.exit(2);
