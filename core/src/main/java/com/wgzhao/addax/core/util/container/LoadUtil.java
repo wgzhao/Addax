@@ -78,7 +78,7 @@ public class LoadUtil
         if (null == pluginConf) {
             throw AddaxException.asAddaxException(
                     FrameworkErrorCode.PLUGIN_INSTALL_ERROR,
-                    String.format("不能找到插件[%s]的配置.", pluginName));
+                    String.format("Can not find the configure of plugin [%s].", pluginName));
         }
 
         return pluginConf;
@@ -99,7 +99,7 @@ public class LoadUtil
         catch (Exception e) {
             throw AddaxException.asAddaxException(
                     FrameworkErrorCode.RUNTIME_ERROR,
-                    String.format("找到plugin[%s]的Job配置.", pluginName), e);
+                    String.format("Exception occurred when load job plugin [%s].", pluginName), e);
         }
     }
 
@@ -117,7 +117,7 @@ public class LoadUtil
         }
         catch (Exception e) {
             throw AddaxException.asAddaxException(FrameworkErrorCode.RUNTIME_ERROR,
-                    String.format("不能找plugin[%s]的Task配置.", pluginName), e);
+                    String.format("Can not find the configure of task plugin [%s].", pluginName), e);
         }
     }
 
@@ -135,7 +135,7 @@ public class LoadUtil
                 return new WriterRunner(taskPlugin);
             default:
                 throw AddaxException.asAddaxException(FrameworkErrorCode.RUNTIME_ERROR,
-                        String.format("插件[%s]的类型必须是[reader]或[writer]!", pluginName));
+                        String.format("The plugin type must be reader or writer, [%s] is unsupported.", pluginName));
         }
     }
 
@@ -166,7 +166,7 @@ public class LoadUtil
             String pluginPath = pluginConf.getString("path");
             if (StringUtils.isBlank(pluginPath)) {
                 throw AddaxException.asAddaxException(FrameworkErrorCode.RUNTIME_ERROR,
-                        String.format("%s插件[%s]路径非法!", pluginType, pluginName));
+                        String.format("Illegal path of plugin [%s] for [%s].",  pluginName, pluginType));
             }
             jarLoader = new JarLoader(new String[] {pluginPath});
             jarLoaderCenter.put(generatePluginKey(pluginType, pluginName), jarLoader);
