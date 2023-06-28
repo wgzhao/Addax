@@ -19,7 +19,6 @@
 package com.wgzhao.addax.storage.util;
 
 import com.google.common.collect.ImmutableMap;
-import com.wgzhao.addax.common.base.Constant;
 import com.wgzhao.addax.common.compress.ZipCycleInputStream;
 import org.apache.commons.compress.compressors.CompressorException;
 import org.apache.commons.compress.compressors.CompressorInputStream;
@@ -41,18 +40,15 @@ import java.io.InputStreamReader;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 import java.util.Set;
 import java.util.regex.Pattern;
 
-public class FileHelper
-{
+public class FileHelper {
     public final static Logger LOG = LoggerFactory.getLogger(FileHelper.class);
 
     private final static ImmutableMap<String, String> COMPRESS_TYPE_SUFFIX_MAP = new ImmutableMap.Builder<String, String>()
@@ -98,31 +94,25 @@ public class FileHelper
      * @param fileName the file name
      * @return the compression type if present, otherwise "none"
      */
-    public static String getFileCompressType(String fileName)
-    {
+    public static String getFileCompressType(String fileName) {
         try {
             InputStream inputStream = new FileInputStream(FilenameUtils.getFullPath(fileName));
-            String fileType =  getFileCompressType(inputStream);
+            String fileType = getFileCompressType(inputStream);
             inputStream.close();
             return fileType;
-        }
-        catch (FileNotFoundException e) {
+        } catch (FileNotFoundException e) {
             throw new RuntimeException("File not found: " + fileName, e);
-        }
-        catch (IOException e) {
+        } catch (IOException e) {
             throw new RuntimeException("Failed to close file: ", e);
         }
     }
 
-    public static String getFileCompressType(InputStream inputStream)
-    {
+    public static String getFileCompressType(InputStream inputStream) {
         try {
             return CompressorStreamFactory.detect(inputStream);
-        }
-        catch (IllegalArgumentException e) {
+        } catch (IllegalArgumentException e) {
             throw new RuntimeException("does not support mark", e);
-        }
-        catch (CompressorException e) {
+        } catch (CompressorException e) {
             return "none";
         }
     }
@@ -133,26 +123,18 @@ public class FileHelper
      * @param compress the compression type name
      * @return the suffix if present, otherwise ""
      */
-    public static String getCompressFileSuffix(String compress)
-    {
+    public static String getCompressFileSuffix(String compress) {
         if (compress == null || compress.isEmpty() || "none".equalsIgnoreCase(compress)) {
             return "";
         }
         return COMPRESS_TYPE_SUFFIX_MAP.getOrDefault(compress.toUpperCase(), "." + compress.toLowerCase());
     }
 
-    public static BufferedReader readCompressFile(String fileName, String encoding)
-    {
-        return readCompressFile(fileName, encoding, Constant.DEFAULT_BUFFER_SIZE);
-    }
-
-    public static BufferedReader readCompressFile(String fileName, String encoding, int bufferSize)
-    {
+    public static BufferedReader readCompressFile(String fileName, String encoding, int bufferSize) {
         FileInputStream inputStream;
         try {
             inputStream = new FileInputStream(FilenameUtils.getFullPath(fileName));
-        }
-        catch (FileNotFoundException e) {
+        } catch (FileNotFoundException e) {
             // warn: sock 文件无法read,能影响所有文件的传输,需要用户自己保证
             throw new RuntimeException("File not found: " + fileName, e);
         }
@@ -171,52 +153,20 @@ public class FileHelper
             BufferedInputStream bis = new BufferedInputStream(inputStream);
             CompressorInputStream input = new CompressorStreamFactory().createCompressorInputStream(compressType, bis, true);
             return new BufferedReader(new InputStreamReader(input, encoding), bufferSize);
-        }
-        catch (CompressorException | IOException e) {
+        } catch (CompressorException | IOException e) {
             throw new RuntimeException("Failed to read compress file", e);
         }
     }
 
-    public static boolean checkDirectoryReadable(String directory)
-    {
+    public static boolean checkDirectoryReadable(String directory) {
         return checkDirPermission(directory, "r");
     }
 
-    public static boolean checkFileReadable(String fileName)
-    {
-        return checkFilePermission(fileName, "r");
-    }
-
-    public static boolean checkDirectoryWritable(String directory)
-    {
+    public static boolean checkDirectoryWritable(String directory) {
         return checkDirPermission(directory, "w");
     }
 
-    public static boolean checkFileWritable(String fileName)
-    {
-        return checkFilePermission(fileName, "w");
-    }
-
-    private static boolean checkFilePermission(String fileName, String permission)
-    {
-        File file = new File(FilenameUtils.getFullPath(fileName));
-        if (!file.exists()) {
-            throw new RuntimeException("The file [" + fileName + "] does not exists.");
-        }
-        if (!file.isFile()) {
-            throw new RuntimeException("The [" + fileName + "] is not a file.");
-        }
-
-        if ("r".equalsIgnoreCase(permission)) {
-            return file.canRead();
-        }
-        else {
-            return file.canWrite();
-        }
-    }
-
-    private static boolean checkDirPermission(String directory, String permission)
-    {
+    private static boolean checkDirPermission(String directory, String permission) {
         File file = new File(FilenameUtils.getFullPath(directory));
         if (!file.exists()) {
             throw new RuntimeException("The directory [" + directory + "] does not exists.");
@@ -227,54 +177,26 @@ public class FileHelper
 
         if ("r".equalsIgnoreCase(permission)) {
             return file.canRead();
-        }
-        else {
+        } else {
             return file.canWrite();
         }
     }
 
-    public static List<String> getAllFiles(String directory)
-    {
-        File file = new File(FilenameUtils.getFullPath(directory));
-        if (!file.exists()) {
-            return Collections.emptyList();
-        }
-        if (!file.isDirectory()) {
-            return Collections.emptyList();
-        }
-        return Arrays.asList(Objects.requireNonNull(file.list()));
-    }
-
-    public static List<String> getAllFiles(List<String> directories)
-    {
-        List<String> files = new ArrayList<>();
-        for (String directory : directories) {
-            if (checkDirectoryReadable(directory)) {
-                files.addAll(getAllFiles(directory));
-            }
-        }
-        return files;
-    }
-
-    public static Pattern generatePattern(String dir)
-    {
+    public static Pattern generatePattern(String dir) {
         String regexString = dir.replace("*", ".*").replace("?", ".?");
         return Pattern.compile(regexString);
     }
 
-    public static boolean isTargetFile(Map<String, Pattern> patterns, Map<String, Boolean> isRegexPath, String regexPath, String absoluteFilePath)
-    {
+    public static boolean isTargetFile(Map<String, Pattern> patterns, Map<String, Boolean> isRegexPath, String regexPath, String absoluteFilePath) {
         if (isRegexPath.get(regexPath)) {
             return patterns.get(regexPath).matcher(absoluteFilePath).matches();
-        }
-        else {
+        } else {
             return true;
         }
     }
 
     // validate the path, path must be an absolute path
-    public static List<String> buildSourceTargets(List<String> directories)
-    {
+    public static List<String> buildSourceTargets(List<String> directories) {
         Map<String, Boolean> isRegexPath = new HashMap<>();
         Map<String, Pattern> patterns = new HashMap<>();
 
@@ -294,8 +216,7 @@ public class FileHelper
             if (!isRegexPath.isEmpty() && isRegexPath.get(eachPath)) {
                 int lastDirSeparator = eachPath.substring(0, endMark).lastIndexOf(IOUtils.DIR_SEPARATOR);
                 parentDirectory = eachPath.substring(0, lastDirSeparator + 1);
-            }
-            else {
+            } else {
                 isRegexPath.put(eachPath, false);
                 parentDirectory = eachPath;
             }
@@ -305,8 +226,7 @@ public class FileHelper
     }
 
     private static void buildSourceTargetsEachPath(String regexPath, String parentDirectory, Set<String> toBeReadFiles,
-            Map<String, Pattern> patterns, Map<String, Boolean> isRegexPath)
-    {
+                                                   Map<String, Pattern> patterns, Map<String, Boolean> isRegexPath) {
         // 检测目录是否存在，错误情况更明确
         assert checkDirectoryReadable(parentDirectory);
 
@@ -314,8 +234,7 @@ public class FileHelper
     }
 
     private static void directoryRover(String regexPath, String parentDirectory, Set<String> toBeReadFiles,
-            Map<String, Pattern> patterns, Map<String, Boolean> isRegexPath)
-    {
+                                       Map<String, Pattern> patterns, Map<String, Boolean> isRegexPath) {
         File directory = new File(parentDirectory);
         // is a normal file
         if (!directory.isDirectory()) {
@@ -323,8 +242,7 @@ public class FileHelper
                 toBeReadFiles.add(parentDirectory);
                 LOG.info("Adding the file [{}] as a candidate to be read.", parentDirectory);
             }
-        }
-        else {
+        } else {
             // 是目录
             try {
                 // warn:对于没有权限的目录,listFiles 返回null，而不是抛出SecurityException
@@ -333,15 +251,13 @@ public class FileHelper
                     for (File subFileNames : files) {
                         directoryRover(regexPath, subFileNames.getAbsolutePath(), toBeReadFiles, patterns, isRegexPath);
                     }
-                }
-                else {
+                } else {
                     // warn: 对于没有权限的文件，是直接throw AddaxException
                     String message = String.format("Permission denied for reading directory [%s].", directory);
                     LOG.error(message);
                     throw new RuntimeException(message);
                 }
-            }
-            catch (SecurityException e) {
+            } catch (SecurityException e) {
                 String message = String.format("Permission denied for reading directory [%s].", directory);
                 LOG.error(message);
                 throw new RuntimeException(message);
@@ -349,8 +265,7 @@ public class FileHelper
         }
     }
 
-    public static <T> List<List<T>> splitSourceFiles(final List<T> sourceList, int adviceNumber)
-    {
+    public static <T> List<List<T>> splitSourceFiles(final List<T> sourceList, int adviceNumber) {
         List<List<T>> splitedList = new ArrayList<>();
         int averageLength = sourceList.size() / adviceNumber;
         averageLength = averageLength == 0 ? 1 : averageLength;
@@ -365,44 +280,10 @@ public class FileHelper
         return splitedList;
     }
 
-    public static String generateFileMiddleName()
-    {
+    public static String generateFileMiddleName() {
         String randomChars = "0123456789abcdefghmnpqrstuvwxyz";
         SimpleDateFormat dateFormat = new SimpleDateFormat("yyyyMMdd_HHmmss_SSS");
         // like 2021-12-03-14-33-29-237-6587fddb
         return dateFormat.format(new Date()) + "_" + RandomStringUtils.random(8, randomChars);
     }
-
-//    private static String bytesToHexString(byte[] src)
-//    {
-//        StringBuilder builder = new StringBuilder();
-//        if (src == null || src.length <= 0) {
-//            return null;
-//        }
-//        String hv;
-//        for (byte b : src) {
-//            // 以十六进制（基数 16）无符号整数形式返回一个整数参数的字符串表示形式，并转换为大写
-//            hv = Integer.toHexString(b & 0xFF).toUpperCase();
-//            if (hv.length() < 2) {
-//                builder.append(0);
-//            }
-//            builder.append(hv);
-//        }
-//        return builder.toString();
-//    }
-
-//    public static String getCompressType(String filePath)
-//            throws IOException
-//    {
-//        FileInputStream fis = new FileInputStream(filePath);
-//        return getCompressType(fis);
-//    }
-//
-//    public static String getCompressType(InputStream inputStream)
-//            throws IOException
-//    {
-//        byte[] b = new byte[2];
-//        inputStream.read(b, 0, b.length);
-//        return mFileTypes.getOrDefault(bytesToHexString(b), null);
-//    }
 }
