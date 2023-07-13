@@ -695,6 +695,20 @@
   
 </li>
         
+          <li class="md-nav__item">
+  <a href="#ispage" class="md-nav__link">
+    isPage
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#pageparams" class="md-nav__link">
+    pageParams
+  </a>
+  
+</li>
+        
       </ul>
     </nav>
   
@@ -1664,6 +1678,20 @@
   
 </li>
         
+          <li class="md-nav__item">
+  <a href="#ispage" class="md-nav__link">
+    isPage
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#pageparams" class="md-nav__link">
+    pageParams
+  </a>
+  
+</li>
+        
       </ul>
     </nav>
   
@@ -2072,10 +2100,25 @@
 <td align="center">无</td>
 <td>定制的请求头信息</td>
 </tr>
+<tr>
+<td>isPage</td>
+<td align="center">否</td>
+<td align="center">boolean</td>
+<td align="center">无</td>
+<td>接口是否分支分页（<code>4.1.1</code> 引入)</td>
+</tr>
+<tr>
+<td>pageParams</td>
+<td align="center">否</td>
+<td align="center">map</td>
+<td align="center">无</td>
+<td>分页参数(<code>4.1.1</code> 引入)</td>
+</tr>
 </tbody>
 </table>
 <h3 id="proxy">proxy<a class="headerlink" href="#proxy" title="Permanent link">&para;</a></h3>
-<p>如果访问的接口需要通过代理，则可以配置 <code>proxy</code> 配置项，该配置项是一个 json 字典，包含一个必选的 <code>host</code> 字段和一个可选的 <code>auth</code> 字段。</p>
+<p>如果访问的接口需要通过代理，则可以配置 <code>proxy</code> 配置项，该配置项是一个 json 字典，包含一个必选的 <code>host</code>
+字段和一个可选的 <code>auth</code> 字段。</p>
 <div class="highlight"><pre><span></span><code><span class="p">{</span>
 <span class="w">  </span><span class="nt">&quot;proxy&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
 <span class="w">    </span><span class="nt">&quot;host&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;http://127.0.0.1:8080&quot;</span><span class="p">,</span>
@@ -2091,7 +2134,8 @@
 <span class="w">  </span><span class="p">}</span>
 <span class="p">}</span>
 </code></pre></div>
-<p><code>host</code> 是代理地址，包含代理类型，目前仅支持 <code>http</code> 代理和 <code>socks</code>(V4, V5 均可) 代理。 如果代理需要认证，则可以配置 <code>auth</code> , 它由用户名和密码组成，两者之间用冒号(<code>:</code>) 隔开。</p>
+<p><code>host</code> 是代理地址，包含代理类型，目前仅支持 <code>http</code> 代理和 <code>socks</code>(V4, V5 均可) 代理。 如果代理需要认证，则可以配置 <code>auth</code> ,
+它由用户名和密码组成，两者之间用冒号(<code>:</code>) 隔开。</p>
 <h3 id="column">column<a class="headerlink" href="#column" title="Permanent link">&para;</a></h3>
 <p><code>column</code> 除了直接指定 key 之外，还允许用 JSON Xpath 风格来指定需要获取的 key 值，假定你要读取的 JSON 文件如下：</p>
 <div class="highlight"><pre><span></span><code><span class="p">{</span>
@@ -2129,7 +2173,12 @@
 </code></pre></div>
 <p>我们希望把 <code>CURR_DATE</code>, <code>ID</code>, <code>COL1</code>, <code>COL2</code> 当作四个字段读取，那么你的 <code>column</code> 可以这样配置：</p>
 <div class="highlight"><pre><span></span><code><span class="p">{</span>
-<span class="w">  </span><span class="nt">&quot;column&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="s2">&quot;CURR_DATE&quot;</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;DEPT.ID&quot;</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;KK[0].COL1&quot;</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;KK[1].COL2&quot;</span><span class="p">]</span>
+<span class="w">  </span><span class="nt">&quot;column&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span>
+<span class="w">    </span><span class="s2">&quot;CURR_DATE&quot;</span><span class="p">,</span>
+<span class="w">    </span><span class="s2">&quot;DEPT.ID&quot;</span><span class="p">,</span>
+<span class="w">    </span><span class="s2">&quot;KK[0].COL1&quot;</span><span class="p">,</span>
+<span class="w">    </span><span class="s2">&quot;KK[1].COL2&quot;</span>
+<span class="w">  </span><span class="p">]</span>
 <span class="p">}</span>
 </code></pre></div>
 <p>其执行结果如下：</p>
@@ -2153,6 +2202,43 @@
 读写失败总数<span class="w">                    </span>:<span class="w">                   </span><span class="m">0</span>
 </code></pre></div>
 <p>注意： 如果你指定了不存在的 Key，则直接返回为 NULL 值。</p>
+<h3 id="ispage">isPage<a class="headerlink" href="#ispage" title="Permanent link">&para;</a></h3>
+<p><code>isPage</code> 参数用来指定接口是否分页，它是一个布尔值，如果为 <code>true</code> 则表示接口分页，否则表示不分页。</p>
+<p>当接口支持分页时，该直接会自动分页读取，直到接口返回的最后一次返回的数据的记录数小于每页的记录数为止。</p>
+<h3 id="pageparams">pageParams<a class="headerlink" href="#pageparams" title="Permanent link">&para;</a></h3>
+<p><code>pageParams</code> 参数仅在 <code>isPage</code> 参数为 <code>true</code> 时生效，它是一个 JSON 字典，包含两个可选字段 <code>pageIndex</code> 和 <code>pageSize</code> 。</p>
+<p><code>pageIndex</code> 用来表示用于分页指示的当前页面，他是一个 JSON 字段，包含两个可选字段 <code>key</code> 和 <code>value</code> ，其中 <code>key</code> 用来指定表示页码的参数名，<code>value</code> 用来指定当前页码的值。</p>
+<p><code>pageSize</code> 用来表示用于分页指示的每页大小，他是一个 JSON 字段，包含两个可选字段 <code>key</code> 和 <code>value</code> ，其中 <code>key</code> 用来指定表示每页大小的参数名，<code>value</code> 用来指定每页大小的值。</p>
+<p>这两个参数的默认值如下：</p>
+<div class="highlight"><pre><span></span><code><span class="p">{</span>
+<span class="w">  </span><span class="nt">&quot;pageParams&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="nt">&quot;pageIndex&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<span class="w">      </span><span class="nt">&quot;key&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;pageIndex&quot;</span><span class="p">,</span>
+<span class="w">      </span><span class="nt">&quot;value&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">1</span>
+<span class="w">    </span><span class="p">},</span>
+<span class="w">    </span><span class="nt">&quot;pageSize&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<span class="w">      </span><span class="nt">&quot;key&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;pageSize&quot;</span><span class="p">,</span>
+<span class="w">      </span><span class="nt">&quot;value&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">100</span>
+<span class="w">    </span><span class="p">}</span>
+<span class="w">  </span><span class="p">}</span>
+<span class="p">}</span>
+</code></pre></div>
+<p>如果你的接口分页参数不是 <code>pageIndex</code> 和 <code>pageSize</code> ，则可以通过 <code>pageParams</code> 参数来指定。比如</p>
+<div class="highlight"><pre><span></span><code><span class="p">{</span>
+<span class="w">  </span><span class="nt">&quot;isPage&quot;</span><span class="p">:</span><span class="w"> </span><span class="kc">true</span><span class="p">,</span>
+<span class="w">  </span><span class="nt">&quot;pageParams&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="nt">&quot;pageIndex&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<span class="w">      </span><span class="nt">&quot;key&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;page&quot;</span><span class="p">,</span>
+<span class="w">      </span><span class="nt">&quot;value&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">1</span>
+<span class="w">    </span><span class="p">},</span>
+<span class="w">    </span><span class="nt">&quot;pageSize&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<span class="w">      </span><span class="nt">&quot;key&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;size&quot;</span><span class="p">,</span>
+<span class="w">      </span><span class="nt">&quot;value&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">100</span>
+<span class="w">    </span><span class="p">}</span>
+<span class="w">  </span><span class="p">}</span>
+<span class="p">}</span>
+</code></pre></div>
+<p>这表示你传递给接口的分页参数为 <code>page=1&amp;size=100</code> 。</p>
 <h2 id="_6">限制说明<a class="headerlink" href="#_6" title="Permanent link">&para;</a></h2>
 <ol>
 <li>返回的结果必须是 JSON 类型</li>
