@@ -12,8 +12,8 @@ HttpReader 插件实现了读取 Restful API 数据的能力
 
 接口接受 GET 请求，请求的参数有
 
-| 参数名称  | 参数值示例 |
-| --------- | ---------- |
+| 参数名称      | 参数值示例      |
+|-----------|------------|
 | CURR_DATE | 2021-01-17 |
 | DEPT      | 9400       |
 | USERNAME  | andi       |
@@ -54,21 +54,24 @@ bin/addax.sh job/httpreader2stream.json
 
 ## 参数说明
 
-| 配置项    | 是否必须 | 数据类型 | 默认值 | 说明                                                          |
-| --------- | :------: | :------: | :----: | ------------------------------------------------------------- |
-| url       |    是    |  string  |   无   | 要访问的 HTTP 地址                                            |
-| reqParams |    否    |   map    |   无   | 接口请求参数                                                  |
-| resultKey |    否    |  string  |   无   | 要获取结果的那个 key 值，如果是获取整个返回值，则可以不用填写 |
-| method    |    否    |  string  |  get   | 请求模式，仅支持 GET，POST 两种，不区分大小写                 |
-| column    |    是    |   list   |   无   | 要获取的 key，如果配置为 `"*"` ，则表示获取所有 key 值        |
-| username  |    否    |  string  |   无   | 接口请求需要的认证帐号(如有)                                  |
-| password  |    否    |  string  |   无   | 接口请求需要的密码(如有)                                      |
-| proxy     |    否    |   map    |   无   | 代理地址,详见下面描述                                         |
-| headers   |    否    |   map    |   无   | 定制的请求头信息                                              |
+| 配置项        | 是否必须 |  数据类型   | 默认值 | 说明                                  |
+|------------|:----:|:-------:|:---:|-------------------------------------|
+| url        |  是   | string  |  无  | 要访问的 HTTP 地址                        |
+| reqParams  |  否   |   map   |  无  | 接口请求参数                              |
+| resultKey  |  否   | string  |  无  | 要获取结果的那个 key 值，如果是获取整个返回值，则可以不用填写   |
+| method     |  否   | string  | get | 请求模式，仅支持 GET，POST 两种，不区分大小写         |
+| column     |  是   |  list   |  无  | 要获取的 key，如果配置为 `"*"` ，则表示获取所有 key 值 |
+| username   |  否   | string  |  无  | 接口请求需要的认证帐号(如有)                     |
+| password   |  否   | string  |  无  | 接口请求需要的密码(如有)                       |
+| proxy      |  否   |   map   |  无  | 代理地址,详见下面描述                         |
+| headers    |  否   |   map   |  无  | 定制的请求头信息                            |
+| isPage     |  否   | boolean |  无  | 接口是否分支分页（`4.1.1` 引入)                |
+| pageParams |  否   |   map   |  无  | 分页参数(`4.1.1` 引入)                    |
 
 ### proxy
 
-如果访问的接口需要通过代理，则可以配置 `proxy` 配置项，该配置项是一个 json 字典，包含一个必选的 `host` 字段和一个可选的 `auth` 字段。
+如果访问的接口需要通过代理，则可以配置 `proxy` 配置项，该配置项是一个 json 字典，包含一个必选的 `host`
+字段和一个可选的 `auth` 字段。
 
 ```json
 {
@@ -90,7 +93,8 @@ bin/addax.sh job/httpreader2stream.json
 }
 ```
 
-`host` 是代理地址，包含代理类型，目前仅支持 `http` 代理和 `socks`(V4, V5 均可) 代理。 如果代理需要认证，则可以配置 `auth` , 它由用户名和密码组成，两者之间用冒号(`:`) 隔开。
+`host` 是代理地址，包含代理类型，目前仅支持 `http` 代理和 `socks`(V4, V5 均可) 代理。 如果代理需要认证，则可以配置 `auth` ,
+它由用户名和密码组成，两者之间用冒号(`:`) 隔开。
 
 ### column
 
@@ -135,7 +139,12 @@ bin/addax.sh job/httpreader2stream.json
 
 ```json
 {
-  "column": ["CURR_DATE", "DEPT.ID", "KK[0].COL1", "KK[1].COL2"]
+  "column": [
+    "CURR_DATE",
+    "DEPT.ID",
+    "KK[0].COL1",
+    "KK[1].COL2"
+  ]
 }
 ```
 
@@ -163,6 +172,57 @@ bin/addax.sh job/httpreader2stream.json
 ```
 
 注意： 如果你指定了不存在的 Key，则直接返回为 NULL 值。
+
+### isPage
+
+`isPage` 参数用来指定接口是否分页，它是一个布尔值，如果为 `true` 则表示接口分页，否则表示不分页。
+
+当接口支持分页时，该直接会自动分页读取，直到接口返回的最后一次返回的数据的记录数小于每页的记录数为止。
+
+### pageParams
+
+`pageParams` 参数仅在 `isPage` 参数为 `true` 时生效，它是一个 JSON 字典，包含两个可选字段 `pageIndex` 和 `pageSize` 。
+
+`pageIndex` 用来表示用于分页指示的当前页面，他是一个 JSON 字段，包含两个可选字段 `key` 和 `value` ，其中 `key` 用来指定表示页码的参数名，`value` 用来指定当前页码的值。
+
+`pageSize` 用来表示用于分页指示的每页大小，他是一个 JSON 字段，包含两个可选字段 `key` 和 `value` ，其中 `key` 用来指定表示每页大小的参数名，`value` 用来指定每页大小的值。
+
+这两个参数的默认值如下：
+
+```json
+{
+  "pageParams": {
+    "pageIndex": {
+      "key": "pageIndex",
+      "value": 1
+    },
+    "pageSize": {
+      "key": "pageSize",
+      "value": 100
+    }
+  }
+}
+```
+
+如果你的接口分页参数不是 `pageIndex` 和 `pageSize` ，则可以通过 `pageParams` 参数来指定。比如
+
+```json
+{
+  "isPage": true,
+  "pageParams": {
+    "pageIndex": {
+      "key": "page",
+      "value": 1
+    },
+    "pageSize": {
+      "key": "size",
+      "value": 100
+    }
+  }
+}
+```
+
+这表示你传递给接口的分页参数为 `page=1&size=100` 。
 
 ## 限制说明
 
