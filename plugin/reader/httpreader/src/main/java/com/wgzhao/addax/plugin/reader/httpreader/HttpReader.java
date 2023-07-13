@@ -145,6 +145,48 @@ public class HttpReader
         public void startRead(RecordSender recordSender)
         {
             String method = readerSliceConfig.getString(HttpKey.METHOD, "get");
+
+
+            boolean isPage = readerSliceConfig.getBool(HttpKey.IS_PAGE, false);
+            String paramPageSize = HttpKey.PAGE_SIZE;
+            int valPageSize = 20;
+            String paramPageIndex = HttpKey.PAGE_INDEX;
+            int valPageIndex = 1;
+            if (isPage) {
+                Map<String, Object> pageParams = readerSliceConfig.getMap(HttpKey.PAGE_PARAMS);
+                if (pageParams != null) {
+                   if (pageParams.containsKey(HttpKey.PAGE_INDEX)) {
+                       Map<String, Object> p = (Map<String, Object>) pageParams.get(HttpKey.PAGE_INDEX);
+                       paramPageIndex = p.get("key").toString();
+                       valPageIndex = Integer.parseInt(p.get("value").toString());
+                   }
+                   if (pageParams.containsKey(HttpKey.PAGE_SIZE)) {
+                       Map<String, Object> p = (Map<String, Object>) pageParams.get(HttpKey.PAGE_SIZE);
+                       paramPageSize = p.get("key").toString();
+                       valPageSize = Integer.parseInt(p.get("value").toString());
+                   }
+                }
+            }
+            if (isPage) {
+                int realPageSize;
+                while (true) {
+                    uriBuilder.setParameter(paramPageIndex, String.valueOf(valPageIndex));
+                    uriBuilder.setParameter(paramPageSize, String.valueOf(valPageSize));
+                    realPageSize = getRecords(recordSender, method);
+                    if (realPageSize < valPageSize) {
+                        // means no more data
+                        break;
+                    }
+                    valPageIndex++;
+                }
+            }
+            else {
+                getRecords(recordSender, method);
+            }
+        }
+
+        private int getRecords(RecordSender recordSender, String method)
+        {
             CloseableHttpResponse response;
             try {
                 response = createCloseableHttpResponse(method);
@@ -187,7 +229,7 @@ public class HttpReader
                 }
                 if (jsonArray == null || jsonArray.isEmpty()) {
                     // empty result
-                    return;
+                    return 0;
                 }
 
                 List<String> columns = readerSliceConfig.getList(HttpKey.COLUMN, String.class);
@@ -204,8 +246,8 @@ public class HttpReader
                     columns.remove(0);
                     columns.addAll((Collection<String>) JSONPath.eval(jsonObject, "$.e.keySet()"));
                 }
-
-                for (int i = 0; i < jsonArray.size(); i++) {
+                int i = 0;
+                for (i=0; i < jsonArray.size(); i++) {
                     jsonObject = jsonArray.getJSONObject(i);
                     record = recordSender.createRecord();
                     for (String k : columns) {
@@ -219,6 +261,7 @@ public class HttpReader
                     }
                     recordSender.sendToWriter(record);
                 }
+                return i;
             }
 
             catch (URISyntaxException | IOException e) {
@@ -227,7 +270,6 @@ public class HttpReader
                 );
             }
         }
-
         private void createProxy(Configuration proxyConf)
         {
             String host = proxyConf.getString(HttpKey.HOST);

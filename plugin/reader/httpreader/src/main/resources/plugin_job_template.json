@@ -14,6 +14,11 @@
       "CURR_DATE":"2021-01-18",
       "DEPT":"9700"
     },
+    "isPage": true,
+    "pageParams": {
+      "pageSize": {"key":"pageSize","value":10},
+      "pageIndex":{"key": "pageNo", "value": 1}
+    },
     "resultKey":"result",
     "method": "GET",
     "column": ["CURR_DATE","DEPT","TOTAL_MANAGED_MARKET_VALUE","TOTAL_MANAGED_MARKET_VALUE_GROWTH"],
