@@ -50,4 +50,8 @@ public final class HttpKey extends Key
     // 请求方法，仅支持get，post两种模式
     public static final String METHOD = "method";
 
+    public static final String IS_PAGE = "isPage";
+    public static final String PAGE_PARAMS = "pageParams";
+    public static final String PAGE_SIZE = "pageSize";
+    public static final String PAGE_INDEX = "pageIndex";
 }
