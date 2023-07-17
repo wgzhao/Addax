@@ -64,6 +64,8 @@ assignees: wgzhao
 
 ### stream reader
 
+### Sybase reader
+
 ### tdengine reader
 
 ### txtfile reader
@@ -123,6 +125,8 @@ assignees: wgzhao
 ### starrockswriter
 
 ### stream writer
+
+### Sybase writer
 
 ### tdengine writer
 
