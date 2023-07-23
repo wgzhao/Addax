@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <parent>
         <groupId>com.wgzhao.addax</groupId>
@@ -12,6 +13,21 @@
     <name>oracle-reader</name>
     <description>read data from Oracle Database</description>
     <packaging>jar</packaging>
+
+    <!-- for downloading oracle spatial dependency -->
+    <repositories>
+        <repository>
+            <id>datanucleus</id>
+            <releases>
+                <enabled>true</enabled>
+            </releases>
+            <snapshots>
+                <enabled>false</enabled>
+            </snapshots>
+            <url>https://www.datanucleus.org/downloads/maven2/</url>
+            <layout>default</layout>
+        </repository>
+    </repositories>
 
     <dependencies>
         <dependency>
@@ -40,12 +56,11 @@
             <version>${oracle.jdbc.version}</version>
         </dependency>
 
+        <!-- missing checksum -->
         <dependency>
             <groupId>oracle</groupId>
-            <artifactId>spatial</artifactId>
-            <scope>system</scope>
-            <version>1.0</version>
-            <systemPath>${project.basedir}/src/main/resources/sdoapi.jar</systemPath>
+            <artifactId>sdoapi</artifactId>
+            <version>11.2.0</version>
         </dependency>
 
         <dependency>
@@ -76,6 +91,15 @@
                         </goals>
                     </execution>
                 </executions>
+            </plugin>
+            <!-- sdoapi jar has no checksum file -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-dependency-plugin</artifactId>
+                <version>3.1.0</version>
+                <configuration>
+                    <checksumPolicy>ignore</checksumPolicy>
+                </configuration>
             </plugin>
         </plugins>
     </build>
