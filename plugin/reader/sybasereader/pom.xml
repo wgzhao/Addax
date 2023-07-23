@@ -12,6 +12,21 @@
     <artifactId>sybasereader</artifactId>
     <name>sybase-reader</name>
 
+    <!-- for downloading sybase jdbc driver -->
+    <repositories>
+        <repository>
+            <id>jumpmind</id>
+            <releases>
+                <enabled>true</enabled>
+            </releases>
+            <snapshots>
+                <enabled>false</enabled>
+            </snapshots>
+            <url>https://maven.jumpmind.com/repo/</url>
+            <layout>default</layout>
+        </repository>
+    </repositories>
+
     <dependencies>
         <dependency>
             <groupId>com.wgzhao.addax</groupId>
@@ -36,8 +51,6 @@
             <groupId>jdbc.sybase</groupId>
             <artifactId>jconn4</artifactId>
             <version>16.0</version>
-            <scope>system</scope>
-            <systemPath>${project.basedir}/lib/jconn4-16.0.jar</systemPath>
         </dependency>
 
     </dependencies>
