@@ -30,7 +30,7 @@
         <!-- basic components -->
         <aircompressor.version>0.24</aircompressor.version>
         <awssdk.version>2.20.5</awssdk.version>
-        <avro.version>1.10.0</avro.version>
+        <avro.version>1.11.2</avro.version>
         <commons.beanutils.version>1.9.4</commons.beanutils.version>
         <commons.configuration.version>1.10</commons.configuration.version>
         <commons.collections.version>4.4</commons.collections.version>
