@@ -60,7 +60,7 @@
         <dependency>
             <groupId>oracle</groupId>
             <artifactId>sdoapi</artifactId>
-            <version>11.2.0</version>
+            <version>1.0</version>
         </dependency>
 
         <dependency>
@@ -77,6 +77,7 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-assembly-plugin</artifactId>
+                <version>3.6.0</version>
                 <configuration>
                     <descriptors>
                         <descriptor>package.xml</descriptor>
