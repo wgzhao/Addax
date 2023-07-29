@@ -112,7 +112,7 @@ public class DorisWriterTask
                     flush(flushBatch);
                     // clear buffer
                     batchCount = 0L;
-                    batchByteSize = 0L;
+                    batchSize = 0L;
                     flushBatch = new DorisFlushBatch(lineDelimiter);
                 }
             } // end of while
