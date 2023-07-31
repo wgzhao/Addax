@@ -51,6 +51,7 @@ import java.io.IOException;
 import java.net.HttpURLConnection;
 import java.net.URI;
 import java.net.URL;
+import java.net.URLDecoder;
 import java.util.Base64;
 import java.util.List;
 import java.util.Map;
@@ -92,6 +93,18 @@ public class DorisWriterEmitter
         }
     }
 
+    public String urlDecode(String outBuffer) {
+        String data = outBuffer;
+        try {
+            data = data.replaceAll("%(?![0-9a-fA-F]{2})", "%25");
+            data = data.replaceAll("\\+", "%2B");
+            data = URLDecoder.decode(data, "utf-8");
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return data;
+    }
+
     /**
      * execute doris stream load
      */
@@ -105,7 +118,8 @@ public class DorisWriterEmitter
         if (null == host) {
             throw new IOException("None of the load url can be connected.");
         }
-        final String loadUrl = host + "/api/" + database + "/" + table + "/_stream_load";
+        String loadUrl = host + "/api/" + database + "/" + table + "/_stream_load";
+        loadUrl = urlDecode(loadUrl);
         // do http put request and get response
         final Map<String, Object> loadResult = this.doHttpPut(loadUrl, flushData);
 
