@@ -295,7 +295,7 @@
             <plugin>
                 <groupId>com.github.spotbugs</groupId>
                 <artifactId>spotbugs-maven-plugin</artifactId>
-                <version>4.7.3.4</version>
+                <version>4.7.3.5</version>
             </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
@@ -321,7 +321,7 @@
                             <excludes>
                                 <exclude>org.apache.maven.plugins:maven-verifier-plugin</exclude>
                             </excludes>
-                            <message>Please consider using the maven-invoker-plugin (http://maven.apache.org/plugins/maven-invoker-plugin/)!</message>
+                            <message>Please consider using the maven-invoker-plugin</message>
                         </bannedPlugins>
                         <requireMavenVersion>
                             <version>(3.5.4,)</version>
@@ -343,6 +343,7 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-release-plugin</artifactId>
+                <version>3.0.1</version>
                 <configuration>
                     <preparationGoals>clean compile -DskipTests</preparationGoals>
                     <tagNameFormat>@{project.version}</tagNameFormat>
@@ -351,8 +352,9 @@
             </plugin>
 
             <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-assembly-plugin</artifactId>
-                <version>3.5.0</version>
+                <version>3.6.0</version>
                 <configuration>
                     <finalName>addax</finalName>
                     <descriptors>
