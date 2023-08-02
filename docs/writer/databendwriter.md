@@ -1,6 +1,7 @@
 # DatabendWriter
 
-Databend 插件用于向 [Databend](https://databend.rs/zh-CN/doc/) 数据库以流式方式写入数据。 其实现上是通过访问 Databend http 连接(8000)
+Databend 插件用于向 [Databend](https://databend.rs/zh-CN/doc/) 数据库以流式方式写入数据。 其实现上是通过访问 Databend
+http 连接(8000)
 ，然后通过 [stream load](https://databend.rs/zh-CN/doc/integrations/api/streaming-load)
 加载数据到数据中，相比 `insert into` 方式效率要高不少，也是官方推荐的生产环境下的数据加载方式。
 
@@ -13,11 +14,12 @@ Databend 是一个兼容 MySQL 协议的数据库后端，因此 Databend 读取
 ```sql
 CREATE
 DATABASE example_db;
-CREATE TABLE `example_db`.`table1` (
-  `siteid` INT DEFAULT CAST(10 AS INT),
-  `citycode` INT,
-  `username` VARCHAR,
-  `pv` BIGINT
+CREATE TABLE `example_db`.`table1`
+(
+    `siteid`   INT DEFAULT CAST(10 AS INT),
+    `citycode` INT,
+    `username` VARCHAR,
+    `pv`       BIGINT
 );
 ```
 
@@ -37,27 +39,34 @@ bin/addax.sh job/stream2Databend.json
 
 ## 参数说明
 
-| 配置项         | 是否必须 | 类型   | 默认值    | 描述                                                                                                            |
-| :------------- | :------: | ------ | --------- | --------------------------------------------------------------------------------------------------------------- |
-| jdbcUrl        |    否    | string | 无        | 目的数据库的 JDBC 连接信息，用于执行`preSql`及`postSql`                                                         |
-| loadUrl        |    是    | string | 无        | Databend query 节点的地址用于 StreamLoad，可以为多个 query 地址，`query_ip:query_http_port`，从多个地址轮循写入 |
-| username       |    是    | string | 无        | HTTP 签名验证帐号                                                                                               |
-| password       |    否    | string | 无        | HTTP 签名验证密码                                                                                               |
-| database       |    是    | string | 无        | Databend 表的数据库名称                                                                                         |
-| table          |    是    | string | 无        | Databend 表的表名称                                                                                             |
-| column         |    否    | list   | 无        | 所配置的表中需要同步的列名集合，详细描述见 [rdbmswriter][1]                                                     |
-| maxBatchRows   |    否    | int    | 500000    | 定义了插件和数据库服务器端每次批量数据获取条数，调高该值可能导致 OOM 或者目标数据库事务提交失败导致挂起         |
-| maxBatchSize   |    否    | int    | 104857600 | 单次 StreamLoad 导入的最大字节数                                                                                |
-| flushInterval  |    否    | int    | 300000    | 上一次 StreamLoad 结束至下一次开始的时间间隔（单位：ms)                                                         |
-| endpoint       |    是    | string | 无        | Databend 的 HTTP 连接方式，只需要写到主机和端口即可，具体路径插件会自动拼装                                     |
-| username       |    是    | string | 无        | HTTP 签名验证帐号                                                                                               |
-| password       |    否    | string | 无        | HTTP 签名验证密码                                                                                               |
-| table          |    是    | string | 无        | 所选取的需要同步的表名                                                                                          |
-| column         |    否    | list   | 无        | 所配置的表中需要同步的列名集合，详细描述见 [rdbmswriter][1]                                                     |
-| batchSize      |    否    | int    | 1024      |                                                                                                                 |
-| lineDelimiter  |    否    | string | `\n`      | 每行的分隔符,支持高位字节, 例如 `\\x02`                                                                         |
-| filedDelimiter |    否    | string | `\t`      | 每列的分隔符,支持高位字节, 例如 `\\x01`                                                                         |
-| format         |    否    | string | `csv`     | 被导入数据会被转换成 format 指定格式。                                                                          |
+| 配置项              | 是否必须 | 类型     | 默认值      | 描述                                                                           |
+|:-----------------|:----:|--------|----------|------------------------------------------------------------------------------|
+| jdbcUrl          |  否   | string | 无        | 目的数据库的 JDBC 连接信息，用于执行`preSql`及`postSql`                                      |
+| username         |  是   | string | 无        | JDBC 数据源用户名                                                                  |
+| password         |  否   | string | 无        | JDBC 数据源密码                                                                   |
+| table            |  是   | string | 无        | Databend 表的表名称                                                               |
+| column           |  否   | list   | 无        | 所配置的表中需要同步的列名集合，详细描述见 [rdbmswriter][1]                                       |
+| preSql           |  否   | list   | 无        | 任务开始前执行的 SQL 语句，多条语句以分号分隔，语句中不能包含分号。                                         |
+| postSql          |  否   | list   | 无        | 任务结束后执行的 SQL 语句，多条语句以分号分隔，语句中不能包含分号。                                         |
+| batchSize        |  否   | int    | 1024     | 每个批次的记录数                                                                     |
+| writeMode        |  否   | string | `insert` | 写入模式，支持 insert 和 replace 两种模式，默认为 insert。若为 replace，务必填写 onConflictColumn 参数 |
+| onConflictColumn |  否   | string | 无        | 冲突列，当 writeMode 为 replace 时，必须指定冲突列，否则会导致写入失败。                               |
+
+### writeMode
+
+该参数为 `4.1.2` 版本引入，用来支持 Databend 的 `replace into` 语法，当该参数设定为 `replace`
+时，必须同时指定 `onConflictColumn` 参数，用来判断数据是插入还是更新的依据。
+
+两个参数的示例如下：
+
+```json
+{
+  "writeMode": "replace",
+  "onConflictColumn": [
+    "id"
+  ]
+}
+```
 
 ## 类型转换
 
