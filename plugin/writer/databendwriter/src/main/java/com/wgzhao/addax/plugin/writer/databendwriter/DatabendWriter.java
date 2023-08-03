@@ -1,5 +1,6 @@
 package com.wgzhao.addax.plugin.writer.databendwriter;
 
+import com.wgzhao.addax.common.element.Column;
 import com.wgzhao.addax.common.plugin.RecordReceiver;
 import com.wgzhao.addax.common.spi.Writer;
 import com.wgzhao.addax.common.util.Configuration;
@@ -9,6 +10,9 @@ import com.wgzhao.addax.rdbms.writer.CommonRdbmsWriter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.sql.PreparedStatement;
+import java.sql.SQLException;
+import java.sql.Types;
 import java.util.List;
 
 public class DatabendWriter extends Writer {
@@ -68,7 +72,28 @@ public class DatabendWriter extends Writer {
         public void init() {
             this.writerSliceConfig = super.getPluginJobConf();
 
-            this.commonRdbmsWriterSlave = new CommonRdbmsWriter.Task(DataBaseType.Databend);
+            this.commonRdbmsWriterSlave = new CommonRdbmsWriter.Task(DataBaseType.Databend)
+            {
+                @Override
+                protected PreparedStatement fillPreparedStatementColumnType(PreparedStatement preparedStatement, int columnIndex, int columnSqlType, Column column)
+                        throws SQLException {
+                    switch (columnSqlType) {
+                        case Types.TINYINT:
+                        case Types.SMALLINT:
+                        case Types.INTEGER:
+                            preparedStatement.setInt(columnIndex, column.asBigInteger().intValue());
+                            return preparedStatement;
+                        case Types.BIGINT:
+                            preparedStatement.setLong(columnIndex, column.asLong());
+                            return preparedStatement;
+                        case Types.JAVA_OBJECT:
+                            // cast variant / array into string is fine.
+                            preparedStatement.setString(columnIndex, column.asString());
+                            return preparedStatement;
+                    }
+                    return super.fillPreparedStatementColumnType(preparedStatement, columnIndex, columnSqlType, column);
+                }
+            };
             this.commonRdbmsWriterSlave.init(this.writerSliceConfig);
         }
 

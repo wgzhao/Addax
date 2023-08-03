@@ -1,21 +1,12 @@
 package com.wgzhao.addax.plugin.writer.databendwriter.util;
 
-import com.alibaba.druid.sql.parser.ParserException;
-import com.google.common.base.Strings;
 import com.wgzhao.addax.common.base.Constant;
 import com.wgzhao.addax.common.base.Key;
 import com.wgzhao.addax.common.util.Configuration;
-import com.wgzhao.addax.plugin.writer.databendwriter.DatabendWriterOptions;
-import com.wgzhao.addax.rdbms.util.DBUtil;
-import com.wgzhao.addax.rdbms.util.DataBaseType;
-import com.wgzhao.addax.rdbms.util.RdbmsException;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.sql.Connection;
-import java.sql.Statement;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.StringJoiner;
 
