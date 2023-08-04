@@ -64,7 +64,7 @@
         <javacsv.version>2.0</javacsv.version>
         <javadbf.version>1.14.0</javadbf.version>
         <jest.version>6.3.1</jest.version>
-        <junit.version>5.9.3</junit.version>
+        <junit.version>5.10.0</junit.version>
         <joda.time.version>2.12.2</joda.time.version>
         <jackson.version>2.9.9</jackson.version>
         <jedis.version>3.7.0</jedis.version>
@@ -106,9 +106,6 @@
         <sqlite.jdbc.version>3.42.0.0</sqlite.jdbc.version>
         <taos.jdbc.version>3.2.1</taos.jdbc.version>
         <trino.jdbc.version>351</trino.jdbc.version>
-
-        <!-- for test -->
-        <junit.version>5.8.1</junit.version>
 
         <!-- maven configuration -->
         <project.sourceEncoding>UTF-8</project.sourceEncoding>
