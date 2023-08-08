@@ -77,7 +77,7 @@
         <mockito.version>2.0.2-beta</mockito.version>
         <netty-buffer.version>4.1.93.Final</netty-buffer.version>
         <ognl.version>3.4.1</ognl.version>
-        <orc.version>1.8.3</orc.version>
+        <orc.version>1.9.0</orc.version>
         <parquet.version>1.10.0</parquet.version>
         <poi.version>5.2.3</poi.version>
         <protobuf.version>3.23.4</protobuf.version>
