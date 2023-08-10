@@ -33,7 +33,7 @@
         <dependency>
             <groupId>com.databend</groupId>
             <artifactId>databend-jdbc</artifactId>
-            <version>0.0.8</version>
+            <version>0.1.0</version>
             <exclusions>
                 <exclusion>
                     <groupId>com.google.guava</groupId>
