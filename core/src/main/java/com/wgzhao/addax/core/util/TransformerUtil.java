@@ -28,6 +28,7 @@ import com.wgzhao.addax.core.transport.transformer.TransformerInfo;
 import com.wgzhao.addax.core.transport.transformer.TransformerRegistry;
 import com.wgzhao.addax.core.util.container.CoreConstant;
 import org.apache.commons.io.FileUtils;
+import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -125,7 +126,8 @@ public class TransformerUtil
                 if (StringUtils.isNotEmpty(codeFile)) {
                     // load groovy code from codeFile
                     // the codeFile default relative path is the same of addax.home properties
-                    File file = new File(codeFile);
+                    // Fix Potential Path Traversal
+                    File file = new File(FilenameUtils.getFullPath(codeFile) + FilenameUtils.getName(codeFile));
                     if (! file.exists() || ! file.isFile()) {
                         throw AddaxException.asAddaxException(TransformerErrorCode.TRANSFORMER_CONFIGURATION_ERROR,
                                 "the codeFile [" + codeFile + "]does not exists or is unreadable!");
