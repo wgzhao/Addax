@@ -126,8 +126,7 @@ public class TransformerUtil
                 if (StringUtils.isNotEmpty(codeFile)) {
                     // load groovy code from codeFile
                     // the codeFile default relative path is the same of addax.home properties
-                    // Fix Potential Path Traversal
-                    File file = new File(FilenameUtils.getFullPath(codeFile) + FilenameUtils.getName(codeFile));
+                    File file = new File(codeFile);
                     if (! file.exists() || ! file.isFile()) {
                         throw AddaxException.asAddaxException(TransformerErrorCode.TRANSFORMER_CONFIGURATION_ERROR,
                                 "the codeFile [" + codeFile + "]does not exists or is unreadable!");
