@@ -162,6 +162,36 @@ String code3="Column column = record.getColumn(1);\n"+
         " return record;";
 ```
 
+从  `4.1.2` 版本开始， `dx_groovy` 支持从外部文件加载 groovy 代码，读取文件的相对路径为 `$ADDAX_HOME` 变量所在的目录，也就是 Addax 的安装目录。
+
+以实现 `subStr` 为例，我们可以创建 `job/substr.groovy` 文件，内容如下：
+
+```groovy
+Column column = record.getColumn(1)
+String oriValue = column.asString()
+String newValue = oriValue.substring(0, 3)
+record.setColumn(1, new StringColumn(newValue))
+return record
+```
+
+然后在 `job` 文件中这样去定义：
+
+```json
+{
+  "transformer": [
+    {
+      "name": "dx_groovy",
+      "parameter": {
+        "codeFile": "job/substr.groovy"
+      }
+    }
+  ]
+}
+```
+
+文件也可以使用绝对路径来指定。
+
+
 ## Job定义
 
 本例中，配置4个UDF。
