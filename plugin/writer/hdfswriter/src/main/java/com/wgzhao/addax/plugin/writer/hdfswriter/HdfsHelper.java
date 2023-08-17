@@ -32,46 +32,24 @@ import com.wgzhao.addax.common.plugin.RecordReceiver;
 import com.wgzhao.addax.common.plugin.TaskPluginCollector;
 import com.wgzhao.addax.common.util.Configuration;
 import org.apache.avro.Conversions;
-import org.apache.avro.LogicalTypes;
-import org.apache.avro.Schema;
 import org.apache.avro.generic.GenericData;
-import org.apache.avro.generic.GenericFixed;
-import org.apache.avro.generic.GenericRecord;
-import org.apache.avro.generic.GenericRecordBuilder;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.tuple.MutablePair;
-import org.apache.hadoop.fs.CommonConfigurationKeys;
-import org.apache.hadoop.fs.FileStatus;
-import org.apache.hadoop.fs.FileSystem;
-import org.apache.hadoop.fs.LocatedFileStatus;
-import org.apache.hadoop.fs.Path;
-import org.apache.hadoop.fs.RemoteIterator;
-import org.apache.hadoop.fs.Trash;
+import org.apache.hadoop.fs.*;
 import org.apache.hadoop.hive.common.type.HiveDecimal;
-import org.apache.hadoop.hive.ql.exec.vector.BytesColumnVector;
-import org.apache.hadoop.hive.ql.exec.vector.ColumnVector;
-import org.apache.hadoop.hive.ql.exec.vector.DecimalColumnVector;
-import org.apache.hadoop.hive.ql.exec.vector.DoubleColumnVector;
-import org.apache.hadoop.hive.ql.exec.vector.LongColumnVector;
-import org.apache.hadoop.hive.ql.exec.vector.TimestampColumnVector;
-import org.apache.hadoop.hive.ql.exec.vector.VectorizedRowBatch;
+import org.apache.hadoop.hive.ql.exec.vector.*;
 import org.apache.hadoop.hive.serde2.io.HiveDecimalWritable;
 import org.apache.hadoop.io.NullWritable;
 import org.apache.hadoop.io.Text;
 import org.apache.hadoop.io.compress.CompressionCodec;
-import org.apache.hadoop.mapred.FileOutputFormat;
-import org.apache.hadoop.mapred.JobConf;
-import org.apache.hadoop.mapred.JobContext;
-import org.apache.hadoop.mapred.RecordWriter;
-import org.apache.hadoop.mapred.Reporter;
-import org.apache.hadoop.mapred.TextOutputFormat;
+import org.apache.hadoop.mapred.*;
 import org.apache.hadoop.security.UserGroupInformation;
-import org.apache.kerby.config.Conf;
 import org.apache.orc.CompressionKind;
 import org.apache.orc.OrcFile;
 import org.apache.orc.TypeDescription;
 import org.apache.orc.Writer;
-import org.apache.parquet.avro.*;
+import org.apache.parquet.avro.AvroReadSupport;
+import org.apache.parquet.avro.AvroWriteSupport;
 import org.apache.parquet.column.ParquetProperties;
 import org.apache.parquet.example.data.Group;
 import org.apache.parquet.example.data.simple.SimpleGroupFactory;
@@ -79,7 +57,6 @@ import org.apache.parquet.hadoop.ParquetWriter;
 import org.apache.parquet.hadoop.example.ExampleParquetWriter;
 import org.apache.parquet.hadoop.example.GroupWriteSupport;
 import org.apache.parquet.hadoop.metadata.CompressionCodecName;
-import org.apache.parquet.hadoop.metadata.ParquetMetadata;
 import org.apache.parquet.hadoop.util.HadoopOutputFile;
 import org.apache.parquet.io.api.Binary;
 import org.apache.parquet.schema.*;
@@ -97,12 +74,21 @@ import java.sql.Timestamp;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.time.LocalDate;
+import java.time.ZoneId;
 import java.time.temporal.JulianFields;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Base64;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import java.util.Set;
+import java.util.StringJoiner;
 import java.util.concurrent.TimeUnit;
 
 import static org.apache.parquet.schema.LogicalTypeAnnotation.decimalType;
-import static org.apache.parquet.schema.MessageTypeParser.parseMessageType;
 
 public class HdfsHelper {
     public static final Logger LOG = LoggerFactory.getLogger(HdfsHelper.class);
@@ -215,110 +201,97 @@ public class HdfsHelper {
         return transportResult;
     }
 
-    private static Binary toInt96(String value) throws ParseException {
-//        String value = "2019-02-13 13:35:05";
+    /**
+     * convert timestamp to parquet INT96
+     *
+     * @param value the timestamp string
+     * @return {@link Binary}
+     * @throws ParseException when the value is invalid
+     */
+    private static Binary tsToBinary(String value) throws ParseException {
 
         final long NANOS_PER_HOUR = TimeUnit.HOURS.toNanos(1);
         final long NANOS_PER_MINUTE = TimeUnit.MINUTES.toNanos(1);
         final long NANOS_PER_SECOND = TimeUnit.SECONDS.toNanos(1);
 
-// Parse date
-        SimpleDateFormat parser = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        // Parse date
+        SimpleDateFormat parser = new SimpleDateFormat(Constant.DEFAULT_DATE_FORMAT);
         Calendar cal = Calendar.getInstance();
         cal.setTime(parser.parse(value));
 
-// Calculate Julian days and nanoseconds in the day
+        // Calculate Julian days and nanoseconds in the day
         LocalDate dt = LocalDate.of(cal.get(Calendar.YEAR), cal.get(Calendar.MONTH) + 1, cal.get(Calendar.DAY_OF_MONTH));
         int julianDays = (int) JulianFields.JULIAN_DAY.getFrom(dt);
         long nanos = (cal.get(Calendar.HOUR_OF_DAY) * NANOS_PER_HOUR)
                 + (cal.get(Calendar.MINUTE) * NANOS_PER_MINUTE)
                 + (cal.get(Calendar.SECOND) * NANOS_PER_SECOND);
 
-// Write INT96 timestamp
+        // Write INT96 timestamp
         byte[] timestampBuffer = new byte[12];
         ByteBuffer buf = ByteBuffer.wrap(timestampBuffer);
         buf.order(ByteOrder.LITTLE_ENDIAN).putLong(nanos).putInt(julianDays);
 
-// This is the properly encoded INT96 timestamp
-        Binary tsValue = Binary.fromReusedByteArray(timestampBuffer);
-        return tsValue;
+        // This is the properly encoded INT96 timestamp
+        return Binary.fromReusedByteArray(timestampBuffer);
     }
 
-    public static GenericData.Record transportParRecord(
-            Record record, List<Configuration> columnsConfiguration,
-            TaskPluginCollector taskPluginCollector, GenericRecordBuilder builder) {
-
-        int recordLength = record.getColumnNumber();
-
-        if (0 != recordLength) {
-            Column column;
-            for (int i = 0; i < recordLength; i++) {
-                column = record.getColumn(i);
-                String colName = columnsConfiguration.get(i).getString(Key.NAME);
-                String typename = columnsConfiguration.get(i).getString(Key.TYPE).toUpperCase();
-                if (null == column || column.getRawData() == null) {
-                    builder.set(colName, null);
-                } else {
-                    String rowData = column.getRawData().toString();
-                    SupportHiveDataType columnType = SupportHiveDataType.valueOf(typename);
-                    //根据writer端类型配置做类型转换
-                    try {
-                        switch (columnType) {
-                            case INT:
-                            case INTEGER:
-                                builder.set(colName, Integer.valueOf(rowData));
-                                break;
-                            case LONG:
-                                builder.set(colName, column.asLong());
-                                break;
-                            case FLOAT:
-                                builder.set(colName, Float.valueOf(rowData));
-                                break;
-                            case DOUBLE:
-                                builder.set(colName, column.asDouble());
-                                break;
-                            case STRING:
-                                builder.set(colName, column.asString());
-                                break;
-                            case DECIMAL:
-                                builder.set(colName, new BigDecimal(column.asString()).setScale(columnsConfiguration.get(i).getInt(Key.SCALE), BigDecimal.ROUND_HALF_UP));
-                                break;
-                            case BOOLEAN:
-                                builder.set(colName, column.asBoolean());
-                                break;
-                            case BINARY:
-                                builder.set(colName, column.asBytes());
-                                break;
-                            case TIMESTAMP:
-//                                builder.set(colName, toInt96(column.asString()));
-                                Binary int96 = toInt96("123.45");
-                                Schema int96schema = Schema.createFixed("INT96", "INT96 represented as byte[12]", null, 12);
-                                GenericFixed genericFixed = new GenericData.Fixed(int96schema, int96.getBytes());
-                                builder.set(colName, int96);
-//                                builder.set(colName, column.asString());
-                                break;
-                            default:
-                                throw AddaxException
-                                        .asAddaxException(
-                                                HdfsWriterErrorCode.ILLEGAL_VALUE,
-                                                String.format(
-                                                        "The columns configuration is incorrect. the field type is unsupported." +
-                                                                "Field name:[%s], Field type:[%s].",
-                                                        columnsConfiguration.get(i).getString(Key.NAME),
-                                                        columnsConfiguration.get(i).getString(Key.TYPE)));
-                        }
-                    } catch (Exception e) {
-                        // warn: 此处认为脏数据
-                        String message = String.format(
-                                "Type conversion error for field. destination column type: [%s], actual column value: [%s].",
-                                columnsConfiguration.get(i).getString(Key.TYPE), column.getRawData());
-                        taskPluginCollector.collectDirtyRecord(record, message);
-                        break;
-                    }
-                }
+    public static Group transportParRecord(
+            Record record, List<Configuration> columns,
+            TaskPluginCollector taskPluginCollector, SimpleGroupFactory simpleGroupFactory) {
+        Column column;
+        Group group = simpleGroupFactory.newGroup();
+        for (int i = 0; i < record.getColumnNumber(); i++) {
+            column = record.getColumn(i);
+            String colName = columns.get(i).getString(Key.NAME);
+            String typename = columns.get(i).getString(Key.TYPE).toUpperCase();
+            if (null == column || column.getRawData() == null) {
+                group.append(colName, "");
             }
+            SupportHiveDataType columnType = SupportHiveDataType.valueOf(typename);
+            assert column != null;
+            switch (columnType) {
+                case INT:
+                case INTEGER:
+                    group.append(colName, Integer.parseInt(column.getRawData().toString()));
+                    break;
+                case LONG:
+                    group.append(colName, column.asLong());
+                    break;
+                case FLOAT:
+                    group.append(colName, column.asDouble().floatValue());
+                    break;
+                case DOUBLE:
+                    group.append(colName, column.asDouble());
+                    break;
+                case STRING:
+                    group.append(colName, column.asString());
+                    break;
+                case BOOLEAN:
+                    group.append(colName, column.asBoolean());
+                    break;
+                case DECIMAL:
+                    group.append(colName, decimalToBinary(column.asString()));
+                    break;
+                case TIMESTAMP:
+                    SimpleDateFormat sdf = new SimpleDateFormat(Constant.DEFAULT_DATE_FORMAT);
+                    try {
+                        group.append(colName, tsToBinary(sdf.format(column.asDate())));
+                    } catch (ParseException e) {
+                        // dirty data
+                        taskPluginCollector.collectDirtyRecord(record, e);
+                    }
+                    break;
+                case DATE:
+                    group.append(colName, (int) Math.round(column.asLong() * 1.0 / 86400000));
+                    break;
+                default:
+                    LOG.warn("convert type[{}] into string", column.getType());
+                    group.append(colName, column.asString());
+                    break;
+            }
+
         }
-        return builder.build();
+        return group;
     }
 
     public void getFileSystem(String defaultFS, Configuration taskConfig) {
@@ -602,103 +575,49 @@ public class HdfsHelper {
         if ("NONE".equals(compress)) {
             compress = "UNCOMPRESSED";
         }
+        CompressionCodecName codecName = CompressionCodecName.fromConf(compress);
         // construct parquet schema
-//        Schema schema = generateParquetSchema(columns);
-        MessageType s = genParquetSchema(columns);
-//        Schema schema = new AvroSchemaConverter().convert(s);
+        MessageType s = generateParquetSchema(columns);
         Path path = new Path(fileName);
         LOG.info("Begin to write parquet file [{}]", fileName);
-        CompressionCodecName codecName = CompressionCodecName.fromConf(compress);
 
         GenericData decimalSupport = new GenericData();
         decimalSupport.addLogicalTypeConversion(new Conversions.DecimalConversion());
         hadoopConf.setBoolean(AvroReadSupport.READ_INT96_AS_FIXED, true);
         hadoopConf.setBoolean(AvroWriteSupport.WRITE_FIXED_AS_INT96, true);
         GroupWriteSupport.setSchema(s, hadoopConf);
+        Map<String, String> extraMeta = new HashMap<>();
+        // hive need timezone info to handle timestamp
+        extraMeta.put("writer.time.zone", ZoneId.systemDefault().toString());
         try (ParquetWriter<Group> writer = ExampleParquetWriter.builder(HadoopOutputFile.fromPath(path, hadoopConf))
+                .withCompressionCodec(codecName)
                 .withConf(hadoopConf)
                 .enableDictionaryEncoding()
                 .withPageSize(1024)
                 .withDictionaryPageSize(512)
                 .withValidation(false)
                 .withWriterVersion(ParquetProperties.WriterVersion.PARQUET_1_0)
+                .withExtraMetaData(extraMeta)
                 .build()) {
-            SimpleGroupFactory f = new SimpleGroupFactory(s);
+            SimpleGroupFactory simpleGroupFactory = new SimpleGroupFactory(s);
             Group group;
             Record record;
-            Column column;
             while ((record = lineReceiver.getFromReader()) != null) {
-                group = f.newGroup();
-                for (int i = 0; i < record.getColumnNumber(); i++) {
-                    column = record.getColumn(i);
-                    String colName = columns.get(i).getString(Key.NAME);
-                    String typename = columns.get(i).getString(Key.TYPE).toUpperCase();
-                    if (null == column || column.getRawData() == null) {
-                        group.append(colName, "");
-                    }
-                    SupportHiveDataType columnType = SupportHiveDataType.valueOf(typename);
-                    switch (columnType) {
-                        case INT:
-                        case INTEGER:
-                            group.append(colName, Integer.valueOf(column.getRawData().toString()));
-                            break;
-                        case LONG:
-                            group.append(colName, column.asLong());
-                            break;
-                        case STRING:
-                            group.append(colName, column.asString());
-                            break;
-                        case DECIMAL:
-                            group.append(colName, decimalToBinary(column.asString()));
-                            break;
-                        case TIMESTAMP:
-                            SimpleDateFormat sdf = new SimpleDateFormat(Constant.DEFAULT_DATE_FORMAT);
-                            group.append(colName, toInt96(sdf.format(column.asDate())));
-                            break;
-                        case DATE:
-                            group.append(colName, (int) Math.round(column.asLong() * 1.0 / 86400000));
-                            break;
-                        default:
-                            group.append(colName, column.asString());
-                            break;
-                    }
-                }
+                group = transportParRecord(record, columns, taskPluginCollector, simpleGroupFactory);
                 writer.write(group);
-//                GenericRecord transportResult = transportParRecord(record, columns, taskPluginCollector, group);
-//                writer.write(transportResult);
             }
-        } catch (ParseException | IOException e) {
+        } catch (IOException e) {
             throw new RuntimeException(e);
         }
-
-//        try (ParquetWriter<GenericRecord> writer = AvroParquetWriter
-//                .<GenericRecord>builder(path)
-//                .withRowGroupSize(ParquetWriter.DEFAULT_BLOCK_SIZE)
-//                .withPageSize(ParquetWriter.DEFAULT_PAGE_SIZE)
-//                .withSchema(schema)
-//                .withConf(hadoopConf)
-//                .withCompressionCodec(codecName)
-//                .withValidation(false)
-//                .withDictionaryEncoding(false)
-//                .withDataModel(decimalSupport)
-//                .withWriterVersion(ParquetProperties.WriterVersion.PARQUET_1_0)
-//                .build()) {
-//            SimpleGroupFactory f = new SimpleGroupFactory(new AvroSchemaConverter().convert(schema));
-//            Record record;
-//            while ((record = lineReceiver.getFromReader()) != null) {
-//                GenericRecordBuilder builder = new GenericRecordBuilder(schema);
-//
-//                GenericRecord transportResult = transportParRecord(record, columns, taskPluginCollector, builder);
-//                writer.write(transportResult);
-//            }
-//        } catch (Exception e) {
-//            LOG.error("IO exception occurred while writing file [{}].", fileName);
-//            deleteDir(path.getParent());
-//            throw AddaxException.asAddaxException(HdfsWriterErrorCode.Write_FILE_IO_ERROR, e);
-//        }
     }
 
-    private Binary decimalToBinary(String bigDecimal) {
+    /**
+     * convert Decimal to {@link Binary} using fix 16 bytes array
+     *
+     * @param bigDecimal the decimal value string want to convert
+     * @return {@link Binary}
+     */
+    private static Binary decimalToBinary(String bigDecimal) {
         BigDecimal myDecimalValue = new BigDecimal(bigDecimal);
 
         //Next we get the decimal value as one BigInteger (like there was no decimal point)
@@ -707,16 +626,6 @@ public class HdfsHelper {
         //Finally we serialize the integer
         byte[] decimalBytes = myUnscaledDecimalValue.toByteArray();
 
-//We need to create an Avro 'Fixed' type and pass the decimal schema once more here:
-//        GenericData.Fixed fixed = new GenericData.Fixed(
-//                new Schema.Parser().parse("required fixed_len_byte_array(12) dec_field (DECIMAL(12,4));"));
-
-        int PRECISION_TO_BYTE_COUNT[] = new int[38];
-        for (int i = 1; i <= 38; i++) {
-            // Estimated number of bytes needed.
-            PRECISION_TO_BYTE_COUNT[i - 1] = (int)
-                    Math.ceil((Math.log(Math.pow(10, i) - 1) / Math.log(2) + 1) / 8);
-        }
         byte[] myDecimalBuffer = new byte[16];
         if (myDecimalBuffer.length >= decimalBytes.length) {
             //Because we set our fixed byte array size as 16 bytes, we need to
@@ -727,24 +636,18 @@ public class HdfsHelper {
                 myDecimalBufferIndex--;
             }
             return Binary.fromConstantByteArray(myDecimalBuffer);
-            //Save result
-//            fixed.bytes(myDecimalBuffer);
         } else {
-            throw new IllegalArgumentException(String.format("Decimal size: %d was greater than the allowed max: %d", decimalBytes.length, myDecimalBuffer.length));
+            throw new IllegalArgumentException(String.format("Decimal size: %d was greater than the allowed max: %d",
+                    decimalBytes.length, myDecimalBuffer.length));
         }
-        //We can finally write our decimal to our record
-
     }
 
-    private MessageType genParquetSchema(List<Configuration> columns) {
-        StringBuilder sb = new StringBuilder();
-        sb.append("message addax {");
+    private MessageType generateParquetSchema(List<Configuration> columns) {
         String type;
         String fieldName;
         Type t;
         Types.MessageTypeBuilder builder = Types.buildMessage();
         Type.Repetition repetition = Type.Repetition.OPTIONAL;
-        List<Type> types = new ArrayList<>();
         for (Configuration column : columns) {
             type = column.getString(Key.TYPE).trim().toUpperCase();
             fieldName = column.getString(Key.NAME);
@@ -753,12 +656,7 @@ public class HdfsHelper {
                     t = Types.primitive(PrimitiveType.PrimitiveTypeName.INT32, repetition).named(fieldName);
                     break;
                 case "DECIMAL":
-//                    int PRECISION_TO_BYTE_COUNT[] = new int[38];
-//                    for (int i = 1; i <= 38; i++) {
-//                        // Estimated number of bytes needed.
-//                        PRECISION_TO_BYTE_COUNT[i - 1] = (int)
-//                                Math.ceil((Math.log(Math.pow(10, i) - 1) / Math.log(2) + 1) / 8);
-//                    }
+                    // use fixed 16 bytes array
                     int prec = column.getInt(Key.PRECISION, Constant.DEFAULT_DECIMAL_MAX_PRECISION);
                     int scale = column.getInt(Key.SCALE, Constant.DEFAULT_DECIMAL_MAX_SCALE);
                     t = Types.primitive(PrimitiveType.PrimitiveTypeName.FIXED_LEN_BYTE_ARRAY, repetition)
@@ -774,72 +672,17 @@ public class HdfsHelper {
                     break;
                 case "DATE":
                     t = Types.primitive(PrimitiveType.PrimitiveTypeName.INT32, repetition).as(LogicalTypeAnnotation.dateType()).named(fieldName);
-//                    sb.append("optional int32 ").append(fieldName).append("(DATE)").append(";");
                     break;
                 case "TIMESTAMP":
                     t = Types.primitive(PrimitiveType.PrimitiveTypeName.INT96, repetition).named(fieldName);
-//                    sb.append("optional int96 ").append(fieldName).append(";");
                     break;
                 default:
                     t = Types.primitive(PrimitiveType.PrimitiveTypeName.valueOf(type), Type.Repetition.OPTIONAL).named(fieldName);
-//                    sb.append(t.toString()).append(fieldName).append(";");
                     break;
             }
             builder.addField(t);
         }
         return builder.named("addax");
-//        return parseMessageType(sb.toString());
-    }
-
-    private Schema generateParquetSchema(List<Configuration> columns) {
-        List<Schema.Field> fields = new ArrayList<>();
-        String fieldName;
-        String type;
-        List<Schema> unionList = new ArrayList<>(2);
-        for (Configuration column : columns) {
-            unionList.clear();
-            fieldName = column.getString(Key.NAME);
-            type = column.getString(Key.TYPE).trim().toUpperCase();
-            unionList.add(Schema.create(Schema.Type.NULL));
-            switch (type) {
-                case "DECIMAL":
-                    Schema dec = LogicalTypes
-                            .decimal(column.getInt(Key.PRECISION, Constant.DEFAULT_DECIMAL_MAX_PRECISION),
-                                    column.getInt(Key.SCALE, Constant.DEFAULT_DECIMAL_MAX_SCALE))
-                            .addToSchema(Schema.createFixed(fieldName, null, null, 16));
-                    unionList.add(dec);
-                    break;
-                case "DATE":
-                    Schema date = LogicalTypes.date().addToSchema(Schema.create(Schema.Type.INT));
-                    unionList.add(date);
-                    break;
-                case "TIMESTAMP":
-//                    Schema ts = LogicalTypes.timestampMillis().addToSchema(Schema.create(Schema.Type.LONG));
-//                    Schema ts = LogicalTypes.timestampMillis().addToSchema(Schema.createFixed("INT96", "INT96 represented as byte[12]",
-//                            null, 12));
-                    MessageType n = Types.buildMessage().required(PrimitiveType.PrimitiveTypeName.INT96).named(fieldName).named(fieldName);
-                    Schema int96schema = Schema.createFixed("INT96", "INT96 represented as byte[12]", null, 12);
-                    unionList.add(int96schema);
-//                    unionList.add(n);
-//                    unionList.add(Schema.createFixed("INT96", "INT96 represented as byte[12]", null, 12));
-                    break;
-                case "UUID":
-                    Schema uuid = LogicalTypes.uuid().addToSchema(Schema.create(Schema.Type.STRING));
-                    unionList.add(uuid);
-                    break;
-                case "BINARY":
-                    unionList.add(Schema.create(Schema.Type.BYTES));
-                    break;
-                default:
-                    // other types
-                    unionList.add(Schema.create(Schema.Type.valueOf(type)));
-                    break;
-            }
-            fields.add(new Schema.Field(fieldName, Schema.createUnion(unionList), null, null));
-        }
-        Schema schema = Schema.createRecord("addax", null, "parquet", false);
-        schema.setFields(fields);
-        return schema;
     }
 
     /**
