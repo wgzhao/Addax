@@ -81,7 +81,7 @@
         <parquet.version>1.10.0</parquet.version>
         <poi.version>5.2.3</poi.version>
         <protobuf.version>3.24.0</protobuf.version>
-        <redis.replicator.version>3.7.0</redis.replicator.version>
+        <redis.replicator.version>3.8.0</redis.replicator.version>
         <slf4j.version>2.0.6</slf4j.version>
         <snappy.version>1.1.10.3</snappy.version>
         <swift.version>1.0.0</swift.version>
