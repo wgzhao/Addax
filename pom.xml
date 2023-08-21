@@ -93,7 +93,7 @@
         <!-- jdbc driver version -->
         <cassandra.jdbc.version>3.11.0</cassandra.jdbc.version>
         <clickhouse.jdbc.version>0.3.2</clickhouse.jdbc.version>
-        <databend.jdbc.version>0.1.0</databend.jdbc.version>
+        <databend.jdbc.version>0.1.1</databend.jdbc.version>
         <hive.jdbc.version>3.1.3</hive.jdbc.version>
         <influxdbClient.version>2.23</influxdbClient.version>
         <hadoop.version>3.2.4</hadoop.version>
