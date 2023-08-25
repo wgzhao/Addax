@@ -127,111 +127,6 @@
         <module>lib/addax-transformer</module>
     </modules>
 
-    <profiles>
-        <profile>
-            <id>basic</id>
-            <modules>
-                <!-- reader -->
-                <module>plugin/reader/datareader</module>
-                <module>plugin/reader/hdfsreader</module>
-                <module>plugin/reader/hivereader</module>
-                <module>plugin/reader/mysqlreader</module>
-                <module>plugin/reader/oraclereader</module>
-                <module>plugin/reader/postgresqlreader</module>
-                <module>plugin/reader/rdbmsreader</module>
-                <module>plugin/reader/sqlitereader</module>
-                <module>plugin/reader/sqlserverreader</module>
-                <module>plugin/reader/streamreader</module>
-                <module>plugin/reader/txtfilereader</module>
-
-                <!-- writer -->
-                <module>plugin/writer/hdfswriter</module>
-                <module>plugin/writer/mysqlwriter</module>
-                <module>plugin/writer/oraclewriter</module>
-                <module>plugin/writer/postgresqlwriter</module>
-                <module>plugin/writer/rdbmswriter</module>
-                <module>plugin/writer/sqlserverwriter</module>
-                <module>plugin/writer/streamwriter</module>
-                <module>plugin/writer/txtfilewriter</module>
-            </modules>
-        </profile>
-
-        <profile>
-            <id>default</id>
-            <activation>
-                <activeByDefault>true</activeByDefault>
-            </activation>
-            <modules>
-                <!-- reader -->
-                <module>plugin/reader/cassandrareader</module>
-                <module>plugin/reader/clickhousereader</module>
-                <module>plugin/reader/databendreader</module>
-                <module>plugin/reader/datareader</module>
-                <module>plugin/reader/dbfreader</module>
-                <module>plugin/reader/elasticsearchreader</module>
-                <module>plugin/reader/excelreader</module>
-                <module>plugin/reader/ftpreader</module>
-                <module>plugin/reader/hbase11xreader</module>
-                <module>plugin/reader/hbase11xsqlreader</module>
-                <module>plugin/reader/hbase20xreader</module>
-                <module>plugin/reader/hbase20xsqlreader</module>
-                <module>plugin/reader/hdfsreader</module>
-                <module>plugin/reader/hivereader</module>
-                <module>plugin/reader/httpreader</module>
-                <module>plugin/reader/influxdbreader</module>
-                <module>plugin/reader/influxdb2reader</module>
-                <module>plugin/reader/kafkareader</module>
-                <module>plugin/reader/kudureader</module>
-                <module>plugin/reader/jsonfilereader</module>
-                <module>plugin/reader/mongodbreader</module>
-                <module>plugin/reader/mysqlreader</module>
-                <module>plugin/reader/oraclereader</module>
-                <module>plugin/reader/postgresqlreader</module>
-                <module>plugin/reader/rdbmsreader</module>
-                <module>plugin/reader/redisreader</module>
-                <module>plugin/reader/s3reader</module>
-                <module>plugin/reader/sqlitereader</module>
-                <module>plugin/reader/sqlserverreader</module>
-                <module>plugin/reader/streamreader</module>
-                <module>plugin/reader/sybasereader</module>
-                <module>plugin/reader/tdenginereader</module>
-                <module>plugin/reader/txtfilereader</module>
-
-                <!-- writer -->
-                <module>plugin/writer/cassandrawriter</module>
-                <module>plugin/writer/clickhousewriter</module>
-                <module>plugin/writer/dbfwriter</module>
-                <module>plugin/writer/databendwriter</module>
-                <module>plugin/writer/doriswriter</module>
-                <module>plugin/writer/elasticsearchwriter</module>
-                <module>plugin/writer/excelwriter</module>
-                <module>plugin/writer/ftpwriter</module>
-                <module>plugin/writer/greenplumwriter</module>
-                <module>plugin/writer/hbase11xsqlwriter</module>
-                <module>plugin/writer/hbase11xwriter</module>
-                <module>plugin/writer/hbase20xsqlwriter</module>
-                <module>plugin/writer/hdfswriter</module>
-                <module>plugin/writer/influxdbwriter</module>
-                <module>plugin/writer/influxdb2writer</module>
-                <module>plugin/writer/kafkawriter</module>
-                <module>plugin/writer/kuduwriter</module>
-                <module>plugin/writer/mongodbwriter</module>
-                <module>plugin/writer/mysqlwriter</module>
-                <module>plugin/writer/oraclewriter</module>
-                <module>plugin/writer/postgresqlwriter</module>
-                <module>plugin/writer/rdbmswriter</module>
-                <module>plugin/writer/rediswriter</module>
-                <module>plugin/writer/s3writer</module>
-                <module>plugin/writer/sqlitewriter</module>
-                <module>plugin/writer/sqlserverwriter</module>
-                <module>plugin/writer/starrockswriter</module>
-                <module>plugin/writer/streamwriter</module>
-                <module>plugin/writer/sybasewriter</module>
-                <module>plugin/writer/tdenginewriter</module>
-                <module>plugin/writer/txtfilewriter</module>
-            </modules>
-        </profile>
-    </profiles>
     <developers>
         <developer>
             <id>wgzhao</id>
@@ -460,4 +355,109 @@
         </plugins>
     </build>
 
+    <profiles>
+        <profile>
+            <id>basic</id>
+            <modules>
+                <!-- reader -->
+                <module>plugin/reader/datareader</module>
+                <module>plugin/reader/hdfsreader</module>
+                <module>plugin/reader/hivereader</module>
+                <module>plugin/reader/mysqlreader</module>
+                <module>plugin/reader/oraclereader</module>
+                <module>plugin/reader/postgresqlreader</module>
+                <module>plugin/reader/rdbmsreader</module>
+                <module>plugin/reader/sqlitereader</module>
+                <module>plugin/reader/sqlserverreader</module>
+                <module>plugin/reader/streamreader</module>
+                <module>plugin/reader/txtfilereader</module>
+
+                <!-- writer -->
+                <module>plugin/writer/hdfswriter</module>
+                <module>plugin/writer/mysqlwriter</module>
+                <module>plugin/writer/oraclewriter</module>
+                <module>plugin/writer/postgresqlwriter</module>
+                <module>plugin/writer/rdbmswriter</module>
+                <module>plugin/writer/sqlserverwriter</module>
+                <module>plugin/writer/streamwriter</module>
+                <module>plugin/writer/txtfilewriter</module>
+            </modules>
+        </profile>
+
+        <profile>
+            <id>default</id>
+            <activation>
+                <activeByDefault>true</activeByDefault>
+            </activation>
+            <modules>
+                <!-- reader -->
+                <module>plugin/reader/cassandrareader</module>
+                <module>plugin/reader/clickhousereader</module>
+                <module>plugin/reader/databendreader</module>
+                <module>plugin/reader/datareader</module>
+                <module>plugin/reader/dbfreader</module>
+                <module>plugin/reader/elasticsearchreader</module>
+                <module>plugin/reader/excelreader</module>
+                <module>plugin/reader/ftpreader</module>
+                <module>plugin/reader/hbase11xreader</module>
+                <module>plugin/reader/hbase11xsqlreader</module>
+                <module>plugin/reader/hbase20xreader</module>
+                <module>plugin/reader/hbase20xsqlreader</module>
+                <module>plugin/reader/hdfsreader</module>
+                <module>plugin/reader/hivereader</module>
+                <module>plugin/reader/httpreader</module>
+                <module>plugin/reader/influxdbreader</module>
+                <module>plugin/reader/influxdb2reader</module>
+                <module>plugin/reader/kafkareader</module>
+                <module>plugin/reader/kudureader</module>
+                <module>plugin/reader/jsonfilereader</module>
+                <module>plugin/reader/mongodbreader</module>
+                <module>plugin/reader/mysqlreader</module>
+                <module>plugin/reader/oraclereader</module>
+                <module>plugin/reader/postgresqlreader</module>
+                <module>plugin/reader/rdbmsreader</module>
+                <module>plugin/reader/redisreader</module>
+                <module>plugin/reader/s3reader</module>
+                <module>plugin/reader/sqlitereader</module>
+                <module>plugin/reader/sqlserverreader</module>
+                <module>plugin/reader/streamreader</module>
+                <module>plugin/reader/sybasereader</module>
+                <module>plugin/reader/tdenginereader</module>
+                <module>plugin/reader/txtfilereader</module>
+
+                <!-- writer -->
+                <module>plugin/writer/cassandrawriter</module>
+                <module>plugin/writer/clickhousewriter</module>
+                <module>plugin/writer/dbfwriter</module>
+                <module>plugin/writer/databendwriter</module>
+                <module>plugin/writer/doriswriter</module>
+                <module>plugin/writer/elasticsearchwriter</module>
+                <module>plugin/writer/excelwriter</module>
+                <module>plugin/writer/ftpwriter</module>
+                <module>plugin/writer/greenplumwriter</module>
+                <module>plugin/writer/hbase11xsqlwriter</module>
+                <module>plugin/writer/hbase11xwriter</module>
+                <module>plugin/writer/hbase20xsqlwriter</module>
+                <module>plugin/writer/hdfswriter</module>
+                <module>plugin/writer/influxdbwriter</module>
+                <module>plugin/writer/influxdb2writer</module>
+                <module>plugin/writer/kafkawriter</module>
+                <module>plugin/writer/kuduwriter</module>
+                <module>plugin/writer/mongodbwriter</module>
+                <module>plugin/writer/mysqlwriter</module>
+                <module>plugin/writer/oraclewriter</module>
+                <module>plugin/writer/postgresqlwriter</module>
+                <module>plugin/writer/rdbmswriter</module>
+                <module>plugin/writer/rediswriter</module>
+                <module>plugin/writer/s3writer</module>
+                <module>plugin/writer/sqlitewriter</module>
+                <module>plugin/writer/sqlserverwriter</module>
+                <module>plugin/writer/starrockswriter</module>
+                <module>plugin/writer/streamwriter</module>
+                <module>plugin/writer/sybasewriter</module>
+                <module>plugin/writer/tdenginewriter</module>
+                <module>plugin/writer/txtfilewriter</module>
+            </modules>
+        </profile>
+    </profiles>
 </project>
