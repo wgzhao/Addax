@@ -2,7 +2,6 @@ package com.wgzhao.addax.plugin.writer.starrockswriter.util;
 
 import com.alibaba.druid.sql.parser.ParserException;
 import com.google.common.base.Strings;
-import com.google.common.collect.ImmutableList;
 import com.wgzhao.addax.common.base.Constant;
 import com.wgzhao.addax.plugin.writer.starrockswriter.StarRocksWriterOptions;
 import com.wgzhao.addax.rdbms.util.DBUtil;
@@ -15,7 +14,6 @@ import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.Statement;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 public final class StarRocksWriterUtil
