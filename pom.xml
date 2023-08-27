@@ -47,7 +47,7 @@
         <fastjson2.version>2.0.39</fastjson2.version>
         <findbugs.version>3.0.1</findbugs.version>
         <guava.version>31.0-jre</guava.version>
-        <groovy.version>3.0.18</groovy.version>
+        <groovy.version>3.0.19</groovy.version>
         <gson.version>2.10.1</gson.version>
         <fluent.hc.version>4.5.14</fluent.hc.version>
         <hadoop.common.version>3.2.4</hadoop.common.version>
