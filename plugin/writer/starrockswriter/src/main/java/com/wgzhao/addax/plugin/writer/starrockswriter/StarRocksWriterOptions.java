@@ -13,8 +13,8 @@ public class StarRocksWriterOptions
         implements Serializable
 {
 
-    private static final long serialVersionUID = 1l;
-    private static final long KILO_BYTES_SCALE = 1024l;
+    private static final long serialVersionUID = 1L;
+    private static final long KILO_BYTES_SCALE = 1024L;
     private static final long MEGA_BYTES_SCALE = KILO_BYTES_SCALE * KILO_BYTES_SCALE;
     private static final long BATCH_BYTES = 90 * MEGA_BYTES_SCALE;
     private static final int MAX_RETRIES = 3;
