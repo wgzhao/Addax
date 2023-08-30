@@ -201,7 +201,8 @@ public final class OriginalConfPretreatmentUtil
                                     "The item column your configured is invalid, because it includes multiply asterisk('*').");
                         }
 
-                        quotedColumns.add(dataBaseType.quoteColumnName(column));
+//                        quotedColumns.add(dataBaseType.quoteColumnName(column));
+                        quotedColumns.add(column);
                     }
 
                     originalConfig.set(Key.COLUMN_LIST, quotedColumns);
