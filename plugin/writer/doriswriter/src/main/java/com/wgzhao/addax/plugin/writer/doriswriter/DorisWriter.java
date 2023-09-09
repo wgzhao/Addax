@@ -36,8 +36,6 @@ public class DorisWriter
 
         private Configuration originalConfig = null;
 
-        private DorisWriterEmitter dorisWriterEmitter;
-
         @Override
         public void init()
         {
@@ -47,7 +45,6 @@ public class DorisWriter
             conn.getNecessaryValue(Key.TABLE, DorisWriterErrorCode.REQUIRED_VALUE);
             conn.getNecessaryValue(Key.ENDPOINT, DorisWriterErrorCode.REQUIRED_VALUE);
             conn.getNecessaryValue(Key.DATABASE, DorisWriterErrorCode.REQUIRED_VALUE);
-             this.dorisWriterEmitter = new DorisWriterEmitter(originalConfig);
         }
 
         @Override
