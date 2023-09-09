@@ -21,6 +21,7 @@ package com.wgzhao.addax.plugin.writer.doriswriter;
 import com.alibaba.fastjson2.JSON;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
+import com.wgzhao.addax.common.base.Key;
 import com.wgzhao.addax.common.exception.AddaxException;
 import com.wgzhao.addax.common.util.Configuration;
 import com.wgzhao.addax.rdbms.util.DBUtilErrorCode;
@@ -70,6 +71,10 @@ public class DorisWriterEmitter
 
     private RequestConfig requestConfig;
 
+    private String database;
+
+    private String table;
+
     public DorisWriterEmitter(final Configuration conf)
     {
         this.conf = conf;
@@ -86,11 +91,15 @@ public class DorisWriterEmitter
     // get target host from config
     private void initHostList()
     {
-        List<String> hosts = conf.getList(DorisKey.ENDPOINT, String.class);
-        if (hosts == null || hosts.isEmpty()) {
+        List<Object> connList = conf.getList(Key.CONNECTION);
+        Configuration conn = Configuration.from(connList.get(0).toString());
+        targetHosts = conn.getList(DorisKey.ENDPOINT, String.class);
+        if (targetHosts == null || targetHosts.isEmpty()) {
             throw AddaxException.asAddaxException(DBUtilErrorCode.CONF_ERROR,
                     " Endpoint must be set");
         }
+        this.database = conn.getString(DorisKey.DATABASE);
+        this.table = conn.getString(DorisKey.TABLE);
     }
 
     public String urlDecode(String outBuffer) {
@@ -113,8 +122,6 @@ public class DorisWriterEmitter
     {
         long start = System.currentTimeMillis();
         final String host = this.getAvailableHost();
-        final String database = conf.getString(DorisKey.DATABASE);
-        final String table = conf.getString(DorisKey.TABLE);
         if (null == host) {
             throw new IOException("None of the load url can be connected.");
         }
@@ -229,7 +236,7 @@ public class DorisWriterEmitter
             httpPut.setHeader("line_delimiter", conf.getString(DorisKey.LINE_DELIMITER, "\n"));
 
             if ("csv".equalsIgnoreCase(format)) {
-                httpPut.setHeader("column_separator", conf.getString(DorisKey.FIELD_DELIMITER, ","));
+                httpPut.setHeader("column_separator", conf.getString(DorisKey.FIELD_DELIMITER, "|"));
             }
             else {
                 httpPut.setHeader("read_json_by_line", "true");
