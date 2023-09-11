@@ -206,7 +206,7 @@ public class DorisWriterTask {
                     return new HttpGet(uri);
                 } else {
                     int status = response.getStatusLine().getStatusCode();
-                    return (HttpUriRequest) (status == 307 ? RequestBuilder.copy(request).setUri(uri).build() : new HttpGet(uri));
+                    return status == 307 ? RequestBuilder.copy(request).setUri(uri).build() : new HttpGet(uri);
                 }
             }
         });
@@ -225,14 +225,14 @@ public class DorisWriterTask {
                     httpPut.setHeader(entry.getKey(), String.valueOf(entry.getValue()));
                 }
             }
-            String format = configuration.getString(DorisKey.FORMAT, "csv");
+            String format = configuration.getString(DorisKey.FORMAT, DEFAULT_FORMAT);
             // set other required headers
             httpPut.setHeader(HttpHeaders.EXPECT, "100-continue");
             httpPut.setHeader(HttpHeaders.AUTHORIZATION,
                     this.getBasicAuthHeader(configuration.getString(DorisKey.USERNAME), configuration.getString(DorisKey.PASSWORD)));
             httpPut.setHeader("label", flushBatch.getLabel());
             httpPut.setHeader("format", format);
-            httpPut.setHeader("line_delimiter", configuration.getString(DorisKey.LINE_DELIMITER, "\n"));
+            httpPut.setHeader("line_delimiter", configuration.getString(DorisKey.LINE_DELIMITER, DEFAULT_LINE_DELIMITER));
 
             if ("csv".equalsIgnoreCase(format)) {
                 httpPut.setHeader("column_separator", configuration.getString(DorisKey.FIELD_DELIMITER, DEFAULT_SEPARATOR));
@@ -275,7 +275,7 @@ public class DorisWriterTask {
     /**
      * loop to get target host
      *
-     * @return
+     * @return the available endpoint
      */
     private String getAvailableEndpoint() {
         List<Object> connList = configuration.getList(Key.CONNECTION);
