@@ -33,6 +33,7 @@
         <avro.version>1.11.2</avro.version>
         <commons.beanutils.version>1.9.4</commons.beanutils.version>
         <commons.configuration.version>1.10</commons.configuration.version>
+        <commons.configuration2.version>2.9.0</commons.configuration2.version>
         <commons.collections.version>4.4</commons.collections.version>
         <commons.codec.version>1.15</commons.codec.version>
         <commons.compress.version>1.24.0</commons.compress.version>
@@ -72,7 +73,7 @@
         <kafka.version>3.2.3</kafka.version>
         <kryo.version>5.5.0</kryo.version>
         <kudu.version>1.16.0</kudu.version>
-        <libthrift.version>0.19.0</libthrift.version>
+        <libthrift.version>0.13.0</libthrift.version>
         <mapreduce.version>3.2.1</mapreduce.version>
         <mockito.version>2.0.2-beta</mockito.version>
         <netty-buffer.version>4.1.93.Final</netty-buffer.version>
