@@ -1847,6 +1847,27 @@ source ==&gt; fr ==&gt; target</code></pre>
 <span class="w">        </span><span class="s">&quot; record.setColumn(1, new StringColumn(newValue));\n&quot;</span><span class="o">+</span>
 <span class="w">        </span><span class="s">&quot; return record;&quot;</span><span class="p">;</span>
 </code></pre></div>
+<p>从  <code>4.1.2</code> 版本开始， <code>dx_groovy</code> 支持从外部文件加载 groovy 代码，读取文件的相对路径为 <code>$ADDAX_HOME</code> 变量所在的目录，也就是 Addax 的安装目录。</p>
+<p>以实现 <code>subStr</code> 为例，我们可以创建 <code>job/substr.groovy</code> 文件，内容如下：</p>
+<div class="highlight"><pre><span></span><code><span class="n">Column</span><span class="w"> </span><span class="n">column</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">record</span><span class="o">.</span><span class="na">getColumn</span><span class="o">(</span><span class="mi">1</span><span class="o">)</span>
+<span class="n">String</span><span class="w"> </span><span class="n">oriValue</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">column</span><span class="o">.</span><span class="na">asString</span><span class="o">()</span>
+<span class="n">String</span><span class="w"> </span><span class="n">newValue</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">oriValue</span><span class="o">.</span><span class="na">substring</span><span class="o">(</span><span class="mi">0</span><span class="o">,</span><span class="w"> </span><span class="mi">3</span><span class="o">)</span>
+<span class="n">record</span><span class="o">.</span><span class="na">setColumn</span><span class="o">(</span><span class="mi">1</span><span class="o">,</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">StringColumn</span><span class="o">(</span><span class="n">newValue</span><span class="o">))</span>
+<span class="k">return</span><span class="w"> </span><span class="n">record</span>
+</code></pre></div>
+<p>然后在 <code>job</code> 文件中这样去定义：</p>
+<div class="highlight"><pre><span></span><code><span class="p">{</span>
+<span class="w">  </span><span class="nt">&quot;transformer&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span>
+<span class="w">    </span><span class="p">{</span>
+<span class="w">      </span><span class="nt">&quot;name&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;dx_groovy&quot;</span><span class="p">,</span>
+<span class="w">      </span><span class="nt">&quot;parameter&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="nt">&quot;codeFile&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;job/substr.groovy&quot;</span>
+<span class="w">      </span><span class="p">}</span>
+<span class="w">    </span><span class="p">}</span>
+<span class="w">  </span><span class="p">]</span>
+<span class="p">}</span>
+</code></pre></div>
+<p>文件也可以使用绝对路径来指定。</p>
 <h2 id="job">Job定义<a class="headerlink" href="#job" title="Permanent link">&para;</a></h2>
 <p>本例中，配置4个UDF。</p>
 <div class="highlight"><pre><span></span><code><span class="p">{</span>

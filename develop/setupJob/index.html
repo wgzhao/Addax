@@ -1801,7 +1801,8 @@
 <h3 id="speedrecord"><code>speed.record</code><a class="headerlink" href="#speedrecord" title="Permanent link">&para;</a></h3>
 <p>设置记录每秒可获取的最大记录条数，该参数需要和 <code>speed.byte</code> 配合使用</p>
 <h3 id="speedchannel"><code>speed.channel</code><a class="headerlink" href="#speedchannel" title="Permanent link">&para;</a></h3>
-<p>设置通道数，该通道路确定了每个任务的线程数，目前一个channel对应5个线程，比如设置 <code>channel</code> 为 3， 则有 <code>3 * 5 + 1 = 16</code> 个线程，其中一个线程为统计线程。</p>
+<p>设置通道数，该通道路确定了总的 Task 线程数，假定设定 <code>speed.channel</code> 为 13， 则一共有 13 个 Task.
+然后根据 <code>conf/core.json</code> 配置中的 <code>taskGroup.channel</code> 配置来确定要创建的 taskGroup 数量。即 <code>taskGroup = speed.channel / taskGroup.channel</code>.</p>
 <h2 id="errorlimit"><code>errorLimit</code><a class="headerlink" href="#errorlimit" title="Permanent link">&para;</a></h2>
 <p><code>errorLimit</code> 用来配置在数据写入报错时的行为，具体如下</p>
 <h3 id="errorlimitrecord"><code>errorLimit.record</code><a class="headerlink" href="#errorlimitrecord" title="Permanent link">&para;</a></h3>
