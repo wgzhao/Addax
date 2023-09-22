@@ -31,7 +31,6 @@
             <scope>runtime</scope>
             <excludes>
                 <exclude>com.wgzhao.addax:*</exclude>
-                <exclude>org.apache.commons:*</exclude>
             </excludes>
         </dependencySet>
     </dependencySets>
