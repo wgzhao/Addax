@@ -13,7 +13,7 @@
 
     <properties>
         <hadoop.version>2.7.5</hadoop.version>
-        <hive.jdbc.version>2.1.1</hive.jdbc.version>
+        <hive.jdbc.version>2.3.4</hive.jdbc.version>
         <curator.version>4.2.0</curator.version>
     </properties>
 
