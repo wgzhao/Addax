@@ -108,7 +108,8 @@
 
 ### `speed.channel`
 
-设置通道数，该通道路确定了每个任务的线程数，目前一个channel对应5个线程，比如设置 `channel` 为 3， 则有 `3 * 5 + 1 = 16` 个线程，其中一个线程为统计线程。
+设置通道数，该通道路确定了总的 Task 线程数，假定设定 `speed.channel` 为 13， 则一共有 13 个 Task.
+然后根据 `conf/core.json` 配置中的 `taskGroup.channel` 配置来确定要创建的 taskGroup 数量。即 `taskGroup = speed.channel / taskGroup.channel`.
 
 ## `errorLimit`
 
