@@ -61,6 +61,9 @@ Addax 支持超过 20 种[关系型和非关系型数据库](support_data_source
 <td><img src="./docs/images/logos/tdengine.svg" height="50px" alt="TDengine"  style="border: 1px solid #ddd;"></td>   
 <td><img src="./docs/images/logos/trino.svg" height="50px" alt="Trino" style="border: 1px solid #ddd;"></td>  
 </tr>
+<tr>
+<td><img src="./docs/images/logos/access.svg" height="50px" alt="Access" style="border: 1px solid #add;"></td>
+</tr>
 </table>
 
 ## 快速开始
