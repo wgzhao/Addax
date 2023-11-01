@@ -1,0 +1,21 @@
+{
+  "name": "accessreader",
+  "parameter": {
+    "username": "root",
+    "password": "root",
+    "column": [
+      "*"
+    ],
+    "connection": [
+      {
+        "table": [
+          "addax_reader"
+        ],
+        "jdbcUrl": [
+          "jdbc:ucanaccess://<mdb or accdb file path>"
+        ]
+      }
+    ],
+    "where": ""
+  }
+}

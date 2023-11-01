@@ -127,6 +127,7 @@
         <module>lib/addax-rdbms</module>
         <module>lib/addax-storage</module>
         <module>lib/addax-transformer</module>
+        <module>plugin/reader/accessreader</module>
     </modules>
 
     <developers>
