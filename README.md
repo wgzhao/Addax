@@ -63,6 +63,9 @@ Addax supports more than 20 SQL and NoSQL [data sources](support_data_sources.md
 <td><img src="./docs/images/logos/tdengine.svg" height="50px" alt="TDengine"  style="border: 1px solid #ddd;"></td>   
 <td><img src="./docs/images/logos/trino.svg" height="50px" alt="Trino" style="border: 1px solid #ddd;"></td>  
 </tr>
+<tr>
+<td><img src="./docs/images/logos/access.svg" height="50px" alt="Access" style="border: 1px solid #add;"></td>
+</tr>
 </table>
 
 ## Getting Started
