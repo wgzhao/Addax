@@ -12,20 +12,20 @@
         <meta name="author" content="Steven Zhao">
       
       
-        <link rel="canonical" href="https://wgzhao.github.io/Addax/develop/reader/clickhousereader/">
+        <link rel="canonical" href="https://wgzhao.github.io/Addax/develop/reader/accessreader/">
       
       
-        <link rel="prev" href="../cassandrareader/">
+        <link rel="prev" href="../../setupJob/">
       
       
-        <link rel="next" href="../databendreader/">
+        <link rel="next" href="../cassandrareader/">
       
       <link rel="icon" href="../../images/favicon.ico">
       <meta name="generator" content="mkdocs-1.4.3, mkdocs-material-9.1.15">
     
     
       
-        <title>ClickHouse Reader - Addax Documentation</title>
+        <title>Access Reader - Addax Documentation</title>
       
     
     
@@ -89,7 +89,7 @@
     <div data-md-component="skip">
       
         
-        <a href="#clickhouse-reader" class="md-skip">
+        <a href="#access-reader" class="md-skip">
           跳转至
         </a>
       
@@ -127,7 +127,7 @@
         <div class="md-header__topic" data-md-component="header-topic">
           <span class="md-ellipsis">
             
-              ClickHouse Reader
+              Access Reader
             
           </span>
         </div>
@@ -410,34 +410,6 @@
               
   
   
-  
-    <li class="md-nav__item">
-      <a href="../accessreader/" class="md-nav__link">
-        Access Reader
-      </a>
-    </li>
-  
-
-            
-          
-            
-              
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../cassandrareader/" class="md-nav__link">
-        Cassandra Reader
-      </a>
-    </li>
-  
-
-            
-          
-            
-              
-  
-  
     
   
   
@@ -450,12 +422,12 @@
       
       
         <label class="md-nav__link md-nav__link--active" for="__toc">
-          ClickHouse Reader
+          Access Reader
           <span class="md-nav__icon md-icon"></span>
         </label>
       
       <a href="./" class="md-nav__link md-nav__link--active">
-        ClickHouse Reader
+        Access Reader
       </a>
       
         
@@ -483,26 +455,6 @@
         
           <li class="md-nav__item">
   <a href="#_2" class="md-nav__link">
-    表结构及数据信息
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#json" class="md-nav__link">
-    配置 json 文件
-  </a>
-  
-    <nav class="md-nav" aria-label="配置 json 文件">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#_3" class="md-nav__link">
     执行采集命令
   </a>
   
@@ -514,22 +466,8 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#_4" class="md-nav__link">
+  <a href="#_3" class="md-nav__link">
     参数说明
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#_5" class="md-nav__link">
-    支持的数据类型
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#_6" class="md-nav__link">
-    限制
   </a>
   
 </li>
@@ -538,6 +476,34 @@
   
 </nav>
       
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../cassandrareader/" class="md-nav__link">
+        Cassandra Reader
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../clickhousereader/" class="md-nav__link">
+        ClickHouse Reader
+      </a>
     </li>
   
 
@@ -1627,26 +1593,6 @@
         
           <li class="md-nav__item">
   <a href="#_2" class="md-nav__link">
-    表结构及数据信息
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#json" class="md-nav__link">
-    配置 json 文件
-  </a>
-  
-    <nav class="md-nav" aria-label="配置 json 文件">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#_3" class="md-nav__link">
     执行采集命令
   </a>
   
@@ -1658,22 +1604,8 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#_4" class="md-nav__link">
+  <a href="#_3" class="md-nav__link">
     参数说明
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#_5" class="md-nav__link">
-    支持的数据类型
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#_6" class="md-nav__link">
-    限制
   </a>
   
 </li>
@@ -1693,277 +1625,63 @@
                   
 
 
-<h1 id="clickhouse-reader">ClickHouse Reader<a class="headerlink" href="#clickhouse-reader" title="Permanent link">&para;</a></h1>
-<p><code>ClickHouseReader</code> 插件支持从 <a href="https://clickhouse.tech">ClickHouse</a>数据库读取数据。</p>
+<h1 id="access-reader">Access Reader<a class="headerlink" href="#access-reader" title="Permanent link">&para;</a></h1>
+<p>AccessReader 实现了从 <a href="https://en.wikipedia.org/wiki/Microsoft_Access">Access</a> 数据库上读取数据的能力，他基于 <a href="../rdbmsreader">Addax RDBMS Reader</a> 实现。</p>
 <h2 id="_1">示例<a class="headerlink" href="#_1" title="Permanent link">&para;</a></h2>
-<h3 id="_2">表结构及数据信息<a class="headerlink" href="#_2" title="Permanent link">&para;</a></h3>
-<p>假定需要的读取的表的结构以及数据如下：</p>
-<div class="highlight"><pre><span></span><code><span class="k">CREATE</span><span class="w"> </span><span class="k">TABLE</span><span class="w"> </span><span class="n">ck_addax</span><span class="w"> </span><span class="p">(</span>
-<span class="w">    </span><span class="n">c_int8</span><span class="w"> </span><span class="nb">Int8</span><span class="p">,</span>
-<span class="w">    </span><span class="n">c_int16</span><span class="w"> </span><span class="n">Int16</span><span class="p">,</span>
-<span class="w">    </span><span class="n">c_int32</span><span class="w"> </span><span class="n">Int32</span><span class="p">,</span>
-<span class="w">    </span><span class="n">c_int64</span><span class="w"> </span><span class="n">Int64</span><span class="p">,</span>
-<span class="w">    </span><span class="n">c_uint8</span><span class="w"> </span><span class="n">UInt8</span><span class="p">,</span>
-<span class="w">    </span><span class="n">c_uint16</span><span class="w"> </span><span class="n">UInt16</span><span class="p">,</span>
-<span class="w">    </span><span class="n">c_uint32</span><span class="w"> </span><span class="n">UInt32</span><span class="p">,</span>
-<span class="w">    </span><span class="n">c_uint64</span><span class="w"> </span><span class="n">UInt64</span><span class="p">,</span>
-<span class="w">    </span><span class="n">c_float32</span><span class="w"> </span><span class="n">Float32</span><span class="p">,</span>
-<span class="w">    </span><span class="n">c_float64</span><span class="w"> </span><span class="n">Float64</span><span class="p">,</span>
-<span class="w">    </span><span class="n">c_decimal</span><span class="w"> </span><span class="nb">Decimal</span><span class="p">(</span><span class="mi">38</span><span class="p">,</span><span class="mi">10</span><span class="p">),</span>
-<span class="w">    </span><span class="n">c_string</span><span class="w"> </span><span class="n">String</span><span class="p">,</span>
-<span class="w">    </span><span class="n">c_fixstr</span><span class="w"> </span><span class="n">FixedString</span><span class="p">(</span><span class="mi">36</span><span class="p">),</span>
-<span class="w">    </span><span class="n">c_uuid</span><span class="w"> </span><span class="n">UUID</span><span class="p">,</span>
-<span class="w">    </span><span class="n">c_date</span><span class="w"> </span><span class="nb">Date</span><span class="p">,</span>
-<span class="w">    </span><span class="n">c_datetime</span><span class="w"> </span><span class="n">DateTime</span><span class="p">(</span><span class="s1">&#39;Asia/Chongqing&#39;</span><span class="p">),</span>
-<span class="w">    </span><span class="n">c_datetime64</span><span class="w"> </span><span class="n">DateTime64</span><span class="p">(</span><span class="mi">3</span><span class="p">,</span><span class="w"> </span><span class="s1">&#39;Asia/Chongqing&#39;</span><span class="p">),</span>
-<span class="w">    </span><span class="n">c_enum</span><span class="w"> </span><span class="n">Enum</span><span class="p">(</span><span class="s1">&#39;hello&#39;</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="s1">&#39;world&#39;</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
-<span class="p">)</span><span class="w"> </span><span class="n">ENGINE</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">MergeTree</span><span class="p">()</span><span class="w"> </span><span class="k">ORDER</span><span class="w"> </span><span class="k">BY</span><span class="w"> </span><span class="p">(</span><span class="n">c_int8</span><span class="p">,</span><span class="w"> </span><span class="n">c_int16</span><span class="p">)</span><span class="w"> </span><span class="n">SETTINGS</span><span class="w"> </span><span class="n">index_granularity</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">8192</span><span class="p">;</span>
-
-<span class="k">insert</span><span class="w"> </span><span class="k">into</span><span class="w"> </span><span class="n">ck_addax</span><span class="w"> </span><span class="k">values</span><span class="p">(</span>
-<span class="w">    </span><span class="mi">127</span><span class="p">,</span>
-<span class="w">    </span><span class="o">-</span><span class="mi">32768</span><span class="p">,</span>
-<span class="w">    </span><span class="mi">2147483647</span><span class="p">,</span>
-<span class="w">    </span><span class="o">-</span><span class="mi">9223372036854775808</span><span class="p">,</span>
-<span class="w">    </span><span class="mi">255</span><span class="p">,</span>
-<span class="w">    </span><span class="mi">65535</span><span class="p">,</span>
-<span class="w">    </span><span class="mi">4294967295</span><span class="p">,</span>
-<span class="w">    </span><span class="mi">18446744073709551615</span><span class="p">,</span>
-<span class="w">    </span><span class="mi">0</span><span class="p">.</span><span class="mi">999999999999</span><span class="p">,</span>
-<span class="w">    </span><span class="mi">0</span><span class="p">.</span><span class="mi">99999999999999999</span><span class="p">,</span>
-<span class="w">    </span><span class="mi">1234567891234567891234567891</span><span class="p">.</span><span class="mi">1234567891</span><span class="p">,</span>
-<span class="w">    </span><span class="s1">&#39;Hello String&#39;</span><span class="p">,</span>
-<span class="w">    </span><span class="s1">&#39;2c:16:db:a3:3a:4f&#39;</span><span class="p">,</span>
-<span class="w">    </span><span class="s1">&#39;5F042A36-5B0C-4F71-ADFD-4DF4FCA1B863&#39;</span><span class="p">,</span>
-<span class="w">    </span><span class="s1">&#39;2021-01-01&#39;</span><span class="p">,</span>
-<span class="w">    </span><span class="s1">&#39;2021-01-01 11:22:33&#39;</span><span class="p">,</span>
-<span class="w">    </span><span class="s1">&#39;2021-01-01 10:33:23.123&#39;</span><span class="p">,</span>
-<span class="w">    </span><span class="s1">&#39;hello&#39;</span>
-<span class="p">);</span>
-</code></pre></div>
-<h2 id="json">配置 json 文件<a class="headerlink" href="#json" title="Permanent link">&para;</a></h2>
-<p>下面的配置文件表示从 ClickHouse 数据库读取指定的表数据并打印到终端</p>
-<div class="tabbed-set" data-tabs="1:1"><input checked="checked" id="__tabbed_1_1" name="__tabbed_1" type="radio" /><label for="__tabbed_1_1">job/clickhouse2stream.json</label><div class="tabbed-content"></div>
+<p>我们下载用于测试用的 <a href="http://www.databasedev.co.uk/downloads/AccessThemeDemo.zip">Acess Demo</a> 文件，解药后得到 <code>AccessThemeDemo.mdb</code> 文件，该文件中包含了一个 <code>tbl_Users</code> 表，我们将该表的数据同步到终端上。</p>
+<p>下面的配置是读取该表到终端的作业:</p>
+<div class="tabbed-set" data-tabs="1:1"><input checked="checked" id="__tabbed_1_1" name="__tabbed_1" type="radio" /><label for="__tabbed_1_1">job/access2stream.json</label><div class="tabbed-content"></div>
 </div>
-<div class="highlight"><pre><span></span><code><span class="p">{</span>
-<span class="w">  </span><span class="nt">&quot;job&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
-<span class="w">    </span><span class="nt">&quot;setting&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
-<span class="w">      </span><span class="nt">&quot;speed&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
-<span class="w">        </span><span class="nt">&quot;channel&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">1</span><span class="p">,</span>
-<span class="w">        </span><span class="nt">&quot;bytes&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">-1</span>
-<span class="w">      </span><span class="p">},</span>
-<span class="w">      </span><span class="nt">&quot;errorLimit&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
-<span class="w">        </span><span class="nt">&quot;record&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">0</span><span class="p">,</span>
-<span class="w">        </span><span class="nt">&quot;percentage&quot;</span><span class="p">:</span><span class="w"> </span><span class="mf">0.02</span>
-<span class="w">      </span><span class="p">}</span>
-<span class="w">    </span><span class="p">},</span>
-<span class="w">    </span><span class="nt">&quot;content&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
-<span class="w">      </span><span class="nt">&quot;reader&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
-<span class="w">        </span><span class="nt">&quot;name&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;clickhousereader&quot;</span><span class="p">,</span>
-<span class="w">        </span><span class="nt">&quot;parameter&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
-<span class="w">          </span><span class="nt">&quot;username&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;root&quot;</span><span class="p">,</span>
-<span class="w">          </span><span class="nt">&quot;password&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;root&quot;</span><span class="p">,</span>
-<span class="w">          </span><span class="nt">&quot;column&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span>
-<span class="w">            </span><span class="s2">&quot;*&quot;</span>
-<span class="w">          </span><span class="p">],</span>
-<span class="w">          </span><span class="nt">&quot;connection&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span>
-<span class="w">            </span><span class="p">{</span>
-<span class="w">              </span><span class="nt">&quot;table&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span>
-<span class="w">                </span><span class="s2">&quot;ck_addax&quot;</span>
-<span class="w">              </span><span class="p">],</span>
-<span class="w">              </span><span class="nt">&quot;jdbcUrl&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span>
-<span class="w">                </span><span class="s2">&quot;jdbc:clickhouse://127.0.0.1:8123/default&quot;</span>
-<span class="w">              </span><span class="p">]</span>
+<div class="highlight"><pre><span></span><code><span class="w">    </span><span class="p">{</span>
+<span class="w">      </span><span class="nt">&quot;job&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="nt">&quot;setting&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<span class="w">          </span><span class="nt">&quot;speed&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<span class="w">            </span><span class="nt">&quot;byte&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">-1</span><span class="p">,</span>
+<span class="w">            </span><span class="nt">&quot;channel&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">1</span>
+<span class="w">          </span><span class="p">}</span>
+<span class="w">        </span><span class="p">},</span>
+<span class="w">        </span><span class="nt">&quot;content&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span>
+<span class="w">          </span><span class="p">{</span>
+<span class="w">            </span><span class="nt">&quot;reader&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<span class="w">              </span><span class="nt">&quot;name&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;accessreader&quot;</span><span class="p">,</span>
+<span class="w">              </span><span class="nt">&quot;parameter&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<span class="w">                </span><span class="nt">&quot;username&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;root&quot;</span><span class="p">,</span>
+<span class="w">                </span><span class="nt">&quot;password&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;&quot;</span><span class="p">,</span>
+<span class="w">                </span><span class="nt">&quot;column&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span>
+<span class="w">                  </span><span class="s2">&quot;*&quot;</span>
+<span class="w">                </span><span class="p">],</span>
+<span class="w">                </span><span class="nt">&quot;connection&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span>
+<span class="w">                  </span><span class="p">{</span>
+<span class="w">                    </span><span class="nt">&quot;table&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span>
+<span class="w">                      </span><span class="s2">&quot;tbl_Users&quot;</span>
+<span class="w">                    </span><span class="p">],</span>
+<span class="w">                    </span><span class="nt">&quot;jdbcUrl&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span>
+<span class="w">                      </span><span class="s2">&quot;jdbc:ucanaccess:///Users/wgzhao/Downloads/AccessThemeDemo.mdb&quot;</span>
+<span class="w">                    </span><span class="p">]</span>
+<span class="w">                  </span><span class="p">}</span>
+<span class="w">                </span><span class="p">],</span>
+<span class="w">                </span><span class="nt">&quot;where&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;&quot;</span>
+<span class="w">              </span><span class="p">}</span>
+<span class="w">            </span><span class="p">},</span>
+<span class="w">            </span><span class="nt">&quot;writer&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<span class="w">              </span><span class="nt">&quot;name&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;streamwriter&quot;</span><span class="p">,</span>
+<span class="w">              </span><span class="nt">&quot;parameter&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<span class="w">                </span><span class="nt">&quot;encoding&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;utf-8&quot;</span><span class="p">,</span>
+<span class="w">                </span><span class="nt">&quot;print&quot;</span><span class="p">:</span><span class="w"> </span><span class="kc">true</span>
+<span class="w">              </span><span class="p">}</span>
 <span class="w">            </span><span class="p">}</span>
-<span class="w">          </span><span class="p">]</span>
-<span class="w">        </span><span class="p">}</span>
-<span class="w">      </span><span class="p">},</span>
-<span class="w">      </span><span class="nt">&quot;writer&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
-<span class="w">        </span><span class="nt">&quot;name&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;streamwriter&quot;</span><span class="p">,</span>
-<span class="w">        </span><span class="nt">&quot;parameter&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
-<span class="w">          </span><span class="nt">&quot;print&quot;</span><span class="p">:</span><span class="w"> </span><span class="kc">true</span>
-<span class="w">        </span><span class="p">}</span>
+<span class="w">          </span><span class="p">}</span>
+<span class="w">        </span><span class="p">]</span>
 <span class="w">      </span><span class="p">}</span>
 <span class="w">    </span><span class="p">}</span>
-<span class="w">  </span><span class="p">}</span>
-<span class="p">}</span>
 </code></pre></div>
-<p>将上述配置文件保存为 <code>job/clickhouse2stream.json</code></p>
-<h3 id="_3">执行采集命令<a class="headerlink" href="#_3" title="Permanent link">&para;</a></h3>
+<p>将上述配置文件保存为   <code>job/access2stream.json</code></p>
+<h3 id="_2">执行采集命令<a class="headerlink" href="#_2" title="Permanent link">&para;</a></h3>
 <p>执行以下命令进行数据采集</p>
-<div class="highlight"><pre><span></span><code>bin/addax.sh<span class="w"> </span>job/clickhouse2stream.json
+<div class="highlight"><pre><span></span><code>bin/addax.sh<span class="w"> </span>job/access2stream.json
 </code></pre></div>
-<p>其输出信息如下（删除了非关键信息)</p>
-<div class="highlight"><pre><span></span><code>021-01-06 14:39:35.742 [main] INFO  VMInfo - VMInfo# operatingSystem class =&gt; com.sun.management.internal.OperatingSystemImpl
-
-2021-01-06 14:39:35.767 [main] INFO  Engine -
-{
-    &quot;content&quot;:
-        {
-            &quot;reader&quot;:{
-                &quot;parameter&quot;:{
-                    &quot;column&quot;:[
-                        &quot;*&quot;
-                    ],
-                    &quot;connection&quot;:[
-                        {
-                            &quot;jdbcUrl&quot;:[
-                                &quot;jdbc:clickhouse://127.0.0.1:8123/&quot;
-                            ],
-                            &quot;table&quot;:[
-                                &quot;ck_addax&quot;
-                            ]
-                        }
-                    ],
-                    &quot;username&quot;:&quot;default&quot;
-                },
-                &quot;name&quot;:&quot;clickhousereader&quot;
-            },
-            &quot;writer&quot;:{
-                &quot;parameter&quot;:{
-                    &quot;print&quot;:true
-                },
-                &quot;name&quot;:&quot;streamwriter&quot;
-            }
-    },
-    &quot;setting&quot;:{
-        &quot;errorLimit&quot;:{
-            &quot;record&quot;:0,
-            &quot;percentage&quot;:0.02
-        },
-        &quot;speed&quot;:{
-            &quot;channel&quot;:3
-        }
-    }
-}
-
-127 -32768  2147483647  -9223372036854775808    255 65535   4294967295  18446744073709551615    1   1   1234567891234567891234567891.1234567891Hello String 2c:16:db:a3:3a:4f   
-5f042a36-5b0c-4f71-adfd-4df4fca1b863    2021-01-01  2021-01-01 00:00:00 2021-01-01 00:00:00 hello
-
-任务启动时刻                    : 2021-01-06 14:39:35
-任务结束时刻                    : 2021-01-06 14:39:39
-任务总计耗时                    :                  3s
-任务平均流量                    :               77B/s
-记录写入速度                    :              0rec/s
-读出记录总数                    :                   1
-读写失败总数                    :                   0
-</code></pre></div>
-<h2 id="_4">参数说明<a class="headerlink" href="#_4" title="Permanent link">&para;</a></h2>
-<p><code>parameter</code> 配置项支持以下配置</p>
-<table>
-<thead>
-<tr>
-<th align="left">配置项</th>
-<th align="center">是否必须</th>
-<th>类型</th>
-<th>默认值</th>
-<th>描述</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td align="left">jdbcUrl</td>
-<td align="center">是</td>
-<td>array</td>
-<td>无</td>
-<td>ClickHouse JDBC 连接信息 ,可按照官方规范填写连接附件控制信息。具体请参看<a href="https://github.com/yandex/clickhouse-jdbc">官方文档</a></td>
-</tr>
-<tr>
-<td align="left">username</td>
-<td align="center">是</td>
-<td>string</td>
-<td>无</td>
-<td>数据源的用户名</td>
-</tr>
-<tr>
-<td align="left">password</td>
-<td align="center">否</td>
-<td>string</td>
-<td>无</td>
-<td>数据源指定用户名的密码</td>
-</tr>
-<tr>
-<td align="left">table</td>
-<td align="center">是</td>
-<td>array</td>
-<td>无</td>
-<td>所选取的需要同步的表 ,当配置为多张表时，用户自己需保证多张表是同一 schema 结构</td>
-</tr>
-<tr>
-<td align="left">column</td>
-<td align="center">是</td>
-<td>array</td>
-<td>无</td>
-<td>所配置的表中需要同步的列名集合, 使用 JSON 的数组描述字段信息。用户使用 <code>*</code> 代表默认使用所有列配置，例如 <code>["*"]</code></td>
-</tr>
-<tr>
-<td align="left">splitPk</td>
-<td align="center">否</td>
-<td>string</td>
-<td>无</td>
-<td>希望使用 splitPk 代表的字段进行数据分片,Addax 因此会启动并发任务进行数据同步，这样可以大大提供数据同步的效能</td>
-</tr>
-<tr>
-<td align="left">autoPk</td>
-<td align="center">否</td>
-<td>bool</td>
-<td>false</td>
-<td>是否自动猜测分片主键，<code>3.2.6</code> 版本引入</td>
-</tr>
-<tr>
-<td align="left">where</td>
-<td align="center">否</td>
-<td>string</td>
-<td>无</td>
-<td>筛选条件</td>
-</tr>
-<tr>
-<td align="left">querySql</td>
-<td align="center">否</td>
-<td>array</td>
-<td>无</td>
-<td>使用 SQL 查询而不是直接指定表的方式读取数据，当用户配置 querySql 时，ClickHouseReader 直接忽略 table、column、where 条件的配置</td>
-</tr>
-</tbody>
-</table>
-<h2 id="_5">支持的数据类型<a class="headerlink" href="#_5" title="Permanent link">&para;</a></h2>
-<p>目前 ClickHouseReader 支持大部分 ClickHouse 类型，但也存在部分个别类型没有支持的情况，请注意检查你的类型。</p>
-<p>下面列出 ClickHouseReader 针对 ClickHouse 类型转换列表:</p>
-<table>
-<thead>
-<tr>
-<th>Addax 内部类型</th>
-<th>ClickHouse 数据类型</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>Long</td>
-<td>Uint8, Uint16, Uint32, Uint64, Int8, Int16, Int32, Int64, Enum8, Enum16</td>
-</tr>
-<tr>
-<td>Double</td>
-<td>Float32, Float64, Decimal</td>
-</tr>
-<tr>
-<td>String</td>
-<td>String, FixedString(N)</td>
-</tr>
-<tr>
-<td>Date</td>
-<td>Date, DateTime, DateTime64</td>
-</tr>
-<tr>
-<td>Boolean</td>
-<td>UInt8</td>
-</tr>
-<tr>
-<td>Bytes</td>
-<td>String</td>
-</tr>
-</tbody>
-</table>
-<h2 id="_6">限制<a class="headerlink" href="#_6" title="Permanent link">&para;</a></h2>
-<p>除上述罗列字段类型外，其他类型均不支持，如 Array、Nested 等</p>
+<h2 id="_3">参数说明<a class="headerlink" href="#_3" title="Permanent link">&para;</a></h2>
+<p>因本插件基于<a href="../rdbmsreader">Addax RDBMS Reader</a> 实现，所以参数说明请参考 <a href="../rdbmsreader">Addax RDBMS Reader</a>。</p>
 
 
   
