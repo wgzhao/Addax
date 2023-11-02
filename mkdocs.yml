@@ -75,6 +75,7 @@ nav:
       - reader/txtfilereader.md
 
   - 写入插件:
+      - writer/accesswriter.md
       - writer/cassandrawriter.md
       - writer/clickhousewriter.md
       - writer/dbfwriter.md
