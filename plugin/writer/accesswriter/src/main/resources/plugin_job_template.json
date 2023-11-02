@@ -1,0 +1,22 @@
+{
+  "name": "accesswriter",
+  "parameter": {
+    "writeMode": "insert",
+    "username": "root",
+    "password": "",
+    "column": [
+      "*"
+    ],
+    "preSql": [
+      "delete from @table"
+    ],
+    "connection": [
+      {
+        "jdbcUrl": "jdbc:ucanaccess://<access db file path>",
+        "table": [
+          "addax_tbl"
+        ]
+      }
+    ]
+  }
+}

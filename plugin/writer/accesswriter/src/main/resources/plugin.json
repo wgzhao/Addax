@@ -1,0 +1,6 @@
+{
+  "name": "accesswriter",
+  "class": "com.wgzhao.addax.plugin.writer.accesswriter.AccessWriter",
+  "description": "writer to access database",
+  "developer": "wgzhao"
+}
