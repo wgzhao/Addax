@@ -323,6 +323,14 @@
 
         <!-- writer -->
         <fileSet>
+            <directory>plugin/writer/accesswriter/target/accesswriter-${project.version}/</directory>
+            <includes>
+                <include>**/*.*</include>
+            </includes>
+            <fileMode>0644</fileMode>
+            <outputDirectory>addax-${project.version}</outputDirectory>
+        </fileSet>
+        <fileSet>
             <directory>plugin/writer/cassandrawriter/target/cassandrawriter-${project.version}/</directory>
             <includes>
                 <include>**/*.*</include>

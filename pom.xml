@@ -429,6 +429,7 @@
                 <module>plugin/reader/txtfilereader</module>
 
                 <!-- writer -->
+                <module>plugin/writer/accesswriter</module>
                 <module>plugin/writer/cassandrawriter</module>
                 <module>plugin/writer/clickhousewriter</module>
                 <module>plugin/writer/dbfwriter</module>
