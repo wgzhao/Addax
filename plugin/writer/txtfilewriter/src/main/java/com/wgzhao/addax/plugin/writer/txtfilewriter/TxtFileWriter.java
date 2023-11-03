@@ -57,18 +57,15 @@ import static com.wgzhao.addax.common.base.Key.WRITE_MODE;
  * Created by haiwei.luo on 14-9-17.
  */
 public class TxtFileWriter
-        extends Writer
-{
+        extends Writer {
     public static class Job
-            extends Writer.Job
-    {
+            extends Writer.Job {
         private static final Logger LOG = LoggerFactory.getLogger(Job.class);
 
         private Configuration writerSliceConfig = null;
 
         @Override
-        public void init()
-        {
+        public void init() {
             this.writerSliceConfig = this.getPluginJobConf();
             this.validateParameter();
             String dateFormatOld = this.writerSliceConfig.getString(FORMAT);
@@ -77,13 +74,12 @@ public class TxtFileWriter
                 this.writerSliceConfig.set(DATE_FORMAT, dateFormatOld);
             }
             if (null != dateFormatOld) {
-                LOG.warn("您使用format配置日期格式化, 这是不推荐的行为, 请优先使用dateFormat配置项, 两项同时存在则使用dateFormat.");
+                LOG.warn("You are using format to configure date format, this is not recommended, please use dateFormat to configure. If both dateFormat and format exist, dateFormat will be used.");
             }
             StorageWriterUtil.validateParameter(this.writerSliceConfig);
         }
 
-        private void validateParameter()
-        {
+        private void validateParameter() {
             this.writerSliceConfig.getNecessaryValue(FILE_NAME, TxtFileWriterErrorCode.REQUIRED_VALUE);
 
             String path = this.writerSliceConfig.getNecessaryValue(PATH, TxtFileWriterErrorCode.REQUIRED_VALUE);
@@ -94,25 +90,23 @@ public class TxtFileWriter
                 if (dir.isFile()) {
                     throw AddaxException.asAddaxException(
                             TxtFileWriterErrorCode.ILLEGAL_VALUE,
-                            String.format("您配置的path: [%s] 不是一个合法的目录, 请您注意文件重名, 不合法目录名等情况.", path));
+                            String.format("The path [%s] is a file, not a directory.", path));
                 }
                 if (!dir.exists()) {
                     boolean createdOk = dir.mkdirs();
                     if (!createdOk) {
                         throw AddaxException.asAddaxException(TxtFileWriterErrorCode.CONFIG_INVALID_EXCEPTION,
-                                String.format("您指定的文件路径 : [%s] 创建失败.", path));
+                                String.format("Failed to create the special path [%s].", path));
                     }
                 }
-            }
-            catch (SecurityException se) {
+            } catch (SecurityException se) {
                 throw AddaxException.asAddaxException(TxtFileWriterErrorCode.SECURITY_NOT_ENOUGH,
-                        String.format("您没有权限创建文件路径 : [%s] ", path), se);
+                        String.format("Permission denied to access path [%s].", path), se);
             }
         }
 
         @Override
-        public void prepare()
-        {
+        public void prepare() {
             String path = this.writerSliceConfig.getString(Key.PATH);
             String fileName = this.writerSliceConfig.getString(FILE_NAME);
             String writeMode = this.writerSliceConfig.getString(WRITE_MODE);
@@ -121,7 +115,7 @@ public class TxtFileWriter
             File dir = new File(path);
             // truncate option handler
             if ("truncate".equalsIgnoreCase(writeMode) || "overwrite".equalsIgnoreCase(writeMode)) {
-                LOG.info("由于您配置了writeMode truncate/overwrite, 开始清理 [{}] 下面以 [{}] 开头的内容", path, fileName);
+                LOG.info("You specify [{}] as writeMode, begin to clean history files starts with [{}] under this path [{}].", writeMode, fileName, path);
                 // warn:需要判断文件是否存在，不存在时，不能删除
                 try {
                     FilenameFilter filter = new PrefixFileFilter(fileName);
@@ -131,30 +125,25 @@ public class TxtFileWriter
                         LOG.info("delete file [{}].", eachFile.getName());
                         FileUtils.forceDelete(eachFile);
                     }
-                }
-                catch (NullPointerException npe) {
+                } catch (NullPointerException npe) {
                     throw AddaxException.asAddaxException(TxtFileWriterErrorCode.WRITE_FILE_ERROR,
-                            String.format("您配置的目录清空时出现空指针异常 : [%s]", path), npe);
-                }
-                catch (IllegalArgumentException iae) {
+                            String.format("NullPointException occurred when clean history files under this path [%s].", path), npe);
+                } catch (IllegalArgumentException iae) {
                     throw AddaxException.asAddaxException(TxtFileWriterErrorCode.SECURITY_NOT_ENOUGH,
-                            String.format("您配置的目录参数异常 : [%s]", path));
-                }
-                catch (IOException e) {
+                            String.format("IllegalArgumentException occurred when clean history files under this path [%s].", path), iae);
+                } catch (IOException e) {
                     throw AddaxException.asAddaxException(TxtFileWriterErrorCode.WRITE_FILE_ERROR,
-                            String.format("无法清空目录 : [%s]", path), e);
+                            String.format("IOException occurred when clean history files under this path [%s].", path), e);
                 }
-            }
-            else if ("append".equals(writeMode)) {
-                LOG.info("由于您配置了writeMode append, 写入前不做清理工作, [{}] 目录下写入相应文件名前缀 [{}] 的文件", path, fileName);
-            }
-            else if ("nonConflict".equals(writeMode)) {
-                LOG.info("由于您配置了writeMode nonConflict, 开始检查 [{}] 下面的内容", path);
+            } else if ("append".equals(writeMode)) {
+                LOG.info("You specify [{}] as writeMode, so we will NOT clean history files starts with [{}] under this path [{}].", writeMode, fileName, path);
+            } else if ("nonConflict".equals(writeMode)) {
+                LOG.info("You specify [{}] as writeMode, begin to check the files in [{}].", writeMode, path);
                 // warn: check two times about exists, mkdir
                 if (dir.exists()) {
                     if (!dir.canRead()) {
                         throw AddaxException.asAddaxException(TxtFileWriterErrorCode.SECURITY_NOT_ENOUGH,
-                                String.format("您没有权限查看目录 : [%s]", path));
+                                String.format("Permission denied to access path [%s].", path));
                     }
                     // fileName is not null
                     FilenameFilter filter = new PrefixFileFilter(fileName);
@@ -165,58 +154,51 @@ public class TxtFileWriter
                         for (File eachFile : filesWithFileNamePrefix) {
                             allFiles.add(eachFile.getName());
                         }
-                        LOG.error("冲突文件列表为: [{}]", StringUtils.join(allFiles, ","));
+                        LOG.error("The file(s) [{}] already exists under path [{}] with nonConflict writeMode.", StringUtils.join(allFiles, ","), path);
                         throw AddaxException.asAddaxException(TxtFileWriterErrorCode.ILLEGAL_VALUE,
-                                String.format("您配置的path: [%s] 目录不为空, 下面存在其他文件或文件夹.", path));
+                                String.format("The directory [%s] contains files.", path));
                     }
-                }
-                else {
+                } else {
                     boolean createdOk = dir.mkdirs();
                     if (!createdOk) {
                         throw AddaxException.asAddaxException(TxtFileWriterErrorCode.CONFIG_INVALID_EXCEPTION,
-                                String.format("您指定的文件路径 : [%s] 创建失败.", path));
+                                String.format("Failed to create the file [%s].", path));
                     }
                 }
-            }
-            else {
+            } else {
                 throw AddaxException.asAddaxException(TxtFileWriterErrorCode.ILLEGAL_VALUE,
-                        String.format("仅支持 truncate, append, nonConflict 三种模式, 不支持您配置的 writeMode 模式 : [%s]", writeMode));
+                        String.format("ONLY support truncate, append and nonConflict as writeMode, but you give [%s].", writeMode));
             }
         }
 
         @Override
-        public void post()
-        {
+        public void post() {
             //
         }
 
         @Override
-        public void destroy()
-        {
+        public void destroy() {
             //
         }
 
         @Override
-        public List<Configuration> split(int mandatoryNumber)
-        {
+        public List<Configuration> split(int mandatoryNumber) {
             Set<String> allFiles;
             String path = null;
             try {
                 path = this.writerSliceConfig.getString(Key.PATH);
                 File dir = new File(path);
                 allFiles = new HashSet<>(Arrays.asList(Objects.requireNonNull(dir.list())));
-            }
-            catch (SecurityException se) {
+            } catch (SecurityException se) {
                 throw AddaxException.asAddaxException(TxtFileWriterErrorCode.SECURITY_NOT_ENOUGH,
-                        String.format("您没有权限查看目录 : [%s]", path));
+                        String.format("Permission denied to access path [%s].", path), se);
             }
             return StorageWriterUtil.split(writerSliceConfig, allFiles, mandatoryNumber);
         }
     }
 
     public static class Task
-            extends Writer.Task
-    {
+            extends Writer.Task {
         private static final Logger LOG = LoggerFactory.getLogger(Task.class);
 
         private Configuration writerSliceConfig;
@@ -227,8 +209,7 @@ public class TxtFileWriter
         private String suffix = "";
 
         @Override
-        public void init()
-        {
+        public void init() {
             this.writerSliceConfig = this.getPluginJobConf();
             this.path = this.writerSliceConfig.getString(PATH);
             this.fileName = this.writerSliceConfig.getString(FILE_NAME);
@@ -236,8 +217,7 @@ public class TxtFileWriter
         }
 
         @Override
-        public void prepare()
-        {
+        public void prepare() {
             String compress = this.writerSliceConfig.getString(COMPRESS);
             suffix = FileHelper.getCompressFileSuffix(compress);
 
@@ -245,8 +225,7 @@ public class TxtFileWriter
         }
 
         @Override
-        public void startWrite(RecordReceiver lineReceiver)
-        {
+        public void startWrite(RecordReceiver lineReceiver) {
             LOG.info("begin do write...");
             String fileFullPath = StorageWriterUtil.buildFilePath(this.path, this.fileName, this.suffix);
             LOG.info("write to file : [{}]", fileFullPath);
@@ -259,30 +238,25 @@ public class TxtFileWriter
                 outputStream = new FileOutputStream(newFile);
                 StorageWriterUtil.writeToStream(lineReceiver, outputStream, this.writerSliceConfig, this.fileName,
                         this.getTaskPluginCollector());
-            }
-            catch (SecurityException se) {
+            } catch (SecurityException se) {
                 throw AddaxException.asAddaxException(TxtFileWriterErrorCode.SECURITY_NOT_ENOUGH,
-                        String.format("您没有权限创建文件  : [%s]", this.fileName));
-            }
-            catch (IOException ioe) {
+                        String.format("Permission denied to create file [%s].", fileFullPath), se);
+            } catch (IOException ioe) {
                 throw AddaxException.asAddaxException(TxtFileWriterErrorCode.WRITE_FILE_IO_ERROR,
-                        String.format("无法创建待写文件 : [%s]", this.fileName), ioe);
-            }
-            finally {
+                        String.format("Fail to create file [%s].", this.fileName), ioe);
+            } finally {
                 IOUtils.closeQuietly(outputStream, null);
             }
             LOG.info("end do write");
         }
 
         @Override
-        public void post()
-        {
+        public void post() {
             //
         }
 
         @Override
-        public void destroy()
-        {
+        public void destroy() {
             //
         }
     }
