@@ -147,7 +147,7 @@ public class Key
     public static final String MANDATORY_ENCODING = "mandatoryEncoding";
     public static final String HEADER = "header";
     public static final String IS_TABLE_MODE = "isTableMode";
-
+    public static final String EXTENDED_INSERT = "extendedInsert";
     public Key()
     {
 
