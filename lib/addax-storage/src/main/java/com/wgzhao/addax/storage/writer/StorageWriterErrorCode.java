@@ -31,6 +31,7 @@ public enum StorageWriterErrorCode
     WRITE_FILE_IO_ERROR("UnstructuredStorageWriter-02", "您配置的文件在写入时出现IO异常."),
     RUNTIME_EXCEPTION("UnstructuredStorageWriter-03", "出现运行时异常, 请联系我们"),
     REQUIRED_VALUE("UnstructuredStorageWriter-04", "您缺失了必须填写的参数值."),
+    SQL_REQUIRED_TABLE_NAME("UnstructuredStorageWriter-05", "sql format required table name."),
     ;
 
     private final String code;
