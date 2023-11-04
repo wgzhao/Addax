@@ -64,7 +64,9 @@ public class Constant
     public static final String ENC_PASSWORD_PREFIX = "${enc:";
 
     public static final Set<String> SUPPORTED_WRITE_MODE = new HashSet<>(Arrays.asList("append", "nonConflict", "overwrite", "truncate"));
-    public static final Set<String> SUPPORTED_FILE_FORMAT = new HashSet<>(Arrays.asList("csv", "text"));
+
+    public static final String SQL_FORMAT = "sql";
+    public static final Set<String> SUPPORTED_FILE_FORMAT = new HashSet<>(Arrays.asList("csv", "text", "sql"));
 
     public static final Set<String> SQL_RESERVED_WORDS = new HashSet<>(Arrays.asList("ALL", "ALTER", "AND", "ANY", "AS", "ASC", "AUTHORIZATION",
             "BACKUP", "BEFORE", "BETWEEN", "BREAK", "BROWSE", "BULK", "BY", "CASCADE", "CASE", "CAST", "CATALOG", "CHECK", "CHECKPOINT",
