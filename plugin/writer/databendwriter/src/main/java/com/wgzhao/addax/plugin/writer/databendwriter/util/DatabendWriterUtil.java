@@ -29,16 +29,16 @@ public final class DatabendWriterUtil {
         String writeMode = originalConfig.getString(Key.WRITE_MODE, "INSERT");
         LOG.info("write mode is {}", writeMode);
         if (writeMode.toLowerCase().contains("replace")) {
-            if (onConflictColumns == null || onConflictColumns.size() == 0) {
+            if (onConflictColumns == null || onConflictColumns.isEmpty()) {
                 LOG.error("Replace mode must has onConflictColumn conf");
                 return;
             }
             // for databend if you want to use replace mode, the writeMode should be:  "writeMode": "replace"
-            writeDataSqlTemplate.append("REPLACE INTO %s (")
+            writeDataSqlTemplate.append("REPLACE INTO  (")
                     .append(StringUtils.join(columns, ",")).append(") ").append(onConFlictDoString(onConflictColumns))
                     .append(" VALUES");
 
-            LOG.info("Replace data [\n{}\n], which jdbcUrl like:[{}]", writeDataSqlTemplate, jdbcUrl);
+            LOG.info("Replace data [{}], which jdbcUrl like:[{}]", writeDataSqlTemplate, jdbcUrl);
             originalConfig.set(Constant.INSERT_OR_REPLACE_TEMPLATE_MARK, writeDataSqlTemplate);
         } else {
             writeDataSqlTemplate.append("INSERT INTO %s");
@@ -50,7 +50,7 @@ public final class DatabendWriterUtil {
             writeDataSqlTemplate.append(String.format("(%s)", columnString));
             writeDataSqlTemplate.append(" VALUES");
 
-            LOG.info("Insert data [\n{}\n], which jdbcUrl like:[{}]", writeDataSqlTemplate, jdbcUrl);
+            LOG.info("Insert data [{}], which jdbcUrl like:[{}]", writeDataSqlTemplate, jdbcUrl);
 
             originalConfig.set(Constant.INSERT_OR_REPLACE_TEMPLATE_MARK, writeDataSqlTemplate);
         }
