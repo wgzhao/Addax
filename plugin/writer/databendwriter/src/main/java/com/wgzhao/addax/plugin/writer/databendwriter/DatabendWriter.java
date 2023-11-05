@@ -1,162 +1,121 @@
 package com.wgzhao.addax.plugin.writer.databendwriter;
 
-import com.wgzhao.addax.common.element.Record;
-import com.wgzhao.addax.common.exception.AddaxException;
+import com.wgzhao.addax.common.element.Column;
 import com.wgzhao.addax.common.plugin.RecordReceiver;
 import com.wgzhao.addax.common.spi.Writer;
 import com.wgzhao.addax.common.util.Configuration;
-import com.wgzhao.addax.plugin.writer.databendwriter.manager.DatabendWriterManager;
-import com.wgzhao.addax.plugin.writer.databendwriter.row.DatabendISerializer;
-import com.wgzhao.addax.plugin.writer.databendwriter.row.DatabendSerializerFactory;
 import com.wgzhao.addax.plugin.writer.databendwriter.util.DatabendWriterUtil;
-import com.wgzhao.addax.rdbms.util.DBUtil;
-import com.wgzhao.addax.rdbms.util.DBUtilErrorCode;
 import com.wgzhao.addax.rdbms.util.DataBaseType;
+import com.wgzhao.addax.rdbms.writer.CommonRdbmsWriter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.sql.Connection;
-import java.util.ArrayList;
-import java.util.Collections;
+import java.sql.PreparedStatement;
+import java.sql.SQLException;
+import java.sql.Types;
 import java.util.List;
 
-public class DatabendWriter
-        extends Writer
-{
+public class DatabendWriter extends Writer {
+    private static final DataBaseType DATABASE_TYPE = DataBaseType.Databend;
 
     public static class Job
-            extends Writer.Job
-    {
-
+            extends Writer.Job {
         private static final Logger LOG = LoggerFactory.getLogger(Job.class);
-        private Configuration originalConfig = null;
-        private DatabendWriterOptions options;
+        private Configuration originalConfig;
+        private CommonRdbmsWriter.Job commonRdbmsWriterMaster;
 
         @Override
-        public void init()
-        {
+        public void init() {
             this.originalConfig = super.getPluginJobConf();
-            options = new DatabendWriterOptions(super.getPluginJobConf());
-            options.doPretreatment();
+            this.commonRdbmsWriterMaster = new CommonRdbmsWriter.Job(DATABASE_TYPE);
+            this.commonRdbmsWriterMaster.init(this.originalConfig);
+            // placeholder currently not supported by databend driver, needs special treatment
+            DatabendWriterUtil.dealWriteMode(this.originalConfig);
         }
 
         @Override
-        public void preCheck()
-        {
+        public void preCheck() {
             this.init();
-            DatabendWriterUtil.preCheckPrePareSQL(options);
-            DatabendWriterUtil.preCheckPostSQL(options);
+            this.commonRdbmsWriterMaster.writerPreCheck(this.originalConfig, DATABASE_TYPE);
         }
 
         @Override
-        public void prepare()
-        {
-            String username = options.getUsername();
-            String password = options.getPassword();
-            String jdbcUrl = options.getJdbcUrl();
-            List<String> renderedPreSqls = DatabendWriterUtil.renderPreOrPostSqls(options.getPreSqlList(), options.getTable());
-            if (null != renderedPreSqls && !renderedPreSqls.isEmpty()) {
-                Connection conn = DBUtil.getConnection(DataBaseType.MySql, jdbcUrl, username, password);
-                LOG.info("Begin to execute preSqls:[{}]. context info:{}.", String.join(";", renderedPreSqls), jdbcUrl);
-                DatabendWriterUtil.executeSqls(conn, renderedPreSqls);
-                DBUtil.closeDBResources(null, null, conn);
-            }
+        public void prepare() {
+            this.commonRdbmsWriterMaster.prepare(this.originalConfig);
         }
 
         @Override
-        public List<Configuration> split(int mandatoryNumber)
-        {
-            List<Configuration> configurations = new ArrayList<>(mandatoryNumber);
-            for (int i = 0; i < mandatoryNumber; i++) {
-                configurations.add(originalConfig);
-            }
-            return configurations;
+        public List<Configuration> split(int mandatoryNumber) {
+            return this.commonRdbmsWriterMaster.split(this.originalConfig, mandatoryNumber);
         }
 
         @Override
-        public void post()
-        {
-            String username = options.getUsername();
-            String password = options.getPassword();
-            String jdbcUrl = options.getJdbcUrl();
-            List<String> renderedPostSqls = DatabendWriterUtil.renderPreOrPostSqls(options.getPostSqlList(), options.getTable());
-            if (null != renderedPostSqls && !renderedPostSqls.isEmpty()) {
-                Connection conn = DBUtil.getConnection(DataBaseType.MySql, jdbcUrl, username, password);
-                LOG.info("Begin to execute preSqls:[{}]. context info:{}.", String.join(";", renderedPostSqls), jdbcUrl);
-                DatabendWriterUtil.executeSqls(conn, renderedPostSqls);
-                DBUtil.closeDBResources(null, null, conn);
-            }
+        public void post() {
+            this.commonRdbmsWriterMaster.post(this.originalConfig);
         }
 
         @Override
-        public void destroy()
-        {
+        public void destroy() {
+            this.commonRdbmsWriterMaster.destroy(this.originalConfig);
         }
     }
 
-    public static class Task
-            extends Writer.Task
-    {
-        private DatabendWriterManager writerManager;
-        private DatabendWriterOptions options;
-        private DatabendISerializer rowSerializer;
+
+    public static class Task extends Writer.Task {
+        private static final Logger LOG = LoggerFactory.getLogger(Task.class);
+
+        private Configuration writerSliceConfig;
+
+        private CommonRdbmsWriter.Task commonRdbmsWriterSlave;
 
         @Override
-        public void init()
-        {
-            options = new DatabendWriterOptions(super.getPluginJobConf());
-            if (options.isWildcardColumn()) {
-                options.setInfoCchemaColumns(Collections.singletonList("*"));
-            }
-            writerManager = new DatabendWriterManager(options);
-            rowSerializer = DatabendSerializerFactory.createSerializer(options);
-        }
+        public void init() {
+            this.writerSliceConfig = super.getPluginJobConf();
 
-        @Override
-        public void prepare()
-        {
-        }
-
-        public void startWrite(RecordReceiver recordReceiver)
-        {
-            try {
-                Record record;
-                while ((record = recordReceiver.getFromReader()) != null) {
-                    if (!options.isWildcardColumn() && record.getColumnNumber() != options.getColumns().size()) {
-                        throw AddaxException
-                                .asAddaxException(
-                                        DBUtilErrorCode.CONF_ERROR,
-                                        String.format(
-                                                "There is an error in the column configuration information. The source reads the number of fields:%s not equal with the number of fields to be written in the destination table:%s. Please check your configuration.",
-                                                record.getColumnNumber(),
-                                                options.getColumns().size()));
+            this.commonRdbmsWriterSlave = new CommonRdbmsWriter.Task(DataBaseType.Databend)
+            {
+                @Override
+                protected PreparedStatement fillPreparedStatementColumnType(PreparedStatement preparedStatement, int columnIndex, int columnSqlType, Column column)
+                        throws SQLException {
+                    switch (columnSqlType) {
+                        case Types.TINYINT:
+                        case Types.SMALLINT:
+                        case Types.INTEGER:
+                            preparedStatement.setInt(columnIndex, column.asBigInteger().intValue());
+                            return preparedStatement;
+                        case Types.BIGINT:
+                            preparedStatement.setLong(columnIndex, column.asLong());
+                            return preparedStatement;
+                        case Types.JAVA_OBJECT:
+                            // cast variant / array into string is fine.
+                            preparedStatement.setString(columnIndex, column.asString());
+                            return preparedStatement;
                     }
-                    writerManager.writeRecord(rowSerializer.serialize(record));
+                    return super.fillPreparedStatementColumnType(preparedStatement, columnIndex, columnSqlType, column);
                 }
-            }
-            catch (Exception e) {
-                throw AddaxException.asAddaxException(DBUtilErrorCode.WRITE_DATA_ERROR, e);
-            }
+            };
+            this.commonRdbmsWriterSlave.init(this.writerSliceConfig);
         }
 
         @Override
-        public void post()
-        {
-            try {
-                writerManager.close();
-            }
-            catch (Exception e) {
-                throw AddaxException.asAddaxException(DBUtilErrorCode.WRITE_DATA_ERROR, e);
-            }
+        public void destroy() {
+            this.commonRdbmsWriterSlave.destroy(this.writerSliceConfig);
         }
 
         @Override
-        public void destroy() {}
+        public void prepare() {
+            this.commonRdbmsWriterSlave.prepare(this.writerSliceConfig);
+        }
 
         @Override
-        public boolean supportFailOver()
-        {
-            return false;
+        public void post() {
+            this.commonRdbmsWriterSlave.post(this.writerSliceConfig);
         }
+
+        @Override
+        public void startWrite(RecordReceiver lineReceiver) {
+            this.commonRdbmsWriterSlave.startWrite(lineReceiver, this.writerSliceConfig, this.getTaskPluginCollector());
+        }
+
     }
 }
