@@ -40,6 +40,7 @@ nav:
   - quickstart.md
   - setupJob.md
   - 读取插件:
+      - reader/accessreader.md
       - reader/cassandrareader.md
       - reader/clickhousereader.md
       - reader/databendreader.md
@@ -75,6 +76,7 @@ nav:
       - reader/txtfilereader.md
 
   - 写入插件:
+      - writer/accesswriter.md
       - writer/cassandrawriter.md
       - writer/clickhousewriter.md
       - writer/dbfwriter.md

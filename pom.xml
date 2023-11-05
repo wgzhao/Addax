@@ -4,7 +4,7 @@
 
     <groupId>com.wgzhao.addax</groupId>
     <artifactId>addax-all</artifactId>
-    <version>4.1.2-SNAPSHOT</version>
+    <version>4.1.3-SNAPSHOT</version>
 
     <name>addax-all</name>
     <description>Addax generic ETL tool</description>
@@ -33,22 +33,23 @@
         <avro.version>1.11.2</avro.version>
         <commons.beanutils.version>1.9.4</commons.beanutils.version>
         <commons.configuration.version>1.10</commons.configuration.version>
+        <commons.configuration2.version>2.9.0</commons.configuration2.version>
         <commons.collections.version>4.4</commons.collections.version>
         <commons.codec.version>1.15</commons.codec.version>
-        <commons.compress.version>1.23.0</commons.compress.version>
+        <commons.compress.version>1.24.0</commons.compress.version>
         <commons.cli.version>1.5.0</commons.cli.version>
         <commons.csv.version>1.10.0</commons.csv.version>
-        <commons.io.version>2.11.0</commons.io.version>
-        <commons.lang3.version>3.12.0</commons.lang3.version>
+        <commons.io.version>2.13.0</commons.io.version>
+        <commons.lang3.version>3.13.0</commons.lang3.version>
         <commons.logging.version>1.2</commons.logging.version>
         <commons.net.version>3.9.0</commons.net.version>
         <diamond.version>3.7.3</diamond.version>
-        <druid.version>1.2.18</druid.version>
-        <fastjson2.version>2.0.32</fastjson2.version>
+        <druid.version>1.2.20</druid.version>
+        <fastjson2.version>2.0.40</fastjson2.version>
         <findbugs.version>3.0.1</findbugs.version>
         <guava.version>31.0-jre</guava.version>
-        <groovy.version>3.0.16</groovy.version>
-        <gson.version>2.9.1</gson.version>
+        <groovy.version>3.0.19</groovy.version>
+        <gson.version>2.10.1</gson.version>
         <fluent.hc.version>4.5.14</fluent.hc.version>
         <hadoop.common.version>3.2.4</hadoop.common.version>
         <hbase1.version>1.4.13</hbase1.version>
@@ -58,15 +59,15 @@
         <httpclient.version>4.5.14</httpclient.version>
         <httpcore.version>4.4.16</httpcore.version>
         <httpmime.version>4.5.14</httpmime.version>
-        <influxdb.client.version>6.3.0</influxdb.client.version>
-        <logback.version>1.3.4</logback.version>
-        <jansi.version>1.17.1</jansi.version>
+        <influxdb.client.version>6.10.0</influxdb.client.version>
+        <logback.version>1.3.11</logback.version>
+        <jansi.version>2.4.0</jansi.version>
         <javacsv.version>2.0</javacsv.version>
         <javadbf.version>1.14.0</javadbf.version>
         <jest.version>6.3.1</jest.version>
-        <junit.version>5.9.3</junit.version>
+        <junit.version>5.10.0</junit.version>
         <joda.time.version>2.12.2</joda.time.version>
-        <jackson.version>2.9.9</jackson.version>
+        <jackson.version>2.15.2</jackson.version>
         <jedis.version>3.7.0</jedis.version>
         <jsch.version>0.1.55</jsch.version>
         <kafka.version>3.2.3</kafka.version>
@@ -76,23 +77,25 @@
         <mapreduce.version>3.2.1</mapreduce.version>
         <mockito.version>2.0.2-beta</mockito.version>
         <netty-buffer.version>4.1.93.Final</netty-buffer.version>
-        <ognl.version>3.3.4</ognl.version>
-        <orc.version>1.8.3</orc.version>
-        <parquet.version>1.10.0</parquet.version>
+        <ognl.version>3.4.2</ognl.version>
+        <orc.version>1.9.1</orc.version>
+        <parquet.version>1.13.1</parquet.version>
         <poi.version>5.2.3</poi.version>
-        <protobuf.version>3.23.4</protobuf.version>
-        <redis.replicator.version>3.7.0</redis.replicator.version>
-        <slf4j.version>2.0.6</slf4j.version>
-        <snappy.version>1.1.9.1</snappy.version>
+        <protobuf.version>3.24.3</protobuf.version>
+        <redis.replicator.version>3.8.0</redis.replicator.version>
+        <slf4j.version>2.0.9</slf4j.version>
+        <snappy.version>1.1.10.3</snappy.version>
         <swift.version>1.0.0</swift.version>
         <woodstox.version>6.5.1</woodstox.version>
         <xz.version>1.9</xz.version>
         <zookeeper.version>3.6.0</zookeeper.version>
-        <zstd.version>1.5.4-1</zstd.version>
+        <zstd.version>1.5.5-5</zstd.version>
 
         <!-- jdbc driver version -->
         <cassandra.jdbc.version>3.11.0</cassandra.jdbc.version>
         <clickhouse.jdbc.version>0.3.2</clickhouse.jdbc.version>
+        <databend.jdbc.version>0.1.0</databend.jdbc.version>
+        <dbcp2.version>2.10.0</dbcp2.version>
         <hive.jdbc.version>3.1.3</hive.jdbc.version>
         <influxdbClient.version>2.23</influxdbClient.version>
         <hadoop.version>3.2.4</hadoop.version>
@@ -103,12 +106,9 @@
         <phoenix1.version>4.14.3-HBase-1.4</phoenix1.version>
         <phoenix2.version>5.1.3</phoenix2.version>
         <postgresql.jdbc.version>42.3.8</postgresql.jdbc.version>
-        <sqlite.jdbc.version>3.42.0.0</sqlite.jdbc.version>
+        <sqlite.jdbc.version>3.42.0.1</sqlite.jdbc.version>
         <taos.jdbc.version>3.2.1</taos.jdbc.version>
         <trino.jdbc.version>351</trino.jdbc.version>
-
-        <!-- for test -->
-        <junit.version>5.8.1</junit.version>
 
         <!-- maven configuration -->
         <project.sourceEncoding>UTF-8</project.sourceEncoding>
@@ -129,111 +129,6 @@
         <module>lib/addax-transformer</module>
     </modules>
 
-    <profiles>
-        <profile>
-            <id>basic</id>
-            <modules>
-                <!-- reader -->
-                <module>plugin/reader/datareader</module>
-                <module>plugin/reader/hdfsreader</module>
-                <module>plugin/reader/hivereader</module>
-                <module>plugin/reader/mysqlreader</module>
-                <module>plugin/reader/oraclereader</module>
-                <module>plugin/reader/postgresqlreader</module>
-                <module>plugin/reader/rdbmsreader</module>
-                <module>plugin/reader/sqlitereader</module>
-                <module>plugin/reader/sqlserverreader</module>
-                <module>plugin/reader/streamreader</module>
-                <module>plugin/reader/txtfilereader</module>
-
-                <!-- writer -->
-                <module>plugin/writer/hdfswriter</module>
-                <module>plugin/writer/mysqlwriter</module>
-                <module>plugin/writer/oraclewriter</module>
-                <module>plugin/writer/postgresqlwriter</module>
-                <module>plugin/writer/rdbmswriter</module>
-                <module>plugin/writer/sqlserverwriter</module>
-                <module>plugin/writer/streamwriter</module>
-                <module>plugin/writer/txtfilewriter</module>
-            </modules>
-        </profile>
-
-        <profile>
-            <id>default</id>
-            <activation>
-                <activeByDefault>true</activeByDefault>
-            </activation>
-            <modules>
-                <!-- reader -->
-                <module>plugin/reader/cassandrareader</module>
-                <module>plugin/reader/clickhousereader</module>
-                <module>plugin/reader/databendreader</module>
-                <module>plugin/reader/datareader</module>
-                <module>plugin/reader/dbfreader</module>
-                <module>plugin/reader/elasticsearchreader</module>
-                <module>plugin/reader/excelreader</module>
-                <module>plugin/reader/ftpreader</module>
-                <module>plugin/reader/hbase11xreader</module>
-                <module>plugin/reader/hbase11xsqlreader</module>
-                <module>plugin/reader/hbase20xreader</module>
-                <module>plugin/reader/hbase20xsqlreader</module>
-                <module>plugin/reader/hdfsreader</module>
-                <module>plugin/reader/hivereader</module>
-                <module>plugin/reader/httpreader</module>
-                <module>plugin/reader/influxdbreader</module>
-                <module>plugin/reader/influxdb2reader</module>
-                <module>plugin/reader/kafkareader</module>
-                <module>plugin/reader/kudureader</module>
-                <module>plugin/reader/jsonfilereader</module>
-                <module>plugin/reader/mongodbreader</module>
-                <module>plugin/reader/mysqlreader</module>
-                <module>plugin/reader/oraclereader</module>
-                <module>plugin/reader/postgresqlreader</module>
-                <module>plugin/reader/rdbmsreader</module>
-                <module>plugin/reader/redisreader</module>
-                <module>plugin/reader/s3reader</module>
-                <module>plugin/reader/sqlitereader</module>
-                <module>plugin/reader/sqlserverreader</module>
-                <module>plugin/reader/streamreader</module>
-                <module>plugin/reader/sybasereader</module>
-                <module>plugin/reader/tdenginereader</module>
-                <module>plugin/reader/txtfilereader</module>
-
-                <!-- writer -->
-                <module>plugin/writer/cassandrawriter</module>
-                <module>plugin/writer/clickhousewriter</module>
-                <module>plugin/writer/dbfwriter</module>
-                <module>plugin/writer/databendwriter</module>
-                <module>plugin/writer/doriswriter</module>
-                <module>plugin/writer/elasticsearchwriter</module>
-                <module>plugin/writer/excelwriter</module>
-                <module>plugin/writer/ftpwriter</module>
-                <module>plugin/writer/greenplumwriter</module>
-                <module>plugin/writer/hbase11xsqlwriter</module>
-                <module>plugin/writer/hbase11xwriter</module>
-                <module>plugin/writer/hbase20xsqlwriter</module>
-                <module>plugin/writer/hdfswriter</module>
-                <module>plugin/writer/influxdbwriter</module>
-                <module>plugin/writer/influxdb2writer</module>
-                <module>plugin/writer/kafkawriter</module>
-                <module>plugin/writer/kuduwriter</module>
-                <module>plugin/writer/mongodbwriter</module>
-                <module>plugin/writer/mysqlwriter</module>
-                <module>plugin/writer/oraclewriter</module>
-                <module>plugin/writer/postgresqlwriter</module>
-                <module>plugin/writer/rdbmswriter</module>
-                <module>plugin/writer/rediswriter</module>
-                <module>plugin/writer/s3writer</module>
-                <module>plugin/writer/sqlitewriter</module>
-                <module>plugin/writer/sqlserverwriter</module>
-                <module>plugin/writer/starrockswriter</module>
-                <module>plugin/writer/streamwriter</module>
-                <module>plugin/writer/sybasewriter</module>
-                <module>plugin/writer/tdenginewriter</module>
-                <module>plugin/writer/txtfilewriter</module>
-            </modules>
-        </profile>
-    </profiles>
     <developers>
         <developer>
             <id>wgzhao</id>
@@ -300,7 +195,7 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-enforcer-plugin</artifactId>
-                <version>3.3.0</version>
+                <version>3.4.1</version>
                 <configuration>
                     <rules>
                         <compound implementation="com.github.ferstl.maven.pomenforcers.CompoundPedanticEnforcer">
@@ -373,12 +268,12 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
-                <version>3.10.1</version>
+                <version>3.11.0</version>
                 <dependencies>
                     <dependency>
                         <groupId>com.google.errorprone</groupId>
                         <artifactId>error_prone_core</artifactId>
-                        <version>2.20.0</version>
+                        <version>2.21.1</version>
                     </dependency>
 
                     <dependency>
@@ -397,7 +292,7 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-dependency-plugin</artifactId>
-                <version>3.5.0</version>
+                <version>3.6.0</version>
             </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
@@ -462,4 +357,111 @@
         </plugins>
     </build>
 
+    <profiles>
+        <profile>
+            <id>basic</id>
+            <modules>
+                <!-- reader -->
+                <module>plugin/reader/datareader</module>
+                <module>plugin/reader/hdfsreader</module>
+                <module>plugin/reader/hivereader</module>
+                <module>plugin/reader/mysqlreader</module>
+                <module>plugin/reader/oraclereader</module>
+                <module>plugin/reader/postgresqlreader</module>
+                <module>plugin/reader/rdbmsreader</module>
+                <module>plugin/reader/sqlitereader</module>
+                <module>plugin/reader/sqlserverreader</module>
+                <module>plugin/reader/streamreader</module>
+                <module>plugin/reader/txtfilereader</module>
+
+                <!-- writer -->
+                <module>plugin/writer/hdfswriter</module>
+                <module>plugin/writer/mysqlwriter</module>
+                <module>plugin/writer/oraclewriter</module>
+                <module>plugin/writer/postgresqlwriter</module>
+                <module>plugin/writer/rdbmswriter</module>
+                <module>plugin/writer/sqlserverwriter</module>
+                <module>plugin/writer/streamwriter</module>
+                <module>plugin/writer/txtfilewriter</module>
+            </modules>
+        </profile>
+
+        <profile>
+            <id>default</id>
+            <activation>
+                <activeByDefault>true</activeByDefault>
+            </activation>
+            <modules>
+                <!-- reader -->
+                <module>plugin/reader/accessreader</module>
+                <module>plugin/reader/cassandrareader</module>
+                <module>plugin/reader/clickhousereader</module>
+                <module>plugin/reader/databendreader</module>
+                <module>plugin/reader/datareader</module>
+                <module>plugin/reader/dbfreader</module>
+                <module>plugin/reader/elasticsearchreader</module>
+                <module>plugin/reader/excelreader</module>
+                <module>plugin/reader/ftpreader</module>
+                <module>plugin/reader/hbase11xreader</module>
+                <module>plugin/reader/hbase11xsqlreader</module>
+                <module>plugin/reader/hbase20xreader</module>
+                <module>plugin/reader/hbase20xsqlreader</module>
+                <module>plugin/reader/hdfsreader</module>
+                <module>plugin/reader/hivereader</module>
+                <module>plugin/reader/httpreader</module>
+                <module>plugin/reader/influxdbreader</module>
+                <module>plugin/reader/influxdb2reader</module>
+                <module>plugin/reader/kafkareader</module>
+                <module>plugin/reader/kudureader</module>
+                <module>plugin/reader/jsonfilereader</module>
+                <module>plugin/reader/mongodbreader</module>
+                <module>plugin/reader/mysqlreader</module>
+                <module>plugin/reader/oraclereader</module>
+                <module>plugin/reader/postgresqlreader</module>
+                <module>plugin/reader/rdbmsreader</module>
+                <module>plugin/reader/redisreader</module>
+                <module>plugin/reader/s3reader</module>
+                <module>plugin/reader/sqlitereader</module>
+                <module>plugin/reader/sqlserverreader</module>
+                <module>plugin/reader/streamreader</module>
+                <module>plugin/reader/sybasereader</module>
+                <module>plugin/reader/tdenginereader</module>
+                <module>plugin/reader/txtfilereader</module>
+
+                <!-- writer -->
+                <module>plugin/writer/accesswriter</module>
+                <module>plugin/writer/cassandrawriter</module>
+                <module>plugin/writer/clickhousewriter</module>
+                <module>plugin/writer/dbfwriter</module>
+                <module>plugin/writer/databendwriter</module>
+                <module>plugin/writer/doriswriter</module>
+                <module>plugin/writer/elasticsearchwriter</module>
+                <module>plugin/writer/excelwriter</module>
+                <module>plugin/writer/ftpwriter</module>
+                <module>plugin/writer/greenplumwriter</module>
+                <module>plugin/writer/hbase11xsqlwriter</module>
+                <module>plugin/writer/hbase11xwriter</module>
+                <module>plugin/writer/hbase20xsqlwriter</module>
+                <module>plugin/writer/hdfswriter</module>
+                <module>plugin/writer/influxdbwriter</module>
+                <module>plugin/writer/influxdb2writer</module>
+                <module>plugin/writer/kafkawriter</module>
+                <module>plugin/writer/kuduwriter</module>
+                <module>plugin/writer/mongodbwriter</module>
+                <module>plugin/writer/mysqlwriter</module>
+                <module>plugin/writer/oraclewriter</module>
+                <module>plugin/writer/postgresqlwriter</module>
+                <module>plugin/writer/rdbmswriter</module>
+                <module>plugin/writer/rediswriter</module>
+                <module>plugin/writer/s3writer</module>
+                <module>plugin/writer/sqlitewriter</module>
+                <module>plugin/writer/sqlserverwriter</module>
+                <module>plugin/writer/starrockswriter</module>
+                <module>plugin/writer/streamwriter</module>
+                <module>plugin/writer/sybasewriter</module>
+                <module>plugin/writer/tdenginewriter</module>
+                <module>plugin/writer/txtfilewriter</module>
+            </modules>
+        </profile>
+    </profiles>
 </project>

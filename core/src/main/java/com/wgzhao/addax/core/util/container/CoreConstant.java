@@ -136,6 +136,9 @@ public class CoreConstant
     public static final String TRANSFORMER_PARAMETER_CODE = "parameter.code";
     public static final String TRANSFORMER_PARAMETER_EXTRA_PACKAGE = "parameter.extraPackage";
 
+    // load groovy code from special file
+    public static final String TRANSFORMER_PARAMETER_CODE_FILE = "parameter.codeFile";
+
     public static final String TASK_ID = "taskId";
 
     // ----------------------------- 环境变量 ---------------------------------

@@ -24,6 +24,7 @@ import com.wgzhao.addax.common.exception.AddaxException;
 
 import java.math.BigDecimal;
 import java.math.BigInteger;
+import java.sql.Time;
 import java.sql.Timestamp;
 import java.util.Date;
 
@@ -35,6 +36,10 @@ public class DateColumn
 {
 
     private DateType subType = DateType.DATETIME;
+
+    private int nanos = 0;
+
+    private int precision = -1;
 
     private final String errorTemplate = "Date type cannot be converted to %s.";
 
@@ -93,6 +98,34 @@ public class DateColumn
         this.setSubType(DateType.DATETIME);
     }
 
+    public DateColumn(Time time, int nanos, int jdbcPrecision) {
+        this(time);
+        if (time != null) {
+            setNanos(nanos);
+        }
+        if (jdbcPrecision == 10) {
+            setPrecision(0);
+        }
+        if (jdbcPrecision >= 12 && jdbcPrecision <= 17) {
+            setPrecision(jdbcPrecision - 11);
+        }
+    }
+
+    public long getNanos() {
+        return nanos;
+    }
+
+    public void setNanos(int nanos) {
+        this.nanos = nanos;
+    }
+
+    public int getPrecision() {
+        return precision;
+    }
+
+    public void setPrecision(int precision) {
+        this.precision = precision;
+    }
     @Override
     public Long asLong()
     {

@@ -1,0 +1,6 @@
+{
+  "name": "accessreader",
+  "class": "com.wgzhao.addax.plugin.reader.accessreader.AccessReader",
+  "description": "access reader",
+  "developer": "wgzhao"
+}

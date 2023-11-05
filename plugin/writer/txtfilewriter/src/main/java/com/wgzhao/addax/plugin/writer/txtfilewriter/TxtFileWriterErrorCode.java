@@ -28,14 +28,14 @@ public enum TxtFileWriterErrorCode
         implements ErrorCode
 {
 
-    CONFIG_INVALID_EXCEPTION("TxtFileWriter-00", "您的参数配置错误."),
-    REQUIRED_VALUE("TxtFileWriter-01", "您缺失了必须填写的参数值."),
-    ILLEGAL_VALUE("TxtFileWriter-02", "您填写的参数值不合法."),
-    WRITE_FILE_ERROR("TxtFileWriter-03", "您配置的目标文件在写入时异常."),
-    WRITE_FILE_IO_ERROR("TxtFileWriter-04", "您配置的文件在写入时出现IO异常."),
-    SECURITY_NOT_ENOUGH("TxtFileWriter-05", "您缺少权限执行相应的文件写入操作."),
-    PATH_NOT_VALID("TxtFileWriter-06", "配置的路径无效"),
-    PAHT_NOT_DIR("TxtFileWriter-06", "您配置的路径不是文件夹.");
+    CONFIG_INVALID_EXCEPTION("TxtFileWriter-00", "error value."),
+    REQUIRED_VALUE("TxtFileWriter-01", "missing mandatory parameters"),
+    ILLEGAL_VALUE("TxtFileWriter-02", "illegal value"),
+    WRITE_FILE_ERROR("TxtFileWriter-03", "failed to write file."),
+    WRITE_FILE_IO_ERROR("TxtFileWriter-04", "IOException occurred when writing the file."),
+    SECURITY_NOT_ENOUGH("TxtFileWriter-05", "permission denied"),
+    PATH_NOT_VALID("TxtFileWriter-06", "invalid path"),
+    PAHT_NOT_DIR("TxtFileWriter-06", "the path is not directory.");
 
     private final String code;
     private final String description;

@@ -20,6 +20,7 @@
 package com.wgzhao.addax.plugin.reader.elasticsearchreader;
 
 import ognl.MemberAccess;
+import ognl.OgnlContext;
 
 import java.lang.reflect.AccessibleObject;
 import java.lang.reflect.Member;
@@ -98,11 +99,11 @@ public class DefaultMemberAccess
     /*===================================================================
         MemberAccess interface
       ===================================================================*/
-    public Object setup(Map context, Object target, Member member, String propertyName)
+    public Object setup(OgnlContext ognlContext, Object o, Member member, String s)
     {
         Object result = null;
 
-        if (isAccessible(context, target, member, propertyName)) {
+        if (isAccessible(ognlContext, o, member, s)) {
             AccessibleObject accessible = (AccessibleObject) member;
 
             if (!accessible.isAccessible()) {
@@ -113,10 +114,10 @@ public class DefaultMemberAccess
         return result;
     }
 
-    public void restore(Map context, Object target, Member member, String propertyName, Object state)
+    public void restore(OgnlContext ognlContext, Object o, Member member, String s, Object o1)
     {
-        if (state != null) {
-            ((AccessibleObject) member).setAccessible(((Boolean) state).booleanValue());
+        if (o1 != null) {
+            ((AccessibleObject) member).setAccessible((Boolean) o1);
         }
     }
 
@@ -124,13 +125,13 @@ public class DefaultMemberAccess
      * Returns true if the given member is accessible or can be made accessible
      * by this object.
      *
-     * @param context the current execution context (not used).
-     * @param target the Object to test accessibility for (not used).
+     * @param ognlContext the current execution context (not used).
+     * @param o the Object to test accessibility for (not used).
      * @param member the Member to test accessibility for.
-     * @param propertyName the property to test accessibility for (not used).
+     * @param s the property to test accessibility for (not used).
      * @return true if the member is accessible in the context, false otherwise.
      */
-    public boolean isAccessible(Map context, Object target, Member member, String propertyName)
+    public boolean isAccessible(OgnlContext ognlContext, Object o, Member member, String s)
     {
         int modifiers = member.getModifiers();
         boolean result = Modifier.isPublic(modifiers);
