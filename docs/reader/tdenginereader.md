@@ -93,12 +93,12 @@ bin/addax.sh job/tdengine2stream.json
 
 ## 类型转换
 
-| Addax 内部类型| TDengine 数据类型    |
-| -------- | -----  |
-| Long     | SMALLINT, TINYINT, INT, BIGINT, TIMESTAMP |
-| Double   | FLOAT, DOUBLE|
-| String   |  BINARY, NCHAR |
-| Boolean  | BOOL   |
+| Addax 内部类型 | TDengine 数据类型                         |
+| -------------- | ----------------------------------------- |
+| Long           | SMALLINT, TINYINT, INT, BIGINT, TIMESTAMP |
+| Double         | FLOAT, DOUBLE                             |
+| String         | BINARY, NCHAR                             |
+| Boolean        | BOOL                                      |
 
 ## 当前支持版本
 

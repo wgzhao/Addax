@@ -37,19 +37,12 @@ bin/addax.sh job/stream2mysql.json
 
 ## 参数说明
 
-| 配置项    | 是否必须 | 类型   | 默认值 | 描述                                                                                              |
-| :-------- | :------: | ------ | ------ | ------------------------------------------------------------------------------------------------- |
-| jdbcUrl   |    是    | list   | 无     | 对端数据库的 JDBC 连接信息，jdbcUrl 按照 RDBMS 官方规范，并可以填写连接[附件控制信息][2]          |
-| driver    |    否    | string | 无     | 自定义驱动类名，解决兼容性问题，详见下面描述                                                      |
-| username  |    是    | string | 无     | 数据源的用户名                                                                                    |
-| password  |    否    | string | 无     | 数据源指定用户名的密码                                                                            |
-| table     |    是    | list   | 无     | 所选取的需要同步的表名,使用 JSON 数据格式，当配置为多张表时，用户自己需保证多张表是同一表结构     |
-| column    |    是    | list   | 无     | 所配置的表中需要同步的列名集合，详细描述见 [rdbmswriter][3]                                       |
-| session   |    否    | list   | 空     | 获取 MySQL 连接时，执行 session 指定的 SQL 语句，修改当前 connection session 属性         |
-| preSql    |    否    | list   | 无     | 数据写入前先执行的 sql 语句，例如清除旧数据,如果 Sql 中有你需要操作到的表名称，可用 `@table` 表示 |
-| postSql   |    否    | list   | 无     | 数据写入完成后执行的 sql 语句，例如加上某一个时间戳                                               |
-| writeMode |    是    | string | insert | 数据写入表的方式，详见下文                                                                        |
-| batchSize |    否    | int    | 1024   | 定义了插件和数据库服务器端每次批量数据获取条数                                                    |
+MysqlWriter 基于 [rdbmswriter](../rdbmswriter) 实现，因此可以参考 rdbmswriter 的所有配置项，并且增加了一些 MySQL 特有的配置项。
+
+| 配置项    | 是否必须 | 类型   | 默认值 | 描述                                           |
+| :-------- | :------: | ------ | ------ | ---------------------------------------------- |
+| writeMode |    是    | string | insert | 数据写入表的方式，详见下文                     |
+| batchSize |    否    | int    | 1024   | 定义了插件和数据库服务器端每次批量数据获取条数 |
 
 ### driver
 
@@ -71,19 +64,3 @@ bin/addax.sh job/stream2mysql.json
 - `replace`表示采用`replace into`方式
 - `update` 表示采用 `ON DUPLICATE KEY UPDATE` 语句
 
-## 类型转换
-
-| Addax 内部类型 | Mysql 数据类型                                       |
-| -------------- | ---------------------------------------------------- |
-| Long           | int, tinyint, smallint, mediumint, int, bigint, year |
-| Double         | float, double, decimal                               |
-| String         | varchar, char, tinytext, text, mediumtext, longtext  |
-| Date           | date, datetime, timestamp, time                      |
-| Boolean        | bit, bool                                            |
-| Bytes          | tinyblob, mediumblob, blob, longblob, varbinary      |
-
-bit 类型目前是未定义类型转换
-
-[1]: https://www.mysql.com
-[2]: http://dev.mysql.com/doc/connector-j/en/connector-j-reference-configuration-properties.html
-[3]: ../rdbmswriter

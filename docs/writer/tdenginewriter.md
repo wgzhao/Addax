@@ -56,16 +56,7 @@ bin/addax.sh job/tdengine2stream.json
 
 ## 参数说明
 
-| 配置项    | 是否必须 | 类型   | 默认值 | 描述                                                                                            |
-| :-------- | :------: | ------ | ------ | ----------------------------------------------------------------------------------------------- |
-| jdbcUrl   |    是    | list   | 无     | 对端数据库的JDBC连接信息，注意，这里的 `TAOS` 必须大写                                          |
-| username  |    是    | string | 无     | 数据源的用户名                                                                                  |
-| password  |    否    | string | 无     | 数据源指定用户名的密码                                                                          |
-| table     |    是    | list   | 无     | 所选取的需要同步的表名,使用JSON数据格式，当配置为多张表时，用户自己需保证多张表是同一表结构     |
-| column    |    是    | list   | 无     | 所配置的表中需要同步的列名集合，详细描述见 [rdbmswriter](../rdbmswriter)                        |
-| preSql    |    否    | list   | 无     | 数据写入钱先执行的sql语句，例如清除旧数据,如果 Sql 中有你需要操作到的表名称，可用 `@table` 表示 |
-| postSql   |    否    | list   | 无     | 数据写入完成后执行的sql语句，例如加上某一个时间戳                                               |
-| batchSize |    否    | int    | 1024   | 定义了插件和数据库服务器端每次批量数据获取条数                                                  |
+TDengineWriter 基于 [rdbmswriter](../rdbmswriter) 实现，因此可以参考 rdbmswriter 的所有配置项，并且增加了一些 TDengine 特有的配置项。
 
 ### 使用 JDBC-RESTful 接口
 
