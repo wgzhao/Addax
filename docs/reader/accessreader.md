@@ -26,7 +26,5 @@ bin/addax.sh job/access2stream.json
 
 ## 参数说明
 
-因本插件基于[Addax RDBMS Reader][2] 实现，所以参数说明请参考 [Addax RDBMS Reader][2]。
+AccessReader 基于 [rdbmsreader](../rdbmsreader) 实现，因此可以参考 rdbmsreader 的所有配置项。
 
-[1]: https://en.wikipedia.org/wiki/Microsoft_Access
-[2]: ../rdbmsreader

@@ -9,6 +9,8 @@ RDBMSReader 插件支持从传统 RDBMS 读取数据。这是一个通用关系�
 - [PostgreSQL Reader](postgresqlreader)
 - [ClickHouse Reader](clickhousereader)
 - [SQLServer Reader](sqlserverreader)
+- [Access Reader](accessreader)
+- [Databend Reader](databendreader)
 
 注意， 如果已经提供了专门的数据库读取插件的，推荐使用专用插件，如果你需要读取的数据库没有专门插件，则考虑使用该通用插件。 在使用之前，还需要执行以下操作才可以正常运行，否则运行会出现异常。
 
@@ -45,19 +47,20 @@ RDBMSReader 插件支持从传统 RDBMS 读取数据。这是一个通用关系�
 
 ## 参数说明
 
-| 配置项    | 是否必须 | 数据类型 | 默认值 | 描述                                                                        |
-| :-------- | :------: | -------- | ------ | -------------------------------------------------------------------------------------------------------------------- |
-| jdbcUrl   |    是    | array    | 无     | 对端数据库的JDBC连接信息，jdbcUrl按照RDBMS官方规范，并可以填写连接附件控制信息          |
-| driver    |    否    | string   | 无     | 自定义驱动类名，解决兼容性问题，详见下面描述                                            |
-| username  |    是    | string   | 无     | 数据源的用户名                                                                      |
-| password  |    否    | string   | 无     | 数据源指定用户名的密码                                                               |
-| table     |    是    | array    | 无     | 所选取的需要同步的表名,使用JSON数据格式，当配置为多张表时，用户自己需保证多张表是同一表结构    |
-| column    |    是    | array    | 无     | 所配置的表中需要同步的列名集合，详细描述见后                                                |
-| splitPk   |    否    | string   | 无     | 使用splitPk代表的字段进行数据分片，Addax因此会启动并发任务进行数据同步，这样可以大大提供数据同步的效能，注意事项见后 |
+| 配置项    | 是否必须 | 数据类型 | 默认值 | 描述                                                                                        |
+| :-------- | :------: | -------- | ------ | ------------------------------------------------------------------------------------------- |
+| jdbcUrl   |    是    | list     | 无     | 对端数据库的JDBC连接信息，jdbcUrl按照RDBMS官方规范，并可以填写连接附件控制信息              |
+| driver    |    否    | string   | 无     | 自定义驱动类名，解决兼容性问题，详见下面描述                                                |
+| username  |    是    | string   | 无     | 数据源的用户名                                                                              |
+| password  |    否    | string   | 无     | 数据源指定用户名的密码                                                                      |
+| table     |    是    | list     | 无     | 所选取的需要同步的表名,使用JSON数据格式，当配置为多张表时，用户自己需保证多张表是同一表结构 |
+| column    |    是    | list     | 无     | 所配置的表中需要同步的列名集合，详细描述见后                                                |
+| splitPk   |    否    | string   | 无     | 使用splitPk代表的字段进行数据分片，这样可以大大提供数据同步的效能，注意事项见后             |
 | autoPk    |    否    | bool     | false  | 是否自动猜测分片主键，`3.2.6` 版本引入，详见后面描述                                        |
-| where     |    否    | string   | 无     | 针对表的筛选条件                                                                                                     |
-| querySql  |    否    | string   | 无     | 使用自定义的SQL而不是指定表来获取数据，当配置了这一项之后，Addax系统就会忽略 `table`，`column`这些配置项             |
-| fetchSize |    否    | int      | 1024   | 定义了插件和数据库服务器端每次批量数据获取条数，调高该值可能导致 Addax 出现OOM                                       |
+| where     |    否    | string   | 无     | 针对表的筛选条件                                                                            |
+| session   |   是否   | list     | 无     | 针对本地连接,修改会话配置,详见下文                                                          |
+| querySql  |    否    | string   | 无     | 使用自定义的SQL而不是指定表来获取数据，当配置了这一项之后，忽略 `table`，`column`配置项忽略 |
+| fetchSize |    否    | int      | 1024   | 定义了插件和数据库服务器端每次批量数据获取条数，调高该值可能导致 Addax 出现OOM              |
 
 ### jdbcUrl
 
@@ -126,6 +129,23 @@ Column必须显示填写，不允许为空！
 - PostgreSQL
 - SQL Server
 
+### session
+
+控制写入数据的时间格式，时区等的配置，目前仅对 `MySQL`, `Oracle`, `SQLServer` 有效。下面是一个针对 Oracle 数据库配置 `session` 的例子。
+
+```json
+{
+  "session": [
+    "alter session set NLS_DATE_FORMAT='yyyy-mm-dd hh24:mi:ss'",
+    "alter session set NLS_TIMESTAMP_FORMAT='yyyy-mm-dd hh24:mi:ss'",
+    "alter session set NLS_TIMESTAMP_TZ_FORMAT='yyyy-mm-dd hh24:mi:ss'",
+    "alter session set TIME_ZONE='Asia/Chongqing'"
+  ]
+}
+```
+
+注意 `&quot;`是 `"` 的转义字符串
+
 ## 类型转换
 
 | Addax 内部类型 | RDBMS 数据类型                                                |
@@ -136,10 +156,3 @@ Column必须显示填写，不允许为空！
 | Date           | date, datetime, timestamp, time                               |
 | Boolean        | bit, bool                                                     |
 | Bytes          | tinyblob, mediumblob, blob, longblob, varbinary               |
-
-## 当前支持的数据库
-
-- [PrestoSQL](https://prestosql.io)
-- [TDH Inceptor2](http://transwarp.io/transwarp/)
-- [IBM DB2](https://www.ibm.com/analytics/db2)
-- [Apache Hive](https://hive.apache.org)

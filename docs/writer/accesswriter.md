@@ -30,7 +30,4 @@ bin/addax.sh job/stream2access.json
 
 ## 参数说明
 
-因本插件基于[Addax RDBMS Writer][2] 实现，所以参数说明请参考 [Addax RDBMS Writer][2]。
-
-[1]: https://en.wikipedia.org/wiki/Microsoft_Access
-[2]: ../rdbmswriter
+AccessWriter 基于 [rdbmswriter](../rdbmswriter) 实现，因此可以参考 rdbmswriter 的所有配置项。

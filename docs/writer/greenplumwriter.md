@@ -38,26 +38,4 @@ bin/addax.sh job/pg2gp.json
 
 ## 参数说明
 
-| 配置项    | 是否必须 | 默认值 | 描述                                                                                                             |
-| :-------- | :------: | ------ | ---------------------------------------------------------------------------------------------------------------- |
-| jdbcUrl   |    是    | 无     | 对端数据库的 JDBC 连接信息，jdbcUrl 按照 RDBMS 官方规范，并可以填写连接 [附件控制信息][1]                        |
-| username  |    是    | 无     | 数据源的用户名                                                                                                   |
-| password  |    否    | 无     | 数据源指定用户名的密码                                                                                           |
-| table     |    是    | 无     | 所选取的需要同步的表名,使用 JSON 数据格式，当配置为多张表时，用户自己需保证多张表是同一表结构                    |
-| column    |    是    | 无     | 所配置的表中需要同步的列名集合，详细描述见 [rdbmswriter](../rdbmswriter)                                         |
-| preSql    |    否    | 无     | 执行数据同步任务之前率先执行的 sql 语句，目前只允许执行一条 SQL 语句，例如清除旧数据,涉及到的表可用 `@table`表示 |
-| postSql   |    否    | 无     | 执行数据同步任务之后执行的 sql 语句，目前只允许执行一条 SQL 语句，例如加上某一个时间戳                           |
-| batchSize |    否    | 1024   | 一次写入的记录数，这里表示 `COPY FROM` 指令后接收的记录数                                                        |
-
-[1]: http://jdbc.postgresql.org/documentation/93/connect.html
-
-### 类型转换
-
-| Addax 内部类型 | Greenplum 数据类型                                        |
-| -------------- | --------------------------------------------------------- |
-| Long           | bigint, bigserial, integer, smallint, serial              |
-| Double         | double precision, money, numeric, real                    |
-| String         | varchar, char, text, bit, inet,cidr,macaddr,uuid,xml,json |
-| Date           | date, time, timestamp                                     |
-| Boolean        | bool                                                      |
-| Bytes          | bytea                                                     |
+GreenplumWriter 基于 [rdbmswriter](../rdbmswriter) 实现，因此可以参考 rdbmswriter 的所有配置项。
