@@ -795,21 +795,8 @@
       
         <li class="md-nav__item">
   <a href="#_4" class="md-nav__link">
-    类型转换
+    类型转换注意事项
   </a>
-  
-    <nav class="md-nav" aria-label="类型转换">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#_5" class="md-nav__link">
-    数据库编码问题
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
   
 </li>
       
@@ -1674,21 +1661,8 @@
       
         <li class="md-nav__item">
   <a href="#_4" class="md-nav__link">
-    类型转换
+    类型转换注意事项
   </a>
-  
-    <nav class="md-nav" aria-label="类型转换">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#_5" class="md-nav__link">
-    数据库编码问题
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
   
 </li>
       
@@ -1708,7 +1682,7 @@
 
 
 <h1 id="mysql-reader">MySQL Reader<a class="headerlink" href="#mysql-reader" title="Permanent link">&para;</a></h1>
-<p>MysqlReader 插件实现了从Mysql读取数据</p>
+<p>MysqlReader 插件实现了从 MySQL 读取数据的能力</p>
 <h2 id="_1">示例<a class="headerlink" href="#_1" title="Permanent link">&para;</a></h2>
 <p>我们在 MySQL 的 test 库上创建如下表，并插入一条记录</p>
 <div class="highlight"><pre><span></span><code><span class="k">CREATE</span><span class="w"> </span><span class="k">TABLE</span><span class="w"> </span><span class="n">addax_reader</span>
@@ -1813,89 +1787,7 @@
 <div class="highlight"><pre><span></span><code>bin/addax.sh<span class="w"> </span>job/mysql2stream.json
 </code></pre></div>
 <h2 id="_3">参数说明<a class="headerlink" href="#_3" title="Permanent link">&para;</a></h2>
-<table>
-<thead>
-<tr>
-<th align="left">配置项</th>
-<th align="center">是否必须</th>
-<th>类型</th>
-<th>默认值</th>
-<th>描述</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td align="left">jdbcUrl</td>
-<td align="center">是</td>
-<td>list</td>
-<td>无</td>
-<td>对端数据库的JDBC连接信息，jdbcUrl按照RDBMS官方规范，并可以填写连接<a href="http://dev.mysql.com/doc/connector-j/en/connector-j-reference-configuration-properties.html">附件控制信息</a></td>
-</tr>
-<tr>
-<td align="left">driver</td>
-<td align="center">否</td>
-<td>string</td>
-<td>无</td>
-<td>自定义驱动类名，解决兼容性问题，详见下面描述</td>
-</tr>
-<tr>
-<td align="left">username</td>
-<td align="center">是</td>
-<td>string</td>
-<td>无</td>
-<td>数据源的用户名</td>
-</tr>
-<tr>
-<td align="left">password</td>
-<td align="center">否</td>
-<td>string</td>
-<td>无</td>
-<td>数据源指定用户名的密码</td>
-</tr>
-<tr>
-<td align="left">table</td>
-<td align="center">是</td>
-<td>list</td>
-<td>无</td>
-<td>所选取的需要同步的表名,使用JSON数据格式，当配置为多张表时，用户自己需保证多张表是同一表结构</td>
-</tr>
-<tr>
-<td align="left">column</td>
-<td align="center">是</td>
-<td>list</td>
-<td>无</td>
-<td>所配置的表中需要同步的列名集合，详细描述 <a href="../rdbmsreader">rdbmreader</a></td>
-</tr>
-<tr>
-<td align="left">splitPk</td>
-<td align="center">否</td>
-<td>string</td>
-<td>无</td>
-<td>使用splitPk代表的字段进行数据分片，详细描述见 <a href="../rdbmsreader">rdbmreader</a></td>
-</tr>
-<tr>
-<td align="left">autoPk</td>
-<td align="center">否</td>
-<td>bool</td>
-<td>false</td>
-<td>是否自动猜测分片主键，<code>3.2.6</code> 版本引入</td>
-</tr>
-<tr>
-<td align="left">where</td>
-<td align="center">否</td>
-<td>string</td>
-<td>无</td>
-<td>针对表的筛选条件</td>
-</tr>
-<tr>
-<td align="left">querySql</td>
-<td align="center">否</td>
-<td>list</td>
-<td>无</td>
-<td>使用自定义的SQL而不是指定表来获取数据，当配置了这一项之后，Addax系统就会忽略 <code>table</code>，<code>column</code>这些配置项</td>
-</tr>
-</tbody>
-</table>
+<p>MysqlReader 基于 <a href="../rdbmsreader">rdbmsreader</a> 实现，因此可以参考 rdbmsreader 的所有配置项。</p>
 <h3 id="driver">driver<a class="headerlink" href="#driver" title="Permanent link">&para;</a></h3>
 <p>当前 Addax 采用的 MySQL JDBC 驱动为 8.0 以上版本，驱动类名使用的 <code>com.mysql.cj.jdbc.Driver</code>，而不是 <code>com.mysql.jdbc.Driver</code>。 如果你需要采集的 MySQL 服务低于 <code>5.6</code>，需要使用到 <code>Connector/J 5.1</code> 驱动，则可以采取下面的步骤：</p>
 <p><strong>替换插件内置的驱动</strong></p>
@@ -1904,54 +1796,12 @@
 <p><code>cp mysql-connector-java-5.1.48.jar plugin/reader/mysqlreader/lib/</code></p>
 <p><strong>指定驱动类名称</strong></p>
 <p>在你的 json 文件类，配置 <code>"driver": "com.mysql.jdbc.Driver"</code></p>
-<h2 id="_4">类型转换<a class="headerlink" href="#_4" title="Permanent link">&para;</a></h2>
-<p>目前MysqlReader支持大部分Mysql类型，但也存在部分个别类型没有支持的情况，请注意检查你的类型。</p>
-<p>下面列出MysqlReader针对Mysql类型转换列表:</p>
-<table>
-<thead>
-<tr>
-<th>Addax 内部类型</th>
-<th>MySQL 数据类型</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>Long</td>
-<td>int, tinyint, smallint, mediumint, int, bigint</td>
-</tr>
-<tr>
-<td>Double</td>
-<td>float, double, decimal</td>
-</tr>
-<tr>
-<td>String</td>
-<td>varchar, char, tinytext, text, mediumtext, longtext, year</td>
-</tr>
-<tr>
-<td>Date</td>
-<td>date, datetime, timestamp, time</td>
-</tr>
-<tr>
-<td>Boolean</td>
-<td>bit, bool</td>
-</tr>
-<tr>
-<td>Bytes</td>
-<td>tinyblob, mediumblob, blob, longblob, varbinary</td>
-</tr>
-</tbody>
-</table>
-<p>请注意:</p>
+<h2 id="_4">类型转换注意事项<a class="headerlink" href="#_4" title="Permanent link">&para;</a></h2>
 <ul>
-<li>除上述罗列字段类型外，其他类型均不支持</li>
-<li><code>tinyint(1)</code> Addax视作为整形</li>
-<li><code>year</code> Addax视作为字符串类型</li>
-<li><code>bit</code> Addax属于未定义行为</li>
+<li><code>tinyint(1)</code> 会视为整形</li>
+<li><code>year</code> 被视为整形</li>
+<li><code>bit</code> 如果是 <code>bit(1)</code> 被视为布尔类型，否则当作二进制类型</li>
 </ul>
-<h3 id="_5">数据库编码问题<a class="headerlink" href="#_5" title="Permanent link">&para;</a></h3>
-<p>Mysql本身的编码设置非常灵活，包括指定编码到库、表、字段级别，甚至可以均不同编码。优先级从高到低为字段、表、库、实例。我们不推荐数据库用户设置如此混乱的编码，最好在库级别就统一到UTF-8。</p>
-<p>MysqlReader底层使用JDBC进行数据抽取，JDBC天然适配各类编码，并在底层进行了编码转换。因此MysqlReader不需用户指定编码，可以自动获取编码并转码。</p>
-<p>对于Mysql底层写入编码和其设定的编码不一致的混乱情况，MysqlReader对此无法识别，对此也无法提供解决方案，对于这类情况，<code>导出有可能为乱码</code>。</p>
 
 
   

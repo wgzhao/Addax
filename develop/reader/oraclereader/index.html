@@ -779,45 +779,12 @@
     参数说明
   </a>
   
-    <nav class="md-nav" aria-label="参数说明">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#session" class="md-nav__link">
-    session
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
 </li>
       
         <li class="md-nav__item">
   <a href="#geometry" class="md-nav__link">
     对 GEOMETRY 类型的支持
   </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#_3" class="md-nav__link">
-    类型转换
-  </a>
-  
-    <nav class="md-nav" aria-label="类型转换">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#_4" class="md-nav__link">
-    数据库编码问题
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
   
 </li>
       
@@ -1638,45 +1605,12 @@
     参数说明
   </a>
   
-    <nav class="md-nav" aria-label="参数说明">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#session" class="md-nav__link">
-    session
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
 </li>
       
         <li class="md-nav__item">
   <a href="#geometry" class="md-nav__link">
     对 GEOMETRY 类型的支持
   </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#_3" class="md-nav__link">
-    类型转换
-  </a>
-  
-    <nav class="md-nav" aria-label="类型转换">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#_4" class="md-nav__link">
-    数据库编码问题
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
   
 </li>
       
@@ -1696,7 +1630,7 @@
 
 
 <h1 id="oracle-reader">Oracle Reader<a class="headerlink" href="#oracle-reader" title="Permanent link">&para;</a></h1>
-<p>OracleReader 插件用于从Oracle读取数据</p>
+<p>OracleReader 插件用于从 Oracle 读取数据</p>
 <h2 id="_1">配置样例<a class="headerlink" href="#_1" title="Permanent link">&para;</a></h2>
 <p>配置一个从Oracle数据库同步抽取数据到本地的作业:</p>
 <div class="tabbed-set" data-tabs="1:1"><input checked="checked" id="__tabbed_1_1" name="__tabbed_1" type="radio" /><label for="__tabbed_1_1">job/oracle2stream.json</label><div class="tabbed-content"></div>
@@ -1743,96 +1677,7 @@
 <span class="p">}</span>
 </code></pre></div>
 <h2 id="_2">参数说明<a class="headerlink" href="#_2" title="Permanent link">&para;</a></h2>
-<table>
-<thead>
-<tr>
-<th align="left">配置项</th>
-<th align="center">是否必须</th>
-<th>默认值</th>
-<th>描述</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td align="left">jdbcUrl</td>
-<td align="center">是</td>
-<td>无</td>
-<td>对端数据库的JDBC连接信息，jdbcUrl按照RDBMS官方规范，并可以填写连接<a href="http://www.oracle.com/technetwork/database/enterprise-edition/documentation/index.html">附件控制信息</a></td>
-</tr>
-<tr>
-<td align="left">username</td>
-<td align="center">是</td>
-<td>无</td>
-<td>数据源的用户名</td>
-</tr>
-<tr>
-<td align="left">password</td>
-<td align="center">否</td>
-<td>无</td>
-<td>数据源指定用户名的密码</td>
-</tr>
-<tr>
-<td align="left">table</td>
-<td align="center">是</td>
-<td>无</td>
-<td>所选取的需要同步的表名,使用JSON数据格式，当配置为多张表时，用户自己需保证多张表是同一表结构</td>
-</tr>
-<tr>
-<td align="left">column</td>
-<td align="center">是</td>
-<td>无</td>
-<td>所配置的表中需要同步的列名集合，详细描述见 <a href="../rdbmsreader">rdbmsreader</a></td>
-</tr>
-<tr>
-<td align="left">splitPk</td>
-<td align="center">否</td>
-<td>无</td>
-<td>使用splitPk代表的字段进行数据分片，Addax因此会启动并发任务进行数据同步，这样可以大大提供数据同步的效能</td>
-</tr>
-<tr>
-<td align="left">autoPk</td>
-<td align="center">否</td>
-<td>false</td>
-<td>是否自动猜测分片主键，<code>3.2.6</code> 版本引入</td>
-</tr>
-<tr>
-<td align="left">where</td>
-<td align="center">否</td>
-<td>无</td>
-<td>针对表的筛选条件</td>
-</tr>
-<tr>
-<td align="left">querySql</td>
-<td align="center">否</td>
-<td>无</td>
-<td>使用自定义的SQL而不是指定表来获取数据，当配置了这一项之后，Addax系统就会忽略 <code>table</code>，<code>column</code>这些配置项</td>
-</tr>
-<tr>
-<td align="left">fetchSize</td>
-<td align="center">否</td>
-<td>1024</td>
-<td>定义了插件和数据库服务器端每次批量数据获取条数，调高该值可能导致 Addax 出现OOM</td>
-</tr>
-<tr>
-<td align="left">session</td>
-<td align="center">否</td>
-<td>无</td>
-<td>针对本地连接,修改会话配置,详见下文</td>
-</tr>
-</tbody>
-</table>
-<h3 id="session">session<a class="headerlink" href="#session" title="Permanent link">&para;</a></h3>
-<p>控制写入数据的时间格式，时区等的配置，如果表中有时间字段，配置该值以明确告知写入 oracle 的时间格式。通常配置的参数为：<code>NLS_DATE_FORMAT</code>,<code>NLS_TIME_FORMAT</code>。其配置的值为 <code>json</code> 格式，例如：</p>
-<div class="highlight"><pre><span></span><code><span class="p">{</span>
-<span class="w">  </span><span class="nt">&quot;session&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span>
-<span class="w">    </span><span class="s2">&quot;alter session set NLS_DATE_FORMAT=&#39;yyyy-mm-dd hh24:mi:ss&#39;&quot;</span><span class="p">,</span>
-<span class="w">    </span><span class="s2">&quot;alter session set NLS_TIMESTAMP_FORMAT=&#39;yyyy-mm-dd hh24:mi:ss&#39;&quot;</span><span class="p">,</span>
-<span class="w">    </span><span class="s2">&quot;alter session set NLS_TIMESTAMP_TZ_FORMAT=&#39;yyyy-mm-dd hh24:mi:ss&#39;&quot;</span><span class="p">,</span>
-<span class="w">    </span><span class="s2">&quot;alter session set TIME_ZONE=&#39;Asia/Chongqing&#39;&quot;</span>
-<span class="w">  </span><span class="p">]</span>
-<span class="p">}</span>
-</code></pre></div>
-<p>注意 <code>&amp;quot;</code>是 <code>"</code> 的转义字符串</p>
+<p>OracleReader 基于 <a href="../rdbmsreader">rdbmsreader</a> 实现，因此可以参考 rdbmsreader 的所有配置项。</p>
 <h2 id="geometry">对 GEOMETRY 类型的支持<a class="headerlink" href="#geometry" title="Permanent link">&para;</a></h2>
 <p>从 Addax <code>4.0.13</code> 开始，实验性的支持 Oracle GEOMETRY 类型，该插件会把该类型的数据转为 JSON 数组字符串。</p>
 <p>假定你有这样的的表和数据</p>
@@ -1841,54 +1686,7 @@
 <p>读取表该的数据的最后输出结果类似如下：</p>
 <div class="highlight"><pre><span></span><code>--8&lt;-- &quot;assets/output/oracle_geom_reader.txt
 </code></pre></div>
-<p>注意：该数据类型目前还处于实验支持阶段，作者对次数据类型的理解并不深刻，也未经过全面的测试，请勿直接在生产环境使用。</p>
-<h2 id="_3">类型转换<a class="headerlink" href="#_3" title="Permanent link">&para;</a></h2>
-<table>
-<thead>
-<tr>
-<th>Addax 内部类型</th>
-<th>Oracle 数据类型</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>Long</td>
-<td>NUMBER, INTEGER, INT, SMALLINT</td>
-</tr>
-<tr>
-<td>Double</td>
-<td>NUMERIC, DECIMAL, FLOAT, DOUBLE PRECISION, REAL</td>
-</tr>
-<tr>
-<td>String</td>
-<td>LONG ,CHAR, NCHAR, VARCHAR, VARCHAR2, NVARCHAR2, CLOB, NCLOB, CHARACTER, STRUCT</td>
-</tr>
-<tr>
-<td>String</td>
-<td>CHARACTER VARYING, CHAR VARYING, NATIONAL CHARACTER, NATIONAL CHAR, NATIONAL CHARACTER VARYING</td>
-</tr>
-<tr>
-<td>String</td>
-<td>NATIONAL CHAR VARYING, NCHAR VARYING</td>
-</tr>
-<tr>
-<td>Date</td>
-<td>TIMESTAMP, DATE</td>
-</tr>
-<tr>
-<td>Boolean</td>
-<td>bit, bool</td>
-</tr>
-<tr>
-<td>Bytes</td>
-<td>BLOB, BFILE, RAW, LONG RAW</td>
-</tr>
-</tbody>
-</table>
-<p>请注意: 除上述罗列字段类型外，其他类型均不支持</p>
-<h3 id="_4">数据库编码问题<a class="headerlink" href="#_4" title="Permanent link">&para;</a></h3>
-<p>OracleReader底层使用JDBC进行数据抽取，JDBC天然适配各类编码，并在底层进行了编码转换。因此OracleReader不需用户指定编码，可以自动获取编码并转码。</p>
-<p>对于Oracle底层写入编码和其设定的编码不一致的混乱情况，OracleReader对此无法识别，对此也无法提供解决方案，对于这类情况，<strong>导出有可能为乱码</strong>。</p>
+<p>注意：该数据类型目前还处于实验支持阶段，作者对此数据类型的理解并不深刻，也未经过全面的测试，请勿直接在生产环境使用。</p>
 
 
   

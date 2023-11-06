@@ -1180,19 +1180,6 @@
     参数说明
   </a>
   
-    <nav class="md-nav" aria-label="参数说明">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#_5" class="md-nav__link">
-    类型转换
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
 </li>
       
     </ul>
@@ -1651,19 +1638,6 @@
     参数说明
   </a>
   
-    <nav class="md-nav" aria-label="参数说明">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#_5" class="md-nav__link">
-    类型转换
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
 </li>
       
     </ul>
@@ -1801,101 +1775,7 @@
 <div class="highlight"><pre><span></span><code>bin/addax.sh<span class="w"> </span>job/pg2gp.json
 </code></pre></div>
 <h2 id="_4">参数说明<a class="headerlink" href="#_4" title="Permanent link">&para;</a></h2>
-<table>
-<thead>
-<tr>
-<th align="left">配置项</th>
-<th align="center">是否必须</th>
-<th>默认值</th>
-<th>描述</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td align="left">jdbcUrl</td>
-<td align="center">是</td>
-<td>无</td>
-<td>对端数据库的 JDBC 连接信息，jdbcUrl 按照 RDBMS 官方规范，并可以填写连接 <a href="http://jdbc.postgresql.org/documentation/93/connect.html">附件控制信息</a></td>
-</tr>
-<tr>
-<td align="left">username</td>
-<td align="center">是</td>
-<td>无</td>
-<td>数据源的用户名</td>
-</tr>
-<tr>
-<td align="left">password</td>
-<td align="center">否</td>
-<td>无</td>
-<td>数据源指定用户名的密码</td>
-</tr>
-<tr>
-<td align="left">table</td>
-<td align="center">是</td>
-<td>无</td>
-<td>所选取的需要同步的表名,使用 JSON 数据格式，当配置为多张表时，用户自己需保证多张表是同一表结构</td>
-</tr>
-<tr>
-<td align="left">column</td>
-<td align="center">是</td>
-<td>无</td>
-<td>所配置的表中需要同步的列名集合，详细描述见 <a href="../rdbmswriter">rdbmswriter</a></td>
-</tr>
-<tr>
-<td align="left">preSql</td>
-<td align="center">否</td>
-<td>无</td>
-<td>执行数据同步任务之前率先执行的 sql 语句，目前只允许执行一条 SQL 语句，例如清除旧数据,涉及到的表可用 <code>@table</code>表示</td>
-</tr>
-<tr>
-<td align="left">postSql</td>
-<td align="center">否</td>
-<td>无</td>
-<td>执行数据同步任务之后执行的 sql 语句，目前只允许执行一条 SQL 语句，例如加上某一个时间戳</td>
-</tr>
-<tr>
-<td align="left">batchSize</td>
-<td align="center">否</td>
-<td>1024</td>
-<td>一次写入的记录数，这里表示 <code>COPY FROM</code> 指令后接收的记录数</td>
-</tr>
-</tbody>
-</table>
-<h3 id="_5">类型转换<a class="headerlink" href="#_5" title="Permanent link">&para;</a></h3>
-<table>
-<thead>
-<tr>
-<th>Addax 内部类型</th>
-<th>Greenplum 数据类型</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>Long</td>
-<td>bigint, bigserial, integer, smallint, serial</td>
-</tr>
-<tr>
-<td>Double</td>
-<td>double precision, money, numeric, real</td>
-</tr>
-<tr>
-<td>String</td>
-<td>varchar, char, text, bit, inet,cidr,macaddr,uuid,xml,json</td>
-</tr>
-<tr>
-<td>Date</td>
-<td>date, time, timestamp</td>
-</tr>
-<tr>
-<td>Boolean</td>
-<td>bool</td>
-</tr>
-<tr>
-<td>Bytes</td>
-<td>bytea</td>
-</tr>
-</tbody>
-</table>
+<p>GreenplumWriter 基于 <a href="../rdbmswriter">rdbmswriter</a> 实现，因此可以参考 rdbmswriter 的所有配置项。</p>
 
 
   

@@ -1373,6 +1373,13 @@
   
 </li>
         
+          <li class="md-nav__item">
+  <a href="#session" class="md-nav__link">
+    session
+  </a>
+  
+</li>
+        
       </ul>
     </nav>
   
@@ -1663,6 +1670,13 @@
   
 </li>
         
+          <li class="md-nav__item">
+  <a href="#session" class="md-nav__link">
+    session
+  </a>
+  
+</li>
+        
       </ul>
     </nav>
   
@@ -1692,6 +1706,8 @@
 <li><a href="postgresqlwriter">PostgreSQL Writer</a></li>
 <li><a href="clickhousewriter">ClickHouse Writer</a></li>
 <li><a href="sqlserverwriter">SQLServer Writer</a></li>
+<li><a href="accesswriter">Access Writer</a></li>
+<li><a href="databendwriter">Databend Writer</a></li>
 </ul>
 <p>注意, 如果已经提供了专门的数据库写入插件的，推荐使用专用插件，如果你需要写入的数据库没有专门插件，则考虑使用该通用插件。 在使用之前，还需要执行以下操作才可以正常运行，否则运行会出现异常。</p>
 <h2 id="_1">配置驱动<a class="headerlink" href="#_1" title="Permanent link">&para;</a></h2>
@@ -1824,28 +1840,28 @@
 <tr>
 <td align="left">table</td>
 <td align="center">是</td>
-<td>array</td>
+<td>list</td>
 <td>无</td>
 <td>所选取的需要同步的表名,使用JSON数据格式，当配置为多张表时，用户自己需保证多张表是同一表结构</td>
 </tr>
 <tr>
 <td align="left">column</td>
 <td align="center">是</td>
-<td>array</td>
+<td>list</td>
 <td>无</td>
 <td>所配置的表中需要同步的列名集合，详细描述见后</td>
 </tr>
 <tr>
 <td align="left">preSql</td>
 <td align="center">否</td>
-<td>array</td>
+<td>list</td>
 <td>无</td>
 <td>执行数据同步任务之前率先执行的sql语句，目前只允许执行一条SQL语句，例如清除旧数据,涉及到的表可用 <code>@table</code>表示</td>
 </tr>
 <tr>
 <td align="left">postSql</td>
 <td align="center">否</td>
-<td>array</td>
+<td>list</td>
 <td>无</td>
 <td>执行数据同步任务之后执行的sql语句，目前只允许执行一条SQL语句，例如加上某一个时间戳</td>
 </tr>
@@ -1855,6 +1871,13 @@
 <td>int</td>
 <td>1024</td>
 <td>定义了插件和数据库服务器端每次批量数据获取条数，调高该值可能导致 Addax 出现OOM或者目标数据库事务提交失败导致挂起</td>
+</tr>
+<tr>
+<td align="left">session</td>
+<td align="center">是否</td>
+<td>list</td>
+<td>无</td>
+<td>针对本地连接,修改会话配置,详见下文</td>
 </tr>
 </tbody>
 </table>
@@ -1915,6 +1938,15 @@
 <p>大部分情况下，一个数据库的JDBC驱动是固定的，但有些因为版本的不同，所建议的驱动类名不同，比如 MySQL。 
 新的 MySQL JDBC 驱动类型推荐使用 <code>com.mysql.cj.jdbc.Driver</code> 而不是以前的 <code>com.mysql.jdbc.Drver</code>。
 如果想要使用就的驱动名称，则可以配置 <code>driver</code> 配置项。</p>
+<h3 id="session">session<a class="headerlink" href="#session" title="Permanent link">&para;</a></h3>
+<p>描述：设置数据库连接时的session信息，比如针对 Oracle 数据库，可以设置如下：</p>
+<div class="highlight"><pre><span></span><code><span class="p">{</span>
+<span class="w">  </span><span class="nt">&quot;session&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span>
+<span class="w">    </span><span class="s2">&quot;alter session set nls_date_format = &#39;dd.mm.yyyy hh24:mi:ss&#39;;&quot;</span><span class="p">,</span>
+<span class="w">    </span><span class="s2">&quot;alter session set NLS_LANG = &#39;AMERICAN&#39;;&quot;</span>
+<span class="w">  </span><span class="p">]</span>
+<span class="p">}</span>
+</code></pre></div>
 
 
   

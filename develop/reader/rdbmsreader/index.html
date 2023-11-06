@@ -858,6 +858,13 @@
   
 </li>
         
+          <li class="md-nav__item">
+  <a href="#session" class="md-nav__link">
+    session
+  </a>
+  
+</li>
+        
       </ul>
     </nav>
   
@@ -866,13 +873,6 @@
         <li class="md-nav__item">
   <a href="#_4" class="md-nav__link">
     类型转换
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#_5" class="md-nav__link">
-    当前支持的数据库
   </a>
   
 </li>
@@ -1717,6 +1717,13 @@
   
 </li>
         
+          <li class="md-nav__item">
+  <a href="#session" class="md-nav__link">
+    session
+  </a>
+  
+</li>
+        
       </ul>
     </nav>
   
@@ -1725,13 +1732,6 @@
         <li class="md-nav__item">
   <a href="#_4" class="md-nav__link">
     类型转换
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#_5" class="md-nav__link">
-    当前支持的数据库
   </a>
   
 </li>
@@ -1760,6 +1760,8 @@
 <li><a href="postgresqlreader">PostgreSQL Reader</a></li>
 <li><a href="clickhousereader">ClickHouse Reader</a></li>
 <li><a href="sqlserverreader">SQLServer Reader</a></li>
+<li><a href="accessreader">Access Reader</a></li>
+<li><a href="databendreader">Databend Reader</a></li>
 </ul>
 <p>注意， 如果已经提供了专门的数据库读取插件的，推荐使用专用插件，如果你需要读取的数据库没有专门插件，则考虑使用该通用插件。 在使用之前，还需要执行以下操作才可以正常运行，否则运行会出现异常。</p>
 <h2 id="_1">配置驱动<a class="headerlink" href="#_1" title="Permanent link">&para;</a></h2>
@@ -1846,7 +1848,7 @@
 <tr>
 <td align="left">jdbcUrl</td>
 <td align="center">是</td>
-<td>array</td>
+<td>list</td>
 <td>无</td>
 <td>对端数据库的JDBC连接信息，jdbcUrl按照RDBMS官方规范，并可以填写连接附件控制信息</td>
 </tr>
@@ -1874,14 +1876,14 @@
 <tr>
 <td align="left">table</td>
 <td align="center">是</td>
-<td>array</td>
+<td>list</td>
 <td>无</td>
 <td>所选取的需要同步的表名,使用JSON数据格式，当配置为多张表时，用户自己需保证多张表是同一表结构</td>
 </tr>
 <tr>
 <td align="left">column</td>
 <td align="center">是</td>
-<td>array</td>
+<td>list</td>
 <td>无</td>
 <td>所配置的表中需要同步的列名集合，详细描述见后</td>
 </tr>
@@ -1890,7 +1892,7 @@
 <td align="center">否</td>
 <td>string</td>
 <td>无</td>
-<td>使用splitPk代表的字段进行数据分片，Addax因此会启动并发任务进行数据同步，这样可以大大提供数据同步的效能，注意事项见后</td>
+<td>使用splitPk代表的字段进行数据分片，这样可以大大提供数据同步的效能，注意事项见后</td>
 </tr>
 <tr>
 <td align="left">autoPk</td>
@@ -1907,11 +1909,18 @@
 <td>针对表的筛选条件</td>
 </tr>
 <tr>
+<td align="left">session</td>
+<td align="center">是否</td>
+<td>list</td>
+<td>无</td>
+<td>针对本地连接,修改会话配置,详见下文</td>
+</tr>
+<tr>
 <td align="left">querySql</td>
 <td align="center">否</td>
 <td>string</td>
 <td>无</td>
-<td>使用自定义的SQL而不是指定表来获取数据，当配置了这一项之后，Addax系统就会忽略 <code>table</code>，<code>column</code>这些配置项</td>
+<td>使用自定义的SQL而不是指定表来获取数据，当配置了这一项之后，忽略 <code>table</code>，<code>column</code>配置项忽略</td>
 </tr>
 <tr>
 <td align="left">fetchSize</td>
@@ -1993,6 +2002,18 @@
 <li>PostgreSQL</li>
 <li>SQL Server</li>
 </ul>
+<h3 id="session">session<a class="headerlink" href="#session" title="Permanent link">&para;</a></h3>
+<p>控制写入数据的时间格式，时区等的配置，目前仅对 <code>MySQL</code>, <code>Oracle</code>, <code>SQLServer</code> 有效。下面是一个针对 Oracle 数据库配置 <code>session</code> 的例子。</p>
+<div class="highlight"><pre><span></span><code><span class="p">{</span>
+<span class="w">  </span><span class="nt">&quot;session&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span>
+<span class="w">    </span><span class="s2">&quot;alter session set NLS_DATE_FORMAT=&#39;yyyy-mm-dd hh24:mi:ss&#39;&quot;</span><span class="p">,</span>
+<span class="w">    </span><span class="s2">&quot;alter session set NLS_TIMESTAMP_FORMAT=&#39;yyyy-mm-dd hh24:mi:ss&#39;&quot;</span><span class="p">,</span>
+<span class="w">    </span><span class="s2">&quot;alter session set NLS_TIMESTAMP_TZ_FORMAT=&#39;yyyy-mm-dd hh24:mi:ss&#39;&quot;</span><span class="p">,</span>
+<span class="w">    </span><span class="s2">&quot;alter session set TIME_ZONE=&#39;Asia/Chongqing&#39;&quot;</span>
+<span class="w">  </span><span class="p">]</span>
+<span class="p">}</span>
+</code></pre></div>
+<p>注意 <code>&amp;quot;</code>是 <code>"</code> 的转义字符串</p>
 <h2 id="_4">类型转换<a class="headerlink" href="#_4" title="Permanent link">&para;</a></h2>
 <table>
 <thead>
@@ -2028,13 +2049,6 @@
 </tr>
 </tbody>
 </table>
-<h2 id="_5">当前支持的数据库<a class="headerlink" href="#_5" title="Permanent link">&para;</a></h2>
-<ul>
-<li><a href="https://prestosql.io">PrestoSQL</a></li>
-<li><a href="http://transwarp.io/transwarp/">TDH Inceptor2</a></li>
-<li><a href="https://www.ibm.com/analytics/db2">IBM DB2</a></li>
-<li><a href="https://hive.apache.org">Apache Hive</a></li>
-</ul>
 
 
   

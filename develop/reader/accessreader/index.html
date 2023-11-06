@@ -1642,7 +1642,7 @@
 
 
 <h1 id="access-reader">Access Reader<a class="headerlink" href="#access-reader" title="Permanent link">&para;</a></h1>
-<p>AccessReader 实现了从 <a href="https://en.wikipedia.org/wiki/Microsoft_Access">Access</a> 数据库上读取数据的能力，他基于 <a href="../rdbmsreader">Addax RDBMS Reader</a> 实现。</p>
+<p>AccessReader 实现了从 [Access][1] 数据库上读取数据的能力，他基于 [Addax RDBMS Reader][2] 实现。</p>
 <h2 id="_1">示例<a class="headerlink" href="#_1" title="Permanent link">&para;</a></h2>
 <p>我们下载用于测试用的 <a href="http://www.databasedev.co.uk/downloads/AccessThemeDemo.zip">Acess Demo</a> 文件，解药后得到 <code>AccessThemeDemo.mdb</code> 文件，该文件中包含了一个 <code>tbl_Users</code> 表，我们将该表的数据同步到终端上。</p>
 <p>下面的配置是读取该表到终端的作业:</p>
@@ -1697,7 +1697,7 @@
 <div class="highlight"><pre><span></span><code>bin/addax.sh<span class="w"> </span>job/access2stream.json
 </code></pre></div>
 <h2 id="_3">参数说明<a class="headerlink" href="#_3" title="Permanent link">&para;</a></h2>
-<p>因本插件基于<a href="../rdbmsreader">Addax RDBMS Reader</a> 实现，所以参数说明请参考 <a href="../rdbmsreader">Addax RDBMS Reader</a>。</p>
+<p>AccessReader 基于 <a href="../rdbmsreader">rdbmsreader</a> 实现，因此可以参考 rdbmsreader 的所有配置项。</p>
 
 
   

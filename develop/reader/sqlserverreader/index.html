@@ -865,13 +865,6 @@
   
 </li>
       
-        <li class="md-nav__item">
-  <a href="#_3" class="md-nav__link">
-    类型转换
-  </a>
-  
-</li>
-      
     </ul>
   
 </nav>
@@ -1607,13 +1600,6 @@
   
 </li>
       
-        <li class="md-nav__item">
-  <a href="#_3" class="md-nav__link">
-    类型转换
-  </a>
-  
-</li>
-      
     </ul>
   
 </nav>
@@ -1630,9 +1616,9 @@
 
 
 <h1 id="sqlserver-reader">SQLServer Reader<a class="headerlink" href="#sqlserver-reader" title="Permanent link">&para;</a></h1>
-<p>SqlServerReader插件用于从从SqlServer读取数据。</p>
+<p>SqlServerReader 插件用于从从 SQLServer 读取数据。</p>
 <h2 id="_1">配置样例<a class="headerlink" href="#_1" title="Permanent link">&para;</a></h2>
-<p>配置一个从SqlServer数据库同步抽取数据到本地的作业:</p>
+<p>配置一个从 SQLServer 数据库同步抽取数据到本地的作业:</p>
 <div class="tabbed-set" data-tabs="1:1"><input checked="checked" id="__tabbed_1_1" name="__tabbed_1" type="radio" /><label for="__tabbed_1_1">job/sqlserver2stream.json</label><div class="tabbed-content"></div>
 </div>
 <div class="highlight"><pre><span></span><code><span class="p">{</span>
@@ -1677,124 +1663,7 @@
 <span class="p">}</span>
 </code></pre></div>
 <h2 id="_2">参数说明<a class="headerlink" href="#_2" title="Permanent link">&para;</a></h2>
-<table>
-<thead>
-<tr>
-<th align="left">配置项</th>
-<th align="center">是否必须</th>
-<th>默认值</th>
-<th>描述</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td align="left">jdbcUrl</td>
-<td align="center">是</td>
-<td>无</td>
-<td>对端数据库的JDBC连接信息，jdbcUrl按照RDBMS官方规范，并可以填写连接附件控制信息</td>
-</tr>
-<tr>
-<td align="left">username</td>
-<td align="center">是</td>
-<td>无</td>
-<td>数据源的用户名</td>
-</tr>
-<tr>
-<td align="left">password</td>
-<td align="center">否</td>
-<td>无</td>
-<td>数据源指定用户名的密码</td>
-</tr>
-<tr>
-<td align="left">table</td>
-<td align="center">是</td>
-<td>无</td>
-<td>所选取的需要同步的表名,使用JSON数据格式，当配置为多张表时，用户自己需保证多张表是同一表结构</td>
-</tr>
-<tr>
-<td align="left">column</td>
-<td align="center">是</td>
-<td>无</td>
-<td>所配置的表中需要同步的列名集合，详细描述见 <a href="../rdbmsreader/">rdbmsreader</a></td>
-</tr>
-<tr>
-<td align="left">splitPk</td>
-<td align="center">否</td>
-<td>无</td>
-<td>使用splitPk代表的字段进行数据分片，详细描述见 <a href="../rdbmsreader/">rdbmsreader</a></td>
-</tr>
-<tr>
-<td align="left">autoPk</td>
-<td align="center">否</td>
-<td>false</td>
-<td>是否自动猜测分片主键，<code>3.2.6</code> 版本引入</td>
-</tr>
-<tr>
-<td align="left">where</td>
-<td align="center">否</td>
-<td>无</td>
-<td>针对表的筛选条件</td>
-</tr>
-<tr>
-<td align="left">querySql</td>
-<td align="center">否</td>
-<td>无</td>
-<td>使用自定义的SQL而不是指定表来获取数据，当配置了这一项之后，Addax系统就会忽略 <code>table</code>，<code>column</code>这些配置项</td>
-</tr>
-<tr>
-<td align="left">fetchSize</td>
-<td align="center">否</td>
-<td>1024</td>
-<td>定义了插件和数据库服务器端每次批量数据获取条数，调高该值可能导致 Addax 出现OOM</td>
-</tr>
-<tr>
-<td align="left">session</td>
-<td align="center">否</td>
-<td>无</td>
-<td>针对本地连接,修改会话配置</td>
-</tr>
-</tbody>
-</table>
-<h2 id="_3">类型转换<a class="headerlink" href="#_3" title="Permanent link">&para;</a></h2>
-<table>
-<thead>
-<tr>
-<th>Addax 内部类型</th>
-<th>SqlServer 数据类型</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>Long</td>
-<td>bigint, int, smallint, tinyint</td>
-</tr>
-<tr>
-<td>Double</td>
-<td>float, decimal, real, numeric</td>
-</tr>
-<tr>
-<td>String</td>
-<td>char,nchar,ntext,nvarchar,text,varchar,nvarchar(MAX),varchar(MAX)</td>
-</tr>
-<tr>
-<td>Date</td>
-<td>date, datetime, time</td>
-</tr>
-<tr>
-<td>Boolean</td>
-<td>bit</td>
-</tr>
-<tr>
-<td>Bytes</td>
-<td>binary,varbinary,varbinary(MAX),timestamp, image</td>
-</tr>
-</tbody>
-</table>
-<p>请注意:</p>
-<ul>
-<li>除上述罗列字段类型外，其他类型均不支持</li>
-<li>timestamp类型作为二进制类型</li>
-</ul>
+<p>SqlServerReader 基于 <a href="../rdbmsreader">rdbmsreader</a> 实现，因此可以参考 rdbmsreader 的所有配置项。</p>
 
 
   

@@ -1335,13 +1335,6 @@
   
 </li>
       
-        <li class="md-nav__item">
-  <a href="#_4" class="md-nav__link">
-    类型转换
-  </a>
-  
-</li>
-      
     </ul>
   
 </nav>
@@ -1673,13 +1666,6 @@
   
 </li>
       
-        <li class="md-nav__item">
-  <a href="#_4" class="md-nav__link">
-    类型转换
-  </a>
-  
-</li>
-      
     </ul>
   
 </nav>
@@ -1696,7 +1682,7 @@
 
 
 <h1 id="mysql-writer">MySQL Writer<a class="headerlink" href="#mysql-writer" title="Permanent link">&para;</a></h1>
-<p>MysqlWriter 插件实现了写入数据到 <a href="https://www.mysql.com">MySQL</a> 目的表的功能。</p>
+<p>MysqlWriter 插件实现了写入数据到 [MySQL][1] 目的表的功能。</p>
 <h2 id="_1">示例<a class="headerlink" href="#_1" title="Permanent link">&para;</a></h2>
 <p>假定要写入的 MySQL 表建表语句如下：</p>
 <div class="highlight"><pre><span></span><code><span class="k">create</span><span class="w"> </span><span class="k">table</span><span class="w"> </span><span class="n">test</span><span class="p">.</span><span class="n">addax_tbl</span>
@@ -1784,6 +1770,7 @@
 <div class="highlight"><pre><span></span><code>bin/addax.sh<span class="w"> </span>job/stream2mysql.json
 </code></pre></div>
 <h2 id="_3">参数说明<a class="headerlink" href="#_3" title="Permanent link">&para;</a></h2>
+<p>MysqlWriter 基于 <a href="../rdbmswriter">rdbmswriter</a> 实现，因此可以参考 rdbmswriter 的所有配置项，并且增加了一些 MySQL 特有的配置项。</p>
 <table>
 <thead>
 <tr>
@@ -1795,69 +1782,6 @@
 </tr>
 </thead>
 <tbody>
-<tr>
-<td align="left">jdbcUrl</td>
-<td align="center">是</td>
-<td>list</td>
-<td>无</td>
-<td>对端数据库的 JDBC 连接信息，jdbcUrl 按照 RDBMS 官方规范，并可以填写连接<a href="http://dev.mysql.com/doc/connector-j/en/connector-j-reference-configuration-properties.html">附件控制信息</a></td>
-</tr>
-<tr>
-<td align="left">driver</td>
-<td align="center">否</td>
-<td>string</td>
-<td>无</td>
-<td>自定义驱动类名，解决兼容性问题，详见下面描述</td>
-</tr>
-<tr>
-<td align="left">username</td>
-<td align="center">是</td>
-<td>string</td>
-<td>无</td>
-<td>数据源的用户名</td>
-</tr>
-<tr>
-<td align="left">password</td>
-<td align="center">否</td>
-<td>string</td>
-<td>无</td>
-<td>数据源指定用户名的密码</td>
-</tr>
-<tr>
-<td align="left">table</td>
-<td align="center">是</td>
-<td>list</td>
-<td>无</td>
-<td>所选取的需要同步的表名,使用 JSON 数据格式，当配置为多张表时，用户自己需保证多张表是同一表结构</td>
-</tr>
-<tr>
-<td align="left">column</td>
-<td align="center">是</td>
-<td>list</td>
-<td>无</td>
-<td>所配置的表中需要同步的列名集合，详细描述见 <a href="../rdbmswriter">rdbmswriter</a></td>
-</tr>
-<tr>
-<td align="left">session</td>
-<td align="center">否</td>
-<td>list</td>
-<td>空</td>
-<td>获取 MySQL 连接时，执行 session 指定的 SQL 语句，修改当前 connection session 属性</td>
-</tr>
-<tr>
-<td align="left">preSql</td>
-<td align="center">否</td>
-<td>list</td>
-<td>无</td>
-<td>数据写入前先执行的 sql 语句，例如清除旧数据,如果 Sql 中有你需要操作到的表名称，可用 <code>@table</code> 表示</td>
-</tr>
-<tr>
-<td align="left">postSql</td>
-<td align="center">否</td>
-<td>list</td>
-<td>无</td>
-<td>数据写入完成后执行的 sql 语句，例如加上某一个时间戳</td>
-</tr>
 <tr>
 <td align="left">writeMode</td>
 <td align="center">是</td>
@@ -1897,42 +1821,6 @@
 <li><code>replace</code>表示采用<code>replace into</code>方式</li>
 <li><code>update</code> 表示采用 <code>ON DUPLICATE KEY UPDATE</code> 语句</li>
 </ul>
-<h2 id="_4">类型转换<a class="headerlink" href="#_4" title="Permanent link">&para;</a></h2>
-<table>
-<thead>
-<tr>
-<th>Addax 内部类型</th>
-<th>Mysql 数据类型</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>Long</td>
-<td>int, tinyint, smallint, mediumint, int, bigint, year</td>
-</tr>
-<tr>
-<td>Double</td>
-<td>float, double, decimal</td>
-</tr>
-<tr>
-<td>String</td>
-<td>varchar, char, tinytext, text, mediumtext, longtext</td>
-</tr>
-<tr>
-<td>Date</td>
-<td>date, datetime, timestamp, time</td>
-</tr>
-<tr>
-<td>Boolean</td>
-<td>bit, bool</td>
-</tr>
-<tr>
-<td>Bytes</td>
-<td>tinyblob, mediumblob, blob, longblob, varbinary</td>
-</tr>
-</tbody>
-</table>
-<p>bit 类型目前是未定义类型转换</p>
 
 
   

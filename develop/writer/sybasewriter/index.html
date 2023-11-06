@@ -1442,13 +1442,6 @@
   
 </li>
       
-        <li class="md-nav__item">
-  <a href="#_3" class="md-nav__link">
-    类型转换
-  </a>
-  
-</li>
-      
     </ul>
   
 </nav>
@@ -1607,13 +1600,6 @@
   
 </li>
       
-        <li class="md-nav__item">
-  <a href="#_3" class="md-nav__link">
-    类型转换
-  </a>
-  
-</li>
-      
     </ul>
   
 </nav>
@@ -1630,7 +1616,7 @@
 
 
 <h1 id="sybase-writer">Sybase Writer<a class="headerlink" href="#sybase-writer" title="Permanent link">&para;</a></h1>
-<p>SybaseWriter 插件实现了写入数据到 <a href="https://www.sap.com/products/technology-platform/sql-anywhere.html">Sybase</a> 库表的功能。</p>
+<p>SybaseWriter 插件实现了写入数据到 [Sybase][1] 库表的功能。</p>
 <h2 id="_1">配置样例<a class="headerlink" href="#_1" title="Permanent link">&para;</a></h2>
 <p>我们可以用 Docker 容器来启动一个 Sybase 数据库</p>
 <div class="highlight"><pre><span></span><code>docker<span class="w"> </span>run<span class="w"> </span>-tid<span class="w"> </span>--rm<span class="w">  </span>-h<span class="w"> </span>dksybase<span class="w"> </span>--name<span class="w"> </span>sybase<span class="w">  </span>-p<span class="w"> </span><span class="m">5000</span>:5000<span class="w">  </span>ifnazar/sybase_15_7<span class="w"> </span>bash<span class="w"> </span>/sybase/start
@@ -1709,86 +1695,7 @@
 <span class="p">}</span>
 </code></pre></div>
 <h2 id="_2">参数说明<a class="headerlink" href="#_2" title="Permanent link">&para;</a></h2>
-<table>
-<thead>
-<tr>
-<th align="left">配置项</th>
-<th align="center">是否必须</th>
-<th>默认值</th>
-<th>描述</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td align="left">jdbcUrl</td>
-<td align="center">是</td>
-<td>无</td>
-<td>对端数据库的JDBC连接信息，jdbcUrl按照RDBMS官方规范，并可以填写连接附件控制信息</td>
-</tr>
-<tr>
-<td align="left">username</td>
-<td align="center">是</td>
-<td>无</td>
-<td>数据源的用户名</td>
-</tr>
-<tr>
-<td align="left">password</td>
-<td align="center">否</td>
-<td>无</td>
-<td>数据源指定用户名的密码</td>
-</tr>
-<tr>
-<td align="left">writeMode</td>
-<td align="center">否</td>
-<td>insert</td>
-<td>写入方式，支持 insert， update，详见下文</td>
-</tr>
-<tr>
-<td align="left">table</td>
-<td align="center">是</td>
-<td>无</td>
-<td>所选取的需要同步的表名,使用JSON数据格式，当配置为多张表时，用户自己需保证多张表是同一表结构</td>
-</tr>
-<tr>
-<td align="left">column</td>
-<td align="center">是</td>
-<td>无</td>
-<td>所配置的表中需要同步的列名集合，详细描述见 <a href="../rdbmswriter">rdbmswriter</a></td>
-</tr>
-<tr>
-<td align="left">splitPk</td>
-<td align="center">否</td>
-<td>无</td>
-<td>使用splitPk代表的字段进行数据分片，详细描述见 <a href="../../reader/rdbmsreader">rdbmsreader</a></td>
-</tr>
-<tr>
-<td align="left">preSql</td>
-<td align="center">否</td>
-<td>无</td>
-<td>数据写入前先执行的sql语句</td>
-</tr>
-<tr>
-<td align="left">postSql</td>
-<td align="center">否</td>
-<td>无</td>
-<td>数据写入完成后,再执行的SQL语句</td>
-</tr>
-<tr>
-<td align="left">batchSize</td>
-<td align="center">否</td>
-<td>1024</td>
-<td>定义了插件和数据库服务器端每次批量数据获取条数，调高该值可能导致 Addax 出现OOM</td>
-</tr>
-<tr>
-<td align="left">session</td>
-<td align="center">否</td>
-<td>无</td>
-<td>针对本地连接,修改会话配置</td>
-</tr>
-</tbody>
-</table>
-<h2 id="_3">类型转换<a class="headerlink" href="#_3" title="Permanent link">&para;</a></h2>
-<p>类似 SqlServerReader ，目前 SqlServerWriter 支持大部分 SqlServer 类型，但也存在部分个别类型没有支持的情况，请注意检查你的类型。</p>
+<p>SybaseWriter 基于 <a href="../rdbmswriter">rdbmswriter</a> 实现，因此可以参考 rdbmswriter 的所有配置项。</p>
 
 
   

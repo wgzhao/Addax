@@ -516,7 +516,7 @@
       
         <li class="md-nav__item">
   <a href="#_4" class="md-nav__link">
-    类型转换
+    限制
   </a>
   
 </li>
@@ -1635,7 +1635,7 @@
       
         <li class="md-nav__item">
   <a href="#_4" class="md-nav__link">
-    类型转换
+    限制
   </a>
   
 </li>
@@ -1725,105 +1725,9 @@
 <div class="highlight"><pre><span></span><code>bin/addax.sh<span class="w"> </span>job/databend2stream.json
 </code></pre></div>
 <h2 id="_3">参数说明<a class="headerlink" href="#_3" title="Permanent link">&para;</a></h2>
-<table>
-<thead>
-<tr>
-<th align="left">配置项</th>
-<th align="center">是否必须</th>
-<th>类型</th>
-<th>默认值</th>
-<th>描述</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td align="left">jdbcUrl</td>
-<td align="center">是</td>
-<td>list</td>
-<td>无</td>
-<td>对端数据库的JDBC连接信息</td>
-</tr>
-<tr>
-<td align="left">username</td>
-<td align="center">是</td>
-<td>string</td>
-<td>无</td>
-<td>数据源的用户名</td>
-</tr>
-<tr>
-<td align="left">password</td>
-<td align="center">否</td>
-<td>string</td>
-<td>无</td>
-<td>数据源指定用户名的密码</td>
-</tr>
-<tr>
-<td align="left">table</td>
-<td align="center">是</td>
-<td>list</td>
-<td>无</td>
-<td>所选取的需要同步的表名,使用JSON数据格式，当配置为多张表时，用户自己需保证多张表是同一表结构</td>
-</tr>
-<tr>
-<td align="left">column</td>
-<td align="center">是</td>
-<td>list</td>
-<td>无</td>
-<td>所配置的表中需要同步的列名集合，详细描述 <a href="../rdbmsreader">rdbmreader</a></td>
-</tr>
-<tr>
-<td align="left">where</td>
-<td align="center">否</td>
-<td>string</td>
-<td>无</td>
-<td>针对表的筛选条件</td>
-</tr>
-<tr>
-<td align="left">querySql</td>
-<td align="center">否</td>
-<td>list</td>
-<td>无</td>
-<td>使用自定义的SQL而不是指定表来获取数据，当配置了这一项之后，Addax系统就会忽略 <code>table</code>，<code>column</code>这些配置项</td>
-</tr>
-</tbody>
-</table>
-<h2 id="_4">类型转换<a class="headerlink" href="#_4" title="Permanent link">&para;</a></h2>
-<p>目前MysqlReader支持大部分Mysql类型，但也存在部分个别类型没有支持的情况，请注意检查你的类型。</p>
-<p>下面列出MysqlReader针对Mysql类型转换列表:</p>
-<table>
-<thead>
-<tr>
-<th>Addax 内部类型</th>
-<th>MySQL 数据类型</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>Long</td>
-<td>int, tinyint, smallint, mediumint, int, bigint</td>
-</tr>
-<tr>
-<td>Double</td>
-<td>float, double, decimal</td>
-</tr>
-<tr>
-<td>String</td>
-<td>varchar, char, tinytext, text, mediumtext, longtext, year</td>
-</tr>
-<tr>
-<td>Date</td>
-<td>date, datetime, timestamp, time</td>
-</tr>
-<tr>
-<td>Boolean</td>
-<td>bit, bool</td>
-</tr>
-<tr>
-<td>Bytes</td>
-<td>tinyblob, mediumblob, blob, longblob, varbinary</td>
-</tr>
-</tbody>
-</table>
+<p>DatabendReader 基于 <a href="../rdbmsreader">rdbmsreader</a> 实现，因此可以参考 rdbmsreader 的所有配置项。</p>
+<h2 id="_4">限制<a class="headerlink" href="#_4" title="Permanent link">&para;</a></h2>
+<p>暂无</p>
 
 
   

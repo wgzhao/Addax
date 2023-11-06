@@ -1793,61 +1793,7 @@
 <div class="highlight"><pre><span></span><code>bin/addax.sh<span class="w"> </span>job/clickhouse2clickhouse.json
 </code></pre></div>
 <h2 id="_5">参数说明<a class="headerlink" href="#_5" title="Permanent link">&para;</a></h2>
-<table>
-<thead>
-<tr>
-<th align="left">配置项</th>
-<th align="center">是否必须</th>
-<th>数据类型</th>
-<th>默认值</th>
-<th>描述</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td align="left">jdbcUrl</td>
-<td align="center">是</td>
-<td>string</td>
-<td>无</td>
-<td>ClickHouse JDBC 连接信息 ,可按照官方规范填写连接附件控制信息。具体请参看<a href="https://github.com/yandex/clickhouse-jdbc">ClickHouse官方文档</a></td>
-</tr>
-<tr>
-<td align="left">username</td>
-<td align="center">是</td>
-<td>string</td>
-<td>无</td>
-<td>数据源的用户名</td>
-</tr>
-<tr>
-<td align="left">password</td>
-<td align="center">否</td>
-<td>string</td>
-<td>无</td>
-<td>数据源指定用户名的密码</td>
-</tr>
-<tr>
-<td align="left">table</td>
-<td align="center">是</td>
-<td><code>list[string]</code></td>
-<td>无</td>
-<td>所选取的需要同步的表 ,当配置为多张表时，用户自己需保证多张表是同一schema结构</td>
-</tr>
-<tr>
-<td align="left">column</td>
-<td align="center">是</td>
-<td><code>list[map]</code></td>
-<td>无</td>
-<td>所配置的表中需要同步的列名集合, 使用JSON的数组描述字段信息。用户使用 <code>*</code> 代表默认使用所有列配置，例如 <code>"['*']"</code></td>
-</tr>
-<tr>
-<td align="left">batchSize</td>
-<td align="center">否</td>
-<td>int</td>
-<td>2048</td>
-<td>每次批量写入数据的条数</td>
-</tr>
-</tbody>
-</table>
+<p>ClickHouseWriter 基于 <a href="../rdbmswriter">rdbmswriter</a> 实现，因此可以参考 rdbmswriter 的所有配置项。</p>
 
 
   

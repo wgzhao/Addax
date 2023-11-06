@@ -1119,13 +1119,6 @@
   
 </li>
       
-        <li class="md-nav__item">
-  <a href="#_3" class="md-nav__link">
-    类型转换
-  </a>
-  
-</li>
-      
     </ul>
   
 </nav>
@@ -1633,13 +1626,6 @@
   
 </li>
       
-        <li class="md-nav__item">
-  <a href="#_3" class="md-nav__link">
-    类型转换
-  </a>
-  
-</li>
-      
     </ul>
   
 </nav>
@@ -1656,11 +1642,8 @@
 
 
 <h1 id="databendwriter">DatabendWriter<a class="headerlink" href="#databendwriter" title="Permanent link">&para;</a></h1>
-<p>Databend 插件用于向 <a href="https://databend.rs/zh-CN/doc/">Databend</a> 数据库以流式方式写入数据。 其实现上是通过访问 Databend
-http 连接(8000)
-，然后通过 <a href="https://databend.rs/zh-CN/doc/integrations/api/streaming-load">stream load</a>
-加载数据到数据中，相比 <code>insert into</code> 方式效率要高不少，也是官方推荐的生产环境下的数据加载方式。</p>
-<p>Databend 是一个兼容 MySQL 协议的数据库后端，因此 Databend 读取可以使用 <a href="../../reader/mysqlreader">MySQLReader</a> 进行访问。</p>
+<p>Databend 插件用于向 <a href="https://databend.rs/zh-CN/doc/">Databend</a> 数据库以 JDBC 方式写入数据。 </p>
+<p>Databend 是一个兼容 MySQL 协议的数据库后端，因此 Databend 写入可以使用 <a href="../../writer/mysqlwriter">MySQLWriter</a> 进行访问。</p>
 <h2 id="_1">示例<a class="headerlink" href="#_1" title="Permanent link">&para;</a></h2>
 <p>假定要写入的表的建表语句如下：</p>
 <div class="highlight"><pre><span></span><code><span class="k">CREATE</span>
@@ -1736,6 +1719,7 @@ http 连接(8000)
 <div class="highlight"><pre><span></span><code>bin/addax.sh<span class="w"> </span>job/stream2Databend.json
 </code></pre></div>
 <h2 id="_2">参数说明<a class="headerlink" href="#_2" title="Permanent link">&para;</a></h2>
+<p>DatabendWriter 基于 <a href="../rdbmswriter">rdbmswriter</a> 实现，因此可以参考 rdbmswriter 的所有配置项，并增加了如下配置项：</p>
 <table>
 <thead>
 <tr>
@@ -1748,67 +1732,11 @@ http 连接(8000)
 </thead>
 <tbody>
 <tr>
-<td align="left">jdbcUrl</td>
-<td align="center">否</td>
-<td>string</td>
-<td>无</td>
-<td>目的数据库的 JDBC 连接信息，用于执行<code>preSql</code>及<code>postSql</code></td>
-</tr>
-<tr>
-<td align="left">username</td>
-<td align="center">是</td>
-<td>string</td>
-<td>无</td>
-<td>JDBC 数据源用户名</td>
-</tr>
-<tr>
-<td align="left">password</td>
-<td align="center">否</td>
-<td>string</td>
-<td>无</td>
-<td>JDBC 数据源密码</td>
-</tr>
-<tr>
-<td align="left">table</td>
-<td align="center">是</td>
-<td>string</td>
-<td>无</td>
-<td>Databend 表的表名称</td>
-</tr>
-<tr>
-<td align="left">column</td>
-<td align="center">否</td>
-<td>list</td>
-<td>无</td>
-<td>所配置的表中需要同步的列名集合，详细描述见 <a href="../rdbmswriter">rdbmswriter</a></td>
-</tr>
-<tr>
-<td align="left">preSql</td>
-<td align="center">否</td>
-<td>list</td>
-<td>无</td>
-<td>任务开始前执行的 SQL 语句，多条语句以分号分隔，语句中不能包含分号。</td>
-</tr>
-<tr>
-<td align="left">postSql</td>
-<td align="center">否</td>
-<td>list</td>
-<td>无</td>
-<td>任务结束后执行的 SQL 语句，多条语句以分号分隔，语句中不能包含分号。</td>
-</tr>
-<tr>
-<td align="left">batchSize</td>
-<td align="center">否</td>
-<td>int</td>
-<td>1024</td>
-<td>每个批次的记录数</td>
-</tr>
-<tr>
 <td align="left">writeMode</td>
 <td align="center">否</td>
 <td>string</td>
 <td><code>insert</code></td>
-<td>写入模式，支持 insert 和 replace 两种模式，默认为 insert。若为 replace，务必填写 onConflictColumn 参数</td>
+<td>写入模式，支持 insert 和 replace 两种模式，默认为 insert。</td>
 </tr>
 <tr>
 <td align="left">onConflictColumn</td>
@@ -1830,8 +1758,6 @@ http 连接(8000)
 <span class="w">  </span><span class="p">]</span>
 <span class="p">}</span>
 </code></pre></div>
-<h2 id="_3">类型转换<a class="headerlink" href="#_3" title="Permanent link">&para;</a></h2>
-<p>默认传入的数据均会被转为字符串，并以<code>\t</code>作为列分隔符，<code>\n</code>作为行分隔符，组成<code>csv</code>文件进行 StreamLoad 导入操作。</p>
 
 
   

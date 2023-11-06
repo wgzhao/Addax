@@ -1642,7 +1642,7 @@
 
 
 <h1 id="access-writer">Access Writer<a class="headerlink" href="#access-writer" title="Permanent link">&para;</a></h1>
-<p>AccessWriter 插件实现了写入数据到 <a href="https://en.wikipedia.org/wiki/Microsoft_Access">Access</a> 目的表的功能。</p>
+<p>AccessWriter 插件实现了写入数据到 [Access][1] 目的表的功能。</p>
 <h2 id="_1">示例<a class="headerlink" href="#_1" title="Permanent link">&para;</a></h2>
 <p>假定要写入的 Access 表建表语句如下：</p>
 <div class="highlight"><pre><span></span><code><span class="k">create</span><span class="w"> </span><span class="k">table</span><span class="w"> </span><span class="n">tbl_test</span><span class="p">(</span><span class="n">name</span><span class="w"> </span><span class="nb">varchar</span><span class="p">(</span><span class="mi">20</span><span class="p">),</span><span class="w"> </span><span class="n">file_size</span><span class="w"> </span><span class="nb">int</span><span class="p">,</span><span class="w"> </span><span class="n">file_date</span><span class="w"> </span><span class="nb">date</span><span class="p">,</span><span class="w"> </span><span class="n">file_open</span><span class="w"> </span><span class="nb">boolean</span><span class="p">,</span><span class="w"> </span><span class="n">memo</span><span class="w"> </span><span class="nb">blob</span><span class="p">);</span>
@@ -1723,7 +1723,7 @@
 <div class="highlight"><pre><span></span><code>bin/addax.sh<span class="w"> </span>job/stream2access.json
 </code></pre></div>
 <h2 id="_3">参数说明<a class="headerlink" href="#_3" title="Permanent link">&para;</a></h2>
-<p>因本插件基于<a href="../rdbmswriter">Addax RDBMS Writer</a> 实现，所以参数说明请参考 <a href="../rdbmswriter">Addax RDBMS Writer</a>。</p>
+<p>AccessWriter 基于 <a href="../rdbmswriter">rdbmswriter</a> 实现，因此可以参考 rdbmswriter 的所有配置项。</p>
 
 
   
