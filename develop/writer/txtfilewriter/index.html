@@ -1485,6 +1485,34 @@
   
 </li>
         
+          <li class="md-nav__item">
+  <a href="#table" class="md-nav__link">
+    table
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#column" class="md-nav__link">
+    column
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#extendedinsert" class="md-nav__link">
+    extendedInsert
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#batchsize" class="md-nav__link">
+    batchSize
+  </a>
+  
+</li>
+        
       </ul>
     </nav>
   
@@ -1642,6 +1670,34 @@
   
 </li>
         
+          <li class="md-nav__item">
+  <a href="#table" class="md-nav__link">
+    table
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#column" class="md-nav__link">
+    column
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#extendedinsert" class="md-nav__link">
+    extendedInsert
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#batchsize" class="md-nav__link">
+    batchSize
+  </a>
+  
+</li>
+        
       </ul>
     </nav>
   
@@ -1733,6 +1789,7 @@
 <tr>
 <th align="left">配置项</th>
 <th align="center">是否必须</th>
+<th>类型</th>
 <th>默认值</th>
 <th>描述</th>
 </tr>
@@ -1741,66 +1798,105 @@
 <tr>
 <td align="left">path</td>
 <td align="center">是</td>
+<td>String</td>
 <td>无</td>
 <td>本地文件系统的路径信息，写入 Path 目录下属多个文件</td>
 </tr>
 <tr>
 <td align="left">fileName</td>
 <td align="center">是</td>
+<td>String</td>
 <td>无</td>
 <td>写入的文件名，该文件名会添加随机的后缀作为每个线程写入实际文件名</td>
 </tr>
 <tr>
 <td align="left">writeMode</td>
 <td align="center">是</td>
+<td>String</td>
 <td>无</td>
 <td>FtpWriter 写入前数据清理处理模式，，详见下文</td>
 </tr>
 <tr>
 <td align="left">column</td>
 <td align="center">是</td>
+<td>List</td>
 <td>无</td>
 <td>读取字段列表，type 指定源数据的类型，详见下文</td>
 </tr>
 <tr>
 <td align="left">fieldDelimiter</td>
 <td align="center">是</td>
+<td>Char</td>
 <td><code>,</code></td>
 <td>描述：读取的字段分隔符</td>
 </tr>
 <tr>
 <td align="left">compress</td>
 <td align="center">否</td>
+<td>String</td>
 <td>无</td>
-<td>文本压缩类型，默认不压缩,支持压缩类型为 zip、lzo、lzop、tgz、bzip2</td>
+<td>文本压缩类型，默认不压缩,支持压缩类型为 <code>zip</code>、<code>lzo</code>、<code>lzop</code>、<code>tgz</code>、<code>bzip2</code></td>
 </tr>
 <tr>
 <td align="left">encoding</td>
 <td align="center">否</td>
+<td>String</td>
 <td>utf-8</td>
 <td>读取文件的编码配置</td>
 </tr>
 <tr>
 <td align="left">nullFormat</td>
 <td align="center">否</td>
+<td>Char</td>
 <td><code>\N</code></td>
 <td>定义哪些字符串可以表示为 null</td>
 </tr>
 <tr>
 <td align="left">dateFormat</td>
 <td align="center">否</td>
+<td>String</td>
 <td>无</td>
 <td>日期类型的数据序列化到文件中时的格式，例如 <code>"dateFormat": "yyyy-MM-dd"</code></td>
 </tr>
 <tr>
 <td align="left">fileFormat</td>
 <td align="center">否</td>
+<td>String</td>
 <td>text</td>
-<td>文件写出的格式，包括 csv, text 两种, 详见下文</td>
+<td>文件写出的格式，包括 csv, text, sql<sup id="fnref:1"><a class="footnote-ref" href="#fn:1">1</a></sup> 三种, 详见下文</td>
+</tr>
+<tr>
+<td align="left">table</td>
+<td align="center">是</td>
+<td>String</td>
+<td>无</td>
+<td>sql 模式时需要指定表名，</td>
+</tr>
+<tr>
+<td align="left">column</td>
+<td align="center">否</td>
+<td>List</td>
+<td>无</td>
+<td>sql 模式时可选指定列名，</td>
+</tr>
+<tr>
+<td align="left">extendedInsert</td>
+<td align="center">否</td>
+<td>Bool</td>
+<td>true</td>
+<td>sql 模式时是否使用批量插入语法，默认为真详见下文</td>
+</tr>
+<tr>
+<td align="left">batchSize</td>
+<td align="center">否</td>
+<td>Int</td>
+<td>2048</td>
+<td>sql 模式时批量插入语法的批次大小，详见下文</td>
 </tr>
 <tr>
 <td align="left">header</td>
 <td align="center">否</td>
+<td>List</td>
 <td>无</td>
 <td>text 写出时的表头，示例 <code>['id', 'name', 'age']</code></td>
 </tr>
@@ -1814,8 +1910,22 @@
 <li>nonConflict，如果目录下有 fileName 前缀的文件，直接报错。</li>
 </ul>
 <h3 id="fileformat">fileFormat<a class="headerlink" href="#fileformat" title="Permanent link">&para;</a></h3>
-<p>文件写出的格式，包括 csv 和 text 两种，csv 是严格的 csv 格式，如果待写数据包括列分隔符，则会按照 csv 的转义语法转义，转义符号为双引号 <code>"</code>；
-text 格式是用列分隔符简单分割待写数据，对于待写数据包括列分隔符情况下不做转义。</p>
+<p>文件写出的格式，包括 csv 和 text 和 <code>4.1.3</code> 版本引入的 sql 三种，csv 是严格的 csv 格式，如果待写数据包括列分隔符，则会按照
+csv
+的转义语法转义，转义符号为双引号 <code>"</code>；
+text 格式是用列分隔符简单分割待写数据，对于待写数据包括列分隔符情况下不做转义。
+sql 格式表示将数据以 SQL 语句 (<code>INSERT INTO ... VALUES</code>) 的方式写入到文件</p>
+<h3 id="table">table<a class="headerlink" href="#table" title="Permanent link">&para;</a></h3>
+<p>仅在 sql 文件格式下需要，用来指定写入的表名</p>
+<h3 id="column">column<a class="headerlink" href="#column" title="Permanent link">&para;</a></h3>
+<p>在 sql 文件格式下，可以指定写入的列名，如果指定，则 sql
+语句类似 <code>INSERT INTO table (col1, col2, col3) VALUES (val1, val2, val3)</code>，模式
+否则为 <code>INSERT INTO table VALUES (val1, val2, val3)</code>。模式</p>
+<h3 id="extendedinsert">extendedInsert<a class="headerlink" href="#extendedinsert" title="Permanent link">&para;</a></h3>
+<p>是否启用批量插入语法，如果启用，则会将 batchSize 个数据一次性写入到文件中，否则每个数据一行。该参数借鉴了 <code>mysqldump</code> 工具的
+<a href="https://dev.mysql.com/doc/refman/8.0/en/mysqldump.html#option_mysqldump_extended-insert">extended-insert</a> 参数语法</p>
+<h3 id="batchsize">batchSize<a class="headerlink" href="#batchsize" title="Permanent link">&para;</a></h3>
+<p>批量插入语法的批次大小，如果 extendedInsert 为 true，则每 batchSize 个数据一次性写入到文件中，否则每个数据一行。</p>
 <h2 id="_3">类型转换<a class="headerlink" href="#_3" title="Permanent link">&para;</a></h2>
 <table>
 <thead>
@@ -1851,6 +1961,14 @@ text 格式是用列分隔符简单分割待写数据，对于待写数据包括
 </tr>
 </tbody>
 </table>
+<div class="footnote">
+<hr />
+<ol>
+<li id="fn:1">
+<p>sql 格式为 4.1.3 版本引入&#160;<a class="footnote-backref" href="#fnref:1" title="Jump back to footnote 1 in the text">&#8617;</a></p>
+</li>
+</ol>
+</div>
 
 
   

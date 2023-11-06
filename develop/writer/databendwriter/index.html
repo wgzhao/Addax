@@ -1104,6 +1104,19 @@
     参数说明
   </a>
   
+    <nav class="md-nav" aria-label="参数说明">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#writemode" class="md-nav__link">
+    writeMode
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
 </li>
       
         <li class="md-nav__item">
@@ -1605,6 +1618,19 @@
     参数说明
   </a>
   
+    <nav class="md-nav" aria-label="参数说明">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#writemode" class="md-nav__link">
+    writeMode
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
 </li>
       
         <li class="md-nav__item">
@@ -1630,7 +1656,8 @@
 
 
 <h1 id="databendwriter">DatabendWriter<a class="headerlink" href="#databendwriter" title="Permanent link">&para;</a></h1>
-<p>Databend 插件用于向 <a href="https://databend.rs/zh-CN/doc/">Databend</a> 数据库以流式方式写入数据。 其实现上是通过访问 Databend http 连接(8000)
+<p>Databend 插件用于向 <a href="https://databend.rs/zh-CN/doc/">Databend</a> 数据库以流式方式写入数据。 其实现上是通过访问 Databend
+http 连接(8000)
 ，然后通过 <a href="https://databend.rs/zh-CN/doc/integrations/api/streaming-load">stream load</a>
 加载数据到数据中，相比 <code>insert into</code> 方式效率要高不少，也是官方推荐的生产环境下的数据加载方式。</p>
 <p>Databend 是一个兼容 MySQL 协议的数据库后端，因此 Databend 读取可以使用 <a href="../../reader/mysqlreader">MySQLReader</a> 进行访问。</p>
@@ -1638,11 +1665,12 @@
 <p>假定要写入的表的建表语句如下：</p>
 <div class="highlight"><pre><span></span><code><span class="k">CREATE</span>
 <span class="k">DATABASE</span><span class="w"> </span><span class="n">example_db</span><span class="p">;</span>
-<span class="k">CREATE</span><span class="w"> </span><span class="k">TABLE</span><span class="w"> </span><span class="o">`</span><span class="n">example_db</span><span class="o">`</span><span class="p">.</span><span class="o">`</span><span class="n">table1</span><span class="o">`</span><span class="w"> </span><span class="p">(</span>
-<span class="w">  </span><span class="o">`</span><span class="n">siteid</span><span class="o">`</span><span class="w"> </span><span class="nb">INT</span><span class="w"> </span><span class="k">DEFAULT</span><span class="w"> </span><span class="k">CAST</span><span class="p">(</span><span class="mi">10</span><span class="w"> </span><span class="k">AS</span><span class="w"> </span><span class="nb">INT</span><span class="p">),</span>
-<span class="w">  </span><span class="o">`</span><span class="n">citycode</span><span class="o">`</span><span class="w"> </span><span class="nb">INT</span><span class="p">,</span>
-<span class="w">  </span><span class="o">`</span><span class="n">username</span><span class="o">`</span><span class="w"> </span><span class="nb">VARCHAR</span><span class="p">,</span>
-<span class="w">  </span><span class="o">`</span><span class="n">pv</span><span class="o">`</span><span class="w"> </span><span class="nb">BIGINT</span>
+<span class="k">CREATE</span><span class="w"> </span><span class="k">TABLE</span><span class="w"> </span><span class="o">`</span><span class="n">example_db</span><span class="o">`</span><span class="p">.</span><span class="o">`</span><span class="n">table1</span><span class="o">`</span>
+<span class="p">(</span>
+<span class="w">    </span><span class="o">`</span><span class="n">siteid</span><span class="o">`</span><span class="w">   </span><span class="nb">INT</span><span class="w"> </span><span class="k">DEFAULT</span><span class="w"> </span><span class="k">CAST</span><span class="p">(</span><span class="mi">10</span><span class="w"> </span><span class="k">AS</span><span class="w"> </span><span class="nb">INT</span><span class="p">),</span>
+<span class="w">    </span><span class="o">`</span><span class="n">citycode</span><span class="o">`</span><span class="w"> </span><span class="nb">INT</span><span class="p">,</span>
+<span class="w">    </span><span class="o">`</span><span class="n">username</span><span class="o">`</span><span class="w"> </span><span class="nb">VARCHAR</span><span class="p">,</span>
+<span class="w">    </span><span class="o">`</span><span class="n">pv</span><span class="o">`</span><span class="w">       </span><span class="nb">BIGINT</span>
 <span class="p">);</span>
 </code></pre></div>
 <p>下面配置一个从内存读取数据，然后写入到 databend 表的配置文件</p>
@@ -1662,16 +1690,17 @@
 <span class="w">          </span><span class="p">],</span>
 <span class="w">          </span><span class="nt">&quot;postSql&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span>
 <span class="w">          </span><span class="p">],</span>
+<span class="w">          </span><span class="nt">&quot;connection&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span>
+<span class="w">            </span><span class="p">{</span>
+<span class="w">              </span><span class="nt">&quot;jdbcUrl&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;jdbc:databend://localhost:8000/addax&quot;</span><span class="p">,</span>
+<span class="w">              </span><span class="nt">&quot;table&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span>
+<span class="w">                </span><span class="s2">&quot;table1&quot;</span>
+<span class="w">              </span><span class="p">]</span>
+<span class="w">            </span><span class="p">}</span>
+<span class="w">          </span><span class="p">],</span>
 <span class="w">          </span><span class="nt">&quot;username&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;u1&quot;</span><span class="p">,</span>
 <span class="w">          </span><span class="nt">&quot;password&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;123&quot;</span><span class="p">,</span>
-<span class="w">          </span><span class="nt">&quot;database&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;example_db&quot;</span><span class="p">,</span>
-<span class="w">          </span><span class="nt">&quot;table&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;table1&quot;</span><span class="p">,</span>
-<span class="w">          </span><span class="nt">&quot;jdbcUrl&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;jdbc:mysql://127.0.0.1:3307/example_db&quot;</span><span class="p">,</span>
-<span class="w">          </span><span class="nt">&quot;loadUrl&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="s2">&quot;127.0.0.1:8000&quot;</span><span class="p">,</span><span class="s2">&quot;127.0.0.1:8000&quot;</span><span class="p">],</span>
-<span class="w">          </span><span class="nt">&quot;fieldDelimiter&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;\\x01&quot;</span><span class="p">,</span>
-<span class="w">          </span><span class="nt">&quot;lineDelimiter&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;\\x02&quot;</span><span class="p">,</span>
-<span class="w">          </span><span class="nt">&quot;column&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="s2">&quot;*&quot;</span><span class="p">],</span>
-<span class="w">          </span><span class="nt">&quot;format&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;csv&quot;</span>
+<span class="w">          </span><span class="nt">&quot;column&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="s2">&quot;*&quot;</span><span class="p">]</span>
 <span class="w">        </span><span class="p">}</span>
 <span class="w">      </span><span class="p">},</span>
 <span class="w">      </span><span class="nt">&quot;reader&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
@@ -1726,32 +1755,18 @@
 <td>目的数据库的 JDBC 连接信息，用于执行<code>preSql</code>及<code>postSql</code></td>
 </tr>
 <tr>
-<td align="left">loadUrl</td>
-<td align="center">是</td>
-<td>string</td>
-<td>无</td>
-<td>Databend query 节点的地址用于 StreamLoad，可以为多个 query 地址，<code>query_ip:query_http_port</code>，从多个地址轮循写入</td>
-</tr>
-<tr>
 <td align="left">username</td>
 <td align="center">是</td>
 <td>string</td>
 <td>无</td>
-<td>HTTP 签名验证帐号</td>
+<td>JDBC 数据源用户名</td>
 </tr>
 <tr>
 <td align="left">password</td>
 <td align="center">否</td>
 <td>string</td>
 <td>无</td>
-<td>HTTP 签名验证密码</td>
-</tr>
-<tr>
-<td align="left">database</td>
-<td align="center">是</td>
-<td>string</td>
-<td>无</td>
-<td>Databend 表的数据库名称</td>
+<td>JDBC 数据源密码</td>
 </tr>
 <tr>
 <td align="left">table</td>
@@ -1768,91 +1783,53 @@
 <td>所配置的表中需要同步的列名集合，详细描述见 <a href="../rdbmswriter">rdbmswriter</a></td>
 </tr>
 <tr>
-<td align="left">maxBatchRows</td>
-<td align="center">否</td>
-<td>int</td>
-<td>500000</td>
-<td>定义了插件和数据库服务器端每次批量数据获取条数，调高该值可能导致 OOM 或者目标数据库事务提交失败导致挂起</td>
-</tr>
-<tr>
-<td align="left">maxBatchSize</td>
-<td align="center">否</td>
-<td>int</td>
-<td>104857600</td>
-<td>单次 StreamLoad 导入的最大字节数</td>
-</tr>
-<tr>
-<td align="left">flushInterval</td>
-<td align="center">否</td>
-<td>int</td>
-<td>300000</td>
-<td>上一次 StreamLoad 结束至下一次开始的时间间隔（单位：ms)</td>
-</tr>
-<tr>
-<td align="left">endpoint</td>
-<td align="center">是</td>
-<td>string</td>
-<td>无</td>
-<td>Databend 的 HTTP 连接方式，只需要写到主机和端口即可，具体路径插件会自动拼装</td>
-</tr>
-<tr>
-<td align="left">username</td>
-<td align="center">是</td>
-<td>string</td>
-<td>无</td>
-<td>HTTP 签名验证帐号</td>
-</tr>
-<tr>
-<td align="left">password</td>
-<td align="center">否</td>
-<td>string</td>
-<td>无</td>
-<td>HTTP 签名验证密码</td>
-</tr>
-<tr>
-<td align="left">table</td>
-<td align="center">是</td>
-<td>string</td>
-<td>无</td>
-<td>所选取的需要同步的表名</td>
-</tr>
-<tr>
-<td align="left">column</td>
+<td align="left">preSql</td>
 <td align="center">否</td>
 <td>list</td>
 <td>无</td>
-<td>所配置的表中需要同步的列名集合，详细描述见 <a href="../rdbmswriter">rdbmswriter</a></td>
+<td>任务开始前执行的 SQL 语句，多条语句以分号分隔，语句中不能包含分号。</td>
+</tr>
+<tr>
+<td align="left">postSql</td>
+<td align="center">否</td>
+<td>list</td>
+<td>无</td>
+<td>任务结束后执行的 SQL 语句，多条语句以分号分隔，语句中不能包含分号。</td>
 </tr>
 <tr>
 <td align="left">batchSize</td>
 <td align="center">否</td>
 <td>int</td>
 <td>1024</td>
-<td></td>
+<td>每个批次的记录数</td>
 </tr>
 <tr>
-<td align="left">lineDelimiter</td>
+<td align="left">writeMode</td>
 <td align="center">否</td>
 <td>string</td>
-<td><code>\n</code></td>
-<td>每行的分隔符,支持高位字节, 例如 <code>\\x02</code></td>
+<td><code>insert</code></td>
+<td>写入模式，支持 insert 和 replace 两种模式，默认为 insert。若为 replace，务必填写 onConflictColumn 参数</td>
 </tr>
 <tr>
-<td align="left">filedDelimiter</td>
+<td align="left">onConflictColumn</td>
 <td align="center">否</td>
 <td>string</td>
-<td><code>\t</code></td>
-<td>每列的分隔符,支持高位字节, 例如 <code>\\x01</code></td>
-</tr>
-<tr>
-<td align="left">format</td>
-<td align="center">否</td>
-<td>string</td>
-<td><code>csv</code></td>
-<td>被导入数据会被转换成 format 指定格式。</td>
+<td>无</td>
+<td>冲突列，当 writeMode 为 replace 时，必须指定冲突列，否则会导致写入失败。</td>
 </tr>
 </tbody>
 </table>
+<h3 id="writemode">writeMode<a class="headerlink" href="#writemode" title="Permanent link">&para;</a></h3>
+<p>该参数为 <code>4.1.2</code> 版本引入，用来支持 Databend 的 <code>replace into</code> 语法，当该参数设定为 <code>replace</code>
+时，必须同时指定 <code>onConflictColumn</code> 参数，用来判断数据是插入还是更新的依据。</p>
+<p>两个参数的示例如下：</p>
+<div class="highlight"><pre><span></span><code><span class="p">{</span>
+<span class="w">  </span><span class="nt">&quot;writeMode&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;replace&quot;</span><span class="p">,</span>
+<span class="w">  </span><span class="nt">&quot;onConflictColumn&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span>
+<span class="w">    </span><span class="s2">&quot;id&quot;</span>
+<span class="w">  </span><span class="p">]</span>
+<span class="p">}</span>
+</code></pre></div>
 <h2 id="_3">类型转换<a class="headerlink" href="#_3" title="Permanent link">&para;</a></h2>
 <p>默认传入的数据均会被转为字符串，并以<code>\t</code>作为列分隔符，<code>\n</code>作为行分隔符，组成<code>csv</code>文件进行 StreamLoad 导入操作。</p>
 
