@@ -37,7 +37,7 @@
         <commons.collections.version>4.4</commons.collections.version>
         <commons.codec.version>1.15</commons.codec.version>
         <commons.compress.version>1.24.0</commons.compress.version>
-        <commons.cli.version>1.5.0</commons.cli.version>
+        <commons.cli.version>1.6.0</commons.cli.version>
         <commons.csv.version>1.10.0</commons.csv.version>
         <commons.io.version>2.13.0</commons.io.version>
         <commons.lang3.version>3.13.0</commons.lang3.version>
