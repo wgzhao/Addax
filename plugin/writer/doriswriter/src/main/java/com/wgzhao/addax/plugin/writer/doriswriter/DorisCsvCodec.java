@@ -31,7 +31,7 @@ public class DorisCsvCodec
     public DorisCsvCodec(final List<String> fieldNames, String columnSeparator)
     {
         super(fieldNames);
-        this.columnSeparator = columnSeparator;
+        this.columnSeparator = DelimiterParser.parse(columnSeparator, "\t");
     }
 
     @Override
