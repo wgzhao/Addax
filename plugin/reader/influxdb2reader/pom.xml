@@ -22,7 +22,7 @@
     <parent>
         <groupId>com.wgzhao.addax</groupId>
         <artifactId>addax-all</artifactId>
-        <version>4.1.3-SNAPSHOT</version>
+        <version>4.1.3</version>
         <relativePath>../../../pom.xml</relativePath>
     </parent>
     <artifactId>influxdb2reader</artifactId>
