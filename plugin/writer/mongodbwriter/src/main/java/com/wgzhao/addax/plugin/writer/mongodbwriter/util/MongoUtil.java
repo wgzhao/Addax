@@ -30,6 +30,7 @@ import com.mongodb.ServerAddress;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 public class MongoUtil
@@ -63,7 +64,7 @@ public class MongoUtil
         }
         try {
             MongoCredential credential = MongoCredential.createCredential(userName, database, password.toCharArray());
-            return new MongoClient(parseServerAddress(addressList), Arrays.asList(credential));
+            return new MongoClient(parseServerAddress(addressList), Collections.singletonList(credential));
         }
         catch (UnknownHostException e) {
             throw AddaxException.asAddaxException(MongoDBWriterErrorCode.ILLEGAL_ADDRESS, "不合法的地址");

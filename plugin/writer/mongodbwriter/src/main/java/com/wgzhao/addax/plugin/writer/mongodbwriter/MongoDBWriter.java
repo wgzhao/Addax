@@ -250,21 +250,21 @@ public class MongoDBWriter
                 for (int i = 0; i < record.getColumnNumber(); i++) {
 
                     String type = columnMeta.getJSONObject(i).getString(KeyConstant.COLUMN_TYPE);
+                    String name = columnMeta.getJSONObject(i).getString(KeyConstant.COLUMN_NAME);
                     //空记录处理
                     if (isNullOrEmpty((record.getColumn(i)).asString())) {
                         if (KeyConstant.isArrayType(type.toLowerCase())) {
-                            data.put(columnMeta.getJSONObject(i).getString(KeyConstant.COLUMN_NAME), new Object[0]);
+                            data.put(name, new Object[0]);
                         }
                         else {
-                            data.put(columnMeta.getJSONObject(i).getString(KeyConstant.COLUMN_NAME), record.getColumn(i).asString());
+                            data.put(name, record.getColumn(i).asString());
                         }
                         continue;
                     }
                     if (Column.Type.INT.name().equalsIgnoreCase(type)) {
                         //int是特殊类型, 其他类型按照保存时Column的类型进行处理
                         try {
-                            data.put(columnMeta.getJSONObject(i).getString(KeyConstant.COLUMN_NAME),
-                                    Integer.parseInt(String.valueOf(record.getColumn(i).getRawData())));
+                            data.put(name, Integer.parseInt(String.valueOf(record.getColumn(i).getRawData())));
                         }
                         catch (Exception e) {
                             super.getTaskPluginCollector().collectDirtyRecord(record, e);
@@ -274,8 +274,7 @@ public class MongoDBWriter
                         //处理ObjectId和数组类型
                         try {
                             if (KeyConstant.isObjectIdType(type.toLowerCase())) {
-                                data.put(columnMeta.getJSONObject(i).getString(KeyConstant.COLUMN_NAME),
-                                        new ObjectId(record.getColumn(i).asString()));
+                                data.put(name, new ObjectId(record.getColumn(i).asString()));
                             }
                             else if (KeyConstant.isArrayType(type.toLowerCase())) {
                                 String splitter = columnMeta.getJSONObject(i).getString(KeyConstant.COLUMN_SPLITTER);
@@ -292,51 +291,51 @@ public class MongoDBWriter
                                         for (String s : item) {
                                             list.add(Double.parseDouble(s));
                                         }
-                                        data.put(columnMeta.getJSONObject(i).getString(KeyConstant.COLUMN_NAME), list.toArray(new Double[0]));
+                                        data.put(name, list.toArray(new Double[0]));
                                     }
                                     else if (itemType.equalsIgnoreCase(Column.Type.INT.name())) {
                                         ArrayList<Integer> list = new ArrayList<>();
                                         for (String s : item) {
                                             list.add(Integer.parseInt(s));
                                         }
-                                        data.put(columnMeta.getJSONObject(i).getString(KeyConstant.COLUMN_NAME), list.toArray(new Integer[0]));
+                                        data.put(name, list.toArray(new Integer[0]));
                                     }
                                     else if (itemType.equalsIgnoreCase(Column.Type.LONG.name())) {
                                         ArrayList<Long> list = new ArrayList<>();
                                         for (String s : item) {
                                             list.add(Long.parseLong(s));
                                         }
-                                        data.put(columnMeta.getJSONObject(i).getString(KeyConstant.COLUMN_NAME), list.toArray(new Long[0]));
+                                        data.put(name, list.toArray(new Long[0]));
                                     }
                                     else if (itemType.equalsIgnoreCase(Column.Type.BOOL.name())) {
                                         ArrayList<Boolean> list = new ArrayList<>();
                                         for (String s : item) {
                                             list.add(Boolean.parseBoolean(s));
                                         }
-                                        data.put(columnMeta.getJSONObject(i).getString(KeyConstant.COLUMN_NAME), list.toArray(new Boolean[0]));
+                                        data.put(name, list.toArray(new Boolean[0]));
                                     }
                                     else if (itemType.equalsIgnoreCase(Column.Type.BYTES.name())) {
                                         ArrayList<Byte> list = new ArrayList<>();
                                         for (String s : item) {
                                             list.add(Byte.parseByte(s));
                                         }
-                                        data.put(columnMeta.getJSONObject(i).getString(KeyConstant.COLUMN_NAME), list.toArray(new Byte[0]));
+                                        data.put(name, list.toArray(new Byte[0]));
                                     }
                                     else {
-                                        data.put(columnMeta.getJSONObject(i).getString(KeyConstant.COLUMN_NAME), record.getColumn(i).asString().split(splitter));
+                                        data.put(name, record.getColumn(i).asString().split(splitter));
                                     }
                                 }
                                 else {
-                                    data.put(columnMeta.getJSONObject(i).getString(KeyConstant.COLUMN_NAME), record.getColumn(i).asString().split(splitter));
+                                    data.put(name, record.getColumn(i).asString().split(splitter));
                                 }
                             }
                             else if (type.equalsIgnoreCase("json")) {
                                 //如果是json类型,将其进行转换
                                 Object mode = JSON.parse(record.getColumn(i).asString());
-                                data.put(columnMeta.getJSONObject(i).getString(KeyConstant.COLUMN_NAME), JSON.toJSON(mode));
+                                data.put(name, JSON.toJSON(mode));
                             }
                             else {
-                                data.put(columnMeta.getJSONObject(i).getString(KeyConstant.COLUMN_NAME), record.getColumn(i).asString());
+                                data.put(name, record.getColumn(i).asString());
                             }
                         }
                         catch (Exception e) {
@@ -346,7 +345,7 @@ public class MongoDBWriter
                     else if (record.getColumn(i) instanceof LongColumn) {
 
                         if (Column.Type.LONG.name().equalsIgnoreCase(type)) {
-                            data.put(columnMeta.getJSONObject(i).getString(KeyConstant.COLUMN_NAME), record.getColumn(i).asLong());
+                            data.put(name, record.getColumn(i).asLong());
                         }
                         else {
                             super.getTaskPluginCollector().collectDirtyRecord(record, "record's [" + i + "] column's type should be: " + type);
@@ -355,8 +354,7 @@ public class MongoDBWriter
                     else if (record.getColumn(i) instanceof DateColumn) {
 
                         if (Column.Type.DATE.name().equalsIgnoreCase(type)) {
-                            data.put(columnMeta.getJSONObject(i).getString(KeyConstant.COLUMN_NAME),
-                                    record.getColumn(i).asDate());
+                            data.put(name, record.getColumn(i).asDate());
                         }
                         else {
                             super.getTaskPluginCollector().collectDirtyRecord(record, "record's [" + i + "] column's type should be: " + type);
@@ -365,8 +363,7 @@ public class MongoDBWriter
                     else if (record.getColumn(i) instanceof DoubleColumn) {
 
                         if (Column.Type.DOUBLE.name().equalsIgnoreCase(type)) {
-                            data.put(columnMeta.getJSONObject(i).getString(KeyConstant.COLUMN_NAME),
-                                    record.getColumn(i).asDouble());
+                            data.put(name, record.getColumn(i).asDouble());
                         }
                         else {
                             super.getTaskPluginCollector().collectDirtyRecord(record, "record's [" + i + "] column's type should be: " + type);
@@ -375,8 +372,7 @@ public class MongoDBWriter
                     else if (record.getColumn(i) instanceof BoolColumn) {
 
                         if (Column.Type.BOOL.name().equalsIgnoreCase(type)) {
-                            data.put(columnMeta.getJSONObject(i).getString(KeyConstant.COLUMN_NAME),
-                                    record.getColumn(i).asBoolean());
+                            data.put(name, record.getColumn(i).asBoolean());
                         }
                         else {
                             super.getTaskPluginCollector().collectDirtyRecord(record, "record's [" + i + "] column's type should be: " + type);
@@ -385,15 +381,14 @@ public class MongoDBWriter
                     else if (record.getColumn(i) instanceof BytesColumn) {
 
                         if (Column.Type.BYTES.name().equalsIgnoreCase(type)) {
-                            data.put(columnMeta.getJSONObject(i).getString(KeyConstant.COLUMN_NAME),
-                                    record.getColumn(i).asBytes());
+                            data.put(name, record.getColumn(i).asBytes());
                         }
                         else {
                             super.getTaskPluginCollector().collectDirtyRecord(record, "record's [" + i + "] column's type should be: " + type);
                         }
                     }
                     else {
-                        data.put(columnMeta.getJSONObject(i).getString(KeyConstant.COLUMN_NAME), record.getColumn(i).asString());
+                        data.put(name, record.getColumn(i).asString());
                     }
                 }
                 dataList.add(data);
