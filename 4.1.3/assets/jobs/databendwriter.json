@@ -1,0 +1,56 @@
+{
+  "job": {
+    "setting": {
+      "speed": {
+        "channel": 2
+      }
+    },
+    "content": {
+      "writer": {
+        "name": "databendwriter",
+        "parameter": {
+          "preSql": [
+            "truncate table @table"
+          ],
+          "postSql": [
+          ],
+          "connection": [
+            {
+              "jdbcUrl": "jdbc:databend://localhost:8000/addax",
+              "table": [
+                "table1"
+              ]
+            }
+          ],
+          "username": "u1",
+          "password": "123",
+          "column": ["*"]
+        }
+      },
+      "reader": {
+        "name": "streamreader",
+        "parameter": {
+          "column": [
+            {
+              "random": "1,500",
+              "type": "long"
+            },
+            {
+              "random": "1,127",
+              "type": "long"
+            },
+            {
+              "value": "this is a text",
+              "type": "string"
+            },
+            {
+              "random": "5,200",
+              "type": "long"
+            }
+          ],
+          "sliceRecordCount": 100
+        }
+      }
+    }
+  }
+}
