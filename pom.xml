@@ -30,7 +30,7 @@
         <!-- basic components -->
         <aircompressor.version>0.25</aircompressor.version>
         <awssdk.version>2.20.5</awssdk.version>
-        <avro.version>1.11.2</avro.version>
+        <avro.version>1.11.3</avro.version>
         <commons.beanutils.version>1.9.4</commons.beanutils.version>
         <commons.configuration.version>1.10</commons.configuration.version>
         <commons.configuration2.version>2.9.0</commons.configuration2.version>
@@ -45,7 +45,7 @@
         <commons.net.version>3.9.0</commons.net.version>
         <diamond.version>3.7.3</diamond.version>
         <druid.version>1.2.20</druid.version>
-        <fastjson2.version>2.0.40</fastjson2.version>
+        <fastjson2.version>2.0.42</fastjson2.version>
         <findbugs.version>3.0.1</findbugs.version>
         <guava.version>31.0-jre</guava.version>
         <groovy.version>3.0.19</groovy.version>
@@ -81,7 +81,7 @@
         <orc.version>1.9.1</orc.version>
         <parquet.version>1.13.1</parquet.version>
         <poi.version>5.2.3</poi.version>
-        <protobuf.version>3.24.3</protobuf.version>
+        <protobuf.version>3.25.1</protobuf.version>
         <redis.replicator.version>3.8.0</redis.replicator.version>
         <slf4j.version>2.0.9</slf4j.version>
         <snappy.version>1.1.10.5</snappy.version>
@@ -89,7 +89,7 @@
         <woodstox.version>6.5.1</woodstox.version>
         <xz.version>1.9</xz.version>
         <zookeeper.version>3.6.0</zookeeper.version>
-        <zstd.version>1.5.5-5</zstd.version>
+        <zstd.version>1.5.5-10</zstd.version>
 
         <!-- jdbc driver version -->
         <cassandra.jdbc.version>3.11.0</cassandra.jdbc.version>
