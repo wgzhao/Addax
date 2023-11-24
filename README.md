@@ -237,6 +237,10 @@ We recommend you use IntelliJ as your IDE. The code style template for the proje
 * Use an assertion from Airlift's `Assertions` class if there is one that covers your case rather than writing the assertion by hand. Over time, we may move over to more fluent assertions like AssertJ.
 * When writing a Git commit message, follow these [guidelines](https://chris.beams.io/posts/git-commit/).
 
+## Star History
+
+[![Star History Chart](https://api.star-history.com/svg?repos=wgzhao/Addax&type=Date)](https://star-history.com/#wgzhao/Addax&Date)
+
 ## License
 
 This software is free to use under the Apache License [Apache license](/LICENSE).

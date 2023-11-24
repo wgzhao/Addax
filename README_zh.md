@@ -239,6 +239,10 @@ Failed record             :                   0
 - 从 `4.0.0` 版本开始，启用新的项目名称 `Addax`, 因此它和以前的版本均不兼容
 - 从 `3.2.1` 版本开始，包类名已经更改，因此不再兼容 `3.1.x` 版本
 
+## Star History
+
+[![Star History Chart](https://api.star-history.com/svg?repos=wgzhao/Addax&type=Date)](https://star-history.com/#wgzhao/Addax&Date)
+
 ## 代码授权许可
 
 该软件在遵守 [Apache license](/license.txt) 下可自由免费使用
