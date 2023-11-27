@@ -2,7 +2,7 @@
     <img alt="Addax Logo" src="https://github.com/wgzhao/Addax/blob/master/docs/images/logo.png?raw=true" width="205" />
 </p>
 <p align="center">Addax 是一个支持主流数据库的通用数据采集工具</p>
-<p align="center"><a href="https://wgzhao.github.io/Addax">使用文档</a> 详细描述了如何安装部署和每个采集插件的使用方法 </p>
+<p align="center"><a href="https://wgzhao.github.io/Addax">使用文档</a> 详细描述了如何安装使用，针对每个插件都有详细的说明和样例配置文档 </p>
 <p align="center">
    <a href="https://github.com/wgzhao/Addax/releases">
       <img src="https://img.shields.io/github/release/wgzhao/addax.svg" alt="release version"/>
@@ -12,7 +12,7 @@
    </a>
 </p>
 
-该项目原始代码来自阿里开源的 [DataX](https://github.com/alibaba/datax) ，但经过了大幅修改，详细情况可参考[与DataX的主要区别](difference.md)
+该项目原始代码来自阿里开源的 [DataX](https://github.com/alibaba/datax) ，在此基础上经过了大量的改进，并提供了更多的读写插件，详细情况可参考[与DataX的主要区别](difference.md)
 
 ## 支持的数据库一览表
 
