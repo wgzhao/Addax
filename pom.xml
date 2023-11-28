@@ -40,7 +40,7 @@
         <commons.cli.version>1.6.0</commons.cli.version>
         <commons.csv.version>1.10.0</commons.csv.version>
         <commons.io.version>2.15.0</commons.io.version>
-        <commons.lang3.version>3.13.0</commons.lang3.version>
+        <commons.lang3.version>3.14.0</commons.lang3.version>
         <commons.logging.version>1.2</commons.logging.version>
         <commons.net.version>3.10.0</commons.net.version>
         <diamond.version>3.7.3</diamond.version>
