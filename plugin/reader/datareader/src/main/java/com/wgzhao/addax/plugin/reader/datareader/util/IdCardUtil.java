@@ -21,8 +21,9 @@
 
 package com.wgzhao.addax.plugin.reader.datareader.util;
 
-import org.apache.commons.lang3.RandomUtils;
 import org.apache.commons.lang3.time.DateUtils;
+import org.apache.commons.rng.UniformRandomProvider;
+import org.apache.commons.rng.simple.RandomSource;
 
 import java.text.SimpleDateFormat;
 import java.time.Duration;
@@ -336,7 +337,8 @@ public class IdCardUtil
     private static Date randomBirth()
     {
         Date minAge = Date.from(Instant.now().minus(Duration.ofDays(MAX_AGE * 365)));
-        return DateUtils.addDays(minAge, RandomUtils.nextInt(MIN_AGE, MAX_AGE) * 365);
+        return DateUtils.addDays(minAge, 
+        RandomSource.XO_RO_SHI_RO_128_PP.create().nextInt(MIN_AGE, MAX_AGE) * 365);
     }
 
     /**
@@ -368,13 +370,16 @@ public class IdCardUtil
         Date birth = IdCardUtil.randomBirth();
         SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd");
         sb.append(sdf.format(birth));
-        if (RandomUtils.nextInt(0, 1) <= 0.5) {
+
+        UniformRandomProvider rng = RandomSource.XO_RO_SHI_RO_128_PP.create();
+
+        if (rng.nextInt(0, 1) <= 0.5) {
             sb.append(CommonUtil.randChoose(FEMALE_NUM));
         }
         else {
             sb.append(CommonUtil.randChoose(MALE_NUM));
         }
-        sb.append(RandomUtils.nextInt(0, 10)).append(RandomUtils.nextInt(0, 10));
+        sb.append(rng.nextInt(0, 10)).append(rng.nextInt(0, 10));
         sb.append(checkSum(sb.toString()));
         return sb.toString();
     }

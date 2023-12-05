@@ -44,9 +44,10 @@ import com.wgzhao.addax.plugin.reader.datareader.util.PersonUtil;
 import com.wgzhao.addax.plugin.reader.datareader.util.PhoneUtil;
 import com.wgzhao.addax.plugin.reader.datareader.util.StockUtil;
 import org.apache.commons.lang3.RandomStringUtils;
-import org.apache.commons.lang3.RandomUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.time.DateUtils;
+import org.apache.commons.rng.UniformRandomProvider;
+import org.apache.commons.rng.simple.RandomSource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -459,24 +460,26 @@ public class DataReader
                 long param1Int = eachColumnConfig.getLong(DataKey.MIXUP_FUNCTION_PARAM1, 0L);
                 long param2Int = eachColumnConfig.getLong(DataKey.MIXUP_FUNCTION_PARAM2, 1L);
                 int scale = eachColumnConfig.getInt(DataKey.MIXUP_FUNCTION_SCALE, -1);
+                // Instantiate a generator with a factory method.
+                UniformRandomProvider rng = RandomSource.XO_RO_SHI_RO_128_PP.create();
                 switch (columnType) {
                     case STRING:
                         return new StringColumn(RandomStringUtils.randomAlphanumeric(
-                                (int) RandomUtils.nextLong(param1Int, param2Int + 1)));
+                                (int) rng.nextLong(param1Int, param2Int + 1)));
                     case LONG:
-                        return new LongColumn(RandomUtils.nextLong(param1Int, param2Int + 1));
+                        return new LongColumn(rng.nextLong(param1Int, param2Int + 1));
                     case DOUBLE:
                         // specify fixed scale or not ?
                         if (scale > 0) {
-                            BigDecimal b = BigDecimal.valueOf(RandomUtils.nextDouble(param1Int, param2Int + 1))
+                            BigDecimal b = BigDecimal.valueOf(rng.nextDouble(param1Int, param2Int + 1))
                                     .setScale(scale, BigDecimal.ROUND_HALF_UP);
                             return new DoubleColumn(b.doubleValue());
                         }
                         else {
-                            return new DoubleColumn(RandomUtils.nextDouble(param1Int, param2Int + 1));
+                            return new DoubleColumn(rng.nextDouble(param1Int, param2Int + 1));
                         }
                     case DATE:
-                        return new DateColumn(new Date(RandomUtils.nextLong(param1Int, param2Int + 1)));
+                        return new DateColumn(new Date(rng.nextLong(param1Int, param2Int + 1)));
                     case BOOL:
                         // warn: no concern -10 etc..., how about (0, 0)(0, 1)(1,2)
                         if (param1Int == param2Int) {
@@ -490,12 +493,12 @@ public class DataReader
                             return new BoolColumn(false);
                         }
                         else {
-                            long randomInt = RandomUtils.nextLong(0, param1Int + param2Int + 1);
+                            long randomInt = rng.nextLong(0, param1Int + param2Int + 1);
                             return new BoolColumn(randomInt > param1Int);
                         }
                     case BYTES:
                         return new BytesColumn(RandomStringUtils.randomAlphanumeric((int)
-                                RandomUtils.nextLong(param1Int, param2Int + 1)).getBytes());
+                                rng.nextLong(param1Int, param2Int + 1)).getBytes());
                     default:
                         // in fact,never to be here
                         throw new Exception(String.format("不支持类型[%s]", columnType.name()));
@@ -573,7 +576,7 @@ public class DataReader
                 case UUID:
                     return new StringColumn(UUID.randomUUID().toString());
                 case ZIP_CODE:
-                    return new LongColumn(RandomUtils.nextLong(1000000, 699000));
+                    return new LongColumn(RandomSource.XO_RO_SHI_RO_1024_PP.create().nextLong(1000000, 699000));
                 default:
                     throw AddaxException.asAddaxException(DataReaderErrorCode.ILLEGAL_VALUE,
                             columnRule + " is unsupported");

@@ -21,7 +21,8 @@
 
 package com.wgzhao.addax.plugin.reader.datareader.util;
 
-import org.apache.commons.lang3.RandomUtils;
+import org.apache.commons.rng.UniformRandomProvider;
+import org.apache.commons.rng.simple.RandomSource;
 
 /**
  * generate a faker address
@@ -100,7 +101,7 @@ public class AddressUtil
                 CommonUtil.randChoose(DISTRICTS),
                 CommonUtil.randChoose(STREETS),
                 CommonUtil.randChoose(STREET_SUFFIXES),
-                RandomUtils.nextInt(0, 300)
+                RandomSource.XO_RO_SHI_RO_1024_PP.create().nextInt(0, 300)
         );
     }
 

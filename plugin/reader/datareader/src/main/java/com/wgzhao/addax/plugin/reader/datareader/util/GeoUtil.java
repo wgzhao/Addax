@@ -21,7 +21,8 @@
 
 package com.wgzhao.addax.plugin.reader.datareader.util;
 
-import org.apache.commons.lang3.RandomUtils;
+import org.apache.commons.rng.UniformRandomProvider;
+import org.apache.commons.rng.simple.RandomSource;
 
 import java.math.BigDecimal;
 
@@ -995,7 +996,8 @@ public class GeoUtil
      */
     private static BigDecimal coordinate()
     {
-        return BigDecimal.valueOf((RandomUtils.nextDouble(0, 360000000) - 180000000) / 1000000.0)
+        return BigDecimal.valueOf((
+            RandomSource.XO_RO_SHI_RO_128_PP.create().nextDouble(0, 360000000) - 180000000) / 1000000.0)
                 .setScale(7, BigDecimal.ROUND_HALF_UP);
     }
 

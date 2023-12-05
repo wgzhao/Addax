@@ -21,7 +21,7 @@
 
 package com.wgzhao.addax.plugin.reader.datareader.util;
 
-import org.apache.commons.lang3.RandomUtils;
+import org.apache.commons.rng.simple.RandomSource;
 
 public class PersonUtil
 {
@@ -61,7 +61,7 @@ public class PersonUtil
     {
         StringBuilder sb = new StringBuilder();
         sb.append(CommonUtil.randChoose(LAST_NAMES));
-        if (RandomUtils.nextInt() < 0.4) {
+        if (RandomSource.XO_SHI_RO_128_PP.create().nextInt(0, 1) < 0.4) {
             sb.append(CommonUtil.randChoose(FIRST_NAMES_FEMALE));
         } else {
             sb.append(CommonUtil.randChoose(FIRST_NAMES_MALE));
