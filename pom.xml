@@ -45,7 +45,7 @@
         <commons.net.version>3.10.0</commons.net.version>
         <diamond.version>3.7.3</diamond.version>
         <druid.version>1.2.20</druid.version>
-        <fastjson2.version>2.0.42</fastjson2.version>
+        <fastjson2.version>2.0.43</fastjson2.version>
         <findbugs.version>3.0.1</findbugs.version>
         <guava.version>31.0-jre</guava.version>
         <groovy.version>3.0.19</groovy.version>
@@ -89,7 +89,7 @@
         <woodstox.version>6.5.1</woodstox.version>
         <xz.version>1.9</xz.version>
         <zookeeper.version>3.6.0</zookeeper.version>
-        <zstd.version>1.5.5-10</zstd.version>
+        <zstd.version>1.5.5-11</zstd.version>
 
         <!-- jdbc driver version -->
         <cassandra.jdbc.version>3.11.0</cassandra.jdbc.version>
@@ -190,7 +190,7 @@
             <plugin>
                 <groupId>com.github.spotbugs</groupId>
                 <artifactId>spotbugs-maven-plugin</artifactId>
-                <version>4.8.1.0</version>
+                <version>4.8.2.0</version>
             </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
@@ -302,7 +302,7 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-javadoc-plugin</artifactId>
-                <version>3.6.2</version>
+                <version>3.6.3</version>
                 <executions>
                     <execution>
                         <id>attach-javadocs</id>
