@@ -17,7 +17,7 @@
  * under the License.
  */
 
-package com.wgzhao.addax.plugin.reader.sqlitreader;
+package com.wgzhao.addax.plugin.reader.sqlitereader;
 
 import com.wgzhao.addax.common.spi.ErrorCode;
 
