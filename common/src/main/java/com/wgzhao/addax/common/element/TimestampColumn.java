@@ -5,11 +5,6 @@ import com.wgzhao.addax.common.exception.CommonErrorCode;
 
 import java.math.BigDecimal;
 import java.math.BigInteger;
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.PreparedStatement;
-import java.sql.SQLException;
-import java.sql.Statement;
 import java.sql.Timestamp;
 import java.util.Date;
 
