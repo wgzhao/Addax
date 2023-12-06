@@ -26,8 +26,6 @@ import com.wgzhao.addax.common.util.Configuration;
 import org.influxdb.InfluxDB;
 import org.influxdb.InfluxDBFactory;
 import org.influxdb.dto.Query;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -39,8 +37,6 @@ public class InfluxDBWriter
     public static class Job
             extends Writer.Job
     {
-        private static final Logger LOG = LoggerFactory.getLogger(Job.class);
-
         private Configuration originalConfig = null;
 
         private String endpoint;

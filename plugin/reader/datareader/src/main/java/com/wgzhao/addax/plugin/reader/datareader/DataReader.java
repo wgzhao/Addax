@@ -48,8 +48,6 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.time.DateUtils;
 import org.apache.commons.rng.UniformRandomProvider;
 import org.apache.commons.rng.simple.RandomSource;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.math.BigDecimal;
 import java.text.ParseException;
@@ -95,8 +93,6 @@ public class DataReader
     public static class Job
             extends Reader.Job
     {
-
-        private static final Logger LOG = LoggerFactory.getLogger(Job.class);
         private Configuration originalConfig;
         private static final List<String> validUnits = Arrays.asList("d", "day", "M", "month", "y", "year", "h", "hour", "m", "minute",
                 "s", "second", "w", "week");

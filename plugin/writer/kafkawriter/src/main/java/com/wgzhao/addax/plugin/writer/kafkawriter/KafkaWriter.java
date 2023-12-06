@@ -25,8 +25,6 @@ import org.apache.kafka.clients.producer.KafkaProducer;
 import org.apache.kafka.clients.producer.ProducerConfig;
 import org.apache.kafka.clients.producer.ProducerRecord;
 import org.apache.kafka.common.serialization.StringSerializer;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.util.Collections;
 import java.util.HashMap;
@@ -48,7 +46,6 @@ public class KafkaWriter
     public static class Job
             extends Writer.Job
     {
-        private static final Logger LOG = LoggerFactory.getLogger(Job.class);
         private Configuration config = null;
 
         @Override

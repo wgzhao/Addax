@@ -54,8 +54,6 @@ public class InfluxDB2Reader
     public static class Job
             extends Reader.Job
     {
-        private static final Logger LOG = LoggerFactory.getLogger(Job.class);
-
         private Configuration originalConfig = null;
         private String endpoint;
         private List<String> tables;

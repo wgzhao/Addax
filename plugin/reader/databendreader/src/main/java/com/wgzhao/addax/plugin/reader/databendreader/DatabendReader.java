@@ -26,8 +26,6 @@ import com.wgzhao.addax.common.spi.Reader;
 import com.wgzhao.addax.common.util.Configuration;
 import com.wgzhao.addax.rdbms.reader.CommonRdbmsReader;
 import com.wgzhao.addax.rdbms.util.DataBaseType;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.util.List;
 
@@ -40,8 +38,6 @@ public class DatabendReader
     public static class Job
             extends Reader.Job
     {
-        private static final Logger LOG = LoggerFactory.getLogger(Job.class);
-
         private Configuration originalConfig = null;
         private CommonRdbmsReader.Job commonRdbmsReaderJob;
 

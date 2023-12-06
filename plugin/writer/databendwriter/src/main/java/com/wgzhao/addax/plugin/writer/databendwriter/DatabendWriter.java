@@ -7,8 +7,6 @@ import com.wgzhao.addax.common.util.Configuration;
 import com.wgzhao.addax.plugin.writer.databendwriter.util.DatabendWriterUtil;
 import com.wgzhao.addax.rdbms.util.DataBaseType;
 import com.wgzhao.addax.rdbms.writer.CommonRdbmsWriter;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
@@ -20,7 +18,6 @@ public class DatabendWriter extends Writer {
 
     public static class Job
             extends Writer.Job {
-        private static final Logger LOG = LoggerFactory.getLogger(Job.class);
         private Configuration originalConfig;
         private CommonRdbmsWriter.Job commonRdbmsWriterMaster;
 
@@ -62,7 +59,6 @@ public class DatabendWriter extends Writer {
 
 
     public static class Task extends Writer.Task {
-        private static final Logger LOG = LoggerFactory.getLogger(Task.class);
 
         private Configuration writerSliceConfig;
 

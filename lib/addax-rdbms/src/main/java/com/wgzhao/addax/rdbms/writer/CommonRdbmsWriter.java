@@ -561,7 +561,7 @@ public class CommonRdbmsWriter
                     break;
 
                 default:
-                    Map map = this.resultSetMetaData.get(columnIndex);
+                    Map<String, Object> map = this.resultSetMetaData.get(columnIndex);
                     throw AddaxException.asAddaxException(
                             DBUtilErrorCode.UNSUPPORTED_TYPE,
                             String.format(
