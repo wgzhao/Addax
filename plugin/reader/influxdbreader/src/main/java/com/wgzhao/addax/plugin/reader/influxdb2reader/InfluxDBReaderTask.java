@@ -19,7 +19,6 @@
 
 package com.wgzhao.addax.plugin.reader.influxdb2reader;
 
-import com.alibaba.fastjson2.JSON;
 import com.alibaba.fastjson2.JSONArray;
 import com.alibaba.fastjson2.JSONObject;
 import com.wgzhao.addax.common.element.Record;
@@ -31,7 +30,6 @@ import com.wgzhao.addax.common.util.Configuration;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.http.client.fluent.Content;
 import org.apache.http.client.fluent.Request;
-import org.apache.http.entity.ContentType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -40,7 +38,6 @@ import java.nio.charset.StandardCharsets;
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
 import java.util.List;
-import java.util.Map;
 
 public class InfluxDBReaderTask
 {
@@ -152,42 +149,6 @@ public class InfluxDBReaderTask
         Content content = Request.Get(url)
                 .connectTimeout(this.connTimeout)
                 .socketTimeout(this.socketTimeout)
-                .execute()
-                .returnContent();
-        if (content == null) {
-            return null;
-        }
-        return content.asString(StandardCharsets.UTF_8);
-    }
-
-    private String post(String url, Map<String, Object> params)
-            throws Exception
-    {
-        return post(url, JSON.toJSONString(params), this.connTimeout, this.socketTimeout);
-    }
-
-    private String post(String url, String params)
-            throws Exception
-    {
-        return post(url, params, this.connTimeout, this.socketTimeout);
-    }
-
-    private String post(String url, Map<String, Object> params,
-            int connectTimeoutInMill, int socketTimeoutInMill)
-            throws Exception
-    {
-        return post(url, JSON.toJSONString(params), connectTimeoutInMill, socketTimeoutInMill);
-    }
-
-    private String post(String url, String params,
-            int connectTimeoutInMill, int socketTimeoutInMill)
-            throws Exception
-    {
-        Content content = Request.Post(url)
-                .connectTimeout(connectTimeoutInMill)
-                .socketTimeout(socketTimeoutInMill)
-                .addHeader("Content-Type", "application/json")
-                .bodyString(params, ContentType.APPLICATION_JSON)
                 .execute()
                 .returnContent();
         if (content == null) {
