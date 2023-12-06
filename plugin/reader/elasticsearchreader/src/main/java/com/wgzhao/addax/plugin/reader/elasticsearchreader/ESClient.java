@@ -191,8 +191,7 @@ public class ESClient
         log.info(rst.getJsonString());
         List<AliasMapping> list = new ArrayList<>();
         if (rst.isSucceeded()) {
-            JsonParser jp = new JsonParser();
-            JsonObject jo = (JsonObject) jp.parse(rst.getJsonString());
+            JsonObject jo = (JsonObject) JsonParser.parseString(rst.getJsonString());
             for (Map.Entry<String, JsonElement> entry : jo.entrySet()) {
                 String index = entry.getKey();
                 if (indexName.equals(index)) {
