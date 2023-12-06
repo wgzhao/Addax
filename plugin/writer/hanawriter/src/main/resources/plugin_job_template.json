@@ -1,0 +1,22 @@
+{
+  "name": "hanawriter",
+  "parameter": {
+    "writeMode": "insert",
+    "username": "root",
+    "password": "",
+    "column": [
+      "*"
+    ],
+    "preSql": [
+      "delete from @table"
+    ],
+    "connection": [
+      {
+        "jdbcUrl": "jdbc:sap://127.0.0.1:37019/test",
+        "table": [
+          "addax_tbl"
+        ]
+      }
+    ]
+  }
+}

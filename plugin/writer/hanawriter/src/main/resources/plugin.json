@@ -1,0 +1,6 @@
+{
+  "name": "hanawriter",
+  "class": "com.wgzhao.addax.plugin.writer.hanawriter.HANAWriter",
+  "description": "Writer to SAP HANA database",
+  "developer": "wgzhao"
+}

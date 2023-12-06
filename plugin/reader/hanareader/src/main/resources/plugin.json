@@ -1,0 +1,7 @@
+{
+  "name": "hanareader",
+  "class": "com.wgzhao.addax.plugin.reader.hanareader.HANAReader",
+  "description": "SAP HANA reader plugin",
+  "developer": "wgzhao",
+  "drivers": []
+}

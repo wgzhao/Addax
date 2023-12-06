@@ -137,6 +137,14 @@
             <outputDirectory>addax-${project.version}</outputDirectory>
         </fileSet>
         <fileSet>
+            <directory>plugin/reader/hanareader/target/hanareader-${project.version}/</directory>
+            <includes>
+                <include>**/*.*</include>
+            </includes>
+            <fileMode>0644</fileMode>
+            <outputDirectory>addax-${project.version}</outputDirectory>
+        </fileSet>
+        <fileSet>
             <directory>plugin/reader/hbase11xreader/target/hbase11xreader-${project.version}/</directory>
             <includes>
                 <include>**/*.*</include>
@@ -396,6 +404,14 @@
         </fileSet>
         <fileSet>
             <directory>plugin/writer/greenplumwriter/target/greenplumwriter-${project.version}/</directory>
+            <includes>
+                <include>**/*.*</include>
+            </includes>
+            <fileMode>0644</fileMode>
+            <outputDirectory>addax-${project.version}</outputDirectory>
+        </fileSet>
+        <fileSet>
+            <directory>plugin/writer/hanawriter/target/hanawriter-${project.version}/</directory>
             <includes>
                 <include>**/*.*</include>
             </includes>
