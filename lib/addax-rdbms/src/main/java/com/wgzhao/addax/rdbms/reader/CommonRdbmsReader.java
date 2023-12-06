@@ -36,7 +36,6 @@ import com.wgzhao.addax.common.exception.AddaxException;
 import com.wgzhao.addax.common.plugin.RecordSender;
 import com.wgzhao.addax.common.plugin.TaskPluginCollector;
 import com.wgzhao.addax.common.statistics.PerfRecord;
-import com.wgzhao.addax.common.statistics.PerfTrace;
 import com.wgzhao.addax.common.util.Configuration;
 import com.wgzhao.addax.rdbms.reader.util.GetPrimaryKeyUtil;
 import com.wgzhao.addax.rdbms.reader.util.OriginalConfPretreatmentUtil;
