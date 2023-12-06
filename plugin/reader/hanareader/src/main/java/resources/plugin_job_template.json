@@ -1,0 +1,19 @@
+{
+  "name": "rdbmsreader",
+  "parameter": {
+    "username": "",
+    "password": "",
+    "column": [],
+    "connection": [
+      {
+        "jdbcUrl": [],
+        "table": [],
+        "driver": ""
+      }
+    ],
+    "where": "1=1",
+    "autoPk": false,
+    "fetchSize": 2048,
+    "splitPk": ""
+  }
+}

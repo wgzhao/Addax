@@ -1,0 +1,7 @@
+{
+  "name": "rdbmsreader",
+  "class": "com.wgzhao.addax.plugin.reader.rdbmsreader.RdbmsReader",
+  "description": "general RDBMS reader plugin",
+  "developer": "alibaba",
+  "drivers": []
+}

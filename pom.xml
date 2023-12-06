@@ -403,6 +403,7 @@
                 <module>plugin/reader/elasticsearchreader</module>
                 <module>plugin/reader/excelreader</module>
                 <module>plugin/reader/ftpreader</module>
+                <module>plugin/reader/hanareader</module>
                 <module>plugin/reader/hbase11xreader</module>
                 <module>plugin/reader/hbase11xsqlreader</module>
                 <module>plugin/reader/hbase20xreader</module>
@@ -440,6 +441,7 @@
                 <module>plugin/writer/excelwriter</module>
                 <module>plugin/writer/ftpwriter</module>
                 <module>plugin/writer/greenplumwriter</module>
+                <module>plugin/writer/hanawriter</module>
                 <module>plugin/writer/hbase11xsqlwriter</module>
                 <module>plugin/writer/hbase11xwriter</module>
                 <module>plugin/writer/hbase20xsqlwriter</module>
