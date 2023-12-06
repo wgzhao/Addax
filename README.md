@@ -66,6 +66,7 @@ Addax supports more than 20 SQL and NoSQL [data sources](support_data_sources.md
 </tr>
 <tr>
 <td><img src="./docs/images/logos/access.svg" height="50px" alt="Access" style="border: 1px solid #add;"></td>
+<td><img src="./docs/images/logos/sap.svg" height="50px" alt="SAP HANA" style="border: 1px solid #add;"></td>
 </tr>
 </table>
 
