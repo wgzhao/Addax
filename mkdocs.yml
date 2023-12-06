@@ -49,6 +49,7 @@ nav:
       - reader/elasticsearchreader.md
       - reader/excelreader.md
       - reader/ftpreader.md
+      - reader/hanareader.md
       - reader/hbase11xreader.md
       - reader/hbase11xsqlreader.md
       - reader/hbase20xreader.md
@@ -86,6 +87,7 @@ nav:
       - writer/excelwriter.md
       - writer/ftpwriter.md
       - writer/greenplumwriter.md
+      - writer/hanawriter.md
       - writer/hbase11xsqlwriter.md
       - writer/hbase11xwriter.md
       - writer/hbase20xsqlwriter.md
