@@ -21,7 +21,6 @@
 
 package com.wgzhao.addax.plugin.reader.datareader.util;
 
-import org.apache.commons.rng.UniformRandomProvider;
 import org.apache.commons.rng.simple.RandomSource;
 
 import java.math.BigDecimal;

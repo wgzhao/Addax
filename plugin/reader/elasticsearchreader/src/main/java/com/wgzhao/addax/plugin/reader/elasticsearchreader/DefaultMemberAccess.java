@@ -25,7 +25,6 @@ import ognl.OgnlContext;
 import java.lang.reflect.AccessibleObject;
 import java.lang.reflect.Member;
 import java.lang.reflect.Modifier;
-import java.util.Map;
 
 /**
  * This class provides methods for setting up and restoring

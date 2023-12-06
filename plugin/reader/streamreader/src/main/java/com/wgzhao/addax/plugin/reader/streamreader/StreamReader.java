@@ -51,7 +51,6 @@ import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.regex.Pattern;
 
 public class StreamReader
         extends Reader
@@ -80,7 +79,6 @@ public class StreamReader
     {
 
         private static final Logger LOG = LoggerFactory.getLogger(Job.class);
-        private Pattern mixupFunctionPattern;
         private Configuration originalConfig;
         private static final List<String> validUnits = Arrays.asList("d", "day", "M", "month", "y", "year", "h", "hour", "m", "minute", "s", "second", "w", "week");
 
@@ -88,9 +86,6 @@ public class StreamReader
         public void init()
         {
             this.originalConfig = getPluginJobConf();
-            // warn: 忽略大小写
-            this.mixupFunctionPattern = Pattern.compile(StreamConstant.MIXUP_FUNCTION_PATTERN,
-                    Pattern.CASE_INSENSITIVE);
             dealColumn(this.originalConfig);
 
             Long sliceRecordCount = this.originalConfig

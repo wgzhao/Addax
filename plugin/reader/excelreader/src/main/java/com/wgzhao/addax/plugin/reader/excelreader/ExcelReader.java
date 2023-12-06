@@ -33,10 +33,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
-import java.util.regex.Pattern;
 
 public class ExcelReader
         extends Reader
@@ -50,8 +47,6 @@ public class ExcelReader
         private Configuration originConfig = null;
         private List<String> path = null;
         private List<String> sourceFiles;
-        private final Map<String, Pattern> pattern = new HashMap<>();
-        private final Map<String, Boolean> isRegexPath = new HashMap<>();
 
         @Override
         public void init()

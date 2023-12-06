@@ -19,7 +19,6 @@
 
 package com.wgzhao.addax.plugin.writer.sqlitewriter;
 
-import com.wgzhao.addax.common.base.Key;
 import com.wgzhao.addax.common.element.Column;
 import com.wgzhao.addax.common.plugin.RecordReceiver;
 import com.wgzhao.addax.common.spi.Writer;

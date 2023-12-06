@@ -35,7 +35,6 @@ import com.wgzhao.addax.common.exception.AddaxException;
 import com.wgzhao.addax.common.plugin.RecordSender;
 import com.wgzhao.addax.common.spi.Reader;
 import com.wgzhao.addax.common.statistics.PerfRecord;
-import com.wgzhao.addax.common.statistics.PerfTrace;
 import com.wgzhao.addax.common.util.Configuration;
 import com.wgzhao.addax.plugin.reader.elasticsearchreader.gson.MapTypeAdapter;
 import io.searchbox.client.JestResult;

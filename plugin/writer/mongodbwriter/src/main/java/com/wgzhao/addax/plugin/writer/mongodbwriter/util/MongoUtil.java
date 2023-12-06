@@ -20,8 +20,6 @@
 package com.wgzhao.addax.plugin.writer.mongodbwriter.util;
 
 import com.wgzhao.addax.common.exception.AddaxException;
-import com.wgzhao.addax.common.util.Configuration;
-import com.wgzhao.addax.plugin.writer.mongodbwriter.KeyConstant;
 import com.wgzhao.addax.plugin.writer.mongodbwriter.MongoDBWriterErrorCode;
 import com.mongodb.MongoClient;
 import com.mongodb.MongoCredential;
@@ -29,7 +27,6 @@ import com.mongodb.ServerAddress;
 
 import java.net.UnknownHostException;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
