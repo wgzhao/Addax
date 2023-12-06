@@ -26,6 +26,11 @@
             </exclusions>
         </dependency>
 
+        <dependency>
+            <groupId>org.apache.commons</groupId>
+            <artifactId>commons-rng-simple</artifactId>
+            <version>${commons.rng.version}</version>
+        </dependency>
     </dependencies>
 
     <build>
