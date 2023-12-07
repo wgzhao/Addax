@@ -127,7 +127,7 @@ public abstract class Channel
 
     public void pushAll(Collection<Record> rs)
     {
-        Validate.notNull(rs);
+        Validate.notNull(rs, "The Record must not be empty");
         Validate.noNullElements(rs);
         this.doPushAll(rs);
         this.statPush(rs.size(), this.getByteSize(rs));
@@ -142,7 +142,7 @@ public abstract class Channel
 
     public void pullAll(Collection<Record> rs)
     {
-        Validate.notNull(rs);
+        Validate.notNull(rs, "The Record must not be empty");
         this.doPullAll(rs);
         this.statPull(rs.size(), this.getByteSize(rs));
     }
