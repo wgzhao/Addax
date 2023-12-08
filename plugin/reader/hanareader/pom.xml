@@ -36,7 +36,7 @@
         <dependency>
             <groupId>com.sap.cloud.db.jdbc</groupId>
             <artifactId>ngdbc</artifactId>
-            <version>2.18.16</version>
+            <version>${ngdbc.version}</version>
         </dependency>
         
     </dependencies>
