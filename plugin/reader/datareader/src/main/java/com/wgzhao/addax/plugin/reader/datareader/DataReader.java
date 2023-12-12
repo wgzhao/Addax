@@ -37,6 +37,7 @@ import com.wgzhao.addax.common.util.Configuration;
 import com.wgzhao.addax.plugin.reader.datareader.util.AddressUtil;
 import com.wgzhao.addax.plugin.reader.datareader.util.BankUtil;
 import com.wgzhao.addax.plugin.reader.datareader.util.CompanyUtil;
+import com.wgzhao.addax.plugin.reader.datareader.util.EmailUtil;
 import com.wgzhao.addax.plugin.reader.datareader.util.GeoUtil;
 import com.wgzhao.addax.plugin.reader.datareader.util.IdCardUtil;
 import com.wgzhao.addax.plugin.reader.datareader.util.JobUtil;
@@ -551,6 +552,8 @@ public class DataReader
                     return new StringColumn(BankUtil.nextCreditCard());
                 case COMPANY:
                     return new StringColumn(CompanyUtil.nextCompany());
+                case EMAIL:
+                    return new StringColumn(EmailUtil.nextEmail());
                 case ID_CARD:
                     return new StringColumn(IdCardUtil.nextIdCard());
                 case LAT:
