@@ -29,6 +29,7 @@ import com.wgzhao.addax.common.element.Column;
 import com.wgzhao.addax.common.element.DateColumn;
 import com.wgzhao.addax.common.element.LongColumn;
 import com.wgzhao.addax.common.element.Record;
+import com.wgzhao.addax.common.element.TimestampColumn;
 import com.wgzhao.addax.common.exception.AddaxException;
 import com.wgzhao.addax.common.plugin.RecordReceiver;
 import com.wgzhao.addax.common.plugin.TaskPluginCollector;
@@ -309,7 +310,7 @@ public class StorageWriterUtil {
                         splitRows.add(nullFormat);
                     } else {
                         // warn: it's all ok if nullFormat is null
-                        boolean isDateColumn = column instanceof DateColumn;
+                        boolean isDateColumn = column instanceof DateColumn || column instanceof TimestampColumn;
                         if (!isDateColumn) {
                             splitRows.add(column.asString());
                         } else {
