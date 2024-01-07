@@ -31,7 +31,10 @@ package com.wgzhao.addax.common.util;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.crypto.BadPaddingException;
 import javax.crypto.Cipher;
+import javax.crypto.IllegalBlockSizeException;
+import javax.crypto.NoSuchPaddingException;
 import javax.crypto.SecretKey;
 import javax.crypto.SecretKeyFactory;
 import javax.crypto.spec.GCMParameterSpec;
@@ -40,7 +43,11 @@ import javax.crypto.spec.PBEKeySpec;
 import javax.crypto.spec.SecretKeySpec;
 
 import java.nio.charset.StandardCharsets;
+import java.security.InvalidAlgorithmParameterException;
+import java.security.InvalidKeyException;
+import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
+import java.security.spec.InvalidKeySpecException;
 import java.util.Base64;
 
 public class EncryptUtil
@@ -48,36 +55,20 @@ public class EncryptUtil
     private static final String SECRET_KEY = "F3M0PxSWod6cyCejYUkpccU9gMsWwgrM";
     private static final String SALT = "G2PuhRinJqKKFcBUT4eMaK3FKMx9iGmx";
 
+    private static final String TRANSFORMATION = "AES/GCM/NoPadding";
+    private static final String ALGORITHM = "AES";
+
     private static final Logger logger = LoggerFactory.getLogger(EncryptUtil.class);
 
-    private static IvParameterSpec ivSpec;
-    private static SecretKeySpec secSpec;
-    private static Cipher pbeCipher;
-
-    static {
-        try {
-            final int iterationCount = 40000;
-            final int keyLength = 128;
-            byte[] iv = new byte[16];
-            new SecureRandom().nextBytes(iv);
-            ivSpec = new IvParameterSpec(iv);
-            pbeCipher = Cipher.getInstance("AES/GCM/NoPadding");
-            SecretKeyFactory keyFactory = SecretKeyFactory.getInstance("PBKDF2WithHmacSHA512");
-            PBEKeySpec keySpec = new PBEKeySpec(SECRET_KEY.toCharArray(), SALT.getBytes(StandardCharsets.UTF_8), iterationCount, keyLength);
-            SecretKey keyTmp = keyFactory.generateSecret(keySpec);
-            secSpec = new SecretKeySpec(keyTmp.getEncoded(), "AES");
-        }
-        catch (Exception e) {
-            logger.error("Unknown checked exception occurred: ", e);
-        }
-    }
 
     public static String encrypt(String password)
     {
         try {
-            GCMParameterSpec params = new GCMParameterSpec(128, ivSpec.getIV(), 0, 12);
-            pbeCipher.init(Cipher.ENCRYPT_MODE, secSpec, params);
-            byte[] cryptoText = pbeCipher.doFinal(password.getBytes(StandardCharsets.UTF_8));
+            SecretKeySpec secSpec = getSecSpec();
+            GCMParameterSpec params = new GCMParameterSpec(128, SECRET_KEY.getBytes(), 0, 12);
+            Cipher cipher = Cipher.getInstance(TRANSFORMATION);
+            cipher.init(Cipher.ENCRYPT_MODE, secSpec, params);
+            byte[] cryptoText = cipher.doFinal(password.getBytes());
             return base64Encode(cryptoText);
         }
         catch (Exception e) {
@@ -93,18 +84,33 @@ public class EncryptUtil
     public static String decrypt(String encrypted)
     {
         try {
-            GCMParameterSpec params = new GCMParameterSpec(128, ivSpec.getIV(), 0, 12);
+            SecretKeySpec secSpec = getSecSpec();
+            GCMParameterSpec params = new GCMParameterSpec(128, SECRET_KEY.getBytes(), 0, 12);
+            Cipher pbeCipher = Cipher.getInstance(TRANSFORMATION);
             pbeCipher.init(Cipher.DECRYPT_MODE, secSpec, params);
-            return new String(pbeCipher.doFinal(base64Decode(encrypted)), StandardCharsets.UTF_8);
-        }
-        catch (Exception e) {
+            return new String(pbeCipher.doFinal(base64Decode(encrypted)));
+        } catch (InvalidAlgorithmParameterException | NoSuchPaddingException | IllegalBlockSizeException |
+                 InvalidKeySpecException | NoSuchAlgorithmException | BadPaddingException | InvalidKeyException e) {
             throw new RuntimeException(e);
         }
+
     }
 
     private static byte[] base64Decode(String property)
     {
         return Base64.getDecoder().decode(property);
+    }
+
+    private static SecretKeySpec getSecSpec() throws InvalidKeySpecException, NoSuchAlgorithmException {
+        final int iterationCount = 40000;
+        final int keyLength = 128;
+        byte[] iv = new byte[16];
+        new SecureRandom().nextBytes(iv);
+//        new IvParameterSpec(iv);
+        SecretKeyFactory keyFactory = SecretKeyFactory.getInstance("PBKDF2WithHmacSHA512");
+        PBEKeySpec keySpec = new PBEKeySpec(SECRET_KEY.toCharArray(), SALT.getBytes(), iterationCount, keyLength);
+        SecretKey keyTmp = keyFactory.generateSecret(keySpec);
+        return  new SecretKeySpec(keyTmp.getEncoded(), ALGORITHM);
     }
 
     // generate encrypt password string which paste to json file
