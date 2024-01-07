@@ -38,11 +38,8 @@ import javax.crypto.NoSuchPaddingException;
 import javax.crypto.SecretKey;
 import javax.crypto.SecretKeyFactory;
 import javax.crypto.spec.GCMParameterSpec;
-import javax.crypto.spec.IvParameterSpec;
 import javax.crypto.spec.PBEKeySpec;
 import javax.crypto.spec.SecretKeySpec;
-
-import java.nio.charset.StandardCharsets;
 import java.security.InvalidAlgorithmParameterException;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
@@ -50,10 +47,12 @@ import java.security.SecureRandom;
 import java.security.spec.InvalidKeySpecException;
 import java.util.Base64;
 
+import static com.wgzhao.addax.common.base.Constant.ENC_PASSWORD_PREFIX;
+
 public class EncryptUtil
 {
     private static final String SECRET_KEY = "F3M0PxSWod6cyCejYUkpccU9gMsWwgrM";
-    private static final String SALT = "G2PuhRinJqKKFcBUT4eMaK3FKMx9iGmx";
+    private static final byte[] SALT = "G2PuhRinJqKKFcBUT4eMaK3FKMx9iGmx".getBytes();
 
     private static final String TRANSFORMATION = "AES/GCM/NoPadding";
     private static final String ALGORITHM = "AES";
@@ -106,9 +105,8 @@ public class EncryptUtil
         final int keyLength = 128;
         byte[] iv = new byte[16];
         new SecureRandom().nextBytes(iv);
-//        new IvParameterSpec(iv);
         SecretKeyFactory keyFactory = SecretKeyFactory.getInstance("PBKDF2WithHmacSHA512");
-        PBEKeySpec keySpec = new PBEKeySpec(SECRET_KEY.toCharArray(), SALT.getBytes(), iterationCount, keyLength);
+        PBEKeySpec keySpec = new PBEKeySpec(SECRET_KEY.toCharArray(), SALT, iterationCount, keyLength);
         SecretKey keyTmp = keyFactory.generateSecret(keySpec);
         return  new SecretKeySpec(keyTmp.getEncoded(), ALGORITHM);
     }
@@ -121,6 +119,6 @@ public class EncryptUtil
             System.exit(1);
         }
         String encrypted = encrypt(args[0]);
-        System.out.println("The encrypt string is : '${enc:" + encrypted + "}', you can paste it to json file.");
+        System.out.printf("The encrypt string is: '%s%s}', you can paste it into json file.", ENC_PASSWORD_PREFIX, encrypted);
     }
 }
