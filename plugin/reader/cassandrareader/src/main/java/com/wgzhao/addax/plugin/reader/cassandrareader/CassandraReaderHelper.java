@@ -248,10 +248,10 @@ public class CassandraReaderHelper
         return result;
     }
 
-    static Map transferMapForJson(Map cmap, DataType keyType, DataType valueType)
+    static Map<Object, Object> transferMapForJson(Map<Object, Object> cmap, DataType keyType, DataType valueType)
             throws TypeNotSupported
     {
-        Map newMap = new HashMap();
+        Map<Object, Object> newMap = new HashMap<>();
         for (Object e : cmap.entrySet()) {
             Object k = ((Map.Entry) e).getKey();
             Object v = ((Map.Entry) e).getValue();
@@ -265,10 +265,10 @@ public class CassandraReaderHelper
         return newMap;
     }
 
-    static List transferTupleForJson(TupleValue tupleValue, List<DataType> componentTypes)
+    static List<Object> transferTupleForJson(TupleValue tupleValue, List<DataType> componentTypes)
             throws TypeNotSupported
     {
-        List l = new ArrayList();
+        List<Object> l = new ArrayList<>();
         for (int j = 0; j < componentTypes.size(); j++) {
             DataType dataType = componentTypes.get(j);
             TypeToken<?> eltClass = registry.codecFor(dataType).getJavaType();
@@ -278,10 +278,10 @@ public class CassandraReaderHelper
         return l;
     }
 
-    static Map transferUDTForJson(UDTValue udtValue)
+    static Map<String, Object> transferUDTForJson(UDTValue udtValue)
             throws TypeNotSupported
     {
-        Map<String, Object> newMap = new HashMap();
+        Map<String, Object> newMap = new HashMap<>();
         int j = 0;
         for (UserType.Field f : udtValue.getType()) {
             DataType dataType = f.getType();
