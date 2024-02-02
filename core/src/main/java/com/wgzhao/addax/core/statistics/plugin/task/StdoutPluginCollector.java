@@ -44,7 +44,7 @@ public class StdoutPluginCollector
 
     private static final int DEFAULT_MAX_DIRTY_NUM = 128;
     private final AtomicInteger currentLogNum = new AtomicInteger(0);
-    private AtomicInteger maxLogNum = new AtomicInteger(0);
+    private final AtomicInteger maxLogNum;
 
     public StdoutPluginCollector(Configuration configuration, Communication communication, PluginType type)
     {
