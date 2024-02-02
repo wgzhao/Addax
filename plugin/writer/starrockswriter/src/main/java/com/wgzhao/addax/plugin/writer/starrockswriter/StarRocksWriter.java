@@ -54,7 +54,7 @@ public class StarRocksWriter
             String password = options.getPassword();
             String jdbcUrl = options.getJdbcUrl();
             List<String> renderedPreSqls = StarRocksWriterUtil.renderPreOrPostSqls(options.getPreSqlList(), options.getTable());
-            if (null != renderedPreSqls && !renderedPreSqls.isEmpty()) {
+            if (!renderedPreSqls.isEmpty()) {
                 Connection conn = DBUtil.getConnection(DataBaseType.MySql, jdbcUrl, username, password);
                 LOG.info("Begin to execute preSqls:[{}]. context info:{}.", String.join(";", renderedPreSqls), jdbcUrl);
                 StarRocksWriterUtil.executeSqls(conn, renderedPreSqls);
@@ -79,7 +79,7 @@ public class StarRocksWriter
             String password = options.getPassword();
             String jdbcUrl = options.getJdbcUrl();
             List<String> renderedPostSqls = StarRocksWriterUtil.renderPreOrPostSqls(options.getPostSqlList(), options.getTable());
-            if (null != renderedPostSqls && !renderedPostSqls.isEmpty()) {
+            if (!renderedPostSqls.isEmpty()) {
                 Connection conn = DBUtil.getConnection(DataBaseType.MySql, jdbcUrl, username, password);
                 LOG.info("Begin to execute postSqls:[{}]. context info:{}.", String.join(";", renderedPostSqls), jdbcUrl);
                 StarRocksWriterUtil.executeSqls(conn, renderedPostSqls);
