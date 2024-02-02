@@ -323,7 +323,7 @@ public class ESWriter
 
         private String getDateStr(ESColumn esColumn, Column column)
         {
-            DateTime date = null;
+            DateTime date;
             DateTimeZone dtz = DateTimeZone.getDefault();
             if (esColumn.getTimezone() != null) {
                 // 所有时区参考 http://www.joda.org/joda-time/timezones.html
@@ -345,7 +345,7 @@ public class ESWriter
 
         private long doBatchInsert(final List<Record> writerBuffer)
         {
-            Map<String, Object> data = null;
+            Map<String, Object> data;
             final Bulk.Builder bulkAction = new Bulk.Builder().defaultIndex(this.index).defaultType(this.type);
             for (Record record : writerBuffer) {
                 data = new HashMap<>();
@@ -403,8 +403,6 @@ public class ESWriter
                                 data.put(columnName, column.asLong());
                                 break;
                             case INTEGER:
-                                data.put(columnName, column.asBigInteger());
-                                break;
                             case SHORT:
                                 data.put(columnName, column.asBigInteger());
                                 break;
