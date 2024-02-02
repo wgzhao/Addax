@@ -82,7 +82,7 @@ public final class StarRocksWriterUtil
         String table = options.getTable();
         List<String> preSqls = options.getPreSqlList();
         List<String> renderedPreSqls = StarRocksWriterUtil.renderPreOrPostSqls(preSqls, table);
-        if (null != renderedPreSqls && !renderedPreSqls.isEmpty()) {
+        if (!renderedPreSqls.isEmpty()) {
             LOG.info("Begin to preCheck preSqls:[{}].", String.join(";", renderedPreSqls));
             for (String sql : renderedPreSqls) {
                 try {
@@ -100,7 +100,7 @@ public final class StarRocksWriterUtil
         String table = options.getTable();
         List<String> postSqls = options.getPostSqlList();
         List<String> renderedPostSqls = StarRocksWriterUtil.renderPreOrPostSqls(postSqls, table);
-        if (null != renderedPostSqls && !renderedPostSqls.isEmpty()) {
+        if (!renderedPostSqls.isEmpty()) {
             LOG.info("Begin to preCheck postSqls:[{}].", String.join(";", renderedPostSqls));
             for (String sql : renderedPostSqls) {
                 try {
