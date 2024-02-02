@@ -104,14 +104,11 @@ public class ClickHouseWriter
                     }
 
                     if (columnSqlType == Types.TIMESTAMP) {
-                        String tz;
                         String columnTypeName = (String) this.resultSetMetaData.get(columnIndex).get("typeName");
                         if (columnTypeName.startsWith("DateTime64(") && columnTypeName.contains(",")) {
-                            tz = columnTypeName.substring(15, columnTypeName.length() - 2);
                             preparedStatement.setObject(columnIndex, column.asTimestamp()); //setTimestamp is slow and not recommended
                         }
                         else if (columnTypeName.startsWith("DateTime(")) {
-                            tz = columnTypeName.substring(10, columnTypeName.length() - 2);
                             preparedStatement.setObject(columnIndex, column.asTimestamp());
                         }
                         else {
