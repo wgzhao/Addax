@@ -54,7 +54,7 @@ public class OpentsdbDataHandler
     @Override
     public int handle(RecordReceiver lineReceiver, TaskPluginCollector collector)
     {
-        int count = 0;
+        int count;
         try (Connection conn = DriverManager.getConnection(jdbcUrl, user, password);) {
             LOG.info("connection[ jdbcUrl: " + jdbcUrl + ", username: " + user + "] established.");
             writer = new SchemalessWriter(conn);

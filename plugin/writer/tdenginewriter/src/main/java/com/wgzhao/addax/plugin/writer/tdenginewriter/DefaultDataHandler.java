@@ -343,7 +343,7 @@ public class DefaultDataHandler
             count++;
         }
 
-        SchemalessWriter writer = null;
+        SchemalessWriter writer;
         try {
             writer = new SchemalessWriter(conn);
         } catch (SQLException e) {
