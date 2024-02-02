@@ -545,7 +545,7 @@ public class DFSUtil
                 String columnType = columnEntry.getType();
                 Integer columnIndex = columnEntry.getIndex();
                 String columnConst = columnEntry.getValue();
-                String columnValue = null;
+                String columnValue;
                 if (null != columnIndex) {
                     if (null != gRecord.get(columnIndex)) {
                         columnValue = gRecord.get(columnIndex).toString();
