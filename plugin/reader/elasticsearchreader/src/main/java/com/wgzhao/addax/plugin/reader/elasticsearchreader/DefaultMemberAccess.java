@@ -42,9 +42,9 @@ public class DefaultMemberAccess
         implements MemberAccess
 {
 
-    public boolean allowPrivateAccess = false;
-    public boolean allowProtectedAccess = false;
-    public boolean allowPackageProtectedAccess = false;
+    public boolean allowPrivateAccess;
+    public boolean allowProtectedAccess;
+    public boolean allowPackageProtectedAccess;
 
     /*===================================================================
         Constructors
