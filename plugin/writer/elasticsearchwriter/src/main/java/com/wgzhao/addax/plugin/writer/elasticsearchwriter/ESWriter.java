@@ -349,7 +349,7 @@ public class ESWriter
             final Bulk.Builder bulkAction = new Bulk.Builder().defaultIndex(this.index).defaultType(this.type);
             for (Record record : writerBuffer) {
                 data = new HashMap<>();
-                String id = null;
+                StringBuilder id = new StringBuilder();
                 for (int i = 0; i < record.getColumnNumber(); i++) {
                     Column column = record.getColumn(i);
                     String columnName = columnList.get(i).getName();
@@ -374,12 +374,7 @@ public class ESWriter
                     else {
                         switch (columnType) {
                             case ID:
-                                if (id != null) {
-                                    id += record.getColumn(i).asString();
-                                }
-                                else {
-                                    id = record.getColumn(i).asString();
-                                }
+                                id.append(record.getColumn(i).asString());
                                 break;
                             case DATE:
                                 try {
@@ -429,12 +424,12 @@ public class ESWriter
                     }
                 }
 
-                if (id == null) {
+                if (id.capacity() == 0) {
                     //id = UUID.randomUUID().toString()
                     bulkAction.addAction(new Index.Builder(data).build());
                 }
                 else {
-                    bulkAction.addAction(new Index.Builder(data).id(id).build());
+                    bulkAction.addAction(new Index.Builder(data).id(id.toString()).build());
                 }
             }
 
