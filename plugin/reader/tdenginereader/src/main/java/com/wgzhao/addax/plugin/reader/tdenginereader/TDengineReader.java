@@ -198,7 +198,7 @@ public class TDengineReader
         Pattern compile = Pattern.compile("^(\\d+)([dhms])$");
         Matcher matcher = compile.matcher(splitInterval);
         while (matcher.find()) {
-            Long value = Long.valueOf(matcher.group(1));
+            long value = Long.parseLong(matcher.group(1));
             if (value == 0) {
                 throw new Exception("invalid splitInterval: 0");
             }
