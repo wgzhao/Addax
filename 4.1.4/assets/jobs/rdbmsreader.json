@@ -1,0 +1,45 @@
+{
+  "job": {
+    "setting": {
+      "speed": {
+        "byte": 1048576,
+        "channel": 1
+      },
+      "errorLimit": {
+        "record": 0,
+        "percentage": 0.02
+      }
+    },
+    "content": {
+      "reader": {
+        "name": "rdbmsreader",
+        "parameter": {
+          "username": "hive",
+          "password": "",
+          "column": [
+            "*"
+          ],
+          "driver": "io.prestosql.jdbc.PrestoDriver",
+          "connection": [
+            {
+              "table": [
+                "default.table"
+              ],
+              "jdbcUrl": [
+                "jdbc:presto://127.0.0.1:8080/hive"
+              ]
+            }
+          ],
+          "fetchSize": 1024,
+          "where": "1 = 1"
+        }
+      },
+      "writer": {
+        "name": "streamwriter",
+        "parameter": {
+          "print": true
+        }
+      }
+    }
+  }
+}
