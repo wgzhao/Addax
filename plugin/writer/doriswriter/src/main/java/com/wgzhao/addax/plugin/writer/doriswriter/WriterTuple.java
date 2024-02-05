@@ -20,11 +20,21 @@
 
 package com.wgzhao.addax.plugin.writer.doriswriter;
 
-import com.wgzhao.addax.common.element.Record;
+import java.util.List;
 
-import java.io.Serializable;
+public class WriterTuple {
+    private String label;
+    private final Long bytes;
+    private final List<byte[]> rows;
 
-public interface DorisCodec extends Serializable {
+    public WriterTuple ( String label, Long bytes, List<byte[]> rows){
+        this.label = label;
+        this.rows = rows;
+        this.bytes = bytes;
+    }
 
-    String codec( Record row);
+    public String getLabel() { return label; }
+    public void setLabel(String label) { this.label = label; }
+    public Long getBytes() { return bytes; }
+    public List<byte[]> getRows() { return rows; }
 }

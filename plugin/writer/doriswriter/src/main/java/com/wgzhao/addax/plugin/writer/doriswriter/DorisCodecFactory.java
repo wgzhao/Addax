@@ -20,11 +20,20 @@
 
 package com.wgzhao.addax.plugin.writer.doriswriter;
 
-import com.wgzhao.addax.common.element.Record;
+import java.util.Map;
 
-import java.io.Serializable;
+public class DorisCodecFactory {
+    public DorisCodecFactory (){
 
-public interface DorisCodec extends Serializable {
-
-    String codec( Record row);
+    }
+    public static DorisCodec createCodec( DorisKey writerOptions) {
+        if ( DorisKey.StreamLoadFormat.CSV.equals(writerOptions.getStreamLoadFormat())) {
+            Map<String, Object> props = writerOptions.getLoadProps();
+            return new DorisCsvCodec (null == props || !props.containsKey("column_separator") ? null : String.valueOf(props.get("column_separator")));
+        }
+        if ( DorisKey.StreamLoadFormat.JSON.equals(writerOptions.getStreamLoadFormat())) {
+            return new DorisJsonCodec (writerOptions.getColumns());
+        }
+        throw new RuntimeException("Failed to create row serializer, unsupported `format` from stream load properties.");
+    }
 }

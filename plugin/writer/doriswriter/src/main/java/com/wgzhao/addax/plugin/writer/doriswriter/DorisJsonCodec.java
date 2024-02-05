@@ -7,43 +7,46 @@
  * "License"); you may not use this file except in compliance
  * with the License.  You may obtain a copy of the License at
  *
- *     http://www.apache.org/licenses/LICENSE-2.0
+ *   http://www.apache.org/licenses/LICENSE-2.0
  *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ * Unless required by applicable law or agreed to in writing,
+ * software distributed under the License is distributed on an
+ * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ * KIND, either express or implied.  See the License for the
+ * specific language governing permissions and limitations
+ * under the License.
  */
+
 
 package com.wgzhao.addax.plugin.writer.doriswriter;
 
-import com.alibaba.fastjson2.JSON;
 import com.wgzhao.addax.common.element.Record;
+import com.alibaba.fastjson2.JSON;
 
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public class DorisJsonCodec
-        extends DorisCodec
-{
-    public DorisJsonCodec(final List<String> fieldNames)
-    {
-        super(fieldNames);
+public class DorisJsonCodec extends DorisBaseCodec implements DorisCodec {
+
+    private static final long serialVersionUID = 1L;
+
+    private final List<String> fieldNames;
+
+    public DorisJsonCodec ( List<String> fieldNames) {
+        this.fieldNames = fieldNames;
     }
 
     @Override
-    public String serialize(final Record row)
-    {
-        if (null == this.fieldNames) {
+    public String codec( Record row) {
+        if (null == fieldNames) {
             return "";
         }
-        final Map<String, Object> rowMap = new HashMap<>(this.fieldNames.size());
+        Map<String, Object> rowMap = new HashMap<> (fieldNames.size());
         int idx = 0;
-        for (final String fieldName : this.fieldNames) {
-            rowMap.put(fieldName, this.convertColumn(row.getColumn(idx)));
-            ++idx;
+        for (String fieldName : fieldNames) {
+            rowMap.put(fieldName, convertionField(row.getColumn(idx)));
+            idx++;
         }
         return JSON.toJSONString(rowMap);
     }

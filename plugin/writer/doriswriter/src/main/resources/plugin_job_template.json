@@ -4,11 +4,13 @@
     "username": "test",
     "password": "123456",
     "batchSize": 1024,
+    "loadUrl": ["fe:fe_port"],
+    "loadProps": {},
     "connection": [
       {
-        "table": "table1",
+        "table": ["table1"],
         "database": "example_db",
-        "endpoint": "http://127.0.0.1:8030/"
+        "jdbcUrl": "jdbc:mysql://fe:fe_port"
       }
     ]
   }
