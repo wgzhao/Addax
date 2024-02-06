@@ -7,13 +7,14 @@
  * "License"); you may not use this file except in compliance
  * with the License.  You may obtain a copy of the License at
  *
- *     http://www.apache.org/licenses/LICENSE-2.0
+ *   http://www.apache.org/licenses/LICENSE-2.0
  *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ * Unless required by applicable law or agreed to in writing,
+ * software distributed under the License is distributed on an
+ * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ * KIND, either express or implied.  See the License for the
+ * specific language governing permissions and limitations
+ * under the License.
  */
 
 package com.wgzhao.addax.plugin.writer.doriswriter;
@@ -22,11 +23,14 @@ import com.google.common.base.Strings;
 
 import java.io.StringWriter;
 
-public class DelimiterParser {
+public class DelimiterParser
+{
 
     private static final String HEX_STRING = "0123456789ABCDEF";
 
-    public static String parse(String sp, String dSp) throws RuntimeException {
+    public static String parse(String sp, String dSp)
+            throws RuntimeException
+    {
         if (Strings.isNullOrEmpty(sp)) {
             return dSp;
         }
@@ -42,7 +46,8 @@ public class DelimiterParser {
         return writer.toString();
     }
 
-    private static String getHexStr(String sp) {
+    private static String getHexStr(String sp)
+    {
         String hexStr = sp.substring(2);
         // check hex str
         if (hexStr.isEmpty()) {
@@ -59,7 +64,8 @@ public class DelimiterParser {
         return hexStr;
     }
 
-    private static byte[] hexStrToBytes(String hexStr) {
+    private static byte[] hexStrToBytes(String hexStr)
+    {
         String upperHexStr = hexStr.toUpperCase();
         int length = upperHexStr.length() / 2;
         char[] hexChars = upperHexStr.toCharArray();
@@ -71,7 +77,8 @@ public class DelimiterParser {
         return bytes;
     }
 
-    private static byte charToByte(char c) {
+    private static byte charToByte(char c)
+    {
         return (byte) HEX_STRING.indexOf(c);
     }
 }

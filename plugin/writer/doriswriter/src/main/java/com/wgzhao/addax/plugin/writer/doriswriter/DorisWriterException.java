@@ -19,42 +19,36 @@
 
 package com.wgzhao.addax.plugin.writer.doriswriter;
 
-import com.wgzhao.addax.common.spi.ErrorCode;
+import java.io.IOException;
+import java.util.Map;
 
-public enum DorisWriterErrorCode
-        implements ErrorCode
+public class DorisWriterException
+        extends IOException
 {
-    REQUIRED_VALUE("DorisWriter-00", "缺失必要的值"),
-    ILLEGAL_VALUE("DorisWriter-01", "值非法"),
-    CONF_ERROR("DorisWriter-02", "您的配置错误."),
-    CONNECT_ERROR("DorisWriter-03", "连接错误"),
-    WRITER_ERROR("DorisWriter-04", "写入错误");
 
-    private final String code;
-    private final String description;
+    private final Map<String, Object> response;
+    private boolean reCreateLabel;
 
-    DorisWriterErrorCode(String code, String description)
+    public DorisWriterException(String message, Map<String, Object> response)
     {
-        this.code = code;
-        this.description = description;
+        super(message);
+        this.response = response;
     }
 
-    @Override
-    public String getCode()
+    public DorisWriterException(String message, Map<String, Object> response, boolean reCreateLabel)
     {
-        return this.code;
+        super(message);
+        this.response = response;
+        this.reCreateLabel = reCreateLabel;
     }
 
-    @Override
-    public String getDescription()
+    public Map<String, Object> getFailedResponse()
     {
-        return this.description;
+        return response;
     }
 
-    @Override
-    public String toString()
+    public boolean needReCreateLabel()
     {
-        return String.format("Code:[%s], Description:[%s]. ", this.code,
-                this.description);
+        return reCreateLabel;
     }
 }

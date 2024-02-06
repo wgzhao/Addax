@@ -20,34 +20,20 @@
 
 package com.wgzhao.addax.plugin.writer.doriswriter;
 
-import com.wgzhao.addax.common.element.Record;
-import com.alibaba.fastjson2.JSON;
-
-import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
-public class DorisJsonCodec extends DorisBaseCodec implements DorisCodec {
+public class DorisCodecFactory {
+    public DorisCodecFactory (){
 
-    private static final long serialVersionUID = 1L;
-
-    private final List<String> fieldNames;
-
-    public DorisJsonCodec ( List<String> fieldNames) {
-        this.fieldNames = fieldNames;
     }
-
-    @Override
-    public String codec( Record row) {
-        if (null == fieldNames) {
-            return "";
+    public static DorisCodec createCodec( DorisKey writerOptions) {
+        if ( DorisKey.StreamLoadFormat.CSV.equals(writerOptions.getStreamLoadFormat())) {
+            Map<String, Object> props = writerOptions.getLoadProps();
+            return new DorisCsvCodec (null == props || !props.containsKey("column_separator") ? null : String.valueOf(props.get("column_separator")));
         }
-        Map<String, Object> rowMap = new HashMap<> (fieldNames.size());
-        int idx = 0;
-        for (String fieldName : fieldNames) {
-            rowMap.put(fieldName, convertField(row.getColumn(idx)));
-            idx++;
+        if ( DorisKey.StreamLoadFormat.JSON.equals(writerOptions.getStreamLoadFormat())) {
+            return new DorisJsonCodec (writerOptions.getColumns());
         }
-        return JSON.toJSONString(rowMap);
+        throw new RuntimeException("Failed to create row serializer, unsupported `format` from stream load properties.");
     }
 }

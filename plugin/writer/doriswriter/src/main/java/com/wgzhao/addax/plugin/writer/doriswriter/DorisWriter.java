@@ -17,56 +17,92 @@
  * under the License.
  */
 
+
 package com.wgzhao.addax.plugin.writer.doriswriter;
 
-import com.wgzhao.addax.common.base.Key;
+import com.wgzhao.addax.common.element.Record;
+import com.wgzhao.addax.common.exception.AddaxException;
 import com.wgzhao.addax.common.plugin.RecordReceiver;
 import com.wgzhao.addax.common.spi.Writer;
 import com.wgzhao.addax.common.util.Configuration;
+import com.wgzhao.addax.rdbms.util.DBUtil;
+import com.wgzhao.addax.rdbms.util.DBUtilErrorCode;
+import com.wgzhao.addax.rdbms.util.DataBaseType;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
+import java.sql.Connection;
 import java.util.ArrayList;
 import java.util.List;
 
+
+/**
+ * doris data writer
+ */
 public class DorisWriter
         extends Writer
 {
+
     public static class Job
             extends Writer.Job
     {
-
+        private static final Logger LOG = LoggerFactory.getLogger(Job.class);
         private Configuration originalConfig = null;
+        private DorisKey options;
 
         @Override
         public void init()
         {
-            this.originalConfig = getPluginJobConf();
-            List<Object> connList = originalConfig.getList(Key.CONNECTION);
-            Configuration conn = Configuration.from(connList.get(0).toString());
-            conn.getNecessaryValue(Key.TABLE, DorisWriterErrorCode.REQUIRED_VALUE);
-            conn.getNecessaryValue(Key.ENDPOINT, DorisWriterErrorCode.REQUIRED_VALUE);
-            conn.getNecessaryValue(Key.DATABASE, DorisWriterErrorCode.REQUIRED_VALUE);
+            this.originalConfig = super.getPluginJobConf();
+            options = new DorisKey(this.originalConfig);
+            options.doPretreatment();
+        }
+
+        @Override
+        public void preCheck() {
+            this.init();
+            DorisUtil.preCheckPrePareSQL(options);
+            DorisUtil.preCheckPostSQL(options);
         }
 
         @Override
         public void prepare()
         {
-            //
+            String username = options.getUsername();
+            String password = options.getPassword();
+            String jdbcUrl = options.getJdbcUrl();
+            List<String> renderedPreSqls = DorisUtil.renderPreOrPostSqls(options.getPreSqlList(), options.getTable());
+            if (!renderedPreSqls.isEmpty()) {
+                Connection conn = DBUtil.getConnection(DataBaseType.MySql, jdbcUrl, username, password);
+                LOG.info("Begin to execute preSqls:[{}]. context info:{}.", String.join(";", renderedPreSqls), jdbcUrl);
+                DorisUtil.executeSqls(conn, renderedPreSqls);
+                DBUtil.closeDBResources(null, null, conn);
+            }
         }
 
         @Override
         public List<Configuration> split(int mandatoryNumber)
         {
-            List<Configuration> splitResultConfigs = new ArrayList<>();
-            for (int j = 0; j < mandatoryNumber; j++) {
-                splitResultConfigs.add(this.originalConfig.clone());
+            List<Configuration> configurations = new ArrayList<>(mandatoryNumber);
+            for (int i = 0; i < mandatoryNumber; i++) {
+                configurations.add(originalConfig);
             }
-            return splitResultConfigs;
+            return configurations;
         }
 
         @Override
         public void post()
         {
-            //
+            String username = options.getUsername();
+            String password = options.getPassword();
+            String jdbcUrl = options.getJdbcUrl();
+            List<String> renderedPostSqls = DorisUtil.renderPreOrPostSqls(options.getPostSqlList(), options.getTable());
+            if (!renderedPostSqls.isEmpty()) {
+                Connection conn = DBUtil.getConnection(DataBaseType.MySql, jdbcUrl, username, password);
+                LOG.info("Start to execute preSqls:[{}]. context info:{}.", String.join(";", renderedPostSqls), jdbcUrl);
+                DorisUtil.executeSqls(conn, renderedPostSqls);
+                DBUtil.closeDBResources(null, null, conn);
+            }
         }
 
         @Override
@@ -79,14 +115,18 @@ public class DorisWriter
     public static class Task
             extends Writer.Task
     {
-        private DorisWriterTask dorisWriterTask;
+        private DorisWriterManager writerManager;
+        private DorisKey options;
+        private DorisCodec rowCodec;
 
         @Override
         public void init()
         {
-            Configuration writerSliceConfig = getPluginJobConf();
-            this.dorisWriterTask = new DorisWriterTask(writerSliceConfig);
-            this.dorisWriterTask.init();
+            options = new DorisKey(super.getPluginJobConf());
+            writerManager = new DorisWriterManager(options);
+            rowCodec = DorisCodecFactory.createCodec(options);
+
+
         }
 
         @Override
@@ -97,13 +137,38 @@ public class DorisWriter
 
         public void startWrite(RecordReceiver recordReceiver)
         {
-            this.dorisWriterTask.startWrite(recordReceiver, getTaskPluginCollector());
+            try {
+                Record record;
+                while ((record = recordReceiver.getFromReader()) != null) {
+                    if (record.getColumnNumber() != options.getColumns().size()) {
+                        throw AddaxException
+                                .asAddaxException(
+                                        DBUtilErrorCode.CONF_ERROR,
+                                        String.format(
+                                                "There is an error in the column configuration information. " +
+                                                        "This is because you have configured a task where the number of fields to be read from the source:%s " +
+                                                        "is not equal to the number of fields to be written to the destination table:%s. " +
+                                                        "Please check your configuration and make changes.",
+                                                record.getColumnNumber(),
+                                                options.getColumns().size()));
+                    }
+                    writerManager.writeRecord(rowCodec.codec(record));
+                }
+            }
+            catch (Exception e) {
+                throw AddaxException.asAddaxException(DBUtilErrorCode.WRITE_DATA_ERROR, e);
+            }
         }
 
         @Override
         public void post()
         {
-            //
+            try {
+                writerManager.close();
+            }
+            catch (Exception e) {
+                throw AddaxException.asAddaxException(DBUtilErrorCode.WRITE_DATA_ERROR, e);
+            }
         }
 
         @Override

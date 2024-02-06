@@ -20,34 +20,21 @@
 
 package com.wgzhao.addax.plugin.writer.doriswriter;
 
-import com.wgzhao.addax.common.element.Record;
-import com.alibaba.fastjson2.JSON;
-
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
-public class DorisJsonCodec extends DorisBaseCodec implements DorisCodec {
+public class WriterTuple {
+    private String label;
+    private final Long bytes;
+    private final List<byte[]> rows;
 
-    private static final long serialVersionUID = 1L;
-
-    private final List<String> fieldNames;
-
-    public DorisJsonCodec ( List<String> fieldNames) {
-        this.fieldNames = fieldNames;
+    public WriterTuple ( String label, Long bytes, List<byte[]> rows){
+        this.label = label;
+        this.rows = rows;
+        this.bytes = bytes;
     }
 
-    @Override
-    public String codec( Record row) {
-        if (null == fieldNames) {
-            return "";
-        }
-        Map<String, Object> rowMap = new HashMap<> (fieldNames.size());
-        int idx = 0;
-        for (String fieldName : fieldNames) {
-            rowMap.put(fieldName, convertField(row.getColumn(idx)));
-            idx++;
-        }
-        return JSON.toJSONString(rowMap);
-    }
+    public String getLabel() { return label; }
+    public void setLabel(String label) { this.label = label; }
+    public Long getBytes() { return bytes; }
+    public List<byte[]> getRows() { return rows; }
 }
