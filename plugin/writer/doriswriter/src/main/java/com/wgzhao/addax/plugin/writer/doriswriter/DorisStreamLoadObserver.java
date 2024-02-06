@@ -93,17 +93,16 @@ public class DorisStreamLoadObserver {
         LOG.info("Start to join batch data: rows[{}] bytes[{}] label[{}].", data.getRows().size(), data.getBytes(), data.getLabel());
         loadUrl = urlDecode(loadUrl);
         Map<String, Object> loadResult = put(loadUrl, data.getLabel(), addRows(data.getRows(), data.getBytes().intValue()));
-        LOG.info("StreamLoad response :{}",JSON.toJSONString(loadResult));
-        final String DorisKeystatus = "Status";
-        if (null == loadResult || !loadResult.containsKey(DorisKeystatus)) {
+        final String keyStatus = "Status";
+        if (null == loadResult || !loadResult.containsKey(keyStatus)) {
             throw new IOException("Unable to flush data to Doris: unknown result status.");
         }
         LOG.debug("StreamLoad response:{}",JSON.toJSONString(loadResult));
-        if (RESULT_FAILED.equals(loadResult.get(DorisKeystatus))) {
+        if (RESULT_FAILED.equals(loadResult.get(keyStatus))) {
             throw new IOException(
                     "Failed to flush data to Doris.\n" + JSON.toJSONString(loadResult)
             );
-        } else if (RESULT_LABEL_EXISTED.equals(loadResult.get(DorisKeystatus))) {
+        } else if (RESULT_LABEL_EXISTED.equals(loadResult.get(keyStatus))) {
             LOG.debug("StreamLoad response:{}",JSON.toJSONString(loadResult));
             checkStreamLoadState(host, data.getLabel());
         }

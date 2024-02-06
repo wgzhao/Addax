@@ -137,12 +137,7 @@ public class DorisWriterManager {
     }
 
     public String createBatchLabel() {
-        StringBuilder sb = new StringBuilder();
-        if (! Strings.isNullOrEmpty(options.getLabelPrefix())) {
-            sb.append(options.getLabelPrefix());
-        }
-        return sb.append(UUID.randomUUID().toString())
-                .toString();
+        return options.getLabelPrefix() + UUID.randomUUID();
     }
 
     private void startAsyncFlushing() {
