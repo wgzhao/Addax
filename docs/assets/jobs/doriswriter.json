@@ -9,6 +9,7 @@
       "writer": {
         "name": "doriswriter",
         "parameter": {
+          "loadUrl": ["127.0.0.1:8030"],
           "username": "test",
           "password": "123456",
           "batchSize": 1024,
@@ -17,12 +18,13 @@
             {
               "table": "table1",
               "database": "example_db",
-              "endpoint": ["http://127.0.0.1:8030/"]
+              "jdbcUrl": "jdbc:mysql://localhost:9030/example_db"
             }
           ],
-          "loadProps": {},
-          "lineDelimiter": "\n",
-          "format": "csv"
+          "loadProps": {
+            "format": "json",
+            "strip_outer_array": true
+          }
         }
       },
       "reader": {

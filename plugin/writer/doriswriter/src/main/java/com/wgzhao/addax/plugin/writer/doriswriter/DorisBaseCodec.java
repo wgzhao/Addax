@@ -20,7 +20,7 @@ package com.wgzhao.addax.plugin.writer.doriswriter;
 import com.wgzhao.addax.common.element.Column;
 
 public class DorisBaseCodec {
-    protected String convertionField( Column col) {
+    protected String convertField( Column col) {
         if (null == col.getRawData() || Column.Type.NULL == col.getType()) {
             return null;
         }

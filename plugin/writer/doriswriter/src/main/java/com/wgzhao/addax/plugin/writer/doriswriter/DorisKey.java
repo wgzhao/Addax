@@ -36,13 +36,14 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+import static com.wgzhao.addax.common.base.Constant.DEFAULT_BATCH_SIZE;
+
 public class DorisKey
         extends Key
 {
 
     private static final int MAX_RETRIES = 3;
-    private static final int BATCH_ROWS = 500000;
-    private static final long DEFAULT_FLUSH_INTERVAL = 30000;
+    private static final long DEFAULT_FLUSH_INTERVAL = 3_000;
 
     private static final String LOAD_PROPS_FORMAT = "format";
 
@@ -51,8 +52,6 @@ public class DorisKey
         CSV, JSON;
     }
 
-    private static final String LABEL_PREFIX = "labelPrefix";
-    private static final String MAX_BATCH_ROWS = "maxBatchRows";
     private static final String FLUSH_INTERVAL = "flushInterval";
     private static final String LOAD_URL = "loadUrl";
     private static final String FLUSH_QUEUE_LENGTH = "flushQueueLength";
@@ -60,11 +59,6 @@ public class DorisKey
 
     private static final String DEFAULT_LABEL_PREFIX = "addax_doris_writer_";
 
-    private static final long DEFAULT_MAX_BATCH_SIZE = 90 * 1024 * 1024; //default 90M
-
-//    private static final String TABLE = "connection[0].table[0]";
-//    private static final String DATABASE = "connection[0].database";
-//    private static final String JDBC_URL = "connection[0].jdbcUrl";
 
     private final Configuration options;
 
@@ -106,7 +100,6 @@ public class DorisKey
             return columns;
         }
         catch (Exception e) {
-//            LOG.error("Failed to get columns for table [{}]: {}", tableName, e.getMessage());
             throw RdbmsException.asQueryException(e, currentSql);
         }
         finally {
@@ -147,8 +140,7 @@ public class DorisKey
 
     public String getLabelPrefix()
     {
-        String label = options.getString(LABEL_PREFIX);
-        return null == label ? DEFAULT_LABEL_PREFIX : label;
+        return DEFAULT_LABEL_PREFIX;
     }
 
     public List<String> getLoadUrlList()
@@ -181,16 +173,10 @@ public class DorisKey
         return MAX_RETRIES;
     }
 
-    public int getBatchRows()
-    {
-        Integer rows = options.getInt(MAX_BATCH_ROWS);
-        return null == rows ? BATCH_ROWS : rows;
-    }
-
     public long getBatchSize()
     {
         Long size = options.getLong(BATCH_SIZE);
-        return null == size ? DEFAULT_MAX_BATCH_SIZE : size;
+        return null == size ? DEFAULT_BATCH_SIZE : size;
     }
 
     public long getFlushInterval()
@@ -226,20 +212,6 @@ public class DorisKey
                 throw AddaxException.asAddaxException(DBUtilErrorCode.CONF_ERROR,
                         "The format of loadUrl is not correct, please enter:[`fe_ip:fe_http_ip;fe_ip:fe_http_ip`].");
             }
-        }
-    }
-
-    private void validateRequired()
-    {
-        final String[] requiredOptionKeys = new String[] {
-                USERNAME,
-                DATABASE,
-                TABLE,
-                COLUMN,
-                LOAD_URL
-        };
-        for (String optionKey : requiredOptionKeys) {
-            options.getNecessaryValue(optionKey, DBUtilErrorCode.REQUIRED_VALUE);
         }
     }
 }

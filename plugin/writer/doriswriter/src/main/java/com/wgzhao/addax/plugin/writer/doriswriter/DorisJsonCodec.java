@@ -45,7 +45,7 @@ public class DorisJsonCodec extends DorisBaseCodec implements DorisCodec {
         Map<String, Object> rowMap = new HashMap<> (fieldNames.size());
         int idx = 0;
         for (String fieldName : fieldNames) {
-            rowMap.put(fieldName, convertionField(row.getColumn(idx)));
+            rowMap.put(fieldName, convertField(row.getColumn(idx)));
             idx++;
         }
         return JSON.toJSONString(rowMap);

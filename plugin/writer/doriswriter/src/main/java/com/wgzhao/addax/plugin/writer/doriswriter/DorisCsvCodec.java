@@ -36,7 +36,7 @@ public class DorisCsvCodec extends DorisBaseCodec implements DorisCodec {
     public String codec( Record row) {
         StringBuilder sb = new StringBuilder();
         for (int i = 0; i < row.getColumnNumber(); i++) {
-            String value = convertionField(row.getColumn(i));
+            String value = convertField(row.getColumn(i));
             sb.append(null == value ? "\\N" : value);
             if (i < row.getColumnNumber() - 1) {
                 sb.append(columnSeparator);

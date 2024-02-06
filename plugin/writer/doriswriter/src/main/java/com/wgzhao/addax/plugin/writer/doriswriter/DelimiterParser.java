@@ -37,6 +37,17 @@ public class DelimiterParser
         if (!sp.toUpperCase().startsWith("\\X")) {
             return sp;
         }
+        String hexStr = getHexStr(sp);
+        // transform to separator
+        StringWriter writer = new StringWriter();
+        for (byte b : hexStrToBytes(hexStr)) {
+            writer.append((char) b);
+        }
+        return writer.toString();
+    }
+
+    private static String getHexStr(String sp)
+    {
         String hexStr = sp.substring(2);
         // check hex str
         if (hexStr.isEmpty()) {
@@ -50,12 +61,7 @@ public class DelimiterParser
                 throw new RuntimeException("Failed to parse delimiter: `Hex str format error`");
             }
         }
-        // transform to separator
-        StringWriter writer = new StringWriter();
-        for (byte b : hexStrToBytes(hexStr)) {
-            writer.append((char) b);
-        }
-        return writer.toString();
+        return hexStr;
     }
 
     private static byte[] hexStrToBytes(String hexStr)

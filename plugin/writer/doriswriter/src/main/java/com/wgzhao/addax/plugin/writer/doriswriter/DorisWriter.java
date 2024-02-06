@@ -176,11 +176,5 @@ public class DorisWriter
         {
             //
         }
-
-        @Override
-        public boolean supportFailOver()
-        {
-            return false;
-        }
     }
 }

@@ -94,7 +94,7 @@ public class DorisWriterManager {
             buffer.add(bts);
             batchCount++;
             batchSize += bts.length;
-            if (batchCount >= options.getBatchRows() || batchSize >= options.getBatchSize()) {
+            if (batchCount >= options.getBatchSize()) {
                 String label = createBatchLabel();
                 LOG.debug(String.format("Doris buffer Sinking triggered: rows[%d] label[%s].", batchCount, label));
                 flush(label, false);
@@ -163,9 +163,9 @@ public class DorisWriterManager {
     }
 
     private void waitAsyncFlushingDone() throws InterruptedException {
-        // wait previous flushings
+        // wait previous flushing
         for (int i = 0; i <= options.getFlushQueueLength(); i++) {
-            flushQueue.put(new WriterTuple ("", 0l, null));
+            flushQueue.put(new WriterTuple ("", 0L, null));
         }
         checkFlushException();
     }
@@ -189,13 +189,13 @@ public class DorisWriterManager {
                 if (i >= options.getMaxRetries()) {
                     throw new IOException(e);
                 }
-                if (e instanceof DorisWriterExcetion && (( DorisWriterExcetion )e).needReCreateLabel()) {
+                if (e instanceof DorisWriterException && ((DorisWriterException)e).needReCreateLabel()) {
                     String newLabel = createBatchLabel();
                     LOG.warn(String.format("Batch label changed from [%s] to [%s]", flushData.getLabel(), newLabel));
                     flushData.setLabel(newLabel);
                 }
                 try {
-                    Thread.sleep(1000l * Math.min(i + 1, 10));
+                    Thread.sleep(1000L * Math.min(i + 1, 10));
                 } catch (InterruptedException ex) {
                     Thread.currentThread().interrupt();
                     throw new IOException("Unable to flush, interrupted while doing another attempt", e);

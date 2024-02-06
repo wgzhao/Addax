@@ -54,8 +54,6 @@ public class DorisStreamLoadObserver {
     private static final Logger LOG = LoggerFactory.getLogger(DorisStreamLoadObserver.class);
 
     private final DorisKey options;
-
-    private long pos;
     private static final String RESULT_FAILED = "Fail";
     private static final String RESULT_LABEL_EXISTED = "Label Already Exists";
     private static final String LABEL_STATE_VISIBLE = "VISIBLE";
@@ -144,7 +142,7 @@ public class DorisStreamLoadObserver {
                         case RESULT_LABEL_PREPARE:
                             continue;
                         case RESULT_LABEL_ABORTED:
-                            throw new DorisWriterExcetion (String.format("Failed to flush data to Doris, Error " +
+                            throw new DorisWriterException(String.format("Failed to flush data to Doris, Error " +
                                     "label[%s] state[%s]\n", label, labelState), null, true);
                         case RESULT_LABEL_UNKNOWN:
                         default:
@@ -200,7 +198,7 @@ public class DorisStreamLoadObserver {
             httpPut.removeHeaders(HttpHeaders.TRANSFER_ENCODING);
             List<String> cols = options.getColumns();
             if (null != cols && !cols.isEmpty() && DorisKey.StreamLoadFormat.CSV.equals(options.getStreamLoadFormat())) {
-                httpPut.setHeader("columns", String.join(",", cols.stream().map(f -> String.format("`%s`", f)).collect(Collectors.toList())));
+                httpPut.setHeader("columns", cols.stream().map(f -> String.format("`%s`", f)).collect(Collectors.joining(",")));
             }
             if (null != options.getLoadProps()) {
                 for (Map.Entry<String, Object> entry : options.getLoadProps().entrySet()) {
@@ -225,7 +223,7 @@ public class DorisStreamLoadObserver {
     private String getBasicAuthHeader(String username, String password) {
         String auth = username + ":" + password;
         byte[] encodedAuth = Base64.encodeBase64(auth.getBytes(StandardCharsets.UTF_8));
-        return new StringBuilder("Basic ").append(new String(encodedAuth)).toString();
+        return "Basic " + new String(encodedAuth);
     }
 
     private HttpEntity getHttpEntity(CloseableHttpResponse resp) {
@@ -245,9 +243,12 @@ public class DorisStreamLoadObserver {
     private String getLoadHost() {
         List<String> hostList = options.getLoadUrlList();
         Collections.shuffle(hostList);
-        String host = "http://" + hostList.get((0));
-        if (checkConnection(host)){
-            return host;
+        // get the first available host
+        for(String host: hostList){
+            String uri = "http://" + host;
+            if (checkConnection(uri)){
+                return uri;
+            }
         }
         return null;
     }
@@ -261,7 +262,7 @@ public class DorisStreamLoadObserver {
             co.disconnect();
             return true;
         } catch (Exception e1) {
-            e1.printStackTrace();
+            LOG.warn("Failed to connect to host:{}", host);
             return false;
         }
     }
