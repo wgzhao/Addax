@@ -31,7 +31,7 @@ jobs:
       #     git-commit-gpgsign: true
 
       - name: 2. Set up Maven
-        uses: stCarolas/setup-maven@v4
+        uses: stCarolas/setup-maven@v5
         with:
           maven-version: 3.6.3
 
