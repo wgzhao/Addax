@@ -164,8 +164,10 @@ public class StorageReaderUtil
         // warn: no default value '\N'
         String nullFormat = readerSliceConfig.getString(Key.NULL_FORMAT);
         csvFormatBuilder.setNullString(nullFormat);
-        Boolean skipHeader = readerSliceConfig.getBool(Key.SKIP_HEADER, Constant.DEFAULT_SKIP_HEADER);
-        csvFormatBuilder.setSkipHeaderRecord(skipHeader);
+        if (readerSliceConfig.getBool(Key.SKIP_HEADER, Constant.DEFAULT_SKIP_HEADER)) {
+            csvFormatBuilder.setHeader();
+            csvFormatBuilder.setSkipHeaderRecord(true);
+        }
         List<ColumnEntry> column = StorageReaderUtil.getListColumnEntry(readerSliceConfig, Key.COLUMN);
 
         // every line logic
@@ -174,6 +176,7 @@ public class StorageReaderUtil
             csvParser.stream().filter(Objects::nonNull).forEach(csvRecord ->
                     StorageReaderUtil.transportOneRecord(recordSender, column, csvRecord.toList().toArray(new String[0]), nullFormat, taskPluginCollector)
             );
+            csvParser.close();
         }
         catch (UnsupportedEncodingException uee) {
             throw AddaxException.asAddaxException(
@@ -193,7 +196,7 @@ public class StorageReaderUtil
                     StorageReaderErrorCode.RUNTIME_EXCEPTION, e);
         }
         finally {
-
+            
             IOUtils.closeQuietly(reader, null);
         }
     }
