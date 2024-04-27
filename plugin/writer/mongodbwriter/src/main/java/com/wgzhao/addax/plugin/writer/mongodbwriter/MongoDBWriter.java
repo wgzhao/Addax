@@ -102,6 +102,7 @@ public class MongoDBWriter
             }
 
             String dbName = connConf.getNecessaryValue(DATABASE, MongoDBWriterErrorCode.REQUIRED_VALUE);
+            String authDb = originalConfig.getString(KeyConstant.MONGO_AUTHDB, dbName);
             String collection = connConf.getNecessaryValue(KeyConstant.MONGO_COLLECTION_NAME, MongoDBWriterErrorCode.REQUIRED_VALUE);
             String username = connConf.getString(USERNAME);
             String password = connConf.getString(PASSWORD);
@@ -111,10 +112,10 @@ public class MongoDBWriter
             }
             MongoClient mongoClient;
             if (StringUtils.isEmpty((username)) || StringUtils.isEmpty((password))) {
-                mongoClient = MongoUtil.initMongoClient(address);
+                mongoClient = MongoUtil.initMongoClient(originalConfig);
             }
             else {
-                mongoClient = MongoUtil.initCredentialMongoClient(address, username, password, dbName);
+                mongoClient = MongoUtil.initCredentialMongoClient(originalConfig, username, password, authDb);
             }
 
             String preSqls = connConf.getString(PRE_SQL);
@@ -191,6 +192,7 @@ public class MongoDBWriter
             Configuration writerSliceConfig = this.getPluginJobConf();
             String userName = writerSliceConfig.getString(USERNAME);
             String password = writerSliceConfig.getString(PASSWORD);
+            String authDb = writerSliceConfig.getString(KeyConstant.MONGO_AUTHDB, this.database);
             if (password != null && password.startsWith(Constant.ENC_PASSWORD_PREFIX)) {
                 // encrypted password, need to decrypt
                 password = EncryptUtil.decrypt(password.substring(6, password.length() - 1));
@@ -199,10 +201,10 @@ public class MongoDBWriter
             this.database = connConf.getString(DATABASE);
             List<Object> addressList = connConf.getList(KeyConstant.MONGO_ADDRESS, Object.class);
             if (!isNullOrEmpty((userName)) && !isNullOrEmpty((password))) {
-                this.mongoClient = MongoUtil.initCredentialMongoClient(addressList, userName, password, database);
+                this.mongoClient = MongoUtil.initCredentialMongoClient(writerSliceConfig, userName, password, authDb);
             }
             else {
-                this.mongoClient = MongoUtil.initMongoClient(addressList);
+                this.mongoClient = MongoUtil.initMongoClient(writerSliceConfig);
             }
             this.collection = connConf.getString(KeyConstant.MONGO_COLLECTION_NAME);
             this.batchSize = writerSliceConfig.getInt(BATCH_SIZE, DEFAULT_BATCH_SIZE);

@@ -29,6 +29,10 @@ public class KeyConstant
      */
     public static final String MONGO_ADDRESS = "address";
     /**
+     * mongodb 的 authDb
+     */
+    public static final String MONGO_AUTHDB = "authDb";
+    /**
      * 数组类型
      */
     public static final String ARRAY_TYPE = "array";
