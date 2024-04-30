@@ -39,7 +39,10 @@ import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.Reader;
+import java.io.StringReader;
 import java.math.BigDecimal;
+import java.sql.Clob;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
@@ -48,6 +51,8 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class CommonRdbmsWriter
 {
@@ -468,9 +473,19 @@ public class CommonRdbmsWriter
             }
             java.util.Date utilDate;
             switch (columnSqlType) {
+                case Types.CLOB:
+                    if (dataBaseType.equals(DataBaseType.Oracle) && column.asString().length() >= 4000) {
+                        Clob clob = preparedStatement.getConnection().createClob();
+                        clob.setString(1, column.asString());
+                        preparedStatement.setClob(columnIndex, clob);
+                    }
+                    else {
+                        preparedStatement.setString(columnIndex, column.asString());
+                    }
+                    break;
+
                 case Types.CHAR:
                 case Types.NCHAR:
-                case Types.CLOB:
                 case Types.NCLOB:
                 case Types.VARCHAR:
                 case Types.LONGVARCHAR:
@@ -587,6 +602,24 @@ public class CommonRdbmsWriter
         protected String calcValueHolder(String columnType)
         {
             return VALUE_HOLDER;
+        }
+
+        private String stringInsertByInterval(String original, String insertString, int interval) {
+            if (original == null) return "";
+            int len = original.length();
+            if (interval >= len) return original;
+
+            String rtnString = original;
+            List<String> strList = new ArrayList<>();
+            Pattern p = Pattern.compile("(.{" + interval + "}|.*)");
+            Matcher m = p.matcher(original);
+            while (m.find()) {
+                strList.add(m.group());
+            }
+            strList = strList.subList(0, strList.size() - 1);
+            rtnString = StringUtils.join(strList, insertString);
+            rtnString = "'TO_CLOB('" + rtnString + "')";
+            return rtnString;
         }
     }
 }
