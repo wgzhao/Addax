@@ -19,8 +19,9 @@
 
 package com.wgzhao.addax.plugin.reader.mongodbreader.util;
 
-import com.mongodb.MongoClient;
+
 import com.mongodb.MongoCommandException;
+import com.mongodb.client.MongoClient;
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoDatabase;
 import com.wgzhao.addax.common.exception.AddaxException;
