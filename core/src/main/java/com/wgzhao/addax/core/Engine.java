@@ -25,6 +25,7 @@ import com.wgzhao.addax.common.util.Configuration;
 import com.wgzhao.addax.core.job.JobContainer;
 import com.wgzhao.addax.core.util.ConfigParser;
 import com.wgzhao.addax.core.util.ConfigurationValidate;
+import com.wgzhao.addax.core.util.ExceptionTracker;
 import com.wgzhao.addax.core.util.container.LoadUtil;
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.DefaultParser;
@@ -134,12 +135,10 @@ public class Engine {
             LOG.error("need a job file");
             System.exit(1);
         }
-
         try {
             Engine.entry(args);
         } catch (Throwable e) {
-            e.printStackTrace();
-            LOG.error(e.toString());
+            LOG.error(ExceptionTracker.trace(e));
             System.exit(2);
         }
         System.exit(0);
