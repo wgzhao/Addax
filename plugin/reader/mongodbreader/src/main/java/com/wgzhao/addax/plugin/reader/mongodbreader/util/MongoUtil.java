@@ -29,7 +29,6 @@ import com.mongodb.ServerAddress;
 
 import java.net.UnknownHostException;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 /**
@@ -57,8 +56,6 @@ public class MongoUtil
             if (! userName.isEmpty() && ! password.isEmpty()) {
                 credential = MongoCredential.createCredential(userName, database, password.toCharArray());
             }
-//            return new MongoClient(parseServerAddress(addressList), Collections.singletonList(credential));
-
             MongoClientSettings.Builder mongoBuilder = MongoClientSettings.builder()
                     .applyToClusterSettings(builder -> {
                         try {

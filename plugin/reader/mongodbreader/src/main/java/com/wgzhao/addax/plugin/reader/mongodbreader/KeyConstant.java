@@ -44,10 +44,7 @@ public class KeyConstant
     public static final String UPPER_BOUND = "upperBound";
     public static final String IS_OBJECT_ID = "isObjectId";
 
-    /*
-     * 批量获取的记录数
-     */
-//    public static final String BATCH_SIZE = "batchSize"
+
     /**
      * MongoDB的_id
      */
