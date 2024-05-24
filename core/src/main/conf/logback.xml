@@ -20,7 +20,7 @@
 
 <configuration>
     <property name="log.dir" value="${addax.log}/" />
-    <!-- 控制台输出 -->
+    <!-- console output -->
     <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
         <withJansi>true</withJansi>
         <encoder class="ch.qos.logback.classic.encoder.PatternLayoutEncoder">
@@ -38,6 +38,9 @@
             </pattern>
         </encoder>
     </appender>
+
+    <!-- disable mongodb driver monitor mass log -->
+    <logger name="org.mongodb.driver" level="WARN"> </logger>
 
     <root level="${loglevel:-INFO}">
         <appender-ref ref="STDOUT" />
