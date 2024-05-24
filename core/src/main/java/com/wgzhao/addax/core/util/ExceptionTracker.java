@@ -9,7 +9,7 @@ public class ExceptionTracker
         sb.append(e.toString()).append("\n");
         StackTraceElement[] stackTrace = e.getStackTrace();
         for (StackTraceElement stackTraceElement : stackTrace) {
-            sb.append("\tat ").append(stackTraceElement).append("\n");
+            sb.append("\t").append(stackTraceElement).append("\n");
         }
         return sb.toString();
     }

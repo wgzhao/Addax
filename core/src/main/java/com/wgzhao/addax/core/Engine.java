@@ -135,7 +135,6 @@ public class Engine {
             LOG.error("need a job file");
             System.exit(1);
         }
-
         try {
             Engine.entry(args);
         } catch (Throwable e) {
