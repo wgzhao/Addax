@@ -19,7 +19,8 @@
 
 package com.wgzhao.addax.plugin.reader.mongodbreader;
 
-import com.mongodb.MongoClient;
+
+import com.mongodb.client.MongoClient;
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoCursor;
 import com.mongodb.client.MongoDatabase;
@@ -65,9 +66,9 @@ public class MongoDBReader
 
         private MongoClient mongoClient;
 
-        private boolean isNullOrEmpty(String obj)
+        private boolean notNullAndEmpty(String obj)
         {
-            return obj == null || obj.isEmpty();
+            return obj != null && !obj.isEmpty();
         }
 
         @Override
@@ -97,7 +98,7 @@ public class MongoDBReader
                 throw AddaxException.asAddaxException(MongoDBReaderErrorCode.ILLEGAL_VALUE,
                         "The configuration column must be required and DOES NOT support \"*\" yet");
             }
-            if (!isNullOrEmpty((userName)) && !isNullOrEmpty((password))) {
+            if (notNullAndEmpty((userName)) && notNullAndEmpty((password))) {
                 this.mongoClient = MongoUtil.initCredentialMongoClient(addressList, userName, password, authDb);
             }
             else {
@@ -129,9 +130,9 @@ public class MongoDBReader
         private boolean isObjectId = true;
         private int fetchSize;
 
-        private boolean isNullOrEmpty(String obj)
+        private boolean notNullAndEmpty(String obj)
         {
-            return obj == null || obj.isEmpty();
+            return obj != null && !obj.isEmpty();
         }
 
         @Override
@@ -161,7 +162,7 @@ public class MongoDBReader
                 filter.append(KeyConstant.MONGO_PRIMARY_ID, new Document("$gte", isObjectId ? new ObjectId(lowerBound.toString()) : lowerBound)
                         .append("$lt", isObjectId ? new ObjectId(upperBound.toString()) : upperBound));
             }
-            if (!isNullOrEmpty((query))) {
+            if (notNullAndEmpty((query))) {
                 Document queryFilter = Document.parse(query);
                 filter = new Document("$and", Arrays.asList(filter, queryFilter));
             }
@@ -250,7 +251,7 @@ public class MongoDBReader
             this.collection = connConf.getString(KeyConstant.MONGO_COLLECTION_NAME);
             String authDb = connConf.getString(KeyConstant.MONGO_AUTH_DB, this.database);
             List<Object> addressList = connConf.getList(KeyConstant.MONGO_ADDRESS, Object.class);
-            if (!isNullOrEmpty((userName)) && !isNullOrEmpty((password))) {
+            if (notNullAndEmpty((userName)) && notNullAndEmpty((password))) {
                 this.mongoClient = MongoUtil.initCredentialMongoClient(addressList, userName, password, authDb);
             }
             else {
@@ -263,11 +264,5 @@ public class MongoDBReader
         {
             //
         }
-    }
-
-    public static void main(String[] args)
-    {
-        String a = "12";
-        System.out.println(Double.parseDouble(a));
     }
 }
