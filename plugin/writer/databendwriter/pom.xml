@@ -49,12 +49,6 @@
         </dependency>
 
         <dependency>
-            <groupId>commons-logging</groupId>
-            <artifactId>commons-logging</artifactId>
-            <version>${commons.logging.version}</version>
-        </dependency>
-
-        <dependency>
             <groupId>com.databend</groupId>
             <artifactId>databend-jdbc</artifactId>
             <version>0.1.2</version>

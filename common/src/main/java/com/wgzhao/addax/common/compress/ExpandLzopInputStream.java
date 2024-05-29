@@ -36,8 +36,8 @@ package com.wgzhao.addax.common.compress;
 import org.anarres.lzo.LzoVersion;
 import org.anarres.lzo.LzopConstants;
 import org.anarres.lzo.LzopInputStream;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.annotation.Nonnegative;
 import javax.annotation.Nonnull;
@@ -70,7 +70,7 @@ public class ExpandLzopInputStream
             throws IOException
     {
         short lzoLibraryVersion = 0x2060;
-        Log log = LogFactory.getLog(LzopInputStream.class);
+        Logger log =  LoggerFactory.getLogger(LzopInputStream.class);
         byte[] lzopMagic = {-119, 'L', 'Z', 'O', 0, '\r', '\n', '\032', '\n'};
         byte[] buf = new byte[9];
         readBytes(buf, 0, 9);
@@ -82,9 +82,8 @@ public class ExpandLzopInputStream
         CRC32 crc32 = new CRC32();
         int hitem = readHeaderItem(buf, 2, adler, crc32); // lzop version
         if (hitem > LzopConstants.LZOP_VERSION) {
-            log.debug("Compressed with later version of lzop: "
-                    + Integer.toHexString(hitem) + " (expected 0x"
-                    + Integer.toHexString(LzopConstants.LZOP_VERSION) + ")");
+            log.debug("Compressed with later version of lzop: {} (expected 0x{})",
+                    Integer.toHexString(hitem), Integer.toHexString(LzopConstants.LZOP_VERSION));
         }
         hitem = readHeaderItem(buf, 2, adler, crc32); // lzo library version
         if (hitem > lzoLibraryVersion) {
