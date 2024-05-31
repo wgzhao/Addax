@@ -45,7 +45,7 @@
         <commons.rng.version>1.5</commons.rng.version>
         <diamond.version>3.7.3</diamond.version>
         <druid.version>1.2.20</druid.version>
-        <fastjson2.version>2.0.43</fastjson2.version>
+        <fastjson2.version>2.0.50</fastjson2.version>
         <findbugs.version>3.0.1</findbugs.version>
         <guava.version>31.0-jre</guava.version>
         <groovy.version>3.0.19</groovy.version>
