@@ -226,6 +226,31 @@ Failed record             :                   0
 - [online](https://wgzhao.github.io/Addax/)
 - [project](docs/index.md)
 
+### compile
+
+First, you need install the following python3 modules
+
+```python
+python3 -m pip install mkdocs-material
+```
+
+you can using `mkdocs` command to build or preview on local
+
+```shell
+mkdocs build
+mkdocs serve -a 0.0.0.0:8888
+```
+
+using the following command to publish release doc
+
+```shell
+export version=4.1.5
+git checkout $version
+mike deploy $version
+git checkout gh-pages
+git push -u origin gh-pages
+```
+
 ## Code Style
 
 We recommend you use IntelliJ as your IDE. The code style template for the project can be found in the [codestyle](https://github.com/airlift/codestyle) repository along with our general programming and Java guidelines. In addition to those you should also adhere to the following:
