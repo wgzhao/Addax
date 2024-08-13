@@ -470,16 +470,6 @@ public class CommonRdbmsWriter
             java.util.Date utilDate;
             switch (columnSqlType) {
                 case Types.CLOB:
-                    if (dataBaseType.equals(DataBaseType.Oracle) && column.asString().length() >= 4000) {
-                        Clob clob = preparedStatement.getConnection().createClob();
-                        clob.setString(1, column.asString());
-                        preparedStatement.setClob(columnIndex, clob);
-                    }
-                    else {
-                        preparedStatement.setString(columnIndex, column.asString());
-                    }
-                    break;
-
                 case Types.CHAR:
                 case Types.NCHAR:
                 case Types.NCLOB:
