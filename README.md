@@ -32,7 +32,7 @@ Addax supports more than 20 SQL and NoSQL [data sources](support_data_sources.md
 <td><img src="./docs/images/logos/doris.svg"  height="50px" alt="Doris" style="border: 1px solid #ddd;"></td>
 <td><img src="./docs/images/logos/elasticsearch.svg" height="50px" alt="Elasticsearch" style="border: 1px solid #ddd;"></td> 
 <td><img src="./docs/images/logos/excel.svg" height="50px" alt="Excel" style="border: 1px solid #ddd;"></td> 
-<td><img src="./docs/images/logos/greenplum.png" height="50px" alt="Greenplum" style="border: 1px solid #ddd;"></td>
+<td><img src="./docs/images/logos/greenplum.svg" height="50px" alt="Greenplum" style="border: 1px solid #ddd;"></td>
 </tr>
 <tr>
 <td><img src="./docs/images/logos/hbase.svg" height="50px" alt="Apache HBase" style="border: 1px solid #ddd;"></td> 
