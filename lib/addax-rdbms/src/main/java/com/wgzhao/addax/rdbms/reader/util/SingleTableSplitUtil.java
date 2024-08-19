@@ -107,7 +107,7 @@ public class SingleTableSplitUtil
             for (String range : rangeList) {
                 Configuration tempConfig = configuration.clone();
 
-                tempQuerySql = buildQuerySql(column, table, where) + (hasWhere ? " and " : " where ") + range;
+                tempQuerySql = buildQuerySql(column, table, where) + (hasWhere ? " AND " : " WHERE ") + range;
 
                 allQuerySql.add(tempQuerySql);
                 tempConfig.set(Key.QUERY_SQL, tempQuerySql);
@@ -118,25 +118,25 @@ public class SingleTableSplitUtil
             //pluginParams.add(configuration); // this is wrong for new & old split
             Configuration tempConfig = configuration.clone();
             tempQuerySql = buildQuerySql(column, table, where)
-                    + (hasWhere ? " AND " : " wHERE ")
+                    + (hasWhere ? " AND " : " WHERE ")
                     + String.format(" %s IS NOT NULL", splitPkName);
             allQuerySql.add(tempQuerySql);
             tempConfig.set(Key.QUERY_SQL, tempQuerySql);
             pluginParams.add(tempConfig);
         }
 
+        // if the `where` clause contains splitPkName, it means that the splitPkName is not null
         // deal pk is null
-        Configuration tempConfig = configuration.clone();
-        tempQuerySql = buildQuerySql(column, table, where)
-                + (hasWhere ? " AND " : " WHERE ")
-                + String.format(" %s IS NULL", splitPkName);
-
-        allQuerySql.add(tempQuerySql);
-
-        LOG.info("After split(), allQuerySql=[\n{}\n].", StringUtils.join(allQuerySql, "\n"));
-
-        tempConfig.set(Key.QUERY_SQL, tempQuerySql);
-        pluginParams.add(tempConfig);
+        if (where == null  || ! where.contains(splitPkName)) {
+            Configuration tempConfig = configuration.clone();
+            tempQuerySql = buildQuerySql(column, table, where)
+                    + (hasWhere? " AND ": " WHERE ")
+                    + splitPkName + " IS NULL";
+            allQuerySql.add(tempQuerySql);
+            tempConfig.set(Key.QUERY_SQL, tempQuerySql);
+            pluginParams.add(tempConfig);
+        }
+        LOG.info("After splitting, all query sql = [\n{}\n].", StringUtils.join(allQuerySql, "\n"));
 
         return pluginParams;
     }

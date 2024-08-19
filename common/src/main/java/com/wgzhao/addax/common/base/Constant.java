@@ -56,8 +56,8 @@ public class Constant
     public static final Object PK_TYPE_STRING = "pkTypeString";
 
     public static final String INSERT_OR_REPLACE_TEMPLATE_MARK = "insertOrReplaceTemplate";
-    public static final String QUERY_SQL_TEMPLATE = "select %s from %s where (%s)";
-    public static final String QUERY_SQL_TEMPLATE_WITHOUT_WHERE = "select %s from %s ";
+    public static final String QUERY_SQL_TEMPLATE = "SELECT %s FROM %s WHERE (%s)";
+    public static final String QUERY_SQL_TEMPLATE_WITHOUT_WHERE = "SELECT %s FROM %s ";
     public static final String TABLE_NAME_PLACEHOLDER = "@table";
     public static final String TABLE_NUMBER_MARK = "tableNumber";
 
