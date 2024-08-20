@@ -1,6 +1,6 @@
 {
   "name": "rdbmswriter",
-  "class": "com.wgzhao.addax.plugin.reader.rdbmswriter.RdbmsWriter",
+  "class": "com.wgzhao.addax.plugin.writer.rdbmswriter.RdbmsWriter",
   "description": "general RDBMS writer plugin",
   "developer": "alibaba",
   "drivers": []
