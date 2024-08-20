@@ -78,6 +78,8 @@
         <mockito.version>2.0.2-beta</mockito.version>
         <netty-buffer.version>4.1.93.Final</netty-buffer.version>
         <ognl.version>3.4.2</ognl.version>
+        <opendal-java.version>0.46.4</opendal-java.version>
+        <opendal.version>0.47.0</opendal.version>
         <orc.version>1.9.2</orc.version>
         <parquet.version>1.13.1</parquet.version>
         <poi.version>5.3.0</poi.version>
@@ -452,6 +454,7 @@
                 <module>plugin/writer/kuduwriter</module>
                 <module>plugin/writer/mongodbwriter</module>
                 <module>plugin/writer/mysqlwriter</module>
+                <module>plugin/writer/opendalwriter</module>
                 <module>plugin/writer/oraclewriter</module>
                 <module>plugin/writer/postgresqlwriter</module>
                 <module>plugin/writer/rdbmswriter</module>

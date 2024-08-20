@@ -1,0 +1,6 @@
+{
+  "name": "opendalwriter",
+  "class": "com.wgzhao.addax.plugin.writer.opendalwriter.OpenDALWriter",
+  "description": "Integrate with OpenDAL to write data to anything that OpenDAL supports.",
+  "developer": "wgzhao"
+}

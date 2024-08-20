@@ -1,0 +1,12 @@
+{
+  "name": "opendalwriter",
+  "parameter": {
+    "scheme": "redis",
+    "config": {
+      "endpoint": "tcp://localhost:6379",
+      "password": "redis",
+      "root": "/",
+      "key": "key"
+    }
+  }
+}
