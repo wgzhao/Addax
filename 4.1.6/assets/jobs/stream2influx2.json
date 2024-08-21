@@ -1,0 +1,65 @@
+{
+  "job": {
+    "setting": {
+      "speed": {
+        "channel": 1,
+        "bytes": -1
+      }
+    },
+    "content": {
+      "reader": {
+        "name": "streamreader",
+        "parameter": {
+          "column": [
+            {
+              "incr": "2021-10-17 22:40:00,1,s",
+              "type": "date"
+            },
+            {
+              "random": "1,1000",
+              "type": "long"
+            },
+            {
+              "random": "1,10",
+              "type": "string"
+            },
+            {
+              "random": "1000,50000",
+              "type": "double"
+            }
+          ],
+          "sliceRecordCount": 10
+        }
+      },
+      "writer": {
+        "name": "influxdb2writer",
+        "parameter": {
+          "connection": [
+            {
+              "endpoint": "http://localhost:8086",
+              "org": "com.wgzhao",
+              "bucket": "test",
+              "table": "datax_tbl"
+            }
+          ],
+          "token": "YOUR_SECURE_TOKEN",
+          "tag": [
+            {
+              "location": "east"
+            },
+            {
+              "lat": 23.123445
+            }
+          ],
+          "interval": "ms",
+          "column": [
+            "c_long",
+            "c_string",
+            "c_double"
+          ],
+          "batchSize": 1024
+        }
+      }
+    }
+  }
+}
