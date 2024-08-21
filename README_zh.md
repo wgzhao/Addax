@@ -78,8 +78,8 @@ docker run -ti --rm --name addax wgzhao/addax:latest /opt/addax/bin/addax.sh /op
 如果你只需要基本的插件，可以使用带有 `-lite` 结尾的镜像，它体积更小。
 
 ```shell
-docker pull wgzhao/addax:4.0.12-lite
-docker run -ti --rm --name addax wgzhao/addax:4.0.12-lite /opt/addax/bin/addax.sh /opt/addax/job/job.json
+docker pull wgzhao/addax:latest-lite
+docker run -ti --rm --name addax wgzhao/addax:latest-lite /opt/addax/bin/addax.sh /opt/addax/job/job.json
 ```
 
 ### 使用一键安装脚本

@@ -81,8 +81,8 @@ docker run -ti --rm --name addax wgzhao/addax:latest /opt/addax/bin/addax.sh /op
 If you want to use common reader and writer plugins, you can pull the image whose name ends with `-lite`, it's very small.
 
 ```shell
-docker pull wgzhao/addax:4.0.12-lite
-docker run -ti --rm --name addax wgzhao/addax:4.0.12-lite /opt/addax/bin/addax.sh /opt/addax/job/job.json
+docker pull wgzhao/addax:latest-lite
+docker run -ti --rm --name addax wgzhao/addax:latest-lite /opt/addax/bin/addax.sh /opt/addax/job/job.json
 ```
 
 ### Use install script
