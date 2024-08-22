@@ -1117,7 +1117,7 @@ public class Configuration
             throw new IllegalArgumentException("System internal error.");
         }
 
-        for (String each : StringUtils.split(".")) {
+        for (String each : StringUtils.split(path, ".")) {
             if (StringUtils.isBlank(each)) {
                 throw new IllegalArgumentException(String.format(
                         "The item [%s] is invalid, Blank characters should not  appear here.", path));
