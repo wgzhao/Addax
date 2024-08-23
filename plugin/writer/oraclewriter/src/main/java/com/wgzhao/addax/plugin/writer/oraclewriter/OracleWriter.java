@@ -29,6 +29,7 @@ import com.wgzhao.addax.rdbms.util.DBUtilErrorCode;
 import com.wgzhao.addax.rdbms.util.DataBaseType;
 import com.wgzhao.addax.rdbms.writer.CommonRdbmsWriter;
 
+import java.sql.Blob;
 import java.sql.Clob;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
@@ -110,11 +111,20 @@ public class OracleWriter
                 protected PreparedStatement fillPreparedStatementColumnType(PreparedStatement preparedStatement, int columnIndex, int columnSqlType, Column column)
                         throws SQLException
                 {
-                    if (writerSliceConfig.getString(Key.WRITE_MODE, "").startsWith("update") && columnSqlType == Types.CLOB ) {
-                        Clob clob = preparedStatement.getConnection().createClob();
-                        clob.setString(1, column.asString());
-                        preparedStatement.setClob(columnIndex, clob);
-                        return preparedStatement;
+                    if (writerSliceConfig.getString(Key.WRITE_MODE, "").startsWith("update")) {
+                        if (columnSqlType == Types.CLOB ) {
+                            Clob clob = preparedStatement.getConnection().createClob();
+                            clob.setString(1, column.asString());
+                            preparedStatement.setClob(columnIndex, clob);
+                            return preparedStatement;
+                        }
+                        if (columnSqlType == Types.BLOB) {
+                            Blob blob = preparedStatement.getConnection().createBlob();
+                            blob.setBytes(1, column.asBytes());
+                            preparedStatement.setBlob(columnIndex, blob);
+                            return preparedStatement;
+                        }
+                        return super.fillPreparedStatementColumnType(preparedStatement, columnIndex, columnSqlType, column);
                     }
 
                     return super.fillPreparedStatementColumnType(preparedStatement, columnIndex, columnSqlType, column);
