@@ -1,6 +1,6 @@
 # SQLite Reader
 
-SQLiteReader 插件用于读取指定目录下的 sqlite 文件， 他继承于 [rdbmsreader](../rdbmsreader)
+SQLite Reader 插件用于读取指定目录下的 sqlite 文件， 他继承于 [RDBMS Reader](../rdbmsreader)
 
 ## 示例
 
@@ -36,5 +36,4 @@ bin/addax.sh job/sqlite2stream.json
 
 ## 参数说明
 
-SQLiteReader 基于 [rdbmsreader](../rdbmsreader) 实现，因此可以参考 rdbmsreader 的所有配置项。
-
+该插件基于 [RDBMS Reader](../rdbmsreader) 实现，因此可以参考 RDBMS Reader 的所有配置项。

@@ -1,6 +1,6 @@
 # Kudu Reader
 
-KuduReader 插件利用 Kudu 的java客户端KuduClient进行Kudu的读操作。
+Kudu Reader 插件利用 Kudu 的 java客户端 KuduClient 进行 Kudu 的读操作。
 
 ## 配置示例
 
@@ -34,17 +34,17 @@ bin/addax.sh job/kudu2stream.json
 
 ## 参数说明
 
-| 配置项    | 是否必须 |  类型      |默认值 | 描述                                            |
-| :-------- | :------: | ------ | -----|------------------------------------------------|
-| masterAddress | 必须 | string  |  无  | Kudu Master集群RPC地址,多个地址用逗号(,)分隔 |
-| table | 必须  |  string | 无 | kudu 表名 |
-| splitPk | 否 |  string | 无  | 并行读取数据分片字段 |
-| lowerBound | 否 | string | 无 | 并行读取数据分片范围下界 |
-| upperBound | 否 | string | 无 | 并行读取数据分片范围上界 |
-| readTimeout | 否 | int  | 10 | 读取数据超时(秒) |
-| scanTimeout | 否  | int | 20  | 数据扫描请求超时(秒) |
-| column      | 否  | list | 无 | 指定要获取的字段，多个字段用逗号分隔，比如 `"column":["user_id","user_name","age"]` |
-| where       | 否  | list | 无 | 指定其他过滤条件，详见下面描述 |
+| 配置项        | 是否必须 | 类型   | 默认值 | 描述                                         |
+| :------------ | :------: | ------ | ------ | -------------------------------------------- |
+| masterAddress |   是   | string | 无     | Kudu Master 集群RPC地址,多个地址用逗号(,)分隔 |
+| table         |   是   | string | 无     | kudu 表名                                    |
+| splitPk       |    否    | string | 无     | 并行读取数据分片字段                         |
+| lowerBound    |    否    | string | 无     | 并行读取数据分片范围下界                     |
+| upperBound    |    否    | string | 无     | 并行读取数据分片范围上界                     |
+| readTimeout   |    否    | int    | 10     | 读取数据超时(秒)                             |
+| scanTimeout   |    否    | int    | 20     | 数据扫描请求超时(秒)                         |
+| column        |    否    | list   | 无     | 指定要获取的字段                             |
+| where         |    否    | list   | 无     | 指定其他过滤条件，详见下面描述               |
 
 ### where
 
@@ -69,11 +69,11 @@ bin/addax.sh job/kudu2stream.json
 
 ## 类型转换
 
-| Addax 内部类型| Kudu 数据类型    |
-| -------- | -----  |
-| Long     | byte, short, int, long |
-| Double   | float, double, decimal |
-| String   | string |
-| Date     | timestamp  |
-| Boolean  | boolean |
-| Bytes    | binary |
+| Addax 内部类型 | Kudu 数据类型          |
+| -------------- | ---------------------- |
+| Long           | byte, short, int, long |
+| Double         | float, double, decimal |
+| String         | string                 |
+| Date           | timestamp              |
+| Boolean        | boolean                |
+| Bytes          | binary                 |

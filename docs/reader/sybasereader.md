@@ -30,5 +30,6 @@ bin/addax.sh job/sybase2stream.json
 
 ## 参数说明
 
-SybaseReader 基于 [rdbmsreader](../rdbmsreader) 实现，因此可以参考 rdbmsreader 的所有配置项。
+该插件基于 [RDBMS Reader](../rdbmsreader) 实现，因此可以参考 RDBMS Reader 的所有配置项。
 
+[1]: https://en.wikipedia.org/wiki/Sybase

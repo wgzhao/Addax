@@ -1,6 +1,6 @@
-# Http Reader
+# HTTP Reader
 
-HttpReader 插件实现了读取 Restful API 数据的能力
+HTTP Reader 插件实现了读取 Restful API 数据的能力
 
 ## 示例
 
@@ -12,8 +12,8 @@ HttpReader 插件实现了读取 Restful API 数据的能力
 
 接口接受 GET 请求，请求的参数有
 
-| 参数名称      | 参数值示例      |
-|-----------|------------|
+| 参数名称  | 参数值示例 |
+| --------- | ---------- |
 | CURR_DATE | 2021-01-17 |
 | DEPT      | 9400       |
 | USERNAME  | andi       |
@@ -54,19 +54,19 @@ bin/addax.sh job/httpreader2stream.json
 
 ## 参数说明
 
-| 配置项        | 是否必须 |  数据类型   | 默认值 | 说明                                  |
-|------------|:----:|:-------:|:---:|-------------------------------------|
-| url        |  是   | string  |  无  | 要访问的 HTTP 地址                        |
-| reqParams  |  否   |   map   |  无  | 接口请求参数                              |
-| resultKey  |  否   | string  |  无  | 要获取结果的那个 key 值，如果是获取整个返回值，则可以不用填写   |
-| method     |  否   | string  | get | 请求模式，仅支持 GET，POST 两种，不区分大小写         |
-| column     |  是   |  list   |  无  | 要获取的 key，如果配置为 `"*"` ，则表示获取所有 key 值 |
-| username   |  否   | string  |  无  | 接口请求需要的认证帐号(如有)                     |
-| password   |  否   | string  |  无  | 接口请求需要的密码(如有)                       |
-| proxy      |  否   |   map   |  无  | 代理地址,详见下面描述                         |
-| headers    |  否   |   map   |  无  | 定制的请求头信息                            |
-| isPage     |  否   | boolean |  无  | 接口是否分支分页（`4.1.1` 引入)                |
-| pageParams |  否   |   map   |  无  | 分页参数(`4.1.1` 引入)                    |
+| 配置项     | 是否必须 | 数据类型 | 默认值 | 说明                                                          |
+| ---------- | :------: | :------: | :----: | ------------------------------------------------------------- |
+| url        |    是    |  string  |   无   | 要访问的 HTTP 地址                                            |
+| reqParams  |    否    |   map    |   无   | 接口请求参数                                                  |
+| resultKey  |    否    |  string  |   无   | 要获取结果的那个 key 值，如果是获取整个返回值，则可以不用填写 |
+| method     |    否    |  string  |  get   | 请求模式，仅支持 GET，POST 两种，不区分大小写                 |
+| column     |    是    |   list   |   无   | 要获取的 key，配置为 `"*"` 表示获取所有 key 值                |
+| username   |    否    |  string  |   无   | 接口请求需要的认证帐号(如有)                                  |
+| password   |    否    |  string  |   无   | 接口请求需要的密码(如有)                                      |
+| proxy      |    否    |   map    |   无   | 代理地址,详见下面描述                                         |
+| headers    |    否    |   map    |   无   | 定制的请求头信息                                              |
+| isPage     |    否    | boolean  |   无   | 接口是否分支分页                                              |
+| pageParams |    否    |   map    |   无   | 分页参数                                                      |
 
 ### proxy
 

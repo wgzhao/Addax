@@ -24,7 +24,7 @@
 
 ## reader 配置项
 
-`reader` 配置项依据不同的 reader 插件而有些微不同，但大部分的配置大同小异，特别是针对关系型数据库而言，其基本配置如下：
+`reader` 配置项依据不同的 reader 插件而有些微不同，但大部分的配置基本相同，特别是针对关系型数据库而言，其基本配置如下：
 
 ```json
 {
@@ -33,6 +33,8 @@
     "username": "",
     "password": "",
     "column": [],
+    "autoPk": false,
+    "splitPk": "",
     "connection": [
       {
         "jdbcUrl": [],
@@ -60,6 +62,7 @@
     "column": [],
     "session": [],
     "preSql": [],
+    "postSql": [],
     "connection": [
       {
         "jdbcUrl": "",
@@ -78,16 +81,14 @@
 
 ```json
 {
-  "setting": {
-    "speed": {
-      "byte": -1,
-      "record": 100,
-      "channel": 1
-    },
-    "errorLimit": {
-      "record": 0,
-      "percentage": 0.02
-    }
+  "speed": {
+    "byte": -1,
+    "record": 100,
+    "channel": 1
+  },
+  "errorLimit": {
+    "record": 0,
+    "percentage": 0.02
   }
 }
 ```
@@ -100,7 +101,7 @@
 
 ### `speed.byte`
 
-设置每秒可获取的字节数(Bps)，一般是为了防止执行任务时将整个带宽跑满，从而影响到其他服务。如果不做限制，可设置为  `-1`
+设置每秒可获取的字节数(Bps)，一般是为了防止执行任务时将整个带宽跑满，从而影响到其他服务。如果不做限制，可设置为 `-1`
 
 ### `speed.record`
 

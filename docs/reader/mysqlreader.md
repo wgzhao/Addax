@@ -30,7 +30,7 @@ bin/addax.sh job/mysql2stream.json
 
 ## 参数说明
 
-MysqlReader 基于 [rdbmsreader](../rdbmsreader) 实现，因此可以参考 rdbmsreader 的所有配置项。
+该插件基于 [RDBMS Reader](../rdbmsreader) 实现，因此可以参考 RDBMS Reader 的所有配置项。
 
 ### driver
 
@@ -38,11 +38,11 @@ MysqlReader 基于 [rdbmsreader](../rdbmsreader) 实现，因此可以参考 rdb
 
 **替换插件内置的驱动**
 
-`rm -f plugin/reader/mysqlreader/lib/mysql-connector-java-*.jar`
+`rm -f plugin/reader/mysqlreader/libs/mysql-connector-java-*.jar`
 
 **拷贝老的驱动到插件目录**
 
-`cp mysql-connector-java-5.1.48.jar plugin/reader/mysqlreader/lib/`
+`cp mysql-connector-java-5.1.48.jar plugin/reader/mysqlreader/libs/`
 
 **指定驱动类名称**
 

@@ -1,6 +1,6 @@
 # Excel Reader
 
-`excelreader` 插件实现了从 Microsoft Excel 文件读取数据的能力。
+`Excel Reader` 插件实现了从 Microsoft Excel 文件读取数据的能力。
 
 ## 配置
 

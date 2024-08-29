@@ -261,31 +261,27 @@ ${ADDAX_HOME}
 │     └── logback.xml
 ├── job
 ├── lib
-│     ├── addax-common-4.0.5.jar
-│     ├── addax-core-4.0.7-SNAPSHOT.jar
-│     ├── addax-rdbms-4.0.5.jar
-│     ├── addax-storage-4.0.5.jar
-│     ├── addax-transformer-4.0.5.jar
-│     ├── aircompressor-0.21.jar
-│     ├── annotations-2.0.3.jar
-│     ├── checker-qual-2.11.1.jar
-│     ├── commons-beanutils-1.9.4.jar
+│     ├── addax-common-<version>.jar
+│     ├── addax-core-<version>.jar
+│     ├── addax-rdbms-<version>.jar
+│     ├── addax-storage-<version>.jar
 ├── log
 ├── plugin
 │     ├── reader
 │     │     ├── cassandrareader
-│     │     │     ├── cassandrareader-4.0.5.jar
+│     │     │     ├── cassandrareader-<version>.jar
 │     │     │     ├── libs
 │     │     │     │     ├── <symbol link to shared folder>
 │     │     │     ├── plugin.json
 │     │     │     └── plugin_job_template.json
 │     └── writer
 │         ├── cassandrawriter
-│         │     ├── cassandrawriter-4.0.5.jar
+│         │     ├── cassandrawriter-<version>.jar
 │         │     ├── libs
 │         │     │     ├── <symbol link to shared folder>
 │         │     ├── plugin.json
 │         │     └── plugin_job_template.json
+├── shared
 ```
 
 - `${ADDAX_HOME}/bin`: 可执行程序目录

@@ -2,7 +2,7 @@
 
 DatabendReader 插件实现了从 [Databend](https://databend.rs) 读取数据
 
-注意，databender 有兼容 MySQL 客户端的协议实现，因此你可以直接使用 [mysqlreader](../mysqlreader) 来读取 Databend 数据。
+注意，databender 有兼容 MySQL 客户端的协议实现，因此你可以直接使用 [MySQL Reader](../mysqlreader) 来读取 Databend 数据。
 
 ## 示例
 
@@ -50,7 +50,7 @@ bin/addax.sh job/databend2stream.json
 
 ## 参数说明
 
-DatabendReader 基于 [rdbmsreader](../rdbmsreader) 实现，因此可以参考 rdbmsreader 的所有配置项。
+该插件基于 [RDBMS Reader](../rdbmsreader) 实现，因此可以参考 RDBMS Reader 的所有参数。
 
 ## 限制
 

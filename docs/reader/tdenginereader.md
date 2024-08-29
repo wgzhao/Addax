@@ -1,6 +1,6 @@
 # TDengine Reader
 
-TDengineReader 插件用于从涛思公司的 [TDengine](https://www.taosdata.com/cn/) 读取数据。
+TDengine Reader 插件用于从涛思公司的 [TDengine](https://www.taosdata.com/cn/) 读取数据。
 
 ## 前置条件
 

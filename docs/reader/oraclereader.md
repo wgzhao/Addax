@@ -1,6 +1,6 @@
 # Oracle Reader
 
-OracleReader 插件用于从 Oracle 读取数据
+Oracle Reader 插件用于从 Oracle 读取数据
 
 ## 配置样例
 
@@ -14,7 +14,7 @@ OracleReader 插件用于从 Oracle 读取数据
 
 ## 参数说明
 
-OracleReader 基于 [rdbmsreader](../rdbmsreader) 实现，因此可以参考 rdbmsreader 的所有配置项。
+该插件基于 [RDBMS Reader](../rdbmsreader) 实现，因此可以参考 RDBMS Reader 的所有配置项。
 
 
 ## 对 GEOMETRY 类型的支持

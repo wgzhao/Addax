@@ -14,5 +14,5 @@ SqlServerReader 插件用于从从 SQLServer 读取数据。
 
 ## 参数说明
 
-SqlServerReader 基于 [rdbmsreader](../rdbmsreader) 实现，因此可以参考 rdbmsreader 的所有配置项。
+该插件基于 [RDBMS Reader](../rdbmsreader) 实现，因此可以参考 RDBMS Reader 的所有配置项。
 

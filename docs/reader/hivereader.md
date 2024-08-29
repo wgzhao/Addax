@@ -1,6 +1,6 @@
 # Hive Reader
 
-HiveReader 插件实现了从 [Apache Hive](https://hive.apache.org) 数据库读取数据的能力
+Hive Reader 插件实现了从 [Apache Hive](https://hive.apache.org) 数据库读取数据的能力
 
 新增该插件的主要目的是解决使用 [RDBMS Reader][1] 插件读取 Hive 数据库时不能解决 Kerberos 认证的问题， 如果你的 Hive 数据库没有启用 Kerberos 认证，那么直接使用 [RDBMS Reader][1] 也可以。 如果启用了 Kerberos 认证，则可以使用该插件。
 
@@ -39,7 +39,7 @@ bin/addax.sh job/hive2stream.json
 | username               |    是    | string | 无     | 数据源的用户名                                                         |
 | password               |    否    | string | 无     | 数据源指定用户名的密码，若无密码，可不指定                             |
 | table                  |    是    | list   | 无     | 所选取的需要同步的表名,使用 JSON 数据格式                              |
-| column                 |    是    | list   | 无     | 所配置的表中需要同步的列名集合，详细描述见 [rdbmreader][1]             |
+| column                 |    是    | `list<map>`   | 无     | 所配置的表中需要同步的列名集合，详细描述见 [rdbmreader][1]             |
 | splitPk                |    否    | string | 无     | 使用 splitPk 代表的字段进行数据分片，详细描述见 [rdbmreader][1]        |
 | where                  |    否    | string | 无     | 针对表的筛选条件                                                       |
 | querySql               |    否    | list   | 无     | 使用 SQL 来获取数据，当配置了这一项之后， `table`，`column` 配置项无效 |
@@ -65,11 +65,11 @@ jdbc:hive2://node1:2181,node2:2181,node3:2181/;serviceDiscoveryMode=zooKeeper;zo
 
 **替换插件内置的驱动**
 
-`rm -f plugin/reader/hivereader/lib/hive-jdbc-*.jar`
+`rm -f plugin/reader/hivereader/libs/hive-jdbc-*.jar`
 
 **拷贝兼容驱动到插件目录**
 
-`cp hive-jdbc-<version>.jar plugin/reader/hivereader/lib/`
+`cp hive-jdbc-<version>.jar plugin/reader/hivereader/libs/`
 
 **指定驱动类名称**
 

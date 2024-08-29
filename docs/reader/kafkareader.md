@@ -1,6 +1,6 @@
 # Kafka Reader
 
-KafkaReader 插件实现从 Kafka 队列中读取 JSON 格式消息的功能。 该插件在 `4.0.10` 版本中引入。
+Kafka Reader 插件实现从 Kafka 队列中读取 JSON 格式消息的功能。 该插件在 `4.0.10` 版本中引入。
 
 ## 示例
 
@@ -27,7 +27,7 @@ KafkaReader 插件实现从 Kafka 队列中读取 JSON 格式消息的功能。 
 | topic           |    是    | string   | 无     | 要写入的 topic                 |
 | column          |    是    | list     | 无     | 所配置的表中需要同步的列名集合，以下详述    |
 | missingKeyValue |    否    | string   | 无     | 字段不存在时用什么值填充，以下详述  |
-| properties      |    否    | dict     | 无     | 需要设置的其他 kafka 连接参数 |
+| properties      |    否    | map     | 无     | 需要设置的其他 kafka 连接参数 |
 
 ### column
 

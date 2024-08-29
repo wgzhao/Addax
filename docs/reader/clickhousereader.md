@@ -40,27 +40,9 @@ bin/addax.sh job/clickhouse2stream.json
 
 ## 参数说明
 
-`parameter` 配置项支持以下配置
-
-| 配置项   | 是否必须 | 类型   | 默认值 | 描述                                                                                                                     |
-| :------- | :------: | ------ | ------ | -------------------------------------------------------------------------------------------------------------------- |
-| jdbcUrl  |    是    | array  | 无     | ClickHouse JDBC 连接信息 ,可按照官方规范填写连接附件控制信息。具体请参看[官方文档][1]                                          |
-| username |    是    | string | 无     | 数据源的用户名                                                                                                                 |
-| password |    否    | string | 无     | 数据源指定用户名的密码                                                                                                         |
-| table    |    是    | array  | 无     | 所选取的需要同步的表 ,当配置为多张表时，用户自己需保证多张表是同一 schema 结构                                                 |
-| column   |    是    | array  | 无     | 所配置的表中需要同步的列名集合, 使用 JSON 的数组描述字段信息。用户使用 `*` 代表默认使用所有列配置，例如 `["*"]`                |
-| splitPk  |    否    | string | 无     | 希望使用 splitPk 代表的字段进行数据分片,Addax 因此会启动并发任务进行数据同步，这样可以大大提供数据同步的效能                   |
-| autoPk   |    否    | bool   | false  | 是否自动猜测分片主键，`3.2.6` 版本引入                                                                                         |
-| where    |    否    | string | 无     | 筛选条件                                                                                                                       |
-| querySql |    否    | array  | 无     | 使用 SQL 查询而不是直接指定表的方式读取数据，当用户配置 querySql 时，ClickHouseReader 直接忽略 table、column、where 条件的配置 |
-
-[1]: https://github.com/yandex/clickhouse-jdbc
+该插件基于 [RDBMS Reader](../rdbmsreader) 实现，因此可以参考 RDBMS Reader 的所有参数。
 
 ## 支持的数据类型
-
-目前 ClickHouseReader 支持大部分 ClickHouse 类型，但也存在部分个别类型没有支持的情况，请注意检查你的类型。
-
-下面列出 ClickHouseReader 针对 ClickHouse 类型转换列表:
 
 | Addax 内部类型 | ClickHouse 数据类型                                                     |
 | -------------- | ----------------------------------------------------------------------- |

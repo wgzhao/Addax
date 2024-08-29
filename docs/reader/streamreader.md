@@ -1,6 +1,6 @@
 # Stream Reader
 
-StreamReader 是一个从内存读取数据的插件， 他主要用来快速生成期望的数据并对写入插件进行测试
+Stream Reader 是一个从内存读取数据的插件， 他主要用来快速生成期望的数据并对写入插件进行测试
 
 一个完整的 StreamReader 配置文件如下：
 

@@ -1,6 +1,6 @@
-# Hbase11X Reader
+# HBase11X Reader
 
-Hbase11X Reader 插件支持从 HBase 1.x 版本读取数据， 其实现方式为 通过 HBase 的 Java 客户端连接远程 HBase 服务，并通过 Scan 方式读取你指定 `rowkey` 范围内的数据。
+HBase11X Reader 插件支持从 HBase 1.x 版本读取数据， 其实现方式为 通过 HBase 的 Java 客户端连接远程 HBase 服务，并通过 Scan 方式读取你指定 `rowkey` 范围内的数据。
 
 ## 配置
 
@@ -113,17 +113,17 @@ ROW               COLUMN+CELL
 
 ## 参数说明
 
-| 配置项        | 是否必须 | 默认值 | 描述                                                                                         |
-| :------------ | :------: | ------ | -------------------------------------------------------------------------------------------- |
-| hbaseConfig   |    是    | 无     | 连接 HBase 集群需要的配置信息, `hbase.zookeeper.quorum` 为必填项，其他 client 的配置为可选项 |
-| mode          |    是    | 无     | 读取 HBase 的模式，可填写 `normal` 或 `multiVersionFixedColumn`                              |
-| table         |    是    | 无     | 要读取的 hbase 表名（大小写敏感）                                                            |
-| encoding      |    否    | UTF-8  | 编码方式，`UTF-8` 或是 `GBK`，用于对二进制存储的 `HBase byte[]` 转为 String 时的编码         |
-| column        |    是    | 无     | 要读取的 hbase 字段，normal 模式与 multiVersionFixedColumn 模式下必填项, 详细说明见下文      |
-| maxVersion    |    是    | 无     | 指定在多版本模式下读取的版本数，`-1` 表示读取所有版本, `multiVersionFixedColumn` 模式下必填  |
-| range         |    否    | 无     | 指定读取的`rowkey` 范围, 详见下文                                                            |
-| scanCacheSize |    否    | 256    | HBase client 每次从服务器端读取的行数                                                        |
-| scanBatchSize |    否    | 100    | HBase client 每次从服务器端读取的列数                                                        |
+| 配置项        | 是否必须 | 数据类型        | 默认值 | 描述                                                                                         |
+| :------------ | :------: | ----------- | ------ | -------------------------------------------------------------------------------------------- |
+| hbaseConfig   |    是    | map         | 无     | 连接 HBase 集群需要的配置信息, `hbase.zookeeper.quorum` 为必填项，其他 client 的配置为可选项 |
+| mode          |    是    | string      | 无     | 读取 HBase 的模式，可填写 `normal` 或 `multiVersionFixedColumn`                              |
+| table         |    是    | string      | 无     | 要读取的 hbase 表名（大小写敏感）                                                            |
+| encoding      |    否    | string      | UTF-8  | 编码方式，`UTF-8` 或是 `GBK`，用于对二进制存储的 `HBase byte[]` 转为 String 时的编码         |
+| column        |    是    | `list<map>` | 无     | 要读取的 hbase 字段，normal 模式与 multiVersionFixedColumn 模式下必填项, 详细说明见下文      |
+| maxVersion    |    是    | string      | 无     | 指定在多版本模式下读取的版本数，`-1` 表示读取所有版本, `multiVersionFixedColumn` 模式下必填  |
+| range         |    否    | string      | 无     | 指定读取的`rowkey` 范围, 详见下文                                                            |
+| scanCacheSize |    否    | int         | 256    | 每次从服务器端读取的行数                                                        |
+| scanBatchSize |    否    | int         | 100    | 每次从服务器端读取的列数                                                        |
 
 ### column
 
@@ -177,7 +177,7 @@ multiVersionFixedColumn 模式下不支持常量列。配置格式如下：
 
 - `startRowkey`：指定开始 `rowkey`
 - `endRowkey` 指定结束 `rowkey`
-- `isBinaryRowkey`：指定配置的 `startRowkey`和 `endRowkey` 转换为`byte[]`时的方式，默认值为 false,若为 true，则调用`Bytes.toBytesBinary(rowkey)`方法进行转换;若为 false：则调用`Bytes.toBytes(rowkey)`
+- `isBinaryRowkey`：指定配置的 `startRowkey` 和 `endRowkey` 转换为 `byte[]` 时的方式，默认值为 false,若为 true，则调用 `Bytes.toBytesBinary(rowkey)` 方法进行转换; 若为 false：则调用 `Bytes.toBytes(rowkey)`
 
 配置格式如下：
 

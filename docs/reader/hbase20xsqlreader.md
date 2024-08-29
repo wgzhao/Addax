@@ -1,6 +1,6 @@
-# hbase20xsql Reader
+# HBase20 SQL Reader
 
-hbase20xsqlreade r 插件实现了从 [Phoenix(HBase SQL)](https://phoenix.apache.org) 读取数据，对应版本为 HBase2.X 和 Phoenix5.X。
+HBase20 SQL Reader 插件实现了从 [Phoenix(HBase SQL)](https://phoenix.apache.org) 读取数据，对应版本为 HBase2.X 和 Phoenix5.X。
 
 ## 配置样例
 
@@ -42,17 +42,17 @@ hbase20xsqlreade r 插件实现了从 [Phoenix(HBase SQL)](https://phoenix.apach
 
 ## 参数说明
 
-| 配置项             | 是否必须 | 默认值   | 描述                                                                                          |
-| :----------------- | :------: | -------- | --------------------------------------------------------------------------------------------- |
-| queryServerAddress |    是    | 无       | Phoenix QueryServer 地址, 该插件通过 PQS 进行连接                                             |
-| serialization      |    否    | PROTOBUF | QueryServer 使用的序列化协议                                                                  |
-| table              |    是    | 无       | 所要读取表名                                                                                  |
-| schema             |    否    | 无       | 表所在的 schema                                                                               |
-| column             |    否    | 全部列   | 填写需要从 phoenix 表中读取的列名集合，使用 JSON 的数组描述字段信息，空值表示读取所有列       |
-| splitKey           |    是    | 无       | 根据数据特征动态指定切分点，对表数据按照指定的列的最大、最小值进行切分,仅支持整型和字符串类型 |
-| splitPoints        |    否    | 无       | 按照表的 split 进行切分                                                                       |
-| where              |    否    | 无       | 支持对表查询增加过滤条件，每个切分都会携带该过滤条件                                          |
-| querySql           |    否    | 无       | 支持指定多个查询语句，但查询列类型和数目必须保持一致                                          |
+| 配置项             | 是否必须 | 数据类型 | 默认值   | 描述                                                                                          |
+| :----------------- | :------: | -------- | -------- | --------------------------------------------------------------------------------------------- |
+| queryServerAddress |    是    | string   | 无       | Phoenix QueryServer 地址, 该插件通过 PQS 进行连接                                             |
+| serialization      |    否    | string   | PROTOBUF | QueryServer 使用的序列化协议                                                                  |
+| table              |    是    | string   | 无       | 所要读取表名                                                                                  |
+| schema             |    否    | string   | 无       | 表所在的 schema                                                                               |
+| column             |    否    | list     | ``       | 填写需要从 phoenix 表中读取的列名集合，空值表示读取所有列                                     |
+| splitKey           |    是    | string   | 无       | 根据数据特征动态指定切分点，对表数据按照指定的列的最大、最小值进行切分,仅支持整型和字符串类型 |
+| splitPoints        |    否    | string   | 无       | 按照表的 split 进行切分                                                                       |
+| where              |    否    | string   | 无       | 支持对表查询增加过滤条件，每个切分都会携带该过滤条件                                          |
+| querySql           |    否    | string   | 无       | 支持指定多个查询语句，但查询列类型和数目必须保持一致                                          |
 
 ## 类型转换
 

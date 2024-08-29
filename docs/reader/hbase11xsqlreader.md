@@ -1,6 +1,6 @@
-# hbase11xsql reader 
+# HBase11x SQL Reader
 
-hbase11xsqlreader 插件实现了从 [Phoenix(HBase SQL)](https://phoenix.apache.org)读取数据, 支持的 HBase 版本为 1.x
+HBase11x SQL Reader 插件实现了从 [Phoenix(HBase SQL)](https://phoenix.apache.org)读取数据, 支持的 HBase 版本为 1.x
 
 ## 配置样例
 
@@ -14,20 +14,20 @@ hbase11xsqlreader 插件实现了从 [Phoenix(HBase SQL)](https://phoenix.apache
                 "byte":-1,
               "channel": 1
             }
-        },  
+        },
         "content": [ {
                 "reader": {
                     "name": "hbase11xsqlreader",
                     "parameter": {
                         "hbaseConfig": {
                             "hbase.zookeeper.quorum": "node1,node2,node3"
-                        },  
+                        },
                         "table": "US_POPULATION",
                         "column": [],
                         "where": "1=1",
                         "querySql": ""
                     }
-                },  
+                },
                 "writer": {
                     "name": "streamwriter",
                     "parameter": {
@@ -43,13 +43,13 @@ hbase11xsqlreader 插件实现了从 [Phoenix(HBase SQL)](https://phoenix.apache
 
 ## 参数说明
 
-| 配置项      | 是否必须 | 默认值 | 描述                                                                           |
-| :---------- | :------: | ------ | --------------------------------------------------------------------------- |
-| hbaseConfig |    是    | 无     | 需要通过 Phoenix 客户端去连接 hbase 集群，因此这里需要填写对应 hbase 集群的 `zkurl`地址 |
-| table       |    是    | 无     | 指定 Phoenix 中的表名,如果有 namespace，该值设置为 `namespace.tablename`          |
-| querySql    |   否     | 无     | 不是直接查询表，而是提供具体的查询语句，如果该参数和 `table` 参数同时存在，则优先使用该参数   |
-| column      |    是    | 无     | 填写需要从phoenix表中读取的列名集合，使用JSON的数组描述字段信息，空值或 `"*"` 表示读取所有列    |
-| where       |   否     | 无     | `where` 条件  |
+| 配置项      | 是否必须 | 数据类型 | 默认值 | 描述                                                                           |
+| :---------- | :------: |-------| ------ | --------------------------------------------------------------------------- |
+| hbaseConfig |    是    | map |无     | 需要通过 Phoenix 客户端去连接 hbase 集群，因此这里需要填写对应 hbase 集群的 `zkurl`地址 |
+| table       |    是    | string |无     | 指定 Phoenix 中的表名,如果有 namespace，该值设置为 `namespace.tablename`          |
+| querySql    |   否     | string |无     | 不是直接查询表，而是提供具体的查询语句，如果该参数和 `table` 参数同时存在，则优先使用该参数   |
+| column      |    是    | `list<map>` |无     | 填写需要从phoenix表中读取的列名集合，使用JSON的数组描述字段信息，空值或 `"*"` 表示读取所有列    |
+| where       |   否     | string  |无     | `where` 条件  |
 
 ## 类型转换
 

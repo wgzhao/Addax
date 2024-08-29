@@ -1,6 +1,6 @@
-# Hbase20XReader 
+# HBase20 Reader
 
-Hbase20X Reader 插件支持从 HBase 2.x 版本读取数据， 其实现方式为 通过 HBase 的 Java 客户端连接远程 HBase 服务，并通过 Scan 方式读取你指定 `rowkey` 范围内的数据。
+HBase20 Reader 插件支持从 HBase 2.x 版本读取数据， 其实现方式为 通过 HBase 的 Java 客户端连接远程 HBase 服务，并通过 Scan 方式读取你指定 `rowkey` 范围内的数据。
 
 ## 配置
 
@@ -57,9 +57,9 @@ ROW           COLUMN+CELL
 读取后数据
 
 | rowKey   | addres:city | address:country | address:province | info:age | info:birthday | info:company |
-| -------- | ----------- | -------------- | ---------------- | -------- | ------------- | ------------ |
-| lisi     | beijing     | china          | beijing          | 27       | 1987-06-17    | baidu        |
-| xiaoming | hangzhou    | china          | zhejiang         | 29       | 1987-06-17    | alibaba      |
+| -------- | ----------- | --------------- | ---------------- | -------- | ------------- | ------------ |
+| lisi     | beijing     | china           | beijing          | 27       | 1987-06-17    | baidu        |
+| xiaoming | hangzhou    | china           | zhejiang         | 29       | 1987-06-17    | alibaba      |
 
 ### multiVersionFixedColumn 模式
 
@@ -89,7 +89,7 @@ ROW              COLUMN+CELL
 读取后数据(4列)
 
 | rowKey   | column:qualifier | timestamp     | value      |
- | -------- | ---------------- | ------------- | ---------- |
+| -------- | ---------------- | ------------- | ---------- |
 | lisi     | address:city     | 1457101972764 | beijing    |
 | lisi     | address:contry   | 1457102773908 | china      |
 | lisi     | address:province | 1457101972736 | beijing    |
@@ -120,17 +120,17 @@ ROW              COLUMN+CELL
 
 ## 参数说明
 
-| 配置项        | 是否必须 | 默认值 | 描述                                                                                              |
-| :------------ | :------: | ------ | --------------------------------------------------------------------------------------------- |
-| hbaseConfig   |    是    | 无     | 连接HBase集群需要的配置信息, `hbase.zookeeper.quorum` 为必填项，其他 HBase client的配置为可选项    |
-| mode          |    是    | 无     | 读取hbase的模式，可填写 `normal` 或 `multiVersionFixedColumn`                                     |
-| table         |    是    | 无     | 要读取的 hbase 表名（大小写敏感）                                                                  |
-| encoding      |    否    | UTF-8  | 编码方式，`UTF-8` 或是 `GBK`，用于对二进制存储的 `HBase byte[]` 转为 `String` 时的编码              |
-| column        |    是    | 无     | 要读取的字段，`normal` 模式与 `multiVersionFixedColumn` 模式下必填项, 详细说明见下文                  |
-| maxVersion    |    是    | 无     | 指定在多版本模式下读取的版本数，`-1` 表示读取所有版本, `multiVersionFixedColumn` 模式下必填 |
-| range         |    否    | 无     | 指定读取的 `rowkey` 范围, 详见下文                                                         |
-| scanCacheSize |    否    | 256    | 每次从服务器端读取的行数                                                                      |
-| scanBatchSize |    否    | 100    | 每次从服务器端读取的列数                                                                  |
+| 配置项        | 是否必须    | 数据类型    | 默认值 | 描述                                                                                        |
+| :------------ | :------: | ----------- | ------ | -------------------------------------------------------------------------------------|
+| hbaseConfig   |    是    | map         | 无     | 连接HBase集群需要的配置信息, `hbase.zookeeper.quorum` 为必填项，其他为可选项                |
+| mode          |    是    | string      | 无     | 读取hbase的模式，可填写 `normal` 或 `multiVersionFixedColumn`                               |
+| table         |    是    | string      | 无     | 要读取的 hbase 表名（大小写敏感）                                                           |
+| encoding      |    否    | string      | UTF-8  | 编码方式，`UTF-8` 或是 `GBK`，用于对二进制存储的 `HBase byte[]` 转为 `String` 时的编码      |
+| column        |    是    | `list<map>` | 无     | 要读取的字段，`normal` 模式与 `multiVersionFixedColumn` 模式下必填项, 详细说明见下文        |
+| maxVersion    |    是    | string      | 无     | 指定在多版本模式下读取的版本数，`-1` 表示读取所有版本, `multiVersionFixedColumn` 模式下必填 |
+| range         |    否    | string      | 无     | 指定读取的 `rowkey` 范围, 详见下文                                                          |
+| scanCacheSize |    否    | int         | 256    | 每次从服务器端读取的行数                                                                    |
+| scanBatchSize |    否    | int         | 100    | 每次从服务器端读取的列数                                                                    |
 
 ### column
 
@@ -205,13 +205,13 @@ normal 模式下，对于用户指定Column信息，type必须填写，name/valu
 
 下面列出支持的读取HBase数据类型:
 
-| Addax 内部类型 | HBase 数据类型      |
-| -------------- | ------------------- |
-| Long           | int, short ,long    |
-| Double         | float, double       |
+| Addax 内部类型 | HBase 数据类型       |
+| -------------- | -------------------- |
+| Long           | int, short ,long     |
+| Double         | float, double        |
 | String         | string, binarystring |
-| Date           | date                |
-| Boolean        | boolean             |
+| Date           | date                 |
+| Boolean        | boolean              |
 
 请注意:
 
@@ -220,5 +220,5 @@ normal 模式下，对于用户指定Column信息，type必须填写，name/valu
 ## 限制
 
 1. 目前不支持动态列的读取。考虑网络传输流量（支持动态列，需要先将hbase所有列的数据读取出来，再按规则进行过滤），现支持的两种读取模式中需要用户明确指定要读取的列。
-2. 关于同步作业的切分：目前的切分方式是根据用户hbase表数据的region分布进行切分。即：在用户填写的 `[startrowkey，endrowkey］` 范围内，一个region会切分成一个task，单个region不进行切分。
+2. 关于同步作业的切分：目前的切分方式是根据用户hbase表数据的region分布进行切分。即：在用户填写的 `[startrowkey，endrowkey]` 范围内，一个region会切分成一个task，单个region不进行切分。
 3. `multiVersionFixedColumn` 模式下不支持增加常量列

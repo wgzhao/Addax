@@ -1,6 +1,6 @@
 # InfluxDB2 Reader
 
-InfluxDB2Reader 插件实现了从 [InfluxDB](https://www.influxdata.com) 2.0 及以上版本读取数据。
+InfluxDB2 Reader 插件实现了从 [InfluxDB](https://www.influxdata.com) 2.0 及以上版本读取数据。
 
 注意，如果你的 InfluxDB 是 1.8及以下版本，则应该使用 [InfluxDBReader](../influxdbreader/) 插件
 
@@ -46,6 +46,7 @@ bin/addax.sh job/influx2stream.json
 否则按照指定字段读取
 
 ### range
+
 `range` 用来指定读取指标的时间范围，其格式如下:
 
 ```json
