@@ -4,7 +4,7 @@
   <defs/>
   <g id="Canvas_1" fill="none" stroke-dasharray="none" fill-opacity="1" stroke-opacity="1" stroke="none">
     <title>Canvas 1</title>
-    <rect fill="white" x="0" y="0" width="500" height="240"/>
+    <rect  x="0" y="0" width="500" height="240"/>
     <g id="Canvas_1_Layer_1">
       <title>Layer 1</title>
       <g id="Group_2">
