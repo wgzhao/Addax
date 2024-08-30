@@ -71,7 +71,7 @@ jobs:
         run: |
           mvn -B -V -T C1 -DskipTests clean package
           mvn package assembly:single
-          bash shrink_package.sh
+          bash shrink_package.sh y
 
       - name: 6. Calucate SHA256SUM
         run: |

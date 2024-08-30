@@ -11,7 +11,6 @@ RUN <<EOF
     mvn clean package -P${package_type} -DskipTests 
     mvn package assembly:single 
     ./shrink_package.sh 
-    rm -f target/addax/addax-*.tar.gz
 EOF
 
 FROM openjdk:8u232-jre-stretch

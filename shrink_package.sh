@@ -39,13 +39,17 @@ TMPDIR=$(ls -d -w1 target/addax/addax-*)
         ( cd ${plugin_dir} && ln -sf ../../../../shared/${file_name} $file_name )
     done
 )
-# create archive package
-cd ${target}/addax
-# should be in target/addax/
-# get archive name including version
-archive_name=$(basename $TMPDIR)
-echo "Create archived package"
-tar -czf "${archive_name}.tar.gz" ${archive_name}/*
-echo "The archive package is at: ${target}/addax/${archive_name}.tar.gz"
+
+if [ "x$1" = "xy" ]; then
+  # create archive package
+  cd ${target}/addax
+  # should be in target/addax/
+  # get archive name including version
+  echo "Create archived package"
+  archive_name=$(basename $TMPDIR)
+  tar -czf "${archive_name}.tar.gz" ${archive_name}/*
+  echo "The archive package is at: ${target}/addax/${archive_name}.tar.gz"
+fi
+
 exit $?
 
