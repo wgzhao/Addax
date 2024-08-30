@@ -1,6 +1,6 @@
 # Excel Writer
 
-`excelwriter` 实现了将数据写入到 Excel 文件的功能
+Excel Writer 实现了将数据写入到 Excel 文件的功能
 
 ## 配置示例
 

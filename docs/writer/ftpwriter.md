@@ -1,6 +1,6 @@
 # Ftp Writer
 
-FtpWriter 提供了向远程 FTP/SFTP 服务写入文件的能力，当前仅支持写入文本文件。
+Ftp Writer 提供了向远程 FTP/SFTP 服务写入文件的能力，当前仅支持写入文本文件。
 
 ## 配置样例
 
@@ -12,30 +12,30 @@ FtpWriter 提供了向远程 FTP/SFTP 服务写入文件的能力，当前仅支
 
 ## 参数说明
 
-| 配置项            | 是否必须 | 默认值          | 描述                                                                                 |
-| :---------------- | :------: | --------------- | ------------------------------------------------------------------------------------ |
-| protocol          |    是    | `ftp`           | ftp/sftp 服务器协议，目前支持传输协议有ftp和sftp                                     |
-| host              |    是    | 无              | ftp/sftp 服务器地址                                                                  |
-| port              |    否    | 22/21           | 若传输协议是sftp协议，默认值是22；若传输协议是标准ftp协议，默认值是21                |
-| timeout           |    否    | `60000`         | 连接ftp服务器连接超时时间，单位毫秒(ms)                                              |
-| connectPattern    |    否    | `PASV`          | 连接模式，仅支持 `PORT`, `PASV` 模式。该参数只在传输协议是标准ftp协议时使用 ｜       |
-| username          |    是    | 无              | ftp/sftp 服务器访问用户名                                                            |
-| password          |    是    | 无              | ftp/sftp 服务器访问密码                                                              |
-| useKey            |    否    | false           | 是否使用私钥登录，仅针对 sftp 登录有效                                               |
-| keyPath           |    否    | `~/.ssh/id_rsa` | 私钥地址，如不填写，则使用默认私钥 `~/.ssh/id_rsa`                                   |
-| keyPass           |    否    | 无              | 私钥密码，若没有设置私钥密码，则无需配置该项                                         |
-| path              |    是    | 无              | 远程FTP文件系统的路径信息，FtpWriter会写入Path目录下属多个文件                       |
-| fileName          |    是    | 无              | FtpWriter写入的文件名，该文件名会添加随机的后缀作为每个线程写入实际文件名            |
-| writeMode         |    是    | 无              | FtpWriter写入前数据清理处理模式，支持 `truncate`, `append`, `nonConflict` ，详见下文 |
-| fieldDelimiter    |    是    | `,`             | 描述：读取的字段分隔符                                                               |
-| compress          |    否    | 无              | 文本压缩类型，暂不支持                                                               |
-| encoding          |    否    | `utf-8`         | 读取文件的编码配置                                                                   |
-| dateFormat        |    否    | 无              | 日期类型的数据序列化到文件中时的格式，例如 `"dateFormat": "yyyy-MM-dd"`              |
-| fileFormat        |    否    | `text`          | 文件写出的格式，包括csv, text两种，                                                  |
-| header            |    否    | 无              | text写出时的表头，示例 `['id', 'name', 'age']`                                       |
-| nullFormat        |    否    | `\N`            | 定义哪些字符串可以表示为null                                                         |
-| maxTraversalLevel |    否    | 100             | 允许遍历文件夹的最大层数                                                             |
-| csvReaderConfig   |    否    | 无              | 读取CSV类型文件参数配置，详见下文                                                    |
+| 配置项            | 是否必须 | 数据类型 | 默认值          | 描述                                                             |
+| :---------------- | :------: | -------- | --------------- | ---------------------------------------------------------------- |
+| protocol          |    是    | string   | `ftp`           | 服务器协议，目前支持传输协议有 ftp 和 sftp                       |
+| host              |    是    | string   | 无              | 服务器地址                                                       |
+| port              |    否    | int      | 22/21           | ftp 默认为 21，sftp 默认为 22                                    |
+| timeout           |    否    | int      | `60000`         | 连接ftp服务器连接超时时间，单位毫秒(ms)                          |
+| connectPattern    |    否    | string   | `PASV`          | 连接模式，仅支持 `PORT`, `PASV` 模式。ftp协议时使用 ｜           |
+| username          |    是    | string   | 无              | 用户名                                                           |
+| password          |    是    | string   | 无              | 访问密码                                                         |
+| useKey            |    否    | boolean  | false           | 是否使用私钥登录，仅针对 sftp 登录有效                           |
+| keyPath           |    否    | string   | `~/.ssh/id_rsa` | 私钥地址                                                         |
+| keyPass           |    否    | string   | 无              | 私钥密码，若没有设置私钥密码，则无需配置该项                     |
+| path              |    是    | string   | 无              | 远程FTP文件系统的路径信息，FtpWriter会写入Path目录下属多个文件   |
+| fileName          |    是    | string   | 无              | 写入的文件名，该文件名会添加随机的后缀作为每个线程写入实际文件名 |
+| writeMode         |    是    | string   | 无              | 写入前数据清理处理模式，详见下文                                 |
+| fieldDelimiter    |    是    | string   | `,`             | 描述：读取的字段分隔符                                           |
+| compress          |    否    | string   | 无              | 文本压缩类型，暂不支持                                           |
+| encoding          |    否    | string   | `utf-8`         | 读取文件的编码配置                                               |
+| dateFormat        |    否    | string   | 无              | 日期类型的数据序列化到文件中时的格式，例如 `"yyyy-MM-dd"`        |
+| fileFormat        |    否    | string   | `text`          | 文件写出的格式，包括 csv, text 两种，                            |
+| header            |    否    | list     | 无              | text写出时的表头，示例 `['id', 'name', 'age']`                   |
+| nullFormat        |    否    | string   | `\N`            | 定义哪些字符串可以表示为null                                     |
+| maxTraversalLevel |    否    | int      | 100             | 允许遍历文件夹的最大层数                                         |
+| csvReaderConfig   |    否    | map      | 无              | 读取CSV类型文件参数配置，详见下文                                |
 
 ### writeMode
 

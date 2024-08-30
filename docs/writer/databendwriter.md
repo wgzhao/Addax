@@ -36,17 +36,16 @@ bin/addax.sh job/stream2Databend.json
 
 ## 参数说明
 
-DatabendWriter 基于 [rdbmswriter](../rdbmswriter) 实现，因此可以参考 rdbmswriter 的所有配置项，并增加了如下配置项：
+该插件基于 [RDBMS Writer](../rdbmswriter) 实现，因此可以参考 RDBMS Writer 的所有配置项, 并增加了如下配置项：
 
-| 配置项           | 是否必须 | 类型   | 默认值   | 描述                                                                     |
-| :--------------- | :------: | ------ | -------- | ------------------------------------------------------------------------ |
-| writeMode        |    否    | string | `insert` | 写入模式，支持 insert 和 replace 两种模式，默认为 insert。               |
-| onConflictColumn |    否    | string | 无       | 冲突列，当 writeMode 为 replace 时，必须指定冲突列，否则会导致写入失败。 |
+| 配置项           | 是否必须 | 类型   | 默认值   | 描述                                                                       |
+| :--------------- | :------: | ------ | -------- | -------------------------------------------------------------------------- |
+| writeMode        |    否    | string | `insert` | 写入模式，支持 `insert` 和 `replace` 两种模式                              |
+| onConflictColumn |    否    | string | 无       | 冲突列，当 writeMode 为 `replace` 时，必须指定冲突列，否则会导致写入失败。 |
 
 ### writeMode
 
-该参数为 `4.1.2` 版本引入，用来支持 Databend 的 `replace into` 语法，当该参数设定为 `replace`
-时，必须同时指定 `onConflictColumn` 参数，用来判断数据是插入还是更新的依据。
+用来支持 Databend 的 `replace into` 语法，当该参数设定为 `replace` 时，必须同时指定 `onConflictColumn` 参数，用来判断数据是插入还是更新的依据。
 
 两个参数的示例如下：
 

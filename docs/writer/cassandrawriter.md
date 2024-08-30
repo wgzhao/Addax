@@ -1,6 +1,6 @@
 # Cassandra Writer
 
-CassandraWriter 插件用于向 [Cassandra](https://cassandra.apache.org) 写入数据。
+Cassandra Writer 插件用于向 [Cassandra](https://cassandra.apache.org) 写入数据。
 
 ## 配置样例
 
@@ -14,20 +14,28 @@ CassandraWriter 插件用于向 [Cassandra](https://cassandra.apache.org) 写入
 
 ## 参数说明
 
-| 配置项                  | 是否必须 | 默认值       | 描述                                                                                                                        |
-| :---------------------- | :------: | ------------ | --------------------------------------------------------------------------------------------------------------------------- |
-| host                    |    是    | 无           | Cassandra 连接点的域名或 ip，多个 node 之间用逗号分隔                                                                       |
-| port                    |    是    | 9042         | Cassandra 端口                                                                                                              |
-| username                |    否    | 无           | 数据源的用户名                                                                                                              |
-| password                |    否    | 无           | 数据源指定用户名的密码                                                                                                      |
-| useSSL                  |    否    | false        | 是否使用 SSL 连接                                                                                                           |
-| connectionsPerHost      |    否    | 8            | 客户端连接池配置：与服务器每个节点建多少个连接                                                                              |
-| maxPendingPerConnection |    否    | 128          | 客户端连接池配置：每个连接最大请求数                                                                                        |
-| keyspace                |    是    | 无           | 需要同步的表所在的 keyspace                                                                                                 |
-| table                   |    是    | 无           | 所选取的需要同步的表                                                                                                        |
-| column                  |    是    | 无           | 所配置的表中需要同步的列集合,内容可以是列的名称或 `writetime()`。如果将列名配置为 `writetime()`，会将这一列的内容作为时间戳 |
-| consistancyLevel        |    否    | LOCAL_QUORUM | 数据一致性级别, 可选 `ONE, QUORUM, LOCAL_QUORUM, EACH_QUORUM, ALL, ANY, TWO, THREE, LOCAL_ONE`                              |
-| batchSize               |    否    | 1            | 一次批量提交(UNLOGGED BATCH)的记录数大小（条数）                                                                            |
+| 配置项                  | 是否必须 | 数据类型 | 默认值         | 描述                                             |
+| :---------------------- | :------: | -------- | -------------- | ------------------------------------------------ |
+| host                    |    是    | string   | 无             | 连接点的域名或 ip，多个 node 之间用逗号分隔      |
+| port                    |    是    | int      | 9042           | Cassandra 端口                                   |
+| username                |    否    | string   | 无             | 数据源的用户名                                   |
+| password                |    否    | string   | 无             | 数据源指定用户名的密码                           |
+| useSSL                  |    否    | boolean  | false          | 是否使用 SSL 连接                                |
+| connectionsPerHost      |    否    | int      | 8              | 客户端连接池配置：与服务器每个节点建多少个连接   |
+| maxPendingPerConnection |    否    | int      | 128            | 客户端连接池配置：每个连接最大请求数             |
+| keyspace                |    是    | string   | 无             | 需要同步的表所在的 keyspace                      |
+| table                   |    是    | string   | 无             | 所选取的需要同步的表                             |
+| column                  |    是    | list     | 无             | 所配置的表中需要同步的列集合                     |
+| consistancyLevel        |    否    | string   | `LOCAL_QUORUM` | 数据一致性级别,                                  |
+| batchSize               |    否    | int      | 1              | 一次批量提交(UNLOGGED BATCH)的记录数大小（条数） |
+
+### column
+
+内容可以是列的名称或 `writetime()`。如果将列名配置为 `writetime()`，会将这一列的内容作为时间戳
+
+### consistancyLevel
+
+可选 `ONE, QUORUM, LOCAL_QUORUM, EACH_QUORUM, ALL, ANY, TWO, THREE, LOCAL_ONE`
 
 ## 类型转换
 

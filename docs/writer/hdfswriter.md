@@ -1,6 +1,6 @@
-# Hdfs Writer
+# HDFS Writer
 
-HdfsWriter 提供向HDFS文件系统指定路径中写入 `TEXTFile` ， `ORCFile` , `PARQUET` 等格式文件的能力， 文件内容可与 hive 中表关联。
+HDFS Writer 提供向 HDFS 文件系统指定路径中写入 `TextFile` ， `ORCFile` , `Parquet` 等格式文件的能力， 文件内容可与 hive 中表关联。
 
 ## 配置样例
 
@@ -10,23 +10,23 @@ HdfsWriter 提供向HDFS文件系统指定路径中写入 `TEXTFile` ， `ORCFil
 
 ## 参数说明
 
-| 配置项                 | 是否必须 | 默认值  | 说明                                                                                                |
-| :--------------------- | :------: | ------- | --------------------------------------------------------------------------------------------------- |
-| path                   |    是    | 无      | 要读取的文件路径                                                                                    |
-| defaultFS              |    是    | 无      | Hadoop hdfs 文件系统 `NAMENODE` 节点地址，如果配置了 HA 模式，则为 `defaultFS` 的值                 |
-| fileType               |    是    | 无      | 文件的类型                                                                                          |
-| fileName               |    是    | 无      | 要写入的文件名，用于当作前缀                                                                        |
-| column                 |    是    | 无      | 写入的字段列表                                                                                      |
-| writeMode              |    是    | 无      | 写入模式，支持 `append`, `overwrite`, `nonConflict`                                                 |
-| skipTrash              |    否    | false   | 是否跳过垃圾回收站，和 `writeMode` 配置相关详见下面描述                                             |
-| fieldDelimiter         |    否    | `,`     | 指定文本文件（即`fileType` 指定为 `text`)的字段分隔符，二进制文件不需要指定该项                     |
-| encoding               |    否    | `utf-8` | 文件的编码配置， 目前仅支持 `utf-8`                                                                 |
-| nullFormat             |    否    | 无      | 自定义哪些字符可以表示为空,例如如果用户配置: `"\\N"` ，那么如果源头数据是 `"\N"` ，视作 `null` 字段 |
-| haveKerberos           |    否    | 无      | 是否启用 Kerberos 认证，如果启用，则需要同时配置以下两项                                            |
-| kerberosKeytabFilePath |    否    | 无      | 用于 Kerberos 认证的凭证文件路径, 比如 `/your/path/addax.service.keytab`                            |
-| kerberosPrincipal      |    否    | 无      | 用于 Kerberos 认证的凭证主体, 比如 `addax/node1@WGZHAO.COM`                                         |
-| compress               |    否    | 无      | 文件的压缩格式，详见下文                                                                        |
-| hadoopConfig           |    否    | 无      | 里可以配置与 Hadoop 相关的一些高级参数，比如HA的配置                                                |
+| 配置项                 | 是否必须 | 数据类型    | 默认值  | 说明                                                                                         |
+| :--------------------- | :------: | ----------- | ------- | -------------------------------------------------------------------------------------------- |
+| path                   |    是    | string      | 无      | 要读取的文件路径                                                                             |
+| defaultFS              |    是    | string      | 无      | 详述见下                                                                                     |
+| fileType               |    是    | string      | 无      | 文件的类型，详述见下                                                                         |
+| fileName               |    是    | string      | 无      | 要写入的文件名，用于当作前缀                                                                 |
+| column                 |    是    | `list<map>` | 无      | 写入的字段列表                                                                               |
+| writeMode              |    是    | string      | 无      | 写入模式，详述见下                                                                           |
+| skipTrash              |    否    | boolean     | false   | 是否跳过垃圾回收站，和 `writeMode` 配置相关详见下面描述                                      |
+| fieldDelimiter         |    否    | string      | `,`     | 文本文件的字段分隔符，二进制文件不需要指定该项                                               |
+| encoding               |    否    | string      | `utf-8` | 文件的编码配置， 目前仅支持 `utf-8`                                                          |
+| nullFormat             |    否    | string      | 无      | 定义表示为空的字符，例如如果用户配置: `"\\N"` ，那么如果源头数据是 `"\N"` ，视作 `null` 字段 |
+| haveKerberos           |    否    | boolean     | false   | 是否启用 Kerberos 认证，如果启用，则需要同时配置以下两项                                     |
+| kerberosKeytabFilePath |    否    | string      | 无      | 用于 Kerberos 认证的凭证文件路径, 比如 `/your/path/addax.service.keytab`                     |
+| kerberosPrincipal      |    否    | string      | 无      | 用于 Kerberos 认证的凭证主体, 比如 `addax/node1@WGZHAO.COM`                                  |
+| compress               |    否    | string      | 无      | 文件的压缩格式，详见下文                                                                     |
+| hadoopConfig           |    否    | map         | 无      | 里可以配置与 Hadoop 相关的一些高级参数，比如HA的配置                                         |
 
 ### path
 
@@ -35,7 +35,7 @@ HdfsWriter 提供向HDFS文件系统指定路径中写入 `TEXTFile` ， `ORCFil
 
 ### defaultFS
 
-Hadoop hdfs文件系统 namenode 节点地址。格式：`hdfs://ip:port` ；例如：`hdfs://127.0.0.1:9000` , 如果启用了HA，则为 servicename 模式，比如 `hdfs://sandbox`
+Hadoop hdfs 文件系统 namenode 节点地址。格式：`hdfs://ip:port` ；例如：`hdfs://127.0.0.1:9000` , 如果启用了HA，则为 servicename 模式，比如 `hdfs://sandbox`
 
 ### fileType
 

@@ -1,6 +1,6 @@
 # Access Writer
 
-AccessWriter 插件实现了写入数据到 [Access][1] 目的表的功能。
+Access Writer 插件实现了写入数据到 [Access](https://en.wikipedia.org/wiki/Microsoft_Access) 目的表的功能。
 
 ## 示例
 
@@ -30,4 +30,4 @@ bin/addax.sh job/stream2access.json
 
 ## 参数说明
 
-AccessWriter 基于 [rdbmswriter](../rdbmswriter) 实现，因此可以参考 rdbmswriter 的所有配置项。
+该插件基于 [RDBMS Writer](../rdbmswriter) 实现，因此可以参考 RDBMS Writer 的所有配置项。

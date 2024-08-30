@@ -1,6 +1,6 @@
 # InfluxDB Writer
 
-InfluxDBWriter 插件实现了将数据写入 [InfluxDB][1] 读取数据的功能。
+InfluxDB Writer 插件实现了将数据写入 [InfluxDB][1] 读取数据的功能。
 底层实现上，是通过调用 InfluQL 语言接口，构建插入语句，然后进行数据插入。
 
 ## 示例
@@ -49,7 +49,7 @@ bin/addax.sh job/stream2influxdb.json
 | writeTimeout    |    否    | int      | 20     | 设置写入超时值，单位为秒           |
 | preSql          |    否    | list     | 无     | 插入数据前执行的SQL语句            |
 | postSql         |    否    | list     | 无     | 数据插入完毕后需要执行的语句       |
-| retentionPolicy |    否    | dict     | 无     | 设置数据库的 Retention Policy 策略 |
+| retentionPolicy |    否    | map      | 无     | 设置数据库的 Retention Policy 策略 |
 
 ### column
 

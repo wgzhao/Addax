@@ -1,6 +1,6 @@
 # Sybase Writer
 
-SybaseWriter 插件实现了写入数据到 [Sybase][1] 库表的功能。
+Sybase Writer 插件实现了写入数据到 [Sybase](https://en.wikipedia.org/wiki/Sybase) 库表的功能。
 
 ## 配置样例
 
@@ -31,4 +31,4 @@ create table addax_writer
 
 ## 参数说明
 
-SybaseWriter 基于 [rdbmswriter](../rdbmswriter) 实现，因此可以参考 rdbmswriter 的所有配置项。
+该插件基于 [RDBMS Writer](../rdbmswriter) 实现，因此可以参考 RDBMS Writer 的所有配置项。

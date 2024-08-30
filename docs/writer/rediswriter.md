@@ -1,6 +1,6 @@
 # Redis Writer
 
-RedisWrite 提供了还原Redis dump命令的能力，并写入到目标Redis。支持redis cluster集群、proxy、以及单机
+Redis Writer 提供了还原 Redis dump 命令的能力，并写入到目标 Redis。支持 redis cluster 集群、proxy、以及单机
 
 ## 配置样例
 
@@ -10,12 +10,10 @@ RedisWrite 提供了还原Redis dump命令的能力，并写入到目标Redis。
 
 ## 参数说明
 
-| 配置项       | 是否必须 | 默认值 | 描述                                                                                                     |
-| :----------- | :------: | ------ | -------------------------------------------------------------------------------------------------------- |
-| uri          |    是    | 否     | redis链接,,如果是集群,单机/proxy/redis cluster集群只需填写一个地址即可, 程序会自动获取集群里的所有master |
-| redisCluster |    否    | false  | redis cluster集群请务必填写此项，否者无法定位slot槽。如果是proxy或单机忽略该项                           |
-| flushDB      |    否    | false  | 迁移前格式化目标Redis                                                                                    |
-| batchSize    |    否    | 1000   | 每次批量处理数量。如果key过大/小,可以相应的调整                                                          |
-| timeout      |    否    | 60000  | 每次执行最大超时时间, 单位毫秒(ms)                                                                       |
-| include      |    否    | 无     | 要包含的 key, 支持正则表达式                                                                             |
-| exclude      |    否    | 无     | 要排除的 key,支持正则表达式                                                                              |
+| 配置项       | 是否必须 | 数据类型 | 默认值 | 描述                                                |
+| :----------- | :------: | -------- | ------ | --------------------------------------------------- |
+| uri          |    是    | string   | 否     | redis链接                                           |
+| redisCluster |    否    | boolean  | false  | 是否为redis cluster集群,如果是 proxy 或单机忽略该项 |
+| flushDB      |    否    | boolean  | false  | 迁移前是否清空目标 Redis                            |
+| batchSize    |    否    | string   | 1000   | 每次批量处理数量。如果key过大/小,可以相应的调整     |
+| timeout      |    否    | string   | 60000  | 每次执行最大超时时间, 单位毫秒(ms)                  |

@@ -1,6 +1,6 @@
 # TDengine Writer
 
-TDengineWriter 插件实现了将数据写入 [TDengine](https://www.taosdata.com/cn/) 数据库系统。在底层实现上，TDengineWriter 通过JDBC JNI 驱动连接远程 TDengine 数据库，
+TDengine Writer 插件实现了将数据写入 [TDengine](https://www.taosdata.com/cn/) 数据库系统。在底层实现上，TDengine Writer 通过JDBC JNI 驱动连接远程 TDengine 数据库，
 并执行相应的sql语句将数据批量写入 TDengine 库中。
 
 ## 前置条件
@@ -56,7 +56,7 @@ bin/addax.sh job/tdengine2stream.json
 
 ## 参数说明
 
-TDengineWriter 基于 [rdbmswriter](../rdbmswriter) 实现，因此可以参考 rdbmswriter 的所有配置项，并且增加了一些 TDengine 特有的配置项。
+该插件基于 [RDBMS Writer](../rdbmswriter) 实现，因此可以参考 RDBMS Writer 的所有配置项，并且增加了一些 TDengine 特有的配置项。
 
 ### 使用 JDBC-RESTful 接口
 

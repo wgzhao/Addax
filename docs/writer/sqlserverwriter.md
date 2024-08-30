@@ -1,6 +1,6 @@
 # SQLServer Writer
 
-SqlServerWriter 插件实现了写入数据到 [SQL Server](https://www.microsoft.com/en-us/sql-server/sql-server-downloads) 库表的功能。
+SQLServer Writer 插件实现了写入数据到 [SQL Server](https://www.microsoft.com/en-us/sql-server/sql-server-downloads) 库表的功能。
 
 ## 配置样例
 
@@ -12,12 +12,7 @@ SqlServerWriter 插件实现了写入数据到 [SQL Server](https://www.microsof
 
 ## 参数说明
 
-SqlServerWriter 基于 [rdbmswriter](../rdbmswriter) 实现，因此可以参考 rdbmswriter 的所有配置项，并在此基础上增加了一些 SqlServerWriter 特有的配置项。
-
-| 配置项    | 是否必须 | 默认值 | 描述                                     |
-| :-------- | :------: | ------ | ---------------------------------------- |
-| writeMode |    否    | insert | 写入方式，支持 insert， update，详见下文 |
-
+该插件基于 [RDBMS Writer](../rdbmswriter) 实现，因此可以参考 RDBMS Writer 的所有配置项。
 
 ### writeMode
 
@@ -37,5 +32,3 @@ SqlServerWriter 基于 [rdbmswriter](../rdbmswriter) 实现，因此可以参考
   "writeMode": "update(col1, col2)"
 }
 ```
-
-注： `update` 模式在 `4.0.8` 版本首次增加，之前版本并不支持。

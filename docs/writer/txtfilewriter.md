@@ -1,6 +1,6 @@
 # TxtFile Writer
 
-TxtFileWriter 提供了向本地文件写入类 CSV 格式的一个或者多个表文件。
+TxtFile Writer 提供了向本地文件写入类 CSV 格式的一个或者多个表文件。
 
 ## 配置样例
 
@@ -10,25 +10,23 @@ TxtFileWriter 提供了向本地文件写入类 CSV 格式的一个或者多个�
 
 ## 参数说明
 
-| 配置项            | 是否必须 | 类型     | 默认值   | 描述                                                    |
-|:---------------|:----:|--------|-------|-------------------------------------------------------|
-| path           |  是   | String | 无     | 本地文件系统的路径信息，写入 Path 目录下属多个文件                          |
-| fileName       |  是   | String | 无     | 写入的文件名，该文件名会添加随机的后缀作为每个线程写入实际文件名                      |
-| writeMode      |  是   | String | 无     | FtpWriter 写入前数据清理处理模式，，详见下文                           |
-| column         |  是   | List   | 无     | 读取字段列表，type 指定源数据的类型，详见下文                             |
-| fieldDelimiter |  是   | Char   | `,`   | 描述：读取的字段分隔符                                           |
-| compress       |  否   | String | 无     | 文本压缩类型，默认不压缩,支持压缩类型为 `zip`、`lzo`、`lzop`、`tgz`、`bzip2` |
-| encoding       |  否   | String | utf-8 | 读取文件的编码配置                                             |
-| nullFormat     |  否   | Char   | `\N`  | 定义哪些字符串可以表示为 null                                     |
-| dateFormat     |  否   | String | 无     | 日期类型的数据序列化到文件中时的格式，例如 `"dateFormat": "yyyy-MM-dd"`    |
-| fileFormat     |  否   | String | text  | 文件写出的格式，包括 csv, text, sql[^1] 三种, 详见下文                |
-| table          |  是   | String | 无     | sql 模式时需要指定表名，                                        |
-| column         |  否   | List   | 无     | sql 模式时可选指定列名，                                        |
-| extendedInsert |  否   | Bool   | true  | sql 模式时是否使用批量插入语法，默认为真详见下文                            |
-| batchSize      |  否   | Int    | 2048  | sql 模式时批量插入语法的批次大小，详见下文                               |
-| header         |  否   | List   | 无     | text 写出时的表头，示例 `['id', 'name', 'age']`                |
+| 配置项         | 是否必须 | 数据类型 | 默认值 | 描述                                                              |
+| :------------- | :------: | -------- | ------ | ----------------------------------------------------------------- |
+| path           |    是    | string   | 无     | 本地文件系统的路径信息，写入 Path 目录下属多个文件                |
+| fileName       |    是    | string   | 无     | 写入的文件名，该文件名会添加随机的后缀作为每个线程写入实际文件名  |
+| writeMode      |    是    | string   | 无     | 写入前数据清理处理模式，详见下文                                  |
+| fieldDelimiter |    是    | string   | `,`    | 描述：读取的字段分隔符                                            |
+| compress       |    否    | string   | 无     | 文本压缩类型，支持压缩类型为 `zip`、`lzo`、`lzop`、`tgz`、`bzip2` |
+| encoding       |    否    | string   | utf-8  | 读取文件的编码配置                                                |
+| nullFormat     |    否    | string   | `\N`   | 定义哪些字符串可以表示为 null                                     |
+| dateFormat     |    否    | string   | 无     | 日期类型的数据序列化到文件中时的格式，例如 `"yyyy-MM-dd"`         |
+| fileFormat     |    否    | string   | text   | 文件写出的格式，详见下文                                          |
+| table          |    是    | string   | 无     | sql 模式时需要指定表名，                                          |
+| column         |    否    | list     | 无     | sql 模式时可选指定列名，                                          |
+| extendedInsert |    否    | boolean  | true   | sql 模式时是否使用批量插入语法，详见下文                          |
+| batchSize      |    否    | int      | 2048   | sql 模式时批量插入语法的批次大小，详见下文                        |
+| header         |    否    | list     | 无     | text 写出时的表头，示例 `['id', 'name', 'age']`                   |
 
-[^1]: sql 格式为 4.1.3 版本引入
 
 ### writeMode
 
@@ -72,6 +70,6 @@ sql 格式表示将数据以 SQL 语句 (`INSERT INTO ... VALUES`) 的方式写�
 |            |
 | Long       | Long      |
 | Double     | Double    |
-| String     | String    |
+| string     | string    |
 | Boolean    | Boolean   |
 | Date       | Date      |

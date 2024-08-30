@@ -1,8 +1,8 @@
 # Stream Writer
 
-StreamWriter 是一个将数据写入内存的插件，一般用来将获取到的数据写到终端，用来调试读取插件的数据处理情况。
+Stream Writer 是一个将数据写入内存的插件，一般用来将获取到的数据写到终端，用来调试读取插件的数据处理情况。
 
-一个典型的 streamwriter 配置如下：
+一个典型的 Stream Writer 配置如下：
 
 ```json
 {

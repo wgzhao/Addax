@@ -1,6 +1,6 @@
 # HANA Writer
 
-HANAWriter 插件实现了写入数据到 [SAP HANA][1] 目的表的功能。
+HANA Writer 插件实现了写入数据到 [SAP HANA](https://www.sap.com/products/hana.html) 目的表的功能。
 
 ## 示例
 
@@ -37,4 +37,6 @@ bin/addax.sh job/hana2stream.json
 
 ## 参数说明
 
-HANAWriter 基于 [rdbmswriter](../rdbmswriter) 实现，因此可以参考 rdbmswriter 的所有配置项。
+该插件基于 [RDBMS Writer](../rdbmswriter) 实现，因此可以参考 RDBMS Writer 的所有配置项。
+
+

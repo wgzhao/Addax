@@ -1,6 +1,6 @@
 # Postgresql Writer
 
-PostgresqlWriter 插件实现了写入数据到 [PostgreSQL](https://postgresql.org) 数据库库表的功能。
+Postgresql Writer 插件实现了写入数据到 [PostgreSQL](https://postgresql.org) 数据库库表的功能。
 
 ## 示例
 
@@ -42,19 +42,8 @@ bin/addax.sh job/pg2pg.json
 
 ## 参数说明
 
-| 配置项    | 是否必须 | 默认值 | 描述                                                                                                             |
-| :-------- | :------: | ------ | ---------------------------------------------------------------------------------------------------------------- |
-| jdbcUrl   |    是    | 无     | 对端数据库的 JDBC 连接信息，jdbcUrl 按照 RDBMS 官方规范，并可以填写连接 [附件控制信息][1]                        |
-| username  |    是    | 无     | 数据源的用户名                                                                                                   |
-| password  |    否    | 无     | 数据源指定用户名的密码                                                                                           |
-| writeMode |    否    | insert | 写入模式，支持 insert, update 详见如下                                                                           |
-| table     |    是    | 无     | 所选取的需要同步的表名,使用 JSON 数据格式，当配置为多张表时，用户自己需保证多张表是同一表结构                    |
-| column    |    是    | 无     | 所配置的表中需要同步的列名集合，详细描述见 [rdbmswriter](../rdbmswriter)                                         |
-| preSql    |    否    | 无     | 执行数据同步任务之前率先执行的 sql 语句，目前只允许执行一条 SQL 语句，例如清除旧数据,涉及到的表可用 `@table`表示 |
-| postSql   |    否    | 无     | 执行数据同步任务之后执行的 sql 语句，目前只允许执行一条 SQL 语句，例如加上某一个时间戳                           |
-| batchSize |    否    | 1024   | 定义了插件和数据库服务器端每次批量数据获取条数                                                                   |
+该插件基于 [RDBMS Writer](../rdbmswriter) 实现，因此可以参考 RDBMS Writer 的所有配置项。
 
-[1]: http://jdbc.postgresql.org/documentation/93/connect.html
 
 ### writeMode
 

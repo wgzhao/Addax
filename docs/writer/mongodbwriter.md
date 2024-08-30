@@ -1,6 +1,6 @@
 # MongoDB Writer
 
-MongoDBWriter 插件用于向 [MongoDB](https://mongodb.com) 写入数据。
+MongoDB Writer 插件用于向 [MongoDB](https://mongodb.com) 写入数据。
 
 ## 配置样例
 
@@ -14,18 +14,18 @@ MongoDBWriter 插件用于向 [MongoDB](https://mongodb.com) 写入数据。
 
 ## 参数说明
 
-| 配置项     | 是否必须 | 类型   | 默认值 | 描述                                                  |
-| :--------- | :------: | ------ | ------ | ----------------------------------------------------- |
-| address    |    是    | list   | 无     | MongoDB 的数据地址信息                                |
-| username   |    否    | string | 无     | MongoDB 的用户名                                      |
-| password   |    否    | string | 无     | MongoDB 的密码                                        |
-| collection |    是    | string | 无     | MongoDB 的集合名                                      |
-| column     |    是    | list   | 无     | MongoDB 的文档列名                                    |
-| splitter   |    否    | string | 无     | 特殊分隔符，详见下文                                  |
-| writeMode  |    否    | string | insert | 指定了传输数据时更新的信息,支持 insert， update 两种  |
-| batchSize  |    否    | 2048   | int    | 指定批次输入的数量                                    |
-| isUpsert   |    否    | string | 无     | 当设置为 true 时，表示针对相同的 upsertKey 做更新操作 |
-| upsertKey  |    否    | string | 无     | upsertKey 指定了没行记录的业务主键。用来做更新时使用  |
+| 配置项     | 是否必须 | 类型        | 默认值 | 描述                                                  |
+| :--------- | :------: | ----------- | ------ | ----------------------------------------------------- |
+| address    |    是    | list        | 无     | MongoDB 的数据地址信息                                |
+| username   |    否    | string      | 无     | MongoDB 的用户名                                      |
+| password   |    否    | string      | 无     | MongoDB 的密码                                        |
+| collection |    是    | string      | 无     | MongoDB 的集合名                                      |
+| column     |    是    | `list<map>` | 无     | MongoDB 的文档列名                                    |
+| splitter   |    否    | string      | 无     | 特殊分隔符，详见下文                                  |
+| writeMode  |    否    | string      | insert | 指定了传输数据时更新的信息,支持 insert， update 两种  |
+| batchSize  |    否    | int         | 2048   | 指定批次输入的数量                                    |
+| isUpsert   |    否    | boolean     | 无     | 当设置为 true 时，表示针对相同的 upsertKey 做更新操作 |
+| upsertKey  |    否    | string      | 无     | upsertKey 指定了没行记录的业务主键。用来做更新时使用  |
 
 ### column
 

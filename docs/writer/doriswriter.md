@@ -4,7 +4,7 @@ DorisWriter 插件用于向 [Doris](http://doris.incubator.apache.org/master/zh-
 Doris http 连接(8030)，然后通过 [stream load](http://doris.incubator.apache.org/master/zh-CN/administrator-guide/load-data/stream-load-manual.html)
 加载数据到数据中，相比 `insert into` 方式效率要高不少，也是官方推荐的生产环境下的数据加载方式。
 
-Doris 是一个兼容 MySQL 协议的数据库后端，因此 Doris 读取可以使用 [MySQLReader](../../reader/mysqlreader) 进行访问。
+Doris 是一个兼容 MySQL 协议的数据库后端，因此 Doris 读取可以使用 [MySQL Reader](../../reader/mysqlreader) 进行访问。
 
 ## 示例
 
@@ -46,21 +46,22 @@ bin/addax.sh job/stream2doris.json
 
 ## 参数说明
 
-| 配置项              | 是否必须 | 类型     | 默认值   | 描述                                                  |
-|:-----------------|:----:|--------|-------|-----------------------------------------------------|
-| loadUrl          |  是   | string | 无     | Stream Load 的连接目标 ｜                                 |
-| username         |  是   | string | 无     | 访问Doris数据库的用户名                                      |
-| password         |  否   | string | 无     | 访问Doris数据库的密码                                       |
-| flushInterval    |  否   | int    | 3000  | 数据写入到目标表的间隔时间，单位为毫秒，即每隔多少毫秒写入一次数据    |
-| flushQueueLength |  否   | int    | 1     | 上传数据的队列长度                                           |
-| table            |  是   | string | 无     | 所选取的需要同步的表名                                         |
-| column           |  是   | list   | 无     | 所配置的表中需要同步的列名集合，详细描述见 [rdbmswriter](../rdbmswriter) |
-| batchSize        |  否   | int    | 2048  | 每批次导入数据的最大行数                                        |
-| loadProps        |  否   | map    | `csv` | streamLoad 的请求参数，详情参照[StreamLoad介绍页面][1]            |
-| preSqL           |  否   | list   |       | 写入数据到目标表前要执行的 SQL 语句                                |
-| postSqL          |  否   | list   |       | 数据写完后要执行的 SQL 语句                                    |
+| 配置项           | 是否必须 | 类型   | 默认值 | 描述                                                               |
+| :--------------- | :------: | ------ | ------ | ------------------------------------------------------------------ |
+| loadUrl          |    是    | string | 无     | Stream Load 的连接目标 ｜                                          |
+| username         |    是    | string | 无     | 访问Doris数据库的用户名                                            |
+| password         |    否    | string | 无     | 访问Doris数据库的密码                                              |
+| flushInterval    |    否    | int    | 3000   | 数据写入到目标表的间隔时间，单位为毫秒，即每隔多少毫秒写入一次数据 |
+| flushQueueLength |    否    | int    | 1      | 上传数据的队列长度                                                 |
+| table            |    是    | string | 无     | 所选取的需要同步的表名                                             |
+| column           |    是    | list   | 无     | 所配置的表中需要同步的列名集合，详细描述见 [RBDMS Writer][1]       |
+| batchSize        |    否    | int    | 2048   | 每批次导入数据的最大行数                                           |
+| loadProps        |    否    | map    | `csv`  | streamLoad 的请求参数，详情参照[StreamLoad介绍页面][2]             |
+| preSql           |    否    | list   |        | 写入数据到目标表前要执行的 SQL 语句                                |
+| postSql          |    否    | list   |        | 数据写完后要执行的 SQL 语句                                        |
 
-[1]: https://github.com/apache/doris-streamloader/tree/master
+[1]: ../rdbmswriter
+[2]: https://github.com/apache/doris-streamloader/tree/master
 
 ## loadUrl
 

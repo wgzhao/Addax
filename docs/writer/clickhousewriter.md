@@ -1,6 +1,6 @@
 # ClickHouse Writer
 
-ClickHouseWriter 插件用于向 [ClickHouse](https://clickhouse.tech) 写入数据。 
+ClickHouse Writer 插件用于向 [ClickHouse](https://clickhouse.tech) 写入数据。 
 
 ## 示例
 
@@ -42,4 +42,4 @@ bin/addax.sh job/clickhouse2clickhouse.json
 
 ## 参数说明
 
-ClickHouseWriter 基于 [rdbmswriter](../rdbmswriter) 实现，因此可以参考 rdbmswriter 的所有配置项。
+该插件基于 [RDBMS Writer](../rdbmswriter) 实现，因此可以参考 RDBMS Writer 的所有配置项。

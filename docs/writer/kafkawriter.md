@@ -1,6 +1,6 @@
 # Kafka Writer
 
-KafkaWriter 插件实现了将数据以 json 格式写入 Kafka 的功能。 该插件在 `4.0.9` 版本中引入。
+Kafka Writer 插件实现了将数据以 json 格式写入 Kafka 的功能。
 
 ## 示例
 
@@ -41,13 +41,13 @@ $ bin/kafka-console-consumer.sh --bootstrap-server localhost:9092 --topic test-1
 
 ## 参数说明
 
-| 配置项     | 是否必须 | 数据类型 | 默认值 | 描述                                                                                  |
-| :--------- | :------: | -------- | ------ | ------------------------------------------------------------------------------------- |
-| brokerList |    是    | string   | 无     | 连接 kafka 服务的 broker 配置，类似 `localhost:9092` ，多个 broker之间用逗号(`,`)分隔 |
-| topic      |    是    | string   | 无     | 要写入的 topic                                                                        |
-| batchSize  |    否    | int      | 1204   | 设置 Kafka 的 `batch.size` 参数                                                       |
-| column     |    是    | list     | 无     | 所配置的表中需要同步的列名集合，不允许为 `*`                                          |
-| properties |    否    | dict     | 无     | 需要设置的其他 kafka 连接参数                                                         |
+| 配置项     | 是否必须 | 数据类型 | 默认值 | 描述                                                          |
+| :--------- | :------: | -------- | ------ | ------------------------------------------------------------- |
+| brokerList |    是    | string   | 无     | 连接 kafka 服务的 broker 配置，多个 broker之间用逗号(`,`)分隔 |
+| topic      |    是    | string   | 无     | 要写入的 topic                                                |
+| batchSize  |    否    | int      | 1204   | 设置 Kafka 的 `batch.size` 参数                               |
+| column     |    是    | list     | 无     | 所配置的表中需要同步的列名集合，不允许为 `*`                  |
+| properties |    否    | map      | 无     | 需要设置的其他 kafka 连接参数                                 |
 
 ## 限制
 
