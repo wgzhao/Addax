@@ -48,7 +48,7 @@ bin/addax.sh job/stream2kudu.json
 | table         |    是    | string  | 无     | kudu 表名                                                              |
 | writeMode     |    否    | string  | upsert | 表数据写入模式，支持 upsert, insert 两者                               |
 | timeout       |    否    | int     | 100    | 写入数据超时时间(秒), 0 表示不受限制                                   |
-| column        |    是    | list    | 无     | 要写入的表字段及类型，配置方式见上示例                                 |
+| column        |    是    | list    | 无     | 要写入的表字段，配置方式见上示例                                 |
 | skipFail      |    否    | boolean | false  | 是否跳过插入失败的记录，如果设置为true，则插件不会把插入失败的当作异常 |
 
 ## column
