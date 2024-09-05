@@ -8,13 +8,14 @@
       "name"
     ],
     "splitPk": "db_id",
+    "autoPk": false,
     "connection": [
       {
-        "table": [
-          "table"
-        ],
         "jdbcUrl": [
           "jdbc:oracle:thin:@<HOST_NAME>:PORT:<DATABASE_NAME>"
+        ],
+        "table": [
+          "table"
         ]
       }
     ],
@@ -25,7 +26,6 @@
       "alter session set NLS_TIMESTAMP_TZ_FORMAT='yyyy-mm-dd hh24:mi:ss'",
       "alter session set TIME_ZONE='Asia/Chongqing'"
     ],
-    "autoPk": false,
     "fetchSize": 2048
   }
 }

@@ -1,14 +1,19 @@
 {
-  "name": "rdbmsreader",
+  "name": "hanareader",
   "parameter": {
-    "username": "",
+    "username": "system",
     "password": "",
-    "column": [],
+    "column": [
+      "*"
+    ],
     "connection": [
       {
-        "jdbcUrl": [],
-        "table": [],
-        "driver": ""
+        "jdbcUrl": [
+          "jdbc:sap://localhost:30015/?currentschema=SYSTEM"
+        ],
+        "table": [
+          "addax_table"
+        ]
       }
     ],
     "where": "1=1",

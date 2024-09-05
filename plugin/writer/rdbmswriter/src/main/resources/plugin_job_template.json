@@ -1,16 +1,20 @@
 {
   "name": "rdbmswriter",
   "parameter": {
-    "username": "",
-    "password": "",
-    "writeMode": "",
-    "column": [],
+    "username": "username",
+    "password": "password",
+    "writeMode": "insert",
+    "column": [
+      "*"
+    ],
     "session": [],
     "preSql": [],
     "connection": [
       {
-        "jdbcUrl": "",
-        "table": []
+        "jdbcUrl": "jdbc:<dbtype>://<host>:<port>/<database>",
+        "table": [
+          "addax_table"
+        ]
       }
     ]
   }

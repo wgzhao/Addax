@@ -3,9 +3,6 @@
   "parameter": {
     "path": "/user/hive/warehouse/mytable01/",
     "defaultFS": "hdfs://cluster",
-    "haveKerberos": "true",
-    "kerberosPrincipal": "hive@EXAMPLE.COM",
-    "kerberosKeytabFilePath": "/etc/security/keytabs/hive.headless.keytab",
     "column": [
       {
         "index": 0,
@@ -27,5 +24,15 @@
     "fileType": "orc",
     "encoding": "UTF-8",
     "fieldDelimiter": ","
+  },
+  "haveKerberos": "true",
+  "kerberosPrincipal": "hive@COMPANY.COM",
+  "kerberosKeytabFilePath": "/etc/security/keytabs/hive.headless.keytab",
+  "hadoopConfig": {
+    "dfs.nameservices": "cluster",
+    "dfs.ha.namenodes.cluster": "nn1,nn2",
+    "dfs.namenode.rpc-address.cluster.nn1": "node1:8020",
+    "dfs.namenode.rpc-address.cluster.nn2": "node2:8020",
+    "dfs.client.failover.proxy.provider.cluster": "org.apache.hadoop.hdfs.server.namenode.ha.ConfiguredFailoverProxyProvider"
   }
 }

@@ -3,15 +3,23 @@
   "parameter": {
     "username": "test",
     "password": "123456",
+    "column": [
+      "col1",
+      "col2"
+    ],
     "batchSize": 1024,
-    "loadUrl": ["fe:fe_port"],
-    "loadProps": {},
+    "loadUrl": [
+      "fe:fe_port"
+    ],
     "connection": [
       {
-        "table": ["table1"],
+        "jdbcUrl": "jdbc:mysql://fe:fe_port",
         "database": "example_db",
-        "jdbcUrl": "jdbc:mysql://fe:fe_port"
+        "table": [
+          "table1"
+        ]
       }
-    ]
+    ],
+    "loadProps": {}
   }
 }

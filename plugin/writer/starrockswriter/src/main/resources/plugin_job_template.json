@@ -1,14 +1,24 @@
 {
-    "name": "starrockswriter",
-    "parameter": {
-        "username": "",
-        "password": "",
-        "database": "",
-        "table": "",
-        "column": [],
-        "preSql": [],
-        "postSql": [], 
-        "jdbcUrl": "",
-        "loadUrl": []
+  "name": "starrockswriter",
+  "parameter": {
+    "username": "test",
+    "password": "123456",
+    "database": "example_db",
+    "table": "table1",
+    "column": [
+      "siteid",
+      "citycode",
+      "username",
+      "pv"
+    ],
+    "jdbcUrl": "jdbc:mysql://172.28.17.100:9030/",
+    "loadUrl": [
+      "172.28.17.100:8030",
+      "172.28.17.100:8030"
+    ],
+    "loadProps": {
+      "column_separator": "\\x01",
+      "row_delimiter": "\\x02"
     }
+  }
 }

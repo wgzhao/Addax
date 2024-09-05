@@ -3,7 +3,9 @@
   "parameter": {
     "username": "",
     "password": "",
-    "column": ["*"],
+    "column": [
+      "*"
+    ],
     "connection": [
       {
         "jdbcUrl": [

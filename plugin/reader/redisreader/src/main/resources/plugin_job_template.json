@@ -15,11 +15,13 @@
         "uri": "http://localhost/dump.rdb"
       }
     ],
-    "db": [],
+    "db": [
+      0,
+      1
+    ],
     "include": [
       "^user"
     ],
-    "exclude": [
-    ]
+    "exclude": []
   }
 }

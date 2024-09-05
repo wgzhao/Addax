@@ -3,22 +3,22 @@
   "parameter": {
     "username": "pgtest",
     "password": "pgtest",
+    "autoPk": false,
+    "splitPk": "",
     "column": [
       "*"
     ],
     "connection": [
       {
-        "table": [
-          "addax_tbl"
-        ],
         "jdbcUrl": [
           "jdbc:postgresql://127.0.0.1:5432/pgtest"
+        ],
+        "table": [
+          "addax_tbl"
         ]
       }
     ],
     "where": "",
-    "autoPk": false,
-    "fetchSize": 2048,
-    "splitPk": ""
+    "fetchSize": 2048
   }
 }

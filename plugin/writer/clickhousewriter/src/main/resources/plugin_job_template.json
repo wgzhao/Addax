@@ -17,7 +17,6 @@
     "preSql": [],
     "postSql": [],
     "batchSize": 65536,
-    "dryRun": false,
     "writeMode": "insert"
   }
 }

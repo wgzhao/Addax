@@ -5,11 +5,11 @@
     "password": "",
     "connection": [
       {
-        "table": [
-          "table"
-        ],
         "jdbcUrl": [
           "jdbc:sqlserver://localhost:3433;DatabaseName=dbname"
+        ],
+        "table": [
+          "table"
         ]
       }
     ],

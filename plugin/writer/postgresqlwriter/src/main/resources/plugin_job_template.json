@@ -1,6 +1,9 @@
 {
   "name": "postgresqlwriter",
   "parameter": {
+    "username": "user",
+    "password": "passw0rd",
+    "writeMode": "insert",
     "column": [
       "*"
     ],
@@ -16,9 +19,6 @@
         ]
       }
     ],
-    "username": "user",
-    "password": "passw0rd",
-    "writeMode": "insert",
     "batchSize": 1024
   }
 }

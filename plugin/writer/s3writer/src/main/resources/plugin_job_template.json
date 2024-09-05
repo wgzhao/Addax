@@ -1,13 +1,14 @@
 {
   "name": "s3writer",
   "parameter": {
-    "endpoint": "",
-    "accessId": "",
-    "accessKey": "",
-    "bucket": "",
-    "object": "",
+    "endpoint": "https://s3.amazonaws.com",
+    "accessId": "xxxxxxxxxxxx",
+    "accessKey": "xxxxxxxxxxxxxxxxxxxxxxx",
+    "bucket": "test",
+    "object": "upload.csv",
+    "region": "ap-northeast-1",
     "encoding": "",
-    "fieldDelimiter": "",
-    "writeMode": ""
+    "fieldDelimiter": ",",
+    "writeMode": "truncate"
   }
 }

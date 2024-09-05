@@ -10,6 +10,7 @@
     "preSql": [
       "delete from @table"
     ],
+    "postSql": [],
     "connection": [
       {
         "jdbcUrl": "jdbc:ucanaccess://<access db file path>",

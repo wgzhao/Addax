@@ -3,11 +3,20 @@
   "parameter": {
     "username": "root",
     "password": "taosdata",
-    "column": ["ts", "name", "file_size", "file_date", "flag_open", "memo" ],
+    "column": [
+      "ts",
+      "name",
+      "file_size",
+      "file_date",
+      "flag_open",
+      "memo"
+    ],
     "connection": [
       {
         "jdbcUrl": "jdbc:TAOS://127.0.0.1:6030/test",
-        "table": [ "addax_test"]
+        "table": [
+          "addax_test"
+        ]
       }
     ]
   }

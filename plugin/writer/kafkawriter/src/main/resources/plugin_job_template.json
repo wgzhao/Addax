@@ -8,6 +8,7 @@
     "batchSize": 1024,
     "brokerList": "localhost:9092,localhost:9093,localhost:9094",
     "topic": "test",
+    "partitions": 0,
     "properties": {}
   }
 }

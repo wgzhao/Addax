@@ -5,6 +5,10 @@
       "*"
     ],
     "brokerList": "localhost:9092,localhost:9093,localhost:9094",
-    "topic": "test"
+    "topic": "test",
+    "missingKeyValue": "\\N",
+    "properties": {
+      "auto.offset.reset": "earliest"
+    }
   }
 }

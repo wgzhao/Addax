@@ -8,7 +8,7 @@
       "name"
     ],
     "preSql": [
-      "delete from test"
+      "delete from @table"
     ],
     "connection": [
       {

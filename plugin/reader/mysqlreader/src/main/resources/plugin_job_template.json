@@ -3,18 +3,21 @@
   "parameter": {
     "username": "root",
     "password": "root",
+    "autoPk": "false",
+    "splitPk": "",
     "column": [
       "*"
     ],
     "connection": [
       {
-        "table": [
-          "addax_reader"
-        ],
         "jdbcUrl": [
           "jdbc:mysql://127.0.0.1:3306/test"
         ],
-        "driver": "com.mysql.jdbc.Driver"
+        "table": [
+          "addax_reader"
+        ],
+        "driver": "com.mysql.jdbc.Driver",
+        "fetchSize": 2048
       }
     ],
     "where": ""

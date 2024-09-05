@@ -3,8 +3,8 @@
   "parameter": {
     "defaultFS": "hdfs://cluster",
     "fileType": "orc",
-    "path": "/user/hive/warehouse/writerorc.db/orcfull",
-    "fileName": "xxxx",
+    "path": "/user/hive/warehouse",
+    "fileName": "addax",
     "column": [
       {
         "name": "col1",
@@ -31,9 +31,9 @@
     "fieldDelimiter": "\u0001",
     "compress": "SNAPPY",
     "haveKerberos": "true",
-    "kerberosPrincipal": "hive@CFZQ.COM",
+    "kerberosPrincipal": "hive@COMPANY.COM",
     "kerberosKeytabFilePath": "/etc/security/keytabs/hive.headless.keytab",
-    "hadoopConfig":{
+    "hadoopConfig": {
       "dfs.nameservices": "cluster",
       "dfs.ha.namenodes.cluster": "nn1,nn2",
       "dfs.namenode.rpc-address.cluster.nn1": "node1:8020",

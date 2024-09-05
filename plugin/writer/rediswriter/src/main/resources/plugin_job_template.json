@@ -11,12 +11,5 @@
     "timeout": 100000,
     "redisCluster": false,
     "flushDB": true
-  },
-  "core": {
-    "transport": {
-      "channel": {
-        "byteCapacity": 536870912
-      }
-    }
   }
 }

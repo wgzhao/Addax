@@ -1,14 +1,20 @@
 {
   "name": "databendwriter",
   "parameter": {
-    "username": "",
-    "password": "",
-    "database": "",
-    "table": "",
-    "column": [],
+    "username": "u1",
+    "password": "123",
+    "column": [
+      "*"
+    ],
     "preSql": [],
     "postSql": [],
-    "jdbcUrl": "",
-    "loadUrl": []
+    "connection": [
+      {
+        "jdbcUrl": "jdbc:databend://localhost:8000/addax",
+        "table": [
+          "table1"
+        ]
+      }
+    ]
   }
 }

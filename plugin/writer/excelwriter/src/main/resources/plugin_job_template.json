@@ -1,8 +1,11 @@
 {
   "name": "excelwriter",
   "parameter": {
-    "path": "",
+    "path": "/tmp/out",
     "fileName": "test.xlsx",
-    "header": []
+    "header": [
+      "name",
+      "age"
+    ]
   }
 }

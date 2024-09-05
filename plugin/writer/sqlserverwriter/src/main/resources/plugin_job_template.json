@@ -17,6 +17,12 @@
       "db_description",
       "db_tddl_info"
     ],
+    "preSql": [
+      "delete from @table where db_id = -1;"
+    ],
+    "postSql": [
+      "update @table set db_modify_time = now() where db_id = 1;"
+    ],
     "connection": [
       {
         "table": [
@@ -24,12 +30,6 @@
         ],
         "jdbcUrl": "jdbc:sqlserver://[HOST_NAME]:PORT;DatabaseName=[DATABASE_NAME]"
       }
-    ],
-    "preSql": [
-      "delete from @table where db_id = -1;"
-    ],
-    "postSql": [
-      "update @table set db_modify_time = now() where db_id = 1;"
     ]
   }
 }

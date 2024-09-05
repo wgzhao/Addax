@@ -3,11 +3,17 @@
   "parameter": {
     "username": "",
     "password": "",
-    "column": [],
+    "column": [
+      "*"
+    ],
     "connection": [
       {
-        "jdbcUrl": [],
-        "table": [],
+        "jdbcUrl": [
+          "jdbc:<dbtype>://<host>:<port>/<database>"
+        ],
+        "table": [
+          "adax_table"
+        ],
         "driver": ""
       }
     ],

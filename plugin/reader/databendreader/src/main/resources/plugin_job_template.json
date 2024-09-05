@@ -8,11 +8,11 @@
     ],
     "connection": [
       {
-        "table": [
-          "addax_reader"
-        ],
         "jdbcUrl": [
           "jdbc:databend://127.0.0.1:8000/test"
+        ],
+        "table": [
+          "addax_reader"
         ]
       }
     ],

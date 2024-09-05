@@ -1,13 +1,19 @@
 {
   "name": "clickhousereader",
   "parameter": {
-    "username": "",
+    "username": "default",
     "password": "",
-    "column": ["*"],
+    "column": [
+      "*"
+    ],
     "connection": [
       {
-        "jdbcUrl": ["jdbc:clickhouse://127.0.0.1:8123/default"],
-        "table": []
+        "jdbcUrl": [
+          "jdbc:clickhouse://127.0.0.1:8123/default"
+        ],
+        "table": [
+          "yourtable"
+        ]
       }
     ],
     "where": ""

@@ -1,15 +1,17 @@
 {
-    "name": "kudureader",
-    "parameter": {
-        "masterAddress": "127.0.0.1:7051",
-        "table": "test",
-        "splitKey": "",
-        "lowerBound": "min",
-        "upperBound": "max",
-        "ReadTimeoutMs": 30000,
-        "scanRequestTimeout": 30000,
-        "columns": [
-            "col1", "col2", "col3"
-        ]
-    }
+  "name": "kudureader",
+  "parameter": {
+    "masterAddress": "127.0.0.1:7051",
+    "table": "test",
+    "splitPk": "",
+    "lowerBound": "min",
+    "upperBound": "max",
+    "ReadTimeoutMs": 30000,
+    "scanRequestTimeout": 30000,
+    "columns": [
+      "col1",
+      "col2",
+      "col3"
+    ]
+  }
 }

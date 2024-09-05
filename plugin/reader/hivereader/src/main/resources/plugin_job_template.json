@@ -9,16 +9,16 @@
     "connection": [
       {
         "jdbcUrl": [
-          "jdbc:hive2://localhost:10000/default;principal=hive/_HOST@EXAMPLE.COM"
+          "jdbc:hive2://localhost:10000/default;principal=hive/_HOST@COMPANY.COM"
         ],
         "table": [
           "hive_reader"
         ]
       }
     ],
-    "where": "logdate='20211013'" ,
+    "where": "logdate='20211013'",
     "haveKerberos": true,
     "kerberosKeytabFilePath": "/etc/security/keytabs/hive.headless.keytab",
-    "kerberosPrincipal": "hive@EXAMPLE.COM"
+    "kerberosPrincipal": "hive@COMPANY.COM"
   }
 }
