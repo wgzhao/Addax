@@ -246,9 +246,9 @@ public class HdfsHelper {
             String typename = columns.get(i).getString(Key.TYPE).toUpperCase();
             if (null == column || column.getRawData() == null) {
                 group.append(colName, "");
+                continue;
             }
             SupportHiveDataType columnType = SupportHiveDataType.valueOf(typename);
-            assert column != null;
             switch (columnType) {
                 case INT:
                 case INTEGER:
