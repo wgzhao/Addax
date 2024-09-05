@@ -47,10 +47,23 @@ public class SftpHelper
     HashSet<String> sourceFiles = new HashSet<>();
 
     @Override
-    public void loginFtpServer(String host, String username, String password, int port, int timeout,
+    public void loginFtpServer(String host, String username, String password, int port, String keyPath, String keyPass, int timeout,
             String connectMode)
     {
         JSch jsch = new JSch(); // 创建JSch对象
+        if (keyPath != null) {
+            try {
+                if (keyPass != null) {
+                    jsch.addIdentity(keyPath, keyPass);
+                }
+                else {
+                    jsch.addIdentity(keyPath);
+                }
+            }
+            catch (JSchException e) {
+                throw AddaxException.asAddaxException(FtpReaderErrorCode.ILLEGAL_VALUE, "Failed to use private key", e);
+            }
+        }
         try {
             session = jsch.getSession(username, host, port);
             // 根据用户名，主机ip，端口获取一个Session对象
@@ -60,7 +73,9 @@ public class SftpHelper
                         "session is null,无法通过sftp与服务器建立链接，请检查主机名和用户名是否正确.");
             }
 
-            session.setPassword(password); // 设置密码
+            if (password != null) {
+                session.setPassword(password); // 设置密码
+            }
             Properties config = new Properties();
             config.put("StrictHostKeyChecking", "no");
             session.setConfig(config); // 为Session对象设置properties

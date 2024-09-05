@@ -44,7 +44,7 @@ public class StandardFtpHelper
     HashSet<String> sourceFiles = new HashSet<>();
 
     @Override
-    public void loginFtpServer(String host, String username, String password, int port, int timeout,
+    public void loginFtpServer(String host, String username, String password, int port, String keyPath, String keyPass, int timeout,
             String connectMode)
     {
         ftpClient = new FTPClient();

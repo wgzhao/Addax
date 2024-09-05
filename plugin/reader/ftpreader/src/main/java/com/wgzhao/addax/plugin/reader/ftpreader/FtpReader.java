@@ -28,6 +28,7 @@ import com.wgzhao.addax.storage.reader.StorageReaderUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.File;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -57,6 +58,8 @@ public class FtpReader
         private String connectPattern;
         private int maxTraversalLevel;
 
+        private static final String DEFAULT_PRIVATE_KEY = "~/.ssh/id_rsa";
+
         private FtpHelper ftpHelper = null;
 
         @Override
@@ -67,6 +70,8 @@ public class FtpReader
 
             this.validateParameter();
             StorageReaderUtil.validateParameter(this.originConfig);
+            String keyPath = this.originConfig.getString(FtpKey.KEY_PATH, null);
+            String keyPass = this.originConfig.getString(FtpKey.KEY_PASS, null);
 
             if ("sftp".equals(protocol)) {
                 //sftp协议
@@ -78,12 +83,12 @@ public class FtpReader
                 this.port = originConfig.getInt(FtpKey.PORT, FtpConstant.DEFAULT_FTP_PORT);
                 this.ftpHelper = new StandardFtpHelper();
             }
-            ftpHelper.loginFtpServer(host, username, password, port, timeout, connectPattern);
+            ftpHelper.loginFtpServer(host, username, password, port, keyPath, keyPass, timeout, connectPattern);
         }
 
         private void validateParameter()
         {
-            this.protocol = this.originConfig.getNecessaryValue(FtpKey.PROTOCOL, FtpReaderErrorCode.REQUIRED_VALUE);
+            this.protocol = this.originConfig.getNecessaryValue(FtpKey.PROTOCOL, FtpReaderErrorCode.REQUIRED_VALUE).toLowerCase();
             boolean protocolTag = "ftp".equals(this.protocol) || "sftp".equals(this.protocol);
             if (!protocolTag) {
                 throw AddaxException.asAddaxException(FtpReaderErrorCode.ILLEGAL_VALUE,
@@ -91,7 +96,7 @@ public class FtpReader
             }
             this.host = this.originConfig.getNecessaryValue(FtpKey.HOST, FtpReaderErrorCode.REQUIRED_VALUE);
             this.username = this.originConfig.getNecessaryValue(FtpKey.USERNAME, FtpReaderErrorCode.REQUIRED_VALUE);
-            this.password = this.originConfig.getNecessaryValue(FtpKey.PASSWORD, FtpReaderErrorCode.REQUIRED_VALUE);
+            this.password = this.originConfig.getString(FtpKey.PASSWORD, null);
             this.timeout = originConfig.getInt(FtpKey.TIME_OUT, FtpConstant.DEFAULT_TIMEOUT);
             this.maxTraversalLevel = originConfig.getInt(FtpKey.MAX_TRAVERSAL_LEVEL, FtpConstant.DEFAULT_MAX_TRAVERSAL_LEVEL);
 
@@ -114,7 +119,7 @@ public class FtpReader
             }
             else {
                 path = this.originConfig.getList(Key.PATH, String.class);
-                if (null == path || path.isEmpty() ) {
+                if (null == path || path.isEmpty()) {
                     throw AddaxException.asAddaxException(FtpReaderErrorCode.REQUIRED_VALUE, "您需要指定待读取的源目录或文件");
                 }
                 for (String eachPath : path) {
@@ -122,6 +127,28 @@ public class FtpReader
                         String message = String.format("请检查参数path:[%s],需要配置为绝对路径", eachPath);
                         LOG.error(message);
                         throw AddaxException.asAddaxException(FtpReaderErrorCode.ILLEGAL_VALUE, message);
+                    }
+                }
+            }
+            if ("sftp".equals(protocol)) {
+                // use ssh private key or not ?
+                boolean useKey = this.originConfig.getBool(FtpKey.USE_KEY, false);
+                if (useKey) {
+                    String privateKey = this.originConfig.getString(FtpKey.KEY_PATH, DEFAULT_PRIVATE_KEY);
+                    // check privateKey does exist or not
+                    if (privateKey.startsWith("~")) {
+                        // expand home directory
+                        privateKey = privateKey.replaceFirst("^~", System.getProperty("user.home"));
+                        // does it exist?
+                        boolean isFile = new File(privateKey).isFile();
+                        if (isFile) {
+                            this.originConfig.set(FtpKey.KEY_PATH, privateKey);
+                        }
+                        else {
+                            String msg = "You have configured to use the key, but neither the configured key file nor the default file(" +
+                                    DEFAULT_PRIVATE_KEY + " exists";
+                            throw AddaxException.asAddaxException(FtpReaderErrorCode.ILLEGAL_VALUE, msg);
+                        }
                     }
                 }
             }
@@ -224,7 +251,8 @@ public class FtpReader
             this.username = readerSliceConfig.getString(FtpKey.USERNAME);
             String password = readerSliceConfig.getString(FtpKey.PASSWORD);
             int timeout = readerSliceConfig.getInt(FtpKey.TIME_OUT, FtpConstant.DEFAULT_TIMEOUT);
-
+            String keyPath = readerSliceConfig.getString(FtpKey.KEY_PATH, null);
+            String keyPass = readerSliceConfig.getString(FtpKey.KEY_PASS, null);
             this.sourceFiles = this.readerSliceConfig.getList(FtpKey.SOURCE_FILES, String.class);
 
             if ("sftp".equals(protocol)) {
@@ -238,7 +266,7 @@ public class FtpReader
                 this.connectPattern = readerSliceConfig.getString(FtpKey.CONNECT_PATTERN, FtpConstant.DEFAULT_FTP_CONNECT_PATTERN);// 默认为被动模式
                 this.ftpHelper = new StandardFtpHelper();
             }
-            ftpHelper.loginFtpServer(host, username, password, port, timeout, connectPattern);
+            ftpHelper.loginFtpServer(host, username, password, port, keyPath, keyPass, timeout, connectPattern);
         }
 
         @Override

@@ -22,7 +22,10 @@ Ftp Reader 提供了读取远程 FTP/SFTP 文件系统数据存储的能力。
 | timeout           |    否    | int         | 60000  | 连接 ftp 服务器连接超时时间，单位毫秒(ms)                                     |
 | connectPattern    |    否    | string      | PASV   | 连接模式，仅支持 `PORT`, `PASV` 模式。该参数仅在 ftp 协议时使用               |
 | username          |    是    | string      | 无     | ftp 服务器访问用户名                                                          |
-| password          |    是    | string      | 无     | ftp 服务器访问密码                                                            |
+| password          |    否    | string      | 无     | ftp 服务器访问密码                                                            |
+| useKey            |    否    | boolean     | false  | 是否使用私钥登录，仅针对 sftp 登录有效                           |
+| keyPath           |    否    | string      | `~/.ssh/id_rsa` | 私钥地址                                                         |
+| keyPass           |    否    | string      | 无              | 私钥密码，若没有设置私钥密码，则无需配置该项                     |
 | path              |    是    | list        | 无     | 远程 FTP 文件系统的路径信息，注意这里可以支持填写多个路径，详细描述见下       |
 | column            |    是    | `list<map>` | 无     | 读取字段列表，type 指定源数据的类型，详见下文                                 |
 | fieldDelimiter    |    是    | string      | `,`    | 描述：读取的字段分隔符                                                        |

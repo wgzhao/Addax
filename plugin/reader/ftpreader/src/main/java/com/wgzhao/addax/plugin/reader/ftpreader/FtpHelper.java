@@ -36,7 +36,7 @@ public abstract class FtpHelper
      * @param timeout 超时时间（单位为秒）
      * @param connectMode 连接模式
      */
-    public abstract void loginFtpServer(String host, String username, String password, int port, int timeout, String connectMode);
+    public abstract void loginFtpServer(String host, String username, String password, int port, String keyPath, String keyPass, int timeout, String connectMode);
 
     /**
      * 断开与ftp服务器的连接

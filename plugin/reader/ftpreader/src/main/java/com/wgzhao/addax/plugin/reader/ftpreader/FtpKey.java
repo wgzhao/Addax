@@ -33,4 +33,10 @@ public class FtpKey extends Key
     public static final String TIME_OUT = "timeout";
     public static final String CONNECT_PATTERN = "connectPattern";
     public static final String MAX_TRAVERSAL_LEVEL = "maxTraversalLevel";
+
+    public static final String USE_KEY = "useKey";
+    // ssh private key
+    public static final String KEY_PATH = "keyPath";
+    // ssh private key passphrase
+    public static final String KEY_PASS = "keyPass";
 }
