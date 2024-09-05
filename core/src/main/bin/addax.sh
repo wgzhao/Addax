@@ -48,6 +48,15 @@ function usage {
     -l, --logdir <log directory> the directory which log writes to
     -d, --debug                 Set to remote debug mode.
     -L, --loglevel <log level>  Set log level such as: debug, info, warn, error, all etc.
+
+
+    Usage: $(basename $0) gen [options]
+
+      generate job template file
+    Options:
+    -r specify reader plugin name
+    -w specify writer plugin name
+    -l [r|w] list all reader/writer plugin names
 EOF
     exit 1
 }
