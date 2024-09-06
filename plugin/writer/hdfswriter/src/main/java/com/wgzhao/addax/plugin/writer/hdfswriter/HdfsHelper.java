@@ -27,9 +27,15 @@ import com.wgzhao.addax.common.base.Key;
 import com.wgzhao.addax.common.exception.AddaxException;
 import com.wgzhao.addax.common.util.Configuration;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.hadoop.fs.*;
+import org.apache.hadoop.fs.CommonConfigurationKeys;
+import org.apache.hadoop.fs.FileStatus;
+import org.apache.hadoop.fs.FileSystem;
+import org.apache.hadoop.fs.LocatedFileStatus;
+import org.apache.hadoop.fs.Path;
+import org.apache.hadoop.fs.RemoteIterator;
+import org.apache.hadoop.fs.Trash;
 import org.apache.hadoop.io.compress.CompressionCodec;
-import org.apache.hadoop.mapred.*;
+import org.apache.hadoop.mapred.JobConf;
 import org.apache.hadoop.security.UserGroupInformation;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -39,11 +45,13 @@ import java.io.IOException;
 import java.util.Objects;
 import java.util.Set;
 
+import static com.wgzhao.addax.common.base.Key.HAVE_KERBEROS;
+import static com.wgzhao.addax.common.base.Key.KERBEROS_KEYTAB_FILE_PATH;
+import static com.wgzhao.addax.common.base.Key.KERBEROS_PRINCIPAL;
+
 public class HdfsHelper
 {
     private static final Logger LOG = LoggerFactory.getLogger(HdfsHelper.class);
-    private static final String HADOOP_SECURITY_AUTHENTICATION_KEY = "hadoop.security.authentication";
-    private static final String HDFS_DEFAULT_FS_KEY = "fs.defaultFS";
 
     protected FileSystem fileSystem = null;
     protected JobConf conf = null;
@@ -61,14 +69,14 @@ public class HdfsHelper
                 hadoopConf.set(each, hadoopSiteParamsAsJsonObject.getString(each));
             }
         }
-        hadoopConf.set(HDFS_DEFAULT_FS_KEY, defaultFS);
+        hadoopConf.set("fs.defaultFS", defaultFS);
 
         //是否有Kerberos认证
-        boolean haveKerberos = taskConfig.getBool(Key.HAVE_KERBEROS, false);
+        boolean haveKerberos = taskConfig.getBool(HAVE_KERBEROS, false);
         if (haveKerberos) {
-            String kerberosKeytabFilePath = taskConfig.getString(Key.KERBEROS_KEYTAB_FILE_PATH);
-            String kerberosPrincipal = taskConfig.getString(Key.KERBEROS_PRINCIPAL);
-            hadoopConf.set(HADOOP_SECURITY_AUTHENTICATION_KEY, "kerberos");
+            String kerberosKeytabFilePath = taskConfig.getString(KERBEROS_KEYTAB_FILE_PATH);
+            String kerberosPrincipal = taskConfig.getString(KERBEROS_PRINCIPAL);
+            hadoopConf.set("hadoop.security.authentication", "kerberos");
             // fix Failed to specify server's Kerberos principal name
             if (Objects.equals(hadoopConf.get("dfs.namenode.kerberos.principal", ""), "")) {
                 // get REALM
@@ -172,7 +180,7 @@ public class HdfsHelper
             if (skipTrash) {
                 while (files.hasNext()) {
                     final LocatedFileStatus next = files.next();
-                    LOG.info("Delete file [{}]", next.getPath());
+                    LOG.info("Delete the file [{}]", next.getPath());
                     fileSystem.delete(next.getPath(), false);
                 }
             }
@@ -183,7 +191,7 @@ public class HdfsHelper
                 final Trash trash = new Trash(hadoopConf);
                 while (files.hasNext()) {
                     final LocatedFileStatus next = files.next();
-                    LOG.info("Move file [{}] to Trash", next.getPath());
+                    LOG.info("Move the file [{}] to Trash", next.getPath());
                     trash.moveToTrash(next.getPath());
                 }
             }
@@ -223,7 +231,7 @@ public class HdfsHelper
             final FileStatus[] fileStatuses = fileSystem.listStatus(sourceDir);
             for (FileStatus file : fileStatuses) {
                 if (file.isFile() && file.getLen() > 0) {
-                    LOG.info("Begin to move file from [{}] to [{}].", file.getPath(), targetDir.getName());
+                    LOG.info("Begin to move the file [{}] to [{}].", file.getPath(), targetDir);
                     fileSystem.rename(file.getPath(), new Path(targetDir, file.getPath().getName()));
                 }
             }
@@ -231,7 +239,7 @@ public class HdfsHelper
         catch (IOException e) {
             throw AddaxException.asAddaxException(HdfsWriterErrorCode.IO_ERROR, e);
         }
-        LOG.info("Finish move file(s).");
+        LOG.info("Finish moving file(s).");
     }
 
     //关闭FileSystem

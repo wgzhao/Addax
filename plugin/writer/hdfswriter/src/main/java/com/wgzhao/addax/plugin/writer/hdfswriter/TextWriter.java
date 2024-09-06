@@ -104,7 +104,6 @@ public class TextWriter
             Record record, char fieldDelimiter, List<Configuration> columnsConfiguration, TaskPluginCollector taskPluginCollector)
     {
         MutablePair<List<Object>, Boolean> transportResultList = transportOneRecord(record, columnsConfiguration, taskPluginCollector);
-        //保存<转换后的数据,是否是脏数据>
         MutablePair<Text, Boolean> transportResult = new MutablePair<>();
         transportResult.setRight(false);
         Text recordResult = new Text(StringUtils.join(transportResultList.getLeft(), fieldDelimiter));
@@ -130,7 +129,6 @@ public class TextWriter
                     String rowData = column.getRawData().toString();
                     SupportHiveDataType columnType = SupportHiveDataType.valueOf(
                             columnsConfiguration.get(i).getString(Key.TYPE).toUpperCase());
-                    //根据writer端类型配置做类型转换
                     try {
                         switch (columnType) {
                             case TINYINT:

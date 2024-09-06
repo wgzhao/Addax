@@ -55,7 +55,7 @@ public class HdfsWriter
 
         private static final String SKIP_TRASH = "skipTrash";
 
-        // 写入文件的临时目录，完成写入后，该目录需要删除
+        // The temporary directory where the file(s) are written will be deleted after the write operation is complete.
         private String tmpStorePath;
         private Configuration writerSliceConfig = null;
         private String path;
@@ -116,8 +116,8 @@ public class HdfsWriter
                     if (eachColumnConf.getString(Key.TYPE).toUpperCase().startsWith("DECIMAL")) {
                         String type = eachColumnConf.getString(Key.TYPE);
                         eachColumnConf.set(Key.TYPE, "decimal");
-                        eachColumnConf.set(Key.PRECISION, getDecimalPrecision(type));
-                        eachColumnConf.set(Key.SCALE, getDecimalScale(type));
+                        eachColumnConf.set(Key.PRECISION, (Object) getDecimalPrecision(type));
+                        eachColumnConf.set(Key.SCALE, (Object) getDecimalScale(type));
                         columns.set(i, eachColumnConf);
                         rewriteFlag = true;
                     }
@@ -200,28 +200,26 @@ public class HdfsWriter
         @Override
         public void prepare()
         {
-            //临时存放路径
+
             this.tmpStorePath = buildTmpFilePath(path);
 
-            //若路径已经存在，检查path是否是目录
+            // Verify whether the path is a directory if it exists.
             if (hdfsHelper.isPathExists(path)) {
                 if (!hdfsHelper.isPathDir(path)) {
                     throw AddaxException.asAddaxException(HdfsWriterErrorCode.ILLEGAL_VALUE,
                             String.format("The item path you configured [%s] is exists ,but it is not directory", path));
                 }
 
-                //根据writeMode对目录下文件进行处理
-                // 写入之前，当前目录下已有的文件，根据writeMode判断是否覆盖
                 Path[] existFilePaths = hdfsHelper.hdfsDirList(path);
 
                 boolean isExistFile = existFilePaths.length > 0;
                 if ("append".equals(writeMode)) {
-                    LOG.info("The current writeMode is append, so no cleanup is performed before writing. " +
-                            "Files with the prefix [{}] are written under the [{}] directory.", fileName, path);
+                    LOG.info("The current write mode is set to 'append', no cleanup is performed before writing. " +
+                            "Files with the prefix [{}] are written in the [{}] directory.", fileName, path);
                 }
                 else if ("nonConflict".equals(writeMode) && isExistFile) {
                     throw AddaxException.asAddaxException(HdfsWriterErrorCode.ILLEGAL_VALUE,
-                            String.format("The current writeMode is nonConflict, but the directory [%s] is not empty, it includes sub-path(s): [%s]",
+                            String.format("The current writeMode is set to 'nonConflict', but the directory [%s] is not empty, it includes the sub-path(s): [%s]",
                                     path, String.join(",", Arrays.stream(existFilePaths).map(Path::getName).collect(Collectors.toSet()))));
                 }
             }
@@ -267,14 +265,13 @@ public class HdfsWriter
             for (int i = 0; i < mandatoryNumber; i++) {
                 // handle same file name
                 Configuration splitTaskConfig = this.writerSliceConfig.clone();
-                tmpFullFileName = String.format("%s/%s_%s.%s", tmpStorePath, filePrefix, FileHelper.generateFileMiddleName(), fileType);
-                endFullFileName = String.format("%s/%s_%s.%s", path, filePrefix, FileHelper.generateFileMiddleName(), fileType);
 
                 // 如果文件已经存在，则重新生成文件名
-                while (allFiles.contains(endFullFileName)) {
+                do {
                     tmpFullFileName = String.format("%s/%s_%s.%s", tmpStorePath, filePrefix, FileHelper.generateFileMiddleName(), fileType);
                     endFullFileName = String.format("%s/%s_%s.%s", path, filePrefix, FileHelper.generateFileMiddleName(), fileType);
                 }
+                while (allFiles.contains(endFullFileName));
                 allFiles.add(endFullFileName);
 
                 splitTaskConfig.set(Key.FILE_NAME, tmpFullFileName);
@@ -373,7 +370,6 @@ public class HdfsWriter
         {
 
             this.writerSliceConfig = this.getPluginJobConf();
-
         }
 
         @Override
@@ -405,19 +401,6 @@ public class HdfsWriter
             String fileName = this.writerSliceConfig.getString(Key.FILE_NAME);
             LOG.info("Begin to write file : [{}]", fileName);
             hdfsHelper.write(lineReceiver, writerSliceConfig, fileName, getTaskPluginCollector());
-//            if ("TEXT".equals(fileType)) {
-//                //写TEXT FILE
-//                hdfsHelper.textFileStartWrite(lineReceiver, writerSliceConfig, fileName, getTaskPluginCollector());
-//            }
-//            else if ("ORC".equals(fileType)) {
-//                //写ORC FILE
-//                hdfsHelper.writeFS(lineReceiver, writerSliceConfig, fileName, getTaskPluginCollector());
-//            }
-//            else if ("PARQUET".equals(fileType)) {
-//                //写Parquet FILE
-//                hdfsHelper.parquetFileStartWrite(lineReceiver, writerSliceConfig, fileName, getTaskPluginCollector());
-//            }
-
             LOG.info("Finish write");
         }
 

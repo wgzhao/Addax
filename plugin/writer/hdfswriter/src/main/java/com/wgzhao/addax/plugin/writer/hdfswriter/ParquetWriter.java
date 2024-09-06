@@ -76,8 +76,7 @@ public class ParquetWriter extends HdfsHelper implements IHDFSWriter
     }
 
     /*
-     * 写Parquet file类型文件
-     * 一个parquet文件的schema类似如下：
+     * the schema of a parquet file is as follows:
      * {
      *    "type":	"record",
      *    "name":	"testFile",
