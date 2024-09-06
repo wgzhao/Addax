@@ -58,7 +58,6 @@ public class HdfsWriter
         // 写入文件的临时目录，完成写入后，该目录需要删除
         private String tmpStorePath;
         private Configuration writerSliceConfig = null;
-        private String defaultFS;
         private String path;
         private String fileName;
         private String writeMode;
@@ -77,12 +76,12 @@ public class HdfsWriter
 
             hdfsHelper = new HdfsHelper();
 
-            hdfsHelper.getFileSystem(defaultFS, this.writerSliceConfig);
+            hdfsHelper.getFileSystem(this.writerSliceConfig);
         }
 
         private void validateParameter()
         {
-            this.defaultFS = this.writerSliceConfig.getNecessaryValue(Key.DEFAULT_FS, HdfsWriterErrorCode.REQUIRED_VALUE);
+            String defaultFS = this.writerSliceConfig.getNecessaryValue(Key.DEFAULT_FS, HdfsWriterErrorCode.REQUIRED_VALUE);
             //fileType check
             String fileType = this.writerSliceConfig.getNecessaryValue(Key.FILE_TYPE, HdfsWriterErrorCode.REQUIRED_VALUE).toUpperCase();
             if (!SUPPORT_FORMAT.contains(fileType)) {
@@ -369,23 +368,12 @@ public class HdfsWriter
 
         private Configuration writerSliceConfig;
 
-        private String fileType;
-        private String fileName;
-
-        private HdfsHelper hdfsHelper = null;
-
         @Override
         public void init()
         {
+
             this.writerSliceConfig = this.getPluginJobConf();
 
-            String defaultFS = this.writerSliceConfig.getString(Key.DEFAULT_FS);
-            this.fileType = this.writerSliceConfig.getString(Key.FILE_TYPE).toUpperCase();
-
-            hdfsHelper = new HdfsHelper();
-            hdfsHelper.getFileSystem(defaultFS, writerSliceConfig);
-            //得当的已经是绝对路径，eg：/user/hive/warehouse/writer.db/text/test.snappy
-            this.fileName = this.writerSliceConfig.getString(Key.FILE_NAME);
         }
 
         @Override
@@ -397,19 +385,38 @@ public class HdfsWriter
         @Override
         public void startWrite(RecordReceiver lineReceiver)
         {
-            LOG.info("Begin to write file : [{}]", this.fileName);
-            if ("TEXT".equals(fileType)) {
-                //写TEXT FILE
-                hdfsHelper.textFileStartWrite(lineReceiver, writerSliceConfig, fileName, getTaskPluginCollector());
+            String fileType = this.writerSliceConfig.getString(Key.FILE_TYPE).toUpperCase();
+            IHDFSWriter hdfsHelper = null;
+            switch (fileType) {
+                case "TEXT":
+                    hdfsHelper = new TextWriter(this.writerSliceConfig);
+                    break;
+                case "ORC":
+                    hdfsHelper = new OrcWriter(this.writerSliceConfig);
+                    break;
+                case "PARQUET":
+                    hdfsHelper = new ParquetWriter(this.writerSliceConfig);
+                    break;
+                default:
+                    throw AddaxException.asAddaxException(HdfsWriterErrorCode.ILLEGAL_VALUE,
+                            String.format("The file format [%s] is supported yet,  the plugin currently only supports: [%s].", fileType, Job.SUPPORT_FORMAT));
             }
-            else if ("ORC".equals(fileType)) {
-                //写ORC FILE
-                hdfsHelper.orcFileStartWrite(lineReceiver, writerSliceConfig, fileName, getTaskPluginCollector());
-            }
-            else if ("PARQUET".equals(fileType)) {
-                //写Parquet FILE
-                hdfsHelper.parquetFileStartWrite(lineReceiver, writerSliceConfig, fileName, getTaskPluginCollector());
-            }
+            //得当的已经是绝对路径，eg：/user/hive/warehouse/writer.db/text/test.snappy
+            String fileName = this.writerSliceConfig.getString(Key.FILE_NAME);
+            LOG.info("Begin to write file : [{}]", fileName);
+            hdfsHelper.write(lineReceiver, writerSliceConfig, fileName, getTaskPluginCollector());
+//            if ("TEXT".equals(fileType)) {
+//                //写TEXT FILE
+//                hdfsHelper.textFileStartWrite(lineReceiver, writerSliceConfig, fileName, getTaskPluginCollector());
+//            }
+//            else if ("ORC".equals(fileType)) {
+//                //写ORC FILE
+//                hdfsHelper.writeFS(lineReceiver, writerSliceConfig, fileName, getTaskPluginCollector());
+//            }
+//            else if ("PARQUET".equals(fileType)) {
+//                //写Parquet FILE
+//                hdfsHelper.parquetFileStartWrite(lineReceiver, writerSliceConfig, fileName, getTaskPluginCollector());
+//            }
 
             LOG.info("Finish write");
         }
