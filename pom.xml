@@ -44,7 +44,7 @@
         <commons.net.version>3.11.1</commons.net.version>
         <commons.rng.version>1.5</commons.rng.version>
         <diamond.version>3.7.3</diamond.version>
-        <druid.version>1.2.20</druid.version>
+        <druid.version>1.2.23</druid.version>
         <fastjson2.version>2.0.50</fastjson2.version>
         <findbugs.version>3.0.1</findbugs.version>
         <guava.version>31.0-jre</guava.version>
