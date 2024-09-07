@@ -131,7 +131,7 @@ public class ParquetWriter extends HdfsHelper implements IHDFSWriter
             Group group;
             Record record;
             while ((record = lineReceiver.getFromReader()) != null) {
-                group = transportParRecord(record, columns, taskPluginCollector, simpleGroupFactory);
+                group = buildRecord(record, columns, taskPluginCollector, simpleGroupFactory);
                 writer.write(group);
             }
         } catch (IOException e) {
@@ -139,7 +139,7 @@ public class ParquetWriter extends HdfsHelper implements IHDFSWriter
         }
     }
 
-    public Group transportParRecord(
+    public Group buildRecord(
             Record record, List<Configuration> columns,
             TaskPluginCollector taskPluginCollector, SimpleGroupFactory simpleGroupFactory) {
         Column column;
@@ -149,7 +149,6 @@ public class ParquetWriter extends HdfsHelper implements IHDFSWriter
             String colName = columns.get(i).getString(Key.NAME);
             String typename = columns.get(i).getString(Key.TYPE).toUpperCase();
             if (null == column || column.getRawData() == null) {
-                group.append(colName, "");
                 continue;
             }
             SupportHiveDataType columnType = SupportHiveDataType.valueOf(typename);
