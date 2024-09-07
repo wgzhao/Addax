@@ -1,5 +1,13 @@
 #!/bin/bash
 # compile specify module and copy to specify directory
+version=$(head -n10 pom.xml | awk -F'[<>]' '/<version>/ {print $3; exit}')
+function build_base() {
+    cd $SRC_DIR
+    mvn package -B --quiet -pl :addax-core,:addax-rdbms,:addax-storage,:addax-transformer -am -Dmaven.test.skip=true || exit 1
+    cp -a core/target/addax/* ${ADDAX_HOME}
+    rsync -azv lib/addax-{rdbms,storage,transformer}/target/addax/lib/* ${ADDAX_HOME}/lib/
+}
+
 if [ -z "$SRC_DIR" ]; then
   SRC_DIR=$HOME/code/personal/Addax
 fi
@@ -13,7 +21,12 @@ if [ -z $1 ]; then
     exit 1
 fi
 
+[ -d $ADDAX_HOME ] || mkdir -p $ADDAX_HOME || exit 1
+
+[ -d $ADDAX_HOME/bin ] || build_base
+
 MODULE_NAME=$1
+
 cd $SRC_DIR
 mvn package -B --quiet -pl :$MODULE_NAME -am -Dmaven.test.skip=true || exit 1
 # if the module nam ends with reader, then the module base directory is plugin/reader,
@@ -23,7 +36,10 @@ if [[ $MODULE_NAME =~ .*"reader" ]]; then
 elif [[ $MODULE_NAME =~ .*"writer" ]]; then
     MODULE_DIR=plugin/writer
 else
-    MODULE_DIR=""
+    echo "module name must end with reader or writer"
+    exit 1
 fi
-cp -a $MODULE_DIR/$MODULE_NAME/target/$MODULE_NAME-*/$MODULE_DIR/${MODULE_NAME} \
+[ -d $ADDAX_HOME/$MODULE_DIR ] || mkdir -p $ADDAX_HOME/$MODULE_DIR || exit 1
+
+cp -a $MODULE_DIR/$MODULE_NAME/target/${MODULE_NAME}-${version}/$MODULE_DIR/${MODULE_NAME} \
        	$ADDAX_HOME/$MODULE_DIR
