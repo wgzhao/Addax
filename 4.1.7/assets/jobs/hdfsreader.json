@@ -1,0 +1,46 @@
+{
+  "job": {
+    "setting": {
+      "speed": {
+        "channel": 3,
+        "bytes": -1
+      }
+    },
+    "content": {
+      "reader": {
+        "name": "hdfsreader",
+        "parameter": {
+          "path": "/user/hive/warehouse/mytable01/*",
+          "defaultFS": "hdfs://xxx:port",
+          "column": [
+            {
+              "index": 0,
+              "type": "long"
+            },
+            {
+              "index": 1,
+              "type": "boolean"
+            },
+            {
+              "type": "string",
+              "value": "hello"
+            },
+            {
+              "index": 2,
+              "type": "double"
+            }
+          ],
+          "fileType": "orc",
+          "encoding": "UTF-8",
+          "fieldDelimiter": ","
+        }
+      },
+      "writer": {
+        "name": "streamwriter",
+        "parameter": {
+          "print": true
+        }
+      }
+    }
+  }
+}
