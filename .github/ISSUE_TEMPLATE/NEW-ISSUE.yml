@@ -24,7 +24,8 @@ body:
       label: Version
       description: What version of our software are you running? （当前您使用的版本，这对于定位问题很重要，请选择正确的版本）
       options:
-        - 4.1.6 (Default)
+        - 4.1.7 (Default)
+        - 4.1.6
         - 4.1.5
         - 4.1.4
         - 4.1.3 
