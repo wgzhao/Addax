@@ -2,6 +2,14 @@
 
 ## 安装 Addax
 
+### 使用 Docker 镜像
+
+可以直接使用 Docker 镜像，只需要执行下面的命令即可
+
+```shell
+docker run -it --rm quay.io/wgzhao/addax:latest /opt/addax/bin/addax.sh /opt/addax/job/job.json
+```
+
 ### 一键安装
 
 如果你不想编译，你可以执行下面的命令，一键安装（当前仅支持 Linux 和 macOS ）

@@ -14,35 +14,35 @@
 
 English | [简体中文](README_zh.md)
 
-The project's initial code originated from  Ali's [DataX](https://github.com/alibaba/datax), and has been greatly improved on this basis. 
+The project's initial code originated from  Ali's [DataX](https://github.com/alibaba/datax), and has been greatly improved on this basis.
 It also provides more read and write plugins. For more details, please refer to the [difference document](difference.md).
 
 ## Supported Data Sources
 
 Addax supports more than 20 SQL and NoSQL [data sources](support_data_sources.md). It can also be extended to support more.
 
-<table> 
+<table>
 <tr>
 <td><img src="./docs/images/logos/cassandra.svg" height="50px" alt="Cassandra" style="border: 1px solid #ddd;"></td>
-<td><img src="./docs/images/logos/clickhouse.svg" height="50px" alt="Clickhouse" style="border: 1px solid #ddd;"></td>   
+<td><img src="./docs/images/logos/clickhouse.svg" height="50px" alt="Clickhouse" style="border: 1px solid #ddd;"></td>
 <td><img src="./docs/images/logos/db2.svg" height="50px" alt="IMB DB2" style="border: 1px solid #ddd;"></td>
 <td><img src="./docs/images/logos/dbase.svg" height="50px" alt="dBase" style="border: 1px solid #ddd;"></td>
 </tr>
 <tr>
 <td><img src="./docs/images/logos/doris.svg"  height="50px" alt="Doris" style="border: 1px solid #ddd;"></td>
-<td><img src="./docs/images/logos/elasticsearch.svg" height="50px" alt="Elasticsearch" style="border: 1px solid #ddd;"></td> 
-<td><img src="./docs/images/logos/excel.svg" height="50px" alt="Excel" style="border: 1px solid #ddd;"></td> 
+<td><img src="./docs/images/logos/elasticsearch.svg" height="50px" alt="Elasticsearch" style="border: 1px solid #ddd;"></td>
+<td><img src="./docs/images/logos/excel.svg" height="50px" alt="Excel" style="border: 1px solid #ddd;"></td>
 <td><img src="./docs/images/logos/greenplum.svg" height="50px" alt="Greenplum" style="border: 1px solid #ddd;"></td>
 </tr>
 <tr>
-<td><img src="./docs/images/logos/hbase.svg" height="50px" alt="Apache HBase" style="border: 1px solid #ddd;"></td> 
+<td><img src="./docs/images/logos/hbase.svg" height="50px" alt="Apache HBase" style="border: 1px solid #ddd;"></td>
 <td><img src="./docs/images/logos/hive.svg" height="50px" alt="Hive" style="border: 1px solid #ddd;"></td>
 <td><img src="./docs/images/logos/influxdata.svg" height="50px" alt="InfluxDB" style="border: 1px solid #ddd;"></td>
-<td><img src="./docs/images/logos/kafka.svg" height="50px" alt="Kafka" style="border: 1px solid #ddd;"></td>  
+<td><img src="./docs/images/logos/kafka.svg" height="50px" alt="Kafka" style="border: 1px solid #ddd;"></td>
 </tr>
-<tr> 
+<tr>
 <td><img src="./docs/images/logos/kudu.svg" height="50px" alt="Kudu" style="border: 1px solid #ddd;"></td>
-<td><img src="./docs/images/logos/minio.svg" height="50px" alt="MinIO" style="border: 1px solid #ddd;"></td>    
+<td><img src="./docs/images/logos/minio.svg" height="50px" alt="MinIO" style="border: 1px solid #ddd;"></td>
 <td><img src="./docs/images/logos/mongodb.svg" height="50px" alt="MongoDB" style="border: 1px solid #ddd;"></td>
 <td><img src="./docs/images/logos/mysql.svg" height="50px" alt="MySQL" style="border: 1px solid #ddd;"></td>
 </tr>
@@ -50,19 +50,19 @@ Addax supports more than 20 SQL and NoSQL [data sources](support_data_sources.md
 <td><img src="./docs/images/logos/oracle.svg" height="50px" alt="Oracle" style="border: 1px solid #ddd;"></td>
 <td><img src="./docs/images/logos/phoenix.svg" height="50px" alt="Phoenix" style="border: 1px solid #ddd;"></td>
 <td><img src="./docs/images/logos/postgresql.svg" height="50px" alt="PostgreSQL" style="border: 1px solid #ddd;"></td>
-<td><img src="./docs/images/logos/presto.svg" height="50px" alt="Presto" style="border: 1px solid #ddd;"></td> 
-</tr>
-<tr>  
-<td><img src="./docs/images/logos/redis.svg" height="50px" alt="Redis" style="border: 1px solid #ddd;"></td>
-<td><img src="./docs/images/logos/s3.svg" height="50px" alt="Amazon S3" style="border: 1px solid #ddd;"></td> 
-<td><img src="./docs/images/logos/sqlite.svg" height="50px" alt="SQLite" style="border: 1px solid #ddd;"></td>   
-<td><img src="./docs/images/logos/sqlserver.svg" height="50px" alt="SQLServer" style="border: 1px solid #ddd;"></td> 
+<td><img src="./docs/images/logos/presto.svg" height="50px" alt="Presto" style="border: 1px solid #ddd;"></td>
 </tr>
 <tr>
-<td><img src="./docs/images/logos/starrocks.svg" height="50px" alt="Starrocks" style="border: 1px solid #ddd;"></td>   
-<td><img src="./docs/images/logos/sybase.svg" height="50px" alt="Sybase" style="border: 1px solid #ddd;"></td>  
-<td><img src="./docs/images/logos/tdengine.svg" height="50px" alt="TDengine"  style="border: 1px solid #ddd;"></td>   
-<td><img src="./docs/images/logos/trino.svg" height="50px" alt="Trino" style="border: 1px solid #ddd;"></td>  
+<td><img src="./docs/images/logos/redis.svg" height="50px" alt="Redis" style="border: 1px solid #ddd;"></td>
+<td><img src="./docs/images/logos/s3.svg" height="50px" alt="Amazon S3" style="border: 1px solid #ddd;"></td>
+<td><img src="./docs/images/logos/sqlite.svg" height="50px" alt="SQLite" style="border: 1px solid #ddd;"></td>
+<td><img src="./docs/images/logos/sqlserver.svg" height="50px" alt="SQLServer" style="border: 1px solid #ddd;"></td>
+</tr>
+<tr>
+<td><img src="./docs/images/logos/starrocks.svg" height="50px" alt="Starrocks" style="border: 1px solid #ddd;"></td>
+<td><img src="./docs/images/logos/sybase.svg" height="50px" alt="Sybase" style="border: 1px solid #ddd;"></td>
+<td><img src="./docs/images/logos/tdengine.svg" height="50px" alt="TDengine"  style="border: 1px solid #ddd;"></td>
+<td><img src="./docs/images/logos/trino.svg" height="50px" alt="Trino" style="border: 1px solid #ddd;"></td>
 </tr>
 <tr>
 <td><img src="./docs/images/logos/access.svg" height="50px" alt="Access" style="border: 1px solid #add;"></td>
@@ -75,14 +75,14 @@ Addax supports more than 20 SQL and NoSQL [data sources](support_data_sources.md
 ### Use docker image
 
 ```shell
-docker pull wgzhao/addax:latest
-docker run -ti --rm --name addax wgzhao/addax:latest /opt/addax/bin/addax.sh /opt/addax/job/job.json
+docker pull quay.io/wgzhao/addax:latest
+docker run -ti --rm --name addax quay.io/wgzhao/addax:latest /opt/addax/bin/addax.sh /opt/addax/job/job.json
 ```
 If you want to use common reader and writer plugins, you can pull the image whose name ends with `-lite`, it's very small.
 
 ```shell
-docker pull wgzhao/addax:latest-lite
-docker run -ti --rm --name addax wgzhao/addax:latest-lite /opt/addax/bin/addax.sh /opt/addax/job/job.json
+docker pull quay.io/wgzhao/addax:latest-lite
+docker run -ti --rm --name addax quay.io/wgzhao/addax:latest-lite /opt/addax/bin/addax.sh /opt/addax/job/job.json
 ```
 
 ### Use install script
