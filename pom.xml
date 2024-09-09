@@ -83,7 +83,7 @@
         <poi.version>5.3.0</poi.version>
         <protobuf.version>3.25.1</protobuf.version>
         <redis.replicator.version>3.8.1</redis.replicator.version>
-        <slf4j.version>2.0.9</slf4j.version>
+        <slf4j.version>2.0.16</slf4j.version>
         <snappy.version>1.1.10.5</snappy.version>
         <swift.version>1.0.0</swift.version>
         <woodstox.version>7.0.0</woodstox.version>
