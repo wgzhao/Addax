@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/sh
 # Addax command line script
 # Author wgzhao<wgzhao@gmail.com>
 # Created at 2021-07-22
@@ -10,6 +10,8 @@ SCRIPT_PATH="$(
 )"
 
 ADDAX_HOME=$(dirname $SCRIPT_PATH)
+
+DEBUG_PORT=9999
 if [ -z "${ADDAX_HOME}" ]; then
     exit 2
 fi
@@ -20,7 +22,7 @@ DEFAULT_JVM="-Xms64m -Xmx2g -XX:+HeapDumpOnOutOfMemoryError -XX:+ExitOnOutOfMemo
 DEFAULT_PROPERTY_CONF="-Dfile.encoding=UTF-8 -Djava.security.egd=file:///dev/urandom -Daddax.home=${ADDAX_HOME} \
                         -Dlogback.configurationFile=${LOGBACK_FILE} "
 ENGINE_COMMAND="java -server ${DEFAULT_JVM} ${DEFAULT_PROPERTY_CONF} -classpath ${CLASS_PATH}  "
-REMOTE_DEBUG_CONFIG="-Xdebug -Xrunjdwp:transport=dt_socket,server=y,address=0.0.0.0:9999"
+REMOTE_DEBUG_CONFIG="-Xdebug -Xrunjdwp:transport=dt_socket,server=y,address=0.0.0.0:${DEBUG_PORT}"
 
 # ------------------------- global variables ---------------------------
 
@@ -32,7 +34,7 @@ JOB_FILE=
 LOG_FILE=
 
 # ---------------------------- base function --------------------------
-function usage {
+usage() {
     cat <<-EOF
     Usage: $(basename $0) [options] job-url-or-path
 
@@ -61,7 +63,7 @@ EOF
     exit 1
 }
 
-function print_version {
+print_version() {
     echo -n -e "Addax version "
     core_jar=$(ls -w1 ${ADDAX_HOME}/lib/addax-core-*.jar)
     if [ -z "$core_jar" ]; then
@@ -72,14 +74,21 @@ function print_version {
     exit 0
 }
 
-function parse_job_file {
+parse_job_file() {
     # check the job file is local file or url ?
-    if [[ "${JOB_FILE}" == "http*" ]]; then
+    case "$JOB_FILE" in
+        http*)
         # download it first
         TMPDIR=$(mktemp -d /tmp/addax.XXXXXX)
-        (cd $TMPDIR && curl -sS ${JOB_FILE})
+        JOB_NAME=$(basename ${JOB_FILE})
+        curl -sS -f -o $TMPDIR/$JOB_NAME ${JOB_FILE} 2>/dev/null
+        if [ $? -ne 0 ]; then
+            echo "Download job file, failed check the url: ${JOB_FILE}"
+            exit 1
+        fi
         JOB_FILE=$(ls -w1 ${TMPDIR}/*)
-    fi
+        ;;
+    esac
 
     if [ ! -f ${JOB_FILE} ]; then
         echo "The job file '${JOB_FILE}' does not exists"
@@ -93,7 +102,7 @@ function parse_job_file {
     # end check job file
 }
 
-function gen_log_file {
+gen_log_file() {
     # ---------------- combine log file name
     job_name=$(basename $JOB_FILE)
     job_escaped_name=$(echo ${job_name%\.*} | tr '.' '_')
@@ -105,7 +114,7 @@ function gen_log_file {
 
 # ---------------------------- generate job template file ---------------
 
-function sub_main() {
+sub_main() {
     shift
     if [ $# -lt 1 ]; then
         sub_help
@@ -127,7 +136,7 @@ function sub_main() {
     fi
 }
 
-function sub_help() {
+sub_help() {
     echo "Usage: $0 gen [options]"
     echo "Options:"
     echo -e "\t -r specify reader plugin name"
@@ -137,7 +146,7 @@ function sub_help() {
     exit 0
 }
 
-function list_all_plugin_names() {
+list_all_plugin_names() {
     echo  "Reader Plugins:"
     for i in plugin/reader/*
     do
@@ -172,18 +181,18 @@ if [ "$1" = "gen" ]; then
         exit 0
     fi
 
-    if [ "x${READER}" == "x" -o "x${WRITER}" == "x" ]; then
+    if [ "x${READER}" = "x" -o "x${WRITER}" = "x" ]; then
         echo "-r/-w required a argument"
         exit 2
     fi
     # specified reader plugin is exists or not ?
     if [ ! -f plugin/reader/${READER}/plugin_job_template.json ]; then
-        echo "Reader plugin ${READER} DOES NOT exists. "
+        echo "Reader plugin ${READER} DOES NOT exists or has not installed yet "
         exit 3
     fi
     reader_content=$(cat plugin/reader/${READER}/plugin_job_template.json)
     if [ ! -f plugin/writer/${WRITER}/plugin_job_template.json ]; then
-        echo  "Reader plugin ${WRITER} DOES NOT exists. "
+        echo  "Reader plugin ${WRITER} DOES NOT exists or has not installed yet"
         exit 3
     fi
     writer_content=$(cat plugin/writer/${WRITER}/plugin_job_template.json)
@@ -295,4 +304,4 @@ fi
 cmd="${cmd} com.wgzhao.addax.core.Engine -job ${JOB_FILE} "
 
 # run it
-bash -c "${cmd}"
+sh -c "${cmd}"
