@@ -85,6 +85,8 @@ docker pull quay.io/wgzhao/addax:latest-lite
 docker run -ti --rm --name addax quay.io/wgzhao/addax:latest-lite /opt/addax/bin/addax.sh /opt/addax/job/job.json
 ```
 
+[here][lite-vs-default.md] is the difference between the default image and the lite image.
+
 ### Use install script
 
 ```shell

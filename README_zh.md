@@ -82,6 +82,8 @@ docker pull quay.io/wgzhao/addax:latest-lite
 docker run -ti --rm --name addax quay.io/wgzhao/addax:latest-lite /opt/addax/bin/addax.sh /opt/addax/job/job.json
 ```
 
+[这里][lite-vs-default.md] 列出了 `lite` 和 `default` 镜像所包含的插件的区别。
+
 ### 使用一键安装脚本
 
 ```shell
