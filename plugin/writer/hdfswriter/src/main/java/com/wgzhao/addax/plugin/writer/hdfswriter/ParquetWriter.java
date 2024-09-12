@@ -275,6 +275,9 @@ public class ParquetWriter extends HdfsHelper implements IHDFSWriter
                 case "INT":
                     t = Types.primitive(PrimitiveType.PrimitiveTypeName.INT32, repetition).named(fieldName);
                     break;
+                case "LONG":
+                    t = Types.primitive(PrimitiveType.PrimitiveTypeName.INT64, repetition).named(fieldName);
+                    break;
                 case "DECIMAL":
                     // use fixed 16 bytes array
                     int prec = column.getInt(Key.PRECISION, Constant.DEFAULT_DECIMAL_MAX_PRECISION);
