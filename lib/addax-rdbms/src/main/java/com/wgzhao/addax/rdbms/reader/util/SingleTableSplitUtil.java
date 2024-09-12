@@ -197,7 +197,6 @@ public class SingleTableSplitUtil
     private static Pair<Object, Object> checkSplitPk(Connection conn, String pkRangeSQL, int fetchSize, String table,
             String username, Configuration configuration)
     {
-        LOG.info("split pk [sql={}] is running... ", pkRangeSQL);
         ResultSet rs = null;
         Pair<Object, Object> minMaxPK = null;
         try {
@@ -424,7 +423,7 @@ public class SingleTableSplitUtil
             rangeList.add(String.format("%s >= '%s' AND %s <= '%s'", pkName, minVal, pkName, maxVal));
             return rangeList;
         }
-        if (where == null) {
+        if (StringUtils.isBlank(where)) {
             where = "1=1";
         }
         if (dataBaseType == DataBaseType.MySql) {
@@ -456,8 +455,8 @@ public class SingleTableSplitUtil
             rangeList.add(String.format("%1$s >='%2$s' AND %1$s <='%3$s' ", pkName, preVal, maxVal));
             return rangeList;
         }
-        catch (SQLException throwables) {
-            throwables.printStackTrace();
+        catch (SQLException e) {
+            LOG.error("Failed to split the table by split key[{}]", splitSql, e);
             return rangeList;
         }
     }
