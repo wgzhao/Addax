@@ -50,6 +50,7 @@ import org.slf4j.LoggerFactory;
 import java.io.IOException;
 import java.math.BigDecimal;
 import java.math.BigInteger;
+import java.math.RoundingMode;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.text.ParseException;
@@ -65,7 +66,9 @@ import java.util.concurrent.TimeUnit;
 
 import static org.apache.parquet.schema.LogicalTypeAnnotation.decimalType;
 
-public class ParquetWriter extends HdfsHelper implements IHDFSWriter
+public class ParquetWriter
+        extends HdfsHelper
+        implements IHDFSWriter
 {
     private static final Logger logger = LoggerFactory.getLogger(ParquetWriter.class.getName());
 
@@ -134,14 +137,16 @@ public class ParquetWriter extends HdfsHelper implements IHDFSWriter
                 group = buildRecord(record, columns, taskPluginCollector, simpleGroupFactory);
                 writer.write(group);
             }
-        } catch (IOException e) {
+        }
+        catch (IOException e) {
             throw new RuntimeException(e);
         }
     }
 
     public Group buildRecord(
             Record record, List<Configuration> columns,
-            TaskPluginCollector taskPluginCollector, SimpleGroupFactory simpleGroupFactory) {
+            TaskPluginCollector taskPluginCollector, SimpleGroupFactory simpleGroupFactory)
+    {
         Column column;
         Group group = simpleGroupFactory.newGroup();
         for (int i = 0; i < record.getColumnNumber(); i++) {
@@ -173,13 +178,15 @@ public class ParquetWriter extends HdfsHelper implements IHDFSWriter
                     group.append(colName, column.asBoolean());
                     break;
                 case DECIMAL:
-                    group.append(colName, decimalToBinary(column.asString()));
+                    int scale = columns.get(i).getInt(Key.SCALE, Constant.DEFAULT_DECIMAL_MAX_SCALE);
+                    group.append(colName, decimalToBinary(column.asString(), scale));
                     break;
                 case TIMESTAMP:
                     SimpleDateFormat sdf = new SimpleDateFormat(Constant.DEFAULT_DATE_FORMAT);
                     try {
                         group.append(colName, tsToBinary(sdf.format(column.asDate())));
-                    } catch (ParseException e) {
+                    }
+                    catch (ParseException e) {
                         // dirty data
                         taskPluginCollector.collectDirtyRecord(record, e);
                     }
@@ -188,11 +195,10 @@ public class ParquetWriter extends HdfsHelper implements IHDFSWriter
                     group.append(colName, (int) Math.round(column.asLong() * 1.0 / 86400000));
                     break;
                 default:
-                    logger.warn("convert type[{}] into string", column.getType());
+                    logger.debug("convert type[{}] into string", column.getType());
                     group.append(colName, column.asString());
                     break;
             }
-
         }
         return group;
     }
@@ -204,7 +210,9 @@ public class ParquetWriter extends HdfsHelper implements IHDFSWriter
      * @return {@link Binary}
      * @throws ParseException when the value is invalid
      */
-    private Binary tsToBinary(String value) throws ParseException {
+    private Binary tsToBinary(String value)
+            throws ParseException
+    {
 
         final long NANOS_PER_HOUR = TimeUnit.HOURS.toNanos(1);
         final long NANOS_PER_MINUTE = TimeUnit.MINUTES.toNanos(1);
@@ -237,14 +245,14 @@ public class ParquetWriter extends HdfsHelper implements IHDFSWriter
      * @param bigDecimal the decimal value string want to convert
      * @return {@link Binary}
      */
-    private Binary decimalToBinary(String bigDecimal) {
-        BigDecimal myDecimalValue = new BigDecimal(bigDecimal);
-
-        //Next we get the decimal value as one BigInteger (like there was no decimal point)
-        BigInteger myUnscaledDecimalValue = myDecimalValue.unscaledValue();
-
-        //Finally we serialize the integer
-        byte[] decimalBytes = myUnscaledDecimalValue.toByteArray();
+    private Binary decimalToBinary(String bigDecimal, int scale)
+    {
+        int realScale = new BigDecimal(bigDecimal).scale();
+        RoundingMode mode = scale >= realScale ? RoundingMode.UNNECESSARY : RoundingMode.HALF_UP;
+        byte[] decimalBytes = new BigDecimal(bigDecimal)
+                .setScale(scale, mode)
+                .unscaledValue()
+                .toByteArray();
 
         byte[] myDecimalBuffer = new byte[16];
         if (myDecimalBuffer.length >= decimalBytes.length) {
@@ -256,13 +264,15 @@ public class ParquetWriter extends HdfsHelper implements IHDFSWriter
                 myDecimalBufferIndex--;
             }
             return Binary.fromConstantByteArray(myDecimalBuffer);
-        } else {
+        }
+        else {
             throw new IllegalArgumentException(String.format("Decimal size: %d was greater than the allowed max: %d",
                     decimalBytes.length, myDecimalBuffer.length));
         }
     }
 
-    private MessageType generateParquetSchema(List<Configuration> columns) {
+    private MessageType generateParquetSchema(List<Configuration> columns)
+    {
         String type;
         String fieldName;
         Type t;
