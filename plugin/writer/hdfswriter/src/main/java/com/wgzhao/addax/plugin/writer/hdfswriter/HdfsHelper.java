@@ -285,4 +285,16 @@ public class HdfsHelper
         }
         return codecClass;
     }
+
+    public boolean isPathWritable(String path) {
+        try {
+            Path p = new Path(path);
+            Path tempFile = new Path(p, "._write_test_" + System.currentTimeMillis());
+            fileSystem.create(tempFile, true).close();
+            fileSystem.delete(tempFile, false);
+            return true;
+        } catch (IOException | IllegalArgumentException e) {
+            return false;
+        }
+    }
 }

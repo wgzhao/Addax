@@ -227,6 +227,12 @@ public class HdfsWriter
                 throw AddaxException.asAddaxException(HdfsWriterErrorCode.ILLEGAL_VALUE,
                         String.format("The directory [%s]  does not exists. please create it first. ", path));
             }
+
+            // validate the write permission
+            if (!hdfsHelper.isPathWritable(path)) {
+                throw AddaxException.asAddaxException(HdfsWriterErrorCode.ILLEGAL_VALUE,
+                        String.format("The path [%s] is not writable or permission denied", path));
+            }
         }
 
         @Override
