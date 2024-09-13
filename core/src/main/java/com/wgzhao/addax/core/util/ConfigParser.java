@@ -37,6 +37,7 @@ import org.apache.http.client.methods.HttpGet;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import static com.wgzhao.addax.core.util.container.CoreConstant.JOB_CONTENT_READER_PARAMETER_CONNECTION;
 
 public final class ConfigParser
 {
@@ -100,14 +101,23 @@ public final class ConfigParser
      */
     private static Configuration upgradeJobConfig(Configuration configuration)
     {
-        String content = configuration.getString("job.content");
-        if (content.startsWith("[")) {
+        if (configuration.getString(CoreConstant.JOB_CONTENT).startsWith("[")) {
             // get the first element
             List<Map> contentList = configuration.getList(CoreConstant.JOB_CONTENT, Map.class);
-            if (contentList!= null && contentList.size() > 0) {
+            if (contentList!= null && !contentList.isEmpty()) {
                 configuration.set("job.content", contentList.get(0));
                 return configuration;
             }
+        }
+        Map reader = configuration.getMap(CoreConstant.JOB_CONTENT_READER_PARAMETER);
+        if (reader != null) {
+            if (reader.containsKey("connection") && configuration.getString(JOB_CONTENT_READER_PARAMETER_CONNECTION).startsWith("[")){
+                List<Map> connectionList = configuration.getList(JOB_CONTENT_READER_PARAMETER_CONNECTION, Map.class);
+                if (connectionList != null && !connectionList.isEmpty()) {
+                    reader.put("connection", connectionList.get(0));
+                }
+            }
+            configuration.set(CoreConstant.JOB_CONTENT_READER_PARAMETER, reader);
         }
         return configuration;
     }

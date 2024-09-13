@@ -82,6 +82,8 @@ public class CoreConstant
 
     public static final String JOB_CONTENT_READER_PARAMETER = "job.content.reader.parameter";
 
+    public static final String JOB_CONTENT_READER_PARAMETER_CONNECTION = "job.content.reader.parameter.connection";
+
     public static final String JOB_CONTENT_WRITER_NAME = "job.content.writer.name";
 
     public static final String JOB_CONTENT_WRITER = "job.content.writer";

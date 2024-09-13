@@ -106,54 +106,51 @@ public final class OriginalConfPretreatmentUtil
         boolean isTableMode = originalConfig.getBool(Key.IS_TABLE_MODE);
         boolean isPreCheck = originalConfig.getBool(Key.DRY_RUN, false);
 
-        List<Object> conns = originalConfig.getList(Key.CONNECTION, Object.class);
+        Configuration connConf = originalConfig.getConfiguration(Key.CONNECTION);
         List<String> preSql = originalConfig.getList(Key.PRE_SQL, String.class);
 
         int tableNum = 0;
 
-        for (int i = 0, len = conns.size(); i < len; i++) {
-            Configuration connConf = Configuration.from(conns.get(i).toString());
-            // 是否配置的定制的驱动名称
-            String driverClass = connConf.getString(Key.JDBC_DRIVER, null);
-            if (driverClass != null && !driverClass.isEmpty()) {
-                LOG.warn("use specified driver class: {}", driverClass);
-                dataBaseType.setDriverClassName(driverClass);
+        // 是否配置的定制的驱动名称
+        String driverClass = connConf.getString(Key.JDBC_DRIVER, null);
+        if (driverClass != null && !driverClass.isEmpty()) {
+            LOG.warn("use specified driver class: {}", driverClass);
+            dataBaseType.setDriverClassName(driverClass);
+        }
+        connConf.getNecessaryValue(Key.JDBC_URL, DBUtilErrorCode.REQUIRED_VALUE);
+
+        List<String> jdbcUrls = connConf.getList(Key.JDBC_URL, String.class);
+
+        String jdbcUrl;
+        if (isPreCheck) {
+            jdbcUrl = DBUtil.chooseJdbcUrlWithoutRetry(dataBaseType, jdbcUrls, username, password, preSql);
+        }
+        else {
+            jdbcUrl = DBUtil.chooseJdbcUrl(dataBaseType, jdbcUrls, username, password, preSql);
+        }
+
+        jdbcUrl = dataBaseType.appendJDBCSuffixForReader(jdbcUrl);
+
+        // 回写到connection.jdbcUrl
+        originalConfig.set(String.format("%s.%s", Key.CONNECTION, Key.JDBC_URL), jdbcUrl);
+
+        LOG.info("Available jdbcUrl [{}].", jdbcUrl);
+
+        if (isTableMode) {
+            // table 方式
+            // 对每一个connection 上配置的table 项进行解析(已对表名称进行了 ` 处理的)
+            List<String> tables = connConf.getList(Key.TABLE, String.class);
+
+            List<String> expandedTables = TableExpandUtil.expandTableConf(dataBaseType, tables);
+
+            if (expandedTables.isEmpty()) {
+                throw AddaxException.asAddaxException(
+                        DBUtilErrorCode.ILLEGAL_VALUE, String.format("Failed to obtain the table [%s].", StringUtils.join(tables, ",")));
             }
-            connConf.getNecessaryValue(Key.JDBC_URL, DBUtilErrorCode.REQUIRED_VALUE);
 
-            List<String> jdbcUrls = connConf.getList(Key.JDBC_URL, String.class);
+            tableNum += expandedTables.size();
 
-            String jdbcUrl;
-            if (isPreCheck) {
-                jdbcUrl = DBUtil.chooseJdbcUrlWithoutRetry(dataBaseType, jdbcUrls, username, password, preSql);
-            }
-            else {
-                jdbcUrl = DBUtil.chooseJdbcUrl(dataBaseType, jdbcUrls, username, password, preSql);
-            }
-
-            jdbcUrl = dataBaseType.appendJDBCSuffixForReader(jdbcUrl);
-
-            // 回写到connection[i].jdbcUrl
-            originalConfig.set(String.format("%s[%d].%s", Key.CONNECTION, i, Key.JDBC_URL), jdbcUrl);
-
-            LOG.info("Available jdbcUrl [{}].", jdbcUrl);
-
-            if (isTableMode) {
-                // table 方式
-                // 对每一个connection 上配置的table 项进行解析(已对表名称进行了 ` 处理的)
-                List<String> tables = connConf.getList(Key.TABLE, String.class);
-
-                List<String> expandedTables = TableExpandUtil.expandTableConf(dataBaseType, tables);
-
-                if (expandedTables.isEmpty()) {
-                    throw AddaxException.asAddaxException(
-                            DBUtilErrorCode.ILLEGAL_VALUE, String.format("Failed to obtain the table [%s].", StringUtils.join(tables, ",")));
-                }
-
-                tableNum += expandedTables.size();
-
-                originalConfig.set(String.format("%s[%d].%s", Key.CONNECTION, i, Key.TABLE), expandedTables);
-            }
+            originalConfig.set(String.format("%s.%s", Key.CONNECTION, Key.TABLE), expandedTables);
         }
 
         originalConfig.set(Constant.TABLE_NUMBER_MARK, tableNum);
@@ -237,48 +234,34 @@ public final class OriginalConfPretreatmentUtil
         }
     }
 
-    private static boolean recognizeTableOrQuerySqlMode(
-            Configuration originalConfig)
+    private static boolean recognizeTableOrQuerySqlMode(Configuration originalConfig)
     {
-        List<Object> conns = originalConfig.getList(Key.CONNECTION, Object.class);
-
-        List<Boolean> tableModeFlags = new ArrayList<>();
-        List<Boolean> querySqlModeFlags = new ArrayList<>();
+        Configuration connConf = originalConfig.getConfiguration(Key.CONNECTION);
 
         String table;
         String querySql;
 
         boolean isTableMode;
         boolean isQuerySqlMode;
-        for (Object conn : conns) {
-            Configuration connConf = Configuration.from(conn.toString());
-            table = connConf.getString(Key.TABLE, null);
-            querySql = connConf.getString(Key.QUERY_SQL, null);
 
-            isTableMode = StringUtils.isNotBlank(table);
-            tableModeFlags.add(isTableMode);
+        table = connConf.getString(Key.TABLE, null);
+        querySql = connConf.getString(Key.QUERY_SQL, null);
 
-            isQuerySqlMode = StringUtils.isNotBlank(querySql);
-            querySqlModeFlags.add(isQuerySqlMode);
+        isTableMode = StringUtils.isNotBlank(table);
 
-            if (!isTableMode && !isQuerySqlMode) {
-                // table 和 querySql 二者均未配置
-                throw AddaxException.asAddaxException(
-                        DBUtilErrorCode.TABLE_QUERY_SQL_MISSING, "You must configure either table or querySql.");
-            }
-            else if (isTableMode && isQuerySqlMode) {
-                // table 和 querySql 二者均配置
-                throw AddaxException.asAddaxException(DBUtilErrorCode.TABLE_QUERY_SQL_MIXED,
-                        "You ca not configure both table and querySql at the same time.");
-            }
+        isQuerySqlMode = StringUtils.isNotBlank(querySql);
+
+        if (!isTableMode && !isQuerySqlMode) {
+            // table 和 querySql 二者均未配置
+            throw AddaxException.asAddaxException(
+                    DBUtilErrorCode.TABLE_QUERY_SQL_MISSING, "You must configure either table or querySql.");
         }
-
-        // 混合配制 table 和 querySql
-        if (!ListUtil.checkIfValueSame(tableModeFlags) || !ListUtil.checkIfValueSame(querySqlModeFlags)) {
+        else if (isTableMode && isQuerySqlMode) {
+            // table 和 querySql 二者均配置
             throw AddaxException.asAddaxException(DBUtilErrorCode.TABLE_QUERY_SQL_MIXED,
                     "You ca not configure both table and querySql at the same time.");
         }
 
-        return tableModeFlags.get(0);
+        return isTableMode;
     }
 }
