@@ -109,13 +109,16 @@ public final class ConfigParser
                 return configuration;
             }
         }
-        Map reader = configuration.getMap(CoreConstant.JOB_CONTENT_READER_PARAMETER);
+        Configuration reader = configuration.getConfiguration(CoreConstant.JOB_CONTENT_READER_PARAMETER);
         if (reader != null) {
-            if (reader.containsKey("connection") && configuration.getString(JOB_CONTENT_READER_PARAMETER_CONNECTION).startsWith("[")){
+            if (reader.getString("connection").startsWith("[")) {
                 List<Map> connectionList = configuration.getList(JOB_CONTENT_READER_PARAMETER_CONNECTION, Map.class);
                 if (connectionList != null && !connectionList.isEmpty()) {
-                    reader.put("connection", connectionList.get(0));
+                    reader.set("connection", connectionList.get(0));
                 }
+            }
+            if (reader.getString("connection.jdbcUrl", "").startsWith("[")) {
+                reader.set("connection.jdbcUrl", reader.getList("connection.jdbcUrl", String.class).get(0));
             }
             configuration.set(CoreConstant.JOB_CONTENT_READER_PARAMETER, reader);
         }

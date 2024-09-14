@@ -119,22 +119,23 @@ public final class OriginalConfPretreatmentUtil
         }
         connConf.getNecessaryValue(Key.JDBC_URL, DBUtilErrorCode.REQUIRED_VALUE);
 
-        List<String> jdbcUrls = connConf.getList(Key.JDBC_URL, String.class);
+        String jdbcUrl = connConf.getString(Key.JDBC_URL);
 
-        String jdbcUrl;
+        if (StringUtils.isBlank(jdbcUrl)) {
+            throw AddaxException.asAddaxException(DBUtilErrorCode.REQUIRED_VALUE, "The parameter [connection.jdbcUrl] is not set.");
+        }
+
         if (isPreCheck) {
-            jdbcUrl = DBUtil.chooseJdbcUrlWithoutRetry(dataBaseType, jdbcUrls, username, password, preSql);
+            DBUtil.validJdbcUrlWithoutRetry(dataBaseType, jdbcUrl, username, password, preSql);
         }
         else {
-            jdbcUrl = DBUtil.chooseJdbcUrl(dataBaseType, jdbcUrls, username, password, preSql);
+            DBUtil.validJdbcUrl(dataBaseType, jdbcUrl, username, password, preSql);
         }
 
         jdbcUrl = dataBaseType.appendJDBCSuffixForReader(jdbcUrl);
 
         // 回写到connection.jdbcUrl
         originalConfig.set(String.format("%s.%s", Key.CONNECTION, Key.JDBC_URL), jdbcUrl);
-
-        LOG.info("Available jdbcUrl [{}].", jdbcUrl);
 
         if (isTableMode) {
             // table 方式
