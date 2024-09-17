@@ -35,6 +35,8 @@ import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
 
+import static com.wgzhao.addax.common.base.Key.CONNECTION;
+
 public class GetPrimaryKeyUtil
 {
     private static final Logger LOG = LoggerFactory.getLogger(GetPrimaryKeyUtil.class);
@@ -54,7 +56,7 @@ public class GetPrimaryKeyUtil
     public static String getPrimaryKey(Configuration readConf)
     {
         String sql;
-        Configuration connConf = Configuration.from(readConf.getList("connection").get(0).toString());
+        Configuration connConf = readConf.getConfiguration(CONNECTION);
         String table = connConf.getList("table").get(0).toString();
         String jdbc_url = connConf.getString(Key.JDBC_URL);
         String username = readConf.getString(Key.USERNAME, null);

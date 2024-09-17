@@ -203,26 +203,26 @@ public final class DBUtil {
     }
 
     private static synchronized Connection connect(DataBaseType dataBaseType, String url, String user, String pass, int socketTimeout) {
-        BasicDataSource bds = new BasicDataSource();
-        bds.setUrl(url);
-        bds.setUsername(user);
-        bds.setPassword(pass);
 
-        if (dataBaseType == DataBaseType.Oracle) {
-            //oracle.net.READ_TIMEOUT for jdbc versions < 10.1.0.5 oracle.jdbc.ReadTimeout for jdbc versions >=10.1.0.5
-            // unit ms
-            bds.addConnectionProperty("oracle.jdbc.ReadTimeout", String.valueOf(socketTimeout * 1000));
-        }
-        if (url.contains("inceptor2")) {
-            LOG.warn("inceptor2 must be process specially");
-            url = url.replace("inceptor2", "hive2");
+        try (BasicDataSource bds = new BasicDataSource()) {
             bds.setUrl(url);
-            bds.setDriverClassName("org.apache.hive.jdbc.HiveDriver");
-        } else {
-            LOG.debug("Connecting to database with driver {}", dataBaseType.getDriverClassName());
-            bds.setDriverClassName(dataBaseType.getDriverClassName());
-        }
-        try {
+            bds.setUsername(user);
+            bds.setPassword(pass);
+
+            if (dataBaseType == DataBaseType.Oracle) {
+                //oracle.net.READ_TIMEOUT for jdbc versions < 10.1.0.5 oracle.jdbc.ReadTimeout for jdbc versions >=10.1.0.5
+                // unit ms
+                bds.addConnectionProperty("oracle.jdbc.ReadTimeout", String.valueOf(socketTimeout * 1000));
+            }
+            if (url.contains("inceptor2")) {
+                LOG.warn("inceptor2 must be process specially");
+                url = url.replace("inceptor2", "hive2");
+                bds.setUrl(url);
+                bds.setDriverClassName("org.apache.hive.jdbc.HiveDriver");
+            } else {
+                LOG.debug("Connecting to database with driver {}", dataBaseType.getDriverClassName());
+                bds.setDriverClassName(dataBaseType.getDriverClassName());
+            }
             bds.setMinIdle(2);
             bds.setMaxIdle(5);
             bds.setMaxOpenPreparedStatements(200);
