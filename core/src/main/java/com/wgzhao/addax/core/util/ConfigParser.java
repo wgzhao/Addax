@@ -224,7 +224,7 @@ public final class ConfigParser {
         }
 
         for (String path : validPaths) {
-            if (content.get(path) == null) {
+            if (conf.get(path) == null) {
                 throw AddaxException.asAddaxException(FrameworkErrorCode.JOB_ERROR,
                         "The configuration item '" + path + "' is required");
             }
