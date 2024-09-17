@@ -21,7 +21,6 @@ package com.wgzhao.addax.core.util;
 
 import com.wgzhao.addax.common.exception.AddaxException;
 import com.wgzhao.addax.common.util.Configuration;
-import com.wgzhao.addax.core.util.container.CoreConstant;
 
 import java.io.File;
 import java.io.IOException;
@@ -40,7 +39,21 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import static com.wgzhao.addax.common.base.Key.CONNECTION;
-import static com.wgzhao.addax.core.util.container.CoreConstant.*;
+import static com.wgzhao.addax.core.util.container.CoreConstant.CONF_PATH;
+import static com.wgzhao.addax.core.util.container.CoreConstant.CORE_SERVER_TIMEOUT_SEC;
+import static com.wgzhao.addax.core.util.container.CoreConstant.JOB_CONTENT;
+import static com.wgzhao.addax.core.util.container.CoreConstant.JOB_CONTENT_READER;
+import static com.wgzhao.addax.core.util.container.CoreConstant.JOB_CONTENT_READER_NAME;
+import static com.wgzhao.addax.core.util.container.CoreConstant.JOB_CONTENT_READER_PARAMETER;
+import static com.wgzhao.addax.core.util.container.CoreConstant.JOB_CONTENT_READER_PARAMETER_CONNECTION;
+import static com.wgzhao.addax.core.util.container.CoreConstant.JOB_CONTENT_WRITER;
+import static com.wgzhao.addax.core.util.container.CoreConstant.JOB_CONTENT_WRITER_NAME;
+import static com.wgzhao.addax.core.util.container.CoreConstant.JOB_CONTENT_WRITER_PARAMETER;
+import static com.wgzhao.addax.core.util.container.CoreConstant.JOB_POST_HANDLER_PLUGIN_NAME;
+import static com.wgzhao.addax.core.util.container.CoreConstant.JOB_PRE_HANDLER_PLUGIN_NAME;
+import static com.wgzhao.addax.core.util.container.CoreConstant.PLUGIN_READER_HOME;
+import static com.wgzhao.addax.core.util.container.CoreConstant.PLUGIN_WRITER_HOME;
+
 
 public final class ConfigParser {
     private static final Logger LOG = LoggerFactory.getLogger(ConfigParser.class);
