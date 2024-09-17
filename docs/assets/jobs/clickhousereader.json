@@ -19,16 +19,12 @@
           "column": [
             "*"
           ],
-          "connection": [
-            {
-              "table": [
-                "ck_addax"
-              ],
-              "jdbcUrl": [
-                "jdbc:clickhouse://127.0.0.1:8123/default"
-              ]
-            }
-          ]
+          "connection": {
+            "table": [
+              "ck_addax"
+            ],
+            "jdbcUrl": "jdbc:clickhouse://127.0.0.1:8123/default"
+          }
         }
       },
       "writer": {

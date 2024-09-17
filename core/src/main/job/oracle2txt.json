@@ -12,16 +12,12 @@
               "BRANCH_NO",
               "BRANCH_NAME"
             ],
-            "connection": [
-              {
-                "jdbcUrl": [
-                  "jdbc:oracle:thin:@127.0.0.1:1521/stage"
-                ],
-                "table": [
-                  "STGUF.ALLBRANCH"
-                ]
-              }
-            ]
+            "connection": {
+              "jdbcUrl": "jdbc:oracle:thin:@127.0.0.1:1521/stage",
+              "table": [
+                "STGUF.ALLBRANCH"
+              ]
+            }
           }
         },
         "writer": {

@@ -8,16 +8,12 @@
     "column": [
       "*"
     ],
-    "connection": [
-      {
-        "jdbcUrl": [
-          "jdbc:postgresql://127.0.0.1:5432/pgtest"
-        ],
-        "table": [
-          "addax_tbl"
-        ]
-      }
-    ],
+    "connection": {
+      "jdbcUrl": "jdbc:postgresql://127.0.0.1:5432/pgtest",
+      "table": [
+        "addax_tbl"
+      ]
+    },
     "where": "",
     "fetchSize": 2048
   }

@@ -18,16 +18,12 @@
           "column": [
             "*"
           ],
-          "connection": [
-            {
-              "jdbcUrl": [
-                "jdbc:sqlite:/tmp/test.sqlite3"
-              ],
-              "table": [
-                "test"
-              ]
-            }
-          ]
+          "connection": {
+            "jdbcUrl": "jdbc:sqlite:/tmp/test.sqlite3",
+            "table": [
+              "test"
+            ]
+          }
         }
       },
       "writer": {

@@ -9,16 +9,12 @@
     ],
     "splitPk": "db_id",
     "autoPk": false,
-    "connection": [
-      {
-        "jdbcUrl": [
-          "jdbc:oracle:thin:@<HOST_NAME>:PORT:<DATABASE_NAME>"
-        ],
-        "table": [
-          "table"
-        ]
-      }
-    ],
+    "connection": {
+      "jdbcUrl": "jdbc:oracle:thin:@<HOST_NAME>:PORT:<DATABASE_NAME>",
+      "table": [
+        "table"
+      ]
+    },
     "where": "",
     "session": [
       "alter session set NLS_DATE_FORMAT='yyyy-mm-dd hh24:mi:ss'",

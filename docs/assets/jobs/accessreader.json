@@ -1,42 +1,38 @@
-    {
-      "job": {
-        "setting": {
-          "speed": {
-            "byte": -1,
-            "channel": 1
+{
+  "job": {
+    "setting": {
+      "speed": {
+        "byte": -1,
+        "channel": 1
+      }
+    },
+    "content": [
+      {
+        "reader": {
+          "name": "accessreader",
+          "parameter": {
+            "username": "root",
+            "password": "",
+            "column": [
+              "*"
+            ],
+            "connection": {
+              "table": [
+                "tbl_Users"
+              ],
+              "jdbcUrl": "jdbc:ucanaccess:///Users/wgzhao/Downloads/AccessThemeDemo.mdb"
+            },
+            "where": ""
           }
         },
-        "content": [
-          {
-            "reader": {
-              "name": "accessreader",
-              "parameter": {
-                "username": "root",
-                "password": "",
-                "column": [
-                  "*"
-                ],
-                "connection": [
-                  {
-                    "table": [
-                      "tbl_Users"
-                    ],
-                    "jdbcUrl": [
-                      "jdbc:ucanaccess:///Users/wgzhao/Downloads/AccessThemeDemo.mdb"
-                    ]
-                  }
-                ],
-                "where": ""
-              }
-            },
-            "writer": {
-              "name": "streamwriter",
-              "parameter": {
-                "encoding": "utf-8",
-                "print": true
-              }
-            }
+        "writer": {
+          "name": "streamwriter",
+          "parameter": {
+            "encoding": "utf-8",
+            "print": true
           }
-        ]
+        }
       }
-    }
+    ]
+  }
+}
