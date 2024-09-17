@@ -6,16 +6,12 @@
     ],
     "username": "hive",
     "password": "",
-    "connection": [
-      {
-        "jdbcUrl": [
-          "jdbc:hive2://localhost:10000/default;principal=hive/_HOST@COMPANY.COM"
-        ],
-        "table": [
-          "hive_reader"
-        ]
-      }
-    ],
+    "connection": {
+      "jdbcUrl": "jdbc:hive2://localhost:10000/default;principal=hive/_HOST@COMPANY.COM",
+      "table": [
+        "hive_reader"
+      ]
+    },
     "where": "logdate='20211013'",
     "haveKerberos": true,
     "kerberosKeytabFilePath": "/etc/security/keytabs/hive.headless.keytab",

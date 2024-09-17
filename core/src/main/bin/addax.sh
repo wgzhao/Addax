@@ -206,12 +206,12 @@ if [ "$1" = "gen" ]; then
               "channel": 1
             }
         },
-        "content": [{
+        "content": {
             "reader":
                 $reader_content ,
             "writer":
                 $writer_content
-        }]
+        }
       }
     }
 EOF

@@ -10,14 +10,12 @@
             "column": [
               "*"
             ],
-            "connection": [
-              {
-                "table": [
-                  "${ddb}.${dtable}"
-                ],
-                "jdbcUrl": "jdbc:oracle:thin:@127.0.0.1/stage"
-              }
-            ],
+            "connection": {
+              "table": [
+                "${ddb}.${dtable}"
+              ],
+              "jdbcUrl": "jdbc:oracle:thin:@127.0.0.1/stage"
+            },
             "preSql": [
               "truncate table @table"
             ]

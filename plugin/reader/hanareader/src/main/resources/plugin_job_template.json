@@ -6,16 +6,12 @@
     "column": [
       "*"
     ],
-    "connection": [
-      {
-        "jdbcUrl": [
-          "jdbc:sap://localhost:30015/?currentschema=SYSTEM"
-        ],
-        "table": [
-          "addax_table"
-        ]
-      }
-    ],
+    "connection": {
+      "jdbcUrl": "jdbc:sap://localhost:30015/?currentschema=SYSTEM",
+      "table": [
+        "addax_table"
+      ]
+    },
     "where": "1=1",
     "autoPk": false,
     "fetchSize": 2048,

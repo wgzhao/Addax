@@ -17,16 +17,12 @@
             "name"
           ],
           "splitPk": "db_id",
-          "connection": [
-            {
-              "table": [
-                "table"
-              ],
-              "jdbcUrl": [
-                "jdbc:oracle:thin:@<HOST_NAME>:PORT:<DATABASE_NAME>"
-              ]
-            }
-          ]
+          "connection": {
+            "table": [
+              "table"
+            ],
+            "jdbcUrl": "jdbc:oracle:thin:@<HOST_NAME>:PORT:<DATABASE_NAME>"
+          }
         }
       },
       "writer": {

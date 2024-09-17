@@ -6,16 +6,12 @@
     "column": [
       "*"
     ],
-    "connection": [
-      {
-        "jdbcUrl": [
-          "jdbc:sybase://127.0.0.1:3306/test"
-        ],
-        "table": [
-          "addax_reader"
-        ]
-      }
-    ],
+    "connection": {
+      "jdbcUrl": "jdbc:sybase://127.0.0.1:3306/test",
+      "table": [
+        "addax_reader"
+      ]
+    },
     "where": ""
   }
 }

@@ -11,16 +11,12 @@
               "BRANCH_NAME",
               "DW_CLT_DATE"
             ],
-            "connection": [
-              {
-                "jdbcUrl": [
-                  "jdbc:oracle:thin:@127.0.0.1:1521/stage"
-                ],
-                "table": [
-                  "STGUF.ALLBRANCH"
-                ]
-              }
-            ],
+            "connection": {
+              "jdbcUrl": "jdbc:oracle:thin:@127.0.0.1:1521/stage",
+              "table": [
+                "STGUF.ALLBRANCH"
+              ]
+            },
             "password": "password",
             "username": "oracle",
             "where": "branch_no = '1211'",

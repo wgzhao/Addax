@@ -6,17 +6,13 @@
     "column": [
       "*"
     ],
-    "connection": [
-      {
-        "jdbcUrl": [
-          "jdbc:<dbtype>://<host>:<port>/<database>"
-        ],
-        "table": [
-          "adax_table"
-        ],
-        "driver": ""
-      }
-    ],
+    "connection": {
+      "jdbcUrl": "jdbc:<dbtype>://<host>:<port>/<database>",
+      "table": [
+        "adax_table"
+      ],
+      "driver": ""
+    },
     "where": "1=1",
     "autoPk": false,
     "fetchSize": 2048,
