@@ -180,12 +180,12 @@ public final class OriginalConfPretreatmentUtil
                     originalConfig.set(Key.COLUMN, "*");
                 }
                 else {
-                    String jdbcUrl = originalConfig.getString(String.format("%s[0].%s", Key.CONNECTION, Key.JDBC_URL));
+                    String jdbcUrl = originalConfig.getString(String.format("%s.%s", Key.CONNECTION, Key.JDBC_URL));
 
                     String username = originalConfig.getString(Key.USERNAME);
                     String password = originalConfig.getString(Key.PASSWORD);
 
-                    String tableName = originalConfig.getString(String.format("%s[0].%s[0]", Key.CONNECTION, Key.TABLE));
+                    String tableName = originalConfig.getString(String.format("%s.%s[0]", Key.CONNECTION, Key.TABLE));
 
                     List<String> allColumns = DBUtil.getTableColumns(dataBaseType, jdbcUrl, username, password, tableName);
                     LOG.info("The table [{}] has columns [{}].", tableName, StringUtils.join(allColumns, ","));
