@@ -3,6 +3,7 @@ package com.wgzhao.addax.plugin.writer.hdfswriter;
 import com.wgzhao.addax.common.base.Constant;
 import com.wgzhao.addax.common.base.Key;
 import com.wgzhao.addax.common.element.Column;
+import com.wgzhao.addax.common.element.DateColumn;
 import com.wgzhao.addax.common.element.Record;
 import com.wgzhao.addax.common.exception.AddaxException;
 import com.wgzhao.addax.common.plugin.RecordReceiver;
@@ -103,14 +104,20 @@ public class OrcWriter
                     case VARCHAR:
                     case CHAR:
                         byte[] buffer;
-                        Column.Type colType = record.getColumn(i).getType();
+                        Column column = record.getColumn(i);
+                        Column.Type colType = column.getType();
                         if (colType == Column.Type.BYTES) {
                             //convert bytes to base64 string
-                            buffer = Base64.getEncoder().encode((byte[]) record.getColumn(i).getRawData());
+                            buffer = Base64.getEncoder().encode((byte[]) column.getRawData());
                         }
                         else if (colType == Column.Type.DATE) {
-                            SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
-                            buffer = sdf.format(record.getColumn(i).asDate()).getBytes(StandardCharsets.UTF_8);
+                            if (((DateColumn) column).getSubType() == DateColumn.DateType.TIME) {
+                                buffer = column.asString().getBytes(StandardCharsets.UTF_8);
+                            }
+                            else {
+                                SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+                                buffer = sdf.format(record.getColumn(i).asDate()).getBytes(StandardCharsets.UTF_8);
+                            }
                         }
                         else {
                             buffer = record.getColumn(i).getRawData().toString().getBytes(StandardCharsets.UTF_8);

@@ -156,6 +156,7 @@ public class ParquetWriter
                 case INTEGER:
                     group.append(colName, Integer.parseInt(column.getRawData().toString()));
                     break;
+                case BIGINT:
                 case LONG:
                     group.append(colName, column.asLong());
                     break;
