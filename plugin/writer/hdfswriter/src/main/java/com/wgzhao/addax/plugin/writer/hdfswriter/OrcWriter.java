@@ -33,6 +33,8 @@ import java.util.Base64;
 import java.util.List;
 import java.util.StringJoiner;
 
+import static com.wgzhao.addax.common.base.Constant.DEFAULT_DATE_FORMAT;
+
 public class OrcWriter extends HdfsHelper implements IHDFSWriter  {
     private final Logger logger = LoggerFactory.getLogger(OrcWriter.class.getName());
     public OrcWriter(Configuration conf) {
@@ -95,13 +97,18 @@ public class OrcWriter extends HdfsHelper implements IHDFSWriter  {
                     case VARCHAR:
                     case CHAR:
                         byte[] buffer;
-                        if (record.getColumn(i).getType() == Column.Type.BYTES) {
+                        Column.Type colType = record.getColumn(i).getType();
+                        if (colType == Column.Type.BYTES) {
                             //convert bytes to base64 string
                             buffer = Base64.getEncoder().encode((byte[]) record.getColumn(i).getRawData());
-                        } else if (record.getColumn(i).getType() == Column.Type.DATE) {
+                        } else if (colType == Column.Type.DATE) {
                             SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
                             buffer = sdf.format(record.getColumn(i).asDate()).getBytes(StandardCharsets.UTF_8);
-                        } else {
+                        } else if (colType == Column.Type.TIMESTAMP) {
+                            SimpleDateFormat sdf = new SimpleDateFormat(DEFAULT_DATE_FORMAT);
+                            buffer = sdf.format(record.getColumn(i).asTimestamp()).getBytes(StandardCharsets.UTF_8);
+                        }
+                        else {
                             buffer = record.getColumn(i).getRawData().toString().getBytes(StandardCharsets.UTF_8);
                         }
                         ((BytesColumnVector) col).setRef(row, buffer, 0, buffer.length);
