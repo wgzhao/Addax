@@ -122,7 +122,7 @@ public final class ConfigParser {
         }
         Configuration reader = configuration.getConfiguration(JOB_CONTENT_READER_PARAMETER);
         if (reader != null) {
-            if (reader.getString(CONNECTION).startsWith("[")) {
+            if (reader.getString(CONNECTION, "").startsWith("[")) {
                 List<Map> connectionList = configuration.getList(JOB_CONTENT_READER_PARAMETER_CONNECTION, Map.class);
                 if (connectionList != null && !connectionList.isEmpty()) {
                     reader.set(CONNECTION, connectionList.get(0));
