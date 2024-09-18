@@ -49,20 +49,14 @@ import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.math.BigDecimal;
-import java.math.BigInteger;
 import java.math.RoundingMode;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.time.LocalDate;
+import java.sql.Timestamp;
 import java.time.ZoneId;
-import java.time.temporal.JulianFields;
-import java.util.Calendar;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.TimeUnit;
 
 import static org.apache.parquet.schema.LogicalTypeAnnotation.decimalType;
 
@@ -182,14 +176,7 @@ public class ParquetWriter
                     group.append(colName, decimalToBinary(column.asString(), scale));
                     break;
                 case TIMESTAMP:
-                    SimpleDateFormat sdf = new SimpleDateFormat(Constant.DEFAULT_DATE_FORMAT);
-                    try {
-                        group.append(colName, tsToBinary(sdf.format(column.asDate())));
-                    }
-                    catch (ParseException e) {
-                        // dirty data
-                        taskPluginCollector.collectDirtyRecord(record, e);
-                    }
+                    group.append(colName, tsToBinary(column.asTimestamp()));
                     break;
                 case DATE:
                     group.append(colName, (int) Math.round(column.asLong() * 1.0 / 86400000));
@@ -206,34 +193,19 @@ public class ParquetWriter
     /**
      * convert timestamp to parquet INT96
      *
-     * @param value the timestamp string
+     * @param ts the {@link Timestamp} want to convert
      * @return {@link Binary}
-     * @throws ParseException when the value is invalid
      */
-    private Binary tsToBinary(String value)
-            throws ParseException
+    private Binary tsToBinary(Timestamp ts)
     {
-
-        final long NANOS_PER_HOUR = TimeUnit.HOURS.toNanos(1);
-        final long NANOS_PER_MINUTE = TimeUnit.MINUTES.toNanos(1);
-        final long NANOS_PER_SECOND = TimeUnit.SECONDS.toNanos(1);
-
-        // Parse date
-        SimpleDateFormat parser = new SimpleDateFormat(Constant.DEFAULT_DATE_FORMAT);
-        Calendar cal = Calendar.getInstance();
-        cal.setTime(parser.parse(value));
-
-        // Calculate Julian days and nanoseconds in the day
-        LocalDate dt = LocalDate.of(cal.get(Calendar.YEAR), cal.get(Calendar.MONTH) + 1, cal.get(Calendar.DAY_OF_MONTH));
-        int julianDays = (int) JulianFields.JULIAN_DAY.getFrom(dt);
-        long nanos = (cal.get(Calendar.HOUR_OF_DAY) * NANOS_PER_HOUR)
-                + (cal.get(Calendar.MINUTE) * NANOS_PER_MINUTE)
-                + (cal.get(Calendar.SECOND) * NANOS_PER_SECOND);
+        long millis = ts.getTime();
+        int julianDays = (int) (millis / 86400000L) + 2440588;
+        long nanosOfDay = (millis % 86400000L) * 1000000L;
 
         // Write INT96 timestamp
         byte[] timestampBuffer = new byte[12];
         ByteBuffer buf = ByteBuffer.wrap(timestampBuffer);
-        buf.order(ByteOrder.LITTLE_ENDIAN).putLong(nanos).putInt(julianDays);
+        buf.order(ByteOrder.LITTLE_ENDIAN).putLong(nanosOfDay).putInt(julianDays).flip();
 
         // This is the properly encoded INT96 timestamp
         return Binary.fromReusedByteArray(timestampBuffer);

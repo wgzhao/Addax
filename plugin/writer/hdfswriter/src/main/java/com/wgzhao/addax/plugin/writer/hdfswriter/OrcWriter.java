@@ -33,25 +33,30 @@ import java.util.Base64;
 import java.util.List;
 import java.util.StringJoiner;
 
-import static com.wgzhao.addax.common.base.Constant.DEFAULT_DATE_FORMAT;
-
-public class OrcWriter extends HdfsHelper implements IHDFSWriter  {
+public class OrcWriter
+        extends HdfsHelper
+        implements IHDFSWriter
+{
     private final Logger logger = LoggerFactory.getLogger(OrcWriter.class.getName());
-    public OrcWriter(Configuration conf) {
+
+    public OrcWriter(Configuration conf)
+    {
         super();
         getFileSystem(conf);
     }
+
     /**
      * write an orc record
      *
-     * @param batch               {@link VectorizedRowBatch}
-     * @param row                 row number
-     * @param record              {@link Record}
-     * @param columns             table columns, {@link List}
+     * @param batch {@link VectorizedRowBatch}
+     * @param row row number
+     * @param record {@link Record}
+     * @param columns table columns, {@link List}
      * @param taskPluginCollector {@link TaskPluginCollector}
      */
     private void setRow(VectorizedRowBatch batch, int row, Record record, List<Configuration> columns,
-            TaskPluginCollector taskPluginCollector) {
+            TaskPluginCollector taskPluginCollector)
+    {
         for (int i = 0; i < columns.size(); i++) {
             Configuration eachColumnConf = columns.get(i);
             String type = eachColumnConf.getString(Key.TYPE).trim().toUpperCase();
@@ -59,7 +64,8 @@ public class OrcWriter extends HdfsHelper implements IHDFSWriter  {
             ColumnVector col = batch.cols[i];
             if (type.startsWith("DECIMAL")) {
                 columnType = SupportHiveDataType.DECIMAL;
-            } else {
+            }
+            else {
                 columnType = SupportHiveDataType.valueOf(type);
             }
             if (record.getColumn(i) == null || record.getColumn(i).getRawData() == null) {
@@ -101,12 +107,10 @@ public class OrcWriter extends HdfsHelper implements IHDFSWriter  {
                         if (colType == Column.Type.BYTES) {
                             //convert bytes to base64 string
                             buffer = Base64.getEncoder().encode((byte[]) record.getColumn(i).getRawData());
-                        } else if (colType == Column.Type.DATE) {
+                        }
+                        else if (colType == Column.Type.DATE) {
                             SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
                             buffer = sdf.format(record.getColumn(i).asDate()).getBytes(StandardCharsets.UTF_8);
-                        } else if (colType == Column.Type.TIMESTAMP) {
-                            SimpleDateFormat sdf = new SimpleDateFormat(DEFAULT_DATE_FORMAT);
-                            buffer = sdf.format(record.getColumn(i).asTimestamp()).getBytes(StandardCharsets.UTF_8);
                         }
                         else {
                             buffer = record.getColumn(i).getRawData().toString().getBytes(StandardCharsets.UTF_8);
@@ -125,7 +129,8 @@ public class OrcWriter extends HdfsHelper implements IHDFSWriter  {
                                                 eachColumnConf.getString(Key.NAME),
                                                 eachColumnConf.getString(Key.TYPE)));
                 }
-            } catch (Exception e) {
+            }
+            catch (Exception e) {
                 taskPluginCollector.collectDirtyRecord(record, e.getMessage());
                 throw AddaxException.asAddaxException(HdfsWriterErrorCode.ILLEGAL_VALUE,
                         String.format("Failed to set ORC row, source field type: %s, destination field original type: %s, " +
@@ -139,7 +144,8 @@ public class OrcWriter extends HdfsHelper implements IHDFSWriter  {
 
     @Override
     public void write(RecordReceiver lineReceiver, Configuration config, String fileName,
-            TaskPluginCollector taskPluginCollector) {
+            TaskPluginCollector taskPluginCollector)
+    {
         List<Configuration> columns = config.getListConfiguration(Key.COLUMN);
         String compress = config.getString(Key.COMPRESS, "NONE").toUpperCase();
         StringJoiner joiner = new StringJoiner(",");
@@ -148,7 +154,8 @@ public class OrcWriter extends HdfsHelper implements IHDFSWriter  {
                 joiner.add(String.format("%s:%s(%s,%s)", column.getString(Key.NAME), "decimal",
                         column.getInt(Key.PRECISION, Constant.DEFAULT_DECIMAL_MAX_PRECISION),
                         column.getInt(Key.SCALE, Constant.DEFAULT_DECIMAL_MAX_SCALE)));
-            } else {
+            }
+            else {
                 joiner.add(String.format("%s:%s", column.getString(Key.NAME), column.getString(Key.TYPE)));
             }
         }
@@ -171,7 +178,8 @@ public class OrcWriter extends HdfsHelper implements IHDFSWriter  {
                 writer.addRowBatch(batch);
                 batch.reset();
             }
-        } catch (IOException e) {
+        }
+        catch (IOException e) {
             logger.error("IO exception occurred while writing file [{}}.", fileName);
             Path path = new Path(fileName);
             deleteDir(path.getParent());
