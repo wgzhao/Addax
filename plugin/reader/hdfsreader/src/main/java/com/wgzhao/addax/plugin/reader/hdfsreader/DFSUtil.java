@@ -438,6 +438,7 @@ public class DFSUtil
                         case DATE:
                             columnGenerated = new DateColumn(new Date(((LongColumnVector) col).vector[row]));
                             break;
+                        case FLOAT:
                         case DOUBLE:
                             columnGenerated = new DoubleColumn(((DoubleColumnVector) col).vector[row]);
                             break;
@@ -516,31 +517,35 @@ public class DFSUtil
         }
     }
 
-    private static String getJavaType(org.apache.parquet.schema.Type field) {
-    if (field.isPrimitive()) {
-        switch (field.asPrimitiveType().getPrimitiveTypeName()) {
-            case BINARY:
-                return Type.STRING.name();
-            case INT32:
-                return Type.INT.name();
-            case INT64:
-                return Type.LONG.name();
-            case INT96:
-                return Type.TIMESTAMP.name();
-            case FLOAT:
-            case DOUBLE:
-                return Type.DOUBLE.name();
-            case BOOLEAN:
-                return Type.BOOLEAN.name();
-            case FIXED_LEN_BYTE_ARRAY:
-                return Type.BINARY.name();
-            default:
-                return Type.STRING.name();
+    private static String getJavaType(org.apache.parquet.schema.Type field)
+    {
+        if (field.isPrimitive()) {
+            switch (field.asPrimitiveType().getPrimitiveTypeName()) {
+                case BINARY:
+                    return Type.BINARY.name();
+                case INT32:
+                    return Type.INT.name();
+                case INT64:
+                    return Type.LONG.name();
+                case INT96:
+                    return Type.TIMESTAMP.name();
+                case FLOAT:
+                    return Type.FLOAT.name();
+                case DOUBLE:
+                    return Type.DOUBLE.name();
+                case BOOLEAN:
+                    return Type.BOOLEAN.name();
+                case FIXED_LEN_BYTE_ARRAY:
+                    return Type.BINARY.name();
+                default:
+                    return Type.STRING.name();
+            }
         }
-    } else {
-        return Type.STRING.name();
+        else {
+            return Type.STRING.name();
+        }
     }
-}
+
     /*
      * create a transport record for Parquet file
      *
@@ -574,6 +579,9 @@ public class DFSUtil
                             break;
                         case LONG:
                             columnGenerated = new LongColumn(gRecord.getLong(columnIndex, 0));
+                            break;
+                        case FLOAT:
+                            columnGenerated = new DoubleColumn(gRecord.getFloat(columnIndex, 0));
                             break;
                         case DOUBLE:
                             columnGenerated = new DoubleColumn(gRecord.getDouble(columnIndex, 0));
@@ -613,9 +621,7 @@ public class DFSUtil
                             break;
                         case TIMESTAMP:
                             Binary binaryTs = gRecord.getInt96(columnIndex, 0);
-
                             columnGenerated = new DateColumn(new Date(getTimestampMills(binaryTs)));
-
                             break;
                         case BINARY:
                             columnGenerated = new BytesColumn(gRecord.getBinary(columnIndex, 0).getBytes());
@@ -874,6 +880,21 @@ public class DFSUtil
 
     private enum Type
     {
-        INT, BIGINT, STRING, LONG, BOOLEAN, DOUBLE, DATE, BINARY, TIMESTAMP, DECIMAL,
+        TINYINT,
+        SMALLINT,
+        INT,
+        INTEGER,
+        BIGINT,
+        FLOAT,
+        DOUBLE,
+        TIMESTAMP,
+        DATE,
+        DECIMAL,
+        STRING,
+        VARCHAR,
+        CHAR,
+        LONG,
+        BOOLEAN,
+        BINARY
     }
 }
