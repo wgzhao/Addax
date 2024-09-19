@@ -14,6 +14,10 @@ RUN <<EOF
 EOF
 
 FROM openjdk:8u232-jre-stretch
+LABEL maintainer="wgzhao <wgzhao@gmail.com>"
+LABEL version="4.1.8"
+LABEL description="Addax is a versatile open-source ETL tool that can seamlessly transfer data between various RDBMS and NoSQL databases, making it an ideal solution for data migration."
+
 COPY --from=build  /src/target/addax/addax-* /opt/addax/
 
 WORKDIR /opt/addax

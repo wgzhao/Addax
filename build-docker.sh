@@ -40,7 +40,9 @@ compress_plugins
 # write a simple Dockerfile for build
 cat > /tmp/Dockerfile <<EOF
 FROM openjdk:8-jre-alpine
-MAINTAINER wgzhao <wgzhao@gmail.com>
+LABEL maintainer="wgzhao <wgzhao@gmail.com>"
+LABEL version="4.1.8"
+LABEL description="Addax is a versatile open-source ETL tool that can seamlessly transfer data between various RDBMS and NoSQL databases, making it an ideal solution for data migration."
 COPY addax-${version} /opt/addax
 WORKDIR /opt/addax
 RUN chmod +x bin/*.sh
@@ -57,7 +59,9 @@ compress_plugins
 # write a simple Dockerfile for build
 cat > /tmp/Dockerfile <<EOF
 FROM openjdk:8-jre-alpine
-MAINTAINER wgzhao <wgzhao@gmail.com>
+LABEL maintainer="wgzhao <wgzhao@gmail.com>"
+LABEL version="4.1.8"
+LABEL description="Addax is a versatile open-source ETL tool that can seamlessly transfer data between various RDBMS and NoSQL databases, making it an ideal solution for data migration."
 COPY addax-${version} /opt/addax
 WORKDIR /opt/addax
 RUN chmod +x bin/*.sh
