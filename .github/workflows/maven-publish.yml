@@ -20,7 +20,7 @@ jobs:
 
       - name: version
         id: version
-        run: echo "::set-output name=version::$(git describe --tags --abbrev=1)"
+        run: echo "{version}=$(git describe --tags --abbrev=1)" >> $GITHUB_OUTPUT
       # - name: 1. Import GPG key
       #   id: import_gpg
       #   uses: crazy-max/ghaction-import-gpg@v4
