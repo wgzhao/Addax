@@ -3,7 +3,7 @@
     <parent>
         <groupId>com.wgzhao.addax</groupId>
         <artifactId>addax-all</artifactId>
-        <version>4.1.8-SNAPSHOT</version>
+        <version>4.1.8</version>
         <relativePath>../../../pom.xml</relativePath>
     </parent>
     <artifactId>hbase11xsqlreader</artifactId>

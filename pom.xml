@@ -4,7 +4,7 @@
 
     <groupId>com.wgzhao.addax</groupId>
     <artifactId>addax-all</artifactId>
-    <version>4.1.8-SNAPSHOT</version>
+    <version>4.1.8</version>
 
     <name>addax-all</name>
     <description>Addax generic ETL tool</description>
@@ -23,7 +23,7 @@
         <connection>scm:git:https://github.com/wgzhao/addax.git</connection>
         <developerConnection>scm:git:git@github.com:wgzhao/addax.git</developerConnection>
         <url>https://github.com/wgzhao/addax</url>
-        <tag>HEAD</tag>
+        <tag>4.1.8</tag>
     </scm>
 
     <properties>
