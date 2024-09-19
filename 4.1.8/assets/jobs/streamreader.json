@@ -1,0 +1,35 @@
+{
+  "reader": {
+    "name": "streamreader",
+    "parameter": {
+      "column": [
+        {
+          "value": "unique_id",
+          "type": "string"
+        },
+        {
+          "value": "1989-06-04 08:12:13",
+          "type": "date",
+          "dateFormat": "yyyy-MM-dd HH:mm:ss"
+        },
+        {
+          "value": 1984,
+          "type": "long"
+        },
+        {
+          "value": 1989.64,
+          "type": "double"
+        },
+        {
+          "value": true,
+          "type": "bool"
+        },
+        {
+          "value": "a long text",
+          "type": "bytes"
+        }
+      ],
+      "sliceRecordCount": 10
+    }
+  }
+}
