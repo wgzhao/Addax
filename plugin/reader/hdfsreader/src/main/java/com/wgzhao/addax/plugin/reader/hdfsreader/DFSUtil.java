@@ -546,11 +546,6 @@ public class DFSUtil
         }
     }
 
-    /*
-     * create a transport record for Parquet file
-     *
-     *
-     */
     private void transportParquetRecord(List<ColumnEntry> columnConfigs, Group gRecord, RecordSender recordSender,
             TaskPluginCollector taskPluginCollector, String nullFormat)
     {
@@ -568,7 +563,6 @@ public class DFSUtil
                     continue;
                 }
                 Type type = Type.valueOf(columnType.toUpperCase());
-
                 try {
                     switch (type) {
                         case STRING:
@@ -608,10 +602,8 @@ public class DFSUtil
                                 String formatString = columnEntry.getFormat();
                                 if (StringUtils.isNotBlank(formatString)) {
                                     // 用户自己配置的格式转换
-                                    SimpleDateFormat format = new SimpleDateFormat(
-                                            formatString);
-                                    columnGenerated = new DateColumn(
-                                            format.parse(columnValue));
+                                    SimpleDateFormat format = new SimpleDateFormat(formatString);
+                                    columnGenerated = new DateColumn(format.parse(columnValue));
                                 }
                                 else {
                                     // 框架尝试转换
@@ -627,14 +619,14 @@ public class DFSUtil
                             columnGenerated = new BytesColumn(gRecord.getBinary(columnIndex, 0).getBytes());
                             break;
                         default:
-                            String errorMessage = String.format("The column type [%s] is unsupported.", columnType);
-                            LOG.error(errorMessage);
-                            throw AddaxException.asAddaxException(StorageReaderErrorCode.NOT_SUPPORT_TYPE, errorMessage);
+                            // try to convert it to string
+                            LOG.debug("try to convert column type {} to String, ", columnType);
+                            columnGenerated = new StringColumn(gRecord.getString(columnIndex, 0));
                     }
                 }
                 catch (Exception e) {
                     throw new IllegalArgumentException(String.format(
-                            "类型转换错误, 无法将[%s] 转换为[%s], %s", gRecord.getString(columnIndex, 0), type, e));
+                            "Can not convert column type %s to %s: %s", columnType, type, e));
                 }
                 record.addColumn(columnGenerated);
             } // end for
@@ -648,7 +640,7 @@ public class DFSUtil
             if (e instanceof AddaxException) {
                 throw (AddaxException) e;
             }
-            // 每一种转换失败都是脏数据处理,包括数字格式 & 日期格式
+            // cast failed means dirty data, including number format, date format, etc.
             taskPluginCollector.collectDirtyRecord(record, e.getMessage());
         }
     }
@@ -658,7 +650,6 @@ public class DFSUtil
         Path path = new Path(filePath);
         try {
             Reader reader = OrcFile.createReader(path, OrcFile.readerOptions(hadoopConf));
-//            return reader.getTypes().get(0).getSubtypesCount()
             return reader.getSchema();
         }
         catch (IOException e) {
