@@ -21,6 +21,9 @@ jobs:
       - name: version
         id: version
         run: echo "{version}=$(git describe --tags --abbrev=1)" >> $GITHUB_OUTPUT
+      - name: changelog
+        id: changelog
+        run: echo "{changelog}=$(git log --oneline)' ${{ github.event.before }}..HEAD)" >> $GITHUB_OUTPUT
       # - name: 1. Import GPG key
       #   id: import_gpg
       #   uses: crazy-max/ghaction-import-gpg@v4
@@ -34,30 +37,6 @@ jobs:
         uses: stCarolas/setup-maven@v5
         with:
           maven-version: 3.8.8
-
-      # - name: 3. Generate settings.xml for Maven Builds
-      #   uses: whelk-io/maven-settings-xml-action@v20
-      #   with:
-      #     servers: >
-      #       [
-      #         {
-      #         "id": "ossrh",
-      #         "username": "${{ secrets.OSSRH_USERNAME }}",
-      #         "password": "${{ secrets.OSSRH_PASSWORD }}"
-      #         },
-      #         {
-      #         "id": "github",
-      #         "url": "https://maven.pkg.github.com/wgzhao/addax",
-      #         "releases": {
-      #           "enabled": "true"
-      #         },
-      #         "snapshots": {
-      #           "enabled": "false"
-      #         },
-      #         "username": "wgzhao",
-      #         "password": "${{ github.token }}"
-      #         }
-      #       ]
 
       - name: 4. Set up JDK
         uses: actions/setup-java@v4.3.0
@@ -86,7 +65,10 @@ jobs:
           prerelease: false
           release_name: ${{ steps.version.outputs.version }}
           tag_name: ${{ github.ref }}
-          body_path: CHANGELOG.md
+          body: |
+            # Addax  ${{ steps.version.outputs.version }} has released! 🎉
+            ## Changes
+            ${{ steps.changelog.outputs.body }}
         env:
           GITHUB_TOKEN: ${{ secrets.TOKEN }}
 
