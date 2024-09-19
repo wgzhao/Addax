@@ -43,7 +43,6 @@ import com.wgzhao.addax.rdbms.reader.util.PreCheckTask;
 import com.wgzhao.addax.rdbms.reader.util.ReaderSplitUtil;
 import com.wgzhao.addax.rdbms.reader.util.SingleTableSplitUtil;
 import com.wgzhao.addax.rdbms.util.DBUtil;
-import com.wgzhao.addax.rdbms.util.DBUtilErrorCode;
 import com.wgzhao.addax.rdbms.util.DataBaseType;
 import com.wgzhao.addax.rdbms.util.RdbmsException;
 import org.apache.commons.lang3.StringUtils;
@@ -330,32 +329,20 @@ public class CommonRdbmsReader
                         return new BytesColumn(rs.getBytes(i));
                     }
 
-                case Types.NULL:
-                    String stringData = null;
-                    if (rs.getObject(i) != null) {
-                        stringData = rs.getObject(i).toString();
-                    }
-                    return new StringColumn(stringData);
-
                 case Types.ARRAY:
                     return new StringColumn(rs.getArray(i).toString());
-
-                case Types.JAVA_OBJECT:
-
-                case Types.OTHER:
-                    return new StringColumn(rs.getObject(i).toString());
 
                 case Types.SQLXML:
                     return new StringColumn(rs.getSQLXML(i).getString());
 
                 default:
-                    throw AddaxException.asAddaxException(DBUtilErrorCode.UNSUPPORTED_TYPE,
-                            String.format("The column configuration is incorrect, The database does not support reading this field type."
-                                            + "Field name:[%s], Field type:[%s], "
-                                            + "Field typename:[%s], Field java type:[%s]. Please try using database " +
-                                            "functions to convert it to a supported type or ignore the field.",
-                                    metaData.getColumnName(i), metaData.getColumnType(i),
-                                    metaData.getColumnTypeName(i), metaData.getColumnClassName(i)));
+                    // use object as default data type for all unknown datatype
+                    LOG.debug("Unknown data type: {} at field name: {}, using getObject().", metaData.getColumnType(i), metaData.getColumnName(i));
+                    String stringData = null;
+                    if (rs.getObject(i) != null) {
+                        stringData = rs.getObject(i).toString();
+                    }
+                    return new StringColumn(stringData);
             }
         }
 
