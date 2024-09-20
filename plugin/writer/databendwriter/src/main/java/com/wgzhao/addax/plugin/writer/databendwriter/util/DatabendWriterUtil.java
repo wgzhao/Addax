@@ -23,7 +23,7 @@ public final class DatabendWriterUtil {
         List<String> onConflictColumns = originalConfig.getList(ONCONFLICT_COLUMN, String.class);
         StringBuilder writeDataSqlTemplate = new StringBuilder();
 
-        String jdbcUrl = originalConfig.getString(String.format("%s[0].%s",
+        String jdbcUrl = originalConfig.getString(String.format("%s.%s",
                 Key.CONNECTION, Key.JDBC_URL));
 
         String writeMode = originalConfig.getString(Key.WRITE_MODE, "INSERT");

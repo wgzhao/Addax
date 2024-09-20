@@ -7,10 +7,13 @@ import com.wgzhao.addax.common.util.Configuration;
 import com.wgzhao.addax.plugin.writer.databendwriter.util.DatabendWriterUtil;
 import com.wgzhao.addax.rdbms.util.DataBaseType;
 import com.wgzhao.addax.rdbms.writer.CommonRdbmsWriter;
+import org.apache.commons.lang3.StringUtils;
 
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.sql.Types;
+import java.util.Arrays;
+import java.util.Base64;
 import java.util.List;
 
 public class DatabendWriter extends Writer {
@@ -86,6 +89,10 @@ public class DatabendWriter extends Writer {
                             // cast variant / array into string is fine.
                             preparedStatement.setString(columnIndex, column.asString());
                             return preparedStatement;
+                        case Types.BLOB:
+                        case Types.BINARY:
+                            preparedStatement.setString(columnIndex,bytesToHex(column.asBytes()));
+                            return preparedStatement;
                     }
                     return super.fillPreparedStatementColumnType(preparedStatement, columnIndex, columnSqlType, column);
                 }
@@ -113,5 +120,16 @@ public class DatabendWriter extends Writer {
             this.commonRdbmsWriterSlave.startWrite(lineReceiver, this.writerSliceConfig, this.getTaskPluginCollector());
         }
 
+        private String bytesToHex(byte[] bytes) {
+            StringBuilder hexString = new StringBuilder();
+            for (byte b : bytes) {
+                String hex = Integer.toHexString(0xFF & b);
+                if (hex.length() == 1) {
+                    hexString.append('0'); // Pad with leading zero if necessary
+                }
+                hexString.append(hex);
+            }
+            return hexString.toString();
+        }
     }
 }
