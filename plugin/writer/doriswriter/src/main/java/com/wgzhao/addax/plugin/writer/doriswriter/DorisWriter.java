@@ -26,7 +26,6 @@ import com.wgzhao.addax.common.plugin.RecordReceiver;
 import com.wgzhao.addax.common.spi.Writer;
 import com.wgzhao.addax.common.util.Configuration;
 import com.wgzhao.addax.rdbms.util.DBUtil;
-import com.wgzhao.addax.rdbms.util.DBUtilErrorCode;
 import com.wgzhao.addax.rdbms.util.DataBaseType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -35,6 +34,8 @@ import java.sql.Connection;
 import java.util.ArrayList;
 import java.util.List;
 
+import static com.wgzhao.addax.common.exception.CommonErrorCode.CONFIG_ERROR;
+import static com.wgzhao.addax.common.exception.CommonErrorCode.EXECUTE_FAIL;
 
 /**
  * doris data writer
@@ -143,7 +144,7 @@ public class DorisWriter
                     if (record.getColumnNumber() != options.getColumns().size()) {
                         throw AddaxException
                                 .asAddaxException(
-                                        DBUtilErrorCode.CONF_ERROR,
+                                        CONFIG_ERROR,
                                         String.format(
                                                 "There is an error in the column configuration information. " +
                                                         "This is because you have configured a task where the number of fields to be read from the source:%s " +
@@ -156,7 +157,7 @@ public class DorisWriter
                 }
             }
             catch (Exception e) {
-                throw AddaxException.asAddaxException(DBUtilErrorCode.WRITE_DATA_ERROR, e);
+                throw AddaxException.asAddaxException(EXECUTE_FAIL, e);
             }
         }
 
@@ -167,7 +168,7 @@ public class DorisWriter
                 writerManager.close();
             }
             catch (Exception e) {
-                throw AddaxException.asAddaxException(DBUtilErrorCode.WRITE_DATA_ERROR, e);
+                throw AddaxException.asAddaxException(EXECUTE_FAIL, e);
             }
         }
 

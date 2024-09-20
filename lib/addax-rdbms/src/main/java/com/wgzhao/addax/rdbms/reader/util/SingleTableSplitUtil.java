@@ -27,7 +27,6 @@ import com.wgzhao.addax.common.base.Key;
 import com.wgzhao.addax.common.exception.AddaxException;
 import com.wgzhao.addax.common.util.Configuration;
 import com.wgzhao.addax.rdbms.util.DBUtil;
-import com.wgzhao.addax.rdbms.util.DBUtilErrorCode;
 import com.wgzhao.addax.rdbms.util.DataBaseType;
 import com.wgzhao.addax.rdbms.util.RdbmsException;
 import com.wgzhao.addax.rdbms.util.RdbmsRangeSplitWrap;
@@ -46,6 +45,9 @@ import java.sql.Statement;
 import java.sql.Types;
 import java.util.ArrayList;
 import java.util.List;
+
+import static com.wgzhao.addax.common.exception.CommonErrorCode.CONFIG_ERROR;
+import static com.wgzhao.addax.common.exception.CommonErrorCode.NOT_SUPPORT_TYPE;
 
 public class SingleTableSplitUtil
 {
@@ -73,7 +75,7 @@ public class SingleTableSplitUtil
         else {
             Pair<Object, Object> minMaxPK = getPkRange(configuration);
             if (null == minMaxPK) {
-                throw AddaxException.asAddaxException(DBUtilErrorCode.ILLEGAL_SPLIT_PK,
+                throw AddaxException.asAddaxException(CONFIG_ERROR,
                         "Primary key-based table splitting failed. The key type ONLY supports integer and string.");
             }
 
@@ -96,7 +98,7 @@ public class SingleTableSplitUtil
                         new BigInteger(minMaxPK.getRight().toString()), adviceNum, splitPkName);
             }
             else {
-                throw AddaxException.asAddaxException(DBUtilErrorCode.ILLEGAL_SPLIT_PK,
+                throw AddaxException.asAddaxException(NOT_SUPPORT_TYPE,
                         "the splitPk[" + splitPkName + "] type is unsupported, it only support int and string");
             }
         }
@@ -177,7 +179,7 @@ public class SingleTableSplitUtil
     {
         Pair<Object, Object> minMaxPK = checkSplitPk(conn, pkRangeSQL, fetchSize, table, username, null);
         if (null == minMaxPK) {
-            throw AddaxException.asAddaxException(DBUtilErrorCode.ILLEGAL_SPLIT_PK,
+            throw AddaxException.asAddaxException(CONFIG_ERROR,
                     "The split key should be single column, and the type is either integer or string.");
         }
     }
@@ -228,23 +230,23 @@ public class SingleTableSplitUtil
                         // check: string shouldn't contain '.', for oracle
                         String minMax = rs.getString(1) + rs.getString(2);
                         if (StringUtils.contains(minMax, '.')) {
-                            throw AddaxException.asAddaxException(DBUtilErrorCode.ILLEGAL_SPLIT_PK, errorMsg);
+                            throw AddaxException.asAddaxException(CONFIG_ERROR, errorMsg);
                         }
                     }
                 }
                 else {
-                    throw AddaxException.asAddaxException(DBUtilErrorCode.ILLEGAL_SPLIT_PK, errorMsg);
+                    throw AddaxException.asAddaxException(CONFIG_ERROR, errorMsg);
                 }
             }
             else {
-                throw AddaxException.asAddaxException(DBUtilErrorCode.ILLEGAL_SPLIT_PK, errorMsg);
+                throw AddaxException.asAddaxException(CONFIG_ERROR, errorMsg);
             }
         }
         catch (AddaxException e) {
             throw e;
         }
         catch (Exception e) {
-            throw AddaxException.asAddaxException(DBUtilErrorCode.ILLEGAL_SPLIT_PK, "Failed to split the table.", e);
+            throw AddaxException.asAddaxException(CONFIG_ERROR, "Failed to split the table.", e);
         }
         finally {
             DBUtil.closeDBResources(rs, null, null);
@@ -267,7 +269,7 @@ public class SingleTableSplitUtil
             }
         }
         catch (Exception e) {
-            throw AddaxException.asAddaxException(DBUtilErrorCode.ILLEGAL_SPLIT_PK,
+            throw AddaxException.asAddaxException(CONFIG_ERROR,
                     "Failed to obtain the type of split key.");
         }
         return ret;
@@ -361,7 +363,7 @@ public class SingleTableSplitUtil
             throw e;
         }
         catch (Exception e) {
-            throw AddaxException.asAddaxException(DBUtilErrorCode.ILLEGAL_SPLIT_PK, "Failed to split table by split key.", e);
+            throw AddaxException.asAddaxException(CONFIG_ERROR, "Failed to split table by split key.", e);
         }
         finally {
             DBUtil.closeDBResources(rs, null, null);
@@ -395,7 +397,7 @@ public class SingleTableSplitUtil
                         splitPK, "'", dataBaseType));
             }
             else {
-                throw AddaxException.asAddaxException(DBUtilErrorCode.ILLEGAL_SPLIT_PK,
+                throw AddaxException.asAddaxException(CONFIG_ERROR,
                         "the data type of split key is unsupported. it ONLY supports integer and string.");
             }
         }

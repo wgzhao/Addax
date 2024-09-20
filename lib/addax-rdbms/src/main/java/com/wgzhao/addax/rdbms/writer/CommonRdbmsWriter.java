@@ -30,7 +30,6 @@ import com.wgzhao.addax.common.plugin.RecordReceiver;
 import com.wgzhao.addax.common.plugin.TaskPluginCollector;
 import com.wgzhao.addax.common.util.Configuration;
 import com.wgzhao.addax.rdbms.util.DBUtil;
-import com.wgzhao.addax.rdbms.util.DBUtilErrorCode;
 import com.wgzhao.addax.rdbms.util.DataBaseType;
 import com.wgzhao.addax.rdbms.util.RdbmsException;
 import com.wgzhao.addax.rdbms.writer.util.OriginalConfPretreatmentUtil;
@@ -40,7 +39,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.math.BigDecimal;
-import java.sql.Clob;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
@@ -49,6 +47,10 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
+
+import static com.wgzhao.addax.common.exception.CommonErrorCode.CONFIG_ERROR;
+import static com.wgzhao.addax.common.exception.CommonErrorCode.EXECUTE_FAIL;
+import static com.wgzhao.addax.common.exception.CommonErrorCode.NOT_SUPPORT_TYPE;
 
 public class CommonRdbmsWriter
 {
@@ -303,7 +305,7 @@ public class CommonRdbmsWriter
                     if (record.getColumnNumber() != this.columnNumber) {
                         // 源头读取字段列数与目的表字段写入列数不相等，直接报错
                         throw AddaxException.asAddaxException(
-                                DBUtilErrorCode.CONF_ERROR,
+                                CONFIG_ERROR,
                                 String.format(
                                         "The item column number [%d] in source file not equals the column number [%d] in table.",
                                         record.getColumnNumber(),
@@ -326,7 +328,7 @@ public class CommonRdbmsWriter
             }
             catch (Exception e) {
                 throw AddaxException.asAddaxException(
-                        DBUtilErrorCode.WRITE_DATA_ERROR, e);
+                        EXECUTE_FAIL, e);
             }
             finally {
                 writeBuffer.clear();
@@ -411,7 +413,7 @@ public class CommonRdbmsWriter
             }
             catch (Exception e) {
                 throw AddaxException.asAddaxException(
-                        DBUtilErrorCode.WRITE_DATA_ERROR, e);
+                        EXECUTE_FAIL, e);
             }
             finally {
                 DBUtil.closeDBResources(preparedStatement, null);
@@ -441,7 +443,7 @@ public class CommonRdbmsWriter
                 }
             }
             catch (Exception e) {
-                throw AddaxException.asAddaxException(DBUtilErrorCode.WRITE_DATA_ERROR, e);
+                throw AddaxException.asAddaxException(EXECUTE_FAIL, e);
             }
             finally {
                 DBUtil.closeDBResources(preparedStatement, null);
@@ -564,7 +566,7 @@ public class CommonRdbmsWriter
                 default:
                     Map<String, Object> map = this.resultSetMetaData.get(columnIndex);
                     throw AddaxException.asAddaxException(
-                            DBUtilErrorCode.UNSUPPORTED_TYPE,
+                            NOT_SUPPORT_TYPE,
                             String.format(
                                     "您的配置文件中的列配置信息有误. 不支持数据库写入这种字段类型. 字段名:[%s], " +
                                             "字段SQL类型编号:[%s], 字段Java类型:[%s]. 请修改表中该字段的类型或者不同步该字段.",

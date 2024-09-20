@@ -10,7 +10,6 @@ import com.wgzhao.addax.plugin.writer.starrockswriter.row.StarRocksISerializer;
 import com.wgzhao.addax.plugin.writer.starrockswriter.row.StarRocksSerializerFactory;
 import com.wgzhao.addax.plugin.writer.starrockswriter.util.StarRocksWriterUtil;
 import com.wgzhao.addax.rdbms.util.DBUtil;
-import com.wgzhao.addax.rdbms.util.DBUtilErrorCode;
 import com.wgzhao.addax.rdbms.util.DataBaseType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -18,6 +17,9 @@ import org.slf4j.LoggerFactory;
 import java.sql.Connection;
 import java.util.ArrayList;
 import java.util.List;
+
+import static com.wgzhao.addax.common.exception.CommonErrorCode.CONFIG_ERROR;
+import static com.wgzhao.addax.common.exception.CommonErrorCode.EXECUTE_FAIL;
 
 public class StarRocksWriter
         extends Writer
@@ -126,7 +128,7 @@ public class StarRocksWriter
                     if (record.getColumnNumber() != options.getColumns().size()) {
                         throw AddaxException
                                 .asAddaxException(
-                                        DBUtilErrorCode.CONF_ERROR,
+                                        CONFIG_ERROR,
                                         String.format(
                                                 "列配置信息有错误. 因为您配置的任务中，源头读取字段数:%s 与 目的表要写入的字段数:%s 不相等. 请检查您的配置并作出修改.",
                                                 record.getColumnNumber(),
@@ -136,7 +138,7 @@ public class StarRocksWriter
                 }
             }
             catch (Exception e) {
-                throw AddaxException.asAddaxException(DBUtilErrorCode.WRITE_DATA_ERROR, e);
+                throw AddaxException.asAddaxException(EXECUTE_FAIL, e);
             }
         }
 
@@ -147,7 +149,7 @@ public class StarRocksWriter
                 writerManager.close();
             }
             catch (Exception e) {
-                throw AddaxException.asAddaxException(DBUtilErrorCode.WRITE_DATA_ERROR, e);
+                throw AddaxException.asAddaxException(EXECUTE_FAIL, e);
             }
         }
 

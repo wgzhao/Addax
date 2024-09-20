@@ -40,7 +40,6 @@ import com.wgzhao.addax.common.exception.AddaxException;
 import com.wgzhao.addax.common.plugin.RecordSender;
 import com.wgzhao.addax.common.plugin.TaskPluginCollector;
 import com.wgzhao.addax.common.util.Configuration;
-import com.wgzhao.addax.storage.reader.StorageReaderErrorCode;
 import com.wgzhao.addax.storage.reader.StorageReaderUtil;
 import org.apache.avro.Conversions;
 import org.apache.avro.generic.GenericData;

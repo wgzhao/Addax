@@ -29,7 +29,6 @@ import com.wgzhao.addax.common.util.EncryptUtil;
 import com.wgzhao.addax.common.util.ListUtil;
 import com.wgzhao.addax.rdbms.util.ConnectionFactory;
 import com.wgzhao.addax.rdbms.util.DBUtil;
-import com.wgzhao.addax.rdbms.util.DBUtilErrorCode;
 import com.wgzhao.addax.rdbms.util.DataBaseType;
 import com.wgzhao.addax.rdbms.util.JdbcConnectionFactory;
 import com.wgzhao.addax.rdbms.util.TableExpandUtil;
@@ -40,6 +39,10 @@ import org.slf4j.LoggerFactory;
 import java.sql.Connection;
 import java.util.ArrayList;
 import java.util.List;
+
+import static com.wgzhao.addax.common.exception.CommonErrorCode.CONFIG_ERROR;
+import static com.wgzhao.addax.common.exception.CommonErrorCode.ILLEGAL_VALUE;
+import static com.wgzhao.addax.common.exception.CommonErrorCode.REQUIRED_VALUE;
 
 public final class OriginalConfPretreatmentUtil
 {
@@ -52,7 +55,7 @@ public final class OriginalConfPretreatmentUtil
     public static void doPretreatment(Configuration originalConfig, DataBaseType dataBaseType)
     {
         // 检查 username 配置（必填）
-        originalConfig.getNecessaryValue(Key.USERNAME, DBUtilErrorCode.REQUIRED_VALUE);
+        originalConfig.getNecessaryValue(Key.USERNAME, REQUIRED_VALUE);
 
         // 有些数据库没有密码，因此密码不再作为必选项
         if (originalConfig.getString(Key.PASSWORD) == null) {
@@ -77,7 +80,7 @@ public final class OriginalConfPretreatmentUtil
         // 检查batchSize 配置（选填，如果未填写，则设置为默认值）
         int batchSize = originalConfig.getInt(Key.BATCH_SIZE, Constant.DEFAULT_BATCH_SIZE);
         if (batchSize < 1) {
-            throw AddaxException.asAddaxException(DBUtilErrorCode.ILLEGAL_VALUE, String.format(
+            throw AddaxException.asAddaxException(ILLEGAL_VALUE, String.format(
                     "The item batchSize [%s] must be greater than 1. recommended value range is [100,1000].",
                     batchSize));
         }
@@ -100,7 +103,7 @@ public final class OriginalConfPretreatmentUtil
             }
             String jdbcUrl = connConf.getString(Key.JDBC_URL);
             if (StringUtils.isBlank(jdbcUrl)) {
-                throw AddaxException.asAddaxException(DBUtilErrorCode.REQUIRED_VALUE, "The item jdbcUrl is required.");
+                throw AddaxException.asAddaxException(REQUIRED_VALUE, "The item jdbcUrl is required.");
             }
 
             jdbcUrl = dataBaseType.appendJDBCSuffixForWriter(jdbcUrl);
@@ -109,7 +112,7 @@ public final class OriginalConfPretreatmentUtil
             List<String> tables = connConf.getList(Key.TABLE, String.class);
 
             if (null == tables || tables.isEmpty()) {
-                throw AddaxException.asAddaxException(DBUtilErrorCode.REQUIRED_VALUE,
+                throw AddaxException.asAddaxException(REQUIRED_VALUE,
                         "The item table is required.");
             }
 
@@ -117,8 +120,7 @@ public final class OriginalConfPretreatmentUtil
             List<String> expandedTables = TableExpandUtil.expandTableConf(dataBaseType, tables);
 
             if (expandedTables.isEmpty()) {
-                throw AddaxException.asAddaxException(DBUtilErrorCode.CONF_ERROR,
-                        "The item table is required.");
+                throw AddaxException.asAddaxException(REQUIRED_VALUE,  "The item table is required.");
             }
 
             tableNum += expandedTables.size();
@@ -133,7 +135,7 @@ public final class OriginalConfPretreatmentUtil
     {
         List<String> userConfiguredColumns = originalConfig.getList(Key.COLUMN, String.class);
         if (null == userConfiguredColumns || userConfiguredColumns.isEmpty()) {
-            throw AddaxException.asAddaxException(DBUtilErrorCode.ILLEGAL_VALUE,
+            throw AddaxException.asAddaxException(ILLEGAL_VALUE,
                     "The item column is required and can not be empty.");
         }
         else {
@@ -157,7 +159,7 @@ public final class OriginalConfPretreatmentUtil
                 originalConfig.set(Key.COLUMN, allColumns);
             }
             else if (userConfiguredColumns.size() > allColumns.size()) {
-                throw AddaxException.asAddaxException(DBUtilErrorCode.ILLEGAL_VALUE,
+                throw AddaxException.asAddaxException(CONFIG_ERROR,
                         String.format("The number of columns your configured [%d] are greater than the number of table columns [%d].",
                                 userConfiguredColumns.size(), allColumns.size()));
             }

@@ -27,7 +27,6 @@ import com.wgzhao.addax.common.plugin.RecordSender;
 import com.wgzhao.addax.common.spi.Reader;
 import com.wgzhao.addax.common.util.Configuration;
 import com.wgzhao.addax.rdbms.reader.CommonRdbmsReader;
-import com.wgzhao.addax.rdbms.util.DBUtilErrorCode;
 import com.wgzhao.addax.rdbms.util.DataBaseType;
 
 import java.io.UnsupportedEncodingException;
@@ -39,6 +38,7 @@ import java.util.List;
 
 import static com.wgzhao.addax.common.base.Key.FETCH_SIZE;
 import static com.wgzhao.addax.common.base.Constant.DEFAULT_FETCH_SIZE;
+import static com.wgzhao.addax.common.exception.CommonErrorCode.ILLEGAL_VALUE;
 
 public class SqlServerReader
         extends Reader
@@ -60,7 +60,7 @@ public class SqlServerReader
             int fetchSize = this.originalConfig.getInt(FETCH_SIZE, DEFAULT_FETCH_SIZE);
             if (fetchSize < 1) {
                 throw AddaxException
-                        .asAddaxException(DBUtilErrorCode.REQUIRED_VALUE,
+                        .asAddaxException(ILLEGAL_VALUE,
                                 String.format("您配置的fetchSize有误，fetchSize : [%d] 设置值不能小于 1.", fetchSize));
             }
             this.originalConfig.set(FETCH_SIZE, fetchSize);

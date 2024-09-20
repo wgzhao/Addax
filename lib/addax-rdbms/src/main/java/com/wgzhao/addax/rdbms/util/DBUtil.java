@@ -49,9 +49,13 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 
+import static com.wgzhao.addax.common.exception.CommonErrorCode.CONFIG_ERROR;
 import static com.wgzhao.addax.common.exception.CommonErrorCode.CONNECT_ERROR;
+import static com.wgzhao.addax.common.exception.CommonErrorCode.EXECUTE_FAIL;
+import static com.wgzhao.addax.common.exception.CommonErrorCode.RUNTIME_ERROR;
 
-public final class DBUtil {
+public final class DBUtil
+{
     private static final Logger LOG = LoggerFactory.getLogger(DBUtil.class);
     private static final int DEFAULT_SOCKET_TIMEOUT_SEC = 20_000;
 
@@ -60,39 +64,47 @@ public final class DBUtil {
             .setDaemon(true)
             .build()));
 
-    private DBUtil() {
+    private DBUtil()
+    {
     }
 
-    public static void validJdbcUrl(DataBaseType dataBaseType, String jdbcUrl, String username, String password, List<String> preSql) {
+    public static void validJdbcUrl(DataBaseType dataBaseType, String jdbcUrl, String username, String password, List<String> preSql)
+    {
         try {
             RetryUtil.executeWithRetry(() -> {
                 if (null == preSql || preSql.isEmpty()) {
                     testConnWithoutRetry(dataBaseType, jdbcUrl, username, password);
-                } else {
+                }
+                else {
                     testConnWithoutRetry(dataBaseType, jdbcUrl, username, password, preSql);
                 }
                 return null;
             }, 3, 1000L, true);
-        } catch (Exception e) {
+        }
+        catch (Exception e) {
             throw AddaxException.asAddaxException(CONNECT_ERROR,
                     "Failed to connect the database server using " + jdbcUrl, e);
         }
     }
 
-    public static void validJdbcUrlWithoutRetry(DataBaseType dataBaseType, String jdbcUrl, String username, String password, List<String> preSql) {
+    public static void validJdbcUrlWithoutRetry(DataBaseType dataBaseType, String jdbcUrl, String username, String password, List<String> preSql)
+    {
         if (null != preSql && !preSql.isEmpty()) {
             testConnWithoutRetry(dataBaseType, jdbcUrl, username, password, preSql);
-        } else {
+        }
+        else {
             try {
                 testConnWithoutRetry(dataBaseType, jdbcUrl, username, password);
-            } catch (Exception e) {
+            }
+            catch (Exception e) {
                 throw AddaxException.asAddaxException(
                         CONNECT_ERROR, "Failed to connect the server using jdbcUrl " + jdbcUrl, e);
             }
         }
     }
 
-    public static boolean checkInsertPrivilege(DataBaseType dataBaseType, String jdbcURL, String userName, String password, List<String> tableList) {
+    public static boolean checkInsertPrivilege(DataBaseType dataBaseType, String jdbcURL, String userName, String password, List<String> tableList)
+    {
         Connection connection = connect(dataBaseType, jdbcURL, userName, password);
         String insertTemplate = "INSERT INTO %s (SELECT * FROM %s WHERE 1 = 2)";
 
@@ -103,7 +115,8 @@ public final class DBUtil {
             try {
                 insertStmt = connection.createStatement();
                 insertStmt.execute(checkInsertPrivilegeSql);
-            } catch (Exception e) {
+            }
+            catch (Exception e) {
                 hasInsertPrivilege = false;
                 LOG.warn("Failed to insert into table [{}] with user [{}]: {}.", userName, tableName, e.getMessage());
             }
@@ -113,7 +126,8 @@ public final class DBUtil {
         return hasInsertPrivilege;
     }
 
-    public static boolean checkDeletePrivilege(DataBaseType dataBaseType, String jdbcURL, String userName, String password, List<String> tableList) {
+    public static boolean checkDeletePrivilege(DataBaseType dataBaseType, String jdbcURL, String userName, String password, List<String> tableList)
+    {
         Connection connection = connect(dataBaseType, jdbcURL, userName, password);
         String deleteTemplate = "DELETE FROM %s WHERE 1 = 2";
 
@@ -124,7 +138,8 @@ public final class DBUtil {
             try {
                 deleteStmt = connection.createStatement();
                 deleteStmt.execute(checkDeletePrivilegeSQL);
-            } catch (Exception e) {
+            }
+            catch (Exception e) {
                 hasInsertPrivilege = false;
                 LOG.warn("Failed to delete from table [{}] with user [{}]: {}.", userName, tableName, e.getMessage());
             }
@@ -134,7 +149,8 @@ public final class DBUtil {
         return hasInsertPrivilege;
     }
 
-    public static boolean needCheckDeletePrivilege(Configuration originalConfig) {
+    public static boolean needCheckDeletePrivilege(Configuration originalConfig)
+    {
         List<String> allSqls = new ArrayList<>();
         List<String> preSQLs = originalConfig.getList(Key.PRE_SQL, String.class);
         List<String> postSQLs = originalConfig.getList(Key.POST_SQL, String.class);
@@ -159,22 +175,25 @@ public final class DBUtil {
      * <p>
      *
      * @param dataBaseType database type.
-     * @param jdbcUrl      java jdbc url.
-     * @param username     User for login.
-     * @param password     Password to use when connecting to server.
+     * @param jdbcUrl java jdbc url.
+     * @param username User for login.
+     * @param password Password to use when connecting to server.
      * @return Connection class {@link Connection}
      */
-    public static Connection getConnection(DataBaseType dataBaseType, String jdbcUrl, String username, String password) {
+    public static Connection getConnection(DataBaseType dataBaseType, String jdbcUrl, String username, String password)
+    {
 
         return getConnection(dataBaseType, jdbcUrl, username, password, DEFAULT_SOCKET_TIMEOUT_SEC);
     }
 
-    public static Connection getConnection(DataBaseType dataBaseType, String jdbcUrl, String username, String password, int socketTimeout) {
+    public static Connection getConnection(DataBaseType dataBaseType, String jdbcUrl, String username, String password, int socketTimeout)
+    {
 
         try {
             return RetryUtil.executeWithRetry(() -> DBUtil.connect(dataBaseType, jdbcUrl, username,
                     password, socketTimeout), 3, 1000L, true);
-        } catch (Exception e) {
+        }
+        catch (Exception e) {
             throw AddaxException.asAddaxException(CONNECT_ERROR,
                     String.format("Failed to connect the database with [%s].", jdbcUrl), e);
         }
@@ -187,24 +206,28 @@ public final class DBUtil {
      * <p>
      *
      * @param dataBaseType The database's type
-     * @param jdbcUrl      jdbc url
-     * @param username     User for login
-     * @param password     Password to use when connecting to server
+     * @param jdbcUrl jdbc url
+     * @param username User for login
+     * @param password Password to use when connecting to server
      * @return Connection class {@link Connection}
      */
-    public static Connection getConnectionWithoutRetry(DataBaseType dataBaseType, String jdbcUrl, String username, String password) {
+    public static Connection getConnectionWithoutRetry(DataBaseType dataBaseType, String jdbcUrl, String username, String password)
+    {
         return getConnectionWithoutRetry(dataBaseType, jdbcUrl, username, password, DEFAULT_SOCKET_TIMEOUT_SEC);
     }
 
-    public static Connection getConnectionWithoutRetry(DataBaseType dataBaseType, String jdbcUrl, String username, String password, int socketTimeout) {
+    public static Connection getConnectionWithoutRetry(DataBaseType dataBaseType, String jdbcUrl, String username, String password, int socketTimeout)
+    {
         return DBUtil.connect(dataBaseType, jdbcUrl, username, password, socketTimeout);
     }
 
-    private static synchronized Connection connect(DataBaseType dataBaseType, String url, String user, String pass) {
+    private static synchronized Connection connect(DataBaseType dataBaseType, String url, String user, String pass)
+    {
         return connect(dataBaseType, url, user, pass, DEFAULT_SOCKET_TIMEOUT_SEC);
     }
 
-    private static synchronized Connection connect(DataBaseType dataBaseType, String url, String user, String pass, int socketTimeout) {
+    private static synchronized Connection connect(DataBaseType dataBaseType, String url, String user, String pass, int socketTimeout)
+    {
 
         try (BasicDataSource bds = new BasicDataSource()) {
             bds.setUrl(url);
@@ -221,7 +244,8 @@ public final class DBUtil {
                 url = url.replace("inceptor2", "hive2");
                 bds.setUrl(url);
                 bds.setDriverClassName("org.apache.hive.jdbc.HiveDriver");
-            } else {
+            }
+            else {
                 LOG.debug("Connecting to database with driver {}", dataBaseType.getDriverClassName());
                 bds.setDriverClassName(dataBaseType.getDriverClassName());
             }
@@ -229,7 +253,8 @@ public final class DBUtil {
             bds.setMaxIdle(5);
             bds.setMaxOpenPreparedStatements(200);
             return bds.getConnection();
-        } catch (Exception e) {
+        }
+        catch (Exception e) {
             LOG.error("An exception occurred while attempting to connect to the database using jdbcUrl '{}': {}'", url, e.toString());
             throw RdbmsException.asConnException(e);
         }
@@ -238,14 +263,15 @@ public final class DBUtil {
     /**
      * a wrapped method to execute select-like sql statement .
      *
-     * @param conn      Database connection .
-     * @param sql       sql statement to be executed
+     * @param conn Database connection .
+     * @param sql sql statement to be executed
      * @param fetchSize fetch size
      * @return a {@link ResultSet}
      * @throws SQLException if occurs SQLException.
      */
     public static ResultSet query(Connection conn, String sql, int fetchSize)
-            throws SQLException {
+            throws SQLException
+    {
         // 默认3600 s 的query Timeout
         return query(conn, sql, fetchSize, DEFAULT_SOCKET_TIMEOUT_SEC);
     }
@@ -253,26 +279,29 @@ public final class DBUtil {
     /**
      * a wrapped method to execute select-like sql statement .
      *
-     * @param conn         Database connection .
-     * @param sql          sql statement to be executed
-     * @param fetchSize    fetch size each batch
+     * @param conn Database connection .
+     * @param sql sql statement to be executed
+     * @param fetchSize fetch size each batch
      * @param queryTimeout unit:second
      * @return A {@link ResultSet}
      * @throws SQLException if failed to execute sql statement
      */
     public static ResultSet query(Connection conn, String sql, int fetchSize, int queryTimeout)
-            throws SQLException {
+            throws SQLException
+    {
 
         Statement stmt;
         try {
             // make sure autocommit is off
             conn.setAutoCommit(false);
-        } catch (SQLFeatureNotSupportedException ignore) {
+        }
+        catch (SQLFeatureNotSupportedException ignore) {
             LOG.warn("The current database does not support AUTO_COMMIT property");
         }
         try {
             stmt = conn.createStatement(ResultSet.TYPE_FORWARD_ONLY, ResultSet.CONCUR_READ_ONLY); //NOSONAR
-        } catch (SQLException ignore) {
+        }
+        catch (SQLException ignore) {
             // some database does not support TYPE_FORWARD_ONLY/CONCUR_READ_ONLY
             LOG.warn("The current database does not support TYPE_FORWARD_ONLY/CONCUR_READ_ONLY");
             stmt = conn.createStatement(); //NOSONAR
@@ -282,11 +311,13 @@ public final class DBUtil {
         return stmt.executeQuery(sql);
     }
 
-    public static void closeDBResources(ResultSet rs, Statement stmt, Connection conn) {
+    public static void closeDBResources(ResultSet rs, Statement stmt, Connection conn)
+    {
         if (null != rs) {
             try {
                 rs.close();
-            } catch (SQLException ignored) {
+            }
+            catch (SQLException ignored) {
                 //
             }
         }
@@ -294,7 +325,8 @@ public final class DBUtil {
         if (null != stmt) {
             try {
                 stmt.close();
-            } catch (SQLException ignored) {
+            }
+            catch (SQLException ignored) {
                 //
             }
         }
@@ -302,22 +334,26 @@ public final class DBUtil {
         if (null != conn) {
             try {
                 conn.close();
-            } catch (SQLException ignored) {
+            }
+            catch (SQLException ignored) {
                 //
             }
         }
     }
 
-    public static void closeDBResources(Statement stmt, Connection conn) {
+    public static void closeDBResources(Statement stmt, Connection conn)
+    {
         closeDBResources(null, stmt, conn);
     }
 
-    public static List<String> getTableColumns(DataBaseType dataBaseType, String jdbcUrl, String user, String pass, String tableName) {
+    public static List<String> getTableColumns(DataBaseType dataBaseType, String jdbcUrl, String user, String pass, String tableName)
+    {
         Connection conn = getConnection(dataBaseType, jdbcUrl, user, pass);
         return getTableColumnsByConn(conn, tableName);
     }
 
-    public static List<String> getTableColumnsByConn(Connection conn, String tableName) {
+    public static List<String> getTableColumnsByConn(Connection conn, String tableName)
+    {
         List<String> columns = new ArrayList<>();
 
         List<Map<String, Object>> rsMetaData = getColumnMetaData(conn, tableName, "*");
@@ -330,12 +366,13 @@ public final class DBUtil {
     /**
      * get column description
      *
-     * @param conn      database connection
+     * @param conn database connection
      * @param tableName The table name
-     * @param column    table column
+     * @param column table column
      * @return {@link List}
      */
-    public static List<Map<String, Object>> getColumnMetaData(Connection conn, String tableName, String column) {
+    public static List<Map<String, Object>> getColumnMetaData(Connection conn, String tableName, String column)
+    {
         List<Map<String, Object>> result = new ArrayList<>();
         // skip index 0, compliant with jdbc resultSet and resultMetaData
         result.add(null);
@@ -345,7 +382,8 @@ public final class DBUtil {
             if (DataBaseType.TDengine.getDriverClassName().equals(conn.getMetaData().getDriverName())) {
                 // TDengine does not support 1=2 clause
                 queryColumnSql = "SELECT " + column + " FROM " + tableName + " LIMIT 0";
-            } else {
+            }
+            else {
                 queryColumnSql = "SELECT " + column + " FROM " + tableName + " WHERE 1 = 2";
             }
             ResultSetMetaData metaData = statement.executeQuery(queryColumnSql).getMetaData();
@@ -361,51 +399,60 @@ public final class DBUtil {
             }
             statement.close();
             return result;
-        } catch (SQLException e) {
-            throw AddaxException.asAddaxException(DBUtilErrorCode.GET_COLUMN_INFO_FAILED,
+        }
+        catch (SQLException e) {
+            throw AddaxException.asAddaxException(EXECUTE_FAIL,
                     String.format("Failed to obtain the fields of table [%s].", tableName), e);
         }
     }
 
-    public static void testConnWithoutRetry(DataBaseType dataBaseType, String url, String user, String pass) {
+    public static void testConnWithoutRetry(DataBaseType dataBaseType, String url, String user, String pass)
+    {
         Connection ignored = null;
         try {
             ignored = connect(dataBaseType, url, user, pass);
-        } catch (Exception e) {
+        }
+        catch (Exception e) {
             throw AddaxException.asAddaxException(CONNECT_ERROR,
                     String.format("Failed to connect the database using '%s': %s.", url, e.getMessage()), e);
-        } finally {
+        }
+        finally {
             if (null != ignored) {
                 try {
                     ignored.close();
-                } catch (SQLException e) {
+                }
+                catch (SQLException e) {
                     LOG.warn("Failed to close the connection.");
                 }
             }
         }
     }
 
-    public static void testConnWithoutRetry(DataBaseType dataBaseType, String url, String user, String pass, List<String> preSql) {
+    public static void testConnWithoutRetry(DataBaseType dataBaseType, String url, String user, String pass, List<String> preSql)
+    {
         try (Connection connection = connect(dataBaseType, url, user, pass)) {
             for (String pre : preSql) {
                 if (!doPreCheck(connection, pre)) {
                     LOG.warn("Failed to doPreCheck.");
                 }
             }
-        } catch (Exception e) {
+        }
+        catch (Exception e) {
             LOG.warn("Failed to connect the database using '{}': {}.", url, e.getMessage());
         }
     }
 
     public static ResultSet query(Connection conn, String sql)
-            throws SQLException {
+            throws SQLException
+    {
         try (Statement stmt = conn.createStatement(ResultSet.TYPE_FORWARD_ONLY, ResultSet.CONCUR_READ_ONLY)) {
             stmt.setQueryTimeout(DEFAULT_SOCKET_TIMEOUT_SEC);
             return stmt.executeQuery(sql);
         }
     }
 
-    private static boolean doPreCheck(Connection conn, String pre) {
+    private static boolean doPreCheck(Connection conn, String pre)
+    {
         try (ResultSet rs = query(conn, pre)) {
             int checkResult = -1;
             if (DBUtil.asyncResultSetNext(rs)) {
@@ -419,14 +466,16 @@ public final class DBUtil {
                 return true;
             }
             LOG.warn("Failed to pre-check with [{}]. It should return 0.", pre);
-        } catch (Exception e) {
+        }
+        catch (Exception e) {
             LOG.warn("Failed to pre-check with [{}], errorMessage: [{}].", pre, e.getMessage());
         }
         return false;
     }
 
     // warn:until now, only oracle need to handle session config.
-    public static void dealWithSessionConfig(Connection conn, Configuration config, DataBaseType databaseType, String message) {
+    public static void dealWithSessionConfig(Connection conn, Configuration config, DataBaseType databaseType, String message)
+    {
         List<String> sessionConfig;
         switch (databaseType) {
             case Oracle:
@@ -440,7 +489,8 @@ public final class DBUtil {
         }
     }
 
-    private static void doDealWithSessionConfig(Connection conn, List<String> sessions, String message) {
+    private static void doDealWithSessionConfig(Connection conn, List<String> sessions, String message)
+    {
         if (null == sessions || sessions.isEmpty()) {
             return;
         }
@@ -448,8 +498,9 @@ public final class DBUtil {
         Statement stmt;
         try {
             stmt = conn.createStatement();
-        } catch (SQLException e) {
-            throw AddaxException.asAddaxException(DBUtilErrorCode.SET_SESSION_ERROR,
+        }
+        catch (SQLException e) {
+            throw AddaxException.asAddaxException(CONFIG_ERROR,
                     String.format("Failed to set session with [%s]", message), e);
         }
 
@@ -457,15 +508,17 @@ public final class DBUtil {
             LOG.info("Executing SQL:[{}]", sessionSql);
             try {
                 stmt.execute(sessionSql);
-            } catch (SQLException e) {
-                throw AddaxException.asAddaxException(DBUtilErrorCode.SET_SESSION_ERROR,
+            }
+            catch (SQLException e) {
+                throw AddaxException.asAddaxException(CONFIG_ERROR,
                         String.format("Failed to set session with [%s].", message), e);
             }
         }
         DBUtil.closeDBResources(stmt, null);
     }
 
-    public static void sqlValid(String sql, DataBaseType dataBaseType) {
+    public static void sqlValid(String sql, DataBaseType dataBaseType)
+    {
         SQLStatementParser statementParser = SQLParserUtils.createSQLStatementParser(sql, dataBaseType.getTypeName());
         statementParser.parseStatementList();
     }
@@ -476,23 +529,27 @@ public final class DBUtil {
      * @param resultSet result set
      * @return boolean
      */
-    public static boolean asyncResultSetNext(ResultSet resultSet) {
+    public static boolean asyncResultSetNext(ResultSet resultSet)
+    {
         return asyncResultSetNext(resultSet, 3600);
     }
 
-    public static boolean asyncResultSetNext(ResultSet resultSet, int timeout) {
+    public static boolean asyncResultSetNext(ResultSet resultSet, int timeout)
+    {
         Future<Boolean> future = rsExecutors.get().submit(resultSet::next);
         try {
             return future.get(timeout, TimeUnit.SECONDS);
-        } catch (Exception e) {
-            throw AddaxException.asAddaxException(DBUtilErrorCode.RS_ASYNC_ERROR, "Asynchronous retrieval of ResultSet failed.", e);
+        }
+        catch (Exception e) {
+            throw AddaxException.asAddaxException(RUNTIME_ERROR, "Asynchronous retrieval of ResultSet failed.", e);
         }
     }
 
-    public static void loadDriverClass(String pluginType, String pluginName) {
+    public static void loadDriverClass(String pluginType, String pluginName)
+    {
         try {
             String pluginJsonPath = StringUtils.join(
-                    new String[]{
+                    new String[] {
                             System.getProperty("addax.home"),
                             "plugin",
                             pluginType,
@@ -503,8 +560,9 @@ public final class DBUtil {
             for (String driver : drivers) {
                 Class.forName(driver);
             }
-        } catch (ClassNotFoundException e) {
-            throw AddaxException.asAddaxException(DBUtilErrorCode.CONF_ERROR,
+        }
+        catch (ClassNotFoundException e) {
+            throw AddaxException.asAddaxException(CONFIG_ERROR,
                     "Error loading database driver. Please confirm that the libs directory has the driver jar package "
                             + "and the drivers configuration in plugin.json is correct.", e);
         }

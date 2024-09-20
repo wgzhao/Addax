@@ -21,9 +21,7 @@ package com.wgzhao.addax.common.exception;
 
 import com.wgzhao.addax.common.spi.ErrorCode;
 
-/**
- *
- */
+
 public enum CommonErrorCode
         implements ErrorCode
 {
@@ -35,9 +33,13 @@ public enum CommonErrorCode
     CONNECT_ERROR("2002", "connection error"),
 
     CONVERT_NOT_SUPPORT("3001", "unsupported data type conversion"),
-    CONVERT_OVER_FLOW("3002", "data type conversion overflow"),
+    NOT_SUPPORT_TYPE("3002", "unsupported data type"),
+    CONVERT_OVER_FLOW("3003", "data type conversion overflow"),
+    ENCODING_ERROR("3004", "encoding error"),
 
     RETRY_FAIL("4001", "retry failed"),
+    EXECUTE_FAIL("4002", "execution failed"),
+    IO_ERROR("4003", "IO error"),
 
     RUNTIME_ERROR("5001", "runtime error"),
     HOOK_INTERNAL_ERROR("5002", "Hook internal error"),
@@ -70,7 +72,6 @@ public enum CommonErrorCode
     @Override
     public String toString()
     {
-        return String.format("Code:[%s], Describe:[%s]", this.code,
-                this.describe);
+        return String.format("Code:[%s], Describe:[%s]", this.code, this.describe);
     }
 }

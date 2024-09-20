@@ -23,7 +23,6 @@ import com.wgzhao.addax.common.base.HBaseConstant;
 import com.wgzhao.addax.common.base.HBaseKey;
 import com.wgzhao.addax.common.exception.AddaxException;
 import com.wgzhao.addax.common.util.Configuration;
-import com.wgzhao.addax.rdbms.util.DBUtilErrorCode;
 import com.wgzhao.addax.rdbms.util.RdbmsRangeSplitWrap;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.tuple.ImmutablePair;
@@ -41,6 +40,8 @@ import java.sql.Statement;
 import java.sql.Types;
 import java.util.ArrayList;
 import java.util.List;
+
+import static com.wgzhao.addax.common.exception.CommonErrorCode.EXECUTE_FAIL;
 
 public class HBase20SQLReaderHelper
 {
@@ -96,7 +97,7 @@ public class HBase20SQLReaderHelper
             }
         }
         catch (Exception e) {
-            throw AddaxException.asAddaxException(DBUtilErrorCode.ILLEGAL_SPLIT_PK,
+            throw AddaxException.asAddaxException(EXECUTE_FAIL,
                     "Addax 获取切分主键(splitPk)字段类型失败. 该错误通常是系统底层异常导致.");
         }
         return ret;

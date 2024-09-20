@@ -25,7 +25,6 @@ import com.wgzhao.addax.common.exception.AddaxException;
 import com.wgzhao.addax.common.plugin.RecordReceiver;
 import com.wgzhao.addax.common.spi.Writer;
 import com.wgzhao.addax.common.util.Configuration;
-import com.wgzhao.addax.rdbms.util.DBUtilErrorCode;
 import com.wgzhao.addax.rdbms.util.DataBaseType;
 import com.wgzhao.addax.rdbms.writer.CommonRdbmsWriter;
 
@@ -35,6 +34,8 @@ import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.sql.Types;
 import java.util.List;
+
+import static com.wgzhao.addax.common.exception.CommonErrorCode.CONFIG_ERROR;
 
 public class OracleWriter
         extends Writer
@@ -62,7 +63,7 @@ public class OracleWriter
             String writeMode = originalConfig.getString(Key.WRITE_MODE);
             if (null != writeMode) {
                 if (!"insert".equalsIgnoreCase(writeMode) && !writeMode.startsWith("update")) {
-                    throw AddaxException.asAddaxException(DBUtilErrorCode.CONF_ERROR,
+                    throw AddaxException.asAddaxException(CONFIG_ERROR,
                             String.format("The item writeMode your configured [%s] is unsupported, it only supports insert and update mode.", writeMode));
                 }
             }

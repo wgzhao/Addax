@@ -24,11 +24,12 @@ import com.wgzhao.addax.common.exception.AddaxException;
 import com.wgzhao.addax.common.plugin.RecordReceiver;
 import com.wgzhao.addax.common.spi.Writer;
 import com.wgzhao.addax.common.util.Configuration;
-import com.wgzhao.addax.rdbms.util.DBUtilErrorCode;
 import com.wgzhao.addax.rdbms.util.DataBaseType;
 import com.wgzhao.addax.rdbms.writer.CommonRdbmsWriter;
 
 import java.util.List;
+
+import static com.wgzhao.addax.common.exception.CommonErrorCode.CONFIG_ERROR;
 
 public class SybaseWriter
         extends Writer
@@ -49,7 +50,7 @@ public class SybaseWriter
             String writeMode = this.originalConfig.getString(Key.WRITE_MODE);
             if (null != writeMode) {
                 if (!"insert".equalsIgnoreCase(writeMode) && !writeMode.startsWith("update")) {
-                    throw AddaxException.asAddaxException(DBUtilErrorCode.CONF_ERROR,
+                    throw AddaxException.asAddaxException(CONFIG_ERROR,
                             String.format("The writeMode '%s' is illegal, Only insert, update are supported.", writeMode));
                 }
             }

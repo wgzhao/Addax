@@ -28,7 +28,6 @@ import com.wgzhao.addax.common.util.Configuration;
 import com.wgzhao.addax.common.util.EncryptUtil;
 import com.wgzhao.addax.common.util.ListUtil;
 import com.wgzhao.addax.rdbms.util.DBUtil;
-import com.wgzhao.addax.rdbms.util.DBUtilErrorCode;
 import com.wgzhao.addax.rdbms.util.DataBaseType;
 import com.wgzhao.addax.rdbms.util.TableExpandUtil;
 import org.apache.commons.lang3.StringUtils;
@@ -37,6 +36,10 @@ import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import static com.wgzhao.addax.common.exception.CommonErrorCode.CONFIG_ERROR;
+import static com.wgzhao.addax.common.exception.CommonErrorCode.EXECUTE_FAIL;
+import static com.wgzhao.addax.common.exception.CommonErrorCode.REQUIRED_VALUE;
 
 public final class OriginalConfPretreatmentUtil
 {
@@ -49,7 +52,7 @@ public final class OriginalConfPretreatmentUtil
     public static void doPretreatment(Configuration originalConfig)
     {
         // 检查 username 配置（必填）
-        originalConfig.getNecessaryValue(Key.USERNAME, DBUtilErrorCode.REQUIRED_VALUE);
+        originalConfig.getNecessaryValue(Key.USERNAME, REQUIRED_VALUE);
         /*
          * 有些数据库没有密码，因此密码不再作为必选项
          */
@@ -117,12 +120,12 @@ public final class OriginalConfPretreatmentUtil
             LOG.warn("use specified driver class: {}", driverClass);
             dataBaseType.setDriverClassName(driverClass);
         }
-        connConf.getNecessaryValue(Key.JDBC_URL, DBUtilErrorCode.REQUIRED_VALUE);
+        connConf.getNecessaryValue(Key.JDBC_URL, REQUIRED_VALUE);
 
         String jdbcUrl = connConf.getString(Key.JDBC_URL);
 
         if (StringUtils.isBlank(jdbcUrl)) {
-            throw AddaxException.asAddaxException(DBUtilErrorCode.REQUIRED_VALUE, "The parameter [connection.jdbcUrl] is not set.");
+            throw AddaxException.asAddaxException(REQUIRED_VALUE, "The parameter [connection.jdbcUrl] is not set.");
         }
 
         if (isPreCheck) {
@@ -146,7 +149,7 @@ public final class OriginalConfPretreatmentUtil
 
             if (expandedTables.isEmpty()) {
                 throw AddaxException.asAddaxException(
-                        DBUtilErrorCode.ILLEGAL_VALUE, String.format("Failed to obtain the table [%s].", StringUtils.join(tables, ",")));
+                        EXECUTE_FAIL, String.format("Failed to obtain the table [%s].", StringUtils.join(tables, ",")));
             }
 
             tableNum += expandedTables.size();
@@ -166,7 +169,7 @@ public final class OriginalConfPretreatmentUtil
         if (isTableMode) {
             if (null == userConfiguredColumns
                     || userConfiguredColumns.isEmpty()) {
-                throw AddaxException.asAddaxException(DBUtilErrorCode.REQUIRED_VALUE, "The item column is required.");
+                throw AddaxException.asAddaxException(REQUIRED_VALUE, "The item column is required.");
             }
             else {
                 String splitPk = originalConfig.getString(Key.SPLIT_PK, null);
@@ -195,7 +198,7 @@ public final class OriginalConfPretreatmentUtil
 
                     for (String column : userConfiguredColumns) {
                         if ("*".equals(column)) {
-                            throw AddaxException.asAddaxException(DBUtilErrorCode.ILLEGAL_VALUE,
+                            throw AddaxException.asAddaxException(CONFIG_ERROR,
                                     "The item column your configured is invalid, because it includes multiply asterisk('*').");
                         }
 
@@ -206,7 +209,7 @@ public final class OriginalConfPretreatmentUtil
                     originalConfig.set(Key.COLUMN_LIST, quotedColumns);
                     originalConfig.set(Key.COLUMN, StringUtils.join(quotedColumns, ","));
                     if (StringUtils.isNotBlank(splitPk) && !allColumns.contains(splitPk.toLowerCase())) {
-                        throw AddaxException.asAddaxException(DBUtilErrorCode.ILLEGAL_SPLIT_PK,
+                        throw AddaxException.asAddaxException(CONFIG_ERROR,
                                 String.format("The table [%s] has not the primary key [%s].", tableName, splitPk));
                     }
                 }
@@ -255,11 +258,11 @@ public final class OriginalConfPretreatmentUtil
         if (!isTableMode && !isQuerySqlMode) {
             // table 和 querySql 二者均未配置
             throw AddaxException.asAddaxException(
-                    DBUtilErrorCode.TABLE_QUERY_SQL_MISSING, "You must configure either table or querySql.");
+                    REQUIRED_VALUE, "You must configure either table or querySql.");
         }
         else if (isTableMode && isQuerySqlMode) {
             // table 和 querySql 二者均配置
-            throw AddaxException.asAddaxException(DBUtilErrorCode.TABLE_QUERY_SQL_MIXED,
+            throw AddaxException.asAddaxException(CONFIG_ERROR,
                     "You ca not configure both table and querySql at the same time.");
         }
 
