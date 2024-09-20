@@ -67,6 +67,9 @@ import static com.wgzhao.addax.common.base.Key.DATE_FORMAT;
 import static com.wgzhao.addax.common.base.Key.SLICE_RECORD_COUNT;
 import static com.wgzhao.addax.common.base.Key.TYPE;
 import static com.wgzhao.addax.common.base.Key.VALUE;
+import static com.wgzhao.addax.common.exception.CommonErrorCode.ILLEGAL_VALUE;
+import static com.wgzhao.addax.common.exception.CommonErrorCode.NOT_SUPPORT_TYPE;
+import static com.wgzhao.addax.common.exception.CommonErrorCode.REQUIRED_VALUE;
 import static com.wgzhao.addax.plugin.reader.datareader.DataKey.RULE;
 
 public class DataReader
@@ -107,10 +110,10 @@ public class DataReader
 
             Long sliceRecordCount = this.originalConfig.getLong(SLICE_RECORD_COUNT);
             if (null == sliceRecordCount) {
-                throw AddaxException.asAddaxException(DataReaderErrorCode.REQUIRED_VALUE, "sliceRecordCount is required");
+                throw AddaxException.asAddaxException(REQUIRED_VALUE, "sliceRecordCount is required");
             }
             else if (sliceRecordCount < 1) {
-                throw AddaxException.asAddaxException(DataReaderErrorCode.ILLEGAL_VALUE, "sliceRecordCount must be greater than 1");
+                throw AddaxException.asAddaxException(ILLEGAL_VALUE, "sliceRecordCount must be greater than 1");
             }
         }
 
@@ -118,7 +121,7 @@ public class DataReader
         {
             List<JSONObject> columns = originalConfig.getList(COLUMN, JSONObject.class);
             if (null == columns || columns.isEmpty()) {
-                throw AddaxException.asAddaxException(DataReaderErrorCode.REQUIRED_VALUE, "column is required and NOT be empty");
+                throw AddaxException.asAddaxException(REQUIRED_VALUE, "column is required and NOT be empty");
             }
 
             List<String> dealColumns = new ArrayList<>();
@@ -128,7 +131,7 @@ public class DataReader
                     this.parseMixupFunctions(eachColumnConfig);
                 }
                 catch (Exception e) {
-                    throw AddaxException.asAddaxException(DataReaderErrorCode.NOT_SUPPORT_TYPE,
+                    throw AddaxException.asAddaxException(NOT_SUPPORT_TYPE,
                             String.format("Failed to parse column: %s", e.getMessage()), e);
                 }
                 String typeName = eachColumnConfig.getString(TYPE);
@@ -145,7 +148,7 @@ public class DataReader
                     }
                     if (!Type.isTypeIllegal(typeName)) {
                         throw AddaxException.asAddaxException(
-                                DataReaderErrorCode.NOT_SUPPORT_TYPE,
+                                NOT_SUPPORT_TYPE,
                                 String.format("不支持类型[%s]", typeName));
                     }
                 }
@@ -213,7 +216,7 @@ public class DataReader
                 }
                 catch (NumberFormatException e) {
                     throw AddaxException.asAddaxException(
-                            DataReaderErrorCode.ILLEGAL_VALUE,
+                            ILLEGAL_VALUE,
                             value + " is illegal, it must be a digital string"
                     );
                 }
@@ -229,7 +232,7 @@ public class DataReader
                     }
                     catch (NumberFormatException e) {
                         throw AddaxException.asAddaxException(
-                                DataReaderErrorCode.ILLEGAL_VALUE,
+                                ILLEGAL_VALUE,
                                 "The second field must be numeric, value [" + fields[1] + "] is not valid"
                         );
                     }
@@ -245,7 +248,7 @@ public class DataReader
             }
             else {
                 throw AddaxException.asAddaxException(
-                        DataReaderErrorCode.NOT_SUPPORT_TYPE,
+                        NOT_SUPPORT_TYPE,
                         "递增序列当前仅支持整数类型(long)和日期类型(date)"
                 );
             }
@@ -256,7 +259,7 @@ public class DataReader
             String value = config.getString(VALUE);
             String[] split = value.split(",");
             if (split.length < 2) {
-                throw AddaxException.asAddaxException(DataReaderErrorCode.ILLEGAL_VALUE,
+                throw AddaxException.asAddaxException(ILLEGAL_VALUE,
                         String.format("Illegal random value [%s], supported random value like 'minVal, MaxVal[,scale]'", value));
             }
             String param1 = split[0];
@@ -265,7 +268,7 @@ public class DataReader
             long param2Int;
             if (StringUtils.isBlank(param1) && StringUtils.isBlank(param2)) {
                 throw AddaxException.asAddaxException(
-                        DataReaderErrorCode.ILLEGAL_VALUE,
+                        ILLEGAL_VALUE,
                         String.format("random混淆函数不合法[%s], 混淆函数random的参数不能为空:%s, %s",
                                 value, param1, param2));
             }
@@ -281,7 +284,7 @@ public class DataReader
                 }
                 catch (ParseException e) {
                     throw AddaxException.asAddaxException(
-                            DataReaderErrorCode.ILLEGAL_VALUE,
+                            ILLEGAL_VALUE,
                             String.format("dateFormat参数[%s]和混淆函数random的参数不匹配，解析错误:%s, %s",
                                     dateFormat, param1, param2), e);
                 }
@@ -292,13 +295,13 @@ public class DataReader
             }
             if (param1Int < 0 || param2Int < 0) {
                 throw AddaxException.asAddaxException(
-                        DataReaderErrorCode.ILLEGAL_VALUE,
+                        ILLEGAL_VALUE,
                         String.format("random 函数不合法[%s], 混淆函数random的参数不能为负数:%s, %s",
                                 value, param1, param2));
             }
             if (!Type.BOOL.name().equalsIgnoreCase(typeName) && param1Int > param2Int) {
                 throw AddaxException.asAddaxException(
-                        DataReaderErrorCode.ILLEGAL_VALUE,
+                        ILLEGAL_VALUE,
                         String.format("random 函数不合法[%s], 混淆函数random的参数需要第一个小于等于第二个:%s, %s",
                                 value, param1, param2));
             }
@@ -337,7 +340,7 @@ public class DataReader
             }
             if (!isOK) {
                 throw AddaxException.asAddaxException(
-                        DataReaderErrorCode.ILLEGAL_VALUE,
+                        ILLEGAL_VALUE,
                         unit + " is NOT valid interval unit，for more details, please refer to the documentation");
             }
         }
@@ -524,7 +527,7 @@ public class DataReader
                         }
                         catch (java.text.ParseException e) {
                             throw AddaxException.asAddaxException(
-                                    DataReaderErrorCode.ILLEGAL_VALUE,
+                                    ILLEGAL_VALUE,
                                     String.format("can not parse date value [%s] with date format [%s]", fields[0], datePattern)
                             );
                         }
@@ -534,7 +537,7 @@ public class DataReader
                 }
                 else {
                     throw AddaxException.asAddaxException(
-                            DataReaderErrorCode.NOT_SUPPORT_TYPE,
+                            NOT_SUPPORT_TYPE,
                             columnType + " can not support for increment"
                     );
                 }
@@ -577,7 +580,7 @@ public class DataReader
                 case ZIP_CODE:
                     return new LongColumn(RandomSource.XO_RO_SHI_RO_1024_PP.create().nextLong(1000000, 699000));
                 default:
-                    throw AddaxException.asAddaxException(DataReaderErrorCode.ILLEGAL_VALUE,
+                    throw AddaxException.asAddaxException(ILLEGAL_VALUE,
                             columnRule + " is unsupported");
             }
         }
@@ -608,7 +611,7 @@ public class DataReader
                 case "s":
                     return DateUtils.addSeconds(curDate, step);
                 default:
-                    throw AddaxException.asAddaxException(DataReaderErrorCode.ILLEGAL_VALUE,
+                    throw AddaxException.asAddaxException(ILLEGAL_VALUE,
                             "The date interval unit '" + unit + "' is unsupported");
             }
         }
@@ -632,7 +635,7 @@ public class DataReader
                 }
             }
             catch (Exception e) {
-                throw AddaxException.asAddaxException(DataReaderErrorCode.ILLEGAL_VALUE, "构造一个record失败.", e);
+                throw AddaxException.asAddaxException(ILLEGAL_VALUE, "构造一个record失败.", e);
             }
             return record;
         }
