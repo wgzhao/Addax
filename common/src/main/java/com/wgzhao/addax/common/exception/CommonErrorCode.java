@@ -31,6 +31,7 @@ public enum CommonErrorCode
 
     PERMISSION_DENIED("2001", "permission denied"),
     CONNECT_ERROR("2002", "connection error"),
+    LOGIN_ERROR("2003", "login error"),
 
     CONVERT_NOT_SUPPORT("3001", "unsupported data type conversion"),
     NOT_SUPPORT_TYPE("3002", "unsupported data type"),

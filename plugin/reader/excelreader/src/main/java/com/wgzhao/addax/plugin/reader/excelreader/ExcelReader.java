@@ -35,6 +35,9 @@ import org.slf4j.LoggerFactory;
 import java.util.ArrayList;
 import java.util.List;
 
+import static com.wgzhao.addax.common.exception.CommonErrorCode.REQUIRED_VALUE;
+import static com.wgzhao.addax.common.exception.CommonErrorCode.RUNTIME_ERROR;
+
 public class ExcelReader
         extends Reader
 {
@@ -53,9 +56,9 @@ public class ExcelReader
         {
             this.originConfig = this.getPluginJobConf();
             // Compatible with the old version, path is a string before
-            String pathInString = this.originConfig.getNecessaryValue(Key.PATH, ExcelReaderErrorCode.REQUIRED_VALUE);
+            String pathInString = this.originConfig.getNecessaryValue(Key.PATH, REQUIRED_VALUE);
             if (StringUtils.isBlank(pathInString)) {
-                throw AddaxException.asAddaxException(ExcelReaderErrorCode.REQUIRED_VALUE, "the path is required");
+                throw AddaxException.asAddaxException(REQUIRED_VALUE, "the path is required");
             }
             if (!pathInString.startsWith("[") && !pathInString.endsWith("]")) {
                 path = new ArrayList<>();
@@ -64,7 +67,7 @@ public class ExcelReader
             else {
                 path = this.originConfig.getList(Key.PATH, String.class);
                 if (null == path || path.isEmpty()) {
-                    throw AddaxException.asAddaxException(ExcelReaderErrorCode.REQUIRED_VALUE, "the path is required");
+                    throw AddaxException.asAddaxException(REQUIRED_VALUE, "the path is required");
                 }
             }
 
@@ -90,7 +93,7 @@ public class ExcelReader
             int splitNumber = this.sourceFiles.size();
             if (0 == splitNumber) {
                 throw AddaxException.asAddaxException(
-                        ExcelReaderErrorCode.EMPTY_DIR_EXCEPTION,
+                        RUNTIME_ERROR,
                         "Nothing found in the directory " + this.originConfig.getString(Key.PATH) + ". Please check it");
             }
 

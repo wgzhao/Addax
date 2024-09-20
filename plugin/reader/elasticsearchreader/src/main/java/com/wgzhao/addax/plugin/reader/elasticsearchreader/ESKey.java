@@ -27,6 +27,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import static com.wgzhao.addax.common.exception.CommonErrorCode.CONFIG_ERROR;
+
 public final class ESKey
 {
     // ----------------------------------------
@@ -45,7 +47,7 @@ public final class ESKey
 
     public static String getEndpoint(Configuration conf)
     {
-        return conf.getNecessaryValue("endpoint", ESReaderErrorCode.BAD_CONFIG_VALUE);
+        return conf.getNecessaryValue("endpoint", CONFIG_ERROR);
     }
 
     public static String getAccessID(Configuration conf)
@@ -95,7 +97,7 @@ public final class ESKey
 
     public static String getIndexName(Configuration conf)
     {
-        return conf.getNecessaryValue("index", ESReaderErrorCode.BAD_CONFIG_VALUE);
+        return conf.getNecessaryValue("index",  CONFIG_ERROR);
     }
 
     public static String getTypeName(Configuration conf)

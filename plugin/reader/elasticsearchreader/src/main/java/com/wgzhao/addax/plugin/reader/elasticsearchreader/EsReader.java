@@ -55,6 +55,12 @@ import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
+import static com.wgzhao.addax.common.exception.CommonErrorCode.CONFIG_ERROR;
+import static com.wgzhao.addax.common.exception.CommonErrorCode.EXECUTE_FAIL;
+import static com.wgzhao.addax.common.exception.CommonErrorCode.ILLEGAL_VALUE;
+import static com.wgzhao.addax.common.exception.CommonErrorCode.NOT_SUPPORT_TYPE;
+import static com.wgzhao.addax.common.exception.CommonErrorCode.REQUIRED_VALUE;
+
 /**
  * @author kesc mail:492167585@qq.com
  * @since 2020-04-14 10:32
@@ -96,7 +102,7 @@ public class EsReader
                 }
             }
             catch (Exception ex) {
-                throw AddaxException.asAddaxException(ESReaderErrorCode.ES_INDEX_NOT_EXISTS, ex.toString());
+                throw AddaxException.asAddaxException(CONFIG_ERROR, ex.toString());
             }
             esClient.closeJestClient();
         }
@@ -177,11 +183,11 @@ public class EsReader
             this.filter = ESKey.getFilter(conf);
             this.column = ESKey.getColumn(conf);
             if (column == null || column.isEmpty()) {
-                throw AddaxException.asAddaxException(ESReaderErrorCode.COLUMN_CANT_BE_EMPTY, "column必须配置");
+                throw AddaxException.asAddaxException(REQUIRED_VALUE, "column必须配置");
             }
             if (column.size() == 1 && "*".equals(column.get(0))) {
                 // TODO get column from record
-                throw AddaxException.asAddaxException(ESReaderErrorCode.COLUMN_CANT_BE_EMPTY, "column暂不支持*配置");
+                throw AddaxException.asAddaxException(ILLEGAL_VALUE, "column暂不支持*配置");
             }
         }
 
@@ -196,10 +202,10 @@ public class EsReader
                 searchResult = esClient.search(query, searchType, index, type, scroll, headers, this.column);
             }
             catch (Exception e) {
-                throw AddaxException.asAddaxException(ESReaderErrorCode.ES_SEARCH_ERROR, e);
+                throw AddaxException.asAddaxException(EXECUTE_FAIL, e);
             }
             if (!searchResult.isSucceeded()) {
-                throw AddaxException.asAddaxException(ESReaderErrorCode.ES_SEARCH_ERROR, searchResult.getResponseCode() + ":" + searchResult.getErrorMessage());
+                throw AddaxException.asAddaxException(EXECUTE_FAIL, searchResult.getResponseCode() + ":" + searchResult.getErrorMessage());
             }
             queryPerfRecord.end();
             //transport records
@@ -221,7 +227,7 @@ public class EsReader
                     JestResult currScroll = esClient.scroll(scrollId, this.scroll);
                     queryPerfRecord.end();
                     if (!currScroll.isSucceeded()) {
-                        throw AddaxException.asAddaxException(ESReaderErrorCode.ES_SEARCH_ERROR,
+                        throw AddaxException.asAddaxException(EXECUTE_FAIL,
                                 String.format("scroll[id=%s] search error,code:%s,msg:%s", scrollId, currScroll.getResponseCode(), currScroll.getErrorMessage()));
                     }
                     allResultPerfRecord.start();
@@ -233,7 +239,7 @@ public class EsReader
                 throw dxe;
             }
             catch (Exception e) {
-                throw AddaxException.asAddaxException(ESReaderErrorCode.ES_SEARCH_ERROR, e);
+                throw AddaxException.asAddaxException(EXECUTE_FAIL, e);
             }
             finally {
                 esClient.clearScroll(scrollId);
@@ -368,7 +374,7 @@ public class EsReader
                 col = new StringColumn(JSON.toJSONString(value));
             }
             else {
-                throw AddaxException.asAddaxException(ESReaderErrorCode.UNKNOWN_DATA_TYPE, "type:" + value.getClass().getName());
+                throw AddaxException.asAddaxException(NOT_SUPPORT_TYPE, "type:" + value.getClass().getName());
             }
             return col;
         }
