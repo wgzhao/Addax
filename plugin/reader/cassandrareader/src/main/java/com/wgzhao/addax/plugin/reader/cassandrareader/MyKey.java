@@ -24,7 +24,8 @@ import com.wgzhao.addax.common.base.Key;
 /**
  * Created by mazhenlin on 2019/8/19.
  */
-public class MyKey extends Key
+public class MyKey
+        extends Key
 {
 
     public final static String HOST = "host";

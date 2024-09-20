@@ -37,8 +37,7 @@ import java.util.List;
 public class CassandraReader
         extends Reader
 {
-    private static final Logger LOG = LoggerFactory
-            .getLogger(CassandraReader.class);
+    private static final Logger LOG = LoggerFactory.getLogger(CassandraReader.class);
 
     public static class Job
             extends Reader.Job
