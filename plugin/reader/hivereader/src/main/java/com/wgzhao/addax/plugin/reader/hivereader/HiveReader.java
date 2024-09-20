@@ -20,9 +20,7 @@
 package com.wgzhao.addax.plugin.reader.hivereader;
 
 import com.wgzhao.addax.common.element.Column;
-import com.wgzhao.addax.common.element.DoubleColumn;
 import com.wgzhao.addax.common.element.TimestampColumn;
-import com.wgzhao.addax.common.exception.AddaxException;
 import com.wgzhao.addax.common.plugin.RecordSender;
 import com.wgzhao.addax.common.spi.Reader;
 import com.wgzhao.addax.common.util.Configuration;
@@ -33,6 +31,7 @@ import org.apache.hadoop.security.UserGroupInformation;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
@@ -47,19 +46,22 @@ import static com.wgzhao.addax.common.base.Key.KERBEROS_KEYTAB_FILE_PATH;
 import static com.wgzhao.addax.common.base.Key.KERBEROS_PRINCIPAL;
 
 public class HiveReader
-        extends Reader {
+        extends Reader
+{
 
     private static final DataBaseType DATABASE_TYPE = DataBaseType.Hive;
 
     public static class Job
-            extends Reader.Job {
+            extends Reader.Job
+    {
         private static final Logger LOG = LoggerFactory.getLogger(Job.class);
 
         private Configuration originalConfig = null;
         private CommonRdbmsReader.Job commonRdbmsReaderJob;
 
         @Override
-        public void init() {
+        public void init()
+        {
             this.originalConfig = getPluginJobConf();
 
             boolean haveKerberos = originalConfig.getBool(HAVE_KERBEROS, false);
@@ -76,80 +78,88 @@ public class HiveReader
         }
 
         @Override
-        public void preCheck() {
+        public void preCheck()
+        {
             this.commonRdbmsReaderJob.preCheck(originalConfig, DATABASE_TYPE);
         }
 
         @Override
-        public List<Configuration> split(int adviceNumber) {
+        public List<Configuration> split(int adviceNumber)
+        {
             return this.commonRdbmsReaderJob.split(originalConfig, adviceNumber);
         }
 
         @Override
-        public void post() {
+        public void post()
+        {
             this.commonRdbmsReaderJob.post(originalConfig);
         }
 
         @Override
-        public void destroy() {
+        public void destroy()
+        {
             this.commonRdbmsReaderJob.destroy(originalConfig);
         }
 
-        private void kerberosAuthentication(String kerberosPrincipal, String kerberosKeytabFilePath, org.apache.hadoop.conf.Configuration hadoopConf) {
+        private void kerberosAuthentication(String kerberosPrincipal, String kerberosKeytabFilePath, org.apache.hadoop.conf.Configuration hadoopConf)
+        {
             if (StringUtils.isNotBlank(kerberosPrincipal) && StringUtils.isNotBlank(kerberosKeytabFilePath)) {
                 UserGroupInformation.setConfiguration(hadoopConf);
                 try {
                     UserGroupInformation.loginUserFromKeytab(kerberosPrincipal, kerberosKeytabFilePath);
-                } catch (Exception e) {
-                    String message = String.format("Auth failure with kerberos, Please check " +
-                                    "kerberosKeytabFilePath[%s] and kerberosPrincipal[%s]",
-                            kerberosKeytabFilePath, kerberosPrincipal);
-                    throw AddaxException.asAddaxException(HiveReaderErrorCode.KERBEROS_LOGIN_ERROR, message, e);
+                }
+                catch (IOException e) {
+                    throw new RuntimeException(e);
                 }
             }
         }
     }
 
     public static class Task
-            extends Reader.Task {
+            extends Reader.Task
+    {
 
         private Configuration readerSliceConfig;
         private CommonRdbmsReader.Task commonRdbmsReaderTask;
 
         @Override
-        public void init() {
+        public void init()
+        {
             this.readerSliceConfig = getPluginJobConf();
-            this.commonRdbmsReaderTask = new CommonRdbmsReader.Task(DATABASE_TYPE, getTaskGroupId(), getTaskId()) {
+            this.commonRdbmsReaderTask = new CommonRdbmsReader.Task(DATABASE_TYPE, getTaskGroupId(), getTaskId())
+            {
 
                 @Override
                 protected Column createColumn(ResultSet rs, ResultSetMetaData metaData, int i)
-                        throws SQLException, UnsupportedEncodingException {
-                    if (metaData.getColumnType(i) == Types.TIMESTAMP ) {
+                        throws SQLException, UnsupportedEncodingException
+                {
+                    if (metaData.getColumnType(i) == Types.TIMESTAMP) {
                         // hive HiveBaseResultSet#getTimestamp(String columnName, Calendar cal) not support
                         return new TimestampColumn(rs.getTimestamp(i));
                     }
                     return super.createColumn(rs, metaData, i);
                 }
-
             };
 
-            this.commonRdbmsReaderTask.init(this.readerSliceConfig);
+            commonRdbmsReaderTask.init(this.readerSliceConfig);
         }
 
         @Override
-        public void startRead(RecordSender recordSender) {
-            int fetchSize = this.readerSliceConfig.getInt(FETCH_SIZE, DEFAULT_FETCH_SIZE);
-
-            this.commonRdbmsReaderTask.startRead(readerSliceConfig, recordSender, getTaskPluginCollector(), fetchSize);
+        public void startRead(RecordSender recordSender)
+        {
+            int fetchSize = readerSliceConfig.getInt(FETCH_SIZE, DEFAULT_FETCH_SIZE);
+            commonRdbmsReaderTask.startRead(readerSliceConfig, recordSender, getTaskPluginCollector(), fetchSize);
         }
 
         @Override
-        public void post() {
+        public void post()
+        {
             this.commonRdbmsReaderTask.post(readerSliceConfig);
         }
 
         @Override
-        public void destroy() {
+        public void destroy()
+        {
             this.commonRdbmsReaderTask.destroy(readerSliceConfig);
         }
     }

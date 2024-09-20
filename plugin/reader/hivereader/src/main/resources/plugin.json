@@ -1,6 +1,6 @@
 {
   "name": "hivereader",
   "class": "com.wgzhao.addax.plugin.reader.hivereader.HiveReader",
-  "description": "Retrieve data from Hive via jdbc",
+  "description": "Efficiently retrieve data from Hive databases using JDBC, enabling seamless integration and data manipulation.",
   "developer": "wgzhao"
 }
