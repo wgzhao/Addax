@@ -49,6 +49,8 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 
+import static com.wgzhao.addax.common.exception.CommonErrorCode.CONNECT_ERROR;
+
 public final class DBUtil {
     private static final Logger LOG = LoggerFactory.getLogger(DBUtil.class);
     private static final int DEFAULT_SOCKET_TIMEOUT_SEC = 20_000;
@@ -72,7 +74,7 @@ public final class DBUtil {
                 return null;
             }, 3, 1000L, true);
         } catch (Exception e) {
-            throw AddaxException.asAddaxException(DBUtilErrorCode.CONN_DB_ERROR,
+            throw AddaxException.asAddaxException(CONNECT_ERROR,
                     "Failed to connect the database server using " + jdbcUrl, e);
         }
     }
@@ -85,7 +87,7 @@ public final class DBUtil {
                 testConnWithoutRetry(dataBaseType, jdbcUrl, username, password);
             } catch (Exception e) {
                 throw AddaxException.asAddaxException(
-                        DBUtilErrorCode.CONN_DB_ERROR, "Failed to connect the server using jdbcUrl " + jdbcUrl, e);
+                        CONNECT_ERROR, "Failed to connect the server using jdbcUrl " + jdbcUrl, e);
             }
         }
     }
@@ -173,7 +175,7 @@ public final class DBUtil {
             return RetryUtil.executeWithRetry(() -> DBUtil.connect(dataBaseType, jdbcUrl, username,
                     password, socketTimeout), 3, 1000L, true);
         } catch (Exception e) {
-            throw AddaxException.asAddaxException(DBUtilErrorCode.CONN_DB_ERROR,
+            throw AddaxException.asAddaxException(CONNECT_ERROR,
                     String.format("Failed to connect the database with [%s].", jdbcUrl), e);
         }
     }
@@ -370,7 +372,7 @@ public final class DBUtil {
         try {
             ignored = connect(dataBaseType, url, user, pass);
         } catch (Exception e) {
-            throw AddaxException.asAddaxException(DBUtilErrorCode.CONN_DB_ERROR,
+            throw AddaxException.asAddaxException(CONNECT_ERROR,
                     String.format("Failed to connect the database using '%s': %s.", url, e.getMessage()), e);
         } finally {
             if (null != ignored) {
