@@ -33,7 +33,7 @@
         <avro.version>1.11.3</avro.version>
         <commons.beanutils.version>1.9.4</commons.beanutils.version>
         <commons.configuration.version>1.10</commons.configuration.version>
-        <commons.configuration2.version>2.9.0</commons.configuration2.version>
+        <commons.configuration2.version>2.11.0</commons.configuration2.version>
         <commons.collections.version>4.4</commons.collections.version>
         <commons.codec.version>1.15</commons.codec.version>
         <commons.compress.version>1.25.0</commons.compress.version>
@@ -45,7 +45,7 @@
         <commons.rng.version>1.6</commons.rng.version>
         <diamond.version>3.7.3</diamond.version>
         <druid.version>1.2.23</druid.version>
-        <fastjson2.version>2.0.50</fastjson2.version>
+        <fastjson2.version>2.0.52</fastjson2.version>
         <findbugs.version>3.0.1</findbugs.version>
         <guava.version>31.0-jre</guava.version>
         <groovy.version>3.0.19</groovy.version>
