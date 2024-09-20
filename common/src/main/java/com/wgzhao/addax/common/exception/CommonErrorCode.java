@@ -27,16 +27,23 @@ import com.wgzhao.addax.common.spi.ErrorCode;
 public enum CommonErrorCode
         implements ErrorCode
 {
+    REQUIRED_VALUE("1001", "missing required parameters"),
+    ILLEGAL_VALUE("1002", "illegal parameter value"),
+    CONFIG_ERROR("1003", "configuration error"),
 
-    CONFIG_ERROR("Common-00", "您提供的配置文件存在错误信息，请检查您的作业配置 ."),
-    CONVERT_NOT_SUPPORT("Common-01", "同步数据出现业务脏数据情况，数据类型转换错误 ."),
-    CONVERT_OVER_FLOW("Common-02", "同步数据出现业务脏数据情况，数据类型转换溢出 ."),
-    RETRY_FAIL("Common-10", "方法调用多次仍旧失败 ."),
-    RUNTIME_ERROR("Common-11", "运行时内部调用错误 ."),
-    HOOK_INTERNAL_ERROR("Common-12", "Hook运行错误 ."),
-    SHUT_DOWN_TASK("Common-20", "Task收到了shutdown指令，为failover做准备"),
-    WAIT_TIME_EXCEED("Common-21", "等待时间超出范围"),
-    TASK_HUNG_EXPIRED("Common-22", "任务hung住，Expired");
+    PERMISSION_DENIED("2001", "permission denied"),
+    CONNECT_ERROR("2002", "connection error"),
+
+    CONVERT_NOT_SUPPORT("3001", "unsupported data type conversion"),
+    CONVERT_OVER_FLOW("3002", "data type conversion overflow"),
+
+    RETRY_FAIL("4001", "retry failed"),
+
+    RUNTIME_ERROR("5001", "runtime error"),
+    HOOK_INTERNAL_ERROR("5002", "Hook internal error"),
+    SHUT_DOWN_TASK("5003", "Task shutdown"),
+    WAIT_TIME_EXCEED("5004", "Wait time exceed"),
+    TASK_HUNG_EXPIRED("5005", "Task hung expired"),;
 
     private final String code;
 
