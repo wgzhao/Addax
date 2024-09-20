@@ -40,6 +40,9 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.List;
 
+import static com.wgzhao.addax.common.exception.CommonErrorCode.REQUIRED_VALUE;
+import static com.wgzhao.addax.common.exception.CommonErrorCode.RUNTIME_ERROR;
+
 /**
  * Created by zhongtian.hu on 19-8-8.
  */
@@ -79,10 +82,10 @@ public class DbfReader
         private void validateParameter()
         {
             // Compatible with the old version, path is a string before
-            String pathInString = this.originConfig.getNecessaryValue(Key.PATH, DbfReaderErrorCode.REQUIRED_VALUE);
+            String pathInString = this.originConfig.getNecessaryValue(Key.PATH, REQUIRED_VALUE);
             if (isBlank(pathInString)) {
                 throw AddaxException.asAddaxException(
-                        DbfReaderErrorCode.REQUIRED_VALUE,
+                        REQUIRED_VALUE,
                         "您需要指定待读取的源目录或文件");
             }
             if (!pathInString.startsWith("[") && !pathInString.endsWith("]")) {
@@ -93,7 +96,7 @@ public class DbfReader
                 path = this.originConfig.getList(Key.PATH, String.class);
                 if (null == path || path.isEmpty()) {
                     throw AddaxException.asAddaxException(
-                            DbfReaderErrorCode.REQUIRED_VALUE,
+                            REQUIRED_VALUE,
                             "您需要指定待读取的源目录或文件");
                 }
             }
@@ -132,7 +135,7 @@ public class DbfReader
             int splitNumber = this.sourceFiles.size();
             if (0 == splitNumber) {
                 throw AddaxException.asAddaxException(
-                        DbfReaderErrorCode.EMPTY_DIR_EXCEPTION,
+                        RUNTIME_ERROR,
                         String.format("未能找到待读取的文件,请确认您的配置项path: %s", this.originConfig.getString(Key.PATH)));
             }
 
@@ -193,7 +196,7 @@ public class DbfReader
             }
             if (column == null) {
                 throw AddaxException.asAddaxException(
-                        DbfReaderErrorCode.RUNTIME_EXCEPTION,
+                        RUNTIME_ERROR,
                         "无法从指定的DBF文件(" + this.sourceFiles.get(0) + ")获取字段信息"
                 );
             }
