@@ -44,6 +44,8 @@ import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.text.ParseException;
 
+import static com.wgzhao.addax.common.spi.ErrorCode.ILLEGAL_VALUE;
+
 public abstract class HbaseAbstractTask
 {
     private final static Logger LOG = LoggerFactory.getLogger(HbaseAbstractTask.class);
@@ -160,7 +162,7 @@ public abstract class HbaseAbstractTask
                 column = new DateColumn(isEmpty ? null : DateUtils.parseDate(dateValue, dateformat));
                 break;
             default:
-                throw AddaxException.asAddaxException(Hbase11xReaderErrorCode.ILLEGAL_VALUE, "Hbasereader 不支持您配置的列类型:" + columnType);
+                throw AddaxException.asAddaxException(ILLEGAL_VALUE, "Hbasereader 不支持您配置的列类型:" + columnType);
         }
         return column;
     }
@@ -189,7 +191,7 @@ public abstract class HbaseAbstractTask
                 column = new DateColumn(DateUtils.parseDate(constantValue, dateformat));
                 break;
             default:
-                throw AddaxException.asAddaxException(Hbase11xReaderErrorCode.ILLEGAL_VALUE, "Hbasereader 常量列不支持您配置的列类型:" + columnType);
+                throw AddaxException.asAddaxException(ILLEGAL_VALUE, "Hbasereader 常量列不支持您配置的列类型:" + columnType);
         }
         return column;
     }

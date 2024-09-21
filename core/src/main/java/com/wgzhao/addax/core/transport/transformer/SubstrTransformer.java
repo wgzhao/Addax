@@ -27,6 +27,9 @@ import com.wgzhao.addax.transformer.Transformer;
 
 import java.util.Arrays;
 
+import static com.wgzhao.addax.common.spi.ErrorCode.ILLEGAL_VALUE;
+import static com.wgzhao.addax.common.spi.ErrorCode.RUNTIME_ERROR;
+
 /**
  * no comments.
  * Created by liqiang on 16/3/4.
@@ -57,7 +60,7 @@ public class SubstrTransformer
             length = Integer.parseInt((String) paras[2]);
         }
         catch (Exception e) {
-            throw AddaxException.asAddaxException(TransformerErrorCode.TRANSFORMER_ILLEGAL_PARAMETER,
+            throw AddaxException.asAddaxException(ILLEGAL_VALUE,
                     "paras:" + Arrays.asList(paras) + " => " + e.getMessage());
         }
 
@@ -85,7 +88,7 @@ public class SubstrTransformer
         }
         catch (Exception e) {
             throw AddaxException.asAddaxException(
-                    TransformerErrorCode.TRANSFORMER_RUN_EXCEPTION, e.getMessage(), e);
+                    RUNTIME_ERROR, e.getMessage(), e);
         }
         return record;
     }

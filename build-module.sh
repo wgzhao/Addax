@@ -29,6 +29,21 @@ MODULE_NAME=$1
 
 cd $SRC_DIR
 mvn package -B --quiet -pl :$MODULE_NAME -am -Dmaven.test.skip=true || exit 1
+
+if [ "$MODULE_NAME" == "addax-core" ]; then
+    cp -a core/target/${MODULE_NAME}-${version}.jar ${ADDAX_HOME}/lib
+    exit 0
+fi
+
+if [ "$MODULE_NAME" == "addax-common" ];then
+    cp -a common/target/${MODULE_NAME}-${version}.jar ${ADDAX_HOME}/lib
+    exit 0
+fi
+
+if [ "$MODULE_NAME" == "addax-rdbms"  -o "$MODULE_NAME" == "addax-storage" -o "$MODULE_NAME" == "addax-transformer" ]; then
+    cp -a lib/${MODULE_NAME}/target/${MODULE_NAME}-${version}.jar ${ADDAX_HOME}/lib
+    exit 0
+fi
 # if the module nam ends with reader, then the module base directory is plugin/reader,
 # else the directory is plugin/writer
 if [[ $MODULE_NAME =~ .*"reader" ]]; then

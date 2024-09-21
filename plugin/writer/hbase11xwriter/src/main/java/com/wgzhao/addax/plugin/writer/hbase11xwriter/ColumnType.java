@@ -24,6 +24,9 @@ import org.apache.commons.lang.StringUtils;
 
 import java.util.Arrays;
 
+import static com.wgzhao.addax.common.spi.ErrorCode.CONFIG_ERROR;
+import static com.wgzhao.addax.common.spi.ErrorCode.NOT_SUPPORT_TYPE;
+
 /**
  * 只对 normal 模式读取时有用，多版本读取时，不存在列类型的
  */
@@ -47,7 +50,7 @@ public enum ColumnType
     public static ColumnType getByTypeName(String typeName)
     {
         if (StringUtils.isBlank(typeName)) {
-            throw AddaxException.asAddaxException(Hbase11xWriterErrorCode.ILLEGAL_VALUE,
+            throw AddaxException.asAddaxException(CONFIG_ERROR,
                     String.format("The data type %s is unsupported, the currently supported data types: %s", typeName, Arrays.asList(values())));
         }
         for (ColumnType columnType : values()) {
@@ -56,7 +59,7 @@ public enum ColumnType
             }
         }
 
-        throw AddaxException.asAddaxException(Hbase11xWriterErrorCode.ILLEGAL_VALUE,
+        throw AddaxException.asAddaxException(NOT_SUPPORT_TYPE,
                 String.format("The data type %s is unsupported, the currently supported data types: %s", typeName, Arrays.asList(values())));
     }
 

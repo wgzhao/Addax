@@ -41,6 +41,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+import static com.wgzhao.addax.common.spi.ErrorCode.CONFIG_ERROR;
+import static com.wgzhao.addax.common.spi.ErrorCode.EXECUTE_FAIL;
+
 public class DefaultDataHandler
         implements DataHandler
 {
@@ -131,7 +134,7 @@ public class DefaultDataHandler
             }
         }
         catch (SQLException e) {
-            throw AddaxException.asAddaxException(TDengineWriterErrorCode.RUNTIME_EXCEPTION, e.getMessage());
+            throw AddaxException.asAddaxException(EXECUTE_FAIL, e.getMessage());
         }
 
         if (affectedRows != count) {
@@ -234,7 +237,7 @@ public class DefaultDataHandler
             count = stmt.executeUpdate(sql);
         }
         catch (SQLException e) {
-            throw AddaxException.asAddaxException(TDengineWriterErrorCode.RUNTIME_EXCEPTION, e.getMessage());
+            throw AddaxException.asAddaxException(EXECUTE_FAIL, e.getMessage());
         }
         return count;
     }
@@ -347,7 +350,7 @@ public class DefaultDataHandler
         try {
             writer = new SchemalessWriter(conn);
         } catch (SQLException e) {
-            throw AddaxException.asAddaxException(TDengineWriterErrorCode.RUNTIME_EXCEPTION, e.getMessage());
+            throw AddaxException.asAddaxException(EXECUTE_FAIL, e.getMessage());
         }
         SchemalessTimestampType timestampType;
         switch (timestampPrecision) {
@@ -367,7 +370,7 @@ public class DefaultDataHandler
             writer.write(lines, SchemalessProtocolType.LINE, timestampType);
         }
         catch (SQLException e) {
-            throw AddaxException.asAddaxException(TDengineWriterErrorCode.RUNTIME_EXCEPTION, e.getMessage());
+            throw AddaxException.asAddaxException(EXECUTE_FAIL, e.getMessage());
         }
 
         LOG.warn("schemalessWriter does not return affected rows!");
@@ -566,7 +569,7 @@ public class DefaultDataHandler
                 return i;
             }
         }
-        throw AddaxException.asAddaxException(TDengineWriterErrorCode.RUNTIME_EXCEPTION,
+        throw AddaxException.asAddaxException(CONFIG_ERROR,
                 "cannot find col: " + colName + " in columns: " + columns);
     }
 }

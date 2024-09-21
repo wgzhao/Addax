@@ -20,7 +20,6 @@
 package com.wgzhao.addax.core.util.container;
 
 import com.wgzhao.addax.common.exception.AddaxException;
-import com.wgzhao.addax.core.util.FrameworkErrorCode;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.Validate;
 
@@ -31,6 +30,8 @@ import java.net.URLClassLoader;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+
+import static com.wgzhao.addax.common.spi.ErrorCode.PLUGIN_INIT_ERROR;
 
 /**
  * 提供Jar隔离的加载机制，会把传入的路径、及其子路径、以及路径中的jar文件加入到class path。
@@ -109,7 +110,7 @@ public class JarLoader
                 jarURLs.add(allJar.toURI().toURL());
             }
             catch (Exception e) {
-                throw AddaxException.asAddaxException(FrameworkErrorCode.PLUGIN_INIT_ERROR,
+                throw AddaxException.asAddaxException(PLUGIN_INIT_ERROR,
                         "Exception occurred when load the jar package.", e);
             }
         }

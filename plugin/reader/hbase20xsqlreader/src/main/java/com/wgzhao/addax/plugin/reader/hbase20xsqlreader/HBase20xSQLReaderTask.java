@@ -47,6 +47,9 @@ import java.sql.Time;
 import java.sql.Timestamp;
 import java.sql.Types;
 
+import static com.wgzhao.addax.common.spi.ErrorCode.EXECUTE_FAIL;
+import static com.wgzhao.addax.common.spi.ErrorCode.NOT_SUPPORT_TYPE;
+
 public class HBase20xSQLReaderTask
 {
     private static final Logger LOG = LoggerFactory.getLogger(HBase20xSQLReaderTask.class);
@@ -101,7 +104,7 @@ public class HBase20xSQLReaderTask
         }
         catch (SQLException e) {
             throw AddaxException.asAddaxException(
-                    HBase20xSQLReaderErrorCode.QUERY_DATA_ERROR, "查询Phoenix数据出现异常，请检查服务状态或与HBase管理员联系！", e);
+                    EXECUTE_FAIL, "查询Phoenix数据出现异常，请检查服务状态或与HBase管理员联系！", e);
         }
         finally {
             helper.closeJdbc(conn, statement, resultSet);
@@ -155,7 +158,7 @@ public class HBase20xSQLReaderTask
                 break;
             default:
                 throw AddaxException.asAddaxException(
-                        HBase20xSQLReaderErrorCode.PHOENIX_COLUMN_TYPE_CONVERT_ERROR, "遇到不可识别的phoenix类型，" + "sqlType :" + sqlType);
+                        NOT_SUPPORT_TYPE, "遇到不可识别的phoenix类型，" + "sqlType :" + sqlType);
         }
         return column;
     }

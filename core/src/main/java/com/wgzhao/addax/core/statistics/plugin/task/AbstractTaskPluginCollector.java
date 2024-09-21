@@ -26,9 +26,10 @@ import com.wgzhao.addax.common.plugin.TaskPluginCollector;
 import com.wgzhao.addax.common.util.Configuration;
 import com.wgzhao.addax.core.statistics.communication.Communication;
 import com.wgzhao.addax.core.statistics.communication.CommunicationTool;
-import com.wgzhao.addax.core.util.FrameworkErrorCode;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import static com.wgzhao.addax.common.spi.ErrorCode.RUNTIME_ERROR;
 
 /**
  * Created by jingxing on 14-9-11.
@@ -90,7 +91,7 @@ public abstract class AbstractTaskPluginCollector
             this.communication.increaseCounter(CommunicationTool.WRITE_FAILED_BYTES, dirtyRecord.getByteSize());
         }
         else {
-            throw AddaxException.asAddaxException(FrameworkErrorCode.RUNTIME_ERROR, String.format("不知道的插件类型[%s].", this.pluginType));
+            throw AddaxException.asAddaxException(RUNTIME_ERROR, String.format("不知道的插件类型[%s].", this.pluginType));
         }
     }
 }

@@ -37,6 +37,9 @@ import org.slf4j.LoggerFactory;
 import java.util.*;
 import java.util.concurrent.TimeUnit;
 
+import static com.wgzhao.addax.common.spi.ErrorCode.CONFIG_ERROR;
+import static com.wgzhao.addax.common.spi.ErrorCode.RUNTIME_ERROR;
+
 public class InfluxDBWriterTask
 {
     private static final Logger LOG = LoggerFactory.getLogger(InfluxDBWriterTask.class);
@@ -169,7 +172,7 @@ public class InfluxDBWriterTask
             while ((record = recordReceiver.getFromReader()) != null) {
                 if (record.getColumnNumber() != this.columnNumber) {
                     throw AddaxException.asAddaxException(
-                            InfluxDBWriterErrorCode.CONF_ERROR,
+                            CONFIG_ERROR,
                             String.format(
                                     "列配置信息有错误. 因为您配置的任务中，源头读取字段数:%s 与 目的表要写入的字段数:%s 不相等. 请检查您的配置并作出修改.",
                                     record.getColumnNumber(),
@@ -222,7 +225,7 @@ public class InfluxDBWriterTask
         }
         catch (Exception e) {
             taskPluginCollector.collectDirtyRecord(record, e);
-            throw AddaxException.asAddaxException(InfluxDBWriterErrorCode.ILLEGAL_VALUE, e);
+            throw AddaxException.asAddaxException(RUNTIME_ERROR, e);
         }
     }
 }

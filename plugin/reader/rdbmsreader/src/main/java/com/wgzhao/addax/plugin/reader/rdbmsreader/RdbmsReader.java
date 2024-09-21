@@ -25,7 +25,6 @@ import com.wgzhao.addax.common.plugin.RecordSender;
 import com.wgzhao.addax.common.spi.Reader;
 import com.wgzhao.addax.common.util.Configuration;
 import com.wgzhao.addax.rdbms.reader.CommonRdbmsReader;
-import com.wgzhao.addax.rdbms.util.DBUtilErrorCode;
 import com.wgzhao.addax.rdbms.util.DataBaseType;
 import org.apache.commons.lang3.StringUtils;
 
@@ -36,6 +35,7 @@ import static com.wgzhao.addax.common.base.Constant.DEFAULT_FETCH_SIZE;
 import static com.wgzhao.addax.common.base.Key.CONNECTION;
 import static com.wgzhao.addax.common.base.Key.FETCH_SIZE;
 import static com.wgzhao.addax.common.base.Key.JDBC_DRIVER;
+import static com.wgzhao.addax.common.spi.ErrorCode.REQUIRED_VALUE;
 
 public class RdbmsReader
         extends Reader
@@ -56,13 +56,13 @@ public class RdbmsReader
             int fetchSize = this.originalConfig.getInt(FETCH_SIZE, DEFAULT_FETCH_SIZE);
             if (fetchSize < 1) {
                 throw AddaxException.asAddaxException(
-                        DBUtilErrorCode.REQUIRED_VALUE,
+                        REQUIRED_VALUE,
                         String.format("您配置的fetchSize有误，fetchSize : [%d] 设置值不能小于 1.", fetchSize));
             }
             this.originalConfig.set(FETCH_SIZE, fetchSize);
             Configuration connection = this.originalConfig.getListConfiguration(CONNECTION).get(0);
             if (connection == null) {
-                throw AddaxException.asAddaxException(DBUtilErrorCode.REQUIRED_VALUE, "config 'connection' is required and must not be " +
+                throw AddaxException.asAddaxException(REQUIRED_VALUE, "config 'connection' is required and must not be " +
                         "empty");
             }
             String jdbcDriver = this.originalConfig.getString(JDBC_DRIVER, null);

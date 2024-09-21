@@ -26,7 +26,6 @@ import com.wgzhao.addax.common.plugin.RecordReceiver;
 import com.wgzhao.addax.common.plugin.TaskPluginCollector;
 import com.wgzhao.addax.common.util.Configuration;
 import com.wgzhao.addax.rdbms.util.DBUtil;
-import com.wgzhao.addax.rdbms.util.DBUtilErrorCode;
 import com.wgzhao.addax.rdbms.util.DataBaseType;
 import com.wgzhao.addax.rdbms.writer.CommonRdbmsWriter;
 import com.wgzhao.addax.rdbms.writer.util.WriterUtil;
@@ -45,6 +44,7 @@ import java.util.List;
 
 import static com.wgzhao.addax.common.base.Constant.DEFAULT_BATCH_SIZE;
 import static com.wgzhao.addax.common.base.Key.BATCH_SIZE;
+import static com.wgzhao.addax.common.spi.ErrorCode.EXECUTE_FAIL;
 
 public class CopyWriterTask
         extends CommonRdbmsWriter.Task
@@ -127,7 +127,7 @@ public class CopyWriterTask
         }
 
         catch (Exception e) {
-            throw AddaxException.asAddaxException(DBUtilErrorCode.WRITE_DATA_ERROR, e);
+            throw AddaxException.asAddaxException(EXECUTE_FAIL, e);
         }
         finally {
             DBUtil.closeDBResources(null, null, connection);

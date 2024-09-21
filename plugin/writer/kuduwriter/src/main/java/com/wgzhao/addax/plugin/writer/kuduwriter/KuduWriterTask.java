@@ -29,6 +29,7 @@ import com.wgzhao.addax.common.util.Configuration;
 import org.apache.kudu.Schema;
 import org.apache.kudu.Type;
 import org.apache.kudu.client.Insert;
+import org.apache.kudu.client.KuduException;
 import org.apache.kudu.client.KuduSession;
 import org.apache.kudu.client.KuduTable;
 import org.apache.kudu.client.PartialRow;
@@ -42,6 +43,9 @@ import java.sql.Timestamp;
 import java.util.List;
 
 import static com.wgzhao.addax.common.base.Constant.DEFAULT_BATCH_SIZE;
+import static com.wgzhao.addax.common.spi.ErrorCode.CONFIG_ERROR;
+import static com.wgzhao.addax.common.spi.ErrorCode.NOT_SUPPORT_TYPE;
+import static com.wgzhao.addax.common.spi.ErrorCode.RUNTIME_ERROR;
 
 public class KuduWriterTask
         extends Writer
@@ -83,7 +87,7 @@ public class KuduWriterTask
 //        List<String> columnNames = KuduHelper.getColumnNames(columns);
         while ((record = lineReceiver.getFromReader()) != null) {
             if (record.getColumnNumber() != columns.size()) {
-                throw AddaxException.asAddaxException(KuduWriterErrorCode.PARAMETER_NUM_ERROR,
+                throw AddaxException.asAddaxException(CONFIG_ERROR,
                         "The number of record fields (" + record.getColumnNumber()
                                 + ") is different from the number of configuration fields (" + columns.size() + ")");
             }
@@ -140,7 +144,7 @@ public class KuduWriterTask
                         break;
                     default:
                         throw AddaxException.asAddaxException(
-                                KuduWriterErrorCode.ILLEGAL_VALUE, "The data type " + type + " is unsupported"
+                                NOT_SUPPORT_TYPE, "The data type " + type + " is unsupported"
                         );
                 }
             } // end a row
@@ -157,14 +161,14 @@ public class KuduWriterTask
                     session.flush();
                 }
             }
-            catch (Exception e) {
+            catch (KuduException e) {
                 LOG.error("Failed to write a record: ", e);
                 if (isSkipFail) {
                     LOG.warn("Since you have configured 'skipFail' to be true, this record will be skipped.");
                     taskPluginCollector.collectDirtyRecord(record, e.getMessage());
                 }
                 else {
-                    throw AddaxException.asAddaxException(KuduWriterErrorCode.PUT_KUDU_ERROR, e.getMessage());
+                    throw AddaxException.asAddaxException(RUNTIME_ERROR, e.getMessage());
                 }
             }
         }
@@ -173,14 +177,14 @@ public class KuduWriterTask
             // try to flush last upsert/insert
             session.flush();
         }
-        catch (Exception e) {
+        catch (KuduException e) {
             LOG.error("Failed to write a record: ", e);
             if (isSkipFail) {
                 LOG.warn("Since you have configured 'skipFail' to be true, this record will be skipped !");
                 taskPluginCollector.collectDirtyRecord(record, e.getMessage());
             }
             else {
-                throw AddaxException.asAddaxException(KuduWriterErrorCode.PUT_KUDU_ERROR, e.getMessage());
+                throw AddaxException.asAddaxException(RUNTIME_ERROR, e.getMessage());
             }
         }
     }

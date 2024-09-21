@@ -29,7 +29,6 @@ import com.jcraft.jsch.Session;
 import com.jcraft.jsch.SftpATTRS;
 import com.jcraft.jsch.SftpException;
 import com.wgzhao.addax.common.exception.AddaxException;
-import com.wgzhao.addax.plugin.writer.ftpwriter.FtpWriterErrorCode;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
@@ -41,6 +40,10 @@ import java.util.HashSet;
 import java.util.Properties;
 import java.util.Set;
 import java.util.Vector;
+
+import static com.wgzhao.addax.common.spi.ErrorCode.ILLEGAL_VALUE;
+import static com.wgzhao.addax.common.spi.ErrorCode.IO_ERROR;
+import static com.wgzhao.addax.common.spi.ErrorCode.LOGIN_ERROR;
 
 public class SftpHelperImpl
         implements IFtpHelper
@@ -64,13 +67,13 @@ public class SftpHelperImpl
                 }
             }
             catch (JSchException e) {
-                throw AddaxException.asAddaxException(FtpWriterErrorCode.ILLEGAL_VALUE, "Failed to use private key", e);
+                throw AddaxException.asAddaxException(ILLEGAL_VALUE, "Failed to use private key", e);
             }
         }
         try {
             this.session = jsch.getSession(username, host, port);
             if (this.session == null) {
-                throw AddaxException.asAddaxException(FtpWriterErrorCode.FAIL_LOGIN,
+                throw AddaxException.asAddaxException(LOGIN_ERROR,
                         String.format("Failed to connect %s:%s via sftp protocol", host, port));
             }
 
@@ -88,7 +91,7 @@ public class SftpHelperImpl
         catch (JSchException e) {
             String message = String.format("Failed to connect %s:%s because: %s", host, port, e.getMessage());
             LOG.error(message);
-            throw AddaxException.asAddaxException(FtpWriterErrorCode.FAIL_LOGIN, message, e);
+            throw AddaxException.asAddaxException(LOGIN_ERROR, message, e);
         }
     }
 
@@ -126,7 +129,7 @@ public class SftpHelperImpl
             }
             catch (SftpException e) {
                 LOG.error("IOException occurred while create folder {}, {}", directoryPath, e);
-                throw AddaxException.asAddaxException(FtpWriterErrorCode.COMMAND_FTP_IO_EXCEPTION, e);
+                throw AddaxException.asAddaxException(IO_ERROR, e);
             }
         }
     }
@@ -158,7 +161,7 @@ public class SftpHelperImpl
             }
             catch (SftpException e) {
                 LOG.error("IOException occurred while create folder {}, {}", directoryPath, e);
-                throw AddaxException.asAddaxException(FtpWriterErrorCode.COMMAND_FTP_IO_EXCEPTION, e);
+                throw AddaxException.asAddaxException(IO_ERROR, e);
             }
         }
     }
@@ -192,14 +195,14 @@ public class SftpHelperImpl
             OutputStream writeOutputStream = this.channelSftp.put(filePath, ChannelSftp.APPEND);
             String message = String.format("打开FTP文件[%s]获取写出流时出错,请确认文件%s有权限创建，有权限写出等", filePath, filePath);
             if (null == writeOutputStream) {
-                throw AddaxException.asAddaxException(FtpWriterErrorCode.OPEN_FILE_ERROR, message);
+                throw AddaxException.asAddaxException(IO_ERROR, message);
             }
             return writeOutputStream;
         }
         catch (SftpException e) {
             String message = String.format("写出文件[%s] 时出错,请确认文件%s有权限写出, errorMessage:%s", filePath, filePath, e.getMessage());
             LOG.error(message);
-            throw AddaxException.asAddaxException(FtpWriterErrorCode.OPEN_FILE_ERROR, message);
+            throw AddaxException.asAddaxException(IO_ERROR, message);
         }
     }
 
@@ -221,7 +224,7 @@ public class SftpHelperImpl
         catch (SftpException e) {
             String message = String.format("写出文件[%s] 时出错,请确认文件%s有权限写出, errorMessage:%s", filePath, filePath, e.getMessage());
             LOG.error(message);
-            throw AddaxException.asAddaxException(FtpWriterErrorCode.OPEN_FILE_ERROR, message);
+            throw AddaxException.asAddaxException(IO_ERROR, message);
         }
     }
 
@@ -247,7 +250,7 @@ public class SftpHelperImpl
             String message = String.format("获取path:[%s] 下文件列表时发生I/O异常,请确认与ftp服务器的连接正常,拥有目录ls权限, errorMessage:%s",
                     dir, e.getMessage());
             LOG.error(message);
-            throw AddaxException.asAddaxException(FtpWriterErrorCode.COMMAND_FTP_IO_EXCEPTION, message, e);
+            throw AddaxException.asAddaxException(IO_ERROR, message, e);
         }
         return allFilesWithPointedPrefix;
     }
@@ -270,7 +273,7 @@ public class SftpHelperImpl
                     eachFile, e.getMessage());
             LOG.error(message);
             throw AddaxException.asAddaxException(
-                    FtpWriterErrorCode.COMMAND_FTP_IO_EXCEPTION, message, e);
+                    IO_ERROR, message, e);
         }
     }
 

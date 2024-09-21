@@ -23,6 +23,8 @@ import com.wgzhao.addax.common.exception.AddaxException;
 
 import java.util.Arrays;
 
+import static com.wgzhao.addax.common.spi.ErrorCode.NOT_SUPPORT_TYPE;
+
 public enum NullModeType
 {
     SKIP("skip"),
@@ -42,7 +44,7 @@ public enum NullModeType
                 return modeType;
             }
         }
-        throw AddaxException.asAddaxException(Hbase11xWriterErrorCode.ILLEGAL_VALUE,
+        throw AddaxException.asAddaxException(NOT_SUPPORT_TYPE,
                 String.format("The nullMode %s is unsupported. %s are supported at current", modeName, Arrays.asList(values())));
     }
 }

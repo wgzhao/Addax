@@ -19,7 +19,7 @@
 
 package com.wgzhao.addax.common.element;
 
-import com.wgzhao.addax.common.exception.CommonErrorCode;
+import com.wgzhao.addax.common.spi.ErrorCode;
 import com.wgzhao.addax.common.exception.AddaxException;
 
 import java.math.BigDecimal;
@@ -50,7 +50,7 @@ public final class OverFlowUtil
 
         if (isOverFlow) {
             throw AddaxException.asAddaxException(
-                    CommonErrorCode.CONVERT_OVER_FLOW,
+                    ErrorCode.CONVERT_OVER_FLOW,
                     String.format("An overflow occurred when converting [%s] to Long type.", integer));
         }
     }
@@ -76,7 +76,7 @@ public final class OverFlowUtil
         boolean isOverFlow = OverFlowUtil.isDoubleOverFlow(decimal);
         if (isOverFlow) {
             throw AddaxException.asAddaxException(
-                    CommonErrorCode.CONVERT_OVER_FLOW,
+                    ErrorCode.CONVERT_OVER_FLOW,
                     String.format("An overflow occurred when converting [%s] to Double type.",
                             decimal.toPlainString()));
         }

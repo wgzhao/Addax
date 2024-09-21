@@ -30,6 +30,9 @@ import org.slf4j.LoggerFactory;
 
 import java.util.List;
 
+import static com.wgzhao.addax.common.spi.ErrorCode.ILLEGAL_VALUE;
+import static com.wgzhao.addax.common.spi.ErrorCode.RUNTIME_ERROR;
+
 /**
  * Hbase11xReader
  * Created by shf on 16/3/7.
@@ -83,7 +86,7 @@ public class Hbase20xReader
                     this.hbaseTaskProxy = new MultiVersionFixedColumnTask(taskConfig);
                     break;
                 default:
-                    throw AddaxException.asAddaxException(Hbase20xReaderErrorCode.ILLEGAL_VALUE, "Hbasereader 不支持此类模式:" + modeType);
+                    throw AddaxException.asAddaxException(ILLEGAL_VALUE, "Hbasereader 不支持此类模式:" + modeType);
             }
         }
 
@@ -94,7 +97,7 @@ public class Hbase20xReader
                 this.hbaseTaskProxy.prepare();
             }
             catch (Exception e) {
-                throw AddaxException.asAddaxException(Hbase20xReaderErrorCode.PREPARE_READ_ERROR, e);
+                throw AddaxException.asAddaxException(RUNTIME_ERROR, e);
             }
         }
 

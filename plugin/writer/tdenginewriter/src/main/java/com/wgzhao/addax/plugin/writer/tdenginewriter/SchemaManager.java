@@ -29,6 +29,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import static com.wgzhao.addax.common.spi.ErrorCode.CONFIG_ERROR;
+import static com.wgzhao.addax.common.spi.ErrorCode.EXECUTE_FAIL;
+
 public class SchemaManager
 {
     private static final Logger LOG = LoggerFactory.getLogger(SchemaManager.class);
@@ -55,7 +58,7 @@ public class SchemaManager
                 dbname = rs.getString("database()");
             }
             if (dbname == null) {
-                throw AddaxException.asAddaxException(TDengineWriterErrorCode.RUNTIME_EXCEPTION,
+                throw AddaxException.asAddaxException(CONFIG_ERROR,
                         "Database not specified or available");
             }
 
@@ -80,7 +83,7 @@ public class SchemaManager
             }
         }
         catch (SQLException e) {
-            throw AddaxException.asAddaxException(TDengineWriterErrorCode.RUNTIME_EXCEPTION, e.getMessage());
+            throw AddaxException.asAddaxException(EXECUTE_FAIL, e.getMessage());
         }
         return this.precision;
     }
@@ -111,12 +114,12 @@ public class SchemaManager
 
             for (String tbname : tables) {
                 if (!tableMetas.containsKey(tbname)) {
-                    throw AddaxException.asAddaxException(TDengineWriterErrorCode.RUNTIME_EXCEPTION, "table metadata of " + tbname + " is empty!");
+                    throw AddaxException.asAddaxException(CONFIG_ERROR, "table metadata of " + tbname + " is empty!");
                 }
             }
         }
         catch (SQLException e) {
-            throw AddaxException.asAddaxException(TDengineWriterErrorCode.RUNTIME_EXCEPTION, e.getMessage());
+            throw AddaxException.asAddaxException(EXECUTE_FAIL, e.getMessage());
         }
         return tableMetas;
     }
@@ -136,7 +139,7 @@ public class SchemaManager
                 }
             }
             catch (SQLException e) {
-                throw AddaxException.asAddaxException(TDengineWriterErrorCode.RUNTIME_EXCEPTION, e.getMessage());
+                throw AddaxException.asAddaxException(EXECUTE_FAIL, e.getMessage());
             }
 
             if (columnMetaList.isEmpty()) {

@@ -39,6 +39,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import static com.wgzhao.addax.common.base.Key.CONNECTION;
+import static com.wgzhao.addax.common.spi.ErrorCode.CONFIG_ERROR;
+import static com.wgzhao.addax.common.spi.ErrorCode.PLUGIN_INIT_ERROR;
+import static com.wgzhao.addax.common.spi.ErrorCode.REQUIRED_VALUE;
 import static com.wgzhao.addax.core.util.container.CoreConstant.CONF_PATH;
 import static com.wgzhao.addax.core.util.container.CoreConstant.CORE_SERVER_TIMEOUT_SEC;
 import static com.wgzhao.addax.core.util.container.CoreConstant.JOB_CONTENT;
@@ -54,17 +57,19 @@ import static com.wgzhao.addax.core.util.container.CoreConstant.JOB_PRE_HANDLER_
 import static com.wgzhao.addax.core.util.container.CoreConstant.PLUGIN_READER_HOME;
 import static com.wgzhao.addax.core.util.container.CoreConstant.PLUGIN_WRITER_HOME;
 
-
-public final class ConfigParser {
+public final class ConfigParser
+{
     private static final Logger LOG = LoggerFactory.getLogger(ConfigParser.class);
 
-    private ConfigParser() {
+    private ConfigParser()
+    {
     }
 
     /*
      * 指定Job配置路径，ConfigParser会解析Job、Plugin、Core全部信息，并以Configuration返回
      */
-    public static Configuration parse(String jobPath) {
+    public static Configuration parse(String jobPath)
+    {
         Configuration configuration = ConfigParser.parseJobConfig(jobPath);
 
         // Upgrade the new job format to the old one
@@ -90,18 +95,7 @@ public final class ConfigParser {
         if (StringUtils.isNotEmpty(postHandlerName)) {
             pluginList.add(postHandlerName);
         }
-        try {
-            configuration.merge(parsePluginConfig(new ArrayList<>(pluginList)), false);
-        } catch (Exception e) {
-            //吞掉异常，保持log干净。这里message足够。
-            LOG.warn("Failed to load plugin(s) [{},{}]: {}, try after 1 second.", readerPluginName, writerPluginName, e.getMessage());
-            try {
-                Thread.sleep(1000);
-            } catch (InterruptedException e1) {
-                //
-            }
-            configuration.merge(parsePluginConfig(new ArrayList<>(pluginList)), false);
-        }
+        configuration.merge(parsePluginConfig(new ArrayList<>(pluginList)), false);
 
         return configuration;
     }
@@ -112,7 +106,9 @@ public final class ConfigParser {
      *
      * @param configuration {@link Configuration}
      */
-    private static void upgradeJobConfig(Configuration configuration) {
+    private static void upgradeJobConfig(Configuration configuration)
+    {
+        configuration.getNecessaryValue(JOB_CONTENT);
         if (configuration.getString(JOB_CONTENT).startsWith("[")) {
             // get the first element
             List<Map> contentList = configuration.getList(JOB_CONTENT, Map.class);
@@ -135,16 +131,19 @@ public final class ConfigParser {
         }
     }
 
-    private static Configuration parseCoreConfig() {
+    private static Configuration parseCoreConfig()
+    {
         return Configuration.from(new File(CONF_PATH));
     }
 
-    public static Configuration parseJobConfig(String path) {
+    public static Configuration parseJobConfig(String path)
+    {
         String jobContent = getJobContent(path);
         return Configuration.from(jobContent);
     }
 
-    private static String getJobContent(String jobResource) {
+    private static String getJobContent(String jobResource)
+    {
         String jobContent;
 
         boolean isJobResourceFromHttp = jobResource.trim().toLowerCase().startsWith("http");
@@ -162,25 +161,29 @@ public final class ConfigParser {
                 httpGet.setURI(url.toURI());
 
                 jobContent = httpClientUtil.executeAndGetWithFailedRetry(httpGet, 1, 1000L);
-            } catch (Exception e) {
-                throw AddaxException.asAddaxException(FrameworkErrorCode.CONFIG_ERROR, "Failed to obtain job configuration:" + jobResource, e);
             }
-        } else {
+            catch (Exception e) {
+                throw AddaxException.asAddaxException(CONFIG_ERROR, "Failed to obtain job configuration:" + jobResource, e);
+            }
+        }
+        else {
             // jobResource 是本地文件绝对路径
             try {
                 jobContent = FileUtils.readFileToString(new File(jobResource), StandardCharsets.UTF_8);
-            } catch (IOException e) {
-                throw AddaxException.asAddaxException(FrameworkErrorCode.CONFIG_ERROR, "Failed to obtain job configuration:" + jobResource, e);
+            }
+            catch (IOException e) {
+                throw AddaxException.asAddaxException(CONFIG_ERROR, "Failed to obtain job configuration:" + jobResource, e);
             }
         }
 
         if (jobContent == null) {
-            throw AddaxException.asAddaxException(FrameworkErrorCode.CONFIG_ERROR, "Failed to obtain job configuration:" + jobResource);
+            throw AddaxException.asAddaxException(CONFIG_ERROR, "Failed to obtain job configuration:" + jobResource);
         }
         return jobContent;
     }
 
-    public static Configuration parsePluginConfig(List<String> wantPluginNames) {
+    public static Configuration parsePluginConfig(List<String> wantPluginNames)
+    {
         Configuration configuration = Configuration.newDefault();
 
         int complete = 0;
@@ -190,13 +193,19 @@ public final class ConfigParser {
             if (plugin.endsWith("reader")) {
                 pluginType = "reader";
                 pluginPath = PLUGIN_READER_HOME + File.separator + plugin;
-            } else {
+            }
+            else {
                 pluginType = "writer";
                 pluginPath = PLUGIN_WRITER_HOME + File.separator + plugin;
             }
 
             String filePath = pluginPath + File.separator + "plugin.json";
-            Configuration pluginConf = Configuration.from(new File(filePath));
+            // check if the plugin.json file exists
+            File file = new File(filePath);
+            if (!file.exists()) {
+                throw AddaxException.asAddaxException(PLUGIN_INIT_ERROR, "The plugin '" + plugin + "' has not installed yet" );
+            }
+            Configuration pluginConf = Configuration.from(file);
             if (StringUtils.isBlank(pluginConf.getString("path"))) {
                 pluginConf.set("path", pluginPath);
             }
@@ -207,25 +216,26 @@ public final class ConfigParser {
         }
 
         if (!wantPluginNames.isEmpty() && wantPluginNames.size() != complete) {
-            throw AddaxException.asAddaxException(FrameworkErrorCode.PLUGIN_INIT_ERROR, "Plugin loading failed. The specified plugin was not loaded: " + wantPluginNames);
+            throw AddaxException.asAddaxException(PLUGIN_INIT_ERROR, "Plugin loading failed. The specified plugin was not loaded: " + wantPluginNames);
         }
 
         return configuration;
     }
 
-    private static void validateJob(Configuration conf) {
+    private static void validateJob(Configuration conf)
+    {
         final Map content = conf.getMap(JOB_CONTENT);
-        String[] validPaths = new String[]{JOB_CONTENT_READER, JOB_CONTENT_WRITER, JOB_CONTENT_READER_NAME,
+        String[] validPaths = new String[] {JOB_CONTENT_READER, JOB_CONTENT_WRITER, JOB_CONTENT_READER_NAME,
                 JOB_CONTENT_READER_PARAMETER, JOB_CONTENT_WRITER_NAME, JOB_CONTENT_WRITER_PARAMETER};
 
         if (content == null || content.isEmpty()) {
-            throw AddaxException.asAddaxException(FrameworkErrorCode.JOB_ERROR,
+            throw AddaxException.asAddaxException(REQUIRED_VALUE,
                     "The configuration item '" + JOB_CONTENT + "' is required");
         }
 
         for (String path : validPaths) {
             if (conf.get(path) == null) {
-                throw AddaxException.asAddaxException(FrameworkErrorCode.JOB_ERROR,
+                throw AddaxException.asAddaxException(REQUIRED_VALUE,
                         "The configuration item '" + path + "' is required");
             }
         }

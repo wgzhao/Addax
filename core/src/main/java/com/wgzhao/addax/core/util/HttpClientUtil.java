@@ -36,6 +36,8 @@ import org.apache.http.util.EntityUtils;
 import java.io.IOException;
 import java.util.concurrent.ThreadPoolExecutor;
 
+import static com.wgzhao.addax.common.spi.ErrorCode.RUNTIME_ERROR;
+
 public class HttpClientUtil
 {
 
@@ -144,14 +146,14 @@ public class HttpClientUtil
                 String result = executeAndGet(httpRequestBase);
                 if (result != null && result.startsWith("{\"result\":-1")) {
                     throw AddaxException.asAddaxException(
-                            FrameworkErrorCode.CALL_REMOTE_FAILED, "The return code is -1, try again.");
+                            RUNTIME_ERROR, "The return code is -1, try again.");
                 }
                 return result;
             }, retryTimes, retryInterval, true,
                     HTTP_TIMEOUT_MILLISECONDS + 1000, asyncExecutor);
         }
         catch (Exception e) {
-            throw AddaxException.asAddaxException(FrameworkErrorCode.RUNTIME_ERROR, e);
+            throw AddaxException.asAddaxException(RUNTIME_ERROR, e);
         }
     }
 }

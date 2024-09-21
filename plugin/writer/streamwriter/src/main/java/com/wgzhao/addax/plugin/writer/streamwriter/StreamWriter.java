@@ -40,6 +40,11 @@ import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
 
+import static com.wgzhao.addax.common.spi.ErrorCode.CONFIG_ERROR;
+import static com.wgzhao.addax.common.spi.ErrorCode.ILLEGAL_VALUE;
+import static com.wgzhao.addax.common.spi.ErrorCode.IO_ERROR;
+import static com.wgzhao.addax.common.spi.ErrorCode.PERMISSION_ERROR;
+
 public class StreamWriter
         extends Writer
 {
@@ -91,7 +96,7 @@ public class StreamWriter
                 if (dir.isFile()) {
                     throw AddaxException
                             .asAddaxException(
-                                    StreamWriterErrorCode.ILLEGAL_VALUE,
+                                    ILLEGAL_VALUE,
                                     String.format(
                                             "您配置的path: [%s] 不是一个合法的目录, 请您注意文件重名, 不合法目录名等情况.",
                                             path));
@@ -101,7 +106,7 @@ public class StreamWriter
                     if (!createdOk) {
                         throw AddaxException
                                 .asAddaxException(
-                                        StreamWriterErrorCode.CONFIG_INVALID_EXCEPTION,
+                                        CONFIG_ERROR,
                                         String.format("您指定的文件路径 : [%s] 创建失败.",
                                                 path));
                     }
@@ -115,14 +120,14 @@ public class StreamWriter
                     }
                     catch (IOException e) {
                         throw AddaxException.asAddaxException(
-                                StreamWriterErrorCode.RUNTIME_EXCEPTION,
+                                IO_ERROR,
                                 String.format("删除文件失败 : [%s] ", fileFullPath), e);
                     }
                 }
             }
             catch (SecurityException se) {
                 throw AddaxException.asAddaxException(
-                        StreamWriterErrorCode.SECURITY_NOT_ENOUGH,
+                        PERMISSION_ERROR,
                         String.format("您没有权限创建文件路径 : [%s] ", path), se);
             }
         }
@@ -189,10 +194,10 @@ public class StreamWriter
             this.sleepTime = writerSliceConfig.getLong(StreamKey.SLEEP_TIME, 0);
             this.nullFormat = writerSliceConfig.getString(StreamKey.NULL_FORMAT, NULL_FLAG);
             if (recordNumBeforeSleep < 0) {
-                throw AddaxException.asAddaxException(StreamWriterErrorCode.CONFIG_INVALID_EXCEPTION, "recordNumber 不能为负值");
+                throw AddaxException.asAddaxException(ILLEGAL_VALUE, "recordNumber 不能为负值");
             }
             if (sleepTime < 0) {
-                throw AddaxException.asAddaxException(StreamWriterErrorCode.CONFIG_INVALID_EXCEPTION, "sleep 不能为负值");
+                throw AddaxException.asAddaxException(ILLEGAL_VALUE, "sleep 不能为负值");
             }
         }
 
@@ -219,8 +224,8 @@ public class StreamWriter
                     }
                     writer.flush();
                 }
-                catch (Exception e) {
-                    throw AddaxException.asAddaxException(StreamWriterErrorCode.RUNTIME_EXCEPTION, e);
+                catch (IOException e) {
+                    throw AddaxException.asAddaxException(IO_ERROR, e);
                 }
             }
         }
@@ -255,8 +260,8 @@ public class StreamWriter
                 }
                 writer.flush();
             }
-            catch (Exception e) {
-                throw AddaxException.asAddaxException(StreamWriterErrorCode.RUNTIME_EXCEPTION, e);
+            catch (IOException | InterruptedException e) {
+                throw AddaxException.asAddaxException(IO_ERROR, e);
             }
         }
 

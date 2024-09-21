@@ -20,7 +20,7 @@
 package com.wgzhao.addax.common.element;
 
 import com.wgzhao.addax.common.exception.AddaxException;
-import com.wgzhao.addax.common.exception.CommonErrorCode;
+import com.wgzhao.addax.common.spi.ErrorCode;
 import org.apache.commons.lang3.math.NumberUtils;
 
 import java.math.BigDecimal;
@@ -56,7 +56,7 @@ public class LongColumn
         }
         catch (Exception e) {
             throw AddaxException.asAddaxException(
-                    CommonErrorCode.CONVERT_NOT_SUPPORT,
+                    ErrorCode.CONVERT_NOT_SUPPORT,
                     String.format("Cannot convert the string [%s] to Long.", data));
         }
     }
@@ -177,6 +177,6 @@ public class LongColumn
     public byte[] asBytes()
     {
         throw AddaxException.asAddaxException(
-                CommonErrorCode.CONVERT_NOT_SUPPORT, "Long type cannot be converted to Bytes.");
+                ErrorCode.CONVERT_NOT_SUPPORT, "Long type cannot be converted to Bytes.");
     }
 }

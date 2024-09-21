@@ -23,6 +23,8 @@ import com.wgzhao.addax.common.exception.AddaxException;
 
 import java.util.Arrays;
 
+import static com.wgzhao.addax.common.spi.ErrorCode.ILLEGAL_VALUE;
+
 public enum ModeType
 {
     NORMAL("normal"),
@@ -42,7 +44,7 @@ public enum ModeType
                 return modeType;
             }
         }
-        throw AddaxException.asAddaxException(Hbase11xReaderErrorCode.ILLEGAL_VALUE,
+        throw AddaxException.asAddaxException(ILLEGAL_VALUE,
                 String.format("HbaseReader 不支持该 mode 类型:%s, 目前支持的 mode 类型是:%s", modeName, Arrays.asList(values())));
     }
 

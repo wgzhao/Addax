@@ -39,6 +39,8 @@ import java.time.LocalDateTime;
 import java.time.ZoneOffset;
 import java.util.List;
 
+import static com.wgzhao.addax.common.spi.ErrorCode.ILLEGAL_VALUE;
+
 public class InfluxDBReaderTask
 {
     private static final Logger LOG = LoggerFactory.getLogger(InfluxDBReaderTask.class);
@@ -101,12 +103,12 @@ public class InfluxDBReaderTask
         }
         catch (Exception e) {
             throw AddaxException.asAddaxException(
-                    InfluxDBReaderErrorCode.ILLEGAL_VALUE, "Failed to get data point！", e);
+                    ILLEGAL_VALUE, "Failed to get data point！", e);
         }
 
         if (StringUtils.isBlank(result)) {
             throw AddaxException.asAddaxException(
-                    InfluxDBReaderErrorCode.ILLEGAL_VALUE, "Get nothing!", null);
+                    ILLEGAL_VALUE, "Get nothing!", null);
         }
         try {
             JSONObject jsonObject = JSONObject.parseObject(result);
@@ -134,12 +136,12 @@ public class InfluxDBReaderTask
             }
             else if (resultsMap.containsKey("error")) {
                 throw AddaxException.asAddaxException(
-                        InfluxDBReaderErrorCode.ILLEGAL_VALUE, "Error occurred in data sets！", null);
+                        ILLEGAL_VALUE, "Error occurred in data sets！", null);
             }
         }
         catch (Exception e) {
             throw AddaxException.asAddaxException(
-                    InfluxDBReaderErrorCode.ILLEGAL_VALUE, "Failed to send data", e);
+                    ILLEGAL_VALUE, "Failed to send data", e);
         }
     }
 

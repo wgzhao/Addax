@@ -23,7 +23,6 @@ import com.alibaba.fastjson2.JSON;
 import com.wgzhao.addax.common.element.Column;
 import com.wgzhao.addax.common.element.Record;
 import com.wgzhao.addax.common.exception.AddaxException;
-import com.wgzhao.addax.core.util.FrameworkErrorCode;
 
 import java.math.BigDecimal;
 import java.math.BigInteger;
@@ -32,6 +31,8 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
+
+import static com.wgzhao.addax.common.spi.ErrorCode.RUNTIME_ERROR;
 
 public class DirtyRecord
         implements Record
@@ -68,31 +69,31 @@ public class DirtyRecord
     @Override
     public void setColumn(int i, Column column)
     {
-        throw AddaxException.asAddaxException(FrameworkErrorCode.RUNTIME_ERROR, NOT_SUPPORT_METHOD);
+        throw AddaxException.asAddaxException(RUNTIME_ERROR, NOT_SUPPORT_METHOD);
     }
 
     @Override
     public Column getColumn(int i)
     {
-        throw AddaxException.asAddaxException(FrameworkErrorCode.RUNTIME_ERROR, NOT_SUPPORT_METHOD);
+        throw AddaxException.asAddaxException(RUNTIME_ERROR, NOT_SUPPORT_METHOD);
     }
 
     @Override
     public int getColumnNumber()
     {
-        throw AddaxException.asAddaxException(FrameworkErrorCode.RUNTIME_ERROR, NOT_SUPPORT_METHOD);
+        throw AddaxException.asAddaxException(RUNTIME_ERROR, NOT_SUPPORT_METHOD);
     }
 
     @Override
     public int getByteSize()
     {
-        throw AddaxException.asAddaxException(FrameworkErrorCode.RUNTIME_ERROR, NOT_SUPPORT_METHOD);
+        throw AddaxException.asAddaxException(RUNTIME_ERROR, NOT_SUPPORT_METHOD);
     }
 
     @Override
     public int getMemorySize()
     {
-        throw AddaxException.asAddaxException(FrameworkErrorCode.RUNTIME_ERROR, NOT_SUPPORT_METHOD);
+        throw AddaxException.asAddaxException(RUNTIME_ERROR, NOT_SUPPORT_METHOD);
     }
 
     @Override
@@ -145,54 +146,54 @@ class DirtyColumn
     @Override
     public Long asLong()
     {
-        throw AddaxException.asAddaxException(FrameworkErrorCode.RUNTIME_ERROR, NOT_SUPPORT_METHOD);
+        throw AddaxException.asAddaxException(RUNTIME_ERROR, NOT_SUPPORT_METHOD);
     }
 
     @Override
     public Double asDouble()
     {
-        throw AddaxException.asAddaxException(FrameworkErrorCode.RUNTIME_ERROR, NOT_SUPPORT_METHOD);
+        throw AddaxException.asAddaxException(RUNTIME_ERROR, NOT_SUPPORT_METHOD);
     }
 
     @Override
     public String asString()
     {
-        throw AddaxException.asAddaxException(FrameworkErrorCode.RUNTIME_ERROR, NOT_SUPPORT_METHOD);
+        throw AddaxException.asAddaxException(RUNTIME_ERROR, NOT_SUPPORT_METHOD);
     }
 
     @Override
     public Date asDate()
     {
-        throw AddaxException.asAddaxException(FrameworkErrorCode.RUNTIME_ERROR, NOT_SUPPORT_METHOD);
+        throw AddaxException.asAddaxException(RUNTIME_ERROR, NOT_SUPPORT_METHOD);
     }
 
     @Override
     public byte[] asBytes()
     {
-        throw AddaxException.asAddaxException(FrameworkErrorCode.RUNTIME_ERROR, NOT_SUPPORT_METHOD);
+        throw AddaxException.asAddaxException(RUNTIME_ERROR, NOT_SUPPORT_METHOD);
     }
 
     @Override
     public Boolean asBoolean()
     {
-        throw AddaxException.asAddaxException(FrameworkErrorCode.RUNTIME_ERROR, NOT_SUPPORT_METHOD);
+        throw AddaxException.asAddaxException(RUNTIME_ERROR, NOT_SUPPORT_METHOD);
     }
 
     @Override
     public BigDecimal asBigDecimal()
     {
-        throw AddaxException.asAddaxException(FrameworkErrorCode.RUNTIME_ERROR, NOT_SUPPORT_METHOD);
+        throw AddaxException.asAddaxException(RUNTIME_ERROR, NOT_SUPPORT_METHOD);
     }
 
     @Override
     public BigInteger asBigInteger()
     {
-        throw AddaxException.asAddaxException(FrameworkErrorCode.RUNTIME_ERROR, NOT_SUPPORT_METHOD);
+        throw AddaxException.asAddaxException(RUNTIME_ERROR, NOT_SUPPORT_METHOD);
     }
 
     @Override
     public Timestamp asTimestamp()
     {
-        throw AddaxException.asAddaxException(FrameworkErrorCode.RUNTIME_ERROR, NOT_SUPPORT_METHOD);
+        throw AddaxException.asAddaxException(RUNTIME_ERROR, NOT_SUPPORT_METHOD);
     }
 }

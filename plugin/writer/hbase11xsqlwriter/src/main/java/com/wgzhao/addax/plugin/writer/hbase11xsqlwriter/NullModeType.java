@@ -23,6 +23,8 @@ import com.wgzhao.addax.common.exception.AddaxException;
 
 import java.util.Arrays;
 
+import static com.wgzhao.addax.common.spi.ErrorCode.ILLEGAL_VALUE;
+
 public enum NullModeType
 {
     SKIP("skip"),
@@ -42,7 +44,7 @@ public enum NullModeType
                 return modeType;
             }
         }
-        throw AddaxException.asAddaxException(HbaseSQLWriterErrorCode.ILLEGAL_VALUE,
+        throw AddaxException.asAddaxException(ILLEGAL_VALUE,
                 "The nullMode type " + modeName + " is unsupported, here are available nullMode:" + Arrays.asList(values()));
     }
 

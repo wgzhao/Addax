@@ -30,6 +30,10 @@ import org.influxdb.dto.Query;
 import java.util.ArrayList;
 import java.util.List;
 
+import static com.wgzhao.addax.common.spi.ErrorCode.CONNECT_ERROR;
+import static com.wgzhao.addax.common.spi.ErrorCode.ILLEGAL_VALUE;
+import static com.wgzhao.addax.common.spi.ErrorCode.REQUIRED_VALUE;
+
 public class InfluxDBWriter
         extends Writer
 {
@@ -50,15 +54,15 @@ public class InfluxDBWriter
             this.originalConfig = super.getPluginJobConf();
             List<Object> connList = originalConfig.getList(InfluxDBKey.CONNECTION);
             Configuration conn = Configuration.from(connList.get(0).toString());
-            conn.getNecessaryValue(InfluxDBKey.TABLE, InfluxDBWriterErrorCode.REQUIRED_VALUE);
-            this.endpoint = conn.getNecessaryValue(InfluxDBKey.ENDPOINT, InfluxDBWriterErrorCode.REQUIRED_VALUE);
-            this.database = conn.getNecessaryValue(InfluxDBKey.DATABASE, InfluxDBWriterErrorCode.REQUIRED_VALUE);
+            conn.getNecessaryValue(InfluxDBKey.TABLE, REQUIRED_VALUE);
+            this.endpoint = conn.getNecessaryValue(InfluxDBKey.ENDPOINT, REQUIRED_VALUE);
+            this.database = conn.getNecessaryValue(InfluxDBKey.DATABASE, REQUIRED_VALUE);
             this.username = originalConfig.getString(InfluxDBKey.USERNAME);
             this.password = originalConfig.getString(InfluxDBKey.PASSWORD);
             List<String> columns = originalConfig.getList(InfluxDBKey.COLUMN, String.class);
             if (columns == null || columns.isEmpty()) {
                 throw AddaxException.asAddaxException(
-                        InfluxDBWriterErrorCode.REQUIRED_VALUE,
+                        REQUIRED_VALUE,
                         "The parameter [" + InfluxDBKey.COLUMN + "] is not set.");
             }
         }
@@ -76,7 +80,7 @@ public class InfluxDBWriter
                 }
                 catch (Exception e) {
                     throw AddaxException.asAddaxException(
-                            InfluxDBWriterErrorCode.CONNECT_ERROR, e
+                            CONNECT_ERROR, e
                     );
                 }
             }
@@ -105,7 +109,7 @@ public class InfluxDBWriter
                 }
                 catch (Exception e) {
                     throw AddaxException.asAddaxException(
-                            InfluxDBWriterErrorCode.ILLEGAL_VALUE, e
+                            ILLEGAL_VALUE, e
                     );
                 }
             }

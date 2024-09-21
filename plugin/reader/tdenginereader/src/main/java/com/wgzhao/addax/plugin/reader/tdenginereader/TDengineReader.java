@@ -37,6 +37,8 @@ import java.util.regex.Pattern;
 import static com.wgzhao.addax.common.base.Constant.DEFAULT_DATE_FORMAT;
 import static com.wgzhao.addax.common.base.Constant.DEFAULT_FETCH_SIZE;
 import static com.wgzhao.addax.common.base.Key.FETCH_SIZE;
+import static com.wgzhao.addax.common.spi.ErrorCode.ILLEGAL_VALUE;
+import static com.wgzhao.addax.common.spi.ErrorCode.REQUIRED_VALUE;
 
 public class TDengineReader
         extends Reader
@@ -69,32 +71,32 @@ public class TDengineReader
             // check beginDateTime
             String beginDatetime = this.originalConfig.getString(TDKey.BEGIN_DATETIME);
             if (StringUtils.isBlank(beginDatetime)) {
-                throw AddaxException.asAddaxException(TDengineReaderErrorCode.REQUIRED_VALUE, "The parameter [" + TDKey.BEGIN_DATETIME + "] is not set.");
+                throw AddaxException.asAddaxException(REQUIRED_VALUE, "The parameter [" + TDKey.BEGIN_DATETIME + "] is not set.");
             }
             long start;
             try {
                 start = format.parse(beginDatetime).getTime();
             }
             catch (ParseException e) {
-                throw AddaxException.asAddaxException(TDengineReaderErrorCode.ILLEGAL_VALUE, "The parameter [" + TDKey.BEGIN_DATETIME +
+                throw AddaxException.asAddaxException(ILLEGAL_VALUE, "The parameter [" + TDKey.BEGIN_DATETIME +
                         "] needs to conform to the [" + DEFAULT_DATE_FORMAT + "] format.");
             }
 
             // check endDateTime
             String endDatetime = this.originalConfig.getString(TDKey.END_DATETIME);
             if (StringUtils.isBlank(endDatetime)) {
-                throw AddaxException.asAddaxException(TDengineReaderErrorCode.REQUIRED_VALUE, "The parameter [" + TDKey.END_DATETIME + "] is not set.");
+                throw AddaxException.asAddaxException(REQUIRED_VALUE, "The parameter [" + TDKey.END_DATETIME + "] is not set.");
             }
             long end;
             try {
                 end = format.parse(endDatetime).getTime();
             }
             catch (ParseException e) {
-                throw AddaxException.asAddaxException(TDengineReaderErrorCode.ILLEGAL_VALUE, "The parameter [" + TDKey.END_DATETIME + "] " +
+                throw AddaxException.asAddaxException(ILLEGAL_VALUE, "The parameter [" + TDKey.END_DATETIME + "] " +
                         "needs to conform to the [" + DEFAULT_DATE_FORMAT + "] format.");
             }
             if (start >= end) {
-                throw AddaxException.asAddaxException(TDengineReaderErrorCode.ILLEGAL_VALUE, "The parameter [" + TDKey.BEGIN_DATETIME +
+                throw AddaxException.asAddaxException(ILLEGAL_VALUE, "The parameter [" + TDKey.BEGIN_DATETIME +
                         "] should be less than the parameter [" + TDKey.END_DATETIME + "].");
             }
 
@@ -102,14 +104,14 @@ public class TDengineReader
             String splitInterval = this.originalConfig.getString(TDKey.SPLIT_INTERVAL);
             Long split;
             if (StringUtils.isBlank(splitInterval)) {
-                throw AddaxException.asAddaxException(TDengineReaderErrorCode.REQUIRED_VALUE, "The parameter [" + TDKey.SPLIT_INTERVAL +
+                throw AddaxException.asAddaxException(REQUIRED_VALUE, "The parameter [" + TDKey.SPLIT_INTERVAL +
                         "] is not set.");
             }
             try {
                 split = parseSplitInterval(splitInterval);
             }
             catch (Exception e) {
-                throw AddaxException.asAddaxException(TDengineReaderErrorCode.ILLEGAL_VALUE, "The parameter [" + TDKey.SPLIT_INTERVAL +
+                throw AddaxException.asAddaxException(ILLEGAL_VALUE, "The parameter [" + TDKey.SPLIT_INTERVAL +
                         "] should be like: \"123d|h|m|s\", error: " + e.getMessage());
             }
 

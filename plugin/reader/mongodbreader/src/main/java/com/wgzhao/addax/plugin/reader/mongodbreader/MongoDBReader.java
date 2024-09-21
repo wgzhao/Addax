@@ -53,6 +53,8 @@ import static com.wgzhao.addax.common.base.Key.DATABASE;
 import static com.wgzhao.addax.common.base.Key.FETCH_SIZE;
 import static com.wgzhao.addax.common.base.Key.PASSWORD;
 import static com.wgzhao.addax.common.base.Key.USERNAME;
+import static com.wgzhao.addax.common.spi.ErrorCode.ILLEGAL_VALUE;
+import static com.wgzhao.addax.common.spi.ErrorCode.REQUIRED_VALUE;
 
 public class MongoDBReader
         extends Reader
@@ -82,7 +84,7 @@ public class MongoDBReader
         {
             this.originalConfig = getPluginJobConf();
             // check required configuration
-            String userName = originalConfig.getNecessaryValue(USERNAME, MongoDBReaderErrorCode.REQUIRED_VALUE);
+            String userName = originalConfig.getNecessaryValue(USERNAME, REQUIRED_VALUE);
             String password = originalConfig.getString(PASSWORD);
             if (password != null && password.startsWith(Constant.ENC_PASSWORD_PREFIX)) {
                 // encrypted password, need to decrypt
@@ -90,12 +92,12 @@ public class MongoDBReader
                 originalConfig.set(Key.PASSWORD, password);
             }
             Configuration connConf = Configuration.from(originalConfig.getList(CONNECTION, Object.class).get(0).toString());
-            String database = connConf.getNecessaryValue(DATABASE, MongoDBReaderErrorCode.REQUIRED_VALUE);
+            String database = connConf.getNecessaryValue(DATABASE, REQUIRED_VALUE);
             String authDb = connConf.getString(KeyConstant.MONGO_AUTH_DB, database);
             List<Object> addressList = connConf.getList(KeyConstant.MONGO_ADDRESS, Object.class);
             List<String> columns = originalConfig.getList(COLUMN, String.class);
             if (columns == null || (columns.size() == 1 && "*".equals(columns.get(0)))) {
-                throw AddaxException.asAddaxException(MongoDBReaderErrorCode.ILLEGAL_VALUE,
+                throw AddaxException.asAddaxException(ILLEGAL_VALUE,
                         "The configuration column must be required and DOES NOT support \"*\" yet");
             }
             if (notNullAndEmpty((userName)) && notNullAndEmpty((password))) {
@@ -142,8 +144,8 @@ public class MongoDBReader
             if (lowerBound == null || upperBound == null ||
                     mongoClient == null || database == null ||
                     collection == null || mongodbColumnMeta == null) {
-                throw AddaxException.asAddaxException(MongoDBReaderErrorCode.ILLEGAL_VALUE,
-                        MongoDBReaderErrorCode.ILLEGAL_VALUE.getDescription());
+                throw AddaxException.asAddaxException(ILLEGAL_VALUE,
+                        ILLEGAL_VALUE.getDescription());
             }
             MongoDatabase db = mongoClient.getDatabase(database);
             MongoCollection<Document> col = db.getCollection(this.collection);

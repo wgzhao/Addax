@@ -23,13 +23,15 @@ import com.mongodb.MongoClientSettings;
 import com.mongodb.client.MongoClient;
 import com.mongodb.client.MongoClients;
 import com.wgzhao.addax.common.exception.AddaxException;
-import com.wgzhao.addax.plugin.reader.mongodbreader.MongoDBReaderErrorCode;
 import com.mongodb.MongoCredential;
 import com.mongodb.ServerAddress;
 
 import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.List;
+
+import static com.wgzhao.addax.common.spi.ErrorCode.ILLEGAL_VALUE;
+import static com.wgzhao.addax.common.spi.ErrorCode.RUNTIME_ERROR;
 
 /**
  * Created by jianying.wcj on 2015/3/17 0017.
@@ -49,7 +51,7 @@ public class MongoUtil
     {
 
         if (!isHostPortPattern(addressList)) {
-            throw AddaxException.asAddaxException(MongoDBReaderErrorCode.ILLEGAL_VALUE, "不合法参数");
+            throw AddaxException.asAddaxException(ILLEGAL_VALUE, "不合法参数");
         }
         try {
             MongoCredential credential = null;
@@ -62,7 +64,7 @@ public class MongoUtil
                             builder.hosts(parseServerAddress(addressList));
                         }
                         catch (UnknownHostException e) {
-                            throw AddaxException.asAddaxException(MongoDBReaderErrorCode.ILLEGAL_ADDRESS, "不合法的地址");
+                            throw AddaxException.asAddaxException(ILLEGAL_VALUE, "不合法的地址");
                         }
                     });
             if (credential != null) {
@@ -72,10 +74,10 @@ public class MongoUtil
 
         }
         catch (NumberFormatException e) {
-            throw AddaxException.asAddaxException(MongoDBReaderErrorCode.ILLEGAL_VALUE, "不合法参数");
+            throw AddaxException.asAddaxException(ILLEGAL_VALUE, "不合法参数");
         }
         catch (Exception e) {
-            throw AddaxException.asAddaxException(MongoDBReaderErrorCode.UNKNOWN_EXCEPTION, "未知异常");
+            throw AddaxException.asAddaxException(RUNTIME_ERROR, "未知异常");
         }
     }
 

@@ -28,6 +28,8 @@ import org.apache.commons.lang3.Validate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import static com.wgzhao.addax.common.spi.ErrorCode.OVER_LIMIT_ERROR;
+
 /**
  * 检查任务是否到达错误记录限制。有检查条数（recordLimit）和百分比(percentageLimit)两种方式。
  * 1. errorRecord表示出错条数不能大于限制数，当超过时任务失败。比如errorRecord为0表示不容许任何脏数据。
@@ -75,7 +77,7 @@ public final class ErrorRecordChecker
         if (recordLimit < errorNumber) {
             LOG.debug("The error limit is set to {}%. The error counter was checked.", recordLimit);
             throw AddaxException.asAddaxException(
-                    FrameworkErrorCode.PLUGIN_DIRTY_DATA_LIMIT_EXCEED,
+                    OVER_LIMIT_ERROR,
                     String.format("The number of dirty data records did not pass the check. " +
                                     "The limit is [%d] records, but [%d] records were actually captured.",
                             recordLimit, errorNumber));
@@ -94,7 +96,7 @@ public final class ErrorRecordChecker
 
         if (total > 0 && ((double) error / (double) total) > percentageLimit) {
             throw AddaxException.asAddaxException(
-                    FrameworkErrorCode.PLUGIN_DIRTY_DATA_LIMIT_EXCEED,
+                    OVER_LIMIT_ERROR,
                     String.format("The dirty data percentage check failed. The limit is [%f], but [%f] was actually captured",
                             percentageLimit, ((double) error / (double) total)));
         }

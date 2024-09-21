@@ -20,8 +20,6 @@ import software.amazon.awssdk.services.s3.model.CreateMultipartUploadRequest;
 import software.amazon.awssdk.services.s3.model.CreateMultipartUploadResponse;
 import software.amazon.awssdk.services.s3.model.Delete;
 import software.amazon.awssdk.services.s3.model.DeleteObjectsRequest;
-import software.amazon.awssdk.services.s3.model.ListObjectsRequest;
-import software.amazon.awssdk.services.s3.model.ListObjectsResponse;
 import software.amazon.awssdk.services.s3.model.ListObjectsV2Request;
 import software.amazon.awssdk.services.s3.model.ListObjectsV2Response;
 import software.amazon.awssdk.services.s3.model.ObjectIdentifier;
@@ -39,7 +37,11 @@ import java.util.List;
 import java.util.Set;
 import java.util.StringJoiner;
 import java.util.UUID;
-import java.util.function.Consumer;
+
+import static com.wgzhao.addax.common.spi.ErrorCode.ILLEGAL_VALUE;
+import static com.wgzhao.addax.common.spi.ErrorCode.IO_ERROR;
+import static com.wgzhao.addax.common.spi.ErrorCode.REQUIRED_VALUE;
+import static com.wgzhao.addax.common.spi.ErrorCode.RUNTIME_ERROR;
 
 public class S3Writer
         extends Writer
@@ -70,11 +72,11 @@ public class S3Writer
 
         private void validateParameter()
         {
-            this.writerSliceConfig.getNecessaryValue(S3Key.REGION, S3WriterErrorCode.REQUIRED_VALUE);
-            this.writerSliceConfig.getNecessaryValue(S3Key.ACCESS_ID, S3WriterErrorCode.REQUIRED_VALUE);
-            this.writerSliceConfig.getNecessaryValue(S3Key.ACCESS_KEY, S3WriterErrorCode.REQUIRED_VALUE);
-            this.writerSliceConfig.getNecessaryValue(S3Key.BUCKET, S3WriterErrorCode.REQUIRED_VALUE);
-            this.writerSliceConfig.getNecessaryValue(S3Key.OBJECT, S3WriterErrorCode.REQUIRED_VALUE);
+            this.writerSliceConfig.getNecessaryValue(S3Key.REGION, REQUIRED_VALUE);
+            this.writerSliceConfig.getNecessaryValue(S3Key.ACCESS_ID, REQUIRED_VALUE);
+            this.writerSliceConfig.getNecessaryValue(S3Key.ACCESS_KEY, REQUIRED_VALUE);
+            this.writerSliceConfig.getNecessaryValue(S3Key.BUCKET, REQUIRED_VALUE);
+            this.writerSliceConfig.getNecessaryValue(S3Key.OBJECT, REQUIRED_VALUE);
 
             StorageWriterUtil.validateParameter(this.writerSliceConfig);
         }
@@ -97,7 +99,7 @@ public class S3Writer
                 List<S3Object> objs = listObjects(bucket, object);
                 if (!objs.isEmpty()) {
                     LOG.error("There have {} objects starts with {} in  bucket {} ", objs.size(), object, bucket);
-                    throw AddaxException.asAddaxException(S3WriterErrorCode.ILLEGAL_VALUE, "Object conflict");
+                    throw AddaxException.asAddaxException(ILLEGAL_VALUE, "Object conflict");
                 }
             }
         }
@@ -199,7 +201,7 @@ public class S3Writer
                     s3Client.deleteObjects(dor);
                 }
                 catch (S3Exception e) {
-                    throw AddaxException.asAddaxException(S3WriterErrorCode.S3_COMM_ERROR, e.getMessage());
+                    throw AddaxException.asAddaxException(RUNTIME_ERROR, e.getMessage());
                 }
             }
         }
@@ -295,7 +297,7 @@ public class S3Writer
                     }
                 }
                 catch (IOException e) {
-                    throw AddaxException.asAddaxException(S3WriterErrorCode.S3_COMM_ERROR, e.getMessage());
+                    throw AddaxException.asAddaxException(IO_ERROR, e.getMessage());
                 }
             }
             // remain bytes

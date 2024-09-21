@@ -22,7 +22,8 @@ package com.wgzhao.addax.core.taskgroup.runner;
 import com.wgzhao.addax.common.exception.AddaxException;
 import com.wgzhao.addax.core.meta.State;
 import com.wgzhao.addax.core.taskgroup.TaskGroupContainer;
-import com.wgzhao.addax.core.util.FrameworkErrorCode;
+
+import static com.wgzhao.addax.common.spi.ErrorCode.RUNTIME_ERROR;
 
 public class TaskGroupContainerRunner
         implements Runnable {
@@ -46,7 +47,7 @@ public class TaskGroupContainerRunner
         } catch (Throwable e) {
             this.state = State.FAILED;
             throw AddaxException.asAddaxException(
-                    FrameworkErrorCode.RUNTIME_ERROR, e);
+                    RUNTIME_ERROR, e);
         }
     }
 

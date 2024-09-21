@@ -28,6 +28,8 @@ import com.wgzhao.addax.common.util.Configuration;
 import java.util.ArrayList;
 import java.util.List;
 
+import static com.wgzhao.addax.common.spi.ErrorCode.ILLEGAL_VALUE;
+
 /**
  * Hbase11xWriter
  * Created by shf on 16/3/17.
@@ -89,7 +91,7 @@ public class Hbase11xWriter
                 this.hbaseTaskProxy = new NormalTask(taskConfig);
             }
             else {
-                throw AddaxException.asAddaxException(Hbase11xWriterErrorCode.ILLEGAL_VALUE, "The mode " + modeType + "is unsupported");
+                throw AddaxException.asAddaxException(ILLEGAL_VALUE, "The mode " + modeType + "is unsupported");
             }
         }
 

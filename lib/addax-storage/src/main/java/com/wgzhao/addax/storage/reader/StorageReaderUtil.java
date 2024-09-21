@@ -63,6 +63,14 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
+import static com.wgzhao.addax.common.spi.ErrorCode.CONFIG_ERROR;
+import static com.wgzhao.addax.common.spi.ErrorCode.ENCODING_ERROR;
+import static com.wgzhao.addax.common.spi.ErrorCode.ILLEGAL_VALUE;
+import static com.wgzhao.addax.common.spi.ErrorCode.IO_ERROR;
+import static com.wgzhao.addax.common.spi.ErrorCode.NOT_SUPPORT_TYPE;
+import static com.wgzhao.addax.common.spi.ErrorCode.REQUIRED_VALUE;
+import static com.wgzhao.addax.common.spi.ErrorCode.RUNTIME_ERROR;
+
 public class StorageReaderUtil
 {
     private static final Logger LOG = LoggerFactory.getLogger(StorageReaderUtil.class);
@@ -118,20 +126,18 @@ public class StorageReaderUtil
         }
         catch (UnsupportedEncodingException uee) {
             throw AddaxException.asAddaxException(
-                    StorageReaderErrorCode.OPEN_FILE_WITH_CHARSET_ERROR,
+                    ENCODING_ERROR,
                     String.format("%s is unsupported", encoding), uee);
         }
         catch (NullPointerException e) {
-            throw AddaxException.asAddaxException(
-                    StorageReaderErrorCode.RUNTIME_EXCEPTION, e);
+            throw AddaxException.asAddaxException(RUNTIME_ERROR, e);
         }
         catch (IOException e) {
             throw AddaxException.asAddaxException(
-                    StorageReaderErrorCode.READ_FILE_IO_ERROR, String.format("Failed to read stream [%s].", fileName), e);
+                    IO_ERROR, String.format("Failed to read stream [%s].", fileName), e);
         }
         catch (CompressorException e) {
-            throw AddaxException.asAddaxException(
-                    StorageReaderErrorCode.ILLEGAL_VALUE,
+            throw AddaxException.asAddaxException(NOT_SUPPORT_TYPE,
                     "The compress algorithm [" + compress + "] is unsupported yet"
             );
         }
@@ -151,7 +157,7 @@ public class StorageReaderUtil
                 .getString(Key.FIELD_DELIMITER);
         if (null != delimiterInStr && 1 != delimiterInStr.length()) {
             throw AddaxException.asAddaxException(
-                    StorageReaderErrorCode.ILLEGAL_VALUE,
+                    ILLEGAL_VALUE,
                     String.format("The delimiter ONLY has one char, [%s] is illegal", delimiterInStr));
         }
         if (null == delimiterInStr) {
@@ -180,23 +186,23 @@ public class StorageReaderUtil
         }
         catch (UnsupportedEncodingException uee) {
             throw AddaxException.asAddaxException(
-                    StorageReaderErrorCode.OPEN_FILE_WITH_CHARSET_ERROR,
+                    ENCODING_ERROR,
                     String.format("The encoding: [%s] is unsupported", encoding), uee);
         }
         catch (FileNotFoundException fnfe) {
             throw AddaxException.asAddaxException(
-                    StorageReaderErrorCode.FILE_NOT_EXISTS, String.format("The file [%s] does not exists ", fileName), fnfe);
+                    IO_ERROR, String.format("The file [%s] does not exists ", fileName), fnfe);
         }
         catch (IOException ioe) {
             throw AddaxException.asAddaxException(
-                    StorageReaderErrorCode.READ_FILE_IO_ERROR, String.format("Failed to ead file [%s]", fileName), ioe);
+                    IO_ERROR, String.format("Failed to ead file [%s]", fileName), ioe);
         }
         catch (Exception e) {
             throw AddaxException.asAddaxException(
-                    StorageReaderErrorCode.RUNTIME_EXCEPTION, e);
+                    RUNTIME_ERROR, e);
         }
         finally {
-            
+
             IOUtils.closeQuietly(reader, null);
         }
     }
@@ -248,12 +254,12 @@ public class StorageReaderUtil
 
                     if (null == columnIndex && null == columnConst) {
                         throw AddaxException.asAddaxException(
-                                StorageReaderErrorCode.NO_INDEX_VALUE, "The index or constant is required when type is present.");
+                                CONFIG_ERROR, "The index or constant is required when type is present.");
                     }
 
                     if (null != columnIndex && null != columnConst) {
                         throw AddaxException.asAddaxException(
-                                StorageReaderErrorCode.MIXED_INDEX_VALUE, "The index and value are both present, choose one of them");
+                                CONFIG_ERROR, "The index and value are both present, choose one of them");
                     }
 
                     if (null != columnIndex) {
@@ -301,7 +307,7 @@ public class StorageReaderUtil
                             default:
                                 String errorMessage = String.format("The column type [%s] is unsupported", columnType);
                                 LOG.error(errorMessage);
-                                throw AddaxException.asAddaxException(StorageReaderErrorCode.NOT_SUPPORT_TYPE, errorMessage);
+                                throw AddaxException.asAddaxException(NOT_SUPPORT_TYPE, errorMessage);
                         }
                     }
                     catch (Exception e) {
@@ -370,11 +376,11 @@ public class StorageReaderUtil
             Charsets.toCharset(encoding);
         }
         catch (UnsupportedCharsetException uce) {
-            throw AddaxException.asAddaxException(StorageReaderErrorCode.ILLEGAL_VALUE,
+            throw AddaxException.asAddaxException(NOT_SUPPORT_TYPE,
                     String.format("The encoding [%s] is unsupported yet.", encoding), uce);
         }
         catch (Exception e) {
-            throw AddaxException.asAddaxException(StorageReaderErrorCode.CONFIG_INVALID_EXCEPTION,
+            throw AddaxException.asAddaxException(CONFIG_ERROR,
                     String.format("Exception occurred while applying encoding [%s].", e.getMessage()), e);
         }
     }
@@ -393,13 +399,13 @@ public class StorageReaderUtil
         //fieldDelimiter check
         String delimiterInStr = readerConfiguration.getString(Key.FIELD_DELIMITER, ",");
         if (null == delimiterInStr) {
-            throw AddaxException.asAddaxException(StorageReaderErrorCode.REQUIRED_VALUE,
+            throw AddaxException.asAddaxException(REQUIRED_VALUE,
                     String.format("The item [%s] is required.",
                             Key.FIELD_DELIMITER));
         }
         else if (1 != delimiterInStr.length()) {
             // warn: if it has, length must be one
-            throw AddaxException.asAddaxException(StorageReaderErrorCode.ILLEGAL_VALUE,
+            throw AddaxException.asAddaxException(ILLEGAL_VALUE,
                     String.format("The delimiter only support single character, [%s] is invalid.", delimiterInStr));
         }
     }
@@ -410,7 +416,7 @@ public class StorageReaderUtil
         // format
         List<Configuration> columns = readerConfiguration.getListConfiguration(Key.COLUMN);
         if (null == columns || columns.isEmpty()) {
-            throw AddaxException.asAddaxException(StorageReaderErrorCode.REQUIRED_VALUE, "The item columns is required.");
+            throw AddaxException.asAddaxException(REQUIRED_VALUE, "The item columns is required.");
         }
         // handle ["*"]
         if (1 == columns.size()) {
@@ -423,21 +429,21 @@ public class StorageReaderUtil
 
         if (null != columns && !columns.isEmpty()) {
             for (Configuration eachColumnConf : columns) {
-                eachColumnConf.getNecessaryValue(Key.TYPE, StorageReaderErrorCode.REQUIRED_VALUE);
+                eachColumnConf.getNecessaryValue(Key.TYPE, REQUIRED_VALUE);
                 Integer columnIndex = eachColumnConf.getInt(Key.INDEX);
                 String columnValue = eachColumnConf.getString(Key.VALUE);
 
                 if (null == columnIndex && null == columnValue) {
-                    throw AddaxException.asAddaxException(StorageReaderErrorCode.NO_INDEX_VALUE,
+                    throw AddaxException.asAddaxException(CONFIG_ERROR,
                             "You must configure one of index or name or value");
                 }
 
                 if (null != columnIndex && null != columnValue) {
-                    throw AddaxException.asAddaxException(StorageReaderErrorCode.MIXED_INDEX_VALUE,
+                    throw AddaxException.asAddaxException(CONFIG_ERROR,
                             "You both configure index, value, or name, you can ONLY specify the one each column");
                 }
                 if (null != columnIndex && columnIndex < 0) {
-                    throw AddaxException.asAddaxException(StorageReaderErrorCode.ILLEGAL_VALUE,
+                    throw AddaxException.asAddaxException(ILLEGAL_VALUE,
                             String.format("The value of index must be greater than 0, %s is illegal", columnIndex));
                 }
             }
@@ -456,7 +462,7 @@ public class StorageReaderUtil
         String parentPath;
         parentPath = regexPath.substring(0, lastDirSeparator + 1);
         if (parentPath.contains("*") || parentPath.contains("?")) {
-            throw AddaxException.asAddaxException(StorageReaderErrorCode.ILLEGAL_VALUE,
+            throw AddaxException.asAddaxException(ILLEGAL_VALUE,
                     String.format("The path '%s' is illegal, ONLY the trail folder can container wildcard * or ? ",
                             regexPath));
         }

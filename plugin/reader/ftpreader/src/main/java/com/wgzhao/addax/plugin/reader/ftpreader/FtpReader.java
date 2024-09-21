@@ -34,6 +34,10 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 
+import static com.wgzhao.addax.common.spi.ErrorCode.CONFIG_ERROR;
+import static com.wgzhao.addax.common.spi.ErrorCode.ILLEGAL_VALUE;
+import static com.wgzhao.addax.common.spi.ErrorCode.REQUIRED_VALUE;
+
 public class FtpReader
         extends Reader
 {
@@ -88,14 +92,14 @@ public class FtpReader
 
         private void validateParameter()
         {
-            this.protocol = this.originConfig.getNecessaryValue(FtpKey.PROTOCOL, FtpReaderErrorCode.REQUIRED_VALUE).toLowerCase();
+            this.protocol = this.originConfig.getNecessaryValue(FtpKey.PROTOCOL, REQUIRED_VALUE).toLowerCase();
             boolean protocolTag = "ftp".equals(this.protocol) || "sftp".equals(this.protocol);
             if (!protocolTag) {
-                throw AddaxException.asAddaxException(FtpReaderErrorCode.ILLEGAL_VALUE,
+                throw AddaxException.asAddaxException(ILLEGAL_VALUE,
                         String.format("仅支持 ftp和sftp 传输协议 , 不支持您配置的传输协议: [%s]", protocol));
             }
-            this.host = this.originConfig.getNecessaryValue(FtpKey.HOST, FtpReaderErrorCode.REQUIRED_VALUE);
-            this.username = this.originConfig.getNecessaryValue(FtpKey.USERNAME, FtpReaderErrorCode.REQUIRED_VALUE);
+            this.host = this.originConfig.getNecessaryValue(FtpKey.HOST, REQUIRED_VALUE);
+            this.username = this.originConfig.getNecessaryValue(FtpKey.USERNAME, REQUIRED_VALUE);
             this.password = this.originConfig.getString(FtpKey.PASSWORD, null);
             this.timeout = originConfig.getInt(FtpKey.TIME_OUT, FtpConstant.DEFAULT_TIMEOUT);
             this.maxTraversalLevel = originConfig.getInt(FtpKey.MAX_TRAVERSAL_LEVEL, FtpConstant.DEFAULT_MAX_TRAVERSAL_LEVEL);
@@ -104,7 +108,7 @@ public class FtpReader
             this.connectPattern = this.originConfig.getUnnecessaryValue(FtpKey.CONNECT_PATTERN, FtpConstant.DEFAULT_FTP_CONNECT_PATTERN);
             boolean connectPatternTag = "PORT".equals(connectPattern) || "PASV".equals(connectPattern);
             if (!connectPatternTag) {
-                throw AddaxException.asAddaxException(FtpReaderErrorCode.ILLEGAL_VALUE,
+                throw AddaxException.asAddaxException(ILLEGAL_VALUE,
                         String.format("不支持您配置的ftp传输模式: [%s]", connectPattern));
             }
             else {
@@ -112,7 +116,7 @@ public class FtpReader
             }
 
             //path check
-            String pathInString = this.originConfig.getNecessaryValue(Key.PATH, FtpReaderErrorCode.REQUIRED_VALUE);
+            String pathInString = this.originConfig.getNecessaryValue(Key.PATH, REQUIRED_VALUE);
             if (!pathInString.startsWith("[") && !pathInString.endsWith("]")) {
                 path = new ArrayList<>();
                 path.add(pathInString);
@@ -120,13 +124,13 @@ public class FtpReader
             else {
                 path = this.originConfig.getList(Key.PATH, String.class);
                 if (null == path || path.isEmpty()) {
-                    throw AddaxException.asAddaxException(FtpReaderErrorCode.REQUIRED_VALUE, "您需要指定待读取的源目录或文件");
+                    throw AddaxException.asAddaxException(REQUIRED_VALUE, "您需要指定待读取的源目录或文件");
                 }
                 for (String eachPath : path) {
                     if (!eachPath.startsWith("/")) {
                         String message = String.format("请检查参数path:[%s],需要配置为绝对路径", eachPath);
                         LOG.error(message);
-                        throw AddaxException.asAddaxException(FtpReaderErrorCode.ILLEGAL_VALUE, message);
+                        throw AddaxException.asAddaxException(ILLEGAL_VALUE, message);
                     }
                 }
             }
@@ -147,7 +151,7 @@ public class FtpReader
                         else {
                             String msg = "You have configured to use the key, but neither the configured key file nor the default file(" +
                                     DEFAULT_PRIVATE_KEY + " exists";
-                            throw AddaxException.asAddaxException(FtpReaderErrorCode.ILLEGAL_VALUE, msg);
+                            throw AddaxException.asAddaxException(ILLEGAL_VALUE, msg);
                         }
                     }
                 }
@@ -195,7 +199,7 @@ public class FtpReader
             // int splitNumber = adviceNumber;
             int splitNumber = this.sourceFiles.size();
             if (0 == splitNumber) {
-                throw AddaxException.asAddaxException(FtpReaderErrorCode.EMPTY_DIR_EXCEPTION,
+                throw AddaxException.asAddaxException(CONFIG_ERROR,
                         String.format("未能找到待读取的文件,请确认您的配置项path: %s", this.originConfig.getString(Key.PATH)));
             }
 

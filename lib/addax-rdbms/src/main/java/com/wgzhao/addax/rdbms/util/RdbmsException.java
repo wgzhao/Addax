@@ -24,6 +24,10 @@ package com.wgzhao.addax.rdbms.util;
 import com.wgzhao.addax.common.exception.AddaxException;
 import com.wgzhao.addax.common.spi.ErrorCode;
 
+import static com.wgzhao.addax.common.spi.ErrorCode.CONNECT_ERROR;
+import static com.wgzhao.addax.common.spi.ErrorCode.EXECUTE_FAIL;
+import static com.wgzhao.addax.common.spi.ErrorCode.PERMISSION_ERROR;
+
 /**
  * Created by judy.lt on 2015/6/5.
  */
@@ -37,42 +41,41 @@ public class RdbmsException
 
     public static AddaxException asConnException(Exception e)
     {
-        return asAddaxException(DBUtilErrorCode.CONN_DB_ERROR, e.getMessage());
+        return asAddaxException(CONNECT_ERROR, e.getMessage());
     }
 
     public static AddaxException asQueryException(Exception e, String querySql)
     {
-        return asAddaxException(DBUtilErrorCode.SQL_EXECUTE_FAIL, e.getMessage());
+        return asAddaxException(EXECUTE_FAIL, e.getMessage());
     }
 
     public static AddaxException asSqlParserException(Exception e, String querySql)
     {
-        throw asAddaxException(DBUtilErrorCode.READ_RECORD_FAIL, e.getMessage());
+        throw asAddaxException(EXECUTE_FAIL, e.getMessage());
     }
 
     public static AddaxException asPreSQLParserException(Exception e, String querySql)
     {
-        throw asAddaxException(DBUtilErrorCode.READ_RECORD_FAIL, e.getMessage());
+        throw asAddaxException(EXECUTE_FAIL, e.getMessage());
     }
 
     public static AddaxException asPostSQLParserException(Exception e, String querySql)
     {
-        throw asAddaxException(DBUtilErrorCode.READ_RECORD_FAIL, e.getMessage());
+        throw asAddaxException(EXECUTE_FAIL, e.getMessage());
     }
 
     public static AddaxException asInsertPriException(String userName, String jdbcUrl)
     {
-        throw asAddaxException(DBUtilErrorCode.NO_INSERT_PRIVILEGE, "");
+        throw asAddaxException(PERMISSION_ERROR, "");
     }
 
     public static AddaxException asDeletePriException(String userName, String jdbcUrl)
     {
-        throw asAddaxException(DBUtilErrorCode.NO_DELETE_PRIVILEGE, "");
+        throw asAddaxException(PERMISSION_ERROR, "");
     }
 
     public static AddaxException asSplitPKException(Exception e, String splitSql, String splitPkID)
     {
-//        return asAddaxException(DBUtilErrorCode.READ_RECORD_FAIL, "配置的SplitPK为: " + splitPkID + ", 执行的SQL为: " + splitSql + " 具体错误信息为：" + e);
-        return asAddaxException(DBUtilErrorCode.READ_RECORD_FAIL, e.getMessage());
+        return asAddaxException(EXECUTE_FAIL, e.getMessage());
     }
 }

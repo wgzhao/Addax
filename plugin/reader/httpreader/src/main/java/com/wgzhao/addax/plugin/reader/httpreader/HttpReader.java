@@ -79,6 +79,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import static com.wgzhao.addax.common.spi.ErrorCode.ILLEGAL_VALUE;
+import static com.wgzhao.addax.common.spi.ErrorCode.REQUIRED_VALUE;
+
 public class HttpReader
         extends Reader
 {
@@ -234,8 +237,7 @@ public class HttpReader
 
                 List<String> columns = readerSliceConfig.getList(HttpKey.COLUMN, String.class);
                 if (columns == null || columns.isEmpty()) {
-                    throw AddaxException.asAddaxException(
-                            HttpReaderErrorCode.REQUIRED_VALUE,
+                    throw AddaxException.asAddaxException(REQUIRED_VALUE,
                             "The parameter [" + HttpKey.COLUMN + "] is not set."
                     );
                 }
@@ -266,7 +268,7 @@ public class HttpReader
 
             catch (URISyntaxException | IOException e) {
                 throw AddaxException.asAddaxException(
-                        HttpReaderErrorCode.ILLEGAL_VALUE, e.getMessage()
+                        ILLEGAL_VALUE, e.getMessage()
                 );
             }
         }
@@ -298,7 +300,7 @@ public class HttpReader
             }
             else {
                 throw AddaxException.asAddaxException(
-                        HttpReaderErrorCode.ILLEGAL_VALUE, "不支持的请求模式: " + method
+                        ILLEGAL_VALUE, "不支持的请求模式: " + method
                 );
             }
             return response;

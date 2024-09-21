@@ -26,13 +26,14 @@ import com.wgzhao.addax.core.statistics.communication.Communication;
 import com.wgzhao.addax.core.statistics.communication.CommunicationTool;
 import com.wgzhao.addax.core.statistics.container.communicator.AbstractContainerCommunicator;
 import com.wgzhao.addax.core.util.ErrorRecordChecker;
-import com.wgzhao.addax.core.util.FrameworkErrorCode;
 import com.wgzhao.addax.core.util.container.CoreConstant;
 import org.apache.commons.lang3.Validate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.List;
+
+import static com.wgzhao.addax.common.spi.ErrorCode.RUNTIME_ERROR;
 
 public abstract class AbstractScheduler
 {
@@ -114,8 +115,7 @@ public abstract class AbstractScheduler
             // 以 failed 状态退出
             LOG.error("An InterruptedException was caught!", e);
 
-            throw AddaxException.asAddaxException(
-                    FrameworkErrorCode.RUNTIME_ERROR, e);
+            throw AddaxException.asAddaxException(RUNTIME_ERROR, e);
         }
     }
 

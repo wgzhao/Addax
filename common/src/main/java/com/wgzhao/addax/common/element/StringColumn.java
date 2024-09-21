@@ -19,7 +19,7 @@
 
 package com.wgzhao.addax.common.element;
 
-import com.wgzhao.addax.common.exception.CommonErrorCode;
+import com.wgzhao.addax.common.spi.ErrorCode;
 import com.wgzhao.addax.common.exception.AddaxException;
 
 import java.math.BigDecimal;
@@ -63,7 +63,7 @@ public class StringColumn
         if ("NaN".equals(data) || "Infinity".equals(data)
                 || "-Infinity".equals(data)) {
             throw AddaxException.asAddaxException(
-                    CommonErrorCode.CONVERT_NOT_SUPPORT,
+                    ErrorCode.CONVERT_NOT_SUPPORT,
                     String.format("['%s'] belongs to the special Double type and cannot be converted to other type.", data));
         }
     }
@@ -82,7 +82,7 @@ public class StringColumn
         }
         catch (Exception e) {
             throw AddaxException.asAddaxException(
-                    CommonErrorCode.CONVERT_NOT_SUPPORT, String.format(
+                    ErrorCode.CONVERT_NOT_SUPPORT, String.format(
                             "['%s'] cannot be converted to BigInteger.", this.asString()));
         }
     }
@@ -112,7 +112,7 @@ public class StringColumn
         }
         catch (Exception e) {
             throw AddaxException.asAddaxException(
-                    CommonErrorCode.CONVERT_NOT_SUPPORT, String.format(errorTemplate, "Long"));
+                    ErrorCode.CONVERT_NOT_SUPPORT, String.format(errorTemplate, "Long"));
         }
     }
 
@@ -130,7 +130,7 @@ public class StringColumn
         }
         catch (Exception e) {
             throw AddaxException.asAddaxException(
-                    CommonErrorCode.CONVERT_NOT_SUPPORT, String.format(errorTemplate, "BigDecimal"));
+                    ErrorCode.CONVERT_NOT_SUPPORT, String.format(errorTemplate, "BigDecimal"));
         }
     }
 
@@ -176,7 +176,7 @@ public class StringColumn
         }
 
         throw AddaxException.asAddaxException(
-                CommonErrorCode.CONVERT_NOT_SUPPORT, String.format(errorTemplate, "Boolean"));
+                ErrorCode.CONVERT_NOT_SUPPORT, String.format(errorTemplate, "Boolean"));
     }
 
     @Override
@@ -187,7 +187,7 @@ public class StringColumn
         }
         catch (Exception e) {
             throw AddaxException.asAddaxException(
-                    CommonErrorCode.CONVERT_NOT_SUPPORT, String.format(errorTemplate, "Date"));
+                    ErrorCode.CONVERT_NOT_SUPPORT, String.format(errorTemplate, "Date"));
         }
     }
 
@@ -199,7 +199,7 @@ public class StringColumn
         }
         catch (Exception e) {
             throw AddaxException.asAddaxException(
-                    CommonErrorCode.CONVERT_NOT_SUPPORT, String.format(errorTemplate, "Bytes"));
+                    ErrorCode.CONVERT_NOT_SUPPORT, String.format(errorTemplate, "Bytes"));
         }
     }
 }

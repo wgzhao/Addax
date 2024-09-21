@@ -48,6 +48,8 @@ import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 import static com.datastax.driver.core.querybuilder.QueryBuilder.timestamp;
+import static com.wgzhao.addax.common.spi.ErrorCode.CONFIG_ERROR;
+import static com.wgzhao.addax.common.spi.ErrorCode.EXECUTE_FAIL;
 
 /**
  * Created by mazhenlin on 2019/8/19.
@@ -109,7 +111,7 @@ public class CassandraWriter
                         // 源头读取字段列数与目的表字段写入列数不相等，直接报错
                         throw AddaxException
                                 .asAddaxException(
-                                        CassandraWriterErrorCode.CONF_ERROR,
+                                        CONFIG_ERROR,
                                         String.format(
                                                 "列配置信息有错误. 因为您配置的任务中，源头读取字段数:%s 与 目的表要写入的字段数:%s 不相等. 请检查您的配置并作出修改.",
                                                 record.getColumnNumber(),
@@ -180,7 +182,7 @@ public class CassandraWriter
             }
             catch (Exception e) {
                 throw AddaxException.asAddaxException(
-                        CassandraWriterErrorCode.WRITE_DATA_ERROR, e);
+                        EXECUTE_FAIL, e);
             }
         }
 
@@ -229,7 +231,7 @@ public class CassandraWriter
                     if (writeTimeCol != -1) {
                         throw AddaxException
                                 .asAddaxException(
-                                        CassandraWriterErrorCode.CONF_ERROR,
+                                        CONFIG_ERROR,
                                         "列配置信息有错误. 只能有一个时间戳列(writetime())");
                     }
                     writeTimeCol = columnTypes.size();
@@ -240,7 +242,7 @@ public class CassandraWriter
                 if (col == null) {
                     throw AddaxException
                             .asAddaxException(
-                                    CassandraWriterErrorCode.CONF_ERROR,
+                                    CONFIG_ERROR,
                                     String.format(
                                             "列配置信息有错误. 表中未找到列名 '%s' .",
                                             colunmnName));

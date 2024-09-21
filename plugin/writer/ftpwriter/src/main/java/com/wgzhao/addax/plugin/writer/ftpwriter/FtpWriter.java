@@ -47,6 +47,10 @@ import static com.wgzhao.addax.common.base.Key.FILE_FORMAT;
 import static com.wgzhao.addax.common.base.Key.FILE_NAME;
 import static com.wgzhao.addax.common.base.Key.SUFFIX;
 import static com.wgzhao.addax.common.base.Key.WRITE_MODE;
+import static com.wgzhao.addax.common.spi.ErrorCode.ILLEGAL_VALUE;
+import static com.wgzhao.addax.common.spi.ErrorCode.IO_ERROR;
+import static com.wgzhao.addax.common.spi.ErrorCode.LOGIN_ERROR;
+import static com.wgzhao.addax.common.spi.ErrorCode.REQUIRED_VALUE;
 
 public class FtpWriter
         extends Writer
@@ -93,28 +97,28 @@ public class FtpWriter
                         protocol, username, host, port, e.getMessage());
                 LOG.error(message);
                 throw AddaxException.asAddaxException(
-                        FtpWriterErrorCode.FAIL_LOGIN, message, e);
+                        LOGIN_ERROR, message, e);
             }
         }
 
         private void validateParameter()
         {
-            this.writerSliceConfig.getNecessaryValue(FILE_NAME, FtpWriterErrorCode.REQUIRED_VALUE);
-            String path = this.writerSliceConfig.getNecessaryValue(FtpKey.PATH, FtpWriterErrorCode.REQUIRED_VALUE);
+            this.writerSliceConfig.getNecessaryValue(FILE_NAME, REQUIRED_VALUE);
+            String path = this.writerSliceConfig.getNecessaryValue(FtpKey.PATH, REQUIRED_VALUE);
             if (!path.startsWith("/")) {
                 String message = String.format("The item path [%s] should be configured as absolute path.", path);
                 LOG.error(message);
-                throw AddaxException.asAddaxException(FtpWriterErrorCode.ILLEGAL_VALUE, message);
+                throw AddaxException.asAddaxException(ILLEGAL_VALUE, message);
             }
 
-            this.host = this.writerSliceConfig.getNecessaryValue(FtpKey.HOST, FtpWriterErrorCode.REQUIRED_VALUE);
-            this.username = this.writerSliceConfig.getNecessaryValue(FtpKey.USERNAME, FtpWriterErrorCode.REQUIRED_VALUE);
+            this.host = this.writerSliceConfig.getNecessaryValue(FtpKey.HOST, REQUIRED_VALUE);
+            this.username = this.writerSliceConfig.getNecessaryValue(FtpKey.USERNAME, REQUIRED_VALUE);
             this.password = this.writerSliceConfig.getString(FtpKey.PASSWORD, null);
             this.timeout = this.writerSliceConfig.getInt(FtpKey.TIMEOUT, DEFAULT_TIMEOUT);
 
             this.protocol = this.writerSliceConfig.getString(FtpKey.PROTOCOL, "ftp");
             if (!("ftp".equalsIgnoreCase(protocol) || "sftp".equalsIgnoreCase(protocol))) {
-                throw AddaxException.asAddaxException(FtpWriterErrorCode.ILLEGAL_VALUE,
+                throw AddaxException.asAddaxException(ILLEGAL_VALUE,
                         protocol + " is unsupported, supported protocol are ftp and sftp");
             }
             this.writerSliceConfig.set(FtpKey.PROTOCOL, protocol);
@@ -137,7 +141,7 @@ public class FtpWriter
                         else {
                             String msg = "You have configured to use the key, but neither the configured key file nor the default file(" +
                                     DEFAULT_PRIVATE_KEY + " exists";
-                            throw AddaxException.asAddaxException(FtpWriterErrorCode.ILLEGAL_VALUE, msg);
+                            throw AddaxException.asAddaxException(ILLEGAL_VALUE, msg);
                         }
                     }
                 }
@@ -150,7 +154,7 @@ public class FtpWriter
             }
             else {
                 throw AddaxException.asAddaxException(
-                        FtpWriterErrorCode.ILLEGAL_VALUE, protocol + " is unsupported, supported protocol are ftp and sftp");
+                        ILLEGAL_VALUE, protocol + " is unsupported, supported protocol are ftp and sftp");
             }
             this.writerSliceConfig.set(FtpKey.PORT, this.port);
         }
@@ -189,14 +193,14 @@ public class FtpWriter
                     LOG.info("The directory [{}] includes the following files with prefix [{}]: [{}].", path, fileName,
                             StringUtils.join(allFilesInDir.iterator(), ", "));
                     throw AddaxException.asAddaxException(
-                            FtpWriterErrorCode.ILLEGAL_VALUE,
+                            ILLEGAL_VALUE,
                             String.format("您配置的path: [%s] 目录不为空, 下面存在其他文件或文件夹.", path));
                 }
             }
             else {
                 throw AddaxException
                         .asAddaxException(
-                                FtpWriterErrorCode.ILLEGAL_VALUE,
+                                ILLEGAL_VALUE,
                                 String.format("仅支持 truncate, append, nonConflict 三种模式, 不支持您配置的 writeMode 模式 : [%s]",
                                         writeMode));
             }
@@ -302,7 +306,7 @@ public class FtpWriter
                         host, username, port, e.getMessage());
                 LOG.error(message);
                 throw AddaxException.asAddaxException(
-                        FtpWriterErrorCode.FAIL_LOGIN, message, e);
+                        LOGIN_ERROR, message, e);
             }
         }
 
@@ -332,7 +336,7 @@ public class FtpWriter
             }
             catch (Exception e) {
                 throw AddaxException.asAddaxException(
-                        FtpWriterErrorCode.WRITE_FILE_IO_ERROR,
+                        IO_ERROR,
                         String.format("无法创建待写文件 : [%s]", this.fileName), e);
             }
             finally {

@@ -28,12 +28,13 @@ import com.wgzhao.addax.common.util.Configuration;
 import com.wgzhao.addax.core.taskgroup.runner.AbstractRunner;
 import com.wgzhao.addax.core.taskgroup.runner.ReaderRunner;
 import com.wgzhao.addax.core.taskgroup.runner.WriterRunner;
-import com.wgzhao.addax.core.util.FrameworkErrorCode;
 import org.apache.commons.lang3.StringUtils;
 
 import java.util.HashMap;
 import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
+
+import static com.wgzhao.addax.common.spi.ErrorCode.PLUGIN_INSTALL_ERROR;
+import static com.wgzhao.addax.common.spi.ErrorCode.RUNTIME_ERROR;
 
 /**
  * Created by jingxing on 14-8-24.
@@ -77,7 +78,7 @@ public class LoadUtil
 
         if (null == pluginConf) {
             throw AddaxException.asAddaxException(
-                    FrameworkErrorCode.PLUGIN_INSTALL_ERROR,
+                    PLUGIN_INSTALL_ERROR,
                     String.format("Can not find the configure of plugin [%s].", pluginName));
         }
 
@@ -98,7 +99,7 @@ public class LoadUtil
         }
         catch (Exception e) {
             throw AddaxException.asAddaxException(
-                    FrameworkErrorCode.RUNTIME_ERROR,
+                    RUNTIME_ERROR,
                     String.format("Exception occurred when load job plugin [%s].", pluginName), e);
         }
     }
@@ -116,7 +117,7 @@ public class LoadUtil
             return taskPlugin;
         }
         catch (Exception e) {
-            throw AddaxException.asAddaxException(FrameworkErrorCode.RUNTIME_ERROR,
+            throw AddaxException.asAddaxException(RUNTIME_ERROR,
                     String.format("Can not find the configure of task plugin [%s].", pluginName), e);
         }
     }
@@ -134,7 +135,7 @@ public class LoadUtil
             case WRITER:
                 return new WriterRunner(taskPlugin);
             default:
-                throw AddaxException.asAddaxException(FrameworkErrorCode.RUNTIME_ERROR,
+                throw AddaxException.asAddaxException(RUNTIME_ERROR,
                         String.format("The plugin type must be reader or writer, [%s] is unsupported.", pluginName));
         }
     }
@@ -154,7 +155,7 @@ public class LoadUtil
                     + pluginRunType.value());
         }
         catch (Exception e) {
-            throw AddaxException.asAddaxException(FrameworkErrorCode.RUNTIME_ERROR, e);
+            throw AddaxException.asAddaxException(RUNTIME_ERROR, e);
         }
     }
 
@@ -165,7 +166,7 @@ public class LoadUtil
         if (null == jarLoader) {
             String pluginPath = pluginConf.getString("path");
             if (StringUtils.isBlank(pluginPath)) {
-                throw AddaxException.asAddaxException(FrameworkErrorCode.RUNTIME_ERROR,
+                throw AddaxException.asAddaxException(RUNTIME_ERROR,
                         String.format("Illegal path of plugin [%s] for [%s].",  pluginName, pluginType));
             }
             jarLoader = new JarLoader(new String[] {pluginPath});

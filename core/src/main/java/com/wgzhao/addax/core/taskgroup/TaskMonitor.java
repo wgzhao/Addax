@@ -19,7 +19,7 @@
 
 package com.wgzhao.addax.core.taskgroup;
 
-import com.wgzhao.addax.common.exception.CommonErrorCode;
+import com.wgzhao.addax.common.spi.ErrorCode;
 import com.wgzhao.addax.common.exception.AddaxException;
 import com.wgzhao.addax.core.meta.State;
 import com.wgzhao.addax.core.statistics.communication.Communication;
@@ -96,7 +96,7 @@ public class TaskMonitor {
             } else if (isExpired(lastUpdateCommunicationTS)) {
                 communication.setState(State.FAILED);
                 communication.setTimestamp(ttl);
-                communication.setThrowable(AddaxException.asAddaxException(CommonErrorCode.TASK_HUNG_EXPIRED,
+                communication.setThrowable(AddaxException.asAddaxException(ErrorCode.TASK_HUNG_EXPIRED,
                         String.format("task(%s) hung expired [allReadRecord(%s), elapsed(%s)]", taskId,
                                 lastAllReadRecords, (ttl - lastUpdateCommunicationTS))));
             }

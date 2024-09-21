@@ -42,6 +42,11 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+import static com.wgzhao.addax.common.spi.ErrorCode.EXECUTE_FAIL;
+import static com.wgzhao.addax.common.spi.ErrorCode.ILLEGAL_VALUE;
+import static com.wgzhao.addax.common.spi.ErrorCode.LOGIN_ERROR;
+import static com.wgzhao.addax.common.spi.ErrorCode.REQUIRED_VALUE;
+
 public class HbaseSQLHelper
 {
     private static final Logger LOG = LoggerFactory.getLogger(HbaseSQLHelper.class);
@@ -62,7 +67,7 @@ public class HbaseSQLHelper
         if (hbaseCfg == null || hbaseCfg.isEmpty()) {
             // 集群配置必须存在且不为空
             throw AddaxException.asAddaxException(
-                    HbaseSQLReaderErrorCode.REQUIRED_VALUE,
+                    REQUIRED_VALUE,
                     String.format("%s must be configured with the following:  %s and  %s",
                             HBaseKey.HBASE_CONFIG, HConstants.ZOOKEEPER_QUORUM, HConstants.ZOOKEEPER_ZNODE_PARENT));
         }
@@ -71,7 +76,7 @@ public class HbaseSQLHelper
         List<String> columns = jobConf.getList(Key.COLUMN, String.class);
         if (table == null && querySql == null) {
             throw AddaxException.asAddaxException(
-                    HbaseSQLReaderErrorCode.REQUIRED_VALUE,
+                    REQUIRED_VALUE,
                     String.format("The %s and %s must have a configuration", Key.TABLE, Key.QUERY_SQL)
             );
         }
@@ -82,7 +87,7 @@ public class HbaseSQLHelper
         // check columns
         if (columns == null) {
             throw AddaxException.asAddaxException(
-                    HbaseSQLReaderErrorCode.ILLEGAL_VALUE, "The column configuration contains illegal chars, please check them");
+                    ILLEGAL_VALUE, "The column configuration contains illegal chars, please check them");
         }
 
         String zkQuorum = hbaseCfg.getOrDefault(HConstants.ZOOKEEPER_QUORUM, "").toString();
@@ -90,11 +95,11 @@ public class HbaseSQLHelper
 
         if (zkQuorum.isEmpty()) {
             throw AddaxException.asAddaxException(
-                    HbaseSQLReaderErrorCode.ILLEGAL_VALUE, "The " + HConstants.ZOOKEEPER_QUORUM + " can not be set to empty");
+                    ILLEGAL_VALUE, "The " + HConstants.ZOOKEEPER_QUORUM + " can not be set to empty");
         }
         if (!znode.startsWith("/")) {
             throw AddaxException.asAddaxException(
-                    HbaseSQLReaderErrorCode.ILLEGAL_VALUE, "The " + HConstants.ZOOKEEPER_ZNODE_PARENT + " must be start with /"
+                    ILLEGAL_VALUE, "The " + HConstants.ZOOKEEPER_ZNODE_PARENT + " must be start with /"
             );
         }
 
@@ -114,7 +119,7 @@ public class HbaseSQLHelper
             String keytab = jobConf.getString(Key.KERBEROS_KEYTAB_FILE_PATH);
             if (principal == null || keytab == null) {
                 throw AddaxException.asAddaxException(
-                        HbaseSQLReaderErrorCode.REQUIRED_VALUE,
+                        REQUIRED_VALUE,
                         "To enable kerberos, you must both configure " + Key.KERBEROS_PRINCIPAL + " and " + Key.KERBEROS_KEYTAB_FILE_PATH
                 );
             }
@@ -179,7 +184,7 @@ public class HbaseSQLHelper
         }
         catch (SQLException e) {
             throw AddaxException.asAddaxException(
-                    HbaseSQLReaderErrorCode.GET_PHOENIX_COLUMN_ERROR, "Failed to get table's column description:\n" + e.getMessage(), e);
+                    EXECUTE_FAIL, "Failed to get table's column description:\n" + e.getMessage(), e);
         }
     }
 
@@ -194,7 +199,7 @@ public class HbaseSQLHelper
             String message = String.format("kerberos authentication failed, please make sure that kerberosKeytabFilePath[%s] and kerberosPrincipal[%s] are configure correctly",
                     kerberosKeytabFilePath, kerberosPrincipal);
             LOG.error(message);
-            throw AddaxException.asAddaxException(HbaseSQLReaderErrorCode.KERBEROS_LOGIN_ERROR, e);
+            throw AddaxException.asAddaxException(LOGIN_ERROR, e);
         }
     }
 }

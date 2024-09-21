@@ -50,6 +50,9 @@ import java.sql.Types;
 import java.util.ArrayList;
 import java.util.List;
 
+import static com.wgzhao.addax.common.spi.ErrorCode.EXECUTE_FAIL;
+import static com.wgzhao.addax.common.spi.ErrorCode.NOT_SUPPORT_TYPE;
+
 public class HbaseSQLReader
         extends Reader
 {
@@ -128,8 +131,7 @@ public class HbaseSQLReader
                 recordSender.flush();
             }
             catch (SQLException e) {
-                throw AddaxException.asAddaxException(
-                        HbaseSQLReaderErrorCode.HBASE_CONNECTION_ERROR,
+                throw AddaxException.asAddaxException(EXECUTE_FAIL,
                         e.getMessage()
                 );
             }
@@ -187,7 +189,7 @@ public class HbaseSQLReader
                             break;
                         default:
                             throw AddaxException.asAddaxException(
-                                    HbaseSQLReaderErrorCode.PHOENIX_COLUMN_TYPE_CONVERT_ERROR, "The data type " + rmd.getColumnType(i) + " is unsupported yet");
+                                    NOT_SUPPORT_TYPE, "The data type " + rmd.getColumnType(i) + " is unsupported yet");
                     }
                     record.addColumn(column);
                 }

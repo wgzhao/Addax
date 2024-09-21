@@ -32,6 +32,9 @@ import org.slf4j.LoggerFactory;
 import java.util.ArrayList;
 import java.util.List;
 
+import static com.wgzhao.addax.common.spi.ErrorCode.CONNECT_ERROR;
+import static com.wgzhao.addax.common.spi.ErrorCode.RUNTIME_ERROR;
+
 public class KuduHelper
 {
 
@@ -52,7 +55,7 @@ public class KuduHelper
                     .build();
         }
         catch (Exception e) {
-            throw AddaxException.asAddaxException(KuduWriterErrorCode.GET_KUDU_CONNECTION_ERROR, e);
+            throw AddaxException.asAddaxException(CONNECT_ERROR, e);
         }
     }
 
@@ -66,8 +69,8 @@ public class KuduHelper
                 kuduTable = kuduClient.openTable(tableName);
                 return kuduTable;
             }
-            catch (Exception e) {
-                throw AddaxException.asAddaxException(KuduWriterErrorCode.GET_KUDU_TABLE_ERROR, e);
+            catch (KuduException e) {
+                throw AddaxException.asAddaxException(RUNTIME_ERROR, e);
             }
         }
     }
@@ -80,8 +83,8 @@ public class KuduHelper
         try {
             return kuduClient.tableExists(tableName);
         }
-        catch (Exception e) {
-            throw AddaxException.asAddaxException(KuduWriterErrorCode.GET_KUDU_CONNECTION_ERROR, e);
+        catch (KuduException e) {
+            throw AddaxException.asAddaxException(RUNTIME_ERROR, e);
         }
     }
 

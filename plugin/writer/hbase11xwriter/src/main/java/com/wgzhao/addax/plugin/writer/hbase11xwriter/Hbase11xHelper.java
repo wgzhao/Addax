@@ -46,6 +46,13 @@ import java.nio.charset.Charset;
 import java.util.List;
 import java.util.Map;
 
+import static com.wgzhao.addax.common.spi.ErrorCode.CONNECT_ERROR;
+import static com.wgzhao.addax.common.spi.ErrorCode.ILLEGAL_VALUE;
+import static com.wgzhao.addax.common.spi.ErrorCode.IO_ERROR;
+import static com.wgzhao.addax.common.spi.ErrorCode.LOGIN_ERROR;
+import static com.wgzhao.addax.common.spi.ErrorCode.REQUIRED_VALUE;
+import static com.wgzhao.addax.common.spi.ErrorCode.RUNTIME_ERROR;
+
 public class Hbase11xHelper
 {
 
@@ -56,7 +63,7 @@ public class Hbase11xHelper
     public static org.apache.hadoop.conf.Configuration getHbaseConfiguration(String hbaseConfig)
     {
         if (StringUtils.isBlank(hbaseConfig)) {
-            throw AddaxException.asAddaxException(Hbase11xWriterErrorCode.REQUIRED_VALUE, "The item hbaseConfig must be configured.");
+            throw AddaxException.asAddaxException(REQUIRED_VALUE, "The item hbaseConfig must be configured.");
         }
         org.apache.hadoop.conf.Configuration hConfiguration = HBaseConfiguration.create();
         try {
@@ -68,7 +75,7 @@ public class Hbase11xHelper
             }
         }
         catch (Exception e) {
-            throw AddaxException.asAddaxException(Hbase11xWriterErrorCode.HBASE_CONNECTION_ERROR, e);
+            throw AddaxException.asAddaxException(CONNECT_ERROR, e);
         }
         return hConfiguration;
     }
@@ -83,7 +90,7 @@ public class Hbase11xHelper
         }
         catch (Exception e) {
             Hbase11xHelper.closeConnection(hConnection);
-            throw AddaxException.asAddaxException(Hbase11xWriterErrorCode.HBASE_CONNECTION_ERROR, e);
+            throw AddaxException.asAddaxException(CONNECT_ERROR, e);
         }
         return hConnection;
     }
@@ -108,7 +115,7 @@ public class Hbase11xHelper
             Hbase11xHelper.closeTable(hTable);
             Hbase11xHelper.closeAdmin(admin);
             Hbase11xHelper.closeConnection(hConnection);
-            throw AddaxException.asAddaxException(Hbase11xWriterErrorCode.HBASE_TABLE_ERROR, e);
+            throw AddaxException.asAddaxException(RUNTIME_ERROR, e);
         }
         return hTable;
     }
@@ -136,7 +143,7 @@ public class Hbase11xHelper
             Hbase11xHelper.closeBufferedMutator(bufferedMutator);
             Hbase11xHelper.closeAdmin(admin);
             Hbase11xHelper.closeConnection(hConnection);
-            throw AddaxException.asAddaxException(Hbase11xWriterErrorCode.GET_HBASE_BUFFERED_MUTATOR_ERROR, e);
+            throw AddaxException.asAddaxException(RUNTIME_ERROR, e);
         }
         return bufferedMutator;
     }
@@ -156,7 +163,7 @@ public class Hbase11xHelper
             admin.truncateTable(hTableName, true);
         }
         catch (Exception e) {
-            throw AddaxException.asAddaxException(Hbase11xWriterErrorCode.TRUNCATE_HBASE_ERROR, e);
+            throw AddaxException.asAddaxException(RUNTIME_ERROR, e);
         }
         finally {
             Hbase11xHelper.closeAdmin(admin);
@@ -172,7 +179,7 @@ public class Hbase11xHelper
             }
         }
         catch (IOException e) {
-            throw AddaxException.asAddaxException(Hbase11xWriterErrorCode.CLOSE_HBASE_CONNECTION_ERROR, e);
+            throw AddaxException.asAddaxException(IO_ERROR, e);
         }
     }
 
@@ -184,7 +191,7 @@ public class Hbase11xHelper
             }
         }
         catch (IOException e) {
-            throw AddaxException.asAddaxException(Hbase11xWriterErrorCode.CLOSE_HBASE_AMIN_ERROR, e);
+            throw AddaxException.asAddaxException(IO_ERROR, e);
         }
     }
 
@@ -196,7 +203,7 @@ public class Hbase11xHelper
             }
         }
         catch (IOException e) {
-            throw AddaxException.asAddaxException(Hbase11xWriterErrorCode.CLOSE_HBASE_BUFFERED_MUTATOR_ERROR, e);
+            throw AddaxException.asAddaxException(IO_ERROR, e);
         }
     }
 
@@ -208,7 +215,7 @@ public class Hbase11xHelper
             }
         }
         catch (IOException e) {
-            throw AddaxException.asAddaxException(Hbase11xWriterErrorCode.CLOSE_HBASE_TABLE_ERROR, e);
+            throw AddaxException.asAddaxException(IO_ERROR, e);
         }
     }
 
@@ -216,33 +223,33 @@ public class Hbase11xHelper
             throws IOException
     {
         if (!admin.tableExists(hTableName)) {
-            throw AddaxException.asAddaxException(Hbase11xWriterErrorCode.ILLEGAL_VALUE, "The table " + hTableName.toString() + "DOES NOT exists.");
+            throw AddaxException.asAddaxException(ILLEGAL_VALUE, "The table " + hTableName.toString() + "DOES NOT exists.");
         }
         if (!admin.isTableAvailable(hTableName)) {
-            throw AddaxException.asAddaxException(Hbase11xWriterErrorCode.ILLEGAL_VALUE, "The table " + hTableName.toString() + " is unavailable.");
+            throw AddaxException.asAddaxException(ILLEGAL_VALUE, "The table " + hTableName.toString() + " is unavailable.");
         }
         if (admin.isTableDisabled(hTableName)) {
-            throw AddaxException.asAddaxException(Hbase11xWriterErrorCode.ILLEGAL_VALUE, "The table " + hTableName.toString() + "is disabled,");
+            throw AddaxException.asAddaxException(ILLEGAL_VALUE, "The table " + hTableName.toString() + "is disabled,");
         }
     }
 
     public static void validateParameter(Configuration originalConfig)
     {
-        originalConfig.getNecessaryValue(HBaseKey.HBASE_CONFIG, Hbase11xWriterErrorCode.REQUIRED_VALUE);
-        originalConfig.getNecessaryValue(HBaseKey.TABLE, Hbase11xWriterErrorCode.REQUIRED_VALUE);
+        originalConfig.getNecessaryValue(HBaseKey.HBASE_CONFIG, REQUIRED_VALUE);
+        originalConfig.getNecessaryValue(HBaseKey.TABLE, REQUIRED_VALUE);
 
         Hbase11xHelper.validateMode(originalConfig);
 
         String encoding = originalConfig.getString(HBaseKey.ENCODING, HBaseConstant.DEFAULT_ENCODING);
         if (!Charset.isSupported(encoding)) {
-            throw AddaxException.asAddaxException(Hbase11xWriterErrorCode.ILLEGAL_VALUE, "The encoding[" + encoding + "] is unsupported ");
+            throw AddaxException.asAddaxException(ILLEGAL_VALUE, "The encoding[" + encoding + "] is unsupported ");
         }
         originalConfig.set(HBaseKey.ENCODING, encoding);
 
         // validate kerberos login
         if (originalConfig.getBool(Key.HAVE_KERBEROS, false)) {
-            String principal = originalConfig.getNecessaryValue(Key.KERBEROS_PRINCIPAL, Hbase11xWriterErrorCode.REQUIRED_VALUE);
-            String keytab = originalConfig.getNecessaryValue(Key.KERBEROS_KEYTAB_FILE_PATH, Hbase11xWriterErrorCode.REQUIRED_VALUE);
+            String principal = originalConfig.getNecessaryValue(Key.KERBEROS_PRINCIPAL, REQUIRED_VALUE);
+            String keytab = originalConfig.getNecessaryValue(Key.KERBEROS_KEYTAB_FILE_PATH, REQUIRED_VALUE);
             kerberosAuthentication(principal, keytab);
         }
         Boolean walFlag = originalConfig.getBool(HBaseKey.WAL_FLAG, false);
@@ -253,7 +260,7 @@ public class Hbase11xHelper
 
     private static void validateMode(Configuration originalConfig)
     {
-        String mode = originalConfig.getNecessaryValue(HBaseKey.MODE, Hbase11xWriterErrorCode.REQUIRED_VALUE);
+        String mode = originalConfig.getNecessaryValue(HBaseKey.MODE, REQUIRED_VALUE);
         ModeType modeType = ModeType.getByTypeName(mode);
         if (modeType == ModeType.NORMAL) {
             validateRowkeyColumn(originalConfig);
@@ -261,7 +268,7 @@ public class Hbase11xHelper
             validateVersionColumn(originalConfig);
         }
         else {
-            throw AddaxException.asAddaxException(Hbase11xWriterErrorCode.ILLEGAL_VALUE, "The mode " + mode + "is unsupported");
+            throw AddaxException.asAddaxException(ILLEGAL_VALUE, "The mode " + mode + "is unsupported");
         }
     }
 
@@ -269,21 +276,21 @@ public class Hbase11xHelper
     {
         List<Configuration> columns = originalConfig.getListConfiguration(HBaseKey.COLUMN);
         if (columns == null || columns.isEmpty()) {
-            throw AddaxException.asAddaxException(Hbase11xWriterErrorCode.REQUIRED_VALUE,
+            throw AddaxException.asAddaxException(REQUIRED_VALUE,
                     "The item column must be configured, the form is 'column:[{\"index\": 0,\"name\": \"cf0:column0\",\"type\": " +
                             "\"string\"},{\"index\": 1,\"name\": \"cf1:column1\",\"type\": \"long\"}]'");
         }
         for (Configuration aColumn : columns) {
             Integer index = aColumn.getInt(HBaseKey.INDEX);
-            String type = aColumn.getNecessaryValue(HBaseKey.TYPE, Hbase11xWriterErrorCode.REQUIRED_VALUE);
-            String name = aColumn.getNecessaryValue(HBaseKey.NAME, Hbase11xWriterErrorCode.REQUIRED_VALUE);
+            String type = aColumn.getNecessaryValue(HBaseKey.TYPE, REQUIRED_VALUE);
+            String name = aColumn.getNecessaryValue(HBaseKey.NAME, REQUIRED_VALUE);
             ColumnType.getByTypeName(type);
             if (name.split(":").length != 2) {
-                throw AddaxException.asAddaxException(Hbase11xWriterErrorCode.ILLEGAL_VALUE,
+                throw AddaxException.asAddaxException(ILLEGAL_VALUE,
                         String.format("The field's name[%s] is not valid, it must be configured as cf:qualifier", name));
             }
             if (index == null || index < 0) {
-                throw AddaxException.asAddaxException(Hbase11xWriterErrorCode.ILLEGAL_VALUE, "The index of name is not valid, it must be non-negative number");
+                throw AddaxException.asAddaxException(ILLEGAL_VALUE, "The index of name is not valid, it must be non-negative number");
             }
         }
     }
@@ -292,24 +299,24 @@ public class Hbase11xHelper
     {
         List<Configuration> rowkeyColumn = originalConfig.getListConfiguration(HBaseKey.ROW_KEY_COLUMN);
         if (rowkeyColumn == null || rowkeyColumn.isEmpty()) {
-            throw AddaxException.asAddaxException(Hbase11xWriterErrorCode.REQUIRED_VALUE,
+            throw AddaxException.asAddaxException(REQUIRED_VALUE,
                     "The item rowkeyColumn is required，such as rowkeyColumn:[{\"index\": 0,\"type\": \"string\"},{\"index\": -1,\"type\": \"string\",\"value\": \"_\"}]");
         }
         int rowkeyColumnSize = rowkeyColumn.size();
         for (Configuration aRowkeyColumn : rowkeyColumn) {
             Integer index = aRowkeyColumn.getInt(HBaseKey.INDEX);
-            String type = aRowkeyColumn.getNecessaryValue(HBaseKey.TYPE, Hbase11xWriterErrorCode.REQUIRED_VALUE);
+            String type = aRowkeyColumn.getNecessaryValue(HBaseKey.TYPE, REQUIRED_VALUE);
             ColumnType.getByTypeName(type);
             if (index == null) {
-                throw AddaxException.asAddaxException(Hbase11xWriterErrorCode.REQUIRED_VALUE, "The index of rowkeyColumn is required");
+                throw AddaxException.asAddaxException(REQUIRED_VALUE, "The index of rowkeyColumn is required");
             }
             //不能只有-1列,即rowkey连接串
             if (rowkeyColumnSize == 1 && index == -1) {
-                throw AddaxException.asAddaxException(Hbase11xWriterErrorCode.ILLEGAL_VALUE,
+                throw AddaxException.asAddaxException(ILLEGAL_VALUE,
                         "The item rowkeyColumn can not all be constant, it must be specify more than one rowkey column");
             }
             if (index == -1) {
-                aRowkeyColumn.getNecessaryValue(HBaseKey.VALUE, Hbase11xWriterErrorCode.REQUIRED_VALUE);
+                aRowkeyColumn.getNecessaryValue(HBaseKey.VALUE, REQUIRED_VALUE);
             }
         }
     }
@@ -321,14 +328,14 @@ public class Hbase11xHelper
         if (versionColumn != null) {
             Integer index = versionColumn.getInt(HBaseKey.INDEX);
             if (index == null) {
-                throw AddaxException.asAddaxException(Hbase11xWriterErrorCode.REQUIRED_VALUE, "The field[index] of versionColumn is required.");
+                throw AddaxException.asAddaxException(REQUIRED_VALUE, "The field[index] of versionColumn is required.");
             }
             if (index == -1) {
                 //指定时间,需要index=-1,value
-                versionColumn.getNecessaryValue(HBaseKey.VALUE, Hbase11xWriterErrorCode.REQUIRED_VALUE);
+                versionColumn.getNecessaryValue(HBaseKey.VALUE, REQUIRED_VALUE);
             }
             else if (index < 0) {
-                throw AddaxException.asAddaxException(Hbase11xWriterErrorCode.ILLEGAL_VALUE, "The field[index] of versionColumn must be either -1 or non-negative number");
+                throw AddaxException.asAddaxException(ILLEGAL_VALUE, "The field[index] of versionColumn must be either -1 or non-negative number");
             }
         }
     }
@@ -346,7 +353,7 @@ public class Hbase11xHelper
             String message = String.format("Kerberos authentication failed, please make sure that kerberosKeytabFilePath[%s] and kerberosPrincipal[%s] are correct",
                     kerberosKeytabFilePath, kerberosPrincipal);
             LOG.error(message);
-            throw AddaxException.asAddaxException(Hbase11xWriterErrorCode.KERBEROS_LOGIN_ERROR, e);
+            throw AddaxException.asAddaxException(LOGIN_ERROR, e);
         }
     }
 }

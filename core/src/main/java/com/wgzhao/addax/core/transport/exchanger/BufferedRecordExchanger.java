@@ -20,7 +20,7 @@
 package com.wgzhao.addax.core.transport.exchanger;
 
 import com.wgzhao.addax.common.element.Record;
-import com.wgzhao.addax.common.exception.CommonErrorCode;
+import com.wgzhao.addax.common.spi.ErrorCode;
 import com.wgzhao.addax.common.exception.AddaxException;
 import com.wgzhao.addax.common.plugin.RecordReceiver;
 import com.wgzhao.addax.common.plugin.RecordSender;
@@ -28,7 +28,6 @@ import com.wgzhao.addax.common.plugin.TaskPluginCollector;
 import com.wgzhao.addax.common.util.Configuration;
 import com.wgzhao.addax.core.transport.channel.Channel;
 import com.wgzhao.addax.core.transport.record.TerminateRecord;
-import com.wgzhao.addax.core.util.FrameworkErrorCode;
 import com.wgzhao.addax.core.util.container.CoreConstant;
 import org.apache.commons.lang3.Validate;
 import org.slf4j.Logger;
@@ -37,6 +36,8 @@ import org.slf4j.LoggerFactory;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
+
+import static com.wgzhao.addax.common.spi.ErrorCode.CONFIG_ERROR;
 
 public class BufferedRecordExchanger
         implements RecordSender, RecordReceiver
@@ -78,7 +79,7 @@ public class BufferedRecordExchanger
                             "com.wgzhao.addax.core.transport.record.DefaultRecord")));
         }
         catch (Exception e) {
-            throw AddaxException.asAddaxException(FrameworkErrorCode.CONFIG_ERROR, e);
+            throw AddaxException.asAddaxException(CONFIG_ERROR, e);
         }
     }
 
@@ -89,7 +90,7 @@ public class BufferedRecordExchanger
             return BufferedRecordExchanger.recordClass.getConstructor().newInstance();
         }
         catch (Exception e) {
-            throw AddaxException.asAddaxException(FrameworkErrorCode.CONFIG_ERROR, e);
+            throw AddaxException.asAddaxException(CONFIG_ERROR, e);
         }
     }
 
@@ -97,7 +98,7 @@ public class BufferedRecordExchanger
     public void sendToWriter(Record record)
     {
         if (shutdown) {
-            throw AddaxException.asAddaxException(CommonErrorCode.SHUT_DOWN_TASK, "");
+            throw AddaxException.asAddaxException(ErrorCode.SHUT_DOWN_TASK, "");
         }
 
         Validate.notNull(record, "The record cannot be empty.");
@@ -123,7 +124,7 @@ public class BufferedRecordExchanger
     public void flush()
     {
         if (shutdown) {
-            throw AddaxException.asAddaxException(CommonErrorCode.SHUT_DOWN_TASK, "");
+            throw AddaxException.asAddaxException(ErrorCode.SHUT_DOWN_TASK, "");
         }
         this.channel.pushAll(this.buffer);
         this.buffer.clear();
@@ -135,7 +136,7 @@ public class BufferedRecordExchanger
     public void terminate()
     {
         if (shutdown) {
-            throw AddaxException.asAddaxException(CommonErrorCode.SHUT_DOWN_TASK, "");
+            throw AddaxException.asAddaxException(ErrorCode.SHUT_DOWN_TASK, "");
         }
         flush();
         this.channel.pushTerminate(TerminateRecord.get());
@@ -145,7 +146,7 @@ public class BufferedRecordExchanger
     public Record getFromReader()
     {
         if (shutdown) {
-            throw AddaxException.asAddaxException(CommonErrorCode.SHUT_DOWN_TASK, "");
+            throw AddaxException.asAddaxException(ErrorCode.SHUT_DOWN_TASK, "");
         }
         boolean isEmpty = (this.bufferIndex >= this.buffer.size());
         if (isEmpty) {

@@ -19,7 +19,7 @@
 
 package com.wgzhao.addax.common.element;
 
-import com.wgzhao.addax.common.exception.CommonErrorCode;
+import com.wgzhao.addax.common.spi.ErrorCode;
 import com.wgzhao.addax.common.exception.AddaxException;
 
 import java.math.BigDecimal;
@@ -122,21 +122,21 @@ public class BoolColumn
     public Date asDate()
     {
         throw AddaxException.asAddaxException(
-                CommonErrorCode.CONVERT_NOT_SUPPORT, "Bool type cannot be converted to Date.");
+                ErrorCode.CONVERT_NOT_SUPPORT, "Bool type cannot be converted to Date.");
     }
 
     @Override
     public byte[] asBytes()
     {
         throw AddaxException.asAddaxException(
-                CommonErrorCode.CONVERT_NOT_SUPPORT, "Bool type cannot be converted to Bytes.");
+                ErrorCode.CONVERT_NOT_SUPPORT, "Bool type cannot be converted to Bytes.");
     }
 
     @Override
     public Timestamp asTimestamp()
     {
         throw AddaxException.asAddaxException(
-                CommonErrorCode.CONVERT_NOT_SUPPORT, "Bool type cannot be converted to Timestamp.");
+                ErrorCode.CONVERT_NOT_SUPPORT, "Bool type cannot be converted to Timestamp.");
     }
 
     private void validate(final String data)
@@ -150,7 +150,7 @@ public class BoolColumn
         }
 
         throw AddaxException.asAddaxException(
-                CommonErrorCode.CONVERT_NOT_SUPPORT,
+                ErrorCode.CONVERT_NOT_SUPPORT,
                 String.format("String [%s] cannot be converted to Bool .", data));
     }
 }

@@ -34,6 +34,9 @@ import org.slf4j.LoggerFactory;
 import java.util.List;
 import java.util.Map;
 
+import static com.wgzhao.addax.common.spi.ErrorCode.ILLEGAL_VALUE;
+import static com.wgzhao.addax.common.spi.ErrorCode.REQUIRED_VALUE;
+
 /**
  * HBase SQL writer config
  *
@@ -112,7 +115,7 @@ public class HbaseSQLWriterConfig
         if (StringUtils.isBlank(hbaseCfg)) {
             // 集群配置必须存在且不为空
             throw AddaxException.asAddaxException(
-                    HbaseSQLWriterErrorCode.REQUIRED_VALUE,
+                    REQUIRED_VALUE,
                     String.format("%s must be configured with the following:  %s and  %s",
                             HBaseKey.HBASE_CONFIG, HConstants.ZOOKEEPER_QUORUM, HConstants.ZOOKEEPER_ZNODE_PARENT));
         }
@@ -125,12 +128,12 @@ public class HbaseSQLWriterConfig
             cfg.password = thinConnectConfig.get(HBaseKey.HBASE_THIN_CONNECT_PASSWORD);
             if (Strings.isNullOrEmpty(thinConnectStr)) {
                 throw AddaxException.asAddaxException(
-                        HbaseSQLWriterErrorCode.ILLEGAL_VALUE,
+                        ILLEGAL_VALUE,
                         "You must configure 'hbase.thin.connect.url' if your want use thinClient mode");
             }
             if (Strings.isNullOrEmpty(cfg.namespace) || Strings.isNullOrEmpty(cfg.username) || Strings
                     .isNullOrEmpty(cfg.password)) {
-                throw AddaxException.asAddaxException(HbaseSQLWriterErrorCode.ILLEGAL_VALUE,
+                throw AddaxException.asAddaxException(ILLEGAL_VALUE,
                         "The items 'hbase.thin.connect.namespace|username|password' must be configured if you want to use thinClient mode");
             }
             cfg.connectionString = thinConnectStr;
@@ -144,14 +147,14 @@ public class HbaseSQLWriterConfig
             catch (Throwable t) {
                 // 解析hbase配置错误
                 throw AddaxException.asAddaxException(
-                        HbaseSQLWriterErrorCode.REQUIRED_VALUE,
+                        REQUIRED_VALUE,
                         "Failed to parse hbaseConfig，please check it.");
             }
             String zkQuorum = zkCfg.getFirst();
             String znode = zkCfg.getSecond();
             if (zkQuorum == null || zkQuorum.isEmpty() || znode == null || znode.isEmpty()) {
                 throw AddaxException.asAddaxException(
-                        HbaseSQLWriterErrorCode.ILLEGAL_VALUE,
+                        ILLEGAL_VALUE,
                         "The items hbase.zookeeper.quorum/zookeeper.znode.parent must be configured");
             }
 
@@ -167,14 +170,14 @@ public class HbaseSQLWriterConfig
 
         if (cfg.tableName == null || cfg.tableName.isEmpty()) {
             throw AddaxException.asAddaxException(
-                    HbaseSQLWriterErrorCode.ILLEGAL_VALUE, "The item tableName must be configured.");
+                    ILLEGAL_VALUE, "The item tableName must be configured.");
         }
         try {
             TableName.valueOf(cfg.tableName);
         }
         catch (Exception e) {
             throw AddaxException.asAddaxException(
-                    HbaseSQLWriterErrorCode.ILLEGAL_VALUE,
+                    ILLEGAL_VALUE,
                     "The table " +  cfg.tableName + " you configured has illegal symbols.");
         }
 
@@ -182,7 +185,7 @@ public class HbaseSQLWriterConfig
         cfg.columns = jobConf.getList(HBaseKey.COLUMN, String.class);
         if (cfg.columns == null || cfg.columns.isEmpty()) {
             throw AddaxException.asAddaxException(
-                    HbaseSQLWriterErrorCode.ILLEGAL_VALUE, "The item columns must be configured and can not be empty.");
+                    ILLEGAL_VALUE, "The item columns must be configured and can not be empty.");
         }
     }
 

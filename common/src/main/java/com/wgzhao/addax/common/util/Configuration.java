@@ -22,7 +22,6 @@ package com.wgzhao.addax.common.util;
 import com.alibaba.fastjson2.JSON;
 import com.alibaba.fastjson2.JSONWriter;
 import com.wgzhao.addax.common.exception.AddaxException;
-import com.wgzhao.addax.common.exception.CommonErrorCode;
 import com.wgzhao.addax.common.spi.ErrorCode;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.CharUtils;
@@ -42,6 +41,8 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+
+import static com.wgzhao.addax.common.spi.ErrorCode.REQUIRED_VALUE;
 
 /**
  * Configuration 提供多级JSON配置信息无损存储 <br>
@@ -82,7 +83,7 @@ public class Configuration
             this.root = JSON.parse(json);
         }
         catch (Exception e) {
-            throw AddaxException.asAddaxException(CommonErrorCode.CONFIG_ERROR,
+            throw AddaxException.asAddaxException(ErrorCode.CONFIG_ERROR,
                     String.format("The configuration is incorrect. The configuration you provided is " +
                             "not in valid JSON format: %s.", e.getMessage()));
         }
@@ -108,7 +109,7 @@ public class Configuration
             return new Configuration(json);
         }
         catch (Exception e) {
-            throw AddaxException.asAddaxException(CommonErrorCode.CONFIG_ERROR,
+            throw AddaxException.asAddaxException(ErrorCode.CONFIG_ERROR,
                     e);
         }
     }
@@ -123,12 +124,12 @@ public class Configuration
                     .toString(new FileInputStream(file), StandardCharsets.UTF_8));
         }
         catch (FileNotFoundException e) {
-            throw AddaxException.asAddaxException(CommonErrorCode.CONFIG_ERROR,
+            throw AddaxException.asAddaxException(ErrorCode.CONFIG_ERROR,
                     String.format("No such file: %s", file.getAbsolutePath()));
         }
         catch (IOException e) {
             throw AddaxException.asAddaxException(
-                    CommonErrorCode.CONFIG_ERROR,
+                    ErrorCode.CONFIG_ERROR,
                     String.format("Failed to read the configuration [%s], reason: %s.",
                             file.getAbsolutePath(), e));
         }
@@ -143,7 +144,7 @@ public class Configuration
             return Configuration.from(IOUtils.toString(is, StandardCharsets.UTF_8));
         }
         catch (IOException e) {
-            throw AddaxException.asAddaxException(CommonErrorCode.CONFIG_ERROR,
+            throw AddaxException.asAddaxException(ErrorCode.CONFIG_ERROR,
                     String.format("Failed to read the configuration reason: %s.", e));
         }
     }
@@ -167,7 +168,7 @@ public class Configuration
     private static void checkJSON(String json)
     {
         if (StringUtils.isBlank(json)) {
-            throw AddaxException.asAddaxException(CommonErrorCode.CONFIG_ERROR,
+            throw AddaxException.asAddaxException(ErrorCode.CONFIG_ERROR,
                     "The configure file is empty.");
         }
     }
@@ -182,10 +183,29 @@ public class Configuration
         String value = this.getString(key, null);
         if (StringUtils.isBlank(value)) {
             throw AddaxException.asAddaxException(errorCode,
-                    String.format("Illegal configuration, the item [%s] is required.", key));
+                    String.format("The required item '%s' is not found", key));
         }
-
         return value;
+    }
+
+    public String getNecessaryValue(String key)
+    {
+        String value = this.getString(key, null);
+        if (StringUtils.isBlank(value)) {
+            throw AddaxException.asAddaxException(REQUIRED_VALUE,
+                    String.format("The required item %s is not found", key));
+        }
+        return value;
+    }
+
+    public void getNecessaryValues(String... keys)
+    {
+        for (String key : keys) {
+            if (StringUtils.isBlank(this.getString(key, null))) {
+                throw AddaxException.asAddaxException(REQUIRED_VALUE,
+                        String.format("The required item %s is not found", key));
+            }
+        }
     }
 
     public String getUnnecessaryValue(String key, String defaultValue)
@@ -294,7 +314,7 @@ public class Configuration
         }
         catch (Exception e) {
             throw AddaxException.asAddaxException(
-                    CommonErrorCode.CONFIG_ERROR,
+                    ErrorCode.CONFIG_ERROR,
                     String.format("Illegal configuration, cannot be converted to string for [%s], reason: %s.", path,
                             e.getMessage()));
         }
@@ -338,7 +358,7 @@ public class Configuration
             return Boolean.FALSE;
         }
         else {
-            throw AddaxException.asAddaxException(CommonErrorCode.CONFIG_ERROR,
+            throw AddaxException.asAddaxException(ErrorCode.CONFIG_ERROR,
                     String.format("Illegal configuration, the value [%s] of [%s] cannot be converted to bool type.",
                             path, result));
         }
@@ -381,7 +401,7 @@ public class Configuration
         }
         catch (Exception e) {
             throw AddaxException.asAddaxException(
-                    CommonErrorCode.CONFIG_ERROR,
+                    ErrorCode.CONFIG_ERROR,
                     String.format("Illegal configuration, the value [%s] of [%s] is expected integer type.", path,
                             e.getMessage()));
         }
@@ -423,7 +443,7 @@ public class Configuration
         }
         catch (Exception e) {
             throw AddaxException.asAddaxException(
-                    CommonErrorCode.CONFIG_ERROR,
+                    ErrorCode.CONFIG_ERROR,
                     String.format("Illegal configuration, the value [%s] of [%s] is expected integer/long type.", path,
                             e.getMessage()));
         }
@@ -465,7 +485,7 @@ public class Configuration
         }
         catch (Exception e) {
             throw AddaxException.asAddaxException(
-                    CommonErrorCode.CONFIG_ERROR,
+                    ErrorCode.CONFIG_ERROR,
                     String.format("Illegal configuration, the value [%s] of [%s] is expected float type.", path,
                             e.getMessage()));
         }
@@ -714,7 +734,7 @@ public class Configuration
         Object result = this.get(path);
         if (null == result) {
             throw AddaxException.asAddaxException(
-                    CommonErrorCode.RUNTIME_ERROR,
+                    ErrorCode.RUNTIME_ERROR,
                     String.format("Illegal configuration, the key [%s] does not exists.", path));
         }
 
@@ -848,7 +868,7 @@ public class Configuration
             return;
         }
 
-        throw AddaxException.asAddaxException(CommonErrorCode.RUNTIME_ERROR,
+        throw AddaxException.asAddaxException(ErrorCode.RUNTIME_ERROR,
                 String.format("Illegal value, cannot set value [%s] for key [%s]",
                         ToStringBuilder.reflectionToString(object), path));
     }
@@ -894,7 +914,7 @@ public class Configuration
     {
         if (null == paths) {
             throw AddaxException.asAddaxException(
-                    CommonErrorCode.RUNTIME_ERROR, "The Path cannot be null");
+                    ErrorCode.RUNTIME_ERROR, "The Path cannot be null");
         }
 
         if (1 == paths.size() && StringUtils.isBlank(paths.get(0))) {
@@ -922,7 +942,7 @@ public class Configuration
             }
 
             throw AddaxException.asAddaxException(
-                    CommonErrorCode.RUNTIME_ERROR, String.format("the value [%s] of [%s] is illegal.",
+                    ErrorCode.RUNTIME_ERROR, String.format("the value [%s] of [%s] is illegal.",
                             StringUtils.join(paths, "."), path));
         }
 
@@ -1009,7 +1029,7 @@ public class Configuration
             return lists;
         }
 
-        throw AddaxException.asAddaxException(CommonErrorCode.RUNTIME_ERROR, "System internal error.");
+        throw AddaxException.asAddaxException(ErrorCode.RUNTIME_ERROR, "System internal error.");
     }
 
     private Object findObject(String path)

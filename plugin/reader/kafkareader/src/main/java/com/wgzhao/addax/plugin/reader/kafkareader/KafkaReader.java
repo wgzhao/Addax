@@ -26,6 +26,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 
+import static com.wgzhao.addax.common.spi.ErrorCode.CONFIG_ERROR;
+import static com.wgzhao.addax.common.spi.ErrorCode.REQUIRED_VALUE;
+
 public class KafkaReader
         extends Reader
 {
@@ -38,8 +41,8 @@ public class KafkaReader
         public void init()
         {
             this.conf = getPluginJobConf();
-            conf.getNecessaryValue(KafkaKey.BROKER_LIST, KafkaReaderErrorCode.REQUIRED_VALUE);
-            conf.getNecessaryValue(KafkaKey.TOPIC, KafkaReaderErrorCode.REQUIRED_VALUE);
+            conf.getNecessaryValue(KafkaKey.BROKER_LIST, REQUIRED_VALUE);
+            conf.getNecessaryValue(KafkaKey.TOPIC, REQUIRED_VALUE);
         }
 
         @Override
@@ -118,7 +121,7 @@ public class KafkaReader
                             for (String col : columns) {
                                 if (!jsonObject.containsKey(col)) {
                                     if (this.missKeyValue == null) {
-                                        throw AddaxException.asAddaxException(KafkaReaderErrorCode.NOT_MATCHED_COLUMNS,
+                                        throw AddaxException.asAddaxException(CONFIG_ERROR,
                                                 "The column " + col + " not exists");
                                     }
                                     record.addColumn(new StringColumn(this.missKeyValue));

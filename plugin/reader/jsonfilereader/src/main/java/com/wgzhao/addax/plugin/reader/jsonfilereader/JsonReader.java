@@ -58,6 +58,12 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.List;
 
+import static com.wgzhao.addax.common.spi.ErrorCode.CONFIG_ERROR;
+import static com.wgzhao.addax.common.spi.ErrorCode.ENCODING_ERROR;
+import static com.wgzhao.addax.common.spi.ErrorCode.IO_ERROR;
+import static com.wgzhao.addax.common.spi.ErrorCode.NOT_SUPPORT_TYPE;
+import static com.wgzhao.addax.common.spi.ErrorCode.REQUIRED_VALUE;
+
 /**
  * Created by jin.zhang on 18-05-30.
  */
@@ -87,10 +93,10 @@ public class JsonReader
         {
             // Compatible with the old version, path is a string before
             String pathInString = this.originConfig.getNecessaryValue(Key.PATH,
-                    JsonReaderErrorCode.REQUIRED_VALUE);
+                    REQUIRED_VALUE);
             if (StringUtils.isBlank(pathInString)) {
                 throw AddaxException.asAddaxException(
-                        JsonReaderErrorCode.REQUIRED_VALUE,
+                        REQUIRED_VALUE,
                         "您需要指定待读取的源目录或文件");
             }
             if (!pathInString.startsWith("[") && !pathInString.endsWith("]")) {
@@ -101,7 +107,7 @@ public class JsonReader
                 path = this.originConfig.getList(Key.PATH, String.class);
                 if (null == path || path.isEmpty()) {
                     throw AddaxException.asAddaxException(
-                            JsonReaderErrorCode.REQUIRED_VALUE,
+                            REQUIRED_VALUE,
                             "您需要指定待读取的源目录或文件");
                 }
             }
@@ -118,12 +124,12 @@ public class JsonReader
                 }
                 catch (UnsupportedCharsetException uce) {
                     throw AddaxException.asAddaxException(
-                            JsonReaderErrorCode.ILLEGAL_VALUE,
+                            NOT_SUPPORT_TYPE,
                             String.format("不支持您配置的编码格式 : [%s]", encoding), uce);
                 }
                 catch (Exception e) {
                     throw AddaxException.asAddaxException(
-                            JsonReaderErrorCode.CONFIG_INVALID_EXCEPTION,
+                            ENCODING_ERROR,
                             String.format("编码配置异常, 请联系我们: %s", e.getMessage()),
                             e);
                 }
@@ -135,16 +141,16 @@ public class JsonReader
 
             if (null != columns && !columns.isEmpty()) {
                 for (Configuration eachColumnConf : columns) {
-                    eachColumnConf.getNecessaryValue(Key.TYPE, JsonReaderErrorCode.REQUIRED_VALUE);
+                    eachColumnConf.getNecessaryValue(Key.TYPE, REQUIRED_VALUE);
                     String columnIndex = eachColumnConf.getString(Key.INDEX);
                     String columnValue = eachColumnConf.getString(Key.VALUE);
 
                     if (null == columnIndex && null == columnValue) {
-                        throw AddaxException.asAddaxException(JsonReaderErrorCode.NO_INDEX_VALUE, "由于您配置了type, 则至少需要配置 index 或 value");
+                        throw AddaxException.asAddaxException(CONFIG_ERROR, "由于您配置了type, 则至少需要配置 index 或 value");
                     }
 
                     if (null != columnIndex && null != columnValue) {
-                        throw AddaxException.asAddaxException(JsonReaderErrorCode.MIXED_INDEX_VALUE, "您混合配置了index, value, 每一列同时仅能选择其中一种");
+                        throw AddaxException.asAddaxException(CONFIG_ERROR, "您混合配置了index, value, 每一列同时仅能选择其中一种");
                     }
                 }
             }
@@ -183,7 +189,7 @@ public class JsonReader
             int splitNumber = this.sourceFiles.size();
             if (0 == splitNumber) {
                 throw AddaxException.asAddaxException(
-                        JsonReaderErrorCode.EMPTY_DIR_EXCEPTION,
+                        CONFIG_ERROR,
                         String.format("NOT find any file in your path: %s", originConfig.getString(Key.PATH)));
             }
 
@@ -305,7 +311,7 @@ public class JsonReader
                 default:
                     String errorMessage = String.format("The type %s is unsupported", type);
                     LOG.error(errorMessage);
-                    throw AddaxException.asAddaxException(JsonReaderErrorCode.NOT_SUPPORT_TYPE, errorMessage);
+                    throw AddaxException.asAddaxException(NOT_SUPPORT_TYPE, errorMessage);
             }
             return columnGenerated;
         }
@@ -353,7 +359,7 @@ public class JsonReader
                     // warn: sock 文件无法read,能影响所有文件的传输,需要用户自己保证
                     String message = String.format("The file %s not found", fileName);
                     LOG.error(message);
-                    throw AddaxException.asAddaxException(JsonReaderErrorCode.OPEN_FILE_ERROR, message);
+                    throw AddaxException.asAddaxException(CONFIG_ERROR, message);
                 }
                 try {
                     if (compressType != null) {
@@ -388,7 +394,7 @@ public class JsonReader
                     // warn: 有可能本地无法读取文件
                     String message = String.format("Failed to open file %s", fileName);
                     LOG.error(message);
-                    throw AddaxException.asAddaxException(JsonReaderErrorCode.READ_FILE_IO_ERROR, message);
+                    throw AddaxException.asAddaxException(IO_ERROR, message);
                 }
                 finally {
                     IOUtils.closeQuietly(reader, null);

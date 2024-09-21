@@ -12,6 +12,8 @@ import org.slf4j.LoggerFactory;
 import java.util.ArrayList;
 import java.util.List;
 
+import static com.wgzhao.addax.common.spi.ErrorCode.REQUIRED_VALUE;
+
 public class TDengineWriter
         extends Writer
 {
@@ -33,21 +35,21 @@ public class TDengineWriter
             // check user
             String user = this.originalConfig.getString(Key.USERNAME);
             if (StringUtils.isBlank(user)) {
-                throw AddaxException.asAddaxException(TDengineWriterErrorCode.REQUIRED_VALUE, "The parameter ["
+                throw AddaxException.asAddaxException(REQUIRED_VALUE, "The parameter ["
                         + Key.USERNAME + "] is not set.");
             }
 
             // check password
             String password = this.originalConfig.getString(Key.PASSWORD);
             if (StringUtils.isBlank(password)) {
-                throw AddaxException.asAddaxException(TDengineWriterErrorCode.REQUIRED_VALUE, "The parameter ["
+                throw AddaxException.asAddaxException(REQUIRED_VALUE, "The parameter ["
                         + Key.PASSWORD + "] is not set.");
             }
 
             // check connection
             List<Object> connection = this.originalConfig.getList(Key.CONNECTION);
             if (connection == null || connection.isEmpty()) {
-                throw AddaxException.asAddaxException(TDengineWriterErrorCode.REQUIRED_VALUE, "The parameter ["
+                throw AddaxException.asAddaxException(REQUIRED_VALUE, "The parameter ["
                         + Key.CONNECTION + "] is not set.");
             }
             if (connection.size() > 1) {
@@ -56,7 +58,7 @@ public class TDengineWriter
             Configuration conn = Configuration.from(connection.get(0).toString());
             String jdbcUrl = conn.getString(Key.JDBC_URL);
             if (StringUtils.isBlank(jdbcUrl)) {
-                throw AddaxException.asAddaxException(TDengineWriterErrorCode.REQUIRED_VALUE, "The parameter ["
+                throw AddaxException.asAddaxException(REQUIRED_VALUE, "The parameter ["
                         + Key.JDBC_URL + "] of connection is not set.");
             }
 

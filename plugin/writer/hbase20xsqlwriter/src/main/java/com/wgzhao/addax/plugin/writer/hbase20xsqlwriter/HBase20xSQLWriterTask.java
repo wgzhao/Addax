@@ -44,6 +44,11 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import static com.wgzhao.addax.common.spi.ErrorCode.EXECUTE_FAIL;
+import static com.wgzhao.addax.common.spi.ErrorCode.ILLEGAL_VALUE;
+import static com.wgzhao.addax.common.spi.ErrorCode.REQUIRED_VALUE;
+import static com.wgzhao.addax.common.spi.ErrorCode.RUNTIME_ERROR;
+
 public class HBase20xSQLWriterTask
 {
     private static final Logger LOG = LoggerFactory.getLogger(HBase20xSQLWriterTask.class);
@@ -83,7 +88,7 @@ public class HBase20xSQLWriterTask
             writeData(lineReceiver);
         }
         catch (Throwable e) {
-            throw AddaxException.asAddaxException(HBase20xSQLWriterErrorCode.PUT_HBASE_ERROR, e);
+            throw AddaxException.asAddaxException(RUNTIME_ERROR, e);
         }
         finally {
             // 关闭jdbc连接
@@ -106,7 +111,7 @@ public class HBase20xSQLWriterTask
         nullModeType = NullModeType.getByTypeName(configuration.getString(HBaseKey.NULL_MODE, HBaseConstant.DEFAULT_NULL_MODE));
         batchSize = configuration.getInt(HBaseKey.BATCH_SIZE, HBaseConstant.DEFAULT_BATCH_ROW_COUNT);
         String schema = configuration.getString(HBaseKey.SCHEMA);
-        String tableName = configuration.getNecessaryValue(HBaseKey.TABLE, HBase20xSQLWriterErrorCode.REQUIRED_VALUE);
+        String tableName = configuration.getNecessaryValue(HBaseKey.TABLE, REQUIRED_VALUE);
         fullTableName = "\"" + tableName + "\"";
         if (schema != null && !schema.isEmpty()) {
             fullTableName = "\"" + schema + "\".\"" + tableName + "\"";
@@ -184,7 +189,7 @@ public class HBase20xSQLWriterTask
             }
         }
         catch (SQLException e) {
-            throw AddaxException.asAddaxException(HBase20xSQLWriterErrorCode.GET_TABLE_COLUMN_TYPE_ERROR,
+            throw AddaxException.asAddaxException(EXECUTE_FAIL,
                     "获取表" + fullTableName + "列类型失败，请检查配置和服务状态或者联系HBase管理员.", e);
         }
         finally {
@@ -208,7 +213,7 @@ public class HBase20xSQLWriterTask
         while ((record = lineReceiver.getFromReader()) != null) {
             // 校验列数量是否符合预期
             if (record.getColumnNumber() != numberOfColumnsToRead) {
-                throw AddaxException.asAddaxException(HBase20xSQLWriterErrorCode.ILLEGAL_VALUE,
+                throw AddaxException.asAddaxException(ILLEGAL_VALUE,
                         "数据源给出的列数量[" + record.getColumnNumber() + "]与您配置中的列数量[" + numberOfColumnsToRead +
                                 "]不同, 请检查您的配置 或者 联系 Hbase 管理员.");
             }
@@ -260,7 +265,7 @@ public class HBase20xSQLWriterTask
             doSingleUpsert(records);
         }
         catch (Exception e) {
-            throw AddaxException.asAddaxException(HBase20xSQLWriterErrorCode.PUT_HBASE_ERROR, e);
+            throw AddaxException.asAddaxException(RUNTIME_ERROR, e);
         }
     }
 
@@ -364,7 +369,7 @@ public class HBase20xSQLWriterTask
                     break;
 
                 default:
-                    throw AddaxException.asAddaxException(HBase20xSQLWriterErrorCode.ILLEGAL_VALUE,
+                    throw AddaxException.asAddaxException(ILLEGAL_VALUE,
                             "不支持您配置的列类型:" + sqlType + ", 请检查您的配置 或者 联系 Hbase 管理员.");
             }
         }
@@ -384,7 +389,7 @@ public class HBase20xSQLWriterTask
 
                 default:
                     // nullMode的合法性在初始化配置的时候已经校验过，这里一定不会出错
-                    throw AddaxException.asAddaxException(HBase20xSQLWriterErrorCode.ILLEGAL_VALUE,
+                    throw AddaxException.asAddaxException(ILLEGAL_VALUE,
                             "Hbasewriter 不支持该 nullMode 类型: " + nullModeType +
                                     ", 目前支持的 nullMode 类型是:" + Arrays.asList(NullModeType.values()));
             }
@@ -449,7 +454,7 @@ public class HBase20xSQLWriterTask
                 return new byte[0];
 
             default:
-                throw AddaxException.asAddaxException(HBase20xSQLWriterErrorCode.ILLEGAL_VALUE,
+                throw AddaxException.asAddaxException(ILLEGAL_VALUE,
                         "不支持您配置的列类型:" + sqlType + ", 请检查您的配置 或者 联系 Hbase 管理员.");
         }
     }

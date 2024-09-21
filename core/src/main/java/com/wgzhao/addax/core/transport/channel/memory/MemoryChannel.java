@@ -24,7 +24,6 @@ import com.wgzhao.addax.common.exception.AddaxException;
 import com.wgzhao.addax.common.util.Configuration;
 import com.wgzhao.addax.core.transport.channel.Channel;
 import com.wgzhao.addax.core.transport.record.TerminateRecord;
-import com.wgzhao.addax.core.util.FrameworkErrorCode;
 import com.wgzhao.addax.core.util.container.CoreConstant;
 
 import java.util.Collection;
@@ -33,6 +32,8 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.locks.Condition;
 import java.util.concurrent.locks.ReentrantLock;
+
+import static com.wgzhao.addax.common.spi.ErrorCode.RUNTIME_ERROR;
 
 /**
  * 内存Channel的具体实现，底层其实是一个ArrayBlockingQueue
@@ -111,7 +112,7 @@ public class MemoryChannel
             notEmpty.signalAll();
         }
         catch (InterruptedException e) {
-            throw AddaxException.asAddaxException(FrameworkErrorCode.RUNTIME_ERROR, e);
+            throw AddaxException.asAddaxException(RUNTIME_ERROR, e);
         }
         finally {
             lock.unlock();
@@ -151,7 +152,7 @@ public class MemoryChannel
             notInsufficient.signalAll();
         }
         catch (InterruptedException e) {
-            throw AddaxException.asAddaxException(FrameworkErrorCode.RUNTIME_ERROR, e);
+            throw AddaxException.asAddaxException(RUNTIME_ERROR, e);
         }
         finally {
             lock.unlock();

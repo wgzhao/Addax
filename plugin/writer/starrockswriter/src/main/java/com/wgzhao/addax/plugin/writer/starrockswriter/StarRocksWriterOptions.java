@@ -2,12 +2,14 @@ package com.wgzhao.addax.plugin.writer.starrockswriter;
 
 import com.wgzhao.addax.common.exception.AddaxException;
 import com.wgzhao.addax.common.util.Configuration;
-import com.wgzhao.addax.rdbms.util.DBUtilErrorCode;
 
 import java.io.Serializable;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
+
+import static com.wgzhao.addax.common.spi.ErrorCode.CONFIG_ERROR;
+import static com.wgzhao.addax.common.spi.ErrorCode.REQUIRED_VALUE;
 
 public class StarRocksWriterOptions
         implements Serializable
@@ -40,6 +42,7 @@ public class StarRocksWriterOptions
     private List<String> infoCchemaColumns;
     private final List<String> userSetColumns;
     private boolean isWildcardColumn;
+
     public StarRocksWriterOptions(Configuration options)
     {
         this.options = options;
@@ -165,7 +168,7 @@ public class StarRocksWriterOptions
         List<String> urlList = getLoadUrlList();
         for (String host : urlList) {
             if (host.split(":").length < 2) {
-                throw AddaxException.asAddaxException(DBUtilErrorCode.CONF_ERROR,
+                throw AddaxException.asAddaxException(CONFIG_ERROR,
                         "loadUrl的格式不正确，请输入 `fe_ip:fe_http_ip;fe_ip:fe_http_ip`。");
             }
         }
@@ -181,7 +184,7 @@ public class StarRocksWriterOptions
                 KEY_LOAD_URL
         };
         for (String optionKey : requiredOptionKeys) {
-            options.getNecessaryValue(optionKey, DBUtilErrorCode.REQUIRED_VALUE);
+            options.getNecessaryValue(optionKey, REQUIRED_VALUE);
         }
     }
 

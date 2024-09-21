@@ -30,7 +30,6 @@ import com.wgzhao.addax.common.spi.Reader;
 import com.wgzhao.addax.common.util.Configuration;
 import com.wgzhao.addax.rdbms.reader.CommonRdbmsReader;
 import com.wgzhao.addax.rdbms.reader.util.HintUtil;
-import com.wgzhao.addax.rdbms.util.DBUtilErrorCode;
 import com.wgzhao.addax.rdbms.util.DataBaseType;
 import oracle.spatial.geometry.JGeometry;
 import org.apache.commons.lang3.StringUtils;
@@ -45,6 +44,8 @@ import java.util.List;
 import static com.wgzhao.addax.common.base.Constant.DEFAULT_FETCH_SIZE;
 import static com.wgzhao.addax.common.base.Key.FETCH_SIZE;
 import static com.wgzhao.addax.common.base.Key.IS_TABLE_MODE;
+import static com.wgzhao.addax.common.spi.ErrorCode.CONFIG_ERROR;
+import static com.wgzhao.addax.common.spi.ErrorCode.ILLEGAL_VALUE;
 
 public class OracleReader
         extends Reader
@@ -100,7 +101,7 @@ public class OracleReader
         {
             int fetchSize = originalConfig.getInt(FETCH_SIZE, DEFAULT_FETCH_SIZE);
             if (fetchSize < 1) {
-                throw AddaxException.asAddaxException(DBUtilErrorCode.REQUIRED_VALUE,
+                throw AddaxException.asAddaxException(ILLEGAL_VALUE,
                         "The value of fetchSize [" + fetchSize + "] in OracleReader can not be less than 1.");
             }
             originalConfig.set(FETCH_SIZE, fetchSize);
@@ -112,7 +113,7 @@ public class OracleReader
             if (StringUtils.isNotBlank(hint)) {
                 boolean isTableMode = originalConfig.getBool(IS_TABLE_MODE);
                 if (!isTableMode) {
-                    throw AddaxException.asAddaxException(OracleReaderErrorCode.HINT_ERROR,
+                    throw AddaxException.asAddaxException(CONFIG_ERROR,
                             "Only querySql mode can configure HINT, please set isTableMode to false.");
                 }
                 HintUtil.initHintConf(DATABASE_TYPE, originalConfig);

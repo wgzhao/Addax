@@ -42,6 +42,8 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.Iterator;
 
+import static com.wgzhao.addax.common.spi.ErrorCode.IO_ERROR;
+
 public class ExcelHelper
 {
     public boolean header;
@@ -81,10 +83,10 @@ public class ExcelHelper
             }
         }
         catch (FileNotFoundException e) {
-            throw AddaxException.asAddaxException(ExcelReaderErrorCode.OPEN_FILE_ERROR, e);
+            throw AddaxException.asAddaxException(IO_ERROR, e);
         }
         catch (IOException e) {
-            throw AddaxException.asAddaxException(ExcelReaderErrorCode.OPEN_FILE_ERROR,
+            throw AddaxException.asAddaxException(IO_ERROR,
                     "IOException occurred when open '" + filePath + "':" + e.getMessage());
         }
     }

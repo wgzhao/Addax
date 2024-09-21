@@ -34,7 +34,6 @@ import com.wgzhao.addax.common.exception.AddaxException;
 import com.wgzhao.addax.common.plugin.RecordReceiver;
 import com.wgzhao.addax.common.plugin.TaskPluginCollector;
 import com.wgzhao.addax.common.util.Configuration;
-import com.wgzhao.addax.storage.reader.StorageReaderErrorCode;
 import com.wgzhao.addax.storage.util.FileHelper;
 import org.apache.commons.compress.compressors.CompressorException;
 import org.apache.commons.compress.compressors.CompressorOutputStream;
@@ -61,27 +60,36 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Set;
 
-import static com.wgzhao.addax.storage.writer.StorageWriterErrorCode.SQL_REQUIRED_TABLE_NAME;
+import static com.wgzhao.addax.common.spi.ErrorCode.CONFIG_ERROR;
+import static com.wgzhao.addax.common.spi.ErrorCode.ENCODING_ERROR;
+import static com.wgzhao.addax.common.spi.ErrorCode.ILLEGAL_VALUE;
+import static com.wgzhao.addax.common.spi.ErrorCode.IO_ERROR;
+import static com.wgzhao.addax.common.spi.ErrorCode.NOT_SUPPORT_TYPE;
+import static com.wgzhao.addax.common.spi.ErrorCode.REQUIRED_VALUE;
+import static com.wgzhao.addax.common.spi.ErrorCode.RUNTIME_ERROR;
 
-public class StorageWriterUtil {
+public class StorageWriterUtil
+{
     private static final Logger LOG = LoggerFactory.getLogger(StorageWriterUtil.class);
     private static final Set<String> supportedWriteModes = new HashSet<>(Arrays.asList("truncate", "append", "nonConflict", "overwrite"));
 
-    private StorageWriterUtil() {
+    private StorageWriterUtil()
+    {
 
     }
 
     /*
      * check parameter: writeMode, encoding, compress, filedDelimiter
      */
-    public static void validateParameter(Configuration writerConfiguration) {
+    public static void validateParameter(Configuration writerConfiguration)
+    {
         // writeMode check
-        String writeMode = writerConfiguration.getNecessaryValue(Key.WRITE_MODE, StorageWriterErrorCode.REQUIRED_VALUE);
+        String writeMode = writerConfiguration.getNecessaryValue(Key.WRITE_MODE, REQUIRED_VALUE);
         writeMode = writeMode.trim();
         if (!supportedWriteModes.contains(writeMode)) {
             throw AddaxException
                     .asAddaxException(
-                            StorageWriterErrorCode.ILLEGAL_VALUE,
+                            NOT_SUPPORT_TYPE,
                             String.format(
                                     "The writeMode [%s] is unsupported, it only supports [%s]",
                                     writeMode, StringUtils.join(supportedWriteModes, ",")));
@@ -94,14 +102,16 @@ public class StorageWriterUtil {
             // like "  ", null
             LOG.warn(String.format("The item encoding is empty, uses [%s] as default.", Constant.DEFAULT_ENCODING));
             writerConfiguration.set(Key.ENCODING, Constant.DEFAULT_ENCODING);
-        } else {
+        }
+        else {
             try {
                 encoding = encoding.trim();
                 writerConfiguration.set(Key.ENCODING, encoding);
                 Charsets.toCharset(encoding);
-            } catch (Exception e) {
+            }
+            catch (Exception e) {
                 throw AddaxException.asAddaxException(
-                        StorageWriterErrorCode.ILLEGAL_VALUE,
+                        NOT_SUPPORT_TYPE,
                         String.format("The encoding [%s] is unsupported.", encoding), e);
             }
         }
@@ -117,7 +127,7 @@ public class StorageWriterUtil {
         // warn: if it has, length must be one
         if (null != delimiterInStr && 1 != delimiterInStr.length()) {
             throw AddaxException.asAddaxException(
-                    StorageWriterErrorCode.ILLEGAL_VALUE,
+                    ILLEGAL_VALUE,
                     String.format("The delimiter only supports single character, [%s] is invalid.", delimiterInStr));
         }
         if (null == delimiterInStr) {
@@ -129,12 +139,13 @@ public class StorageWriterUtil {
         String fileFormat = writerConfiguration.getString(Key.FILE_FORMAT, Constant.DEFAULT_FILE_FORMAT);
         if (!Constant.SUPPORTED_FILE_FORMAT.contains(fileFormat)) {
             throw AddaxException.asAddaxException(
-                    StorageWriterErrorCode.ILLEGAL_VALUE,
+                    ILLEGAL_VALUE,
                     String.format("The fileFormat [%s] you configured is invalid, it only supports %s.", fileFormat, Constant.SUPPORTED_FILE_FORMAT));
         }
     }
 
-    public static List<Configuration> split(Configuration writerSliceConfig, Set<String> originAllFileExists, int mandatoryNumber) {
+    public static List<Configuration> split(Configuration writerSliceConfig, Set<String> originAllFileExists, int mandatoryNumber)
+    {
         List<Configuration> writerSplitConfigs = new ArrayList<>();
         LOG.info("Begin to split...");
         if (mandatoryNumber == 1) {
@@ -163,7 +174,8 @@ public class StorageWriterUtil {
         return writerSplitConfigs;
     }
 
-    public static String buildFilePath(String path, String fileName, String suffix) {
+    public static String buildFilePath(String path, String fileName, String suffix)
+    {
         boolean isEndWithSeparator = false;
         switch (IOUtils.DIR_SEPARATOR) {
             case IOUtils.DIR_SEPARATOR_UNIX:
@@ -180,15 +192,17 @@ public class StorageWriterUtil {
         }
         if (null == suffix) {
             suffix = "";
-        } else {
+        }
+        else {
             suffix = suffix.trim();
         }
         return String.format("%s%s%s", path, fileName, suffix);
     }
 
     public static void writeToStream(RecordReceiver lineReceiver,
-                                     OutputStream outputStream, Configuration config, String fileName,
-                                     TaskPluginCollector taskPluginCollector) {
+            OutputStream outputStream, Configuration config, String fileName,
+            TaskPluginCollector taskPluginCollector)
+    {
         String encoding = config.getString(Key.ENCODING, Constant.DEFAULT_ENCODING);
         // handle blank encoding
         if (StringUtils.isBlank(encoding)) {
@@ -202,49 +216,58 @@ public class StorageWriterUtil {
         try {
             if (null == compress) {
                 writer = new BufferedWriter(new OutputStreamWriter(outputStream, encoding));
-            } else {
+            }
+            else {
                 //normalize compress name
                 if ("gzip".equalsIgnoreCase(compress)) {
                     compress = "gz";
-                } else if ("bz2".equalsIgnoreCase(compress)) {
+                }
+                else if ("bz2".equalsIgnoreCase(compress)) {
                     compress = "bzip2";
                 }
 
                 if ("zip".equals(compress)) {
                     ZipCycleOutputStream zis = new ZipCycleOutputStream(outputStream, fileName);
                     writer = new BufferedWriter(new OutputStreamWriter(zis, encoding));
-                } else {
+                }
+                else {
                     CompressorOutputStream compressorOutputStream = new CompressorStreamFactory().createCompressorOutputStream(compress,
                             outputStream);
                     writer = new BufferedWriter(new OutputStreamWriter(compressorOutputStream, encoding));
                 }
             }
             StorageWriterUtil.doWriteToStream(lineReceiver, writer, fileName, config, taskPluginCollector);
-        } catch (UnsupportedEncodingException uee) {
+        }
+        catch (UnsupportedEncodingException uee) {
             throw AddaxException
                     .asAddaxException(
-                            StorageWriterErrorCode.WRITE_FILE_WITH_CHARSET_ERROR,
+                            ENCODING_ERROR,
                             String.format("The encoding [%s] is unsupported.", encoding), uee);
-        } catch (NullPointerException e) {
-            throw AddaxException.asAddaxException(StorageWriterErrorCode.RUNTIME_EXCEPTION, "NPE occurred", e);
-        } catch (CompressorException e) {
+        }
+        catch (NullPointerException e) {
+            throw AddaxException.asAddaxException(RUNTIME_ERROR, "NPE occurred", e);
+        }
+        catch (CompressorException e) {
             throw AddaxException.asAddaxException(
-                    StorageReaderErrorCode.ILLEGAL_VALUE,
+                    NOT_SUPPORT_TYPE,
                     "The compress algorithm [" + compress + "] is unsupported yet."
             );
-        } catch (IOException e) {
+        }
+        catch (IOException e) {
             throw AddaxException.asAddaxException(
-                    StorageWriterErrorCode.WRITE_FILE_IO_ERROR,
+                    IO_ERROR,
                     String.format("IO exception occurred when writing [%s].", fileName), e);
-        } finally {
+        }
+        finally {
             IOUtils.closeQuietly(writer, null);
         }
     }
 
     private static void doWriteToStream(RecordReceiver lineReceiver,
-                                        BufferedWriter writer, String context, Configuration config,
-                                        TaskPluginCollector taskPluginCollector)
-            throws IOException {
+            BufferedWriter writer, String context, Configuration config,
+            TaskPluginCollector taskPluginCollector)
+            throws IOException
+    {
         CSVFormat.Builder csvBuilder = CSVFormat.DEFAULT.builder();
         csvBuilder.setRecordSeparator(IOUtils.LINE_SEPARATOR_UNIX);
         String nullFormat = config.getString(Key.NULL_FORMAT);
@@ -266,7 +289,7 @@ public class StorageWriterUtil {
         String delimiterInStr = config.getString(Key.FIELD_DELIMITER);
         if (null != delimiterInStr && 1 != delimiterInStr.length()) {
             throw AddaxException.asAddaxException(
-                    StorageWriterErrorCode.ILLEGAL_VALUE,
+                    ILLEGAL_VALUE,
                     String.format("The item delimiter is only support single character, [%s] is invalid.", delimiterInStr));
         }
         if (null == delimiterInStr) {
@@ -297,7 +320,8 @@ public class StorageWriterUtil {
         // IOUtils.closeQuietly(unstructuredWriter);
     }
 
-    public static List<String> recordToList(Record record, String nullFormat, DateFormat dateParse, TaskPluginCollector taskPluginCollector) {
+    public static List<String> recordToList(Record record, String nullFormat, DateFormat dateParse, TaskPluginCollector taskPluginCollector)
+    {
         try {
             List<String> splitRows = new ArrayList<>();
             int recordLength = record.getColumnNumber();
@@ -308,15 +332,18 @@ public class StorageWriterUtil {
                     if (null == column || null == column.getRawData() || column.asString().equals(nullFormat)) {
                         // warn: it's all ok if nullFormat is null
                         splitRows.add(nullFormat);
-                    } else {
+                    }
+                    else {
                         // warn: it's all ok if nullFormat is null
                         boolean isDateColumn = column instanceof DateColumn || column instanceof TimestampColumn;
                         if (!isDateColumn) {
                             splitRows.add(column.asString());
-                        } else {
+                        }
+                        else {
                             if (null != dateParse) {
                                 splitRows.add(dateParse.format(column.asDate()));
-                            } else {
+                            }
+                            else {
                                 splitRows.add(column.asString());
                             }
                         }
@@ -324,16 +351,19 @@ public class StorageWriterUtil {
                 }
             }
             return splitRows;
-        } catch (Exception e) {
+        }
+        catch (Exception e) {
             // warn: dirty data
             taskPluginCollector.collectDirtyRecord(record, e);
             return null;
         }
     }
 
-    public static void writeToSql(RecordReceiver lineReceiver, BufferedWriter writer, Configuration config) throws IOException {
+    public static void writeToSql(RecordReceiver lineReceiver, BufferedWriter writer, Configuration config)
+            throws IOException
+    {
         // sql format required table and column name and optional extendedInsert and optional batchSize
-        String tableName = config.getNecessaryValue(Key.TABLE, SQL_REQUIRED_TABLE_NAME);
+        String tableName = config.getNecessaryValue(Key.TABLE, REQUIRED_VALUE);
         String existColumns = config.getString(Key.COLUMN, null);
         List<String> columns = null;
         if (existColumns != null) {
@@ -350,18 +380,19 @@ public class StorageWriterUtil {
         StringBuilder sb = new StringBuilder();
         sb.append(sqlHeader).append(" VALUES (");
         while ((record = lineReceiver.getFromReader()) != null) {
-            if (columns!= null && record.getColumnNumber() != columns.size()) {
+            if (columns != null && record.getColumnNumber() != columns.size()) {
                 throw AddaxException.asAddaxException(
-                        StorageWriterErrorCode.ILLEGAL_VALUE,
+                        CONFIG_ERROR,
                         String.format("The column number [%d] of record is not equal to the column number [%d] of table.",
                                 record.getColumnNumber(), columns.size()));
             }
             Column column;
-            for (int i =0; i < record.getColumnNumber(); i++ ) {
+            for (int i = 0; i < record.getColumnNumber(); i++) {
                 column = record.getColumn(i);
                 if (column instanceof LongColumn || column instanceof BoolColumn) {
                     sb.append(column.asString());
-                } else {
+                }
+                else {
                     sb.append("'").append(column.asString()).append("'");
                 }
                 if (i < record.getColumnNumber() - 1) {
@@ -379,11 +410,13 @@ public class StorageWriterUtil {
                     sb.append(sqlHeader).append(" VALUES (");
                     // reset counter
                     curNum = 0;
-                } else {
+                }
+                else {
                     sb.append("), (");
                     curNum++;
                 }
-            } else {
+            }
+            else {
                 sb.append(");\n");
                 //write to file
                 writer.write(sb.toString());

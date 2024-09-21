@@ -49,6 +49,9 @@ import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 
+import static com.wgzhao.addax.common.spi.ErrorCode.CONFIG_ERROR;
+import static com.wgzhao.addax.common.spi.ErrorCode.NOT_SUPPORT_TYPE;
+
 /**
  * Created by mazhenlin on 2019/8/21.
  */
@@ -147,7 +150,7 @@ public class CassandraWriterHelper
                 return parseFromJson(jsonObject, sqlType);
 
             default:
-                throw AddaxException.asAddaxException(CassandraWriterErrorCode.CONF_ERROR,
+                throw AddaxException.asAddaxException(CONFIG_ERROR,
                         "不支持您配置的列类型:" + sqlType + ", 请检查您的配置 或者 联系 管理员.");
         } // end switch
     }
@@ -355,7 +358,7 @@ public class CassandraWriterHelper
                     break;
 
                 default:
-                    throw AddaxException.asAddaxException(CassandraWriterErrorCode.CONF_ERROR,
+                    throw AddaxException.asAddaxException(NOT_SUPPORT_TYPE,
                             "不支持您配置的列类型:" + sqlType + ", 请检查您的配置 或者 联系 管理员.");
             } // end switch
         }

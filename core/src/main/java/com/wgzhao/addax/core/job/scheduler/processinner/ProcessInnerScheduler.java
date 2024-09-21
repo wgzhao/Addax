@@ -25,11 +25,12 @@ import com.wgzhao.addax.core.job.scheduler.AbstractScheduler;
 import com.wgzhao.addax.core.statistics.container.communicator.AbstractContainerCommunicator;
 import com.wgzhao.addax.core.taskgroup.TaskGroupContainer;
 import com.wgzhao.addax.core.taskgroup.runner.TaskGroupContainerRunner;
-import com.wgzhao.addax.core.util.FrameworkErrorCode;
 
 import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+
+import static com.wgzhao.addax.common.spi.ErrorCode.RUNTIME_ERROR;
 
 public abstract class ProcessInnerScheduler
         extends AbstractScheduler
@@ -61,7 +62,7 @@ public abstract class ProcessInnerScheduler
     {
         this.taskGroupContainerExecutorService.shutdownNow();
         throw AddaxException.asAddaxException(
-                FrameworkErrorCode.PLUGIN_RUNTIME_ERROR, throwable);
+                RUNTIME_ERROR, throwable);
     }
 
     @Override
@@ -69,7 +70,7 @@ public abstract class ProcessInnerScheduler
     {
         //通过进程退出返回码标示状态
         this.taskGroupContainerExecutorService.shutdownNow();
-        throw AddaxException.asAddaxException(FrameworkErrorCode.KILLED_EXIT_VALUE, "The job was terminated");
+        throw AddaxException.asAddaxException(RUNTIME_ERROR, "The job was terminated");
     }
 
     private TaskGroupContainerRunner newTaskGroupContainerRunner(

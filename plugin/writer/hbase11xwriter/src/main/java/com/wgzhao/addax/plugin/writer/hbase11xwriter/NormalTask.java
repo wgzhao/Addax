@@ -37,6 +37,9 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
+import static com.wgzhao.addax.common.spi.ErrorCode.CONFIG_ERROR;
+import static com.wgzhao.addax.common.spi.ErrorCode.ILLEGAL_VALUE;
+
 public class NormalTask
         extends HbaseAbstractTask
 {
@@ -72,7 +75,7 @@ public class NormalTask
             String[] cfAndQualifier = name.split(":");
             Validate.isTrue(cfAndQualifier.length == 2 && StringUtils.isNotBlank(cfAndQualifier[0]) && StringUtils.isNotBlank(cfAndQualifier[1]), promptInfo);
             if (index >= record.getColumnNumber()) {
-                throw AddaxException.asAddaxException(Hbase11xWriterErrorCode.ILLEGAL_VALUE,
+                throw AddaxException.asAddaxException(ILLEGAL_VALUE,
                         String.format("The field[index] of column is out-range, it should be less than %s. actually got %s.", record.getColumnNumber(), index));
             }
             byte[] columnBytes = getColumnByte(columnType, record.getColumn(index));
@@ -97,7 +100,7 @@ public class NormalTask
             }
             else {
                 if (index >= record.getColumnNumber()) {
-                    throw AddaxException.asAddaxException(Hbase11xWriterErrorCode.CONSTRUCT_ROWKEY_ERROR,
+                    throw AddaxException.asAddaxException(ILLEGAL_VALUE,
                             String.format("The field[index] of rowkeyColumn is out-range, it should be less than %s. actually got %s.", record.getColumnNumber(), index));
                 }
                 byte[] value = getColumnByte(columnType, record.getColumn(index));
@@ -115,17 +118,17 @@ public class NormalTask
             //指定时间作为版本
             timestamp = versionColumn.getLong(HBaseKey.VALUE);
             if (timestamp < 0) {
-                throw AddaxException.asAddaxException(Hbase11xWriterErrorCode.CONSTRUCT_VERSION_ERROR, "Illegal timestamp version");
+                throw AddaxException.asAddaxException(ILLEGAL_VALUE, "Illegal timestamp version");
             }
         }
         else {
             //指定列作为版本,long/doubleColumn直接record.asLong, 其它类型尝试用yyyy-MM-dd HH:mm:ss,yyyy-MM-dd HH:mm:ss SSS去format
             if (index >= record.getColumnNumber()) {
-                throw AddaxException.asAddaxException(Hbase11xWriterErrorCode.CONSTRUCT_VERSION_ERROR,
+                throw AddaxException.asAddaxException(CONFIG_ERROR,
                         String.format("The field[index] of versionColumn is out-range, it should be less than %s. actually got %s.", record.getColumnNumber(), index));
             }
             if (record.getColumn(index).getRawData() == null) {
-                throw AddaxException.asAddaxException(Hbase11xWriterErrorCode.CONSTRUCT_VERSION_ERROR, "The version is empty");
+                throw AddaxException.asAddaxException(CONFIG_ERROR, "The version is empty");
             }
             SimpleDateFormat dfSeconds = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
             SimpleDateFormat dfMs = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss SSS");
@@ -143,7 +146,7 @@ public class NormalTask
                     }
                     catch (ParseException e1) {
                         LOG.info(String.format("The value of version %s can not parsed as Date type with 'yyyy-MM-dd HH:mm:ss' and 'yyyy-MM-dd HH:mm:ss SSS' format", index));
-                        throw AddaxException.asAddaxException(Hbase11xWriterErrorCode.CONSTRUCT_VERSION_ERROR, e1);
+                        throw AddaxException.asAddaxException(ILLEGAL_VALUE, e1);
                     }
                 }
                 timestamp = date.getTime();
