@@ -39,6 +39,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import static com.wgzhao.addax.common.base.Key.CONNECTION;
+import static com.wgzhao.addax.common.exception.CommonErrorCode.CONFIG_ERROR;
+import static com.wgzhao.addax.common.exception.CommonErrorCode.PLUGIN_INIT_ERROR;
+import static com.wgzhao.addax.common.exception.CommonErrorCode.REQUIRED_VALUE;
 import static com.wgzhao.addax.core.util.container.CoreConstant.CONF_PATH;
 import static com.wgzhao.addax.core.util.container.CoreConstant.CORE_SERVER_TIMEOUT_SEC;
 import static com.wgzhao.addax.core.util.container.CoreConstant.JOB_CONTENT;
@@ -163,19 +166,19 @@ public final class ConfigParser {
 
                 jobContent = httpClientUtil.executeAndGetWithFailedRetry(httpGet, 1, 1000L);
             } catch (Exception e) {
-                throw AddaxException.asAddaxException(FrameworkErrorCode.CONFIG_ERROR, "Failed to obtain job configuration:" + jobResource, e);
+                throw AddaxException.asAddaxException(CONFIG_ERROR, "Failed to obtain job configuration:" + jobResource, e);
             }
         } else {
             // jobResource 是本地文件绝对路径
             try {
                 jobContent = FileUtils.readFileToString(new File(jobResource), StandardCharsets.UTF_8);
             } catch (IOException e) {
-                throw AddaxException.asAddaxException(FrameworkErrorCode.CONFIG_ERROR, "Failed to obtain job configuration:" + jobResource, e);
+                throw AddaxException.asAddaxException(CONFIG_ERROR, "Failed to obtain job configuration:" + jobResource, e);
             }
         }
 
         if (jobContent == null) {
-            throw AddaxException.asAddaxException(FrameworkErrorCode.CONFIG_ERROR, "Failed to obtain job configuration:" + jobResource);
+            throw AddaxException.asAddaxException(CONFIG_ERROR, "Failed to obtain job configuration:" + jobResource);
         }
         return jobContent;
     }
@@ -207,7 +210,7 @@ public final class ConfigParser {
         }
 
         if (!wantPluginNames.isEmpty() && wantPluginNames.size() != complete) {
-            throw AddaxException.asAddaxException(FrameworkErrorCode.PLUGIN_INIT_ERROR, "Plugin loading failed. The specified plugin was not loaded: " + wantPluginNames);
+            throw AddaxException.asAddaxException(PLUGIN_INIT_ERROR, "Plugin loading failed. The specified plugin was not loaded: " + wantPluginNames);
         }
 
         return configuration;
@@ -219,13 +222,13 @@ public final class ConfigParser {
                 JOB_CONTENT_READER_PARAMETER, JOB_CONTENT_WRITER_NAME, JOB_CONTENT_WRITER_PARAMETER};
 
         if (content == null || content.isEmpty()) {
-            throw AddaxException.asAddaxException(FrameworkErrorCode.JOB_ERROR,
+            throw AddaxException.asAddaxException(REQUIRED_VALUE,
                     "The configuration item '" + JOB_CONTENT + "' is required");
         }
 
         for (String path : validPaths) {
             if (conf.get(path) == null) {
-                throw AddaxException.asAddaxException(FrameworkErrorCode.JOB_ERROR,
+                throw AddaxException.asAddaxException(REQUIRED_VALUE,
                         "The configuration item '" + path + "' is required");
             }
         }

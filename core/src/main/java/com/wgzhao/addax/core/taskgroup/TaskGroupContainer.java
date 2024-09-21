@@ -42,7 +42,6 @@ import com.wgzhao.addax.core.transport.exchanger.BufferedRecordExchanger;
 import com.wgzhao.addax.core.transport.exchanger.BufferedRecordTransformerExchanger;
 import com.wgzhao.addax.core.transport.transformer.TransformerExecution;
 import com.wgzhao.addax.core.util.ClassUtil;
-import com.wgzhao.addax.core.util.FrameworkErrorCode;
 import com.wgzhao.addax.core.util.TransformerUtil;
 import com.wgzhao.addax.core.util.container.CoreConstant;
 import com.wgzhao.addax.core.util.container.LoadUtil;
@@ -55,6 +54,9 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+
+import static com.wgzhao.addax.common.exception.CommonErrorCode.CONFIG_ERROR;
+import static com.wgzhao.addax.common.exception.CommonErrorCode.RUNTIME_ERROR;
 
 public class TaskGroupContainer
         extends AbstractContainer
@@ -185,7 +187,7 @@ public class TaskGroupContainer
                 if (failedOrKilled) {
                     lastTaskGroupContainerCommunication = reportTaskGroupCommunication(lastTaskGroupContainerCommunication, taskCountInThisTaskGroup);
 
-                    throw AddaxException.asAddaxException(FrameworkErrorCode.PLUGIN_RUNTIME_ERROR, lastTaskGroupContainerCommunication.getThrowable());
+                    throw AddaxException.asAddaxException(RUNTIME_ERROR, lastTaskGroupContainerCommunication.getThrowable());
                 }
 
                 //3.有任务未执行，且正在运行的任务数小于最大通道限制
@@ -272,7 +274,7 @@ public class TaskGroupContainer
             this.containerCommunicator.report(nowTaskGroupContainerCommunication);
 
             throw AddaxException.asAddaxException(
-                    FrameworkErrorCode.RUNTIME_ERROR, e);
+                    RUNTIME_ERROR, e);
         }
     }
 
@@ -415,7 +417,7 @@ public class TaskGroupContainer
 
             // reader没有起来，writer不可能结束
             if (!this.writerThread.isAlive() || this.taskCommunication.getState() == State.FAILED) {
-                throw AddaxException.asAddaxException(FrameworkErrorCode.RUNTIME_ERROR, this.taskCommunication.getThrowable());
+                throw AddaxException.asAddaxException(RUNTIME_ERROR, this.taskCommunication.getThrowable());
             }
 
             this.readerThread.start();
@@ -423,7 +425,7 @@ public class TaskGroupContainer
             // 这里reader可能很快结束
             if (!this.readerThread.isAlive() && this.taskCommunication.getState() == State.FAILED) {
                 // 这里有可能出现Reader线上启动即挂情况 对于这类情况 需要立刻抛出异常
-                throw AddaxException.asAddaxException(FrameworkErrorCode.RUNTIME_ERROR, this.taskCommunication.getThrowable());
+                throw AddaxException.asAddaxException(RUNTIME_ERROR, this.taskCommunication.getThrowable());
             }
         }
 
@@ -471,7 +473,7 @@ public class TaskGroupContainer
                     newRunner.setTaskPluginCollector(pluginCollector);
                     break;
                 default:
-                    throw AddaxException.asAddaxException(FrameworkErrorCode.ARGUMENT_ERROR, "Cant generateRunner for:" + pluginType);
+                    throw AddaxException.asAddaxException(CONFIG_ERROR, "Cant generateRunner for:" + pluginType);
             }
 
             newRunner.setTaskGroupId(taskGroupId);

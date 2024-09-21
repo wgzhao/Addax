@@ -30,13 +30,14 @@ import com.wgzhao.addax.core.statistics.communication.Communication;
 import com.wgzhao.addax.core.transport.channel.Channel;
 import com.wgzhao.addax.core.transport.record.TerminateRecord;
 import com.wgzhao.addax.core.transport.transformer.TransformerExecution;
-import com.wgzhao.addax.core.util.FrameworkErrorCode;
 import com.wgzhao.addax.core.util.container.CoreConstant;
 import org.apache.commons.lang3.Validate;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
+
+import static com.wgzhao.addax.common.exception.CommonErrorCode.CONFIG_ERROR;
 
 public class BufferedRecordTransformerExchanger
         extends TransformerExchanger
@@ -79,8 +80,7 @@ public class BufferedRecordTransformerExchanger
                             "com.wgzhao.addax.core.transport.record.DefaultRecord")));
         }
         catch (Exception e) {
-            throw AddaxException.asAddaxException(
-                    FrameworkErrorCode.CONFIG_ERROR, e);
+            throw AddaxException.asAddaxException(CONFIG_ERROR, e);
         }
     }
 
@@ -91,8 +91,7 @@ public class BufferedRecordTransformerExchanger
             return BufferedRecordTransformerExchanger.RECORD_CLASS.getConstructor().newInstance();
         }
         catch (Exception e) {
-            throw AddaxException.asAddaxException(
-                    FrameworkErrorCode.CONFIG_ERROR, e);
+            throw AddaxException.asAddaxException(CONFIG_ERROR, e);
         }
     }
 

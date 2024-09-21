@@ -29,6 +29,9 @@ import org.codehaus.groovy.control.CompilationFailedException;
 import java.util.Arrays;
 import java.util.List;
 
+import static com.wgzhao.addax.common.exception.CommonErrorCode.ILLEGAL_VALUE;
+import static com.wgzhao.addax.common.exception.CommonErrorCode.RUNTIME_ERROR;
+
 /**
  * no comments.
  * Created by liqiang on 16/3/4.
@@ -51,7 +54,7 @@ public class GroovyTransformer
             //全局唯一
             if (paras.length < 1 || paras.length > 2) {
                 throw AddaxException.asAddaxException(
-                        TransformerErrorCode.TRANSFORMER_ILLEGAL_PARAMETER,
+                        ILLEGAL_VALUE,
                         "The dx_groovy parameters must be 1 or 2. The current parameter is: " + Arrays.asList(paras));
             }
             synchronized (this) {
@@ -79,21 +82,21 @@ public class GroovyTransformer
         }
         catch (CompilationFailedException cfe) {
             throw AddaxException.asAddaxException(
-                    TransformerErrorCode.TRANSFORMER_GROOVY_INIT_EXCEPTION, cfe);
+                    RUNTIME_ERROR, cfe);
         }
 
         try {
             Object t = groovyClass.getConstructor().newInstance();
             if (!(t instanceof Transformer)) {
                 throw AddaxException.asAddaxException(
-                        TransformerErrorCode.TRANSFORMER_GROOVY_INIT_EXCEPTION,
+                        RUNTIME_ERROR,
                         "Addax bug! ");
             }
             this.groovyTransformer = (Transformer) t;
         }
         catch (Throwable ex) {
             throw AddaxException.asAddaxException(
-                    TransformerErrorCode.TRANSFORMER_GROOVY_INIT_EXCEPTION, ex);
+                    RUNTIME_ERROR, ex);
         }
     }
 

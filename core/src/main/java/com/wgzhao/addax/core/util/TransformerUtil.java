@@ -21,7 +21,6 @@ package com.wgzhao.addax.core.util;
 
 import com.wgzhao.addax.common.exception.AddaxException;
 import com.wgzhao.addax.common.util.Configuration;
-import com.wgzhao.addax.core.transport.transformer.TransformerErrorCode;
 import com.wgzhao.addax.core.transport.transformer.TransformerExecution;
 import com.wgzhao.addax.core.transport.transformer.TransformerExecutionParas;
 import com.wgzhao.addax.core.transport.transformer.TransformerInfo;
@@ -37,6 +36,10 @@ import java.io.IOException;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.List;
+
+import static com.wgzhao.addax.common.exception.CommonErrorCode.CONFIG_ERROR;
+import static com.wgzhao.addax.common.exception.CommonErrorCode.IO_ERROR;
+import static com.wgzhao.addax.common.exception.CommonErrorCode.REQUIRED_VALUE;
 
 /**
  * no comments.
@@ -61,12 +64,12 @@ public class TransformerUtil
         for (Configuration configuration : tfConfigs) {
             String functionName = configuration.getString("name");
             if (StringUtils.isEmpty(functionName)) {
-                throw AddaxException.asAddaxException(TransformerErrorCode.TRANSFORMER_CONFIGURATION_ERROR,
+                throw AddaxException.asAddaxException(CONFIG_ERROR,
                         "config=" + configuration.toJSON());
             }
 
             if ("dx_groovy".equals(functionName) && functionNames.contains("dx_groovy")) {
-                throw AddaxException.asAddaxException(TransformerErrorCode.TRANSFORMER_CONFIGURATION_ERROR,
+                throw AddaxException.asAddaxException(CONFIG_ERROR,
                         "dx_groovy can be invoke once only.");
             }
             functionNames.add(functionName);
@@ -84,7 +87,7 @@ public class TransformerUtil
             String functionName = configuration.getString("name");
             TransformerInfo transformerInfo = TransformerRegistry.getTransformer(functionName);
             if (transformerInfo == null) {
-                throw AddaxException.asAddaxException(TransformerErrorCode.TRANSFORMER_NOTFOUND_ERROR,
+                throw AddaxException.asAddaxException(REQUIRED_VALUE,
                         "name=" + functionName);
             }
 
@@ -99,7 +102,7 @@ public class TransformerUtil
                 Integer columnIndex = configuration.getInt(CoreConstant.TRANSFORMER_PARAMETER_COLUMN_INDEX);
 
                 if (columnIndex == null) {
-                    throw AddaxException.asAddaxException(TransformerErrorCode.TRANSFORMER_ILLEGAL_PARAMETER,
+                    throw AddaxException.asAddaxException(REQUIRED_VALUE,
                             "columnIndex must be set by UDF: name=" + functionName);
                 }
 
@@ -113,7 +116,7 @@ public class TransformerUtil
                 String code = configuration.getString(CoreConstant.TRANSFORMER_PARAMETER_CODE);
                 String codeFile = configuration.getString(CoreConstant.TRANSFORMER_PARAMETER_CODE_FILE);
                 if (StringUtils.isAllEmpty(code, codeFile)) {
-                    throw AddaxException.asAddaxException(TransformerErrorCode.TRANSFORMER_ILLEGAL_PARAMETER,
+                    throw AddaxException.asAddaxException(REQUIRED_VALUE,
                             "groovy code or codeFile must be set by UDF: name=" + functionName);
                 }
                 // code and codeFile both setup, prefers to code , ignore codeFile
@@ -125,13 +128,13 @@ public class TransformerUtil
                     // the codeFile default relative path is the same of addax.home properties
                     File file = new File(codeFile);
                     if (! file.exists() || ! file.isFile()) {
-                        throw AddaxException.asAddaxException(TransformerErrorCode.TRANSFORMER_CONFIGURATION_ERROR,
+                        throw AddaxException.asAddaxException(CONFIG_ERROR,
                                 "the codeFile [" + codeFile + "]does not exists or is unreadable!");
                     }
                     try {
                         code = FileUtils.readFileToString(file, Charset.defaultCharset());
                     } catch (IOException e) {
-                        throw AddaxException.asAddaxException(TransformerErrorCode.TRANSFORMER_RUN_EXCEPTION,
+                        throw AddaxException.asAddaxException(IO_ERROR,
                                 "read codeFile [" + codeFile + "] failure:", e);
                     }
                 }

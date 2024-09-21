@@ -36,6 +36,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import static com.wgzhao.addax.common.exception.CommonErrorCode.CONFIG_ERROR;
+
 /**
  * no comments.
  * Created by liqiang on 16/3/3.
@@ -144,7 +146,7 @@ public class TransformerRegistry
 
         if (registeredTransformer.containsKey(transformer.getTransformerName())) {
             throw AddaxException.asAddaxException(
-                    TransformerErrorCode.TRANSFORMER_DUPLICATE_ERROR,
+                    CONFIG_ERROR,
                     " name=" + transformer.getTransformerName());
         }
 
@@ -161,7 +163,7 @@ public class TransformerRegistry
 
         if (registeredTransformer.containsKey(complexTransformer.getTransformerName())) {
             throw AddaxException.asAddaxException(
-                    TransformerErrorCode.TRANSFORMER_DUPLICATE_ERROR,
+                    CONFIG_ERROR,
                     " name=" + complexTransformer.getTransformerName());
         }
 
@@ -185,7 +187,7 @@ public class TransformerRegistry
 
         if (!checkResult) {
             throw AddaxException.asAddaxException(
-                    TransformerErrorCode.TRANSFORMER_NAME_ERROR,
+                    CONFIG_ERROR,
                     " name=" + functionName + ": isNative=" + isNative);
         }
     }

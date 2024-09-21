@@ -41,7 +41,6 @@ import com.wgzhao.addax.core.statistics.container.communicator.AbstractContainer
 import com.wgzhao.addax.core.statistics.container.communicator.job.StandAloneJobContainerCommunicator;
 import com.wgzhao.addax.core.statistics.plugin.DefaultJobPluginCollector;
 import com.wgzhao.addax.core.util.ErrorRecordChecker;
-import com.wgzhao.addax.core.util.FrameworkErrorCode;
 import com.wgzhao.addax.core.util.container.ClassLoaderSwapper;
 import com.wgzhao.addax.core.util.container.CoreConstant;
 import com.wgzhao.addax.core.util.container.LoadUtil;
@@ -62,6 +61,10 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
+import static com.wgzhao.addax.common.exception.CommonErrorCode.CONFIG_ERROR;
+import static com.wgzhao.addax.common.exception.CommonErrorCode.EXECUTE_FAIL;
+import static com.wgzhao.addax.common.exception.CommonErrorCode.RUNTIME_ERROR;
 
 /*
  * Created by jingxing on 14-8-24.
@@ -163,7 +166,7 @@ public class JobContainer
             super.getContainerCommunicator().report(reportCommunication);
 
             throw AddaxException.asAddaxException(
-                    FrameworkErrorCode.RUNTIME_ERROR, e);
+                   RUNTIME_ERROR, e);
         } finally {
             if (!isDryRun) {
 
@@ -282,7 +285,7 @@ public class JobContainer
             handlerPluginType = PluginType.valueOf(handlerPluginTypeStr.toUpperCase());
         } catch (IllegalArgumentException e) {
             throw AddaxException.asAddaxException(
-                    FrameworkErrorCode.CONFIG_ERROR,
+                   CONFIG_ERROR,
                     String.format("The plugin type (%s) set for the pre-handler of job failed, reason: %s", handlerPluginTypeStr.toUpperCase(), e.getMessage()));
         }
 
@@ -313,7 +316,7 @@ public class JobContainer
             handlerPluginType = PluginType.valueOf(handlerPluginTypeStr.toUpperCase());
         } catch (IllegalArgumentException e) {
             throw AddaxException.asAddaxException(
-                    FrameworkErrorCode.CONFIG_ERROR,
+                   CONFIG_ERROR,
                     String.format("The plugin type (%s) set for the post-handler of job failed, reason: %s", handlerPluginTypeStr.toUpperCase(), e.getMessage()));
         }
 
@@ -373,7 +376,7 @@ public class JobContainer
             Long channelLimitedByteSpeed = this.configuration.getLong(CoreConstant.CORE_TRANSPORT_CHANNEL_SPEED_BYTE, -1);
             if (channelLimitedByteSpeed == null || channelLimitedByteSpeed <= 0) {
                 throw AddaxException.asAddaxException(
-                        FrameworkErrorCode.CONFIG_ERROR,
+                       CONFIG_ERROR,
                         "Under the condition of total bps limit, the bps value of a single channel cannot be empty or non-positive");
             }
 
@@ -387,7 +390,7 @@ public class JobContainer
             long globalLimitedRecordSpeed = this.configuration.getInt(CoreConstant.JOB_SETTING_SPEED_RECORD, 100000);
             Long channelLimitedRecordSpeed = this.configuration.getLong(CoreConstant.CORE_TRANSPORT_CHANNEL_SPEED_RECORD, -1);
             if (channelLimitedRecordSpeed == null || channelLimitedRecordSpeed <= 0) {
-                throw AddaxException.asAddaxException(FrameworkErrorCode.CONFIG_ERROR,
+                throw AddaxException.asAddaxException(CONFIG_ERROR,
                         "Under the condition of total tps limit, the tps value of a single channel cannot be empty or non-positive");
             }
 
@@ -443,7 +446,7 @@ public class JobContainer
             LOG.error("The scheduler failed to run.");
             this.endTransferTimeStamp = System.currentTimeMillis();
             throw AddaxException.asAddaxException(
-                    FrameworkErrorCode.RUNTIME_ERROR, e);
+                   RUNTIME_ERROR, e);
         }
 
         /*
@@ -631,7 +634,7 @@ public class JobContainer
         classLoaderSwapper.setCurrentThreadClassLoader(LoadUtil.getJarLoader(PluginType.READER, this.readerPluginName));
         List<Configuration> readerSlicesConfigs = this.jobReader.split(adviceNumber);
         if (readerSlicesConfigs == null || readerSlicesConfigs.isEmpty()) {
-            throw AddaxException.asAddaxException(FrameworkErrorCode.PLUGIN_SPLIT_ERROR,
+            throw AddaxException.asAddaxException(EXECUTE_FAIL,
                     "The number of tasks divided by the reader's job cannot be less than or equal to zero");
         }
         LOG.info("The Reader.Job [{}] is divided into [{}] task(s).", this.readerPluginName, readerSlicesConfigs.size());
@@ -644,7 +647,7 @@ public class JobContainer
 
         List<Configuration> writerSlicesConfigs = this.jobWriter.split(readerTaskNumber);
         if (writerSlicesConfigs == null || writerSlicesConfigs.isEmpty()) {
-            throw AddaxException.asAddaxException(FrameworkErrorCode.PLUGIN_SPLIT_ERROR,
+            throw AddaxException.asAddaxException(EXECUTE_FAIL,
                     "The number of tasks divided by the writer's job cannot be less than or equal to zero");
         }
         LOG.info("The Writer.Job [{}] is divided into [{}] task(s).", this.writerPluginName, writerSlicesConfigs.size());
@@ -662,7 +665,7 @@ public class JobContainer
             List<Configuration> transformerConfigs) {
         if (readerTasksConfigs.size() != writerTasksConfigs.size()) {
             throw AddaxException.asAddaxException(
-                    FrameworkErrorCode.PLUGIN_SPLIT_ERROR,
+                    CONFIG_ERROR,
                     String.format("The number of tasks [%d] divided by the reader's job does not equal " +
                                     "the number of tasks [%d] divided by the writer's job",
                             readerTasksConfigs.size(), writerTasksConfigs.size())

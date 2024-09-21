@@ -19,6 +19,7 @@
 
 package com.wgzhao.addax.plugin.reader.hbase20xreader;
 
+import com.jcraft.jsch.IO;
 import com.wgzhao.addax.common.base.HBaseConstant;
 import com.wgzhao.addax.common.base.HBaseKey;
 import com.wgzhao.addax.common.exception.AddaxException;
@@ -48,6 +49,11 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import static com.wgzhao.addax.common.exception.CommonErrorCode.EXECUTE_FAIL;
+import static com.wgzhao.addax.common.exception.CommonErrorCode.ILLEGAL_VALUE;
+import static com.wgzhao.addax.common.exception.CommonErrorCode.IO_ERROR;
+import static com.wgzhao.addax.common.exception.CommonErrorCode.REQUIRED_VALUE;
+
 public class Hbase20xHelper
 {
 
@@ -60,26 +66,23 @@ public class Hbase20xHelper
             return H_CONNECTION;
         }
         if (StringUtils.isBlank(hbaseConfig)) {
-            throw AddaxException.asAddaxException(Hbase20xReaderErrorCode.REQUIRED_VALUE, "读 Hbase 时需要配置hbaseConfig，其内容为 Hbase 连接信息，请联系 Hbase PE 获取该信息.");
+            throw AddaxException.asAddaxException(REQUIRED_VALUE, "读 Hbase 时需要配置hbaseConfig，其内容为 Hbase 连接信息，请联系 Hbase PE 获取该信息.");
         }
         org.apache.hadoop.conf.Configuration hConfiguration = HBaseConfiguration.create();
-        try {
-            Map<String, String> hbaseConfigMap = JSON.parseObject(hbaseConfig, new TypeReference<Map<String, String>>() {});
-            // 用户配置的 key-value 对 来表示 hbaseConfig
-            Validate.isTrue(hbaseConfigMap != null && hbaseConfigMap.size() != 0, "hbaseConfig不能为空Map结构!");
-            for (Map.Entry<String, String> entry : hbaseConfigMap.entrySet()) {
-                hConfiguration.set(entry.getKey(), entry.getValue());
-            }
+
+        Map<String, String> hbaseConfigMap = JSON.parseObject(hbaseConfig, new TypeReference<Map<String, String>>() {});
+        // 用户配置的 key-value 对 来表示 hbaseConfig
+        Validate.isTrue(hbaseConfigMap != null && !hbaseConfigMap.isEmpty(), "hbaseConfig不能为空Map结构!");
+        for (Map.Entry<String, String> entry : hbaseConfigMap.entrySet()) {
+            hConfiguration.set(entry.getKey(), entry.getValue());
         }
-        catch (Exception e) {
-            throw AddaxException.asAddaxException(Hbase20xReaderErrorCode.GET_HBASE_CONNECTION_ERROR, e);
-        }
+
         try {
             H_CONNECTION = ConnectionFactory.createConnection(hConfiguration);
         }
-        catch (Exception e) {
+        catch (IOException e) {
             Hbase20xHelper.closeConnection(H_CONNECTION);
-            throw AddaxException.asAddaxException(Hbase20xReaderErrorCode.GET_HBASE_CONNECTION_ERROR, e);
+            throw AddaxException.asAddaxException(IO_ERROR, e);
         }
         return H_CONNECTION;
     }
@@ -97,10 +100,10 @@ public class Hbase20xHelper
             Hbase20xHelper.checkHbaseTable(admin, hTableName);
             hTable = hConnection.getTable(hTableName);
         }
-        catch (Exception e) {
+        catch (IOException e) {
             Hbase20xHelper.closeAdmin(admin);
             Hbase20xHelper.closeConnection(hConnection);
-            throw AddaxException.asAddaxException(Hbase20xReaderErrorCode.GET_HBASE_TABLE_ERROR, e);
+            throw AddaxException.asAddaxException(IO_ERROR, e);
         }
         return hTable;
     }
@@ -118,10 +121,10 @@ public class Hbase20xHelper
             Hbase20xHelper.checkHbaseTable(admin, hTableName);
             regionLocator = hConnection.getRegionLocator(hTableName);
         }
-        catch (Exception e) {
+        catch (IOException e) {
             Hbase20xHelper.closeAdmin(admin);
             Hbase20xHelper.closeConnection(hConnection);
-            throw AddaxException.asAddaxException(Hbase20xReaderErrorCode.GET_HBASE_REGINLOCTOR_ERROR, e);
+            throw AddaxException.asAddaxException(IO_ERROR, e);
         }
         return regionLocator;
     }
@@ -134,7 +137,7 @@ public class Hbase20xHelper
             }
         }
         catch (IOException e) {
-            throw AddaxException.asAddaxException(Hbase20xReaderErrorCode.CLOSE_HBASE_CONNECTION_ERROR, e);
+            throw AddaxException.asAddaxException(IO_ERROR, e);
         }
     }
 
@@ -146,7 +149,7 @@ public class Hbase20xHelper
             }
         }
         catch (IOException e) {
-            throw AddaxException.asAddaxException(Hbase20xReaderErrorCode.CLOSE_HBASE_ADMIN_ERROR, e);
+            throw AddaxException.asAddaxException(IO_ERROR, e);
         }
     }
 
@@ -158,7 +161,7 @@ public class Hbase20xHelper
             }
         }
         catch (IOException e) {
-            throw AddaxException.asAddaxException(Hbase20xReaderErrorCode.CLOSE_HBASE_TABLE_ERROR, e);
+            throw AddaxException.asAddaxException(IO_ERROR, e);
         }
     }
 
@@ -177,7 +180,7 @@ public class Hbase20xHelper
             }
         }
         catch (IOException e) {
-            throw AddaxException.asAddaxException(Hbase20xReaderErrorCode.CLOSE_HBASE_REGINLOCTOR_ERROR, e);
+            throw AddaxException.asAddaxException(IO_ERROR, e);
         }
     }
 
@@ -185,15 +188,15 @@ public class Hbase20xHelper
             throws IOException
     {
         if (!admin.tableExists(hTableName)) {
-            throw AddaxException.asAddaxException(Hbase20xReaderErrorCode.ILLEGAL_VALUE, "HBase源头表" + hTableName.toString()
+            throw AddaxException.asAddaxException(ILLEGAL_VALUE, "HBase源头表" + hTableName.toString()
                     + "不存在, 请检查您的配置 或者 联系 Hbase 管理员.");
         }
         if (!admin.isTableAvailable(hTableName)) {
-            throw AddaxException.asAddaxException(Hbase20xReaderErrorCode.ILLEGAL_VALUE, "HBase源头表" + hTableName.toString()
+            throw AddaxException.asAddaxException(ILLEGAL_VALUE, "HBase源头表" + hTableName.toString()
                     + " 不可用, 请检查您的配置 或者 联系 Hbase 管理员.");
         }
         if (admin.isTableDisabled(hTableName)) {
-            throw AddaxException.asAddaxException(Hbase20xReaderErrorCode.ILLEGAL_VALUE, "HBase源头表" + hTableName.toString()
+            throw AddaxException.asAddaxException(ILLEGAL_VALUE, "HBase源头表" + hTableName.toString()
                     + "is disabled, 请检查您的配置 或者 联系 Hbase 管理员.");
         }
     }
@@ -288,7 +291,7 @@ public class Hbase20xHelper
                     dateformat = HBaseConstant.DEFAULT_DATE_FORMAT;
                 }
                 Validate.isTrue(StringUtils.isNotBlank(columnName)
-                        || StringUtils.isNotBlank(columnValue),
+                                || StringUtils.isNotBlank(columnValue),
                         "Hbasereader 在 normal 方式读取时则要么是 type + name + format 的组合，" +
                                 "要么是type + value + format 的组合. 而您的配置非这两种组合，请检查并修改.");
 
@@ -301,7 +304,7 @@ public class Hbase20xHelper
             }
             else {
                 Validate.isTrue(StringUtils.isNotBlank(columnName)
-                        || StringUtils.isNotBlank(columnValue),
+                                || StringUtils.isNotBlank(columnValue),
                         "Hbasereader 在 normal 方式读取时，其列配置中，如果类型不是时间，" +
                                 "则要么是 type + name 的组合，要么是type + value 的组合. 而您的配置非这两种组合，请检查并修改.");
                 oneColumnCell = new HbaseColumnCell.Builder(type)
@@ -333,7 +336,7 @@ public class Hbase20xHelper
             if (!Hbase20xHelper.isRowkeyColumn(columnName)) {
                 String[] cfAndQualifier = columnName.split(":");
                 if (cfAndQualifier.length != 2) {
-                    throw AddaxException.asAddaxException(Hbase20xReaderErrorCode.ILLEGAL_VALUE, "Hbasereader 中，column 的列配置格式应该是：列族:列名. 您配置的列错误：" + columnName);
+                    throw AddaxException.asAddaxException(ILLEGAL_VALUE, "Hbasereader 中，column 的列配置格式应该是：列族:列名. 您配置的列错误：" + columnName);
                 }
                 familyQualifier = StringUtils.join(cfAndQualifier[0].trim(), ":", cfAndQualifier[1].trim());
             }
@@ -357,14 +360,14 @@ public class Hbase20xHelper
         /* 如果用户配置了 startRowkey 和 endRowkey，需要确保：startRowkey <= endRowkey */
         if (startRowkeyByte.length != 0 && endRowkeyByte.length != 0
                 && Bytes.compareTo(startRowkeyByte, endRowkeyByte) > 0) {
-            throw AddaxException.asAddaxException(Hbase20xReaderErrorCode.ILLEGAL_VALUE, "Hbasereader 中 startRowkey 不得大于 endRowkey.");
+            throw AddaxException.asAddaxException(ILLEGAL_VALUE, "Hbasereader 中 startRowkey 不得大于 endRowkey.");
         }
         RegionLocator regionLocator = Hbase20xHelper.getRegionLocator(configuration);
         List<Configuration> resultConfigurations;
         try {
             Pair<byte[][], byte[][]> regionRanges = regionLocator.getStartEndKeys();
             if (null == regionRanges) {
-                throw AddaxException.asAddaxException(Hbase20xReaderErrorCode.SPLIT_ERROR, "获取源头 Hbase 表的 rowkey 范围失败.");
+                throw AddaxException.asAddaxException(EXECUTE_FAIL, "获取源头 Hbase 表的 rowkey 范围失败.");
             }
             resultConfigurations = Hbase20xHelper.doSplit(configuration, startRowkeyByte, endRowkeyByte,
                     regionRanges);
@@ -373,7 +376,7 @@ public class Hbase20xHelper
             return resultConfigurations;
         }
         catch (Exception e) {
-            throw AddaxException.asAddaxException(Hbase20xReaderErrorCode.SPLIT_ERROR, "切分源头 Hbase 表失败.", e);
+            throw AddaxException.asAddaxException(EXECUTE_FAIL, "切分源头 Hbase 表失败.", e);
         }
         finally {
             Hbase20xHelper.closeRegionLocator(regionLocator);
@@ -478,15 +481,15 @@ public class Hbase20xHelper
 
     public static void validateParameter(Configuration originalConfig)
     {
-        originalConfig.getNecessaryValue(HBaseKey.HBASE_CONFIG, Hbase20xReaderErrorCode.REQUIRED_VALUE);
-        originalConfig.getNecessaryValue(HBaseKey.TABLE, Hbase20xReaderErrorCode.REQUIRED_VALUE);
+        originalConfig.getNecessaryValue(HBaseKey.HBASE_CONFIG, REQUIRED_VALUE);
+        originalConfig.getNecessaryValue(HBaseKey.TABLE, REQUIRED_VALUE);
 
         Hbase20xHelper.validateMode(originalConfig);
 
         //非必选参数处理
         String encoding = originalConfig.getString(HBaseKey.ENCODING, HBaseConstant.DEFAULT_ENCODING);
         if (!Charset.isSupported(encoding)) {
-            throw AddaxException.asAddaxException(Hbase20xReaderErrorCode.ILLEGAL_VALUE, String.format("Hbasereader 不支持您所配置的编码:[%s]", encoding));
+            throw AddaxException.asAddaxException(ILLEGAL_VALUE, String.format("Hbasereader 不支持您所配置的编码:[%s]", encoding));
         }
         originalConfig.set(HBaseKey.ENCODING, encoding);
         // 处理 range 的配置
@@ -515,10 +518,10 @@ public class Hbase20xHelper
 
     private static void validateMode(Configuration originalConfig)
     {
-        String mode = originalConfig.getNecessaryValue(HBaseKey.MODE, Hbase20xReaderErrorCode.REQUIRED_VALUE);
+        String mode = originalConfig.getNecessaryValue(HBaseKey.MODE, REQUIRED_VALUE);
         List<Map> column = originalConfig.getList(HBaseKey.COLUMN, Map.class);
         if (column == null || column.isEmpty()) {
-            throw AddaxException.asAddaxException(Hbase20xReaderErrorCode.REQUIRED_VALUE,
+            throw AddaxException.asAddaxException(REQUIRED_VALUE,
                     "您配置的column为空,Hbase必须配置 column，其形式为：column:[{\"name\": \"cf0:column0\",\"type\": \"string\"},{\"name\": \"cf1:column1\",\"type\": \"long\"}]");
         }
         ModeType modeType = ModeType.getByTypeName(mode);
@@ -539,7 +542,7 @@ public class Hbase20xHelper
                 break;
             }
             default:
-                throw AddaxException.asAddaxException(Hbase20xReaderErrorCode.ILLEGAL_VALUE,
+                throw AddaxException.asAddaxException(ILLEGAL_VALUE,
                         String.format("HbaseReader不支持该 mode 类型:%s", mode));
         }
     }

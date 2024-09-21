@@ -27,6 +27,9 @@ import com.wgzhao.addax.transformer.Transformer;
 
 import java.util.Arrays;
 
+import static com.wgzhao.addax.common.exception.CommonErrorCode.ILLEGAL_VALUE;
+import static com.wgzhao.addax.common.exception.CommonErrorCode.RUNTIME_ERROR;
+
 /**
  * no comments.
  * Created by liqiang on 16/3/4.
@@ -58,7 +61,7 @@ public class ReplaceTransformer
             replaceString = (String) paras[3];
         }
         catch (Exception e) {
-            throw AddaxException.asAddaxException(TransformerErrorCode.TRANSFORMER_ILLEGAL_PARAMETER,
+            throw AddaxException.asAddaxException(ILLEGAL_VALUE,
                     "paras:" + Arrays.asList(paras) + " => " + e.getMessage());
         }
 
@@ -88,7 +91,7 @@ public class ReplaceTransformer
         }
         catch (Exception e) {
             throw AddaxException.asAddaxException(
-                    TransformerErrorCode.TRANSFORMER_RUN_EXCEPTION, e.getMessage(), e);
+                    RUNTIME_ERROR, e.getMessage(), e);
         }
         return record;
     }

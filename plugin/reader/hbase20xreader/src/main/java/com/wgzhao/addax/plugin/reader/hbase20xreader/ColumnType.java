@@ -24,6 +24,10 @@ import org.apache.commons.lang3.StringUtils;
 
 import java.util.Arrays;
 
+import static com.wgzhao.addax.common.exception.CommonErrorCode.ILLEGAL_VALUE;
+import static com.wgzhao.addax.common.exception.CommonErrorCode.NOT_SUPPORT_TYPE;
+import static com.wgzhao.addax.common.exception.CommonErrorCode.REQUIRED_VALUE;
+
 /**
  * 只对 normal 模式读取时有用，多版本读取时，不存在列类型的
  */
@@ -49,7 +53,7 @@ public enum ColumnType
     public static ColumnType getByTypeName(String typeName)
     {
         if (StringUtils.isBlank(typeName)) {
-            throw AddaxException.asAddaxException(Hbase20xReaderErrorCode.ILLEGAL_VALUE,
+            throw AddaxException.asAddaxException(REQUIRED_VALUE,
                     String.format("Hbasereader 不支持该类型:%s, 目前支持的类型是:%s", typeName, Arrays.asList(values())));
         }
         for (ColumnType columnType : values()) {
@@ -58,7 +62,7 @@ public enum ColumnType
             }
         }
 
-        throw AddaxException.asAddaxException(Hbase20xReaderErrorCode.ILLEGAL_VALUE,
+        throw AddaxException.asAddaxException(NOT_SUPPORT_TYPE,
                 String.format("Hbasereader 不支持该类型:%s, 目前支持的类型是:%s", typeName, Arrays.asList(values())));
     }
 

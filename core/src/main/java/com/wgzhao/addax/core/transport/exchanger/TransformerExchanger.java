@@ -24,11 +24,12 @@ import com.wgzhao.addax.common.exception.AddaxException;
 import com.wgzhao.addax.common.plugin.TaskPluginCollector;
 import com.wgzhao.addax.core.statistics.communication.Communication;
 import com.wgzhao.addax.core.statistics.communication.CommunicationTool;
-import com.wgzhao.addax.core.transport.transformer.TransformerErrorCode;
 import com.wgzhao.addax.core.transport.transformer.TransformerExecution;
 import com.wgzhao.addax.core.util.container.ClassLoaderSwapper;
 
 import java.util.List;
+
+import static com.wgzhao.addax.common.exception.CommonErrorCode.ILLEGAL_VALUE;
 
 /**
  * no comments.
@@ -87,7 +88,7 @@ public abstract class TransformerExchanger
 
                 if (transformerInfoExec.getColumnIndex() != null
                         && transformerInfoExec.getColumnIndex() >= record.getColumnNumber()) {
-                    throw AddaxException.asAddaxException(TransformerErrorCode.TRANSFORMER_ILLEGAL_PARAMETER,
+                    throw AddaxException.asAddaxException(ILLEGAL_VALUE,
                             String.format("columnIndex[%s] out of bound[%s]. name=%s",
                                     transformerInfoExec.getColumnIndex(), record.getColumnNumber(),
                                     transformerInfoExec.getTransformerName()));

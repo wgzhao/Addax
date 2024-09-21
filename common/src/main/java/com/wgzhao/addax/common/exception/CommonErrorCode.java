@@ -46,7 +46,11 @@ public enum CommonErrorCode
     HOOK_INTERNAL_ERROR("5002", "Hook internal error"),
     SHUT_DOWN_TASK("5003", "Task shutdown"),
     WAIT_TIME_EXCEED("5004", "Wait time exceed"),
-    TASK_HUNG_EXPIRED("5005", "Task hung expired"),;
+    TASK_HUNG_EXPIRED("5005", "Task hung expired"),
+
+    PLUGIN_INSTALL_ERROR("6001", "Plugins installation error."),
+    PLUGIN_INIT_ERROR("6002", "Plugins initialization error."),
+    OVER_LIMIT_ERROR("6003", "Over limit error.");
 
     private final String code;
 

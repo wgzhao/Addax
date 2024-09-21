@@ -24,12 +24,13 @@ import com.wgzhao.addax.common.element.Column;
 import com.wgzhao.addax.common.element.Record;
 import com.wgzhao.addax.common.exception.AddaxException;
 import com.wgzhao.addax.core.util.ClassSize;
-import com.wgzhao.addax.core.util.FrameworkErrorCode;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
+import static com.wgzhao.addax.common.exception.CommonErrorCode.ILLEGAL_VALUE;
 
 /**
  * Created by jingxing on 14-8-24.
@@ -75,7 +76,7 @@ public class DefaultRecord
     public void setColumn(int i, Column column)
     {
         if (i < 0) {
-            throw AddaxException.asAddaxException(FrameworkErrorCode.ARGUMENT_ERROR,
+            throw AddaxException.asAddaxException(ILLEGAL_VALUE,
                     "Cannot set a value for a column with an index less than 0");
         }
 

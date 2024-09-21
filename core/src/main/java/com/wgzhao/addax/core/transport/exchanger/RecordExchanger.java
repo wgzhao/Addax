@@ -30,10 +30,11 @@ import com.wgzhao.addax.core.statistics.communication.Communication;
 import com.wgzhao.addax.core.transport.channel.Channel;
 import com.wgzhao.addax.core.transport.record.TerminateRecord;
 import com.wgzhao.addax.core.transport.transformer.TransformerExecution;
-import com.wgzhao.addax.core.util.FrameworkErrorCode;
 import com.wgzhao.addax.core.util.container.CoreConstant;
 
 import java.util.List;
+
+import static com.wgzhao.addax.common.exception.CommonErrorCode.CONFIG_ERROR;
 
 public class RecordExchanger
         extends TransformerExchanger
@@ -59,8 +60,7 @@ public class RecordExchanger
                             "com.wgzhao.addax.core.transport.record.DefaultRecord"));
         }
         catch (ClassNotFoundException e) {
-            throw AddaxException.asAddaxException(
-                    FrameworkErrorCode.CONFIG_ERROR, e);
+            throw AddaxException.asAddaxException(CONFIG_ERROR, e);
         }
     }
 
@@ -81,8 +81,7 @@ public class RecordExchanger
             return RECORD_CLASS.getConstructor().newInstance();
         }
         catch (Exception e) {
-            throw AddaxException.asAddaxException(
-                    FrameworkErrorCode.CONFIG_ERROR, e);
+            throw AddaxException.asAddaxException(CONFIG_ERROR, e);
         }
     }
 
