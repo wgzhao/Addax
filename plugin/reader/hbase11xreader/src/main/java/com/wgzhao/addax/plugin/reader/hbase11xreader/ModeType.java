@@ -23,7 +23,7 @@ import com.wgzhao.addax.common.exception.AddaxException;
 
 import java.util.Arrays;
 
-import static com.wgzhao.addax.common.exception.ErrorCode.ILLEGAL_VALUE;
+import static com.wgzhao.addax.common.spi.ErrorCode.ILLEGAL_VALUE;
 
 public enum ModeType
 {

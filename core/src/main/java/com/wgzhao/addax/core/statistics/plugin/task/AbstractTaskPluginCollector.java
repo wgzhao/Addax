@@ -29,7 +29,7 @@ import com.wgzhao.addax.core.statistics.communication.CommunicationTool;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import static com.wgzhao.addax.common.exception.ErrorCode.RUNTIME_ERROR;
+import static com.wgzhao.addax.common.spi.ErrorCode.RUNTIME_ERROR;
 
 /**
  * Created by jingxing on 14-9-11.

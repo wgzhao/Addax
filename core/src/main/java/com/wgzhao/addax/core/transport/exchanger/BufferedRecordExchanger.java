@@ -20,7 +20,7 @@
 package com.wgzhao.addax.core.transport.exchanger;
 
 import com.wgzhao.addax.common.element.Record;
-import com.wgzhao.addax.common.exception.ErrorCode;
+import com.wgzhao.addax.common.spi.ErrorCode;
 import com.wgzhao.addax.common.exception.AddaxException;
 import com.wgzhao.addax.common.plugin.RecordReceiver;
 import com.wgzhao.addax.common.plugin.RecordSender;
@@ -37,7 +37,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
 
-import static com.wgzhao.addax.common.exception.ErrorCode.CONFIG_ERROR;
+import static com.wgzhao.addax.common.spi.ErrorCode.CONFIG_ERROR;
 
 public class BufferedRecordExchanger
         implements RecordSender, RecordReceiver

@@ -35,7 +35,7 @@ import java.sql.SQLException;
 import java.sql.Types;
 import java.util.List;
 
-import static com.wgzhao.addax.common.exception.ErrorCode.CONFIG_ERROR;
+import static com.wgzhao.addax.common.spi.ErrorCode.CONFIG_ERROR;
 
 public class OracleWriter
         extends Writer

@@ -36,7 +36,7 @@ import org.apache.http.util.EntityUtils;
 import java.io.IOException;
 import java.util.concurrent.ThreadPoolExecutor;
 
-import static com.wgzhao.addax.common.exception.ErrorCode.RUNTIME_ERROR;
+import static com.wgzhao.addax.common.spi.ErrorCode.RUNTIME_ERROR;
 
 public class HttpClientUtil
 {

@@ -42,8 +42,8 @@ import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 
-import static com.wgzhao.addax.common.exception.ErrorCode.ILLEGAL_VALUE;
-import static com.wgzhao.addax.common.exception.ErrorCode.NOT_SUPPORT_TYPE;
+import static com.wgzhao.addax.common.spi.ErrorCode.ILLEGAL_VALUE;
+import static com.wgzhao.addax.common.spi.ErrorCode.NOT_SUPPORT_TYPE;
 
 public abstract class HbaseAbstractTask
 {

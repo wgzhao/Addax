@@ -46,7 +46,7 @@ import static com.wgzhao.addax.common.base.Key.CONNECTION;
 import static com.wgzhao.addax.common.base.Key.ENDPOINT;
 import static com.wgzhao.addax.common.base.Key.QUERY_SQL;
 import static com.wgzhao.addax.common.base.Key.TABLE;
-import static com.wgzhao.addax.common.exception.ErrorCode.REQUIRED_VALUE;
+import static com.wgzhao.addax.common.spi.ErrorCode.REQUIRED_VALUE;
 
 public class InfluxDB2Reader
         extends Reader

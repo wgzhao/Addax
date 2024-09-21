@@ -8,8 +8,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-import static com.wgzhao.addax.common.exception.ErrorCode.CONFIG_ERROR;
-import static com.wgzhao.addax.common.exception.ErrorCode.REQUIRED_VALUE;
+import static com.wgzhao.addax.common.spi.ErrorCode.CONFIG_ERROR;
+import static com.wgzhao.addax.common.spi.ErrorCode.REQUIRED_VALUE;
 
 public class StarRocksWriterOptions
         implements Serializable

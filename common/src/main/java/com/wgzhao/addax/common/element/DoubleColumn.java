@@ -19,7 +19,7 @@
 
 package com.wgzhao.addax.common.element;
 
-import com.wgzhao.addax.common.exception.ErrorCode;
+import com.wgzhao.addax.common.spi.ErrorCode;
 import com.wgzhao.addax.common.exception.AddaxException;
 
 import java.math.BigDecimal;

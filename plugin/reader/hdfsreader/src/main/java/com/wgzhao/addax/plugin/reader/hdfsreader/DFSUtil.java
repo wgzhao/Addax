@@ -97,11 +97,11 @@ import java.util.concurrent.TimeUnit;
 
 import static com.wgzhao.addax.common.base.Key.COLUMN;
 import static com.wgzhao.addax.common.base.Key.NULL_FORMAT;
-import static com.wgzhao.addax.common.exception.ErrorCode.CONFIG_ERROR;
-import static com.wgzhao.addax.common.exception.ErrorCode.EXECUTE_FAIL;
-import static com.wgzhao.addax.common.exception.ErrorCode.IO_ERROR;
-import static com.wgzhao.addax.common.exception.ErrorCode.LOGIN_ERROR;
-import static com.wgzhao.addax.common.exception.ErrorCode.NOT_SUPPORT_TYPE;
+import static com.wgzhao.addax.common.spi.ErrorCode.CONFIG_ERROR;
+import static com.wgzhao.addax.common.spi.ErrorCode.EXECUTE_FAIL;
+import static com.wgzhao.addax.common.spi.ErrorCode.IO_ERROR;
+import static com.wgzhao.addax.common.spi.ErrorCode.LOGIN_ERROR;
+import static com.wgzhao.addax.common.spi.ErrorCode.NOT_SUPPORT_TYPE;
 
 /**
  * Created by mingya.wmy on 2015/8/12.

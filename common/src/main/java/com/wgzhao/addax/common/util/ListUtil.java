@@ -19,7 +19,7 @@
 
 package com.wgzhao.addax.common.util;
 
-import com.wgzhao.addax.common.exception.ErrorCode;
+import com.wgzhao.addax.common.spi.ErrorCode;
 import com.wgzhao.addax.common.exception.AddaxException;
 import org.apache.commons.lang3.StringUtils;
 

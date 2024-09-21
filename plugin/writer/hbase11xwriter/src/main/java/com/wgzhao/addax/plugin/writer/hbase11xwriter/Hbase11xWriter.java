@@ -28,7 +28,7 @@ import com.wgzhao.addax.common.util.Configuration;
 import java.util.ArrayList;
 import java.util.List;
 
-import static com.wgzhao.addax.common.exception.ErrorCode.ILLEGAL_VALUE;
+import static com.wgzhao.addax.common.spi.ErrorCode.ILLEGAL_VALUE;
 
 /**
  * Hbase11xWriter

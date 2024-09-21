@@ -48,10 +48,10 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import static com.wgzhao.addax.common.exception.ErrorCode.EXECUTE_FAIL;
-import static com.wgzhao.addax.common.exception.ErrorCode.ILLEGAL_VALUE;
-import static com.wgzhao.addax.common.exception.ErrorCode.IO_ERROR;
-import static com.wgzhao.addax.common.exception.ErrorCode.REQUIRED_VALUE;
+import static com.wgzhao.addax.common.spi.ErrorCode.EXECUTE_FAIL;
+import static com.wgzhao.addax.common.spi.ErrorCode.ILLEGAL_VALUE;
+import static com.wgzhao.addax.common.spi.ErrorCode.IO_ERROR;
+import static com.wgzhao.addax.common.spi.ErrorCode.REQUIRED_VALUE;
 
 public class Hbase20xHelper
 {

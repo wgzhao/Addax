@@ -49,13 +49,13 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Set;
 
-import static com.wgzhao.addax.common.exception.ErrorCode.CONFIG_ERROR;
-import static com.wgzhao.addax.common.exception.ErrorCode.EXECUTE_FAIL;
-import static com.wgzhao.addax.common.exception.ErrorCode.ILLEGAL_VALUE;
-import static com.wgzhao.addax.common.exception.ErrorCode.IO_ERROR;
-import static com.wgzhao.addax.common.exception.ErrorCode.PERMISSION_ERROR;
-import static com.wgzhao.addax.common.exception.ErrorCode.REQUIRED_VALUE;
-import static com.wgzhao.addax.common.exception.ErrorCode.RUNTIME_ERROR;
+import static com.wgzhao.addax.common.spi.ErrorCode.CONFIG_ERROR;
+import static com.wgzhao.addax.common.spi.ErrorCode.EXECUTE_FAIL;
+import static com.wgzhao.addax.common.spi.ErrorCode.ILLEGAL_VALUE;
+import static com.wgzhao.addax.common.spi.ErrorCode.IO_ERROR;
+import static com.wgzhao.addax.common.spi.ErrorCode.PERMISSION_ERROR;
+import static com.wgzhao.addax.common.spi.ErrorCode.REQUIRED_VALUE;
+import static com.wgzhao.addax.common.spi.ErrorCode.RUNTIME_ERROR;
 
 /**
  * Created by haiwei.luo on 14-9-17.

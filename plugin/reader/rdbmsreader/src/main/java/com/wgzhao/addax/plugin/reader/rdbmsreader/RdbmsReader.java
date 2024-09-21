@@ -35,7 +35,7 @@ import static com.wgzhao.addax.common.base.Constant.DEFAULT_FETCH_SIZE;
 import static com.wgzhao.addax.common.base.Key.CONNECTION;
 import static com.wgzhao.addax.common.base.Key.FETCH_SIZE;
 import static com.wgzhao.addax.common.base.Key.JDBC_DRIVER;
-import static com.wgzhao.addax.common.exception.ErrorCode.REQUIRED_VALUE;
+import static com.wgzhao.addax.common.spi.ErrorCode.REQUIRED_VALUE;
 
 public class RdbmsReader
         extends Reader

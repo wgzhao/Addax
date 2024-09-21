@@ -48,9 +48,9 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
-import static com.wgzhao.addax.common.exception.ErrorCode.CONFIG_ERROR;
-import static com.wgzhao.addax.common.exception.ErrorCode.EXECUTE_FAIL;
-import static com.wgzhao.addax.common.exception.ErrorCode.NOT_SUPPORT_TYPE;
+import static com.wgzhao.addax.common.spi.ErrorCode.CONFIG_ERROR;
+import static com.wgzhao.addax.common.spi.ErrorCode.EXECUTE_FAIL;
+import static com.wgzhao.addax.common.spi.ErrorCode.NOT_SUPPORT_TYPE;
 
 public class CommonRdbmsWriter
 {

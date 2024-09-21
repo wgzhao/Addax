@@ -43,9 +43,9 @@ import java.sql.Timestamp;
 import java.util.List;
 
 import static com.wgzhao.addax.common.base.Constant.DEFAULT_BATCH_SIZE;
-import static com.wgzhao.addax.common.exception.ErrorCode.CONFIG_ERROR;
-import static com.wgzhao.addax.common.exception.ErrorCode.NOT_SUPPORT_TYPE;
-import static com.wgzhao.addax.common.exception.ErrorCode.RUNTIME_ERROR;
+import static com.wgzhao.addax.common.spi.ErrorCode.CONFIG_ERROR;
+import static com.wgzhao.addax.common.spi.ErrorCode.NOT_SUPPORT_TYPE;
+import static com.wgzhao.addax.common.spi.ErrorCode.RUNTIME_ERROR;
 
 public class KuduWriterTask
         extends Writer

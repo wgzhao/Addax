@@ -39,9 +39,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import static com.wgzhao.addax.common.base.Key.CONNECTION;
-import static com.wgzhao.addax.common.exception.ErrorCode.CONFIG_ERROR;
-import static com.wgzhao.addax.common.exception.ErrorCode.PLUGIN_INIT_ERROR;
-import static com.wgzhao.addax.common.exception.ErrorCode.REQUIRED_VALUE;
+import static com.wgzhao.addax.common.spi.ErrorCode.CONFIG_ERROR;
+import static com.wgzhao.addax.common.spi.ErrorCode.PLUGIN_INIT_ERROR;
+import static com.wgzhao.addax.common.spi.ErrorCode.REQUIRED_VALUE;
 import static com.wgzhao.addax.core.util.container.CoreConstant.CONF_PATH;
 import static com.wgzhao.addax.core.util.container.CoreConstant.CORE_SERVER_TIMEOUT_SEC;
 import static com.wgzhao.addax.core.util.container.CoreConstant.JOB_CONTENT;

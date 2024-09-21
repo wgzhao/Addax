@@ -30,8 +30,8 @@ import org.slf4j.LoggerFactory;
 
 import java.util.List;
 
-import static com.wgzhao.addax.common.exception.ErrorCode.ILLEGAL_VALUE;
-import static com.wgzhao.addax.common.exception.ErrorCode.IO_ERROR;
+import static com.wgzhao.addax.common.spi.ErrorCode.ILLEGAL_VALUE;
+import static com.wgzhao.addax.common.spi.ErrorCode.IO_ERROR;
 
 /**
  * Hbase11xReader

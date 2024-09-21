@@ -1,7 +1,7 @@
 package com.wgzhao.addax.common.element;
 
 import com.wgzhao.addax.common.exception.AddaxException;
-import com.wgzhao.addax.common.exception.ErrorCode;
+import com.wgzhao.addax.common.spi.ErrorCode;
 
 import java.math.BigDecimal;
 import java.math.BigInteger;

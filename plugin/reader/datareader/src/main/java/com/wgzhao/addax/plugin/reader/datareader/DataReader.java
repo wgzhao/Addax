@@ -67,9 +67,9 @@ import static com.wgzhao.addax.common.base.Key.DATE_FORMAT;
 import static com.wgzhao.addax.common.base.Key.SLICE_RECORD_COUNT;
 import static com.wgzhao.addax.common.base.Key.TYPE;
 import static com.wgzhao.addax.common.base.Key.VALUE;
-import static com.wgzhao.addax.common.exception.ErrorCode.ILLEGAL_VALUE;
-import static com.wgzhao.addax.common.exception.ErrorCode.NOT_SUPPORT_TYPE;
-import static com.wgzhao.addax.common.exception.ErrorCode.REQUIRED_VALUE;
+import static com.wgzhao.addax.common.spi.ErrorCode.ILLEGAL_VALUE;
+import static com.wgzhao.addax.common.spi.ErrorCode.NOT_SUPPORT_TYPE;
+import static com.wgzhao.addax.common.spi.ErrorCode.REQUIRED_VALUE;
 import static com.wgzhao.addax.plugin.reader.datareader.DataKey.RULE;
 
 public class DataReader

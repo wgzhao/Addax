@@ -33,8 +33,8 @@ import org.apache.commons.lang3.StringUtils;
 import java.util.HashMap;
 import java.util.Map;
 
-import static com.wgzhao.addax.common.exception.ErrorCode.PLUGIN_INSTALL_ERROR;
-import static com.wgzhao.addax.common.exception.ErrorCode.RUNTIME_ERROR;
+import static com.wgzhao.addax.common.spi.ErrorCode.PLUGIN_INSTALL_ERROR;
+import static com.wgzhao.addax.common.spi.ErrorCode.RUNTIME_ERROR;
 
 /**
  * Created by jingxing on 14-8-24.

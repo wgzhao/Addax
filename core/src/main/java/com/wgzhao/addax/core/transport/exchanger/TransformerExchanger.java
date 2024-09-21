@@ -29,7 +29,7 @@ import com.wgzhao.addax.core.util.container.ClassLoaderSwapper;
 
 import java.util.List;
 
-import static com.wgzhao.addax.common.exception.ErrorCode.ILLEGAL_VALUE;
+import static com.wgzhao.addax.common.spi.ErrorCode.ILLEGAL_VALUE;
 
 /**
  * no comments.
