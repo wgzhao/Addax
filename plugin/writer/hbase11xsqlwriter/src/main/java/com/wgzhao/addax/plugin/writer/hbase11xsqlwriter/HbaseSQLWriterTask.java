@@ -41,6 +41,10 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
+import static com.wgzhao.addax.common.exception.CommonErrorCode.EXECUTE_FAIL;
+import static com.wgzhao.addax.common.exception.CommonErrorCode.ILLEGAL_VALUE;
+import static com.wgzhao.addax.common.exception.CommonErrorCode.RUNTIME_ERROR;
+
 /**
  * @author yanghan.y
  */
@@ -75,7 +79,7 @@ public class HbaseSQLWriterTask
             while ((record = lineReceiver.getFromReader()) != null) {
                 // 校验列数量是否符合预期
                 if (record.getColumnNumber() != numberOfColumnsToRead) {
-                    throw AddaxException.asAddaxException(HbaseSQLWriterErrorCode.ILLEGAL_VALUE,
+                    throw AddaxException.asAddaxException(ILLEGAL_VALUE,
                             "The number of fields(" + record.getColumnNumber()
                                     + ") in the source and the number of fields(" + numberOfColumnsToRead + ") you configured in 'column' are not the same.");
                 }
@@ -95,7 +99,7 @@ public class HbaseSQLWriterTask
         }
         catch (Throwable t) {
             // 确保所有异常都转化为 AddaxException
-            throw AddaxException.asAddaxException(HbaseSQLWriterErrorCode.PUT_HBASE_ERROR, t);
+            throw AddaxException.asAddaxException(RUNTIME_ERROR, t);
         }
         finally {
             close();
@@ -163,7 +167,7 @@ public class HbaseSQLWriterTask
             doSingleUpsert(records);
         }
         catch (Exception e) {
-            throw AddaxException.asAddaxException(HbaseSQLWriterErrorCode.PUT_HBASE_ERROR, e);
+            throw AddaxException.asAddaxException(EXECUTE_FAIL, e);
         }
     }
 
@@ -304,7 +308,7 @@ public class HbaseSQLWriterTask
                     break;
 
                 default:
-                    throw AddaxException.asAddaxException(HbaseSQLWriterErrorCode.ILLEGAL_VALUE,
+                    throw AddaxException.asAddaxException(ILLEGAL_VALUE,
                             "The data type " + sqlType + "is unsupported.");
             } // end switch
         }
@@ -324,7 +328,7 @@ public class HbaseSQLWriterTask
 
                 default:
                     // nullMode的合法性在初始化配置的时候已经校验过，这里一定不会出错
-                    throw AddaxException.asAddaxException(HbaseSQLWriterErrorCode.ILLEGAL_VALUE,
+                    throw AddaxException.asAddaxException(ILLEGAL_VALUE,
                             "The nullMode type " + cfg.getNullMode() + " is unsupported, here are available nullMode:" + Arrays.asList(NullModeType.values()));
             }
         }
@@ -389,7 +393,7 @@ public class HbaseSQLWriterTask
                 return new byte[0];
 
             default:
-                throw AddaxException.asAddaxException(HbaseSQLWriterErrorCode.ILLEGAL_VALUE,
+                throw AddaxException.asAddaxException(ILLEGAL_VALUE,
                         "The data type " + sqlType + " is unsupported yet.");
         }
     }

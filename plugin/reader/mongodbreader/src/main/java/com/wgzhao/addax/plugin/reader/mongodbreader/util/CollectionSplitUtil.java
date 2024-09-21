@@ -27,7 +27,6 @@ import com.mongodb.client.MongoDatabase;
 import com.wgzhao.addax.common.exception.AddaxException;
 import com.wgzhao.addax.common.util.Configuration;
 import com.wgzhao.addax.plugin.reader.mongodbreader.KeyConstant;
-import com.wgzhao.addax.plugin.reader.mongodbreader.MongoDBReaderErrorCode;
 import org.bson.Document;
 import org.bson.types.ObjectId;
 
@@ -36,6 +35,7 @@ import java.util.List;
 
 import static com.wgzhao.addax.common.base.Key.CONNECTION;
 import static com.wgzhao.addax.common.base.Key.DATABASE;
+import static com.wgzhao.addax.common.exception.CommonErrorCode.ILLEGAL_VALUE;
 
 public class CollectionSplitUtil
 {
@@ -53,8 +53,8 @@ public class CollectionSplitUtil
         String collName = connConf.getString(KeyConstant.MONGO_COLLECTION_NAME);
 
         if (null == dbName || dbName.isEmpty() || null == collName || collName.isEmpty() || mongoClient == null) {
-            throw AddaxException.asAddaxException(MongoDBReaderErrorCode.ILLEGAL_VALUE,
-                    MongoDBReaderErrorCode.ILLEGAL_VALUE.getDescription());
+            throw AddaxException.asAddaxException(ILLEGAL_VALUE,
+                    ILLEGAL_VALUE.getDescription());
         }
 
         boolean isObjectId = isPrimaryIdObjectId(mongoClient, dbName, collName);

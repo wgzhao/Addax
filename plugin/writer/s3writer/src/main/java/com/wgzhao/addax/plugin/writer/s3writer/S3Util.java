@@ -9,6 +9,8 @@ import software.amazon.awssdk.services.s3.S3Client;
 
 import java.net.URI;
 
+import static com.wgzhao.addax.common.exception.CommonErrorCode.ILLEGAL_VALUE;
+
 public class S3Util
 {
     public static S3Client initS3Client(Configuration conf) {
@@ -34,7 +36,7 @@ public class S3Util
                     .build();
         } catch (IllegalArgumentException e) {
             throw AddaxException.asAddaxException(
-                    S3WriterErrorCode.ILLEGAL_VALUE, e.getMessage());
+                    ILLEGAL_VALUE, e.getMessage());
         }
     }
 }

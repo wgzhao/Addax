@@ -30,6 +30,9 @@ import org.slf4j.LoggerFactory;
 import java.util.ArrayList;
 import java.util.List;
 
+import static com.wgzhao.addax.common.exception.CommonErrorCode.CONFIG_ERROR;
+import static com.wgzhao.addax.common.exception.CommonErrorCode.REQUIRED_VALUE;
+
 public class KuduWriter
         extends Writer
 {
@@ -53,8 +56,8 @@ public class KuduWriter
 
         private void validateParameter()
         {
-            String tableName = config.getNecessaryValue(KuduKey.TABLE, KuduWriterErrorCode.REQUIRED_VALUE);
-            String masterAddress = config.getNecessaryValue(KuduKey.KUDU_MASTER_ADDRESSES, KuduWriterErrorCode.REQUIRED_VALUE);
+            String tableName = config.getNecessaryValue(KuduKey.TABLE, REQUIRED_VALUE);
+            String masterAddress = config.getNecessaryValue(KuduKey.KUDU_MASTER_ADDRESSES, REQUIRED_VALUE);
             long timeout = config.getInt(KuduKey.KUDU_TIMEOUT, DEFAULT_TIME_OUT) * 1000L;
             // write back default value with ms unit
             this.config.set(KuduKey.KUDU_TIMEOUT, timeout);
@@ -63,14 +66,14 @@ public class KuduWriter
             KuduHelper kuduHelper = new KuduHelper(masterAddress, timeout);
             // check table exists or not
             if (!kuduHelper.isTableExists(tableName)) {
-                throw AddaxException.asAddaxException(KuduWriterErrorCode.TABLE_NOT_EXISTS, "table '" + tableName + "' does not exists");
+                throw AddaxException.asAddaxException(CONFIG_ERROR, "table '" + tableName + "' does not exists");
             }
 
             // column check
             List<String> columns = this.config.getList(KuduKey.COLUMN, String.class);
             if (null == columns || columns.isEmpty()) {
                 throw AddaxException.asAddaxException(
-                        KuduWriterErrorCode.REQUIRED_VALUE, "the configuration 'column' must be specified"
+                        REQUIRED_VALUE, "the configuration 'column' must be specified"
                 );
             }
 
@@ -85,7 +88,7 @@ public class KuduWriter
                 final Schema schema = kuduHelper.getSchema(tableName);
                 for (String column : columns) {
                     if (schema.getColumn(column) == null) {
-                        throw AddaxException.asAddaxException(KuduWriterErrorCode.COLUMN_NOT_EXISTS, "column '" + column + "' does not exists");
+                        throw AddaxException.asAddaxException(CONFIG_ERROR, "column '" + column + "' does not exists");
                     }
                 }
             }

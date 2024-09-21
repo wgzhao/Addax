@@ -59,6 +59,8 @@ import static com.wgzhao.addax.common.base.Key.PASSWORD;
 import static com.wgzhao.addax.common.base.Key.PRE_SQL;
 import static com.wgzhao.addax.common.base.Key.USERNAME;
 import static com.wgzhao.addax.common.base.Key.WRITE_MODE;
+import static com.wgzhao.addax.common.exception.CommonErrorCode.ILLEGAL_VALUE;
+import static com.wgzhao.addax.common.exception.CommonErrorCode.REQUIRED_VALUE;
 
 public class MongoDBWriter
         extends Writer
@@ -91,18 +93,18 @@ public class MongoDBWriter
         {
             super.prepare();
             // parameters check
-            originalConfig.getNecessaryValue(CONNECTION, MongoDBWriterErrorCode.REQUIRED_VALUE);
+            originalConfig.getNecessaryValue(CONNECTION, REQUIRED_VALUE);
             Configuration connConf = Configuration.from(originalConfig.getList(CONNECTION, Object.class).get(0).toString());
             List<Object> address = connConf.getList(KeyConstant.MONGO_ADDRESS, Object.class);
             if (address == null || address.isEmpty()) {
                 throw AddaxException.asAddaxException(
-                        MongoDBWriterErrorCode.ILLEGAL_VALUE,
+                        ILLEGAL_VALUE,
                         "The configuration address is illegal, please check your json file:"
                 );
             }
 
-            String dbName = connConf.getNecessaryValue(DATABASE, MongoDBWriterErrorCode.REQUIRED_VALUE);
-            String collection = connConf.getNecessaryValue(KeyConstant.MONGO_COLLECTION_NAME, MongoDBWriterErrorCode.REQUIRED_VALUE);
+            String dbName = connConf.getNecessaryValue(DATABASE, REQUIRED_VALUE);
+            String collection = connConf.getNecessaryValue(KeyConstant.MONGO_COLLECTION_NAME, REQUIRED_VALUE);
             String username = connConf.getString(USERNAME);
             String password = connConf.getString(PASSWORD);
             if (password != null && password.startsWith(Constant.ENC_PASSWORD_PREFIX)) {
@@ -210,7 +212,7 @@ public class MongoDBWriter
             this.writeMode = writerSliceConfig.getString(WRITE_MODE, "insert");
             if (this.writeMode.startsWith("update")) {
                 if (!this.writeMode.contains("(")) {
-                    throw AddaxException.asAddaxException(MongoDBWriterErrorCode.ILLEGAL_VALUE,
+                    throw AddaxException.asAddaxException(ILLEGAL_VALUE,
                             "When specifying the mode is update, you MUST both specify the field to be updated");
                 }
                 this.updateKey = this.writeMode.split("\\(")[1].replace(")", "");
@@ -279,8 +281,8 @@ public class MongoDBWriter
                             else if (KeyConstant.isArrayType(type.toLowerCase())) {
                                 String splitter = columnMeta.getJSONObject(i).getString(KeyConstant.COLUMN_SPLITTER);
                                 if (isNullOrEmpty((splitter))) {
-                                    throw AddaxException.asAddaxException(MongoDBWriterErrorCode.ILLEGAL_VALUE,
-                                            MongoDBWriterErrorCode.ILLEGAL_VALUE.getDescription());
+                                    throw AddaxException.asAddaxException(ILLEGAL_VALUE,
+                                            ILLEGAL_VALUE.getDescription());
                                 }
                                 String itemType = columnMeta.getJSONObject(i).getString(KeyConstant.ITEM_TYPE);
                                 if (itemType != null && !itemType.isEmpty()) {

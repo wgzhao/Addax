@@ -48,6 +48,11 @@ import java.util.Set;
 import static com.wgzhao.addax.common.base.Key.HAVE_KERBEROS;
 import static com.wgzhao.addax.common.base.Key.KERBEROS_KEYTAB_FILE_PATH;
 import static com.wgzhao.addax.common.base.Key.KERBEROS_PRINCIPAL;
+import static com.wgzhao.addax.common.exception.CommonErrorCode.CONFIG_ERROR;
+import static com.wgzhao.addax.common.exception.CommonErrorCode.IO_ERROR;
+import static com.wgzhao.addax.common.exception.CommonErrorCode.LOGIN_ERROR;
+import static com.wgzhao.addax.common.exception.CommonErrorCode.NOT_SUPPORT_TYPE;
+import static com.wgzhao.addax.common.exception.CommonErrorCode.RUNTIME_ERROR;
 
 public class HdfsHelper
 {
@@ -94,12 +99,12 @@ public class HdfsHelper
             String message = String.format("Network IO exception occurred while obtaining Filesystem with defaultFS: [%s]",
                     defaultFS);
             LOG.error(message);
-            throw AddaxException.asAddaxException(HdfsWriterErrorCode.CONNECT_HDFS_IO_ERROR, e);
+            throw AddaxException.asAddaxException(IO_ERROR, e);
         }
         catch (Exception e) {
             String message = String.format("Failed to obtain Filesystem with defaultFS: [%s]", defaultFS);
             LOG.error(message);
-            throw AddaxException.asAddaxException(HdfsWriterErrorCode.CONNECT_HDFS_IO_ERROR, e);
+            throw AddaxException.asAddaxException(RUNTIME_ERROR, e);
         }
     }
 
@@ -114,7 +119,7 @@ public class HdfsHelper
                 String message = String.format("kerberos authentication failed, keytab file: [%s], principal: [%s]",
                         kerberosKeytabFilePath, kerberosPrincipal);
                 LOG.error(message);
-                throw AddaxException.asAddaxException(HdfsWriterErrorCode.KERBEROS_LOGIN_ERROR, e);
+                throw AddaxException.asAddaxException(LOGIN_ERROR, e);
             }
         }
     }
@@ -140,7 +145,7 @@ public class HdfsHelper
         catch (IOException e) {
             String message = String.format("Network IO exception occurred while fetching file list for directory [%s]", dir);
             LOG.error(message);
-            throw AddaxException.asAddaxException(HdfsWriterErrorCode.CONNECT_HDFS_IO_ERROR, e);
+            throw AddaxException.asAddaxException(IO_ERROR, e);
         }
         return files;
     }
@@ -154,7 +159,7 @@ public class HdfsHelper
         }
         catch (IOException e) {
             LOG.error("Network IO exception occurred while checking if file path [{}] exists", filePath);
-            throw AddaxException.asAddaxException(HdfsWriterErrorCode.CONNECT_HDFS_IO_ERROR, e);
+            throw AddaxException.asAddaxException(IO_ERROR, e);
         }
         return exist;
     }
@@ -168,7 +173,7 @@ public class HdfsHelper
         }
         catch (IOException e) {
             LOG.error("Network IO exception occurred while checking if path [{}] is directory or not.", filePath);
-            throw AddaxException.asAddaxException(HdfsWriterErrorCode.CONNECT_HDFS_IO_ERROR, e);
+            throw AddaxException.asAddaxException(IO_ERROR, e);
         }
         return isDir;
     }
@@ -197,10 +202,10 @@ public class HdfsHelper
             }
         }
         catch (FileNotFoundException fileNotFoundException) {
-            throw new AddaxException(HdfsWriterErrorCode.FILE_NOT_FOUND, fileNotFoundException.getMessage());
+            throw new AddaxException(CONFIG_ERROR, fileNotFoundException.getMessage());
         }
         catch (IOException ioException) {
-            throw new AddaxException(HdfsWriterErrorCode.IO_ERROR, ioException.getMessage());
+            throw new AddaxException(IO_ERROR, ioException.getMessage());
         }
     }
 
@@ -212,9 +217,9 @@ public class HdfsHelper
                 fileSystem.delete(path, true);
             }
         }
-        catch (Exception e) {
+        catch (IOException e) {
             LOG.error("IO exception occurred while delete temporary directory [{}].", path);
-            throw AddaxException.asAddaxException(HdfsWriterErrorCode.CONNECT_HDFS_IO_ERROR, e);
+            throw AddaxException.asAddaxException(IO_ERROR, e);
         }
         LOG.info("Finish deleting temporary dir [{}] .", path);
     }
@@ -237,7 +242,7 @@ public class HdfsHelper
             }
         }
         catch (IOException e) {
-            throw AddaxException.asAddaxException(HdfsWriterErrorCode.IO_ERROR, e);
+            throw AddaxException.asAddaxException(IO_ERROR, e);
         }
         LOG.info("Finish moving file(s).");
     }
@@ -250,7 +255,7 @@ public class HdfsHelper
         }
         catch (IOException e) {
             LOG.error("IO exception occurred while closing Filesystem.");
-            throw AddaxException.asAddaxException(HdfsWriterErrorCode.CONNECT_HDFS_IO_ERROR, e);
+            throw AddaxException.asAddaxException(IO_ERROR, e);
         }
     }
 
@@ -280,7 +285,7 @@ public class HdfsHelper
                 codecClass = org.apache.hadoop.io.compress.DeflateCodec.class;
                 break;
             default:
-                throw AddaxException.asAddaxException(HdfsWriterErrorCode.ILLEGAL_VALUE,
+                throw AddaxException.asAddaxException(NOT_SUPPORT_TYPE,
                         String.format("The compress mode [%s} is unsupported yet.", compress));
         }
         return codecClass;

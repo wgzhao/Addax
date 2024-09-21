@@ -34,6 +34,10 @@ import java.util.Base64;
 import java.util.List;
 import java.util.StringJoiner;
 
+import static com.wgzhao.addax.common.exception.CommonErrorCode.IO_ERROR;
+import static com.wgzhao.addax.common.exception.CommonErrorCode.NOT_SUPPORT_TYPE;
+import static com.wgzhao.addax.common.exception.CommonErrorCode.RUNTIME_ERROR;
+
 public class OrcWriter
         extends HdfsHelper
         implements IHDFSWriter
@@ -131,7 +135,7 @@ public class OrcWriter
                     default:
                         throw AddaxException
                                 .asAddaxException(
-                                        HdfsWriterErrorCode.ILLEGAL_VALUE,
+                                        NOT_SUPPORT_TYPE,
                                         String.format("The columns configuration is incorrect. the field type is unsupported yet. Field name: [%s], Field type name:[%s].",
                                                 eachColumnConf.getString(Key.NAME),
                                                 eachColumnConf.getString(Key.TYPE)));
@@ -139,7 +143,7 @@ public class OrcWriter
             }
             catch (Exception e) {
                 taskPluginCollector.collectDirtyRecord(record, e.getMessage());
-                throw AddaxException.asAddaxException(HdfsWriterErrorCode.ILLEGAL_VALUE,
+                throw AddaxException.asAddaxException(RUNTIME_ERROR,
                         String.format("Failed to set ORC row, source field type: %s, destination field original type: %s, " +
                                         "destination field hive type: %s, field name: %s, source field value: %s, root cause:%n%s",
                                 record.getColumn(i).getType(), columnType, eachColumnConf.getString(Key.TYPE),
@@ -190,7 +194,7 @@ public class OrcWriter
             logger.error("IO exception occurred while writing file [{}}.", fileName);
             Path path = new Path(fileName);
             deleteDir(path.getParent());
-            throw AddaxException.asAddaxException(HdfsWriterErrorCode.Write_FILE_IO_ERROR, e);
+            throw AddaxException.asAddaxException(IO_ERROR, e);
         }
     }
 }

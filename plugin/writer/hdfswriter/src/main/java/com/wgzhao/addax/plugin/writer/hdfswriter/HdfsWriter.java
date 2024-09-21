@@ -45,6 +45,9 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
+import static com.wgzhao.addax.common.exception.CommonErrorCode.ILLEGAL_VALUE;
+import static com.wgzhao.addax.common.exception.CommonErrorCode.REQUIRED_VALUE;
+
 public class HdfsWriter
         extends Writer
 {
@@ -81,38 +84,38 @@ public class HdfsWriter
 
         private void validateParameter()
         {
-            String defaultFS = this.writerSliceConfig.getNecessaryValue(Key.DEFAULT_FS, HdfsWriterErrorCode.REQUIRED_VALUE);
+            String defaultFS = this.writerSliceConfig.getNecessaryValue(Key.DEFAULT_FS, REQUIRED_VALUE);
             //fileType check
-            String fileType = this.writerSliceConfig.getNecessaryValue(Key.FILE_TYPE, HdfsWriterErrorCode.REQUIRED_VALUE).toUpperCase();
+            String fileType = this.writerSliceConfig.getNecessaryValue(Key.FILE_TYPE, REQUIRED_VALUE).toUpperCase();
             if (!SUPPORT_FORMAT.contains(fileType)) {
                 String message = String.format("The file format [%s] is supported yet,  the plugin currently only supports: [%s].", fileType, SUPPORT_FORMAT);
-                throw AddaxException.asAddaxException(HdfsWriterErrorCode.ILLEGAL_VALUE, message);
+                throw AddaxException.asAddaxException(ILLEGAL_VALUE, message);
             }
             //path
-            this.path = this.writerSliceConfig.getNecessaryValue(Key.PATH, HdfsWriterErrorCode.REQUIRED_VALUE);
+            this.path = this.writerSliceConfig.getNecessaryValue(Key.PATH, REQUIRED_VALUE);
             if (!path.startsWith("/")) {
                 String message = String.format("The path [%s] must be configured as an absolute path.", path);
                 LOG.error(message);
-                throw AddaxException.asAddaxException(HdfsWriterErrorCode.ILLEGAL_VALUE, message);
+                throw AddaxException.asAddaxException(ILLEGAL_VALUE, message);
             }
             if (path.contains("*") || path.contains("?")) {
                 String message = String.format("The path [%s] cannot contain special characters like '*','?'.", path);
                 LOG.error(message);
-                throw AddaxException.asAddaxException(HdfsWriterErrorCode.ILLEGAL_VALUE, message);
+                throw AddaxException.asAddaxException(ILLEGAL_VALUE, message);
             }
             //fileName
-            this.fileName = this.writerSliceConfig.getNecessaryValue(Key.FILE_NAME, HdfsWriterErrorCode.REQUIRED_VALUE);
+            this.fileName = this.writerSliceConfig.getNecessaryValue(Key.FILE_NAME, REQUIRED_VALUE);
             //columns check
             List<Configuration> columns = this.writerSliceConfig.getListConfiguration(Key.COLUMN);
             if (null == columns || columns.isEmpty()) {
-                throw AddaxException.asAddaxException(HdfsWriterErrorCode.REQUIRED_VALUE, "The item columns should be configured");
+                throw AddaxException.asAddaxException(REQUIRED_VALUE, "The item columns should be configured");
             }
             else {
                 boolean rewriteFlag = false;
                 for (int i = 0; i < columns.size(); i++) {
                     Configuration eachColumnConf = columns.get(i);
-                    eachColumnConf.getNecessaryValue(Key.NAME, HdfsWriterErrorCode.COLUMN_REQUIRED_VALUE);
-                    eachColumnConf.getNecessaryValue(Key.TYPE, HdfsWriterErrorCode.COLUMN_REQUIRED_VALUE);
+                    eachColumnConf.getNecessaryValue(Key.NAME, REQUIRED_VALUE);
+                    eachColumnConf.getNecessaryValue(Key.TYPE, REQUIRED_VALUE);
                     if (eachColumnConf.getString(Key.TYPE).toUpperCase().startsWith("DECIMAL")) {
                         String type = eachColumnConf.getString(Key.TYPE);
                         eachColumnConf.set(Key.TYPE, "decimal");
@@ -127,9 +130,9 @@ public class HdfsWriter
                 }
             }
             //writeMode check
-            this.writeMode = this.writerSliceConfig.getNecessaryValue(Key.WRITE_MODE, HdfsWriterErrorCode.REQUIRED_VALUE);
+            this.writeMode = this.writerSliceConfig.getNecessaryValue(Key.WRITE_MODE, REQUIRED_VALUE);
             if (!Constant.SUPPORTED_WRITE_MODE.contains(writeMode)) {
-                throw AddaxException.asAddaxException(HdfsWriterErrorCode.ILLEGAL_VALUE,
+                throw AddaxException.asAddaxException(ILLEGAL_VALUE,
                         String.format("The item writeMode only supports append, noConflict and overwrite, [%s] is unsupported yet.",
                                 writeMode));
             }
@@ -137,13 +140,13 @@ public class HdfsWriter
                 //fieldDelimiter check
                 String fieldDelimiter = this.writerSliceConfig.getString(Key.FIELD_DELIMITER, null);
                 if (StringUtils.isEmpty(fieldDelimiter)) {
-                    throw AddaxException.asAddaxException(HdfsWriterErrorCode.REQUIRED_VALUE,
+                    throw AddaxException.asAddaxException(REQUIRED_VALUE,
                             String.format("The item [%s] should be configured and valid while write TEXT file.", Key.FIELD_DELIMITER));
                 }
 
                 if (1 != fieldDelimiter.length()) {
                     // warn: if it has, length must be one
-                    throw AddaxException.asAddaxException(HdfsWriterErrorCode.ILLEGAL_VALUE,
+                    throw AddaxException.asAddaxException(ILLEGAL_VALUE,
                             String.format("The field delimiter is only support single character, your configure: [%s]", fieldDelimiter));
                 }
             }
@@ -155,7 +158,7 @@ public class HdfsWriter
                     CompressionKind.valueOf(compress);
                 }
                 catch (IllegalArgumentException e) {
-                    throw AddaxException.asAddaxException(HdfsWriterErrorCode.ILLEGAL_VALUE,
+                    throw AddaxException.asAddaxException(ILLEGAL_VALUE,
                             String.format("The ORC format only supports [%s] compression. your configure [%s] is unsupported yet.",
                                     Arrays.toString(CompressionKind.values()), compress));
                 }
@@ -169,7 +172,7 @@ public class HdfsWriter
                     CompressionCodecName.fromConf(compress);
                 }
                 catch (Exception e) {
-                    throw AddaxException.asAddaxException(HdfsWriterErrorCode.ILLEGAL_VALUE,
+                    throw AddaxException.asAddaxException(ILLEGAL_VALUE,
                             String.format("The PARQUET format only supports [%s] compression. your configure [%s] is unsupported yet.",
                                     Arrays.toString(CompressionCodecName.values()), compress));
                 }
@@ -178,8 +181,8 @@ public class HdfsWriter
             //Kerberos check
             boolean haveKerberos = this.writerSliceConfig.getBool(Key.HAVE_KERBEROS, false);
             if (haveKerberos) {
-                this.writerSliceConfig.getNecessaryValue(Key.KERBEROS_KEYTAB_FILE_PATH, HdfsWriterErrorCode.REQUIRED_VALUE);
-                this.writerSliceConfig.getNecessaryValue(Key.KERBEROS_PRINCIPAL, HdfsWriterErrorCode.REQUIRED_VALUE);
+                this.writerSliceConfig.getNecessaryValue(Key.KERBEROS_KEYTAB_FILE_PATH, REQUIRED_VALUE);
+                this.writerSliceConfig.getNecessaryValue(Key.KERBEROS_PRINCIPAL, REQUIRED_VALUE);
             }
             // encoding check
             String encoding = this.writerSliceConfig.getString(Key.ENCODING, Constant.DEFAULT_ENCODING);
@@ -189,7 +192,7 @@ public class HdfsWriter
                 Charsets.toCharset(encoding);
             }
             catch (Exception e) {
-                throw AddaxException.asAddaxException(HdfsWriterErrorCode.ILLEGAL_VALUE,
+                throw AddaxException.asAddaxException(ILLEGAL_VALUE,
                         String.format("The encoding [%s] is unsupported yet.", encoding), e);
             }
 
@@ -206,7 +209,7 @@ public class HdfsWriter
             // Verify whether the path is a directory if it exists.
             if (hdfsHelper.isPathExists(path)) {
                 if (!hdfsHelper.isPathDir(path)) {
-                    throw AddaxException.asAddaxException(HdfsWriterErrorCode.ILLEGAL_VALUE,
+                    throw AddaxException.asAddaxException(ILLEGAL_VALUE,
                             String.format("The item path you configured [%s] is exists ,but it is not directory", path));
                 }
 
@@ -218,19 +221,19 @@ public class HdfsWriter
                             "Files with the prefix [{}] are written in the [{}] directory.", fileName, path);
                 }
                 else if ("nonConflict".equals(writeMode) && isExistFile) {
-                    throw AddaxException.asAddaxException(HdfsWriterErrorCode.ILLEGAL_VALUE,
+                    throw AddaxException.asAddaxException(ILLEGAL_VALUE,
                             String.format("The current writeMode is set to 'nonConflict', but the directory [%s] is not empty, it includes the sub-path(s): [%s]",
                                     path, String.join(",", Arrays.stream(existFilePaths).map(Path::getName).collect(Collectors.toSet()))));
                 }
             }
             else {
-                throw AddaxException.asAddaxException(HdfsWriterErrorCode.ILLEGAL_VALUE,
+                throw AddaxException.asAddaxException(ILLEGAL_VALUE,
                         String.format("The directory [%s]  does not exists. please create it first. ", path));
             }
 
             // validate the write permission
             if (!hdfsHelper.isPathWritable(path)) {
-                throw AddaxException.asAddaxException(HdfsWriterErrorCode.ILLEGAL_VALUE,
+                throw AddaxException.asAddaxException(ILLEGAL_VALUE,
                         String.format("The path [%s] is not writable or permission denied", path));
             }
         }
@@ -400,7 +403,7 @@ public class HdfsWriter
                     hdfsHelper = new ParquetWriter(this.writerSliceConfig);
                     break;
                 default:
-                    throw AddaxException.asAddaxException(HdfsWriterErrorCode.ILLEGAL_VALUE,
+                    throw AddaxException.asAddaxException(ILLEGAL_VALUE,
                             String.format("The file format [%s] is supported yet,  the plugin currently only supports: [%s].", fileType, Job.SUPPORT_FORMAT));
             }
             //得当的已经是绝对路径，eg：/user/hive/warehouse/writer.db/text/test.snappy

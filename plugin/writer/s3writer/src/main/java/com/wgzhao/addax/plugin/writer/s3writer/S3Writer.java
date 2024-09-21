@@ -41,6 +41,11 @@ import java.util.StringJoiner;
 import java.util.UUID;
 import java.util.function.Consumer;
 
+import static com.wgzhao.addax.common.exception.CommonErrorCode.ILLEGAL_VALUE;
+import static com.wgzhao.addax.common.exception.CommonErrorCode.IO_ERROR;
+import static com.wgzhao.addax.common.exception.CommonErrorCode.REQUIRED_VALUE;
+import static com.wgzhao.addax.common.exception.CommonErrorCode.RUNTIME_ERROR;
+
 public class S3Writer
         extends Writer
 {
@@ -70,11 +75,11 @@ public class S3Writer
 
         private void validateParameter()
         {
-            this.writerSliceConfig.getNecessaryValue(S3Key.REGION, S3WriterErrorCode.REQUIRED_VALUE);
-            this.writerSliceConfig.getNecessaryValue(S3Key.ACCESS_ID, S3WriterErrorCode.REQUIRED_VALUE);
-            this.writerSliceConfig.getNecessaryValue(S3Key.ACCESS_KEY, S3WriterErrorCode.REQUIRED_VALUE);
-            this.writerSliceConfig.getNecessaryValue(S3Key.BUCKET, S3WriterErrorCode.REQUIRED_VALUE);
-            this.writerSliceConfig.getNecessaryValue(S3Key.OBJECT, S3WriterErrorCode.REQUIRED_VALUE);
+            this.writerSliceConfig.getNecessaryValue(S3Key.REGION, REQUIRED_VALUE);
+            this.writerSliceConfig.getNecessaryValue(S3Key.ACCESS_ID, REQUIRED_VALUE);
+            this.writerSliceConfig.getNecessaryValue(S3Key.ACCESS_KEY, REQUIRED_VALUE);
+            this.writerSliceConfig.getNecessaryValue(S3Key.BUCKET, REQUIRED_VALUE);
+            this.writerSliceConfig.getNecessaryValue(S3Key.OBJECT, REQUIRED_VALUE);
 
             StorageWriterUtil.validateParameter(this.writerSliceConfig);
         }
@@ -97,7 +102,7 @@ public class S3Writer
                 List<S3Object> objs = listObjects(bucket, object);
                 if (!objs.isEmpty()) {
                     LOG.error("There have {} objects starts with {} in  bucket {} ", objs.size(), object, bucket);
-                    throw AddaxException.asAddaxException(S3WriterErrorCode.ILLEGAL_VALUE, "Object conflict");
+                    throw AddaxException.asAddaxException(ILLEGAL_VALUE, "Object conflict");
                 }
             }
         }
@@ -199,7 +204,7 @@ public class S3Writer
                     s3Client.deleteObjects(dor);
                 }
                 catch (S3Exception e) {
-                    throw AddaxException.asAddaxException(S3WriterErrorCode.S3_COMM_ERROR, e.getMessage());
+                    throw AddaxException.asAddaxException(RUNTIME_ERROR, e.getMessage());
                 }
             }
         }
@@ -295,7 +300,7 @@ public class S3Writer
                     }
                 }
                 catch (IOException e) {
-                    throw AddaxException.asAddaxException(S3WriterErrorCode.S3_COMM_ERROR, e.getMessage());
+                    throw AddaxException.asAddaxException(IO_ERROR, e.getMessage());
                 }
             }
             // remain bytes

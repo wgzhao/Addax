@@ -51,6 +51,12 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import static com.wgzhao.addax.common.exception.CommonErrorCode.CONNECT_ERROR;
+import static com.wgzhao.addax.common.exception.CommonErrorCode.EXECUTE_FAIL;
+import static com.wgzhao.addax.common.exception.CommonErrorCode.ILLEGAL_VALUE;
+import static com.wgzhao.addax.common.exception.CommonErrorCode.LOGIN_ERROR;
+import static com.wgzhao.addax.common.exception.CommonErrorCode.PERMISSION_ERROR;
+
 /**
  * @author yanghan.y
  */
@@ -128,7 +134,7 @@ public class HbaseSQLHelper
             schema = getTableSchema(conn, cfg.getNamespace(), cfg.getTableName(), cfg.isThinClient());
         }
         catch (SQLException e) {
-            throw AddaxException.asAddaxException(HbaseSQLWriterErrorCode.GET_HBASE_CONNECTION_ERROR,
+            throw AddaxException.asAddaxException(CONNECT_ERROR,
                     "Unable to get the metadata of table " + cfg.getTableName(), e);
         }
         List<String> columnNames = cfg.getColumns();
@@ -140,12 +146,12 @@ public class HbaseSQLHelper
         }
         catch (ColumnNotFoundException e) {
             // 用户配置的列名在元数据中不存在
-            throw AddaxException.asAddaxException(HbaseSQLWriterErrorCode.ILLEGAL_VALUE,
+            throw AddaxException.asAddaxException(ILLEGAL_VALUE,
                     "The column '" + e.getColumnName() + "' your configured does not exists in the target table "  + cfg.getTableName(), e);
         }
         catch (SQLException e) {
             // 列名有二义性或者其他问题
-            throw AddaxException.asAddaxException(HbaseSQLWriterErrorCode.ILLEGAL_VALUE,
+            throw AddaxException.asAddaxException(ILLEGAL_VALUE,
                     "The column validation of target table " + cfg.getTableName() + "has got failure", e);
         }
     }
@@ -180,7 +186,7 @@ public class HbaseSQLHelper
             conn.setAutoCommit(false);
         }
         catch (Throwable e) {
-            throw AddaxException.asAddaxException(HbaseSQLWriterErrorCode.GET_HBASE_CONNECTION_ERROR,
+            throw AddaxException.asAddaxException(CONNECT_ERROR,
                     "Unable to connect to hbase cluster, please check the configuration and cluster status ", e);
         }
         LOG.debug("Connected to HBase cluster successfully.");
@@ -198,7 +204,7 @@ public class HbaseSQLHelper
                 String message = String.format("Kerberos authentication failed, please make sure that kerberosKeytabFilePath[%s] and kerberosPrincipal[%s] are correct",
                         kerberosKeytabFilePath, kerberosPrincipal);
                 LOG.error(message);
-                throw AddaxException.asAddaxException(HbaseSQLWriterErrorCode.KERBEROS_LOGIN_ERROR, e);
+                throw AddaxException.asAddaxException(LOGIN_ERROR, e);
             }
         }
     }
@@ -222,7 +228,7 @@ public class HbaseSQLHelper
             return conn;
         }
         catch (Exception e) {
-            throw AddaxException.asAddaxException(HbaseSQLWriterErrorCode.GET_HBASE_CONNECTION_ERROR,
+            throw AddaxException.asAddaxException(CONNECT_ERROR,
                     "Can not connection to the namespace.", e);
         }
     }
@@ -331,7 +337,7 @@ public class HbaseSQLHelper
         }
         catch (Throwable t) {
             // 清空表失败
-            throw AddaxException.asAddaxException(HbaseSQLWriterErrorCode.TRUNCATE_HBASE_ERROR,
+            throw AddaxException.asAddaxException(EXECUTE_FAIL,
                     "Failed to truncate " + tableName + ".", t);
         }
         finally {
@@ -373,7 +379,7 @@ public class HbaseSQLHelper
             checkTable(admin, getTableName(tableName));
         }
         catch (SQLException | IOException t) {
-            throw AddaxException.asAddaxException(HbaseSQLWriterErrorCode.TRUNCATE_HBASE_ERROR,
+            throw AddaxException.asAddaxException(EXECUTE_FAIL,
                     "The table " + tableName + "status check failed, please check the HBase cluster status.", t);
         }
         finally {
@@ -387,15 +393,15 @@ public class HbaseSQLHelper
             throws IOException
     {
         if (!admin.tableExists(tableName)) {
-            throw AddaxException.asAddaxException(HbaseSQLWriterErrorCode.ILLEGAL_VALUE,
+            throw AddaxException.asAddaxException(ILLEGAL_VALUE,
                     "The hbase table " + tableName + "doest not exists.");
         }
         if (!admin.isTableAvailable(tableName)) {
-            throw AddaxException.asAddaxException(HbaseSQLWriterErrorCode.ILLEGAL_VALUE,
+            throw AddaxException.asAddaxException(ILLEGAL_VALUE,
                     "The hbase table" + tableName + "is unavailable.");
         }
         if (admin.isTableDisabled(tableName)) {
-            throw AddaxException.asAddaxException(HbaseSQLWriterErrorCode.ILLEGAL_VALUE,
+            throw AddaxException.asAddaxException(ILLEGAL_VALUE,
                     "The hbase table " + tableName + "is disabled at current, please enable it before using");
         }
         LOG.info("table {} exists", tableName);
@@ -409,7 +415,7 @@ public class HbaseSQLHelper
             }
         }
         catch (IOException e) {
-            throw AddaxException.asAddaxException(HbaseSQLWriterErrorCode.CLOSE_HBASE_AMIN_ERROR, e);
+            throw AddaxException.asAddaxException(PERMISSION_ERROR, e);
         }
     }
 

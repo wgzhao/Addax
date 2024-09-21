@@ -42,6 +42,12 @@ import static com.wgzhao.addax.common.base.Key.ENCODING;
 import static com.wgzhao.addax.common.base.Key.INDEX;
 import static com.wgzhao.addax.common.base.Key.TYPE;
 import static com.wgzhao.addax.common.base.Key.VALUE;
+import static com.wgzhao.addax.common.exception.CommonErrorCode.CONFIG_ERROR;
+import static com.wgzhao.addax.common.exception.CommonErrorCode.EXECUTE_FAIL;
+import static com.wgzhao.addax.common.exception.CommonErrorCode.ILLEGAL_VALUE;
+import static com.wgzhao.addax.common.exception.CommonErrorCode.NOT_SUPPORT_TYPE;
+import static com.wgzhao.addax.common.exception.CommonErrorCode.REQUIRED_VALUE;
+import static com.wgzhao.addax.common.exception.CommonErrorCode.RUNTIME_ERROR;
 
 public class HdfsReader
         extends Reader
@@ -82,30 +88,30 @@ public class HdfsReader
 
         public void validate()
         {
-            readerOriginConfig.getNecessaryValue(Key.DEFAULT_FS, HdfsReaderErrorCode.DEFAULT_FS_NOT_FIND_ERROR);
+            readerOriginConfig.getNecessaryValue(Key.DEFAULT_FS, CONFIG_ERROR);
 
             // path check
-            String pathInString = readerOriginConfig.getNecessaryValue(Key.PATH, HdfsReaderErrorCode.REQUIRED_VALUE);
+            String pathInString = readerOriginConfig.getNecessaryValue(Key.PATH, REQUIRED_VALUE);
             if (!pathInString.startsWith("[") && !pathInString.endsWith("]")) {
                 path = Collections.singletonList(pathInString);
             }
             else {
                 path = readerOriginConfig.getList(Key.PATH, String.class);
                 if (null == path || path.isEmpty()) {
-                    throw AddaxException.asAddaxException(HdfsReaderErrorCode.REQUIRED_VALUE, "The item path is required.");
+                    throw AddaxException.asAddaxException(REQUIRED_VALUE, "The item path is required.");
                 }
                 for (String eachPath : path) {
                     if (!eachPath.startsWith("/")) {
                         String message = String.format("The item path [%s] should be a absolute path.", eachPath);
                         LOG.error(message);
-                        throw AddaxException.asAddaxException(HdfsReaderErrorCode.ILLEGAL_VALUE, message);
+                        throw AddaxException.asAddaxException(ILLEGAL_VALUE, message);
                     }
                 }
             }
 
-            specifiedFileType = readerOriginConfig.getNecessaryValue(Key.FILE_TYPE, HdfsReaderErrorCode.REQUIRED_VALUE).toUpperCase();
+            specifiedFileType = readerOriginConfig.getNecessaryValue(Key.FILE_TYPE, REQUIRED_VALUE).toUpperCase();
             if (!HdfsConstant.SUPPORT_FILE_TYPE.contains(specifiedFileType)) {
-                throw AddaxException.asAddaxException(HdfsReaderErrorCode.FILE_TYPE_ERROR,
+                throw AddaxException.asAddaxException(NOT_SUPPORT_TYPE,
                         "The file type only supports " + HdfsConstant.SUPPORT_FILE_TYPE + " but not " + specifiedFileType);
             }
 
@@ -116,18 +122,18 @@ public class HdfsReader
             }
             catch (UnsupportedCharsetException uce) {
                 throw AddaxException.asAddaxException(
-                        HdfsReaderErrorCode.ILLEGAL_VALUE,
+                        ILLEGAL_VALUE,
                         "The encoding [" +  encoding + "] is unsupported.", uce);
             }
             catch (Exception e) {
                 throw AddaxException.asAddaxException(
-                        HdfsReaderErrorCode.ILLEGAL_VALUE, "Exception occurred", e);
+                        ILLEGAL_VALUE, "Exception occurred", e);
             }
             //check Kerberos
             boolean haveKerberos = readerOriginConfig.getBool(Key.HAVE_KERBEROS, false);
             if (haveKerberos) {
-                readerOriginConfig.getNecessaryValue(Key.KERBEROS_KEYTAB_FILE_PATH, HdfsReaderErrorCode.REQUIRED_VALUE);
-                readerOriginConfig.getNecessaryValue(Key.KERBEROS_PRINCIPAL, HdfsReaderErrorCode.REQUIRED_VALUE);
+                readerOriginConfig.getNecessaryValue(Key.KERBEROS_KEYTAB_FILE_PATH, REQUIRED_VALUE);
+                readerOriginConfig.getNecessaryValue(Key.KERBEROS_PRINCIPAL, REQUIRED_VALUE);
             }
 
             // validate the Columns
@@ -155,23 +161,23 @@ public class HdfsReader
                 List<Configuration> columns = readerOriginConfig.getListConfiguration(COLUMN);
 
                 if (null == columns || columns.isEmpty()) {
-                    throw AddaxException.asAddaxException(HdfsReaderErrorCode.CONFIG_INVALID_EXCEPTION,
+                    throw AddaxException.asAddaxException(CONFIG_ERROR,
                             "The item columns is required.");
                 }
 
                 for (Configuration eachColumnConf : columns) {
-                    eachColumnConf.getNecessaryValue(TYPE, HdfsReaderErrorCode.REQUIRED_VALUE);
+                    eachColumnConf.getNecessaryValue(TYPE, REQUIRED_VALUE);
                     Integer columnIndex = eachColumnConf.getInt(INDEX);
                     String columnValue = eachColumnConf.getString(VALUE);
 
                     if (null == columnIndex && null == columnValue) {
                         throw AddaxException.asAddaxException(
-                                HdfsReaderErrorCode.NO_INDEX_VALUE,
+                                CONFIG_ERROR,
                                 "The index or value must have one, both of them are null.");
                     }
 
                     if (null != columnIndex && null != columnValue) {
-                        throw AddaxException.asAddaxException(HdfsReaderErrorCode.MIXED_INDEX_VALUE,
+                        throw AddaxException.asAddaxException(CONFIG_ERROR,
                                 "The index and value must have one, can not have both.");
                     }
                 }
@@ -195,7 +201,7 @@ public class HdfsReader
             // warn:每个slice拖且仅拖一个文件,
             int splitNumber = sourceFiles.size();
             if (0 == splitNumber) {
-                throw AddaxException.asAddaxException(HdfsReaderErrorCode.EMPTY_DIR_EXCEPTION,
+                throw AddaxException.asAddaxException(EXECUTE_FAIL,
                         "Can not find any file in path : [" + readerOriginConfig.getString(Key.PATH) + "]");
 
             }
@@ -239,7 +245,7 @@ public class HdfsReader
 
             this.taskConfig = getPluginJobConf();
             this.sourceFiles = taskConfig.getList(HdfsConstant.SOURCE_FILES, String.class);
-            this.specifiedFileType = taskConfig.getNecessaryValue(Key.FILE_TYPE, HdfsReaderErrorCode.REQUIRED_VALUE);
+            this.specifiedFileType = taskConfig.getNecessaryValue(Key.FILE_TYPE, REQUIRED_VALUE);
             this.dfsUtil = new DFSUtil(taskConfig);
         }
 
@@ -277,7 +283,7 @@ public class HdfsReader
                     dfsUtil.parquetFileStartRead(sourceFile, taskConfig, recordSender, getTaskPluginCollector());
                 }
                 else {
-                    throw AddaxException.asAddaxException(HdfsReaderErrorCode.FILE_TYPE_UNSUPPORTED,
+                    throw AddaxException.asAddaxException(NOT_SUPPORT_TYPE,
                             "The specifiedFileType: [" + specifiedFileType + "] is unsupported. "
                                     + "HdfsReader only support TEXT, CSV, ORC, SEQUENCE, RC, PARQUET now.");
                 }

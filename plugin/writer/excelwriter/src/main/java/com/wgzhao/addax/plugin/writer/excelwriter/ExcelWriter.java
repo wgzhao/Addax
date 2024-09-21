@@ -23,6 +23,13 @@ import java.util.List;
 import static com.wgzhao.addax.common.base.Key.FILE_NAME;
 import static com.wgzhao.addax.common.base.Key.HEADER;
 import static com.wgzhao.addax.common.base.Key.PATH;
+import static com.wgzhao.addax.common.exception.CommonErrorCode.CONFIG_ERROR;
+import static com.wgzhao.addax.common.exception.CommonErrorCode.EXECUTE_FAIL;
+import static com.wgzhao.addax.common.exception.CommonErrorCode.ILLEGAL_VALUE;
+import static com.wgzhao.addax.common.exception.CommonErrorCode.IO_ERROR;
+import static com.wgzhao.addax.common.exception.CommonErrorCode.NOT_SUPPORT_TYPE;
+import static com.wgzhao.addax.common.exception.CommonErrorCode.PERMISSION_ERROR;
+import static com.wgzhao.addax.common.exception.CommonErrorCode.REQUIRED_VALUE;
 
 public class ExcelWriter
     extends Writer
@@ -41,11 +48,11 @@ public class ExcelWriter
 
         private void validateParameter()
         {
-            this.conf.getNecessaryValue(PATH, ExcelWriterErrorCode.REQUIRED_VALUE);
-            String path = this.conf.getNecessaryValue(PATH, ExcelWriterErrorCode.REQUIRED_VALUE);
-            String fileName = this.conf.getNecessaryValue(FILE_NAME, ExcelWriterErrorCode.REQUIRED_VALUE);
+            this.conf.getNecessaryValue(PATH, REQUIRED_VALUE);
+            String path = this.conf.getNecessaryValue(PATH, REQUIRED_VALUE);
+            String fileName = this.conf.getNecessaryValue(FILE_NAME, REQUIRED_VALUE);
             if (fileName.endsWith(".xls")){
-                throw AddaxException.asAddaxException(ExcelWriterErrorCode.FILE_FORMAT_ERROR, "Only support new excel format file(.xlsx)");
+                throw AddaxException.asAddaxException(NOT_SUPPORT_TYPE, "Only support new excel format file(.xlsx)");
             }
             if (fileName.split("\\.").length == 1) {
                 // no suffix ?
@@ -55,18 +62,18 @@ public class ExcelWriter
                 // warn: 这里用户需要配一个目录
                 File dir = new File(path);
                 if (dir.isFile()) {
-                    throw AddaxException.asAddaxException(ExcelWriterErrorCode.ILLEGAL_VALUE, path + " is normal file instead of directory");
+                    throw AddaxException.asAddaxException(ILLEGAL_VALUE, path + " is normal file instead of directory");
                 }
                 if (!dir.exists()) {
                     boolean createdOk = dir.mkdirs();
                     if (!createdOk) {
-                        throw AddaxException.asAddaxException(ExcelWriterErrorCode.CONFIG_INVALID_EXCEPTION,
+                        throw AddaxException.asAddaxException(EXECUTE_FAIL,
                                "can not create directory '" + dir + "' failure");
                     }
                 }
             }
             catch (SecurityException se) {
-                throw AddaxException.asAddaxException(ExcelWriterErrorCode.SECURITY_NOT_ENOUGH,
+                throw AddaxException.asAddaxException(PERMISSION_ERROR,
                         "Create directory '" + path + "' failure: permission deny: ", se);
             }
         }
@@ -172,10 +179,10 @@ public class ExcelWriter
                 workbook.close();
             }
             catch (FileNotFoundException e) {
-                throw AddaxException.asAddaxException(ExcelWriterErrorCode.WRITE_FILE_ERROR, "No such file: " + filePath);
+                throw AddaxException.asAddaxException(CONFIG_ERROR, "No such file: " + filePath);
             }
             catch (IOException e) {
-                throw AddaxException.asAddaxException(ExcelWriterErrorCode.WRITE_FILE_IO_ERROR, "IOException occurred while writing to " + filePath);
+                throw AddaxException.asAddaxException(IO_ERROR, "IOException occurred while writing to " + filePath);
             }
         }
     }

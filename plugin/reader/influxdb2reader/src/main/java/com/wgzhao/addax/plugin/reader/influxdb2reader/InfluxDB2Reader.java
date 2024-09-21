@@ -46,6 +46,7 @@ import static com.wgzhao.addax.common.base.Key.CONNECTION;
 import static com.wgzhao.addax.common.base.Key.ENDPOINT;
 import static com.wgzhao.addax.common.base.Key.QUERY_SQL;
 import static com.wgzhao.addax.common.base.Key.TABLE;
+import static com.wgzhao.addax.common.exception.CommonErrorCode.REQUIRED_VALUE;
 
 public class InfluxDB2Reader
         extends Reader
@@ -72,13 +73,13 @@ public class InfluxDB2Reader
         @Override
         public void prepare()
         {
-            this.token = originalConfig.getNecessaryValue(InfluxDB2Key.TOKEN, InfluxDB2ReaderErrorCode.REQUIRED_VALUE);
-            originalConfig.getNecessaryValue(InfluxDB2Key.RANGE, InfluxDB2ReaderErrorCode.REQUIRED_VALUE);
+            this.token = originalConfig.getNecessaryValue(InfluxDB2Key.TOKEN, REQUIRED_VALUE);
+            originalConfig.getNecessaryValue(InfluxDB2Key.RANGE, REQUIRED_VALUE);
             this.range = originalConfig.getList(InfluxDB2Key.RANGE, String.class);
             Configuration connConf = Configuration.from(originalConfig.getList(CONNECTION, Object.class).get(0).toString());
-            this.endpoint = connConf.getNecessaryValue(InfluxDB2Key.ENDPOINT, InfluxDB2ReaderErrorCode.REQUIRED_VALUE);
-            this.bucket = connConf.getNecessaryValue(InfluxDB2Key.BUCKET, InfluxDB2ReaderErrorCode.REQUIRED_VALUE);
-            this.org = connConf.getNecessaryValue(InfluxDB2Key.ORG, InfluxDB2ReaderErrorCode.REQUIRED_VALUE);
+            this.endpoint = connConf.getNecessaryValue(InfluxDB2Key.ENDPOINT, REQUIRED_VALUE);
+            this.bucket = connConf.getNecessaryValue(InfluxDB2Key.BUCKET, REQUIRED_VALUE);
+            this.org = connConf.getNecessaryValue(InfluxDB2Key.ORG, REQUIRED_VALUE);
             this.tables = connConf.getList(TABLE, String.class);
             this.columns = originalConfig.getList(COLUMN, String.class);
 
@@ -132,7 +133,7 @@ public class InfluxDB2Reader
                         fluxColumns.add(map);
                     }
                     else {
-                        throw AddaxException.asAddaxException(InfluxDB2ReaderErrorCode.MISSING_COLUMN,
+                        throw AddaxException.asAddaxException(REQUIRED_VALUE,
                                 "The column '" + col + "' you specified doest not exists");
                     }
                 }

@@ -29,7 +29,7 @@ public enum CommonErrorCode
     ILLEGAL_VALUE("1002", "illegal parameter value"),
     CONFIG_ERROR("1003", "configuration error"),
 
-    PERMISSION_DENIED("2001", "permission denied"),
+    PERMISSION_ERROR("2001", "permission denied"),
     CONNECT_ERROR("2002", "connection error"),
     LOGIN_ERROR("2003", "login error"),
 

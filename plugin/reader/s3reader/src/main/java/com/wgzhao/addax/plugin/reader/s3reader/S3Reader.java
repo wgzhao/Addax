@@ -7,14 +7,10 @@ import com.wgzhao.addax.common.spi.Reader;
 import com.wgzhao.addax.common.util.Configuration;
 import com.wgzhao.addax.storage.reader.StorageReaderUtil;
 import org.apache.commons.io.Charsets;
-import org.apache.commons.io.IOUtils;
-import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import software.amazon.awssdk.services.s3.S3Client;
 import software.amazon.awssdk.services.s3.model.GetObjectRequest;
-import software.amazon.awssdk.services.s3.model.ListObjectsRequest;
-import software.amazon.awssdk.services.s3.model.ListObjectsResponse;
 import software.amazon.awssdk.services.s3.model.ListObjectsV2Request;
 import software.amazon.awssdk.services.s3.model.ListObjectsV2Response;
 import software.amazon.awssdk.services.s3.model.NoSuchKeyException;
@@ -26,7 +22,10 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Pattern;
 
-import static com.wgzhao.addax.plugin.reader.s3reader.S3ReaderErrorCode.REQUIRED_VALUE;
+import static com.wgzhao.addax.common.exception.CommonErrorCode.CONFIG_ERROR;
+import static com.wgzhao.addax.common.exception.CommonErrorCode.ILLEGAL_VALUE;
+import static com.wgzhao.addax.common.exception.CommonErrorCode.REQUIRED_VALUE;
+import static com.wgzhao.addax.common.exception.CommonErrorCode.RUNTIME_ERROR;
 
 public class S3Reader
         extends Reader
@@ -63,11 +62,11 @@ public class S3Reader
                 Charsets.toCharset(encoding);
             }
             catch (UnsupportedCharsetException uce) {
-                throw AddaxException.asAddaxException(S3ReaderErrorCode.ILLEGAL_VALUE,
+                throw AddaxException.asAddaxException(ILLEGAL_VALUE,
                         String.format("unsupported encoding : [%s]", encoding), uce);
             }
             catch (Exception e) {
-                throw AddaxException.asAddaxException(S3ReaderErrorCode.ILLEGAL_VALUE,
+                throw AddaxException.asAddaxException(ILLEGAL_VALUE,
                         String.format("Runtime Error : %s", e.getMessage()), e);
             }
 
@@ -83,7 +82,7 @@ public class S3Reader
 
                 if (null == columns || columns.isEmpty()) {
                     throw AddaxException.asAddaxException(
-                            S3ReaderErrorCode.CONFIG_INVALID_EXCEPTION,
+                            REQUIRED_VALUE,
                             "The item column is required");
                 }
 
@@ -94,13 +93,13 @@ public class S3Reader
 
                     if (null == columnIndex && null == columnValue) {
                         throw AddaxException.asAddaxException(
-                                S3ReaderErrorCode.NO_INDEX_VALUE,
+                                CONFIG_ERROR,
                                 "You configured type, also configured index or value");
                     }
 
                     if (null != columnIndex && null != columnValue) {
                         throw AddaxException.asAddaxException(
-                                S3ReaderErrorCode.MIXED_INDEX_VALUE,
+                                CONFIG_ERROR,
                                 "You configured both index and value");
                     }
                 }
@@ -126,7 +125,7 @@ public class S3Reader
             List<String> objects = parseOriginObjects(readerOriginConfig.getList(S3Key.OBJECT, String.class));
             if (objects.isEmpty()) {
                 throw AddaxException.asAddaxException(
-                        S3ReaderErrorCode.EMPTY_BUCKET_EXCEPTION,
+                        RUNTIME_ERROR,
                         String.format(
                                 "The object %s in bucket %s is not found",
                                 this.readerOriginConfig.get(S3Key.OBJECT),

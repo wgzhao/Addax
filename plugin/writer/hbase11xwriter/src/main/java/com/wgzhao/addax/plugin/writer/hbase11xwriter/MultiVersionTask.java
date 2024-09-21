@@ -24,6 +24,8 @@ import com.wgzhao.addax.common.exception.AddaxException;
 import com.wgzhao.addax.common.util.Configuration;
 import org.apache.hadoop.hbase.client.Put;
 
+import static com.wgzhao.addax.common.exception.CommonErrorCode.ILLEGAL_VALUE;
+
 public class MultiVersionTask
         extends HbaseAbstractTask
 {
@@ -40,7 +42,7 @@ public class MultiVersionTask
             // multi-version 模式下源头读取字段列数为4元组(rowkey,column,timestamp,value),目的端需告诉[]
             throw AddaxException
                     .asAddaxException(
-                            Hbase11xWriterErrorCode.ILLEGAL_VALUE,
+                            ILLEGAL_VALUE,
                             String.format(
                                     "The record should be a tuple of (rowkey,column,timestamp,value) in multi-version mode. actually get %s",
                                     record.getColumnNumber()));

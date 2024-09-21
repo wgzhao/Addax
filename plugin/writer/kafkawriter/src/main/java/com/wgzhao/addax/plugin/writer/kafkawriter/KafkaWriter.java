@@ -36,6 +36,10 @@ import java.util.Properties;
 import static com.wgzhao.addax.common.base.Constant.DEFAULT_BATCH_SIZE;
 import static com.wgzhao.addax.common.base.Key.BATCH_SIZE;
 import static com.wgzhao.addax.common.base.Key.COLUMN;
+import static com.wgzhao.addax.common.exception.CommonErrorCode.CONFIG_ERROR;
+import static com.wgzhao.addax.common.exception.CommonErrorCode.ILLEGAL_VALUE;
+import static com.wgzhao.addax.common.exception.CommonErrorCode.REQUIRED_VALUE;
+import static com.wgzhao.addax.common.exception.CommonErrorCode.RUNTIME_ERROR;
 import static com.wgzhao.addax.plugin.writer.kafkawriter.KafkaKey.BROKER_LIST;
 import static com.wgzhao.addax.plugin.writer.kafkawriter.KafkaKey.PROPERTIES;
 import static com.wgzhao.addax.plugin.writer.kafkawriter.KafkaKey.TOPIC;
@@ -57,11 +61,11 @@ public class KafkaWriter
 
         private void validateParameter()
         {
-            config.getNecessaryValue(BROKER_LIST, KafkaWriterErrorCode.REQUIRED_VALUE);
-            config.getNecessaryValue(TOPIC, KafkaWriterErrorCode.REQUIRED_VALUE);
+            config.getNecessaryValue(BROKER_LIST, REQUIRED_VALUE);
+            config.getNecessaryValue(TOPIC, REQUIRED_VALUE);
             List<String> columns = config.getList(COLUMN, String.class);
             if (columns == null || columns.isEmpty() || (columns.size() == 1 && Objects.equals(columns.get(0), "*"))) {
-                throw AddaxException.asAddaxException(KafkaWriterErrorCode.ILLEGAL_VALUE, "the item column must be configure and be not " +
+                throw AddaxException.asAddaxException(ILLEGAL_VALUE, "the item column must be configure and be not " +
                         "'*'");
             }
         }
@@ -130,7 +134,7 @@ public class KafkaWriter
                 if (record.getColumnNumber() != columns.size()) {
                     String msg = String.format("Your item column has %d , but the record has %d", columns.size(),
                             record.getColumnNumber());
-                    throw AddaxException.asAddaxException(KafkaWriterErrorCode.NOT_MATCHED_COLUMNS, msg);
+                    throw AddaxException.asAddaxException(CONFIG_ERROR, msg);
                 }
                 Map<String, Object> message = new HashMap<>();
                 for (int i = 0; i < record.getColumnNumber(); i++) {
@@ -168,7 +172,7 @@ public class KafkaWriter
 
                 kafkaProducer.send(producerRecord, (metadata, exception) -> {
                     if (exception != null) {
-                        throw AddaxException.asAddaxException(KafkaWriterErrorCode.PUT_KAFKA_ERROR, exception);
+                        throw AddaxException.asAddaxException(RUNTIME_ERROR, exception);
                     }
                 });
             }

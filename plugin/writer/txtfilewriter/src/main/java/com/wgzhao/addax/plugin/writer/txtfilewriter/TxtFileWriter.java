@@ -52,6 +52,12 @@ import static com.wgzhao.addax.common.base.Key.FILE_NAME;
 import static com.wgzhao.addax.common.base.Key.FORMAT;
 import static com.wgzhao.addax.common.base.Key.PATH;
 import static com.wgzhao.addax.common.base.Key.WRITE_MODE;
+import static com.wgzhao.addax.common.exception.CommonErrorCode.EXECUTE_FAIL;
+import static com.wgzhao.addax.common.exception.CommonErrorCode.ILLEGAL_VALUE;
+import static com.wgzhao.addax.common.exception.CommonErrorCode.IO_ERROR;
+import static com.wgzhao.addax.common.exception.CommonErrorCode.PERMISSION_ERROR;
+import static com.wgzhao.addax.common.exception.CommonErrorCode.REQUIRED_VALUE;
+import static com.wgzhao.addax.common.exception.CommonErrorCode.RUNTIME_ERROR;
 
 /**
  * Created by haiwei.luo on 14-9-17.
@@ -80,27 +86,27 @@ public class TxtFileWriter
         }
 
         private void validateParameter() {
-            this.writerSliceConfig.getNecessaryValue(FILE_NAME, TxtFileWriterErrorCode.REQUIRED_VALUE);
+            this.writerSliceConfig.getNecessaryValue(FILE_NAME, REQUIRED_VALUE);
 
-            String path = this.writerSliceConfig.getNecessaryValue(PATH, TxtFileWriterErrorCode.REQUIRED_VALUE);
+            String path = this.writerSliceConfig.getNecessaryValue(PATH, REQUIRED_VALUE);
 
             try {
                 // warn: 这里用户需要配一个目录
                 File dir = new File(path);
                 if (dir.isFile()) {
                     throw AddaxException.asAddaxException(
-                            TxtFileWriterErrorCode.ILLEGAL_VALUE,
+                            ILLEGAL_VALUE,
                             String.format("The path [%s] is a file, not a directory.", path));
                 }
                 if (!dir.exists()) {
                     boolean createdOk = dir.mkdirs();
                     if (!createdOk) {
-                        throw AddaxException.asAddaxException(TxtFileWriterErrorCode.CONFIG_INVALID_EXCEPTION,
+                        throw AddaxException.asAddaxException(EXECUTE_FAIL,
                                 String.format("Failed to create the special path [%s].", path));
                     }
                 }
             } catch (SecurityException se) {
-                throw AddaxException.asAddaxException(TxtFileWriterErrorCode.SECURITY_NOT_ENOUGH,
+                throw AddaxException.asAddaxException(PERMISSION_ERROR,
                         String.format("Permission denied to access path [%s].", path), se);
             }
         }
@@ -126,13 +132,13 @@ public class TxtFileWriter
                         FileUtils.forceDelete(eachFile);
                     }
                 } catch (NullPointerException npe) {
-                    throw AddaxException.asAddaxException(TxtFileWriterErrorCode.WRITE_FILE_ERROR,
+                    throw AddaxException.asAddaxException(RUNTIME_ERROR,
                             String.format("NullPointException occurred when clean history files under this path [%s].", path), npe);
                 } catch (IllegalArgumentException iae) {
-                    throw AddaxException.asAddaxException(TxtFileWriterErrorCode.SECURITY_NOT_ENOUGH,
+                    throw AddaxException.asAddaxException(PERMISSION_ERROR,
                             String.format("IllegalArgumentException occurred when clean history files under this path [%s].", path), iae);
                 } catch (IOException e) {
-                    throw AddaxException.asAddaxException(TxtFileWriterErrorCode.WRITE_FILE_ERROR,
+                    throw AddaxException.asAddaxException(IO_ERROR,
                             String.format("IOException occurred when clean history files under this path [%s].", path), e);
                 }
             } else if ("append".equals(writeMode)) {
@@ -142,7 +148,7 @@ public class TxtFileWriter
                 // warn: check two times about exists, mkdir
                 if (dir.exists()) {
                     if (!dir.canRead()) {
-                        throw AddaxException.asAddaxException(TxtFileWriterErrorCode.SECURITY_NOT_ENOUGH,
+                        throw AddaxException.asAddaxException(PERMISSION_ERROR,
                                 String.format("Permission denied to access path [%s].", path));
                     }
                     // fileName is not null
@@ -155,18 +161,18 @@ public class TxtFileWriter
                             allFiles.add(eachFile.getName());
                         }
                         LOG.error("The file(s) [{}] already exists under path [{}] with nonConflict writeMode.", StringUtils.join(allFiles, ","), path);
-                        throw AddaxException.asAddaxException(TxtFileWriterErrorCode.ILLEGAL_VALUE,
+                        throw AddaxException.asAddaxException(ILLEGAL_VALUE,
                                 String.format("The directory [%s] contains files.", path));
                     }
                 } else {
                     boolean createdOk = dir.mkdirs();
                     if (!createdOk) {
-                        throw AddaxException.asAddaxException(TxtFileWriterErrorCode.CONFIG_INVALID_EXCEPTION,
+                        throw AddaxException.asAddaxException(EXECUTE_FAIL,
                                 String.format("Failed to create the file [%s].", path));
                     }
                 }
             } else {
-                throw AddaxException.asAddaxException(TxtFileWriterErrorCode.ILLEGAL_VALUE,
+                throw AddaxException.asAddaxException(ILLEGAL_VALUE,
                         String.format("ONLY support truncate, append and nonConflict as writeMode, but you give [%s].", writeMode));
             }
         }
@@ -190,7 +196,7 @@ public class TxtFileWriter
                 File dir = new File(path);
                 allFiles = new HashSet<>(Arrays.asList(Objects.requireNonNull(dir.list())));
             } catch (SecurityException se) {
-                throw AddaxException.asAddaxException(TxtFileWriterErrorCode.SECURITY_NOT_ENOUGH,
+                throw AddaxException.asAddaxException(PERMISSION_ERROR,
                         String.format("Permission denied to access path [%s].", path), se);
             }
             return StorageWriterUtil.split(writerSliceConfig, allFiles, mandatoryNumber);
@@ -239,10 +245,10 @@ public class TxtFileWriter
                 StorageWriterUtil.writeToStream(lineReceiver, outputStream, this.writerSliceConfig, this.fileName,
                         this.getTaskPluginCollector());
             } catch (SecurityException se) {
-                throw AddaxException.asAddaxException(TxtFileWriterErrorCode.SECURITY_NOT_ENOUGH,
+                throw AddaxException.asAddaxException(PERMISSION_ERROR,
                         String.format("Permission denied to create file [%s].", fileFullPath), se);
             } catch (IOException ioe) {
-                throw AddaxException.asAddaxException(TxtFileWriterErrorCode.WRITE_FILE_IO_ERROR,
+                throw AddaxException.asAddaxException(IO_ERROR,
                         String.format("Fail to create file [%s].", this.fileName), ioe);
             } finally {
                 IOUtils.closeQuietly(outputStream, null);

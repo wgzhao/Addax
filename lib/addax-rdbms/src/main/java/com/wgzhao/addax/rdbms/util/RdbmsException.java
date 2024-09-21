@@ -26,7 +26,7 @@ import com.wgzhao.addax.common.spi.ErrorCode;
 
 import static com.wgzhao.addax.common.exception.CommonErrorCode.CONNECT_ERROR;
 import static com.wgzhao.addax.common.exception.CommonErrorCode.EXECUTE_FAIL;
-import static com.wgzhao.addax.common.exception.CommonErrorCode.PERMISSION_DENIED;
+import static com.wgzhao.addax.common.exception.CommonErrorCode.PERMISSION_ERROR;
 
 /**
  * Created by judy.lt on 2015/6/5.
@@ -66,12 +66,12 @@ public class RdbmsException
 
     public static AddaxException asInsertPriException(String userName, String jdbcUrl)
     {
-        throw asAddaxException(PERMISSION_DENIED, "");
+        throw asAddaxException(PERMISSION_ERROR, "");
     }
 
     public static AddaxException asDeletePriException(String userName, String jdbcUrl)
     {
-        throw asAddaxException(PERMISSION_DENIED, "");
+        throw asAddaxException(PERMISSION_ERROR, "");
     }
 
     public static AddaxException asSplitPKException(Exception e, String splitSql, String splitPkID)

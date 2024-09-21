@@ -54,6 +54,9 @@ import java.util.regex.Pattern;
 
 import static com.wgzhao.addax.common.base.Key.COLUMN;
 import static com.wgzhao.addax.common.base.Key.WHERE;
+import static com.wgzhao.addax.common.exception.CommonErrorCode.ILLEGAL_VALUE;
+import static com.wgzhao.addax.common.exception.CommonErrorCode.NOT_SUPPORT_TYPE;
+import static com.wgzhao.addax.common.exception.CommonErrorCode.RUNTIME_ERROR;
 
 /**
  * Kudu reader plugin
@@ -140,12 +143,12 @@ public class KuduReader
                                 result.add(conf);
                             }
                             else {
-                                throw AddaxException.asAddaxException(KuduReaderErrorCode.ILLEGAL_VALUE,
+                                throw AddaxException.asAddaxException(NOT_SUPPORT_TYPE,
                                         "operator '" + matcher.group(2) + "' is unsupported");
                             }
                         }
                         else {
-                            throw AddaxException.asAddaxException(KuduReaderErrorCode.ILLEGAL_VALUE,
+                            throw AddaxException.asAddaxException(ILLEGAL_VALUE,
                                     "Illegal where clause: " + w);
                         }
                     }
@@ -210,7 +213,7 @@ public class KuduReader
             }
             catch (KuduException ex) {
                 throw AddaxException.asAddaxException(
-                        KuduReaderErrorCode.UNKNOWN_EXCEPTION,
+                        RUNTIME_ERROR,
                         ex.getMessage()
                 );
             }
@@ -243,7 +246,7 @@ public class KuduReader
                     for (String column : columns) {
                         if (!schema.hasColumn(column)) {
                             throw AddaxException.asAddaxException(
-                                    KuduReaderErrorCode.ILLEGAL_VALUE,
+                                    ILLEGAL_VALUE,
                                     "column '" + column + "' does not exists in the table '" + tableName + "'"
                             );
                         }
@@ -270,7 +273,7 @@ public class KuduReader
                 }
                 catch (KuduException ex) {
                     throw AddaxException.asAddaxException(
-                            KuduReaderErrorCode.UNKNOWN_EXCEPTION,
+                            RUNTIME_ERROR,
                             ex.getMessage()
                     );
                 }
@@ -345,7 +348,7 @@ public class KuduReader
             }
             catch (KuduException ex) {
                 throw AddaxException.asAddaxException(
-                        KuduReaderErrorCode.UNKNOWN_EXCEPTION,
+                        RUNTIME_ERROR,
                         ex.getMessage()
                 );
             }
@@ -422,7 +425,7 @@ public class KuduReader
                 op = KUDU_OPERATORS.get(conf.getString("op"));
                 if (!schema.hasColumn(field)) {
                     throw AddaxException.asAddaxException(
-                            KuduReaderErrorCode.ILLEGAL_VALUE,
+                            ILLEGAL_VALUE,
                             "column '" + field + "' in where clause does not exists in the table '" + tableName + "'"
                     );
                 }
@@ -477,7 +480,7 @@ public class KuduReader
             }
             catch (KuduException ex) {
                 throw AddaxException.asAddaxException(
-                        KuduReaderErrorCode.UNKNOWN_EXCEPTION,
+                        RUNTIME_ERROR,
                         ex.getMessage()
                 );
             }

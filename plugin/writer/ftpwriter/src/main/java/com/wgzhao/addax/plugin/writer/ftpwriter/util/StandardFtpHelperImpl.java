@@ -22,7 +22,6 @@ package com.wgzhao.addax.plugin.writer.ftpwriter.util;
 import com.alibaba.fastjson2.JSON;
 import com.alibaba.fastjson2.JSONWriter;
 import com.wgzhao.addax.common.exception.AddaxException;
-import com.wgzhao.addax.plugin.writer.ftpwriter.FtpWriterErrorCode;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.net.ftp.FTPClient;
@@ -38,6 +37,10 @@ import java.net.UnknownHostException;
 import java.util.HashSet;
 import java.util.Set;
 
+import static com.wgzhao.addax.common.exception.CommonErrorCode.CONNECT_ERROR;
+import static com.wgzhao.addax.common.exception.CommonErrorCode.EXECUTE_FAIL;
+import static com.wgzhao.addax.common.exception.CommonErrorCode.IO_ERROR;
+import static com.wgzhao.addax.common.exception.CommonErrorCode.LOGIN_ERROR;
 import static org.apache.commons.net.ftp.FTP.BINARY_FILE_TYPE;
 
 public class StandardFtpHelperImpl
@@ -74,7 +77,7 @@ public class StandardFtpHelperImpl
                                 host, port, username, reply);
                 LOG.error(message);
                 throw AddaxException.asAddaxException(
-                        FtpWriterErrorCode.FAIL_LOGIN, message);
+                        LOGIN_ERROR, message);
             }
         }
         catch (UnknownHostException e) {
@@ -83,7 +86,7 @@ public class StandardFtpHelperImpl
                     host, e.getMessage());
             LOG.error(message);
             throw AddaxException.asAddaxException(
-                    FtpWriterErrorCode.FAIL_LOGIN, message, e);
+                    LOGIN_ERROR, message, e);
         }
         catch (IllegalArgumentException e) {
             String message = String.format(
@@ -91,7 +94,7 @@ public class StandardFtpHelperImpl
                     e.getMessage());
             LOG.error(message);
             throw AddaxException.asAddaxException(
-                    FtpWriterErrorCode.FAIL_LOGIN, message, e);
+                    LOGIN_ERROR, message, e);
         }
         catch (Exception e) {
             String message = String
@@ -99,7 +102,7 @@ public class StandardFtpHelperImpl
                             host, port, username, e.getMessage());
             LOG.error(message);
             throw AddaxException.asAddaxException(
-                    FtpWriterErrorCode.FAIL_LOGIN, message, e);
+                    LOGIN_ERROR, message, e);
         }
     }
 
@@ -115,7 +118,7 @@ public class StandardFtpHelperImpl
                         "与ftp服务器断开连接失败, errorMessage:%s", e.getMessage());
                 LOG.error(message);
                 throw AddaxException.asAddaxException(
-                        FtpWriterErrorCode.FAIL_DISCONNECT, message, e);
+                        CONNECT_ERROR, message, e);
             }
             finally {
                 if (this.ftpClient.isConnected()) {
@@ -150,7 +153,7 @@ public class StandardFtpHelperImpl
                 if (replayCode != FTPReply.COMMAND_OK
                         && replayCode != FTPReply.PATHNAME_CREATED) {
                     throw AddaxException.asAddaxException(
-                            FtpWriterErrorCode.COMMAND_FTP_IO_EXCEPTION,
+                            EXECUTE_FAIL,
                             message);
                 }
             }
@@ -160,7 +163,7 @@ public class StandardFtpHelperImpl
                     e.getMessage());
             LOG.error(message);
             throw AddaxException.asAddaxException(
-                    FtpWriterErrorCode.COMMAND_FTP_IO_EXCEPTION, message, e);
+                    IO_ERROR, message, e);
         }
     }
 
@@ -179,7 +182,7 @@ public class StandardFtpHelperImpl
                 dirPath.append(IOUtils.DIR_SEPARATOR_UNIX);
                 if (!mkdirSuccess) {
                     throw AddaxException.asAddaxException(
-                            FtpWriterErrorCode.COMMAND_FTP_IO_EXCEPTION,
+                            EXECUTE_FAIL,
                             message);
                 }
             }
@@ -189,7 +192,7 @@ public class StandardFtpHelperImpl
                     e.getMessage());
             LOG.error(message);
             throw AddaxException.asAddaxException(
-                    FtpWriterErrorCode.COMMAND_FTP_IO_EXCEPTION, message, e);
+                    IO_ERROR, message, e);
         }
     }
 
@@ -223,7 +226,7 @@ public class StandardFtpHelperImpl
                     filePath);
             if (null == writeOutputStream) {
                 throw AddaxException.asAddaxException(
-                        FtpWriterErrorCode.OPEN_FILE_ERROR, message);
+                        EXECUTE_FAIL, message);
             }
 
             return writeOutputStream;
@@ -234,7 +237,7 @@ public class StandardFtpHelperImpl
                     filePath, filePath, e.getMessage());
             LOG.error(message);
             throw AddaxException.asAddaxException(
-                    FtpWriterErrorCode.OPEN_FILE_ERROR, message);
+                    IO_ERROR, message);
         }
     }
 
@@ -260,7 +263,7 @@ public class StandardFtpHelperImpl
                     filePath, filePath, e.getMessage());
             LOG.error(message);
             throw AddaxException.asAddaxException(
-                    FtpWriterErrorCode.OPEN_FILE_ERROR, message);
+                    IO_ERROR, message);
         }
     }
 
@@ -272,7 +275,7 @@ public class StandardFtpHelperImpl
             boolean isDirExist = this.ftpClient.changeWorkingDirectory(dir);
             if (!isDirExist) {
                 throw AddaxException.asAddaxException(
-                        FtpWriterErrorCode.COMMAND_FTP_IO_EXCEPTION,
+                        EXECUTE_FAIL,
                         String.format("进入目录[%s]失败", dir));
             }
             this.printWorkingDirectory();
@@ -293,7 +296,7 @@ public class StandardFtpHelperImpl
                             dir, e.getMessage());
             LOG.error(message);
             throw AddaxException.asAddaxException(
-                    FtpWriterErrorCode.COMMAND_FTP_IO_EXCEPTION, message, e);
+                    IO_ERROR, message, e);
         }
         return allFilesWithPointedPrefix;
     }
@@ -313,7 +316,7 @@ public class StandardFtpHelperImpl
                     String message = String.format(
                             "删除文件:[%s] 时失败,请确认指定文件有删除权限", eachFile);
                     throw AddaxException.asAddaxException(
-                            FtpWriterErrorCode.COMMAND_FTP_IO_EXCEPTION,
+                            IO_ERROR,
                             message);
                 }
             }
@@ -324,7 +327,7 @@ public class StandardFtpHelperImpl
                     eachFile, e.getMessage());
             LOG.error(message);
             throw AddaxException.asAddaxException(
-                    FtpWriterErrorCode.COMMAND_FTP_IO_EXCEPTION, message, e);
+                    IO_ERROR, message, e);
         }
     }
 
@@ -353,7 +356,7 @@ public class StandardFtpHelperImpl
             boolean isOk = this.ftpClient.completePendingCommand();
             if (!isOk) {
                 throw AddaxException.asAddaxException(
-                        FtpWriterErrorCode.COMMAND_FTP_IO_EXCEPTION,
+                        EXECUTE_FAIL,
                         "完成ftp completePendingCommand操作发生异常");
             }
         }
@@ -363,7 +366,7 @@ public class StandardFtpHelperImpl
                     e.getMessage());
             LOG.error(message);
             throw AddaxException.asAddaxException(
-                    FtpWriterErrorCode.COMMAND_FTP_IO_EXCEPTION, message, e);
+                    EXECUTE_FAIL, message, e);
         }
     }
 }

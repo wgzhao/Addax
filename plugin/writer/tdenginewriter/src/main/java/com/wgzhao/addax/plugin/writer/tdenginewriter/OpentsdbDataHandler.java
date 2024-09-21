@@ -30,6 +30,10 @@ import org.slf4j.LoggerFactory;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
+import java.sql.SQLException;
+
+import static com.wgzhao.addax.common.exception.CommonErrorCode.EXECUTE_FAIL;
+import static com.wgzhao.addax.common.exception.CommonErrorCode.RUNTIME_ERROR;
 
 public class OpentsdbDataHandler
         implements DataHandler
@@ -60,8 +64,8 @@ public class OpentsdbDataHandler
             writer = new SchemalessWriter(conn);
             count = write(lineReceiver, batchSize);
         }
-        catch (Exception e) {
-            throw AddaxException.asAddaxException(TDengineWriterErrorCode.RUNTIME_EXCEPTION, e);
+        catch (SQLException e) {
+            throw AddaxException.asAddaxException(EXECUTE_FAIL, e);
         }
 
         return count;
@@ -103,7 +107,7 @@ public class OpentsdbDataHandler
             }
         }
         catch (Exception e) {
-            throw AddaxException.asAddaxException(TDengineWriterErrorCode.RUNTIME_EXCEPTION, e);
+            throw AddaxException.asAddaxException(RUNTIME_ERROR, e);
         }
         return recordIndex - 1;
     }

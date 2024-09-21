@@ -82,6 +82,8 @@ import static com.moilioncircle.redis.replicator.Constants.RDB_TYPE_STRING;
 import static com.moilioncircle.redis.replicator.Constants.RDB_TYPE_ZSET;
 import static com.moilioncircle.redis.replicator.Constants.RDB_TYPE_ZSET_2;
 import static com.moilioncircle.redis.replicator.Constants.RDB_TYPE_ZSET_ZIPLIST;
+import static com.wgzhao.addax.common.exception.CommonErrorCode.ILLEGAL_VALUE;
+import static com.wgzhao.addax.common.exception.CommonErrorCode.REQUIRED_VALUE;
 
 public class RedisReader
         extends Reader
@@ -105,15 +107,15 @@ public class RedisReader
                 Configuration conConf = Configuration.from(connection.toString());
                 String uri = conConf.getString(RedisKey.URI);
                 if (uri == null || uri.isEmpty()) {
-                    throw AddaxException.asAddaxException(RedisErrorCode.REQUIRED_VALUE, "uri is null or empty");
+                    throw AddaxException.asAddaxException(REQUIRED_VALUE, "uri is null or empty");
                 }
                 if (!(uri.startsWith("tcp") || uri.startsWith("file") || uri.startsWith("http") || uri.startsWith("https"))) {
-                    throw AddaxException.asAddaxException(RedisErrorCode.ILLEGAL_VALUE, "uri is not start with tcp, file, http or https");
+                    throw AddaxException.asAddaxException(ILLEGAL_VALUE, "uri is not start with tcp, file, http or https");
                 }
                 String mode = conConf.getString(RedisKey.MODE, "standalone");
                 if ("sentinel".equalsIgnoreCase(mode)) {
                     // required other items
-                    conConf.getNecessaryValue(RedisKey.MASTER_NAME, RedisErrorCode.REQUIRED_VALUE);
+                    conConf.getNecessaryValue(RedisKey.MASTER_NAME, REQUIRED_VALUE);
                 }
             }
         }

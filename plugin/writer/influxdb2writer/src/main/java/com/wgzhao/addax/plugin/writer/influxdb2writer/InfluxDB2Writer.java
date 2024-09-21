@@ -42,6 +42,7 @@ import static com.wgzhao.addax.common.base.Key.COLUMN;
 import static com.wgzhao.addax.common.base.Key.CONNECTION;
 import static com.wgzhao.addax.common.base.Key.ENDPOINT;
 import static com.wgzhao.addax.common.base.Key.TABLE;
+import static com.wgzhao.addax.common.exception.CommonErrorCode.REQUIRED_VALUE;
 
 public class InfluxDB2Writer
         extends Writer
@@ -56,15 +57,15 @@ public class InfluxDB2Writer
         public void init()
         {
             this.originalConfig = super.getPluginJobConf();
-            originalConfig.getNecessaryValue(InfluxDB2Key.TOKEN, InfluxDB2WriterErrorCode.REQUIRED_VALUE);
+            originalConfig.getNecessaryValue(InfluxDB2Key.TOKEN, REQUIRED_VALUE);
             Configuration connConf = Configuration.from(originalConfig.getList(CONNECTION, Object.class).get(0).toString());
-            connConf.getNecessaryValue(InfluxDB2Key.ENDPOINT, InfluxDB2WriterErrorCode.REQUIRED_VALUE);
-            connConf.getNecessaryValue(InfluxDB2Key.BUCKET, InfluxDB2WriterErrorCode.REQUIRED_VALUE);
-            connConf.getNecessaryValue(InfluxDB2Key.ORG, InfluxDB2WriterErrorCode.REQUIRED_VALUE);
-            connConf.getNecessaryValue(TABLE, InfluxDB2WriterErrorCode.REQUIRED_VALUE);
+            connConf.getNecessaryValue(InfluxDB2Key.ENDPOINT, REQUIRED_VALUE);
+            connConf.getNecessaryValue(InfluxDB2Key.BUCKET, REQUIRED_VALUE);
+            connConf.getNecessaryValue(InfluxDB2Key.ORG, REQUIRED_VALUE);
+            connConf.getNecessaryValue(TABLE, REQUIRED_VALUE);
             List<String> columns = originalConfig.getList(COLUMN, String.class);
             if (columns == null || columns.isEmpty() || (columns.size() == 1 && "*".equals(columns.get(0)))) {
-                throw AddaxException.asAddaxException(InfluxDB2WriterErrorCode.REQUIRED_VALUE,
+                throw AddaxException.asAddaxException(REQUIRED_VALUE,
                         "The column must be configured and '*' is not supported yet");
             }
         }

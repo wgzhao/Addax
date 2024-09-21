@@ -49,6 +49,14 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Set;
 
+import static com.wgzhao.addax.common.exception.CommonErrorCode.CONFIG_ERROR;
+import static com.wgzhao.addax.common.exception.CommonErrorCode.EXECUTE_FAIL;
+import static com.wgzhao.addax.common.exception.CommonErrorCode.ILLEGAL_VALUE;
+import static com.wgzhao.addax.common.exception.CommonErrorCode.IO_ERROR;
+import static com.wgzhao.addax.common.exception.CommonErrorCode.PERMISSION_ERROR;
+import static com.wgzhao.addax.common.exception.CommonErrorCode.REQUIRED_VALUE;
+import static com.wgzhao.addax.common.exception.CommonErrorCode.RUNTIME_ERROR;
+
 /**
  * Created by haiwei.luo on 14-9-17.
  */
@@ -76,29 +84,29 @@ public class DbfWriter
         }
 
         private void validateParameter() {
-            this.writerSliceConfig.getNecessaryValue(Key.FILE_NAME, DbfWriterErrorCode.REQUIRED_VALUE);
+            this.writerSliceConfig.getNecessaryValue(Key.FILE_NAME, REQUIRED_VALUE);
 
-            String path = this.writerSliceConfig.getNecessaryValue(Key.PATH, DbfWriterErrorCode.REQUIRED_VALUE);
+            String path = this.writerSliceConfig.getNecessaryValue(Key.PATH, REQUIRED_VALUE);
 
             try {
                 // warn: 这里用户需要配一个目录
                 File dir = new File(path);
                 if (dir.isFile()) {
                     throw AddaxException.asAddaxException(
-                            DbfWriterErrorCode.ILLEGAL_VALUE,
+                            ILLEGAL_VALUE,
                             String.format("The path [%s] you configured exists ,but it is file not directory.", path));
                 }
                 if (!dir.exists()) {
                     boolean createdOk = dir.mkdirs();
                     if (!createdOk) {
                         throw AddaxException.asAddaxException(
-                                DbfWriterErrorCode.CONFIG_INVALID_EXCEPTION,
+                                CONFIG_ERROR,
                                 String.format("Failed to create directory [%s].", path));
                     }
                 }
             } catch (SecurityException se) {
                 throw AddaxException.asAddaxException(
-                        DbfWriterErrorCode.SECURITY_NOT_ENOUGH,
+                        PERMISSION_ERROR,
                         String.format("Permission denied while creating directory [%s].", path), se);
             }
         }
@@ -129,19 +137,19 @@ public class DbfWriter
                 } catch (NullPointerException npe) {
                     throw AddaxException
                             .asAddaxException(
-                                    DbfWriterErrorCode.WRITE_FILE_ERROR,
+                                    RUNTIME_ERROR,
                                     String.format("NPE occurred whiling cleanup [%s].", path), npe);
                 } catch (IllegalArgumentException iae) {
                     throw AddaxException.asAddaxException(
-                            DbfWriterErrorCode.SECURITY_NOT_ENOUGH,
+                            PERMISSION_ERROR,
                             String.format("IllegalArgumentException occurred cleanup [%s].", path));
                 } catch (SecurityException se) {
                     throw AddaxException.asAddaxException(
-                            DbfWriterErrorCode.SECURITY_NOT_ENOUGH,
+                            PERMISSION_ERROR,
                             String.format("Permission denied for cleaning up [%s]", path));
                 } catch (IOException e) {
                     throw AddaxException.asAddaxException(
-                            DbfWriterErrorCode.WRITE_FILE_ERROR,
+                            IO_ERROR,
                             String.format("IO exception occurred while cleanup [%s]", path), e);
                 }
             } else if ("append".equals(writeMode)) {
@@ -155,7 +163,7 @@ public class DbfWriter
                     if (dir.exists()) {
                         if (dir.isFile()) {
                             throw AddaxException.asAddaxException(
-                                    DbfWriterErrorCode.ILLEGAL_VALUE,
+                                    ILLEGAL_VALUE,
                                     String.format("The path [%s] exists, but it is file not directory.", path));
                         }
                         // fileName is not null
@@ -169,25 +177,25 @@ public class DbfWriter
                             }
                             LOG.error("The following files are conflict: [{}]", StringUtils.join(allFiles, ","));
                             throw AddaxException.asAddaxException(
-                                    DbfWriterErrorCode.ILLEGAL_VALUE,
+                                    ILLEGAL_VALUE,
                                     String.format("The path [%s] is not empty.", path));
                         }
                     } else {
                         boolean createdOk = dir.mkdirs();
                         if (!createdOk) {
                             throw AddaxException.asAddaxException(
-                                    DbfWriterErrorCode.CONFIG_INVALID_EXCEPTION,
+                                    EXECUTE_FAIL,
                                     String.format("Failed to create directory [%s].", path));
                         }
                     }
                 } catch (SecurityException se) {
                     throw AddaxException.asAddaxException(
-                            DbfWriterErrorCode.SECURITY_NOT_ENOUGH,
+                            PERMISSION_ERROR,
                             String.format("Permission denied for creating directory [%s]", path));
                 }
             } else {
                 throw AddaxException.asAddaxException(
-                        DbfWriterErrorCode.ILLEGAL_VALUE,
+                        ILLEGAL_VALUE,
                         String.format("The item writeMode only supports truncate, append and nonConflict  the [%s] is not supported.", writeMode));
             }
 
@@ -197,14 +205,14 @@ public class DbfWriter
                 if ("numeric".equalsIgnoreCase(column.getString(Key.TYPE)) &&
                         (column.getString(Key.LENGTH, null) == null || column.getString(Key.SCALE, null) == null)) {
                     throw AddaxException.asAddaxException(
-                            DbfWriterErrorCode.CONFIG_INVALID_EXCEPTION,
+                            CONFIG_ERROR,
                             String.format("The numeric type both require configured item %s and %s.", Key.LENGTH, Key.SCALE)
                     );
                 }
 
                 if ("char".equalsIgnoreCase(column.getString(Key.TYPE)) && column.getString(Key.LENGTH, null) == null) {
                     throw AddaxException.asAddaxException(
-                            DbfWriterErrorCode.CONFIG_INVALID_EXCEPTION,
+                            CONFIG_ERROR,
                             String.format("The char type require configured item %s.", Key.LENGTH)
                     );
                 }
@@ -241,7 +249,7 @@ public class DbfWriter
                 allFiles = new HashSet<>(Arrays.asList(Objects.requireNonNull(dir.list())));
             } catch (SecurityException se) {
                 throw AddaxException.asAddaxException(
-                        DbfWriterErrorCode.SECURITY_NOT_ENOUGH,
+                        PERMISSION_ERROR,
                         String.format("Permission denied for viewing directory [%s].", path));
             }
 
@@ -371,7 +379,7 @@ public class DbfWriter
                 writer.close();
             } catch (SecurityException se) {
                 throw AddaxException.asAddaxException(
-                        DbfWriterErrorCode.SECURITY_NOT_ENOUGH,
+                        PERMISSION_ERROR,
                         String.format("Permission denied for create directory [%s].", this.fileName));
             }
             LOG.info("Writing finished");

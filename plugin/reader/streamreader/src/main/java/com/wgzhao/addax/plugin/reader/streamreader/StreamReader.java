@@ -52,6 +52,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
+import static com.wgzhao.addax.common.exception.CommonErrorCode.ILLEGAL_VALUE;
+import static com.wgzhao.addax.common.exception.CommonErrorCode.NOT_SUPPORT_TYPE;
+import static com.wgzhao.addax.common.exception.CommonErrorCode.REQUIRED_VALUE;
+
 public class StreamReader
         extends Reader
 {
@@ -91,11 +95,11 @@ public class StreamReader
             Long sliceRecordCount = this.originalConfig
                     .getLong(Key.SLICE_RECORD_COUNT);
             if (null == sliceRecordCount) {
-                throw AddaxException.asAddaxException(StreamReaderErrorCode.REQUIRED_VALUE,
+                throw AddaxException.asAddaxException(REQUIRED_VALUE,
                         "The item sliceRecordCount is required.");
             }
             else if (sliceRecordCount < 1) {
-                throw AddaxException.asAddaxException(StreamReaderErrorCode.ILLEGAL_VALUE,
+                throw AddaxException.asAddaxException(ILLEGAL_VALUE,
                         "The value of item sliceRecordCount must be greater than 0.");
             }
         }
@@ -105,7 +109,7 @@ public class StreamReader
             List<JSONObject> columns = originalConfig.getList(Key.COLUMN,
                     JSONObject.class);
             if (null == columns || columns.isEmpty()) {
-                throw AddaxException.asAddaxException(StreamReaderErrorCode.REQUIRED_VALUE,
+                throw AddaxException.asAddaxException(REQUIRED_VALUE,
                         "The item column is required.");
             }
 
@@ -116,7 +120,7 @@ public class StreamReader
                     this.parseMixupFunctions(eachColumnConfig);
                 }
                 catch (Exception e) {
-                    throw AddaxException.asAddaxException(StreamReaderErrorCode.NOT_SUPPORT_TYPE,
+                    throw AddaxException.asAddaxException(NOT_SUPPORT_TYPE,
                             String.format("Failed to parse mixup functions [%s]", e.getMessage()), e);
                 }
 
@@ -135,7 +139,7 @@ public class StreamReader
                     }
                     if (!Type.isTypeIllegal(typeName)) {
                         throw AddaxException.asAddaxException(
-                                StreamReaderErrorCode.NOT_SUPPORT_TYPE,
+                                NOT_SUPPORT_TYPE,
                                 String.format("The [%s] is unsupported.", typeName));
                     }
                 }
@@ -175,7 +179,7 @@ public class StreamReader
             String columnRandom = eachColumnConfig.getString(StreamConstant.RANDOM);
             String columnIncr = eachColumnConfig.getString(StreamConstant.INCR);
             if (StringUtils.isBlank(columnRandom) && StringUtils.isBlank(columnIncr)) {
-                eachColumnConfig.getNecessaryValue(Key.VALUE, StreamReaderErrorCode.REQUIRED_VALUE);
+                eachColumnConfig.getNecessaryValue(Key.VALUE, REQUIRED_VALUE);
             }
             if (StringUtils.isNotBlank(columnIncr)) {
                 // 类型判断
@@ -194,7 +198,7 @@ public class StreamReader
                     }
                     catch (NumberFormatException e) {
                         throw AddaxException.asAddaxException(
-                                StreamReaderErrorCode.ILLEGAL_VALUE,
+                                ILLEGAL_VALUE,
                                 "The value of  must be numeric, value [" + columnValue + "] is not valid."
                         );
                     }
@@ -209,7 +213,7 @@ public class StreamReader
                             Integer.parseInt(fields[1]);
                         } catch (NumberFormatException e) {
                             throw AddaxException.asAddaxException(
-                                    StreamReaderErrorCode.ILLEGAL_VALUE,
+                                    ILLEGAL_VALUE,
                                     "The second field must be numeric, value [" + fields[1] + "] is not valid"
                             );
                         }
@@ -225,7 +229,7 @@ public class StreamReader
                 }
                 else {
                     throw AddaxException.asAddaxException(
-                            StreamReaderErrorCode.NOT_SUPPORT_TYPE,
+                            NOT_SUPPORT_TYPE,
                             "The increment sequence must be long or date, value [" + dType + "] is not valid."
                     );
                 }
@@ -247,7 +251,7 @@ public class StreamReader
                 String[] split = columnRandom.split(",");
                 if (split.length < 2) {
                     throw AddaxException.asAddaxException(
-                            StreamReaderErrorCode.ILLEGAL_VALUE,
+                            ILLEGAL_VALUE,
                             String.format("Illegal random value [%s], supported random value like 'minVal, MaxVal[,scale]'",
                                     columnRandom));
                 }
@@ -257,7 +261,7 @@ public class StreamReader
                 long param2Int;
                 if (StringUtils.isBlank(param1) && StringUtils.isBlank(param2)) {
                     throw AddaxException.asAddaxException(
-                            StreamReaderErrorCode.ILLEGAL_VALUE,
+                            ILLEGAL_VALUE,
                             "The random function's params can not be empty.");
                 }
 
@@ -273,7 +277,7 @@ public class StreamReader
                     }
                     catch (ParseException e) {
                         throw AddaxException.asAddaxException(
-                                StreamReaderErrorCode.ILLEGAL_VALUE,
+                                ILLEGAL_VALUE,
                                 String.format("The random function's params [%s,%s] does not match the dateFormat[%s].",
                                         dateFormat, param1, param2), e);
                     }
@@ -284,13 +288,13 @@ public class StreamReader
                 }
                 if (param1Int < 0 || param2Int < 0) {
                     throw AddaxException.asAddaxException(
-                            StreamReaderErrorCode.ILLEGAL_VALUE,
+                            ILLEGAL_VALUE,
                             String.format("The random function's params [%s,%s] can not be negative.",
                                     param1, param2));
                 }
                 if (!Type.BOOL.name().equalsIgnoreCase(typeName) && param1Int > param2Int) {
                     throw AddaxException.asAddaxException(
-                            StreamReaderErrorCode.ILLEGAL_VALUE,
+                            ILLEGAL_VALUE,
                             String.format("The random function's params [%s,%s] is not valid, the first param must be less than the second one.",
                                     param1, param2));
                 }
@@ -328,7 +332,7 @@ public class StreamReader
             }
             if (!isOK) {
                 throw AddaxException.asAddaxException(
-                        StreamReaderErrorCode.ILLEGAL_VALUE,
+                        ILLEGAL_VALUE,
                         unit + " is NOT valid interval unit，for more details, please refer to the documentation");
             }
         }
@@ -498,7 +502,7 @@ public class StreamReader
                             currVal = sdf.parse(fields[0]);
                         } catch (java.text.ParseException e) {
                             throw AddaxException.asAddaxException(
-                                    StreamReaderErrorCode.ILLEGAL_VALUE,
+                                    ILLEGAL_VALUE,
                                     String.format("can not parse date value [%s] with date format [%s]", fields[0], datePattern)
                             );
                         }
@@ -507,7 +511,7 @@ public class StreamReader
                     return new DateColumn((Date)currVal);
                 } else {
                     throw AddaxException.asAddaxException(
-                            StreamReaderErrorCode.NOT_SUPPORT_TYPE,
+                            NOT_SUPPORT_TYPE,
                             columnType + " can not support for increment"
                     );
                 }
@@ -584,7 +588,7 @@ public class StreamReader
                 }
             }
             catch (Exception e) {
-                throw AddaxException.asAddaxException(StreamReaderErrorCode.ILLEGAL_VALUE,
+                throw AddaxException.asAddaxException(ILLEGAL_VALUE,
                         "Failed to build record.", e);
             }
             return record;

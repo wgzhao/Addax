@@ -44,6 +44,7 @@ import java.util.List;
 import static com.wgzhao.addax.common.base.Constant.DEFAULT_FETCH_SIZE;
 import static com.wgzhao.addax.common.base.Key.FETCH_SIZE;
 import static com.wgzhao.addax.common.base.Key.IS_TABLE_MODE;
+import static com.wgzhao.addax.common.exception.CommonErrorCode.CONFIG_ERROR;
 import static com.wgzhao.addax.common.exception.CommonErrorCode.ILLEGAL_VALUE;
 
 public class OracleReader
@@ -112,7 +113,7 @@ public class OracleReader
             if (StringUtils.isNotBlank(hint)) {
                 boolean isTableMode = originalConfig.getBool(IS_TABLE_MODE);
                 if (!isTableMode) {
-                    throw AddaxException.asAddaxException(OracleReaderErrorCode.HINT_ERROR,
+                    throw AddaxException.asAddaxException(CONFIG_ERROR,
                             "Only querySql mode can configure HINT, please set isTableMode to false.");
                 }
                 HintUtil.initHintConf(DATABASE_TYPE, originalConfig);

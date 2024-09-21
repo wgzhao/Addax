@@ -28,6 +28,8 @@ import org.apache.commons.lang3.StringUtils;
 import java.util.ArrayList;
 import java.util.List;
 
+import static com.wgzhao.addax.common.exception.CommonErrorCode.REQUIRED_VALUE;
+
 public class InfluxDBReader
         extends Reader
 {
@@ -48,19 +50,19 @@ public class InfluxDBReader
         public void preCheck()
         {
             init();
-            originalConfig.getNecessaryValue(InfluxDBKey.ENDPOINT, InfluxDBReaderErrorCode.REQUIRED_VALUE);
+            originalConfig.getNecessaryValue(InfluxDBKey.ENDPOINT, REQUIRED_VALUE);
             List<String> columns = originalConfig.getList(InfluxDBKey.COLUMN, String.class);
             String querySql = originalConfig.getNecessaryValue(InfluxDBKey.QUERY_SQL, null);
             String database = originalConfig.getString(InfluxDBKey.DATABASE, null);
             if (StringUtils.isAllBlank(querySql,database)) {
                 throw AddaxException.asAddaxException(
-                        InfluxDBReaderErrorCode.REQUIRED_VALUE,
+                        REQUIRED_VALUE,
                         "One of database or querySql must be specified"
                 );
             }
             if (columns == null || columns.isEmpty()) {
                 throw AddaxException.asAddaxException(
-                        InfluxDBReaderErrorCode.REQUIRED_VALUE,
+                        REQUIRED_VALUE,
                         "The parameter [" + InfluxDBKey.COLUMN + "] is not set.");
             }
         }

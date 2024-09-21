@@ -23,6 +23,8 @@ import com.wgzhao.addax.common.exception.AddaxException;
 
 import java.util.Arrays;
 
+import static com.wgzhao.addax.common.exception.CommonErrorCode.NOT_SUPPORT_TYPE;
+
 public enum ModeType
 {
     NORMAL("normal"),
@@ -42,7 +44,7 @@ public enum ModeType
                 return modeType;
             }
         }
-        throw AddaxException.asAddaxException(Hbase11xWriterErrorCode.ILLEGAL_VALUE,
+        throw AddaxException.asAddaxException(NOT_SUPPORT_TYPE,
                 String.format("The mode %s is unsupported. %s are supported yet.", modeName, Arrays.asList(values())));
     }
 }

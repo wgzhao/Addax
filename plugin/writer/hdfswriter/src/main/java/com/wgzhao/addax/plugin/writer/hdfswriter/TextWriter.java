@@ -41,11 +41,15 @@ import org.apache.hadoop.mapred.TextOutputFormat;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.IOException;
 import java.sql.Timestamp;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+
+import static com.wgzhao.addax.common.exception.CommonErrorCode.IO_ERROR;
+import static com.wgzhao.addax.common.exception.CommonErrorCode.NOT_SUPPORT_TYPE;
 
 public class TextWriter
         extends HdfsHelper
@@ -92,11 +96,11 @@ public class TextWriter
             }
             writer.close(Reporter.NULL);
         }
-        catch (Exception e) {
+        catch (IOException e) {
             logger.error("IO exception occurred while writing text file [{}]", fileName);
             Path path = new Path(fileName);
             deleteDir(path.getParent());
-            throw AddaxException.asAddaxException(HdfsWriterErrorCode.Write_FILE_IO_ERROR, e);
+            throw AddaxException.asAddaxException(IO_ERROR, e);
         }
     }
 
@@ -172,7 +176,7 @@ public class TextWriter
                                 break;
                             default:
                                 throw AddaxException.asAddaxException(
-                                        HdfsWriterErrorCode.ILLEGAL_VALUE,
+                                        NOT_SUPPORT_TYPE,
                                         String.format(
                                                 "The configuration is incorrect. The database does not support writing this type of field. " +
                                                         "Field name: [%s], field type: [%s].",

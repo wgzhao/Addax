@@ -40,6 +40,11 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import static com.wgzhao.addax.common.exception.CommonErrorCode.CONFIG_ERROR;
+import static com.wgzhao.addax.common.exception.CommonErrorCode.ILLEGAL_VALUE;
+import static com.wgzhao.addax.common.exception.CommonErrorCode.IO_ERROR;
+import static com.wgzhao.addax.common.exception.CommonErrorCode.REQUIRED_VALUE;
+
 /**
  * Created by haiwei.luo on 14-9-20.
  */
@@ -67,9 +72,9 @@ public class TxtFileReader
         {
             LOG.debug("prepare() begin...");
             // Compatible with the old version, path is a string before
-            String pathInString = this.originConfig.getNecessaryValue(Key.PATH, TxtFileReaderErrorCode.REQUIRED_VALUE);
+            String pathInString = this.originConfig.getNecessaryValue(Key.PATH, REQUIRED_VALUE);
             if (StringUtils.isBlank(pathInString)) {
-                throw AddaxException.asAddaxException(TxtFileReaderErrorCode.REQUIRED_VALUE, "the path is required");
+                throw AddaxException.asAddaxException(REQUIRED_VALUE, "the path is required");
             }
             List<String> path;
             if (!pathInString.startsWith("[") && !pathInString.endsWith("]")) {
@@ -79,7 +84,7 @@ public class TxtFileReader
             else {
                 path = this.originConfig.getList(Key.PATH, String.class);
                 if (null == path || path.isEmpty()) {
-                    throw AddaxException.asAddaxException(TxtFileReaderErrorCode.REQUIRED_VALUE, "the path is required");
+                    throw AddaxException.asAddaxException(REQUIRED_VALUE, "the path is required");
                 }
             }
 
@@ -123,7 +128,7 @@ public class TxtFileReader
             int splitNumber = this.sourceFiles.size();
             if (0 == splitNumber) {
                 throw AddaxException.asAddaxException(
-                        TxtFileReaderErrorCode.EMPTY_DIR_EXCEPTION, String
+                        CONFIG_ERROR, String
                                 .format("未能找到待读取的文件,请确认您的配置项path: %s",
                                         this.originConfig.getString(Key.PATH)));
             }
@@ -146,7 +151,7 @@ public class TxtFileReader
                 }
             }
             throw AddaxException.asAddaxException(
-                    TxtFileReaderErrorCode.ILLEGAL_VALUE,
+                    ILLEGAL_VALUE,
                     "The name '" + name + "' DOES NOT exists in file header: " + Arrays.toString(allNames)
             );
         }
@@ -224,7 +229,7 @@ public class TxtFileReader
                 }
                 catch (FileNotFoundException e) {
                     throw AddaxException.asAddaxException(
-                            TxtFileReaderErrorCode.OPEN_FILE_ERROR,
+                            IO_ERROR,
                             "Open file '" + fileName + "' failure"
                     );
                 }

@@ -38,6 +38,10 @@ import java.io.IOException;
 import java.nio.charset.Charset;
 import java.util.List;
 
+import static com.wgzhao.addax.common.exception.CommonErrorCode.ILLEGAL_VALUE;
+import static com.wgzhao.addax.common.exception.CommonErrorCode.IO_ERROR;
+import static com.wgzhao.addax.common.exception.CommonErrorCode.NOT_SUPPORT_TYPE;
+
 public abstract class HbaseAbstractTask
 {
     private static final Logger LOG = LoggerFactory.getLogger(HbaseAbstractTask.class);
@@ -92,7 +96,7 @@ public abstract class HbaseAbstractTask
             }
         }
         catch (IOException e) {
-            throw AddaxException.asAddaxException(Hbase11xWriterErrorCode.PUT_HBASE_ERROR, e);
+            throw AddaxException.asAddaxException(IO_ERROR, e);
         }
         finally {
             Hbase11xHelper.closeBufferedMutator(this.bufferedMutator);
@@ -133,7 +137,7 @@ public abstract class HbaseAbstractTask
                     bytes = this.getValueByte(columnType, column.asString());
                     break;
                 default:
-                    throw AddaxException.asAddaxException(Hbase11xWriterErrorCode.ILLEGAL_VALUE, "The data type " + columnType + "is unsupported");
+                    throw AddaxException.asAddaxException(ILLEGAL_VALUE, "The data type " + columnType + "is unsupported");
             }
         }
         else {
@@ -145,7 +149,7 @@ public abstract class HbaseAbstractTask
                     bytes = HConstants.EMPTY_BYTE_ARRAY;
                     break;
                 default:
-                    throw AddaxException.asAddaxException(Hbase11xWriterErrorCode.ILLEGAL_VALUE, "The item nullMode must be configured either skip or empty");
+                    throw AddaxException.asAddaxException(ILLEGAL_VALUE, "The item nullMode must be configured either skip or empty");
             }
         }
         return bytes;
@@ -178,7 +182,7 @@ public abstract class HbaseAbstractTask
                     bytes = value.getBytes(Charset.forName(encoding));
                     break;
                 default:
-                    throw AddaxException.asAddaxException(Hbase11xWriterErrorCode.ILLEGAL_VALUE, "The data type " + columnType + "is unsupported");
+                    throw AddaxException.asAddaxException(NOT_SUPPORT_TYPE, "The data type " + columnType + "is unsupported");
             }
         }
         else {

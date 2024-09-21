@@ -97,6 +97,11 @@ import java.util.concurrent.TimeUnit;
 
 import static com.wgzhao.addax.common.base.Key.COLUMN;
 import static com.wgzhao.addax.common.base.Key.NULL_FORMAT;
+import static com.wgzhao.addax.common.exception.CommonErrorCode.CONFIG_ERROR;
+import static com.wgzhao.addax.common.exception.CommonErrorCode.EXECUTE_FAIL;
+import static com.wgzhao.addax.common.exception.CommonErrorCode.IO_ERROR;
+import static com.wgzhao.addax.common.exception.CommonErrorCode.LOGIN_ERROR;
+import static com.wgzhao.addax.common.exception.CommonErrorCode.NOT_SUPPORT_TYPE;
 
 /**
  * Created by mingya.wmy on 2015/8/12.
@@ -161,7 +166,7 @@ public class DFSUtil
             catch (Exception e) {
                 String message = String.format("kerberos认证失败,请确定kerberosKeytabFilePath[%s]和kerberosPrincipal[%s]填写正确",
                         kerberosKeytabFilePath, kerberosPrincipal);
-                throw AddaxException.asAddaxException(HdfsReaderErrorCode.KERBEROS_LOGIN_ERROR, message, e);
+                throw AddaxException.asAddaxException(LOGIN_ERROR, message, e);
             }
         }
     }
@@ -224,7 +229,7 @@ public class DFSUtil
         }
         catch (IOException e) {
             LOG.error("IO exception occurred while reading file(s) under [{}].", hdfsPath);
-            throw AddaxException.asAddaxException(HdfsReaderErrorCode.PATH_CONFIG_ERROR, e);
+            throw AddaxException.asAddaxException(CONFIG_ERROR, e);
         }
     }
 
@@ -271,7 +276,7 @@ public class DFSUtil
                     , filePath, this.specifiedFileType);
             LOG.error(message);
             throw AddaxException.asAddaxException(
-                    HdfsReaderErrorCode.FILE_TYPE_UNSUPPORTED, message);
+                    NOT_SUPPORT_TYPE, message);
         }
     }
 
@@ -288,7 +293,7 @@ public class DFSUtil
         }
         catch (IOException e) {
             String message = String.format("IO exception occurred while reading the file [%s].", filepath);
-            throw AddaxException.asAddaxException(HdfsReaderErrorCode.READ_FILE_ERROR, message, e);
+            throw AddaxException.asAddaxException(IO_ERROR, message, e);
         }
     }
 
@@ -313,7 +318,7 @@ public class DFSUtil
         catch (Exception e) {
             String message = String.format("Exception occurred while reading the file [%s].", sourceSequenceFilePath);
             LOG.error(message);
-            throw AddaxException.asAddaxException(HdfsReaderErrorCode.READ_SEQUENCE_FILE_ERROR, message, e);
+            throw AddaxException.asAddaxException(EXECUTE_FAIL, message, e);
         }
     }
 
@@ -350,7 +355,7 @@ public class DFSUtil
         catch (IOException e) {
             String message = String.format("IO exception occurred while reading the file [%s].", sourceRcFilePath);
             LOG.error(message);
-            throw AddaxException.asAddaxException(HdfsReaderErrorCode.READ_RCFILE_ERROR, message, e);
+            throw AddaxException.asAddaxException(IO_ERROR, message, e);
         }
         finally {
             try {
@@ -395,7 +400,7 @@ public class DFSUtil
         catch (Exception e) {
             String message = String.format("Exception occurred while reading the file [%s].", sourceOrcFilePath);
             LOG.error(message);
-            throw AddaxException.asAddaxException(HdfsReaderErrorCode.READ_FILE_ERROR, message);
+            throw AddaxException.asAddaxException(IO_ERROR, message);
         }
     }
 
@@ -512,7 +517,7 @@ public class DFSUtil
         catch (IOException e) {
             String message = String.format("IO exception occurred while reading the parquet-file [%s]", sourceParquetFilePath);
             LOG.error(message);
-            throw AddaxException.asAddaxException(HdfsReaderErrorCode.READ_FILE_ERROR, message);
+            throw AddaxException.asAddaxException(IO_ERROR, message);
         }
     }
 
@@ -652,7 +657,7 @@ public class DFSUtil
             return reader.getSchema();
         }
         catch (IOException e) {
-            throw AddaxException.asAddaxException(HdfsReaderErrorCode.READ_FILE_ERROR, "IO exception occurred when reading orc file");
+            throw AddaxException.asAddaxException(IO_ERROR, "IO exception occurred when reading orc file");
         }
     }
 
@@ -684,7 +689,7 @@ public class DFSUtil
             String message = String.format("Can not get the file format for [%s]，it only supports [%s].",
                     filepath, HdfsConstant.SUPPORT_FILE_TYPE);
             LOG.error(message);
-            throw AddaxException.asAddaxException(HdfsReaderErrorCode.READ_FILE_ERROR, message, e);
+            throw AddaxException.asAddaxException(EXECUTE_FAIL, message, e);
         }
         return false;
     }

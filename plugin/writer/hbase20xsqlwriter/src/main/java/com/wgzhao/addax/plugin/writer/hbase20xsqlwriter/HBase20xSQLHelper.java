@@ -35,6 +35,13 @@ import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
 
+import static com.wgzhao.addax.common.exception.CommonErrorCode.CONFIG_ERROR;
+import static com.wgzhao.addax.common.exception.CommonErrorCode.CONNECT_ERROR;
+import static com.wgzhao.addax.common.exception.CommonErrorCode.EXECUTE_FAIL;
+import static com.wgzhao.addax.common.exception.CommonErrorCode.ILLEGAL_VALUE;
+import static com.wgzhao.addax.common.exception.CommonErrorCode.LOGIN_ERROR;
+import static com.wgzhao.addax.common.exception.CommonErrorCode.REQUIRED_VALUE;
+
 public class HBase20xSQLHelper
 {
 
@@ -56,8 +63,8 @@ public class HBase20xSQLHelper
     public static void validateParameter(Configuration originalConfig)
     {
         // 表名和queryserver地址必须配置，否则抛异常
-        String tableName = originalConfig.getNecessaryValue(HBaseKey.TABLE, HBase20xSQLWriterErrorCode.REQUIRED_VALUE);
-        String jdbcUrl = originalConfig.getNecessaryValue(HBaseKey.JDBC_URL, HBase20xSQLWriterErrorCode.REQUIRED_VALUE);
+        String tableName = originalConfig.getNecessaryValue(HBaseKey.TABLE, REQUIRED_VALUE);
+        String jdbcUrl = originalConfig.getNecessaryValue(HBaseKey.JDBC_URL, REQUIRED_VALUE);
         boolean isThinMode = jdbcUrl.contains(":thin:");
         // 序列化格式，可不配置，默认PROTOBUF
         String serialization = originalConfig.getString(HBaseKey.SERIALIZATION_NAME, HBaseConstant.DEFAULT_SERIALIZATION);
@@ -67,8 +74,8 @@ public class HBase20xSQLHelper
         }
         // check kerberos
         if (originalConfig.getBool(HBaseKey.HAVE_KERBEROS, false)) {
-            String principal = originalConfig.getNecessaryValue(HBaseKey.KERBEROS_PRINCIPAL, HBase20xSQLWriterErrorCode.REQUIRED_VALUE);
-            String keytab = originalConfig.getNecessaryValue(HBaseKey.KERBEROS_KEYTAB_FILE_PATH, HBase20xSQLWriterErrorCode.REQUIRED_VALUE);
+            String principal = originalConfig.getNecessaryValue(HBaseKey.KERBEROS_PRINCIPAL, REQUIRED_VALUE);
+            String keytab = originalConfig.getNecessaryValue(HBaseKey.KERBEROS_KEYTAB_FILE_PATH, REQUIRED_VALUE);
             kerberosAuthentication(principal, keytab);
             if (isThinMode) {
                 connStr = connStr + "authentication=SPENGO;principal=" + principal + ";keytab=" + keytab;
@@ -87,7 +94,7 @@ public class HBase20xSQLHelper
         List<String> columnNames = originalConfig.getList(HBaseKey.COLUMN, String.class);
         if (columnNames == null || columnNames.isEmpty()) {
             throw AddaxException.asAddaxException(
-                    HBase20xSQLWriterErrorCode.ILLEGAL_VALUE, "HBase的columns配置不能为空,请添加目标表的列名配置.");
+                    CONFIG_ERROR, "HBase的columns配置不能为空,请添加目标表的列名配置.");
         }
         String schema = originalConfig.getString(HBaseKey.SCHEMA);
         // 检查表以及配置列是否存在
@@ -109,7 +116,7 @@ public class HBase20xSQLHelper
             conn.setAutoCommit(false);
         }
         catch (Throwable e) {
-            throw AddaxException.asAddaxException(HBase20xSQLWriterErrorCode.GET_QUERYSERVER_CONNECTION_ERROR,
+            throw AddaxException.asAddaxException(CONNECT_ERROR,
                     "无法连接QueryServer，配置不正确或服务未启动，请检查配置和服务状态或者联系HBase管理员.", e);
         }
         LOG.debug("Connected to QueryServer successfully.");
@@ -118,7 +125,7 @@ public class HBase20xSQLHelper
 
     public static Connection getJdbcConnection(Configuration conf)
     {
-        String queryServerAddress = conf.getNecessaryValue(HBaseKey.QUERY_SERVER_ADDRESS, HBase20xSQLWriterErrorCode.REQUIRED_VALUE);
+        String queryServerAddress = conf.getNecessaryValue(HBaseKey.QUERY_SERVER_ADDRESS, REQUIRED_VALUE);
         if (queryServerAddress.contains(":thin:")) {
             return getClientConnection(queryServerAddress, PHOENIX_JDBC_THIN_DRIVER);
         } else {
@@ -139,8 +146,8 @@ public class HBase20xSQLHelper
                 allColumns.add(rs.getString(1));
             }
             else {
-                LOG.error("表 {} 不存在，请检查表名是否正确或是否已创建. {}", tableName, HBase20xSQLWriterErrorCode.GET_HBASE_TABLE_ERROR);
-                throw AddaxException.asAddaxException(HBase20xSQLWriterErrorCode.GET_HBASE_TABLE_ERROR,
+                LOG.error("表 {} 不存在，请检查表名是否正确或是否已创建. {}", tableName, CONFIG_ERROR);
+                throw AddaxException.asAddaxException(CONFIG_ERROR,
                         tableName + "表不存在，请检查表名是否正确或是否已创建.");
             }
             while (rs.next()) {
@@ -149,13 +156,13 @@ public class HBase20xSQLHelper
             for (String columnName : columnNames) {
                 if (!allColumns.contains(columnName)) {
                     // 用户配置的列名在元数据中不存在
-                    throw AddaxException.asAddaxException(HBase20xSQLWriterErrorCode.ILLEGAL_VALUE,
+                    throw AddaxException.asAddaxException(ILLEGAL_VALUE,
                             "您配置的列" + columnName + "在目的表" + tableName + "的元数据中不存在，请检查您的配置或者联系HBase管理员.");
                 }
             }
         }
         catch (SQLException t) {
-            throw AddaxException.asAddaxException(HBase20xSQLWriterErrorCode.GET_HBASE_TABLE_ERROR,
+            throw AddaxException.asAddaxException(EXECUTE_FAIL,
                     "获取表" + tableName + "信息失败，请检查您的集群和表状态或者联系HBase管理员.", t);
         }
         finally {
@@ -186,7 +193,7 @@ public class HBase20xSQLHelper
             }
         }
         catch (SQLException e) {
-            LOG.warn("数据库连接关闭异常. {}", HBase20xSQLWriterErrorCode.CLOSE_HBASE_CONNECTION_ERROR);
+            LOG.warn("数据库连接关闭异常. {}", EXECUTE_FAIL);
         }
     }
 
@@ -208,7 +215,7 @@ public class HBase20xSQLHelper
             String message = String.format("Kerberos authentication failed, please make sure that kerberosKeytabFilePath[%s] and kerberosPrincipal[%s] are correct",
                     kerberosKeytabFilePath, kerberosPrincipal);
             LOG.error(message);
-            throw AddaxException.asAddaxException(HBase20xSQLWriterErrorCode.KERBEROS_LOGIN_ERROR, e);
+            throw AddaxException.asAddaxException(LOGIN_ERROR, e);
         }
     }
 }
