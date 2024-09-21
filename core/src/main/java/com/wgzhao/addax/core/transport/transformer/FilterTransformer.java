@@ -33,8 +33,8 @@ import org.apache.commons.lang3.StringUtils;
 
 import java.util.Arrays;
 
-import static com.wgzhao.addax.common.exception.CommonErrorCode.ILLEGAL_VALUE;
-import static com.wgzhao.addax.common.exception.CommonErrorCode.RUNTIME_ERROR;
+import static com.wgzhao.addax.common.exception.ErrorCode.ILLEGAL_VALUE;
+import static com.wgzhao.addax.common.exception.ErrorCode.RUNTIME_ERROR;
 
 /**
  * no comments.

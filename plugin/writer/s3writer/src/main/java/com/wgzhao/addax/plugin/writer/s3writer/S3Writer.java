@@ -20,8 +20,6 @@ import software.amazon.awssdk.services.s3.model.CreateMultipartUploadRequest;
 import software.amazon.awssdk.services.s3.model.CreateMultipartUploadResponse;
 import software.amazon.awssdk.services.s3.model.Delete;
 import software.amazon.awssdk.services.s3.model.DeleteObjectsRequest;
-import software.amazon.awssdk.services.s3.model.ListObjectsRequest;
-import software.amazon.awssdk.services.s3.model.ListObjectsResponse;
 import software.amazon.awssdk.services.s3.model.ListObjectsV2Request;
 import software.amazon.awssdk.services.s3.model.ListObjectsV2Response;
 import software.amazon.awssdk.services.s3.model.ObjectIdentifier;
@@ -39,12 +37,11 @@ import java.util.List;
 import java.util.Set;
 import java.util.StringJoiner;
 import java.util.UUID;
-import java.util.function.Consumer;
 
-import static com.wgzhao.addax.common.exception.CommonErrorCode.ILLEGAL_VALUE;
-import static com.wgzhao.addax.common.exception.CommonErrorCode.IO_ERROR;
-import static com.wgzhao.addax.common.exception.CommonErrorCode.REQUIRED_VALUE;
-import static com.wgzhao.addax.common.exception.CommonErrorCode.RUNTIME_ERROR;
+import static com.wgzhao.addax.common.exception.ErrorCode.ILLEGAL_VALUE;
+import static com.wgzhao.addax.common.exception.ErrorCode.IO_ERROR;
+import static com.wgzhao.addax.common.exception.ErrorCode.REQUIRED_VALUE;
+import static com.wgzhao.addax.common.exception.ErrorCode.RUNTIME_ERROR;
 
 public class S3Writer
         extends Writer

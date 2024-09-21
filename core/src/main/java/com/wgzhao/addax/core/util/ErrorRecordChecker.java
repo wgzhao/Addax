@@ -28,7 +28,7 @@ import org.apache.commons.lang3.Validate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import static com.wgzhao.addax.common.exception.CommonErrorCode.OVER_LIMIT_ERROR;
+import static com.wgzhao.addax.common.exception.ErrorCode.OVER_LIMIT_ERROR;
 
 /**
  * 检查任务是否到达错误记录限制。有检查条数（recordLimit）和百分比(percentageLimit)两种方式。

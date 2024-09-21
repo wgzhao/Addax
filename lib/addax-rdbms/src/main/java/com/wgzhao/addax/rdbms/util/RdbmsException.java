@@ -22,11 +22,11 @@
 package com.wgzhao.addax.rdbms.util;
 
 import com.wgzhao.addax.common.exception.AddaxException;
-import com.wgzhao.addax.common.spi.ErrorCode;
+import com.wgzhao.addax.common.exception.ErrorCode;
 
-import static com.wgzhao.addax.common.exception.CommonErrorCode.CONNECT_ERROR;
-import static com.wgzhao.addax.common.exception.CommonErrorCode.EXECUTE_FAIL;
-import static com.wgzhao.addax.common.exception.CommonErrorCode.PERMISSION_ERROR;
+import static com.wgzhao.addax.common.exception.ErrorCode.CONNECT_ERROR;
+import static com.wgzhao.addax.common.exception.ErrorCode.EXECUTE_FAIL;
+import static com.wgzhao.addax.common.exception.ErrorCode.PERMISSION_ERROR;
 
 /**
  * Created by judy.lt on 2015/6/5.

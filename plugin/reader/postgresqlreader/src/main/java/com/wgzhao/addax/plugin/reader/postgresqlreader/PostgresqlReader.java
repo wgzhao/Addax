@@ -37,7 +37,7 @@ import java.util.List;
 
 import static com.wgzhao.addax.common.base.Constant.DEFAULT_FETCH_SIZE;
 import static com.wgzhao.addax.common.base.Key.FETCH_SIZE;
-import static com.wgzhao.addax.common.exception.CommonErrorCode.ILLEGAL_VALUE;
+import static com.wgzhao.addax.common.exception.ErrorCode.ILLEGAL_VALUE;
 
 public class PostgresqlReader
         extends Reader

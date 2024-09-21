@@ -33,7 +33,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.locks.Condition;
 import java.util.concurrent.locks.ReentrantLock;
 
-import static com.wgzhao.addax.common.exception.CommonErrorCode.RUNTIME_ERROR;
+import static com.wgzhao.addax.common.exception.ErrorCode.RUNTIME_ERROR;
 
 /**
  * 内存Channel的具体实现，底层其实是一个ArrayBlockingQueue

@@ -49,10 +49,10 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 
-import static com.wgzhao.addax.common.exception.CommonErrorCode.CONFIG_ERROR;
-import static com.wgzhao.addax.common.exception.CommonErrorCode.CONNECT_ERROR;
-import static com.wgzhao.addax.common.exception.CommonErrorCode.EXECUTE_FAIL;
-import static com.wgzhao.addax.common.exception.CommonErrorCode.RUNTIME_ERROR;
+import static com.wgzhao.addax.common.exception.ErrorCode.CONFIG_ERROR;
+import static com.wgzhao.addax.common.exception.ErrorCode.CONNECT_ERROR;
+import static com.wgzhao.addax.common.exception.ErrorCode.EXECUTE_FAIL;
+import static com.wgzhao.addax.common.exception.ErrorCode.RUNTIME_ERROR;
 
 public final class DBUtil
 {

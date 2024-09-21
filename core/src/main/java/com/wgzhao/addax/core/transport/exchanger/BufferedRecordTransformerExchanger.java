@@ -20,7 +20,7 @@
 package com.wgzhao.addax.core.transport.exchanger;
 
 import com.wgzhao.addax.common.element.Record;
-import com.wgzhao.addax.common.exception.CommonErrorCode;
+import com.wgzhao.addax.common.exception.ErrorCode;
 import com.wgzhao.addax.common.exception.AddaxException;
 import com.wgzhao.addax.common.plugin.RecordReceiver;
 import com.wgzhao.addax.common.plugin.RecordSender;
@@ -37,7 +37,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
 
-import static com.wgzhao.addax.common.exception.CommonErrorCode.CONFIG_ERROR;
+import static com.wgzhao.addax.common.exception.ErrorCode.CONFIG_ERROR;
 
 public class BufferedRecordTransformerExchanger
         extends TransformerExchanger
@@ -99,7 +99,7 @@ public class BufferedRecordTransformerExchanger
     public void sendToWriter(Record record)
     {
         if (shutdown) {
-            throw AddaxException.asAddaxException(CommonErrorCode.SHUT_DOWN_TASK, "");
+            throw AddaxException.asAddaxException(ErrorCode.SHUT_DOWN_TASK, "");
         }
 
         Validate.notNull(record, "The record cannot be empty.");
@@ -131,7 +131,7 @@ public class BufferedRecordTransformerExchanger
     public void flush()
     {
         if (shutdown) {
-            throw AddaxException.asAddaxException(CommonErrorCode.SHUT_DOWN_TASK, "");
+            throw AddaxException.asAddaxException(ErrorCode.SHUT_DOWN_TASK, "");
         }
         this.channel.pushAll(this.buffer);
         //和channel的统计保持同步
@@ -145,7 +145,7 @@ public class BufferedRecordTransformerExchanger
     public void terminate()
     {
         if (shutdown) {
-            throw AddaxException.asAddaxException(CommonErrorCode.SHUT_DOWN_TASK, "");
+            throw AddaxException.asAddaxException(ErrorCode.SHUT_DOWN_TASK, "");
         }
         flush();
         this.channel.pushTerminate(TerminateRecord.get());
@@ -155,7 +155,7 @@ public class BufferedRecordTransformerExchanger
     public Record getFromReader()
     {
         if (shutdown) {
-            throw AddaxException.asAddaxException(CommonErrorCode.SHUT_DOWN_TASK, "");
+            throw AddaxException.asAddaxException(ErrorCode.SHUT_DOWN_TASK, "");
         }
         boolean isEmpty = (this.bufferIndex >= this.buffer.size());
         if (isEmpty) {

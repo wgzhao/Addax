@@ -61,7 +61,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import static com.wgzhao.addax.common.exception.CommonErrorCode.CONFIG_ERROR;
+import static com.wgzhao.addax.common.exception.ErrorCode.CONFIG_ERROR;
 
 /**
  * Created by mazhenlin on 2019/8/21.

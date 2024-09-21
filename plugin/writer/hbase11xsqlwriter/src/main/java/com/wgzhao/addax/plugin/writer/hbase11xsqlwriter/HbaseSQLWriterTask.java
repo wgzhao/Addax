@@ -41,9 +41,9 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
-import static com.wgzhao.addax.common.exception.CommonErrorCode.EXECUTE_FAIL;
-import static com.wgzhao.addax.common.exception.CommonErrorCode.ILLEGAL_VALUE;
-import static com.wgzhao.addax.common.exception.CommonErrorCode.RUNTIME_ERROR;
+import static com.wgzhao.addax.common.exception.ErrorCode.EXECUTE_FAIL;
+import static com.wgzhao.addax.common.exception.ErrorCode.ILLEGAL_VALUE;
+import static com.wgzhao.addax.common.exception.ErrorCode.RUNTIME_ERROR;
 
 /**
  * @author yanghan.y

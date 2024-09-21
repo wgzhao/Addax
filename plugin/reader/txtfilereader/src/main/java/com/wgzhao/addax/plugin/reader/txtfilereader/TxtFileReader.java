@@ -40,10 +40,10 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import static com.wgzhao.addax.common.exception.CommonErrorCode.CONFIG_ERROR;
-import static com.wgzhao.addax.common.exception.CommonErrorCode.ILLEGAL_VALUE;
-import static com.wgzhao.addax.common.exception.CommonErrorCode.IO_ERROR;
-import static com.wgzhao.addax.common.exception.CommonErrorCode.REQUIRED_VALUE;
+import static com.wgzhao.addax.common.exception.ErrorCode.CONFIG_ERROR;
+import static com.wgzhao.addax.common.exception.ErrorCode.ILLEGAL_VALUE;
+import static com.wgzhao.addax.common.exception.ErrorCode.IO_ERROR;
+import static com.wgzhao.addax.common.exception.ErrorCode.REQUIRED_VALUE;
 
 /**
  * Created by haiwei.luo on 14-9-20.

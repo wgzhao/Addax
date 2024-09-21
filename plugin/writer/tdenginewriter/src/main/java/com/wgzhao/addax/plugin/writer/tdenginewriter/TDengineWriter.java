@@ -12,7 +12,7 @@ import org.slf4j.LoggerFactory;
 import java.util.ArrayList;
 import java.util.List;
 
-import static com.wgzhao.addax.common.exception.CommonErrorCode.REQUIRED_VALUE;
+import static com.wgzhao.addax.common.exception.ErrorCode.REQUIRED_VALUE;
 
 public class TDengineWriter
         extends Writer

@@ -37,8 +37,8 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
-import static com.wgzhao.addax.common.exception.CommonErrorCode.CONFIG_ERROR;
-import static com.wgzhao.addax.common.exception.CommonErrorCode.ILLEGAL_VALUE;
+import static com.wgzhao.addax.common.exception.ErrorCode.CONFIG_ERROR;
+import static com.wgzhao.addax.common.exception.ErrorCode.ILLEGAL_VALUE;
 
 public class NormalTask
         extends HbaseAbstractTask

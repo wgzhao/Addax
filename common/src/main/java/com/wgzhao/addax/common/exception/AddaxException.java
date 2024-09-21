@@ -19,7 +19,9 @@
 
 package com.wgzhao.addax.common.exception;
 
-import com.wgzhao.addax.common.spi.ErrorCode;
+import org.apache.commons.lang3.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.PrintWriter;
 import java.io.StringWriter;
@@ -27,7 +29,7 @@ import java.io.StringWriter;
 public class AddaxException
         extends RuntimeException
 {
-
+    private static final Logger logger=  LoggerFactory.getLogger(AddaxException.class);
     private static final long serialVersionUID = 1L;
 
     private final transient ErrorCode errorCode;
@@ -35,6 +37,7 @@ public class AddaxException
     public AddaxException(ErrorCode errorCode, String errorMessage)
     {
         super(errorMessage);
+        logger.error("Error Code: {}: {}", errorCode.getCode(), errorMessage);
         this.errorCode = errorCode;
     }
 
@@ -47,7 +50,11 @@ public class AddaxException
 
     public static AddaxException asAddaxException(ErrorCode errorCode, String message)
     {
-        return new AddaxException(errorCode, message);
+        if (StringUtils.isBlank(message)){
+            message = errorCode.getDescription();
+        }
+        throw new RuntimeException(message);
+//        return new AddaxException(errorCode, message);
     }
 
     public static AddaxException asAddaxException(ErrorCode errorCode, String message, Throwable cause)

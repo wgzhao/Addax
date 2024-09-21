@@ -29,8 +29,8 @@ import org.codehaus.groovy.control.CompilationFailedException;
 import java.util.Arrays;
 import java.util.List;
 
-import static com.wgzhao.addax.common.exception.CommonErrorCode.ILLEGAL_VALUE;
-import static com.wgzhao.addax.common.exception.CommonErrorCode.RUNTIME_ERROR;
+import static com.wgzhao.addax.common.exception.ErrorCode.ILLEGAL_VALUE;
+import static com.wgzhao.addax.common.exception.ErrorCode.RUNTIME_ERROR;
 
 /**
  * no comments.

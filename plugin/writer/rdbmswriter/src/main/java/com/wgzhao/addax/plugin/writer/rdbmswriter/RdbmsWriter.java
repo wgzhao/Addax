@@ -32,8 +32,8 @@ import org.apache.commons.lang3.StringUtils;
 import java.util.List;
 
 import static com.wgzhao.addax.common.base.Key.JDBC_DRIVER;
-import static com.wgzhao.addax.common.exception.CommonErrorCode.CONFIG_ERROR;
-import static com.wgzhao.addax.common.exception.CommonErrorCode.REQUIRED_VALUE;
+import static com.wgzhao.addax.common.exception.ErrorCode.CONFIG_ERROR;
+import static com.wgzhao.addax.common.exception.ErrorCode.REQUIRED_VALUE;
 
 public class RdbmsWriter
         extends Writer

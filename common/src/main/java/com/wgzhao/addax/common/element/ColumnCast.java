@@ -19,7 +19,7 @@
 
 package com.wgzhao.addax.common.element;
 
-import com.wgzhao.addax.common.exception.CommonErrorCode;
+import com.wgzhao.addax.common.exception.ErrorCode;
 import com.wgzhao.addax.common.exception.AddaxException;
 import com.wgzhao.addax.common.util.Configuration;
 import org.apache.commons.lang3.time.DateFormatUtils;
@@ -207,7 +207,7 @@ class DateCast
                         DateCast.datetimeFormat, DateCast.timeZoner);
             default:
                 throw AddaxException
-                        .asAddaxException(CommonErrorCode.CONVERT_NOT_SUPPORT,
+                        .asAddaxException(ErrorCode.CONVERT_NOT_SUPPORT,
                                 "An unsupported type occurred for the date type. Currently, only DATE/TIME/DATETIME are supported.");
         }
     }

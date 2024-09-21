@@ -34,8 +34,8 @@ import java.sql.Connection;
 import java.util.ArrayList;
 import java.util.List;
 
-import static com.wgzhao.addax.common.exception.CommonErrorCode.CONFIG_ERROR;
-import static com.wgzhao.addax.common.exception.CommonErrorCode.EXECUTE_FAIL;
+import static com.wgzhao.addax.common.exception.ErrorCode.CONFIG_ERROR;
+import static com.wgzhao.addax.common.exception.ErrorCode.EXECUTE_FAIL;
 
 /**
  * doris data writer

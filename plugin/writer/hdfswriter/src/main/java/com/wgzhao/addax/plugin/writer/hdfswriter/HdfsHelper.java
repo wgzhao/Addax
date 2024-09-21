@@ -48,11 +48,11 @@ import java.util.Set;
 import static com.wgzhao.addax.common.base.Key.HAVE_KERBEROS;
 import static com.wgzhao.addax.common.base.Key.KERBEROS_KEYTAB_FILE_PATH;
 import static com.wgzhao.addax.common.base.Key.KERBEROS_PRINCIPAL;
-import static com.wgzhao.addax.common.exception.CommonErrorCode.CONFIG_ERROR;
-import static com.wgzhao.addax.common.exception.CommonErrorCode.IO_ERROR;
-import static com.wgzhao.addax.common.exception.CommonErrorCode.LOGIN_ERROR;
-import static com.wgzhao.addax.common.exception.CommonErrorCode.NOT_SUPPORT_TYPE;
-import static com.wgzhao.addax.common.exception.CommonErrorCode.RUNTIME_ERROR;
+import static com.wgzhao.addax.common.exception.ErrorCode.CONFIG_ERROR;
+import static com.wgzhao.addax.common.exception.ErrorCode.IO_ERROR;
+import static com.wgzhao.addax.common.exception.ErrorCode.LOGIN_ERROR;
+import static com.wgzhao.addax.common.exception.ErrorCode.NOT_SUPPORT_TYPE;
+import static com.wgzhao.addax.common.exception.ErrorCode.RUNTIME_ERROR;
 
 public class HdfsHelper
 {

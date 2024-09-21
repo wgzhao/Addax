@@ -52,9 +52,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
-import static com.wgzhao.addax.common.exception.CommonErrorCode.ILLEGAL_VALUE;
-import static com.wgzhao.addax.common.exception.CommonErrorCode.NOT_SUPPORT_TYPE;
-import static com.wgzhao.addax.common.exception.CommonErrorCode.REQUIRED_VALUE;
+import static com.wgzhao.addax.common.exception.ErrorCode.ILLEGAL_VALUE;
+import static com.wgzhao.addax.common.exception.ErrorCode.NOT_SUPPORT_TYPE;
+import static com.wgzhao.addax.common.exception.ErrorCode.REQUIRED_VALUE;
 
 public class StreamReader
         extends Reader

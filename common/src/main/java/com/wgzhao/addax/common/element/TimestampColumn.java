@@ -1,7 +1,7 @@
 package com.wgzhao.addax.common.element;
 
 import com.wgzhao.addax.common.exception.AddaxException;
-import com.wgzhao.addax.common.exception.CommonErrorCode;
+import com.wgzhao.addax.common.exception.ErrorCode;
 
 import java.math.BigDecimal;
 import java.math.BigInteger;
@@ -91,24 +91,24 @@ public class TimestampColumn
     @Override
     public byte[] asBytes()
     {
-        throw AddaxException.asAddaxException(CommonErrorCode.CONVERT_NOT_SUPPORT, String.format(errorTemplate, "Bytes"));
+        throw AddaxException.asAddaxException(ErrorCode.CONVERT_NOT_SUPPORT, String.format(errorTemplate, "Bytes"));
     }
 
     @Override
     public Boolean asBoolean()
     {
-        throw AddaxException.asAddaxException(CommonErrorCode.CONVERT_NOT_SUPPORT, String.format(errorTemplate, "Boolean"));
+        throw AddaxException.asAddaxException(ErrorCode.CONVERT_NOT_SUPPORT, String.format(errorTemplate, "Boolean"));
     }
 
     @Override
     public BigDecimal asBigDecimal()
     {
-        throw AddaxException.asAddaxException(CommonErrorCode.CONVERT_NOT_SUPPORT, String.format(errorTemplate, "BigDecimal"));
+        throw AddaxException.asAddaxException(ErrorCode.CONVERT_NOT_SUPPORT, String.format(errorTemplate, "BigDecimal"));
     }
 
     @Override
     public BigInteger asBigInteger()
     {
-        throw AddaxException.asAddaxException(CommonErrorCode.CONVERT_NOT_SUPPORT, String.format(errorTemplate, "BigInteger"));
+        throw AddaxException.asAddaxException(ErrorCode.CONVERT_NOT_SUPPORT, String.format(errorTemplate, "BigInteger"));
     }
 }

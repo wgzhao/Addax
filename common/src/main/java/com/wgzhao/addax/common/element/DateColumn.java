@@ -19,7 +19,7 @@
 
 package com.wgzhao.addax.common.element;
 
-import com.wgzhao.addax.common.exception.CommonErrorCode;
+import com.wgzhao.addax.common.exception.ErrorCode;
 import com.wgzhao.addax.common.exception.AddaxException;
 
 import java.math.BigDecimal;
@@ -141,7 +141,7 @@ public class DateColumn
         }
         catch (Exception e) {
             throw AddaxException.asAddaxException(
-                    CommonErrorCode.CONVERT_NOT_SUPPORT,
+                    ErrorCode.CONVERT_NOT_SUPPORT,
                     String.format("Date[%s] type cannot be converted to String .", this));
         }
     }
@@ -160,28 +160,28 @@ public class DateColumn
     public byte[] asBytes()
     {
         throw AddaxException.asAddaxException(
-                CommonErrorCode.CONVERT_NOT_SUPPORT, String.format(errorTemplate, "Bytes"));
+                ErrorCode.CONVERT_NOT_SUPPORT, String.format(errorTemplate, "Bytes"));
     }
 
     @Override
     public Boolean asBoolean()
     {
         throw AddaxException.asAddaxException(
-                CommonErrorCode.CONVERT_NOT_SUPPORT, String.format(errorTemplate, "Boolean"));
+                ErrorCode.CONVERT_NOT_SUPPORT, String.format(errorTemplate, "Boolean"));
     }
 
     @Override
     public Double asDouble()
     {
         throw AddaxException.asAddaxException(
-                CommonErrorCode.CONVERT_NOT_SUPPORT, String.format(errorTemplate, "Double"));
+                ErrorCode.CONVERT_NOT_SUPPORT, String.format(errorTemplate, "Double"));
     }
 
     @Override
     public BigInteger asBigInteger()
     {
         throw AddaxException.asAddaxException(
-                CommonErrorCode.CONVERT_NOT_SUPPORT, String.format(errorTemplate, "BigInteger"));
+                ErrorCode.CONVERT_NOT_SUPPORT, String.format(errorTemplate, "BigInteger"));
     }
 
     @Override
@@ -197,7 +197,7 @@ public class DateColumn
     public BigDecimal asBigDecimal()
     {
         throw AddaxException.asAddaxException(
-                CommonErrorCode.CONVERT_NOT_SUPPORT, String.format(errorTemplate, "BigDecimal"));
+                ErrorCode.CONVERT_NOT_SUPPORT, String.format(errorTemplate, "BigDecimal"));
     }
 
     public DateType getSubType()

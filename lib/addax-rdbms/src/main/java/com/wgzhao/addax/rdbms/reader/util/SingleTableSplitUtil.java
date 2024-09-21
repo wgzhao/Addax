@@ -46,8 +46,8 @@ import java.sql.Types;
 import java.util.ArrayList;
 import java.util.List;
 
-import static com.wgzhao.addax.common.exception.CommonErrorCode.CONFIG_ERROR;
-import static com.wgzhao.addax.common.exception.CommonErrorCode.NOT_SUPPORT_TYPE;
+import static com.wgzhao.addax.common.exception.ErrorCode.CONFIG_ERROR;
+import static com.wgzhao.addax.common.exception.ErrorCode.NOT_SUPPORT_TYPE;
 
 public class SingleTableSplitUtil
 {

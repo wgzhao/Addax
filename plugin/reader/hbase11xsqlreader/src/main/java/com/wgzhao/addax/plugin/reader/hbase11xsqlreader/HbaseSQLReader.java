@@ -50,8 +50,8 @@ import java.sql.Types;
 import java.util.ArrayList;
 import java.util.List;
 
-import static com.wgzhao.addax.common.exception.CommonErrorCode.EXECUTE_FAIL;
-import static com.wgzhao.addax.common.exception.CommonErrorCode.NOT_SUPPORT_TYPE;
+import static com.wgzhao.addax.common.exception.ErrorCode.EXECUTE_FAIL;
+import static com.wgzhao.addax.common.exception.ErrorCode.NOT_SUPPORT_TYPE;
 
 public class HbaseSQLReader
         extends Reader

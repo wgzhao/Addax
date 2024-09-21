@@ -34,9 +34,9 @@ import java.util.Base64;
 import java.util.List;
 import java.util.StringJoiner;
 
-import static com.wgzhao.addax.common.exception.CommonErrorCode.IO_ERROR;
-import static com.wgzhao.addax.common.exception.CommonErrorCode.NOT_SUPPORT_TYPE;
-import static com.wgzhao.addax.common.exception.CommonErrorCode.RUNTIME_ERROR;
+import static com.wgzhao.addax.common.exception.ErrorCode.IO_ERROR;
+import static com.wgzhao.addax.common.exception.ErrorCode.NOT_SUPPORT_TYPE;
+import static com.wgzhao.addax.common.exception.ErrorCode.RUNTIME_ERROR;
 
 public class OrcWriter
         extends HdfsHelper

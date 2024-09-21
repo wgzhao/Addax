@@ -9,7 +9,7 @@ import software.amazon.awssdk.services.s3.S3Client;
 
 import java.net.URI;
 
-import static com.wgzhao.addax.common.exception.CommonErrorCode.ILLEGAL_VALUE;
+import static com.wgzhao.addax.common.exception.ErrorCode.ILLEGAL_VALUE;
 
 public class S3Util
 {

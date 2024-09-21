@@ -30,6 +30,7 @@ import com.wgzhao.addax.common.spi.Reader;
 import com.wgzhao.addax.common.util.Configuration;
 import com.wgzhao.addax.storage.reader.StorageReaderUtil;
 import com.wgzhao.addax.storage.util.FileHelper;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -40,8 +41,8 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.List;
 
-import static com.wgzhao.addax.common.exception.CommonErrorCode.REQUIRED_VALUE;
-import static com.wgzhao.addax.common.exception.CommonErrorCode.RUNTIME_ERROR;
+import static com.wgzhao.addax.common.exception.ErrorCode.REQUIRED_VALUE;
+import static com.wgzhao.addax.common.exception.ErrorCode.RUNTIME_ERROR;
 
 /**
  * Created by zhongtian.hu on 19-8-8.
@@ -60,17 +61,6 @@ public class DbfReader
 
         private List<String> sourceFiles;
 
-        private boolean isBlank(Object object)
-        {
-            if (null == object) {
-                return true;
-            }
-            if ((object instanceof String)) {
-                return "".equals(((String) object).trim());
-            }
-            return false;
-        }
-
         @Override
         public void init()
         {
@@ -83,11 +73,6 @@ public class DbfReader
         {
             // Compatible with the old version, path is a string before
             String pathInString = this.originConfig.getNecessaryValue(Key.PATH, REQUIRED_VALUE);
-            if (isBlank(pathInString)) {
-                throw AddaxException.asAddaxException(
-                        REQUIRED_VALUE,
-                        "您需要指定待读取的源目录或文件");
-            }
             if (!pathInString.startsWith("[") && !pathInString.endsWith("]")) {
                 path = new ArrayList<>();
                 path.add(pathInString);
@@ -97,7 +82,7 @@ public class DbfReader
                 if (null == path || path.isEmpty()) {
                     throw AddaxException.asAddaxException(
                             REQUIRED_VALUE,
-                            "您需要指定待读取的源目录或文件");
+                            "Nothing to read due to no file path specified.");
                 }
             }
         }
@@ -109,7 +94,7 @@ public class DbfReader
 
             this.sourceFiles = FileHelper.buildSourceTargets(this.path);
 
-            LOG.info("您即将读取的文件数为: [{}]", this.sourceFiles.size());
+            LOG.info("{} file(s) to be read", this.sourceFiles.size());
         }
 
         @Override
@@ -203,6 +188,10 @@ public class DbfReader
             int colNum = column.size();
             DBFRow row;
             for (String fileName : this.sourceFiles) {
+                if (StringUtils.isBlank(fileName)) {
+                    LOG.warn("source file name is blank, continue...");
+                    continue;
+                }
                 LOG.info("begin reading file : [{}]", fileName);
                 try (DBFReader reader = new DBFReader(new FileInputStream(fileName), Charset.forName(encode))) {
                     while ((row = reader.nextRow()) != null) {

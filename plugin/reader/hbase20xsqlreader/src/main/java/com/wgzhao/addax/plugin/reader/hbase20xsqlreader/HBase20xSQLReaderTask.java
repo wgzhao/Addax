@@ -47,8 +47,8 @@ import java.sql.Time;
 import java.sql.Timestamp;
 import java.sql.Types;
 
-import static com.wgzhao.addax.common.exception.CommonErrorCode.EXECUTE_FAIL;
-import static com.wgzhao.addax.common.exception.CommonErrorCode.NOT_SUPPORT_TYPE;
+import static com.wgzhao.addax.common.exception.ErrorCode.EXECUTE_FAIL;
+import static com.wgzhao.addax.common.exception.ErrorCode.NOT_SUPPORT_TYPE;
 
 public class HBase20xSQLReaderTask
 {

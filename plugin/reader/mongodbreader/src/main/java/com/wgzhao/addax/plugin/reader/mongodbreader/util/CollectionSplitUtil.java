@@ -35,7 +35,7 @@ import java.util.List;
 
 import static com.wgzhao.addax.common.base.Key.CONNECTION;
 import static com.wgzhao.addax.common.base.Key.DATABASE;
-import static com.wgzhao.addax.common.exception.CommonErrorCode.ILLEGAL_VALUE;
+import static com.wgzhao.addax.common.exception.ErrorCode.ILLEGAL_VALUE;
 
 public class CollectionSplitUtil
 {

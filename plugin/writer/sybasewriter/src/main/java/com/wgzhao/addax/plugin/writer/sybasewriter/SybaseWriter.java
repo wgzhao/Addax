@@ -29,7 +29,7 @@ import com.wgzhao.addax.rdbms.writer.CommonRdbmsWriter;
 
 import java.util.List;
 
-import static com.wgzhao.addax.common.exception.CommonErrorCode.CONFIG_ERROR;
+import static com.wgzhao.addax.common.exception.ErrorCode.CONFIG_ERROR;
 
 public class SybaseWriter
         extends Writer

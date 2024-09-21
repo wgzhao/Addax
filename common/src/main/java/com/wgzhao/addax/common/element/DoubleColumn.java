@@ -19,7 +19,7 @@
 
 package com.wgzhao.addax.common.element;
 
-import com.wgzhao.addax.common.exception.CommonErrorCode;
+import com.wgzhao.addax.common.exception.ErrorCode;
 import com.wgzhao.addax.common.exception.AddaxException;
 
 import java.math.BigDecimal;
@@ -103,7 +103,7 @@ public class DoubleColumn
         }
         catch (NumberFormatException e) {
             throw AddaxException.asAddaxException(
-                    CommonErrorCode.CONVERT_NOT_SUPPORT,
+                    ErrorCode.CONVERT_NOT_SUPPORT,
                     String.format("String[%s] cannot be converted to Double.",
                             this.getRawData()));
         }
@@ -166,28 +166,28 @@ public class DoubleColumn
     public Boolean asBoolean()
     {
         throw AddaxException.asAddaxException(
-                CommonErrorCode.CONVERT_NOT_SUPPORT, String.format(errorTemplate, "Boolean"));
+                ErrorCode.CONVERT_NOT_SUPPORT, String.format(errorTemplate, "Boolean"));
     }
 
     @Override
     public Date asDate()
     {
         throw AddaxException.asAddaxException(
-                CommonErrorCode.CONVERT_NOT_SUPPORT, String.format(errorTemplate, "Date"));
+                ErrorCode.CONVERT_NOT_SUPPORT, String.format(errorTemplate, "Date"));
     }
 
     @Override
     public byte[] asBytes()
     {
         throw AddaxException.asAddaxException(
-                CommonErrorCode.CONVERT_NOT_SUPPORT, String.format(errorTemplate, "Bytes"));
+                ErrorCode.CONVERT_NOT_SUPPORT, String.format(errorTemplate, "Bytes"));
     }
 
     @Override
     public Timestamp asTimestamp()
     {
         throw AddaxException.asAddaxException(
-                CommonErrorCode.CONVERT_NOT_SUPPORT, String.format(errorTemplate, "Timestamp"));
+                ErrorCode.CONVERT_NOT_SUPPORT, String.format(errorTemplate, "Timestamp"));
     }
 
     private void validate( String data)
@@ -206,7 +206,7 @@ public class DoubleColumn
         }
         catch (Exception e) {
             throw AddaxException.asAddaxException(
-                    CommonErrorCode.CONVERT_NOT_SUPPORT,
+                    ErrorCode.CONVERT_NOT_SUPPORT,
                     String.format("String[%s] cannot be converted to Double.", data));
         }
     }

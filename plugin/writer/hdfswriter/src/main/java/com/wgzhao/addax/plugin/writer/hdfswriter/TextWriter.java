@@ -48,8 +48,8 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
-import static com.wgzhao.addax.common.exception.CommonErrorCode.IO_ERROR;
-import static com.wgzhao.addax.common.exception.CommonErrorCode.NOT_SUPPORT_TYPE;
+import static com.wgzhao.addax.common.exception.ErrorCode.IO_ERROR;
+import static com.wgzhao.addax.common.exception.ErrorCode.NOT_SUPPORT_TYPE;
 
 public class TextWriter
         extends HdfsHelper

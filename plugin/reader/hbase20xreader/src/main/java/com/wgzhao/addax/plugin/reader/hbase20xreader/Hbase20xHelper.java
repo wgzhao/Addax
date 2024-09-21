@@ -19,7 +19,6 @@
 
 package com.wgzhao.addax.plugin.reader.hbase20xreader;
 
-import com.jcraft.jsch.IO;
 import com.wgzhao.addax.common.base.HBaseConstant;
 import com.wgzhao.addax.common.base.HBaseKey;
 import com.wgzhao.addax.common.exception.AddaxException;
@@ -49,10 +48,10 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import static com.wgzhao.addax.common.exception.CommonErrorCode.EXECUTE_FAIL;
-import static com.wgzhao.addax.common.exception.CommonErrorCode.ILLEGAL_VALUE;
-import static com.wgzhao.addax.common.exception.CommonErrorCode.IO_ERROR;
-import static com.wgzhao.addax.common.exception.CommonErrorCode.REQUIRED_VALUE;
+import static com.wgzhao.addax.common.exception.ErrorCode.EXECUTE_FAIL;
+import static com.wgzhao.addax.common.exception.ErrorCode.ILLEGAL_VALUE;
+import static com.wgzhao.addax.common.exception.ErrorCode.IO_ERROR;
+import static com.wgzhao.addax.common.exception.ErrorCode.REQUIRED_VALUE;
 
 public class Hbase20xHelper
 {

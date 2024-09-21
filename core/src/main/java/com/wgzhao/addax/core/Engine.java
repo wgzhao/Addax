@@ -124,13 +124,13 @@ public class Engine {
     }
 
     public static void main(String[] args) {
-        System.out.println("\n  ___      _     _            \n" +
+        LOG.info("\n  ___      _     _            \n" +
                 " / _ \\    | |   | |           \n" +
                 "/ /_\\ \\ __| | __| | __ ___  __\n" +
                 "|  _  |/ _` |/ _` |/ _` \\ \\/ /\n" +
                 "| | | | (_| | (_| | (_| |>  < \n" +
-                "\\_| |_/\\__,_|\\__,_|\\__,_/_/\\_\\\n");
-        System.out.println(":: Addax version ::    (v" + Engine.getVersion() + ")\n");
+                "\\_| |_/\\__,_|\\__,_|\\__,_/_/\\_\\\n"+
+                        ":: Addax version ::    (v{})", Engine.getVersion());
         if (args.length < 2) {
             LOG.error("need a job file");
             System.exit(1);

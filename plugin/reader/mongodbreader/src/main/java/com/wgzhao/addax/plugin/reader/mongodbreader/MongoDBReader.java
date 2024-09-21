@@ -53,8 +53,8 @@ import static com.wgzhao.addax.common.base.Key.DATABASE;
 import static com.wgzhao.addax.common.base.Key.FETCH_SIZE;
 import static com.wgzhao.addax.common.base.Key.PASSWORD;
 import static com.wgzhao.addax.common.base.Key.USERNAME;
-import static com.wgzhao.addax.common.exception.CommonErrorCode.ILLEGAL_VALUE;
-import static com.wgzhao.addax.common.exception.CommonErrorCode.REQUIRED_VALUE;
+import static com.wgzhao.addax.common.exception.ErrorCode.ILLEGAL_VALUE;
+import static com.wgzhao.addax.common.exception.ErrorCode.REQUIRED_VALUE;
 
 public class MongoDBReader
         extends Reader

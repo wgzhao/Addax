@@ -20,7 +20,7 @@
 package com.wgzhao.addax.core.transport.exchanger;
 
 import com.wgzhao.addax.common.element.Record;
-import com.wgzhao.addax.common.exception.CommonErrorCode;
+import com.wgzhao.addax.common.exception.ErrorCode;
 import com.wgzhao.addax.common.exception.AddaxException;
 import com.wgzhao.addax.common.plugin.RecordReceiver;
 import com.wgzhao.addax.common.plugin.RecordSender;
@@ -34,7 +34,7 @@ import com.wgzhao.addax.core.util.container.CoreConstant;
 
 import java.util.List;
 
-import static com.wgzhao.addax.common.exception.CommonErrorCode.CONFIG_ERROR;
+import static com.wgzhao.addax.common.exception.ErrorCode.CONFIG_ERROR;
 
 public class RecordExchanger
         extends TransformerExchanger
@@ -68,7 +68,7 @@ public class RecordExchanger
     public Record getFromReader()
     {
         if (shutdown) {
-            throw AddaxException.asAddaxException(CommonErrorCode.SHUT_DOWN_TASK, "");
+            throw AddaxException.asAddaxException(ErrorCode.SHUT_DOWN_TASK, "");
         }
         Record record = this.channel.pull();
         return (record instanceof TerminateRecord ? null : record);
@@ -89,7 +89,7 @@ public class RecordExchanger
     public void sendToWriter(Record record)
     {
         if (shutdown) {
-            throw AddaxException.asAddaxException(CommonErrorCode.SHUT_DOWN_TASK, "");
+            throw AddaxException.asAddaxException(ErrorCode.SHUT_DOWN_TASK, "");
         }
         record = doTransformer(record);
         if (record == null) {
@@ -109,7 +109,7 @@ public class RecordExchanger
     public void terminate()
     {
         if (shutdown) {
-            throw AddaxException.asAddaxException(CommonErrorCode.SHUT_DOWN_TASK, "");
+            throw AddaxException.asAddaxException(ErrorCode.SHUT_DOWN_TASK, "");
         }
         this.channel.pushTerminate(TerminateRecord.get());
         //和channel的统计保持同步

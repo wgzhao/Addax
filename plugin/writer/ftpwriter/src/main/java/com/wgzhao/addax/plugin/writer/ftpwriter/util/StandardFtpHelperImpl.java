@@ -37,10 +37,10 @@ import java.net.UnknownHostException;
 import java.util.HashSet;
 import java.util.Set;
 
-import static com.wgzhao.addax.common.exception.CommonErrorCode.CONNECT_ERROR;
-import static com.wgzhao.addax.common.exception.CommonErrorCode.EXECUTE_FAIL;
-import static com.wgzhao.addax.common.exception.CommonErrorCode.IO_ERROR;
-import static com.wgzhao.addax.common.exception.CommonErrorCode.LOGIN_ERROR;
+import static com.wgzhao.addax.common.exception.ErrorCode.CONNECT_ERROR;
+import static com.wgzhao.addax.common.exception.ErrorCode.EXECUTE_FAIL;
+import static com.wgzhao.addax.common.exception.ErrorCode.IO_ERROR;
+import static com.wgzhao.addax.common.exception.ErrorCode.LOGIN_ERROR;
 import static org.apache.commons.net.ftp.FTP.BINARY_FILE_TYPE;
 
 public class StandardFtpHelperImpl

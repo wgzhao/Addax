@@ -23,7 +23,7 @@ import com.wgzhao.addax.common.exception.AddaxException;
 import com.wgzhao.addax.core.meta.State;
 import com.wgzhao.addax.core.taskgroup.TaskGroupContainer;
 
-import static com.wgzhao.addax.common.exception.CommonErrorCode.RUNTIME_ERROR;
+import static com.wgzhao.addax.common.exception.ErrorCode.RUNTIME_ERROR;
 
 public class TaskGroupContainerRunner
         implements Runnable {

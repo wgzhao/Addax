@@ -22,7 +22,7 @@ package com.wgzhao.addax.core.taskgroup;
 import com.alibaba.fastjson2.JSON;
 import com.wgzhao.addax.common.constant.PluginType;
 import com.wgzhao.addax.common.exception.AddaxException;
-import com.wgzhao.addax.common.exception.CommonErrorCode;
+import com.wgzhao.addax.common.exception.ErrorCode;
 import com.wgzhao.addax.common.plugin.RecordSender;
 import com.wgzhao.addax.common.plugin.TaskPluginCollector;
 import com.wgzhao.addax.common.util.Configuration;
@@ -55,8 +55,8 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
-import static com.wgzhao.addax.common.exception.CommonErrorCode.CONFIG_ERROR;
-import static com.wgzhao.addax.common.exception.CommonErrorCode.RUNTIME_ERROR;
+import static com.wgzhao.addax.common.exception.ErrorCode.CONFIG_ERROR;
+import static com.wgzhao.addax.common.exception.ErrorCode.RUNTIME_ERROR;
 
 public class TaskGroupContainer
         extends AbstractContainer
@@ -208,7 +208,7 @@ public class TaskGroupContainer
                             if (now - failedTime > taskMaxWaitInMs) {
                                 markCommunicationFailed(taskId);
                                 reportTaskGroupCommunication(lastTaskGroupContainerCommunication, taskCountInThisTaskGroup);
-                                throw AddaxException.asAddaxException(CommonErrorCode.WAIT_TIME_EXCEED, "The task failover wait timed out.");
+                                throw AddaxException.asAddaxException(ErrorCode.WAIT_TIME_EXCEED, "The task failover wait timed out.");
                             }
                             else {
                                 lastExecutor.shutdown(); //try to close again
