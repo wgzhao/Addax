@@ -28,14 +28,13 @@ import com.wgzhao.addax.common.element.LongColumn;
 import com.wgzhao.addax.common.element.Record;
 import com.wgzhao.addax.common.element.StringColumn;
 import com.wgzhao.addax.common.exception.AddaxException;
-import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.DateUtil;
 import org.apache.poi.ss.usermodel.FormulaEvaluator;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
-import org.apache.poi.xssf.usermodel.XSSFWorkbook;
+import org.apache.poi.ss.usermodel.WorkbookFactory;
 
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -61,12 +60,8 @@ public class ExcelHelper
     {
         try {
             this.file = new FileInputStream(filePath);
-            if (filePath.endsWith(".xlsx")) {
-                this.workbook = new XSSFWorkbook(file);
-            } else {
-                this.workbook = new HSSFWorkbook(file);
-            }
-            // ONLY reader the first sheet
+            workbook = WorkbookFactory.create(file);
+            // ONLY read the first sheet
             Sheet sheet = workbook.getSheetAt(0);
             this.evaluator =  workbook.getCreationHelper().createFormulaEvaluator();
             this.rowIterator = sheet.iterator();

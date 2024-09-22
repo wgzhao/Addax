@@ -28,15 +28,14 @@ import com.wgzhao.addax.common.plugin.RecordSender;
 import com.wgzhao.addax.common.spi.Reader;
 import com.wgzhao.addax.common.util.Configuration;
 import com.wgzhao.addax.storage.util.FileHelper;
-import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
 import java.util.List;
 
+import static com.wgzhao.addax.common.spi.ErrorCode.CONFIG_ERROR;
 import static com.wgzhao.addax.common.spi.ErrorCode.REQUIRED_VALUE;
-import static com.wgzhao.addax.common.spi.ErrorCode.RUNTIME_ERROR;
 
 public class ExcelReader
         extends Reader
@@ -48,7 +47,6 @@ public class ExcelReader
         private static final Logger LOG = LoggerFactory.getLogger(Job.class);
 
         private Configuration originConfig = null;
-        private List<String> path = null;
         private List<String> sourceFiles;
 
         @Override
@@ -57,9 +55,7 @@ public class ExcelReader
             this.originConfig = this.getPluginJobConf();
             // Compatible with the old version, path is a string before
             String pathInString = this.originConfig.getNecessaryValue(Key.PATH, REQUIRED_VALUE);
-            if (StringUtils.isBlank(pathInString)) {
-                throw AddaxException.asAddaxException(REQUIRED_VALUE, "the path is required");
-            }
+            List<String> path;
             if (!pathInString.startsWith("[") && !pathInString.endsWith("]")) {
                 path = new ArrayList<>();
                 path.add(pathInString);
@@ -71,8 +67,11 @@ public class ExcelReader
                 }
             }
 
-//            this.sourceFiles = this.buildSourceTargets();
             this.sourceFiles = FileHelper.buildSourceTargets(path);
+            if (sourceFiles.isEmpty()) {
+                throw AddaxException.asAddaxException(CONFIG_ERROR,
+                        "Cannot find any file in path: " + path + ", assuring the path(s) exists and has right permission");
+            }
             LOG.info("The number of files to read is: [{}]", this.sourceFiles.size());
         }
 
@@ -88,14 +87,7 @@ public class ExcelReader
             LOG.debug("Begin to split...");
             List<Configuration> readerSplitConfigs = new ArrayList<>();
 
-            // warn:每个slice拖且仅拖一个文件,
-            // int splitNumber = adviceNumber
-            int splitNumber = this.sourceFiles.size();
-            if (0 == splitNumber) {
-                throw AddaxException.asAddaxException(
-                        RUNTIME_ERROR,
-                        "Nothing found in the directory " + this.originConfig.getString(Key.PATH) + ". Please check it");
-            }
+            int splitNumber = Math.min(this.sourceFiles.size(), adviceNumber);
 
             List<List<String>> splitSourceFiles = FileHelper.splitSourceFiles(this.sourceFiles, splitNumber);
             for (List<String> files : splitSourceFiles) {
