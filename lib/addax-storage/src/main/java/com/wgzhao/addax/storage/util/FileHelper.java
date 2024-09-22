@@ -24,7 +24,6 @@ import org.apache.commons.compress.compressors.CompressorException;
 import org.apache.commons.compress.compressors.CompressorInputStream;
 import org.apache.commons.compress.compressors.CompressorStreamFactory;
 import org.apache.commons.io.FilenameUtils;
-import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
@@ -44,14 +43,11 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
-import java.util.regex.Pattern;
 
 public class FileHelper {
     public final static Logger LOG = LoggerFactory.getLogger(FileHelper.class);
@@ -161,11 +157,6 @@ public class FileHelper {
         } catch (CompressorException | IOException e) {
             throw new RuntimeException("Failed to read compress file", e);
         }
-    }
-
-    public static boolean checkDirectoryWritable(String directory) {
-        Path path = Paths.get(directory);
-        return Files.isWritable(path);
     }
 
     // validate the path, path must be an absolute path
