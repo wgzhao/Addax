@@ -38,7 +38,7 @@
           }
         },
         "writer": {
-          "name": "dbffilewriter",
+          "name": "dbfwriter",
           "parameter": {
             "column": [
               {
