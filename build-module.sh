@@ -1,9 +1,10 @@
 #!/bin/bash
 # compile specify module and copy to specify directory
 version=$(head -n10 pom.xml | awk -F'[<>]' '/<version>/ {print $3; exit}')
+mvn_opts="-Dmaven.test.skip=true -Dmaven.javadoc.skip=true -Dmaven.source.skip=true --quiet"
 function build_base() {
     cd $SRC_DIR
-    mvn package -B --quiet -pl :addax-core,:addax-rdbms,:addax-storage,:addax-transformer -am -Dmaven.test.skip=true || exit 1
+    mvn package -B $mvn_opts -pl :addax-core,:addax-rdbms,:addax-storage,:addax-transformer -am || exit 1
     cp -a core/target/addax/* ${ADDAX_HOME}
     rsync -azv lib/addax-{rdbms,storage,transformer}/target/addax/lib/* ${ADDAX_HOME}/lib/
 }
@@ -28,7 +29,7 @@ fi
 MODULE_NAME=$1
 
 cd $SRC_DIR
-mvn package -B --quiet -pl :$MODULE_NAME -am -Dmaven.test.skip=true || exit 1
+mvn package -B $mvn_opts -pl :$MODULE_NAME -am  || exit 1
 
 if [ "$MODULE_NAME" == "addax-core" ]; then
     cp -a core/target/${MODULE_NAME}-${version}.jar ${ADDAX_HOME}/lib
