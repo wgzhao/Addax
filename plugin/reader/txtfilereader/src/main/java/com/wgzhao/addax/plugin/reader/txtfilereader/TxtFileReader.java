@@ -42,7 +42,6 @@ import java.util.List;
 
 import static com.wgzhao.addax.common.spi.ErrorCode.CONFIG_ERROR;
 import static com.wgzhao.addax.common.spi.ErrorCode.ILLEGAL_VALUE;
-import static com.wgzhao.addax.common.spi.ErrorCode.IO_ERROR;
 import static com.wgzhao.addax.common.spi.ErrorCode.REQUIRED_VALUE;
 
 /**
@@ -89,7 +88,10 @@ public class TxtFileReader
             }
 
             this.sourceFiles = FileHelper.buildSourceTargets(path);
-
+            if (sourceFiles.isEmpty()) {
+                throw AddaxException.asAddaxException(CONFIG_ERROR,
+                        "Cannot find any file in path: " + path + ", assuring the path(s) exists and has right permission");
+            }
             List<Configuration> columns = this.originConfig.getListConfiguration(Key.COLUMN);
             if (null != columns && !columns.isEmpty()) {
                 for (Configuration eachColumnConf : columns) {
@@ -105,33 +107,18 @@ public class TxtFileReader
         }
 
         @Override
-        public void post()
-        {
-            //
-        }
-
-        @Override
         public void destroy()
         {
             //
         }
 
-        // warn: 如果源目录为空会报错，拖空目录意图=>空文件显示指定此意图
         @Override
         public List<Configuration> split(int adviceNumber)
         {
             LOG.debug("split() begin...");
             List<Configuration> readerSplitConfigs = new ArrayList<>();
 
-            // warn:每个slice拖且仅拖一个文件,
-            // int splitNumber = adviceNumber
-            int splitNumber = this.sourceFiles.size();
-            if (0 == splitNumber) {
-                throw AddaxException.asAddaxException(
-                        CONFIG_ERROR, String
-                                .format("未能找到待读取的文件,请确认您的配置项path: %s",
-                                        this.originConfig.getString(Key.PATH)));
-            }
+            int splitNumber = sourceFiles.size() > 10 ? adviceNumber : sourceFiles.size();
 
             List<List<String>> splitSourceFiles = FileHelper.splitSourceFiles(this.sourceFiles, splitNumber);
             for (List<String> files : splitSourceFiles) {
@@ -176,7 +163,7 @@ public class TxtFileReader
                 this.originConfig.set(Key.COLUMN, columns);
             }
             catch (IOException e) {
-                e.printStackTrace();
+                LOG.error(e.getMessage());
             }
             finally {
                 IOUtils.closeQuietly(reader, null);
@@ -200,18 +187,6 @@ public class TxtFileReader
         }
 
         @Override
-        public void prepare()
-        {
-            //
-        }
-
-        @Override
-        public void post()
-        {
-            //
-        }
-
-        @Override
         public void destroy()
         {
             //
@@ -220,18 +195,15 @@ public class TxtFileReader
         @Override
         public void startRead(RecordSender recordSender)
         {
-            LOG.debug("start read source files...");
+            LOG.debug("Begin to read source files...");
             FileInputStream inputStream;
             for (String fileName : this.sourceFiles) {
-                LOG.info("reading file : [{}]", fileName);
+                LOG.info("Reading file {}", fileName);
                 try {
                     inputStream = new FileInputStream(fileName);
                 }
                 catch (FileNotFoundException e) {
-                    throw AddaxException.asAddaxException(
-                            IO_ERROR,
-                            "Open file '" + fileName + "' failure"
-                    );
+                    throw AddaxException.asAddaxException(CONFIG_ERROR, "The file '" + fileName + "' does not exists");
                 }
                 StorageReaderUtil.readFromStream(inputStream, fileName, readerSliceConfig, recordSender, getTaskPluginCollector());
             }
