@@ -163,47 +163,13 @@ public class FileHelper {
         }
     }
 
-    public static boolean checkDirectoryReadable(String directory) {
-        return checkDirPermission(directory, "r");
-    }
-
     public static boolean checkDirectoryWritable(String directory) {
-        return checkDirPermission(directory, "w");
-    }
-
-    private static boolean checkDirPermission(String directory, String permission) {
-        File file = new File(FilenameUtils.getFullPath(directory));
-        if (!file.exists()) {
-            throw new RuntimeException("The directory [" + directory + "] does not exists.");
-        }
-        if (!file.isDirectory()) {
-            throw new RuntimeException("The [" + directory + "] is not a directory.");
-        }
-
-        if ("r".equalsIgnoreCase(permission)) {
-            return file.canRead();
-        } else {
-            return file.canWrite();
-        }
-    }
-
-    public static Pattern generatePattern(String dir) {
-        String regexString = dir.replace("*", ".*").replace("?", ".?");
-        return Pattern.compile(regexString);
-    }
-
-    public static boolean isTargetFile(Map<String, Pattern> patterns, Map<String, Boolean> isRegexPath, String regexPath, String absoluteFilePath) {
-        if (isRegexPath.get(regexPath)) {
-            return patterns.get(regexPath).matcher(absoluteFilePath).matches();
-        } else {
-            return true;
-        }
+        Path path = Paths.get(directory);
+        return Files.isWritable(path);
     }
 
     // validate the path, path must be an absolute path
     public static List<String> buildSourceTargets(List<String> directories) {
-        Map<String, Boolean> isRegexPath = new HashMap<>();
-        Map<String, Pattern> patterns = new HashMap<>();
         // for each path
         Set<String> toBeReadFiles = new HashSet<>();
         for (String eachPath : directories) {
@@ -222,13 +188,27 @@ public class FileHelper {
                 }
             }
         }
-        return Arrays.asList(toBeReadFiles.toArray(new String[0]));
+        return new ArrayList<>(toBeReadFiles);
     }
 
     private static List<String> listFilesWithWildcard(String wildcardPath) {
         List<String> result = new ArrayList<>();
-        Path dir = Paths.get(wildcardPath).getParent();
-        String globPattern = Paths.get(wildcardPath).getFileName().toString();
+        Path path = Paths.get(wildcardPath);
+        Path dir = path.getParent();
+        String globPattern = path.getFileName().toString();
+        if (dir == null) {
+            LOG.error("Invalid wildcard path: {}", wildcardPath);
+            return result;
+        }
+        if (!Files.exists(dir)) {
+            LOG.error("Directory not exists: {}", dir);
+            return result;
+        }
+        // check the read permission
+        if (!Files.isReadable(dir)) {
+            LOG.error("No read permission for directory: {}", dir);
+            return result;
+        }
         // List all files that match the wildcard path
         try (DirectoryStream<Path> stream = Files.newDirectoryStream(dir, globPattern)) {
             for (Path entry : stream) {
