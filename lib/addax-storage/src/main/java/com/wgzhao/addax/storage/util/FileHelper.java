@@ -26,6 +26,7 @@ import org.apache.commons.compress.compressors.CompressorStreamFactory;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.RandomStringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -37,6 +38,10 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.nio.file.DirectoryStream;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -158,111 +163,61 @@ public class FileHelper {
         }
     }
 
-    public static boolean checkDirectoryReadable(String directory) {
-        return checkDirPermission(directory, "r");
-    }
-
     public static boolean checkDirectoryWritable(String directory) {
-        return checkDirPermission(directory, "w");
-    }
-
-    private static boolean checkDirPermission(String directory, String permission) {
-        File file = new File(FilenameUtils.getFullPath(directory));
-        if (!file.exists()) {
-            throw new RuntimeException("The directory [" + directory + "] does not exists.");
-        }
-        if (!file.isDirectory()) {
-            throw new RuntimeException("The [" + directory + "] is not a directory.");
-        }
-
-        if ("r".equalsIgnoreCase(permission)) {
-            return file.canRead();
-        } else {
-            return file.canWrite();
-        }
-    }
-
-    public static Pattern generatePattern(String dir) {
-        String regexString = dir.replace("*", ".*").replace("?", ".?");
-        return Pattern.compile(regexString);
-    }
-
-    public static boolean isTargetFile(Map<String, Pattern> patterns, Map<String, Boolean> isRegexPath, String regexPath, String absoluteFilePath) {
-        if (isRegexPath.get(regexPath)) {
-            return patterns.get(regexPath).matcher(absoluteFilePath).matches();
-        } else {
-            return true;
-        }
+        Path path = Paths.get(directory);
+        return Files.isWritable(path);
     }
 
     // validate the path, path must be an absolute path
     public static List<String> buildSourceTargets(List<String> directories) {
-        Map<String, Boolean> isRegexPath = new HashMap<>();
-        Map<String, Pattern> patterns = new HashMap<>();
-
         // for each path
         Set<String> toBeReadFiles = new HashSet<>();
         for (String eachPath : directories) {
-            int endMark;
-            for (endMark = 0; endMark < eachPath.length(); endMark++) {
-                if ('*' == eachPath.charAt(endMark) || '?' == eachPath.charAt(endMark)) {
-                    isRegexPath.put(eachPath, true);
-                    patterns.put(eachPath, generatePattern(eachPath));
-                    break;
-                }
+            if (StringUtils.isBlank(eachPath)) {
+                continue;
             }
-
-            String parentDirectory;
-            if (!isRegexPath.isEmpty() && isRegexPath.get(eachPath)) {
-                int lastDirSeparator = eachPath.substring(0, endMark).lastIndexOf(IOUtils.DIR_SEPARATOR);
-                parentDirectory = eachPath.substring(0, lastDirSeparator + 1);
+            if (eachPath.contains("*") || eachPath.contains("?")) {
+                toBeReadFiles.addAll(listFilesWithWildcard(eachPath));
             } else {
-                isRegexPath.put(eachPath, false);
-                parentDirectory = eachPath;
-            }
-            buildSourceTargetsEachPath(eachPath, parentDirectory, toBeReadFiles, patterns, isRegexPath);
-        }
-        return Arrays.asList(toBeReadFiles.toArray(new String[0]));
-    }
-
-    private static void buildSourceTargetsEachPath(String regexPath, String parentDirectory, Set<String> toBeReadFiles,
-                                                   Map<String, Pattern> patterns, Map<String, Boolean> isRegexPath) {
-        // 检测目录是否存在，错误情况更明确
-        assert checkDirectoryReadable(parentDirectory);
-
-        directoryRover(regexPath, parentDirectory, toBeReadFiles, patterns, isRegexPath);
-    }
-
-    private static void directoryRover(String regexPath, String parentDirectory, Set<String> toBeReadFiles,
-                                       Map<String, Pattern> patterns, Map<String, Boolean> isRegexPath) {
-        File directory = new File(parentDirectory);
-        // is a normal file
-        if (!directory.isDirectory()) {
-            if (isTargetFile(patterns, isRegexPath, regexPath, directory.getAbsolutePath())) {
-                toBeReadFiles.add(parentDirectory);
-                LOG.info("Adding the file [{}] as a candidate to be read.", parentDirectory);
-            }
-        } else {
-            // 是目录
-            try {
-                // warn:对于没有权限的目录,listFiles 返回null，而不是抛出SecurityException
-                File[] files = directory.listFiles();
-                if (null != files) {
-                    for (File subFileNames : files) {
-                        directoryRover(regexPath, subFileNames.getAbsolutePath(), toBeReadFiles, patterns, isRegexPath);
-                    }
+                File file = new File(eachPath);
+                if (file.isDirectory()) {
+                    // list all files in current directory
+                    toBeReadFiles.addAll(listFilesWithWildcard(eachPath+"/*.*"));
                 } else {
-                    // warn: 对于没有权限的文件，是直接throw AddaxException
-                    String message = String.format("Permission denied for reading directory [%s].", directory);
-                    LOG.error(message);
-                    throw new RuntimeException(message);
+                    toBeReadFiles.add(eachPath);
                 }
-            } catch (SecurityException e) {
-                String message = String.format("Permission denied for reading directory [%s].", directory);
-                LOG.error(message);
-                throw new RuntimeException(message);
             }
         }
+        return new ArrayList<>(toBeReadFiles);
+    }
+
+    private static List<String> listFilesWithWildcard(String wildcardPath) {
+        List<String> result = new ArrayList<>();
+        Path path = Paths.get(wildcardPath);
+        Path dir = path.getParent();
+        String globPattern = path.getFileName().toString();
+        if (dir == null) {
+            LOG.error("Invalid wildcard path: {}", wildcardPath);
+            return result;
+        }
+        if (!Files.exists(dir)) {
+            LOG.error("Directory not exists: {}", dir);
+            return result;
+        }
+        // check the read permission
+        if (!Files.isReadable(dir)) {
+            LOG.error("No read permission for directory: {}", dir);
+            return result;
+        }
+        // List all files that match the wildcard path
+        try (DirectoryStream<Path> stream = Files.newDirectoryStream(dir, globPattern)) {
+            for (Path entry : stream) {
+                result.add(entry.toFile().getAbsolutePath());
+            }
+        } catch (IOException e) {
+            LOG.error("Failed to list files with wildcard path: {}", wildcardPath, e);
+        }
+        return result;
     }
 
     public static <T> List<List<T>> splitSourceFiles(final List<T> sourceList, int adviceNumber) {
