@@ -49,7 +49,7 @@ public abstract class FtpHelper
      * @param directoryPath 要判断的目录
      * @return boolean
      */
-    public abstract boolean isDirExist(String directoryPath);
+    public abstract boolean isDirectory(String directoryPath);
 
     /**
      * 判断指定路径是否是文件
@@ -57,7 +57,7 @@ public abstract class FtpHelper
      * @param filePath 要判断的文件
      * @return boolean
      */
-    public abstract boolean isFileExist(String filePath);
+    public abstract boolean isFile(String filePath);
 
     /**
      * 判断指定路径是否是软链接

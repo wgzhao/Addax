@@ -19,6 +19,8 @@
 
 package com.wgzhao.addax.plugin.reader.ftpreader;
 
+import com.jcraft.jsch.ChannelSftp;
+import com.jcraft.jsch.SftpException;
 import com.wgzhao.addax.common.exception.AddaxException;
 import com.wgzhao.addax.storage.reader.StorageReaderUtil;
 import org.apache.commons.io.IOUtils;
@@ -32,11 +34,12 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.UnknownHostException;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Paths;
+import java.util.ArrayList;
 import java.util.HashSet;
 
 import static com.wgzhao.addax.common.spi.ErrorCode.CONFIG_ERROR;
 import static com.wgzhao.addax.common.spi.ErrorCode.CONNECT_ERROR;
-import static com.wgzhao.addax.common.spi.ErrorCode.ILLEGAL_VALUE;
 import static com.wgzhao.addax.common.spi.ErrorCode.IO_ERROR;
 import static com.wgzhao.addax.common.spi.ErrorCode.RUNTIME_ERROR;
 import static org.apache.commons.net.ftp.FTP.BINARY_FILE_TYPE;
@@ -119,20 +122,19 @@ public class StandardFtpHelper
     }
 
     @Override
-    public boolean isDirExist(String directoryPath)
+    public boolean isDirectory(String directoryPath)
     {
         try {
             return ftpClient.changeWorkingDirectory(new String(directoryPath.getBytes(), StandardCharsets.ISO_8859_1));
         }
         catch (IOException e) {
-            String message = String.format("进入目录：[%s]时发生I/O异常,请确认与ftp服务器的连接正常", directoryPath);
-            LOG.error(message);
-            throw AddaxException.asAddaxException(IO_ERROR, message, e);
+            LOG.error("Failed to check whether the directory exists", e);
+            return false;
         }
     }
 
     @Override
-    public boolean isFileExist(String filePath)
+    public boolean isFile(String filePath)
     {
         boolean isExitFlag = false;
         try {
@@ -170,89 +172,25 @@ public class StandardFtpHelper
     @Override
     public HashSet<String> getListFiles(String directoryPath, int parentLevel, int maxTraversalLevel)
     {
-        if (parentLevel < maxTraversalLevel) {
-            String parentPath;// 父级目录,以'/'结尾
-            int pathLen = directoryPath.length();
-            if (directoryPath.contains("*") || directoryPath.contains("?")) {
-                // path是正则表达式				
-                String subPath = StorageReaderUtil.getRegexPathParentPath(directoryPath);
-                if (isDirExist(subPath)) {
-                    parentPath = subPath;
-                }
-                else {
-                    String message = String.format("不能进入目录：[%s]," + "请确认您的配置项path:[%s]存在，且配置的用户有权限进入", subPath,
-                            directoryPath);
-                    LOG.error(message);
-                    throw AddaxException.asAddaxException(CONFIG_ERROR, message);
-                }
-            }
-            else if (isDirExist(directoryPath)) {
-                // path是目录
-                if (directoryPath.charAt(pathLen - 1) == IOUtils.DIR_SEPARATOR) {
-                    parentPath = directoryPath;
-                }
-                else {
-                    parentPath = directoryPath + IOUtils.DIR_SEPARATOR;
-                }
-            }
-            else if (isFileExist(directoryPath)) {
-                // path指向具体文件
-                sourceFiles.add(directoryPath);
-                return sourceFiles;
-            }
-            else if (isSymbolicLink(directoryPath)) {
-                //path是链接文件
-                String message = String.format("文件:[%s]是链接文件，当前不支持链接文件的读取", directoryPath);
-                LOG.error(message);
-                throw AddaxException.asAddaxException(ILLEGAL_VALUE, message);
-            }
-            else {
-                String message = String.format("请确认您的配置项path:[%s]存在，且配置的用户有权限读取", directoryPath);
-                LOG.error(message);
-                throw AddaxException.asAddaxException(CONNECT_ERROR, message);
-            }
-
-            try {
-                FTPFile[] fs = ftpClient.listFiles(new String(directoryPath.getBytes(), StandardCharsets.ISO_8859_1));
-                for (FTPFile ff : fs) {
-                    String strName = ff.getName();
-                    String filePath = parentPath + strName;
-                    if (ff.isDirectory()) {
-                        if (!(strName.equals(".") || strName.equals(".."))) {
-                            //递归处理
-                            getListFiles(filePath, parentLevel + 1, maxTraversalLevel);
-                        }
-                    }
-                    else if (ff.isFile()) {
-                        // 是文件
-                        sourceFiles.add(filePath);
-                    }
-                    else if (ff.isSymbolicLink()) {
-                        //是链接文件
-                        String message = String.format("文件:[%s]是链接文件，当前不支持链接文件的读取", filePath);
-                        LOG.error(message);
-                        throw AddaxException.asAddaxException(CONFIG_ERROR, message);
-                    }
-                    else {
-                        String message = String.format("请确认path:[%s]存在，且配置的用户有权限读取", filePath);
-                        LOG.error(message);
-                        throw AddaxException.asAddaxException(CONNECT_ERROR, message);
-                    }
-                } // end for FTPFile
-            }
-            catch (IOException e) {
-                String message = String.format("获取path：[%s] 下文件列表时发生I/O异常,请确认与ftp服务器的连接正常", directoryPath);
-                LOG.error(message);
-                throw AddaxException.asAddaxException(IO_ERROR, message, e);
-            }
-            return sourceFiles;
+        String parentDir;
+        if (isDirectory(directoryPath)) {
+            parentDir = directoryPath;
+        } else {
+            parentDir = Paths.get(directoryPath).getParent().toString();
         }
-        else {
-            //超出最大递归层数
-            String message = String.format("获取path：[%s] 下文件列表时超出最大层数,请确认路径[%s]下不存在软连接文件", directoryPath, directoryPath);
-            LOG.error(message);
-            throw AddaxException.asAddaxException(RUNTIME_ERROR, message);
+        try {
+            FTPFile[] fs = ftpClient.listFiles(directoryPath);
+            for (FTPFile ff : fs) {
+                if (ff.isFile()) {
+                    // 是文件
+                    sourceFiles.add(parentDir + IOUtils.DIR_SEPARATOR + ff.getName());
+                }
+            } // end for vector
         }
+        catch (IOException e) {
+            LOG.error("Failed to retrieve file(s) from {}", directoryPath, e);
+        }
+        return sourceFiles;
     }
 
     @Override

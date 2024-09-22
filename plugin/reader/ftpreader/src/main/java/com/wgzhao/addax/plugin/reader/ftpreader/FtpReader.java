@@ -25,17 +25,21 @@ import com.wgzhao.addax.common.plugin.RecordSender;
 import com.wgzhao.addax.common.spi.Reader;
 import com.wgzhao.addax.common.util.Configuration;
 import com.wgzhao.addax.storage.reader.StorageReaderUtil;
+import com.wgzhao.addax.storage.util.FileHelper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.io.InputStream;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 
 import static com.wgzhao.addax.common.spi.ErrorCode.CONFIG_ERROR;
 import static com.wgzhao.addax.common.spi.ErrorCode.ILLEGAL_VALUE;
+import static com.wgzhao.addax.common.spi.ErrorCode.NOT_SUPPORT_TYPE;
+import static com.wgzhao.addax.common.spi.ErrorCode.PERMISSION_ERROR;
 import static com.wgzhao.addax.common.spi.ErrorCode.REQUIRED_VALUE;
 
 public class FtpReader
@@ -95,25 +99,14 @@ public class FtpReader
             this.protocol = this.originConfig.getNecessaryValue(FtpKey.PROTOCOL, REQUIRED_VALUE).toLowerCase();
             boolean protocolTag = "ftp".equals(this.protocol) || "sftp".equals(this.protocol);
             if (!protocolTag) {
-                throw AddaxException.asAddaxException(ILLEGAL_VALUE,
-                        String.format("仅支持 ftp和sftp 传输协议 , 不支持您配置的传输协议: [%s]", protocol));
+                throw AddaxException.asAddaxException(NOT_SUPPORT_TYPE,
+                        "Only support ftp and sftp protocols, the  " + protocol + " is not supported.");
             }
             this.host = this.originConfig.getNecessaryValue(FtpKey.HOST, REQUIRED_VALUE);
             this.username = this.originConfig.getNecessaryValue(FtpKey.USERNAME, REQUIRED_VALUE);
             this.password = this.originConfig.getString(FtpKey.PASSWORD, null);
             this.timeout = originConfig.getInt(FtpKey.TIME_OUT, FtpConstant.DEFAULT_TIMEOUT);
             this.maxTraversalLevel = originConfig.getInt(FtpKey.MAX_TRAVERSAL_LEVEL, FtpConstant.DEFAULT_MAX_TRAVERSAL_LEVEL);
-
-            // only support connect pattern
-            this.connectPattern = this.originConfig.getUnnecessaryValue(FtpKey.CONNECT_PATTERN, FtpConstant.DEFAULT_FTP_CONNECT_PATTERN);
-            boolean connectPatternTag = "PORT".equals(connectPattern) || "PASV".equals(connectPattern);
-            if (!connectPatternTag) {
-                throw AddaxException.asAddaxException(ILLEGAL_VALUE,
-                        String.format("不支持您配置的ftp传输模式: [%s]", connectPattern));
-            }
-            else {
-                this.originConfig.set(FtpKey.CONNECT_PATTERN, connectPattern);
-            }
 
             //path check
             String pathInString = this.originConfig.getNecessaryValue(Key.PATH, REQUIRED_VALUE);
@@ -124,37 +117,39 @@ public class FtpReader
             else {
                 path = this.originConfig.getList(Key.PATH, String.class);
                 if (null == path || path.isEmpty()) {
-                    throw AddaxException.asAddaxException(REQUIRED_VALUE, "您需要指定待读取的源目录或文件");
+                    throw AddaxException.asAddaxException(REQUIRED_VALUE, "the path is required");
                 }
                 for (String eachPath : path) {
                     if (!eachPath.startsWith("/")) {
-                        String message = String.format("请检查参数path:[%s],需要配置为绝对路径", eachPath);
-                        LOG.error(message);
-                        throw AddaxException.asAddaxException(ILLEGAL_VALUE, message);
+                        throw AddaxException.asAddaxException(ILLEGAL_VALUE,
+                                "The path must be an absolute path, please check the path configuration");
                     }
                 }
             }
-            if ("sftp".equals(protocol)) {
-                // use ssh private key or not ?
-                boolean useKey = this.originConfig.getBool(FtpKey.USE_KEY, false);
-                if (useKey) {
-                    String privateKey = this.originConfig.getString(FtpKey.KEY_PATH, DEFAULT_PRIVATE_KEY);
-                    // check privateKey does exist or not
-                    if (privateKey.startsWith("~")) {
-                        // expand home directory
-                        privateKey = privateKey.replaceFirst("^~", System.getProperty("user.home"));
-                        // does it exist?
-                        boolean isFile = new File(privateKey).isFile();
-                        if (isFile) {
-                            this.originConfig.set(FtpKey.KEY_PATH, privateKey);
-                        }
-                        else {
-                            String msg = "You have configured to use the key, but neither the configured key file nor the default file(" +
-                                    DEFAULT_PRIVATE_KEY + " exists";
-                            throw AddaxException.asAddaxException(ILLEGAL_VALUE, msg);
-                        }
-                    }
+
+            if ("ftp".equals(protocol)) {
+                this.connectPattern = this.originConfig.getUnnecessaryValue(FtpKey.CONNECT_PATTERN, FtpConstant.DEFAULT_FTP_CONNECT_PATTERN);
+                boolean connectPatternTag = "PORT".equals(connectPattern) || "PASV".equals(connectPattern);
+                if (!connectPatternTag) {
+                    throw AddaxException.asAddaxException(NOT_SUPPORT_TYPE,
+                            "Only PORT and PASV are accepted, the " + connectPattern + " is not supported.");
                 }
+                else {
+                    this.originConfig.set(FtpKey.CONNECT_PATTERN, connectPattern);
+                }
+            } else if (originConfig.getBool(FtpKey.USE_KEY, false)) {
+                String privateKey = originConfig.getString(FtpKey.KEY_PATH, DEFAULT_PRIVATE_KEY)
+                        .replaceFirst("^~", System.getProperty("user.home"));
+                // check privateKey does exist or not
+                File file = new File(privateKey);
+                if (! file.isFile()) {
+                    throw AddaxException.asAddaxException(CONFIG_ERROR,
+                            "The private ssh key " + privateKey + " does not exist.");
+                } else if (! file.canRead()) {
+                    throw AddaxException.asAddaxException(PERMISSION_ERROR,
+                            "The private ssh key " + privateKey + " is not readable.");
+                }
+                this.originConfig.set(FtpKey.KEY_PATH, privateKey);
             }
         }
 
@@ -164,14 +159,11 @@ public class FtpReader
             LOG.debug("prepare() begin...");
 
             this.sourceFiles = (HashSet<String>) ftpHelper.getAllFiles(path, 0, maxTraversalLevel);
-
-            LOG.info("您即将读取的文件数为: [{}]", this.sourceFiles.size());
-        }
-
-        @Override
-        public void post()
-        {
-            //
+            if (sourceFiles.isEmpty()) {
+                throw AddaxException.asAddaxException(CONFIG_ERROR,
+                        "Cannot find any file in path: " + path + ", assuring the path(s) exists and has right permission");
+            }
+            LOG.info("{} file(s) to be read", this.sourceFiles.size());
         }
 
         @Override
@@ -181,10 +173,7 @@ public class FtpReader
                 this.ftpHelper.logoutFtpServer();
             }
             catch (Exception e) {
-                String message = String.format(
-                        "关闭与ftp服务器连接失败: [%s] host=%s, username=%s, port=%s",
-                        e.getMessage(), host, username, port);
-                LOG.error(message, e);
+                LOG.error("Failed to logout (s)Ftp Server", e);
             }
         }
 
@@ -195,38 +184,15 @@ public class FtpReader
             LOG.debug("split() begin...");
             List<Configuration> readerSplitConfigs = new ArrayList<>();
 
-            // warn:每个slice拖且仅拖一个文件,
-            // int splitNumber = adviceNumber;
-            int splitNumber = this.sourceFiles.size();
-            if (0 == splitNumber) {
-                throw AddaxException.asAddaxException(CONFIG_ERROR,
-                        String.format("未能找到待读取的文件,请确认您的配置项path: %s", this.originConfig.getString(Key.PATH)));
-            }
-
-            List<List<String>> splitedSourceFiles = this.splitSourceFiles(new ArrayList(this.sourceFiles), splitNumber);
-            for (List<String> files : splitedSourceFiles) {
-                Configuration splitedConfig = this.originConfig.clone();
-                splitedConfig.set(FtpKey.SOURCE_FILES, files);
-                readerSplitConfigs.add(splitedConfig);
+            int splitNumber = Math.min(sourceFiles.size(), adviceNumber);
+            List<List<String>> splitSourceFiles = FileHelper.splitSourceFiles(new ArrayList<>(sourceFiles), splitNumber);
+            for (List<String> files : splitSourceFiles) {
+                Configuration splitConfig = this.originConfig.clone();
+                splitConfig.set(FtpKey.SOURCE_FILES, files);
+                readerSplitConfigs.add(splitConfig);
             }
             LOG.debug("split() ok and end...");
             return readerSplitConfigs;
-        }
-
-        private <T> List<List<T>> splitSourceFiles(final List<T> sourceList, int adviceNumber)
-        {
-            List<List<T>> splitedList = new ArrayList<>();
-            int averageLength = sourceList.size() / adviceNumber;
-            averageLength = averageLength == 0 ? 1 : averageLength;
-
-            for (int begin = 0, end; begin < sourceList.size(); begin = end) {
-                end = begin + averageLength;
-                if (end > sourceList.size()) {
-                    end = sourceList.size();
-                }
-                splitedList.add(sourceList.subList(begin, end));
-            }
-            return splitedList;
         }
     }
 
@@ -271,18 +237,6 @@ public class FtpReader
                 this.ftpHelper = new StandardFtpHelper();
             }
             ftpHelper.loginFtpServer(host, username, password, port, keyPath, keyPass, timeout, connectPattern);
-        }
-
-        @Override
-        public void prepare()
-        {
-
-        }
-
-        @Override
-        public void post()
-        {
-
         }
 
         @Override
