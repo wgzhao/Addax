@@ -34,10 +34,11 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.File;
-import java.io.FileOutputStream;
 import java.io.FilenameFilter;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
@@ -56,6 +57,7 @@ import static com.wgzhao.addax.common.spi.ErrorCode.CONFIG_ERROR;
 import static com.wgzhao.addax.common.spi.ErrorCode.EXECUTE_FAIL;
 import static com.wgzhao.addax.common.spi.ErrorCode.ILLEGAL_VALUE;
 import static com.wgzhao.addax.common.spi.ErrorCode.IO_ERROR;
+import static com.wgzhao.addax.common.spi.ErrorCode.NOT_SUPPORT_TYPE;
 import static com.wgzhao.addax.common.spi.ErrorCode.PERMISSION_ERROR;
 import static com.wgzhao.addax.common.spi.ErrorCode.REQUIRED_VALUE;
 import static com.wgzhao.addax.common.spi.ErrorCode.RUNTIME_ERROR;
@@ -84,7 +86,7 @@ public class TxtFileWriter
                 this.writerSliceConfig.set(DATE_FORMAT, dateFormatOld);
             }
             if (null != dateFormatOld) {
-                LOG.warn("You are using format to configure date format, this is not recommended, please use dateFormat to configure. If both dateFormat and format exist, dateFormat will be used.");
+                LOG.warn("The `format` item has been deprecated; please use `dateFormat` for configuration.");
             }
             StorageWriterUtil.validateParameter(this.writerSliceConfig);
         }
@@ -103,12 +105,15 @@ public class TxtFileWriter
                         String.format("The path [%s] is a file, not a directory.", path));
             }
 
-            if (!dir.exists()) {
-                    if (!dir.mkdirs()) {
-                        throw AddaxException.asAddaxException(
-                                EXECUTE_FAIL,
-                                String.format("Failed to create directory [%s].", path));
-                    }
+            if (!dir.exists() && !dir.mkdirs()) {
+                throw AddaxException.asAddaxException(
+                        EXECUTE_FAIL,
+                        "Failed to create directory: " + path);
+            }
+            else if (!dir.canWrite()) {
+                throw AddaxException.asAddaxException(
+                        PERMISSION_ERROR,
+                        "No write permission on directory: " + path);
             }
         }
 
@@ -119,7 +124,6 @@ public class TxtFileWriter
             String fileName = this.writerSliceConfig.getString(FILE_NAME);
             String writeMode = this.writerSliceConfig.getString(WRITE_MODE);
 
-            assert FileHelper.checkDirectoryWritable(path);
             File dir = new File(path);
             // truncate option handler
             if ("truncate".equalsIgnoreCase(writeMode) || "overwrite".equalsIgnoreCase(writeMode)) {
@@ -138,10 +142,6 @@ public class TxtFileWriter
                     throw AddaxException.asAddaxException(RUNTIME_ERROR,
                             String.format("NullPointException occurred when clean history files under this path [%s].", path), npe);
                 }
-                catch (IllegalArgumentException iae) {
-                    throw AddaxException.asAddaxException(PERMISSION_ERROR,
-                            String.format("IllegalArgumentException occurred when clean history files under this path [%s].", path), iae);
-                }
                 catch (IOException e) {
                     throw AddaxException.asAddaxException(IO_ERROR,
                             String.format("IOException occurred when clean history files under this path [%s].", path), e);
@@ -156,7 +156,7 @@ public class TxtFileWriter
                 if (dir.exists()) {
                     if (!dir.canRead()) {
                         throw AddaxException.asAddaxException(PERMISSION_ERROR,
-                                String.format("Permission denied to access path [%s].", path));
+                                "Permission denied to access path " + path);
                     }
                     // fileName is not null
                     FilenameFilter filter = new PrefixFileFilter(fileName);
@@ -172,24 +172,11 @@ public class TxtFileWriter
                                 String.format("The directory [%s] contains files.", path));
                     }
                 }
-                else {
-                    boolean createdOk = dir.mkdirs();
-                    if (!createdOk) {
-                        throw AddaxException.asAddaxException(EXECUTE_FAIL,
-                                String.format("Failed to create the file [%s].", path));
-                    }
-                }
             }
             else {
-                throw AddaxException.asAddaxException(ILLEGAL_VALUE,
-                        String.format("ONLY support truncate, append and nonConflict as writeMode, but you give [%s].", writeMode));
+                throw AddaxException.asAddaxException(NOT_SUPPORT_TYPE,
+                        "Only 'truncate', 'append', and 'nonConflict' are supported as write modes, but you provided " + writeMode);
             }
-        }
-
-        @Override
-        public void post()
-        {
-            //
         }
 
         @Override
@@ -258,7 +245,7 @@ public class TxtFileWriter
             try {
                 File newFile = new File(fileFullPath);
                 assert newFile.createNewFile();
-                outputStream = new FileOutputStream(newFile);
+                outputStream = Files.newOutputStream(newFile.toPath());
                 StorageWriterUtil.writeToStream(lineReceiver, outputStream, this.writerSliceConfig, this.fileName,
                         this.getTaskPluginCollector());
             }
@@ -274,12 +261,6 @@ public class TxtFileWriter
                 IOUtils.closeQuietly(outputStream, null);
             }
             LOG.info("end do write");
-        }
-
-        @Override
-        public void post()
-        {
-            //
         }
 
         @Override
