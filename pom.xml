@@ -71,7 +71,7 @@
         <jedis.version>3.7.0</jedis.version>
         <jsch.version>0.2.19</jsch.version>
         <kafka.version>3.2.3</kafka.version>
-        <kryo.version>5.5.0</kryo.version>
+        <kryo.version>5.6.0</kryo.version>
         <kudu.version>1.16.0</kudu.version>
         <libthrift.version>0.13.0</libthrift.version>
         <mapreduce.version>3.2.1</mapreduce.version>
