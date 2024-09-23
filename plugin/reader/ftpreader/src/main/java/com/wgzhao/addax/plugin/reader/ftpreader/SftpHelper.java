@@ -114,8 +114,7 @@ public class SftpHelper
         }
     }
 
-    @Override
-    public boolean isDirectory(String directoryPath)
+    private boolean isDirectory(String directoryPath)
     {
         try {
             SftpATTRS sftpATTRS = channelSftp.lstat(directoryPath);
@@ -123,31 +122,6 @@ public class SftpHelper
         }
         catch (SftpException e) {
             return false;
-        }
-    }
-
-    @Override
-    public boolean isFile(String filePath)
-    {
-        boolean isExitFlag = false;
-        try {
-            SftpATTRS sftpATTRS = channelSftp.lstat(filePath);
-            return sftpATTRS.getSize() >= 0;
-        }
-        catch (SftpException e) {
-            return false;
-        }
-    }
-
-    @Override
-    public boolean isSymbolicLink(String filePath)
-    {
-        try {
-            SftpATTRS sftpATTRS = channelSftp.lstat(filePath);
-            return sftpATTRS.isLink();
-        }
-        catch (SftpException e) {
-            throw AddaxException.asAddaxException(IO_ERROR, "Failed to check whether the file is a symbolic link", e);
         }
     }
 

@@ -7,7 +7,7 @@
     "username": "xx",
     "password": "xxx",
     "path": [
-      "/var/pub/ftpReaderTest/data"
+      "/var/ftp/*.txt", "/var/tmp/*.txt", "/public/ftp"
     ],
     "column": [
       {

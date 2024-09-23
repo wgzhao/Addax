@@ -33,8 +33,10 @@ import org.slf4j.LoggerFactory;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.UnknownHostException;
+import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Paths;
+import java.time.Duration;
 import java.util.ArrayList;
 import java.util.HashSet;
 
@@ -64,7 +66,7 @@ public class StandardFtpHelper
             // 不需要写死ftp server的OS TYPE,FTPClient getSystemType()方法会自动识别
             // ftpClient.configure(new FTPClientConfig(FTPClientConfig.SYS_UNIX))
             ftpClient.setConnectTimeout(timeout);
-            ftpClient.setDataTimeout(timeout);
+            ftpClient.setDataTimeout(Duration.ofMillis(timeout));
             if ("PASV".equals(connectMode)) {
                 ftpClient.enterRemotePassiveMode();
                 ftpClient.enterLocalPassiveMode();
@@ -76,32 +78,18 @@ public class StandardFtpHelper
             int reply = ftpClient.getReplyCode();
             if (!FTPReply.isPositiveCompletion(reply)) {
                 ftpClient.disconnect();
-                String message = String.format("与ftp服务器建立连接失败,请检查用户名和密码是否正确: [%s]",
-                        "message:host =" + host + ",username = " + username + ",port =" + port);
-                LOG.error(message);
-                throw AddaxException.asAddaxException(CONNECT_ERROR, message);
+                throw AddaxException.asAddaxException(CONNECT_ERROR,
+                        "Failed to connect to the ftp server " + host);
             }
             //设置命令传输编码
-            String fileEncoding = System.getProperty("file.encoding");
+            String fileEncoding = Charset.defaultCharset().displayName();
             ftpClient.setControlEncoding(fileEncoding);
             // always use binary transfer model
             ftpClient.setFileType(BINARY_FILE_TYPE);
         }
-        catch (UnknownHostException e) {
-            String message = String.format("请确认ftp服务器地址是否正确，无法连接到地址为: [%s] 的ftp服务器", host);
-            LOG.error(message);
-            throw AddaxException.asAddaxException(CONNECT_ERROR, message, e);
-        }
-        catch (IllegalArgumentException e) {
-            String message = String.format("请确认连接ftp服务器端口是否正确，错误的端口: [%s] ", port);
-            LOG.error(message);
-            throw AddaxException.asAddaxException(CONNECT_ERROR, message, e);
-        }
         catch (Exception e) {
-            String message = String.format("与ftp服务器建立连接失败 : [%s]",
-                    "message:host =" + host + ",username = " + username + ",port =" + port);
-            LOG.error(message);
-            throw AddaxException.asAddaxException(CONNECT_ERROR, message, e);
+            throw AddaxException.asAddaxException(CONNECT_ERROR,
+                    "Failed to connect to the ftp server " + host, e);
         }
     }
 
@@ -114,59 +102,21 @@ public class StandardFtpHelper
                 ftpClient.logout();
             }
             catch (IOException e) {
-                String message = "与ftp服务器断开连接失败";
-                LOG.error(message);
-                throw AddaxException.asAddaxException(CONNECT_ERROR, message, e);
+                throw AddaxException.asAddaxException(IO_ERROR,
+                        "Failed to close the connection", e);
             }
         }
     }
 
-    @Override
-    public boolean isDirectory(String directoryPath)
+    private boolean isDirectory(String directoryPath)
     {
         try {
-            return ftpClient.changeWorkingDirectory(new String(directoryPath.getBytes(), StandardCharsets.ISO_8859_1));
+            return ftpClient.changeWorkingDirectory(directoryPath);
         }
         catch (IOException e) {
             LOG.error("Failed to check whether the directory exists", e);
             return false;
         }
-    }
-
-    @Override
-    public boolean isFile(String filePath)
-    {
-        boolean isExitFlag = false;
-        try {
-            FTPFile[] ftpFiles = ftpClient.listFiles(new String(filePath.getBytes(), StandardCharsets.ISO_8859_1));
-            if (ftpFiles.length == 1 && ftpFiles[0].isFile()) {
-                isExitFlag = true;
-            }
-        }
-        catch (IOException e) {
-            String message = String.format("获取文件：[%s] 属性时发生I/O异常,请确认与ftp服务器的连接正常", filePath);
-            LOG.error(message);
-            throw AddaxException.asAddaxException(IO_ERROR, message, e);
-        }
-        return isExitFlag;
-    }
-
-    @Override
-    public boolean isSymbolicLink(String filePath)
-    {
-        boolean isExitFlag = false;
-        try {
-            FTPFile[] ftpFiles = ftpClient.listFiles(new String(filePath.getBytes(), StandardCharsets.ISO_8859_1));
-            if (ftpFiles.length == 1 && ftpFiles[0].isSymbolicLink()) {
-                isExitFlag = true;
-            }
-        }
-        catch (IOException e) {
-            String message = String.format("获取文件：[%s] 属性时发生I/O异常,请确认与ftp服务器的连接正常", filePath);
-            LOG.error(message);
-            throw AddaxException.asAddaxException(IO_ERROR, message, e);
-        }
-        return isExitFlag;
     }
 
     @Override
@@ -197,12 +147,12 @@ public class StandardFtpHelper
     public InputStream getInputStream(String filePath)
     {
         try {
+            //Passing filePath directly to retrieveFileStream causes a NullPointerException when filePath contains Chinese characters.
             return ftpClient.retrieveFileStream(new String(filePath.getBytes(), StandardCharsets.ISO_8859_1));
         }
         catch (IOException e) {
-            String message = String.format("读取文件 : [%s] 时出错,请确认文件：[%s]存在且配置的用户有权限读取", filePath, filePath);
-            LOG.error(message);
-            throw AddaxException.asAddaxException(IO_ERROR, message);
+            throw AddaxException.asAddaxException(IO_ERROR,
+                    "Failed to read the file: " + filePath, e);
         }
     }
 }

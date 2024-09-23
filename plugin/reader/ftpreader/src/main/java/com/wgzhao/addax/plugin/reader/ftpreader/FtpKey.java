@@ -21,14 +21,13 @@ package com.wgzhao.addax.plugin.reader.ftpreader;
 
 import com.wgzhao.addax.common.base.Key;
 
-public class FtpKey extends Key
+public class FtpKey
+        extends Key
 {
     private FtpKey() {}
 
     public static final String PROTOCOL = "protocol";
     public static final String HOST = "host";
-    public static final String USERNAME = "username";
-    public static final String PASSWORD = "password";
     public static final String PORT = "port";
     public static final String TIME_OUT = "timeout";
     public static final String CONNECT_PATTERN = "connectPattern";

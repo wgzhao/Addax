@@ -31,16 +31,32 @@ import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.io.InputStream;
-import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 
+import static com.wgzhao.addax.common.base.Key.PASSWORD;
+import static com.wgzhao.addax.common.base.Key.SOURCE_FILES;
+import static com.wgzhao.addax.common.base.Key.USERNAME;
 import static com.wgzhao.addax.common.spi.ErrorCode.CONFIG_ERROR;
 import static com.wgzhao.addax.common.spi.ErrorCode.ILLEGAL_VALUE;
 import static com.wgzhao.addax.common.spi.ErrorCode.NOT_SUPPORT_TYPE;
 import static com.wgzhao.addax.common.spi.ErrorCode.PERMISSION_ERROR;
 import static com.wgzhao.addax.common.spi.ErrorCode.REQUIRED_VALUE;
+import static com.wgzhao.addax.plugin.reader.ftpreader.FtpConstant.DEFAULT_FTP_CONNECT_PATTERN;
+import static com.wgzhao.addax.plugin.reader.ftpreader.FtpConstant.DEFAULT_FTP_PORT;
+import static com.wgzhao.addax.plugin.reader.ftpreader.FtpConstant.DEFAULT_MAX_TRAVERSAL_LEVEL;
+import static com.wgzhao.addax.plugin.reader.ftpreader.FtpConstant.DEFAULT_SFTP_PORT;
+import static com.wgzhao.addax.plugin.reader.ftpreader.FtpConstant.DEFAULT_TIMEOUT_MS;
+import static com.wgzhao.addax.plugin.reader.ftpreader.FtpKey.CONNECT_PATTERN;
+import static com.wgzhao.addax.plugin.reader.ftpreader.FtpKey.HOST;
+import static com.wgzhao.addax.plugin.reader.ftpreader.FtpKey.KEY_PASS;
+import static com.wgzhao.addax.plugin.reader.ftpreader.FtpKey.KEY_PATH;
+import static com.wgzhao.addax.plugin.reader.ftpreader.FtpKey.MAX_TRAVERSAL_LEVEL;
+import static com.wgzhao.addax.plugin.reader.ftpreader.FtpKey.PORT;
+import static com.wgzhao.addax.plugin.reader.ftpreader.FtpKey.PROTOCOL;
+import static com.wgzhao.addax.plugin.reader.ftpreader.FtpKey.TIME_OUT;
+import static com.wgzhao.addax.plugin.reader.ftpreader.FtpKey.USE_KEY;
 
 public class FtpReader
         extends Reader
@@ -78,17 +94,15 @@ public class FtpReader
 
             this.validateParameter();
             StorageReaderUtil.validateParameter(this.originConfig);
-            String keyPath = this.originConfig.getString(FtpKey.KEY_PATH, null);
-            String keyPass = this.originConfig.getString(FtpKey.KEY_PASS, null);
+            String keyPath = this.originConfig.getString(KEY_PATH, null);
+            String keyPass = this.originConfig.getString(KEY_PASS, null);
 
             if ("sftp".equals(protocol)) {
-                //sftp协议
-                this.port = originConfig.getInt(FtpKey.PORT, FtpConstant.DEFAULT_SFTP_PORT);
+                this.port = originConfig.getInt(PORT, DEFAULT_SFTP_PORT);
                 this.ftpHelper = new SftpHelper();
             }
             else if ("ftp".equals(protocol)) {
-                // ftp 协议
-                this.port = originConfig.getInt(FtpKey.PORT, FtpConstant.DEFAULT_FTP_PORT);
+                this.port = originConfig.getInt(PORT, DEFAULT_FTP_PORT);
                 this.ftpHelper = new StandardFtpHelper();
             }
             ftpHelper.loginFtpServer(host, username, password, port, keyPath, keyPass, timeout, connectPattern);
@@ -96,17 +110,16 @@ public class FtpReader
 
         private void validateParameter()
         {
-            this.protocol = this.originConfig.getNecessaryValue(FtpKey.PROTOCOL, REQUIRED_VALUE).toLowerCase();
-            boolean protocolTag = "ftp".equals(this.protocol) || "sftp".equals(this.protocol);
-            if (!protocolTag) {
+            this.protocol = this.originConfig.getNecessaryValue(PROTOCOL, REQUIRED_VALUE).toLowerCase();
+            if (!protocol.equals("ftp") && !protocol.equals("sftp")) {
                 throw AddaxException.asAddaxException(NOT_SUPPORT_TYPE,
                         "Only support ftp and sftp protocols, the  " + protocol + " is not supported.");
             }
-            this.host = this.originConfig.getNecessaryValue(FtpKey.HOST, REQUIRED_VALUE);
-            this.username = this.originConfig.getNecessaryValue(FtpKey.USERNAME, REQUIRED_VALUE);
-            this.password = this.originConfig.getString(FtpKey.PASSWORD, null);
-            this.timeout = originConfig.getInt(FtpKey.TIME_OUT, FtpConstant.DEFAULT_TIMEOUT);
-            this.maxTraversalLevel = originConfig.getInt(FtpKey.MAX_TRAVERSAL_LEVEL, FtpConstant.DEFAULT_MAX_TRAVERSAL_LEVEL);
+            this.host = this.originConfig.getNecessaryValue(HOST, REQUIRED_VALUE);
+            this.username = this.originConfig.getNecessaryValue(USERNAME, REQUIRED_VALUE);
+            this.password = this.originConfig.getString(PASSWORD, null);
+            this.timeout = originConfig.getInt(TIME_OUT, DEFAULT_TIMEOUT_MS);
+            this.maxTraversalLevel = originConfig.getInt(MAX_TRAVERSAL_LEVEL, DEFAULT_MAX_TRAVERSAL_LEVEL);
 
             //path check
             String pathInString = this.originConfig.getNecessaryValue(Key.PATH, REQUIRED_VALUE);
@@ -128,28 +141,30 @@ public class FtpReader
             }
 
             if ("ftp".equals(protocol)) {
-                this.connectPattern = this.originConfig.getUnnecessaryValue(FtpKey.CONNECT_PATTERN, FtpConstant.DEFAULT_FTP_CONNECT_PATTERN);
+                this.connectPattern = this.originConfig.getUnnecessaryValue(CONNECT_PATTERN, DEFAULT_FTP_CONNECT_PATTERN);
                 boolean connectPatternTag = "PORT".equals(connectPattern) || "PASV".equals(connectPattern);
                 if (!connectPatternTag) {
                     throw AddaxException.asAddaxException(NOT_SUPPORT_TYPE,
                             "Only PORT and PASV are accepted, the " + connectPattern + " is not supported.");
                 }
                 else {
-                    this.originConfig.set(FtpKey.CONNECT_PATTERN, connectPattern);
+                    this.originConfig.set(CONNECT_PATTERN, connectPattern);
                 }
-            } else if (originConfig.getBool(FtpKey.USE_KEY, false)) {
-                String privateKey = originConfig.getString(FtpKey.KEY_PATH, DEFAULT_PRIVATE_KEY)
+            }
+            else if (originConfig.getBool(USE_KEY, false)) {
+                String privateKey = originConfig.getString(KEY_PATH, DEFAULT_PRIVATE_KEY)
                         .replaceFirst("^~", System.getProperty("user.home"));
                 // check privateKey does exist or not
                 File file = new File(privateKey);
-                if (! file.isFile()) {
+                if (!file.isFile()) {
                     throw AddaxException.asAddaxException(CONFIG_ERROR,
                             "The private ssh key " + privateKey + " does not exist.");
-                } else if (! file.canRead()) {
+                }
+                else if (!file.canRead()) {
                     throw AddaxException.asAddaxException(PERMISSION_ERROR,
                             "The private ssh key " + privateKey + " is not readable.");
                 }
-                this.originConfig.set(FtpKey.KEY_PATH, privateKey);
+                this.originConfig.set(KEY_PATH, privateKey);
             }
         }
 
@@ -188,7 +203,7 @@ public class FtpReader
             List<List<String>> splitSourceFiles = FileHelper.splitSourceFiles(new ArrayList<>(sourceFiles), splitNumber);
             for (List<String> files : splitSourceFiles) {
                 Configuration splitConfig = this.originConfig.clone();
-                splitConfig.set(FtpKey.SOURCE_FILES, files);
+                splitConfig.set(SOURCE_FILES, files);
                 readerSplitConfigs.add(splitConfig);
             }
             LOG.debug("split() ok and end...");
@@ -201,11 +216,6 @@ public class FtpReader
     {
         private static final Logger LOG = LoggerFactory.getLogger(Task.class);
 
-        private String host;
-        private int port;
-        private String username;
-        private String connectPattern;
-
         private Configuration readerSliceConfig;
         private List<String> sourceFiles;
 
@@ -213,27 +223,26 @@ public class FtpReader
 
         @Override
         public void init()
-        {//连接重试
-            /* for ftp connection */
-            this.readerSliceConfig = this.getPluginJobConf();
-            this.host = readerSliceConfig.getString(FtpKey.HOST);
-            String protocol = readerSliceConfig.getString(FtpKey.PROTOCOL);
-            this.username = readerSliceConfig.getString(FtpKey.USERNAME);
-            String password = readerSliceConfig.getString(FtpKey.PASSWORD);
-            int timeout = readerSliceConfig.getInt(FtpKey.TIME_OUT, FtpConstant.DEFAULT_TIMEOUT);
-            String keyPath = readerSliceConfig.getString(FtpKey.KEY_PATH, null);
-            String keyPass = readerSliceConfig.getString(FtpKey.KEY_PASS, null);
-            this.sourceFiles = this.readerSliceConfig.getList(FtpKey.SOURCE_FILES, String.class);
+        {
+            int port;
+            String connectPattern = null;
+            this.readerSliceConfig = getPluginJobConf();
+            String host = readerSliceConfig.getString(HOST);
+            String protocol = readerSliceConfig.getString(PROTOCOL).toLowerCase();
+            String username = readerSliceConfig.getString(USERNAME);
+            String password = readerSliceConfig.getString(PASSWORD);
+            int timeout = readerSliceConfig.getInt(TIME_OUT, DEFAULT_TIMEOUT_MS);
+            String keyPath = readerSliceConfig.getString(KEY_PATH, null);
+            String keyPass = readerSliceConfig.getString(KEY_PASS, null);
+            this.sourceFiles = readerSliceConfig.getList(SOURCE_FILES, String.class);
 
             if ("sftp".equals(protocol)) {
-                //sftp协议
-                this.port = readerSliceConfig.getInt(FtpKey.PORT, FtpConstant.DEFAULT_SFTP_PORT);
+                port = readerSliceConfig.getInt(PORT, DEFAULT_SFTP_PORT);
                 this.ftpHelper = new SftpHelper();
             }
-            else if ("ftp".equals(protocol)) {
-                // ftp 协议
-                this.port = readerSliceConfig.getInt(FtpKey.PORT, FtpConstant.DEFAULT_FTP_PORT);
-                this.connectPattern = readerSliceConfig.getString(FtpKey.CONNECT_PATTERN, FtpConstant.DEFAULT_FTP_CONNECT_PATTERN);// 默认为被动模式
+            else  {
+                port = readerSliceConfig.getInt(PORT, DEFAULT_FTP_PORT);
+                connectPattern = readerSliceConfig.getString(CONNECT_PATTERN, DEFAULT_FTP_CONNECT_PATTERN);// 默认为被动模式
                 this.ftpHelper = new StandardFtpHelper();
             }
             ftpHelper.loginFtpServer(host, username, password, port, keyPath, keyPass, timeout, connectPattern);
@@ -246,10 +255,7 @@ public class FtpReader
                 this.ftpHelper.logoutFtpServer();
             }
             catch (Exception e) {
-                String message = String.format(
-                        "关闭与ftp服务器连接失败: [%s] host=%s, username=%s, port=%s",
-                        e.getMessage(), host, username, port);
-                LOG.error(message, e);
+                LOG.error("Failed to close connection", e);
             }
         }
 
@@ -257,17 +263,14 @@ public class FtpReader
         public void startRead(RecordSender recordSender)
         {
             LOG.debug("start read source files...");
-            for (String fileName : this.sourceFiles) {
-                LOG.info(String.format("reading file : [%s]", fileName));
-                InputStream inputStream;
-
+            InputStream inputStream;
+            for (String fileName : sourceFiles) {
+                LOG.info("reading file : {}", fileName);
                 inputStream = ftpHelper.getInputStream(fileName);
-
-                StorageReaderUtil.readFromStream(inputStream, fileName, this.readerSliceConfig,
-                        recordSender, this.getTaskPluginCollector());
+                StorageReaderUtil.readFromStream(inputStream, fileName, readerSliceConfig,
+                        recordSender, getTaskPluginCollector());
                 recordSender.flush();
             }
-
             LOG.debug("end read source files...");
         }
     }
