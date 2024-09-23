@@ -20,7 +20,6 @@
 package com.wgzhao.addax.plugin.reader.ftpreader;
 
 import com.wgzhao.addax.common.exception.AddaxException;
-import com.wgzhao.addax.storage.reader.StorageReaderUtil;
 import com.jcraft.jsch.ChannelSftp;
 import com.jcraft.jsch.ChannelSftp.LsEntry;
 import com.jcraft.jsch.JSch;
@@ -41,7 +40,6 @@ import java.util.Properties;
 
 import static com.wgzhao.addax.common.spi.ErrorCode.CONFIG_ERROR;
 import static com.wgzhao.addax.common.spi.ErrorCode.CONNECT_ERROR;
-import static com.wgzhao.addax.common.spi.ErrorCode.IO_ERROR;
 import static com.wgzhao.addax.common.spi.ErrorCode.RUNTIME_ERROR;
 
 public class SftpHelper

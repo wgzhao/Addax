@@ -19,10 +19,7 @@
 
 package com.wgzhao.addax.plugin.reader.ftpreader;
 
-import com.jcraft.jsch.ChannelSftp;
-import com.jcraft.jsch.SftpException;
 import com.wgzhao.addax.common.exception.AddaxException;
-import com.wgzhao.addax.storage.reader.StorageReaderUtil;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.net.ftp.FTPClient;
 import org.apache.commons.net.ftp.FTPFile;
@@ -32,18 +29,14 @@ import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.net.UnknownHostException;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Paths;
 import java.time.Duration;
-import java.util.ArrayList;
 import java.util.HashSet;
 
-import static com.wgzhao.addax.common.spi.ErrorCode.CONFIG_ERROR;
 import static com.wgzhao.addax.common.spi.ErrorCode.CONNECT_ERROR;
 import static com.wgzhao.addax.common.spi.ErrorCode.IO_ERROR;
-import static com.wgzhao.addax.common.spi.ErrorCode.RUNTIME_ERROR;
 import static org.apache.commons.net.ftp.FTP.BINARY_FILE_TYPE;
 
 public class StandardFtpHelper
