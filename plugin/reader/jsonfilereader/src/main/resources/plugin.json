@@ -1,6 +1,6 @@
 {
   "name": "jsonfilereader",
   "class": "com.wgzhao.addax.plugin.reader.jsonfilereader.JsonReader",
-  "description": "useScene: test. mechanism: use addax framework to transport data from json file. warn: The more you know about the data, the less problems you encounter.",
-  "developer": "szunicom"
+  "description": "read json file, support JSON and JSON Lines format",
+  "developer": "szunicom, wgzhao"
 }

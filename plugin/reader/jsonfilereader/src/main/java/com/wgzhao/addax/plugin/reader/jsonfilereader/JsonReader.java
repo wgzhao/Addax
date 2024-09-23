@@ -21,6 +21,10 @@ package com.wgzhao.addax.plugin.reader.jsonfilereader;
 
 import com.jayway.jsonpath.DocumentContext;
 import com.jayway.jsonpath.JsonPath;
+import com.jayway.jsonpath.Option;
+import com.jayway.jsonpath.ParseContext;
+import com.jayway.jsonpath.ReadContext;
+import com.jayway.jsonpath.TypeRef;
 import com.wgzhao.addax.common.base.Constant;
 import com.wgzhao.addax.common.base.Key;
 import com.wgzhao.addax.common.compress.ZipCycleInputStream;
@@ -47,6 +51,7 @@ import org.slf4j.LoggerFactory;
 
 import java.io.BufferedInputStream;
 import java.io.BufferedReader;
+import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -56,7 +61,11 @@ import java.nio.charset.UnsupportedCharsetException;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 
 import static com.wgzhao.addax.common.spi.ErrorCode.CONFIG_ERROR;
 import static com.wgzhao.addax.common.spi.ErrorCode.ENCODING_ERROR;
@@ -94,11 +103,6 @@ public class JsonReader
             // Compatible with the old version, path is a string before
             String pathInString = this.originConfig.getNecessaryValue(Key.PATH,
                     REQUIRED_VALUE);
-            if (StringUtils.isBlank(pathInString)) {
-                throw AddaxException.asAddaxException(
-                        REQUIRED_VALUE,
-                        "您需要指定待读取的源目录或文件");
-            }
             if (!pathInString.startsWith("[") && !pathInString.endsWith("]")) {
                 path = new ArrayList<>();
                 path.add(pathInString);
@@ -108,7 +112,7 @@ public class JsonReader
                 if (null == path || path.isEmpty()) {
                     throw AddaxException.asAddaxException(
                             REQUIRED_VALUE,
-                            "您需要指定待读取的源目录或文件");
+                            "The item `path` must be not empty");
                 }
             }
 
@@ -125,13 +129,12 @@ public class JsonReader
                 catch (UnsupportedCharsetException uce) {
                     throw AddaxException.asAddaxException(
                             NOT_SUPPORT_TYPE,
-                            String.format("不支持您配置的编码格式 : [%s]", encoding), uce);
+                            "Not supported encoding type " + encoding, uce);
                 }
                 catch (Exception e) {
                     throw AddaxException.asAddaxException(
                             ENCODING_ERROR,
-                            String.format("编码配置异常, 请联系我们: %s", e.getMessage()),
-                            e);
+                            "Encoding Error:", e);
                 }
             }
 
@@ -146,11 +149,13 @@ public class JsonReader
                     String columnValue = eachColumnConf.getString(Key.VALUE);
 
                     if (null == columnIndex && null == columnValue) {
-                        throw AddaxException.asAddaxException(CONFIG_ERROR, "由于您配置了type, 则至少需要配置 index 或 value");
+                        throw AddaxException.asAddaxException(CONFIG_ERROR,
+                                "Either index or value is required for type configuration");
                     }
 
                     if (null != columnIndex && null != columnValue) {
-                        throw AddaxException.asAddaxException(CONFIG_ERROR, "您混合配置了index, value, 每一列同时仅能选择其中一种");
+                        throw AddaxException.asAddaxException(CONFIG_ERROR,
+                                "Both index and value are set, only one is allowed");
                     }
                 }
             }
@@ -166,12 +171,6 @@ public class JsonReader
         }
 
         @Override
-        public void post()
-        {
-            //
-        }
-
-        @Override
         public void destroy()
         {
             //
@@ -184,13 +183,11 @@ public class JsonReader
             LOG.debug("begin to split...");
             List<Configuration> readerSplitConfigs = new ArrayList<>();
 
-            // warn:每个slice拖且仅拖一个文件,
-            // int splitNumber = adviceNumber
-            int splitNumber = this.sourceFiles.size();
+            int splitNumber = Math.min(sourceFiles.size(), adviceNumber);
             if (0 == splitNumber) {
                 throw AddaxException.asAddaxException(
                         CONFIG_ERROR,
-                        String.format("NOT find any file in your path: %s", originConfig.getString(Key.PATH)));
+                        "none find path " + originConfig.getString(Key.PATH));
             }
 
             List<List<String>> splitSourceFiles = FileHelper.splitSourceFiles(sourceFiles, splitNumber);
@@ -219,6 +216,9 @@ public class JsonReader
         private String compressType;
         private String encoding;
 
+        private ParseContext parse;
+        private boolean multiline;
+
         @Override
         public void init()
         {
@@ -227,13 +227,18 @@ public class JsonReader
             this.columns = readerSliceConfig.getListConfiguration(Key.COLUMN);
             this.compressType = readerSliceConfig.getString(Key.COMPRESS, null);
             this.encoding = readerSliceConfig.getString(Key.ENCODING, "utf-8");
+            this.multiline = readerSliceConfig.getBool("singleLine", true);
+            // return null for missing leafs.
+            com.jayway.jsonpath.Configuration jsonConf = com.jayway.jsonpath.Configuration.defaultConfiguration();
+            jsonConf.addOptions(Option.DEFAULT_PATH_LEAF_TO_NULL);
+            this.parse = JsonPath.using(jsonConf);
         }
 
         //解析json，返回已经经过处理的行
         private List<Column> parseFromJson(String json)
         {
             List<Column> splitLine = new ArrayList<>();
-            DocumentContext document = JsonPath.parse(json);
+            DocumentContext document = parse.parse(json);
             String tempValue;
             for (Configuration eachColumnConf : columns) {
                 String columnIndex = eachColumnConf.getString(Key.INDEX);
@@ -245,12 +250,7 @@ public class JsonReader
                     tempValue = columnValue;
                 }
                 else {
-                    try {
-                        tempValue = document.read(columnIndex, columnType.getClass());
-                    }
-                    catch (Exception ignore) {
-                        tempValue = null;
-                    }
+                    tempValue = document.read(columnIndex, columnType.getClass());
                 }
                 Column insertColumn = getColumn(columnType, tempValue, columnFormat);
                 splitLine.add(insertColumn);
@@ -309,9 +309,8 @@ public class JsonReader
                     }
                     break;
                 default:
-                    String errorMessage = String.format("The type %s is unsupported", type);
-                    LOG.error(errorMessage);
-                    throw AddaxException.asAddaxException(NOT_SUPPORT_TYPE, errorMessage);
+                    throw AddaxException.asAddaxException(NOT_SUPPORT_TYPE,
+                            "The type" + type + " is unsupported");
             }
             return columnGenerated;
         }
@@ -324,18 +323,6 @@ public class JsonReader
                 record.addColumn(eachValue);
             }
             recordSender.sendToWriter(record);
-        }
-
-        @Override
-        public void prepare()
-        {
-            //
-        }
-
-        @Override
-        public void post()
-        {
-            //
         }
 
         @Override
@@ -376,31 +363,91 @@ public class JsonReader
                     else {
                         reader = new BufferedReader(new InputStreamReader(fileInputStream, encoding), Constant.DEFAULT_BUFFER_SIZE);
                     }
-
-                    // read the content
-                    String jsonLine;
-                    jsonLine = reader.readLine();
-                    while (jsonLine != null) {
-                        List<Column> sourceLine = parseFromJson(jsonLine);
-                        transportOneRecord(recordSender, sourceLine);
-                        recordSender.flush();
-                        jsonLine = reader.readLine();
-                    }
                 }
                 catch (CompressorException | UnsupportedEncodingException e) {
-                    e.printStackTrace();
+                    throw AddaxException.asAddaxException(IO_ERROR, e);
                 }
-                catch (IOException e) {
-                    // warn: 有可能本地无法读取文件
-                    String message = String.format("Failed to open file %s", fileName);
-                    LOG.error(message);
-                    throw AddaxException.asAddaxException(IO_ERROR, message);
+                if (multiline) {
+                    multilineJsonParse(reader, recordSender);
+                } else {
+                    singleJsonParse(reader, recordSender);
                 }
-                finally {
-                    IOUtils.closeQuietly(reader, null);
-                }
+                IOUtils.closeQuietly(reader, null);
             }
             LOG.debug("end reading source files...");
+        }
+
+        /**
+         * parse JSON Lines file
+         * each line is a json object
+         *
+         * @param reader {@link BufferedReader}
+         * @param recordSender {@link RecordSender}
+         */
+        private void multilineJsonParse(BufferedReader reader, RecordSender recordSender)
+        {
+            // read the content
+            String jsonLine;
+            try {
+                jsonLine = reader.readLine();
+                while (jsonLine != null) {
+                    List<Column> sourceLine = parseFromJson(jsonLine);
+                    transportOneRecord(recordSender, sourceLine);
+                    recordSender.flush();
+                    jsonLine = reader.readLine();
+                }
+            }
+            catch (IOException e) {
+                throw AddaxException.asAddaxException(IO_ERROR, e);
+            }
+        }
+
+        private void singleJsonParse(BufferedReader reader, RecordSender recordSender)
+        {
+            StringBuilder jsonBuffer = new StringBuilder();
+            String line;
+            try {
+                while ((line = reader.readLine()) != null) {
+                    jsonBuffer.append(line);
+                }
+            }
+            catch (IOException e) {
+                throw AddaxException.asAddaxException(IO_ERROR, e);
+            }
+
+            DocumentContext ctx = parse.parse(jsonBuffer.toString());
+            List<List<String>> jsonColumns = new ArrayList<>();
+            List<Column> sourceLine = new ArrayList<>();
+            int recordNum = -1;
+            List<String> placeHolder =  Collections.emptyList();
+            for (Configuration col: columns) {
+                if (col.getString(Key.VALUE) == null) {
+                    if (recordNum < 0) {
+                        List<String> jsonColumn = ctx.read(col.getString(Key.INDEX));
+                        recordNum = jsonColumn.size();
+                        jsonColumns.add(jsonColumn);
+                    } else {
+                        jsonColumns.add(ctx.read(col.getString(Key.INDEX)));
+                    }
+                } else {
+                    // the column use constant, mark it
+                    jsonColumns.add(placeHolder);
+                }
+            }
+            for (int i =0 ;i < recordNum; i++) {
+                for (int j=0; j < columns.size(); j++) {
+                    Configuration column = columns.get(j);
+                    if (jsonColumns.get(j).isEmpty()) {
+                        // use constant value
+                        sourceLine.add(getColumn(column.getString(Key.TYPE), column.getString(Key.VALUE), column.getString(Key.FORMAT)));
+                    } else {
+                        sourceLine.add(getColumn(column.getString(Key.TYPE), String.valueOf(jsonColumns.get(j).get(i)), column.getString(Key.FORMAT)));
+                    }
+                }
+                transportOneRecord(recordSender, sourceLine);
+                recordSender.flush();
+                sourceLine.clear();
+            }
         }
     }
 }

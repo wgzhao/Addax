@@ -4,6 +4,7 @@
     "path": [
       "/tmp/test*.json"
     ],
+    "singleLine": true,
     "column": [
       {
         "index": "$.id",
