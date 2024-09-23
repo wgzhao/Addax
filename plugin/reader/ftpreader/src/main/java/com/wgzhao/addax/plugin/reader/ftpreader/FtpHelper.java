@@ -44,30 +44,6 @@ public abstract class FtpHelper
     public abstract void logoutFtpServer();
 
     /**
-     * 判断指定路径是否是目录
-     *
-     * @param directoryPath 要判断的目录
-     * @return boolean
-     */
-    public abstract boolean isDirExist(String directoryPath);
-
-    /**
-     * 判断指定路径是否是文件
-     *
-     * @param filePath 要判断的文件
-     * @return boolean
-     */
-    public abstract boolean isFileExist(String filePath);
-
-    /**
-     * 判断指定路径是否是软链接
-     *
-     * @param filePath 要判断的文件
-     * @return boolean
-     */
-    public abstract boolean isSymbolicLink(String filePath);
-
-    /**
      * 递归获取指定路径下符合条件的所有文件绝对路径
      *
      * @param directoryPath 根目录
