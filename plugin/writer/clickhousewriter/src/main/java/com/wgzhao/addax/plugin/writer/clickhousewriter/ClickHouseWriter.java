@@ -20,20 +20,19 @@
 package com.wgzhao.addax.plugin.writer.clickhousewriter;
 
 import com.wgzhao.addax.common.element.Column;
-import com.wgzhao.addax.common.element.Record;
 import com.wgzhao.addax.common.plugin.RecordReceiver;
 import com.wgzhao.addax.common.spi.Writer;
 import com.wgzhao.addax.common.util.Configuration;
 import com.wgzhao.addax.rdbms.util.DataBaseType;
 import com.wgzhao.addax.rdbms.writer.CommonRdbmsWriter;
 
-import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.sql.Types;
+import java.text.SimpleDateFormat;
 import java.util.List;
-import java.util.Map;
-import java.util.StringJoiner;
+
+import static com.wgzhao.addax.common.base.Constant.DEFAULT_DATE_FORMAT;
 
 public class ClickHouseWriter
         extends Writer
@@ -111,39 +110,19 @@ public class ClickHouseWriter
                         else if (columnTypeName.startsWith("DateTime(")) {
                             preparedStatement.setObject(columnIndex, column.asTimestamp());
                         }
+                        else if (columnTypeName.equals("DateTime")) {
+                            // no precision specified, use default
+                            SimpleDateFormat sdf = new SimpleDateFormat(DEFAULT_DATE_FORMAT);
+                            preparedStatement.setString(columnIndex, sdf.format(column.asDate()));
+                        }
                         else {
                             preparedStatement.setString(columnIndex, column.asString());
                         }
                         return preparedStatement;
                     }
-
                     return super.fillPreparedStatementColumnType(preparedStatement, columnIndex, columnSqlType, column);
                 }
-
-                @Override
-                protected void doBatchInsert(Connection connection, List<Record> buffer)
-                        throws SQLException
-                {
-                    // references https://github.com/ClickHouse/clickhouse-jdbc/tree/master/clickhouse-jdbc
-                    String insertSql = "insert into " + this.table + " select ";
-                    StringJoiner selectCols = new StringJoiner(",");
-                    StringJoiner selectColWithType = new StringJoiner(",");
-                    for (int i = 1; i < this.resultSetMetaData.size(); i++) {
-                        final Map<String, Object> md = this.resultSetMetaData.get(i);
-                        selectCols.add(md.get("name").toString());
-                        selectColWithType.add(md.get("name").toString() + " " + md.get("typeName"));
-                    }
-                    insertSql += selectCols + " from input('" + selectColWithType + "')";
-                    LOG.info("insert sql: {}", insertSql);
-                    PreparedStatement ps = connection.prepareStatement(insertSql);
-                    for (Record record : buffer) {
-                        ps = this.fillPreparedStatement(ps, record);
-                        ps.addBatch();
-                    }
-                    ps.executeBatch(); // stream everything on-hand into ClickHouse
-                }
-            }
-            ;
+            };
 
             this.commonRdbmsWriterSlave.init(this.writerSliceConfig);
         }
