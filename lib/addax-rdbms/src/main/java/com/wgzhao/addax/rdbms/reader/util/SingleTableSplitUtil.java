@@ -28,7 +28,6 @@ import com.wgzhao.addax.common.exception.AddaxException;
 import com.wgzhao.addax.common.util.Configuration;
 import com.wgzhao.addax.rdbms.util.DBUtil;
 import com.wgzhao.addax.rdbms.util.DataBaseType;
-import com.wgzhao.addax.rdbms.util.RdbmsException;
 import com.wgzhao.addax.rdbms.util.RdbmsRangeSplitWrap;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.tuple.ImmutablePair;
@@ -36,18 +35,20 @@ import org.apache.commons.lang3.tuple.Pair;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.sql.Connection;
+import java.sql.JDBCType;
 import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.sql.Types;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import static com.wgzhao.addax.common.spi.ErrorCode.CONFIG_ERROR;
-import static com.wgzhao.addax.common.spi.ErrorCode.NOT_SUPPORT_TYPE;
 
 public class SingleTableSplitUtil
 {
@@ -73,7 +74,7 @@ public class SingleTableSplitUtil
             // warn: mysql etc to be added...
         }
         else {
-            Pair<Object, Object> minMaxPK = getPkRange(configuration);
+            Pair<Object, Object> minMaxPK = getPkMinAndMaxValue(configuration);
             if (null == minMaxPK) {
                 throw AddaxException.asAddaxException(CONFIG_ERROR,
                         "Primary key-based table splitting failed. The key type ONLY supports integer and string.");
@@ -86,20 +87,16 @@ public class SingleTableSplitUtil
                 return pluginParams;
             }
 
-            boolean isStringType = Constant.PK_TYPE_STRING.equals(configuration.getString(Constant.PK_TYPE));
             boolean isLongType = Constant.PK_TYPE_LONG.equals(configuration.getString(Constant.PK_TYPE));
+            boolean isFloatType = Constant.PK_TYPE_FLOAT.equals(configuration.getString(Constant.PK_TYPE));
 
-            if (isStringType) {
-                rangeList = splitStringPk(configuration, table, where, minMaxPK.getLeft().toString(), minMaxPK.getRight().toString(),
-                        adviceNum, splitPkName);
-            }
-            else if (isLongType) {
-                rangeList = RdbmsRangeSplitWrap.splitAndWrap(new BigInteger(minMaxPK.getLeft().toString()),
-                        new BigInteger(minMaxPK.getRight().toString()), adviceNum, splitPkName);
+            if (isLongType) {
+                rangeList = genPkRange(Long.parseLong(minMaxPK.getLeft().toString()), Long.parseLong(minMaxPK.getRight().toString()), adviceNum, splitPkName);
+            } else if (isFloatType) {
+                rangeList = genPkRange(new BigDecimal(minMaxPK.getLeft().toString()), new BigDecimal(minMaxPK.getRight().toString()), adviceNum, splitPkName);
             }
             else {
-                throw AddaxException.asAddaxException(NOT_SUPPORT_TYPE,
-                        "the splitPk[" + splitPkName + "] type is unsupported, it only support int and string");
+                rangeList = genPkRange(minMaxPK.getLeft().toString(), minMaxPK.getRight().toString(), adviceNum, splitPkName);
             }
         }
         String tempQuerySql;
@@ -129,10 +126,10 @@ public class SingleTableSplitUtil
 
         // if the `where` clause contains splitPkName, it means that the splitPkName is not null
         // deal pk is null
-        if (where == null  || ! where.contains(splitPkName)) {
+        if (where == null || !where.contains(splitPkName)) {
             Configuration tempConfig = configuration.clone();
             tempQuerySql = buildQuerySql(column, table, where)
-                    + (hasWhere? " AND ": " WHERE ")
+                    + (hasWhere ? " AND " : " WHERE ")
                     + splitPkName + " IS NULL";
             allQuerySql.add(tempQuerySql);
             tempConfig.set(Key.QUERY_SQL, tempQuerySql);
@@ -157,16 +154,17 @@ public class SingleTableSplitUtil
         return querySql;
     }
 
-    @SuppressWarnings("resource")
-    private static Pair<Object, Object> getPkRange(Configuration configuration)
+    private static Pair<Object, Object> getPkMinAndMaxValue(Configuration configuration)
     {
-        String pkRangeSQL = genPKRangeSQL(configuration);
+        String splitPK = configuration.getString(Key.SPLIT_PK).trim();
+        String table = configuration.getString(Key.TABLE).trim();
+        String where = configuration.getString(Key.WHERE, null);
+        String pkRangeSQL = genPKSql(splitPK, table, where);
 
         int fetchSize = configuration.getInt(Key.FETCH_SIZE);
         String jdbcURL = configuration.getString(Key.JDBC_URL);
         String username = configuration.getString(Key.USERNAME);
         String password = configuration.getString(Key.PASSWORD);
-        String table = configuration.getString(Key.TABLE);
 
         Connection conn = DBUtil.getConnection(dataBaseType, jdbcURL, username, password);
         Pair<Object, Object> minMaxPK = checkSplitPk(conn, pkRangeSQL, fetchSize, table, username, configuration);
@@ -202,45 +200,22 @@ public class SingleTableSplitUtil
         ResultSet rs = null;
         Pair<Object, Object> minMaxPK = null;
         try {
-            String errorMsg =  "the splitPk type is unsupported, it only support int and string";
-            try {
-                rs = DBUtil.query(conn, pkRangeSQL, fetchSize);
-            }
-            catch (Exception e) {
-                throw RdbmsException.asQueryException(e, pkRangeSQL);
-            }
+            String errorMsg = "the splitPk type is unsupported, it only support int and string";
+            rs = DBUtil.query(conn, pkRangeSQL, fetchSize);
             ResultSetMetaData rsMetaData = rs.getMetaData();
-            if (isPKTypeValid(rsMetaData)) {
-                if (isStringType(rsMetaData.getColumnType(1))) {
-                    if (configuration != null) {
-                        configuration.set(Constant.PK_TYPE, Constant.PK_TYPE_STRING);
-                    }
-                    while (DBUtil.asyncResultSetNext(rs)) {
-                        minMaxPK = new ImmutablePair<>(rs.getString(1), rs.getString(2));
-                    }
-                }
-                else if (isLongType(rsMetaData.getColumnType(1))) {
-                    if (configuration != null) {
-                        configuration.set(Constant.PK_TYPE, Constant.PK_TYPE_LONG);
-                    }
-
-                    while (DBUtil.asyncResultSetNext(rs)) {
-                        minMaxPK = new ImmutablePair<>(rs.getString(1), rs.getString(2));
-
-                        // check: string shouldn't contain '.', for oracle
-                        String minMax = rs.getString(1) + rs.getString(2);
-                        if (StringUtils.contains(minMax, '.')) {
-                            throw AddaxException.asAddaxException(CONFIG_ERROR, errorMsg);
-                        }
-                    }
-                }
-                else {
-                    throw AddaxException.asAddaxException(CONFIG_ERROR, errorMsg);
-                }
+            if (isLongType(rsMetaData.getColumnType(1))) {
+                configuration.set(Constant.PK_TYPE, Constant.PK_TYPE_LONG);
+            }
+            else if(isFloatType(rsMetaData.getColumnType(1))) {
+                configuration.set(Constant.PK_TYPE, Constant.PK_TYPE_FLOAT);
             }
             else {
-                throw AddaxException.asAddaxException(CONFIG_ERROR, errorMsg);
+                configuration.set(Constant.PK_TYPE, Constant.PK_TYPE_STRING);
             }
+            while (DBUtil.asyncResultSetNext(rs)) {
+                minMaxPK = new ImmutablePair<>(rs.getObject(1), rs.getObject(2));
+            }
+            return minMaxPK;
         }
         catch (AddaxException e) {
             throw e;
@@ -252,7 +227,7 @@ public class SingleTableSplitUtil
             DBUtil.closeDBResources(rs, null, null);
         }
 
-        return minMaxPK;
+        //return minMaxPK;
     }
 
     private static boolean isPKTypeValid(ResultSetMetaData rsMetaData)
@@ -280,26 +255,23 @@ public class SingleTableSplitUtil
     // Types.NUMERIC
     private static boolean isLongType(int type)
     {
-        boolean isValidLongType = type == Types.BIGINT || type == Types.INTEGER || type == Types.SMALLINT || type == Types.TINYINT;
+        List<JDBCType> longTypeList = Arrays.asList(
+                JDBCType.BIGINT, JDBCType.INTEGER, JDBCType.SMALLINT, JDBCType.TINYINT
+        );
+        return longTypeList.contains(JDBCType.valueOf(type));
+    }
 
-        if (SingleTableSplitUtil.dataBaseType == DataBaseType.Oracle) {
-            isValidLongType |= type == Types.NUMERIC;
-        }
-        return isValidLongType;
+    private static boolean isFloatType(int type)
+    {
+        List<JDBCType> floatTypeList = Arrays.asList(JDBCType.DECIMAL, JDBCType.NUMERIC,
+                JDBCType.DOUBLE, JDBCType.FLOAT, JDBCType.REAL
+        );
+        return floatTypeList.contains(JDBCType.valueOf(type));
     }
 
     private static boolean isStringType(int type)
     {
         return type == Types.CHAR || type == Types.NCHAR || type == Types.VARCHAR || type == Types.LONGVARCHAR || type == Types.NVARCHAR;
-    }
-
-    private static String genPKRangeSQL(Configuration configuration)
-    {
-
-        String splitPK = configuration.getString(Key.SPLIT_PK).trim();
-        String table = configuration.getString(Key.TABLE).trim();
-        String where = configuration.getString(Key.WHERE, null);
-        return genPKSql(splitPK, table, where);
     }
 
     public static String genPKSql(String splitPK, String table, String where)
@@ -421,8 +393,14 @@ public class SingleTableSplitUtil
     {
         List<String> rangeList = new ArrayList<>();
         String splitSql;
+        boolean isLong = configuration.getString(Constant.PK_TYPE).equals(Constant.PK_TYPE_LONG);
         if (splitNum < 2) {
-            rangeList.add(String.format("%s >= '%s' AND %s <= '%s'", pkName, minVal, pkName, maxVal));
+            if (isLong) {
+                rangeList.add(String.format("%s >= %s AND %s <= %s", pkName, minVal, pkName, maxVal));
+            }
+            else {
+                rangeList.add(String.format("%s >= '%s' AND %s <= '%s'", pkName, minVal, pkName, maxVal));
+            }
             return rangeList;
         }
         if (StringUtils.isBlank(where)) {
@@ -433,7 +411,7 @@ public class SingleTableSplitUtil
                     pkName, table, where, splitNum - 1);
         }
         else if (dataBaseType == DataBaseType.PostgreSQL) {
-            splitSql = String.format("SELECT %s FROM %s TABLESAMPLE SYSTEM(10) REPEATABLE(200) ORDER BY %s LIMIT %d",
+            splitSql = String.format("SELECT %s FROM %s TABLESAMPLE BERNOULLI(10) REPEATABLE(200) ORDER BY %s LIMIT %d",
                     pkName, table, pkName, splitNum - 1);
         }
         else {
@@ -451,15 +429,90 @@ public class SingleTableSplitUtil
             }
             String preVal = minVal;
             for (String val : values) {
-                rangeList.add(String.format("%1$s >='%2$s' AND %1$s <'%3$s' ", pkName, preVal, val));
+                if (isLong) {
+                    rangeList.add(String.format("%1$s >=%2$s AND %1$s <%3$s ", pkName, preVal, val));
+                }
+                else {
+                    rangeList.add(String.format("%1$s >='%2$s' AND %1$s <'%3$s' ", pkName, preVal, val));
+                }
                 preVal = val;
             }
-            rangeList.add(String.format("%1$s >='%2$s' AND %1$s <='%3$s' ", pkName, preVal, maxVal));
+            if (isLong) {
+                rangeList.add(String.format("%1$s >=%2$s AND %1$s <=%3$s ", pkName, preVal, maxVal));
+            }
+            else {
+                rangeList.add(String.format("%1$s >='%2$s' AND %1$s <='%3$s' ", pkName, preVal, maxVal));
+            }
             return rangeList;
         }
         catch (SQLException e) {
             LOG.error("Failed to split the table by split key[{}]", splitSql, e);
             return rangeList;
         }
+    }
+
+    public static List<String> genPkRange(long minVal, long maxVal, int splitNum, String pkName)
+    {
+        List<Number> rangeList = new ArrayList<>();
+        List<String> rangeSql = new ArrayList<>();
+        if (splitNum < 2) {
+            rangeSql.add(String.format("%s >= %s AND %s <= %s", pkName, minVal, pkName, maxVal));
+            return rangeSql;
+        }
+
+        long step = (maxVal - minVal) / splitNum;
+        for (int i = 0; i < splitNum; i++) {
+            rangeList.add(minVal + i * step);
+        }
+
+        for (int i = 0; i < rangeList.size() - 1; i++) {
+            rangeSql.add(String.format("%s >= %s AND %s < %s", pkName, rangeList.get(i), pkName, rangeList.get(i + 1)));
+        }
+        rangeSql.add(String.format("%s >= %s AND %s <= %s", pkName, rangeList.get(rangeList.size() - 1), pkName, maxVal));
+        return rangeSql;
+    }
+
+    public static List<String> genPkRange(Number minVal, Number maxVal, int splitNum, String pkName)
+    {
+        List<Number> rangeList = new ArrayList<>();
+        List<String> rangeSql = new ArrayList<>();
+        if (splitNum < 2) {
+            rangeSql.add(String.format("%s >= %s AND %s <= %s", pkName, minVal, pkName, maxVal));
+            return rangeSql;
+        }
+
+        long step = Math.round((maxVal.doubleValue() - minVal.doubleValue()) / splitNum);
+        for (int i = 0; i < splitNum; i++) {
+            rangeList.add(minVal.doubleValue() + i * step);
+        }
+
+        for (int i = 0; i < rangeList.size() - 1; i++) {
+            rangeSql.add(String.format("%s >= %s AND %s < %s", pkName, rangeList.get(i), pkName, rangeList.get(i + 1)));
+        }
+        rangeSql.add(String.format("%s >= %s AND %s <= %s", pkName, rangeList.get(rangeList.size() - 1), pkName, maxVal));
+        return rangeSql;
+    }
+
+    public static List<String> genPkRange(String minVal, String maxVal, int splitNum, String pkName)
+    {
+        List<String> rangeList = new ArrayList<>();
+        List<String> rangeSql = new ArrayList<>();
+        if (splitNum < 2) {
+            rangeSql.add(String.format("%s >= '%s' AND %s <= '%s'", pkName, minVal, pkName, maxVal));
+            return rangeSql;
+        }
+
+        int minLen = minVal.length();
+        int maxLen = maxVal.length();
+        int step = (maxLen - minLen) / splitNum;
+        for (int i = 0; i < splitNum; i++) {
+            rangeList.add(minVal + StringUtils.repeat("\u0000", step * i));
+        }
+
+        for (int i = 0; i < rangeList.size() - 1; i++) {
+            rangeSql.add(String.format("%s >= '%s' AND %s < '%s'", pkName, rangeList.get(i), pkName, rangeList.get(i + 1)));
+        }
+        rangeSql.add(String.format("%s >= '%s' AND %s <= '%s'", pkName, rangeList.get(rangeList.size() - 1), pkName, maxVal));
+        return rangeSql;
     }
 }

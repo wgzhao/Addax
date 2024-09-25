@@ -83,10 +83,10 @@ public class CommonRdbmsReader
 
             OriginalConfPretreatmentUtil.doPretreatment(originalConfig);
             if (originalConfig.getString(Key.SPLIT_PK) == null && originalConfig.getBool(Key.AUTO_PK, false)) {
-                LOG.info("The primary key used for splitting is not configured, try to guess the primary key that can be split.");
+                LOG.info("The split key is not configured, try to guess the split key.");
                 String splitPK = GetPrimaryKeyUtil.getPrimaryKey(originalConfig);
                 if (splitPK != null) {
-                    LOG.info("Try to use [{}] as primary key to split", splitPK);
+                    LOG.info("Try to use [{}] as split key", splitPK);
                     originalConfig.set(Key.SPLIT_PK, splitPK);
                     if (originalConfig.getInt(Key.EACH_TABLE_SPLIT_SIZE, -1) == -1) {
                         originalConfig.set(Key.EACH_TABLE_SPLIT_SIZE, Constant.DEFAULT_EACH_TABLE_SPLIT_SIZE);

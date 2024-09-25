@@ -30,6 +30,7 @@ import org.apache.commons.lang3.tuple.Pair;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.sql.Connection;
 import java.sql.DriverManager;
@@ -305,8 +306,8 @@ public class HBase20SQLReaderHelper
                 }
                 else if (isLongType) {
                     rangeList = RdbmsRangeSplitWrap.splitAndWrap(
-                            new BigInteger(minMaxPK.getLeft().toString()),
-                            new BigInteger(minMaxPK.getRight().toString()),
+                            new BigDecimal(minMaxPK.getLeft().toString()),
+                            new BigDecimal(minMaxPK.getRight().toString()),
                             adviceNumber, splitKey);
                 }
                 else {
