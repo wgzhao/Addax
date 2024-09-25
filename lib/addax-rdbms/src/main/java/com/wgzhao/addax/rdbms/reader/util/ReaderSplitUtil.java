@@ -84,7 +84,7 @@ public final class ReaderSplitUtil
 
             String splitPk = originalSliceConfig.getString(Key.SPLIT_PK, null);
             //最终切分份数不一定等于 eachTableShouldSplitNumber
-            boolean needSplitTable = tableSplitNumber > 1 && StringUtils.isNotBlank(splitPk);
+            boolean needSplitTable = tableSplitNumber > 0 && StringUtils.isNotBlank(splitPk);
             if (needSplitTable) {
                 if (tables.size() == 1 && !isUserSpecifyEachTableSplitSize) {
                     //原来:如果是单表的，主键切分num=num*2+1
