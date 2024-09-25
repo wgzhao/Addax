@@ -70,7 +70,7 @@ public class SingleTableSplitUtil
         String where = configuration.getString(Key.WHERE, null);
         boolean hasWhere = StringUtils.isNotBlank(where);
         if (dataBaseType == DataBaseType.Oracle) {
-            rangeList = genSplitSqlForOracle(splitPkName, table, where, configuration, adviceNum);
+            rangeList = genPkRangeSQLForOracle(splitPkName, table, where, configuration, adviceNum);
             // warn: mysql etc to be added...
         }
         else {
@@ -91,12 +91,14 @@ public class SingleTableSplitUtil
             boolean isFloatType = Constant.PK_TYPE_FLOAT.equals(configuration.getString(Constant.PK_TYPE));
 
             if (isLongType) {
-                rangeList = genPkRange(Long.parseLong(minMaxPK.getLeft().toString()), Long.parseLong(minMaxPK.getRight().toString()), adviceNum, splitPkName);
-            } else if (isFloatType) {
-                rangeList = genPkRange(new BigDecimal(minMaxPK.getLeft().toString()), new BigDecimal(minMaxPK.getRight().toString()), adviceNum, splitPkName);
+                rangeList = genPkRangeSQL(Long.parseLong(minMaxPK.getLeft().toString()), Long.parseLong(minMaxPK.getRight().toString()), adviceNum, splitPkName);
+            }
+            else if (isFloatType) {
+                rangeList = genPkRangeSQL(new BigDecimal(minMaxPK.getLeft().toString()), new BigDecimal(minMaxPK.getRight().toString()), adviceNum, splitPkName);
             }
             else {
-                rangeList = genPkRange(minMaxPK.getLeft().toString(), minMaxPK.getRight().toString(), adviceNum, splitPkName);
+                rangeList = genPkRangeSQLByQuery(configuration, table, where, minMaxPK.getLeft().toString(), minMaxPK.getRight().toString(), adviceNum, splitPkName);
+//                rangeList = genPkRange(minMaxPK.getLeft().toString(), minMaxPK.getRight().toString(), adviceNum, splitPkName);
             }
         }
         String tempQuerySql;
@@ -206,7 +208,7 @@ public class SingleTableSplitUtil
             if (isLongType(rsMetaData.getColumnType(1))) {
                 configuration.set(Constant.PK_TYPE, Constant.PK_TYPE_LONG);
             }
-            else if(isFloatType(rsMetaData.getColumnType(1))) {
+            else if (isFloatType(rsMetaData.getColumnType(1))) {
                 configuration.set(Constant.PK_TYPE, Constant.PK_TYPE_FLOAT);
             }
             else {
@@ -295,7 +297,7 @@ public class SingleTableSplitUtil
      * @param adviceNum the number of split
      * @return list of string
      */
-    public static List<String> genSplitSqlForOracle(String splitPK, String table, String where, Configuration configuration, int adviceNum)
+    public static List<String> genPkRangeSQLForOracle(String splitPK, String table, String where, Configuration configuration, int adviceNum)
     {
         if (adviceNum < 1) {
             throw new IllegalArgumentException(String.format("The number of split should be greater than or equal 1, but it got %d.", adviceNum));
@@ -377,7 +379,8 @@ public class SingleTableSplitUtil
     }
 
     /**
-     * common String split method
+     * get the split range sql by query database
+     * it should be invoke when the split key is string type
      *
      * @param configuration configuration
      * @param table the table which be queried
@@ -386,21 +389,16 @@ public class SingleTableSplitUtil
      * @param maxVal maximal value
      * @param splitNum expected split number
      * @param pkName the column which split by
-     * @return list of string
+     * @return {@link List} of query string
      */
-    private static List<String> splitStringPk(Configuration configuration, String table, String where, String minVal, String maxVal,
+    private static List<String> genPkRangeSQLByQuery(Configuration configuration, String table, String where, String minVal, String maxVal,
             int splitNum, String pkName)
     {
         List<String> rangeList = new ArrayList<>();
         String splitSql;
         boolean isLong = configuration.getString(Constant.PK_TYPE).equals(Constant.PK_TYPE_LONG);
         if (splitNum < 2) {
-            if (isLong) {
-                rangeList.add(String.format("%s >= %s AND %s <= %s", pkName, minVal, pkName, maxVal));
-            }
-            else {
-                rangeList.add(String.format("%s >= '%s' AND %s <= '%s'", pkName, minVal, pkName, maxVal));
-            }
+            rangeList.add(String.format("%s >= '%s' AND %s <= '%s'", pkName, minVal, pkName, maxVal));
             return rangeList;
         }
         if (StringUtils.isBlank(where)) {
@@ -429,20 +427,14 @@ public class SingleTableSplitUtil
             }
             String preVal = minVal;
             for (String val : values) {
-                if (isLong) {
-                    rangeList.add(String.format("%1$s >=%2$s AND %1$s <%3$s ", pkName, preVal, val));
-                }
-                else {
-                    rangeList.add(String.format("%1$s >='%2$s' AND %1$s <'%3$s' ", pkName, preVal, val));
-                }
+
+                rangeList.add(String.format("%1$s >='%2$s' AND %1$s <'%3$s' ", pkName, preVal, val));
+
                 preVal = val;
             }
-            if (isLong) {
-                rangeList.add(String.format("%1$s >=%2$s AND %1$s <=%3$s ", pkName, preVal, maxVal));
-            }
-            else {
-                rangeList.add(String.format("%1$s >='%2$s' AND %1$s <='%3$s' ", pkName, preVal, maxVal));
-            }
+
+            rangeList.add(String.format("%1$s >='%2$s' AND %1$s <='%3$s' ", pkName, preVal, maxVal));
+
             return rangeList;
         }
         catch (SQLException e) {
@@ -451,7 +443,16 @@ public class SingleTableSplitUtil
         }
     }
 
-    public static List<String> genPkRange(long minVal, long maxVal, int splitNum, String pkName)
+    /**
+     * common long split method
+     *
+     * @param minVal minimal value
+     * @param maxVal maximal value
+     * @param splitNum expected split number
+     * @param pkName the column which split by
+     * @return list of split query sql, do not include is null clause
+     */
+    public static List<String> genPkRangeSQL(long minVal, long maxVal, int splitNum, String pkName)
     {
         List<Number> rangeList = new ArrayList<>();
         List<String> rangeSql = new ArrayList<>();
@@ -472,7 +473,7 @@ public class SingleTableSplitUtil
         return rangeSql;
     }
 
-    public static List<String> genPkRange(Number minVal, Number maxVal, int splitNum, String pkName)
+    public static List<String> genPkRangeSQL(Number minVal, Number maxVal, int splitNum, String pkName)
     {
         List<Number> rangeList = new ArrayList<>();
         List<String> rangeSql = new ArrayList<>();
@@ -493,7 +494,7 @@ public class SingleTableSplitUtil
         return rangeSql;
     }
 
-    public static List<String> genPkRange(String minVal, String maxVal, int splitNum, String pkName)
+    public static List<String> genPkRangeSQL(String minVal, String maxVal, int splitNum, String pkName)
     {
         List<String> rangeList = new ArrayList<>();
         List<String> rangeSql = new ArrayList<>();

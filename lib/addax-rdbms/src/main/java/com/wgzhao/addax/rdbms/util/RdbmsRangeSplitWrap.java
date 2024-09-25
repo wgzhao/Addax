@@ -46,15 +46,6 @@ public final class RdbmsRangeSplitWrap
         return RdbmsRangeSplitWrap.wrapRange(tempResult, columnName);
     }
 
-    public static List<String> wrapRange(long[] rangeResult, String columnName)
-    {
-        String[] rangeStr = new String[rangeResult.length];
-        for (int i = 0, len = rangeResult.length; i < len; i++) {
-            rangeStr[i] = String.valueOf(rangeResult[i]);
-        }
-        return wrapRange(rangeStr, columnName, "", null);
-    }
-
     public static List<String> wrapRange(BigInteger[] rangeResult, String columnName)
     {
         String[] rangeStr = new String[rangeResult.length];
