@@ -103,42 +103,10 @@ public class CommonRdbmsReader
             /* 检查每个表是否有读权限，以及querySql跟split Key是否正确 */
             Configuration queryConf = ReaderSplitUtil.doPreCheckSplit(originalConfig);
             String splitPK = queryConf.getString(Key.SPLIT_PK);
-            List<Object> connList = queryConf.getList(Key.CONNECTION, Object.class);
+            Configuration connConf = queryConf.getConfiguration(Key.CONNECTION);
             String username = queryConf.getString(Key.USERNAME);
             String password = queryConf.getString(Key.PASSWORD);
-            ExecutorService exec;
-            if (connList.size() < 10) {
-                exec = Executors.newFixedThreadPool(connList.size());
-            }
-            else {
-                exec = Executors.newFixedThreadPool(10);
-            }
-            Collection<PreCheckTask> taskList = new ArrayList<>();
-            for (Object o : connList) {
-                Configuration connConf = Configuration.from(o.toString());
-                PreCheckTask t = new PreCheckTask(username, password, connConf, dataBaseType, splitPK);
-                taskList.add(t);
-            }
-            List<Future<Boolean>> results = new ArrayList<>();
-            try {
-                results = exec.invokeAll(taskList);
-            }
-            catch (InterruptedException e) {
-                Thread.currentThread().interrupt();
-            }
-
-            for (Future<Boolean> result : results) {
-                try {
-                    result.get();
-                }
-                catch (ExecutionException e) {
-                    throw (AddaxException) e.getCause();
-                }
-                catch (InterruptedException e) {
-                    Thread.currentThread().interrupt();
-                }
-            }
-            exec.shutdownNow();
+            new PreCheckTask(username, password, connConf, dataBaseType, splitPK).call();
         }
 
         public List<Configuration> split(Configuration originalConfig, int adviceNumber)

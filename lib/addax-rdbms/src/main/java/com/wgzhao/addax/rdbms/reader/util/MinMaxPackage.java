@@ -21,6 +21,7 @@ import com.wgzhao.addax.common.base.Constant;
 
 import java.util.Collections;
 import java.util.List;
+import java.util.Objects;
 
 public class MinMaxPackage
 {
@@ -109,14 +110,22 @@ public class MinMaxPackage
         if (splitNum < 2) {
             return Collections.emptyList();
         }
-        List<Object> result = new java.util.ArrayList<>(splitNum - 1);
+        List<Object> result = new java.util.ArrayList<>();
         double min = Double.parseDouble(this.min.toString());
         double max = Double.parseDouble(this.max.toString());
+        if ((max - min) <= splitNum) {
+            // the difference between min and max is less than splitNum
+            return result;
+        }
         double step = Math.round((max - min) / splitNum);
         // exclude min and max
         for (long i = 1; i < splitNum; i++) {
             result.add(min + i * step);
         }
         return result;
+    }
+
+    public boolean isSameValue() {
+        return Objects.equals(min, max);
     }
 }
