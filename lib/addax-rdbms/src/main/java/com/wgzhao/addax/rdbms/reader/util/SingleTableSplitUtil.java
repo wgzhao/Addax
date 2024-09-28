@@ -28,26 +28,21 @@ import com.wgzhao.addax.common.exception.AddaxException;
 import com.wgzhao.addax.common.util.Configuration;
 import com.wgzhao.addax.rdbms.util.DBUtil;
 import com.wgzhao.addax.rdbms.util.DataBaseType;
-import com.wgzhao.addax.rdbms.util.RdbmsException;
-import com.wgzhao.addax.rdbms.util.RdbmsRangeSplitWrap;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.lang3.tuple.ImmutablePair;
-import org.apache.commons.lang3.tuple.Pair;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.math.BigInteger;
 import java.sql.Connection;
+import java.sql.JDBCType;
 import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
-import java.sql.SQLException;
-import java.sql.Statement;
-import java.sql.Types;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
+import java.util.StringJoiner;
 
 import static com.wgzhao.addax.common.spi.ErrorCode.CONFIG_ERROR;
-import static com.wgzhao.addax.common.spi.ErrorCode.NOT_SUPPORT_TYPE;
 
 public class SingleTableSplitUtil
 {
@@ -68,77 +63,49 @@ public class SingleTableSplitUtil
         String table = configuration.getString(Key.TABLE);
         String where = configuration.getString(Key.WHERE, null);
         boolean hasWhere = StringUtils.isNotBlank(where);
-        if (dataBaseType == DataBaseType.Oracle) {
-            rangeList = genSplitSqlForOracle(splitPkName, table, where, configuration, adviceNum);
-            // warn: mysql etc to be added...
+        if (adviceNum < 1) {
+            throw new IllegalArgumentException("The number of split should be greater than or equal 1, but it got " + adviceNum);
         }
-        else {
-            Pair<Object, Object> minMaxPK = getPkRange(configuration);
-            if (null == minMaxPK) {
-                throw AddaxException.asAddaxException(CONFIG_ERROR,
-                        "Primary key-based table splitting failed. The key type ONLY supports integer and string.");
-            }
-
+        if (adviceNum == 1) {
+            LOG.warn("The adviceNumber is 1, so we only have one slice.");
             configuration.set(Key.QUERY_SQL, buildQuerySql(column, table, where));
-            if (null == minMaxPK.getLeft() || null == minMaxPK.getRight()) {
-                // 切分后获取到的start/end 有 Null 的情况
-                pluginParams.add(configuration);
-                return pluginParams;
-            }
-
-            boolean isStringType = Constant.PK_TYPE_STRING.equals(configuration.getString(Constant.PK_TYPE));
-            boolean isLongType = Constant.PK_TYPE_LONG.equals(configuration.getString(Constant.PK_TYPE));
-
-            if (isStringType) {
-                rangeList = splitStringPk(configuration, table, where, minMaxPK.getLeft().toString(), minMaxPK.getRight().toString(),
-                        adviceNum, splitPkName);
-            }
-            else if (isLongType) {
-                rangeList = RdbmsRangeSplitWrap.splitAndWrap(new BigInteger(minMaxPK.getLeft().toString()),
-                        new BigInteger(minMaxPK.getRight().toString()), adviceNum, splitPkName);
-            }
-            else {
-                throw AddaxException.asAddaxException(NOT_SUPPORT_TYPE,
-                        "the splitPk[" + splitPkName + "] type is unsupported, it only support int and string");
-            }
+            pluginParams.add(configuration);
+            return pluginParams;
         }
+
+        rangeList = genPkRangeSQLForGeneric(splitPkName, table, where, configuration, adviceNum);
+
+        if (rangeList.isEmpty()) {
+            //mean the split key only has null value
+            LOG.warn("The min value is equal to the max value, or the split key has only null value to table {}. so we only have one slice.", table);
+            configuration.set(Key.QUERY_SQL, buildQuerySql(column, table, where));
+            pluginParams.add(configuration);
+            return pluginParams;
+        }
+
         String tempQuerySql;
-        List<String> allQuerySql = new ArrayList<>();
+        StringJoiner allQuerySql = new StringJoiner("\n");
 
-        if (!rangeList.isEmpty()) {
-            for (String range : rangeList) {
-                Configuration tempConfig = configuration.clone();
-
-                tempQuerySql = buildQuerySql(column, table, where) + (hasWhere ? " AND " : " WHERE ") + range;
-
-                allQuerySql.add(tempQuerySql);
-                tempConfig.set(Key.QUERY_SQL, tempQuerySql);
-                pluginParams.add(tempConfig);
-            }
-        }
-        else {
-            //pluginParams.add(configuration); // this is wrong for new & old split
+        for (String range : rangeList) {
             Configuration tempConfig = configuration.clone();
-            tempQuerySql = buildQuerySql(column, table, where)
-                    + (hasWhere ? " AND " : " WHERE ")
-                    + String.format(" %s IS NOT NULL", splitPkName);
+
+            tempQuerySql = buildQuerySql(column, table, where) + (hasWhere ? " AND " : " WHERE ") + range;
+
             allQuerySql.add(tempQuerySql);
             tempConfig.set(Key.QUERY_SQL, tempQuerySql);
             pluginParams.add(tempConfig);
         }
 
-        // if the `where` clause contains splitPkName, it means that the splitPkName is not null
-        // deal pk is null
-        if (where == null  || ! where.contains(splitPkName)) {
+        if (configuration.getBool("pkExistsNull", false)) {
             Configuration tempConfig = configuration.clone();
             tempQuerySql = buildQuerySql(column, table, where)
-                    + (hasWhere? " AND ": " WHERE ")
+                    + (hasWhere ? " AND " : " WHERE ")
                     + splitPkName + " IS NULL";
             allQuerySql.add(tempQuerySql);
             tempConfig.set(Key.QUERY_SQL, tempQuerySql);
             pluginParams.add(tempConfig);
         }
-        LOG.info("After splitting, all query sql = [\n{}\n].", StringUtils.join(allQuerySql, "\n"));
+        LOG.info("After splitting for table {}, all query sql = [\n{}\n].", table, allQuerySql);
 
         return pluginParams;
     }
@@ -157,90 +124,57 @@ public class SingleTableSplitUtil
         return querySql;
     }
 
-    @SuppressWarnings("resource")
-    private static Pair<Object, Object> getPkRange(Configuration configuration)
+    /**
+     * get the min and max value of the split key
+     *
+     * @param configuration {@link Configuration}
+     * @return {@link MinMaxPackage}
+     * e.g {"min": 1, "max": 100, "type": "long"} `type` is one of `long`, `float`, `string`
+     */
+    private static MinMaxPackage getPkMinAndMaxValue(Configuration configuration)
     {
-        String pkRangeSQL = genPKRangeSQL(configuration);
+        String splitPK = configuration.getString(Key.SPLIT_PK).trim();
+        String table = configuration.getString(Key.TABLE).trim();
+        String where = configuration.getString(Key.WHERE, null);
+        String pkRangeSQL = genPKSql(splitPK, table, where);
 
-        int fetchSize = configuration.getInt(Key.FETCH_SIZE);
         String jdbcURL = configuration.getString(Key.JDBC_URL);
         String username = configuration.getString(Key.USERNAME);
         String password = configuration.getString(Key.PASSWORD);
-        String table = configuration.getString(Key.TABLE);
 
         Connection conn = DBUtil.getConnection(dataBaseType, jdbcURL, username, password);
-        Pair<Object, Object> minMaxPK = checkSplitPk(conn, pkRangeSQL, fetchSize, table, username, configuration);
-        DBUtil.closeDBResources(null, conn);
-        return minMaxPK;
-    }
-
-    public static void preCheckSplitPk(Connection conn, String pkRangeSQL, int fetchSize,
-            String table, String username)
-    {
-        Pair<Object, Object> minMaxPK = checkSplitPk(conn, pkRangeSQL, fetchSize, table, username, null);
-        if (null == minMaxPK) {
-            throw AddaxException.asAddaxException(CONFIG_ERROR,
-                    "The split key should be single column, and the type is either integer or string.");
-        }
-    }
-
-    /**
-     * 检测splitPk的配置是否正确。
-     * configuration为null, 是preCheck的逻辑，不需要回写PK_TYPE到configuration中
-     *
-     * @param conn database connection
-     * @param pkRangeSQL query sql for getting the primary key range
-     * @param fetchSize fetch size
-     * @param table the table name
-     * @param username database connect username
-     * @param configuration connect configuration
-     * @return primary key range pair
-     */
-    private static Pair<Object, Object> checkSplitPk(Connection conn, String pkRangeSQL, int fetchSize, String table,
-            String username, Configuration configuration)
-    {
+        MinMaxPackage minMaxPackage = new MinMaxPackage();
         ResultSet rs = null;
-        Pair<Object, Object> minMaxPK = null;
         try {
-            String errorMsg =  "the splitPk type is unsupported, it only support int and string";
-            try {
-                rs = DBUtil.query(conn, pkRangeSQL, fetchSize);
-            }
-            catch (Exception e) {
-                throw RdbmsException.asQueryException(e, pkRangeSQL);
-            }
+            rs = DBUtil.query(conn, pkRangeSQL, 1);
             ResultSetMetaData rsMetaData = rs.getMetaData();
-            if (isPKTypeValid(rsMetaData)) {
-                if (isStringType(rsMetaData.getColumnType(1))) {
-                    if (configuration != null) {
-                        configuration.set(Constant.PK_TYPE, Constant.PK_TYPE_STRING);
-                    }
-                    while (DBUtil.asyncResultSetNext(rs)) {
-                        minMaxPK = new ImmutablePair<>(rs.getString(1), rs.getString(2));
-                    }
-                }
-                else if (isLongType(rsMetaData.getColumnType(1))) {
-                    if (configuration != null) {
-                        configuration.set(Constant.PK_TYPE, Constant.PK_TYPE_LONG);
-                    }
-
-                    while (DBUtil.asyncResultSetNext(rs)) {
-                        minMaxPK = new ImmutablePair<>(rs.getString(1), rs.getString(2));
-
-                        // check: string shouldn't contain '.', for oracle
-                        String minMax = rs.getString(1) + rs.getString(2);
-                        if (StringUtils.contains(minMax, '.')) {
-                            throw AddaxException.asAddaxException(CONFIG_ERROR, errorMsg);
-                        }
-                    }
-                }
-                else {
-                    throw AddaxException.asAddaxException(CONFIG_ERROR, errorMsg);
-                }
+            if (isLongType(rsMetaData.getColumnType(1))) {
+                minMaxPackage.setType(Constant.PK_TYPE_LONG);
+            }
+            else if (isFloatType(rsMetaData.getColumnType(1))) {
+                minMaxPackage.setType(Constant.PK_TYPE_FLOAT);
             }
             else {
-                throw AddaxException.asAddaxException(CONFIG_ERROR, errorMsg);
+                minMaxPackage.setType(Constant.PK_TYPE_STRING);
             }
+            while (DBUtil.asyncResultSetNext(rs)) {
+                minMaxPackage.setMin(rs.getObject(1));
+                minMaxPackage.setMax(rs.getObject(2));
+            }
+            rs.close();
+            // the pk exists null at the current condition
+            if (StringUtils.isBlank(where)) {
+                rs = DBUtil.query(conn, "SELECT count(*) FROM " + table + " WHERE " + splitPK + " IS NULL", 1);
+            }
+            else {
+                rs = DBUtil.query(conn, "SELECT count(*) FROM " + table + " WHERE " + where + " AND " + splitPK + " IS NULL", 1);
+            }
+            if (rs.next() && rs.getInt(1) > 0) {
+                LOG.info("the split key has null value.");
+                //minMaxPackage.setPkExistsNull(true);
+                configuration.set("pkExistsNull", true);
+            }
+            rs.close();
         }
         catch (AddaxException e) {
             throw e;
@@ -250,67 +184,9 @@ public class SingleTableSplitUtil
         }
         finally {
             DBUtil.closeDBResources(rs, null, null);
+            DBUtil.closeDBResources(null, conn);
         }
-
-        return minMaxPK;
-    }
-
-    private static boolean isPKTypeValid(ResultSetMetaData rsMetaData)
-    {
-        boolean ret = false;
-        try {
-            int minType = rsMetaData.getColumnType(1);
-            int maxType = rsMetaData.getColumnType(2);
-            boolean isNumberType = isLongType(minType);
-            boolean isStringType = isStringType(minType);
-
-            if (minType == maxType && (isNumberType || isStringType)) {
-                ret = true;
-            }
-        }
-        catch (Exception e) {
-            throw AddaxException.asAddaxException(CONFIG_ERROR,
-                    "Failed to obtain the type of split key.");
-        }
-        return ret;
-    }
-
-    // warn: Types.NUMERIC is used for oracle! because oracle use NUMBER to
-    // store INT, SMALLINT, INTEGER, and only oracle need to concern
-    // Types.NUMERIC
-    private static boolean isLongType(int type)
-    {
-        boolean isValidLongType = type == Types.BIGINT || type == Types.INTEGER || type == Types.SMALLINT || type == Types.TINYINT;
-
-        if (SingleTableSplitUtil.dataBaseType == DataBaseType.Oracle) {
-            isValidLongType |= type == Types.NUMERIC;
-        }
-        return isValidLongType;
-    }
-
-    private static boolean isStringType(int type)
-    {
-        return type == Types.CHAR || type == Types.NCHAR || type == Types.VARCHAR || type == Types.LONGVARCHAR || type == Types.NVARCHAR;
-    }
-
-    private static String genPKRangeSQL(Configuration configuration)
-    {
-
-        String splitPK = configuration.getString(Key.SPLIT_PK).trim();
-        String table = configuration.getString(Key.TABLE).trim();
-        String where = configuration.getString(Key.WHERE, null);
-        return genPKSql(splitPK, table, where);
-    }
-
-    public static String genPKSql(String splitPK, String table, String where)
-    {
-
-        String minMaxTemplate = "SELECT MIN(%s), MAX(%s) FROM %s";
-        String pkRangeSQL = String.format(minMaxTemplate, splitPK, splitPK, table);
-        if (StringUtils.isNotBlank(where)) {
-            pkRangeSQL = String.format("%s WHERE (%s AND %s IS NOT NULL)", pkRangeSQL, where, splitPK);
-        }
-        return pkRangeSQL;
+        return minMaxPackage;
     }
 
     /**
@@ -321,42 +197,40 @@ public class SingleTableSplitUtil
      * @param where where clause
      * @param configuration configuration
      * @param adviceNum the number of split
-     * @return list of string
+     * @return 1. empty list of the min value is equal to max value, or the split key has only null value;
+     *         2. {@link List} of where clause
      */
-    public static List<String> genSplitSqlForOracle(String splitPK, String table, String where, Configuration configuration, int adviceNum)
+    public static List<String> genPkRangeSQLForGeneric(String splitPK, String table, String where, Configuration configuration, int adviceNum)
     {
-        if (adviceNum < 1) {
-            throw new IllegalArgumentException(String.format("The number of split should be greater than or equal 1, but it got %d.", adviceNum));
-        }
-        else if (adviceNum == 1) {
+        if (adviceNum == 1) {
             return new ArrayList<>();
         }
-        String whereSql = String.format("%s IS NOT NULL", splitPK);
-        if (StringUtils.isNotBlank(where)) {
-            whereSql = String.format(" WHERE (%s) AND (%s) ", whereSql, where);
-        }
-        else {
-            whereSql = String.format(" WHERE (%s) ", whereSql);
-        }
-        Double percentage = configuration.getDouble(Key.SAMPLE_PERCENTAGE, 0.1);
-        String sampleSqlTemplate = "SELECT * FROM ( SELECT %s FROM %s SAMPLE (%s) %s ORDER BY DBMS_RANDOM.VALUE) WHERE ROWNUM <= %s ORDER by %s ASC";
-        String splitSql = String.format(sampleSqlTemplate, splitPK, table, percentage, whereSql, adviceNum, splitPK);
 
-        int fetchSize = configuration.getInt(Key.FETCH_SIZE, 32);
+        List<Object> rangeValue = new ArrayList<>();
+        MinMaxPackage pkMinAndMaxValue = getPkMinAndMaxValue(configuration);
+        if (pkMinAndMaxValue.getMin() == null || pkMinAndMaxValue.getMax() == null || pkMinAndMaxValue.isSameValue()) {
+            // mean the split key has only null value, it can not split
+             return Collections.emptyList();
+        }
+
+        if (pkMinAndMaxValue.isNumeric()) {
+            LOG.info("The type of split key is numeric, so we use the math algorithm to split the table.");
+            rangeValue = pkMinAndMaxValue.genSplitPoint(adviceNum);
+            return genAllTypePkRangeWhereClause(splitPK, pkMinAndMaxValue, rangeValue);
+        }
+
+        String splitSql = genSplitPointSql(splitPK, table, where, adviceNum, dataBaseType, pkMinAndMaxValue);
         String jdbcURL = configuration.getString(Key.JDBC_URL);
         String username = configuration.getString(Key.USERNAME);
         String password = configuration.getString(Key.PASSWORD);
         Connection conn = DBUtil.getConnection(dataBaseType, jdbcURL, username, password);
         LOG.info("split pk [sql={}] is running... ", splitSql);
         ResultSet rs = null;
-        List<Pair<Object, Integer>> splitRange = new ArrayList<>();
+
         try {
-            rs = DBUtil.query(conn, splitSql, fetchSize);
-            configuration.set(Constant.PK_TYPE, Constant.PK_TYPE_MONTE_CARLO);
-            ResultSetMetaData rsMetaData = rs.getMetaData();
+            rs = DBUtil.query(conn, splitSql, adviceNum);
             while (DBUtil.asyncResultSetNext(rs)) {
-                ImmutablePair<Object, Integer> eachPoint = new ImmutablePair<>(rs.getObject(1), rsMetaData.getColumnType(1));
-                splitRange.add(eachPoint);
+                rangeValue.add(rs.getObject(1));
             }
         }
         catch (AddaxException e) {
@@ -369,97 +243,128 @@ public class SingleTableSplitUtil
             DBUtil.closeDBResources(rs, null, null);
         }
 
-        LOG.debug(JSON.toJSONString(splitRange));
-        List<String> rangeSql = new ArrayList<>();
-        int splitRangeSize = splitRange.size();
-        // warn: splitRangeSize may be 0 or 1，切分规则为IS NULL以及 IS NOT NULL
-        // demo: Parameter rangeResult can not be null and its length can not <2. detail:rangeResult=[24999930].
-        if (splitRangeSize >= 2) {
-            // warn: oracle Number is long type here
-            if (isLongType(splitRange.get(0).getRight())) {
-                BigInteger[] integerPoints = new BigInteger[splitRange.size()];
-                for (int i = 0; i < splitRangeSize; i++) {
-                    integerPoints[i] = new BigInteger(splitRange.get(i).getLeft().toString());
-                }
-                rangeSql.addAll(RdbmsRangeSplitWrap.wrapRange(integerPoints, splitPK));
-                // it's ok if splitRangeSize is 1
-                rangeSql.add(RdbmsRangeSplitWrap.wrapFirstLastPoint(integerPoints[0], integerPoints[splitRangeSize - 1], splitPK));
-            }
-            else if (isStringType(splitRange.get(0).getRight())) {
-                // warn: treated as string type
-                String[] stringPoints = new String[splitRange.size()];
-                for (int i = 0; i < splitRangeSize; i++) {
-                    stringPoints[i] = splitRange.get(i).getLeft().toString();
-                }
-                rangeSql.addAll(RdbmsRangeSplitWrap.wrapRange(stringPoints, splitPK, "'", dataBaseType));
-                // it's ok if splitRangeSize is 1
-                rangeSql.add(RdbmsRangeSplitWrap.wrapFirstLastPoint(stringPoints[0], stringPoints[splitRangeSize - 1],
-                        splitPK, "'", dataBaseType));
-            }
-            else {
-                throw AddaxException.asAddaxException(CONFIG_ERROR,
-                        "the data type of split key is unsupported. it ONLY supports integer and string.");
-            }
-        }
-        return rangeSql;
+        LOG.debug(JSON.toJSONString(rangeValue));
+        return genAllTypePkRangeWhereClause(splitPK, pkMinAndMaxValue, rangeValue);
     }
 
     /**
-     * common String split method
+     * generate sql that get the split points, whose points is the boundary of the split
+     * we can use math algorithm to get the split points, but it causes the data skew when the
+     * split key is not uniform distributed. So we use the random algorithm to get the split points
      *
-     * @param configuration configuration
-     * @param table the table which be queried
-     * @param where where clause
-     * @param minVal minimal value
-     * @param maxVal maximal value
-     * @param splitNum expected split number
-     * @param pkName the column which split by
-     * @return list of string
+     * @param splitPK the split key
+     * @param table the table name
+     * @param whereSql the where clause
+     * @param adviceNum the number of split
+     * @param dataBaseType the database type
+     * @param minMaxPack {@link MinMaxPackage}
+     * @return the sql string that get the split points
      */
-    private static List<String> splitStringPk(Configuration configuration, String table, String where, String minVal, String maxVal,
-            int splitNum, String pkName)
+    private static String genSplitPointSql(String splitPK, String table, String whereSql, int adviceNum, DataBaseType dataBaseType, MinMaxPackage minMaxPack)
     {
-        List<String> rangeList = new ArrayList<>();
-        String splitSql;
-        if (splitNum < 2) {
-            rangeList.add(String.format("%s >= '%s' AND %s <= '%s'", pkName, minVal, pkName, maxVal));
-            return rangeList;
+        String sql;
+        if (StringUtils.isBlank(whereSql)) {
+            whereSql = " WHERE 1=1 ";
         }
-        if (StringUtils.isBlank(where)) {
-            where = "1=1";
-        }
-        if (dataBaseType == DataBaseType.MySql) {
-            splitSql = String.format("SELECT %1$s from (SELECT %1$s FROM %2$s WHERE %3$s ORDER BY RAND() LIMIT %4$d) T ORDER BY %1$s ASC",
-                    pkName, table, where, splitNum - 1);
-        }
-        else if (dataBaseType == DataBaseType.PostgreSQL) {
-            splitSql = String.format("SELECT %s FROM %s TABLESAMPLE SYSTEM(10) REPEATABLE(200) ORDER BY %s LIMIT %d",
-                    pkName, table, pkName, splitNum - 1);
+        if (minMaxPack.getType() == Constant.PK_TYPE_STRING) {
+            whereSql = whereSql + " AND " + splitPK + " > '" + minMaxPack.getMin().toString() + "' AND " + splitPK + "< '" + minMaxPack.getMax().toString() + "'";
         }
         else {
-            return RdbmsRangeSplitWrap.splitAndWrap(minVal, maxVal, splitNum, pkName, "'", dataBaseType);
+            whereSql = whereSql + " AND " + splitPK + " > " + minMaxPack.getMin() + " AND " + splitPK + "<" + minMaxPack.getMax();
         }
-        String jdbcURL = configuration.getString(Key.JDBC_URL);
-        String username = configuration.getString(Key.USERNAME);
-        String password = configuration.getString(Key.PASSWORD);
-        try (Connection conn = DBUtil.getConnection(dataBaseType, jdbcURL, username, password)) {
-            Statement statement = conn.createStatement();
-            ResultSet resultSet = statement.executeQuery(splitSql);
-            List<String> values = new ArrayList<>();
-            while (resultSet.next()) {
-                values.add(resultSet.getString(1));
-            }
-            String preVal = minVal;
-            for (String val : values) {
-                rangeList.add(String.format("%1$s >='%2$s' AND %1$s <'%3$s' ", pkName, preVal, val));
-                preVal = val;
-            }
-            rangeList.add(String.format("%1$s >='%2$s' AND %1$s <='%3$s' ", pkName, preVal, maxVal));
-            return rangeList;
+
+        if (dataBaseType == DataBaseType.Oracle) {
+            sql = String.format("select %1$s from (select %1$s from %2$s %3$s order by DBMS_RANDOM.VALUE) where rownum < %4$d order by %1$s",
+                    splitPK, table, whereSql, adviceNum);
         }
-        catch (SQLException e) {
-            LOG.error("Failed to split the table by split key[{}]", splitSql, e);
-            return rangeList;
+        else if (dataBaseType == DataBaseType.SQLServer || dataBaseType == DataBaseType.Sybase) {
+            sql = String.format("select %1$s from (select top %4$d %1$s from %2$s %3$s order by newid()) t order by %1$s",
+                    splitPK, table, whereSql, adviceNum - 1);
         }
+        else if (dataBaseType == DataBaseType.PostgreSQL || dataBaseType == DataBaseType.SQLite) {
+            sql = String.format("select %1s from (select %1$s from %2$s %3$s order by random() limit %4$d) t order by %1$s",
+                    splitPK, table, whereSql, adviceNum - 1);
+        }
+        else {
+            // include mysql, mariadb, clickhouse, hive, trinodb, presto, doris, phoenix with hbase
+            sql = String.format("select %1$s from (select %1$s from %2$s %3$s order by rand() limit %4$d) t order by %1$s",
+                    splitPK, table, whereSql, adviceNum - 1);
+        }
+        return sql;
+    }
+
+    /**
+     * generate all split query where clause like the following:
+     * <p>
+     * pk &ge; min and pk &lt; splitPoint1
+     * pk &ge; splitPoint1 and pk &lt; splitPoint2
+     * ....
+     * pk &ge; splitPointN and pk &le; max
+     * </p>
+     *
+     * @param pkName the split key name
+     * @param minMaxPackage {@link MinMaxPackage}
+     * @param rangeValues the list of split points
+     * @return the list of where clause
+     */
+    public static List<String> genAllTypePkRangeWhereClause(String pkName, MinMaxPackage minMaxPackage, List<Object> rangeValues)
+    {
+        List<String> rangeSql = new ArrayList<>();
+        String singleSqlTemplate;
+        String middleSqlTemplate;
+        String lastSqlTemplate;
+
+        boolean isString = minMaxPackage.getType() == Constant.PK_TYPE_STRING;
+        if (isString) {
+            singleSqlTemplate = "%s >= '%s' AND %s <= '%s'";
+            middleSqlTemplate = "%s >= '%s' AND %s < '%s'";
+            lastSqlTemplate = "%s >= '%s' AND %s <= '%s'";
+        }
+        else {
+            singleSqlTemplate = "%s >= %s AND %s <= %s";
+            middleSqlTemplate = "%s >= %s AND %s < %s";
+            lastSqlTemplate = "%s >= %s AND %s <= %s";
+        }
+        Object min = minMaxPackage.getMin();
+        Object max = minMaxPackage.getMax();
+        if (rangeValues.isEmpty()) {
+            rangeSql.add(String.format(singleSqlTemplate, pkName, min, pkName, max));
+            return rangeSql;
+        }
+        rangeValues.add(0, min);
+        for (int i = 0; i < rangeValues.size() - 1; i++) {
+            rangeSql.add(String.format(middleSqlTemplate, pkName, rangeValues.get(i), pkName, rangeValues.get(i + 1)));
+        }
+
+        rangeSql.add(String.format(lastSqlTemplate, pkName, rangeValues.get(rangeValues.size() - 1), pkName, max));
+
+        return rangeSql;
+    }
+
+    private static boolean isLongType(int type)
+    {
+        List<JDBCType> longTypeList = Arrays.asList(
+                JDBCType.BIGINT, JDBCType.INTEGER, JDBCType.SMALLINT, JDBCType.TINYINT
+        );
+        return longTypeList.contains(JDBCType.valueOf(type));
+    }
+
+    private static boolean isFloatType(int type)
+    {
+        List<JDBCType> floatTypeList = Arrays.asList(JDBCType.DECIMAL, JDBCType.NUMERIC,
+                JDBCType.DOUBLE, JDBCType.FLOAT, JDBCType.REAL
+        );
+        return floatTypeList.contains(JDBCType.valueOf(type));
+    }
+
+    public static String genPKSql(String splitPK, String table, String where)
+    {
+
+        String minMaxTemplate = "SELECT MIN(%s), MAX(%s) FROM %s";
+        String pkRangeSQL = String.format(minMaxTemplate, splitPK, splitPK, table);
+        if (StringUtils.isNotBlank(where)) {
+            pkRangeSQL = String.format("%s WHERE (%s AND %s IS NOT NULL)", pkRangeSQL, where, splitPK);
+        }
+        return pkRangeSQL;
     }
 }

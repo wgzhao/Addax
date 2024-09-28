@@ -54,6 +54,7 @@ public class Constant
     public static final Object PK_TYPE_MONTE_CARLO = "pkTypeMonteCarlo";
     // The data type of primary key is string.
     public static final Object PK_TYPE_STRING = "pkTypeString";
+    public static final Object PK_TYPE_FLOAT = "pkTypeFloat";
 
     public static final String INSERT_OR_REPLACE_TEMPLATE_MARK = "insertOrReplaceTemplate";
     public static final String QUERY_SQL_TEMPLATE = "SELECT %s FROM %s WHERE (%s)";

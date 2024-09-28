@@ -101,9 +101,6 @@ public class PreCheckTask
                     if (splitPkSqls != null && !splitPkSqls.isEmpty()) {
                         splitPkSql = splitPkSqls.get(i).toString();
                         DBUtil.sqlValid(splitPkSql, dataBaseType);
-                        if (i == 0) {
-                            SingleTableSplitUtil.preCheckSplitPk(conn, splitPkSql, fetchSize, table, userName);
-                        }
                     }
                 }
                 catch (ParserException e) {
