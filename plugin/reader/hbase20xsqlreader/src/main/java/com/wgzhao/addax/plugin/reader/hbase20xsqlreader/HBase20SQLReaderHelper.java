@@ -24,30 +24,21 @@ import com.wgzhao.addax.common.base.HBaseKey;
 import com.wgzhao.addax.common.exception.AddaxException;
 import com.wgzhao.addax.common.util.Configuration;
 import com.wgzhao.addax.rdbms.reader.util.ReaderSplitUtil;
-import com.wgzhao.addax.rdbms.util.RdbmsRangeSplitWrap;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.lang3.tuple.ImmutablePair;
-import org.apache.commons.lang3.tuple.Pair;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.math.BigDecimal;
-import java.math.BigInteger;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.ResultSet;
-import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
 import java.sql.Statement;
-import java.sql.Types;
 import java.util.ArrayList;
 import java.util.List;
 
-import static com.wgzhao.addax.common.spi.ErrorCode.CONFIG_ERROR;
 import static com.wgzhao.addax.common.spi.ErrorCode.CONNECT_ERROR;
 import static com.wgzhao.addax.common.spi.ErrorCode.EXECUTE_FAIL;
 import static com.wgzhao.addax.common.spi.ErrorCode.ILLEGAL_VALUE;
-import static com.wgzhao.addax.common.spi.ErrorCode.NOT_SUPPORT_TYPE;
 import static com.wgzhao.addax.common.spi.ErrorCode.REQUIRED_VALUE;
 
 public class HBase20SQLReaderHelper
