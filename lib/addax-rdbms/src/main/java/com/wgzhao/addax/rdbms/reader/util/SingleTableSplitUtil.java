@@ -296,10 +296,10 @@ public class SingleTableSplitUtil
     /**
      * generate all split query where clause like the following:
      * <p>
-     * pk >= min and pk < splitPoint1
-     * pk >= splitPoint1 and pk < splitPoint2
+     * pk &ge; min and pk &lt; splitPoint1
+     * pk &ge; splitPoint1 and pk &lt; splitPoint2
      * ....
-     * pk >= splitPointN and pk <= max
+     * pk &ge; splitPointN and pk &le; max
      * </p>
      *
      * @param pkName the split key name
