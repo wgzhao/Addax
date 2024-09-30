@@ -67,7 +67,7 @@
         <jest.version>6.3.1</jest.version>
         <junit.version>5.10.2</junit.version>
         <joda.time.version>2.12.7</joda.time.version>
-        <jackson.version>2.16.0</jackson.version>
+        <jackson.version>2.18.0</jackson.version>
         <jedis.version>3.7.0</jedis.version>
         <jsch.version>0.2.20</jsch.version>
         <kafka.version>3.2.3</kafka.version>
