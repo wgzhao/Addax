@@ -45,13 +45,10 @@ import com.wgzhao.addax.core.util.container.ClassLoaderSwapper;
 import com.wgzhao.addax.core.util.container.CoreConstant;
 import com.wgzhao.addax.core.util.container.LoadUtil;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.http.HttpResponse;
-import org.apache.http.client.config.RequestConfig;
-import org.apache.http.client.methods.HttpPost;
-import org.apache.http.entity.ContentType;
-import org.apache.http.entity.StringEntity;
-import org.apache.http.impl.client.CloseableHttpClient;
-import org.apache.http.impl.client.HttpClients;
+import org.apache.hc.client5.http.fluent.Request;
+import org.apache.hc.core5.http.ContentType;
+import org.apache.hc.core5.http.HttpResponse;
+import org.apache.hc.core5.util.Timeout;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -718,24 +715,16 @@ public class JobContainer
     private void postJobRunStatistic(String url, int timeoutMills, String jsonStr) {
         LOG.info("Upload the job run statistics to [{}]", url);
 
-        RequestConfig requestConfig = RequestConfig.custom().setConnectTimeout(timeoutMills)
-                .setSocketTimeout(timeoutMills)
-                .setConnectionRequestTimeout(timeoutMills)
-                .build();
-
-        CloseableHttpClient httpClient = HttpClients.custom().setDefaultRequestConfig(requestConfig).build();
-
-        HttpPost post;
-        StringEntity entity;
-        post = new HttpPost(url);
-        entity = new StringEntity(jsonStr, ContentType.APPLICATION_JSON);
-        post.setEntity(entity);
         try {
-            HttpResponse response = httpClient.execute(post);
-            if (response.getStatusLine().getStatusCode() == 200) {
+            HttpResponse httpResponse = Request.post(url)
+                    .connectTimeout(Timeout.ofMilliseconds(timeoutMills))
+                    .bodyString(jsonStr, ContentType.APPLICATION_JSON)
+                    .execute()
+                    .returnResponse();
+            if (httpResponse.getCode() == 200) {
                 LOG.info("The job results were uploaded successfully");
             } else {
-                LOG.warn("Uploading the job results failed: {}", response.getEntity().toString());
+                LOG.warn("Uploading the job results failed: {}", httpResponse.toString());
             }
         } catch (IOException e) {
             LOG.warn("Uploading the job results failed with an exception: {}", e.getMessage());

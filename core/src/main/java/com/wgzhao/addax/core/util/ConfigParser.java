@@ -34,12 +34,14 @@ import java.util.Set;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.http.client.methods.HttpGet;
+import org.apache.hc.client5.http.fluent.Request;
+import org.apache.hc.core5.util.Timeout;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import static com.wgzhao.addax.common.base.Key.CONNECTION;
 import static com.wgzhao.addax.common.spi.ErrorCode.CONFIG_ERROR;
+import static com.wgzhao.addax.common.spi.ErrorCode.IO_ERROR;
 import static com.wgzhao.addax.common.spi.ErrorCode.PLUGIN_INIT_ERROR;
 import static com.wgzhao.addax.common.spi.ErrorCode.REQUIRED_VALUE;
 import static com.wgzhao.addax.core.util.container.CoreConstant.CONF_PATH;
@@ -151,19 +153,17 @@ public final class ConfigParser
         if (isJobResourceFromHttp) {
             //设置httpclient的 HTTP_TIMEOUT_IN_MILLION_SECONDS
             Configuration coreConfig = ConfigParser.parseCoreConfig();
-            int httpTimeOutInMillionSeconds = coreConfig.getInt(CORE_SERVER_TIMEOUT_SEC, 5) * 1000;
-            HttpClientUtil.setHttpTimeoutInMillionSeconds(httpTimeOutInMillionSeconds);
-
-            HttpClientUtil httpClientUtil = new HttpClientUtil();
+            int timeoutSecs = coreConfig.getInt(CORE_SERVER_TIMEOUT_SEC, 5);
             try {
-                URL url = new URL(jobResource);
-                HttpGet httpGet = HttpClientUtil.getGetRequest();
-                httpGet.setURI(url.toURI());
-
-                jobContent = httpClientUtil.executeAndGetWithFailedRetry(httpGet, 1, 1000L);
+                jobContent = Request
+                        .get(jobResource)
+                        .connectTimeout(Timeout.ofSeconds(timeoutSecs))
+                        .execute()
+                        .returnContent()
+                        .asString();
             }
-            catch (Exception e) {
-                throw AddaxException.asAddaxException(CONFIG_ERROR, "Failed to obtain job configuration:" + jobResource, e);
+            catch (IOException e) {
+                throw AddaxException.asAddaxException(IO_ERROR, "Failed to obtain job configuration:" + jobResource, e);
             }
         }
         else {
@@ -203,7 +203,7 @@ public final class ConfigParser
             // check if the plugin.json file exists
             File file = new File(filePath);
             if (!file.exists()) {
-                throw AddaxException.asAddaxException(PLUGIN_INIT_ERROR, "The plugin '" + plugin + "' has not installed yet" );
+                throw AddaxException.asAddaxException(PLUGIN_INIT_ERROR, "The plugin '" + plugin + "' has not installed yet");
             }
             Configuration pluginConf = Configuration.from(file);
             if (StringUtils.isBlank(pluginConf.getString("path"))) {
