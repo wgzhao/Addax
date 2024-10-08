@@ -1,7 +1,7 @@
 {
   "name": "httpreader",
   "parameter": {
-    "connection": [
+    "connection":
       {
         "url": "http://127.0.0.1:9090/mock/17/LDJSC/ASSET",
         "proxy": {
@@ -9,7 +9,7 @@
           "auth": "user:pass"
         }
       }
-    ],
+    ,
     "reqParams": {
       "CURR_DATE":"2021-01-18",
       "DEPT":"9700"
