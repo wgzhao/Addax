@@ -7,13 +7,10 @@ import com.wgzhao.addax.common.util.Configuration;
 import com.wgzhao.addax.plugin.writer.databendwriter.util.DatabendWriterUtil;
 import com.wgzhao.addax.rdbms.util.DataBaseType;
 import com.wgzhao.addax.rdbms.writer.CommonRdbmsWriter;
-import org.apache.commons.lang3.StringUtils;
 
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.sql.Types;
-import java.util.Arrays;
-import java.util.Base64;
 import java.util.List;
 
 public class DatabendWriter extends Writer {
