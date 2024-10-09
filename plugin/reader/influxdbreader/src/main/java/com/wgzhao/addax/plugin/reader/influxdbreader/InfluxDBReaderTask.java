@@ -28,16 +28,15 @@ import com.wgzhao.addax.common.plugin.RecordSender;
 import com.wgzhao.addax.common.plugin.TaskPluginCollector;
 import com.wgzhao.addax.common.util.Configuration;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.http.client.fluent.Content;
-import org.apache.http.client.fluent.Request;
+import org.apache.hc.client5.http.fluent.Request;
+import org.apache.hc.core5.util.Timeout;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.IOException;
 import java.net.URLEncoder;
-import java.nio.charset.StandardCharsets;
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
-import java.util.List;
 
 import static com.wgzhao.addax.common.spi.ErrorCode.ILLEGAL_VALUE;
 
@@ -55,19 +54,22 @@ public class InfluxDBReaderTask
     private final String password;
 
     private final int connTimeout;
-    private final int socketTimeout;
 
     public InfluxDBReaderTask(Configuration configuration)
     {
-        List<Object> connList = configuration.getList(InfluxDBKey.CONNECTION);
-        Configuration conn = Configuration.from(connList.get(0).toString());
-        this.querySql = configuration.getString(InfluxDBKey.QUERY_SQL, "");
+        Configuration conn = configuration.getConfiguration(InfluxDBKey.CONNECTION);
+        this.querySql = configuration.getString(InfluxDBKey.QUERY_SQL, null);
         this.database = conn.getString(InfluxDBKey.DATABASE);
         this.endpoint = conn.getString(InfluxDBKey.ENDPOINT);
-        this.username = configuration.getString(InfluxDBKey.USERNAME);
-        this.password = configuration.getString(InfluxDBKey.PASSWORD, null);
-        this.connTimeout = configuration.getInt(InfluxDBKey.CONNECT_TIMEOUT_SECONDS, CONNECT_TIMEOUT_SECONDS_DEFAULT) * 1000;
-        this.socketTimeout = configuration.getInt(InfluxDBKey.SOCKET_TIMEOUT_SECONDS, SOCKET_TIMEOUT_SECONDS_DEFAULT) * 1000;
+        if (this.querySql == null) {
+            this.querySql = "select * from " + conn.getString(InfluxDBKey.TABLE);
+        }
+        if (!"".equals(configuration.getString(InfluxDBKey.WHERE, ""))) {
+            this.querySql += " where " + configuration.getString(InfluxDBKey.WHERE);
+        }
+        this.username = configuration.getString(InfluxDBKey.USERNAME, "");
+        this.password = configuration.getString(InfluxDBKey.PASSWORD, "");
+        this.connTimeout = configuration.getInt(InfluxDBKey.CONNECT_TIMEOUT_SECONDS, CONNECT_TIMEOUT_SECONDS_DEFAULT);
     }
 
     public void post()
@@ -83,29 +85,16 @@ public class InfluxDBReaderTask
     public void startRead(RecordSender recordSender, TaskPluginCollector taskPluginCollector)
     {
         LOG.info("connect influxdb: {} with username: {}", endpoint, username);
-
-        String tail = "/query";
-        String enc = "utf-8";
         String result;
         try {
-            String url = endpoint + tail + "?db=" + URLEncoder.encode(database, enc);
-            if (!"".equals(username)) {
-                url += "&u=" + URLEncoder.encode(username, enc);
-            }
-            if (!"".equals(password)) {
-                url += "&p=" + URLEncoder.encode(password, enc);
-            }
-            if (querySql.contains("#lastMinute#")) {
-                this.querySql = querySql.replace("#lastMinute#", getLastMinute());
-            }
-            url += "&q=" + URLEncoder.encode(querySql, enc);
-            result = get(url);
+            result = Request.get(combineUrl())
+                    .connectTimeout(Timeout.ofSeconds(connTimeout))
+                    .execute()
+                    .returnContent().asString();
         }
-        catch (Exception e) {
-            throw AddaxException.asAddaxException(
-                    ILLEGAL_VALUE, "Failed to get data point！", e);
+        catch (IOException e) {
+            throw new RuntimeException(e);
         }
-
         if (StringUtils.isBlank(result)) {
             throw AddaxException.asAddaxException(
                     ILLEGAL_VALUE, "Get nothing!", null);
@@ -145,18 +134,27 @@ public class InfluxDBReaderTask
         }
     }
 
-    public String get(String url)
-            throws Exception
+    private String combineUrl()
     {
-        Content content = Request.Get(url)
-                .connectTimeout(this.connTimeout)
-                .socketTimeout(this.socketTimeout)
-                .execute()
-                .returnContent();
-        if (content == null) {
-            return null;
+        String enc = "utf-8";
+        try {
+            String url = endpoint + "/query?db=" + URLEncoder.encode(database, enc);
+            if (!"".equals(username)) {
+                url += "&u=" + URLEncoder.encode(username, enc);
+            }
+            if (!"".equals(password)) {
+                url += "&p=" + URLEncoder.encode(password, enc);
+            }
+            if (querySql.contains("#lastMinute#")) {
+                this.querySql = querySql.replace("#lastMinute#", getLastMinute());
+            }
+            url += "&q=" + URLEncoder.encode(querySql, enc);
+            return url;
         }
-        return content.asString(StandardCharsets.UTF_8);
+        catch (Exception e) {
+            throw AddaxException.asAddaxException(
+                    ILLEGAL_VALUE, "Failed to get data point！", e);
+        }
     }
 
     @SuppressWarnings("JavaTimeDefaultTimeZone")

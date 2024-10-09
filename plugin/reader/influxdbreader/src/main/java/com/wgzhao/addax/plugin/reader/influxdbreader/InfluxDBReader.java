@@ -51,13 +51,14 @@ public class InfluxDBReader
         {
             init();
             originalConfig.getNecessaryValue(InfluxDBKey.ENDPOINT, REQUIRED_VALUE);
+            originalConfig.getNecessaryValue(InfluxDBKey.DATABASE, REQUIRED_VALUE);
             List<String> columns = originalConfig.getList(InfluxDBKey.COLUMN, String.class);
-            String querySql = originalConfig.getNecessaryValue(InfluxDBKey.QUERY_SQL, null);
-            String database = originalConfig.getString(InfluxDBKey.DATABASE, null);
-            if (StringUtils.isAllBlank(querySql,database)) {
+            String querySql = originalConfig.getString(InfluxDBKey.QUERY_SQL, null);
+            String table = originalConfig.getString(InfluxDBKey.TABLE, null);
+            if (StringUtils.isAllBlank(querySql, table)) {
                 throw AddaxException.asAddaxException(
                         REQUIRED_VALUE,
-                        "One of database or querySql must be specified"
+                        "One of table or querySql must be specified"
                 );
             }
             if (columns == null || columns.isEmpty()) {
@@ -74,12 +75,6 @@ public class InfluxDBReader
             List<Configuration> splitConfigs = new ArrayList<>();
             splitConfigs.add(readerSliceConfig);
             return splitConfigs;
-        }
-
-        @Override
-        public void post()
-        {
-            //
         }
 
         @Override
