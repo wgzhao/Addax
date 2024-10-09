@@ -78,6 +78,9 @@ parse_job_file() {
     # check the job file is local file or url ?
     case "$JOB_FILE" in
         http*)
+        # check curl command is exists or not
+        # if curl does not exists, the addax engine will download it first
+        which curl >/dev/null 2>&1 || return
         # download it first
         TMPDIR=$(mktemp -d /tmp/addax.XXXXXX)
         JOB_NAME=$(basename ${JOB_FILE})
