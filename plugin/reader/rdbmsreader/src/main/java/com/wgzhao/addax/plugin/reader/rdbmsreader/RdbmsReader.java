@@ -60,7 +60,7 @@ public class RdbmsReader
                         String.format("您配置的fetchSize有误，fetchSize : [%d] 设置值不能小于 1.", fetchSize));
             }
             this.originalConfig.set(FETCH_SIZE, fetchSize);
-            Configuration connection = this.originalConfig.getListConfiguration(CONNECTION).get(0);
+            Configuration connection = this.originalConfig.getConfiguration(CONNECTION);
             if (connection == null) {
                 throw AddaxException.asAddaxException(REQUIRED_VALUE, "config 'connection' is required and must not be " +
                         "empty");
