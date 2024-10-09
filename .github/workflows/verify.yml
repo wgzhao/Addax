@@ -27,4 +27,4 @@ jobs:
         with:
           java-version: '8'
           distribution: 'adopt'
-      - run: mvn  -B -V -T 1 -Dmaven.test.skip=true -Dmaven.javadoc.skip=true -Dmaven.source.skip=true verify
+      - run: mvn  -B -V -T 1 -Dmaven.test.skip=true -Dmaven.javadoc.skip=true -Dmaven.source.skip=true -Dgpg.skip=true verify

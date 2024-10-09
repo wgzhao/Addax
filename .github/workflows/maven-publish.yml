@@ -48,11 +48,11 @@ jobs:
 
       - name: 5. Build and packaging
         run: |
-          mvn -B -V -T C1 -DskipTests clean package
+          mvn -B -V -T 1 -DskipTests clean package
           mvn package assembly:single
           bash shrink_package.sh y
 
-      - name: 6. Calucate SHA256SUM
+      - name: 6. Calculate SHA256SUM
         run: |
           cd target/addax
           sha256sum addax-${{ steps.version.outputs.version }}.tar.gz > addax-${{ steps.version.outputs.version }}.tar.gz.sha256sum.asc
