@@ -171,12 +171,12 @@ public class DorisWriterManager {
             return;
         }
         stopScheduler();
-        LOG.debug(String.format("Async stream load: rows[%d] bytes[%d] label[%s].", flushData.getRows().size(), flushData.getBytes(), flushData.getLabel()));
+        LOG.debug("Async stream load: rows[{}] bytes[{}] label[{}].", flushData.getRows().size(), flushData.getBytes(), flushData.getLabel());
         for (int i = 0; i <= options.getMaxRetries(); i++) {
             try {
                 // flush to Doris with stream load
                 visitor.streamLoad(flushData);
-                LOG.info(String.format("Async stream load finished: label[%s].", flushData.getLabel()));
+                LOG.info("Async stream load finished: label[{}].", flushData.getLabel());
                 startScheduler();
                 break;
             } catch (Exception e) {
@@ -186,7 +186,7 @@ public class DorisWriterManager {
                 }
                 if (e instanceof DorisWriterException && ((DorisWriterException)e).needReCreateLabel()) {
                     String newLabel = createBatchLabel();
-                    LOG.warn(String.format("Batch label changed from [%s] to [%s]", flushData.getLabel(), newLabel));
+                    LOG.warn("Batch label changed from [{}] to [{}]", flushData.getLabel(), newLabel);
                     flushData.setLabel(newLabel);
                 }
                 try {
