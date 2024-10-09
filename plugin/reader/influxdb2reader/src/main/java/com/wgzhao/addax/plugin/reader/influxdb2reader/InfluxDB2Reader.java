@@ -76,7 +76,7 @@ public class InfluxDB2Reader
             this.token = originalConfig.getNecessaryValue(InfluxDB2Key.TOKEN, REQUIRED_VALUE);
             originalConfig.getNecessaryValue(InfluxDB2Key.RANGE, REQUIRED_VALUE);
             this.range = originalConfig.getList(InfluxDB2Key.RANGE, String.class);
-            Configuration connConf = Configuration.from(originalConfig.getList(CONNECTION, Object.class).get(0).toString());
+            Configuration connConf = originalConfig.getConfiguration(CONNECTION);
             this.endpoint = connConf.getNecessaryValue(InfluxDB2Key.ENDPOINT, REQUIRED_VALUE);
             this.bucket = connConf.getNecessaryValue(InfluxDB2Key.BUCKET, REQUIRED_VALUE);
             this.org = connConf.getNecessaryValue(InfluxDB2Key.ORG, REQUIRED_VALUE);
@@ -146,7 +146,7 @@ public class InfluxDB2Reader
 
         private String generalQueryQL()
         {
-            Configuration connConf = Configuration.from(originalConfig.getList(CONNECTION, Object.class).get(0).toString());
+            Configuration connConf = originalConfig.getConfiguration(CONNECTION);
             String bucket = connConf.getString(InfluxDB2Key.BUCKET);
             String startTime = null, endTime = null;
             if (!range.isEmpty()) {
@@ -241,7 +241,7 @@ public class InfluxDB2Reader
         public void init()
         {
             Configuration readerSliceConfig = super.getPluginJobConf();
-            Configuration connConf = Configuration.from(readerSliceConfig.getList(CONNECTION, Object.class).get(0).toString());
+            Configuration connConf = readerSliceConfig.getConfiguration(CONNECTION);
             this.endpoint = connConf.getString(ENDPOINT);
             this.token = readerSliceConfig.getString("token");
             this.org = connConf.getString("org");
