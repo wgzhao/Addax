@@ -20,6 +20,7 @@ import java.io.IOException;
 import java.util.Collections;
 import java.util.List;
 
+import static com.wgzhao.addax.common.base.Constant.DEFAULT_DATE_FORMAT;
 import static com.wgzhao.addax.common.base.Key.FILE_NAME;
 import static com.wgzhao.addax.common.base.Key.HEADER;
 import static com.wgzhao.addax.common.base.Key.PATH;
@@ -77,11 +78,7 @@ public class ExcelWriter
                         "Create directory '" + path + "' failure: permission deny: ", se);
             }
         }
-        @Override
-        public void prepare()
-        {
 
-        }
         @Override
         public void destroy()
         {
@@ -100,17 +97,15 @@ public class ExcelWriter
         extends Writer.Task
     {
 
-        private Configuration conf;
-
         private String filePath;
         private List<String> header;
 
         @Override
         public void init()
         {
-            this.conf = this.getPluginJobConf();
-            this.filePath = this.conf.get(PATH) + "/" + this.conf.get(FILE_NAME);
-            this.header =this.conf.getList(HEADER, String.class);
+            Configuration conf = this.getPluginJobConf();
+            this.filePath = conf.get(PATH) + "/" + conf.get(FILE_NAME);
+            this.header = conf.getList(HEADER, String.class);
         }
 
         @Override
@@ -139,7 +134,7 @@ public class ExcelWriter
             // set date format
             CellStyle dateStyle = workbook.createCellStyle();
             CreationHelper createHelper = workbook.getCreationHelper();
-            dateStyle.setDataFormat(createHelper.createDataFormat().getFormat("yyyy-MM-dd HH:mm:ss"));
+            dateStyle.setDataFormat(createHelper.createDataFormat().getFormat(DEFAULT_DATE_FORMAT));
 
             while ( (record = lineReceiver.getFromReader()) != null)
             {
