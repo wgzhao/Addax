@@ -47,7 +47,7 @@ public class CollectionSplitUtil
 
         List<Configuration> confList = new ArrayList<>();
 
-        Configuration connConf = Configuration.from(originalSliceConfig.getList(CONNECTION, Object.class).get(0).toString());
+        Configuration connConf = originalSliceConfig.getConfiguration(CONNECTION);
         String dbName = connConf.getString(DATABASE);
 
         String collName = connConf.getString(KeyConstant.MONGO_COLLECTION_NAME);

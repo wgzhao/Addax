@@ -91,7 +91,7 @@ public class MongoDBReader
                 password = EncryptUtil.decrypt(password.substring(6, password.length() - 1));
                 originalConfig.set(Key.PASSWORD, password);
             }
-            Configuration connConf = Configuration.from(originalConfig.getList(CONNECTION, Object.class).get(0).toString());
+            Configuration connConf = originalConfig.getConfiguration(CONNECTION);
             String database = connConf.getNecessaryValue(DATABASE, REQUIRED_VALUE);
             String authDb = connConf.getString(KeyConstant.MONGO_AUTH_DB, database);
             List<Object> addressList = connConf.getList(KeyConstant.MONGO_ADDRESS, Object.class);
@@ -248,7 +248,7 @@ public class MongoDBReader
             this.upperBound = readerSliceConfig.get(KeyConstant.UPPER_BOUND);
             this.isObjectId = readerSliceConfig.getBool(KeyConstant.IS_OBJECT_ID);
 
-            Configuration connConf = Configuration.from(readerSliceConfig.getList(CONNECTION, Object.class).get(0).toString());
+            Configuration connConf = readerSliceConfig.getConfiguration(CONNECTION);
             this.database = connConf.getString(DATABASE);
             this.collection = connConf.getString(KeyConstant.MONGO_COLLECTION_NAME);
             String authDb = connConf.getString(KeyConstant.MONGO_AUTH_DB, this.database);
