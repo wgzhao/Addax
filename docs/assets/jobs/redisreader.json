@@ -4,12 +4,10 @@
       "reader": {
         "name": "redisreader",
         "parameter": {
-          "connection": [
-            {
-              "uri": "tcp://127.0.0.1:7003",
-              "auth": "password"
-            }
-          ],
+          "connection": {
+            "uri": "tcp://127.0.0.1:7003",
+            "auth": "password"
+          },
           "include": [
             "^user"
           ],

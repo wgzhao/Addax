@@ -27,4 +27,8 @@ public class RedisKey
     public static final String MODE = "mode";
     public static final String AUTH = "auth";
     public static final String MASTER_NAME  = "masterName";
+    public static final String INCLUDE = "include";
+    public static final String EXCLUDE = "exclude";
+    public static final String DB = "db";
+    public static final String KEY_THRESHOLD_LENGTH = "keyThresholdLength";
 }
