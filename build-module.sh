@@ -63,5 +63,5 @@ else
 fi
 [ -d $ADDAX_HOME/$MODULE_DIR ] || mkdir -p $ADDAX_HOME/$MODULE_DIR || exit 1
 
-scp  $MODULE_DIR/$MODULE_NAME/target/${MODULE_NAME}-${version}/$MODULE_DIR/${MODULE_NAME} \
-       	$ADDAX_HOME/$MODULE_DIR
+rsync -avz  $MODULE_DIR/$MODULE_NAME/target/${MODULE_NAME}-${version}/$MODULE_DIR/${MODULE_NAME} \
+       	$ADDAX_HOME/$MODULE_DIR/
