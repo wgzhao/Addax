@@ -35,20 +35,14 @@ import com.wgzhao.addax.common.plugin.RecordSender;
 import com.wgzhao.addax.common.spi.Reader;
 import com.wgzhao.addax.common.util.Configuration;
 import com.wgzhao.addax.plugin.reader.redisreader.impl.SentinelReplicator;
-import org.apache.http.HttpEntity;
-import org.apache.http.client.methods.CloseableHttpResponse;
-import org.apache.http.client.methods.HttpGet;
-import org.apache.http.impl.client.CloseableHttpClient;
-import org.apache.http.impl.client.HttpClientBuilder;
+import org.apache.hc.client5.http.fluent.Request;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import redis.clients.jedis.HostAndPort;
 
 import java.io.BufferedOutputStream;
 import java.io.File;
-import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -181,7 +175,7 @@ public class RedisReader
                     String masterName = connection.getString(RedisKey.MASTER_NAME, null);
                     File file = new File(UUID.randomUUID() + ".rdb");
                     if (uri.startsWith("http") || uri.startsWith("https")) {
-                        this.download(new URI(uri), file);
+                        Request.get(uri).execute().saveContent(file);
                     }
                     else if (uri.startsWith("tcp")) {
                         this.dump(uriToHosts(uri), mode, connection.getString(RedisKey.AUTH), masterName, file);
@@ -335,6 +329,7 @@ public class RedisReader
          *
          * @param hosts list of {@link HostAndPort}
          * @param mode redis running mode, cluster, master/slave, sentinel or cluster
+         * @param auth auth password
          * @param masterName master name for sentinel mode
          * @param outFile file which dump to
          * @throws IOException file not found
@@ -344,7 +339,7 @@ public class RedisReader
                 throws IOException, URISyntaxException
         {
             LOG.info("mode = {}", mode);
-            OutputStream out = new BufferedOutputStream(new FileOutputStream(outFile));
+            OutputStream out = new BufferedOutputStream(Files.newOutputStream(outFile.toPath()));
             RawByteListener rawByteListener = rawBytes -> {
                 try {
                     out.write(rawBytes);
@@ -409,37 +404,6 @@ public class RedisReader
                 e.printStackTrace();
             }
             return result;
-        }
-
-        /**
-         * 下载远程rdb文件
-         *
-         * @param uri uri
-         * @param outFile file will be written
-         * @throws IOException when can not reach to uri
-         */
-        private void download(URI uri, File outFile)
-                throws IOException
-        {
-            CloseableHttpClient httpClient = this.getHttpClient();
-            CloseableHttpResponse response = httpClient.execute(new HttpGet(uri));
-            HttpEntity entity = response.getEntity();
-            InputStream in = entity.getContent();
-            byte[] bytes = new byte[4096 * 1000];
-
-            int len;
-            try (FileOutputStream out = new FileOutputStream(outFile)) {
-                while ((len = in.read(bytes)) != -1) {
-                    out.write(bytes, 0, len);
-                    out.flush();
-                }
-                in.close();
-            }
-        }
-
-        private CloseableHttpClient getHttpClient()
-        {
-            return HttpClientBuilder.create().build();
         }
 
         private void collectType(int type)
