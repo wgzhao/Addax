@@ -75,27 +75,24 @@ public final class WriterUtil
         List<String> preSqls = simplifiedConf.getList(Key.PRE_SQL, String.class);
         List<String> postSqls = simplifiedConf.getList(Key.POST_SQL, String.class);
 
-        List<Configuration> connections = simplifiedConf.getListConfiguration(Key.CONNECTION);
+        Configuration connConf = simplifiedConf.getConfiguration(Key.CONNECTION);
 
-        for (Configuration connConf : connections) {
-            Configuration sliceConfig = simplifiedConf.clone();
+        Configuration sliceConfig = simplifiedConf.clone();
 
-//            Configuration connConf = Configuration.from(conn.toString());
-            jdbcUrl = connConf.getString(Key.JDBC_URL);
-            sliceConfig.set(Key.JDBC_URL, jdbcUrl);
+        jdbcUrl = connConf.getString(Key.JDBC_URL);
+        sliceConfig.set(Key.JDBC_URL, jdbcUrl);
 
-            sliceConfig.remove(Key.CONNECTION);
+        sliceConfig.remove(Key.CONNECTION);
 
-            List<String> tables = connConf.getList(Key.TABLE, String.class);
+        List<String> tables = connConf.getList(Key.TABLE, String.class);
 
-            for (String table : tables) {
-                Configuration tempSlice = sliceConfig.clone();
-                tempSlice.set(Key.TABLE, table);
-                tempSlice.set(Key.PRE_SQL, renderPreOrPostSqls(preSqls, table));
-                tempSlice.set(Key.POST_SQL, renderPreOrPostSqls(postSqls, table));
+        for (String table : tables) {
+            Configuration tempSlice = sliceConfig.clone();
+            tempSlice.set(Key.TABLE, table);
+            tempSlice.set(Key.PRE_SQL, renderPreOrPostSqls(preSqls, table));
+            tempSlice.set(Key.POST_SQL, renderPreOrPostSqls(postSqls, table));
 
-                splitResultConfigs.add(tempSlice);
-            }
+            splitResultConfigs.add(tempSlice);
         }
 
         return splitResultConfigs;
@@ -185,7 +182,7 @@ public final class WriterUtil
         sb.append(" ON CONFLICT ");
         sb.append(conflict);
         sb.append(" DO ");
-        if (columnHolders == null || columnHolders.size() < 1) {
+        if (columnHolders == null || columnHolders.isEmpty()) {
             sb.append("NOTHING");
             return sb.toString();
         }
@@ -296,7 +293,7 @@ public final class WriterUtil
 
     public static void preCheckPrePareSQL(Configuration originalConfig, DataBaseType type)
     {
-        Configuration connConf = originalConfig.getListConfiguration(Key.CONNECTION).get(0);
+        Configuration connConf = originalConfig.getConfiguration(Key.CONNECTION);
         String table = connConf.getList(Key.TABLE, String.class).get(0);
 
         List<String> preSqls = originalConfig.getList(Key.PRE_SQL, String.class);
@@ -317,7 +314,7 @@ public final class WriterUtil
 
     public static void preCheckPostSQL(Configuration originalConfig, DataBaseType type)
     {
-        Configuration connConf = originalConfig.getListConfiguration(Key.CONNECTION).get(0);
+        Configuration connConf = originalConfig.getConfiguration(Key.CONNECTION);
         String table = connConf.getList(Key.TABLE, String.class).get(0);
 
         List<String> postSqls = originalConfig.getList(Key.POST_SQL, String.class);

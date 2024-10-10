@@ -42,6 +42,8 @@ import java.util.Map.Entry;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicLong;
 
+import static com.wgzhao.addax.common.base.Key.CONNECTION;
+
 public class RedisWriter
         extends Writer
 {
@@ -84,61 +86,56 @@ public class RedisWriter
         public void init()
         {
             Configuration pluginJobConf = this.getPluginJobConf();
-            List connections = pluginJobConf.getList("connection");
+            Configuration connection = pluginJobConf.getConfiguration(CONNECTION);
             boolean isCluster = pluginJobConf.getBool("redisCluster", false);
             int timeout = pluginJobConf.getInt("timeout", 60000);
             this.batchSize = pluginJobConf.getLong("batchSize", 1000L);
-            if (connections.isEmpty()) {
-                throw new RuntimeException("请添加redis 连接");
+
+            URI uri = URI.create(connection.getString("uri"));
+            String host = uri.getHost();
+            int port = uri.getPort();
+            this.jedis = new Jedis(host, port, timeout, timeout);
+
+            //如果是redis cluster,将获取cluster主机节点对应的slot槽
+            if (isCluster) {
+                StringBuilder sb = new StringBuilder("\r\nRedis Cluster 节点分配\r\n");
+                List<Object> slots = this.jedis.clusterSlots();
+
+                for (Object slot : slots) {
+                    List list = (List) slot;
+                    //slot 开始节点
+                    Long start = (Long) list.get(0);
+                    //slot 结束节点
+                    Long end = (Long) list.get(1);
+                    //slot 对应主机信息
+                    List hostInfo = (List) list.get(2);
+
+                    String nodeHost = new String((byte[]) hostInfo.get(0));
+                    Long nodePort = (Long) hostInfo.get(1);
+                    Jedis node = new Jedis(nodeHost, nodePort.intValue(), timeout, timeout);
+                    for (int i = start.intValue(); i <= end.intValue(); i++) {
+                        this.cluster.put(i, node);
+                    }
+
+                    this.nodeCounterMap.put(node, new AtomicLong());
+                    sb.append(nodeHost)
+                            .append(":")
+                            .append(nodePort)
+                            .append("\t")
+                            .append("slot:")
+                            .append(start)
+                            .append("-").append(end)
+                            .append("\r\n");
+                }
+                LOG.info(sb.toString());
             }
             else {
-                Map connection = (Map) connections.get(0);
-                URI uri = URI.create(connection.get("uri").toString());
-                String host = uri.getHost();
-                int port = uri.getPort();
-                this.jedis = new Jedis(host, port, timeout, timeout);
-
-                //如果是redis cluster,将获取cluster主机节点对应的slot槽
-                if (isCluster) {
-                    StringBuilder sb = new StringBuilder("\r\nRedis Cluster 节点分配\r\n");
-                    List<Object> slots = this.jedis.clusterSlots();
-
-                    for (Object slot : slots) {
-
-                        List list = (List) slot;
-                        //slot 开始节点
-                        Long start = (Long) list.get(0);
-                        //slot 结束节点
-                        Long end = (Long) list.get(1);
-                        //slot 对应主机信息
-                        List hostInfo = (List) list.get(2);
-
-                        String nodeHost = new String((byte[]) hostInfo.get(0));
-                        Long nodePort = (Long) hostInfo.get(1);
-                        Jedis node = new Jedis(nodeHost, nodePort.intValue(), timeout, timeout);
-                        for (int i = start.intValue(); i <= end.intValue(); i++) {
-                            this.cluster.put(i, node);
-                        }
-
-                        this.nodeCounterMap.put(node, new AtomicLong());
-                        sb.append(nodeHost)
-                                .append(":")
-                                .append(nodePort)
-                                .append("\t")
-                                .append("slot:")
-                                .append(start)
-                                .append("-").append(end)
-                                .append("\r\n");
-                    }
-                    LOG.info(sb.toString());
-                }
-                else {
-                    String auth = (String) connection.get("auth");
-                    if (StringUtils.isNotBlank(auth)) {
-                        this.jedis.auth(auth);
-                    }
+                String auth = (String) connection.get("auth");
+                if (StringUtils.isNotBlank(auth)) {
+                    this.jedis.auth(auth);
                 }
             }
+
             prepare();
         }
 

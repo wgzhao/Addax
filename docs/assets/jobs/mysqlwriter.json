@@ -50,15 +50,13 @@
           "preSql": [
             "delete from @table"
           ],
-          "connection": [
-            {
-              "jdbcUrl": "jdbc:mysql://127.0.0.1:3306/test?useSSL=false",
-              "table": [
-                "addax_tbl"
-              ],
-              "driver": "com.mysql.jdbc.Driver"
-            }
-          ]
+          "connection": {
+            "jdbcUrl": "jdbc:mysql://127.0.0.1:3306/test?useSSL=false",
+            "table": [
+              "addax_tbl"
+            ],
+            "driver": "com.mysql.jdbc.Driver"
+          }
         }
       }
     }

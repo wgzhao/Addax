@@ -92,23 +92,19 @@ public class CommonRdbmsWriter
             /*检查insert 跟delete权限*/
             String username = originalConfig.getString(Key.USERNAME);
             String password = originalConfig.getString(Key.PASSWORD);
-            List<Object> connections = originalConfig.getList(Key.CONNECTION, Object.class);
+            Configuration connConf = originalConfig.getConfiguration(Key.CONNECTION);
+            String jdbcUrl = connConf.getString(Key.JDBC_URL);
+            List<String> expandedTables = connConf.getList(Key.TABLE, String.class);
+            boolean hasInsertPri = DBUtil.checkInsertPrivilege(dataBaseType, jdbcUrl, username, password, expandedTables);
 
-            for (Object connection : connections) {
-                Configuration connConf = Configuration.from(connection.toString());
-                String jdbcUrl = connConf.getString(Key.JDBC_URL);
-                List<String> expandedTables = connConf.getList(Key.TABLE, String.class);
-                boolean hasInsertPri = DBUtil.checkInsertPrivilege(dataBaseType, jdbcUrl, username, password, expandedTables);
+            if (!hasInsertPri) {
+                throw RdbmsException.asInsertPriException(originalConfig.getString(Key.USERNAME), jdbcUrl);
+            }
 
-                if (!hasInsertPri) {
-                    throw RdbmsException.asInsertPriException(originalConfig.getString(Key.USERNAME), jdbcUrl);
-                }
-
-                if (DBUtil.needCheckDeletePrivilege(originalConfig)) {
-                    boolean hasDeletePri = DBUtil.checkDeletePrivilege(dataBaseType, jdbcUrl, username, password, expandedTables);
-                    if (!hasDeletePri) {
-                        throw RdbmsException.asDeletePriException(originalConfig.getString(Key.USERNAME), jdbcUrl);
-                    }
+            if (DBUtil.needCheckDeletePrivilege(originalConfig)) {
+                boolean hasDeletePri = DBUtil.checkDeletePrivilege(dataBaseType, jdbcUrl, username, password, expandedTables);
+                if (!hasDeletePri) {
+                    throw RdbmsException.asDeletePriException(originalConfig.getString(Key.USERNAME), jdbcUrl);
                 }
             }
         }
@@ -121,8 +117,7 @@ public class CommonRdbmsWriter
                 String username = originalConfig.getString(Key.USERNAME);
                 String password = originalConfig.getString(Key.PASSWORD);
 
-                List<Object> conns = originalConfig.getList(Key.CONNECTION, Object.class);
-                Configuration connConf = Configuration.from(conns.get(0).toString());
+                Configuration connConf = originalConfig.getConfiguration(Key.CONNECTION);
 
                 // 这里的 jdbcUrl 已经 append 了合适后缀参数
                 String jdbcUrl = connConf.getString(Key.JDBC_URL);

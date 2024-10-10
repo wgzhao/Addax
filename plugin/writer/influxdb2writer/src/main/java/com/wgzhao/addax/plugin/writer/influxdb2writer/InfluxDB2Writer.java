@@ -58,7 +58,7 @@ public class InfluxDB2Writer
         {
             this.originalConfig = super.getPluginJobConf();
             originalConfig.getNecessaryValue(InfluxDB2Key.TOKEN, REQUIRED_VALUE);
-            Configuration connConf = Configuration.from(originalConfig.getList(CONNECTION, Object.class).get(0).toString());
+            Configuration connConf = originalConfig.getConfiguration(CONNECTION);
             connConf.getNecessaryValue(InfluxDB2Key.ENDPOINT, REQUIRED_VALUE);
             connConf.getNecessaryValue(InfluxDB2Key.BUCKET, REQUIRED_VALUE);
             connConf.getNecessaryValue(InfluxDB2Key.ORG, REQUIRED_VALUE);
@@ -71,23 +71,11 @@ public class InfluxDB2Writer
         }
 
         @Override
-        public void prepare()
-        {
-
-        }
-
-        @Override
         public List<Configuration> split(int adviceNumber)
         {
             List<Configuration> splitConfigs = new ArrayList<>();
             splitConfigs.add(originalConfig);
             return splitConfigs;
-        }
-
-        @Override
-        public void post()
-        {
-            //
         }
 
         @Override
@@ -116,7 +104,7 @@ public class InfluxDB2Writer
         {
             Configuration readerSliceConfig = super.getPluginJobConf();
             // get connection information
-            Configuration connConf = Configuration.from(readerSliceConfig.getList(CONNECTION, Object.class).get(0).toString());
+            Configuration connConf = readerSliceConfig.getConfiguration(CONNECTION);
             this.endpoint = connConf.getString(ENDPOINT);
             this.org = connConf.getString(InfluxDB2Key.ORG);
             this.bucket = connConf.getString(InfluxDB2Key.BUCKET);
@@ -142,7 +130,7 @@ public class InfluxDB2Writer
             while ((record = lineReceiver.getFromReader()) != null) {
                 Point point = Point.measurement(table);
                 if (!tags.isEmpty()) {
-                    tags.forEach(i -> point.addTags(i));
+                    tags.forEach(point::addTags);
                 }
 
                 // The first column must be timestamp
@@ -184,11 +172,8 @@ public class InfluxDB2Writer
 
         private long processTimeUnit(Instant instant)
         {
-            long ts = instant.toEpochMilli();
+            long ts;
             switch (wp) {
-                case MS:
-                    ts = instant.toEpochMilli();
-                    break;
                 case S:
                     ts = instant.getEpochSecond();
                     break;
@@ -198,13 +183,11 @@ public class InfluxDB2Writer
                 case NS:
                     ts = instant.getNano();
                     break;
+                default:
+                    ts = instant.toEpochMilli();
+                    break;
             }
             return ts;
-        }
-        @Override
-        public void post()
-        {
-            //
         }
 
         @Override

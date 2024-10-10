@@ -45,14 +45,12 @@
           "preSql": [
             "delete from @table"
           ],
-          "connection": [
-            {
-              "jdbcUrl": "jdbc:sqlite://tmp/writer.sqlite3",
-              "table": [
-                "addax_tbl"
-              ]
-            }
-          ]
+          "connection": {
+            "jdbcUrl": "jdbc:sqlite://tmp/writer.sqlite3",
+            "table": [
+              "addax_tbl"
+            ]
+          }
         }
       }
     }

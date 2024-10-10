@@ -27,14 +27,12 @@
             "db_description",
             "db_tddl_info"
           ],
-          "connection": [
-            {
-              "table": [
-                "db_info_for_writer"
-              ],
-              "jdbcUrl": "jdbc:sqlserver://[HOST_NAME]:PORT;DatabaseName=[DATABASE_NAME]"
-            }
-          ],
+          "connection": {
+            "table": [
+              "db_info_for_writer"
+            ],
+            "jdbcUrl": "jdbc:sqlserver://[HOST_NAME]:PORT;DatabaseName=[DATABASE_NAME]"
+          },
           "preSql": [
             "delete from @table where db_id = -1;"
           ],

@@ -70,7 +70,7 @@ public class DorisKey
     public DorisKey(Configuration options)
     {
         this.options = options;
-        Configuration conn = Configuration.from(options.getList(CONNECTION).get(0).toString());
+        Configuration conn = options.getConfiguration(CONNECTION);
         this.database = conn.getNecessaryValue(DATABASE, REQUIRED_VALUE);
         this.jdbcUrl = conn.getNecessaryValue(JDBC_URL, REQUIRED_VALUE);
         this.table = conn.getList(TABLE, String.class).get(0);

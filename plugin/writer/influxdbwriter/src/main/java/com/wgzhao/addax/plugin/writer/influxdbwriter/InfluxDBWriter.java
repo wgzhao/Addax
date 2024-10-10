@@ -52,8 +52,7 @@ public class InfluxDBWriter
         public void init()
         {
             this.originalConfig = super.getPluginJobConf();
-            List<Object> connList = originalConfig.getList(InfluxDBKey.CONNECTION);
-            Configuration conn = Configuration.from(connList.get(0).toString());
+            Configuration conn = originalConfig.getConfiguration(InfluxDBKey.CONNECTION);
             conn.getNecessaryValue(InfluxDBKey.TABLE, REQUIRED_VALUE);
             this.endpoint = conn.getNecessaryValue(InfluxDBKey.ENDPOINT, REQUIRED_VALUE);
             this.database = conn.getNecessaryValue(InfluxDBKey.DATABASE, REQUIRED_VALUE);

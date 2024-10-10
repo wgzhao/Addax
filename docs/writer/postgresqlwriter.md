@@ -17,7 +17,7 @@ Postgresql Writer 插件实现了写入数据到 [PostgreSQL](https://postgresql
 创建需要插入的表的语句如下:
 
 ```sql
-create table addax_tbl1 like addax_tbl;
+create table addax_tbl1 as select * from  addax_tbl where 1=2;
 ```
 
 ### 任务配置

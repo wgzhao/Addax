@@ -94,7 +94,7 @@ public class MongoDBWriter
             super.prepare();
             // parameters check
             originalConfig.getNecessaryValue(CONNECTION, REQUIRED_VALUE);
-            Configuration connConf = Configuration.from(originalConfig.getList(CONNECTION, Object.class).get(0).toString());
+            Configuration connConf = originalConfig.getConfiguration(CONNECTION);
             List<Object> address = connConf.getList(KeyConstant.MONGO_ADDRESS, Object.class);
             if (address == null || address.isEmpty()) {
                 throw AddaxException.asAddaxException(
@@ -197,7 +197,7 @@ public class MongoDBWriter
                 // encrypted password, need to decrypt
                 password = EncryptUtil.decrypt(password.substring(6, password.length() - 1));
             }
-            Configuration connConf = Configuration.from(writerSliceConfig.getList(CONNECTION, Object.class).get(0).toString());
+            Configuration connConf = writerSliceConfig.getConfiguration(CONNECTION);
             this.database = connConf.getString(DATABASE);
             List<Object> addressList = connConf.getList(KeyConstant.MONGO_ADDRESS, Object.class);
             if (!isNullOrEmpty((userName)) && !isNullOrEmpty((password))) {

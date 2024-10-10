@@ -46,16 +46,7 @@ public class TDengineWriter
                         + Key.PASSWORD + "] is not set.");
             }
 
-            // check connection
-            List<Object> connection = this.originalConfig.getList(Key.CONNECTION);
-            if (connection == null || connection.isEmpty()) {
-                throw AddaxException.asAddaxException(REQUIRED_VALUE, "The parameter ["
-                        + Key.CONNECTION + "] is not set.");
-            }
-            if (connection.size() > 1) {
-                LOG.warn("connection.size is " + connection.size() + " and only connection[0] will be used.");
-            }
-            Configuration conn = Configuration.from(connection.get(0).toString());
+            Configuration conn = originalConfig.getConfiguration(Key.CONNECTION);
             String jdbcUrl = conn.getString(Key.JDBC_URL);
             if (StringUtils.isBlank(jdbcUrl)) {
                 throw AddaxException.asAddaxException(REQUIRED_VALUE, "The parameter ["
@@ -76,17 +67,15 @@ public class TDengineWriter
         {
             List<Configuration> writerSplitConfigs = new ArrayList<>();
 
-            List<Object> conns = this.originalConfig.getList(Key.CONNECTION);
+            Configuration conf = this.originalConfig.getConfiguration(Key.CONNECTION);
             for (int i = 0; i < mandatoryNumber; i++) {
                 Configuration clone = this.originalConfig.clone();
-                Configuration conf = Configuration.from(conns.get(0).toString());
                 String jdbcUrl = conf.getString(Key.JDBC_URL);
                 clone.set(Key.JDBC_URL, jdbcUrl);
                 clone.set(Key.TABLE, conf.getList(Key.TABLE));
                 clone.remove(Key.CONNECTION);
                 writerSplitConfigs.add(clone);
             }
-
             return writerSplitConfigs;
         }
     }
@@ -114,7 +103,7 @@ public class TDengineWriter
         public void startWrite(RecordReceiver lineReceiver)
         {
             String peerPluginName = this.writerSliceConfig.getString(PEER_PLUGIN_NAME);
-            LOG.debug("start to handle record from: " + peerPluginName);
+            LOG.debug("start to handle record from: {}", peerPluginName);
 
             DataHandler handler;
             if (peerPluginName.equals("opentsdbreader")) {
@@ -125,7 +114,7 @@ public class TDengineWriter
             }
 
             long records = handler.handle(lineReceiver, getTaskPluginCollector());
-            LOG.debug("handle data finished, records: " + records);
+            LOG.debug("handle data finished, records: {}", records);
         }
     }
 }

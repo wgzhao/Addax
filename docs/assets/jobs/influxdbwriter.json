@@ -34,13 +34,11 @@
       "writer": {
         "name": "influxdbwriter",
         "parameter": {
-          "connection": [
-            {
-              "endpoint": "http://localhost:8086",
-              "database": "addax",
-              "table": "addax_tbl"
-            }
-          ],
+          "connection": {
+            "endpoint": "http://localhost:8086",
+            "database": "addax",
+            "table": "addax_tbl"
+          },
           "connTimeout": 15,
           "readTimeout": 20,
           "writeTimeout": 20,

@@ -131,6 +131,17 @@ public final class ConfigParser
             }
             configuration.set(JOB_CONTENT_READER_PARAMETER, reader);
         }
+        // switch `write.connection` from list to map
+        Configuration writer = configuration.getConfiguration(JOB_CONTENT_WRITER_PARAMETER);
+        if (writer != null) {
+            if (writer.getString(CONNECTION, "").startsWith("[")) {
+                List<Map> connectionList = configuration.getList(JOB_CONTENT_WRITER_PARAMETER + ".connection", Map.class);
+                if (connectionList != null && !connectionList.isEmpty()) {
+                    writer.set(CONNECTION, connectionList.get(0));
+                }
+            }
+            configuration.set(JOB_CONTENT_WRITER_PARAMETER, writer);
+        }
     }
 
     private static Configuration parseCoreConfig()

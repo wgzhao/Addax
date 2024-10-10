@@ -15,16 +15,14 @@
           "column": [
             "*"
           ],
-          "connection": [
-            {
-              "table": [
-                "addax_tbl"
-              ],
-              "jdbcUrl": [
-                "jdbc:postgresql://localhost:5432/pgtest"
-              ]
-            }
-          ]
+          "connection": {
+            "table": [
+              "addax_tbl"
+            ],
+            "jdbcUrl": [
+              "jdbc:postgresql://localhost:5432/pgtest"
+            ]
+          }
         }
       },
       "writer": {
@@ -36,14 +34,12 @@
           "preSql": [
             "truncate table @table"
           ],
-          "connection": [
-            {
-              "jdbcUrl": "jdbc:postgresql://127.0.0.1:5432/pgtest",
-              "table": [
-                "addax_tbl1"
-              ]
-            }
-          ],
+          "connection": {
+            "jdbcUrl": "jdbc:postgresql://127.0.0.1:5432/pgtest",
+            "table": [
+              "addax_tbl1"
+            ]
+          },
           "username": "pgtest",
           "password": "pgtest",
           "writeMode": "insert"

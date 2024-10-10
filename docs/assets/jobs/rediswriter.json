@@ -14,12 +14,10 @@
       "writer": {
         "name": "rediswriter",
         "parameter": {
-          "connection": [
-            {
-              "uri": "tcp://127.0.0.1:6379",
-              "auth": "123456"
-            }
-          ],
+          "connection": {
+            "uri": "tcp://127.0.0.1:6379",
+            "auth": "123456"
+          },
           "redisCluster": false,
           "flushDB": false
         }

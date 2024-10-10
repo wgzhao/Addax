@@ -77,8 +77,7 @@ public class InfluxDBWriterTask
 
     public InfluxDBWriterTask(Configuration configuration)
     {
-        List<Object> connList = configuration.getList(InfluxDBKey.CONNECTION);
-        Configuration conn = Configuration.from(connList.get(0).toString());
+        Configuration conn = configuration.getConfiguration(InfluxDBKey.CONNECTION);
         this.endpoint = conn.getString(InfluxDBKey.ENDPOINT);
         this.table = conn.getString(InfluxDBKey.TABLE);
         this.database = conn.getString(InfluxDBKey.DATABASE);

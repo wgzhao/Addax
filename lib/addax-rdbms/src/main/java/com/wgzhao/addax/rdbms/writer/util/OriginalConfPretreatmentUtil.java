@@ -56,21 +56,15 @@ public final class OriginalConfPretreatmentUtil
     {
         // 检查 username 配置（必填）
         originalConfig.getNecessaryValue(Key.USERNAME, REQUIRED_VALUE);
-
-        // 有些数据库没有密码，因此密码不再作为必选项
-        if (originalConfig.getString(Key.PASSWORD) == null) {
-            originalConfig.set(Key.PASSWORD, "");
-        }
-        else if (originalConfig.getString(Key.PASSWORD).startsWith(Constant.ENC_PASSWORD_PREFIX)) {
+        String pass = originalConfig.getString(Key.PASSWORD, null);
+        if (pass.startsWith(Constant.ENC_PASSWORD_PREFIX)) {
             // encrypted password, need to decrypt
-            String pass = originalConfig.getString(Key.PASSWORD);
             String decryptPassword = EncryptUtil.decrypt(pass.substring(6, pass.length() - 1));
             originalConfig.set(Key.PASSWORD, decryptPassword);
         }
+
         doCheckBatchSize(originalConfig);
-
         simplifyConf(originalConfig);
-
         dealColumnConf(originalConfig);
         dealWriteMode(originalConfig, dataBaseType);
     }
@@ -90,45 +84,39 @@ public final class OriginalConfPretreatmentUtil
 
     public static void simplifyConf(Configuration originalConfig)
     {
-        List<Configuration> connections = originalConfig.getListConfiguration(Key.CONNECTION);
-        int tableNum = 0;
+        Configuration connConf = originalConfig.getConfiguration(Key.CONNECTION);
 
-        for (int i = 0, len = connections.size(); i < len; i++) {
-            Configuration connConf = connections.get(i);
-            // 是否配置的定制的驱动名称
-            String driverClass = connConf.getString(Key.JDBC_DRIVER, null);
-            if (driverClass != null && !driverClass.isEmpty()) {
-                LOG.warn("Use specified driver class [{}]", driverClass);
-                dataBaseType.setDriverClassName(driverClass);
-            }
-            String jdbcUrl = connConf.getString(Key.JDBC_URL);
-            if (StringUtils.isBlank(jdbcUrl)) {
-                throw AddaxException.asAddaxException(REQUIRED_VALUE, "The item jdbcUrl is required.");
-            }
-
-            jdbcUrl = dataBaseType.appendJDBCSuffixForWriter(jdbcUrl);
-            originalConfig.set(String.format("%s[%d].%s", Key.CONNECTION, i, Key.JDBC_URL), jdbcUrl);
-
-            List<String> tables = connConf.getList(Key.TABLE, String.class);
-
-            if (null == tables || tables.isEmpty()) {
-                throw AddaxException.asAddaxException(REQUIRED_VALUE,
-                        "The item table is required.");
-            }
-
-            // 对每一个connection 上配置的table 项进行解析
-            List<String> expandedTables = TableExpandUtil.expandTableConf(dataBaseType, tables);
-
-            if (expandedTables.isEmpty()) {
-                throw AddaxException.asAddaxException(REQUIRED_VALUE,  "The item table is required.");
-            }
-
-            tableNum += expandedTables.size();
-
-            originalConfig.set(String.format("%s[%d].%s", Key.CONNECTION, i, Key.TABLE), expandedTables);
+        // 是否配置的定制的驱动名称
+        String driverClass = connConf.getString(Key.JDBC_DRIVER, null);
+        if (driverClass != null && !driverClass.isEmpty()) {
+            LOG.warn("Use specified driver class [{}]", driverClass);
+            dataBaseType.setDriverClassName(driverClass);
+        }
+        String jdbcUrl = connConf.getString(Key.JDBC_URL);
+        if (StringUtils.isBlank(jdbcUrl)) {
+            throw AddaxException.asAddaxException(REQUIRED_VALUE, "The item jdbcUrl is required.");
         }
 
-        originalConfig.set(Constant.TABLE_NUMBER_MARK, tableNum);
+        jdbcUrl = dataBaseType.appendJDBCSuffixForWriter(jdbcUrl);
+        originalConfig.set(String.format("%s.%s", Key.CONNECTION, Key.JDBC_URL), jdbcUrl);
+
+        List<String> tables = connConf.getList(Key.TABLE, String.class);
+
+        if (null == tables || tables.isEmpty()) {
+            throw AddaxException.asAddaxException(REQUIRED_VALUE,
+                    "The item table is required.");
+        }
+
+        // 对每一个connection 上配置的table 项进行解析
+        List<String> expandedTables = TableExpandUtil.expandTableConf(dataBaseType, tables);
+
+        if (expandedTables.isEmpty()) {
+            throw AddaxException.asAddaxException(REQUIRED_VALUE, "The item table is required.");
+        }
+
+        originalConfig.set(String.format("%s.%s", Key.CONNECTION, Key.TABLE), expandedTables);
+
+        originalConfig.set(Constant.TABLE_NUMBER_MARK, expandedTables.size());
     }
 
     public static void dealColumnConf(Configuration originalConfig, ConnectionFactory connectionFactory, String oneTable)
@@ -171,7 +159,8 @@ public final class OriginalConfPretreatmentUtil
                     // 检查列是否都为数据库表中正确的列（通过执行一次 select column from table 进行判断）
                     connection = connectionFactory.getConnection();
                     DBUtil.getColumnMetaData(connection, oneTable, StringUtils.join(userConfiguredColumns, ","));
-                } finally {
+                }
+                finally {
                     DBUtil.closeDBResources(null, null, connection);
                 }
             }
@@ -180,10 +169,10 @@ public final class OriginalConfPretreatmentUtil
 
     public static void dealColumnConf(Configuration originalConfig)
     {
-        String jdbcUrl = originalConfig.getString(String.format("%s[0].%s", Key.CONNECTION, Key.JDBC_URL));
+        String jdbcUrl = originalConfig.getString(String.format("%s.%s", Key.CONNECTION, Key.JDBC_URL));
         String username = originalConfig.getString(Key.USERNAME);
         String password = originalConfig.getString(Key.PASSWORD);
-        String oneTable = originalConfig.getString(String.format("%s[0].%s[0]", Key.CONNECTION, Key.TABLE));
+        String oneTable = originalConfig.getString(String.format("%s.%s[0]", Key.CONNECTION, Key.TABLE));
 
         JdbcConnectionFactory jdbcConnectionFactory = new JdbcConnectionFactory(dataBaseType, jdbcUrl, username, password);
         dealColumnConf(originalConfig, jdbcConnectionFactory, oneTable);
@@ -193,7 +182,7 @@ public final class OriginalConfPretreatmentUtil
     {
         List<String> columns = originalConfig.getList(Key.COLUMN, String.class);
 
-        String jdbcUrl = originalConfig.getString(String.format("%s[0].%s", Key.CONNECTION, Key.JDBC_URL));
+        String jdbcUrl = originalConfig.getString(String.format("%s.%s", Key.CONNECTION, Key.JDBC_URL));
 
         // 默认为：insert 方式
         String writeMode = originalConfig.getString(Key.WRITE_MODE, "INSERT");
