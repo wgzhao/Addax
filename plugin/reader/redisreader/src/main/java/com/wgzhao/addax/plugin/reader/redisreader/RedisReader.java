@@ -360,9 +360,7 @@ public class RedisReader
             }
             else {
                 // defaults to standalone
-                StringJoiner hostJoiner = new StringJoiner(",");
-                hosts.forEach(k -> hostJoiner.add("redis://" + k.getHost() + ":" + k.getPort()));
-                replicator = new RedisReplicator(hostJoiner.toString());
+                replicator = new RedisReplicator(hosts.get(0).getHost(), hosts.get(0).getPort(), conf);
             }
             replicator.setRdbVisitor(new SkipRdbVisitor(replicator));
             replicator.addEventListener((replicator1, event) -> {
