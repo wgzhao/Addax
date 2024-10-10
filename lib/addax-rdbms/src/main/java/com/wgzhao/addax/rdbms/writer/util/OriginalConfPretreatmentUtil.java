@@ -57,9 +57,11 @@ public final class OriginalConfPretreatmentUtil
         // 检查 username 配置（必填）
         originalConfig.getNecessaryValue(Key.USERNAME, REQUIRED_VALUE);
         String pass = originalConfig.getString(Key.PASSWORD, null);
-        if (pass.startsWith(Constant.ENC_PASSWORD_PREFIX)) {
+        if (pass != null && pass.startsWith(Constant.ENC_PASSWORD_PREFIX)) {
             // encrypted password, need to decrypt
-            String decryptPassword = EncryptUtil.decrypt(pass.substring(6, pass.length() - 1));
+            String decryptPassword = EncryptUtil.decrypt(
+                    pass.substring(Constant.ENC_PASSWORD_PREFIX.length(), pass.length() - 1)
+            );
             originalConfig.set(Key.PASSWORD, decryptPassword);
         }
 
