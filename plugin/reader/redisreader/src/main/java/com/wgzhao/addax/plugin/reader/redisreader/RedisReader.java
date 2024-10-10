@@ -56,7 +56,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.StringJoiner;
 import java.util.TreeMap;
 import java.util.UUID;
 import java.util.regex.Pattern;
@@ -86,6 +85,7 @@ public class RedisReader
             extends Reader.Job
     {
         private Configuration conf;
+        private List<String> uris;
 
         @Override
         public void init()
@@ -97,17 +97,19 @@ public class RedisReader
         private void validateParam()
         {
             Configuration conConf = conf.getConfiguration(RedisKey.CONNECTION);
-            String uri = conConf.getString(RedisKey.URI);
-            if (uri == null || uri.isEmpty()) {
-                throw AddaxException.asAddaxException(REQUIRED_VALUE, "uri is null or empty");
-            }
-            if (!(uri.startsWith("tcp") || uri.startsWith("file") || uri.startsWith("http") || uri.startsWith("https"))) {
-                throw AddaxException.asAddaxException(ILLEGAL_VALUE, "uri is not start with tcp, file, http or https");
-            }
-            String mode = conConf.getString(RedisKey.MODE, "standalone");
-            if ("sentinel".equalsIgnoreCase(mode)) {
-                // required other items
-                conConf.getNecessaryValue(RedisKey.MASTER_NAME, REQUIRED_VALUE);
+            uris = conConf.getList(RedisKey.URI, String.class);
+            for (String uri : uris) {
+                if (uri == null || uri.isEmpty()) {
+                    throw AddaxException.asAddaxException(REQUIRED_VALUE, "uri is null or empty");
+                }
+                if (!(uri.startsWith("tcp") || uri.startsWith("file") || uri.startsWith("http") || uri.startsWith("https"))) {
+                    throw AddaxException.asAddaxException(ILLEGAL_VALUE, "uri is not start with tcp, file, http or https");
+                }
+                String mode = conConf.getString(RedisKey.MODE, "standalone");
+                if ("sentinel".equalsIgnoreCase(mode) && uri.startsWith("tcp")) {
+                    // required other items
+                    conConf.getNecessaryValue(RedisKey.MASTER_NAME, REQUIRED_VALUE);
+                }
             }
         }
 
@@ -121,7 +123,23 @@ public class RedisReader
         public List<Configuration> split(int adviceNumber)
         {
             // ignore adviceNumber
-            return Collections.singletonList(conf);
+            if (adviceNumber != uris.size() ) {
+                throw AddaxException.asAddaxException(ILLEGAL_VALUE, "adviceNumber is not equal to uri size");
+            }
+            if (adviceNumber == 1) {
+                conf.set(String.format("%s.%s", RedisKey.CONNECTION, RedisKey.URI), uris.get(0));
+                return Collections.singletonList(conf);
+            }
+
+            List<Configuration> configurations = new ArrayList<>();
+            for (String uri : uris) {
+                Configuration clone = conf.clone();
+                Configuration conConf = clone.getConfiguration(RedisKey.CONNECTION);
+                conConf.set(RedisKey.URI, uri);
+                clone.set(RedisKey.CONNECTION, conConf);
+                configurations.add(clone);
+            }
+            return configurations;
         }
     }
 
@@ -176,7 +194,7 @@ public class RedisReader
                     this.dump(uriToHosts(uri), mode, connection.getString(RedisKey.AUTH), masterName, file);
                 }
                 else {
-                    file = new File(uri);
+                    Files.copy(Paths.get(new URI(uri)), file.toPath());
                 }
 
                 LOG.info("loading {} ", file.getAbsolutePath());
@@ -393,7 +411,7 @@ public class RedisReader
                 }
             }
             catch (URISyntaxException e) {
-                e.printStackTrace();
+                throw new RuntimeException(e.getMessage(), e);
             }
             return result;
         }

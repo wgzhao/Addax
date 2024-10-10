@@ -1,20 +1,13 @@
 {
   "name": "redisreader",
   "parameter": {
-    "connection": [
+    "connection":
       {
-        "uri": "tcp://127.0.0.1:6379",
+        "uri": ["tcp://127.0.0.1:6379", "file:///data/dump.rdb", "http://localhost/dump.rdb"],
         "auth": "",
         "mode": "sentinel|master/slave|standalone|cluster",
         "masterName": "mymaster"
       },
-      {
-        "uri": "file:///data/dump.rdb"
-      },
-      {
-        "uri": "http://localhost/dump.rdb"
-      }
-    ],
     "db": [
       0,
       1

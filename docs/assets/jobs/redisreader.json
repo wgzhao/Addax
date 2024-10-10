@@ -5,7 +5,7 @@
         "name": "redisreader",
         "parameter": {
           "connection": {
-            "uri": "tcp://127.0.0.1:7003",
+            "uri": ["tcp://127.0.0.1:6379", "file:///data/dump.rdb", "http://localhost/dump.rdb"],
             "auth": "password"
           },
           "include": [
@@ -23,12 +23,10 @@
       "writer": {
         "name": "rediswriter",
         "parameter": {
-          "connection": [
-            {
-              "uri": "tcp://127.0.0.1:6379",
-              "auth": "123456"
-            }
-          ],
+          "connection": {
+            "uri": "tcp://127.0.0.1:6379",
+            "auth": "123456"
+          },
           "timeout": 60000
         }
       }
