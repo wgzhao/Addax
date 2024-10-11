@@ -137,7 +137,7 @@ public class CommonRdbmsWriter
                     Connection conn = DBUtil.getConnection(dataBaseType, jdbcUrl, username, password);
                     LOG.info("Begin to execute preSqls:[{}]. context info:{}.", StringUtils.join(renderedPreSqls, ";"), jdbcUrl);
 
-                    WriterUtil.executeSqls(conn, renderedPreSqls, jdbcUrl, dataBaseType);
+                    WriterUtil.executeSqls(conn, renderedPreSqls);
                     DBUtil.closeDBResources(null, null, conn);
                 }
             }
@@ -173,7 +173,7 @@ public class CommonRdbmsWriter
                     Connection conn = DBUtil.getConnection(this.dataBaseType, jdbcUrl, username, password);
 
                     LOG.info("Begin to execute postSqls:[{}]. context info:{}.", StringUtils.join(renderedPostSqls, ";"), jdbcUrl);
-                    WriterUtil.executeSqls(conn, renderedPostSqls, jdbcUrl, dataBaseType);
+                    WriterUtil.executeSqls(conn, renderedPostSqls);
                     DBUtil.closeDBResources(null, null, conn);
                 }
             }
@@ -248,7 +248,7 @@ public class CommonRdbmsWriter
                     Constant.TABLE_NUMBER_MARK);
             if (tableNumber != 1) {
                 LOG.info("Begin to execute preSqls:[{}]. context info:{}.", StringUtils.join(this.preSqls, ";"), basicMessage);
-                WriterUtil.executeSqls(connection, preSqls, basicMessage, dataBaseType);
+                WriterUtil.executeSqls(connection, preSqls);
             }
 
             DBUtil.closeDBResources(null, connection);
@@ -350,7 +350,7 @@ public class CommonRdbmsWriter
             Connection connection = DBUtil.getConnection(dataBaseType, jdbcUrl, username, password);
 
             LOG.info("Begin to execute postSqls:[{}]. context info:{}.", StringUtils.join(postSqls, ";"), basicMessage);
-            WriterUtil.executeSqls(connection, postSqls, basicMessage, dataBaseType);
+            WriterUtil.executeSqls(connection, postSqls);
             DBUtil.closeDBResources(null, null, connection);
         }
 

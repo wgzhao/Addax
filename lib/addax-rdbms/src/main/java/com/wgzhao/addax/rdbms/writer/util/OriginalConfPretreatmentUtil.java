@@ -49,6 +49,7 @@ public final class OriginalConfPretreatmentUtil
     private static final Logger LOG = LoggerFactory.getLogger(OriginalConfPretreatmentUtil.class);
 
     public static DataBaseType dataBaseType;
+    private static final String jdbcUrlPath = String.format("%s.%s", Key.CONNECTION, Key.JDBC_URL);
 
     private OriginalConfPretreatmentUtil() {}
 
@@ -100,7 +101,7 @@ public final class OriginalConfPretreatmentUtil
         }
 
         jdbcUrl = dataBaseType.appendJDBCSuffixForWriter(jdbcUrl);
-        originalConfig.set(String.format("%s.%s", Key.CONNECTION, Key.JDBC_URL), jdbcUrl);
+        originalConfig.set(jdbcUrlPath, jdbcUrl);
 
         List<String> tables = connConf.getList(Key.TABLE, String.class);
 
@@ -171,7 +172,7 @@ public final class OriginalConfPretreatmentUtil
 
     public static void dealColumnConf(Configuration originalConfig)
     {
-        String jdbcUrl = originalConfig.getString(String.format("%s.%s", Key.CONNECTION, Key.JDBC_URL));
+        String jdbcUrl = originalConfig.getString(jdbcUrlPath);
         String username = originalConfig.getString(Key.USERNAME);
         String password = originalConfig.getString(Key.PASSWORD);
         String oneTable = originalConfig.getString(String.format("%s.%s[0]", Key.CONNECTION, Key.TABLE));
@@ -183,21 +184,14 @@ public final class OriginalConfPretreatmentUtil
     public static void dealWriteMode(Configuration originalConfig, DataBaseType dataBaseType)
     {
         List<String> columns = originalConfig.getList(Key.COLUMN, String.class);
-
-        String jdbcUrl = originalConfig.getString(String.format("%s.%s", Key.CONNECTION, Key.JDBC_URL));
-
-        // 默认为：insert 方式
         String writeMode = originalConfig.getString(Key.WRITE_MODE, "INSERT");
-
         List<String> valueHolders = new ArrayList<>(columns.size());
         for (int i = 0; i < columns.size(); i++) {
             valueHolders.add("?");
         }
 
         String writeDataSqlTemplate = WriterUtil.getWriteTemplate(columns, valueHolders, writeMode, dataBaseType, false);
-
         LOG.info("Writing data using [{}].", writeDataSqlTemplate);
-
         originalConfig.set(Constant.INSERT_OR_REPLACE_TEMPLATE_MARK, writeDataSqlTemplate);
     }
 }

@@ -74,11 +74,6 @@ public class PreCheckTask
                 String splitPkSql = null;
                 String querySql = querySqls.get(i).toString();
 
-                String table = null;
-                if (tables != null && !tables.isEmpty()) {
-                    table = tables.get(i).toString();
-                }
-
                 /*verify query*/
                 ResultSet rs = null;
                 try {

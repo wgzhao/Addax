@@ -67,7 +67,7 @@ public final class WriterUtil
 
         if (tableNumber != adviceNumber) {
             throw AddaxException.asAddaxException(CONFIG_ERROR,
-                    String.format("您的配置文件中的列配置信息有误. 您要写入的目的端的表个数是:%s , 但是根据系统建议需要切分的份数是：%s. 请检查您的配置并作出修改.",
+                    String.format("The number of writing tables(%d) is NOT equal to the number of channels(%d).",
                             tableNumber, adviceNumber));
         }
 
@@ -115,7 +115,7 @@ public final class WriterUtil
         return renderedSqls;
     }
 
-    public static void executeSqls(Connection conn, List<String> sqls, String basicMessage, DataBaseType dataBaseType)
+    public static void executeSqls(Connection conn, List<String> sqls)
     {
         String currentSql = null;
         try (Statement stmt = conn.createStatement()) {

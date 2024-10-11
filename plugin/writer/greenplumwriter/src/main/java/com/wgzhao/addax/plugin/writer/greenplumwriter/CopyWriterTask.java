@@ -262,7 +262,7 @@ public class CopyWriterTask
         sqls.add("set gp_max_csv_line_length = " + GPConstant.MAX_CSV_SIZE);
 
         try {
-            WriterUtil.executeSqls(conn, sqls, getJdbcUrl(), DataBaseType.PostgreSQL);
+            WriterUtil.executeSqls(conn, sqls);
         }
         catch (Exception e) {
             LOG.warn("Cannot set gp_max_csv_line_length to {}", GPConstant.MAX_CSV_SIZE);
