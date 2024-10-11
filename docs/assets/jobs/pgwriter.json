@@ -19,9 +19,7 @@
             "table": [
               "addax_tbl"
             ],
-            "jdbcUrl": [
-              "jdbc:postgresql://localhost:5432/pgtest"
-            ]
+            "jdbcUrl": "jdbc:postgresql://localhost:5432/pgtest"
           }
         }
       },
