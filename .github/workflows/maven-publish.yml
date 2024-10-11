@@ -10,6 +10,10 @@ on:
 jobs:
   publish:
     runs-on: ubuntu-latest
+    outputs:
+      version: ${{ steps.version.outputs.version }}
+      changelog: ${{ steps.changelog.outputs.changelog }}
+
     permissions:
       contents: read
       packages: write
@@ -20,10 +24,10 @@ jobs:
 
       - name: version
         id: version
-        run: echo "{version}=$(git describe --tags --abbrev=1)" >> $GITHUB_OUTPUT
+        run: echo "version=$(git describe --tags --abbrev=1)" >> $GITHUB_OUTPUT
       - name: changelog
         id: changelog
-        run: echo "{changelog}=$(git log --oneline)' ${{ github.event.before }}..HEAD)" >> $GITHUB_OUTPUT
+        run: echo "changelog=$(git log --oneline)' ${{ github.event.before }}..HEAD)" >> $GITHUB_OUTPUT
       # - name: 1. Import GPG key
       #   id: import_gpg
       #   uses: crazy-max/ghaction-import-gpg@v4
