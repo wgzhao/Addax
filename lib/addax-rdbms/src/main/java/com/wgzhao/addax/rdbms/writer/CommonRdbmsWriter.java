@@ -45,6 +45,7 @@ import java.sql.SQLException;
 import java.sql.Types;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
@@ -67,6 +68,7 @@ public class CommonRdbmsWriter
 
         public void init(Configuration originalConfig)
         {
+            ddlValid(originalConfig, dataBaseType);
             OriginalConfPretreatmentUtil.doPretreatment(originalConfig, this.dataBaseType);
             LOG.debug("After job init(), originalConfig now is:[\n{}\n]", originalConfig.toJSON());
         }
@@ -106,6 +108,21 @@ public class CommonRdbmsWriter
                 if (!hasDeletePri) {
                     throw RdbmsException.asDeletePriException(originalConfig.getString(Key.USERNAME), jdbcUrl);
                 }
+            }
+        }
+
+        public void ddlValid(Configuration originalConfig, DataBaseType dataBaseType)
+        {
+            if (originalConfig.getString("ddl", null) != null) {
+                String username = originalConfig.getString(Key.USERNAME);
+                String password = originalConfig.getString(Key.PASSWORD);
+                Configuration connConf = originalConfig.getConfiguration(Key.CONNECTION);
+                String jdbcUrl = connConf.getString(Key.JDBC_URL);
+                String ddl = originalConfig.getString("ddl");
+                Connection connection = DBUtil.getConnection(dataBaseType, jdbcUrl, username, password);
+                LOG.info("Executing DDL: {}. context info:{}.", ddl, jdbcUrl);
+                WriterUtil.executeSqls(connection, Collections.singletonList(ddl));
+                DBUtil.closeDBResources(null, connection);
             }
         }
 
