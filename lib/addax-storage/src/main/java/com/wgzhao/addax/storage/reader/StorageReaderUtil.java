@@ -104,7 +104,7 @@ public class StorageReaderUtil
 
         // compress logic
         try {
-            if (compress == null || "".equals(compress) || "none".equalsIgnoreCase(compress)) {
+            if (compress == null || compress.isEmpty() || "none".equalsIgnoreCase(compress)) {
                 reader = new BufferedReader(new InputStreamReader(inputStream, encoding), bufferSize);
             }
             else {
@@ -353,13 +353,7 @@ public class StorageReaderUtil
     public static void validateParameter(Configuration readerConfiguration)
     {
 
-        // encoding check
         validateEncoding(readerConfiguration);
-
-        //only support compress types
-//        validateCompress(readerConfiguration);
-
-        //fieldDelimiter check
         validateFieldDelimiter(readerConfiguration);
 
         // column: 1. index type 2.value type 3.when type is Date, may have format
@@ -383,15 +377,6 @@ public class StorageReaderUtil
             throw AddaxException.asAddaxException(CONFIG_ERROR,
                     String.format("Exception occurred while applying encoding [%s].", e.getMessage()), e);
         }
-    }
-
-    public static void validateCompress(Configuration readerConfiguration)
-    {
-        String compress = readerConfiguration.getUnnecessaryValue(Key.COMPRESS, "").toLowerCase();
-        if ("gzip".equals(compress)) {
-            compress = "gz";
-        }
-        readerConfiguration.set(Key.COMPRESS, compress);
     }
 
     public static void validateFieldDelimiter(Configuration readerConfiguration)

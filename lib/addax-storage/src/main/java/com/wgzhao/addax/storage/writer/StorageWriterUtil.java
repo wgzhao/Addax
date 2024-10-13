@@ -100,7 +100,7 @@ public class StorageWriterUtil
         String encoding = writerConfiguration.getString(Key.ENCODING);
         if (StringUtils.isBlank(encoding)) {
             // like "  ", null
-            LOG.warn(String.format("The item encoding is empty, uses [%s] as default.", Constant.DEFAULT_ENCODING));
+            LOG.warn("The item encoding is empty, uses [{}] as default.", Constant.DEFAULT_ENCODING);
             writerConfiguration.set(Key.ENCODING, Constant.DEFAULT_ENCODING);
         }
         else {
@@ -161,13 +161,13 @@ public class StorageWriterUtil
             // handle same file name
             Configuration splitTaskConfig = writerSliceConfig.clone();
             String fullFileName;
-            fullFileName = String.format("%s__%s", filePrefix, FileHelper.generateFileMiddleName());
-            while (allFileExists.contains(fullFileName)) {
+            do {
                 fullFileName = String.format("%s__%s", filePrefix, FileHelper.generateFileMiddleName());
             }
+            while (allFileExists.contains(fullFileName));
             allFileExists.add(fullFileName);
             splitTaskConfig.set(Key.FILE_NAME, fullFileName);
-            LOG.info(String.format("split write file name:[%s]", fullFileName));
+            LOG.info("split write file name:[{}]", fullFileName);
             writerSplitConfigs.add(splitTaskConfig);
         }
         LOG.info("Finished split.");
@@ -204,11 +204,7 @@ public class StorageWriterUtil
             TaskPluginCollector taskPluginCollector)
     {
         String encoding = config.getString(Key.ENCODING, Constant.DEFAULT_ENCODING);
-        // handle blank encoding
-        if (StringUtils.isBlank(encoding)) {
-            LOG.warn("The item encoding is empty, uses [{}] as default.", Constant.DEFAULT_ENCODING);
-            encoding = Constant.DEFAULT_ENCODING;
-        }
+
         String compress = config.getString(Key.COMPRESS);
 
         BufferedWriter writer = null;
@@ -293,8 +289,7 @@ public class StorageWriterUtil
                     String.format("The item delimiter is only support single character, [%s] is invalid.", delimiterInStr));
         }
         if (null == delimiterInStr) {
-            LOG.warn(String.format("The item delimiter is empty, uses [%s] as default.",
-                    Constant.DEFAULT_FIELD_DELIMITER));
+            LOG.warn("The item delimiter is empty, uses [{}] as default.", Constant.DEFAULT_FIELD_DELIMITER);
         }
 
         // warn: fieldDelimiter could not be '' for no fieldDelimiter
@@ -303,7 +298,6 @@ public class StorageWriterUtil
 
         List<String> headers = config.getList(Key.HEADER, String.class);
         if (null != headers && !headers.isEmpty()) {
-//            unstructuredWriter.writeOneRecord(headers);
             csvBuilder.setHeader(headers.toArray(new String[0]));
         }
 
@@ -315,9 +309,7 @@ public class StorageWriterUtil
                 csvPrinter.printRecord(result);
             }
         }
-
-        // warn:由调用方控制流的关闭
-        // IOUtils.closeQuietly(unstructuredWriter);
+        csvPrinter.close();
     }
 
     public static List<String> recordToList(Record record, String nullFormat, DateFormat dateParse, TaskPluginCollector taskPluginCollector)
