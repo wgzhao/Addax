@@ -39,6 +39,7 @@ import java.io.OutputStreamWriter;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 import static com.wgzhao.addax.common.spi.ErrorCode.CONFIG_ERROR;
 import static com.wgzhao.addax.common.spi.ErrorCode.ILLEGAL_VALUE;
@@ -133,12 +134,6 @@ public class StreamWriter
         }
 
         @Override
-        public void prepare()
-        {
-            //
-        }
-
-        @Override
         public List<Configuration> split(int mandatoryNumber)
         {
             List<Configuration> writerSplitConfigs = new ArrayList<>();
@@ -147,12 +142,6 @@ public class StreamWriter
             }
 
             return writerSplitConfigs;
-        }
-
-        @Override
-        public void post()
-        {
-            //
         }
 
         @Override
@@ -166,7 +155,6 @@ public class StreamWriter
             extends Writer.Task
     {
         private static final Logger LOG = LoggerFactory.getLogger(Task.class);
-        private static final String NULL_FLAG = "NULL";
         private static final String NEWLINE_FLAG = System.getProperty("line.separator", "\n");
 
         private String fieldDelimiter;
@@ -192,19 +180,13 @@ public class StreamWriter
             this.fileName = writerSliceConfig.getString(StreamKey.FILE_NAME, null);
             this.recordNumBeforeSleep = writerSliceConfig.getLong(StreamKey.RECORD_NUM_BEFORE_SLEEP, 0);
             this.sleepTime = writerSliceConfig.getLong(StreamKey.SLEEP_TIME, 0);
-            this.nullFormat = writerSliceConfig.getString(StreamKey.NULL_FORMAT, NULL_FLAG);
+            this.nullFormat = writerSliceConfig.getString(StreamKey.NULL_FORMAT, StreamKey.NULL_FLAG);
             if (recordNumBeforeSleep < 0) {
-                throw AddaxException.asAddaxException(ILLEGAL_VALUE, "recordNumber 不能为负值");
+                throw AddaxException.asAddaxException(ILLEGAL_VALUE, "recordNumber must be greater than 0");
             }
             if (sleepTime < 0) {
-                throw AddaxException.asAddaxException(ILLEGAL_VALUE, "sleep 不能为负值");
+                throw AddaxException.asAddaxException(ILLEGAL_VALUE, "sleep time must be greater than 0");
             }
-        }
-
-        @Override
-        public void prepare()
-        {
-            //
         }
 
         @Override
@@ -238,14 +220,6 @@ public class StreamWriter
             String fileFullPath = buildFilePath(path, fileName);
             LOG.info("write to file : [{}]", fileFullPath);
             File newFile = new File(fileFullPath);
-            try {
-                if (!newFile.createNewFile()) {
-                    LOG.error("failed to create file {}", fileFullPath);
-                }
-            }
-            catch (IOException ioe) {
-                LOG.error("failed to create file {}", fileFullPath);
-            }
             try (BufferedWriter writer = new BufferedWriter(
                     new OutputStreamWriter(new FileOutputStream(newFile, true), StandardCharsets.UTF_8))) {
                 Record record;
@@ -253,7 +227,8 @@ public class StreamWriter
                 while ((record = recordReceiver.getFromReader()) != null) {
                     if (recordNumBeforeSleep > 0 && sleepTime > 0 && count == recordNumBeforeSleep) {
                         LOG.info("StreamWriter start to sleep ... recordNumBeforeSleep={},sleepTime={}", recordNumBeforeSleep, sleepTime);
-                        Thread.sleep(sleepTime * 1000L);
+                        TimeUnit.SECONDS.sleep(sleepTime);
+                        count=0;
                     }
                     writer.write(recordToString(record));
                     count++;
@@ -263,12 +238,6 @@ public class StreamWriter
             catch (IOException | InterruptedException e) {
                 throw AddaxException.asAddaxException(IO_ERROR, e);
             }
-        }
-
-        @Override
-        public void post()
-        {
-            //
         }
 
         @Override
