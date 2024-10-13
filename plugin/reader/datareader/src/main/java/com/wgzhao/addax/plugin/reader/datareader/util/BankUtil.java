@@ -80,7 +80,7 @@ public class BankUtil
     {
         StringBuilder sb = new StringBuilder();
         sb.append(CommonUtil.randChoose(DEBIT_CARD_PREFIXES));
-        sb.append(RandomStringUtils.randomNumeric(DEBIT_CARD_LENGTH - sb.length()));
+        sb.append(RandomStringUtils.secure().nextNumeric(DEBIT_CARD_LENGTH - sb.length()));
         return sb.toString();
     }
 
@@ -88,7 +88,7 @@ public class BankUtil
     {
         StringBuilder sb = new StringBuilder();
         sb.append(CommonUtil.randChoose(CREDIT_CARD_PREFIXES));
-        sb.append(RandomStringUtils.randomNumeric(CREDIT_CARD_LENGTH - sb.length()));
+        sb.append(RandomStringUtils.secure().nextNumeric(CREDIT_CARD_LENGTH - sb.length()));
         return sb.toString();
     }
 }

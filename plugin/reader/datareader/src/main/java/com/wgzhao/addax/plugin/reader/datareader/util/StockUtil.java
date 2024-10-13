@@ -34,11 +34,11 @@ public class StockUtil
 
     public static String nextStockCode()
     {
-        return CommonUtil.randChoose(CODE_PREFIXES) + RandomStringUtils.randomNumeric(4);
+        return CommonUtil.randChoose(CODE_PREFIXES) + RandomStringUtils.secure().nextNumeric(4);
     }
 
     public static String nextStockAccount()
     {
-        return RandomStringUtils.randomNumeric(10);
+        return RandomStringUtils.secure().nextNumeric(10);
     }
 }

@@ -31,6 +31,6 @@ public class PhoneUtil
 
     public static String nextPhoneNumber()
     {
-        return CommonUtil.randChoose(PHONE_NUMBER_PREFIXES) + RandomStringUtils.randomNumeric(8);
+        return CommonUtil.randChoose(PHONE_NUMBER_PREFIXES) + RandomStringUtils.secure().nextNumeric(8);
     }
 }

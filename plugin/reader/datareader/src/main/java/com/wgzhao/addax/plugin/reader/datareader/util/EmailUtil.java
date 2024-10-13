@@ -34,8 +34,9 @@ public class EmailUtil {
     private static final int userLength = 10;
 
     public static String nextEmail() {
-        return RandomStringUtils.randomAlphanumeric(
-                                rng.nextInt(3, userLength)) + "@" + CommonUtil.randChoose(EMAIL_DOMAIN);
+        return RandomStringUtils.secure().nextAlphanumeric(rng.nextInt(3, userLength))
+                + "@"
+                + CommonUtil.randChoose(EMAIL_DOMAIN);
         
     }
 }
