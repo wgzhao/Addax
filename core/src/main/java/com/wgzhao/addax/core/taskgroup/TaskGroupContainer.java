@@ -152,7 +152,7 @@ public class TaskGroupContainer
                     //上面从runTasks里移除了，因此对应在monitor里移除
                     taskMonitor.removeTask(taskId);
 
-                    //失败，看task是否支持failover，重试次数未超过最大限制
+                    //失败，看task是否支持fail over，重试次数未超过最大限制
                     if (taskCommunication.getState() == State.FAILED) {
                         taskFailedExecutorMap.put(taskId, taskExecutor);
                         assert taskExecutor != null;

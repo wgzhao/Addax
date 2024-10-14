@@ -37,8 +37,7 @@ public class ReaderRunner
         implements Runnable
 {
 
-    private static final Logger LOG = LoggerFactory
-            .getLogger(ReaderRunner.class);
+    private static final Logger LOG = LoggerFactory.getLogger(ReaderRunner.class);
 
     private RecordSender recordSender;
 

@@ -120,20 +120,21 @@ public class TransformerUtil
                             "groovy code or codeFile must be set by UDF: name=" + functionName);
                 }
                 // code and codeFile both setup, prefers to code , ignore codeFile
-                if ( StringUtils.isNoneEmpty(code, codeFile)) {
+                if (StringUtils.isNoneEmpty(code, codeFile)) {
                     LOG.warn("Both setup code and codeFile, will pickup code, ignore the codeFile");
                 }
                 if (StringUtils.isNotEmpty(codeFile)) {
                     // load groovy code from codeFile
                     // the codeFile default relative path is the same of addax.home properties
                     File file = new File(codeFile);
-                    if (! file.exists() || ! file.isFile()) {
+                    if (!file.exists() || !file.isFile()) {
                         throw AddaxException.asAddaxException(CONFIG_ERROR,
                                 "the codeFile [" + codeFile + "]does not exists or is unreadable!");
                     }
                     try {
                         code = FileUtils.readFileToString(file, Charset.defaultCharset());
-                    } catch (IOException e) {
+                    }
+                    catch (IOException e) {
                         throw AddaxException.asAddaxException(IO_ERROR,
                                 "read codeFile [" + codeFile + "] failure:", e);
                     }
@@ -154,9 +155,9 @@ public class TransformerUtil
             transformerExecution.genFinalParas();
             result.add(transformerExecution);
             i++;
-            LOG.info(String.format(" %s of transformer init success. name=%s, isNative=%s parameter = %s"
-                    , i, transformerInfo.getTransformer().getTransformerName()
-                    , transformerInfo.isNative(), configuration.getConfiguration("parameter")));
+            LOG.info(" {} of transformer init success. name={}, isNative={} parameter = {}",
+                    i, transformerInfo.getTransformer().getTransformerName(), transformerInfo.isNative(),
+                    configuration.getConfiguration("parameter"));
         }
 
         return result;

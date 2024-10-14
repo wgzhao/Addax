@@ -66,8 +66,8 @@ public abstract class Channel
         }
 
         if (isFirstPrint) {
-            LOG.info("The Channel set byte_speed_limit to " + byteSpeed + (byteSpeed <= 0 ? ", No bps activated." : "."));
-            LOG.info("The Channel set record_speed_limit to " + recordSpeed + (recordSpeed <= 0 ? ", No tps activated." : "."));
+            LOG.info("The Channel set byte_speed_limit to {}{}", byteSpeed, byteSpeed <= 0 ? ", No bps activated." : ".");
+            LOG.info("The Channel set record_speed_limit to {}{}", recordSpeed, recordSpeed <= 0 ? ", No tps activated." : ".");
             isFirstPrint = false;
         }
 

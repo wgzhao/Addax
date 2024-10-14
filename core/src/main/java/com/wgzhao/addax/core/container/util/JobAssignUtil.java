@@ -43,19 +43,20 @@ public final class JobAssignUtil
      * 公平体现在：会考虑 task 中对资源负载作的 load 标识进行更均衡的作业分配操作。
      *
      * @param configuration configuration
-     * @param channelNumber  the number of channel
+     * @param channelNumber the number of channel
      * @param channelsPerTaskGroup the channel of task group
      * @return list of configuration
      */
     public static List<Configuration> assignFairly(Configuration configuration, int channelNumber, int channelsPerTaskGroup)
     {
-        Validate.isTrue(configuration != null, "框架获得的 Job 不能为 null.");
+        Validate.isTrue(configuration != null, "The `job.content` can not be null.");
 
         List<Configuration> contentConfig = configuration.getListConfiguration(CoreConstant.JOB_CONTENT);
-        Validate.isTrue(!contentConfig.isEmpty(), "框架获得的切分后的 Job 无内容.");
+        Validate.isTrue(!contentConfig.isEmpty(), "The `job.content` is empty");
 
         Validate.isTrue(channelNumber > 0 && channelsPerTaskGroup > 0,
-                "每个channel的平均task数[averTaskPerChannel]，channel数目[channelNumber]，每个taskGroup的平均channel数[channelsPerTaskGroup]都应该为正数");
+                "The average number of tasks per channel [averTaskPerChannel], the number of channels [channelNumber], and the average number of channels per task group " +
+                        "[channelsPerTaskGroup] should all be positive numbers.");
 
         int taskGroupNumber = (int) Math.ceil(1.0 * channelNumber / channelsPerTaskGroup);
 
@@ -142,7 +143,6 @@ public final class JobAssignUtil
     }
 
     /**
-     *
      * 需要实现的效果通过例子来说是：
      * <pre>
      * a 库上有表：0, 1, 2
@@ -158,8 +158,8 @@ public final class JobAssignUtil
      *
      * </pre>
      *
-     * @param resourceMarkAndTaskIdMap  resource map
-     * @param jobConfiguration  configuration
+     * @param resourceMarkAndTaskIdMap resource map
+     * @param jobConfiguration configuration
      * @param taskGroupNumber the number of group
      * @return list of configuration
      */

@@ -49,6 +49,7 @@ public class Communication
 
     public Communication(Communication communication)
     {
+        this.init();
         for (Map.Entry<String, Number> entry : this.counter.entrySet()) {
             String key = entry.getKey();
             Number value = entry.getValue();
@@ -201,10 +202,10 @@ public class Communication
         this.counter.put(key, value + deltaValue);
     }
 
-    public synchronized Communication mergeFrom(Communication otherComm)
+    public synchronized void mergeFrom(Communication otherComm)
     {
         if (otherComm == null) {
-            return this;
+            return;
         }
 
         /*
@@ -256,8 +257,6 @@ public class Communication
 
             valueList.addAll(entry.getValue());
         }
-
-        return this;
     }
 
     /**
@@ -265,13 +264,12 @@ public class Communication
      * 这里不会出现 Killing 状态，killing 状态只在 Job 自身状态上才有.
      *
      * @param otherComm communication
-     * @return the communication state
      */
-    public synchronized State mergeStateFrom(Communication otherComm)
+    public synchronized void mergeStateFrom(Communication otherComm)
     {
         State retState = this.getState();
         if (otherComm == null) {
-            return retState;
+            return;
         }
 
         if (this.state == State.FAILED || otherComm.getState() == State.FAILED
@@ -283,7 +281,6 @@ public class Communication
         }
 
         this.setState(retState);
-        return retState;
     }
 
     public synchronized boolean isFinished()

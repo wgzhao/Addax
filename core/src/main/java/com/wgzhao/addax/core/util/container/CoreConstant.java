@@ -30,11 +30,7 @@ public class CoreConstant
 {
     // --------------------------- 全局使用的变量(最好按照逻辑顺序，调整下成员变量顺序)
     // --------------------------------
-    public static final String JOB_CONTENT_WRITER_PARAMETER_JOB_ID = "job.content.writer.parameter.jobid";
-    public static final String JOB_CONTENT_READER_PARAMETER_JOB_ID = "job.content.reader.parameter.jobid";
     public static final String CORE_CONTAINER_TASK_GROUP_CHANNEL = "core.container.taskGroup.channel";
-
-    public static final String CORE_CONTAINER_JOB_ID = "core.container.job.id";
 
     public static final String CORE_CONTAINER_JOB_REPORT_INTERVAL = "core.container.job.reportInterval";
 
@@ -89,8 +85,6 @@ public class CoreConstant
     public static final String JOB_CONTENT_WRITER = "job.content.writer";
 
     public static final String JOB_CONTENT_WRITER_PARAMETER = "job.content.writer.parameter";
-
-    public static final String JOB_JOB_INFO = "job.jobInfo";
 
     public static final String JOB_CONTENT = "job.content";
 
