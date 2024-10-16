@@ -29,6 +29,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.sql.Connection;
+import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -37,41 +38,41 @@ import java.util.List;
 /**
  * jdbc util
  */
-public class DorisUtil {
+public class DorisUtil
+{
     private static final Logger LOG = LoggerFactory.getLogger(DorisUtil.class);
 
     private DorisUtil() {}
 
-    public static List<String> renderPreOrPostSqls(List<String> preOrPostSqls, String tableName) {
+    public static List<String> renderPreOrPostSqls(List<String> preOrPostSqls, String tableName)
+    {
         if (null == preOrPostSqls) {
             return Collections.emptyList();
         }
         List<String> renderedSqls = new ArrayList<>();
         for (String sql : preOrPostSqls) {
-            if (! Strings.isNullOrEmpty(sql)) {
+            if (!Strings.isNullOrEmpty(sql)) {
                 renderedSqls.add(sql.replace(Constant.TABLE_NAME_PLACEHOLDER, tableName));
             }
         }
         return renderedSqls;
     }
 
-    public static void executeSqls(Connection conn, List<String> sqls) {
-        Statement stmt = null;
-        String currentSql = null;
+    public static void executeSqls(Connection conn, List<String> sqls)
+    {
         try {
-            stmt = conn.createStatement();
             for (String sql : sqls) {
-                currentSql = sql;
-                stmt.execute(sql);
+                LOG.info("Executing sql:[{}].", sql);
+                DBUtil.query(conn, sql);
             }
-        } catch (Exception e) {
-            throw RdbmsException.asQueryException(e, currentSql);
-        } finally {
-           DBUtil.closeDBResources(null, stmt, null);
+        }
+        catch (SQLException e) {
+            throw new RuntimeException(e);
         }
     }
 
-    public static void preCheckPrePareSQL( DorisKey options) {
+    public static void preCheckPrePareSQL(DorisKey options)
+    {
         String table = options.getTable();
         List<String> preSqls = options.getPreSqlList();
         List<String> renderedPreSqls = DorisUtil.renderPreOrPostSqls(preSqls, table);
@@ -80,24 +81,27 @@ public class DorisUtil {
             for (String sql : renderedPreSqls) {
                 try {
                     DBUtil.sqlValid(sql, DataBaseType.MySql);
-                } catch ( ParserException e) {
-                    throw RdbmsException.asPreSQLParserException(e,sql);
+                }
+                catch (ParserException e) {
+                    throw RdbmsException.asPreSQLParserException(e, sql);
                 }
             }
         }
     }
 
-    public static void preCheckPostSQL( DorisKey options) {
+    public static void preCheckPostSQL(DorisKey options)
+    {
         String table = options.getTable();
         List<String> postSqls = options.getPostSqlList();
         List<String> renderedPostSqls = DorisUtil.renderPreOrPostSqls(postSqls, table);
         if (!renderedPostSqls.isEmpty()) {
             LOG.info("Begin to preCheck postSqls:[{}].", String.join(";", renderedPostSqls));
-            for(String sql : renderedPostSqls) {
+            for (String sql : renderedPostSqls) {
                 try {
                     DBUtil.sqlValid(sql, DataBaseType.MySql);
-                } catch (ParserException e){
-                    throw RdbmsException.asPostSQLParserException(e,sql);
+                }
+                catch (ParserException e) {
+                    throw RdbmsException.asPostSQLParserException(e, sql);
                 }
             }
         }

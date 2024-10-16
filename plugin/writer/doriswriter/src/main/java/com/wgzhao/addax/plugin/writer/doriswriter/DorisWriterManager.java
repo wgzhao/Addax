@@ -21,6 +21,8 @@
 package com.wgzhao.addax.plugin.writer.doriswriter;
 
 import com.google.common.base.Strings;
+import com.wgzhao.addax.common.exception.AddaxException;
+import com.wgzhao.addax.common.spi.ErrorCode;
 import org.apache.commons.lang3.concurrent.BasicThreadFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -67,7 +69,7 @@ public class DorisWriterManager {
                 if (!closed) {
                     try {
                         String label = createBatchLabel();
-                        LOG.info(String.format("Doris interval Sinking triggered: label[%s].", label));
+                        LOG.info("Doris interval Sinking triggered: label[{}].", label);
                         if (batchCount == 0) {
                             startScheduler();
                         }
@@ -87,7 +89,7 @@ public class DorisWriterManager {
         }
     }
 
-    public final synchronized void writeRecord(String record) throws IOException {
+    public final synchronized void writeRecord(String record) {
         checkFlushException();
         try {
             byte[] bts = record.getBytes(StandardCharsets.UTF_8);
@@ -96,11 +98,11 @@ public class DorisWriterManager {
             batchSize += bts.length;
             if (batchCount >= options.getBatchSize()) {
                 String label = createBatchLabel();
-                LOG.debug(String.format("Doris buffer Sinking triggered: rows[%d] label[%s].", batchCount, label));
+                LOG.debug("Doris buffer Sinking triggered: rows[{}] label[{}].", batchCount, label);
                 flush(label, false);
             }
         } catch (Exception e) {
-            throw new IOException("Writing records to Doris failed.", e);
+            throw AddaxException.asAddaxException(ErrorCode.EXECUTE_FAIL, e);
         }
     }
 
@@ -127,7 +129,7 @@ public class DorisWriterManager {
             closed = true;
             try {
                 String label = createBatchLabel();
-                if (batchCount > 0) LOG.debug(String.format("Doris Sink is about to close: label[%s].", label));
+                if (batchCount > 0) LOG.debug("Doris Sink is about to close: label[{}].", label);
                 flush(label, true);
             } catch (Exception e) {
                 throw new RuntimeException("Writing records to Doris failed.", e);
@@ -189,12 +191,7 @@ public class DorisWriterManager {
                     LOG.warn("Batch label changed from [{}] to [{}]", flushData.getLabel(), newLabel);
                     flushData.setLabel(newLabel);
                 }
-                try {
-                    Thread.sleep(1000L * Math.min(i + 1, 10));
-                } catch (InterruptedException ex) {
-                    Thread.currentThread().interrupt();
-                    throw new IOException("Unable to flush, interrupted while doing another attempt", e);
-                }
+                TimeUnit.SECONDS.sleep(Math.min(i + 1, 10));
             }
         }
     }

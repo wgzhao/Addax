@@ -22,19 +22,24 @@ package com.wgzhao.addax.plugin.writer.doriswriter;
 
 import java.util.List;
 
-public class WriterTuple {
+public class WriterTuple
+{
     private String label;
     private final Long bytes;
     private final List<byte[]> rows;
 
-    public WriterTuple ( String label, Long bytes, List<byte[]> rows){
+    public WriterTuple(String label, Long bytes, List<byte[]> rows)
+    {
         this.label = label;
         this.rows = rows;
         this.bytes = bytes;
     }
 
-    public String getLabel() { return label; }
-    public void setLabel(String label) { this.label = label; }
-    public Long getBytes() { return bytes; }
-    public List<byte[]> getRows() { return rows; }
+    public String getLabel() {return label;}
+
+    public void setLabel(String label) {this.label = label;}
+
+    public Long getBytes() {return bytes;}
+
+    public List<byte[]> getRows() {return rows;}
 }

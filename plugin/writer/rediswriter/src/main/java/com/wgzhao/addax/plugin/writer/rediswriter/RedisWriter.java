@@ -32,6 +32,9 @@ import redis.clients.jedis.Jedis;
 import redis.clients.jedis.exceptions.JedisDataException;
 import redis.clients.jedis.util.JedisClusterCRC16;
 
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
 import java.net.URI;
 import java.util.Collections;
 import java.util.HashMap;
@@ -176,16 +179,12 @@ public class RedisWriter
             Client client = this.jedis.getClient();
             Record fromReader;
             while ((fromReader = lineReceiver.getFromReader()) != null) {
-                Column dbColumn = fromReader.getColumn(0);
+                int db = fromReader.getColumn(0).asLong().intValue();
 //                Column type = fromReader.getColumn(1)
-                Column expireColumn = fromReader.getColumn(2);
-                Column keyColumn = fromReader.getColumn(3);
-                Column valueColumn = fromReader.getColumn(4);
-                Long db = dbColumn.asLong();
-                long expire = expireColumn.asLong();
-                byte[] key = keyColumn.asBytes();
-                byte[] value = valueColumn.asBytes();
-                client.select(db.intValue());
+                long expire = fromReader.getColumn(2).asLong();
+                byte[] key = fromReader.getColumn(3).toString().getBytes();
+                byte[] value = string2byte(fromReader.getColumn(4).toString());
+                client.select(db);
                 restore(client, key, value, expire, counter);
             }
 
@@ -227,10 +226,22 @@ public class RedisWriter
             }
         }
 
+        private byte[] string2byte(String str)
+        {
+            ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
+         try {
+             byteArrayOutputStream.write(str.getBytes());
+             return byteArrayOutputStream.toByteArray();
+         }
+         catch (IOException e) {
+             return str.getBytes();
+         }
+        }
+
         private void restore(Client client, byte[] key, byte[] value, long expire, AtomicLong currentCounter)
         {
 
-            client.restore(key, 0, value);
+            client.restore(key, 0L, value);
 
             if (expire > 0) {
                 client.expireAt(key, expire);

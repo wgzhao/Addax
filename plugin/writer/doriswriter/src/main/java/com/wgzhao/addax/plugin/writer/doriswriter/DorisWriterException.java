@@ -27,24 +27,13 @@ public class DorisWriterException
 {
 
     private final Map<String, Object> response;
-    private boolean reCreateLabel;
-
-    public DorisWriterException(String message, Map<String, Object> response)
-    {
-        super(message);
-        this.response = response;
-    }
+    private final boolean reCreateLabel;
 
     public DorisWriterException(String message, Map<String, Object> response, boolean reCreateLabel)
     {
         super(message);
         this.response = response;
         this.reCreateLabel = reCreateLabel;
-    }
-
-    public Map<String, Object> getFailedResponse()
-    {
-        return response;
     }
 
     public boolean needReCreateLabel()

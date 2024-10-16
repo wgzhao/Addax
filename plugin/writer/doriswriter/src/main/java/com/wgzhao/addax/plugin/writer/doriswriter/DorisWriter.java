@@ -25,6 +25,8 @@ import com.wgzhao.addax.common.exception.AddaxException;
 import com.wgzhao.addax.common.plugin.RecordReceiver;
 import com.wgzhao.addax.common.spi.Writer;
 import com.wgzhao.addax.common.util.Configuration;
+import com.wgzhao.addax.plugin.writer.doriswriter.codec.DorisCodec;
+import com.wgzhao.addax.plugin.writer.doriswriter.codec.DorisCodecFactory;
 import com.wgzhao.addax.rdbms.util.DBUtil;
 import com.wgzhao.addax.rdbms.util.DataBaseType;
 import org.slf4j.Logger;
@@ -35,7 +37,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static com.wgzhao.addax.common.spi.ErrorCode.CONFIG_ERROR;
-import static com.wgzhao.addax.common.spi.ErrorCode.EXECUTE_FAIL;
 
 /**
  * doris data writer
@@ -57,11 +58,12 @@ public class DorisWriter
             this.originalConfig = super.getPluginJobConf();
             options = new DorisKey(this.originalConfig);
             options.doPretreatment();
+            preCheck();
         }
 
         @Override
-        public void preCheck() {
-            this.init();
+        public void preCheck()
+        {
             DorisUtil.preCheckPrePareSQL(options);
             DorisUtil.preCheckPostSQL(options);
         }
@@ -73,8 +75,9 @@ public class DorisWriter
             String password = options.getPassword();
             String jdbcUrl = options.getJdbcUrl();
             List<String> renderedPreSqls = DorisUtil.renderPreOrPostSqls(options.getPreSqlList(), options.getTable());
+            // check username and password is valid
+            Connection conn = DBUtil.getConnection(DataBaseType.MySql, jdbcUrl, username, password);
             if (!renderedPreSqls.isEmpty()) {
-                Connection conn = DBUtil.getConnection(DataBaseType.MySql, jdbcUrl, username, password);
                 LOG.info("Begin to execute preSqls:[{}]. context info:{}.", String.join(";", renderedPreSqls), jdbcUrl);
                 DorisUtil.executeSqls(conn, renderedPreSqls);
                 DBUtil.closeDBResources(null, null, conn);
@@ -126,56 +129,27 @@ public class DorisWriter
             options = new DorisKey(super.getPluginJobConf());
             writerManager = new DorisWriterManager(options);
             rowCodec = DorisCodecFactory.createCodec(options);
-
-
-        }
-
-        @Override
-        public void prepare()
-        {
-            //
         }
 
         public void startWrite(RecordReceiver recordReceiver)
         {
-            try {
-                Record record;
-                while ((record = recordReceiver.getFromReader()) != null) {
-                    if (record.getColumnNumber() != options.getColumns().size()) {
-                        throw AddaxException
-                                .asAddaxException(
-                                        CONFIG_ERROR,
-                                        String.format(
-                                                "There is an error in the column configuration information. " +
-                                                        "This is because you have configured a task where the number of fields to be read from the source:%s " +
-                                                        "is not equal to the number of fields to be written to the destination table:%s. " +
-                                                        "Please check your configuration and make changes.",
-                                                record.getColumnNumber(),
-                                                options.getColumns().size()));
-                    }
-                    writerManager.writeRecord(rowCodec.codec(record));
+            Record record;
+            while ((record = recordReceiver.getFromReader()) != null) {
+                if (record.getColumnNumber() != options.getColumns().size()) {
+                    throw AddaxException.asAddaxException(CONFIG_ERROR,
+                            String.format(
+                                    "The number of columns(%d) in the record does not match the number of columns(%d) in the configuration",
+                                    record.getColumnNumber(),
+                                    options.getColumns().size()));
                 }
-            }
-            catch (Exception e) {
-                throw AddaxException.asAddaxException(EXECUTE_FAIL, e);
-            }
-        }
-
-        @Override
-        public void post()
-        {
-            try {
-                writerManager.close();
-            }
-            catch (Exception e) {
-                throw AddaxException.asAddaxException(EXECUTE_FAIL, e);
+                writerManager.writeRecord(rowCodec.codec(record));
             }
         }
 
         @Override
         public void destroy()
         {
-            //
+            writerManager.close();
         }
     }
 }
