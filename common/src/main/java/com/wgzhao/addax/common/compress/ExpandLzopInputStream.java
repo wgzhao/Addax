@@ -70,7 +70,7 @@ public class ExpandLzopInputStream
             throws IOException
     {
         short lzoLibraryVersion = 0x2060;
-        Logger log =  LoggerFactory.getLogger(LzopInputStream.class);
+        Logger log =  LoggerFactory.getLogger(ExpandLzopInputStream.class);
         byte[] lzopMagic = {-119, 'L', 'Z', 'O', 0, '\r', '\n', '\032', '\n'};
         byte[] buf = new byte[9];
         readBytes(buf, 0, 9);

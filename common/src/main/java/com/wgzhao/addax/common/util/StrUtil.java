@@ -22,6 +22,7 @@ package com.wgzhao.addax.common.util;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.Validate;
 
+import java.nio.charset.Charset;
 import java.text.DecimalFormat;
 import java.util.HashMap;
 import java.util.Map;
@@ -43,7 +44,7 @@ public class StrUtil
 
     private static final Pattern VARIABLE_PATTERN = Pattern.compile("(\\$)\\{?(\\w+)\\}?");
 
-    private static String systemEncoding = System.getProperty("file.encoding");
+    private static String systemEncoding = Charset.defaultCharset().displayName();
 
     private StrUtil()
     {

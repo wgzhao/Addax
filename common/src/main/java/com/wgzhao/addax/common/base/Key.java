@@ -130,7 +130,6 @@ public class Key
     // For char type
     public static final String LENGTH = "length";
 
-
     // For Oracle reader ONLY
     public static final String HINT = "hint";
     public static final String SAMPLE_PERCENTAGE = "samplePercentage";
@@ -148,6 +147,8 @@ public class Key
     public static final String HEADER = "header";
     public static final String IS_TABLE_MODE = "isTableMode";
     public static final String EXTENDED_INSERT = "extendedInsert";
+    public static final String TABLE_NUMBER= "tableNumber";
+
     public Key()
     {
 

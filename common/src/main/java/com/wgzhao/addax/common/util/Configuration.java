@@ -219,9 +219,7 @@ public class Configuration
 
     /**
      * 根据用户提供的json path，寻址具体的对象。
-     *
      * NOTE: 目前仅支持Map以及List下标寻址, 例如:
-     *
      * 对于如下JSON
      * <p>
      * {"a": {"b": {"c": [0,1,2,3]}}}
@@ -682,7 +680,6 @@ public class Configuration
 
     /**
      * 根据用户提供的json path，插入指定对象，并返回之前存在的对象(如果存在)
-     *
      * 目前仅支持.以及数组下标寻址, 例如:
      * <p>
      * config.set("a.b.c[3]", object);
@@ -1060,7 +1057,7 @@ public class Configuration
         if (!isMap) {
             throw new IllegalArgumentException(String.format(
                     "The item [%s] requires a Map object in json format, but the actual type is [%s].",
-                    index, target.getClass().toString()));
+                    index, target.getClass()));
         }
 
         Object result = ((Map<String, Object>) target).get(index);
@@ -1071,14 +1068,13 @@ public class Configuration
         return result;
     }
 
-    @SuppressWarnings({"unchecked"})
     private Object findObjectInList(Object target, String each)
     {
         boolean isList = (target instanceof List);
         if (!isList) {
             throw new IllegalArgumentException(String.format(
                     "The item [%s] requires a Map object in json format, but the actual type is [%s].",
-                    each, target.getClass().toString()));
+                    each, target.getClass()));
         }
 
         String index = each.replace("[", "").replace("]", "");
@@ -1142,18 +1138,6 @@ public class Configuration
                 throw new IllegalArgumentException(String.format(
                         "The item [%s] is invalid, Blank characters should not  appear here.", path));
             }
-        }
-    }
-
-    public Set<String> getSecretKeyPathSet()
-    {
-        return secretKeyPathSet;
-    }
-
-    public void setSecretKeyPathSet(Set<String> keyPathSet)
-    {
-        if (keyPathSet != null) {
-            this.secretKeyPathSet = keyPathSet;
         }
     }
 }

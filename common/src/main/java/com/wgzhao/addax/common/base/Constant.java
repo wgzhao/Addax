@@ -47,20 +47,10 @@ public class Constant
     public static final int DEFAULT_FETCH_SIZE = 2048;
     public static final int DEFAULT_DECIMAL_MAX_PRECISION = 38;
     public static final int DEFAULT_DECIMAL_MAX_SCALE = 18;
-
-    public static final String PK_TYPE = "pkType";
-    // The data type of primary key is long.
-    public static final Object PK_TYPE_LONG = "pkTypeLong";
-    public static final Object PK_TYPE_MONTE_CARLO = "pkTypeMonteCarlo";
-    // The data type of primary key is string.
-    public static final Object PK_TYPE_STRING = "pkTypeString";
-    public static final Object PK_TYPE_FLOAT = "pkTypeFloat";
-
     public static final String INSERT_OR_REPLACE_TEMPLATE_MARK = "insertOrReplaceTemplate";
     public static final String QUERY_SQL_TEMPLATE = "SELECT %s FROM %s WHERE (%s)";
     public static final String QUERY_SQL_TEMPLATE_WITHOUT_WHERE = "SELECT %s FROM %s ";
     public static final String TABLE_NAME_PLACEHOLDER = "@table";
-    public static final String TABLE_NUMBER_MARK = "tableNumber";
 
     public static final String ENC_PASSWORD_PREFIX = "${enc:";
 
@@ -85,4 +75,7 @@ public class Constant
             "SYSTEM_USER", "TABLE", "TABLESAMPLE", "TEXTSIZE", "THEN", "TO", "TOP", "TRAN", "TRANSACTION", "TRIGGER", "TRUNCATE", "TRY_CONVERT",
             "TSEQUAL", "UNION", "UNIQUE", "UNPIVOT", "UPDATE", "UPDATETEXT", "USE", "USER", "VALUES", "VARYING", "VIEW", "WAITFOR", "WHEN",
             "WHERE", "WHILE", "WITH", "WRITETEXT", "XACT_ABORT"));
+
+    //用于插件对自身 split 的每个 task 标识其使用的资源，以告知core 对 reader/writer split 之后的 task 进行拼接时需要根据资源标签进行更有意义的 shuffle 操作
+    public static final String LOAD_BALANCE_RESOURCE_MARK = "loadBalanceResourceMark";
 }

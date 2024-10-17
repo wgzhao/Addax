@@ -148,10 +148,6 @@ public final class RetryUtil
                 }
                 catch (Exception e) {
                     saveException = e;
-//                    if (i == 0) {
-//                        LOG.error(String.format("Exception occurred while calling callable: %s", saveException.getMessage()), saveException);
-//                    }
-
                     if (null != retryExceptionClass && !retryExceptionClass.isEmpty()) {
                         boolean needRetry = false;
                         for (Class<?> eachExceptionClass : retryExceptionClass) {
@@ -231,9 +227,6 @@ public final class RetryUtil
             Future<T> future = executor.submit(callable);
             try {
                 return future.get(timeoutMs, TimeUnit.MILLISECONDS);
-            }
-            catch (Exception e) {
-                throw e;
             }
             finally {
                 if (!future.isDone()) {

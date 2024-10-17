@@ -23,6 +23,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.lang.management.GarbageCollectorMXBean;
+import java.lang.management.ManagementFactory;
 import java.lang.management.MemoryPoolMXBean;
 import java.lang.management.OperatingSystemMXBean;
 import java.lang.management.RuntimeMXBean;
@@ -68,10 +69,10 @@ public class VMInfo
     private VMInfo()
     {
         //初始化静态信息
-        osMXBean = java.lang.management.ManagementFactory.getOperatingSystemMXBean();
-        runtimeMXBean = java.lang.management.ManagementFactory.getRuntimeMXBean();
-        garbageCollectorMXBeanList = java.lang.management.ManagementFactory.getGarbageCollectorMXBeans();
-        memoryPoolMXBeanList = java.lang.management.ManagementFactory.getMemoryPoolMXBeans();
+        osMXBean = ManagementFactory.getOperatingSystemMXBean();
+        runtimeMXBean = ManagementFactory.getRuntimeMXBean();
+        garbageCollectorMXBeanList = ManagementFactory.getGarbageCollectorMXBeans();
+        memoryPoolMXBeanList = ManagementFactory.getMemoryPoolMXBeans();
 
         jvmInfo = runtimeMXBean.getVmVendor() + " " + runtimeMXBean.getSpecVersion() + " " + runtimeMXBean.getVmVersion();
         osInfo = osMXBean.getName() + " " + osMXBean.getArch() + " " + osMXBean.getVersion();
@@ -135,7 +136,7 @@ public class VMInfo
             return (Long) method.invoke(operatingSystem, (Object[]) null);
         }
         catch (final Exception e) {
-            LOG.info(String.format("OperatingSystemMXBean %s failed, Exception = %s ", methodName, e.getMessage()));
+            LOG.info("OperatingSystemMXBean {} failed, Exception = {} ", methodName, e.getMessage());
         }
 
         return -1;
@@ -143,7 +144,7 @@ public class VMInfo
 
     public String toString()
     {
-        return "the machine info  => \n\n"
+        return "The machine info  => \n\n"
                 + "\tosInfo: \t" + osInfo + "\n"
                 + "\tjvmInfo:\t" + jvmInfo + "\n"
                 + "\tcpu num:\t" + totalProcessorCount + "\n\n"
@@ -208,7 +209,7 @@ public class VMInfo
             }
 
             if (print) {
-                LOG.info(processCpuStatus.getDeltaString() + processMemoryStatus.getDeltaString() + processGCStatus.getDeltaString());
+                LOG.info("{}{}{}", processCpuStatus.getDeltaString(), processMemoryStatus.getDeltaString(), processGCStatus.getDeltaString());
             }
         }
         catch (Exception e) {

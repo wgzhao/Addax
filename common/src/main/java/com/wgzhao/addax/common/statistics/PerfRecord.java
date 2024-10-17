@@ -24,22 +24,23 @@ import org.apache.commons.lang3.time.DateFormatUtils;
 
 import java.util.Date;
 import java.util.Objects;
+import java.util.concurrent.atomic.AtomicLong;
+
+import static com.wgzhao.addax.common.base.Constant.DEFAULT_DATE_FORMAT;
 
 /**
  * Created by liqiang on 15/8/23.
  */
-@SuppressWarnings("NullableProblems")
 public class PerfRecord
         implements Comparable<PerfRecord>
 {
-    private static final String DATETIME_FORMAT = "yyyy-MM-dd HH:mm:ss";
     private final int taskGroupId;
     private final int taskId;
     private final PHASE phase;
-    private volatile Date startTime; //NOSONAR
-    private final long elapsedTimeInNs = -1;
-    private volatile long count = 0;
-    private volatile long size = 0;
+    private volatile Date startTime;
+    private final AtomicLong count = new AtomicLong(0);
+//    private volatile long size = 0;
+    private final AtomicLong size = new AtomicLong(0);
 
     public PerfRecord(int taskGroupId, int taskId, PHASE phase)
     {
@@ -54,12 +55,12 @@ public class PerfRecord
 
     public void addCount(long count)
     {
-        this.count += count;
+        this.count.addAndGet(count);
     }
 
     public void addSize(long size)
     {
-        this.size += size;
+        this.size.addAndGet(size);
     }
 
     public void end()
@@ -73,18 +74,10 @@ public class PerfRecord
     @Override
     public String toString()
     {
+        long elapsedTimeInNs = -1;
         return String.format("%s,%s,%s,%s,%s,%s,%s,%s,%s"
                 , getInstId(), taskGroupId, taskId, phase,
-                DateFormatUtils.format(startTime, DATETIME_FORMAT), elapsedTimeInNs, count, size, getHostIP());
-    }
-
-    @Override
-    public int compareTo(PerfRecord o)
-    {
-        if (o == null) {
-            return 1;
-        }
-        return Long.compare(this.elapsedTimeInNs, o.elapsedTimeInNs);
+                DateFormatUtils.format(startTime, DEFAULT_DATE_FORMAT), elapsedTimeInNs, count, size, getHostIP());
     }
 
     @Override
@@ -142,12 +135,12 @@ public class PerfRecord
 
     public long getCount()
     {
-        return count;
+        return count.get();
     }
 
     public long getSize()
     {
-        return size;
+        return size.get();
     }
 
     public long getInstId()
@@ -160,6 +153,14 @@ public class PerfRecord
         return HostUtils.IP;
     }
 
+    @Override
+    public int compareTo(PerfRecord o)
+    {
+        if (o == null) {
+            return 1;
+        }
+        return 0;
+    }
 
     public enum PHASE
     {
@@ -188,11 +189,6 @@ public class PerfRecord
          * 数据从sql全部读出来
          */
         RESULT_NEXT_ALL(101),
-
-        /**
-         * only odps block close
-         */
-        ODPS_BLOCK_CLOSE(102),
 
         WAIT_READ_TIME(103),
 
