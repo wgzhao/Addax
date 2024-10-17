@@ -19,7 +19,6 @@
 
 package com.wgzhao.addax.plugin.reader.kudureader;
 
-import com.google.common.collect.ImmutableMap;
 import com.wgzhao.addax.common.element.BoolColumn;
 import com.wgzhao.addax.common.element.BytesColumn;
 import com.wgzhao.addax.common.element.DateColumn;
@@ -48,7 +47,6 @@ import java.sql.Date;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -57,6 +55,7 @@ import static com.wgzhao.addax.common.base.Key.WHERE;
 import static com.wgzhao.addax.common.spi.ErrorCode.ILLEGAL_VALUE;
 import static com.wgzhao.addax.common.spi.ErrorCode.NOT_SUPPORT_TYPE;
 import static com.wgzhao.addax.common.spi.ErrorCode.RUNTIME_ERROR;
+import static com.wgzhao.addax.plugin.reader.kudureader.KuduKey.KUDU_OPERATORS;
 
 /**
  * Kudu reader plugin
@@ -78,13 +77,15 @@ public class KuduReader
         // match where clause such as age > 18
         private static final String PATTERN_FOR_WHERE = "^(\\w+)\\s+(=|>|>=|<|<=)\\s+(.*)$";
         private static final Pattern pattern = Pattern.compile(PATTERN_FOR_WHERE);
-        private static final Map<String, KuduPredicate.ComparisonOp> KUDU_OPERATORS = ImmutableMap.of(
-                "=", KuduPredicate.ComparisonOp.EQUAL,
-                ">", KuduPredicate.ComparisonOp.GREATER,
-                ">=", KuduPredicate.ComparisonOp.GREATER_EQUAL,
-                "<", KuduPredicate.ComparisonOp.LESS,
-                "<=", KuduPredicate.ComparisonOp.LESS_EQUAL
-        );
+
+        @Override
+        public void init()
+        {
+            originalConfig = super.getPluginJobConf();
+            splitKey = originalConfig.getString(KuduKey.SPLIT_PK);
+            lowerBound = originalConfig.getString(KuduKey.LOWER_BOUND, "min");
+            upperBound = originalConfig.getString(KuduKey.UPPER_BOUND, "max");
+        }
 
         @Override
         public List<Configuration> split(int adviceNumber)
@@ -161,15 +162,6 @@ public class KuduReader
         }
 
         @Override
-        public void init()
-        {
-            originalConfig = super.getPluginJobConf();
-            splitKey = originalConfig.getString(KuduKey.SPLIT_KEY);
-            lowerBound = originalConfig.getString(KuduKey.LOWER_BOUND);
-            upperBound = originalConfig.getString(KuduKey.UPPER_BOUND);
-        }
-
-        @Override
         public void destroy()
         {
             //
@@ -194,13 +186,7 @@ public class KuduReader
         private List<String> columns;
         private boolean specifyColumn = false;
         List<KuduPredicate> customPredicate;
-        private static final Map<String, KuduPredicate.ComparisonOp> KUDU_OPERATORS = ImmutableMap.of(
-                "=", KuduPredicate.ComparisonOp.EQUAL,
-                ">", KuduPredicate.ComparisonOp.GREATER,
-                ">=", KuduPredicate.ComparisonOp.GREATER_EQUAL,
-                "<", KuduPredicate.ComparisonOp.LESS,
-                "<=", KuduPredicate.ComparisonOp.LESS_EQUAL
-        );
+
 
         List<Configuration> where;
 
@@ -359,7 +345,7 @@ public class KuduReader
         {
             Configuration readerSliceConfig = super.getPluginJobConf();
             String masterAddresses = readerSliceConfig.getString(KuduKey.KUDU_MASTER_ADDRESSES);
-            tableName = readerSliceConfig.getString(KuduKey.KUDU_TABlE_NAME);
+            tableName = readerSliceConfig.getString(KuduKey.TABLE);
             long socketReadTimeoutMs = readerSliceConfig.getLong(KuduKey.SOCKET_READ_TIMEOUT, 10) * 1000L;
             scanRequestTimeout = readerSliceConfig.getLong(KuduKey.SCAN_REQUEST_TIMEOUT, 20L) * 1000L;
             KuduClient.KuduClientBuilder kuduClientBuilder = (new KuduClient.KuduClientBuilder(masterAddresses));
@@ -368,7 +354,7 @@ public class KuduReader
             kuduClient = kuduClientBuilder.build();
             lowerBound = readerSliceConfig.getString(KuduKey.SPLIT_LOWER_BOUND);
             upperBound = readerSliceConfig.getString(KuduKey.SPLIT_UPPER_BOUND);
-            splitKey = readerSliceConfig.getString(KuduKey.SPLIT_KEY);
+            splitKey = readerSliceConfig.getString(KuduKey.SPLIT_PK);
             columns = readerSliceConfig.getList(COLUMN, String.class);
             if (!columns.isEmpty()) {
                 specifyColumn = columns.size() != 1 || (!"*".equals(columns.get(0)) && !"\"*\"".equals(columns.get(0)));

@@ -19,17 +19,20 @@
 
 package com.wgzhao.addax.plugin.reader.kudureader;
 
+import com.google.common.collect.ImmutableMap;
 import com.wgzhao.addax.common.base.Key;
+import org.apache.kudu.client.KuduPredicate;
+
+import java.util.Map;
 
 /**
  * Created by roy on 2019/12/12 1543.
  */
-public final class KuduKey extends Key
+public final class KuduKey
+        extends Key
 {
 
     public static final String KUDU_MASTER_ADDRESSES = "masterAddress";
-
-    public static final String KUDU_TABlE_NAME = "table";
 
     public static final String LOWER_BOUND = "lowerBound";
 
@@ -39,10 +42,15 @@ public final class KuduKey extends Key
 
     public static final String SPLIT_UPPER_BOUND = "splitUpperBound";
 
-    public static final String SPLIT_KEY = "splitPk";
-
     public static final String SOCKET_READ_TIMEOUT = "readTimeout";
 
     public static final String SCAN_REQUEST_TIMEOUT = "scanTimeout";
 
+    public static final Map<String, KuduPredicate.ComparisonOp> KUDU_OPERATORS = ImmutableMap.of(
+            "=", KuduPredicate.ComparisonOp.EQUAL,
+            ">", KuduPredicate.ComparisonOp.GREATER,
+            ">=", KuduPredicate.ComparisonOp.GREATER_EQUAL,
+            "<", KuduPredicate.ComparisonOp.LESS,
+            "<=", KuduPredicate.ComparisonOp.LESS_EQUAL
+    );
 }
