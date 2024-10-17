@@ -32,6 +32,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 import static com.wgzhao.addax.common.spi.ErrorCode.RUNTIME_ERROR;
 
@@ -107,8 +108,7 @@ public abstract class AbstractScheduler
                 if (nowJobContainerCommunication.getState() == State.FAILED) {
                     dealFailedStat(this.containerCommunicator, nowJobContainerCommunication.getThrowable());
                 }
-
-                Thread.sleep(jobSleepIntervalInMillSec);
+                TimeUnit.MILLISECONDS.sleep(jobSleepIntervalInMillSec);
             }
         }
         catch (InterruptedException e) {

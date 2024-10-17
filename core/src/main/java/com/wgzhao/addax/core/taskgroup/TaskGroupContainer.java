@@ -54,6 +54,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.TimeUnit;
 
 import static com.wgzhao.addax.common.spi.ErrorCode.CONFIG_ERROR;
 import static com.wgzhao.addax.common.spi.ErrorCode.RUNTIME_ERROR;
@@ -63,10 +64,10 @@ public class TaskGroupContainer
 {
     private static final Logger LOG = LoggerFactory.getLogger(TaskGroupContainer.class);
 
-     // The current taskGroupId
+    // The current taskGroupId
     private final int taskGroupId;
 
-     // The channel class used 使用的channel类
+    // The channel class used 使用的channel类
     private final String channelClazz;
 
     /**
@@ -100,43 +101,41 @@ public class TaskGroupContainer
     @Override
     public void start()
     {
-        try {
+        // 状态check时间间隔，较短，可以把任务及时分发到对应channel中
+        int sleepIntervalInMillSec = this.configuration.getInt(CoreConstant.CORE_CONTAINER_TASK_GROUP_SLEEP_INTERVAL, 100);
 
-            // 状态check时间间隔，较短，可以把任务及时分发到对应channel中
-            int sleepIntervalInMillSec = this.configuration.getInt(CoreConstant.CORE_CONTAINER_TASK_GROUP_SLEEP_INTERVAL, 100);
+        // 状态汇报时间间隔，稍长，避免大量汇报
+        long reportIntervalInMillSec = this.configuration.getLong(CoreConstant.CORE_CONTAINER_TASK_GROUP_REPORT_INTERVAL, 10000);
 
-            // 状态汇报时间间隔，稍长，避免大量汇报
-            long reportIntervalInMillSec = this.configuration.getLong(CoreConstant.CORE_CONTAINER_TASK_GROUP_REPORT_INTERVAL, 10000);
+        // 获取channel数目
+        int channelNumber = this.configuration.getInt(CoreConstant.CORE_CONTAINER_TASK_GROUP_CHANNEL, 1);
 
-            // 获取channel数目
-            int channelNumber = this.configuration.getInt(CoreConstant.CORE_CONTAINER_TASK_GROUP_CHANNEL, 1);
+        int taskMaxRetryTimes = this.configuration.getInt(CoreConstant.CORE_CONTAINER_TASK_FAIL_OVER_MAX_RETRY_TIMES, 1);
 
-            int taskMaxRetryTimes = this.configuration.getInt(CoreConstant.CORE_CONTAINER_TASK_FAIL_OVER_MAX_RETRY_TIMES, 1);
+        long taskRetryIntervalInMs = this.configuration.getLong(CoreConstant.CORE_CONTAINER_TASK_FAIL_OVER_RETRY_INTERVAL_IN_MSEC, 10000);
 
-            long taskRetryIntervalInMs = this.configuration.getLong(CoreConstant.CORE_CONTAINER_TASK_FAIL_OVER_RETRY_INTERVAL_IN_MSEC, 10000);
+        long taskMaxWaitInMs = this.configuration.getLong(CoreConstant.CORE_CONTAINER_TASK_FAIL_OVER_MAX_WAIT_IN_MSEC, 60000);
 
-            long taskMaxWaitInMs = this.configuration.getLong(CoreConstant.CORE_CONTAINER_TASK_FAIL_OVER_MAX_WAIT_IN_MSEC, 60000);
+        List<Configuration> taskConfigs = this.configuration.getListConfiguration(CoreConstant.JOB_CONTENT);
 
-            List<Configuration> taskConfigs = this.configuration.getListConfiguration(CoreConstant.JOB_CONTENT);
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("The task configuration [{} for taskGroup[{}]", this.taskGroupId, JSON.toJSONString(taskConfigs));
+        }
 
-            if (LOG.isDebugEnabled()) {
-                LOG.debug("The task configuration [{} for taskGroup[{}]", this.taskGroupId, JSON.toJSONString(taskConfigs));
-            }
+        int taskCountInThisTaskGroup = taskConfigs.size();
+        LOG.info("The taskGroupId=[{}] started [{}] channels for [{}] tasks.", this.taskGroupId, channelNumber, taskCountInThisTaskGroup);
 
-            int taskCountInThisTaskGroup = taskConfigs.size();
-            LOG.info("The taskGroupId=[{}] started [{}] channels for [{}] tasks.", this.taskGroupId, channelNumber, taskCountInThisTaskGroup);
+        this.containerCommunicator.registerCommunication(taskConfigs);
+        Map<Integer, Configuration> taskConfigMap = buildTaskConfigMap(taskConfigs); //taskId与task配置
+        List<Configuration> taskQueue = buildRemainTasks(taskConfigs); //待运行task列表
+        Map<Integer, TaskExecutor> taskFailedExecutorMap = new HashMap<>(); //taskId与上次失败实例
+        List<TaskExecutor> runTasks = new ArrayList<>(channelNumber); //正在运行task
+        Map<Integer, Long> taskStartTimeMap = new HashMap<>(); //任务开始时间
 
-            this.containerCommunicator.registerCommunication(taskConfigs);
+        long lastReportTimeStamp = 0;
+        Communication lastTaskGroupContainerCommunication = new Communication();
 
-            Map<Integer, Configuration> taskConfigMap = buildTaskConfigMap(taskConfigs); //taskId与task配置
-            List<Configuration> taskQueue = buildRemainTasks(taskConfigs); //待运行task列表
-            Map<Integer, TaskExecutor> taskFailedExecutorMap = new HashMap<>(); //taskId与上次失败实例
-            List<TaskExecutor> runTasks = new ArrayList<>(channelNumber); //正在运行task
-            Map<Integer, Long> taskStartTimeMap = new HashMap<>(); //任务开始时间
-
-            long lastReportTimeStamp = 0;
-            Communication lastTaskGroupContainerCommunication = new Communication();
-
+//        try {
             while (true) {
                 //1.判断task状态
                 boolean failedOrKilled = false;
@@ -208,7 +207,7 @@ public class TaskGroupContainer
                             if (now - failedTime > taskMaxWaitInMs) {
                                 markCommunicationFailed(taskId);
                                 reportTaskGroupCommunication(lastTaskGroupContainerCommunication, taskCountInThisTaskGroup);
-                                throw AddaxException.asAddaxException(ErrorCode.WAIT_TIME_EXCEED, "The task failover wait timed out.");
+                                throw AddaxException.asAddaxException(ErrorCode.WAIT_TIME_EXCEED, "The task fail over wait timed out.");
                             }
                             else {
                                 lastExecutor.shutdown(); //try to close again
@@ -257,25 +256,35 @@ public class TaskGroupContainer
                         taskMonitor.report(taskExecutor.getTaskId(), this.containerCommunicator.getCommunication(taskExecutor.getTaskId()));
                     }
                 }
+                try {
+                    TimeUnit.MILLISECONDS.sleep(sleepIntervalInMillSec);
+                }
+                catch (InterruptedException e) {
+                    Communication nowTaskGroupContainerCommunication = this.containerCommunicator.collect();
 
-                Thread.sleep(sleepIntervalInMillSec);
+                    if (nowTaskGroupContainerCommunication.getThrowable() == null) {
+                        nowTaskGroupContainerCommunication.setThrowable(e);
+                    }
+                    nowTaskGroupContainerCommunication.setState(State.FAILED);
+                    this.containerCommunicator.report(nowTaskGroupContainerCommunication);
+                    throw AddaxException.asAddaxException(RUNTIME_ERROR, e);
+                }
             }
 
             //6.最后还要汇报一次
             reportTaskGroupCommunication(lastTaskGroupContainerCommunication, taskCountInThisTaskGroup);
-        }
-        catch (Throwable e) {
-            Communication nowTaskGroupContainerCommunication = this.containerCommunicator.collect();
-
-            if (nowTaskGroupContainerCommunication.getThrowable() == null) {
-                nowTaskGroupContainerCommunication.setThrowable(e);
-            }
-            nowTaskGroupContainerCommunication.setState(State.FAILED);
-            this.containerCommunicator.report(nowTaskGroupContainerCommunication);
-
-            throw AddaxException.asAddaxException(
-                    RUNTIME_ERROR, e);
-        }
+//        }
+//        catch (Throwable e) {
+//            Communication nowTaskGroupContainerCommunication = this.containerCommunicator.collect();
+//
+//            if (nowTaskGroupContainerCommunication.getThrowable() == null) {
+//                nowTaskGroupContainerCommunication.setThrowable(e);
+//            }
+//            nowTaskGroupContainerCommunication.setState(State.FAILED);
+//            this.containerCommunicator.report(nowTaskGroupContainerCommunication);
+//
+//            throw AddaxException.asAddaxException(RUNTIME_ERROR, e);
+//        }
     }
 
     private Map<Integer, Configuration> buildTaskConfigMap(List<Configuration> configurations)
@@ -395,7 +404,7 @@ public class TaskGroupContainer
             /*
              * 生成writerThread
              */
-            writerRunner = (WriterRunner) generateRunner(PluginType.WRITER);
+            writerRunner = (WriterRunner) generateRunner(PluginType.WRITER, null);
             this.writerThread = new Thread(writerRunner, String.format("writer-%d-%d", taskGroupId, this.taskId));
             //通过设置thread的contextClassLoader，即可实现同步和主程序不通的加载器
             this.writerThread.setContextClassLoader(LoadUtil.getJarLoader(PluginType.WRITER, this.taskConfig.getString(CoreConstant.JOB_WRITER_NAME)));
@@ -427,11 +436,6 @@ public class TaskGroupContainer
                 // 这里有可能出现Reader线上启动即挂情况 对于这类情况 需要立刻抛出异常
                 throw AddaxException.asAddaxException(RUNTIME_ERROR, this.taskCommunication.getThrowable());
             }
-        }
-
-        private AbstractRunner generateRunner(PluginType pluginType)
-        {
-            return generateRunner(pluginType, null);
         }
 
         private AbstractRunner generateRunner(PluginType pluginType, List<TransformerExecution> transformerInfoExecs)

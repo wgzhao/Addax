@@ -19,7 +19,6 @@
 
 package com.wgzhao.addax.core.container.util;
 
-import com.wgzhao.addax.common.constant.CommonConstant;
 import com.wgzhao.addax.common.util.Configuration;
 import com.wgzhao.addax.core.util.container.CoreConstant;
 import org.apache.commons.lang3.Validate;
@@ -31,6 +30,13 @@ import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+
+import static com.wgzhao.addax.common.base.Constant.LOAD_BALANCE_RESOURCE_MARK;
+import static com.wgzhao.addax.core.util.container.CoreConstant.CORE_CONTAINER_TASK_GROUP_CHANNEL;
+import static com.wgzhao.addax.core.util.container.CoreConstant.CORE_CONTAINER_TASK_GROUP_ID;
+import static com.wgzhao.addax.core.util.container.CoreConstant.JOB_CONTENT;
+import static com.wgzhao.addax.core.util.container.CoreConstant.JOB_READER_PARAMETER;
+import static com.wgzhao.addax.core.util.container.CoreConstant.JOB_WRITER_PARAMETER;
 
 public final class JobAssignUtil
 {
@@ -51,7 +57,7 @@ public final class JobAssignUtil
     {
         Validate.isTrue(configuration != null, "The `job.content` can not be null.");
 
-        List<Configuration> contentConfig = configuration.getListConfiguration(CoreConstant.JOB_CONTENT);
+        List<Configuration> contentConfig = configuration.getListConfiguration(JOB_CONTENT);
         Validate.isTrue(!contentConfig.isEmpty(), "The `job.content` is empty");
 
         Validate.isTrue(channelNumber > 0 && channelsPerTaskGroup > 0,
@@ -62,10 +68,10 @@ public final class JobAssignUtil
 
         Configuration aTaskConfig = contentConfig.get(0);
 
-        String readerResourceMark = aTaskConfig.getString(CoreConstant.JOB_READER_PARAMETER + "." +
-                CommonConstant.LOAD_BALANCE_RESOURCE_MARK);
-        String writerResourceMark = aTaskConfig.getString(CoreConstant.JOB_WRITER_PARAMETER + "." +
-                CommonConstant.LOAD_BALANCE_RESOURCE_MARK);
+        String readerResourceMark = aTaskConfig.getString(JOB_READER_PARAMETER + "." +
+                LOAD_BALANCE_RESOURCE_MARK);
+        String writerResourceMark = aTaskConfig.getString(JOB_WRITER_PARAMETER + "." +
+                LOAD_BALANCE_RESOURCE_MARK);
 
         boolean hasLoadBalanceResourceMark = StringUtils.isNotBlank(readerResourceMark) ||
                 StringUtils.isNotBlank(writerResourceMark);
@@ -73,8 +79,8 @@ public final class JobAssignUtil
         if (!hasLoadBalanceResourceMark) {
             // fake 一个固定的 key 作为资源标识（在 reader 或者 writer 上均可，此处选择在 reader 上进行 fake）
             for (Configuration conf : contentConfig) {
-                conf.set(CoreConstant.JOB_READER_PARAMETER + "." +
-                        CommonConstant.LOAD_BALANCE_RESOURCE_MARK, "aFakeResourceMarkForLoadBalance");
+                conf.set(JOB_READER_PARAMETER + "." +
+                        LOAD_BALANCE_RESOURCE_MARK, "aFakeResourceMarkForLoadBalance");
             }
             // 是为了避免某些插件没有设置 资源标识 而进行了一次随机打乱操作
             Collections.shuffle(contentConfig, new SecureRandom());
@@ -98,11 +104,11 @@ public final class JobAssignUtil
 
         int i = 0;
         for (; i < remainderChannelCount; i++) {
-            taskGroupConfig.get(i).set(CoreConstant.CORE_CONTAINER_TASK_GROUP_CHANNEL, avgChannelsPerTaskGroup + 1);
+            taskGroupConfig.get(i).set(CORE_CONTAINER_TASK_GROUP_CHANNEL, avgChannelsPerTaskGroup + 1);
         }
 
         for (int j = 0; j < taskGroupNumber - remainderChannelCount; j++) {
-            taskGroupConfig.get(i + j).set(CoreConstant.CORE_CONTAINER_TASK_GROUP_CHANNEL, avgChannelsPerTaskGroup);
+            taskGroupConfig.get(i + j).set(CORE_CONTAINER_TASK_GROUP_CHANNEL, avgChannelsPerTaskGroup);
         }
     }
 
@@ -122,12 +128,12 @@ public final class JobAssignUtil
         for (Configuration aTaskConfig : contentConfig) {
             int taskId = aTaskConfig.getInt(CoreConstant.TASK_ID);
             // 把 readerResourceMark 加到 readerResourceMarkAndTaskIdMap 中
-            String readerResourceMark = aTaskConfig.getString(CoreConstant.JOB_READER_PARAMETER + "." + CommonConstant.LOAD_BALANCE_RESOURCE_MARK);
+            String readerResourceMark = aTaskConfig.getString(JOB_READER_PARAMETER + "." + LOAD_BALANCE_RESOURCE_MARK);
             readerResourceMarkAndTaskIdMap.computeIfAbsent(readerResourceMark, k -> new ArrayList<>());
             readerResourceMarkAndTaskIdMap.get(readerResourceMark).add(taskId);
 
             // 把 writerResourceMark 加到 writerResourceMarkAndTaskIdMap 中
-            String writerResourceMark = aTaskConfig.getString(CoreConstant.JOB_WRITER_PARAMETER + "." + CommonConstant.LOAD_BALANCE_RESOURCE_MARK);
+            String writerResourceMark = aTaskConfig.getString(JOB_WRITER_PARAMETER + "." + LOAD_BALANCE_RESOURCE_MARK);
             writerResourceMarkAndTaskIdMap.computeIfAbsent(writerResourceMark, k -> new ArrayList<>());
             writerResourceMarkAndTaskIdMap.get(writerResourceMark).add(taskId);
         }
@@ -165,10 +171,10 @@ public final class JobAssignUtil
      */
     private static List<Configuration> doAssign(LinkedHashMap<String, List<Integer>> resourceMarkAndTaskIdMap, Configuration jobConfiguration, int taskGroupNumber)
     {
-        List<Configuration> contentConfig = jobConfiguration.getListConfiguration(CoreConstant.JOB_CONTENT);
+        List<Configuration> contentConfig = jobConfiguration.getListConfiguration(JOB_CONTENT);
 
         Configuration taskGroupTemplate = jobConfiguration.clone();
-        taskGroupTemplate.remove(CoreConstant.JOB_CONTENT);
+        taskGroupTemplate.remove(JOB_CONTENT);
 
         List<Configuration> result = new ArrayList<>();
 
@@ -202,8 +208,8 @@ public final class JobAssignUtil
         Configuration tempTaskGroupConfig;
         for (int i = 0; i < taskGroupNumber; i++) {
             tempTaskGroupConfig = taskGroupTemplate.clone();
-            tempTaskGroupConfig.set(CoreConstant.JOB_CONTENT, taskGroupConfigList.get(i));
-            tempTaskGroupConfig.set(CoreConstant.CORE_CONTAINER_TASK_GROUP_ID, i);
+            tempTaskGroupConfig.set(JOB_CONTENT, taskGroupConfigList.get(i));
+            tempTaskGroupConfig.set(CORE_CONTAINER_TASK_GROUP_ID, i);
 
             result.add(tempTaskGroupConfig);
         }

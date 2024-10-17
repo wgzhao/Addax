@@ -66,6 +66,7 @@ public class VMInfo
     private long lastUpTime = 0;
     //nano
     private long lastProcessCpuTime = 0;
+
     private VMInfo()
     {
         //初始化静态信息
@@ -111,6 +112,7 @@ public class VMInfo
 
     /**
      * static method, get vm information and returns
+     *
      * @return null or vmInfo. null is something error, job no care it.
      */
     public static synchronized VMInfo getVmInfo()
@@ -246,19 +248,19 @@ public class VMInfo
         public String getDeltaString()
         {
             StringBuilder sb = new StringBuilder();
-            sb.append("\n\t [delta gc info] => \n");
-            sb.append("\t\t ");
-            sb.append(String.format("%-20s | %-18s | %-18s | %-18s | %-18s | %-18s | %-18s | " +
-                    "%-18s | %-18s \n", "NAME", "curDeltaGCCount", "totalGCCount", "maxDeltaGCCount", "minDeltaGCCount", "curDeltaGCTime", "totalGCTime", "maxDeltaGCTime", "minDeltaGCTime"));
+            sb.append("\n [delta gc info] => \n");
+            sb.append("\t");
+            sb.append(String.format("%-16s | %-15s | %-12s | %-15s | %-15s | %-14s | %-14s | %-11s | %-14s %n",
+                    "NAME", "curDeltaGCCount", "totalGCCount", "maxDeltaGCCount", "minDeltaGCCount", "curDeltaGCTime",
+                    "totalGCTime", "maxDeltaGCTime", "minDeltaGCTime"));
             for (GCStatus gc : gcStatusMap.values()) {
-                sb.append("\t\t ");
-                sb.append(String.format("%-20s | %-18s | %-18s | %-18s | %-18s | %-18s | %-18s | " +
-                                "%-18s | %-18s %n",
+                sb.append("\t");
+                sb.append(String.format("%-16s | %-15s | %-12s | %-15s | %-15s | %,-14.3f | %,-14.3f | %,-11.3f | %,-14.3f %n",
                         gc.name, gc.curDeltaGCCount, gc.totalGCCount, gc.maxDeltaGCCount, gc.minDeltaGCCount,
-                        String.format("%,.3fs", (float) gc.curDeltaGCTime / 1000),
-                        String.format("%,.3fs", (float) gc.totalGCTime / 1000),
-                        String.format("%,.3fs", (float) gc.maxDeltaGCTime / 1000),
-                        String.format("%,.3fs", (float) gc.minDeltaGCTime / 1000)));
+                        (float) gc.curDeltaGCTime / 1000,
+                        (float) gc.totalGCTime / 1000,
+                        (float) gc.maxDeltaGCTime / 1000,
+                        (float) gc.minDeltaGCTime / 1000));
             }
             return sb.toString();
         }
@@ -266,13 +268,13 @@ public class VMInfo
         public String getTotalString()
         {
             StringBuilder sb = new StringBuilder();
-            sb.append("\n\t [total gc info] => \n");
-            sb.append("\t\t ");
-            sb.append(String.format("%-20s | %-18s | %-18s | %-18s | %-18s | %-18s | %-18s %n",
+            sb.append("\n [total gc info] => \n");
+            sb.append("\t");
+            sb.append(String.format("%-16s | %-12s | %-15s | %-15s | %-11s | %-14s | %-14s %n",
                     "NAME", "totalGCCount", "maxDeltaGCCount", "minDeltaGCCount", "totalGCTime", "maxDeltaGCTime", "minDeltaGCTime"));
             for (GCStatus gc : gcStatusMap.values()) {
-                sb.append("\t\t ");
-                sb.append(String.format("%-20s | %-18s | %-18s | %-18s | %-18s | %-18s | %-18s %n",
+                sb.append("\t");
+                sb.append(String.format("%-16s | %-12s | %-15s | %-15s | %-11s | %-14s | %-14s %n",
                         gc.name, gc.totalGCCount, gc.maxDeltaGCCount, gc.minDeltaGCCount,
                         String.format("%,.3fs", (float) gc.totalGCTime / 1000),
                         String.format("%,.3fs", (float) gc.maxDeltaGCTime / 1000),
@@ -290,11 +292,10 @@ public class VMInfo
         {
             StringBuilder sb = new StringBuilder();
             sb.append("\t");
-            sb.append(String.format("%-30s | %-30s | %-30s %n", "MEMORY_NAME", "allocation_size", "init_size"));
+            sb.append(String.format("%-30s | %-14s | %-8s %n", "MEMORY_NAME", "allocation(MB)", "init(MB)"));
             for (MemoryStatus ms : memoryStatusMap.values()) {
                 sb.append("\t");
-                sb.append(String.format("%-30s | %-30s | %-30s %n",
-                        ms.name, String.format("%,.2fMB", (float) ms.maxSize / MB), String.format("%,.2fMB", (float) ms.initSize / MB)));
+                sb.append(String.format("%-30s | %,-14.2f | %,-8.2f %n", ms.name, (float) ms.maxSize / MB, (float) ms.initSize / MB));
             }
             return sb.toString();
         }
@@ -302,17 +303,14 @@ public class VMInfo
         public String getDeltaString()
         {
             StringBuilder sb = new StringBuilder();
-            sb.append("\n\t [delta memory info] => \n");
-            sb.append("\t\t ");
-            sb.append(String.format("%-30s | %-30s | %-30s | %-30s | %-30s %n", "NAME",
-                    "used_size", "used_percent", "max_used_size", "max_percent"));
+            sb.append("\n [delta memory info] => \n");
+            sb.append("\t");
+            sb.append(String.format("%-22s | %-10s | %-12s | %-13s | %-12s %n",
+                    "NAME", "used(MB)", "used_pct(%)", "max_used(MB)", "max_pct(%)"));
             for (MemoryStatus ms : memoryStatusMap.values()) {
-                sb.append("\t\t ");
-                sb.append(String.format("%-30s | %-30s | %-30s | %-30s | %-30s %n",
-                        ms.name, String.format("%,.2f", (float) ms.usedSize / MB) + "MB",
-                        String.format("%,.2f", ms.percent) + "%",
-                        String.format("%,.2f", (float) ms.maxUsedSize / MB) + "MB",
-                        String.format("%,.2f", ms.maxPercent) + "%"));
+                sb.append("\t");
+                sb.append(String.format("%-22s | %,-10.2f | %,-12.2f | %,-13.2f | %,-12.2f %n",
+                        ms.name, (float) ms.usedSize / MB, ms.percent, (float) ms.maxUsedSize / MB, ms.maxPercent));
             }
             return sb.toString();
         }
@@ -410,11 +408,11 @@ public class VMInfo
         public String getDeltaString()
         {
 
-            return "\n\t [delta cpu info] => \n" +
-                    "\t\t" +
-                    String.format("%-30s | %-30s | %-30s | %-30s %n", "curDeltaCpu", "averageCpu", "maxDeltaCpu", "minDeltaCpu") +
-                    "\t\t" +
-                    String.format("%-30s | %-30s | %-30s | %-30s %n",
+            return "\n [delta cpu info] => \n" +
+                    "\t" +
+                    String.format("%-11s | %-10s | %-11s | %-11s %n", "curDeltaCPU", "averageCPU", "maxDeltaCPU", "minDeltaCPU") +
+                    "\t" +
+                    String.format("%-11s | %-10s | %-11s | %-11s %n",
                             String.format("%,.2f%%", processCpuStatus.curDeltaCpu),
                             String.format("%,.2f%%", processCpuStatus.averageCpu),
                             String.format("%,.2f%%", processCpuStatus.maxDeltaCpu),
@@ -424,11 +422,11 @@ public class VMInfo
         public String getTotalString()
         {
 
-            return "\n\t [total cpu info] => \n" +
-                    "\t\t" +
-                    String.format("%-30s | %-30s | %-30s %n", "averageCpu", "maxDeltaCpu", "minDeltaCpu") +
-                    "\t\t" +
-                    String.format("%-30s | %-30s | %-30s %n",
+            return "\n [total cpu info] => \n" +
+                    "\t" +
+                    String.format("%-10s | %-11s | %-11s %n", "averageCPU", "maxDeltaCPU", "minDeltaCPU") +
+                    "\t" +
+                    String.format("%-10s | %-11s | %-11s %n",
                             String.format("%,.2f%%", processCpuStatus.averageCpu),
                             String.format("%,.2f%%", processCpuStatus.maxDeltaCpu),
                             String.format("%,.2f%%%n", processCpuStatus.minDeltaCpu));
