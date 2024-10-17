@@ -24,13 +24,14 @@ package com.wgzhao.addax.rdbms.reader.util;
 import com.wgzhao.addax.common.base.Constant;
 import com.wgzhao.addax.common.base.Key;
 import com.wgzhao.addax.rdbms.util.DataBaseType;
-import com.wgzhao.addax.common.constant.CommonConstant;
 import com.wgzhao.addax.common.util.Configuration;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.Validate;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import static com.wgzhao.addax.common.base.Constant.LOAD_BALANCE_RESOURCE_MARK;
 
 public final class ReaderSplitUtil
 {
@@ -49,7 +50,7 @@ public final class ReaderSplitUtil
                 // adviceNumber这里是channel数量大小, 即addax并发task数量
                 // eachTableShouldSplitNumber是单表应该切分的份数, 向上取整可能和adviceNumber没有比例关系了已经
                 eachTableShouldSplitNumber = calculateEachTableShouldSplitNumber(
-                        adviceNumber, originalSliceConfig.getInt(Constant.TABLE_NUMBER_MARK));
+                        adviceNumber, originalSliceConfig.getInt(Key.TABLE_NUMBER));
             }
             else {
                 eachTableShouldSplitNumber = originalSliceConfig.getInt(Key.EACH_TABLE_SPLIT_SIZE, -1);
@@ -69,7 +70,7 @@ public final class ReaderSplitUtil
         sliceConfig.set(Key.JDBC_URL, jdbcUrl);
 
         // 抽取 jdbcUrl 中的 ip/port 进行资源使用的打标，以提供给 core 做有意义的 shuffle 操作
-        sliceConfig.set(CommonConstant.LOAD_BALANCE_RESOURCE_MARK, DataBaseType.parseIpFromJdbcUrl(jdbcUrl));
+        sliceConfig.set(LOAD_BALANCE_RESOURCE_MARK, DataBaseType.parseIpFromJdbcUrl(jdbcUrl));
 
         sliceConfig.remove(Key.CONNECTION);
         int tableSplitNumber = eachTableShouldSplitNumber;

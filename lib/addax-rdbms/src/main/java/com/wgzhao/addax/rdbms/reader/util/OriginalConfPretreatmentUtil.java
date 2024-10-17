@@ -157,7 +157,7 @@ public final class OriginalConfPretreatmentUtil
             originalConfig.set(String.format("%s.%s", Key.CONNECTION, Key.TABLE), expandedTables);
         }
 
-        originalConfig.set(Constant.TABLE_NUMBER_MARK, tableNum);
+        originalConfig.set(Key.TABLE_NUMBER, tableNum);
     }
 
     private static void dealColumnConf(Configuration originalConfig)

@@ -53,7 +53,7 @@ public final class WriterUtil
 
         List<Configuration> splitResultConfigs = new ArrayList<>();
 
-        int tableNumber = simplifiedConf.getInt(Constant.TABLE_NUMBER_MARK);
+        int tableNumber = simplifiedConf.getInt(Key.TABLE_NUMBER);
 
         //处理单表的情况
         if (tableNumber == 1) {

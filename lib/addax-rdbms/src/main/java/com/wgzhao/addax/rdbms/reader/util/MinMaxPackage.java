@@ -17,17 +17,23 @@
 
 package com.wgzhao.addax.rdbms.reader.util;
 
-import com.wgzhao.addax.common.base.Constant;
-
 import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 
 public class MinMaxPackage
 {
+    public enum PkType
+    {
+        LONG,
+        STRING,
+        MONTE_CARLO,
+        FLOAT
+    }
+
     private Object min;
     private Object max;
-    private Object type;
+    private PkType type;
 
     public MinMaxPackage()
     {
@@ -61,31 +67,33 @@ public class MinMaxPackage
         return type;
     }
 
-    public void setType(Object type)
+    public void setType(PkType type)
     {
         this.type = type;
     }
 
     public boolean isLong()
     {
-        return type == Constant.PK_TYPE_LONG;
+        return type == PkType.LONG;
     }
 
     public boolean isFloat()
     {
-        return type == Constant.PK_TYPE_FLOAT;
+        return type == PkType.FLOAT;
     }
 
-    public boolean isNumeric() {
+    public boolean isNumeric()
+    {
         return isLong() || isFloat();
     }
 
     public boolean isString()
     {
-        return type == Constant.PK_TYPE_STRING;
+        return type == PkType.STRING;
     }
 
-    public List<Object> genSplitPoint(int splitNum) {
+    public List<Object> genSplitPoint(int splitNum)
+    {
         if (splitNum < 2) {
             return Collections.emptyList();
         }
@@ -106,7 +114,8 @@ public class MinMaxPackage
         return result;
     }
 
-    public List<Object> genFloatSplitPoint(int splitNum) {
+    public List<Object> genFloatSplitPoint(int splitNum)
+    {
         if (splitNum < 2) {
             return Collections.emptyList();
         }
@@ -125,7 +134,8 @@ public class MinMaxPackage
         return result;
     }
 
-    public boolean isSameValue() {
+    public boolean isSameValue()
+    {
         return Objects.equals(min, max);
     }
 }

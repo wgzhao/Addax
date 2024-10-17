@@ -149,13 +149,13 @@ public class SingleTableSplitUtil
             rs = DBUtil.query(conn, pkRangeSQL, 1);
             ResultSetMetaData rsMetaData = rs.getMetaData();
             if (isLongType(rsMetaData.getColumnType(1))) {
-                minMaxPackage.setType(Constant.PK_TYPE_LONG);
+                minMaxPackage.setType(MinMaxPackage.PkType.LONG);
             }
             else if (isFloatType(rsMetaData.getColumnType(1))) {
-                minMaxPackage.setType(Constant.PK_TYPE_FLOAT);
+                minMaxPackage.setType(MinMaxPackage.PkType.FLOAT);
             }
             else {
-                minMaxPackage.setType(Constant.PK_TYPE_STRING);
+                minMaxPackage.setType(MinMaxPackage.PkType.STRING);
             }
             while (DBUtil.asyncResultSetNext(rs)) {
                 minMaxPackage.setMin(rs.getObject(1));
@@ -266,7 +266,7 @@ public class SingleTableSplitUtil
         if (StringUtils.isBlank(whereSql)) {
             whereSql = " WHERE 1=1 ";
         }
-        if (minMaxPack.getType() == Constant.PK_TYPE_STRING) {
+        if (minMaxPack.getType() == MinMaxPackage.PkType.STRING) {
             whereSql = whereSql + " AND " + splitPK + " > '" + minMaxPack.getMin().toString() + "' AND " + splitPK + "< '" + minMaxPack.getMax().toString() + "'";
         }
         else {
@@ -314,7 +314,7 @@ public class SingleTableSplitUtil
         String middleSqlTemplate;
         String lastSqlTemplate;
 
-        boolean isString = minMaxPackage.getType() == Constant.PK_TYPE_STRING;
+        boolean isString = minMaxPackage.getType() == MinMaxPackage.PkType.STRING;
         if (isString) {
             singleSqlTemplate = "%s >= '%s' AND %s <= '%s'";
             middleSqlTemplate = "%s >= '%s' AND %s < '%s'";

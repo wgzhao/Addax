@@ -119,7 +119,7 @@ public final class OriginalConfPretreatmentUtil
 
         originalConfig.set(String.format("%s.%s", Key.CONNECTION, Key.TABLE), expandedTables);
 
-        originalConfig.set(Constant.TABLE_NUMBER_MARK, expandedTables.size());
+        originalConfig.set(Key.TABLE_NUMBER, expandedTables.size());
     }
 
     public static void dealColumnConf(Configuration originalConfig, ConnectionFactory connectionFactory, String oneTable)

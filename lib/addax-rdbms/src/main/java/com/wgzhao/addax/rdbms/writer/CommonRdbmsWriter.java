@@ -129,7 +129,7 @@ public class CommonRdbmsWriter
         // 一般来说，是需要推迟到 task 中进行pre 的执行（单表情况例外）
         public void prepare(Configuration originalConfig)
         {
-            int tableNumber = originalConfig.getInt(Constant.TABLE_NUMBER_MARK);
+            int tableNumber = originalConfig.getInt(Key.TABLE_NUMBER);
             if (tableNumber == 1) {
                 String username = originalConfig.getString(Key.USERNAME);
                 String password = originalConfig.getString(Key.PASSWORD);
@@ -170,7 +170,7 @@ public class CommonRdbmsWriter
         // 一般来说，是需要推迟到 task 中进行post 的执行（单表情况例外）
         public void post(Configuration originalConfig)
         {
-            int tableNumber = originalConfig.getInt(Constant.TABLE_NUMBER_MARK);
+            int tableNumber = originalConfig.getInt(Key.TABLE_NUMBER);
             if (tableNumber == 1) {
                 String username = originalConfig.getString(Key.USERNAME);
                 String password = originalConfig.getString(Key.PASSWORD);
@@ -262,7 +262,7 @@ public class CommonRdbmsWriter
             DBUtil.dealWithSessionConfig(connection, writerSliceConfig, this.dataBaseType, basicMessage);
 
             int tableNumber = writerSliceConfig.getInt(
-                    Constant.TABLE_NUMBER_MARK);
+                    Key.TABLE_NUMBER);
             if (tableNumber != 1) {
                 LOG.info("Begin to execute preSqls:[{}]. context info:{}.", StringUtils.join(this.preSqls, ";"), basicMessage);
                 WriterUtil.executeSqls(connection, preSqls);
@@ -357,7 +357,7 @@ public class CommonRdbmsWriter
 
         public void post(Configuration writerSliceConfig)
         {
-            int tableNumber = writerSliceConfig.getInt(Constant.TABLE_NUMBER_MARK);
+            int tableNumber = writerSliceConfig.getInt(Key.TABLE_NUMBER);
 
             boolean hasPostSql = (postSqls != null && !postSqls.isEmpty());
             if (tableNumber == 1 || !hasPostSql) {
