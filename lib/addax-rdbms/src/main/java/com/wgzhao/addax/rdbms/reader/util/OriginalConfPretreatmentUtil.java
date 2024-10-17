@@ -75,7 +75,7 @@ public final class OriginalConfPretreatmentUtil
         String where = originalConfig.getString(Key.WHERE, null);
         if (StringUtils.isNotBlank(where)) {
             String whereImprove = where.trim();
-            if (whereImprove.endsWith(";") || whereImprove.endsWith("；")) {
+            if (whereImprove.endsWith(";")) {
                 whereImprove = whereImprove.substring(0, whereImprove.length() - 1);
             }
             originalConfig.set(Key.WHERE, whereImprove);

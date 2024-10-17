@@ -267,10 +267,10 @@ public class SingleTableSplitUtil
             whereSql = " WHERE 1=1 ";
         }
         if (minMaxPack.getType() == MinMaxPackage.PkType.STRING) {
-            whereSql = whereSql + " AND " + splitPK + " > '" + minMaxPack.getMin().toString() + "' AND " + splitPK + "< '" + minMaxPack.getMax().toString() + "'";
+            whereSql = "WHERE (" + whereSql + ") AND " + splitPK + " > '" + minMaxPack.getMin().toString() + "' AND " + splitPK + "< '" + minMaxPack.getMax().toString() + "'";
         }
         else {
-            whereSql = whereSql + " AND " + splitPK + " > " + minMaxPack.getMin() + " AND " + splitPK + "<" + minMaxPack.getMax();
+            whereSql = "WHERE (" + whereSql + ") AND " + splitPK + " > " + minMaxPack.getMin() + " AND " + splitPK + "<" + minMaxPack.getMax();
         }
 
         if (dataBaseType == DataBaseType.Oracle) {
