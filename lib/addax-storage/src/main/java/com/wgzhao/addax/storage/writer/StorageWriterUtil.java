@@ -156,13 +156,18 @@ public class StorageWriterUtil
         Set<String> allFileExists = new HashSet<>(originAllFileExists);
 
         String filePrefix = writerSliceConfig.getString(Key.FILE_NAME);
-
+        String suffix="";
+        if (filePrefix.contains(".")) {
+            String[] split = filePrefix.split("\\.");
+            filePrefix = split[0];
+            suffix = "." + split[1];
+        }
         for (int i = 0; i < mandatoryNumber; i++) {
             // handle same file name
             Configuration splitTaskConfig = writerSliceConfig.clone();
             String fullFileName;
             do {
-                fullFileName = String.format("%s__%s", filePrefix, FileHelper.generateFileMiddleName());
+                fullFileName = String.format("%s_%s%s", filePrefix, FileHelper.generateFileMiddleName(), suffix);
             }
             while (allFileExists.contains(fullFileName));
             allFileExists.add(fullFileName);

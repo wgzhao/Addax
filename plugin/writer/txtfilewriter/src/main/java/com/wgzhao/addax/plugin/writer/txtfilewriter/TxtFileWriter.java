@@ -38,7 +38,6 @@ import java.io.FilenameFilter;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.nio.file.Files;
-import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
@@ -228,9 +227,10 @@ public class TxtFileWriter
         public void prepare()
         {
             String compress = this.writerSliceConfig.getString(COMPRESS);
+            if (!fileName.contains(".")) {
+                this.fileName = this.fileName + "." + this.fileFormat;
+            }
             suffix = FileHelper.getCompressFileSuffix(compress);
-
-            this.fileName = this.fileName + "." + this.fileFormat;
         }
 
         @Override
