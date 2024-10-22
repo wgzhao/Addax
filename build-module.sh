@@ -2,6 +2,8 @@
 # compile specify module and copy to specify directory
 version=$(head -n10 pom.xml | awk -F'[<>]' '/<version>/ {print $3; exit}')
 mvn_opts="-Dmaven.test.skip=true -Dmaven.javadoc.skip=true -Dmaven.source.skip=true --quiet"
+# if build for remote host, then skip all path exists check
+SKIP_CHECK=0
 function build_base() {
     cd $SRC_DIR
     mvn package -B $mvn_opts -pl :addax-core,:addax-rdbms,:addax-storage,:addax-transformer -am || exit 1
@@ -23,11 +25,12 @@ if [ -z $1 ]; then
 fi
 
 
-
 if [ -n "${REMOTE_HOST}" ]; then
     echo "The building module will upload to ${REMOTE_HOST}"
     ADDAX_HOME=${REMOTE_HOST}:${ADDAX_HOME}
-else
+    SKIP_CHECK=1
+fi
+if [ $SKIP_CHECK -eq 0 ]; then
     [ -d $ADDAX_HOME ] || mkdir -p $ADDAX_HOME || exit 1
     [ -d $ADDAX_HOME/bin ] || build_base
 fi
@@ -61,7 +64,14 @@ else
     echo "module name must end with reader or writer"
     exit 1
 fi
-[ -d $ADDAX_HOME/$MODULE_DIR ] || mkdir -p $ADDAX_HOME/$MODULE_DIR || exit 1
+if [ $SKIP_CHECK -eq 0 ]; then
+    [ -d $ADDAX_HOME/$MODULE_DIR ] || mkdir -p $ADDAX_HOME/$MODULE_DIR || exit 1
+fi
 
-rsync -avz  $MODULE_DIR/$MODULE_NAME/target/${MODULE_NAME}-${version}/$MODULE_DIR/${MODULE_NAME} \
+if [ -n "$2" -a "$2" = "s" ]; then
+    rsync -avz  $MODULE_DIR/$MODULE_NAME/target/${MODULE_NAME}-${version}/$MODULE_DIR/${MODULE_NAME}/${MODULE_NAME}-${version}.jar \
+           	$ADDAX_HOME/$MODULE_DIR/${MODULE_NAME}
+else
+    rsync -avz  $MODULE_DIR/$MODULE_NAME/target/${MODULE_NAME}-${version}/$MODULE_DIR/${MODULE_NAME} \
        	$ADDAX_HOME/$MODULE_DIR/
+fi
