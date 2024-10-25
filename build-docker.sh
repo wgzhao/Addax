@@ -41,7 +41,7 @@ compress_plugins
 cat > /tmp/Dockerfile <<EOF
 FROM openjdk:8-jre-alpine
 LABEL maintainer="wgzhao <wgzhao@gmail.com>"
-LABEL version="4.1.8"
+LABEL version="$version"
 LABEL description="Addax is a versatile open-source ETL tool that can seamlessly transfer data between various RDBMS and NoSQL databases, making it an ideal solution for data migration."
 COPY addax-${version} /opt/addax
 WORKDIR /opt/addax
@@ -49,8 +49,8 @@ RUN chmod +x bin/*.sh
 EOF
 
 # build it
-docker build -t wgzhao/addax:${version}-lite -f /tmp/Dockerfile target/addax
-
+docker build -t quay.io/wgzhao/addax:${version}-lite -f /tmp/Dockerfile target/addax
+docker tag quay.io/wgzhao/addax:${version}-lite quay.io/wgzhao/addax:latest-lite
 # then compile default images
 mvn clean package -Dmaven.test.skip=true -Pdefault
 mvn package assembly:single -Pdefault
@@ -60,7 +60,7 @@ compress_plugins
 cat > /tmp/Dockerfile <<EOF
 FROM openjdk:8-jre-alpine
 LABEL maintainer="wgzhao <wgzhao@gmail.com>"
-LABEL version="4.1.8"
+LABEL version="${version}"
 LABEL description="Addax is a versatile open-source ETL tool that can seamlessly transfer data between various RDBMS and NoSQL databases, making it an ideal solution for data migration."
 COPY addax-${version} /opt/addax
 WORKDIR /opt/addax
@@ -68,4 +68,5 @@ RUN chmod +x bin/*.sh
 EOF
 
 # build it
-docker build -t wgzhao/addax:${version} -f /tmp/Dockerfile target/addax
+docker build -t quay.io/wgzhao/addax:${version} -f /tmp/Dockerfile target/addax
+docker tag quay.io/wgzhao/addax:${version} quay.io/wgzhao/addax:latest
