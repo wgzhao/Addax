@@ -3,7 +3,7 @@
     <parent>
         <groupId>com.wgzhao.addax</groupId>
         <artifactId>addax-all</artifactId>
-        <version>4.2.2-SNAPSHOT</version>
+        <version>4.2.1-SNAPSHOT</version>
         <relativePath>../../pom.xml</relativePath>
     </parent>
 
