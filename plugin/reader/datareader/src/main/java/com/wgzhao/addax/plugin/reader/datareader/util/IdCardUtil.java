@@ -343,7 +343,6 @@ public class IdCardUtil
 
     /**
      * ID Card checksum
-     * visit <a href="https://zh.wikipedia.org/wiki/校验码">校验码</a> for detail
      *
      * @param s id card without checksum
      * @return checksum
