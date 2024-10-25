@@ -47,14 +47,12 @@
           "preSql": [
             "delete from test"
           ],
-          "connection": [
-            {
-              "jdbcUrl": "jdbc:oracle:thin:@[HOST_NAME]:PORT:[DATABASE_NAME]",
-              "table": [
-                "test"
-              ]
-            }
-          ]
+          "connection": {
+            "jdbcUrl": "jdbc:oracle:thin:@[HOST_NAME]:PORT:[DATABASE_NAME]",
+            "table": [
+              "test"
+            ]
+          }
         }
       }
     }

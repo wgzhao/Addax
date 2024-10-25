@@ -7,14 +7,12 @@
           "column": [
             "*"
           ],
-          "connection": [
-            {
-              "endpoint": "http://localhost:8086",
-              "database": "NOAA_water_database",
-              "table": "h2o_feet",
-              "where": "1=1"
-            }
-          ],
+          "where": "1=1",
+          "connection": {
+            "endpoint": "http://localhost:8086",
+            "database": "NOAA_water_database",
+            "table": "h2o_feet"
+          },
           "connTimeout": 15,
           "readTimeout": 20,
           "writeTimeout": 20,

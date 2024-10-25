@@ -12,19 +12,18 @@
           "preSql": [
             "truncate table @table"
           ],
-          "postSql": [
-          ],
-          "connection": [
-            {
-              "jdbcUrl": "jdbc:databend://localhost:8000/addax",
-              "table": [
-                "table1"
-              ]
-            }
-          ],
+          "postSql": [],
+          "connection": {
+            "jdbcUrl": "jdbc:databend://localhost:8000/addax",
+            "table": [
+              "table1"
+            ]
+          },
           "username": "u1",
           "password": "123",
-          "column": ["*"]
+          "column": [
+            "*"
+          ]
         }
       },
       "reader": {

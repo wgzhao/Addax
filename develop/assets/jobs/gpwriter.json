@@ -15,16 +15,12 @@
           "column": [
             "*"
           ],
-          "connection": [
-            {
-              "table": [
-                "addax_tbl"
-              ],
-              "jdbcUrl": [
-                "jdbc:postgresql://localhost:5432/wgzhao"
-              ]
-            }
-          ]
+          "connection": {
+            "table": [
+              "addax_tbl"
+            ],
+            "jdbcUrl": "jdbc:postgresql://localhost:5432/wgzhao"
+          }
         }
       },
       "writer": {
@@ -38,14 +34,12 @@
           "preSql": [
             "truncate table @table"
           ],
-          "connection": [
-            {
-              "jdbcUrl": "jdbc:postgresql://localhost:5432/wgzhao",
-              "table": [
-                "gp_test"
-              ]
-            }
-          ]
+          "connection": {
+            "jdbcUrl": "jdbc:postgresql://localhost:5432/wgzhao",
+            "table": [
+              "gp_test"
+            ]
+          }
         }
       }
     }

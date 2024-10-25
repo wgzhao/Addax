@@ -10,16 +10,14 @@
       "reader": {
         "name": "mongodbreader",
         "parameter": {
-          "connection": [
-            {
-              "address": [
-                "127.0.0.1:27017"
-              ],
-              "database": "tag_per_data",
-              "collection": "tag_data",
-              "authDb": "admin"
-            }
-          ],
+          "connection": {
+            "address": [
+              "127.0.0.1:27017"
+            ],
+            "database": "tag_per_data",
+            "collection": "tag_data",
+            "authDb": "admin"
+          },
           "username": "",
           "password": "",
           "column": [

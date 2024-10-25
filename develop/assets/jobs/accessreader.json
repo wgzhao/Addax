@@ -6,7 +6,7 @@
         "channel": 1
       }
     },
-    "content": [
+    "content":
       {
         "reader": {
           "name": "accessreader",
@@ -33,6 +33,5 @@
           }
         }
       }
-    ]
   }
 }
