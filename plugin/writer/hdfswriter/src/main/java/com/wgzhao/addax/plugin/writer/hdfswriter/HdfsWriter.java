@@ -26,6 +26,7 @@ import com.wgzhao.addax.common.plugin.RecordReceiver;
 import com.wgzhao.addax.common.spi.Writer;
 import com.wgzhao.addax.common.util.Configuration;
 import com.wgzhao.addax.storage.util.FileHelper;
+import org.apache.commons.exec.DefaultExecutor;
 import org.apache.commons.io.Charsets;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.hadoop.fs.Path;
@@ -45,8 +46,12 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
+import org.apache.commons.exec.CommandLine;
+
+import static com.wgzhao.addax.common.spi.ErrorCode.EXECUTE_FAIL;
 import static com.wgzhao.addax.common.spi.ErrorCode.ILLEGAL_VALUE;
 import static com.wgzhao.addax.common.spi.ErrorCode.REQUIRED_VALUE;
+import static com.wgzhao.addax.common.spi.ErrorCode.RUNTIME_ERROR;
 
 public class HdfsWriter
         extends Writer
@@ -203,6 +208,13 @@ public class HdfsWriter
         @Override
         public void prepare()
         {
+            // check preShell item
+            List<String> preShells = this.writerSliceConfig.getList("preShell", String.class);
+            if (!preShells.isEmpty()) {
+                for (String preShell : preShells) {
+                    execShell(preShell);
+                }
+            }
 
             this.tmpStorePath = buildTmpFilePath(path);
 
@@ -249,6 +261,14 @@ public class HdfsWriter
 
             // 删除临时目录
             hdfsHelper.deleteDir(new Path(tmpStorePath));
+
+            //check postShell item
+            List<String> postShells = this.writerSliceConfig.getList("postShell", String.class);
+            if (!postShells.isEmpty()) {
+                for (String postShell : postShells) {
+                    execShell(postShell);
+                }
+            }
         }
 
         @Override
@@ -363,6 +383,22 @@ public class HdfsWriter
             }
             else {
                 return Integer.parseInt(type.split(",")[1].replace(")", "").trim());
+            }
+        }
+
+        private static void execShell(String command)
+        {
+            CommandLine cmdLine = CommandLine.parse(command);
+            DefaultExecutor executor = DefaultExecutor.builder().get();
+            LOG.info("Running command: {}", command);
+            try {
+                int retCode = executor.execute(cmdLine);
+                if (retCode != 0) {
+                    throw AddaxException.asAddaxException(EXECUTE_FAIL, String.format("Command [%s] exited with code %d", command, retCode));
+                }
+            }
+            catch (Exception e) {
+                throw AddaxException.asAddaxException(RUNTIME_ERROR, e);
             }
         }
     }

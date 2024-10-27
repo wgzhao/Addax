@@ -5,6 +5,8 @@
     "fileType": "orc",
     "path": "/user/hive/warehouse",
     "fileName": "addax",
+    "preShell": [],
+    "postShell": [],
     "column": [
       {
         "name": "col1",
