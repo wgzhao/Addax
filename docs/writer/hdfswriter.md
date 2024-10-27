@@ -10,8 +10,8 @@ HDFS Writer 提供向 HDFS 文件系统指定路径中写入 `TextFile` ， `ORC
 
 ## 参数说明
 
-| 配置项                 | 是否必须 | 数据类型    | 默认值  | 说明                                                                                         |
-| :--------------------- | :------: | ----------- | ------- | -------------------------------------------------------------------------------------------- |
+| 配置项                    | 是否必须 | 数据类型        | 默认值  | 说明                                                                                         |
+|:-----------------------| :------: |-------------| ------- | -------------------------------------------------------------------------------------------- |
 | path                   |    是    | string      | 无      | 要读取的文件路径                                                                             |
 | defaultFS              |    是    | string      | 无      | 详述见下                                                                                     |
 | fileType               |    是    | string      | 无      | 文件的类型，详述见下                                                                         |
@@ -27,6 +27,8 @@ HDFS Writer 提供向 HDFS 文件系统指定路径中写入 `TextFile` ， `ORC
 | kerberosPrincipal      |    否    | string      | 无      | 用于 Kerberos 认证的凭证主体, 比如 `addax/node1@WGZHAO.COM`                                  |
 | compress               |    否    | string      | 无      | 文件的压缩格式，详见下文                                                                     |
 | hadoopConfig           |    否    | map         | 无      | 里可以配置与 Hadoop 相关的一些高级参数，比如HA的配置                                         |
+| preShell               |    否    | `list`      | 无      | 写入数据前执行的shell命令，比如 `hive -e "truncate table test.hello"`                        |
+| postShell             |    否    | `list`      | 无      | 写入数据后执行的shell命令，比如 `hive -e "select count(1) from test.hello"`                 |
 
 ### path
 
@@ -123,6 +125,10 @@ Hadoop hdfs 文件系统 namenode 节点地址。格式：`hdfs://ip:port` ；�
 
 这里的 `cluster` 表示 HDFS 配置成HA时的名字，也是 `defaultFS` 配置项中的名字 如果实际环境中的名字不是 `cluster` ，则上述配置中所有写有 `cluster` 都需要替换
 
+### preShell 与 postShell
+
+引入 `preShell` 与 `postShell` 的目的是为了在写入数据前后执行一些额外的操作，比如在写入数据前清空表，写入数据后查询表的行数等。一个典型的生产环境场景时，采集的数据按日分区保存在 HDFS 上，
+采集之前需要创建分区，这样就可以通过配置 `preShell` 来实现，比如 `hive -e "alter table test.hello add partition(dt='${logdate}')"`
 
 ## 类型转换
 

@@ -48,6 +48,7 @@ import java.util.stream.Collectors;
 
 import org.apache.commons.exec.CommandLine;
 
+import static com.wgzhao.addax.common.spi.ErrorCode.EXECUTE_FAIL;
 import static com.wgzhao.addax.common.spi.ErrorCode.ILLEGAL_VALUE;
 import static com.wgzhao.addax.common.spi.ErrorCode.REQUIRED_VALUE;
 import static com.wgzhao.addax.common.spi.ErrorCode.RUNTIME_ERROR;
@@ -391,7 +392,10 @@ public class HdfsWriter
             DefaultExecutor executor = DefaultExecutor.builder().get();
             LOG.info("Running command: {}", command);
             try {
-                executor.execute(cmdLine);
+                int retCode = executor.execute(cmdLine);
+                if (retCode != 0) {
+                    throw AddaxException.asAddaxException(EXECUTE_FAIL, String.format("Command [%s] exited with code %d", command, retCode));
+                }
             } catch (Exception e) {
                 throw AddaxException.asAddaxException(RUNTIME_ERROR, e);
             }
