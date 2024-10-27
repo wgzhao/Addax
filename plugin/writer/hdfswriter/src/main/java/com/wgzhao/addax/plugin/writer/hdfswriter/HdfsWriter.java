@@ -208,6 +208,13 @@ public class HdfsWriter
         @Override
         public void prepare()
         {
+            // check preShell item
+            List<String> preShells = this.writerSliceConfig.getList("preShell", String.class);
+            if (!preShells.isEmpty()) {
+                for (String preShell : preShells) {
+                    execShell(preShell);
+                }
+            }
 
             this.tmpStorePath = buildTmpFilePath(path);
 
@@ -240,14 +247,6 @@ public class HdfsWriter
             if (!hdfsHelper.isPathWritable(path)) {
                 throw AddaxException.asAddaxException(ILLEGAL_VALUE,
                         String.format("The path [%s] is not writable or permission denied", path));
-            }
-
-            // check preShell item
-            List<String> preShells = this.writerSliceConfig.getList("preShell", String.class);
-            if (!preShells.isEmpty()) {
-                for (String preShell : preShells) {
-                    execShell(preShell);
-                }
             }
         }
 
@@ -387,7 +386,8 @@ public class HdfsWriter
             }
         }
 
-        private static void execShell(String command) {
+        private static void execShell(String command)
+        {
             CommandLine cmdLine = CommandLine.parse(command);
             DefaultExecutor executor = DefaultExecutor.builder().get();
             LOG.info("Running command: {}", command);
@@ -396,7 +396,8 @@ public class HdfsWriter
                 if (retCode != 0) {
                     throw AddaxException.asAddaxException(EXECUTE_FAIL, String.format("Command [%s] exited with code %d", command, retCode));
                 }
-            } catch (Exception e) {
+            }
+            catch (Exception e) {
                 throw AddaxException.asAddaxException(RUNTIME_ERROR, e);
             }
         }
