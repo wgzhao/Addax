@@ -24,7 +24,6 @@ import com.wgzhao.addax.common.exception.AddaxException;
 import com.wgzhao.addax.common.util.Configuration;
 import com.wgzhao.addax.core.transport.channel.Channel;
 import com.wgzhao.addax.core.transport.record.TerminateRecord;
-import com.wgzhao.addax.core.util.container.CoreConstant;
 
 import java.util.Collection;
 import java.util.concurrent.ArrayBlockingQueue;
@@ -34,6 +33,7 @@ import java.util.concurrent.locks.Condition;
 import java.util.concurrent.locks.ReentrantLock;
 
 import static com.wgzhao.addax.common.spi.ErrorCode.RUNTIME_ERROR;
+import static com.wgzhao.addax.core.util.container.CoreConstant.CORE_TRANSPORT_EXCHANGER_BUFFER_SIZE;
 
 /**
  * 内存Channel的具体实现，底层其实是一个ArrayBlockingQueue
@@ -57,7 +57,7 @@ public class MemoryChannel
     {
         super(configuration);
         this.queue = new ArrayBlockingQueue<>(this.getCapacity());
-        this.bufferSize = configuration.getInt(CoreConstant.CORE_TRANSPORT_EXCHANGER_BUFFER_SIZE, 32);
+        this.bufferSize = configuration.getInt(CORE_TRANSPORT_EXCHANGER_BUFFER_SIZE, 32);
 
         lock = new ReentrantLock();
         notInsufficient = lock.newCondition();
@@ -88,7 +88,7 @@ public class MemoryChannel
         try {
             long startTime = System.nanoTime();
             this.queue.put(r);
-            waitWriterTime += System.nanoTime() - startTime;
+            waitReaderTime.addAndGet(System.nanoTime() - startTime);
             memoryBytes.addAndGet(r.getMemorySize());
         }
         catch (InterruptedException ex) {
@@ -107,7 +107,7 @@ public class MemoryChannel
                 notInsufficient.await(200L, TimeUnit.MILLISECONDS);
             }
             this.queue.addAll(rs);
-            waitWriterTime += System.nanoTime() - startTime;
+            waitReaderTime.addAndGet(System.nanoTime() - startTime);
             memoryBytes.addAndGet(bytes);
             notEmpty.signalAll();
         }
@@ -125,7 +125,7 @@ public class MemoryChannel
         try {
             long startTime = System.nanoTime();
             Record r = this.queue.take();
-            waitReaderTime += System.nanoTime() - startTime;
+            waitReaderTime.addAndGet(System.nanoTime() - startTime);
             memoryBytes.addAndGet(-r.getMemorySize());
             return r;
         }
@@ -146,7 +146,7 @@ public class MemoryChannel
             while (this.queue.drainTo(rs, bufferSize) <= 0) {
                 notEmpty.await(200L, TimeUnit.MILLISECONDS);
             }
-            waitReaderTime += System.nanoTime() - startTime;
+            waitReaderTime.addAndGet(System.nanoTime() - startTime);
             int bytes = getRecordBytes(rs);
             memoryBytes.addAndGet(-bytes);
             notInsufficient.signalAll();

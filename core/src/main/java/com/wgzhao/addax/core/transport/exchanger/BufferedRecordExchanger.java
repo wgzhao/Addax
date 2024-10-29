@@ -20,7 +20,6 @@
 package com.wgzhao.addax.core.transport.exchanger;
 
 import com.wgzhao.addax.common.element.Record;
-import com.wgzhao.addax.common.spi.ErrorCode;
 import com.wgzhao.addax.common.exception.AddaxException;
 import com.wgzhao.addax.common.plugin.RecordReceiver;
 import com.wgzhao.addax.common.plugin.RecordSender;
@@ -28,7 +27,6 @@ import com.wgzhao.addax.common.plugin.TaskPluginCollector;
 import com.wgzhao.addax.common.util.Configuration;
 import com.wgzhao.addax.core.transport.channel.Channel;
 import com.wgzhao.addax.core.transport.record.TerminateRecord;
-import com.wgzhao.addax.core.util.container.CoreConstant;
 import org.apache.commons.lang3.Validate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -38,6 +36,10 @@ import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import static com.wgzhao.addax.common.spi.ErrorCode.CONFIG_ERROR;
+import static com.wgzhao.addax.common.spi.ErrorCode.SHUT_DOWN_TASK;
+import static com.wgzhao.addax.core.util.container.CoreConstant.CORE_TRANSPORT_CHANNEL_CAPACITY_BYTE;
+import static com.wgzhao.addax.core.util.container.CoreConstant.CORE_TRANSPORT_EXCHANGER_BUFFER_SIZE;
+import static com.wgzhao.addax.core.util.container.CoreConstant.CORE_TRANSPORT_RECORD_CLASS;
 
 public class BufferedRecordExchanger
         implements RecordSender, RecordReceiver
@@ -65,17 +67,17 @@ public class BufferedRecordExchanger
         this.pluginCollector = pluginCollector;
         Configuration configuration = channel.getConfiguration();
 
-        this.bufferSize = configuration.getInt(CoreConstant.CORE_TRANSPORT_EXCHANGER_BUFFER_SIZE, 32);
+        this.bufferSize = configuration.getInt(CORE_TRANSPORT_EXCHANGER_BUFFER_SIZE, 32);
         this.buffer = new ArrayList<>(bufferSize);
 
         //channel的queue默认大小为8M，原来为64M
         this.byteCapacity = configuration.getInt(
-                CoreConstant.CORE_TRANSPORT_CHANNEL_CAPACITY_BYTE, 8 * 1024 * 1024);
+                CORE_TRANSPORT_CHANNEL_CAPACITY_BYTE, 8 * 1024 * 1024);
 
         try {
             BufferedRecordExchanger.recordClass = ((Class<? extends Record>) Class
                     .forName(configuration.getString(
-                            CoreConstant.CORE_TRANSPORT_RECORD_CLASS,
+                            CORE_TRANSPORT_RECORD_CLASS,
                             "com.wgzhao.addax.core.transport.record.DefaultRecord")));
         }
         catch (Exception e) {
@@ -98,7 +100,7 @@ public class BufferedRecordExchanger
     public void sendToWriter(Record record)
     {
         if (shutdown) {
-            throw AddaxException.asAddaxException(ErrorCode.SHUT_DOWN_TASK, "");
+            throw AddaxException.asAddaxException(SHUT_DOWN_TASK, "");
         }
 
         Validate.notNull(record, "The record cannot be empty.");
@@ -124,7 +126,7 @@ public class BufferedRecordExchanger
     public void flush()
     {
         if (shutdown) {
-            throw AddaxException.asAddaxException(ErrorCode.SHUT_DOWN_TASK, "");
+            throw AddaxException.asAddaxException(SHUT_DOWN_TASK, "");
         }
         this.channel.pushAll(this.buffer);
         this.buffer.clear();
@@ -136,7 +138,7 @@ public class BufferedRecordExchanger
     public void terminate()
     {
         if (shutdown) {
-            throw AddaxException.asAddaxException(ErrorCode.SHUT_DOWN_TASK, "");
+            throw AddaxException.asAddaxException(SHUT_DOWN_TASK, "");
         }
         flush();
         this.channel.pushTerminate(TerminateRecord.get());
@@ -146,7 +148,7 @@ public class BufferedRecordExchanger
     public Record getFromReader()
     {
         if (shutdown) {
-            throw AddaxException.asAddaxException(ErrorCode.SHUT_DOWN_TASK, "");
+            throw AddaxException.asAddaxException(SHUT_DOWN_TASK, "");
         }
         boolean isEmpty = (this.bufferIndex >= this.buffer.size());
         if (isEmpty) {

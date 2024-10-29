@@ -24,13 +24,19 @@ import com.wgzhao.addax.common.util.Configuration;
 import com.wgzhao.addax.core.statistics.communication.Communication;
 import com.wgzhao.addax.core.statistics.communication.CommunicationTool;
 import com.wgzhao.addax.core.transport.record.TerminateRecord;
-import com.wgzhao.addax.core.util.container.CoreConstant;
 import org.apache.commons.lang3.Validate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.Collection;
-import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicLong;
+
+import static com.wgzhao.addax.core.util.container.CoreConstant.CORE_CONTAINER_TASK_GROUP_ID;
+import static com.wgzhao.addax.core.util.container.CoreConstant.CORE_TRANSPORT_CHANNEL_CAPACITY;
+import static com.wgzhao.addax.core.util.container.CoreConstant.CORE_TRANSPORT_CHANNEL_CAPACITY_BYTE;
+import static com.wgzhao.addax.core.util.container.CoreConstant.CORE_TRANSPORT_CHANNEL_FLOW_CONTROL_INTERVAL;
+import static com.wgzhao.addax.core.util.container.CoreConstant.CORE_TRANSPORT_CHANNEL_SPEED_BYTE;
+import static com.wgzhao.addax.core.util.container.CoreConstant.CORE_TRANSPORT_CHANNEL_SPEED_RECORD;
 
 /**
  * Created by jingxing on 14-8-25.
@@ -51,16 +57,16 @@ public abstract class Channel
     protected long flowControlInterval;
     protected volatile boolean isClosed = false;
     protected Configuration configuration;
-    protected volatile long waitReaderTime = 0;
-    protected volatile long waitWriterTime = 0;
+    protected volatile AtomicLong waitReaderTime = new AtomicLong(0);
+    protected volatile AtomicLong waitWriterTime = new AtomicLong(0);
     private Communication currentCommunication;
 
     public Channel(Configuration configuration)
     {
         //channel的queue里默认record为1万条。原来为512条
-        int capacity = configuration.getInt(CoreConstant.CORE_TRANSPORT_CHANNEL_CAPACITY, 2048);
-        long byteSpeed = configuration.getLong(CoreConstant.CORE_TRANSPORT_CHANNEL_SPEED_BYTE, 1024 * 1024L);
-        long recordSpeed = configuration.getLong(CoreConstant.CORE_TRANSPORT_CHANNEL_SPEED_RECORD, 10000L);
+        int capacity = configuration.getInt(CORE_TRANSPORT_CHANNEL_CAPACITY, 2048);
+        long byteSpeed = configuration.getLong(CORE_TRANSPORT_CHANNEL_SPEED_BYTE, 1024 * 1024L);
+        long recordSpeed = configuration.getLong(CORE_TRANSPORT_CHANNEL_SPEED_RECORD, 10000L);
 
         if (capacity <= 0) {
             throw new IllegalArgumentException(String.format("The channel capacity [%d] must be greater than 0.", capacity));
@@ -72,13 +78,13 @@ public abstract class Channel
             isFirstPrint = false;
         }
 
-        this.taskGroupId = configuration.getInt(CoreConstant.CORE_CONTAINER_TASK_GROUP_ID);
+        this.taskGroupId = configuration.getInt(CORE_CONTAINER_TASK_GROUP_ID);
         this.capacity = capacity;
         this.byteSpeed = byteSpeed;
         this.recordSpeed = recordSpeed;
-        this.flowControlInterval = configuration.getLong(CoreConstant.CORE_TRANSPORT_CHANNEL_FLOW_CONTROL_INTERVAL, 1000);
+        this.flowControlInterval = configuration.getLong(CORE_TRANSPORT_CHANNEL_FLOW_CONTROL_INTERVAL, 1000);
         //channel的queue默认大小为8M，原来为64M
-        this.byteCapacity = configuration.getInt(CoreConstant.CORE_TRANSPORT_CHANNEL_CAPACITY_BYTE, 8 * 1024 * 1024);
+        this.byteCapacity = configuration.getInt(CORE_TRANSPORT_CHANNEL_CAPACITY_BYTE, 8 * 1024 * 1024);
         this.configuration = configuration;
     }
 
@@ -177,8 +183,8 @@ public abstract class Channel
         currentCommunication.increaseCounter(CommunicationTool.READ_SUCCEED_BYTES, byteSize);
         //在读的时候进行统计waitCounter即可，因为写（pull）的时候可能正在阻塞，但读的时候已经能读到这个阻塞的counter数
 
-        currentCommunication.setLongCounter(CommunicationTool.WAIT_READER_TIME, waitReaderTime);
-        currentCommunication.setLongCounter(CommunicationTool.WAIT_WRITER_TIME, waitWriterTime);
+        currentCommunication.setLongCounter(CommunicationTool.WAIT_READER_TIME, waitReaderTime.get());
+        currentCommunication.setLongCounter(CommunicationTool.WAIT_WRITER_TIME, waitWriterTime.get());
 
         boolean isChannelByteSpeedLimit = (this.byteSpeed > 0);
         boolean isChannelRecordSpeedLimit = (this.recordSpeed > 0);

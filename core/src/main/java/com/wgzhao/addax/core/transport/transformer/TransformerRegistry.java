@@ -37,6 +37,7 @@ import java.util.List;
 import java.util.Map;
 
 import static com.wgzhao.addax.common.spi.ErrorCode.CONFIG_ERROR;
+import static com.wgzhao.addax.core.util.container.CoreConstant.STORAGE_TRANSFORMER_HOME;
 
 /**
  * no comments.
@@ -57,7 +58,7 @@ public class TransformerRegistry
     public static void loadTransformerFromLocalStorage(List<String> transformers)
     {
 
-        String[] paths = new File(CoreConstant.STORAGE_TRANSFORMER_HOME).list();
+        String[] paths = new File(STORAGE_TRANSFORMER_HOME).list();
         if (null == paths) {
             return;
         }
@@ -77,7 +78,7 @@ public class TransformerRegistry
 
     public static void loadTransformer(String each)
     {
-        String transformerPath = CoreConstant.STORAGE_TRANSFORMER_HOME + File.separator + each;
+        String transformerPath = STORAGE_TRANSFORMER_HOME + File.separator + each;
         Configuration transformerConfiguration;
         try {
             transformerConfiguration = loadTransFormerConfig(transformerPath);

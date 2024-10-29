@@ -62,7 +62,7 @@ public class FilterTransformer
             }
 
             columnIndex = (Integer) paras[0];
-            code = (String) paras[1];
+            code = paras[1].toString().toLowerCase();
             value = (String) paras[2];
 
             if (StringUtils.isEmpty(value)) {
@@ -77,33 +77,26 @@ public class FilterTransformer
         Column column = record.getColumn(columnIndex);
 
         try {
-
-            if ("like".equalsIgnoreCase(code)) {
-                return doLike(record, value, column);
-            }
-            else if ("not like".equalsIgnoreCase(code)) {
-                return doNotLike(record, value, column);
-            }
-            else if (">".equalsIgnoreCase(code)) {
-                return doGreat(record, value, column, false);
-            }
-            else if ("<".equalsIgnoreCase(code)) {
-                return doLess(record, value, column, false);
-            }
-            else if ("=".equalsIgnoreCase(code) || "==".equalsIgnoreCase(code)) {
-                return doEqual(record, value, column);
-            }
-            else if ("!=".equalsIgnoreCase(code)) {
-                return doNotEqual(record, value, column);
-            }
-            else if (">=".equalsIgnoreCase(code)) {
-                return doGreat(record, value, column, true);
-            }
-            else if ("<=".equalsIgnoreCase(code)) {
-                return doLess(record, value, column, true);
-            }
-            else {
-                throw new RuntimeException("dx_filter code:" + code + " is unsupported");
+            switch (code) {
+                case "like":
+                    return doLike(record, value, column);
+                case "not like":
+                    return doNotLike(record, value, column);
+                case ">":
+                    return doGreat(record, value, column, false);
+                case "<":
+                    return doLess(record, value, column, false);
+                case "=":
+                case "==":
+                    return doEqual(record, value, column);
+                case "!=":
+                    return doNotEqual(record, value, column);
+                case ">=":
+                    return doGreat(record, value, column, true);
+                case "<=":
+                    return doLess(record, value, column, true);
+                default:
+                    throw new RuntimeException("dx_filter code:" + code + " is unsupported");
             }
         }
         catch (Exception e) {
@@ -267,6 +260,7 @@ public class FilterTransformer
 
     /**
      * DateColumn将比较long值，StringColumn，ByteColumn以及BooleanColumn比较其String值
+     *
      * @param record message record
      * @param value value to compared
      * @param column the column of record

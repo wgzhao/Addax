@@ -72,11 +72,13 @@ public class SubstrTransformer
             if (oriValue == null) {
                 return record;
             }
-            String newValue;
+
             if (startIndex > oriValue.length()) {
                 throw new RuntimeException(String.format("The dx_substr startIndex(%s) out of range" +
                         "(%s) of (%s)", startIndex, oriValue.length(), oriValue));
             }
+
+            String newValue;
             if (startIndex + length >= oriValue.length()) {
                 newValue = oriValue.substring(startIndex);
             }

@@ -78,7 +78,7 @@ public class TransformerUtil
         /*
          * 延迟load 第三方插件的function，并按需load
          */
-        LOG.info(String.format("Loading the  user config transformers [%s] ...", functionNames));
+        LOG.info("Loading the  user config transformers [{}] ...", functionNames);
         TransformerRegistry.loadTransformerFromLocalStorage(functionNames);
 
         int i = 0;

@@ -20,7 +20,6 @@
 package com.wgzhao.addax.core.transport.exchanger;
 
 import com.wgzhao.addax.common.element.Record;
-import com.wgzhao.addax.common.spi.ErrorCode;
 import com.wgzhao.addax.common.exception.AddaxException;
 import com.wgzhao.addax.common.plugin.RecordReceiver;
 import com.wgzhao.addax.common.plugin.RecordSender;
@@ -28,13 +27,16 @@ import com.wgzhao.addax.common.plugin.TaskPluginCollector;
 import com.wgzhao.addax.common.util.Configuration;
 import com.wgzhao.addax.core.statistics.communication.Communication;
 import com.wgzhao.addax.core.transport.channel.Channel;
+import com.wgzhao.addax.core.transport.record.DefaultRecord;
 import com.wgzhao.addax.core.transport.record.TerminateRecord;
 import com.wgzhao.addax.core.transport.transformer.TransformerExecution;
-import com.wgzhao.addax.core.util.container.CoreConstant;
+import org.apache.commons.lang3.StringUtils;
 
 import java.util.List;
 
 import static com.wgzhao.addax.common.spi.ErrorCode.CONFIG_ERROR;
+import static com.wgzhao.addax.common.spi.ErrorCode.SHUT_DOWN_TASK;
+import static com.wgzhao.addax.core.util.container.CoreConstant.CORE_TRANSPORT_RECORD_CLASS;
 
 public class RecordExchanger
         extends TransformerExchanger
@@ -54,10 +56,13 @@ public class RecordExchanger
         this.channel = channel;
         Configuration configuration = channel.getConfiguration();
         try {
-            RecordExchanger.RECORD_CLASS = (Class<? extends Record>) Class
-                    .forName(configuration.getString(
-                            CoreConstant.CORE_TRANSPORT_RECORD_CLASS,
-                            "com.wgzhao.addax.core.transport.record.DefaultRecord"));
+            String cls = configuration.getString(CORE_TRANSPORT_RECORD_CLASS, null);
+            if (!StringUtils.isBlank(cls)) {
+                RECORD_CLASS = (Class<? extends Record>) Class.forName(cls);
+            }
+            else {
+                RecordExchanger.RECORD_CLASS = DefaultRecord.class;
+            }
         }
         catch (ClassNotFoundException e) {
             throw AddaxException.asAddaxException(CONFIG_ERROR, e);
@@ -68,7 +73,7 @@ public class RecordExchanger
     public Record getFromReader()
     {
         if (shutdown) {
-            throw AddaxException.asAddaxException(ErrorCode.SHUT_DOWN_TASK, "");
+            throw AddaxException.asAddaxException(SHUT_DOWN_TASK, "");
         }
         Record record = this.channel.pull();
         return (record instanceof TerminateRecord ? null : record);
@@ -89,7 +94,7 @@ public class RecordExchanger
     public void sendToWriter(Record record)
     {
         if (shutdown) {
-            throw AddaxException.asAddaxException(ErrorCode.SHUT_DOWN_TASK, "");
+            throw AddaxException.asAddaxException(SHUT_DOWN_TASK, "");
         }
         record = doTransformer(record);
         if (record == null) {
@@ -109,7 +114,7 @@ public class RecordExchanger
     public void terminate()
     {
         if (shutdown) {
-            throw AddaxException.asAddaxException(ErrorCode.SHUT_DOWN_TASK, "");
+            throw AddaxException.asAddaxException(SHUT_DOWN_TASK, "");
         }
         this.channel.pushTerminate(TerminateRecord.get());
         //和channel的统计保持同步

@@ -42,7 +42,7 @@ public interface Record
 
     int getMemorySize();
 
-    public void setMeta(Map<String, String> meta);
+    void setMeta(Map<String, String> meta);
 
-    public Map<String, String> getMeta();
+    Map<String, String> getMeta();
 }
