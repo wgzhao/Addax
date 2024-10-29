@@ -149,6 +149,10 @@ public class Key
     public static final String EXTENDED_INSERT = "extendedInsert";
     public static final String TABLE_NUMBER= "tableNumber";
 
+    public static final String PRE_SHELL = "preShell";
+    public static final String POST_SHELL = "postShell";
+    public static final String IGNORE_ERROR = "ignoreError";
+
     public Key()
     {
 
