@@ -50,6 +50,7 @@ import org.slf4j.LoggerFactory;
 
 import java.math.BigDecimal;
 import java.math.BigInteger;
+import java.math.RoundingMode;
 import java.net.InetAddress;
 import java.nio.ByteBuffer;
 import java.util.ArrayList;
@@ -468,7 +469,7 @@ public class CassandraReaderHelper
             BigDecimal minToken = BigDecimal.valueOf(-1);
             BigDecimal maxToken = new BigDecimal(new BigInteger("2").pow(127));
             BigDecimal step = maxToken.subtract(minToken)
-                    .divide(BigDecimal.valueOf(adviceNumber), 2, BigDecimal.ROUND_HALF_EVEN);
+                    .divide(BigDecimal.valueOf(adviceNumber), 2, RoundingMode.HALF_EVEN);
             for (int i = 0; i < adviceNumber; i++) {
                 BigInteger l = minToken.add(step.multiply(BigDecimal.valueOf(i))).toBigInteger();
                 BigInteger r = minToken.add(step.multiply(BigDecimal.valueOf(i + 1))).toBigInteger();
@@ -485,7 +486,7 @@ public class CassandraReaderHelper
             BigDecimal minToken = BigDecimal.valueOf(Long.MIN_VALUE);
             BigDecimal maxToken = BigDecimal.valueOf(Long.MAX_VALUE);
             BigDecimal step = maxToken.subtract(minToken)
-                    .divide(BigDecimal.valueOf(adviceNumber), 2, BigDecimal.ROUND_HALF_EVEN);
+                    .divide(BigDecimal.valueOf(adviceNumber), 2, RoundingMode.HALF_EVEN);
             for (int i = 0; i < adviceNumber; i++) {
                 long l = minToken.add(step.multiply(BigDecimal.valueOf(i))).longValue();
                 long r = minToken.add(step.multiply(BigDecimal.valueOf(i + 1))).longValue();
@@ -553,9 +554,9 @@ public class CassandraReaderHelper
         boolean allowFiltering = taskConfig.getBool(MyKey.ALLOW_FILTERING, false);
 
         StringBuilder select = new StringBuilder();
-        select.append("SELECT ").append(columns.toString()).append(" FROM ").append(table);
+        select.append("SELECT ").append(columns).append(" FROM ").append(table);
         if (where.length() > 0) {
-            select.append(" where ").append(where.toString());
+            select.append(" where ").append(where);
         }
         if (allowFiltering) {
             select.append(" ALLOW FILTERING");

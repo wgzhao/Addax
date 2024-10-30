@@ -313,7 +313,7 @@ public class MathUtil
         if (null == v1) {
             v1 = BigDecimal.ZERO;
         }
-        if (null == valList || valList.length == 0) {
+        if (null == valList) {
             return v1;
         }
         for (BigDecimal val : valList) {
@@ -386,7 +386,7 @@ public class MathUtil
     public static BigDecimal max(BigDecimal v1, BigDecimal... valList)
     {
         BigDecimal max = v1;
-        if (null == valList || valList.length == 0) {
+        if (null == valList) {
             return max;
         }
         for (BigDecimal val : valList) {
@@ -422,7 +422,7 @@ public class MathUtil
     public static BigDecimal min(BigDecimal v1, BigDecimal... valList)
     {
         BigDecimal min = v1;
-        if (null == valList || valList.length == 0) {
+        if (null == valList) {
             return min;
         }
         for (BigDecimal val : valList) {

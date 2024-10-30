@@ -57,27 +57,26 @@ public class StarRocksStreamLoadVisitor
         if (null == host) {
             throw new IOException("None of the host in `load_url` could be connected.");
         }
-        String loadUrl = new StringBuilder(host)
-                .append("/api/")
-                .append(writerOptions.getDatabase())
-                .append("/")
-                .append(writerOptions.getTable())
-                .append("/_stream_load")
-                .toString();
+        String loadUrl = host +
+                "/api/" +
+                writerOptions.getDatabase() +
+                "/" +
+                writerOptions.getTable() +
+                "/_stream_load";
         LOG.debug(String.format("Start to join batch data: rows[%d] bytes[%d] label[%s].", flushData.getRows().size(), flushData.getBytes(), flushData.getLabel()));
         Map<String, Object> loadResult = doHttpPut(loadUrl, flushData.getLabel(), joinRows(flushData.getRows(), flushData.getBytes().intValue()));
         final String keyStatus = "Status";
         if (null == loadResult || !loadResult.containsKey(keyStatus)) {
             throw new IOException("Unable to flush data to StarRocks: unknown result status.");
         }
-        LOG.debug(new StringBuilder("StreamLoad response:\n").append(JSON.toJSONString(loadResult)).toString());
+        LOG.debug("StreamLoad response:\n" + JSON.toJSONString(loadResult));
         if (RESULT_FAILED.equals(loadResult.get(keyStatus))) {
             throw new IOException(
-                    new StringBuilder("Failed to flush data to StarRocks.\n").append(JSON.toJSONString(loadResult)).toString()
+                    "Failed to flush data to StarRocks.\n" + JSON.toJSONString(loadResult)
             );
         }
         else if (RESULT_LABEL_EXISTED.equals(loadResult.get(keyStatus))) {
-            LOG.debug(new StringBuilder("StreamLoad response:\n").append(JSON.toJSONString(loadResult)).toString());
+            LOG.debug("StreamLoad response:\n" + JSON.toJSONString(loadResult));
             // has to block-checking the state to get the final result
             checkLabelState(host, flushData.getLabel());
         }
@@ -88,7 +87,7 @@ public class StarRocksStreamLoadVisitor
         List<String> hostList = writerOptions.getLoadUrlList();
         long tmp = pos + hostList.size();
         for (; pos < tmp; pos++) {
-            String host = new StringBuilder("http://").append(hostList.get((int) (pos % hostList.size()))).toString();
+            String host = "http://" + hostList.get((int) (pos % hostList.size()));
             if (tryHttpConnection(host)) {
                 return host;
             }

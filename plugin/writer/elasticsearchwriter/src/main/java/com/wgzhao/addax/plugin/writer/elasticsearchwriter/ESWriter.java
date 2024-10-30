@@ -124,11 +124,11 @@ public class ESWriter
                     String colName = jo.getString("name");
                     String colTypeStr = jo.getString("type");
                     if (colTypeStr == null) {
-                        throw AddaxException.asAddaxException(CONFIG_ERROR, col.toString() + " column must have type");
+                        throw AddaxException.asAddaxException(CONFIG_ERROR, col + " column must have type");
                     }
                     ESFieldType colType = ESFieldType.getESFieldType(colTypeStr);
                     if (colType == null) {
-                        throw AddaxException.asAddaxException(NOT_SUPPORT_TYPE, col.toString() + " unsupported type");
+                        throw AddaxException.asAddaxException(NOT_SUPPORT_TYPE, col + " unsupported type");
                     }
 
                     ESColumn columnItem = new ESColumn();
@@ -387,7 +387,7 @@ public class ESWriter
                                     data.put(columnName, dateStr);
                                 }
                                 catch (Exception e) {
-                                    getTaskPluginCollector().collectDirtyRecord(record, String.format("时间类型解析失败 [%s:%s] exception: %s", columnName, column.toString(), e.toString()));
+                                    getTaskPluginCollector().collectDirtyRecord(record, String.format("时间类型解析失败 [%s:%s] exception: %s", columnName, column.toString(), e));
                                 }
                                 break;
                             case KEYWORD:

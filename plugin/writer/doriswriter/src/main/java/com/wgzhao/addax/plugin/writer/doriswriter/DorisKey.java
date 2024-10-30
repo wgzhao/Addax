@@ -51,7 +51,7 @@ public class DorisKey
 
     public enum StreamLoadFormat
     {
-        CSV, JSON;
+        CSV, JSON
     }
 
     private static final String FLUSH_INTERVAL = "flushInterval";

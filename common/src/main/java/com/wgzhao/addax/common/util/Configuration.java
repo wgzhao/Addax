@@ -72,7 +72,7 @@ public class Configuration
      * 对于加密的keyPath，需要记录下来
      * 为的是后面分布式情况下将该值加密后抛到 AddaxServer中
      */
-    private Set<String> secretKeyPathSet =
+    private final Set<String> secretKeyPathSet =
             new HashSet<>();
 
     private Object root;

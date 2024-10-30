@@ -51,14 +51,14 @@ public class DefaultDataHandler
     private static final String DEFAULT_USERNAME = "root";
     private static final String DEFAULT_PASSWORD = "taosdata";
     private static final boolean DEFAULT_IGNORE_TAGS_UNMATCHED = false;
-    private String username;
-    private String password;
-    private String jdbcUrl;
-    private int batchSize;
-    private boolean ignoreTagsUnmatched;
+    private final String username;
+    private final String password;
+    private final String jdbcUrl;
+    private final int batchSize;
+    private final boolean ignoreTagsUnmatched;
 
-    private List<String> tables;
-    private List<String> columns;
+    private final List<String> tables;
+    private final List<String> columns;
 
     private Map<String, TableMeta> tableMetas;
     private SchemaManager schemaManager;

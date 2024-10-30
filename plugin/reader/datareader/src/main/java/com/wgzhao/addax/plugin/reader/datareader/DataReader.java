@@ -51,6 +51,7 @@ import org.apache.commons.rng.UniformRandomProvider;
 import org.apache.commons.rng.simple.RandomSource;
 
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -472,7 +473,7 @@ public class DataReader
                         // specify fixed scale or not ?
                         if (scale > 0) {
                             BigDecimal b = BigDecimal.valueOf(rng.nextDouble(param1Int, param2Int + 1))
-                                    .setScale(scale, BigDecimal.ROUND_HALF_UP);
+                                    .setScale(scale, RoundingMode.HALF_UP);
                             return new DoubleColumn(b.doubleValue());
                         }
                         else {

@@ -41,9 +41,9 @@ public class OpentsdbDataHandler
     private static final Logger LOG = LoggerFactory.getLogger(OpentsdbDataHandler.class);
     private SchemalessWriter writer;
 
-    private String jdbcUrl;
-    private String user;
-    private String password;
+    private final String jdbcUrl;
+    private final String user;
+    private final String password;
     int batchSize;
 
     public OpentsdbDataHandler(Configuration config)
@@ -59,7 +59,7 @@ public class OpentsdbDataHandler
     public int handle(RecordReceiver lineReceiver, TaskPluginCollector collector)
     {
         int count;
-        try (Connection conn = DriverManager.getConnection(jdbcUrl, user, password);) {
+        try (Connection conn = DriverManager.getConnection(jdbcUrl, user, password)) {
             LOG.info("connection[ jdbcUrl: " + jdbcUrl + ", username: " + user + "] established.");
             writer = new SchemalessWriter(conn);
             count = write(lineReceiver, batchSize);

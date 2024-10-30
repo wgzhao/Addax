@@ -765,7 +765,7 @@ public class JobContainer
                 LOG.info("The job results were uploaded successfully");
             }
             else {
-                LOG.warn("Uploading the job results failed: {}", httpResponse.toString());
+                LOG.warn("Uploading the job results failed: {}", httpResponse);
             }
         }
         catch (IOException e) {

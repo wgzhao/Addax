@@ -227,7 +227,7 @@ public class CassandraWriter
 
             Insert insertStmt = QueryBuilder.insertInto(table);
             for (String colunmnName : columnMeta) {
-                if (colunmnName.toLowerCase().equals(CassandraKey.WRITE_TIME)) {
+                if (colunmnName.equalsIgnoreCase(CassandraKey.WRITE_TIME)) {
                     if (writeTimeCol != -1) {
                         throw AddaxException
                                 .asAddaxException(

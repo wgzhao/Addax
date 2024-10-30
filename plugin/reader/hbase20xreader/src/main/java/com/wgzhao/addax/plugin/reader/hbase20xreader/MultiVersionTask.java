@@ -51,8 +51,8 @@ public abstract class MultiVersionTask
         super(configuration);
 
         this.maxVersion = configuration.getInt(HBaseKey.MAX_VERSION);
-        this.column = configuration.getList(HBaseKey.COLUMN, Map.class);
-        this.familyQualifierMap = Hbase20xHelper.parseColumnOfMultiversionMode(this.column);
+        column = configuration.getList(HBaseKey.COLUMN, Map.class);
+        this.familyQualifierMap = Hbase20xHelper.parseColumnOfMultiversionMode(column);
     }
 
     @Override

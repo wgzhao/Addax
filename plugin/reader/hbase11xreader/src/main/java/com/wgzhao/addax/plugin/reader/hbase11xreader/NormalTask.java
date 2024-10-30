@@ -35,7 +35,7 @@ public class NormalTask
         extends HbaseAbstractTask
 {
     private final List<HbaseColumnCell> hbaseColumnCells;
-    private List<Map> column;
+    private final List<Map> column;
 
     public NormalTask(Configuration configuration)
     {

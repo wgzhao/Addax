@@ -105,7 +105,7 @@ public class HttpReader
         private URIBuilder uriBuilder;
         private String username;
         private String password;
-        private BasicCredentialsProvider credsProvider = new BasicCredentialsProvider();
+        private final BasicCredentialsProvider credsProvider = new BasicCredentialsProvider();
         private HttpHost proxy = null;
         private Request request;
         private String method;

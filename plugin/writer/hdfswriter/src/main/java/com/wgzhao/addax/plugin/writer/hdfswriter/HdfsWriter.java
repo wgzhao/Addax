@@ -128,8 +128,8 @@ public class HdfsWriter
                     if (eachColumnConf.getString(Key.TYPE).toUpperCase().startsWith("DECIMAL")) {
                         String type = eachColumnConf.getString(Key.TYPE);
                         eachColumnConf.set(Key.TYPE, "decimal");
-                        eachColumnConf.set(Key.PRECISION, (Object) getDecimalPrecision(type));
-                        eachColumnConf.set(Key.SCALE, (Object) getDecimalScale(type));
+                        eachColumnConf.set(Key.PRECISION, getDecimalPrecision(type));
+                        eachColumnConf.set(Key.SCALE, getDecimalScale(type));
                         columns.set(i, eachColumnConf);
                         rewriteFlag = true;
                     }
