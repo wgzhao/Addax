@@ -29,7 +29,7 @@ import java.util.List;
 public class MultiVersionDynamicColumnTask
         extends MultiVersionTask
 {
-    private List<String> columnFamilies = null;
+    private final List<String> columnFamilies;
 
     public MultiVersionDynamicColumnTask(Configuration configuration)
     {
