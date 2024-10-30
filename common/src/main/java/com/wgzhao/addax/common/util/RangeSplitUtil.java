@@ -248,7 +248,7 @@ public final class RangeSplitUtil
 
         for (int i = 0, len = aString.length(); i < len; i++) {
             char ch = aString.charAt(i);
-            if (ch >= 127 || ch < 0) {
+            if (ch >= 127) {
                 return false;
             }
         }
