@@ -59,10 +59,9 @@ public class FileTypeUtils
 
     private static boolean isParquetFile(Path file)
     {
-        try {
-            GroupReadSupport readSupport = new GroupReadSupport();
-            ParquetReader.Builder<Group> reader = ParquetReader.builder(readSupport, file);
-            ParquetReader<Group> build = reader.build();
+        GroupReadSupport readSupport = new GroupReadSupport();
+        ParquetReader.Builder<Group> reader = ParquetReader.builder(readSupport, file);
+        try (ParquetReader<Group> build = reader.build()) {
             if (build.read() != null) {
                 return true;
             }
