@@ -60,9 +60,7 @@ public class HbaseColumnCell
 
                 String promptInfo = "Hbasereader 中，column 的列配置格式应该是：列族:列名. 您配置的列错误：" + this.columnName;
                 String[] cfAndQualifier = this.columnName.split(":");
-                Validate.isTrue(cfAndQualifier != null && cfAndQualifier.length == 2
-                        && StringUtils.isNotBlank(cfAndQualifier[0])
-                        && StringUtils.isNotBlank(cfAndQualifier[1]), promptInfo);
+                Validate.isTrue(cfAndQualifier.length == 2 && StringUtils.isNotBlank(cfAndQualifier[0]) && StringUtils.isNotBlank(cfAndQualifier[1]), promptInfo);
 
                 this.columnFamily = Bytes.toBytes(cfAndQualifier[0].trim());
                 this.qualifier = Bytes.toBytes(cfAndQualifier[1].trim());
