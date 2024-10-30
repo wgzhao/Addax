@@ -192,7 +192,7 @@ public class StarRocksWriterManager
                     flushData.setLabel(newLabel);
                 }
                 try {
-                    Thread.sleep(1000L * Math.min(i + 1, 10));
+                    TimeUnit.SECONDS.sleep(Math.min(i + 1, 10));
                 }
                 catch (InterruptedException ex) {
                     Thread.currentThread().interrupt();
