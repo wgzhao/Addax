@@ -55,8 +55,8 @@ public class HBase20xSQLReaderTask
     private static final Logger LOG = LoggerFactory.getLogger(HBase20xSQLReaderTask.class);
 
     private final Configuration readerConfig;
-    private int taskGroupId = -1;
-    private int taskId = -1;
+    private int taskGroupId;
+    private int taskId;
 
     public HBase20xSQLReaderTask(Configuration config, int taskGroupId, int taskId)
     {
