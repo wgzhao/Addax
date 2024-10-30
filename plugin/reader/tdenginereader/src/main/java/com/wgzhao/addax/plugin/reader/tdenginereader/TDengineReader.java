@@ -208,13 +208,13 @@ public class TDengineReader
             switch (unit) {
                 case 'd':
                     return value * day;
-                default:
-                case 'h':
-                    return value * hour;
                 case 'm':
                     return value * minute;
                 case 's':
                     return value * second;
+                case 'h':
+                default:
+                    return value * hour;
             }
         }
         throw new Exception("invalid splitInterval: " + splitInterval);
