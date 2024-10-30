@@ -86,7 +86,7 @@ public class DefaultDataHandler
             Class.forName("com.taosdata.jdbc.rs.RestfulDriver");
         }
         catch (ClassNotFoundException e) {
-           LOG.error(e.getMessage());
+            LOG.error(e.getMessage());
         }
     }
 
@@ -294,7 +294,8 @@ public class DefaultDataHandler
         TimestampPrecision timestampPrecision = schemaManager.loadDatabasePrecision();
 
         List<ColumnMeta> columnMetaList = this.columnMetas.get(table);
-        ColumnMeta ts = columnMetaList.stream().filter(colMeta -> colMeta.isPrimaryKey).findFirst().get();
+        ColumnMeta ts = columnMetaList.stream().filter(colMeta -> colMeta.isPrimaryKey).findFirst().orElseThrow(
+                () -> AddaxException.asAddaxException(CONFIG_ERROR, "no primary key found"));
 
         List<String> lines = new ArrayList<>();
         for (Record record : recordBatch) {
@@ -349,7 +350,8 @@ public class DefaultDataHandler
         SchemalessWriter writer;
         try {
             writer = new SchemalessWriter(conn);
-        } catch (SQLException e) {
+        }
+        catch (SQLException e) {
             throw AddaxException.asAddaxException(EXECUTE_FAIL, e.getMessage());
         }
         SchemalessTimestampType timestampType;
