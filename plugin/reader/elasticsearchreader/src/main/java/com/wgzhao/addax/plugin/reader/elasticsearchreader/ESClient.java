@@ -100,21 +100,19 @@ public class ESClient
         boolean isIndicesExists = false;
         JestResult rst = jestClient.execute(new IndicesExists.Builder(indexName).build());
         if (rst.isSucceeded()) {
-            isIndicesExists = true;
+            return true;
         }
         else {
             switch (rst.getResponseCode()) {
                 case 404:
-                    isIndicesExists = false;
-                    break;
+                    return false;
                 case 401:
                     // 无权访问
                 default:
                     log.warn(rst.getErrorMessage());
-                    break;
+                    return false;
             }
         }
-        return isIndicesExists;
     }
 
     public SearchResult search(String query,
