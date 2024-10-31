@@ -121,8 +121,6 @@ public abstract class AbstractScheduler
 
     protected abstract void dealFailedStat(AbstractContainerCommunicator frameworkCollector, Throwable throwable);
 
-    protected abstract void dealKillingStat(AbstractContainerCommunicator frameworkCollector, int totalTasks);
-
     private int calculateTaskCount(List<Configuration> configurations)
     {
         int totalTasks = 0;
