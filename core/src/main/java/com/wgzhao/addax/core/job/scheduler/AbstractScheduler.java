@@ -47,7 +47,6 @@ public abstract class AbstractScheduler
         this.containerCommunicator = containerCommunicator;
     }
 
-
     public void schedule(List<Configuration> configurations)
     {
         Validate.notNull(configurations, "The scheduler configuration cannot be empty");
@@ -69,53 +68,52 @@ public abstract class AbstractScheduler
         Communication lastJobContainerCommunication = new Communication();
 
         long lastReportTimeStamp = System.currentTimeMillis();
-        try {
-            while (true) {
-                /*
-                 * step 1: collect job stat
-                 * step 2: getReport info, then report it
-                 * step 3: errorLimit do check
-                 * step 4: dealSucceedStat();
-                 * step 5: dealKillingStat();
-                 * step 6: dealFailedStat();
-                 * step 7: refresh last job stat, and then sleep for next while
-                 *
-                 * above steps, some ones should report info to DS
-                 *
-                 */
-                Communication nowJobContainerCommunication = this.containerCommunicator.collect();
-                nowJobContainerCommunication.setTimestamp(System.currentTimeMillis());
-                LOG.debug(nowJobContainerCommunication.toString());
+        while (true) {
+            /*
+             * step 1: collect job stat
+             * step 2: getReport info, then report it
+             * step 3: errorLimit do check
+             * step 4: dealSucceedStat();
+             * step 5: dealKillingStat();
+             * step 6: dealFailedStat();
+             * step 7: refresh last job stat, and then sleep for next while
+             *
+             * above steps, some ones should report info to DS
+             *
+             */
+            Communication nowJobContainerCommunication = this.containerCommunicator.collect();
+            nowJobContainerCommunication.setTimestamp(System.currentTimeMillis());
+            LOG.debug(nowJobContainerCommunication.toString());
 
-                //汇报周期
-                long now = System.currentTimeMillis();
-                if (now - lastReportTimeStamp > jobReportIntervalInMillSec) {
-                    Communication reportCommunication = CommunicationTool
-                            .getReportCommunication(nowJobContainerCommunication, lastJobContainerCommunication, totalTasks);
+            //汇报周期
+            long now = System.currentTimeMillis();
+            if (now - lastReportTimeStamp > jobReportIntervalInMillSec) {
+                Communication reportCommunication = CommunicationTool
+                        .getReportCommunication(nowJobContainerCommunication, lastJobContainerCommunication, totalTasks);
 
-                    this.containerCommunicator.report(reportCommunication);
-                    lastReportTimeStamp = now;
-                    lastJobContainerCommunication = nowJobContainerCommunication;
-                }
+                this.containerCommunicator.report(reportCommunication);
+                lastReportTimeStamp = now;
+                lastJobContainerCommunication = nowJobContainerCommunication;
+            }
 
-                errorLimit.checkRecordLimit(nowJobContainerCommunication);
+            errorLimit.checkRecordLimit(nowJobContainerCommunication);
 
-                if (nowJobContainerCommunication.getState() == State.SUCCEEDED) {
-                    LOG.info("The scheduler has completed all tasks.");
-                    break;
-                }
+            if (nowJobContainerCommunication.getState() == State.SUCCEEDED) {
+                LOG.info("The scheduler has completed all tasks.");
+                break;
+            }
 
-                if (nowJobContainerCommunication.getState() == State.FAILED) {
-                    dealFailedStat(this.containerCommunicator, nowJobContainerCommunication.getThrowable());
-                }
+            if (nowJobContainerCommunication.getState() == State.FAILED) {
+                dealFailedStat(this.containerCommunicator, nowJobContainerCommunication.getThrowable());
+            }
+            try {
                 TimeUnit.MILLISECONDS.sleep(jobSleepIntervalInMillSec);
             }
-        }
-        catch (InterruptedException e) {
-            // 以 failed 状态退出
-            LOG.error("An InterruptedException was caught!", e);
-
-            throw AddaxException.asAddaxException(RUNTIME_ERROR, e);
+            catch (InterruptedException e) {
+                // 以 failed 状态退出
+                LOG.error("An InterruptedException was caught!", e);
+                throw AddaxException.asAddaxException(RUNTIME_ERROR, e);
+            }
         }
     }
 
