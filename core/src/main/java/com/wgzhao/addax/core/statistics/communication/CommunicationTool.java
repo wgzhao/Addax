@@ -148,21 +148,21 @@ public final class CommunicationTool
             sb.append(" All Task WaitReaderTime ");
             sb.append(PerfTrace.unitTime(communication.getLongCounter(WAIT_READER_TIME)));
             sb.append(" | ");
-            if (communication.getLongCounter(CommunicationTool.TRANSFORMER_USED_TIME) > 0
-                    || communication.getLongCounter(CommunicationTool.TRANSFORMER_SUCCEED_RECORDS) > 0
-                    || communication.getLongCounter(CommunicationTool.TRANSFORMER_FAILED_RECORDS) > 0
-                    || communication.getLongCounter(CommunicationTool.TRANSFORMER_FILTER_RECORDS) > 0) {
+            if (communication.getLongCounter(TRANSFORMER_USED_TIME) > 0
+                    || communication.getLongCounter(TRANSFORMER_SUCCEED_RECORDS) > 0
+                    || communication.getLongCounter(TRANSFORMER_FAILED_RECORDS) > 0
+                    || communication.getLongCounter(TRANSFORMER_FILTER_RECORDS) > 0) {
                 sb.append("Transformer Success ");
-                sb.append(String.format("%d records", communication.getLongCounter(CommunicationTool.TRANSFORMER_SUCCEED_RECORDS)));
+                sb.append(String.format("%d records", communication.getLongCounter(TRANSFORMER_SUCCEED_RECORDS)));
                 sb.append(" | ");
                 sb.append("Transformer Error ");
-                sb.append(String.format("%d records", communication.getLongCounter(CommunicationTool.TRANSFORMER_FAILED_RECORDS)));
+                sb.append(String.format("%d records", communication.getLongCounter(TRANSFORMER_FAILED_RECORDS)));
                 sb.append(" | ");
                 sb.append("Transformer Filter ");
-                sb.append(String.format("%d records", communication.getLongCounter(CommunicationTool.TRANSFORMER_FILTER_RECORDS)));
+                sb.append(String.format("%d records", communication.getLongCounter(TRANSFORMER_FILTER_RECORDS)));
                 sb.append(" | ");
                 sb.append("Transformer usedTime ");
-                sb.append(PerfTrace.unitTime(communication.getLongCounter(CommunicationTool.TRANSFORMER_USED_TIME)));
+                sb.append(PerfTrace.unitTime(communication.getLongCounter(TRANSFORMER_USED_TIME)));
                 sb.append(" | ");
             }
             sb.append("Percentage ");

@@ -135,156 +135,143 @@ public class TaskGroupContainer
         long lastReportTimeStamp = 0;
         Communication lastTaskGroupContainerCommunication = new Communication();
 
-//        try {
-            while (true) {
-                //1.判断task状态
-                boolean failedOrKilled = false;
-                Map<Integer, Communication> communicationMap = containerCommunicator.getCommunicationMap();
-                for (Map.Entry<Integer, Communication> entry : communicationMap.entrySet()) {
-                    Integer taskId = entry.getKey();
-                    Communication taskCommunication = entry.getValue();
-                    if (!taskCommunication.isFinished()) {
-                        continue;
-                    }
-                    TaskExecutor taskExecutor = removeTask(runTasks, taskId);
+        while (true) {
+            //1.判断task状态
+            boolean failedOrKilled = false;
+            Map<Integer, Communication> communicationMap = containerCommunicator.getCommunicationMap();
+            for (Map.Entry<Integer, Communication> entry : communicationMap.entrySet()) {
+                Integer taskId = entry.getKey();
+                Communication taskCommunication = entry.getValue();
+                if (!taskCommunication.isFinished()) {
+                    continue;
+                }
+                TaskExecutor taskExecutor = removeTask(runTasks, taskId);
 
-                    //上面从runTasks里移除了，因此对应在monitor里移除
-                    taskMonitor.removeTask(taskId);
+                //上面从runTasks里移除了，因此对应在monitor里移除
+                taskMonitor.removeTask(taskId);
 
-                    //失败，看task是否支持fail over，重试次数未超过最大限制
-                    if (taskCommunication.getState() == State.FAILED) {
-                        taskFailedExecutorMap.put(taskId, taskExecutor);
-                        assert taskExecutor != null;
-                        if (taskExecutor.supportFailOver() && taskExecutor.getAttemptCount() < taskMaxRetryTimes) {
-                            taskExecutor.shutdown(); //关闭老的executor
-                            containerCommunicator.resetCommunication(taskId); //将task的状态重置
-                            Configuration taskConfig = taskConfigMap.get(taskId);
-                            taskQueue.add(taskConfig); //重新加入任务列表
-                        }
-                        else {
-                            failedOrKilled = true;
-                            break;
-                        }
+                //失败，看task是否支持fail over，重试次数未超过最大限制
+                if (taskCommunication.getState() == State.FAILED) {
+                    taskFailedExecutorMap.put(taskId, taskExecutor);
+                    assert taskExecutor != null;
+                    if (taskExecutor.supportFailOver() && taskExecutor.getAttemptCount() < taskMaxRetryTimes) {
+                        taskExecutor.shutdown(); //关闭老的executor
+                        containerCommunicator.resetCommunication(taskId); //将task的状态重置
+                        Configuration taskConfig = taskConfigMap.get(taskId);
+                        taskQueue.add(taskConfig); //重新加入任务列表
                     }
-                    else if (taskCommunication.getState() == State.KILLED) {
+                    else {
                         failedOrKilled = true;
                         break;
                     }
-                    else if (taskCommunication.getState() == State.SUCCEEDED) {
-                        Long taskStartTime = taskStartTimeMap.get(taskId);
-                        if (taskStartTime != null) {
-                            long usedTime = System.currentTimeMillis() - taskStartTime;
-                            LOG.debug("TaskGroup[{}] TaskId[{}] succeeded, used [{}]ms",
-                                    this.taskGroupId, taskId, usedTime);
-                            taskStartTimeMap.remove(taskId);
-                            taskConfigMap.remove(taskId);
-                        }
-                    }
                 }
-
-                // 2.发现该taskGroup下taskExecutor的总状态失败则汇报错误
-                if (failedOrKilled) {
-                    lastTaskGroupContainerCommunication = reportTaskGroupCommunication(lastTaskGroupContainerCommunication, taskCountInThisTaskGroup);
-
-                    throw AddaxException.asAddaxException(RUNTIME_ERROR, lastTaskGroupContainerCommunication.getThrowable());
-                }
-
-                //3.有任务未执行，且正在运行的任务数小于最大通道限制
-                Iterator<Configuration> iterator = taskQueue.iterator();
-                while (iterator.hasNext() && runTasks.size() < channelNumber) {
-                    Configuration taskConfig = iterator.next();
-                    Integer taskId = taskConfig.getInt(CoreConstant.TASK_ID);
-                    int attemptCount = 1;
-                    TaskExecutor lastExecutor = taskFailedExecutorMap.get(taskId);
-                    if (lastExecutor != null) {
-                        attemptCount = lastExecutor.getAttemptCount() + 1;
-                        long now = System.currentTimeMillis();
-                        long failedTime = lastExecutor.getTimeStamp();
-                        if (now - failedTime < taskRetryIntervalInMs) {  //未到等待时间，继续留在队列
-                            continue;
-                        }
-                        if (!lastExecutor.isShutdown()) { //上次失败的task仍未结束
-                            if (now - failedTime > taskMaxWaitInMs) {
-                                markCommunicationFailed(taskId);
-                                reportTaskGroupCommunication(lastTaskGroupContainerCommunication, taskCountInThisTaskGroup);
-                                throw AddaxException.asAddaxException(ErrorCode.WAIT_TIME_EXCEED, "The task fail over wait timed out.");
-                            }
-                            else {
-                                lastExecutor.shutdown(); //try to close again
-                                continue;
-                            }
-                        }
-                        else {
-                            LOG.debug("TaskGroup[{}] TaskId[{}] AttemptCount[{}] has already shutdown",
-                                    this.taskGroupId, taskId, lastExecutor.getAttemptCount());
-                        }
-                    }
-                    Configuration taskConfigForRun = taskMaxRetryTimes > 1 ? taskConfig.clone() : taskConfig;
-                    TaskExecutor taskExecutor = new TaskExecutor(taskConfigForRun, attemptCount);
-                    taskStartTimeMap.put(taskId, System.currentTimeMillis());
-                    taskExecutor.doStart();
-
-                    iterator.remove();
-                    runTasks.add(taskExecutor);
-
-                    //上面，增加task到runTasks列表，因此在monitor里注册。
-                    taskMonitor.registerTask(taskId, this.containerCommunicator.getCommunication(taskId));
-
-                    taskFailedExecutorMap.remove(taskId);
-                    LOG.debug("TaskGroup[{}] TaskId[{}] AttemptCount[{}] has started",
-                            this.taskGroupId, taskId, attemptCount);
-                }
-
-                //4.任务列表为空，executor已结束, 搜集状态为success--->成功
-                if (taskQueue.isEmpty() && isAllTaskDone(runTasks) && containerCommunicator.collectState() == State.SUCCEEDED) {
-                    // 成功的情况下，也需要汇报一次。否则在任务结束非常快的情况下，采集的信息将会不准确
-                    lastTaskGroupContainerCommunication = reportTaskGroupCommunication(lastTaskGroupContainerCommunication, taskCountInThisTaskGroup);
-
-                    LOG.debug("The taskGroup[{}] has completed it's tasks.", this.taskGroupId);
+                else if (taskCommunication.getState() == State.KILLED) {
+                    failedOrKilled = true;
                     break;
                 }
-
-                // 5.如果当前时间已经超出汇报时间的interval，那么我们需要马上汇报
-                long now = System.currentTimeMillis();
-                if (now - lastReportTimeStamp > reportIntervalInMillSec) {
-                    lastTaskGroupContainerCommunication = reportTaskGroupCommunication(lastTaskGroupContainerCommunication, taskCountInThisTaskGroup);
-
-                    lastReportTimeStamp = now;
-
-                    //taskMonitor对于正在运行的task，每reportIntervalInMillSec进行检查
-                    for (TaskExecutor taskExecutor : runTasks) {
-                        taskMonitor.report(taskExecutor.getTaskId(), this.containerCommunicator.getCommunication(taskExecutor.getTaskId()));
+                else if (taskCommunication.getState() == State.SUCCEEDED) {
+                    Long taskStartTime = taskStartTimeMap.get(taskId);
+                    if (taskStartTime != null) {
+                        long usedTime = System.currentTimeMillis() - taskStartTime;
+                        LOG.debug("TaskGroup[{}] TaskId[{}] succeeded, used [{}]ms",
+                                this.taskGroupId, taskId, usedTime);
+                        taskStartTimeMap.remove(taskId);
+                        taskConfigMap.remove(taskId);
                     }
-                }
-                try {
-                    TimeUnit.MILLISECONDS.sleep(sleepIntervalInMillSec);
-                }
-                catch (InterruptedException e) {
-                    Communication nowTaskGroupContainerCommunication = this.containerCommunicator.collect();
-
-                    if (nowTaskGroupContainerCommunication.getThrowable() == null) {
-                        nowTaskGroupContainerCommunication.setThrowable(e);
-                    }
-                    nowTaskGroupContainerCommunication.setState(State.FAILED);
-                    this.containerCommunicator.report(nowTaskGroupContainerCommunication);
-                    throw AddaxException.asAddaxException(RUNTIME_ERROR, e);
                 }
             }
 
-            //6.最后还要汇报一次
-            reportTaskGroupCommunication(lastTaskGroupContainerCommunication, taskCountInThisTaskGroup);
-//        }
-//        catch (Throwable e) {
-//            Communication nowTaskGroupContainerCommunication = this.containerCommunicator.collect();
-//
-//            if (nowTaskGroupContainerCommunication.getThrowable() == null) {
-//                nowTaskGroupContainerCommunication.setThrowable(e);
-//            }
-//            nowTaskGroupContainerCommunication.setState(State.FAILED);
-//            this.containerCommunicator.report(nowTaskGroupContainerCommunication);
-//
-//            throw AddaxException.asAddaxException(RUNTIME_ERROR, e);
-//        }
+            // 2.发现该taskGroup下taskExecutor的总状态失败则汇报错误
+            if (failedOrKilled) {
+                lastTaskGroupContainerCommunication = reportTaskGroupCommunication(lastTaskGroupContainerCommunication, taskCountInThisTaskGroup);
+
+                throw AddaxException.asAddaxException(RUNTIME_ERROR, lastTaskGroupContainerCommunication.getThrowable());
+            }
+
+            //3.有任务未执行，且正在运行的任务数小于最大通道限制
+            Iterator<Configuration> iterator = taskQueue.iterator();
+            while (iterator.hasNext() && runTasks.size() < channelNumber) {
+                Configuration taskConfig = iterator.next();
+                Integer taskId = taskConfig.getInt(CoreConstant.TASK_ID);
+                int attemptCount = 1;
+                TaskExecutor lastExecutor = taskFailedExecutorMap.get(taskId);
+                if (lastExecutor != null) {
+                    attemptCount = lastExecutor.getAttemptCount() + 1;
+                    long now = System.currentTimeMillis();
+                    long failedTime = lastExecutor.getTimeStamp();
+                    if (now - failedTime < taskRetryIntervalInMs) {  //未到等待时间，继续留在队列
+                        continue;
+                    }
+                    if (!lastExecutor.isShutdown()) { //上次失败的task仍未结束
+                        if (now - failedTime > taskMaxWaitInMs) {
+                            markCommunicationFailed(taskId);
+                            reportTaskGroupCommunication(lastTaskGroupContainerCommunication, taskCountInThisTaskGroup);
+                            throw AddaxException.asAddaxException(ErrorCode.WAIT_TIME_EXCEED, "The task fail over wait timed out.");
+                        }
+                        else {
+                            lastExecutor.shutdown(); //try to close again
+                            continue;
+                        }
+                    }
+                    else {
+                        LOG.debug("TaskGroup[{}] TaskId[{}] AttemptCount[{}] has already shutdown",
+                                this.taskGroupId, taskId, lastExecutor.getAttemptCount());
+                    }
+                }
+                Configuration taskConfigForRun = taskMaxRetryTimes > 1 ? taskConfig.clone() : taskConfig;
+                TaskExecutor taskExecutor = new TaskExecutor(taskConfigForRun, attemptCount);
+                taskStartTimeMap.put(taskId, System.currentTimeMillis());
+                taskExecutor.doStart();
+
+                iterator.remove();
+                runTasks.add(taskExecutor);
+
+                //上面，增加task到runTasks列表，因此在monitor里注册。
+                taskMonitor.registerTask(taskId, this.containerCommunicator.getCommunication(taskId));
+
+                taskFailedExecutorMap.remove(taskId);
+                LOG.debug("TaskGroup[{}] TaskId[{}] AttemptCount[{}] has started",
+                        this.taskGroupId, taskId, attemptCount);
+            }
+
+            //4.任务列表为空，executor已结束, 搜集状态为success--->成功
+            if (taskQueue.isEmpty() && isAllTaskDone(runTasks) && containerCommunicator.collectState() == State.SUCCEEDED) {
+                // 成功的情况下，也需要汇报一次。否则在任务结束非常快的情况下，采集的信息将会不准确
+                lastTaskGroupContainerCommunication = reportTaskGroupCommunication(lastTaskGroupContainerCommunication, taskCountInThisTaskGroup);
+
+                LOG.debug("The taskGroup[{}] has completed it's tasks.", this.taskGroupId);
+                break;
+            }
+
+            // 5.如果当前时间已经超出汇报时间的interval，那么我们需要马上汇报
+            long now = System.currentTimeMillis();
+            if (now - lastReportTimeStamp > reportIntervalInMillSec) {
+                lastTaskGroupContainerCommunication = reportTaskGroupCommunication(lastTaskGroupContainerCommunication, taskCountInThisTaskGroup);
+
+                lastReportTimeStamp = now;
+
+                //taskMonitor对于正在运行的task，每reportIntervalInMillSec进行检查
+                for (TaskExecutor taskExecutor : runTasks) {
+                    taskMonitor.report(taskExecutor.getTaskId(), this.containerCommunicator.getCommunication(taskExecutor.getTaskId()));
+                }
+            }
+            try {
+                TimeUnit.MILLISECONDS.sleep(sleepIntervalInMillSec);
+            }
+            catch (InterruptedException e) {
+                Communication nowTaskGroupContainerCommunication = this.containerCommunicator.collect();
+
+                if (nowTaskGroupContainerCommunication.getThrowable() == null) {
+                    nowTaskGroupContainerCommunication.setThrowable(e);
+                }
+                nowTaskGroupContainerCommunication.setState(State.FAILED);
+                this.containerCommunicator.report(nowTaskGroupContainerCommunication);
+                throw AddaxException.asAddaxException(RUNTIME_ERROR, e);
+            }
+        }
+
+        //6.最后还要汇报一次
+        reportTaskGroupCommunication(lastTaskGroupContainerCommunication, taskCountInThisTaskGroup);
     }
 
     private Map<Integer, Configuration> buildTaskConfigMap(List<Configuration> configurations)
