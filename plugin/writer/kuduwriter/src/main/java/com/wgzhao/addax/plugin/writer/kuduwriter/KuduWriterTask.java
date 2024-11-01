@@ -40,6 +40,8 @@ import org.slf4j.LoggerFactory;
 
 import java.math.BigDecimal;
 import java.sql.Timestamp;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
 import java.util.List;
 
 import static com.wgzhao.addax.common.base.Constant.DEFAULT_BATCH_SIZE;
@@ -136,7 +138,10 @@ public class KuduWriterTask
                         row.addDecimal(name, new BigDecimal(column.asString()));
                         break;
                     case UNIXTIME_MICROS:
-                        row.addTimestamp(name, new Timestamp(column.asLong()));
+                        // need convert local timestamp to  UTC
+                        int offsetSecs = ZonedDateTime.now(ZoneId.systemDefault()).getOffset().getTotalSeconds();
+                        // use nanos timestamp value
+                        row.addLong(name, (column.asTimestamp().getTime() * 1_000L + offsetSecs * 1_000_000L));
                         break;
                     case DATE:
                         // Kudu take date as string
