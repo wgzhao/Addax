@@ -59,13 +59,12 @@ bin/addax.sh job/kudu2stream.json
 上述定义了两个过滤条件，每个过滤条件由三部分组成，格式为  `column operator value`
 
 - `column`: 要过滤的字段
-- `operator`: 比较符号，当前仅支持 `=`,  `>`, '>=', `<`, `<=` , 其他操作符号当前还不支持
-- `value`: 比较值，如果是字符串，可以加上单引号(`'`), 不加可以，因为实际类型会从数据库表中获取对应字段(`column`)的类型，但如果值含有空格，则一定要加上单引号
+- `operator`: 比较符号，当前仅支持 `=`,  `>`, `>=`, `<`, `<=` , `!=` 其他操作符号当前还不支持
+- `value`: 比较值
 
 这里还有其他一些限定，在使用时，要特别注意：
 
-1. 上述三个部分之间至少有一个空格 `age>1`, `age >1` 这种均无效，这是因为我们实际上是把 SQL 风格的过滤提交转换为 Kudu 的 [KuduPredicate](https://kudu.apache.org/releases/1.14.0/apidocs/org/apache/kudu/client/KuduPredicate.html) 类
-2. 多个过滤条件之间的逻辑与关系(`AND`)，暂不支持逻辑或(`OR`)关系
+1. 多个过滤条件之间的逻辑与关系(`AND`)，暂不支持逻辑或(`OR`)关系
 
 ## 类型转换
 

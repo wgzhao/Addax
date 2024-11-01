@@ -21,11 +21,11 @@ package com.wgzhao.addax.plugin.reader.kudureader;
 
 import com.wgzhao.addax.common.element.BoolColumn;
 import com.wgzhao.addax.common.element.BytesColumn;
-import com.wgzhao.addax.common.element.DateColumn;
 import com.wgzhao.addax.common.element.DoubleColumn;
 import com.wgzhao.addax.common.element.LongColumn;
 import com.wgzhao.addax.common.element.Record;
 import com.wgzhao.addax.common.element.StringColumn;
+import com.wgzhao.addax.common.element.TimestampColumn;
 import com.wgzhao.addax.common.exception.AddaxException;
 import com.wgzhao.addax.common.plugin.RecordSender;
 import com.wgzhao.addax.common.spi.Reader;
@@ -44,14 +44,19 @@ import org.apache.kudu.client.RowResultIterator;
 import java.math.BigDecimal;
 import java.nio.charset.StandardCharsets;
 import java.sql.Date;
-import java.sql.Timestamp;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import static com.wgzhao.addax.common.base.Constant.DEFAULT_DATE_FORMAT;
 import static com.wgzhao.addax.common.base.Key.COLUMN;
 import static com.wgzhao.addax.common.base.Key.WHERE;
+import static com.wgzhao.addax.common.spi.ErrorCode.CONFIG_ERROR;
 import static com.wgzhao.addax.common.spi.ErrorCode.ILLEGAL_VALUE;
 import static com.wgzhao.addax.common.spi.ErrorCode.NOT_SUPPORT_TYPE;
 import static com.wgzhao.addax.common.spi.ErrorCode.RUNTIME_ERROR;
@@ -75,7 +80,7 @@ public class KuduReader
 
         private String upperBound;
         // match where clause such as age > 18
-        private static final String PATTERN_FOR_WHERE = "^(\\w+)\\s+(=|>|>=|<|<=)\\s+(.*)$";
+        private static final String PATTERN_FOR_WHERE = "^\\s*(\\w+)\\s*(>=|<|<=|!=|=|>)\\s*(.*)$";
         private static final Pattern pattern = Pattern.compile(PATTERN_FOR_WHERE);
 
         @Override
@@ -306,7 +311,9 @@ public class KuduReader
                                 record.addColumn(new DoubleColumn(result.getDouble(columnSchema.getName())));
                                 break;
                             case UNIXTIME_MICROS:
-                                record.addColumn(new DateColumn(result.getTimestamp(columnSchema.getName())));
+                                int offsetSecs = ZonedDateTime.now(ZoneId.systemDefault()).getOffset().getTotalSeconds();
+                                long ts = result.getLong(columnSchema.getName()) / 1_000L - offsetSecs * 1_000L;
+                                record.addColumn(new TimestampColumn(ts));
                                 break;
                             case DECIMAL:
                                 record.addColumn(new DoubleColumn(result.getDecimal(columnSchema.getName())));
@@ -448,7 +455,16 @@ public class KuduReader
                         predicate = KuduPredicate.newComparisonPredicate(column, op, value.getBytes(StandardCharsets.UTF_8));
                         break;
                     case UNIXTIME_MICROS:
-                        predicate = KuduPredicate.newComparisonPredicate(column, op, Timestamp.valueOf(value));
+                        SimpleDateFormat sdf = new SimpleDateFormat(DEFAULT_DATE_FORMAT);
+                        try {
+                            java.util.Date date = sdf.parse(value);
+                            int offsetSecs = ZonedDateTime.now(ZoneId.systemDefault()).getOffset().getTotalSeconds();
+                            long ts  = date.getTime() * 1_000L + offsetSecs * 1_000_000L;
+                            predicate = KuduPredicate.newComparisonPredicate(column, op, ts);
+                        }
+                        catch (ParseException e) {
+                            throw AddaxException.asAddaxException(CONFIG_ERROR, "Can not parse date: " + value);
+                        }
                         break;
                     default:
                         throw new IllegalStateException("Unexpected type: " + column.getType());
