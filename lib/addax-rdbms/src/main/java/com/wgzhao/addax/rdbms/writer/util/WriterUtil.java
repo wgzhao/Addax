@@ -67,8 +67,8 @@ public final class WriterUtil
 
         if (tableNumber != adviceNumber) {
             throw AddaxException.asAddaxException(CONFIG_ERROR,
-                    String.format("The number of writing tables(%d) is NOT equal to the number of channels(%d).",
-                            tableNumber, adviceNumber));
+                    "The number of writing tables(" + tableNumber + ") is NOT equal to the number of channels(" + adviceNumber + ")."
+            );
         }
 
         String jdbcUrl;
@@ -139,7 +139,7 @@ public final class WriterUtil
 
         if (!isWriteModeLegal) {
             throw AddaxException.asAddaxException(ILLEGAL_VALUE,
-                    String.format("您所配置的 writeMode:%s 错误. 目前仅支持replace,update 或 insert 方式. 请检查您的配置并作出修改.", writeMode));
+                    "The writeMode " + writeMode + " is not supported, choose one of replace, update and insert.");
         }
         String writeDataSqlTemplate;
         if (forceUseUpdate || mode.startsWith("update")) {
@@ -161,7 +161,7 @@ public final class WriterUtil
             }
             else {
                 throw AddaxException.asAddaxException(ILLEGAL_VALUE,
-                        String.format("当前数据库不支持 writeMode:%s 模式.", writeMode));
+                        "The writeMode " + writeMode + " is not supported by current database");
             }
         }
         else {

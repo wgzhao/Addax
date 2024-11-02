@@ -252,7 +252,7 @@ public class CommonRdbmsWriter
             insertOrReplaceTemplate = writerSliceConfig.getString(Constant.INSERT_OR_REPLACE_TEMPLATE_MARK);
             this.writeRecordSql = String.format(insertOrReplaceTemplate, this.table);
 
-            basicMessage = String.format("jdbcUrl:[%s], table:[%s]", this.jdbcUrl, this.table);
+            basicMessage = "jdbcUrl:" + jdbcUrl + ",table:" + table;
         }
 
         public void prepare(Configuration writerSliceConfig)
@@ -318,10 +318,8 @@ public class CommonRdbmsWriter
                         // 源头读取字段列数与目的表字段写入列数不相等，直接报错
                         throw AddaxException.asAddaxException(
                                 CONFIG_ERROR,
-                                String.format(
-                                        "The item column number [%d] in source file not equals the column number [%d] in table.",
-                                        record.getColumnNumber(),
-                                        this.columnNumber));
+                                "The item column number " + record.getColumnNumber() + " in source file not equals the column number " + columnNumber + " in table."
+                        );
                     }
 
                     writeBuffer.add(record);
@@ -529,7 +527,7 @@ public class CommonRdbmsWriter
                         preparedStatement.setDate(columnIndex, new java.sql.Date(utilDate.getTime()));
                     }
                     catch (AddaxException e) {
-                        throw new SQLException(String.format("Failed to convert the column [%s] to Date type.Date", column));
+                        throw new SQLException("Failed to convert the column " + column + "to Date type.");
                     }
                     break;
 
@@ -539,8 +537,7 @@ public class CommonRdbmsWriter
                         utilDate = column.asDate();
                     }
                     catch (AddaxException e) {
-                        throw new SQLException(String.format(
-                                "Failed to convert the column [%s] to time type.", column));
+                        throw new SQLException("Failed to convert the column " + column + " to time type.");
                     }
 
                     if (null != utilDate) {
@@ -579,10 +576,9 @@ public class CommonRdbmsWriter
                     Map<String, Object> map = this.resultSetMetaData.get(columnIndex);
                     throw AddaxException.asAddaxException(
                             NOT_SUPPORT_TYPE,
-                            String.format(
-                                    "您的配置文件中的列配置信息有误. 不支持数据库写入这种字段类型. 字段名:[%s], " +
-                                            "字段SQL类型编号:[%s], 字段Java类型:[%s]. 请修改表中该字段的类型或者不同步该字段.",
-                                    map.get("name"), map.get("type"), map.get("typeName")));
+                            "Not support the type: field name: " + map.get("name")
+                                    + "The SQL type: " + map.get("type")
+                                    + "The Java type: " + map.get("typeName"));
             }
             return preparedStatement;
         }

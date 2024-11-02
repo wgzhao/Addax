@@ -162,7 +162,7 @@ public class CommonRdbmsReader
 
             this.mandatoryEncoding = readerSliceConfig.getString(Key.MANDATORY_ENCODING, "");
 
-            basicMsg = String.format("jdbcUrl:[%s]", this.jdbcUrl);
+            basicMsg = "jdbcUrl: " + this.jdbcUrl;
         }
 
         public void startRead(Configuration readerSliceConfig, RecordSender recordSender,

@@ -194,8 +194,7 @@ public final class DBUtil
                     password, socketTimeout), 3, 1000L, true);
         }
         catch (Exception e) {
-            throw AddaxException.asAddaxException(CONNECT_ERROR,
-                    String.format("Failed to connect the database with [%s].", jdbcUrl), e);
+            throw AddaxException.asAddaxException(CONNECT_ERROR, "Failed to connect the database with " + jdbcUrl, e);
         }
     }
 
@@ -401,8 +400,7 @@ public final class DBUtil
             return result;
         }
         catch (SQLException e) {
-            throw AddaxException.asAddaxException(EXECUTE_FAIL,
-                    String.format("Failed to obtain the fields of table [%s].", tableName), e);
+            throw AddaxException.asAddaxException(EXECUTE_FAIL, "Failed to obtain the fields of table " + tableName, e);
         }
     }
 
@@ -413,8 +411,7 @@ public final class DBUtil
             ignored = connect(dataBaseType, url, user, pass);
         }
         catch (Exception e) {
-            throw AddaxException.asAddaxException(CONNECT_ERROR,
-                    String.format("Failed to connect the database using '%s': %s.", url, e.getMessage()), e);
+            throw AddaxException.asAddaxException(CONNECT_ERROR, "Failed to connect the database using " + url, e);
         }
         finally {
             if (null != ignored) {
@@ -422,7 +419,7 @@ public final class DBUtil
                     ignored.close();
                 }
                 catch (SQLException e) {
-                    LOG.warn("Failed to close the connection.");
+                    LOG.warn("Failed to close the connection.", e);
                 }
             }
         }
@@ -500,8 +497,7 @@ public final class DBUtil
             stmt = conn.createStatement();
         }
         catch (SQLException e) {
-            throw AddaxException.asAddaxException(CONFIG_ERROR,
-                    String.format("Failed to set session with [%s]", message), e);
+            throw AddaxException.asAddaxException(CONFIG_ERROR, "Failed to set session with " + message, e);
         }
 
         for (String sessionSql : sessions) {
@@ -510,8 +506,7 @@ public final class DBUtil
                 stmt.execute(sessionSql);
             }
             catch (SQLException e) {
-                throw AddaxException.asAddaxException(CONFIG_ERROR,
-                        String.format("Failed to set session with [%s].", message), e);
+                throw AddaxException.asAddaxException(CONFIG_ERROR, "Failed to set session with " + message, e);
             }
         }
         DBUtil.closeDBResources(stmt, null);
@@ -553,7 +548,7 @@ public final class DBUtil
                             System.getProperty("addax.home"),
                             "plugin",
                             pluginType,
-                            String.format("%s%s", pluginName, pluginType),
+                            pluginName + pluginType,
                             "plugin.json"}, File.separator);
             Configuration configuration = Configuration.from(new File(pluginJsonPath));
             List<String> drivers = configuration.getList("drivers", String.class);

@@ -49,7 +49,7 @@ public final class OriginalConfPretreatmentUtil
     private static final Logger LOG = LoggerFactory.getLogger(OriginalConfPretreatmentUtil.class);
 
     public static DataBaseType dataBaseType;
-    private static final String jdbcUrlPath = String.format("%s.%s", Key.CONNECTION, Key.JDBC_URL);
+    private static final String jdbcUrlPath = Key.CONNECTION + "." + Key.JDBC_URL;
 
     private OriginalConfPretreatmentUtil() {}
 
@@ -77,9 +77,8 @@ public final class OriginalConfPretreatmentUtil
         // 检查batchSize 配置（选填，如果未填写，则设置为默认值）
         int batchSize = originalConfig.getInt(Key.BATCH_SIZE, Constant.DEFAULT_BATCH_SIZE);
         if (batchSize < 1) {
-            throw AddaxException.asAddaxException(ILLEGAL_VALUE, String.format(
-                    "The item batchSize [%s] must be greater than 1. recommended value range is [100,1000].",
-                    batchSize));
+            throw AddaxException.asAddaxException(ILLEGAL_VALUE,
+                    "The item batchSize " + batchSize + " must be greater than 1. recommended value range is [100,1000].");
         }
 
         originalConfig.set(Key.BATCH_SIZE, batchSize);
@@ -117,7 +116,7 @@ public final class OriginalConfPretreatmentUtil
             throw AddaxException.asAddaxException(REQUIRED_VALUE, "The item table is required.");
         }
 
-        originalConfig.set(String.format("%s.%s", Key.CONNECTION, Key.TABLE), expandedTables);
+        originalConfig.set(Key.CONNECTION + "." + Key.TABLE, expandedTables);
 
         originalConfig.set(Key.TABLE_NUMBER, expandedTables.size());
     }
@@ -151,8 +150,8 @@ public final class OriginalConfPretreatmentUtil
             }
             else if (userConfiguredColumns.size() > allColumns.size()) {
                 throw AddaxException.asAddaxException(CONFIG_ERROR,
-                        String.format("The number of columns your configured [%d] are greater than the number of table columns [%d].",
-                                userConfiguredColumns.size(), allColumns.size()));
+                        "The number of columns your configured " + userConfiguredColumns.size()
+                                + "are greater than the number of table columns " + allColumns.size());
             }
             else {
                 // 确保用户配置的 column 不重复
@@ -175,7 +174,7 @@ public final class OriginalConfPretreatmentUtil
         String jdbcUrl = originalConfig.getString(jdbcUrlPath);
         String username = originalConfig.getString(Key.USERNAME);
         String password = originalConfig.getString(Key.PASSWORD);
-        String oneTable = originalConfig.getString(String.format("%s.%s[0]", Key.CONNECTION, Key.TABLE));
+        String oneTable = originalConfig.getString(Key.CONNECTION + "." + Key.TABLE + "[0]");
 
         JdbcConnectionFactory jdbcConnectionFactory = new JdbcConnectionFactory(dataBaseType, jdbcUrl, username, password);
         dealColumnConf(originalConfig, jdbcConnectionFactory, oneTable);

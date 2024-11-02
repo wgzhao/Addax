@@ -138,7 +138,7 @@ public final class OriginalConfPretreatmentUtil
         jdbcUrl = dataBaseType.appendJDBCSuffixForReader(jdbcUrl);
 
         // 回写到connection.jdbcUrl
-        originalConfig.set(String.format("%s.%s", Key.CONNECTION, Key.JDBC_URL), jdbcUrl);
+        originalConfig.set(Key.CONNECTION + "."  + Key.JDBC_URL, jdbcUrl);
 
         if (isTableMode) {
             // table 方式
@@ -148,13 +148,12 @@ public final class OriginalConfPretreatmentUtil
             List<String> expandedTables = TableExpandUtil.expandTableConf(dataBaseType, tables);
 
             if (expandedTables.isEmpty()) {
-                throw AddaxException.asAddaxException(
-                        EXECUTE_FAIL, String.format("Failed to obtain the table [%s].", StringUtils.join(tables, ",")));
+                throw AddaxException.asAddaxException(EXECUTE_FAIL, "Failed to obtain the table " + StringUtils.join(tables, ","));
             }
 
             tableNum += expandedTables.size();
 
-            originalConfig.set(String.format("%s.%s", Key.CONNECTION, Key.TABLE), expandedTables);
+            originalConfig.set(Key.CONNECTION + "." + Key.TABLE, expandedTables);
         }
 
         originalConfig.set(Key.TABLE_NUMBER, tableNum);
@@ -183,12 +182,12 @@ public final class OriginalConfPretreatmentUtil
                     originalConfig.set(Key.COLUMN, "*");
                 }
                 else {
-                    String jdbcUrl = originalConfig.getString(String.format("%s.%s", Key.CONNECTION, Key.JDBC_URL));
+                    String jdbcUrl = originalConfig.getString(Key.CONNECTION + "." + Key.JDBC_URL);
 
                     String username = originalConfig.getString(Key.USERNAME);
                     String password = originalConfig.getString(Key.PASSWORD);
 
-                    String tableName = originalConfig.getString(String.format("%s.%s[0]", Key.CONNECTION, Key.TABLE));
+                    String tableName = originalConfig.getString(Key.CONNECTION + "." + Key.TABLE + "[0]");
 
                     List<String> allColumns = DBUtil.getTableColumns(dataBaseType, jdbcUrl, username, password, tableName);
                     LOG.info("The table [{}] has columns [{}].", tableName, StringUtils.join(allColumns, ","));
@@ -210,7 +209,7 @@ public final class OriginalConfPretreatmentUtil
                     originalConfig.set(Key.COLUMN, StringUtils.join(quotedColumns, ","));
                     if (StringUtils.isNotBlank(splitPk) && !allColumns.contains(splitPk.toLowerCase())) {
                         throw AddaxException.asAddaxException(CONFIG_ERROR,
-                                String.format("The table [%s] has not the primary key [%s].", tableName, splitPk));
+                                "The table " + tableName + " has not the primary key " +  splitPk);
                     }
                 }
             }
