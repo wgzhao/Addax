@@ -20,12 +20,12 @@
 package com.wgzhao.addax.core;
 
 import com.wgzhao.addax.common.element.ColumnCast;
+import com.wgzhao.addax.common.exception.AddaxException;
 import com.wgzhao.addax.common.statistics.VMInfo;
 import com.wgzhao.addax.common.util.Configuration;
 import com.wgzhao.addax.core.job.JobContainer;
 import com.wgzhao.addax.core.util.ConfigParser;
 import com.wgzhao.addax.core.util.ConfigurationValidate;
-import com.wgzhao.addax.core.util.ExceptionTracker;
 import com.wgzhao.addax.core.util.container.LoadUtil;
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.DefaultParser;
@@ -35,6 +35,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
+import java.io.PrintWriter;
+import java.io.StringWriter;
 import java.util.Properties;
 import java.util.Set;
 
@@ -138,7 +140,14 @@ public class Engine {
         try {
             Engine.entry(args);
         } catch (Throwable e) {
-            LOG.error(ExceptionTracker.trace(e));
+            if (e instanceof AddaxException) {
+                LOG.error(e.getMessage());
+            } else {
+                StringWriter sw = new StringWriter();
+                PrintWriter pw = new PrintWriter(sw);
+                e.printStackTrace(pw);
+                LOG.error(sw.toString());
+            }
             System.exit(2);
         }
         System.exit(0);
