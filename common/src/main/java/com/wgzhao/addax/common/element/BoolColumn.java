@@ -151,6 +151,6 @@ public class BoolColumn
 
         throw AddaxException.asAddaxException(
                 ErrorCode.CONVERT_NOT_SUPPORT,
-                String.format("String [%s] cannot be converted to Bool .", data));
+                "String [" + data + "] cannot be converted to Bool .");
     }
 }

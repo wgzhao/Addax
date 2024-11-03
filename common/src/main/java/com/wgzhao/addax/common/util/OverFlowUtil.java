@@ -6,9 +6,7 @@
  * to you under the Apache License, Version 2.0 (the
  * "License"); you may not use this file except in compliance
  * with the License.  You may obtain a copy of the License at
- *
  *   http://www.apache.org/licenses/LICENSE-2.0
- *
  * Unless required by applicable law or agreed to in writing,
  * software distributed under the License is distributed on an
  * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
@@ -17,7 +15,7 @@
  * under the License.
  */
 
-package com.wgzhao.addax.common.element;
+package com.wgzhao.addax.common.util;
 
 import com.wgzhao.addax.common.spi.ErrorCode;
 import com.wgzhao.addax.common.exception.AddaxException;
@@ -27,14 +25,10 @@ import java.math.BigInteger;
 
 public final class OverFlowUtil
 {
-    public static final BigInteger MAX_LONG = BigInteger
-            .valueOf(Long.MAX_VALUE);
-    public static final BigInteger MIN_LONG = BigInteger
-            .valueOf(Long.MIN_VALUE);
-    public static final BigDecimal MIN_DOUBLE_POSITIVE = new BigDecimal(
-            String.valueOf(Double.MIN_VALUE));
-    public static final BigDecimal MAX_DOUBLE_POSITIVE = new BigDecimal(
-            String.valueOf(Double.MAX_VALUE));
+    public static final BigInteger MAX_LONG = BigInteger.valueOf(Long.MAX_VALUE);
+    public static final BigInteger MIN_LONG = BigInteger.valueOf(Long.MIN_VALUE);
+    public static final BigDecimal MIN_DOUBLE_POSITIVE = new BigDecimal(String.valueOf(Double.MIN_VALUE));
+    public static final BigDecimal MAX_DOUBLE_POSITIVE = new BigDecimal(String.valueOf(Double.MAX_VALUE));
 
     private OverFlowUtil() {}
 
@@ -51,7 +45,7 @@ public final class OverFlowUtil
         if (isOverFlow) {
             throw AddaxException.asAddaxException(
                     ErrorCode.CONVERT_OVER_FLOW,
-                    String.format("An overflow occurred when converting [%s] to Long type.", integer));
+                    "An overflow occurred when converting " + integer + " to Long type.");
         }
     }
 
@@ -67,8 +61,8 @@ public final class OverFlowUtil
             newDecimal = decimal.negate();
         }
 
-        return (newDecimal.compareTo(MIN_DOUBLE_POSITIVE) < 0 || newDecimal
-                .compareTo(MAX_DOUBLE_POSITIVE) > 0);
+        return (newDecimal.compareTo(MIN_DOUBLE_POSITIVE) < 0
+                || newDecimal.compareTo(MAX_DOUBLE_POSITIVE) > 0);
     }
 
     public static void validateDoubleNotOverFlow(final BigDecimal decimal)
@@ -77,8 +71,7 @@ public final class OverFlowUtil
         if (isOverFlow) {
             throw AddaxException.asAddaxException(
                     ErrorCode.CONVERT_OVER_FLOW,
-                    String.format("An overflow occurred when converting [%s] to Double type.",
-                            decimal.toPlainString()));
+                    "An overflow occurred when converting " + decimal.toPlainString() + " to Double type.");
         }
     }
 }

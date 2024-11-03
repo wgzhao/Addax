@@ -69,7 +69,7 @@ public class BytesColumn
         catch (Exception e) {
             throw AddaxException.asAddaxException(
                     ErrorCode.CONVERT_NOT_SUPPORT,
-                    String.format("Bytes[%s] cannot be converted to String .", this));
+                    "Bytes[" + this + "] cannot be converted to String .");
         }
     }
 
