@@ -128,14 +128,14 @@ public final class OriginalConfPretreatmentUtil
             throw AddaxException.asAddaxException(REQUIRED_VALUE, "The parameter [connection.jdbcUrl] is not set.");
         }
 
+        jdbcUrl = dataBaseType.appendJDBCSuffixForReader(jdbcUrl);
+
         if (isPreCheck) {
             DBUtil.validJdbcUrlWithoutRetry(dataBaseType, jdbcUrl, username, password, preSql);
         }
         else {
             DBUtil.validJdbcUrl(dataBaseType, jdbcUrl, username, password, preSql);
         }
-
-        jdbcUrl = dataBaseType.appendJDBCSuffixForReader(jdbcUrl);
 
         // 回写到connection.jdbcUrl
         originalConfig.set(Key.CONNECTION + "."  + Key.JDBC_URL, jdbcUrl);
