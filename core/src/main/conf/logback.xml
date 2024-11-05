@@ -20,15 +20,24 @@
 
 <configuration>
     <property name="log.dir" value="${addax.log}/" />
-    <!-- console output -->
-    <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
-        <withJansi>true</withJansi>
-        <encoder class="ch.qos.logback.classic.encoder.PatternLayoutEncoder">
-            <pattern>
-                %cyan(%d{yyyy-MM-dd HH:mm:ss.SSS}) %green([%12thread]) %highlight(%-5level) %magenta(%-20logger{0}) - %msg%n
-            </pattern>
-        </encoder>
-    </appender>
+    <!-- Suppress all internal status messages -->
+    <statusListener class="ch.qos.logback.core.status.NopStatusListener" />
+    <if condition='!isDefined("console.enabled") || "${console.enabled}" == "true"' >
+        <then>
+            <!-- console output -->
+            <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
+                <withJansi>true</withJansi>
+                <encoder class="ch.qos.logback.classic.encoder.PatternLayoutEncoder">
+                    <pattern>
+                        %cyan(%d{yyyy-MM-dd HH:mm:ss.SSS}) %green([%12thread]) %highlight(%-5level) %magenta(%-20logger{0}) - %msg%n
+                    </pattern>
+                </encoder>
+            </appender>
+            <root level="${logLevel:-INFO}">
+                <appender-ref ref="STDOUT" />
+            </root>
+        </then>
+    </if>
 
     <appender name="FILE" class="ch.qos.logback.core.FileAppender">
         <file>${log.dir}/${log.file.name}</file>
@@ -43,7 +52,6 @@
     <logger name="org.mongodb.driver" level="WARN"> </logger>
 
     <root level="${loglevel:-INFO}">
-        <appender-ref ref="STDOUT" />
         <appender-ref ref="FILE" />
     </root>
 </configuration>
