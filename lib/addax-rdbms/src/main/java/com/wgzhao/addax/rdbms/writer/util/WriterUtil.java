@@ -177,7 +177,7 @@ public final class WriterUtil
 
     private static String doPostgresqlUpdate(String writeMode, List<String> columnHolders)
     {
-        String conflict = writeMode.replace("update", "");
+        String conflict = writeMode.replaceFirst("update", "");
         StringBuilder sb = new StringBuilder();
         sb.append(" ON CONFLICT ");
         sb.append(conflict);
