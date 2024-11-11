@@ -34,12 +34,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.File;
-import java.sql.Connection;
-import java.sql.ResultSet;
-import java.sql.ResultSetMetaData;
-import java.sql.SQLException;
-import java.sql.SQLFeatureNotSupportedException;
-import java.sql.Statement;
+import java.sql.*;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -58,6 +53,7 @@ public final class DBUtil
 {
     private static final Logger LOG = LoggerFactory.getLogger(DBUtil.class);
     private static final int DEFAULT_SOCKET_TIMEOUT_SEC = 20_000;
+    private static final int DEFAULT_LOGIN_TIMEOUT_SEC = 1000;
 
     private static final ThreadLocal<ExecutorService> rsExecutors = ThreadLocal.withInitial(() -> Executors.newFixedThreadPool(1, new ThreadFactoryBuilder()
             .setNameFormat("rsExecutors-%d")
@@ -245,6 +241,11 @@ public final class DBUtil
                 bds.setDriverClassName("org.apache.hive.jdbc.HiveDriver");
             }
             else {
+                if("org.apache.hive.jdbc.HiveDriver".equals(bds.getDriverClassName())){
+                    DriverManager.setLoginTimeout(DEFAULT_LOGIN_TIMEOUT_SEC);
+                }
+
+
                 LOG.debug("Connecting to database with driver {}", dataBaseType.getDriverClassName());
                 bds.setDriverClassName(dataBaseType.getDriverClassName());
             }
