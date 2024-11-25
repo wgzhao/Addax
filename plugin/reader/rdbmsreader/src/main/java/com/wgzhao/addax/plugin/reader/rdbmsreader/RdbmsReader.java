@@ -68,7 +68,7 @@ public class RdbmsReader
             String jdbcDriver = this.originalConfig.getString(JDBC_DRIVER, null);
             if (jdbcDriver == null || StringUtils.isBlank(jdbcDriver)) {
                 // guess jdbc driver name from jdbc url if not set
-                final String jdbcType = connection.getList(Key.JDBC_URL).get(0).toString().split(":")[1];
+                final String jdbcType = connection.getString(Key.JDBC_URL).split(":")[1];
                 Arrays.stream(DataBaseType.values()).filter(
                         dataBaseType -> dataBaseType.getTypeName().equals(jdbcType)).findFirst().ifPresent(dataBaseType ->
                         DATABASE_TYPE.setDriverClassName(dataBaseType.getDriverClassName()));
