@@ -18,18 +18,23 @@ public class S3Util
         Region region = Region.of(regionStr);
         String accessId = conf.getString(S3Key.ACCESS_ID);
         String accessKey = conf.getString(S3Key.ACCESS_KEY);
+        String pathStyleAccessEnabled =conf.getString(S3Key.PATH_STYLE_ACCESS_ENABLED,"");
 
-        return initS3Client(conf.getString(S3Key.ENDPOINT), region, accessId, accessKey);
+        return initS3Client(conf.getString(S3Key.ENDPOINT), region, accessId, accessKey ,pathStyleAccessEnabled);
 
     }
 
-    public static S3Client initS3Client(String endpoint, Region region, String accessId, String accessKey) {
+    public static S3Client initS3Client(String endpoint, Region region, String accessId, String accessKey ,String pathStyleAccessEnabled) {
         if (null == region) {
             region = Region.of("ap-northeast-1");
         }
         try {
             AwsBasicCredentials awsCreds = AwsBasicCredentials.create(accessId, accessKey);
-            return S3Client.builder()
+            return S3Client.builder().serviceConfiguration(e -> {
+                if("true".equals(pathStyleAccessEnabled)) {
+                    e.pathStyleAccessEnabled(true);
+                }
+            })
                     .credentialsProvider(StaticCredentialsProvider.create(awsCreds))
                     .region(region)
                     .endpointOverride(URI.create(endpoint))
