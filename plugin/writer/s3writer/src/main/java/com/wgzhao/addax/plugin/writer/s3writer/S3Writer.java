@@ -307,22 +307,26 @@ public class S3Writer
                 completedParts.add(completedPart);
                 outputStream.reset();
             }
-            // Finally, call completeMultipartUpload operation to tell S3 to merge all uploaded
-            // parts and finish the multipart operation.
-            CompletedMultipartUpload completedMultipartUpload = CompletedMultipartUpload.builder()
-                    .parts(completedParts)
-                    .build();
+            if(!completedParts.isEmpty()) {
+                // Finally, call completeMultipartUpload operation to tell S3 to merge all uploaded
+                // parts and finish the multipart operation.
+                CompletedMultipartUpload completedMultipartUpload = CompletedMultipartUpload.builder()
+                        .parts(completedParts)
+                        .build();
 
-            CompleteMultipartUploadRequest completeMultipartUploadRequest =
-                    CompleteMultipartUploadRequest.builder()
-                            .bucket(bucket)
-                            .key(object)
-                            .uploadId(uploadId)
-                            .multipartUpload(completedMultipartUpload)
-                            .build();
+                CompleteMultipartUploadRequest completeMultipartUploadRequest =
+                        CompleteMultipartUploadRequest.builder()
+                                .bucket(bucket)
+                                .key(object)
+                                .uploadId(uploadId)
+                                .multipartUpload(completedMultipartUpload)
+                                .build();
 
-            s3Client.completeMultipartUpload(completeMultipartUploadRequest);
-            LOG.info("end do write");
+                s3Client.completeMultipartUpload(completeMultipartUploadRequest);
+                LOG.info("end do write");
+            } else {
+                LOG.info("no content do write");
+            }
         }
 
         private String record2String(Record record)
