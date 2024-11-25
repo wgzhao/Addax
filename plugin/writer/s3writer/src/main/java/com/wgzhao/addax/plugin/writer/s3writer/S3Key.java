@@ -20,4 +20,6 @@ public class S3Key extends Key
     public static final String MAX_FILE_SIZE = "maxFileSize";
 
     public static final String DEFAULT_SUFFIX = "defaultSuffix";
+
+    public static final String PATH_STYLE_ACCESS_ENABLED = "pathStyleAccessEnabled";
 }
