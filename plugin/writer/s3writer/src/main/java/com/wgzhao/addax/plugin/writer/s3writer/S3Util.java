@@ -19,12 +19,13 @@ public class S3Util
         String accessId = conf.getString(S3Key.ACCESS_ID);
         String accessKey = conf.getString(S3Key.ACCESS_KEY);
         String pathStyleAccessEnabled =conf.getString(S3Key.PATH_STYLE_ACCESS_ENABLED,"");
+        String fileFormat = conf.getString(S3Key.FILE_FORMAT,"text");
 
-        return initS3Client(conf.getString(S3Key.ENDPOINT), region, accessId, accessKey ,pathStyleAccessEnabled);
+        return initS3Client(conf.getString(S3Key.ENDPOINT), region, accessId, accessKey ,pathStyleAccessEnabled,fileFormat);
 
     }
 
-    public static S3Client initS3Client(String endpoint, Region region, String accessId, String accessKey ,String pathStyleAccessEnabled) {
+    public static S3Client initS3Client(String endpoint, Region region, String accessId, String accessKey ,String pathStyleAccessEnabled,String fileFormat) {
         if (null == region) {
             region = Region.of("ap-northeast-1");
         }
