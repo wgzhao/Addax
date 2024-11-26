@@ -119,6 +119,11 @@ public class TextWriter implements IFormatWriter {
     }
 
     @Override
+    public void init(Configuration config) {
+
+    }
+
+    @Override
     public void write(RecordReceiver lineReceiver, Configuration config, TaskPluginCollector taskPluginCollector) {
 
         // 设置每块字符串长度
