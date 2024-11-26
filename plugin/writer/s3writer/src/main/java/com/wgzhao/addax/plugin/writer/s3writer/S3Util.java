@@ -31,10 +31,10 @@ public class S3Util
         try {
             AwsBasicCredentials awsCreds = AwsBasicCredentials.create(accessId, accessKey);
             return S3Client.builder().serviceConfiguration(e -> {
-                if("true".equals(pathStyleAccessEnabled)) {
-                    e.pathStyleAccessEnabled(true);
-                }
-            })
+                        if("true".equals(pathStyleAccessEnabled)) {
+                            e.pathStyleAccessEnabled(true);
+                        }
+                    })
                     .credentialsProvider(StaticCredentialsProvider.create(awsCreds))
                     .region(region)
                     .endpointOverride(URI.create(endpoint))
