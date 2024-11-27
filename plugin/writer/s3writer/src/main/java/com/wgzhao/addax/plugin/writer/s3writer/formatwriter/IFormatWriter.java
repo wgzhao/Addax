@@ -6,6 +6,7 @@ import com.wgzhao.addax.common.util.Configuration;
 
 public interface IFormatWriter {
     void init(Configuration config);
+
     void write(RecordReceiver lineReceiver, Configuration config,
                TaskPluginCollector taskPluginCollector);
 }

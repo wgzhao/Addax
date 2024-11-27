@@ -19,8 +19,7 @@
 
 package com.wgzhao.addax.plugin.writer.s3writer.formatwriter;
 
-public enum SupportHiveDataType
-{
+public enum SupportHiveDataType {
     TINYINT,
     SMALLINT,
     INT,

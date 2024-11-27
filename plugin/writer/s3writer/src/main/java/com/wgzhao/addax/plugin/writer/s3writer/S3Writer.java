@@ -6,6 +6,7 @@ import com.wgzhao.addax.common.plugin.RecordReceiver;
 import com.wgzhao.addax.common.spi.Writer;
 import com.wgzhao.addax.common.util.Configuration;
 import com.wgzhao.addax.plugin.writer.s3writer.formatwriter.OrcWriter;
+import com.wgzhao.addax.plugin.writer.s3writer.formatwriter.ParquetWriter;
 import com.wgzhao.addax.plugin.writer.s3writer.formatwriter.TextWriter;
 import com.wgzhao.addax.storage.writer.StorageWriterUtil;
 import org.apache.commons.lang3.StringUtils;
@@ -220,8 +221,7 @@ public class S3Writer
                         .setFieldDelimiter(this.fieldDelimiter)
                         .setMaxFileSize(this.maxFileSize);
                 textWriter.write(lineReceiver, this.getPluginJobConf(), this.getTaskPluginCollector());
-            }
-            if ("orc".equals(this.fileType)) {
+            } else if ("orc".equals(this.fileType)) {
                 OrcWriter orcWriter = new OrcWriter()
                         .setBucket(this.bucket)
                         .setDateFormat(this.dateFormat)
@@ -234,6 +234,19 @@ public class S3Writer
                         .setSslEnabled(this.sslEnabled);
                 orcWriter.init(this.getPluginJobConf());
                 orcWriter.write(lineReceiver, this.getPluginJobConf(), this.getTaskPluginCollector());
+            } else if ("parquet".equals(this.fileType)) {
+                ParquetWriter parquetWriter = new ParquetWriter()
+                        .setBucket(this.bucket)
+                        .setDateFormat(this.dateFormat)
+                        .setEncoding(this.encoding)
+                        .setHeader(this.header)
+                        .setNullFormat(this.nullFormat)
+                        .setObject(this.object)
+                        .setS3Client(this.s3Client)
+                        .setFieldDelimiter(this.fieldDelimiter)
+                        .setSslEnabled(this.sslEnabled);
+                parquetWriter.init(this.getPluginJobConf());
+                parquetWriter.write(lineReceiver, this.getPluginJobConf(), this.getTaskPluginCollector());
             }
 
         }

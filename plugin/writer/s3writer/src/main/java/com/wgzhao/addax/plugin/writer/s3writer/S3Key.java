@@ -2,8 +2,7 @@ package com.wgzhao.addax.plugin.writer.s3writer;
 
 import com.wgzhao.addax.common.base.Key;
 
-public class S3Key extends Key
-{
+public class S3Key extends Key {
     public static final String REGION = "region";
 
     public static final String ENDPOINT = "endpoint";

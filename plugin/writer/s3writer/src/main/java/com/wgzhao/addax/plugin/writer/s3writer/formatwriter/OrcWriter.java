@@ -36,8 +36,7 @@ import java.util.StringJoiner;
 import static com.wgzhao.addax.common.spi.ErrorCode.*;
 
 public class OrcWriter
-        implements IFormatWriter
-{
+        implements IFormatWriter {
     private final Logger logger = LoggerFactory.getLogger(OrcWriter.class.getName());
     private char fieldDelimiter;
     private String nullFormat;
@@ -52,6 +51,9 @@ public class OrcWriter
     private String fileName;
 
     private org.apache.hadoop.conf.Configuration hadoopConf = null;
+
+    public OrcWriter() {
+    }
 
     public char getFieldDelimiter() {
         return fieldDelimiter;
@@ -70,8 +72,6 @@ public class OrcWriter
         this.nullFormat = nullFormat;
         return this;
     }
-
-
 
     public String getSslEnabled() {
         return sslEnabled;
@@ -118,7 +118,6 @@ public class OrcWriter
         return this;
     }
 
-
     public List<String> getHeader() {
         return header;
     }
@@ -127,6 +126,7 @@ public class OrcWriter
         this.header = header;
         return this;
     }
+
     public S3Client getS3Client() {
         return s3Client;
     }
@@ -136,23 +136,17 @@ public class OrcWriter
         return this;
     }
 
-    
-    public OrcWriter()
-    {
-    }
-
     /**
      * write an orc record
      *
-     * @param batch {@link VectorizedRowBatch}
-     * @param row row number
-     * @param record {@link Record}
-     * @param columns table columns, {@link List}
+     * @param batch               {@link VectorizedRowBatch}
+     * @param row                 row number
+     * @param record              {@link Record}
+     * @param columns             table columns, {@link List}
      * @param taskPluginCollector {@link TaskPluginCollector}
      */
     private void setRow(VectorizedRowBatch batch, int row, Record record, List<Configuration> columns,
-            TaskPluginCollector taskPluginCollector)
-    {
+                        TaskPluginCollector taskPluginCollector) {
         for (int i = 0; i < columns.size(); i++) {
             Configuration eachColumnConf = columns.get(i);
             String type = eachColumnConf.getString(Key.TYPE).trim().toUpperCase();
@@ -160,8 +154,7 @@ public class OrcWriter
             ColumnVector col = batch.cols[i];
             if (type.startsWith("DECIMAL")) {
                 columnType = SupportHiveDataType.DECIMAL;
-            }
-            else {
+            } else {
                 columnType = SupportHiveDataType.valueOf(type);
             }
             if (record.getColumn(i) == null || record.getColumn(i).getRawData() == null) {
@@ -204,17 +197,14 @@ public class OrcWriter
                         if (colType == Column.Type.BYTES) {
                             //convert bytes to base64 string
                             buffer = Base64.getEncoder().encode((byte[]) column.getRawData());
-                        }
-                        else if (colType == Column.Type.DATE) {
+                        } else if (colType == Column.Type.DATE) {
                             if (((DateColumn) column).getSubType() == DateColumn.DateType.TIME) {
                                 buffer = column.asString().getBytes(StandardCharsets.UTF_8);
-                            }
-                            else {
+                            } else {
                                 SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
                                 buffer = sdf.format(record.getColumn(i).asDate()).getBytes(StandardCharsets.UTF_8);
                             }
-                        }
-                        else {
+                        } else {
                             buffer = record.getColumn(i).getRawData().toString().getBytes(StandardCharsets.UTF_8);
                         }
                         ((BytesColumnVector) col).setRef(row, buffer, 0, buffer.length);
@@ -231,8 +221,7 @@ public class OrcWriter
                                                 eachColumnConf.getString(Key.NAME),
                                                 eachColumnConf.getString(Key.TYPE)));
                 }
-            }
-            catch (Exception e) {
+            } catch (Exception e) {
                 taskPluginCollector.collectDirtyRecord(record, e.getMessage());
                 throw AddaxException.asAddaxException(RUNTIME_ERROR,
                         String.format("Failed to set ORC row, source field type: %s, destination field original type: %s, " +
@@ -247,21 +236,20 @@ public class OrcWriter
     @Override
     public void init(Configuration config) {
 
-        this.fileName ="s3a://"+this.bucket+"/"+this.object;
+        this.fileName = "s3a://" + this.bucket + "/" + this.object;
 
         hadoopConf = new org.apache.hadoop.conf.Configuration();
-        hadoopConf.set("fs.s3a.access.key",config.getString(S3Key.ACCESS_ID));
-        hadoopConf.set("fs.s3a.secret.key",config.getString(S3Key.ACCESS_KEY));
-        hadoopConf.set("fs.s3a.endpoint",config.getString(S3Key.ENDPOINT));
-        hadoopConf.set("fs.s3a.ssl.enabled",config.getString(S3Key.SSLENABLED,"true"));
-        hadoopConf.set("fs.s3a.path.style.access",config.getString(S3Key.PATH_STYLE_ACCESS_ENABLED,"false"));
+        hadoopConf.set("fs.s3a.access.key", config.getString(S3Key.ACCESS_ID));
+        hadoopConf.set("fs.s3a.secret.key", config.getString(S3Key.ACCESS_KEY));
+        hadoopConf.set("fs.s3a.endpoint", config.getString(S3Key.ENDPOINT));
+        hadoopConf.set("fs.s3a.ssl.enabled", config.getString(S3Key.SSLENABLED, "true"));
+        hadoopConf.set("fs.s3a.path.style.access", config.getString(S3Key.PATH_STYLE_ACCESS_ENABLED, "false"));
 
     }
 
     @Override
     public void write(RecordReceiver lineReceiver, Configuration config,
-            TaskPluginCollector taskPluginCollector)
-    {
+                      TaskPluginCollector taskPluginCollector) {
         List<Configuration> columns = config.getListConfiguration(Key.COLUMN);
         String compress = config.getString(Key.COMPRESS, "NONE").toUpperCase();
         StringJoiner joiner = new StringJoiner(",");
@@ -270,8 +258,7 @@ public class OrcWriter
                 joiner.add(String.format("%s:%s(%s,%s)", column.getString(Key.NAME), "decimal",
                         column.getInt(Key.PRECISION, Constant.DEFAULT_DECIMAL_MAX_PRECISION),
                         column.getInt(Key.SCALE, Constant.DEFAULT_DECIMAL_MAX_SCALE)));
-            }
-            else {
+            } else {
                 joiner.add(String.format("%s:%s", column.getString(Key.NAME), column.getString(Key.TYPE)));
             }
         }
@@ -294,8 +281,7 @@ public class OrcWriter
                 writer.addRowBatch(batch);
                 batch.reset();
             }
-        }
-        catch (IOException e) {
+        } catch (IOException e) {
             logger.error("IO exception occurred while writing file [{}}.", fileName);
             DeleteObjectsRequest dor = DeleteObjectsRequest.builder()
                     .bucket(bucket)
