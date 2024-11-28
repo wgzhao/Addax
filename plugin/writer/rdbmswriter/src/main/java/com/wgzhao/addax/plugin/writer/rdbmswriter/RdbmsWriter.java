@@ -29,6 +29,7 @@ import com.wgzhao.addax.rdbms.util.DataBaseType;
 import com.wgzhao.addax.rdbms.writer.CommonRdbmsWriter;
 import org.apache.commons.lang3.StringUtils;
 
+import java.util.Arrays;
 import java.util.List;
 
 import static com.wgzhao.addax.common.base.Key.JDBC_DRIVER;
@@ -38,7 +39,7 @@ import static com.wgzhao.addax.common.spi.ErrorCode.REQUIRED_VALUE;
 public class RdbmsWriter
         extends Writer
 {
-    private static final DataBaseType DATABASE_TYPE = DataBaseType.RDBMS;
+    private static  DataBaseType DATABASE_TYPE = DataBaseType.RDBMS;
 
     public static class Job
             extends Writer.Job
@@ -63,7 +64,9 @@ public class RdbmsWriter
                 throw AddaxException.asAddaxException(REQUIRED_VALUE, "config 'driver' is required and must not be empty");
             }
             // use special jdbc driver class
-            DATABASE_TYPE.setDriverClassName(jdbcDriver);
+            Arrays.stream(DataBaseType.values()).filter(
+                    d -> d.getDriverClassName().equals(jdbcDriver)).findFirst().ifPresent(d ->
+                    DATABASE_TYPE=d);
             this.commonRdbmsWriterJob = new CommonRdbmsWriter.Job(DATABASE_TYPE);
             commonRdbmsWriterJob.init(originalConfig);
         }

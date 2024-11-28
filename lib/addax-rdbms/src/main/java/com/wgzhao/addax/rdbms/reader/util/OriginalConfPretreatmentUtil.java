@@ -35,6 +35,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import static com.wgzhao.addax.common.spi.ErrorCode.CONFIG_ERROR;
@@ -118,7 +119,11 @@ public final class OriginalConfPretreatmentUtil
         String driverClass = connConf.getString(Key.JDBC_DRIVER, null);
         if (driverClass != null && !driverClass.isEmpty()) {
             LOG.warn("use specified driver class: {}", driverClass);
-            dataBaseType.setDriverClassName(driverClass);
+
+
+            Arrays.stream(DataBaseType.values()).filter(
+                    d -> d.getDriverClassName().equals(driverClass)).findFirst().ifPresent(d ->
+                    dataBaseType=d);
         }
         connConf.getNecessaryValue(Key.JDBC_URL, REQUIRED_VALUE);
 

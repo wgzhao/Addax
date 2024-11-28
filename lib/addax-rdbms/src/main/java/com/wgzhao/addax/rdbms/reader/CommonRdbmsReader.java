@@ -166,7 +166,7 @@ public class CommonRdbmsReader
         }
 
         public void startRead(Configuration readerSliceConfig, RecordSender recordSender,
-                TaskPluginCollector taskPluginCollector, int fetchSize)
+                              TaskPluginCollector taskPluginCollector, int fetchSize)
         {
             String querySql = readerSliceConfig.getString(Key.QUERY_SQL);
 
@@ -223,7 +223,7 @@ public class CommonRdbmsReader
         }
 
         protected void transportOneRecord(RecordSender recordSender, ResultSet rs, ResultSetMetaData metaData,
-                int columnNumber, TaskPluginCollector taskPluginCollector)
+                                          int columnNumber, TaskPluginCollector taskPluginCollector)
         {
             Record record = buildRecord(recordSender, rs, metaData, columnNumber, taskPluginCollector);
             recordSender.sendToWriter(record);
@@ -272,7 +272,12 @@ public class CommonRdbmsReader
                     return new DateColumn(rs.getDate(i));
 
                 case Types.TIMESTAMP:
-                    return new TimestampColumn(rs.getTimestamp(i, Calendar.getInstance()));
+                    if(!"org.apache.hive.jdbc.HiveDriver".equals(this.dataBaseType.getDriverClassName())){
+                        return new TimestampColumn(rs.getTimestamp(i, Calendar.getInstance()));
+                    }else{
+                        //hive not support method(Timestamp getTimestamp(int columnIndex, Calendar cal))
+                        return new TimestampColumn(rs.getTimestamp(i));
+                    }
 
                 case Types.BINARY:
                 case Types.VARBINARY:
@@ -311,7 +316,7 @@ public class CommonRdbmsReader
         }
 
         protected Record buildRecord(RecordSender recordSender, ResultSet rs, ResultSetMetaData metaData, int columnNumber,
-                TaskPluginCollector taskPluginCollector)
+                                     TaskPluginCollector taskPluginCollector)
         {
             Record record = recordSender.createRecord();
 
