@@ -40,7 +40,7 @@ import static com.wgzhao.addax.common.spi.ErrorCode.REQUIRED_VALUE;
 public class RdbmsReader
         extends Reader
 {
-    private static final DataBaseType DATABASE_TYPE = DataBaseType.RDBMS;
+    private static  DataBaseType DATABASE_TYPE = DataBaseType.RDBMS;
 
     public static class Job
             extends Reader.Job
@@ -71,11 +71,13 @@ public class RdbmsReader
                 final String jdbcType = connection.getString(Key.JDBC_URL).split(":")[1];
                 Arrays.stream(DataBaseType.values()).filter(
                         dataBaseType -> dataBaseType.getTypeName().equals(jdbcType)).findFirst().ifPresent(dataBaseType ->
-                        DATABASE_TYPE.setDriverClassName(dataBaseType.getDriverClassName()));
+                        DATABASE_TYPE=dataBaseType);
             }
             else {
                 // use custom jdbc driver
-                DATABASE_TYPE.setDriverClassName(jdbcDriver);
+                Arrays.stream(DataBaseType.values()).filter(
+                        dataBaseType -> dataBaseType.getDriverClassName().equals(jdbcDriver)).findFirst().ifPresent(dataBaseType ->
+                        DATABASE_TYPE=dataBaseType);
             }
             this.commonRdbmsReaderMaster = new SubCommonRdbmsReader.Job(DATABASE_TYPE);
             this.originalConfig = this.commonRdbmsReaderMaster.init(this.originalConfig);

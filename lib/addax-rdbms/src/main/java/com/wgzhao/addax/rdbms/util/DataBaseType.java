@@ -50,7 +50,8 @@ public enum DataBaseType
     Sybase("sybase", "com.sybase.jdbc4.jdbc.SybDriver"),
     Databend("databend", "com.databend.jdbc.DatabendDriver"),
     Access("access","net.ucanaccess.jdbc.UcanaccessDriver"),
-    HANA("hana", "com.sap.db.jdbc.Driver");
+    HANA("hana", "com.sap.db.jdbc.Driver"),
+    VERTICA("vertica", "com.vertica.jdbc.Driver");
 
     private static final Pattern jdbcUrlPattern = Pattern.compile("jdbc:\\w+:(?:thin:url=|//|thin:@|)([\\w\\d.,]+).*");
 
@@ -162,8 +163,4 @@ public enum DataBaseType
         return typeName;
     }
 
-    public void setDriverClassName(String driverClassName)
-    {
-        this.driverClassName = driverClassName;
-    }
 }
