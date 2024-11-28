@@ -51,7 +51,14 @@ public enum DataBaseType
     Databend("databend", "com.databend.jdbc.DatabendDriver"),
     Access("access","net.ucanaccess.jdbc.UcanaccessDriver"),
     HANA("hana", "com.sap.db.jdbc.Driver"),
-    VERTICA("vertica", "com.vertica.jdbc.Driver");
+    VERTICA("vertica", "com.vertica.jdbc.Driver"),
+    DM("dm","dm.jdbc.driver.DmDriver"),
+    OSCAR("oscar","com.oscar.Driver"),
+    KINGBASE8("kingbase8","com.kingbase8.Driver"),
+    HIGHGO("highgo","com.highgo.jdbc.Driver"),
+    OCEANBASE("oceanbase","com.alipay.oceanbase.jdbc.Driver"),
+    GOLDENDB("goldendb","com.goldendb.jdbc.Driver"),
+    GBASEDBT("gbasedbt-sqli","com.gbasedbt.jdbc.Driver");
 
     private static final Pattern jdbcUrlPattern = Pattern.compile("jdbc:\\w+:(?:thin:url=|//|thin:@|)([\\w\\d.,]+).*");
 
