@@ -48,7 +48,7 @@ public class DorisWriterManager {
     private int batchCount = 0;
     private long batchSize = 0;
     private volatile boolean closed = false;
-    private volatile Exception flushException;
+    private volatile Throwable flushException;
     private final LinkedBlockingDeque< WriterTuple > flushQueue;
     private ScheduledExecutorService scheduler;
     private ScheduledFuture<?> scheduledFuture;
@@ -74,7 +74,7 @@ public class DorisWriterManager {
                             startScheduler();
                         }
                         flush(label, false);
-                    } catch (Exception e) {
+                    } catch (Throwable e) {
                         flushException = e;
                     }
                 }
@@ -149,7 +149,7 @@ public class DorisWriterManager {
                 while(true) {
                     try {
                         asyncFlush();
-                    } catch (Exception e) {
+                    } catch (Throwable e) {
                         flushException = e;
                     }
                 }
