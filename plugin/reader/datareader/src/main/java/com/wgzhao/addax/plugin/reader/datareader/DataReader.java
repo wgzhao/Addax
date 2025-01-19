@@ -221,6 +221,12 @@ public class DataReader
                             value + " is illegal, it must be a digital string"
                     );
                 }
+                catch(IndexOutOfBoundsException e) {
+                    throw AddaxException.asAddaxException(
+                            ILLEGAL_VALUE,
+                            value + " is illegal, it must format as 'start, step'"
+                    );
+                }
             }
             else if ("date".equals(dType)) {
                 String[] fields = value.split(",");
