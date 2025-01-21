@@ -609,5 +609,13 @@
             <fileMode>0644</fileMode>
             <outputDirectory>addax-${project.version}</outputDirectory>
         </fileSet>
+        <fileSet>
+            <directory>plugin/writer/paimonwriter/target/paimonwriter-${project.version}/</directory>
+            <includes>
+                <include>**/*.*</include>
+            </includes>
+            <fileMode>0644</fileMode>
+            <outputDirectory>addax-${project.version}</outputDirectory>
+        </fileSet>
     </fileSets>
 </assembly>

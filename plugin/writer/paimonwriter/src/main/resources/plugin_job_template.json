@@ -1,0 +1,13 @@
+{
+  "name": "paimonwriter",
+  "parameter": {
+
+    "dbName": "test",
+    "tableName": "test",
+    "writeMode": "truncate",
+    "paimonConfig": {
+      "warehouse": "file:///tmp/paimon",
+      "metastore": "filesystem"
+    }
+  }
+}

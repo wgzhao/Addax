@@ -395,6 +395,7 @@
                 <module>plugin/writer/sybasewriter</module>
                 <module>plugin/writer/tdenginewriter</module>
                 <module>plugin/writer/txtfilewriter</module>
+                <module>plugin/writer/paimonwriter</module>
             </modules>
         </profile>
     </profiles>
