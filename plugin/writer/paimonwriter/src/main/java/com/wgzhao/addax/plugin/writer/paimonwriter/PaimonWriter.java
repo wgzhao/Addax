@@ -21,6 +21,7 @@ import org.apache.paimon.table.sink.CommitMessage;
 import org.apache.paimon.types.DataField;
 import org.apache.paimon.types.DataType;
 import org.apache.paimon.types.DataTypeRoot;
+import org.apache.paimon.types.DecimalType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -203,6 +204,9 @@ public class PaimonWriter extends Writer {
                 StringBuilder id = new StringBuilder();
                 for (int i = 0; i < record.getColumnNumber(); i++) {
                     Column column = record.getColumn(i);
+                    if(column ==null ){
+                        continue;
+                    }
                     if (i >= columnList.size()) {
                         throw new RuntimeException("columnList size is " + columnList.size() + ", but record column number is " + record.getColumnNumber());
                     }
@@ -220,8 +224,14 @@ public class PaimonWriter extends Writer {
                         switch (columnType.getTypeRoot()) {
 
                             case DATE:
+                            case TIMESTAMP_WITH_LOCAL_TIME_ZONE:
+                            case TIMESTAMP_WITHOUT_TIME_ZONE:
                                 try {
-                                    data.setField(i, Timestamp.fromEpochMillis(column.asLong()));
+                                    if(column.asLong()!=null) {
+                                        data.setField(i, Timestamp.fromEpochMillis(column.asLong()));
+                                    } else {
+                                        data.setField(i, null);
+                                    }
                                 } catch (Exception e) {
                                     getTaskPluginCollector().collectDirtyRecord(record, String.format("时间类型解析失败 [%s:%s] exception: %s", columnName, column.toString(), e));
                                 }
@@ -243,11 +253,19 @@ public class PaimonWriter extends Writer {
                             case INTEGER:
                             case SMALLINT:
                             case TINYINT:
-                                data.setField(i, column.asBigInteger().intValue());
+                                data.setField(i, column.asBigInteger()==null?null:column.asBigInteger().intValue());
                                 break;
                             case FLOAT:
                             case DOUBLE:
+
                                 data.setField(i, column.asDouble());
+                                break;
+                            case DECIMAL:
+                                if(column.asBigDecimal()!=null) {
+                                    data.setField(i, Decimal.fromBigDecimal(column.asBigDecimal(), ((DecimalType) columnType).getPrecision(), ((DecimalType) columnType).getScale()));
+                                } else {
+                                    data.setField(i, null);
+                                }
                                 break;
                             case MAP:
                                 try {
