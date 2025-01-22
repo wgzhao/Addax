@@ -99,6 +99,7 @@ nav:
       - writer/mongodbwriter.md
       - writer/mysqlwriter.md
       - writer/oraclewriter.md
+      - writer/paimonwriter.md
       - writer/postgresqlwriter.md
       - writer/rdbmswriter.md
       - writer/rediswriter.md
