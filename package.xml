@@ -522,6 +522,14 @@
             <outputDirectory>addax-${project.version}</outputDirectory>
         </fileSet>
         <fileSet>
+            <directory>plugin/writer/paimonwriter/target/paimonwriter-${project.version}/</directory>
+            <includes>
+                <include>**/*.*</include>
+            </includes>
+            <fileMode>0644</fileMode>
+            <outputDirectory>addax-${project.version}</outputDirectory>
+        </fileSet>
+        <fileSet>
             <directory>plugin/writer/postgresqlwriter/target/postgresqlwriter-${project.version}/</directory>
             <includes>
                 <include>**/*.*</include>
@@ -603,14 +611,6 @@
         </fileSet>
         <fileSet>
             <directory>plugin/writer/txtfilewriter/target/txtfilewriter-${project.version}/</directory>
-            <includes>
-                <include>**/*.*</include>
-            </includes>
-            <fileMode>0644</fileMode>
-            <outputDirectory>addax-${project.version}</outputDirectory>
-        </fileSet>
-        <fileSet>
-            <directory>plugin/writer/paimonwriter/target/paimonwriter-${project.version}/</directory>
             <includes>
                 <include>**/*.*</include>
             </includes>
