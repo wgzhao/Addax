@@ -1,0 +1,6 @@
+{
+  "name": "paimonwriter",
+  "class": "com.wgzhao.addax.plugin.writer.paimonwriter.PaimonWriter",
+  "description": "write data to paimon",
+  "developer": "awol2005ex"
+}
