@@ -205,7 +205,7 @@ public class PaimonWriter extends Writer {
                 for (int i = 0; i < record.getColumnNumber(); i++) {
                     Column column = record.getColumn(i);
                     if(column ==null ){
-                         continue;
+                        continue;
                     }
                     if (i >= columnList.size()) {
                         throw new RuntimeException("columnList size is " + columnList.size() + ", but record column number is " + record.getColumnNumber());
