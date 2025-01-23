@@ -280,7 +280,7 @@ public class CreatePaimonTable {
 Spark 或者 flink 环境创建表
 
 ```sql
-CREATE TABLE if not exists test.test2  tblproperties (
+CREATE TABLE if not exists test.test2(id int ,name string)  tblproperties (
     'primary-key' = 'id',
     'bucket' = '1',
     'bucket-key' = 'id'
