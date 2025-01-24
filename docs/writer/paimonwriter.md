@@ -241,6 +241,26 @@ public class CreatePaimonTable {
         CatalogContext context = CatalogContext.create(new Path("file:///g:/paimon"));
         return CatalogFactory.createCatalog(context);
     }
+    /* 如果是minio则例子如下
+     
+     public static Catalog createFilesystemCatalog() {
+        Options options = new Options();
+        options.set("warehouse", "s3a://pvc-91d1e2cd-4d25-45c9-8613-6c4f7bf0a4cc/paimon");
+        Configuration hadoopConf = new Configuration();
+        hadoopConf.set("fs.s3a.endpoint", "http://localhost:9000");
+        hadoopConf.set("fs.s3a.access.key", "gy0dX5lALP176g6c9fYf");
+        hadoopConf.set("fs.s3a.secret.key", "ReuUrCzzu5wKWAegtswoHIWV389BYl9AB1ZQbiKr");
+        hadoopConf.set("fs.s3a.connection.ssl.enabled", "false");
+        hadoopConf.set("fs.s3a.path.style.access", "true");
+        hadoopConf.set("fs.s3a.impl","org.apache.hadoop.fs.s3a.S3AFileSystem");
+        CatalogContext context = CatalogContext.create(options,hadoopConf);
+
+
+        return CatalogFactory.createCatalog(context);
+    }
+     * 
+     * 
+     * */
 
     public static void main(String[] args) {
         Schema.Builder schemaBuilder = Schema.newBuilder();
@@ -297,6 +317,7 @@ CREATE TABLE if not exists test.test2(id int ,name string)  tblproperties (
 
 ```
 
+本地文件例子
 
 ```json
 {
@@ -312,6 +333,70 @@ CREATE TABLE if not exists test.test2(id int ,name string)  tblproperties (
 					}
 }
 ```
+
+s3 或者 minio catalog例子
+```json
+{
+	"job": {
+		"setting": {
+			"speed": {
+				"channel": 3
+			},
+			"errorLimit": {
+				"record": 0,
+				"percentage": 0
+			}
+		},
+		"content": [
+			{
+				"reader": {
+					"name": "rdbmsreader",
+					"parameter": {
+						"username": "root",
+						"password": "root",
+						"column": [
+							"*"
+						],
+						"connection": [
+							{
+								"querySql": [
+									"select 1+0 id ,'test1' as name"
+								],
+								"jdbcUrl": [
+									"jdbc:mysql://localhost:3306/ruoyi_vue_camunda?allowPublicKeyRetrieval=true"
+								]
+							}
+						],
+						"fetchSize": 1024
+					}
+				},
+				"writer": {
+					"name": "paimonwriter",
+					"parameter": {
+						"dbName": "test",
+						"tableName": "test2",
+						"writeMode": "truncate",
+						"paimonConfig": {
+							"warehouse": "s3a://pvc-91d1e2cd-4d25-45c9-8613-6c4f7bf0a4cc/paimon",
+							"metastore": "filesystem",
+							"fs.s3a.endpoint": "http://localhost:9000",
+							"fs.s3a.access.key": "gy0dX5lALP176g6c9fYf",
+							"fs.s3a.secret.key": "ReuUrCzzu5wKWAegtswoHIWV389BYl9AB1ZQbiKr",
+							"fs.s3a.connection.ssl.enabled": "false",
+							"fs.s3a.path.style.access": "true",
+							"fs.s3a.impl": "org.apache.hadoop.fs.s3a.S3AFileSystem"
+						}
+					}
+				}
+			}
+		]
+	}
+}
+```
+
+
+hdfs catalog例子
+
 ```json
 {
   "paimonConfig": {
