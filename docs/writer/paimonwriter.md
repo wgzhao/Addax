@@ -263,11 +263,14 @@ public class CreatePaimonTable {
         Identifier identifier = Identifier.create("test", "test2");
         try {
             Catalog catalog = CreatePaimonTable.createFilesystemCatalog();
+            catalog.createDatabase("test",true);
             catalog.createTable(identifier, schema, true);
         } catch (Catalog.TableAlreadyExistException e) {
             e.printStackTrace();
         } catch (Catalog.DatabaseNotExistException e) {
             e.printStackTrace();
+        } catch (Catalog.DatabaseAlreadyExistException e) {
+            throw new RuntimeException(e);
         }
 
 
