@@ -4,7 +4,7 @@
 
     <groupId>com.wgzhao.addax</groupId>
     <artifactId>addax-all</artifactId>
-    <version>4.2.3</version>
+    <version>4.2.4-SNAPSHOT</version>
 
     <name>addax-all</name>
     <description>Addax generic ETL tool</description>
