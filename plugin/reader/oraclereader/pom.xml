@@ -13,6 +13,13 @@
     <description>read data from Oracle Database</description>
     <packaging>jar</packaging>
 
+    <repositories>
+        <repository>
+            <id>mvnrepository</id>
+            <url>https://www.datanucleus.org/downloads/maven2/</url>
+        </repository>
+    </repositories>
+
     <dependencies>
         <dependency>
             <groupId>com.wgzhao.addax</groupId>
@@ -47,13 +54,11 @@
             <version>${oracle.jdbc.version}</version>
         </dependency>
 
-        <!-- missing checksum -->
+        <!-- https://mvnrepository.com/artifact/oracle/sdoapi -->
         <dependency>
             <groupId>oracle</groupId>
             <artifactId>sdoapi</artifactId>
             <version>11.2.0</version>
-            <scope>system</scope>
-            <systemPath>${project.basedir}/lib/sdoapi-11.2.0.jar</systemPath>
         </dependency>
 
     </dependencies>
