@@ -1,0 +1,36 @@
+{
+  "job": {
+    "setting": {
+      "speed": {
+        "byte": 1048576,
+        "channel": 1
+      }
+    },
+    "content": {
+      "reader": {
+        "name": "oraclereader",
+        "parameter": {
+          "username": "root",
+          "password": "root",
+          "column": [
+            "id",
+            "name"
+          ],
+          "splitPk": "db_id",
+          "connection": {
+            "table": [
+              "table"
+            ],
+            "jdbcUrl": "jdbc:oracle:thin:@<HOST_NAME>:PORT:<DATABASE_NAME>"
+          }
+        }
+      },
+      "writer": {
+        "name": "streamwriter",
+        "parameter": {
+          "print": true
+        }
+      }
+    }
+  }
+}

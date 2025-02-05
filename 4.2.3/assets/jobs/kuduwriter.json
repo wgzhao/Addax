@@ -1,0 +1,46 @@
+{
+  "job": {
+    "setting": {
+      "speed": {
+        "channel": 1,
+        "bytes": -1
+      }
+    },
+    "content": {
+      "reader": {
+        "name": "streamreader",
+        "parameter": {
+          "column": [
+            {
+              "random": "1,1000",
+              "type": "long"
+            },
+            {
+              "random": "1,10",
+              "type": "string"
+            },
+            {
+              "random": "1000,50000",
+              "type": "double"
+            }
+          ],
+          "sliceRecordCount": 1000
+        }
+      },
+      "writer": {
+        "name": "kuduwriter",
+        "parameter": {
+          "masterAddress": "127.0.0.1:7051,127.0.0.1:7151,127.0.0.1:7251",
+          "timeout": 60,
+          "table": "users",
+          "writeMode": "upsert",
+          "column": [ "user_id", "user_name", "salary"],
+          "batchSize": 1024,
+          "bufferSize": 2048,
+          "skipFail": false,
+          "encoding": "UTF-8"
+        }
+      }
+    }
+  }
+}
