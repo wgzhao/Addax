@@ -1,7 +1,6 @@
 {
   "name": "paimonwriter",
   "parameter": {
-
     "dbName": "test",
     "tableName": "test",
     "writeMode": "truncate",

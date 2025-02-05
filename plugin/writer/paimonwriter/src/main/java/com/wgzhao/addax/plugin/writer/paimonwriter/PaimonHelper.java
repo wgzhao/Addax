@@ -36,7 +36,11 @@ public class PaimonHelper {
 
     public static CatalogContext getCatalogContext(Options options) {
         CatalogContext context = null;
-        if(options.get("warehouse").startsWith("hdfs://")){
+        String warehouse=options.get("warehouse");
+        if (warehouse ==null || warehouse.isEmpty()){
+            throw new RuntimeException("warehouse of the paimonConfig is null");
+        }
+        if(warehouse.startsWith("hdfs://")||warehouse.startsWith("s3a://")){
 
             org.apache.hadoop.conf.Configuration hadoopConf = new org.apache.hadoop.conf.Configuration();
             options.toMap().forEach((k, v) -> hadoopConf.set(k, String.valueOf(v)));
