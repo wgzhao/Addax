@@ -7,8 +7,10 @@
         <version>4.2.4-SNAPSHOT</version>
         <relativePath>../../../pom.xml</relativePath>
     </parent>
+
     <artifactId>kafkareader</artifactId>
     <name>kafka-reader</name>
+    <description>Kafka reader plugin for Addax</description>
     <packaging>jar</packaging>
 
     <dependencies>

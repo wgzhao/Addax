@@ -12,6 +12,7 @@
 
     <artifactId>hbase20xsqlreader</artifactId>
     <name>hbase20xsql-reader</name>
+    <description>HBase 2.x reader plugin with phoenix for Addax</description>
     <packaging>jar</packaging>
 
     <dependencies>

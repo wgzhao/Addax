@@ -9,7 +9,7 @@
 
     <artifactId>addax-transformer</artifactId>
     <name>addax-transformer</name>
-    <description>data transformer</description>
+    <description>Transformer library for Addax</description>
     <packaging>jar</packaging>
 
     <dependencies>

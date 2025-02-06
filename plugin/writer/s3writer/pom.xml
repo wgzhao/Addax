@@ -11,7 +11,7 @@
 
     <artifactId>s3writer</artifactId>
     <name>s3-writer</name>
-    <description>write data to amazon aws s3 service</description>
+    <description>Amazon AWS S3 and variant writer plugin for Addax</description>
     <packaging>jar</packaging>
 
     <dependencyManagement>

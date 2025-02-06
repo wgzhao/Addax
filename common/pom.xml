@@ -8,6 +8,7 @@
 
     <artifactId>addax-common</artifactId>
     <name>addax-common</name>
+    <description>Common library for Addax</description>
     <packaging>jar</packaging>
 
     <dependencies>

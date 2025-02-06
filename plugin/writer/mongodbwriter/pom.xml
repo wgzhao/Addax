@@ -12,6 +12,7 @@
 
     <artifactId>mongodbwriter</artifactId>
     <name>mongodb-writer</name>
+    <description>MongoDB writer plugin for Addax</description>
     <packaging>jar</packaging>
 
     <dependencies>

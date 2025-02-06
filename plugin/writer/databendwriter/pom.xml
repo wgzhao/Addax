@@ -9,6 +9,7 @@
 
     <artifactId>databendwriter</artifactId>
     <name>databend-writer</name>
+    <description>Databend writer plugin for Addax</description>
     <packaging>jar</packaging>
 
     <dependencies>

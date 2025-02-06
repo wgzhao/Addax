@@ -10,7 +10,7 @@
 
     <artifactId>sqlserverwriter</artifactId>
     <name>sqlserver-writer</name>
-    <description>writer data into sqlserver database</description>
+    <description>Microsoft SQLServer writer plugin for Addax</description>
     <packaging>jar</packaging>
 
     <dependencies>

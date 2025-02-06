@@ -10,7 +10,7 @@
 
     <artifactId>oraclewriter</artifactId>
     <name>oracle-writer</name>
-    <description>writer data into oracle database</description>
+    <description>Oracle database writer plugin for Addax</description>
     <packaging>jar</packaging>
 
     <dependencies>

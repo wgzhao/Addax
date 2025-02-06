@@ -11,6 +11,8 @@
 
     <artifactId>sybasereader</artifactId>
     <name>sybase-reader</name>
+    <description>Sybase database reader plugin for Addax</description>
+    <packaging>jar</packaging>
 
      <repositories>
         <repository>

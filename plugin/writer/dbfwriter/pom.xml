@@ -9,7 +9,7 @@
 
     <artifactId>dbfwriter</artifactId>
     <name>dbf-writer</name>
-    <description>DbfWriter 提供了本地写入dbf功能</description>
+    <description>DBF file writer plugin for Addax</description>
     <packaging>jar</packaging>
 
     <dependencies>

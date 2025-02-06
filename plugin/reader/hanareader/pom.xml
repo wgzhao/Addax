@@ -10,7 +10,7 @@
 
     <artifactId>hanareader</artifactId>
     <name>hanareader-reader</name>
-    <description>SAP HANA Reader</description>
+    <description>SAP HANA reader plugin for Addax</description>
     <packaging>jar</packaging>
 
     <dependencies>

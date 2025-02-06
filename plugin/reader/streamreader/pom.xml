@@ -11,6 +11,7 @@
 
     <artifactId>streamreader</artifactId>
     <name>stream-reader</name>
+    <description>stream reader plugin for Addax</description>
     <packaging>jar</packaging>
 
     <dependencies>

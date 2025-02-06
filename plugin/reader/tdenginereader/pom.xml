@@ -9,6 +9,7 @@
     </parent>
     <artifactId>tdenginereader</artifactId>
     <name>tdengine-reader</name>
+    <description>TDengine Time-Series Database reader plugin for Addax</description>
     <packaging>jar</packaging>
 
     <dependencies>

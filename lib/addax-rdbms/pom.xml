@@ -9,6 +9,7 @@
 
     <artifactId>addax-rdbms</artifactId>
     <name>addax-rdbms</name>
+    <description>RDBMS reader and writer library for Addax</description>
     <packaging>jar</packaging>
 
     <dependencies>

@@ -10,6 +10,7 @@
 
     <artifactId>accessreader</artifactId>
     <name>access-reader</name>
+    <description>Access reader plugin for Addax</description>
     <packaging>jar</packaging>
 
     <dependencies>

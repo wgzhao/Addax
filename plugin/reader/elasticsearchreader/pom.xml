@@ -9,7 +9,7 @@
     </parent>
     <artifactId>elasticsearchreader</artifactId>
     <name>elasticsearch-reader</name>
-    <description>Retrieve data from ElasticSearch</description>
+    <description>ElasticSearch reader plugin for Addax</description>
     <packaging>jar</packaging>
 
     <dependencies>

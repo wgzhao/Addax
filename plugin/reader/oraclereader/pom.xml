@@ -10,7 +10,7 @@
 
     <artifactId>oraclereader</artifactId>
     <name>oracle-reader</name>
-    <description>read data from Oracle Database</description>
+    <description>Oracle Database reader plugin for Addax</description>
     <packaging>jar</packaging>
 
     <repositories>

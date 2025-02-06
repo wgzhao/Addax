@@ -8,6 +8,7 @@
     </parent>
     <artifactId>hbase20xreader</artifactId>
     <name>hbase20x-reader</name>
+    <description>HBase 2.x reader plugin for Addax</description>
     <packaging>jar</packaging>
 
     <dependencies>

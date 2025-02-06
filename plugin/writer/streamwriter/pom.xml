@@ -11,6 +11,7 @@
 
     <artifactId>streamwriter</artifactId>
     <name>stream-writer</name>
+    <description>stream(console) writer plugin for Addax</description>
     <packaging>jar</packaging>
 
     <dependencies>

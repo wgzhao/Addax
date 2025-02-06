@@ -8,7 +8,7 @@
     </parent>
     <artifactId>hanawriter</artifactId>
     <name>hana-writer</name>
-    <description>SAP HANA Writer</description>
+    <description>SAP HANA writer plugin for Addax</description>
     <packaging>jar</packaging>
 
     <dependencies>

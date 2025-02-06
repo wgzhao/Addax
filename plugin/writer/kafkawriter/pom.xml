@@ -10,7 +10,7 @@
 
     <artifactId>kafkawriter</artifactId>
     <name>kafka-writer</name>
-    <description>writer data to kafka topic</description>
+    <description>Kafka writer plugin for Addax</description>
     <packaging>jar</packaging>
 
     <dependencies>

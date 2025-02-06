@@ -12,6 +12,7 @@
 
     <artifactId>rdbmswriter</artifactId>
     <name>rdbms-writer</name>
+    <description>Any RDBMS writer plugin with jdbc for Addax</description>
     <packaging>jar</packaging>
 
     <dependencies>

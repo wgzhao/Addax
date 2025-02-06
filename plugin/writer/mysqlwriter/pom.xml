@@ -6,8 +6,10 @@
         <version>4.2.4-SNAPSHOT</version>
         <relativePath>../../../pom.xml</relativePath>
     </parent>
+
     <artifactId>mysqlwriter</artifactId>
     <name>mysql-writer</name>
+    <description>MySQL writer plugin for Addax</description>
     <packaging>jar</packaging>
 
     <dependencies>

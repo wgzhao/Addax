@@ -10,6 +10,7 @@
 
     <artifactId>kudureader</artifactId>
     <name>kudu-reader</name>
+    <description>Apache Kudu reader plugin for Addax</description>
     <packaging>jar</packaging>
 
     <dependencies>

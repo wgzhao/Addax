@@ -10,7 +10,7 @@
 
     <artifactId>rdbmsreader</artifactId>
     <name>rdbms-reader</name>
-    <description>RDBMS Reader</description>
+    <description>Any RDBMS reader plugin with jdbc for Addax</description>
     <packaging>jar</packaging>
 
     <dependencies>

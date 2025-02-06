@@ -12,6 +12,7 @@
 
     <artifactId>postgresqlreader</artifactId>
     <name>postgresql-reader</name>
+    <description>PostgreSQL reader plugin for Addax</description>
     <packaging>jar</packaging>
 
     <dependencies>

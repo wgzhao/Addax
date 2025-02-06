@@ -9,7 +9,7 @@
 
     <artifactId>greenplumwriter</artifactId>
     <name>greenplum-writer</name>
-    <description>writer data into Greenplum Database</description>
+    <description>Greenplum Database writer plugin for Addax</description>
     <packaging>jar</packaging>
 
     <dependencies>

@@ -12,7 +12,7 @@
 
     <artifactId>hdfswriter</artifactId>
     <name>hdfs-writer</name>
-    <description>HdfsWriter提供了写入HDFS功能。</description>
+    <description>Hadoop HDFS file writer plugin for Addax</description>
     <packaging>jar</packaging>
 
     <dependencies>

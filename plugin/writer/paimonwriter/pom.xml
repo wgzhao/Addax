@@ -11,7 +11,7 @@
 
     <artifactId>paimonwriter</artifactId>
     <name>paimon-writer</name>
-    <description>PaimonWriter提供了本地写入paimon格式文件功能，建议开发、测试环境使用。</description>
+    <description>Apache Paimon writer plugin for Addax</description>
     <packaging>jar</packaging>
 
     <dependencies>

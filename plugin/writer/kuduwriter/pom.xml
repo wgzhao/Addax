@@ -10,6 +10,8 @@
 
     <artifactId>kuduwriter</artifactId>
     <name>kudu-writer</name>
+    <description>Apache Kudu writer plugin for Addax</description>
+    <packaging>jar</packaging>
 
     <dependencies>
         <dependency>

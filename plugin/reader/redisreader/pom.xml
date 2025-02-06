@@ -11,7 +11,7 @@
 
     <artifactId>redisreader</artifactId>
     <name>redis-reader</name>
-    <description>Redis Reader</description>
+    <description>Redis reader plugin for Addax</description>
     <packaging>jar</packaging>
 
     <dependencies>

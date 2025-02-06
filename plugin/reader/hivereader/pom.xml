@@ -9,6 +9,7 @@
     </parent>
     <artifactId>hivereader</artifactId>
     <name>hive-reader</name>
+    <description>Apache Hive reader plugin for Addax</description>
     <packaging>jar</packaging>
 
     <properties>

@@ -11,7 +11,7 @@
 
     <artifactId>datareader</artifactId>
     <name>data-reader</name>
-    <description>Generates fake data for populating your database</description>
+    <description>Fake data generator for Addax</description>
     <packaging>jar</packaging>
 
     <dependencies>

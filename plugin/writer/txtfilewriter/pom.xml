@@ -11,7 +11,7 @@
 
     <artifactId>txtfilewriter</artifactId>
     <name>txtfile-writer</name>
-    <description>TxtFileWriter提供了本地写入TEXT功能，建议开发、测试环境使用。</description>
+    <description>Local text file writer plugin for Addax</description>
     <packaging>jar</packaging>
 
     <dependencies>

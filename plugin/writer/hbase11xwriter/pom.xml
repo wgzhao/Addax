@@ -10,6 +10,7 @@
 
     <artifactId>hbase11xwriter</artifactId>
     <name>hbase11x-writer</name>
+    <description>HBase 1.1.x writer plugin for Addax</description>
     <packaging>jar</packaging>
 
     <dependencies>

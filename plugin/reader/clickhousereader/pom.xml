@@ -9,6 +9,7 @@
     </parent>
     <artifactId>clickhousereader</artifactId>
     <name>clickhouse-reader</name>
+    <description>Clickhouse reader plugin for Addax</description>
     <packaging>jar</packaging>
 
     <dependencies>

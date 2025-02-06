@@ -9,6 +9,7 @@
     </parent>
     <artifactId>databendreader</artifactId>
     <name>databend-reader</name>
+    <description>Databend reader plugin for Addax</description>
     <packaging>jar</packaging>
 
     <dependencies>

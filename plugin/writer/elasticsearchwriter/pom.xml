@@ -11,6 +11,7 @@
 
     <artifactId>elasticsearchwriter</artifactId>
     <name>elasticsearch-writer</name>
+    <description>ElasticSearch writer plugin for Addax</description>
     <packaging>jar</packaging>
 
     <dependencies>

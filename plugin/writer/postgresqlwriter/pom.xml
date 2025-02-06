@@ -11,7 +11,7 @@
 
     <artifactId>postgresqlwriter</artifactId>
     <name>postgresql-writer</name>
-    <description>writer data into postgresql database</description>
+    <description>PostgreSQL writer plugin for Addax</description>
     <packaging>jar</packaging>
 
     <dependencies>

@@ -10,6 +10,7 @@
 
     <artifactId>hbase20xsqlwriter</artifactId>
     <name>hbase20xsql-writer</name>
+    <description>HBase 2.x writer plugin with phoenix for Addax</description>
     <packaging>jar</packaging>
 
     <dependencies>

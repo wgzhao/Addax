@@ -11,6 +11,8 @@
 
     <artifactId>mongodbreader</artifactId>
     <name>mongodb-reader</name>
+    <description>MongoDB reader plugin for Addax</description>
+    <packaging>jar</packaging>
 
     <dependencies>
         <dependency>

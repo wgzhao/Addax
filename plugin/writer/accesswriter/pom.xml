@@ -6,8 +6,11 @@
         <version>4.2.4-SNAPSHOT</version>
         <relativePath>../../../pom.xml</relativePath>
     </parent>
+
     <artifactId>accesswriter</artifactId>
     <name>access-writer</name>
+    <description>Access writer plugin for Addax</description>
+    <packaging>jar</packaging>
 
     <dependencies>
         <dependency>

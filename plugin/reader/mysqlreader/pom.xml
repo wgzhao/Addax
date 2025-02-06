@@ -7,8 +7,10 @@
         <version>4.2.4-SNAPSHOT</version>
         <relativePath>../../../pom.xml</relativePath>
     </parent>
+
     <artifactId>mysqlreader</artifactId>
     <name>mysql-reader</name>
+    <description>MySQL reader plugin for Addax</description>
     <packaging>jar</packaging>
 
     <dependencies>

@@ -9,7 +9,7 @@
     </parent>
     <artifactId>excelreader</artifactId>
     <name>excel-reader</name>
-    <description>Retrieve data from Microsoft Excel</description>
+    <description>Microsoft Excel file reader plugin for Addax</description>
     <packaging>jar</packaging>
 
     <dependencies>

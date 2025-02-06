@@ -10,7 +10,7 @@
 
     <artifactId>hbase11xsqlwriter</artifactId>
     <name>hbase11xsql-writer</name>
-    <description>HBase writer via Phoenix</description>
+    <description>HBase 11.x writer plugin with phoenix for Addax</description>
     <packaging>jar</packaging>
 
     <dependencies>
