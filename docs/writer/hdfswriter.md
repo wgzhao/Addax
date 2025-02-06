@@ -30,6 +30,7 @@ HDFS Writer 提供向 HDFS 文件系统指定路径中写入 `TextFile` ， `ORC
 | preShell               |    否    | `list`      | 无      | 写入数据前执行的shell命令，比如 `hive -e "truncate table test.hello"`                     |
 | postShell              |    否    | `list`      | 无      | 写入数据后执行的shell命令，比如 `hive -e "select count(1) from test.hello"`               |
 | ignoreError            |    否    | boolean     | false   | 是否忽略`preShell`, `postShell` 命令的错误 |
+| hdfsSitePath           |    否    | string      | 无      | `hdfs-site.xml` 的路径，详细解释见下                                |
 
 ### path
 
@@ -135,6 +136,20 @@ Hadoop hdfs 文件系统 namenode 节点地址。格式：`hdfs://ip:port` ；�
 
 该配置项用于控制是否忽略 `preShell` 和 `postShell` 命令的错误，如果配置为 `true`，则在执行 `preShell` 和 `postShell` 命令时，如果命令执行失败，不会导致任务失败，而是会打印错误日志，继续执行任务。
 否则，如果配置为 `false`，则在执行 `preShell` 和 `postShell` 命令时，如果命令执行失败，会导致任务失败。
+
+### hdfsSitePath
+
+这是 `4.2.4` 引入的新配置想，用于指定 `hdfs-site.xml` 文件的路径，比如对 HDP/CDH 而言，可以这样配置：
+
+```json
+{
+  "hdfsSitePath": "/etc/hadoop/conf/hdfs-site.xml"
+}
+```
+
+如果配置了 `hdfsSitePath` , 则插件会从该文件中获得访问 HDFS 文件系统必要的配置，从而在大部分情况下不在需要配置 `hadoopConfig`，减少配置量。
+
+对于把 Addax 部署在 Hadoop 集群上的场景，推荐使用这种方式。
 
 ## 类型转换
 

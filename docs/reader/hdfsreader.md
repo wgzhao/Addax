@@ -31,20 +31,21 @@ HDFS Reader 提供了读取分布式文件系统 Hadoop HDFS 数据存储的能�
 
 ## 配置项说明
 
-| 配置项                 | 是否必须 | 数据类型    | 默认值  | 说明                                                                                     |
-| :--------------------- | :------: | ----------- | ------- | ---------------------------------------------------------------------------------------- |
-| path                   |    是    | string      | 无      | 要读取的文件路径                                                                         |
-| defaultFS              |    是    | string      | 无      | HDFS `NAMENODE` 节点地址，如果配置了 HA 模式，则为 `defaultFS` 的值                      |
-| fileType               |    是    | string      | 无      | 文件的类型                                                                               |
-| column                 |    是    | `list<map>` | 无      | 读取字段列表                                                                             |
-| fieldDelimiter         |    否    | char        | `,`     | 指定文本文件的字段分隔符，二进制文件不需要指定该项                                       |
-| encoding               |    否    | string      | `utf-8` | 读取文件的编码配置， 目前仅支持 `utf-8`                                                  |
+| 配置项                    | 是否必须 | 数据类型        | 默认值  | 说明                                                        |
+|:-----------------------| :------: |-------------| ------- |-----------------------------------------------------------|
+| path                   |    是    | string      | 无      | 要读取的文件路径                                                  |
+| defaultFS              |    是    | string      | 无      | HDFS `NAMENODE` 节点地址，如果配置了 HA 模式，则为 `defaultFS` 的值        |
+| fileType               |    是    | string      | 无      | 文件的类型                                                     |
+| column                 |    是    | `list<map>` | 无      | 读取字段列表                                                    |
+| fieldDelimiter         |    否    | char        | `,`     | 指定文本文件的字段分隔符，二进制文件不需要指定该项                                 |
+| encoding               |    否    | string      | `utf-8` | 读取文件的编码配置， 目前仅支持 `utf-8`                                  |
 | nullFormat             |    否    | string      | 无      | 可以表示为空的字符，如果用户配置: `"\\N"` ，那么如果源头数据是 `"\N"` ，视作 `null` 字段 |
-| haveKerberos           |    否    | boolean     | 无      | 是否启用 Kerberos 认证，如果启用，则需要同时配置下面两项                                 |
-| kerberosKeytabFilePath |    否    | string      | 无      | Kerberos 认证的凭证文件路径, 比如 `/your/path/addax.service.keytab`                      |
-| kerberosPrincipal      |    否    | string      | 无      | Kerberos 认证的凭证主体, 比如 `addax/node1@WGZHAO.COM`                                   |
-| compress               |    否    | string      | 无      | 指定要读取的文件的压缩格式                                                               |
-| hadoopConfig           |    否    | map         | 无      | 里可以配置与 Hadoop 相关的一些高级参数，比如 HA 的配置                                   |
+| haveKerberos           |    否    | boolean     | 无      | 是否启用 Kerberos 认证，如果启用，则需要同时配置下面两项                         |
+| kerberosKeytabFilePath |    否    | string      | 无      | Kerberos 认证的凭证文件路径, 比如 `/your/path/addax.service.keytab`  |
+| kerberosPrincipal      |    否    | string      | 无      | Kerberos 认证的凭证主体, 比如 `addax/node1@WGZHAO.COM`             |
+| compress               |    否    | string      | 无      | 指定要读取的文件的压缩格式                                             |
+| hadoopConfig           |    否    | map         | 无      | 里可以配置与 Hadoop 相关的一些高级参数，比如 HA 的配置                         |
+| hdfsSitePath           |    否    | string      | 无      | `hdfs-site.xml` 的路径，详细解释见下                                |
 
 ### path
 
@@ -168,6 +169,20 @@ boolean safetySwitch = true;//单列长度是否限制100000字符
 boolean skipEmptyRecords = true;//是否跳过空行
 boolean captureRawRecord = true;
 ```
+
+### hdfsSitePath
+
+这是 `4.2.4` 引入的新配置想，用于指定 `hdfs-site.xml` 文件的路径，比如对 HDP/CDH 而言，可以这样配置：
+
+```json
+{
+  "hdfsSitePath": "/etc/hadoop/conf/hdfs-site.xml"
+}
+```
+
+如果配置了 `hdfsSitePath` , 则插件会从该文件中获得访问 HDFS 文件系统必要的配置，从而在大部分情况下不在需要配置 `hadoopConfig`，减少配置量。
+
+对于把 Addax 部署在 Hadoop 集群上的场景，推荐使用这种方式。
 
 ## 类型转换
 
