@@ -1746,6 +1746,15 @@
   
 </li>
         
+          <li class="md-nav__item">
+  <a href="#hdfssitepath" class="md-nav__link">
+    <span class="md-ellipsis">
+      hdfsSitePath
+    </span>
+  </a>
+  
+</li>
+        
       </ul>
     </nav>
   
@@ -2425,6 +2434,15 @@
   
 </li>
         
+          <li class="md-nav__item">
+  <a href="#hdfssitepath" class="md-nav__link">
+    <span class="md-ellipsis">
+      hdfsSitePath
+    </span>
+  </a>
+  
+</li>
+        
       </ul>
     </nav>
   
@@ -2679,6 +2697,13 @@
 <td>false</td>
 <td>是否忽略<code>preShell</code>, <code>postShell</code> 命令的错误</td>
 </tr>
+<tr>
+<td style="text-align: left;">hdfsSitePath</td>
+<td style="text-align: center;">否</td>
+<td>string</td>
+<td>无</td>
+<td><code>hdfs-site.xml</code> 的路径，详细解释见下</td>
+</tr>
 </tbody>
 </table>
 <h3 id="path">path<a class="headerlink" href="#path" title="Permanent link">&para;</a></h3>
@@ -2758,6 +2783,14 @@
 <h3 id="ignoreerror">ignoreError<a class="headerlink" href="#ignoreerror" title="Permanent link">&para;</a></h3>
 <p>该配置项用于控制是否忽略 <code>preShell</code> 和 <code>postShell</code> 命令的错误，如果配置为 <code>true</code>，则在执行 <code>preShell</code> 和 <code>postShell</code> 命令时，如果命令执行失败，不会导致任务失败，而是会打印错误日志，继续执行任务。
 否则，如果配置为 <code>false</code>，则在执行 <code>preShell</code> 和 <code>postShell</code> 命令时，如果命令执行失败，会导致任务失败。</p>
+<h3 id="hdfssitepath">hdfsSitePath<a class="headerlink" href="#hdfssitepath" title="Permanent link">&para;</a></h3>
+<p>这是 <code>4.2.4</code> 引入的新配置想，用于指定 <code>hdfs-site.xml</code> 文件的路径，比如对 HDP/CDH 而言，可以这样配置：</p>
+<div class="highlight"><pre><span></span><code><span class="p">{</span>
+<span class="w">  </span><span class="nt">&quot;hdfsSitePath&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;/etc/hadoop/conf/hdfs-site.xml&quot;</span>
+<span class="p">}</span>
+</code></pre></div>
+<p>如果配置了 <code>hdfsSitePath</code> , 则插件会从该文件中获得访问 HDFS 文件系统必要的配置，从而在大部分情况下不在需要配置 <code>hadoopConfig</code>，减少配置量。</p>
+<p>对于把 Addax 部署在 Hadoop 集群上的场景，推荐使用这种方式。</p>
 <h2 id="_3">类型转换<a class="headerlink" href="#_3" title="Permanent link">&para;</a></h2>
 <table>
 <thead>

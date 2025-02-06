@@ -872,6 +872,15 @@
   
 </li>
         
+          <li class="md-nav__item">
+  <a href="#hdfssitepath" class="md-nav__link">
+    <span class="md-ellipsis">
+      hdfsSitePath
+    </span>
+  </a>
+  
+</li>
+        
       </ul>
     </nav>
   
@@ -2371,6 +2380,15 @@
   
 </li>
         
+          <li class="md-nav__item">
+  <a href="#hdfssitepath" class="md-nav__link">
+    <span class="md-ellipsis">
+      hdfsSitePath
+    </span>
+  </a>
+  
+</li>
+        
       </ul>
     </nav>
   
@@ -2576,6 +2594,13 @@
 <td>无</td>
 <td>里可以配置与 Hadoop 相关的一些高级参数，比如 HA 的配置</td>
 </tr>
+<tr>
+<td style="text-align: left;">hdfsSitePath</td>
+<td style="text-align: center;">否</td>
+<td>string</td>
+<td>无</td>
+<td><code>hdfs-site.xml</code> 的路径，详细解释见下</td>
+</tr>
 </tbody>
 </table>
 <h3 id="path">path<a class="headerlink" href="#path" title="Permanent link">&para;</a></h3>
@@ -2673,6 +2698,14 @@
 <span class="na">boolean skipEmptyRecords</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">true</span><span class="c1">;//是否跳过空行</span>
 <span class="na">boolean captureRawRecord</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">true</span><span class="c1">;</span>
 </code></pre></div>
+<h3 id="hdfssitepath">hdfsSitePath<a class="headerlink" href="#hdfssitepath" title="Permanent link">&para;</a></h3>
+<p>这是 <code>4.2.4</code> 引入的新配置想，用于指定 <code>hdfs-site.xml</code> 文件的路径，比如对 HDP/CDH 而言，可以这样配置：</p>
+<div class="highlight"><pre><span></span><code><span class="p">{</span>
+<span class="w">  </span><span class="nt">&quot;hdfsSitePath&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;/etc/hadoop/conf/hdfs-site.xml&quot;</span>
+<span class="p">}</span>
+</code></pre></div>
+<p>如果配置了 <code>hdfsSitePath</code> , 则插件会从该文件中获得访问 HDFS 文件系统必要的配置，从而在大部分情况下不在需要配置 <code>hadoopConfig</code>，减少配置量。</p>
+<p>对于把 Addax 部署在 Hadoop 集群上的场景，推荐使用这种方式。</p>
 <h2 id="_4">类型转换<a class="headerlink" href="#_4" title="Permanent link">&para;</a></h2>
 <table>
 <thead>

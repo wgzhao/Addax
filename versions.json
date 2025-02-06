@@ -3,9 +3,9 @@
     "version": "develop",
     "title": "develop",
     "aliases": [
-      "last",
       "lastest",
-      "latest"
+      "latest",
+      "last"
     ]
   },
   {
