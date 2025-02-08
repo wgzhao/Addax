@@ -1,3 +1,11 @@
+---
+template: home.html
+title: Documentation for Addax
+social:
+  cards_layout_options:
+    title: Documentation for Addax
+---
+
 # Addax 介绍
 
 ## 概览
