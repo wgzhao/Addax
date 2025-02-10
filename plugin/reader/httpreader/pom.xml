@@ -3,12 +3,12 @@
     <parent>
         <groupId>com.wgzhao.addax</groupId>
         <artifactId>addax-all</artifactId>
-        <version>4.2.3-SNAPSHOT</version>
+        <version>4.2.4-SNAPSHOT</version>
         <relativePath>../../../pom.xml</relativePath>
     </parent>
     <artifactId>httpreader</artifactId>
     <name>http-reader</name>
-    <description>HTTPReader提供了读取指定HTTP服务接口的功能，并对返回的JSON内容进行解析</description>
+    <description>HTTP JSON response content reader plugin for Addax</description>
     <packaging>jar</packaging>
 
     <dependencies>

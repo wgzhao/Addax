@@ -5,12 +5,13 @@
     <parent>
         <groupId>com.wgzhao.addax</groupId>
         <artifactId>addax-all</artifactId>
-        <version>4.2.3-SNAPSHOT</version>
+        <version>4.2.4-SNAPSHOT</version>
         <relativePath>../../../pom.xml</relativePath>
     </parent>
 
     <artifactId>elasticsearchwriter</artifactId>
     <name>elasticsearch-writer</name>
+    <description>ElasticSearch writer plugin for Addax</description>
     <packaging>jar</packaging>
 
     <dependencies>

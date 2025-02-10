@@ -6,16 +6,18 @@ repo_name: wgzhao/addax
 repo_url: https://github.com/wgzhao/Addax
 edit_uri: ""
 
-copyright: Copyright &copy; 2019 - 2023 Steven Zhao
+copyright: Copyright &copy; 2019 - 2025 Steven Zhao
 theme:
   name: material
+  custom_dir: overrides
   language: zh
   logo: images/logo.png
   favicon: images/favicon.ico
   icon:
     repo: fontawesome/brands/github
   palette:
-    # - primary: blue
+    - primary: black
+    - accent: indigo
     - scheme: slate
       toggle:
         icon: material/toggle-switch-off-outline
@@ -25,18 +27,36 @@ theme:
         icon: material/toggle-switch
         name: Switch to light mode
   features:
-    - navigation.instant
-    - navigation.indexes
+    - announce.dismiss
+    - content.action.edit
+    - content.action.view
     - content.code.annotate
-    - content.tabs.link
+    - content.code.copy
+    # - content.code.select
+    # - content.footnote.tooltips
+    # - content.tabs.link
+    - content.tooltips
+    # - header.autohide
+    # - navigation.expand
+    - navigation.footer
+    - navigation.indexes
+    # - navigation.instant
+    # - navigation.instant.prefetch
+    # - navigation.instant.progress
+    # - navigation.prune
+    - navigation.sections
+    - navigation.tabs
+    # - navigation.tabs.sticky
     - navigation.top
     - navigation.tracking
     - search.highlight
     - search.share
     - search.suggest
+    - toc.follow
+    # - toc.integrate
 
 nav:
-  - index.md
+  - Home: index.md
   - quickstart.md
   - setupJob.md
   - 读取插件:
@@ -127,8 +147,8 @@ extra:
       link: https://github.com/wgzhao
   analytics:
     provider: google
-    property:  G-J252L4LHDX
- 
+    property: G-J252L4LHDX
+
 # Extensions
 markdown_extensions:
   - admonition

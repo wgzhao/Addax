@@ -3,12 +3,12 @@
     <parent>
         <groupId>com.wgzhao.addax</groupId>
         <artifactId>addax-all</artifactId>
-        <version>4.2.3-SNAPSHOT</version>
+        <version>4.2.4-SNAPSHOT</version>
         <relativePath>../../../pom.xml</relativePath>
     </parent>
     <artifactId>ftpwriter</artifactId>
     <name>ftp-writer</name>
-    <description>FtpWriter提供了写数据到指定ftp服务器文件功能。</description>
+    <description>FTP remote file writer plugin for Addax</description>
     <packaging>jar</packaging>
 
     <dependencies>

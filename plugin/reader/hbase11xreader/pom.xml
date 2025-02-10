@@ -3,11 +3,12 @@
     <parent>
         <groupId>com.wgzhao.addax</groupId>
         <artifactId>addax-all</artifactId>
-        <version>4.2.3-SNAPSHOT</version>
+        <version>4.2.4-SNAPSHOT</version>
         <relativePath>../../../pom.xml</relativePath>
     </parent>
     <artifactId>hbase11xreader</artifactId>
     <name>hbase11x-reader</name>
+    <description>HBase 11.x reader plugin for Addax</description>
     <packaging>jar</packaging>
 
     <dependencies>

@@ -4,12 +4,13 @@
     <parent>
         <groupId>com.wgzhao.addax</groupId>
         <artifactId>addax-all</artifactId>
-        <version>4.2.3-SNAPSHOT</version>
+        <version>4.2.4-SNAPSHOT</version>
         <relativePath>../../../pom.xml</relativePath>
     </parent>
 
     <artifactId>hbase20xsqlwriter</artifactId>
     <name>hbase20xsql-writer</name>
+    <description>HBase 2.x writer plugin with phoenix for Addax</description>
     <packaging>jar</packaging>
 
     <dependencies>

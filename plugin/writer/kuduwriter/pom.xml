@@ -4,12 +4,14 @@
     <parent>
         <artifactId>addax-all</artifactId>
         <groupId>com.wgzhao.addax</groupId>
-        <version>4.2.3-SNAPSHOT</version>
+        <version>4.2.4-SNAPSHOT</version>
         <relativePath>../../../pom.xml</relativePath>
     </parent>
 
     <artifactId>kuduwriter</artifactId>
     <name>kudu-writer</name>
+    <description>Apache Kudu writer plugin for Addax</description>
+    <packaging>jar</packaging>
 
     <dependencies>
         <dependency>

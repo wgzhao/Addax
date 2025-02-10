@@ -5,13 +5,13 @@
     <parent>
         <groupId>com.wgzhao.addax</groupId>
         <artifactId>addax-all</artifactId>
-        <version>4.2.3-SNAPSHOT</version>
+        <version>4.2.4-SNAPSHOT</version>
         <relativePath>../../../pom.xml</relativePath>
     </parent>
 
     <artifactId>s3reader</artifactId>
     <name>s3-reader</name>
-    <description>read from amazon aws s3 service</description>
+    <description>Amazon AWS s3 or variant reader plugin for Addax</description>
     <packaging>jar</packaging>
 
     <dependencyManagement>

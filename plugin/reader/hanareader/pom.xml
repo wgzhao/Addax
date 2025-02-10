@@ -4,13 +4,13 @@
     <parent>
         <artifactId>addax-all</artifactId>
         <groupId>com.wgzhao.addax</groupId>
-        <version>4.2.3-SNAPSHOT</version>
+        <version>4.2.4-SNAPSHOT</version>
         <relativePath>../../../pom.xml</relativePath>
     </parent>
 
     <artifactId>hanareader</artifactId>
     <name>hanareader-reader</name>
-    <description>SAP HANA Reader</description>
+    <description>SAP HANA reader plugin for Addax</description>
     <packaging>jar</packaging>
 
     <dependencies>

@@ -1,0 +1,72 @@
+{% extends "main.html" %}
+{% block tabs %}
+  {{ super() }}
+<div class="bg-gray-900 text-gray-100">
+    <section class="bg-gradient-to-r from-gray-800 to-gray-700 text-white py-20">
+        <div class="container mx-auto px-4 text-center">
+            <h1 class="text-5xl font-bold mb-4">Welcome to Open Source Tool</h1>
+            <p class="text-xl mb-8">A powerful and flexible open-source tool for your data processing needs.</p>
+            <a href="#download" class="bg-blue-600 text-white px-6 py-3 rounded-full font-semibold hover:bg-blue-700">Get Started</a>
+        </div>
+    </section>
+
+    <!-- Features Section -->
+    <section id="features" class="py-16">
+        <div class="container mx-auto px-4">
+            <h2 class="text-3xl font-bold text-center mb-12">Features</h2>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+                <div class="bg-gray-800 p-6 rounded-lg shadow-lg text-center">
+                    <i class="fas fa-cogs text-4xl text-blue-400 mb-4"></i>
+                    <h3 class="text-xl font-bold mb-4">Feature One</h3>
+                    <p class="text-gray-300">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.</p>
+                </div>
+                <div class="bg-gray-800 p-6 rounded-lg shadow-lg text-center">
+                    <i class="fas fa-rocket text-4xl text-blue-400 mb-4"></i>
+                    <h3 class="text-xl font-bold mb-4">Feature Two</h3>
+                    <p class="text-gray-300">Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.</p>
+                </div>
+                <div class="bg-gray-800 p-6 rounded-lg shadow-lg text-center">
+                    <i class="fas fa-shield-alt text-4xl text-blue-400 mb-4"></i>
+                    <h3 class="text-xl font-bold mb-4">Feature Three</h3>
+                    <p class="text-gray-300">Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Documentation Section -->
+    <section id="documentation" class="bg-gray-800 py-16">
+        <div class="container mx-auto px-4">
+            <h2 class="text-3xl font-bold text-center mb-12">Documentation</h2>
+            <div class="text-center">
+                <p class="text-xl mb-8">Explore our comprehensive documentation to get started with Open Source Tool.</p>
+                <a href="#" class="bg-blue-600 text-white px-6 py-3 rounded-full font-semibold hover:bg-blue-700">Read Documentation</a>
+            </div>
+        </div>
+    </section>
+
+    <!-- Community Section -->
+    <section id="community" class="py-16">
+        <div class="container mx-auto px-4">
+            <h2 class="text-3xl font-bold text-center mb-12">Community</h2>
+            <div class="text-center">
+                <p class="text-xl mb-8">Join our vibrant community of developers and contributors.</p>
+                <a href="#" class="bg-blue-600 text-white px-6 py-3 rounded-full font-semibold hover:bg-blue-700">Join Community</a>
+            </div>
+        </div>
+    </section>
+
+    <!-- Download Section -->
+    <section id="download" class="bg-gradient-to-r from-gray-800 to-gray-700 text-white py-16">
+        <div class="container mx-auto px-4">
+            <h2 class="text-3xl font-bold text-center mb-12">Download</h2>
+            <div class="text-center">
+                <p class="text-xl mb-8">Get the latest version of Open Source Tool and start building today.</p>
+                <a href="#" class="bg-blue-600 text-white px-6 py-3 rounded-full font-semibold hover:bg-blue-700">Download Now</a>
+            </div>
+        </div>
+    </section>
+</div>
+{% endblock %}
+{% block content %}{% endblock %}
+{% block footer %}{% endblock %}

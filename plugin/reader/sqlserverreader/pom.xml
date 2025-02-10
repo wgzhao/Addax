@@ -3,13 +3,13 @@
     <parent>
         <groupId>com.wgzhao.addax</groupId>
         <artifactId>addax-all</artifactId>
-        <version>4.2.3-SNAPSHOT</version>
+        <version>4.2.4-SNAPSHOT</version>
         <relativePath>../../../pom.xml</relativePath>
     </parent>
 
     <artifactId>sqlserverreader</artifactId>
     <name>sqlserver-reader</name>
-    <description>SQLServer reader plugin</description>
+    <description>Microsoft SQLServer reader plugin for Addax</description>
     <packaging>jar</packaging>
 
     <dependencies>

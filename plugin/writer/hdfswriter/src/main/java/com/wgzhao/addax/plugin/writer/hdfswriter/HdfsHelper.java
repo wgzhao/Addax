@@ -46,6 +46,7 @@ import java.util.Objects;
 import java.util.Set;
 
 import static com.wgzhao.addax.common.base.Key.HAVE_KERBEROS;
+import static com.wgzhao.addax.common.base.Key.HDFS_SIZE_PATH;
 import static com.wgzhao.addax.common.base.Key.KERBEROS_KEYTAB_FILE_PATH;
 import static com.wgzhao.addax.common.base.Key.KERBEROS_PRINCIPAL;
 import static com.wgzhao.addax.common.spi.ErrorCode.CONFIG_ERROR;
@@ -74,6 +75,11 @@ public class HdfsHelper
                 hadoopConf.set(each, hadoopSiteParamsAsJsonObject.getString(each));
             }
         }
+
+        if (taskConfig.getString(HDFS_SIZE_PATH, null) !=null) {
+            hadoopConf.addResource(new Path(taskConfig.getString(HDFS_SIZE_PATH)));
+        }
+
         hadoopConf.set("fs.defaultFS", defaultFS);
 
         //是否有Kerberos认证

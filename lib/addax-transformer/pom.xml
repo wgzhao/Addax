@@ -3,13 +3,13 @@
     <parent>
         <groupId>com.wgzhao.addax</groupId>
         <artifactId>addax-all</artifactId>
-        <version>4.2.3-SNAPSHOT</version>
+        <version>4.2.4-SNAPSHOT</version>
         <relativePath>../../pom.xml</relativePath>
     </parent>
 
     <artifactId>addax-transformer</artifactId>
     <name>addax-transformer</name>
-    <description>data transformer</description>
+    <description>Transformer library for Addax</description>
     <packaging>jar</packaging>
 
     <dependencies>

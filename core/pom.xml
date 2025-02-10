@@ -3,11 +3,12 @@
     <parent>
         <groupId>com.wgzhao.addax</groupId>
         <artifactId>addax-all</artifactId>
-        <version>4.2.3-SNAPSHOT</version>
+        <version>4.2.4-SNAPSHOT</version>
     </parent>
 
     <artifactId>addax-core</artifactId>
     <name>addax-core</name>
+    <description>The core library for Addax</description>
     <packaging>jar</packaging>
 
     <dependencies>
