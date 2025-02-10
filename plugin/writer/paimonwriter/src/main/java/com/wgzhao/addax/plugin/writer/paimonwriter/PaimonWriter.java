@@ -237,7 +237,7 @@ public class PaimonWriter
                             case TIMESTAMP_WITHOUT_TIME_ZONE:
                                 try {
                                     if (column.asLong() != null) {
-                                        data.setField(i, Timestamp.fromEpochMillis(column.asLong()));
+                                        data.setField(i, Timestamp.fromSQLTimestamp(column.asTimestamp()));
                                     }
                                     else {
                                         data.setField(i, null);
