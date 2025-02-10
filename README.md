@@ -14,8 +14,8 @@
 
 English | [简体中文](README_zh.md)
 
-The project's initial code originated from  Ali's [DataX](https://github.com/alibaba/datax), and has been greatly improved on this basis.
-It also provides more read and write plugins. For more details, please refer to the [difference document](difference.md).
+The project's initial code was originally developed by Ali's [DataX](https://github.com/alibaba/datax) team and has been significantly improved over time based on user feedback. 
+It also provides more read and write plugins, which can be beneficial for data processing tasks. If you need further clarification, you should check out this [comparison](difference.md)
 
 ## Supported Data Sources
 
