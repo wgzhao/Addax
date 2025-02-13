@@ -78,13 +78,17 @@ Addax supports more than 20 SQL and NoSQL [data sources](support_data_sources.md
 
 ```shell
 docker pull quay.io/wgzhao/addax:latest
-docker run -ti --rm --name addax quay.io/wgzhao/addax:latest /opt/addax/bin/addax.sh /opt/addax/job/job.json
+docker run -ti --rm --name addax \
+  quay.io/wgzhao/addax:latest \
+  /opt/addax/bin/addax.sh /opt/addax/job/job.json
 ```
 If you want to use common reader and writer plugins, you can pull the image whose name ends with `-lite`, it's very small.
 
 ```shell
 docker pull quay.io/wgzhao/addax:latest-lite
-docker run -ti --rm --name addax quay.io/wgzhao/addax:latest-lite /opt/addax/bin/addax.sh /opt/addax/job/job.json
+docker run -ti --rm --name addax \
+  quay.io/wgzhao/addax:latest-lite \
+  /opt/addax/bin/addax.sh /opt/addax/job/job.json
 ```
 
 [here][lite-vs-default.md] is the difference between the default image and the lite image.

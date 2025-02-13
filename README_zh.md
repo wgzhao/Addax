@@ -75,13 +75,17 @@ Addax 支持超过 20 种[关系型和非关系型数据库](support_data_source
 
 ```shell
 docker pull quay.io/wgzhao/addax:latest
-docker run -ti --rm --name addax quay.io/wgzhao/addax:latest /opt/addax/bin/addax.sh /opt/addax/job/job.json
+docker run -ti --rm --name addax \
+  quay.io/wgzhao/addax:latest \
+  /opt/addax/bin/addax.sh /opt/addax/job/job.json
 ```
 如果你只需要基本的插件，可以使用带有 `-lite` 结尾的镜像，它体积更小。
 
 ```shell
 docker pull quay.io/wgzhao/addax:latest-lite
-docker run -ti --rm --name addax quay.io/wgzhao/addax:latest-lite /opt/addax/bin/addax.sh /opt/addax/job/job.json
+docker run -ti --rm --name addax \
+  quay.io/wgzhao/addax:latest-lite \
+  /opt/addax/bin/addax.sh /opt/addax/job/job.json
 ```
 
 [这里][lite-vs-default.md] 列出了 `lite` 和 `default` 镜像所包含的插件的区别。
