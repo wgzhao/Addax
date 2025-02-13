@@ -34,6 +34,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.File;
+import java.sql.DriverManager;
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
@@ -238,11 +239,15 @@ public final class DBUtil
                 // unit ms
                 bds.addConnectionProperty("oracle.jdbc.ReadTimeout", String.valueOf(socketTimeout * 1000));
             }
+	    if ("org.apache.hive.jdbc.HiveDriver".equals(bds.getDriverClassName())) {
+		DriverManager.setLoginTimeout(DEFAULT_SOCKET_TIMEOUT_SEC);
+	    }
             if (url.contains("inceptor2")) {
                 LOG.warn("inceptor2 must be process specially");
                 url = url.replace("inceptor2", "hive2");
                 bds.setUrl(url);
                 bds.setDriverClassName("org.apache.hive.jdbc.HiveDriver");
+		DriverManager.setLoginTimeout(DEFAULT_SOCKET_TIMEOUT_SEC);
             }
             else {
                 LOG.debug("Connecting to database with driver {}", dataBaseType.getDriverClassName());
