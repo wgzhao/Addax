@@ -49,7 +49,8 @@ jobs:
 
       - name: 5. Build and packaging
         run: |
-          mvn -B -V -T 1 -DskipTests -Dmaven.javadoc.skip=true -Dmaven.source.skip=true -Dgpg.skip=true clean package
+          export MAVEN_OPTS="-DskipTests -Dmaven.javadoc.skip=true -Dmaven.source.skip=true -Dgpg.skip=true"
+          mvn -B -V -T 1 clean package
           mvn package assembly:single
           bash shrink_package.sh y
 

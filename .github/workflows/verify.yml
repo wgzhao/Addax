@@ -27,4 +27,6 @@ jobs:
         with:
           java-version: '8'
           distribution: 'adopt'
-      - run: mvn  -B -V -T 1 -Dmaven.test.skip=true -Dmaven.javadoc.skip=true -Dmaven.source.skip=true -Dgpg.skip=true verify
+      - run: |
+          export MAVEN_OPTS="-DskipTests -Dmaven.javadoc.skip=true -Dmaven.source.skip=true -Dgpg.skip=true"
+          mvn  -B -V -T 1 verify
