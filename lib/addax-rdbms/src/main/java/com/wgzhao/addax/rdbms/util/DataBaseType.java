@@ -171,4 +171,8 @@ public enum DataBaseType
         return typeName;
     }
 
+    public void setDriverClassName(String driverClassName)
+    {
+        this.driverClassName = driverClassName;
+    }
 }
