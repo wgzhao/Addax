@@ -28,6 +28,8 @@ import com.wgzhao.addax.rdbms.util.DBUtil;
 import com.wgzhao.addax.rdbms.util.DataBaseType;
 import com.wgzhao.addax.rdbms.writer.CommonRdbmsWriter;
 import org.apache.commons.lang3.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.List;
 
@@ -38,6 +40,7 @@ import static com.wgzhao.addax.common.spi.ErrorCode.REQUIRED_VALUE;
 public class RdbmsWriter
         extends Writer
 {
+    private static final Logger LOG = LoggerFactory.getLogger(Writer.class);
     private static final DataBaseType DATABASE_TYPE = DataBaseType.RDBMS_WRITER;
 
     public static class Job
@@ -54,9 +57,7 @@ public class RdbmsWriter
             // warn：not like mysql, only support insert mode, don't use
             String writeMode = this.originalConfig.getString(Key.WRITE_MODE);
             if (null != writeMode) {
-                throw AddaxException.asAddaxException(CONFIG_ERROR,
-                        String.format("写入模式(writeMode)配置有误. 因为不支持配置参数项 writeMode: %s, 仅使用insert sql 插入数据. 请检查您的配置并作出修改.",
-                                writeMode));
+                LOG.warn("The writeMode is not supported in RdbmsWriter, ignore it.");
             }
             String jdbcDriver = this.originalConfig.getString(JDBC_DRIVER, null);
             if (jdbcDriver == null || StringUtils.isBlank(jdbcDriver)) {
