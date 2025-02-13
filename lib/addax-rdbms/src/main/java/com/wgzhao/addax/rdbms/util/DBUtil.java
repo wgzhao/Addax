@@ -34,7 +34,13 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.File;
-import java.sql.*;
+import java.sql.DriverManager;
+import java.sql.Connection;
+import java.sql.ResultSet;
+import java.sql.ResultSetMetaData;
+import java.sql.SQLException;
+import java.sql.SQLFeatureNotSupportedException;
+import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -53,7 +59,6 @@ public final class DBUtil
 {
     private static final Logger LOG = LoggerFactory.getLogger(DBUtil.class);
     private static final int DEFAULT_SOCKET_TIMEOUT_SEC = 20_000;
-    private static final int DEFAULT_LOGIN_TIMEOUT_SEC = 1000;
 
     private static final ThreadLocal<ExecutorService> rsExecutors = ThreadLocal.withInitial(() -> Executors.newFixedThreadPool(1, new ThreadFactoryBuilder()
             .setNameFormat("rsExecutors-%d")
@@ -234,18 +239,17 @@ public final class DBUtil
                 // unit ms
                 bds.addConnectionProperty("oracle.jdbc.ReadTimeout", String.valueOf(socketTimeout * 1000));
             }
+	    if ("org.apache.hive.jdbc.HiveDriver".equals(bds.getDriverClassName())) {
+		DriverManager.setLoginTimeout(DEFAULT_SOCKET_TIMEOUT_SEC);
+	    }
             if (url.contains("inceptor2")) {
                 LOG.warn("inceptor2 must be process specially");
                 url = url.replace("inceptor2", "hive2");
                 bds.setUrl(url);
                 bds.setDriverClassName("org.apache.hive.jdbc.HiveDriver");
+		DriverManager.setLoginTimeout(DEFAULT_SOCKET_TIMEOUT_SEC);
             }
             else {
-                if("org.apache.hive.jdbc.HiveDriver".equals(bds.getDriverClassName())){
-                    DriverManager.setLoginTimeout(DEFAULT_LOGIN_TIMEOUT_SEC);
-                }
-
-
                 LOG.debug("Connecting to database with driver {}", dataBaseType.getDriverClassName());
                 bds.setDriverClassName(dataBaseType.getDriverClassName());
             }
