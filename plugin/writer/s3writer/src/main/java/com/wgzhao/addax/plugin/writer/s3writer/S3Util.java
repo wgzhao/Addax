@@ -24,14 +24,14 @@ public class S3Util
 
     }
 
-    public static S3Client initS3Client(String endpoint, Region region, String accessId, String accessKey ,String pathStyleAccessEnabled) {
+    public static S3Client initS3Client(String endpoint, Region region, String accessId, String accessKey, String pathStyleAccessEnabled) {
         if (null == region) {
             region = Region.of("ap-northeast-1");
         }
         try {
             AwsBasicCredentials awsCreds = AwsBasicCredentials.create(accessId, accessKey);
             return S3Client.builder().serviceConfiguration(e -> {
-                        if("true".equals(pathStyleAccessEnabled)) {
+                        if ("true".equals(pathStyleAccessEnabled)) {
                             e.pathStyleAccessEnabled(true);
                         }
                     })
