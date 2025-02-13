@@ -38,7 +38,7 @@ import static com.wgzhao.addax.common.spi.ErrorCode.REQUIRED_VALUE;
 public class RdbmsWriter
         extends Writer
 {
-    private static final DataBaseType DATABASE_TYPE = DataBaseType.RDBMS;
+    private static final DataBaseType DATABASE_TYPE = DataBaseType.RDBMS_WRITER;
 
     public static class Job
             extends Writer.Job
