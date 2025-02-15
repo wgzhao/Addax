@@ -55,7 +55,7 @@ import java.util.Objects;
 import java.util.Set;
 
 import static com.wgzhao.addax.common.base.Key.COLUMN;
-import static com.wgzhao.addax.common.base.Key.HDFS_SIZE_PATH;
+import static com.wgzhao.addax.common.base.Key.HDFS_SITE_PATH;
 import static com.wgzhao.addax.common.base.Key.NULL_FORMAT;
 import static com.wgzhao.addax.common.spi.ErrorCode.CONFIG_ERROR;
 import static com.wgzhao.addax.common.spi.ErrorCode.EXECUTE_FAIL;
@@ -95,8 +95,8 @@ public class DFSUtil
             }
         }
 
-        if (taskConfig.getString(HDFS_SIZE_PATH, null) !=null) {
-            hadoopConf.addResource(new Path(taskConfig.getString(HDFS_SIZE_PATH)));
+        if (taskConfig.getString(HDFS_SITE_PATH, null) !=null) {
+            hadoopConf.addResource(new Path(taskConfig.getString(HDFS_SITE_PATH)));
         }
 
         hadoopConf.set(HdfsConstant.HDFS_DEFAULT_KEY, taskConfig.getString(Key.DEFAULT_FS));

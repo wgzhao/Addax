@@ -103,7 +103,7 @@ public class Key
     // The file type will be read from or write to hadoop hdfs, such as ORC, Parquet, Text etc. string type.
     public static final String FILE_TYPE = "fileType";
     // The hdfs-site.xml path, use the file will auto get the hadoop configuration
-    public static final String HDFS_SIZE_PATH = "hdfsSitePath";
+    public static final String HDFS_SITE_PATH = "hdfsSitePath";
     // How to present null, by default, NULL is stored as \N. string type
     public static final String NULL_FORMAT = "nullFormat";
     // The record count, mainly used for streamreader plugin. numeric type
