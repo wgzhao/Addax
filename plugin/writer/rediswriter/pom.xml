@@ -10,8 +10,8 @@
 
     <artifactId>rediswriter</artifactId>
     <name>redis-writer</name>
-    <packaging>jar</packaging>
     <description>Redis writer plugin for Addax</description>
+    <packaging>jar</packaging>
 
     <dependencies>
         <dependency>

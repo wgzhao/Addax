@@ -187,7 +187,7 @@
                 <configuration>
                     <rules>
                         <compound implementation="com.github.ferstl.maven.pomenforcers.CompoundPedanticEnforcer">
-                            <enforcers>POM_SECTION_ORDER,DEPENDENCY_MANAGEMENT_ORDER,DEPENDENCY_ORDER
+                            <enforcers>POM_SECTION_ORDER,MODULE_ORDER,DEPENDENCY_MANAGEMENT_ORDER,DEPENDENCY_ORDER,PLUGIN_MANAGEMENT_ORDER
                             </enforcers>
                             <pomSectionPriorities>
                                 modelVersion,parent,groupId,artifactId,version,name,description,packaging,url,inceptionYear,licenses,scm,properties,modules
