@@ -95,7 +95,7 @@ public class DFSUtil
             }
         }
 
-        if (taskConfig.getString(HDFS_SITE_PATH, null) !=null) {
+        if (taskConfig.getString(HDFS_SITE_PATH, null) != null) {
             hadoopConf.addResource(new Path(taskConfig.getString(HDFS_SITE_PATH)));
         }
 
@@ -178,6 +178,10 @@ public class DFSUtil
                 Path path = new Path(hdfsPath);
                 FileStatus[] stats = hdfs.globStatus(path);
                 for (FileStatus f : stats) {
+                    if (f.getPath().getName().startsWith(".")) {
+                        LOG.warn("The  [{}] is a hidden directory or file, ignore it.", f.getPath());
+                        continue;
+                    }
                     if (f.isFile()) {
                         addSourceFileIfNotEmpty(f);
                     }
