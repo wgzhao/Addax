@@ -276,7 +276,7 @@ public class HdfsReader
                 }
                 else if (specifiedFileType.equalsIgnoreCase(HdfsConstant.RC)) {
 
-                    dfsUtil.rcFileStartRead(sourceFile, taskConfig, recordSender, getTaskPluginCollector());
+                    dfsUtil.rcFileStartRead(sourceFile, recordSender, getTaskPluginCollector());
                 }
                 else if (specifiedFileType.equalsIgnoreCase(HdfsConstant.PARQUET)) {
                     dfsUtil.parquetFileStartRead(sourceFile, taskConfig, recordSender, getTaskPluginCollector());

@@ -84,8 +84,6 @@ public class DFSUtil
         hadoopConf = new org.apache.hadoop.conf.Configuration();
         this.columns = StorageReaderUtil.getListColumnEntry(taskConfig, COLUMN);
         this.nullFormat = taskConfig.getString(NULL_FORMAT);
-        //io.file.buffer.size 性能参数
-        //http://blog.csdn.net/yangjl38/article/details/7583374
         Configuration hadoopSiteParams = taskConfig.getConfiguration(Key.HADOOP_CONFIG);
         JSONObject hadoopSiteParamsAsJsonObject = JSON.parseObject(taskConfig.getString(Key.HADOOP_CONFIG));
         if (null != hadoopSiteParams) {
@@ -128,8 +126,7 @@ public class DFSUtil
                 UserGroupInformation.loginUserFromKeytab(kerberosPrincipal, kerberosKeytabFilePath);
             }
             catch (Exception e) {
-                String message = String.format("kerberos认证失败,请确定kerberosKeytabFilePath[%s]和kerberosPrincipal[%s]填写正确",
-                        kerberosKeytabFilePath, kerberosPrincipal);
+                String message = String.format("Kerberos auth failed with %s using %s", kerberosPrincipal, kerberosKeytabFilePath);
                 throw AddaxException.asAddaxException(LOGIN_ERROR, message, e);
             }
         }
@@ -226,7 +223,11 @@ public class DFSUtil
         }
     }
 
-    // 根据用户指定的文件类型，将指定的文件类型的路径加入sourceHDFSAllFilesList
+    /**
+     * Adds the source file to the list if its type matches the specified file type.
+     *
+     * @param filePath the path of the file to be added
+     */
     private void addSourceFileByType(String filePath)
     {
         // 检查file的类型和用户配置的fileType类型是否一致
@@ -243,6 +244,12 @@ public class DFSUtil
         }
     }
 
+    /**
+     * Opens an InputStream for the specified file path in HDFS.
+     *
+     * @param filepath the path to the file in HDFS
+     * @return an InputStream to read the file
+     */
     public InputStream getInputStream(String filepath)
     {
         InputStream inputStream;
@@ -260,6 +267,14 @@ public class DFSUtil
         }
     }
 
+    /**
+     * Reads data from a sequence file and sends it to the RecordSender.
+     *
+     * @param sourceSequenceFilePath the path to the sequence file to read
+     * @param readerSliceConfig the configuration for the reader slice
+     * @param recordSender the RecordSender to send the read records to
+     * @param taskPluginCollector the TaskPluginCollector for collecting task-related metrics and errors
+     */
     public void sequenceFileStartRead(String sourceSequenceFilePath, Configuration readerSliceConfig,
             RecordSender recordSender, TaskPluginCollector taskPluginCollector)
     {
@@ -284,16 +299,23 @@ public class DFSUtil
         }
     }
 
-    public void rcFileStartRead(String sourceRcFilePath, Configuration readerSliceConfig,
-            RecordSender recordSender, TaskPluginCollector taskPluginCollector)
+    /**
+     * Reads data from an RCFile and sends it to the RecordSender.
+     *
+     * @param sourceRcFilePath the path to the RCFile to read
+     * @param recordSender the RecordSender to send the read records to
+     * @param taskPluginCollector the TaskPluginCollector for collecting task-related metrics and errors
+     */
+    public void rcFileStartRead(String sourceRcFilePath, RecordSender recordSender, TaskPluginCollector taskPluginCollector)
     {
         LOG.info("Start Read rc-file [{}].", sourceRcFilePath);
         Path rcFilePath = new Path(sourceRcFilePath);
-        RCFileRecordReader recordReader = null;
+
+        RCFileRecordReader<LongWritable, BytesRefArrayWritable> recordReader = null;
         try (FileSystem fs = FileSystem.get(rcFilePath.toUri(), hadoopConf)) {
             long fileLen = fs.getFileStatus(rcFilePath).getLen();
             FileSplit split = new FileSplit(rcFilePath, 0, fileLen, (String[]) null);
-            recordReader = new RCFileRecordReader(hadoopConf, split);
+            recordReader = new RCFileRecordReader<>(hadoopConf, split);
             LongWritable key = new LongWritable();
             BytesRefArrayWritable value = new BytesRefArrayWritable();
             Text txt = new Text();
