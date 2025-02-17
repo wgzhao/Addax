@@ -222,34 +222,4 @@ public class GetPrimaryKeyUtil
         }
         return sql;
     }
-
-    /**
-     * get current schema
-     *
-     * @param schema schema name
-     * @return schema name or get schema expression
-     */
-    public static String getSchema(String schema)
-    {
-        if (schema != null) {
-            return "'" + schema + "'";
-        }
-        switch (dataBaseType) {
-            case MySql:
-                schema = "SELECT SCHEMA()";
-                break;
-            case PostgreSQL:
-                schema = "SELECT CURRENT_SCHEMA()";
-                break;
-            case SQLServer:
-                schema = "SELECT SCHEMA_NAME()";
-                break;
-            case ClickHouse:
-                schema = "SELECT currentDatabase()";
-                break;
-            default:
-                break;
-        }
-        return schema;
-    }
 }
