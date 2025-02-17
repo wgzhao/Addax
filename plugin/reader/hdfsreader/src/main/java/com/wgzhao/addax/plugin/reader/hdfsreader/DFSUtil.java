@@ -348,16 +348,14 @@ public class DFSUtil
         }
     }
 
-    public void orcFileStartRead(String sourceOrcFilePath, Configuration readerSliceConfig,
-            RecordSender recordSender, TaskPluginCollector taskPluginCollector)
+    public void orcFileStartRead(String sourceOrcFilePath, RecordSender recordSender, TaskPluginCollector taskPluginCollector)
     {
         LOG.info("Being to read the orc-file [{}].", sourceOrcFilePath);
         MyOrcReader myOrcReader = new MyOrcReader(hadoopConf, new Path(sourceOrcFilePath), nullFormat, columns);
         myOrcReader.reader(recordSender, taskPluginCollector);
     }
 
-    public void parquetFileStartRead(String sourceParquetFilePath, Configuration readerSliceConfig,
-            RecordSender recordSender, TaskPluginCollector taskPluginCollector)
+    public void parquetFileStartRead(String sourceParquetFilePath, RecordSender recordSender, TaskPluginCollector taskPluginCollector)
     {
         LOG.info("Begin to read the parquet-file [{}].", sourceParquetFilePath);
         Path parquetFilePath = new Path(sourceParquetFilePath);
