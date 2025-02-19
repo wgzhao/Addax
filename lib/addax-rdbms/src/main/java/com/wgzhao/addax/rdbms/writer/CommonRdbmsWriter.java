@@ -271,7 +271,7 @@ public class CommonRdbmsWriter
             DBUtil.closeDBResources(null, connection);
         }
 
-        public void startWriteWithConnection(RecordReceiver recordReceiver, TaskPluginCollector taskPluginCollector, Connection connection)
+        public void startWriteWithConnection(RecordReceiver recordReceiver, TaskPluginCollector taskPluginCollector, Connection connection, boolean supportCommit)
         {
             this.taskPluginCollector = taskPluginCollector;
             List<String> mergeColumns = new ArrayList<>();
@@ -326,13 +326,13 @@ public class CommonRdbmsWriter
                     bufferBytes += record.getMemorySize();
 
                     if (writeBuffer.size() >= batchSize || bufferBytes >= batchByteSize) {
-                        doBatchInsert(connection, writeBuffer);
+                        doBatchInsert(connection, writeBuffer, supportCommit);
                         writeBuffer.clear();
                         bufferBytes = 0;
                     }
                 }
                 if (!writeBuffer.isEmpty()) {
-                    doBatchInsert(connection, writeBuffer);
+                    doBatchInsert(connection, writeBuffer, supportCommit);
                     writeBuffer.clear();
                 }
             }
@@ -350,7 +350,14 @@ public class CommonRdbmsWriter
         {
             Connection connection = DBUtil.getConnection(dataBaseType, jdbcUrl, username, password);
             DBUtil.dealWithSessionConfig(connection, writerSliceConfig, dataBaseType, basicMessage);
-            startWriteWithConnection(recordReceiver, taskPluginCollector, connection);
+            startWriteWithConnection(recordReceiver, taskPluginCollector, connection, true);
+        }
+
+        public void startWrite(RecordReceiver recordReceiver, Configuration writerSliceConfig, TaskPluginCollector taskPluginCollector, boolean supportCommit)
+        {
+            Connection connection = DBUtil.getConnection(dataBaseType, jdbcUrl, username, password);
+            DBUtil.dealWithSessionConfig(connection, writerSliceConfig, dataBaseType, basicMessage);
+            startWriteWithConnection(recordReceiver, taskPluginCollector, connection, supportCommit);
         }
 
         public void post(Configuration writerSliceConfig)
@@ -374,7 +381,7 @@ public class CommonRdbmsWriter
             //
         }
 
-        protected void doBatchInsert(Connection connection, List<Record> buffer)
+        protected void doBatchInsert(Connection connection, List<Record> buffer, boolean supportCommit)
                 throws SQLException
         {
             PreparedStatement preparedStatement = null;
@@ -414,11 +421,15 @@ public class CommonRdbmsWriter
                     }
                 }
                 preparedStatement.executeBatch();
-                connection.commit();
+                if (supportCommit) {
+                    connection.commit();
+                }
             }
             catch (SQLException e) {
                 LOG.warn("Rolling back the write, try to write one line at a time. because: {}", e.getMessage());
-                connection.rollback();
+                if (supportCommit) {
+                    connection.rollback();
+                }
                 doOneInsert(connection, buffer);
             }
             catch (Exception e) {
