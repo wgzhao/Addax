@@ -191,7 +191,12 @@ public final class OriginalConfPretreatmentUtil
                     // warn: does it need to judge the table column is case-insensitive?
                     allColumns.removeAll(excludeColumns);
                     originalConfig.set(Key.COLUMN_LIST, allColumns);
-                    originalConfig.set(Key.COLUMN, StringUtils.join(allColumns, ","));
+                    // each column in allColumns should be quoted with ``
+                    List<String> quotedColumns = new ArrayList<>();
+                    for (String column : allColumns) {
+                        quotedColumns.add(dataBaseType.quoteColumnName(column));
+                    }
+                    originalConfig.set(Key.COLUMN, StringUtils.join(quotedColumns, ","));
                 }
                 else {
                     originalConfig.set(Key.COLUMN, "*");
@@ -208,7 +213,7 @@ public final class OriginalConfPretreatmentUtil
                         throw AddaxException.asAddaxException(CONFIG_ERROR,
                                 "The item column your configured is invalid, because it includes multiply asterisk('*').");
                     }
-                    quotedColumns.add(column);
+                    quotedColumns.add(dataBaseType.quoteColumnName(column));
                 }
 
                 originalConfig.set(Key.COLUMN_LIST, quotedColumns);
