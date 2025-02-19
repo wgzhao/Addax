@@ -29,4 +29,5 @@ jobs:
           distribution: 'adopt'
       - run: |
           export MAVEN_OPTS="-DskipTests -Dmaven.javadoc.skip=true -Dmaven.source.skip=true -Dgpg.skip=true"
-          mvn  -B -V -T 1 verify
+          mvn -B -V -T 1 verify
+          mvn -B -V -T 1 enforcer:enforce

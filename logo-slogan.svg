@@ -1,19 +1,16 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
 <svg xmlns:xl="http://www.w3.org/1999/xlink" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:dc="http://purl.org/dc/elements/1.1/" viewBox="0 0 1280 640" width="1280" height="640">
-  <defs/>
+<defs />
   <g id="logo-slogan" fill="none" stroke-dasharray="none" fill-opacity="1" stroke-opacity="1" stroke="none">
     <title>logo-slogan</title>
-    <rect fill="white" x="0" y="0" width="1280" height="640"/>
+    <rect fill="#6d6d6d" x="0" y="0" width="1280" height="640" />
     <g id="logo-slogan_Layer_1">
       <title>Layer 1</title>
       <g id="Graphic_6">
         <rect x="352.5" y="132.6211" width="205" height="164" id="path"/>
-        <clipPath id="clip_path">
-          <use xl:href="#path"/>
-        </clipPath>
-        <g clip-path="url(#clip_path)">
-          <image xl:href="image1.png" width="49.2" height="39.36" transform="translate(352.5 132.6211) scale(4.1666667)"/>
+        <g >
+          <image xl:href="docs/images/logo.svg" width="46" height="46" transform="translate(352.5 132.6211) scale(4.1666667)"/>
         </g>
       </g>
       <g id="Graphic_7">
@@ -27,7 +24,7 @@
         </text>
       </g>
       <g id="Graphic_9">
-        <text transform="translate(225.75 414.5)" fill="#1f2328">
+        <text transform="translate(225.75 414.5)" fill="#616161">
           <tspan font-family="Helvetica Neue" font-size="30" fill="#1f2328" x="0" y="29">A versatile open-source ETL tool that can seamlessly transfer </tspan>
           <tspan font-family="Helvetica Neue" font-size="30" fill="#1f2328" x="0" y="64.84">data between various RDBMS and NoSQL databases</tspan>
         </text>

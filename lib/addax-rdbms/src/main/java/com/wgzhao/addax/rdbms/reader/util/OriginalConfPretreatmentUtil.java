@@ -47,6 +47,8 @@ public final class OriginalConfPretreatmentUtil
 
     public static DataBaseType dataBaseType;
 
+    private static final String EXCLUDE_COLUMN = "excludeColumn";
+
     private OriginalConfPretreatmentUtil() {}
 
     public static void doPretreatment(Configuration originalConfig)
@@ -138,7 +140,7 @@ public final class OriginalConfPretreatmentUtil
         }
 
         // 回写到connection.jdbcUrl
-        originalConfig.set(Key.CONNECTION + "."  + Key.JDBC_URL, jdbcUrl);
+        originalConfig.set(Key.CONNECTION + "." + Key.JDBC_URL, jdbcUrl);
 
         if (isTableMode) {
             // table 方式
@@ -170,47 +172,56 @@ public final class OriginalConfPretreatmentUtil
                     || userConfiguredColumns.isEmpty()) {
                 throw AddaxException.asAddaxException(REQUIRED_VALUE, "The item column is required.");
             }
-            else {
-                String splitPk = originalConfig.getString(Key.SPLIT_PK, null);
 
-                if (1 == userConfiguredColumns.size()
-                        && "*".equals(userConfiguredColumns.get(0))) {
-                    LOG.warn("There are some risks in the column configuration. Because you did not configure the columns " +
-                            "to read the database table, changes in the number and types of fields in your table may affect " +
-                            "the correctness of the task or even cause errors.");
-                    // 回填其值，需要以 String 的方式转交后续处理
-                    originalConfig.set(Key.COLUMN, "*");
+            String jdbcUrl = originalConfig.getString(Key.CONNECTION + "." + Key.JDBC_URL);
+            String username = originalConfig.getString(Key.USERNAME);
+            String password = originalConfig.getString(Key.PASSWORD);
+            String tableName = originalConfig.getString(Key.CONNECTION + "." + Key.TABLE + "[0]");
+
+            if (1 == userConfiguredColumns.size()
+                    && "*".equals(userConfiguredColumns.get(0))) {
+                LOG.warn("There are some risks in the column configuration. Because you did not configure the columns " +
+                        "to read the database table, changes in the number and types of fields in your table may affect " +
+                        "the correctness of the task or even cause errors.");
+                // 回填其值，需要以 String 的方式转交后续处理
+                List<String> excludeColumns = originalConfig.getList(EXCLUDE_COLUMN, String.class);
+                if (!excludeColumns.isEmpty()) {
+                    // get the all columns of table and exclude the excludeColumns
+                    List<String> allColumns = DBUtil.getTableColumns(dataBaseType, jdbcUrl, username, password, tableName);
+                    // warn: does it need to judge the table column is case-insensitive?
+                    allColumns.removeAll(excludeColumns);
+                    originalConfig.set(Key.COLUMN_LIST, allColumns);
+                    // each column in allColumns should be quoted with ``
+                    List<String> quotedColumns = new ArrayList<>();
+                    for (String column : allColumns) {
+                        quotedColumns.add(dataBaseType.quoteColumnName(column));
+                    }
+                    originalConfig.set(Key.COLUMN, StringUtils.join(quotedColumns, ","));
                 }
                 else {
-                    String jdbcUrl = originalConfig.getString(Key.CONNECTION + "." + Key.JDBC_URL);
-
-                    String username = originalConfig.getString(Key.USERNAME);
-                    String password = originalConfig.getString(Key.PASSWORD);
-
-                    String tableName = originalConfig.getString(Key.CONNECTION + "." + Key.TABLE + "[0]");
-
-                    List<String> allColumns = DBUtil.getTableColumns(dataBaseType, jdbcUrl, username, password, tableName);
-                    LOG.info("The table [{}] has columns [{}].", tableName, StringUtils.join(allColumns, ","));
-                    // warn:注意mysql表名区分大小写
-                    allColumns = ListUtil.valueToLowerCase(allColumns);
-                    List<String> quotedColumns = new ArrayList<>();
-
-                    for (String column : userConfiguredColumns) {
-                        if ("*".equals(column)) {
-                            throw AddaxException.asAddaxException(CONFIG_ERROR,
-                                    "The item column your configured is invalid, because it includes multiply asterisk('*').");
-                        }
-
-//                        quotedColumns.add(dataBaseType.quoteColumnName(column));
-                        quotedColumns.add(column);
-                    }
-
-                    originalConfig.set(Key.COLUMN_LIST, quotedColumns);
-                    originalConfig.set(Key.COLUMN, StringUtils.join(quotedColumns, ","));
-                    if (StringUtils.isNotBlank(splitPk) && !allColumns.contains(splitPk.toLowerCase())) {
+                    originalConfig.set(Key.COLUMN, "*");
+                }
+            }
+            else {
+                List<String> allColumns = DBUtil.getTableColumns(dataBaseType, jdbcUrl, username, password, tableName);
+                LOG.info("The table [{}] has columns [{}].", tableName, StringUtils.join(allColumns, ","));
+                // warn:注意mysql表名区分大小写
+                allColumns = ListUtil.valueToLowerCase(allColumns);
+                List<String> quotedColumns = new ArrayList<>();
+                for (String column : userConfiguredColumns) {
+                    if ("*".equals(column)) {
                         throw AddaxException.asAddaxException(CONFIG_ERROR,
-                                "The table " + tableName + " has not the primary key " +  splitPk);
+                                "The item column your configured is invalid, because it includes multiply asterisk('*').");
                     }
+                    quotedColumns.add(dataBaseType.quoteColumnName(column));
+                }
+
+                originalConfig.set(Key.COLUMN_LIST, quotedColumns);
+                originalConfig.set(Key.COLUMN, StringUtils.join(quotedColumns, ","));
+                String splitPk = originalConfig.getString(Key.SPLIT_PK, null);
+                if (StringUtils.isNotBlank(splitPk) && !allColumns.contains(splitPk.toLowerCase())) {
+                    throw AddaxException.asAddaxException(CONFIG_ERROR,
+                            "The table " + tableName + " has not the primary key " + splitPk);
                 }
             }
         }

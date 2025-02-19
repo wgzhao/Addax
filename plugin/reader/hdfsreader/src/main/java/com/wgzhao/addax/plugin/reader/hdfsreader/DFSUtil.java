@@ -55,7 +55,7 @@ import java.util.Objects;
 import java.util.Set;
 
 import static com.wgzhao.addax.common.base.Key.COLUMN;
-import static com.wgzhao.addax.common.base.Key.HDFS_SIZE_PATH;
+import static com.wgzhao.addax.common.base.Key.HDFS_SITE_PATH;
 import static com.wgzhao.addax.common.base.Key.NULL_FORMAT;
 import static com.wgzhao.addax.common.spi.ErrorCode.CONFIG_ERROR;
 import static com.wgzhao.addax.common.spi.ErrorCode.EXECUTE_FAIL;
@@ -84,8 +84,6 @@ public class DFSUtil
         hadoopConf = new org.apache.hadoop.conf.Configuration();
         this.columns = StorageReaderUtil.getListColumnEntry(taskConfig, COLUMN);
         this.nullFormat = taskConfig.getString(NULL_FORMAT);
-        //io.file.buffer.size 性能参数
-        //http://blog.csdn.net/yangjl38/article/details/7583374
         Configuration hadoopSiteParams = taskConfig.getConfiguration(Key.HADOOP_CONFIG);
         JSONObject hadoopSiteParamsAsJsonObject = JSON.parseObject(taskConfig.getString(Key.HADOOP_CONFIG));
         if (null != hadoopSiteParams) {
@@ -95,8 +93,8 @@ public class DFSUtil
             }
         }
 
-        if (taskConfig.getString(HDFS_SIZE_PATH, null) !=null) {
-            hadoopConf.addResource(new Path(taskConfig.getString(HDFS_SIZE_PATH)));
+        if (taskConfig.getString(HDFS_SITE_PATH, null) != null) {
+            hadoopConf.addResource(new Path(taskConfig.getString(HDFS_SITE_PATH)));
         }
 
         hadoopConf.set(HdfsConstant.HDFS_DEFAULT_KEY, taskConfig.getString(Key.DEFAULT_FS));
@@ -128,8 +126,7 @@ public class DFSUtil
                 UserGroupInformation.loginUserFromKeytab(kerberosPrincipal, kerberosKeytabFilePath);
             }
             catch (Exception e) {
-                String message = String.format("kerberos认证失败,请确定kerberosKeytabFilePath[%s]和kerberosPrincipal[%s]填写正确",
-                        kerberosKeytabFilePath, kerberosPrincipal);
+                String message = String.format("Kerberos auth failed with %s using %s", kerberosPrincipal, kerberosKeytabFilePath);
                 throw AddaxException.asAddaxException(LOGIN_ERROR, message, e);
             }
         }
@@ -178,6 +175,10 @@ public class DFSUtil
                 Path path = new Path(hdfsPath);
                 FileStatus[] stats = hdfs.globStatus(path);
                 for (FileStatus f : stats) {
+                    if (f.getPath().getName().startsWith(".")) {
+                        LOG.warn("The  [{}] is a hidden directory or file, ignore it.", f.getPath());
+                        continue;
+                    }
                     if (f.isFile()) {
                         addSourceFileIfNotEmpty(f);
                     }
@@ -222,7 +223,11 @@ public class DFSUtil
         }
     }
 
-    // 根据用户指定的文件类型，将指定的文件类型的路径加入sourceHDFSAllFilesList
+    /**
+     * Adds the source file to the list if its type matches the specified file type.
+     *
+     * @param filePath the path of the file to be added
+     */
     private void addSourceFileByType(String filePath)
     {
         // 检查file的类型和用户配置的fileType类型是否一致
@@ -239,6 +244,12 @@ public class DFSUtil
         }
     }
 
+    /**
+     * Opens an InputStream for the specified file path in HDFS.
+     *
+     * @param filepath the path to the file in HDFS
+     * @return an InputStream to read the file
+     */
     public InputStream getInputStream(String filepath)
     {
         InputStream inputStream;
@@ -256,6 +267,14 @@ public class DFSUtil
         }
     }
 
+    /**
+     * Reads data from a sequence file and sends it to the RecordSender.
+     *
+     * @param sourceSequenceFilePath the path to the sequence file to read
+     * @param readerSliceConfig the configuration for the reader slice
+     * @param recordSender the RecordSender to send the read records to
+     * @param taskPluginCollector the TaskPluginCollector for collecting task-related metrics and errors
+     */
     public void sequenceFileStartRead(String sourceSequenceFilePath, Configuration readerSliceConfig,
             RecordSender recordSender, TaskPluginCollector taskPluginCollector)
     {
@@ -280,16 +299,23 @@ public class DFSUtil
         }
     }
 
-    public void rcFileStartRead(String sourceRcFilePath, Configuration readerSliceConfig,
-            RecordSender recordSender, TaskPluginCollector taskPluginCollector)
+    /**
+     * Reads data from an RCFile and sends it to the RecordSender.
+     *
+     * @param sourceRcFilePath the path to the RCFile to read
+     * @param recordSender the RecordSender to send the read records to
+     * @param taskPluginCollector the TaskPluginCollector for collecting task-related metrics and errors
+     */
+    public void rcFileStartRead(String sourceRcFilePath, RecordSender recordSender, TaskPluginCollector taskPluginCollector)
     {
         LOG.info("Start Read rc-file [{}].", sourceRcFilePath);
         Path rcFilePath = new Path(sourceRcFilePath);
-        RCFileRecordReader recordReader = null;
+
+        RCFileRecordReader<LongWritable, BytesRefArrayWritable> recordReader = null;
         try (FileSystem fs = FileSystem.get(rcFilePath.toUri(), hadoopConf)) {
             long fileLen = fs.getFileStatus(rcFilePath).getLen();
             FileSplit split = new FileSplit(rcFilePath, 0, fileLen, (String[]) null);
-            recordReader = new RCFileRecordReader(hadoopConf, split);
+            recordReader = new RCFileRecordReader<>(hadoopConf, split);
             LongWritable key = new LongWritable();
             BytesRefArrayWritable value = new BytesRefArrayWritable();
             Text txt = new Text();
@@ -322,16 +348,14 @@ public class DFSUtil
         }
     }
 
-    public void orcFileStartRead(String sourceOrcFilePath, Configuration readerSliceConfig,
-            RecordSender recordSender, TaskPluginCollector taskPluginCollector)
+    public void orcFileStartRead(String sourceOrcFilePath, RecordSender recordSender, TaskPluginCollector taskPluginCollector)
     {
         LOG.info("Being to read the orc-file [{}].", sourceOrcFilePath);
         MyOrcReader myOrcReader = new MyOrcReader(hadoopConf, new Path(sourceOrcFilePath), nullFormat, columns);
         myOrcReader.reader(recordSender, taskPluginCollector);
     }
 
-    public void parquetFileStartRead(String sourceParquetFilePath, Configuration readerSliceConfig,
-            RecordSender recordSender, TaskPluginCollector taskPluginCollector)
+    public void parquetFileStartRead(String sourceParquetFilePath, RecordSender recordSender, TaskPluginCollector taskPluginCollector)
     {
         LOG.info("Begin to read the parquet-file [{}].", sourceParquetFilePath);
         Path parquetFilePath = new Path(sourceParquetFilePath);

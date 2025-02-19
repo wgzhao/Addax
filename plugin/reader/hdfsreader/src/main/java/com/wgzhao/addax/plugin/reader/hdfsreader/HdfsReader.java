@@ -268,7 +268,7 @@ public class HdfsReader
                 }
                 else if (specifiedFileType.equalsIgnoreCase(HdfsConstant.ORC)) {
 
-                    dfsUtil.orcFileStartRead(sourceFile, taskConfig, recordSender, getTaskPluginCollector());
+                    dfsUtil.orcFileStartRead(sourceFile, recordSender, getTaskPluginCollector());
                 }
                 else if (specifiedFileType.equalsIgnoreCase(HdfsConstant.SEQ)) {
 
@@ -276,10 +276,10 @@ public class HdfsReader
                 }
                 else if (specifiedFileType.equalsIgnoreCase(HdfsConstant.RC)) {
 
-                    dfsUtil.rcFileStartRead(sourceFile, taskConfig, recordSender, getTaskPluginCollector());
+                    dfsUtil.rcFileStartRead(sourceFile, recordSender, getTaskPluginCollector());
                 }
                 else if (specifiedFileType.equalsIgnoreCase(HdfsConstant.PARQUET)) {
-                    dfsUtil.parquetFileStartRead(sourceFile, taskConfig, recordSender, getTaskPluginCollector());
+                    dfsUtil.parquetFileStartRead(sourceFile, recordSender, getTaskPluginCollector());
                 }
                 else {
                     throw AddaxException.asAddaxException(NOT_SUPPORT_TYPE,

@@ -69,7 +69,7 @@ public class MyParquetReader
 
     private final MessageType schema;
     private final String nullFormat;
-    private List<ColumnEntry> columnEntries;
+    private final List<ColumnEntry> columnEntries;
     private final ParquetReader<Group> reader;
 
     public MyParquetReader(org.apache.hadoop.conf.Configuration hadoopConf, Path path, String nullFormat, List<ColumnEntry> columns)
@@ -93,13 +93,14 @@ public class MyParquetReader
         catch (IOException e) {
             throw new RuntimeException(e);
         }
-        if (columnEntries != null && !columnEntries.isEmpty()) {
+
+        if ( !columns.isEmpty() ) {
             this.columnEntries = columns;
         }
         else {
+            // the columns maybe empty or '*' in the configuration, we need to get the schema from the parquet file
             List<Type> fields = schema.getFields();
             this.columnEntries = new ArrayList<>(fields.size());
-            // 用户没有填写具体的字段信息，需要从parquet文件构建
             for (int i = 0; i < schema.getFields().size(); i++) {
                 ColumnEntry columnEntry = new ColumnEntry();
                 columnEntry.setIndex(i);

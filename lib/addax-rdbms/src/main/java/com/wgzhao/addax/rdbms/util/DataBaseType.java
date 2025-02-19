@@ -145,8 +145,20 @@ public enum DataBaseType
 
     public String quoteColumnName(String columnName)
     {
+        String quoteChar = "'`\"";
         // if the column is not reserved words , it's constant value
         if (! SQL_RESERVED_WORDS.contains(columnName.toUpperCase())) {
+            return columnName;
+        }
+        // if the column has quote char, return directly
+        if (quoteChar.contains(columnName.charAt(0) + "")) {
+            return columnName;
+        }
+        if (columnName.equals("*")) {
+            return columnName;
+        }
+        // if the column consists of only numbers, return directly
+        if (columnName.matches("\\d+")) {
             return columnName;
         }
         if (this == MySql || this == Hive) {
