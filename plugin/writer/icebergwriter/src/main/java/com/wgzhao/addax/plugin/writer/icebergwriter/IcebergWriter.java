@@ -25,10 +25,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.UUID;
+import java.util.*;
 
 
 public class IcebergWriter extends Writer {
@@ -195,7 +192,7 @@ public class IcebergWriter extends Writer {
                             data.setField(field.name(), null);
                         } else {
                             String[] dataList = column.asString().split(",");
-                            data.setField(field.name(), dataList);
+                            data.setField(field.name(), Arrays.asList(dataList));
                         }
                     } else {
                         switch (columnType.typeId()) {
@@ -203,7 +200,7 @@ public class IcebergWriter extends Writer {
                             case DATE:
                                 try {
                                     if (column.asLong() != null) {
-                                        data.setField(field.name(), column.asTimestamp().toLocalDateTime());
+                                        data.setField(field.name(), column.asTimestamp().toLocalDateTime().toLocalDate());
                                     } else {
                                         data.setField(field.name(), null);
                                     }
@@ -259,13 +256,6 @@ public class IcebergWriter extends Writer {
                                     data.setField(field.name(), JSON.parseObject(column.asString(), Map.class));
                                 } catch (Exception e) {
                                     getTaskPluginCollector().collectDirtyRecord(record, String.format("MAP类型解析失败 [%s:%s] exception: %s", field.name(), column, e));
-                                }
-                                break;
-                            case VARIANT:
-                                try {
-                                    data.setField(field.name(), JSON.parseObject(column.asString(), Map.class));
-                                } catch (Exception e) {
-                                    getTaskPluginCollector().collectDirtyRecord(record, String.format("VARIANT类型解析失败 [%s:%s] exception: %s", field.name(), column, e));
                                 }
                                 break;
                             default:
