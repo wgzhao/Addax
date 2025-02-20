@@ -386,7 +386,9 @@ public class CommonRdbmsWriter
         {
             PreparedStatement preparedStatement = null;
             try {
-                connection.setAutoCommit(false);
+                if (supportCommit) {
+                    connection.setAutoCommit(false);
+                }
                 preparedStatement = connection.prepareStatement(writeRecordSql);
                 if ((this.dataBaseType == DataBaseType.Oracle || this.dataBaseType == DataBaseType.SQLServer)
                         && !"insert".equalsIgnoreCase(writeMode)) {
