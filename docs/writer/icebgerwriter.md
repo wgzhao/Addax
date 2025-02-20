@@ -608,4 +608,11 @@ hive catalog例子
 | STRING(逗号分隔如'a,b,c')      | ARRAY        |
 | STRING(json格式如'{"a":"1"}') | MAP          |
 
+##插件构建
+
+```shell
+set JAVA_HOME=E:\jdk\openlogic-openjdk-17.0.13+11-windows-x64
+mvn package install -Pdefault -Piceberg   -pl plugin/writer/icebergwriter
+```
+
 
