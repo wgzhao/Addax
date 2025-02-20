@@ -1,6 +1,6 @@
-# Paimon Writer
+# Iceberg Writer
 
-Paimon Writer 提供向 已有的paimon表写入数据的能力。
+Iceberg Writer 提供向 已有的iceberg表写入数据的能力。
 
 ## 配置样例
 
