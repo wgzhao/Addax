@@ -31,7 +31,7 @@
         <aircompressor.version>0.25</aircompressor.version>
         <awssdk.version>2.29.20</awssdk.version>
         <avro.version>1.11.3</avro.version>
-        <commons.beanutils.version>1.9.4</commons.beanutils.version>
+        <commons.beanutils.version>1.10.1</commons.beanutils.version>
         <commons.configuration.version>1.10</commons.configuration.version>
         <commons.configuration2.version>2.11.0</commons.configuration2.version>
         <commons.collections.version>4.4</commons.collections.version>
