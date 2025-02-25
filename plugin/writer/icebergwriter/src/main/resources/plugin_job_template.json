@@ -1,0 +1,17 @@
+{
+  "name": "icebergwriter",
+  "parameter": {
+    "tableName": "test.test1",
+    "catalogType" : "hadoop",
+    "writeMode": "truncate",
+    "warehouse": "s3a://pvc-91d1e2cd-4d25-45c9-8613-6c4f7bf0a4cc/iceberg",
+    "hadoopConfig": {
+      "fs.s3a.endpoint":"http://localhost:9000",
+      "fs.s3a.access.key":"gy0dX5lALP176g6c9fYf",
+      "fs.s3a.secret.key":"ReuUrCzzu5wKWAegtswoHIWV389BYl9AB1ZQbiKr",
+      "fs.s3a.connection.ssl.enabled":"false",
+      "fs.s3a.path.style.access":"true",
+      "fs.s3a.impl":"org.apache.hadoop.fs.s3a.S3AFileSystem"
+    }
+  }
+}

@@ -439,5 +439,21 @@
                 <module>plugin/writer/txtfilewriter</module>
             </modules>
         </profile>
+
+        <profile>
+            <id>iceberg</id>
+            <properties>
+
+                <iceberg.version>1.8.0</iceberg.version>
+                <jdk.version>11</jdk.version>
+                <maven.compiler.source>11</maven.compiler.source>
+                <maven.compiler.target>11</maven.compiler.target>
+            </properties>
+            <modules>
+
+                <!-- writer -->
+                <module>plugin/writer/icebergwriter</module>
+            </modules>
+        </profile>
     </profiles>
 </project>
