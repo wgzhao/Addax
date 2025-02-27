@@ -7,7 +7,7 @@
       "col1",
       "col2"
     ],
-    "batchSize": 1024,
+    "batchSize": 102400,
     "loadUrl": [
       "fe:fe_port"
     ],
@@ -20,6 +20,8 @@
         ]
       }
     ],
-    "loadProps": {}
+    "loadProps": {
+      "workers": "2"
+    }
   }
 }
