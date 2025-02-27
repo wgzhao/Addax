@@ -24,7 +24,9 @@ body:
       label: Version
       description: What version of our software are you running? （当前您使用的版本，这对于定位问题很重要，请选择正确的版本）
       options:
-        - 4.2.2 (Default)
+        - 4.2.4 (Default)
+        - 4.2.3
+        - 4.2.2
         - 4.2.1
         - 4.2.0
         - 4.1.8
@@ -38,7 +40,9 @@ body:
     id: os
     attributes:
       label: OS Type
-      description: What Operation System are you seeing the problem on? (发现问题时 Addax 运行在哪个操作系统上)
+      description: |
+        What Operation System are you seeing the problem on? 
+        (发现问题时 Addax 运行在哪个操作系统上)
       multiple: true
       options:
         - Linux (Default)
@@ -58,5 +62,7 @@ body:
     id: logs
     attributes:
       label: Relevant log output
-      description: Please copy and paste any relevant log output. This will be automatically formatted into code, so no need for backticks. (请完整的贴出任务输出结果）
+      description: |
+        Please copy and paste any relevant log output. This will be automatically formatted into code, so no need for backticks.
+        (请完整的贴出任务输出结果,不要使用截图，不要使用截图，不要使用截图）
       render: shell-script

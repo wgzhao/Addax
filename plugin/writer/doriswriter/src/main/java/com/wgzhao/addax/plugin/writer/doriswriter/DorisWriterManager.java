@@ -178,7 +178,7 @@ public class DorisWriterManager {
             try {
                 // flush to Doris with stream load
                 visitor.streamLoad(flushData);
-                LOG.info("Async stream load finished: label[{}].", flushData.getLabel());
+                LOG.debug("Async stream load finished: label[{}].", flushData.getLabel());
                 startScheduler();
                 break;
             } catch (Exception e) {
