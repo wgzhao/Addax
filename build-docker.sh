@@ -32,8 +32,9 @@ function compress_plugins() {
 }
 
 version=$(get_version)
+export MAVEN_OPTS="-DskipTests -Dmaven.javadoc.skip=true -Dmaven.source.skip=true -Dgpg.skip=true"
 # first compile basic images
-mvn clean package -Dmaven.test.skip=true -Pbasic
+mvn -B -V -T 1  clean package -Pbasic
 mvn package assembly:single -Pbasic
 compress_plugins
 
@@ -51,8 +52,11 @@ EOF
 # build it
 docker build -t quay.io/wgzhao/addax:${version}-lite -f /tmp/Dockerfile target/addax
 docker tag quay.io/wgzhao/addax:${version}-lite quay.io/wgzhao/addax:latest-lite
+docker push quay.io/wgzhao/addax:${version}-lite
+docker push quay.io/wgzhao/addax:latest-lite
+
 # then compile default images
-mvn clean package -Dmaven.test.skip=true -Pdefault
+mvn -B -V -T 1  clean package -Pdefault
 mvn package assembly:single -Pdefault
 compress_plugins
 
@@ -70,3 +74,7 @@ EOF
 # build it
 docker build -t quay.io/wgzhao/addax:${version} -f /tmp/Dockerfile target/addax
 docker tag quay.io/wgzhao/addax:${version} quay.io/wgzhao/addax:latest
+
+# push
+docker push quay.io/wgzhao/addax:${version}
+docker push quay.io/wgzhao/addax:latest
