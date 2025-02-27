@@ -193,31 +193,29 @@ if [ "$1" = "gen" ]; then
         echo "Reader plugin ${READER} DOES NOT exists or has not installed yet "
         exit 3
     fi
-    reader_content=$(cat plugin/reader/${READER}/plugin_job_template.json)
     if [ ! -f plugin/writer/${WRITER}/plugin_job_template.json ]; then
         echo  "Reader plugin ${WRITER} DOES NOT exists or has not installed yet"
         exit 3
     fi
-    writer_content=$(cat plugin/writer/${WRITER}/plugin_job_template.json)
+    # correct identified reader and writer plugin
+    reader_content=$(cat plugin/reader/${READER}/plugin_job_template.json | sed 's/^/      /')
+    writer_content=$(cat plugin/writer/${WRITER}/plugin_job_template.json | sed 's/^/      /')
     #combine reader and writer plugin
-    cat - <<-EOF
-    {
-      "job" :{
-        "setting": {
-           "speed": {
-              "byte": -1,
-              "channel": 1
-            }
-        },
-        "content": {
-            "reader":
-                $reader_content ,
-            "writer":
-                $writer_content
-        }
+    printf '{
+  "job": {
+    "setting": {
+      "speed": {
+        "byte": -1,
+        "channel": 1
       }
+    },
+    "content": {
+      "reader": %s,
+      "writer": %s
     }
-EOF
+  }
+}\n' "$reader_content" "$writer_content"
+
     exit 0
 fi
 
