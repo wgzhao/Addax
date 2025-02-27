@@ -1,5 +1,5 @@
 <p align="center">
-    <img alt="Addax Logo" src="https://github.com/wgzhao/Addax/blob/master/docs/images/logo.png?raw=true" width="205" />
+    <img alt="Addax Logo" src="https://github.com/wgzhao/Addax/blob/master/docs/images/logo.svg?raw=true" width="205" />
 </p>
 <p align="center">Addax is a versatile open-source ETL tool</p>
 <p align="center">The <a href="https://wgzhao.github.io/Addax">documentation</a> describes in detail how to install and use the plugins. It provides detailed instructions and sample configuration documentation for each plugin. </p>
