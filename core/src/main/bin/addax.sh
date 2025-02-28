@@ -18,7 +18,8 @@ fi
 
 CLASS_PATH=".:/etc/hbase/conf:${ADDAX_HOME}/lib/*"
 LOGBACK_FILE="${ADDAX_HOME}/conf/logback.xml"
-DEFAULT_JVM="-Xms64m -Xmx2g -XX:+HeapDumpOnOutOfMemoryError -XX:+ExitOnOutOfMemoryError -XX:HeapDumpPath=${ADDAX_HOME}"
+CORE_JVM=$(grep '"jvm":' ${ADDAX_HOME}/conf/core.json | cut -d: -f2 |tr -d ',')
+DEFAULT_JVM="$CORE_JVM -XX:+HeapDumpOnOutOfMemoryError -XX:+ExitOnOutOfMemoryError -XX:HeapDumpPath=${ADDAX_HOME}"
 DEFAULT_PROPERTY_CONF="-Dfile.encoding=UTF-8 -Djava.security.egd=file:///dev/urandom -Daddax.home=${ADDAX_HOME} \
                         -Dlogback.configurationFile=${LOGBACK_FILE} "
 ENGINE_COMMAND="java -server ${DEFAULT_JVM} ${DEFAULT_PROPERTY_CONF} -classpath ${CLASS_PATH}  "

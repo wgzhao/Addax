@@ -31,6 +31,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.apache.commons.exec.environment.EnvironmentUtils;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.hc.client5.http.fluent.Request;
@@ -145,7 +146,13 @@ public final class ConfigParser
 
     private static Configuration parseCoreConfig()
     {
-        return Configuration.from(new File(CONF_PATH));
+
+        Configuration coreConfig = Configuration.from(new File(CONF_PATH));
+        // apply the environment variables
+        coreConfig.getMap("entry.environment").forEach((k, v) -> {
+            System.setProperty(k, v.toString());
+        });
+        return coreConfig;
     }
 
     public static Configuration parseJobConfig(String path)
