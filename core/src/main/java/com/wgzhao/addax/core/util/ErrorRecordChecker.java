@@ -31,10 +31,12 @@ import org.slf4j.LoggerFactory;
 import static com.wgzhao.addax.common.spi.ErrorCode.OVER_LIMIT_ERROR;
 
 /**
- * 检查任务是否到达错误记录限制。有检查条数（recordLimit）和百分比(percentageLimit)两种方式。
- * 1. errorRecord表示出错条数不能大于限制数，当超过时任务失败。比如errorRecord为0表示不容许任何脏数据。
- * 2. errorPercentage表示出错比例，在任务结束时校验。
- * 3. errorRecord优先级高于errorPercentage。
+ * Check whether the task has reached the error record limit. There are two ways to check: by record count (recordLimit) and
+ *  by percentage (percentageLimit).
+ * 1. errorRecord indicates that the number of error records cannot exceed the limit. If it does, the task fails.
+ *  For example, an errorRecord of 0 means that no dirty data is allowed.
+ * 2. errorPercentage indicates the error ratio, which is checked when the task ends.
+ * 3. errorRecord takes precedence over errorPercentage.
  */
 public final class ErrorRecordChecker
 {

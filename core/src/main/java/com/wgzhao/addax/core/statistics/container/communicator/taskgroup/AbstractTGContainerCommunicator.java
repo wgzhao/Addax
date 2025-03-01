@@ -31,24 +31,17 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * 该类是用于处理 taskGroupContainer 的 communication 的收集汇报的父类
- * 主要是 taskCommunicationMap 记录了 taskExecutor 的 communication 属性
+ * The AbstractTGContainerCommunicator class is the parent class for processing the collection and reporting of taskGroupContainer communication.
+ * The main taskCommunicationMap records the communication attributes of taskExecutor.
  */
 public abstract class AbstractTGContainerCommunicator
         extends AbstractContainerCommunicator
 {
-    /**
-     * 由于taskGroupContainer是进程内部调度
-     * 其registerCommunication()，getCommunication()，
-     * getCommunications()，collect()等方法是一致的
-     * 所有TG的Collector都是ProcessInnerCollector
-     */
     protected int taskGroupId;
 
     public AbstractTGContainerCommunicator(Configuration configuration)
     {
         super(configuration);
-//        this.jobId = configuration.getInt(CoreConstant.CORE_CONTAINER_JOB_ID);
         super.setCollector(new ProcessInnerCollector());
         this.taskGroupId = configuration.getInt(CoreConstant.CORE_CONTAINER_TASK_GROUP_ID);
     }
@@ -81,7 +74,7 @@ public abstract class AbstractTGContainerCommunicator
     @Override
     public final Communication getCommunication(Integer taskId)
     {
-        Validate.isTrue(taskId >= 0, "注册的taskId不能小于0");
+        Validate.isTrue(taskId >= 0, "The taskId must not be less than 0");
 
         return super.getCollector().getTaskCommunication(taskId);
     }

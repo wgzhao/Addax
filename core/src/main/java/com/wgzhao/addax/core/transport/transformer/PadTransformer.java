@@ -72,7 +72,6 @@ public class PadTransformer
         try {
             String oriValue = column.asString();
 
-            //如果字段为空，作为空字符串处理
             if (oriValue == null) {
                 oriValue = "";
             }

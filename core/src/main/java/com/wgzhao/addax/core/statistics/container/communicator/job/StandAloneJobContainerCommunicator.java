@@ -35,8 +35,7 @@ import java.util.Map;
 public class StandAloneJobContainerCommunicator
         extends AbstractContainerCommunicator
 {
-    private static final Logger LOG = LoggerFactory
-            .getLogger(StandAloneJobContainerCommunicator.class);
+    private static final Logger LOG = LoggerFactory.getLogger(StandAloneJobContainerCommunicator.class);
 
     public StandAloneJobContainerCommunicator(Configuration configuration)
     {
@@ -63,9 +62,6 @@ public class StandAloneJobContainerCommunicator
         return this.collect().getState();
     }
 
-    /**
-     * 和 DistributeJobContainerCollector 的 report 实现一样
-     */
     @Override
     public void report(Communication communication)
     {

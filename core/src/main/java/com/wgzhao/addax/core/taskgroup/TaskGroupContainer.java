@@ -101,13 +101,14 @@ public class TaskGroupContainer
     @Override
     public void start()
     {
-        // 状态check时间间隔，较短，可以把任务及时分发到对应channel中
+        // the interval time for checking the status of the task
+        // it is short, so that the task can be distributed to the corresponding channel in time
         int sleepIntervalInMillSec = this.configuration.getInt(CoreConstant.CORE_CONTAINER_TASK_GROUP_SLEEP_INTERVAL, 100);
 
-        // 状态汇报时间间隔，稍长，避免大量汇报
+        // the interval time for reporting the status of the task
+        // it is long to avoid a large number of reports
         long reportIntervalInMillSec = this.configuration.getLong(CoreConstant.CORE_CONTAINER_TASK_GROUP_REPORT_INTERVAL, 10000);
 
-        // 获取channel数目
         int channelNumber = this.configuration.getInt(CoreConstant.CORE_CONTAINER_TASK_GROUP_CHANNEL, 1);
 
         int taskMaxRetryTimes = this.configuration.getInt(CoreConstant.CORE_CONTAINER_TASK_FAIL_OVER_MAX_RETRY_TIMES, 1);
@@ -118,25 +119,27 @@ public class TaskGroupContainer
 
         List<Configuration> taskConfigs = this.configuration.getListConfiguration(CoreConstant.JOB_CONTENT);
 
-        if (LOG.isDebugEnabled()) {
-            LOG.debug("The task configuration [{} for taskGroup[{}]", this.taskGroupId, JSON.toJSONString(taskConfigs));
-        }
+        LOG.debug("The task configuration [{} for taskGroup[{}]", this.taskGroupId, JSON.toJSONString(taskConfigs));
 
         int taskCountInThisTaskGroup = taskConfigs.size();
         LOG.info("The taskGroupId=[{}] started [{}] channels for [{}] tasks.", this.taskGroupId, channelNumber, taskCountInThisTaskGroup);
 
         this.containerCommunicator.registerCommunication(taskConfigs);
-        Map<Integer, Configuration> taskConfigMap = buildTaskConfigMap(taskConfigs); //taskId与task配置
-        List<Configuration> taskQueue = buildRemainTasks(taskConfigs); //待运行task列表
-        Map<Integer, TaskExecutor> taskFailedExecutorMap = new HashMap<>(); //taskId与上次失败实例
-        List<TaskExecutor> runTasks = new ArrayList<>(channelNumber); //正在运行task
-        Map<Integer, Long> taskStartTimeMap = new HashMap<>(); //任务开始时间
+        // setup the taskId and task configuration map
+        Map<Integer, Configuration> taskConfigMap = buildTaskConfigMap(taskConfigs);
+        // the task queue for the task that has not been executed
+        List<Configuration> taskQueue = buildRemainTasks(taskConfigs);
+        // the map for the task that has failed
+        Map<Integer, TaskExecutor> taskFailedExecutorMap = new HashMap<>();
+        // the list for the task that is running
+        List<TaskExecutor> runTasks = new ArrayList<>(channelNumber);
+        // the map for the task start time
+        Map<Integer, Long> taskStartTimeMap = new HashMap<>();
 
         long lastReportTimeStamp = 0;
         Communication lastTaskGroupContainerCommunication = new Communication();
 
         while (true) {
-            //1.判断task状态
             boolean failedOrKilled = false;
             Map<Integer, Communication> communicationMap = containerCommunicator.getCommunicationMap();
             for (Map.Entry<Integer, Communication> entry : communicationMap.entrySet()) {
@@ -147,18 +150,19 @@ public class TaskGroupContainer
                 }
                 TaskExecutor taskExecutor = removeTask(runTasks, taskId);
 
-                //上面从runTasks里移除了，因此对应在monitor里移除
+                // the task has been removed from runTasks, so remove it from the monitor
                 taskMonitor.removeTask(taskId);
 
-                //失败，看task是否支持fail over，重试次数未超过最大限制
+                // if the task is failed, and the task supports fail over, and the attempt count is less than the max retry times
                 if (taskCommunication.getState() == State.FAILED) {
                     taskFailedExecutorMap.put(taskId, taskExecutor);
                     assert taskExecutor != null;
                     if (taskExecutor.supportFailOver() && taskExecutor.getAttemptCount() < taskMaxRetryTimes) {
-                        taskExecutor.shutdown(); //关闭老的executor
-                        containerCommunicator.resetCommunication(taskId); //将task的状态重置
+                        taskExecutor.shutdown();
+                        // reset the task status
+                        containerCommunicator.resetCommunication(taskId);
                         Configuration taskConfig = taskConfigMap.get(taskId);
-                        taskQueue.add(taskConfig); //重新加入任务列表
+                        taskQueue.add(taskConfig);
                     }
                     else {
                         failedOrKilled = true;
@@ -181,14 +185,14 @@ public class TaskGroupContainer
                 }
             }
 
-            // 2.发现该taskGroup下taskExecutor的总状态失败则汇报错误
+            // if the task group has failed, then report the error
             if (failedOrKilled) {
                 lastTaskGroupContainerCommunication = reportTaskGroupCommunication(lastTaskGroupContainerCommunication, taskCountInThisTaskGroup);
 
                 throw AddaxException.asAddaxException(RUNTIME_ERROR, lastTaskGroupContainerCommunication.getThrowable());
             }
 
-            //3.有任务未执行，且正在运行的任务数小于最大通道限制
+            // the task that has not been executed, and the number of running tasks is less than the channel number
             Iterator<Configuration> iterator = taskQueue.iterator();
             while (iterator.hasNext() && runTasks.size() < channelNumber) {
                 Configuration taskConfig = iterator.next();
@@ -199,17 +203,17 @@ public class TaskGroupContainer
                     attemptCount = lastExecutor.getAttemptCount() + 1;
                     long now = System.currentTimeMillis();
                     long failedTime = lastExecutor.getTimeStamp();
-                    if (now - failedTime < taskRetryIntervalInMs) {  //未到等待时间，继续留在队列
+                    if (now - failedTime < taskRetryIntervalInMs) {
                         continue;
                     }
-                    if (!lastExecutor.isShutdown()) { //上次失败的task仍未结束
+                    if (!lastExecutor.isShutdown()) {
                         if (now - failedTime > taskMaxWaitInMs) {
                             markCommunicationFailed(taskId);
                             reportTaskGroupCommunication(lastTaskGroupContainerCommunication, taskCountInThisTaskGroup);
                             throw AddaxException.asAddaxException(ErrorCode.WAIT_TIME_EXCEED, "The task fail over wait timed out.");
                         }
                         else {
-                            lastExecutor.shutdown(); //try to close again
+                            lastExecutor.shutdown();
                             continue;
                         }
                     }
@@ -226,7 +230,6 @@ public class TaskGroupContainer
                 iterator.remove();
                 runTasks.add(taskExecutor);
 
-                //上面，增加task到runTasks列表，因此在monitor里注册。
                 taskMonitor.registerTask(taskId, this.containerCommunicator.getCommunication(taskId));
 
                 taskFailedExecutorMap.remove(taskId);
@@ -234,23 +237,21 @@ public class TaskGroupContainer
                         this.taskGroupId, taskId, attemptCount);
             }
 
-            //4.任务列表为空，executor已结束, 搜集状态为success--->成功
+            // the task queue is empty, the executor has ended, and the collection status is success
             if (taskQueue.isEmpty() && isAllTaskDone(runTasks) && containerCommunicator.collectState() == State.SUCCEEDED) {
-                // 成功的情况下，也需要汇报一次。否则在任务结束非常快的情况下，采集的信息将会不准确
                 lastTaskGroupContainerCommunication = reportTaskGroupCommunication(lastTaskGroupContainerCommunication, taskCountInThisTaskGroup);
-
                 LOG.debug("The taskGroup[{}] has completed it's tasks.", this.taskGroupId);
                 break;
             }
 
-            // 5.如果当前时间已经超出汇报时间的interval，那么我们需要马上汇报
+            // if the current time has exceeded the interval of the report time, we need to report immediately
             long now = System.currentTimeMillis();
             if (now - lastReportTimeStamp > reportIntervalInMillSec) {
                 lastTaskGroupContainerCommunication = reportTaskGroupCommunication(lastTaskGroupContainerCommunication, taskCountInThisTaskGroup);
 
                 lastReportTimeStamp = now;
 
-                //taskMonitor对于正在运行的task，每reportIntervalInMillSec进行检查
+                // for the running tasks, check every reportIntervalInMillSec
                 for (TaskExecutor taskExecutor : runTasks) {
                     taskMonitor.report(taskExecutor.getTaskId(), this.containerCommunicator.getCommunication(taskExecutor.getTaskId()));
                 }
@@ -270,7 +271,7 @@ public class TaskGroupContainer
             }
         }
 
-        //6.最后还要汇报一次
+        // final report for all taskGroup
         reportTaskGroupCommunication(lastTaskGroupContainerCommunication, taskCountInThisTaskGroup);
     }
 
@@ -328,10 +329,6 @@ public class TaskGroupContainer
         communication.setState(State.FAILED);
     }
 
-    /**
-     * TaskExecutor是一个完整task的执行器
-     * 其中包括1：1的reader和writer
-     */
     class TaskExecutor
     {
         private final Configuration taskConfig;
@@ -350,60 +347,38 @@ public class TaskGroupContainer
 
         private final WriterRunner writerRunner;
 
-        /**
-         * 该处的taskCommunication在多处用到：
-         * 1. channel
-         * 2. readerRunner和writerRunner
-         * 3. reader和writer的taskPluginCollector
-         */
+        // the taskCommunication for the taskExecutor will be invoked by channel, readerRunner, writerRunner
+        // and the taskPluginCollector of reader and writer
         private final Communication taskCommunication;
 
         public TaskExecutor(Configuration taskConf, int attemptCount)
         {
-            // 获取该taskExecutor的配置
             this.taskConfig = taskConf;
             Validate.isTrue(null != this.taskConfig.getConfiguration(CoreConstant.JOB_READER)
                             && null != this.taskConfig.getConfiguration(CoreConstant.JOB_WRITER),
                     "The plugin parameters for reader and(or) writer cannot be empty!");
 
-            // 得到taskId
             this.taskId = this.taskConfig.getInt(CoreConstant.TASK_ID);
             this.attemptCount = attemptCount;
 
-            /*
-             * 由taskId得到该taskExecutor的Communication
-             * 要传给readerRunner和writerRunner，同时要传给channel作统计用
-             */
-            this.taskCommunication = containerCommunicator
-                    .getCommunication(taskId);
+            // get the communication for the taskExecutor via taskId
+            // then pass it to readerRunner and writerRunner, and pass it to channel for statistics
+            this.taskCommunication = containerCommunicator.getCommunication(taskId);
             Validate.notNull(this.taskCommunication,
-                    String.format("Communication has not been registered for taskId[%d]", taskId));
-            this.channel = ClassUtil.instantiate(channelClazz,
-                    Channel.class, configuration);
+                    "Communication has not been registered for taskId:" + taskId);
+            this.channel = ClassUtil.instantiate(channelClazz, Channel.class, configuration);
             this.channel.setCommunication(this.taskCommunication);
-
-            /*
-             * 获取transformer的参数
-             */
 
             List<TransformerExecution> transformerInfoExecs = TransformerUtil.buildTransformerInfo(taskConfig);
 
-            /*
-             * 生成writerThread
-             */
             writerRunner = (WriterRunner) generateRunner(PluginType.WRITER, null);
             this.writerThread = new Thread(writerRunner, String.format("writer-%d-%d", taskGroupId, this.taskId));
-            //通过设置thread的contextClassLoader，即可实现同步和主程序不通的加载器
+            // through setting the contextClassLoader of the thread, we can achieve the synchronization and the main program
             this.writerThread.setContextClassLoader(LoadUtil.getJarLoader(PluginType.WRITER, this.taskConfig.getString(CoreConstant.JOB_WRITER_NAME)));
 
-            /*
-             * 生成readerThread
-             */
             readerRunner = (ReaderRunner) generateRunner(PluginType.READER, transformerInfoExecs);
             this.readerThread = new Thread(readerRunner, String.format("reader-%d-%d", taskGroupId, this.taskId));
-            /*
-             * 通过设置thread的contextClassLoader，即可实现同步和主程序不同的加载器
-             */
+
             this.readerThread.setContextClassLoader(LoadUtil.getJarLoader(PluginType.READER, this.taskConfig.getString(CoreConstant.JOB_READER_NAME)));
         }
 
@@ -411,16 +386,13 @@ public class TaskGroupContainer
         {
             this.writerThread.start();
 
-            // reader没有起来，writer不可能结束
             if (!this.writerThread.isAlive() || this.taskCommunication.getState() == State.FAILED) {
                 throw AddaxException.asAddaxException(RUNTIME_ERROR, this.taskCommunication.getThrowable());
             }
 
             this.readerThread.start();
 
-            // 这里reader可能很快结束
             if (!this.readerThread.isAlive() && this.taskCommunication.getState() == State.FAILED) {
-                // 这里有可能出现Reader线上启动即挂情况 对于这类情况 需要立刻抛出异常
                 throw AddaxException.asAddaxException(RUNTIME_ERROR, this.taskCommunication.getThrowable());
             }
         }
@@ -447,9 +419,7 @@ public class TaskGroupContainer
 
                     ((ReaderRunner) newRunner).setRecordSender(recordSender);
 
-                    /*
-                     * 设置taskPlugin的collector，用来处理脏数据和job/task通信
-                     */
+                    // set the taskPlugin's collector to handle dirty data and job/task communication
                     newRunner.setTaskPluginCollector(pluginCollector);
                     break;
                 case WRITER:
@@ -458,9 +428,8 @@ public class TaskGroupContainer
 
                     pluginCollector = ClassUtil.instantiate(taskCollectorClass, AbstractTaskPluginCollector.class, configuration, this.taskCommunication, PluginType.WRITER);
                     ((WriterRunner) newRunner).setRecordReceiver(new BufferedRecordExchanger(this.channel, pluginCollector));
-                    /*
-                     * 设置taskPlugin的collector，用来处理脏数据和job/task通信
-                     */
+
+                    // set the taskPlugin's collector to handle dirty data and job/task communication
                     newRunner.setTaskPluginCollector(pluginCollector);
                     break;
                 default:
@@ -474,10 +443,8 @@ public class TaskGroupContainer
             return newRunner;
         }
 
-        // 检查任务是否结束
         private boolean isTaskFinished()
         {
-            // 如果reader 或 writer没有完成工作，那么直接返回工作没有完成
             if (readerThread.isAlive() || writerThread.isAlive()) {
                 return false;
             }

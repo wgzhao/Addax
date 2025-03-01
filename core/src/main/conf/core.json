@@ -3,6 +3,18 @@
     "jvm": "-Xms32M -Xmx1G",
     "environment": {}
   },
+  "common": {
+    "column": {
+      "datetimeFormat": "yyyy-MM-dd HH:mm:ss",
+      "timeFormat": "HH:mm:ss",
+      "dateFormat": "yyyy-MM-dd",
+      "extraFormats": [
+        "yyyyMMdd"
+      ],
+      "timeZone": "PRC",
+      "encoding": "utf-8"
+    }
+  },
   "core": {
     "server": {
       "address": "",

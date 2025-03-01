@@ -75,9 +75,6 @@ public class TransformerUtil
             functionNames.add(functionName);
         }
 
-        /*
-         * 延迟load 第三方插件的function，并按需load
-         */
         LOG.info("Loading the  user config transformers [{}] ...", functionNames);
         TransformerRegistry.loadTransformerFromLocalStorage(functionNames);
 
@@ -91,13 +88,9 @@ public class TransformerUtil
                         "name=" + functionName);
             }
 
-            /*
-             * 具体的UDF对应一个paras
-             */
             TransformerExecutionParas transformerExecutionParas = new TransformerExecutionParas();
-            /*
-             * groovy function仅仅只有code
-             */
+
+            // the groovy function has only code
             if (!"dx_groovy".equals(functionName) && !"dx_fackGroovy".equals(functionName)) {
                 Integer columnIndex = configuration.getInt(CoreConstant.TRANSFORMER_PARAMETER_COLUMN_INDEX);
 

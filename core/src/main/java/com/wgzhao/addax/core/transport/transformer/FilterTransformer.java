@@ -319,10 +319,9 @@ public class FilterTransformer
     }
 
     /**
-     * DateColumn将比较long值，StringColumn，ByteColumn以及BooleanColumn比较其String值
-     *
+     * For DateColumn, it will compare long value, for StringColumn, ByteColumn and BooleanColumn, it will compare their String value.
      * @param record message record
-     * @param value value to compared
+     * @param value value to compare
      * @param column the column of record
      * @return Record
      */

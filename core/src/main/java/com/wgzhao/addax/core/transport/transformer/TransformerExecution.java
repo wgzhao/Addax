@@ -23,19 +23,12 @@ import com.wgzhao.addax.transformer.ComplexTransformer;
 
 import java.util.Map;
 
-/**
- * 每个func对应一个实例.
- * Created by liqiang on 16/3/16.
- */
 public class TransformerExecution
 {
 
     private final TransformerExecutionParas transformerExecutionParas;
     private final TransformerInfo transformerInfo;
     private Object[] finalParas;
-    /**
-     * 参数采取延迟检查
-     */
 
     private boolean isChecked = false;
 
@@ -49,18 +42,13 @@ public class TransformerExecution
     public void genFinalParas()
     {
 
-        /*
-         * groovy不支持传参
-         */
         if ("dx_groovy".equals(transformerInfo.getTransformer().getTransformerName())) {
             finalParas = new Object[2];
             finalParas[0] = transformerExecutionParas.getCode();
             finalParas[1] = transformerExecutionParas.getExtraPackage();
             return;
         }
-        /*
-         * 其他function，按照columnIndex和para的顺序，如果columnIndex为空，跳过columnIndex
-         */
+
         if (transformerExecutionParas.getColumnIndex() != null) {
             if (transformerExecutionParas.getParas() != null) {
                 finalParas = new Object[transformerExecutionParas.getParas().length + 1];
@@ -98,9 +86,6 @@ public class TransformerExecution
         return isChecked;
     }
 
-    /*
-     * 一些代理方法
-     */
     public ClassLoader getClassLoader()
     {
         return transformerInfo.getClassLoader();

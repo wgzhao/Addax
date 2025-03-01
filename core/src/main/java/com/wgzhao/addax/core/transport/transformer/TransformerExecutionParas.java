@@ -28,11 +28,6 @@ import java.util.Map;
  */
 public class TransformerExecutionParas
 {
-
-    /**
-     * 以下是function参数
-     */
-
     private Integer columnIndex;
     private String[] paras;
     private Map<String, Object> tContext;

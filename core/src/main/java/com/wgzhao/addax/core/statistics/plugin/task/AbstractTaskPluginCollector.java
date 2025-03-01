@@ -91,7 +91,7 @@ public abstract class AbstractTaskPluginCollector
             this.communication.increaseCounter(CommunicationTool.WRITE_FAILED_BYTES, dirtyRecord.getByteSize());
         }
         else {
-            throw AddaxException.asAddaxException(RUNTIME_ERROR, String.format("不知道的插件类型[%s].", this.pluginType));
+            throw AddaxException.asAddaxException(RUNTIME_ERROR, "Unknown plugin type " + this.pluginType);
         }
     }
 }

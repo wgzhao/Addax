@@ -46,7 +46,7 @@ public class DefaultRecord
 
     private int byteSize;
 
-    // 首先是Record本身需要的内存
+    // The memory size of the record itself
     private int memorySize = ClassSize.DEFAULT_RECORD_HEAD;
 
     private Map<String, String> meta;

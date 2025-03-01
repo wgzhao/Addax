@@ -41,32 +41,29 @@ import java.util.Properties;
 import java.util.Set;
 
 /**
- * Engine是 Addax 入口类，该类负责初始化Job或者Task的运行容器，并运行插件的Job或者Task逻辑
+ * Engine is the entry class of Addax. This class is responsible for initializing the running container of Job or Task,
+ * and running the Job or Task logic of the plugin.
  */
 public class Engine
 {
     private static final Logger LOG = LoggerFactory.getLogger(Engine.class);
 
-    /* check job model (job/task) first */
     public void start(Configuration allConf)
     {
 
-        // 绑定column转换信息
+        // bind and casting column type
         ColumnCast.bind(allConf);
 
-        /*
-         * 初始化PluginLoader，可以获取各种插件配置
-         */
+        // initialize the PluginLoader
         LoadUtil.bind(allConf);
 
-        //JobContainer会在schedule后再行进行设置和调整值
         AbstractContainer container;
         container = new JobContainer(allConf);
 
         container.start();
     }
 
-    // 注意屏蔽敏感信息
+
     public static String filterJobConfiguration(final Configuration configuration)
     {
         Configuration jobConfWithSetting = configuration.getConfiguration("job").clone();

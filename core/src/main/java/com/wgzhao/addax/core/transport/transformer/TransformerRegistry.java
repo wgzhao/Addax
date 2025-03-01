@@ -39,10 +39,6 @@ import java.util.Map;
 import static com.wgzhao.addax.common.spi.ErrorCode.CONFIG_ERROR;
 import static com.wgzhao.addax.core.util.container.CoreConstant.STORAGE_TRANSFORMER_HOME;
 
-/**
- * no comments.
- * Created by liqiang on 16/3/3.
- */
 public class TransformerRegistry
 {
 

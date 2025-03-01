@@ -25,10 +25,10 @@ import java.io.File;
 import java.util.Map;
 
 /**
- * 扫描给定目录的所有一级子目录，每个子目录当作一个Hook的目录。
- * 对于每个子目录，必须符合ServiceLoader的标准目录格式，见
- * <a href="http://docs.oracle.com/javase/6/docs/api/java/util/ServiceLoader.html">ServiceLoader</a>。
- * 加载里头的jar，使用ServiceLoader机制调用。
+ * Scan all first-level subdirectories of the given directory, and treat each subdirectory as a directory of Hook.
+ * For each subdirectory, it must conform to the standard directory format of ServiceLoader, see
+ * <a href="http://docs.oracle.com/javase/6/docs/api/java/util/ServiceLoader.html">ServiceLoader</a>.
+ * Load the jar inside, and call using the ServiceLoader mechanism.
  */
 public class HookInvoker
 {

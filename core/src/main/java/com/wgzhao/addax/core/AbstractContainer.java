@@ -24,7 +24,7 @@ import com.wgzhao.addax.core.statistics.container.communicator.AbstractContainer
 import org.apache.commons.lang3.Validate;
 
 /**
- * 执行容器的抽象类，持有该容器全局的配置 configuration
+ * Abstract class of the execution container, holding the global configuration of the container
  */
 public abstract class AbstractContainer
 {

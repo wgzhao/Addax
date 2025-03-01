@@ -45,8 +45,8 @@ public final class JobAssignUtil
     }
 
     /**
-     * 公平的分配 task 到对应的 taskGroup 中。
-     * 公平体现在：会考虑 task 中对资源负载作的 load 标识进行更均衡的作业分配操作。
+     * Assign tasks to task groups fairly.
+     * Fairness is reflected in the more balanced job distribution based on the load identification of the resource load in the task.
      *
      * @param configuration configuration
      * @param channelNumber the number of channel
@@ -77,30 +77,36 @@ public final class JobAssignUtil
                 StringUtils.isNotBlank(writerResourceMark);
 
         if (!hasLoadBalanceResourceMark) {
-            // fake 一个固定的 key 作为资源标识（在 reader 或者 writer 上均可，此处选择在 reader 上进行 fake）
+            // set a fake resource mark for load balance (can be set on reader or writer, here choose to fake on reader)
             for (Configuration conf : contentConfig) {
                 conf.set(JOB_READER_PARAMETER + "." +
                         LOAD_BALANCE_RESOURCE_MARK, "aFakeResourceMarkForLoadBalance");
             }
-            // 是为了避免某些插件没有设置 资源标识 而进行了一次随机打乱操作
+            // to avoid some plugins not setting the resource mark and performing a random shuffle
             Collections.shuffle(contentConfig, new SecureRandom());
         }
 
         LinkedHashMap<String, List<Integer>> resourceMarkAndTaskIdMap = parseAndGetResourceMarkAndTaskIdMap(contentConfig);
         List<Configuration> taskGroupConfig = doAssign(resourceMarkAndTaskIdMap, configuration, taskGroupNumber);
 
-        // 调整 每个 taskGroup 对应的 Channel 个数（属于优化范畴）
+        // adjust channel number per task group
         adjustChannelNumPerTaskGroup(taskGroupConfig, channelNumber);
         return taskGroupConfig;
     }
 
+    /**
+     * Adjust the number of channels per task group.
+     *
+     * @param taskGroupConfig configuration
+     * @param channelNumber the number of channel
+     */
     private static void adjustChannelNumPerTaskGroup(List<Configuration> taskGroupConfig, int channelNumber)
     {
         int taskGroupNumber = taskGroupConfig.size();
+        // indicates that there are remainderChannelCount taskGroups,
+        // and the corresponding number of Channels should be: avgChannelsPerTaskGroup + 1;
         int avgChannelsPerTaskGroup = channelNumber / taskGroupNumber;
         int remainderChannelCount = channelNumber % taskGroupNumber;
-        // 表示有 remainderChannelCount 个 taskGroup,其对应 Channel 个数应该为：avgChannelsPerTaskGroup + 1；
-        // （taskGroupNumber - remainderChannelCount）个 taskGroup,其对应 Channel 个数应该为：avgChannelsPerTaskGroup
 
         int i = 0;
         for (; i < remainderChannelCount; i++) {
@@ -112,12 +118,12 @@ public final class JobAssignUtil
         }
     }
 
+
     /**
-     * 根据task 配置，获取到：
-     * 资源名称到 taskId(List) 的 map 映射关系
+     * Parse the resource mark and taskId map.
      *
      * @param contentConfig configuration
-     * @return hashmap
+     * @return map of resource mark and taskId
      */
     private static LinkedHashMap<String, List<Integer>> parseAndGetResourceMarkAndTaskIdMap(List<Configuration> contentConfig)
     {
@@ -149,19 +155,18 @@ public final class JobAssignUtil
     }
 
     /**
-     * 需要实现的效果通过例子来说是：
+     * Assign tasks to task groups.
+     * The effect to be implemented is explained by example:
      * <pre>
-     * a 库上有表：0, 1, 2
-     * a 库上有表：3, 4
-     * c 库上有表：5, 6, 7
-     *
-     * 如果有 4个 taskGroup
-     * 则 assign 后的结果为：
-     * taskGroup-0: 0,  4,
-     * taskGroup-1: 3,  6,
-     * taskGroup-2: 5,  2,
-     * taskGroup-3: 1,  7
-     *
+     *     database A has tables: 0, 1, 2
+     *     database B has tables: 3, 4
+     *     database C has tables: 5, 6, 7
+     *     If there are 4 task groups
+     *     The result after assign is:
+     *     taskGroup-0: 0,  4,
+     *     taskGroup-1: 3,  6,
+     *     taskGroup-2: 5,  2,
+     *     taskGroup-3: 1,  7
      * </pre>
      *
      * @param resourceMarkAndTaskIdMap resource map

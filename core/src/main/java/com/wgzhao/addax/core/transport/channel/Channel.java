@@ -39,9 +39,8 @@ import static com.wgzhao.addax.core.util.container.CoreConstant.CORE_TRANSPORT_C
 import static com.wgzhao.addax.core.util.container.CoreConstant.CORE_TRANSPORT_CHANNEL_SPEED_RECORD;
 
 /**
- * Created by jingxing on 14-8-25.
- * <p>
- * 统计和限速都在这里
+ * The Channel is a queue between Reader and Writer.
+ * it supports statistics and speed limit.
  */
 public abstract class Channel
 {
@@ -63,7 +62,6 @@ public abstract class Channel
 
     public Channel(Configuration configuration)
     {
-        //channel的queue里默认record为1万条。原来为512条
         int capacity = configuration.getInt(CORE_TRANSPORT_CHANNEL_CAPACITY, 2048);
         long byteSpeed = configuration.getLong(CORE_TRANSPORT_CHANNEL_SPEED_BYTE, 1024 * 1024L);
         long recordSpeed = configuration.getLong(CORE_TRANSPORT_CHANNEL_SPEED_RECORD, 10000L);
@@ -83,7 +81,6 @@ public abstract class Channel
         this.byteSpeed = byteSpeed;
         this.recordSpeed = recordSpeed;
         this.flowControlInterval = configuration.getLong(CORE_TRANSPORT_CHANNEL_FLOW_CONTROL_INTERVAL, 1000);
-        //channel的queue默认大小为8M，原来为64M
         this.byteCapacity = configuration.getInt(CORE_TRANSPORT_CHANNEL_CAPACITY_BYTE, 8 * 1024 * 1024);
         this.configuration = configuration;
     }
@@ -181,7 +178,6 @@ public abstract class Channel
     {
         currentCommunication.increaseCounter(CommunicationTool.READ_SUCCEED_RECORDS, recordSize);
         currentCommunication.increaseCounter(CommunicationTool.READ_SUCCEED_BYTES, byteSize);
-        //在读的时候进行统计waitCounter即可，因为写（pull）的时候可能正在阻塞，但读的时候已经能读到这个阻塞的counter数
 
         currentCommunication.setLongCounter(CommunicationTool.WAIT_READER_TIME, waitReaderTime.get());
         currentCommunication.setLongCounter(CommunicationTool.WAIT_WRITER_TIME, waitWriterTime.get());
@@ -202,7 +198,6 @@ public abstract class Channel
                 long currentByteSpeed = (CommunicationTool.getTotalReadBytes(currentCommunication) -
                         CommunicationTool.getTotalReadBytes(lastCommunication)) * 1000 / interval;
                 if (currentByteSpeed > this.byteSpeed) {
-                    // 计算根据byteLimit得到的休眠时间
                     byteLimitSleepTime = currentByteSpeed * interval / this.byteSpeed - interval;
                 }
             }
@@ -211,12 +206,10 @@ public abstract class Channel
                 long currentRecordSpeed = (CommunicationTool.getTotalReadRecords(currentCommunication) -
                         CommunicationTool.getTotalReadRecords(lastCommunication)) * 1000 / interval;
                 if (currentRecordSpeed > this.recordSpeed) {
-                    // 计算根据recordLimit得到的休眠时间
                     recordLimitSleepTime = currentRecordSpeed * interval / this.recordSpeed - interval;
                 }
             }
 
-            // 休眠时间取较大值
             long sleepTime = Math.max(byteLimitSleepTime, recordLimitSleepTime);
             if (sleepTime > 0) {
                 try {

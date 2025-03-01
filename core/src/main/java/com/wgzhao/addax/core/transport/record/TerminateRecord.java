@@ -24,9 +24,6 @@ import com.wgzhao.addax.common.element.Record;
 
 import java.util.Map;
 
-/**
- * 作为标示 生产者已经完成生产的标志
- */
 public class TerminateRecord
         implements Record
 {

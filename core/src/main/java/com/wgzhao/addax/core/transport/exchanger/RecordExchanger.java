@@ -101,7 +101,6 @@ public class RecordExchanger
             return;
         }
         this.channel.push(record);
-        //和channel的统计保持同步
         doStat();
     }
 

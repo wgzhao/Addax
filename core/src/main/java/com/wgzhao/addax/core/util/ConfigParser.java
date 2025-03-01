@@ -67,8 +67,10 @@ public final class ConfigParser
     {
     }
 
-    /*
-     * 指定Job配置路径，ConfigParser会解析Job、Plugin、Core全部信息，并以Configuration返回
+    /**
+     * Parse the job configuration file and merge the core configuration
+     * @param jobPath the path of the job configuration file
+     * @return the merged configuration
      */
     public static Configuration parse(String jobPath)
     {
@@ -184,7 +186,6 @@ public final class ConfigParser
             }
         }
         else {
-            // jobResource 是本地文件绝对路径
             try {
                 jobContent = FileUtils.readFileToString(new File(jobResource), StandardCharsets.UTF_8);
             }
