@@ -62,7 +62,7 @@ public final class ListUtil
                             .asAddaxException(
                                     ErrorCode.CONFIG_ERROR,
                                     String.format(
-                                            "您提供的作业配置信息有误, String:[%s] 不允许重复出现在列表中: [%s].",
+                                            "The item '%s' is duplicated in list: %s.",
                                             list.get(i),
                                             StringUtils.join(aList, ",")));
                 }
@@ -113,7 +113,7 @@ public final class ListUtil
                         .asAddaxException(
                                 ErrorCode.CONFIG_ERROR,
                                 String.format(
-                                        "您提供的作业配置信息有误, String:[%s] 不存在于列表中:[%s].",
+                                        "The item '%s' doest not exists in list: '%s'.",
                                         oneValue, StringUtils.join(aList, ",")));
             }
         }

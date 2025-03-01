@@ -49,6 +49,16 @@ public final class RetryUtil
      * @return 经过重试的callable的执行结果
      * @throws Exception 运行异常
      */
+
+    /**
+     *  This method is used to execute the callable with retry.
+     * @param callable the actual logic
+     * @param retryTimes the maximum number of retries
+     * @param sleepTimeInMilliSecond the time to sleep after the operation fails before retrying
+     * @param exponential whether the sleep time is exponentially increased
+     * @param <T> the return type
+     * @throws Exception if the operation fails
+     */
     public static <T> T executeWithRetry(Callable<T> callable,
             int retryTimes,
             long sleepTimeInMilliSecond,
@@ -60,16 +70,14 @@ public final class RetryUtil
     }
 
     /**
-     * 重试次数工具方法.
-     *
-     * @param callable 实际逻辑
-     * @param retryTimes 最大重试次数
-     * @param sleepTimeInMilliSecond 运行失败后休眠对应时间再重试
-     * @param exponential 休眠时间是否指数递增
-     * @param <T> 返回值类型
-     * @param retryExceptionClass 出现指定的异常类型时才进行重试
-     * @return 经过重试的callable的执行结果
-     * @throws Exception 运行异常
+     *  This method is used to execute the callable with retry.
+     * @param callable the actual logic
+     * @param retryTimes the maximum number of retries
+     * @param sleepTimeInMilliSecond the time to sleep after the operation fails before retrying
+     * @param exponential whether the sleep time is exponentially increased
+     * @param retryExceptionClass the exception types that trigger a retry
+     * @param <T> the return type
+     * @throws Exception if the operation fails
      */
     public static <T> T executeWithRetry(Callable<T> callable,
             int retryTimes,
@@ -83,19 +91,17 @@ public final class RetryUtil
     }
 
     /**
-     * 在外部线程执行并且重试。每次执行需要在timeoutMs内执行完，不然视为失败。
-     * 执行异步操作的线程池从外部传入，线程池的共享粒度由外部控制。比如，HttpClientUtil共享一个线程池。
-     * 限制条件：仅仅能够在阻塞的时候interrupt线程
-     *
-     * @param callable 实际逻辑
-     * @param retryTimes 最大重试次数
-     * @param sleepTimeInMilliSecond 运行失败后休眠对应时间再重试
-     * @param exponential 休眠时间是否指数递增
-     * @param timeoutMs callable执行超时时间，毫秒
-     * @param executor 执行异步操作的线程池
-     * @param <T> 返回值类型
-     * @return 经过重试的callable的执行结果
-     * @throws Exception 运行异常
+     *  It is used to execute and retry in an external thread. Each execution must be completed within timeoutMs, otherwise it is considered a failure.
+     *  limit conditions: can only interrupt threads when blocking
+     * @param callable the actual logic
+     * @param retryTimes the maximum number of retries
+     * @param sleepTimeInMilliSecond the time to sleep after the operation fails before retrying
+     * @param exponential whether the sleep time is exponentially increased
+     * @param timeoutMs the timeout for the callable to execute, in milliseconds
+     * @param executor the thread pool for executing asynchronous operations
+     * @return the result of the callable after retry
+     * @param <T> the return type
+     * @throws Exception if the operation fails
      */
     public static <T> T asyncExecuteWithRetry(Callable<T> callable,
             int retryTimes,
@@ -110,13 +116,13 @@ public final class RetryUtil
     }
 
     /**
-     * 创建异步执行的线程池。特性如下：
-     * core大小为0，初始状态下无线程，无初始消耗。
-     * max大小为5，最多五个线程。
-     * 60秒超时时间，闲置超过60秒线程会被回收。
-     * 使用SynchronousQueue，任务不会排队，必须要有可用线程才能提交成功，否则会RejectedExecutionException。
-     *
-     * @return 线程池
+     *  Create an asynchronous thread pool. The characteristics are as follows:
+     *  The core size is 0, and there are no threads initially, so there is no initial consumption.
+     *  The maximum size is 5, with a maximum of five threads.
+     *  The timeout is 60 seconds, and threads that are idle for more than 60 seconds will be recycled.
+     *  Use SynchronousQueue, tasks are not queued, and there must be available threads to submit successfully,
+     *  otherwise a RejectedExecutionException will be thrown.
+     * @return the thread pool
      */
     public static ThreadPoolExecutor createThreadPoolExecutor()
     {
@@ -214,11 +220,11 @@ public final class RetryUtil
         }
 
         /**
-         * 使用传入的线程池异步执行任务，并且等待。
-         * future.get()方法，等待指定的毫秒数。如果任务在超时时间内结束，则正常返回。
-         * 如果抛异常（可能是执行超时、执行异常、被其他线程cancel或interrupt），都记录日志并且网上抛异常。
-         * 正常和非正常的情况都会判断任务是否结束，如果没有结束，则cancel任务。cancel参数为true，表示即使
-         * 任务正在执行，也会interrupt线程。
+         *  Asynchronously execute the task using the thread pool provided, and wait.
+         *  The future.get() method waits for the specified number of milliseconds. If the task ends within the timeout period, it returns normally.
+         *  If an exception is thrown (possibly due to a timeout, an exception during execution, or being canceled or interrupted by another thread), log it and throw an exception.
+         *  In both normal and abnormal cases, check whether the task has ended. If it has not ended, cancel the task. The cancel parameter is true,
+         *  which means that even if the task is running, the thread will be interrupted.
          */
         @Override
         protected <T> T call(Callable<T> callable)

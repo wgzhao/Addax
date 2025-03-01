@@ -27,35 +27,29 @@ import com.wgzhao.addax.common.util.Configuration;
 
 import java.util.List;
 
-/**
- * 每个Reader插件在其内部内部实现Job、Task两个内部类。
- */
 public abstract class Reader
         extends BaseObject
 {
 
-    /**
-     * 每个Reader插件必须实现Job内部类。
-     */
     public abstract static class Job
             extends AbstractJobPlugin
     {
 
         /**
-         * 切分任务
+         * split the task
          *
-         * @param adviceNumber 着重说明下，adviceNumber是框架建议插件切分的任务数，插件开发人员最好切分出来的任务数大于
-         * adviceNumber。
-         * 之所以采取这个建议是为了给用户最好的实现，例如框架根据计算认为用户数据存储可以支持100个并发连接，
-         * 并且用户认为需要100个并发。 此时，插件开发人员如果能够根据上述切分规则进行切分并做到超过100连接信息，
-         * Addax 就可以同时启动100个Channel，这样给用户最好的吞吐量
-         * 例如用户同步一张Mysql单表，但是认为可以到10并发吞吐量，插件开发人员最好对该表进行切分，比如使用主键范围切分，
-         * 并且如果最终切分任务数大于等于10，我们就可以提供给用户最大的吞吐量。
-         * 当然，我们这里只是提供一个建议值，Reader插件可以按照自己规则切分。但是我们更建议按照框架提供的建议值来切分。
-         * 对于ODPS写入OTS而言，如果存在预排序预切分问题，这样就可能只能按照分区信息切分，无法更细粒度切分，
-         * 这类情况只能按照源头物理信息切分规则切分。
+         * @param adviceNumber the number of tasks that the framework suggests the plugin to split
+         * The reason for this suggestion is to provide the best implementation for the user.
+         * For example, the framework calculates that the user's data storage can support 100 concurrent connections,
+         * and the user needs 100 concurrent connections. If the plugin developer can split the tasks according to the
+         * above rules and achieve more than 100 connections, Addax can start 100 Channels simultaneously, providing
+         * the best throughput for the user.
+         * For example, if the user is synchronizing a single MySQL table and expects a throughput of 10 concurrent connections,
+         * the plugin developer should split the table, such as by using primary key ranges. If the final number of split tasks is
+         * greater than or equal to 10, we can provide the user with the maximum throughput.
+         * * Of course, this is just a suggested value. The Reader plugin can split according to its own rules, but we recommend
+         * splitting according to the framework's suggested value.
          * @return list of configuration
-         *
          */
         public abstract List<Configuration> split(int adviceNumber);
     }

@@ -71,43 +71,32 @@ public final class ColumnCast
 class StringCast
 {
 
-    static String datetimeFormat = "yyyy-MM-dd HH:mm:ss";
-    static String dateFormat = "yyyy-MM-dd";
-    static String timeFormat = "HH:mm:ss";
-    static List<String> extraFormats = Collections.emptyList();
-    static String timeZone = "GMT+8";
+    static String datetimeFormat;
+    static String dateFormat;
+    static String timeFormat;
+    static List<String> extraFormats;
+    static String timeZone;
     static FastDateFormat dateFormatter;
     static FastDateFormat timeFormatter;
     static FastDateFormat datetimeFormatter;
     static TimeZone timeZoner;
-    static String encoding = "UTF-8";
+    static String encoding ;
 
     private StringCast() {}
 
     static void init(final Configuration configuration)
     {
-        StringCast.datetimeFormat = configuration.getString(
-                "common.column.datetimeFormat", StringCast.datetimeFormat);
-        StringCast.dateFormat = configuration.getString(
-                "common.column.dateFormat", StringCast.dateFormat);
-        StringCast.timeFormat = configuration.getString(
-                "common.column.timeFormat", StringCast.timeFormat);
-        StringCast.extraFormats = configuration.getList(
-                "common.column.extraFormats", Collections.emptyList(), String.class);
+        StringCast.datetimeFormat = configuration.getString("common.column.datetimeFormat",  "yyyy-MM-dd HH:mm:ss");
+        StringCast.dateFormat = configuration.getString("common.column.dateFormat", "yyyy-MM-dd");
+        StringCast.timeFormat = configuration.getString("common.column.timeFormat", "HH:mm:ss");
+        StringCast.extraFormats = configuration.getList("common.column.extraFormats", Collections.emptyList(), String.class);
+        StringCast.timeZone = configuration.getString("common.column.timeZone", "GMT+8");
+        StringCast.encoding = configuration.getString("common.column.encoding", "UTF-8");
 
-        StringCast.timeZone = configuration.getString("common.column.timeZone",
-                StringCast.timeZone);
         StringCast.timeZoner = TimeZone.getTimeZone(StringCast.timeZone);
-
-        StringCast.datetimeFormatter = FastDateFormat.getInstance(
-                StringCast.datetimeFormat, StringCast.timeZoner);
-        StringCast.dateFormatter = FastDateFormat.getInstance(
-                StringCast.dateFormat, StringCast.timeZoner);
-        StringCast.timeFormatter = FastDateFormat.getInstance(
-                StringCast.timeFormat, StringCast.timeZoner);
-
-        StringCast.encoding = configuration.getString("common.column.encoding",
-                StringCast.encoding);
+        StringCast.datetimeFormatter = FastDateFormat.getInstance(StringCast.datetimeFormat, StringCast.timeZoner);
+        StringCast.dateFormatter = FastDateFormat.getInstance(StringCast.dateFormat, StringCast.timeZoner);
+        StringCast.timeFormatter = FastDateFormat.getInstance(StringCast.timeFormat, StringCast.timeZoner);
     }
 
     static Date asDate(final StringColumn column)
@@ -161,31 +150,22 @@ class StringCast
     }
 }
 
-/**
- * 后续为了可维护性，可以考虑直接使用 apache 的DateFormatUtils.
- * <p>
- * 迟南已经修复了该问题，但是为了维护性，还是直接使用apache的内置函数
- */
 class DateCast
 {
-    static String datetimeFormat = "yyyy-MM-dd HH:mm:ss";
-    static String dateFormat = "yyyy-MM-dd";
-    static String timeFormat = "HH:mm:ss";
-    static String timeZone = "GMT+8";
-    static TimeZone timeZoner = TimeZone.getTimeZone(DateCast.timeZone);
+    static String datetimeFormat;
+    static String dateFormat;
+    static String timeFormat;
+    static String timeZone;
+    static TimeZone timeZoner;
 
     private DateCast() {}
 
     static void init(final Configuration configuration)
     {
-        DateCast.datetimeFormat = configuration.getString(
-                "common.column.datetimeFormat", datetimeFormat);
-        DateCast.timeFormat = configuration.getString(
-                "common.column.timeFormat", timeFormat);
-        DateCast.dateFormat = configuration.getString(
-                "common.column.dateFormat", dateFormat);
-        DateCast.timeZone = configuration.getString("common.column.timeZone",
-                DateCast.timeZone);
+        DateCast.datetimeFormat = configuration.getString("common.column.datetimeFormat", "yyyy-MM-dd HH:mm:ss");
+        DateCast.timeFormat = configuration.getString("common.column.timeFormat", "HH:mm:ss");
+        DateCast.dateFormat = configuration.getString("common.column.dateFormat", "yyyy-MM-dd");
+        DateCast.timeZone = configuration.getString("common.column.timeZone", "GMT+8");
         DateCast.timeZoner = TimeZone.getTimeZone(DateCast.timeZone);
     }
 
@@ -215,14 +195,13 @@ class DateCast
 
 class BytesCast
 {
-    static String encoding = "utf-8";
+    static String encoding;
 
     private BytesCast() {}
 
     static void init(final Configuration configuration)
     {
-        BytesCast.encoding = configuration.getString("common.column.encoding",
-                BytesCast.encoding);
+        BytesCast.encoding = configuration.getString("common.column.encoding", "utf-8");
     }
 
     static String asString(final BytesColumn column)

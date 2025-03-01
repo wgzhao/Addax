@@ -45,35 +45,29 @@ import java.util.Set;
 import static com.wgzhao.addax.common.spi.ErrorCode.REQUIRED_VALUE;
 
 /**
- * Configuration 提供多级JSON配置信息无损存储 <br>
- * 实例代码:<br>
- * 获取job的配置信息<br>
+ * Configuration provides multi-level JSON configuration information lossless storage <br>
+ * Instance code: <br>
+ * Get the configuration information of the job <br>
+ * <pre>
  * Configuration configuration = Configuration.from(new File("Config.json")); <br>
- * String jobContainerClass =
- * configuration.getString("core.container.job.class"); <br>
- * 设置多级List <br>
- * configuration.set("job.reader.parameter.jdbcUrl", Arrays.asList(new String[]
- * {"jdbc", "jdbc"}));
- * 合并Configuration: <br>
+ * String jobContainerClass = configuration.getString("core.container.job.class"); <br>
+ * Set multi-level List <br>
+ * configuration.set("job.reader.parameter.jdbcUrl", Arrays.asList(new String[] {"jdbc", "jdbc"})); <br>
+ * Merge Configuration: <br>
  * configuration.merge(another);
- * Configuration 存在两种较好地实现方式<br>
- * 第一种是将JSON配置信息中所有的Key全部打平，用a.b.c的级联方式作为Map的Key，内部使用一个Map保存信息 <br>
- * 第二种是将JSON的对象直接使用结构化树形结构保存<br>
- * 目前使用的第二种实现方式，使用第一种的问题在于: <br>
- * 1. 插入新对象，比较难处理，例如a.b.c="foo"，此时如果需要插入a="foo"，也即是根目录下第一层所有类型全部要废弃
- * ，使用"foo"作为value，第一种方式使用字符串表示key，难以处理这类问题。 <br>
- * 2. 返回树形结构，例如 a.b.c.d = "foo"，如果返回"a"下的所有元素，实际上是一个Map，需要合并处理 <br>
- * 3. 输出JSON，将上述对象转为JSON，要把上述Map的多级key转为树形结构，并输出为JSON <br>
+ * </pre>
+ * There are two better implementations of Configuration <br>
+ * The first is to flatten all the keys in the JSON configuration information, use the cascade of a.b.c as the key of the Map, and use a Map to save the information <br>
+ * The second is to directly use the structured tree structure to save the JSON object <br>
+ * Currently use the second implementation method, the problem with the first method is: <br>
+ * 1. Inserting new objects is relatively difficult to handle, for example, a.b.c="foo", at this time, if you need to insert a="foo", that is,
+ * all types of the first layer under the root need to be discarded, and "foo" is used as the value, the first type The way to use a string to
+ * represent the key is difficult to handle such problems. <br>
+ * 2. Return the tree structure, for example, a.b.c.d = "foo", if you return all elements under "a", it is actually a Map that needs to be merged and processed <br>
+ * 3. Output JSON, convert the above objects to JSON, convert the multi-level key of the above Map to a tree structure, and output it as JSON <br>
  */
 public class Configuration
 {
-
-    /**
-     * 对于加密的keyPath，需要记录下来
-     * 为的是后面分布式情况下将该值加密后抛到 AddaxServer中
-     */
-    private final Set<String> secretKeyPathSet =
-            new HashSet<>();
 
     private Object root;
 
@@ -83,23 +77,15 @@ public class Configuration
             this.root = JSON.parse(json);
         }
         catch (Exception e) {
-            throw AddaxException.asAddaxException(ErrorCode.CONFIG_ERROR,
-                    String.format("The configuration is incorrect. The configuration you provided is " +
-                            "not in valid JSON format: %s.", e.getMessage()));
+            throw AddaxException.asAddaxException(ErrorCode.CONFIG_ERROR, String.format("The configuration is incorrect. The configuration you provided is " + "not in valid JSON format: %s.", e.getMessage()));
         }
     }
 
-    /*
-     * 初始化空白的Configuration
-     */
     public static Configuration newDefault()
     {
         return Configuration.from("{}");
     }
 
-    /*
-     * 从JSON字符串加载Configuration
-     */
     public static Configuration from(String json)
     {
         json = StrUtil.replaceVariable(json);
@@ -109,34 +95,28 @@ public class Configuration
             return new Configuration(json);
         }
         catch (Exception e) {
-            throw AddaxException.asAddaxException(ErrorCode.CONFIG_ERROR,
-                    e);
+            throw AddaxException.asAddaxException(ErrorCode.CONFIG_ERROR, e);
         }
     }
 
-    /*
-     * 从包括json的File对象加载Configuration
-     */
     public static Configuration from(File file)
     {
         try {
-            return Configuration.from(IOUtils
-                    .toString(new FileInputStream(file), StandardCharsets.UTF_8));
+            return Configuration.from(IOUtils.toString(new FileInputStream(file), StandardCharsets.UTF_8));
         }
         catch (FileNotFoundException e) {
-            throw AddaxException.asAddaxException(ErrorCode.CONFIG_ERROR,
-                    String.format("No such file: %s", file.getAbsolutePath()));
+            throw AddaxException.asAddaxException(ErrorCode.CONFIG_ERROR, String.format("No such file: %s", file.getAbsolutePath()));
         }
         catch (IOException e) {
-            throw AddaxException.asAddaxException(
-                    ErrorCode.CONFIG_ERROR,
-                    String.format("Failed to read the configuration [%s], reason: %s.",
-                            file.getAbsolutePath(), e));
+            throw AddaxException.asAddaxException(ErrorCode.CONFIG_ERROR, String.format("Failed to read the configuration [%s], reason: %s.", file.getAbsolutePath(), e));
         }
     }
 
-    /*
-     * 从包括json的InputStream对象加载Configuration
+    /**
+     * load configuration from json InputStream
+     *
+     * @param is InputStream
+     * @return {@link Configuration}
      */
     public static Configuration from(InputStream is)
     {
@@ -144,22 +124,15 @@ public class Configuration
             return Configuration.from(IOUtils.toString(is, StandardCharsets.UTF_8));
         }
         catch (IOException e) {
-            throw AddaxException.asAddaxException(ErrorCode.CONFIG_ERROR,
-                    String.format("Failed to read the configuration reason: %s.", e));
+            throw AddaxException.asAddaxException(ErrorCode.CONFIG_ERROR, String.format("Failed to read the configuration reason: %s.", e));
         }
     }
 
-    /*
-     * 从Map对象加载Configuration
-     */
     public static Configuration from(final Map<String, Object> object)
     {
         return Configuration.from(Configuration.toJSONString(object));
     }
 
-    /*
-     * 从List对象加载Configuration
-     */
     public static Configuration from(final List<Object> object)
     {
         return Configuration.from(Configuration.toJSONString(object));
@@ -168,8 +141,7 @@ public class Configuration
     private static void checkJSON(String json)
     {
         if (StringUtils.isBlank(json)) {
-            throw AddaxException.asAddaxException(ErrorCode.CONFIG_ERROR,
-                    "The configure file is empty.");
+            throw AddaxException.asAddaxException(ErrorCode.CONFIG_ERROR, "The configure file is empty.");
         }
     }
 
@@ -182,8 +154,7 @@ public class Configuration
     {
         String value = this.getString(key, null);
         if (StringUtils.isBlank(value)) {
-            throw AddaxException.asAddaxException(errorCode,
-                    String.format("The required item '%s' is not found", key));
+            throw AddaxException.asAddaxException(errorCode, String.format("The required item '%s' is not found", key));
         }
         return value;
     }
@@ -192,8 +163,7 @@ public class Configuration
     {
         String value = this.getString(key, null);
         if (StringUtils.isBlank(value)) {
-            throw AddaxException.asAddaxException(REQUIRED_VALUE,
-                    String.format("The required item %s is not found", key));
+            throw AddaxException.asAddaxException(REQUIRED_VALUE, String.format("The required item %s is not found", key));
         }
         return value;
     }
@@ -202,8 +172,7 @@ public class Configuration
     {
         for (String key : keys) {
             if (StringUtils.isBlank(this.getString(key, null))) {
-                throw AddaxException.asAddaxException(REQUIRED_VALUE,
-                        String.format("The required item %s is not found", key));
+                throw AddaxException.asAddaxException(REQUIRED_VALUE, String.format("The required item %s is not found", key));
             }
         }
     }
@@ -218,19 +187,20 @@ public class Configuration
     }
 
     /**
-     * 根据用户提供的json path，寻址具体的对象。
-     * NOTE: 目前仅支持Map以及List下标寻址, 例如:
-     * 对于如下JSON
+     * find object by path
+     * Locate the specific object based on the JSON path provided by the user.
+     * NOTE: Currently only supports Map and List index addressing, for example:
+     * For the following JSON
      * <p>
      * {"a": {"b": {"c": [0,1,2,3]}}}
      * </p>
-     * config.get("") 返回整个Map <br>
-     * config.get("a") 返回a下属整个Map <br>
-     * config.get("a.b.c") 返回c对应的数组List <br>
-     * config.get("a.b.c[0]") 返回数字0
+     * config.get("") returns the entire Map <br>
+     * config.get("a") returns the entire Map under a <br>
+     * config.get("a.b.c") returns the array List corresponding to c <br>
+     * config.get("a.b.c[0]") returns the number 0
      *
-     * @param path String 要查的json路径
-     * @return Java表示的JSON对象，如果path不存在或者对象不存在，均返回null。
+     * @param path String the JSON path to query
+     * @return Java representation of the JSON object, returns null if the path does not exist or the object does not exist.
      */
     public Object get(String path)
     {
@@ -244,10 +214,10 @@ public class Configuration
     }
 
     /**
-     * 用户指定部分path，获取Configuration的子集
+     * get the subset of Configuration by user-specified json path
      *
-     * @param path String json 路径
-     * @return Configuration 配置对象， 如果path获取的路径或者对象不存在，返回null
+     * @param path String json path
+     * @return Configuration object, if the path or object obtained by path does not exist, return null
      */
     public Configuration getConfiguration(String path)
     {
@@ -260,11 +230,10 @@ public class Configuration
     }
 
     /**
-     * 根据用户提供的json path，寻址String对象
+     * get the string value by user-specified json path
      *
-     * @param path String json 路径
-     *
-     * @return String 对象，如果path不存在或者String不存在，返回null
+     * @param path String json path
+     * @return String value, if the path or object obtained by path does not exist, return null
      */
     public String getString(String path)
     {
@@ -276,12 +245,11 @@ public class Configuration
     }
 
     /**
-     * 根据用户提供的json path，寻址String对象，如果对象不存在，返回默认字符串
+     * get the string value by user-specified json path
      *
-     * @param path String json 路径
-     * @param defaultValue String 如果path不存在，则返回该值
-     *
-     * @return String对象，如果path不存在或者String不存在，返回默认字符串
+     * @param path String json path
+     * @param defaultValue String default value
+     * @return String value, if the path or object obtained by path does not exist, return the default value
      */
     public String getString(String path, String defaultValue)
     {
@@ -295,10 +263,10 @@ public class Configuration
     }
 
     /**
-     * 根据用户提供的json path，寻址Character对象
+     * get the boolean value by user-specified json path
      *
-     * @param path String json 路径
-     * @return Character对象，如果path不存在或者Character不存在，返回null
+     * @param path String json path
+     * @return Boolean value, if the path or object obtained by path does not exist, return null
      */
     public Character getChar(String path)
     {
@@ -311,20 +279,16 @@ public class Configuration
             return CharUtils.toChar(result);
         }
         catch (Exception e) {
-            throw AddaxException.asAddaxException(
-                    ErrorCode.CONFIG_ERROR,
-                    String.format("Illegal configuration, cannot be converted to string for [%s], reason: %s.", path,
-                            e.getMessage()));
+            throw AddaxException.asAddaxException(ErrorCode.CONFIG_ERROR, String.format("Illegal configuration, cannot be converted to string for [%s], reason: %s.", path, e.getMessage()));
         }
     }
 
     /**
-     * 根据用户提供的json path，寻址Boolean对象，如果对象不存在，返回默认Character对象
+     * get the boolean value by user-specified json path
      *
-     * @param path String json 路径
-     * @param defaultValue String 如果path不存在，则返回该值
-     *
-     * @return Character对象，如果path不存在或者Character不存在，返回默认Character对象
+     * @param path String json path
+     * @param defaultValue String default value
+     * @return Boolean value, if the path or object obtained by path does not exist, return the default value
      */
     public Character getChar(String path, char defaultValue)
     {
@@ -336,18 +300,17 @@ public class Configuration
     }
 
     /**
-     * 根据用户提供的json path，寻址Boolean对象
+     * get the boolean value by user-specified json path
      *
-     * @param path String json 路径
-     *
-     * @return Boolean对象，如果path值非true,false ，将报错.特别注意：当 path 不存在时，会返回：null.
+     * @param path String json path
+     * @return Boolean value, if the path or object obtained by path does not exist, return null
      */
     public Boolean getBool(String path)
     {
         String result = this.getString(path);
 
         if (null == result) {
-            return null; //NOSONAR
+            return null;
         }
         else if ("true".equalsIgnoreCase(result)) {
             return Boolean.TRUE;
@@ -356,20 +319,16 @@ public class Configuration
             return Boolean.FALSE;
         }
         else {
-            throw AddaxException.asAddaxException(ErrorCode.CONFIG_ERROR,
-                    String.format("Illegal configuration, the value [%s] of [%s] cannot be converted to bool type.",
-                            path, result));
+            throw AddaxException.asAddaxException(ErrorCode.CONFIG_ERROR, String.format("Illegal configuration, the value [%s] of [%s] cannot be converted to bool type.", path, result));
         }
     }
 
     /**
-     * 根据用户提供的json path，寻址Boolean对象，如果对象不存在，返回默认Boolean对象
+     * get the boolean value by user-specified json path
      *
-     *
-     * @param path String json 路径
-     * @param defaultValue String 如果path不存在，则返回该值
-     *
-     * @return Boolean对象，如果path不存在或者Boolean不存在，返回默认Boolean对象
+     * @param path String json path
+     * @param defaultValue String default value
+     * @return Boolean value, if the path or object obtained by path does not exist, return the default value
      */
     public Boolean getBool(String path, boolean defaultValue)
     {
@@ -381,11 +340,10 @@ public class Configuration
     }
 
     /**
-     * 根据用户提供的json path，寻址Integer对象
+     * get the integer value by user-specified json path
      *
-     * @param path String json 路径
-     *
-     * @return Integer对象，如果path不存在或者Integer不存在，返回null
+     * @param path String json path
+     * @return Integer value, if the path or object obtained by path does not exist, return null
      */
     public Integer getInt(String path)
     {
@@ -398,20 +356,16 @@ public class Configuration
             return Integer.valueOf(result);
         }
         catch (Exception e) {
-            throw AddaxException.asAddaxException(
-                    ErrorCode.CONFIG_ERROR,
-                    String.format("Illegal configuration, the value [%s] of [%s] is expected integer type.", path,
-                            e.getMessage()));
+            throw AddaxException.asAddaxException(ErrorCode.CONFIG_ERROR, String.format("Illegal configuration, the value [%s] of [%s] is expected integer type.", path, e.getMessage()));
         }
     }
 
     /**
-     * 根据用户提供的json path，寻址Integer对象，如果对象不存在，返回默认Integer对象
+     * get the integer value by user-specified json path
      *
-     * @param path String json 路径
-     * @param defaultValue String 如果path不存在，则返回该值
-     *
-     * @return Integer对象，如果path不存在或者Integer不存在，返回默认Integer对象
+     * @param path String json path
+     * @param defaultValue String default value
+     * @return Integer value, if the path or object obtained by path does not exist, return the default value
      */
     public Integer getInt(String path, int defaultValue)
     {
@@ -423,11 +377,10 @@ public class Configuration
     }
 
     /**
-     * 根据用户提供的json path，寻址Long对象
+     * get the long value by user-specified json path
      *
-     * @param path String json 路径
-     *
-     * @return Long对象，如果path不存在或者Long不存在，返回null
+     * @param path String json path
+     * @return Long value, if the path or object obtained by path does not exist, return null
      */
     public Long getLong(String path)
     {
@@ -440,20 +393,16 @@ public class Configuration
             return Long.valueOf(result);
         }
         catch (Exception e) {
-            throw AddaxException.asAddaxException(
-                    ErrorCode.CONFIG_ERROR,
-                    String.format("Illegal configuration, the value [%s] of [%s] is expected integer/long type.", path,
-                            e.getMessage()));
+            throw AddaxException.asAddaxException(ErrorCode.CONFIG_ERROR, String.format("Illegal configuration, the value [%s] of [%s] is expected integer/long type.", path, e.getMessage()));
         }
     }
 
     /**
-     * 根据用户提供的json path，寻址Long对象，如果对象不存在，返回默认Long对象
+     * get the long value by user-specified json path
      *
-     * @param path String json 路径
-     * @param defaultValue String 如果path不存在，则返回该值
-     *
-     * @return Long对象，如果path不存在或者Integer不存在，返回默认Long对象
+     * @param path String json path
+     * @param defaultValue String default value
+     * @return Long value, if the path or object obtained by path does not exist, return the default value
      */
     public Long getLong(String path, long defaultValue)
     {
@@ -465,11 +414,10 @@ public class Configuration
     }
 
     /**
-     * 根据用户提供的json path，寻址Double对象
+     * get the double value by user-specified json path
      *
-     * @param path String json 路径
-     *
-     * @return Double对象，如果path不存在或者Double不存在，返回null
+     * @param path String json path
+     * @return Double value, if the path or object obtained by path does not exist, return null
      */
     public Double getDouble(String path)
     {
@@ -482,20 +430,16 @@ public class Configuration
             return Double.valueOf(result);
         }
         catch (Exception e) {
-            throw AddaxException.asAddaxException(
-                    ErrorCode.CONFIG_ERROR,
-                    String.format("Illegal configuration, the value [%s] of [%s] is expected float type.", path,
-                            e.getMessage()));
+            throw AddaxException.asAddaxException(ErrorCode.CONFIG_ERROR, String.format("Illegal configuration, the value [%s] of [%s] is expected float type.", path, e.getMessage()));
         }
     }
 
     /**
-     * 根据用户提供的json path，寻址Double对象，如果对象不存在，返回默认Double对象
+     * get the double value by user-specified json path
      *
-     * @param path String json 路径
-     * @param defaultValue String 如果path不存在，则返回该值
-     *
-     * @return Double对象，如果path不存在或者Double不存在，返回默认Double对象
+     * @param path String json path
+     * @param defaultValue String default value
+     * @return Double value, if the path or object obtained by path does not exist, return the default value
      */
     public Double getDouble(String path, double defaultValue)
     {
@@ -507,28 +451,25 @@ public class Configuration
     }
 
     /**
-     * 根据用户提供的json path，寻址List对象，如果对象不存在，返回null
+     * get the list value by user-specified json path
      *
-     * @param path String json 路径
-     *
-     * @return 对象列表
+     * @param path String json path
+     * @return List value, if the path or object obtained by path does not exist, return null
      */
-    @SuppressWarnings("unchecked")
     public List<Object> getList(String path)
     {
         return this.get(path, List.class);
     }
 
     /**
-     * 根据用户提供的json path，寻址List对象，如果对象不存在，返回null
+     * get the list value by user-specified json path
      *
-     * @param path json 路径
-     * @param t 要转换的类型
-     * @param <T> 类型
-     * @return 列表
+     * @param path String json path
+     * @param clazz Class type
+     * @param <T> type
+     * @return List value, if the path or object obtained by path does not exist, return null
      */
-    @SuppressWarnings("unchecked")
-    public <T> List<T> getList(String path, Class<T> t)
+    public <T> List<T> getList(String path, Class<T> clazz)
     {
         List<Object> object = this.get(path, List.class);
         if (null == object) {
@@ -542,25 +483,23 @@ public class Configuration
             origin = object;
         }
         catch (ClassCastException e) {
-            // .warn("{} 转为 List 时发生了异常，默认将此值添加到 List 中", String.valueOf(object))
             origin = new ArrayList<>();
             origin.add(String.valueOf(object));
         }
 
         for (Object each : origin) {
-            result.add((T) each);
+            result.add(clazz.cast(each));
         }
 
         return result;
     }
 
     /**
-     * 根据用户提供的json path，寻址List对象，如果对象不存在，返回默认List
+     * get the list value by user-specified json path
      *
-     * @param path json 路径
-     * @param defaultList 默认返回的值
-     *
-     * @return 对象列表
+     * @param path String json path
+     * @param defaultList List default value
+     * @return List value, if the path or object obtained by path does not exist, return the default value
      */
     public List<Object> getList(String path, List<Object> defaultList)
     {
@@ -572,17 +511,15 @@ public class Configuration
     }
 
     /**
-     * 根据用户提供的json path，寻址List对象，如果对象不存在，返回默认List
+     * get the list value by user-specified json path
      *
-     * @param path String json 路径
-     * @param defaultList 默认返回的值
-     * @param t 要转换的类型
-     * @param <T> 类型
-     *
-     * @return 列表
+     * @param path String json path
+     * @param defaultList List default value
+     * @param t Class type
+     * @param <T> type
+     * @return List value, if the path or object obtained by path does not exist, return the default value
      */
-    public <T> List<T> getList(String path, List<T> defaultList,
-            Class<T> t)
+    public <T> List<T> getList(String path, List<T> defaultList, Class<T> t)
     {
         List<T> list = this.getList(path, t);
         if (null == list) {
@@ -592,11 +529,10 @@ public class Configuration
     }
 
     /**
-     * 根据用户提供的json path，寻址包含Configuration的List，如果对象不存在，返回默认null
+     * get the map value by user-specified json path
      *
-     * @param path String json 路径
-     *
-     * @return 列表
+     * @param path String json path
+     * @return Map value, if the path or object obtained by path does not exist, return null
      */
     public List<Configuration> getListConfiguration(String path)
     {
@@ -613,28 +549,24 @@ public class Configuration
     }
 
     /**
-     * 根据用户提供的json path，寻址Map对象，如果对象不存在，返回null
+     * get the map value by user-specified json path
      *
-     * @param path String json 路径
-     *
-     * @return map 对象
+     * @param path String json path
+     * @return Map value, if the path or object obtained by path does not exist, return null
      */
-    @SuppressWarnings("unchecked")
     public Map<String, Object> getMap(String path)
     {
         return this.get(path, Map.class);
     }
 
     /**
-     * 根据用户提供的json path，寻址Map对象，如果对象不存在，返回默认map
+     * get the map value by user-specified json path
      *
-     * @param path String json 路径
-     * @param defaultMap 默认返回值
-     *
-     * @return map对象
+     * @param path String json path
+     * @param defaultMap Map default value
+     * @return Map value, if the path or object obtained by path does not exist, return the default value
      */
-    public Map<String, Object> getMap(String path,
-            Map<String, Object> defaultMap)
+    public Map<String, Object> getMap(String path, Map<String, Object> defaultMap)
     {
         Map<String, Object> object = this.getMap(path);
         if (null == object) {
@@ -644,52 +576,49 @@ public class Configuration
     }
 
     /**
-     * 根据用户提供的json path，寻址具体的对象，并转为用户提供的类型
-     * NOTE: 目前仅支持Map以及List下标寻址, 例如:
-     * 对于如下JSON
+     * Locate the specific object based on the JSON path provided by the user and convert it to the specified type.
+     * NOTE: Currently only supports Map and List index addressing, for example:
+     * For the following JSON:
      * <p>
      * {"a": {"b": {"c": [0,1,2,3]}}}
      * </p>
-     * config.get("") 返回整个Map <br>
-     * config.get("a") 返回a下属整个Map <br>
-     * config.get("a.b.c") 返回c对应的数组List <br>
-     * config.get("a.b.c[0]") 返回数字0
+     * config.get("") returns the entire Map <br>
+     * config.get("a") returns the entire Map under "a" <br>
+     * config.get("a.b.c") returns the List corresponding to "c" <br>
+     * config.get("a.b.c[0]") returns the number 0
      *
-     * @param path String json 路径
-     * @param clazz Class 要转换的类型
-     * @param <T> 类型
-     *
-     * @return Java表示的JSON对象，如果转型失败，将抛出异常
+     * @param path The JSON path
+     * @param clazz The class type to convert to
+     * @param <T> The type
+     * @return The Java representation of the JSON object, throws an exception if the conversion fails
      */
-    @SuppressWarnings("unchecked")
     public <T> T get(String path, Class<T> clazz)
     {
         this.checkPath(path);
-        return (T) this.get(path);
+        Object object = this.get(path);
+        if (object == null) {
+            return null;
+        }
+        return clazz.cast(object);
     }
 
-    /**
-     * 格式化Configuration输出
-     *
-     * @return string
-     */
     public String beautify()
     {
         return JSON.toJSONString(this.getInternal(), JSONWriter.Feature.PrettyFormat);
     }
 
     /**
-     * 根据用户提供的json path，插入指定对象，并返回之前存在的对象(如果存在)
-     * 目前仅支持.以及数组下标寻址, 例如:
+     * Inserts the specified object at the given JSON path and returns the previously existing object (if any).
+     * Currently, only dot notation and array index addressing are supported, for example:
      * <p>
      * config.set("a.b.c[3]", object);
      * </p>
-     * 对于插入对象，Configuration 不做任何限制，但是请务必保证该对象是简单对象，不要使用自定义对象，否则后续对于JSON序列化等情况会出现未定义行为。
+     * There are no restrictions on the object being inserted, but please ensure that the object is a simple object.
+     * Avoid using custom objects, as this may lead to undefined behavior during subsequent JSON serialization.
      *
-     * @param path JSON path对象
-     * @param object 需要插入的对象
-     *
-     * @return Java表示的JSON对象
+     * @param path JSON path
+     * @param object Object to be inserted
+     * @return Java representation of the JSON object
      */
     public Object set(String path, Object object)
     {
@@ -703,12 +632,12 @@ public class Configuration
     }
 
     /**
-     * 获取Configuration下所有叶子节点的key
-     * 对于
+     * get all keys of the configuration
+     * for example:
      * <p>
      * {"a": {"b": {"c": [0,1,2,3]}}, "x": "y"}
      * </p>
-     * 下属的key包括: a.b.c[0],a.b.c[1],a.b.c[2],a.b.c[3],x
+     * the keys includes: a.b.c[0],a.b.c[1],a.b.c[2],a.b.c[3],x
      *
      * @return set of string
      */
@@ -720,19 +649,16 @@ public class Configuration
     }
 
     /**
-     * 删除path对应的值，如果path不存在，将抛出异常。
+     * Deletes the value corresponding to the path. If the path does not exist, an exception will be thrown.
      *
-     * @param path String json 路径
-     *
-     * @return Object 返回查到的对象，若不存在则返回为空
+     * @param path String json path
+     * @return Object the object found, or null if it does not exist
      */
     public Object remove(String path)
     {
         Object result = this.get(path);
         if (null == result) {
-            throw AddaxException.asAddaxException(
-                    ErrorCode.RUNTIME_ERROR,
-                    String.format("Illegal configuration, the key [%s] does not exists.", path));
+            throw AddaxException.asAddaxException(ErrorCode.RUNTIME_ERROR, "Illegal configuration, the key '" + path + "' does not exists.");
         }
 
         this.set(path, null);
@@ -740,20 +666,17 @@ public class Configuration
     }
 
     /**
-     * 合并其他Configuration，并修改两者冲突的KV配置
+     * Merge another Configuration and modify the KV configuration of the two when they conflict
      *
-     * @param another Configuration 合并加入的第三方Configuration
-     * @param updateWhenConflict boolean 当合并双方出现KV冲突时候，选择更新当前KV，或者忽略该KV
-     *
-     * @return Configuration
+     * @param another Configuration the third-party Configuration to be merged
+     * @param updateWhenConflict boolean when there is a KV conflict between the two merged parties, choose to update the current KV, or ignore the KV
      */
-    public Configuration merge(Configuration another,
-            boolean updateWhenConflict)
+    public void merge(Configuration another, boolean updateWhenConflict)
     {
         Set<String> keys = another.getKeys();
 
-        // 如果使用更新策略，凡是another存在的key，均需要更新
-        // 使用忽略策略，只有another Configuration存在但是当前Configuration不存在的key，才需要更新
+        // if updateWhenConflict is true, update all keys in another
+        // if updateWhenConflict is false, only update the key that another has but the current does not
         keys.forEach(key -> {
             if (updateWhenConflict) {
                 this.set(key, another.get(key));
@@ -765,7 +688,6 @@ public class Configuration
             }
             this.set(key, another.get(key));
         });
-        return this;
     }
 
     @Override
@@ -774,52 +696,17 @@ public class Configuration
         return this.toJSON();
     }
 
-    /**
-     * 将Configuration作为JSON输出
-     *
-     * @return String json string
-     */
     public String toJSON()
     {
         return Configuration.toJSONString(this.getInternal());
     }
 
-    /**
-     * 拷贝当前Configuration，注意，这里使用了深拷贝，避免冲突
-     */
     @Override
     public Configuration clone()
     {
-        Configuration config = Configuration
-                .from(Configuration.toJSONString(this.getInternal()));
-        config.addSecretKeyPath(this.secretKeyPathSet);
-        return config;
+        return Configuration.from(Configuration.toJSONString(this.getInternal()));
     }
 
-    /**
-     * 按照configuration要求格式的path
-     * 比如：
-     * a.b.c
-     * a.b[2].c
-     *
-     * @param path 路径
-     *
-     */
-    public void addSecretKeyPath(String path)
-    {
-        if (StringUtils.isNotBlank(path)) {
-            this.secretKeyPathSet.add(path);
-        }
-    }
-
-    public void addSecretKeyPath(Set<String> pathSet)
-    {
-        if (pathSet != null) {
-            this.secretKeyPathSet.addAll(pathSet);
-        }
-    }
-
-    @SuppressWarnings("unchecked")
     void getKeysRecursive(Object current, String path, Set<String> collect)
     {
         boolean isRegularElement = !(current instanceof Map || current instanceof List);
@@ -836,8 +723,7 @@ public class Configuration
                     getKeysRecursive(mapping.get(key), key.trim(), collect);
                 }
                 else {
-                    getKeysRecursive(mapping.get(key), path + "." + key.trim(),
-                            collect);
+                    getKeysRecursive(mapping.get(key), path + "." + key.trim(), collect);
                 }
             });
             return;
@@ -845,8 +731,7 @@ public class Configuration
 
         List<Object> lists = (List<Object>) current;
         for (int i = 0; i < lists.size(); i++) {
-            getKeysRecursive(lists.get(i), path + String.format("[%d]", i),
-                    collect);
+            getKeysRecursive(lists.get(i), path + String.format("[%d]", i), collect);
         }
     }
 
@@ -857,20 +742,16 @@ public class Configuration
 
     private void setObject(String path, Object object)
     {
-        Object newRoot = setObjectRecursive(this.root, split2List(path), 0,
-                object);
+        Object newRoot = setObjectRecursive(this.root, split2List(path), 0, object);
 
         if (isSuitForRoot(newRoot)) {
             this.root = newRoot;
             return;
         }
 
-        throw AddaxException.asAddaxException(ErrorCode.RUNTIME_ERROR,
-                String.format("Illegal value, cannot set value [%s] for key [%s]",
-                        ToStringBuilder.reflectionToString(object), path));
+        throw AddaxException.asAddaxException(ErrorCode.RUNTIME_ERROR, String.format("Illegal value, cannot set value [%s] for key [%s]", ToStringBuilder.reflectionToString(object), path));
     }
 
-    @SuppressWarnings("unchecked")
     private Object extractConfiguration(Object object)
     {
         if (object instanceof Configuration) {
@@ -888,9 +769,7 @@ public class Configuration
         if (object instanceof Map) {
             Map<String, Object> result = new HashMap<>();
             for (String key : ((Map<String, Object>) object).keySet()) {
-                result.put(key,
-                        extractFromConfiguration(((Map<String, Object>) object)
-                                .get(key)));
+                result.put(key, extractFromConfiguration(((Map<String, Object>) object).get(key)));
             }
             return result;
         }
@@ -910,8 +789,7 @@ public class Configuration
     Object buildObject(List<String> paths, Object object)
     {
         if (null == paths) {
-            throw AddaxException.asAddaxException(
-                    ErrorCode.RUNTIME_ERROR, "The Path cannot be null");
+            throw AddaxException.asAddaxException(ErrorCode.RUNTIME_ERROR, "The Path cannot be null");
         }
 
         if (1 == paths.size() && StringUtils.isBlank(paths.get(0))) {
@@ -930,28 +808,22 @@ public class Configuration
             }
 
             if (isPathList(path)) {
-                List<Object> lists = new ArrayList<>(
-                        this.getIndex(path) + 1);
+                List<Object> lists = new ArrayList<>(this.getIndex(path) + 1);
                 expand(lists, this.getIndex(path) + 1);
                 lists.set(this.getIndex(path), child);
                 child = lists;
                 continue;
             }
 
-            throw AddaxException.asAddaxException(
-                    ErrorCode.RUNTIME_ERROR, String.format("the value [%s] of [%s] is illegal.",
-                            StringUtils.join(paths, "."), path));
+            throw AddaxException.asAddaxException(ErrorCode.RUNTIME_ERROR, String.format("the value [%s] of [%s] is illegal.", StringUtils.join(paths, "."), path));
         }
 
         return child;
     }
 
-    @SuppressWarnings("unchecked")
-    Object setObjectRecursive(Object current, List<String> paths,
-            int index, Object value)
+    Object setObjectRecursive(Object current, List<String> paths, int index, Object value)
     {
-
-        // 如果是已经超出path，我们就返回value即可，作为最底层叶子节点
+        // if the index is out of the path, we return the value as the leaf node
         boolean isLastIndex = index == paths.size();
         if (isLastIndex) {
             return value;
@@ -962,32 +834,25 @@ public class Configuration
         if (isNeedMap) {
             Map<String, Object> mapping;
 
-            // 当前不是map，因此全部替换为map，并返回新建的map对象
+            // the current is not a map, so we replace it with a map and return the new map object
             boolean isCurrentMap = current instanceof Map;
             if (!isCurrentMap) {
                 mapping = new HashMap<>();
-                mapping.put(
-                        path,
-                        buildObject(paths.subList(index + 1, paths.size()),
-                                value));
+                mapping.put(path, buildObject(paths.subList(index + 1, paths.size()), value));
                 return mapping;
             }
 
-            // 当前是map，但是没有对应的key，也就是我们需要新建对象插入该map，并返回该map
+            // the current is a map, but the key does not exist, so we need to insert the object and return the map
             mapping = ((Map<String, Object>) current);
             boolean hasSameKey = mapping.containsKey(path);
             if (!hasSameKey) {
-                mapping.put(
-                        path,
-                        buildObject(paths.subList(index + 1, paths.size()),
-                                value));
+                mapping.put(path, buildObject(paths.subList(index + 1, paths.size()), value));
                 return mapping;
             }
 
             // 当前是map，而且还竟然存在这个值，好吧，继续递归遍历
             current = mapping.get(path);
-            mapping.put(path,
-                    setObjectRecursive(current, paths, index + 1, value));
+            mapping.put(path, setObjectRecursive(current, paths, index + 1, value));
             return mapping;
         }
 
@@ -1000,29 +865,22 @@ public class Configuration
             boolean isCurrentList = current instanceof List;
             if (!isCurrentList) {
                 lists = expand(new ArrayList<>(), listIndexer + 1);
-                lists.set(
-                        listIndexer,
-                        buildObject(paths.subList(index + 1, paths.size()),
-                                value));
+                lists.set(listIndexer, buildObject(paths.subList(index + 1, paths.size()), value));
                 return lists;
             }
 
-            // 当前是list，但是对应的indexer是没有具体的值，也就是我们新建对象然后插入到该list，并返回该List
+            // the current is a list, but the index does not exist, so we need to insert the object and return the list
             lists = expand((List<Object>) current, listIndexer + 1);
 
             boolean hasSameIndex = lists.get(listIndexer) != null;
             if (!hasSameIndex) {
-                lists.set(
-                        listIndexer,
-                        buildObject(paths.subList(index + 1, paths.size()),
-                                value));
+                lists.set(listIndexer, buildObject(paths.subList(index + 1, paths.size()), value));
                 return lists;
             }
 
-            // 当前是list，并且存在对应的index，没有办法继续递归寻找
+            // the current is a list, and the index exists, so we need to continue to find the value
             current = lists.get(listIndexer);
-            lists.set(listIndexer,
-                    setObjectRecursive(current, paths, index + 1, value));
+            lists.set(listIndexer, setObjectRecursive(current, paths, index + 1, value));
             return lists;
         }
 
@@ -1050,19 +908,16 @@ public class Configuration
         return target;
     }
 
-    @SuppressWarnings("unchecked")
     private Object findObjectInMap(Object target, String index)
     {
         boolean isMap = (target instanceof Map);
         if (!isMap) {
-            throw new IllegalArgumentException(String.format(
-                    "The item [%s] requires a Map object in json format, but the actual type is [%s].",
-                    index, target.getClass()));
+            throw new IllegalArgumentException(String.format("The item [%s] requires a Map object in json format, but the actual type is [%s].", index, target.getClass()));
         }
 
         Object result = ((Map<String, Object>) target).get(index);
         if (null == result) {
-            throw new IllegalArgumentException(String.format("The value of item [%s] is null.", index));
+            throw new IllegalArgumentException("The value of item '" + index + "'is null.");
         }
 
         return result;
@@ -1072,17 +927,12 @@ public class Configuration
     {
         boolean isList = (target instanceof List);
         if (!isList) {
-            throw new IllegalArgumentException(String.format(
-                    "The item [%s] requires a Map object in json format, but the actual type is [%s].",
-                    each, target.getClass()));
+            throw new IllegalArgumentException(String.format("The item [%s] requires a Map object in json format, but the actual type is [%s].", each, target.getClass()));
         }
 
         String index = each.replace("[", "").replace("]", "");
         if (!StringUtils.isNumeric(index)) {
-            throw new IllegalArgumentException(
-                    String.format(
-                            "The list subscript must be a numeric type, but the actual type is [%s].",
-                            index));
+            throw new IllegalArgumentException(String.format("The list subscript must be a numeric type, but the actual type is [%s].", index));
         }
 
         return ((List<Object>) target).get(Integer.parseInt(index));
@@ -1135,8 +985,7 @@ public class Configuration
 
         for (String each : StringUtils.split(path, ".")) {
             if (StringUtils.isBlank(each)) {
-                throw new IllegalArgumentException(String.format(
-                        "The item [%s] is invalid, Blank characters should not  appear here.", path));
+                throw new IllegalArgumentException("The item '" + path + "' is invalid, Blank characters should not  appear here.");
             }
         }
     }

@@ -29,13 +29,9 @@ public interface JobPluginCollector
         extends PluginCollector
 {
 
-
-     // 从Task获取自定义收集信息
-
+    // gather the message from the task
     Map<String, List<String>> getMessage();
 
-
-    // 从Task获取自定义收集信息
-
+    // gather the message from the task
     List<String> getMessage(String key);
 }

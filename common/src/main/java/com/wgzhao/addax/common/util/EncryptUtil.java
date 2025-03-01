@@ -40,6 +40,7 @@ import javax.crypto.SecretKeyFactory;
 import javax.crypto.spec.GCMParameterSpec;
 import javax.crypto.spec.PBEKeySpec;
 import javax.crypto.spec.SecretKeySpec;
+
 import java.security.InvalidAlgorithmParameterException;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
@@ -58,7 +59,6 @@ public class EncryptUtil
     private static final String ALGORITHM = "AES";
 
     private static final Logger logger = LoggerFactory.getLogger(EncryptUtil.class);
-
 
     public static String encrypt(String password)
     {
@@ -88,11 +88,11 @@ public class EncryptUtil
             Cipher pbeCipher = Cipher.getInstance(TRANSFORMATION);
             pbeCipher.init(Cipher.DECRYPT_MODE, secSpec, params);
             return new String(pbeCipher.doFinal(base64Decode(encrypted)));
-        } catch (InvalidAlgorithmParameterException | NoSuchPaddingException | IllegalBlockSizeException |
-                 InvalidKeySpecException | NoSuchAlgorithmException | BadPaddingException | InvalidKeyException e) {
+        }
+        catch (InvalidAlgorithmParameterException | NoSuchPaddingException | IllegalBlockSizeException |
+               InvalidKeySpecException | NoSuchAlgorithmException | BadPaddingException | InvalidKeyException e) {
             throw new RuntimeException(e);
         }
-
     }
 
     private static byte[] base64Decode(String property)
@@ -100,7 +100,9 @@ public class EncryptUtil
         return Base64.getDecoder().decode(property);
     }
 
-    private static SecretKeySpec getSecSpec() throws InvalidKeySpecException, NoSuchAlgorithmException {
+    private static SecretKeySpec getSecSpec()
+            throws InvalidKeySpecException, NoSuchAlgorithmException
+    {
         final int iterationCount = 40000;
         final int keyLength = 128;
         byte[] iv = new byte[16];
@@ -108,7 +110,7 @@ public class EncryptUtil
         SecretKeyFactory keyFactory = SecretKeyFactory.getInstance("PBKDF2WithHmacSHA512");
         PBEKeySpec keySpec = new PBEKeySpec(SECRET_KEY.toCharArray(), SALT, iterationCount, keyLength);
         SecretKey keyTmp = keyFactory.generateSecret(keySpec);
-        return  new SecretKeySpec(keyTmp.getEncoded(), ALGORITHM);
+        return new SecretKeySpec(keyTmp.getEncoded(), ALGORITHM);
     }
 
     // generate encrypt password string which paste to json file

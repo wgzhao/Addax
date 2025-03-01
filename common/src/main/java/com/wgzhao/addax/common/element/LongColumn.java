@@ -29,14 +29,18 @@ import java.math.BigInteger;
 import java.sql.Timestamp;
 import java.util.Date;
 
+/**
+ * A Column implementation for handling long values.
+ * This class supports various constructors to initialize the column with different data types.
+ */
 public class LongColumn
         extends Column
 {
+
     /**
-     * 从整形字符串表示转为LongColumn，支持Java科学计数法
-     * 如果data为浮点类型的字符串表示，数据将会失真，请使用DoubleColumn对接浮点字符串
+     * Creates a LongColumn with a string representation of the data.
      *
-     * @param data 要转成long型的字符串
+     * @param data The string data to initialize the column
      */
     public LongColumn(String data)
     {
@@ -49,44 +53,73 @@ public class LongColumn
             BigInteger rawData = NumberUtils.createBigDecimal(data).toBigInteger();
             super.setRawData(rawData);
 
-			/*
-			 * 当 rawData 为[0-127]时，rawData.bitLength() < 8，导致其 byteSize = 0，简单起见，直接认为其长度为 data.length()
-			 super.setByteSize(rawData.bitLength() / 8)
-			 */
+            /*
+             * When rawData is in the range [0-127], rawData.bitLength() < 8,
+             * causing its byteSize to be 0. For simplicity, we assume its length is data.length().
+             * super.setByteSize(rawData.bitLength() / 8)
+             */
             super.setByteSize(data.length());
         }
         catch (Exception e) {
             throw AddaxException.asAddaxException(
-                    ErrorCode.CONVERT_NOT_SUPPORT,
-                    String.format("Cannot convert the string [%s] to Long.", data));
+                    ErrorCode.CONVERT_NOT_SUPPORT, "Cannot convert the string '" + data + "' to Long.");
         }
     }
 
+    /**
+     * Creates a LongColumn with a Long value.
+     *
+     * @param data The Long data to initialize the column
+     */
     public LongColumn(Long data)
     {
         this(null == data ? null : BigInteger.valueOf(data));
     }
 
+    /**
+     * Creates a LongColumn with an Integer value.
+     *
+     * @param data The Integer data to initialize the column
+     */
     public LongColumn(Integer data)
     {
         this(null == data ? null : BigInteger.valueOf(data));
     }
 
+    /**
+     * Creates a LongColumn with a BigInteger value.
+     *
+     * @param data The BigInteger data to initialize the column
+     */
     public LongColumn(BigInteger data)
     {
         this(data, null == data ? 0 : 8);
     }
 
+    /**
+     * Private constructor to initialize the column with BigInteger data and byte size.
+     *
+     * @param data The BigInteger data to initialize the column
+     * @param byteSize The byte size of the data
+     */
     private LongColumn(BigInteger data, int byteSize)
     {
         super(data, Column.Type.LONG, byteSize);
     }
 
+    /**
+     * Creates an empty LongColumn with null value.
+     */
     public LongColumn()
     {
         this((BigInteger) null);
     }
 
+    /**
+     * Converts the column data to BigInteger.
+     *
+     * @return The BigInteger representation of the data
+     */
     @Override
     public BigInteger asBigInteger()
     {
@@ -97,6 +130,11 @@ public class LongColumn
         return (BigInteger) this.getRawData();
     }
 
+    /**
+     * Converts the column data to Timestamp.
+     *
+     * @return The Timestamp representation of the data
+     */
     @Override
     public Timestamp asTimestamp()
     {
@@ -110,6 +148,11 @@ public class LongColumn
         }
     }
 
+    /**
+     * Converts the column data to Long.
+     *
+     * @return The Long representation of the data
+     */
     @Override
     public Long asLong()
     {
@@ -123,6 +166,11 @@ public class LongColumn
         return rawData.longValue();
     }
 
+    /**
+     * Converts the column data to Double.
+     *
+     * @return The Double representation of the data
+     */
     @Override
     public Double asDouble()
     {
@@ -136,16 +184,26 @@ public class LongColumn
         return decimal.doubleValue();
     }
 
+    /**
+     * Converts the column data to Boolean.
+     *
+     * @return The Boolean representation of the data
+     */
     @Override
     public Boolean asBoolean()
     {
         if (null == this.getRawData()) {
-            return null; //NOSONAR;
+            return null;
         }
 
         return this.asBigInteger().compareTo(BigInteger.ZERO) != 0;
     }
 
+    /**
+     * Converts the column data to BigDecimal.
+     *
+     * @return The BigDecimal representation of the data
+     */
     @Override
     public BigDecimal asBigDecimal()
     {
@@ -156,6 +214,11 @@ public class LongColumn
         return new BigDecimal(this.asBigInteger());
     }
 
+    /**
+     * Converts the column data to String.
+     *
+     * @return The String representation of the data
+     */
     @Override
     public String asString()
     {
@@ -165,6 +228,11 @@ public class LongColumn
         return this.getRawData().toString();
     }
 
+    /**
+     * Converts the column data to Date.
+     *
+     * @return The Date representation of the data
+     */
     @Override
     public Date asDate()
     {
@@ -174,6 +242,11 @@ public class LongColumn
         return new Date(this.asLong());
     }
 
+    /**
+     * Conversion to byte array is not supported.
+     *
+     * @throws AddaxException always
+     */
     @Override
     public byte[] asBytes()
     {

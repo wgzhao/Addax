@@ -29,23 +29,35 @@ import java.sql.Timestamp;
 import java.util.Date;
 
 /**
- * Created by jingxing on 14-8-24.
+ * A Column implementation for handling date and time values in various formats.
+ * This class supports DATE, TIME, and DATETIME types with optional precision and nanoseconds.
  */
 public class DateColumn
         extends Column
 {
 
+    /**
+     * The specific type of date value (DATE, TIME, or DATETIME)
+     */
     private DateType subType = DateType.DATETIME;
 
+    /**
+     * Nanoseconds component of the time value
+     */
     private int nanos = 0;
 
+    /**
+     * Precision for the time value, -1 if not specified
+     */
     private int precision = -1;
 
+    /**
+     * Template for error messages when type conversion is not supported
+     */
     private final String errorTemplate = "Date type cannot be converted to %s.";
 
     /**
-     * 构建值为null的DateColumn，使用Date子类型为DATETIME
-     *
+     * Creates an empty DateColumn with null value.
      */
     public DateColumn()
     {
@@ -53,52 +65,70 @@ public class DateColumn
     }
 
     /**
-     * 构建值为stamp(Unix时间戳)的DateColumn，使用Date子类型为DATETIME
-     * 实际存储有date改为long的ms，节省存储
+     * Creates a DateColumn with a timestamp value.
      *
-     * @param stamp 时间戳
+     * @param stamp Unix timestamp in milliseconds
      */
-    public DateColumn( Long stamp)
+    public DateColumn(Long stamp)
     {
         super(stamp, Column.Type.DATE, (null == stamp ? 0 : 8));
     }
 
-    /*
-     * 构建值为date(java.util.Date)的DateColumn，使用Date子类型为DATETIME
+    /**
+     * Creates a DateColumn from a java.util.Date object.
+     *
+     * @param date The Date object to convert
      */
-    public DateColumn( Date date)
+    public DateColumn(Date date)
     {
         this(date == null ? null : date.getTime());
     }
 
-    /*
-     * 构建值为date(java.sql.Date)的DateColumn，使用Date子类型为DATE，只有日期，没有时间
+    /**
+     * Creates a DateColumn from a java.sql.Date object.
+     * Sets the subtype to DATE.
+     *
+     * @param date The SQL Date object to convert
      */
-    public DateColumn( java.sql.Date date)
+    public DateColumn(java.sql.Date date)
     {
         this(date == null ? null : date.getTime());
         this.setSubType(DateType.DATE);
     }
 
-    /*
-     * 构建值为time(java.sql.Time)的DateColumn，使用Date子类型为TIME，只有时间，没有日期
+    /**
+     * Creates a DateColumn from a java.sql.Time object.
+     * Sets the subtype to TIME.
+     *
+     * @param time The SQL Time object to convert
      */
-    public DateColumn( java.sql.Time time)
+    public DateColumn(java.sql.Time time)
     {
         this(time == null ? null : time.getTime());
         this.setSubType(DateType.TIME);
     }
 
-    /*
-     * 构建值为ts(java.sql.Timestamp)的DateColumn，使用Date子类型为DATETIME
+    /**
+     * Creates a DateColumn from a java.sql.Timestamp object.
+     * Sets the subtype to DATETIME.
+     *
+     * @param ts The SQL Timestamp object to convert
      */
-    public DateColumn( java.sql.Timestamp ts)
+    public DateColumn(java.sql.Timestamp ts)
     {
         this(ts == null ? null : ts.getTime());
         this.setSubType(DateType.DATETIME);
     }
 
-    public DateColumn(Time time, int nanos, int jdbcPrecision) {
+    /**
+     * Creates a DateColumn from a Time object with specified precision and nanoseconds.
+     *
+     * @param time The SQL Time object
+     * @param nanos Nanoseconds component
+     * @param jdbcPrecision nanos, int jdbcPrecision)
+     */
+    public DateColumn(Time time, int nanos, int jdbcPrecision)
+    {
         this(time);
         if (time != null) {
             setNanos(nanos);
@@ -111,28 +141,58 @@ public class DateColumn
         }
     }
 
-    public long getNanos() {
+    public long getNanos()
+    {
         return nanos;
     }
 
-    public void setNanos(int nanos) {
+    /**
+     * Sets the nanoseconds component.
+     *
+     * @param nanos nanoseconds value to set
+     */
+    public void setNanos(int nanos)
+    {
         this.nanos = nanos;
     }
 
-    public int getPrecision() {
+    /**
+     * Gets the precision value.
+     *
+     * @return precision value (-1 if not set)
+     */
+    public int getPrecision()
+    {
         return precision;
     }
 
-    public void setPrecision(int precision) {
+    /**
+     * Sets the precision value.
+     *
+     * @param precision precision value to set
+     */
+    public void setPrecision(int precision)
+    {
         this.precision = precision;
     }
+
+    /**
+     * Converts the date value to a Long timestamp.
+     *
+     * @return timestamp in milliseconds since epoch
+     */
     @Override
     public Long asLong()
     {
-
         return (Long) this.getRawData();
     }
 
+    /**
+     * Converts the date value to a String representation.
+     *
+     * @return string representation of the date
+     * @throws AddaxException if conversion fails
+     */
     @Override
     public String asString()
     {
@@ -146,16 +206,25 @@ public class DateColumn
         }
     }
 
+    /**
+     * Converts the date value to a Date object.
+     *
+     * @return Date object, null if raw data is null
+     */
     @Override
     public Date asDate()
     {
         if (null == this.getRawData()) {
             return null;
         }
-
         return new Date((Long) this.getRawData());
     }
 
+    /**
+     * Not supported conversion to bytes.
+     *
+     * @throws AddaxException always
+     */
     @Override
     public byte[] asBytes()
     {
@@ -163,6 +232,11 @@ public class DateColumn
                 ErrorCode.CONVERT_NOT_SUPPORT, String.format(errorTemplate, "Bytes"));
     }
 
+    /**
+     * Not supported conversion to Boolean.
+     *
+     * @throws AddaxException always
+     */
     @Override
     public Boolean asBoolean()
     {
@@ -170,6 +244,11 @@ public class DateColumn
                 ErrorCode.CONVERT_NOT_SUPPORT, String.format(errorTemplate, "Boolean"));
     }
 
+    /**
+     * Not supported conversion to Double.
+     *
+     * @throws AddaxException always
+     */
     @Override
     public Double asDouble()
     {
@@ -177,6 +256,11 @@ public class DateColumn
                 ErrorCode.CONVERT_NOT_SUPPORT, String.format(errorTemplate, "Double"));
     }
 
+    /**
+     * Not supported conversion to BigInteger.
+     *
+     * @throws AddaxException always
+     */
     @Override
     public BigInteger asBigInteger()
     {
@@ -184,6 +268,11 @@ public class DateColumn
                 ErrorCode.CONVERT_NOT_SUPPORT, String.format(errorTemplate, "BigInteger"));
     }
 
+    /**
+     * Converts the date value to a Timestamp object.
+     *
+     * @return Timestamp object, null if raw data is null
+     */
     @Override
     public Timestamp asTimestamp()
     {
@@ -193,6 +282,11 @@ public class DateColumn
         return new Timestamp(this.asLong());
     }
 
+    /**
+     * Not supported conversion to BigDecimal.
+     *
+     * @throws AddaxException always
+     */
     @Override
     public BigDecimal asBigDecimal()
     {
@@ -200,16 +294,29 @@ public class DateColumn
                 ErrorCode.CONVERT_NOT_SUPPORT, String.format(errorTemplate, "BigDecimal"));
     }
 
+    /**
+     * Gets the date subtype (DATE, TIME, or DATETIME).
+     *
+     * @return current DateType
+     */
     public DateType getSubType()
     {
         return subType;
     }
 
+    /**
+     * Sets the date subtype.
+     *
+     * @param subType DateType to set
+     */
     public void setSubType(DateType subType)
     {
         this.subType = subType;
     }
 
+    /**
+     * Enumeration of supported date types.
+     */
     public enum DateType
     {
         DATE, TIME, DATETIME

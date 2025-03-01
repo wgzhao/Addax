@@ -65,7 +65,7 @@ public class StringColumn
                 || "-Infinity".equals(data)) {
             throw AddaxException.asAddaxException(
                     ErrorCode.CONVERT_NOT_SUPPORT,
-                    String.format("['%s'] belongs to the special Double type and cannot be converted to other type.", data));
+                    "'" + data + "' belongs to the special Double type and cannot be converted to other type.");
         }
     }
 
@@ -83,8 +83,7 @@ public class StringColumn
         }
         catch (Exception e) {
             throw AddaxException.asAddaxException(
-                    ErrorCode.CONVERT_NOT_SUPPORT, String.format(
-                            "['%s'] cannot be converted to BigInteger.", this.asString()));
+                    ErrorCode.CONVERT_NOT_SUPPORT, "'" + this.asString() + "' cannot be converted to BigInteger.");
         }
     }
 

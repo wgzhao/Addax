@@ -28,70 +28,117 @@ import java.math.BigInteger;
 import java.sql.Timestamp;
 import java.util.Date;
 
+/**
+ * A Column implementation for handling double values.
+ * This class supports various constructors to initialize the column with different data types.
+ */
 public class DoubleColumn
         extends Column
 {
 
+    /**
+     * Template for error messages when type conversion is not supported
+     */
     private final String errorTemplate = "Double type cannot be converted to %s.";
 
-    public DoubleColumn( String data)
+    /**
+     * Creates a DoubleColumn with a string representation of the data.
+     *
+     * @param data The string data to initialize the column
+     */
+    public DoubleColumn(String data)
     {
         this(data, null == data ? 0 : data.length());
         this.validate(data);
     }
 
+    /**
+     * Creates a DoubleColumn with a Long value.
+     *
+     * @param data The Long data to initialize the column
+     */
     public DoubleColumn(Long data)
     {
         this(data == null ? null : String.valueOf(data));
     }
 
+    /**
+     * Creates a DoubleColumn with an Integer value.
+     *
+     * @param data The Integer data to initialize the column
+     */
     public DoubleColumn(Integer data)
     {
         this(data == null ? null : String.valueOf(data));
     }
 
     /**
-     * Double无法表示准确的小数数据，我们不推荐使用该方法保存Double数据，建议使用String作为构造入参
+     * Creates a DoubleColumn with a Double value.
+     * Note: Double cannot accurately represent decimal data, use String constructor instead.
      *
-     * @param data 要转成double类型的double数
+     * @param data The Double data to initialize the column
      */
-    public DoubleColumn( Double data)
+    public DoubleColumn(Double data)
     {
-        this(data == null ? null
-                : new BigDecimal(String.valueOf(data)).toPlainString());
+        this(data == null ? null : new BigDecimal(String.valueOf(data)).toPlainString());
     }
 
     /**
-     * Float无法表示准确的小数数据，我们不推荐使用该方法保存Float数据，建议使用String作为构造入参
+     * Creates a DoubleColumn with a Float value.
+     * Note: Float cannot accurately represent decimal data, use String constructor instead.
      *
-     * @param data 要转成double类型的浮点数
+     * @param data The Float data to initialize the column
      */
-    public DoubleColumn( Float data)
+    public DoubleColumn(Float data)
     {
-        this(data == null ? null
-                : new BigDecimal(String.valueOf(data)).toPlainString());
+        this(data == null ? null : new BigDecimal(String.valueOf(data)).toPlainString());
     }
 
-    public DoubleColumn( BigDecimal data)
+    /**
+     * Creates a DoubleColumn with a BigDecimal value.
+     *
+     * @param data The BigDecimal data to initialize the column
+     */
+    public DoubleColumn(BigDecimal data)
     {
         this(null == data ? null : data.toPlainString());
     }
 
-    public DoubleColumn( BigInteger data)
+    /**
+     * Creates a DoubleColumn with a BigInteger value.
+     *
+     * @param data The BigInteger data to initialize the column
+     */
+    public DoubleColumn(BigInteger data)
     {
         this(null == data ? null : data.toString());
     }
 
+    /**
+     * Creates an empty DoubleColumn with null value.
+     */
     public DoubleColumn()
     {
         this((String) null);
     }
 
-    private DoubleColumn( String data, int byteSize)
+    /**
+     * Private constructor to initialize the column with string data and byte size.
+     *
+     * @param data The string data to initialize the column
+     * @param byteSize The byte size of the data
+     */
+    private DoubleColumn(String data, int byteSize)
     {
         super(data, Column.Type.DOUBLE, byteSize);
     }
 
+    /**
+     * Converts the column data to BigDecimal.
+     *
+     * @return The BigDecimal representation of the data
+     * @throws AddaxException if conversion fails
+     */
     @Override
     public BigDecimal asBigDecimal()
     {
@@ -105,11 +152,16 @@ public class DoubleColumn
         catch (NumberFormatException e) {
             throw AddaxException.asAddaxException(
                     ErrorCode.CONVERT_NOT_SUPPORT,
-                    String.format("String[%s] cannot be converted to Double.",
-                            this.getRawData()));
+                    String.format("String[%s] cannot be converted to Double.", this.getRawData()));
         }
     }
 
+    /**
+     * Converts the column data to Double.
+     *
+     * @return The Double representation of the data
+     * @throws AddaxException if conversion fails
+     */
     @Override
     public Double asDouble()
     {
@@ -131,6 +183,11 @@ public class DoubleColumn
         return result.doubleValue();
     }
 
+    /**
+     * Converts the column data to Long.
+     *
+     * @throws AddaxException if conversion fails
+     */
     @Override
     public Long asLong()
     {
@@ -144,6 +201,12 @@ public class DoubleColumn
         return result.longValue();
     }
 
+    /**
+     * Converts the column data to BigInteger.
+     *
+     * @return The BigInteger representation of the data
+     * @throws AddaxException if conversion fails
+     */
     @Override
     public BigInteger asBigInteger()
     {
@@ -154,6 +217,11 @@ public class DoubleColumn
         return this.asBigDecimal().toBigInteger();
     }
 
+    /**
+     * Converts the column data to String.
+     *
+     * @return The String representation of the data
+     */
     @Override
     public String asString()
     {
@@ -163,6 +231,11 @@ public class DoubleColumn
         return (String) this.getRawData();
     }
 
+    /**
+     * Conversion to Boolean is not supported.
+     *
+     * @throws AddaxException always
+     */
     @Override
     public Boolean asBoolean()
     {
@@ -170,6 +243,11 @@ public class DoubleColumn
                 ErrorCode.CONVERT_NOT_SUPPORT, String.format(errorTemplate, "Boolean"));
     }
 
+    /**
+     * Conversion to Date is not supported.
+     *
+     * @throws AddaxException always
+     */
     @Override
     public Date asDate()
     {
@@ -177,6 +255,11 @@ public class DoubleColumn
                 ErrorCode.CONVERT_NOT_SUPPORT, String.format(errorTemplate, "Date"));
     }
 
+    /**
+     * Conversion to byte array is not supported.
+     *
+     * @throws AddaxException always
+     */
     @Override
     public byte[] asBytes()
     {
@@ -184,6 +267,11 @@ public class DoubleColumn
                 ErrorCode.CONVERT_NOT_SUPPORT, String.format(errorTemplate, "Bytes"));
     }
 
+    /**
+     * Conversion to Timestamp is not supported.
+     *
+     * @throws AddaxException always
+     */
     @Override
     public Timestamp asTimestamp()
     {
@@ -191,7 +279,13 @@ public class DoubleColumn
                 ErrorCode.CONVERT_NOT_SUPPORT, String.format(errorTemplate, "Timestamp"));
     }
 
-    private void validate( String data)
+    /**
+     * Validates the string data to ensure it can be converted to a double.
+     *
+     * @param data The string data to validate
+     * @throws AddaxException if validation fails
+     */
+    private void validate(String data)
     {
         if (null == data) {
             return;

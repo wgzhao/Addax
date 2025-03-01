@@ -27,31 +27,22 @@ import com.wgzhao.addax.common.util.Configuration;
 
 import java.util.List;
 
-/**
- * 每个Writer插件需要实现Writer类，并在其内部实现Job、Task两个内部类。
- */
 public abstract class Writer
         extends BaseObject
 {
-    /**
-     * 每个Writer插件必须实现Job内部类
-     */
     public abstract static class Job
             extends AbstractJobPlugin
     {
+
         /**
-         * 切分任务。<br>
+         * split the task
          *
-         * @param mandatoryNumber 为了做到Reader、Writer任务数对等，这里要求Writer插件必须按照源端的切分数进行切分。否则框架报错！
-         *
+         * @param mandatoryNumber the number of tasks that the framework suggests the plugin to split
          * @return list of configuration
          */
         public abstract List<Configuration> split(int mandatoryNumber);
     }
 
-    /**
-     * 每个Writer插件必须实现Task内部类
-     */
     public abstract static class Task
             extends AbstractTaskPlugin
     {

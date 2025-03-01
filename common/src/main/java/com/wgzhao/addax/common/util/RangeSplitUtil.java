@@ -30,7 +30,7 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * 提供通用的根据数字范围、字符串范围等进行切分的通用功能.
+ * support split range by BigInteger, long, and String.
  */
 public final class RangeSplitUtil
 {
@@ -45,7 +45,8 @@ public final class RangeSplitUtil
                 stringToBigInteger(right, radix), expectSliceNumber);
         String[] result = new String[tempResult.length];
 
-        //处理第一个字符串（因为：在转换为数字，再还原的时候，如果首字符刚好是 basic,则不知道应该添加多少个 basic）
+        // handle the first string (because: when converting to a number, and then restoring it,
+        // if the first character is just basic, it is not known how many basics should be added)
         result[0] = left;
         result[tempResult.length - 1] = right;
 
@@ -96,9 +97,7 @@ public final class RangeSplitUtil
             BigInteger step = endAndStartGap.divide(BigInteger.valueOf(expectSliceNumber));
             BigInteger remainder = endAndStartGap.remainder(BigInteger.valueOf(expectSliceNumber));
 
-            //remainder 不可能超过expectSliceNumber,所以不需要检查remainder的 Integer 的范围
-
-            // 这里不能 step.intValue()==0，因为可能溢出
+            // can not use step.intValue()==0, because it may overflow
             if (step.compareTo(BigInteger.ZERO) == 0) {
                 expectSliceNumber = remainder.intValue();
             }
@@ -130,12 +129,12 @@ public final class RangeSplitUtil
     }
 
     /**
-     * 由于只支持 ascii 码对应字符，所以radix 范围为[1,128]
+     * convert string to BigInteger.
+     * Note: radix and basic range are both [1,128], and the sum of radix and basic must also be in [1,128].
      *
-     * @param aString ascii码
-     * @param radix 指数
-     *
-     * @return bigint
+     * @param aString the string to convert
+     * @param radix the radix
+     * @return the BigInteger
      */
     public static BigInteger stringToBigInteger(String aString, int radix)
     {
@@ -166,12 +165,12 @@ public final class RangeSplitUtil
     }
 
     /**
-     * 把BigInteger 转换为 String.注意：radix 和 basic 范围都为[1,128], radix + basic 的范围也必须在[1,128].
+     * convert BigInteger to string.
+     * Note: radix and basic range are both [1,128], and the sum of radix and basic must also be in [1,128].
      *
-     * @param bigInteger 要转的数
-     * @param radix  范围
-     *
-     * @return string
+     * @param bigInteger the BigInteger to convert
+     * @param radix the radix
+     * @return the string
      */
     private static String bigIntegerToString(BigInteger bigInteger, int radix)
     {
@@ -212,11 +211,11 @@ public final class RangeSplitUtil
     }
 
     /**
-     * 获取字符串中的最小字符和最大字符（依据 ascii 进行判断）.要求字符串必须非空，并且为 ascii 字符串.
-     * 返回的Pair，left=最小字符，right=最大字符.
+     * Get the minimum and maximum characters in the string (based on ascii judgment).
+     * The string must be non-empty and an ascii string.
+     * The returned Pair, left=minimum character, right=maximum character.
      *
-     * @param aString 字符串
-     *
+     * @param aString the string
      * @return pair
      */
     public static Pair<Character, Character> getMinAndMaxCharacter(String aString)
@@ -240,6 +239,12 @@ public final class RangeSplitUtil
         return new ImmutablePair<>(min, max);
     }
 
+    /**
+     * Check if the string is pure ascii.
+     *
+     * @param aString the string
+     * @return true if the string is pure ascii, otherwise false
+     */
     private static boolean isPureAscii(String aString)
     {
         if (null == aString) {

@@ -39,7 +39,6 @@ public class PerfRecord
     private final PHASE phase;
     private volatile Date startTime;
     private final AtomicLong count = new AtomicLong(0);
-//    private volatile long size = 0;
     private final AtomicLong size = new AtomicLong(0);
 
     public PerfRecord(int taskGroupId, int taskId, PHASE phase)
