@@ -25,7 +25,7 @@ import java.util.Map;
 
 public abstract class ComplexTransformer
 {
-    //transformerName的唯一性在 addax 中检查，或者提交到插件中心检查。
+    // the transformerName is unique
     private String transformerName;
 
     public String getTransformerName()
@@ -40,9 +40,9 @@ public abstract class ComplexTransformer
 
     /**
      * abstract class
-     * @param record 行记录，UDF进行record的处理后，更新相应的record
-     * @param tContext transformer运行的配置项
-     * @param paras transformer函数参数
+     * @param record record
+     * @param tContext the transformer function context
+     * @param paras transformer parameters
      * @return record
      */
     public abstract Record evaluate(Record record, Map<String, Object> tContext, Object... paras);
