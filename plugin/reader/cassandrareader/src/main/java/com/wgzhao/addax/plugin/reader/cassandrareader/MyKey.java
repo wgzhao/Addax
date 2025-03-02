@@ -21,9 +21,6 @@ package com.wgzhao.addax.plugin.reader.cassandrareader;
 
 import com.wgzhao.addax.common.base.Key;
 
-/**
- * Created by mazhenlin on 2019/8/19.
- */
 public class MyKey
         extends Key
 {
@@ -41,22 +38,7 @@ public class MyKey
     public final static String MIN_TOKEN = "minToken";
     public final static String MAX_TOKEN = "maxToken";
 
-    /**
-     * 每个列的名字
-     */
     public static final String COLUMN_NAME = "name";
-    /**
-     * 列分隔符
-     */
-    public static final String COLUMN_SPLITTER = "format";
-    public static final String WRITE_TIME = "writetime(";
-    public static final String ELEMENT_SPLITTER = "splitter";
-    public static final String ENTRY_SPLITTER = "entrySplitter";
-    public static final String KV_SPLITTER = "kvSplitter";
-    public static final String ELEMENT_CONFIG = "element";
-    public static final String TUPLE_CONNECTOR = "_";
-    public static final String KEY_CONFIG = "key";
-    public static final String VALUE_CONFIG = "value";
 
     public MyKey() {super();}
 }

@@ -64,13 +64,10 @@ import java.util.Set;
 
 import static com.wgzhao.addax.common.spi.ErrorCode.CONFIG_ERROR;
 
-/**
- * Created by mazhenlin on 2019/8/21.
- */
+
 public class CassandraReaderHelper
 {
-    private static final Logger LOG = LoggerFactory
-            .getLogger(CassandraReader.class);
+    private static final Logger LOG = LoggerFactory.getLogger(CassandraReaderHelper.class);
     static CodecRegistry registry = new CodecRegistry();
 
     static String toJSonString(Object o, DataType type)
@@ -422,27 +419,20 @@ public class CassandraReaderHelper
                             throw AddaxException
                                     .asAddaxException(
                                             CONFIG_ERROR,
-                                            String.format(
-                                                    "您的配置文件中的列配置信息有误. 不支持数据库读取这种字段类型. 字段名:[%s], "
-                                                            + "字段类型:[%s]. ",
-                                                    metaData.getName(i),
-                                                    metaData.getType(i)));
+                                            "The column type is not supported. column name: " + metaData.getName(i)
+                                                    + ", column type: " + metaData.getType(i));
                     }
                 }
                 catch (TypeNotSupported t) {
                     throw AddaxException
                             .asAddaxException(
                                     CONFIG_ERROR,
-                                    String.format(
-                                            "您的配置文件中的列配置信息有误. 不支持数据库读取这种字段类型. 字段名:[%s], "
-                                                    + "字段类型:[%s]. ",
-                                            metaData.getName(i),
-                                            metaData.getType(i)));
+                                    "The column type is not supported. column name: " + metaData.getName(i)
+                                            + ", column type: " + metaData.getType(i));
                 }
             }
         }
         catch (Exception e) {
-            //TODO 这里识别为脏数据靠谱吗？
             taskPluginCollector.collectDirtyRecord(record, e);
             if (e instanceof AddaxException) {
                 throw (AddaxException) e;
@@ -572,15 +562,13 @@ public class CassandraReaderHelper
         ensureStringExists(jobConfig, MyKey.TABLE);
         ensureExists(jobConfig, MyKey.COLUMN);
 
-        ///keyspace,table是否存在
+        ///keyspace,table is exists or not
         String keyspace = jobConfig.getString(MyKey.KEYSPACE);
         if (cluster.getMetadata().getKeyspace(keyspace) == null) {
             throw AddaxException
                     .asAddaxException(
                             CONFIG_ERROR,
-                            String.format(
-                                    "配置信息有错误.keyspace'%s'不存在 .",
-                                    keyspace));
+                            "The keyspace '" + keyspace + "' does not exist.");
         }
         String table = jobConfig.getString(MyKey.TABLE);
         TableMetadata tableMetadata = cluster.getMetadata().getKeyspace(keyspace).getTable(table);
@@ -588,9 +576,7 @@ public class CassandraReaderHelper
             throw AddaxException
                     .asAddaxException(
                             CONFIG_ERROR,
-                            String.format(
-                                    "配置信息有错误.表'%s'不存在 .",
-                                    table));
+                            "The table '" + table + "' does not exist.");
         }
         List<String> columns = jobConfig.getList(MyKey.COLUMN, String.class);
         for (String name : columns) {
@@ -598,8 +584,7 @@ public class CassandraReaderHelper
                 throw AddaxException
                         .asAddaxException(
                                 CONFIG_ERROR,
-                                String.format(
-                                        "配置信息有错误.列信息中需要包含'%s'字段 .", MyKey.COLUMN_NAME));
+                                "The column must include '" + MyKey.COLUMN_NAME + "' field.");
             }
         }
     }
@@ -610,9 +595,7 @@ public class CassandraReaderHelper
             throw AddaxException
                     .asAddaxException(
                             CONFIG_ERROR,
-                            String.format(
-                                    "配置信息有错误.参数'%s'为必填项 .",
-                                    keyword));
+                            "The configuration item '" + keyword + "' is required.");
         }
     }
 
@@ -623,9 +606,7 @@ public class CassandraReaderHelper
             throw AddaxException
                     .asAddaxException(
                             CONFIG_ERROR,
-                            String.format(
-                                    "配置信息有错误.参数'%s'不能为空 .",
-                                    keyword));
+                            "The configuration item '" + keyword + "' is not empty.");
         }
     }
 
