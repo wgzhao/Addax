@@ -31,10 +31,6 @@ import static com.wgzhao.addax.common.spi.ErrorCode.CONFIG_ERROR;
 
 public final class ESKey
 {
-    // ----------------------------------------
-    //  类型定义 主键字段定义
-    // ----------------------------------------
-
     public static final String SEARCH_KEY = "search";
 
     private ESKey() {}

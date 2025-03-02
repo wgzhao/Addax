@@ -79,10 +79,6 @@ public class EsReader
         @Override
         public void prepare()
         {
-            /*
-             * 注意：此方法仅执行一次。
-             * 最佳实践：如果 Job 中有需要进行数据同步之前的处理，可以在此处完成，如果没有必要则可以直接去掉。
-             */
             ESClient esClient = new ESClient();
             esClient.createClient(ESKey.getEndpoint(conf),
                     ESKey.getAccessID(conf),
@@ -183,11 +179,10 @@ public class EsReader
             this.filter = ESKey.getFilter(conf);
             this.column = ESKey.getColumn(conf);
             if (column == null || column.isEmpty()) {
-                throw AddaxException.asAddaxException(REQUIRED_VALUE, "column必须配置");
+                throw AddaxException.asAddaxException(REQUIRED_VALUE, "column is required");
             }
             if (column.size() == 1 && "*".equals(column.get(0))) {
-                // TODO get column from record
-                throw AddaxException.asAddaxException(ILLEGAL_VALUE, "column暂不支持*配置");
+                throw AddaxException.asAddaxException(ILLEGAL_VALUE, "The '*' is not supported");
             }
         }
 
