@@ -104,6 +104,12 @@ public class HbaseSQLReader
         }
 
         @Override
+        public void destroy()
+        {
+            //
+        }
+
+        @Override
         public void prepare()
         {
             //
@@ -199,18 +205,6 @@ public class HbaseSQLReader
                 taskPluginCollector.collectDirtyRecord(record, e);
                 return null;
             }
-        }
-
-        @Override
-        public void post()
-        {
-            //
-        }
-
-        @Override
-        public void destroy()
-        {
-            //
         }
     }
 }
