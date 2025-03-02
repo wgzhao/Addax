@@ -52,12 +52,8 @@ public class StandardFtpHelper
     {
         ftpClient = new FTPClient();
         try {
-            // 连接
             ftpClient.connect(host, port);
-            // 登录
             ftpClient.login(username, password);
-            // 不需要写死ftp server的OS TYPE,FTPClient getSystemType()方法会自动识别
-            // ftpClient.configure(new FTPClientConfig(FTPClientConfig.SYS_UNIX))
             ftpClient.setConnectTimeout(timeout);
             ftpClient.setDataTimeout(Duration.ofMillis(timeout));
             if ("PASV".equals(connectMode)) {
@@ -66,7 +62,6 @@ public class StandardFtpHelper
             }
             else if ("PORT".equals(connectMode)) {
                 ftpClient.enterLocalActiveMode();
-                // ftpClient.enterRemoteActiveMode(host, port)
             }
             int reply = ftpClient.getReplyCode();
             if (!FTPReply.isPositiveCompletion(reply)) {
@@ -74,7 +69,6 @@ public class StandardFtpHelper
                 throw AddaxException.asAddaxException(CONNECT_ERROR,
                         "Failed to connect to the ftp server " + host);
             }
-            //设置命令传输编码
             String fileEncoding = Charset.defaultCharset().displayName();
             ftpClient.setControlEncoding(fileEncoding);
             // always use binary transfer model
@@ -91,7 +85,6 @@ public class StandardFtpHelper
     {
         if (ftpClient.isConnected()) {
             try {
-                // ftpClient.completePendingCommand();//打开流操作之后必须，原因还需要深究
                 ftpClient.logout();
             }
             catch (IOException e) {

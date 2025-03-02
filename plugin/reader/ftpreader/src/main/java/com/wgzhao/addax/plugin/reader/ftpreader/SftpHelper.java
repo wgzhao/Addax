@@ -71,28 +71,22 @@ public class SftpHelper
         }
         try {
             session = jsch.getSession(username, host, port);
-            // 根据用户名，主机ip，端口获取一个Session对象
-            // 如果服务器连接不上，则抛出异常
             if (session == null) {
                 throw AddaxException.asAddaxException(CONNECT_ERROR,
                         "Failed to connect server " + host + ":" + port + " with user " + username);
             }
 
             if (!StringUtils.isBlank(password)) {
-                session.setPassword(password); // 设置密码
+                session.setPassword(password);
             }
             Properties config = new Properties();
             config.put("StrictHostKeyChecking", "no");
-            session.setConfig(config); // 为Session对象设置properties
-            session.setTimeout(timeout); // 设置timeout时间
-            session.connect(); // 通过Session建立链接
+            session.setConfig(config);
+            session.setTimeout(timeout);
+            session.connect();
 
-            channelSftp = (ChannelSftp) session.openChannel("sftp"); // 打开SFTP通道
-            channelSftp.connect(); // 建立SFTP通道的连接
-
-            //设置命令传输编码
-            //String fileEncoding = System.getProperty("file.encoding")
-            //channelSftp.setFilenameEncoding(fileEncoding)
+            channelSftp = (ChannelSftp) session.openChannel("sftp");
+            channelSftp.connect();
         }
         catch (JSchException e) {
             throw AddaxException.asAddaxException(CONNECT_ERROR,

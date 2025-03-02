@@ -72,7 +72,6 @@ public class FtpReader
 
         private HashSet<String> sourceFiles;
 
-        // ftp链接参数
         private String protocol;
         private String host;
         private int port;
