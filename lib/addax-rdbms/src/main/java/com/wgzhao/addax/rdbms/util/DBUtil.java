@@ -240,15 +240,15 @@ public final class DBUtil
                 // unit ms
                 bds.addConnectionProperty("oracle.jdbc.ReadTimeout", String.valueOf(socketTimeout * 1000));
             }
-	    if ("org.apache.hive.jdbc.HiveDriver".equals(bds.getDriverClassName())) {
-		DriverManager.setLoginTimeout(DEFAULT_SOCKET_TIMEOUT_SEC);
-	    }
+            if ("org.apache.hive.jdbc.HiveDriver".equals(bds.getDriverClassName())) {
+                DriverManager.setLoginTimeout(DEFAULT_SOCKET_TIMEOUT_SEC);
+            }
             if (url.contains("inceptor2")) {
                 LOG.warn("inceptor2 must be process specially");
                 url = url.replace("inceptor2", "hive2");
                 bds.setUrl(url);
                 bds.setDriverClassName("org.apache.hive.jdbc.HiveDriver");
-		DriverManager.setLoginTimeout(DEFAULT_SOCKET_TIMEOUT_SEC);
+                DriverManager.setLoginTimeout(DEFAULT_SOCKET_TIMEOUT_SEC);
             }
             else {
                 LOG.debug("Connecting to database with driver {}", dataBaseType.getDriverClassName());
@@ -525,7 +525,7 @@ public final class DBUtil
     }
 
     /**
-     * 异步获取resultSet的next(),注意，千万不能应用在数据的读取中。只能用在meta的获取
+     * async next() only apply to meta query, not for data reading
      *
      * @param resultSet result set
      * @return boolean

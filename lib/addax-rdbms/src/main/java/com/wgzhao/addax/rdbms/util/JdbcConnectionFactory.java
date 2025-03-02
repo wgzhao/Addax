@@ -23,9 +23,6 @@ package com.wgzhao.addax.rdbms.util;
 
 import java.sql.Connection;
 
-/**
- * Date: 15/3/16 下午3:12
- */
 public class JdbcConnectionFactory
         implements ConnectionFactory
 {

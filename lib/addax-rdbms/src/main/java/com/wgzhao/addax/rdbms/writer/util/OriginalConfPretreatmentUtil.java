@@ -55,7 +55,6 @@ public final class OriginalConfPretreatmentUtil
 
     public static void doPretreatment(Configuration originalConfig, DataBaseType dataBaseType)
     {
-        // 检查 username 配置（必填）
         originalConfig.getNecessaryValue(Key.USERNAME, REQUIRED_VALUE);
         String pass = originalConfig.getString(Key.PASSWORD, null);
         if (pass != null && pass.startsWith(Constant.ENC_PASSWORD_PREFIX)) {
@@ -74,7 +73,6 @@ public final class OriginalConfPretreatmentUtil
 
     public static void doCheckBatchSize(Configuration originalConfig)
     {
-        // 检查batchSize 配置（选填，如果未填写，则设置为默认值）
         int batchSize = originalConfig.getInt(Key.BATCH_SIZE, Constant.DEFAULT_BATCH_SIZE);
         if (batchSize < 1) {
             throw AddaxException.asAddaxException(ILLEGAL_VALUE,
@@ -88,7 +86,6 @@ public final class OriginalConfPretreatmentUtil
     {
         Configuration connConf = originalConfig.getConfiguration(Key.CONNECTION);
 
-        // 是否配置的定制的驱动名称
         String driverClass = connConf.getString(Key.JDBC_DRIVER, null);
         if (driverClass != null && !driverClass.isEmpty()) {
             LOG.warn("Use specified driver class [{}]", driverClass);
@@ -109,7 +106,6 @@ public final class OriginalConfPretreatmentUtil
                     "The item table is required.");
         }
 
-        // 对每一个connection 上配置的table 项进行解析
         List<String> expandedTables = TableExpandUtil.expandTableConf(dataBaseType, tables);
 
         if (expandedTables.isEmpty()) {
@@ -145,7 +141,6 @@ public final class OriginalConfPretreatmentUtil
                         "to read the database table, changes in the number and types of fields in your table may affect " +
                         "the correctness of the task or even cause errors.");
 
-                // 回填其值，需要以 String 的方式转交后续处理
                 originalConfig.set(Key.COLUMN, allColumns);
             }
             else if (userConfiguredColumns.size() > allColumns.size()) {
@@ -154,11 +149,11 @@ public final class OriginalConfPretreatmentUtil
                                 + "are greater than the number of table columns " + allColumns.size());
             }
             else {
-                // 确保用户配置的 column 不重复
+                // ensure the column is not duplicated
                 ListUtil.makeSureNoValueDuplicate(userConfiguredColumns, false);
                 Connection connection = null;
                 try {
-                    // 检查列是否都为数据库表中正确的列（通过执行一次 select column from table 进行判断）
+                    // check whether the user's configuration column exists in the table
                     connection = connectionFactory.getConnection();
                     DBUtil.getColumnMetaData(connection, oneTable, StringUtils.join(userConfiguredColumns, ","));
                 }

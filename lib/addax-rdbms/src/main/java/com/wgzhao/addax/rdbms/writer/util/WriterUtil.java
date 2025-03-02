@@ -55,7 +55,6 @@ public final class WriterUtil
 
         int tableNumber = simplifiedConf.getInt(Key.TABLE_NUMBER);
 
-        //处理单表的情况
         if (tableNumber == 1) {
             //由于在之前的  master prepare 中已经把 table,jdbcUrl 提取出来，所以这里处理十分简单
             for (int j = 0; j < adviceNumber; j++) {
@@ -106,7 +105,6 @@ public final class WriterUtil
 
         List<String> renderedSqls = new ArrayList<>();
         for (String sql : preOrPostSqls) {
-            //preSql为空时，不加入执行队列
             if (StringUtils.isNotBlank(sql)) {
                 renderedSqls.add(sql.replace(Constant.TABLE_NAME_PLACEHOLDER, tableName));
             }
@@ -165,7 +163,6 @@ public final class WriterUtil
             }
         }
         else {
-            //这里是保护,如果其他错误的使用了update,需要更换为replace
             if (mode.startsWith("update")) {
                 writeMode = "replace";
             }

@@ -51,13 +51,16 @@ public final class OriginalConfPretreatmentUtil
 
     private OriginalConfPretreatmentUtil() {}
 
+    /**
+     * handle the configuration before
+     * @param originalConfig configuration
+     */
     public static void doPretreatment(Configuration originalConfig)
     {
-        // 检查 username 配置（必填）
+        // the username is mandatory for RDBMS
         originalConfig.getNecessaryValue(Key.USERNAME, REQUIRED_VALUE);
-        /*
-         * 有些数据库没有密码，因此密码不再作为必选项
-         */
+
+        // some rdbms has no password in default , so the password is optional
         if (originalConfig.getString(Key.PASSWORD) == null) {
             originalConfig.set(Key.PASSWORD, "");
         }
@@ -72,6 +75,10 @@ public final class OriginalConfPretreatmentUtil
         simplifyConf(originalConfig);
     }
 
+    /**
+     * handle the where clause
+     * @param originalConfig configuration
+     */
     public static void dealWhere(Configuration originalConfig)
     {
         String where = originalConfig.getString(Key.WHERE, null);
@@ -85,13 +92,10 @@ public final class OriginalConfPretreatmentUtil
     }
 
     /**
-     * 对配置进行初步处理：
-     * <ol>
-     * <li>处理同一个数据库配置了多个jdbcUrl的情况</li>
-     * <li>识别并标记是采用querySql 模式还是 table 模式</li>
-     * <li>对 table 模式，确定分表个数，并处理 column 转 *事项</li>
-     * </ol>
-     *
+     * handle configuration preliminary:
+     * 1. handle the situation where multiple jdbcUrls are configured for the same database
+     * 2. identify and mark whether to use querySql mode or table mode
+     * 3. for table mode, determine the number of sub-tables and process the column to * matters
      * @param originalConfig configuration
      */
     private static void simplifyConf(Configuration originalConfig)
@@ -104,6 +108,10 @@ public final class OriginalConfPretreatmentUtil
         dealColumnConf(originalConfig);
     }
 
+    /**
+     * handle the jdbcUrl and table configuration
+     * @param originalConfig configuration
+     */
     private static void dealJdbcAndTable(Configuration originalConfig)
     {
         String username = originalConfig.getString(Key.USERNAME);
@@ -116,7 +124,6 @@ public final class OriginalConfPretreatmentUtil
 
         int tableNum = 0;
 
-        // 是否配置的定制的驱动名称
         String driverClass = connConf.getString(Key.JDBC_DRIVER, null);
         if (driverClass != null && !driverClass.isEmpty()) {
             LOG.warn("use specified driver class: {}", driverClass);
@@ -139,12 +146,10 @@ public final class OriginalConfPretreatmentUtil
             DBUtil.validJdbcUrl(dataBaseType, jdbcUrl, username, password, preSql);
         }
 
-        // 回写到connection.jdbcUrl
+        // write back the connection.jdbcUrl item
         originalConfig.set(Key.CONNECTION + "." + Key.JDBC_URL, jdbcUrl);
 
         if (isTableMode) {
-            // table 方式
-            // 对每一个connection 上配置的table 项进行解析(已对表名称进行了 ` 处理的)
             List<String> tables = connConf.getList(Key.TABLE, String.class);
 
             List<String> expandedTables = TableExpandUtil.expandTableConf(dataBaseType, tables);
@@ -161,6 +166,10 @@ public final class OriginalConfPretreatmentUtil
         originalConfig.set(Key.TABLE_NUMBER, tableNum);
     }
 
+    /**
+     * handle the column configuration
+     * @param originalConfig configuration
+     */
     private static void dealColumnConf(Configuration originalConfig)
     {
         boolean isTableMode = originalConfig.getBool(Key.IS_TABLE_MODE);
@@ -183,7 +192,6 @@ public final class OriginalConfPretreatmentUtil
                 LOG.warn("There are some risks in the column configuration. Because you did not configure the columns " +
                         "to read the database table, changes in the number and types of fields in your table may affect " +
                         "the correctness of the task or even cause errors.");
-                // 回填其值，需要以 String 的方式转交后续处理
                 List<String> excludeColumns = originalConfig.getList(EXCLUDE_COLUMN, String.class);
                 if (!excludeColumns.isEmpty()) {
                     // get the all columns of table and exclude the excludeColumns
@@ -205,7 +213,6 @@ public final class OriginalConfPretreatmentUtil
             else {
                 List<String> allColumns = DBUtil.getTableColumns(dataBaseType, jdbcUrl, username, password, tableName);
                 LOG.info("The table [{}] has columns [{}].", tableName, StringUtils.join(allColumns, ","));
-                // warn:注意mysql表名区分大小写
                 allColumns = ListUtil.valueToLowerCase(allColumns);
                 List<String> quotedColumns = new ArrayList<>();
                 for (String column : userConfiguredColumns) {
@@ -226,20 +233,20 @@ public final class OriginalConfPretreatmentUtil
             }
         }
         else {
-            // querySql模式，不希望配制 column，那样是混淆不清晰的
+            // column is not allowed in querySql mode
             if (null != userConfiguredColumns && !userConfiguredColumns.isEmpty()) {
                 LOG.warn("You configured both column and querySql, querySql will be preferred.");
                 originalConfig.remove(Key.COLUMN);
             }
 
-            // querySql模式，不希望配制 where，那样是混淆不清晰的
+            // where is not allowed in querySql mode
             String where = originalConfig.getString(Key.WHERE, null);
             if (StringUtils.isNotBlank(where)) {
                 LOG.warn("You configured both querySql and where. the where will be ignored.");
                 originalConfig.remove(Key.WHERE);
             }
 
-            // querySql模式，不希望配制 splitPk，那样是混淆不清晰的
+            // splitPk is not allowed in querySql mode
             String splitPk = originalConfig.getString(Key.SPLIT_PK, null);
             if (StringUtils.isNotBlank(splitPk)) {
                 LOG.warn("You configured both querySql and splitPk. the splitPk will be ignored.");
@@ -248,6 +255,11 @@ public final class OriginalConfPretreatmentUtil
         }
     }
 
+    /**
+     * identify and mark whether to use querySql mode or table mode
+     * @param originalConfig configuration
+     * @return true if table mode, false if querySql mode
+     */
     private static boolean recognizeTableOrQuerySqlMode(Configuration originalConfig)
     {
         Configuration connConf = originalConfig.getConfiguration(Key.CONNECTION);
@@ -266,12 +278,12 @@ public final class OriginalConfPretreatmentUtil
         isQuerySqlMode = StringUtils.isNotBlank(querySql);
 
         if (!isTableMode && !isQuerySqlMode) {
-            // table 和 querySql 二者均未配置
+            // neither table nor querySql is configured
             throw AddaxException.asAddaxException(
                     REQUIRED_VALUE, "You must configure either table or querySql.");
         }
         else if (isTableMode && isQuerySqlMode) {
-            // table 和 querySql 二者均配置
+            // both table and querySql are configured
             throw AddaxException.asAddaxException(CONFIG_ERROR,
                     "You ca not configure both table and querySql at the same time.");
         }

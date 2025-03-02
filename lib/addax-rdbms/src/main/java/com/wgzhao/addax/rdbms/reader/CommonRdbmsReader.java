@@ -96,7 +96,7 @@ public class CommonRdbmsReader
 
         public void preCheck(Configuration originalConfig, DataBaseType dataBaseType)
         {
-            /* 检查每个表是否有读权限，以及querySql跟split Key是否正确 */
+            // check each table can read and split key is valid
             Configuration queryConf = ReaderSplitUtil.doPreCheckSplit(originalConfig);
             String splitPK = queryConf.getString(Key.SPLIT_PK);
             Configuration connConf = queryConf.getConfiguration(Key.CONNECTION);
@@ -136,7 +136,6 @@ public class CommonRdbmsReader
         private String jdbcUrl;
         private String mandatoryEncoding;
 
-        // 作为日志显示信息时，需要附带的通用信息。比如信息所对应的数据库连接等信息，针对哪个表做的操作
         private String basicMsg;
 
         public Task(DataBaseType dataBaseType)
@@ -153,9 +152,6 @@ public class CommonRdbmsReader
 
         public void init(Configuration readerSliceConfig)
         {
-
-            /* for database connection */
-
             this.username = readerSliceConfig.getString(Key.USERNAME);
             this.password = readerSliceConfig.getString(Key.PASSWORD);
             this.jdbcUrl = readerSliceConfig.getString(Key.JDBC_URL);
@@ -165,6 +161,13 @@ public class CommonRdbmsReader
             basicMsg = "jdbcUrl: " + this.jdbcUrl;
         }
 
+        /**
+         * read data
+         * @param readerSliceConfig The read configuration
+         * @param recordSender The record sender
+         * @param taskPluginCollector The task plugin collector
+         * @param fetchSize The fetch size
+         */
         public void startRead(Configuration readerSliceConfig, RecordSender recordSender,
                 TaskPluginCollector taskPluginCollector, int fetchSize)
         {
@@ -188,7 +191,6 @@ public class CommonRdbmsReader
                 ResultSetMetaData metaData = rs.getMetaData();
                 columnNumber = metaData.getColumnCount();
 
-                // 这个统计干净的result_Next时间
                 PerfRecord allResultPerfRecord = new PerfRecord(taskGroupId, taskId, PerfRecord.PHASE.RESULT_NEXT_ALL);
                 allResultPerfRecord.start();
 
@@ -201,7 +203,6 @@ public class CommonRdbmsReader
                 }
 
                 allResultPerfRecord.end(rsNextUsedTime);
-                // 目前大盘是依赖这个打印，而之前这个Finish read record是包含了sql查询和result next的全部时间
                 LOG.info("Finished reading records by executing SQL query: [{}].", querySql);
             }
             catch (Exception e) {
@@ -229,6 +230,15 @@ public class CommonRdbmsReader
             recordSender.sendToWriter(record);
         }
 
+        /**
+         * create column
+         * @param rs The result set
+         * @param metaData The result set meta data
+         * @param i The column index
+         * @return The column
+         * @throws SQLException If an SQL exception occurs
+         * @throws UnsupportedEncodingException If the encoding is not supported
+         */
         protected Column createColumn(ResultSet rs, ResultSetMetaData metaData, int i)
                 throws SQLException, UnsupportedEncodingException
         {
@@ -284,8 +294,8 @@ public class CommonRdbmsReader
                     return new BoolColumn(rs.getBoolean(i));
 
                 case Types.BIT:
-                    // bit(1) -> Types.BIT 可使用BoolColumn
-                    // bit(>1) -> Types.VARBINARY 可使用BytesColumn
+                    // bit(1) -> Types.BIT  use BooleanColumn
+                    // bit(>1) -> Types.VARBINARY use BytesColumn
                     if (metaData.getPrecision(i) == 1) {
                         return new BoolColumn(rs.getBoolean(i));
                     }
@@ -310,6 +320,15 @@ public class CommonRdbmsReader
             }
         }
 
+        /**
+         * build record
+         * @param recordSender The record sender
+         * @param rs The result set
+         * @param metaData The result set meta data
+         * @param columnNumber The column number
+         * @param taskPluginCollector The task plugin collector
+         * @return The record
+         */
         protected Record buildRecord(RecordSender recordSender, ResultSet rs, ResultSetMetaData metaData, int columnNumber,
                 TaskPluginCollector taskPluginCollector)
         {

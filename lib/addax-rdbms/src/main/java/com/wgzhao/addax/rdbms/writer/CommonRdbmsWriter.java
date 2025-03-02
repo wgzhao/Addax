@@ -148,9 +148,7 @@ public class CommonRdbmsWriter
 
                 originalConfig.remove(Key.CONNECTION);
                 if (!renderedPreSqls.isEmpty()) {
-                    // 说明有 preSql 配置，则此处删除掉
                     originalConfig.remove(Key.PRE_SQL);
-
                     Connection conn = DBUtil.getConnection(dataBaseType, jdbcUrl, username, password);
                     LOG.info("Begin to execute preSqls:[{}]. context info:{}.", StringUtils.join(renderedPreSqls, ";"), jdbcUrl);
 
@@ -167,7 +165,6 @@ public class CommonRdbmsWriter
             return WriterUtil.doSplit(originalConfig, mandatoryNumber);
         }
 
-        // 一般来说，是需要推迟到 task 中进行post 的执行（单表情况例外）
         public void post(Configuration originalConfig)
         {
             int tableNumber = originalConfig.getInt(Key.TABLE_NUMBER);
@@ -184,11 +181,8 @@ public class CommonRdbmsWriter
                 List<String> renderedPostSqls = WriterUtil.renderPreOrPostSqls(postSqls, table);
 
                 if (!renderedPostSqls.isEmpty()) {
-                    // 说明有 postSql 配置，则此处删除掉
                     originalConfig.remove(Key.POST_SQL);
-
                     Connection conn = DBUtil.getConnection(this.dataBaseType, jdbcUrl, username, password);
-
                     LOG.info("Begin to execute postSqls:[{}]. context info:{}.", StringUtils.join(renderedPostSqls, ";"), jdbcUrl);
                     WriterUtil.executeSqls(conn, renderedPostSqls);
                     DBUtil.closeDBResources(null, null, conn);
@@ -206,7 +200,6 @@ public class CommonRdbmsWriter
     {
         protected static final Logger LOG = LoggerFactory.getLogger(Task.class);
         private static final String VALUE_HOLDER = "?";
-        // 作为日志显示信息时，需要附带的通用信息。比如信息所对应的数据库连接等信息，针对哪个表做的操作
         protected static String basicMessage;
         protected static String insertOrReplaceTemplate;
         protected DataBaseType dataBaseType;
@@ -303,10 +296,9 @@ public class CommonRdbmsWriter
             }
             mergeColumns.addAll(this.columns);
 
-            // 用于写入数据的时候的类型根据目的表字段类型转换
             this.resultSetMetaData = DBUtil.getColumnMetaData(connection, this.table, StringUtils.join(mergeColumns, ","));
 
-            // 写数据库的SQL语句
+            // combine the insert statement
             calcWriteRecordSql();
 
             List<Record> writeBuffer = new ArrayList<>(this.batchSize);
@@ -315,7 +307,6 @@ public class CommonRdbmsWriter
                 Record record;
                 while ((record = recordReceiver.getFromReader()) != null) {
                     if (record.getColumnNumber() != this.columnNumber) {
-                        // 源头读取字段列数与目的表字段写入列数不相等，直接报错
                         throw AddaxException.asAddaxException(
                                 CONFIG_ERROR,
                                 "The item column number " + record.getColumnNumber() + " in source file not equals the column number " + columnNumber + " in table."
@@ -473,7 +464,6 @@ public class CommonRdbmsWriter
             }
         }
 
-        // 直接使用了两个类变量：columnNumber,resultSetMetaData
         protected PreparedStatement fillPreparedStatement(PreparedStatement preparedStatement, Record record)
                 throws SQLException
         {
@@ -485,6 +475,15 @@ public class CommonRdbmsWriter
             return preparedStatement;
         }
 
+        /**
+         * populate the preparedStatement via the different column type
+         * @param preparedStatement the PreparedStatement
+         * @param columnIndex the index of the column
+         * @param columnSqlType the sql type of the column
+         * @param column the column data
+         * @return the preparedStatement
+         * @throws SQLException if the column type is not supported
+         */
         protected PreparedStatement fillPreparedStatementColumnType(PreparedStatement preparedStatement, int columnIndex, int columnSqlType, Column column)
                 throws SQLException
         {

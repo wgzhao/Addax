@@ -58,7 +58,7 @@ public class GetPrimaryKeyUtil
      * and lastly, other divisible unique indexes.
      *
      * @param readConf {@link Configuration}
-     * @return column name if has primary key or unique key, else null
+     * @return column name if it has primary key or unique key, else null
      */
     public static String getPrimaryKey(Configuration readConf)
     {
@@ -137,12 +137,12 @@ public class GetPrimaryKeyUtil
     }
 
     /**
-     * 依据不同数据库类型，返回对应的获取主键的SQL语句
+     * generate SQL to get primary key
      *
      * @param schema schema
-     * @param tableName 要查询的表
+     * @param tableName the table name
      * @param username username
-     * @return 获取主键 SQL 语句
+     * @return the sql string to get primary key
      */
     public static String getPrimaryKeyQuery(String schema, String tableName, String username)
     {

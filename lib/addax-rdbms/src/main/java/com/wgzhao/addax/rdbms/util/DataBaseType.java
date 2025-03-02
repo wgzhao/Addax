@@ -26,9 +26,6 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import static com.wgzhao.addax.common.base.Constant.SQL_RESERVED_WORDS;
 
-/**
- * refer:<a href="http://blog.csdn.net/ring0hx/article/details/6152528">...</a>
- */
 public enum DataBaseType
 {
     MySql("mysql", "com.mysql.cj.jdbc.Driver"),
@@ -45,7 +42,6 @@ public enum DataBaseType
     Inceptor2("inceptor2", "org.apache.hive.jdbc.HiveDriver"),
     InfluxDB("influxdb", "org.influxdb.influxdb-java"),
     Impala("impala", "com.cloudera.impala.jdbc41.Driver"),
-    //    TDengine("tdengine","com.taosdata.jdbc.rs.RestfulDriver"),
     TDengine("tdengine", "com.taosdata.jdbc.TSDBDriver"),
     Trino("trino", "io.trino.jdbc.TrinoDriver"),
     Sybase("sybase", "com.sybase.jdbc4.jdbc.SybDriver"),
@@ -65,7 +61,7 @@ public enum DataBaseType
     }
 
     /**
-     * 注意：从JDBC连接串中识别出 ip/host 信息.未识别到则返回 null.
+     * extract IP/host from jdbc url, return null if not recognize
      * <code>
      * jdbc:phoenix:thin:url=dn01,dn02:6667
      * jdbc:phoenix:dn01,dn02,dn03:2181:/hbase-secure:trino@DOMAIN.COM:/etc/trino/trino.headless.keytab
