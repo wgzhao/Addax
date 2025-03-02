@@ -312,11 +312,11 @@ public class DataReader
                         String.format("random 函数不合法[%s], 混淆函数random的参数需要第一个小于等于第二个:%s, %s",
                                 value, param1, param2));
             }
-            config.set(DataKey.MIXUP_FUNCTION_PARAM1, param1Int);
-            config.set(DataKey.MIXUP_FUNCTION_PARAM2, param2Int);
+            config.set(DataKey.MIX_FUNCTION_PARAM1, param1Int);
+            config.set(DataKey.MIX_FUNCTION_PARAM2, param2Int);
             if (split.length == 3) {
                 int scale = Integer.parseInt(split[2].trim());
-                config.set(DataKey.MIXUP_FUNCTION_SCALE, scale);
+                config.set(DataKey.MIX_FUNCTION_SCALE, scale);
             }
 //                this.originalConfig.set(DataConstant.HAVE_MIXUP_FUNCTION, true);
         }
@@ -464,9 +464,9 @@ public class DataReader
                 if ("null".equals(columnValue)) {
                     return null;
                 }
-                long param1Int = eachColumnConfig.getLong(DataKey.MIXUP_FUNCTION_PARAM1, 0L);
-                long param2Int = eachColumnConfig.getLong(DataKey.MIXUP_FUNCTION_PARAM2, 1L);
-                int scale = eachColumnConfig.getInt(DataKey.MIXUP_FUNCTION_SCALE, -1);
+                long param1Int = eachColumnConfig.getLong(DataKey.MIX_FUNCTION_PARAM1, 0L);
+                long param2Int = eachColumnConfig.getLong(DataKey.MIX_FUNCTION_PARAM2, 1L);
+                int scale = eachColumnConfig.getInt(DataKey.MIX_FUNCTION_SCALE, -1);
                 // Instantiate a generator with a factory method.
                 UniformRandomProvider rng = RandomSource.XO_RO_SHI_RO_128_PP.create();
                 switch (columnType) {

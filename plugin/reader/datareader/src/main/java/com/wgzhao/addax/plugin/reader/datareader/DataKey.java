@@ -24,9 +24,9 @@ import com.wgzhao.addax.common.base.Key;
 public final class DataKey
         extends Key
 {
-    public static final String MIXUP_FUNCTION_PARAM1 = "mixupParam1";
-    public static final String MIXUP_FUNCTION_PARAM2 = "mixupParam2";
-    public static final String MIXUP_FUNCTION_SCALE = "scale";
+    public static final String MIX_FUNCTION_PARAM1 = "mixParam1";
+    public static final String MIX_FUNCTION_PARAM2 = "mixParam2";
+    public static final String MIX_FUNCTION_SCALE = "scale";
     public static final String RULE = "rule";
 
     private DataKey() {}

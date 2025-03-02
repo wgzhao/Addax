@@ -26,6 +26,7 @@ import org.apache.commons.lang3.RandomStringUtils;
 public class StockUtil
 {
 
+    // China stock symbol prefix
     private static final String[] CODE_PREFIXES = {
             "68", "10", "16", "75", "42", "73", "07", "90", "87", "13", "14", "08", "11", "43", "19", "71", "01", "56", "70", "37", "76",
             "12", "88", "00", "51", "72", "60", "50", "03", "29", "83", "18", "02", "20", "40", "06", "15", "09", "38", "58", "17", "36",
