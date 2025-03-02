@@ -109,19 +109,16 @@ public class DbfReader
             //
         }
 
-        // warn: 如果源目录为空会报错，拖空目录意图=>空文件显示指定此意图
         @Override
         public List<Configuration> split(int adviceNumber)
         {
             LOG.debug("split() begin...");
             List<Configuration> readerSplitConfigs = new ArrayList<>();
 
-            // warn:每个slice拖且仅拖一个文件,
             int splitNumber = this.sourceFiles.size();
             if (0 == splitNumber) {
                 throw AddaxException.asAddaxException(
-                        RUNTIME_ERROR,
-                        String.format("未能找到待读取的文件,请确认您的配置项path: %s", this.originConfig.getString(Key.PATH)));
+                        RUNTIME_ERROR, "can not find any files to read in " + this.originConfig.getString(Key.PATH));
             }
 
             List<List<String>> splitSourceFiles = FileHelper.splitSourceFiles(this.sourceFiles, splitNumber);
@@ -181,9 +178,7 @@ public class DbfReader
             }
             if (column == null) {
                 throw AddaxException.asAddaxException(
-                        RUNTIME_ERROR,
-                        "无法从指定的DBF文件(" + this.sourceFiles.get(0) + ")获取字段信息"
-                );
+                        RUNTIME_ERROR, "can not retrieve the field information from " + this.sourceFiles.get(0));
             }
             int colNum = column.size();
             DBFRow row;
@@ -282,8 +277,9 @@ public class DbfReader
                 return column;
             }
             catch (FileNotFoundException e) {
-                e.printStackTrace();
-                return null;
+                LOG.error("FileNotFoundException occurred: ", e);
+                throw AddaxException.asAddaxException(
+                        RUNTIME_ERROR, "can not retrieve the field information from " + fPath);
             }
         }
     }
