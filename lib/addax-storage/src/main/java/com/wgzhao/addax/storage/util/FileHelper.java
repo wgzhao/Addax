@@ -136,7 +136,6 @@ public class FileHelper {
         try {
             inputStream = new FileInputStream(FilenameUtils.getFullPath(fileName));
         } catch (FileNotFoundException e) {
-            // warn: sock 文件无法read,能影响所有文件的传输,需要用户自己保证
             throw new RuntimeException("File not found: " + fileName, e);
         }
         try {

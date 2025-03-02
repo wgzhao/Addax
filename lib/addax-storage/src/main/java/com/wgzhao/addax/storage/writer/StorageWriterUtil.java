@@ -273,9 +273,8 @@ public class StorageWriterUtil
         csvBuilder.setRecordSeparator(IOUtils.LINE_SEPARATOR_UNIX);
         String nullFormat = config.getString(Key.NULL_FORMAT);
         csvBuilder.setNullString(nullFormat);
-        // 兼容format & dataFormat
         String dateFormat = config.getString(Key.DATE_FORMAT);
-        DateFormat dateParse = null; // warn: 可能不兼容
+        DateFormat dateParse = null; //
         if (StringUtils.isNotBlank(dateFormat)) {
             dateParse = new SimpleDateFormat(dateFormat);
         }

@@ -211,7 +211,7 @@ public class StorageReaderUtil
             TaskPluginCollector taskPluginCollector, String line)
     {
         List<ColumnEntry> column = StorageReaderUtil.getListColumnEntry(configuration, Key.COLUMN);
-        // 注意: nullFormat 没有默认值
+        // the nullFormat has not default value
         String nullFormat = configuration.getString(Key.NULL_FORMAT);
 
         // warn: default value ',', fieldDelimiter could be \n(lineDelimiter)
@@ -229,7 +229,6 @@ public class StorageReaderUtil
         Record record = recordSender.createRecord();
         Column columnGenerated;
 
-        // 创建都为String类型column的record
         if (null == columnConfigs || columnConfigs.isEmpty()) {
             for (String columnValue : sourceLine) {
                 // not equalsIgnoreCase, it's all ok if nullFormat is null
@@ -295,12 +294,10 @@ public class StorageReaderUtil
                             case DATE:
                                 String formatString = columnConfig.getFormat();
                                 if (StringUtils.isNotBlank(formatString)) {
-                                    // 用户自己配置的格式转换, 脏数据行为出现变化
                                     DateFormat format = columnConfig.getDateFormat();
                                     columnGenerated = new DateColumn(format.parse(columnValue));
                                 }
                                 else {
-                                    // 框架尝试转换
                                     columnGenerated = new DateColumn(new StringColumn(columnValue).asDate());
                                 }
                                 break;
@@ -326,7 +323,7 @@ public class StorageReaderUtil
                 if (e instanceof AddaxException) {
                     throw (AddaxException) e;
                 }
-                // 每一种转换失败都是脏数据处理,包括数字格式 & 日期格式
+                // each record which transfer failed  should be regarded as dirty one
                 taskPluginCollector.collectDirtyRecord(record, e.getMessage());
             }
         }
@@ -348,7 +345,7 @@ public class StorageReaderUtil
     /**
      * check parameter:encoding, compress, filedDelimiter
      *
-     * @param readerConfiguration 配置项
+     * @param readerConfiguration {@link Configuration}
      */
     public static void validateParameter(Configuration readerConfiguration)
     {
@@ -436,7 +433,7 @@ public class StorageReaderUtil
     }
 
     /**
-     * 获取含有通配符路径的父目录，目前只支持在最后一级目录使用通配符*或者
+     * get the parent path of the path with wildcard, only the last level
      *
      * @param regexPath path
      * @return String
