@@ -86,7 +86,7 @@ public class NormalTask
                     // 对常量字段的处理
                     String constantValue = cell.getColumnValue();
 
-                    Column constantColumn = super.convertValueToAssignType(columnType, constantValue, cell.getDateformat());
+                    Column constantColumn = super.convertValueToAssignType(columnType, constantValue, cell.getDateFormat());
                     record.addColumn(constantColumn);
                 }
                 else {
@@ -101,7 +101,7 @@ public class NormalTask
                         hbaseColumnValue = result.getValue(columnFamily, qualifier);
                     }
 
-                    Column hbaseColumn = super.convertBytesToAssignType(columnType, hbaseColumnValue, cell.getDateformat());
+                    Column hbaseColumn = super.convertBytesToAssignType(columnType, hbaseColumnValue, cell.getDateFormat());
                     record.addColumn(hbaseColumn);
                 }
             }

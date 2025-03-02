@@ -77,7 +77,6 @@ public abstract class HbaseAbstractTask
     public abstract boolean fetchLine(Record record)
             throws Exception;
 
-    //不同模式设置不同,如多版本模式需要设置版本
     public abstract void initScan(Scan scan);
 
     public void prepare()
@@ -88,11 +87,8 @@ public abstract class HbaseAbstractTask
         this.scan.withStartRow(startKey);
         this.scan.withStopRow(endKey);
         LOG.info("The task set startRowkey=[{}], endRowkey=[{}].", Bytes.toStringBinary(this.startKey), Bytes.toStringBinary(this.endKey));
-        //scan的Caching Batch全部留在hConfig中每次从服务器端读取的行数，设置默认值未256
         this.scan.setCaching(this.scanCacheSize);
-        //设置获取记录的列个数，hbase默认无限制，也就是返回所有的列,这里默认是100
         this.scan.setBatch(this.scanBatchSize);
-        //为是否缓存块，hbase默认缓存,同步全部数据时非热点数据，因此不需要缓存
         this.scan.setCacheBlocks(false);
         initScan(this.scan);
 
@@ -162,7 +158,7 @@ public abstract class HbaseAbstractTask
                 column = new DateColumn(isEmpty ? null : DateUtils.parseDate(dateValue, dateformat));
                 break;
             default:
-                throw AddaxException.asAddaxException(ILLEGAL_VALUE, "Hbasereader 不支持您配置的列类型:" + columnType);
+                throw AddaxException.asAddaxException(ILLEGAL_VALUE, "The column type " + columnType + " is not supported");
         }
         return column;
     }
@@ -191,7 +187,7 @@ public abstract class HbaseAbstractTask
                 column = new DateColumn(DateUtils.parseDate(constantValue, dateformat));
                 break;
             default:
-                throw AddaxException.asAddaxException(ILLEGAL_VALUE, "Hbasereader 常量列不支持您配置的列类型:" + columnType);
+                throw AddaxException.asAddaxException(ILLEGAL_VALUE, "The column type " + columnType + " is not supported");
         }
         return column;
     }

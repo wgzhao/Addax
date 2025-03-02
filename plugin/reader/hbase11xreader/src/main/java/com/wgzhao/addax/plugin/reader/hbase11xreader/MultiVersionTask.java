@@ -104,7 +104,6 @@ public abstract class MultiVersionTask
 
         record.addColumn(convertBytesToAssignType(rawRowkeyType, rawRowkey, columnValueFormat));
         record.addColumn(convertBytesToAssignType(ColumnType.STRING, cfAndQualifierName, columnValueFormat));
-        // 直接忽略了用户配置的 timestamp 的类型
         record.addColumn(new LongColumn(timestamp));
         record.addColumn(convertBytesToAssignType(columnValueType, columnValue, columnValueFormat));
     }
