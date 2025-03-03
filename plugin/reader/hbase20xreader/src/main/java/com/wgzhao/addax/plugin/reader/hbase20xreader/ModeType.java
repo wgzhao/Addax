@@ -44,8 +44,7 @@ public enum ModeType
                 return modeType;
             }
         }
-        throw AddaxException.asAddaxException(NOT_SUPPORT_TYPE,
-                String.format("HbaseReader 不支持该 mode 类型:%s, 目前支持的 mode 类型是:%s", modeName, Arrays.asList(values())));
+        throw AddaxException.asAddaxException(NOT_SUPPORT_TYPE, "The mode '" + modeName + "' is not supported");
     }
 
     public String getMode()

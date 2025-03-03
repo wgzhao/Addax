@@ -60,8 +60,7 @@ public class SqlServerReader
             int fetchSize = this.originalConfig.getInt(FETCH_SIZE, DEFAULT_FETCH_SIZE);
             if (fetchSize < 1) {
                 throw AddaxException
-                        .asAddaxException(ILLEGAL_VALUE,
-                                String.format("您配置的fetchSize有误，fetchSize : [%d] 设置值不能小于 1.", fetchSize));
+                        .asAddaxException(ILLEGAL_VALUE, "The fetchSize can not be less than 1");
             }
             this.originalConfig.set(FETCH_SIZE, fetchSize);
 
@@ -106,7 +105,7 @@ public class SqlServerReader
                         throws SQLException, UnsupportedEncodingException
                 {
                     if (metaData.getColumnType(i) == -151) {
-                        // 兼容老的SQLServer版本的datetime数据类型
+                        // compatible with old version SQLServer datetime type
                         return new TimestampColumn(rs.getTimestamp(i));
                     }
                     if (metaData.getColumnType(i) == Types.OTHER && "image".equals(metaData.getColumnTypeName(i))) {

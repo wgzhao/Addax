@@ -56,14 +56,12 @@ public class RdbmsReader
             int fetchSize = this.originalConfig.getInt(FETCH_SIZE, DEFAULT_FETCH_SIZE);
             if (fetchSize < 1) {
                 throw AddaxException.asAddaxException(
-                        REQUIRED_VALUE,
-                        String.format("您配置的fetchSize有误，fetchSize : [%d] 设置值不能小于 1.", fetchSize));
+                        REQUIRED_VALUE, "The fetchSize can not be less than 1");
             }
             this.originalConfig.set(FETCH_SIZE, fetchSize);
             Configuration connection = this.originalConfig.getConfiguration(CONNECTION);
             if (connection == null) {
-                throw AddaxException.asAddaxException(REQUIRED_VALUE, "config 'connection' is required and must not be " +
-                        "empty");
+                throw AddaxException.asAddaxException(REQUIRED_VALUE, "The config 'connection' is required and must not be empty");
             }
             String jdbcDriver = this.originalConfig.getString(JDBC_DRIVER, null);
             if (jdbcDriver == null || StringUtils.isBlank(jdbcDriver)) {

@@ -140,7 +140,6 @@ public class JsonReader
 
             // column: 1. index type 2.value type 3.when type is Date, may have
             List<Configuration> columns = this.originConfig.getListConfiguration(Key.COLUMN);
-            // 不再支持 ["*"]，必须指定json数据的路径
 
             if (null != columns && !columns.isEmpty()) {
                 for (Configuration eachColumnConf : columns) {
@@ -159,7 +158,6 @@ public class JsonReader
                     }
                 }
             }
-            // 后续支持解压缩，现在暂不支持
         }
 
         @Override
@@ -176,7 +174,6 @@ public class JsonReader
             //
         }
 
-        // warn: 如果源目录为空会报错，拖空目录意图=>空文件显示指定此意图
         @Override
         public List<Configuration> split(int adviceNumber)
         {
@@ -234,7 +231,6 @@ public class JsonReader
             this.parse = JsonPath.using(jsonConf);
         }
 
-        //解析json，返回已经经过处理的行
         private List<Column> parseFromJson(String json)
         {
             List<Column> splitLine = new ArrayList<>();
@@ -258,7 +254,6 @@ public class JsonReader
             return splitLine;
         }
 
-        //匹配类型
         private Column getColumn(String type, String columnValue, String columnFormat)
         {
             Column columnGenerated;
@@ -293,14 +288,12 @@ public class JsonReader
                     }
                     break;
                 case DATE:
-                    try { //直接利用支持的处理日期数据
+                    try {
                         if (StringUtils.isNotBlank(columnFormat)) {
-                            // 用户自己配置的格式转换, 脏数据行为出现变化
                             DateFormat format = new SimpleDateFormat(columnFormat);
                             columnGenerated = new DateColumn(format.parse(columnValue));
                         }
                         else {
-                            // 框架尝试转换
                             columnGenerated = new DateColumn(new StringColumn(columnValue).asDate());
                         }
                     }
@@ -309,13 +302,11 @@ public class JsonReader
                     }
                     break;
                 default:
-                    throw AddaxException.asAddaxException(NOT_SUPPORT_TYPE,
-                            "The type" + type + " is unsupported");
+                    throw AddaxException.asAddaxException(NOT_SUPPORT_TYPE, "The type" + type + " is unsupported");
             }
             return columnGenerated;
         }
 
-        //传输一行数据
         private void transportOneRecord(RecordSender recordSender, List<Column> sourceLine)
         {
             Record record = recordSender.createRecord();
@@ -343,7 +334,7 @@ public class JsonReader
                     fileInputStream = new FileInputStream(fileName);
                 }
                 catch (FileNotFoundException e) {
-                    // warn: sock 文件无法read,能影响所有文件的传输,需要用户自己保证
+                    // warn: the socket file can not be read, it may affect the transmission of all files, the user needs to ensure it by himself
                     String message = String.format("The file %s not found", fileName);
                     LOG.error(message);
                     throw AddaxException.asAddaxException(CONFIG_ERROR, message);

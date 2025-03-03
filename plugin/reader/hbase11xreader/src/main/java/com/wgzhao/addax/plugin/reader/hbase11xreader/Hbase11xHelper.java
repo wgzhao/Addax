@@ -475,7 +475,7 @@ public class Hbase11xHelper
 
         String encoding = originalConfig.getString(HBaseKey.ENCODING, HBaseConstant.DEFAULT_ENCODING);
         if (!Charset.isSupported(encoding)) {
-            throw AddaxException.asAddaxException(ILLEGAL_VALUE, String.format("Hbasereader 不支持您所配置的编码:[%s]", encoding));
+            throw AddaxException.asAddaxException(ILLEGAL_VALUE, String.format("The encoding '" + encoding + "' is not supported."));
         }
         originalConfig.set(HBaseKey.ENCODING, encoding);
         String startRowkey = originalConfig.getString(HBaseConstant.RANGE + "." + HBaseKey.START_ROW_KEY);

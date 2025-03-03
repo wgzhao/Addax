@@ -57,8 +57,7 @@ public class PostgresqlReader
             this.originalConfig = super.getPluginJobConf();
             int fetchSize = this.originalConfig.getInt(FETCH_SIZE, DEFAULT_FETCH_SIZE);
             if (fetchSize < 1) {
-                throw AddaxException.asAddaxException(ILLEGAL_VALUE,
-                        String.format("您配置的fetchSize有误，fetchSize : [%d] 设置值不能小于 1.", fetchSize));
+                throw AddaxException.asAddaxException(ILLEGAL_VALUE, "the fetchSize can not be less than 1.");
             }
             this.originalConfig.set(FETCH_SIZE, fetchSize);
 

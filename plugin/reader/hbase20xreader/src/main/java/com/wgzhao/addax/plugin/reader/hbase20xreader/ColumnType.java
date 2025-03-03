@@ -27,9 +27,6 @@ import java.util.Arrays;
 import static com.wgzhao.addax.common.spi.ErrorCode.NOT_SUPPORT_TYPE;
 import static com.wgzhao.addax.common.spi.ErrorCode.REQUIRED_VALUE;
 
-/**
- * 只对 normal 模式读取时有用，多版本读取时，不存在列类型的
- */
 public enum ColumnType
 {
     BOOLEAN("boolean"),
@@ -52,8 +49,7 @@ public enum ColumnType
     public static ColumnType getByTypeName(String typeName)
     {
         if (StringUtils.isBlank(typeName)) {
-            throw AddaxException.asAddaxException(REQUIRED_VALUE,
-                    String.format("Hbasereader 不支持该类型:%s, 目前支持的类型是:%s", typeName, Arrays.asList(values())));
+            throw AddaxException.asAddaxException(REQUIRED_VALUE, "The configuration item type is required ");
         }
         for (ColumnType columnType : values()) {
             if (StringUtils.equalsIgnoreCase(columnType.typeName, typeName.trim())) {
@@ -61,8 +57,7 @@ public enum ColumnType
             }
         }
 
-        throw AddaxException.asAddaxException(NOT_SUPPORT_TYPE,
-                String.format("Hbasereader 不支持该类型:%s, 目前支持的类型是:%s", typeName, Arrays.asList(values())));
+        throw AddaxException.asAddaxException(NOT_SUPPORT_TYPE, "The type '" + typeName + "' is not supported");
     }
 
     @Override

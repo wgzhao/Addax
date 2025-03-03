@@ -205,10 +205,9 @@ public class HttpReader
             else {
                 object = JSON.parse(body);
             }
-            // 需要判断返回的结果仅仅是一条记录还是多条记录，如果是一条记录，则是一个map
-            // 否则是一个array
+            // judge the result is a single record or multiple records
+            // if it is a single record, it is a map, otherwise it is an array
             if (object instanceof JSONArray) {
-                // 有空值的情况下, toString会过滤掉，所以不能简单的使用 object.toString()方式
                 // https://github.com/wgzhao/Addax/issues/171
                 jsonArray = JSON.parseArray(JSONObject.toJSONString(object, JSONWriter.Feature.WriteMapNullValue));
             }
@@ -230,7 +229,7 @@ public class HttpReader
             Record record;
             JSONObject jsonObject = jsonArray.getJSONObject(0);
             if (columns.size() == 1 && "*".equals(columns.get(0))) {
-                // 没有给定key的情况下，提取JSON的第一层key作为字段处理
+                // if no key is given, extract the first layer key of JSON as the field
                 columns.remove(0);
                 columns.addAll((Collection<String>) JSONPath.eval(jsonObject, "$.e.keySet()"));
             }

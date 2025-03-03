@@ -21,33 +21,32 @@ package com.wgzhao.addax.plugin.reader.httpreader;
 
 import com.wgzhao.addax.common.base.Key;
 
-public final class HttpKey extends Key
+public final class HttpKey
+        extends Key
 {
-    // 获取返回json的那个key值
+    // the key of the json result
     public static final String RESULT_KEY = "resultKey";
-    // 连接信息
+    // connection info
     public static final String CONNECTION = "connection";
-    // 配置连接代理
     public static final String PROXY = "proxy";
-    // 代理地址
+    // proxy host
     public static final String HOST = "host";
-    // 代理认证信息，格式为 username:password
+    // proxy auth, the format is username:password
     public static final String AUTH = "auth";
-    // 请求的地址
     public static final String URL = "url";
-    // 接口认证帐号
+    // api username for auth
     public static final String USERNAME = "username";
-    // 接口认证密码
+    // api password for auth
     public static final String PASSWORD = "password";
-    // 接口认证token
+    // or api token for auth
     public static final String TOKEN = "token";
-    // 接口请求参数
+    // api parameters
     public static final String REQUEST_PARAMETERS = "reqParams";
-    // 请求的定制头信息
+    // custom http headers
     public static final String HEADERS = "headers";
-    // 请求超时参数，单位为秒
+    // timeout in seconds
     public static final String TIMEOUT_SEC = "timeout";
-    // 请求方法，仅支持get，post两种模式
+    // request method , only support GET and POST
     public static final String METHOD = "method";
 
     public static final String IS_PAGE = "isPage";

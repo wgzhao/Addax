@@ -133,11 +133,11 @@ public class DFSUtil
     }
 
     /**
-     * 获取指定路径列表下符合条件的所有文件的绝对路径
+     * Gets all files in the specified source paths.
      *
-     * @param srcPaths 路径列表
-     * @param specifiedFileType 指定文件类型
-     * @return set of string
+     * @param srcPaths the list of source paths
+     * @param specifiedFileType the specified file type
+     * @return a set of all files in the source paths
      */
     public Set<String> getAllFiles(List<String> srcPaths, String specifiedFileType)
     {
@@ -170,7 +170,6 @@ public class DFSUtil
     {
         try {
             FileSystem hdfs = FileSystem.get(hadoopConf);
-            //判断hdfsPath是否包含正则符号
             if (hdfsPath.contains("*") || hdfsPath.contains("?")) {
                 Path path = new Path(hdfsPath);
                 FileStatus[] stats = hdfs.globStatus(path);
@@ -204,11 +203,10 @@ public class DFSUtil
 
         // If the network disconnected, this method will retry 45 times
         // each time the retry interval for 20 seconds
-        // 获取要读取的文件的根目录的所有二级子文件目录
         FileStatus[] stats = hdfs.listStatus(listFiles);
 
         for (FileStatus f : stats) {
-            // 判断是不是目录，如果是目录，递归调用
+            // if it is a directory, recursively call
             if (f.isDirectory()) {
                 LOG.info("The [{}] is directory, reading all files in the directory.", f.getPath());
                 getHDFSAllFilesNORegex(f.getPath().toString(), hdfs);

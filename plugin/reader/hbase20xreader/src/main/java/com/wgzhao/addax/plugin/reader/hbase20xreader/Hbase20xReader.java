@@ -86,7 +86,7 @@ public class Hbase20xReader
                     this.hbaseTaskProxy = new MultiVersionFixedColumnTask(taskConfig);
                     break;
                 default:
-                    throw AddaxException.asAddaxException(ILLEGAL_VALUE, "Hbasereader 不支持此类模式:" + modeType);
+                    throw AddaxException.asAddaxException(ILLEGAL_VALUE, "The mode '" + modeType + "' is not supported");
             }
         }
 

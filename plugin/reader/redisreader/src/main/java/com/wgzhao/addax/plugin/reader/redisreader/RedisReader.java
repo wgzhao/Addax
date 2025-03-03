@@ -149,32 +149,16 @@ public class RedisReader
 
         private static final Logger LOG = LoggerFactory.getLogger(Task.class);
 
-        /**
-         * 包含key正则
-         */
         private final List<Pattern> includePatterns = new ArrayList<>();
 
-        /**
-         * 排除key正则
-         */
         private final List<Pattern> excludePatterns = new ArrayList<>();
 
-        /**
-         * 包含DB
-         */
         private final Set<Integer> includeDB = new HashSet<>();
 
-        /**
-         * 记录redis 比较大的key 用于展示
-         */
         private final Map<String, Integer> bigKey = new TreeMap<>();
-        /**
-         * 用于记录数据类型分布
-         */
+
         private final Map<String, Long> collectTypeMap = new HashMap<>();
-        /**
-         * value达到64m阀值，将记录该key
-         */
+
         private int keyThresholdLength;
 
         @Override
@@ -208,10 +192,8 @@ public class RedisReader
                         byte[] value = dkv.getValue();
                         long expire = dkv.getExpiredMs() == null ? 0 : dkv.getExpiredMs();
 
-                        //记录较大的key
                         recordBigKey(dbNumber, rdbType, key, value);
 
-                        //记录数据类型
                         collectType(rdbType);
 
                         if (Task.this.matchDB((int) dbNumber) && Task.this.matchKey(key)) {
@@ -277,27 +259,6 @@ public class RedisReader
         @Override
         public void destroy()
         {
-            StringBuilder sb = new StringBuilder("Redis中较大的key:\n");
-
-            for (Map.Entry<String, Integer> entry : bigKey.entrySet()) {
-                sb.append(entry.getKey())
-                        .append("\t")
-                        .append(entry.getValue())
-                        .append("\n");
-            }
-
-            LOG.info(sb.toString());
-
-            sb = new StringBuilder("Redis数据类型分布:\n");
-
-            for (Map.Entry<String, Long> entry : collectTypeMap.entrySet()) {
-                sb.append(entry.getKey())
-                        .append("\t")
-                        .append(entry.getValue())
-                        .append("\n");
-            }
-
-            LOG.info(sb.toString());
         }
 
         private boolean matchKey(byte[] bytes)
@@ -325,19 +286,13 @@ public class RedisReader
             return false;
         }
 
-        /**
-         * 判断是否包含相关db
-         *
-         * @param db db index
-         * @return true if match else false
-         */
         private boolean matchDB(int db)
         {
             return this.includeDB.isEmpty() || this.includeDB.contains(db);
         }
 
         /**
-         * 通过sync命令远程下载redis server rdb文件
+         * download remote db via rsync
          *
          * @param hosts list of {@link HostAndPort}
          * @param mode redis running mode, cluster, master/slave, sentinel or cluster
@@ -345,10 +300,9 @@ public class RedisReader
          * @param masterName master name for sentinel mode
          * @param outFile file which dump to
          * @throws IOException file not found
-         * @throws URISyntaxException uri parser error
          */
         private void dump(List<HostAndPort> hosts, String mode, String auth, String masterName, File outFile)
-                throws IOException, URISyntaxException
+                throws IOException
         {
             LOG.info("mode = {}", mode);
             OutputStream out = new BufferedOutputStream(Files.newOutputStream(outFile.toPath()));

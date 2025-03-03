@@ -59,7 +59,7 @@ public class SybaseReader
 
             Integer userConfiguredFetchSize = this.originalConfig.getInt(Key.FETCH_SIZE);
             if (userConfiguredFetchSize == null || userConfiguredFetchSize < 1) {
-                LOG.warn("The plugin(SybaseReader) need to setup fetchSize to improve performance.");
+                LOG.warn("The plugin need to setup fetchSize to improve performance.");
                 this.originalConfig.set(Key.FETCH_SIZE, Constant.DEFAULT_FETCH_SIZE);
             }
 

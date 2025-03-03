@@ -367,7 +367,6 @@ public class KuduReader
                 specifyColumn = columns.size() != 1 || (!"*".equals(columns.get(0)) && !"\"*\"".equals(columns.get(0)));
             }
             where = readerSliceConfig.getListConfiguration(WHERE);
-//            processWhere(where);
         }
 
         private void processWhere(List<Configuration> where)

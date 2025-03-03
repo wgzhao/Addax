@@ -58,7 +58,7 @@ public class MysqlReader
 
             Integer userConfiguredFetchSize = this.originalConfig.getInt(Key.FETCH_SIZE);
             if (userConfiguredFetchSize != null) {
-                LOG.warn("The plugin(mysqlreader) not support fetchSize config, fetchSize will be forced to -1(ignore).");
+                LOG.warn("The plugin not support fetchSize config, fetchSize will be forced to -1(ignore).");
             }
 
             this.originalConfig.set(Key.FETCH_SIZE, Integer.MIN_VALUE);

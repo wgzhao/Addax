@@ -51,18 +51,6 @@ import static com.wgzhao.addax.common.spi.ErrorCode.REQUIRED_VALUE;
 public class HdfsReader
         extends Reader
 {
-
-    /**
-     * Job 中的方法仅执行一次，Task 中方法会由框架启动多个 Task 线程并行执行。
-     * <p>
-     * 整个 Reader 执行流程是：
-     * <pre>
-     * Job类init--&gt;prepare--&gt;split
-     * Task类init--&gt;prepare--&gt;startRead--&gt;post--&gt;destroy
-     * Task类init--&gt;prepare--&gt;startRead--&gt;post--&gt;destroy
-     * Job类post--&gt;destroy
-     * </pre>
-     */
     public static class Job
             extends Reader.Job
     {
@@ -197,7 +185,6 @@ public class HdfsReader
 
             LOG.info("split() begin...");
             List<Configuration> readerSplitConfigs = new ArrayList<>();
-            // warn:每个slice拖且仅拖一个文件,
             int splitNumber = sourceFiles.size();
             if (0 == splitNumber) {
                 throw AddaxException.asAddaxException(EXECUTE_FAIL,

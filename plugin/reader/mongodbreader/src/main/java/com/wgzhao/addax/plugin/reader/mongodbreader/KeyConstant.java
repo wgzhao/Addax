@@ -25,33 +25,18 @@ public class KeyConstant
         extends Key
 {
 
-    /**
-     * mongodb 的 host 地址
-     */
     public static final String MONGO_ADDRESS = "address";
 
     public static final String MONGO_AUTH_DB = "authDb";
-    /**
-     * mongodb 集合名
-     */
     public static final String MONGO_COLLECTION_NAME = "collection";
-    /**
-     * mongodb 查询条件
-     */
     public static final String MONGO_QUERY = "query";
 
     public static final String LOWER_BOUND = "lowerBound";
     public static final String UPPER_BOUND = "upperBound";
     public static final String IS_OBJECT_ID = "isObjectId";
 
-
-    /**
-     * MongoDB的_id
-     */
     public static final String MONGO_PRIMARY_ID = "_id";
-    /**
-     * MongoDB的错误码
-     */
+
     public static final int MONGO_UNAUTHORIZED_ERR_CODE = 13;
     public static final int MONGO_ILLEGAL_OP_ERR_CODE = 20;
     public static final int MONGO_COMMAND_NOT_FOUND_CODE = 59;
