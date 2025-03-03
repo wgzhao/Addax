@@ -2,6 +2,9 @@ package com.wgzhao.addax.plugin.writer.icebergwriter;
 
 import com.alibaba.fastjson2.JSON;
 import com.google.common.collect.ImmutableList;
+import com.google.common.collect.Maps;
+import com.google.common.collect.Sets;
+import com.google.common.primitives.Ints;
 import com.wgzhao.addax.common.element.Column;
 import com.wgzhao.addax.common.element.Record;
 import com.wgzhao.addax.common.plugin.RecordReceiver;
