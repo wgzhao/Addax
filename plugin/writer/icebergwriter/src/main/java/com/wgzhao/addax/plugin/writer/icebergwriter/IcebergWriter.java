@@ -2,29 +2,34 @@ package com.wgzhao.addax.plugin.writer.icebergwriter;
 
 import com.alibaba.fastjson2.JSON;
 import com.google.common.collect.ImmutableList;
+import com.google.common.collect.Maps;
+import com.google.common.collect.Sets;
+import com.google.common.primitives.Ints;
 import com.wgzhao.addax.common.element.Column;
 import com.wgzhao.addax.common.element.Record;
 import com.wgzhao.addax.common.plugin.RecordReceiver;
 import com.wgzhao.addax.common.spi.Writer;
 import com.wgzhao.addax.common.util.Configuration;
-import org.apache.iceberg.DataFile;
-import org.apache.iceberg.Table;
+import org.apache.iceberg.*;
 import org.apache.iceberg.catalog.Catalog;
 import org.apache.iceberg.catalog.TableIdentifier;
+import org.apache.iceberg.data.GenericAppenderFactory;
 import org.apache.iceberg.data.GenericRecord;
 import org.apache.iceberg.data.orc.GenericOrcWriter;
 import org.apache.iceberg.data.parquet.GenericParquetWriter;
 import org.apache.iceberg.hadoop.HadoopCatalog;
 import org.apache.iceberg.hive.HiveCatalog;
-import org.apache.iceberg.io.DataWriter;
-import org.apache.iceberg.io.OutputFile;
+import org.apache.iceberg.io.*;
 import org.apache.iceberg.orc.ORC;
 import org.apache.iceberg.parquet.Parquet;
+import org.apache.iceberg.types.TypeUtil;
 import org.apache.iceberg.types.Types;
+import org.apache.iceberg.util.PropertyUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
+import java.io.UncheckedIOException;
 import java.util.*;
 
 
@@ -268,39 +273,105 @@ public class IcebergWriter extends Writer {
 
                 builder.add(data);
             }
+            ImmutableList<GenericRecord> rows = builder.build();
 
             String filepath = table.location() + "/" + UUID.randomUUID();
             OutputFile file = table.io().newOutputFile(filepath);
 
-            DataWriter<GenericRecord> dataWriter = null;
+            if(table.spec()==null) {
+                DataWriter<GenericRecord> dataWriter = null;
 
-            if ("parquet".equals(fileFormat)) {
-                try {
-                    dataWriter = Parquet.writeData(file).overwrite().forTable(table).createWriterFunc(GenericParquetWriter::buildWriter).build();
-                } catch (IOException e) {
-                    throw new RuntimeException(e);
+                if ("parquet".equals(fileFormat)) {
+                    try {
+                        dataWriter = Parquet.writeData(file).overwrite().forTable(table).createWriterFunc(GenericParquetWriter::buildWriter).build();
+                    } catch (IOException e) {
+                        throw new RuntimeException(e);
+                    }
+                } else if ("orc".equals(fileFormat)) {
+                    dataWriter = ORC.writeData(file).overwrite().forTable(table).createWriterFunc(GenericOrcWriter::buildWriter).build();
+                } else {
+                    throw new RuntimeException("不支持的文件格式:" + fileFormat);
                 }
-            } else if ("orc".equals(fileFormat)) {
-                dataWriter = ORC.writeData(file).overwrite().forTable(table).createWriterFunc(GenericOrcWriter::buildWriter).build();
+
+
+                if (dataWriter != null) {
+                    dataWriter.write(rows);
+                }
+
+
+                if (dataWriter != null) {
+                    try {
+                        dataWriter.close();
+                    } catch (IOException e) {
+                        throw new RuntimeException(e);
+                    }
+                }
+                DataFile dataFile = dataWriter.toDataFile();
+                table.newAppend().appendFile(dataFile).commit();
             } else {
-                throw new RuntimeException("不支持的文件格式:" + fileFormat);
-            }
-            ImmutableList<GenericRecord> rows = builder.build();
+                Map<String, String> tableProps = Maps.newHashMap(table.properties());
+                long targetFileSize =
+                        PropertyUtil.propertyAsLong(
+                                tableProps,
+                                TableProperties.WRITE_TARGET_FILE_SIZE_BYTES,
+                                TableProperties.WRITE_TARGET_FILE_SIZE_BYTES_DEFAULT);
 
-            if (dataWriter != null) {
-                dataWriter.write(rows);
-            }
+                int partitionId = 1, taskId = 1;
+                FileFormat fileFormat= FileFormat.PARQUET;
+                if("orc".equals(fileFormat)){
+                    fileFormat= FileFormat.ORC;
+                }
+                Set<Integer> identifierFieldIds = table.schema().identifierFieldIds();
+                FileAppenderFactory<org.apache.iceberg.data.Record> appenderFactory;
+                if (identifierFieldIds == null || identifierFieldIds.isEmpty()) {
+                    appenderFactory =
+                            new GenericAppenderFactory(table.schema(), table.spec(), null, null, null)
+                                    .setAll(tableProps);
+                } else {
+                    appenderFactory =
+                            new GenericAppenderFactory(
+                                    table.schema(),
+                                    table.spec(),
+                                    Ints.toArray(identifierFieldIds),
+                                    TypeUtil.select(table.schema(), Sets.newHashSet(identifierFieldIds)),
+                                    null)
+                                    .setAll(tableProps);
+                }
+                OutputFileFactory outputFileFactory = OutputFileFactory.builderFor(table, partitionId, taskId).format(fileFormat).build();
+                final PartitionKey partitionKey = new PartitionKey(table.spec(), table.spec().schema());
+                // partitionedFanoutWriter will auto partitioned record and create the partitioned writer
+                PartitionedFanoutWriter<org.apache.iceberg.data.Record> partitionedFanoutWriter = new PartitionedFanoutWriter<org.apache.iceberg.data.Record>(table.spec(), fileFormat, appenderFactory, outputFileFactory, table.io(), targetFileSize) {
+                    @Override
+                    protected PartitionKey partition(org.apache.iceberg.data.Record record) {
+                        partitionKey.partition(record);
+                        return partitionKey;
+                    }
+                };
 
-
-            if (dataWriter != null) {
+                rows.forEach(
+                        row -> {
+                            try {
+                                partitionedFanoutWriter.write(row);
+                            } catch (IOException e) {
+                                throw new UncheckedIOException(e);
+                            }
+                        });
                 try {
-                    dataWriter.close();
+                    WriteResult writeResult =partitionedFanoutWriter.complete();
+
+                    AppendFiles appends = table.newAppend();
+                    Arrays.stream(writeResult.dataFiles()).forEach(appends::appendFile);
+                    appends.commit();
+
+                } catch (IOException e) {
+                    throw new RuntimeException(e);
+                }
+                try {
+                    partitionedFanoutWriter.close();
                 } catch (IOException e) {
                     throw new RuntimeException(e);
                 }
             }
-            DataFile dataFile = dataWriter.toDataFile();
-            table.newAppend().appendFile(dataFile).commit();
             return rows.size();
         }
     }
