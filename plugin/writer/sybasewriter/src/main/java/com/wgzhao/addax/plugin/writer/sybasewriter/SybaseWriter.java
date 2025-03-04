@@ -50,8 +50,7 @@ public class SybaseWriter
             String writeMode = this.originalConfig.getString(Key.WRITE_MODE);
             if (null != writeMode) {
                 if (!"insert".equalsIgnoreCase(writeMode) && !writeMode.startsWith("update")) {
-                    throw AddaxException.asAddaxException(CONFIG_ERROR,
-                            String.format("The writeMode '%s' is illegal, Only insert, update are supported.", writeMode));
+                    throw AddaxException.asAddaxException(CONFIG_ERROR, "The write mode " + writeMode + " is not supported by Sybase writer.");
                 }
             }
 

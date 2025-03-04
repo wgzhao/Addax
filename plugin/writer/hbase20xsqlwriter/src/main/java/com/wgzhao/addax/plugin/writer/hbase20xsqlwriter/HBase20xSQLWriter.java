@@ -81,7 +81,7 @@ public class HBase20xSQLWriter
         @Override
         public void destroy()
         {
-            // 不需要close
+            //
         }
     }
 }

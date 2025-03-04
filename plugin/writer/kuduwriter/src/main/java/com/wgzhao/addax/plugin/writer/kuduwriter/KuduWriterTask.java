@@ -86,7 +86,6 @@ public class KuduWriterTask
         Record record;
         int commit = 0;
         final Schema schema = this.table.getSchema();
-//        List<String> columnNames = KuduHelper.getColumnNames(columns);
         while ((record = lineReceiver.getFromReader()) != null) {
             if (record.getColumnNumber() != columns.size()) {
                 throw AddaxException.asAddaxException(CONFIG_ERROR,

@@ -29,9 +29,7 @@ import static com.wgzhao.addax.common.spi.ErrorCode.REQUIRED_VALUE;
 
 public final class ESKey
 {
-    // ----------------------------------------
-    //  类型定义 主键字段定义
-    // ----------------------------------------
+
     public static final String PRIMARY_KEY_COLUMN_NAME = "pk";
 
     private ESKey() {}

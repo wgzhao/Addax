@@ -92,15 +92,12 @@ public class StreamWriter
         private void validateParameter(String path, String fileName)
         {
             try {
-                // warn: 这里用户需要配一个目录
                 File dir = new File(path);
                 if (dir.isFile()) {
                     throw AddaxException
                             .asAddaxException(
                                     ILLEGAL_VALUE,
-                                    String.format(
-                                            "您配置的path: [%s] 不是一个合法的目录, 请您注意文件重名, 不合法目录名等情况.",
-                                            path));
+                                   "The path you configured is a file, not a directory.");
                 }
                 if (!dir.exists()) {
                     boolean createdOk = dir.mkdirs();
@@ -108,8 +105,7 @@ public class StreamWriter
                         throw AddaxException
                                 .asAddaxException(
                                         CONFIG_ERROR,
-                                        String.format("您指定的文件路径 : [%s] 创建失败.",
-                                                path));
+                                        "Failed to create directory: " + path);
                     }
                 }
 
@@ -122,14 +118,14 @@ public class StreamWriter
                     catch (IOException e) {
                         throw AddaxException.asAddaxException(
                                 IO_ERROR,
-                                String.format("删除文件失败 : [%s] ", fileFullPath), e);
+                                "Failed to delete file: ", e);
                     }
                 }
             }
             catch (SecurityException se) {
                 throw AddaxException.asAddaxException(
                         PERMISSION_ERROR,
-                        String.format("您没有权限创建文件路径 : [%s] ", path), se);
+                        "The permission is denied to create file", se);
             }
         }
 

@@ -185,7 +185,6 @@ public class TextWriter
                         }
                     }
                     catch (Exception e) {
-                        // warn: 此处认为脏数据
                         logger.warn("Warn: convert field[{}] from [{}] to [{}] error.",
                                 columnsConfiguration.get(i).getString(Key.NAME),
                                 column.getRawData(), columnType);

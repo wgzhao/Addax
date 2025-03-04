@@ -265,9 +265,6 @@ public class ESClient
         return rst;
     }
 
-    /**
-     * 关闭JestClient客户端
-     */
     public void closeJestClient()
     {
         if (jestClient != null) {

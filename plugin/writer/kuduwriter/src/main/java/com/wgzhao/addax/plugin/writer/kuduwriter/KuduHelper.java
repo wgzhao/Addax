@@ -96,7 +96,7 @@ public class KuduHelper
             }
         }
         catch (KuduException e) {
-            LOG.warn("The \"kudu client\" was not stopped gracefully. !");
+            LOG.warn("The kudu client was not stopped gracefully. !");
         }
     }
 

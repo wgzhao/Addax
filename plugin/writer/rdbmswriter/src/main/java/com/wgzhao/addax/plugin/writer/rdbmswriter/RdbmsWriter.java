@@ -133,7 +133,6 @@ public class RdbmsWriter
     }
 
     static {
-        // 加载插件下面配置的驱动类
         DBUtil.loadDriverClass("writer", "rdbms");
     }
 }

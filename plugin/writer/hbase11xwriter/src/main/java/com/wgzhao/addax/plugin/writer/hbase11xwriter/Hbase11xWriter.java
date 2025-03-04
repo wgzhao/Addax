@@ -30,10 +30,6 @@ import java.util.List;
 
 import static com.wgzhao.addax.common.spi.ErrorCode.ILLEGAL_VALUE;
 
-/**
- * Hbase11xWriter
- * Created by shf on 16/3/17.
- */
 public class Hbase11xWriter
         extends Writer
 {

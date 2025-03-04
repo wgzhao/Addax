@@ -57,12 +57,9 @@ public class MysqlWriter
             this.commonRdbmsWriterJob.init(this.originalConfig);
         }
 
-        // 一般来说，是需要推迟到 task 中进行pre 的执行（单表情况例外）
         @Override
         public void prepare()
         {
-            //实跑先不支持 权限 检验
-//            this.commonRdbmsWriterJob.privilegeValid(this.originalConfig, DATABASE_TYPE)
             this.commonRdbmsWriterJob.prepare(this.originalConfig);
         }
 
@@ -72,7 +69,6 @@ public class MysqlWriter
             return this.commonRdbmsWriterJob.split(this.originalConfig, mandatoryNumber);
         }
 
-        // 一般来说，是需要推迟到 task 中进行post 的执行（单表情况例外）
         @Override
         public void post()
         {
@@ -135,7 +131,6 @@ public class MysqlWriter
             this.commonRdbmsWriterTask.prepare(this.writerSliceConfig);
         }
 
-        //TODO 改用连接池，确保每次获取的连接都是可用的（注意：连接可能需要每次都初始化其 session）
         public void startWrite(RecordReceiver recordReceiver)
         {
             this.commonRdbmsWriterTask.startWrite(recordReceiver, this.writerSliceConfig,

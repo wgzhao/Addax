@@ -44,7 +44,6 @@ public enum NullModeType
                 return modeType;
             }
         }
-        throw AddaxException.asAddaxException(NOT_SUPPORT_TYPE,
-                "Hbasewriter 不支持该 nullMode 类型:" + modeName + ", 目前支持的 nullMode 类型是:" + Arrays.asList(values()));
+        throw AddaxException.asAddaxException(NOT_SUPPORT_TYPE, "The nullMode " + modeName + " is unsupported. ");
     }
 }

@@ -130,13 +130,6 @@ public class HdfsHelper
         }
     }
 
-    /**
-     * 获取指定目录下的文件列表
-     *
-     * @param dir 需要搜索的目录
-     * @return 文件数组，文件是全路径，
-     * eg：hdfs://10.101.204.12:9000/user/hive/warehouse/writer.db/text/test.txt
-     */
     public Path[] hdfsDirList(String dir)
     {
         Path path = new Path(dir);
@@ -253,7 +246,6 @@ public class HdfsHelper
         LOG.info("Finish moving file(s).");
     }
 
-    //关闭FileSystem
     public void closeFileSystem()
     {
         try {
@@ -265,7 +257,6 @@ public class HdfsHelper
         }
     }
 
-    // compress 已经转为大写
     public Class<? extends CompressionCodec> getCompressCodec(String compress)
     {
         compress = compress.toUpperCase();

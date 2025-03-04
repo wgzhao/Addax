@@ -57,9 +57,7 @@ public class PostgresqlWriter
                         && !writeMode.startsWith("update")) {
                     throw AddaxException.asAddaxException(
                             ILLEGAL_VALUE,
-                            String.format("写入模式(writeMode)配置错误. PostgreSQL 仅支持insert, update两种模式." +
-                                            " %s 不支持",
-                                    writeMode));
+                            "The writeMode should be insert or update or updateAndInsert, but not : " + writeMode);
                 }
             }
 

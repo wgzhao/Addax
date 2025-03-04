@@ -61,9 +61,6 @@ import static com.wgzhao.addax.common.spi.ErrorCode.PERMISSION_ERROR;
 import static com.wgzhao.addax.common.spi.ErrorCode.REQUIRED_VALUE;
 import static com.wgzhao.addax.common.spi.ErrorCode.RUNTIME_ERROR;
 
-/**
- * Created by haiwei.luo on 14-9-17.
- */
 public class TxtFileWriter
         extends Writer
 {
@@ -101,7 +98,7 @@ public class TxtFileWriter
             if (dir.isFile()) {
                 throw AddaxException.asAddaxException(
                         CONFIG_ERROR,
-                        String.format("The path [%s] is a file, not a directory.", path));
+                        "You need to set the path to a directory, but you set it to a file: " + path);
             }
 
             if (!dir.exists() && !dir.mkdirs()) {

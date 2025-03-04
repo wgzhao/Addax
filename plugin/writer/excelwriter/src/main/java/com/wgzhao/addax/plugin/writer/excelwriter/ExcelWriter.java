@@ -60,7 +60,6 @@ public class ExcelWriter
                 this.conf.set(FILE_NAME, fileName + ".xlsx");
             }
             try {
-                // warn: 这里用户需要配一个目录
                 File dir = new File(path);
                 if (dir.isFile()) {
                     throw AddaxException.asAddaxException(ILLEGAL_VALUE, path + " is normal file instead of directory");

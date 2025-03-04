@@ -143,7 +143,7 @@ public class KuduWriter
                 }
             }
             catch (Exception e) {
-                LOG.warn("The \"kudu session\" was not stopped gracefully !");
+                LOG.warn("The kudu session was not closed gracefully !");
             }
             kuduTaskProxy.close();
         }

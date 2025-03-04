@@ -219,7 +219,6 @@ public class PaimonWriter
                     }
                     String columnName = columnList.get(i).name();
                     DataType columnType = typeList.get(i);
-                    //如果是数组类型，那它传入的必是字符串类型
                     if (columnType.getTypeRoot().equals(DataTypeRoot.ARRAY)) {
                         if (null == column.asString()) {
                             data.setField(i, null);
@@ -284,11 +283,11 @@ public class PaimonWriter
                                     data.setField(i, new GenericMap(JSON.parseObject(column.asString(), Map.class)));
                                 }
                                 catch (Exception e) {
-                                    getTaskPluginCollector().collectDirtyRecord(record, String.format("MAP类型解析失败 [%s:%s] exception: %s", columnName, column.toString(), e));
+                                    getTaskPluginCollector().collectDirtyRecord(record, "failed to parse the '" + column.asString() + "' to map: " + e);
                                 }
                                 break;
                             default:
-                                getTaskPluginCollector().collectDirtyRecord(record, "类型错误:不支持的类型:" + columnType + " " + columnName);
+                                getTaskPluginCollector().collectDirtyRecord(record, "The column type is not supported: " + columnType.getTypeRoot());
                         }
                     }
                 }

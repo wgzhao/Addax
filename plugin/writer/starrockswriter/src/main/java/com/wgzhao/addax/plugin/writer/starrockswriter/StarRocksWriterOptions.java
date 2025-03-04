@@ -168,8 +168,7 @@ public class StarRocksWriterOptions
         List<String> urlList = getLoadUrlList();
         for (String host : urlList) {
             if (host.split(":").length < 2) {
-                throw AddaxException.asAddaxException(CONFIG_ERROR,
-                        "loadUrl的格式不正确，请输入 `fe_ip:fe_http_ip;fe_ip:fe_http_ip`。");
+                throw AddaxException.asAddaxException(CONFIG_ERROR, "The loadUrl format is incorrect, please input 'fe_ip:fe_http_ip;fe_ip:fe_http_ip'.");
             }
         }
     }

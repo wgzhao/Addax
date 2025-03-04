@@ -108,7 +108,7 @@ public class DefaultDataHandler
         int affectedRows = 0;
 
         try (Connection conn = DriverManager.getConnection(jdbcUrl, username, password)) {
-            LOG.info("connection[ jdbcUrl: " + jdbcUrl + ", username: " + username + "] established.");
+            LOG.info(" jdbcUrl: {}, username: {} is established", jdbcUrl, username);
             // prepare table_name -> table_meta
             this.schemaManager = new SchemaManager(conn);
             this.tableMetas = schemaManager.loadTableMeta(tables);
@@ -138,23 +138,22 @@ public class DefaultDataHandler
         }
 
         if (affectedRows != count) {
-            LOG.error("write record missing or incorrect happened, affectedRows: " + affectedRows + ", total: " + count);
+            LOG.error("write record missing or incorrect happened, affectedRows: {}, total: {}", affectedRows, count);
         }
 
         return affectedRows;
     }
 
     /**
-     * table: [ "stb1", "stb2", "tb1", "tb2", "t1" ]
+     * Table types: [ "stb1", "stb2", "tb1", "tb2", "t1" ]
      * stb1[ts,f1,f2] tags:[t1]
      * stb2[ts,f1,f2,f3] tags:[t1,t2]
-     * 1. tables 表的的类型分成：stb(super table)/tb(sub table)/t(original table)
-     * 2. 对于stb，自动建表/schemaless
-     * 2.1: data中有tbname字段, 例如：data: [ts, f1, f2, f3, t1, t2, tbname] tbColumn: [ts, f1, f2, t1] =&gt; insert into tbname using stb1 tags
-     * (t1) values(ts, f1, f2)
-     * 2.2: data中没有tbname字段，例如：data: [ts, f1, f2, f3, t1, t2] tbColumn: [ts, f1, f2, t1] =&gt; schemaless: stb1,t1=t1 f1=f1,f2=f2 ts, 没有批量写
-     * 3. 对于tb，拼sql，例如：data: [ts, f1, f2, f3, t1, t2] tbColumn: [ts, f1, f2, t1] =&gt; insert into tb(ts, f1, f2) values(ts, f1, f2)
-     * 4. 对于t，拼sql，例如：data: [ts, f1, f2, f3, t1, t2] tbColumn: [ts, f1, f2, f3, t1, t2] insert into t(ts, f1, f2, f3, t1, t2) values(ts, f1, f2, f3, t1, t2)
+     * 1. Table types are divided into: stb (super table), tb (sub table), t (original table)
+     * 2. For stb, create table automatically/schemaless
+     * 2.1: If data contains the tbname field, e.g., data: [ts, f1, f2, f3, t1, t2, tbname], tbColumn: [ts, f1, f2, t1] => insert into tbname using stb1 tags (t1) values(ts, f1, f2)
+     * 2.2: If data does not contain the tbname field, e.g., data: [ts, f1, f2, f3, t1, t2], tbColumn: [ts, f1, f2, t1] => schemaless: stb1,t1=t1 f1=f1,f2=f2 ts, no batch write
+     * 3. For tb, construct SQL, e.g., data: [ts, f1, f2, f3, t1, t2], tbColumn: [ts, f1, f2, t1] => insert into tb(ts, f1, f2) values(ts, f1, f2)
+     * 4. For t, construct SQL, e.g., data: [ts, f1, f2, f3, t1, t2], tbColumn: [ts, f1, f2, f3, t1, t2] => insert into t(ts, f1, f2, f3, t1, t2) values(ts, f1, f2, f3, t1, t2)
      *
      * @param conn {@link Connection}
      * @param recordBatch list of {@link Record}
@@ -315,7 +314,6 @@ public class DefaultDataHandler
                         return !colMeta.isTag && !colMeta.isPrimaryKey;
                     }).map(colMeta -> {
                         return colMeta.field + "=" + buildSchemalessColumnValue(colMeta, record);
-//                        return colMeta.field + "=" + record.getColumn(indexOf(colMeta.field)).asString();
                     }).collect(Collectors.joining(",")))
                     .append(" ");
             // timestamp

@@ -175,11 +175,11 @@ public class SftpHelperImpl
             isDirExist = sftpATTRS.isDir();
         }
         catch (SftpException e) {
-            LOG.info(String.format("正在逐级创建目录 [%s]", directoryPath));
+            LOG.info("creating folder {}", directoryPath);
             this.channelSftp.mkdir(directoryPath);
         }
         if (!isDirExist) {
-            LOG.info(String.format("正在逐级创建目录 [%s]", directoryPath));
+            LOG.info("creating folder {}", directoryPath);
             this.channelSftp.mkdir(directoryPath);
         }
     }
@@ -193,16 +193,13 @@ public class SftpHelperImpl
             this.channelSftp.cd(parentDir);
             this.printWorkingDirectory();
             OutputStream writeOutputStream = this.channelSftp.put(filePath, ChannelSftp.APPEND);
-            String message = String.format("打开FTP文件[%s]获取写出流时出错,请确认文件%s有权限创建，有权限写出等", filePath, filePath);
             if (null == writeOutputStream) {
-                throw AddaxException.asAddaxException(IO_ERROR, message);
+                throw AddaxException.asAddaxException(IO_ERROR, "failed to write file " + filePath);
             }
             return writeOutputStream;
         }
         catch (SftpException e) {
-            String message = String.format("写出文件[%s] 时出错,请确认文件%s有权限写出, errorMessage:%s", filePath, filePath, e.getMessage());
-            LOG.error(message);
-            throw AddaxException.asAddaxException(IO_ERROR, message);
+            throw AddaxException.asAddaxException(IO_ERROR, "failed to write file " + filePath);
         }
     }
 
@@ -222,9 +219,7 @@ public class SftpHelperImpl
             return result;
         }
         catch (SftpException e) {
-            String message = String.format("写出文件[%s] 时出错,请确认文件%s有权限写出, errorMessage:%s", filePath, filePath, e.getMessage());
-            LOG.error(message);
-            throw AddaxException.asAddaxException(IO_ERROR, message);
+            throw AddaxException.asAddaxException(IO_ERROR, "failed to write file " + filePath);
         }
     }
 
@@ -236,8 +231,7 @@ public class SftpHelperImpl
             this.printWorkingDirectory();
             @SuppressWarnings("rawtypes")
             Vector allFiles = this.channelSftp.ls(dir);
-            LOG.debug(String.format("ls: %s", JSON.toJSONString(allFiles,
-                    JSONWriter.Feature.UseSingleQuotes)));
+            LOG.debug("list files: {}", JSON.toJSONString(allFiles, JSONWriter.Feature.UseSingleQuotes));
             for (Object allFile : allFiles) {
                 LsEntry le = (LsEntry) allFile;
                 String strName = le.getFilename();
@@ -247,10 +241,7 @@ public class SftpHelperImpl
             }
         }
         catch (SftpException e) {
-            String message = String.format("获取path:[%s] 下文件列表时发生I/O异常,请确认与ftp服务器的连接正常,拥有目录ls权限, errorMessage:%s",
-                    dir, e.getMessage());
-            LOG.error(message);
-            throw AddaxException.asAddaxException(IO_ERROR, message, e);
+            throw AddaxException.asAddaxException(IO_ERROR, "failed to list files in " + dir, e);
         }
         return allFilesWithPointedPrefix;
     }
@@ -262,28 +253,24 @@ public class SftpHelperImpl
         try {
             this.printWorkingDirectory();
             for (String each : filesToDelete) {
-                LOG.info(String.format("delete file [%s].", each));
+                LOG.info("delete file {}", each);
                 eachFile = each;
                 this.channelSftp.rm(each);
             }
         }
         catch (SftpException e) {
-            String message = String.format(
-                    "删除文件:[%s] 时发生异常,请确认指定文件有删除权限,以及网络交互正常, errorMessage:%s",
-                    eachFile, e.getMessage());
-            LOG.error(message);
             throw AddaxException.asAddaxException(
-                    IO_ERROR, message, e);
+                    IO_ERROR, "failed to delete file " + eachFile, e);
         }
     }
 
     private void printWorkingDirectory()
     {
         try {
-            LOG.info(String.format("current working directory:%s", channelSftp.pwd()));
+            LOG.info("current working directory {}", channelSftp.pwd());
         }
-        catch (Exception e) {
-            LOG.warn(String.format("printWorkingDirectory error:%s", e.getMessage()));
+        catch (SftpException e) {
+            LOG.error("failed to print current working directory", e);
         }
     }
 

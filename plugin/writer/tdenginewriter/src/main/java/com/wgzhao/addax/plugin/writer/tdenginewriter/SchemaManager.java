@@ -161,7 +161,7 @@ public class SchemaManager
                     }
                 }
                 catch (SQLException e) {
-                    e.printStackTrace();
+                    LOG.error("failed to get tag value of {} from {}: {}", colMeta.field, table, e);
                 }
                 colMeta.value = value;
             });
@@ -196,7 +196,7 @@ public class SchemaManager
         tableMeta.columns = rs.getInt("columns");
         tableMeta.stable_name = StringUtils.isBlank(stable_name) ? null : stable_name;
 
-        LOG.debug("load table metadata of " + tableMeta.tbname + ": " + tableMeta);
+        LOG.debug("load table metadata of {}: {}", tableMeta.tbname, tableMeta);
         return tableMeta;
     }
 

@@ -49,9 +49,6 @@ public class HBase20xSQLHelper
     public static final String PHOENIX_JDBC_THIN_DRIVER = "org.apache.phoenix.queryserver.client.Driver";
     // phoenix jdbc driver name
     public static final String PHOENIX_JDBC_THICK_DRIVER = "org.apache.phoenix.jdbc.PhoenixDriver";
-    /*
-     * 从系统表查找配置表信息
-     */
     public static final String SELECT_CATALOG_TABLE_STRING = "SELECT COLUMN_NAME FROM SYSTEM.CATALOG WHERE TABLE_NAME='%s' AND COLUMN_NAME IS NOT NULL";
     private static final Logger LOG = LoggerFactory.getLogger(HBase20xSQLHelper.class);
 
@@ -62,11 +59,9 @@ public class HBase20xSQLHelper
      */
     public static void validateParameter(Configuration originalConfig)
     {
-        // 表名和queryserver地址必须配置，否则抛异常
         String tableName = originalConfig.getNecessaryValue(HBaseKey.TABLE, REQUIRED_VALUE);
         String jdbcUrl = originalConfig.getNecessaryValue(HBaseKey.JDBC_URL, REQUIRED_VALUE);
         boolean isThinMode = jdbcUrl.contains(":thin:");
-        // 序列化格式，可不配置，默认PROTOBUF
         String serialization = originalConfig.getString(HBaseKey.SERIALIZATION_NAME, HBaseConstant.DEFAULT_SERIALIZATION);
         String connStr = jdbcUrl;
         if (isThinMode) {
@@ -83,7 +78,6 @@ public class HBase20xSQLHelper
                 connStr = connStr + ":" + principal + ":" + keytab;
             }
         }
-        // 校验jdbc连接是否正常
         Connection conn;
         if (jdbcUrl.contains(":thin:")) {
              conn = getClientConnection(connStr, PHOENIX_JDBC_THIN_DRIVER);
@@ -94,18 +88,14 @@ public class HBase20xSQLHelper
         List<String> columnNames = originalConfig.getList(HBaseKey.COLUMN, String.class);
         if (columnNames == null || columnNames.isEmpty()) {
             throw AddaxException.asAddaxException(
-                    CONFIG_ERROR, "HBase的columns配置不能为空,请添加目标表的列名配置.");
+                    CONFIG_ERROR, "The column configuration is empty, please check the configuration.");
         }
         String schema = originalConfig.getString(HBaseKey.SCHEMA);
-        // 检查表以及配置列是否存在
         checkTable(conn, schema, tableName, columnNames);
         // rewrite queryServerAddress with extra properties
         originalConfig.set(HBaseKey.QUERY_SERVER_ADDRESS, connStr);
     }
 
-    /*
-     * 获取JDBC连接，轻量级连接，使用完后必须显式close
-     */
     public static Connection getClientConnection(String connStr, String driverName)
     {
         LOG.debug("Connecting to QueryServer [{}] ...", connStr);
@@ -116,8 +106,7 @@ public class HBase20xSQLHelper
             conn.setAutoCommit(false);
         }
         catch (Throwable e) {
-            throw AddaxException.asAddaxException(CONNECT_ERROR,
-                    "无法连接QueryServer，配置不正确或服务未启动，请检查配置和服务状态或者联系HBase管理员.", e);
+            throw AddaxException.asAddaxException(CONNECT_ERROR, "Failed to connect the QueryServer", e);
         }
         LOG.debug("Connected to QueryServer successfully.");
         return conn;
@@ -146,24 +135,19 @@ public class HBase20xSQLHelper
                 allColumns.add(rs.getString(1));
             }
             else {
-                LOG.error("表 {} 不存在，请检查表名是否正确或是否已创建. {}", tableName, CONFIG_ERROR);
-                throw AddaxException.asAddaxException(CONFIG_ERROR,
-                        tableName + "表不存在，请检查表名是否正确或是否已创建.");
+                throw AddaxException.asAddaxException(CONFIG_ERROR, "The table " + tableName + " does not exist, please check the configuration.");
             }
             while (rs.next()) {
                 allColumns.add(rs.getString(1));
             }
             for (String columnName : columnNames) {
                 if (!allColumns.contains(columnName)) {
-                    // 用户配置的列名在元数据中不存在
-                    throw AddaxException.asAddaxException(ILLEGAL_VALUE,
-                            "您配置的列" + columnName + "在目的表" + tableName + "的元数据中不存在，请检查您的配置或者联系HBase管理员.");
+                    throw AddaxException.asAddaxException(ILLEGAL_VALUE, "The column " + columnName + " does not exists in the table " + tableName);
                 }
             }
         }
-        catch (SQLException t) {
-            throw AddaxException.asAddaxException(EXECUTE_FAIL,
-                    "获取表" + tableName + "信息失败，请检查您的集群和表状态或者联系HBase管理员.", t);
+        catch (SQLException e) {
+            throw AddaxException.asAddaxException(EXECUTE_FAIL,"Failed to get the table information of " + tableName, e);
         }
         finally {
             closeJdbc(conn, st, rs);
@@ -193,7 +177,7 @@ public class HBase20xSQLHelper
             }
         }
         catch (SQLException e) {
-            LOG.warn("数据库连接关闭异常. {}", EXECUTE_FAIL);
+            LOG.warn("Failed to close the jdbc connection", e);
         }
     }
 

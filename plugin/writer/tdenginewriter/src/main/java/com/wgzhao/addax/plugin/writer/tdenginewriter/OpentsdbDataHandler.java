@@ -60,7 +60,6 @@ public class OpentsdbDataHandler
     {
         int count;
         try (Connection conn = DriverManager.getConnection(jdbcUrl, user, password)) {
-            LOG.info("connection[ jdbcUrl: " + jdbcUrl + ", username: " + user + "] established.");
             writer = new SchemalessWriter(conn);
             count = write(lineReceiver, batchSize);
         }
@@ -81,7 +80,7 @@ public class OpentsdbDataHandler
             while ((record = lineReceiver.getFromReader()) != null) {
                 if (batchSize == 1) {
                     String jsonData = recordToString(record);
-                    LOG.debug(">>> " + jsonData);
+                    LOG.debug(">>> {} ", jsonData);
                     writer.write(jsonData, SchemalessProtocolType.JSON, SchemalessTimestampType.NOT_CONFIGURED);
                 }
                 else if (recordIndex % batchSize == 1) {
@@ -90,7 +89,7 @@ public class OpentsdbDataHandler
                 else if (recordIndex % batchSize == 0) {
                     sb.append(recordToString(record)).append("]");
                     String jsonData = sb.toString();
-                    LOG.debug(">>> " + jsonData);
+                    LOG.debug(">>> {}", jsonData);
                     writer.write(jsonData, SchemalessProtocolType.JSON, SchemalessTimestampType.NOT_CONFIGURED);
                     sb.delete(0, sb.length());
                 }
@@ -102,7 +101,7 @@ public class OpentsdbDataHandler
             if (sb.length() != 0 && sb.charAt(0) == '[') {
                 String jsonData = sb.deleteCharAt(sb.length() - 1).append("]").toString();
                 System.err.println(jsonData);
-                LOG.debug(">>> " + jsonData);
+                LOG.debug(">>> {}" , jsonData);
                 writer.write(jsonData, SchemalessProtocolType.JSON, SchemalessTimestampType.NOT_CONFIGURED);
             }
         }

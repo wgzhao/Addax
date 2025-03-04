@@ -73,10 +73,6 @@ public class ESWriter
         @Override
         public void prepare()
         {
-            /*
-             * 注意：此方法仅执行一次。
-             * 最佳实践：如果 Job 中有需要进行数据同步之前的处理，可以在此处完成，如果没有必要则可以直接去掉。
-             */
             ESClient esClient = new ESClient();
             esClient.createClient(ESKey.getEndpoint(conf),
                     ESKey.getAccessID(conf),
@@ -100,7 +96,6 @@ public class ESWriter
                 if (ESKey.isCleanup(this.conf) && isIndicesExists) {
                     esClient.deleteIndex(indexName);
                 }
-                // 强制创建,内部自动忽略已存在的情况
                 if (!esClient.createIndex(indexName, typeName, mappings, settings, dynamic)) {
                     throw new IOException("create index or mapping failed");
                 }
@@ -134,7 +129,7 @@ public class ESWriter
                     ESColumn columnItem = new ESColumn();
 
                     if (colName.equals(ESKey.PRIMARY_KEY_COLUMN_NAME)) {
-                        // 兼容已有版本
+                        // compatible with old addax version
                         colType = ESFieldType.ID;
                         colTypeStr = "id";
                     }
@@ -144,7 +139,6 @@ public class ESWriter
 
                     if (colType == ESFieldType.ID) {
                         columnList.add(columnItem);
-                        // 如果是id,则properties为空
                         continue;
                     }
 
@@ -162,7 +156,7 @@ public class ESWriter
 
                     switch (colType) {
                         case STRING:
-                            // 兼容string类型,ES5之前版本
+                            // compatible with es version 5 or before
                             break;
                         case KEYWORD:
                             // https://www.elastic.co/guide/en/elasticsearch/reference/current/tune-for-search-speed.html#_warm_up_global_ordinals
@@ -170,7 +164,6 @@ public class ESWriter
                             break;
                         case TEXT:
                             field.put("analyzer", jo.getString("analyzer"));
-                            // 优化disk使用,也同步会提高index性能
                             // https://www.elastic.co/guide/en/elasticsearch/reference/current/tune-for-disk-usage.html
                             field.put("norms", jo.getBoolean("norms"));
                             field.put("index_options", jo.getBoolean("index_options"));
@@ -178,7 +171,6 @@ public class ESWriter
                         case DATE:
                             columnItem.setTimeZone(jo.getString("timezone"));
                             columnItem.setFormat(jo.getString("format"));
-                            // 后面时间会处理为带时区的标准时间,所以不需要给ES指定格式
                             break;
                         case GEO_SHAPE:
                             field.put("tree", jo.getString("tree"));
@@ -203,7 +195,7 @@ public class ESWriter
 
             mappings = JSON.toJSONString(rootMappings);
 
-            if (mappings == null || "".equals(mappings)) {
+            if (mappings == null || mappings.isEmpty()) {
                 throw AddaxException.asAddaxException(REQUIRED_VALUE, "must have mappings");
             }
 
@@ -331,7 +323,7 @@ public class ESWriter
             DateTime date;
             DateTimeZone dtz = DateTimeZone.getDefault();
             if (esColumn.getTimezone() != null) {
-                // 所有时区参考 http://www.joda.org/joda-time/timezones.html
+                // http://www.joda.org/joda-time/timezones.html
                 dtz = DateTimeZone.forID(esColumn.getTimezone());
             }
             if (column.getType() != Column.Type.DATE && esColumn.getFormat() != null) {
@@ -359,7 +351,7 @@ public class ESWriter
                     Column column = record.getColumn(i);
                     String columnName = columnList.get(i).getName();
                     ESFieldType columnType = typeList.get(i);
-                    //如果是数组类型，那它传入的必是字符串类型
+                    // for array type, it must be string type
                     if (columnList.get(i).isArray() != null && columnList.get(i).isArray()) {
                         if (null == column.asString()) {
                             data.put(columnName, null);
@@ -387,7 +379,7 @@ public class ESWriter
                                     data.put(columnName, dateStr);
                                 }
                                 catch (Exception e) {
-                                    getTaskPluginCollector().collectDirtyRecord(record, String.format("时间类型解析失败 [%s:%s] exception: %s", columnName, column.toString(), e));
+                                    getTaskPluginCollector().collectDirtyRecord(record, String.format("failed to parse " +  columnName + " : "  + e));
                                 }
                                 break;
                             case KEYWORD:
@@ -422,7 +414,7 @@ public class ESWriter
                                 data.put(columnName, JSON.parse(column.asString()));
                                 break;
                             default:
-                                getTaskPluginCollector().collectDirtyRecord(record, "类型错误:不支持的类型:" + columnType + " " + columnName);
+                                getTaskPluginCollector().collectDirtyRecord(record, "The column type " + columnType + " is not supported ");
                         }
                     }
                 }
@@ -488,7 +480,7 @@ public class ESWriter
             }
             catch (Exception e) {
                 if (ESKey.isIgnoreWriteError(this.conf)) {
-                    log.warn(String.format("重试[%d]次写入失败，忽略该错误，继续写入!", trySize));
+                    log.warn("failed to write in " +  trySize + " times, so ignore it");
                 }
                 else {
                     throw AddaxException.asAddaxException(EXECUTE_FAIL, e);

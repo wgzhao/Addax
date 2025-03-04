@@ -358,7 +358,7 @@ public class FtpWriter
                 this.ftpHelper.logoutFtpServer();
             }
             catch (Exception e) {
-                String message = String.format("关闭与ftp服务器连接失败, host:%s, username:%s, port:%s, errorMessage:%s",
+                String message = String.format("failed to close ftp connection, host:%s, username:%s, port:%s, errorMessage:%s",
                         host, username, port, e.getMessage());
                 LOG.error(message, e);
             }

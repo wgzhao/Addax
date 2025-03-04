@@ -168,7 +168,6 @@ public class HdfsWriter
                 }
             }
             if ("PARQUET".equals(fileType)) {
-                // parquet 默认的非压缩标志是 UNCOMPRESSED ，而不是常见的 NONE，这里统一为 NONE
                 if ("NONE".equals(compress)) {
                     compress = "UNCOMPRESSED";
                 }
@@ -286,7 +285,6 @@ public class HdfsWriter
             List<Configuration> writerSplitConfigs = new ArrayList<>();
             String filePrefix = fileName;
 
-            //获取该路径下的所有已有文件列表
             Set<String> allFiles = Arrays.stream(hdfsHelper.hdfsDirList(path)).map(Path::toString).collect(Collectors.toSet());
 
             String fileType = this.writerSliceConfig.getString(Key.FILE_TYPE, "txt").toLowerCase();
@@ -296,7 +294,6 @@ public class HdfsWriter
                 // handle same file name
                 Configuration splitTaskConfig = this.writerSliceConfig.clone();
 
-                // 如果文件已经存在，则重新生成文件名
                 do {
                     tmpFullFileName = String.format("%s/%s_%s.%s", tmpStorePath, filePrefix, FileHelper.generateFileMiddleName(), fileType);
                     endFullFileName = String.format("%s/%s_%s.%s", path, filePrefix, FileHelper.generateFileMiddleName(), fileType);
@@ -314,13 +311,6 @@ public class HdfsWriter
             return writerSplitConfigs;
         }
 
-        /**
-         * 创建临时目录
-         * 在给定目录的下，创建一个已点开头，uuid为名字的文件夹，用于临时存储写入的文件
-         *
-         * @param userPath hdfs path
-         * @return temporary path
-         */
         private String buildTmpFilePath(String userPath)
         {
             String tmpDir;
@@ -427,7 +417,7 @@ public class HdfsWriter
                     throw AddaxException.asAddaxException(ILLEGAL_VALUE,
                             String.format("The file format [%s] is supported yet,  the plugin currently only supports: [%s].", fileType, Job.SUPPORT_FORMAT));
             }
-            //得当的已经是绝对路径，eg：/user/hive/warehouse/writer.db/text/test.snappy
+            // absolute path，eg：/user/hive/warehouse/writer.db/text/test.snappy
             String fileName = this.writerSliceConfig.getString(Key.FILE_NAME);
             LOG.info("Begin to write file : [{}]", fileName);
             hdfsHelper.write(lineReceiver, writerSliceConfig, fileName, getTaskPluginCollector());

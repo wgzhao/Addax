@@ -264,7 +264,7 @@ public class MongoDBWriter
                         continue;
                     }
                     if (Column.Type.INT.name().equalsIgnoreCase(type)) {
-                        //int是特殊类型, 其他类型按照保存时Column的类型进行处理
+                        // the int type is special
                         try {
                             data.put(name, Integer.parseInt(String.valueOf(record.getColumn(i).getRawData())));
                         }
@@ -273,7 +273,7 @@ public class MongoDBWriter
                         }
                     }
                     else if (record.getColumn(i) instanceof StringColumn) {
-                        //处理ObjectId和数组类型
+                        //handle ObjectId and array type
                         try {
                             if (KeyConstant.isObjectIdType(type.toLowerCase())) {
                                 data.put(name, new ObjectId(record.getColumn(i).asString()));
@@ -286,7 +286,6 @@ public class MongoDBWriter
                                 }
                                 String itemType = columnMeta.getJSONObject(i).getString(KeyConstant.ITEM_TYPE);
                                 if (itemType != null && !itemType.isEmpty()) {
-                                    //如果数组指定类型不为空，将其转换为指定类型
                                     String[] item = record.getColumn(i).asString().split(splitter);
                                     if (itemType.equalsIgnoreCase(Column.Type.DOUBLE.name())) {
                                         ArrayList<Double> list = new ArrayList<>();
@@ -332,7 +331,6 @@ public class MongoDBWriter
                                 }
                             }
                             else if (type.equalsIgnoreCase("json")) {
-                                //如果是json类型,将其进行转换
                                 Object mode = JSON.parse(record.getColumn(i).asString());
                                 data.put(name, JSON.toJSON(mode));
                             }
@@ -396,7 +394,6 @@ public class MongoDBWriter
                 dataList.add(data);
             }
 
-            // 如果存在重复的值覆盖
             if ("update".equals(writeMode)) {
                 List<ReplaceOneModel<BasicDBObject>> replaceOneModelList = new ArrayList<>();
                 for (BasicDBObject data : dataList) {

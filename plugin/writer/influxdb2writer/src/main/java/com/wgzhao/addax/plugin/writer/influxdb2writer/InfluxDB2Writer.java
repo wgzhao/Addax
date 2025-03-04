@@ -133,7 +133,7 @@ public class InfluxDB2Writer
                     tags.forEach(point::addTags);
                 }
 
-                // The first column must be timestamp
+                // The first column must be time stamp
                 column = record.getColumn(0);
                 final Instant instant = column.asTimestamp().toInstant();
                 point.time(processTimeUnit(instant), wp);

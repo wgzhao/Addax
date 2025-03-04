@@ -68,7 +68,6 @@ public class Hbase11xHelper
         org.apache.hadoop.conf.Configuration hConfiguration = HBaseConfiguration.create();
         try {
             Map<String, String> hbaseConfigMap = JSON.parseObject(hbaseConfig, new TypeReference<Map<String, String>>() {});
-            // 用户配置的 key-value 对 来表示 hbaseConfig
             Validate.isTrue(hbaseConfigMap != null, "The item hbaseConfig must be not empty.");
             for (Map.Entry<String, String> entry : hbaseConfigMap.entrySet()) {
                 hConfiguration.set(entry.getKey(), entry.getValue());
@@ -133,7 +132,7 @@ public class Hbase11xHelper
         try {
             admin = hConnection.getAdmin();
             Hbase11xHelper.checkHbaseTable(admin, hTableName);
-            //参考HTable getBufferedMutator()
+            // reference the HTable#getBufferedMutator()
             bufferedMutator = hConnection.getBufferedMutator(
                     new BufferedMutatorParams(hTableName)
                             .pool(HTable.getDefaultExecutor(hConfiguration))
