@@ -41,10 +41,6 @@ public class KeyConstant
 
     public static final String COLUMN_SPLITTER = "splitter";
 
-    public static final String IS_REPLACE = "isReplace";
-
-    public static final String UNIQUE_KEY = "replaceKey";
-
     private KeyConstant() {}
 
     public static boolean isArrayType(String type)
@@ -57,8 +53,4 @@ public class KeyConstant
         return OBJECT_ID_TYPE.equals(type);
     }
 
-    public static boolean isValueTrue(String value)
-    {
-        return "true".equals(value);
-    }
 }

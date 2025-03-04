@@ -41,7 +41,6 @@ import java.sql.Time;
 import java.sql.Timestamp;
 import java.sql.Types;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 import static com.wgzhao.addax.common.spi.ErrorCode.EXECUTE_FAIL;

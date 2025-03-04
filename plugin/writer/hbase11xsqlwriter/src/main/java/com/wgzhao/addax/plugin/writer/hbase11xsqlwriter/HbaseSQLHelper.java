@@ -20,7 +20,6 @@
 package com.wgzhao.addax.plugin.writer.hbase11xsqlwriter;
 
 import com.wgzhao.addax.common.base.HBaseConstant;
-import com.wgzhao.addax.common.base.HBaseKey;
 import com.wgzhao.addax.common.exception.AddaxException;
 import com.wgzhao.addax.common.util.Configuration;
 import com.alibaba.fastjson2.JSON;

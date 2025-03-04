@@ -34,7 +34,6 @@ import org.slf4j.LoggerFactory;
 import java.util.List;
 
 import static com.wgzhao.addax.common.base.Key.JDBC_DRIVER;
-import static com.wgzhao.addax.common.spi.ErrorCode.CONFIG_ERROR;
 import static com.wgzhao.addax.common.spi.ErrorCode.REQUIRED_VALUE;
 
 public class RdbmsWriter

@@ -241,7 +241,9 @@ public class TxtFileWriter
 
             try {
                 File newFile = new File(fileFullPath);
-                assert newFile.createNewFile();
+                if (!newFile.createNewFile()) {
+                    throw new IOException("Failed to create new file: " + fileFullPath);
+                }
                 outputStream = Files.newOutputStream(newFile.toPath());
                 StorageWriterUtil.writeToStream(lineReceiver, outputStream, this.writerSliceConfig, this.fileName,
                         this.getTaskPluginCollector());

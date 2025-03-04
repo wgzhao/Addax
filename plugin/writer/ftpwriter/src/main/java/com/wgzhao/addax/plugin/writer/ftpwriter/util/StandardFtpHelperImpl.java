@@ -33,7 +33,6 @@ import org.slf4j.LoggerFactory;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
-import java.net.UnknownHostException;
 import java.time.Duration;
 import java.util.HashSet;
 import java.util.Set;
@@ -56,7 +55,6 @@ public class StandardFtpHelperImpl
         this.ftpClient = new FTPClient();
         try {
             this.ftpClient.setControlEncoding("UTF-8");
-            // this.ftpClient.configure(new FTPClientConfig(FTPClientConfig.SYS_UNIX));
             this.ftpClient.setDefaultTimeout(timeout);
             this.ftpClient.setConnectTimeout(timeout);
             this.ftpClient.setDataTimeout(Duration.ofSeconds(timeout));

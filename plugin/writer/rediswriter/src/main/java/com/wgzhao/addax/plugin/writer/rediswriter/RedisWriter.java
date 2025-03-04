@@ -32,7 +32,6 @@ import redis.clients.jedis.Jedis;
 import redis.clients.jedis.exceptions.JedisDataException;
 import redis.clients.jedis.util.JedisClusterCRC16;
 
-import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.net.URI;
@@ -94,16 +93,16 @@ public class RedisWriter
             this.jedis = new Jedis(host, port, timeout, timeout);
 
             if (isCluster) {
-                StringBuilder sb = new StringBuilder("\r\nRedis Cluster 节点分配\r\n");
+                StringBuilder sb = new StringBuilder("\r\nRedis Cluster node assign\r\n");
                 List<Object> slots = this.jedis.clusterSlots();
 
                 for (Object slot : slots) {
-                    List list = (List) slot;
-                    //slot 开始节点
+                    List<Object> list = (List<Object>) slot;
+                    //slot begin node
                     Long start = (Long) list.get(0);
-                    //slot 结束节点
+                    //slot end node
                     Long end = (Long) list.get(1);
-                    //slot 对应主机信息
+                    //slot node host
                     List hostInfo = (List) list.get(2);
 
                     String nodeHost = new String((byte[]) hostInfo.get(0));
@@ -126,7 +125,7 @@ public class RedisWriter
                 LOG.info(sb.toString());
             }
             else {
-                String auth = (String) connection.get("auth");
+                String auth = connection.getString("auth");
                 if (StringUtils.isNotBlank(auth)) {
                     this.jedis.auth(auth);
                 }
@@ -241,22 +240,22 @@ public class RedisWriter
                 }
 
                 boolean isCluster = getPluginJobConf().getBool("redisCluster", false);
-
+                Client client = null;
                 if (isCluster) {
                     for (Jedis cJedis : new HashSet<>(cluster.values())) {
-                        Client client = cJedis.getClient();
-                        LOG.info("redis client: {}: {}", client.getHost(), client.getPort());
+                        client = cJedis.getClient();
                         jedis.flushAll();
                     }
                 }
                 else {
                     if (this.jedis != null) {
-                        Client client = jedis.getClient();
-                        LOG.info("redis client: {}:{}", client.getHost(), client.getPort());
+                        client = jedis.getClient();
                         jedis.flushAll();
                     }
                 }
-
+                if (client != null ) {
+                    LOG.info("redis client: {}: {}", client.getHost(), client.getPort());
+                }
                 FLUSH_FLAG.set(true);
             }
         }

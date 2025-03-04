@@ -124,7 +124,6 @@ public class PaimonWriter
     {
 
         private static final Logger log = LoggerFactory.getLogger(Task.class);
-        private Configuration conf = null;
         private BatchWriteBuilder writeBuilder = null;
         private Integer batchSize = 1000;
         private List<DataField> columnList = new ArrayList<>();
@@ -158,11 +157,11 @@ public class PaimonWriter
         @Override
         public void init()
         {
-            this.conf = super.getPluginJobConf();
+            Configuration conf = super.getPluginJobConf();
 
             batchSize = conf.getInt("batchSize", 1000);
 
-            Options options = PaimonHelper.getOptions(this.conf);
+            Options options = PaimonHelper.getOptions(conf);
             CatalogContext context = PaimonHelper.getCatalogContext(options);
 
             if ("kerberos".equals(options.get("hadoop.security.authentication"))) {
@@ -180,8 +179,8 @@ public class PaimonWriter
 
             try (Catalog catalog = CatalogFactory.createCatalog(context)) {
 
-                String dbName = this.conf.getString("dbName");
-                String tableName = this.conf.getString("tableName");
+                String dbName = conf.getString("dbName");
+                String tableName = conf.getString("tableName");
                 Identifier identifier = Identifier.create(dbName, tableName);
 
                 Table table = catalog.getTable(identifier);

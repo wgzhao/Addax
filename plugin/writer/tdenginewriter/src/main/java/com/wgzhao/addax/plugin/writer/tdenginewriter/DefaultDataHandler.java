@@ -204,23 +204,35 @@ public class DefaultDataHandler
             sb.append(" ").append(record.getColumn(indexOf("tbname")).asString())
                     .append(" using ").append(table)
                     .append(" tags")
-                    .append(columnMetas.stream().filter(colMeta -> columns.contains(colMeta.field)).filter(colMeta -> {
-                        return colMeta.isTag;
-                    }).map(colMeta -> {
-                        return buildColumnValue(colMeta, record);
-                    }).collect(Collectors.joining(",", "(", ")")))
+                    .append(columnMetas.stream()
+                            .filter(colMeta -> columns.contains(colMeta.field))
+                            .filter(colMeta -> {
+                                return colMeta.isTag;
+                            })
+                            .map(colMeta -> {
+                                return buildColumnValue(colMeta, record);
+                            })
+                            .collect(Collectors.joining(",", "(", ")")))
                     .append(" ")
-                    .append(columnMetas.stream().filter(colMeta -> columns.contains(colMeta.field)).filter(colMeta -> {
-                        return !colMeta.isTag;
-                    }).map(colMeta -> {
-                        return colMeta.field;
-                    }).collect(Collectors.joining(",", "(", ")")))
+                    .append(columnMetas.stream()
+                            .filter(colMeta -> columns.contains(colMeta.field))
+                            .filter(colMeta -> {
+                                return !colMeta.isTag;
+                            })
+                            .map(colMeta -> {
+                                return colMeta.field;
+                            })
+                            .collect(Collectors.joining(",", "(", ")")))
                     .append(" values")
-                    .append(columnMetas.stream().filter(colMeta -> columns.contains(colMeta.field)).filter(colMeta -> {
-                        return !colMeta.isTag;
-                    }).map(colMeta -> {
-                        return buildColumnValue(colMeta, record);
-                    }).collect(Collectors.joining(",", "(", ")")));
+                    .append(columnMetas.stream()
+                            .filter(colMeta -> columns.contains(colMeta.field))
+                            .filter(colMeta -> {
+                                return !colMeta.isTag;
+                            })
+                            .map(colMeta -> {
+                                return buildColumnValue(colMeta, record);
+                            })
+                            .collect(Collectors.joining(",", "(", ")")));
         }
         String sql = sb.toString();
 
@@ -232,7 +244,7 @@ public class DefaultDataHandler
     {
         int count;
         try (Statement stmt = conn.createStatement()) {
-            LOG.debug(">>> " + sql);
+            LOG.debug(">>> {}", sql);
             count = stmt.executeUpdate(sql);
         }
         catch (SQLException e) {
@@ -265,7 +277,7 @@ public class DefaultDataHandler
                     return "\"" + column.asString() + "\"";
                 }
                 String value = column.asString();
-                return "\'" + Utils.escapeSingleQuota(value) + "\'";
+                return "'" + Utils.escapeSingleQuota(value) + "'";
             case NULL:
             case BAD:
                 return "NULL";
@@ -300,21 +312,29 @@ public class DefaultDataHandler
         for (Record record : recordBatch) {
             StringBuilder sb = new StringBuilder();
             sb.append(table).append(",")
-                    .append(columnMetaList.stream().filter(colMeta -> columns.contains(colMeta.field)).filter(colMeta -> {
-                        return colMeta.isTag;
-                    }).map(colMeta -> {
-                        String value = record.getColumn(indexOf(colMeta.field)).asString();
-                        if (value.contains(" ")) {
-                            value = value.replace(" ", "\\ ");
-                        }
-                        return colMeta.field + "=" + value;
-                    }).collect(Collectors.joining(",")))
+                    .append(columnMetaList.stream()
+                            .filter(colMeta -> columns.contains(colMeta.field))
+                            .filter(colMeta -> {
+                                return colMeta.isTag;
+                            })
+                            .map(colMeta -> {
+                                String value = record.getColumn(indexOf(colMeta.field)).asString();
+                                if (value.contains(" ")) {
+                                    value = value.replace(" ", "\\ ");
+                                }
+                                return colMeta.field + "=" + value;
+                            })
+                            .collect(Collectors.joining(",")))
                     .append(" ")
-                    .append(columnMetaList.stream().filter(colMeta -> columns.contains(colMeta.field)).filter(colMeta -> {
-                        return !colMeta.isTag && !colMeta.isPrimaryKey;
-                    }).map(colMeta -> {
-                        return colMeta.field + "=" + buildSchemalessColumnValue(colMeta, record);
-                    }).collect(Collectors.joining(",")))
+                    .append(columnMetaList.stream()
+                            .filter(colMeta -> columns.contains(colMeta.field))
+                            .filter(colMeta -> {
+                                return !colMeta.isTag && !colMeta.isPrimaryKey;
+                            })
+                            .map(colMeta -> {
+                                return colMeta.field + "=" + buildSchemalessColumnValue(colMeta, record);
+                            })
+                            .collect(Collectors.joining(",")))
                     .append(" ");
             // timestamp
             Column column = record.getColumn(indexOf(ts.field));
@@ -340,7 +360,7 @@ public class DefaultDataHandler
                 sb.append(column.asLong());
             }
             String line = sb.toString();
-            LOG.debug(">>> " + line);
+            LOG.debug(">>> {}", line);
             lines.add(line);
             count++;
         }
@@ -414,17 +434,15 @@ public class DefaultDataHandler
             }
             case INT:
             case LONG: {
-                if (colMeta.type.equals("TINYINT")) {
-                    return column.asString() + "i8";
-                }
-                if (colMeta.type.equals("SMALLINT")) {
-                    return column.asString() + "i16";
-                }
-                if (colMeta.type.equals("INT")) {
-                    return column.asString() + "i32";
-                }
-                if (colMeta.type.equals("BIGINT")) {
-                    return column.asString() + "i64";
+                switch (colMeta.type) {
+                    case "TINYINT":
+                        return column.asString() + "i8";
+                    case "SMALLINT":
+                        return column.asString() + "i16";
+                    case "INT":
+                        return column.asString() + "i32";
+                    case "BIGINT":
+                        return column.asString() + "i64";
                 }
             }
             case BYTES:
@@ -477,23 +495,24 @@ public class DefaultDataHandler
                 continue;
             }
 
-            boolean tagsAllMatch = columnMetas.stream().filter(colMeta -> columns.contains(colMeta.field)).filter(colMeta -> {
-                return colMeta.isTag;
-            }).allMatch(colMeta -> {
-                Column column = record.getColumn(indexOf(colMeta.field));
-                boolean equals = equals(column, colMeta);
-                return equals;
-            });
+            boolean tagsAllMatch = columnMetas.stream().filter(
+                            colMeta -> columns.contains(colMeta.field))
+                    .filter(colMeta -> colMeta.isTag).allMatch(colMeta ->
+                    {
+                        Column column = record.getColumn(indexOf(colMeta.field));
+                        return equals(column, colMeta);
+                    });
 
             if (ignoreTagsUnmatched && !tagsAllMatch) {
                 continue;
             }
 
-            sb.append(columnMetas.stream().filter(colMeta -> columns.contains(colMeta.field)).filter(colMeta -> {
-                return !colMeta.isTag;
-            }).map(colMeta -> {
-                return buildColumnValue(colMeta, record);
-            }).collect(Collectors.joining(", ", "(", ") ")));
+            sb.append(columnMetas.stream().filter(colMeta -> columns.contains(colMeta.field))
+                    .filter(colMeta -> {
+                        return !colMeta.isTag;
+                    }).map(colMeta -> {
+                        return buildColumnValue(colMeta, record);
+                    }).collect(Collectors.joining(", ", "(", ") ")));
             validRecords++;
         }
 

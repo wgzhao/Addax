@@ -21,8 +21,6 @@ package com.wgzhao.addax.plugin.writer.hbase20xsqlwriter;
 
 import com.wgzhao.addax.common.exception.AddaxException;
 
-import java.util.Arrays;
-
 import static com.wgzhao.addax.common.spi.ErrorCode.NOT_SUPPORT_TYPE;
 
 public enum NullModeType
