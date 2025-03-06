@@ -31,7 +31,7 @@
         <aircompressor.version>0.25</aircompressor.version>
         <awssdk.version>2.29.20</awssdk.version>
         <avro.version>1.11.3</avro.version>
-        <commons.beanutils.version>1.9.4</commons.beanutils.version>
+        <commons.beanutils.version>1.10.1</commons.beanutils.version>
         <commons.configuration.version>1.10</commons.configuration.version>
         <commons.configuration2.version>2.11.0</commons.configuration2.version>
         <commons.collections.version>4.4</commons.collections.version>
@@ -64,10 +64,10 @@
         <javadbf.version>1.14.1</javadbf.version>
         <jest.version>6.3.1</jest.version>
         <junit.version>5.10.2</junit.version>
-        <joda.time.version>2.12.7</joda.time.version>
+        <joda.time.version>2.13.1</joda.time.version>
         <jackson.version>2.18.0</jackson.version>
         <jedis.version>3.7.0</jedis.version>
-        <jsch.version>0.2.20</jsch.version>
+        <jsch.version>0.2.23</jsch.version>
         <kafka.version>3.2.3</kafka.version>
         <kryo.version>5.6.2</kryo.version>
         <kudu.version>1.16.0</kudu.version>
@@ -268,7 +268,7 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-dependency-plugin</artifactId>
-                <version>3.8.0</version>
+                <version>3.8.1</version>
             </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
