@@ -41,7 +41,6 @@ import com.wgzhao.addax.rdbms.reader.util.GetPrimaryKeyUtil;
 import com.wgzhao.addax.rdbms.reader.util.OriginalConfPretreatmentUtil;
 import com.wgzhao.addax.rdbms.reader.util.PreCheckTask;
 import com.wgzhao.addax.rdbms.reader.util.ReaderSplitUtil;
-import com.wgzhao.addax.rdbms.reader.util.SingleTableSplitUtil;
 import com.wgzhao.addax.rdbms.util.DBUtil;
 import com.wgzhao.addax.rdbms.util.DataBaseType;
 import com.wgzhao.addax.rdbms.util.RdbmsException;
@@ -65,17 +64,16 @@ public class CommonRdbmsReader
     {
         private static final Logger LOG = LoggerFactory.getLogger(Job.class);
 
+        private final DataBaseType dataBaseType;
         public Job(DataBaseType dataBaseType)
         {
-            OriginalConfPretreatmentUtil.dataBaseType = dataBaseType;
-            SingleTableSplitUtil.dataBaseType = dataBaseType;
-            GetPrimaryKeyUtil.dataBaseType = dataBaseType;
+            this.dataBaseType = dataBaseType;
         }
 
         public Configuration init(Configuration originalConfig)
         {
 
-            OriginalConfPretreatmentUtil.doPretreatment(originalConfig);
+            OriginalConfPretreatmentUtil.doPretreatment(dataBaseType, originalConfig);
             if (originalConfig.getString(Key.SPLIT_PK) == null && originalConfig.getBool(Key.AUTO_PK, false)) {
                 LOG.info("The split key is not configured, try to guess the split key.");
                 String splitPK = GetPrimaryKeyUtil.getPrimaryKey(originalConfig);
@@ -107,7 +105,7 @@ public class CommonRdbmsReader
 
         public List<Configuration> split(Configuration originalConfig, int adviceNumber)
         {
-            return ReaderSplitUtil.doSplit(originalConfig, adviceNumber);
+            return ReaderSplitUtil.doSplit(dataBaseType, originalConfig, adviceNumber);
         }
 
         public void post(Configuration originalConfig)

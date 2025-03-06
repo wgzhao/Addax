@@ -210,6 +210,10 @@ public class HBase20SQLReaderHelper
      */
     public List<Configuration> doSplit(int adviceNumber)
     {
-        return ReaderSplitUtil.doSplit(configuration, adviceNumber);
+        List<Configuration> splitResultConfigs = new ArrayList<>();
+        for (int j = 0; j < adviceNumber; j++) {
+            splitResultConfigs.add(configuration.clone());
+        }
+        return splitResultConfigs;
     }
 }
