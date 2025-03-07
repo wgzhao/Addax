@@ -272,6 +272,22 @@ We recommend you use IntelliJ as your IDE. The code style template for the proje
 * Use an assertion from Airlift's `Assertions` class if there is one that covers your case rather than writing the assertion by hand. Over time, we may move over to more fluent assertions like AssertJ.
 * When writing a Git commit message, follow these [guidelines](https://chris.beams.io/posts/git-commit/).
 
+## Versioning Scheme
+
+This project adheres to the [Semantic Versioning (SemVer)](https://semver.org/) standard with the format `x.y.z`. The meanings of each segment are as follows:
+
+- **z（Patch Version）**:
+  - Bug fixes and performance improvements that do not affect compatibility with existing features.
+  - Example: `1.2.3 → 1.2.4`
+
+- **y（Minor Version）**:
+  - Introducing new features or module adjustments that could break backward compatibility.
+  - Example: `1.2.3 → 1.3.0`
+
+- **x（Major Version）**:
+  - Significant changes or new features that are often incompatible with previous versions.
+  - Example: `1.3.0 → 2.0.0`
+    
 ## Star History
 
 [![Star History Chart](https://api.star-history.com/svg?repos=wgzhao/Addax&type=Date)](https://star-history.com/#wgzhao/Addax&Date)
