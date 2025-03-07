@@ -45,8 +45,6 @@ public class GetPrimaryKeyUtil
 {
     private static final Logger LOG = LoggerFactory.getLogger(GetPrimaryKeyUtil.class);
 
-    public static DataBaseType dataBaseType;
-
     private GetPrimaryKeyUtil()
     {
     }
@@ -57,10 +55,11 @@ public class GetPrimaryKeyUtil
      * Give priority to selecting the primary key, followed by a unique index of numeric type,
      * and lastly, other divisible unique indexes.
      *
+     * @param dataBaseType {@link DataBaseType}
      * @param readConf {@link Configuration}
      * @return column name if it has primary key or unique key, else null
      */
-    public static String getPrimaryKey(Configuration readConf)
+    public static String getPrimaryKey(DataBaseType dataBaseType, Configuration readConf)
     {
         String sql;
         List<String[]> columns = new ArrayList<>();
@@ -75,7 +74,7 @@ public class GetPrimaryKeyUtil
             table = table.split("\\.")[1];
         }
 
-        sql = getPrimaryKeyQuery(schema, table, username);
+        sql = getPrimaryKeyQuery(dataBaseType, schema, table, username);
         if (sql == null) {
             LOG.debug("The current database is unsupported yet.");
             return null;
@@ -146,7 +145,7 @@ public class GetPrimaryKeyUtil
      * @param username username (used for Oracle when schema is null)
      * @return the sql string to get primary key
      */
-    public static String getPrimaryKeyQuery(String schema, String tableName, String username)
+    public static String getPrimaryKeyQuery(DataBaseType dataBaseType, String schema, String tableName, String username)
     {
         if (dataBaseType == null) {
             LOG.warn("Database type is null, cannot generate primary key query");

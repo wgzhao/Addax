@@ -76,13 +76,13 @@ public class CommonRdbmsReader
             OriginalConfPretreatmentUtil.doPretreatment(dataBaseType, originalConfig);
             if (originalConfig.getString(Key.SPLIT_PK) == null && originalConfig.getBool(Key.AUTO_PK, false)) {
                 LOG.info("The split key is not configured, try to guess the split key.");
-                String splitPK = GetPrimaryKeyUtil.getPrimaryKey(originalConfig);
+                String splitPK = GetPrimaryKeyUtil.getPrimaryKey(dataBaseType, originalConfig);
                 if (splitPK != null) {
                     LOG.info("Take the field {} as split key", splitPK);
                     originalConfig.set(Key.SPLIT_PK, splitPK);
-                    if (originalConfig.getInt(Key.EACH_TABLE_SPLIT_SIZE, -1) == -1) {
-                        originalConfig.set(Key.EACH_TABLE_SPLIT_SIZE, Constant.DEFAULT_EACH_TABLE_SPLIT_SIZE);
-                    }
+//                    if (originalConfig.getInt(Key.EACH_TABLE_SPLIT_SIZE, -1) == -1) {
+//                        originalConfig.set(Key.EACH_TABLE_SPLIT_SIZE, Constant.DEFAULT_EACH_TABLE_SPLIT_SIZE);
+//                    }
                 } else {
                     LOG.warn("There is no primary key or unique key in the table, and the split key cannot be guessed.");
                 }
