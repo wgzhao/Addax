@@ -21,7 +21,6 @@
 
 package com.wgzhao.addax.rdbms.reader;
 
-import com.wgzhao.addax.common.base.Constant;
 import com.wgzhao.addax.common.base.Key;
 import com.wgzhao.addax.common.element.BoolColumn;
 import com.wgzhao.addax.common.element.BytesColumn;
@@ -70,8 +69,7 @@ public class CommonRdbmsReader
             this.dataBaseType = dataBaseType;
         }
 
-        public Configuration init(Configuration originalConfig)
-        {
+        public Configuration init(Configuration originalConfig) {
 
             OriginalConfPretreatmentUtil.doPretreatment(dataBaseType, originalConfig);
             if (originalConfig.getString(Key.SPLIT_PK) == null && originalConfig.getBool(Key.AUTO_PK, false)) {
@@ -80,9 +78,6 @@ public class CommonRdbmsReader
                 if (splitPK != null) {
                     LOG.info("Take the field {} as split key", splitPK);
                     originalConfig.set(Key.SPLIT_PK, splitPK);
-//                    if (originalConfig.getInt(Key.EACH_TABLE_SPLIT_SIZE, -1) == -1) {
-//                        originalConfig.set(Key.EACH_TABLE_SPLIT_SIZE, Constant.DEFAULT_EACH_TABLE_SPLIT_SIZE);
-//                    }
                 } else {
                     LOG.warn("There is no primary key or unique key in the table, and the split key cannot be guessed.");
                 }
@@ -92,8 +87,7 @@ public class CommonRdbmsReader
             return originalConfig;
         }
 
-        public void preCheck(Configuration originalConfig, DataBaseType dataBaseType)
-        {
+        public void preCheck(Configuration originalConfig, DataBaseType dataBaseType) {
             // check each table can read and split key is valid
             Configuration queryConf = ReaderSplitUtil.doPreCheckSplit(originalConfig);
             String splitPK = queryConf.getString(Key.SPLIT_PK);
@@ -103,8 +97,7 @@ public class CommonRdbmsReader
             new PreCheckTask(username, password, connConf, dataBaseType, splitPK).call();
         }
 
-        public List<Configuration> split(Configuration originalConfig, int adviceNumber)
-        {
+        public List<Configuration> split(Configuration originalConfig, int adviceNumber) {
             return ReaderSplitUtil.doSplit(dataBaseType, originalConfig, adviceNumber);
         }
 
@@ -136,20 +129,17 @@ public class CommonRdbmsReader
 
         private String basicMsg;
 
-        public Task(DataBaseType dataBaseType)
-        {
+        public Task(DataBaseType dataBaseType) {
             this(dataBaseType, -1, -1);
         }
 
-        public Task(DataBaseType dataBaseType, int taskGroupId, int taskId)
-        {
+        public Task(DataBaseType dataBaseType, int taskGroupId, int taskId) {
             this.dataBaseType = dataBaseType;
             this.taskGroupId = taskGroupId;
             this.taskId = taskId;
         }
 
-        public void init(Configuration readerSliceConfig)
-        {
+        public void init(Configuration readerSliceConfig) {
             this.username = readerSliceConfig.getString(Key.USERNAME);
             this.password = readerSliceConfig.getString(Key.PASSWORD);
             this.jdbcUrl = readerSliceConfig.getString(Key.JDBC_URL);
@@ -161,14 +151,14 @@ public class CommonRdbmsReader
 
         /**
          * read data
-         * @param readerSliceConfig The read configuration
-         * @param recordSender The record sender
+         *
+         * @param readerSliceConfig   The read configuration
+         * @param recordSender        The record sender
          * @param taskPluginCollector The task plugin collector
-         * @param fetchSize The fetch size
+         * @param fetchSize           The fetch size
          */
         public void startRead(Configuration readerSliceConfig, RecordSender recordSender,
-                TaskPluginCollector taskPluginCollector, int fetchSize)
-        {
+                              TaskPluginCollector taskPluginCollector, int fetchSize) {
             String querySql = readerSliceConfig.getString(Key.QUERY_SQL);
 
             LOG.info("Begin reading records by executing SQL query: [{}].", querySql);
@@ -202,44 +192,39 @@ public class CommonRdbmsReader
 
                 allResultPerfRecord.end(rsNextUsedTime);
                 LOG.info("Finished reading records by executing SQL query: [{}].", querySql);
-            }
-            catch (Exception e) {
+            } catch (Exception e) {
                 throw RdbmsException.asQueryException(e, querySql);
-            }
-            finally {
+            } finally {
                 DBUtil.closeDBResources(null, conn);
             }
         }
 
-        public void post(Configuration originalConfig)
-        {
+        public void post(Configuration originalConfig) {
             // do nothing
         }
 
-        public void destroy(Configuration originalConfig)
-        {
+        public void destroy(Configuration originalConfig) {
             // do nothing
         }
 
         protected void transportOneRecord(RecordSender recordSender, ResultSet rs, ResultSetMetaData metaData,
-                int columnNumber, TaskPluginCollector taskPluginCollector)
-        {
+                                          int columnNumber, TaskPluginCollector taskPluginCollector) {
             Record record = buildRecord(recordSender, rs, metaData, columnNumber, taskPluginCollector);
             recordSender.sendToWriter(record);
         }
 
         /**
          * create column
-         * @param rs The result set
+         *
+         * @param rs       The result set
          * @param metaData The result set meta data
-         * @param i The column index
+         * @param i        The column index
          * @return The column
-         * @throws SQLException If an SQL exception occurs
+         * @throws SQLException                 If an SQL exception occurs
          * @throws UnsupportedEncodingException If the encoding is not supported
          */
         protected Column createColumn(ResultSet rs, ResultSetMetaData metaData, int i)
-                throws SQLException, UnsupportedEncodingException
-        {
+                throws SQLException, UnsupportedEncodingException {
             switch (metaData.getColumnType(i)) {
                 case Types.CHAR:
                 case Types.NCHAR:
@@ -250,8 +235,7 @@ public class CommonRdbmsReader
                     String rawData;
                     if (StringUtils.isBlank(mandatoryEncoding)) {
                         rawData = rs.getString(i);
-                    }
-                    else {
+                    } else {
                         rawData = new String((rs.getBytes(i) == null ? EMPTY_CHAR_ARRAY : rs.getBytes(i)), mandatoryEncoding);
                     }
                     return new StringColumn(rawData);
@@ -296,8 +280,7 @@ public class CommonRdbmsReader
                     // bit(>1) -> Types.VARBINARY use BytesColumn
                     if (metaData.getPrecision(i) == 1) {
                         return new BoolColumn(rs.getBoolean(i));
-                    }
-                    else {
+                    } else {
                         return new BytesColumn(rs.getBytes(i));
                     }
 
@@ -320,24 +303,23 @@ public class CommonRdbmsReader
 
         /**
          * build record
-         * @param recordSender The record sender
-         * @param rs The result set
-         * @param metaData The result set meta data
-         * @param columnNumber The column number
+         *
+         * @param recordSender        The record sender
+         * @param rs                  The result set
+         * @param metaData            The result set meta data
+         * @param columnNumber        The column number
          * @param taskPluginCollector The task plugin collector
          * @return The record
          */
         protected Record buildRecord(RecordSender recordSender, ResultSet rs, ResultSetMetaData metaData, int columnNumber,
-                TaskPluginCollector taskPluginCollector)
-        {
+                                     TaskPluginCollector taskPluginCollector) {
             Record record = recordSender.createRecord();
 
             try {
                 for (int i = 1; i <= columnNumber; i++) {
                     record.addColumn(createColumn(rs, metaData, i));
                 }
-            }
-            catch (Exception e) {
+            } catch (Exception e) {
                 if (IS_DEBUG) {
                     LOG.debug("Exception occurred while reading {} : {}", record, e.getMessage());
                 }
