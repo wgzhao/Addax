@@ -45,8 +45,6 @@ public class GetPrimaryKeyUtil
 {
     private static final Logger LOG = LoggerFactory.getLogger(GetPrimaryKeyUtil.class);
 
-    public static DataBaseType dataBaseType;
-
     private GetPrimaryKeyUtil()
     {
     }
@@ -57,16 +55,17 @@ public class GetPrimaryKeyUtil
      * Give priority to selecting the primary key, followed by a unique index of numeric type,
      * and lastly, other divisible unique indexes.
      *
+     * @param dataBaseType {@link DataBaseType}
      * @param readConf {@link Configuration}
      * @return column name if it has primary key or unique key, else null
      */
-    public static String getPrimaryKey(Configuration readConf)
+    public static String getPrimaryKey(DataBaseType dataBaseType, Configuration readConf)
     {
         String sql;
         List<String[]> columns = new ArrayList<>();
         Configuration connConf = readConf.getConfiguration(CONNECTION);
         String table = connConf.getList(TABLE).get(0).toString();
-        String jdbc_url = connConf.getString(JDBC_URL);
+        String jdbcUrl = connConf.getString(JDBC_URL);
         String username = readConf.getString(USERNAME, null);
         String password = readConf.getString(PASSWORD, null);
         String schema = null;
@@ -75,15 +74,17 @@ public class GetPrimaryKeyUtil
             table = table.split("\\.")[1];
         }
 
-        try (Connection connection = DBUtil.getConnection(dataBaseType, jdbc_url, username, password)) {
-            sql = getPrimaryKeyQuery(schema, table, username);
-            if (sql == null) {
-                LOG.debug("The current database is unsupported yet.");
-                return null;
-            }
+        sql = getPrimaryKeyQuery(dataBaseType, schema, table, username);
+        if (sql == null) {
+            LOG.debug("The current database is unsupported yet.");
+            return null;
+        }
+
+        try (Connection connection = DBUtil.getConnection(dataBaseType, jdbcUrl, username, password);
+                Statement statement = connection.createStatement();
+                ResultSet resultSet = statement.executeQuery(sql)) {
+
             LOG.debug("query primary sql: [{}]", sql);
-            Statement statement = connection.createStatement();
-            ResultSet resultSet = statement.executeQuery(sql);
 
             while (resultSet.next()) {
                 // column_name, data_type
@@ -137,89 +138,96 @@ public class GetPrimaryKeyUtil
     }
 
     /**
-     * generate SQL to get primary key
+     * Generate SQL to get primary key or unique single-column key
      *
-     * @param schema schema
+     * @param schema schema name, can be null
      * @param tableName the table name
-     * @param username username
+     * @param username username (used for Oracle when schema is null)
      * @return the sql string to get primary key
      */
-    public static String getPrimaryKeyQuery(String schema, String tableName, String username)
+    public static String getPrimaryKeyQuery(DataBaseType dataBaseType, String schema, String tableName, String username)
     {
-        String sql = null;
+        if (dataBaseType == null) {
+            LOG.warn("Database type is null, cannot generate primary key query");
+            return null;
+        }
+
+        StringBuilder sql = new StringBuilder();
+
         switch (dataBaseType) {
             case MySql:
-                sql = "select "
-                        + " c.COLUMN_NAME, upper(c.DATA_TYPE) AS COLUMN_TYPE, c.COLUMN_KEY AS KEY_TYPE "
-                        + " from INFORMATION_SCHEMA.`COLUMNS` c , INFORMATION_SCHEMA.STATISTICS s "
-                        + " where c.TABLE_SCHEMA = s.TABLE_SCHEMA "
-                        + "  AND c.TABLE_NAME = s.TABLE_NAME "
-                        + "  AND c.COLUMN_NAME = s.COLUMN_NAME "
-                        + "  AND s.TABLE_SCHEMA = (SELECT SCHEMA()) "
-                        + "  AND s.TABLE_NAME = '" + tableName + "' "
-                        + "  AND NON_UNIQUE = 0 "
-                        + " AND COLUMN_KEY <> 'MUL' and COLUMN_KEY <> '' "
-                        + " ORDER BY c.COLUMN_KEY ASC, c.DATA_TYPE ASC";
+                sql.append("select ")
+                        .append(" c.COLUMN_NAME, upper(c.DATA_TYPE) AS COLUMN_TYPE, c.COLUMN_KEY AS KEY_TYPE ")
+                        .append(" from INFORMATION_SCHEMA.`COLUMNS` c , INFORMATION_SCHEMA.STATISTICS s ")
+                        .append(" where c.TABLE_SCHEMA = s.TABLE_SCHEMA ")
+                        .append("  AND c.TABLE_NAME = s.TABLE_NAME ")
+                        .append("  AND c.COLUMN_NAME = s.COLUMN_NAME ")
+                        .append("  AND s.TABLE_SCHEMA = (SELECT SCHEMA()) ")
+                        .append("  AND s.TABLE_NAME = '").append(tableName).append("' ")
+                        .append("  AND NON_UNIQUE = 0 ")
+                        .append(" AND COLUMN_KEY <> 'MUL' and COLUMN_KEY <> '' ")
+                        .append(" ORDER BY c.COLUMN_KEY ASC, c.DATA_TYPE ASC");
                 break;
             case PostgreSQL:
-                sql = "SELECT a.attname AS COLUMN_NAME, "
-                        + " upper(format_type(a.atttypid, a.atttypmod)) AS COLUMN_TYPE, "
-                        + " CASE WHEN con.contype = 'p' THEN 'PRI' ELSE 'UNI' END AS KEY_TYPE "
-                        + " FROM pg_constraint con "
-                        + " JOIN pg_class rel ON rel.oid = con.conrelid "
-                        + " JOIN pg_namespace nsp ON nsp.oid = rel.relnamespace "
-                        + " LEFT JOIN pg_attribute a ON a.attnum = ANY(con.conkey) AND a.attrelid = con.conrelid "
-                        + " WHERE nsp.nspname = (SELECT CURRENT_SCHEMA()) "
-                        + " AND rel.relname = '" + tableName + "'"
-                        + " AND con.contype IN ('p', 'u') AND array_length(con.conkey, 1) = 1"
-                        + " ORDER BY con.contype ASC, a.atttypid ASC";
+                sql.append("SELECT a.attname AS COLUMN_NAME, ")
+                        .append(" upper(format_type(a.atttypid, a.atttypmod)) AS COLUMN_TYPE, ")
+                        .append(" CASE WHEN con.contype = 'p' THEN 'PRI' ELSE 'UNI' END AS KEY_TYPE ")
+                        .append(" FROM pg_constraint con ")
+                        .append(" JOIN pg_class rel ON rel.oid = con.conrelid ")
+                        .append(" JOIN pg_namespace nsp ON nsp.oid = rel.relnamespace ")
+                        .append(" LEFT JOIN pg_attribute a ON a.attnum = ANY(con.conkey) AND a.attrelid = con.conrelid ")
+                        .append(" WHERE nsp.nspname = (SELECT CURRENT_SCHEMA()) ")
+                        .append(" AND rel.relname = '").append(tableName).append("'")
+                        .append(" AND con.contype IN ('p', 'u') AND array_length(con.conkey, 1) = 1")
+                        .append(" ORDER BY con.contype ASC, a.atttypid ASC");
                 break;
             case SQLServer:
-                sql = "SELECT "
-                        + "    kc.COLUMN_NAME, "
-                        + "    upper(c.DATA_TYPE) AS COLUMN_TYPE, "
-                        + "    CASE WHEN tc.CONSTRAINT_TYPE = 'PRIMARY KEY' THEN 'PRI' ELSE 'UNI' END AS KEY_TYPE "
-                        + " FROM "
-                        + "    INFORMATION_SCHEMA.TABLE_CONSTRAINTS tc "
-                        + "    JOIN INFORMATION_SCHEMA.KEY_COLUMN_USAGE kc ON tc.CONSTRAINT_NAME = kc.CONSTRAINT_NAME "
-                        + "    JOIN INFORMATION_SCHEMA.COLUMNS c ON kc.TABLE_NAME = c.TABLE_NAME AND kc.COLUMN_NAME = c.COLUMN_NAME "
-                        + " WHERE "
-                        + "    tc.CONSTRAINT_TYPE IN ('PRIMARY KEY', 'UNIQUE')  "
-                        + "    AND kc.TABLE_SCHEMA = (select schema_name())  "
-                        + "    AND kc.TABLE_NAME = '" + tableName + "'  "
-                        + "    AND (SELECT COUNT(*) FROM INFORMATION_SCHEMA.KEY_COLUMN_USAGE WHERE CONSTRAINT_NAME = kc.CONSTRAINT_NAME) = 1"
-                        + " ORDER BY tc.CONSTRAINT_TYPE ASC, c.DATA_TYPE ASC";
+                sql.append("SELECT ")
+                        .append("    kc.COLUMN_NAME, ")
+                        .append("    upper(c.DATA_TYPE) AS COLUMN_TYPE, ")
+                        .append("    CASE WHEN tc.CONSTRAINT_TYPE = 'PRIMARY KEY' THEN 'PRI' ELSE 'UNI' END AS KEY_TYPE ")
+                        .append(" FROM ")
+                        .append("    INFORMATION_SCHEMA.TABLE_CONSTRAINTS tc ")
+                        .append("    JOIN INFORMATION_SCHEMA.KEY_COLUMN_USAGE kc ON tc.CONSTRAINT_NAME = kc.CONSTRAINT_NAME ")
+                        .append("    JOIN INFORMATION_SCHEMA.COLUMNS c ON kc.TABLE_NAME = c.TABLE_NAME AND kc.COLUMN_NAME = c.COLUMN_NAME ")
+                        .append(" WHERE ")
+                        .append("    tc.CONSTRAINT_TYPE IN ('PRIMARY KEY', 'UNIQUE')  ")
+                        .append("    AND kc.TABLE_SCHEMA = (select schema_name())  ")
+                        .append("    AND kc.TABLE_NAME = '").append(tableName).append("'  ")
+                        .append("    AND (SELECT COUNT(*) FROM INFORMATION_SCHEMA.KEY_COLUMN_USAGE WHERE CONSTRAINT_NAME = kc.CONSTRAINT_NAME) = 1")
+                        .append(" ORDER BY tc.CONSTRAINT_TYPE ASC, c.DATA_TYPE ASC");
                 break;
             case ClickHouse:
-                sql = "SELECT name as column_name, type as column_type, 'PRI' as key_type"
-                        + " FROM system.columns "
-                        + " WHERE database = (SELECT currentDatabase()) "
-                        + " AND table = '" + tableName + "'"
-                        + " AND is_in_primary_key = 1"
-                        + " ORDER BY type ASC";
+                sql.append("SELECT name as column_name, type as column_type, 'PRI' as key_type")
+                        .append(" FROM system.columns ")
+                        .append(" WHERE database = (SELECT currentDatabase()) ")
+                        .append(" AND table = '").append(tableName).append("'")
+                        .append(" AND is_in_primary_key = 1")
+                        .append(" ORDER BY type ASC");
                 break;
             case Oracle:
-                schema = schema == null ? username.toUpperCase() : schema.toUpperCase();
-                // 表明如果没有强制原始大小写，则一律转为大写
-                if (!tableName.startsWith("\"")) {
-                    tableName = tableName.toUpperCase();
-                }
-                sql = "SELECT acc.column_name, upper(cc.data_type) AS COLUMN_TYPE, "
-                        + " CASE WHEN ac.constraint_type = 'P' THEN 'PRI' ELSE 'UNI' END AS KEY_TYPE "
-                        + "FROM "
-                        + "    all_constraints ac "
-                        + "    JOIN all_cons_columns acc ON ac.constraint_name = acc.constraint_name "
-                        + "    JOIN all_tab_columns cc ON acc.table_name = cc.table_name AND acc.column_name = cc.column_name "
-                        + "WHERE "
-                        + "    ac.constraint_type IN ('P', 'U')  "
-                        + "    AND ac.owner = '" + schema + "' "
-                        + "    AND acc.table_name = '" + tableName + "' "
-                        + "    AND (SELECT COUNT(*) FROM all_cons_columns WHERE constraint_name = ac.constraint_name) = 1"
-                        + " ORDER BY ac.constraint_type ASC, cc.data_type ASC";
+                String normalizedSchema = schema == null ? username.toUpperCase() : schema.toUpperCase();
+                // Preserve exact case if quoted, otherwise convert to uppercase
+                String normalizedTableName = tableName.startsWith("\"") ? tableName : tableName.toUpperCase();
+
+                sql.append("SELECT acc.column_name, upper(cc.data_type) AS COLUMN_TYPE, ")
+                        .append(" CASE WHEN ac.constraint_type = 'P' THEN 'PRI' ELSE 'UNI' END AS KEY_TYPE ")
+                        .append("FROM ")
+                        .append("    all_constraints ac ")
+                        .append("    JOIN all_cons_columns acc ON ac.constraint_name = acc.constraint_name ")
+                        .append("    JOIN all_tab_columns cc ON acc.table_name = cc.table_name AND acc.column_name = cc.column_name ")
+                        .append("WHERE ")
+                        .append("    ac.constraint_type IN ('P', 'U')  ")
+                        .append("    AND ac.owner = '").append(normalizedSchema).append("' ")
+                        .append("    AND acc.table_name = '").append(normalizedTableName).append("' ")
+                        .append("    AND (SELECT COUNT(*) FROM all_cons_columns WHERE constraint_name = ac.constraint_name) = 1")
+                        .append(" ORDER BY ac.constraint_type ASC, cc.data_type ASC");
                 break;
             default:
-                break;
+                LOG.warn("Unsupported database type: {}", dataBaseType);
+                return null;
         }
-        return sql;
+
+        return sql.toString();
     }
 }

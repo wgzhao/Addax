@@ -45,17 +45,14 @@ public final class OriginalConfPretreatmentUtil
 {
     private static final Logger LOG = LoggerFactory.getLogger(OriginalConfPretreatmentUtil.class);
 
-    public static DataBaseType dataBaseType;
-
     private static final String EXCLUDE_COLUMN = "excludeColumn";
-
-    private OriginalConfPretreatmentUtil() {}
 
     /**
      * handle the configuration before
+     *
      * @param originalConfig configuration
      */
-    public static void doPretreatment(Configuration originalConfig)
+    public static void doPretreatment(DataBaseType dataBaseType, Configuration originalConfig)
     {
         // the username is mandatory for RDBMS
         originalConfig.getNecessaryValue(Key.USERNAME, REQUIRED_VALUE);
@@ -72,11 +69,12 @@ public final class OriginalConfPretreatmentUtil
         }
         dealWhere(originalConfig);
 
-        simplifyConf(originalConfig);
+        simplifyConf(dataBaseType, originalConfig);
     }
 
     /**
      * handle the where clause
+     *
      * @param originalConfig configuration
      */
     public static void dealWhere(Configuration originalConfig)
@@ -96,23 +94,25 @@ public final class OriginalConfPretreatmentUtil
      * 1. handle the situation where multiple jdbcUrls are configured for the same database
      * 2. identify and mark whether to use querySql mode or table mode
      * 3. for table mode, determine the number of sub-tables and process the column to * matters
+     *
      * @param originalConfig configuration
      */
-    private static void simplifyConf(Configuration originalConfig)
+    private static void simplifyConf(DataBaseType dataBaseType, Configuration originalConfig)
     {
         boolean isTableMode = recognizeTableOrQuerySqlMode(originalConfig);
         originalConfig.set(Key.IS_TABLE_MODE, isTableMode);
 
-        dealJdbcAndTable(originalConfig);
+        dealJdbcAndTable(dataBaseType, originalConfig);
 
-        dealColumnConf(originalConfig);
+        dealColumnConf(dataBaseType, originalConfig);
     }
 
     /**
      * handle the jdbcUrl and table configuration
+     *
      * @param originalConfig configuration
      */
-    private static void dealJdbcAndTable(Configuration originalConfig)
+    private static void dealJdbcAndTable(DataBaseType dataBaseType, Configuration originalConfig)
     {
         String username = originalConfig.getString(Key.USERNAME);
         String password = originalConfig.getString(Key.PASSWORD);
@@ -168,9 +168,10 @@ public final class OriginalConfPretreatmentUtil
 
     /**
      * handle the column configuration
+     *
      * @param originalConfig configuration
      */
-    private static void dealColumnConf(Configuration originalConfig)
+    private static void dealColumnConf(DataBaseType dataBaseType, Configuration originalConfig)
     {
         boolean isTableMode = originalConfig.getBool(Key.IS_TABLE_MODE);
 
@@ -257,6 +258,7 @@ public final class OriginalConfPretreatmentUtil
 
     /**
      * identify and mark whether to use querySql mode or table mode
+     *
      * @param originalConfig configuration
      * @return true if table mode, false if querySql mode
      */
