@@ -34,7 +34,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.File;
-import java.sql.DatabaseMetaData;
 import java.sql.DriverManager;
 import java.sql.Connection;
 import java.sql.ResultSet;
@@ -74,12 +73,7 @@ public final class DBUtil
     {
         try {
             RetryUtil.executeWithRetry(() -> {
-                if (null == preSql || preSql.isEmpty()) {
-                    testConnWithoutRetry(dataBaseType, jdbcUrl, username, password);
-                }
-                else {
-                    testConnWithoutRetry(dataBaseType, jdbcUrl, username, password, preSql);
-                }
+                testConnWithoutRetry(dataBaseType, jdbcUrl, username, password, preSql);
                 return null;
             }, 3, 1000L, true);
         }
@@ -91,23 +85,19 @@ public final class DBUtil
 
     public static void validJdbcUrlWithoutRetry(DataBaseType dataBaseType, String jdbcUrl, String username, String password, List<String> preSql)
     {
-        if (null != preSql && !preSql.isEmpty()) {
+
+        try {
             testConnWithoutRetry(dataBaseType, jdbcUrl, username, password, preSql);
         }
-        else {
-            try {
-                testConnWithoutRetry(dataBaseType, jdbcUrl, username, password);
-            }
-            catch (Exception e) {
-                throw AddaxException.asAddaxException(
-                        CONNECT_ERROR, "Failed to connect the server using jdbcUrl " + jdbcUrl, e);
-            }
+        catch (Exception e) {
+            throw AddaxException.asAddaxException(
+                    CONNECT_ERROR, "Failed to connect the server using jdbcUrl " + jdbcUrl, e);
         }
     }
 
     public static boolean checkInsertPrivilege(DataBaseType dataBaseType, String jdbcURL, String userName, String password, List<String> tableList)
     {
-        Connection connection = connect(dataBaseType, jdbcURL, userName, password);
+        Connection connection = getConnection(dataBaseType, jdbcURL, userName, password);
         String insertTemplate = "INSERT INTO %s (SELECT * FROM %s WHERE 1 = 2)";
 
         boolean hasInsertPrivilege = true;
@@ -130,7 +120,7 @@ public final class DBUtil
 
     public static boolean checkDeletePrivilege(DataBaseType dataBaseType, String jdbcURL, String userName, String password, List<String> tableList)
     {
-        Connection connection = connect(dataBaseType, jdbcURL, userName, password);
+        Connection connection = getConnection(dataBaseType, jdbcURL, userName, password);
         String deleteTemplate = "DELETE FROM %s WHERE 1 = 2";
 
         boolean hasInsertPrivilege = true;
@@ -182,21 +172,46 @@ public final class DBUtil
      * @param password Password to use when connecting to server.
      * @return Connection class {@link Connection}
      */
-    public static Connection getConnection(DataBaseType dataBaseType, String jdbcUrl, String username, String password)
+    public static synchronized Connection getConnection(DataBaseType dataBaseType, String jdbcUrl, String username, String password)
     {
 
         return getConnection(dataBaseType, jdbcUrl, username, password, DEFAULT_SOCKET_TIMEOUT_SEC);
     }
 
-    public static Connection getConnection(DataBaseType dataBaseType, String jdbcUrl, String username, String password, int socketTimeout)
+    public static synchronized Connection getConnection(DataBaseType dataBaseType, String jdbcUrl, String username, String password, int socketTimeout)
     {
 
-        try {
-            return RetryUtil.executeWithRetry(() -> DBUtil.connect(dataBaseType, jdbcUrl, username,
-                    password, socketTimeout), 3, 1000L, true);
+        try (BasicDataSource bds = new BasicDataSource()) {
+            bds.setUrl(jdbcUrl);
+            bds.setUsername(username);
+            bds.setPassword(password);
+
+            if (dataBaseType == DataBaseType.Oracle) {
+                //oracle.net.READ_TIMEOUT for jdbc versions < 10.1.0.5 oracle.jdbc.ReadTimeout for jdbc versions >=10.1.0.5
+                // unit ms
+                bds.addConnectionProperty("oracle.jdbc.ReadTimeout", String.valueOf(socketTimeout * 1000));
+            }
+            if ("org.apache.hive.jdbc.HiveDriver".equals(bds.getDriverClassName())) {
+                DriverManager.setLoginTimeout(DEFAULT_SOCKET_TIMEOUT_SEC);
+            }
+            if (jdbcUrl.contains("inceptor2")) {
+                LOG.warn("inceptor2 must be process specially");
+                jdbcUrl = jdbcUrl.replace("inceptor2", "hive2");
+                bds.setUrl(jdbcUrl);
+                bds.setDriverClassName("org.apache.hive.jdbc.HiveDriver");
+                DriverManager.setLoginTimeout(DEFAULT_SOCKET_TIMEOUT_SEC);
+            }
+            else {
+                LOG.debug("Connecting to database with driver {}", dataBaseType.getDriverClassName());
+                bds.setDriverClassName(dataBaseType.getDriverClassName());
+            }
+            bds.setMinIdle(2);
+            bds.setMaxIdle(5);
+            bds.setMaxOpenPreparedStatements(200);
+            return bds.getConnection();
         }
         catch (Exception e) {
-            throw AddaxException.asAddaxException(CONNECT_ERROR, "Failed to connect the database with " + jdbcUrl, e);
+            throw RdbmsException.asConnException(e);
         }
     }
 
@@ -219,50 +234,7 @@ public final class DBUtil
 
     public static Connection getConnectionWithoutRetry(DataBaseType dataBaseType, String jdbcUrl, String username, String password, int socketTimeout)
     {
-        return DBUtil.connect(dataBaseType, jdbcUrl, username, password, socketTimeout);
-    }
-
-    private static synchronized Connection connect(DataBaseType dataBaseType, String url, String user, String pass)
-    {
-        return connect(dataBaseType, url, user, pass, DEFAULT_SOCKET_TIMEOUT_SEC);
-    }
-
-    private static synchronized Connection connect(DataBaseType dataBaseType, String url, String user, String pass, int socketTimeout)
-    {
-
-        try (BasicDataSource bds = new BasicDataSource()) {
-            bds.setUrl(url);
-            bds.setUsername(user);
-            bds.setPassword(pass);
-
-            if (dataBaseType == DataBaseType.Oracle) {
-                //oracle.net.READ_TIMEOUT for jdbc versions < 10.1.0.5 oracle.jdbc.ReadTimeout for jdbc versions >=10.1.0.5
-                // unit ms
-                bds.addConnectionProperty("oracle.jdbc.ReadTimeout", String.valueOf(socketTimeout * 1000));
-            }
-            if ("org.apache.hive.jdbc.HiveDriver".equals(bds.getDriverClassName())) {
-                DriverManager.setLoginTimeout(DEFAULT_SOCKET_TIMEOUT_SEC);
-            }
-            if (url.contains("inceptor2")) {
-                LOG.warn("inceptor2 must be process specially");
-                url = url.replace("inceptor2", "hive2");
-                bds.setUrl(url);
-                bds.setDriverClassName("org.apache.hive.jdbc.HiveDriver");
-                DriverManager.setLoginTimeout(DEFAULT_SOCKET_TIMEOUT_SEC);
-            }
-            else {
-                LOG.debug("Connecting to database with driver {}", dataBaseType.getDriverClassName());
-                bds.setDriverClassName(dataBaseType.getDriverClassName());
-            }
-            bds.setMinIdle(2);
-            bds.setMaxIdle(5);
-            bds.setMaxOpenPreparedStatements(200);
-            return bds.getConnection();
-        }
-        catch (Exception e) {
-            LOG.error("An exception occurred while attempting to connect to the database using jdbcUrl '{}': {}'", url, e.toString());
-            throw RdbmsException.asConnException(e);
-        }
+        return DBUtil.getConnection(dataBaseType, jdbcUrl, username, password, socketTimeout);
     }
 
     /**
@@ -410,38 +382,15 @@ public final class DBUtil
         }
     }
 
-    public static void testConnWithoutRetry(DataBaseType dataBaseType, String url, String user, String pass)
-    {
-        Connection ignored = null;
-        try {
-            ignored = connect(dataBaseType, url, user, pass);
-        }
-        catch (Exception e) {
-            throw AddaxException.asAddaxException(CONNECT_ERROR, "Failed to connect the database using " + url, e);
-        }
-        finally {
-            if (null != ignored) {
-                try {
-                    ignored.close();
-                }
-                catch (SQLException e) {
-                    LOG.warn("Failed to close the connection.", e);
-                }
-            }
-        }
-    }
-
     public static void testConnWithoutRetry(DataBaseType dataBaseType, String url, String user, String pass, List<String> preSql)
     {
-        try (Connection connection = connect(dataBaseType, url, user, pass)) {
+        Connection connection = getConnection(dataBaseType, url, user, pass);
+        if (preSql != null && !preSql.isEmpty()) {
             for (String pre : preSql) {
                 if (!doPreCheck(connection, pre)) {
                     LOG.warn("Failed to doPreCheck.");
                 }
             }
-        }
-        catch (Exception e) {
-            LOG.warn("Failed to connect the database using '{}': {}.", url, e.getMessage());
         }
     }
 
