@@ -27,10 +27,8 @@ import com.wgzhao.addax.common.exception.AddaxException;
 import com.wgzhao.addax.common.util.Configuration;
 import com.wgzhao.addax.common.util.EncryptUtil;
 import com.wgzhao.addax.common.util.ListUtil;
-import com.wgzhao.addax.rdbms.util.ConnectionFactory;
 import com.wgzhao.addax.rdbms.util.DBUtil;
 import com.wgzhao.addax.rdbms.util.DataBaseType;
-import com.wgzhao.addax.rdbms.util.JdbcConnectionFactory;
 import com.wgzhao.addax.rdbms.util.TableExpandUtil;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
@@ -117,8 +115,13 @@ public final class OriginalConfPretreatmentUtil
         originalConfig.set(Key.TABLE_NUMBER, expandedTables.size());
     }
 
-    public static void dealColumnConf(Configuration originalConfig, ConnectionFactory connectionFactory, String oneTable)
+    public static void dealColumnConf(Configuration originalConfig)
     {
+        String jdbcUrl = originalConfig.getString(jdbcUrlPath);
+        String username = originalConfig.getString(Key.USERNAME);
+        String password = originalConfig.getString(Key.PASSWORD);
+        String oneTable = originalConfig.getString(Key.CONNECTION + "." + Key.TABLE + "[0]");
+
         List<String> userConfiguredColumns = originalConfig.getList(Key.COLUMN, String.class);
         if (null == userConfiguredColumns || userConfiguredColumns.isEmpty()) {
             throw AddaxException.asAddaxException(ILLEGAL_VALUE,
@@ -127,12 +130,10 @@ public final class OriginalConfPretreatmentUtil
         else {
             boolean isPreCheck = originalConfig.getBool(Key.DRY_RUN, false);
             List<String> allColumns;
-            if (isPreCheck) {
-                allColumns = DBUtil.getTableColumnsByConn(connectionFactory.getConnectionWithoutRetry(), oneTable);
-            }
-            else {
-                allColumns = DBUtil.getTableColumnsByConn(connectionFactory.getConnection(), oneTable);
-            }
+            Connection connection = DBUtil.getConnectionWithoutRetry(dataBaseType, jdbcUrl, username, password);
+
+            allColumns = DBUtil.getTableColumnsByConn(connection, oneTable);
+
 
             LOG.info("The table [{}] has columns [{}].", oneTable, StringUtils.join(allColumns, ","));
 
@@ -151,10 +152,8 @@ public final class OriginalConfPretreatmentUtil
             else {
                 // ensure the column is not duplicated
                 ListUtil.makeSureNoValueDuplicate(userConfiguredColumns, false);
-                Connection connection = null;
                 try {
                     // check whether the user's configuration column exists in the table
-                    connection = connectionFactory.getConnection();
                     DBUtil.getColumnMetaData(connection, oneTable, StringUtils.join(userConfiguredColumns, ","));
                 }
                 finally {
@@ -162,17 +161,6 @@ public final class OriginalConfPretreatmentUtil
                 }
             }
         }
-    }
-
-    public static void dealColumnConf(Configuration originalConfig)
-    {
-        String jdbcUrl = originalConfig.getString(jdbcUrlPath);
-        String username = originalConfig.getString(Key.USERNAME);
-        String password = originalConfig.getString(Key.PASSWORD);
-        String oneTable = originalConfig.getString(Key.CONNECTION + "." + Key.TABLE + "[0]");
-
-        JdbcConnectionFactory jdbcConnectionFactory = new JdbcConnectionFactory(dataBaseType, jdbcUrl, username, password);
-        dealColumnConf(originalConfig, jdbcConnectionFactory, oneTable);
     }
 
     public static void dealWriteMode(Configuration originalConfig, DataBaseType dataBaseType)
