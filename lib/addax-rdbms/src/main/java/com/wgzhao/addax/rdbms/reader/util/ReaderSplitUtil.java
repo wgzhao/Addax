@@ -78,7 +78,7 @@ public final class ReaderSplitUtil
         if (isTableMode) {
             List<String> tables = connConf.getList(Key.TABLE, String.class);
 
-            Validate.isTrue(null != tables && !tables.isEmpty(), "您读取数据库表配置错误.");
+            Validate.isTrue(null != tables && !tables.isEmpty(), "");
 
             String splitPk = originalSliceConfig.getString(Key.SPLIT_PK, null);
             boolean needSplitTable = tableSplitNumber > 0 && StringUtils.isNotBlank(splitPk);

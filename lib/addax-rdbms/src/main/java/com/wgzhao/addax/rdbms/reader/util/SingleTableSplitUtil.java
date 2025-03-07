@@ -197,7 +197,7 @@ public class SingleTableSplitUtil
      * @param configuration configuration
      * @param adviceNum the number of split
      * @return 1. empty list of the min value is equal to max value, or the split key has only null value;
-     *         2. {@link List} of where clause
+     * 2. {@link List} of where clause
      */
     public static List<String> genPkRangeSQLForGeneric(DataBaseType dataBaseType, String splitPK, String table, String where, Configuration configuration, int adviceNum)
     {
@@ -209,7 +209,7 @@ public class SingleTableSplitUtil
         MinMaxPackage pkMinAndMaxValue = getPkMinAndMaxValue(dataBaseType, configuration);
         if (pkMinAndMaxValue.getMin() == null || pkMinAndMaxValue.getMax() == null || pkMinAndMaxValue.isSameValue()) {
             // mean the split key has only null value, it can not split
-             return Collections.emptyList();
+            return Collections.emptyList();
         }
 
         if (pkMinAndMaxValue.isNumeric()) {
