@@ -162,11 +162,6 @@ public enum DataBaseType
         return columnName;
     }
 
-    public String quoteTableName(String tableName)
-    {
-        return quoteColumnName(tableName);
-    }
-
     public String getTypeName()
     {
         return typeName;

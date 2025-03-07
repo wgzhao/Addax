@@ -128,7 +128,6 @@ public final class OriginalConfPretreatmentUtil
                     "The item column is required and can not be empty.");
         }
         else {
-            boolean isPreCheck = originalConfig.getBool(Key.DRY_RUN, false);
             List<String> allColumns;
             Connection connection = DBUtil.getConnectionWithoutRetry(dataBaseType, jdbcUrl, username, password);
 
