@@ -40,7 +40,6 @@ import java.util.Arrays;
 import java.util.List;
 
 import static com.wgzhao.addax.common.spi.ErrorCode.CONFIG_ERROR;
-import static com.wgzhao.addax.common.spi.ErrorCode.ILLEGAL_VALUE;
 
 public final class WriterUtil
 {
@@ -136,8 +135,7 @@ public final class WriterUtil
         boolean isWriteModeLegal = mode.startsWith("insert") || mode.startsWith("replace") || mode.startsWith("update");
 
         if (!isWriteModeLegal) {
-            throw AddaxException.asAddaxException(ILLEGAL_VALUE,
-                    "The writeMode " + writeMode + " is not supported, choose one of replace, update and insert.");
+            throw AddaxException.illegalConfigValue(Key.WRITE_MODE, mode);
         }
         String writeDataSqlTemplate;
         if (forceUseUpdate || mode.startsWith("update")) {
@@ -158,8 +156,7 @@ public final class WriterUtil
                         "INSERT (" + columns + ") VALUES ( " + placeHolders + " );";
             }
             else {
-                throw AddaxException.asAddaxException(ILLEGAL_VALUE,
-                        "The writeMode " + writeMode + " is not supported by current database");
+                throw AddaxException.illegalConfigValue(Key.WRITE_MODE, writeMode);
             }
         }
         else {

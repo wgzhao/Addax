@@ -39,7 +39,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static com.wgzhao.addax.common.spi.ErrorCode.CONFIG_ERROR;
-import static com.wgzhao.addax.common.spi.ErrorCode.ILLEGAL_VALUE;
 import static com.wgzhao.addax.common.spi.ErrorCode.REQUIRED_VALUE;
 
 public final class OriginalConfPretreatmentUtil
@@ -73,8 +72,7 @@ public final class OriginalConfPretreatmentUtil
     {
         int batchSize = originalConfig.getInt(Key.BATCH_SIZE, Constant.DEFAULT_BATCH_SIZE);
         if (batchSize < 1) {
-            throw AddaxException.asAddaxException(ILLEGAL_VALUE,
-                    "The item batchSize " + batchSize + " must be greater than 1. recommended value range is [100,1000].");
+            throw AddaxException.illegalConfigValue(Key.BATCH_SIZE, batchSize, " must be greater than 1. recommended value range is [100,1000].");
         }
 
         originalConfig.set(Key.BATCH_SIZE, batchSize);
@@ -91,7 +89,7 @@ public final class OriginalConfPretreatmentUtil
         }
         String jdbcUrl = connConf.getString(Key.JDBC_URL);
         if (StringUtils.isBlank(jdbcUrl)) {
-            throw AddaxException.asAddaxException(REQUIRED_VALUE, "The item jdbcUrl is required.");
+            throw AddaxException.missingConfig(Key.JDBC_URL);
         }
 
         jdbcUrl = dataBaseType.appendJDBCSuffixForWriter(jdbcUrl);
@@ -100,14 +98,13 @@ public final class OriginalConfPretreatmentUtil
         List<String> tables = connConf.getList(Key.TABLE, String.class);
 
         if (null == tables || tables.isEmpty()) {
-            throw AddaxException.asAddaxException(REQUIRED_VALUE,
-                    "The item table is required.");
+            throw AddaxException.missingConfig(Key.TABLE);
         }
 
         List<String> expandedTables = TableExpandUtil.expandTableConf(dataBaseType, tables);
 
         if (expandedTables.isEmpty()) {
-            throw AddaxException.asAddaxException(REQUIRED_VALUE, "The item table is required.");
+            throw AddaxException.missingConfig(Key.TABLE);
         }
 
         originalConfig.set(Key.CONNECTION + "." + Key.TABLE, expandedTables);
@@ -124,8 +121,7 @@ public final class OriginalConfPretreatmentUtil
 
         List<String> userConfiguredColumns = originalConfig.getList(Key.COLUMN, String.class);
         if (null == userConfiguredColumns || userConfiguredColumns.isEmpty()) {
-            throw AddaxException.asAddaxException(ILLEGAL_VALUE,
-                    "The item column is required and can not be empty.");
+            throw AddaxException.illegalConfigValue(Key.COLUMN, userConfiguredColumns);
         }
         else {
             List<String> allColumns;

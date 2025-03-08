@@ -73,6 +73,24 @@ public class AddaxException
         return new AddaxException(errorCode, getMessage(cause), cause);
     }
 
+    public static AddaxException illegalConfigValue(String configName, Object configValue)
+    {
+        return new AddaxException(ErrorCode.ILLEGAL_VALUE,
+                String.format("The configuration value for '%s' is illegal or unsupported: '%s'", configName, configValue));
+    }
+
+    public static AddaxException illegalConfigValue(String configName, Object configValue, String message)
+    {
+        return new AddaxException(ErrorCode.ILLEGAL_VALUE,
+                String.format("The configuration value for '%s' is illegal or unsupported: '%s': %s", configName, configValue, message));
+    }
+
+    public static AddaxException missingConfig(String configName)
+    {
+        return new AddaxException(ErrorCode.REQUIRED_VALUE,
+                "The configuration for '" + configName + "' is required but not provided");
+    }
+
     private static String getMessage(Object obj)
     {
         if (obj == null) {

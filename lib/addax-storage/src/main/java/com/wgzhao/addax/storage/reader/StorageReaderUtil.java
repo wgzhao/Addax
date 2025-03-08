@@ -156,9 +156,7 @@ public class StorageReaderUtil
         String delimiterInStr = readerSliceConfig
                 .getString(Key.FIELD_DELIMITER);
         if (null != delimiterInStr && 1 != delimiterInStr.length()) {
-            throw AddaxException.asAddaxException(
-                    ILLEGAL_VALUE,
-                    String.format("The delimiter ONLY has one char, [%s] is illegal", delimiterInStr));
+            throw AddaxException.illegalConfigValue(Key.FIELD_DELIMITER, delimiterInStr);
         }
         if (null == delimiterInStr) {
             LOG.warn("Uses [{}] as delimiter by default", Constant.DEFAULT_FIELD_DELIMITER);
@@ -387,8 +385,7 @@ public class StorageReaderUtil
         }
         else if (1 != delimiterInStr.length()) {
             // warn: if it has, length must be one
-            throw AddaxException.asAddaxException(ILLEGAL_VALUE,
-                    String.format("The delimiter only support single character, [%s] is invalid.", delimiterInStr));
+            throw AddaxException.illegalConfigValue(Key.FIELD_DELIMITER, delimiterInStr);
         }
     }
 
@@ -398,7 +395,7 @@ public class StorageReaderUtil
         // format
         List<Configuration> columns = readerConfiguration.getListConfiguration(Key.COLUMN);
         if (null == columns || columns.isEmpty()) {
-            throw AddaxException.asAddaxException(REQUIRED_VALUE, "The item columns is required.");
+            throw AddaxException.missingConfig(Key.COLUMN);
         }
         // handle ["*"]
         if (1 == columns.size()) {

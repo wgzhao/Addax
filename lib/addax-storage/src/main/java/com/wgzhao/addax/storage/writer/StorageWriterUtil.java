@@ -62,7 +62,6 @@ import java.util.Set;
 
 import static com.wgzhao.addax.common.spi.ErrorCode.CONFIG_ERROR;
 import static com.wgzhao.addax.common.spi.ErrorCode.ENCODING_ERROR;
-import static com.wgzhao.addax.common.spi.ErrorCode.ILLEGAL_VALUE;
 import static com.wgzhao.addax.common.spi.ErrorCode.IO_ERROR;
 import static com.wgzhao.addax.common.spi.ErrorCode.NOT_SUPPORT_TYPE;
 import static com.wgzhao.addax.common.spi.ErrorCode.REQUIRED_VALUE;
@@ -87,12 +86,8 @@ public class StorageWriterUtil
         String writeMode = writerConfiguration.getNecessaryValue(Key.WRITE_MODE, REQUIRED_VALUE);
         writeMode = writeMode.trim();
         if (!supportedWriteModes.contains(writeMode)) {
-            throw AddaxException
-                    .asAddaxException(
-                            NOT_SUPPORT_TYPE,
-                            String.format(
-                                    "The writeMode [%s] is unsupported, it only supports [%s]",
-                                    writeMode, StringUtils.join(supportedWriteModes, ",")));
+            throw AddaxException.illegalConfigValue(Key.WRITE_MODE, writeMode, "valid write modes " + StringUtils.join(supportedWriteModes, ","));
+
         }
         writerConfiguration.set(Key.WRITE_MODE, writeMode);
 
@@ -126,21 +121,17 @@ public class StorageWriterUtil
         String delimiterInStr = writerConfiguration.getString(Key.FIELD_DELIMITER);
         // warn: if it has, length must be one
         if (null != delimiterInStr && 1 != delimiterInStr.length()) {
-            throw AddaxException.asAddaxException(
-                    ILLEGAL_VALUE,
-                    String.format("The delimiter only supports single character, [%s] is invalid.", delimiterInStr));
+            throw AddaxException.illegalConfigValue(Key.FIELD_DELIMITER, delimiterInStr);
         }
         if (null == delimiterInStr) {
-            LOG.warn(String.format("The item delimiter is empty, uses [%s] as default.", Constant.DEFAULT_FIELD_DELIMITER));
+            LOG.warn("The item delimiter is empty, uses {} as default.", Constant.DEFAULT_FIELD_DELIMITER);
             writerConfiguration.set(Key.FIELD_DELIMITER, Constant.DEFAULT_FIELD_DELIMITER);
         }
 
         // fileFormat check
         String fileFormat = writerConfiguration.getString(Key.FILE_FORMAT, Constant.DEFAULT_FILE_FORMAT);
         if (!Constant.SUPPORTED_FILE_FORMAT.contains(fileFormat)) {
-            throw AddaxException.asAddaxException(
-                    ILLEGAL_VALUE,
-                    String.format("The fileFormat [%s] you configured is invalid, it only supports %s.", fileFormat, Constant.SUPPORTED_FILE_FORMAT));
+            throw AddaxException.illegalConfigValue(Key.FILE_NAME, fileFormat, "valid file format are " + Constant.SUPPORTED_FILE_FORMAT.toString());
         }
     }
 
@@ -240,10 +231,8 @@ public class StorageWriterUtil
             StorageWriterUtil.doWriteToStream(lineReceiver, writer, fileName, config, taskPluginCollector);
         }
         catch (UnsupportedEncodingException uee) {
-            throw AddaxException
-                    .asAddaxException(
-                            ENCODING_ERROR,
-                            String.format("The encoding [%s] is unsupported.", encoding), uee);
+            throw AddaxException.asAddaxException(ENCODING_ERROR,
+                            "The encoding " + encoding + " is unsupported.", uee);
         }
         catch (NullPointerException e) {
             throw AddaxException.asAddaxException(RUNTIME_ERROR, "NPE occurred", e);
@@ -251,13 +240,13 @@ public class StorageWriterUtil
         catch (CompressorException e) {
             throw AddaxException.asAddaxException(
                     NOT_SUPPORT_TYPE,
-                    "The compress algorithm [" + compress + "] is unsupported yet."
+                    "The compress algorithm " + compress + " is unsupported yet."
             );
         }
         catch (IOException e) {
             throw AddaxException.asAddaxException(
                     IO_ERROR,
-                    String.format("IO exception occurred when writing [%s].", fileName), e);
+                    "IO exception occurred when writing " + fileName, e);
         }
         finally {
             IOUtils.closeQuietly(writer, null);
@@ -288,12 +277,10 @@ public class StorageWriterUtil
 
         String delimiterInStr = config.getString(Key.FIELD_DELIMITER);
         if (null != delimiterInStr && 1 != delimiterInStr.length()) {
-            throw AddaxException.asAddaxException(
-                    ILLEGAL_VALUE,
-                    String.format("The item delimiter is only support single character, [%s] is invalid.", delimiterInStr));
+            throw AddaxException.illegalConfigValue(Key.FIELD_DELIMITER, delimiterInStr);
         }
         if (null == delimiterInStr) {
-            LOG.warn("The item delimiter is empty, uses [{}] as default.", Constant.DEFAULT_FIELD_DELIMITER);
+            LOG.warn("Take the  {}  as the value of {}", Constant.DEFAULT_FIELD_DELIMITER, Key.FIELD_DELIMITER);
         }
 
         // warn: fieldDelimiter could not be '' for no fieldDelimiter

@@ -228,7 +228,7 @@ public class FileHelper {
     public static String generateFileMiddleName() {
         String randomChars = "0123456789abcdefghmnpqrstuvwxyz";
         SimpleDateFormat dateFormat = new SimpleDateFormat("yyyyMMdd_HHmmss_SSS");
-        // like 2021-12-03-14-33-29-237-6587fddb
+        // like 20211203_143329_237_6587fddb
         return dateFormat.format(new Date()) + "_" + RandomStringUtils.insecure().next(8, randomChars);
     }
 }
