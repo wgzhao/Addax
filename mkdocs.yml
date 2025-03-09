@@ -149,6 +149,11 @@ extra:
     provider: google
     property: G-J252L4LHDX
 
+#extra_css:
+#  - stylesheets/extra.css
+#extra_javascript:
+#  - javascript/extra.js
+
 # Extensions
 markdown_extensions:
   - admonition
