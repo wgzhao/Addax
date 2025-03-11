@@ -261,7 +261,15 @@ Failed record             :                   0
 
 ## Star History
 
-[![Star History Chart](https://api.star-history.com/svg?repos=wgzhao/Addax&type=Date)](https://star-history.com/#wgzhao/Addax&Date)
+## Star History
+
+<a href="https://www.star-history.com/#wgzhao/Addax&Date">
+ <picture>
+   <source media="(prefers-color-scheme: dark)" srcset="https://api.star-history.com/svg?repos=wgzhao/Addax&type=Date&theme=dark" />
+   <source media="(prefers-color-scheme: light)" srcset="https://api.star-history.com/svg?repos=wgzhao/Addax&type=Date" />
+   <img alt="Star History Chart" src="https://api.star-history.com/svg?repos=wgzhao/Addax&type=Date" />
+ </picture>
+</a>
 
 ## 代码授权许可
 
