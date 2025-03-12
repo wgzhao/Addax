@@ -150,6 +150,10 @@ public enum DataBaseType
         if (columnName.matches("\\d+")) {
             return columnName;
         }
+        // if the column is null string, means use null as column value
+        if (columnName.equals("null")) {
+            return columnName;
+        }
         if (this == MySql || this == Hive) {
             return "`" + columnName.replace("`", "``") + "`";
         }
