@@ -75,6 +75,11 @@ public class StorageReaderUtil
 {
     private static final Logger LOG = LoggerFactory.getLogger(StorageReaderUtil.class);
 
+    // Compression type constants
+    private static final String COMPRESS_NONE = "none";
+    private static final String COMPRESS_ZIP = "zip";
+    private static final String COMPRESS_LZO = "lzo";
+
     private StorageReaderUtil()
     {
 
@@ -99,38 +104,16 @@ public class StorageReaderUtil
             readerSliceConfig.set(Key.COLUMN, null);
         }
 
-        BufferedReader reader = null;
         int bufferSize = readerSliceConfig.getInt(Key.BUFFER_SIZE, Constant.DEFAULT_BUFFER_SIZE);
 
         // compress logic
-        try {
-            if (compress == null || compress.isEmpty() || "none".equalsIgnoreCase(compress)) {
-                reader = new BufferedReader(new InputStreamReader(inputStream, encoding), bufferSize);
-            }
-            else {
-                if ("zip".equalsIgnoreCase(compress)) {
-                    ZipCycleInputStream zipCycleInputStream = new ZipCycleInputStream(inputStream);
-                    reader = new BufferedReader(new InputStreamReader(zipCycleInputStream, encoding), bufferSize);
-                }
-                else if ("lzo".equalsIgnoreCase(compress)) {
-                    ExpandLzopInputStream expandLzopInputStream = new ExpandLzopInputStream(inputStream);
-                    reader = new BufferedReader(new InputStreamReader(expandLzopInputStream, encoding), bufferSize);
-                }
-                else {
-                    // common-compress supports almost compress alg
-                    CompressorInputStream input = new CompressorStreamFactory().createCompressorInputStream(compress.toUpperCase(), inputStream, true);
-                    reader = new BufferedReader(new InputStreamReader(input, encoding), bufferSize);
-                }
-            }
-            StorageReaderUtil.doReadFromStream(reader, fileName, readerSliceConfig, recordSender, taskPluginCollector);
+        try (BufferedReader reader = createBufferedReader(inputStream, compress, encoding, bufferSize)) {
+            doReadFromStream(reader, fileName, readerSliceConfig, recordSender, taskPluginCollector);
         }
         catch (UnsupportedEncodingException uee) {
             throw AddaxException.asAddaxException(
                     ENCODING_ERROR,
                     String.format("%s is unsupported", encoding), uee);
-        }
-        catch (NullPointerException e) {
-            throw AddaxException.asAddaxException(RUNTIME_ERROR, e);
         }
         catch (IOException e) {
             throw AddaxException.asAddaxException(
@@ -141,8 +124,32 @@ public class StorageReaderUtil
                     "The compress algorithm [" + compress + "] is unsupported yet"
             );
         }
-        finally {
-            IOUtils.closeQuietly(reader, null);
+        catch (NullPointerException e) {
+            throw AddaxException.asAddaxException(RUNTIME_ERROR, e);
+        }
+    }
+
+    private static BufferedReader createBufferedReader(InputStream inputStream, String compress,
+            String encoding, int bufferSize)
+            throws IOException, CompressorException
+    {
+
+        if (StringUtils.isBlank(compress) || COMPRESS_NONE.equalsIgnoreCase(compress)) {
+            return new BufferedReader(new InputStreamReader(inputStream, encoding), bufferSize);
+        }
+        else if (COMPRESS_ZIP.equalsIgnoreCase(compress)) {
+            ZipCycleInputStream zipCycleInputStream = new ZipCycleInputStream(inputStream);
+            return new BufferedReader(new InputStreamReader(zipCycleInputStream, encoding), bufferSize);
+        }
+        else if (COMPRESS_LZO.equalsIgnoreCase(compress)) {
+            ExpandLzopInputStream expandLzopInputStream = new ExpandLzopInputStream(inputStream);
+            return new BufferedReader(new InputStreamReader(expandLzopInputStream, encoding), bufferSize);
+        }
+        else {
+            // common-compress supports almost compress alg
+            CompressorInputStream input = new CompressorStreamFactory().createCompressorInputStream(
+                    compress.toUpperCase(), inputStream, true);
+            return new BufferedReader(new InputStreamReader(input, encoding), bufferSize);
         }
     }
 
@@ -150,11 +157,11 @@ public class StorageReaderUtil
             Configuration readerSliceConfig, RecordSender recordSender,
             TaskPluginCollector taskPluginCollector)
     {
+        // Configure CSV parser
         CSVFormat.Builder csvFormatBuilder = CSVFormat.DEFAULT.builder();
-        String encoding = readerSliceConfig.getString(Key.ENCODING, Constant.DEFAULT_ENCODING);
-        Character fieldDelimiter;
-        String delimiterInStr = readerSliceConfig
-                .getString(Key.FIELD_DELIMITER);
+
+        // Get field delimiter
+        String delimiterInStr = readerSliceConfig.getString(Key.FIELD_DELIMITER);
         if (null != delimiterInStr && 1 != delimiterInStr.length()) {
             throw AddaxException.illegalConfigValue(Key.FIELD_DELIMITER, delimiterInStr);
         }
@@ -163,11 +170,14 @@ public class StorageReaderUtil
         }
 
         // warn: default value ',', fieldDelimiter could be \n(lineDelimiter) for no fieldDelimiter
-        fieldDelimiter = readerSliceConfig.getChar(Key.FIELD_DELIMITER, Constant.DEFAULT_FIELD_DELIMITER);
+        Character fieldDelimiter = readerSliceConfig.getChar(Key.FIELD_DELIMITER, Constant.DEFAULT_FIELD_DELIMITER);
         csvFormatBuilder.setDelimiter(fieldDelimiter);
-        // warn: no default value '\N'
+
+        // Null format configuration, warn: no default value '\N'
         String nullFormat = readerSliceConfig.getString(Key.NULL_FORMAT);
         csvFormatBuilder.setNullString(nullFormat);
+
+        // Header handling
         if (readerSliceConfig.getBool(Key.SKIP_HEADER, Constant.DEFAULT_SKIP_HEADER)) {
             csvFormatBuilder.setHeader();
             csvFormatBuilder.setSkipHeaderRecord(true);
@@ -175,17 +185,17 @@ public class StorageReaderUtil
         List<ColumnEntry> column = StorageReaderUtil.getListColumnEntry(readerSliceConfig, Key.COLUMN);
 
         // every line logic
-        try {
-            CSVParser csvParser = new CSVParser(reader, csvFormatBuilder.build());
-            csvParser.stream().filter(Objects::nonNull).forEach(csvRecord ->
-                    StorageReaderUtil.transportOneRecord(recordSender, column, csvRecord.toList().toArray(new String[0]), nullFormat, taskPluginCollector)
-            );
-            csvParser.close();
+        try (CSVParser csvParser = new CSVParser(reader, csvFormatBuilder.build())) {
+            csvParser.stream()
+                    .filter(Objects::nonNull)
+                    .forEach(csvRecord -> StorageReaderUtil.transportOneRecord(
+                            recordSender, column, csvRecord.toList().toArray(new String[0]), nullFormat, taskPluginCollector)
+                    );
         }
         catch (UnsupportedEncodingException uee) {
+            String encoding = readerSliceConfig.getString(Key.ENCODING, Constant.DEFAULT_ENCODING);
             throw AddaxException.asAddaxException(
-                    ENCODING_ERROR,
-                    String.format("The encoding: [%s] is unsupported", encoding), uee);
+                    ENCODING_ERROR, String.format("The encoding %s is unsupported", encoding), uee);
         }
         catch (FileNotFoundException fnfe) {
             throw AddaxException.asAddaxException(
@@ -199,17 +209,13 @@ public class StorageReaderUtil
             throw AddaxException.asAddaxException(
                     RUNTIME_ERROR, e);
         }
-        finally {
-
-            IOUtils.closeQuietly(reader, null);
-        }
     }
 
     public static void transportOneRecord(RecordSender recordSender, Configuration configuration,
             TaskPluginCollector taskPluginCollector, String line)
     {
         List<ColumnEntry> column = StorageReaderUtil.getListColumnEntry(configuration, Key.COLUMN);
-        // the nullFormat has not default value
+        // the nullFormat has not defaulted value
         String nullFormat = configuration.getString(Key.NULL_FORMAT);
 
         // warn: default value ',', fieldDelimiter could be \n(lineDelimiter)
