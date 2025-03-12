@@ -55,6 +55,7 @@ import java.sql.SQLException;
 import java.sql.Types;
 import java.util.Calendar;
 import java.util.List;
+import java.util.Objects;
 
 public class CommonRdbmsReader
 {
@@ -73,7 +74,7 @@ public class CommonRdbmsReader
         public Configuration init(Configuration originalConfig)
         {
             OriginalConfPretreatmentUtil.doPretreatment(dataBaseType, originalConfig);
-            if (originalConfig.getString(Key.SPLIT_PK) == null && originalConfig.getBool(Key.AUTO_PK, false)) {
+            if (Objects.equals(originalConfig.getString(Key.SPLIT_PK, ""), "") && originalConfig.getBool(Key.AUTO_PK, false)) {
                 LOG.info("The split key is not configured, try to guess the split key.");
                 String splitPK = GetPrimaryKeyUtil.getPrimaryKey(dataBaseType, originalConfig);
                 if (splitPK != null) {
