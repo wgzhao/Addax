@@ -26,6 +26,7 @@ import org.slf4j.LoggerFactory;
 
 import java.io.PrintWriter;
 import java.io.StringWriter;
+import java.util.Objects;
 
 public class AddaxException
         extends RuntimeException
@@ -38,23 +39,21 @@ public class AddaxException
     public AddaxException(ErrorCode errorCode, String errorMessage)
     {
         super(errorMessage);
-        logger.error("Error Code: {}: {}", errorCode.getCode(), errorMessage);
-        this.errorCode = errorCode;
+        this.errorCode = Objects.requireNonNull(errorCode, "ErrorCode cannot be null");
+//        logger.error("Error Code: {}: {}", errorCode.getCode(), errorMessage);
     }
 
     private AddaxException(ErrorCode errorCode, String errorMessage, Throwable cause)
     {
         super(errorMessage, cause);
-
-        this.errorCode = errorCode;
+        this.errorCode = Objects.requireNonNull(errorCode, "ErrorCode cannot be null");
+//        logger.error("Error Code: {}: {}", errorCode.getCode(), errorMessage, cause);
     }
 
     public static AddaxException asAddaxException(ErrorCode errorCode, String message)
     {
-        if (StringUtils.isBlank(message)) {
-            message = errorCode.getDescription();
-        }
-        throw new RuntimeException(message);
+        String errorMessage = StringUtils.isBlank(message) ? errorCode.getDescription() : message;
+        return new AddaxException(errorCode, errorMessage);
     }
 
     public static AddaxException asAddaxException(ErrorCode errorCode, String message, Throwable cause)
@@ -70,7 +69,7 @@ public class AddaxException
         if (cause instanceof AddaxException) {
             return (AddaxException) cause;
         }
-        return new AddaxException(errorCode, getMessage(cause), cause);
+        return new AddaxException(errorCode, formatCauseMessage(cause), cause);
     }
 
     public static AddaxException illegalConfigValue(String configName, Object configValue)
@@ -91,21 +90,17 @@ public class AddaxException
                 "The configuration for '" + configName + "' is required but not provided");
     }
 
-    private static String getMessage(Object obj)
+    private static String formatCauseMessage(Throwable cause)
     {
-        if (obj == null) {
+        if (cause == null) {
             return "";
         }
 
-        if (obj instanceof Throwable) {
-            StringWriter str = new StringWriter();
-            PrintWriter pw = new PrintWriter(str);
-            ((Throwable) obj).printStackTrace(pw);
-            return str.toString();
-        }
-        else {
-            return obj.toString();
-        }
+        // For exceptions, use stack trace
+        StringWriter str = new StringWriter();
+        PrintWriter pw = new PrintWriter(str);
+        cause.printStackTrace(pw);
+        return str.toString();
     }
 
     public ErrorCode getErrorCode()
