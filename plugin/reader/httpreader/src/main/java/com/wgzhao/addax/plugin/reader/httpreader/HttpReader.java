@@ -110,7 +110,7 @@ public class HttpReader
         private String username;
         private String password;
         private String token;
-        private final BasicCredentialsProvider credsProvider = new BasicCredentialsProvider();
+        private BasicCredentialsProvider credsProvider;
         private HttpHost proxy = null;
         private Request request;
         private String method;
@@ -275,6 +275,7 @@ public class HttpReader
             this.proxy = new HttpHost(host.getScheme(), host.getHost(), host.getPort());
             if (proxyConf.getString(HttpKey.AUTH, null) != null) {
                 String[] auth = proxyConf.getString(HttpKey.AUTH).split(":");
+                credsProvider = new BasicCredentialsProvider();
                 credsProvider.setCredentials(
                         new AuthScope(proxy),
                         new UsernamePasswordCredentials(auth[0], auth[1].toCharArray())
@@ -284,11 +285,9 @@ public class HttpReader
 
         private Content createCloseableHttpResponse()
         {
-            Map<String, Object> headers = readerSliceConfig.getMap(HttpKey.HEADERS, new HashMap<>());
-            CloseableHttpClient httpClient;
-            headers.forEach((k, v) -> request.addHeader(k, v.toString()));
-            httpClient = createCloseableHttpClient();
-            try {
+            readerSliceConfig.getMap(HttpKey.HEADERS, new HashMap<>())
+                    .forEach((k, v) -> request.addHeader(k, v.toString()));
+            try(CloseableHttpClient httpClient = createCloseableHttpClient()) {
                 return Executor.newInstance(httpClient)
                         .execute(request)
                         .returnContent();
