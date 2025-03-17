@@ -189,8 +189,7 @@ public class ParquetWriter
             }
             catch (IllegalArgumentException e) {
                 logger.warn("Convert type [{}] into string", typename);
-//                group.append(colName, column.asString());
-                taskPluginCollector.collectDirtyRecord(record, e);
+                group.append(colName, column.asString());
             }
         }
         return group;
@@ -214,9 +213,6 @@ public class ParquetWriter
                 break;
             case DOUBLE:
                 group.append(colName, column.asDouble());
-                break;
-            case STRING:
-                group.append(colName, column.asString());
                 break;
             case BOOLEAN:
                 group.append(colName, column.asBoolean());
@@ -315,11 +311,11 @@ public class ParquetWriter
             case "LONG":
                 return Types.primitive(PrimitiveType.PrimitiveTypeName.INT64, repetition).named(fieldName);
             case "DECIMAL":
-                int prec = column.getInt(Key.PRECISION, Constant.DEFAULT_DECIMAL_MAX_PRECISION);
+                int precision = column.getInt(Key.PRECISION, Constant.DEFAULT_DECIMAL_MAX_PRECISION);
                 int scale = column.getInt(Key.SCALE, Constant.DEFAULT_DECIMAL_MAX_SCALE);
                 return Types.primitive(PrimitiveType.PrimitiveTypeName.FIXED_LEN_BYTE_ARRAY, repetition)
                         .length(DECIMAL_BYTE_LENGTH)
-                        .as(decimalType(scale, prec))
+                        .as(decimalType(scale, precision))
                         .named(fieldName);
             case "STRING":
                 return Types.primitive(PrimitiveType.PrimitiveTypeName.BINARY, repetition)
