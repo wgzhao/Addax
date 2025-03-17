@@ -1,3 +1,22 @@
+/*
+ *  Licensed to the Apache Software Foundation (ASF) under one
+ *  or more contributor license agreements.  See the NOTICE file
+ *  distributed with this work for additional information
+ *  regarding copyright ownership.  The ASF licenses this file
+ *  to you under the Apache License, Version 2.0 (the
+ *  "License"); you may not use this file except in compliance
+ *  with the License.  You may obtain a copy of the License at
+ *
+ *    http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *  Unless required by applicable law or agreed to in writing,
+ *  software distributed under the License is distributed on an
+ *  "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ *  KIND, either express or implied.  See the License for the
+ *  specific language governing permissions and limitations
+ *  under the License.
+ */
+
 package com.wgzhao.addax.plugin.writer.hdfswriter;
 
 import com.wgzhao.addax.common.base.Constant;
@@ -42,7 +61,10 @@ public class OrcWriter
         extends HdfsHelper
         implements IHDFSWriter
 {
-    private final Logger logger = LoggerFactory.getLogger(OrcWriter.class.getName());
+    private static final Logger logger = LoggerFactory.getLogger(OrcWriter.class);
+    private static final int DEFAULT_BATCH_SIZE = 1024;
+    private static final ThreadLocal<SimpleDateFormat> DATE_FORMAT =
+            ThreadLocal.withInitial(() -> new SimpleDateFormat("yyyy-MM-dd"));
 
     public OrcWriter(Configuration conf)
     {
@@ -65,92 +87,109 @@ public class OrcWriter
         for (int i = 0; i < columns.size(); i++) {
             Configuration eachColumnConf = columns.get(i);
             String type = eachColumnConf.getString(Key.TYPE).trim().toUpperCase();
-            SupportHiveDataType columnType;
             ColumnVector col = batch.cols[i];
-            if (type.startsWith("DECIMAL")) {
-                columnType = SupportHiveDataType.DECIMAL;
-            }
-            else {
-                columnType = SupportHiveDataType.valueOf(type);
-            }
-            if (record.getColumn(i) == null || record.getColumn(i).getRawData() == null) {
+
+            // Handle null values
+            Column recordColumn = record.getColumn(i);
+            if (recordColumn == null || recordColumn.getRawData() == null) {
                 col.isNull[row] = true;
                 col.noNulls = false;
                 continue;
             }
 
             try {
+                // Determine column type
+                SupportHiveDataType columnType;
+                if (type.startsWith("DECIMAL")) {
+                    columnType = SupportHiveDataType.DECIMAL;
+                }
+                else {
+                    try {
+                        columnType = SupportHiveDataType.valueOf(type);
+                    }
+                    catch (IllegalArgumentException e) {
+                        throw AddaxException.asAddaxException(
+                                NOT_SUPPORT_TYPE,
+                                String.format("Unsupported field type. Field name: [%s], Field type:[%s].",
+                                        eachColumnConf.getString(Key.NAME), type));
+                    }
+                }
+
+                // Set value based on column type
                 switch (columnType) {
                     case TINYINT:
                     case SMALLINT:
                     case INT:
                     case BIGINT:
                     case BOOLEAN:
-                        ((LongColumnVector) col).vector[row] = record.getColumn(i).asLong();
+                        ((LongColumnVector) col).vector[row] = recordColumn.asLong();
                         break;
                     case DATE:
-                        ((LongColumnVector) col).vector[row] = LocalDate.parse(record.getColumn(i).asString()).toEpochDay();
+                        ((LongColumnVector) col).vector[row] = LocalDate.parse(recordColumn.asString()).toEpochDay();
                         break;
                     case FLOAT:
                     case DOUBLE:
-                        ((DoubleColumnVector) col).vector[row] = record.getColumn(i).asDouble();
+                        ((DoubleColumnVector) col).vector[row] = recordColumn.asDouble();
                         break;
                     case DECIMAL:
+                        int scale = eachColumnConf.getInt(Key.SCALE, Constant.DEFAULT_DECIMAL_MAX_SCALE);
                         HiveDecimalWritable hdw = new HiveDecimalWritable();
-                        hdw.set(HiveDecimal.create(record.getColumn(i).asBigDecimal())
-                                .setScale(eachColumnConf.getInt(Key.SCALE), HiveDecimal.ROUND_HALF_UP));
+                        hdw.set(HiveDecimal.create(recordColumn.asBigDecimal())
+                                .setScale(scale, HiveDecimal.ROUND_HALF_UP));
                         ((DecimalColumnVector) col).set(row, hdw);
                         break;
                     case TIMESTAMP:
-                        ((TimestampColumnVector) col).set(row, record.getColumn(i).asTimestamp());
+                        ((TimestampColumnVector) col).set(row, recordColumn.asTimestamp());
                         break;
                     case STRING:
                     case VARCHAR:
                     case CHAR:
-                        byte[] buffer;
-                        Column column = record.getColumn(i);
-                        Column.Type colType = column.getType();
-                        if (colType == Column.Type.BYTES) {
-                            //convert bytes to base64 string
-                            buffer = Base64.getEncoder().encode((byte[]) column.getRawData());
-                        }
-                        else if (colType == Column.Type.DATE) {
-                            if (((DateColumn) column).getSubType() == DateColumn.DateType.TIME) {
-                                buffer = column.asString().getBytes(StandardCharsets.UTF_8);
-                            }
-                            else {
-                                SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
-                                buffer = sdf.format(record.getColumn(i).asDate()).getBytes(StandardCharsets.UTF_8);
-                            }
-                        }
-                        else {
-                            buffer = record.getColumn(i).getRawData().toString().getBytes(StandardCharsets.UTF_8);
-                        }
-                        ((BytesColumnVector) col).setRef(row, buffer, 0, buffer.length);
+                        setStringValue(col, row, recordColumn);
                         break;
                     case BINARY:
-                        byte[] content = (byte[]) record.getColumn(i).getRawData();
+                        byte[] content = (byte[]) recordColumn.getRawData();
                         ((BytesColumnVector) col).setRef(row, content, 0, content.length);
                         break;
                     default:
-                        throw AddaxException
-                                .asAddaxException(
-                                        NOT_SUPPORT_TYPE,
-                                        String.format("The columns configuration is incorrect. the field type is unsupported yet. Field name: [%s], Field type name:[%s].",
-                                                eachColumnConf.getString(Key.NAME),
-                                                eachColumnConf.getString(Key.TYPE)));
+                        throw AddaxException.asAddaxException(
+                                NOT_SUPPORT_TYPE,
+                                String.format("Unsupported field type. Field name: [%s], Field type:[%s].",
+                                        eachColumnConf.getString(Key.NAME), type));
                 }
             }
             catch (Exception e) {
                 taskPluginCollector.collectDirtyRecord(record, e.getMessage());
                 throw AddaxException.asAddaxException(RUNTIME_ERROR,
-                        String.format("Failed to set ORC row, source field type: %s, destination field original type: %s, " +
-                                        "destination field hive type: %s, field name: %s, source field value: %s, root cause:%n%s",
-                                record.getColumn(i).getType(), columnType, eachColumnConf.getString(Key.TYPE),
+                        String.format("Failed to set ORC row, source field type: %s, destination type: %s, " +
+                                        "field name: %s, value: %s, error: %s",
+                                recordColumn.getType(), type,
                                 eachColumnConf.getString(Key.NAME),
-                                record.getColumn(i).getRawData(), e));
+                                recordColumn.getRawData(), e.getMessage()));
             }
         }
+    }
+
+    private void setStringValue(ColumnVector col, int row, Column column)
+    {
+        byte[] buffer;
+        Column.Type colType = column.getType();
+
+        if (colType == Column.Type.BYTES) {
+            buffer = Base64.getEncoder().encode((byte[]) column.getRawData());
+        }
+        else if (colType == Column.Type.DATE) {
+            if (((DateColumn) column).getSubType() == DateColumn.DateType.TIME) {
+                buffer = column.asString().getBytes(StandardCharsets.UTF_8);
+            }
+            else {
+                buffer = DATE_FORMAT.get().format(column.asDate()).getBytes(StandardCharsets.UTF_8);
+            }
+        }
+        else {
+            buffer = column.getRawData().toString().getBytes(StandardCharsets.UTF_8);
+        }
+
+        ((BytesColumnVector) col).setRef(row, buffer, 0, buffer.length);
     }
 
     @Override
@@ -159,42 +198,59 @@ public class OrcWriter
     {
         List<Configuration> columns = config.getListConfiguration(Key.COLUMN);
         String compress = config.getString(Key.COMPRESS, "NONE").toUpperCase();
-        StringJoiner joiner = new StringJoiner(",");
-        for (Configuration column : columns) {
-            if ("decimal".equals(column.getString(Key.TYPE))) {
-                joiner.add(String.format("%s:%s(%s,%s)", column.getString(Key.NAME), "decimal",
-                        column.getInt(Key.PRECISION, Constant.DEFAULT_DECIMAL_MAX_PRECISION),
-                        column.getInt(Key.SCALE, Constant.DEFAULT_DECIMAL_MAX_SCALE)));
-            }
-            else {
-                joiner.add(String.format("%s:%s", column.getString(Key.NAME), column.getString(Key.TYPE)));
-            }
-        }
-        TypeDescription schema = TypeDescription.fromString("struct<" + joiner + ">");
-        try (Writer writer = OrcFile.createWriter(new Path(fileName),
+        int batchSize = config.getInt(Key.BATCH_SIZE, DEFAULT_BATCH_SIZE);
+
+        TypeDescription schema = buildOrcSchema(columns);
+        Path filePath = new Path(fileName);
+
+        try (Writer writer = OrcFile.createWriter(filePath,
                 OrcFile.writerOptions(conf)
                         .setSchema(schema)
                         .compress(CompressionKind.valueOf(compress)))) {
+
             Record record;
-            VectorizedRowBatch batch = schema.createRowBatch(1024);
+            VectorizedRowBatch batch = schema.createRowBatch(batchSize);
+
             while ((record = lineReceiver.getFromReader()) != null) {
                 int row = batch.size++;
                 setRow(batch, row, record, columns, taskPluginCollector);
+
                 if (batch.size == batch.getMaxSize()) {
                     writer.addRowBatch(batch);
                     batch.reset();
                 }
             }
+
             if (batch.size != 0) {
                 writer.addRowBatch(batch);
                 batch.reset();
             }
         }
         catch (IOException e) {
-            logger.error("IO exception occurred while writing file [{}}.", fileName);
-            Path path = new Path(fileName);
-            deleteDir(path.getParent());
+            logger.error("IO exception occurred while writing file [{}]: {}", fileName, e.getMessage());
+            deleteDir(filePath.getParent());
             throw AddaxException.asAddaxException(IO_ERROR, e);
         }
+    }
+
+    private TypeDescription buildOrcSchema(List<Configuration> columns)
+    {
+        StringJoiner joiner = new StringJoiner(",");
+
+        for (Configuration column : columns) {
+            String typeName = column.getString(Key.TYPE);
+            String fieldName = column.getString(Key.NAME);
+
+            if ("decimal".equalsIgnoreCase(typeName)) {
+                int precision = column.getInt(Key.PRECISION, Constant.DEFAULT_DECIMAL_MAX_PRECISION);
+                int scale = column.getInt(Key.SCALE, Constant.DEFAULT_DECIMAL_MAX_SCALE);
+                joiner.add(String.format("%s:decimal(%d,%d)", fieldName, precision, scale));
+            }
+            else {
+                joiner.add(String.format("%s:%s", fieldName, typeName));
+            }
+        }
+
+        return TypeDescription.fromString("struct<" + joiner + ">");
     }
 }

@@ -163,7 +163,7 @@ public class HdfsWriter
                 }
                 catch (IllegalArgumentException e) {
                     throw AddaxException.asAddaxException(ILLEGAL_VALUE,
-                            String.format("The ORC format only supports [%s] compression. your configure [%s] is unsupported yet.",
+                            String.format("The ORC format only supports %s compression. your configure [%s] is unsupported yet.",
                                     Arrays.toString(CompressionKind.values()), compress));
                 }
             }
