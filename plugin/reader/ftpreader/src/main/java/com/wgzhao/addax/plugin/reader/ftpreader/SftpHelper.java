@@ -33,10 +33,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.InputStream;
-import java.nio.file.Paths;
-import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.Properties;
+import java.util.Vector;
 
 import static com.wgzhao.addax.common.spi.ErrorCode.CONFIG_ERROR;
 import static com.wgzhao.addax.common.spi.ErrorCode.CONNECT_ERROR;
@@ -49,7 +47,6 @@ public class SftpHelper
 
     Session session = null;
     ChannelSftp channelSftp = null;
-    HashSet<String> sourceFiles = new HashSet<>();
 
     @Override
     public void loginFtpServer(String host, String username, String password, int port, String keyPath, String keyPass, int timeout,
@@ -106,7 +103,8 @@ public class SftpHelper
         }
     }
 
-    private boolean isDirectory(String directoryPath)
+    @Override
+    protected boolean isDirectory(String directoryPath)
     {
         try {
             SftpATTRS sftpATTRS = channelSftp.lstat(directoryPath);
@@ -118,31 +116,88 @@ public class SftpHelper
     }
 
     @Override
-    public HashSet<String> getListFiles(String directoryPath, int parentLevel, int maxTraversalLevel)
+    public void getListFiles(String directoryPath, int parentLevel, int maxTraversalLevel)
     {
-        String parentDir;
-        if (isDirectory(directoryPath)) {
-            parentDir = directoryPath;
-        } else {
-            parentDir = Paths.get(directoryPath).getParent().toString();
+        if (parentLevel > maxTraversalLevel) {
+            return;
         }
+
         try {
-                ArrayList<Object> vector = new ArrayList<>(channelSftp.ls(directoryPath));
-                for (Object o : vector) {
-                    LsEntry le = (LsEntry) o;
-                    // the long name format is like
-                    // drwxr-xr-x    2 root     root         4096 Mar  1  2010 bin
-                    String strName = le.getLongname();
-                    if (strName.startsWith("-")) {
-                        // 是文件
-                        sourceFiles.add(parentDir + IOUtils.DIR_SEPARATOR + le.getFilename());
+            // Handle wildcard pattern in the path
+            if (hasWildcard(directoryPath)) {
+                String parentDir = directoryPath.substring(0, directoryPath.lastIndexOf('/'));
+                String filePattern = directoryPath.substring(directoryPath.lastIndexOf('/') + 1);
+
+                try {
+                    if (!isDirectory(parentDir)) {
+                        LOG.warn("Parent directory does not exist: {}", parentDir);
+                        return;
                     }
-                } // end for vector
+
+                    Vector<LsEntry> vector = channelSftp.ls(parentDir);
+                    for (LsEntry entry : vector) {
+                        String fileName = entry.getFilename();
+                        if (!".".equals(fileName) && !"..".equals(fileName) &&
+                                !entry.getAttrs().isDir() && matchWildcard(filePattern, fileName)) {
+                            String filePath = parentDir + "/" + fileName;
+                            sourceFiles.add(filePath);
+                            LOG.debug("Added file (wildcard match): {}", filePath);
+                        }
+                    }
+                }
+                catch (SftpException e) {
+                    LOG.error("Failed to list directory with wildcard: {}", parentDir, e);
+                }
+                return;
             }
-            catch (SftpException e) {
-                LOG.error("Failed to retrieve file(s) from {}", directoryPath, e);
+
+            // Regular path handling
+            if (!isDirectory(directoryPath)) {
+                // Check if file exists
+                try {
+                    channelSftp.lstat(directoryPath);
+                    sourceFiles.add(directoryPath);
+                    LOG.debug("Added file: {}", directoryPath);
+                }
+                catch (SftpException e) {
+                    LOG.warn("File does not exist: {}", directoryPath);
+                }
+                return;
             }
-            return sourceFiles;
+
+            // Ensure directory path ends with separator
+            String normalizedPath = directoryPath.endsWith(IOUtils.DIR_SEPARATOR + "") ?
+                    directoryPath : directoryPath + IOUtils.DIR_SEPARATOR;
+
+            Vector<LsEntry> vector = channelSftp.ls(directoryPath);
+            if (vector == null || vector.isEmpty()) {
+                LOG.info("No files found in directory: {}", directoryPath);
+                return;
+            }
+
+            for (LsEntry entry : vector) {
+                String fileName = entry.getFilename();
+                // Skip current directory and parent directory entries
+                if (".".equals(fileName) || "..".equals(fileName)) {
+                    continue;
+                }
+
+                String fullPath = normalizedPath + fileName;
+                SftpATTRS attrs = entry.getAttrs();
+
+                if (attrs.isDir()) {
+                    // Recursively traverse subdirectories
+                    getListFiles(fullPath, parentLevel + 1, maxTraversalLevel);
+                }
+                else if (attrs.isReg()) {
+                    sourceFiles.add(fullPath);
+                    LOG.debug("Added file: {}", fullPath);
+                }
+            }
+        }
+        catch (SftpException e) {
+            LOG.error("Failed to retrieve files from {}: {}", directoryPath, e.getMessage());
+        }
     }
 
     @Override
