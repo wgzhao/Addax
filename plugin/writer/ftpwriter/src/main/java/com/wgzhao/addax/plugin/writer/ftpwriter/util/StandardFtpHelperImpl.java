@@ -21,7 +21,7 @@ package com.wgzhao.addax.plugin.writer.ftpwriter.util;
 
 import com.alibaba.fastjson2.JSON;
 import com.alibaba.fastjson2.JSONWriter;
-import com.wgzhao.addax.common.exception.AddaxException;
+import com.wgzhao.addax.core.exception.AddaxException;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.net.ftp.FTPClient;

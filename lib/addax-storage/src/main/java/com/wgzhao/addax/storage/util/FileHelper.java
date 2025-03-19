@@ -19,9 +19,9 @@
 package com.wgzhao.addax.storage.util;
 
 import com.google.common.collect.ImmutableMap;
-import com.wgzhao.addax.common.compress.ZipCycleInputStream;
-import com.wgzhao.addax.common.exception.AddaxException;
-import com.wgzhao.addax.common.spi.ErrorCode;
+import com.wgzhao.addax.core.compress.ZipCycleInputStream;
+import com.wgzhao.addax.core.exception.AddaxException;
+import com.wgzhao.addax.core.spi.ErrorCode;
 import org.apache.commons.compress.compressors.CompressorException;
 import org.apache.commons.compress.compressors.CompressorInputStream;
 import org.apache.commons.compress.compressors.CompressorStreamFactory;

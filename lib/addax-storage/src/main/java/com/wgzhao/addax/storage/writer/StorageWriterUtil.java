@@ -21,19 +21,19 @@
 
 package com.wgzhao.addax.storage.writer;
 
-import com.wgzhao.addax.common.base.Constant;
-import com.wgzhao.addax.common.base.Key;
-import com.wgzhao.addax.common.compress.ZipCycleOutputStream;
-import com.wgzhao.addax.common.element.BoolColumn;
-import com.wgzhao.addax.common.element.Column;
-import com.wgzhao.addax.common.element.DateColumn;
-import com.wgzhao.addax.common.element.LongColumn;
-import com.wgzhao.addax.common.element.Record;
-import com.wgzhao.addax.common.element.TimestampColumn;
-import com.wgzhao.addax.common.exception.AddaxException;
-import com.wgzhao.addax.common.plugin.RecordReceiver;
-import com.wgzhao.addax.common.plugin.TaskPluginCollector;
-import com.wgzhao.addax.common.util.Configuration;
+import com.wgzhao.addax.core.base.Constant;
+import com.wgzhao.addax.core.base.Key;
+import com.wgzhao.addax.core.compress.ZipCycleOutputStream;
+import com.wgzhao.addax.core.element.BoolColumn;
+import com.wgzhao.addax.core.element.Column;
+import com.wgzhao.addax.core.element.DateColumn;
+import com.wgzhao.addax.core.element.LongColumn;
+import com.wgzhao.addax.core.element.Record;
+import com.wgzhao.addax.core.element.TimestampColumn;
+import com.wgzhao.addax.core.exception.AddaxException;
+import com.wgzhao.addax.core.plugin.RecordReceiver;
+import com.wgzhao.addax.core.plugin.TaskPluginCollector;
+import com.wgzhao.addax.core.util.Configuration;
 import com.wgzhao.addax.storage.util.FileHelper;
 import org.apache.commons.compress.compressors.CompressorException;
 import org.apache.commons.compress.compressors.CompressorOutputStream;
@@ -60,12 +60,12 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Set;
 
-import static com.wgzhao.addax.common.spi.ErrorCode.CONFIG_ERROR;
-import static com.wgzhao.addax.common.spi.ErrorCode.ENCODING_ERROR;
-import static com.wgzhao.addax.common.spi.ErrorCode.IO_ERROR;
-import static com.wgzhao.addax.common.spi.ErrorCode.NOT_SUPPORT_TYPE;
-import static com.wgzhao.addax.common.spi.ErrorCode.REQUIRED_VALUE;
-import static com.wgzhao.addax.common.spi.ErrorCode.RUNTIME_ERROR;
+import static com.wgzhao.addax.core.spi.ErrorCode.CONFIG_ERROR;
+import static com.wgzhao.addax.core.spi.ErrorCode.ENCODING_ERROR;
+import static com.wgzhao.addax.core.spi.ErrorCode.IO_ERROR;
+import static com.wgzhao.addax.core.spi.ErrorCode.NOT_SUPPORT_TYPE;
+import static com.wgzhao.addax.core.spi.ErrorCode.REQUIRED_VALUE;
+import static com.wgzhao.addax.core.spi.ErrorCode.RUNTIME_ERROR;
 
 public class StorageWriterUtil
 {

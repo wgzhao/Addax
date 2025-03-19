@@ -22,7 +22,7 @@ package com.wgzhao.addax.plugin.reader.mongodbreader.util;
 import com.mongodb.MongoClientSettings;
 import com.mongodb.client.MongoClient;
 import com.mongodb.client.MongoClients;
-import com.wgzhao.addax.common.exception.AddaxException;
+import com.wgzhao.addax.core.exception.AddaxException;
 import com.mongodb.MongoCredential;
 import com.mongodb.ServerAddress;
 

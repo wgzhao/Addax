@@ -24,7 +24,7 @@ package com.wgzhao.addax.rdbms.util;
 import java.util.TimeZone;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import static com.wgzhao.addax.common.base.Constant.SQL_RESERVED_WORDS;
+import static com.wgzhao.addax.core.base.Constant.SQL_RESERVED_WORDS;
 
 public enum DataBaseType
 {

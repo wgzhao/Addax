@@ -9,27 +9,11 @@
     <includeBaseDirectory>false</includeBaseDirectory>
     <fileSets>
         <fileSet>
-            <directory>common/target/addax/</directory>
-            <includes>
-                <include>*.jar</include>
-            </includes>
-            <fileMode>0644</fileMode>
-            <outputDirectory>addax-${project.version}/lib</outputDirectory>
-        </fileSet>
-        <fileSet>
             <directory>core/target/addax/</directory>
             <includes>
                 <include>**/*.*</include>
             </includes>
             <outputDirectory>addax-${project.version}</outputDirectory>
-        </fileSet>
-        <fileSet>
-            <directory>lib/transformer/target/addax/lib/</directory>
-            <includes>
-                <include>*.*</include>
-            </includes>
-            <fileMode>0644</fileMode>
-            <outputDirectory>addax-${project.version}/lib</outputDirectory>
         </fileSet>
         <fileSet>
             <directory>lib/addax-rdbms/target/addax/lib/</directory>

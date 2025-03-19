@@ -19,14 +19,14 @@
 
 package com.wgzhao.addax.plugin.writer.hbase11xwriter;
 
-import com.wgzhao.addax.common.base.HBaseConstant;
-import com.wgzhao.addax.common.base.HBaseKey;
-import com.wgzhao.addax.common.element.Column;
-import com.wgzhao.addax.common.element.Record;
-import com.wgzhao.addax.common.exception.AddaxException;
-import com.wgzhao.addax.common.plugin.RecordReceiver;
-import com.wgzhao.addax.common.plugin.TaskPluginCollector;
-import com.wgzhao.addax.common.util.Configuration;
+import com.wgzhao.addax.core.base.HBaseConstant;
+import com.wgzhao.addax.core.base.HBaseKey;
+import com.wgzhao.addax.core.element.Column;
+import com.wgzhao.addax.core.element.Record;
+import com.wgzhao.addax.core.exception.AddaxException;
+import com.wgzhao.addax.core.plugin.RecordReceiver;
+import com.wgzhao.addax.core.plugin.TaskPluginCollector;
+import com.wgzhao.addax.core.util.Configuration;
 import org.apache.hadoop.hbase.HConstants;
 import org.apache.hadoop.hbase.client.BufferedMutator;
 import org.apache.hadoop.hbase.client.Put;

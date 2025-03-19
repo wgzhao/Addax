@@ -1,7 +1,7 @@
 package com.wgzhao.addax.plugin.writer.s3writer;
 
-import com.wgzhao.addax.common.exception.AddaxException;
-import com.wgzhao.addax.common.util.Configuration;
+import com.wgzhao.addax.core.exception.AddaxException;
+import com.wgzhao.addax.core.util.Configuration;
 import software.amazon.awssdk.auth.credentials.AwsBasicCredentials;
 import software.amazon.awssdk.auth.credentials.StaticCredentialsProvider;
 import software.amazon.awssdk.regions.Region;

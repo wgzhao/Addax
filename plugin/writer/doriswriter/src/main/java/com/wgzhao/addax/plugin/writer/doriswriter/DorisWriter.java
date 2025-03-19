@@ -20,11 +20,11 @@
 
 package com.wgzhao.addax.plugin.writer.doriswriter;
 
-import com.wgzhao.addax.common.element.Record;
-import com.wgzhao.addax.common.exception.AddaxException;
-import com.wgzhao.addax.common.plugin.RecordReceiver;
-import com.wgzhao.addax.common.spi.Writer;
-import com.wgzhao.addax.common.util.Configuration;
+import com.wgzhao.addax.core.element.Record;
+import com.wgzhao.addax.core.exception.AddaxException;
+import com.wgzhao.addax.core.plugin.RecordReceiver;
+import com.wgzhao.addax.core.spi.Writer;
+import com.wgzhao.addax.core.util.Configuration;
 import com.wgzhao.addax.plugin.writer.doriswriter.codec.DorisCodec;
 import com.wgzhao.addax.plugin.writer.doriswriter.codec.DorisCodecFactory;
 import com.wgzhao.addax.rdbms.util.DBUtil;

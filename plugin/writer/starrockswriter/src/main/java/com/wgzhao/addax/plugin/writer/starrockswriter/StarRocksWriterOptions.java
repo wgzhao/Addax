@@ -1,7 +1,7 @@
 package com.wgzhao.addax.plugin.writer.starrockswriter;
 
-import com.wgzhao.addax.common.exception.AddaxException;
-import com.wgzhao.addax.common.util.Configuration;
+import com.wgzhao.addax.core.exception.AddaxException;
+import com.wgzhao.addax.core.util.Configuration;
 
 import java.io.Serializable;
 import java.util.List;

@@ -19,9 +19,9 @@
 
 package com.wgzhao.addax.core.transport.exchanger;
 
-import com.wgzhao.addax.common.element.Record;
-import com.wgzhao.addax.common.exception.AddaxException;
-import com.wgzhao.addax.common.plugin.TaskPluginCollector;
+import com.wgzhao.addax.core.element.Record;
+import com.wgzhao.addax.core.exception.AddaxException;
+import com.wgzhao.addax.core.plugin.TaskPluginCollector;
 import com.wgzhao.addax.core.statistics.communication.Communication;
 import com.wgzhao.addax.core.statistics.communication.CommunicationTool;
 import com.wgzhao.addax.core.transport.transformer.TransformerExecution;
@@ -29,7 +29,7 @@ import com.wgzhao.addax.core.util.container.ClassLoaderSwapper;
 
 import java.util.List;
 
-import static com.wgzhao.addax.common.spi.ErrorCode.ILLEGAL_VALUE;
+import static com.wgzhao.addax.core.spi.ErrorCode.ILLEGAL_VALUE;
 
 /**
  * no comments.

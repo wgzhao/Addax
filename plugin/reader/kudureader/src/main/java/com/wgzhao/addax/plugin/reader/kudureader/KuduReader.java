@@ -19,17 +19,17 @@
 
 package com.wgzhao.addax.plugin.reader.kudureader;
 
-import com.wgzhao.addax.common.element.BoolColumn;
-import com.wgzhao.addax.common.element.BytesColumn;
-import com.wgzhao.addax.common.element.DoubleColumn;
-import com.wgzhao.addax.common.element.LongColumn;
-import com.wgzhao.addax.common.element.Record;
-import com.wgzhao.addax.common.element.StringColumn;
-import com.wgzhao.addax.common.element.TimestampColumn;
-import com.wgzhao.addax.common.exception.AddaxException;
-import com.wgzhao.addax.common.plugin.RecordSender;
-import com.wgzhao.addax.common.spi.Reader;
-import com.wgzhao.addax.common.util.Configuration;
+import com.wgzhao.addax.core.element.BoolColumn;
+import com.wgzhao.addax.core.element.BytesColumn;
+import com.wgzhao.addax.core.element.DoubleColumn;
+import com.wgzhao.addax.core.element.LongColumn;
+import com.wgzhao.addax.core.element.Record;
+import com.wgzhao.addax.core.element.StringColumn;
+import com.wgzhao.addax.core.element.TimestampColumn;
+import com.wgzhao.addax.core.exception.AddaxException;
+import com.wgzhao.addax.core.plugin.RecordSender;
+import com.wgzhao.addax.core.spi.Reader;
+import com.wgzhao.addax.core.util.Configuration;
 import org.apache.kudu.ColumnSchema;
 import org.apache.kudu.Schema;
 import org.apache.kudu.Type;

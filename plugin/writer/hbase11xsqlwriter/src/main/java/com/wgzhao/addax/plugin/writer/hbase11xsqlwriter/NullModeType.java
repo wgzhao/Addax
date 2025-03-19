@@ -19,7 +19,7 @@
 
 package com.wgzhao.addax.plugin.writer.hbase11xsqlwriter;
 
-import com.wgzhao.addax.common.exception.AddaxException;
+import com.wgzhao.addax.core.exception.AddaxException;
 
 import java.util.Arrays;
 

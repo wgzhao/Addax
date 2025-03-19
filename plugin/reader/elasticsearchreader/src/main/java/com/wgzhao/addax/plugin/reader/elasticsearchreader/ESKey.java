@@ -19,7 +19,7 @@
 
 package com.wgzhao.addax.plugin.reader.elasticsearchreader;
 
-import com.wgzhao.addax.common.util.Configuration;
+import com.wgzhao.addax.core.util.Configuration;
 import io.searchbox.params.SearchType;
 import org.apache.commons.lang3.StringUtils;
 

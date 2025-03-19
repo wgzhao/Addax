@@ -1,11 +1,11 @@
 package com.wgzhao.addax.plugin.writer.excelwriter;
 
-import com.wgzhao.addax.common.element.Column;
-import com.wgzhao.addax.common.element.Record;
-import com.wgzhao.addax.common.exception.AddaxException;
-import com.wgzhao.addax.common.plugin.RecordReceiver;
-import com.wgzhao.addax.common.spi.Writer;
-import com.wgzhao.addax.common.util.Configuration;
+import com.wgzhao.addax.core.element.Column;
+import com.wgzhao.addax.core.element.Record;
+import com.wgzhao.addax.core.exception.AddaxException;
+import com.wgzhao.addax.core.plugin.RecordReceiver;
+import com.wgzhao.addax.core.spi.Writer;
+import com.wgzhao.addax.core.util.Configuration;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.CellStyle;
 import org.apache.poi.ss.usermodel.CreationHelper;

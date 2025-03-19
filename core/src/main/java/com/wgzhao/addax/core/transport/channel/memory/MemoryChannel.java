@@ -19,9 +19,9 @@
 
 package com.wgzhao.addax.core.transport.channel.memory;
 
-import com.wgzhao.addax.common.element.Record;
-import com.wgzhao.addax.common.exception.AddaxException;
-import com.wgzhao.addax.common.util.Configuration;
+import com.wgzhao.addax.core.element.Record;
+import com.wgzhao.addax.core.exception.AddaxException;
+import com.wgzhao.addax.core.util.Configuration;
 import com.wgzhao.addax.core.transport.channel.Channel;
 import com.wgzhao.addax.core.transport.record.TerminateRecord;
 
@@ -32,7 +32,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.locks.Condition;
 import java.util.concurrent.locks.ReentrantLock;
 
-import static com.wgzhao.addax.common.spi.ErrorCode.RUNTIME_ERROR;
+import static com.wgzhao.addax.core.spi.ErrorCode.RUNTIME_ERROR;
 import static com.wgzhao.addax.core.util.container.CoreConstant.CORE_TRANSPORT_EXCHANGER_BUFFER_SIZE;
 
 

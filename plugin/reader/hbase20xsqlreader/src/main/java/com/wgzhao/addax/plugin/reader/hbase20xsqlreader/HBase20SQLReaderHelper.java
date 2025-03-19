@@ -19,11 +19,10 @@
 
 package com.wgzhao.addax.plugin.reader.hbase20xsqlreader;
 
-import com.wgzhao.addax.common.base.HBaseConstant;
-import com.wgzhao.addax.common.base.HBaseKey;
-import com.wgzhao.addax.common.exception.AddaxException;
-import com.wgzhao.addax.common.util.Configuration;
-import com.wgzhao.addax.rdbms.reader.util.ReaderSplitUtil;
+import com.wgzhao.addax.core.base.HBaseConstant;
+import com.wgzhao.addax.core.base.HBaseKey;
+import com.wgzhao.addax.core.exception.AddaxException;
+import com.wgzhao.addax.core.util.Configuration;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

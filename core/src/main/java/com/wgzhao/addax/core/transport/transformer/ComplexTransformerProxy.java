@@ -19,9 +19,7 @@
 
 package com.wgzhao.addax.core.transport.transformer;
 
-import com.wgzhao.addax.common.element.Record;
-import com.wgzhao.addax.transformer.ComplexTransformer;
-import com.wgzhao.addax.transformer.Transformer;
+import com.wgzhao.addax.core.element.Record;
 
 import java.util.Map;
 

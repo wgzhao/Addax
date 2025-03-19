@@ -19,7 +19,7 @@
 
 package com.wgzhao.addax.core.container.util;
 
-import com.wgzhao.addax.common.util.Configuration;
+import com.wgzhao.addax.core.util.Configuration;
 
 import java.io.File;
 import java.util.Map;

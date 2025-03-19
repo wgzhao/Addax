@@ -21,14 +21,14 @@
 
 package com.wgzhao.addax.rdbms.writer;
 
-import com.wgzhao.addax.common.base.Constant;
-import com.wgzhao.addax.common.base.Key;
-import com.wgzhao.addax.common.element.Column;
-import com.wgzhao.addax.common.element.Record;
-import com.wgzhao.addax.common.exception.AddaxException;
-import com.wgzhao.addax.common.plugin.RecordReceiver;
-import com.wgzhao.addax.common.plugin.TaskPluginCollector;
-import com.wgzhao.addax.common.util.Configuration;
+import com.wgzhao.addax.core.base.Constant;
+import com.wgzhao.addax.core.base.Key;
+import com.wgzhao.addax.core.element.Column;
+import com.wgzhao.addax.core.element.Record;
+import com.wgzhao.addax.core.exception.AddaxException;
+import com.wgzhao.addax.core.plugin.RecordReceiver;
+import com.wgzhao.addax.core.plugin.TaskPluginCollector;
+import com.wgzhao.addax.core.util.Configuration;
 import com.wgzhao.addax.rdbms.util.DBUtil;
 import com.wgzhao.addax.rdbms.util.DataBaseType;
 import com.wgzhao.addax.rdbms.util.RdbmsException;
@@ -49,9 +49,9 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
-import static com.wgzhao.addax.common.spi.ErrorCode.CONFIG_ERROR;
-import static com.wgzhao.addax.common.spi.ErrorCode.EXECUTE_FAIL;
-import static com.wgzhao.addax.common.spi.ErrorCode.NOT_SUPPORT_TYPE;
+import static com.wgzhao.addax.core.spi.ErrorCode.CONFIG_ERROR;
+import static com.wgzhao.addax.core.spi.ErrorCode.EXECUTE_FAIL;
+import static com.wgzhao.addax.core.spi.ErrorCode.NOT_SUPPORT_TYPE;
 
 public class CommonRdbmsWriter
 {

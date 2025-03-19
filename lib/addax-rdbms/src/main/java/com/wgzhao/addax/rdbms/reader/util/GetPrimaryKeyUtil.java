@@ -20,7 +20,7 @@
  */
 package com.wgzhao.addax.rdbms.reader.util;
 
-import com.wgzhao.addax.common.util.Configuration;
+import com.wgzhao.addax.core.util.Configuration;
 import com.wgzhao.addax.rdbms.util.DBUtil;
 import com.wgzhao.addax.rdbms.util.DataBaseType;
 import org.slf4j.Logger;
@@ -35,11 +35,11 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import static com.wgzhao.addax.common.base.Key.CONNECTION;
-import static com.wgzhao.addax.common.base.Key.JDBC_URL;
-import static com.wgzhao.addax.common.base.Key.PASSWORD;
-import static com.wgzhao.addax.common.base.Key.TABLE;
-import static com.wgzhao.addax.common.base.Key.USERNAME;
+import static com.wgzhao.addax.core.base.Key.CONNECTION;
+import static com.wgzhao.addax.core.base.Key.JDBC_URL;
+import static com.wgzhao.addax.core.base.Key.PASSWORD;
+import static com.wgzhao.addax.core.base.Key.TABLE;
+import static com.wgzhao.addax.core.base.Key.USERNAME;
 
 public class GetPrimaryKeyUtil
 {

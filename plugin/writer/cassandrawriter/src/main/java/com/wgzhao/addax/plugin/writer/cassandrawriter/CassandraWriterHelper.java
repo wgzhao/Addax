@@ -19,8 +19,8 @@
 
 package com.wgzhao.addax.plugin.writer.cassandrawriter;
 
-import com.wgzhao.addax.common.element.Column;
-import com.wgzhao.addax.common.exception.AddaxException;
+import com.wgzhao.addax.core.element.Column;
+import com.wgzhao.addax.core.exception.AddaxException;
 import com.alibaba.fastjson2.JSON;
 import com.alibaba.fastjson2.JSONArray;
 import com.alibaba.fastjson2.JSONObject;

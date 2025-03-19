@@ -1,9 +1,9 @@
 package com.wgzhao.addax.plugin.writer.accesswriter;
 
 
-import com.wgzhao.addax.common.plugin.RecordReceiver;
-import com.wgzhao.addax.common.spi.Writer;
-import com.wgzhao.addax.common.util.Configuration;
+import com.wgzhao.addax.core.plugin.RecordReceiver;
+import com.wgzhao.addax.core.spi.Writer;
+import com.wgzhao.addax.core.util.Configuration;
 import com.wgzhao.addax.rdbms.util.DataBaseType;
 import com.wgzhao.addax.rdbms.writer.CommonRdbmsWriter;
 

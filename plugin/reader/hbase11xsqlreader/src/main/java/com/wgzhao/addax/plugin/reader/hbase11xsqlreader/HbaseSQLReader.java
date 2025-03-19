@@ -19,20 +19,20 @@
 
 package com.wgzhao.addax.plugin.reader.hbase11xsqlreader;
 
-import com.wgzhao.addax.common.base.Key;
-import com.wgzhao.addax.common.element.BoolColumn;
-import com.wgzhao.addax.common.element.BytesColumn;
-import com.wgzhao.addax.common.element.Column;
-import com.wgzhao.addax.common.element.DateColumn;
-import com.wgzhao.addax.common.element.DoubleColumn;
-import com.wgzhao.addax.common.element.LongColumn;
-import com.wgzhao.addax.common.element.Record;
-import com.wgzhao.addax.common.element.StringColumn;
-import com.wgzhao.addax.common.exception.AddaxException;
-import com.wgzhao.addax.common.plugin.RecordSender;
-import com.wgzhao.addax.common.plugin.TaskPluginCollector;
-import com.wgzhao.addax.common.spi.Reader;
-import com.wgzhao.addax.common.util.Configuration;
+import com.wgzhao.addax.core.base.Key;
+import com.wgzhao.addax.core.element.BoolColumn;
+import com.wgzhao.addax.core.element.BytesColumn;
+import com.wgzhao.addax.core.element.Column;
+import com.wgzhao.addax.core.element.DateColumn;
+import com.wgzhao.addax.core.element.DoubleColumn;
+import com.wgzhao.addax.core.element.LongColumn;
+import com.wgzhao.addax.core.element.Record;
+import com.wgzhao.addax.core.element.StringColumn;
+import com.wgzhao.addax.core.exception.AddaxException;
+import com.wgzhao.addax.core.plugin.RecordSender;
+import com.wgzhao.addax.core.plugin.TaskPluginCollector;
+import com.wgzhao.addax.core.spi.Reader;
+import com.wgzhao.addax.core.util.Configuration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

@@ -20,16 +20,16 @@
 package com.wgzhao.addax.core.job;
 
 import com.alibaba.fastjson2.JSON;
-import com.wgzhao.addax.common.constant.PluginType;
-import com.wgzhao.addax.common.exception.AddaxException;
-import com.wgzhao.addax.common.plugin.AbstractJobPlugin;
-import com.wgzhao.addax.common.plugin.JobPluginCollector;
-import com.wgzhao.addax.common.spi.Reader;
-import com.wgzhao.addax.common.spi.Writer;
-import com.wgzhao.addax.common.statistics.PerfTrace;
-import com.wgzhao.addax.common.statistics.VMInfo;
-import com.wgzhao.addax.common.util.Configuration;
-import com.wgzhao.addax.common.util.StrUtil;
+import com.wgzhao.addax.core.constant.PluginType;
+import com.wgzhao.addax.core.exception.AddaxException;
+import com.wgzhao.addax.core.plugin.AbstractJobPlugin;
+import com.wgzhao.addax.core.plugin.JobPluginCollector;
+import com.wgzhao.addax.core.spi.Reader;
+import com.wgzhao.addax.core.spi.Writer;
+import com.wgzhao.addax.core.statistics.PerfTrace;
+import com.wgzhao.addax.core.statistics.VMInfo;
+import com.wgzhao.addax.core.util.Configuration;
+import com.wgzhao.addax.core.util.StrUtil;
 import com.wgzhao.addax.core.AbstractContainer;
 import com.wgzhao.addax.core.Engine;
 import com.wgzhao.addax.core.container.util.JobAssignUtil;
@@ -59,9 +59,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import static com.wgzhao.addax.common.spi.ErrorCode.CONFIG_ERROR;
-import static com.wgzhao.addax.common.spi.ErrorCode.EXECUTE_FAIL;
-import static com.wgzhao.addax.common.spi.ErrorCode.RUNTIME_ERROR;
+import static com.wgzhao.addax.core.spi.ErrorCode.CONFIG_ERROR;
+import static com.wgzhao.addax.core.spi.ErrorCode.EXECUTE_FAIL;
+import static com.wgzhao.addax.core.spi.ErrorCode.RUNTIME_ERROR;
 
 /*
  * Created by jingxing on 14-8-24.

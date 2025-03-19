@@ -19,8 +19,8 @@
 
 package com.wgzhao.addax.core.transport.record;
 
-import com.wgzhao.addax.common.element.Column;
-import com.wgzhao.addax.common.element.Record;
+import com.wgzhao.addax.core.element.Column;
+import com.wgzhao.addax.core.element.Record;
 
 import java.util.Map;
 

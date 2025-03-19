@@ -19,7 +19,7 @@
 
 package com.wgzhao.addax.plugin.reader.datareader;
 
-import com.wgzhao.addax.common.base.Key;
+import com.wgzhao.addax.core.base.Key;
 
 public final class DataKey
         extends Key

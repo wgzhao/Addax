@@ -1,7 +1,7 @@
 package com.wgzhao.addax.plugin.writer.paimonwriter;
 
-import com.wgzhao.addax.common.exception.AddaxException;
-import com.wgzhao.addax.common.util.Configuration;
+import com.wgzhao.addax.core.exception.AddaxException;
+import com.wgzhao.addax.core.util.Configuration;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.hadoop.security.UserGroupInformation;
 import org.apache.paimon.catalog.CatalogContext;

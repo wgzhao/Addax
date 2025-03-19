@@ -20,7 +20,7 @@
 package com.wgzhao.addax.plugin.reader.kudureader;
 
 import com.google.common.collect.ImmutableMap;
-import com.wgzhao.addax.common.base.Key;
+import com.wgzhao.addax.core.base.Key;
 import org.apache.kudu.client.KuduPredicate;
 
 import java.util.Map;

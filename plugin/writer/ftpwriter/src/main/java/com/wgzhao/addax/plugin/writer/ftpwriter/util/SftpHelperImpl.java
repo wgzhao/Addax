@@ -28,7 +28,7 @@ import com.jcraft.jsch.JSchException;
 import com.jcraft.jsch.Session;
 import com.jcraft.jsch.SftpATTRS;
 import com.jcraft.jsch.SftpException;
-import com.wgzhao.addax.common.exception.AddaxException;
+import com.wgzhao.addax.core.exception.AddaxException;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;

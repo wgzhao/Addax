@@ -19,11 +19,11 @@
 
 package com.wgzhao.addax.plugin.writer.ftpwriter;
 
-import com.wgzhao.addax.common.exception.AddaxException;
-import com.wgzhao.addax.common.plugin.RecordReceiver;
-import com.wgzhao.addax.common.spi.Writer;
-import com.wgzhao.addax.common.util.Configuration;
-import com.wgzhao.addax.common.util.RetryUtil;
+import com.wgzhao.addax.core.exception.AddaxException;
+import com.wgzhao.addax.core.plugin.RecordReceiver;
+import com.wgzhao.addax.core.spi.Writer;
+import com.wgzhao.addax.core.util.Configuration;
+import com.wgzhao.addax.core.util.RetryUtil;
 import com.wgzhao.addax.plugin.writer.ftpwriter.util.IFtpHelper;
 import com.wgzhao.addax.plugin.writer.ftpwriter.util.SftpHelperImpl;
 import com.wgzhao.addax.plugin.writer.ftpwriter.util.StandardFtpHelperImpl;

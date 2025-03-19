@@ -16,7 +16,7 @@
     <dependencies>
         <dependency>
             <groupId>com.wgzhao.addax</groupId>
-            <artifactId>addax-common</artifactId>
+            <artifactId>addax-core</artifactId>
             <version>${project.version}</version>
             <exclusions>
                 <exclusion>

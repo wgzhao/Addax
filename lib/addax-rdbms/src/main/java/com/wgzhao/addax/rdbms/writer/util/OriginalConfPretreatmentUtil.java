@@ -21,12 +21,12 @@
 
 package com.wgzhao.addax.rdbms.writer.util;
 
-import com.wgzhao.addax.common.base.Constant;
-import com.wgzhao.addax.common.base.Key;
-import com.wgzhao.addax.common.exception.AddaxException;
-import com.wgzhao.addax.common.util.Configuration;
-import com.wgzhao.addax.common.util.EncryptUtil;
-import com.wgzhao.addax.common.util.ListUtil;
+import com.wgzhao.addax.core.base.Constant;
+import com.wgzhao.addax.core.base.Key;
+import com.wgzhao.addax.core.exception.AddaxException;
+import com.wgzhao.addax.core.util.Configuration;
+import com.wgzhao.addax.core.util.EncryptUtil;
+import com.wgzhao.addax.core.util.ListUtil;
 import com.wgzhao.addax.rdbms.util.DBUtil;
 import com.wgzhao.addax.rdbms.util.DataBaseType;
 import com.wgzhao.addax.rdbms.util.TableExpandUtil;
@@ -38,8 +38,8 @@ import java.sql.Connection;
 import java.util.ArrayList;
 import java.util.List;
 
-import static com.wgzhao.addax.common.spi.ErrorCode.CONFIG_ERROR;
-import static com.wgzhao.addax.common.spi.ErrorCode.REQUIRED_VALUE;
+import static com.wgzhao.addax.core.spi.ErrorCode.CONFIG_ERROR;
+import static com.wgzhao.addax.core.spi.ErrorCode.REQUIRED_VALUE;
 
 public final class OriginalConfPretreatmentUtil
 {

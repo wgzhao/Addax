@@ -19,9 +19,9 @@
 
 package com.wgzhao.addax.plugin.writer.hdfswriter;
 
-import com.wgzhao.addax.common.plugin.RecordReceiver;
-import com.wgzhao.addax.common.plugin.TaskPluginCollector;
-import com.wgzhao.addax.common.util.Configuration;
+import com.wgzhao.addax.core.plugin.RecordReceiver;
+import com.wgzhao.addax.core.plugin.TaskPluginCollector;
+import com.wgzhao.addax.core.util.Configuration;
 
 public interface IHDFSWriter
 {

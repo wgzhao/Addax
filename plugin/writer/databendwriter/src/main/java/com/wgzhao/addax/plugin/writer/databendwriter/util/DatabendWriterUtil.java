@@ -1,8 +1,8 @@
 package com.wgzhao.addax.plugin.writer.databendwriter.util;
 
-import com.wgzhao.addax.common.base.Constant;
-import com.wgzhao.addax.common.base.Key;
-import com.wgzhao.addax.common.util.Configuration;
+import com.wgzhao.addax.core.base.Constant;
+import com.wgzhao.addax.core.base.Key;
+import com.wgzhao.addax.core.util.Configuration;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

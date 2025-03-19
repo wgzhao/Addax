@@ -19,7 +19,7 @@
 
 package com.wgzhao.addax.plugin.reader.ftpreader;
 
-import com.wgzhao.addax.common.exception.AddaxException;
+import com.wgzhao.addax.core.exception.AddaxException;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.net.ftp.FTPClient;
 import org.apache.commons.net.ftp.FTPFile;
@@ -32,9 +32,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
-import java.nio.file.Paths;
 import java.time.Duration;
-import java.util.HashSet;
 
 import static com.wgzhao.addax.common.spi.ErrorCode.CONNECT_ERROR;
 import static com.wgzhao.addax.common.spi.ErrorCode.IO_ERROR;

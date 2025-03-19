@@ -19,16 +19,16 @@
 
 package com.wgzhao.addax.plugin.reader.cassandrareader;
 
-import com.wgzhao.addax.common.plugin.RecordSender;
-import com.wgzhao.addax.common.spi.Reader;
-import com.wgzhao.addax.common.util.Configuration;
+import com.wgzhao.addax.core.plugin.RecordSender;
+import com.wgzhao.addax.core.spi.Reader;
+import com.wgzhao.addax.core.util.Configuration;
 import com.datastax.driver.core.Cluster;
 import com.datastax.driver.core.ConsistencyLevel;
 import com.datastax.driver.core.ResultSet;
 import com.datastax.driver.core.Row;
 import com.datastax.driver.core.Session;
 import com.datastax.driver.core.SimpleStatement;
-import com.wgzhao.addax.common.element.Record;
+import com.wgzhao.addax.core.element.Record;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

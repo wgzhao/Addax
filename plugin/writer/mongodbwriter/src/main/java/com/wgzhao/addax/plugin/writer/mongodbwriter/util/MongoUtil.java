@@ -19,7 +19,7 @@
 
 package com.wgzhao.addax.plugin.writer.mongodbwriter.util;
 
-import com.wgzhao.addax.common.exception.AddaxException;
+import com.wgzhao.addax.core.exception.AddaxException;
 import com.mongodb.MongoClient;
 import com.mongodb.MongoClientOptions;
 import com.mongodb.MongoCredential;

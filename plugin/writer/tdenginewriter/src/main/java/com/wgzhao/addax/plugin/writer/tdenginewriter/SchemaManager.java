@@ -14,7 +14,7 @@
 
 package com.wgzhao.addax.plugin.writer.tdenginewriter;
 
-import com.wgzhao.addax.common.exception.AddaxException;
+import com.wgzhao.addax.core.exception.AddaxException;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

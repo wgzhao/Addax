@@ -20,12 +20,12 @@
 package com.wgzhao.addax.core.taskgroup;
 
 import com.alibaba.fastjson2.JSON;
-import com.wgzhao.addax.common.constant.PluginType;
-import com.wgzhao.addax.common.exception.AddaxException;
-import com.wgzhao.addax.common.spi.ErrorCode;
-import com.wgzhao.addax.common.plugin.RecordSender;
-import com.wgzhao.addax.common.plugin.TaskPluginCollector;
-import com.wgzhao.addax.common.util.Configuration;
+import com.wgzhao.addax.core.constant.PluginType;
+import com.wgzhao.addax.core.exception.AddaxException;
+import com.wgzhao.addax.core.spi.ErrorCode;
+import com.wgzhao.addax.core.plugin.RecordSender;
+import com.wgzhao.addax.core.plugin.TaskPluginCollector;
+import com.wgzhao.addax.core.util.Configuration;
 import com.wgzhao.addax.core.AbstractContainer;
 import com.wgzhao.addax.core.meta.State;
 import com.wgzhao.addax.core.statistics.communication.Communication;
@@ -56,8 +56,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
-import static com.wgzhao.addax.common.spi.ErrorCode.CONFIG_ERROR;
-import static com.wgzhao.addax.common.spi.ErrorCode.RUNTIME_ERROR;
+import static com.wgzhao.addax.core.spi.ErrorCode.CONFIG_ERROR;
+import static com.wgzhao.addax.core.spi.ErrorCode.RUNTIME_ERROR;
 
 public class TaskGroupContainer
         extends AbstractContainer

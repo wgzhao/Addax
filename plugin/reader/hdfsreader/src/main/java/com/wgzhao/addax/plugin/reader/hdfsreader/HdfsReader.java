@@ -19,11 +19,11 @@
 
 package com.wgzhao.addax.plugin.reader.hdfsreader;
 
-import com.wgzhao.addax.common.base.Key;
-import com.wgzhao.addax.common.exception.AddaxException;
-import com.wgzhao.addax.common.plugin.RecordSender;
-import com.wgzhao.addax.common.spi.Reader;
-import com.wgzhao.addax.common.util.Configuration;
+import com.wgzhao.addax.core.base.Key;
+import com.wgzhao.addax.core.exception.AddaxException;
+import com.wgzhao.addax.core.plugin.RecordSender;
+import com.wgzhao.addax.core.spi.Reader;
+import com.wgzhao.addax.core.util.Configuration;
 import com.wgzhao.addax.storage.reader.StorageReaderUtil;
 import com.wgzhao.addax.storage.util.FileHelper;
 import org.apache.commons.io.Charsets;

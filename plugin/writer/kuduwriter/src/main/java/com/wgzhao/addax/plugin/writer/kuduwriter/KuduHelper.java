@@ -19,7 +19,7 @@
 
 package com.wgzhao.addax.plugin.writer.kuduwriter;
 
-import com.wgzhao.addax.common.exception.AddaxException;
+import com.wgzhao.addax.core.exception.AddaxException;
 import org.apache.kudu.ColumnSchema;
 import org.apache.kudu.Schema;
 import org.apache.kudu.client.KuduClient;

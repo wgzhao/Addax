@@ -19,7 +19,7 @@
 
 package com.wgzhao.addax.plugin.reader.hbase20xreader;
 
-import com.wgzhao.addax.common.base.BaseObject;
+import com.wgzhao.addax.core.base.BaseObject;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.Validate;
 import org.apache.hadoop.hbase.util.Bytes;

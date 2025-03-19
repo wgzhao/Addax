@@ -19,10 +19,10 @@
 
 package com.wgzhao.addax.plugin.reader.influxdbreader;
 
-import com.wgzhao.addax.common.exception.AddaxException;
-import com.wgzhao.addax.common.plugin.RecordSender;
-import com.wgzhao.addax.common.spi.Reader;
-import com.wgzhao.addax.common.util.Configuration;
+import com.wgzhao.addax.core.exception.AddaxException;
+import com.wgzhao.addax.core.plugin.RecordSender;
+import com.wgzhao.addax.core.spi.Reader;
+import com.wgzhao.addax.core.util.Configuration;
 import org.apache.commons.lang3.StringUtils;
 
 import java.util.ArrayList;

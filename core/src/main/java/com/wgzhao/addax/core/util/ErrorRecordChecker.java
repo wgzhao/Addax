@@ -19,8 +19,7 @@
 
 package com.wgzhao.addax.core.util;
 
-import com.wgzhao.addax.common.exception.AddaxException;
-import com.wgzhao.addax.common.util.Configuration;
+import com.wgzhao.addax.core.exception.AddaxException;
 import com.wgzhao.addax.core.statistics.communication.Communication;
 import com.wgzhao.addax.core.statistics.communication.CommunicationTool;
 import com.wgzhao.addax.core.util.container.CoreConstant;
@@ -28,7 +27,7 @@ import org.apache.commons.lang3.Validate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import static com.wgzhao.addax.common.spi.ErrorCode.OVER_LIMIT_ERROR;
+import static com.wgzhao.addax.core.spi.ErrorCode.OVER_LIMIT_ERROR;
 
 /**
  * Check whether the task has reached the error record limit. There are two ways to check: by record count (recordLimit) and

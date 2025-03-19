@@ -19,10 +19,10 @@
 
 package com.wgzhao.addax.plugin.reader.sqlitereader;
 
-import com.wgzhao.addax.common.base.Key;
-import com.wgzhao.addax.common.plugin.RecordSender;
-import com.wgzhao.addax.common.spi.Reader;
-import com.wgzhao.addax.common.util.Configuration;
+import com.wgzhao.addax.core.base.Key;
+import com.wgzhao.addax.core.plugin.RecordSender;
+import com.wgzhao.addax.core.spi.Reader;
+import com.wgzhao.addax.core.util.Configuration;
 import com.wgzhao.addax.rdbms.reader.CommonRdbmsReader;
 import com.wgzhao.addax.rdbms.util.DataBaseType;
 

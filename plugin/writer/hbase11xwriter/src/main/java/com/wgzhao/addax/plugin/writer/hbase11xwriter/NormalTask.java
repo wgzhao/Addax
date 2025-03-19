@@ -19,12 +19,12 @@
 
 package com.wgzhao.addax.plugin.writer.hbase11xwriter;
 
-import com.wgzhao.addax.common.base.HBaseKey;
-import com.wgzhao.addax.common.element.DoubleColumn;
-import com.wgzhao.addax.common.element.LongColumn;
-import com.wgzhao.addax.common.element.Record;
-import com.wgzhao.addax.common.exception.AddaxException;
-import com.wgzhao.addax.common.util.Configuration;
+import com.wgzhao.addax.core.base.HBaseKey;
+import com.wgzhao.addax.core.element.DoubleColumn;
+import com.wgzhao.addax.core.element.LongColumn;
+import com.wgzhao.addax.core.element.Record;
+import com.wgzhao.addax.core.exception.AddaxException;
+import com.wgzhao.addax.core.util.Configuration;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.Validate;
 import org.apache.hadoop.hbase.client.Durability;

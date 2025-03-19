@@ -19,8 +19,8 @@
 
 package com.wgzhao.addax.core.job.scheduler;
 
-import com.wgzhao.addax.common.exception.AddaxException;
-import com.wgzhao.addax.common.util.Configuration;
+import com.wgzhao.addax.core.exception.AddaxException;
+import com.wgzhao.addax.core.util.Configuration;
 import com.wgzhao.addax.core.meta.State;
 import com.wgzhao.addax.core.statistics.communication.Communication;
 import com.wgzhao.addax.core.statistics.communication.CommunicationTool;
@@ -34,7 +34,7 @@ import org.slf4j.LoggerFactory;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
-import static com.wgzhao.addax.common.spi.ErrorCode.RUNTIME_ERROR;
+import static com.wgzhao.addax.core.spi.ErrorCode.RUNTIME_ERROR;
 
 public abstract class AbstractScheduler
 {

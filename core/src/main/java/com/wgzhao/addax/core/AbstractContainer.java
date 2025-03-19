@@ -19,7 +19,7 @@
 
 package com.wgzhao.addax.core;
 
-import com.wgzhao.addax.common.util.Configuration;
+import com.wgzhao.addax.core.util.Configuration;
 import com.wgzhao.addax.core.statistics.container.communicator.AbstractContainerCommunicator;
 import org.apache.commons.lang3.Validate;
 

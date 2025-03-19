@@ -19,9 +19,7 @@
 
 package com.wgzhao.addax.plugin.reader.hbase20xreader;
 
-import com.wgzhao.addax.common.exception.AddaxException;
-
-import java.util.Arrays;
+import com.wgzhao.addax.core.exception.AddaxException;
 
 import static com.wgzhao.addax.common.spi.ErrorCode.NOT_SUPPORT_TYPE;
 

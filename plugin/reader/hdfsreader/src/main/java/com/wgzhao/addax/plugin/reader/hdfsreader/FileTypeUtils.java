@@ -19,7 +19,7 @@
 
 package com.wgzhao.addax.plugin.reader.hdfsreader;
 
-import com.wgzhao.addax.common.exception.AddaxException;
+import com.wgzhao.addax.core.exception.AddaxException;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.hadoop.fs.FSDataInputStream;
 import org.apache.hadoop.fs.FileSystem;

@@ -19,8 +19,8 @@
 
 package com.wgzhao.addax.core.taskgroup;
 
-import com.wgzhao.addax.common.spi.ErrorCode;
-import com.wgzhao.addax.common.exception.AddaxException;
+import com.wgzhao.addax.core.spi.ErrorCode;
+import com.wgzhao.addax.core.exception.AddaxException;
 import com.wgzhao.addax.core.meta.State;
 import com.wgzhao.addax.core.statistics.communication.Communication;
 import com.wgzhao.addax.core.statistics.communication.CommunicationTool;

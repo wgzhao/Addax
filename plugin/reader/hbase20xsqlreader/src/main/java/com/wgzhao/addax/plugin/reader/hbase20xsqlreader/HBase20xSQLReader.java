@@ -19,9 +19,9 @@
 
 package com.wgzhao.addax.plugin.reader.hbase20xsqlreader;
 
-import com.wgzhao.addax.common.plugin.RecordSender;
-import com.wgzhao.addax.common.spi.Reader;
-import com.wgzhao.addax.common.util.Configuration;
+import com.wgzhao.addax.core.plugin.RecordSender;
+import com.wgzhao.addax.core.spi.Reader;
+import com.wgzhao.addax.core.util.Configuration;
 
 import java.util.List;
 

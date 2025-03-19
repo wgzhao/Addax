@@ -19,8 +19,7 @@
 
 package com.wgzhao.addax.core.util;
 
-import com.wgzhao.addax.common.exception.AddaxException;
-import com.wgzhao.addax.common.util.Configuration;
+import com.wgzhao.addax.core.exception.AddaxException;
 
 import java.io.File;
 import java.io.IOException;
@@ -31,7 +30,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.apache.commons.exec.environment.EnvironmentUtils;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.hc.client5.http.fluent.Request;
@@ -39,11 +37,11 @@ import org.apache.hc.core5.util.Timeout;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import static com.wgzhao.addax.common.base.Key.CONNECTION;
-import static com.wgzhao.addax.common.spi.ErrorCode.CONFIG_ERROR;
-import static com.wgzhao.addax.common.spi.ErrorCode.IO_ERROR;
-import static com.wgzhao.addax.common.spi.ErrorCode.PLUGIN_INIT_ERROR;
-import static com.wgzhao.addax.common.spi.ErrorCode.REQUIRED_VALUE;
+import static com.wgzhao.addax.core.base.Key.CONNECTION;
+import static com.wgzhao.addax.core.spi.ErrorCode.CONFIG_ERROR;
+import static com.wgzhao.addax.core.spi.ErrorCode.IO_ERROR;
+import static com.wgzhao.addax.core.spi.ErrorCode.PLUGIN_INIT_ERROR;
+import static com.wgzhao.addax.core.spi.ErrorCode.REQUIRED_VALUE;
 import static com.wgzhao.addax.core.util.container.CoreConstant.CONF_PATH;
 import static com.wgzhao.addax.core.util.container.CoreConstant.CORE_SERVER_TIMEOUT_SEC;
 import static com.wgzhao.addax.core.util.container.CoreConstant.JOB_CONTENT;

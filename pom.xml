@@ -121,11 +121,9 @@
 
     <modules>
         <!-- common modules -->
-        <module>common</module>
         <module>core</module>
         <module>lib/addax-rdbms</module>
         <module>lib/addax-storage</module>
-        <module>lib/addax-transformer</module>
     </modules>
 
     <developers>
@@ -139,11 +137,6 @@
 
     <dependencyManagement>
         <dependencies>
-            <dependency>
-                <groupId>com.wgzhao.addax</groupId>
-                <artifactId>addax-common</artifactId>
-                <version>${project.version}</version>
-            </dependency>
 
             <!-- Addax external dependencies -->
             <dependency>

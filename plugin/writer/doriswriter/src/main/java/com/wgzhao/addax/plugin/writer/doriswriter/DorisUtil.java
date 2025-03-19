@@ -21,7 +21,7 @@ package com.wgzhao.addax.plugin.writer.doriswriter;
 
 import com.alibaba.druid.sql.parser.ParserException;
 import com.google.common.base.Strings;
-import com.wgzhao.addax.common.base.Constant;
+import com.wgzhao.addax.core.base.Constant;
 import com.wgzhao.addax.rdbms.util.DBUtil;
 import com.wgzhao.addax.rdbms.util.DataBaseType;
 import com.wgzhao.addax.rdbms.util.RdbmsException;
@@ -30,7 +30,6 @@ import org.slf4j.LoggerFactory;
 
 import java.sql.Connection;
 import java.sql.SQLException;
-import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;

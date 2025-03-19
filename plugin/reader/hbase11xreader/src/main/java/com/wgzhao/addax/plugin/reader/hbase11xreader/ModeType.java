@@ -19,7 +19,7 @@
 
 package com.wgzhao.addax.plugin.reader.hbase11xreader;
 
-import com.wgzhao.addax.common.exception.AddaxException;
+import com.wgzhao.addax.core.exception.AddaxException;
 
 import java.util.Arrays;
 

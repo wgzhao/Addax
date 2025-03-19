@@ -19,11 +19,11 @@
 
 package com.wgzhao.addax.plugin.reader.hivereader;
 
-import com.wgzhao.addax.common.element.Column;
-import com.wgzhao.addax.common.element.TimestampColumn;
-import com.wgzhao.addax.common.plugin.RecordSender;
-import com.wgzhao.addax.common.spi.Reader;
-import com.wgzhao.addax.common.util.Configuration;
+import com.wgzhao.addax.core.element.Column;
+import com.wgzhao.addax.core.element.TimestampColumn;
+import com.wgzhao.addax.core.plugin.RecordSender;
+import com.wgzhao.addax.core.spi.Reader;
+import com.wgzhao.addax.core.util.Configuration;
 import com.wgzhao.addax.rdbms.reader.CommonRdbmsReader;
 import com.wgzhao.addax.rdbms.util.DataBaseType;
 import org.apache.commons.lang3.StringUtils;

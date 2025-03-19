@@ -19,7 +19,7 @@
 
 package com.wgzhao.addax.plugin.reader.hdfsreader;
 
-import com.wgzhao.addax.common.base.Constant;
+import com.wgzhao.addax.core.base.Constant;
 
 import java.util.Arrays;
 import java.util.List;
