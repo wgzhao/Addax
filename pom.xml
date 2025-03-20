@@ -99,7 +99,7 @@
         <hadoop.version>3.2.4</hadoop.version>
         <mongodb.jdbc.version>3.12.14</mongodb.jdbc.version>
         <mysql.jdbc.version>8.0.28</mysql.jdbc.version>
-        <mssql.jdbc.version>9.2.1.jre8</mssql.jdbc.version>
+        <mssql.jdbc.version>12.10.0.jre8</mssql.jdbc.version>
         <ngdbc.version>2.21.11</ngdbc.version>
         <oracle.jdbc.version>19.7.0.0</oracle.jdbc.version>
         <phoenix1.version>4.14.3-HBase-1.4</phoenix1.version>
