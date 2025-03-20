@@ -19,6 +19,7 @@
             <groupId>com.wgzhao.addax</groupId>
             <artifactId>addax-core</artifactId>
             <version>${project.version}</version>
+            <scope>provided</scope>
             <exclusions>
                 <exclusion>
                     <artifactId>slf4j-log4j12</artifactId>

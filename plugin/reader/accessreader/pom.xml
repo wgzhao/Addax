@@ -18,6 +18,7 @@
         <groupId>com.wgzhao.addax</groupId>
         <artifactId>addax-core</artifactId>
         <version>${project.version}</version>
+        <scope>provided</scope>
         <exclusions>
             <exclusion>
                 <artifactId>slf4j-log4j12</artifactId>
@@ -30,12 +31,23 @@
         <groupId>com.wgzhao.addax</groupId>
         <artifactId>addax-rdbms</artifactId>
         <version>${project.version}</version>
+        <scope>provided</scope>
     </dependency>
 
         <dependency>
             <groupId>net.sf.ucanaccess</groupId>
             <artifactId>ucanaccess</artifactId>
             <version>5.0.1</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>org.apache.commons</groupId>
+                    <artifactId>commons-lang3</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>commons-logging</groupId>
+                    <artifactId>commons-logging</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
 
     </dependencies>

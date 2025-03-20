@@ -18,6 +18,7 @@
             <groupId>com.wgzhao.addax</groupId>
             <artifactId>addax-core</artifactId>
             <version>${project.version}</version>
+            <scope>provided</scope>
         </dependency>
 
         <dependency>
