@@ -10,10 +10,10 @@
     </parent>
 
     <artifactId>kafkareader</artifactId>
-    <packaging>jar</packaging>
 
     <name>kafka-reader</name>
     <description>Kafka reader plugin for Addax</description>
+    <packaging>jar</packaging>
 
     <dependencies>
         <dependency>

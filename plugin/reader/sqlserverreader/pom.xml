@@ -10,10 +10,10 @@
     </parent>
 
     <artifactId>sqlserverreader</artifactId>
-    <packaging>jar</packaging>
 
     <name>sqlserver-reader</name>
     <description>Microsoft SQLServer reader plugin for Addax</description>
+    <packaging>jar</packaging>
 
     <dependencies>
 

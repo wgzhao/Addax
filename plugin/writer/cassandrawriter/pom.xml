@@ -10,10 +10,10 @@
     </parent>
 
     <artifactId>cassandrawriter</artifactId>
-    <packaging>jar</packaging>
 
     <name>cassandra-writer</name>
     <description>Cassandra writer plugin for Addax</description>
+    <packaging>jar</packaging>
 
     <dependencies>
 

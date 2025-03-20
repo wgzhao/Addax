@@ -10,10 +10,10 @@
     </parent>
 
     <artifactId>hanareader</artifactId>
-    <packaging>jar</packaging>
 
     <name>hanareader-reader</name>
     <description>SAP HANA reader plugin for Addax</description>
+    <packaging>jar</packaging>
 
     <dependencies>
 

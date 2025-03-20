@@ -10,10 +10,10 @@
     </parent>
 
     <artifactId>paimonwriter</artifactId>
-    <packaging>jar</packaging>
 
     <name>paimon-writer</name>
     <description>Apache Paimon writer plugin for Addax</description>
+    <packaging>jar</packaging>
 
     <dependencies>
         <dependency>

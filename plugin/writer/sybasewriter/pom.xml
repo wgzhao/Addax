@@ -10,10 +10,17 @@
     </parent>
 
     <artifactId>sybasewriter</artifactId>
-    <packaging>jar</packaging>
 
     <name>sybase-writer</name>
     <description>Sybase writer plugin for Addax</description>
+    <packaging>jar</packaging>
+
+    <repositories>
+        <repository>
+            <id>jumpmind</id>
+            <url>https://maven.jumpmind.com/repo/</url>
+        </repository>
+    </repositories>
 
     <dependencies>
         <dependency>
@@ -38,13 +45,6 @@
         </dependency>
 
     </dependencies>
-
-    <repositories>
-        <repository>
-            <id>jumpmind</id>
-            <url>https://maven.jumpmind.com/repo/</url>
-        </repository>
-    </repositories>
 
     <build>
         <plugins>

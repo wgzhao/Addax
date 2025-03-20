@@ -10,10 +10,10 @@
     </parent>
 
     <artifactId>elasticsearchreader</artifactId>
-    <packaging>jar</packaging>
 
     <name>elasticsearch-reader</name>
     <description>ElasticSearch reader plugin for Addax</description>
+    <packaging>jar</packaging>
 
     <dependencies>
         <dependency>

@@ -10,10 +10,10 @@
     </parent>
 
     <artifactId>mysqlreader</artifactId>
-    <packaging>jar</packaging>
 
     <name>mysql-reader</name>
     <description>MySQL reader plugin for Addax</description>
+    <packaging>jar</packaging>
 
     <dependencies>
         <dependency>

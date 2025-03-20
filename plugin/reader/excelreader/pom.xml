@@ -10,10 +10,10 @@
     </parent>
 
     <artifactId>excelreader</artifactId>
-    <packaging>jar</packaging>
 
     <name>excel-reader</name>
     <description>Microsoft Excel file reader plugin for Addax</description>
+    <packaging>jar</packaging>
 
     <dependencies>
         <dependency>

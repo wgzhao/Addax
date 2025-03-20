@@ -10,10 +10,10 @@
     </parent>
 
     <artifactId>clickhousewriter</artifactId>
-    <packaging>jar</packaging>
 
     <name>clickhouse-writer</name>
     <description>ClickHouse writer plugin for Addax</description>
+    <packaging>jar</packaging>
 
     <dependencies>
 

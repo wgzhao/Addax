@@ -10,10 +10,10 @@
     </parent>
 
     <artifactId>sqlserverwriter</artifactId>
-    <packaging>jar</packaging>
 
     <name>sqlserver-writer</name>
     <description>Microsoft SQLServer writer plugin for Addax</description>
+    <packaging>jar</packaging>
 
     <dependencies>
         <dependency>

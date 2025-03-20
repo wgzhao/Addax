@@ -10,10 +10,10 @@
     </parent>
 
     <artifactId>ftpwriter</artifactId>
-    <packaging>jar</packaging>
 
     <name>ftp-writer</name>
     <description>FTP remote file writer plugin for Addax</description>
+    <packaging>jar</packaging>
 
     <dependencies>
 

@@ -10,10 +10,10 @@
     </parent>
 
     <artifactId>excelwriter</artifactId>
-    <packaging>jar</packaging>
 
     <name>excel-writer</name>
     <description>Microsoft Excel file writer plugin for Addax</description>
+    <packaging>jar</packaging>
 
     <dependencies>
         <dependency>

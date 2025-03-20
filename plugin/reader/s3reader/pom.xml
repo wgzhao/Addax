@@ -10,10 +10,10 @@
     </parent>
 
     <artifactId>s3reader</artifactId>
-    <packaging>jar</packaging>
 
     <name>s3-reader</name>
     <description>Amazon AWS s3 or variant reader plugin for Addax</description>
+    <packaging>jar</packaging>
 
     <dependencyManagement>
         <dependencies>

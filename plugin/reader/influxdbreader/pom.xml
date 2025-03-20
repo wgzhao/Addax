@@ -28,10 +28,10 @@
     </parent>
 
     <artifactId>influxdbreader</artifactId>
-    <packaging>jar</packaging>
 
     <name>influxdb-reader</name>
     <description>InfluxDB 1.x reader plugin for Addax</description>
+    <packaging>jar</packaging>
 
     <dependencies>
         <dependency>

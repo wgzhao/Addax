@@ -10,10 +10,10 @@
     </parent>
 
     <artifactId>rdbmswriter</artifactId>
-    <packaging>jar</packaging>
 
     <name>rdbms-writer</name>
     <description>Any RDBMS writer plugin with jdbc for Addax</description>
+    <packaging>jar</packaging>
 
     <dependencies>
         <dependency>

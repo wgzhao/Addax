@@ -10,10 +10,10 @@
     </parent>
 
     <artifactId>jsonfilereader</artifactId>
-    <packaging>jar</packaging>
 
     <name>jsonfile-reader</name>
     <description>JSON format files reader plugin for Addax</description>
+    <packaging>jar</packaging>
 
     <dependencies>
         <dependency>

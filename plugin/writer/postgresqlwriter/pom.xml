@@ -10,10 +10,10 @@
     </parent>
 
     <artifactId>postgresqlwriter</artifactId>
-    <packaging>jar</packaging>
 
     <name>postgresql-writer</name>
     <description>PostgreSQL writer plugin for Addax</description>
+    <packaging>jar</packaging>
 
     <dependencies>
         <dependency>

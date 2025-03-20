@@ -10,10 +10,10 @@
     </parent>
 
     <artifactId>hdfsreader</artifactId>
-    <packaging>jar</packaging>
 
     <name>hdfs-reader</name>
     <description>Hadoop HDFS files reader plugin for Addax</description>
+    <packaging>jar</packaging>
 
     <dependencies>
         <dependency>

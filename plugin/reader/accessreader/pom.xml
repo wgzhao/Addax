@@ -10,31 +10,30 @@
     </parent>
 
     <artifactId>accessreader</artifactId>
-    <packaging>jar</packaging>
-
     <name>access-reader</name>
     <description>Access reader plugin for Addax</description>
 
-    <dependencies>
-    <dependency>
-        <groupId>com.wgzhao.addax</groupId>
-        <artifactId>addax-core</artifactId>
-        <version>${project.version}</version>
-        <scope>provided</scope>
-        <exclusions>
-            <exclusion>
-                <groupId>org.slf4j</groupId>
-                <artifactId>slf4j-log4j12</artifactId>
-            </exclusion>
-        </exclusions>
-    </dependency>
 
-    <dependency>
-        <groupId>com.wgzhao.addax</groupId>
-        <artifactId>addax-rdbms</artifactId>
-        <version>${project.version}</version>
-        <scope>provided</scope>
-    </dependency>
+    <dependencies>
+        <dependency>
+            <groupId>com.wgzhao.addax</groupId>
+            <artifactId>addax-core</artifactId>
+            <version>${project.version}</version>
+            <scope>provided</scope>
+            <exclusions>
+                <exclusion>
+                    <groupId>org.slf4j</groupId>
+                    <artifactId>slf4j-log4j12</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+
+        <dependency>
+            <groupId>com.wgzhao.addax</groupId>
+            <artifactId>addax-rdbms</artifactId>
+            <version>${project.version}</version>
+            <scope>provided</scope>
+        </dependency>
 
         <dependency>
             <groupId>net.sf.ucanaccess</groupId>

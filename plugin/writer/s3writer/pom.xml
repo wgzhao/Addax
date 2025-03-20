@@ -10,10 +10,10 @@
     </parent>
 
     <artifactId>s3writer</artifactId>
-    <packaging>jar</packaging>
 
     <name>s3-writer</name>
     <description>Amazon AWS S3 and variant writer plugin for Addax</description>
+    <packaging>jar</packaging>
 
     <dependencyManagement>
         <dependencies>

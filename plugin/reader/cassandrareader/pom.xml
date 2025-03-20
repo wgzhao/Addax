@@ -10,10 +10,10 @@
     </parent>
 
     <artifactId>cassandrareader</artifactId>
-    <packaging>jar</packaging>
 
     <name>cassandra-reader</name>
     <description>Cassandra reader plugin for Addax</description>
+    <packaging>jar</packaging>
 
     <dependencies>
 

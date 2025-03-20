@@ -10,10 +10,10 @@
     </parent>
 
     <artifactId>oraclewriter</artifactId>
-    <packaging>jar</packaging>
 
     <name>oracle-writer</name>
     <description>Oracle database writer plugin for Addax</description>
+    <packaging>jar</packaging>
 
     <dependencies>
         <dependency>

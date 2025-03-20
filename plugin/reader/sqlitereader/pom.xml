@@ -10,10 +10,10 @@
     </parent>
 
     <artifactId>sqlitereader</artifactId>
-    <packaging>jar</packaging>
 
     <name>sqlite-reader</name>
     <description>SQLite reader plugin for Addax</description>
+    <packaging>jar</packaging>
 
     <dependencies>
         <dependency>

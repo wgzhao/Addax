@@ -10,10 +10,10 @@
     </parent>
 
     <artifactId>rdbmsreader</artifactId>
-    <packaging>jar</packaging>
 
     <name>rdbms-reader</name>
     <description>Any RDBMS reader plugin with jdbc for Addax</description>
+    <packaging>jar</packaging>
 
     <dependencies>
 

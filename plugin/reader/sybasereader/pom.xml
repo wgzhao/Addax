@@ -10,10 +10,17 @@
     </parent>
 
     <artifactId>sybasereader</artifactId>
-    <packaging>jar</packaging>
 
     <name>sybase-reader</name>
     <description>Sybase database reader plugin for Addax</description>
+    <packaging>jar</packaging>
+
+    <repositories>
+        <repository>
+            <id>jumpmind</id>
+            <url>https://maven.jumpmind.com/repo/</url>
+        </repository>
+    </repositories>
 
     <dependencies>
         <dependency>
@@ -35,15 +42,7 @@
             <artifactId>jconn4</artifactId>
             <version>16.0</version>
         </dependency>
-
     </dependencies>
-
-    <repositories>
-        <repository>
-            <id>jumpmind</id>
-	    <url>https://maven.jumpmind.com/repo/</url>
-        </repository>
-    </repositories>
 
     <build>
         <plugins>

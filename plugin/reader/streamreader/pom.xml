@@ -10,10 +10,10 @@
     </parent>
 
     <artifactId>streamreader</artifactId>
-    <packaging>jar</packaging>
 
     <name>stream-reader</name>
     <description>stream reader plugin for Addax</description>
+    <packaging>jar</packaging>
 
     <dependencies>
         <dependency>

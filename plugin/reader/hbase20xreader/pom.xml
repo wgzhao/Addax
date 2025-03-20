@@ -10,10 +10,10 @@
     </parent>
 
     <artifactId>hbase20xreader</artifactId>
-    <packaging>jar</packaging>
 
     <name>hbase20x-reader</name>
     <description>HBase 2.x reader plugin for Addax</description>
+    <packaging>jar</packaging>
 
     <dependencies>
 
@@ -187,12 +187,6 @@
         </dependency>
 
         <dependency>
-            <groupId>org.xerial.snappy</groupId>
-            <artifactId>snappy-java</artifactId>
-            <version>${snappy.version}</version>
-        </dependency>
-
-        <dependency>
             <groupId>org.apache.zookeeper</groupId>
             <artifactId>zookeeper</artifactId>
             <version>${zookeeper.version}</version>
@@ -215,6 +209,12 @@
                     <artifactId>netty-handler</artifactId>
                 </exclusion>
             </exclusions>
+        </dependency>
+
+        <dependency>
+            <groupId>org.xerial.snappy</groupId>
+            <artifactId>snappy-java</artifactId>
+            <version>${snappy.version}</version>
         </dependency>
     </dependencies>
 

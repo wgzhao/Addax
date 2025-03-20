@@ -10,10 +10,10 @@
     </parent>
 
     <artifactId>hbase11xsqlwriter</artifactId>
-    <packaging>jar</packaging>
 
     <name>hbase11xsql-writer</name>
     <description>HBase 11.x writer plugin with phoenix for Addax</description>
+    <packaging>jar</packaging>
 
     <dependencies>
         <dependency>

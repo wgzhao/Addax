@@ -10,10 +10,10 @@
     </parent>
 
     <artifactId>hanawriter</artifactId>
-    <packaging>jar</packaging>
 
     <name>hana-writer</name>
     <description>SAP HANA writer plugin for Addax</description>
+    <packaging>jar</packaging>
 
     <dependencies>
         <dependency>
