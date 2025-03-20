@@ -48,6 +48,12 @@
             <groupId>org.anarres.lzo</groupId>
             <artifactId>lzo-core</artifactId>
             <version>1.0.6</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>commons-logging</groupId>
+                    <artifactId>commons-logging</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
 
         <dependency>
