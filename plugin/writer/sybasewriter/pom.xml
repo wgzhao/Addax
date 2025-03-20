@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
     <parent>
@@ -10,16 +10,10 @@
     </parent>
 
     <artifactId>sybasewriter</artifactId>
-    <name>sybase-writer</name>
-    <description>Sybase writer plugin for Addax</description>
     <packaging>jar</packaging>
 
-    <repositories>
-        <repository>
-            <id>jumpmind</id>
-            <url>https://maven.jumpmind.com/repo/</url>
-        </repository>
-    </repositories>
+    <name>sybase-writer</name>
+    <description>Sybase writer plugin for Addax</description>
 
     <dependencies>
         <dependency>
@@ -44,6 +38,13 @@
         </dependency>
 
     </dependencies>
+
+    <repositories>
+        <repository>
+            <id>jumpmind</id>
+            <url>https://maven.jumpmind.com/repo/</url>
+        </repository>
+    </repositories>
 
     <build>
         <plugins>

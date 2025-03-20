@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
+
     <parent>
         <groupId>com.wgzhao.addax</groupId>
         <artifactId>addax-all</artifactId>
@@ -9,29 +10,23 @@
     </parent>
 
     <artifactId>oraclereader</artifactId>
-    <name>oracle-reader</name>
-    <description>Oracle Database reader plugin for Addax</description>
     <packaging>jar</packaging>
 
-    <repositories>
-        <repository>
-            <id>mvnrepository</id>
-            <url>https://www.datanucleus.org/downloads/maven2/</url>
-        </repository>
-    </repositories>
+    <name>oracle-reader</name>
+    <description>Oracle Database reader plugin for Addax</description>
 
     <dependencies>
         <dependency>
             <groupId>com.wgzhao.addax</groupId>
             <artifactId>addax-core</artifactId>
             <version>${project.version}</version>
+            <scope>compile</scope>
             <exclusions>
                 <exclusion>
-                    <artifactId>slf4j-log4j12</artifactId>
                     <groupId>org.slf4j</groupId>
+                    <artifactId>slf4j-log4j12</artifactId>
                 </exclusion>
             </exclusions>
-            <scope>compile</scope>
         </dependency>
 
         <dependency>
@@ -62,6 +57,13 @@
         </dependency>
 
     </dependencies>
+
+    <repositories>
+        <repository>
+            <id>mvnrepository</id>
+            <url>https://www.datanucleus.org/downloads/maven2/</url>
+        </repository>
+    </repositories>
 
     <build>
         <plugins>
