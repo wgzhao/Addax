@@ -32,9 +32,9 @@ import java.sql.Types;
 import java.text.SimpleDateFormat;
 import java.util.List;
 
-import static com.wgzhao.addax.common.base.Constant.DEFAULT_DATE_FORMAT;
-import static com.wgzhao.addax.common.base.Key.PASSWORD;
-import static com.wgzhao.addax.common.base.Key.USERNAME;
+import static com.wgzhao.addax.core.base.Constant.DEFAULT_DATE_FORMAT;
+import static com.wgzhao.addax.core.base.Key.PASSWORD;
+import static com.wgzhao.addax.core.base.Key.USERNAME;
 
 public class SqliteWriter
         extends Writer

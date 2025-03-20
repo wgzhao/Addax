@@ -41,10 +41,10 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
-import static com.wgzhao.addax.common.spi.ErrorCode.CONFIG_ERROR;
-import static com.wgzhao.addax.common.spi.ErrorCode.ILLEGAL_VALUE;
-import static com.wgzhao.addax.common.spi.ErrorCode.IO_ERROR;
-import static com.wgzhao.addax.common.spi.ErrorCode.PERMISSION_ERROR;
+import static com.wgzhao.addax.core.spi.ErrorCode.CONFIG_ERROR;
+import static com.wgzhao.addax.core.spi.ErrorCode.ILLEGAL_VALUE;
+import static com.wgzhao.addax.core.spi.ErrorCode.IO_ERROR;
+import static com.wgzhao.addax.core.spi.ErrorCode.PERMISSION_ERROR;
 
 public class StreamWriter
         extends Writer

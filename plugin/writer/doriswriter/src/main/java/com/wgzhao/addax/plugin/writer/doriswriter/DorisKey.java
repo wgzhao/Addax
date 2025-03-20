@@ -35,9 +35,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import static com.wgzhao.addax.common.base.Constant.DEFAULT_BATCH_SIZE;
-import static com.wgzhao.addax.common.spi.ErrorCode.CONFIG_ERROR;
-import static com.wgzhao.addax.common.spi.ErrorCode.REQUIRED_VALUE;
+import static com.wgzhao.addax.core.base.Constant.DEFAULT_BATCH_SIZE;
+import static com.wgzhao.addax.core.spi.ErrorCode.CONFIG_ERROR;
+import static com.wgzhao.addax.core.spi.ErrorCode.REQUIRED_VALUE;
 
 public class DorisKey
         extends Key

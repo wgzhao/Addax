@@ -34,8 +34,8 @@ import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.time.Duration;
 
-import static com.wgzhao.addax.common.spi.ErrorCode.CONNECT_ERROR;
-import static com.wgzhao.addax.common.spi.ErrorCode.IO_ERROR;
+import static com.wgzhao.addax.core.spi.ErrorCode.CONNECT_ERROR;
+import static com.wgzhao.addax.core.spi.ErrorCode.IO_ERROR;
 import static org.apache.commons.net.ftp.FTP.BINARY_FILE_TYPE;
 
 public class StandardFtpHelper

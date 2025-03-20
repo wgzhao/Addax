@@ -46,15 +46,15 @@ import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 
-import static com.wgzhao.addax.common.base.Constant.DEFAULT_FETCH_SIZE;
-import static com.wgzhao.addax.common.base.Key.COLUMN;
-import static com.wgzhao.addax.common.base.Key.CONNECTION;
-import static com.wgzhao.addax.common.base.Key.DATABASE;
-import static com.wgzhao.addax.common.base.Key.FETCH_SIZE;
-import static com.wgzhao.addax.common.base.Key.PASSWORD;
-import static com.wgzhao.addax.common.base.Key.USERNAME;
-import static com.wgzhao.addax.common.spi.ErrorCode.ILLEGAL_VALUE;
-import static com.wgzhao.addax.common.spi.ErrorCode.REQUIRED_VALUE;
+import static com.wgzhao.addax.core.base.Constant.DEFAULT_FETCH_SIZE;
+import static com.wgzhao.addax.core.base.Key.COLUMN;
+import static com.wgzhao.addax.core.base.Key.CONNECTION;
+import static com.wgzhao.addax.core.base.Key.DATABASE;
+import static com.wgzhao.addax.core.base.Key.FETCH_SIZE;
+import static com.wgzhao.addax.core.base.Key.PASSWORD;
+import static com.wgzhao.addax.core.base.Key.USERNAME;
+import static com.wgzhao.addax.core.spi.ErrorCode.ILLEGAL_VALUE;
+import static com.wgzhao.addax.core.spi.ErrorCode.REQUIRED_VALUE;
 
 public class MongoDBReader
         extends Reader

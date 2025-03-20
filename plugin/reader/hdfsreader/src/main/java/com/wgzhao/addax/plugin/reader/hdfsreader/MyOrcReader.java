@@ -49,7 +49,7 @@ import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 
-import static com.wgzhao.addax.common.spi.ErrorCode.IO_ERROR;
+import static com.wgzhao.addax.core.spi.ErrorCode.IO_ERROR;
 
 public class MyOrcReader
 {

@@ -38,7 +38,7 @@ import java.net.URLEncoder;
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
 
-import static com.wgzhao.addax.common.spi.ErrorCode.ILLEGAL_VALUE;
+import static com.wgzhao.addax.core.spi.ErrorCode.ILLEGAL_VALUE;
 
 public class InfluxDBReaderTask
 {

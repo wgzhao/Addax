@@ -42,9 +42,9 @@ import java.sql.Types;
 import java.util.ArrayList;
 import java.util.List;
 
-import static com.wgzhao.addax.common.base.Constant.DEFAULT_BATCH_SIZE;
-import static com.wgzhao.addax.common.base.Key.BATCH_SIZE;
-import static com.wgzhao.addax.common.spi.ErrorCode.EXECUTE_FAIL;
+import static com.wgzhao.addax.core.base.Constant.DEFAULT_BATCH_SIZE;
+import static com.wgzhao.addax.core.base.Key.BATCH_SIZE;
+import static com.wgzhao.addax.core.spi.ErrorCode.EXECUTE_FAIL;
 
 public class CopyWriterTask
         extends CommonRdbmsWriter.Task

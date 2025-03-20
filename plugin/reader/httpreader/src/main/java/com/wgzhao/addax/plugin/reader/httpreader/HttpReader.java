@@ -66,8 +66,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 
-import static com.wgzhao.addax.common.spi.ErrorCode.ILLEGAL_VALUE;
-import static com.wgzhao.addax.common.spi.ErrorCode.REQUIRED_VALUE;
+import static com.wgzhao.addax.core.spi.ErrorCode.ILLEGAL_VALUE;
+import static com.wgzhao.addax.core.spi.ErrorCode.REQUIRED_VALUE;
 
 public class HttpReader
         extends Reader

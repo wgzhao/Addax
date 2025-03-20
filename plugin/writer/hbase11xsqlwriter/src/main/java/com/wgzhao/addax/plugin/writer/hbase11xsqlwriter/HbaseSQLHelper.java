@@ -50,11 +50,11 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import static com.wgzhao.addax.common.spi.ErrorCode.CONNECT_ERROR;
-import static com.wgzhao.addax.common.spi.ErrorCode.EXECUTE_FAIL;
-import static com.wgzhao.addax.common.spi.ErrorCode.ILLEGAL_VALUE;
-import static com.wgzhao.addax.common.spi.ErrorCode.LOGIN_ERROR;
-import static com.wgzhao.addax.common.spi.ErrorCode.PERMISSION_ERROR;
+import static com.wgzhao.addax.core.spi.ErrorCode.CONNECT_ERROR;
+import static com.wgzhao.addax.core.spi.ErrorCode.EXECUTE_FAIL;
+import static com.wgzhao.addax.core.spi.ErrorCode.ILLEGAL_VALUE;
+import static com.wgzhao.addax.core.spi.ErrorCode.LOGIN_ERROR;
+import static com.wgzhao.addax.core.spi.ErrorCode.PERMISSION_ERROR;
 
 public class HbaseSQLHelper
 {

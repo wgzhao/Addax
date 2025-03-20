@@ -45,15 +45,15 @@ import java.io.IOException;
 import java.util.Objects;
 import java.util.Set;
 
-import static com.wgzhao.addax.common.base.Key.HAVE_KERBEROS;
-import static com.wgzhao.addax.common.base.Key.HDFS_SITE_PATH;
-import static com.wgzhao.addax.common.base.Key.KERBEROS_KEYTAB_FILE_PATH;
-import static com.wgzhao.addax.common.base.Key.KERBEROS_PRINCIPAL;
-import static com.wgzhao.addax.common.spi.ErrorCode.CONFIG_ERROR;
-import static com.wgzhao.addax.common.spi.ErrorCode.IO_ERROR;
-import static com.wgzhao.addax.common.spi.ErrorCode.LOGIN_ERROR;
-import static com.wgzhao.addax.common.spi.ErrorCode.NOT_SUPPORT_TYPE;
-import static com.wgzhao.addax.common.spi.ErrorCode.RUNTIME_ERROR;
+import static com.wgzhao.addax.core.base.Key.HAVE_KERBEROS;
+import static com.wgzhao.addax.core.base.Key.HDFS_SITE_PATH;
+import static com.wgzhao.addax.core.base.Key.KERBEROS_KEYTAB_FILE_PATH;
+import static com.wgzhao.addax.core.base.Key.KERBEROS_PRINCIPAL;
+import static com.wgzhao.addax.core.spi.ErrorCode.CONFIG_ERROR;
+import static com.wgzhao.addax.core.spi.ErrorCode.IO_ERROR;
+import static com.wgzhao.addax.core.spi.ErrorCode.LOGIN_ERROR;
+import static com.wgzhao.addax.core.spi.ErrorCode.NOT_SUPPORT_TYPE;
+import static com.wgzhao.addax.core.spi.ErrorCode.RUNTIME_ERROR;
 
 public class HdfsHelper
 {

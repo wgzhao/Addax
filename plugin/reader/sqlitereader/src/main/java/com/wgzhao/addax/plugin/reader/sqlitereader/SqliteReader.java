@@ -28,7 +28,7 @@ import com.wgzhao.addax.rdbms.util.DataBaseType;
 
 import java.util.List;
 
-import static com.wgzhao.addax.common.base.Constant.DEFAULT_FETCH_SIZE;
+import static com.wgzhao.addax.core.base.Constant.DEFAULT_FETCH_SIZE;
 
 public class SqliteReader
         extends Reader

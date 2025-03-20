@@ -44,7 +44,7 @@ import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.text.ParseException;
 
-import static com.wgzhao.addax.common.spi.ErrorCode.ILLEGAL_VALUE;
+import static com.wgzhao.addax.core.spi.ErrorCode.ILLEGAL_VALUE;
 
 public abstract class HbaseAbstractTask
 {

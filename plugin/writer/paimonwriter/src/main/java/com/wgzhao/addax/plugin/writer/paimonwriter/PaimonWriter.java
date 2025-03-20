@@ -29,8 +29,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-import static com.wgzhao.addax.common.base.Key.KERBEROS_KEYTAB_FILE_PATH;
-import static com.wgzhao.addax.common.base.Key.KERBEROS_PRINCIPAL;
+import static com.wgzhao.addax.core.base.Key.KERBEROS_KEYTAB_FILE_PATH;
+import static com.wgzhao.addax.core.base.Key.KERBEROS_PRINCIPAL;
 
 public class PaimonWriter
         extends Writer

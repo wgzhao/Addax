@@ -36,7 +36,7 @@ import java.sql.Connection;
 import java.util.ArrayList;
 import java.util.List;
 
-import static com.wgzhao.addax.common.spi.ErrorCode.CONFIG_ERROR;
+import static com.wgzhao.addax.core.spi.ErrorCode.CONFIG_ERROR;
 
 /**
  * doris data writer

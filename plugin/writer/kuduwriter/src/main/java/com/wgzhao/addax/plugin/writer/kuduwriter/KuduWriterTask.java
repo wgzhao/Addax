@@ -43,10 +43,10 @@ import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.util.List;
 
-import static com.wgzhao.addax.common.base.Constant.DEFAULT_BATCH_SIZE;
-import static com.wgzhao.addax.common.spi.ErrorCode.CONFIG_ERROR;
-import static com.wgzhao.addax.common.spi.ErrorCode.NOT_SUPPORT_TYPE;
-import static com.wgzhao.addax.common.spi.ErrorCode.RUNTIME_ERROR;
+import static com.wgzhao.addax.core.base.Constant.DEFAULT_BATCH_SIZE;
+import static com.wgzhao.addax.core.spi.ErrorCode.CONFIG_ERROR;
+import static com.wgzhao.addax.core.spi.ErrorCode.NOT_SUPPORT_TYPE;
+import static com.wgzhao.addax.core.spi.ErrorCode.RUNTIME_ERROR;
 
 public class KuduWriterTask
         extends Writer

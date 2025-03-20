@@ -46,11 +46,11 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
-import static com.wgzhao.addax.common.base.Key.IGNORE_ERROR;
-import static com.wgzhao.addax.common.base.Key.POST_SHELL;
-import static com.wgzhao.addax.common.base.Key.PRE_SHELL;
-import static com.wgzhao.addax.common.spi.ErrorCode.ILLEGAL_VALUE;
-import static com.wgzhao.addax.common.spi.ErrorCode.REQUIRED_VALUE;
+import static com.wgzhao.addax.core.base.Key.IGNORE_ERROR;
+import static com.wgzhao.addax.core.base.Key.POST_SHELL;
+import static com.wgzhao.addax.core.base.Key.PRE_SHELL;
+import static com.wgzhao.addax.core.spi.ErrorCode.ILLEGAL_VALUE;
+import static com.wgzhao.addax.core.spi.ErrorCode.REQUIRED_VALUE;
 
 public class HdfsWriter
         extends Writer

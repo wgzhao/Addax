@@ -33,8 +33,8 @@ import org.slf4j.LoggerFactory;
 
 import java.util.List;
 
-import static com.wgzhao.addax.common.base.Key.JDBC_DRIVER;
-import static com.wgzhao.addax.common.spi.ErrorCode.REQUIRED_VALUE;
+import static com.wgzhao.addax.core.base.Key.JDBC_DRIVER;
+import static com.wgzhao.addax.core.spi.ErrorCode.REQUIRED_VALUE;
 
 public class RdbmsWriter
         extends Writer

@@ -24,7 +24,7 @@ import com.wgzhao.addax.core.exception.AddaxException;
 import com.wgzhao.addax.core.util.Configuration;
 import org.apache.hadoop.hbase.client.Put;
 
-import static com.wgzhao.addax.common.spi.ErrorCode.ILLEGAL_VALUE;
+import static com.wgzhao.addax.core.spi.ErrorCode.ILLEGAL_VALUE;
 
 public class MultiVersionTask
         extends HbaseAbstractTask

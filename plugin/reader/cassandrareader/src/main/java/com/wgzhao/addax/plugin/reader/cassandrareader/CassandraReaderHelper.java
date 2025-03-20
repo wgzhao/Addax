@@ -62,7 +62,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import static com.wgzhao.addax.common.spi.ErrorCode.CONFIG_ERROR;
+import static com.wgzhao.addax.core.spi.ErrorCode.CONFIG_ERROR;
 
 
 public class CassandraReaderHelper

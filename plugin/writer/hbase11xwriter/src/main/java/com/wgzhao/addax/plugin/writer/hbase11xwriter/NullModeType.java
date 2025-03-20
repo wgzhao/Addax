@@ -23,7 +23,7 @@ import com.wgzhao.addax.core.exception.AddaxException;
 
 import java.util.Arrays;
 
-import static com.wgzhao.addax.common.spi.ErrorCode.NOT_SUPPORT_TYPE;
+import static com.wgzhao.addax.core.spi.ErrorCode.NOT_SUPPORT_TYPE;
 
 public enum NullModeType
 {

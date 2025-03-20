@@ -9,7 +9,7 @@ import org.apache.paimon.options.Options;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import static com.wgzhao.addax.common.spi.ErrorCode.LOGIN_ERROR;
+import static com.wgzhao.addax.core.spi.ErrorCode.LOGIN_ERROR;
 
 public class PaimonHelper {
     private static final Logger LOG = LoggerFactory.getLogger(PaimonHelper.class);

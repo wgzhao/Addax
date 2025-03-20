@@ -53,13 +53,13 @@ import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import static com.wgzhao.addax.common.base.Constant.DEFAULT_DATE_FORMAT;
-import static com.wgzhao.addax.common.base.Key.COLUMN;
-import static com.wgzhao.addax.common.base.Key.WHERE;
-import static com.wgzhao.addax.common.spi.ErrorCode.CONFIG_ERROR;
-import static com.wgzhao.addax.common.spi.ErrorCode.ILLEGAL_VALUE;
-import static com.wgzhao.addax.common.spi.ErrorCode.NOT_SUPPORT_TYPE;
-import static com.wgzhao.addax.common.spi.ErrorCode.RUNTIME_ERROR;
+import static com.wgzhao.addax.core.base.Constant.DEFAULT_DATE_FORMAT;
+import static com.wgzhao.addax.core.base.Key.COLUMN;
+import static com.wgzhao.addax.core.base.Key.WHERE;
+import static com.wgzhao.addax.core.spi.ErrorCode.CONFIG_ERROR;
+import static com.wgzhao.addax.core.spi.ErrorCode.ILLEGAL_VALUE;
+import static com.wgzhao.addax.core.spi.ErrorCode.NOT_SUPPORT_TYPE;
+import static com.wgzhao.addax.core.spi.ErrorCode.RUNTIME_ERROR;
 import static com.wgzhao.addax.plugin.reader.kudureader.KuduKey.KUDU_OPERATORS;
 
 /**

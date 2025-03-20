@@ -38,7 +38,7 @@ import java.sql.Types;
 import java.time.LocalDateTime;
 import java.util.List;
 
-import static com.wgzhao.addax.common.base.Constant.DEFAULT_FETCH_SIZE;
+import static com.wgzhao.addax.core.base.Constant.DEFAULT_FETCH_SIZE;
 
 public class ClickHouseReader
         extends Reader

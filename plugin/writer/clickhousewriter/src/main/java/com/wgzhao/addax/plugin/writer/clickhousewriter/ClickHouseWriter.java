@@ -32,7 +32,7 @@ import java.sql.Types;
 import java.text.SimpleDateFormat;
 import java.util.List;
 
-import static com.wgzhao.addax.common.base.Constant.DEFAULT_DATE_FORMAT;
+import static com.wgzhao.addax.core.base.Constant.DEFAULT_DATE_FORMAT;
 
 public class ClickHouseWriter
         extends Writer

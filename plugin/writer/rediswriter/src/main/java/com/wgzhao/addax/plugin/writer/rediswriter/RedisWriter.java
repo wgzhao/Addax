@@ -44,7 +44,7 @@ import java.util.Map.Entry;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicLong;
 
-import static com.wgzhao.addax.common.base.Key.CONNECTION;
+import static com.wgzhao.addax.core.base.Key.CONNECTION;
 
 public class RedisWriter
         extends Writer

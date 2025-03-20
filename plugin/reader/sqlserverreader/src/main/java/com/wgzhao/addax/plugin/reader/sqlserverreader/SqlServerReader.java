@@ -36,9 +36,9 @@ import java.sql.SQLException;
 import java.sql.Types;
 import java.util.List;
 
-import static com.wgzhao.addax.common.base.Key.FETCH_SIZE;
-import static com.wgzhao.addax.common.base.Constant.DEFAULT_FETCH_SIZE;
-import static com.wgzhao.addax.common.spi.ErrorCode.ILLEGAL_VALUE;
+import static com.wgzhao.addax.core.base.Key.FETCH_SIZE;
+import static com.wgzhao.addax.core.base.Constant.DEFAULT_FETCH_SIZE;
+import static com.wgzhao.addax.core.spi.ErrorCode.ILLEGAL_VALUE;
 
 public class SqlServerReader
         extends Reader

@@ -33,7 +33,7 @@ import java.sql.SQLException;
 import java.sql.Types;
 import java.util.List;
 
-import static com.wgzhao.addax.common.spi.ErrorCode.ILLEGAL_VALUE;
+import static com.wgzhao.addax.core.spi.ErrorCode.ILLEGAL_VALUE;
 
 public class PostgresqlWriter
         extends Writer

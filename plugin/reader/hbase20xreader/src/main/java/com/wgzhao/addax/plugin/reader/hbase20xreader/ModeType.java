@@ -21,7 +21,7 @@ package com.wgzhao.addax.plugin.reader.hbase20xreader;
 
 import com.wgzhao.addax.core.exception.AddaxException;
 
-import static com.wgzhao.addax.common.spi.ErrorCode.NOT_SUPPORT_TYPE;
+import static com.wgzhao.addax.core.spi.ErrorCode.NOT_SUPPORT_TYPE;
 
 public enum ModeType
 {

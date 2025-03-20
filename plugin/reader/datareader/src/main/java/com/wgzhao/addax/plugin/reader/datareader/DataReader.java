@@ -62,15 +62,15 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
-import static com.wgzhao.addax.common.base.Constant.DEFAULT_DATE_FORMAT;
-import static com.wgzhao.addax.common.base.Key.COLUMN;
-import static com.wgzhao.addax.common.base.Key.DATE_FORMAT;
-import static com.wgzhao.addax.common.base.Key.SLICE_RECORD_COUNT;
-import static com.wgzhao.addax.common.base.Key.TYPE;
-import static com.wgzhao.addax.common.base.Key.VALUE;
-import static com.wgzhao.addax.common.spi.ErrorCode.ILLEGAL_VALUE;
-import static com.wgzhao.addax.common.spi.ErrorCode.NOT_SUPPORT_TYPE;
-import static com.wgzhao.addax.common.spi.ErrorCode.REQUIRED_VALUE;
+import static com.wgzhao.addax.core.base.Constant.DEFAULT_DATE_FORMAT;
+import static com.wgzhao.addax.core.base.Key.COLUMN;
+import static com.wgzhao.addax.core.base.Key.DATE_FORMAT;
+import static com.wgzhao.addax.core.base.Key.SLICE_RECORD_COUNT;
+import static com.wgzhao.addax.core.base.Key.TYPE;
+import static com.wgzhao.addax.core.base.Key.VALUE;
+import static com.wgzhao.addax.core.spi.ErrorCode.ILLEGAL_VALUE;
+import static com.wgzhao.addax.core.spi.ErrorCode.NOT_SUPPORT_TYPE;
+import static com.wgzhao.addax.core.spi.ErrorCode.REQUIRED_VALUE;
 import static com.wgzhao.addax.plugin.reader.datareader.DataKey.RULE;
 
 public class DataReader

@@ -37,16 +37,16 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 
-import static com.wgzhao.addax.common.base.Key.COLUMN;
-import static com.wgzhao.addax.common.base.Key.ENCODING;
-import static com.wgzhao.addax.common.base.Key.INDEX;
-import static com.wgzhao.addax.common.base.Key.TYPE;
-import static com.wgzhao.addax.common.base.Key.VALUE;
-import static com.wgzhao.addax.common.spi.ErrorCode.CONFIG_ERROR;
-import static com.wgzhao.addax.common.spi.ErrorCode.EXECUTE_FAIL;
-import static com.wgzhao.addax.common.spi.ErrorCode.ILLEGAL_VALUE;
-import static com.wgzhao.addax.common.spi.ErrorCode.NOT_SUPPORT_TYPE;
-import static com.wgzhao.addax.common.spi.ErrorCode.REQUIRED_VALUE;
+import static com.wgzhao.addax.core.base.Key.COLUMN;
+import static com.wgzhao.addax.core.base.Key.ENCODING;
+import static com.wgzhao.addax.core.base.Key.INDEX;
+import static com.wgzhao.addax.core.base.Key.TYPE;
+import static com.wgzhao.addax.core.base.Key.VALUE;
+import static com.wgzhao.addax.core.spi.ErrorCode.CONFIG_ERROR;
+import static com.wgzhao.addax.core.spi.ErrorCode.EXECUTE_FAIL;
+import static com.wgzhao.addax.core.spi.ErrorCode.ILLEGAL_VALUE;
+import static com.wgzhao.addax.core.spi.ErrorCode.NOT_SUPPORT_TYPE;
+import static com.wgzhao.addax.core.spi.ErrorCode.REQUIRED_VALUE;
 
 public class HdfsReader
         extends Reader

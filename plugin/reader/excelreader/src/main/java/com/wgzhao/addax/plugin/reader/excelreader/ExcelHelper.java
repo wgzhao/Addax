@@ -41,7 +41,7 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.Iterator;
 
-import static com.wgzhao.addax.common.spi.ErrorCode.IO_ERROR;
+import static com.wgzhao.addax.core.spi.ErrorCode.IO_ERROR;
 
 public class ExcelHelper
 {

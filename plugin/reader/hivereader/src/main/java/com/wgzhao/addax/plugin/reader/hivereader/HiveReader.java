@@ -39,11 +39,11 @@ import java.sql.SQLException;
 import java.sql.Types;
 import java.util.List;
 
-import static com.wgzhao.addax.common.base.Constant.DEFAULT_FETCH_SIZE;
-import static com.wgzhao.addax.common.base.Key.FETCH_SIZE;
-import static com.wgzhao.addax.common.base.Key.HAVE_KERBEROS;
-import static com.wgzhao.addax.common.base.Key.KERBEROS_KEYTAB_FILE_PATH;
-import static com.wgzhao.addax.common.base.Key.KERBEROS_PRINCIPAL;
+import static com.wgzhao.addax.core.base.Constant.DEFAULT_FETCH_SIZE;
+import static com.wgzhao.addax.core.base.Key.FETCH_SIZE;
+import static com.wgzhao.addax.core.base.Key.HAVE_KERBEROS;
+import static com.wgzhao.addax.core.base.Key.KERBEROS_KEYTAB_FILE_PATH;
+import static com.wgzhao.addax.core.base.Key.KERBEROS_PRINCIPAL;
 
 public class HiveReader
         extends Reader

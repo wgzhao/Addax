@@ -50,17 +50,17 @@ import org.bson.types.ObjectId;
 import java.util.ArrayList;
 import java.util.List;
 
-import static com.wgzhao.addax.common.base.Constant.DEFAULT_BATCH_SIZE;
-import static com.wgzhao.addax.common.base.Key.BATCH_SIZE;
-import static com.wgzhao.addax.common.base.Key.COLUMN;
-import static com.wgzhao.addax.common.base.Key.CONNECTION;
-import static com.wgzhao.addax.common.base.Key.DATABASE;
-import static com.wgzhao.addax.common.base.Key.PASSWORD;
-import static com.wgzhao.addax.common.base.Key.PRE_SQL;
-import static com.wgzhao.addax.common.base.Key.USERNAME;
-import static com.wgzhao.addax.common.base.Key.WRITE_MODE;
-import static com.wgzhao.addax.common.spi.ErrorCode.ILLEGAL_VALUE;
-import static com.wgzhao.addax.common.spi.ErrorCode.REQUIRED_VALUE;
+import static com.wgzhao.addax.core.base.Constant.DEFAULT_BATCH_SIZE;
+import static com.wgzhao.addax.core.base.Key.BATCH_SIZE;
+import static com.wgzhao.addax.core.base.Key.COLUMN;
+import static com.wgzhao.addax.core.base.Key.CONNECTION;
+import static com.wgzhao.addax.core.base.Key.DATABASE;
+import static com.wgzhao.addax.core.base.Key.PASSWORD;
+import static com.wgzhao.addax.core.base.Key.PRE_SQL;
+import static com.wgzhao.addax.core.base.Key.USERNAME;
+import static com.wgzhao.addax.core.base.Key.WRITE_MODE;
+import static com.wgzhao.addax.core.spi.ErrorCode.ILLEGAL_VALUE;
+import static com.wgzhao.addax.core.spi.ErrorCode.REQUIRED_VALUE;
 
 public class MongoDBWriter
         extends Writer

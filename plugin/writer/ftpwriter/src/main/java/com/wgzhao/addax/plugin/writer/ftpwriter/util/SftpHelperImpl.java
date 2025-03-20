@@ -41,9 +41,9 @@ import java.util.Properties;
 import java.util.Set;
 import java.util.Vector;
 
-import static com.wgzhao.addax.common.spi.ErrorCode.ILLEGAL_VALUE;
-import static com.wgzhao.addax.common.spi.ErrorCode.IO_ERROR;
-import static com.wgzhao.addax.common.spi.ErrorCode.LOGIN_ERROR;
+import static com.wgzhao.addax.core.spi.ErrorCode.ILLEGAL_VALUE;
+import static com.wgzhao.addax.core.spi.ErrorCode.IO_ERROR;
+import static com.wgzhao.addax.core.spi.ErrorCode.LOGIN_ERROR;
 
 public class SftpHelperImpl
         implements IFtpHelper

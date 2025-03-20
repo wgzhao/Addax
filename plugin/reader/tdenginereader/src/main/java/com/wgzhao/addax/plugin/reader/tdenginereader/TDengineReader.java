@@ -34,11 +34,11 @@ import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import static com.wgzhao.addax.common.base.Constant.DEFAULT_DATE_FORMAT;
-import static com.wgzhao.addax.common.base.Constant.DEFAULT_FETCH_SIZE;
-import static com.wgzhao.addax.common.base.Key.FETCH_SIZE;
-import static com.wgzhao.addax.common.spi.ErrorCode.ILLEGAL_VALUE;
-import static com.wgzhao.addax.common.spi.ErrorCode.REQUIRED_VALUE;
+import static com.wgzhao.addax.core.base.Constant.DEFAULT_DATE_FORMAT;
+import static com.wgzhao.addax.core.base.Constant.DEFAULT_FETCH_SIZE;
+import static com.wgzhao.addax.core.base.Key.FETCH_SIZE;
+import static com.wgzhao.addax.core.spi.ErrorCode.ILLEGAL_VALUE;
+import static com.wgzhao.addax.core.spi.ErrorCode.REQUIRED_VALUE;
 
 public class TDengineReader
         extends Reader
