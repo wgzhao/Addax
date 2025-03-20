@@ -19,8 +19,8 @@
 
 package com.wgzhao.addax.core.statistics.communication;
 
-import com.wgzhao.addax.common.statistics.PerfTrace;
-import com.wgzhao.addax.common.util.StrUtil;
+import com.wgzhao.addax.core.statistics.PerfTrace;
+import com.wgzhao.addax.core.util.StrUtil;
 import org.apache.commons.lang3.Validate;
 
 import java.text.DecimalFormat;

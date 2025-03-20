@@ -19,7 +19,7 @@
 
 package com.wgzhao.addax.core.container.util;
 
-import com.wgzhao.addax.common.util.Configuration;
+import com.wgzhao.addax.core.util.Configuration;
 import com.wgzhao.addax.core.util.container.CoreConstant;
 import org.apache.commons.lang3.Validate;
 import org.apache.commons.lang3.StringUtils;
@@ -31,7 +31,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
-import static com.wgzhao.addax.common.base.Constant.LOAD_BALANCE_RESOURCE_MARK;
+import static com.wgzhao.addax.core.base.Constant.LOAD_BALANCE_RESOURCE_MARK;
 import static com.wgzhao.addax.core.util.container.CoreConstant.CORE_CONTAINER_TASK_GROUP_CHANNEL;
 import static com.wgzhao.addax.core.util.container.CoreConstant.CORE_CONTAINER_TASK_GROUP_ID;
 import static com.wgzhao.addax.core.util.container.CoreConstant.JOB_CONTENT;

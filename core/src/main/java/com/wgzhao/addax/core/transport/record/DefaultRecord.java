@@ -20,9 +20,9 @@
 package com.wgzhao.addax.core.transport.record;
 
 import com.alibaba.fastjson2.JSON;
-import com.wgzhao.addax.common.element.Column;
-import com.wgzhao.addax.common.element.Record;
-import com.wgzhao.addax.common.exception.AddaxException;
+import com.wgzhao.addax.core.element.Column;
+import com.wgzhao.addax.core.element.Record;
+import com.wgzhao.addax.core.exception.AddaxException;
 import com.wgzhao.addax.core.util.ClassSize;
 
 import java.util.ArrayList;
@@ -30,7 +30,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import static com.wgzhao.addax.common.spi.ErrorCode.ILLEGAL_VALUE;
+import static com.wgzhao.addax.core.spi.ErrorCode.ILLEGAL_VALUE;
 
 /**
  * Created by jingxing on 14-8-24.

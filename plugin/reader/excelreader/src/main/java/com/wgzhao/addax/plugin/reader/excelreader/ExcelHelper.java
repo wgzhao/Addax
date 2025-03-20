@@ -21,13 +21,13 @@
 
 package com.wgzhao.addax.plugin.reader.excelreader;
 
-import com.wgzhao.addax.common.element.BoolColumn;
-import com.wgzhao.addax.common.element.DateColumn;
-import com.wgzhao.addax.common.element.DoubleColumn;
-import com.wgzhao.addax.common.element.LongColumn;
-import com.wgzhao.addax.common.element.Record;
-import com.wgzhao.addax.common.element.StringColumn;
-import com.wgzhao.addax.common.exception.AddaxException;
+import com.wgzhao.addax.core.element.BoolColumn;
+import com.wgzhao.addax.core.element.DateColumn;
+import com.wgzhao.addax.core.element.DoubleColumn;
+import com.wgzhao.addax.core.element.LongColumn;
+import com.wgzhao.addax.core.element.Record;
+import com.wgzhao.addax.core.element.StringColumn;
+import com.wgzhao.addax.core.exception.AddaxException;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.DateUtil;
 import org.apache.poi.ss.usermodel.FormulaEvaluator;
@@ -41,7 +41,7 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.Iterator;
 
-import static com.wgzhao.addax.common.spi.ErrorCode.IO_ERROR;
+import static com.wgzhao.addax.core.spi.ErrorCode.IO_ERROR;
 
 public class ExcelHelper
 {

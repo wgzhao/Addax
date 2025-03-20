@@ -19,11 +19,11 @@
 
 package com.wgzhao.addax.plugin.writer.ftpwriter;
 
-import com.wgzhao.addax.common.exception.AddaxException;
-import com.wgzhao.addax.common.plugin.RecordReceiver;
-import com.wgzhao.addax.common.spi.Writer;
-import com.wgzhao.addax.common.util.Configuration;
-import com.wgzhao.addax.common.util.RetryUtil;
+import com.wgzhao.addax.core.exception.AddaxException;
+import com.wgzhao.addax.core.plugin.RecordReceiver;
+import com.wgzhao.addax.core.spi.Writer;
+import com.wgzhao.addax.core.util.Configuration;
+import com.wgzhao.addax.core.util.RetryUtil;
 import com.wgzhao.addax.plugin.writer.ftpwriter.util.IFtpHelper;
 import com.wgzhao.addax.plugin.writer.ftpwriter.util.SftpHelperImpl;
 import com.wgzhao.addax.plugin.writer.ftpwriter.util.StandardFtpHelperImpl;
@@ -40,17 +40,17 @@ import java.util.List;
 import java.util.Set;
 import java.util.concurrent.Callable;
 
-import static com.wgzhao.addax.common.base.Constant.DEFAULT_ENCODING;
-import static com.wgzhao.addax.common.base.Key.COMPRESS;
-import static com.wgzhao.addax.common.base.Key.ENCODING;
-import static com.wgzhao.addax.common.base.Key.FILE_FORMAT;
-import static com.wgzhao.addax.common.base.Key.FILE_NAME;
-import static com.wgzhao.addax.common.base.Key.SUFFIX;
-import static com.wgzhao.addax.common.base.Key.WRITE_MODE;
-import static com.wgzhao.addax.common.spi.ErrorCode.ILLEGAL_VALUE;
-import static com.wgzhao.addax.common.spi.ErrorCode.IO_ERROR;
-import static com.wgzhao.addax.common.spi.ErrorCode.LOGIN_ERROR;
-import static com.wgzhao.addax.common.spi.ErrorCode.REQUIRED_VALUE;
+import static com.wgzhao.addax.core.base.Constant.DEFAULT_ENCODING;
+import static com.wgzhao.addax.core.base.Key.COMPRESS;
+import static com.wgzhao.addax.core.base.Key.ENCODING;
+import static com.wgzhao.addax.core.base.Key.FILE_FORMAT;
+import static com.wgzhao.addax.core.base.Key.FILE_NAME;
+import static com.wgzhao.addax.core.base.Key.SUFFIX;
+import static com.wgzhao.addax.core.base.Key.WRITE_MODE;
+import static com.wgzhao.addax.core.spi.ErrorCode.ILLEGAL_VALUE;
+import static com.wgzhao.addax.core.spi.ErrorCode.IO_ERROR;
+import static com.wgzhao.addax.core.spi.ErrorCode.LOGIN_ERROR;
+import static com.wgzhao.addax.core.spi.ErrorCode.REQUIRED_VALUE;
 
 public class FtpWriter
         extends Writer

@@ -19,7 +19,7 @@
 
 package com.wgzhao.addax.plugin.writer.kuduwriter;
 
-import com.wgzhao.addax.common.base.Key;
+import com.wgzhao.addax.core.base.Key;
 
 public class KuduKey extends Key
 {

@@ -19,9 +19,8 @@
 
 package com.wgzhao.addax.core.transport.transformer;
 
-import com.wgzhao.addax.common.element.Record;
-import com.wgzhao.addax.common.exception.AddaxException;
-import com.wgzhao.addax.transformer.Transformer;
+import com.wgzhao.addax.core.element.Record;
+import com.wgzhao.addax.core.exception.AddaxException;
 import groovy.lang.GroovyClassLoader;
 import org.apache.commons.lang3.StringUtils;
 import org.codehaus.groovy.control.CompilationFailedException;
@@ -29,8 +28,8 @@ import org.codehaus.groovy.control.CompilationFailedException;
 import java.util.Arrays;
 import java.util.List;
 
-import static com.wgzhao.addax.common.spi.ErrorCode.ILLEGAL_VALUE;
-import static com.wgzhao.addax.common.spi.ErrorCode.RUNTIME_ERROR;
+import static com.wgzhao.addax.core.spi.ErrorCode.ILLEGAL_VALUE;
+import static com.wgzhao.addax.core.spi.ErrorCode.RUNTIME_ERROR;
 
 /**
  * no comments.
@@ -111,9 +110,9 @@ public class GroovyTransformer
             }
         }
         sb.append("import static com.wgzhao.addax.core.transport.transformer.GroovyTransformerStaticUtil.*;");
-        sb.append("import com.wgzhao.addax.common.element.*;");
-        sb.append("import com.wgzhao.addax.common.exception.AddaxException;");
-        sb.append("import com.wgzhao.addax.transformer.Transformer;");
+        sb.append("import com.wgzhao.addax.core.element.*;");
+        sb.append("import com.wgzhao.addax.core.exception.AddaxException;");
+        sb.append("import com.wgzhao.addax.core.transport.transformer.Transformer;");
         sb.append("import java.util.*;");
         sb.append("public class RULE extends Transformer").append("{");
         sb.append("public Record evaluate(Record record, Object... paras) {");

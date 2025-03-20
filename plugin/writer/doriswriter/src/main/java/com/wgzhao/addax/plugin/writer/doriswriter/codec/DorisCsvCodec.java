@@ -20,7 +20,7 @@
 
 package com.wgzhao.addax.plugin.writer.doriswriter.codec;
 
-import com.wgzhao.addax.common.element.Record;
+import com.wgzhao.addax.core.element.Record;
 import com.wgzhao.addax.plugin.writer.doriswriter.DelimiterParser;
 
 public class DorisCsvCodec

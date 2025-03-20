@@ -19,10 +19,9 @@
 
 package com.wgzhao.addax.core;
 
-import com.wgzhao.addax.common.element.ColumnCast;
-import com.wgzhao.addax.common.exception.AddaxException;
-import com.wgzhao.addax.common.statistics.VMInfo;
-import com.wgzhao.addax.common.util.Configuration;
+import com.wgzhao.addax.core.element.ColumnCast;
+import com.wgzhao.addax.core.statistics.VMInfo;
+import com.wgzhao.addax.core.util.Configuration;
 import com.wgzhao.addax.core.job.JobContainer;
 import com.wgzhao.addax.core.util.ConfigParser;
 import com.wgzhao.addax.core.util.ConfigurationValidate;

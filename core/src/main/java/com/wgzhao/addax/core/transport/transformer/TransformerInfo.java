@@ -19,9 +19,6 @@
 
 package com.wgzhao.addax.core.transport.transformer;
 
-import com.wgzhao.addax.transformer.ComplexTransformer;
-
-
 public class TransformerInfo
 {
     private ComplexTransformer transformer;

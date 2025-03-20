@@ -19,10 +19,10 @@
 
 package com.wgzhao.addax.plugin.writer.sqlitewriter;
 
-import com.wgzhao.addax.common.element.Column;
-import com.wgzhao.addax.common.plugin.RecordReceiver;
-import com.wgzhao.addax.common.spi.Writer;
-import com.wgzhao.addax.common.util.Configuration;
+import com.wgzhao.addax.core.element.Column;
+import com.wgzhao.addax.core.plugin.RecordReceiver;
+import com.wgzhao.addax.core.spi.Writer;
+import com.wgzhao.addax.core.util.Configuration;
 import com.wgzhao.addax.rdbms.util.DataBaseType;
 import com.wgzhao.addax.rdbms.writer.CommonRdbmsWriter;
 
@@ -32,9 +32,9 @@ import java.sql.Types;
 import java.text.SimpleDateFormat;
 import java.util.List;
 
-import static com.wgzhao.addax.common.base.Constant.DEFAULT_DATE_FORMAT;
-import static com.wgzhao.addax.common.base.Key.PASSWORD;
-import static com.wgzhao.addax.common.base.Key.USERNAME;
+import static com.wgzhao.addax.core.base.Constant.DEFAULT_DATE_FORMAT;
+import static com.wgzhao.addax.core.base.Key.PASSWORD;
+import static com.wgzhao.addax.core.base.Key.USERNAME;
 
 public class SqliteWriter
         extends Writer

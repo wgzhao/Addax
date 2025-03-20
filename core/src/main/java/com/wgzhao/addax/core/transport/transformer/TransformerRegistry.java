@@ -19,12 +19,9 @@
 
 package com.wgzhao.addax.core.transport.transformer;
 
-import com.wgzhao.addax.common.exception.AddaxException;
-import com.wgzhao.addax.common.util.Configuration;
-import com.wgzhao.addax.core.util.container.CoreConstant;
+import com.wgzhao.addax.core.exception.AddaxException;
+import com.wgzhao.addax.core.util.Configuration;
 import com.wgzhao.addax.core.util.container.JarLoader;
-import com.wgzhao.addax.transformer.ComplexTransformer;
-import com.wgzhao.addax.transformer.Transformer;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
@@ -36,7 +33,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import static com.wgzhao.addax.common.spi.ErrorCode.CONFIG_ERROR;
+import static com.wgzhao.addax.core.spi.ErrorCode.CONFIG_ERROR;
 import static com.wgzhao.addax.core.util.container.CoreConstant.STORAGE_TRANSFORMER_HOME;
 
 public class TransformerRegistry

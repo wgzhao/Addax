@@ -19,8 +19,8 @@
 
 package com.wgzhao.addax.core.transport.channel;
 
-import com.wgzhao.addax.common.element.Record;
-import com.wgzhao.addax.common.util.Configuration;
+import com.wgzhao.addax.core.element.Record;
+import com.wgzhao.addax.core.util.Configuration;
 import com.wgzhao.addax.core.statistics.communication.Communication;
 import com.wgzhao.addax.core.statistics.communication.CommunicationTool;
 import com.wgzhao.addax.core.transport.record.TerminateRecord;

@@ -19,8 +19,6 @@
 
 package com.wgzhao.addax.core.transport.transformer;
 
-import com.wgzhao.addax.transformer.ComplexTransformer;
-
 import java.util.Map;
 
 public class TransformerExecution

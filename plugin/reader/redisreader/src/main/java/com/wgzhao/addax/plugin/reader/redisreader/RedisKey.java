@@ -18,7 +18,7 @@
 
 package com.wgzhao.addax.plugin.reader.redisreader;
 
-import com.wgzhao.addax.common.base.Key;
+import com.wgzhao.addax.core.base.Key;
 
 public class RedisKey
     extends Key

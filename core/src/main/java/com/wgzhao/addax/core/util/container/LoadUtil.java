@@ -19,12 +19,12 @@
 
 package com.wgzhao.addax.core.util.container;
 
-import com.wgzhao.addax.common.constant.PluginType;
-import com.wgzhao.addax.common.exception.AddaxException;
-import com.wgzhao.addax.common.plugin.AbstractJobPlugin;
-import com.wgzhao.addax.common.plugin.AbstractPlugin;
-import com.wgzhao.addax.common.plugin.AbstractTaskPlugin;
-import com.wgzhao.addax.common.util.Configuration;
+import com.wgzhao.addax.core.constant.PluginType;
+import com.wgzhao.addax.core.exception.AddaxException;
+import com.wgzhao.addax.core.plugin.AbstractJobPlugin;
+import com.wgzhao.addax.core.plugin.AbstractPlugin;
+import com.wgzhao.addax.core.plugin.AbstractTaskPlugin;
+import com.wgzhao.addax.core.util.Configuration;
 import com.wgzhao.addax.core.taskgroup.runner.AbstractRunner;
 import com.wgzhao.addax.core.taskgroup.runner.ReaderRunner;
 import com.wgzhao.addax.core.taskgroup.runner.WriterRunner;
@@ -33,8 +33,8 @@ import org.apache.commons.lang3.StringUtils;
 import java.util.HashMap;
 import java.util.Map;
 
-import static com.wgzhao.addax.common.spi.ErrorCode.PLUGIN_INSTALL_ERROR;
-import static com.wgzhao.addax.common.spi.ErrorCode.RUNTIME_ERROR;
+import static com.wgzhao.addax.core.spi.ErrorCode.PLUGIN_INSTALL_ERROR;
+import static com.wgzhao.addax.core.spi.ErrorCode.RUNTIME_ERROR;
 
 /**
  * The plugin loader, which is roughly divided into three types of plugins: reader, transformer (not yet implemented), and writer.

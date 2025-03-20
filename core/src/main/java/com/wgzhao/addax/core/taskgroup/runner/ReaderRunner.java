@@ -19,10 +19,10 @@
 
 package com.wgzhao.addax.core.taskgroup.runner;
 
-import com.wgzhao.addax.common.plugin.AbstractTaskPlugin;
-import com.wgzhao.addax.common.plugin.RecordSender;
-import com.wgzhao.addax.common.spi.Reader;
-import com.wgzhao.addax.common.statistics.PerfRecord;
+import com.wgzhao.addax.core.plugin.AbstractTaskPlugin;
+import com.wgzhao.addax.core.plugin.RecordSender;
+import com.wgzhao.addax.core.spi.Reader;
+import com.wgzhao.addax.core.statistics.PerfRecord;
 import com.wgzhao.addax.core.statistics.communication.CommunicationTool;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

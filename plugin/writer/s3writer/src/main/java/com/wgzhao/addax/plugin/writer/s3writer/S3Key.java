@@ -1,6 +1,6 @@
 package com.wgzhao.addax.plugin.writer.s3writer;
 
-import com.wgzhao.addax.common.base.Key;
+import com.wgzhao.addax.core.base.Key;
 
 public class S3Key extends Key
 {

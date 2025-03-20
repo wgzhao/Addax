@@ -1,10 +1,10 @@
 package com.wgzhao.addax.plugin.writer.starrockswriter;
 
-import com.wgzhao.addax.common.element.Record;
-import com.wgzhao.addax.common.exception.AddaxException;
-import com.wgzhao.addax.common.plugin.RecordReceiver;
-import com.wgzhao.addax.common.spi.Writer;
-import com.wgzhao.addax.common.util.Configuration;
+import com.wgzhao.addax.core.element.Record;
+import com.wgzhao.addax.core.exception.AddaxException;
+import com.wgzhao.addax.core.plugin.RecordReceiver;
+import com.wgzhao.addax.core.spi.Writer;
+import com.wgzhao.addax.core.util.Configuration;
 import com.wgzhao.addax.plugin.writer.starrockswriter.manager.StarRocksWriterManager;
 import com.wgzhao.addax.plugin.writer.starrockswriter.row.StarRocksISerializer;
 import com.wgzhao.addax.plugin.writer.starrockswriter.row.StarRocksSerializerFactory;
@@ -18,8 +18,8 @@ import java.sql.Connection;
 import java.util.ArrayList;
 import java.util.List;
 
-import static com.wgzhao.addax.common.spi.ErrorCode.CONFIG_ERROR;
-import static com.wgzhao.addax.common.spi.ErrorCode.EXECUTE_FAIL;
+import static com.wgzhao.addax.core.spi.ErrorCode.CONFIG_ERROR;
+import static com.wgzhao.addax.core.spi.ErrorCode.EXECUTE_FAIL;
 
 public class StarRocksWriter
         extends Writer

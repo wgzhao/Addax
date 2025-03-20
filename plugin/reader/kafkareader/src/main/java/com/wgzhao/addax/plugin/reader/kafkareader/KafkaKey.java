@@ -14,7 +14,7 @@
 
 package com.wgzhao.addax.plugin.reader.kafkareader;
 
-import com.wgzhao.addax.common.base.Key;
+import com.wgzhao.addax.core.base.Key;
 
 public class KafkaKey
         extends Key

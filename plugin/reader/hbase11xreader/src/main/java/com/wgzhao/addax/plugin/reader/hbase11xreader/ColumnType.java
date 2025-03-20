@@ -19,12 +19,10 @@
 
 package com.wgzhao.addax.plugin.reader.hbase11xreader;
 
-import com.wgzhao.addax.common.exception.AddaxException;
+import com.wgzhao.addax.core.exception.AddaxException;
 import org.apache.commons.lang.StringUtils;
 
-import java.util.Arrays;
-
-import static com.wgzhao.addax.common.spi.ErrorCode.NOT_SUPPORT_TYPE;
+import static com.wgzhao.addax.core.spi.ErrorCode.NOT_SUPPORT_TYPE;
 
 public enum ColumnType
 {

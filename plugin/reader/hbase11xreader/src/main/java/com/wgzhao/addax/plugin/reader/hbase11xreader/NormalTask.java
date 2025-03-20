@@ -19,11 +19,11 @@
 
 package com.wgzhao.addax.plugin.reader.hbase11xreader;
 
-import com.wgzhao.addax.common.base.HBaseKey;
-import com.wgzhao.addax.common.element.Column;
-import com.wgzhao.addax.common.element.StringColumn;
-import com.wgzhao.addax.common.util.Configuration;
-import com.wgzhao.addax.common.element.Record;
+import com.wgzhao.addax.core.base.HBaseKey;
+import com.wgzhao.addax.core.element.Column;
+import com.wgzhao.addax.core.element.StringColumn;
+import com.wgzhao.addax.core.util.Configuration;
+import com.wgzhao.addax.core.element.Record;
 import org.apache.hadoop.hbase.client.Result;
 import org.apache.hadoop.hbase.client.Scan;
 import org.apache.hadoop.hbase.util.Bytes;

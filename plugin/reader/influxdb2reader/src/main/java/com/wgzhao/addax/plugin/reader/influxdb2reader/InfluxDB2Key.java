@@ -1,6 +1,6 @@
 package com.wgzhao.addax.plugin.reader.influxdb2reader;
 
-import com.wgzhao.addax.common.base.Key;
+import com.wgzhao.addax.core.base.Key;
 
 public final class InfluxDB2Key
         extends Key

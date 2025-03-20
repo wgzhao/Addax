@@ -14,8 +14,8 @@
 
 package com.wgzhao.addax.plugin.writer.tdenginewriter;
 
-import com.wgzhao.addax.common.plugin.RecordReceiver;
-import com.wgzhao.addax.common.plugin.TaskPluginCollector;
+import com.wgzhao.addax.core.plugin.RecordReceiver;
+import com.wgzhao.addax.core.plugin.TaskPluginCollector;
 
 public interface DataHandler
 {

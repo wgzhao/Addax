@@ -18,14 +18,14 @@ import com.taosdata.jdbc.SchemalessWriter;
 import com.taosdata.jdbc.enums.SchemalessProtocolType;
 import com.taosdata.jdbc.enums.SchemalessTimestampType;
 import com.taosdata.jdbc.utils.Utils;
-import com.wgzhao.addax.common.base.Constant;
-import com.wgzhao.addax.common.base.Key;
-import com.wgzhao.addax.common.element.Column;
-import com.wgzhao.addax.common.element.Record;
-import com.wgzhao.addax.common.exception.AddaxException;
-import com.wgzhao.addax.common.plugin.RecordReceiver;
-import com.wgzhao.addax.common.plugin.TaskPluginCollector;
-import com.wgzhao.addax.common.util.Configuration;
+import com.wgzhao.addax.core.base.Constant;
+import com.wgzhao.addax.core.base.Key;
+import com.wgzhao.addax.core.element.Column;
+import com.wgzhao.addax.core.element.Record;
+import com.wgzhao.addax.core.exception.AddaxException;
+import com.wgzhao.addax.core.plugin.RecordReceiver;
+import com.wgzhao.addax.core.plugin.TaskPluginCollector;
+import com.wgzhao.addax.core.util.Configuration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -41,8 +41,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-import static com.wgzhao.addax.common.spi.ErrorCode.CONFIG_ERROR;
-import static com.wgzhao.addax.common.spi.ErrorCode.EXECUTE_FAIL;
+import static com.wgzhao.addax.core.spi.ErrorCode.CONFIG_ERROR;
+import static com.wgzhao.addax.core.spi.ErrorCode.EXECUTE_FAIL;
 
 public class DefaultDataHandler
         implements DataHandler
@@ -150,10 +150,10 @@ public class DefaultDataHandler
      * stb2[ts,f1,f2,f3] tags:[t1,t2]
      * 1. Table types are divided into: stb (super table), tb (sub table), t (original table)
      * 2. For stb, create table automatically/schemaless
-     * 2.1: If data contains the tbname field, e.g., data: [ts, f1, f2, f3, t1, t2, tbname], tbColumn: [ts, f1, f2, t1] => insert into tbname using stb1 tags (t1) values(ts, f1, f2)
-     * 2.2: If data does not contain the tbname field, e.g., data: [ts, f1, f2, f3, t1, t2], tbColumn: [ts, f1, f2, t1] => schemaless: stb1,t1=t1 f1=f1,f2=f2 ts, no batch write
-     * 3. For tb, construct SQL, e.g., data: [ts, f1, f2, f3, t1, t2], tbColumn: [ts, f1, f2, t1] => insert into tb(ts, f1, f2) values(ts, f1, f2)
-     * 4. For t, construct SQL, e.g., data: [ts, f1, f2, f3, t1, t2], tbColumn: [ts, f1, f2, f3, t1, t2] => insert into t(ts, f1, f2, f3, t1, t2) values(ts, f1, f2, f3, t1, t2)
+     * 2.1: If data contains the tbname field, e.g., data: [ts, f1, f2, f3, t1, t2, tbname], tbColumn: [ts, f1, f2, t1] =&ge; insert into tbname using stb1 tags (t1) values(ts, f1, f2)
+     * 2.2: If data does not contain the tbname field, e.g., data: [ts, f1, f2, f3, t1, t2], tbColumn: [ts, f1, f2, t1] =&ge; schemaless: stb1,t1=t1 f1=f1,f2=f2 ts, no batch write
+     * 3. For tb, construct SQL, e.g., data: [ts, f1, f2, f3, t1, t2], tbColumn: [ts, f1, f2, t1] =&ge; insert into tb(ts, f1, f2) values(ts, f1, f2)
+     * 4. For t, construct SQL, e.g., data: [ts, f1, f2, f3, t1, t2], tbColumn: [ts, f1, f2, f3, t1, t2] =&ge; insert into t(ts, f1, f2, f3, t1, t2) values(ts, f1, f2, f3, t1, t2)
      *
      * @param conn {@link Connection}
      * @param recordBatch list of {@link Record}

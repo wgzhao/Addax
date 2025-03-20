@@ -19,8 +19,8 @@
 
 package com.wgzhao.addax.plugin.writer.cassandrawriter;
 
-import com.wgzhao.addax.common.element.Column;
-import com.wgzhao.addax.common.exception.AddaxException;
+import com.wgzhao.addax.core.element.Column;
+import com.wgzhao.addax.core.exception.AddaxException;
 import com.alibaba.fastjson2.JSON;
 import com.alibaba.fastjson2.JSONArray;
 import com.alibaba.fastjson2.JSONObject;
@@ -49,8 +49,8 @@ import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 
-import static com.wgzhao.addax.common.spi.ErrorCode.CONFIG_ERROR;
-import static com.wgzhao.addax.common.spi.ErrorCode.NOT_SUPPORT_TYPE;
+import static com.wgzhao.addax.core.spi.ErrorCode.CONFIG_ERROR;
+import static com.wgzhao.addax.core.spi.ErrorCode.NOT_SUPPORT_TYPE;
 
 /**
  * Created by mazhenlin on 2019/8/21.

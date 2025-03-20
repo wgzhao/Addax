@@ -19,13 +19,13 @@
 
 package com.wgzhao.addax.plugin.writer.hdfswriter;
 
-import com.wgzhao.addax.common.base.Constant;
-import com.wgzhao.addax.common.base.Key;
-import com.wgzhao.addax.common.exception.AddaxException;
-import com.wgzhao.addax.common.plugin.RecordReceiver;
-import com.wgzhao.addax.common.spi.Writer;
-import com.wgzhao.addax.common.util.Configuration;
-import com.wgzhao.addax.common.util.ShellUtil;
+import com.wgzhao.addax.core.base.Constant;
+import com.wgzhao.addax.core.base.Key;
+import com.wgzhao.addax.core.exception.AddaxException;
+import com.wgzhao.addax.core.plugin.RecordReceiver;
+import com.wgzhao.addax.core.spi.Writer;
+import com.wgzhao.addax.core.util.Configuration;
+import com.wgzhao.addax.core.util.ShellUtil;
 import com.wgzhao.addax.storage.util.FileHelper;
 import org.apache.commons.io.Charsets;
 import org.apache.commons.lang3.StringUtils;
@@ -46,11 +46,11 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
-import static com.wgzhao.addax.common.base.Key.IGNORE_ERROR;
-import static com.wgzhao.addax.common.base.Key.POST_SHELL;
-import static com.wgzhao.addax.common.base.Key.PRE_SHELL;
-import static com.wgzhao.addax.common.spi.ErrorCode.ILLEGAL_VALUE;
-import static com.wgzhao.addax.common.spi.ErrorCode.REQUIRED_VALUE;
+import static com.wgzhao.addax.core.base.Key.IGNORE_ERROR;
+import static com.wgzhao.addax.core.base.Key.POST_SHELL;
+import static com.wgzhao.addax.core.base.Key.PRE_SHELL;
+import static com.wgzhao.addax.core.spi.ErrorCode.ILLEGAL_VALUE;
+import static com.wgzhao.addax.core.spi.ErrorCode.REQUIRED_VALUE;
 
 public class HdfsWriter
         extends Writer

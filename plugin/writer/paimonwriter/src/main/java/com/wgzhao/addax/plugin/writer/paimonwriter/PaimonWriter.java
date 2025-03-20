@@ -1,11 +1,11 @@
 package com.wgzhao.addax.plugin.writer.paimonwriter;
 
 import com.alibaba.fastjson2.JSON;
-import com.wgzhao.addax.common.element.Column;
-import com.wgzhao.addax.common.element.Record;
-import com.wgzhao.addax.common.plugin.RecordReceiver;
-import com.wgzhao.addax.common.spi.Writer;
-import com.wgzhao.addax.common.util.Configuration;
+import com.wgzhao.addax.core.element.Column;
+import com.wgzhao.addax.core.element.Record;
+import com.wgzhao.addax.core.plugin.RecordReceiver;
+import com.wgzhao.addax.core.spi.Writer;
+import com.wgzhao.addax.core.util.Configuration;
 import org.apache.hadoop.fs.FileSystem;
 import org.apache.paimon.catalog.Catalog;
 import org.apache.paimon.catalog.CatalogContext;
@@ -29,8 +29,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-import static com.wgzhao.addax.common.base.Key.KERBEROS_KEYTAB_FILE_PATH;
-import static com.wgzhao.addax.common.base.Key.KERBEROS_PRINCIPAL;
+import static com.wgzhao.addax.core.base.Key.KERBEROS_KEYTAB_FILE_PATH;
+import static com.wgzhao.addax.core.base.Key.KERBEROS_PRINCIPAL;
 
 public class PaimonWriter
         extends Writer

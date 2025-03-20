@@ -21,16 +21,16 @@
 
 package com.wgzhao.addax.rdbms.reader.util;
 
-import com.wgzhao.addax.common.base.Key;
+import com.wgzhao.addax.core.base.Key;
 import com.wgzhao.addax.rdbms.util.DataBaseType;
-import com.wgzhao.addax.common.util.Configuration;
+import com.wgzhao.addax.core.util.Configuration;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.Validate;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import static com.wgzhao.addax.common.base.Constant.LOAD_BALANCE_RESOURCE_MARK;
+import static com.wgzhao.addax.core.base.Constant.LOAD_BALANCE_RESOURCE_MARK;
 
 public final class ReaderSplitUtil
 {

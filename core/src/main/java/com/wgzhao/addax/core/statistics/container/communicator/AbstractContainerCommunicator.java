@@ -19,8 +19,8 @@
 
 package com.wgzhao.addax.core.statistics.container.communicator;
 
-import com.wgzhao.addax.common.statistics.VMInfo;
-import com.wgzhao.addax.common.util.Configuration;
+import com.wgzhao.addax.core.statistics.VMInfo;
+import com.wgzhao.addax.core.util.Configuration;
 import com.wgzhao.addax.core.meta.State;
 import com.wgzhao.addax.core.statistics.communication.Communication;
 import com.wgzhao.addax.core.statistics.container.collector.AbstractCollector;

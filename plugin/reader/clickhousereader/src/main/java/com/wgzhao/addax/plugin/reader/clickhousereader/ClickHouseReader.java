@@ -19,13 +19,13 @@
 
 package com.wgzhao.addax.plugin.reader.clickhousereader;
 
-import com.wgzhao.addax.common.base.Key;
-import com.wgzhao.addax.common.element.Column;
-import com.wgzhao.addax.common.element.StringColumn;
-import com.wgzhao.addax.common.element.TimestampColumn;
-import com.wgzhao.addax.common.plugin.RecordSender;
-import com.wgzhao.addax.common.spi.Reader;
-import com.wgzhao.addax.common.util.Configuration;
+import com.wgzhao.addax.core.base.Key;
+import com.wgzhao.addax.core.element.Column;
+import com.wgzhao.addax.core.element.StringColumn;
+import com.wgzhao.addax.core.element.TimestampColumn;
+import com.wgzhao.addax.core.plugin.RecordSender;
+import com.wgzhao.addax.core.spi.Reader;
+import com.wgzhao.addax.core.util.Configuration;
 import com.wgzhao.addax.rdbms.reader.CommonRdbmsReader;
 import com.wgzhao.addax.rdbms.util.DataBaseType;
 
@@ -38,7 +38,7 @@ import java.sql.Types;
 import java.time.LocalDateTime;
 import java.util.List;
 
-import static com.wgzhao.addax.common.base.Constant.DEFAULT_FETCH_SIZE;
+import static com.wgzhao.addax.core.base.Constant.DEFAULT_FETCH_SIZE;
 
 public class ClickHouseReader
         extends Reader
