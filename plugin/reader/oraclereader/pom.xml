@@ -18,6 +18,12 @@
         <repository>
             <id>mvnrepository</id>
             <url>https://www.datanucleus.org/downloads/maven2/</url>
+            <releases>
+                <enabled>true</enabled>
+            </releases>
+            <snapshots>
+                <enabled>false</enabled>
+            </snapshots>
         </repository>
     </repositories>
 
@@ -25,28 +31,17 @@
         <dependency>
             <groupId>com.wgzhao.addax</groupId>
             <artifactId>addax-core</artifactId>
-            <version>${project.version}</version>
-            <scope>provided</scope>
-            <exclusions>
-                <exclusion>
-                    <groupId>org.slf4j</groupId>
-                    <artifactId>slf4j-log4j12</artifactId>
-                </exclusion>
-            </exclusions>
         </dependency>
 
         <dependency>
             <groupId>com.wgzhao.addax</groupId>
             <artifactId>addax-rdbms</artifactId>
-            <version>${project.version}</version>
-            <scope>provided</scope>
         </dependency>
 
         <dependency>
             <groupId>com.google.code.gson</groupId>
             <artifactId>gson</artifactId>
             <version>${gson.version}</version>
-            <scope>compile</scope>
         </dependency>
 
         <dependency>
