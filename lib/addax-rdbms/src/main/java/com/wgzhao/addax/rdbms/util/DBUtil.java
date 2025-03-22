@@ -399,7 +399,12 @@ public final class DBUtil
     {
         try (Statement stmt = conn.createStatement(ResultSet.TYPE_FORWARD_ONLY, ResultSet.CONCUR_READ_ONLY)) {
             stmt.setQueryTimeout(DEFAULT_SOCKET_TIMEOUT_SEC);
-            return stmt.executeQuery(sql);
+            boolean hasResultSet = stmt.execute(sql);
+            if (hasResultSet) {
+                return stmt.getResultSet();
+            } else {
+                return null;
+            }
         }
     }
 
