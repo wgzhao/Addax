@@ -18,37 +18,39 @@
 #  * under the License.
 #  */
 #
+function get_version() {
+    version=$(grep -o -E '<version>.*</version>' pom.xml | head -n 1 | sed -e 's/<version>\(.*\)<\/version>/\1/')
+    echo $version
+}
 echo "Begin shrinking package..."
 target="$(dirname $0)/target"
 [ -d ${target} ] || exit 1
-TMPDIR=$(ls -d -w1 target/addax/addax-*)
-[ -n "$TMPDIR" ] || exit 2
+version=$(get_version)
+[ -d ${target}/addax-${version} ] || exit 2
 
-(
-    cd ${TMPDIR} || exit 3
-    # should be in target/addax/addax-<version>
-    [ -d shared ] || mkdir shared
 
-    for jar in $(find  plugin/*/*/libs -type f -name *.jar)
-    do
-        plugin_dir=$(dirname $jar)
-        file_name=$(basename $jar)
-        # 1. move it to shared folder
-        /bin/mv -f ${jar} shared/
-        # 2. create symbol link
-        ( cd ${plugin_dir} && ln -sf ../../../../shared/${file_name} $file_name )
-    done
-)
+cd ${target}/addax-${version} || exit 3
+# should be in target/addax-<version>
+[ -d shared ] || mkdir shared
+
+for jar in $(find  plugin/*/*/libs -type f -name *.jar)
+do
+    plugin_dir=$(dirname $jar)
+    file_name=$(basename $jar)
+    # 1. move it to shared folder
+    /bin/mv -f ${jar} shared/
+    # 2. create symbol link
+    ( cd ${plugin_dir} && ln -sf ../../../../shared/${file_name} $file_name )
+done
+
+cd -
 
 if [ "x$1" = "xy" ]; then
   # create archive package
-  cd ${target}/addax
-  # should be in target/addax/
-  # get archive name including version
+  cd ${target}
   echo "Create archived package"
-  archive_name=$(basename $TMPDIR)
-  tar -czf "${archive_name}.tar.gz" ${archive_name}/*
-  echo "The archive package is at: ${target}/addax/${archive_name}.tar.gz"
+  tar -czf "addax-${version}.tar.gz" addax-${version}/
+  echo "The archive package is at: ${target}/addax-${version}.tar.gz"
 fi
 
 exit $?

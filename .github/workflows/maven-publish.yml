@@ -59,12 +59,12 @@ jobs:
         run: |
           export MAVEN_OPTS="-DskipTests -Dmaven.javadoc.skip=true -Dmaven.source.skip=true -Dgpg.skip=true"
           mvn -B -V -T 1 clean package
-          mvn package assembly:single
+          mvn package -Pdistribution
           bash shrink_package.sh y
 
       - name: Calculate SHA256SUM
         run: |
-          cd target/addax
+          cd target
           sha256sum addax-${{ steps.version.outputs.version }}.tar.gz > addax-${{ steps.version.outputs.version }}.tar.gz.sha256sum.asc
 
       - name: Create release
@@ -89,7 +89,7 @@ jobs:
         if: startsWith(github.ref, 'refs/tags/')
         with:
           files: |
-            target/addax/addax-${{ steps.version.outputs.version }}.tar.gz
-            target/addax/addax-${{ steps.version.outputs.version }}.tar.gz.sha256sum.asc
+            target/addax-${{ steps.version.outputs.version }}.tar.gz
+            target/addax-${{ steps.version.outputs.version }}.tar.gz.sha256sum.asc
         env:
           GITHUB_TOKEN: ${{ secrets.TOKEN }}

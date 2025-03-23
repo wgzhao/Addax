@@ -19,15 +19,11 @@
         <dependency>
             <groupId>com.wgzhao.addax</groupId>
             <artifactId>addax-core</artifactId>
-            <version>${project.version}</version>
-            <scope>provided</scope>
         </dependency>
 
         <dependency>
             <groupId>com.wgzhao.addax</groupId>
             <artifactId>addax-rdbms</artifactId>
-            <version>${project.version}</version>
-            <scope>provided</scope>
         </dependency>
 
         <dependency>
@@ -45,7 +41,6 @@
         <dependency>
             <groupId>com.google.guava</groupId>
             <artifactId>guava</artifactId>
-            <version>${guava.version}</version>
         </dependency>
 
     </dependencies>
@@ -53,22 +48,8 @@
     <build>
         <plugins>
             <plugin>
+               <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-assembly-plugin</artifactId>
-                <configuration>
-                    <descriptors>
-                        <descriptor>package.xml</descriptor>
-                    </descriptors>
-                    <finalName>${project.artifactId}-${project.version}</finalName>
-                </configuration>
-                <executions>
-                    <execution>
-                        <id>release</id>
-                        <phase>package</phase>
-                        <goals>
-                            <goal>single</goal>
-                        </goals>
-                    </execution>
-                </executions>
             </plugin>
         </plugins>
     </build>
