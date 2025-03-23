@@ -9,27 +9,27 @@
     <includeBaseDirectory>false</includeBaseDirectory>
     <fileSets>
         <fileSet>
-            <directory>core/target/addax/</directory>
+            <directory>core/target/addax-core-${project.version}/</directory>
             <includes>
                 <include>**/*.*</include>
             </includes>
-            <outputDirectory>addax-${project.version}</outputDirectory>
+            <outputDirectory>/</outputDirectory>
         </fileSet>
         <fileSet>
-            <directory>lib/addax-rdbms/target/addax/lib/</directory>
+            <directory>lib/addax-rdbms/target/addax-rdbms-${project.version}/lib/</directory>
             <includes>
                 <include>*.*</include>
             </includes>
             <fileMode>0644</fileMode>
-            <outputDirectory>addax-${project.version}/lib</outputDirectory>
+            <outputDirectory>lib</outputDirectory>
         </fileSet>
         <fileSet>
-            <directory>lib/addax-storage/target/addax/lib/</directory>
+            <directory>lib/addax-storage/target/addax-storage-${project.version}/lib/</directory>
             <includes>
                 <include>*.*</include>
             </includes>
             <fileMode>0644</fileMode>
-            <outputDirectory>addax-${project.version}/lib</outputDirectory>
+            <outputDirectory>lib</outputDirectory>
         </fileSet>
         <!-- reader -->
         <fileSet>
@@ -38,7 +38,7 @@
                 <include>**/*.*</include>
             </includes>
             <fileMode>0644</fileMode>
-            <outputDirectory>addax-${project.version}</outputDirectory>
+            <outputDirectory>/</outputDirectory>
         </fileSet>
         <fileSet>
             <directory>plugin/reader/cassandrareader/target/cassandrareader-${project.version}/</directory>
@@ -46,7 +46,7 @@
                 <include>**/*.*</include>
             </includes>
             <fileMode>0644</fileMode>
-            <outputDirectory>addax-${project.version}</outputDirectory>
+            <outputDirectory>/</outputDirectory>
         </fileSet>
         <fileSet>
             <directory>plugin/reader/clickhousereader/target/clickhousereader-${project.version}/</directory>
@@ -54,7 +54,7 @@
                 <include>**/*.*</include>
             </includes>
             <fileMode>0644</fileMode>
-            <outputDirectory>addax-${project.version}</outputDirectory>
+            <outputDirectory>/</outputDirectory>
         </fileSet>
         <fileSet>
             <directory>plugin/reader/databendreader/target/databendreader-${project.version}/</directory>
@@ -62,7 +62,7 @@
                 <include>**/*.*</include>
             </includes>
             <fileMode>0644</fileMode>
-            <outputDirectory>addax-${project.version}</outputDirectory>
+            <outputDirectory>/</outputDirectory>
         </fileSet>
         <fileSet>
             <directory>plugin/reader/datareader/target/datareader-${project.version}/</directory>
@@ -70,7 +70,7 @@
                 <include>**/*.*</include>
             </includes>
             <fileMode>0644</fileMode>
-            <outputDirectory>addax-${project.version}</outputDirectory>
+            <outputDirectory>/</outputDirectory>
         </fileSet>
         <fileSet>
             <directory>plugin/reader/dbfreader/target/dbfreader-${project.version}/</directory>
@@ -78,7 +78,7 @@
                 <include>**/*.*</include>
             </includes>
             <fileMode>0644</fileMode>
-            <outputDirectory>addax-${project.version}</outputDirectory>
+            <outputDirectory>/</outputDirectory>
         </fileSet>
         <fileSet>
             <directory>plugin/reader/elasticsearchreader/target/elasticsearchreader-${project.version}/</directory>
@@ -86,7 +86,7 @@
                 <include>**/*.*</include>
             </includes>
             <fileMode>0644</fileMode>
-            <outputDirectory>addax-${project.version}</outputDirectory>
+            <outputDirectory>/</outputDirectory>
         </fileSet>
         <fileSet>
             <directory>plugin/reader/excelreader/target/excelreader-${project.version}/</directory>
@@ -94,7 +94,7 @@
                 <include>**/*.*</include>
             </includes>
             <fileMode>0644</fileMode>
-            <outputDirectory>addax-${project.version}</outputDirectory>
+            <outputDirectory>/</outputDirectory>
         </fileSet>
         <fileSet>
             <directory>plugin/reader/ftpreader/target/ftpreader-${project.version}/</directory>
@@ -102,7 +102,7 @@
                 <include>**/*.*</include>
             </includes>
             <fileMode>0644</fileMode>
-            <outputDirectory>addax-${project.version}</outputDirectory>
+            <outputDirectory>/</outputDirectory>
         </fileSet>
         <fileSet>
             <directory>plugin/reader/influxdbreader/target/influxdbreader-${project.version}/</directory>
@@ -110,7 +110,7 @@
                 <include>**/*.*</include>
             </includes>
             <fileMode>0644</fileMode>
-            <outputDirectory>addax-${project.version}</outputDirectory>
+            <outputDirectory>/</outputDirectory>
         </fileSet>
         <fileSet>
             <directory>plugin/reader/influxdb2reader/target/influxdb2reader-${project.version}/</directory>
@@ -118,7 +118,7 @@
                 <include>**/*.*</include>
             </includes>
             <fileMode>0644</fileMode>
-            <outputDirectory>addax-${project.version}</outputDirectory>
+            <outputDirectory>/</outputDirectory>
         </fileSet>
         <fileSet>
             <directory>plugin/reader/hanareader/target/hanareader-${project.version}/</directory>
@@ -126,7 +126,7 @@
                 <include>**/*.*</include>
             </includes>
             <fileMode>0644</fileMode>
-            <outputDirectory>addax-${project.version}</outputDirectory>
+            <outputDirectory>/</outputDirectory>
         </fileSet>
         <fileSet>
             <directory>plugin/reader/hbase11xreader/target/hbase11xreader-${project.version}/</directory>
@@ -134,7 +134,7 @@
                 <include>**/*.*</include>
             </includes>
             <fileMode>0644</fileMode>
-            <outputDirectory>addax-${project.version}</outputDirectory>
+            <outputDirectory>/</outputDirectory>
         </fileSet>
         <fileSet>
             <directory>plugin/reader/hbase11xsqlreader/target/hbase11xsqlreader-${project.version}/</directory>
@@ -142,7 +142,7 @@
                 <include>**/*.*</include>
             </includes>
             <fileMode>0644</fileMode>
-            <outputDirectory>addax-${project.version}</outputDirectory>
+            <outputDirectory>/</outputDirectory>
         </fileSet>
         <fileSet>
             <directory>plugin/reader/hbase20xreader/target/hbase20xreader-${project.version}/</directory>
@@ -150,7 +150,7 @@
                 <include>**/*.*</include>
             </includes>
             <fileMode>0644</fileMode>
-            <outputDirectory>addax-${project.version}</outputDirectory>
+            <outputDirectory>/</outputDirectory>
         </fileSet>
         <fileSet>
             <directory>plugin/reader/hbase20xsqlreader/target/hbase20xsqlreader-${project.version}/</directory>
@@ -158,7 +158,7 @@
                 <include>**/*.*</include>
             </includes>
             <fileMode>0644</fileMode>
-            <outputDirectory>addax-${project.version}</outputDirectory>
+            <outputDirectory>/</outputDirectory>
         </fileSet>
         <fileSet>
             <directory>plugin/reader/hdfsreader/target/hdfsreader-${project.version}/</directory>
@@ -166,7 +166,7 @@
                 <include>**/*.*</include>
             </includes>
             <fileMode>0644</fileMode>
-            <outputDirectory>addax-${project.version}</outputDirectory>
+            <outputDirectory>/</outputDirectory>
         </fileSet>
         <fileSet>
             <directory>plugin/reader/hivereader/target/hivereader-${project.version}/</directory>
@@ -174,7 +174,7 @@
                 <include>**/*.*</include>
             </includes>
             <fileMode>0644</fileMode>
-            <outputDirectory>addax-${project.version}</outputDirectory>
+            <outputDirectory>/</outputDirectory>
         </fileSet>
         <fileSet>
             <directory>plugin/reader/httpreader/target/httpreader-${project.version}/</directory>
@@ -182,7 +182,7 @@
                 <include>**/*.*</include>
             </includes>
             <fileMode>0644</fileMode>
-            <outputDirectory>addax-${project.version}</outputDirectory>
+            <outputDirectory>/</outputDirectory>
         </fileSet>
         <fileSet>
             <directory>plugin/reader/jsonfilereader/target/jsonfilereader-${project.version}/</directory>
@@ -190,7 +190,7 @@
                 <include>**/*.*</include>
             </includes>
             <fileMode>0644</fileMode>
-            <outputDirectory>addax-${project.version}</outputDirectory>
+            <outputDirectory>/</outputDirectory>
         </fileSet>
         <fileSet>
             <directory>plugin/reader/kafkareader/target/kafkareader-${project.version}/</directory>
@@ -198,7 +198,7 @@
                 <include>**/*.*</include>
             </includes>
             <fileMode>0644</fileMode>
-            <outputDirectory>addax-${project.version}</outputDirectory>
+            <outputDirectory>/</outputDirectory>
         </fileSet>
         <fileSet>
             <directory>plugin/reader/kudureader/target/kudureader-${project.version}/</directory>
@@ -206,7 +206,7 @@
                 <include>**/*.*</include>
             </includes>
             <fileMode>0644</fileMode>
-            <outputDirectory>addax-${project.version}</outputDirectory>
+            <outputDirectory>/</outputDirectory>
         </fileSet>
         <fileSet>
             <directory>plugin/reader/mongodbreader/target/mongodbreader-${project.version}/</directory>
@@ -214,7 +214,7 @@
                 <include>**/*.*</include>
             </includes>
             <fileMode>0644</fileMode>
-            <outputDirectory>addax-${project.version}</outputDirectory>
+            <outputDirectory>/</outputDirectory>
         </fileSet>
         <fileSet>
             <directory>plugin/reader/mysqlreader/target/mysqlreader-${project.version}/</directory>
@@ -222,7 +222,7 @@
                 <include>**/*.*</include>
             </includes>
             <fileMode>0644</fileMode>
-            <outputDirectory>addax-${project.version}</outputDirectory>
+            <outputDirectory>/</outputDirectory>
         </fileSet>
         <fileSet>
             <directory>plugin/reader/oraclereader/target/oraclereader-${project.version}/</directory>
@@ -230,7 +230,7 @@
                 <include>**/*.*</include>
             </includes>
             <fileMode>0644</fileMode>
-            <outputDirectory>addax-${project.version}</outputDirectory>
+            <outputDirectory>/</outputDirectory>
         </fileSet>
         <fileSet>
             <directory>plugin/reader/postgresqlreader/target/postgresqlreader-${project.version}/</directory>
@@ -238,7 +238,7 @@
                 <include>**/*.*</include>
             </includes>
             <fileMode>0644</fileMode>
-            <outputDirectory>addax-${project.version}</outputDirectory>
+            <outputDirectory>/</outputDirectory>
         </fileSet>
         <fileSet>
             <directory>plugin/reader/rdbmsreader/target/rdbmsreader-${project.version}/</directory>
@@ -246,7 +246,7 @@
                 <include>**/*.*</include>
             </includes>
             <fileMode>0644</fileMode>
-            <outputDirectory>addax-${project.version}</outputDirectory>
+            <outputDirectory>/</outputDirectory>
         </fileSet>
         <fileSet>
             <directory>plugin/reader/redisreader/target/redisreader-${project.version}/</directory>
@@ -254,7 +254,7 @@
                 <include>**/*.*</include>
             </includes>
             <fileMode>0644</fileMode>
-            <outputDirectory>addax-${project.version}</outputDirectory>
+            <outputDirectory>/</outputDirectory>
         </fileSet>
         <fileSet>
             <directory>plugin/reader/s3reader/target/s3reader-${project.version}/</directory>
@@ -262,7 +262,7 @@
                 <include>**/*.*</include>
             </includes>
             <fileMode>0644</fileMode>
-            <outputDirectory>addax-${project.version}</outputDirectory>
+            <outputDirectory>/</outputDirectory>
         </fileSet>
         <fileSet>
             <directory>plugin/reader/sqlitereader/target/sqlitereader-${project.version}/</directory>
@@ -270,7 +270,7 @@
                 <include>**/*.*</include>
             </includes>
             <fileMode>0644</fileMode>
-            <outputDirectory>addax-${project.version}</outputDirectory>
+            <outputDirectory>/</outputDirectory>
         </fileSet>
         <fileSet>
             <directory>plugin/reader/sqlserverreader/target/sqlserverreader-${project.version}/</directory>
@@ -278,7 +278,7 @@
                 <include>**/*.*</include>
             </includes>
             <fileMode>0644</fileMode>
-            <outputDirectory>addax-${project.version}</outputDirectory>
+            <outputDirectory>/</outputDirectory>
         </fileSet>
         <fileSet>
             <directory>plugin/reader/streamreader/target/streamreader-${project.version}/</directory>
@@ -286,7 +286,7 @@
                 <include>**/*.*</include>
             </includes>
             <fileMode>0644</fileMode>
-            <outputDirectory>addax-${project.version}</outputDirectory>
+            <outputDirectory>/</outputDirectory>
         </fileSet>
         <fileSet>
             <directory>plugin/reader/sybasereader/target/sybasereader-${project.version}/</directory>
@@ -294,7 +294,7 @@
                 <include>**/*.*</include>
             </includes>
             <fileMode>0644</fileMode>
-            <outputDirectory>addax-${project.version}</outputDirectory>
+            <outputDirectory>/</outputDirectory>
         </fileSet>
         <fileSet>
             <directory>plugin/reader/tdenginereader/target/tdenginereader-${project.version}/</directory>
@@ -302,7 +302,7 @@
                 <include>**/*.*</include>
             </includes>
             <fileMode>0644</fileMode>
-            <outputDirectory>addax-${project.version}</outputDirectory>
+            <outputDirectory>/</outputDirectory>
         </fileSet>
         <fileSet>
             <directory>plugin/reader/txtfilereader/target/txtfilereader-${project.version}/</directory>
@@ -310,7 +310,7 @@
                 <include>**/*.*</include>
             </includes>
             <fileMode>0644</fileMode>
-            <outputDirectory>addax-${project.version}</outputDirectory>
+            <outputDirectory>/</outputDirectory>
         </fileSet>
 
         <!-- writer -->
@@ -320,7 +320,7 @@
                 <include>**/*.*</include>
             </includes>
             <fileMode>0644</fileMode>
-            <outputDirectory>addax-${project.version}</outputDirectory>
+            <outputDirectory>/</outputDirectory>
         </fileSet>
         <fileSet>
             <directory>plugin/writer/cassandrawriter/target/cassandrawriter-${project.version}/</directory>
@@ -328,7 +328,7 @@
                 <include>**/*.*</include>
             </includes>
             <fileMode>0644</fileMode>
-            <outputDirectory>addax-${project.version}</outputDirectory>
+            <outputDirectory>/</outputDirectory>
         </fileSet>
         <fileSet>
             <directory>plugin/writer/clickhousewriter/target/clickhousewriter-${project.version}/</directory>
@@ -336,7 +336,7 @@
                 <include>**/*.*</include>
             </includes>
             <fileMode>0644</fileMode>
-            <outputDirectory>addax-${project.version}</outputDirectory>
+            <outputDirectory>/</outputDirectory>
         </fileSet>
         <fileSet>
             <directory>plugin/writer/dbfwriter/target/dbfwriter-${project.version}/</directory>
@@ -344,7 +344,7 @@
                 <include>**/*.*</include>
             </includes>
             <fileMode>0644</fileMode>
-            <outputDirectory>addax-${project.version}</outputDirectory>
+            <outputDirectory>/</outputDirectory>
         </fileSet>
         <fileSet>
             <directory>plugin/writer/databendwriter/target/databendwriter-${project.version}/</directory>
@@ -352,7 +352,7 @@
                 <include>**/*.*</include>
             </includes>
             <fileMode>0644</fileMode>
-            <outputDirectory>addax-${project.version}</outputDirectory>
+            <outputDirectory>/</outputDirectory>
         </fileSet>
         <fileSet>
             <directory>plugin/writer/doriswriter/target/doriswriter-${project.version}/</directory>
@@ -360,7 +360,7 @@
                 <include>**/*.*</include>
             </includes>
             <fileMode>0644</fileMode>
-            <outputDirectory>addax-${project.version}</outputDirectory>
+            <outputDirectory>/</outputDirectory>
         </fileSet>
         <fileSet>
             <directory>plugin/writer/elasticsearchwriter/target/elasticsearchwriter-${project.version}/</directory>
@@ -368,7 +368,7 @@
                 <include>**/*.*</include>
             </includes>
             <fileMode>0644</fileMode>
-            <outputDirectory>addax-${project.version}</outputDirectory>
+            <outputDirectory>/</outputDirectory>
         </fileSet>
         <fileSet>
             <directory>plugin/writer/excelwriter/target/excelwriter-${project.version}/</directory>
@@ -376,7 +376,7 @@
                 <include>**/*.*</include>
             </includes>
             <fileMode>0644</fileMode>
-            <outputDirectory>addax-${project.version}</outputDirectory>
+            <outputDirectory>/</outputDirectory>
         </fileSet>
         <fileSet>
             <directory>plugin/writer/ftpwriter/target/ftpwriter-${project.version}/</directory>
@@ -384,7 +384,7 @@
                 <include>**/*.*</include>
             </includes>
             <fileMode>0644</fileMode>
-            <outputDirectory>addax-${project.version}</outputDirectory>
+            <outputDirectory>/</outputDirectory>
         </fileSet>
         <fileSet>
             <directory>plugin/writer/greenplumwriter/target/greenplumwriter-${project.version}/</directory>
@@ -392,7 +392,7 @@
                 <include>**/*.*</include>
             </includes>
             <fileMode>0644</fileMode>
-            <outputDirectory>addax-${project.version}</outputDirectory>
+            <outputDirectory>/</outputDirectory>
         </fileSet>
         <fileSet>
             <directory>plugin/writer/hanawriter/target/hanawriter-${project.version}/</directory>
@@ -400,7 +400,7 @@
                 <include>**/*.*</include>
             </includes>
             <fileMode>0644</fileMode>
-            <outputDirectory>addax-${project.version}</outputDirectory>
+            <outputDirectory>/</outputDirectory>
         </fileSet>
         <fileSet>
             <directory>plugin/writer/hbase11xsqlwriter/target/hbase11xsqlwriter-${project.version}/</directory>
@@ -408,7 +408,7 @@
                 <include>**/*.*</include>
             </includes>
             <fileMode>0644</fileMode>
-            <outputDirectory>addax-${project.version}</outputDirectory>
+            <outputDirectory>/</outputDirectory>
         </fileSet>
         <fileSet>
             <directory>plugin/writer/hbase11xwriter/target/hbase11xwriter-${project.version}/</directory>
@@ -416,7 +416,7 @@
                 <include>**/*.*</include>
             </includes>
             <fileMode>0644</fileMode>
-            <outputDirectory>addax-${project.version}</outputDirectory>
+            <outputDirectory>/</outputDirectory>
         </fileSet>
         <fileSet>
             <directory>plugin/writer/hbase20xsqlwriter/target/hbase20xsqlwriter-${project.version}/</directory>
@@ -424,7 +424,7 @@
                 <include>**/*.*</include>
             </includes>
             <fileMode>0644</fileMode>
-            <outputDirectory>addax-${project.version}</outputDirectory>
+            <outputDirectory>/</outputDirectory>
         </fileSet>
         <fileSet>
             <directory>plugin/writer/hdfswriter/target/hdfswriter-${project.version}/</directory>
@@ -435,7 +435,7 @@
                 <exclude>**/addax-common*.jar</exclude>
             </excludes>
             <fileMode>0644</fileMode>
-            <outputDirectory>addax-${project.version}</outputDirectory>
+            <outputDirectory>/</outputDirectory>
         </fileSet>
         <fileSet>
             <directory>plugin/writer/influxdbwriter/target/influxdbwriter-${project.version}/</directory>
@@ -446,7 +446,7 @@
                 <exclude>**/addax-common*.jar</exclude>
             </excludes>
             <fileMode>0644</fileMode>
-            <outputDirectory>addax-${project.version}</outputDirectory>
+            <outputDirectory>/</outputDirectory>
         </fileSet>
         <fileSet>
             <directory>plugin/writer/influxdb2writer/target/influxdb2writer-${project.version}/</directory>
@@ -457,7 +457,7 @@
                 <exclude>**/addax-common*.jar</exclude>
             </excludes>
             <fileMode>0644</fileMode>
-            <outputDirectory>addax-${project.version}</outputDirectory>
+            <outputDirectory>/</outputDirectory>
         </fileSet>
         <fileSet>
             <directory>plugin/writer/kafkawriter/target/kafkawriter-${project.version}/</directory>
@@ -468,7 +468,7 @@
                 <exclude>**/addax-common*.jar</exclude>
             </excludes>
             <fileMode>0644</fileMode>
-            <outputDirectory>addax-${project.version}</outputDirectory>
+            <outputDirectory>/</outputDirectory>
         </fileSet>
         <fileSet>
             <directory>plugin/writer/kuduwriter/target/kuduwriter-${project.version}/</directory>
@@ -479,7 +479,7 @@
                 <exclude>**/addax-common*.jar</exclude>
             </excludes>
             <fileMode>0644</fileMode>
-            <outputDirectory>addax-${project.version}</outputDirectory>
+            <outputDirectory>/</outputDirectory>
         </fileSet>
         <fileSet>
             <directory>plugin/writer/mongodbwriter/target/mongodbwriter-${project.version}/</directory>
@@ -487,7 +487,7 @@
                 <include>**/*.*</include>
             </includes>
             <fileMode>0644</fileMode>
-            <outputDirectory>addax-${project.version}</outputDirectory>
+            <outputDirectory>/</outputDirectory>
         </fileSet>
         <fileSet>
             <directory>plugin/writer/mysqlwriter/target/mysqlwriter-${project.version}/</directory>
@@ -495,7 +495,7 @@
                 <include>**/*.*</include>
             </includes>
             <fileMode>0644</fileMode>
-            <outputDirectory>addax-${project.version}</outputDirectory>
+            <outputDirectory>/</outputDirectory>
         </fileSet>
         <fileSet>
             <directory>plugin/writer/oraclewriter/target/oraclewriter-${project.version}/</directory>
@@ -503,7 +503,7 @@
                 <include>**/*.*</include>
             </includes>
             <fileMode>0644</fileMode>
-            <outputDirectory>addax-${project.version}</outputDirectory>
+            <outputDirectory>/</outputDirectory>
         </fileSet>
         <fileSet>
             <directory>plugin/writer/paimonwriter/target/paimonwriter-${project.version}/</directory>
@@ -511,7 +511,7 @@
                 <include>**/*.*</include>
             </includes>
             <fileMode>0644</fileMode>
-            <outputDirectory>addax-${project.version}</outputDirectory>
+            <outputDirectory>/</outputDirectory>
         </fileSet>
         <fileSet>
             <directory>plugin/writer/postgresqlwriter/target/postgresqlwriter-${project.version}/</directory>
@@ -519,7 +519,7 @@
                 <include>**/*.*</include>
             </includes>
             <fileMode>0644</fileMode>
-            <outputDirectory>addax-${project.version}</outputDirectory>
+            <outputDirectory>/</outputDirectory>
         </fileSet>
         <fileSet>
             <directory>plugin/writer/rdbmswriter/target/rdbmswriter-${project.version}/</directory>
@@ -527,7 +527,7 @@
                 <include>**/*.*</include>
             </includes>
             <fileMode>0644</fileMode>
-            <outputDirectory>addax-${project.version}</outputDirectory>
+            <outputDirectory>/</outputDirectory>
         </fileSet>
         <fileSet>
             <directory>plugin/writer/rediswriter/target/rediswriter-${project.version}/</directory>
@@ -535,7 +535,7 @@
                 <include>**/*.*</include>
             </includes>
             <fileMode>0644</fileMode>
-            <outputDirectory>addax-${project.version}</outputDirectory>
+            <outputDirectory>/</outputDirectory>
         </fileSet>
         <fileSet>
             <directory>plugin/writer/s3writer/target/s3writer-${project.version}/</directory>
@@ -543,7 +543,7 @@
                 <include>**/*.*</include>
             </includes>
             <fileMode>0644</fileMode>
-            <outputDirectory>addax-${project.version}</outputDirectory>
+            <outputDirectory>/</outputDirectory>
         </fileSet>
         <fileSet>
             <directory>plugin/writer/sqlitewriter/target/sqlitewriter-${project.version}/</directory>
@@ -551,7 +551,7 @@
                 <include>**/*.*</include>
             </includes>
             <fileMode>0644</fileMode>
-            <outputDirectory>addax-${project.version}</outputDirectory>
+            <outputDirectory>/</outputDirectory>
         </fileSet>
         <fileSet>
             <directory>plugin/writer/sqlserverwriter/target/sqlserverwriter-${project.version}/</directory>
@@ -559,7 +559,7 @@
                 <include>**/*.*</include>
             </includes>
             <fileMode>0644</fileMode>
-            <outputDirectory>addax-${project.version}</outputDirectory>
+            <outputDirectory>/</outputDirectory>
         </fileSet>
         <fileSet>
             <directory>plugin/writer/starrockswriter/target/starrockswriter-${project.version}/</directory>
@@ -567,7 +567,7 @@
                 <include>**/*.*</include>
             </includes>
             <fileMode>0644</fileMode>
-            <outputDirectory>addax-${project.version}</outputDirectory>
+            <outputDirectory>/</outputDirectory>
         </fileSet>
         <fileSet>
             <directory>plugin/writer/streamwriter/target/streamwriter-${project.version}/</directory>
@@ -575,7 +575,7 @@
                 <include>**/*.*</include>
             </includes>
             <fileMode>0644</fileMode>
-            <outputDirectory>addax-${project.version}</outputDirectory>
+            <outputDirectory>/</outputDirectory>
         </fileSet>
         <fileSet>
             <directory>plugin/writer/sybasewriter/target/sybasewriter-${project.version}/</directory>
@@ -583,7 +583,7 @@
                 <include>**/*.*</include>
             </includes>
             <fileMode>0644</fileMode>
-            <outputDirectory>addax-${project.version}</outputDirectory>
+            <outputDirectory>/</outputDirectory>
         </fileSet>
         <fileSet>
             <directory>plugin/writer/tdenginewriter/target/tdenginewriter-${project.version}/</directory>
@@ -591,7 +591,7 @@
                 <include>**/*.*</include>
             </includes>
             <fileMode>0644</fileMode>
-            <outputDirectory>addax-${project.version}</outputDirectory>
+            <outputDirectory>/</outputDirectory>
         </fileSet>
         <fileSet>
             <directory>plugin/writer/txtfilewriter/target/txtfilewriter-${project.version}/</directory>
@@ -599,7 +599,7 @@
                 <include>**/*.*</include>
             </includes>
             <fileMode>0644</fileMode>
-            <outputDirectory>addax-${project.version}</outputDirectory>
+            <outputDirectory>/</outputDirectory>
         </fileSet>
     </fileSets>
 </assembly>

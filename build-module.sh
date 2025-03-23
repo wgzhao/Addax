@@ -20,8 +20,8 @@ function build_base() {
     # Ensure target directories exist
     mkdir -p "${ADDAX_HOME}/lib"
 
-    rsync -a core/target/addax/* "${ADDAX_HOME}"
-    rsync -azv lib/addax-{rdbms,storage}/target/addax/lib/* "${ADDAX_HOME}/lib/"
+    rsync -a core/target/addax-${version}/* "${ADDAX_HOME}"
+    rsync -azv lib/addax-{rdbms,storage}/target/addax-{rdbms,storage}-${version}/lib/* "${ADDAX_HOME}/lib/"
     echo "Base build completed successfully"
 }
 
@@ -77,13 +77,6 @@ if [ "$MODULE_NAME" == "addax-core" ]; then
     echo "Deploying core module..."
     rsync -av core/target/${MODULE_NAME}-${version}.jar ${ADDAX_HOME}/lib/
     echo "Core module deployed successfully"
-    exit 0
-fi
-
-if [ "$MODULE_NAME" == "addax-common" ]; then
-    echo "Deploying common module..."
-    rsync -av common/target/${MODULE_NAME}-${version}.jar ${ADDAX_HOME}/lib/
-    echo "Common module deployed successfully"
     exit 0
 fi
 
