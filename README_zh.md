@@ -79,16 +79,6 @@ docker run -ti --rm --name addax \
   quay.io/wgzhao/addax:latest \
   /opt/addax/bin/addax.sh /opt/addax/job/job.json
 ```
-如果你只需要基本的插件，可以使用带有 `-lite` 结尾的镜像，它体积更小。
-
-```shell
-docker pull quay.io/wgzhao/addax:latest-lite
-docker run -ti --rm --name addax \
-  quay.io/wgzhao/addax:latest-lite \
-  /opt/addax/bin/addax.sh /opt/addax/job/job.json
-```
-
-[这里][lite-vs-default.md] 列出了 `lite` 和 `default` 镜像所包含的插件的区别。
 
 ### 使用一键安装脚本
 
@@ -102,11 +92,12 @@ docker run -ti --rm --name addax \
 ```shell
 git clone https://github.com/wgzhao/addax.git addax
 cd addax
-mvn clean package -pl '!:addax-docs'
-mvn package assembly:single
+export MAVEN_OPTS="-DskipTests -Dmaven.javadoc.skip=true -Dmaven.source.skip=true -Dgpg.skip=true"
+mvn clean package 
+mvn package -Pdistribution
 ```
 
-编译打包成功后，会在项目目录的`target/addax` 目录下创建一个 `addax-<version>`的 文件夹，其中 `<version>` 表示版本。
+编译打包成功后，会在项目目录的`target` 目录下创建一个 `addax-<version>`的 文件夹，其中 `<version>` 表示版本。
 
 ### 开始第一个任务
 

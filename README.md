@@ -114,8 +114,6 @@ docker run -ti --rm --name addax \
   /opt/addax/bin/addax.sh /opt/addax/job/job.json
 ```
 
-> A lightweight `-lite` image is also available: [Learn more](lite-vs-default.md).
-
 ### 2. Use installation script
 
 Install Addax with a single command:
@@ -133,11 +131,12 @@ For developers targeting custom-builds, compile and package Addax locally:
 ```shell
 git clone https://github.com/wgzhao/addax.git addax
 cd addax
+export MAVEN_OPTS="-DskipTests -Dmaven.javadoc.skip=true -Dmaven.source.skip=true -Dgpg.skip=true"
 mvn clean package
-mvn package assembly:single
+mvn package -Pdistribution
 ```
 
-The compiled binary will be in `target/datax/addax-<version>`.
+The compiled binary will be in `target/addax-<version>`.
 
 ### 4. Run Your First Task
 
