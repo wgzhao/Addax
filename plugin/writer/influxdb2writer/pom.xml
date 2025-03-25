@@ -47,7 +47,6 @@
         <dependency>
             <groupId>com.influxdb</groupId>
             <artifactId>influxdb-client-java</artifactId>
-            <version>${influxdb.client.version}</version>
         </dependency>
 
     </dependencies>

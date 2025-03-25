@@ -29,7 +29,6 @@
         <dependency>
             <groupId>org.influxdb</groupId>
             <artifactId>influxdb-java</artifactId>
-            <version>${influxdbClient.version}</version>
         </dependency>
 
     </dependencies>

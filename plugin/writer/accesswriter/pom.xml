@@ -20,14 +20,15 @@
             <groupId>com.wgzhao.addax</groupId>
             <artifactId>addax-core</artifactId>
         </dependency>
+
         <dependency>
             <groupId>com.wgzhao.addax</groupId>
             <artifactId>addax-rdbms</artifactId>
         </dependency>
+
         <dependency>
             <groupId>net.sf.ucanaccess</groupId>
             <artifactId>ucanaccess</artifactId>
-            <version>5.0.1</version>
         </dependency>
     </dependencies>
 

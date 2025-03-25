@@ -23,21 +23,23 @@
         </dependency>
 
         <dependency>
+            <groupId>com.google.code.gson</groupId>
+            <artifactId>gson</artifactId>
+        </dependency>
+
+        <dependency>
             <groupId>io.searchbox</groupId>
             <artifactId>jest</artifactId>
-            <version>${jest.version}</version>
         </dependency>
 
         <dependency>
             <groupId>io.searchbox</groupId>
             <artifactId>jest-common</artifactId>
-            <version>${jest.version}</version>
         </dependency>
 
         <dependency>
             <groupId>joda-time</groupId>
             <artifactId>joda-time</artifactId>
-            <version>${joda.time.version}</version>
         </dependency>
 
     </dependencies>

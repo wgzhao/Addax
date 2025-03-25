@@ -36,12 +36,6 @@
             <groupId>org.apache.phoenix</groupId>
             <artifactId>phoenix-client-hbase-2.1</artifactId>
             <version>${phoenix2.version}</version>
-            <exclusions>
-                <exclusion>
-                    <groupId>org.apache.zookeeper</groupId>
-                    <artifactId>zookeeper</artifactId>
-                </exclusion>
-            </exclusions>
         </dependency>
 
         <dependency>
