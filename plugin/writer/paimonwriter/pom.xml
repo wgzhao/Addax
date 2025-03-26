@@ -15,6 +15,10 @@
     <description>Apache Paimon writer plugin for Addax</description>
     <packaging>jar</packaging>
 
+    <properties>
+        <paimon.version>1.0.1</paimon.version>
+    </properties>
+
     <dependencies>
         <dependency>
             <groupId>com.wgzhao.addax</groupId>
@@ -43,8 +47,14 @@
 
         <dependency>
             <groupId>org.apache.paimon</groupId>
-            <artifactId>paimon-bundle</artifactId>
-            <version>1.0.0</version>
+            <artifactId>paimon-core</artifactId>
+            <version>${paimon.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.apache.paimon</groupId>
+            <artifactId>paimon-format</artifactId>
+            <version>${paimon.version}</version>
         </dependency>
 
     </dependencies>
