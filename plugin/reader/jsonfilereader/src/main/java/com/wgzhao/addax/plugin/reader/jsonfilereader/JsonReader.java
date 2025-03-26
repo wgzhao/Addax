@@ -23,22 +23,20 @@ import com.jayway.jsonpath.DocumentContext;
 import com.jayway.jsonpath.JsonPath;
 import com.jayway.jsonpath.Option;
 import com.jayway.jsonpath.ParseContext;
-import com.jayway.jsonpath.ReadContext;
-import com.jayway.jsonpath.TypeRef;
-import com.wgzhao.addax.common.base.Constant;
-import com.wgzhao.addax.common.base.Key;
-import com.wgzhao.addax.common.compress.ZipCycleInputStream;
-import com.wgzhao.addax.common.element.BoolColumn;
-import com.wgzhao.addax.common.element.Column;
-import com.wgzhao.addax.common.element.DateColumn;
-import com.wgzhao.addax.common.element.DoubleColumn;
-import com.wgzhao.addax.common.element.LongColumn;
-import com.wgzhao.addax.common.element.Record;
-import com.wgzhao.addax.common.element.StringColumn;
-import com.wgzhao.addax.common.exception.AddaxException;
-import com.wgzhao.addax.common.plugin.RecordSender;
-import com.wgzhao.addax.common.spi.Reader;
-import com.wgzhao.addax.common.util.Configuration;
+import com.wgzhao.addax.core.base.Constant;
+import com.wgzhao.addax.core.base.Key;
+import com.wgzhao.addax.core.compress.ZipCycleInputStream;
+import com.wgzhao.addax.core.element.BoolColumn;
+import com.wgzhao.addax.core.element.Column;
+import com.wgzhao.addax.core.element.DateColumn;
+import com.wgzhao.addax.core.element.DoubleColumn;
+import com.wgzhao.addax.core.element.LongColumn;
+import com.wgzhao.addax.core.element.Record;
+import com.wgzhao.addax.core.element.StringColumn;
+import com.wgzhao.addax.core.exception.AddaxException;
+import com.wgzhao.addax.core.plugin.RecordSender;
+import com.wgzhao.addax.core.spi.Reader;
+import com.wgzhao.addax.core.util.Configuration;
 import com.wgzhao.addax.storage.util.FileHelper;
 import org.apache.commons.compress.compressors.CompressorException;
 import org.apache.commons.compress.compressors.CompressorInputStream;
@@ -51,7 +49,6 @@ import org.slf4j.LoggerFactory;
 
 import java.io.BufferedInputStream;
 import java.io.BufferedReader;
-import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -62,16 +59,13 @@ import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
-import java.util.Optional;
 
-import static com.wgzhao.addax.common.spi.ErrorCode.CONFIG_ERROR;
-import static com.wgzhao.addax.common.spi.ErrorCode.ENCODING_ERROR;
-import static com.wgzhao.addax.common.spi.ErrorCode.IO_ERROR;
-import static com.wgzhao.addax.common.spi.ErrorCode.NOT_SUPPORT_TYPE;
-import static com.wgzhao.addax.common.spi.ErrorCode.REQUIRED_VALUE;
+import static com.wgzhao.addax.core.spi.ErrorCode.CONFIG_ERROR;
+import static com.wgzhao.addax.core.spi.ErrorCode.ENCODING_ERROR;
+import static com.wgzhao.addax.core.spi.ErrorCode.IO_ERROR;
+import static com.wgzhao.addax.core.spi.ErrorCode.NOT_SUPPORT_TYPE;
+import static com.wgzhao.addax.core.spi.ErrorCode.REQUIRED_VALUE;
 
 /**
  * Created by jin.zhang on 18-05-30.
@@ -140,7 +134,6 @@ public class JsonReader
 
             // column: 1. index type 2.value type 3.when type is Date, may have
             List<Configuration> columns = this.originConfig.getListConfiguration(Key.COLUMN);
-            // 不再支持 ["*"]，必须指定json数据的路径
 
             if (null != columns && !columns.isEmpty()) {
                 for (Configuration eachColumnConf : columns) {
@@ -159,7 +152,6 @@ public class JsonReader
                     }
                 }
             }
-            // 后续支持解压缩，现在暂不支持
         }
 
         @Override
@@ -176,7 +168,6 @@ public class JsonReader
             //
         }
 
-        // warn: 如果源目录为空会报错，拖空目录意图=>空文件显示指定此意图
         @Override
         public List<Configuration> split(int adviceNumber)
         {
@@ -234,7 +225,6 @@ public class JsonReader
             this.parse = JsonPath.using(jsonConf);
         }
 
-        //解析json，返回已经经过处理的行
         private List<Column> parseFromJson(String json)
         {
             List<Column> splitLine = new ArrayList<>();
@@ -258,7 +248,6 @@ public class JsonReader
             return splitLine;
         }
 
-        //匹配类型
         private Column getColumn(String type, String columnValue, String columnFormat)
         {
             Column columnGenerated;
@@ -293,14 +282,12 @@ public class JsonReader
                     }
                     break;
                 case DATE:
-                    try { //直接利用支持的处理日期数据
+                    try {
                         if (StringUtils.isNotBlank(columnFormat)) {
-                            // 用户自己配置的格式转换, 脏数据行为出现变化
                             DateFormat format = new SimpleDateFormat(columnFormat);
                             columnGenerated = new DateColumn(format.parse(columnValue));
                         }
                         else {
-                            // 框架尝试转换
                             columnGenerated = new DateColumn(new StringColumn(columnValue).asDate());
                         }
                     }
@@ -309,13 +296,11 @@ public class JsonReader
                     }
                     break;
                 default:
-                    throw AddaxException.asAddaxException(NOT_SUPPORT_TYPE,
-                            "The type" + type + " is unsupported");
+                    throw AddaxException.asAddaxException(NOT_SUPPORT_TYPE, "The type" + type + " is unsupported");
             }
             return columnGenerated;
         }
 
-        //传输一行数据
         private void transportOneRecord(RecordSender recordSender, List<Column> sourceLine)
         {
             Record record = recordSender.createRecord();
@@ -343,7 +328,7 @@ public class JsonReader
                     fileInputStream = new FileInputStream(fileName);
                 }
                 catch (FileNotFoundException e) {
-                    // warn: sock 文件无法read,能影响所有文件的传输,需要用户自己保证
+                    // warn: the socket file can not be read, it may affect the transmission of all files, the user needs to ensure it by himself
                     String message = String.format("The file %s not found", fileName);
                     LOG.error(message);
                     throw AddaxException.asAddaxException(CONFIG_ERROR, message);

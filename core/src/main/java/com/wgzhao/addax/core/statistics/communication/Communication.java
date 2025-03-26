@@ -19,7 +19,7 @@
 
 package com.wgzhao.addax.core.statistics.communication;
 
-import com.wgzhao.addax.common.base.BaseObject;
+import com.wgzhao.addax.core.base.BaseObject;
 import com.wgzhao.addax.core.meta.State;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.Validate;
@@ -208,10 +208,7 @@ public class Communication
             return;
         }
 
-        /*
-         * counter的合并，将otherComm的值累加到this中，不存在的则创建
-         * 同为long
-         */
+        // merge counter, add otherComm's value to this, create if not exist
         for (Entry<String, Number> entry : otherComm.getCounter().entrySet()) {
             String key = entry.getKey();
             Number otherValue = entry.getValue();
@@ -235,22 +232,11 @@ public class Communication
             this.counter.put(key, value);
         }
 
-        // 合并state
         mergeStateFrom(otherComm);
 
-        /*
-         * 合并throwable，当this的throwable为空时，
-         * 才将otherComm的throwable合并进来
-         */
         this.throwable = this.throwable == null ? otherComm.getThrowable() : this.throwable;
 
-        /*
-         * timestamp是整个一次合并的时间戳，单独两两communication不作合并
-         */
-
-        /*
-         * message的合并采取求并的方式，即全部累计在一起
-         */
+        // combine all messages
         for (Entry<String, List<String>> entry : otherComm.getMessage().entrySet()) {
             String key = entry.getKey();
             List<String> valueList = this.message.computeIfAbsent(key, k -> new ArrayList<>());
@@ -260,8 +246,8 @@ public class Communication
     }
 
     /**
-     * 合并state，优先级： ( Failed | Killed )  &gt; Running &gt; Success
-     * 这里不会出现 Killing 状态，killing 状态只在 Job 自身状态上才有.
+     * Merge state, priority: ( Failed | Killed )  &gt; Running &gt; Success
+     * Killing state only exists in Job's own state.
      *
      * @param otherComm communication
      */

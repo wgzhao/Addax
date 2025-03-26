@@ -19,11 +19,11 @@
 
 package com.wgzhao.addax.plugin.reader.hbase11xreader;
 
-import com.wgzhao.addax.common.base.HBaseConstant;
-import com.wgzhao.addax.common.base.HBaseKey;
-import com.wgzhao.addax.common.element.LongColumn;
-import com.wgzhao.addax.common.util.Configuration;
-import com.wgzhao.addax.common.element.Record;
+import com.wgzhao.addax.core.base.HBaseConstant;
+import com.wgzhao.addax.core.base.HBaseKey;
+import com.wgzhao.addax.core.element.LongColumn;
+import com.wgzhao.addax.core.util.Configuration;
+import com.wgzhao.addax.core.element.Record;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.hadoop.hbase.Cell;
 import org.apache.hadoop.hbase.CellUtil;
@@ -104,7 +104,6 @@ public abstract class MultiVersionTask
 
         record.addColumn(convertBytesToAssignType(rawRowkeyType, rawRowkey, columnValueFormat));
         record.addColumn(convertBytesToAssignType(ColumnType.STRING, cfAndQualifierName, columnValueFormat));
-        // 直接忽略了用户配置的 timestamp 的类型
         record.addColumn(new LongColumn(timestamp));
         record.addColumn(convertBytesToAssignType(columnValueType, columnValue, columnValueFormat));
     }

@@ -28,7 +28,6 @@ public class ClassSize
     public static final int DEFAULT_RECORD_HEAD;
     public static final int COLUMN_HEAD;
 
-    //objectHead的大小
     public static final int REFERENCE;
     public static final int OBJECT;
     public static final int ARRAY;

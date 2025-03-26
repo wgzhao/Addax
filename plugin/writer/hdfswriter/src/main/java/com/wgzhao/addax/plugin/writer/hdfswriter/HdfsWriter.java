@@ -19,13 +19,13 @@
 
 package com.wgzhao.addax.plugin.writer.hdfswriter;
 
-import com.wgzhao.addax.common.base.Constant;
-import com.wgzhao.addax.common.base.Key;
-import com.wgzhao.addax.common.exception.AddaxException;
-import com.wgzhao.addax.common.plugin.RecordReceiver;
-import com.wgzhao.addax.common.spi.Writer;
-import com.wgzhao.addax.common.util.Configuration;
-import com.wgzhao.addax.common.util.ShellUtil;
+import com.wgzhao.addax.core.base.Constant;
+import com.wgzhao.addax.core.base.Key;
+import com.wgzhao.addax.core.exception.AddaxException;
+import com.wgzhao.addax.core.plugin.RecordReceiver;
+import com.wgzhao.addax.core.spi.Writer;
+import com.wgzhao.addax.core.util.Configuration;
+import com.wgzhao.addax.core.util.ShellUtil;
 import com.wgzhao.addax.storage.util.FileHelper;
 import org.apache.commons.io.Charsets;
 import org.apache.commons.lang3.StringUtils;
@@ -46,11 +46,11 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
-import static com.wgzhao.addax.common.base.Key.IGNORE_ERROR;
-import static com.wgzhao.addax.common.base.Key.POST_SHELL;
-import static com.wgzhao.addax.common.base.Key.PRE_SHELL;
-import static com.wgzhao.addax.common.spi.ErrorCode.ILLEGAL_VALUE;
-import static com.wgzhao.addax.common.spi.ErrorCode.REQUIRED_VALUE;
+import static com.wgzhao.addax.core.base.Key.IGNORE_ERROR;
+import static com.wgzhao.addax.core.base.Key.POST_SHELL;
+import static com.wgzhao.addax.core.base.Key.PRE_SHELL;
+import static com.wgzhao.addax.core.spi.ErrorCode.ILLEGAL_VALUE;
+import static com.wgzhao.addax.core.spi.ErrorCode.REQUIRED_VALUE;
 
 public class HdfsWriter
         extends Writer
@@ -163,12 +163,11 @@ public class HdfsWriter
                 }
                 catch (IllegalArgumentException e) {
                     throw AddaxException.asAddaxException(ILLEGAL_VALUE,
-                            String.format("The ORC format only supports [%s] compression. your configure [%s] is unsupported yet.",
+                            String.format("The ORC format only supports %s compression. your configure [%s] is unsupported yet.",
                                     Arrays.toString(CompressionKind.values()), compress));
                 }
             }
             if ("PARQUET".equals(fileType)) {
-                // parquet 默认的非压缩标志是 UNCOMPRESSED ，而不是常见的 NONE，这里统一为 NONE
                 if ("NONE".equals(compress)) {
                     compress = "UNCOMPRESSED";
                 }
@@ -286,7 +285,6 @@ public class HdfsWriter
             List<Configuration> writerSplitConfigs = new ArrayList<>();
             String filePrefix = fileName;
 
-            //获取该路径下的所有已有文件列表
             Set<String> allFiles = Arrays.stream(hdfsHelper.hdfsDirList(path)).map(Path::toString).collect(Collectors.toSet());
 
             String fileType = this.writerSliceConfig.getString(Key.FILE_TYPE, "txt").toLowerCase();
@@ -296,7 +294,6 @@ public class HdfsWriter
                 // handle same file name
                 Configuration splitTaskConfig = this.writerSliceConfig.clone();
 
-                // 如果文件已经存在，则重新生成文件名
                 do {
                     tmpFullFileName = String.format("%s/%s_%s.%s", tmpStorePath, filePrefix, FileHelper.generateFileMiddleName(), fileType);
                     endFullFileName = String.format("%s/%s_%s.%s", path, filePrefix, FileHelper.generateFileMiddleName(), fileType);
@@ -314,13 +311,6 @@ public class HdfsWriter
             return writerSplitConfigs;
         }
 
-        /**
-         * 创建临时目录
-         * 在给定目录的下，创建一个已点开头，uuid为名字的文件夹，用于临时存储写入的文件
-         *
-         * @param userPath hdfs path
-         * @return temporary path
-         */
         private String buildTmpFilePath(String userPath)
         {
             String tmpDir;
@@ -427,7 +417,7 @@ public class HdfsWriter
                     throw AddaxException.asAddaxException(ILLEGAL_VALUE,
                             String.format("The file format [%s] is supported yet,  the plugin currently only supports: [%s].", fileType, Job.SUPPORT_FORMAT));
             }
-            //得当的已经是绝对路径，eg：/user/hive/warehouse/writer.db/text/test.snappy
+            // absolute path，eg：/user/hive/warehouse/writer.db/text/test.snappy
             String fileName = this.writerSliceConfig.getString(Key.FILE_NAME);
             LOG.info("Begin to write file : [{}]", fileName);
             hdfsHelper.write(lineReceiver, writerSliceConfig, fileName, getTaskPluginCollector());

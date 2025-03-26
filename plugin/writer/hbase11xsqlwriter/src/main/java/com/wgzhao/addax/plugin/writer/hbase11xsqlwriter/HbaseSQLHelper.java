@@ -19,10 +19,9 @@
 
 package com.wgzhao.addax.plugin.writer.hbase11xsqlwriter;
 
-import com.wgzhao.addax.common.base.HBaseConstant;
-import com.wgzhao.addax.common.base.HBaseKey;
-import com.wgzhao.addax.common.exception.AddaxException;
-import com.wgzhao.addax.common.util.Configuration;
+import com.wgzhao.addax.core.base.HBaseConstant;
+import com.wgzhao.addax.core.exception.AddaxException;
+import com.wgzhao.addax.core.util.Configuration;
 import com.alibaba.fastjson2.JSON;
 import com.alibaba.fastjson2.TypeReference;
 import org.apache.commons.lang3.StringUtils;
@@ -51,54 +50,35 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import static com.wgzhao.addax.common.spi.ErrorCode.CONNECT_ERROR;
-import static com.wgzhao.addax.common.spi.ErrorCode.EXECUTE_FAIL;
-import static com.wgzhao.addax.common.spi.ErrorCode.ILLEGAL_VALUE;
-import static com.wgzhao.addax.common.spi.ErrorCode.LOGIN_ERROR;
-import static com.wgzhao.addax.common.spi.ErrorCode.PERMISSION_ERROR;
+import static com.wgzhao.addax.core.spi.ErrorCode.CONNECT_ERROR;
+import static com.wgzhao.addax.core.spi.ErrorCode.EXECUTE_FAIL;
+import static com.wgzhao.addax.core.spi.ErrorCode.ILLEGAL_VALUE;
+import static com.wgzhao.addax.core.spi.ErrorCode.LOGIN_ERROR;
+import static com.wgzhao.addax.core.spi.ErrorCode.PERMISSION_ERROR;
 
-/**
- * @author yanghan.y
- */
 public class HbaseSQLHelper
 {
     private static final Logger LOG = LoggerFactory.getLogger(HbaseSQLHelper.class);
 
-    public static  ThinClientPTable pTable;
+    public static ThinClientPTable pTable;
     public static final org.apache.hadoop.conf.Configuration hadoopConf = new org.apache.hadoop.conf.Configuration();
     // Kerberos
     private static boolean haveKerberos = false;
     private static String kerberosKeytabFilePath;
     private static String kerberosPrincipal;
-    //public static final String HADOOP_SECURITY_AUTHENTICATION_KEY = "hadoop.security.authentication"
 
     private HbaseSQLHelper() {}
 
-    /**
-     * 将 addax 的配置解析成sql writer的配置
-     *
-     * @param cfg configuration
-     * @return HbaseSQLWriterConfig class
-     */
     public static HbaseSQLWriterConfig parseConfig(Configuration cfg)
     {
         return HbaseSQLWriterConfig.parse(cfg);
     }
 
-    /**
-     * 将hbase config字符串解析成zk quorum和znode。
-     * 因为hbase使用的配置名称 xxx.xxx.xxx会被{@link Configuration#from(String)}识别成json路径，
-     * 而不是一个完整的配置项，所以，hbase的配置必须通过直接调用json API进行解析。
-     *
-     * @param hbaseCfgString 配置中{@link HBaseKey#HBASE_CONFIG}的值
-     * @return 返回2个string，第一个是zk quorum,第二个是znode
-     */
     public static Pair<String, String> getHbaseConfig(String hbaseCfgString)
     {
         assert hbaseCfgString != null;
         Map<String, String> hbaseConfigMap = JSON.parseObject(hbaseCfgString, new TypeReference<Map<String, String>>() {});
         String zkQuorum = hbaseConfigMap.get(HConstants.ZOOKEEPER_QUORUM);
-        // 如果没有提供Zookeeper端口，则使用默认端口
         if (!zkQuorum.contains(":")) {
             zkQuorum = zkQuorum + ":2181";
         }
@@ -115,20 +95,12 @@ public class HbaseSQLHelper
         return JSON.parseObject(hbaseCfgString, new TypeReference<Map<String, String>>() {});
     }
 
-    /**
-     * 校验配置
-     *
-     * @param cfg configuration
-     */
     public static void validateConfig(HbaseSQLWriterConfig cfg)
     {
-        // 校验集群地址：尝试连接，连不上就说明有问题，抛错退出
         Connection conn = getJdbcConnection(cfg);
 
-        // 检查表:存在，可用
         checkTable(conn, cfg.getNamespace(), cfg.getTableName(), cfg.isThinClient());
 
-        // 校验元数据：配置中给出的列必须是目的表中已经存在的列
         PTable schema;
         try {
             schema = getTableSchema(conn, cfg.getNamespace(), cfg.getTableName(), cfg.isThinClient());
@@ -145,9 +117,8 @@ public class HbaseSQLHelper
             }
         }
         catch (ColumnNotFoundException e) {
-            // 用户配置的列名在元数据中不存在
             throw AddaxException.asAddaxException(ILLEGAL_VALUE,
-                    "The column '" + e.getColumnName() + "' your configured does not exists in the target table "  + cfg.getTableName(), e);
+                    "The column '" + e.getColumnName() + "' your configured does not exists in the target table " + cfg.getTableName(), e);
         }
         catch (SQLException e) {
             // 列名有二义性或者其他问题
@@ -156,18 +127,11 @@ public class HbaseSQLHelper
         }
     }
 
-    /**
-     * 获取JDBC连接，轻量级连接，使用完后必须显式close
-     *
-     * @param cfg configuration
-     * @return database connection class {@link Connection}
-     */
     public static Connection getJdbcConnection(HbaseSQLWriterConfig cfg)
     {
         String connStr = cfg.getConnectionString();
         LOG.debug("Connecting to HBase cluster [{}] ...", connStr);
         Connection conn;
-        //是否有Kerberos认证
         haveKerberos = cfg.haveKerberos();
         if (haveKerberos) {
             kerberosKeytabFilePath = cfg.getKerberosKeytabFilePath();
@@ -209,13 +173,6 @@ public class HbaseSQLHelper
         }
     }
 
-    /**
-     * 创建 thin client jdbc连接
-     *
-     * @param cfg hbase configuration string
-     * @return Connection
-     * @throws SQLException sql connection exception
-     */
     public static Connection getThinClientJdbcConnection(HbaseSQLWriterConfig cfg)
             throws SQLException
     {
@@ -233,14 +190,6 @@ public class HbaseSQLHelper
         }
     }
 
-    /**
-     * 获取一张表的元数据信息
-     *
-     * @param conn hbase sql的jdbc连接
-     * @param fullTableName 目标表的完整表名
-     * @return 表的元数据 {@link PTable}
-     * @throws SQLException sql exception
-     */
     public static PTable getTableSchema(Connection conn, String fullTableName)
             throws SQLException
     {
@@ -251,16 +200,6 @@ public class HbaseSQLHelper
         return mdc.updateCache(schemaName, tableName).getTable();
     }
 
-    /**
-     * 获取一张表的元数据信息
-     *
-     * @param conn phoenix connection
-     * @param namespace hbase table's namespace
-     * @param fullTableName hbase full-quality table name
-     * @param isThinClient 是否使用thin client
-     * @return 表的元数据 {@link PTable}
-     * @throws SQLException exception
-     */
     public static PTable getTableSchema(Connection conn, String namespace, String fullTableName, boolean isThinClient)
             throws
             SQLException
@@ -281,13 +220,6 @@ public class HbaseSQLHelper
         }
     }
 
-    /**
-     * 解析字段
-     *
-     * @param rs Resultset
-     * @return Map pair
-     * @throws SQLException exception
-     */
     public static Map<String, ThinClientPTable.ThinClientPColumn> parseColType(ResultSet rs)
             throws SQLException
     {
@@ -314,12 +246,6 @@ public class HbaseSQLHelper
         return cols;
     }
 
-    /**
-     * 清空表
-     *
-     * @param conn database connection {@link Connection}
-     * @param tableName the table's name
-     */
     public static void truncateTable(Connection conn, String tableName)
     {
         PhoenixConnection sqlConn;
@@ -328,15 +254,12 @@ public class HbaseSQLHelper
             sqlConn = conn.unwrap(PhoenixConnection.class);
             admin = sqlConn.getQueryServices().getAdmin();
             TableName hTableName = getTableName(tableName);
-            // 确保表存在、可用
             checkTable(admin, hTableName);
-            // 清空表
             admin.disableTable(hTableName);
             admin.truncateTable(hTableName, true);
             LOG.debug("Table {} has been truncated.", tableName);
         }
         catch (Throwable t) {
-            // 清空表失败
             throw AddaxException.asAddaxException(EXECUTE_FAIL,
                     "Failed to truncate " + tableName + ".", t);
         }
@@ -347,14 +270,6 @@ public class HbaseSQLHelper
         }
     }
 
-    /**
-     * 检查表
-     *
-     * @param conn database connection {@link Connection}
-     * @param namespace hbase namespace
-     * @param tableName  table name
-     * @param isThinClient whether thin client or not
-     */
     public static void checkTable(Connection conn, String namespace, String tableName, boolean isThinClient)
     {
         //ignore check table when use thin client
@@ -363,12 +278,6 @@ public class HbaseSQLHelper
         }
     }
 
-    /**
-     * 检查表：表要存在，enabled
-     *
-     * @param conn The {@link Connection} instance
-     * @param tableName hbase table name
-     */
     public static void checkTable(Connection conn, String tableName)
     {
         PhoenixConnection sqlConn;
@@ -419,9 +328,6 @@ public class HbaseSQLHelper
         }
     }
 
-    /*
-     * 如果是phoenix风格的表名，则需要替换成hbase风格
-     */
     private static TableName getTableName(String tableName)
     {
         if (tableName.contains(".")) {

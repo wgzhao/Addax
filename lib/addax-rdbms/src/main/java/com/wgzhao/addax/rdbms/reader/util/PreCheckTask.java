@@ -22,9 +22,9 @@
 package com.wgzhao.addax.rdbms.reader.util;
 
 import com.alibaba.druid.sql.parser.ParserException;
-import com.wgzhao.addax.common.base.Key;
-import com.wgzhao.addax.common.exception.AddaxException;
-import com.wgzhao.addax.common.util.Configuration;
+import com.wgzhao.addax.core.base.Key;
+import com.wgzhao.addax.core.exception.AddaxException;
+import com.wgzhao.addax.core.util.Configuration;
 import com.wgzhao.addax.rdbms.util.DBUtil;
 import com.wgzhao.addax.rdbms.util.DataBaseType;
 import com.wgzhao.addax.rdbms.util.RdbmsException;
@@ -34,9 +34,6 @@ import java.sql.ResultSet;
 import java.util.List;
 import java.util.concurrent.Callable;
 
-/**
- * Created by judy.lt on 2015/6/4.
- */
 public class PreCheckTask
         implements Callable<Boolean>
 {
@@ -62,7 +59,6 @@ public class PreCheckTask
         String jdbcUrl = this.connection.getString(Key.JDBC_URL);
         List<Object> querySqls = this.connection.getList(Key.QUERY_SQL, Object.class);
         List<Object> splitPkSqls = this.connection.getList(Key.SPLIT_PK_SQL, Object.class);
-        List<Object> tables = this.connection.getList(Key.TABLE, Object.class);
         Connection conn = DBUtil.getConnectionWithoutRetry(this.dataBaseType, jdbcUrl, this.userName, password);
         int fetchSize = 1;
         if (DataBaseType.MySql == dataBaseType) {
@@ -74,7 +70,6 @@ public class PreCheckTask
                 String splitPkSql = null;
                 String querySql = querySqls.get(i).toString();
 
-                /*verify query*/
                 ResultSet rs = null;
                 try {
                     DBUtil.sqlValid(querySql, dataBaseType);
@@ -91,7 +86,6 @@ public class PreCheckTask
                 finally {
                     DBUtil.closeDBResources(rs, null, null);
                 }
-                /*verify splitPK*/
                 try {
                     if (splitPkSqls != null && !splitPkSqls.isEmpty()) {
                         splitPkSql = splitPkSqls.get(i).toString();

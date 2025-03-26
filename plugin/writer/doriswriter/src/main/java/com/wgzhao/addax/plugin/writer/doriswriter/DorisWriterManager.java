@@ -21,8 +21,8 @@
 package com.wgzhao.addax.plugin.writer.doriswriter;
 
 import com.google.common.base.Strings;
-import com.wgzhao.addax.common.exception.AddaxException;
-import com.wgzhao.addax.common.spi.ErrorCode;
+import com.wgzhao.addax.core.exception.AddaxException;
+import com.wgzhao.addax.core.spi.ErrorCode;
 import org.apache.commons.lang3.concurrent.BasicThreadFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -178,7 +178,7 @@ public class DorisWriterManager {
             try {
                 // flush to Doris with stream load
                 visitor.streamLoad(flushData);
-                LOG.info("Async stream load finished: label[{}].", flushData.getLabel());
+                LOG.debug("Async stream load finished: label[{}].", flushData.getLabel());
                 startScheduler();
                 break;
             } catch (Exception e) {

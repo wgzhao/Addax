@@ -28,7 +28,7 @@ import java.io.File;
  */
 public class CoreConstant
 {
-    // --------------------------- 全局使用的变量(最好按照逻辑顺序，调整下成员变量顺序)
+    // --------------------------- global variables (
     // --------------------------------
     public static final String CORE_CONTAINER_TASK_GROUP_CHANNEL = "core.container.taskGroup.channel";
 
@@ -111,7 +111,7 @@ public class CoreConstant
     public static final String JOB_POST_HANDLER_PLUGIN_NAME = "job.postHandler.pluginName";
 
     public static final String JOB_CONTENT_WRITER_PATH = "job.content.writer.parameter.path";
-    // ----------------------------- 局部使用的变量
+    // ----------------------------- local variables
     public static final String JOB_WRITER = "writer";
 
     public static final String JOB_READER = "reader";
@@ -137,7 +137,7 @@ public class CoreConstant
 
     public static final String TASK_ID = "taskId";
 
-    // ----------------------------- 环境变量 ---------------------------------
+    // ----------------------------- environment ---------------------------------
 
     public static final String HOME = System.getProperty("addax.home");
 

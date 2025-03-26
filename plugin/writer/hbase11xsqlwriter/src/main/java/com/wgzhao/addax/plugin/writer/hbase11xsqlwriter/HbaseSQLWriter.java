@@ -19,17 +19,14 @@
 
 package com.wgzhao.addax.plugin.writer.hbase11xsqlwriter;
 
-import com.wgzhao.addax.common.plugin.RecordReceiver;
-import com.wgzhao.addax.common.spi.Writer;
-import com.wgzhao.addax.common.util.Configuration;
+import com.wgzhao.addax.core.plugin.RecordReceiver;
+import com.wgzhao.addax.core.spi.Writer;
+import com.wgzhao.addax.core.util.Configuration;
 
 import java.sql.Connection;
 import java.util.ArrayList;
 import java.util.List;
 
-/**
- * @author yanghan.y
- */
 public class HbaseSQLWriter
         extends Writer
 {
@@ -41,17 +38,13 @@ public class HbaseSQLWriter
         @Override
         public void init()
         {
-            // 解析配置
             config = HbaseSQLHelper.parseConfig(this.getPluginJobConf());
-
-            // 校验配置，会访问集群来检查表
             HbaseSQLHelper.validateConfig(config);
         }
 
         @Override
         public void prepare()
         {
-            // 写之前是否要清空目标表，默认不清空
             if (config.truncate()) {
                 Connection conn = HbaseSQLHelper.getJdbcConnection(config);
                 HbaseSQLHelper.truncateTable(conn, config.getTableName());
@@ -96,7 +89,7 @@ public class HbaseSQLWriter
         @Override
         public void destroy()
         {
-            // hbaseSQLTask不需要close
+            //
         }
     }
 }

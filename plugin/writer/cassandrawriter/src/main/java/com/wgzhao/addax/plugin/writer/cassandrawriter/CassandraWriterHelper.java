@@ -19,8 +19,8 @@
 
 package com.wgzhao.addax.plugin.writer.cassandrawriter;
 
-import com.wgzhao.addax.common.element.Column;
-import com.wgzhao.addax.common.exception.AddaxException;
+import com.wgzhao.addax.core.element.Column;
+import com.wgzhao.addax.core.exception.AddaxException;
 import com.alibaba.fastjson2.JSON;
 import com.alibaba.fastjson2.JSONArray;
 import com.alibaba.fastjson2.JSONObject;
@@ -49,8 +49,8 @@ import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 
-import static com.wgzhao.addax.common.spi.ErrorCode.CONFIG_ERROR;
-import static com.wgzhao.addax.common.spi.ErrorCode.NOT_SUPPORT_TYPE;
+import static com.wgzhao.addax.core.spi.ErrorCode.CONFIG_ERROR;
+import static com.wgzhao.addax.core.spi.ErrorCode.NOT_SUPPORT_TYPE;
 
 /**
  * Created by mazhenlin on 2019/8/21.
@@ -117,7 +117,7 @@ public class CassandraWriterHelper
             case DATE: {
                 String[] a = s.split("-");
                 if (a.length != 3) {
-                    throw new Exception(String.format("DATE类型数据 '%s' 格式不正确，必须为yyyy-mm-dd格式", s));
+                    throw new Exception("The date format is not correct, it must be yyyy-mm-dd");
                 }
                 return LocalDate.fromYearMonthDay(Integer.parseInt(a[0]), Integer.parseInt(a[1]),
                         Integer.parseInt(a[2]));
@@ -150,8 +150,7 @@ public class CassandraWriterHelper
                 return parseFromJson(jsonObject, sqlType);
 
             default:
-                throw AddaxException.asAddaxException(CONFIG_ERROR,
-                        "不支持您配置的列类型:" + sqlType + ", 请检查您的配置 或者 联系 管理员.");
+                throw AddaxException.asAddaxException(CONFIG_ERROR, "The data type is not supported: " + sqlType);
         } // end switch
     }
 
@@ -358,8 +357,7 @@ public class CassandraWriterHelper
                     break;
 
                 default:
-                    throw AddaxException.asAddaxException(NOT_SUPPORT_TYPE,
-                            "不支持您配置的列类型:" + sqlType + ", 请检查您的配置 或者 联系 管理员.");
+                    throw AddaxException.asAddaxException(NOT_SUPPORT_TYPE, "The data type is not supported: " + sqlType);
             } // end switch
         }
         else {

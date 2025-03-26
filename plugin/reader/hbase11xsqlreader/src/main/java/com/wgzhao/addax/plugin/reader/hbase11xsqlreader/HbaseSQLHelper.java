@@ -19,11 +19,11 @@
 
 package com.wgzhao.addax.plugin.reader.hbase11xsqlreader;
 
-import com.wgzhao.addax.common.base.HBaseConstant;
-import com.wgzhao.addax.common.base.HBaseKey;
-import com.wgzhao.addax.common.base.Key;
-import com.wgzhao.addax.common.exception.AddaxException;
-import com.wgzhao.addax.common.util.Configuration;
+import com.wgzhao.addax.core.base.HBaseConstant;
+import com.wgzhao.addax.core.base.HBaseKey;
+import com.wgzhao.addax.core.base.Key;
+import com.wgzhao.addax.core.exception.AddaxException;
+import com.wgzhao.addax.core.util.Configuration;
 import org.apache.hadoop.hbase.HConstants;
 import org.apache.hadoop.security.UserGroupInformation;
 import org.apache.phoenix.jdbc.PhoenixConnection;
@@ -42,15 +42,14 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-import static com.wgzhao.addax.common.spi.ErrorCode.EXECUTE_FAIL;
-import static com.wgzhao.addax.common.spi.ErrorCode.ILLEGAL_VALUE;
-import static com.wgzhao.addax.common.spi.ErrorCode.LOGIN_ERROR;
-import static com.wgzhao.addax.common.spi.ErrorCode.REQUIRED_VALUE;
+import static com.wgzhao.addax.core.spi.ErrorCode.EXECUTE_FAIL;
+import static com.wgzhao.addax.core.spi.ErrorCode.ILLEGAL_VALUE;
+import static com.wgzhao.addax.core.spi.ErrorCode.LOGIN_ERROR;
+import static com.wgzhao.addax.core.spi.ErrorCode.REQUIRED_VALUE;
 
 public class HbaseSQLHelper
 {
     private static final Logger LOG = LoggerFactory.getLogger(HbaseSQLHelper.class);
-    //    private static final String JDBC_PHOENIX_DRIVER = "org.apache.phoenix.jdbc.PhoenixDriver";
     private static final org.apache.hadoop.conf.Configuration hadoopConf = new org.apache.hadoop.conf.Configuration();
     private final Configuration jobConf;
 
@@ -61,11 +60,9 @@ public class HbaseSQLHelper
 
     public Configuration parseConfig()
     {
-        // 获取hbase集群的连接信息字符串
         Map<String, Object> hbaseCfg = jobConf.getMap(HBaseKey.HBASE_CONFIG);
         String zkUrl;
         if (hbaseCfg == null || hbaseCfg.isEmpty()) {
-            // 集群配置必须存在且不为空
             throw AddaxException.asAddaxException(
                     REQUIRED_VALUE,
                     String.format("%s must be configured with the following:  %s and  %s",
@@ -111,7 +108,7 @@ public class HbaseSQLHelper
             // Uses default zookeeper port
             zkUrl = String.format("%s:%s:%s", zkQuorum, HConstants.DEFAULT_ZOOKEPER_CLIENT_PORT, znode);
         }
-        // 生成sql使用的连接字符串， 格式： jdbc:hbase:zk_quorum:2181:/znode_parent:[principal:keytab]
+        // the jdbc format: jdbc:hbase:zk_quorum:2181:/znode_parent:[principal:keytab]
         String jdbcUrl = "jdbc:phoenix:" + zkUrl;
         // has kerberos ?
         if (jobConf.getBool(Key.HAVE_KERBEROS, false)) {
@@ -135,13 +132,6 @@ public class HbaseSQLHelper
         return jobConf;
     }
 
-    /**
-     * 依据三个不同配置场景生成正确的查询语句
-     *
-     * @param table 表名
-     * @param columns 字段
-     * @param url jdbc url
-     */
     private void generateQuerySql(String table, List<String> columns, String url)
     {
         if (columns.isEmpty() || (columns.size() == 1 && "*".equals(columns.get(0)))) {

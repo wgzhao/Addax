@@ -1,25 +1,48 @@
 <p align="center">
-    <img alt="Addax Logo" src="https://github.com/wgzhao/Addax/blob/master/docs/images/logo.png?raw=true" width="205" />
+    <img alt="Addax Logo" src="https://github.com/wgzhao/Addax/blob/master/docs/images/logo.svg?raw=true" width="205" />
 </p>
-<p align="center">Addax is a versatile open-source ETL tool</p>
-<p align="center">The <a href="https://wgzhao.github.io/Addax">documentation</a> describes in detail how to install and use the plugins. It provides detailed instructions and sample configuration documentation for each plugin. </p>
+<h1 align="center">Addax</h1>
+<p align="center">
+    <b>A versatile open-source ETL tool</b>
+</p>
+<p align="center">
+Addax is an extensible ETL (Extract, Transform, Load) tool supporting over 20 SQL/NoSQL data sources, developed as a fork and evolution of Alibaba's <a href="https://github.com/alibaba/datax">DataX</a>. It provides a growing ecosystem of plugins and offers easy-to-follow configuration for data integrations.
+</p>
 <p align="center">
    <a href="https://github.com/wgzhao/Addax/releases">
-      <img src="https://img.shields.io/github/release/wgzhao/addax.svg" alt="release version"/>
-    </a>
+      <img src="https://img.shields.io/github/release/wgzhao/addax.svg" alt="Release Version" />
+   </a>
    <a href="https://github.com/wgzhao/Addax/workflows/Maven%20Package/badge.svg">
        <img src="https://github.com/wgzhao/Addax/workflows/Maven%20Package/badge.svg" alt="Maven Package" />
    </a>
 </p>
 
-English | [简体中文](README_zh.md)
+[简体中文](README_zh.md)
 
-The project's initial code was originally developed by Ali's [DataX](https://github.com/alibaba/datax) team and has been significantly improved over time based on user feedback. 
-It also provides more read and write plugins, which can be beneficial for data processing tasks. If you need further clarification, you should check out this [comparison](difference.md)
+---
 
-## Supported Data Sources
+## 🚀 Features
 
-Addax supports more than 20 SQL and NoSQL [data sources](support_data_sources.md). It can also be extended to support more.
+- Supports 20+ SQL and NoSQL data sources, and easily extendable for more.
+- Configurable via simple JSON-based job descriptions.
+- Actively maintained with improved architecture and added functionality compared to [DataX](https://github.com/alibaba/datax).
+- Docker images for quick deployment.
+
+---
+
+## 📚 Documentation
+
+Detailed instructions on installation, configuration, and usage are available:
+
+- [Online Documentation](https://wgzhao.github.io/Addax/)
+- [GitHub Docs](https://wgzhao.github.io/Addax)
+- [Plugin Comparison](difference.md)
+
+---
+
+## 📦 Supported Data Sources
+
+Addax supports a wide range of database systems and file sources. Below is a selection of supported platforms:
 
 <table>
 <tr>
@@ -72,9 +95,17 @@ Addax supports more than 20 SQL and NoSQL [data sources](support_data_sources.md
 </tr>
 </table>
 
-## Getting Started
+> **See the [full list](support_data_sources.md) of supported data sources**.
 
-### Use docker image
+---
+
+## 🛠️ Getting Started
+
+Addax can be quickly installed and used via Docker, installation scripts, or compiled from source.
+
+### 1. Use docker image
+
+Pull the prebuilt Docker image and run a test job:
 
 ```shell
 docker pull quay.io/wgzhao/addax:latest
@@ -82,204 +113,125 @@ docker run -ti --rm --name addax \
   quay.io/wgzhao/addax:latest \
   /opt/addax/bin/addax.sh /opt/addax/job/job.json
 ```
-If you want to use common reader and writer plugins, you can pull the image whose name ends with `-lite`, it's very small.
 
-```shell
-docker pull quay.io/wgzhao/addax:latest-lite
-docker run -ti --rm --name addax \
-  quay.io/wgzhao/addax:latest-lite \
-  /opt/addax/bin/addax.sh /opt/addax/job/job.json
-```
+### 2. Use installation script
 
-[here][lite-vs-default.md] is the difference between the default image and the lite image.
+Install Addax with a single command:
 
-### Use install script
-
-```shell
+```bash
 /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/wgzhao/Addax/master/install.sh)"
 ```
 
-This script installs Addax to its preferred prefix (/usr/local for macOS Intel, /opt/addax for Apple Silicon and /opt/addax/ for Linux)
+> Installation paths: /usr/local (macOS), /opt/addax/ (Linux).
 
-### Compile and Package
+### 3. Compile and Package from Source
+
+For developers targeting custom-builds, compile and package Addax locally:
 
 ```shell
 git clone https://github.com/wgzhao/addax.git addax
 cd addax
+export MAVEN_OPTS="-DskipTests -Dmaven.javadoc.skip=true -Dmaven.source.skip=true -Dgpg.skip=true"
 mvn clean package
-mvn package assembly:single
+mvn package -Pdistribution
 ```
 
-After successful compilation and packaging, a `addax-<version>` folder will be created in the `target/datax` directory of the project directory, where `<version` indicates the version.
+The compiled binary will be in `target/addax-<version>`.
 
-### Begin your first task
+### 4. Run Your First Task
 
-The `job` subdirectory contains many sample jobs, of which `job.json` can be used as a smoke-out test and executed as follows
+Load sample job configuration and test the setup:
 
-```shell
+```bash
 bin/addax.sh job/job.json
 ```
 
-The output of the above command is roughly as follows.
+Explore more [example jobs](docs/assets/jobs)
 
-<details>
-<summary>Click to expand</summary>
+---
+
+## 📖 Runtime Requirements
+
+- **Java Runtime**: JDK 1.8+
+- **Python Version**: Python 2.7+ / 3.7+ (Windows only)
+
+---
+
+## 🧩 Developing Addax
+
+### Building Documentation
+
+Generate or preview online documentation locally using [mkdocs](https://www.mkdocs.org):
 
 ```shell
-$ bin/addax.sh job/job.json
-  ___      _     _
- / _ \    | |   | |
-/ /_\ \ __| | __| | __ ___  __
-|  _  |/ _` |/ _` |/ _` \ \/ /
-| | | | (_| | (_| | (_| |>  <
-\_| |_/\__,_|\__,_|\__,_/_/\_\
-
-:: Addax version ::    (v4.0.13-SNAPSHOT)
-
-2023-05-14 11:43:38.040 [        main] INFO  VMInfo               - VMInfo# operatingSystem class => sun.management.OperatingSystemImpl
-2023-05-14 11:43:38.062 [        main] INFO  Engine               -
-{
-	"setting":{
-		"speed":{
-			"byte":-1,
-			"channel":1,
-			"record":-1
-		}
-	},
-	"content":{
-		"reader":{
-			"name":"streamreader",
-			"parameter":{
-				"sliceRecordCount":10,
-				"column":[
-					{
-						"value":"addax",
-						"type":"string"
-					},
-					{
-						"value":19890604,
-						"type":"long"
-					},
-					{
-						"value":"1989-06-04 11:22:33 123456",
-						"type":"date",
-						"dateFormat":"yyyy-MM-dd HH:mm:ss SSSSSS"
-					},
-					{
-						"value":true,
-						"type":"bool"
-					},
-					{
-						"value":"test",
-						"type":"bytes"
-					}
-				]
-			}
-		},
-		"writer":{
-			"name":"streamwriter",
-			"parameter":{
-				"print":true,
-				"encoding":"UTF-8"
-			}
-		}
-	}
-}
-
-2023-05-14 11:43:38.092 [        main] INFO  JobContainer         - The jobContainer begins to process the job.
-2023-05-14 11:43:38.107 [       job-0] INFO  JobContainer         - The Reader.Job [streamreader] perform prepare work .
-2023-05-14 11:43:38.107 [       job-0] INFO  JobContainer         - The Writer.Job [streamwriter] perform prepare work .
-2023-05-14 11:43:38.108 [       job-0] INFO  JobContainer         - Job set Channel-Number to 1 channel(s).
-2023-05-14 11:43:38.108 [       job-0] INFO  JobContainer         - The Reader.Job [streamreader] is divided into [1] task(s).
-2023-05-14 11:43:38.108 [       job-0] INFO  JobContainer         - The Writer.Job [streamwriter] is divided into [1] task(s).
-2023-05-14 11:43:38.130 [       job-0] INFO  JobContainer         - The Scheduler launches [1] taskGroup(s).
-2023-05-14 11:43:38.138 [ taskGroup-0] INFO  TaskGroupContainer   - The taskGroupId=[0] started [1] channels for [1] tasks.
-2023-05-14 11:43:38.141 [ taskGroup-0] INFO  Channel              - The Channel set byte_speed_limit to -1, No bps activated.
-2023-05-14 11:43:38.141 [ taskGroup-0] INFO  Channel              - The Channel set record_speed_limit to -1, No tps activated.
-addax  19890604	1989-06-04 11:24:36	true	test
-addax  19890604	1989-06-04 11:24:36	true	test
-addax  19890604	1989-06-04 11:24:36	true	test
-addax  19890604	1989-06-04 11:24:36	true	test
-addax  19890604	1989-06-04 11:24:36	true	test
-addax  19890604	1989-06-04 11:24:36	true	test
-addax  19890604	1989-06-04 11:24:36	true	test
-addax  19890604	1989-06-04 11:24:36	true	test
-addax  19890604	1989-06-04 11:24:36	true	test
-addax  19890604	1989-06-04 11:24:36	true	test
-2023-05-14 11:43:41.157 [       job-0] INFO  AbstractScheduler    - The scheduler has completed all tasks.
-2023-05-14 11:43:41.158 [       job-0] INFO  JobContainer         - The Writer.Job [streamwriter] perform post work.
-2023-05-14 11:43:41.159 [       job-0] INFO  JobContainer         - The Reader.Job [streamreader] perform post work.
-2023-05-14 11:43:41.162 [       job-0] INFO  StandAloneJobContainerCommunicator - Total 10 records, 260 bytes | Speed 86B/s, 3 records/s | Error 0 records, 0 bytes |  All Task WaitWriterTime 0.000s |  All Task WaitReaderTime 0.000s | Percentage 100.00%
-2023-05-14 11:43:41.596 [       job-0] INFO  JobContainer         -
-Job start  at             : 2023-05-14 11:43:38
-Job end    at             : 2023-05-14 11:43:41
-Job took secs             :                  3ss
-Average   bps             :               86B/s
-Average   rps             :              3rec/s
-Number of rec             :                  10
-Failed record             :                   0
-```
-
-</details>
-
-[Here](core/src/main/job) and [Here](docs/assets/jobs) provides all kinds of job configuration examples
-
-## Runtime Requirements
-
-- JDK 1.8+
-- Python 2.7+ / Python 3.7+ (Windows)
-
-## Documentation
-
-- [online](https://wgzhao.github.io/Addax/)
-- [project](docs/index.md)
-
-### compile
-
-First, you need install the following python3 modules
-
-```python
 python3 -m pip install mkdocs-material
-```
-
-you can using `mkdocs` command to build or preview on local
-
-```shell
 mkdocs build
 mkdocs serve -a 0.0.0.0:8888
 ```
 
-using the following command to publish release doc
+For publishing:
 
 ```shell
 export version=4.1.5
 git checkout $version
-mike deploy $version
-git checkout gh-pages
-git push -u origin gh-pages
+mike deploy -p $version
 ```
 
-## Code Style
+---
 
-We recommend you use IntelliJ as your IDE. The code style template for the project can be found in the [codestyle](https://github.com/airlift/codestyle) repository along with our general programming and Java guidelines. In addition to those you should also adhere to the following:
+## Code Style Guidelines
 
-* Alphabetize sections in the documentation source files (both in table of contents files and other regular documentation files). In general, alphabetize methods/variables/sections if such ordering already exists in the surrounding code.
-* When appropriate, use the Java 8 stream API. However, note that the stream implementation does not perform well so avoid using it in inner loops or otherwise performance sensitive sections.
-* Categorize errors when throwing exceptions. For example, AddaxException takes an error code and error message as arguments, `AddaxException(REQUIRE_VALUE, "lack of required item")`. This categorization lets you generate reports, so you can monitor the frequency of various failures.
-* Ensure that all files have the appropriate license header; you can generate the license by running `mvn license:format`.
-* Consider using String formatting (printf style formatting using the Java `Formatter` class): `format("Session property %s is invalid: %s", name, value)` (note that `format()` should always be statically imported). Sometimes, if you only need to append something, consider using the `+` operator.
-* Avoid using the ternary operator except for trivial expressions.
-* Use an assertion from Airlift's `Assertions` class if there is one that covers your case rather than writing the assertion by hand. Over time, we may move over to more fluent assertions like AssertJ.
-* When writing a Git commit message, follow these [guidelines](https://chris.beams.io/posts/git-commit/).
+Follow general Java conventions and patterns:
+
+1. Use IntelliJ IDE with [Airlift's Code Style](https://github.com/airlift/codestyle)
+2. Categorize exceptions clearly with AddaxException (e.g., `AddaxException(REQUIRE_VALUE, "missing required parameter")`).
+3. Use the Java 8 Stream API cautiously (avoid in performance-sensitive areas).
+4. Avoid ternary operators for non-trivial expressions.
+5. Include proper Apache license headers in every file.
+
+> Refer to our [Programming Guidelines](https://cbea.ms/git-commit/) for commit message formats.
+
+---
+
+## 🗓️ Versioning Scheme
+
+This project adheres to the [Semantic Versioning (SemVer)](https://semver.org/) standard with the format `x.y.z`. The meanings of each segment are as follows:
+
+- **z（Patch Version）**:
+    - Bug fixes and performance improvements that do not affect compatibility with existing features.
+    - Example: `1.2.3 → 1.2.4`
+
+- **y（Minor Version）**:
+    - Introducing new features or module adjustments that could break backward compatibility.
+    - Example: `1.2.3 → 1.3.0`
+
+- **x（Major Version）**:
+    - Significant changes or new features that are often incompatible with previous versions.
+    - Example: `1.3.0 → 2.0.0`
+
+---
+
+## 🌟 Star History
 
 ## Star History
 
-[![Star History Chart](https://api.star-history.com/svg?repos=wgzhao/Addax&type=Date)](https://star-history.com/#wgzhao/Addax&Date)
+<a href="https://www.star-history.com/#wgzhao/Addax&Date">
+ <picture>
+   <source media="(prefers-color-scheme: dark)" srcset="https://api.star-history.com/svg?repos=wgzhao/Addax&type=Date&theme=dark" />
+   <source media="(prefers-color-scheme: light)" srcset="https://api.star-history.com/svg?repos=wgzhao/Addax&type=Date" />
+   <img alt="Star History Chart" src="https://api.star-history.com/svg?repos=wgzhao/Addax&type=Date" />
+ </picture>
+</a>
 
-## License
+--- 
 
-This software is free to use under the Apache License [Apache license](/LICENSE).
+## ⚖️ License
 
-## Special Thanks
+This software is free to use under the [Apache License 2.0](/LICENSE).
 
-Special thanks to [JetBrains](https://jb.gg/OpenSource) for his supports to this project.
+---
+
+## 💌 Special Thanks
+
+Special thanks to [JetBrains](https://jb.gg/OpenSource) for providing open-source support to this project.
+

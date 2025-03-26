@@ -19,13 +19,13 @@
 
 package com.wgzhao.addax.plugin.reader.sybasereader;
 
-import com.wgzhao.addax.common.base.Constant;
-import com.wgzhao.addax.common.base.Key;
-import com.wgzhao.addax.common.element.Column;
-import com.wgzhao.addax.common.element.LongColumn;
-import com.wgzhao.addax.common.plugin.RecordSender;
-import com.wgzhao.addax.common.spi.Reader;
-import com.wgzhao.addax.common.util.Configuration;
+import com.wgzhao.addax.core.base.Constant;
+import com.wgzhao.addax.core.base.Key;
+import com.wgzhao.addax.core.element.Column;
+import com.wgzhao.addax.core.element.LongColumn;
+import com.wgzhao.addax.core.plugin.RecordSender;
+import com.wgzhao.addax.core.spi.Reader;
+import com.wgzhao.addax.core.util.Configuration;
 import com.wgzhao.addax.rdbms.reader.CommonRdbmsReader;
 import com.wgzhao.addax.rdbms.util.DataBaseType;
 import org.slf4j.Logger;
@@ -59,7 +59,7 @@ public class SybaseReader
 
             Integer userConfiguredFetchSize = this.originalConfig.getInt(Key.FETCH_SIZE);
             if (userConfiguredFetchSize == null || userConfiguredFetchSize < 1) {
-                LOG.warn("The plugin(SybaseReader) need to setup fetchSize to improve performance.");
+                LOG.warn("The plugin need to setup fetchSize to improve performance.");
                 this.originalConfig.set(Key.FETCH_SIZE, Constant.DEFAULT_FETCH_SIZE);
             }
 

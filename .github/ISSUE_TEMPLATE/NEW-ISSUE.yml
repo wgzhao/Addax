@@ -1,5 +1,5 @@
 name: Bug Report
-description: BUG 提交
+description: Bug 报告模板 | Bug Report Template
 title: "[Bug]: "
 labels: [ "bug", "triage" ]
 assignees:
@@ -8,23 +8,43 @@ body:
   - type: markdown
     attributes:
       value: |
-        Thanks for taking the time to fill out this bug report! （感谢您提交发现的 bug）
+        🙏 **感谢您提交 Bug 报告！Thanks for submitting a bug report!**  
+        为了帮助我们更快地定位和解决问题，请尽量完整地填写以下信息。  
+        To help us diagnose and fix the issue faster, please provide as much detail as possible in the fields below.
+
+        **提醒 Tips:**  
+        - **避免标题过于简单**，请用简洁准确的描述反映问题核心。  
+          *Avoid overly simple titles; provide a concise and descriptive issue title.*  
+        - **贴出完整日志（不要使用截图）**，这样我们可以更快定位问题。  
+          *Include complete logs (no screenshots!) to help us troubleshoot efficiently.*
+
   - type: textarea
     id: what-happened
     attributes:
-      label: What happened?
-      description: Also tell us, what did you expect to happen? （BUG 标题，请简要描述发现的问题）
-      placeholder: Tell us what you see!
-      value: "A bug happened!"
+      label: 1️⃣ 问题描述 | Problem Description
+      description: |
+        - 请详细描述问题发生的场景，包括触发问题的操作和环境。  
+          *Describe the problem in detail, including the actions and environment that triggered it.*  
+        - 同时，补充说明您预期的结果是什么。  
+          *Additionally, describe what you expected to happen.*
+      placeholder: 请描述您遇到的问题和您期望的行为 | Please describe the issue and the expected behavior
+      value: "举例: 运行任务时出现错误，无法正常完成任务。期望: 任务可以顺利完成。\nExample: An error occurred while running the task, and it failed to complete successfully. Expected: The task should complete without errors."
     validations:
       required: true
+
   - type: dropdown
     id: version
     attributes:
-      label: Version
-      description: What version of our software are you running? （当前您使用的版本，这对于定位问题很重要，请选择正确的版本）
+      label: 2️⃣ 当前使用的 Addax 版本 | Addax Version
+      description: |
+        - 选择您运行 Addax 的版本（非常重要）。  
+          *Select the Addax version you are using (this is crucial for debugging).*  
+        - 如果您的版本不在列表中，请选择 "4.1.4 or older" 并在问题描述中补充准确的版本号。  
+          *If your version is not listed, select "4.1.4 or older" and specify the exact version in the description.*
       options:
-        - 4.2.2 (Default)
+        - 4.2.4 (Default)
+        - 4.2.3
+        - 4.2.2
         - 4.2.1
         - 4.2.0
         - 4.1.8
@@ -34,29 +54,48 @@ body:
         - 4.1.4 or older
     validations:
       required: true
+
   - type: dropdown
     id: os
     attributes:
-      label: OS Type
-      description: What Operation System are you seeing the problem on? (发现问题时 Addax 运行在哪个操作系统上)
-      multiple: true
+      label: 3️⃣ 操作系统类型 | Operating System
+      description: |
+        - 选择运行 Addax 的操作系统类型。  
+          *Select the operating system where Addax is running.*  
+        - 如果不确定，请选择 "Others" 并在问题描述中补充说明。  
+          *If unsure, select "Others" and add details in the problem description.*
+      multiple: false
       options:
         - Linux (Default)
         - MacOS
         - Windows
         - Unix
         - Others
+
   - type: input
     id: jdk
     attributes:
-      label: Java JDK Version
-      description: What version of Java JDK are you running? (发现问题时, 使用的JDK 什么版本)
-      placeholder: "Oracle JDK 1.8.0_231"
+      label: 4️⃣ 使用的 Java JDK 版本 | Java JDK Version
+      description: |
+        - 请填写运行 Addax 所使用的 JDK 版本。  
+          *Specify the Java JDK version used to run Addax.*  
+        - 示例: "Oracle JDK 1.8.0_231" 或 "OpenJDK 17.0.2"  
+          *Example: "Oracle JDK 1.8.0_231" or "OpenJDK 17.0.2"*
+      placeholder: 请填写完整的 JDK 版本号 | Please enter the full JDK version
       value: "Oracle JDK 1.8.0"
 
   - type: textarea
     id: logs
     attributes:
-      label: Relevant log output
-      description: Please copy and paste any relevant log output. This will be automatically formatted into code, so no need for backticks. (请完整的贴出任务输出结果）
+      label: 5️⃣ 相关日志/输出结果 | Relevant Log Output
+      description: |
+        - **请完整地粘贴 Addax 的任务输出日志，不要使用截图！**  
+          *Please paste the full Addax task log output (do not use screenshots).*  
+        - 日志是定位问题的关键，请确保提供完整内容。  
+          *Logs are crucial for diagnosis. Please ensure they are complete.*  
+        - 如果日志中包含敏感信息，请进行脱敏处理后再提交。  
+          *Anonymize sensitive information in logs before submission, if necessary.*
+      placeholder: |
+        粘贴日志或错误信息... ⚠️ 不要使用截图  
+        Paste logs or error messages... ⚠️ No screenshots, please
       render: shell-script

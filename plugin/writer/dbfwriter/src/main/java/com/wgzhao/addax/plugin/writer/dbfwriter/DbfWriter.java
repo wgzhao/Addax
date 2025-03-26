@@ -22,13 +22,13 @@ package com.wgzhao.addax.plugin.writer.dbfwriter;
 import com.linuxense.javadbf.DBFDataType;
 import com.linuxense.javadbf.DBFField;
 import com.linuxense.javadbf.DBFWriter;
-import com.wgzhao.addax.common.base.Key;
-import com.wgzhao.addax.common.element.Column;
-import com.wgzhao.addax.common.element.Record;
-import com.wgzhao.addax.common.exception.AddaxException;
-import com.wgzhao.addax.common.plugin.RecordReceiver;
-import com.wgzhao.addax.common.spi.Writer;
-import com.wgzhao.addax.common.util.Configuration;
+import com.wgzhao.addax.core.base.Key;
+import com.wgzhao.addax.core.element.Column;
+import com.wgzhao.addax.core.element.Record;
+import com.wgzhao.addax.core.exception.AddaxException;
+import com.wgzhao.addax.core.plugin.RecordReceiver;
+import com.wgzhao.addax.core.spi.Writer;
+import com.wgzhao.addax.core.util.Configuration;
 import com.wgzhao.addax.storage.util.FileHelper;
 import com.wgzhao.addax.storage.writer.StorageWriterUtil;
 import org.apache.commons.io.FileUtils;
@@ -49,27 +49,30 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Set;
 
-import static com.wgzhao.addax.common.spi.ErrorCode.CONFIG_ERROR;
-import static com.wgzhao.addax.common.spi.ErrorCode.EXECUTE_FAIL;
-import static com.wgzhao.addax.common.spi.ErrorCode.ILLEGAL_VALUE;
-import static com.wgzhao.addax.common.spi.ErrorCode.IO_ERROR;
-import static com.wgzhao.addax.common.spi.ErrorCode.PERMISSION_ERROR;
-import static com.wgzhao.addax.common.spi.ErrorCode.REQUIRED_VALUE;
-import static com.wgzhao.addax.common.spi.ErrorCode.RUNTIME_ERROR;
+import static com.wgzhao.addax.core.spi.ErrorCode.CONFIG_ERROR;
+import static com.wgzhao.addax.core.spi.ErrorCode.EXECUTE_FAIL;
+import static com.wgzhao.addax.core.spi.ErrorCode.ILLEGAL_VALUE;
+import static com.wgzhao.addax.core.spi.ErrorCode.IO_ERROR;
+import static com.wgzhao.addax.core.spi.ErrorCode.PERMISSION_ERROR;
+import static com.wgzhao.addax.core.spi.ErrorCode.REQUIRED_VALUE;
+import static com.wgzhao.addax.core.spi.ErrorCode.RUNTIME_ERROR;
 
 /**
  * Created by haiwei.luo on 14-9-17.
  */
 public class DbfWriter
-        extends Writer {
+        extends Writer
+{
     public static class Job
-            extends Writer.Job {
+            extends Writer.Job
+    {
         private static final Logger LOG = LoggerFactory.getLogger(Job.class);
 
         private Configuration writerSliceConfig = null;
 
         @Override
-        public void init() {
+        public void init()
+        {
             this.writerSliceConfig = this.getPluginJobConf();
             this.validateParameter();
             String dateFormatOld = this.writerSliceConfig.getString(Key.FORMAT);
@@ -83,13 +86,13 @@ public class DbfWriter
             validateParameter();
         }
 
-        private void validateParameter() {
+        private void validateParameter()
+        {
             this.writerSliceConfig.getNecessaryValue(Key.FILE_NAME, REQUIRED_VALUE);
 
             String path = this.writerSliceConfig.getNecessaryValue(Key.PATH, REQUIRED_VALUE);
 
             try {
-                // warn: 这里用户需要配一个目录
                 File dir = new File(path);
                 if (dir.isFile()) {
                     throw AddaxException.asAddaxException(
@@ -104,7 +107,8 @@ public class DbfWriter
                                 String.format("Failed to create directory [%s].", path));
                     }
                 }
-            } catch (SecurityException se) {
+            }
+            catch (SecurityException se) {
                 throw AddaxException.asAddaxException(
                         PERMISSION_ERROR,
                         String.format("Permission denied while creating directory [%s].", path), se);
@@ -112,7 +116,8 @@ public class DbfWriter
         }
 
         @Override
-        public void prepare() {
+        public void prepare()
+        {
             String path = this.writerSliceConfig.getString(Key.PATH);
             String fileName = this.writerSliceConfig.getString(Key.FILE_NAME);
             String writeMode = this.writerSliceConfig.getString(Key.WRITE_MODE);
@@ -121,10 +126,8 @@ public class DbfWriter
                 LOG.info("The current writeMode is 'truncate', begin to cleanup all files or sub-directories " +
                         "with prefix is [{}] under [{}].", path, fileName);
                 File dir = new File(path);
-                // warn:需要判断文件是否存在，不存在时，不能删除
                 try {
                     if (dir.exists()) {
-                        // warn:不要使用FileUtils.deleteQuietly(dir)
                         FilenameFilter filter = new PrefixFileFilter(fileName);
                         File[] filesWithFileNamePrefix = dir.listFiles(filter);
                         assert filesWithFileNamePrefix != null;
@@ -132,30 +135,35 @@ public class DbfWriter
                             LOG.info("Delete file [{}].", eachFile.getName());
                             FileUtils.forceDelete(eachFile);
                         }
-                        // FileUtils.cleanDirectory(dir)
                     }
-                } catch (NullPointerException npe) {
+                }
+                catch (NullPointerException npe) {
                     throw AddaxException
                             .asAddaxException(
                                     RUNTIME_ERROR,
                                     String.format("NPE occurred whiling cleanup [%s].", path), npe);
-                } catch (IllegalArgumentException iae) {
+                }
+                catch (IllegalArgumentException iae) {
                     throw AddaxException.asAddaxException(
                             PERMISSION_ERROR,
                             String.format("IllegalArgumentException occurred cleanup [%s].", path));
-                } catch (SecurityException se) {
+                }
+                catch (SecurityException se) {
                     throw AddaxException.asAddaxException(
                             PERMISSION_ERROR,
                             String.format("Permission denied for cleaning up [%s]", path));
-                } catch (IOException e) {
+                }
+                catch (IOException e) {
                     throw AddaxException.asAddaxException(
                             IO_ERROR,
                             String.format("IO exception occurred while cleanup [%s]", path), e);
                 }
-            } else if ("append".equals(writeMode)) {
+            }
+            else if ("append".equals(writeMode)) {
                 LOG.info("The current writeMode is append, no cleanup is performed before writing." +
                         "It will write files with prefix [{}] under the directory [{}].", path, fileName);
-            } else if ("nonConflict".equals(writeMode)) {
+            }
+            else if ("nonConflict".equals(writeMode)) {
                 LOG.info("The current writeMode is nonConflict, begin to check the directory [{}] is empty or not.", path);
                 // warn: check two times about exists, mkdir
                 File dir = new File(path);
@@ -180,7 +188,8 @@ public class DbfWriter
                                     ILLEGAL_VALUE,
                                     String.format("The path [%s] is not empty.", path));
                         }
-                    } else {
+                    }
+                    else {
                         boolean createdOk = dir.mkdirs();
                         if (!createdOk) {
                             throw AddaxException.asAddaxException(
@@ -188,12 +197,14 @@ public class DbfWriter
                                     String.format("Failed to create directory [%s].", path));
                         }
                     }
-                } catch (SecurityException se) {
+                }
+                catch (SecurityException se) {
                     throw AddaxException.asAddaxException(
                             PERMISSION_ERROR,
                             String.format("Permission denied for creating directory [%s]", path));
                 }
-            } else {
+            }
+            else {
                 throw AddaxException.asAddaxException(
                         ILLEGAL_VALUE,
                         String.format("The item writeMode only supports truncate, append and nonConflict  the [%s] is not supported.", writeMode));
@@ -220,24 +231,26 @@ public class DbfWriter
         }
 
         @Override
-        public void post() {
+        public void post()
+        {
             //
         }
 
         @Override
-        public void destroy() {
+        public void destroy()
+        {
             //
         }
 
         @Override
-        public List<Configuration> split(int mandatoryNumber) {
+        public List<Configuration> split(int mandatoryNumber)
+        {
             List<Configuration> writerSplitConfigs = new ArrayList<>();
             LOG.info("Begin doing split...");
             if (mandatoryNumber == 1) {
                 writerSplitConfigs.add(this.writerSliceConfig);
                 return writerSplitConfigs;
             }
-
 
             String filePrefix = this.writerSliceConfig.getString(Key.FILE_NAME).split("\\.")[0];
 
@@ -247,7 +260,8 @@ public class DbfWriter
                 path = this.writerSliceConfig.getString(Key.PATH);
                 File dir = new File(path);
                 allFiles = new HashSet<>(Arrays.asList(Objects.requireNonNull(dir.list())));
-            } catch (SecurityException se) {
+            }
+            catch (SecurityException se) {
                 throw AddaxException.asAddaxException(
                         PERMISSION_ERROR,
                         String.format("Permission denied for viewing directory [%s].", path));
@@ -279,7 +293,8 @@ public class DbfWriter
     }
 
     public static class Task
-            extends Writer.Task {
+            extends Writer.Task
+    {
         private static final Logger LOG = LoggerFactory.getLogger(Task.class);
 
         private Configuration writerSliceConfig;
@@ -289,7 +304,8 @@ public class DbfWriter
         private String fileName;
 
         @Override
-        public void init() {
+        public void init()
+        {
             this.writerSliceConfig = this.getPluginJobConf();
             this.path = this.writerSliceConfig.getString(Key.PATH);
             // remove file suffix
@@ -298,12 +314,14 @@ public class DbfWriter
         }
 
         @Override
-        public void prepare() {
+        public void prepare()
+        {
             //
         }
 
         @Override
-        public void startWrite(RecordReceiver lineReceiver) {
+        public void startWrite(RecordReceiver lineReceiver)
+        {
             LOG.info("Begin to write...");
             String fileSuffix = ".dbf";
             String fileFullPath = StorageWriterUtil.buildFilePath(path, fileName, fileSuffix);
@@ -342,7 +360,6 @@ public class DbfWriter
                             fields[i].setLength(columns.get(i).getInt(Key.LENGTH));
                             break;
                     }
-                    // Date类型不能设置字段长度，这里没有处理其它没有字段长度的类型
                 }
                 writer.setFields(fields);
 
@@ -359,7 +376,6 @@ public class DbfWriter
                                     rowData[i] = Float.valueOf(colData);
                                     break;
                                 case "char":
-                                    //rowData[i] = new String(colData.getBytes("GBK"))
                                     rowData[i] = colData;
                                     break;
                                 case "date":
@@ -377,7 +393,8 @@ public class DbfWriter
                 }
 
                 writer.close();
-            } catch (SecurityException se) {
+            }
+            catch (SecurityException se) {
                 throw AddaxException.asAddaxException(
                         PERMISSION_ERROR,
                         String.format("Permission denied for create directory [%s].", this.fileName));
@@ -386,12 +403,14 @@ public class DbfWriter
         }
 
         @Override
-        public void post() {
+        public void post()
+        {
             //
         }
 
         @Override
-        public void destroy() {
+        public void destroy()
+        {
             //
         }
     }

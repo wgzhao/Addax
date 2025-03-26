@@ -19,7 +19,7 @@
 
 package com.wgzhao.addax.core.util.container;
 
-import com.wgzhao.addax.common.exception.AddaxException;
+import com.wgzhao.addax.core.exception.AddaxException;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.Validate;
 
@@ -31,10 +31,10 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
-import static com.wgzhao.addax.common.spi.ErrorCode.PLUGIN_INIT_ERROR;
+import static com.wgzhao.addax.core.spi.ErrorCode.PLUGIN_INIT_ERROR;
 
 /**
- * 提供Jar隔离的加载机制，会把传入的路径、及其子路径、以及路径中的jar文件加入到class path。
+ * Provide a jar isolation loading mechanism, which will add the path, its sub-path, and the jar file in the path to the class path.
  */
 public class JarLoader
         extends URLClassLoader

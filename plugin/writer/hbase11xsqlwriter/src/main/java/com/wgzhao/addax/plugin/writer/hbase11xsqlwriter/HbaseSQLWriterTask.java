@@ -19,13 +19,13 @@
 
 package com.wgzhao.addax.plugin.writer.hbase11xsqlwriter;
 
-import com.wgzhao.addax.common.base.HBaseConstant;
-import com.wgzhao.addax.common.element.Column;
-import com.wgzhao.addax.common.element.Record;
-import com.wgzhao.addax.common.exception.AddaxException;
-import com.wgzhao.addax.common.plugin.RecordReceiver;
-import com.wgzhao.addax.common.plugin.TaskPluginCollector;
-import com.wgzhao.addax.common.util.Configuration;
+import com.wgzhao.addax.core.base.HBaseConstant;
+import com.wgzhao.addax.core.element.Column;
+import com.wgzhao.addax.core.element.Record;
+import com.wgzhao.addax.core.exception.AddaxException;
+import com.wgzhao.addax.core.plugin.RecordReceiver;
+import com.wgzhao.addax.core.plugin.TaskPluginCollector;
+import com.wgzhao.addax.core.util.Configuration;
 import org.apache.phoenix.schema.PTable;
 import org.apache.phoenix.schema.types.PDataType;
 import org.slf4j.Logger;
@@ -41,9 +41,9 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
-import static com.wgzhao.addax.common.spi.ErrorCode.EXECUTE_FAIL;
-import static com.wgzhao.addax.common.spi.ErrorCode.ILLEGAL_VALUE;
-import static com.wgzhao.addax.common.spi.ErrorCode.RUNTIME_ERROR;
+import static com.wgzhao.addax.core.spi.ErrorCode.EXECUTE_FAIL;
+import static com.wgzhao.addax.core.spi.ErrorCode.ILLEGAL_VALUE;
+import static com.wgzhao.addax.core.spi.ErrorCode.RUNTIME_ERROR;
 
 /**
  * @author yanghan.y
@@ -55,15 +55,12 @@ public class HbaseSQLWriterTask
     private TaskPluginCollector taskPluginCollector;
     private Connection connection = null;
     private PreparedStatement ps = null;
-    // 需要向 hbase 写入的列的数量,即用户配置的column参数中列的个数。时间戳不包含在内
     private int numberOfColumnsToWrite;
-    // 期待从源头表的Record中拿到多少列
     private int numberOfColumnsToRead;
     private int[] columnTypes;
 
     public HbaseSQLWriterTask(Configuration configuration)
     {
-        // 这里仅解析配置，不访问远端集群，配置的合法性检查在writer的init过程中进行
         cfg = HbaseSQLHelper.parseConfig(configuration);
     }
 
@@ -72,12 +69,10 @@ public class HbaseSQLWriterTask
         this.taskPluginCollector = taskPluginCollector;
         Record record;
         try {
-            // 准备阶段
             prepare();
 
             List<Record> buffer = new ArrayList<>(cfg.getBatchSize());
             while ((record = lineReceiver.getFromReader()) != null) {
-                // 校验列数量是否符合预期
                 if (record.getColumnNumber() != numberOfColumnsToRead) {
                     throw AddaxException.asAddaxException(ILLEGAL_VALUE,
                             "The number of fields(" + record.getColumnNumber()
@@ -91,14 +86,12 @@ public class HbaseSQLWriterTask
                 }
             } // end while loop
 
-            // 处理剩余的record
             if (!buffer.isEmpty()) {
                 doBatchUpsert(buffer);
                 buffer.clear();
             }
         }
         catch (Throwable t) {
-            // 确保所有异常都转化为 AddaxException
             throw AddaxException.asAddaxException(RUNTIME_ERROR, t);
         }
         finally {
@@ -115,7 +108,6 @@ public class HbaseSQLWriterTask
         }
 
         if (ps == null) {
-            // 一个Task的生命周期中只使用一个PreparedStatement对象，所以，在
             ps = createPreparedStatement();
             columnTypes = getColumnSqlType(cfg.getColumns());
         }
@@ -128,7 +120,6 @@ public class HbaseSQLWriterTask
                 ps.close();
             }
             catch (SQLException e) {
-                // 不会出错
                 LOG.error("Failed to close PreparedStatement", e);
             }
         }
@@ -137,20 +128,15 @@ public class HbaseSQLWriterTask
                 connection.close();
             }
             catch (SQLException e) {
-                // 不会出错
                 LOG.error("Failed to close Connection", e);
             }
         }
     }
 
-    /*
-     * 批量提交一组数据，如果失败，则尝试一行行提交，如果仍然失败，抛错给用户
-     */
     private void doBatchUpsert(List<Record> records)
             throws SQLException
     {
         try {
-            // 将所有record提交到connection缓存
             for (Record r : records) {
                 setupStatement(r);
                 ps.executeUpdate();
@@ -162,7 +148,6 @@ public class HbaseSQLWriterTask
         catch (SQLException e) {
             LOG.error("Failed to batch commit {} records", records.size(), e);
 
-            // 批量提交失败，则一行行重试，以确定那一行出错
             connection.rollback();
             doSingleUpsert(records);
         }
@@ -171,9 +156,6 @@ public class HbaseSQLWriterTask
         }
     }
 
-    /*
-     * 单行提交，将出错的行记录到脏数据中。由脏数据收集模块判断任务是否继续
-     */
     private void doSingleUpsert(List<Record> records)
     {
         for (Record r : records) {
@@ -183,26 +165,20 @@ public class HbaseSQLWriterTask
                 connection.commit();
             }
             catch (SQLException e) {
-                //出错了，记录脏数据
                 LOG.error("Failed to write hbase", e);
                 this.taskPluginCollector.collectDirtyRecord(r, e);
             }
         }
     }
 
-    /*
-     * 生成sql模板，并根据模板创建PreparedStatement
-     */
     private PreparedStatement createPreparedStatement()
             throws SQLException
     {
-        // 生成列名集合，列之间用逗号分隔： col1,col2,col3,...
         String columnNames = String.join(",", cfg.getColumns());
 
         numberOfColumnsToWrite = cfg.getColumns().size();
         numberOfColumnsToRead = numberOfColumnsToWrite;   // 开始的时候，要读的列数娱要写的列数相等
 
-        // 生成UPSERT模板
         String tableName = cfg.getTableName();
         String sql = String.format("UPSERT INTO %s ( %s ) VALUES ( %s )", tableName, columnNames, String.join(",", Collections.nCopies(cfg.getColumns().size(), "?")));
         PreparedStatement ps = connection.prepareStatement(sql);
@@ -210,9 +186,6 @@ public class HbaseSQLWriterTask
         return ps;
     }
 
-    /*
-     * 根据列名来从数据库元数据中获取这一列对应的SQL类型
-     */
     private int[] getColumnSqlType(List<String> columnNames)
             throws SQLException
     {
@@ -232,11 +205,9 @@ public class HbaseSQLWriterTask
     private void setupStatement(Record record)
             throws SQLException
     {
-        // 一开始的时候就已经校验过record中的列数量与ps中需要的值数量相等
         for (int i = 0; i < numberOfColumnsToWrite; i++) {
             Column col = record.getColumn(i);
             int sqlType = columnTypes[i];
-            // PreparedStatement中的索引从1开始，所以用i+1
             setupColumn(i + 1, sqlType, col);
         }
     }
@@ -313,21 +284,16 @@ public class HbaseSQLWriterTask
             } // end switch
         }
         else {
-            // 没有值，按空值的配置情况处理
             switch (cfg.getNullMode()) {
                 case SKIP:
-                    // 跳过空值，则不插入该列,
                     ps.setNull(pos, sqlType);
                     break;
 
                 case EMPTY:
-                    // 插入"空值"，请注意不同类型的空值不同
-                    // 另外，对SQL来说，空值本身是有值的，这与直接操作HBASE Native API时的空值完全不同
                     ps.setObject(pos, getEmptyValue(sqlType));
                     break;
 
                 default:
-                    // nullMode的合法性在初始化配置的时候已经校验过，这里一定不会出错
                     throw AddaxException.asAddaxException(ILLEGAL_VALUE,
                             "The nullMode type " + cfg.getNullMode() + " is unsupported, here are available nullMode:" + Arrays.asList(NullModeType.values()));
             }
@@ -335,11 +301,10 @@ public class HbaseSQLWriterTask
     }
 
     /**
-     * 根据类型获取"空值"
-     * 值类型的空值都是0，bool是false，String是空字符串
+     * Get the empty value for the specified SQL type.
      *
-     * @param sqlType sql数据类型，定义于{@link Types}
-     * @return Object
+     * @param sqlType the SQL type
+     * @return the empty value
      */
     private Object getEmptyValue(int sqlType)
     {

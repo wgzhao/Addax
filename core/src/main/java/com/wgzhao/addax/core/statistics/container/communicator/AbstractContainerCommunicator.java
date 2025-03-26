@@ -19,8 +19,8 @@
 
 package com.wgzhao.addax.core.statistics.container.communicator;
 
-import com.wgzhao.addax.common.statistics.VMInfo;
-import com.wgzhao.addax.common.util.Configuration;
+import com.wgzhao.addax.core.statistics.VMInfo;
+import com.wgzhao.addax.core.util.Configuration;
 import com.wgzhao.addax.core.meta.State;
 import com.wgzhao.addax.core.statistics.communication.Communication;
 import com.wgzhao.addax.core.statistics.container.collector.AbstractCollector;
@@ -77,9 +77,9 @@ public abstract class AbstractContainerCommunicator
 
     public abstract Communication getCommunication(Integer id);
 
-    /*
-     * 当 实现是 TGContainerCommunicator 时，返回的 Map: key=taskId, value=Communication
-     * 当 实现是 JobContainerCommunicator 时，返回的 Map: key=taskGroupId, value=Communication
+    /**
+     * When the implementation is TGContainerCommunicator, the returned Map: key=taskId, value=Communication
+     * When the implementation is JobContainerCommunicator, the returned Map: key=taskGroupId, value=Communication
      * @return map
      */
     public abstract Map<Integer, Communication> getCommunicationMap();
@@ -93,9 +93,7 @@ public abstract class AbstractContainerCommunicator
     public void reportVmInfo()
     {
         long now = System.currentTimeMillis();
-        //每5分钟打印一次
         if (now - lastReportTime >= 300000) {
-            //当前仅打印
             if (vmInfo != null) {
                 vmInfo.getDelta(true);
             }

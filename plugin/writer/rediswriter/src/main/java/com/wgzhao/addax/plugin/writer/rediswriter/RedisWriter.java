@@ -19,11 +19,11 @@
 
 package com.wgzhao.addax.plugin.writer.rediswriter;
 
-import com.wgzhao.addax.common.element.Column;
-import com.wgzhao.addax.common.element.Record;
-import com.wgzhao.addax.common.plugin.RecordReceiver;
-import com.wgzhao.addax.common.spi.Writer;
-import com.wgzhao.addax.common.util.Configuration;
+import com.wgzhao.addax.core.element.Column;
+import com.wgzhao.addax.core.element.Record;
+import com.wgzhao.addax.core.plugin.RecordReceiver;
+import com.wgzhao.addax.core.spi.Writer;
+import com.wgzhao.addax.core.util.Configuration;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -32,7 +32,6 @@ import redis.clients.jedis.Jedis;
 import redis.clients.jedis.exceptions.JedisDataException;
 import redis.clients.jedis.util.JedisClusterCRC16;
 
-import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.net.URI;
@@ -45,7 +44,7 @@ import java.util.Map.Entry;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicLong;
 
-import static com.wgzhao.addax.common.base.Key.CONNECTION;
+import static com.wgzhao.addax.core.base.Key.CONNECTION;
 
 public class RedisWriter
         extends Writer
@@ -57,18 +56,12 @@ public class RedisWriter
 
         private static final Logger LOG = LoggerFactory.getLogger(Task.class);
         private static final AtomicBoolean FLUSH_FLAG = new AtomicBoolean(false);
-        /**
-         * slot 对应cluster Redis 节点
-         */
+
         private final Map<Integer, Jedis> cluster = new HashMap<>();
         private final Map<Jedis, AtomicLong> nodeCounterMap = new HashMap<>();
-        /**
-         * 单机redis
-         */
+
         private Jedis jedis;
-        /**
-         * 每次批量处理数量
-         */
+
         private long batchSize = 1000L;
 
         @Override
@@ -99,18 +92,17 @@ public class RedisWriter
             int port = uri.getPort();
             this.jedis = new Jedis(host, port, timeout, timeout);
 
-            //如果是redis cluster,将获取cluster主机节点对应的slot槽
             if (isCluster) {
-                StringBuilder sb = new StringBuilder("\r\nRedis Cluster 节点分配\r\n");
+                StringBuilder sb = new StringBuilder("\r\nRedis Cluster node assign\r\n");
                 List<Object> slots = this.jedis.clusterSlots();
 
                 for (Object slot : slots) {
-                    List list = (List) slot;
-                    //slot 开始节点
+                    List<Object> list = (List<Object>) slot;
+                    //slot begin node
                     Long start = (Long) list.get(0);
-                    //slot 结束节点
+                    //slot end node
                     Long end = (Long) list.get(1);
-                    //slot 对应主机信息
+                    //slot node host
                     List hostInfo = (List) list.get(2);
 
                     String nodeHost = new String((byte[]) hostInfo.get(0));
@@ -133,7 +125,7 @@ public class RedisWriter
                 LOG.info(sb.toString());
             }
             else {
-                String auth = (String) connection.get("auth");
+                String auth = connection.getString("auth");
                 if (StringUtils.isNotBlank(auth)) {
                     this.jedis.auth(auth);
                 }
@@ -142,9 +134,6 @@ public class RedisWriter
             prepare();
         }
 
-        /**
-         * 判断是否携带格式化redis 数据库
-         */
         @Override
         public void prepare()
         {
@@ -168,11 +157,6 @@ public class RedisWriter
             this.cluster.clear();
         }
 
-        /**
-         * 单机或proxy 写入模式
-         *
-         * @param lineReceiver record
-         */
         private void standaloneWrite(RecordReceiver lineReceiver)
         {
             AtomicLong counter = new AtomicLong(0L);
@@ -180,7 +164,6 @@ public class RedisWriter
             Record fromReader;
             while ((fromReader = lineReceiver.getFromReader()) != null) {
                 int db = fromReader.getColumn(0).asLong().intValue();
-//                Column type = fromReader.getColumn(1)
                 long expire = fromReader.getColumn(2).asLong();
                 byte[] key = fromReader.getColumn(3).toString().getBytes();
                 byte[] value = string2byte(fromReader.getColumn(4).toString());
@@ -193,11 +176,6 @@ public class RedisWriter
             }
         }
 
-        /**
-         * redis cluster 集群写入
-         *
-         * @param lineReceiver record
-         */
         private void clusterWrite(RecordReceiver lineReceiver)
         {
 
@@ -262,31 +240,26 @@ public class RedisWriter
                 }
 
                 boolean isCluster = getPluginJobConf().getBool("redisCluster", false);
-
+                Client client = null;
                 if (isCluster) {
                     for (Jedis cJedis : new HashSet<>(cluster.values())) {
-                        Client client = cJedis.getClient();
-                        LOG.info("格式化: {}: {}", client.getHost(), client.getPort());
+                        client = cJedis.getClient();
                         jedis.flushAll();
                     }
                 }
                 else {
                     if (this.jedis != null) {
-                        Client client = jedis.getClient();
-                        LOG.info("格式化: {}:{}", client.getHost(), client.getPort());
+                        client = jedis.getClient();
                         jedis.flushAll();
                     }
                 }
-
+                if (client != null ) {
+                    LOG.info("redis client: {}: {}", client.getHost(), client.getPort());
+                }
                 FLUSH_FLAG.set(true);
             }
         }
 
-        /**
-         * 发送并检查异常
-         *
-         * @param client redis client
-         */
         private void flushAndCheckReply(Client client)
         {
             List<Object> allReply = client.getObjectMultiBulkReply();

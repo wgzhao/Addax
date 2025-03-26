@@ -19,7 +19,7 @@
 
 package com.wgzhao.addax.plugin.reader.elasticsearchreader;
 
-import com.wgzhao.addax.common.util.Configuration;
+import com.wgzhao.addax.core.util.Configuration;
 import io.searchbox.params.SearchType;
 import org.apache.commons.lang3.StringUtils;
 
@@ -27,14 +27,10 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import static com.wgzhao.addax.common.spi.ErrorCode.CONFIG_ERROR;
+import static com.wgzhao.addax.core.spi.ErrorCode.CONFIG_ERROR;
 
 public final class ESKey
 {
-    // ----------------------------------------
-    //  类型定义 主键字段定义
-    // ----------------------------------------
-
     public static final String SEARCH_KEY = "search";
 
     private ESKey() {}

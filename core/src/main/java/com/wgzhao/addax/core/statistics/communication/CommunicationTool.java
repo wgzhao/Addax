@@ -19,15 +19,12 @@
 
 package com.wgzhao.addax.core.statistics.communication;
 
-import com.wgzhao.addax.common.statistics.PerfTrace;
-import com.wgzhao.addax.common.util.StrUtil;
+import com.wgzhao.addax.core.statistics.PerfTrace;
+import com.wgzhao.addax.core.util.StrUtil;
 import org.apache.commons.lang3.Validate;
 
 import java.text.DecimalFormat;
 
-/**
- * 这里主要是业务层面的处理
- */
 public final class CommunicationTool
 {
     public static final String STAGE = "stage";
@@ -59,14 +56,13 @@ public final class CommunicationTool
     private static final String TOTAL_ERROR_BYTES = "totalErrorBytes";
     private static final String WRITE_SUCCEED_RECORDS = "writeSucceedRecords";
     private static final String WRITE_SUCCEED_BYTES = "writeSucceedBytes";
-    //public static final String TRANSFORMER_NAME_PREFIX = "usedTimeByTransformer_"
 
     private CommunicationTool() {}
 
     public static Communication getReportCommunication(Communication now, Communication old, int totalStage)
     {
         Validate.isTrue(now != null && old != null,
-                "为汇报准备的新旧metric不能为null");
+                "The metric can not be null");
 
         long totalReadRecords = getTotalReadRecords(now);
         long totalReadBytes = getTotalReadBytes(now);

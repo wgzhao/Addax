@@ -22,10 +22,10 @@
 package com.wgzhao.addax.rdbms.writer.util;
 
 import com.alibaba.druid.sql.parser.ParserException;
-import com.wgzhao.addax.common.base.Constant;
-import com.wgzhao.addax.common.base.Key;
-import com.wgzhao.addax.common.exception.AddaxException;
-import com.wgzhao.addax.common.util.Configuration;
+import com.wgzhao.addax.core.base.Constant;
+import com.wgzhao.addax.core.base.Key;
+import com.wgzhao.addax.core.exception.AddaxException;
+import com.wgzhao.addax.core.util.Configuration;
 import com.wgzhao.addax.rdbms.util.DBUtil;
 import com.wgzhao.addax.rdbms.util.DataBaseType;
 import com.wgzhao.addax.rdbms.util.RdbmsException;
@@ -39,8 +39,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import static com.wgzhao.addax.common.spi.ErrorCode.CONFIG_ERROR;
-import static com.wgzhao.addax.common.spi.ErrorCode.ILLEGAL_VALUE;
+import static com.wgzhao.addax.core.spi.ErrorCode.CONFIG_ERROR;
 
 public final class WriterUtil
 {
@@ -55,7 +54,6 @@ public final class WriterUtil
 
         int tableNumber = simplifiedConf.getInt(Key.TABLE_NUMBER);
 
-        //处理单表的情况
         if (tableNumber == 1) {
             //由于在之前的  master prepare 中已经把 table,jdbcUrl 提取出来，所以这里处理十分简单
             for (int j = 0; j < adviceNumber; j++) {
@@ -106,7 +104,6 @@ public final class WriterUtil
 
         List<String> renderedSqls = new ArrayList<>();
         for (String sql : preOrPostSqls) {
-            //preSql为空时，不加入执行队列
             if (StringUtils.isNotBlank(sql)) {
                 renderedSqls.add(sql.replace(Constant.TABLE_NAME_PLACEHOLDER, tableName));
             }
@@ -138,8 +135,7 @@ public final class WriterUtil
         boolean isWriteModeLegal = mode.startsWith("insert") || mode.startsWith("replace") || mode.startsWith("update");
 
         if (!isWriteModeLegal) {
-            throw AddaxException.asAddaxException(ILLEGAL_VALUE,
-                    "The writeMode " + writeMode + " is not supported, choose one of replace, update and insert.");
+            throw AddaxException.illegalConfigValue(Key.WRITE_MODE, mode);
         }
         String writeDataSqlTemplate;
         if (forceUseUpdate || mode.startsWith("update")) {
@@ -160,12 +156,10 @@ public final class WriterUtil
                         "INSERT (" + columns + ") VALUES ( " + placeHolders + " );";
             }
             else {
-                throw AddaxException.asAddaxException(ILLEGAL_VALUE,
-                        "The writeMode " + writeMode + " is not supported by current database");
+                throw AddaxException.illegalConfigValue(Key.WRITE_MODE, writeMode);
             }
         }
         else {
-            //这里是保护,如果其他错误的使用了update,需要更换为replace
             if (mode.startsWith("update")) {
                 writeMode = "replace";
             }

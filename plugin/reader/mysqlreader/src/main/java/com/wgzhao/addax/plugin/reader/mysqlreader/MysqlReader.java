@@ -19,12 +19,12 @@
 
 package com.wgzhao.addax.plugin.reader.mysqlreader;
 
-import com.wgzhao.addax.common.base.Key;
-import com.wgzhao.addax.common.element.Column;
-import com.wgzhao.addax.common.element.LongColumn;
-import com.wgzhao.addax.common.plugin.RecordSender;
-import com.wgzhao.addax.common.spi.Reader;
-import com.wgzhao.addax.common.util.Configuration;
+import com.wgzhao.addax.core.base.Key;
+import com.wgzhao.addax.core.element.Column;
+import com.wgzhao.addax.core.element.LongColumn;
+import com.wgzhao.addax.core.plugin.RecordSender;
+import com.wgzhao.addax.core.spi.Reader;
+import com.wgzhao.addax.core.util.Configuration;
 import com.wgzhao.addax.rdbms.reader.CommonRdbmsReader;
 import com.wgzhao.addax.rdbms.util.DataBaseType;
 import org.slf4j.Logger;
@@ -58,7 +58,7 @@ public class MysqlReader
 
             Integer userConfiguredFetchSize = this.originalConfig.getInt(Key.FETCH_SIZE);
             if (userConfiguredFetchSize != null) {
-                LOG.warn("The plugin(mysqlreader) not support fetchSize config, fetchSize will be forced to -1(ignore).");
+                LOG.warn("The plugin not support fetchSize config, fetchSize will be forced to -1(ignore).");
             }
 
             this.originalConfig.set(Key.FETCH_SIZE, Integer.MIN_VALUE);

@@ -14,7 +14,7 @@
 
 package com.wgzhao.addax.plugin.writer.tdenginewriter;
 
-import com.wgzhao.addax.common.base.Key;
+import com.wgzhao.addax.core.base.Key;
 
 public class TDKey
         extends Key

@@ -1,7 +1,7 @@
 package com.wgzhao.addax.plugin.writer.starrockswriter.row;
 
 import com.alibaba.fastjson2.JSON;
-import com.wgzhao.addax.common.element.Record;
+import com.wgzhao.addax.core.element.Record;
 
 import java.util.HashMap;
 import java.util.List;

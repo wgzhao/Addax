@@ -20,20 +20,20 @@
 package com.wgzhao.addax.plugin.reader.streamreader;
 
 import com.alibaba.fastjson2.JSONObject;
-import com.wgzhao.addax.common.base.Key;
-import com.wgzhao.addax.common.element.BoolColumn;
-import com.wgzhao.addax.common.element.BytesColumn;
-import com.wgzhao.addax.common.element.Column;
-import com.wgzhao.addax.common.element.DateColumn;
-import com.wgzhao.addax.common.element.DoubleColumn;
-import com.wgzhao.addax.common.element.LongColumn;
-import com.wgzhao.addax.common.element.Record;
-import com.wgzhao.addax.common.element.StringColumn;
-import com.wgzhao.addax.common.element.TimestampColumn;
-import com.wgzhao.addax.common.exception.AddaxException;
-import com.wgzhao.addax.common.plugin.RecordSender;
-import com.wgzhao.addax.common.spi.Reader;
-import com.wgzhao.addax.common.util.Configuration;
+import com.wgzhao.addax.core.base.Key;
+import com.wgzhao.addax.core.element.BoolColumn;
+import com.wgzhao.addax.core.element.BytesColumn;
+import com.wgzhao.addax.core.element.Column;
+import com.wgzhao.addax.core.element.DateColumn;
+import com.wgzhao.addax.core.element.DoubleColumn;
+import com.wgzhao.addax.core.element.LongColumn;
+import com.wgzhao.addax.core.element.Record;
+import com.wgzhao.addax.core.element.StringColumn;
+import com.wgzhao.addax.core.element.TimestampColumn;
+import com.wgzhao.addax.core.exception.AddaxException;
+import com.wgzhao.addax.core.plugin.RecordSender;
+import com.wgzhao.addax.core.spi.Reader;
+import com.wgzhao.addax.core.util.Configuration;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.time.DateUtils;
@@ -53,9 +53,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
-import static com.wgzhao.addax.common.spi.ErrorCode.ILLEGAL_VALUE;
-import static com.wgzhao.addax.common.spi.ErrorCode.NOT_SUPPORT_TYPE;
-import static com.wgzhao.addax.common.spi.ErrorCode.REQUIRED_VALUE;
+import static com.wgzhao.addax.core.spi.ErrorCode.ILLEGAL_VALUE;
+import static com.wgzhao.addax.core.spi.ErrorCode.NOT_SUPPORT_TYPE;
+import static com.wgzhao.addax.core.spi.ErrorCode.REQUIRED_VALUE;
 
 public class StreamReader
         extends Reader
@@ -151,26 +151,26 @@ public class StreamReader
         }
 
         /**
-         * 支持随机函数, demo如下:
-         * LONG: random 0, 10 0到10之间的随机数字
-         * STRING: random 0, 10 0到10长度之间的随机字符串
-         * BOOL: random 0, 10 false 和 true出现的比率
-         * DOUBLE: random 0, 10 0到10之间的随机浮点数
-         * DOUBLE: random 0, 10, 2 0到10之间的随机浮点数，小数位为2位
-         * DATE: random 2014-07-07 00:00:00, 2016-07-07 00:00:00 开始时间-&gt;结束时间之间的随机时间，
-         * 日期格式默认(不支持逗号)yyyy-MM-dd HH:mm:ss
-         * BYTES: random 0, 10 0到10长度之间的随机字符串获取其UTF-8编码的二进制串
-         * 配置了混淆函数后，可不配置value
-         * 2者都没有配置
-         * 支持递增函数，当前仅支持整数类型，demo如下
-         * LONG: incr 100 从100开始，每次加1
-         * LONG: incr 0, 1 从0开始，每次加1
-         * LONG: incr 1, 10 从 1 开始，每次加10
-         * LONG: incr 1000, 1 从 1000开始，每次加-1，允许出现负数
+         * Supports random functions, examples are as follows:
+         * LONG: random 0, 10 - random number between 0 and 10
+         * STRING: random 0, 10 - random string with length between 0 and 10
+         * BOOL: random 0, 10 - ratio of false and true
+         * DOUBLE: random 0, 10 - random floating-point number between 0 and 10
+         * DOUBLE: random 0, 10, 2 - random floating-point number between 0 and 10 with 2 decimal places
+         * DATE: random 2014-07-07 00:00:00, 2016-07-07 00:00:00 - random date between start and end time,
+         * default date format (comma not supported) is yyyy-MM-dd HH:mm:ss
+         * BYTES: random 0, 10 - random string with length between 0 and 10, encoded in UTF-8 binary
+         * When a mixup function is configured, value can be omitted
+         * If neither is configured
+         * Supports increment functions, currently only supports integer types, examples are as follows:
+         * LONG: incr 100 - starts from 100, increments by 1 each time
+         * LONG: incr 0, 1 - starts from 0, increments by 1 each time
+         * LONG: incr 1, 10 - starts from 1, increments by 10 each time
+         * LONG: incr 1000, 1 - starts from 1000, increments by -1 each time, allowing negative values
          * DATE: incr &lt;date from&gt; &lt;interval&gt; &lt;unit&gt;
-         * date from : 指定开始日期，必填
-         * interval: 隔间周期，默认为1，负数则递减 选填
-         * unit: 间隔单位，默认为day，可设置为 d/day, m/month, y/year
+         * date from: specifies the start date, required
+         * interval: interval period, default is 1, negative values decrement, optional
+         * unit: interval unit, default is day, can be set to d/day, m/month, y/year
          *
          * @param eachColumnConfig see {@link Configuration}
          */
@@ -212,7 +212,8 @@ public class StreamReader
                     else if (fields.length == 2) {
                         try {
                             Integer.parseInt(fields[1]);
-                        } catch (NumberFormatException e) {
+                        }
+                        catch (NumberFormatException e) {
                             throw AddaxException.asAddaxException(
                                     ILLEGAL_VALUE,
                                     "The second field must be numeric, value [" + fields[1] + "] is not valid"
@@ -312,23 +313,25 @@ public class StreamReader
         /**
          * valid the unit
          * current support unit are the following:
-         *  1. d/day
-         *  2. M/month
-         *  3. y/year
-         *  4. h/hour
-         *  5. m/minute
-         *  6. s/second
-         *  7. w/week
+         * 1. d/day
+         * 2. M/month
+         * 3. y/year
+         * 4. h/hour
+         * 5. m/minute
+         * 6. s/second
+         * 7. w/week
+         *
          * @param unit the date interval unit
          */
         private void validateDateIncrUnit(String unit)
         {
             boolean isOK = true;
-            if ( unit.length() == 1 ) {
-                if (! validUnits.contains(unit)) {
+            if (unit.length() == 1) {
+                if (!validUnits.contains(unit)) {
                     isOK = false;
                 }
-            }  else if (! validUnits.contains(unit.toLowerCase())) {
+            }
+            else if (!validUnits.contains(unit.toLowerCase())) {
                 isOK = false;
             }
             if (!isOK) {
@@ -435,7 +438,7 @@ public class StreamReader
             String columnIncr = eachColumnConfig.getString(StreamConstant.INCR);
             long param1Int = eachColumnConfig.getLong(StreamConstant.MIXUP_FUNCTION_PARAM1, 0L);
             long param2Int = eachColumnConfig.getLong(StreamConstant.MIXUP_FUNCTION_PARAM2, 1L);
-            int  scale = eachColumnConfig.getInt(StreamConstant.MIXUP_FUNCTION_SCALE, -1);
+            int scale = eachColumnConfig.getInt(StreamConstant.MIXUP_FUNCTION_SCALE, -1);
             boolean isColumnMixup = StringUtils.isNotBlank(columnRandom);
             boolean isIncr = StringUtils.isNotBlank(columnIncr);
             UniformRandomProvider rng = RandomSource.XO_RO_SHI_RO_128_PP.create();
@@ -452,7 +455,8 @@ public class StreamReader
                             BigDecimal b = BigDecimal.valueOf(rng.nextDouble(param1Int, param2Int + 1))
                                     .setScale(scale, RoundingMode.HALF_UP);
                             return new DoubleColumn(b.doubleValue());
-                        } else {
+                        }
+                        else {
                             return new DoubleColumn(rng.nextDouble(param1Int, param2Int + 1));
                         }
                     case DATE:
@@ -480,7 +484,7 @@ public class StreamReader
                         return new TimestampColumn(rng.nextLong(1_100_000_000_000L, 2_100_000_000_000L));
                     default:
                         // in fact,never to be here
-                        throw new Exception(String.format("不支持类型[%s]", columnType.name()));
+                        throw new Exception("The type " + columnType.name() + "is not supported");
                 }
             }
             else if (isIncr) {
@@ -493,7 +497,8 @@ public class StreamReader
                     currVal = incrMap.getOrDefault(columnIndex, currVal);
                     incrMap.put(columnIndex, (long) currVal + step);
                     return new LongColumn((long) currVal);
-                } else if (columnType == Type.DATE) {
+                }
+                else if (columnType == Type.DATE) {
                     String[] fields = columnIncr.split(",");
                     currVal = incrMap.getOrDefault(columnIndex, null);
                     if (currVal == null) {
@@ -501,7 +506,8 @@ public class StreamReader
                         SimpleDateFormat sdf = new SimpleDateFormat(datePattern);
                         try {
                             currVal = sdf.parse(fields[0]);
-                        } catch (java.text.ParseException e) {
+                        }
+                        catch (java.text.ParseException e) {
                             throw AddaxException.asAddaxException(
                                     ILLEGAL_VALUE,
                                     String.format("can not parse date value [%s] with date format [%s]", fields[0], datePattern)
@@ -509,8 +515,9 @@ public class StreamReader
                         }
                     }
                     incrMap.put(columnIndex, dateIncrement((Date) currVal, Integer.parseInt(fields[1]), fields[2]));
-                    return new DateColumn((Date)currVal);
-                } else {
+                    return new DateColumn((Date) currVal);
+                }
+                else {
                     throw AddaxException.asAddaxException(
                             NOT_SUPPORT_TYPE,
                             columnType + " can not support for increment"
@@ -543,6 +550,7 @@ public class StreamReader
 
         /**
          * calculate next date via interval
+         *
          * @param curDate current date
          * @param step interval
          * @param unit unit
@@ -550,7 +558,7 @@ public class StreamReader
          */
         private Date dateIncrement(Date curDate, int step, String unit)
         {
-            switch(unit) {
+            switch (unit) {
                 case "d":
                     return DateUtils.addDays(curDate, step);
                 case "M":

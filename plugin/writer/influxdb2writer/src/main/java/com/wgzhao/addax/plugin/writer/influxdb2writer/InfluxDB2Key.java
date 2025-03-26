@@ -1,6 +1,6 @@
 package com.wgzhao.addax.plugin.writer.influxdb2writer;
 
-import com.wgzhao.addax.common.base.Key;
+import com.wgzhao.addax.core.base.Key;
 
 public final class InfluxDB2Key
         extends Key

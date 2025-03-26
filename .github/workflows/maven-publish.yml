@@ -16,15 +16,23 @@ jobs:
       packages: write
 
     steps:
-
+      # Step 1: checkout code
       - uses: actions/checkout@v4
-
+      # Step 2: get the current release version
       - name: version
         id: version
         run: echo "version=$(git describe --tags --abbrev=1)" >> $GITHUB_OUTPUT
+      # Step 3: generate change log
       - name: changelog
         id: changelog
-        run: echo "changelog=$(git log --oneline ${{ github.event.before }}..HEAD)" >> $GITHUB_OUTPUT
+        run: |
+          export START_COMMIT=$(git describe --tags --abbrev=0 HEAD^)  # 获取前一个标签（版本起点）
+          export END_COMMIT=HEAD                                      # 当前版本的结束点
+          echo "Generating changelog from $START_COMMIT to $END_COMMIT"
+
+          # 获取提交日志并格式化
+          CHANGELOG=$(git log --oneline ${START_COMMIT}..${END_COMMIT} | sed 's/^/- /')
+          echo "changelog=$CHANGELOG" >> $GITHUB_OUTPUT
       # - name: 1. Import GPG key
       #   id: import_gpg
       #   uses: crazy-max/ghaction-import-gpg@v4
@@ -34,12 +42,12 @@ jobs:
       #     git-user-signingkey: true
       #     git-commit-gpgsign: true
 
-      - name: 2. Set up Maven
+      - name: Set up Maven
         uses: stCarolas/setup-maven@v5
         with:
           maven-version: 3.8.8
 
-      - name: 4. Set up JDK
+      - name: Set up JDK
         uses: actions/setup-java@v4.7.0
         with:
           java-version: '8'
@@ -47,19 +55,19 @@ jobs:
           server-id: ossrh # Value of the distributionManagement/repository/id field of the pom.xml
           settings-path: ${{ github.workspace }} # location for the settings.xml file
 
-      - name: 5. Build and packaging
+      - name: Build and packaging
         run: |
           export MAVEN_OPTS="-DskipTests -Dmaven.javadoc.skip=true -Dmaven.source.skip=true -Dgpg.skip=true"
           mvn -B -V -T 1 clean package
-          mvn package assembly:single
+          mvn package -Pdistribution
           bash shrink_package.sh y
 
-      - name: 6. Calculate SHA256SUM
+      - name: Calculate SHA256SUM
         run: |
-          cd target/addax
+          cd target
           sha256sum addax-${{ steps.version.outputs.version }}.tar.gz > addax-${{ steps.version.outputs.version }}.tar.gz.sha256sum.asc
 
-      - name: 7. Create release page
+      - name: Create release
         uses: actions/create-release@v1
         id: create_release
         with:
@@ -69,17 +77,19 @@ jobs:
           tag_name: ${{ github.ref }}
           body: |
             # Addax  ${{ steps.version.outputs.version }} has released! 🎉
-            ## Changes
+            
+            ## 📜 Changes
+            
             ${{ steps.changelog.outputs.changelog }}
         env:
           GITHUB_TOKEN: ${{ secrets.TOKEN }}
 
-      - name: 8. Upload to GitHub
+      - name: Upload to GitHub
         uses: softprops/action-gh-release@v2
         if: startsWith(github.ref, 'refs/tags/')
         with:
           files: |
-            target/addax/addax-${{ steps.version.outputs.version }}.tar.gz
-            target/addax/addax-${{ steps.version.outputs.version }}.tar.gz.sha256sum.asc
+            target/addax-${{ steps.version.outputs.version }}.tar.gz
+            target/addax-${{ steps.version.outputs.version }}.tar.gz.sha256sum.asc
         env:
           GITHUB_TOKEN: ${{ secrets.TOKEN }}

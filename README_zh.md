@@ -1,5 +1,5 @@
 <p align="center">
-    <img alt="Addax Logo" src="https://github.com/wgzhao/Addax/blob/master/docs/images/logo.png?raw=true" width="205" />
+    <img alt="Addax Logo" src="https://github.com/wgzhao/Addax/blob/master/docs/images/logo.svg?raw=true" width="205" />
 </p>
 <p align="center">Addax 是一个支持主流数据库的通用数据采集工具</p>
 <p align="center"><a href="https://wgzhao.github.io/Addax">使用文档</a> 详细描述了如何安装使用，针对每个插件都有详细的说明和样例配置文档 </p>
@@ -79,16 +79,6 @@ docker run -ti --rm --name addax \
   quay.io/wgzhao/addax:latest \
   /opt/addax/bin/addax.sh /opt/addax/job/job.json
 ```
-如果你只需要基本的插件，可以使用带有 `-lite` 结尾的镜像，它体积更小。
-
-```shell
-docker pull quay.io/wgzhao/addax:latest-lite
-docker run -ti --rm --name addax \
-  quay.io/wgzhao/addax:latest-lite \
-  /opt/addax/bin/addax.sh /opt/addax/job/job.json
-```
-
-[这里][lite-vs-default.md] 列出了 `lite` 和 `default` 镜像所包含的插件的区别。
 
 ### 使用一键安装脚本
 
@@ -102,11 +92,12 @@ docker run -ti --rm --name addax \
 ```shell
 git clone https://github.com/wgzhao/addax.git addax
 cd addax
-mvn clean package -pl '!:addax-docs'
-mvn package assembly:single
+export MAVEN_OPTS="-DskipTests -Dmaven.javadoc.skip=true -Dmaven.source.skip=true -Dgpg.skip=true"
+mvn clean package 
+mvn package -Pdistribution
 ```
 
-编译打包成功后，会在项目目录的`target/addax` 目录下创建一个 `addax-<version>`的 文件夹，其中 `<version>` 表示版本。
+编译打包成功后，会在项目目录的`target` 目录下创建一个 `addax-<version>`的 文件夹，其中 `<version>` 表示版本。
 
 ### 开始第一个任务
 
@@ -243,14 +234,33 @@ Failed record             :                   0
 * 如果有涵盖你的情况的断言，就使用Airlift的`Assertions`类，而不是手工写断言。
 * 在编写Git提交信息时，请遵循这些[指南]（https://chris.beams.io/posts/git-commit/）。
 
-## 版本兼容性说明
+## 版本命名规范
 
-- 从 `4.0.0` 版本开始，启用新的项目名称 `Addax`, 因此它和以前的版本均不兼容
-- 从 `3.2.1` 版本开始，包类名已经更改，因此不再兼容 `3.1.x` 版本
+本项目遵循 [语义化版本规则](https://semver.org/lang/zh-CN/) 管理版本号，格式为 `x.y.z`，每个部分含义如下：
+
+- **z（补丁版本）**:
+  - 修复问题、性能优化等小改动，不影响现有功能的兼容性。
+  - 示例: `1.2.3 → 1.2.4`
+
+- **y（次要版本）**:
+  - 添加新功能、模块调整，可能打破部分兼容性。
+  - 示例: `1.2.3 → 1.3.0`
+
+- **x（主要版本）**:
+  - 引入重大变更或全新功能，大概率与前版本不兼容。
+  - 示例: `1.3.0 → 2.0.0`
 
 ## Star History
 
-[![Star History Chart](https://api.star-history.com/svg?repos=wgzhao/Addax&type=Date)](https://star-history.com/#wgzhao/Addax&Date)
+## Star History
+
+<a href="https://www.star-history.com/#wgzhao/Addax&Date">
+ <picture>
+   <source media="(prefers-color-scheme: dark)" srcset="https://api.star-history.com/svg?repos=wgzhao/Addax&type=Date&theme=dark" />
+   <source media="(prefers-color-scheme: light)" srcset="https://api.star-history.com/svg?repos=wgzhao/Addax&type=Date" />
+   <img alt="Star History Chart" src="https://api.star-history.com/svg?repos=wgzhao/Addax&type=Date" />
+ </picture>
+</a>
 
 ## 代码授权许可
 

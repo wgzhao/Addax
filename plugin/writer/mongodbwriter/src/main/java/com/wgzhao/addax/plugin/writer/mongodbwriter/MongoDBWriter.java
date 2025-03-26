@@ -28,20 +28,20 @@ import com.mongodb.client.MongoDatabase;
 import com.mongodb.client.model.BulkWriteOptions;
 import com.mongodb.client.model.ReplaceOneModel;
 import com.mongodb.client.model.ReplaceOptions;
-import com.wgzhao.addax.common.base.Constant;
-import com.wgzhao.addax.common.element.BoolColumn;
-import com.wgzhao.addax.common.element.BytesColumn;
-import com.wgzhao.addax.common.element.Column;
-import com.wgzhao.addax.common.element.DateColumn;
-import com.wgzhao.addax.common.element.DoubleColumn;
-import com.wgzhao.addax.common.element.LongColumn;
-import com.wgzhao.addax.common.element.Record;
-import com.wgzhao.addax.common.element.StringColumn;
-import com.wgzhao.addax.common.exception.AddaxException;
-import com.wgzhao.addax.common.plugin.RecordReceiver;
-import com.wgzhao.addax.common.spi.Writer;
-import com.wgzhao.addax.common.util.Configuration;
-import com.wgzhao.addax.common.util.EncryptUtil;
+import com.wgzhao.addax.core.base.Constant;
+import com.wgzhao.addax.core.element.BoolColumn;
+import com.wgzhao.addax.core.element.BytesColumn;
+import com.wgzhao.addax.core.element.Column;
+import com.wgzhao.addax.core.element.DateColumn;
+import com.wgzhao.addax.core.element.DoubleColumn;
+import com.wgzhao.addax.core.element.LongColumn;
+import com.wgzhao.addax.core.element.Record;
+import com.wgzhao.addax.core.element.StringColumn;
+import com.wgzhao.addax.core.exception.AddaxException;
+import com.wgzhao.addax.core.plugin.RecordReceiver;
+import com.wgzhao.addax.core.spi.Writer;
+import com.wgzhao.addax.core.util.Configuration;
+import com.wgzhao.addax.core.util.EncryptUtil;
 import com.wgzhao.addax.plugin.writer.mongodbwriter.util.MongoUtil;
 import org.apache.commons.lang3.StringUtils;
 import org.bson.Document;
@@ -50,17 +50,17 @@ import org.bson.types.ObjectId;
 import java.util.ArrayList;
 import java.util.List;
 
-import static com.wgzhao.addax.common.base.Constant.DEFAULT_BATCH_SIZE;
-import static com.wgzhao.addax.common.base.Key.BATCH_SIZE;
-import static com.wgzhao.addax.common.base.Key.COLUMN;
-import static com.wgzhao.addax.common.base.Key.CONNECTION;
-import static com.wgzhao.addax.common.base.Key.DATABASE;
-import static com.wgzhao.addax.common.base.Key.PASSWORD;
-import static com.wgzhao.addax.common.base.Key.PRE_SQL;
-import static com.wgzhao.addax.common.base.Key.USERNAME;
-import static com.wgzhao.addax.common.base.Key.WRITE_MODE;
-import static com.wgzhao.addax.common.spi.ErrorCode.ILLEGAL_VALUE;
-import static com.wgzhao.addax.common.spi.ErrorCode.REQUIRED_VALUE;
+import static com.wgzhao.addax.core.base.Constant.DEFAULT_BATCH_SIZE;
+import static com.wgzhao.addax.core.base.Key.BATCH_SIZE;
+import static com.wgzhao.addax.core.base.Key.COLUMN;
+import static com.wgzhao.addax.core.base.Key.CONNECTION;
+import static com.wgzhao.addax.core.base.Key.DATABASE;
+import static com.wgzhao.addax.core.base.Key.PASSWORD;
+import static com.wgzhao.addax.core.base.Key.PRE_SQL;
+import static com.wgzhao.addax.core.base.Key.USERNAME;
+import static com.wgzhao.addax.core.base.Key.WRITE_MODE;
+import static com.wgzhao.addax.core.spi.ErrorCode.ILLEGAL_VALUE;
+import static com.wgzhao.addax.core.spi.ErrorCode.REQUIRED_VALUE;
 
 public class MongoDBWriter
         extends Writer
@@ -264,7 +264,7 @@ public class MongoDBWriter
                         continue;
                     }
                     if (Column.Type.INT.name().equalsIgnoreCase(type)) {
-                        //int是特殊类型, 其他类型按照保存时Column的类型进行处理
+                        // the int type is special
                         try {
                             data.put(name, Integer.parseInt(String.valueOf(record.getColumn(i).getRawData())));
                         }
@@ -273,7 +273,7 @@ public class MongoDBWriter
                         }
                     }
                     else if (record.getColumn(i) instanceof StringColumn) {
-                        //处理ObjectId和数组类型
+                        //handle ObjectId and array type
                         try {
                             if (KeyConstant.isObjectIdType(type.toLowerCase())) {
                                 data.put(name, new ObjectId(record.getColumn(i).asString()));
@@ -286,7 +286,6 @@ public class MongoDBWriter
                                 }
                                 String itemType = columnMeta.getJSONObject(i).getString(KeyConstant.ITEM_TYPE);
                                 if (itemType != null && !itemType.isEmpty()) {
-                                    //如果数组指定类型不为空，将其转换为指定类型
                                     String[] item = record.getColumn(i).asString().split(splitter);
                                     if (itemType.equalsIgnoreCase(Column.Type.DOUBLE.name())) {
                                         ArrayList<Double> list = new ArrayList<>();
@@ -332,7 +331,6 @@ public class MongoDBWriter
                                 }
                             }
                             else if (type.equalsIgnoreCase("json")) {
-                                //如果是json类型,将其进行转换
                                 Object mode = JSON.parse(record.getColumn(i).asString());
                                 data.put(name, JSON.toJSON(mode));
                             }
@@ -396,7 +394,6 @@ public class MongoDBWriter
                 dataList.add(data);
             }
 
-            // 如果存在重复的值覆盖
             if ("update".equals(writeMode)) {
                 List<ReplaceOneModel<BasicDBObject>> replaceOneModelList = new ArrayList<>();
                 for (BasicDBObject data : dataList) {

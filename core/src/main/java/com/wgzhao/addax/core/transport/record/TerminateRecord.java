@@ -19,14 +19,11 @@
 
 package com.wgzhao.addax.core.transport.record;
 
-import com.wgzhao.addax.common.element.Column;
-import com.wgzhao.addax.common.element.Record;
+import com.wgzhao.addax.core.element.Column;
+import com.wgzhao.addax.core.element.Record;
 
 import java.util.Map;
 
-/**
- * 作为标示 生产者已经完成生产的标志
- */
 public class TerminateRecord
         implements Record
 {

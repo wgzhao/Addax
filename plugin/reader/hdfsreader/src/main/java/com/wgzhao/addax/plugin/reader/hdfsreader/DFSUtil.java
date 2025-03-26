@@ -23,12 +23,12 @@ import com.alibaba.fastjson2.JSON;
 import com.alibaba.fastjson2.JSONObject;
 import com.google.common.base.Splitter;
 import com.google.common.collect.Iterables;
-import com.wgzhao.addax.common.base.Key;
-import com.wgzhao.addax.common.element.ColumnEntry;
-import com.wgzhao.addax.common.exception.AddaxException;
-import com.wgzhao.addax.common.plugin.RecordSender;
-import com.wgzhao.addax.common.plugin.TaskPluginCollector;
-import com.wgzhao.addax.common.util.Configuration;
+import com.wgzhao.addax.core.base.Key;
+import com.wgzhao.addax.core.element.ColumnEntry;
+import com.wgzhao.addax.core.exception.AddaxException;
+import com.wgzhao.addax.core.plugin.RecordSender;
+import com.wgzhao.addax.core.plugin.TaskPluginCollector;
+import com.wgzhao.addax.core.util.Configuration;
 import com.wgzhao.addax.storage.reader.StorageReaderUtil;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.hadoop.fs.FileStatus;
@@ -54,14 +54,14 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Set;
 
-import static com.wgzhao.addax.common.base.Key.COLUMN;
-import static com.wgzhao.addax.common.base.Key.HDFS_SITE_PATH;
-import static com.wgzhao.addax.common.base.Key.NULL_FORMAT;
-import static com.wgzhao.addax.common.spi.ErrorCode.CONFIG_ERROR;
-import static com.wgzhao.addax.common.spi.ErrorCode.EXECUTE_FAIL;
-import static com.wgzhao.addax.common.spi.ErrorCode.IO_ERROR;
-import static com.wgzhao.addax.common.spi.ErrorCode.LOGIN_ERROR;
-import static com.wgzhao.addax.common.spi.ErrorCode.NOT_SUPPORT_TYPE;
+import static com.wgzhao.addax.core.base.Key.COLUMN;
+import static com.wgzhao.addax.core.base.Key.HDFS_SITE_PATH;
+import static com.wgzhao.addax.core.base.Key.NULL_FORMAT;
+import static com.wgzhao.addax.core.spi.ErrorCode.CONFIG_ERROR;
+import static com.wgzhao.addax.core.spi.ErrorCode.EXECUTE_FAIL;
+import static com.wgzhao.addax.core.spi.ErrorCode.IO_ERROR;
+import static com.wgzhao.addax.core.spi.ErrorCode.LOGIN_ERROR;
+import static com.wgzhao.addax.core.spi.ErrorCode.NOT_SUPPORT_TYPE;
 
 /**
  * Created by mingya.wmy on 2015/8/12.
@@ -133,11 +133,11 @@ public class DFSUtil
     }
 
     /**
-     * 获取指定路径列表下符合条件的所有文件的绝对路径
+     * Gets all files in the specified source paths.
      *
-     * @param srcPaths 路径列表
-     * @param specifiedFileType 指定文件类型
-     * @return set of string
+     * @param srcPaths the list of source paths
+     * @param specifiedFileType the specified file type
+     * @return a set of all files in the source paths
      */
     public Set<String> getAllFiles(List<String> srcPaths, String specifiedFileType)
     {
@@ -170,7 +170,6 @@ public class DFSUtil
     {
         try {
             FileSystem hdfs = FileSystem.get(hadoopConf);
-            //判断hdfsPath是否包含正则符号
             if (hdfsPath.contains("*") || hdfsPath.contains("?")) {
                 Path path = new Path(hdfsPath);
                 FileStatus[] stats = hdfs.globStatus(path);
@@ -204,11 +203,10 @@ public class DFSUtil
 
         // If the network disconnected, this method will retry 45 times
         // each time the retry interval for 20 seconds
-        // 获取要读取的文件的根目录的所有二级子文件目录
         FileStatus[] stats = hdfs.listStatus(listFiles);
 
         for (FileStatus f : stats) {
-            // 判断是不是目录，如果是目录，递归调用
+            // if it is a directory, recursively call
             if (f.isDirectory()) {
                 LOG.info("The [{}] is directory, reading all files in the directory.", f.getPath());
                 getHDFSAllFilesNORegex(f.getPath().toString(), hdfs);

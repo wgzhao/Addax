@@ -19,8 +19,8 @@
 
 package com.wgzhao.addax.core.job.scheduler.processinner;
 
-import com.wgzhao.addax.common.exception.AddaxException;
-import com.wgzhao.addax.common.util.Configuration;
+import com.wgzhao.addax.core.exception.AddaxException;
+import com.wgzhao.addax.core.util.Configuration;
 import com.wgzhao.addax.core.job.scheduler.AbstractScheduler;
 import com.wgzhao.addax.core.statistics.container.communicator.AbstractContainerCommunicator;
 import com.wgzhao.addax.core.taskgroup.TaskGroupContainer;
@@ -30,7 +30,7 @@ import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
-import static com.wgzhao.addax.common.spi.ErrorCode.RUNTIME_ERROR;
+import static com.wgzhao.addax.core.spi.ErrorCode.RUNTIME_ERROR;
 
 public abstract class ProcessInnerScheduler
         extends AbstractScheduler

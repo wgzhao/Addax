@@ -107,7 +107,6 @@ public class ESClient
                 case 404:
                     return false;
                 case 401:
-                    // 无权访问
                 default:
                     log.warn(rst.getErrorMessage());
                     return false;
@@ -213,9 +212,6 @@ public class ESClient
         return true;
     }
 
-    /**
-     * 关闭JestClient客户端
-     */
     public void closeJestClient()
     {
         if (jestClient != null) {

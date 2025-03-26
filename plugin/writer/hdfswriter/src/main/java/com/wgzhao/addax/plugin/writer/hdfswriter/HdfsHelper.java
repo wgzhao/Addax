@@ -23,9 +23,9 @@ import com.alibaba.fastjson2.JSON;
 import com.alibaba.fastjson2.JSONObject;
 import com.google.common.base.Splitter;
 import com.google.common.collect.Iterables;
-import com.wgzhao.addax.common.base.Key;
-import com.wgzhao.addax.common.exception.AddaxException;
-import com.wgzhao.addax.common.util.Configuration;
+import com.wgzhao.addax.core.base.Key;
+import com.wgzhao.addax.core.exception.AddaxException;
+import com.wgzhao.addax.core.util.Configuration;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.hadoop.fs.CommonConfigurationKeys;
 import org.apache.hadoop.fs.FileStatus;
@@ -45,15 +45,15 @@ import java.io.IOException;
 import java.util.Objects;
 import java.util.Set;
 
-import static com.wgzhao.addax.common.base.Key.HAVE_KERBEROS;
-import static com.wgzhao.addax.common.base.Key.HDFS_SITE_PATH;
-import static com.wgzhao.addax.common.base.Key.KERBEROS_KEYTAB_FILE_PATH;
-import static com.wgzhao.addax.common.base.Key.KERBEROS_PRINCIPAL;
-import static com.wgzhao.addax.common.spi.ErrorCode.CONFIG_ERROR;
-import static com.wgzhao.addax.common.spi.ErrorCode.IO_ERROR;
-import static com.wgzhao.addax.common.spi.ErrorCode.LOGIN_ERROR;
-import static com.wgzhao.addax.common.spi.ErrorCode.NOT_SUPPORT_TYPE;
-import static com.wgzhao.addax.common.spi.ErrorCode.RUNTIME_ERROR;
+import static com.wgzhao.addax.core.base.Key.HAVE_KERBEROS;
+import static com.wgzhao.addax.core.base.Key.HDFS_SITE_PATH;
+import static com.wgzhao.addax.core.base.Key.KERBEROS_KEYTAB_FILE_PATH;
+import static com.wgzhao.addax.core.base.Key.KERBEROS_PRINCIPAL;
+import static com.wgzhao.addax.core.spi.ErrorCode.CONFIG_ERROR;
+import static com.wgzhao.addax.core.spi.ErrorCode.IO_ERROR;
+import static com.wgzhao.addax.core.spi.ErrorCode.LOGIN_ERROR;
+import static com.wgzhao.addax.core.spi.ErrorCode.NOT_SUPPORT_TYPE;
+import static com.wgzhao.addax.core.spi.ErrorCode.RUNTIME_ERROR;
 
 public class HdfsHelper
 {
@@ -130,13 +130,6 @@ public class HdfsHelper
         }
     }
 
-    /**
-     * 获取指定目录下的文件列表
-     *
-     * @param dir 需要搜索的目录
-     * @return 文件数组，文件是全路径，
-     * eg：hdfs://10.101.204.12:9000/user/hive/warehouse/writer.db/text/test.txt
-     */
     public Path[] hdfsDirList(String dir)
     {
         Path path = new Path(dir);
@@ -253,7 +246,6 @@ public class HdfsHelper
         LOG.info("Finish moving file(s).");
     }
 
-    //关闭FileSystem
     public void closeFileSystem()
     {
         try {
@@ -265,7 +257,6 @@ public class HdfsHelper
         }
     }
 
-    // compress 已经转为大写
     public Class<? extends CompressionCodec> getCompressCodec(String compress)
     {
         compress = compress.toUpperCase();

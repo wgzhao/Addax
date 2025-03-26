@@ -19,12 +19,12 @@
 
 package com.wgzhao.addax.plugin.writer.hbase11xwriter;
 
-import com.wgzhao.addax.common.base.HBaseKey;
-import com.wgzhao.addax.common.element.DoubleColumn;
-import com.wgzhao.addax.common.element.LongColumn;
-import com.wgzhao.addax.common.element.Record;
-import com.wgzhao.addax.common.exception.AddaxException;
-import com.wgzhao.addax.common.util.Configuration;
+import com.wgzhao.addax.core.base.HBaseKey;
+import com.wgzhao.addax.core.element.DoubleColumn;
+import com.wgzhao.addax.core.element.LongColumn;
+import com.wgzhao.addax.core.element.Record;
+import com.wgzhao.addax.core.exception.AddaxException;
+import com.wgzhao.addax.core.util.Configuration;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.Validate;
 import org.apache.hadoop.hbase.client.Durability;
@@ -37,8 +37,8 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
-import static com.wgzhao.addax.common.spi.ErrorCode.CONFIG_ERROR;
-import static com.wgzhao.addax.common.spi.ErrorCode.ILLEGAL_VALUE;
+import static com.wgzhao.addax.core.spi.ErrorCode.CONFIG_ERROR;
+import static com.wgzhao.addax.core.spi.ErrorCode.ILLEGAL_VALUE;
 
 public class NormalTask
         extends HbaseAbstractTask
@@ -79,7 +79,6 @@ public class NormalTask
                         String.format("The field[index] of column is out-range, it should be less than %s. actually got %s.", record.getColumnNumber(), index));
             }
             byte[] columnBytes = getColumnByte(columnType, record.getColumn(index));
-            //columnBytes 为null忽略这列
             if (null != columnBytes) {
                 put.addColumn(Bytes.toBytes(cfAndQualifier[0]), Bytes.toBytes(cfAndQualifier[1]), columnBytes);
             }
@@ -115,14 +114,12 @@ public class NormalTask
         int index = versionColumn.getInt(HBaseKey.INDEX);
         long timestamp;
         if (index == -1) {
-            //指定时间作为版本
             timestamp = versionColumn.getLong(HBaseKey.VALUE);
             if (timestamp < 0) {
                 throw AddaxException.asAddaxException(ILLEGAL_VALUE, "Illegal timestamp version");
             }
         }
         else {
-            //指定列作为版本,long/doubleColumn直接record.asLong, 其它类型尝试用yyyy-MM-dd HH:mm:ss,yyyy-MM-dd HH:mm:ss SSS去format
             if (index >= record.getColumnNumber()) {
                 throw AddaxException.asAddaxException(CONFIG_ERROR,
                         String.format("The field[index] of versionColumn is out-range, it should be less than %s. actually got %s.", record.getColumnNumber(), index));
@@ -145,7 +142,7 @@ public class NormalTask
                         date = dfSeconds.parse(record.getColumn(index).asString());
                     }
                     catch (ParseException e1) {
-                        LOG.info(String.format("The value of version %s can not parsed as Date type with 'yyyy-MM-dd HH:mm:ss' and 'yyyy-MM-dd HH:mm:ss SSS' format", index));
+                        LOG.info("The value of version {} can not parsed as Date type with 'yyyy-MM-dd HH:mm:ss' and 'yyyy-MM-dd HH:mm:ss SSS' format", index);
                         throw AddaxException.asAddaxException(ILLEGAL_VALUE, e1);
                     }
                 }

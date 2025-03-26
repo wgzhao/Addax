@@ -1,15 +1,15 @@
 package com.wgzhao.addax.plugin.writer.starrockswriter;
 
-import com.wgzhao.addax.common.exception.AddaxException;
-import com.wgzhao.addax.common.util.Configuration;
+import com.wgzhao.addax.core.exception.AddaxException;
+import com.wgzhao.addax.core.util.Configuration;
 
 import java.io.Serializable;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-import static com.wgzhao.addax.common.spi.ErrorCode.CONFIG_ERROR;
-import static com.wgzhao.addax.common.spi.ErrorCode.REQUIRED_VALUE;
+import static com.wgzhao.addax.core.spi.ErrorCode.CONFIG_ERROR;
+import static com.wgzhao.addax.core.spi.ErrorCode.REQUIRED_VALUE;
 
 public class StarRocksWriterOptions
         implements Serializable
@@ -168,8 +168,7 @@ public class StarRocksWriterOptions
         List<String> urlList = getLoadUrlList();
         for (String host : urlList) {
             if (host.split(":").length < 2) {
-                throw AddaxException.asAddaxException(CONFIG_ERROR,
-                        "loadUrl的格式不正确，请输入 `fe_ip:fe_http_ip;fe_ip:fe_http_ip`。");
+                throw AddaxException.asAddaxException(CONFIG_ERROR, "The loadUrl format is incorrect, please input 'fe_ip:fe_http_ip;fe_ip:fe_http_ip'.");
             }
         }
     }

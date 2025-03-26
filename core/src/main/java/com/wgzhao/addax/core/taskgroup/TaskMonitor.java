@@ -19,8 +19,8 @@
 
 package com.wgzhao.addax.core.taskgroup;
 
-import com.wgzhao.addax.common.spi.ErrorCode;
-import com.wgzhao.addax.common.exception.AddaxException;
+import com.wgzhao.addax.core.spi.ErrorCode;
+import com.wgzhao.addax.core.exception.AddaxException;
 import com.wgzhao.addax.core.meta.State;
 import com.wgzhao.addax.core.statistics.communication.Communication;
 import com.wgzhao.addax.core.statistics.communication.CommunicationTool;
@@ -47,7 +47,6 @@ public class TaskMonitor {
     }
 
     public void registerTask(Integer taskId, Communication communication) {
-        //如果task已经finish，直接返回
         if (communication.isFinished()) {
             return;
         }
@@ -59,7 +58,6 @@ public class TaskMonitor {
     }
 
     public void report(Integer taskId, Communication communication) {
-        //如果task已经finish，直接返回
         if (communication.isFinished()) {
             return;
         }
@@ -73,9 +71,7 @@ public class TaskMonitor {
 
     public static class TaskCommunication {
         private final Integer taskId;
-        //记录最后更新的communication
         private long lastAllReadRecords;
-        //只有第一次，或者统计变更时才会更新TS
         private long lastUpdateCommunicationTS;
         private long ttl;
 
@@ -89,7 +85,6 @@ public class TaskMonitor {
         public void report(Communication communication) {
 
             ttl = System.currentTimeMillis();
-            //采集的数量增长，则变更当前记录, 优先判断这个条件，因为目的是不卡住，而不是expired
             if (CommunicationTool.getTotalReadRecords(communication) > lastAllReadRecords) {
                 lastAllReadRecords = CommunicationTool.getTotalReadRecords(communication);
                 lastUpdateCommunicationTS = ttl;

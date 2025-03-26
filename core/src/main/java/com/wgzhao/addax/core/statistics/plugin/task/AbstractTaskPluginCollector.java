@@ -19,17 +19,17 @@
 
 package com.wgzhao.addax.core.statistics.plugin.task;
 
-import com.wgzhao.addax.common.constant.PluginType;
-import com.wgzhao.addax.common.element.Record;
-import com.wgzhao.addax.common.exception.AddaxException;
-import com.wgzhao.addax.common.plugin.TaskPluginCollector;
-import com.wgzhao.addax.common.util.Configuration;
+import com.wgzhao.addax.core.constant.PluginType;
+import com.wgzhao.addax.core.element.Record;
+import com.wgzhao.addax.core.exception.AddaxException;
+import com.wgzhao.addax.core.plugin.TaskPluginCollector;
+import com.wgzhao.addax.core.util.Configuration;
 import com.wgzhao.addax.core.statistics.communication.Communication;
 import com.wgzhao.addax.core.statistics.communication.CommunicationTool;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import static com.wgzhao.addax.common.spi.ErrorCode.RUNTIME_ERROR;
+import static com.wgzhao.addax.core.spi.ErrorCode.RUNTIME_ERROR;
 
 /**
  * Created by jingxing on 14-9-11.
@@ -91,7 +91,7 @@ public abstract class AbstractTaskPluginCollector
             this.communication.increaseCounter(CommunicationTool.WRITE_FAILED_BYTES, dirtyRecord.getByteSize());
         }
         else {
-            throw AddaxException.asAddaxException(RUNTIME_ERROR, String.format("不知道的插件类型[%s].", this.pluginType));
+            throw AddaxException.asAddaxException(RUNTIME_ERROR, "Unknown plugin type " + this.pluginType);
         }
     }
 }

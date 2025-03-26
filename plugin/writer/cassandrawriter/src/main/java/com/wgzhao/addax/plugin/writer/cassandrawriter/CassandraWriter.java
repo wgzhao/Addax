@@ -19,12 +19,12 @@
 
 package com.wgzhao.addax.plugin.writer.cassandrawriter;
 
-import com.wgzhao.addax.common.element.Column;
-import com.wgzhao.addax.common.element.Record;
-import com.wgzhao.addax.common.exception.AddaxException;
-import com.wgzhao.addax.common.plugin.RecordReceiver;
-import com.wgzhao.addax.common.spi.Writer;
-import com.wgzhao.addax.common.util.Configuration;
+import com.wgzhao.addax.core.element.Column;
+import com.wgzhao.addax.core.element.Record;
+import com.wgzhao.addax.core.exception.AddaxException;
+import com.wgzhao.addax.core.plugin.RecordReceiver;
+import com.wgzhao.addax.core.spi.Writer;
+import com.wgzhao.addax.core.util.Configuration;
 import com.datastax.driver.core.BatchStatement;
 import com.datastax.driver.core.BatchStatement.Type;
 import com.datastax.driver.core.BoundStatement;
@@ -48,8 +48,8 @@ import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 import static com.datastax.driver.core.querybuilder.QueryBuilder.timestamp;
-import static com.wgzhao.addax.common.spi.ErrorCode.CONFIG_ERROR;
-import static com.wgzhao.addax.common.spi.ErrorCode.EXECUTE_FAIL;
+import static com.wgzhao.addax.core.spi.ErrorCode.CONFIG_ERROR;
+import static com.wgzhao.addax.core.spi.ErrorCode.EXECUTE_FAIL;
 
 /**
  * Created by mazhenlin on 2019/8/19.
@@ -108,14 +108,10 @@ public class CassandraWriter
                 Record record;
                 while ((record = lineReceiver.getFromReader()) != null) {
                     if (record.getColumnNumber() != columnNumber) {
-                        // 源头读取字段列数与目的表字段写入列数不相等，直接报错
                         throw AddaxException
                                 .asAddaxException(
                                         CONFIG_ERROR,
-                                        String.format(
-                                                "列配置信息有错误. 因为您配置的任务中，源头读取字段数:%s 与 目的表要写入的字段数:%s 不相等. 请检查您的配置并作出修改.",
-                                                record.getColumnNumber(),
-                                                this.columnNumber));
+                                        "The reader column number(" + record.getColumnNumber() + ") is not equal to the writer column number(" + this.columnNumber + ")");
                     }
 
                     BoundStatement boundStmt = statement.bind();
@@ -156,24 +152,23 @@ public class CassandraWriter
                                     session.execute(batchStatement);
                                 }
                                 catch (Exception e) {
-                                    LOG.error("batch写入失败，尝试逐条写入.", e);
+                                    LOG.error("failed to write in batch, try to write one by one", e);
                                     for (BoundStatement stmt : bufferedWrite) {
                                         session.execute(stmt);
                                     }
                                 }
-                                ///LOG.info("batch finished. size = " + bufferedWrite.size());
                                 bufferedWrite.clear();
                             }
                         }
                     }
                 }
-                if (unConfirmedWrite != null && unConfirmedWrite.size() > 0) {
+                if (unConfirmedWrite != null && !unConfirmedWrite.isEmpty()) {
                     for (ResultSetFuture write : unConfirmedWrite) {
                         write.getUninterruptibly(10000, TimeUnit.MILLISECONDS);
                     }
                     unConfirmedWrite.clear();
                 }
-                if (bufferedWrite != null && bufferedWrite.size() > 0) {
+                if (bufferedWrite != null && !bufferedWrite.isEmpty()) {
                     BatchStatement batchStatement = new BatchStatement(Type.UNLOGGED);
                     batchStatement.addAll(bufferedWrite);
                     session.execute(batchStatement);
@@ -231,8 +226,7 @@ public class CassandraWriter
                     if (writeTimeCol != -1) {
                         throw AddaxException
                                 .asAddaxException(
-                                        CONFIG_ERROR,
-                                        "列配置信息有错误. 只能有一个时间戳列(writetime())");
+                                        CONFIG_ERROR,"Only one timestamp column(writetime()) is allowed.");
                     }
                     writeTimeCol = columnTypes.size();
                     continue;
@@ -242,10 +236,7 @@ public class CassandraWriter
                 if (col == null) {
                     throw AddaxException
                             .asAddaxException(
-                                    CONFIG_ERROR,
-                                    String.format(
-                                            "列配置信息有错误. 表中未找到列名 '%s' .",
-                                            colunmnName));
+                                    CONFIG_ERROR, "The column name '" + colunmnName + "' is not found in table.");
                 }
                 columnTypes.add(col.getType());
             }

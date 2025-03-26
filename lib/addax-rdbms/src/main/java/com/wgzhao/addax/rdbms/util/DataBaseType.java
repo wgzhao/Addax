@@ -24,11 +24,8 @@ package com.wgzhao.addax.rdbms.util;
 import java.util.TimeZone;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import static com.wgzhao.addax.common.base.Constant.SQL_RESERVED_WORDS;
+import static com.wgzhao.addax.core.base.Constant.SQL_RESERVED_WORDS;
 
-/**
- * refer:<a href="http://blog.csdn.net/ring0hx/article/details/6152528">...</a>
- */
 public enum DataBaseType
 {
     MySql("mysql", "com.mysql.cj.jdbc.Driver"),
@@ -39,13 +36,13 @@ public enum DataBaseType
     SQLite("sqlite", "org.sqlite.JDBC"),
     SQLServer("sqlserver", "com.microsoft.sqlserver.jdbc.SQLServerDriver"),
     PostgreSQL("postgresql", "org.postgresql.Driver"),
-    RDBMS_READER("rdbms_reader", "com.wgzhao.addax.rdbms.util.DataBaseType"),
-    RDBMS_WRITER("rdbms_writer", "com.wgzhao.addax.rdbms.util.DataBaseType"),
+    RDBMS("rdbms", DataBaseType.class.getName()),
+    RDBMS_READER("rdbms_reader", DataBaseType.class.getName()),
+    RDBMS_WRITER("rdbms_writer", DataBaseType.class.getName()),
     DB2("db2", "com.ibm.db2.jcc.DB2Driver"),
     Inceptor2("inceptor2", "org.apache.hive.jdbc.HiveDriver"),
     InfluxDB("influxdb", "org.influxdb.influxdb-java"),
     Impala("impala", "com.cloudera.impala.jdbc41.Driver"),
-    //    TDengine("tdengine","com.taosdata.jdbc.rs.RestfulDriver"),
     TDengine("tdengine", "com.taosdata.jdbc.TSDBDriver"),
     Trino("trino", "io.trino.jdbc.TrinoDriver"),
     Sybase("sybase", "com.sybase.jdbc4.jdbc.SybDriver"),
@@ -73,7 +70,7 @@ public enum DataBaseType
     }
 
     /**
-     * 注意：从JDBC连接串中识别出 ip/host 信息.未识别到则返回 null.
+     * extract IP/host from jdbc url, return null if not recognize
      * <code>
      * jdbc:phoenix:thin:url=dn01,dn02:6667
      * jdbc:phoenix:dn01,dn02,dn03:2181:/hbase-secure:trino@DOMAIN.COM:/etc/trino/trino.headless.keytab
@@ -161,6 +158,10 @@ public enum DataBaseType
         if (columnName.matches("\\d+")) {
             return columnName;
         }
+        // if the column is null string, means use null as column value
+        if (columnName.equals("null")) {
+            return columnName;
+        }
         if (this == MySql || this == Hive) {
             return "`" + columnName.replace("`", "``") + "`";
         }
@@ -171,11 +172,6 @@ public enum DataBaseType
             return columnName.startsWith("[") ? columnName: "[" + columnName + "]";
         }
         return columnName;
-    }
-
-    public String quoteTableName(String tableName)
-    {
-        return quoteColumnName(tableName);
     }
 
     public String getTypeName()

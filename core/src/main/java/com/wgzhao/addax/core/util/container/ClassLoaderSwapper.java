@@ -20,10 +20,10 @@
 package com.wgzhao.addax.core.util.container;
 
 /**
- * Created by jingxing on 14-8-29.
- * <p>
- * 为避免jar冲突，比如hbase可能有多个版本的读写依赖jar包，JobContainer和TaskGroupContainer
- * 就需要脱离当前classLoader去加载这些jar包，执行完成后，又退回到原来classLoader上继续执行接下来的代码
+ * for save and restore current thread classLoader
+ * to avoid jar conflict, for example, hbase may have multiple versions of read and write dependent jar packages,
+ * JobContainer and TaskGroupContainer need to load these jar packages out of the current classLoader,
+ * and then return to the original classLoader to continue executing the next code
  */
 public final class ClassLoaderSwapper
 {
@@ -48,7 +48,7 @@ public final class ClassLoaderSwapper
     }
 
     /**
-     * 将当前线程的类加载器设置为保存的类加载
+     * restore current thread classLoader
      */
     public void restoreCurrentThreadClassLoader()
     {

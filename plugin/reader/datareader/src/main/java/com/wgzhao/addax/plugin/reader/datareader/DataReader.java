@@ -21,19 +21,19 @@ package com.wgzhao.addax.plugin.reader.datareader;
 
 import com.alibaba.fastjson2.JSONObject;
 import com.google.common.base.CaseFormat;
-import com.wgzhao.addax.common.base.Key;
-import com.wgzhao.addax.common.element.BoolColumn;
-import com.wgzhao.addax.common.element.BytesColumn;
-import com.wgzhao.addax.common.element.Column;
-import com.wgzhao.addax.common.element.DateColumn;
-import com.wgzhao.addax.common.element.DoubleColumn;
-import com.wgzhao.addax.common.element.LongColumn;
-import com.wgzhao.addax.common.element.Record;
-import com.wgzhao.addax.common.element.StringColumn;
-import com.wgzhao.addax.common.exception.AddaxException;
-import com.wgzhao.addax.common.plugin.RecordSender;
-import com.wgzhao.addax.common.spi.Reader;
-import com.wgzhao.addax.common.util.Configuration;
+import com.wgzhao.addax.core.base.Key;
+import com.wgzhao.addax.core.element.BoolColumn;
+import com.wgzhao.addax.core.element.BytesColumn;
+import com.wgzhao.addax.core.element.Column;
+import com.wgzhao.addax.core.element.DateColumn;
+import com.wgzhao.addax.core.element.DoubleColumn;
+import com.wgzhao.addax.core.element.LongColumn;
+import com.wgzhao.addax.core.element.Record;
+import com.wgzhao.addax.core.element.StringColumn;
+import com.wgzhao.addax.core.exception.AddaxException;
+import com.wgzhao.addax.core.plugin.RecordSender;
+import com.wgzhao.addax.core.spi.Reader;
+import com.wgzhao.addax.core.util.Configuration;
 import com.wgzhao.addax.plugin.reader.datareader.util.AddressUtil;
 import com.wgzhao.addax.plugin.reader.datareader.util.BankUtil;
 import com.wgzhao.addax.plugin.reader.datareader.util.CompanyUtil;
@@ -62,15 +62,15 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
-import static com.wgzhao.addax.common.base.Constant.DEFAULT_DATE_FORMAT;
-import static com.wgzhao.addax.common.base.Key.COLUMN;
-import static com.wgzhao.addax.common.base.Key.DATE_FORMAT;
-import static com.wgzhao.addax.common.base.Key.SLICE_RECORD_COUNT;
-import static com.wgzhao.addax.common.base.Key.TYPE;
-import static com.wgzhao.addax.common.base.Key.VALUE;
-import static com.wgzhao.addax.common.spi.ErrorCode.ILLEGAL_VALUE;
-import static com.wgzhao.addax.common.spi.ErrorCode.NOT_SUPPORT_TYPE;
-import static com.wgzhao.addax.common.spi.ErrorCode.REQUIRED_VALUE;
+import static com.wgzhao.addax.core.base.Constant.DEFAULT_DATE_FORMAT;
+import static com.wgzhao.addax.core.base.Key.COLUMN;
+import static com.wgzhao.addax.core.base.Key.DATE_FORMAT;
+import static com.wgzhao.addax.core.base.Key.SLICE_RECORD_COUNT;
+import static com.wgzhao.addax.core.base.Key.TYPE;
+import static com.wgzhao.addax.core.base.Key.VALUE;
+import static com.wgzhao.addax.core.spi.ErrorCode.ILLEGAL_VALUE;
+import static com.wgzhao.addax.core.spi.ErrorCode.NOT_SUPPORT_TYPE;
+import static com.wgzhao.addax.core.spi.ErrorCode.REQUIRED_VALUE;
 import static com.wgzhao.addax.plugin.reader.datareader.DataKey.RULE;
 
 public class DataReader
@@ -312,11 +312,11 @@ public class DataReader
                         String.format("random 函数不合法[%s], 混淆函数random的参数需要第一个小于等于第二个:%s, %s",
                                 value, param1, param2));
             }
-            config.set(DataKey.MIXUP_FUNCTION_PARAM1, param1Int);
-            config.set(DataKey.MIXUP_FUNCTION_PARAM2, param2Int);
+            config.set(DataKey.MIX_FUNCTION_PARAM1, param1Int);
+            config.set(DataKey.MIX_FUNCTION_PARAM2, param2Int);
             if (split.length == 3) {
                 int scale = Integer.parseInt(split[2].trim());
-                config.set(DataKey.MIXUP_FUNCTION_SCALE, scale);
+                config.set(DataKey.MIX_FUNCTION_SCALE, scale);
             }
 //                this.originalConfig.set(DataConstant.HAVE_MIXUP_FUNCTION, true);
         }
@@ -464,9 +464,9 @@ public class DataReader
                 if ("null".equals(columnValue)) {
                     return null;
                 }
-                long param1Int = eachColumnConfig.getLong(DataKey.MIXUP_FUNCTION_PARAM1, 0L);
-                long param2Int = eachColumnConfig.getLong(DataKey.MIXUP_FUNCTION_PARAM2, 1L);
-                int scale = eachColumnConfig.getInt(DataKey.MIXUP_FUNCTION_SCALE, -1);
+                long param1Int = eachColumnConfig.getLong(DataKey.MIX_FUNCTION_PARAM1, 0L);
+                long param2Int = eachColumnConfig.getLong(DataKey.MIX_FUNCTION_PARAM2, 1L);
+                int scale = eachColumnConfig.getInt(DataKey.MIX_FUNCTION_SCALE, -1);
                 // Instantiate a generator with a factory method.
                 UniformRandomProvider rng = RandomSource.XO_RO_SHI_RO_128_PP.create();
                 switch (columnType) {

@@ -1,11 +1,11 @@
 package com.wgzhao.addax.plugin.writer.paimonwriter;
 
 import com.alibaba.fastjson2.JSON;
-import com.wgzhao.addax.common.element.Column;
-import com.wgzhao.addax.common.element.Record;
-import com.wgzhao.addax.common.plugin.RecordReceiver;
-import com.wgzhao.addax.common.spi.Writer;
-import com.wgzhao.addax.common.util.Configuration;
+import com.wgzhao.addax.core.element.Column;
+import com.wgzhao.addax.core.element.Record;
+import com.wgzhao.addax.core.plugin.RecordReceiver;
+import com.wgzhao.addax.core.spi.Writer;
+import com.wgzhao.addax.core.util.Configuration;
 import org.apache.hadoop.fs.FileSystem;
 import org.apache.paimon.catalog.Catalog;
 import org.apache.paimon.catalog.CatalogContext;
@@ -29,8 +29,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-import static com.wgzhao.addax.common.base.Key.KERBEROS_KEYTAB_FILE_PATH;
-import static com.wgzhao.addax.common.base.Key.KERBEROS_PRINCIPAL;
+import static com.wgzhao.addax.core.base.Key.KERBEROS_KEYTAB_FILE_PATH;
+import static com.wgzhao.addax.core.base.Key.KERBEROS_PRINCIPAL;
 
 public class PaimonWriter
         extends Writer
@@ -124,7 +124,6 @@ public class PaimonWriter
     {
 
         private static final Logger log = LoggerFactory.getLogger(Task.class);
-        private Configuration conf = null;
         private BatchWriteBuilder writeBuilder = null;
         private Integer batchSize = 1000;
         private List<DataField> columnList = new ArrayList<>();
@@ -158,11 +157,11 @@ public class PaimonWriter
         @Override
         public void init()
         {
-            this.conf = super.getPluginJobConf();
+            Configuration conf = super.getPluginJobConf();
 
             batchSize = conf.getInt("batchSize", 1000);
 
-            Options options = PaimonHelper.getOptions(this.conf);
+            Options options = PaimonHelper.getOptions(conf);
             CatalogContext context = PaimonHelper.getCatalogContext(options);
 
             if ("kerberos".equals(options.get("hadoop.security.authentication"))) {
@@ -180,8 +179,8 @@ public class PaimonWriter
 
             try (Catalog catalog = CatalogFactory.createCatalog(context)) {
 
-                String dbName = this.conf.getString("dbName");
-                String tableName = this.conf.getString("tableName");
+                String dbName = conf.getString("dbName");
+                String tableName = conf.getString("tableName");
                 Identifier identifier = Identifier.create(dbName, tableName);
 
                 Table table = catalog.getTable(identifier);
@@ -219,7 +218,6 @@ public class PaimonWriter
                     }
                     String columnName = columnList.get(i).name();
                     DataType columnType = typeList.get(i);
-                    //如果是数组类型，那它传入的必是字符串类型
                     if (columnType.getTypeRoot().equals(DataTypeRoot.ARRAY)) {
                         if (null == column.asString()) {
                             data.setField(i, null);
@@ -284,11 +282,11 @@ public class PaimonWriter
                                     data.setField(i, new GenericMap(JSON.parseObject(column.asString(), Map.class)));
                                 }
                                 catch (Exception e) {
-                                    getTaskPluginCollector().collectDirtyRecord(record, String.format("MAP类型解析失败 [%s:%s] exception: %s", columnName, column.toString(), e));
+                                    getTaskPluginCollector().collectDirtyRecord(record, "failed to parse the '" + column.asString() + "' to map: " + e);
                                 }
                                 break;
                             default:
-                                getTaskPluginCollector().collectDirtyRecord(record, "类型错误:不支持的类型:" + columnType + " " + columnName);
+                                getTaskPluginCollector().collectDirtyRecord(record, "The column type is not supported: " + columnType.getTypeRoot());
                         }
                     }
                 }

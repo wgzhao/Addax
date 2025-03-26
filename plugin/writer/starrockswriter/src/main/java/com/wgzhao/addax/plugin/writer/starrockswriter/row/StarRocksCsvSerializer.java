@@ -1,6 +1,6 @@
 package com.wgzhao.addax.plugin.writer.starrockswriter.row;
 
-import com.wgzhao.addax.common.element.Record;
+import com.wgzhao.addax.core.element.Record;
 
 public class StarRocksCsvSerializer
         extends StarRocksBaseSerializer

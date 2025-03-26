@@ -24,12 +24,12 @@ import com.alibaba.fastjson2.JSONArray;
 import com.alibaba.fastjson2.JSONObject;
 import com.alibaba.fastjson2.JSONPath;
 import com.alibaba.fastjson2.JSONWriter;
-import com.wgzhao.addax.common.element.Record;
-import com.wgzhao.addax.common.element.StringColumn;
-import com.wgzhao.addax.common.exception.AddaxException;
-import com.wgzhao.addax.common.plugin.RecordSender;
-import com.wgzhao.addax.common.spi.Reader;
-import com.wgzhao.addax.common.util.Configuration;
+import com.wgzhao.addax.core.element.Record;
+import com.wgzhao.addax.core.element.StringColumn;
+import com.wgzhao.addax.core.exception.AddaxException;
+import com.wgzhao.addax.core.plugin.RecordSender;
+import com.wgzhao.addax.core.spi.Reader;
+import com.wgzhao.addax.core.util.Configuration;
 import org.apache.hc.client5.http.auth.AuthScope;
 import org.apache.hc.client5.http.auth.UsernamePasswordCredentials;
 import org.apache.hc.client5.http.fluent.Content;
@@ -41,13 +41,14 @@ import org.apache.hc.client5.http.impl.classic.HttpClientBuilder;
 import org.apache.hc.client5.http.impl.classic.HttpClients;
 import org.apache.hc.client5.http.impl.io.PoolingHttpClientConnectionManager;
 import org.apache.hc.client5.http.impl.io.PoolingHttpClientConnectionManagerBuilder;
-import org.apache.hc.client5.http.protocol.HttpClientContext;
 import org.apache.hc.client5.http.ssl.DefaultClientTlsStrategy;
 import org.apache.hc.client5.http.ssl.NoopHostnameVerifier;
 import org.apache.hc.core5.http.HttpHost;
 import org.apache.hc.core5.net.URIBuilder;
 import org.apache.hc.core5.ssl.SSLContexts;
 import org.apache.hc.core5.ssl.TrustStrategy;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.net.ssl.SSLContext;
 
@@ -60,14 +61,13 @@ import java.security.KeyManagementException;
 import java.security.KeyStoreException;
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 
-import static com.wgzhao.addax.common.spi.ErrorCode.ILLEGAL_VALUE;
-import static com.wgzhao.addax.common.spi.ErrorCode.REQUIRED_VALUE;
+import static com.wgzhao.addax.core.spi.ErrorCode.ILLEGAL_VALUE;
+import static com.wgzhao.addax.core.spi.ErrorCode.REQUIRED_VALUE;
 
 public class HttpReader
         extends Reader
@@ -101,11 +101,16 @@ public class HttpReader
     public static class Task
             extends Reader.Task
     {
+        private static final Logger LOG = LoggerFactory.getLogger(Task.class);
+
+        private static final int DEFAULT_PAGE_INDEX = 1;
+        private static final int DEFAULT_PAGE_SIZE = 20;
         private Configuration readerSliceConfig = null;
         private URIBuilder uriBuilder;
         private String username;
         private String password;
-        private final BasicCredentialsProvider credsProvider = new BasicCredentialsProvider();
+        private String token;
+        private BasicCredentialsProvider credsProvider;
         private HttpHost proxy = null;
         private Request request;
         private String method;
@@ -116,6 +121,7 @@ public class HttpReader
             this.readerSliceConfig = this.getPluginJobConf();
             this.username = readerSliceConfig.getString(HttpKey.USERNAME, null);
             this.password = readerSliceConfig.getString(HttpKey.PASSWORD, null);
+            this.token = readerSliceConfig.getString(HttpKey.TOKEN, null);
             this.method = readerSliceConfig.getString(HttpKey.METHOD, "get");
             Configuration conn = readerSliceConfig.getConfiguration(HttpKey.CONNECTION);
             uriBuilder = new URIBuilder(URI.create(conn.getString(HttpKey.URL)));
@@ -138,30 +144,32 @@ public class HttpReader
         public void startRead(RecordSender recordSender)
         {
             boolean isPage = readerSliceConfig.getBool(HttpKey.IS_PAGE, false);
+            // the pageSize key, different pagination API may have different key, such as pageSize, page_size, size
             String paramPageSize = HttpKey.PAGE_SIZE;
-            int valPageSize = 20;
+            // the pageIndex key, different pagination API may have different key, such as pageIndex, page_index, page
             String paramPageIndex = HttpKey.PAGE_INDEX;
-            int valPageIndex = 1;
+            // the pageSize value
+            int valPageSize = DEFAULT_PAGE_SIZE;
+            // the first page index
+            int valPageIndex = DEFAULT_PAGE_INDEX;
             if (isPage) {
-                Map<String, Object> pageParams = readerSliceConfig.getMap(HttpKey.PAGE_PARAMS);
+                Configuration pageParams = readerSliceConfig.getConfiguration(HttpKey.PAGE_PARAMS);
                 if (pageParams != null) {
-                    if (pageParams.containsKey(HttpKey.PAGE_INDEX)) {
-                        Map<String, Object> p = (Map<String, Object>) pageParams.get(HttpKey.PAGE_INDEX);
-                        paramPageIndex = p.get("key").toString();
-                        valPageIndex = Integer.parseInt(p.get("value").toString());
+                    if (pageParams.getString(HttpKey.PAGE_INDEX, null) != null) {
+                        Map<String, Object> p = pageParams.getMap(HttpKey.PAGE_INDEX);
+                        paramPageIndex = p.getOrDefault("key", HttpKey.PAGE_INDEX).toString();
+                        valPageIndex = Integer.parseInt(p.getOrDefault("value", DEFAULT_PAGE_INDEX).toString());
                     }
-                    if (pageParams.containsKey(HttpKey.PAGE_SIZE)) {
-                        Map<String, Object> p = (Map<String, Object>) pageParams.get(HttpKey.PAGE_SIZE);
-                        paramPageSize = p.get("key").toString();
-                        valPageSize = Integer.parseInt(p.get("value").toString());
+                    if (pageParams.getString(HttpKey.PAGE_SIZE, null) != null) {
+                        Map<String, Object> p = pageParams.getMap(HttpKey.PAGE_SIZE);
+                        paramPageSize = p.getOrDefault("key", HttpKey.PAGE_SIZE).toString();
+                        valPageSize = Integer.parseInt(p.getOrDefault("value", DEFAULT_PAGE_SIZE).toString());
                     }
                 }
-            }
-            if (isPage) {
                 int realPageSize;
+                uriBuilder.setParameter(paramPageSize, String.valueOf(valPageSize));
                 while (true) {
                     uriBuilder.setParameter(paramPageIndex, String.valueOf(valPageIndex));
-                    uriBuilder.setParameter(paramPageSize, String.valueOf(valPageSize));
                     realPageSize = getRecords(recordSender);
                     if (realPageSize < valPageSize) {
                         // means no more data
@@ -187,6 +195,7 @@ public class HttpReader
             }
 
             try {
+                LOG.info("Requesting: {}", uriBuilder.build().toString());
                 request = Request.create(method, uriBuilder.build());
             }
             catch (URISyntaxException e) {
@@ -197,18 +206,17 @@ public class HttpReader
 
             String body = createCloseableHttpResponse().asString(charset);
             JSONArray jsonArray = null;
-            String key = readerSliceConfig.get(HttpKey.RESULT_KEY, null);
+            String key = readerSliceConfig.getString(HttpKey.RESULT_KEY, null);
             Object object;
-            if (key != null) {
-                object = JSON.parseObject(body).get(key);
+            if (key != null && !key.isEmpty()) {
+                object = JSONPath.eval(JSON.parse(body), "$." + key);
             }
             else {
                 object = JSON.parse(body);
             }
-            // 需要判断返回的结果仅仅是一条记录还是多条记录，如果是一条记录，则是一个map
-            // 否则是一个array
+            // judge the result is a single record or multiple records
+            // if it is a single record, it is a map, otherwise it is an array
             if (object instanceof JSONArray) {
-                // 有空值的情况下, toString会过滤掉，所以不能简单的使用 object.toString()方式
                 // https://github.com/wgzhao/Addax/issues/171
                 jsonArray = JSON.parseArray(JSONObject.toJSONString(object, JSONWriter.Feature.WriteMapNullValue));
             }
@@ -230,9 +238,9 @@ public class HttpReader
             Record record;
             JSONObject jsonObject = jsonArray.getJSONObject(0);
             if (columns.size() == 1 && "*".equals(columns.get(0))) {
-                // 没有给定key的情况下，提取JSON的第一层key作为字段处理
+                // if no key is given, extract the first layer key of JSON as the field
                 columns.remove(0);
-                columns.addAll((Collection<String>) JSONPath.eval(jsonObject, "$.e.keySet()"));
+                columns.addAll(jsonObject.keySet());
             }
             int i;
             for (i = 0; i < jsonArray.size(); i++) {
@@ -267,6 +275,7 @@ public class HttpReader
             this.proxy = new HttpHost(host.getScheme(), host.getHost(), host.getPort());
             if (proxyConf.getString(HttpKey.AUTH, null) != null) {
                 String[] auth = proxyConf.getString(HttpKey.AUTH).split(":");
+                credsProvider = new BasicCredentialsProvider();
                 credsProvider.setCredentials(
                         new AuthScope(proxy),
                         new UsernamePasswordCredentials(auth[0], auth[1].toCharArray())
@@ -276,11 +285,9 @@ public class HttpReader
 
         private Content createCloseableHttpResponse()
         {
-            Map<String, Object> headers = readerSliceConfig.getMap(HttpKey.HEADERS, new HashMap<>());
-            CloseableHttpClient httpClient;
-            headers.forEach((k, v) -> request.addHeader(k, v.toString()));
-            httpClient = createCloseableHttpClient();
-            try {
+            readerSliceConfig.getMap(HttpKey.HEADERS, new HashMap<>())
+                    .forEach((k, v) -> request.addHeader(k, v.toString()));
+            try(CloseableHttpClient httpClient = createCloseableHttpClient()) {
                 return Executor.newInstance(httpClient)
                         .execute(request)
                         .returnContent();
@@ -305,6 +312,11 @@ public class HttpReader
                 // Inject the credentials
                 credsProvider.setCredentials(new AuthScope(target), credentials);
             }
+
+            if (this.token != null) {
+                request.addHeader("Authorization", "Bearer " + token);
+            }
+
             if (credsProvider != null) {
                 httpClientBuilder.setDefaultCredentialsProvider(credsProvider);
             }

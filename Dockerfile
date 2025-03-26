@@ -1,24 +1,22 @@
 # define an alias
-FROM maven:3.6-jdk-8 as build
+FROM docker.m.daocloud.io/library/maven:3.8.3-jdk-8 AS build
 
 COPY . /src
 WORKDIR /src
 
-ARG type="basic"
-ENV package_type=$type
-
 RUN <<EOF
-    mvn clean package -P${package_type} -DskipTests 
-    mvn package assembly:single 
+    export MAVEN_OPTS="-DskipTests -Dmaven.javadoc.skip=true -Dmaven.source.skip=true -Dgpg.skip=true"
+    mvn clean package
+    mvn package -Pdistribution
     ./shrink_package.sh 
 EOF
 
-FROM openjdk:8u232-jre-stretch
+FROM docker.m.daocloud.io/library/openjdk:8u232-jre-stretch
 LABEL maintainer="wgzhao <wgzhao@gmail.com>"
-LABEL version="4.1.8"
+LABEL version="latest"
 LABEL description="Addax is a versatile open-source ETL tool that can seamlessly transfer data between various RDBMS and NoSQL databases, making it an ideal solution for data migration."
 
-COPY --from=build  /src/target/addax/addax-* /opt/addax/
+COPY --from=build  /src/target/addax-all-* /opt/addax/
 
 WORKDIR /opt/addax
 

@@ -19,22 +19,21 @@
 
 package com.wgzhao.addax.core.transport.transformer;
 
-import com.wgzhao.addax.common.element.Column;
-import com.wgzhao.addax.common.element.Record;
-import com.wgzhao.addax.common.element.StringColumn;
-import com.wgzhao.addax.common.exception.AddaxException;
-import com.wgzhao.addax.transformer.Transformer;
+import com.wgzhao.addax.core.element.Column;
+import com.wgzhao.addax.core.element.Record;
+import com.wgzhao.addax.core.element.StringColumn;
+import com.wgzhao.addax.core.exception.AddaxException;
 
 import java.util.Arrays;
 
-import static com.wgzhao.addax.common.spi.ErrorCode.ILLEGAL_VALUE;
-import static com.wgzhao.addax.common.spi.ErrorCode.RUNTIME_ERROR;
-import static com.wgzhao.addax.common.util.MathUtil.add;
-import static com.wgzhao.addax.common.util.MathUtil.divide;
-import static com.wgzhao.addax.common.util.MathUtil.mod;
-import static com.wgzhao.addax.common.util.MathUtil.multiply;
-import static com.wgzhao.addax.common.util.MathUtil.pow;
-import static com.wgzhao.addax.common.util.MathUtil.subtract;
+import static com.wgzhao.addax.core.spi.ErrorCode.ILLEGAL_VALUE;
+import static com.wgzhao.addax.core.spi.ErrorCode.RUNTIME_ERROR;
+import static com.wgzhao.addax.core.util.MathUtil.add;
+import static com.wgzhao.addax.core.util.MathUtil.divide;
+import static com.wgzhao.addax.core.util.MathUtil.mod;
+import static com.wgzhao.addax.core.util.MathUtil.multiply;
+import static com.wgzhao.addax.core.util.MathUtil.pow;
+import static com.wgzhao.addax.core.util.MathUtil.subtract;
 
 /**
  * no comments.

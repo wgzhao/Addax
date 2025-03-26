@@ -22,10 +22,10 @@
 package com.wgzhao.addax.rdbms.reader.util;
 
 import com.alibaba.fastjson2.JSON;
-import com.wgzhao.addax.common.base.Constant;
-import com.wgzhao.addax.common.base.Key;
-import com.wgzhao.addax.common.exception.AddaxException;
-import com.wgzhao.addax.common.util.Configuration;
+import com.wgzhao.addax.core.base.Constant;
+import com.wgzhao.addax.core.base.Key;
+import com.wgzhao.addax.core.exception.AddaxException;
+import com.wgzhao.addax.core.util.Configuration;
 import com.wgzhao.addax.rdbms.util.DBUtil;
 import com.wgzhao.addax.rdbms.util.DataBaseType;
 import org.apache.commons.lang3.StringUtils;
@@ -42,19 +42,17 @@ import java.util.Collections;
 import java.util.List;
 import java.util.StringJoiner;
 
-import static com.wgzhao.addax.common.spi.ErrorCode.CONFIG_ERROR;
+import static com.wgzhao.addax.core.spi.ErrorCode.CONFIG_ERROR;
 
 public class SingleTableSplitUtil
 {
     private static final Logger LOG = LoggerFactory.getLogger(SingleTableSplitUtil.class);
 
-    public static DataBaseType dataBaseType;
-
     private SingleTableSplitUtil()
     {
     }
 
-    public static List<Configuration> splitSingleTable(Configuration configuration, int adviceNum)
+    public static List<Configuration> splitSingleTable(DataBaseType dataBaseType, Configuration configuration, int adviceNum)
     {
         List<Configuration> pluginParams = new ArrayList<>();
         List<String> rangeList;
@@ -73,7 +71,7 @@ public class SingleTableSplitUtil
             return pluginParams;
         }
 
-        rangeList = genPkRangeSQLForGeneric(splitPkName, table, where, configuration, adviceNum);
+        rangeList = genPkRangeSQLForGeneric(dataBaseType, splitPkName, table, where, configuration, adviceNum);
 
         if (rangeList.isEmpty()) {
             //mean the split key only has null value
@@ -127,11 +125,12 @@ public class SingleTableSplitUtil
     /**
      * get the min and max value of the split key
      *
+     * @param dataBaseType {@link DataBaseType}
      * @param configuration {@link Configuration}
      * @return {@link MinMaxPackage}
      * e.g {"min": 1, "max": 100, "type": "long"} `type` is one of `long`, `float`, `string`
      */
-    private static MinMaxPackage getPkMinAndMaxValue(Configuration configuration)
+    private static MinMaxPackage getPkMinAndMaxValue(DataBaseType dataBaseType, Configuration configuration)
     {
         String splitPK = configuration.getString(Key.SPLIT_PK).trim();
         String table = configuration.getString(Key.TABLE).trim();
@@ -198,19 +197,19 @@ public class SingleTableSplitUtil
      * @param configuration configuration
      * @param adviceNum the number of split
      * @return 1. empty list of the min value is equal to max value, or the split key has only null value;
-     *         2. {@link List} of where clause
+     * 2. {@link List} of where clause
      */
-    public static List<String> genPkRangeSQLForGeneric(String splitPK, String table, String where, Configuration configuration, int adviceNum)
+    public static List<String> genPkRangeSQLForGeneric(DataBaseType dataBaseType, String splitPK, String table, String where, Configuration configuration, int adviceNum)
     {
         if (adviceNum == 1) {
             return new ArrayList<>();
         }
 
         List<Object> rangeValue = new ArrayList<>();
-        MinMaxPackage pkMinAndMaxValue = getPkMinAndMaxValue(configuration);
+        MinMaxPackage pkMinAndMaxValue = getPkMinAndMaxValue(dataBaseType, configuration);
         if (pkMinAndMaxValue.getMin() == null || pkMinAndMaxValue.getMax() == null || pkMinAndMaxValue.isSameValue()) {
             // mean the split key has only null value, it can not split
-             return Collections.emptyList();
+            return Collections.emptyList();
         }
 
         if (pkMinAndMaxValue.isNumeric()) {

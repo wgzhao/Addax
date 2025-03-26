@@ -18,14 +18,14 @@ import com.taosdata.jdbc.SchemalessWriter;
 import com.taosdata.jdbc.enums.SchemalessProtocolType;
 import com.taosdata.jdbc.enums.SchemalessTimestampType;
 import com.taosdata.jdbc.utils.Utils;
-import com.wgzhao.addax.common.base.Constant;
-import com.wgzhao.addax.common.base.Key;
-import com.wgzhao.addax.common.element.Column;
-import com.wgzhao.addax.common.element.Record;
-import com.wgzhao.addax.common.exception.AddaxException;
-import com.wgzhao.addax.common.plugin.RecordReceiver;
-import com.wgzhao.addax.common.plugin.TaskPluginCollector;
-import com.wgzhao.addax.common.util.Configuration;
+import com.wgzhao.addax.core.base.Constant;
+import com.wgzhao.addax.core.base.Key;
+import com.wgzhao.addax.core.element.Column;
+import com.wgzhao.addax.core.element.Record;
+import com.wgzhao.addax.core.exception.AddaxException;
+import com.wgzhao.addax.core.plugin.RecordReceiver;
+import com.wgzhao.addax.core.plugin.TaskPluginCollector;
+import com.wgzhao.addax.core.util.Configuration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -41,8 +41,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-import static com.wgzhao.addax.common.spi.ErrorCode.CONFIG_ERROR;
-import static com.wgzhao.addax.common.spi.ErrorCode.EXECUTE_FAIL;
+import static com.wgzhao.addax.core.spi.ErrorCode.CONFIG_ERROR;
+import static com.wgzhao.addax.core.spi.ErrorCode.EXECUTE_FAIL;
 
 public class DefaultDataHandler
         implements DataHandler
@@ -108,7 +108,7 @@ public class DefaultDataHandler
         int affectedRows = 0;
 
         try (Connection conn = DriverManager.getConnection(jdbcUrl, username, password)) {
-            LOG.info("connection[ jdbcUrl: " + jdbcUrl + ", username: " + username + "] established.");
+            LOG.info(" jdbcUrl: {}, username: {} is established", jdbcUrl, username);
             // prepare table_name -> table_meta
             this.schemaManager = new SchemaManager(conn);
             this.tableMetas = schemaManager.loadTableMeta(tables);
@@ -138,23 +138,22 @@ public class DefaultDataHandler
         }
 
         if (affectedRows != count) {
-            LOG.error("write record missing or incorrect happened, affectedRows: " + affectedRows + ", total: " + count);
+            LOG.error("write record missing or incorrect happened, affectedRows: {}, total: {}", affectedRows, count);
         }
 
         return affectedRows;
     }
 
     /**
-     * table: [ "stb1", "stb2", "tb1", "tb2", "t1" ]
+     * Table types: [ "stb1", "stb2", "tb1", "tb2", "t1" ]
      * stb1[ts,f1,f2] tags:[t1]
      * stb2[ts,f1,f2,f3] tags:[t1,t2]
-     * 1. tables 表的的类型分成：stb(super table)/tb(sub table)/t(original table)
-     * 2. 对于stb，自动建表/schemaless
-     * 2.1: data中有tbname字段, 例如：data: [ts, f1, f2, f3, t1, t2, tbname] tbColumn: [ts, f1, f2, t1] =&gt; insert into tbname using stb1 tags
-     * (t1) values(ts, f1, f2)
-     * 2.2: data中没有tbname字段，例如：data: [ts, f1, f2, f3, t1, t2] tbColumn: [ts, f1, f2, t1] =&gt; schemaless: stb1,t1=t1 f1=f1,f2=f2 ts, 没有批量写
-     * 3. 对于tb，拼sql，例如：data: [ts, f1, f2, f3, t1, t2] tbColumn: [ts, f1, f2, t1] =&gt; insert into tb(ts, f1, f2) values(ts, f1, f2)
-     * 4. 对于t，拼sql，例如：data: [ts, f1, f2, f3, t1, t2] tbColumn: [ts, f1, f2, f3, t1, t2] insert into t(ts, f1, f2, f3, t1, t2) values(ts, f1, f2, f3, t1, t2)
+     * 1. Table types are divided into: stb (super table), tb (sub table), t (original table)
+     * 2. For stb, create table automatically/schemaless
+     * 2.1: If data contains the tbname field, e.g., data: [ts, f1, f2, f3, t1, t2, tbname], tbColumn: [ts, f1, f2, t1] =&ge; insert into tbname using stb1 tags (t1) values(ts, f1, f2)
+     * 2.2: If data does not contain the tbname field, e.g., data: [ts, f1, f2, f3, t1, t2], tbColumn: [ts, f1, f2, t1] =&ge; schemaless: stb1,t1=t1 f1=f1,f2=f2 ts, no batch write
+     * 3. For tb, construct SQL, e.g., data: [ts, f1, f2, f3, t1, t2], tbColumn: [ts, f1, f2, t1] =&ge; insert into tb(ts, f1, f2) values(ts, f1, f2)
+     * 4. For t, construct SQL, e.g., data: [ts, f1, f2, f3, t1, t2], tbColumn: [ts, f1, f2, f3, t1, t2] =&ge; insert into t(ts, f1, f2, f3, t1, t2) values(ts, f1, f2, f3, t1, t2)
      *
      * @param conn {@link Connection}
      * @param recordBatch list of {@link Record}
@@ -205,23 +204,35 @@ public class DefaultDataHandler
             sb.append(" ").append(record.getColumn(indexOf("tbname")).asString())
                     .append(" using ").append(table)
                     .append(" tags")
-                    .append(columnMetas.stream().filter(colMeta -> columns.contains(colMeta.field)).filter(colMeta -> {
-                        return colMeta.isTag;
-                    }).map(colMeta -> {
-                        return buildColumnValue(colMeta, record);
-                    }).collect(Collectors.joining(",", "(", ")")))
+                    .append(columnMetas.stream()
+                            .filter(colMeta -> columns.contains(colMeta.field))
+                            .filter(colMeta -> {
+                                return colMeta.isTag;
+                            })
+                            .map(colMeta -> {
+                                return buildColumnValue(colMeta, record);
+                            })
+                            .collect(Collectors.joining(",", "(", ")")))
                     .append(" ")
-                    .append(columnMetas.stream().filter(colMeta -> columns.contains(colMeta.field)).filter(colMeta -> {
-                        return !colMeta.isTag;
-                    }).map(colMeta -> {
-                        return colMeta.field;
-                    }).collect(Collectors.joining(",", "(", ")")))
+                    .append(columnMetas.stream()
+                            .filter(colMeta -> columns.contains(colMeta.field))
+                            .filter(colMeta -> {
+                                return !colMeta.isTag;
+                            })
+                            .map(colMeta -> {
+                                return colMeta.field;
+                            })
+                            .collect(Collectors.joining(",", "(", ")")))
                     .append(" values")
-                    .append(columnMetas.stream().filter(colMeta -> columns.contains(colMeta.field)).filter(colMeta -> {
-                        return !colMeta.isTag;
-                    }).map(colMeta -> {
-                        return buildColumnValue(colMeta, record);
-                    }).collect(Collectors.joining(",", "(", ")")));
+                    .append(columnMetas.stream()
+                            .filter(colMeta -> columns.contains(colMeta.field))
+                            .filter(colMeta -> {
+                                return !colMeta.isTag;
+                            })
+                            .map(colMeta -> {
+                                return buildColumnValue(colMeta, record);
+                            })
+                            .collect(Collectors.joining(",", "(", ")")));
         }
         String sql = sb.toString();
 
@@ -233,7 +244,7 @@ public class DefaultDataHandler
     {
         int count;
         try (Statement stmt = conn.createStatement()) {
-            LOG.debug(">>> " + sql);
+            LOG.debug(">>> {}", sql);
             count = stmt.executeUpdate(sql);
         }
         catch (SQLException e) {
@@ -266,7 +277,7 @@ public class DefaultDataHandler
                     return "\"" + column.asString() + "\"";
                 }
                 String value = column.asString();
-                return "\'" + Utils.escapeSingleQuota(value) + "\'";
+                return "'" + Utils.escapeSingleQuota(value) + "'";
             case NULL:
             case BAD:
                 return "NULL";
@@ -301,22 +312,29 @@ public class DefaultDataHandler
         for (Record record : recordBatch) {
             StringBuilder sb = new StringBuilder();
             sb.append(table).append(",")
-                    .append(columnMetaList.stream().filter(colMeta -> columns.contains(colMeta.field)).filter(colMeta -> {
-                        return colMeta.isTag;
-                    }).map(colMeta -> {
-                        String value = record.getColumn(indexOf(colMeta.field)).asString();
-                        if (value.contains(" ")) {
-                            value = value.replace(" ", "\\ ");
-                        }
-                        return colMeta.field + "=" + value;
-                    }).collect(Collectors.joining(",")))
+                    .append(columnMetaList.stream()
+                            .filter(colMeta -> columns.contains(colMeta.field))
+                            .filter(colMeta -> {
+                                return colMeta.isTag;
+                            })
+                            .map(colMeta -> {
+                                String value = record.getColumn(indexOf(colMeta.field)).asString();
+                                if (value.contains(" ")) {
+                                    value = value.replace(" ", "\\ ");
+                                }
+                                return colMeta.field + "=" + value;
+                            })
+                            .collect(Collectors.joining(",")))
                     .append(" ")
-                    .append(columnMetaList.stream().filter(colMeta -> columns.contains(colMeta.field)).filter(colMeta -> {
-                        return !colMeta.isTag && !colMeta.isPrimaryKey;
-                    }).map(colMeta -> {
-                        return colMeta.field + "=" + buildSchemalessColumnValue(colMeta, record);
-//                        return colMeta.field + "=" + record.getColumn(indexOf(colMeta.field)).asString();
-                    }).collect(Collectors.joining(",")))
+                    .append(columnMetaList.stream()
+                            .filter(colMeta -> columns.contains(colMeta.field))
+                            .filter(colMeta -> {
+                                return !colMeta.isTag && !colMeta.isPrimaryKey;
+                            })
+                            .map(colMeta -> {
+                                return colMeta.field + "=" + buildSchemalessColumnValue(colMeta, record);
+                            })
+                            .collect(Collectors.joining(",")))
                     .append(" ");
             // timestamp
             Column column = record.getColumn(indexOf(ts.field));
@@ -342,7 +360,7 @@ public class DefaultDataHandler
                 sb.append(column.asLong());
             }
             String line = sb.toString();
-            LOG.debug(">>> " + line);
+            LOG.debug(">>> {}", line);
             lines.add(line);
             count++;
         }
@@ -416,17 +434,15 @@ public class DefaultDataHandler
             }
             case INT:
             case LONG: {
-                if (colMeta.type.equals("TINYINT")) {
-                    return column.asString() + "i8";
-                }
-                if (colMeta.type.equals("SMALLINT")) {
-                    return column.asString() + "i16";
-                }
-                if (colMeta.type.equals("INT")) {
-                    return column.asString() + "i32";
-                }
-                if (colMeta.type.equals("BIGINT")) {
-                    return column.asString() + "i64";
+                switch (colMeta.type) {
+                    case "TINYINT":
+                        return column.asString() + "i8";
+                    case "SMALLINT":
+                        return column.asString() + "i16";
+                    case "INT":
+                        return column.asString() + "i32";
+                    case "BIGINT":
+                        return column.asString() + "i64";
                 }
             }
             case BYTES:
@@ -479,23 +495,24 @@ public class DefaultDataHandler
                 continue;
             }
 
-            boolean tagsAllMatch = columnMetas.stream().filter(colMeta -> columns.contains(colMeta.field)).filter(colMeta -> {
-                return colMeta.isTag;
-            }).allMatch(colMeta -> {
-                Column column = record.getColumn(indexOf(colMeta.field));
-                boolean equals = equals(column, colMeta);
-                return equals;
-            });
+            boolean tagsAllMatch = columnMetas.stream().filter(
+                            colMeta -> columns.contains(colMeta.field))
+                    .filter(colMeta -> colMeta.isTag).allMatch(colMeta ->
+                    {
+                        Column column = record.getColumn(indexOf(colMeta.field));
+                        return equals(column, colMeta);
+                    });
 
             if (ignoreTagsUnmatched && !tagsAllMatch) {
                 continue;
             }
 
-            sb.append(columnMetas.stream().filter(colMeta -> columns.contains(colMeta.field)).filter(colMeta -> {
-                return !colMeta.isTag;
-            }).map(colMeta -> {
-                return buildColumnValue(colMeta, record);
-            }).collect(Collectors.joining(", ", "(", ") ")));
+            sb.append(columnMetas.stream().filter(colMeta -> columns.contains(colMeta.field))
+                    .filter(colMeta -> {
+                        return !colMeta.isTag;
+                    }).map(colMeta -> {
+                        return buildColumnValue(colMeta, record);
+                    }).collect(Collectors.joining(", ", "(", ") ")));
             validRecords++;
         }
 

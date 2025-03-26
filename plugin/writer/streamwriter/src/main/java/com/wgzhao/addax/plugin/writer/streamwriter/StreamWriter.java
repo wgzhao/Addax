@@ -19,12 +19,12 @@
 
 package com.wgzhao.addax.plugin.writer.streamwriter;
 
-import com.wgzhao.addax.common.element.Column;
-import com.wgzhao.addax.common.element.Record;
-import com.wgzhao.addax.common.exception.AddaxException;
-import com.wgzhao.addax.common.plugin.RecordReceiver;
-import com.wgzhao.addax.common.spi.Writer;
-import com.wgzhao.addax.common.util.Configuration;
+import com.wgzhao.addax.core.element.Column;
+import com.wgzhao.addax.core.element.Record;
+import com.wgzhao.addax.core.exception.AddaxException;
+import com.wgzhao.addax.core.plugin.RecordReceiver;
+import com.wgzhao.addax.core.spi.Writer;
+import com.wgzhao.addax.core.util.Configuration;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -41,10 +41,10 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
-import static com.wgzhao.addax.common.spi.ErrorCode.CONFIG_ERROR;
-import static com.wgzhao.addax.common.spi.ErrorCode.ILLEGAL_VALUE;
-import static com.wgzhao.addax.common.spi.ErrorCode.IO_ERROR;
-import static com.wgzhao.addax.common.spi.ErrorCode.PERMISSION_ERROR;
+import static com.wgzhao.addax.core.spi.ErrorCode.CONFIG_ERROR;
+import static com.wgzhao.addax.core.spi.ErrorCode.ILLEGAL_VALUE;
+import static com.wgzhao.addax.core.spi.ErrorCode.IO_ERROR;
+import static com.wgzhao.addax.core.spi.ErrorCode.PERMISSION_ERROR;
 
 public class StreamWriter
         extends Writer
@@ -92,15 +92,12 @@ public class StreamWriter
         private void validateParameter(String path, String fileName)
         {
             try {
-                // warn: 这里用户需要配一个目录
                 File dir = new File(path);
                 if (dir.isFile()) {
                     throw AddaxException
                             .asAddaxException(
                                     ILLEGAL_VALUE,
-                                    String.format(
-                                            "您配置的path: [%s] 不是一个合法的目录, 请您注意文件重名, 不合法目录名等情况.",
-                                            path));
+                                   "The path you configured is a file, not a directory.");
                 }
                 if (!dir.exists()) {
                     boolean createdOk = dir.mkdirs();
@@ -108,8 +105,7 @@ public class StreamWriter
                         throw AddaxException
                                 .asAddaxException(
                                         CONFIG_ERROR,
-                                        String.format("您指定的文件路径 : [%s] 创建失败.",
-                                                path));
+                                        "Failed to create directory: " + path);
                     }
                 }
 
@@ -122,14 +118,14 @@ public class StreamWriter
                     catch (IOException e) {
                         throw AddaxException.asAddaxException(
                                 IO_ERROR,
-                                String.format("删除文件失败 : [%s] ", fileFullPath), e);
+                                "Failed to delete file: ", e);
                     }
                 }
             }
             catch (SecurityException se) {
                 throw AddaxException.asAddaxException(
                         PERMISSION_ERROR,
-                        String.format("您没有权限创建文件路径 : [%s] ", path), se);
+                        "The permission is denied to create file", se);
             }
         }
 

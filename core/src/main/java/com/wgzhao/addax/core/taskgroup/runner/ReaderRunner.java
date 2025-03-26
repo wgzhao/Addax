@@ -19,10 +19,10 @@
 
 package com.wgzhao.addax.core.taskgroup.runner;
 
-import com.wgzhao.addax.common.plugin.AbstractTaskPlugin;
-import com.wgzhao.addax.common.plugin.RecordSender;
-import com.wgzhao.addax.common.spi.Reader;
-import com.wgzhao.addax.common.statistics.PerfRecord;
+import com.wgzhao.addax.core.plugin.AbstractTaskPlugin;
+import com.wgzhao.addax.core.plugin.RecordSender;
+import com.wgzhao.addax.core.spi.Reader;
+import com.wgzhao.addax.core.statistics.PerfRecord;
 import com.wgzhao.addax.core.statistics.communication.CommunicationTool;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -58,7 +58,6 @@ public class ReaderRunner
 
         Reader.Task taskReader = (Reader.Task) this.getPlugin();
 
-        //统计waitWriterTime，并且在finally才end。
         PerfRecord channelWaitWrite = new PerfRecord(getTaskGroupId(), getTaskId(), PerfRecord.PHASE.WAIT_WRITE_TIME);
         try {
             channelWaitWrite.start();
@@ -90,8 +89,6 @@ public class ReaderRunner
             postPerfRecord.start();
             taskReader.post();
             postPerfRecord.end();
-            // automatic flush
-            // super.markSuccess(); 这里不能标记为成功，成功的标志由 writerRunner 来标志（否则可能导致 reader 先结束，而 writer 还没有结束的严重 bug）
         }
         catch (Throwable e) {
             LOG.error("Reader runner Received Exceptions:", e);

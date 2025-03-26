@@ -19,8 +19,7 @@
 
 package com.wgzhao.addax.core.util;
 
-import com.wgzhao.addax.common.exception.AddaxException;
-import com.wgzhao.addax.common.util.Configuration;
+import com.wgzhao.addax.core.exception.AddaxException;
 import com.wgzhao.addax.core.transport.transformer.TransformerExecution;
 import com.wgzhao.addax.core.transport.transformer.TransformerExecutionParas;
 import com.wgzhao.addax.core.transport.transformer.TransformerInfo;
@@ -37,9 +36,9 @@ import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.List;
 
-import static com.wgzhao.addax.common.spi.ErrorCode.CONFIG_ERROR;
-import static com.wgzhao.addax.common.spi.ErrorCode.IO_ERROR;
-import static com.wgzhao.addax.common.spi.ErrorCode.REQUIRED_VALUE;
+import static com.wgzhao.addax.core.spi.ErrorCode.CONFIG_ERROR;
+import static com.wgzhao.addax.core.spi.ErrorCode.IO_ERROR;
+import static com.wgzhao.addax.core.spi.ErrorCode.REQUIRED_VALUE;
 
 /**
  * no comments.
@@ -75,9 +74,6 @@ public class TransformerUtil
             functionNames.add(functionName);
         }
 
-        /*
-         * 延迟load 第三方插件的function，并按需load
-         */
         LOG.info("Loading the  user config transformers [{}] ...", functionNames);
         TransformerRegistry.loadTransformerFromLocalStorage(functionNames);
 
@@ -91,13 +87,9 @@ public class TransformerUtil
                         "name=" + functionName);
             }
 
-            /*
-             * 具体的UDF对应一个paras
-             */
             TransformerExecutionParas transformerExecutionParas = new TransformerExecutionParas();
-            /*
-             * groovy function仅仅只有code
-             */
+
+            // the groovy function has only code
             if (!"dx_groovy".equals(functionName) && !"dx_fackGroovy".equals(functionName)) {
                 Integer columnIndex = configuration.getInt(CoreConstant.TRANSFORMER_PARAMETER_COLUMN_INDEX);
 

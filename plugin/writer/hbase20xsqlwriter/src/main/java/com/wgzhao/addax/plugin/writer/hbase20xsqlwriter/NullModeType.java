@@ -19,11 +19,9 @@
 
 package com.wgzhao.addax.plugin.writer.hbase20xsqlwriter;
 
-import com.wgzhao.addax.common.exception.AddaxException;
+import com.wgzhao.addax.core.exception.AddaxException;
 
-import java.util.Arrays;
-
-import static com.wgzhao.addax.common.spi.ErrorCode.NOT_SUPPORT_TYPE;
+import static com.wgzhao.addax.core.spi.ErrorCode.NOT_SUPPORT_TYPE;
 
 public enum NullModeType
 {
@@ -44,7 +42,6 @@ public enum NullModeType
                 return modeType;
             }
         }
-        throw AddaxException.asAddaxException(NOT_SUPPORT_TYPE,
-                "Hbasewriter 不支持该 nullMode 类型:" + modeName + ", 目前支持的 nullMode 类型是:" + Arrays.asList(values()));
+        throw AddaxException.asAddaxException(NOT_SUPPORT_TYPE, "The nullMode " + modeName + " is unsupported. ");
     }
 }

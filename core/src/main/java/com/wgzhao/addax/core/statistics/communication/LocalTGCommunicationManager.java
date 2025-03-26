@@ -49,11 +49,10 @@ public final class LocalTGCommunicationManager
     }
 
     /**
-     * 采用获取taskGroupId后再获取对应communication的方式，
-     * 防止map遍历时修改，同时也防止对map key-value对的修改
-     *
+     * Get the communication of the task group according to the taskGroupId
+     * prevent the modification of the map key-value pair
      * @param taskGroupId task group id
-     * @return set
+     * @return Communication
      */
     public static Communication getTaskGroupCommunication(int taskGroupId)
     {

@@ -1,8 +1,5 @@
 #!/bin/bash
 # create addax docker image
-# the image including two type default and basic
-# default: addax with all modules
-# basic: addax with basic modules
 
 function get_version() {
     version=$(grep -o -E '<version>.*</version>' pom.xml | head -n 1 | sed -e 's/<version>\(.*\)<\/version>/\1/')
@@ -10,7 +7,7 @@ function get_version() {
 }
 function compress_plugins() {
     version=$(get_version)
-    TMPDIR=$(ls -d -w1 target/addax/addax-${version})
+    TMPDIR=$(ls -d -w1 target/addax-all-${version})
     [ -n "$TMPDIR" ] || exit 2
 
     (
@@ -32,9 +29,10 @@ function compress_plugins() {
 }
 
 version=$(get_version)
+export MAVEN_OPTS="-DskipTests -Dmaven.javadoc.skip=true -Dmaven.source.skip=true -Dgpg.skip=true"
 # first compile basic images
-mvn clean package -Dmaven.test.skip=true -Pbasic
-mvn package assembly:single -Pbasic
+mvn -B -V -T 1  clean package
+mvn package -Pdistribution
 compress_plugins
 
 # write a simple Dockerfile for build
@@ -43,7 +41,7 @@ FROM openjdk:8-jre-alpine
 LABEL maintainer="wgzhao <wgzhao@gmail.com>"
 LABEL version="$version"
 LABEL description="Addax is a versatile open-source ETL tool that can seamlessly transfer data between various RDBMS and NoSQL databases, making it an ideal solution for data migration."
-COPY addax-${version} /opt/addax
+COPY addax-all-${version} /opt/addax
 WORKDIR /opt/addax
 RUN chmod +x bin/*.sh
 EOF
@@ -51,22 +49,9 @@ EOF
 # build it
 docker build -t quay.io/wgzhao/addax:${version}-lite -f /tmp/Dockerfile target/addax
 docker tag quay.io/wgzhao/addax:${version}-lite quay.io/wgzhao/addax:latest-lite
-# then compile default images
-mvn clean package -Dmaven.test.skip=true -Pdefault
-mvn package assembly:single -Pdefault
-compress_plugins
+docker push quay.io/wgzhao/addax:${version}-lite
+docker push quay.io/wgzhao/addax:latest-lite
 
-# write a simple Dockerfile for build
-cat > /tmp/Dockerfile <<EOF
-FROM openjdk:8-jre-alpine
-LABEL maintainer="wgzhao <wgzhao@gmail.com>"
-LABEL version="${version}"
-LABEL description="Addax is a versatile open-source ETL tool that can seamlessly transfer data between various RDBMS and NoSQL databases, making it an ideal solution for data migration."
-COPY addax-${version} /opt/addax
-WORKDIR /opt/addax
-RUN chmod +x bin/*.sh
-EOF
-
-# build it
-docker build -t quay.io/wgzhao/addax:${version} -f /tmp/Dockerfile target/addax
-docker tag quay.io/wgzhao/addax:${version} quay.io/wgzhao/addax:latest
+# push
+docker push quay.io/wgzhao/addax:${version}
+docker push quay.io/wgzhao/addax:latest

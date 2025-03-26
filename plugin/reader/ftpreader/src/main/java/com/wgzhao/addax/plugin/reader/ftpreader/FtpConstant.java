@@ -19,7 +19,7 @@
 
 package com.wgzhao.addax.plugin.reader.ftpreader;
 
-import com.wgzhao.addax.common.base.Constant;
+import com.wgzhao.addax.core.base.Constant;
 
 public class FtpConstant extends Constant
 {

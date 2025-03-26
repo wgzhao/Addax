@@ -25,8 +25,15 @@ import org.apache.commons.lang3.RandomStringUtils;
 
 public class PhoneUtil
 {
-    private static final String[] PHONE_NUMBER_PREFIXES = {"134", "135", "136", "137", "138", "139", "147", "150,151", "152", "157", "158",
-            "159", "182", "187", "188", "130", "131", "132", "145", "155", "156", "185", "186", "145", "133", "153", "180", "181", "189"};
+    /**
+     * Array of Chinese mobile phone number prefixes (first 3 digits).
+     * Represents the mobile prefixes used by major carriers in China:
+     * - China Mobile: 134-139, 147, 150-153, 157-159, 177, 182, 187-188
+     * - China Unicom: 130-132, 145, 155-156, 185-186
+     * - China Telecom: 133, 153, 180-181, 189-191, 193
+     */
+    private static final String[] PHONE_NUMBER_PREFIXES = {"134", "135", "136", "137", "138", "139", "147", "150", "151", "152", "157", "158",
+            "159", "177", "182", "187", "188", "130", "131", "132", "145", "155", "156", "185", "186", "133", "153", "180", "181", "189", "190", "191", "193"};
 
 
     public static String nextPhoneNumber()

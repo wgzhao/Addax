@@ -19,13 +19,13 @@
 
 package com.wgzhao.addax.plugin.reader.sqlserverreader;
 
-import com.wgzhao.addax.common.element.BytesColumn;
-import com.wgzhao.addax.common.element.Column;
-import com.wgzhao.addax.common.element.TimestampColumn;
-import com.wgzhao.addax.common.exception.AddaxException;
-import com.wgzhao.addax.common.plugin.RecordSender;
-import com.wgzhao.addax.common.spi.Reader;
-import com.wgzhao.addax.common.util.Configuration;
+import com.wgzhao.addax.core.element.BytesColumn;
+import com.wgzhao.addax.core.element.Column;
+import com.wgzhao.addax.core.element.TimestampColumn;
+import com.wgzhao.addax.core.exception.AddaxException;
+import com.wgzhao.addax.core.plugin.RecordSender;
+import com.wgzhao.addax.core.spi.Reader;
+import com.wgzhao.addax.core.util.Configuration;
 import com.wgzhao.addax.rdbms.reader.CommonRdbmsReader;
 import com.wgzhao.addax.rdbms.util.DataBaseType;
 
@@ -36,9 +36,9 @@ import java.sql.SQLException;
 import java.sql.Types;
 import java.util.List;
 
-import static com.wgzhao.addax.common.base.Key.FETCH_SIZE;
-import static com.wgzhao.addax.common.base.Constant.DEFAULT_FETCH_SIZE;
-import static com.wgzhao.addax.common.spi.ErrorCode.ILLEGAL_VALUE;
+import static com.wgzhao.addax.core.base.Key.FETCH_SIZE;
+import static com.wgzhao.addax.core.base.Constant.DEFAULT_FETCH_SIZE;
+import static com.wgzhao.addax.core.spi.ErrorCode.ILLEGAL_VALUE;
 
 public class SqlServerReader
         extends Reader
@@ -60,8 +60,7 @@ public class SqlServerReader
             int fetchSize = this.originalConfig.getInt(FETCH_SIZE, DEFAULT_FETCH_SIZE);
             if (fetchSize < 1) {
                 throw AddaxException
-                        .asAddaxException(ILLEGAL_VALUE,
-                                String.format("您配置的fetchSize有误，fetchSize : [%d] 设置值不能小于 1.", fetchSize));
+                        .asAddaxException(ILLEGAL_VALUE, "The fetchSize can not be less than 1");
             }
             this.originalConfig.set(FETCH_SIZE, fetchSize);
 
@@ -106,7 +105,7 @@ public class SqlServerReader
                         throws SQLException, UnsupportedEncodingException
                 {
                     if (metaData.getColumnType(i) == -151) {
-                        // 兼容老的SQLServer版本的datetime数据类型
+                        // compatible with old version SQLServer datetime type
                         return new TimestampColumn(rs.getTimestamp(i));
                     }
                     if (metaData.getColumnType(i) == Types.OTHER && "image".equals(metaData.getColumnTypeName(i))) {

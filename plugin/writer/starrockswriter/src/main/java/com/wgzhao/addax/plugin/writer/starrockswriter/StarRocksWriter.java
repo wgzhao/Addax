@@ -1,10 +1,10 @@
 package com.wgzhao.addax.plugin.writer.starrockswriter;
 
-import com.wgzhao.addax.common.element.Record;
-import com.wgzhao.addax.common.exception.AddaxException;
-import com.wgzhao.addax.common.plugin.RecordReceiver;
-import com.wgzhao.addax.common.spi.Writer;
-import com.wgzhao.addax.common.util.Configuration;
+import com.wgzhao.addax.core.element.Record;
+import com.wgzhao.addax.core.exception.AddaxException;
+import com.wgzhao.addax.core.plugin.RecordReceiver;
+import com.wgzhao.addax.core.spi.Writer;
+import com.wgzhao.addax.core.util.Configuration;
 import com.wgzhao.addax.plugin.writer.starrockswriter.manager.StarRocksWriterManager;
 import com.wgzhao.addax.plugin.writer.starrockswriter.row.StarRocksISerializer;
 import com.wgzhao.addax.plugin.writer.starrockswriter.row.StarRocksSerializerFactory;
@@ -18,8 +18,8 @@ import java.sql.Connection;
 import java.util.ArrayList;
 import java.util.List;
 
-import static com.wgzhao.addax.common.spi.ErrorCode.CONFIG_ERROR;
-import static com.wgzhao.addax.common.spi.ErrorCode.EXECUTE_FAIL;
+import static com.wgzhao.addax.core.spi.ErrorCode.CONFIG_ERROR;
+import static com.wgzhao.addax.core.spi.ErrorCode.EXECUTE_FAIL;
 
 public class StarRocksWriter
         extends Writer
@@ -129,10 +129,7 @@ public class StarRocksWriter
                         throw AddaxException
                                 .asAddaxException(
                                         CONFIG_ERROR,
-                                        String.format(
-                                                "列配置信息有错误. 因为您配置的任务中，源头读取字段数:%s 与 目的表要写入的字段数:%s 不相等. 请检查您的配置并作出修改.",
-                                                record.getColumnNumber(),
-                                                options.getColumns().size()));
+                                        "The record's column number must be equal to the column number in the writer configuration file");
                     }
                     writerManager.writeRecord(rowSerializer.serialize(record));
                 }

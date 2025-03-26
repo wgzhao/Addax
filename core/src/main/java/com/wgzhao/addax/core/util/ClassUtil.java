@@ -23,22 +23,19 @@ import java.lang.reflect.Constructor;
 
 public final class ClassUtil
 {
-
     /**
-     * 通过反射构造类对象
-     *
-     * @param className 反射的类名称
-     * @param t 反射类的类型Class对象
-     * @param <T> class type
-     * @param args 构造参数
+     * instantiate class object by reflection
+     * @param className class name
+     * @param clazz class type
+     * @param args constructor arguments
      * @return T
+     * @param <T> class type
      */
-    @SuppressWarnings({"rawtypes", "unchecked"})
-    public static <T> T instantiate(String className, Class<T> t, Object... args)
+    public static <T> T instantiate(String className, Class<T> clazz, Object... args)
     {
         try {
-            Constructor constructor = Class.forName(className).getConstructor(ClassUtil.toClassType(args));
-            return (T) constructor.newInstance(args);
+            Constructor<?> constructor = Class.forName(className).getConstructor(ClassUtil.toClassType(args));
+            return clazz.cast(constructor.newInstance(args));
         }
         catch (Exception e) {
             throw new IllegalArgumentException(e);

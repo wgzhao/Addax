@@ -21,27 +21,25 @@
 
 package com.wgzhao.addax.rdbms.reader;
 
-import com.wgzhao.addax.common.base.Constant;
-import com.wgzhao.addax.common.base.Key;
-import com.wgzhao.addax.common.element.BoolColumn;
-import com.wgzhao.addax.common.element.BytesColumn;
-import com.wgzhao.addax.common.element.Column;
-import com.wgzhao.addax.common.element.DateColumn;
-import com.wgzhao.addax.common.element.DoubleColumn;
-import com.wgzhao.addax.common.element.LongColumn;
-import com.wgzhao.addax.common.element.Record;
-import com.wgzhao.addax.common.element.StringColumn;
-import com.wgzhao.addax.common.element.TimestampColumn;
-import com.wgzhao.addax.common.exception.AddaxException;
-import com.wgzhao.addax.common.plugin.RecordSender;
-import com.wgzhao.addax.common.plugin.TaskPluginCollector;
-import com.wgzhao.addax.common.statistics.PerfRecord;
-import com.wgzhao.addax.common.util.Configuration;
+import com.wgzhao.addax.core.base.Key;
+import com.wgzhao.addax.core.element.BoolColumn;
+import com.wgzhao.addax.core.element.BytesColumn;
+import com.wgzhao.addax.core.element.Column;
+import com.wgzhao.addax.core.element.DateColumn;
+import com.wgzhao.addax.core.element.DoubleColumn;
+import com.wgzhao.addax.core.element.LongColumn;
+import com.wgzhao.addax.core.element.Record;
+import com.wgzhao.addax.core.element.StringColumn;
+import com.wgzhao.addax.core.element.TimestampColumn;
+import com.wgzhao.addax.core.exception.AddaxException;
+import com.wgzhao.addax.core.plugin.RecordSender;
+import com.wgzhao.addax.core.plugin.TaskPluginCollector;
+import com.wgzhao.addax.core.statistics.PerfRecord;
+import com.wgzhao.addax.core.util.Configuration;
 import com.wgzhao.addax.rdbms.reader.util.GetPrimaryKeyUtil;
 import com.wgzhao.addax.rdbms.reader.util.OriginalConfPretreatmentUtil;
 import com.wgzhao.addax.rdbms.reader.util.PreCheckTask;
 import com.wgzhao.addax.rdbms.reader.util.ReaderSplitUtil;
-import com.wgzhao.addax.rdbms.reader.util.SingleTableSplitUtil;
 import com.wgzhao.addax.rdbms.util.DBUtil;
 import com.wgzhao.addax.rdbms.util.DataBaseType;
 import com.wgzhao.addax.rdbms.util.RdbmsException;
@@ -57,6 +55,7 @@ import java.sql.SQLException;
 import java.sql.Types;
 import java.util.Calendar;
 import java.util.List;
+import java.util.Objects;
 
 public class CommonRdbmsReader
 {
@@ -65,27 +64,24 @@ public class CommonRdbmsReader
     {
         private static final Logger LOG = LoggerFactory.getLogger(Job.class);
 
+        private final DataBaseType dataBaseType;
+
         public Job(DataBaseType dataBaseType)
         {
-            OriginalConfPretreatmentUtil.dataBaseType = dataBaseType;
-            SingleTableSplitUtil.dataBaseType = dataBaseType;
-            GetPrimaryKeyUtil.dataBaseType = dataBaseType;
+            this.dataBaseType = dataBaseType;
         }
 
         public Configuration init(Configuration originalConfig)
         {
-
-            OriginalConfPretreatmentUtil.doPretreatment(originalConfig);
-            if (originalConfig.getString(Key.SPLIT_PK) == null && originalConfig.getBool(Key.AUTO_PK, false)) {
+            OriginalConfPretreatmentUtil.doPretreatment(dataBaseType, originalConfig);
+            if (Objects.equals(originalConfig.getString(Key.SPLIT_PK, ""), "") && originalConfig.getBool(Key.AUTO_PK, false)) {
                 LOG.info("The split key is not configured, try to guess the split key.");
-                String splitPK = GetPrimaryKeyUtil.getPrimaryKey(originalConfig);
+                String splitPK = GetPrimaryKeyUtil.getPrimaryKey(dataBaseType, originalConfig);
                 if (splitPK != null) {
                     LOG.info("Take the field {} as split key", splitPK);
                     originalConfig.set(Key.SPLIT_PK, splitPK);
-                    if (originalConfig.getInt(Key.EACH_TABLE_SPLIT_SIZE, -1) == -1) {
-                        originalConfig.set(Key.EACH_TABLE_SPLIT_SIZE, Constant.DEFAULT_EACH_TABLE_SPLIT_SIZE);
-                    }
-                } else {
+                }
+                else {
                     LOG.warn("There is no primary key or unique key in the table, and the split key cannot be guessed.");
                 }
             }
@@ -96,7 +92,7 @@ public class CommonRdbmsReader
 
         public void preCheck(Configuration originalConfig, DataBaseType dataBaseType)
         {
-            /* 检查每个表是否有读权限，以及querySql跟split Key是否正确 */
+            // check each table can read and split key is valid
             Configuration queryConf = ReaderSplitUtil.doPreCheckSplit(originalConfig);
             String splitPK = queryConf.getString(Key.SPLIT_PK);
             Configuration connConf = queryConf.getConfiguration(Key.CONNECTION);
@@ -107,7 +103,7 @@ public class CommonRdbmsReader
 
         public List<Configuration> split(Configuration originalConfig, int adviceNumber)
         {
-            return ReaderSplitUtil.doSplit(originalConfig, adviceNumber);
+            return ReaderSplitUtil.doSplit(dataBaseType, originalConfig, adviceNumber);
         }
 
         public void post(Configuration originalConfig)
@@ -136,7 +132,6 @@ public class CommonRdbmsReader
         private String jdbcUrl;
         private String mandatoryEncoding;
 
-        // 作为日志显示信息时，需要附带的通用信息。比如信息所对应的数据库连接等信息，针对哪个表做的操作
         private String basicMsg;
 
         public Task(DataBaseType dataBaseType)
@@ -153,9 +148,6 @@ public class CommonRdbmsReader
 
         public void init(Configuration readerSliceConfig)
         {
-
-            /* for database connection */
-
             this.username = readerSliceConfig.getString(Key.USERNAME);
             this.password = readerSliceConfig.getString(Key.PASSWORD);
             this.jdbcUrl = readerSliceConfig.getString(Key.JDBC_URL);
@@ -165,6 +157,14 @@ public class CommonRdbmsReader
             basicMsg = "jdbcUrl: " + this.jdbcUrl;
         }
 
+        /**
+         * read data
+         *
+         * @param readerSliceConfig The read configuration
+         * @param recordSender The record sender
+         * @param taskPluginCollector The task plugin collector
+         * @param fetchSize The fetch size
+         */
         public void startRead(Configuration readerSliceConfig, RecordSender recordSender,
                 TaskPluginCollector taskPluginCollector, int fetchSize)
         {
@@ -188,7 +188,6 @@ public class CommonRdbmsReader
                 ResultSetMetaData metaData = rs.getMetaData();
                 columnNumber = metaData.getColumnCount();
 
-                // 这个统计干净的result_Next时间
                 PerfRecord allResultPerfRecord = new PerfRecord(taskGroupId, taskId, PerfRecord.PHASE.RESULT_NEXT_ALL);
                 allResultPerfRecord.start();
 
@@ -201,7 +200,6 @@ public class CommonRdbmsReader
                 }
 
                 allResultPerfRecord.end(rsNextUsedTime);
-                // 目前大盘是依赖这个打印，而之前这个Finish read record是包含了sql查询和result next的全部时间
                 LOG.info("Finished reading records by executing SQL query: [{}].", querySql);
             }
             catch (Exception e) {
@@ -229,6 +227,16 @@ public class CommonRdbmsReader
             recordSender.sendToWriter(record);
         }
 
+        /**
+         * create column
+         *
+         * @param rs The result set
+         * @param metaData The result set meta data
+         * @param i The column index
+         * @return The column
+         * @throws SQLException If an SQL exception occurs
+         * @throws UnsupportedEncodingException If the encoding is not supported
+         */
         protected Column createColumn(ResultSet rs, ResultSetMetaData metaData, int i)
                 throws SQLException, UnsupportedEncodingException
         {
@@ -289,8 +297,8 @@ public class CommonRdbmsReader
                     return new BoolColumn(rs.getBoolean(i));
 
                 case Types.BIT:
-                    // bit(1) -> Types.BIT 可使用BoolColumn
-                    // bit(>1) -> Types.VARBINARY 可使用BytesColumn
+                    // bit(1) -> Types.BIT  use BooleanColumn
+                    // bit(>1) -> Types.VARBINARY use BytesColumn
                     if (metaData.getPrecision(i) == 1) {
                         return new BoolColumn(rs.getBoolean(i));
                     }
@@ -315,6 +323,16 @@ public class CommonRdbmsReader
             }
         }
 
+        /**
+         * build record
+         *
+         * @param recordSender The record sender
+         * @param rs The result set
+         * @param metaData The result set meta data
+         * @param columnNumber The column number
+         * @param taskPluginCollector The task plugin collector
+         * @return The record
+         */
         protected Record buildRecord(RecordSender recordSender, ResultSet rs, ResultSetMetaData metaData, int columnNumber,
                 TaskPluginCollector taskPluginCollector)
         {

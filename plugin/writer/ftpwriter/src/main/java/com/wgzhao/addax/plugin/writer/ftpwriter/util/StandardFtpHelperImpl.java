@@ -21,7 +21,7 @@ package com.wgzhao.addax.plugin.writer.ftpwriter.util;
 
 import com.alibaba.fastjson2.JSON;
 import com.alibaba.fastjson2.JSONWriter;
-import com.wgzhao.addax.common.exception.AddaxException;
+import com.wgzhao.addax.core.exception.AddaxException;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.net.ftp.FTPClient;
@@ -33,14 +33,14 @@ import org.slf4j.LoggerFactory;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
-import java.net.UnknownHostException;
+import java.time.Duration;
 import java.util.HashSet;
 import java.util.Set;
 
-import static com.wgzhao.addax.common.spi.ErrorCode.CONNECT_ERROR;
-import static com.wgzhao.addax.common.spi.ErrorCode.EXECUTE_FAIL;
-import static com.wgzhao.addax.common.spi.ErrorCode.IO_ERROR;
-import static com.wgzhao.addax.common.spi.ErrorCode.LOGIN_ERROR;
+import static com.wgzhao.addax.core.spi.ErrorCode.CONNECT_ERROR;
+import static com.wgzhao.addax.core.spi.ErrorCode.EXECUTE_FAIL;
+import static com.wgzhao.addax.core.spi.ErrorCode.IO_ERROR;
+import static com.wgzhao.addax.core.spi.ErrorCode.LOGIN_ERROR;
 import static org.apache.commons.net.ftp.FTP.BINARY_FILE_TYPE;
 
 public class StandardFtpHelperImpl
@@ -55,13 +55,10 @@ public class StandardFtpHelperImpl
         this.ftpClient = new FTPClient();
         try {
             this.ftpClient.setControlEncoding("UTF-8");
-            // 不需要写死ftp server的OS TYPE,FTPClient getSystemType()方法会自动识别
-            // this.ftpClient.configure(new FTPClientConfig(FTPClientConfig.SYS_UNIX));
             this.ftpClient.setDefaultTimeout(timeout);
             this.ftpClient.setConnectTimeout(timeout);
-            this.ftpClient.setDataTimeout(timeout);
+            this.ftpClient.setDataTimeout(Duration.ofSeconds(timeout));
 
-            // 连接登录
             this.ftpClient.connect(host, port);
             this.ftpClient.login(username, password);
 
@@ -72,37 +69,13 @@ public class StandardFtpHelperImpl
             int reply = this.ftpClient.getReplyCode();
             if (!FTPReply.isPositiveCompletion(reply)) {
                 this.ftpClient.disconnect();
-                String message = String
-                        .format("与ftp服务器建立连接失败,host:%s, port:%s, username:%s, replyCode:%s",
-                                host, port, username, reply);
-                LOG.error(message);
                 throw AddaxException.asAddaxException(
-                        LOGIN_ERROR, message);
+                        LOGIN_ERROR, "Failed to connect ftp server" );
             }
         }
-        catch (UnknownHostException e) {
-            String message = String.format(
-                    "请确认ftp服务器地址是否正确，无法连接到地址为: [%s] 的ftp服务器, errorMessage:%s",
-                    host, e.getMessage());
-            LOG.error(message);
-            throw AddaxException.asAddaxException(
-                    LOGIN_ERROR, message, e);
-        }
-        catch (IllegalArgumentException e) {
-            String message = String.format(
-                    "请确认连接ftp服务器端口是否正确，错误的端口: [%s], errorMessage:%s", port,
-                    e.getMessage());
-            LOG.error(message);
-            throw AddaxException.asAddaxException(
-                    LOGIN_ERROR, message, e);
-        }
         catch (Exception e) {
-            String message = String
-                    .format("与ftp服务器建立连接失败,host:%s, port:%s, username:%s, errorMessage:%s",
-                            host, port, username, e.getMessage());
-            LOG.error(message);
             throw AddaxException.asAddaxException(
-                    LOGIN_ERROR, message, e);
+                    LOGIN_ERROR, "Failed to connect the ftp server", e);
         }
     }
 
@@ -114,11 +87,8 @@ public class StandardFtpHelperImpl
                 this.ftpClient.logout();
             }
             catch (IOException e) {
-                String message = String.format(
-                        "与ftp服务器断开连接失败, errorMessage:%s", e.getMessage());
-                LOG.error(message);
                 throw AddaxException.asAddaxException(
-                        CONNECT_ERROR, message, e);
+                        CONNECT_ERROR, "Failed to disconnect", e);
             }
             finally {
                 if (this.ftpClient.isConnected()) {
@@ -126,10 +96,7 @@ public class StandardFtpHelperImpl
                         this.ftpClient.disconnect();
                     }
                     catch (IOException e) {
-                        String message = String.format(
-                                "与ftp服务器断开连接失败, errorMessage:%s",
-                                e.getMessage());
-                        LOG.error(message);
+                        LOG.error("Failed to disconnect", e);
                     }
                 }
                 this.ftpClient = null;
@@ -140,30 +107,20 @@ public class StandardFtpHelperImpl
     @Override
     public void mkdir(String directoryPath)
     {
-        String message = String.format("创建目录:%s时发生异常,请确认与ftp服务器的连接正常,拥有目录创建权限",
-                directoryPath);
         try {
             this.printWorkingDirectory();
-            boolean isDirExist = this.ftpClient
-                    .changeWorkingDirectory(directoryPath);
+            boolean isDirExist = this.ftpClient.changeWorkingDirectory(directoryPath);
             if (!isDirExist) {
                 int replayCode = this.ftpClient.mkd(directoryPath);
-                message = String
-                        .format("%s,replayCode:%s", message, replayCode);
-                if (replayCode != FTPReply.COMMAND_OK
-                        && replayCode != FTPReply.PATHNAME_CREATED) {
+                if (replayCode != FTPReply.COMMAND_OK && replayCode != FTPReply.PATHNAME_CREATED) {
                     throw AddaxException.asAddaxException(
                             EXECUTE_FAIL,
-                            message);
+                            "Failed to create directory, please check the permission");
                 }
             }
         }
         catch (IOException e) {
-            message = String.format("%s, errorMessage:%s", message,
-                    e.getMessage());
-            LOG.error(message);
-            throw AddaxException.asAddaxException(
-                    IO_ERROR, message, e);
+            throw AddaxException.asAddaxException(IO_ERROR, "Failed to create directory", e);
         }
     }
 
@@ -173,26 +130,18 @@ public class StandardFtpHelperImpl
         StringBuilder dirPath = new StringBuilder();
         dirPath.append(IOUtils.DIR_SEPARATOR_UNIX);
         String[] dirSplit = StringUtils.split(directoryPath, IOUtils.DIR_SEPARATOR_UNIX);
-        String message = String.format("创建目录:%s时发生异常,请确认与ftp服务器的连接正常,拥有目录创建权限", directoryPath);
         try {
-            // ftp server不支持递归创建目录,只能一级一级创建
             for (String dirName : dirSplit) {
                 dirPath.append(dirName);
                 boolean mkdirSuccess = mkDirSingleHierarchy(dirPath.toString());
                 dirPath.append(IOUtils.DIR_SEPARATOR_UNIX);
                 if (!mkdirSuccess) {
-                    throw AddaxException.asAddaxException(
-                            EXECUTE_FAIL,
-                            message);
+                    throw AddaxException.asAddaxException(EXECUTE_FAIL, "Failed to create directory");
                 }
             }
         }
         catch (IOException e) {
-            message = String.format("%s, errorMessage:%s", message,
-                    e.getMessage());
-            LOG.error(message);
-            throw AddaxException.asAddaxException(
-                    IO_ERROR, message, e);
+            throw AddaxException.asAddaxException(IO_ERROR, "Failed to create directory", e);
         }
     }
 
@@ -201,11 +150,9 @@ public class StandardFtpHelperImpl
     {
         boolean isDirExist = this.ftpClient
                 .changeWorkingDirectory(directoryPath);
-        // 如果directoryPath目录不存在,则创建
         if (!isDirExist) {
             int replayCode = this.ftpClient.mkd(directoryPath);
-            return replayCode == FTPReply.COMMAND_OK
-                    || replayCode == FTPReply.PATHNAME_CREATED;
+            return replayCode == FTPReply.COMMAND_OK || replayCode == FTPReply.PATHNAME_CREATED;
         }
         return true;
     }
@@ -215,29 +162,18 @@ public class StandardFtpHelperImpl
     {
         try {
             this.printWorkingDirectory();
-            String parentDir = filePath.substring(0,
-                    StringUtils.lastIndexOf(filePath, IOUtils.DIR_SEPARATOR));
+            String parentDir = filePath.substring(0, StringUtils.lastIndexOf(filePath, IOUtils.DIR_SEPARATOR));
             this.ftpClient.changeWorkingDirectory(parentDir);
             this.printWorkingDirectory();
-            OutputStream writeOutputStream = this.ftpClient
-                    .appendFileStream(filePath);
-            String message = String.format(
-                    "打开FTP文件[%s]获取写出流时出错,请确认文件%s有权限创建，有权限写出等", filePath,
-                    filePath);
+            OutputStream writeOutputStream = this.ftpClient.appendFileStream(filePath);
             if (null == writeOutputStream) {
-                throw AddaxException.asAddaxException(
-                        EXECUTE_FAIL, message);
+                throw AddaxException.asAddaxException(EXECUTE_FAIL, "Failed to open file for writing");
             }
 
             return writeOutputStream;
         }
         catch (IOException e) {
-            String message = String.format(
-                    "写出文件 : [%s] 时出错,请确认文件:[%s]存在且配置的用户有权限写, errorMessage:%s",
-                    filePath, filePath, e.getMessage());
-            LOG.error(message);
-            throw AddaxException.asAddaxException(
-                    IO_ERROR, message);
+            throw AddaxException.asAddaxException(IO_ERROR, "Failed to open file for writing", e);
         }
     }
 
@@ -247,8 +183,7 @@ public class StandardFtpHelperImpl
         try {
             this.completePendingCommand();
             this.printWorkingDirectory();
-            String parentDir = filePath.substring(0,
-                    StringUtils.lastIndexOf(filePath, IOUtils.DIR_SEPARATOR));
+            String parentDir = filePath.substring(0, StringUtils.lastIndexOf(filePath, IOUtils.DIR_SEPARATOR));
             this.ftpClient.changeWorkingDirectory(parentDir);
             this.printWorkingDirectory();
             ByteArrayOutputStream outputStream = new ByteArrayOutputStream(22);
@@ -258,12 +193,7 @@ public class StandardFtpHelperImpl
             return result;
         }
         catch (IOException e) {
-            String message = String.format(
-                    "读取文件 : [%s] 时出错,请确认文件:[%s]存在且配置的用户有权限读取, errorMessage:%s",
-                    filePath, filePath, e.getMessage());
-            LOG.error(message);
-            throw AddaxException.asAddaxException(
-                    IO_ERROR, message);
+            throw AddaxException.asAddaxException(IO_ERROR, "Failed to get file content", e);
         }
     }
 
@@ -274,15 +204,11 @@ public class StandardFtpHelperImpl
         try {
             boolean isDirExist = this.ftpClient.changeWorkingDirectory(dir);
             if (!isDirExist) {
-                throw AddaxException.asAddaxException(
-                        EXECUTE_FAIL,
-                        String.format("进入目录[%s]失败", dir));
+                throw AddaxException.asAddaxException(EXECUTE_FAIL, "the directory " + dir + " does not exist");
             }
             this.printWorkingDirectory();
             FTPFile[] fs = this.ftpClient.listFiles(dir);
-            // LOG.debug(JSON.toJSONString(this.ftpClient.listNames(dir)));
-            LOG.debug(String.format("ls: %s",
-                    JSON.toJSONString(fs, JSONWriter.Feature.UseSingleQuotes)));
+            LOG.debug("list files in  {}", JSON.toJSONString(fs, JSONWriter.Feature.UseSingleQuotes));
             for (FTPFile ff : fs) {
                 String strName = ff.getName();
                 if (strName.startsWith(prefixFileName)) {
@@ -291,12 +217,7 @@ public class StandardFtpHelperImpl
             }
         }
         catch (IOException e) {
-            String message = String
-                    .format("获取path:[%s] 下文件列表时发生I/O异常,请确认与ftp服务器的连接正常,拥有目录ls权限, errorMessage:%s",
-                            dir, e.getMessage());
-            LOG.error(message);
-            throw AddaxException.asAddaxException(
-                    IO_ERROR, message, e);
+            throw AddaxException.asAddaxException(IO_ERROR, "Failed to change working directory", e);
         }
         return allFilesWithPointedPrefix;
     }
@@ -304,42 +225,32 @@ public class StandardFtpHelperImpl
     @Override
     public void deleteFiles(Set<String> filesToDelete)
     {
-        String eachFile = null;
         boolean deleteOk;
+        this.printWorkingDirectory();
         try {
-            this.printWorkingDirectory();
             for (String each : filesToDelete) {
-                LOG.info(String.format("delete file [%s].", each));
-                eachFile = each;
+                LOG.info("Try to delete file {}", each);
                 deleteOk = this.ftpClient.deleteFile(each);
                 if (!deleteOk) {
-                    String message = String.format(
-                            "删除文件:[%s] 时失败,请确认指定文件有删除权限", eachFile);
                     throw AddaxException.asAddaxException(
                             IO_ERROR,
-                            message);
+                            "Failed to delete file, please check the permission");
                 }
             }
         }
         catch (IOException e) {
-            String message = String.format(
-                    "删除文件:[%s] 时发生异常,请确认指定文件有删除权限,以及网络交互正常, errorMessage:%s",
-                    eachFile, e.getMessage());
-            LOG.error(message);
             throw AddaxException.asAddaxException(
-                    IO_ERROR, message, e);
+                    IO_ERROR, "Failed to delete file", e);
         }
     }
 
     private void printWorkingDirectory()
     {
         try {
-            LOG.info(String.format("current working directory:%s",
-                    this.ftpClient.printWorkingDirectory()));
+            LOG.info("current working directory:{}", this.ftpClient.printWorkingDirectory());
         }
         catch (Exception e) {
-            LOG.warn(String.format("printWorkingDirectory error:%s",
-                    e.getMessage()));
+            LOG.warn("printWorkingDirectory error:{}", e.getMessage());
         }
     }
 
@@ -357,16 +268,12 @@ public class StandardFtpHelperImpl
             if (!isOk) {
                 throw AddaxException.asAddaxException(
                         EXECUTE_FAIL,
-                        "完成ftp completePendingCommand操作发生异常");
+                        "Failed to complete the pending command, please check the permission");
             }
         }
         catch (IOException e) {
-            String message = String.format(
-                    "完成ftp completePendingCommand操作发生异常, errorMessage:%s",
-                    e.getMessage());
-            LOG.error(message);
             throw AddaxException.asAddaxException(
-                    EXECUTE_FAIL, message, e);
+                    EXECUTE_FAIL, "Failed to complete the pending command", e);
         }
     }
 }

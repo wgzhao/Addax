@@ -19,14 +19,8 @@
 
 package com.wgzhao.addax.core.util;
 
-import com.wgzhao.addax.common.util.Configuration;
 import org.apache.commons.lang3.Validate;
 
-/**
- * Created by jingxing on 14-9-16.
- * <p>
- * 对配置文件做整体检查
- */
 public class ConfigurationValidate
 {
 

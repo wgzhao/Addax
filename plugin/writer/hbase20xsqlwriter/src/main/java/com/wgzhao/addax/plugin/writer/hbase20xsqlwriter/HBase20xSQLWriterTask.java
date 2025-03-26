@@ -19,14 +19,14 @@
 
 package com.wgzhao.addax.plugin.writer.hbase20xsqlwriter;
 
-import com.wgzhao.addax.common.base.HBaseConstant;
-import com.wgzhao.addax.common.base.HBaseKey;
-import com.wgzhao.addax.common.element.Column;
-import com.wgzhao.addax.common.element.Record;
-import com.wgzhao.addax.common.exception.AddaxException;
-import com.wgzhao.addax.common.plugin.RecordReceiver;
-import com.wgzhao.addax.common.plugin.TaskPluginCollector;
-import com.wgzhao.addax.common.util.Configuration;
+import com.wgzhao.addax.core.base.HBaseConstant;
+import com.wgzhao.addax.core.base.HBaseKey;
+import com.wgzhao.addax.core.element.Column;
+import com.wgzhao.addax.core.element.Record;
+import com.wgzhao.addax.core.exception.AddaxException;
+import com.wgzhao.addax.core.plugin.RecordReceiver;
+import com.wgzhao.addax.core.plugin.TaskPluginCollector;
+import com.wgzhao.addax.core.util.Configuration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -41,13 +41,12 @@ import java.sql.Time;
 import java.sql.Timestamp;
 import java.sql.Types;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
-import static com.wgzhao.addax.common.spi.ErrorCode.EXECUTE_FAIL;
-import static com.wgzhao.addax.common.spi.ErrorCode.ILLEGAL_VALUE;
-import static com.wgzhao.addax.common.spi.ErrorCode.REQUIRED_VALUE;
-import static com.wgzhao.addax.common.spi.ErrorCode.RUNTIME_ERROR;
+import static com.wgzhao.addax.core.spi.ErrorCode.EXECUTE_FAIL;
+import static com.wgzhao.addax.core.spi.ErrorCode.ILLEGAL_VALUE;
+import static com.wgzhao.addax.core.spi.ErrorCode.REQUIRED_VALUE;
+import static com.wgzhao.addax.core.spi.ErrorCode.RUNTIME_ERROR;
 
 public class HBase20xSQLWriterTask
 {
@@ -59,9 +58,7 @@ public class HBase20xSQLWriterTask
     private Connection connection = null;
     private PreparedStatement pstmt = null;
 
-    // 需要向 hbase 写入的列的数量,即用户配置的column参数中列的个数。时间戳不包含在内
     private int numberOfColumnsToWrite;
-    // 期待从源头表的Record中拿到多少列
     private int numberOfColumnsToRead;
     private int[] columnTypes;
     private List<String> columns;
@@ -72,7 +69,6 @@ public class HBase20xSQLWriterTask
 
     public HBase20xSQLWriterTask(Configuration configuration)
     {
-        // 这里仅解析配置，不访问远端集群，配置的合法性检查在writer的init过程中进行
         this.configuration = configuration;
     }
 
@@ -81,26 +77,18 @@ public class HBase20xSQLWriterTask
         this.taskPluginCollector = taskPluginCollector;
 
         try {
-            // 准备阶段
             initialize();
 
-            // 写入数据
             writeData(lineReceiver);
         }
         catch (Throwable e) {
             throw AddaxException.asAddaxException(RUNTIME_ERROR, e);
         }
         finally {
-            // 关闭jdbc连接
             HBase20xSQLHelper.closeJdbc(connection, pstmt, null);
         }
     }
 
-    /**
-     * 初始化JDBC操作对象及列类型
-     *
-     * @throws SQLException sql exception
-     */
     private void initialize()
             throws SQLException
     {
@@ -118,42 +106,34 @@ public class HBase20xSQLWriterTask
         }
         columns = configuration.getList(HBaseKey.COLUMN, String.class);
         if (pstmt == null) {
-            // 一个Task的生命周期中只使用一个PreparedStatement对象
             pstmt = createPreparedStatement();
             columnTypes = getColumnSqlType();
         }
     }
 
-    /**
-     * 生成sql模板，并根据模板创建PreparedStatement
-     * @return A {@link PreparedStatement}
-     * @throws SQLException if occurred
-     */
+
     private PreparedStatement createPreparedStatement()
             throws SQLException
     {
-        // 生成列名集合，列之间用逗号分隔： col1,col2,col3,...
         StringBuilder columnNamesBuilder = new StringBuilder();
         for (String col : columns) {
-            // 列名使用双引号，则不自动转换为全大写，而是保留用户配置的大小写
             columnNamesBuilder.append("\"");
             columnNamesBuilder.append(col);
             columnNamesBuilder.append("\"");
             columnNamesBuilder.append(",");
         }
-        // 移除末尾多余的逗号
         columnNamesBuilder.setLength(columnNamesBuilder.length() - 1);
         String columnNames = columnNamesBuilder.toString();
         numberOfColumnsToWrite = columns.size();
-        numberOfColumnsToRead = numberOfColumnsToWrite;   // 开始的时候，要读的列数娱要写的列数相等
+        numberOfColumnsToRead = numberOfColumnsToWrite;
 
-        // 生成UPSERT模板
         StringBuilder upsertBuilder =
                 new StringBuilder("upsert into " + fullTableName + " (" + columnNames + " ) values (");
         for (int i = 0; i < numberOfColumnsToWrite; i++) {
             upsertBuilder.append("?,");
         }
-        upsertBuilder.setLength(upsertBuilder.length() - 1);  // 移除末尾多余的逗号
+        // remove the trailing comma
+        upsertBuilder.setLength(upsertBuilder.length() - 1);
         upsertBuilder.append(")");
 
         String sql = upsertBuilder.toString();
@@ -162,11 +142,6 @@ public class HBase20xSQLWriterTask
         return ps;
     }
 
-    /**
-     * 根据列名来从数据库元数据中获取这一列对应的SQL类型
-     *
-     * @return Array of integers
-     */
     private int[] getColumnSqlType()
     {
         int[] types = new int[numberOfColumnsToWrite];
@@ -175,7 +150,6 @@ public class HBase20xSQLWriterTask
             columnNamesBuilder.append("\"").append(columnName).append("\",");
         }
         columnNamesBuilder.setLength(columnNamesBuilder.length() - 1);
-        // 查询一条数据获取表meta信息
         String selectSql = "SELECT " + columnNamesBuilder + " FROM " + fullTableName + " LIMIT 1";
         Statement statement = null;
         try {
@@ -190,7 +164,7 @@ public class HBase20xSQLWriterTask
         }
         catch (SQLException e) {
             throw AddaxException.asAddaxException(EXECUTE_FAIL,
-                    "获取表" + fullTableName + "列类型失败，请检查配置和服务状态或者联系HBase管理员.", e);
+                   "Failed to get the columns of "+ fullTableName, e);
         }
         finally {
             HBase20xSQLHelper.closeJdbc(null, statement, null);
@@ -199,23 +173,15 @@ public class HBase20xSQLWriterTask
         return types;
     }
 
-    /**
-     * 从接收器中获取每条记录，写入Phoenix
-     *
-     * @param lineReceiver record
-     * @throws SQLException sql exception
-     */
     private void writeData(RecordReceiver lineReceiver)
             throws SQLException
     {
         List<Record> buffer = new ArrayList<>(batchSize);
         Record record;
         while ((record = lineReceiver.getFromReader()) != null) {
-            // 校验列数量是否符合预期
             if (record.getColumnNumber() != numberOfColumnsToRead) {
-                throw AddaxException.asAddaxException(ILLEGAL_VALUE,
-                        "数据源给出的列数量[" + record.getColumnNumber() + "]与您配置中的列数量[" + numberOfColumnsToRead +
-                                "]不同, 请检查您的配置 或者 联系 Hbase 管理员.");
+                throw AddaxException.asAddaxException(ILLEGAL_VALUE, "The number of columns(" + record.getColumnNumber() +
+                        ") is not equal to  the number of columns (" + numberOfColumnsToRead  + "in your configuration");
             }
 
             buffer.add(record);
@@ -225,31 +191,22 @@ public class HBase20xSQLWriterTask
             }
         }
 
-        // 处理剩余的record
         if (!buffer.isEmpty()) {
             doBatchUpsert(buffer);
             buffer.clear();
         }
     }
 
-    /**
-     * 批量提交一组数据，如果失败，则尝试一行行提交，如果仍然失败，抛错给用户
-     *
-     * @param records list of record
-     * @throws SQLException sql exception
-     */
     private void doBatchUpsert(List<Record> records)
             throws SQLException
     {
         try {
-            // 将所有record提交到connection缓存
             for (Record r : records) {
                 setupStatement(r);
                 pstmt.addBatch();
             }
 
             pstmt.executeBatch();
-            // 将缓存的数据提交到phoenix
             connection.commit();
             pstmt.clearParameters();
             pstmt.clearBatch();
@@ -257,7 +214,6 @@ public class HBase20xSQLWriterTask
         catch (SQLException e) {
             LOG.error("Failed batch committing {} records", records.size(), e);
 
-            // 批量提交失败，则一行行重试，以确定哪一行出错
             connection.rollback();
             HBase20xSQLHelper.closeJdbc(null, pstmt, null);
             connection.setAutoCommit(true);
@@ -269,11 +225,6 @@ public class HBase20xSQLWriterTask
         }
     }
 
-    /**
-     * 单行提交，将出错的行记录到脏数据中。由脏数据收集模块判断任务是否继续
-     *
-     * @param records list of records
-     */
     private void doSingleUpsert(List<Record> records)
     {
         int rowNumber = 0;
@@ -284,7 +235,6 @@ public class HBase20xSQLWriterTask
                 pstmt.executeUpdate();
             }
             catch (SQLException e) {
-                //出错了，记录脏数据
                 LOG.error("Failed writing to phoenix, rowNumber: {}", rowNumber);
                 this.taskPluginCollector.collectDirtyRecord(r, e);
             }
@@ -297,7 +247,6 @@ public class HBase20xSQLWriterTask
         for (int i = 0; i < numberOfColumnsToWrite; i++) {
             Column col = record.getColumn(i);
             int sqlType = columnTypes[i];
-            // PreparedStatement中的索引从1开始，所以用i+1
             setupColumn(i + 1, sqlType, col);
         }
     }
@@ -369,40 +318,26 @@ public class HBase20xSQLWriterTask
                     break;
 
                 default:
-                    throw AddaxException.asAddaxException(ILLEGAL_VALUE,
-                            "不支持您配置的列类型:" + sqlType + ", 请检查您的配置 或者 联系 Hbase 管理员.");
+                    throw AddaxException.asAddaxException(ILLEGAL_VALUE, "The column type " + sqlType + " is unsupported");
             }
         }
         else {
-            // 没有值，按空值的配置情况处理
             switch (nullModeType) {
                 case SKIP:
-                    // 跳过空值，则不插入该列,
                     pstmt.setNull(pos, sqlType);
                     break;
 
                 case EMPTY:
-                    // 插入"空值"，请注意不同类型的空值不同
-                    // 另外，对SQL来说，空值本身是有值的，这与直接操作HBASE Native API时的空值完全不同
                     pstmt.setObject(pos, getEmptyValue(sqlType));
                     break;
 
                 default:
-                    // nullMode的合法性在初始化配置的时候已经校验过，这里一定不会出错
                     throw AddaxException.asAddaxException(ILLEGAL_VALUE,
-                            "Hbasewriter 不支持该 nullMode 类型: " + nullModeType +
-                                    ", 目前支持的 nullMode 类型是:" + Arrays.asList(NullModeType.values()));
+                            "The value of nullMode is not supported, it should be either skip or empty");
             }
         }
     }
 
-    /**
-     * 根据类型获取"空值"
-     * 值类型的空值都是0，bool是false，String是空字符串
-     *
-     * @param sqlType sql数据类型，定义于{@link Types}
-     * @return value
-     */
     private Object getEmptyValue(int sqlType)
     {
         switch (sqlType) {
@@ -454,8 +389,7 @@ public class HBase20xSQLWriterTask
                 return new byte[0];
 
             default:
-                throw AddaxException.asAddaxException(ILLEGAL_VALUE,
-                        "不支持您配置的列类型:" + sqlType + ", 请检查您的配置 或者 联系 Hbase 管理员.");
+                throw AddaxException.asAddaxException(ILLEGAL_VALUE, "The column type " + sqlType + " is unsupported");
         }
     }
 }

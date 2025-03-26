@@ -19,7 +19,7 @@
 
 package com.wgzhao.addax.core.statistics.plugin;
 
-import com.wgzhao.addax.common.plugin.JobPluginCollector;
+import com.wgzhao.addax.core.plugin.JobPluginCollector;
 import com.wgzhao.addax.core.statistics.communication.Communication;
 import com.wgzhao.addax.core.statistics.container.communicator.AbstractContainerCommunicator;
 

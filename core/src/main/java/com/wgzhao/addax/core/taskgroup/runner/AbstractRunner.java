@@ -19,9 +19,9 @@
 
 package com.wgzhao.addax.core.taskgroup.runner;
 
-import com.wgzhao.addax.common.plugin.AbstractTaskPlugin;
-import com.wgzhao.addax.common.plugin.TaskPluginCollector;
-import com.wgzhao.addax.common.util.Configuration;
+import com.wgzhao.addax.core.plugin.AbstractTaskPlugin;
+import com.wgzhao.addax.core.plugin.TaskPluginCollector;
+import com.wgzhao.addax.core.util.Configuration;
 import com.wgzhao.addax.core.meta.State;
 import com.wgzhao.addax.core.statistics.communication.Communication;
 import com.wgzhao.addax.core.statistics.communication.CommunicationTool;
@@ -121,7 +121,7 @@ public abstract class AbstractRunner
     public void setRunnerCommunication(final Communication runnerCommunication)
     {
         Validate.notNull(runnerCommunication,
-                "插件的Communication不能为空");
+                "The Communication of plugin can not be null");
         this.runnerCommunication = runnerCommunication;
     }
 

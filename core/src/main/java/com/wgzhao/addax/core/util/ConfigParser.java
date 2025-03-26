@@ -19,8 +19,7 @@
 
 package com.wgzhao.addax.core.util;
 
-import com.wgzhao.addax.common.exception.AddaxException;
-import com.wgzhao.addax.common.util.Configuration;
+import com.wgzhao.addax.core.exception.AddaxException;
 
 import java.io.File;
 import java.io.IOException;
@@ -38,11 +37,11 @@ import org.apache.hc.core5.util.Timeout;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import static com.wgzhao.addax.common.base.Key.CONNECTION;
-import static com.wgzhao.addax.common.spi.ErrorCode.CONFIG_ERROR;
-import static com.wgzhao.addax.common.spi.ErrorCode.IO_ERROR;
-import static com.wgzhao.addax.common.spi.ErrorCode.PLUGIN_INIT_ERROR;
-import static com.wgzhao.addax.common.spi.ErrorCode.REQUIRED_VALUE;
+import static com.wgzhao.addax.core.base.Key.CONNECTION;
+import static com.wgzhao.addax.core.spi.ErrorCode.CONFIG_ERROR;
+import static com.wgzhao.addax.core.spi.ErrorCode.IO_ERROR;
+import static com.wgzhao.addax.core.spi.ErrorCode.PLUGIN_INIT_ERROR;
+import static com.wgzhao.addax.core.spi.ErrorCode.REQUIRED_VALUE;
 import static com.wgzhao.addax.core.util.container.CoreConstant.CONF_PATH;
 import static com.wgzhao.addax.core.util.container.CoreConstant.CORE_SERVER_TIMEOUT_SEC;
 import static com.wgzhao.addax.core.util.container.CoreConstant.JOB_CONTENT;
@@ -66,8 +65,10 @@ public final class ConfigParser
     {
     }
 
-    /*
-     * 指定Job配置路径，ConfigParser会解析Job、Plugin、Core全部信息，并以Configuration返回
+    /**
+     * Parse the job configuration file and merge the core configuration
+     * @param jobPath the path of the job configuration file
+     * @return the merged configuration
      */
     public static Configuration parse(String jobPath)
     {
@@ -145,7 +146,13 @@ public final class ConfigParser
 
     private static Configuration parseCoreConfig()
     {
-        return Configuration.from(new File(CONF_PATH));
+
+        Configuration coreConfig = Configuration.from(new File(CONF_PATH));
+        // apply the environment variables
+        coreConfig.getMap("entry.environment").forEach((k, v) -> {
+            System.setProperty(k, v.toString());
+        });
+        return coreConfig;
     }
 
     public static Configuration parseJobConfig(String path)
@@ -177,7 +184,6 @@ public final class ConfigParser
             }
         }
         else {
-            // jobResource 是本地文件绝对路径
             try {
                 jobContent = FileUtils.readFileToString(new File(jobResource), StandardCharsets.UTF_8);
             }

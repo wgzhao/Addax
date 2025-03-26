@@ -21,16 +21,14 @@
 
 package com.wgzhao.addax.rdbms.util;
 
-import com.wgzhao.addax.common.exception.AddaxException;
-import com.wgzhao.addax.common.spi.ErrorCode;
+import com.wgzhao.addax.core.exception.AddaxException;
+import com.wgzhao.addax.core.spi.ErrorCode;
 
-import static com.wgzhao.addax.common.spi.ErrorCode.CONNECT_ERROR;
-import static com.wgzhao.addax.common.spi.ErrorCode.EXECUTE_FAIL;
-import static com.wgzhao.addax.common.spi.ErrorCode.PERMISSION_ERROR;
+import static com.wgzhao.addax.core.spi.ErrorCode.CONNECT_ERROR;
+import static com.wgzhao.addax.core.spi.ErrorCode.EXECUTE_FAIL;
+import static com.wgzhao.addax.core.spi.ErrorCode.PERMISSION_ERROR;
 
-/**
- * Created by judy.lt on 2015/6/5.
- */
+
 public class RdbmsException
         extends AddaxException
 {

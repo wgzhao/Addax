@@ -26,57 +26,72 @@ import java.util.Set;
 
 public abstract class FtpHelper
 {
-    /**
-     * 与ftp服务器建立连接
-     *
-     * @param host 要连接的主机名，可以是IP地址
-     * @param username 连接的账号
-     * @param password 账号对应的密码
-     * @param port 连接端口
-     * @param timeout 超时时间（单位为秒）
-     * @param connectMode 连接模式
-     */
+    protected final HashSet<String> sourceFiles = new HashSet<>();
+
     public abstract void loginFtpServer(String host, String username, String password, int port, String keyPath, String keyPass, int timeout, String connectMode);
 
-    /**
-     * 断开与ftp服务器的连接
-     */
     public abstract void logoutFtpServer();
 
     /**
-     * 递归获取指定路径下符合条件的所有文件绝对路径
-     *
-     * @param directoryPath 根目录
-     * @param parentLevel 父目录的递归层数（首次为0）
-     * @param maxTraversalLevel 允许的最大递归层数
-     * @return HashSet of String
+     * List files under the specified directory up to the maximum traversal level.
+     * @param directoryPath Path to check for files
+     * @param parentLevel Current traversal level
+     * @param maxTraversalLevel Maximum depth to traverse
      */
-    public abstract Set<String> getListFiles(String directoryPath, int parentLevel, int maxTraversalLevel);
+    public abstract void getListFiles(String directoryPath, int parentLevel, int maxTraversalLevel);
 
     /**
-     * 获取指定路径的输入流
-     *
-     * @param filePath 需要获取的文件目录
-     * @return InputStream
+     * Get input stream for reading a file
+     * @param filePath Path to the file
+     * @return Input stream for the file
      */
     public abstract InputStream getInputStream(String filePath);
 
     /**
-     * 获取指定路径列表下符合条件的所有文件的绝对路径
-     *
-     * @param srcPaths 路径列表
-     * @param parentLevel 父目录的递归层数（首次为0）
-     * @param maxTraversalLevel 允许的最大递归层数
-     * @return HashSet of String
+     * Check if the path contains wildcard characters
+     * @param path Path to check
+     * @return true if path contains wildcards
+     */
+    protected boolean hasWildcard(String path) {
+        return path.contains("*") || path.contains("?");
+    }
+
+    /**
+     * Match filename against a pattern with wildcards
+     * @param pattern Pattern with possible wildcards (* and ?)
+     * @param filename Filename to check
+     * @return true if filename matches pattern
+     */
+    protected boolean matchWildcard(String pattern, String filename) {
+        String regex = pattern
+                .replace(".", "\\.")
+                .replace("*", ".*")
+                .replace("?", ".");
+        return filename.matches(regex);
+    }
+
+    /**
+     * Get all files from a list of source paths
+     * @param srcPaths List of paths to scan
+     * @param parentLevel Initial level (usually 0)
+     * @param maxTraversalLevel Maximum traversal depth
+     * @return Set containing all found files
      */
     public Set<String> getAllFiles(List<String> srcPaths, int parentLevel, int maxTraversalLevel)
     {
-        HashSet<String> sourceAllFiles = new HashSet<>();
-        if (!srcPaths.isEmpty()) {
+        sourceFiles.clear(); // Clear previous results
+        if (srcPaths != null && !srcPaths.isEmpty()) {
             for (String eachPath : srcPaths) {
-                sourceAllFiles.addAll(getListFiles(eachPath, parentLevel, maxTraversalLevel));
+                getListFiles(eachPath, parentLevel, maxTraversalLevel);
             }
         }
-        return sourceAllFiles;
+        return new HashSet<>(sourceFiles); // Return a copy to prevent modification
     }
+
+    /**
+     * Check if a path is a directory
+     * @param directoryPath Path to check
+     * @return true if it's a directory, false otherwise
+     */
+    protected abstract boolean isDirectory(String directoryPath);
 }

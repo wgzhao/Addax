@@ -23,19 +23,19 @@ import com.alibaba.fastjson2.JSON;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonElement;
-import com.wgzhao.addax.common.element.BoolColumn;
-import com.wgzhao.addax.common.element.BytesColumn;
-import com.wgzhao.addax.common.element.Column;
-import com.wgzhao.addax.common.element.DateColumn;
-import com.wgzhao.addax.common.element.DoubleColumn;
-import com.wgzhao.addax.common.element.LongColumn;
-import com.wgzhao.addax.common.element.Record;
-import com.wgzhao.addax.common.element.StringColumn;
-import com.wgzhao.addax.common.exception.AddaxException;
-import com.wgzhao.addax.common.plugin.RecordSender;
-import com.wgzhao.addax.common.spi.Reader;
-import com.wgzhao.addax.common.statistics.PerfRecord;
-import com.wgzhao.addax.common.util.Configuration;
+import com.wgzhao.addax.core.element.BoolColumn;
+import com.wgzhao.addax.core.element.BytesColumn;
+import com.wgzhao.addax.core.element.Column;
+import com.wgzhao.addax.core.element.DateColumn;
+import com.wgzhao.addax.core.element.DoubleColumn;
+import com.wgzhao.addax.core.element.LongColumn;
+import com.wgzhao.addax.core.element.Record;
+import com.wgzhao.addax.core.element.StringColumn;
+import com.wgzhao.addax.core.exception.AddaxException;
+import com.wgzhao.addax.core.plugin.RecordSender;
+import com.wgzhao.addax.core.spi.Reader;
+import com.wgzhao.addax.core.statistics.PerfRecord;
+import com.wgzhao.addax.core.util.Configuration;
 import com.wgzhao.addax.plugin.reader.elasticsearchreader.gson.MapTypeAdapter;
 import io.searchbox.client.JestResult;
 import io.searchbox.core.SearchResult;
@@ -55,11 +55,11 @@ import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
-import static com.wgzhao.addax.common.spi.ErrorCode.CONFIG_ERROR;
-import static com.wgzhao.addax.common.spi.ErrorCode.EXECUTE_FAIL;
-import static com.wgzhao.addax.common.spi.ErrorCode.ILLEGAL_VALUE;
-import static com.wgzhao.addax.common.spi.ErrorCode.NOT_SUPPORT_TYPE;
-import static com.wgzhao.addax.common.spi.ErrorCode.REQUIRED_VALUE;
+import static com.wgzhao.addax.core.spi.ErrorCode.CONFIG_ERROR;
+import static com.wgzhao.addax.core.spi.ErrorCode.EXECUTE_FAIL;
+import static com.wgzhao.addax.core.spi.ErrorCode.ILLEGAL_VALUE;
+import static com.wgzhao.addax.core.spi.ErrorCode.NOT_SUPPORT_TYPE;
+import static com.wgzhao.addax.core.spi.ErrorCode.REQUIRED_VALUE;
 
 /**
  * @author kesc mail:492167585@qq.com
@@ -79,10 +79,6 @@ public class EsReader
         @Override
         public void prepare()
         {
-            /*
-             * 注意：此方法仅执行一次。
-             * 最佳实践：如果 Job 中有需要进行数据同步之前的处理，可以在此处完成，如果没有必要则可以直接去掉。
-             */
             ESClient esClient = new ESClient();
             esClient.createClient(ESKey.getEndpoint(conf),
                     ESKey.getAccessID(conf),
@@ -183,11 +179,10 @@ public class EsReader
             this.filter = ESKey.getFilter(conf);
             this.column = ESKey.getColumn(conf);
             if (column == null || column.isEmpty()) {
-                throw AddaxException.asAddaxException(REQUIRED_VALUE, "column必须配置");
+                throw AddaxException.asAddaxException(REQUIRED_VALUE, "column is required");
             }
             if (column.size() == 1 && "*".equals(column.get(0))) {
-                // TODO get column from record
-                throw AddaxException.asAddaxException(ILLEGAL_VALUE, "column暂不支持*配置");
+                throw AddaxException.asAddaxException(ILLEGAL_VALUE, "The '*' is not supported");
             }
         }
 

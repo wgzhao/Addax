@@ -19,12 +19,12 @@
 
 package com.wgzhao.addax.core.util.container;
 
-import com.wgzhao.addax.common.constant.PluginType;
-import com.wgzhao.addax.common.exception.AddaxException;
-import com.wgzhao.addax.common.plugin.AbstractJobPlugin;
-import com.wgzhao.addax.common.plugin.AbstractPlugin;
-import com.wgzhao.addax.common.plugin.AbstractTaskPlugin;
-import com.wgzhao.addax.common.util.Configuration;
+import com.wgzhao.addax.core.constant.PluginType;
+import com.wgzhao.addax.core.exception.AddaxException;
+import com.wgzhao.addax.core.plugin.AbstractJobPlugin;
+import com.wgzhao.addax.core.plugin.AbstractPlugin;
+import com.wgzhao.addax.core.plugin.AbstractTaskPlugin;
+import com.wgzhao.addax.core.util.Configuration;
 import com.wgzhao.addax.core.taskgroup.runner.AbstractRunner;
 import com.wgzhao.addax.core.taskgroup.runner.ReaderRunner;
 import com.wgzhao.addax.core.taskgroup.runner.WriterRunner;
@@ -33,37 +33,25 @@ import org.apache.commons.lang3.StringUtils;
 import java.util.HashMap;
 import java.util.Map;
 
-import static com.wgzhao.addax.common.spi.ErrorCode.PLUGIN_INSTALL_ERROR;
-import static com.wgzhao.addax.common.spi.ErrorCode.RUNTIME_ERROR;
+import static com.wgzhao.addax.core.spi.ErrorCode.PLUGIN_INSTALL_ERROR;
+import static com.wgzhao.addax.core.spi.ErrorCode.RUNTIME_ERROR;
 
 /**
- * Created by jingxing on 14-8-24.
- * <p>
- * 插件加载器，大体上分reader、transformer（还未实现）和writer三中插件类型，
- * reader和writer在执行时又可能出现Job和Task两种运行时（加载的类不同）
+ * The plugin loader, which is roughly divided into three types of plugins: reader, transformer (not yet implemented), and writer.
  */
 public class LoadUtil
 {
     private static Configuration configurationSet;
 
-    /*
-     * jarLoader的缓冲
-     */
     private static final Map<String, JarLoader> jarLoaderCenter = new HashMap<>();
 
     private LoadUtil()
     {
     }
 
-    /*
-     * 设置pluginConfigs，方便后面插件来获取
-     */
+
     public static synchronized void bind(Configuration pluginConfigs)
     {
-        /*
-         * 所有插件配置放置在pluginRegisterCenter中，为区别reader、transformer和writer，还能区别
-         * 具体pluginName，故使用pluginType.pluginName作为key放置在该map中
-         */
         configurationSet = pluginConfigs;
     }
 
@@ -85,9 +73,6 @@ public class LoadUtil
         return pluginConf;
     }
 
-    /*
-     * 加载JobPlugin，reader、writer都可能要加载
-     */
     public static AbstractJobPlugin loadJobPlugin(PluginType pluginType, String pluginName)
     {
         Class<? extends AbstractPlugin> clazz = LoadUtil.loadPluginClass(pluginType, pluginName, ContainerType.Job);
@@ -104,9 +89,6 @@ public class LoadUtil
         }
     }
 
-    /*
-     * 加载taskPlugin，reader、writer都可能加载
-     */
     public static AbstractTaskPlugin loadTaskPlugin(PluginType pluginType, String pluginName)
     {
         Class<? extends AbstractPlugin> clazz = LoadUtil.loadPluginClass(pluginType, pluginName, ContainerType.Task);
@@ -122,9 +104,6 @@ public class LoadUtil
         }
     }
 
-    /*
-     * 根据插件类型、名字和执行时taskGroupId加载对应运行器
-     */
     public static AbstractRunner loadPluginRunner(PluginType pluginType, String pluginName)
     {
         AbstractTaskPlugin taskPlugin = LoadUtil.loadTaskPlugin(pluginType, pluginName);
@@ -140,9 +119,6 @@ public class LoadUtil
         }
     }
 
-    /*
-     * 反射出具体plugin实例
-     */
     @SuppressWarnings("unchecked")
     private static synchronized Class<? extends AbstractPlugin> loadPluginClass(
             PluginType pluginType, String pluginName,

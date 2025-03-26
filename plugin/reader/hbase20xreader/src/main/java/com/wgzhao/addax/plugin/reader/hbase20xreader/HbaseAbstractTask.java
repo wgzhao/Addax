@@ -19,17 +19,17 @@
 
 package com.wgzhao.addax.plugin.reader.hbase20xreader;
 
-import com.wgzhao.addax.common.base.HBaseConstant;
-import com.wgzhao.addax.common.base.HBaseKey;
-import com.wgzhao.addax.common.element.BoolColumn;
-import com.wgzhao.addax.common.element.Column;
-import com.wgzhao.addax.common.element.DateColumn;
-import com.wgzhao.addax.common.element.DoubleColumn;
-import com.wgzhao.addax.common.element.LongColumn;
-import com.wgzhao.addax.common.element.StringColumn;
-import com.wgzhao.addax.common.element.Record;
-import com.wgzhao.addax.common.exception.AddaxException;
-import com.wgzhao.addax.common.util.Configuration;
+import com.wgzhao.addax.core.base.HBaseConstant;
+import com.wgzhao.addax.core.base.HBaseKey;
+import com.wgzhao.addax.core.element.BoolColumn;
+import com.wgzhao.addax.core.element.Column;
+import com.wgzhao.addax.core.element.DateColumn;
+import com.wgzhao.addax.core.element.DoubleColumn;
+import com.wgzhao.addax.core.element.LongColumn;
+import com.wgzhao.addax.core.element.StringColumn;
+import com.wgzhao.addax.core.element.Record;
+import com.wgzhao.addax.core.exception.AddaxException;
+import com.wgzhao.addax.core.util.Configuration;
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.time.DateUtils;
 import org.apache.hadoop.hbase.client.Result;
@@ -42,8 +42,8 @@ import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 
-import static com.wgzhao.addax.common.spi.ErrorCode.ILLEGAL_VALUE;
-import static com.wgzhao.addax.common.spi.ErrorCode.NOT_SUPPORT_TYPE;
+import static com.wgzhao.addax.core.spi.ErrorCode.ILLEGAL_VALUE;
+import static com.wgzhao.addax.core.spi.ErrorCode.NOT_SUPPORT_TYPE;
 
 public abstract class HbaseAbstractTask
 {
@@ -87,11 +87,8 @@ public abstract class HbaseAbstractTask
         this.scan.withStartRow(startKey);
         this.scan.withStopRow(endKey);
         LOG.info("The task set startRowkey=[{}], endRowkey=[{}].", Bytes.toStringBinary(this.startKey), Bytes.toStringBinary(this.endKey));
-        //scan的Caching Batch全部留在hconfig中每次从服务器端读取的行数，设置默认值未256
         this.scan.setCaching(this.scanCacheSize);
-        //设置获取记录的列个数，hbase默认无限制，也就是返回所有的列,这里默认是100
         this.scan.setBatch(this.scanBatchSize);
-        //为是否缓存块，hbase默认缓存,同步全部数据时非热点数据，因此不需要缓存
         this.scan.setCacheBlocks(false);
         initScan(this.scan);
 
@@ -160,7 +157,7 @@ public abstract class HbaseAbstractTask
                 column = new DateColumn(ArrayUtils.isEmpty(byteArray) ? null : DateUtils.parseDate(dateValue, dateformat));
                 break;
             default:
-                throw AddaxException.asAddaxException(ILLEGAL_VALUE, "Hbasereader 不支持您配置的列类型:" + columnType);
+                throw AddaxException.asAddaxException(ILLEGAL_VALUE, "The column type '" + columnType + "' is not supported");
         }
         return column;
     }
@@ -189,7 +186,7 @@ public abstract class HbaseAbstractTask
                 column = new DateColumn(DateUtils.parseDate(constantValue, dateformat));
                 break;
             default:
-                throw AddaxException.asAddaxException(NOT_SUPPORT_TYPE, "Hbasereader 常量列不支持您配置的列类型:" + columnType);
+                throw AddaxException.asAddaxException(NOT_SUPPORT_TYPE, "The column type '" + columnType + "' is not supported");
         }
         return column;
     }

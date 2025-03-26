@@ -19,10 +19,10 @@
 
 package com.wgzhao.addax.plugin.writer.hbase11xsqlwriter;
 
-import com.wgzhao.addax.common.base.HBaseConstant;
-import com.wgzhao.addax.common.base.HBaseKey;
-import com.wgzhao.addax.common.exception.AddaxException;
-import com.wgzhao.addax.common.util.Configuration;
+import com.wgzhao.addax.core.base.HBaseConstant;
+import com.wgzhao.addax.core.base.HBaseKey;
+import com.wgzhao.addax.core.exception.AddaxException;
+import com.wgzhao.addax.core.util.Configuration;
 import com.google.common.base.Strings;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.hadoop.hbase.HConstants;
@@ -34,75 +34,54 @@ import org.slf4j.LoggerFactory;
 import java.util.List;
 import java.util.Map;
 
-import static com.wgzhao.addax.common.spi.ErrorCode.ILLEGAL_VALUE;
-import static com.wgzhao.addax.common.spi.ErrorCode.REQUIRED_VALUE;
+import static com.wgzhao.addax.core.spi.ErrorCode.ILLEGAL_VALUE;
+import static com.wgzhao.addax.core.spi.ErrorCode.REQUIRED_VALUE;
 
-/**
- * HBase SQL writer config
- *
- * @author yanghan.y
- */
 public class HbaseSQLWriterConfig
 {
     private static final Logger LOG = LoggerFactory.getLogger(HbaseSQLWriterConfig.class);
-    private Configuration originalConfig;   // 原始的配置数据
+    private Configuration originalConfig;
 
-    // 集群配置
     private String connectionString;
 
-    // 表配置
     private String tableName;
-    private List<String> columns;           // 目的表的所有列的列名，包括主键和非主键，不包括时间列
+    private List<String> columns;
 
-    // 其他配置
     private NullModeType nullMode;
-    private int batchSize;                  // 一次批量写入多少行
-    private boolean truncate;               // 导入开始前是否要清空目的表
+    private int batchSize;
+    private boolean truncate;
     private boolean isThinClient;
     private String namespace;
     private String username;
     private String password;
 
-    // kerberos 配置
     private boolean haveKerberos;
     private String kerberosKeytabFilePath;
     private String kerberosPrincipal;
 
-    /**
-     * 禁止直接实例化本类，必须调用{@link #parse}接口来初始化
-     */
     private HbaseSQLWriterConfig()
     {
     }
 
-    /**
-     * @param jobConf configuration json
-     * @return hbase writer class
-     */
     public static HbaseSQLWriterConfig parse(Configuration jobConf)
     {
         assert jobConf != null;
         HbaseSQLWriterConfig cfg = new HbaseSQLWriterConfig();
         cfg.originalConfig = jobConf;
 
-        // 1. 解析集群配置
         parseClusterConfig(cfg, jobConf);
 
-        // 2. 解析列配置
         parseTableConfig(cfg, jobConf);
 
-        // 3. 解析其他配置
         cfg.nullMode = NullModeType.getByTypeName(jobConf.getString(HBaseKey.NULL_MODE, HBaseConstant.DEFAULT_NULL_MODE));
         cfg.batchSize = jobConf.getInt(HBaseKey.BATCH_SIZE, HBaseConstant.DEFAULT_BATCH_ROW_COUNT);
         cfg.truncate = jobConf.getBool(HBaseKey.TRUNCATE, HBaseConstant.DEFAULT_TRUNCATE);
         cfg.isThinClient = jobConf.getBool(HBaseKey.THIN_CLIENT, HBaseConstant.DEFAULT_USE_THIN_CLIENT);
 
-        // 4. 解析kerberos 配置
         cfg.haveKerberos = jobConf.getBool(HBaseKey.HAVE_KERBEROS, HBaseConstant.DEFAULT_HAVE_KERBEROS);
         cfg.kerberosPrincipal = jobConf.getString(HBaseKey.KERBEROS_PRINCIPAL, HBaseConstant.DEFAULT_KERBEROS_PRINCIPAL);
         cfg.kerberosKeytabFilePath = jobConf.getString(HBaseKey.KERBEROS_KEYTAB_FILE_PATH, HBaseConstant.DEFAULT_KERBEROS_KEYTAB_FILE_PATH);
 
-        // 4. 打印解析出来的配置
         LOG.debug("HBase SQL writer config parsed: {}", cfg);
 
         return cfg;
@@ -110,10 +89,8 @@ public class HbaseSQLWriterConfig
 
     private static void parseClusterConfig(HbaseSQLWriterConfig cfg, Configuration jobConf)
     {
-        // 获取hbase集群的连接信息字符串
         String hbaseCfg = jobConf.getString(HBaseKey.HBASE_CONFIG);
         if (StringUtils.isBlank(hbaseCfg)) {
-            // 集群配置必须存在且不为空
             throw AddaxException.asAddaxException(
                     REQUIRED_VALUE,
                     String.format("%s must be configured with the following:  %s and  %s",
@@ -139,7 +116,7 @@ public class HbaseSQLWriterConfig
             cfg.connectionString = thinConnectStr;
         }
         else {
-            // 解析zk服务器和znode信息
+            // parse the zk quorum and znode
             Pair<String, String> zkCfg;
             try {
                 zkCfg = HbaseSQLHelper.getHbaseConfig(hbaseCfg);
@@ -158,14 +135,14 @@ public class HbaseSQLWriterConfig
                         "The items hbase.zookeeper.quorum/zookeeper.znode.parent must be configured");
             }
 
-            // 生成sql使用的连接字符串， 格式： jdbc:phoenix:zk_quorum[:port]:/znode_parent[:principal:keytab]
+            // generate phoenix jdbc url string
+            // jdbc:phoenix:zk_quorum[:port]:/znode_parent[:principal:keytab]
             cfg.connectionString = "jdbc:phoenix:" + zkQuorum + ":" + znode;
         }
     }
 
     private static void parseTableConfig(HbaseSQLWriterConfig cfg, Configuration jobConf)
     {
-        // 解析并检查表名
         cfg.tableName = jobConf.getString(HBaseKey.TABLE);
 
         if (cfg.tableName == null || cfg.tableName.isEmpty()) {
@@ -178,7 +155,7 @@ public class HbaseSQLWriterConfig
         catch (Exception e) {
             throw AddaxException.asAddaxException(
                     ILLEGAL_VALUE,
-                    "The table " +  cfg.tableName + " you configured has illegal symbols.");
+                    "The table " + cfg.tableName + " you configured has illegal symbols.");
         }
 
         // 解析列配置
@@ -189,33 +166,21 @@ public class HbaseSQLWriterConfig
         }
     }
 
-    /**
-     * @return 获取原始配置
-     */
     public Configuration getOriginalConfig()
     {
         return originalConfig;
     }
 
-    /**
-     * @return 获取连接字符串，使用ZK模式
-     */
     public String getConnectionString()
     {
         return connectionString;
     }
 
-    /**
-     * @return 获取表名
-     */
     public String getTableName()
     {
         return tableName;
     }
 
-    /**
-     * @return 返回所有的列，包括主键列和非主键列，但不包括version列
-     */
     public List<String> getColumns()
     {
         return columns;
@@ -226,17 +191,11 @@ public class HbaseSQLWriterConfig
         return nullMode;
     }
 
-    /**
-     * @return 批量写入的最大行数
-     */
-    public int  getBatchSize()
+    public int getBatchSize()
     {
         return batchSize;
     }
 
-    /**
-     * @return 在writer初始化的时候是否要清空目标表
-     */
     public boolean truncate()
     {
         return truncate;
@@ -281,7 +240,6 @@ public class HbaseSQLWriterConfig
     public String toString()
     {
         StringBuilder ret = new StringBuilder();
-        // 集群配置
         ret.append("\n[jdbc]");
         ret.append(connectionString);
         ret.append("\n");
@@ -298,7 +256,6 @@ public class HbaseSQLWriterConfig
         ret.setLength(ret.length() - 1);
         ret.append("\n");
 
-        // 其他配置
         ret.append("[nullMode]");
         ret.append(nullMode);
         ret.append("\n");

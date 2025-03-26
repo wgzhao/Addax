@@ -89,7 +89,7 @@ public class DorisStreamLoadObserver
             throw new IOException("load_url cannot be empty, or the host cannot connect.Please check your configuration.");
         }
         String loadUrl = host + "/api/" + options.getDatabase() + "/" + options.getTable() + "/_stream_load";
-        LOG.info("Start to join batch data: rows[{}] bytes[{}] label[{}].", data.getRows().size(), data.getBytes(), data.getLabel());
+        LOG.debug("Start to join batch data: rows[{}] bytes[{}] label[{}].", data.getRows().size(), data.getBytes(), data.getLabel());
         loadUrl = urlDecode(loadUrl);
         Map<String, Object> loadResult = put(loadUrl, data.getLabel(), addRows(data.getRows(), data.getBytes().intValue()));
         final String keyStatus = "Status";
@@ -190,7 +190,7 @@ public class DorisStreamLoadObserver
     private Map<String, Object> put(String loadUrl, String label, byte[] data)
             throws IOException
     {
-        LOG.info("Executing stream load to: '{}', size: '{}'", loadUrl, data.length);
+        LOG.debug("Executing stream load to: '{}', size: '{}'", loadUrl, data.length);
         final HttpClientBuilder httpClientBuilder = HttpClients.custom()
                 .setRedirectStrategy(new DefaultRedirectStrategy()
                 {

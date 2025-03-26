@@ -19,11 +19,11 @@
 
 package com.wgzhao.addax.plugin.reader.hdfsreader;
 
-import com.wgzhao.addax.common.base.Key;
-import com.wgzhao.addax.common.exception.AddaxException;
-import com.wgzhao.addax.common.plugin.RecordSender;
-import com.wgzhao.addax.common.spi.Reader;
-import com.wgzhao.addax.common.util.Configuration;
+import com.wgzhao.addax.core.base.Key;
+import com.wgzhao.addax.core.exception.AddaxException;
+import com.wgzhao.addax.core.plugin.RecordSender;
+import com.wgzhao.addax.core.spi.Reader;
+import com.wgzhao.addax.core.util.Configuration;
 import com.wgzhao.addax.storage.reader.StorageReaderUtil;
 import com.wgzhao.addax.storage.util.FileHelper;
 import org.apache.commons.io.Charsets;
@@ -37,32 +37,20 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 
-import static com.wgzhao.addax.common.base.Key.COLUMN;
-import static com.wgzhao.addax.common.base.Key.ENCODING;
-import static com.wgzhao.addax.common.base.Key.INDEX;
-import static com.wgzhao.addax.common.base.Key.TYPE;
-import static com.wgzhao.addax.common.base.Key.VALUE;
-import static com.wgzhao.addax.common.spi.ErrorCode.CONFIG_ERROR;
-import static com.wgzhao.addax.common.spi.ErrorCode.EXECUTE_FAIL;
-import static com.wgzhao.addax.common.spi.ErrorCode.ILLEGAL_VALUE;
-import static com.wgzhao.addax.common.spi.ErrorCode.NOT_SUPPORT_TYPE;
-import static com.wgzhao.addax.common.spi.ErrorCode.REQUIRED_VALUE;
+import static com.wgzhao.addax.core.base.Key.COLUMN;
+import static com.wgzhao.addax.core.base.Key.ENCODING;
+import static com.wgzhao.addax.core.base.Key.INDEX;
+import static com.wgzhao.addax.core.base.Key.TYPE;
+import static com.wgzhao.addax.core.base.Key.VALUE;
+import static com.wgzhao.addax.core.spi.ErrorCode.CONFIG_ERROR;
+import static com.wgzhao.addax.core.spi.ErrorCode.EXECUTE_FAIL;
+import static com.wgzhao.addax.core.spi.ErrorCode.ILLEGAL_VALUE;
+import static com.wgzhao.addax.core.spi.ErrorCode.NOT_SUPPORT_TYPE;
+import static com.wgzhao.addax.core.spi.ErrorCode.REQUIRED_VALUE;
 
 public class HdfsReader
         extends Reader
 {
-
-    /**
-     * Job 中的方法仅执行一次，Task 中方法会由框架启动多个 Task 线程并行执行。
-     * <p>
-     * 整个 Reader 执行流程是：
-     * <pre>
-     * Job类init--&gt;prepare--&gt;split
-     * Task类init--&gt;prepare--&gt;startRead--&gt;post--&gt;destroy
-     * Task类init--&gt;prepare--&gt;startRead--&gt;post--&gt;destroy
-     * Job类post--&gt;destroy
-     * </pre>
-     */
     public static class Job
             extends Reader.Job
     {
@@ -197,7 +185,6 @@ public class HdfsReader
 
             LOG.info("split() begin...");
             List<Configuration> readerSplitConfigs = new ArrayList<>();
-            // warn:每个slice拖且仅拖一个文件,
             int splitNumber = sourceFiles.size();
             if (0 == splitNumber) {
                 throw AddaxException.asAddaxException(EXECUTE_FAIL,

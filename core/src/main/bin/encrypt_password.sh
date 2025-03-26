@@ -37,4 +37,4 @@ do
    classpath=${classpath}:$jar
 done
 java -cp $classpath com.wgzhao.addax.common.util.EncryptUtil $1
-#java -cp ${ADDAX_HOME}/lib/addax-common-*.jar:${ADDAX_HOME}/lib/slf4j-api-*.jar com.wgzhao.addax.common.util.EncryptUtil $1
+#java -cp ${ADDAX_HOME}/lib/addax-common-*.jar:${ADDAX_HOME}/lib/slf4j-api-*.jar com.wgzhao.addax.core.util.EncryptUtil $1

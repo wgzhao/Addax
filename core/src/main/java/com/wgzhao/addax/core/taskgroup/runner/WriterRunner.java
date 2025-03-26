@@ -19,20 +19,15 @@
 
 package com.wgzhao.addax.core.taskgroup.runner;
 
-import com.wgzhao.addax.common.plugin.AbstractTaskPlugin;
-import com.wgzhao.addax.common.plugin.RecordReceiver;
-import com.wgzhao.addax.common.spi.Writer;
-import com.wgzhao.addax.common.statistics.PerfRecord;
+import com.wgzhao.addax.core.plugin.AbstractTaskPlugin;
+import com.wgzhao.addax.core.plugin.RecordReceiver;
+import com.wgzhao.addax.core.spi.Writer;
+import com.wgzhao.addax.core.statistics.PerfRecord;
 import com.wgzhao.addax.core.statistics.communication.CommunicationTool;
 import org.apache.commons.lang3.Validate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-/**
- * Created by jingxing on 14-9-1.
- * <p>
- * 单个slice的writer执行调用
- */
 public class WriterRunner
         extends AbstractRunner
         implements Runnable
@@ -58,7 +53,6 @@ public class WriterRunner
         Validate.isTrue(this.recordReceiver != null);
 
         Writer.Task taskWriter = (Writer.Task) this.getPlugin();
-        //统计waitReadTime，并且在finally end
         PerfRecord channelWaitRead = new PerfRecord(getTaskGroupId(), getTaskId(), PerfRecord.PHASE.WAIT_READ_TIME);
         try {
             channelWaitRead.start();

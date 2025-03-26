@@ -19,7 +19,7 @@
 
 package com.wgzhao.addax.core.statistics.container.communicator.job;
 
-import com.wgzhao.addax.common.util.Configuration;
+import com.wgzhao.addax.core.util.Configuration;
 import com.wgzhao.addax.core.meta.State;
 import com.wgzhao.addax.core.statistics.communication.Communication;
 import com.wgzhao.addax.core.statistics.communication.CommunicationTool;
@@ -35,8 +35,7 @@ import java.util.Map;
 public class StandAloneJobContainerCommunicator
         extends AbstractContainerCommunicator
 {
-    private static final Logger LOG = LoggerFactory
-            .getLogger(StandAloneJobContainerCommunicator.class);
+    private static final Logger LOG = LoggerFactory.getLogger(StandAloneJobContainerCommunicator.class);
 
     public StandAloneJobContainerCommunicator(Configuration configuration)
     {
@@ -63,9 +62,6 @@ public class StandAloneJobContainerCommunicator
         return this.collect().getState();
     }
 
-    /**
-     * 和 DistributeJobContainerCollector 的 report 实现一样
-     */
     @Override
     public void report(Communication communication)
     {
