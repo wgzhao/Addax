@@ -71,6 +71,7 @@ public class KafkaReader
         KafkaConsumer<String, Object> kafkaConsumer;
         private List<String> columns;
         private String missKeyValue;
+        private long maxMessageNumber;
 
         @Override
         public void init()
@@ -81,8 +82,9 @@ public class KafkaReader
             String topic = configuration.getString(KafkaKey.TOPIC);
             this.columns = configuration.getList(KafkaKey.COLUMN, String.class);
             this.missKeyValue = configuration.getString(KafkaKey.MISSING_KEY_VALUE, null);
+            this.maxMessageNumber = configuration.getLong(KafkaKey.MAX_MESSAGE_NUMBER, Long.MAX_VALUE);
             properties.put(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, brokeLists);
-            properties.put(ConsumerConfig.GROUP_ID_CONFIG, GROUP_ID + "-" + RandomStringUtils.randomAlphanumeric(5));
+            properties.put(ConsumerConfig.GROUP_ID_CONFIG, GROUP_ID + "-" + RandomStringUtils.insecure().nextAlphanumeric(5));
             properties.put(ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class);
             properties.put(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class);
             properties.put(ConsumerConfig.CLIENT_ID_CONFIG, CLIENT_ID);
@@ -103,10 +105,11 @@ public class KafkaReader
         @Override
         public void startRead(RecordSender recordSender)
         {
-            while (true) {
+            while (maxMessageNumber > 0) {
                 ConsumerRecords<String, Object> items = kafkaConsumer.poll(Duration.ofSeconds(2));
                 sendData(items, recordSender);
                 recordSender.flush();
+                maxMessageNumber -= items.count();
             }
         }
 
