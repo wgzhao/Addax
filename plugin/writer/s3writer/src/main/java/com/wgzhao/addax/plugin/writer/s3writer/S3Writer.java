@@ -17,7 +17,7 @@ import software.amazon.awssdk.services.s3.model.*;
 
 import java.util.*;
 
-import static com.wgzhao.addax.common.spi.ErrorCode.*;
+import static com.wgzhao.addax.core.spi.ErrorCode.*;
 
 public class S3Writer
         extends Writer {

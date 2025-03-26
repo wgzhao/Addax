@@ -1,14 +1,14 @@
 package com.wgzhao.addax.plugin.writer.s3writer.formatwriter;
 
-import com.wgzhao.addax.common.base.Constant;
-import com.wgzhao.addax.common.base.Key;
-import com.wgzhao.addax.common.element.Column;
-import com.wgzhao.addax.common.element.DateColumn;
-import com.wgzhao.addax.common.element.Record;
-import com.wgzhao.addax.common.exception.AddaxException;
-import com.wgzhao.addax.common.plugin.RecordReceiver;
-import com.wgzhao.addax.common.plugin.TaskPluginCollector;
-import com.wgzhao.addax.common.util.Configuration;
+import com.wgzhao.addax.core.base.Constant;
+import com.wgzhao.addax.core.base.Key;
+import com.wgzhao.addax.core.element.Column;
+import com.wgzhao.addax.core.element.DateColumn;
+import com.wgzhao.addax.core.element.Record;
+import com.wgzhao.addax.core.exception.AddaxException;
+import com.wgzhao.addax.core.plugin.RecordReceiver;
+import com.wgzhao.addax.core.plugin.TaskPluginCollector;
+import com.wgzhao.addax.core.util.Configuration;
 import com.wgzhao.addax.plugin.writer.s3writer.S3Key;
 import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.hive.common.type.HiveDecimal;
@@ -33,7 +33,7 @@ import java.util.Base64;
 import java.util.List;
 import java.util.StringJoiner;
 
-import static com.wgzhao.addax.common.spi.ErrorCode.*;
+import static com.wgzhao.addax.core.spi.ErrorCode.*;
 
 public class OrcWriter
         implements IFormatWriter {
