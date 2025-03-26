@@ -110,7 +110,8 @@ public class ClickHouseReader
                     // and java.time.LocalDate instead of java.sql.Date.
                     // references https://github.com/ClickHouse/clickhouse-jdbc/tree/master/clickhouse-jdbc
                     if (dataType == Types.TIMESTAMP) {
-                        return new TimestampColumn(Timestamp.valueOf((LocalDateTime) rs.getObject(i)));
+//                        return new TimestampColumn(Timestamp.valueOf((LocalDateTime) rs.getObject(i)));
+                        return new TimestampColumn(Timestamp.valueOf(rs.getObject(i, java.time.LocalDateTime.class)));
                     }
                     else if (dataType == Types.OTHER) {
                         // database-specific type, convert it to string as default

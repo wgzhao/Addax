@@ -120,6 +120,11 @@ public class ClickHouseWriter
                         }
                         return preparedStatement;
                     }
+                    if (columnSqlType == Types.BIGINT) {
+                        // the big int type in clickhouse is 64 bit, it can not be cast to java long directly
+                        preparedStatement.setObject(columnIndex, column.asBigInteger());
+                        return preparedStatement;
+                    }
                     return super.fillPreparedStatementColumnType(preparedStatement, columnIndex, columnSqlType, column);
                 }
             };
@@ -136,7 +141,7 @@ public class ClickHouseWriter
         @Override
         public void startWrite(RecordReceiver recordReceiver)
         {
-            this.commonRdbmsWriterSlave.startWrite(recordReceiver, this.writerSliceConfig, super.getTaskPluginCollector());
+            this.commonRdbmsWriterSlave.startWrite(recordReceiver, this.writerSliceConfig, super.getTaskPluginCollector(), false);
         }
 
         @Override
