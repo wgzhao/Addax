@@ -29,9 +29,9 @@
 
     <properties>
         <!-- basic components -->
-        <aircompressor.version>0.25</aircompressor.version>
+        <aircompressor.version>0.27</aircompressor.version>
         <awssdk.version>2.29.20</awssdk.version>
-        <avro.version>1.11.3</avro.version>
+        <avro.version>1.11.4</avro.version>
         <commons.beanutils.version>1.10.1</commons.beanutils.version>
         <commons.configuration.version>1.10</commons.configuration.version>
         <commons.configuration2.version>2.11.0</commons.configuration2.version>
@@ -50,7 +50,7 @@
         <druid.version>1.2.23</druid.version>
         <fastjson2.version>2.0.53</fastjson2.version>
         <findbugs.version>3.0.1</findbugs.version>
-        <guava.version>31.0-jre</guava.version>
+        <guava.version>32.0.1-jre</guava.version>
         <groovy.version>3.0.19</groovy.version>
         <gson.version>2.12.1</gson.version>
         <fluent.hc.version>4.5.14</fluent.hc.version>
@@ -93,7 +93,7 @@
         <zstd.version>1.5.6-6</zstd.version>
 
         <!-- jdbc driver version -->
-        <cassandra.jdbc.version>3.11.0</cassandra.jdbc.version>
+        <cassandra.jdbc.version>3.11.5</cassandra.jdbc.version>
         <clickhouse.jdbc.version>0.8.1</clickhouse.jdbc.version>
         <databend.jdbc.version>0.3.4</databend.jdbc.version>
         <dbcp2.version>2.11.0</dbcp2.version>
@@ -312,6 +312,10 @@
                         <groupId>io.netty</groupId>
                         <artifactId>netty-buffer</artifactId>
                     </exclusion>
+                    <exclusion>
+                        <groupId>io.netty</groupId>
+                        <artifactId>netty-handler</artifactId>
+                    </exclusion>
                 </exclusions>
             </dependency>
 
@@ -515,6 +519,13 @@
                 <groupId>net.sf.ucanaccess</groupId>
                 <artifactId>ucanaccess</artifactId>
                 <version>5.0.1</version>
+                <exclusions>
+                    <exclusion>
+                        <!-- CVE-2022-41853 -->
+                        <groupId>org.hsqldb</groupId>
+                        <artifactId>hsqldb</artifactId>
+                    </exclusion>
+                </exclusions>
             </dependency>
 
             <dependency>
@@ -737,6 +748,14 @@
                     <exclusion>
                         <groupId>io.netty</groupId>
                         <artifactId>netty</artifactId>
+                    </exclusion>
+                    <exclusion>
+                        <groupId>org.apache.hadoop</groupId>
+                        <artifactId>hadoop-yarn-client</artifactId>
+                    </exclusion>
+                    <exclusion>
+                        <groupId>org.apache.hadoop</groupId>
+                        <artifactId>hadoop-yarn-common</artifactId>
                     </exclusion>
                 </exclusions>
             </dependency>

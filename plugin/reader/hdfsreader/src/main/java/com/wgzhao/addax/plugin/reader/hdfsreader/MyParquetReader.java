@@ -37,7 +37,6 @@ import org.apache.avro.Conversions;
 import org.apache.avro.generic.GenericData;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.hadoop.fs.Path;
-import org.apache.hadoop.mapred.JobConf;
 import org.apache.parquet.example.data.Group;
 import org.apache.parquet.hadoop.ParquetFileReader;
 import org.apache.parquet.hadoop.ParquetReader;
@@ -75,7 +74,6 @@ public class MyParquetReader
     public MyParquetReader(org.apache.hadoop.conf.Configuration hadoopConf, Path path, String nullFormat, List<ColumnEntry> columns)
     {
         hadoopConf.set("parquet.avro.readInt96AsFixed", "true");
-        JobConf jobConf = new JobConf(hadoopConf);
         this.nullFormat = nullFormat;
         try {
             this.schema = ParquetFileReader.open(HadoopInputFile.fromPath(path, hadoopConf)).getFileMetaData().getSchema();
@@ -87,7 +85,7 @@ public class MyParquetReader
         decimalSupport.addLogicalTypeConversion(new Conversions.DecimalConversion());
         try {
             this.reader = ParquetReader.builder(new GroupReadSupport(), path)
-                    .withConf(jobConf)
+                    .withConf(hadoopConf)
                     .build();
         }
         catch (IOException e) {
