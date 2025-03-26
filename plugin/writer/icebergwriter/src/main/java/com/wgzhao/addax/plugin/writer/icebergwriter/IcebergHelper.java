@@ -1,7 +1,7 @@
 package com.wgzhao.addax.plugin.writer.icebergwriter;
 
-import com.wgzhao.addax.common.exception.AddaxException;
-import com.wgzhao.addax.common.util.Configuration;
+import com.wgzhao.addax.core.exception.AddaxException;
+import com.wgzhao.addax.core.util.Configuration;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.hadoop.security.UserGroupInformation;
 import org.apache.iceberg.catalog.Catalog;
@@ -13,9 +13,9 @@ import org.slf4j.LoggerFactory;
 import java.util.HashMap;
 import java.util.Map;
 
-import static com.wgzhao.addax.common.base.Key.KERBEROS_KEYTAB_FILE_PATH;
-import static com.wgzhao.addax.common.base.Key.KERBEROS_PRINCIPAL;
-import static com.wgzhao.addax.common.spi.ErrorCode.LOGIN_ERROR;
+import static com.wgzhao.addax.core.base.Key.KERBEROS_KEYTAB_FILE_PATH;
+import static com.wgzhao.addax.core.base.Key.KERBEROS_PRINCIPAL;
+import static com.wgzhao.addax.core.spi.ErrorCode.LOGIN_ERROR;
 
 public class IcebergHelper {
     private static final Logger LOG = LoggerFactory.getLogger(IcebergHelper.class);
