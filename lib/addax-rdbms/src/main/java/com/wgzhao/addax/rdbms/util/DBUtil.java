@@ -21,6 +21,7 @@
 
 package com.wgzhao.addax.rdbms.util;
 
+import com.alibaba.druid.pool.DruidDataSource;
 import com.alibaba.druid.sql.parser.SQLParserUtils;
 import com.alibaba.druid.sql.parser.SQLStatementParser;
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
@@ -28,7 +29,6 @@ import com.wgzhao.addax.core.base.Key;
 import com.wgzhao.addax.core.exception.AddaxException;
 import com.wgzhao.addax.core.util.Configuration;
 import com.wgzhao.addax.core.util.RetryUtil;
-import org.apache.commons.dbcp2.BasicDataSource;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -181,7 +181,7 @@ public final class DBUtil
     public static synchronized Connection getConnection(DataBaseType dataBaseType, String jdbcUrl, String username, String password, int socketTimeout)
     {
 
-        try (BasicDataSource bds = new BasicDataSource()) {
+        try (DruidDataSource bds = new DruidDataSource()) {
             bds.setUrl(jdbcUrl);
             bds.setUsername(username);
             bds.setPassword(password);
@@ -206,7 +206,7 @@ public final class DBUtil
                 bds.setDriverClassName(dataBaseType.getDriverClassName());
             }
             bds.setMinIdle(2);
-            bds.setMaxIdle(5);
+            bds.setMaxActive(5);
             bds.setMaxOpenPreparedStatements(200);
             return bds.getConnection();
         }
