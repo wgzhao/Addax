@@ -355,7 +355,5 @@ fi
 cmd="${cmd} com.wgzhao.addax.core.Engine -job ${JOB_FILE}"
 
 # Execute the command
-echo "Starting Addax job..."
-echo "Log file: ${LOG_DIR}/${LOG_FILE}"
 sh -c "${cmd}"
 exit $?
