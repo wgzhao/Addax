@@ -19,6 +19,7 @@
 
 package com.wgzhao.addax.plugin.reader.hivereader;
 
+import com.wgzhao.addax.core.element.BytesColumn;
 import com.wgzhao.addax.core.element.Column;
 import com.wgzhao.addax.core.element.TimestampColumn;
 import com.wgzhao.addax.core.plugin.RecordSender;
@@ -33,6 +34,7 @@ import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
+import java.nio.charset.StandardCharsets;
 import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
@@ -137,6 +139,16 @@ public class HiveReader
                         // hive HiveBaseResultSet#getTimestamp(String columnName, Calendar cal) not support
                         return new TimestampColumn(rs.getTimestamp(i));
                     }
+                    if (metaData.getColumnType(i)  == Types.BINARY ||
+                            metaData.getColumnType(i)  == Types.VARBINARY) {
+                        try {
+                        return new BytesColumn(rs.getBytes(i));
+                        } catch (SQLException e) {
+                            // HiveBaseResultSet#getBytes(String columnName) not support
+                            return new BytesColumn(rs.getString(i).getBytes(StandardCharsets.UTF_8));
+                        }
+                    }
+
                     return super.createColumn(rs, metaData, i);
                 }
             };
