@@ -47,6 +47,7 @@
         <commons.rng.version>1.6</commons.rng.version>
         <curator.version>4.2.0</curator.version>
         <diamond.version>3.7.3</diamond.version>
+        <dbcp2.version>2.13.0</dbcp2.version>
         <druid.version>1.2.24</druid.version>
         <fastjson2.version>2.0.53</fastjson2.version>
         <findbugs.version>3.0.1</findbugs.version>
@@ -595,6 +596,12 @@
                 <groupId>org.apache.commons</groupId>
                 <artifactId>commons-csv</artifactId>
                 <version>${commons.csv.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>org.apache.commons</groupId>
+                <artifactId>commons-dbcp2</artifactId>
+                <version>${dbcp2.version}</version>
             </dependency>
 
             <dependency>
