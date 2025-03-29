@@ -113,23 +113,19 @@ public class OracleWriter
                 protected PreparedStatement fillPreparedStatementColumnType(PreparedStatement preparedStatement, int columnIndex, int columnSqlType, Column column)
                         throws SQLException
                 {
-
                     if (columnSqlType == Types.CLOB) {
                         Clob clob = preparedStatement.getConnection().createClob();
                         clob.setString(1, column.asString());
                         preparedStatement.setClob(columnIndex, clob);
-                        // free clob
-                        clob.free();
                         return preparedStatement;
                     }
                     if (columnSqlType == Types.BLOB) {
                         Blob blob = preparedStatement.getConnection().createBlob();
                         blob.setBytes(1, column.asBytes());
                         preparedStatement.setBlob(columnIndex, blob);
-                        // free blob
-                        blob.free();
                         return preparedStatement;
                     }
+
                     if (columnSqlType == Types.NVARCHAR || columnSqlType == Types.NCHAR) {
                         preparedStatement.setNString(columnIndex, column.asString());
                         return preparedStatement;
