@@ -232,7 +232,7 @@ public final class WriterUtil
         StringBuilder update = new StringBuilder();
         for (int i = 0; i < columnHolders.size(); i++) {
             String columnHolder = columnHolders.get(i);
-            if (Arrays.asList(sArray).contains(columnHolder)) {
+            if (Arrays.stream(sArray).anyMatch(s -> s.equalsIgnoreCase(columnHolder))) {
                 if (!first) {
                     sb.append(",");
                     str.append(" AND ");
@@ -250,14 +250,15 @@ public final class WriterUtil
         }
 
         for (int i = 0; i < columnHolders.size(); i++) {
-            if (!Arrays.asList(sArray).contains(columnHolders.get(i))) {
+            String columnHolder = columnHolders.get(i);
+            if (Arrays.stream(sArray).noneMatch(s -> s.equalsIgnoreCase(columnHolder))) {
                 if (!first1) {
                     update.append(",");
                 }
                 else {
                     first1 = false;
                 }
-                update.append(columnHolders.get(i));
+                update.append(columnHolder);
                 update.append(" = ");
                 update.append(valueHolders.get(i));
             }
