@@ -640,6 +640,14 @@
                 <version>${hadoop.common.version}</version>
                 <exclusions>
                     <exclusion>
+                        <groupId>com.jcraft</groupId>
+                        <artifactId>jsch</artifactId>
+                    </exclusion>
+                    <exclusion>
+                        <groupId>dnsjava</groupId>
+                        <artifactId>dnsjava</artifactId>
+                    </exclusion>
+                    <exclusion>
                         <groupId>jdk.tools</groupId>
                         <artifactId>jdk.tools</artifactId>
                     </exclusion>
@@ -648,16 +656,8 @@
                         <artifactId>commons-logging</artifactId>
                     </exclusion>
                     <exclusion>
-                        <groupId>org.apache.zookeeper</groupId>
-                        <artifactId>zookeeper</artifactId>
-                    </exclusion>
-                    <exclusion>
                         <groupId>org.slf4j</groupId>
                         <artifactId>slf4j-log4j12</artifactId>
-                    </exclusion>
-                    <exclusion>
-                        <groupId>com.fasterxml.jackson.core</groupId>
-                        <artifactId>jackson-databind</artifactId>
                     </exclusion>
                     <exclusion>
                         <groupId>com.fasterxml.woodstox</groupId>
@@ -670,6 +670,30 @@
                     <exclusion>
                         <groupId>com.google.protobuf</groupId>
                         <artifactId>protobuf-java</artifactId>
+                    </exclusion>
+                    <exclusion>
+                        <groupId>com.sun.jersey</groupId>
+                        <artifactId>*</artifactId>
+                    </exclusion>
+                    <exclusion>
+                        <groupId>org.apache.curator</groupId>
+                        <artifactId>*</artifactId>
+                    </exclusion>
+                    <exclusion>
+                        <groupId>org.apache.commons</groupId>
+                        <artifactId>commons-text</artifactId>
+                    </exclusion>
+                    <exclusion>
+                        <groupId>org.eclipse.jetty</groupId>
+                        <artifactId>*</artifactId>
+                    </exclusion>
+                    <exclusion>
+                        <groupId>commons-beanutils</groupId>
+                        <artifactId>commons-beanutils</artifactId>
+                    </exclusion>
+                    <exclusion>
+                        <groupId>org.apache.httpcomponents</groupId>
+                        <artifactId>httpclient</artifactId>
                     </exclusion>
                     <exclusion>
                         <groupId>org.codehaus.jackson</groupId>
@@ -706,6 +730,10 @@
                     <exclusion>
                         <groupId>org.codehaus.jettison</groupId>
                         <artifactId>jettison</artifactId>
+                    </exclusion>
+                    <exclusion>
+                        <groupId>org.slf4j</groupId>
+                        <artifactId>slf4j-reload4j</artifactId>
                     </exclusion>
                     <exclusion>
                         <groupId>org.xerial.snappy</groupId>
