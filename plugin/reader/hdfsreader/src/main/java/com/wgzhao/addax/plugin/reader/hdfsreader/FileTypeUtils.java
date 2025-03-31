@@ -24,7 +24,6 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.hadoop.fs.FSDataInputStream;
 import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
-import org.apache.hadoop.hive.ql.io.RCFile;
 import org.apache.hadoop.io.Text;
 import org.apache.parquet.example.data.Group;
 import org.apache.parquet.hadoop.ParquetReader;
@@ -113,18 +112,6 @@ public class FileTypeUtils
                 }
             }
 
-            if (version == ORIGINAL_VERSION) {
-                try {
-                    Class<?> keyCls = hadoopConf.getClassByName(Text.readString(in));
-                    Class<?> valCls = hadoopConf.getClassByName(Text.readString(in));
-                    if (!keyCls.equals(RCFile.KeyBuffer.class) || !valCls.equals(RCFile.ValueBuffer.class)) {
-                        return false;
-                    }
-                }
-                catch (ClassNotFoundException e) {
-                    return false;
-                }
-            }
 //            boolean decompress = in.readBoolean(); // is compressed?
             if (version == ORIGINAL_VERSION) {
                 // is block-compressed? it should be always false.

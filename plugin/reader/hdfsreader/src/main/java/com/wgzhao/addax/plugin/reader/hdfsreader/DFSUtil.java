@@ -34,14 +34,9 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.hadoop.fs.FileStatus;
 import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
-import org.apache.hadoop.hive.ql.io.RCFileRecordReader;
-import org.apache.hadoop.hive.serde2.columnar.BytesRefArrayWritable;
-import org.apache.hadoop.hive.serde2.columnar.BytesRefWritable;
-import org.apache.hadoop.io.LongWritable;
 import org.apache.hadoop.io.SequenceFile;
 import org.apache.hadoop.io.Text;
 import org.apache.hadoop.io.Writable;
-import org.apache.hadoop.mapred.FileSplit;
 import org.apache.hadoop.security.UserGroupInformation;
 import org.apache.hadoop.util.ReflectionUtils;
 import org.slf4j.Logger;
@@ -306,44 +301,7 @@ public class DFSUtil
      */
     public void rcFileStartRead(String sourceRcFilePath, RecordSender recordSender, TaskPluginCollector taskPluginCollector)
     {
-        LOG.info("Start Read rc-file [{}].", sourceRcFilePath);
-        Path rcFilePath = new Path(sourceRcFilePath);
-
-        RCFileRecordReader<LongWritable, BytesRefArrayWritable> recordReader = null;
-        try (FileSystem fs = FileSystem.get(rcFilePath.toUri(), hadoopConf)) {
-            long fileLen = fs.getFileStatus(rcFilePath).getLen();
-            FileSplit split = new FileSplit(rcFilePath, 0, fileLen, (String[]) null);
-            recordReader = new RCFileRecordReader<>(hadoopConf, split);
-            LongWritable key = new LongWritable();
-            BytesRefArrayWritable value = new BytesRefArrayWritable();
-            Text txt = new Text();
-            while (recordReader.next(key, value)) {
-                String[] sourceLine = new String[value.size()];
-                txt.clear();
-                for (int i = 0; i < value.size(); i++) {
-                    BytesRefWritable v = value.get(i);
-                    txt.set(v.getData(), v.getStart(), v.getLength());
-                    sourceLine[i] = txt.toString();
-                }
-                StorageReaderUtil.transportOneRecord(recordSender, columns, sourceLine, nullFormat, taskPluginCollector);
-            }
-        }
-        catch (IOException e) {
-            String message = String.format("IO exception occurred while reading the file [%s].", sourceRcFilePath);
-            LOG.error(message);
-            throw AddaxException.asAddaxException(IO_ERROR, message, e);
-        }
-        finally {
-            try {
-                if (recordReader != null) {
-                    recordReader.close();
-                    LOG.info("Finally, Close RCFileRecordReader.");
-                }
-            }
-            catch (IOException e) {
-                LOG.warn("Failed to close RCFileRecordReader: {}", e.getMessage());
-            }
-        }
+        throw AddaxException.asAddaxException(NOT_SUPPORT_TYPE, "The rc-file is not support longer");
     }
 
     public void orcFileStartRead(String sourceOrcFilePath, RecordSender recordSender, TaskPluginCollector taskPluginCollector)
