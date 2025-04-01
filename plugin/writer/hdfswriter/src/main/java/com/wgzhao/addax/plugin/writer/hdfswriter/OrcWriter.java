@@ -19,6 +19,8 @@
 
 package com.wgzhao.addax.plugin.writer.hdfswriter;
 
+import com.alibaba.fastjson2.JSONArray;
+import com.alibaba.fastjson2.JSONObject;
 import com.wgzhao.addax.core.base.Constant;
 import com.wgzhao.addax.core.base.Key;
 import com.wgzhao.addax.core.element.Column;
@@ -36,6 +38,7 @@ import org.apache.hadoop.hive.ql.exec.vector.DecimalColumnVector;
 import org.apache.hadoop.hive.ql.exec.vector.DoubleColumnVector;
 import org.apache.hadoop.hive.ql.exec.vector.ListColumnVector;
 import org.apache.hadoop.hive.ql.exec.vector.LongColumnVector;
+import org.apache.hadoop.hive.ql.exec.vector.MapColumnVector;
 import org.apache.hadoop.hive.ql.exec.vector.TimestampColumnVector;
 import org.apache.hadoop.hive.ql.exec.vector.VectorizedRowBatch;
 import org.apache.hadoop.hive.serde2.io.HiveDecimalWritable;
@@ -51,6 +54,8 @@ import java.nio.charset.StandardCharsets;
 import java.text.SimpleDateFormat;
 import java.util.Base64;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 import java.util.StringJoiner;
 
 import static com.wgzhao.addax.core.spi.ErrorCode.IO_ERROR;
@@ -102,6 +107,10 @@ public class OrcWriter
                 SupportHiveDataType columnType;
                 if (type.startsWith("DECIMAL")) {
                     columnType = SupportHiveDataType.DECIMAL;
+                } else if (type.startsWith("ARRAY")) {
+                    columnType = SupportHiveDataType.ARRAY;
+                } else if (type.startsWith("MAP")) {
+                    columnType = SupportHiveDataType.MAP;
                 }
                 else {
                     try {
@@ -153,16 +162,37 @@ public class OrcWriter
                         break;
                     case ARRAY:
                         // assume the column is a list of V or the string of list of V
+                        // ["value1","value2"] ,convert the string to a list of V
                         String arrayString = recordColumn.asString();
-                        // convert the string to a list of V
-                        String[] array = arrayString.split(",");
+                        JSONArray jsonArray = JSONArray.parseArray(arrayString);
                         ListColumnVector listVector = (ListColumnVector) col;
                         listVector.offsets[row] = listVector.childCount;
-                        listVector.lengths[row] = array.length;
-                        listVector.childCount += array.length;
-                        for (int j = 0; j < array.length; j++) {
+                        listVector.lengths[row] = jsonArray.size();
+//                        listVector.childCount += array.length;
+                        for (Object o : jsonArray) {
                             BytesColumnVector childVector = (BytesColumnVector) listVector.child;
-                            childVector.setVal(listVector.childCount + j, array[j].getBytes(StandardCharsets.UTF_8));
+                            byte[] bytes = ((String) o).getBytes(StandardCharsets.UTF_8);
+                            childVector.setRef(listVector.childCount++, bytes, 0, bytes.length);
+                        }
+                        break;
+                    case MAP:
+                        // assume the column is a map of V or the string of map of V
+                        // {key1:value1,key2:value2}
+                        String mapString = recordColumn.asString();
+                        JSONObject jsonObject = JSONObject.parseObject(mapString);
+                        // convert the string to a map of V
+                        MapColumnVector mapVector = (MapColumnVector) col;
+                        mapVector.offsets[row] = mapVector.childCount;
+                        mapVector.lengths[row] = jsonObject.size();
+                        BytesColumnVector mapKeyVector = (BytesColumnVector) mapVector.keys;
+                        BytesColumnVector mapValueVector = (BytesColumnVector) mapVector.values;
+                        for (Map.Entry<String, Object> entry : jsonObject.entrySet()) {
+                            byte[] keyBytes = entry.getKey().getBytes(StandardCharsets.UTF_8);
+                            byte[] valueBytes = entry.getValue().toString().getBytes(StandardCharsets.UTF_8);
+
+                            mapKeyVector.setRef(mapVector.childCount, keyBytes, 0, keyBytes.length);
+                            mapValueVector.setRef(mapVector.childCount, valueBytes, 0, valueBytes.length);
+                            mapVector.childCount++;
                         }
                         break;
                     default:

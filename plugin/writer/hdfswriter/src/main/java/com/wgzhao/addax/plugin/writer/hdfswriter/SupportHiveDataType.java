@@ -37,5 +37,6 @@ public enum SupportHiveDataType
     LONG,
     BOOLEAN,
     BINARY,
+    MAP,
     ARRAY
 }
