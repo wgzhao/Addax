@@ -34,6 +34,7 @@ import org.apache.hadoop.hive.ql.exec.vector.BytesColumnVector;
 import org.apache.hadoop.hive.ql.exec.vector.ColumnVector;
 import org.apache.hadoop.hive.ql.exec.vector.DecimalColumnVector;
 import org.apache.hadoop.hive.ql.exec.vector.DoubleColumnVector;
+import org.apache.hadoop.hive.ql.exec.vector.ListColumnVector;
 import org.apache.hadoop.hive.ql.exec.vector.LongColumnVector;
 import org.apache.hadoop.hive.ql.exec.vector.TimestampColumnVector;
 import org.apache.hadoop.hive.ql.exec.vector.VectorizedRowBatch;
@@ -48,7 +49,6 @@ import org.slf4j.LoggerFactory;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.text.SimpleDateFormat;
-import java.time.LocalDate;
 import java.util.Base64;
 import java.util.List;
 import java.util.StringJoiner;
@@ -125,7 +125,8 @@ public class OrcWriter
                         ((LongColumnVector) col).vector[row] = recordColumn.asLong();
                         break;
                     case DATE:
-                        ((LongColumnVector) col).vector[row] = LocalDate.parse(recordColumn.asString()).toEpochDay();
+                        java.sql.Date sqlDate = new java.sql.Date(recordColumn.asDate().getTime());
+                        ((LongColumnVector) col).vector[row] = sqlDate.toLocalDate().toEpochDay();
                         break;
                     case FLOAT:
                     case DOUBLE:
@@ -149,6 +150,20 @@ public class OrcWriter
                     case BINARY:
                         byte[] content = (byte[]) recordColumn.getRawData();
                         ((BytesColumnVector) col).setRef(row, content, 0, content.length);
+                        break;
+                    case ARRAY:
+                        // assume the column is a list of V or the string of list of V
+                        String arrayString = recordColumn.asString();
+                        // convert the string to a list of V
+                        String[] array = arrayString.split(",");
+                        ListColumnVector listVector = (ListColumnVector) col;
+                        listVector.offsets[row] = listVector.childCount;
+                        listVector.lengths[row] = array.length;
+                        listVector.childCount += array.length;
+                        for (int j = 0; j < array.length; j++) {
+                            BytesColumnVector childVector = (BytesColumnVector) listVector.child;
+                            childVector.setVal(listVector.childCount + j, array[j].getBytes(StandardCharsets.UTF_8));
+                        }
                         break;
                     default:
                         throw AddaxException.asAddaxException(
@@ -200,7 +215,8 @@ public class OrcWriter
         String compress = config.getString(Key.COMPRESS, "NONE").toUpperCase();
         int batchSize = config.getInt(Key.BATCH_SIZE, DEFAULT_BATCH_SIZE);
 
-        TypeDescription schema = buildOrcSchema(columns);
+        TypeDescription schema = buildOrcSchema1(columns);
+        schema.setAttribute("creator", "addax");
         Path filePath = new Path(fileName);
 
         try (Writer writer = OrcFile.createWriter(filePath,
@@ -252,5 +268,38 @@ public class OrcWriter
         }
 
         return TypeDescription.fromString("struct<" + joiner + ">");
+    }
+
+    private TypeDescription buildOrcSchema1(List<Configuration> columns)
+    {
+        TypeDescription schema = TypeDescription.createStruct().setAttribute("creator", "addax");
+
+        for (Configuration column : columns) {
+            String typeName = column.getString(Key.TYPE).toLowerCase();
+            String fieldName = column.getString(Key.NAME);
+
+            if ("decimal".equalsIgnoreCase(typeName)) {
+                int precision = column.getInt(Key.PRECISION, Constant.DEFAULT_DECIMAL_MAX_PRECISION);
+                int scale = column.getInt(Key.SCALE, Constant.DEFAULT_DECIMAL_MAX_SCALE);
+                schema.addField(fieldName, TypeDescription.createDecimal().withPrecision(precision).withScale(scale));
+            }
+            else if(typeName.startsWith("array")) {
+                String elementType = typeName.substring(typeName.indexOf("<") + 1, typeName.indexOf(">"));
+                TypeDescription elementTypeDesc = TypeDescription.fromString(elementType);
+                schema.addField(fieldName, TypeDescription.createList(elementTypeDesc));
+            }
+            else if(typeName.startsWith("map")) {
+                String keyValueType = typeName.substring(typeName.indexOf("<") + 1, typeName.indexOf(">"));
+                String[] keyValueTypes = keyValueType.split(",");
+                TypeDescription keyTypeDesc = TypeDescription.fromString(keyValueTypes[0]);
+                TypeDescription valueTypeDesc = TypeDescription.fromString(keyValueTypes[1]);
+                schema.addField(fieldName, TypeDescription.createMap(keyTypeDesc, valueTypeDesc));
+            }
+            else {
+                schema.addField(fieldName, TypeDescription.fromString(typeName));
+            }
+        }
+
+        return schema;
     }
 }

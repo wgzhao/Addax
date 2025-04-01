@@ -36,5 +36,6 @@ public enum SupportHiveDataType
     CHAR,
     LONG,
     BOOLEAN,
-    BINARY
+    BINARY,
+    ARRAY
 }
