@@ -9,6 +9,7 @@ import org.apache.paimon.options.Options;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+
 import static com.wgzhao.addax.core.spi.ErrorCode.LOGIN_ERROR;
 
 public class PaimonHelper {
@@ -53,5 +54,4 @@ public class PaimonHelper {
 
         return context;
     }
-
 }
