@@ -107,27 +107,29 @@ public class OracleWriter
         public void init()
         {
             this.writerSliceConfig = getPluginJobConf();
-            this.commonRdbmsWriterTask = new CommonRdbmsWriter.Task(DATABASE_TYPE) {
+            this.commonRdbmsWriterTask = new CommonRdbmsWriter.Task(DATABASE_TYPE)
+            {
                 @Override
                 protected PreparedStatement fillPreparedStatementColumnType(PreparedStatement preparedStatement, int columnIndex, int columnSqlType, Column column)
                         throws SQLException
                 {
-                    if (writerSliceConfig.getString(Key.WRITE_MODE, "").startsWith("update")) {
-                        if (columnSqlType == Types.CLOB ) {
-                            Clob clob = preparedStatement.getConnection().createClob();
-                            clob.setString(1, column.asString());
-                            preparedStatement.setClob(columnIndex, clob);
-                            return preparedStatement;
-                        }
-                        if (columnSqlType == Types.BLOB) {
-                            Blob blob = preparedStatement.getConnection().createBlob();
-                            blob.setBytes(1, column.asBytes());
-                            preparedStatement.setBlob(columnIndex, blob);
-                            return preparedStatement;
-                        }
-                        return super.fillPreparedStatementColumnType(preparedStatement, columnIndex, columnSqlType, column);
+                    if (columnSqlType == Types.CLOB) {
+                        Clob clob = preparedStatement.getConnection().createClob();
+                        clob.setString(1, column.asString());
+                        preparedStatement.setClob(columnIndex, clob);
+                        return preparedStatement;
+                    }
+                    if (columnSqlType == Types.BLOB) {
+                        Blob blob = preparedStatement.getConnection().createBlob();
+                        blob.setBytes(1, column.asBytes());
+                        preparedStatement.setBlob(columnIndex, blob);
+                        return preparedStatement;
                     }
 
+                    if (columnSqlType == Types.NVARCHAR || columnSqlType == Types.NCHAR) {
+                        preparedStatement.setNString(columnIndex, column.asString());
+                        return preparedStatement;
+                    }
                     return super.fillPreparedStatementColumnType(preparedStatement, columnIndex, columnSqlType, column);
                 }
             };

@@ -29,9 +29,9 @@
 
     <properties>
         <!-- basic components -->
-        <aircompressor.version>0.25</aircompressor.version>
+        <aircompressor.version>0.27</aircompressor.version>
         <awssdk.version>2.29.20</awssdk.version>
-        <avro.version>1.11.3</avro.version>
+        <avro.version>1.11.4</avro.version>
         <commons.beanutils.version>1.10.1</commons.beanutils.version>
         <commons.configuration.version>1.10</commons.configuration.version>
         <commons.configuration2.version>2.11.0</commons.configuration2.version>
@@ -39,7 +39,7 @@
         <commons.codec.version>1.18.0</commons.codec.version>
         <commons.compress.version>1.27.1</commons.compress.version>
         <commons.cli.version>1.9.0</commons.cli.version>
-        <commons.csv.version>1.12.0</commons.csv.version>
+        <commons.csv.version>1.14.0</commons.csv.version>
         <commons.io.version>2.18.0</commons.io.version>
         <commons.lang3.version>3.17.0</commons.lang3.version>
         <commons.logging.version>1.3.4</commons.logging.version>
@@ -47,10 +47,11 @@
         <commons.rng.version>1.6</commons.rng.version>
         <curator.version>4.2.0</curator.version>
         <diamond.version>3.7.3</diamond.version>
-        <druid.version>1.2.23</druid.version>
+        <dbcp2.version>2.13.0</dbcp2.version>
+        <druid.version>1.2.24</druid.version>
         <fastjson2.version>2.0.53</fastjson2.version>
         <findbugs.version>3.0.1</findbugs.version>
-        <guava.version>31.0-jre</guava.version>
+        <guava.version>32.0.1-jre</guava.version>
         <groovy.version>3.0.19</groovy.version>
         <gson.version>2.12.1</gson.version>
         <fluent.hc.version>4.5.14</fluent.hc.version>
@@ -61,7 +62,8 @@
         <httpclient.version>5.4</httpclient.version>
         <httpcore.version>5.3.3</httpcore.version>
         <influxdb.client.version>6.11.0</influxdb.client.version>
-        <logback.version>1.3.12</logback.version>
+        <logback.version>1.3.15</logback.version>
+        <log4j.version>2.24.3</log4j.version>
         <jansi.version>2.4.1</jansi.version>
         <javacsv.version>2.0</javacsv.version>
         <javadbf.version>1.14.1</javadbf.version>
@@ -93,24 +95,24 @@
         <zstd.version>1.5.6-6</zstd.version>
 
         <!-- jdbc driver version -->
-        <cassandra.jdbc.version>3.11.0</cassandra.jdbc.version>
+        <cassandra.jdbc.version>3.11.5</cassandra.jdbc.version>
         <clickhouse.jdbc.version>0.8.1</clickhouse.jdbc.version>
         <databend.jdbc.version>0.3.4</databend.jdbc.version>
-        <dbcp2.version>2.11.0</dbcp2.version>
         <hive.jdbc.version>3.1.3</hive.jdbc.version>
         <influxdbClient.version>2.24</influxdbClient.version>
         <hadoop.version>3.2.4</hadoop.version>
         <mongodb.jdbc.version>3.12.14</mongodb.jdbc.version>
-        <mysql.jdbc.version>8.0.28</mysql.jdbc.version>
+        <mysql.jdbc.version>8.2.0</mysql.jdbc.version>
         <mssql.jdbc.version>9.2.1.jre8</mssql.jdbc.version>
         <ngdbc.version>2.21.11</ngdbc.version>
-        <oracle.jdbc.version>19.7.0.0</oracle.jdbc.version>
+        <oracle.jdbc.version>21.5.0.0</oracle.jdbc.version>
         <phoenix1.version>4.14.3-HBase-1.4</phoenix1.version>
         <phoenix2.version>5.1.3</phoenix2.version>
         <postgresql.jdbc.version>42.3.8</postgresql.jdbc.version>
-        <sqlite.jdbc.version>3.44.1.0</sqlite.jdbc.version>
+        <sqlite.jdbc.version>3.48.0.0</sqlite.jdbc.version>
         <taos.jdbc.version>3.2.1</taos.jdbc.version>
         <trino.jdbc.version>351</trino.jdbc.version>
+        <ucanaccess.version>5.0.1</ucanaccess.version>
 
         <!-- maven configuration -->
         <project.sourceEncoding>UTF-8</project.sourceEncoding>
@@ -258,6 +260,12 @@
             </dependency>
 
             <dependency>
+                <groupId>com.alibaba</groupId>
+                <artifactId>druid</artifactId>
+                <version>${druid.version}</version>
+            </dependency>
+
+            <dependency>
                 <groupId>com.alibaba.fastjson2</groupId>
                 <artifactId>fastjson2</artifactId>
                 <version>${fastjson2.version}</version>
@@ -311,6 +319,10 @@
                     <exclusion>
                         <groupId>io.netty</groupId>
                         <artifactId>netty-buffer</artifactId>
+                    </exclusion>
+                    <exclusion>
+                        <groupId>io.netty</groupId>
+                        <artifactId>netty-handler</artifactId>
                     </exclusion>
                 </exclusions>
             </dependency>
@@ -383,6 +395,18 @@
                     <exclusion>
                         <groupId>org.slf4j</groupId>
                         <artifactId>slf4j-api</artifactId>
+                    </exclusion>
+                </exclusions>
+            </dependency>
+
+            <dependency>
+                <groupId>com.mysql</groupId>
+                <artifactId>mysql-connector-j</artifactId>
+                <version>${mysql.jdbc.version}</version>
+                <exclusions>
+                    <exclusion>
+                        <groupId>com.google.protobuf</groupId>
+                        <artifactId>protobuf-java</artifactId>
                     </exclusion>
                 </exclusions>
             </dependency>
@@ -500,21 +524,16 @@
             </dependency>
 
             <dependency>
-                <groupId>mysql</groupId>
-                <artifactId>mysql-connector-java</artifactId>
-                <version>${mysql.jdbc.version}</version>
-                <exclusions>
-                    <exclusion>
-                        <groupId>com.google.protobuf</groupId>
-                        <artifactId>protobuf-java</artifactId>
-                    </exclusion>
-                </exclusions>
-            </dependency>
-
-            <dependency>
                 <groupId>net.sf.ucanaccess</groupId>
                 <artifactId>ucanaccess</artifactId>
-                <version>5.0.1</version>
+                <version>${ucanaccess.version}</version>
+                <exclusions>
+                    <exclusion>
+                        <!-- CVE-2022-41853 -->
+                        <groupId>org.hsqldb</groupId>
+                        <artifactId>hsqldb</artifactId>
+                    </exclusion>
+                </exclusions>
             </dependency>
 
             <dependency>
@@ -621,6 +640,14 @@
                 <version>${hadoop.common.version}</version>
                 <exclusions>
                     <exclusion>
+                        <groupId>com.jcraft</groupId>
+                        <artifactId>jsch</artifactId>
+                    </exclusion>
+                    <exclusion>
+                        <groupId>dnsjava</groupId>
+                        <artifactId>dnsjava</artifactId>
+                    </exclusion>
+                    <exclusion>
                         <groupId>jdk.tools</groupId>
                         <artifactId>jdk.tools</artifactId>
                     </exclusion>
@@ -629,16 +656,8 @@
                         <artifactId>commons-logging</artifactId>
                     </exclusion>
                     <exclusion>
-                        <groupId>org.apache.zookeeper</groupId>
-                        <artifactId>zookeeper</artifactId>
-                    </exclusion>
-                    <exclusion>
                         <groupId>org.slf4j</groupId>
                         <artifactId>slf4j-log4j12</artifactId>
-                    </exclusion>
-                    <exclusion>
-                        <groupId>com.fasterxml.jackson.core</groupId>
-                        <artifactId>jackson-databind</artifactId>
                     </exclusion>
                     <exclusion>
                         <groupId>com.fasterxml.woodstox</groupId>
@@ -651,6 +670,30 @@
                     <exclusion>
                         <groupId>com.google.protobuf</groupId>
                         <artifactId>protobuf-java</artifactId>
+                    </exclusion>
+                    <exclusion>
+                        <groupId>com.sun.jersey</groupId>
+                        <artifactId>*</artifactId>
+                    </exclusion>
+                    <exclusion>
+                        <groupId>org.apache.curator</groupId>
+                        <artifactId>*</artifactId>
+                    </exclusion>
+                    <exclusion>
+                        <groupId>org.apache.commons</groupId>
+                        <artifactId>commons-text</artifactId>
+                    </exclusion>
+                    <exclusion>
+                        <groupId>org.eclipse.jetty</groupId>
+                        <artifactId>*</artifactId>
+                    </exclusion>
+                    <exclusion>
+                        <groupId>commons-beanutils</groupId>
+                        <artifactId>commons-beanutils</artifactId>
+                    </exclusion>
+                    <exclusion>
+                        <groupId>org.apache.httpcomponents</groupId>
+                        <artifactId>httpclient</artifactId>
                     </exclusion>
                     <exclusion>
                         <groupId>org.codehaus.jackson</groupId>
@@ -687,6 +730,10 @@
                     <exclusion>
                         <groupId>org.codehaus.jettison</groupId>
                         <artifactId>jettison</artifactId>
+                    </exclusion>
+                    <exclusion>
+                        <groupId>org.slf4j</groupId>
+                        <artifactId>slf4j-reload4j</artifactId>
                     </exclusion>
                     <exclusion>
                         <groupId>org.xerial.snappy</groupId>
@@ -737,6 +784,14 @@
                     <exclusion>
                         <groupId>io.netty</groupId>
                         <artifactId>netty</artifactId>
+                    </exclusion>
+                    <exclusion>
+                        <groupId>org.apache.hadoop</groupId>
+                        <artifactId>hadoop-yarn-client</artifactId>
+                    </exclusion>
+                    <exclusion>
+                        <groupId>org.apache.hadoop</groupId>
+                        <artifactId>hadoop-yarn-common</artifactId>
                     </exclusion>
                 </exclusions>
             </dependency>
@@ -911,6 +966,22 @@
                         <artifactId>netty-buffer</artifactId>
                     </exclusion>
                     <exclusion>
+                        <groupId>org.apache.hive</groupId>
+                        <artifactId>hive-llap-tez</artifactId>
+                    </exclusion>
+                    <exclusion>
+                        <groupId>org.apache.hive</groupId>
+                        <artifactId>hive-shims</artifactId>
+                    </exclusion>
+                    <exclusion>
+                        <groupId>org.apache.logging.log4j</groupId>
+                        <artifactId>log4j-1.2-api</artifactId>
+                    </exclusion>
+                    <exclusion>
+                        <groupId>org.apache.logging.log4j</groupId>
+                        <artifactId>log4j-slf4j-impl</artifactId>
+                    </exclusion>
+                    <exclusion>
                         <groupId>org.apache.zookeeper</groupId>
                         <artifactId>zookeeper</artifactId>
                     </exclusion>
@@ -985,8 +1056,14 @@
 
             <dependency>
                 <groupId>org.apache.logging.log4j</groupId>
+                <artifactId>log4j-api</artifactId>
+                <version>${log4j.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>org.apache.logging.log4j</groupId>
                 <artifactId>log4j-core</artifactId>
-                <version>2.23.1</version>
+                <version>${log4j.version}</version>
             </dependency>
 
             <dependency>

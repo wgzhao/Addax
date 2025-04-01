@@ -38,6 +38,7 @@ import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import static com.wgzhao.addax.core.spi.ErrorCode.CONFIG_ERROR;
 
@@ -171,28 +172,20 @@ public final class WriterUtil
 
     private static String doPostgresqlUpdate(String writeMode, List<String> columnHolders)
     {
-        String conflict = writeMode.replaceFirst("update", "");
+        String conflict = writeMode.replaceFirst("update", "").trim();
         StringBuilder sb = new StringBuilder();
-        sb.append(" ON CONFLICT ");
-        sb.append(conflict);
-        sb.append(" DO ");
+        sb.append(" ON CONFLICT ").append(conflict).append(" DO ");
+
         if (columnHolders == null || columnHolders.isEmpty()) {
             sb.append("NOTHING");
-            return sb.toString();
         }
-        sb.append(" UPDATE SET ");
-        boolean first = true;
-        for (String column : columnHolders) {
-            if (!first) {
-                sb.append(",");
-            }
-            else {
-                first = false;
-            }
-            sb.append(column);
-            sb.append("=excluded.");
-            sb.append(column);
+        else {
+            sb.append("UPDATE SET ");
+            sb.append(columnHolders.stream()
+                    .map(column -> column + "=excluded." + column)
+                    .collect(Collectors.joining(",")));
         }
+
         return sb.toString();
     }
 
@@ -201,79 +194,75 @@ public final class WriterUtil
         if (columnHolders == null || columnHolders.isEmpty()) {
             return "";
         }
-        StringBuilder sb = new StringBuilder();
-        sb.append(" ON DUPLICATE KEY UPDATE ");
-        boolean first = true;
-        for (String column : columnHolders) {
-            if (!first) {
-                sb.append(",");
-            }
-            else {
-                first = false;
-            }
-            sb.append(column);
-            sb.append("=VALUES(");
-            sb.append(column);
-            sb.append(")");
-        }
 
-        return sb.toString();
+        String updates = columnHolders.stream()
+                .map(column -> column + "=VALUES(" + column + ")")
+                .collect(Collectors.joining(","));
+
+        return " ON DUPLICATE KEY UPDATE " + updates;
     }
 
     public static String doOracleOrSqlServerUpdate(String merge, List<String> columnHolders, List<String> valueHolders, DataBaseType dataBaseType)
     {
-        String[] sArray = getStrings(merge);
-        StringBuilder sb = new StringBuilder();
-        sb.append("MERGE INTO %s A USING ( SELECT ");
+        // Extract key columns from the merge clause for the join condition
+        String[] keyColumns = getStrings(merge);
 
-        boolean first = true;
-        boolean first1 = true;
-        StringBuilder str = new StringBuilder();
-        StringBuilder update = new StringBuilder();
+        if (columnHolders == null || columnHolders.isEmpty() || valueHolders == null || valueHolders.isEmpty()) {
+            throw AddaxException.asAddaxException(CONFIG_ERROR, "Column holders or value holders cannot be empty for MERGE operation");
+        }
+
+        StringBuilder mergeSql = new StringBuilder();
+        StringBuilder joinCondition = new StringBuilder();
+        StringBuilder updateClause = new StringBuilder();
+
+        // Start building MERGE statement
+        mergeSql.append("MERGE INTO %s A USING (SELECT ");
+
+        // Build SELECT clause and join conditions
+        boolean isFirstKeyColumn = true;
         for (int i = 0; i < columnHolders.size(); i++) {
             String columnHolder = columnHolders.get(i);
-            if (Arrays.asList(sArray).contains(columnHolder)) {
-                if (!first) {
-                    sb.append(",");
-                    str.append(" AND ");
+            // If this is a key column used for matching records
+            if (Arrays.stream(keyColumns).anyMatch(s -> s.equalsIgnoreCase(columnHolder))) {
+                if (!isFirstKeyColumn) {
+                    mergeSql.append(", ");
+                    joinCondition.append(" AND ");
                 }
                 else {
-                    first = false;
+                    isFirstKeyColumn = false;
                 }
-                str.append("TMP.").append(columnHolder);
-                sb.append(valueHolders.get(i));
-                str.append(" = ");
-                sb.append(" AS ");
-                str.append("A.").append(columnHolder);
-                sb.append(columnHolder);
+
+                mergeSql.append(valueHolders.get(i)).append(" AS ").append(columnHolder);
+                joinCondition.append("TMP.").append(columnHolder).append(" = A.").append(columnHolder);
             }
         }
 
-        for (int i = 0; i < columnHolders.size(); i++) {
-            if (!Arrays.asList(sArray).contains(columnHolders.get(i))) {
-                if (!first1) {
-                    update.append(",");
-                }
-                else {
-                    first1 = false;
-                }
-                update.append(columnHolders.get(i));
-                update.append(" = ");
-                update.append(valueHolders.get(i));
-            }
-        }
-
+        // Add FROM clause based on database type
         if (dataBaseType == DataBaseType.Oracle) {
-            sb.append(" FROM DUAL ) TMP ON (");
+            mergeSql.append(" FROM DUAL");
         }
-        else {
-            sb.append(" ) TMP ON (");
+        mergeSql.append(") TMP ON (").append(joinCondition).append(")");
+
+        // Build UPDATE SET clause for non-key columns
+        boolean isFirstUpdateColumn = true;
+        for (int i = 0; i < columnHolders.size(); i++) {
+            String columnHolder = columnHolders.get(i);
+            if (Arrays.stream(keyColumns).noneMatch(s -> s.equalsIgnoreCase(columnHolder))) {
+                if (!isFirstUpdateColumn) {
+                    updateClause.append(", ");
+                }
+                else {
+                    isFirstUpdateColumn = false;
+                }
+                updateClause.append(columnHolder).append(" = ").append(valueHolders.get(i));
+            }
         }
-        sb.append(str);
-        sb.append(" ) WHEN MATCHED THEN UPDATE SET ");
-        sb.append(update);
-        sb.append(" WHEN NOT MATCHED THEN ");
-        return sb.toString();
+
+        // Complete the MERGE statement
+        mergeSql.append(" WHEN MATCHED THEN UPDATE SET ").append(updateClause);
+        mergeSql.append(" WHEN NOT MATCHED THEN ");
+
+        return mergeSql.toString();
     }
 
     public static String[] getStrings(String merge)
@@ -321,3 +310,4 @@ public final class WriterUtil
         }
     }
 }
+

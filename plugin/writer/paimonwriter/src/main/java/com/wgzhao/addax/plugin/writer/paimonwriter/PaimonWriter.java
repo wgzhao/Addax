@@ -128,6 +128,8 @@ public class PaimonWriter
         private Integer batchSize = 1000;
         private List<DataField> columnList = new ArrayList<>();
         private List<DataType> typeList = new ArrayList<>();
+        private boolean isDynamicBucketMode;
+        private int bucketNum = 0;
 
         @Override
         public void startWrite(RecordReceiver recordReceiver)
@@ -185,9 +187,22 @@ public class PaimonWriter
 
                 Table table = catalog.getTable(identifier);
 
+                // check the table has dynamic bucket
+                Map<String, String> tableOptions = table.options();
+                String bucketMode = tableOptions.getOrDefault("bucket-mode", "dynamic");
+                this.isDynamicBucketMode = "dynamic".equalsIgnoreCase(bucketMode);
+                String bucketNumStr = tableOptions.getOrDefault("bucket", "32");
+                if (bucketNumStr != null && !bucketNumStr.isEmpty()) {
+                    try {
+                        this.bucketNum = Integer.parseInt(bucketNumStr);
+                    } catch (NumberFormatException e) {
+                        log.warn("Can not parse the bucket number: {}", bucketNumStr);
+                    }
+                }
+
                 columnList = table.rowType().getFields();
                 typeList = table.rowType().getFieldTypes();
-                writeBuilder = table.newBatchWriteBuilder();
+                writeBuilder = table.newBatchWriteBuilder().withOverwrite();
             }
             catch (Exception e) {
                 log.error("init paimon error", e);
@@ -292,7 +307,12 @@ public class PaimonWriter
                 }
 
                 try {
-                    write.write(data);
+                    if (isDynamicBucketMode) {
+                        int bucketId = Math.abs(data.hashCode() % bucketNum);
+                        write.write(data, bucketId);
+                    } else {
+                        write.write(data);
+                    }
                 }
                 catch (Exception e) {
                     throw new RuntimeException(e);

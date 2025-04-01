@@ -21,6 +21,7 @@
 
 package com.wgzhao.addax.rdbms.util;
 
+import com.alibaba.druid.pool.DruidDataSource;
 import com.alibaba.druid.sql.parser.SQLParserUtils;
 import com.alibaba.druid.sql.parser.SQLStatementParser;
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
@@ -206,7 +207,7 @@ public final class DBUtil
                 bds.setDriverClassName(dataBaseType.getDriverClassName());
             }
             bds.setMinIdle(2);
-            bds.setMaxIdle(5);
+//            bds.setMaxActive(5);
             bds.setMaxOpenPreparedStatements(200);
             return bds.getConnection();
         }

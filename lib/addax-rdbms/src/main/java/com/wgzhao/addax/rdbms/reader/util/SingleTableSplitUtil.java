@@ -265,8 +265,16 @@ public class SingleTableSplitUtil
         if (StringUtils.isBlank(whereSql)) {
             whereSql = " WHERE 1=1 ";
         }
+        // If it's a string type and we need to split efficiently
         if (minMaxPack.getType() == MinMaxPackage.PkType.STRING) {
-            whereSql = "WHERE (" + whereSql + ") AND " + splitPK + " > '" + minMaxPack.getMin().toString() + "' AND " + splitPK + "< '" + minMaxPack.getMax().toString() + "'";
+            // For string type, we'll calculate the split points directly instead of using ORDER BY RAND()
+            List<Object> splitPoints = calculateStringSplitPoints(
+                    minMaxPack.getMin().toString(),
+                    minMaxPack.getMax().toString(),
+                    adviceNum - 1);
+
+            // Store the calculated split points in configuration for use later
+            return buildStringSplitPointQuery(splitPK, table, whereSql, splitPoints);
         }
         else {
             whereSql = "WHERE (" + whereSql + ") AND " + splitPK + " > " + minMaxPack.getMin() + " AND " + splitPK + "<" + minMaxPack.getMax();
@@ -365,5 +373,96 @@ public class SingleTableSplitUtil
             pkRangeSQL = String.format("%s WHERE (%s AND %s IS NOT NULL)", pkRangeSQL, where, splitPK);
         }
         return pkRangeSQL;
+    }
+
+    /**
+     * Calculate split points for string type primary keys
+     *
+     * @param min Minimum value of the primary key
+     * @param max Maximum value of the primary key
+     * @param numSplits Number of split points to generate
+     * @return List of split points
+     */
+    private static List<Object> calculateStringSplitPoints(String min, String max, int numSplits)
+    {
+        List<Object> splitPoints = new ArrayList<>();
+        if (numSplits <= 0 || min.compareTo(max) >= 0) {
+            return splitPoints;
+        }
+
+        // Use lexicographic distribution to create split points
+        for (int i = 1; i <= numSplits; i++) {
+            // Create a weighted average of min and max strings
+            String splitPoint = calculateStringBetween(min, max, (double) i / (numSplits + 1));
+            splitPoints.add(splitPoint);
+        }
+
+        return splitPoints;
+    }
+
+    /**
+     * Calculate a string that is approximately at the given fraction between min and max
+     *
+     * @param min Minimum string value
+     * @param max Maximum string value
+     * @param fraction Fraction between 0 and 1
+     * @return A string value at the approximate position
+     */
+    private static String calculateStringBetween(String min, String max, double fraction)
+    {
+        // Convert to character arrays for easier manipulation
+        char[] minChars = min.toCharArray();
+        char[] maxChars = max.toCharArray();
+
+        // Get common prefix length
+        int commonPrefixLength = 0;
+        int minLength = Math.min(minChars.length, maxChars.length);
+
+        while (commonPrefixLength < minLength && minChars[commonPrefixLength] == maxChars[commonPrefixLength]) {
+            commonPrefixLength++;
+        }
+
+        // If they share the entire prefix, return a value based on length
+        if (commonPrefixLength == minLength) {
+            if (minChars.length == maxChars.length) {
+                return min; // They're equal, can't create a midpoint
+            }
+
+            // Return a value with length between min and max
+            int targetLength = (int) (minChars.length + fraction * (maxChars.length - minChars.length));
+            char[] result = Arrays.copyOf(minChars, targetLength);
+            return new String(result);
+        }
+
+        // Create a new string with the common prefix and a character between the differing positions
+        char[] result = Arrays.copyOf(minChars, minChars.length);
+        result[commonPrefixLength] = (char) (minChars[commonPrefixLength] +
+                (int) (fraction * (maxChars[commonPrefixLength] - minChars[commonPrefixLength])));
+
+        // If we added to the character, truncate the rest
+        if (result[commonPrefixLength] > minChars[commonPrefixLength]) {
+            return new String(Arrays.copyOf(result, commonPrefixLength + 1));
+        }
+
+        return new String(result);
+    }
+
+    /**
+     * Build a query that returns the pre-calculated split points
+     */
+    private static String buildStringSplitPointQuery(String splitPK, String table, String whereSql, List<Object> splitPoints)
+    {
+        StringBuilder sb = new StringBuilder();
+        sb.append("SELECT * FROM (");
+
+        for (int i = 0; i < splitPoints.size(); i++) {
+            if (i > 0) {
+                sb.append(" UNION ALL ");
+            }
+            sb.append("SELECT '").append(splitPoints.get(i)).append("' AS ").append(splitPK);
+        }
+
+        sb.append(") t ORDER BY ").append(splitPK);
+        return sb.toString();
     }
 }

@@ -310,10 +310,10 @@ public class Configuration
         if (null == result) {
             return null;
         }
-        else if ("true".equalsIgnoreCase(result)) {
+        else if ("true".equalsIgnoreCase(result) || "yes".equalsIgnoreCase(result)) {
             return Boolean.TRUE;
         }
-        else if ("false".equalsIgnoreCase(result)) {
+        else if ("false".equalsIgnoreCase(result) || "no".equalsIgnoreCase(result)) {
             return Boolean.FALSE;
         }
         else {
