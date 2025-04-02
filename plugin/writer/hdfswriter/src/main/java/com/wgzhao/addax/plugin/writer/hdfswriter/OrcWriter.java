@@ -160,38 +160,10 @@ public class OrcWriter
                         ((BytesColumnVector) col).setRef(row, content, 0, content.length);
                         break;
                     case ARRAY:
-                        // assume the column is a list of V or the string of list of V
-                        // ["value1","value2"] ,convert the string to a list of V
-                        String arrayString = recordColumn.asString();
-                        JSONArray jsonArray = JSONArray.parseArray(arrayString);
-                        ListColumnVector listVector = (ListColumnVector) col;
-                        listVector.offsets[row] = listVector.childCount;
-                        listVector.lengths[row] = jsonArray.size();
-                        for (Object o : jsonArray) {
-                            BytesColumnVector childVector = (BytesColumnVector) listVector.child;
-                            byte[] bytes = ((String) o).getBytes(StandardCharsets.UTF_8);
-                            childVector.setRef(listVector.childCount++, bytes, 0, bytes.length);
-                        }
+                        appendArrayValue(row, recordColumn, (ListColumnVector) col);
                         break;
                     case MAP:
-                        // assume the column is a map of V or the string of map of V
-                        // {key1:value1,key2:value2}
-                        String mapString = recordColumn.asString();
-                        JSONObject jsonObject = JSONObject.parseObject(mapString);
-                        // convert the string to a map of V
-                        MapColumnVector mapVector = (MapColumnVector) col;
-                        mapVector.offsets[row] = mapVector.childCount;
-                        mapVector.lengths[row] = jsonObject.size();
-                        BytesColumnVector mapKeyVector = (BytesColumnVector) mapVector.keys;
-                        BytesColumnVector mapValueVector = (BytesColumnVector) mapVector.values;
-                        for (Map.Entry<String, Object> entry : jsonObject.entrySet()) {
-                            byte[] keyBytes = entry.getKey().getBytes(StandardCharsets.UTF_8);
-                            byte[] valueBytes = entry.getValue().toString().getBytes(StandardCharsets.UTF_8);
-
-                            mapKeyVector.setRef(mapVector.childCount, keyBytes, 0, keyBytes.length);
-                            mapValueVector.setRef(mapVector.childCount, valueBytes, 0, valueBytes.length);
-                            mapVector.childCount++;
-                        }
+                        appendMapValue(row, recordColumn, (MapColumnVector) col);
                         break;
                     default:
                         throw AddaxException.asAddaxException(
@@ -209,6 +181,42 @@ public class OrcWriter
                                 eachColumnConf.getString(Key.NAME),
                                 recordColumn.getRawData(), e.getMessage()));
             }
+        }
+    }
+
+    private static void appendArrayValue(int row, Column recordColumn, ListColumnVector col)
+    {
+        // assume the column is a list of V or the string of list of V
+        // ["value1","value2"] ,convert the string to a list of V
+        String arrayString = recordColumn.asString();
+        JSONArray jsonArray = JSONArray.parseArray(arrayString);
+        col.offsets[row] = col.childCount;
+        col.lengths[row] = jsonArray.size();
+        for (Object o : jsonArray) {
+            BytesColumnVector childVector = (BytesColumnVector) col.child;
+            byte[] bytes = ((String) o).getBytes(StandardCharsets.UTF_8);
+            childVector.setRef(col.childCount++, bytes, 0, bytes.length);
+        }
+    }
+
+    private static void appendMapValue(int row, Column recordColumn, MapColumnVector col)
+    {
+        // assume the column is a map of V or the string of map of V
+        // {key1:value1,key2:value2}
+        String mapString = recordColumn.asString();
+        JSONObject jsonObject = JSONObject.parseObject(mapString);
+        // convert the string to a map of V
+        col.offsets[row] = col.childCount;
+        col.lengths[row] = jsonObject.size();
+        BytesColumnVector mapKeyVector = (BytesColumnVector) col.keys;
+        BytesColumnVector mapValueVector = (BytesColumnVector) col.values;
+        for (Map.Entry<String, Object> entry : jsonObject.entrySet()) {
+            byte[] keyBytes = entry.getKey().getBytes(StandardCharsets.UTF_8);
+            byte[] valueBytes = entry.getValue().toString().getBytes(StandardCharsets.UTF_8);
+
+            mapKeyVector.setRef(col.childCount, keyBytes, 0, keyBytes.length);
+            mapValueVector.setRef(col.childCount, valueBytes, 0, valueBytes.length);
+            col.childCount++;
         }
     }
 
