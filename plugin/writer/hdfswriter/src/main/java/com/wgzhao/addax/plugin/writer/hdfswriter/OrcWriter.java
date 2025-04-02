@@ -19,6 +19,8 @@
 
 package com.wgzhao.addax.plugin.writer.hdfswriter;
 
+import com.alibaba.fastjson2.JSONArray;
+import com.alibaba.fastjson2.JSONObject;
 import com.wgzhao.addax.core.base.Constant;
 import com.wgzhao.addax.core.base.Key;
 import com.wgzhao.addax.core.element.Column;
@@ -34,7 +36,9 @@ import org.apache.hadoop.hive.ql.exec.vector.BytesColumnVector;
 import org.apache.hadoop.hive.ql.exec.vector.ColumnVector;
 import org.apache.hadoop.hive.ql.exec.vector.DecimalColumnVector;
 import org.apache.hadoop.hive.ql.exec.vector.DoubleColumnVector;
+import org.apache.hadoop.hive.ql.exec.vector.ListColumnVector;
 import org.apache.hadoop.hive.ql.exec.vector.LongColumnVector;
+import org.apache.hadoop.hive.ql.exec.vector.MapColumnVector;
 import org.apache.hadoop.hive.ql.exec.vector.TimestampColumnVector;
 import org.apache.hadoop.hive.ql.exec.vector.VectorizedRowBatch;
 import org.apache.hadoop.hive.serde2.io.HiveDecimalWritable;
@@ -48,10 +52,9 @@ import org.slf4j.LoggerFactory;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.text.SimpleDateFormat;
-import java.time.LocalDate;
 import java.util.Base64;
 import java.util.List;
-import java.util.StringJoiner;
+import java.util.Map;
 
 import static com.wgzhao.addax.core.spi.ErrorCode.IO_ERROR;
 import static com.wgzhao.addax.core.spi.ErrorCode.NOT_SUPPORT_TYPE;
@@ -103,6 +106,12 @@ public class OrcWriter
                 if (type.startsWith("DECIMAL")) {
                     columnType = SupportHiveDataType.DECIMAL;
                 }
+                else if (type.startsWith("ARRAY")) {
+                    columnType = SupportHiveDataType.ARRAY;
+                }
+                else if (type.startsWith("MAP")) {
+                    columnType = SupportHiveDataType.MAP;
+                }
                 else {
                     try {
                         columnType = SupportHiveDataType.valueOf(type);
@@ -125,7 +134,8 @@ public class OrcWriter
                         ((LongColumnVector) col).vector[row] = recordColumn.asLong();
                         break;
                     case DATE:
-                        ((LongColumnVector) col).vector[row] = LocalDate.parse(recordColumn.asString()).toEpochDay();
+                        java.sql.Date sqlDate = new java.sql.Date(recordColumn.asDate().getTime());
+                        ((LongColumnVector) col).vector[row] = sqlDate.toLocalDate().toEpochDay();
                         break;
                     case FLOAT:
                     case DOUBLE:
@@ -150,6 +160,12 @@ public class OrcWriter
                         byte[] content = (byte[]) recordColumn.getRawData();
                         ((BytesColumnVector) col).setRef(row, content, 0, content.length);
                         break;
+                    case ARRAY:
+                        appendArrayValue(row, recordColumn, (ListColumnVector) col);
+                        break;
+                    case MAP:
+                        appendMapValue(row, recordColumn, (MapColumnVector) col);
+                        break;
                     default:
                         throw AddaxException.asAddaxException(
                                 NOT_SUPPORT_TYPE,
@@ -166,6 +182,101 @@ public class OrcWriter
                                 eachColumnConf.getString(Key.NAME),
                                 recordColumn.getRawData(), e.getMessage()));
             }
+        }
+    }
+
+    private static void appendArrayValue(int row, Column recordColumn, ListColumnVector col)
+    {
+        // "['value1','value2'] ,convert the string to a list of V
+        String arrayString = recordColumn.asString();
+        JSONArray jsonArray = JSONArray.parseArray(arrayString);
+        col.offsets[row] = col.childCount;
+        col.lengths[row] = jsonArray.size();
+        for (Object o : jsonArray) {
+
+            if (o == null) {
+                col.child.isNull[col.childCount] = true;
+                col.child.noNulls = false;
+                col.childCount++;
+                continue;
+            }
+
+            // according to the child type to set the value
+            if (col.child instanceof BytesColumnVector) {
+                // string
+                BytesColumnVector childVector = (BytesColumnVector) col.child;
+                byte[] bytes = o.toString().getBytes(StandardCharsets.UTF_8);
+                childVector.setRef(col.childCount, bytes, 0, bytes.length);
+            }
+            else if (col.child instanceof LongColumnVector) {
+                // integer type or boolean type
+                LongColumnVector childVector = (LongColumnVector) col.child;
+                childVector.vector[col.childCount] = Long.parseLong(o.toString());
+            }
+            else if (col.child instanceof DoubleColumnVector) {
+                // float type or double type
+                DoubleColumnVector childVector = (DoubleColumnVector) col.child;
+                childVector.vector[col.childCount] = Double.parseDouble(o.toString());
+            }
+            else if (col.child instanceof DecimalColumnVector) {
+                // decimal type
+                DecimalColumnVector childVector = (DecimalColumnVector) col.child;
+                HiveDecimalWritable hdw = new HiveDecimalWritable();
+                hdw.set(HiveDecimal.create(new java.math.BigDecimal(o.toString())));
+                childVector.set(col.childCount, hdw);
+            }
+            else {
+                throw new RuntimeException("The data type in array is not supported: " + col.child.getClass().getName());
+            }
+            col.childCount++;
+        }
+    }
+
+    private static void appendMapValue(int row, Column recordColumn, MapColumnVector col)
+    {
+        // assume the column is a map of V or the string of map of V
+        // {key1:value1,key2:value2}
+        String mapString = recordColumn.asString();
+        JSONObject jsonObject = JSONObject.parseObject(mapString);
+        // convert the string to a map of V
+        col.offsets[row] = col.childCount;
+        col.lengths[row] = jsonObject.size();
+        // The key in map must be a string type
+        BytesColumnVector mapKeyVector = (BytesColumnVector) col.keys;
+        for (Map.Entry<String, Object> entry : jsonObject.entrySet()) {
+            byte[] keyBytes = entry.getKey().getBytes(StandardCharsets.UTF_8);
+            mapKeyVector.setRef(col.childCount, keyBytes, 0, keyBytes.length);
+
+            Object value = entry.getValue();
+
+            if (value == null) {
+                col.values.isNull[col.childCount] = true;
+                col.values.noNulls = false;
+            }
+            else if (col.values instanceof BytesColumnVector) {
+                BytesColumnVector valueVector = (BytesColumnVector) col.values;
+                byte[] valueBytes = value.toString().getBytes(StandardCharsets.UTF_8);
+                valueVector.setRef(col.childCount, valueBytes, 0, valueBytes.length);
+            }
+            else if (col.values instanceof LongColumnVector) {
+                LongColumnVector valueVector = (LongColumnVector) col.values;
+                valueVector.vector[col.childCount] = Long.parseLong(value.toString());
+            }
+            else if (col.values instanceof DoubleColumnVector) {
+                DoubleColumnVector valueVector = (DoubleColumnVector) col.values;
+                valueVector.vector[col.childCount] = Double.parseDouble(value.toString());
+            }
+            else if (col.values instanceof DecimalColumnVector) {
+                DecimalColumnVector valueVector = (DecimalColumnVector) col.values;
+                HiveDecimalWritable hdw = new HiveDecimalWritable();
+                hdw.set(HiveDecimal.create(new java.math.BigDecimal(value.toString())));
+                valueVector.set(col.childCount, hdw);
+            }
+            else {
+                throw new RuntimeException("The data type in map is not supported: " + col.values.getClass().getName());
+            }
+
+            col.childCount++;
         }
     }
 
@@ -235,22 +346,34 @@ public class OrcWriter
 
     private TypeDescription buildOrcSchema(List<Configuration> columns)
     {
-        StringJoiner joiner = new StringJoiner(",");
+        TypeDescription schema = TypeDescription.createStruct().setAttribute("creator", "addax");
 
         for (Configuration column : columns) {
-            String typeName = column.getString(Key.TYPE);
+            String typeName = column.getString(Key.TYPE).toLowerCase();
             String fieldName = column.getString(Key.NAME);
 
             if ("decimal".equalsIgnoreCase(typeName)) {
                 int precision = column.getInt(Key.PRECISION, Constant.DEFAULT_DECIMAL_MAX_PRECISION);
                 int scale = column.getInt(Key.SCALE, Constant.DEFAULT_DECIMAL_MAX_SCALE);
-                joiner.add(String.format("%s:decimal(%d,%d)", fieldName, precision, scale));
+                schema.addField(fieldName, TypeDescription.createDecimal().withPrecision(precision).withScale(scale));
+            }
+            else if (typeName.startsWith("array")) {
+                String elementType = typeName.substring(typeName.indexOf("<") + 1, typeName.indexOf(">"));
+                TypeDescription elementTypeDesc = TypeDescription.fromString(elementType);
+                schema.addField(fieldName, TypeDescription.createList(elementTypeDesc));
+            }
+            else if (typeName.startsWith("map")) {
+                String keyValueType = typeName.substring(typeName.indexOf("<") + 1, typeName.indexOf(">"));
+                String[] keyValueTypes = keyValueType.split(",");
+                TypeDescription keyTypeDesc = TypeDescription.fromString(keyValueTypes[0]);
+                TypeDescription valueTypeDesc = TypeDescription.fromString(keyValueTypes[1]);
+                schema.addField(fieldName, TypeDescription.createMap(keyTypeDesc, valueTypeDesc));
             }
             else {
-                joiner.add(String.format("%s:%s", fieldName, typeName));
+                schema.addField(fieldName, TypeDescription.fromString(typeName));
             }
         }
 
-        return TypeDescription.fromString("struct<" + joiner + ">");
+        return schema;
     }
 }

@@ -19,6 +19,8 @@
 
 package com.wgzhao.addax.plugin.writer.hdfswriter;
 
+import com.alibaba.fastjson2.JSONArray;
+import com.alibaba.fastjson2.JSONObject;
 import com.wgzhao.addax.core.base.Constant;
 import com.wgzhao.addax.core.base.Key;
 import com.wgzhao.addax.core.element.Column;
@@ -97,7 +99,7 @@ public class ParquetWriter
      *      }
      *    ]
      *  }
-     * "null" 表示该字段允许为空
+     * "null" indicates that the field is optional
      */
     @Override
     public void write(RecordReceiver lineReceiver, Configuration config, String fileName, TaskPluginCollector taskPluginCollector)
@@ -184,8 +186,16 @@ public class ParquetWriter
             String typename = columns.get(i).getString(Key.TYPE).toUpperCase();
 
             try {
-                SupportHiveDataType columnType = SupportHiveDataType.valueOf(typename);
-                appendValueByType(group, column, colName, columnType, columns.get(i));
+                if (typename.startsWith("ARRAY<")) {
+                    appendArrayValue(group, column, colName);
+                }
+                else if (typename.startsWith("MAP<")) {
+                    appendMapValue(group, column, colName);
+                }
+                else {
+                    SupportHiveDataType columnType = SupportHiveDataType.valueOf(typename);
+                    appendValueByType(group, column, colName, columnType, columns.get(i));
+                }
             }
             catch (IllegalArgumentException e) {
                 logger.warn("Convert type [{}] into string", typename);
@@ -230,6 +240,92 @@ public class ParquetWriter
             default:
                 group.append(colName, column.asString());
                 break;
+        }
+    }
+
+    /**
+     * Appends an array value to a Parquet group structure.
+     * <p>
+     * This method processes a JSON array string representation from a column
+     * and converts it into a properly nested Parquet array structure.
+     * The array is added to the specified group with the given column name.
+     *
+     * @param group The Parquet group to which the array will be added
+     * @param column The column containing the array data as a JSON string
+     * @param colName The name of the column/field in the Parquet schema
+     */
+    private void appendArrayValue(Group group, Column column, String colName)
+    {
+        //  "['value1', 'value2', ...]"
+        JSONArray jsonArray = JSONArray.parseArray(column.asString());
+        Group arrayGroup = group.addGroup(colName);
+
+        for (Object value : jsonArray) {
+            Group listItem = arrayGroup.addGroup("list");
+            if (value == null) {
+                // keep null value
+                continue;
+            }
+            appendPrimitiveValue(value, "element", listItem);
+        }
+    }
+
+    private static void appendPrimitiveValue(Object value, String element, Group group)
+    {
+        if (value instanceof Number) {
+            if (value instanceof Integer) {
+                group.append(element, ((Number) value).intValue());
+            }
+            else if (value instanceof Long) {
+                group.append(element, ((Number) value).longValue());
+            }
+            else if (value instanceof Short) {
+                group.append(element, ((Number) value).shortValue());
+            }
+            else if (value instanceof Float || value instanceof Double) {
+                group.append(element, ((Number) value).doubleValue());
+            }
+            else {
+                // BigDecimal
+                group.append(element, value.toString());
+            }
+        }
+        else if (value instanceof Boolean) {
+            group.append(element, (Boolean) value);
+        }
+        else {
+            // string or other type
+            group.append(element, value.toString());
+        }
+    }
+
+    /**
+     * Appends a map value to a Parquet group structure.
+     * <p>
+     * This method processes a JSON object string representation from a column
+     * and converts it into a properly nested Parquet map structure.
+     * The map is added to the specified group with the given column name.
+     *
+     * @param group The Parquet group to which the map will be added
+     * @param column The column containing the map data as a JSON string
+     * @param colName The name of the column/field in the Parquet schema
+     */
+    private void appendMapValue(Group group, Column column, String colName)
+    {
+        //  {'key1':'value1', 'key2':'value2', ...}
+        JSONObject jsonObject = JSONObject.parseObject(column.asString());
+
+        Group mapGroup = group.addGroup(colName);
+
+        for (Map.Entry<String, Object> entry : jsonObject.entrySet()) {
+            Group kvGroup = mapGroup.addGroup("key_value");
+            kvGroup.append("key", entry.getKey());
+
+            Object value = entry.getValue();
+            if (value == null) {
+                continue;
+            }
+            appendPrimitiveValue(value, "value", kvGroup);
         }
     }
 
@@ -303,6 +399,35 @@ public class ParquetWriter
     }
 
     private Type createFieldByType(String type, String fieldName, Type.Repetition repetition, Configuration column)
+    {
+        if (type.startsWith("ARRAY<")) {
+            // extract element type，e.g the String of ARRAY<STRING>
+            String elementType = type.substring(6, type.length() - 1).trim().toUpperCase();
+            PrimitiveType element = getPrimitiveType(elementType, "element", Type.Repetition.REQUIRED, column);
+            return Types.optionalList()
+                    .element(element)
+                    .named(fieldName);
+        }
+        else if (type.startsWith("MAP<")) {
+            // MAP<STRING,STRING>
+            String mapTypes = type.substring(4, type.length() - 1);
+            String[] keyValueTypes = mapTypes.split(",", 2);
+            String keyType = keyValueTypes[0].trim().toUpperCase();
+            String valueType = keyValueTypes[1].trim().toUpperCase();
+
+            Type keyField = Types.required(PrimitiveType.PrimitiveTypeName.BINARY).named("key");
+            Type valueField = getPrimitiveType(valueType, "value", repetition, column);
+
+            return Types.map(repetition)
+                    .key(keyField)
+                    .value(valueField)
+                    .named(fieldName);
+        }
+
+        return getPrimitiveType(type, fieldName, repetition, column);
+    }
+
+    private static PrimitiveType getPrimitiveType(String type, String fieldName, Type.Repetition repetition, Configuration column)
     {
         switch (type) {
             case "INT":
