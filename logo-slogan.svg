@@ -17,17 +17,16 @@
           <feMergeNode in="SourceGraphic"/>
         </feMerge>
       </filter>
+
     </defs>
 
-    <!-- 背景装饰 - 科技感圆点 -->
-    <g fill="#4573fb" opacity="0.1">
-      <circle cx="30" cy="30" r="2"/>
-      <circle cx="60" cy="40" r="2"/>
-      <circle cx="270" cy="30" r="2"/>
-      <circle cx="250" cy="50" r="2"/>
-      <circle cx="40" cy="270" r="2"/>
-      <circle cx="270" cy="260" r="2"/>
+    <!-- 新增：科技网格背景 -->
+    <g id="tech-background">
+      <!-- 背景网格 -->
+      <path d="M0,0 L300,0 L300,300 L0,300 Z" fill="url(#gridGradient)" opacity="0.3"/>
+
     </g>
+    
 
     <!-- 所有内部连接线 -->
     <g stroke="#00d4ff" stroke-width="2" opacity="0.6">
@@ -81,27 +80,52 @@
   </g>
   <g id="logo-slogan" fill="none" stroke-dasharray="none" fill-opacity="1" stroke-opacity="1" stroke="none">
     <title>logo-slogan</title>
-    <rect fill="#6d6d6d" x="0" y="0" width="1280" height="640" />
+    <!-- 替换原来的纯色背景为科技感背景 -->
+    <rect fill="#1e2029" x="0" y="0" width="1280" height="640" />
+    
+    <!-- 背景装饰图案 -->
+    <g opacity="0.2">
+
+      
+      <!-- 对角线图案 -->
+      <path d="M0,0 L1280,640 M1280,0 L0,640" stroke="#4573fb" stroke-width="0.5" opacity="0.05"/>
+      
+      <!-- 动态光效 -->
+      <circle cx="640" cy="320" r="300" fill="url(#pulseGradient)" opacity="0.1">
+        <animate attributeName="r" values="300;350;300" dur="10s" repeatCount="indefinite" />
+        <animate attributeName="opacity" values="0.1;0.05;0.1" dur="10s" repeatCount="indefinite" />
+      </circle>
+    </g>
+    
     <g id="logo-slogan_Layer_1">
       <title>Layer 1</title>
       <g id="Graphic_6">
-        <rect x="300" y="100" width="205" height="164" id="path"/>
-          <use href="#logo"  width="46" height="46" transform="translate(384 140) scale(0.5)"/>
+        <rect x="260" y="100" width="205" height="164" id="path"/>
+        <use href="#logo" width="46" height="46" transform="translate(344 140) scale(0.5)"/>
       </g>
+      
+      <!-- 主标题优化：增大字体，更换字体，添加轻微发光效果 -->
       <g id="Graphic_7">
-        <text transform="translate(584.8242 144.1211)" fill="#1b1f23">
-          <tspan font-family="DIN Alternate" font-weight="bold" font-size="120" fill="#1b1f23" x="0" y="113">Addax</tspan>
+        <text transform="translate(524.8242 138)" fill="#f0f6fc" filter="url(#glow)">
+          <tspan font-family="Montserrat, Arial, sans-serif" font-weight="800" font-size="140" fill="#f0f6fc" x="0" y="113">Addax</tspan>
+        </text>
+        <!-- 添加轻微阴影/光晕效果增强可读性 -->
+        <text transform="translate(524.8242 134.1211)" fill="url(#mainGradient)" opacity="0.4" filter="url(#glow)">
+          <tspan font-family="Montserrat, Arial, sans-serif" font-weight="800" font-size="140" x="0" y="113">Addax</tspan>
         </text>
       </g>
+      
+      <!-- 副标题优化：调整位置，增强对比度和层级 -->
       <g id="Graphic_8">
-        <text transform="translate(239.87793 311.0699)" fill="black">
-          <tspan font-family="DIN Alternate" font-weight="bold" font-size="60" fill="black" x="0" y="56">Versatile Open-Source ETL tool</tspan>
+        <text transform="translate(140 350)" fill="#f0f6fc">
+          <tspan font-family="Roboto, DIN Alternate, sans-serif" font-weight="700" font-size="80" letter-spacing="1" fill="#f0f6fc" x="0" y="56">versatile open source ETL tool</tspan>
         </text>
       </g>
+      
+      <!-- 说明文本优化：调整位置，增加行距，改变字体 -->
       <g id="Graphic_9">
-        <text transform="translate(225.75 414.5)" fill="#616161">
-          <tspan font-family="Helvetica Neue" font-size="30" fill="#1f2328" x="0" y="29">A versatile open-source ETL tool that can seamlessly transfer </tspan>
-          <tspan font-family="Helvetica Neue" font-size="30" fill="#1f2328" x="0" y="64.84">data between various RDBMS and NoSQL databases</tspan>
+        <text transform="translate(210 480)" fill="#c0c7d0">
+          <tspan font-family="Open Sans, Helvetica Neue, sans-serif" font-size="32" font-weight="300" fill="#c0c7d0" x="0" y="29">seamlessly transfer data between various RDBMS and NoSQL systems</tspan>
         </text>
       </g>
     </g>
