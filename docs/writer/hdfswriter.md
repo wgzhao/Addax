@@ -10,31 +10,32 @@ HDFS Writer 提供向 HDFS 文件系统指定路径中写入 `TextFile` ， `ORC
 
 ## 参数说明
 
-| 配置项                    | 是否必须 | 数据类型        | 默认值  | 说明                                                                           |
-|:-----------------------| :------: |-------------| ------- |------------------------------------------------------------------------------|
-| path                   |    是    | string      | 无      | 要读取的文件路径                                                                     |
-| defaultFS              |    是    | string      | 无      | 详述见下                                                                         |
-| fileType               |    是    | string      | 无      | 文件的类型，详述见下                                                                   |
-| fileName               |    是    | string      | 无      | 要写入的文件名，用于当作前缀                                                               |
-| column                 |    是    | `list<map>` | 无      | 写入的字段列表                                                                      |
-| writeMode              |    是    | string      | 无      | 写入模式，详述见下                                                                    |
-| skipTrash              |    否    | boolean     | false   | 是否跳过垃圾回收站，和 `writeMode` 配置相关详见下面描述                                           |
-| fieldDelimiter         |    否    | string      | `,`     | 文本文件的字段分隔符，二进制文件不需要指定该项                                                      |
-| encoding               |    否    | string      | `utf-8` | 文件的编码配置， 目前仅支持 `utf-8`                                                       |
-| nullFormat             |    否    | string      | 无      | 定义表示为空的字符，例如如果用户配置: `"\\N"` ，那么如果源头数据是 `"\N"` ，视作 `null` 字段                  |
-| haveKerberos           |    否    | boolean     | false   | 是否启用 Kerberos 认证，如果启用，则需要同时配置以下两项                                            |
-| kerberosKeytabFilePath |    否    | string      | 无      | 用于 Kerberos 认证的凭证文件路径, 比如 `/your/path/addax.service.keytab`                  |
-| kerberosPrincipal      |    否    | string      | 无      | 用于 Kerberos 认证的凭证主体, 比如 `addax/node1@WGZHAO.COM`                             |
-| compress               |    否    | string      | 无      | 文件的压缩格式，详见下文                                                                 |
-| hadoopConfig           |    否    | map         | 无      | 里可以配置与 Hadoop 相关的一些高级参数，比如HA的配置                                              |
-| preShell               |    否    | `list`      | 无      | 写入数据前执行的shell命令，比如 `hive -e "truncate table test.hello"`                     |
-| postShell              |    否    | `list`      | 无      | 写入数据后执行的shell命令，比如 `hive -e "select count(1) from test.hello"`               |
-| ignoreError            |    否    | boolean     | false   | 是否忽略`preShell`, `postShell` 命令的错误 |
-| hdfsSitePath           |    否    | string      | 无      | `hdfs-site.xml` 的路径，详细解释见下                                |
+| 配置项                    | 是否必须 | 数据类型        | 默认值     | 说明                                                             |
+|:-----------------------|:----:|-------------|---------|----------------------------------------------------------------|
+| path                   |  是   | string      | 无       | 要读取的文件路径                                                       |
+| defaultFS              |  是   | string      | 无       | 详述见下                                                           |
+| fileType               |  是   | string      | 无       | 文件的类型，详述见下                                                     |
+| fileName               |  是   | string      | 无       | 要写入的文件名，用于当作前缀                                                 |
+| column                 |  是   | `list<map>` | 无       | 写入的字段列表                                                        |
+| writeMode              |  是   | string      | 无       | 写入模式，详述见下                                                      |
+| skipTrash              |  否   | boolean     | false   | 是否跳过垃圾回收站，和 `writeMode` 配置相关详见下面描述                             |
+| fieldDelimiter         |  否   | string      | `,`     | 文本文件的字段分隔符，二进制文件不需要指定该项                                        |
+| encoding               |  否   | string      | `utf-8` | 文件的编码配置， 目前仅支持 `utf-8`                                         |
+| nullFormat             |  否   | string      | 无       | 定义表示为空的字符，例如如果用户配置: `"\\N"` ，那么如果源头数据是 `"\N"` ，视作 `null` 字段    |
+| haveKerberos           |  否   | boolean     | false   | 是否启用 Kerberos 认证，如果启用，则需要同时配置以下两项                              |
+| kerberosKeytabFilePath |  否   | string      | 无       | 用于 Kerberos 认证的凭证文件路径, 比如 `/your/path/addax.service.keytab`    |
+| kerberosPrincipal      |  否   | string      | 无       | 用于 Kerberos 认证的凭证主体, 比如 `addax/node1@WGZHAO.COM`               |
+| compress               |  否   | string      | 无       | 文件的压缩格式，详见下文                                                   |
+| hadoopConfig           |  否   | map         | 无       | 里可以配置与 Hadoop 相关的一些高级参数，比如HA的配置                                |
+| preShell               |  否   | `list`      | 无       | 写入数据前执行的shell命令，比如 `hive -e "truncate table test.hello"`       |
+| postShell              |  否   | `list`      | 无       | 写入数据后执行的shell命令，比如 `hive -e "select count(1) from test.hello"` |
+| ignoreError            |  否   | boolean     | false   | 是否忽略`preShell`, `postShell` 命令的错误                              |
+| hdfsSitePath           |  否   | string      | 无       | `hdfs-site.xml` 的路径，详细解释见下                                     |
 
 ### path
 
-存储到 Hadoop hdfs文件系统的路径信息，HdfsWriter 会根据并发配置在 `Path` 目录下写入多个文件。为与hive表关联，请填写hive表在hdfs上的存储路径。 例：Hive上设置的数据仓库的存储路径为：`/user/hive/warehouse/`
+存储到 Hadoop hdfs文件系统的路径信息，HdfsWriter 会根据并发配置在 `Path` 目录下写入多个文件。为与hive表关联，请填写hive表在hdfs上的存储路径。 例：Hive上设置的数据仓库的存储路径为：
+`/user/hive/warehouse/`
 ，已建立数据库：`test`，表：`hello`； 则对应的存储路径为：`/user/hive/warehouse/test.db/hello` (如果建表时指定了`location` 属性，则依据该属性的路径)
 
 ### defaultFS
@@ -83,6 +84,8 @@ Hadoop hdfs 文件系统 namenode 节点地址。格式：`hdfs://ip:port` ；�
 2. 如果仅指定了精度但未指定小数位，则小数位用0表示，即 `decimal(p,0)`
 3. 如果都指定，则使用指定的规格，即 `decimal(p,s)`
 
+从 `5.0.1` 开始，已经支持 `array`, `map` 两种复合类型，上述示例配置文件给出的使用方式
+
 ### writeMode
 
 写入前数据清理处理模式：
@@ -129,7 +132,8 @@ Hadoop hdfs 文件系统 namenode 节点地址。格式：`hdfs://ip:port` ；�
 
 ### preShell 与 postShell
 
-引入 `preShell` 与 `postShell` 的目的是为了在写入数据前后执行一些额外的操作，比如在写入数据前清空表，写入数据后查询表的行数等。一个典型的生产环境场景时，采集的数据按日分区保存在 HDFS 上，
+引入 `preShell` 与 `postShell` 的目的是为了在写入数据前后执行一些额外的操作，比如在写入数据前清空表，写入数据后查询表的行数等。一个典型的生产环境场景时，采集的数据按日分区保存在 HDFS
+上，
 采集之前需要创建分区，这样就可以通过配置 `preShell` 来实现，比如 `hive -e "alter table test.hello add partition(dt='${logdate}')"`
 
 ### ignoreError
@@ -153,15 +157,16 @@ Hadoop hdfs 文件系统 namenode 节点地址。格式：`hdfs://ip:port` ；�
 
 ## 类型转换
 
-| Addax 内部类型 | HIVE 数据类型                       |
-| -------------- | ----------------------------------- |
-| Long           | TINYINT,SMALLINT,INT,INTEGER,BIGINT |
-| Double         | FLOAT,DOUBLE,DECIMAL                |
-| String         | STRING,VARCHAR,CHAR                 |
-| Boolean        | BOOLEAN                             |
-| Date           | DATE,TIMESTAMP                      |
-| Bytes          | BINARY                              |
+| Addax 内部类型 | HIVE 数据类型                           |
+|------------|-------------------------------------|
+| Long       | TINYINT,SMALLINT,INT,INTEGER,BIGINT |
+| Double     | FLOAT,DOUBLE,DECIMAL                |
+| String     | STRING,VARCHAR,CHAR                 |
+| Boolean    | BOOLEAN                             |
+| Date       | DATE,TIMESTAMP                      |
+| Bytes      | BINARY                              |
+| String     | ARRAY, MAP                          |
 
 ## 功能与限制
 
-1. 目前不支持：`binary`、`arrays`、`maps`、`structs`、`union` 类型
+1. 目前不支持：`structs`、`union` 类型

@@ -30,6 +30,14 @@
             {
               "value": "test",
               "type": "bytes"
+            },
+            {
+              "value": "['tag1', 'tag2', 'tag3']",
+              "type": "string"
+            },
+            {
+              "value": "{'loc':'HZ','num':'12'}",
+              "type": "string"
             }
           ],
           "sliceRecordCount": 1000
@@ -61,6 +69,14 @@
               {
                 "name": "col5",
                 "type": "string"
+              },
+              {
+                "name": "col6",
+                "type": "array<string>"
+              },
+              {
+                "name": "col7",
+                "type": "map<string,string>"
               }
             ],
             "writeMode": "overwrite",

@@ -55,7 +55,6 @@ import java.text.SimpleDateFormat;
 import java.util.Base64;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.StringJoiner;
 
 import static com.wgzhao.addax.core.spi.ErrorCode.IO_ERROR;
@@ -168,7 +167,6 @@ public class OrcWriter
                         ListColumnVector listVector = (ListColumnVector) col;
                         listVector.offsets[row] = listVector.childCount;
                         listVector.lengths[row] = jsonArray.size();
-//                        listVector.childCount += array.length;
                         for (Object o : jsonArray) {
                             BytesColumnVector childVector = (BytesColumnVector) listVector.child;
                             byte[] bytes = ((String) o).getBytes(StandardCharsets.UTF_8);
@@ -245,8 +243,7 @@ public class OrcWriter
         String compress = config.getString(Key.COMPRESS, "NONE").toUpperCase();
         int batchSize = config.getInt(Key.BATCH_SIZE, DEFAULT_BATCH_SIZE);
 
-        TypeDescription schema = buildOrcSchema1(columns);
-        schema.setAttribute("creator", "addax");
+        TypeDescription schema = buildOrcSchema(columns);
         Path filePath = new Path(fileName);
 
         try (Writer writer = OrcFile.createWriter(filePath,
@@ -280,27 +277,6 @@ public class OrcWriter
     }
 
     private TypeDescription buildOrcSchema(List<Configuration> columns)
-    {
-        StringJoiner joiner = new StringJoiner(",");
-
-        for (Configuration column : columns) {
-            String typeName = column.getString(Key.TYPE);
-            String fieldName = column.getString(Key.NAME);
-
-            if ("decimal".equalsIgnoreCase(typeName)) {
-                int precision = column.getInt(Key.PRECISION, Constant.DEFAULT_DECIMAL_MAX_PRECISION);
-                int scale = column.getInt(Key.SCALE, Constant.DEFAULT_DECIMAL_MAX_SCALE);
-                joiner.add(String.format("%s:decimal(%d,%d)", fieldName, precision, scale));
-            }
-            else {
-                joiner.add(String.format("%s:%s", fieldName, typeName));
-            }
-        }
-
-        return TypeDescription.fromString("struct<" + joiner + ">");
-    }
-
-    private TypeDescription buildOrcSchema1(List<Configuration> columns)
     {
         TypeDescription schema = TypeDescription.createStruct().setAttribute("creator", "addax");
 
