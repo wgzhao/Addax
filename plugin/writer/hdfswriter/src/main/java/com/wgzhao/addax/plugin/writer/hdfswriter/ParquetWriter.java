@@ -99,7 +99,7 @@ public class ParquetWriter
      *      }
      *    ]
      *  }
-     * "null" 表示该字段允许为空
+     * "null" indicates that the field is optional
      */
     @Override
     public void write(RecordReceiver lineReceiver, Configuration config, String fileName, TaskPluginCollector taskPluginCollector)
@@ -262,7 +262,40 @@ public class ParquetWriter
 
         for (Object value : jsonArray) {
             Group listItem = arrayGroup.addGroup("list");
-            listItem.append("element", value.toString());
+            if (value == null) {
+                // keep null value
+                continue;
+            }
+            appendPrimitiveValue(value, "element", listItem);
+        }
+    }
+
+    private static void appendPrimitiveValue(Object value, String element, Group group)
+    {
+        if (value instanceof Number) {
+            if (value instanceof Integer) {
+                group.append(element, ((Number) value).intValue());
+            }
+            else if (value instanceof Long) {
+                group.append(element, ((Number) value).longValue());
+            }
+            else if (value instanceof Short) {
+                group.append(element, ((Number) value).shortValue());
+            }
+            else if (value instanceof Float || value instanceof Double) {
+                group.append(element, ((Number) value).doubleValue());
+            }
+            else {
+                // BigDecimal
+                group.append(element, value.toString());
+            }
+        }
+        else if (value instanceof Boolean) {
+            group.append(element, (Boolean) value);
+        }
+        else {
+            // string or other type
+            group.append(element, value.toString());
         }
     }
 
@@ -287,7 +320,12 @@ public class ParquetWriter
         for (Map.Entry<String, Object> entry : jsonObject.entrySet()) {
             Group kvGroup = mapGroup.addGroup("key_value");
             kvGroup.append("key", entry.getKey());
-            kvGroup.append("value", entry.getValue().toString());
+
+            Object value = entry.getValue();
+            if (value == null) {
+                continue;
+            }
+            appendPrimitiveValue(value, "value", kvGroup);
         }
     }
 
@@ -365,9 +403,9 @@ public class ParquetWriter
         if (type.startsWith("ARRAY<")) {
             // extract element type，e.g the String of ARRAY<STRING>
             String elementType = type.substring(6, type.length() - 1).trim().toUpperCase();
-            Type elementField = createFieldByType(elementType, "element", Type.Repetition.REQUIRED, column);
-            return Types.list(repetition)
-                    .element(elementField)
+            PrimitiveType element = getPrimitiveType(elementType, "element", Type.Repetition.REQUIRED, column);
+            return Types.optionalList()
+                    .element(element)
                     .named(fieldName);
         }
         else if (type.startsWith("MAP<")) {
@@ -377,8 +415,8 @@ public class ParquetWriter
             String keyType = keyValueTypes[0].trim().toUpperCase();
             String valueType = keyValueTypes[1].trim().toUpperCase();
 
-            Type keyField = createFieldByType(keyType, "key", Type.Repetition.REQUIRED, column);
-            Type valueField = createFieldByType(valueType, "value", Type.Repetition.OPTIONAL, column);
+            Type keyField = Types.required(PrimitiveType.PrimitiveTypeName.BINARY).named("key");
+            Type valueField = getPrimitiveType(valueType, "value", repetition, column);
 
             return Types.map(repetition)
                     .key(keyField)
@@ -386,6 +424,11 @@ public class ParquetWriter
                     .named(fieldName);
         }
 
+        return getPrimitiveType(type, fieldName, repetition, column);
+    }
+
+    private static PrimitiveType getPrimitiveType(String type, String fieldName, Type.Repetition repetition, Configuration column)
+    {
         switch (type) {
             case "INT":
                 return Types.primitive(PrimitiveType.PrimitiveTypeName.INT32, repetition).named(fieldName);
