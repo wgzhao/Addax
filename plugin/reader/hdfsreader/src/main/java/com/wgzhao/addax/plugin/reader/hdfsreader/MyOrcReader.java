@@ -232,7 +232,6 @@ public class MyOrcReader
             case TIMESTAMP:
                 columnGenerated = new TimestampColumn(((TimestampColumnVector) col).getTime(row));
                 break;
-
             default:
                 // type is string or other
                 String v = ((BytesColumnVector) col).toString(row);
