@@ -201,8 +201,8 @@ public class DFSUtil
         FileStatus[] stats = hdfs.listStatus(listFiles);
 
         for (FileStatus f : stats) {
-            // if it is a directory, recursively call
-            if (f.isDirectory()) {
+            // if it is a directory, and not starts with dot(.), recursively call
+            if (f.isDirectory() && ! f.getPath().getName().startsWith(".")) {
                 LOG.info("The [{}] is directory, reading all files in the directory.", f.getPath());
                 getHDFSAllFilesNORegex(f.getPath().toString(), hdfs);
             }

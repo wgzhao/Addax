@@ -35,5 +35,7 @@ public enum JavaType {
     CHAR,
     LONG,
     BOOLEAN,
-    BINARY
+    BINARY,
+    ARRAY,
+    MAP
 }

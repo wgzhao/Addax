@@ -22,7 +22,6 @@ package com.wgzhao.addax.plugin.reader.hdfsreader;
 import com.wgzhao.addax.core.element.BytesColumn;
 import com.wgzhao.addax.core.element.Column;
 import com.wgzhao.addax.core.element.ColumnEntry;
-import com.wgzhao.addax.core.element.DateColumn;
 import com.wgzhao.addax.core.element.DoubleColumn;
 import com.wgzhao.addax.core.element.LongColumn;
 import com.wgzhao.addax.core.element.Record;
@@ -36,20 +35,27 @@ import org.apache.hadoop.hive.ql.exec.vector.BytesColumnVector;
 import org.apache.hadoop.hive.ql.exec.vector.ColumnVector;
 import org.apache.hadoop.hive.ql.exec.vector.DecimalColumnVector;
 import org.apache.hadoop.hive.ql.exec.vector.DoubleColumnVector;
+import org.apache.hadoop.hive.ql.exec.vector.ListColumnVector;
 import org.apache.hadoop.hive.ql.exec.vector.LongColumnVector;
+import org.apache.hadoop.hive.ql.exec.vector.MapColumnVector;
 import org.apache.hadoop.hive.ql.exec.vector.TimestampColumnVector;
 import org.apache.hadoop.hive.ql.exec.vector.VectorizedRowBatch;
 import org.apache.orc.OrcFile;
 import org.apache.orc.Reader;
 import org.apache.orc.TypeDescription;
+import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.text.SimpleDateFormat;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
+import java.util.StringJoiner;
 
 import static com.wgzhao.addax.core.spi.ErrorCode.IO_ERROR;
+import static com.wgzhao.addax.plugin.reader.hdfsreader.JavaType.ARRAY;
+import static com.wgzhao.addax.plugin.reader.hdfsreader.JavaType.MAP;
 
 public class MyOrcReader
 {
@@ -122,37 +128,14 @@ public class MyOrcReader
                         record.addColumn(new StringColumn(null));
                         continue;
                     }
-                    switch (type) {
-                        case INT:
-                        case LONG:
-                        case BOOLEAN:
-                        case BIGINT:
-                            columnGenerated = new LongColumn(((LongColumnVector) col).vector[row]);
-                            break;
-                        case DATE:
-                            columnGenerated = new DateColumn(new Date(((LongColumnVector) col).vector[row]));
-                            break;
-                        case FLOAT:
-                        case DOUBLE:
-                            columnGenerated = new DoubleColumn(((DoubleColumnVector) col).vector[row]);
-                            break;
-                        case DECIMAL:
-                            columnGenerated = new DoubleColumn(((DecimalColumnVector) col).vector[row].doubleValue());
-                            break;
-                        case BINARY:
-                            BytesColumnVector b = (BytesColumnVector) col;
-                            byte[] val = Arrays.copyOfRange(b.vector[row], b.start[row], b.start[row] + b.length[row]);
-                            columnGenerated = new BytesColumn(val);
-                            break;
-                        case TIMESTAMP:
-                            // FIXME: incorrect timezone value
-                            columnGenerated = new TimestampColumn(((TimestampColumnVector) col).getTime(row));
-                            break;
-                        default:
-                            // type is string or other
-                            String v = ((BytesColumnVector) col).toString(row);
-                            columnGenerated = v.equals(nullFormat) ? new StringColumn() : new StringColumn(v);
-                            break;
+                    if (type == ARRAY) {
+                        columnGenerated = getArrayColumn(nullFormat, (ListColumnVector) col, row);
+                    }
+                    else if (type == MAP) {
+                        columnGenerated = getMapColumn(nullFormat, (MapColumnVector) col, row);
+                    }
+                    else {
+                        columnGenerated = getPrimitiveColumn(nullFormat, type, col, row);
                     }
                     record.addColumn(columnGenerated);
                 }
@@ -165,5 +148,96 @@ public class MyOrcReader
                 taskPluginCollector.collectDirtyRecord(record, e.getMessage());
             }
         }
+    }
+
+    private static @NotNull Column getMapColumn(String nullFormat, MapColumnVector col, int row)
+    {
+        Column columnGenerated;
+        StringBuilder mapBuilder = new StringBuilder("{");
+        // all value type must be same
+        for (int j = (int) col.offsets[row]; j < col.offsets[row] + col.lengths[row]; j++) {
+            if (j > col.offsets[row]) {
+                mapBuilder.append(", ");
+            }
+
+            // The key must be string
+            String key = ((BytesColumnVector) col.keys).toString(j);
+
+            mapBuilder.append("\"").append(key).append("\": ");
+            ColumnVector valueCol = col.values;
+            if (valueCol.isNull[j]) {
+                mapBuilder.append(nullFormat);
+            }
+            else {
+                StringBuilder sb = new StringBuilder();
+                valueCol.stringifyValue(sb, j);
+                mapBuilder.append(sb);
+            }
+        }
+        mapBuilder.append("}");
+        columnGenerated = new StringColumn(mapBuilder.toString());
+        return columnGenerated;
+    }
+
+    private static @NotNull Column getArrayColumn(String nullFormat, ListColumnVector col, int row)
+    {
+        Column columnGenerated;
+        StringJoiner joiner = new StringJoiner(", ");
+
+        for (int j = (int) col.offsets[row]; j < col.offsets[row] + col.lengths[row]; j++) {
+            ColumnVector childCol = col.child;
+            if (childCol.isNull[j]) {
+                joiner.add(nullFormat);
+            }
+            else {
+                StringBuilder sb = new StringBuilder();
+                childCol.stringifyValue(sb, j);;
+                joiner.add(sb);
+            }
+        }
+        // convert the result to array string
+        columnGenerated = new StringColumn("[" + joiner + "]");
+        return columnGenerated;
+    }
+
+    private static @NotNull Column getPrimitiveColumn(String nullFormat, JavaType type, ColumnVector col, int row)
+    {
+        Column columnGenerated;
+        switch (type) {
+            case INT:
+            case LONG:
+            case BOOLEAN:
+            case BIGINT:
+                columnGenerated = new LongColumn(((LongColumnVector) col).vector[row]);
+                break;
+            case DATE:
+                // java.sql.Date is yyyy-MM-dd, but the java Date including time
+                // convert the java.sql.Date to string
+                Date date = new Date(((LongColumnVector) col).vector[row] * 86400 * 1000);
+                SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+                columnGenerated = new StringColumn(sdf.format(date));
+                break;
+            case FLOAT:
+            case DOUBLE:
+                columnGenerated = new DoubleColumn(((DoubleColumnVector) col).vector[row]);
+                break;
+            case DECIMAL:
+                columnGenerated = new DoubleColumn(((DecimalColumnVector) col).vector[row].doubleValue());
+                break;
+            case BINARY:
+                BytesColumnVector b = (BytesColumnVector) col;
+                byte[] val = Arrays.copyOfRange(b.vector[row], b.start[row], b.start[row] + b.length[row]);
+                columnGenerated = new BytesColumn(val);
+                break;
+            case TIMESTAMP:
+                columnGenerated = new TimestampColumn(((TimestampColumnVector) col).getTime(row));
+                break;
+            default:
+                // type is string or other
+                String v = ((BytesColumnVector) col).toString(row);
+                columnGenerated = v.equals(nullFormat) ? new StringColumn() : new StringColumn(v);
+                break;
+        }
+        return columnGenerated;
     }
 }
