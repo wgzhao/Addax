@@ -21,6 +21,7 @@ package com.wgzhao.addax.plugin.reader.hivereader;
 
 import com.wgzhao.addax.core.element.BytesColumn;
 import com.wgzhao.addax.core.element.Column;
+import com.wgzhao.addax.core.element.StringColumn;
 import com.wgzhao.addax.core.element.TimestampColumn;
 import com.wgzhao.addax.core.plugin.RecordSender;
 import com.wgzhao.addax.core.spi.Reader;
@@ -135,11 +136,12 @@ public class HiveReader
                 protected Column createColumn(ResultSet rs, ResultSetMetaData metaData, int i)
                         throws SQLException, UnsupportedEncodingException
                 {
-                    if (metaData.getColumnType(i) == Types.TIMESTAMP) {
+                    int columnType = metaData.getColumnType(i);
+                    if (columnType == Types.TIMESTAMP) {
                         // hive HiveBaseResultSet#getTimestamp(String columnName, Calendar cal) not support
                         return new TimestampColumn(rs.getTimestamp(i));
                     }
-                    if (metaData.getColumnType(i)  == Types.BINARY ||
+                    if (columnType  == Types.BINARY ||
                             metaData.getColumnType(i)  == Types.VARBINARY) {
                         try {
                         return new BytesColumn(rs.getBytes(i));
@@ -148,7 +150,10 @@ public class HiveReader
                             return new BytesColumn(rs.getString(i).getBytes(StandardCharsets.UTF_8));
                         }
                     }
-
+                    if (columnType == Types.ARRAY || columnType == Types.STRUCT || columnType == Types.JAVA_OBJECT) {
+                        // HiveBaseResultSet#getArray(String columnName) not support
+                        return new StringColumn( rs.getString(i));
+                    }
                     return super.createColumn(rs, metaData, i);
                 }
             };
