@@ -16,7 +16,7 @@ LABEL maintainer="wgzhao <wgzhao@gmail.com>"
 LABEL version="latest"
 LABEL description="Addax is a versatile open-source ETL tool that can seamlessly transfer data between various RDBMS and NoSQL databases, making it an ideal solution for data migration."
 
-COPY --from=build  /src/target/addax-all-* /opt/addax/
+COPY --from=build  /src/target/addax-* /opt/addax/
 
 WORKDIR /opt/addax
 
