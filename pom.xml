@@ -91,7 +91,7 @@
         <swift.version>1.0.0</swift.version>
         <woodstox.version>7.0.0</woodstox.version>
         <xz.version>1.10</xz.version>
-        <zookeeper.version>3.6.0</zookeeper.version>
+        <zookeeper.version>3.7.2</zookeeper.version>
         <zstd.version>1.5.6-6</zstd.version>
 
         <!-- jdbc driver version -->
