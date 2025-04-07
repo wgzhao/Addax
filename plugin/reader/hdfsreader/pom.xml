@@ -84,7 +84,7 @@
 
         <dependency>
             <groupId>org.apache.parquet</groupId>
-            <artifactId>parquet-avro</artifactId>
+            <artifactId>parquet-hadoop-bundle</artifactId>
         </dependency>
 
         <dependency>
