@@ -114,6 +114,9 @@ public class HBase20xSQLReaderTask
     private Column convertPhoenixValueToAddaxColumn(int sqlType, Object value)
     {
         Column column;
+        if (value == null) {
+            return new StringColumn(null);
+        }
         switch (sqlType) {
             case Types.CHAR:
             case Types.VARCHAR:
