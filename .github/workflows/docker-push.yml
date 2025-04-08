@@ -30,7 +30,7 @@ jobs:
 #          password: ${{ secrets.QUAY_PASSWORD }}
 
       - name: Build and push Docker image to Docker Hub and Quay.io
-        uses: docker/build-push-action@v2
+        uses: docker/build-push-action@v6
         with:
           push: true
           tags: |
