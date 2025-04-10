@@ -265,7 +265,7 @@ public class SingleTableSplitUtil
         if (StringUtils.isBlank(whereSql)) {
             whereSql = " WHERE 1=1 ";
         }
-        // If it's a string type and we need to split efficiently
+        // If it's a string type, we need to split efficiently
         if (minMaxPack.getType() == MinMaxPackage.PkType.STRING) {
             // For string type, we'll calculate the split points directly instead of using ORDER BY RAND()
             List<Object> splitPoints = calculateStringSplitPoints(
@@ -430,21 +430,44 @@ public class SingleTableSplitUtil
 
             // Return a value with length between min and max
             int targetLength = (int) (minChars.length + fraction * (maxChars.length - minChars.length));
-            char[] result = Arrays.copyOf(minChars, targetLength);
-            return new String(result);
+            return new String(minChars, 0, targetLength);
         }
 
-        // Create a new string with the common prefix and a character between the differing positions
+        // Create a result array based on minChars
         char[] result = Arrays.copyOf(minChars, minChars.length);
-        result[commonPrefixLength] = (char) (minChars[commonPrefixLength] +
-                (int) (fraction * (maxChars[commonPrefixLength] - minChars[commonPrefixLength])));
+        // Calculate a candidate character in the area where min and max differ
+        char candidate = (char) (minChars[commonPrefixLength]
+                + (int) ((maxChars[commonPrefixLength] - minChars[commonPrefixLength]) * fraction));
 
-        // If we added to the character, truncate the rest
-        if (result[commonPrefixLength] > minChars[commonPrefixLength]) {
-            return new String(Arrays.copyOf(result, commonPrefixLength + 1));
+        // Clamp the candidate to the allowed range
+        candidate = clampToAllowedChar(candidate);
+        result[commonPrefixLength] = candidate;
+
+        // Truncate the remaining part
+        return new String(result, 0, commonPrefixLength + 1);
+    }
+
+    // Clamp the character to the nearest valid character from ALLOWED_CHARS
+    private static char clampToAllowedChar(char c) {
+        // Define allowed character set (digits, letters, underscores)
+        final char[] ALLOWED_CHARS = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz_".toCharArray();
+        if (c <= ALLOWED_CHARS[0]) {
+            return ALLOWED_CHARS[0];
         }
-
-        return new String(result);
+        if (c >= ALLOWED_CHARS[ALLOWED_CHARS.length - 1]) {
+            return ALLOWED_CHARS[ALLOWED_CHARS.length - 1];
+        }
+        for (int i = 0; i < ALLOWED_CHARS.length - 1; i++) {
+            if (c >= ALLOWED_CHARS[i] && c <= ALLOWED_CHARS[i + 1]) {
+                // Choose the closer one
+                if ((c - ALLOWED_CHARS[i]) <= (ALLOWED_CHARS[i + 1] - c)) {
+                    return ALLOWED_CHARS[i];
+                } else {
+                    return ALLOWED_CHARS[i + 1];
+                }
+            }
+        }
+        return c;
     }
 
     /**
