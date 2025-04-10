@@ -13,6 +13,10 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
+      - name: version
+        id: version
+        run: echo "version=$(git describe --tags --abbrev=1)" >> $GITHUB_OUTPUT
+
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
 
@@ -34,5 +38,6 @@ jobs:
         with:
           push: true
           tags: |
-            ${{ secrets.DOCKER_USERNAME }}/addax:${{ github.ref }}
+            ${{ secrets.DOCKER_USERNAME }}/addax:${{ steps.version.outputs.version }}
+            ${{ secrets.DOCKER_USERNAME }}/addax:latest
 #            quay.io/${{ secrets.QUAY_USERNAME }}/addax:${{ github.ref }}
