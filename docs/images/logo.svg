@@ -2,27 +2,27 @@
     <defs>
         <!-- 主题渐变色 -->
         <linearGradient id="mainGradient" x1="0%" y1="0%" x2="100%" y2="100%">
-            <stop offset="10%" style="stop-color:#4573fb"/>
-            <stop offset="100%" style="stop-color:#00d4ff"/>
+            <stop offset="10%" style="stop-color:#4573fb" />
+            <stop offset="100%" style="stop-color:#00d4ff" />
         </linearGradient>
         <!-- 发光效果 -->
         <filter id="glow">
-            <feGaussianBlur stdDeviation="2" result="coloredBlur"/>
+            <feGaussianBlur stdDeviation="2" result="coloredBlur" />
             <feMerge>
-                <feMergeNode in="coloredBlur"/>
-                <feMergeNode in="SourceGraphic"/>
+                <feMergeNode in="coloredBlur" />
+                <feMergeNode in="SourceGraphic" />
             </feMerge>
         </filter>
     </defs>
 
     <!-- 背景装饰 - 科技感圆点 -->
     <g fill="#4573fb" opacity="0.1">
-        <circle cx="30" cy="30" r="2"/>
-        <circle cx="60" cy="40" r="2"/>
-        <circle cx="270" cy="30" r="2"/>
-        <circle cx="250" cy="50" r="2"/>
-        <circle cx="40" cy="270" r="2"/>
-        <circle cx="270" cy="260" r="2"/>
+        <circle cx="30" cy="30" r="2" />
+        <circle cx="60" cy="40" r="2" />
+        <circle cx="270" cy="30" r="2" />
+        <circle cx="250" cy="50" r="2" />
+        <circle cx="40" cy="270" r="2" />
+        <circle cx="270" cy="260" r="2" />
     </g>
 
     <!-- 所有内部连接线 -->
@@ -31,47 +31,61 @@
         <line x1="150" y1="30" x2="150" y2="270" />
 
         <!-- 对角线连接 -->
-        <line x1="150" y1="30" x2="254" y2="210"/>
-        <line x1="150" y1="30" x2="46" y2="210"/>
-        <line x1="254" y1="90" x2="46" y2="210"/>
-        <line x1="254" y1="210" x2="46" y2="90"/>
+        <line x1="150" y1="30" x2="254" y2="210" />
+        <line x1="150" y1="30" x2="46" y2="210" />
+        <line x1="254" y1="90" x2="46" y2="210" />
+        <line x1="254" y1="210" x2="46" y2="90" />
 
         <!-- 水平连接 -->
-        <line x1="254" y1="90" x2="46" y2="90"/>
-        <line x1="254" y1="210" x2="46" y2="210"/>
+        <line x1="254" y1="90" x2="46" y2="90" />
+        <line x1="254" y1="210" x2="46" y2="210" />
+        <!-- 相隔点连接 -->
+        <line x1="254" y1="90" x2="150" y2="270" />
+        <line x1="46" y1="90" x2="150" y2="270" />
     </g>
 
     <!-- 外圈连接线 -->
-    <path d="M 150,30 L 254,90 L 254,210 L 150,270 L 46,210 L 46,90 Z"
-          fill="none"
-          stroke="url(#mainGradient)"
-          stroke-width="4"
-          filter="url(#glow)"
-          stroke-opacity="0.8">
-        <animate attributeName="stroke-opacity"
-                 values="0.8;1;0.8"
-                 dur="2s"
-                 repeatCount="indefinite"/>
+    <path
+        d="M 150,30 L 254,90 L 254,210 L 150,270 L 46,210 L 46,90 Z"
+        fill="none"
+        stroke="url(#mainGradient)"
+        stroke-width="4"
+        filter="url(#glow)"
+        stroke-opacity="0.8"
+    >
+        <animate
+            attributeName="stroke-opacity"
+            values="0.8;1;0.8"
+            dur="2s"
+            repeatCount="indefinite"
+        />
     </path>
 
     <!-- 中心六边形 -->
-    <path id="centerHex"
-          d="M 150,100 L 193,125 L 193,175 L 150,200 L 107,175 L 107,125 Z"
-          fill="url(#mainGradient)"
-          filter="url(#glow)">
-        <animate attributeName="opacity"
-                 values="1"
-                 dur="3s"
-                 repeatCount="indefinite"/>
+    <path
+        id="centerHex"
+        d="M 150,100 L 193,125 L 193,175 L 150,200 L 107,175 L 107,125 Z"
+        fill="url(#mainGradient)"
+        filter="url(#glow)"
+    >
+        <animate
+            attributeName="opacity"
+            values="1"
+            dur="3s"
+            repeatCount="indefinite"
+        />
     </path>
 
     <!-- 现代感文字 -->
-    <text x="150" y="155"
-          font-family="Arial, sans-serif"
-          font-size="24"
-          fill="white"
-          text-anchor="middle"
-          dominant-baseline="middle"
-          font-weight="600"
-          letter-spacing="1">Addax</text>
+    <text
+        x="150"
+        y="155"
+        font-family="Arial, sans-serif"
+        font-size="24"
+        fill="white"
+        text-anchor="middle"
+        dominant-baseline="middle"
+        font-weight="600"
+        letter-spacing="1"
+    >Addax</text>
 </svg>
