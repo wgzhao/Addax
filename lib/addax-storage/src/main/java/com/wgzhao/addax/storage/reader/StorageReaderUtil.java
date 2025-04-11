@@ -185,7 +185,7 @@ public class StorageReaderUtil
         List<ColumnEntry> column = StorageReaderUtil.getListColumnEntry(readerSliceConfig, Key.COLUMN);
 
         // every line logic
-        try (CSVParser csvParser = new CSVParser(reader, csvFormatBuilder.build())) {
+        try (CSVParser csvParser = CSVParser.parse(reader, csvFormatBuilder.get())) {
             csvParser.stream()
                     .filter(Objects::nonNull)
                     .forEach(csvRecord -> StorageReaderUtil.transportOneRecord(
