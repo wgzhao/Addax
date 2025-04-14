@@ -419,16 +419,6 @@ public class JobContainer
 
         // 取较小值
         this.needChannelNumber = Math.min(needChannelNumberByByte, needChannelNumberByRecord);
-
-        // 如果从byte或record上设置了needChannelNumber则退出
-        if (this.needChannelNumber < Integer.MAX_VALUE) {
-            return;
-        }
-
-        this.needChannelNumber = this.configuration.getInt(CoreConstant.JOB_SETTING_SPEED_CHANNEL, 1);
-        if (this.needChannelNumber <= 0) {
-            this.needChannelNumber = 1;
-        }
         LOG.info("Job set Channel-Number to {} channel(s).", this.needChannelNumber);
     }
 
