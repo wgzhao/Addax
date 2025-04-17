@@ -157,7 +157,7 @@ public class GetPrimaryKeyUtil
                         .append("  AND c.TABLE_NAME = s.TABLE_NAME ")
                         .append("  AND c.COLUMN_NAME = s.COLUMN_NAME ")
                         .append("  AND s.TABLE_SCHEMA = ")
-                        .append(schema == null ? "(SELECT SCHEMA()) ": "'" + schema + "'")
+                        .append(schema == null ? "(SELECT SCHEMA()) " : "'" + schema + "'")
                         .append("  AND s.TABLE_NAME = '").append(tableName).append("' ")
                         .append("  AND NON_UNIQUE = 0 ")
                         .append(" AND COLUMN_KEY <> 'MUL' and COLUMN_KEY <> '' ")
@@ -172,7 +172,7 @@ public class GetPrimaryKeyUtil
                         .append(" JOIN pg_namespace nsp ON nsp.oid = rel.relnamespace ")
                         .append(" LEFT JOIN pg_attribute a ON a.attnum = ANY(con.conkey) AND a.attrelid = con.conrelid ")
                         .append(" WHERE nsp.nspname = ")
-                        .append(schema == null ? "(SELECT CURRENT_SCHEMA()) ": "'" + schema + "'")
+                        .append(schema == null ? "(SELECT CURRENT_SCHEMA()) " : "'" + schema + "'")
                         .append(" AND rel.relname = '").append(tableName).append("'")
                         .append(" AND con.contype IN ('p', 'u') AND array_length(con.conkey, 1) = 1")
                         .append(" ORDER BY con.contype ASC, a.atttypid ASC");
@@ -189,7 +189,7 @@ public class GetPrimaryKeyUtil
                         .append(" WHERE ")
                         .append("    tc.CONSTRAINT_TYPE IN ('PRIMARY KEY', 'UNIQUE')  ")
                         .append("    AND kc.TABLE_SCHEMA = ")
-                        .append(schema == null ? "(select schema_name())  ": "'" + schema + "'")
+                        .append(schema == null ? "(select schema_name())  " : "'" + schema + "'")
                         .append("    AND kc.TABLE_NAME = '").append(tableName).append("'  ")
                         .append("    AND (SELECT COUNT(*) FROM INFORMATION_SCHEMA.KEY_COLUMN_USAGE WHERE CONSTRAINT_NAME = kc.CONSTRAINT_NAME) = 1")
                         .append(" ORDER BY tc.CONSTRAINT_TYPE ASC, c.DATA_TYPE ASC");
@@ -198,7 +198,7 @@ public class GetPrimaryKeyUtil
                 sql.append("SELECT name as column_name, type as column_type, 'PRI' as key_type")
                         .append(" FROM system.columns ")
                         .append(" WHERE database = ")
-                        .append(schema == null ? "SELECT currentDatabase()) ": "'" + schema + "'")
+                        .append(schema == null ? "SELECT currentDatabase()) " : "'" + schema + "'")
                         .append(" AND table = '").append(tableName).append("'")
                         .append(" AND is_in_primary_key = 1")
                         .append(" ORDER BY type ASC");
@@ -220,6 +220,22 @@ public class GetPrimaryKeyUtil
                         .append("    AND acc.table_name = '").append(normalizedTableName).append("' ")
                         .append("    AND (SELECT COUNT(*) FROM all_cons_columns WHERE constraint_name = ac.constraint_name) = 1")
                         .append(" ORDER BY ac.constraint_type ASC, cc.data_type ASC");
+                break;
+            case SQLite:
+                sql.append("SELECT ")
+                        .append("    name AS column_name,  `type` AS column_type, 'PRI' AS KEY_TYPE ")
+                        .append("FROM  pragma_table_info('")
+                        .append(tableName).append("') ")
+                        .append("WHERE   pk > 0 ")
+                        .append("UNION ALL ")
+                        .append("SELECT ")
+                        .append(" t.name,  t.`type`, 'UNI' ")
+                        .append("FROM pragma_index_list('").append(tableName).append("') AS il ")
+                        .append("JOIN pragma_index_info(il.name) AS ii ")
+                        .append("JOIN pragma_table_info('").append(tableName).append("') AS t ")
+                        .append(" ON t.name = ii.name ")
+                        .append("WHERE  il.`unique` = 1  AND il.origin != 'pk' ")
+                        .append("GROUP BY seq HAVING  count(seq) = 1");
                 break;
             default:
                 LOG.warn("Unsupported database type: {}", dataBaseType);

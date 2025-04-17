@@ -151,6 +151,9 @@ Column必须显示填写，不允许为空！
 - Oracle
 - PostgreSQL
 - SQL Server
+- SQLite
+
+⚠️ 注意，如果同时配置了 `splitPk` 和 `autoPk` ，则 `splitPk` 优先级更高，`autoPk` 将被忽略。
 
 ### session
 
