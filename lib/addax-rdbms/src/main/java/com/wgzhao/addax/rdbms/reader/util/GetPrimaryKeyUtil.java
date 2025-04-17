@@ -237,6 +237,28 @@ public class GetPrimaryKeyUtil
                         .append("WHERE  il.`unique` = 1  AND il.origin != 'pk' ")
                         .append("GROUP BY seq HAVING  count(seq) = 1");
                 break;
+            case Sybase:
+                sql.append("SELECT ")
+                        .append("    c.name AS COLUMN_NAME, ")
+                        .append("    UPPER(t.name) AS COLUMN_TYPE, ")
+                        .append("    CASE WHEN i.status & 2048 = 2048 THEN 'PRI' ELSE 'UNI' END AS KEY_TYPE ")
+                        .append("FROM ")
+                        .append("    sysindexes i ")
+                        .append("    JOIN syscolumns c ON i.id = c.id AND c.colid = (")
+                        .append("        SELECT MIN(cx.colid) FROM sysindexkeys k ")
+                        .append("        JOIN syscolumns cx ON k.id = cx.id AND k.colid = cx.colid ")
+                        .append("        WHERE k.id = i.id AND k.indid = i.indid) ")
+                        .append("    JOIN sysobjects o ON i.id = o.id ")
+                        .append("    JOIN systypes t ON c.usertype = t.usertype ")
+                        .append("WHERE ")
+                        .append("    o.name = '").append(tableName).append("' ")
+                        .append("    AND (i.status & 2 = 2 OR i.status & 2048 = 2048) ") // unique or primary key
+                        .append("    AND (SELECT COUNT(*) FROM sysindexkeys k WHERE k.id = i.id AND k.indid = i.indid) = 1 ") // single-column index
+                        .append("    AND o.uid = USER_ID('").append(username != null ? username : schema).append("') ")
+                        .append("ORDER BY ")
+                        .append("    CASE WHEN i.status & 2048 = 2048 THEN 0 ELSE 1 END, ") // primary key is prior
+                        .append("    t.name");
+                break;
             default:
                 LOG.warn("Unsupported database type: {}", dataBaseType);
                 return null;
