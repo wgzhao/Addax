@@ -233,7 +233,7 @@ public class GetPrimaryKeyUtil
                         .append("FROM pragma_index_list('").append(tableName).append("') AS il ")
                         .append("JOIN pragma_index_info(il.name) AS ii ")
                         .append("JOIN pragma_table_info('").append(tableName).append("') AS t ")
-                        .append(" ON t.name = ii.name")
+                        .append(" ON t.name = ii.name ")
                         .append("WHERE  il.`unique` = 1  AND il.origin != 'pk' ")
                         .append("GROUP BY seq HAVING  count(seq) = 1");
                 break;
