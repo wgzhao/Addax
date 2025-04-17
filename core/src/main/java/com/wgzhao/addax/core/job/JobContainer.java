@@ -417,10 +417,9 @@ public class JobContainer
             LOG.info("Job set Max-Record-Speed to {} records.", globalLimitedRecordSpeed);
         }
 
-        // 取较小值
         this.needChannelNumber = Math.min(needChannelNumberByByte, needChannelNumberByRecord);
 
-        // 如果从byte或record上设置了needChannelNumber则退出
+        // if set this value via byte or record ,then skip
         if (this.needChannelNumber < Integer.MAX_VALUE) {
             return;
         }

@@ -54,4 +54,6 @@ bin/addax.sh job/mysql2stream.json
 * `year` 被视为整形
 * `bit` 如果是 `bit(1)` 被视为布尔类型，否则当作二进制类型
 
+## 注意事项
 
+1. 在使用 `autoPk` 或者 `splitPk` 时，如果选择的字段类型是字符类型，且该字段设置的 `COLLATE` 为不区分大小写的字符集，比如 `utf8_general_ci` 和 `utf8mb4_general_ci` ，则会出现数据重复的情况。因此需要避免使用不区分大小写的字符集。

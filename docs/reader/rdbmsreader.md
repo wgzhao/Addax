@@ -135,7 +135,14 @@ Column必须显示填写，不允许为空！
 
 #### autoPk
 
-从 `3.2.6` 版本开始，支持自动获取表主键或唯一索引，如果设置为 `true` ，将尝试通过查询数据库的元数据信息获取指定表的主键字段或唯一索引字段，如果获取可用于分隔的 字段不止一个，则默认取第一个。
+从 `3.2.6` 版本开始，支持自动获取表主键或唯一索引，如果设置为 `true` ，程序将猜测可用于拆分表的字段，他通过查询数据库的元数据信息获取指定表具有主键、单字段唯一索引索引的字段，
+如果有多个字段符合要求，则优先使用数字类型的字段，其次使用字符类型的字段。如果没有符合要求的字段，则不切分表。
+如果配置了 `autoPk`，则任务执行时，有类似如下的日志输出:
+
+```
+2025-04-13 23:17:11.036 [       job-0] INFO  CommonRdbmsReader$Job - The split key is not configured, try to guess the split key.
+2025-04-13 23:17:11.059 [       job-0] INFO  CommonRdbmsReader$Job - Take the field id as split key
+```
 
 该特性目前支持的数据库有：
 
@@ -144,6 +151,9 @@ Column必须显示填写，不允许为空！
 - Oracle
 - PostgreSQL
 - SQL Server
+- SQLite
+
+⚠️ 注意，如果同时配置了 `splitPk` 和 `autoPk` ，则 `splitPk` 优先级更高，`autoPk` 将被忽略。
 
 ### session
 

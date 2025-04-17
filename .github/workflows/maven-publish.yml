@@ -26,12 +26,12 @@ jobs:
       - name: changelog
         id: changelog
         run: |
-          export START_COMMIT=$(git describe --tags --abbrev=0 HEAD^)  # 获取前一个标签（版本起点）
-          export END_COMMIT=HEAD                                      # 当前版本的结束点
-          echo "Generating changelog from $START_COMMIT to $END_COMMIT"
-
+          response=$(curl --silent -H "Accept: application/vnd.github.v3+json" https://api.github.com/repos/wgzhao/Addax/releases/latest)
+          last_tag=$(echo "$response" | grep \"tag_name\" | sed -E 's/.*"tag_name": "([^"]+)".*/\1/')
+          export LAST_TAG=${last_tag}                              # 获取最新版本号
+          echo "Generating changelog from $last_tag to HEAD"
           # 获取提交日志并格式化
-          CHANGELOG=$(git log --oneline ${START_COMMIT}..${END_COMMIT} | sed 's/^/- /')
+          CHANGELOG=$(git log --oneline ${last_tag}..HEAD | sed 's/^/- /')
           echo "changelog=$CHANGELOG" >> $GITHUB_OUTPUT
       # - name: 1. Import GPG key
       #   id: import_gpg
@@ -48,7 +48,7 @@ jobs:
           maven-version: 3.8.8
 
       - name: Set up JDK
-        uses: actions/setup-java@v4.7.0
+        uses: actions/setup-java@v4.7.1
         with:
           java-version: '8'
           distribution: 'adopt'
@@ -77,6 +77,9 @@ jobs:
           tag_name: ${{ github.ref }}
           body: |
             # Addax  ${{ steps.version.outputs.version }} has released! 🎉
+            
+            We are pleased to announce version ${{ steps.version.outputs.version }}, which focuses on improving stability and performance by addressing several bugs and implementing minor code refinements. 
+            Below are the key updates in this release:
             
             ## 📜 Changes
             
