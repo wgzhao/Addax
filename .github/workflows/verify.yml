@@ -22,10 +22,10 @@ jobs:
         uses: stCarolas/setup-maven@v5
         with:
           maven-version: 3.8.8
-      - name: Set up JDK 8
+      - name: Set up JDK 17
         uses: actions/setup-java@v4.7.1
         with:
-          java-version: '8'
+          java-version: '17'
           distribution: 'adopt'
       - run: |
           export MAVEN_OPTS="-DskipTests -Dmaven.javadoc.skip=true -Dmaven.source.skip=true -Dgpg.skip=true"
