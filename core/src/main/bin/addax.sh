@@ -110,6 +110,32 @@ print_version() {
     exit 0
 }
 
+# check the jdk version
+get_jdk_version() {
+    # get major version
+    local version_string=$(java -version 2>&1 | head -n 1 | grep -o -E '\"[^\"]+\"' | sed 's/"//g')
+    if echo "$version_string" | grep -q '^1\.'; then
+        # old version (like JDK 1.8)
+        echo ${version_string#1.} | cut -d '.' -f 1
+    else
+        # new version (like JDK 9+)
+        echo $version_string | cut -d '.' -f 1
+    fi
+}
+
+# setup GC options based on JDK version
+setup_gc_opts() {
+    local jdk_version=$(get_jdk_version)
+    if [[ $jdk_version -eq 8 ]]; then
+        # JDK 8, use  CMS GC or G1 GC
+        export JAVA_OPTS="$DEFAULT_JAVA_OPTS -XX:+UseConcMarkSweepGC -XX:+CMSParallelRemarkEnabled -XX:MaxTenuringThreshold=15"
+    elif [[ $jdk_version -ge 17 ]]; then
+        export JAVA_OPTS="$DEFAULT_JAVA_OPTS -XX:+UseG1GC -XX:MaxGCPauseMillis=200 -XX:InitiatingHeapOccupancyPercent=75"
+    else
+        export JAVA_OPTS="$DEFAULT_JAVA_OPTS -XX:+UseG1GC"
+    fi
+}
+
 parse_job_file() {
     # check the job file is local file or url?
     case "$JOB_FILE" in
@@ -342,9 +368,9 @@ fi
 JOB_FILE="${1}"
 parse_job_file
 gen_log_file
-
+setup_gc_opts
 # Combine command
-cmd="${ENGINE_COMMAND} ${CUST_JVM} ${PARAMS} -Dloglevel=${LOG_LEVEL} -Daddax.log=${LOG_DIR} -Dlog.file.name=${LOG_FILE}"
+cmd="${ENGINE_COMMAND} ${JAVA_OPTS} ${CUST_JVM} ${PARAMS} -Dloglevel=${LOG_LEVEL} -Daddax.log=${LOG_DIR} -Dlog.file.name=${LOG_FILE}"
 
 if [ ${DEBUG} -eq 1 ]; then
     cmd="${cmd} ${REMOTE_DEBUG_CONFIG}"
