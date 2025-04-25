@@ -146,11 +146,10 @@ public class GetPrimaryKeyUtil
             return null;
         }
 
-        String sql;
-
-        switch (dataBaseType) {
-            case MySql:
-                sql = String.format("""
+        return switch (dataBaseType) {
+            case MySql -> {
+                var schemaExpr = schema == null ? "(SELECT SCHEMA()) " : "'" + schema + "'";
+                yield """
                          select
                          c.COLUMN_NAME, upper(c.DATA_TYPE) AS COLUMN_TYPE, c.COLUMN_KEY AS KEY_TYPE
                          from INFORMATION_SCHEMA.`COLUMNS` c , INFORMATION_SCHEMA.STATISTICS s
@@ -162,10 +161,11 @@ public class GetPrimaryKeyUtil
                           AND NON_UNIQUE = 0
                          AND COLUMN_KEY <> 'MUL' and COLUMN_KEY <> ''
                          ORDER BY c.COLUMN_KEY ASC, c.DATA_TYPE ASC
-                        """, schema == null ? "(SELECT SCHEMA()) " : "'" + schema + "'", tableName);
-                break;
-            case PostgreSQL:
-                sql = String.format("""
+                        """.formatted(schemaExpr, tableName);
+            }
+            case PostgreSQL -> {
+                var schemaExpr = schema == null ? "(SELECT CURRENT_SCHEMA()) " : "'" + schema + "'";
+                yield """
                          SELECT a.attname AS COLUMN_NAME,
                          upper(format_type(a.atttypid, a.atttypmod)) AS COLUMN_TYPE,
                          CASE WHEN con.contype = 'p' THEN 'PRI' ELSE 'UNI' END AS KEY_TYPE
@@ -177,10 +177,11 @@ public class GetPrimaryKeyUtil
                          AND rel.relname = '%s'
                          AND con.contype IN ('p', 'u') AND array_length(con.conkey, 1) = 1
                          ORDER BY con.contype ASC, a.atttypid ASC
-                        """, schema == null ? "(SELECT CURRENT_SCHEMA()) " : "'" + schema + "'", tableName);
-                break;
-            case SQLServer:
-                sql = String.format("""
+                        """.formatted(schemaExpr, tableName);
+            }
+            case SQLServer -> {
+                var schemaExpr = schema == null ? "(select schema_name())  " : "'" + schema + "'";
+                yield """
                         SELECT  kc.COLUMN_NAME, upper(c.DATA_TYPE) AS COLUMN_TYPE,
                             CASE WHEN tc.CONSTRAINT_TYPE = 'PRIMARY KEY' THEN 'PRI' ELSE 'UNI' END AS KEY_TYPE
                          FROM
@@ -193,24 +194,24 @@ public class GetPrimaryKeyUtil
                             AND kc.TABLE_NAME = '%s'
                             AND (SELECT COUNT(*) FROM INFORMATION_SCHEMA.KEY_COLUMN_USAGE WHERE CONSTRAINT_NAME = kc.CONSTRAINT_NAME) = 1
                          ORDER BY tc.CONSTRAINT_TYPE ASC, c.DATA_TYPE ASC
-                        """, schema == null ? "(select schema_name())  " : "'" + schema + "'", tableName);
-                break;
-            case ClickHouse:
-                sql = String.format("""
+                        """.formatted(schemaExpr, tableName);
+            }
+            case ClickHouse -> {
+                var schemaExpr = schema == null ? "SELECT currentDatabase()) " : "'" + schema + "'";
+                yield """
                         SELECT name as column_name, type as column_type, 'PRI' as key_type
                         FROM system.columns
                          WHERE database =  %s
                          AND table = '%s'
                          AND is_in_primary_key = 1
                          ORDER BY type ASC
-                        """, schema == null ? "SELECT currentDatabase()) " : "'" + schema + "'", tableName);
-                break;
-            case Oracle:
-                String normalizedSchema = schema == null ? username.toUpperCase() : schema.toUpperCase();
+                        """.formatted(schemaExpr, tableName);
+            }
+            case Oracle -> {
+                var normalizedSchema = schema == null ? username.toUpperCase() : schema.toUpperCase();
                 // Preserve exact case if quoted, otherwise convert to uppercase
-                String normalizedTableName = tableName.startsWith("\"") ? tableName : tableName.toUpperCase();
-
-                sql = String.format("""
+                var normalizedTableName = tableName.startsWith("\"") ? tableName : tableName.toUpperCase();
+                yield """
                         SELECT acc.column_name, upper(cc.data_type) AS COLUMN_TYPE,
                         CASE WHEN ac.constraint_type = 'P' THEN 'PRI' ELSE 'UNI' END AS KEY_TYPE
                         FROM
@@ -223,10 +224,10 @@ public class GetPrimaryKeyUtil
                             AND acc.table_name = '%s'
                             AND (SELECT COUNT(*) FROM all_cons_columns WHERE constraint_name = ac.constraint_name) = 1
                         ORDER BY ac.constraint_type ASC, cc.data_type ASC
-                        """, normalizedSchema, normalizedTableName);
-                break;
-            case SQLite:
-                sql = String.format("""
+                        """.formatted(normalizedSchema, normalizedTableName);
+            }
+            case SQLite -> {
+                yield """
                         SELECT name AS column_name,  `type` AS column_type, 'PRI' AS KEY_TYPE
                         FROM  pragma_table_info('%1$s')
                         WHERE  pk > 0
@@ -238,10 +239,10 @@ public class GetPrimaryKeyUtil
                          ON t.name = ii.name
                         WHERE  il.`unique` = 1  AND il.origin != 'pk'
                         GROUP BY seq HAVING  count(seq) = 1
-                        """, tableName);
-                break;
-            case Sybase:
-                sql = String.format("""
+                        """.formatted(tableName);
+            }
+            case Sybase -> {
+                yield """
                         SELECT  c.name AS COLUMN_NAME, UPPER(t.name) AS COLUMN_TYPE,  CASE WHEN i.status & 2048 = 2048 THEN 'PRI' ELSE 'UNI' END AS KEY_TYPE
                         FROM sysindexes i JOIN syscolumns c ON i.id = c.id AND
                         c.colid = (
@@ -258,12 +259,12 @@ public class GetPrimaryKeyUtil
                             AND o.uid = USER_ID('%s')
                         ORDER BY
                             CASE WHEN i.status & 2048 = 2048 THEN 0 ELSE 1 END,  t.name
-                        """, tableName, username != null ? username : schema);
-                break;
-            default:
+                        """.formatted(tableName, username != null ? username : schema);
+            }
+            default -> {
                 LOG.warn("Unsupported database type: {}", dataBaseType);
-                return null;
-        }
-        return sql;
+                yield null;
+            }
+        };
     }
 }

@@ -136,7 +136,7 @@ public final class ReaderSplitUtil
         // table mode
         if (isTableMode) {
             List<String> tables = connConf.getList(Key.TABLE, String.class);
-            Validate.isTrue(null != tables && !tables.isEmpty(), "您读取数据库表配置错误.");
+            Validate.isTrue(null != tables && !tables.isEmpty(), "Failed to get tables from connection.");
             for (String table : tables) {
                 queries.add(SingleTableSplitUtil.buildQuerySql(column, table, where));
                 if (splitPK != null && !splitPK.isEmpty()) {

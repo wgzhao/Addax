@@ -36,6 +36,8 @@ import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
+import java.util.function.Predicate;
 
 import static com.wgzhao.addax.core.spi.ErrorCode.CONFIG_ERROR;
 import static com.wgzhao.addax.core.spi.ErrorCode.EXECUTE_FAIL;
@@ -48,52 +50,53 @@ public final class OriginalConfPretreatmentUtil
     private static final String EXCLUDE_COLUMN = "excludeColumn";
 
     /**
-     * handle the configuration before
+     * Handle the configuration before execution
      *
+     * @param dataBaseType database type
      * @param originalConfig configuration
      */
     public static void doPretreatment(DataBaseType dataBaseType, Configuration originalConfig)
     {
-        // the username is mandatory for RDBMS
+        // The username is mandatory for RDBMS
         originalConfig.getNecessaryValue(Key.USERNAME, REQUIRED_VALUE);
 
-        // some rdbms has no password in default , so the password is optional
-        if (originalConfig.getString(Key.PASSWORD) == null) {
-            originalConfig.set(Key.PASSWORD, "");
-        }
-        else if (originalConfig.getString(Key.PASSWORD).startsWith(Constant.ENC_PASSWORD_PREFIX)) {
-            // encrypted password, need to decrypt
-            String pass = originalConfig.getString(Key.PASSWORD);
-            String decryptPassword = EncryptUtil.decrypt(pass.substring(6, pass.length() - 1));
-            originalConfig.set(Key.PASSWORD, decryptPassword);
-        }
-        dealWhere(originalConfig);
+        // Some RDBMS has no password in default, so the password is optional
+        Optional.ofNullable(originalConfig.getString(Key.PASSWORD))
+                .ifPresentOrElse(
+                        password -> {
+                            if (password.startsWith(Constant.ENC_PASSWORD_PREFIX)) {
+                                // Encrypted password, need to decrypt
+                                var decryptPassword = EncryptUtil.decrypt(
+                                        password.substring(6, password.length() - 1));
+                                originalConfig.set(Key.PASSWORD, decryptPassword);
+                            }
+                        },
+                        () -> originalConfig.set(Key.PASSWORD, "")
+                );
 
+        dealWhere(originalConfig);
         simplifyConf(dataBaseType, originalConfig);
     }
 
     /**
-     * handle the where clause
+     * Handle the where clause
      *
      * @param originalConfig configuration
      */
     public static void dealWhere(Configuration originalConfig)
     {
-        String where = originalConfig.getString(Key.WHERE, null);
-        if (StringUtils.isNotBlank(where)) {
-            String whereImprove = where.trim();
-            if (whereImprove.endsWith(";")) {
-                whereImprove = whereImprove.substring(0, whereImprove.length() - 1);
-            }
-            originalConfig.set(Key.WHERE, whereImprove);
-        }
+        Optional.ofNullable(originalConfig.getString(Key.WHERE))
+                .filter(StringUtils::isNotBlank)
+                .map(String::trim)
+                .map(where -> where.endsWith(";") ? where.substring(0, where.length() - 1) : where)
+                .ifPresent(improvedWhere -> originalConfig.set(Key.WHERE, improvedWhere));
     }
 
     /**
-     * handle configuration preliminary:
-     * 1. handle the situation where multiple jdbcUrls are configured for the same database
-     * 2. identify and mark whether to use querySql mode or table mode
-     * 3. for table mode, determine the number of sub-tables and process the column to * matters
+     * Handle configuration preliminary:
+     * 1. Handle the situation where multiple jdbcUrls are configured for the same database
+     * 2. Identify and mark whether to use querySql mode or table mode
+     * 3. For table mode, determine the number of sub-tables and process the column to * matters
      *
      * @param originalConfig configuration
      */
@@ -103,13 +106,13 @@ public final class OriginalConfPretreatmentUtil
         originalConfig.set(Key.IS_TABLE_MODE, isTableMode);
 
         dealJdbcAndTable(dataBaseType, originalConfig);
-
         dealColumnConf(dataBaseType, originalConfig);
     }
 
     /**
-     * handle the jdbcUrl and table configuration
+     * Handle the jdbcUrl and table configuration
      *
+     * @param dataBaseType database type
      * @param originalConfig configuration
      */
     private static void dealJdbcAndTable(DataBaseType dataBaseType, Configuration originalConfig)
@@ -124,11 +127,13 @@ public final class OriginalConfPretreatmentUtil
 
         int tableNum = 0;
 
-        String driverClass = connConf.getString(Key.JDBC_DRIVER, null);
-        if (driverClass != null && !driverClass.isEmpty()) {
-            LOG.warn("use specified driver class: {}", driverClass);
-            dataBaseType.setDriverClassName(driverClass);
-        }
+        // Set driver class if specified
+        Optional.ofNullable(connConf.getString(Key.JDBC_DRIVER))
+                .ifPresent(driverClass -> {
+                    LOG.warn("Use specified driver class: {}", driverClass);
+                    dataBaseType.setDriverClassName(driverClass);
+                });
+
         connConf.getNecessaryValue(Key.JDBC_URL, REQUIRED_VALUE);
 
         String jdbcUrl = connConf.getString(Key.JDBC_URL);
@@ -139,6 +144,7 @@ public final class OriginalConfPretreatmentUtil
 
         jdbcUrl = dataBaseType.appendJDBCSuffixForReader(jdbcUrl);
 
+        // Validate JDBC URL with or without retry based on preCheck flag
         if (isPreCheck) {
             DBUtil.validJdbcUrlWithoutRetry(dataBaseType, jdbcUrl, username, password, preSql);
         }
@@ -146,7 +152,7 @@ public final class OriginalConfPretreatmentUtil
             DBUtil.validJdbcUrl(dataBaseType, jdbcUrl, username, password, preSql);
         }
 
-        // write back the connection.jdbcUrl item
+        // Write back the connection.jdbcUrl item
         originalConfig.set(Key.CONNECTION + "." + Key.JDBC_URL, jdbcUrl);
 
         if (isTableMode) {
@@ -159,7 +165,6 @@ public final class OriginalConfPretreatmentUtil
             }
 
             tableNum += expandedTables.size();
-
             originalConfig.set(Key.CONNECTION + "." + Key.TABLE, expandedTables);
         }
 
@@ -167,7 +172,7 @@ public final class OriginalConfPretreatmentUtil
     }
 
     /**
-     * handle the column configuration
+     * Handle the column configuration
      *
      * @param originalConfig configuration
      */
@@ -178,8 +183,7 @@ public final class OriginalConfPretreatmentUtil
         List<String> userConfiguredColumns = originalConfig.getList(Key.COLUMN, String.class);
 
         if (isTableMode) {
-            if (null == userConfiguredColumns
-                    || userConfiguredColumns.isEmpty()) {
+            if (userConfiguredColumns == null || userConfiguredColumns.isEmpty()) {
                 throw AddaxException.asAddaxException(REQUIRED_VALUE, "The item column is required.");
             }
 
@@ -188,106 +192,109 @@ public final class OriginalConfPretreatmentUtil
             String password = originalConfig.getString(Key.PASSWORD);
             String tableName = originalConfig.getString(Key.CONNECTION + "." + Key.TABLE + "[0]");
 
-            if (1 == userConfiguredColumns.size()
-                    && "*".equals(userConfiguredColumns.get(0))) {
-                LOG.warn("There are some risks in the column configuration. Because you did not configure the columns " +
-                        "to read the database table, changes in the number and types of fields in your table may affect " +
-                        "the correctness of the task or even cause errors.");
-                List<String> excludeColumns = originalConfig.getList(EXCLUDE_COLUMN, String.class);
+            // Handle special case with '*' column
+            if (userConfiguredColumns.size() == 1 && "*".equals(userConfiguredColumns.get(0))) {
+                LOG.warn("""
+                        There are some risks in the column configuration. Because you did not configure the columns \
+                        to read the database table, changes in the number and types of fields in your table may affect \
+                        the correctness of the task or even cause errors.""");
+
+                var excludeColumns = originalConfig.getList(EXCLUDE_COLUMN, String.class);
+
                 if (!excludeColumns.isEmpty()) {
-                    // get the all columns of table and exclude the excludeColumns
+                    // Get the all columns of table and exclude the excludeColumns
                     List<String> allColumns = DBUtil.getTableColumns(dataBaseType, jdbcUrl, username, password, tableName);
                     // warn: does it need to judge the table column is case-insensitive?
                     allColumns.removeAll(excludeColumns);
                     originalConfig.set(Key.COLUMN_LIST, allColumns);
-                    // each column in allColumns should be quoted with ``
-                    List<String> quotedColumns = new ArrayList<>();
-                    for (String column : allColumns) {
-                        quotedColumns.add(dataBaseType.quoteColumnName(column));
-                    }
-                    originalConfig.set(Key.COLUMN, StringUtils.join(quotedColumns, ","));
-                }
-                else {
+
+                    // Each column in allColumns should be quoted with ``
+                    var quotedColumns = allColumns.stream()
+                            .map(dataBaseType::quoteColumnName)
+                            .toList();
+
+                    originalConfig.set(Key.COLUMN, String.join(",", quotedColumns));
+                } else {
                     originalConfig.set(Key.COLUMN, "*");
                 }
             }
             else {
-                List<String> allColumns = DBUtil.getTableColumns(dataBaseType, jdbcUrl, username, password, tableName);
+                final List<String> allColumns = ListUtil.valueToLowerCase(DBUtil.getTableColumns(dataBaseType, jdbcUrl, username, password, tableName));
                 LOG.info("The table [{}] has columns [{}].", tableName, StringUtils.join(allColumns, ","));
-                allColumns = ListUtil.valueToLowerCase(allColumns);
-                List<String> quotedColumns = new ArrayList<>();
-                for (String column : userConfiguredColumns) {
-                    if ("*".equals(column)) {
-                        throw AddaxException.asAddaxException(CONFIG_ERROR,
-                                "The item column your configured is invalid, because it includes multiply asterisk('*').");
-                    }
-                    quotedColumns.add(dataBaseType.quoteColumnName(column));
-                }
+
+                // Quote all user configured columns
+                var quotedColumns = userConfiguredColumns.stream()
+                        .peek(column -> {
+                            if ("*".equals(column)) {
+                                throw AddaxException.asAddaxException(CONFIG_ERROR,
+                                        "The item column your configured is invalid, because it includes multiply asterisk('*').");
+                            }
+                        })
+                        .map(dataBaseType::quoteColumnName)
+                        .toList();
 
                 originalConfig.set(Key.COLUMN_LIST, quotedColumns);
-                originalConfig.set(Key.COLUMN, StringUtils.join(quotedColumns, ","));
-                String splitPk = originalConfig.getString(Key.SPLIT_PK, null);
-                if (StringUtils.isNotBlank(splitPk) && !allColumns.contains(splitPk.toLowerCase())) {
-                    throw AddaxException.asAddaxException(CONFIG_ERROR,
-                            "The table " + tableName + " has not the primary key " + splitPk);
-                }
+                originalConfig.set(Key.COLUMN, String.join(",", quotedColumns));
+
+                // Validate splitPk exists in the table
+                Optional.ofNullable(originalConfig.getString(Key.SPLIT_PK))
+                        .filter(StringUtils::isNotBlank)
+                        .ifPresent(splitPk -> {
+                            if (!allColumns.contains(splitPk.toLowerCase())) {
+                                throw AddaxException.asAddaxException(CONFIG_ERROR,
+                                        "The table " + tableName + " has not the primary key " + splitPk);
+                            }
+                        });
             }
-        }
-        else {
-            // column is not allowed in querySql mode
-            if (null != userConfiguredColumns && !userConfiguredColumns.isEmpty()) {
+        } else {
+            // Column is not allowed in querySql mode
+            if (userConfiguredColumns != null && !userConfiguredColumns.isEmpty()) {
                 LOG.warn("You configured both column and querySql, querySql will be preferred.");
                 originalConfig.remove(Key.COLUMN);
             }
 
-            // where is not allowed in querySql mode
-            String where = originalConfig.getString(Key.WHERE, null);
-            if (StringUtils.isNotBlank(where)) {
-                LOG.warn("You configured both querySql and where. the where will be ignored.");
-                originalConfig.remove(Key.WHERE);
-            }
+            // Where is not allowed in querySql mode
+            Optional.ofNullable(originalConfig.getString(Key.WHERE))
+                    .filter(StringUtils::isNotBlank)
+                    .ifPresent(where -> {
+                        LOG.warn("You configured both querySql and where. The where will be ignored.");
+                        originalConfig.remove(Key.WHERE);
+                    });
 
-            // splitPk is not allowed in querySql mode
-            String splitPk = originalConfig.getString(Key.SPLIT_PK, null);
-            if (StringUtils.isNotBlank(splitPk)) {
-                LOG.warn("You configured both querySql and splitPk. the splitPk will be ignored.");
-                originalConfig.remove(Key.SPLIT_PK);
-            }
+            // SplitPk is not allowed in querySql mode
+            Optional.ofNullable(originalConfig.getString(Key.SPLIT_PK))
+                    .filter(StringUtils::isNotBlank)
+                    .ifPresent(splitPk -> {
+                        LOG.warn("You configured both querySql and splitPk. The splitPk will be ignored.");
+                        originalConfig.remove(Key.SPLIT_PK);
+                    });
         }
     }
 
     /**
-     * identify and mark whether to use querySql mode or table mode
+     * Identify and mark whether to use querySql mode or table mode
      *
      * @param originalConfig configuration
      * @return true if table mode, false if querySql mode
      */
     private static boolean recognizeTableOrQuerySqlMode(Configuration originalConfig)
     {
-        Configuration connConf = originalConfig.getConfiguration(Key.CONNECTION);
+        var connConf = originalConfig.getConfiguration(Key.CONNECTION);
+        var table = connConf.getString(Key.TABLE);
+        var querySql = connConf.getString(Key.QUERY_SQL);
 
-        String table;
-        String querySql;
+        var isTableMode = StringUtils.isNotBlank(table);
+        var isQuerySqlMode = StringUtils.isNotBlank(querySql);
 
-        boolean isTableMode;
-        boolean isQuerySqlMode;
+        Predicate<Boolean> neitherConfigured = mode -> !mode;
+        Predicate<Boolean> bothConfigured = mode -> mode;
 
-        table = connConf.getString(Key.TABLE, null);
-        querySql = connConf.getString(Key.QUERY_SQL, null);
-
-        isTableMode = StringUtils.isNotBlank(table);
-
-        isQuerySqlMode = StringUtils.isNotBlank(querySql);
-
-        if (!isTableMode && !isQuerySqlMode) {
-            // neither table nor querySql is configured
+        if (neitherConfigured.test(isTableMode) && neitherConfigured.test(isQuerySqlMode)) {
             throw AddaxException.asAddaxException(
                     REQUIRED_VALUE, "You must configure either table or querySql.");
-        }
-        else if (isTableMode && isQuerySqlMode) {
-            // both table and querySql are configured
+        } else if (bothConfigured.test(isTableMode) && bothConfigured.test(isQuerySqlMode)) {
             throw AddaxException.asAddaxException(CONFIG_ERROR,
-                    "You ca not configure both table and querySql at the same time.");
+                    "You cannot configure both table and querySql at the same time.");
         }
 
         return isTableMode;

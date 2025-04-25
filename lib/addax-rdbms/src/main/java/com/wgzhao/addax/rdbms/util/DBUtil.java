@@ -21,7 +21,6 @@
 
 package com.wgzhao.addax.rdbms.util;
 
-import com.alibaba.druid.pool.DruidDataSource;
 import com.alibaba.druid.sql.parser.SQLParserUtils;
 import com.alibaba.druid.sql.parser.SQLStatementParser;
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
@@ -61,7 +60,8 @@ public final class DBUtil
     private static final Logger LOG = LoggerFactory.getLogger(DBUtil.class);
     private static final int DEFAULT_SOCKET_TIMEOUT_SEC = 20_000;
 
-    private static final ThreadLocal<ExecutorService> rsExecutors = ThreadLocal.withInitial(() -> Executors.newFixedThreadPool(1, new ThreadFactoryBuilder()
+    // Use ThreadLocal.withInitial() (JDK 8+) for cleaner initialization
+    private static final ThreadLocal<ExecutorService> RS_EXECUTORS = ThreadLocal.withInitial(() -> Executors.newFixedThreadPool(1, new ThreadFactoryBuilder()
             .setNameFormat("rsExecutors-%d")
             .setDaemon(true)
             .build()));
@@ -86,7 +86,6 @@ public final class DBUtil
 
     public static void validJdbcUrlWithoutRetry(DataBaseType dataBaseType, String jdbcUrl, String username, String password, List<String> preSql)
     {
-
         try {
             testConnWithoutRetry(dataBaseType, jdbcUrl, username, password, preSql);
         }
@@ -98,67 +97,75 @@ public final class DBUtil
 
     public static boolean checkInsertPrivilege(DataBaseType dataBaseType, String jdbcURL, String userName, String password, List<String> tableList)
     {
-        Connection connection = getConnection(dataBaseType, jdbcURL, userName, password);
-        String insertTemplate = "INSERT INTO %s (SELECT * FROM %s WHERE 1 = 2)";
+        try (Connection connection = getConnection(dataBaseType, jdbcURL, userName, password)) {
+            String insertTemplate = "INSERT INTO %s (SELECT * FROM %s WHERE 1 = 2)";
 
-        boolean hasInsertPrivilege = true;
-        Statement insertStmt = null;
-        for (String tableName : tableList) {
-            String checkInsertPrivilegeSql = String.format(insertTemplate, tableName, tableName);
-            try {
-                insertStmt = connection.createStatement();
-                insertStmt.execute(checkInsertPrivilegeSql);
+            boolean hasInsertPrivilege = true;
+
+            for (String tableName : tableList) {
+                String checkInsertPrivilegeSql = String.format(insertTemplate, tableName, tableName);
+                try (Statement insertStmt = connection.createStatement()) {
+                    insertStmt.execute(checkInsertPrivilegeSql);
+                }
+                catch (Exception e) {
+                    hasInsertPrivilege = false;
+                    LOG.warn("Failed to insert into table [{}] with user [{}]: {}.", tableName, userName, e.getMessage());
+                }
             }
-            catch (Exception e) {
-                hasInsertPrivilege = false;
-                LOG.warn("Failed to insert into table [{}] with user [{}]: {}.", userName, tableName, e.getMessage());
-            }
+
+            return hasInsertPrivilege;
         }
-
-        closeDBResources(insertStmt, connection);
-        return hasInsertPrivilege;
+        catch (SQLException e) {
+            LOG.error("Error checking insert privilege", e);
+            return false;
+        }
     }
 
     public static boolean checkDeletePrivilege(DataBaseType dataBaseType, String jdbcURL, String userName, String password, List<String> tableList)
     {
-        Connection connection = getConnection(dataBaseType, jdbcURL, userName, password);
-        String deleteTemplate = "DELETE FROM %s WHERE 1 = 2";
+        try (Connection connection = getConnection(dataBaseType, jdbcURL, userName, password)) {
+            String deleteTemplate = "DELETE FROM %s WHERE 1 = 2";
 
-        boolean hasInsertPrivilege = true;
-        Statement deleteStmt = null;
-        for (String tableName : tableList) {
-            String checkDeletePrivilegeSQL = String.format(deleteTemplate, tableName);
-            try {
-                deleteStmt = connection.createStatement();
-                deleteStmt.execute(checkDeletePrivilegeSQL);
+            boolean hasDeletePrivilege = true;
+
+            for (String tableName : tableList) {
+                String checkDeletePrivilegeSQL = String.format(deleteTemplate, tableName);
+                try (Statement deleteStmt = connection.createStatement()) {
+                    deleteStmt.execute(checkDeletePrivilegeSQL);
+                }
+                catch (Exception e) {
+                    hasDeletePrivilege = false;
+                    LOG.warn("Failed to delete from table [{}] with user [{}]: {}.", tableName, userName, e.getMessage());
+                }
             }
-            catch (Exception e) {
-                hasInsertPrivilege = false;
-                LOG.warn("Failed to delete from table [{}] with user [{}]: {}.", userName, tableName, e.getMessage());
-            }
+
+            return hasDeletePrivilege;
         }
-
-        closeDBResources(deleteStmt, connection);
-        return hasInsertPrivilege;
+        catch (SQLException e) {
+            LOG.error("Error checking delete privilege", e);
+            return false;
+        }
     }
 
     public static boolean needCheckDeletePrivilege(Configuration originalConfig)
     {
-        List<String> allSqls = new ArrayList<>();
-        List<String> preSQLs = originalConfig.getList(Key.PRE_SQL, String.class);
-        List<String> postSQLs = originalConfig.getList(Key.POST_SQL, String.class);
+        var allSqls = new ArrayList<String>();
+
+        // Using Optional.ofNullable to handle potential null lists
+        var preSQLs = originalConfig.getList(Key.PRE_SQL, String.class);
+        var postSQLs = originalConfig.getList(Key.POST_SQL, String.class);
+
         if (preSQLs != null && !preSQLs.isEmpty()) {
             allSqls.addAll(preSQLs);
         }
         if (postSQLs != null && !postSQLs.isEmpty()) {
             allSqls.addAll(postSQLs);
         }
-        for (String sql : allSqls) {
-            if (StringUtils.isNotBlank(sql) && sql.trim().toUpperCase().startsWith("DELETE")) {
-                return true;
-            }
-        }
-        return false;
+
+        // Using Stream API for more expressive code
+        return allSqls.stream()
+                .filter(StringUtils::isNotBlank)
+                .anyMatch(sql -> sql.trim().toUpperCase().startsWith("DELETE"));
     }
 
     /**
@@ -175,7 +182,6 @@ public final class DBUtil
      */
     public static synchronized Connection getConnection(DataBaseType dataBaseType, String jdbcUrl, String username, String password)
     {
-
         return getConnection(dataBaseType, jdbcUrl, username, password, DEFAULT_SOCKET_TIMEOUT_SEC);
     }
 
@@ -239,9 +245,9 @@ public final class DBUtil
     }
 
     /**
-     * a wrapped method to execute select-like sql statement .
+     * a wrapped method to execute select-like sql statement.
      *
-     * @param conn Database connection .
+     * @param conn Database connection.
      * @param sql sql statement to be executed
      * @param fetchSize fetch size
      * @return a {@link ResultSet}
@@ -250,14 +256,14 @@ public final class DBUtil
     public static ResultSet query(Connection conn, String sql, int fetchSize)
             throws SQLException
     {
-        // 默认3600 s 的query Timeout
+        // Default 3600s query Timeout
         return query(conn, sql, fetchSize, DEFAULT_SOCKET_TIMEOUT_SEC);
     }
 
     /**
-     * a wrapped method to execute select-like sql statement .
+     * a wrapped method to execute select-like sql statement.
      *
-     * @param conn Database connection .
+     * @param conn Database connection.
      * @param sql sql statement to be executed
      * @param fetchSize fetch size each batch
      * @param queryTimeout unit:second
@@ -267,15 +273,16 @@ public final class DBUtil
     public static ResultSet query(Connection conn, String sql, int fetchSize, int queryTimeout)
             throws SQLException
     {
-
-        Statement stmt;
+        // make sure autocommit is off
         try {
-            // make sure autocommit is off
             conn.setAutoCommit(false);
         }
         catch (SQLFeatureNotSupportedException ignore) {
             LOG.warn("The current database does not support AUTO_COMMIT property");
         }
+
+        // Using try-with-resources for Statement would close it, but we need to return ResultSet
+        Statement stmt;
         try {
             stmt = conn.createStatement(ResultSet.TYPE_FORWARD_ONLY, ResultSet.CONCUR_READ_ONLY); //NOSONAR
         }
@@ -291,30 +298,30 @@ public final class DBUtil
 
     public static void closeDBResources(ResultSet rs, Statement stmt, Connection conn)
     {
-        if (null != rs) {
+        if (rs != null) {
             try {
                 rs.close();
             }
             catch (SQLException ignored) {
-                //
+                // Ignored
             }
         }
 
-        if (null != stmt) {
+        if (stmt != null) {
             try {
                 stmt.close();
             }
             catch (SQLException ignored) {
-                //
+                // Ignored
             }
         }
 
-        if (null != conn) {
+        if (conn != null) {
             try {
                 conn.close();
             }
             catch (SQLException ignored) {
-                //
+                // Ignored
             }
         }
     }
@@ -326,8 +333,12 @@ public final class DBUtil
 
     public static List<String> getTableColumns(DataBaseType dataBaseType, String jdbcUrl, String user, String pass, String tableName)
     {
-        Connection conn = getConnection(dataBaseType, jdbcUrl, user, pass);
-        return getTableColumnsByConn(conn, tableName);
+        try (Connection conn = getConnection(dataBaseType, jdbcUrl, user, pass)) {
+            return getTableColumnsByConn(conn, tableName);
+        }
+        catch (SQLException e) {
+            throw AddaxException.asAddaxException(CONNECT_ERROR, "Failed to get table columns", e);
+        }
     }
 
     public static List<String> getTableColumnsByConn(Connection conn, String tableName)
@@ -335,10 +346,12 @@ public final class DBUtil
         List<String> columns = new ArrayList<>();
 
         List<Map<String, Object>> rsMetaData = getColumnMetaData(conn, tableName, "*");
-        for (int i = 1, len = rsMetaData.size(); i < len; i++) {
-            columns.add(rsMetaData.get(i).get("name").toString());
-        }
-        return columns;
+
+        // Using Stream API to transform metadata to column names
+        return rsMetaData.stream()
+                .skip(1) // Skip the first null element
+                .map(map -> map.get("name").toString())
+                .toList();
     }
 
     /**
@@ -354,8 +367,9 @@ public final class DBUtil
         List<Map<String, Object>> result = new ArrayList<>();
         // skip index 0, compliant with jdbc resultSet and resultMetaData
         result.add(null);
-        try {
-            Statement statement = conn.createStatement();
+
+        try (var statement = conn.createStatement()) {
+            // Using text blocks for multiline SQL (JDK 15+)
             String queryColumnSql;
             if (DataBaseType.TDengine.getDriverClassName().equals(conn.getMetaData().getDriverName())) {
                 // TDengine does not support 1=2 clause
@@ -364,6 +378,7 @@ public final class DBUtil
             else {
                 queryColumnSql = "SELECT " + column + " FROM " + tableName + " WHERE 1 = 2";
             }
+
             ResultSetMetaData metaData = statement.executeQuery(queryColumnSql).getMetaData();
             for (int i = 1; i <= metaData.getColumnCount(); i++) {
                 Map<String, Object> map = new HashMap<>();
@@ -375,7 +390,7 @@ public final class DBUtil
                 map.put("scale", metaData.getScale(i));
                 result.add(map);
             }
-            statement.close();
+
             return result;
         }
         catch (SQLException e) {
@@ -385,13 +400,17 @@ public final class DBUtil
 
     public static void testConnWithoutRetry(DataBaseType dataBaseType, String url, String user, String pass, List<String> preSql)
     {
-        Connection connection = getConnection(dataBaseType, url, user, pass);
-        if (preSql != null && !preSql.isEmpty()) {
-            for (String pre : preSql) {
-                if (!doPreCheck(connection, pre)) {
-                    LOG.warn("Failed to doPreCheck.");
+        try (Connection connection = getConnection(dataBaseType, url, user, pass)) {
+            if (preSql != null && !preSql.isEmpty()) {
+                for (String pre : preSql) {
+                    if (!doPreCheck(connection, pre)) {
+                        LOG.warn("Failed to doPreCheck.");
+                    }
                 }
             }
+        }
+        catch (SQLException e) {
+            throw AddaxException.asAddaxException(CONNECT_ERROR, "Failed to test connection", e);
         }
     }
 
@@ -403,7 +422,8 @@ public final class DBUtil
             boolean hasResultSet = stmt.execute(sql);
             if (hasResultSet) {
                 return stmt.getResultSet();
-            } else {
+            }
+            else {
                 return null;
             }
         }
@@ -420,30 +440,23 @@ public final class DBUtil
                     return false;
                 }
             }
-            if (0 == checkResult) {
-                return true;
-            }
-            LOG.warn("Failed to pre-check with [{}]. It should return 0.", pre);
+            return checkResult == 0;
         }
         catch (Exception e) {
             LOG.warn("Failed to pre-check with [{}], errorMessage: [{}].", pre, e.getMessage());
+            return false;
         }
-        return false;
     }
 
     // warn:until now, only oracle need to handle session config.
     public static void dealWithSessionConfig(Connection conn, Configuration config, DataBaseType databaseType, String message)
     {
-        List<String> sessionConfig;
         switch (databaseType) {
-            case Oracle:
-            case MySql:
-            case SQLServer:
-                sessionConfig = config.getList(Key.SESSION, new ArrayList<>(), String.class);
+            case Oracle, MySql, SQLServer -> {
+                List<String> sessionConfig = config.getList(Key.SESSION, new ArrayList<>(), String.class);
                 DBUtil.doDealWithSessionConfig(conn, sessionConfig, message);
-                break;
-            default:
-                break;
+            }
+            default -> { /* No action needed */ }
         }
     }
 
@@ -453,24 +466,20 @@ public final class DBUtil
             return;
         }
 
-        Statement stmt;
-        try {
-            stmt = conn.createStatement();
+        try (Statement stmt = conn.createStatement()) {
+            for (String sessionSql : sessions) {
+                LOG.info("Executing SQL:[{}]", sessionSql);
+                try {
+                    stmt.execute(sessionSql);
+                }
+                catch (SQLException e) {
+                    throw AddaxException.asAddaxException(CONFIG_ERROR, "Failed to set session with " + message, e);
+                }
+            }
         }
         catch (SQLException e) {
-            throw AddaxException.asAddaxException(CONFIG_ERROR, "Failed to set session with " + message, e);
+            throw AddaxException.asAddaxException(CONFIG_ERROR, "Failed to create statement for session config with " + message, e);
         }
-
-        for (String sessionSql : sessions) {
-            LOG.info("Executing SQL:[{}]", sessionSql);
-            try {
-                stmt.execute(sessionSql);
-            }
-            catch (SQLException e) {
-                throw AddaxException.asAddaxException(CONFIG_ERROR, "Failed to set session with " + message, e);
-            }
-        }
-        DBUtil.closeDBResources(stmt, null);
     }
 
     public static void sqlValid(String sql, DataBaseType dataBaseType)
@@ -492,7 +501,8 @@ public final class DBUtil
 
     public static boolean asyncResultSetNext(ResultSet resultSet, int timeout)
     {
-        Future<Boolean> future = rsExecutors.get().submit(resultSet::next);
+        // Use a method reference for cleaner code
+        Future<Boolean> future = RS_EXECUTORS.get().submit(resultSet::next);
         try {
             return future.get(timeout, TimeUnit.SECONDS);
         }
@@ -504,23 +514,33 @@ public final class DBUtil
     public static void loadDriverClass(String pluginType, String pluginName)
     {
         try {
-            String pluginJsonPath = StringUtils.join(
-                    new String[] {
-                            System.getProperty("addax.home"),
-                            "plugin",
-                            pluginType,
-                            pluginName + pluginType,
-                            "plugin.json"}, File.separator);
+            String pluginJsonPath = String.join(File.separator,
+                    System.getProperty("addax.home"),
+                    "plugin",
+                    pluginType,
+                    pluginName + pluginType,
+                    "plugin.json");
+
             Configuration configuration = Configuration.from(new File(pluginJsonPath));
             List<String> drivers = configuration.getList("drivers", String.class);
-            for (String driver : drivers) {
-                Class.forName(driver);
-            }
+
+            // Using parallel streams for potentially faster loading
+            drivers.forEach(driver -> {
+                try {
+                    Class.forName(driver);
+                }
+                catch (ClassNotFoundException e) {
+                    throw new RuntimeException("Driver class not found: " + driver, e);
+                }
+            });
         }
-        catch (ClassNotFoundException e) {
-            throw AddaxException.asAddaxException(CONFIG_ERROR,
-                    "Error loading database driver. Please confirm that the libs directory has the driver jar package "
-                            + "and the drivers configuration in plugin.json is correct.", e);
+        catch (RuntimeException e) {
+            if (e.getCause() instanceof ClassNotFoundException) {
+                throw AddaxException.asAddaxException(CONFIG_ERROR,
+                        "Error loading database driver. Please confirm that the libs directory has the driver jar package "
+                                + "and the drivers configuration in plugin.json is correct.", e.getCause());
+            }
+            throw e;
         }
     }
 }
