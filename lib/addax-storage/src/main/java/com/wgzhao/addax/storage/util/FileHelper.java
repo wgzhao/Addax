@@ -18,12 +18,10 @@
 
 package com.wgzhao.addax.storage.util;
 
-import com.google.common.collect.ImmutableMap;
 import com.wgzhao.addax.core.compress.ZipCycleInputStream;
 import com.wgzhao.addax.core.exception.AddaxException;
 import com.wgzhao.addax.core.spi.ErrorCode;
 import org.apache.commons.compress.compressors.CompressorException;
-import org.apache.commons.compress.compressors.CompressorInputStream;
 import org.apache.commons.compress.compressors.CompressorStreamFactory;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -46,7 +44,6 @@ import java.nio.file.Paths;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;

@@ -36,7 +36,6 @@ import com.wgzhao.addax.core.plugin.TaskPluginCollector;
 import com.wgzhao.addax.core.util.Configuration;
 import com.wgzhao.addax.storage.util.FileHelper;
 import org.apache.commons.compress.compressors.CompressorException;
-import org.apache.commons.compress.compressors.CompressorOutputStream;
 import org.apache.commons.compress.compressors.CompressorStreamFactory;
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVPrinter;
@@ -54,7 +53,6 @@ import java.io.UnsupportedEncodingException;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Objects;
@@ -65,7 +63,6 @@ import static com.wgzhao.addax.core.spi.ErrorCode.ENCODING_ERROR;
 import static com.wgzhao.addax.core.spi.ErrorCode.IO_ERROR;
 import static com.wgzhao.addax.core.spi.ErrorCode.NOT_SUPPORT_TYPE;
 import static com.wgzhao.addax.core.spi.ErrorCode.REQUIRED_VALUE;
-import static com.wgzhao.addax.core.spi.ErrorCode.RUNTIME_ERROR;
 
 public class StorageWriterUtil
 {
