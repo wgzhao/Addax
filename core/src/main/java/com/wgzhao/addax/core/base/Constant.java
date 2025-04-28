@@ -37,8 +37,6 @@ public class Constant
     public static final int DEFAULT_BATCH_BYTE_SIZE = 32 * 1024 * 1024;
     public static final int DEFAULT_BATCH_SIZE = 2048;
     public static final int DEFAULT_BUFFER_SIZE = 8192;
-    public static final int DEFAULT_DECIMAL_PRECISION = 38;
-    public static final int DEFAULT_DECIMAL_SCALE = 10;
     public static final int DEFAULT_EACH_TABLE_SPLIT_SIZE = 5;
     public static final int DEFAULT_FETCH_SIZE = 2048;
     public static final int DEFAULT_DECIMAL_MAX_PRECISION = 38;

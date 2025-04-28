@@ -25,19 +25,10 @@ public final class HBaseKey
 
     public static final String HBASE_CONFIG = "hbaseConfig";
 
-    /**
-     * mode 可以取 normal 或者 multiVersionFixedColumn 或者 multiVersionDynamicColumn 三个值，无默认值。
-     * <p>
-     * normal 配合 column(Map 结构的)使用
-     */
+    // mode is one of normal, multiVersionFixedColumn, multiVersionDynamicColumn
     public static final String MODE = "mode";
 
-    /**
-     * 配合 mode = multiVersion 时使用，指明需要读取的版本个数。无默认值
-     * <code>-1</code> 表示去读全部版本
-     * 不能为 <code>0,1</code>
-     * &gt; 1 表示最多读取对应个数的版本数(不能超过 Integer 的最大值)
-     */
+    // should set up this when mode is multiVersion, default is -1 mean all, greater than 1 means the max version will read
     public static final String MAX_VERSION = "maxVersion";
     public static final String COLUMN_FAMILY = "columnFamily";
     public static final String START_ROW_KEY = "startRowkey";
@@ -56,7 +47,6 @@ public final class HBaseKey
     public static final String SPLIT_POINT = "splitPoint";
 
     // For Phoenix Query Server connection mode
-    // Phoenix QueryServer服务地址
     public static final String QUERY_SERVER_ADDRESS = "queryServerAddress";
     public static final String HBASE_THIN_CONNECT_URL = "hbase.thin.connect.url";
     public static final String HBASE_THIN_CONNECT_NAMESPACE = "hbase.thin.connect.namespace";

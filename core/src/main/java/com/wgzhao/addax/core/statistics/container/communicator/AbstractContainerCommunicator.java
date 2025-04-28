@@ -93,7 +93,7 @@ public abstract class AbstractContainerCommunicator
     public void reportVmInfo()
     {
         long now = System.currentTimeMillis();
-        if (now - lastReportTime >= 300000) {
+        if (now - lastReportTime >= 300_000) {
             if (vmInfo != null) {
                 vmInfo.getDelta(true);
             }
