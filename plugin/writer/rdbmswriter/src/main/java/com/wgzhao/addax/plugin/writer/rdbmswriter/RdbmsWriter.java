@@ -39,7 +39,7 @@ import static com.wgzhao.addax.core.spi.ErrorCode.REQUIRED_VALUE;
 public class RdbmsWriter
         extends Writer
 {
-    private static final Logger LOG = LoggerFactory.getLogger(Writer.class);
+    private static final Logger LOG = LoggerFactory.getLogger(RdbmsWriter.class);
     private static final DataBaseType DATABASE_TYPE = DataBaseType.RDBMS_WRITER;
 
     public static class Job
