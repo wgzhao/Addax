@@ -161,45 +161,29 @@ public class OrcWriter
     private void appendPrimitiveColumn(int row, SupportHiveDataType columnType, ColumnVector col, Column recordColumn, Configuration eachColumnConf, String type)
     {
         switch (columnType) {
-            case TINYINT:
-            case SMALLINT:
-            case INT:
-            case BIGINT:
-            case BOOLEAN:
-                ((LongColumnVector) col).vector[row] = recordColumn.asLong();
-                break;
-            case DATE:
+            case TINYINT, SMALLINT, INT, BIGINT, BOOLEAN -> ((LongColumnVector) col).vector[row] = recordColumn.asLong();
+            case DATE -> {
                 java.sql.Date sqlDate = new java.sql.Date(recordColumn.asDate().getTime());
                 ((LongColumnVector) col).vector[row] = sqlDate.toLocalDate().toEpochDay();
-                break;
-            case FLOAT:
-            case DOUBLE:
-                ((DoubleColumnVector) col).vector[row] = recordColumn.asDouble();
-                break;
-            case DECIMAL:
+            }
+            case FLOAT, DOUBLE -> ((DoubleColumnVector) col).vector[row] = recordColumn.asDouble();
+            case DECIMAL -> {
                 int scale = eachColumnConf.getInt(Key.SCALE, Constant.DEFAULT_DECIMAL_MAX_SCALE);
                 HiveDecimalWritable hdw = new HiveDecimalWritable();
                 hdw.set(HiveDecimal.create(recordColumn.asBigDecimal())
                         .setScale(scale, HiveDecimal.ROUND_HALF_UP));
                 ((DecimalColumnVector) col).set(row, hdw);
-                break;
-            case TIMESTAMP:
-                ((TimestampColumnVector) col).set(row, recordColumn.asTimestamp());
-                break;
-            case STRING:
-            case VARCHAR:
-            case CHAR:
-                setStringValue(col, row, recordColumn);
-                break;
-            case BINARY:
+            }
+            case TIMESTAMP -> ((TimestampColumnVector) col).set(row, recordColumn.asTimestamp());
+            case STRING, VARCHAR, CHAR -> setStringValue(col, row, recordColumn);
+            case BINARY -> {
                 byte[] content = (byte[]) recordColumn.getRawData();
                 ((BytesColumnVector) col).setRef(row, content, 0, content.length);
-                break;
-            default:
-                throw AddaxException.asAddaxException(
-                        NOT_SUPPORT_TYPE,
-                        String.format("Unsupported field type. Field name: [%s], Field type:[%s].",
-                                eachColumnConf.getString(Key.NAME), type));
+            }
+            default -> throw AddaxException.asAddaxException(
+                    NOT_SUPPORT_TYPE,
+                    String.format("Unsupported field type. Field name: [%s], Field type:[%s].",
+                            eachColumnConf.getString(Key.NAME), type));
         }
     }
 
