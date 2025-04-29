@@ -30,10 +30,8 @@ import org.apache.commons.io.Charsets;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.InputStream;
 import java.nio.charset.UnsupportedCharsetException;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 
@@ -80,7 +78,7 @@ public class HdfsReader
             // path check
             String pathInString = readerOriginConfig.getNecessaryValue(Key.PATH, REQUIRED_VALUE);
             if (!pathInString.startsWith("[") && !pathInString.endsWith("]")) {
-                path = Collections.singletonList(pathInString);
+                path = List.of(pathInString);
             }
             else {
                 path = readerOriginConfig.getList(Key.PATH, String.class);
@@ -89,9 +87,8 @@ public class HdfsReader
                 }
                 for (String eachPath : path) {
                     if (!eachPath.startsWith("/")) {
-                        String message = String.format("The item path [%s] should be a absolute path.", eachPath);
-                        LOG.error(message);
-                        throw AddaxException.asAddaxException(ILLEGAL_VALUE, message);
+                        throw AddaxException.asAddaxException(ILLEGAL_VALUE,
+                                "The item path [%s] should be a absolute path.".formatted(eachPath));
                     }
                 }
             }
@@ -245,33 +242,30 @@ public class HdfsReader
         public void startRead(RecordSender recordSender)
         {
 
-            LOG.info("Being to read.");
-            for (String sourceFile : this.sourceFiles) {
-                LOG.info("Reading the file [{}]", sourceFile);
+            LOG.info("Begin to read files");
 
-                if (specifiedFileType.equalsIgnoreCase(HdfsConstant.TEXT) || specifiedFileType.equalsIgnoreCase(HdfsConstant.CSV)) {
-                    InputStream inputStream = dfsUtil.getInputStream(sourceFile);
-                    StorageReaderUtil.readFromStream(inputStream, sourceFile, taskConfig, recordSender, getTaskPluginCollector());
-                }
-                else if (specifiedFileType.equalsIgnoreCase(HdfsConstant.ORC)) {
+            for (var sourceFile : this.sourceFiles) {
+                LOG.info("Reading file: {}", sourceFile);
 
-                    dfsUtil.orcFileStartRead(sourceFile, recordSender, getTaskPluginCollector());
-                }
-                else if (specifiedFileType.equalsIgnoreCase(HdfsConstant.SEQ)) {
-
-                    dfsUtil.sequenceFileStartRead(sourceFile, taskConfig, recordSender, getTaskPluginCollector());
-                }
-                else if (specifiedFileType.equalsIgnoreCase(HdfsConstant.RC)) {
-
-                    dfsUtil.rcFileStartRead(sourceFile, recordSender, getTaskPluginCollector());
-                }
-                else if (specifiedFileType.equalsIgnoreCase(HdfsConstant.PARQUET)) {
-                    dfsUtil.parquetFileStartRead(sourceFile, recordSender, getTaskPluginCollector());
-                }
-                else {
-                    throw AddaxException.asAddaxException(NOT_SUPPORT_TYPE,
-                            "The specifiedFileType: [" + specifiedFileType + "] is unsupported. "
-                                    + "HdfsReader only support TEXT, CSV, ORC, SEQUENCE, RC, PARQUET now.");
+                switch (specifiedFileType.toUpperCase()) {
+                    case HdfsConstant.TEXT, HdfsConstant.CSV -> {
+                        var inputStream = dfsUtil.getInputStream(sourceFile);
+                        StorageReaderUtil.readFromStream(inputStream, sourceFile, taskConfig,
+                                recordSender, getTaskPluginCollector());
+                    }
+                    case HdfsConstant.ORC ->
+                            dfsUtil.orcFileStartRead(sourceFile, recordSender, getTaskPluginCollector());
+                    case HdfsConstant.SEQ ->
+                            dfsUtil.sequenceFileStartRead(sourceFile, taskConfig, recordSender, getTaskPluginCollector());
+                    case HdfsConstant.RC ->
+                            dfsUtil.rcFileStartRead(sourceFile, recordSender, getTaskPluginCollector());
+                    case HdfsConstant.PARQUET ->
+                            dfsUtil.parquetFileStartRead(sourceFile, recordSender, getTaskPluginCollector());
+                    default -> throw AddaxException.asAddaxException(NOT_SUPPORT_TYPE,
+                            """
+                            The specifiedFileType: [%s] is unsupported.
+                            HdfsReader only support TEXT, CSV, ORC, SEQUENCE, RC, PARQUET now.
+                            """.formatted(specifiedFileType));
                 }
 
                 if (recordSender != null) {
@@ -279,7 +273,7 @@ public class HdfsReader
                 }
             }
 
-            LOG.info("Reading files finished.");
+            LOG.info("Reading files finished");
         }
 
         @Override

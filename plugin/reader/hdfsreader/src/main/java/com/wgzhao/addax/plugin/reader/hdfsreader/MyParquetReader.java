@@ -128,8 +128,8 @@ public class MyParquetReader
                     recordSender.sendToWriter(record);
                 }
                 catch (Exception e) {
-                    if (e instanceof AddaxException) {
-                        throw (AddaxException) e;
+                    if (e instanceof AddaxException ae) {
+                        throw ae;
                     }
                     // cast failed means dirty data, including number format, date format, etc.
                     taskPluginCollector.collectDirtyRecord(record, e.getMessage());
@@ -158,23 +158,20 @@ public class MyParquetReader
             return new StringColumn(nullFormat);
         }
 
-        JavaType type = JavaType.valueOf(columnType.toUpperCase());
-        if (type == JavaType.ARRAY) {
-            columnGenerated = getArrayColumn(group, columnEntry, columnIndex, columnType);
-        }
-        else if (type == JavaType.MAP) {
-            columnGenerated = getMapColumn(group, columnEntry, columnIndex, columnType);
-        }
-        else {
-            try {
-                columnGenerated = getPrimitiveColumn(group, columnEntry, type, columnIndex, columnType);
+        var type = JavaType.valueOf(columnType.toUpperCase());
+        return switch (type) {
+            case ARRAY -> getArrayColumn(group, columnEntry, columnIndex, columnType);
+            case MAP -> getMapColumn(group, columnEntry, columnIndex, columnType);
+            default -> {
+                try {
+                    yield getPrimitiveColumn(group, columnEntry, type, columnIndex, columnType);
+                }
+                catch (Exception e) {
+                    throw new IllegalArgumentException(
+                            "Cannot convert column type %s to %s: %s".formatted(columnType, type, e));
+                }
             }
-            catch (Exception e) {
-                throw new IllegalArgumentException(String.format(
-                        "Can not convert column type %s to %s: %s", columnType, type, e));
-            }
-        }
-        return columnGenerated;
+        };
     }
 
     private static @NotNull Column getArrayColumn(Group group, ColumnEntry columnEntry, Integer columnIndex, String columnType)
@@ -233,65 +230,39 @@ public class MyParquetReader
         return new StringColumn(jsonObject.toString());
     }
 
-    private static @NotNull Column getPrimitiveColumn(Group group, ColumnEntry columnEntry, JavaType type, Integer columnIndex, String columnType)
+    private static @NotNull Column getPrimitiveColumn(Group group, ColumnEntry columnEntry, JavaType type,
+            Integer columnIndex, String columnType)
     {
-        String columnValue;
-        Column columnGenerated;
-        switch (type) {
-            case STRING:
-                columnGenerated = new StringColumn(group.getString(columnIndex, 0));
-                break;
-            case INT:
-                columnGenerated = new LongColumn(group.getInteger(columnIndex, 0));
-                break;
-            case LONG:
-                columnGenerated = new LongColumn(group.getLong(columnIndex, 0));
-                break;
-            case FLOAT:
-                columnGenerated = new DoubleColumn(group.getFloat(columnIndex, 0));
-                break;
-            case DOUBLE:
-                columnGenerated = new DoubleColumn(group.getDouble(columnIndex, 0));
-                break;
-            case DECIMAL:
-                // get decimal value
-                Binary binary = group.getBinary(columnIndex, 0);
+        return switch (type) {
+            case STRING -> new StringColumn(group.getString(columnIndex, 0));
+            case INT -> new LongColumn(group.getInteger(columnIndex, 0));
+            case LONG -> new LongColumn(group.getLong(columnIndex, 0));
+            case FLOAT -> new DoubleColumn(group.getFloat(columnIndex, 0));
+            case DOUBLE -> new DoubleColumn(group.getDouble(columnIndex, 0));
+            case DECIMAL -> {
+                var binary = group.getBinary(columnIndex, 0);
                 if (binary == null) {
-                    columnGenerated = new DoubleColumn((Double) null);
+                    yield new DoubleColumn((Double) null);
                 }
-                else {
-                    // get correct scale
-                    int scale = ((LogicalTypeAnnotation.DecimalLogicalTypeAnnotation) group.getType().getType(columnIndex).getLogicalTypeAnnotation()).getScale();
-                    BigDecimal bigDecimal = new BigDecimal(new BigInteger(binary.getBytes()), scale).setScale(scale, RoundingMode.HALF_UP);
-                    columnGenerated = new DoubleColumn(bigDecimal);
-                }
-                break;
-            case BOOLEAN:
-                columnGenerated = new BoolColumn(group.getBoolean(columnIndex, 0));
-                break;
-            case DATE:
-                // java sql data is yyyy-MM-dd
-                int epoch = group.getInteger(columnIndex, 0);
-                if (epoch == 0) {
-                    columnGenerated = new StringColumn(null);
-                }
-                else {
-                    columnGenerated = new StringColumn(LocalDate.of(1970, 1, 1).plusDays(epoch).toString());
-                }
-                break;
-            case TIMESTAMP:
-                Binary binaryTs = group.getInt96(columnIndex, 0);
-                columnGenerated = new DateColumn(new Date(getTimestampMills(binaryTs)));
-                break;
-            case BINARY:
-                columnGenerated = new BytesColumn(group.getBinary(columnIndex, 0).getBytes());
-                break;
-            default:
-                // try to convert it to string
-                LOG.debug("try to convert column type {} to String, ", columnType);
-                columnGenerated = new StringColumn(group.getString(columnIndex, 0));
-        }
-        return columnGenerated;
+                var scale = ((LogicalTypeAnnotation.DecimalLogicalTypeAnnotation)
+                        group.getType().getType(columnIndex).getLogicalTypeAnnotation()).getScale();
+                var bigDecimal = new BigDecimal(new BigInteger(binary.getBytes()), scale)
+                        .setScale(scale, RoundingMode.HALF_UP);
+                yield new DoubleColumn(bigDecimal);
+            }
+            case BOOLEAN -> new BoolColumn(group.getBoolean(columnIndex, 0));
+            case DATE -> {
+                var epoch = group.getInteger(columnIndex, 0);
+                yield epoch == 0 ? new StringColumn(null) :
+                        new StringColumn(LocalDate.of(1970, 1, 1).plusDays(epoch).toString());
+            }
+            case TIMESTAMP -> new DateColumn(new Date(getTimestampMills(group.getInt96(columnIndex, 0))));
+            case BINARY -> new BytesColumn(group.getBinary(columnIndex, 0).getBytes());
+            default -> {
+                LOG.debug("Converting column type {} to String", columnType);
+                yield new StringColumn(group.getString(columnIndex, 0));
+            }
+        };
     }
 
     /**
@@ -339,24 +310,16 @@ public class MyParquetReader
                     return JavaType.valueOf(type);
                 }
             }
-            switch (field.asPrimitiveType().getPrimitiveTypeName()) {
-                case INT32:
-                    return JavaType.INT;
-                case INT64:
-                    return JavaType.LONG;
-                case INT96:
-                    return JavaType.TIMESTAMP;
-                case FLOAT:
-                    return JavaType.FLOAT;
-                case DOUBLE:
-                    return JavaType.DOUBLE;
-                case BOOLEAN:
-                    return JavaType.BOOLEAN;
-                case FIXED_LEN_BYTE_ARRAY:
-                    return JavaType.BINARY;
-                default:
-                    return JavaType.STRING; //Binary as string
-            }
+            return switch (field.asPrimitiveType().getPrimitiveTypeName()) {
+                case INT32 -> JavaType.INT;
+                case INT64 -> JavaType.LONG;
+                case INT96 -> JavaType.TIMESTAMP;
+                case FLOAT -> JavaType.FLOAT;
+                case DOUBLE -> JavaType.DOUBLE;
+                case BOOLEAN -> JavaType.BOOLEAN;
+                case FIXED_LEN_BYTE_ARRAY -> JavaType.BINARY;
+                default -> JavaType.STRING; //Binary as string
+            };
         }
         else {
             LogicalTypeAnnotation logicalTypeAnnotation = field.getLogicalTypeAnnotation();
