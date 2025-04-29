@@ -132,7 +132,7 @@ public class SingleTableSplitUtil
      */
     private static MinMaxPackage getPkMinAndMaxValue(DataBaseType dataBaseType, Configuration configuration)
     {
-        String splitPK = configuration.getString(Key.SPLIT_PK).trim();
+        String splitPK = dataBaseType.quoteColumnName(configuration.getString(Key.SPLIT_PK).trim());
         String table = configuration.getString(Key.TABLE).trim();
         String where = configuration.getString(Key.WHERE, null);
         String pkRangeSQL = genPKSql(splitPK, table, where);
@@ -366,7 +366,6 @@ public class SingleTableSplitUtil
 
     public static String genPKSql(String splitPK, String table, String where)
     {
-
         String minMaxTemplate = "SELECT MIN(%s), MAX(%s) FROM %s";
         String pkRangeSQL = String.format(minMaxTemplate, splitPK, splitPK, table);
         if (StringUtils.isNotBlank(where)) {
