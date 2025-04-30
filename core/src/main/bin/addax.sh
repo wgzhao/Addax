@@ -21,37 +21,22 @@
 # Author wgzhao<wgzhao@gmail.com>
 # Created at 2021-07-22
 
-# ------------------------------ constant ----------------------------------------
+# ------------------------------ Constants ----------------------------------------
 SCRIPT_PATH="$(
     cd -- "$(dirname "$0")" >/dev/null 2>&1
     pwd -P
 )"
-
 ADDAX_HOME=$(dirname "$SCRIPT_PATH")
-
 DEBUG_PORT=9999
-if [ -z "${ADDAX_HOME}" ]; then
-    echo "Error: Cannot determine ADDAX_HOME directory"
-    exit 2
-fi
 
 CLASS_PATH=".:/etc/hbase/conf:${ADDAX_HOME}/lib/*"
 LOGBACK_FILE="${ADDAX_HOME}/conf/logback.xml"
 CORE_JSON="${ADDAX_HOME}/conf/core.json"
 
-if [ ! -f "$CORE_JSON" ]; then
-    echo "Error: core.json not found at ${CORE_JSON}"
-    exit 2
-fi
-
-CORE_JVM=$(grep '"jvm":' "${CORE_JSON}" | cut -d: -f2 | tr -d ',"')
-DEFAULT_JVM="$CORE_JVM -XX:+HeapDumpOnOutOfMemoryError -XX:+ExitOnOutOfMemoryError -XX:HeapDumpPath=${ADDAX_HOME}"
-DEFAULT_PROPERTY_CONF="-Dfile.encoding=UTF-8 -Djava.security.egd=file:///dev/urandom -Daddax.home=${ADDAX_HOME} \
-                        -Dlogback.configurationFile=${LOGBACK_FILE}"
-ENGINE_COMMAND="java -server ${DEFAULT_JVM} ${DEFAULT_PROPERTY_CONF} -classpath ${CLASS_PATH}"
+DEFAULT_PROPERTY_CONF="-Dfile.encoding=UTF-8 -Djava.security.egd=file:///dev/urandom -Daddax.home=${ADDAX_HOME} -Dlogback.configurationFile=${LOGBACK_FILE}"
 REMOTE_DEBUG_CONFIG="-Xdebug -Xrunjdwp:transport=dt_socket,server=y,address=0.0.0.0:${DEBUG_PORT}"
 
-# ------------------------- global variables ---------------------------
+# ------------------------------ Global Variables ---------------------------------
 CUST_JVM=""
 LOG_DIR="${ADDAX_HOME}/log"
 DEBUG=0
@@ -60,7 +45,9 @@ JOB_FILE=""
 LOG_FILE=""
 TMPDIR=""
 
-# ---------------------------- base function --------------------------
+# ------------------------------ Functions ----------------------------------------
+
+# Print usage information
 usage() {
     cat <<-EOF
 Usage: $(basename "$0") [options] job-url-or-path
@@ -69,14 +56,10 @@ Options:
   -h, --help                  This help text
   -v, --version               Show version number and quit
   -j, --jvm <jvm parameters>  Set extra java jvm parameters if necessary.
-  -p, --params <parameter>    Set job parameter, eg: the item 'tableName' which you want to specify by command,
-                              you can use pass -p"-DtableName=your-table-name".
-                              If you want multiple parameters, you can pass
-                              -p"-DtableName=your-table-name -DcolumnName=your-column-name".
-                              Note: you should configure tableName with \${tableName} in your job.
+  -p, --params <parameter>    Set job parameter, e.g., -p"-DtableName=your-table-name".
   -l, --logdir <log directory> The directory where logs are written to
-  -d, --debug                 Set to remote debug mode.
-  -L, --loglevel <log level>  Set log level such as: debug, info, warn, error, all etc.
+  -d, --debug                 Enable remote debug mode.
+  -L, --loglevel <log level>  Set log level (e.g., debug, info, warn, error, all).
 
 Usage: $(basename "$0") gen [options]
 
@@ -89,16 +72,7 @@ EOF
     exit 1
 }
 
-# Clean up temporary directory on exit
-cleanup() {
-    if [ -n "$TMPDIR" ] && [ -d "$TMPDIR" ]; then
-        rm -rf "$TMPDIR"
-    fi
-}
-
-# Register the cleanup function to be called on exit
-trap cleanup EXIT
-
+# Print version information
 print_version() {
     echo -n "Addax version: "
     core_jar=$(ls -w1 "${ADDAX_HOME}"/lib/addax-core-*.jar 2>/dev/null)
@@ -110,47 +84,26 @@ print_version() {
     exit 0
 }
 
-# check the jdk version
-get_jdk_version() {
-    # get major version
-    local version_string=$(java -version 2>&1 | head -n 1 | grep -o -E '\"[^\"]+\"' | sed 's/"//g')
-    if echo "$version_string" | grep -q '^1\.'; then
-        # old version (like JDK 1.8)
-        echo ${version_string#1.} | cut -d '.' -f 1
-    else
-        # new version (like JDK 9+)
-        echo $version_string | cut -d '.' -f 1
+# Cleanup temporary files
+cleanup() {
+    if [ -n "$TMPDIR" ] && [ -d "$TMPDIR" ]; then
+        rm -rf "$TMPDIR"
     fi
 }
+trap cleanup EXIT
 
-# setup GC options based on JDK version
-setup_gc_opts() {
-    local jdk_version=$(get_jdk_version)
-    if [[ $jdk_version -eq 8 ]]; then
-        # JDK 8, use  CMS GC or G1 GC
-        export JAVA_OPTS="$DEFAULT_JAVA_OPTS -XX:+UseConcMarkSweepGC -XX:+CMSParallelRemarkEnabled -XX:MaxTenuringThreshold=15"
-    elif [[ $jdk_version -ge 17 ]]; then
-        export JAVA_OPTS="$DEFAULT_JAVA_OPTS -XX:+UseG1GC -XX:MaxGCPauseMillis=200 -XX:InitiatingHeapOccupancyPercent=75"
-    else
-        export JAVA_OPTS="$DEFAULT_JAVA_OPTS -XX:+UseG1GC"
-    fi
-}
-
+# Parse job file (local or remote)
 parse_job_file() {
-    # check the job file is local file or url?
     case "$JOB_FILE" in
         http*)
-            # check curl command exists or not
             if ! command -v curl >/dev/null 2>&1; then
                 echo "Error: curl command not found, cannot download job file"
                 exit 1
             fi
-
-            # download it first
             TMPDIR=$(mktemp -d /tmp/addax.XXXXXX)
             JOB_NAME=$(basename "${JOB_FILE}")
             if ! curl -sS -f -o "$TMPDIR/$JOB_NAME" "${JOB_FILE}" 2>/dev/null; then
-                echo "Error: Download job file failed, check the URL: ${JOB_FILE}"
+                echo "Error: Failed to download job file from ${JOB_FILE}"
                 exit 1
             fi
             JOB_FILE=$(ls -w1 "${TMPDIR}/"*)
@@ -168,8 +121,8 @@ parse_job_file() {
     fi
 }
 
+# Generate log file name
 gen_log_file() {
-    # Create log directory if it doesn't exist
     if [ ! -d "${LOG_DIR}" ]; then
         mkdir -p "${LOG_DIR}" || {
             echo "Error: Failed to create log directory ${LOG_DIR}"
@@ -177,13 +130,11 @@ gen_log_file() {
         }
     fi
 
-    # Check if LOG_DIR is writable
     if [ ! -w "${LOG_DIR}" ]; then
         echo "Error: Log directory ${LOG_DIR} is not writable"
         exit 1
     fi
 
-    # Combine log file name
     job_name=$(basename "$JOB_FILE")
     job_escaped_name=$(echo "${job_name%\.*}" | tr '.' '_')
     curr_time=$(date +"%Y%m%d_%H%M%S")
@@ -191,32 +142,41 @@ gen_log_file() {
     LOG_FILE="addax_${job_escaped_name}_${curr_time}_${pid}.log"
 }
 
-# ---------------------------- generate job template file ---------------
-
-list_all_plugin_names() {
-    echo "Reader Plugins:"
-    for i in "${ADDAX_HOME}"/plugin/reader/*
-    do
-        if [ -d "$i" ]; then
-            echo "  $(basename "${i}")"
-        fi
-    done
-    echo
-    echo "Writer Plugins:"
-    for i in "${ADDAX_HOME}"/plugin/writer/*
-    do
-        if [ -d "$i" ]; then
-            echo "  $(basename "${i}")"
-        fi
-    done
+# check the jdk version
+get_jdk_version() {
+    # get major version
+    local version_string=$(java -version 2>&1 | head -n 1 | grep -o -E '\"[^\"]+\"' | sed 's/"//g')
+    if echo "$version_string" | grep -q '^1\.'; then
+        # old version (like JDK 1.8)
+        echo ${version_string#1.} | cut -d '.' -f 1
+    else
+        # new version (like JDK 9+)
+        echo $version_string | cut -d '.' -f 1
+    fi
 }
 
-# ------------------------------------ main -----------------------------
+check_jdk_version() {
+    local jdk_version=$(get_jdk_version)
+    if [ "$jdk_version" -lt 17 ]; then
+        echo "Error: JDK version $jdk_version is not supported. Please use JDK 17 or higher."
+        exit 1
+    fi
+}
 
-[ $# -eq 0 ] && usage
+# Setup GC options based on JDK version
+setup_gc_opts() {
+    local jdk_version=$(java -version 2>&1 | head -n 1 | grep -o -E '\"[^\"]+\"' | sed 's/"//g' | cut -d '.' -f 1)
+    if [ "$jdk_version" -eq 8 ]; then
+        JAVA_OPTS="$JAVA_OPTS -XX:+UseConcMarkSweepGC -XX:+CMSParallelRemarkEnabled -XX:MaxTenuringThreshold=15"
+    elif [ "$jdk_version" -ge 17 ]; then
+        JAVA_OPTS="$JAVA_OPTS -XX:+UseG1GC -XX:MaxGCPauseMillis=200 -XX:InitiatingHeapOccupancyPercent=75"
+    else
+        JAVA_OPTS="$JAVA_OPTS -XX:+UseG1GC"
+    fi
+}
 
-if [ "$1" = "gen" ]; then
-    shift 1
+# Generate job template JSON
+generate_json() {
     LIST_PLUGINS=0
     READER=""
     WRITER=""
@@ -248,7 +208,6 @@ if [ "$1" = "gen" ]; then
         exit 2
     fi
 
-    # Check if specified reader plugin exists
     READER_TEMPLATE="${ADDAX_HOME}/plugin/reader/${READER}/plugin_job_template.json"
     if [ ! -f "${READER_TEMPLATE}" ]; then
         echo "Error: Reader plugin ${READER} does not exist or has not been installed yet"
@@ -261,7 +220,6 @@ if [ "$1" = "gen" ]; then
         exit 3
     fi
 
-    # Check if specified writer plugin exists
     WRITER_TEMPLATE="${ADDAX_HOME}/plugin/writer/${WRITER}/plugin_job_template.json"
     if [ ! -f "${WRITER_TEMPLATE}" ]; then
         echo "Error: Writer plugin ${WRITER} does not exist or has not been installed yet"
@@ -274,30 +232,56 @@ if [ "$1" = "gen" ]; then
         exit 3
     fi
 
-    # Combine reader and writer plugin templates
     reader_content=$(sed 's/^/      /' "${READER_TEMPLATE}")
     writer_content=$(sed 's/^/      /' "${WRITER_TEMPLATE}")
 
     printf '{
-  "job": {
-    "setting": {
-      "speed": {
-        "byte": -1,
-        "channel": 1
+      "job": {
+        "setting": {
+          "speed": {
+            "byte": -1,
+            "channel": 1
+          }
+        },
+        "content": {
+          "reader": %s,
+          "writer": %s
+        }
       }
-    },
-    "content": {
-      "reader": %s,
-      "writer": %s
-    }
-  }
-}\n' "$reader_content" "$writer_content"
+    }\n' "$reader_content" "$writer_content"
+}
 
+# List all plugin names
+list_all_plugin_names() {
+    echo "Reader Plugins:"
+    for i in "${ADDAX_HOME}"/plugin/reader/*
+    do
+        if [ -d "$i" ]; then
+            echo "  $(basename "${i}")"
+        fi
+    done
+    echo
+    echo "Writer Plugins:"
+    for i in "${ADDAX_HOME}"/plugin/writer/*
+    do
+        if [ -d "$i" ]; then
+            echo "  $(basename "${i}")"
+        fi
+    done
+}
+
+# ------------------------------ Main Logic ---------------------------------------
+
+[ $# -eq 0 ] && usage
+
+if [ "$1" = "gen" ]; then
+    shift 1
+    generate_json "$@"
     exit 0
 fi
 
-# OS detect and argument parsing
-if command -v getopt >/dev/null 2>&1; then
+OS=$(uname -s)
+if [ "$OS" = "Linux" ]; then
     PARSED_ARGUMENTS=$(getopt -a -n 'addax' -o hj:p:l:vL:d -l help,jvm:,params:,logdir:,version,loglevel:,debug -- "$@")
     if [ $? -ne 0 ]; then
         echo "Error: Failed to parse arguments"
@@ -343,7 +327,6 @@ if command -v getopt >/dev/null 2>&1; then
         esac
     done
 else
-    # Fallback for systems without getopt (like macOS)
     while getopts 'hj:p:l:vdL:' option; do
         case "$option" in
             h) usage ;;
@@ -359,27 +342,20 @@ else
     shift $((OPTIND - 1))
 fi
 
-# Check job file is provided
 if [ $# -eq 0 ]; then
     echo "Error: Job file is required"
     usage
 fi
 
 JOB_FILE="${1}"
+check_jdk_version
 parse_job_file
 gen_log_file
 setup_gc_opts
-# Combine command
-cmd="${ENGINE_COMMAND} ${JAVA_OPTS} ${CUST_JVM} ${PARAMS} -Dloglevel=${LOG_LEVEL} -Daddax.log=${LOG_DIR} -Dlog.file.name=${LOG_FILE}"
 
-if [ ${DEBUG} -eq 1 ]; then
-    cmd="${cmd} ${REMOTE_DEBUG_CONFIG}"
-    echo "Debug mode enabled on port ${DEBUG_PORT}"
-fi
+PARAMS=" ${DEFAULT_PROPERTY_CONF} -Dloglevel=${LOG_LEVEL} -Daddax.log=${LOG_DIR} -Dlog.file.name=${LOG_FILE} ${PARAMS}"
+cmd="java -server ${DEFAULT_JVM} -classpath ${CLASS_PATH} $JAVA_OPTS ${CUST_JVM} ${PARAMS}"
+[ ${DEBUG} -eq 1 ] && cmd="${cmd} ${REMOTE_DEBUG_CONFIG}"
 
-# Attach main class
-cmd="${cmd} com.wgzhao.addax.core.Engine -job ${JOB_FILE}"
-
-# Execute the command
-sh -c "${cmd}"
+sh -c "${cmd} com.wgzhao.addax.core.Engine -job ${JOB_FILE}"
 exit $?
