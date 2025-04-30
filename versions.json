@@ -4,9 +4,14 @@
     "title": "develop",
     "aliases": [
       "last",
-      "latest",
-      "lastest"
+      "lastest",
+      "latest"
     ]
+  },
+  {
+    "version": "5.1.2",
+    "title": "5.1.2",
+    "aliases": []
   },
   {
     "version": "5.1.1",

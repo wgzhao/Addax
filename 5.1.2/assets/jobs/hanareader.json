@@ -1,0 +1,36 @@
+{
+  "job": {
+    "content": [
+      {
+        "reader": {
+          "name": "hanareader",
+          "parameter": {
+            "column": [
+              "*"
+            ],
+            "connection": {
+              "jdbcUrl": "jdbc:sap://wgzhao-pc:39017/system",
+              "table": [
+                "addax_tbl"
+              ]
+            },
+            "username": "system",
+            "password": "HXEHana1"
+          }
+        },
+        "writer": {
+          "name": "streamwriter",
+          "parameter": {
+            "print": true
+          }
+        }
+      }
+    ],
+    "setting": {
+      "speed": {
+        "bytes": -1,
+        "channel": 1
+      }
+    }
+  }
+}
