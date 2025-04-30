@@ -25,14 +25,11 @@ import java.lang.management.ManagementFactory;
 import java.lang.management.MemoryPoolMXBean;
 import java.lang.management.OperatingSystemMXBean;
 import java.lang.management.RuntimeMXBean;
-import java.lang.reflect.Method;
+import java.lang.management.ThreadMXBean;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-/**
- * Created by liqiang on 15/11/12.
- */
 public class VMInfo
 {
     static final long MB = 1024L * 1024L;
@@ -40,15 +37,15 @@ public class VMInfo
     private static final Logger LOG = LoggerFactory.getLogger(VMInfo.class);
     private static VMInfo vmInfo;
 
-    private final OperatingSystemMXBean osMXBean;
-    private final RuntimeMXBean runtimeMXBean;
     private final List<GarbageCollectorMXBean> garbageCollectorMXBeanList;
     private final List<MemoryPoolMXBean> memoryPoolMXBeanList;
+    private final RuntimeMXBean runtimeMXBean;
+    private final ThreadMXBean threadMXBean;
 
     private final String osInfo;
     private final String jvmInfo;
-
     private final int totalProcessorCount;
+
     // machine status
     private final PhyOSStatus startPhyOSStatus;
     private final ProcessCpuStatus processCpuStatus = new ProcessCpuStatus();
@@ -61,9 +58,10 @@ public class VMInfo
 
     private VMInfo()
     {
-        //初始化静态信息
-        osMXBean = ManagementFactory.getOperatingSystemMXBean();
-        runtimeMXBean = ManagementFactory.getRuntimeMXBean();
+        Runtime runtime = Runtime.getRuntime();
+        OperatingSystemMXBean osMXBean = ManagementFactory.getOperatingSystemMXBean();
+        this.runtimeMXBean = ManagementFactory.getRuntimeMXBean();
+        this.threadMXBean = ManagementFactory.getThreadMXBean();
         garbageCollectorMXBeanList = ManagementFactory.getGarbageCollectorMXBeans();
         memoryPoolMXBeanList = ManagementFactory.getMemoryPoolMXBeans();
 
@@ -72,15 +70,17 @@ public class VMInfo
         totalProcessorCount = osMXBean.getAvailableProcessors();
 
         startPhyOSStatus = new PhyOSStatus(
-                VMInfo.getLongFromOperatingSystem(osMXBean, "getTotalPhysicalMemorySize"),
-                VMInfo.getLongFromOperatingSystem(osMXBean, "getFreePhysicalMemorySize"),
-                VMInfo.getLongFromOperatingSystem(osMXBean, "getMaxFileDescriptorCount"),
-                VMInfo.getLongFromOperatingSystem(osMXBean, "getOpenFileDescriptorCount")
+                runtime.totalMemory(),
+                runtime.freeMemory(),
+                -1L, // File descriptor count not available in standard API
+                -1L  // Open file count not available in standard API
         );
 
         // initialize processGCStatus
         for (GarbageCollectorMXBean garbage : garbageCollectorMXBeanList) {
-            GCStatus gcStatus = new GCStatus.Builder().name(garbage.getName()).build();
+            GCStatus gcStatus = new GCStatus.Builder()
+                    .name(garbage.getName())
+                    .build();
             processGCStatus.gcStatusMap.put(garbage.getName(), gcStatus);
         }
 
@@ -88,38 +88,12 @@ public class VMInfo
         updateMemoryStatuses();
     }
 
-    /**
-     * static method, get vm information and returns
-     *
-     * @return null or vmInfo. null is something error, job no care it.
-     */
     public static synchronized VMInfo getVmInfo()
     {
         if (vmInfo == null) {
             vmInfo = new VMInfo();
         }
         return vmInfo;
-    }
-
-    public static boolean isSunOsMBean(OperatingSystemMXBean operatingSystem)
-    {
-        final String className = operatingSystem.getClass().getName();
-
-        return "com.sun.management.UnixOperatingSystem".equals(className);
-    }
-
-    public static long getLongFromOperatingSystem(OperatingSystemMXBean operatingSystem, String methodName)
-    {
-        try {
-            final Method method = operatingSystem.getClass().getMethod(methodName, (Class<?>[]) null);
-            method.setAccessible(true);
-            return (Long) method.invoke(operatingSystem, (Object[]) null);
-        }
-        catch (final Exception e) {
-            LOG.info("OperatingSystemMXBean {} failed, Exception = {} ", methodName, e.getMessage());
-        }
-
-        return -1;
     }
 
     public String toString()
@@ -142,25 +116,29 @@ public class VMInfo
     {
 
         try {
-            if (VMInfo.isSunOsMBean(osMXBean)) {
-                long curUptime = runtimeMXBean.getUptime();
-                long curProcessTime = getLongFromOperatingSystem(osMXBean, "getProcessCpuTime");
-                //percent， the unit of unit is ms and processTime unit is nano
-                if ((curUptime > lastUpTime) && (curProcessTime >= lastProcessCpuTime)) {
-                    float curDeltaCpu = (float) (curProcessTime - lastProcessCpuTime) / ((curUptime - lastUpTime) * totalProcessorCount * 10000);
-                    processCpuStatus.setMaxMinCpu(curDeltaCpu);
-                    processCpuStatus.averageCpu = (float) curProcessTime / (curUptime * totalProcessorCount * 10000);
+            long curUptime = runtimeMXBean.getUptime();
+            // Get CPU time by summing all thread CPU times
+            long curProcessTime = getTotalThreadCpuTime();
 
-                    lastUpTime = curUptime;
-                    lastProcessCpuTime = curProcessTime;
-                }
+            // CPU load calculation
+            if ((curUptime > lastUpTime) && (curProcessTime >= lastProcessCpuTime)) {
+                long deltaUptime = curUptime - lastUpTime;
+                long deltaProcessTime = curProcessTime - lastProcessCpuTime;
+
+                float cpu = ((float) deltaProcessTime / deltaUptime / totalProcessorCount) * 100;
+                processCpuStatus.setMaxMinCpu(cpu);
+                processCpuStatus.averageCpu = cpu;
             }
+            this.lastUpTime = curUptime;
+            this.lastProcessCpuTime = curProcessTime;
 
+            // Update GC statistics
             for (GarbageCollectorMXBean garbage : garbageCollectorMXBeanList) {
-
                 GCStatus gcStatus = processGCStatus.gcStatusMap.get(garbage.getName());
                 if (gcStatus == null) {
-                    gcStatus = new GCStatus.Builder().name(garbage.getName()).build();
+                    gcStatus = new GCStatus.Builder()
+                            .name(garbage.getName())
+                            .build();
                     processGCStatus.gcStatusMap.put(garbage.getName(), gcStatus);
                 }
 
@@ -175,12 +153,30 @@ public class VMInfo
             updateMemoryStatuses();
 
             if (print) {
-                LOG.info("{}{}{}", processCpuStatus.getDeltaString(), processMemoryStatus.getDeltaString(), processGCStatus.getDeltaString());
+                LOG.info("{}{}{}",
+                        processCpuStatus.getDeltaString(),
+                        processMemoryStatus.getDeltaString(),
+                        processGCStatus.getDeltaString()
+                );
             }
         }
         catch (Exception e) {
-            LOG.warn("no need care, the fail is ignored : vmInfo getDelta failed {}", e.getMessage(), e);
+            LOG.warn("VMInfo getDelta failed: {}", e.getMessage(), e);
         }
+    }
+
+    private long getTotalThreadCpuTime()
+    {
+        long totalCpuTime = 0;
+        if (threadMXBean.isThreadCpuTimeSupported() && threadMXBean.isThreadCpuTimeEnabled()) {
+            for (long threadId : threadMXBean.getAllThreadIds()) {
+                long cpuTime = threadMXBean.getThreadCpuTime(threadId);
+                if (cpuTime != -1) {
+                    totalCpuTime += cpuTime;
+                }
+            }
+        }
+        return totalCpuTime;
     }
 
     private void updateMemoryStatuses()
@@ -437,7 +433,6 @@ public class VMInfo
 
         public String getTotalString()
         {
-
             return String.format("""
                             
                              [total cpu info] =>
