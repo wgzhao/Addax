@@ -17,8 +17,6 @@
 
 package com.wgzhao.addax.core.base;
 
-import java.util.Arrays;
-import java.util.HashSet;
 import java.util.Set;
 
 /**
@@ -48,12 +46,12 @@ public class Constant
 
     public static final String ENC_PASSWORD_PREFIX = "${enc:";
 
-    public static final Set<String> SUPPORTED_WRITE_MODE = new HashSet<>(Arrays.asList("append", "nonConflict", "overwrite", "truncate"));
+    public static final Set<String> SUPPORTED_WRITE_MODE = Set.of("append", "nonConflict", "overwrite", "truncate");
 
     public static final String SQL_FORMAT = "sql";
-    public static final Set<String> SUPPORTED_FILE_FORMAT = new HashSet<>(Arrays.asList("csv", "text", "sql"));
+    public static final Set<String> SUPPORTED_FILE_FORMAT = Set.of("csv", "text", "sql");
 
-    public static final Set<String> SQL_RESERVED_WORDS = new HashSet<>(Arrays.asList("ALL", "ALTER", "AND", "ANY", "AS", "ASC", "AUTHORIZATION",
+    public static final Set<String> SQL_RESERVED_WORDS = Set.of("ALL", "ALTER", "AND", "ANY", "AS", "ASC", "AUTHORIZATION",
             "BACKUP", "BEFORE", "BETWEEN", "BREAK", "BROWSE", "BULK", "BY", "CASCADE", "CASE", "CAST", "CATALOG", "CHECK", "CHECKPOINT",
             "CLOSE", "CLUSTERED", "COALESCE", "COLLATE", "COLUMN", "COMMIT", "COMPUTE", "CONSTRAINT", "CONTAINS", "CONTINUE", "CONVERT",
             "CREATE", "CURRENT", "CURRENT_DATE", "CURRENT_TIME", "CURRENT_TIMESTAMP", "CURRENT_USER", "CURSOR", "DATABASE", "DATE", "DAY",
@@ -68,8 +66,7 @@ public class Constant
             "SECURITYAUDIT", "SELECT", "SEMANTICKEYPHRASETABLE", "SESSION_USER", "SET", "SETUSER", "SHUTDOWN", "SOME", "STATISTICS",
             "SYSTEM_USER", "TABLE", "TABLESAMPLE", "TEXTSIZE", "THEN", "TO", "TOP", "TRAN", "TRANSACTION", "TRIGGER", "TRUNCATE", "TRY_CONVERT",
             "TSEQUAL", "UNION", "UNIQUE", "UNPIVOT", "UPDATE", "UPDATETEXT", "USE", "USER", "VALUES", "VARYING", "VIEW", "WAITFOR", "WHEN",
-            "WHERE", "WHILE", "WITH", "WRITETEXT", "XACT_ABORT"));
+            "WHERE", "WHILE", "WITH", "WRITETEXT", "XACT_ABORT");
 
-    //用于插件对自身 split 的每个 task 标识其使用的资源，以告知core 对 reader/writer split 之后的 task 进行拼接时需要根据资源标签进行更有意义的 shuffle 操作
     public static final String LOAD_BALANCE_RESOURCE_MARK = "loadBalanceResourceMark";
 }
