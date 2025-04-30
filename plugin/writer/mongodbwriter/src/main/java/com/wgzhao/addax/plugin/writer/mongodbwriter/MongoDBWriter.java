@@ -178,11 +178,6 @@ public class MongoDBWriter
         private String writeMode = null;
         private String updateKey;
 
-        private boolean isNullOrEmpty(String obj)
-        {
-            return obj == null || obj.isEmpty();
-        }
-
         @Override
         public void init()
         {
