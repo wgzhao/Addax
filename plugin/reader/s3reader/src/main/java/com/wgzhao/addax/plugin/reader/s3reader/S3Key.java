@@ -15,4 +15,6 @@ public class S3Key extends Key
     public static final String BUCKET = "bucket";
 
     public static final String OBJECT = "object";
+
+    public static final String PATH_STYLE_ACCESS_ENABLED = "pathStyleAccessEnabled";
 }

@@ -18,6 +18,7 @@ public class S3Util
         Region region = Region.of(regionStr);
         String accessId = conf.getString(S3Key.ACCESS_ID);
         String accessKey = conf.getString(S3Key.ACCESS_KEY);
+        boolean pathStyleAccessEnabled = conf.getBool(S3Key.PATH_STYLE_ACCESS_ENABLED, false);
 
         try {
             AwsBasicCredentials awsCreds = AwsBasicCredentials.create(accessId, accessKey);
@@ -25,6 +26,7 @@ public class S3Util
                     .credentialsProvider(StaticCredentialsProvider.create(awsCreds))
                     .region(region)
                     .endpointOverride(URI.create(conf.getString(S3Key.ENDPOINT)))
+                    .forcePathStyle(pathStyleAccessEnabled)
                     .build();
         } catch (IllegalArgumentException e) {
             throw AddaxException.asAddaxException(
