@@ -1,0 +1,6 @@
+{
+  "name": "icebergwriter",
+  "class": "com.wgzhao.addax.plugin.writer.icebergwriter.IcebergWriter",
+  "description": "write data to iceberg",
+  "developer": "awol2005ex"
+}
