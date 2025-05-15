@@ -35,6 +35,7 @@ CORE_JSON="${ADDAX_HOME}/conf/core.json"
 
 DEFAULT_PROPERTY_CONF="-Dfile.encoding=UTF-8 -Djava.security.egd=file:///dev/urandom -Daddax.home=${ADDAX_HOME} -Dlogback.configurationFile=${LOGBACK_FILE}"
 REMOTE_DEBUG_CONFIG="-Xdebug -Xrunjdwp:transport=dt_socket,server=y,address=0.0.0.0:${DEBUG_PORT}"
+JAVA_OPTS="$JAVA_OPTS -XX:+UseG1GC -XX:MaxGCPauseMillis=200 -XX:InitiatingHeapOccupancyPercent=75"
 
 # ------------------------------ Global Variables ---------------------------------
 CUST_JVM=""
@@ -160,18 +161,6 @@ check_jdk_version() {
     if [ "$jdk_version" -lt 17 ]; then
         echo "Error: JDK version $jdk_version is not supported. Please use JDK 17 or higher."
         exit 1
-    fi
-}
-
-# Setup GC options based on JDK version
-setup_gc_opts() {
-    local jdk_version=$(java -version 2>&1 | head -n 1 | grep -o -E '\"[^\"]+\"' | sed 's/"//g' | cut -d '.' -f 1)
-    if [ "$jdk_version" -eq 8 ]; then
-        JAVA_OPTS="$JAVA_OPTS -XX:+UseConcMarkSweepGC -XX:+CMSParallelRemarkEnabled -XX:MaxTenuringThreshold=15"
-    elif [ "$jdk_version" -ge 17 ]; then
-        JAVA_OPTS="$JAVA_OPTS -XX:+UseG1GC -XX:MaxGCPauseMillis=200 -XX:InitiatingHeapOccupancyPercent=75"
-    else
-        JAVA_OPTS="$JAVA_OPTS -XX:+UseG1GC"
     fi
 }
 
@@ -351,7 +340,6 @@ JOB_FILE="${1}"
 check_jdk_version
 parse_job_file
 gen_log_file
-setup_gc_opts
 
 PARAMS=" ${DEFAULT_PROPERTY_CONF} -Dloglevel=${LOG_LEVEL} -Daddax.log=${LOG_DIR} -Dlog.file.name=${LOG_FILE} ${PARAMS}"
 cmd="java -server ${DEFAULT_JVM} -classpath ${CLASS_PATH} $JAVA_OPTS ${CUST_JVM} ${PARAMS}"
