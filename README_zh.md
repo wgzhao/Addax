@@ -215,7 +215,7 @@ Failed record             :                   0
 
 ## 运行要求
 
-- JDK 1.8+ / JDK 17
+- JDK 17 or later
 - Python 2.7+ / Python 3.7+ (Windows)
 
 ## 文档

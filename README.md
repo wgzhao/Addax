@@ -154,7 +154,7 @@ Explore more [example jobs](docs/assets/jobs)
 
 ## 📖 Runtime Requirements
 
-- **Java Runtime**: JDK 1.8 / JDK 17
+- **Java Runtime**:  JDK 17
 - **Python Version**: Python 2.7+ / 3.7+ (Windows only)
 
 ---
