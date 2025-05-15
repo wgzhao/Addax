@@ -446,7 +446,7 @@
                 <exclude>**/addax-common*.jar</exclude>
             </excludes>
             <fileMode>0644</fileMode>
-            <outputDirectory>addax-${project.version}</outputDirectory>
+            <outputDirectory>/</outputDirectory>
         </fileSet>
         <fileSet>
             <directory>plugin/writer/influxdbwriter/target/influxdbwriter-${project.version}/</directory>
