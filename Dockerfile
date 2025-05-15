@@ -1,5 +1,5 @@
 # define an alias
-FROM maven:3.8.3-jdk-8 AS build
+FROM maven:3.8.3-openjdk-17 AS build
 
 ARG use_cn=0
 
@@ -31,7 +31,7 @@ RUN <<EOF
     ./shrink_package.sh 
 EOF
 
-FROM openjdk:8u232-jre-stretch
+FROM eclipse-temurin:17-jre-noble
 LABEL maintainer="wgzhao <wgzhao@gmail.com>"
 LABEL version="latest"
 LABEL description="Addax is a versatile open-source ETL tool that can seamlessly transfer data between various RDBMS and NoSQL databases, making it an ideal solution for data migration."

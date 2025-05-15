@@ -135,53 +135,25 @@ public class TextWriter
                             columnsConfiguration.get(i).getString(Key.TYPE).toUpperCase());
                     try {
                         switch (columnType) {
-                            case TINYINT:
-                                recordList.add(Byte.valueOf(rowData));
-                                break;
-                            case SMALLINT:
-                                recordList.add(Short.valueOf(rowData));
-                                break;
-                            case INT:
-                            case INTEGER:
-                                recordList.add(Integer.valueOf(rowData));
-                                break;
-                            case BIGINT:
-                                recordList.add(column.asLong());
-                                break;
-                            case FLOAT:
-                                recordList.add(Float.valueOf(rowData));
-                                break;
-                            case DOUBLE:
-                                recordList.add(column.asDouble());
-                                break;
-                            case STRING:
-                            case VARCHAR:
-                            case CHAR:
-                                recordList.add(column.asString());
-                                break;
-                            case DECIMAL:
-                                recordList.add(HiveDecimal.create(column.asBigDecimal()));
-                                break;
-                            case BOOLEAN:
-                                recordList.add(column.asBoolean());
-                                break;
-                            case DATE:
-                                recordList.add(org.apache.hadoop.hive.common.type.Date.valueOf(column.asString()));
-                                break;
-                            case TIMESTAMP:
-                                recordList.add(Timestamp.valueOf(column.asString()));
-                                break;
-                            case BINARY:
-                                recordList.add(column.asBytes());
-                                break;
-                            default:
-                                throw AddaxException.asAddaxException(
-                                        NOT_SUPPORT_TYPE,
-                                        String.format(
-                                                "The configuration is incorrect. The database does not support writing this type of field. " +
-                                                        "Field name: [%s], field type: [%s].",
-                                                columnsConfiguration.get(i).getString(Key.NAME),
-                                                columnsConfiguration.get(i).getString(Key.TYPE)));
+                            case TINYINT -> recordList.add(Byte.valueOf(rowData));
+                            case SMALLINT -> recordList.add(Short.valueOf(rowData));
+                            case INT, INTEGER -> recordList.add(Integer.valueOf(rowData));
+                            case BIGINT -> recordList.add(column.asLong());
+                            case FLOAT -> recordList.add(Float.valueOf(rowData));
+                            case DOUBLE -> recordList.add(column.asDouble());
+                            case STRING, VARCHAR, CHAR -> recordList.add(column.asString());
+                            case DECIMAL -> recordList.add(HiveDecimal.create(column.asBigDecimal()));
+                            case BOOLEAN -> recordList.add(column.asBoolean());
+                            case DATE -> recordList.add(org.apache.hadoop.hive.common.type.Date.valueOf(column.asString()));
+                            case TIMESTAMP -> recordList.add(Timestamp.valueOf(column.asString()));
+                            case BINARY -> recordList.add(column.asBytes());
+                            default -> throw AddaxException.asAddaxException(
+                                    NOT_SUPPORT_TYPE,
+                                    String.format(
+                                            "The configuration is incorrect. The database does not support writing this type of field. " +
+                                                    "Field name: [%s], field type: [%s].",
+                                            columnsConfiguration.get(i).getString(Key.NAME),
+                                            columnsConfiguration.get(i).getString(Key.TYPE)));
                         }
                     }
                     catch (Exception e) {

@@ -4,7 +4,7 @@
 
     <groupId>com.wgzhao.addax</groupId>
     <artifactId>addax-all</artifactId>
-    <version>5.1.2-SNAPSHOT</version>
+    <version>5.1.3-SNAPSHOT</version>
     <name>addax-all</name>
     <description>Addax: a versatile open-source ETL tool</description>
     <packaging>pom</packaging>
@@ -118,9 +118,11 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
         <maven.compiler.encoding>UTF-8</maven.compiler.encoding>
-        <jdk.version>1.8</jdk.version>
-        <maven.compiler.source>1.8</maven.compiler.source>
-        <maven.compiler.target>1.8</maven.compiler.target>
+        <jdk.version>17</jdk.version>
+        <maven.compiler.source>17</maven.compiler.source>
+        <maven.compiler.target>17</maven.compiler.target>
+        <maven.compiler.release>17</maven.compiler.release>
+        <maven.compiler.showDeprecation>true</maven.compiler.showDeprecation>
     </properties>
 
     <modules>
@@ -1334,6 +1336,9 @@
                         <version>2.15.0</version>
                     </dependency>
                 </dependencies>
+                <configuration>
+                    <release>${maven.compiler.release}</release>
+                </configuration>
             </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>

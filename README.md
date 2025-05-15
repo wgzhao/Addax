@@ -126,7 +126,9 @@ Install Addax with a single command:
 
 ### 3. Compile and Package from Source
 
-For developers targeting custom-builds, compile and package Addax locally:
+- **Java Compiler**: JDK 17
+
+For developers aiming to create custom-builds, compile and package Addax locally:
 
 ```shell
 git clone https://github.com/wgzhao/addax.git addax
@@ -152,7 +154,7 @@ Explore more [example jobs](docs/assets/jobs)
 
 ## 📖 Runtime Requirements
 
-- **Java Runtime**: JDK 1.8+
+- **Java Runtime**:  JDK 17
 - **Python Version**: Python 2.7+ / 3.7+ (Windows only)
 
 ---

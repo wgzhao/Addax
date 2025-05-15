@@ -111,12 +111,8 @@ public class MyOrcReader
                 for (ColumnEntry column : columnEntries) {
                     Column columnGenerated;
                     if (column.getValue() != null) {
-                        if (!"null".equals(column.getValue())) {
-                            columnGenerated = new StringColumn(column.getValue());
-                        }
-                        else {
-                            columnGenerated = new StringColumn(nullFormat);
-                        }
+                        columnGenerated = "null".equals(column.getValue()) ?
+                            new StringColumn(nullFormat) : new StringColumn(column.getValue());
                         record.addColumn(columnGenerated);
                         continue;
                     }
@@ -128,32 +124,27 @@ public class MyOrcReader
                         record.addColumn(new StringColumn(null));
                         continue;
                     }
-                    if (type == ARRAY) {
-                        columnGenerated = getArrayColumn(nullFormat, (ListColumnVector) col, row);
-                    }
-                    else if (type == MAP) {
-                        columnGenerated = getMapColumn(nullFormat, (MapColumnVector) col, row);
-                    }
-                    else {
-                        columnGenerated = getPrimitiveColumn(nullFormat, type, col, row);
-                    }
+
+                    columnGenerated = switch (type) {
+                        case ARRAY -> getArrayColumn(nullFormat, (ListColumnVector) col, row);
+                        case MAP -> getMapColumn(nullFormat, (MapColumnVector) col, row);
+                        default -> getPrimitiveColumn(nullFormat, type, col, row);
+                    };
                     record.addColumn(columnGenerated);
                 }
                 recordSender.sendToWriter(record);
             }
             catch (Exception e) {
-                if (e instanceof AddaxException) {
-                    throw (AddaxException) e;
+                if (e instanceof AddaxException ae) {
+                    throw ae;
                 }
                 taskPluginCollector.collectDirtyRecord(record, e.getMessage());
             }
         }
     }
 
-    private static @NotNull Column getMapColumn(String nullFormat, MapColumnVector col, int row)
-    {
-        Column columnGenerated;
-        StringBuilder mapBuilder = new StringBuilder("{");
+    private static @NotNull Column getMapColumn(String nullFormat, MapColumnVector col, int row) {
+        var mapBuilder = new StringBuilder("{");
         // all value type must be same
         for (int j = (int) col.offsets[row]; j < col.offsets[row] + col.lengths[row]; j++) {
             if (j > col.offsets[row]) {
@@ -161,83 +152,62 @@ public class MyOrcReader
             }
 
             // The key must be string
-            String key = ((BytesColumnVector) col.keys).toString(j);
+            var key = ((BytesColumnVector) col.keys).toString(j);
+            mapBuilder.append("\"%s\": ".formatted(key));
 
-            mapBuilder.append("\"").append(key).append("\": ");
-            ColumnVector valueCol = col.values;
+            var valueCol = col.values;
             if (valueCol.isNull[j]) {
                 mapBuilder.append(nullFormat);
             }
             else {
-                StringBuilder sb = new StringBuilder();
+                var sb = new StringBuilder();
                 valueCol.stringifyValue(sb, j);
                 mapBuilder.append(sb);
             }
         }
-        mapBuilder.append("}");
-        columnGenerated = new StringColumn(mapBuilder.toString());
-        return columnGenerated;
+        return new StringColumn(mapBuilder.append("}").toString());
     }
 
-    private static @NotNull Column getArrayColumn(String nullFormat, ListColumnVector col, int row)
-    {
-        Column columnGenerated;
-        StringJoiner joiner = new StringJoiner(", ");
-
-        for (int j = (int) col.offsets[row]; j < col.offsets[row] + col.lengths[row]; j++) {
-            ColumnVector childCol = col.child;
+    private static @NotNull Column getArrayColumn(String nullFormat, ListColumnVector col, int row) {
+        var joiner = new StringJoiner(", ");
+        for (var j = (int) col.offsets[row]; j < col.offsets[row] + col.lengths[row]; j++) {
+            var childCol = col.child;
             if (childCol.isNull[j]) {
                 joiner.add(nullFormat);
             }
             else {
-                StringBuilder sb = new StringBuilder();
-                childCol.stringifyValue(sb, j);;
-                joiner.add(sb);
+                var sb = new StringBuilder();
+                childCol.stringifyValue(sb, j);
+                joiner.add(sb.toString());
             }
         }
-        // convert the result to array string
-        columnGenerated = new StringColumn("[" + joiner + "]");
-        return columnGenerated;
+        return new StringColumn("[%s]".formatted(joiner));
     }
 
-    private static @NotNull Column getPrimitiveColumn(String nullFormat, JavaType type, ColumnVector col, int row)
-    {
-        Column columnGenerated;
-        switch (type) {
-            case INT:
-            case LONG:
-            case BOOLEAN:
-            case BIGINT:
-                columnGenerated = new LongColumn(((LongColumnVector) col).vector[row]);
-                break;
-            case DATE:
-                // java.sql.Date is yyyy-MM-dd, but the java Date including time
-                // convert the java.sql.Date to string
-                Date date = new Date(((LongColumnVector) col).vector[row] * 86400 * 1000);
-                SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
-                columnGenerated = new StringColumn(sdf.format(date));
-                break;
-            case FLOAT:
-            case DOUBLE:
-                columnGenerated = new DoubleColumn(((DoubleColumnVector) col).vector[row]);
-                break;
-            case DECIMAL:
-                columnGenerated = new DoubleColumn(((DecimalColumnVector) col).vector[row].doubleValue());
-                break;
-            case BINARY:
-                BytesColumnVector b = (BytesColumnVector) col;
-                byte[] val = Arrays.copyOfRange(b.vector[row], b.start[row], b.start[row] + b.length[row]);
-                columnGenerated = new BytesColumn(val);
-                break;
-            case TIMESTAMP:
-                columnGenerated = new TimestampColumn(((TimestampColumnVector) col).getTime(row));
-                break;
-            default:
-                // type is string or other
-                String v = ((BytesColumnVector) col).toString(row);
-                columnGenerated = v.equals(nullFormat) ? new StringColumn() : new StringColumn(v);
-                break;
-        }
-        return columnGenerated;
+    private static @NotNull Column getPrimitiveColumn(String nullFormat, JavaType type, ColumnVector col, int row) {
+        return switch (type) {
+            case INT, LONG, BOOLEAN, BIGINT ->
+                new LongColumn(((LongColumnVector) col).vector[row]);
+            case DATE -> {
+                var date = new Date(((LongColumnVector) col).vector[row] * 86400 * 1000);
+                var sdf = new SimpleDateFormat("yyyy-MM-dd");
+                yield new StringColumn(sdf.format(date));
+            }
+            case FLOAT, DOUBLE ->
+                new DoubleColumn(((DoubleColumnVector) col).vector[row]);
+            case DECIMAL ->
+                new DoubleColumn(((DecimalColumnVector) col).vector[row].doubleValue());
+            case BINARY -> {
+                var b = (BytesColumnVector) col;
+                var val = Arrays.copyOfRange(b.vector[row], b.start[row], b.start[row] + b.length[row]);
+                yield new BytesColumn(val);
+            }
+            case TIMESTAMP ->
+                new TimestampColumn(((TimestampColumnVector) col).getTime(row));
+            default -> {
+                var v = ((BytesColumnVector) col).toString(row);
+                yield v.equals(nullFormat) ? new StringColumn() : new StringColumn(v);
+            }
+        };
     }
 }

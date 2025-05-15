@@ -72,6 +72,16 @@ import static com.wgzhao.addax.core.spi.ErrorCode.REQUIRED_VALUE;
 public class HttpReader
         extends Reader
 {
+    // Use record for page configuration
+    private record PageConfig(String sizeKey, String indexKey, int initialSize, int initialIndex)
+    {
+        static PageConfig defaultConfig()
+        {
+            return new PageConfig(HttpKey.PAGE_SIZE, HttpKey.PAGE_INDEX,
+                    Task.DEFAULT_PAGE_SIZE, Task.DEFAULT_PAGE_INDEX);
+        }
+    }
+
     public static class Job
             extends Reader.Job
     {
@@ -143,121 +153,111 @@ public class HttpReader
         @Override
         public void startRead(RecordSender recordSender)
         {
-            boolean isPage = readerSliceConfig.getBool(HttpKey.IS_PAGE, false);
-            // the pageSize key, different pagination API may have different key, such as pageSize, page_size, size
-            String paramPageSize = HttpKey.PAGE_SIZE;
-            // the pageIndex key, different pagination API may have different key, such as pageIndex, page_index, page
-            String paramPageIndex = HttpKey.PAGE_INDEX;
-            // the pageSize value
-            int valPageSize = DEFAULT_PAGE_SIZE;
-            // the first page index
-            int valPageIndex = DEFAULT_PAGE_INDEX;
+            var isPage = readerSliceConfig.getBool(HttpKey.IS_PAGE, false);
             if (isPage) {
-                Configuration pageParams = readerSliceConfig.getConfiguration(HttpKey.PAGE_PARAMS);
-                if (pageParams != null) {
-                    if (pageParams.getString(HttpKey.PAGE_INDEX, null) != null) {
-                        Map<String, Object> p = pageParams.getMap(HttpKey.PAGE_INDEX);
-                        paramPageIndex = p.getOrDefault("key", HttpKey.PAGE_INDEX).toString();
-                        valPageIndex = Integer.parseInt(p.getOrDefault("value", DEFAULT_PAGE_INDEX).toString());
-                    }
-                    if (pageParams.getString(HttpKey.PAGE_SIZE, null) != null) {
-                        Map<String, Object> p = pageParams.getMap(HttpKey.PAGE_SIZE);
-                        paramPageSize = p.getOrDefault("key", HttpKey.PAGE_SIZE).toString();
-                        valPageSize = Integer.parseInt(p.getOrDefault("value", DEFAULT_PAGE_SIZE).toString());
-                    }
-                }
-                int realPageSize;
-                uriBuilder.setParameter(paramPageSize, String.valueOf(valPageSize));
-                while (true) {
-                    uriBuilder.setParameter(paramPageIndex, String.valueOf(valPageIndex));
-                    realPageSize = getRecords(recordSender);
-                    if (realPageSize < valPageSize) {
-                        // means no more data
-                        break;
-                    }
-                    valPageIndex++;
-                }
+                processPagedRequest(recordSender);
             }
             else {
                 getRecords(recordSender);
             }
         }
 
-        private int getRecords(RecordSender recordSender)
+        private void processPagedRequest(RecordSender recordSender)
         {
-            String encoding = readerSliceConfig.getString(HttpKey.ENCODING, null);
-            Charset charset;
-            if (encoding != null) {
-                charset = Charset.forName(encoding);
+            var pageConfig = getPageConfig();
+            var pageSize = pageConfig.initialSize();
+            var pageIndex = pageConfig.initialIndex();
+
+            uriBuilder.setParameter(pageConfig.sizeKey(), String.valueOf(pageSize));
+            while (true) {
+                uriBuilder.setParameter(pageConfig.indexKey(), String.valueOf(pageIndex));
+                var realPageSize = getRecords(recordSender);
+                if (realPageSize < pageSize) {
+                    break;
+                }
+                pageIndex++;
             }
-            else {
-                charset = StandardCharsets.UTF_8;
+        }
+
+        private PageConfig getPageConfig()
+        {
+            var pageParams = readerSliceConfig.getConfiguration(HttpKey.PAGE_PARAMS);
+            if (pageParams == null) {
+                return PageConfig.defaultConfig();
             }
 
+            var indexConfig = pageParams.getString(HttpKey.PAGE_INDEX) != null ?
+                    pageParams.getMap(HttpKey.PAGE_INDEX) : Map.of();
+            var sizeConfig = pageParams.getString(HttpKey.PAGE_SIZE) != null ?
+                    pageParams.getMap(HttpKey.PAGE_SIZE) : Map.of();
+
+            return new PageConfig(
+                    (String) sizeConfig.getOrDefault("key", HttpKey.PAGE_SIZE),
+                    (String) indexConfig.getOrDefault("key", HttpKey.PAGE_INDEX),
+                    Integer.parseInt(sizeConfig.getOrDefault("value", DEFAULT_PAGE_SIZE).toString()),
+                    Integer.parseInt(indexConfig.getOrDefault("value", DEFAULT_PAGE_INDEX).toString())
+            );
+        }
+
+        private int getRecords(RecordSender recordSender)
+        {
+            var charset = Charset.forName(readerSliceConfig.getString(HttpKey.ENCODING, StandardCharsets.UTF_8.name()));
+
             try {
-                LOG.info("Requesting: {}", uriBuilder.build().toString());
+                LOG.info("Requesting: {}", uriBuilder.build());
                 request = Request.create(method, uriBuilder.build());
             }
             catch (URISyntaxException e) {
-                throw AddaxException.asAddaxException(
-                        ILLEGAL_VALUE, e.getMessage()
-                );
+                throw AddaxException.asAddaxException(ILLEGAL_VALUE,
+                        "Invalid URI: %s".formatted(e.getMessage()));
             }
 
-            String body = createCloseableHttpResponse().asString(charset);
+            var body = createCloseableHttpResponse().asString(charset);
+            var resultKey = readerSliceConfig.getString(HttpKey.RESULT_KEY, "");
+            var jsonData = resultKey.isEmpty() ?
+                    JSON.parse(body) :
+                    JSONPath.eval(JSON.parse(body), "$." + resultKey);
             JSONArray jsonArray = null;
-            String key = readerSliceConfig.getString(HttpKey.RESULT_KEY, null);
-            Object object;
-            if (key != null && !key.isEmpty()) {
-                object = JSONPath.eval(JSON.parse(body), "$." + key);
+            if (jsonData instanceof JSONArray) {
+                jsonArray = JSON.parseArray(JSONObject.toJSONString(jsonData, JSONWriter.Feature.WriteMapNullValue));
             }
-            else {
-                object = JSON.parse(body);
-            }
-            // judge the result is a single record or multiple records
-            // if it is a single record, it is a map, otherwise it is an array
-            if (object instanceof JSONArray) {
-                // https://github.com/wgzhao/Addax/issues/171
-                jsonArray = JSON.parseArray(JSONObject.toJSONString(object, JSONWriter.Feature.WriteMapNullValue));
-            }
-            else if (object instanceof JSONObject) {
+            else if (jsonData instanceof JSONObject) {
                 jsonArray = new JSONArray();
-                jsonArray.add(object);
+                jsonArray.add(jsonData);
             }
+
             if (jsonArray == null || jsonArray.isEmpty()) {
-                // empty result
                 return 0;
             }
 
-            List<String> columns = readerSliceConfig.getList(HttpKey.COLUMN, String.class);
+            var columns = readerSliceConfig.getList(HttpKey.COLUMN, String.class);
             if (columns == null || columns.isEmpty()) {
                 throw AddaxException.asAddaxException(REQUIRED_VALUE,
-                        "The parameter [" + HttpKey.COLUMN + "] is not set."
-                );
+                        "The parameter [%s] is required".formatted(HttpKey.COLUMN));
             }
-            Record record;
-            JSONObject jsonObject = jsonArray.getJSONObject(0);
+
+            // Handle column extraction
             if (columns.size() == 1 && "*".equals(columns.get(0))) {
-                // if no key is given, extract the first layer key of JSON as the field
-                columns.remove(0);
-                columns.addAll(jsonObject.keySet());
+                columns = new ArrayList<>(jsonArray.getJSONObject(0).keySet());
             }
-            int i;
-            for (i = 0; i < jsonArray.size(); i++) {
-                jsonObject = jsonArray.getJSONObject(i);
-                record = recordSender.createRecord();
-                for (String k : columns) {
-                    Object v = JSONPath.eval(jsonObject, k);
-                    if (v == null) {
-                        record.addColumn(new StringColumn());
-                    }
-                    else {
-                        record.addColumn(new StringColumn(v.toString()));
-                    }
-                }
+
+            return processJsonArray(jsonArray, columns, recordSender);
+        }
+
+        private int processJsonArray(JSONArray jsonArray, List<String> columns, RecordSender recordSender)
+        {
+            for (int i = 0; i < jsonArray.size(); i++) {
+                var record = recordSender.createRecord();
+                var jsonObject = jsonArray.getJSONObject(i);
+
+                columns.forEach(column -> {
+                    var value = JSONPath.eval(jsonObject, column);
+                    record.addColumn(new StringColumn(value != null ? value.toString() : null));
+                });
+
                 recordSender.sendToWriter(record);
             }
-            return i;
+            return jsonArray.size();
         }
 
         private void setProxy(Configuration proxyConf)
@@ -287,7 +287,7 @@ public class HttpReader
         {
             readerSliceConfig.getMap(HttpKey.HEADERS, new HashMap<>())
                     .forEach((k, v) -> request.addHeader(k, v.toString()));
-            try(CloseableHttpClient httpClient = createCloseableHttpClient()) {
+            try (CloseableHttpClient httpClient = createCloseableHttpClient()) {
                 return Executor.newInstance(httpClient)
                         .execute(request)
                         .returnContent();
@@ -310,6 +310,9 @@ public class HttpReader
                 // Create credential pair
                 UsernamePasswordCredentials credentials = new UsernamePasswordCredentials(username, password.toCharArray());
                 // Inject the credentials
+                if (credsProvider == null) {
+                    credsProvider =  new BasicCredentialsProvider();
+                }
                 credsProvider.setCredentials(new AuthScope(target), credentials);
             }
 

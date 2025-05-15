@@ -19,7 +19,6 @@
 
 package com.wgzhao.addax.plugin.reader.mongodbreader;
 
-
 import com.mongodb.client.MongoClient;
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoCursor;
@@ -42,7 +41,6 @@ import com.wgzhao.addax.plugin.reader.mongodbreader.util.MongoUtil;
 import org.bson.Document;
 import org.bson.types.ObjectId;
 
-import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 
@@ -132,9 +130,90 @@ public class MongoDBReader
         private boolean isObjectId = true;
         private int fetchSize;
 
+        private record MongoQueryFilter(Document filter, boolean isObjectId) {}
+
         private boolean notNullAndEmpty(String obj)
         {
             return obj != null && !obj.isEmpty();
+        }
+
+        private MongoQueryFilter buildQueryFilter()
+        {
+            Document filter = new Document();
+            if (lowerBound.equals("min")) {
+                if (!upperBound.equals("max")) {
+                    filter.append(KeyConstant.MONGO_PRIMARY_ID,
+                            new Document("$lt", isObjectId ? new ObjectId(upperBound.toString()) : upperBound));
+                }
+            }
+            else if (upperBound.equals("max")) {
+                filter.append(KeyConstant.MONGO_PRIMARY_ID,
+                        new Document("$gte", isObjectId ? new ObjectId(lowerBound.toString()) : lowerBound));
+            }
+            else {
+                filter.append(KeyConstant.MONGO_PRIMARY_ID,
+                        new Document("$gte", isObjectId ? new ObjectId(lowerBound.toString()) : lowerBound)
+                                .append("$lt", isObjectId ? new ObjectId(upperBound.toString()) : upperBound));
+            }
+
+            if (query != null && !query.isEmpty()) {
+                Document queryFilter = Document.parse(query);
+                filter = new Document("$and", List.of(filter, queryFilter));
+            }
+
+            return new MongoQueryFilter(filter, isObjectId);
+        }
+
+        private void addColumnToRecord(Record record, Document item, String column)
+        {
+            if (column.startsWith("'")) {
+                record.addColumn(new StringColumn(column.replace("'", "")));
+                return;
+            }
+
+            try {
+                Double numValue = Double.parseDouble(column);
+                record.addColumn(column.contains(".") ?
+                        new DoubleColumn(numValue) :
+                        new LongColumn(Long.parseLong(column)));
+                return;
+            }
+            catch (NumberFormatException ignored) {
+                // Not a number, continue with normal processing
+            }
+
+            if (!item.containsKey(column)) {
+                record.addColumn(new StringColumn());
+                return;
+            }
+
+            Object tempCol = item.get(column);
+            if (tempCol == null) {
+                record.addColumn(new StringColumn());
+                return;
+            }
+
+            if (tempCol instanceof Double d) {
+                record.addColumn(new DoubleColumn(d));
+            }
+            else if (tempCol instanceof Boolean b) {
+                record.addColumn(new BoolColumn(b));
+            }
+            else if (tempCol instanceof Date d) {
+                record.addColumn(new DateColumn(d));
+            }
+            else if (tempCol instanceof Integer i) {
+                record.addColumn(new LongColumn(i));
+            }
+            else if (tempCol instanceof Long l) {
+                record.addColumn(new LongColumn(l));
+            }
+            else if (tempCol instanceof Document doc) {
+                record.addColumn(new StringColumn(doc.toJson()));
+            }
+            else {
+                record.addColumn(new StringColumn(tempCol.toString()));
+            }
         }
 
         @Override
@@ -147,87 +226,21 @@ public class MongoDBReader
                 throw AddaxException.asAddaxException(ILLEGAL_VALUE,
                         ILLEGAL_VALUE.getDescription());
             }
+
             MongoDatabase db = mongoClient.getDatabase(database);
             MongoCollection<Document> col = db.getCollection(this.collection);
 
-            MongoCursor<Document> dbCursor;
-            Document filter = new Document();
-            if (lowerBound.equals("min")) {
-                if (!upperBound.equals("max")) {
-                    filter.append(KeyConstant.MONGO_PRIMARY_ID, new Document("$lt", isObjectId ? new ObjectId(upperBound.toString()) : upperBound));
+            MongoQueryFilter queryFilter = buildQueryFilter();
+            try (MongoCursor<Document> dbCursor = col.find(queryFilter.filter())
+                    .batchSize(fetchSize)
+                    .iterator()) {
+
+                while (dbCursor.hasNext()) {
+                    Document item = dbCursor.next();
+                    Record record = recordSender.createRecord();
+                    mongodbColumnMeta.forEach(column -> addColumnToRecord(record, item, column));
+                    recordSender.sendToWriter(record);
                 }
-            }
-            else if (upperBound.equals("max")) {
-                filter.append(KeyConstant.MONGO_PRIMARY_ID, new Document("$gte", isObjectId ? new ObjectId(lowerBound.toString()) : lowerBound));
-            }
-            else {
-                filter.append(KeyConstant.MONGO_PRIMARY_ID, new Document("$gte", isObjectId ? new ObjectId(lowerBound.toString()) : lowerBound)
-                        .append("$lt", isObjectId ? new ObjectId(upperBound.toString()) : upperBound));
-            }
-            if (notNullAndEmpty((query))) {
-                Document queryFilter = Document.parse(query);
-                filter = new Document("$and", Arrays.asList(filter, queryFilter));
-            }
-            dbCursor = col.find(filter).batchSize(fetchSize).iterator();
-            Document item;
-
-            while (dbCursor.hasNext()) {
-                item = dbCursor.next();
-                Record record = recordSender.createRecord();
-
-                for (String column : mongodbColumnMeta) {
-                    // assume: The field name CANNOT all consist of numbers
-                    // TODO more elegant solution
-                    if (column.startsWith("'")) {
-                        record.addColumn(new StringColumn(column.replace("'", "")));
-                        continue;
-                    }
-                    try {
-                        Double a = Double.parseDouble(column);
-                        if (column.contains(".")) {
-                            record.addColumn(new DoubleColumn(a));
-                        }
-                        else {
-                            record.addColumn(new LongColumn(Long.parseLong(column)));
-                        }
-                        continue;
-                    }
-                    catch (NumberFormatException ignore) {
-
-                    }
-                    if (!item.containsKey(column)) {
-                        record.addColumn(new StringColumn());
-                        continue;
-                    }
-                    Object tempCol = item.get(column);
-                    if (tempCol == null) {
-                        record.addColumn(new StringColumn());
-                        continue;
-                    }
-
-                    if (tempCol instanceof Double) {
-                        record.addColumn(new DoubleColumn((Double) tempCol));
-                    }
-                    else if (tempCol instanceof Boolean) {
-                        record.addColumn(new BoolColumn((Boolean) tempCol));
-                    }
-                    else if (tempCol instanceof Date) {
-                        record.addColumn(new DateColumn((Date) tempCol));
-                    }
-                    else if (tempCol instanceof Integer) {
-                        record.addColumn(new LongColumn((Integer) tempCol));
-                    }
-                    else if (tempCol instanceof Long) {
-                        record.addColumn(new LongColumn((Long) tempCol));
-                    }
-                    else if (tempCol instanceof Document) {
-                        record.addColumn(new StringColumn(((Document) tempCol).toJson()));
-                    }
-                    else {
-                        record.addColumn(new StringColumn(tempCol.toString()));
-                    }
-                }
-                recordSender.sendToWriter(record);
             }
         }
 

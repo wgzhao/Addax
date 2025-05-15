@@ -25,23 +25,21 @@ import com.wgzhao.addax.core.exception.AddaxException;
 import com.wgzhao.addax.core.plugin.RecordReceiver;
 import com.wgzhao.addax.core.spi.Writer;
 import com.wgzhao.addax.core.util.Configuration;
-import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.BufferedWriter;
-import java.io.File;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
-import static com.wgzhao.addax.core.spi.ErrorCode.CONFIG_ERROR;
 import static com.wgzhao.addax.core.spi.ErrorCode.ILLEGAL_VALUE;
 import static com.wgzhao.addax.core.spi.ErrorCode.IO_ERROR;
 import static com.wgzhao.addax.core.spi.ErrorCode.PERMISSION_ERROR;
@@ -49,25 +47,19 @@ import static com.wgzhao.addax.core.spi.ErrorCode.PERMISSION_ERROR;
 public class StreamWriter
         extends Writer
 {
+
     private static String buildFilePath(String path, String fileName)
     {
-        boolean isEndWithSeparator = false;
-        switch (IOUtils.DIR_SEPARATOR) {
-            case IOUtils.DIR_SEPARATOR_UNIX:
-                isEndWithSeparator = path.endsWith(String
-                        .valueOf(IOUtils.DIR_SEPARATOR));
-                break;
-            case IOUtils.DIR_SEPARATOR_WINDOWS:
-                isEndWithSeparator = path.endsWith(String
-                        .valueOf(IOUtils.DIR_SEPARATOR_WINDOWS));
-                break;
-            default:
-                break;
-        }
+        boolean isEndWithSeparator = switch (IOUtils.DIR_SEPARATOR) {
+            case IOUtils.DIR_SEPARATOR_UNIX -> path.endsWith(String.valueOf(IOUtils.DIR_SEPARATOR));
+            case IOUtils.DIR_SEPARATOR_WINDOWS -> path.endsWith(String.valueOf(IOUtils.DIR_SEPARATOR_WINDOWS));
+            default -> false;
+        };
+
         if (!isEndWithSeparator) {
             path = path + IOUtils.DIR_SEPARATOR;
         }
-        return String.format("%s%s", path, fileName);
+        return "%s%s".formatted(path, fileName);
     }
 
     public static class Job
@@ -84,7 +76,7 @@ public class StreamWriter
             String path = this.originalConfig.getString(StreamKey.PATH, null);
             String fileName = this.originalConfig.getString(StreamKey.FILE_NAME, null);
 
-            if (StringUtils.isNoneBlank(path) && StringUtils.isNoneBlank(fileName)) {
+            if (StringUtils.isNoneBlank(path, fileName)) {
                 validateParameter(path, fileName);
             }
         }
@@ -92,39 +84,22 @@ public class StreamWriter
         private void validateParameter(String path, String fileName)
         {
             try {
-                File dir = new File(path);
-                if (dir.isFile()) {
-                    throw AddaxException
-                            .asAddaxException(
-                                    ILLEGAL_VALUE,
-                                   "The path you configured is a file, not a directory.");
-                }
-                if (!dir.exists()) {
-                    boolean createdOk = dir.mkdirs();
-                    if (!createdOk) {
-                        throw AddaxException
-                                .asAddaxException(
-                                        CONFIG_ERROR,
-                                        "Failed to create directory: " + path);
-                    }
+                Path dirPath = Path.of(path);
+                if (Files.isRegularFile(dirPath)) {
+                    throw AddaxException.asAddaxException(ILLEGAL_VALUE,
+                            "The path you configured is a file, not a directory.");
                 }
 
-                String fileFullPath = buildFilePath(path, fileName);
-                File newFile = new File(fileFullPath);
-                if (newFile.exists()) {
-                    try {
-                        FileUtils.forceDelete(newFile);
-                    }
-                    catch (IOException e) {
-                        throw AddaxException.asAddaxException(
-                                IO_ERROR,
-                                "Failed to delete file: ", e);
-                    }
-                }
+                Files.createDirectories(dirPath);
+
+                Path filePath = Path.of(buildFilePath(path, fileName));
+                Files.deleteIfExists(filePath);
+            }
+            catch (IOException e) {
+                throw AddaxException.asAddaxException(IO_ERROR, "Failed to create directory or delete file", e);
             }
             catch (SecurityException se) {
-                throw AddaxException.asAddaxException(
-                        PERMISSION_ERROR,
+                throw AddaxException.asAddaxException(PERMISSION_ERROR,
                         "The permission is denied to create file", se);
             }
         }
@@ -132,11 +107,10 @@ public class StreamWriter
         @Override
         public List<Configuration> split(int mandatoryNumber)
         {
-            List<Configuration> writerSplitConfigs = new ArrayList<>();
+            List<Configuration> writerSplitConfigs = new ArrayList<>(mandatoryNumber);
             for (int i = 0; i < mandatoryNumber; i++) {
                 writerSplitConfigs.add(this.originalConfig);
             }
-
             return writerSplitConfigs;
         }
 
@@ -151,7 +125,7 @@ public class StreamWriter
             extends Writer.Task
     {
         private static final Logger LOG = LoggerFactory.getLogger(Task.class);
-        private static final String NEWLINE_FLAG = System.getProperty("line.separator", "\n");
+        private static final String NEWLINE_FLAG = System.lineSeparator();
 
         private String fieldDelimiter;
         private boolean print;
@@ -177,6 +151,7 @@ public class StreamWriter
             this.recordNumBeforeSleep = writerSliceConfig.getLong(StreamKey.RECORD_NUM_BEFORE_SLEEP, 0);
             this.sleepTime = writerSliceConfig.getLong(StreamKey.SLEEP_TIME, 0);
             this.nullFormat = writerSliceConfig.getString(StreamKey.NULL_FORMAT, StreamKey.NULL_FLAG);
+
             if (recordNumBeforeSleep < 0) {
                 throw AddaxException.asAddaxException(ILLEGAL_VALUE, "recordNumber must be greater than 0");
             }
@@ -188,43 +163,45 @@ public class StreamWriter
         @Override
         public void startWrite(RecordReceiver recordReceiver)
         {
-
-            if (StringUtils.isNoneBlank(path) && StringUtils.isNoneBlank(fileName)) {
-                writeToFile(recordReceiver, path, fileName, recordNumBeforeSleep, sleepTime);
+            if (StringUtils.isNoneBlank(path, fileName)) {
+                writeToFile(recordReceiver);
             }
             else if (this.print) {
-                try {
-                    BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(System.out, StandardCharsets.UTF_8));
-
-                    Record record;
-                    while ((record = recordReceiver.getFromReader()) != null) {
-                        writer.write(recordToString(record));
-                    }
-                    writer.flush();
-                }
-                catch (IOException e) {
-                    throw AddaxException.asAddaxException(IO_ERROR, e);
-                }
+                writeToConsole(recordReceiver);
             }
         }
 
-        private void writeToFile(RecordReceiver recordReceiver, String path, String fileName,
-                long recordNumBeforeSleep, long sleepTime)
+        private void writeToConsole(RecordReceiver recordReceiver)
         {
+            try (BufferedWriter writer = new BufferedWriter(
+                    new OutputStreamWriter(System.out, StandardCharsets.UTF_8))) {
+                Record record;
+                while ((record = recordReceiver.getFromReader()) != null) {
+                    writer.write(recordToString(record));
+                }
+                writer.flush();
+            }
+            catch (IOException e) {
+                throw AddaxException.asAddaxException(IO_ERROR, e);
+            }
+        }
 
+        private void writeToFile(RecordReceiver recordReceiver)
+        {
             LOG.info("begin do write...");
             String fileFullPath = buildFilePath(path, fileName);
             LOG.info("write to file : [{}]", fileFullPath);
-            File newFile = new File(fileFullPath);
-            try (BufferedWriter writer = new BufferedWriter(
-                    new OutputStreamWriter(new FileOutputStream(newFile, true), StandardCharsets.UTF_8))) {
+
+            try (BufferedWriter writer = Files.newBufferedWriter(
+                    Path.of(fileFullPath), StandardCharsets.UTF_8)) {
                 Record record;
                 int count = 0;
                 while ((record = recordReceiver.getFromReader()) != null) {
                     if (recordNumBeforeSleep > 0 && sleepTime > 0 && count == recordNumBeforeSleep) {
-                        LOG.info("StreamWriter start to sleep ... recordNumBeforeSleep={},sleepTime={}", recordNumBeforeSleep, sleepTime);
+                        LOG.info("StreamWriter start to sleep ... recordNumBeforeSleep={},sleepTime={}",
+                                recordNumBeforeSleep, sleepTime);
                         TimeUnit.SECONDS.sleep(sleepTime);
-                        count=0;
+                        count = 0;
                     }
                     writer.write(recordToString(record));
                     count++;
@@ -236,12 +213,6 @@ public class StreamWriter
             }
         }
 
-        @Override
-        public void destroy()
-        {
-            //
-        }
-
         private String recordToString(Record record)
         {
             int recordLength = record.getColumnNumber();
@@ -249,23 +220,25 @@ public class StreamWriter
                 return NEWLINE_FLAG;
             }
 
-            Column column;
             StringBuilder sb = new StringBuilder();
             for (int i = 0; i < recordLength; i++) {
-                column = record.getColumn(i);
-                if (column != null && column.getRawData() != null) {
-                    sb.append(column.asString());
-                }
-                else {
-                    // use NULL FLAG to replace null value
-                    sb.append(nullFormat);
-                }
-                sb.append(fieldDelimiter);
+                Column column = record.getColumn(i);
+                sb.append(column != null && column.getRawData() != null
+                                ? column.asString()
+                                : nullFormat)
+                        .append(fieldDelimiter);
             }
-            sb.setLength(sb.length() - 1);
-            sb.append(NEWLINE_FLAG);
 
-            return sb.toString();
+            if (!sb.isEmpty()) {
+                sb.setLength(sb.length() - fieldDelimiter.length());
+            }
+            return sb.append(NEWLINE_FLAG).toString();
+        }
+
+        @Override
+        public void destroy()
+        {
+            // No resources to clean up
         }
     }
 }

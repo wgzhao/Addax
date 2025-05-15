@@ -89,6 +89,8 @@ docker run -ti --rm --name addax \
 
 ### 编译及打包
 
+目前编译需要 JDK 17 版本
+
 ```shell
 git clone https://github.com/wgzhao/addax.git addax
 cd addax
@@ -213,7 +215,7 @@ Failed record             :                   0
 
 ## 运行要求
 
-- JDK 1.8+
+- JDK 17 or later
 - Python 2.7+ / Python 3.7+ (Windows)
 
 ## 文档

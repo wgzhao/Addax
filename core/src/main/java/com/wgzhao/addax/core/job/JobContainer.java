@@ -698,9 +698,8 @@ public class JobContainer
         if (readerTasksConfigs.size() != writerTasksConfigs.size()) {
             throw AddaxException.asAddaxException(
                     CONFIG_ERROR,
-                    String.format("The number of tasks [%d] divided by the reader's job does not equal " +
-                                    "the number of tasks [%d] divided by the writer's job",
-                            readerTasksConfigs.size(), writerTasksConfigs.size())
+                    "Number of reader tasks (%d) does not match writer tasks (%d)"
+                            .formatted(readerTasksConfigs.size(), writerTasksConfigs.size())
             );
         }
 
@@ -712,7 +711,7 @@ public class JobContainer
             taskConfig.set(CoreConstant.JOB_WRITER_NAME, this.writerPluginName);
             taskConfig.set(CoreConstant.JOB_WRITER_PARAMETER, writerTasksConfigs.get(i));
 
-            if (transformerConfigs != null && !transformerConfigs.isEmpty()) {
+            if (!transformerConfigs.isEmpty()) {
                 taskConfig.set(CoreConstant.JOB_TRANSFORMER, transformerConfigs);
             }
 
@@ -761,14 +760,13 @@ public class JobContainer
                     .execute()
                     .returnResponse();
             if (httpResponse.getCode() == 200) {
-                LOG.info("The job results were uploaded successfully");
-            }
-            else {
-                LOG.warn("Uploading the job results failed: {}", httpResponse);
+                LOG.info("Job results uploaded successfully");
+            } else {
+                LOG.warn("Failed to upload job results, the response code: {}", httpResponse.getCode());
             }
         }
         catch (IOException e) {
-            LOG.warn("Uploading the job results failed with an exception: {}", e.getMessage());
+            LOG.warn("IOException occurred while uploading the job results: {}", e.getMessage());
         }
     }
 

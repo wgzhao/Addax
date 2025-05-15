@@ -68,7 +68,6 @@ public abstract class ProcessInnerScheduler
     @Override
     public void dealKillingStat(AbstractContainerCommunicator frameworkCollector, int totalTasks)
     {
-        //通过进程退出返回码标示状态
         this.taskGroupContainerExecutorService.shutdownNow();
         throw AddaxException.asAddaxException(RUNTIME_ERROR, "The job was terminated");
     }

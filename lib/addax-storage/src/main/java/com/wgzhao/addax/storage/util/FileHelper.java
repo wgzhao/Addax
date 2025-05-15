@@ -18,12 +18,10 @@
 
 package com.wgzhao.addax.storage.util;
 
-import com.google.common.collect.ImmutableMap;
 import com.wgzhao.addax.core.compress.ZipCycleInputStream;
 import com.wgzhao.addax.core.exception.AddaxException;
 import com.wgzhao.addax.core.spi.ErrorCode;
 import org.apache.commons.compress.compressors.CompressorException;
-import org.apache.commons.compress.compressors.CompressorInputStream;
 import org.apache.commons.compress.compressors.CompressorStreamFactory;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -38,6 +36,7 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.nio.charset.Charset;
 import java.nio.file.DirectoryStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -45,52 +44,51 @@ import java.nio.file.Paths;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
-public class FileHelper {
+public class FileHelper
+{
     private static final Logger LOG = LoggerFactory.getLogger(FileHelper.class);
 
-    private static final ImmutableMap<String, String> COMPRESS_TYPE_SUFFIX_MAP = new ImmutableMap.Builder<String, String>()
-            .put("BZIP", ".bz2")
-            .put("BZIP2", ".bz2")
-            .put("DEFLATE", ".deflate")
-            .put("DEFLATE64", ".deflate")
-            .put("GZIP", ".gz")
-            .put("GZ", ".gz")
-            .put("LZ4", ".lz4")
-            .put("LZ4-BLOCK", ".lz4")
-            .put("LZ4-FRAMED", ".lz4")
-            .put("LZO", ".lzo")
-            .put("LZOP", ".lzo")
-            .put("SNAPPY", ".snappy")
-            .put("XZ", ".xz")
-            .put("Z", ".z")
-            .put("ZIP", ".zip")
-            .put("ZLIB", ".zlib")
-            .put("ZSTANDARD", ".zstd")
-            .put("ZSTD", ".zstd")
-            .build();
+    private static final Map<String, String> COMPRESS_TYPE_SUFFIX_MAP = Map.ofEntries(
+            Map.entry("BZIP", ".bz2"),
+            Map.entry("BZIP2", ".bz2"),
+            Map.entry("DEFLATE", ".deflate"),
+            Map.entry("DEFLATE64", ".deflate"),
+            Map.entry("GZIP", ".gz"),
+            Map.entry("GZ", ".gz"),
+            Map.entry("LZ4", ".lz4"),
+            Map.entry("LZ4-BLOCK", ".lz4"),
+            Map.entry("LZ4-FRAMED", ".lz4"),
+            Map.entry("LZO", ".lzo"),
+            Map.entry("LZOP", ".lzo"),
+            Map.entry("SNAPPY", ".snappy"),
+            Map.entry("XZ", ".xz"),
+            Map.entry("Z", ".z"),
+            Map.entry("ZIP", ".zip"),
+            Map.entry("ZLIB", ".zlib"),
+            Map.entry("ZSTANDARD", ".zstd"),
+            Map.entry("ZSTD", ".zstd")
+    );
 
-    public static final HashMap<String, String> FILE_MAGIC_TYPES = new HashMap<>();
+    public static final Map<String, String> FILE_MAGIC_TYPES = Map.ofEntries(
+            Map.entry("504B", "zip"),
+            Map.entry("5261", "rar"),
+            Map.entry("1F8B", "gz"),
+            Map.entry("1F9D", "z"),
+            Map.entry("1FA0", "z"),
+            Map.entry("425A", "bz2"),
+            Map.entry("377A", "7z"),
+            Map.entry("FD37", "xz"),
+            Map.entry("0422", "lz4"),
+            Map.entry("7573", "tar")
+    );
 
-    static {
-        // compress type magic number
-        FILE_MAGIC_TYPES.put("504B", "zip");
-        FILE_MAGIC_TYPES.put("5261", "rar");
-        FILE_MAGIC_TYPES.put("1F8B", "gz");
-        FILE_MAGIC_TYPES.put("1F9D", "z");  // z, tar.z using Lempel-Ziv-Welch algorithm
-        FILE_MAGIC_TYPES.put("1FA0", "z");  // z, tar.z using LZH algorithm
-        FILE_MAGIC_TYPES.put("425A", "bz2");
-        FILE_MAGIC_TYPES.put("377A", "7z");
-        FILE_MAGIC_TYPES.put("FD37", "xz");
-        FILE_MAGIC_TYPES.put("0422", "lz4");
-        FILE_MAGIC_TYPES.put("7573", "tar");
-    }
-
-    private FileHelper() {
+    private FileHelper()
+    {
         // Prevent instantiation
     }
 
@@ -101,7 +99,9 @@ public class FileHelper {
      * @return the compression type if present, otherwise "none"
      * @throws IOException if there's an error reading the file
      */
-    public static String getFileCompressType(String fileName) throws IOException {
+    public static String getFileCompressType(String fileName)
+            throws IOException
+    {
         if (fileName == null || fileName.isEmpty()) {
             LOG.warn("Empty file name provided for compression detection");
             return "none";
@@ -110,7 +110,8 @@ public class FileHelper {
         LOG.debug("Detecting compression type for file: {}", fileName);
         try (InputStream inputStream = new FileInputStream(fileName)) {
             return getFileCompressType(inputStream);
-        } catch (FileNotFoundException e) {
+        }
+        catch (FileNotFoundException e) {
             LOG.error("Failed to find file for compression detection: {}", fileName);
             throw new IOException("File not found: " + fileName, e);
         }
@@ -122,15 +123,18 @@ public class FileHelper {
      * @param inputStream the input stream to detect
      * @return the compression type if present, otherwise "none"
      */
-    public static String getFileCompressType(InputStream inputStream) {
+    public static String getFileCompressType(InputStream inputStream)
+    {
         try {
             String type = CompressorStreamFactory.detect(inputStream);
             LOG.debug("Detected compression type: {}", type);
             return type;
-        } catch (IllegalArgumentException e) {
+        }
+        catch (IllegalArgumentException e) {
             LOG.warn("Cannot detect compression type: stream does not support mark", e);
             throw new IllegalArgumentException("Input stream does not support mark operation", e);
-        } catch (CompressorException e) {
+        }
+        catch (CompressorException e) {
             LOG.debug("No compression detected, assuming uncompressed file");
             return "none";
         }
@@ -142,7 +146,8 @@ public class FileHelper {
      * @param compress the compression type name
      * @return the suffix if present, otherwise empty string
      */
-    public static String getCompressFileSuffix(String compress) {
+    public static String getCompressFileSuffix(String compress)
+    {
         if (StringUtils.isBlank(compress) || "none".equalsIgnoreCase(compress)) {
             return "";
         }
@@ -154,44 +159,47 @@ public class FileHelper {
     /**
      * Read a compressed file and return a buffered reader
      *
-     * @param fileName   the file to read
-     * @param encoding   character encoding to use
+     * @param fileName the file to read
+     * @param encoding character encoding to use
      * @param bufferSize buffer size for reading
      * @return BufferedReader for reading the file content
      */
-    public static BufferedReader readCompressFile(String fileName, String encoding, int bufferSize) {
+    public static BufferedReader readCompressFile(String fileName, String encoding, int bufferSize)
+    {
         if (StringUtils.isBlank(fileName)) {
-            LOG.error("Cannot read from blank file name");
             throw new IllegalArgumentException("File name cannot be blank");
         }
 
         LOG.debug("Reading compressed file: {} with encoding: {}", fileName, encoding);
 
         try {
-            String compressType = getFileCompressType(fileName);
+
+            var compressType = getFileCompressType(fileName);
             LOG.debug("Detected compression type: {} for file: {}", compressType, fileName);
+            var path = Path.of(fileName);
 
-            InputStream inputStream = new FileInputStream(fileName);
-
-            if ("none".equals(compressType)) {
-                return new BufferedReader(new InputStreamReader(inputStream, encoding), bufferSize);
-            }
-
-            if ("zip".equals(compressType)) {
-                ZipCycleInputStream zis = new ZipCycleInputStream(inputStream);
-                return new BufferedReader(new InputStreamReader(zis, encoding), bufferSize);
-            }
-
-            BufferedInputStream bis = new BufferedInputStream(inputStream);
-            CompressorInputStream input = new CompressorStreamFactory().createCompressorInputStream(compressType, bis, true);
-            return new BufferedReader(new InputStreamReader(input, encoding), bufferSize);
-        } catch (FileNotFoundException e) {
-            throw AddaxException.asAddaxException( ErrorCode.ILLEGAL_VALUE, "File not found: " + fileName, e);
-        } catch (CompressorException e) {
-            throw AddaxException.asAddaxException(ErrorCode.IO_ERROR, "Failed to create compressor for file: " + fileName, e);
-        } catch (IOException e) {
-            LOG.error("IO error reading file: {}", fileName, e);
-            throw AddaxException.asAddaxException(ErrorCode.IO_ERROR, "Failed to read file: " + fileName, e);
+            return switch (compressType) {
+                case "none" -> Files.newBufferedReader(path, Charset.forName(encoding));
+                case "zip" -> {
+                    var inputStream = new FileInputStream(fileName);
+                    var zis = new ZipCycleInputStream(inputStream);
+                    yield new BufferedReader(new InputStreamReader(zis, encoding), bufferSize);
+                }
+                default -> {
+                    var inputStream = new FileInputStream(fileName);
+                    var bis = new BufferedInputStream(inputStream);
+                    var input = new CompressorStreamFactory()
+                            .createCompressorInputStream(compressType, bis, true);
+                    yield new BufferedReader(new InputStreamReader(input, encoding), bufferSize);
+                }
+            };
+        }
+        catch (IOException | CompressorException e) {
+            throw AddaxException.asAddaxException(
+                    ErrorCode.IO_ERROR,
+                    "Failed to read compressed file: " + fileName,
+                    e
+            );
         }
     }
 
@@ -201,7 +209,8 @@ public class FileHelper {
      * @param directories list of directory paths, possibly with wildcards
      * @return list of resolved file paths
      */
-    public static List<String> buildSourceTargets(List<String> directories) {
+    public static List<String> buildSourceTargets(List<String> directories)
+    {
         if (directories == null || directories.isEmpty()) {
             LOG.info("No directories specified for source targets");
             return new ArrayList<>();
@@ -221,14 +230,16 @@ public class FileHelper {
                 List<String> matched = listFilesWithWildcard(eachPath);
                 LOG.debug("Found {} files matching wildcard path: {}", matched.size(), eachPath);
                 toBeReadFiles.addAll(matched);
-            } else {
+            }
+            else {
                 File file = new File(eachPath);
                 if (file.isDirectory()) {
                     LOG.debug("Processing directory: {}", eachPath);
                     List<String> dirFiles = listFilesWithWildcard(eachPath + "/*.*");
                     LOG.debug("Found {} files in directory: {}", dirFiles.size(), eachPath);
                     toBeReadFiles.addAll(dirFiles);
-                } else {
+                }
+                else {
                     LOG.debug("Adding single file: {}", eachPath);
                     toBeReadFiles.add(eachPath);
                 }
@@ -245,7 +256,8 @@ public class FileHelper {
      * @param wildcardPath path with wildcard patterns
      * @return list of matching files
      */
-    private static List<String> listFilesWithWildcard(String wildcardPath) {
+    private static List<String> listFilesWithWildcard(String wildcardPath)
+    {
         List<String> result = new ArrayList<>();
         if (StringUtils.isBlank(wildcardPath)) {
             LOG.warn("Empty wildcard path provided");
@@ -277,7 +289,8 @@ public class FileHelper {
                 result.add(entry.toFile().getAbsolutePath());
             }
             LOG.debug("Found {} files matching pattern: {}", result.size(), globPattern);
-        } catch (IOException e) {
+        }
+        catch (IOException e) {
             LOG.error("Failed to list files with wildcard path: {}", wildcardPath, e);
         }
 
@@ -287,11 +300,12 @@ public class FileHelper {
     /**
      * Split a list into approximately equal-sized sublists
      *
-     * @param sourceList   the list to split
+     * @param sourceList the list to split
      * @param adviceNumber suggested number of sublists
      * @return list of sublists
      */
-    public static <T> List<List<T>> splitSourceFiles(final List<T> sourceList, int adviceNumber) {
+    public static <T> List<List<T>> splitSourceFiles(final List<T> sourceList, int adviceNumber)
+    {
         List<List<T>> splitedList = new ArrayList<>();
 
         if (sourceList == null || sourceList.isEmpty()) {
@@ -320,7 +334,8 @@ public class FileHelper {
      *
      * @return generated string for file naming
      */
-    public static String generateFileMiddleName() {
+    public static String generateFileMiddleName()
+    {
         String randomChars = "0123456789abcdefghmnpqrstuvwxyz";
         SimpleDateFormat dateFormat = new SimpleDateFormat("yyyyMMdd_HHmmss_SSS");
         // like 20211203_143329_237_6587fddb

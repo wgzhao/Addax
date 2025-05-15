@@ -21,6 +21,7 @@ package com.wgzhao.addax.plugin.writer.mongodbwriter;
 
 import com.alibaba.fastjson2.JSON;
 import com.alibaba.fastjson2.JSONArray;
+import com.alibaba.fastjson2.JSONObject;
 import com.mongodb.BasicDBObject;
 import com.mongodb.MongoClient;
 import com.mongodb.client.MongoCollection;
@@ -29,12 +30,7 @@ import com.mongodb.client.model.BulkWriteOptions;
 import com.mongodb.client.model.ReplaceOneModel;
 import com.mongodb.client.model.ReplaceOptions;
 import com.wgzhao.addax.core.base.Constant;
-import com.wgzhao.addax.core.element.BoolColumn;
-import com.wgzhao.addax.core.element.BytesColumn;
 import com.wgzhao.addax.core.element.Column;
-import com.wgzhao.addax.core.element.DateColumn;
-import com.wgzhao.addax.core.element.DoubleColumn;
-import com.wgzhao.addax.core.element.LongColumn;
 import com.wgzhao.addax.core.element.Record;
 import com.wgzhao.addax.core.element.StringColumn;
 import com.wgzhao.addax.core.exception.AddaxException;
@@ -182,11 +178,6 @@ public class MongoDBWriter
         private String writeMode = null;
         private String updateKey;
 
-        private boolean isNullOrEmpty(String obj)
-        {
-            return obj == null || obj.isEmpty();
-        }
-
         @Override
         public void init()
         {
@@ -194,22 +185,20 @@ public class MongoDBWriter
             String userName = writerSliceConfig.getString(USERNAME);
             String password = writerSliceConfig.getString(PASSWORD);
             if (password != null && password.startsWith(Constant.ENC_PASSWORD_PREFIX)) {
-                // encrypted password, need to decrypt
                 password = EncryptUtil.decrypt(password.substring(6, password.length() - 1));
             }
             Configuration connConf = writerSliceConfig.getConfiguration(CONNECTION);
             this.database = connConf.getString(DATABASE);
             List<Object> addressList = connConf.getList(KeyConstant.MONGO_ADDRESS, Object.class);
-            if (!isNullOrEmpty((userName)) && !isNullOrEmpty((password))) {
-                this.mongoClient = MongoUtil.initCredentialMongoClient(addressList, userName, password, database);
-            }
-            else {
-                this.mongoClient = MongoUtil.initMongoClient(addressList);
-            }
+            this.mongoClient = StringUtils.isNotEmpty(userName) && StringUtils.isNotEmpty(password) ?
+                    MongoUtil.initCredentialMongoClient(addressList, userName, password, database) :
+                    MongoUtil.initMongoClient(addressList);
+
             this.collection = connConf.getString(KeyConstant.MONGO_COLLECTION_NAME);
             this.batchSize = writerSliceConfig.getInt(BATCH_SIZE, DEFAULT_BATCH_SIZE);
             this.mongodbColumnMeta = JSON.parseArray(writerSliceConfig.getString(COLUMN));
             this.writeMode = writerSliceConfig.getString(WRITE_MODE, "insert");
+
             if (this.writeMode.startsWith("update")) {
                 if (!this.writeMode.contains("(")) {
                     throw AddaxException.asAddaxException(ILLEGAL_VALUE,
@@ -242,170 +231,115 @@ public class MongoDBWriter
 
         private void doBatchInsert(MongoCollection<BasicDBObject> collection, List<Record> writerBuffer, JSONArray columnMeta)
         {
-
             List<BasicDBObject> dataList = new ArrayList<>();
-
             for (Record record : writerBuffer) {
-
-                BasicDBObject data = new BasicDBObject();
-
-                for (int i = 0; i < record.getColumnNumber(); i++) {
-
-                    String type = columnMeta.getJSONObject(i).getString(KeyConstant.COLUMN_TYPE);
-                    String name = columnMeta.getJSONObject(i).getString(KeyConstant.COLUMN_NAME);
-                    //空记录处理
-                    if (isNullOrEmpty((record.getColumn(i)).asString())) {
-                        if (KeyConstant.isArrayType(type.toLowerCase())) {
-                            data.put(name, new Object[0]);
-                        }
-                        else {
-                            data.put(name, record.getColumn(i).asString());
-                        }
-                        continue;
-                    }
-                    if (Column.Type.INT.name().equalsIgnoreCase(type)) {
-                        // the int type is special
-                        try {
-                            data.put(name, Integer.parseInt(String.valueOf(record.getColumn(i).getRawData())));
-                        }
-                        catch (Exception e) {
-                            super.getTaskPluginCollector().collectDirtyRecord(record, e);
-                        }
-                    }
-                    else if (record.getColumn(i) instanceof StringColumn) {
-                        //handle ObjectId and array type
-                        try {
-                            if (KeyConstant.isObjectIdType(type.toLowerCase())) {
-                                data.put(name, new ObjectId(record.getColumn(i).asString()));
-                            }
-                            else if (KeyConstant.isArrayType(type.toLowerCase())) {
-                                String splitter = columnMeta.getJSONObject(i).getString(KeyConstant.COLUMN_SPLITTER);
-                                if (isNullOrEmpty((splitter))) {
-                                    throw AddaxException.asAddaxException(ILLEGAL_VALUE,
-                                            ILLEGAL_VALUE.getDescription());
-                                }
-                                String itemType = columnMeta.getJSONObject(i).getString(KeyConstant.ITEM_TYPE);
-                                if (itemType != null && !itemType.isEmpty()) {
-                                    String[] item = record.getColumn(i).asString().split(splitter);
-                                    if (itemType.equalsIgnoreCase(Column.Type.DOUBLE.name())) {
-                                        ArrayList<Double> list = new ArrayList<>();
-                                        for (String s : item) {
-                                            list.add(Double.parseDouble(s));
-                                        }
-                                        data.put(name, list.toArray(new Double[0]));
-                                    }
-                                    else if (itemType.equalsIgnoreCase(Column.Type.INT.name())) {
-                                        ArrayList<Integer> list = new ArrayList<>();
-                                        for (String s : item) {
-                                            list.add(Integer.parseInt(s));
-                                        }
-                                        data.put(name, list.toArray(new Integer[0]));
-                                    }
-                                    else if (itemType.equalsIgnoreCase(Column.Type.LONG.name())) {
-                                        ArrayList<Long> list = new ArrayList<>();
-                                        for (String s : item) {
-                                            list.add(Long.parseLong(s));
-                                        }
-                                        data.put(name, list.toArray(new Long[0]));
-                                    }
-                                    else if (itemType.equalsIgnoreCase(Column.Type.BOOL.name())) {
-                                        ArrayList<Boolean> list = new ArrayList<>();
-                                        for (String s : item) {
-                                            list.add(Boolean.parseBoolean(s));
-                                        }
-                                        data.put(name, list.toArray(new Boolean[0]));
-                                    }
-                                    else if (itemType.equalsIgnoreCase(Column.Type.BYTES.name())) {
-                                        ArrayList<Byte> list = new ArrayList<>();
-                                        for (String s : item) {
-                                            list.add(Byte.parseByte(s));
-                                        }
-                                        data.put(name, list.toArray(new Byte[0]));
-                                    }
-                                    else {
-                                        data.put(name, record.getColumn(i).asString().split(splitter));
-                                    }
-                                }
-                                else {
-                                    data.put(name, record.getColumn(i).asString().split(splitter));
-                                }
-                            }
-                            else if (type.equalsIgnoreCase("json")) {
-                                Object mode = JSON.parse(record.getColumn(i).asString());
-                                data.put(name, JSON.toJSON(mode));
-                            }
-                            else {
-                                data.put(name, record.getColumn(i).asString());
-                            }
-                        }
-                        catch (Exception e) {
-                            super.getTaskPluginCollector().collectDirtyRecord(record, e);
-                        }
-                    }
-                    else if (record.getColumn(i) instanceof LongColumn) {
-
-                        if (Column.Type.LONG.name().equalsIgnoreCase(type)) {
-                            data.put(name, record.getColumn(i).asLong());
-                        }
-                        else {
-                            super.getTaskPluginCollector().collectDirtyRecord(record, "record's [" + i + "] column's type should be: " + type);
-                        }
-                    }
-                    else if (record.getColumn(i) instanceof DateColumn) {
-
-                        if (Column.Type.DATE.name().equalsIgnoreCase(type)) {
-                            data.put(name, record.getColumn(i).asDate());
-                        }
-                        else {
-                            super.getTaskPluginCollector().collectDirtyRecord(record, "record's [" + i + "] column's type should be: " + type);
-                        }
-                    }
-                    else if (record.getColumn(i) instanceof DoubleColumn) {
-
-                        if (Column.Type.DOUBLE.name().equalsIgnoreCase(type)) {
-                            data.put(name, record.getColumn(i).asDouble());
-                        }
-                        else {
-                            super.getTaskPluginCollector().collectDirtyRecord(record, "record's [" + i + "] column's type should be: " + type);
-                        }
-                    }
-                    else if (record.getColumn(i) instanceof BoolColumn) {
-
-                        if (Column.Type.BOOL.name().equalsIgnoreCase(type)) {
-                            data.put(name, record.getColumn(i).asBoolean());
-                        }
-                        else {
-                            super.getTaskPluginCollector().collectDirtyRecord(record, "record's [" + i + "] column's type should be: " + type);
-                        }
-                    }
-                    else if (record.getColumn(i) instanceof BytesColumn) {
-
-                        if (Column.Type.BYTES.name().equalsIgnoreCase(type)) {
-                            data.put(name, record.getColumn(i).asBytes());
-                        }
-                        else {
-                            super.getTaskPluginCollector().collectDirtyRecord(record, "record's [" + i + "] column's type should be: " + type);
-                        }
-                    }
-                    else {
-                        data.put(name, record.getColumn(i).asString());
-                    }
+                BasicDBObject data = processRecord(record, columnMeta);
+                if (data != null) {
+                    dataList.add(data);
                 }
-                dataList.add(data);
             }
 
             if ("update".equals(writeMode)) {
-                List<ReplaceOneModel<BasicDBObject>> replaceOneModelList = new ArrayList<>();
-                for (BasicDBObject data : dataList) {
-                    BasicDBObject query = new BasicDBObject();
-                    query.put(updateKey, data.get(updateKey));
-                    ReplaceOneModel<BasicDBObject> replaceOneModel = new ReplaceOneModel<>(query, data, new ReplaceOptions().upsert(true));
-                    replaceOneModelList.add(replaceOneModel);
-                }
+                List<ReplaceOneModel<BasicDBObject>> replaceOneModelList = dataList.stream()
+                        .map(data -> {
+                            BasicDBObject query = new BasicDBObject(updateKey, data.get(updateKey));
+                            return new ReplaceOneModel<>(query, data, new ReplaceOptions().upsert(true));
+                        })
+                        .toList();
                 collection.bulkWrite(replaceOneModelList, new BulkWriteOptions().ordered(false));
             }
             else {
                 collection.insertMany(dataList);
+            }
+        }
+
+        private BasicDBObject processRecord(Record record, JSONArray columnMeta)
+        {
+            BasicDBObject data = new BasicDBObject();
+            try {
+                for (int i = 0; i < record.getColumnNumber(); i++) {
+                    processColumn(record.getColumn(i), columnMeta.getJSONObject(i), data);
+                }
+                return data;
+            }
+            catch (Exception e) {
+                super.getTaskPluginCollector().collectDirtyRecord(record, e);
+                return null;
+            }
+        }
+
+        private void processColumn(Column column, JSONObject meta, BasicDBObject data)
+        {
+            String type = meta.getString(KeyConstant.COLUMN_TYPE);
+            String name = meta.getString(KeyConstant.COLUMN_NAME);
+
+            if (StringUtils.isEmpty(column.asString())) {
+                data.put(name, KeyConstant.isArrayType(type.toLowerCase()) ? new Object[0] : column.asString());
+                return;
+            }
+
+            if (column instanceof StringColumn) {
+                processStringColumn(column, type, name, meta, data);
+            }
+            else {
+                processPrimitiveColumn(column, type, name, data);
+            }
+        }
+
+        private void processStringColumn(Column column, String type, String name, JSONObject meta, BasicDBObject data)
+        {
+            try {
+                if (KeyConstant.isObjectIdType(type.toLowerCase())) {
+                    data.put(name, new ObjectId(column.asString()));
+                }
+                else if (KeyConstant.isArrayType(type.toLowerCase())) {
+                    String splitter = meta.getString(KeyConstant.COLUMN_SPLITTER);
+                    if (StringUtils.isEmpty(splitter)) {
+                        throw AddaxException.asAddaxException(ILLEGAL_VALUE, ILLEGAL_VALUE.getDescription());
+                    }
+                    String itemType = meta.getString(KeyConstant.ITEM_TYPE);
+                    if (StringUtils.isNotEmpty(itemType)) {
+                        String[] item = column.asString().split(splitter);
+                        switch (itemType.toUpperCase()) {
+                            case "DOUBLE" -> data.put(name, parseArray(item, Double::parseDouble));
+                            case "INT" -> data.put(name, parseArray(item, Integer::parseInt));
+                            case "LONG" -> data.put(name, parseArray(item, Long::parseLong));
+                            case "BOOL" -> data.put(name, parseArray(item, Boolean::parseBoolean));
+                            case "BYTES" -> data.put(name, parseArray(item, Byte::parseByte));
+                            default -> data.put(name, item);
+                        }
+                    }
+                    else {
+                        data.put(name, column.asString().split(splitter));
+                    }
+                }
+                else if ("json".equalsIgnoreCase(type)) {
+                    Object mode = JSON.parse(column.asString());
+                    data.put(name, JSON.toJSON(mode));
+                }
+                else {
+                    data.put(name, column.asString());
+                }
+            }
+            catch (Exception e) {
+                throw new RuntimeException(e);
+            }
+        }
+
+        private <T> T[] parseArray(String[] items, java.util.function.Function<String, T> parser)
+        {
+            return java.util.Arrays.stream(items).map(parser).toArray(size -> (T[]) java.lang.reflect.Array.newInstance(parser.apply("").getClass(), size));
+        }
+
+        private void processPrimitiveColumn(Column column, String type, String name, BasicDBObject data)
+        {
+            switch (type.toUpperCase()) {
+                case "LONG" -> data.put(name, column.asLong());
+                case "DATE" -> data.put(name, column.asDate());
+                case "DOUBLE" -> data.put(name, column.asDouble());
+                case "BOOL" -> data.put(name, column.asBoolean());
+                case "BYTES" -> data.put(name, column.asBytes());
+                default -> data.put(name, column.asString());
             }
         }
 

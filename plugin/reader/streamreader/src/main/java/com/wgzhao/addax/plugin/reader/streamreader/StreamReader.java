@@ -47,10 +47,10 @@ import java.math.RoundingMode;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
 import static com.wgzhao.addax.core.spi.ErrorCode.ILLEGAL_VALUE;
@@ -85,7 +85,7 @@ public class StreamReader
 
         private static final Logger LOG = LoggerFactory.getLogger(Job.class);
         private Configuration originalConfig;
-        private static final List<String> validUnits = Arrays.asList("d", "day", "M", "month", "y", "year", "h", "hour", "m", "minute", "s", "second", "w", "week");
+        private static final Set<String> validUnits = Set.of("d", "day", "M", "month", "y", "year", "h", "hour", "m", "minute", "s", "second", "w", "week");
 
         @Override
         public void init()
@@ -93,8 +93,7 @@ public class StreamReader
             this.originalConfig = getPluginJobConf();
             dealColumn(this.originalConfig);
 
-            Long sliceRecordCount = this.originalConfig
-                    .getLong(Key.SLICE_RECORD_COUNT);
+            Long sliceRecordCount = this.originalConfig.getLong(Key.SLICE_RECORD_COUNT);
             if (null == sliceRecordCount) {
                 throw AddaxException.asAddaxException(REQUIRED_VALUE,
                         "The item sliceRecordCount is required.");
@@ -107,8 +106,7 @@ public class StreamReader
 
         private void dealColumn(Configuration originalConfig)
         {
-            List<JSONObject> columns = originalConfig.getList(Key.COLUMN,
-                    JSONObject.class);
+            List<JSONObject> columns = originalConfig.getList(Key.COLUMN, JSONObject.class);
             if (null == columns || columns.isEmpty()) {
                 throw AddaxException.asAddaxException(REQUIRED_VALUE,
                         "The item column is required.");
@@ -118,11 +116,11 @@ public class StreamReader
             for (JSONObject eachColumn : columns) {
                 Configuration eachColumnConfig = Configuration.from(eachColumn);
                 try {
-                    this.parseMixupFunctions(eachColumnConfig);
+                    this.parseMixUpFunctions(eachColumnConfig);
                 }
                 catch (Exception e) {
                     throw AddaxException.asAddaxException(NOT_SUPPORT_TYPE,
-                            String.format("Failed to parse mixup functions [%s]", e.getMessage()), e);
+                            String.format("Failed to parse mix up functions [%s]", e.getMessage()), e);
                 }
 
                 String typeName = eachColumnConfig.getString(Key.TYPE);
@@ -174,71 +172,19 @@ public class StreamReader
          *
          * @param eachColumnConfig see {@link Configuration}
          */
-        private void parseMixupFunctions(Configuration eachColumnConfig)
+        private void parseMixUpFunctions(Configuration eachColumnConfig)
         {
             String columnValue = eachColumnConfig.getString(Key.VALUE);
             String columnRandom = eachColumnConfig.getString(StreamConstant.RANDOM);
             String columnIncr = eachColumnConfig.getString(StreamConstant.INCR);
-            if (StringUtils.isBlank(columnRandom) && StringUtils.isBlank(columnIncr)) {
+            if (StringUtils.isAllBlank(columnRandom, columnIncr)) {
                 eachColumnConfig.getNecessaryValue(Key.VALUE, REQUIRED_VALUE);
             }
             if (StringUtils.isNotBlank(columnIncr)) {
-                // 类型判断
-                String dType = eachColumnConfig.getString(Key.TYPE).toLowerCase();
-                if ("long".equals(dType)) {
-                    //  columnValue is valid number ?
-                    if (!columnIncr.contains(",")) {
-                        // setup the default step value
-                        columnIncr = columnIncr + ",1";
-                        eachColumnConfig.set(StreamConstant.INCR, columnIncr);
-                    }
-                    // validate value
-                    try {
-                        Long.parseLong(columnIncr.split(",")[0].trim());
-                        Long.parseLong(columnIncr.split(",")[1].trim());
-                    }
-                    catch (NumberFormatException e) {
-                        throw AddaxException.asAddaxException(
-                                ILLEGAL_VALUE,
-                                "The value of  must be numeric, value [" + columnValue + "] is not valid."
-                        );
-                    }
-                }
-                else if ("date".equals(dType)) {
-                    String[] fields = columnIncr.split(",");
-                    if (fields.length == 1) {
-                        eachColumnConfig.set(StreamConstant.INCR, columnIncr.trim() + ",1,d");
-                    }
-                    else if (fields.length == 2) {
-                        try {
-                            Integer.parseInt(fields[1]);
-                        }
-                        catch (NumberFormatException e) {
-                            throw AddaxException.asAddaxException(
-                                    ILLEGAL_VALUE,
-                                    "The second field must be numeric, value [" + fields[1] + "] is not valid"
-                            );
-                        }
-                        eachColumnConfig.set(StreamConstant.INCR, fields[0].trim() + "," + fields[1].trim() + ",d");
-                    }
-                    else {
-                        String unit = fields[2].charAt(0) + "";
-                        // validate unit
-                        validateDateIncrUnit(unit);
-                        // normalize unit to 1-char
-                        eachColumnConfig.set(StreamConstant.INCR, fields[0].trim() + "," + fields[1].trim() + "," + unit);
-                    }
-                }
-                else {
-                    throw AddaxException.asAddaxException(
-                            NOT_SUPPORT_TYPE,
-                            "The increment sequence must be long or date, value [" + dType + "] is not valid."
-                    );
-                }
-                this.originalConfig.set(StreamConstant.HAVE_INCR_FUNCTION, true);
+                handleIncrFunction(columnIncr, columnValue, eachColumnConfig);
             }
-            // 三者都有配置
-            if ((StringUtils.isNotBlank(columnRandom) || StringUtils.isNotBlank(columnIncr)) && StringUtils.isNotBlank(columnValue)) {
+
+            if (StringUtils.isNoneBlank(columnRandom, columnIncr, columnValue)) {
                 LOG.warn("You both configure the constant column(value:{}) and random column(random:{}) " +
                                 "or incr column(incr:{}), constant column is prior to others.",
                         columnValue, columnRandom, columnIncr);
@@ -250,64 +196,126 @@ public class StreamReader
                 }
             }
             if (StringUtils.isNotBlank(columnRandom)) {
-                String[] split = columnRandom.split(",");
-                if (split.length < 2) {
-                    throw AddaxException.asAddaxException(
-                            ILLEGAL_VALUE,
-                            String.format("Illegal random value [%s], supported random value like 'minVal, MaxVal[,scale]'",
-                                    columnRandom));
-                }
-                String param1 = split[0];
-                long param1Int;
-                String param2 = split[1];
-                long param2Int;
-                if (StringUtils.isBlank(param1) && StringUtils.isBlank(param2)) {
-                    throw AddaxException.asAddaxException(
-                            ILLEGAL_VALUE,
-                            "The random function's params can not be empty.");
-                }
+                handleRandomFunction(columnRandom, eachColumnConfig);
+            }
+        }
 
-                String typeName = eachColumnConfig.getString(Key.TYPE);
-                if (Type.DATE.name().equalsIgnoreCase(typeName)) {
-                    String dateFormat = eachColumnConfig.getString(Key.DATE_FORMAT, StreamConstant.DEFAULT_DATE_FORMAT);
+        private void handleIncrFunction(String column, String columnValue, Configuration eachColumnConfig)
+        {
+            // 类型判断
+            String dType = eachColumnConfig.getString(Key.TYPE).toLowerCase();
+            if ("long".equals(dType)) {
+                //  columnValue is valid number ?
+                if (!column.contains(",")) {
+                    // setup the default step value
+                    column = column + ",1";
+                    eachColumnConfig.set(StreamConstant.INCR, column);
+                }
+                // validate value
+                try {
+                    Long.parseLong(column.split(",")[0].trim());
+                    Long.parseLong(column.split(",")[1].trim());
+                }
+                catch (NumberFormatException e) {
+                    throw AddaxException.asAddaxException(
+                            ILLEGAL_VALUE,
+                            "The value of  must be numeric, value [" + columnValue + "] is not valid."
+                    );
+                }
+            }
+            else if ("date".equals(dType)) {
+                String[] fields = column.split(",");
+                if (fields.length == 1) {
+                    eachColumnConfig.set(StreamConstant.INCR, column.trim() + ",1,d");
+                }
+                else if (fields.length == 2) {
                     try {
-                        SimpleDateFormat format = new SimpleDateFormat(
-                                eachColumnConfig.getString(Key.DATE_FORMAT, StreamConstant.DEFAULT_DATE_FORMAT));
-                        //warn: do no concern int -> long
-                        param1Int = format.parse(param1).getTime();//milliseconds
-                        param2Int = format.parse(param2).getTime();//milliseconds
+                        Integer.parseInt(fields[1]);
                     }
-                    catch (ParseException e) {
+                    catch (NumberFormatException e) {
                         throw AddaxException.asAddaxException(
                                 ILLEGAL_VALUE,
-                                String.format("The random function's params [%s,%s] does not match the dateFormat[%s].",
-                                        dateFormat, param1, param2), e);
+                                "The second field must be numeric, value [" + fields[1] + "] is not valid"
+                        );
                     }
+                    eachColumnConfig.set(StreamConstant.INCR, fields[0].trim() + "," + fields[1].trim() + ",d");
                 }
                 else {
-                    param1Int = Integer.parseInt(param1);
-                    param2Int = Integer.parseInt(param2);
+                    String unit = fields[2].charAt(0) + "";
+                    // validate unit
+                    validateDateIncrUnit(unit);
+                    // normalize unit to 1-char
+                    eachColumnConfig.set(StreamConstant.INCR, fields[0].trim() + "," + fields[1].trim() + "," + unit);
                 }
-                if (param1Int < 0 || param2Int < 0) {
-                    throw AddaxException.asAddaxException(
-                            ILLEGAL_VALUE,
-                            String.format("The random function's params [%s,%s] can not be negative.",
-                                    param1, param2));
-                }
-                if (!Type.BOOL.name().equalsIgnoreCase(typeName) && param1Int > param2Int) {
-                    throw AddaxException.asAddaxException(
-                            ILLEGAL_VALUE,
-                            String.format("The random function's params [%s,%s] is not valid, the first param must be less than the second one.",
-                                    param1, param2));
-                }
-                eachColumnConfig.set(StreamConstant.MIXUP_FUNCTION_PARAM1, param1Int);
-                eachColumnConfig.set(StreamConstant.MIXUP_FUNCTION_PARAM2, param2Int);
-                if (split.length == 3) {
-                    int scale = Integer.parseInt(split[2].trim());
-                    eachColumnConfig.set(StreamConstant.MIXUP_FUNCTION_SCALE, scale);
-                }
-                this.originalConfig.set(StreamConstant.HAVE_MIXUP_FUNCTION, true);
             }
+            else {
+                throw AddaxException.asAddaxException(
+                        NOT_SUPPORT_TYPE,
+                        "The increment sequence must be long or date, value [" + dType + "] is not valid."
+                );
+            }
+            this.originalConfig.set(StreamConstant.HAVE_INCR_FUNCTION, true);
+        }
+
+        private void handleRandomFunction(String columnRandom, Configuration eachColumnConfig)
+        {
+            String[] split = columnRandom.split(",");
+            if (split.length < 2) {
+                throw AddaxException.asAddaxException(
+                        ILLEGAL_VALUE,
+                        String.format("Illegal random value [%s], supported random value like 'minVal, MaxVal[,scale]'",
+                                columnRandom));
+            }
+            String param1 = split[0];
+            long param1Int;
+            String param2 = split[1];
+            long param2Int;
+            if (StringUtils.isBlank(param1) && StringUtils.isBlank(param2)) {
+                throw AddaxException.asAddaxException(
+                        ILLEGAL_VALUE,
+                        "The random function's params can not be empty.");
+            }
+
+            String typeName = eachColumnConfig.getString(Key.TYPE);
+            if (Type.DATE.name().equalsIgnoreCase(typeName)) {
+                String dateFormat = eachColumnConfig.getString(Key.DATE_FORMAT, StreamConstant.DEFAULT_DATE_FORMAT);
+                try {
+                    SimpleDateFormat format = new SimpleDateFormat(
+                            eachColumnConfig.getString(Key.DATE_FORMAT, StreamConstant.DEFAULT_DATE_FORMAT));
+                    //warn: do no concern int -> long
+                    param1Int = format.parse(param1).getTime();//milliseconds
+                    param2Int = format.parse(param2).getTime();//milliseconds
+                }
+                catch (ParseException e) {
+                    throw AddaxException.asAddaxException(
+                            ILLEGAL_VALUE,
+                            String.format("The random function's params [%s,%s] does not match the dateFormat[%s].",
+                                    dateFormat, param1, param2), e);
+                }
+            }
+            else {
+                param1Int = Integer.parseInt(param1);
+                param2Int = Integer.parseInt(param2);
+            }
+            if (param1Int < 0 || param2Int < 0) {
+                throw AddaxException.asAddaxException(
+                        ILLEGAL_VALUE,
+                        String.format("The random function's params [%s,%s] can not be negative.",
+                                param1, param2));
+            }
+            if (!Type.BOOL.name().equalsIgnoreCase(typeName) && param1Int > param2Int) {
+                throw AddaxException.asAddaxException(
+                        ILLEGAL_VALUE,
+                        String.format("The random function's params [%s,%s] is not valid, the first param must be less than the second one.",
+                                param1, param2));
+            }
+            eachColumnConfig.set(StreamConstant.MIXUP_FUNCTION_PARAM1, param1Int);
+            eachColumnConfig.set(StreamConstant.MIXUP_FUNCTION_PARAM2, param2Int);
+            if (split.length == 3) {
+                int scale = Integer.parseInt(split[2].trim());
+                eachColumnConfig.set(StreamConstant.MIXUP_FUNCTION_SCALE, scale);
+            }
+            this.originalConfig.set(StreamConstant.HAVE_MIXUP_FUNCTION, true);
         }
 
         /**
@@ -378,7 +386,7 @@ public class StreamReader
 
         private long sliceRecordCount;
 
-        private boolean haveMixupFunction;
+        private boolean haveMixUpFunction;
         private boolean haveIncrFunction;
 
         // 递增字段字段，用于存储当前的递增值
@@ -391,7 +399,7 @@ public class StreamReader
             this.columns = readerSliceConfig.getList(Key.COLUMN, String.class);
 
             this.sliceRecordCount = readerSliceConfig.getLong(Key.SLICE_RECORD_COUNT);
-            this.haveMixupFunction = readerSliceConfig.getBool(StreamConstant.HAVE_MIXUP_FUNCTION, false);
+            this.haveMixUpFunction = readerSliceConfig.getBool(StreamConstant.HAVE_MIXUP_FUNCTION, false);
             this.haveIncrFunction = readerSliceConfig.getBool(StreamConstant.HAVE_INCR_FUNCTION, false);
         }
 
@@ -408,7 +416,7 @@ public class StreamReader
             while (this.sliceRecordCount > 0) {
                 recordSender.sendToWriter(oneRecord);
                 this.sliceRecordCount--;
-                if (this.haveMixupFunction || this.haveIncrFunction) {
+                if (this.haveMixUpFunction || this.haveIncrFunction) {
                     oneRecord = buildOneRecord(recordSender, this.columns);
                 }
             }
@@ -443,108 +451,112 @@ public class StreamReader
             boolean isIncr = StringUtils.isNotBlank(columnIncr);
             UniformRandomProvider rng = RandomSource.XO_RO_SHI_RO_128_PP.create();
             if (isColumnMixup) {
-                switch (columnType) {
-                    case STRING:
-                        return new StringColumn(RandomStringUtils.randomAlphanumeric(
-                                (int) rng.nextLong(param1Int, param2Int + 1)));
-                    case LONG:
-                        return new LongColumn(rng.nextLong(param1Int, param2Int + 1));
-                    case DOUBLE:
-                        // specify fixed scale or not ?
-                        if (scale > 0) {
-                            BigDecimal b = BigDecimal.valueOf(rng.nextDouble(param1Int, param2Int + 1))
-                                    .setScale(scale, RoundingMode.HALF_UP);
-                            return new DoubleColumn(b.doubleValue());
-                        }
-                        else {
-                            return new DoubleColumn(rng.nextDouble(param1Int, param2Int + 1));
-                        }
-                    case DATE:
-                        return new DateColumn(new Date(rng.nextLong(param1Int, param2Int + 1)));
-                    case BOOL:
-                        // warn: no concern -10 etc..., how about (0, 0)(0, 1)(1,2)
-                        if (param1Int == param2Int) {
-                            param1Int = 0;
-                            param2Int = 1;
-                        }
-                        if (param1Int == 0) {
-                            return new BoolColumn(true);
-                        }
-                        else if (param2Int == 0) {
-                            return new BoolColumn(false);
-                        }
-                        else {
-                            long randomInt = rng.nextLong(0, param1Int + param2Int + 1);
-                            return new BoolColumn(randomInt > param1Int);
-                        }
-                    case BYTES:
-                        return new BytesColumn(RandomStringUtils.randomAlphanumeric((int)
-                                rng.nextLong(param1Int, param2Int + 1)).getBytes());
-                    case TIMESTAMP:
-                        return new TimestampColumn(rng.nextLong(1_100_000_000_000L, 2_100_000_000_000L));
-                    default:
-                        // in fact,never to be here
-                        throw new Exception("The type " + columnType.name() + "is not supported");
-                }
+                return handleMixupColumn(columnType, rng, param1Int, param2Int, scale);
             }
-            else if (isIncr) {
-                Object currVal;
-                long step;
-                if (columnType == Type.LONG) {
-                    //get initial value and step
-                    currVal = Long.parseLong(columnIncr.split(",")[0]);
-                    step = Long.parseLong(columnIncr.split(",")[1]);
-                    currVal = incrMap.getOrDefault(columnIndex, currVal);
-                    incrMap.put(columnIndex, (long) currVal + step);
-                    return new LongColumn((long) currVal);
+            if (isIncr) {
+                return handleIncrColumn(eachColumnConfig, columnIndex, columnType, columnIncr);
+            }
+
+            // in fact,never to be here
+            return switch (columnType) {
+                case STRING -> new StringColumn(columnValue);
+                case LONG -> new LongColumn(columnValue);
+                case DOUBLE -> new DoubleColumn(columnValue);
+                case DATE -> {
+                    SimpleDateFormat format = new SimpleDateFormat(eachColumnConfig.getString(Key.DATE_FORMAT, StreamConstant.DEFAULT_DATE_FORMAT));
+                    yield new DateColumn(format.parse(columnValue));
                 }
-                else if (columnType == Type.DATE) {
-                    String[] fields = columnIncr.split(",");
-                    currVal = incrMap.getOrDefault(columnIndex, null);
-                    if (currVal == null) {
-                        String datePattern = eachColumnConfig.getString(Key.DATE_FORMAT, StreamConstant.DEFAULT_DATE_FORMAT);
-                        SimpleDateFormat sdf = new SimpleDateFormat(datePattern);
-                        try {
-                            currVal = sdf.parse(fields[0]);
-                        }
-                        catch (java.text.ParseException e) {
-                            throw AddaxException.asAddaxException(
-                                    ILLEGAL_VALUE,
-                                    String.format("can not parse date value [%s] with date format [%s]", fields[0], datePattern)
-                            );
-                        }
+                case BOOL -> new BoolColumn("true".equalsIgnoreCase(columnValue));
+                case BYTES -> new BytesColumn(columnValue.getBytes());
+                case TIMESTAMP -> new TimestampColumn(columnValue);
+                default -> throw new Exception(String.format("The column type [%s] is unsupported.", columnType.name()));
+            };
+        }
+
+        private Column handleIncrColumn(Configuration eachColumnConfig, int columnIndex, Type columnType, String columnIncr)
+        {
+            Object currVal;
+            long step;
+            if (columnType == Type.LONG) {
+                //get initial value and step
+                currVal = Long.parseLong(columnIncr.split(",")[0]);
+                step = Long.parseLong(columnIncr.split(",")[1]);
+                currVal = incrMap.getOrDefault(columnIndex, currVal);
+                incrMap.put(columnIndex, (long) currVal + step);
+                return new LongColumn((long) currVal);
+            }
+            else if (columnType == Type.DATE) {
+                String[] fields = columnIncr.split(",");
+                currVal = incrMap.getOrDefault(columnIndex, null);
+                if (currVal == null) {
+                    String datePattern = eachColumnConfig.getString(Key.DATE_FORMAT, StreamConstant.DEFAULT_DATE_FORMAT);
+                    SimpleDateFormat sdf = new SimpleDateFormat(datePattern);
+                    try {
+                        currVal = sdf.parse(fields[0]);
                     }
-                    incrMap.put(columnIndex, dateIncrement((Date) currVal, Integer.parseInt(fields[1]), fields[2]));
-                    return new DateColumn((Date) currVal);
+                    catch (ParseException e) {
+                        throw AddaxException.asAddaxException(
+                                ILLEGAL_VALUE,
+                                String.format("can not parse date value [%s] with date format [%s]", fields[0], datePattern)
+                        );
+                    }
                 }
-                else {
-                    throw AddaxException.asAddaxException(
-                            NOT_SUPPORT_TYPE,
-                            columnType + " can not support for increment"
-                    );
-                }
+                incrMap.put(columnIndex, dateIncrement((Date) currVal, Integer.parseInt(fields[1]), fields[2]));
+                return new DateColumn((Date) currVal);
             }
             else {
-                switch (columnType) {
-                    case STRING:
-                        return new StringColumn(columnValue);
-                    case LONG:
-                        return new LongColumn(columnValue);
-                    case DOUBLE:
-                        return new DoubleColumn(columnValue);
-                    case DATE:
-                        SimpleDateFormat format = new SimpleDateFormat(eachColumnConfig.getString(Key.DATE_FORMAT, StreamConstant.DEFAULT_DATE_FORMAT));
-                        return new DateColumn(format.parse(columnValue));
-                    case BOOL:
-                        return new BoolColumn("true".equalsIgnoreCase(columnValue));
-                    case BYTES:
-                        return new BytesColumn(columnValue.getBytes());
-                    case TIMESTAMP:
-                        return new TimestampColumn(columnValue);
-                    default:
-                        // in fact,never to be here
-                        throw new Exception(String.format("The column type [%s] is unsupported.", columnType.name()));
-                }
+                throw AddaxException.asAddaxException(
+                        NOT_SUPPORT_TYPE,
+                        columnType + " can not support for increment"
+                );
+            }
+        }
+
+        private Column handleMixupColumn(Type columnType, UniformRandomProvider rng, long param1Int, long param2Int, int scale)
+                throws Exception
+        {
+            switch (columnType) {
+                case STRING:
+                    return new StringColumn(RandomStringUtils.insecure().nextAlphanumeric(
+                            (int) rng.nextLong(param1Int, param2Int + 1)));
+                case LONG:
+                    return new LongColumn(rng.nextLong(param1Int, param2Int + 1));
+                case DOUBLE:
+                    // specify fixed scale or not ?
+                    if (scale > 0) {
+                        BigDecimal b = BigDecimal.valueOf(rng.nextDouble(param1Int, param2Int + 1))
+                                .setScale(scale, RoundingMode.HALF_UP);
+                        return new DoubleColumn(b.doubleValue());
+                    }
+                    else {
+                        return new DoubleColumn(rng.nextDouble(param1Int, param2Int + 1));
+                    }
+                case DATE:
+                    return new DateColumn(new Date(rng.nextLong(param1Int, param2Int + 1)));
+                case BOOL:
+                    // warn: no concern -10 etc..., how about (0, 0)(0, 1)(1,2)
+                    if (param1Int == param2Int) {
+                        param1Int = 0;
+                        param2Int = 1;
+                    }
+                    if (param1Int == 0) {
+                        return new BoolColumn(true);
+                    }
+                    else if (param2Int == 0) {
+                        return new BoolColumn(false);
+                    }
+                    else {
+                        long randomInt = rng.nextLong(0, param1Int + param2Int + 1);
+                        return new BoolColumn(randomInt > param1Int);
+                    }
+                case BYTES:
+                    return new BytesColumn(RandomStringUtils.insecure().nextAlphanumeric((int)
+                            rng.nextLong(param1Int, param2Int + 1)).getBytes());
+                case TIMESTAMP:
+                    return new TimestampColumn(rng.nextLong(1_100_000_000_000L, 2_100_000_000_000L));
+                default:
+                    // in fact,never to be here
+                    throw new Exception("The type " + columnType.name() + "is not supported");
             }
         }
 
@@ -558,24 +570,16 @@ public class StreamReader
          */
         private Date dateIncrement(Date curDate, int step, String unit)
         {
-            switch (unit) {
-                case "d":
-                    return DateUtils.addDays(curDate, step);
-                case "M":
-                    return DateUtils.addMonths(curDate, step);
-                case "y":
-                    return DateUtils.addYears(curDate, step);
-                case "w":
-                    return DateUtils.addWeeks(curDate, step);
-                case "h":
-                    return DateUtils.addHours(curDate, step);
-                case "m":
-                    return DateUtils.addMinutes(curDate, step);
-                case "s":
-                    return DateUtils.addSeconds(curDate, step);
-                default:
-                    return DateUtils.addDays(curDate, step);
-            }
+            return switch (unit) {
+                case "d" -> DateUtils.addDays(curDate, step);
+                case "M" -> DateUtils.addMonths(curDate, step);
+                case "y" -> DateUtils.addYears(curDate, step);
+                case "w" -> DateUtils.addWeeks(curDate, step);
+                case "h" -> DateUtils.addHours(curDate, step);
+                case "m" -> DateUtils.addMinutes(curDate, step);
+                case "s" -> DateUtils.addSeconds(curDate, step);
+                default -> DateUtils.addDays(curDate, step);
+            };
         }
 
         private Record buildOneRecord(RecordSender recordSender,

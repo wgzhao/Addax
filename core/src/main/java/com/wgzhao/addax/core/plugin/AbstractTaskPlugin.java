@@ -24,7 +24,6 @@ public abstract class AbstractTaskPlugin
         extends AbstractPlugin
 {
 
-    //TaskPlugin 应该具备taskId
     private int taskGroupId;
     private int taskId;
     private TaskPluginCollector taskPluginCollector;
