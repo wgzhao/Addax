@@ -36,7 +36,6 @@ import com.wgzhao.addax.core.plugin.TaskPluginCollector;
 import com.wgzhao.addax.core.util.Configuration;
 import com.wgzhao.addax.storage.util.FileHelper;
 import org.apache.commons.compress.compressors.CompressorException;
-import org.apache.commons.compress.compressors.CompressorOutputStream;
 import org.apache.commons.compress.compressors.CompressorStreamFactory;
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVPrinter;
@@ -54,7 +53,6 @@ import java.io.UnsupportedEncodingException;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Objects;
@@ -65,12 +63,11 @@ import static com.wgzhao.addax.core.spi.ErrorCode.ENCODING_ERROR;
 import static com.wgzhao.addax.core.spi.ErrorCode.IO_ERROR;
 import static com.wgzhao.addax.core.spi.ErrorCode.NOT_SUPPORT_TYPE;
 import static com.wgzhao.addax.core.spi.ErrorCode.REQUIRED_VALUE;
-import static com.wgzhao.addax.core.spi.ErrorCode.RUNTIME_ERROR;
 
 public class StorageWriterUtil
 {
     private static final Logger LOG = LoggerFactory.getLogger(StorageWriterUtil.class);
-    private static final Set<String> supportedWriteModes = new HashSet<>(Arrays.asList("truncate", "append", "nonConflict", "overwrite"));
+    private static final Set<String> supportedWriteModes = Set.of("truncate", "append", "nonConflict", "overwrite");
 
     private StorageWriterUtil()
     {
@@ -87,7 +84,6 @@ public class StorageWriterUtil
         writeMode = writeMode.trim();
         if (!supportedWriteModes.contains(writeMode)) {
             throw AddaxException.illegalConfigValue(Key.WRITE_MODE, writeMode, "valid write modes " + StringUtils.join(supportedWriteModes, ","));
-
         }
         writerConfiguration.set(Key.WRITE_MODE, writeMode);
 
@@ -147,7 +143,7 @@ public class StorageWriterUtil
         Set<String> allFileExists = new HashSet<>(originAllFileExists);
 
         String filePrefix = writerSliceConfig.getString(Key.FILE_NAME);
-        String suffix="";
+        String suffix = "";
         if (filePrefix.contains(".")) {
             String[] split = filePrefix.split("\\.");
             filePrefix = split[0];
@@ -172,27 +168,18 @@ public class StorageWriterUtil
 
     public static String buildFilePath(String path, String fileName, String suffix)
     {
-        boolean isEndWithSeparator = false;
-        switch (IOUtils.DIR_SEPARATOR) {
-            case IOUtils.DIR_SEPARATOR_UNIX:
-                isEndWithSeparator = path.endsWith(String.valueOf(IOUtils.DIR_SEPARATOR));
-                break;
-            case IOUtils.DIR_SEPARATOR_WINDOWS:
-                isEndWithSeparator = path.endsWith(String.valueOf(IOUtils.DIR_SEPARATOR_WINDOWS));
-                break;
-            default:
-                break;
-        }
+        boolean isEndWithSeparator = switch (IOUtils.DIR_SEPARATOR) {
+            case IOUtils.DIR_SEPARATOR_UNIX -> path.endsWith(String.valueOf(IOUtils.DIR_SEPARATOR));
+            case IOUtils.DIR_SEPARATOR_WINDOWS -> path.endsWith(String.valueOf(IOUtils.DIR_SEPARATOR_WINDOWS));
+            default -> false;
+        };
+
         if (!isEndWithSeparator) {
             path = path + IOUtils.DIR_SEPARATOR;
         }
-        if (null == suffix) {
-            suffix = "";
-        }
-        else {
-            suffix = suffix.trim();
-        }
-        return String.format("%s%s%s", path, fileName, suffix);
+
+        suffix = (suffix == null) ? "" : suffix.trim();
+        return "%s%s%s".formatted(path, fileName, suffix);
     }
 
     public static void writeToStream(RecordReceiver lineReceiver,
@@ -203,54 +190,49 @@ public class StorageWriterUtil
 
         String compress = config.getString(Key.COMPRESS);
 
-        BufferedWriter writer = null;
-        // compress logic
-        try {
-            if (null == compress) {
-                writer = new BufferedWriter(new OutputStreamWriter(outputStream, encoding));
-            }
-            else {
-                //normalize compress name
-                if ("gzip".equalsIgnoreCase(compress)) {
-                    compress = "gz";
-                }
-                else if ("bz2".equalsIgnoreCase(compress)) {
-                    compress = "bzip2";
-                }
-
-                if ("zip".equals(compress)) {
-                    ZipCycleOutputStream zis = new ZipCycleOutputStream(outputStream, fileName);
-                    writer = new BufferedWriter(new OutputStreamWriter(zis, encoding));
-                }
-                else {
-                    CompressorOutputStream compressorOutputStream = new CompressorStreamFactory().createCompressorOutputStream(compress,
-                            outputStream);
-                    writer = new BufferedWriter(new OutputStreamWriter(compressorOutputStream, encoding));
-                }
-            }
+        try (var writer = createWriter(outputStream, encoding, compress, fileName)) {
             StorageWriterUtil.doWriteToStream(lineReceiver, writer, fileName, config, taskPluginCollector);
         }
         catch (UnsupportedEncodingException uee) {
             throw AddaxException.asAddaxException(ENCODING_ERROR,
-                            "The encoding " + encoding + " is unsupported.", uee);
-        }
-        catch (NullPointerException e) {
-            throw AddaxException.asAddaxException(RUNTIME_ERROR, "NPE occurred", e);
+                    "Unsupported encoding: " + encoding, uee);
         }
         catch (CompressorException e) {
             throw AddaxException.asAddaxException(
                     NOT_SUPPORT_TYPE,
-                    "The compress algorithm " + compress + " is unsupported yet."
+                    "Unsupported compression algorithm: " + compress
             );
         }
         catch (IOException e) {
             throw AddaxException.asAddaxException(
                     IO_ERROR,
-                    "IO exception occurred when writing " + fileName, e);
+                    "IO exception occurred when writing: " + fileName, e);
         }
-        finally {
-            IOUtils.closeQuietly(writer, null);
+    }
+
+    private static BufferedWriter createWriter(OutputStream outputStream, String encoding,
+            String compress, String fileName)
+            throws IOException, CompressorException
+    {
+        if (compress == null) {
+            return new BufferedWriter(new OutputStreamWriter(outputStream, encoding));
         }
+
+        // Normalize compress name
+        compress = switch (compress.toLowerCase()) {
+            case "gzip" -> "gz";
+            case "bz2" -> "bzip2";
+            default -> compress;
+        };
+
+        if ("zip".equals(compress)) {
+            var zis = new ZipCycleOutputStream(outputStream, fileName);
+            return new BufferedWriter(new OutputStreamWriter(zis, encoding));
+        }
+
+        var compressorOutputStream = new CompressorStreamFactory()
+                .createCompressorOutputStream(compress, outputStream);
+        return new BufferedWriter(new OutputStreamWriter(compressorOutputStream, encoding));
     }
 
     private static void doWriteToStream(RecordReceiver lineReceiver,
@@ -354,44 +336,29 @@ public class StorageWriterUtil
         }
         boolean extendedInsert = config.getBool(Key.EXTENDED_INSERT, true);
         int batchSize = config.getInt(Key.BATCH_SIZE, Constant.DEFAULT_BATCH_SIZE);
-        Record record;
+
+        String sqlHeader = existColumns != null
+                ? "INSERT INTO %s(%s)".formatted(tableName, String.join(",", columns))
+                : "INSERT INTO %s".formatted(tableName);
+
+        var sb = new StringBuilder(sqlHeader).append(" VALUES (");
         int curNum = 0;
-        String sqlHeader = "INSERT INTO " + tableName;
-        if (existColumns != null) {
-            sqlHeader += "(" + StringUtils.join(columns, ",") + ")";
-        }
-        StringBuilder sb = new StringBuilder();
-        sb.append(sqlHeader).append(" VALUES (");
+
+        Record record;
         while ((record = lineReceiver.getFromReader()) != null) {
             if (columns != null && record.getColumnNumber() != columns.size()) {
                 throw AddaxException.asAddaxException(
                         CONFIG_ERROR,
-                        String.format("The column number [%d] of record is not equal to the column number [%d] of table.",
-                                record.getColumnNumber(), columns.size()));
+                        "Column count mismatch: record has %d columns but table has %d columns"
+                                .formatted(record.getColumnNumber(), columns.size())
+                );
             }
-            Column column;
-            for (int i = 0; i < record.getColumnNumber(); i++) {
-                column = record.getColumn(i);
-                if (column instanceof LongColumn || column instanceof BoolColumn) {
-                    sb.append(column.asString());
-                }
-                else {
-                    sb.append("'").append(column.asString()).append("'");
-                }
-                if (i < record.getColumnNumber() - 1) {
-                    sb.append(",");
-                }
-            }
+
+            appendRecordValues(record, sb);
+
             if (extendedInsert) {
-                // reach batch size ?
                 if (curNum >= batchSize) {
-                    sb.append(";\n");
-                    //write to file
-                    writer.write(sb.toString());
-                    // initial sb
-                    sb.setLength(0);
-                    sb.append(sqlHeader).append(" VALUES (");
-                    // reset counter
+                    writeAndResetBuffer(writer, sb, sqlHeader);
                     curNum = 0;
                 }
                 else {
@@ -401,18 +368,41 @@ public class StorageWriterUtil
             }
             else {
                 sb.append(");\n");
-                //write to file
                 writer.write(sb.toString());
-                // initial sb
                 sb.setLength(0);
                 sb.append(sqlHeader).append(" VALUES (");
             }
         }
-        // reminder sql
+
+        // Write remaining records
         if (curNum > 0) {
-            // remove last ", (" and append the last ";"
             sb.delete(sb.length() - 3, sb.length()).append(";");
             writer.write(sb.toString());
         }
+    }
+
+    private static void appendRecordValues(Record record, StringBuilder sb)
+    {
+        for (int i = 0; i < record.getColumnNumber(); i++) {
+            var column = record.getColumn(i);
+            if (column instanceof LongColumn || column instanceof BoolColumn) {
+                sb.append(column.asString());
+            }
+            else {
+                sb.append("'").append(column.asString()).append("'");
+            }
+            if (i < record.getColumnNumber() - 1) {
+                sb.append(",");
+            }
+        }
+    }
+
+    private static void writeAndResetBuffer(BufferedWriter writer, StringBuilder sb, String sqlHeader)
+            throws IOException
+    {
+        sb.append(";\n");
+        writer.write(sb.toString());
+        sb.setLength(0);
+        sb.append(sqlHeader).append(" VALUES (");
     }
 }

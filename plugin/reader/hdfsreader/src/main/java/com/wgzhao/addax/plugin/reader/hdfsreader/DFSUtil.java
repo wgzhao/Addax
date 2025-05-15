@@ -21,6 +21,7 @@ package com.wgzhao.addax.plugin.reader.hdfsreader;
 
 import com.alibaba.fastjson2.JSON;
 import com.alibaba.fastjson2.JSONObject;
+import com.alibaba.fastjson2.JSONWriter;
 import com.google.common.base.Splitter;
 import com.google.common.collect.Iterables;
 import com.wgzhao.addax.core.base.Key;
@@ -110,7 +111,8 @@ public class DFSUtil
         }
         this.kerberosAuthentication(this.kerberosPrincipal, this.kerberosKeytabFilePath);
 
-        LOG.debug("hadoopConfig details:{}", JSON.toJSONString(this.hadoopConf));
+        // fix com.alibaba.fastjson2.JSONException: level too large : 2048
+        LOG.debug("hadoopConfig details:{}", JSON.toJSONString(this.hadoopConf, JSONWriter.Feature.ReferenceDetection));
     }
 
     private void kerberosAuthentication(String kerberosPrincipal, String kerberosKeytabFilePath)

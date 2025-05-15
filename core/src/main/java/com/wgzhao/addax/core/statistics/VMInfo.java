@@ -25,37 +25,28 @@ import java.lang.management.ManagementFactory;
 import java.lang.management.MemoryPoolMXBean;
 import java.lang.management.OperatingSystemMXBean;
 import java.lang.management.RuntimeMXBean;
-import java.lang.reflect.Method;
+import java.lang.management.ThreadMXBean;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-/**
- * Created by liqiang on 15/11/12.
- */
 public class VMInfo
 {
     static final long MB = 1024L * 1024L;
     static final long GB = 1024 * 1024 * 1024L;
     private static final Logger LOG = LoggerFactory.getLogger(VMInfo.class);
     private static VMInfo vmInfo;
-    // 数据的MxBean
-    private final OperatingSystemMXBean osMXBean;
-    private final RuntimeMXBean runtimeMXBean;
+
     private final List<GarbageCollectorMXBean> garbageCollectorMXBeanList;
     private final List<MemoryPoolMXBean> memoryPoolMXBeanList;
-    /**
-     * 静态信息
-     */
+    private final RuntimeMXBean runtimeMXBean;
+    private final ThreadMXBean threadMXBean;
+
     private final String osInfo;
     private final String jvmInfo;
-    /**
-     * cpu个数
-     */
     private final int totalProcessorCount;
-    /**
-     * 机器的各个状态，用于中间打印和统计上报
-     */
+
+    // machine status
     private final PhyOSStatus startPhyOSStatus;
     private final ProcessCpuStatus processCpuStatus = new ProcessCpuStatus();
     private final ProcessGCStatus processGCStatus = new ProcessGCStatus();
@@ -67,9 +58,10 @@ public class VMInfo
 
     private VMInfo()
     {
-        //初始化静态信息
-        osMXBean = ManagementFactory.getOperatingSystemMXBean();
-        runtimeMXBean = ManagementFactory.getRuntimeMXBean();
+        Runtime runtime = Runtime.getRuntime();
+        OperatingSystemMXBean osMXBean = ManagementFactory.getOperatingSystemMXBean();
+        this.runtimeMXBean = ManagementFactory.getRuntimeMXBean();
+        this.threadMXBean = ManagementFactory.getThreadMXBean();
         garbageCollectorMXBeanList = ManagementFactory.getGarbageCollectorMXBeans();
         memoryPoolMXBeanList = ManagementFactory.getMemoryPoolMXBeans();
 
@@ -77,69 +69,31 @@ public class VMInfo
         osInfo = osMXBean.getName() + " " + osMXBean.getArch() + " " + osMXBean.getVersion();
         totalProcessorCount = osMXBean.getAvailableProcessors();
 
-        //构建startPhyOSStatus
-        startPhyOSStatus = new PhyOSStatus();
-        LOG.info("VMInfo# operatingSystem class => {}", osMXBean.getClass().getName());
-        if (VMInfo.isSunOsMBean(osMXBean)) {
-            {
-                startPhyOSStatus.totalPhysicalMemory = VMInfo.getLongFromOperatingSystem(osMXBean, "getTotalPhysicalMemorySize");
-                startPhyOSStatus.freePhysicalMemory = VMInfo.getLongFromOperatingSystem(osMXBean, "getFreePhysicalMemorySize");
-                startPhyOSStatus.maxFileDescriptorCount = VMInfo.getLongFromOperatingSystem(osMXBean, "getMaxFileDescriptorCount");
-                startPhyOSStatus.currentOpenFileDescriptorCount = VMInfo.getLongFromOperatingSystem(osMXBean, "getOpenFileDescriptorCount");
-            }
-        }
+        startPhyOSStatus = new PhyOSStatus(
+                runtime.totalMemory(),
+                runtime.freeMemory(),
+                -1L, // File descriptor count not available in standard API
+                -1L  // Open file count not available in standard API
+        );
 
-        // 初始化processGCStatus
+        // initialize processGCStatus
         for (GarbageCollectorMXBean garbage : garbageCollectorMXBeanList) {
-            GCStatus gcStatus = new GCStatus();
-            gcStatus.name = garbage.getName();
+            GCStatus gcStatus = new GCStatus.Builder()
+                    .name(garbage.getName())
+                    .build();
             processGCStatus.gcStatusMap.put(garbage.getName(), gcStatus);
         }
 
-        // 初始化processMemoryStatus
-        if (memoryPoolMXBeanList != null && !memoryPoolMXBeanList.isEmpty()) {
-            for (MemoryPoolMXBean pool : memoryPoolMXBeanList) {
-                MemoryStatus memoryStatus = new MemoryStatus();
-                memoryStatus.name = pool.getName();
-                memoryStatus.initSize = pool.getUsage().getInit();
-                memoryStatus.maxSize = pool.getUsage().getMax();
-                processMemoryStatus.memoryStatusMap.put(pool.getName(), memoryStatus);
-            }
-        }
+        // initialize processMemoryStatus
+        updateMemoryStatuses();
     }
 
-    /**
-     * static method, get vm information and returns
-     *
-     * @return null or vmInfo. null is something error, job no care it.
-     */
     public static synchronized VMInfo getVmInfo()
     {
         if (vmInfo == null) {
             vmInfo = new VMInfo();
         }
         return vmInfo;
-    }
-
-    public static boolean isSunOsMBean(OperatingSystemMXBean operatingSystem)
-    {
-        final String className = operatingSystem.getClass().getName();
-
-        return "com.sun.management.UnixOperatingSystem".equals(className);
-    }
-
-    public static long getLongFromOperatingSystem(OperatingSystemMXBean operatingSystem, String methodName)
-    {
-        try {
-            final Method method = operatingSystem.getClass().getMethod(methodName, (Class<?>[]) null);
-            method.setAccessible(true);
-            return (Long) method.invoke(operatingSystem, (Object[]) null);
-        }
-        catch (final Exception e) {
-            LOG.info("OperatingSystemMXBean {} failed, Exception = {} ", methodName, e.getMessage());
-        }
-
-        return -1;
     }
 
     public String toString()
@@ -162,75 +116,114 @@ public class VMInfo
     {
 
         try {
-            if (VMInfo.isSunOsMBean(osMXBean)) {
-                long curUptime = runtimeMXBean.getUptime();
-                long curProcessTime = getLongFromOperatingSystem(osMXBean, "getProcessCpuTime");
-                //百分比， uptime是ms，processTime是nano
-                if ((curUptime > lastUpTime) && (curProcessTime >= lastProcessCpuTime)) {
-                    float curDeltaCpu = (float) (curProcessTime - lastProcessCpuTime) / ((curUptime - lastUpTime) * totalProcessorCount * 10000);
-                    processCpuStatus.setMaxMinCpu(curDeltaCpu);
-                    processCpuStatus.averageCpu = (float) curProcessTime / (curUptime * totalProcessorCount * 10000);
+            long curUptime = runtimeMXBean.getUptime();
+            // Get CPU time by summing all thread CPU times
+            long curProcessTime = getTotalThreadCpuTime();
 
-                    lastUpTime = curUptime;
-                    lastProcessCpuTime = curProcessTime;
-                }
+            // CPU load calculation
+            if ((curUptime > lastUpTime) && (curProcessTime >= lastProcessCpuTime)) {
+                long deltaUptime = curUptime - lastUpTime;
+                long deltaProcessTime = curProcessTime - lastProcessCpuTime;
+
+                float cpu = ((float) deltaProcessTime / deltaUptime / totalProcessorCount) * 100;
+                processCpuStatus.setMaxMinCpu(cpu);
+                processCpuStatus.averageCpu = cpu;
             }
+            this.lastUpTime = curUptime;
+            this.lastProcessCpuTime = curProcessTime;
 
+            // Update GC statistics
             for (GarbageCollectorMXBean garbage : garbageCollectorMXBeanList) {
-
                 GCStatus gcStatus = processGCStatus.gcStatusMap.get(garbage.getName());
                 if (gcStatus == null) {
-                    gcStatus = new GCStatus();
-                    gcStatus.name = garbage.getName();
+                    gcStatus = new GCStatus.Builder()
+                            .name(garbage.getName())
+                            .build();
                     processGCStatus.gcStatusMap.put(garbage.getName(), gcStatus);
                 }
 
-                long curTotalGcCount = garbage.getCollectionCount();
-                gcStatus.setCurTotalGcCount(curTotalGcCount);
+                GCStatus.Builder builder = new GCStatus.Builder()
+                        .name(gcStatus.name)
+                        .setCurTotalGcCount(garbage.getCollectionCount())
+                        .setCurTotalGcTime(garbage.getCollectionTime());
 
-                long curtotalGcTime = garbage.getCollectionTime();
-                gcStatus.setCurTotalGcTime(curtotalGcTime);
+                processGCStatus.gcStatusMap.put(garbage.getName(), builder.build());
             }
 
-            if (memoryPoolMXBeanList != null && !memoryPoolMXBeanList.isEmpty()) {
-                for (MemoryPoolMXBean pool : memoryPoolMXBeanList) {
-
-                    MemoryStatus memoryStatus = processMemoryStatus.memoryStatusMap.get(pool.getName());
-                    if (memoryStatus == null) {
-                        memoryStatus = new MemoryStatus();
-                        memoryStatus.name = pool.getName();
-                        processMemoryStatus.memoryStatusMap.put(pool.getName(), memoryStatus);
-                    }
-                    memoryStatus.commitedSize = pool.getUsage().getCommitted();
-                    memoryStatus.setMaxMinUsedSize(pool.getUsage().getUsed());
-                    long maxMemory = memoryStatus.commitedSize > 0 ? memoryStatus.commitedSize : memoryStatus.maxSize;
-                    memoryStatus.setMaxMinPercent(maxMemory > 0 ? (float) 100 * memoryStatus.usedSize / maxMemory : -1);
-                }
-            }
+            updateMemoryStatuses();
 
             if (print) {
-                LOG.info("{}{}{}", processCpuStatus.getDeltaString(), processMemoryStatus.getDeltaString(), processGCStatus.getDeltaString());
+                LOG.info("{}{}{}",
+                        processCpuStatus.getDeltaString(),
+                        processMemoryStatus.getDeltaString(),
+                        processGCStatus.getDeltaString()
+                );
             }
         }
         catch (Exception e) {
-            LOG.warn("no need care, the fail is ignored : vmInfo getDelta failed {}", e.getMessage(), e);
+            LOG.warn("VMInfo getDelta failed: {}", e.getMessage(), e);
         }
     }
 
-    private static class PhyOSStatus
+    private long getTotalThreadCpuTime()
     {
-        long totalPhysicalMemory = -1;
-        long freePhysicalMemory = -1;
-        long maxFileDescriptorCount = -1;
-        long currentOpenFileDescriptorCount = -1;
+        long totalCpuTime = 0;
+        if (threadMXBean.isThreadCpuTimeSupported() && threadMXBean.isThreadCpuTimeEnabled()) {
+            for (long threadId : threadMXBean.getAllThreadIds()) {
+                long cpuTime = threadMXBean.getThreadCpuTime(threadId);
+                if (cpuTime != -1) {
+                    totalCpuTime += cpuTime;
+                }
+            }
+        }
+        return totalCpuTime;
+    }
 
+    private void updateMemoryStatuses()
+    {
+        if (memoryPoolMXBeanList != null && !memoryPoolMXBeanList.isEmpty()) {
+            memoryPoolMXBeanList.forEach(pool -> {
+                var memoryStatus = processMemoryStatus.memoryStatusMap.get(pool.getName());
+                if (memoryStatus == null) {
+                    memoryStatus = MemoryStatus.create(
+                            pool.getName(),
+                            pool.getUsage().getInit(),
+                            pool.getUsage().getMax()
+                    );
+                    processMemoryStatus.memoryStatusMap.put(pool.getName(), memoryStatus);
+                }
+
+                processMemoryStatus.memoryStatusMap.put(
+                        pool.getName(),
+                        memoryStatus.withUsage(
+                                pool.getUsage().getUsed(),
+                                pool.getUsage().getCommitted()
+                        )
+                );
+            });
+        }
+    }
+
+    private record PhyOSStatus(
+            long totalPhysicalMemory,
+            long freePhysicalMemory,
+            long maxFileDescriptorCount,
+            long currentOpenFileDescriptorCount
+    )
+    {
         public String toString()
         {
-            return String.format("\ttotalPhysicalMemory:\t%,.2fG%n"
-                            + "\tfreePhysicalMemory:\t%,.2fG%n"
-                            + "\tmaxFileDescriptorCount:\t%s%n"
-                            + "\tcurrentOpenFileDescriptorCount:\t%s%n",
-                    (float) totalPhysicalMemory / GB, (float) freePhysicalMemory / GB, maxFileDescriptorCount, currentOpenFileDescriptorCount);
+            return """
+                    \ttotalPhysicalMemory:\t%,.2fG
+                    \tfreePhysicalMemory:\t%,.2fG
+                    \tmaxFileDescriptorCount:\t%s
+                    \tcurrentOpenFileDescriptorCount:\t%s
+                    """.formatted(
+                    (float) totalPhysicalMemory / GB,
+                    (float) freePhysicalMemory / GB,
+                    maxFileDescriptorCount,
+                    currentOpenFileDescriptorCount
+            );
         }
     }
 
@@ -254,11 +247,11 @@ public class VMInfo
             for (GCStatus gc : gcStatusMap.values()) {
                 sb.append("\t");
                 sb.append(String.format("%-16s | %-15s | %-12s | %-15s | %-15s | %,-14.3f | %,-14.3f | %,-11.3f | %,-14.3f %n",
-                        gc.name, gc.curDeltaGCCount, gc.totalGCCount, gc.maxDeltaGCCount, gc.minDeltaGCCount,
-                        (float) gc.curDeltaGCTime / 1000,
-                        (float) gc.totalGCTime / 1000,
-                        (float) gc.maxDeltaGCTime / 1000,
-                        (float) gc.minDeltaGCTime / 1000));
+                        gc.name(), gc.curDeltaGCCount(), gc.totalGCCount(), gc.maxDeltaGCCount(), gc.minDeltaGCCount(),
+                        (float) gc.curDeltaGCTime() / 1000,
+                        (float) gc.totalGCTime() / 1000,
+                        (float) gc.maxDeltaGCTime() / 1000,
+                        (float) gc.minDeltaGCTime() / 1000));
             }
             return sb.toString();
         }
@@ -273,12 +266,72 @@ public class VMInfo
             for (GCStatus gc : gcStatusMap.values()) {
                 sb.append("\t");
                 sb.append(String.format("%-16s | %-12s | %-15s | %-15s | %-11s | %-14s | %-14s %n",
-                        gc.name, gc.totalGCCount, gc.maxDeltaGCCount, gc.minDeltaGCCount,
-                        String.format("%,.3fs", (float) gc.totalGCTime / 1000),
-                        String.format("%,.3fs", (float) gc.maxDeltaGCTime / 1000),
-                        String.format("%,.3fs", (float) gc.minDeltaGCTime / 1000)));
+                        gc.name(), gc.totalGCCount(), gc.maxDeltaGCCount(), gc.minDeltaGCCount(),
+                        String.format("%,.3fs", (float) gc.totalGCTime() / 1000),
+                        String.format("%,.3fs", (float) gc.maxDeltaGCTime() / 1000),
+                        String.format("%,.3fs", (float) gc.minDeltaGCTime() / 1000)));
             }
             return sb.toString();
+        }
+    }
+
+    private record GCStatus(
+            String name,
+            long maxDeltaGCCount,
+            long minDeltaGCCount,
+            long curDeltaGCCount,
+            long totalGCCount,
+            long maxDeltaGCTime,
+            long minDeltaGCTime,
+            long curDeltaGCTime,
+            long totalGCTime
+    )
+    {
+        public static class Builder
+        {
+            private String name;
+            private long maxDeltaGCCount = -1;
+            private long minDeltaGCCount = -1;
+            private long curDeltaGCCount;
+            private long totalGCCount = 0;
+            private long maxDeltaGCTime = -1;
+            private long minDeltaGCTime = -1;
+            private long curDeltaGCTime;
+            private long totalGCTime = 0;
+
+            public Builder name(String name)
+            {
+                this.name = name;
+                return this;
+            }
+
+            public Builder setCurTotalGcCount(long curTotalGcCount)
+            {
+                this.curDeltaGCCount = curTotalGcCount - totalGCCount;
+                this.totalGCCount = curTotalGcCount;
+
+                this.maxDeltaGCCount = Math.max(maxDeltaGCCount, curDeltaGCCount);
+                this.minDeltaGCCount = (minDeltaGCCount == -1) ?
+                        curDeltaGCCount : Math.min(minDeltaGCCount, curDeltaGCCount);
+                return this;
+            }
+
+            public Builder setCurTotalGcTime(long curTotalGcTime)
+            {
+                this.curDeltaGCTime = curTotalGcTime - totalGCTime;
+                this.totalGCTime = curTotalGcTime;
+
+                this.maxDeltaGCTime = Math.max(maxDeltaGCTime, curDeltaGCTime);
+                this.minDeltaGCTime = (minDeltaGCTime == -1) ?
+                        curDeltaGCTime : Math.min(minDeltaGCTime, curDeltaGCTime);
+                return this;
+            }
+
+            public GCStatus build()
+            {
+                return new GCStatus(name, maxDeltaGCCount, minDeltaGCCount, curDeltaGCCount,
+                        totalGCCount, maxDeltaGCTime, minDeltaGCTime, curDeltaGCTime, totalGCTime);
+            }
         }
     }
 
@@ -293,7 +346,7 @@ public class VMInfo
             sb.append(String.format("%-30s | %-14s | %-8s %n", "MEMORY_NAME", "allocation(MB)", "init(MB)"));
             for (MemoryStatus ms : memoryStatusMap.values()) {
                 sb.append("\t");
-                sb.append(String.format("%-30s | %,-14.2f | %,-8.2f %n", ms.name, (float) ms.maxSize / MB, (float) ms.initSize / MB));
+                sb.append(String.format("%-30s | %,-14.2f | %,-8.2f %n", ms.name(), (float) ms.maxSize() / MB, (float) ms.initSize() / MB));
             }
             return sb.toString();
         }
@@ -308,78 +361,37 @@ public class VMInfo
             for (MemoryStatus ms : memoryStatusMap.values()) {
                 sb.append("\t");
                 sb.append(String.format("%-22s | %,-10.2f | %,-12.2f | %,-13.2f | %,-12.2f %n",
-                        ms.name, (float) ms.usedSize / MB, ms.percent, (float) ms.maxUsedSize / MB, ms.maxPercent));
+                        ms.name(), (float) ms.usedSize() / MB, ms.percent(), (float) ms.maxUsedSize() / MB, ms.maxPercent()));
             }
             return sb.toString();
         }
     }
 
-    private static class GCStatus
+    private record MemoryStatus(
+            String name,
+            long initSize,
+            long maxSize,
+            long commitedSize,
+            long usedSize,
+            float percent,
+            long maxUsedSize,
+            float maxPercent
+    )
     {
-        String name;
-        long maxDeltaGCCount = -1;
-        long minDeltaGCCount = -1;
-        long curDeltaGCCount;
-        long totalGCCount = 0;
-        long maxDeltaGCTime = -1;
-        long minDeltaGCTime = -1;
-        long curDeltaGCTime;
-        long totalGCTime = 0;
-
-        public void setCurTotalGcCount(long curTotalGcCount)
+        public static MemoryStatus create(String name, long initSize, long maxSize)
         {
-            this.curDeltaGCCount = curTotalGcCount - totalGCCount;
-            this.totalGCCount = curTotalGcCount;
-
-            if (maxDeltaGCCount < curDeltaGCCount) {
-                maxDeltaGCCount = curDeltaGCCount;
-            }
-
-            if (minDeltaGCCount == -1 || minDeltaGCCount > curDeltaGCCount) {
-                minDeltaGCCount = curDeltaGCCount;
-            }
+            return new MemoryStatus(name, initSize, maxSize, 0, 0, 0, -1, 0);
         }
 
-        public void setCurTotalGcTime(long curTotalGcTime)
+        public MemoryStatus withUsage(long curUsedSize, long commitedSize)
         {
-            this.curDeltaGCTime = curTotalGcTime - totalGCTime;
-            this.totalGCTime = curTotalGcTime;
+            long newMaxUsedSize = Math.max(this.maxUsedSize, curUsedSize);
+            float curPercent = commitedSize > 0 ?
+                    (float) 100 * curUsedSize / commitedSize : -1;
+            float newMaxPercent = Math.max(this.maxPercent, curPercent);
 
-            if (maxDeltaGCTime < curDeltaGCTime) {
-                maxDeltaGCTime = curDeltaGCTime;
-            }
-
-            if (minDeltaGCTime == -1 || minDeltaGCTime > curDeltaGCTime) {
-                minDeltaGCTime = curDeltaGCTime;
-            }
-        }
-    }
-
-    private static class MemoryStatus
-    {
-        String name;
-        long initSize;
-        long maxSize;
-        long commitedSize;
-        long usedSize;
-        float percent;
-        long maxUsedSize = -1;
-        float maxPercent = 0;
-
-        void setMaxMinUsedSize(long curUsedSize)
-        {
-            if (maxUsedSize < curUsedSize) {
-                maxUsedSize = curUsedSize;
-            }
-            this.usedSize = curUsedSize;
-        }
-
-        void setMaxMinPercent(float curPercent)
-        {
-            if (maxPercent < curPercent) {
-                maxPercent = curPercent;
-            }
-            this.percent = curPercent;
+            return new MemoryStatus(name, initSize, maxSize, commitedSize,
+                    curUsedSize, curPercent, newMaxUsedSize, newMaxPercent);
         }
     }
 
@@ -406,28 +418,30 @@ public class VMInfo
         public String getDeltaString()
         {
 
-            return "\n [delta cpu info] => \n" +
-                    "\t" +
-                    String.format("%-11s | %-10s | %-11s | %-11s %n", "curDeltaCPU", "averageCPU", "maxDeltaCPU", "minDeltaCPU") +
-                    "\t" +
-                    String.format("%-11s | %-10s | %-11s | %-11s %n",
-                            String.format("%,.2f%%", processCpuStatus.curDeltaCpu),
-                            String.format("%,.2f%%", processCpuStatus.averageCpu),
-                            String.format("%,.2f%%", processCpuStatus.maxDeltaCpu),
-                            String.format("%,.2f%%%n", processCpuStatus.minDeltaCpu));
+            return String.format("""
+                            
+                             [delta cpu info] =>
+                            \t%-11s | %-10s | %-11s | %-11s
+                            \t%11.2f%% | %10.2f%% | %11.2f%% | %11.2f%%
+                            """,
+                    "curDeltaCPU", "averageCPU", "maxDeltaCPU", "minDeltaCPU",
+                    processCpuStatus.curDeltaCpu,
+                    processCpuStatus.averageCpu,
+                    processCpuStatus.maxDeltaCpu,
+                    processCpuStatus.minDeltaCpu);
         }
 
         public String getTotalString()
         {
-
-            return "\n [total cpu info] => \n" +
-                    "\t" +
-                    String.format("%-10s | %-11s | %-11s %n", "averageCPU", "maxDeltaCPU", "minDeltaCPU") +
-                    "\t" +
-                    String.format("%-10s | %-11s | %-11s %n",
-                            String.format("%,.2f%%", processCpuStatus.averageCpu),
-                            String.format("%,.2f%%", processCpuStatus.maxDeltaCpu),
-                            String.format("%,.2f%%%n", processCpuStatus.minDeltaCpu));
+            return String.format("""
+                            
+                             [total cpu info] =>
+                            \t%-10s | %-11s | %-11s
+                            \t%10.2f%% | %11.2f%% | %11.2f%%
+                            """, "averageCPU", "maxDeltaCPU", "minDeltaCPU",
+                    processCpuStatus.averageCpu,
+                    processCpuStatus.maxDeltaCpu,
+                    processCpuStatus.minDeltaCpu);
         }
     }
 }

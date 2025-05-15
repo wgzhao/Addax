@@ -106,10 +106,7 @@ public class ParquetWriter
     {
         List<Configuration> columns = config.getListConfiguration(Key.COLUMN);
         String compress = config.getString(Key.COMPRESS, "UNCOMPRESSED").toUpperCase().trim();
-        if ("NONE".equals(compress)) {
-            compress = "UNCOMPRESSED";
-        }
-        CompressionCodecName codecName = CompressionCodecName.fromConf(compress);
+        CompressionCodecName codecName = CompressionCodecName.fromConf(compress.equals("NONE") ? "UNCOMPRESSED" : compress);
 
         // Construct parquet schema
         MessageType schema = generateParquetSchema(columns);
@@ -210,36 +207,18 @@ public class ParquetWriter
     {
 
         switch (columnType) {
-            case INT:
-            case INTEGER:
-                group.append(colName, Integer.parseInt(column.getRawData().toString()));
-                break;
-            case BIGINT:
-            case LONG:
-                group.append(colName, column.asLong());
-                break;
-            case FLOAT:
-                group.append(colName, column.asDouble().floatValue());
-                break;
-            case DOUBLE:
-                group.append(colName, column.asDouble());
-                break;
-            case BOOLEAN:
-                group.append(colName, column.asBoolean());
-                break;
-            case DECIMAL:
+            case INT, INTEGER -> group.append(colName, Integer.parseInt(column.getRawData().toString()));
+            case BIGINT, LONG -> group.append(colName, column.asLong());
+            case FLOAT -> group.append(colName, column.asDouble().floatValue());
+            case DOUBLE -> group.append(colName, column.asDouble());
+            case BOOLEAN -> group.append(colName, column.asBoolean());
+            case DECIMAL -> {
                 int scale = colConfig.getInt(Key.SCALE, Constant.DEFAULT_DECIMAL_MAX_SCALE);
                 group.append(colName, decimalToBinary(column.asString(), scale));
-                break;
-            case TIMESTAMP:
-                group.append(colName, tsToBinary(column.asTimestamp()));
-                break;
-            case DATE:
-                group.append(colName, (int) Math.round(column.asLong() * 1.0 / MILLIS_PER_DAY));
-                break;
-            default:
-                group.append(colName, column.asString());
-                break;
+            }
+            case TIMESTAMP -> group.append(colName, tsToBinary(column.asTimestamp()));
+            case DATE -> group.append(colName, (int) Math.round(column.asLong() * 1.0 / MILLIS_PER_DAY));
+            default -> group.append(colName, column.asString());
         }
     }
 
@@ -272,18 +251,18 @@ public class ParquetWriter
 
     private static void appendPrimitiveValue(Object value, String element, Group group)
     {
-        if (value instanceof Number) {
-            if (value instanceof Integer) {
-                group.append(element, ((Number) value).intValue());
+        if (value instanceof Number number) {
+            if (value instanceof Integer i ) {
+                group.append(element, i);
             }
-            else if (value instanceof Long) {
-                group.append(element, ((Number) value).longValue());
+            else if (value instanceof Long i) {
+                group.append(element, i);
             }
-            else if (value instanceof Short) {
-                group.append(element, ((Number) value).shortValue());
+            else if (value instanceof Short i) {
+                group.append(element, i);
             }
             else if (value instanceof Float || value instanceof Double) {
-                group.append(element, ((Number) value).doubleValue());
+                group.append(element, number.doubleValue());
             }
             else {
                 // BigDecimal
@@ -430,33 +409,39 @@ public class ParquetWriter
     private static PrimitiveType getPrimitiveType(String type, String fieldName, Type.Repetition repetition, Configuration column)
     {
         switch (type) {
-            case "INT":
+            case "INT" -> {
                 return Types.primitive(PrimitiveType.PrimitiveTypeName.INT32, repetition).named(fieldName);
-            case "BIGINT":
-            case "LONG":
+            }
+            case "BIGINT", "LONG" -> {
                 return Types.primitive(PrimitiveType.PrimitiveTypeName.INT64, repetition).named(fieldName);
-            case "DECIMAL":
+            }
+            case "DECIMAL" -> {
                 int precision = column.getInt(Key.PRECISION, Constant.DEFAULT_DECIMAL_MAX_PRECISION);
                 int scale = column.getInt(Key.SCALE, Constant.DEFAULT_DECIMAL_MAX_SCALE);
                 return Types.primitive(PrimitiveType.PrimitiveTypeName.FIXED_LEN_BYTE_ARRAY, repetition)
                         .length(DECIMAL_BYTE_LENGTH)
                         .as(decimalType(scale, precision))
                         .named(fieldName);
-            case "STRING":
+            }
+            case "STRING" -> {
                 return Types.primitive(PrimitiveType.PrimitiveTypeName.BINARY, repetition)
                         .as(LogicalTypeAnnotation.stringType())
                         .named(fieldName);
-            case "BYTES":
+            }
+            case "BYTES" -> {
                 return Types.primitive(PrimitiveType.PrimitiveTypeName.BINARY, repetition)
                         .named(fieldName);
-            case "DATE":
+            }
+            case "DATE" -> {
                 return Types.primitive(PrimitiveType.PrimitiveTypeName.INT32, repetition)
                         .as(LogicalTypeAnnotation.dateType())
                         .named(fieldName);
-            case "TIMESTAMP":
+            }
+            case "TIMESTAMP" -> {
                 return Types.primitive(PrimitiveType.PrimitiveTypeName.INT96, repetition)
                         .named(fieldName);
-            default:
+            }
+            default -> {
                 try {
                     return Types.primitive(PrimitiveType.PrimitiveTypeName.valueOf(type), repetition)
                             .named(fieldName);
@@ -467,6 +452,7 @@ public class ParquetWriter
                             .as(LogicalTypeAnnotation.stringType())
                             .named(fieldName);
                 }
+            }
         }
     }
 }

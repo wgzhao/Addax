@@ -73,7 +73,11 @@ public class HdfsWriter
         // option bypasses trash, if enabled, and immediately deletes
         private boolean skipTrash = false;
 
-        public static final Set<String> SUPPORT_FORMAT = new HashSet<>(Arrays.asList("ORC", "PARQUET", "TEXT"));
+        // Use Set.of() for immutable set creation
+        public static final Set<String> SUPPORT_FORMAT = Set.of("ORC", "PARQUET", "TEXT");
+
+        // Create record for decimal configuration
+        private record DecimalConfig(int precision, int scale) {}
 
         @Override
         public void init()
@@ -114,25 +118,8 @@ public class HdfsWriter
             if (null == columns || columns.isEmpty()) {
                 throw AddaxException.asAddaxException(REQUIRED_VALUE, "The item columns should be configured");
             }
-            else {
-                boolean rewriteFlag = false;
-                for (int i = 0; i < columns.size(); i++) {
-                    Configuration eachColumnConf = columns.get(i);
-                    eachColumnConf.getNecessaryValue(Key.NAME, REQUIRED_VALUE);
-                    eachColumnConf.getNecessaryValue(Key.TYPE, REQUIRED_VALUE);
-                    if (eachColumnConf.getString(Key.TYPE).toUpperCase().startsWith("DECIMAL")) {
-                        String type = eachColumnConf.getString(Key.TYPE);
-                        eachColumnConf.set(Key.TYPE, "decimal");
-                        eachColumnConf.set(Key.PRECISION, getDecimalPrecision(type));
-                        eachColumnConf.set(Key.SCALE, getDecimalScale(type));
-                        columns.set(i, eachColumnConf);
-                        rewriteFlag = true;
-                    }
-                }
-                if (rewriteFlag) {
-                    this.writerSliceConfig.set(Key.COLUMN, columns);
-                }
-            }
+            processColumns(columns);
+
             //writeMode check
             this.writeMode = this.writerSliceConfig.getNecessaryValue(Key.WRITE_MODE, REQUIRED_VALUE);
             if (!Constant.SUPPORTED_WRITE_MODE.contains(writeMode)) {
@@ -156,48 +143,11 @@ public class HdfsWriter
             }
 
             //compress check
-            String compress = this.writerSliceConfig.getString(Key.COMPRESS, "NONE").toUpperCase().trim();
-            if ("ORC".equals(fileType)) {
-                try {
-                    CompressionKind.valueOf(compress);
-                }
-                catch (IllegalArgumentException e) {
-                    throw AddaxException.asAddaxException(ILLEGAL_VALUE,
-                            String.format("The ORC format only supports %s compression. your configure [%s] is unsupported yet.",
-                                    Arrays.toString(CompressionKind.values()), compress));
-                }
-            }
-            if ("PARQUET".equals(fileType)) {
-                if ("NONE".equals(compress)) {
-                    compress = "UNCOMPRESSED";
-                }
-                try {
-                    CompressionCodecName.fromConf(compress);
-                }
-                catch (Exception e) {
-                    throw AddaxException.asAddaxException(ILLEGAL_VALUE,
-                            String.format("The PARQUET format only supports [%s] compression. your configure [%s] is unsupported yet.",
-                                    Arrays.toString(CompressionCodecName.values()), compress));
-                }
-            }
-
+            validateCompression(fileType);
             //Kerberos check
-            boolean haveKerberos = this.writerSliceConfig.getBool(Key.HAVE_KERBEROS, false);
-            if (haveKerberos) {
-                this.writerSliceConfig.getNecessaryValue(Key.KERBEROS_KEYTAB_FILE_PATH, REQUIRED_VALUE);
-                this.writerSliceConfig.getNecessaryValue(Key.KERBEROS_PRINCIPAL, REQUIRED_VALUE);
-            }
+            validateKerberos();
             // encoding check
-            String encoding = this.writerSliceConfig.getString(Key.ENCODING, Constant.DEFAULT_ENCODING);
-            try {
-                encoding = encoding.trim();
-                this.writerSliceConfig.set(Key.ENCODING, encoding);
-                Charsets.toCharset(encoding);
-            }
-            catch (Exception e) {
-                throw AddaxException.asAddaxException(ILLEGAL_VALUE,
-                        String.format("The encoding [%s] is unsupported yet.", encoding), e);
-            }
+            validateEncoding();
 
             // trash
             this.skipTrash = this.writerSliceConfig.getBool(SKIP_TRASH, false);
@@ -376,6 +326,114 @@ public class HdfsWriter
                 return Integer.parseInt(type.split(",")[1].replace(")", "").trim());
             }
         }
+
+        private void processColumns(List<Configuration> columns)
+        {
+            var rewriteFlag = false;
+            for (var i = 0; i < columns.size(); i++) {
+                var column = columns.get(i);
+                column.getNecessaryValue(Key.NAME, REQUIRED_VALUE);
+                column.getNecessaryValue(Key.TYPE, REQUIRED_VALUE);
+
+                if (column.getString(Key.TYPE).toUpperCase().startsWith("DECIMAL")) {
+                    var type = column.getString(Key.TYPE);
+                    var config = parseDecimalConfig(type);
+                    column.set(Key.TYPE, "decimal");
+                    column.set(Key.PRECISION, config.precision());
+                    column.set(Key.SCALE, config.scale());
+                    columns.set(i, column);
+                    rewriteFlag = true;
+                }
+            }
+
+            if (rewriteFlag) {
+                this.writerSliceConfig.set(Key.COLUMN, columns);
+            }
+        }
+
+        private DecimalConfig parseDecimalConfig(String type)
+        {
+            if (!type.contains("(")) {
+                return new DecimalConfig(
+                        Constant.DEFAULT_DECIMAL_MAX_PRECISION,
+                        Constant.DEFAULT_DECIMAL_MAX_SCALE
+                );
+            }
+
+            var matcher = Pattern.compile("\\d+").matcher(type);
+            var numbers = new ArrayList<Integer>();
+            while (matcher.find()) {
+                numbers.add(Integer.parseInt(matcher.group()));
+            }
+
+            return switch (numbers.size()) {
+                case 1 -> new DecimalConfig(numbers.get(0), 0);
+                case 2 -> new DecimalConfig(numbers.get(0), numbers.get(1));
+                default -> new DecimalConfig(
+                        Constant.DEFAULT_DECIMAL_MAX_PRECISION,
+                        Constant.DEFAULT_DECIMAL_MAX_SCALE
+                );
+            };
+        }
+
+        private void validateCompression(String fileType)
+        {
+            var compress = this.writerSliceConfig.getString(Key.COMPRESS, "NONE")
+                    .toUpperCase()
+                    .trim();
+
+            switch (fileType) {
+                case "ORC" -> {
+                    try {
+                        CompressionKind.valueOf(compress);
+                    }
+                    catch (IllegalArgumentException e) {
+                        throw AddaxException.asAddaxException(ILLEGAL_VALUE,
+                                """
+                                        The ORC format only supports %s compression.
+                                        Your configure [%s] is unsupported yet.
+                                        """.formatted(Arrays.toString(CompressionKind.values()), compress));
+                    }
+                }
+                case "PARQUET" -> {
+                    if ("NONE".equals(compress)) {
+                        compress = "UNCOMPRESSED";
+                    }
+                    try {
+                        CompressionCodecName.fromConf(compress);
+                    }
+                    catch (Exception e) {
+                        throw AddaxException.asAddaxException(ILLEGAL_VALUE,
+                                """
+                                        The PARQUET format only supports [%s] compression.
+                                        Your configure [%s] is unsupported yet.
+                                        """.formatted(Arrays.toString(CompressionCodecName.values()), compress));
+                    }
+                }
+            }
+        }
+
+        private void validateKerberos()
+        {
+            var haveKerberos = this.writerSliceConfig.getBool(Key.HAVE_KERBEROS, false);
+            if (haveKerberos) {
+                this.writerSliceConfig.getNecessaryValue(Key.KERBEROS_KEYTAB_FILE_PATH, REQUIRED_VALUE);
+                this.writerSliceConfig.getNecessaryValue(Key.KERBEROS_PRINCIPAL, REQUIRED_VALUE);
+            }
+        }
+
+        private void validateEncoding()
+        {
+            var encoding = this.writerSliceConfig.getString(Key.ENCODING, Constant.DEFAULT_ENCODING).trim();
+            try {
+                this.writerSliceConfig.set(Key.ENCODING, encoding);
+                Charsets.toCharset(encoding);
+            }
+            catch (Exception e) {
+                throw AddaxException.asAddaxException(ILLEGAL_VALUE,
+                        "The encoding [%s] is unsupported yet.".formatted(encoding), e);
+            }
+        }
     }
 
     public static class Task
@@ -402,21 +460,13 @@ public class HdfsWriter
         public void startWrite(RecordReceiver lineReceiver)
         {
             String fileType = this.writerSliceConfig.getString(Key.FILE_TYPE).toUpperCase();
-            IHDFSWriter hdfsHelper = null;
-            switch (fileType) {
-                case "TEXT":
-                    hdfsHelper = new TextWriter(this.writerSliceConfig);
-                    break;
-                case "ORC":
-                    hdfsHelper = new OrcWriter(this.writerSliceConfig);
-                    break;
-                case "PARQUET":
-                    hdfsHelper = new ParquetWriter(this.writerSliceConfig);
-                    break;
-                default:
-                    throw AddaxException.asAddaxException(ILLEGAL_VALUE,
-                            String.format("The file format [%s] is supported yet,  the plugin currently only supports: [%s].", fileType, Job.SUPPORT_FORMAT));
-            }
+            IHDFSWriter hdfsHelper = switch (fileType) {
+                case "TEXT" -> new TextWriter(this.writerSliceConfig);
+                case "ORC" -> new OrcWriter(this.writerSliceConfig);
+                case "PARQUET" -> new ParquetWriter(this.writerSliceConfig);
+                default -> throw AddaxException.asAddaxException(ILLEGAL_VALUE,
+                        String.format("The file format [%s] is supported yet,  the plugin currently only supports: [%s].", fileType, Job.SUPPORT_FORMAT));
+            };
             // absolute path，eg：/user/hive/warehouse/writer.db/text/test.snappy
             String fileName = this.writerSliceConfig.getString(Key.FILE_NAME);
             LOG.info("Begin to write file : [{}]", fileName);

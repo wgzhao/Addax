@@ -34,19 +34,14 @@ public final class HBaseConstant extends Constant
 
     public static final String SELECT_COLUMNS_TEMPLATE = "SELECT COLUMN_NAME, COLUMN_FAMILY FROM SYSTEM.CATALOG WHERE TABLE_NAME='%s' AND COLUMN_NAME IS NOT NULL";
 
-    public static final String QUERY_MIN_MAX_TEMPLATE = "SELECT MIN(%s),MAX(%s) FROM %s";
-
-    public static final String QUERY_COLUMN_TYPE_TEMPLATE = "SELECT %s FROM %s LIMIT 1";
-
     public static final String QUERY_SQL_PER_SPLIT = "querySqlPerSplit";
 
     public static final String DEFAULT_NULL_MODE = "skip";
     public static final String DEFAULT_ZNODE = "/hbase";
-    //    public static final boolean DEFAULT_LAST_COLUMN_IS_VERSION = false;   // 默认最后一列不是version列
-    public static final int DEFAULT_BATCH_ROW_COUNT = 256;   // 默认一次写256行
-    public static final boolean DEFAULT_TRUNCATE = false;    // 默认开始的时候不清空表
-    public static final boolean DEFAULT_USE_THIN_CLIENT = false;    // 默认不用thin客户端
-    public static final boolean DEFAULT_HAVE_KERBEROS = false; //默认不启用 kerberos
+    public static final int DEFAULT_BATCH_ROW_COUNT = 256;
+    public static final boolean DEFAULT_TRUNCATE = false;
+    public static final boolean DEFAULT_USE_THIN_CLIENT = false;
+    public static final boolean DEFAULT_HAVE_KERBEROS = false;
     public static final String DEFAULT_KERBEROS_KEYTAB_FILE_PATH = null;
     public static final String DEFAULT_KERBEROS_PRINCIPAL = null;
 
@@ -54,8 +49,6 @@ public final class HBaseConstant extends Constant
     public static final int TYPE_UNSIGNED_SMALLINT = 13;
     public static final int TYPE_UNSIGNED_INTEGER = 9;
     public static final int TYPE_UNSIGNED_LONG = 10;
-    // public static final int TYPE_UNSIGNED_FLOAT = 14
-    // public static final int TYPE_UNSIGNED_DOUBLE = 15
     public static final int TYPE_UNSIGNED_DATE = 19;
     public static final int TYPE_UNSIGNED_TIME = 18;
     public static final int TYPE_UNSIGNED_TIMESTAMP = 20;

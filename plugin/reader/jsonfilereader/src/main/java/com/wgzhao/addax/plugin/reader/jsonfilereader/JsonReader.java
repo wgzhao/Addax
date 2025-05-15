@@ -98,14 +98,12 @@ public class JsonReader
             String pathInString = this.originConfig.getNecessaryValue(Key.PATH,
                     REQUIRED_VALUE);
             if (!pathInString.startsWith("[") && !pathInString.endsWith("]")) {
-                path = new ArrayList<>();
-                path.add(pathInString);
+                path = List.of(pathInString);
             }
             else {
                 path = this.originConfig.getList(Key.PATH, String.class);
-                if (null == path || path.isEmpty()) {
-                    throw AddaxException.asAddaxException(
-                            REQUIRED_VALUE,
+                if (path == null || path.isEmpty()) {
+                    throw AddaxException.asAddaxException(REQUIRED_VALUE,
                             "The item `path` must be not empty");
                 }
             }
@@ -126,31 +124,32 @@ public class JsonReader
                             "Not supported encoding type " + encoding, uce);
                 }
                 catch (Exception e) {
-                    throw AddaxException.asAddaxException(
-                            ENCODING_ERROR,
+                    throw AddaxException.asAddaxException(ENCODING_ERROR,
                             "Encoding Error:", e);
                 }
             }
 
             // column: 1. index type 2.value type 3.when type is Date, may have
-            List<Configuration> columns = this.originConfig.getListConfiguration(Key.COLUMN);
+            var columns = this.originConfig.getListConfiguration(Key.COLUMN);
+            if (columns != null && !columns.isEmpty()) {
+                columns.forEach(this::validateColumn);
+            }
+        }
 
-            if (null != columns && !columns.isEmpty()) {
-                for (Configuration eachColumnConf : columns) {
-                    eachColumnConf.getNecessaryValue(Key.TYPE, REQUIRED_VALUE);
-                    String columnIndex = eachColumnConf.getString(Key.INDEX);
-                    String columnValue = eachColumnConf.getString(Key.VALUE);
+        private void validateColumn(Configuration columnConf)
+        {
+            columnConf.getNecessaryValue(Key.TYPE, REQUIRED_VALUE);
+            var columnIndex = columnConf.getString(Key.INDEX);
+            var columnValue = columnConf.getString(Key.VALUE);
 
-                    if (null == columnIndex && null == columnValue) {
-                        throw AddaxException.asAddaxException(CONFIG_ERROR,
-                                "Either index or value is required for type configuration");
-                    }
+            if (columnIndex == null && columnValue == null) {
+                throw AddaxException.asAddaxException(CONFIG_ERROR,
+                        "Either index or value is required for type configuration");
+            }
 
-                    if (null != columnIndex && null != columnValue) {
-                        throw AddaxException.asAddaxException(CONFIG_ERROR,
-                                "Both index and value are set, only one is allowed");
-                    }
-                }
+            if (columnIndex != null && columnValue != null) {
+                throw AddaxException.asAddaxException(CONFIG_ERROR,
+                        "Both index and value are set, only one is allowed");
             }
         }
 
@@ -196,11 +195,9 @@ public class JsonReader
             extends Reader.Task
     {
         private static final Logger LOG = LoggerFactory.getLogger(Task.class);
-        public static final String STRING = "string";
-        public static final String LONG = "long";
-        public static final String BOOLEAN = "boolean";
-        public static final String DATE = "date";
-        public static final String DOUBLE = "double";
+
+        // Use record for column configuration
+        private record ColumnConfig(String type, String value, String index, String format) {}
 
         private List<String> sourceFiles;
         private List<Configuration> columns;
@@ -250,55 +247,64 @@ public class JsonReader
 
         private Column getColumn(String type, String columnValue, String columnFormat)
         {
-            Column columnGenerated;
-            String errorTemplate = "Type cast error, can not cast %s to %s";
-            switch (type) {
-                case STRING:
-                    columnGenerated = new StringColumn(columnValue);
-                    break;
-                case DOUBLE:
-                    try {
-                        columnGenerated = new DoubleColumn(columnValue);
-                    }
-                    catch (Exception e) {
-                        throw new IllegalArgumentException(String.format(errorTemplate, columnValue, "DOUBLE"));
-                    }
-                    break;
-                case BOOLEAN:
-                    try {
-                        columnGenerated = new BoolColumn(columnValue);
-                    }
-                    catch (Exception e) {
-                        throw new IllegalArgumentException(String.format(errorTemplate, columnValue, "BOOLEAN"));
-                    }
-                    break;
-                case LONG:
-                    try {
-                        columnGenerated = new LongColumn(columnValue);
-                    }
-                    catch (Exception e) {
-                        LOG.error(e.getMessage());
-                        throw new IllegalArgumentException(String.format(errorTemplate, columnValue, "LONG"));
-                    }
-                    break;
-                case DATE:
-                    try {
-                        if (StringUtils.isNotBlank(columnFormat)) {
-                            DateFormat format = new SimpleDateFormat(columnFormat);
-                            columnGenerated = new DateColumn(format.parse(columnValue));
-                        }
-                        else {
-                            columnGenerated = new DateColumn(new StringColumn(columnValue).asDate());
-                        }
-                    }
-                    catch (Exception e) {
-                        throw new IllegalArgumentException(String.format(errorTemplate, columnValue, "DATE"));
-                    }
-                    break;
-                default:
-                    throw AddaxException.asAddaxException(NOT_SUPPORT_TYPE, "The type" + type + " is unsupported");
+            return switch (type.toLowerCase()) {
+                case "string" -> new StringColumn(columnValue);
+                case "double" -> tryParseDouble(columnValue);
+                case "boolean" -> tryParseBoolean(columnValue);
+                case "long" -> tryParseLong(columnValue);
+                case "date" -> tryParseDate(columnValue, columnFormat);
+                default -> throw AddaxException.asAddaxException(NOT_SUPPORT_TYPE,
+                        "The type %s is unsupported".formatted(type));
+            };
+        }
+
+        private Column tryParseDouble(String value)
+        {
+            try {
+                return new DoubleColumn(value);
             }
-            return columnGenerated;
+            catch (Exception e) {
+                throw new IllegalArgumentException(
+                        "Type cast error, cannot cast %s to DOUBLE".formatted(value));
+            }
+        }
+
+        private Column tryParseBoolean(String value)
+        {
+            try {
+                return new BoolColumn(value);
+            }
+            catch (Exception e) {
+                throw new IllegalArgumentException(
+                        "Type cast error, cannot cast %s to BOOLEAN".formatted(value));
+            }
+        }
+
+        private Column tryParseLong(String value)
+        {
+            try {
+                return new LongColumn(value);
+            }
+            catch (Exception e) {
+                LOG.error(e.getMessage());
+                throw new IllegalArgumentException(
+                        "Type cast error, cannot cast %s to LONG".formatted(value));
+            }
+        }
+
+        private Column tryParseDate(String value, String format)
+        {
+            try {
+                if (StringUtils.isNotBlank(format)) {
+                    var dateFormat = new SimpleDateFormat(format);
+                    return new DateColumn(dateFormat.parse(value));
+                }
+                return new DateColumn(new StringColumn(value).asDate());
+            }
+            catch (Exception e) {
+                throw new IllegalArgumentException(
+                        "Type cast error, cannot cast %s to DATE".formatted(value));
+            }
         }
 
         private void transportOneRecord(RecordSender recordSender, List<Column> sourceLine)

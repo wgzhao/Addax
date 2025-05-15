@@ -40,6 +40,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import java.util.Set;
 import java.util.StringJoiner;
 
 import static com.wgzhao.addax.core.spi.ErrorCode.CONFIG_ERROR;
@@ -48,6 +49,15 @@ public class SingleTableSplitUtil
 {
     private static final Logger LOG = LoggerFactory.getLogger(SingleTableSplitUtil.class);
 
+    private static final Set<JDBCType> LONG_TYPES = Set.of(
+            JDBCType.BIGINT, JDBCType.INTEGER, JDBCType.SMALLINT, JDBCType.TINYINT
+    );
+
+    private static final Set<JDBCType> FLOAT_TYPES = Set.of(
+            JDBCType.DECIMAL, JDBCType.NUMERIC,
+            JDBCType.DOUBLE, JDBCType.FLOAT, JDBCType.REAL
+    );
+
     private SingleTableSplitUtil()
     {
     }
@@ -55,12 +65,12 @@ public class SingleTableSplitUtil
     public static List<Configuration> splitSingleTable(DataBaseType dataBaseType, Configuration configuration, int adviceNum)
     {
         List<Configuration> pluginParams = new ArrayList<>();
-        List<String> rangeList;
         String splitPkName = configuration.getString(Key.SPLIT_PK);
         String column = configuration.getString(Key.COLUMN);
         String table = configuration.getString(Key.TABLE);
         String where = configuration.getString(Key.WHERE, null);
         boolean hasWhere = StringUtils.isNotBlank(where);
+
         if (adviceNum < 1) {
             throw new IllegalArgumentException("The number of split should be greater than or equal 1, but it got " + adviceNum);
         }
@@ -71,7 +81,7 @@ public class SingleTableSplitUtil
             return pluginParams;
         }
 
-        rangeList = genPkRangeSQLForGeneric(dataBaseType, splitPkName, table, where, configuration, adviceNum);
+        var rangeList = genPkRangeSQLForGeneric(dataBaseType, splitPkName, table, where, configuration, adviceNum);
 
         if (rangeList.isEmpty()) {
             //mean the split key only has null value
@@ -81,13 +91,11 @@ public class SingleTableSplitUtil
             return pluginParams;
         }
 
-        String tempQuerySql;
         StringJoiner allQuerySql = new StringJoiner("\n");
 
         for (String range : rangeList) {
-            Configuration tempConfig = configuration.clone();
-
-            tempQuerySql = buildQuerySql(column, table, where) + (hasWhere ? " AND " : " WHERE ") + range;
+            var tempConfig = configuration.clone();
+            var tempQuerySql = buildQuerySql(column, table, where) + (hasWhere ? " AND " : " WHERE ") + range;
 
             allQuerySql.add(tempQuerySql);
             tempConfig.set(Key.QUERY_SQL, tempQuerySql);
@@ -95,8 +103,8 @@ public class SingleTableSplitUtil
         }
 
         if (configuration.getBool("pkExistsNull", false)) {
-            Configuration tempConfig = configuration.clone();
-            tempQuerySql = buildQuerySql(column, table, where)
+            var tempConfig = configuration.clone();
+            var tempQuerySql = buildQuerySql(column, table, where)
                     + (hasWhere ? " AND " : " WHERE ")
                     + splitPkName + " IS NULL";
             allQuerySql.add(tempQuerySql);
@@ -110,16 +118,9 @@ public class SingleTableSplitUtil
 
     public static String buildQuerySql(String column, String table, String where)
     {
-        String querySql;
-
-        if (StringUtils.isBlank(where)) {
-            querySql = String.format(Constant.QUERY_SQL_TEMPLATE_WITHOUT_WHERE, column, table);
-        }
-        else {
-            querySql = String.format(Constant.QUERY_SQL_TEMPLATE, column, table, where);
-        }
-
-        return querySql;
+        return StringUtils.isBlank(where)
+                ? String.format(Constant.QUERY_SQL_TEMPLATE_WITHOUT_WHERE, column, table)
+                : String.format(Constant.QUERY_SQL_TEMPLATE, column, table, where);
     }
 
     /**
@@ -141,11 +142,10 @@ public class SingleTableSplitUtil
         String username = configuration.getString(Key.USERNAME);
         String password = configuration.getString(Key.PASSWORD);
 
-        Connection conn = DBUtil.getConnection(dataBaseType, jdbcURL, username, password);
-        MinMaxPackage minMaxPackage = new MinMaxPackage();
-        ResultSet rs = null;
-        try {
-            rs = DBUtil.query(conn, pkRangeSQL, 1);
+        try (Connection conn = DBUtil.getConnection(dataBaseType, jdbcURL, username, password);
+                ResultSet rs = DBUtil.query(conn, pkRangeSQL, 1)) {
+
+            MinMaxPackage minMaxPackage = new MinMaxPackage();
             ResultSetMetaData rsMetaData = rs.getMetaData();
             if (isLongType(rsMetaData.getColumnType(1))) {
                 minMaxPackage.setType(MinMaxPackage.PkType.LONG);
@@ -160,20 +160,10 @@ public class SingleTableSplitUtil
                 minMaxPackage.setMin(rs.getObject(1));
                 minMaxPackage.setMax(rs.getObject(2));
             }
-            rs.close();
-            // the pk exists null at the current condition
-            if (StringUtils.isBlank(where)) {
-                rs = DBUtil.query(conn, "SELECT count(*) FROM " + table + " WHERE " + splitPK + " IS NULL", 1);
-            }
-            else {
-                rs = DBUtil.query(conn, "SELECT count(*) FROM " + table + " WHERE " + where + " AND " + splitPK + " IS NULL", 1);
-            }
-            if (rs.next() && rs.getInt(1) > 0) {
-                LOG.info("the split key has null value.");
-                //minMaxPackage.setPkExistsNull(true);
-                configuration.set("pkExistsNull", true);
-            }
-            rs.close();
+
+            checkForNullValues(configuration, conn, splitPK, table, where);
+
+            return minMaxPackage;
         }
         catch (AddaxException e) {
             throw e;
@@ -181,11 +171,23 @@ public class SingleTableSplitUtil
         catch (Exception e) {
             throw AddaxException.asAddaxException(CONFIG_ERROR, "Failed to split the table.", e);
         }
-        finally {
-            DBUtil.closeDBResources(rs, null, null);
-            DBUtil.closeDBResources(null, conn);
+    }
+
+    private static void checkForNullValues(Configuration configuration, Connection conn, String splitPK, String table, String where)
+    {
+        String nullCheckSql = StringUtils.isBlank(where)
+                ? "SELECT count(*) FROM " + table + " WHERE " + splitPK + " IS NULL"
+                : "SELECT count(*) FROM " + table + " WHERE " + where + " AND " + splitPK + " IS NULL";
+
+        try (ResultSet rs = DBUtil.query(conn, nullCheckSql, 1)) {
+            if (rs.next() && rs.getInt(1) > 0) {
+                LOG.info("the split key has null value.");
+                configuration.set("pkExistsNull", true);
+            }
         }
-        return minMaxPackage;
+        catch (Exception e) {
+            throw AddaxException.asAddaxException(CONFIG_ERROR, "Failed to split the table.", e);
+        }
     }
 
     /**
@@ -205,13 +207,13 @@ public class SingleTableSplitUtil
             return new ArrayList<>();
         }
 
-        List<Object> rangeValue = new ArrayList<>();
         MinMaxPackage pkMinAndMaxValue = getPkMinAndMaxValue(dataBaseType, configuration);
         if (pkMinAndMaxValue.getMin() == null || pkMinAndMaxValue.getMax() == null || pkMinAndMaxValue.isSameValue()) {
             // mean the split key has only null value, it can not split
             return Collections.emptyList();
         }
 
+        List<Object> rangeValue;
         if (pkMinAndMaxValue.isNumeric()) {
             LOG.info("The type of split key is numeric, so we use the math algorithm to split the table.");
             rangeValue = pkMinAndMaxValue.genSplitPoint(adviceNum);
@@ -222,12 +224,13 @@ public class SingleTableSplitUtil
         String jdbcURL = configuration.getString(Key.JDBC_URL);
         String username = configuration.getString(Key.USERNAME);
         String password = configuration.getString(Key.PASSWORD);
-        Connection conn = DBUtil.getConnection(dataBaseType, jdbcURL, username, password);
-        LOG.info("split pk [sql={}] is running... ", splitSql);
-        ResultSet rs = null;
 
-        try {
-            rs = DBUtil.query(conn, splitSql, adviceNum);
+        LOG.info("split pk [sql={}] is running... ", splitSql);
+
+        rangeValue = new ArrayList<>();
+        try (Connection conn = DBUtil.getConnection(dataBaseType, jdbcURL, username, password);
+                ResultSet rs = DBUtil.query(conn, splitSql, adviceNum)) {
+
             while (DBUtil.asyncResultSetNext(rs)) {
                 rangeValue.add(rs.getObject(1));
             }
@@ -237,9 +240,6 @@ public class SingleTableSplitUtil
         }
         catch (Exception e) {
             throw AddaxException.asAddaxException(CONFIG_ERROR, "Failed to split table by split key.", e);
-        }
-        finally {
-            DBUtil.closeDBResources(rs, null, null);
         }
 
         LOG.debug(JSON.toJSONString(rangeValue));
@@ -261,11 +261,7 @@ public class SingleTableSplitUtil
      */
     private static String genSplitPointSql(String splitPK, String table, String whereSql, int adviceNum, DataBaseType dataBaseType, MinMaxPackage minMaxPack)
     {
-        String sql;
-        if (StringUtils.isBlank(whereSql)) {
-            whereSql = " WHERE 1=1 ";
-        }
-        // If it's a string type, we need to split efficiently
+        // 使用JDK17的文本块特性来改写SQL拼接
         if (minMaxPack.getType() == MinMaxPackage.PkType.STRING) {
             // For string type, we'll calculate the split points directly instead of using ORDER BY RAND()
             List<Object> splitPoints = calculateStringSplitPoints(
@@ -276,28 +272,40 @@ public class SingleTableSplitUtil
             // Store the calculated split points in configuration for use later
             return buildStringSplitPointQuery(splitPK, table, whereSql, splitPoints);
         }
+
+        // 处理whereSql
+        if (StringUtils.isBlank(whereSql)) {
+            whereSql = " WHERE 1=1 ";
+        }
         else {
             whereSql = "WHERE (" + whereSql + ") AND " + splitPK + " > " + minMaxPack.getMin() + " AND " + splitPK + "<" + minMaxPack.getMax();
         }
 
-        if (dataBaseType == DataBaseType.Oracle) {
-            sql = String.format("select %1$s from (select %1$s from %2$s %3$s order by DBMS_RANDOM.VALUE) where rownum < %4$d order by %1$s",
+        return switch (dataBaseType) {
+            case Oracle -> String.format("""
+                            select %1$s from (
+                                select %1$s from %2$s %3$s order by DBMS_RANDOM.VALUE
+                            ) where rownum < %4$d order by %1$s""",
                     splitPK, table, whereSql, adviceNum);
-        }
-        else if (dataBaseType == DataBaseType.SQLServer || dataBaseType == DataBaseType.Sybase) {
-            sql = String.format("select %1$s from (select top %4$d %1$s from %2$s %3$s order by newid()) t order by %1$s",
+
+            case SQLServer, Sybase -> String.format("""
+                            select %1$s from (
+                                select top %4$d %1$s from %2$s %3$s order by newid()
+                            ) t order by %1$s""",
                     splitPK, table, whereSql, adviceNum - 1);
-        }
-        else if (dataBaseType == DataBaseType.PostgreSQL || dataBaseType == DataBaseType.SQLite) {
-            sql = String.format("select %1s from (select %1$s from %2$s %3$s order by random() limit %4$d) t order by %1$s",
+
+            case PostgreSQL, SQLite -> String.format("""
+                            select %1$s from (
+                                select %1$s from %2$s %3$s order by random() limit %4$d
+                            ) t order by %1$s""",
                     splitPK, table, whereSql, adviceNum - 1);
-        }
-        else {
-            // include mysql, mariadb, clickhouse, hive, trinodb, presto, doris, phoenix with hbase
-            sql = String.format("select %1$s from (select %1$s from %2$s %3$s order by rand() limit %4$d) t order by %1$s",
+
+            default -> String.format("""
+                            select %1$s from (
+                                select %1$s from %2$s %3$s order by rand() limit %4$d
+                            ) t order by %1$s""",
                     splitPK, table, whereSql, adviceNum - 1);
-        }
-        return sql;
+        };
     }
 
     /**
@@ -317,60 +325,50 @@ public class SingleTableSplitUtil
     public static List<String> genAllTypePkRangeWhereClause(String pkName, MinMaxPackage minMaxPackage, List<Object> rangeValues)
     {
         List<String> rangeSql = new ArrayList<>();
-        String singleSqlTemplate;
-        String middleSqlTemplate;
-        String lastSqlTemplate;
-
         boolean isString = minMaxPackage.getType() == MinMaxPackage.PkType.STRING;
-        if (isString) {
-            singleSqlTemplate = "%s >= '%s' AND %s <= '%s'";
-            middleSqlTemplate = "%s >= '%s' AND %s < '%s'";
-            lastSqlTemplate = "%s >= '%s' AND %s <= '%s'";
-        }
-        else {
-            singleSqlTemplate = "%s >= %s AND %s <= %s";
-            middleSqlTemplate = "%s >= %s AND %s < %s";
-            lastSqlTemplate = "%s >= %s AND %s <= %s";
-        }
+
+        String singleSqlTemplate = isString ? "%s >= '%s' AND %s <= '%s'" : "%s >= %s AND %s <= %s";
+        String middleSqlTemplate = isString ? "%s >= '%s' AND %s < '%s'" : "%s >= %s AND %s < %s";
+        String lastSqlTemplate = isString ? "%s >= '%s' AND %s <= '%s'" : "%s >= %s AND %s <= %s";
+
         Object min = minMaxPackage.getMin();
         Object max = minMaxPackage.getMax();
         if (rangeValues.isEmpty()) {
             rangeSql.add(String.format(singleSqlTemplate, pkName, min, pkName, max));
             return rangeSql;
         }
-        rangeValues.add(0, min);
-        for (int i = 0; i < rangeValues.size() - 1; i++) {
-            rangeSql.add(String.format(middleSqlTemplate, pkName, rangeValues.get(i), pkName, rangeValues.get(i + 1)));
+
+        var allPoints = new ArrayList<>(rangeValues.size() + 1);
+        allPoints.add(min);
+        allPoints.addAll(rangeValues);
+
+        for (int i = 0; i < allPoints.size() - 1; i++) {
+            rangeSql.add(String.format(middleSqlTemplate, pkName, allPoints.get(i), pkName, allPoints.get(i + 1)));
         }
 
-        rangeSql.add(String.format(lastSqlTemplate, pkName, rangeValues.get(rangeValues.size() - 1), pkName, max));
+        rangeSql.add(String.format(lastSqlTemplate, pkName, allPoints.get(allPoints.size() - 1), pkName, max));
 
         return rangeSql;
     }
 
     private static boolean isLongType(int type)
     {
-        List<JDBCType> longTypeList = Arrays.asList(
-                JDBCType.BIGINT, JDBCType.INTEGER, JDBCType.SMALLINT, JDBCType.TINYINT
-        );
-        return longTypeList.contains(JDBCType.valueOf(type));
+        return LONG_TYPES.contains(JDBCType.valueOf(type));
     }
 
     private static boolean isFloatType(int type)
     {
-        List<JDBCType> floatTypeList = Arrays.asList(JDBCType.DECIMAL, JDBCType.NUMERIC,
-                JDBCType.DOUBLE, JDBCType.FLOAT, JDBCType.REAL
-        );
-        return floatTypeList.contains(JDBCType.valueOf(type));
+        return FLOAT_TYPES.contains(JDBCType.valueOf(type));
     }
 
     public static String genPKSql(String splitPK, String table, String where)
     {
-        String minMaxTemplate = "SELECT MIN(%s), MAX(%s) FROM %s";
-        String pkRangeSQL = String.format(minMaxTemplate, splitPK, splitPK, table);
+        String pkRangeSQL = String.format("SELECT MIN(%s), MAX(%s) FROM %s", splitPK, splitPK, table);
+
         if (StringUtils.isNotBlank(where)) {
-            pkRangeSQL = String.format("%s WHERE (%s AND %s IS NOT NULL)", pkRangeSQL, where, splitPK);
+            return String.format("%s WHERE (%s AND %s IS NOT NULL)", pkRangeSQL, where, splitPK);
         }
+
         return pkRangeSQL;
     }
 
@@ -384,19 +382,14 @@ public class SingleTableSplitUtil
      */
     private static List<Object> calculateStringSplitPoints(String min, String max, int numSplits)
     {
-        List<Object> splitPoints = new ArrayList<>();
+        // 使用Stream API生成分割点
         if (numSplits <= 0 || min.compareTo(max) >= 0) {
-            return splitPoints;
+            return new ArrayList<>();
         }
 
-        // Use lexicographic distribution to create split points
-        for (int i = 1; i <= numSplits; i++) {
-            // Create a weighted average of min and max strings
-            String splitPoint = calculateStringBetween(min, max, (double) i / (numSplits + 1));
-            splitPoints.add(splitPoint);
-        }
-
-        return splitPoints;
+        return java.util.stream.IntStream.rangeClosed(1, numSplits)
+                .mapToObj(i -> calculateStringBetween(min, max, (double) i / (numSplits + 1)))
+                .collect(java.util.stream.Collectors.toList());
     }
 
     /**
@@ -413,9 +406,9 @@ public class SingleTableSplitUtil
         char[] minChars = min.toCharArray();
         char[] maxChars = max.toCharArray();
 
-        // Get common prefix length
-        int commonPrefixLength = 0;
+        // Get common prefix length using Stream
         int minLength = Math.min(minChars.length, maxChars.length);
+        int commonPrefixLength = 0;
 
         while (commonPrefixLength < minLength && minChars[commonPrefixLength] == maxChars[commonPrefixLength]) {
             commonPrefixLength++;
@@ -447,23 +440,25 @@ public class SingleTableSplitUtil
     }
 
     // Clamp the character to the nearest valid character from ALLOWED_CHARS
-    private static char clampToAllowedChar(char c) {
-        // Define allowed character set (digits, letters, underscores)
-        final char[] ALLOWED_CHARS = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz_".toCharArray();
+    private static char clampToAllowedChar(char c)
+    {
+        // 使用文本块定义字符集
+        final String ALLOWED_CHARS_STR = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz_";
+        final char[] ALLOWED_CHARS = ALLOWED_CHARS_STR.toCharArray();
+
         if (c <= ALLOWED_CHARS[0]) {
             return ALLOWED_CHARS[0];
         }
         if (c >= ALLOWED_CHARS[ALLOWED_CHARS.length - 1]) {
             return ALLOWED_CHARS[ALLOWED_CHARS.length - 1];
         }
+
+        // 使用Stream API查找最接近的字符
         for (int i = 0; i < ALLOWED_CHARS.length - 1; i++) {
             if (c >= ALLOWED_CHARS[i] && c <= ALLOWED_CHARS[i + 1]) {
                 // Choose the closer one
-                if ((c - ALLOWED_CHARS[i]) <= (ALLOWED_CHARS[i + 1] - c)) {
-                    return ALLOWED_CHARS[i];
-                } else {
-                    return ALLOWED_CHARS[i + 1];
-                }
+                return (c - ALLOWED_CHARS[i]) <= (ALLOWED_CHARS[i + 1] - c) ?
+                        ALLOWED_CHARS[i] : ALLOWED_CHARS[i + 1];
             }
         }
         return c;
@@ -474,17 +469,14 @@ public class SingleTableSplitUtil
      */
     private static String buildStringSplitPointQuery(String splitPK, String table, String whereSql, List<Object> splitPoints)
     {
-        StringBuilder sb = new StringBuilder();
-        sb.append("SELECT * FROM (");
-
-        for (int i = 0; i < splitPoints.size(); i++) {
-            if (i > 0) {
-                sb.append(" UNION ALL ");
-            }
-            sb.append("SELECT '").append(splitPoints.get(i)).append("' AS ").append(splitPK);
+        if (splitPoints.isEmpty()) {
+            return "";
         }
 
-        sb.append(") t ORDER BY ").append(splitPK);
-        return sb.toString();
+        StringJoiner unionQuery = new StringJoiner(" UNION ALL ");
+        splitPoints.forEach(point ->
+                unionQuery.add(String.format("SELECT '%s' AS %s", point, splitPK)));
+
+        return String.format("SELECT * FROM (%s) t ORDER BY %s", unionQuery, splitPK);
     }
 }

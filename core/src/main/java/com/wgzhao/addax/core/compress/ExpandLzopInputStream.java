@@ -41,6 +41,7 @@ import javax.annotation.Nonnull;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Arrays;
+import java.util.Objects;
 import java.util.zip.Adler32;
 import java.util.zip.CRC32;
 
@@ -58,15 +59,15 @@ public class ExpandLzopInputStream
     }
 
     /**
-     * Read and verify an lzo header, setting relevant block checksum options
+     * Read and verify a lzo header, setting relevant block checksum options
      * and ignoring most everything else.
      */
     @Override
     protected int readHeader()
             throws IOException
     {
-        short lzoLibraryVersion = 0x2060;
-        Logger log =  LoggerFactory.getLogger(ExpandLzopInputStream.class);
+        final short lzoLibraryVersion = 0x2060;
+        Logger log = LoggerFactory.getLogger(ExpandLzopInputStream.class);
         byte[] lzopMagic = {-119, 'L', 'Z', 'O', 0, '\r', '\n', '\032', '\n'};
         byte[] buf = new byte[9];
         readBytes(buf, 0, 9);
@@ -89,18 +90,16 @@ public class ExpandLzopInputStream
         }
         hitem = readHeaderItem(buf, 2, adler, crc32); // lzop extract version
         if (hitem > LzopConstants.LZOP_VERSION) {
-            throw new IOException("Compressed with incompatible lzop version: 0x"
-                    + Integer.toHexString(hitem) + " (expected 0x"
-                    + Integer.toHexString(LzopConstants.LZOP_VERSION) + ")");
+            throw new IOException("""
+                    Compressed with incompatible lzop version: 0x%s (expected 0x%s)
+                    """.formatted(
+                    Integer.toHexString(hitem),
+                    Integer.toHexString(LzopConstants.LZOP_VERSION)));
         }
         hitem = readHeaderItem(buf, 1, adler, crc32); // method
         switch (hitem) {
-            case LzopConstants.M_LZO1X_1:
-            case LzopConstants.M_LZO1X_1_15:
-            case LzopConstants.M_LZO1X_999:
-                break;
-            default:
-                throw new IOException("Invalid strategy " + Integer.toHexString(hitem));
+            case LzopConstants.M_LZO1X_1, LzopConstants.M_LZO1X_1_15, LzopConstants.M_LZO1X_999 -> {}
+            default -> throw new IOException("Invalid strategy: 0x%x".formatted(hitem));
         }
         readHeaderItem(buf, 1, adler, crc32); // ignore level
 
@@ -130,9 +129,11 @@ public class ExpandLzopInputStream
         int checksum = (int) (useCRC32 ? crc32.getValue() : adler.getValue());
         hitem = readHeaderItem(buf, 4, adler, crc32); // read checksum
         if (hitem != checksum) {
-            throw new IOException("Invalid header checksum: "
-                    + Long.toHexString(checksum) + " (expected 0x"
-                    + Integer.toHexString(hitem) + ")");
+            throw new IOException("""
+                    Invalid header checksum: %s (expected 0x%s)
+                    """.formatted(
+                    Long.toHexString(checksum),
+                    Integer.toHexString(hitem)));
         }
         if (extraField) { // lzop 1.08 ultimately ignores this
             log.debug("Extra header field not processed");
@@ -152,6 +153,10 @@ public class ExpandLzopInputStream
     private int readHeaderItem(@Nonnull byte[] buf, @Nonnegative int len, @Nonnull Adler32 adler, @Nonnull CRC32 crc32)
             throws IOException
     {
+        Objects.requireNonNull(buf, "Buffer cannot be null");
+        Objects.requireNonNull(adler, "Adler32 cannot be null");
+        Objects.requireNonNull(crc32, "CRC32 cannot be null");
+
         int ret = readInt(buf, len);
         adler.update(buf, 0, len);
         crc32.update(buf, 0, len);

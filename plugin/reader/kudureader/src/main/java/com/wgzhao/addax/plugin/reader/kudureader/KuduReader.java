@@ -72,12 +72,11 @@ public class KuduReader
     public static class Job
             extends Reader.Job
     {
+        private record WhereClause(String field, String operator, String value) {}
+
         private Configuration originalConfig = null;
-
         private String splitKey;
-
         private String lowerBound;
-
         private String upperBound;
         // match where clause such as age > 18
         private static final String PATTERN_FOR_WHERE = "^\\s*(\\w+)\\s*(>=|<|<=|!=|=|>)\\s*(.*)$";
@@ -97,17 +96,18 @@ public class KuduReader
         {
             List<Configuration> confList = new ArrayList<>();
 
-            if ((splitKey != null) && (!"min".equals(lowerBound)) && (!"max".equals(upperBound))) {
+            if (shouldSplit()) {
                 int iLowerBound = Integer.parseInt(this.lowerBound);
                 int iUpperBound = Integer.parseInt(this.upperBound);
                 int range = (iUpperBound - iLowerBound) + 1;
                 int limit = (int) Math.ceil((double) range / (double) adviceNumber);
-                int offset;
+
                 for (int page = 0; page < adviceNumber; ++page) {
-                    offset = page * limit;
-                    Configuration conf = originalConfig.clone();
+                    int offset = page * limit;
+                    Configuration conf = this.originalConfig.clone();
                     int possibleLowerBound = (iLowerBound + offset);
                     int possibleUpperBound = (iLowerBound + offset + limit - 1);
+
                     if (possibleLowerBound > iUpperBound) {
                         possibleLowerBound = 0;
                         possibleUpperBound = 0;
@@ -115,13 +115,14 @@ public class KuduReader
                     else {
                         possibleUpperBound = Math.min(possibleUpperBound, iUpperBound);
                     }
+
                     conf.set(KuduKey.SPLIT_LOWER_BOUND, String.valueOf(possibleLowerBound));
                     conf.set(KuduKey.SPLIT_UPPER_BOUND, String.valueOf(possibleUpperBound));
                     confList.add(conf);
                 }
             }
             else {
-                Configuration conf = originalConfig.clone();
+                Configuration conf = this.originalConfig.clone();
                 conf.set(KuduKey.SPLIT_LOWER_BOUND, "min");
                 conf.set(KuduKey.SPLIT_UPPER_BOUND, "max");
                 confList.add(conf);
@@ -130,33 +131,32 @@ public class KuduReader
             return confList;
         }
 
+        private boolean shouldSplit()
+        {
+            return (this.splitKey != null) && (!"min".equals(this.lowerBound)) && (!"max".equals(this.upperBound));
+        }
+
         @Override
         public void prepare()
         {
             List<String> where = this.originalConfig.getList(WHERE, String.class);
             if (where != null && !where.isEmpty()) {
                 List<Configuration> result = new ArrayList<>();
-                Matcher matcher;
 
                 for (String w : where) {
-                    matcher = pattern.matcher(w);
-                    while (matcher.find()) {
-                        if (matcher.groupCount() == 3) {
-                            if (KUDU_OPERATORS.containsKey(matcher.group(2))) {
-                                Configuration conf = Configuration.from(
-                                        String.format("{\"field\": \"%s\", \"op\": \"%s\", \"value\": \"%s\"}",
-                                                matcher.group(1).trim(), matcher.group(2).trim(), matcher.group(3).trim()));
-                                result.add(conf);
-                            }
-                            else {
-                                throw AddaxException.asAddaxException(NOT_SUPPORT_TYPE,
-                                        "operator '" + matcher.group(2) + "' is unsupported");
-                            }
-                        }
-                        else {
-                            throw AddaxException.asAddaxException(ILLEGAL_VALUE,
-                                    "Illegal where clause: " + w);
-                        }
+                    WhereClause whereClause = parseWhereClause(w);
+                    if (KUDU_OPERATORS.containsKey(whereClause.operator())) {
+                        Configuration conf = Configuration.from("""
+                                {
+                                    "field": "%s",
+                                    "op": "%s",
+                                    "value": "%s"
+                                }""".formatted(whereClause.field(), whereClause.operator(), whereClause.value()));
+                        result.add(conf);
+                    }
+                    else {
+                        throw AddaxException.asAddaxException(NOT_SUPPORT_TYPE,
+                                "Operator '%s' is unsupported".formatted(whereClause.operator()));
                     }
                 }
 
@@ -164,6 +164,20 @@ public class KuduReader
                     this.originalConfig.set(WHERE, result);
                 }
             }
+        }
+
+        private WhereClause parseWhereClause(String whereClause)
+        {
+            Matcher matcher = pattern.matcher(whereClause);
+            if (matcher.find() && matcher.groupCount() == 3) {
+                return new WhereClause(
+                        matcher.group(1).trim(),
+                        matcher.group(2).trim(),
+                        matcher.group(3).trim()
+                );
+            }
+            throw AddaxException.asAddaxException(ILLEGAL_VALUE,
+                    "Illegal where clause: " + whereClause);
         }
 
         @Override
@@ -178,312 +192,240 @@ public class KuduReader
     {
 
         private KuduClient kuduClient;
-
-        private String tableName = null;
-
+        private String tableName;
         private String splitKey;
-
         private String lowerBound;
-
         private String upperBound;
-
         private Long scanRequestTimeout;
         private List<String> columns;
         private boolean specifyColumn = false;
-        List<KuduPredicate> customPredicate;
-
-
-        List<Configuration> where;
-
-        @Override
-        public void startRead(RecordSender recordSender)
-        {
-            KuduTable kuduTable;
-            try {
-                kuduTable = kuduClient.openTable(tableName);
-            }
-            catch (KuduException ex) {
-                throw AddaxException.asAddaxException(
-                        RUNTIME_ERROR,
-                        ex.getMessage()
-                );
-            }
-
-            Schema schema = kuduTable.getSchema();
-
-            KuduScanner.KuduScannerBuilder kuduScannerBuilder = kuduClient.newScannerBuilder(kuduTable);
-            if (scanRequestTimeout != null) {
-                kuduScannerBuilder.scanRequestTimeout(scanRequestTimeout);
-            }
-            KuduScanner kuduScanner;
-
-            if ((splitKey != null) && (!"min".equals(lowerBound)) && (!"max".equals(upperBound))) {
-                KuduPredicate lowerBoundPredicate = KuduPredicate.newComparisonPredicate(
-                        schema.getColumn(splitKey),
-                        KuduPredicate.ComparisonOp.GREATER_EQUAL,
-                        Integer.parseInt(lowerBound)
-                );
-                KuduPredicate upperBoundPredicate = KuduPredicate.newComparisonPredicate(
-                        schema.getColumn(splitKey),
-                        KuduPredicate.ComparisonOp.LESS_EQUAL,
-                        Integer.parseInt(upperBound)
-                );
-                kuduScannerBuilder
-                        .addPredicate(lowerBoundPredicate)
-                        .addPredicate(upperBoundPredicate);
-                if (specifyColumn) {
-                    // judge specific column exists or not
-
-                    for (String column : columns) {
-                        if (!schema.hasColumn(column)) {
-                            throw AddaxException.asAddaxException(
-                                    ILLEGAL_VALUE,
-                                    "column '" + column + "' does not exists in the table '" + tableName + "'"
-                            );
-                        }
-                    }
-                    kuduScannerBuilder.setProjectedColumnNames(columns);
-                }
-            }
-
-            if (!where.isEmpty()) {
-                List<KuduPredicate> customPredicate = processWhere(where, schema);
-                for (KuduPredicate p : customPredicate) {
-                    kuduScannerBuilder.addPredicate(p);
-                }
-            }
-
-            kuduScanner = kuduScannerBuilder.build();
-
-            List<ColumnSchema> columnSchemas = kuduScanner.getProjectionSchema().getColumns();
-
-            while (kuduScanner.hasMoreRows()) {
-                RowResultIterator rows;
-                try {
-                    rows = kuduScanner.nextRows();
-                }
-                catch (KuduException ex) {
-                    throw AddaxException.asAddaxException(
-                            RUNTIME_ERROR,
-                            ex.getMessage()
-                    );
-                }
-                while (rows.hasNext()) {
-                    RowResult result = rows.next();
-
-                    Record record = recordSender.createRecord();
-
-                    boolean isDirtyRecord = false;
-
-                    for (ColumnSchema columnSchema : columnSchemas) {
-                        if (result.isNull(columnSchema.getName())) {
-                            record.addColumn(new StringColumn());
-                            continue;
-                        }
-
-                        Type columnType = columnSchema.getType();
-                        switch (columnType) {
-                            case INT8:
-                                record.addColumn(new LongColumn(Long.valueOf(result.getByte(columnSchema.getName()))));
-                                break;
-                            case INT16:
-                                record.addColumn(new LongColumn(Long.valueOf(result.getShort(columnSchema.getName()))));
-                                break;
-                            case INT32:
-                                record.addColumn(new LongColumn(Long.valueOf(result.getInt(columnSchema.getName()))));
-                                break;
-                            case INT64:
-                                record.addColumn(new LongColumn(result.getLong(columnSchema.getName())));
-                                break;
-                            case BINARY:
-                                record.addColumn(new BytesColumn(result.getString(columnSchema.getName()).getBytes(StandardCharsets.UTF_8)));
-                                break;
-                            case STRING:
-                                record.addColumn(new StringColumn(result.getString(columnSchema.getName())));
-                                break;
-                            case BOOL:
-                                record.addColumn(new BoolColumn(result.getBoolean(columnSchema.getName())));
-                                break;
-                            case FLOAT:
-                                record.addColumn(new DoubleColumn(result.getFloat(columnSchema.getName())));
-                                break;
-                            case DOUBLE:
-                                record.addColumn(new DoubleColumn(result.getDouble(columnSchema.getName())));
-                                break;
-                            case UNIXTIME_MICROS:
-                                int offsetSecs = ZonedDateTime.now(ZoneId.systemDefault()).getOffset().getTotalSeconds();
-                                long ts = result.getLong(columnSchema.getName()) / 1_000L - offsetSecs * 1_000L;
-                                record.addColumn(new TimestampColumn(ts));
-                                break;
-                            case DECIMAL:
-                                record.addColumn(new DoubleColumn(result.getDecimal(columnSchema.getName())));
-                                break;
-                            default:
-                                isDirtyRecord = true;
-                                getTaskPluginCollector().collectDirtyRecord(
-                                        record,
-                                        "Invalid kudu data type: " + columnType.getName()
-                                );
-                                break;
-                        }
-                        if (isDirtyRecord) {
-                            break;
-                        }
-                    }
-                    if (!isDirtyRecord) {
-                        recordSender.sendToWriter(record);
-                    }
-                }
-            }
-
-            try {
-                kuduScanner.close();
-            }
-            catch (KuduException ex) {
-                throw AddaxException.asAddaxException(
-                        RUNTIME_ERROR,
-                        ex.getMessage()
-                );
-            }
-        }
+        private List<KuduPredicate> customPredicate;
+        private List<Configuration> where;
 
         @Override
         public void init()
         {
             Configuration readerSliceConfig = super.getPluginJobConf();
             String masterAddresses = readerSliceConfig.getString(KuduKey.KUDU_MASTER_ADDRESSES);
-            tableName = readerSliceConfig.getString(KuduKey.TABLE);
+            this.tableName = readerSliceConfig.getString(KuduKey.TABLE);
             long socketReadTimeoutMs = readerSliceConfig.getLong(KuduKey.SOCKET_READ_TIMEOUT, 10) * 1000L;
-            scanRequestTimeout = readerSliceConfig.getLong(KuduKey.SCAN_REQUEST_TIMEOUT, 20L) * 1000L;
-            KuduClient.KuduClientBuilder kuduClientBuilder = (new KuduClient.KuduClientBuilder(masterAddresses));
-            kuduClientBuilder.defaultOperationTimeoutMs(socketReadTimeoutMs);
+            this.scanRequestTimeout = readerSliceConfig.getLong(KuduKey.SCAN_REQUEST_TIMEOUT, 20L) * 1000L;
 
-            kuduClient = kuduClientBuilder.build();
-            lowerBound = readerSliceConfig.getString(KuduKey.SPLIT_LOWER_BOUND);
-            upperBound = readerSliceConfig.getString(KuduKey.SPLIT_UPPER_BOUND);
-            splitKey = readerSliceConfig.getString(KuduKey.SPLIT_PK);
-            columns = readerSliceConfig.getList(COLUMN, String.class);
-            if (!columns.isEmpty()) {
-                specifyColumn = columns.size() != 1 || (!"*".equals(columns.get(0)) && !"\"*\"".equals(columns.get(0)));
+            this.kuduClient = new KuduClient.KuduClientBuilder(masterAddresses)
+                    .defaultOperationTimeoutMs(socketReadTimeoutMs)
+                    .build();
+
+            this.lowerBound = readerSliceConfig.getString(KuduKey.SPLIT_LOWER_BOUND);
+            this.upperBound = readerSliceConfig.getString(KuduKey.SPLIT_UPPER_BOUND);
+            this.splitKey = readerSliceConfig.getString(KuduKey.SPLIT_PK);
+            this.columns = readerSliceConfig.getList(COLUMN, String.class);
+
+            if (!this.columns.isEmpty()) {
+                this.specifyColumn = !isWildcardColumn(this.columns.get(0));
             }
-            where = readerSliceConfig.getListConfiguration(WHERE);
+
+            this.where = readerSliceConfig.getListConfiguration(WHERE);
         }
 
-        private void processWhere(List<Configuration> where)
+        private boolean isWildcardColumn(String column)
         {
-            String field;
-            KuduPredicate.ComparisonOp op;
-            KuduPredicate predicate;
-            for (Configuration conf : where) {
-                field = conf.getString("field");
-                op = KUDU_OPERATORS.get(conf.getString("op"));
-                ColumnSchema column;
-                String value = conf.getString("value");
-                if (value.startsWith("'")) {
-                    column = new ColumnSchema.ColumnSchemaBuilder(field, Type.VARCHAR).build();
-                    predicate = KuduPredicate.newComparisonPredicate(column, op, value);
-                }
-                else if (value.indexOf('.') > 0) {
-                    column = new ColumnSchema.ColumnSchemaBuilder(field, Type.DOUBLE).build();
-                    predicate = KuduPredicate.newComparisonPredicate(column, op, Double.valueOf(value));
-                }
-                else {
-                    column = new ColumnSchema.ColumnSchemaBuilder(field, Type.INT32).build();
-                    predicate = KuduPredicate.newComparisonPredicate(column, op, Long.parseLong(value));
-                }
-                this.customPredicate.add(predicate);
+            return "*".equals(column) || "\"*\"".equals(column);
+        }
+
+        @Override
+        public void startRead(RecordSender recordSender)
+        {
+            KuduTable kuduTable;
+            try {
+                kuduTable = this.kuduClient.openTable(this.tableName);
+                Schema schema = kuduTable.getSchema();
+                KuduScanner scanner = buildScanner(kuduTable, schema);
+                processRows(scanner, recordSender);
+            }
+            catch (KuduException ex) {
+                throw AddaxException.asAddaxException(RUNTIME_ERROR, ex.getMessage());
             }
         }
 
-        /**
-         * convert sql-format where to kudu {@link KuduPredicate} format
-         * "age &gt; 1" as assumed where clause , it will be convert into
-         * <pre>
-         *      KuduPredicate.newComparisonPredicate("age", KuduPredicate.ComparisonOp.GREATER, 1);
-         * </pre>
-         *
-         * @param where List of configuration, each element like <code>{"field":"age", "op": "&gt;", "value": 1}</code>
-         * @param schema kudu schema
-         * @return list of {@link KuduPredicate}
-         */
+        private KuduScanner buildScanner(KuduTable kuduTable, Schema schema)
+        {
+            KuduScanner.KuduScannerBuilder builder = this.kuduClient.newScannerBuilder(kuduTable);
+
+            if (this.scanRequestTimeout != null) {
+                builder.scanRequestTimeout(this.scanRequestTimeout);
+            }
+
+            if (shouldApplySplitPredicates()) {
+                applySplitPredicates(builder, schema);
+            }
+
+            if (!this.where.isEmpty()) {
+                List<KuduPredicate> predicates = processWhere(this.where, schema);
+                predicates.forEach(builder::addPredicate);
+            }
+
+            return builder.build();
+        }
+
+        private boolean shouldApplySplitPredicates()
+        {
+            return (this.splitKey != null) && (!"min".equals(this.lowerBound)) && (!"max".equals(this.upperBound));
+        }
+
+        private void applySplitPredicates(KuduScanner.KuduScannerBuilder builder, Schema schema)
+        {
+            builder.addPredicate(KuduPredicate.newComparisonPredicate(
+                            schema.getColumn(this.splitKey),
+                            KuduPredicate.ComparisonOp.GREATER_EQUAL,
+                            Integer.parseInt(this.lowerBound)))
+                    .addPredicate(KuduPredicate.newComparisonPredicate(
+                            schema.getColumn(this.splitKey),
+                            KuduPredicate.ComparisonOp.LESS_EQUAL,
+                            Integer.parseInt(this.upperBound)));
+
+            if (this.specifyColumn) {
+                validateAndSetProjectedColumns(builder, schema);
+            }
+        }
+
+        private void validateAndSetProjectedColumns(KuduScanner.KuduScannerBuilder builder, Schema schema)
+        {
+            for (String column : this.columns) {
+                if (!schema.hasColumn(column)) {
+                    throw AddaxException.asAddaxException(
+                            ILLEGAL_VALUE,
+                            "Column '%s' does not exist in table '%s'".formatted(column, this.tableName)
+                    );
+                }
+            }
+            builder.setProjectedColumnNames(this.columns);
+        }
+
+        private void processRows(KuduScanner scanner, RecordSender recordSender)
+                throws KuduException
+        {
+            List<ColumnSchema> columnSchemas = scanner.getProjectionSchema().getColumns();
+
+            while (scanner.hasMoreRows()) {
+                RowResultIterator rows = scanner.nextRows();
+                while (rows.hasNext()) {
+                    processRow(rows.next(), columnSchemas, recordSender);
+                }
+            }
+        }
+
+        private void processRow(RowResult result, List<ColumnSchema> columnSchemas, RecordSender recordSender)
+        {
+            Record record = recordSender.createRecord();
+            boolean isDirtyRecord = false;
+
+            for (ColumnSchema columnSchema : columnSchemas) {
+                if (result.isNull(columnSchema.getName())) {
+                    record.addColumn(new StringColumn());
+                    continue;
+                }
+
+                try {
+                    addColumnToRecord(record, result, columnSchema);
+                }
+                catch (Exception e) {
+                    isDirtyRecord = true;
+                    getTaskPluginCollector().collectDirtyRecord(record,
+                            "Invalid kudu data type: " + columnSchema.getType().getName());
+                    break;
+                }
+            }
+
+            if (!isDirtyRecord) {
+                recordSender.sendToWriter(record);
+            }
+        }
+
+        private void addColumnToRecord(Record record, RowResult result, ColumnSchema columnSchema)
+        {
+            String columnName = columnSchema.getName();
+            Type columnType = columnSchema.getType();
+
+            switch (columnType) {
+                case INT8 -> record.addColumn(new LongColumn(Long.valueOf(result.getByte(columnName))));
+                case INT16 -> record.addColumn(new LongColumn(Long.valueOf(result.getShort(columnName))));
+                case INT32 -> record.addColumn(new LongColumn(result.getInt(columnName)));
+                case INT64 -> record.addColumn(new LongColumn(result.getLong(columnName)));
+                case BINARY -> record.addColumn(new BytesColumn(result.getString(columnName).getBytes(StandardCharsets.UTF_8)));
+                case STRING -> record.addColumn(new StringColumn(result.getString(columnName)));
+                case BOOL -> record.addColumn(new BoolColumn(result.getBoolean(columnName)));
+                case FLOAT -> record.addColumn(new DoubleColumn(result.getFloat(columnName)));
+                case DOUBLE -> record.addColumn(new DoubleColumn(result.getDouble(columnName)));
+                case UNIXTIME_MICROS -> {
+                    int offsetSecs = ZonedDateTime.now(ZoneId.systemDefault()).getOffset().getTotalSeconds();
+                    long ts = result.getLong(columnName) / 1_000L - offsetSecs * 1_000L;
+                    record.addColumn(new TimestampColumn(ts));
+                }
+                case DECIMAL -> record.addColumn(new DoubleColumn(result.getDecimal(columnName)));
+                default -> throw new IllegalStateException("Unexpected column type: " + columnType);
+            }
+        }
+
         private List<KuduPredicate> processWhere(List<Configuration> where, Schema schema)
         {
-            List<KuduPredicate> customPredicate = new ArrayList<>();
-            String field;
-            KuduPredicate.ComparisonOp op;
-            KuduPredicate predicate;
+            List<KuduPredicate> predicates = new ArrayList<>();
+
             for (Configuration conf : where) {
-                field = conf.getString("field");
-                op = KUDU_OPERATORS.get(conf.getString("op"));
+                String field = conf.getString("field");
                 if (!schema.hasColumn(field)) {
                     throw AddaxException.asAddaxException(
                             ILLEGAL_VALUE,
-                            "column '" + field + "' in where clause does not exists in the table '" + tableName + "'"
+                            "Column '%s' in where clause does not exist in table '%s'".formatted(field, this.tableName)
                     );
                 }
+
+                KuduPredicate.ComparisonOp op = KUDU_OPERATORS.get(conf.getString("op"));
                 ColumnSchema column = schema.getColumn(field);
                 String value = conf.getString("value");
 
-                switch (column.getType()) {
-                    case INT8:
-                    case INT16:
-                    case INT32:
-                    case INT64:
-                        predicate = KuduPredicate.newComparisonPredicate(column, op, Long.parseLong(value));
-                        break;
-                    case BOOL:
-                        predicate = KuduPredicate.newComparisonPredicate(column, op, Boolean.valueOf(value));
-                        break;
-                    case STRING:
-                    case VARCHAR:
-                        predicate = KuduPredicate.newComparisonPredicate(column, op, value);
-                        break;
-                    case DATE:
-                        predicate = KuduPredicate.newComparisonPredicate(column, op, Date.valueOf(value));
-                        break;
-                    case FLOAT:
-                        predicate = KuduPredicate.newComparisonPredicate(column, op, Float.valueOf(value));
-                        break;
-                    case DOUBLE:
-                        predicate = KuduPredicate.newComparisonPredicate(column, op, Double.valueOf(value));
-                        break;
-                    case DECIMAL:
-                        predicate = KuduPredicate.newComparisonPredicate(column, op, new BigDecimal(value));
-                        break;
-                    case BINARY:
-                        predicate = KuduPredicate.newComparisonPredicate(column, op, value.getBytes(StandardCharsets.UTF_8));
-                        break;
-                    case UNIXTIME_MICROS:
-                        SimpleDateFormat sdf = new SimpleDateFormat(DEFAULT_DATE_FORMAT);
-                        try {
-                            java.util.Date date = sdf.parse(value);
-                            int offsetSecs = ZonedDateTime.now(ZoneId.systemDefault()).getOffset().getTotalSeconds();
-                            long ts  = date.getTime() * 1_000L + offsetSecs * 1_000_000L;
-                            predicate = KuduPredicate.newComparisonPredicate(column, op, ts);
-                        }
-                        catch (ParseException e) {
-                            throw AddaxException.asAddaxException(CONFIG_ERROR, "Can not parse date: " + value);
-                        }
-                        break;
-                    default:
-                        throw new IllegalStateException("Unexpected type: " + column.getType());
-                }
-                customPredicate.add(predicate);
+                predicates.add(createPredicate(column, op, value));
             }
-            return customPredicate;
+
+            return predicates;
+        }
+
+        private KuduPredicate createPredicate(ColumnSchema column, KuduPredicate.ComparisonOp op, String value)
+        {
+            return switch (column.getType()) {
+                case INT8, INT16, INT32, INT64 -> KuduPredicate.newComparisonPredicate(column, op, Long.parseLong(value));
+                case BOOL -> KuduPredicate.newComparisonPredicate(column, op, Boolean.parseBoolean(value));
+                case STRING, VARCHAR -> KuduPredicate.newComparisonPredicate(column, op, value);
+                case DATE -> KuduPredicate.newComparisonPredicate(column, op, Date.valueOf(value));
+                case FLOAT -> KuduPredicate.newComparisonPredicate(column, op, Float.parseFloat(value));
+                case DOUBLE -> KuduPredicate.newComparisonPredicate(column, op, Double.parseDouble(value));
+                case DECIMAL -> KuduPredicate.newComparisonPredicate(column, op, new BigDecimal(value));
+                case BINARY -> KuduPredicate.newComparisonPredicate(column, op, value.getBytes(StandardCharsets.UTF_8));
+                case UNIXTIME_MICROS -> {
+                    SimpleDateFormat sdf = new SimpleDateFormat(DEFAULT_DATE_FORMAT);
+                    try {
+                        java.util.Date date = sdf.parse(value);
+                        int offsetSecs = ZonedDateTime.now(ZoneId.systemDefault()).getOffset().getTotalSeconds();
+                        long ts = date.getTime() * 1_000L + offsetSecs * 1_000_000L;
+                        yield KuduPredicate.newComparisonPredicate(column, op, ts);
+                    }
+                    catch (ParseException e) {
+                        throw AddaxException.asAddaxException(CONFIG_ERROR, "Cannot parse date: " + value);
+                    }
+                }
+                default -> throw new IllegalStateException("Unexpected type: " + column.getType());
+            };
         }
 
         @Override
         public void destroy()
         {
             try {
-                kuduClient.close();
+                if (this.kuduClient != null) {
+                    this.kuduClient.close();
+                }
             }
             catch (KuduException ex) {
-                throw AddaxException.asAddaxException(
-                        RUNTIME_ERROR,
-                        ex.getMessage()
-                );
+                throw AddaxException.asAddaxException(RUNTIME_ERROR, ex.getMessage());
             }
         }
     }

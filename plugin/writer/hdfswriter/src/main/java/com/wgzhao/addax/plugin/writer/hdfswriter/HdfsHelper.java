@@ -260,31 +260,16 @@ public class HdfsHelper
     public Class<? extends CompressionCodec> getCompressCodec(String compress)
     {
         compress = compress.toUpperCase();
-        Class<? extends CompressionCodec> codecClass;
-        switch (compress) {
-            case "GZIP":
-                codecClass = org.apache.hadoop.io.compress.GzipCodec.class;
-                break;
-            case "BZIP2":
-                codecClass = org.apache.hadoop.io.compress.BZip2Codec.class;
-                break;
-            case "SNAPPY":
-                codecClass = org.apache.hadoop.io.compress.SnappyCodec.class;
-                break;
-            case "LZ4":
-                codecClass = org.apache.hadoop.io.compress.Lz4Codec.class;
-                break;
-            case "ZSTD":
-                codecClass = org.apache.hadoop.io.compress.ZStandardCodec.class;
-                break;
-            case "DEFLATE":
-            case "ZLIB":
-                codecClass = org.apache.hadoop.io.compress.DeflateCodec.class;
-                break;
-            default:
-                throw AddaxException.asAddaxException(NOT_SUPPORT_TYPE,
-                        String.format("The compress mode [%s} is unsupported yet.", compress));
-        }
+        Class<? extends CompressionCodec> codecClass = switch (compress) {
+            case "GZIP" -> org.apache.hadoop.io.compress.GzipCodec.class;
+            case "BZIP2" -> org.apache.hadoop.io.compress.BZip2Codec.class;
+            case "SNAPPY" -> org.apache.hadoop.io.compress.SnappyCodec.class;
+            case "LZ4" -> org.apache.hadoop.io.compress.Lz4Codec.class;
+            case "ZSTD" -> org.apache.hadoop.io.compress.ZStandardCodec.class;
+            case "DEFLATE", "ZLIB" -> org.apache.hadoop.io.compress.DeflateCodec.class;
+            default -> throw AddaxException.asAddaxException(NOT_SUPPORT_TYPE,
+                    String.format("The compress mode [%s} is unsupported yet.", compress));
+        };
         return codecClass;
     }
 

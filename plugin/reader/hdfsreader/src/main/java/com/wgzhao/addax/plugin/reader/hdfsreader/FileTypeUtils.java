@@ -61,9 +61,7 @@ public class FileTypeUtils
         GroupReadSupport readSupport = new GroupReadSupport();
         ParquetReader.Builder<Group> reader = ParquetReader.builder(readSupport, file);
         try (ParquetReader<Group> build = reader.build()) {
-            if (build.read() != null) {
-                return true;
-            }
+            return build.read() != null;
         }
         catch (IOException e) {
             LOG.info("The file [{}] is not parquet file.", file);
@@ -175,34 +173,25 @@ public class FileTypeUtils
 
     public static boolean checkHdfsFileType(org.apache.hadoop.conf.Configuration hadoopConf, String filepath, String specifiedFileType)
     {
+        var file = new Path(filepath);
 
-        Path file = new Path(filepath);
-
-        try (FileSystem fs = FileSystem.get(hadoopConf); FSDataInputStream in = fs.open(file)) {
-            if (StringUtils.equalsIgnoreCase(specifiedFileType, HdfsConstant.ORC)) {
-                return isORCFile(file, fs, in);
-            }
-            else if (StringUtils.equalsIgnoreCase(specifiedFileType, HdfsConstant.RC)) {
-                return isRCFile(hadoopConf, filepath, in);
-            }
-            else if (StringUtils.equalsIgnoreCase(specifiedFileType, HdfsConstant.SEQ)) {
-
-                return isSequenceFile(file, in);
-            }
-            else if (StringUtils.equalsIgnoreCase(specifiedFileType, HdfsConstant.PARQUET)) {
-                return isParquetFile(file);
-            }
-            else if (StringUtils.equalsIgnoreCase(specifiedFileType, HdfsConstant.CSV)
-                    || StringUtils.equalsIgnoreCase(specifiedFileType, HdfsConstant.TEXT)) {
-                return true;
-            }
+        try (var fs = FileSystem.get(hadoopConf);
+             var in = fs.open(file)) {
+            return switch (specifiedFileType.toUpperCase()) {
+                case HdfsConstant.ORC -> isORCFile(file, fs, in);
+                case HdfsConstant.RC -> isRCFile(hadoopConf, filepath, in);
+                case HdfsConstant.SEQ -> isSequenceFile(file, in);
+                case HdfsConstant.PARQUET -> isParquetFile(file);
+                case HdfsConstant.CSV, HdfsConstant.TEXT -> true;
+                default -> false;
+            };
         }
         catch (Exception e) {
-            String message = String.format("Can not get the file format for [%s]，it only supports [%s].",
-                    filepath, HdfsConstant.SUPPORT_FILE_TYPE);
+            var message = """
+                    Can not get the file format for [%s], it only supports [%s].
+                    """.formatted(filepath, HdfsConstant.SUPPORT_FILE_TYPE);
             LOG.error(message);
             throw AddaxException.asAddaxException(EXECUTE_FAIL, message, e);
         }
-        return false;
     }
 }
