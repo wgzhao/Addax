@@ -29,7 +29,12 @@ import com.wgzhao.addax.core.element.Record;
 import com.wgzhao.addax.core.plugin.RecordReceiver;
 import com.wgzhao.addax.core.spi.Writer;
 import com.wgzhao.addax.core.util.Configuration;
-import org.apache.iceberg.*;
+import org.apache.iceberg.AppendFiles;
+import org.apache.iceberg.DataFile;
+import org.apache.iceberg.FileFormat;
+import org.apache.iceberg.PartitionKey;
+import org.apache.iceberg.Table;
+import org.apache.iceberg.TableProperties;
 import org.apache.iceberg.catalog.Catalog;
 import org.apache.iceberg.catalog.TableIdentifier;
 import org.apache.iceberg.data.GenericAppenderFactory;
@@ -38,7 +43,12 @@ import org.apache.iceberg.data.orc.GenericOrcWriter;
 import org.apache.iceberg.data.parquet.GenericParquetWriter;
 import org.apache.iceberg.hadoop.HadoopCatalog;
 import org.apache.iceberg.hive.HiveCatalog;
-import org.apache.iceberg.io.*;
+import org.apache.iceberg.io.DataWriter;
+import org.apache.iceberg.io.FileAppenderFactory;
+import org.apache.iceberg.io.OutputFile;
+import org.apache.iceberg.io.OutputFileFactory;
+import org.apache.iceberg.io.PartitionedFanoutWriter;
+import org.apache.iceberg.io.WriteResult;
 import org.apache.iceberg.orc.ORC;
 import org.apache.iceberg.parquet.Parquet;
 import org.apache.iceberg.types.TypeUtil;
@@ -51,21 +61,25 @@ import java.io.IOException;
 import java.io.UncheckedIOException;
 import java.util.*;
 
-
-public class IcebergWriter extends Writer {
+public class IcebergWriter
+        extends Writer
+{
     public static class Job
-            extends Writer.Job {
+            extends Writer.Job
+    {
         private static final Logger LOG = LoggerFactory.getLogger(Job.class);
         private Configuration conf = null;
         private Catalog catalog = null;
         private String tableName = null;
 
         @Override
-        public void init() {
+        public void init()
+        {
             this.conf = this.getPluginJobConf();
             try {
                 this.catalog = IcebergHelper.getCatalog(conf);
-            } catch (Exception e) {
+            }
+            catch (Exception e) {
                 throw new RuntimeException(e);
             }
 
@@ -73,12 +87,11 @@ public class IcebergWriter extends Writer {
             if (tableName == null || tableName.trim().isEmpty()) {
                 throw new RuntimeException("tableName is not set");
             }
-
-
         }
 
         @Override
-        public List<Configuration> split(int mandatoryNumber) {
+        public List<Configuration> split(int mandatoryNumber)
+        {
             List<Configuration> configurations = new ArrayList<>(mandatoryNumber);
             for (int i = 0; i < mandatoryNumber; i++) {
                 configurations.add(conf);
@@ -87,7 +100,8 @@ public class IcebergWriter extends Writer {
         }
 
         @Override
-        public void prepare() {
+        public void prepare()
+        {
             String writeMode = this.conf.getString("writeMode");
             if ("truncate".equalsIgnoreCase(writeMode)) {
                 Table table = catalog.loadTable(TableIdentifier.of(tableName.split("\\.")));
@@ -96,7 +110,8 @@ public class IcebergWriter extends Writer {
         }
 
         @Override
-        public void destroy() {
+        public void destroy()
+        {
             if (this.catalog != null) {
                 try {
                     if (this.catalog instanceof HiveCatalog) {
@@ -105,16 +120,17 @@ public class IcebergWriter extends Writer {
                     if (this.catalog instanceof HadoopCatalog) {
                         ((HadoopCatalog) this.catalog).close();
                     }
-                } catch (Exception e) {
+                }
+                catch (Exception e) {
                     throw new RuntimeException(e);
                 }
             }
-
         }
     }
 
     public static class Task
-            extends Writer.Task {
+            extends Writer.Task
+    {
 
         private static final Logger log = LoggerFactory.getLogger(Task.class);
         private Catalog catalog = null;
@@ -125,7 +141,8 @@ public class IcebergWriter extends Writer {
         private List<org.apache.iceberg.types.Types.NestedField> columnList = null;
 
         @Override
-        public void startWrite(RecordReceiver recordReceiver) {
+        public void startWrite(RecordReceiver recordReceiver)
+        {
 
             List<Record> writerBuffer = new ArrayList<>(this.batchSize);
             Record record;
@@ -149,14 +166,16 @@ public class IcebergWriter extends Writer {
         }
 
         @Override
-        public void init() {
+        public void init()
+        {
             Configuration conf = super.getPluginJobConf();
 
             batchSize = conf.getInt("batchSize", 1000);
 
             try {
                 this.catalog = IcebergHelper.getCatalog(conf);
-            } catch (Exception e) {
+            }
+            catch (Exception e) {
                 throw new RuntimeException(e);
             }
 
@@ -173,12 +192,12 @@ public class IcebergWriter extends Writer {
                 fileFormat = "parquet";
             }
 
-
             columnList = schema.columns();
         }
 
         @Override
-        public void destroy() {
+        public void destroy()
+        {
             if (this.catalog != null) {
                 try {
                     if (this.catalog instanceof HiveCatalog) {
@@ -187,16 +206,16 @@ public class IcebergWriter extends Writer {
                     if (this.catalog instanceof HadoopCatalog) {
                         ((HadoopCatalog) this.catalog).close();
                     }
-                } catch (Exception e) {
+                }
+                catch (Exception e) {
                     throw new RuntimeException(e);
                 }
             }
-
         }
 
-        private long doBatchInsert(final List<Record> writerBuffer) {
+        private long doBatchInsert(final List<Record> writerBuffer)
+        {
             ImmutableList.Builder<GenericRecord> builder = ImmutableList.builder();
-
 
             for (Record record : writerBuffer) {
                 GenericRecord data = GenericRecord.create(schema);
@@ -214,21 +233,25 @@ public class IcebergWriter extends Writer {
                     if (columnType.isListType()) {
                         if (null == column.asString()) {
                             data.setField(field.name(), null);
-                        } else {
+                        }
+                        else {
                             String[] dataList = column.asString().split(",");
                             data.setField(field.name(), Arrays.asList(dataList));
                         }
-                    } else {
+                    }
+                    else {
                         switch (columnType.typeId()) {
 
                             case DATE:
                                 try {
                                     if (column.asLong() != null) {
                                         data.setField(field.name(), column.asTimestamp().toLocalDateTime().toLocalDate());
-                                    } else {
+                                    }
+                                    else {
                                         data.setField(field.name(), null);
                                     }
-                                } catch (Exception e) {
+                                }
+                                catch (Exception e) {
                                     getTaskPluginCollector().collectDirtyRecord(record, String.format("日期类型解析失败 [%s:%s] exception: %s", field.name(), column, e));
                                 }
                                 break;
@@ -238,10 +261,12 @@ public class IcebergWriter extends Writer {
                                 try {
                                     if (column.asLong() != null) {
                                         data.setField(field.name(), column.asTimestamp().toLocalDateTime());
-                                    } else {
+                                    }
+                                    else {
                                         data.setField(field.name(), null);
                                     }
-                                } catch (Exception e) {
+                                }
+                                catch (Exception e) {
                                     getTaskPluginCollector().collectDirtyRecord(record, String.format("时间类型解析失败 [%s:%s] exception: %s", field.name(), column, e));
                                 }
                                 break;
@@ -271,14 +296,16 @@ public class IcebergWriter extends Writer {
                             case DECIMAL:
                                 if (column.asBigDecimal() != null) {
                                     data.setField(field.name(), column.asBigDecimal());
-                                } else {
+                                }
+                                else {
                                     data.setField(field.name(), null);
                                 }
                                 break;
                             case MAP:
                                 try {
                                     data.setField(field.name(), JSON.parseObject(column.asString(), Map.class));
-                                } catch (Exception e) {
+                                }
+                                catch (Exception e) {
                                     getTaskPluginCollector().collectDirtyRecord(record, String.format("MAP类型解析失败 [%s:%s] exception: %s", field.name(), column, e));
                                 }
                                 break;
@@ -286,9 +313,7 @@ public class IcebergWriter extends Writer {
                                 getTaskPluginCollector().collectDirtyRecord(record, "类型错误:不支持的类型:" + columnType + " " + field.name());
                         }
                     }
-
                 }
-
 
                 builder.add(data);
             }
@@ -297,37 +322,40 @@ public class IcebergWriter extends Writer {
             String filepath = table.location() + "/" + UUID.randomUUID();
             OutputFile file = table.io().newOutputFile(filepath);
 
-            if(table.spec()==null) {
+            if (table.spec() == null) {
                 DataWriter<GenericRecord> dataWriter = null;
 
                 if ("parquet".equals(fileFormat)) {
                     try {
                         dataWriter = Parquet.writeData(file).overwrite().forTable(table).createWriterFunc(GenericParquetWriter::buildWriter).build();
-                    } catch (IOException e) {
+                    }
+                    catch (IOException e) {
                         throw new RuntimeException(e);
                     }
-                } else if ("orc".equals(fileFormat)) {
+                }
+                else if ("orc".equals(fileFormat)) {
                     dataWriter = ORC.writeData(file).overwrite().forTable(table).createWriterFunc(GenericOrcWriter::buildWriter).build();
-                } else {
+                }
+                else {
                     throw new RuntimeException("不支持的文件格式:" + fileFormat);
                 }
-
 
                 if (dataWriter != null) {
                     dataWriter.write(rows);
                 }
 
-
                 if (dataWriter != null) {
                     try {
                         dataWriter.close();
-                    } catch (IOException e) {
+                    }
+                    catch (IOException e) {
                         throw new RuntimeException(e);
                     }
                 }
                 DataFile dataFile = dataWriter.toDataFile();
                 table.newAppend().appendFile(dataFile).commit();
-            } else {
+            }
+            else {
                 Map<String, String> tableProps = Maps.newHashMap(table.properties());
                 long targetFileSize =
                         PropertyUtil.propertyAsLong(
@@ -336,9 +364,9 @@ public class IcebergWriter extends Writer {
                                 TableProperties.WRITE_TARGET_FILE_SIZE_BYTES_DEFAULT);
 
                 int partitionId = 1, taskId = 1;
-                FileFormat fileFormat= FileFormat.PARQUET;
-                if("orc".equals(fileFormat)){
-                    fileFormat= FileFormat.ORC;
+                FileFormat fileFormat = FileFormat.PARQUET;
+                if ("orc".equals(fileFormat)) {
+                    fileFormat = FileFormat.ORC;
                 }
                 Set<Integer> identifierFieldIds = table.schema().identifierFieldIds();
                 FileAppenderFactory<org.apache.iceberg.data.Record> appenderFactory;
@@ -346,7 +374,8 @@ public class IcebergWriter extends Writer {
                     appenderFactory =
                             new GenericAppenderFactory(table.schema(), table.spec(), null, null, null)
                                     .setAll(tableProps);
-                } else {
+                }
+                else {
                     appenderFactory =
                             new GenericAppenderFactory(
                                     table.schema(),
@@ -359,9 +388,11 @@ public class IcebergWriter extends Writer {
                 OutputFileFactory outputFileFactory = OutputFileFactory.builderFor(table, partitionId, taskId).format(fileFormat).build();
                 final PartitionKey partitionKey = new PartitionKey(table.spec(), table.spec().schema());
                 // partitionedFanoutWriter will auto partitioned record and create the partitioned writer
-                PartitionedFanoutWriter<org.apache.iceberg.data.Record> partitionedFanoutWriter = new PartitionedFanoutWriter<org.apache.iceberg.data.Record>(table.spec(), fileFormat, appenderFactory, outputFileFactory, table.io(), targetFileSize) {
+                PartitionedFanoutWriter<org.apache.iceberg.data.Record> partitionedFanoutWriter = new PartitionedFanoutWriter<org.apache.iceberg.data.Record>(table.spec(), fileFormat, appenderFactory, outputFileFactory, table.io(), targetFileSize)
+                {
                     @Override
-                    protected PartitionKey partition(org.apache.iceberg.data.Record record) {
+                    protected PartitionKey partition(org.apache.iceberg.data.Record record)
+                    {
                         partitionKey.partition(record);
                         return partitionKey;
                     }
@@ -371,23 +402,25 @@ public class IcebergWriter extends Writer {
                         row -> {
                             try {
                                 partitionedFanoutWriter.write(row);
-                            } catch (IOException e) {
+                            }
+                            catch (IOException e) {
                                 throw new UncheckedIOException(e);
                             }
                         });
                 try {
-                    WriteResult writeResult =partitionedFanoutWriter.complete();
+                    WriteResult writeResult = partitionedFanoutWriter.complete();
 
                     AppendFiles appends = table.newAppend();
                     Arrays.stream(writeResult.dataFiles()).forEach(appends::appendFile);
                     appends.commit();
-
-                } catch (IOException e) {
+                }
+                catch (IOException e) {
                     throw new RuntimeException(e);
                 }
                 try {
                     partitionedFanoutWriter.close();
-                } catch (IOException e) {
+                }
+                catch (IOException e) {
                     throw new RuntimeException(e);
                 }
             }
