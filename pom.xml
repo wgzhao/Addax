@@ -112,6 +112,7 @@
         <taos.jdbc.version>3.2.1</taos.jdbc.version>
         <trino.jdbc.version>351</trino.jdbc.version>
         <ucanaccess.version>5.0.1</ucanaccess.version>
+        <iceberg.version>1.8.0</iceberg.version>
 
         <!-- maven configuration -->
         <project.sourceEncoding>UTF-8</project.sourceEncoding>
@@ -183,6 +184,7 @@
         <module>plugin/writer/hbase11xwriter</module>
         <module>plugin/writer/hbase20xsqlwriter</module>
         <module>plugin/writer/hdfswriter</module>
+        <module>plugin/writer/icebergwriter</module>
         <module>plugin/writer/influxdb2writer</module>
         <module>plugin/writer/influxdbwriter</module>
         <module>plugin/writer/kafkawriter</module>
@@ -1492,22 +1494,6 @@
                     </plugin>
                 </plugins>
             </build>
-        </profile>
-
-        <profile>
-            <id>iceberg</id>
-            <properties>
-
-                <iceberg.version>1.8.0</iceberg.version>
-                <jdk.version>11</jdk.version>
-                <maven.compiler.source>11</maven.compiler.source>
-                <maven.compiler.target>11</maven.compiler.target>
-            </properties>
-            <modules>
-
-                <!-- writer -->
-                <module>plugin/writer/icebergwriter</module>
-            </modules>
         </profile>
     </profiles>
 </project>
