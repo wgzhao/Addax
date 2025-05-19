@@ -45,6 +45,7 @@
         <commons.logging.version>1.3.5</commons.logging.version>
         <commons.net.version>3.11.1</commons.net.version>
         <commons.rng.version>1.6</commons.rng.version>
+        <commons.text.version>1.13.1</commons.text.version>
         <curator.version>4.2.0</curator.version>
         <diamond.version>3.7.3</diamond.version>
         <dbcp2.version>2.13.0</dbcp2.version>
