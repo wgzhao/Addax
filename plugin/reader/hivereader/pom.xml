@@ -17,8 +17,6 @@
 
     <properties>
         <hive.version>2.1.1</hive.version>
-        <hadoop.version>3.2.4</hadoop.version>
-        <curator.version>4.2.0</curator.version>
     </properties>
 
     <dependencies>
