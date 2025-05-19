@@ -1,3 +1,22 @@
+/*
+ *  Licensed to the Apache Software Foundation (ASF) under one
+ *  or more contributor license agreements.  See the NOTICE file
+ *  distributed with this work for additional information
+ *  regarding copyright ownership.  The ASF licenses this file
+ *  to you under the Apache License, Version 2.0 (the
+ *  "License"); you may not use this file except in compliance
+ *  with the License.  You may obtain a copy of the License at
+ *
+ *    http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *  Unless required by applicable law or agreed to in writing,
+ *  software distributed under the License is distributed on an
+ *  "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ *  KIND, either express or implied.  See the License for the
+ *  specific language governing permissions and limitations
+ *  under the License.
+ */
+
 package com.wgzhao.addax.plugin.writer.icebergwriter;
 
 import com.wgzhao.addax.core.exception.AddaxException;
@@ -17,15 +36,19 @@ import static com.wgzhao.addax.core.base.Key.KERBEROS_KEYTAB_FILE_PATH;
 import static com.wgzhao.addax.core.base.Key.KERBEROS_PRINCIPAL;
 import static com.wgzhao.addax.core.spi.ErrorCode.LOGIN_ERROR;
 
-public class IcebergHelper {
+public class IcebergHelper
+{
     private static final Logger LOG = LoggerFactory.getLogger(IcebergHelper.class);
 
-    public static void kerberosAuthentication(org.apache.hadoop.conf.Configuration hadoopConf, String kerberosPrincipal, String kerberosKeytabFilePath) throws Exception {
+    public static void kerberosAuthentication(org.apache.hadoop.conf.Configuration hadoopConf, String kerberosPrincipal, String kerberosKeytabFilePath)
+            throws Exception
+    {
         if (StringUtils.isNotBlank(kerberosPrincipal) && StringUtils.isNotBlank(kerberosKeytabFilePath)) {
             UserGroupInformation.setConfiguration(hadoopConf);
             try {
                 UserGroupInformation.loginUserFromKeytab(kerberosPrincipal, kerberosKeytabFilePath);
-            } catch (Exception e) {
+            }
+            catch (Exception e) {
                 String message = String.format("kerberos authentication failed, keytab file: [%s], principal: [%s]",
                         kerberosKeytabFilePath, kerberosPrincipal);
                 LOG.error(message);
@@ -34,7 +57,9 @@ public class IcebergHelper {
         }
     }
 
-    public static Catalog getCatalog(Configuration conf) throws Exception {
+    public static Catalog getCatalog(Configuration conf)
+            throws Exception
+    {
 
         String catalogType = conf.getString("catalogType");
         if (catalogType == null || catalogType.trim().isEmpty()) {
@@ -50,29 +75,30 @@ public class IcebergHelper {
         org.apache.hadoop.conf.Configuration hadoopConf = null;
 
         if (conf.getConfiguration("hadoopConfig") != null) {
-            Map<String,Object> hadoopConfig = conf.getMap("hadoopConfig");
+            Map<String, Object> hadoopConfig = conf.getMap("hadoopConfig");
 
             hadoopConf = new org.apache.hadoop.conf.Configuration();
 
             for (String key : hadoopConfig.keySet()) {
-                hadoopConf.set(key, (String)hadoopConfig.get(key));
+                hadoopConf.set(key, (String) hadoopConfig.get(key));
             }
 
-
-            String authentication = (String)hadoopConfig.get("hadoop.security.authentication");
+            String authentication = (String) hadoopConfig.get("hadoop.security.authentication");
 
             if ("kerberos".equals(authentication)) {
                 String kerberosKeytabFilePath = conf.getString(KERBEROS_KEYTAB_FILE_PATH);
-                if(kerberosKeytabFilePath ==null || kerberosKeytabFilePath.trim().isEmpty()){
+                if (kerberosKeytabFilePath == null || kerberosKeytabFilePath.trim().isEmpty()) {
                     throw new RuntimeException("kerberosKeytabFilePath is not set");
-                } else {
+                }
+                else {
                     kerberosKeytabFilePath = kerberosKeytabFilePath.trim();
                 }
 
                 String kerberosPrincipal = conf.getString(KERBEROS_PRINCIPAL);
-                if(kerberosPrincipal ==null || kerberosPrincipal.trim().isEmpty()){
+                if (kerberosPrincipal == null || kerberosPrincipal.trim().isEmpty()) {
                     throw new RuntimeException("kerberosPrincipal is not set");
-                } else {
+                }
+                else {
                     kerberosPrincipal = kerberosPrincipal.trim();
                 }
                 IcebergHelper.kerberosAuthentication(hadoopConf, kerberosPrincipal, kerberosKeytabFilePath);
@@ -98,5 +124,4 @@ public class IcebergHelper {
 
         throw new RuntimeException("not support catalogType:" + catalogType);
     }
-
 }
