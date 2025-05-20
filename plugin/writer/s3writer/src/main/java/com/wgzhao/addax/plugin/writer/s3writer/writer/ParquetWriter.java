@@ -17,7 +17,7 @@
  *  under the License.
  */
 
-package com.wgzhao.addax.plugin.writer.s3writer.formatwriter;
+package com.wgzhao.addax.plugin.writer.s3writer.writer;
 
 import com.wgzhao.addax.core.base.Constant;
 import com.wgzhao.addax.core.base.Key;
@@ -59,7 +59,8 @@ import java.util.Map;
 import static org.apache.parquet.schema.LogicalTypeAnnotation.decimalType;
 
 public class ParquetWriter
-        implements IFormatWriter {
+        implements IFormatWriter
+{
     private static final Logger logger = LoggerFactory.getLogger(ParquetWriter.class.getName());
     private char fieldDelimiter;
     private String nullFormat;
@@ -75,92 +76,112 @@ public class ParquetWriter
 
     private org.apache.hadoop.conf.Configuration hadoopConf = null;
 
-    public ParquetWriter() {
+    public ParquetWriter()
+    {
     }
 
-    public char getFieldDelimiter() {
+    public char getFieldDelimiter()
+    {
         return fieldDelimiter;
     }
 
-    public ParquetWriter setFieldDelimiter(char fieldDelimiter) {
+    public ParquetWriter setFieldDelimiter(char fieldDelimiter)
+    {
         this.fieldDelimiter = fieldDelimiter;
         return this;
     }
 
-    public String getNullFormat() {
+    public String getNullFormat()
+    {
         return nullFormat;
     }
 
-    public ParquetWriter setNullFormat(String nullFormat) {
+    public ParquetWriter setNullFormat(String nullFormat)
+    {
         this.nullFormat = nullFormat;
         return this;
     }
 
-    public String getSslEnabled() {
+    public String getSslEnabled()
+    {
         return sslEnabled;
     }
 
-    public ParquetWriter setSslEnabled(String sslEnabled) {
+    public ParquetWriter setSslEnabled(String sslEnabled)
+    {
         this.sslEnabled = sslEnabled;
         return this;
     }
 
-    public String getDateFormat() {
+    public String getDateFormat()
+    {
         return dateFormat;
     }
 
-    public ParquetWriter setDateFormat(String dateFormat) {
+    public ParquetWriter setDateFormat(String dateFormat)
+    {
         this.dateFormat = dateFormat;
         return this;
     }
 
-    public String getEncoding() {
+    public String getEncoding()
+    {
         return encoding;
     }
 
-    public ParquetWriter setEncoding(String encoding) {
+    public ParquetWriter setEncoding(String encoding)
+    {
         this.encoding = encoding;
         return this;
     }
 
-    public String getBucket() {
+    public String getBucket()
+    {
         return bucket;
     }
 
-    public ParquetWriter setBucket(String bucket) {
+    public ParquetWriter setBucket(String bucket)
+    {
         this.bucket = bucket;
         return this;
     }
 
-    public String getObject() {
+    public String getObject()
+    {
         return object;
     }
 
-    public ParquetWriter setObject(String object) {
+    public ParquetWriter setObject(String object)
+    {
         this.object = object;
         return this;
     }
 
-    public List<String> getHeader() {
+    public List<String> getHeader()
+    {
         return header;
     }
 
-    public ParquetWriter setHeader(List<String> header) {
+    public ParquetWriter setHeader(List<String> header)
+    {
         this.header = header;
         return this;
     }
 
-    public S3Client getS3Client() {
+    public S3Client getS3Client()
+    {
         return s3Client;
     }
 
-    public ParquetWriter setS3Client(S3Client s3Client) {
+    public ParquetWriter setS3Client(S3Client s3Client)
+    {
         this.s3Client = s3Client;
         return this;
     }
 
     @Override
-    public void init(Configuration config) {
+    public void init(Configuration config)
+    {
 
         this.fileName = "s3a://" + this.bucket + "/" + this.object;
 
@@ -170,7 +191,6 @@ public class ParquetWriter
         hadoopConf.set("fs.s3a.endpoint", config.getString(S3Key.ENDPOINT));
         hadoopConf.set("fs.s3a.ssl.enabled", config.getString(S3Key.SSL_ENABLED, "true"));
         hadoopConf.set("fs.s3a.path.style.access", config.getString(S3Key.PATH_STYLE_ACCESS_ENABLED, "false"));
-
     }
 
     /*
@@ -194,7 +214,8 @@ public class ParquetWriter
      * "null" 表示该字段允许为空
      */
     @Override
-    public void write(RecordReceiver lineReceiver, Configuration config, TaskPluginCollector taskPluginCollector) {
+    public void write(RecordReceiver lineReceiver, Configuration config, TaskPluginCollector taskPluginCollector)
+    {
         List<Configuration> columns = config.getListConfiguration(Key.COLUMN);
         String compress = config.getString(Key.COMPRESS, "UNCOMPRESSED").toUpperCase().trim();
         if ("NONE".equals(compress)) {
@@ -231,14 +252,16 @@ public class ParquetWriter
                 group = buildRecord(record, columns, taskPluginCollector, simpleGroupFactory);
                 writer.write(group);
             }
-        } catch (IOException e) {
+        }
+        catch (IOException e) {
             throw new RuntimeException(e);
         }
     }
 
     public Group buildRecord(
             Record record, List<Configuration> columns,
-            TaskPluginCollector taskPluginCollector, SimpleGroupFactory simpleGroupFactory) {
+            TaskPluginCollector taskPluginCollector, SimpleGroupFactory simpleGroupFactory)
+    {
         Column column;
         Group group = simpleGroupFactory.newGroup();
         for (int i = 0; i < record.getColumnNumber(); i++) {
@@ -295,7 +318,8 @@ public class ParquetWriter
      * @param ts the {@link Timestamp} want to convert
      * @return {@link Binary}
      */
-    private Binary tsToBinary(Timestamp ts) {
+    private Binary tsToBinary(Timestamp ts)
+    {
         long millis = ts.getTime();
         int julianDays = (int) (millis / 86400000L) + 2440588;
         long nanosOfDay = (millis % 86400000L) * 1000000L;
@@ -315,7 +339,8 @@ public class ParquetWriter
      * @param bigDecimal the decimal value string want to convert
      * @return {@link Binary}
      */
-    private Binary decimalToBinary(String bigDecimal, int scale) {
+    private Binary decimalToBinary(String bigDecimal, int scale)
+    {
         int realScale = new BigDecimal(bigDecimal).scale();
         RoundingMode mode = scale >= realScale ? RoundingMode.UNNECESSARY : RoundingMode.HALF_UP;
         byte[] decimalBytes = new BigDecimal(bigDecimal)
@@ -333,13 +358,15 @@ public class ParquetWriter
                 myDecimalBufferIndex--;
             }
             return Binary.fromConstantByteArray(myDecimalBuffer);
-        } else {
+        }
+        else {
             throw new IllegalArgumentException(String.format("Decimal size: %d was greater than the allowed max: %d",
                     decimalBytes.length, myDecimalBuffer.length));
         }
     }
 
-    private MessageType generateParquetSchema(List<Configuration> columns) {
+    private MessageType generateParquetSchema(List<Configuration> columns)
+    {
         String type;
         String fieldName;
         Type t;
