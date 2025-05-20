@@ -12,8 +12,15 @@ import com.wgzhao.addax.core.util.Configuration;
 import com.wgzhao.addax.plugin.writer.s3writer.S3Key;
 import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.hive.common.type.HiveDecimal;
-import org.apache.hadoop.hive.ql.exec.vector.*;
+import org.apache.hadoop.hive.ql.exec.vector.BytesColumnVector;
+import org.apache.hadoop.hive.ql.exec.vector.ColumnVector;
+import org.apache.hadoop.hive.ql.exec.vector.DecimalColumnVector;
+import org.apache.hadoop.hive.ql.exec.vector.DoubleColumnVector;
+import org.apache.hadoop.hive.ql.exec.vector.LongColumnVector;
+import org.apache.hadoop.hive.ql.exec.vector.TimestampColumnVector;
+import org.apache.hadoop.hive.ql.exec.vector.VectorizedRowBatch;
 import org.apache.hadoop.hive.serde2.io.HiveDecimalWritable;
+import org.apache.hadoop.metrics2.lib.DefaultMetricsSystem;
 import org.apache.orc.CompressionKind;
 import org.apache.orc.OrcFile;
 import org.apache.orc.TypeDescription;
@@ -266,11 +273,17 @@ public class OrcWriter
         this.fileName = "s3a://" + this.bucket + "/" + this.object;
 
         hadoopConf = new org.apache.hadoop.conf.Configuration();
+        DefaultMetricsSystem.initialize("null");
+        DefaultMetricsSystem.shutdown();
+
         hadoopConf.set("fs.s3a.access.key", config.getString(S3Key.ACCESS_ID));
         hadoopConf.set("fs.s3a.secret.key", config.getString(S3Key.ACCESS_KEY));
         hadoopConf.set("fs.s3a.endpoint", config.getString(S3Key.ENDPOINT));
         hadoopConf.set("fs.s3a.ssl.enabled", config.getString(S3Key.SSL_ENABLED, "true"));
         hadoopConf.set("fs.s3a.path.style.access", config.getString(S3Key.PATH_STYLE_ACCESS_ENABLED, "false"));
+        hadoopConf.set("fs.s3a.fast.upload", "true");
+        hadoopConf.set("fs.s3a.impl.disable.metrics", "true");
+        hadoopConf.set("hadoop.metrics2.sink.file.enable", "false");
     }
 
     @Override

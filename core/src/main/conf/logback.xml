@@ -50,6 +50,8 @@
 
     <!-- disable mongodb driver monitor mass log -->
     <logger name="org.mongodb.driver" level="WARN"> </logger>
+    <!-- disable hadoop aws metrics info -->
+    <Logger name="org.apache.hadoop.metrics2.impl.MetricsSystemImpl" level="WARN" />
 
     <root level="${loglevel:-INFO}">
         <appender-ref ref="FILE" />
