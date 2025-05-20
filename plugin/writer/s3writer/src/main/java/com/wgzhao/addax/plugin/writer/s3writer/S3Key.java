@@ -22,4 +22,10 @@ public class S3Key extends Key
     public static final String DEFAULT_SUFFIX = "defaultSuffix";
 
     public static final String PATH_STYLE_ACCESS_ENABLED = "pathStyleAccessEnabled";
+
+    public static final String FILE_TYPE = "fileType";
+
+    public static final String SSL_ENABLED = "sslEnabled";
+
+
 }
