@@ -5,9 +5,9 @@ import com.wgzhao.addax.core.exception.AddaxException;
 import com.wgzhao.addax.core.plugin.RecordReceiver;
 import com.wgzhao.addax.core.spi.Writer;
 import com.wgzhao.addax.core.util.Configuration;
-import com.wgzhao.addax.plugin.writer.s3writer.formatwriter.OrcWriter;
-import com.wgzhao.addax.plugin.writer.s3writer.formatwriter.ParquetWriter;
-import com.wgzhao.addax.plugin.writer.s3writer.formatwriter.TextWriter;
+import com.wgzhao.addax.plugin.writer.s3writer.writer.OrcWriter;
+import com.wgzhao.addax.plugin.writer.s3writer.writer.ParquetWriter;
+import com.wgzhao.addax.plugin.writer.s3writer.writer.TextWriter;
 import com.wgzhao.addax.storage.writer.StorageWriterUtil;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
@@ -20,29 +20,34 @@ import java.util.*;
 import static com.wgzhao.addax.core.spi.ErrorCode.*;
 
 public class S3Writer
-        extends Writer {
+        extends Writer
+{
     public static class Job
-            extends Writer.Job {
+            extends Writer.Job
+    {
         private static final Logger LOG = LoggerFactory.getLogger(Job.class);
 
         private Configuration writerSliceConfig = null;
         private S3Client s3Client = null;
 
         @Override
-        public void init() {
+        public void init()
+        {
             this.writerSliceConfig = this.getPluginJobConf();
             this.validateParameter();
             this.s3Client = S3Util.initS3Client(this.writerSliceConfig);
         }
 
         @Override
-        public void destroy() {
+        public void destroy()
+        {
             if (this.s3Client != null) {
                 this.s3Client.close();
             }
         }
 
-        private void validateParameter() {
+        private void validateParameter()
+        {
             this.writerSliceConfig.getNecessaryValue(S3Key.REGION, REQUIRED_VALUE);
             this.writerSliceConfig.getNecessaryValue(S3Key.ACCESS_ID, REQUIRED_VALUE);
             this.writerSliceConfig.getNecessaryValue(S3Key.ACCESS_KEY, REQUIRED_VALUE);
@@ -53,7 +58,8 @@ public class S3Writer
         }
 
         @Override
-        public void prepare() {
+        public void prepare()
+        {
             LOG.info("begin do prepare...");
             String bucket = this.writerSliceConfig.getString(S3Key.BUCKET);
             String object = this.writerSliceConfig.getString(S3Key.OBJECT);
@@ -63,7 +69,8 @@ public class S3Writer
             if ("truncate".equals(writeMode)) {
                 LOG.info("It will cleanup all objects which starts with [{}] in  [{}]", object, bucket);
                 deleteBucketObjects(bucket, object);
-            } else if ("nonConflict".equals(writeMode)) {
+            }
+            else if ("nonConflict".equals(writeMode)) {
                 LOG.info("Begin to check for existing objects that starts with [{}] in bucket [{}]", object, bucket);
                 List<S3Object> objs = listObjects(bucket, object);
                 if (!objs.isEmpty()) {
@@ -74,14 +81,15 @@ public class S3Writer
         }
 
         @Override
-        public List<Configuration> split(int mandatoryNumber) {
+        public List<Configuration> split(int mandatoryNumber)
+        {
             LOG.info("begin do split...");
             List<Configuration> writerSplitConfigs = new ArrayList<>();
             String object = this.writerSliceConfig.getString(S3Key.OBJECT);
             String bucket = this.writerSliceConfig.getString(S3Key.BUCKET);
             String objectName = object;
             String objectSuffix = null;
-            // if the object has suffix, it should separate the object name
+            // if the object has a suffix, it should separate the object name
             if (object.contains(".")) {
                 objectName = object.split("\\.", -1)[0];
                 objectSuffix = "." + object.split("\\.", -1)[1];
@@ -113,13 +121,14 @@ public class S3Writer
         }
 
         /**
-         * find all objects which starts with objectName and return
+         * find all objects that start with objectName and return
          *
-         * @param bucket     the S3 bucket name
+         * @param bucket the S3 bucket name
          * @param objectName the object prefix will be found
          * @return {@link List}
          */
-        private List<S3Object> listObjects(String bucket, String objectName) {
+        private List<S3Object> listObjects(String bucket, String objectName)
+        {
             String suffix = null;
             if (objectName.contains(".")) {
                 suffix = "." + objectName.split("\\.", -1)[1];
@@ -138,7 +147,8 @@ public class S3Writer
             for (S3Object obj : objects) {
                 if (suffix == null) {
                     result.add(obj);
-                } else if (obj.key().endsWith(suffix)) {
+                }
+                else if (obj.key().endsWith(suffix)) {
                     result.add(obj);
                 }
             }
@@ -146,12 +156,13 @@ public class S3Writer
         }
 
         /**
-         * delete all objects which starts with objectName in bucket
+         * delete all objects that start with objectName in bucket
          *
-         * @param bucket     the S3 bucket name
+         * @param bucket the S3 bucket name
          * @param objectName the object prefix will be deleted
          */
-        private void deleteBucketObjects(String bucket, String objectName) {
+        private void deleteBucketObjects(String bucket, String objectName)
+        {
             List<S3Object> objects = listObjects(bucket, objectName);
             ArrayList<ObjectIdentifier> toDelete = new ArrayList<>();
             if (!objects.isEmpty()) {
@@ -164,7 +175,8 @@ public class S3Writer
                             .delete(Delete.builder().objects(toDelete).build())
                             .build();
                     s3Client.deleteObjects(dor);
-                } catch (S3Exception e) {
+                }
+                catch (S3Exception e) {
                     throw AddaxException.asAddaxException(RUNTIME_ERROR, e.getMessage());
                 }
             }
@@ -172,7 +184,8 @@ public class S3Writer
     }
 
     public static class Task
-            extends Writer.Task {
+            extends Writer.Task
+    {
         private static final Logger LOG = LoggerFactory.getLogger(Task.class);
 
         private S3Client s3Client;
@@ -188,7 +201,8 @@ public class S3Writer
         private String sslEnabled;
 
         @Override
-        public void init() {
+        public void init()
+        {
             Configuration writerSliceConfig = this.getPluginJobConf();
             this.s3Client = S3Util.initS3Client(writerSliceConfig);
             this.bucket = writerSliceConfig.getString(S3Key.BUCKET);
@@ -208,7 +222,8 @@ public class S3Writer
         }
 
         @Override
-        public void startWrite(RecordReceiver lineReceiver) {
+        public void startWrite(RecordReceiver lineReceiver)
+        {
             if ("text".equals(this.fileType)) {
                 TextWriter textWriter = new TextWriter()
                         .setBucket(this.bucket)
@@ -221,7 +236,8 @@ public class S3Writer
                         .setFieldDelimiter(this.fieldDelimiter)
                         .setMaxFileSize(this.maxFileSize);
                 textWriter.write(lineReceiver, this.getPluginJobConf(), this.getTaskPluginCollector());
-            } else if ("orc".equals(this.fileType)) {
+            }
+            else if ("orc".equals(this.fileType)) {
                 OrcWriter orcWriter = new OrcWriter()
                         .setBucket(this.bucket)
                         .setDateFormat(this.dateFormat)
@@ -234,7 +250,8 @@ public class S3Writer
                         .setSslEnabled(this.sslEnabled);
                 orcWriter.init(this.getPluginJobConf());
                 orcWriter.write(lineReceiver, this.getPluginJobConf(), this.getTaskPluginCollector());
-            } else if ("parquet".equals(this.fileType)) {
+            }
+            else if ("parquet".equals(this.fileType)) {
                 ParquetWriter parquetWriter = new ParquetWriter()
                         .setBucket(this.bucket)
                         .setDateFormat(this.dateFormat)
@@ -248,12 +265,11 @@ public class S3Writer
                 parquetWriter.init(this.getPluginJobConf());
                 parquetWriter.write(lineReceiver, this.getPluginJobConf(), this.getTaskPluginCollector());
             }
-
         }
 
-
         @Override
-        public void destroy() {
+        public void destroy()
+        {
             if (this.s3Client != null) {
                 this.s3Client.close();
             }

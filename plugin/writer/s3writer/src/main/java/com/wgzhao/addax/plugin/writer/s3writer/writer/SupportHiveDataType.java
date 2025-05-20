@@ -17,7 +17,7 @@
  * under the License.
  */
 
-package com.wgzhao.addax.plugin.writer.s3writer.formatwriter;
+package com.wgzhao.addax.plugin.writer.s3writer.writer;
 
 public enum SupportHiveDataType {
     TINYINT,
