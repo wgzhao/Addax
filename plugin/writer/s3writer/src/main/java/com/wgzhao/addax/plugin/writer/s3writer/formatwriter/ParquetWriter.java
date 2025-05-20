@@ -168,7 +168,7 @@ public class ParquetWriter
         hadoopConf.set("fs.s3a.access.key", config.getString(S3Key.ACCESS_ID));
         hadoopConf.set("fs.s3a.secret.key", config.getString(S3Key.ACCESS_KEY));
         hadoopConf.set("fs.s3a.endpoint", config.getString(S3Key.ENDPOINT));
-        hadoopConf.set("fs.s3a.ssl.enabled", config.getString(S3Key.SSLENABLED, "true"));
+        hadoopConf.set("fs.s3a.ssl.enabled", config.getString(S3Key.SSL_ENABLED, "true"));
         hadoopConf.set("fs.s3a.path.style.access", config.getString(S3Key.PATH_STYLE_ACCESS_ENABLED, "false"));
 
     }

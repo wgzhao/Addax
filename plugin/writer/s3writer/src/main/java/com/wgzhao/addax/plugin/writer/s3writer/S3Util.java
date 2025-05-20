@@ -11,14 +11,14 @@ import java.net.URI;
 
 import static com.wgzhao.addax.core.spi.ErrorCode.ILLEGAL_VALUE;
 
-public class S3Util {
+public class S3Util
+{
     public static S3Client initS3Client(Configuration conf) {
         String regionStr = conf.getString(S3Key.REGION);
         Region region = Region.of(regionStr);
         String accessId = conf.getString(S3Key.ACCESS_ID);
         String accessKey = conf.getString(S3Key.ACCESS_KEY);
-        String pathStyleAccessEnabled = conf.getString(S3Key.PATH_STYLE_ACCESS_ENABLED, "");
-
+        String pathStyleAccessEnabled = conf.getString(S3Key.PATH_STYLE_ACCESS_ENABLED, "false");
 
         return initS3Client(conf.getString(S3Key.ENDPOINT), region, accessId, accessKey, pathStyleAccessEnabled);
 

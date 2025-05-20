@@ -2,7 +2,8 @@ package com.wgzhao.addax.plugin.writer.s3writer;
 
 import com.wgzhao.addax.core.base.Key;
 
-public class S3Key extends Key {
+public class S3Key extends Key
+{
     public static final String REGION = "region";
 
     public static final String ENDPOINT = "endpoint";
@@ -24,8 +25,7 @@ public class S3Key extends Key {
 
     public static final String FILE_TYPE = "fileType";
 
-
-    public static final String SSLENABLED = "sslEnabled";
+    public static final String SSL_ENABLED = "sslEnabled";
 
 
 }
