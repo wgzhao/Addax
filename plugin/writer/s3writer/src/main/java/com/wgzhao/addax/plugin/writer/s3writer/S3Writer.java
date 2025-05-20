@@ -204,7 +204,7 @@ public class S3Writer
             this.maxFileSize = writerSliceConfig.getInt(S3Key.MAX_FILE_SIZE, DEFAULT_MAX_FILE_SIZE);
 
             this.fileType = writerSliceConfig.getString(S3Key.FILE_TYPE, "text");
-            this.sslEnabled = writerSliceConfig.getString(S3Key.SSLENABLED, "true");
+            this.sslEnabled = writerSliceConfig.getString(S3Key.SSL_ENABLED, "true");
         }
 
         @Override
