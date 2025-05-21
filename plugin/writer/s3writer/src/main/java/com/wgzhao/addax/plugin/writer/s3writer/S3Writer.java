@@ -101,7 +101,7 @@ public class S3Writer
 
             String fullObjectName;
             for (int i = 0; i < mandatoryNumber; i++) {
-                // handle same object name
+                // handle the same object name
                 Configuration splitTaskConfig = this.writerSliceConfig.clone();
                 do {
                     fullObjectName = String.format("%s_%s%s", objectName,
