@@ -67,6 +67,9 @@ Addax 支持超过 20 种[关系型和非关系型数据库](support_data_source
 <td><img src="./docs/images/logos/sap.svg" height="50px" alt="SAP HANA" style="border: 1px solid #add;"></td>
 <td><img src="./docs/images/logos/paimon.svg" height="50px" alt="Paimon" style="border: 1px solid #add;"></td>
 </tr>
+<tr>
+<td><img src="./docs/images/logos/iceberg.svg" height="50px" alt="Iceberg" style="border: 1px solid #add;"></td>
+</tr>
 </table>
 
 ## 快速开始
