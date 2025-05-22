@@ -2195,15 +2195,6 @@
   
 </li>
       
-        <li class="md-nav__item">
-  <a href="#_4" class="md-nav__link">
-    <span class="md-ellipsis">
-      限制说明
-    </span>
-  </a>
-  
-</li>
-      
     </ul>
   
 </nav>
@@ -2547,15 +2538,6 @@
   
 </li>
       
-        <li class="md-nav__item">
-  <a href="#_4" class="md-nav__link">
-    <span class="md-ellipsis">
-      限制说明
-    </span>
-  </a>
-  
-</li>
-      
     </ul>
   
 </nav>
@@ -2729,11 +2711,39 @@ html">SDK 2.0</a> 编写。</p>
 <td><code>append</code></td>
 <td>写入模式，详见 <a href="../hdfswriter">hdfswriter</a> 中相关描述</td>
 </tr>
+<tr>
+<td style="text-align: left;">pathStyleAccessEnabled</td>
+<td style="text-align: center;">否</td>
+<td>bool</td>
+<td>false</td>
+<td>是否使用path access方式访问</td>
+</tr>
+<tr>
+<td style="text-align: left;">sslEnabled</td>
+<td style="text-align: center;">否</td>
+<td>bool</td>
+<td>true</td>
+<td>是否使用ssl方式访问</td>
+</tr>
+<tr>
+<td style="text-align: left;">fileType</td>
+<td style="text-align: center;">否</td>
+<td>string</td>
+<td><code>text</code></td>
+<td>文件类型 text, orc ,parquet</td>
+</tr>
+<tr>
+<td style="text-align: left;">compress</td>
+<td style="text-align: center;">否</td>
+<td>string</td>
+<td>orc 默认<code>NONE</code> parquet 默认 <code>UNCOMPRESSED</code></td>
+<td>orc或parquet文件的压缩方式,默认不压缩</td>
+</tr>
 </tbody>
 </table>
 <h3 id="object">object<a class="headerlink" href="#object" title="Permanent link">&para;</a></h3>
 <p>上述配置中的 <code>object</code> 配置的虽然是 <code>upload.csv</code> 文件，实际上在 S3 写入的文件名会在指定的文件名后面加上 <code>uuid</code> 后缀，
-类似 <code>upload.csv_c0d2ca7df0444933a6f18ea76718b569</code>。 这是用于在多通道写入的情况下，确保文件名不会重名。</p>
+类似 <code>upload_c0d2ca7df0444933a6f18ea76718b569.csv</code>。 这是用于在多通道写入的情况下，确保文件名不会重名。</p>
 <h2 id="_3">类型转换<a class="headerlink" href="#_3" title="Permanent link">&para;</a></h2>
 <table>
 <thead>
@@ -2769,11 +2779,6 @@ html">SDK 2.0</a> 编写。</p>
 </tr>
 </tbody>
 </table>
-<h2 id="_4">限制说明<a class="headerlink" href="#_4" title="Permanent link">&para;</a></h2>
-<ol>
-<li>仅支持写入文本文件格式</li>
-<li>暂不支持压缩</li>
-</ol>
 
 
 

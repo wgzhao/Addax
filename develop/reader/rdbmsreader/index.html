@@ -2947,7 +2947,12 @@
 <p>目前 <code>splitPk</code> 仅支持整形、字符串型数据(ASCII类型) 切分，不支持浮点、日期等其他类型。 如果用户指定其他非支持类型，RDBMSReader 将报错！</p>
 <p><code>splitPk</code> 如果不填写，将视作用户不对单表进行切分，而使用单通道同步全量数据。</p>
 <h4 id="autopk">autoPk<a class="headerlink" href="#autopk" title="Permanent link">&para;</a></h4>
-<p>从 <code>3.2.6</code> 版本开始，支持自动获取表主键或唯一索引，如果设置为 <code>true</code> ，将尝试通过查询数据库的元数据信息获取指定表的主键字段或唯一索引字段，如果获取可用于分隔的 字段不止一个，则默认取第一个。</p>
+<p>从 <code>3.2.6</code> 版本开始，支持自动获取表主键或唯一索引，如果设置为 <code>true</code> ，程序将猜测可用于拆分表的字段，他通过查询数据库的元数据信息获取指定表具有主键、单字段唯一索引索引的字段，
+如果有多个字段符合要求，则优先使用数字类型的字段，其次使用字符类型的字段。如果没有符合要求的字段，则不切分表。
+如果配置了 <code>autoPk</code>，则任务执行时，有类似如下的日志输出:</p>
+<div class="highlight"><pre><span></span><code>2025-04-13 23:17:11.036 [       job-0] INFO  CommonRdbmsReader$Job - The split key is not configured, try to guess the split key.
+2025-04-13 23:17:11.059 [       job-0] INFO  CommonRdbmsReader$Job - Take the field id as split key
+</code></pre></div>
 <p>该特性目前支持的数据库有：</p>
 <ul>
 <li>ClickHouse</li>
@@ -2955,7 +2960,10 @@
 <li>Oracle</li>
 <li>PostgreSQL</li>
 <li>SQL Server</li>
+<li>SQLite</li>
+<li>Sybase ASE</li>
 </ul>
+<p>⚠️ 注意，如果同时配置了 <code>splitPk</code> 和 <code>autoPk</code> ，则 <code>splitPk</code> 优先级更高，<code>autoPk</code> 将被忽略。</p>
 <h3 id="session">session<a class="headerlink" href="#session" title="Permanent link">&para;</a></h3>
 <p>控制写入数据的时间格式，时区等的配置，目前仅对 <code>MySQL</code>, <code>Oracle</code>, <code>SQLServer</code> 有效。下面是一个针对 Oracle 数据库配置 <code>session</code> 的例子。</p>
 <div class="highlight"><pre><span></span><code><span class="p">{</span>

@@ -1337,6 +1337,15 @@
   
 </li>
         
+          <li class="md-nav__item">
+  <a href="#pathstyleaccessenabled" class="md-nav__link">
+    <span class="md-ellipsis">
+      pathStyleAccessEnabled
+    </span>
+  </a>
+  
+</li>
+        
       </ul>
     </nav>
   
@@ -2533,6 +2542,15 @@
   
 </li>
         
+          <li class="md-nav__item">
+  <a href="#pathstyleaccessenabled" class="md-nav__link">
+    <span class="md-ellipsis">
+      pathStyleAccessEnabled
+    </span>
+  </a>
+  
+</li>
+        
       </ul>
     </nav>
   
@@ -2711,6 +2729,13 @@ html">SDK 2.0</a> 编写。</p>
 <td><code>nonConflict</code></td>
 <td></td>
 </tr>
+<tr>
+<td style="text-align: left;">pathStyleAccessEnabled</td>
+<td style="text-align: center;">否</td>
+<td>boolean</td>
+<td>false</td>
+<td>是否启用路径访问模式</td>
+</tr>
 </tbody>
 </table>
 <h3 id="object">object<a class="headerlink" href="#object" title="Permanent link">&para;</a></h3>
@@ -2718,6 +2743,9 @@ html">SDK 2.0</a> 编写。</p>
 <p>当指定多个 object，插件支持使用多线程进行数据抽取。线程并发数通过通道数指定。</p>
 <p>当指定通配符，插件尝试遍历出多个 object 信息。</p>
 <p>例如: 指定 <code>/*</code> 代表读取 bucket 下所有的 object，指定 <code>/foo/*</code> 代表读取 <code>foo</code> 目录下所有的 object。</p>
+<h3 id="pathstyleaccessenabled">pathStyleAccessEnabled<a class="headerlink" href="#pathstyleaccessenabled" title="Permanent link">&para;</a></h3>
+<p>是否启用路径访问模式,如果启用，则访问 bucket 的路径为 <code>example.com/bucket-name</code>,否则为 <code>bucket-name.example.com</code> ，详细情况可以参观
+<a href="https://min.io/docs/minio/linux/administration/object-management.html#minio-object-management-path-virtual-access">path vs virtual access</a> </p>
 <h2 id="_3">类型转换<a class="headerlink" href="#_3" title="Permanent link">&para;</a></h2>
 <table>
 <thead>

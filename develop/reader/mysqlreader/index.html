@@ -1256,6 +1256,15 @@
   
 </li>
       
+        <li class="md-nav__item">
+  <a href="#_5" class="md-nav__link">
+    <span class="md-ellipsis">
+      注意事项
+    </span>
+  </a>
+  
+</li>
+      
     </ul>
   
 </nav>
@@ -2568,6 +2577,15 @@
   
 </li>
       
+        <li class="md-nav__item">
+  <a href="#_5" class="md-nav__link">
+    <span class="md-ellipsis">
+      注意事项
+    </span>
+  </a>
+  
+</li>
+      
     </ul>
   
 </nav>
@@ -2701,6 +2719,10 @@
 <li><code>year</code> 被视为整形</li>
 <li><code>bit</code> 如果是 <code>bit(1)</code> 被视为布尔类型，否则当作二进制类型</li>
 </ul>
+<h2 id="_5">注意事项<a class="headerlink" href="#_5" title="Permanent link">&para;</a></h2>
+<ol>
+<li>在使用 <code>autoPk</code> 或者 <code>splitPk</code> 时，如果选择的字段类型是字符类型，且该字段设置的 <code>COLLATE</code> 为不区分大小写的字符集，比如 <code>utf8_general_ci</code> 和 <code>utf8mb4_general_ci</code> ，则会出现数据重复的情况。因此需要避免使用不区分大小写的字符集。</li>
+</ol>
 
 
 

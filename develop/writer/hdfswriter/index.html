@@ -2799,6 +2799,14 @@
 <span class="w">            </span><span class="p">{</span>
 <span class="w">              </span><span class="nt">&quot;value&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;test&quot;</span><span class="p">,</span>
 <span class="w">              </span><span class="nt">&quot;type&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;bytes&quot;</span>
+<span class="w">            </span><span class="p">},</span>
+<span class="w">            </span><span class="p">{</span>
+<span class="w">              </span><span class="nt">&quot;value&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;[&#39;tag1&#39;, &#39;tag2&#39;, &#39;tag3&#39;]&quot;</span><span class="p">,</span>
+<span class="w">              </span><span class="nt">&quot;type&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;string&quot;</span>
+<span class="w">            </span><span class="p">},</span>
+<span class="w">            </span><span class="p">{</span>
+<span class="w">              </span><span class="nt">&quot;value&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;{&#39;loc&#39;:&#39;HZ&#39;,&#39;num&#39;:&#39;12&#39;}&quot;</span><span class="p">,</span>
+<span class="w">              </span><span class="nt">&quot;type&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;string&quot;</span>
 <span class="w">            </span><span class="p">}</span>
 <span class="w">          </span><span class="p">],</span>
 <span class="w">          </span><span class="nt">&quot;sliceRecordCount&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">1000</span>
@@ -2830,6 +2838,14 @@
 <span class="w">              </span><span class="p">{</span>
 <span class="w">                </span><span class="nt">&quot;name&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;col5&quot;</span><span class="p">,</span>
 <span class="w">                </span><span class="nt">&quot;type&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;string&quot;</span>
+<span class="w">              </span><span class="p">},</span>
+<span class="w">              </span><span class="p">{</span>
+<span class="w">                </span><span class="nt">&quot;name&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;col6&quot;</span><span class="p">,</span>
+<span class="w">                </span><span class="nt">&quot;type&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;array&lt;string&gt;&quot;</span>
+<span class="w">              </span><span class="p">},</span>
+<span class="w">              </span><span class="p">{</span>
+<span class="w">                </span><span class="nt">&quot;name&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;col7&quot;</span><span class="p">,</span>
+<span class="w">                </span><span class="nt">&quot;type&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;map&lt;string,string&gt;&quot;</span>
 <span class="w">              </span><span class="p">}</span>
 <span class="w">            </span><span class="p">],</span>
 <span class="w">            </span><span class="nt">&quot;writeMode&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;overwrite&quot;</span><span class="p">,</span>
@@ -2990,7 +3006,8 @@
 </tbody>
 </table>
 <h3 id="path">path<a class="headerlink" href="#path" title="Permanent link">&para;</a></h3>
-<p>存储到 Hadoop hdfs文件系统的路径信息，HdfsWriter 会根据并发配置在 <code>Path</code> 目录下写入多个文件。为与hive表关联，请填写hive表在hdfs上的存储路径。 例：Hive上设置的数据仓库的存储路径为：<code>/user/hive/warehouse/</code>
+<p>存储到 Hadoop hdfs文件系统的路径信息，HdfsWriter 会根据并发配置在 <code>Path</code> 目录下写入多个文件。为与hive表关联，请填写hive表在hdfs上的存储路径。 例：Hive上设置的数据仓库的存储路径为：
+<code>/user/hive/warehouse/</code>
 ，已建立数据库：<code>test</code>，表：<code>hello</code>； 则对应的存储路径为：<code>/user/hive/warehouse/test.db/hello</code> (如果建表时指定了<code>location</code> 属性，则依据该属性的路径)</p>
 <h3 id="defaultfs">defaultFS<a class="headerlink" href="#defaultfs" title="Permanent link">&para;</a></h3>
 <p>Hadoop hdfs 文件系统 namenode 节点地址。格式：<code>hdfs://ip:port</code> ；例如：<code>hdfs://127.0.0.1:9000</code> , 如果启用了HA，则为 servicename 模式，比如 <code>hdfs://sandbox</code></p>
@@ -3030,6 +3047,7 @@
 <li>如果仅指定了精度但未指定小数位，则小数位用0表示，即 <code>decimal(p,0)</code></li>
 <li>如果都指定，则使用指定的规格，即 <code>decimal(p,s)</code></li>
 </ol>
+<p>从 <code>5.0.1</code> 开始，已经支持 <code>array</code>, <code>map</code> 两种复合类型，上述示例配置文件给出的使用方式</p>
 <h3 id="writemode">writeMode<a class="headerlink" href="#writemode" title="Permanent link">&para;</a></h3>
 <p>写入前数据清理处理模式：</p>
 <ul>
@@ -3061,7 +3079,8 @@
 </code></pre></div>
 <p>这里的 <code>cluster</code> 表示 HDFS 配置成HA时的名字，也是 <code>defaultFS</code> 配置项中的名字 如果实际环境中的名字不是 <code>cluster</code> ，则上述配置中所有写有 <code>cluster</code> 都需要替换</p>
 <h3 id="preshell-postshell">preShell 与 postShell<a class="headerlink" href="#preshell-postshell" title="Permanent link">&para;</a></h3>
-<p>引入 <code>preShell</code> 与 <code>postShell</code> 的目的是为了在写入数据前后执行一些额外的操作，比如在写入数据前清空表，写入数据后查询表的行数等。一个典型的生产环境场景时，采集的数据按日分区保存在 HDFS 上，
+<p>引入 <code>preShell</code> 与 <code>postShell</code> 的目的是为了在写入数据前后执行一些额外的操作，比如在写入数据前清空表，写入数据后查询表的行数等。一个典型的生产环境场景时，采集的数据按日分区保存在 HDFS
+上，
 采集之前需要创建分区，这样就可以通过配置 <code>preShell</code> 来实现，比如 <code>hive -e "alter table test.hello add partition(dt='${logdate}')"</code></p>
 <h3 id="ignoreerror">ignoreError<a class="headerlink" href="#ignoreerror" title="Permanent link">&para;</a></h3>
 <p>该配置项用于控制是否忽略 <code>preShell</code> 和 <code>postShell</code> 命令的错误，如果配置为 <code>true</code>，则在执行 <code>preShell</code> 和 <code>postShell</code> 命令时，如果命令执行失败，不会导致任务失败，而是会打印错误日志，继续执行任务。
@@ -3107,11 +3126,15 @@
 <td>Bytes</td>
 <td>BINARY</td>
 </tr>
+<tr>
+<td>String</td>
+<td>ARRAY, MAP</td>
+</tr>
 </tbody>
 </table>
 <h2 id="_4">功能与限制<a class="headerlink" href="#_4" title="Permanent link">&para;</a></h2>
 <ol>
-<li>目前不支持：<code>binary</code>、<code>arrays</code>、<code>maps</code>、<code>structs</code>、<code>union</code> 类型</li>
+<li>目前不支持：<code>structs</code>、<code>union</code> 类型</li>
 </ol>
 
 
