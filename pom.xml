@@ -93,10 +93,12 @@
         <zookeeper.version>3.7.2</zookeeper.version>
         <zstd.version>1.5.6-6</zstd.version>
 
+
         <!-- jdbc driver version -->
         <cassandra.jdbc.version>3.11.5</cassandra.jdbc.version>
         <clickhouse.jdbc.version>0.8.1</clickhouse.jdbc.version>
         <databend.jdbc.version>0.3.6</databend.jdbc.version>
+        <gaussdb.jdbc.version>506.0.0.b058-jdk7</gaussdb.jdbc.version>
         <hive.jdbc.version>3.1.3</hive.jdbc.version>
         <influxdbClient.version>2.25</influxdbClient.version>
         <hadoop.version>3.2.4</hadoop.version>
@@ -112,6 +114,7 @@
         <taos.jdbc.version>3.2.1</taos.jdbc.version>
         <trino.jdbc.version>351</trino.jdbc.version>
         <ucanaccess.version>5.0.1</ucanaccess.version>
+
 
         <!-- maven configuration -->
         <project.sourceEncoding>UTF-8</project.sourceEncoding>
@@ -140,6 +143,7 @@
         <module>plugin/reader/elasticsearchreader</module>
         <module>plugin/reader/excelreader</module>
         <module>plugin/reader/ftpreader</module>
+        <module>plugin/reader/gaussdbreader</module>
         <module>plugin/reader/hanareader</module>
         <module>plugin/reader/hbase11xreader</module>
         <module>plugin/reader/hbase11xsqlreader</module>
@@ -167,6 +171,8 @@
         <module>plugin/reader/tdenginereader</module>
         <module>plugin/reader/txtfilereader</module>
 
+
+
         <!-- writer -->
         <module>plugin/writer/accesswriter</module>
         <module>plugin/writer/cassandrawriter</module>
@@ -177,6 +183,7 @@
         <module>plugin/writer/elasticsearchwriter</module>
         <module>plugin/writer/excelwriter</module>
         <module>plugin/writer/ftpwriter</module>
+        <module>plugin/writer/gaussdbwriter</module>
         <module>plugin/writer/greenplumwriter</module>
         <module>plugin/writer/hanawriter</module>
         <module>plugin/writer/hbase11xsqlwriter</module>
@@ -368,6 +375,12 @@
                 <groupId>com.google.protobuf</groupId>
                 <artifactId>protobuf-java</artifactId>
                 <version>${protobuf.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>com.huaweicloud.gaussdb</groupId>
+                <artifactId>gaussdbjdbc</artifactId>
+                <version>${gaussdb.jdbc.version}</version>
             </dependency>
 
             <dependency>

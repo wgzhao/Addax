@@ -288,7 +288,7 @@ public class SingleTableSplitUtil
             sql = String.format("select %1$s from (select top %4$d %1$s from %2$s %3$s order by newid()) t order by %1$s",
                     splitPK, table, whereSql, adviceNum - 1);
         }
-        else if (dataBaseType == DataBaseType.PostgreSQL || dataBaseType == DataBaseType.SQLite) {
+        else if (dataBaseType == DataBaseType.PostgreSQL || dataBaseType == DataBaseType.SQLite || dataBaseType == DataBaseType.GaussDB) {
             sql = String.format("select %1s from (select %1$s from %2$s %3$s order by random() limit %4$d) t order by %1$s",
                     splitPK, table, whereSql, adviceNum - 1);
         }

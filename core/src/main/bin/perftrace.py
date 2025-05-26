@@ -163,6 +163,9 @@ def parsePluginName(jdbcUrl, pluginType):
     postgresqlRegex = re.compile('jdbc:(postgresql)://.*')
     if (postgresqlRegex.match(jdbcUrl)):
         name = 'postgresql'
+    gaussdbRegex = re.compile('jdbc:(gaussdb)://.*')
+    if (gaussdbRegex.match(jdbcUrl)):
+        name = 'gaussdb'
     oracleRegex = re.compile('jdbc:(oracle):.*')
     if (oracleRegex.match(jdbcUrl)):
         name = 'oracle'

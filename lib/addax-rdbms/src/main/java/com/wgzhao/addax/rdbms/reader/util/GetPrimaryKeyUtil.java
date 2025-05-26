@@ -177,6 +177,20 @@ public class GetPrimaryKeyUtil
                         .append(" AND con.contype IN ('p', 'u') AND array_length(con.conkey, 1) = 1")
                         .append(" ORDER BY con.contype ASC, a.atttypid ASC");
                 break;
+            case GaussDB:
+                sql.append("SELECT a.attname AS COLUMN_NAME, ")
+                        .append(" upper(format_type(a.atttypid, a.atttypmod)) AS COLUMN_TYPE, ")
+                        .append(" CASE WHEN con.contype = 'p' THEN 'PRI' ELSE 'UNI' END AS KEY_TYPE ")
+                        .append(" FROM pg_constraint con ")
+                        .append(" JOIN pg_class rel ON rel.oid = con.conrelid ")
+                        .append(" JOIN pg_namespace nsp ON nsp.oid = rel.relnamespace ")
+                        .append(" LEFT JOIN pg_attribute a ON a.attnum = ANY(con.conkey) AND a.attrelid = con.conrelid ")
+                        .append(" WHERE nsp.nspname = ")
+                        .append(schema == null ? "(SELECT CURRENT_SCHEMA()) " : "'" + schema + "'")
+                        .append(" AND rel.relname = '").append(tableName).append("'")
+                        .append(" AND con.contype IN ('p', 'u') AND array_length(con.conkey, 1) = 1")
+                        .append(" ORDER BY con.contype ASC, a.atttypid ASC");
+                break;
             case SQLServer:
                 sql.append("SELECT ")
                         .append("    kc.COLUMN_NAME, ")

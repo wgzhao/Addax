@@ -36,6 +36,7 @@ public enum DataBaseType
     SQLite("sqlite", "org.sqlite.JDBC"),
     SQLServer("sqlserver", "com.microsoft.sqlserver.jdbc.SQLServerDriver"),
     PostgreSQL("postgresql", "org.postgresql.Driver"),
+    GaussDB("gaussdb", "com.huawei.gaussdb.jdbc.Driver"),
     RDBMS("rdbms", DataBaseType.class.getName()),
     RDBMS_READER("rdbms_reader", DataBaseType.class.getName()),
     RDBMS_WRITER("rdbms_writer", DataBaseType.class.getName()),
@@ -49,6 +50,7 @@ public enum DataBaseType
     Databend("databend", "com.databend.jdbc.DatabendDriver"),
     Access("access","net.ucanaccess.jdbc.UcanaccessDriver"),
     HANA("hana", "com.sap.db.jdbc.Driver");
+
 
     private static final Pattern jdbcUrlPattern = Pattern.compile("jdbc:\\w+:(?:thin:url=|//|thin:@|)([\\w\\d.,]+).*");
 
