@@ -1,0 +1,13 @@
+{
+    "name": "gaussdbreader",
+    "parameter": {
+        "username": "",
+        "password": "",
+        "connection": [
+            {
+                "table": [],
+                "jdbcUrl": "jdbc:gaussdb://127.0.0.1:8000/test"
+            }
+        ]
+    }
+}

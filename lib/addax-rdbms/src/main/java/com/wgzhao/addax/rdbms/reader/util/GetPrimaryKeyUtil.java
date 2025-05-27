@@ -163,6 +163,22 @@ public class GetPrimaryKeyUtil
                          ORDER BY c.COLUMN_KEY ASC, c.DATA_TYPE ASC
                         """.formatted(schemaExpr, tableName);
             }
+            case GaussDB -> {
+                var schemaExpr = schema == null ? "(SELECT CURRENT_SCHEMA()) " : "'" + schema + "'";
+                yield """
+                         SELECT a.attname AS COLUMN_NAME,
+                         upper(format_type(a.atttypid, a.atttypmod)) AS COLUMN_TYPE,
+                         CASE WHEN con.contype = 'p' THEN 'PRI' ELSE 'UNI' END AS KEY_TYPE
+                         FROM pg_constraint con
+                         JOIN pg_class rel ON rel.oid = con.conrelid
+                         JOIN pg_namespace nsp ON nsp.oid = rel.relnamespace
+                         LEFT JOIN pg_attribute a ON a.attnum = ANY(con.conkey) AND a.attrelid = con.conrelid
+                         WHERE nsp.nspname = %s
+                         AND rel.relname = '%s'
+                         AND con.contype IN ('p', 'u') AND array_length(con.conkey, 1) = 1
+                         ORDER BY con.contype ASC, a.atttypid ASC
+                        """.formatted(schemaExpr, tableName);
+            }
             case PostgreSQL -> {
                 var schemaExpr = schema == null ? "(SELECT CURRENT_SCHEMA()) " : "'" + schema + "'";
                 yield """

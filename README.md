@@ -95,6 +95,7 @@ Addax supports a wide range of database systems and file sources. Below is a sel
 </tr>
 <tr>
 <td><img src="./docs/images/logos/iceberg.svg" height="50px" alt="Iceberg" style="border: 1px solid #add;"></td>
+<td><img src="./docs/images/logos/gaussdb.svg" height="50px" alt="GaussDB" style="border: 1px solid #add;"></td>
 </tr>
 </table>
 
