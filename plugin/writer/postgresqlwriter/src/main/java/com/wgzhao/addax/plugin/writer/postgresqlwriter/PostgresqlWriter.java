@@ -19,6 +19,7 @@
 
 package com.wgzhao.addax.plugin.writer.postgresqlwriter;
 
+import com.alibaba.fastjson2.JSON;
 import com.wgzhao.addax.core.base.Key;
 import com.wgzhao.addax.core.element.Column;
 import com.wgzhao.addax.core.exception.AddaxException;
@@ -26,12 +27,17 @@ import com.wgzhao.addax.core.plugin.RecordReceiver;
 import com.wgzhao.addax.core.spi.Writer;
 import com.wgzhao.addax.core.util.Configuration;
 import com.wgzhao.addax.rdbms.util.DataBaseType;
+import com.wgzhao.addax.rdbms.util.DataWrapper;
 import com.wgzhao.addax.rdbms.writer.CommonRdbmsWriter;
+import org.postgresql.util.PGobject;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.sql.Types;
 import java.util.List;
+import java.util.Objects;
 
 import static com.wgzhao.addax.core.spi.ErrorCode.ILLEGAL_VALUE;
 
@@ -39,6 +45,7 @@ public class PostgresqlWriter
         extends Writer
 {
     private static final DataBaseType DATABASE_TYPE = DataBaseType.PostgreSQL;
+    private static final Logger log = LoggerFactory.getLogger(PostgresqlWriter.class);
 
     public static class Job
             extends Writer.Job
@@ -138,14 +145,65 @@ public class PostgresqlWriter
                     if (columnSqlType == Types.BIT) {
                         String v;
                         if (column.getType() == Column.Type.BOOL) {
-                           v =  column.asBoolean() ? "1" : "0";
-                        } else {
+                            v = column.asBoolean() ? "1" : "0";
+                        }
+                        else {
                             v = bytes2Binary(column.asBytes());
                         }
                         preparedStatement.setString(columnIndex, v);
                         return preparedStatement;
                     }
-
+                    else if (columnSqlType == Types.OTHER) {
+                        Object rawData = column.getRawData();
+                        if (Objects.isNull(rawData)) {
+                            preparedStatement.setNull(columnIndex, Types.OTHER);
+                            return preparedStatement;
+                        }
+                        if (rawData instanceof byte[]) {
+                            // only handle PGobject, others will be handled in super class
+                            DataWrapper dataWrapper = JSON.parseObject(column.asBytes(), DataWrapper.class);
+                            if (Objects.nonNull(dataWrapper)) {
+                                Object pgRawData = dataWrapper.getRawData();
+                                String columnTypeName = dataWrapper.getColumnTypeName();
+                                if (PostGisColumnTypeName.isPGObject(columnTypeName)) {
+                                    PGobject pgObject = JSON.parseObject((String) pgRawData, PGobject.class);
+                                    preparedStatement.setObject(columnIndex, pgObject);
+                                    return preparedStatement;
+                                }
+                            }
+                        }
+                    }
+                    else if (columnSqlType == Types.ARRAY) {
+                        Object rawData = column.getRawData();
+                        if (Objects.isNull(rawData)) {
+                            preparedStatement.setNull(columnIndex, Types.ARRAY);
+                            return preparedStatement;
+                        }
+                        if (rawData instanceof byte[]) {
+                            DataWrapper dataWrapper = JSON.parseObject(column.asBytes(), DataWrapper.class);
+                            if (Objects.nonNull(dataWrapper)) {
+                                Object pgRawData = dataWrapper.getRawData();
+                                String columnTypeName = dataWrapper.getColumnTypeName();
+                                String arrayStr = (String) pgRawData;
+                                if (arrayStr.startsWith("{") && arrayStr.endsWith("}")) {
+                                    arrayStr = arrayStr.substring(1, arrayStr.length() - 1);
+                                }
+                                String[] elements = arrayStr.split(",");
+                                Object[] pgArray = new Object[elements.length];
+                                for (int i = 0; i < elements.length; i++) {
+                                    pgArray[i] = elements[i].trim();
+                                }
+                                preparedStatement.setArray(columnIndex,
+                                        preparedStatement.getConnection().createArrayOf(
+                                                columnTypeName, pgArray));
+                            }
+                            else {
+                                log.error("type array deserialized PostgisWrapper is null, please check your database data.");
+                                preparedStatement.setNull(columnIndex, Types.ARRAY);
+                            }
+                            return preparedStatement;
+                        }
+                    }
                     return super.fillPreparedStatementColumnType(preparedStatement, columnIndex, columnSqlType, column);
                 }
             };
