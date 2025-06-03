@@ -167,14 +167,15 @@ public class StreamWriter
                 writeToFile(recordReceiver);
             }
             else if (this.print) {
-                writeToConsole(recordReceiver);
+               writeToConsole(recordReceiver);
             }
         }
 
         private void writeToConsole(RecordReceiver recordReceiver)
         {
-            try (BufferedWriter writer = new BufferedWriter(
-                    new OutputStreamWriter(System.out, StandardCharsets.UTF_8))) {
+            BufferedWriter writer = new BufferedWriter(
+                    new OutputStreamWriter(System.out, StandardCharsets.UTF_8));
+            try {
                 Record record;
                 while ((record = recordReceiver.getFromReader()) != null) {
                     writer.write(recordToString(record));
