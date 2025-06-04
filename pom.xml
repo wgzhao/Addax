@@ -4,7 +4,7 @@
 
     <groupId>com.wgzhao.addax</groupId>
     <artifactId>addax-all</artifactId>
-    <version>6.0.0</version>
+    <version>6.0.1-SNAPSHOT</version>
     <name>addax-all</name>
     <description>Addax: a versatile open-source ETL tool</description>
     <packaging>pom</packaging>
@@ -24,7 +24,7 @@
         <connection>scm:git:https://github.com/wgzhao/addax.git</connection>
         <developerConnection>scm:git:git@github.com:wgzhao/addax.git</developerConnection>
         <url>https://github.com/wgzhao/addax</url>
-        <tag>6.0.0</tag>
+        <tag>4.2.3</tag>
     </scm>
 
     <properties>
