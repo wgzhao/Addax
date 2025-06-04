@@ -66,30 +66,19 @@ jobs:
           cd target
           sha256sum addax-${{ steps.version.outputs.version }}.tar.gz > addax-${{ steps.version.outputs.version }}.tar.gz.sha256sum.asc
 
-      - name: Create release
-        uses: actions/create-release@v1
-        id: create_release
-        with:
-          draft: false
-          prerelease: false
-          release_name: ${{ steps.version.outputs.version }}
-          tag_name: ${{ github.ref }}
-          body: |
-            # Addax  ${{ steps.version.outputs.version }} has released! 🎉
-            
-            We are pleased to announce version ${{ steps.version.outputs.version }}, which focuses on improving stability and performance by addressing several bugs and implementing minor code refinements. 
-            Below are the key updates in this release:
-            
-            ## 📜 Changes
-            
-            ${{ steps.changelog.outputs.changelog }}
-        env:
-          GITHUB_TOKEN: ${{ secrets.TOKEN }}
-
       - name: Upload to GitHub
         uses: softprops/action-gh-release@v2
         if: github.ref_type == 'tag'
         with:
+          body: |
+            # Addax  ${{ steps.version.outputs.version }} has released! 🎉
+
+            We are pleased to announce version ${{ steps.version.outputs.version }}, which focuses on improving stability and performance by addressing several bugs and implementing minor code refinements. 
+            Below are the key updates in this release:
+
+            ## 📜 Changes
+
+            ${{ steps.changelog.outputs.changelog }}
           files: |
             target/addax-${{ steps.version.outputs.version }}.tar.gz
             target/addax-${{ steps.version.outputs.version }}.tar.gz.sha256sum.asc
