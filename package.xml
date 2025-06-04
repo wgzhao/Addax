@@ -105,6 +105,14 @@
             <outputDirectory>/</outputDirectory>
         </fileSet>
         <fileSet>
+            <directory>plugin/reader/gaussdbreader/target/gaussdbreader-${project.version}/</directory>
+            <includes>
+                <include>**/*.*</include>
+            </includes>
+            <fileMode>0644</fileMode>
+            <outputDirectory>/</outputDirectory>
+        </fileSet>
+        <fileSet>
             <directory>plugin/reader/influxdbreader/target/influxdbreader-${project.version}/</directory>
             <includes>
                 <include>**/*.*</include>
@@ -380,6 +388,14 @@
         </fileSet>
         <fileSet>
             <directory>plugin/writer/ftpwriter/target/ftpwriter-${project.version}/</directory>
+            <includes>
+                <include>**/*.*</include>
+            </includes>
+            <fileMode>0644</fileMode>
+            <outputDirectory>/</outputDirectory>
+        </fileSet>
+        <fileSet>
+            <directory>plugin/writer/gaussdbwriter/target/gaussdbwriter-${project.version}/</directory>
             <includes>
                 <include>**/*.*</include>
             </includes>
