@@ -19,6 +19,7 @@
 
 package com.wgzhao.addax.plugin.writer.kuduwriter;
 
+import com.wgzhao.addax.core.base.Key;
 import com.wgzhao.addax.core.exception.AddaxException;
 import com.wgzhao.addax.core.plugin.RecordReceiver;
 import com.wgzhao.addax.core.spi.Writer;
@@ -63,7 +64,7 @@ public class KuduWriter
             this.config.set(KuduKey.KUDU_TIMEOUT, timeout);
 
             LOG.info("Try to connect kudu with {}", masterAddress);
-            KuduHelper kuduHelper = new KuduHelper(masterAddress, timeout);
+            KuduHelper kuduHelper = new KuduHelper(this.config,masterAddress, timeout);
             // check table exists or not
             if (!kuduHelper.isTableExists(tableName)) {
                 throw AddaxException.asAddaxException(CONFIG_ERROR, "table '" + tableName + "' does not exists");
@@ -95,6 +96,19 @@ public class KuduWriter
             // writeMode check
             String writeMode = this.config.getString(KuduKey.WRITE_MODE, INSERT_MODE);
             this.config.set(KuduKey.WRITE_MODE, writeMode);
+
+
+            //Kerberos check
+            validateKerberos();
+        }
+
+        private void validateKerberos()
+        {
+            boolean haveKerberos = this.config.getBool(Key.HAVE_KERBEROS, false);
+            if (haveKerberos) {
+                this.config.getNecessaryValue(Key.KERBEROS_KEYTAB_FILE_PATH, REQUIRED_VALUE);
+                this.config.getNecessaryValue(Key.KERBEROS_PRINCIPAL, REQUIRED_VALUE);
+            }
         }
 
         @Override

@@ -20,6 +20,8 @@
 package com.wgzhao.addax.plugin.writer.kuduwriter;
 
 import com.wgzhao.addax.core.exception.AddaxException;
+import com.wgzhao.addax.core.util.Configuration;
+import org.apache.hadoop.security.UserGroupInformation;
 import org.apache.kudu.ColumnSchema;
 import org.apache.kudu.Schema;
 import org.apache.kudu.client.KuduClient;
@@ -29,90 +31,96 @@ import org.apache.kudu.client.KuduTable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.security.PrivilegedExceptionAction;
 import java.util.ArrayList;
 import java.util.List;
 
+import static com.wgzhao.addax.core.base.Key.*;
 import static com.wgzhao.addax.core.spi.ErrorCode.CONNECT_ERROR;
 import static com.wgzhao.addax.core.spi.ErrorCode.RUNTIME_ERROR;
 
-public class KuduHelper
-{
+public class KuduHelper {
 
     private static final Logger LOG = LoggerFactory.getLogger(KuduHelper.class);
     private final KuduClient kuduClient;
     private KuduTable kuduTable;
 
-    public KuduHelper(String masterAddress)
-    {
-        this(masterAddress, 100 * 1000L);
+    public KuduHelper(Configuration config, String masterAddress) {
+        this(config, masterAddress, 100 * 1000L);
     }
 
-    public KuduHelper(String masterAddress, long timeout)
-    {
+    public KuduHelper(Configuration config, String masterAddress, long timeout) {
         try {
-            this.kuduClient = new KuduClient.KuduClientBuilder(masterAddress)
-                    .defaultOperationTimeoutMs(timeout)
-                    .build();
-        }
-        catch (Exception e) {
+            boolean haveKerberos = config.getBool(HAVE_KERBEROS, false);
+
+            if (!haveKerberos) {
+                this.kuduClient = new KuduClient.KuduClientBuilder(masterAddress)
+                        .defaultOperationTimeoutMs(timeout)
+                        .build();
+            } else {
+                org.apache.hadoop.conf.Configuration configuration = new org.apache.hadoop.conf.Configuration();
+                UserGroupInformation.setConfiguration(configuration);
+
+                String kerberosKeytabFilePath = config.getString(KERBEROS_KEYTAB_FILE_PATH);
+                String kerberosPrincipal = config.getString(KERBEROS_PRINCIPAL);
+                UserGroupInformation.loginUserFromKeytab(kerberosPrincipal, kerberosKeytabFilePath);
+                this.kuduClient = UserGroupInformation.getLoginUser().doAs(
+                        new PrivilegedExceptionAction<KuduClient>() {
+                            @Override
+                            public KuduClient run() throws Exception {
+                                return new KuduClient.KuduClientBuilder(masterAddress).defaultOperationTimeoutMs(timeout).build();
+                            }
+                        });
+            }
+        } catch (Exception e) {
             throw AddaxException.asAddaxException(CONNECT_ERROR, e);
         }
     }
 
-    public KuduTable getKuduTable(String tableName)
-    {
+    public KuduTable getKuduTable(String tableName) {
         if (tableName == null) {
             return null;
-        }
-        else {
+        } else {
             try {
                 kuduTable = kuduClient.openTable(tableName);
                 return kuduTable;
-            }
-            catch (KuduException e) {
+            } catch (KuduException e) {
                 throw AddaxException.asAddaxException(RUNTIME_ERROR, e);
             }
         }
     }
 
-    public boolean isTableExists(String tableName)
-    {
+    public boolean isTableExists(String tableName) {
         if (tableName == null) {
             return false;
         }
         try {
             return kuduClient.tableExists(tableName);
-        }
-        catch (KuduException e) {
+        } catch (KuduException e) {
             throw AddaxException.asAddaxException(RUNTIME_ERROR, e);
         }
     }
 
-    public void closeClient()
-    {
+    public void closeClient() {
         try {
             if (kuduClient != null) {
                 kuduClient.close();
             }
-        }
-        catch (KuduException e) {
+        } catch (KuduException e) {
             LOG.warn("The kudu client was not stopped gracefully. !");
         }
     }
 
-    public Schema getSchema(String tableName)
-    {
+    public Schema getSchema(String tableName) {
         if (kuduTable != null) {
             return kuduTable.getSchema();
-        }
-        else {
+        } else {
             kuduTable = getKuduTable(tableName);
             return kuduTable.getSchema();
         }
     }
 
-    public List<String> getAllColumns(String tableName)
-    {
+    public List<String> getAllColumns(String tableName) {
         List<String> columns = new ArrayList<>();
         Schema schema = getSchema(tableName);
         for (ColumnSchema column : schema.getColumns()) {
@@ -121,8 +129,7 @@ public class KuduHelper
         return columns;
     }
 
-    public KuduSession getSession()
-    {
+    public KuduSession getSession() {
         return kuduClient.newSession();
     }
 }
