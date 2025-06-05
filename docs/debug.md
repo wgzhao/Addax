@@ -31,7 +31,7 @@
 - Name: 调试描述名称，这里可以按照自己喜好填写
 - Run on: 选择 `Local machine`
 - Build and run:
-  - 第一个框: 选择 JDK 版本，目前仅在1.8版本上严格测试，建议选择1.8版本
+  - 第一个框: 选择 JDK 版本，当前支持 17 版本，建议选择 17 版本
   - 第二个框: 选择 `addax-core` 模块
   - `Main class`: 填写 `com.wgzhao.addax.core.Engine`
   - 点击 `Modify options`，在弹出的下拉框中，选择 `Add VM Options`，在增加的 `VM Options` 中，填写 `-Daddax.home=/opt/app/addax/4.0.3`

@@ -100,7 +100,7 @@ public class JobContainer
 
     /*
      * The main work of the jobContainer is all done in the start() method，
-     * including init, prepare, split, scheduler,  post, destroy and statistics
+     * including init, prepare, split, scheduler, post, destroy and statistics
      */
     @Override
     public void start()
@@ -537,7 +537,7 @@ public class JobContainer
         String jobResultReportUrl = userConf.getString(CoreConstant.CORE_SERVER_ADDRESS);
         if (StringUtils.isNotBlank(jobResultReportUrl)) {
             String jobKey = "jobName";
-            // Get the job name, there are two ways to obtain it:
+            // Get the job name, there are two ways to get it:
             // 1. Pass it through the command line using -DjobName;
             // 2. Analyze the log writing path of the writer plugin and splice the 2nd and 3rd directories
             String jobContentWriterPath = userConf.getString(CoreConstant.JOB_CONTENT_WRITER_PATH);
@@ -575,7 +575,7 @@ public class JobContainer
             LOG.debug("The report contents: {}", jsonStr);
             postJobRunStatistic(jobResultReportUrl, timeoutMills, jsonStr);
         }
-        LOG.info(String.format("%n" + "%-26s: %-18s%n" + "%-26s: %-18s%n" + "%-26s: %19s%n"
+        String statMsg = String.format("%n" + "%-26s: %-18s%n" + "%-26s: %-18s%n" + "%-26s: %19s%n"
                         + "%-26s: %19s%n" + "%-26s: %19s%n" + "%-26s: %19s%n" + "%-26s: %19s%n",
                 "Job start  at", dateFormat.format(startTimeStamp),
                 "Job end    at", dateFormat.format(endTimeStamp),
@@ -584,16 +584,18 @@ public class JobContainer
                 "Average   rps", recordSpeedPerSecond + "rec/s",
                 "Number of rec", totalReadRecords,
                 "Failed record", totalErrorRecords
-        ));
+        );
+        LOG.info(statMsg);
         final Long counterSucc = communication.getLongCounter(CommunicationTool.TRANSFORMER_SUCCEED_RECORDS);
         final Long counterFail = communication.getLongCounter(CommunicationTool.TRANSFORMER_FAILED_RECORDS);
         final Long counterFilter = communication.getLongCounter(CommunicationTool.TRANSFORMER_FILTER_RECORDS);
         if (counterSucc + counterFail + counterFilter > 0) {
-            LOG.info(String.format("%n" + "%-26s: %19s%n" + "%-26s: %19s%n" + "%-26s: %19s%n",
+            String transStatMsg = String.format("%n" + "%-26s: %19s%n" + "%-26s: %19s%n" + "%-26s: %19s%n",
                     "Transformer success records", counterSucc,
                     "Transformer failed  records", counterFail,
                     "Transformer filter  records", counterFilter
-            ));
+            );
+            LOG.info(transStatMsg);
         }
     }
 
