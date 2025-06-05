@@ -113,7 +113,7 @@
         <taos.jdbc.version>3.2.1</taos.jdbc.version>
         <trino.jdbc.version>351</trino.jdbc.version>
         <ucanaccess.version>5.0.1</ucanaccess.version>
-        <iceberg.version>1.8.0</iceberg.version>
+        <iceberg.version>1.9.1</iceberg.version>
 
         <!-- maven configuration -->
         <project.sourceEncoding>UTF-8</project.sourceEncoding>
