@@ -21,7 +21,8 @@ package com.wgzhao.addax.plugin.writer.kuduwriter;
 
 import com.wgzhao.addax.core.base.Key;
 
-public class KuduKey extends Key {
+public class KuduKey extends Key
+{
     public final static String KUDU_MASTER_ADDRESSES = "masterAddress";
     public final static String KUDU_TIMEOUT = "timeout";
 

@@ -35,9 +35,11 @@ import static com.wgzhao.addax.core.spi.ErrorCode.CONFIG_ERROR;
 import static com.wgzhao.addax.core.spi.ErrorCode.REQUIRED_VALUE;
 
 public class KuduWriter
-        extends Writer {
+        extends Writer
+{
     public static class Job
-            extends Writer.Job {
+            extends Writer.Job
+    {
         private static final Logger LOG = LoggerFactory.getLogger(Job.class);
 
         private static final String INSERT_MODE = "upsert";
@@ -47,20 +49,25 @@ public class KuduWriter
         private Configuration config = null;
 
         @Override
-        public void init() {
+        public void init()
+        {
             this.config = this.getPluginJobConf();
             this.validateParameter();
         }
 
-        private void validateParameter() {
+        private void validateParameter()
+        {
             String tableName = config.getNecessaryValue(KuduKey.TABLE, REQUIRED_VALUE);
             String masterAddress = config.getNecessaryValue(KuduKey.KUDU_MASTER_ADDRESSES, REQUIRED_VALUE);
             long timeout = config.getInt(KuduKey.KUDU_TIMEOUT, DEFAULT_TIME_OUT) * 1000L;
             // write back default value with ms unit
             this.config.set(KuduKey.KUDU_TIMEOUT, timeout);
 
+            //Kerberos check
+            validateKerberos();
+
             LOG.info("Try to connect kudu with {}", masterAddress);
-            KuduHelper kuduHelper = new KuduHelper(this.config, masterAddress, timeout);
+            KuduHelper kuduHelper = new KuduHelper(masterAddress, timeout, this.config);
             // check table exists or not
             if (!kuduHelper.isTableExists(tableName)) {
                 throw AddaxException.asAddaxException(CONFIG_ERROR, "table '" + tableName + "' does not exists");
@@ -79,7 +86,8 @@ public class KuduWriter
                 LOG.info("Take the columns of table '{}' as writing columns", tableName);
                 columns = kuduHelper.getAllColumns(tableName);
                 this.config.set(KuduKey.COLUMN, columns);
-            } else {
+            }
+            else {
                 // check column exists or not
                 final Schema schema = kuduHelper.getSchema(tableName);
                 for (String column : columns) {
@@ -91,13 +99,10 @@ public class KuduWriter
             // writeMode check
             String writeMode = this.config.getString(KuduKey.WRITE_MODE, INSERT_MODE);
             this.config.set(KuduKey.WRITE_MODE, writeMode);
-
-
-            //Kerberos check
-            validateKerberos();
         }
 
-        private void validateKerberos() {
+        private void validateKerberos()
+        {
             boolean haveKerberos = this.config.getBool(Key.HAVE_KERBEROS, false);
             if (haveKerberos) {
                 this.config.getNecessaryValue(Key.KERBEROS_KEYTAB_FILE_PATH, REQUIRED_VALUE);
@@ -106,7 +111,8 @@ public class KuduWriter
         }
 
         @Override
-        public List<Configuration> split(int i) {
+        public List<Configuration> split(int i)
+        {
             List<Configuration> splitResultConfigs = new ArrayList<>();
             for (int j = 0; j < i; j++) {
                 splitResultConfigs.add(config.clone());
@@ -116,34 +122,40 @@ public class KuduWriter
         }
 
         @Override
-        public void destroy() {
+        public void destroy()
+        {
             //
         }
     }
 
     public static class Task
-            extends Writer.Task {
+            extends Writer.Task
+    {
         private static final Logger LOG = LoggerFactory.getLogger(Job.class);
         private KuduWriterTask kuduTaskProxy;
 
         @Override
-        public void init() {
+        public void init()
+        {
             Configuration taskConfig = getPluginJobConf();
             this.kuduTaskProxy = new KuduWriterTask(taskConfig);
         }
 
         @Override
-        public void startWrite(RecordReceiver lineReceiver) {
+        public void startWrite(RecordReceiver lineReceiver)
+        {
             this.kuduTaskProxy.startWriter(lineReceiver, getTaskPluginCollector());
         }
 
         @Override
-        public void destroy() {
+        public void destroy()
+        {
             try {
                 if (kuduTaskProxy.session != null) {
                     kuduTaskProxy.session.close();
                 }
-            } catch (Exception e) {
+            }
+            catch (Exception e) {
                 LOG.warn("The kudu session was not closed gracefully !");
             }
             kuduTaskProxy.close();

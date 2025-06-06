@@ -28,7 +28,14 @@ import com.wgzhao.addax.core.spi.Writer;
 import com.wgzhao.addax.core.util.Configuration;
 import org.apache.kudu.Schema;
 import org.apache.kudu.Type;
-import org.apache.kudu.client.*;
+import org.apache.kudu.client.Insert;
+import org.apache.kudu.client.KuduException;
+import org.apache.kudu.client.KuduSession;
+import org.apache.kudu.client.KuduTable;
+import org.apache.kudu.client.OperationResponse;
+import org.apache.kudu.client.PartialRow;
+import org.apache.kudu.client.SessionConfiguration;
+import org.apache.kudu.client.Upsert;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -38,10 +45,13 @@ import java.time.ZonedDateTime;
 import java.util.List;
 
 import static com.wgzhao.addax.core.base.Constant.DEFAULT_BATCH_SIZE;
-import static com.wgzhao.addax.core.spi.ErrorCode.*;
+import static com.wgzhao.addax.core.spi.ErrorCode.CONFIG_ERROR;
+import static com.wgzhao.addax.core.spi.ErrorCode.NOT_SUPPORT_TYPE;
+import static com.wgzhao.addax.core.spi.ErrorCode.RUNTIME_ERROR;
 
 public class KuduWriterTask
-        extends Writer {
+        extends Writer
+{
     private static final Logger LOG = LoggerFactory.getLogger(KuduWriterTask.class);
     private final Double batchSize;
     private final List<String> columns;
@@ -51,10 +61,11 @@ public class KuduWriterTask
     private final KuduHelper kuduHelper;
     public KuduSession session;
 
-    public KuduWriterTask(Configuration configuration) {
+    public KuduWriterTask(Configuration configuration)
+    {
 
         String masterAddress = configuration.getString(KuduKey.KUDU_MASTER_ADDRESSES);
-        this.kuduHelper = new KuduHelper(configuration, masterAddress, configuration.getLong(KuduKey.KUDU_TIMEOUT));
+        this.kuduHelper = new KuduHelper(masterAddress, configuration.getLong(KuduKey.KUDU_TIMEOUT), configuration);
         this.columns = configuration.getList(KuduKey.COLUMN, String.class);
 
         this.batchSize = configuration.getDouble(KuduKey.BATCH_SIZE, DEFAULT_BATCH_SIZE);
@@ -69,7 +80,8 @@ public class KuduWriterTask
         session.setMutationBufferSpace((int) mutationBufferSpace);
     }
 
-    public void startWriter(RecordReceiver lineReceiver, TaskPluginCollector taskPluginCollector) {
+    public void startWriter(RecordReceiver lineReceiver, TaskPluginCollector taskPluginCollector)
+    {
         LOG.info("Begin to write");
         Record record;
         Record lastRecord = null;
@@ -88,7 +100,8 @@ public class KuduWriterTask
             if (isUpsert) {
                 //override update
                 row = upsert.getRow();
-            } else {
+            }
+            else {
                 //incremental update
                 row = insert.getRow();
             }
@@ -144,7 +157,8 @@ public class KuduWriterTask
             try {
                 if (isUpsert) {
                     session.apply(upsert);
-                } else {
+                }
+                else {
                     session.apply(insert);
                 }
                 commit++;
@@ -157,14 +171,15 @@ public class KuduWriterTask
                         }
                     }
                 }
-            } catch (KuduException e) {
+            }
+            catch (KuduException e) {
                 LOG.error("Failed to write a record: ", e);
 
                 if (isSkipFail) {
                     taskPluginCollector.collectDirtyRecord(record, e.getMessage());
                     LOG.warn("Since you have configured 'skipFail' to be true, this record will be skipped.");
-
-                } else {
+                }
+                else {
                     throw AddaxException.asAddaxException(RUNTIME_ERROR, e.getMessage());
                 }
             }
@@ -177,22 +192,23 @@ public class KuduWriterTask
                 if (operationResponse.hasRowError()) {
                     throw AddaxException.asAddaxException(RUNTIME_ERROR, operationResponse.getRowError().getErrorStatus().toString());
                 }
-
             }
-        } catch (KuduException e) {
+        }
+        catch (KuduException e) {
             LOG.error("Failed to write a record: ", e);
 
             if (isSkipFail) {
                 taskPluginCollector.collectDirtyRecord(lastRecord, e.getMessage());
                 LOG.warn("Since you have configured 'skipFail' to be true, this record will be skipped !");
-
-            } else {
+            }
+            else {
                 throw AddaxException.asAddaxException(RUNTIME_ERROR, e.getMessage());
             }
         }
     }
 
-    public void close() {
+    public void close()
+    {
         kuduHelper.closeClient();
     }
 }
