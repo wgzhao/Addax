@@ -20,6 +20,8 @@
 package com.wgzhao.addax.plugin.writer.kuduwriter;
 
 import com.wgzhao.addax.core.exception.AddaxException;
+import com.wgzhao.addax.core.util.Configuration;
+import org.apache.hadoop.security.UserGroupInformation;
 import org.apache.kudu.ColumnSchema;
 import org.apache.kudu.Schema;
 import org.apache.kudu.client.KuduClient;
@@ -29,9 +31,13 @@ import org.apache.kudu.client.KuduTable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.security.PrivilegedExceptionAction;
 import java.util.ArrayList;
 import java.util.List;
 
+import static com.wgzhao.addax.core.base.Key.HAVE_KERBEROS;
+import static com.wgzhao.addax.core.base.Key.KERBEROS_KEYTAB_FILE_PATH;
+import static com.wgzhao.addax.core.base.Key.KERBEROS_PRINCIPAL;
 import static com.wgzhao.addax.core.spi.ErrorCode.CONNECT_ERROR;
 import static com.wgzhao.addax.core.spi.ErrorCode.RUNTIME_ERROR;
 
@@ -49,10 +55,37 @@ public class KuduHelper
 
     public KuduHelper(String masterAddress, long timeout)
     {
+        this(masterAddress, timeout, null);
+    }
+
+    public KuduHelper(String masterAddress, long timeout, Configuration config)
+    {
         try {
-            this.kuduClient = new KuduClient.KuduClientBuilder(masterAddress)
-                    .defaultOperationTimeoutMs(timeout)
-                    .build();
+            boolean haveKerberos = config != null && config.getBool(HAVE_KERBEROS, false);
+
+            if (!haveKerberos) {
+                this.kuduClient = new KuduClient.KuduClientBuilder(masterAddress)
+                        .defaultOperationTimeoutMs(timeout)
+                        .build();
+            }
+            else {
+                org.apache.hadoop.conf.Configuration configuration = new org.apache.hadoop.conf.Configuration();
+                UserGroupInformation.setConfiguration(configuration);
+
+                String kerberosKeytabFilePath = config.getString(KERBEROS_KEYTAB_FILE_PATH);
+                String kerberosPrincipal = config.getString(KERBEROS_PRINCIPAL);
+                UserGroupInformation.loginUserFromKeytab(kerberosPrincipal, kerberosKeytabFilePath);
+                this.kuduClient = UserGroupInformation.getLoginUser().doAs(
+                        new PrivilegedExceptionAction<KuduClient>()
+                        {
+                            @Override
+                            public KuduClient run()
+                                    throws Exception
+                            {
+                                return new KuduClient.KuduClientBuilder(masterAddress).defaultOperationTimeoutMs(timeout).build();
+                            }
+                        });
+            }
         }
         catch (Exception e) {
             throw AddaxException.asAddaxException(CONNECT_ERROR, e);
