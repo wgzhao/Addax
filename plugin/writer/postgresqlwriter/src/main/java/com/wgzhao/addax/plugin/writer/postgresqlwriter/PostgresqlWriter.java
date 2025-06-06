@@ -37,6 +37,7 @@ import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.sql.Types;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 
 import static com.wgzhao.addax.core.spi.ErrorCode.ILLEGAL_VALUE;
@@ -102,6 +103,7 @@ public class PostgresqlWriter
     {
         private Configuration writerSliceConfig;
         private CommonRdbmsWriter.Task commonRdbmsWriterSlave;
+        private List<Integer> hasZColumns;
 
         @Override
         public void init()
@@ -172,6 +174,18 @@ public class PostgresqlWriter
                                 }
                             }
                         }
+                        else if (rawData instanceof String) {
+                            if (column.getType() == Column.Type.STRING) {
+                                if (Objects.nonNull(hasZColumns) && hasZColumns.contains(columnIndex)) {
+                                    String original2D = (String) rawData;
+                                    if(original2D.contains("EMPTY")) {
+                                        String zmEmptyGeometry = original2D.replace("EMPTY", "ZM EMPTY");
+                                        preparedStatement.setObject(columnIndex, zmEmptyGeometry, Types.OTHER);
+                                        return preparedStatement;
+                                    }
+                                }
+                            }
+                        }
                     }
                     else if (columnSqlType == Types.ARRAY) {
                         Object rawData = column.getRawData();
@@ -209,6 +223,7 @@ public class PostgresqlWriter
             };
 
             this.commonRdbmsWriterSlave.init(this.writerSliceConfig);
+            this.hasZColumns = writerSliceConfig.getList(Key.HAS_Z_COLUMN, Integer.class);
         }
 
         private String bytes2Binary(byte[] bytes)
