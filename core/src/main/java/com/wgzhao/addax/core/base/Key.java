@@ -151,6 +151,8 @@ public class Key
     public static final String POST_SHELL = "postShell";
     public static final String IGNORE_ERROR = "ignoreError";
 
+    public static final String HAS_Z_COLUMN = "hasZColumns";
+
     public Key()
     {
 
