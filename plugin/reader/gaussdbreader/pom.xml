@@ -29,7 +29,7 @@
         <dependency>
             <groupId>com.huaweicloud.gaussdb</groupId>
             <artifactId>gaussdbjdbc</artifactId>
-            <version>506.0.0.b058</version>
+<!--            <version>506.0.0.b058-jdk7</version>-->
         </dependency>
 
     </dependencies>
