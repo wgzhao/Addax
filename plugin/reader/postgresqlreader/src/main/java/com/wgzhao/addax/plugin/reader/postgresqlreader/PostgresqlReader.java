@@ -29,8 +29,8 @@ import com.wgzhao.addax.core.spi.Reader;
 import com.wgzhao.addax.core.util.Configuration;
 import com.wgzhao.addax.rdbms.reader.CommonRdbmsReader;
 import com.wgzhao.addax.rdbms.util.DataBaseType;
-import com.wgzhao.addax.rdbms.util.DataWrapper;
-import org.postgis.PGgeometry;
+import com.wgzhao.addax.rdbms.util.postgresql.DataWrapper;
+import com.wgzhao.addax.rdbms.util.postgresql.PostgrelsqlColumnTypeName;
 import org.postgresql.util.PGobject;
 
 import java.io.UnsupportedEncodingException;
@@ -111,7 +111,7 @@ public class PostgresqlReader
                     else if (metaData.getColumnType(i) == Types.OTHER) {
                         Object object = rs.getObject(i);
                         // only handle PGobject, others will be handled in super class
-                        if (object instanceof PGobject && !(object instanceof PGgeometry)) {
+                        if (object instanceof PGobject && !PostgrelsqlColumnTypeName.isGeometry(metaData.getColumnTypeName(i))) {
                             DataWrapper dataWrapper = new DataWrapper();
                             dataWrapper.setRawData(JSON.toJSONString(object));
                             dataWrapper.setColumnTypeName(metaData.getColumnTypeName(i));

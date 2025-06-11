@@ -1,4 +1,4 @@
-package com.wgzhao.addax.rdbms.util;
+package com.wgzhao.addax.rdbms.util.postgresql;
 
 import java.io.Serializable;
 

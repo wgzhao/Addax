@@ -27,7 +27,8 @@ import com.wgzhao.addax.core.plugin.RecordReceiver;
 import com.wgzhao.addax.core.spi.Writer;
 import com.wgzhao.addax.core.util.Configuration;
 import com.wgzhao.addax.rdbms.util.DataBaseType;
-import com.wgzhao.addax.rdbms.util.DataWrapper;
+import com.wgzhao.addax.rdbms.util.postgresql.DataWrapper;
+import com.wgzhao.addax.rdbms.util.postgresql.PostgrelsqlColumnTypeName;
 import com.wgzhao.addax.rdbms.writer.CommonRdbmsWriter;
 import org.postgresql.util.PGobject;
 import org.slf4j.Logger;
@@ -37,7 +38,6 @@ import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.sql.Types;
 import java.util.List;
-import java.util.Map;
 import java.util.Objects;
 
 import static com.wgzhao.addax.core.spi.ErrorCode.ILLEGAL_VALUE;
@@ -167,7 +167,7 @@ public class PostgresqlWriter
                             if (Objects.nonNull(dataWrapper)) {
                                 Object pgRawData = dataWrapper.getRawData();
                                 String columnTypeName = dataWrapper.getColumnTypeName();
-                                if (PostGisColumnTypeName.isPGObject(columnTypeName)) {
+                                if (PostgrelsqlColumnTypeName.isPGObject(columnTypeName)) {
                                     PGobject pgObject = JSON.parseObject((String) pgRawData, PGobject.class);
                                     preparedStatement.setObject(columnIndex, pgObject);
                                     return preparedStatement;

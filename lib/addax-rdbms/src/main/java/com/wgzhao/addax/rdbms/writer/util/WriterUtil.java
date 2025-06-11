@@ -173,11 +173,8 @@ public final class WriterUtil
     private static String doPostgresqlUpdate(String writeMode, List<String> columnHolders)
     {
         String conflict = writeMode.replaceFirst("update", "").trim();
-        if(StringUtils.isEmpty(conflict)){
-            throw new AddaxException(CONFIG_ERROR, "PostgreSQL update mode must specify ON CONFLICT clause.");
-        }
         if (!conflict.startsWith("(") || !conflict.endsWith(")")) {
-            throw new AddaxException(CONFIG_ERROR, "PostgreSQL update mode ON CONFLICT clause must be in parentheses.");
+            throw new AddaxException(CONFIG_ERROR, "PostgreSQL update mode ON CONFLICT clause must be in parentheses and specify the columns to check for conflicts, e.g. (column1, column2).");
         }
         String conflictWithoutParentheses = conflict.substring(1, conflict.length() - 1).trim();
         if (StringUtils.isEmpty(conflictWithoutParentheses)) {

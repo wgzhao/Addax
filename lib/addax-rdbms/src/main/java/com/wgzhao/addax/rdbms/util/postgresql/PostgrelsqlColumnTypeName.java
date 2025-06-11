@@ -1,6 +1,7 @@
-package com.wgzhao.addax.plugin.writer.postgresqlwriter;
+package com.wgzhao.addax.rdbms.util.postgresql;
 
-public class PostGisColumnTypeName {
+public class PostgrelsqlColumnTypeName
+{
 
     public static final String GEOMETRY = "geometry";
 
@@ -20,5 +21,9 @@ public class PostGisColumnTypeName {
                 columnTypeName.equals(JSONB) ||
                 columnTypeName.equals(INET) ||
                 columnTypeName.equals(TSVECTOR);
+    }
+
+    public static boolean isGeometry(String columnTypeName){
+        return columnTypeName.equals(GEOMETRY);
     }
 }

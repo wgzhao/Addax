@@ -27,9 +27,8 @@
         </dependency>
 
         <dependency>
-            <groupId>net.postgis</groupId>
-            <artifactId>postgis-jdbc</artifactId>
-            <version>${postgis.jdbc.version}</version>
+            <groupId>org.postgresql</groupId>
+            <artifactId>postgresql</artifactId>
         </dependency>
 
     </dependencies>
