@@ -19,8 +19,6 @@
 
 package com.wgzhao.addax.plugin.reader.postgresqlreader;
 
-import com.alibaba.fastjson2.JSON;
-import com.wgzhao.addax.core.element.BytesColumn;
 import com.wgzhao.addax.core.element.Column;
 import com.wgzhao.addax.core.element.DoubleColumn;
 import com.wgzhao.addax.core.exception.AddaxException;
@@ -29,14 +27,13 @@ import com.wgzhao.addax.core.spi.Reader;
 import com.wgzhao.addax.core.util.Configuration;
 import com.wgzhao.addax.rdbms.reader.CommonRdbmsReader;
 import com.wgzhao.addax.rdbms.util.DataBaseType;
-import com.wgzhao.addax.rdbms.util.postgresql.DataWrapper;
-import com.wgzhao.addax.rdbms.util.postgresql.PostgrelsqlColumnTypeName;
-import org.postgresql.util.PGobject;
 
 import java.io.UnsupportedEncodingException;
-import java.sql.*;
+import java.sql.ResultSet;
+import java.sql.ResultSetMetaData;
+import java.sql.SQLException;
+import java.sql.Types;
 import java.util.List;
-import java.util.Objects;
 
 import static com.wgzhao.addax.core.base.Constant.DEFAULT_FETCH_SIZE;
 import static com.wgzhao.addax.core.base.Key.FETCH_SIZE;
@@ -107,26 +104,6 @@ public class PostgresqlReader
                     if (metaData.getColumnType(i) == Types.DOUBLE && metaData.isCurrency(i)) {
                         // money type has currency symbol( etc $) and thousands separator(,)
                         return new DoubleColumn(Double.valueOf(rs.getString(i).substring(1).replace(",", "")));
-                    }
-                    else if (metaData.getColumnType(i) == Types.OTHER) {
-                        Object object = rs.getObject(i);
-                        // only handle PGobject, others will be handled in super class
-                        if (object instanceof PGobject && !PostgrelsqlColumnTypeName.isGeometry(metaData.getColumnTypeName(i))) {
-                            DataWrapper dataWrapper = new DataWrapper();
-                            dataWrapper.setRawData(JSON.toJSONString(object));
-                            dataWrapper.setColumnTypeName(metaData.getColumnTypeName(i));
-                            return new BytesColumn(JSON.toJSONBytes(dataWrapper));
-                        }
-                    }
-                    else if (metaData.getColumnType(i) == Types.ARRAY) {
-                        Array dataArray = rs.getArray(i);
-                        if (Objects.isNull(dataArray)) {
-                            return new BytesColumn(null);
-                        }
-                        DataWrapper pgWrapperForArray = new DataWrapper();
-                        pgWrapperForArray.setColumnTypeName(dataArray.getBaseTypeName());
-                        pgWrapperForArray.setRawData(dataArray.toString());
-                        return new BytesColumn(JSON.toJSONBytes(pgWrapperForArray));
                     }
                     return super.createColumn(rs, metaData, i);
                 }

@@ -24,10 +24,10 @@ import com.wgzhao.addax.core.base.Key;
 import com.wgzhao.addax.core.element.Column;
 import com.wgzhao.addax.core.exception.AddaxException;
 import com.wgzhao.addax.core.plugin.RecordReceiver;
+import com.wgzhao.addax.core.spi.ErrorCode;
 import com.wgzhao.addax.core.spi.Writer;
 import com.wgzhao.addax.core.util.Configuration;
 import com.wgzhao.addax.rdbms.util.DataBaseType;
-import com.wgzhao.addax.rdbms.util.postgresql.DataWrapper;
 import com.wgzhao.addax.rdbms.util.postgresql.PostgrelsqlColumnTypeName;
 import com.wgzhao.addax.rdbms.writer.CommonRdbmsWriter;
 import org.postgresql.util.PGobject;
@@ -38,7 +38,9 @@ import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.sql.Types;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
+import java.util.Optional;
 
 import static com.wgzhao.addax.core.spi.ErrorCode.ILLEGAL_VALUE;
 
@@ -155,70 +157,72 @@ public class PostgresqlWriter
                         preparedStatement.setString(columnIndex, v);
                         return preparedStatement;
                     }
-                    else if (columnSqlType == Types.OTHER) {
-                        Object rawData = column.getRawData();
-                        if (Objects.isNull(rawData)) {
-                            preparedStatement.setNull(columnIndex, Types.OTHER);
-                            return preparedStatement;
-                        }
-                        if (rawData instanceof byte[]) {
-                            // only handle PGobject, others will be handled in super class
-                            DataWrapper dataWrapper = JSON.parseObject(column.asBytes(), DataWrapper.class);
-                            if (Objects.nonNull(dataWrapper)) {
-                                Object pgRawData = dataWrapper.getRawData();
-                                String columnTypeName = dataWrapper.getColumnTypeName();
-                                if (PostgrelsqlColumnTypeName.isPGObject(columnTypeName)) {
-                                    PGobject pgObject = JSON.parseObject((String) pgRawData, PGobject.class);
-                                    preparedStatement.setObject(columnIndex, pgObject);
-                                    return preparedStatement;
-                                }
-                            }
-                        }
-                        else if (rawData instanceof String) {
-                            if (column.getType() == Column.Type.STRING) {
-                                if (Objects.nonNull(hasZColumns) && hasZColumns.contains(columnIndex)) {
-                                    String original2D = (String) rawData;
-                                    if(original2D.contains("EMPTY")) {
-                                        String zmEmptyGeometry = original2D.replace("EMPTY", "ZM EMPTY");
-                                        preparedStatement.setObject(columnIndex, zmEmptyGeometry, Types.OTHER);
-                                        return preparedStatement;
-                                    }
-                                }
-                            }
-                        }
-                    }
                     else if (columnSqlType == Types.ARRAY) {
                         Object rawData = column.getRawData();
                         if (Objects.isNull(rawData)) {
                             preparedStatement.setNull(columnIndex, Types.ARRAY);
                             return preparedStatement;
                         }
-                        if (rawData instanceof byte[]) {
-                            DataWrapper dataWrapper = JSON.parseObject(column.asBytes(), DataWrapper.class);
-                            if (Objects.nonNull(dataWrapper)) {
-                                Object pgRawData = dataWrapper.getRawData();
-                                String columnTypeName = dataWrapper.getColumnTypeName();
-                                String arrayStr = (String) pgRawData;
-                                if (arrayStr.startsWith("{") && arrayStr.endsWith("}")) {
-                                    arrayStr = arrayStr.substring(1, arrayStr.length() - 1);
-                                }
-                                String[] elements = arrayStr.split(",");
-                                Object[] pgArray = new Object[elements.length];
-                                for (int i = 0; i < elements.length; i++) {
-                                    pgArray[i] = elements[i].trim();
-                                }
-                                preparedStatement.setArray(columnIndex,
-                                        preparedStatement.getConnection().createArrayOf(
-                                                columnTypeName, pgArray));
+                        String columnTypeName = getColumnTypeName(columnIndex);
+                        if (PostgrelsqlColumnTypeName.isArray(columnTypeName)) {
+                            Optional<String> columnTypeOptional = PostgrelsqlColumnTypeName.extractArrayType(columnTypeName);
+                            if (columnTypeOptional.isEmpty()) {
+                                throw AddaxException.asAddaxException(ErrorCode.ILLEGAL_VALUE,
+                                        "PostgreSQL array type name is illegal: " + columnTypeName);
                             }
-                            else {
-                                log.error("type array deserialized PostgisWrapper is null, please check your database data.");
-                                preparedStatement.setNull(columnIndex, Types.ARRAY);
+                            String arrayStr = (String) rawData;
+                            if (arrayStr.startsWith("{") && arrayStr.endsWith("}")) {
+                                arrayStr = arrayStr.substring(1, arrayStr.length() - 1);
                             }
+                            String[] elements = arrayStr.split(",");
+                            Object[] pgArray = new Object[elements.length];
+                            for (int i = 0; i < elements.length; i++) {
+                                pgArray[i] = elements[i].trim();
+                            }
+                            preparedStatement.setArray(columnIndex,
+                                    preparedStatement.getConnection().createArrayOf(
+                                            columnTypeOptional.get(), pgArray));
                             return preparedStatement;
                         }
                     }
+                    else if (columnSqlType == Types.OTHER) {
+                        Object rawData = column.getRawData();
+                        if (Objects.isNull(rawData)) {
+                            preparedStatement.setNull(columnIndex, Types.OTHER);
+                            return preparedStatement;
+                        }
+                        // Unknown type uses String type
+                        if (rawData instanceof String && column.getType() == Column.Type.STRING) {
+                            String columnTypeName = getColumnTypeName(columnIndex);
+                            if (PostgrelsqlColumnTypeName.isGeometry(columnTypeName) &&
+                                    Objects.nonNull(hasZColumns) && hasZColumns.contains(columnIndex)) {
+                                String original2D = (String) rawData;
+                                if (original2D.contains("EMPTY")) {
+                                    String zmEmptyGeometry = original2D.replace("EMPTY", "ZM EMPTY");
+                                    preparedStatement.setObject(columnIndex, zmEmptyGeometry, Types.OTHER);
+                                    return preparedStatement;
+                                }
+                            } else if (PostgrelsqlColumnTypeName.isPGObject(columnTypeName)) {
+                                PGobject pgObject = new PGobject();
+                                pgObject.setType(columnTypeName);
+                                pgObject.setValue((String) rawData);
+                                preparedStatement.setObject(columnIndex, pgObject);
+                                return preparedStatement;
+                            }
+                        }
+                    }
                     return super.fillPreparedStatementColumnType(preparedStatement, columnIndex, columnSqlType, column);
+                }
+
+                private String getColumnTypeName(int columnIndex)
+                {
+                    Map<String, Object> columnMetaMap = this.resultSetMetaData.get(columnIndex);
+                    if (Objects.isNull(columnMetaMap) || columnMetaMap.isEmpty() || Objects.isNull(columnMetaMap.get("typeName"))) {
+                        throw AddaxException.asAddaxException(ErrorCode.META_DATA_INIT_ERROR,
+                                "resultSetMetaData init error, please check your database data.resultSetMetaData is: "
+                                        + JSON.toJSONString(resultSetMetaData));
+                    }
+                    return (String) columnMetaMap.get("typeName");
                 }
             };
 
