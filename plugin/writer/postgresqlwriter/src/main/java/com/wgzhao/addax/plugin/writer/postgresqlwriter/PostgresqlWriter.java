@@ -157,59 +157,42 @@ public class PostgresqlWriter
                         preparedStatement.setString(columnIndex, v);
                         return preparedStatement;
                     }
-                    else if (columnSqlType == Types.ARRAY) {
+                    else if (columnSqlType == Types.ARRAY || columnSqlType == Types.OTHER) {
                         Object rawData = column.getRawData();
                         if (Objects.isNull(rawData)) {
                             preparedStatement.setNull(columnIndex, Types.ARRAY);
                             return preparedStatement;
                         }
                         String columnTypeName = getColumnTypeName(columnIndex);
+                        String pgObjectTypeName;
                         if (PostgrelsqlColumnTypeName.isArray(columnTypeName)) {
                             Optional<String> columnTypeOptional = PostgrelsqlColumnTypeName.extractArrayType(columnTypeName);
                             if (columnTypeOptional.isEmpty()) {
                                 throw AddaxException.asAddaxException(ErrorCode.ILLEGAL_VALUE,
                                         "PostgreSQL array type name is illegal: " + columnTypeName);
                             }
-                            String arrayStr = (String) rawData;
-                            if (arrayStr.startsWith("{") && arrayStr.endsWith("}")) {
-                                arrayStr = arrayStr.substring(1, arrayStr.length() - 1);
+                            else {
+                                pgObjectTypeName = columnTypeOptional.get() + "[]";
                             }
-                            String[] elements = arrayStr.split(",");
-                            Object[] pgArray = new Object[elements.length];
-                            for (int i = 0; i < elements.length; i++) {
-                                pgArray[i] = elements[i].trim();
-                            }
-                            preparedStatement.setArray(columnIndex,
-                                    preparedStatement.getConnection().createArrayOf(
-                                            columnTypeOptional.get(), pgArray));
-                            return preparedStatement;
                         }
-                    }
-                    else if (columnSqlType == Types.OTHER) {
-                        Object rawData = column.getRawData();
-                        if (Objects.isNull(rawData)) {
-                            preparedStatement.setNull(columnIndex, Types.OTHER);
-                            return preparedStatement;
-                        }
-                        // Unknown type uses String type
-                        if (rawData instanceof String && column.getType() == Column.Type.STRING) {
-                            String columnTypeName = getColumnTypeName(columnIndex);
-                            if (PostgrelsqlColumnTypeName.isGeometry(columnTypeName) &&
-                                    Objects.nonNull(hasZColumns) && hasZColumns.contains(columnIndex)) {
-                                String original2D = (String) rawData;
-                                if (original2D.contains("EMPTY")) {
-                                    String zmEmptyGeometry = original2D.replace("EMPTY", "ZM EMPTY");
-                                    preparedStatement.setObject(columnIndex, zmEmptyGeometry, Types.OTHER);
-                                    return preparedStatement;
-                                }
-                            } else if (PostgrelsqlColumnTypeName.isPGObject(columnTypeName)) {
-                                PGobject pgObject = new PGobject();
-                                pgObject.setType(columnTypeName);
-                                pgObject.setValue((String) rawData);
-                                preparedStatement.setObject(columnIndex, pgObject);
+                        else if (PostgrelsqlColumnTypeName.isGeometry(columnTypeName) &&
+                                Objects.nonNull(hasZColumns) && hasZColumns.contains(columnIndex)) {
+                            String original2D = (String) rawData;
+                            pgObjectTypeName = PostgrelsqlColumnTypeName.GEOMETRY;
+                            if (original2D.contains("EMPTY")) {
+                                String zmEmptyGeometry = original2D.replace("EMPTY", "ZM EMPTY");
+                                preparedStatement.setObject(columnIndex, zmEmptyGeometry, Types.OTHER);
                                 return preparedStatement;
                             }
                         }
+                        else {
+                            pgObjectTypeName = columnTypeName;
+                        }
+                        PGobject pgObject = new PGobject();
+                        pgObject.setType(pgObjectTypeName);
+                        pgObject.setValue((String) rawData);
+                        preparedStatement.setObject(columnIndex, pgObject);
+                        return preparedStatement;
                     }
                     return super.fillPreparedStatementColumnType(preparedStatement, columnIndex, columnSqlType, column);
                 }
