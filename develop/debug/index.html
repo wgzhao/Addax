@@ -2592,7 +2592,7 @@
 <li>第一个框: 选择 JDK 版本，当前支持 17 版本，建议选择 17 版本</li>
 <li>第二个框: 选择 <code>addax-core</code> 模块</li>
 <li><code>Main class</code>: 填写 <code>com.wgzhao.addax.core.Engine</code></li>
-<li>点击 <code>Modify options</code>，在弹出的下拉框中，选择 <code>Add VM Options</code>，在增加的 <code>VM Options</code> 中，填写 <code>-Daddax.home=/opt/app/addax/4.0.3</code></li>
+<li>点击 <code>Modify options</code>，在弹出的下拉框中，选择 <code>Add VM Options</code>，在增加的 <code>VM Options</code> 中，填写 <code>-Daddax.home=/opt/app/addax/4.0.3</code>。如果你的reader或者writer依赖了lib中的代码，则还需要添加 <code>-classpath .:/opt/app/addax/4.0.3/lib/*</code>，如果没有依赖，则不需要添加。</li>
 <li><code>Program arguments</code>: 填写 <code>-job job/job.json</code></li>
 <li><code>Working directory</code>： 填写 <code>/opt/app/addax/4.0.3</code></li>
 </ul>
