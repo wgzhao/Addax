@@ -176,12 +176,18 @@ public final class WriterUtil
         StringBuilder sb = new StringBuilder();
         sb.append(" ON CONFLICT ").append(conflict).append(" DO ");
 
+        String conflictWithoutParentheses = conflict.substring(1, conflict.length() - 1).trim();
+        List<String> conflictColumns = Arrays.stream(conflictWithoutParentheses.split(","))
+                .map(String::trim)
+                .toList();
+
         if (columnHolders == null || columnHolders.isEmpty()) {
             sb.append("NOTHING");
         }
         else {
             sb.append("UPDATE SET ");
             sb.append(columnHolders.stream()
+                    .filter(column -> !conflictColumns.contains(column))
                     .map(column -> column + "=excluded." + column)
                     .collect(Collectors.joining(",")));
         }
