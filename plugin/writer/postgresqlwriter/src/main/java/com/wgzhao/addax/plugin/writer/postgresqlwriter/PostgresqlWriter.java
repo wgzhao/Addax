@@ -19,19 +19,28 @@
 
 package com.wgzhao.addax.plugin.writer.postgresqlwriter;
 
+import com.alibaba.fastjson2.JSON;
 import com.wgzhao.addax.core.base.Key;
 import com.wgzhao.addax.core.element.Column;
 import com.wgzhao.addax.core.exception.AddaxException;
 import com.wgzhao.addax.core.plugin.RecordReceiver;
+import com.wgzhao.addax.core.spi.ErrorCode;
 import com.wgzhao.addax.core.spi.Writer;
 import com.wgzhao.addax.core.util.Configuration;
 import com.wgzhao.addax.rdbms.util.DataBaseType;
+import com.wgzhao.addax.rdbms.util.postgresql.PostgrelsqlColumnTypeName;
 import com.wgzhao.addax.rdbms.writer.CommonRdbmsWriter;
+import org.postgresql.util.PGobject;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.sql.Types;
 import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import java.util.Optional;
 
 import static com.wgzhao.addax.core.spi.ErrorCode.ILLEGAL_VALUE;
 
@@ -39,6 +48,7 @@ public class PostgresqlWriter
         extends Writer
 {
     private static final DataBaseType DATABASE_TYPE = DataBaseType.PostgreSQL;
+    private static final Logger log = LoggerFactory.getLogger(PostgresqlWriter.class);
 
     public static class Job
             extends Writer.Job
@@ -95,6 +105,7 @@ public class PostgresqlWriter
     {
         private Configuration writerSliceConfig;
         private CommonRdbmsWriter.Task commonRdbmsWriterSlave;
+        private List<Integer> hasZColumns;
 
         @Override
         public void init()
@@ -138,19 +149,68 @@ public class PostgresqlWriter
                     if (columnSqlType == Types.BIT) {
                         String v;
                         if (column.getType() == Column.Type.BOOL) {
-                           v =  column.asBoolean() ? "1" : "0";
-                        } else {
+                            v = column.asBoolean() ? "1" : "0";
+                        }
+                        else {
                             v = bytes2Binary(column.asBytes());
                         }
                         preparedStatement.setString(columnIndex, v);
                         return preparedStatement;
                     }
-
+                    else if (columnSqlType == Types.ARRAY || columnSqlType == Types.OTHER) {
+                        Object rawData = column.getRawData();
+                        if (Objects.isNull(rawData)) {
+                            preparedStatement.setNull(columnIndex, Types.ARRAY);
+                            return preparedStatement;
+                        }
+                        String columnTypeName = getColumnTypeName(columnIndex);
+                        String pgObjectTypeName;
+                        if (PostgrelsqlColumnTypeName.isArray(columnTypeName)) {
+                            Optional<String> columnTypeOptional = PostgrelsqlColumnTypeName.extractArrayType(columnTypeName);
+                            if (columnTypeOptional.isEmpty()) {
+                                throw AddaxException.asAddaxException(ErrorCode.ILLEGAL_VALUE,
+                                        "PostgreSQL array type name is illegal: " + columnTypeName);
+                            }
+                            else {
+                                pgObjectTypeName = columnTypeOptional.get() + "[]";
+                            }
+                        }
+                        else if (PostgrelsqlColumnTypeName.isGeometry(columnTypeName) &&
+                                Objects.nonNull(hasZColumns) && hasZColumns.contains(columnIndex)) {
+                            String original2D = (String) rawData;
+                            pgObjectTypeName = PostgrelsqlColumnTypeName.GEOMETRY;
+                            if (original2D.contains("EMPTY")) {
+                                String zmEmptyGeometry = original2D.replace("EMPTY", "ZM EMPTY");
+                                preparedStatement.setObject(columnIndex, zmEmptyGeometry, Types.OTHER);
+                                return preparedStatement;
+                            }
+                        }
+                        else {
+                            pgObjectTypeName = columnTypeName;
+                        }
+                        PGobject pgObject = new PGobject();
+                        pgObject.setType(pgObjectTypeName);
+                        pgObject.setValue((String) rawData);
+                        preparedStatement.setObject(columnIndex, pgObject);
+                        return preparedStatement;
+                    }
                     return super.fillPreparedStatementColumnType(preparedStatement, columnIndex, columnSqlType, column);
+                }
+
+                private String getColumnTypeName(int columnIndex)
+                {
+                    Map<String, Object> columnMetaMap = this.resultSetMetaData.get(columnIndex);
+                    if (Objects.isNull(columnMetaMap) || columnMetaMap.isEmpty() || Objects.isNull(columnMetaMap.get("typeName"))) {
+                        throw AddaxException.asAddaxException(ErrorCode.META_DATA_INIT_ERROR,
+                                "resultSetMetaData init error, please check your database data.resultSetMetaData is: "
+                                        + JSON.toJSONString(resultSetMetaData));
+                    }
+                    return (String) columnMetaMap.get("typeName");
                 }
             };
 
             this.commonRdbmsWriterSlave.init(this.writerSliceConfig);
+            this.hasZColumns = writerSliceConfig.getList(Key.HAS_Z_COLUMN, Integer.class);
         }
 
         private String bytes2Binary(byte[] bytes)
