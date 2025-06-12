@@ -28,7 +28,6 @@ import com.wgzhao.addax.core.spi.ErrorCode;
 import com.wgzhao.addax.core.spi.Writer;
 import com.wgzhao.addax.core.util.Configuration;
 import com.wgzhao.addax.rdbms.util.DataBaseType;
-import com.wgzhao.addax.rdbms.util.postgresql.PostgrelsqlColumnTypeName;
 import com.wgzhao.addax.rdbms.writer.CommonRdbmsWriter;
 import org.postgresql.util.PGobject;
 import org.slf4j.Logger;
@@ -106,6 +105,8 @@ public class PostgresqlWriter
         private Configuration writerSliceConfig;
         private CommonRdbmsWriter.Task commonRdbmsWriterSlave;
         private List<Integer> hasZColumns;
+        private static final String HAS_Z_COLUMN = "hasZColumns";
+        private static final String GEOMETRY = "geometry";
 
         @Override
         public void init()
@@ -165,8 +166,8 @@ public class PostgresqlWriter
                         }
                         String columnTypeName = getColumnTypeName(columnIndex);
                         String pgObjectTypeName;
-                        if (PostgrelsqlColumnTypeName.isArray(columnTypeName)) {
-                            Optional<String> columnTypeOptional = PostgrelsqlColumnTypeName.extractArrayType(columnTypeName);
+                        if (isArray(columnTypeName)) {
+                            Optional<String> columnTypeOptional = extractArrayType(columnTypeName);
                             if (columnTypeOptional.isEmpty()) {
                                 throw AddaxException.asAddaxException(ErrorCode.ILLEGAL_VALUE,
                                         "PostgreSQL array type name is illegal: " + columnTypeName);
@@ -175,10 +176,10 @@ public class PostgresqlWriter
                                 pgObjectTypeName = columnTypeOptional.get() + "[]";
                             }
                         }
-                        else if (PostgrelsqlColumnTypeName.isGeometry(columnTypeName) &&
+                        else if (isGeometry(columnTypeName) &&
                                 Objects.nonNull(hasZColumns) && hasZColumns.contains(columnIndex)) {
                             String original2D = (String) rawData;
-                            pgObjectTypeName = PostgrelsqlColumnTypeName.GEOMETRY;
+                            pgObjectTypeName = GEOMETRY;
                             if (original2D.contains("EMPTY")) {
                                 String zmEmptyGeometry = original2D.replace("EMPTY", "ZM EMPTY");
                                 preparedStatement.setObject(columnIndex, zmEmptyGeometry, Types.OTHER);
@@ -201,7 +202,7 @@ public class PostgresqlWriter
                 {
                     Map<String, Object> columnMetaMap = this.resultSetMetaData.get(columnIndex);
                     if (Objects.isNull(columnMetaMap) || columnMetaMap.isEmpty() || Objects.isNull(columnMetaMap.get("typeName"))) {
-                        throw AddaxException.asAddaxException(ErrorCode.META_DATA_INIT_ERROR,
+                        throw AddaxException.asAddaxException(ErrorCode.RUNTIME_ERROR,
                                 "resultSetMetaData init error, please check your database data.resultSetMetaData is: "
                                         + JSON.toJSONString(resultSetMetaData));
                     }
@@ -210,7 +211,7 @@ public class PostgresqlWriter
             };
 
             this.commonRdbmsWriterSlave.init(this.writerSliceConfig);
-            this.hasZColumns = writerSliceConfig.getList(Key.HAS_Z_COLUMN, Integer.class);
+            this.hasZColumns = writerSliceConfig.getList(HAS_Z_COLUMN, Integer.class);
         }
 
         private String bytes2Binary(byte[] bytes)
@@ -220,6 +221,27 @@ public class PostgresqlWriter
                 sb.append(String.format("%8s", Integer.toBinaryString(b & 0xFF)).replace(' ', '0'));
             }
             return sb.toString();
+        }
+
+        private boolean isGeometry(String columnTypeName)
+        {
+            return columnTypeName.equals(GEOMETRY);
+        }
+
+        public boolean isArray(String columnTypeName)
+        {
+            if (Objects.isNull(columnTypeName)) {
+                return false;
+            }
+            return columnTypeName.startsWith("_");
+        }
+
+        public Optional<String> extractArrayType(String columnTypeName)
+        {
+            if (isArray(columnTypeName)) {
+                return Optional.of(columnTypeName.substring(1));
+            }
+            return Optional.empty();
         }
 
         @Override

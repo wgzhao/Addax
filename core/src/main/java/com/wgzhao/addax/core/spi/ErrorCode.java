@@ -50,7 +50,6 @@ public enum ErrorCode
     SHUT_DOWN_TASK("5003", "Task shutdown"),
     WAIT_TIME_EXCEED("5004", "Wait time exceeded"),
     TASK_HUNG_EXPIRED("5005", "Task hung expired"),
-    META_DATA_INIT_ERROR("5006", "Metadata initialization error"),
 
     // Plugin Errors
     PLUGIN_INSTALL_ERROR("6001", "Plugins installation error"),
