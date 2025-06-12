@@ -43,7 +43,6 @@ import static com.wgzhao.addax.core.spi.ErrorCode.RUNTIME_ERROR;
 
 public class KuduHelper
 {
-
     private static final Logger LOG = LoggerFactory.getLogger(KuduHelper.class);
     private final KuduClient kuduClient;
     private KuduTable kuduTable;
@@ -61,7 +60,7 @@ public class KuduHelper
     public KuduHelper(String masterAddress, long timeout, Configuration config)
     {
         try {
-            boolean haveKerberos = config != null && config.getBool(HAVE_KERBEROS, false);
+            boolean haveKerberos = config.getBool(HAVE_KERBEROS, false);
 
             if (!haveKerberos) {
                 this.kuduClient = new KuduClient.KuduClientBuilder(masterAddress)
@@ -76,15 +75,8 @@ public class KuduHelper
                 String kerberosPrincipal = config.getString(KERBEROS_PRINCIPAL);
                 UserGroupInformation.loginUserFromKeytab(kerberosPrincipal, kerberosKeytabFilePath);
                 this.kuduClient = UserGroupInformation.getLoginUser().doAs(
-                        new PrivilegedExceptionAction<KuduClient>()
-                        {
-                            @Override
-                            public KuduClient run()
-                                    throws Exception
-                            {
-                                return new KuduClient.KuduClientBuilder(masterAddress).defaultOperationTimeoutMs(timeout).build();
-                            }
-                        });
+                        (PrivilegedExceptionAction<KuduClient>) () ->
+                                new KuduClient.KuduClientBuilder(masterAddress).defaultOperationTimeoutMs(timeout).build());
             }
         }
         catch (Exception e) {

@@ -67,12 +67,10 @@ public class KuduWriterTask
         String masterAddress = configuration.getString(KuduKey.KUDU_MASTER_ADDRESSES);
         this.kuduHelper = new KuduHelper(masterAddress, configuration.getLong(KuduKey.KUDU_TIMEOUT), configuration);
         this.columns = configuration.getList(KuduKey.COLUMN, String.class);
-
         this.batchSize = configuration.getDouble(KuduKey.BATCH_SIZE, DEFAULT_BATCH_SIZE);
         this.isUpsert = !"insert".equalsIgnoreCase(configuration.getString(KuduKey.WRITE_MODE));
         this.isSkipFail = configuration.getBool(KuduKey.SKIP_FAIL);
         long mutationBufferSpace = configuration.getLong(KuduKey.MUTATION_BUFFER_SPACE);
-
         this.table = kuduHelper.getKuduTable(configuration.getString(KuduKey.TABLE));
 
         this.session = kuduHelper.getSession();
@@ -139,13 +137,13 @@ public class KuduWriterTask
                         row.addDecimal(name, new BigDecimal(column.asString()));
                         break;
                     case UNIXTIME_MICROS:
-                        // need convert local timestamp to  UTC
+                        // need to convert local timestamp to UTC
                         int offsetSecs = ZonedDateTime.now(ZoneId.systemDefault()).getOffset().getTotalSeconds();
                         // use nanos timestamp value
                         row.addLong(name, (column.asTimestamp().getTime() * 1_000L + offsetSecs * 1_000_000L));
                         break;
                     case DATE:
-                        // Kudu take date as string
+                        // Kudu takes date as string
                         row.addString(name, column.asString());
                         break;
                     default:
@@ -174,7 +172,6 @@ public class KuduWriterTask
             }
             catch (KuduException e) {
                 LOG.error("Failed to write a record: ", e);
-
                 if (isSkipFail) {
                     taskPluginCollector.collectDirtyRecord(record, e.getMessage());
                     LOG.warn("Since you have configured 'skipFail' to be true, this record will be skipped.");
