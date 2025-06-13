@@ -45,6 +45,9 @@ bin/addax.sh job/kudu2stream.json
 | scanTimeout   |    否    | int    | 20     | 数据扫描请求超时(秒)                         |
 | column        |    否    | list   | 无     | 指定要获取的字段                             |
 | where         |    否    | list   | 无     | 指定其他过滤条件，详见下面描述               |
+| haveKerberos           |  否   | boolean     | false   | 是否启用 Kerberos 认证，如果启用，则需要同时配置以下两项                              |
+| kerberosKeytabFilePath |  否   | string      | 无       | 用于 Kerberos 认证的凭证文件路径, 比如 `/your/path/addax.service.keytab`    |
+| kerberosPrincipal      |  否   | string      | 无       | 用于 Kerberos 认证的凭证主体, 比如 `addax/node1@WGZHAO.COM`               |
 
 ### where
 

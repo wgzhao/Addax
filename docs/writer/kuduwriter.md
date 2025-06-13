@@ -50,6 +50,9 @@ bin/addax.sh job/stream2kudu.json
 | timeout       |    否    | int     | 100    | 写入数据超时时间(秒), 0 表示不受限制                                   |
 | column        |    是    | list    | 无     | 要写入的表字段，配置方式见上示例                                 |
 | skipFail      |    否    | boolean | false  | 是否跳过插入失败的记录，如果设置为true，则插件不会把插入失败的当作异常 |
+| haveKerberos           |  否   | boolean     | false   | 是否启用 Kerberos 认证，如果启用，则需要同时配置以下两项                              |
+| kerberosKeytabFilePath |  否   | string      | 无       | 用于 Kerberos 认证的凭证文件路径, 比如 `/your/path/addax.service.keytab`    |
+| kerberosPrincipal      |  否   | string      | 无       | 用于 Kerberos 认证的凭证主体, 比如 `addax/node1@WGZHAO.COM`               |
 
 ## column
 
