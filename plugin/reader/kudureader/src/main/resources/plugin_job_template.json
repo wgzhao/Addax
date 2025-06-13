@@ -12,6 +12,9 @@
       "col1",
       "col2",
       "col3"
-    ]
+    ],
+    "haveKerberos": "true",
+    "kerberosPrincipal": "hive@COMPANY.COM",
+    "kerberosKeytabFilePath": "/etc/security/keytabs/hive.headless.keytab"
   }
 }

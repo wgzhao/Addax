@@ -13,6 +13,9 @@
     "batchSize": 1024,
     "bufferSize": 2048,
     "skipFail": false,
-    "encoding": "UTF-8"
+    "encoding": "UTF-8",
+    "haveKerberos": "true",
+    "kerberosPrincipal": "hive@COMPANY.COM",
+    "kerberosKeytabFilePath": "/etc/security/keytabs/hive.headless.keytab"
   }
 }

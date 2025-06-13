@@ -30,6 +30,7 @@ import com.wgzhao.addax.core.exception.AddaxException;
 import com.wgzhao.addax.core.plugin.RecordSender;
 import com.wgzhao.addax.core.spi.Reader;
 import com.wgzhao.addax.core.util.Configuration;
+import org.apache.hadoop.security.UserGroupInformation;
 import org.apache.kudu.ColumnSchema;
 import org.apache.kudu.Schema;
 import org.apache.kudu.Type;
@@ -41,8 +42,10 @@ import org.apache.kudu.client.KuduTable;
 import org.apache.kudu.client.RowResult;
 import org.apache.kudu.client.RowResultIterator;
 
+import java.io.IOException;
 import java.math.BigDecimal;
 import java.nio.charset.StandardCharsets;
+import java.security.PrivilegedExceptionAction;
 import java.sql.Date;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -55,6 +58,9 @@ import java.util.regex.Pattern;
 
 import static com.wgzhao.addax.core.base.Constant.DEFAULT_DATE_FORMAT;
 import static com.wgzhao.addax.core.base.Key.COLUMN;
+import static com.wgzhao.addax.core.base.Key.HAVE_KERBEROS;
+import static com.wgzhao.addax.core.base.Key.KERBEROS_KEYTAB_FILE_PATH;
+import static com.wgzhao.addax.core.base.Key.KERBEROS_PRINCIPAL;
 import static com.wgzhao.addax.core.base.Key.WHERE;
 import static com.wgzhao.addax.core.spi.ErrorCode.CONFIG_ERROR;
 import static com.wgzhao.addax.core.spi.ErrorCode.ILLEGAL_VALUE;
@@ -211,9 +217,29 @@ public class KuduReader
             long socketReadTimeoutMs = readerSliceConfig.getLong(KuduKey.SOCKET_READ_TIMEOUT, 10) * 1000L;
             this.scanRequestTimeout = readerSliceConfig.getLong(KuduKey.SCAN_REQUEST_TIMEOUT, 20L) * 1000L;
 
-            this.kuduClient = new KuduClient.KuduClientBuilder(masterAddresses)
-                    .defaultOperationTimeoutMs(socketReadTimeoutMs)
-                    .build();
+            boolean haveKerberos = readerSliceConfig.getBool(HAVE_KERBEROS, false);
+
+            if (!haveKerberos) {
+                this.kuduClient = new KuduClient.KuduClientBuilder(masterAddresses)
+                        .defaultOperationTimeoutMs(socketReadTimeoutMs)
+                        .build();
+            }
+            else {
+                org.apache.hadoop.conf.Configuration configuration = new org.apache.hadoop.conf.Configuration();
+                UserGroupInformation.setConfiguration(configuration);
+
+                String kerberosKeytabFilePath = readerSliceConfig.getString(KERBEROS_KEYTAB_FILE_PATH);
+                String kerberosPrincipal = readerSliceConfig.getString(KERBEROS_PRINCIPAL);
+                try {
+                    UserGroupInformation.loginUserFromKeytab(kerberosPrincipal, kerberosKeytabFilePath);
+                    this.kuduClient = UserGroupInformation.getLoginUser().doAs(
+                            (PrivilegedExceptionAction<KuduClient>) () ->
+                                    new KuduClient.KuduClientBuilder(masterAddresses).defaultOperationTimeoutMs(socketReadTimeoutMs).build());
+                }
+                catch (IOException | InterruptedException e) {
+                    throw new RuntimeException(e);
+                }
+            }
 
             this.lowerBound = readerSliceConfig.getString(KuduKey.SPLIT_LOWER_BOUND);
             this.upperBound = readerSliceConfig.getString(KuduKey.SPLIT_UPPER_BOUND);
