@@ -103,11 +103,10 @@ public class PostgresqlReader
                 {
                     if (metaData.getColumnType(i) == Types.DOUBLE && metaData.isCurrency(i)) {
                         // money type has currency symbol( etc $) and thousands separator(,)
-                        return new DoubleColumn(Double.valueOf(rs.getString(i).substring(1).replace(",","")));
+                        return new DoubleColumn(Double.valueOf(rs.getString(i).substring(1).replace(",", "")));
                     }
                     return super.createColumn(rs, metaData, i);
                 }
-
             };
             this.commonRdbmsReaderSlave.init(this.readerSliceConfig);
         }

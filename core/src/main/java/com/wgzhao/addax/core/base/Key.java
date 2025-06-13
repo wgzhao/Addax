@@ -145,7 +145,7 @@ public class Key
     public static final String HEADER = "header";
     public static final String IS_TABLE_MODE = "isTableMode";
     public static final String EXTENDED_INSERT = "extendedInsert";
-    public static final String TABLE_NUMBER= "tableNumber";
+    public static final String TABLE_NUMBER = "tableNumber";
 
     public static final String PRE_SHELL = "preShell";
     public static final String POST_SHELL = "postShell";

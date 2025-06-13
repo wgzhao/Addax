@@ -63,8 +63,11 @@ public class KuduWriter
             // write back default value with ms unit
             this.config.set(KuduKey.KUDU_TIMEOUT, timeout);
 
+            //Kerberos check
+            validateKerberos();
+
             LOG.info("Try to connect kudu with {}", masterAddress);
-            KuduHelper kuduHelper = new KuduHelper(this.config,masterAddress, timeout);
+            KuduHelper kuduHelper = new KuduHelper(masterAddress, timeout, this.config);
             // check table exists or not
             if (!kuduHelper.isTableExists(tableName)) {
                 throw AddaxException.asAddaxException(CONFIG_ERROR, "table '" + tableName + "' does not exists");
@@ -96,10 +99,6 @@ public class KuduWriter
             // writeMode check
             String writeMode = this.config.getString(KuduKey.WRITE_MODE, INSERT_MODE);
             this.config.set(KuduKey.WRITE_MODE, writeMode);
-
-
-            //Kerberos check
-            validateKerberos();
         }
 
         private void validateKerberos()

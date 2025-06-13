@@ -307,7 +307,7 @@ public class CommonRdbmsReader
                     }
 
                 case Types.ARRAY:
-                    return new StringColumn(rs.getArray(i).toString());
+                    return new StringColumn(Objects.isNull(rs.getObject(i)) ? null : rs.getArray(i).toString());
 
                 case Types.SQLXML:
                     return new StringColumn(rs.getSQLXML(i).getString());
