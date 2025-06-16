@@ -21,13 +21,24 @@ package com.wgzhao.addax.plugin.writer.mysqlwriter;
 
 import com.wgzhao.addax.core.base.Key;
 import com.wgzhao.addax.core.element.Column;
+import com.wgzhao.addax.core.exception.AddaxException;
 import com.wgzhao.addax.core.plugin.RecordReceiver;
+import com.wgzhao.addax.core.spi.ErrorCode;
 import com.wgzhao.addax.core.spi.Writer;
 import com.wgzhao.addax.core.util.Configuration;
+import com.wgzhao.addax.rdbms.util.DBUtil;
 import com.wgzhao.addax.rdbms.util.DataBaseType;
 import com.wgzhao.addax.rdbms.writer.CommonRdbmsWriter;
+import org.locationtech.jts.geom.Geometry;
+import org.locationtech.jts.io.ParseException;
+import org.locationtech.jts.io.WKBReader;
+import org.locationtech.jts.io.WKBWriter;
+import org.locationtech.jts.io.WKTReader;
 
+import java.nio.ByteBuffer;
+import java.sql.Connection;
 import java.sql.PreparedStatement;
+import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Types;
 import java.util.List;
@@ -119,7 +130,68 @@ public class MysqlWriter
                         preparedStatement.setLong(columnIndex, column.asLong());
                         return preparedStatement;
                     }
+                    if (columnSqlType == Types.BINARY && "GEOMETRY".equals(this.resultSetMetaData.get(columnIndex).get("typeName"))) {
+                        // GEOMETRY type is not supported by MySQL JDBC driver, so we convert it to String
+                        // get the srid value
+                        int srid = getSrid(columnIndex);
+                        Geometry geometry;
+                        if (column.getType() == Column.Type.STRING) {
+                            WKTReader wktReader = new WKTReader();
+                            try {
+                                geometry = wktReader.read(column.asString());
+                            }
+                            catch (ParseException e) {
+                                throw new RuntimeException(e);
+                            }
+                        }
+                        else {
+                            // If it's not a String, we convert it to String
+                            WKBReader wkbReader = new WKBReader();
+                            try {
+                                geometry = wkbReader.read(column.asBytes());
+                            }
+                            catch (ParseException e) {
+                                throw AddaxException.asAddaxException(ErrorCode.RUNTIME_ERROR,
+                                        String.format("Failed to parse WKB geometry: %s", e.getMessage()), e);
+                            }
+                        }
+                        geometry.setSRID(srid);
+                        byte[] wkb = new WKBWriter(2, 2, false).write(geometry);
+                        ByteBuffer buffer = ByteBuffer.allocate(4 + wkb.length);
+                        buffer.putInt(Integer.reverseBytes(srid)); // Write SRID in little-endian
+                        buffer.put(wkb); // Write WKB data
+                        preparedStatement.setBytes(columnIndex, buffer.array());
+                        return preparedStatement;
+                    }
                     return super.fillPreparedStatementColumnType(preparedStatement, columnIndex, columnSqlType, column);
+                }
+
+                private int getSrid(int columnIndex)
+                        throws SQLException
+                {
+                    int srid = 0;
+                    String schema;
+                    String tableName;
+                    if (this.table.contains(".")) {
+                        schema = "'" + this.table.split("\\.")[0].trim() + "'";
+                        tableName = this.table.split("\\.")[1].trim();
+                    }
+                    else {
+                        schema = "schema()";
+                        tableName = this.table;
+                    }
+                    try (Connection connection = DBUtil.getConnection(this.dataBaseType, this.jdbcUrl, this.username, this.password)) {
+                        String sql = String.format("""
+                                SELECT SRS_ID
+                                FROM INFORMATION_SCHEMA.ST_GEOMETRY_COLUMNS
+                                WHERE TABLE_SCHEMA = %s AND TABLE_NAME = '%s' AND COLUMN_NAME = '%s'
+                                """, schema, tableName, this.resultSetMetaData.get(columnIndex).get("name"));
+                        ResultSet resultSet = connection.createStatement().executeQuery(sql);
+                        if (resultSet.next()) {
+                            srid = resultSet.getInt("SRS_ID");
+                        }
+                        return srid;
+                    }
                 }
             };
             this.commonRdbmsWriterTask.init(this.writerSliceConfig);
