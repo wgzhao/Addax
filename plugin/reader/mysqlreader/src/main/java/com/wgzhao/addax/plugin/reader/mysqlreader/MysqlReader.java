@@ -119,7 +119,7 @@ public class MysqlReader
                     if (metaData.getColumnType(i) == Types.DATE && "YEAR".equals(metaData.getColumnTypeName(i))) {
                         return new LongColumn(rs.getLong(i));
                     }
-                    if ("GEOMETRY".equals(metaData.getColumnTypeName(i))) {
+                    if (metaData.getColumnType(i) == Types.BINARY && "GEOMETRY".equals(metaData.getColumnTypeName(i))) {
                         WKBReader wkbReader = new WKBReader();
                         try {
                             Geometry geometry = wkbReader.read(rs.getBytes(i));
