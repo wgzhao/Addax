@@ -74,6 +74,7 @@
         <jackson.version>2.18.0</jackson.version>
         <jedis.version>3.7.0</jedis.version>
         <jsch.version>2.27.2</jsch.version>
+        <jts.version>1.20.0</jts.version>
         <kafka.version>3.2.3</kafka.version>
         <kryo.version>5.6.2</kryo.version>
         <kudu.version>1.16.0</kudu.version>

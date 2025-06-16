@@ -22,11 +22,17 @@ package com.wgzhao.addax.plugin.reader.mysqlreader;
 import com.wgzhao.addax.core.base.Key;
 import com.wgzhao.addax.core.element.Column;
 import com.wgzhao.addax.core.element.LongColumn;
+import com.wgzhao.addax.core.element.StringColumn;
+import com.wgzhao.addax.core.exception.AddaxException;
 import com.wgzhao.addax.core.plugin.RecordSender;
+import com.wgzhao.addax.core.spi.ErrorCode;
 import com.wgzhao.addax.core.spi.Reader;
 import com.wgzhao.addax.core.util.Configuration;
 import com.wgzhao.addax.rdbms.reader.CommonRdbmsReader;
 import com.wgzhao.addax.rdbms.util.DataBaseType;
+import org.locationtech.jts.geom.Geometry;
+import org.locationtech.jts.io.ParseException;
+import org.locationtech.jts.io.WKBReader;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -36,6 +42,7 @@ import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
 import java.sql.Types;
 import java.util.List;
+import java.util.Set;
 
 public class MysqlReader
         extends Reader
@@ -111,6 +118,17 @@ public class MysqlReader
                 {
                     if (metaData.getColumnType(i) == Types.DATE && "YEAR".equals(metaData.getColumnTypeName(i))) {
                         return new LongColumn(rs.getLong(i));
+                    }
+                    if ("GEOMETRY".equals(metaData.getColumnTypeName(i))) {
+                        WKBReader wkbReader = new WKBReader();
+                        try {
+                            Geometry geometry = wkbReader.read(rs.getBytes(i));
+                            return new StringColumn(geometry.toString());
+                        }
+                        catch (ParseException e) {
+                            throw AddaxException.asAddaxException(ErrorCode.RUNTIME_ERROR,
+                                    String.format("Failed to parse WKB data in column %d: %s", i, e.getMessage()), e);
+                        }
                     }
                     return super.createColumn(rs, metaData, i);
                 }
