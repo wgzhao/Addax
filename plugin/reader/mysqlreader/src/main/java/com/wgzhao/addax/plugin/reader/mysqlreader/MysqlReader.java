@@ -122,7 +122,16 @@ public class MysqlReader
                     if (metaData.getColumnType(i) == Types.BINARY && "GEOMETRY".equals(metaData.getColumnTypeName(i))) {
                         WKBReader wkbReader = new WKBReader();
                         try {
-                            Geometry geometry = wkbReader.read(rs.getBytes(i));
+                            byte[] wkbWithSRID = rs.getBytes(i);
+                            if (wkbWithSRID != null && wkbWithSRID.length > 0) {
+                                // Remove the SRID prefix (4 bytes) if present
+                                if (wkbWithSRID.length > 4) {
+                                    byte[] wkbWithoutSRID = new byte[wkbWithSRID.length - 4];
+                                    System.arraycopy(wkbWithSRID, 4, wkbWithoutSRID, 0, wkbWithoutSRID.length);
+                                    wkbWithSRID = wkbWithoutSRID;
+                                }
+                            }
+                            Geometry geometry = wkbReader.read(wkbWithSRID);
                             return new StringColumn(geometry.toText());
                         }
                         catch (ParseException e) {
