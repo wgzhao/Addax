@@ -180,17 +180,18 @@ public class MysqlWriter
                         schema = "schema()";
                         tableName = this.table;
                     }
-                    Connection connection = DBUtil.getConnection(this.dataBaseType, this.jdbcUrl, this.username, this.password);
-                    String sql = String.format("""
-                            SELECT SRS_ID
-                            FROM INFORMATION_SCHEMA.ST_GEOMETRY_COLUMNS
-                            WHERE TABLE_SCHEMA = %s AND TABLE_NAME = '%s' AND COLUMN_NAME = '%s'
-                            """, schema, tableName, this.resultSetMetaData.get(columnIndex).get("name"));
-                    ResultSet resultSet = connection.createStatement().executeQuery(sql);
-                    if (resultSet.next()) {
-                        srid = resultSet.getInt("SRS_ID");
+                    try (Connection connection = DBUtil.getConnection(this.dataBaseType, this.jdbcUrl, this.username, this.password)) {
+                        String sql = String.format("""
+                                SELECT SRS_ID
+                                FROM INFORMATION_SCHEMA.ST_GEOMETRY_COLUMNS
+                                WHERE TABLE_SCHEMA = %s AND TABLE_NAME = '%s' AND COLUMN_NAME = '%s'
+                                """, schema, tableName, this.resultSetMetaData.get(columnIndex).get("name"));
+                        ResultSet resultSet = connection.createStatement().executeQuery(sql);
+                        if (resultSet.next()) {
+                            srid = resultSet.getInt("SRS_ID");
+                        }
+                        return srid;
                     }
-                    return srid;
                 }
             };
             this.commonRdbmsWriterTask.init(this.writerSliceConfig);
