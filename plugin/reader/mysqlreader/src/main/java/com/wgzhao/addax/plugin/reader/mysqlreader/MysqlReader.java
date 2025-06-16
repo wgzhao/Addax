@@ -123,7 +123,7 @@ public class MysqlReader
                         WKBReader wkbReader = new WKBReader();
                         try {
                             Geometry geometry = wkbReader.read(rs.getBytes(i));
-                            return new StringColumn(geometry.toString());
+                            return new StringColumn(geometry.toText());
                         }
                         catch (ParseException e) {
                             throw AddaxException.asAddaxException(ErrorCode.RUNTIME_ERROR,
