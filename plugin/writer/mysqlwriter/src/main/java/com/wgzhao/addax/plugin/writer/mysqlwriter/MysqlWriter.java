@@ -133,26 +133,7 @@ public class MysqlWriter
                     if (columnSqlType == Types.BINARY && "GEOMETRY".equals(this.resultSetMetaData.get(columnIndex).get("typeName"))) {
                         // GEOMETRY type is not supported by MySQL JDBC driver, so we convert it to String
                         // get the srid value
-                        int srid = 0;
-                        String schema;
-                        String tableName;
-                        if (this.table.contains(".")) {
-                            schema = "'" + this.table.split("\\.")[0].trim() + "'";
-                            tableName = this.table.split("\\.")[1].trim();
-                        } else {
-                            schema = "schema()";
-                            tableName = this.table;
-                        }
-                        Connection connection = DBUtil.getConnection(this.dataBaseType, this.jdbcUrl, this.username, this.password);
-                        String sql = String.format("""
-                                        SELECT SRS_ID
-                                        FROM INFORMATION_SCHEMA.ST_GEOMETRY_COLUMNS
-                                        WHERE TABLE_SCHEMA = %s AND TABLE_NAME = '%s' AND COLUMN_NAME = '%s'
-                                        """, schema, tableName, this.resultSetMetaData.get(columnIndex).get("name"));
-                        ResultSet resultSet = connection.createStatement().executeQuery(sql);
-                        if (resultSet.next()) {
-                            srid = resultSet.getInt("SRS_ID");
-                        }
+                        int srid = getSrid(columnIndex);
                         Geometry geometry;
                         if (column.getType() == Column.Type.STRING) {
                             WKTReader wktReader = new WKTReader();
@@ -163,7 +144,7 @@ public class MysqlWriter
                                 throw new RuntimeException(e);
                             }
                         }
-                        else  {
+                        else {
                             // If it's not a String, we convert it to String
                             WKBReader wkbReader = new WKBReader();
                             try {
@@ -183,6 +164,33 @@ public class MysqlWriter
                         return preparedStatement;
                     }
                     return super.fillPreparedStatementColumnType(preparedStatement, columnIndex, columnSqlType, column);
+                }
+
+                private int getSrid(int columnIndex)
+                        throws SQLException
+                {
+                    int srid = 0;
+                    String schema;
+                    String tableName;
+                    if (this.table.contains(".")) {
+                        schema = "'" + this.table.split("\\.")[0].trim() + "'";
+                        tableName = this.table.split("\\.")[1].trim();
+                    }
+                    else {
+                        schema = "schema()";
+                        tableName = this.table;
+                    }
+                    Connection connection = DBUtil.getConnection(this.dataBaseType, this.jdbcUrl, this.username, this.password);
+                    String sql = String.format("""
+                            SELECT SRS_ID
+                            FROM INFORMATION_SCHEMA.ST_GEOMETRY_COLUMNS
+                            WHERE TABLE_SCHEMA = %s AND TABLE_NAME = '%s' AND COLUMN_NAME = '%s'
+                            """, schema, tableName, this.resultSetMetaData.get(columnIndex).get("name"));
+                    ResultSet resultSet = connection.createStatement().executeQuery(sql);
+                    if (resultSet.next()) {
+                        srid = resultSet.getInt("SRS_ID");
+                    }
+                    return srid;
                 }
             };
             this.commonRdbmsWriterTask.init(this.writerSliceConfig);
