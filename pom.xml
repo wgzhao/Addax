@@ -71,7 +71,7 @@
         <jest.version>6.3.1</jest.version>
         <junit.version>5.10.2</junit.version>
         <joda.time.version>2.14.0</joda.time.version>
-        <jackson.version>2.18.0</jackson.version>
+        <jackson.version>2.19.1</jackson.version>
         <jedis.version>3.7.0</jedis.version>
         <jsch.version>2.27.2</jsch.version>
         <jts.version>1.20.0</jts.version>
@@ -87,10 +87,10 @@
         <parquet.version>1.15.1</parquet.version>
         <poi.version>5.4.1</poi.version>
         <protobuf.version>3.25.5</protobuf.version>
-        <redis.replicator.version>3.8.1</redis.replicator.version>
+        <redis.replicator.version>3.9.0</redis.replicator.version>
         <slf4j.version>2.0.9</slf4j.version>
         <snappy.version>1.1.10.7</snappy.version>
-        <woodstox.version>7.1.0</woodstox.version>
+        <woodstox.version>7.1.1</woodstox.version>
         <xz.version>1.10</xz.version>
         <zookeeper.version>3.7.2</zookeeper.version>
         <zstd.version>1.5.6-6</zstd.version>
@@ -110,7 +110,7 @@
         <phoenix1.version>4.14.3-HBase-1.4</phoenix1.version>
         <phoenix2.version>5.1.3</phoenix2.version>
         <postgresql.jdbc.version>42.3.9</postgresql.jdbc.version>
-        <sqlite.jdbc.version>3.48.0.0</sqlite.jdbc.version>
+        <sqlite.jdbc.version>3.50.1.0</sqlite.jdbc.version>
         <taos.jdbc.version>3.2.1</taos.jdbc.version>
         <trino.jdbc.version>351</trino.jdbc.version>
         <ucanaccess.version>5.0.1</ucanaccess.version>
