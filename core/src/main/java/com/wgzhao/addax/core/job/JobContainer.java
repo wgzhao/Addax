@@ -45,15 +45,15 @@ import com.wgzhao.addax.core.util.container.ClassLoaderSwapper;
 import com.wgzhao.addax.core.util.container.CoreConstant;
 import com.wgzhao.addax.core.util.container.LoadUtil;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.hc.client5.http.fluent.Request;
-import org.apache.hc.core5.http.ContentType;
-import org.apache.hc.core5.http.HttpResponse;
-import org.apache.hc.core5.util.Timeout;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
+import java.net.http.HttpClient;
+import java.net.http.HttpRequest;
+import java.net.http.HttpResponse;
 import java.text.SimpleDateFormat;
+import java.time.Duration;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -755,20 +755,28 @@ public class JobContainer
     {
         LOG.info("Upload the job run statistics to [{}]", url);
 
+        HttpClient client = HttpClient.newBuilder()
+                .followRedirects(HttpClient.Redirect.NORMAL)
+                .connectTimeout(Duration.ofMillis(timeoutMills))
+                .build();
+
+        HttpRequest request = HttpRequest.newBuilder()
+                .uri(java.net.URI.create(url))
+                .header("Content-Type", "application/json")
+                .timeout(java.time.Duration.ofMillis(timeoutMills))
+                .POST(HttpRequest.BodyPublishers.ofString(jsonStr))
+                .build();
+
         try {
-            HttpResponse httpResponse = Request.post(url)
-                    .connectTimeout(Timeout.ofMilliseconds(timeoutMills))
-                    .bodyString(jsonStr, ContentType.APPLICATION_JSON)
-                    .execute()
-                    .returnResponse();
-            if (httpResponse.getCode() == 200) {
+            HttpResponse<String> httpResponse = client.send(request, HttpResponse.BodyHandlers.ofString());
+            if (httpResponse.statusCode() == 200) {
                 LOG.info("Job results uploaded successfully");
             } else {
-                LOG.warn("Failed to upload job results, the response code: {}", httpResponse.getCode());
+                LOG.warn("Failed to upload job results, the response code: {}", httpResponse.statusCode());
             }
         }
-        catch (IOException e) {
-            LOG.warn("IOException occurred while uploading the job results: {}", e.getMessage());
+        catch (IOException | InterruptedException e) {
+            LOG.warn("Exception occurred while uploading the job results: {}", e.getMessage());
         }
     }
 

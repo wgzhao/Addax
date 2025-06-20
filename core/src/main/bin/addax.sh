@@ -35,7 +35,7 @@ CORE_JSON="${ADDAX_HOME}/conf/core.json"
 
 DEFAULT_PROPERTY_CONF="-Dfile.encoding=UTF-8 -Djava.security.egd=file:///dev/urandom -Daddax.home=${ADDAX_HOME} -Dlogback.configurationFile=${LOGBACK_FILE}"
 REMOTE_DEBUG_CONFIG="-Xdebug -Xrunjdwp:transport=dt_socket,server=y,address=0.0.0.0:${DEBUG_PORT}"
-JAVA_OPTS="$JAVA_OPTS -XX:+UseG1GC -XX:MaxGCPauseMillis=200 -XX:InitiatingHeapOccupancyPercent=75"
+JAVA_OPTS="$JAVA_OPTS -XX:+UseZGC -XX:MaxGCPauseMillis=200 -XX:InitiatingHeapOccupancyPercent=75"
 
 # ------------------------------ Global Variables ---------------------------------
 CUST_JVM=""
