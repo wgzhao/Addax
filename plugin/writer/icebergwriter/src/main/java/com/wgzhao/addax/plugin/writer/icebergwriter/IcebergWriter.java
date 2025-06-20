@@ -188,6 +188,7 @@ public class IcebergWriter
             schema = table.schema();
 
             fileFormat = table.properties().get("write.format.default");
+            log.info("fileFormat: {}", fileFormat);
             if (fileFormat == null || fileFormat.trim().isEmpty()) {
                 fileFormat = "parquet";
             }
@@ -326,6 +327,7 @@ public class IcebergWriter
                 DataWriter<GenericRecord> dataWriter = null;
 
                 if ("parquet".equals(fileFormat)) {
+                    log.info("start writing fileFormat: {}", fileFormat);
                     try {
                         dataWriter = Parquet.writeData(file).overwrite().forTable(table).createWriterFunc(GenericParquetWriter::buildWriter).build();
                     }
@@ -334,7 +336,14 @@ public class IcebergWriter
                     }
                 }
                 else if ("orc".equals(fileFormat)) {
-                    dataWriter = ORC.writeData(file).overwrite().forTable(table).createWriterFunc(GenericOrcWriter::buildWriter).build();
+
+                    log.info("start writing fileFormat: {}", fileFormat);
+                    try {
+                        dataWriter = ORC.writeData(file).overwrite().forTable(table).createWriterFunc(GenericOrcWriter::buildWriter).build();
+                    }
+                    catch (Exception e) {
+                        throw new RuntimeException(e);
+                    }
                 }
                 else {
                     throw new RuntimeException("不支持的文件格式:" + fileFormat);
@@ -364,9 +373,9 @@ public class IcebergWriter
                                 TableProperties.WRITE_TARGET_FILE_SIZE_BYTES_DEFAULT);
 
                 int partitionId = 1, taskId = 1;
-                FileFormat fileFormat = FileFormat.PARQUET;
+                FileFormat fileFormatIntance = FileFormat.PARQUET;
                 if ("orc".equals(fileFormat)) {
-                    fileFormat = FileFormat.ORC;
+                    fileFormatIntance = FileFormat.ORC;
                 }
                 Set<Integer> identifierFieldIds = table.schema().identifierFieldIds();
                 FileAppenderFactory<org.apache.iceberg.data.Record> appenderFactory;
@@ -385,10 +394,10 @@ public class IcebergWriter
                                     null)
                                     .setAll(tableProps);
                 }
-                OutputFileFactory outputFileFactory = OutputFileFactory.builderFor(table, partitionId, taskId).format(fileFormat).build();
+                OutputFileFactory outputFileFactory = OutputFileFactory.builderFor(table, partitionId, taskId).format(fileFormatIntance).build();
                 final PartitionKey partitionKey = new PartitionKey(table.spec(), table.spec().schema());
                 // partitionedFanoutWriter will auto partitioned record and create the partitioned writer
-                PartitionedFanoutWriter<org.apache.iceberg.data.Record> partitionedFanoutWriter = new PartitionedFanoutWriter<org.apache.iceberg.data.Record>(table.spec(), fileFormat, appenderFactory, outputFileFactory, table.io(), targetFileSize)
+                PartitionedFanoutWriter<org.apache.iceberg.data.Record> partitionedFanoutWriter = new PartitionedFanoutWriter<org.apache.iceberg.data.Record>(table.spec(), fileFormatIntance, appenderFactory, outputFileFactory, table.io(), targetFileSize)
                 {
                     @Override
                     protected PartitionKey partition(org.apache.iceberg.data.Record record)

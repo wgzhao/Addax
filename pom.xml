@@ -31,7 +31,7 @@
         <!-- basic components -->
         <aircompressor.version>0.27</aircompressor.version>
         <awssdk.version>2.29.20</awssdk.version>
-        <avro.version>1.11.4</avro.version>
+        <avro.version>1.12.0</avro.version>
         <commons.beanutils.version>1.10.1</commons.beanutils.version>
         <commons.configuration.version>1.10</commons.configuration.version>
         <commons.configuration2.version>2.11.0</commons.configuration2.version>
@@ -83,7 +83,7 @@
         <mockito.version>2.0.2-beta</mockito.version>
         <netty-buffer.version>4.1.93.Final</netty-buffer.version>
         <ognl.version>3.4.7</ognl.version>
-        <orc.version>1.9.2</orc.version>
+        <orc.version>1.9.5</orc.version>
         <parquet.version>1.15.1</parquet.version>
         <poi.version>5.4.1</poi.version>
         <protobuf.version>3.25.5</protobuf.version>
