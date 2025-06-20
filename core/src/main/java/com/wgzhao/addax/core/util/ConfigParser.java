@@ -23,7 +23,11 @@ import com.wgzhao.addax.core.exception.AddaxException;
 
 import java.io.File;
 import java.io.IOException;
+import java.net.http.HttpClient;
+import java.net.http.HttpRequest;
+import java.net.http.HttpResponse;
 import java.nio.charset.StandardCharsets;
+import java.time.Duration;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -32,8 +36,6 @@ import java.util.Set;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.hc.client5.http.fluent.Request;
-import org.apache.hc.core5.util.Timeout;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -67,6 +69,7 @@ public final class ConfigParser
 
     /**
      * Parse the job configuration file and merge the core configuration
+     *
      * @param jobPath the path of the job configuration file
      * @return the merged configuration
      */
@@ -168,18 +171,19 @@ public final class ConfigParser
         boolean isJobResourceFromHttp = jobResource.trim().toLowerCase().startsWith("http");
 
         if (isJobResourceFromHttp) {
-            //设置httpclient的 HTTP_TIMEOUT_IN_MILLION_SECONDS
             Configuration coreConfig = ConfigParser.parseCoreConfig();
             int timeoutSecs = coreConfig.getInt(CORE_SERVER_TIMEOUT_SEC, 5);
+            HttpClient client = HttpClient.newBuilder()
+                    .connectTimeout(Duration.ofSeconds(timeoutSecs))
+                    .build();
+            HttpRequest request = HttpRequest.newBuilder()
+                    .uri(java.net.URI.create(jobResource))
+                    .timeout(Duration.ofSeconds(timeoutSecs))
+                    .build();
             try {
-                jobContent = Request
-                        .get(jobResource)
-                        .connectTimeout(Timeout.ofSeconds(timeoutSecs))
-                        .execute()
-                        .returnContent()
-                        .asString();
+                jobContent = client.send(request, HttpResponse.BodyHandlers.ofString()).body();
             }
-            catch (IOException e) {
+            catch (IOException | InterruptedException e) {
                 throw AddaxException.asAddaxException(IO_ERROR, "Failed to obtain job configuration:" + jobResource, e);
             }
         }
