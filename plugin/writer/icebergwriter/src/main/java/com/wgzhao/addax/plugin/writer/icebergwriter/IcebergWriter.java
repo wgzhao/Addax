@@ -332,7 +332,6 @@ public class IcebergWriter
                 DataWriter<GenericRecord> dataWriter = null;
 
                 if ("parquet".equals(fileFormat)) {
-                    log.info("start writing fileFormat: {}", fileFormat);
                     try {
                         dataWriter = Parquet.writeData(file).overwrite().forTable(table).createWriterFunc(GenericParquetWriter::buildWriter).build();
                     }
@@ -342,7 +341,6 @@ public class IcebergWriter
                 }
                 else if ("orc".equals(fileFormat)) {
 
-                    log.info("start writing fileFormat: {}", fileFormat);
                     try {
                         dataWriter = ORC.writeData(file).overwrite().forTable(table).createWriterFunc(GenericOrcWriter::buildWriter).build();
                     }
