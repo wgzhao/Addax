@@ -349,7 +349,7 @@ public class IcebergWriter
                     }
                 }
                 else {
-                    throw new RuntimeException("不支持的文件格式:" + fileFormat);
+                    throw new RuntimeException("not supported file format:" + fileFormat);
                 }
 
                 if (dataWriter != null) {
