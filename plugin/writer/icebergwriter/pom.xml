@@ -13,6 +13,10 @@
     <name>iceberg-writer</name>
     <description>Apache Iceberg writer plugin for Addax</description>
     <packaging>jar</packaging>
+    <properties>
+        <avro.version>1.12.0</avro.version>
+        <orc.version>1.9.5</orc.version>
+    </properties>
 
     <dependencies>
         <dependency>
