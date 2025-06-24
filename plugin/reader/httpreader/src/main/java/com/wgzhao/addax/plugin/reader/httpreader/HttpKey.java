@@ -24,7 +24,7 @@ import com.wgzhao.addax.core.base.Key;
 public final class HttpKey
         extends Key
 {
-    // the key of the json result
+    // the key of the JSON result
     public static final String RESULT_KEY = "resultKey";
     // connection info
     public static final String CONNECTION = "connection";
@@ -46,7 +46,7 @@ public final class HttpKey
     public static final String HEADERS = "headers";
     // timeout in seconds
     public static final String TIMEOUT_SEC = "timeout";
-    // request method , only support GET and POST
+    // request method, only support GET and POST
     public static final String METHOD = "method";
 
     public static final String IS_PAGE = "isPage";
