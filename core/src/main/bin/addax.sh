@@ -96,7 +96,7 @@ trap cleanup EXIT
 # Parse job file (local or remote)
 parse_job_file() {
     case "$JOB_FILE" in
-        http*)
+        [hH][tT][tT][pP]://* | [hH][tT][tT][pP][sS]://*)
             if ! command -v curl >/dev/null 2>&1; then
                 echo "Error: curl command not found, cannot download job file"
                 exit 1
