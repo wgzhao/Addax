@@ -112,7 +112,7 @@ public class HttpReader
         private static final Logger LOG = LoggerFactory.getLogger(Task.class);
         private static final int DEFAULT_PAGE_INDEX = 1;
         private static final int DEFAULT_PAGE_SIZE = 20;
-        private static final  int DEFAULT_TIMEOUT_SEC = 60;
+        private static final int DEFAULT_TIMEOUT_SEC = 60;
 
         private Configuration readerSliceConfig = null;
         private URI baseUri;
@@ -311,9 +311,15 @@ public class HttpReader
                 requestBuilder.header("Authorization", "Bearer " + token);
             }
             // Set method and handle body for POST
+            String jsonBody;
             if ("POST".equalsIgnoreCase(method)) {
-                // 将参数转换为 JSON 格式作为 POST body
-                String jsonBody = JSON.toJSONString(queryParams);
+                if (queryParams.containsKey("")) {
+                    // maybe just one parameter, like ["123","456"], or [1,2,3], or "123,456"
+                    jsonBody = queryParams.get("").trim();
+                }
+                else {
+                    jsonBody = JSON.toJSONString(queryParams);
+                }
                 requestBuilder.header("Content-Type", "application/json");
                 requestBuilder.POST(HttpRequest.BodyPublishers.ofString(jsonBody));
             }
