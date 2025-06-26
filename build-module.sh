@@ -23,7 +23,7 @@
 set -e  # Exit on any error
 
 # Get project version
-version=$(head -n10 pom.xml | awk -F'[<>]' '/<version>/ {print $3; exit}')
+version=$(head -n25 pom.xml | awk -F'[<>]' '/<version>/ {print $3; exit}')
 export MAVEN_OPTS="-Dmaven.test.skip=true -Dmaven.javadoc.skip=true -Dmaven.source.skip=true "
 # if build for remote host, then skip all path exists check
 SKIP_CHECK=0
