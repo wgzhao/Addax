@@ -2634,6 +2634,27 @@
 <td>false</td>
 <td>是否跳过插入失败的记录，如果设置为true，则插件不会把插入失败的当作异常</td>
 </tr>
+<tr>
+<td style="text-align: left;">haveKerberos</td>
+<td style="text-align: center;">否</td>
+<td>boolean</td>
+<td>false</td>
+<td>是否启用 Kerberos 认证，如果启用，则需要同时配置以下两项</td>
+</tr>
+<tr>
+<td style="text-align: left;">kerberosKeytabFilePath</td>
+<td style="text-align: center;">否</td>
+<td>string</td>
+<td>无</td>
+<td>用于 Kerberos 认证的凭证文件路径, 比如 <code>/your/path/addax.service.keytab</code></td>
+</tr>
+<tr>
+<td style="text-align: left;">kerberosPrincipal</td>
+<td style="text-align: center;">否</td>
+<td>string</td>
+<td>无</td>
+<td>用于 Kerberos 认证的凭证主体, 比如 <code>addax/node1@WGZHAO.COM</code></td>
+</tr>
 </tbody>
 </table>
 <h2 id="column">column<a class="headerlink" href="#column" title="Permanent link">&para;</a></h2>

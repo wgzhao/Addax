@@ -1076,6 +1076,15 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
+  <a href="#reqparams" class="md-nav__link">
+    <span class="md-ellipsis">
+      reqParams
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#proxy" class="md-nav__link">
     <span class="md-ellipsis">
       proxy
@@ -2529,6 +2538,15 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
+  <a href="#reqparams" class="md-nav__link">
+    <span class="md-ellipsis">
+      reqParams
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#proxy" class="md-nav__link">
     <span class="md-ellipsis">
       proxy
@@ -2990,6 +3008,17 @@
 </tr>
 </tbody>
 </table>
+<h3 id="reqparams">reqParams<a class="headerlink" href="#reqparams" title="Permanent link">&para;</a></h3>
+<p>reqParams 是请求参数， 如果请求是 <code>GET</code> 方式，则会以 <code>k=v</code> 的方式拼接在 <code>url</code> 的后面。
+如果请求的是 <code>POST</code> 模式，则会把 <code>reqParams</code> 当做 JSON 内容作为请求体发送。
+特别的，如果在 <code>POST</code> 模式下，如果你发送的请求提并不是一个 <code>k-v</code> 结构，则可以把 <code>key</code> 设置为空字符串，类似如下：</p>
+<div class="highlight"><pre><span></span><code><span class="p">{</span>
+<span class="w">  </span><span class="nt">&quot;reqParams&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="nt">&quot;&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="mi">123</span><span class="p">,</span><span class="mi">3456</span><span class="p">]</span>
+<span class="w">  </span><span class="p">}</span>
+<span class="p">}</span>
+</code></pre></div>
+<p>程序会针对这种进行进行特别处理。</p>
 <h3 id="proxy">proxy<a class="headerlink" href="#proxy" title="Permanent link">&para;</a></h3>
 <p>如果访问的接口需要通过代理，则可以配置 <code>proxy</code> 配置项，该配置项是一个 json 字典，包含一个必选的 <code>host</code>
 字段和一个可选的 <code>auth</code> 字段。</p>
