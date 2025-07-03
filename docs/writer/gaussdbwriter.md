@@ -1,4 +1,4 @@
-# DataX GaussDbWriter
+#  GaussDbWriter  插件文档
 
 
 ---
