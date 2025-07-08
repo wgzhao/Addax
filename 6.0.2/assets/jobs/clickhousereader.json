@@ -1,0 +1,38 @@
+{
+  "job": {
+    "setting": {
+      "speed": {
+        "channel": 1,
+        "bytes": -1
+      },
+      "errorLimit": {
+        "record": 0,
+        "percentage": 0.02
+      }
+    },
+    "content": {
+      "reader": {
+        "name": "clickhousereader",
+        "parameter": {
+          "username": "root",
+          "password": "root",
+          "column": [
+            "*"
+          ],
+          "connection": {
+            "table": [
+              "ck_addax"
+            ],
+            "jdbcUrl": "jdbc:clickhouse://127.0.0.1:8123/default"
+          }
+        }
+      },
+      "writer": {
+        "name": "streamwriter",
+        "parameter": {
+          "print": true
+        }
+      }
+    }
+  }
+}
