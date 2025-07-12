@@ -45,6 +45,7 @@ public class KuduWriter
         private static final String INSERT_MODE = "upsert";
 
         private static final int DEFAULT_TIME_OUT = 100;
+        private static final int DEFAULT_BUFFER_SIZE = 2048;
 
         private Configuration config = null;
 
@@ -60,8 +61,10 @@ public class KuduWriter
             String tableName = config.getNecessaryValue(KuduKey.TABLE, REQUIRED_VALUE);
             String masterAddress = config.getNecessaryValue(KuduKey.KUDU_MASTER_ADDRESSES, REQUIRED_VALUE);
             long timeout = config.getInt(KuduKey.KUDU_TIMEOUT, DEFAULT_TIME_OUT) * 1000L;
+            int bufferSize = config.getInt(KuduKey.MUTATION_BUFFER_SPACE, DEFAULT_BUFFER_SIZE);
             // write back default value with ms unit
             this.config.set(KuduKey.KUDU_TIMEOUT, timeout);
+            this.config.set(KuduKey.MUTATION_BUFFER_SPACE, bufferSize);
 
             //Kerberos check
             validateKerberos();
