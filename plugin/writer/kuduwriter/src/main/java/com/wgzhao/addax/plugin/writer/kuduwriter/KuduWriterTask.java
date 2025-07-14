@@ -112,44 +112,20 @@ public class KuduWriterTask
                     continue;
                 }
                 switch (type) {
-                    case INT8:
-                    case INT16:
-                    case INT32:
-                        row.addInt(name, Integer.parseInt(column.asString()));
-                        break;
-                    case INT64:
-                        row.addLong(name, Long.parseLong(column.asString()));
-                        break;
-                    case FLOAT:
-                    case DOUBLE:
-                        row.addDouble(name, column.asDouble());
-                        break;
-                    case STRING:
-                        row.addString(name, column.asString());
-                        break;
-                    case BOOL:
-                        row.addBoolean(name, column.asBoolean());
-                        break;
-                    case BINARY:
-                        row.addBinary(name, column.asBytes());
-                        break;
-                    case DECIMAL:
-                        row.addDecimal(name, new BigDecimal(column.asString()));
-                        break;
-                    case UNIXTIME_MICROS:
-                        // need to convert local timestamp to UTC
+                    case INT8, INT16, INT32 -> row.addInt(name, Integer.parseInt(column.asString()));
+                    case INT64 -> row.addLong(name, Long.parseLong(column.asString()));
+                    case FLOAT, DOUBLE -> row.addDouble(name, column.asDouble());
+                    case STRING, DATE -> row.addString(name, column.asString());
+                    case BOOL -> row.addBoolean(name, column.asBoolean());
+                    case BINARY -> row.addBinary(name, column.asBytes());
+                    case DECIMAL -> row.addDecimal(name, new BigDecimal(column.asString()));
+                    case UNIXTIME_MICROS -> {
                         int offsetSecs = ZonedDateTime.now(ZoneId.systemDefault()).getOffset().getTotalSeconds();
-                        // use nanos timestamp value
                         row.addLong(name, (column.asTimestamp().getTime() * 1_000L + offsetSecs * 1_000_000L));
-                        break;
-                    case DATE:
-                        // Kudu takes date as string
-                        row.addString(name, column.asString());
-                        break;
-                    default:
-                        throw AddaxException.asAddaxException(
-                                NOT_SUPPORT_TYPE, "The data type " + type + " is unsupported"
-                        );
+                    }
+                    default -> throw AddaxException.asAddaxException(
+                            NOT_SUPPORT_TYPE, "The data type " + type + " is unsupported"
+                    );
                 }
             } // end a row
             try {

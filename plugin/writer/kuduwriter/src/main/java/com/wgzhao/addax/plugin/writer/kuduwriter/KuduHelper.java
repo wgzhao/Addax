@@ -47,16 +47,6 @@ public class KuduHelper
     private final KuduClient kuduClient;
     private KuduTable kuduTable;
 
-    public KuduHelper(String masterAddress)
-    {
-        this(masterAddress, 100 * 1000L);
-    }
-
-    public KuduHelper(String masterAddress, long timeout)
-    {
-        this(masterAddress, timeout, null);
-    }
-
     public KuduHelper(String masterAddress, long timeout, Configuration config)
     {
         try {
