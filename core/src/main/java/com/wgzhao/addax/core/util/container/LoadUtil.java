@@ -108,15 +108,12 @@ public class LoadUtil
     {
         AbstractTaskPlugin taskPlugin = LoadUtil.loadTaskPlugin(pluginType, pluginName);
 
-        switch (pluginType) {
-            case READER:
-                return new ReaderRunner(taskPlugin);
-            case WRITER:
-                return new WriterRunner(taskPlugin);
-            default:
-                throw AddaxException.asAddaxException(RUNTIME_ERROR,
-                        String.format("The plugin type must be reader or writer, [%s] is unsupported.", pluginName));
-        }
+        return switch (pluginType) {
+            case READER -> new ReaderRunner(taskPlugin);
+            case WRITER -> new WriterRunner(taskPlugin);
+            default -> throw AddaxException.asAddaxException(RUNTIME_ERROR,
+                    String.format("The plugin type must be reader or writer, [%s] is unsupported.", pluginName));
+        };
     }
 
     @SuppressWarnings("unchecked")
