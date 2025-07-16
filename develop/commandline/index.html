@@ -12,28 +12,28 @@
         <meta name="author" content="Steven Zhao">
       
       
-        <link rel="canonical" href="https://wgzhao.github.io/Addax/develop/writer/hanawriter/">
+        <link rel="canonical" href="https://wgzhao.github.io/Addax/develop/commandline/">
       
       
-        <link rel="prev" href="../greenplumwriter/">
+        <link rel="prev" href="../setupJob/">
       
       
-        <link rel="next" href="../hbase11xsqlwriter/">
+        <link rel="next" href="../reader/accessreader/">
       
       
-      <link rel="icon" href="../../images/favicon.ico">
+      <link rel="icon" href="../images/favicon.ico">
       <meta name="generator" content="mkdocs-1.6.0, mkdocs-material-9.5.25">
     
     
       
-        <title>HANA Writer - Addax Documentation</title>
+        <title>命令行工具 - Addax Documentation</title>
       
     
     
-      <link rel="stylesheet" href="../../assets/stylesheets/main.6543a935.min.css">
+      <link rel="stylesheet" href="../assets/stylesheets/main.6543a935.min.css">
       
         
-        <link rel="stylesheet" href="../../assets/stylesheets/palette.06af60db.min.css">
+        <link rel="stylesheet" href="../assets/stylesheets/palette.06af60db.min.css">
       
       
 
@@ -52,7 +52,7 @@
       
     
     
-    <script>__md_scope=new URL("../..",location),__md_hash=e=>[...e].reduce((e,_)=>(e<<5)-e+_.charCodeAt(0),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    <script>__md_scope=new URL("..",location),__md_hash=e=>[...e].reduce((e,_)=>(e<<5)-e+_.charCodeAt(0),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
     
       
   
@@ -88,7 +88,7 @@
     <div data-md-component="skip">
       
         
-        <a href="#hana-writer" class="md-skip">
+        <a href="#_1" class="md-skip">
           跳转至
         </a>
       
@@ -108,9 +108,9 @@
 
 <header class="md-header md-header--shadow md-header--lifted" data-md-component="header">
   <nav class="md-header__inner md-grid" aria-label="页眉">
-    <a href="../.." title="Addax Documentation" class="md-header__button md-logo" aria-label="Addax Documentation" data-md-component="logo">
+    <a href=".." title="Addax Documentation" class="md-header__button md-logo" aria-label="Addax Documentation" data-md-component="logo">
       
-  <img src="../../images/logo.png" alt="logo">
+  <img src="../images/logo.png" alt="logo">
 
     </a>
     <label class="md-header__button md-icon" for="__drawer">
@@ -127,7 +127,7 @@
         <div class="md-header__topic" data-md-component="header-topic">
           <span class="md-ellipsis">
             
-              HANA Writer
+              命令行工具
             
           </span>
         </div>
@@ -235,7 +235,7 @@
   
   
     <li class="md-tabs__item">
-      <a href="../.." class="md-tabs__link">
+      <a href=".." class="md-tabs__link">
         
   
     
@@ -252,7 +252,7 @@
   
   
     <li class="md-tabs__item">
-      <a href="../../quickstart/" class="md-tabs__link">
+      <a href="../quickstart/" class="md-tabs__link">
         
   
     
@@ -269,7 +269,7 @@
   
   
     <li class="md-tabs__item">
-      <a href="../../setupJob/" class="md-tabs__link">
+      <a href="../setupJob/" class="md-tabs__link">
         
   
     
@@ -284,9 +284,11 @@
         
   
   
+    
   
-    <li class="md-tabs__item">
-      <a href="../../commandline/" class="md-tabs__link">
+  
+    <li class="md-tabs__item md-tabs__item--active">
+      <a href="./" class="md-tabs__link">
         
   
     
@@ -305,7 +307,7 @@
     
     
       <li class="md-tabs__item">
-        <a href="../../reader/accessreader/" class="md-tabs__link">
+        <a href="../reader/accessreader/" class="md-tabs__link">
           
   
     
@@ -321,13 +323,11 @@
         
   
   
-    
-  
   
     
     
-      <li class="md-tabs__item md-tabs__item--active">
-        <a href="../accesswriter/" class="md-tabs__link">
+      <li class="md-tabs__item">
+        <a href="../writer/accesswriter/" class="md-tabs__link">
           
   
     
@@ -345,7 +345,7 @@
   
   
     <li class="md-tabs__item">
-      <a href="../../debug/" class="md-tabs__link">
+      <a href="../debug/" class="md-tabs__link">
         
   
     
@@ -362,7 +362,7 @@
   
   
     <li class="md-tabs__item">
-      <a href="../../encrypt_password/" class="md-tabs__link">
+      <a href="../encrypt_password/" class="md-tabs__link">
         
   
     
@@ -379,7 +379,7 @@
   
   
     <li class="md-tabs__item">
-      <a href="../../statsreport/" class="md-tabs__link">
+      <a href="../statsreport/" class="md-tabs__link">
         
   
     
@@ -396,7 +396,7 @@
   
   
     <li class="md-tabs__item">
-      <a href="../../transformer/" class="md-tabs__link">
+      <a href="../transformer/" class="md-tabs__link">
         
   
     
@@ -413,7 +413,7 @@
   
   
     <li class="md-tabs__item">
-      <a href="../../plugin_development/" class="md-tabs__link">
+      <a href="../plugin_development/" class="md-tabs__link">
         
   
     
@@ -453,9 +453,9 @@
 
 <nav class="md-nav md-nav--primary md-nav--lifted" aria-label="导航栏" data-md-level="0">
   <label class="md-nav__title" for="__drawer">
-    <a href="../.." title="Addax Documentation" class="md-nav__button md-logo" aria-label="Addax Documentation" data-md-component="logo">
+    <a href=".." title="Addax Documentation" class="md-nav__button md-logo" aria-label="Addax Documentation" data-md-component="logo">
       
-  <img src="../../images/logo.png" alt="logo">
+  <img src="../images/logo.png" alt="logo">
 
     </a>
     Addax Documentation
@@ -482,7 +482,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../.." class="md-nav__link">
+      <a href=".." class="md-nav__link">
         
   
   <span class="md-ellipsis">
@@ -502,7 +502,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../quickstart/" class="md-nav__link">
+      <a href="../quickstart/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
@@ -522,7 +522,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../setupJob/" class="md-nav__link">
+      <a href="../setupJob/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
@@ -539,10 +539,30 @@
       
   
   
+    
   
   
-    <li class="md-nav__item">
-      <a href="../../commandline/" class="md-nav__link">
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  <span class="md-ellipsis">
+    命令行工具
+  </span>
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
         
   
   <span class="md-ellipsis">
@@ -551,6 +571,68 @@
   
 
       </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="目录">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      目录
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#_2" class="md-nav__link">
+    <span class="md-ellipsis">
+      命令行工具
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_3" class="md-nav__link">
+    <span class="md-ellipsis">
+      使用方法
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_4" class="md-nav__link">
+    <span class="md-ellipsis">
+      参数
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="参数">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#params" class="md-nav__link">
+    <span class="md-ellipsis">
+      params 参数说明
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
     </li>
   
 
@@ -674,7 +756,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../reader/accessreader/" class="md-nav__link">
+      <a href="../reader/accessreader/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
@@ -695,7 +777,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../reader/cassandrareader/" class="md-nav__link">
+      <a href="../reader/cassandrareader/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
@@ -716,7 +798,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../reader/clickhousereader/" class="md-nav__link">
+      <a href="../reader/clickhousereader/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
@@ -737,7 +819,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../reader/databendreader/" class="md-nav__link">
+      <a href="../reader/databendreader/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
@@ -758,7 +840,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../reader/datareader/" class="md-nav__link">
+      <a href="../reader/datareader/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
@@ -779,7 +861,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../reader/dbfreader/" class="md-nav__link">
+      <a href="../reader/dbfreader/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
@@ -800,7 +882,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../reader/elasticsearchreader/" class="md-nav__link">
+      <a href="../reader/elasticsearchreader/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
@@ -821,7 +903,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../reader/excelreader/" class="md-nav__link">
+      <a href="../reader/excelreader/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
@@ -842,7 +924,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../reader/ftpreader/" class="md-nav__link">
+      <a href="../reader/ftpreader/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
@@ -863,7 +945,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../reader/hanareader/" class="md-nav__link">
+      <a href="../reader/hanareader/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
@@ -884,7 +966,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../reader/hbase11xreader/" class="md-nav__link">
+      <a href="../reader/hbase11xreader/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
@@ -905,7 +987,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../reader/hbase11xsqlreader/" class="md-nav__link">
+      <a href="../reader/hbase11xsqlreader/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
@@ -926,7 +1008,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../reader/hbase20xreader/" class="md-nav__link">
+      <a href="../reader/hbase20xreader/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
@@ -947,7 +1029,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../reader/hbase20xsqlreader/" class="md-nav__link">
+      <a href="../reader/hbase20xsqlreader/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
@@ -968,7 +1050,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../reader/hdfsreader/" class="md-nav__link">
+      <a href="../reader/hdfsreader/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
@@ -989,7 +1071,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../reader/hivereader/" class="md-nav__link">
+      <a href="../reader/hivereader/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
@@ -1010,7 +1092,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../reader/httpreader/" class="md-nav__link">
+      <a href="../reader/httpreader/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
@@ -1031,7 +1113,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../reader/influxdbreader/" class="md-nav__link">
+      <a href="../reader/influxdbreader/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
@@ -1052,7 +1134,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../reader/influxdb2reader/" class="md-nav__link">
+      <a href="../reader/influxdb2reader/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
@@ -1073,7 +1155,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../reader/jsonfilereader/" class="md-nav__link">
+      <a href="../reader/jsonfilereader/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
@@ -1094,7 +1176,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../reader/kafkareader/" class="md-nav__link">
+      <a href="../reader/kafkareader/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
@@ -1115,7 +1197,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../reader/kudureader/" class="md-nav__link">
+      <a href="../reader/kudureader/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
@@ -1136,7 +1218,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../reader/mongodbreader/" class="md-nav__link">
+      <a href="../reader/mongodbreader/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
@@ -1157,7 +1239,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../reader/mysqlreader/" class="md-nav__link">
+      <a href="../reader/mysqlreader/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
@@ -1178,7 +1260,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../reader/oraclereader/" class="md-nav__link">
+      <a href="../reader/oraclereader/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
@@ -1199,7 +1281,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../reader/postgresqlreader/" class="md-nav__link">
+      <a href="../reader/postgresqlreader/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
@@ -1220,7 +1302,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../reader/rdbmsreader/" class="md-nav__link">
+      <a href="../reader/rdbmsreader/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
@@ -1241,7 +1323,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../reader/redisreader/" class="md-nav__link">
+      <a href="../reader/redisreader/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
@@ -1262,7 +1344,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../reader/s3reader/" class="md-nav__link">
+      <a href="../reader/s3reader/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
@@ -1283,7 +1365,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../reader/sqlitereader/" class="md-nav__link">
+      <a href="../reader/sqlitereader/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
@@ -1304,7 +1386,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../reader/sqlserverreader/" class="md-nav__link">
+      <a href="../reader/sqlserverreader/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
@@ -1325,7 +1407,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../reader/streamreader/" class="md-nav__link">
+      <a href="../reader/streamreader/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
@@ -1346,7 +1428,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../reader/sybasereader/" class="md-nav__link">
+      <a href="../reader/sybasereader/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
@@ -1367,7 +1449,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../reader/tdenginereader/" class="md-nav__link">
+      <a href="../reader/tdenginereader/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
@@ -1388,7 +1470,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../reader/txtfilereader/" class="md-nav__link">
+      <a href="../reader/txtfilereader/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
@@ -1413,10 +1495,8 @@
       
   
   
-    
   
   
-  
     
     
       
@@ -1491,22 +1571,19 @@
     
     
       
-        
-        
-      
       
         
       
     
     
-    <li class="md-nav__item md-nav__item--active md-nav__item--section md-nav__item--nested">
+    <li class="md-nav__item md-nav__item--nested">
       
         
         
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_6" checked>
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_6" >
         
           
-          <label class="md-nav__link" for="__nav_6" id="__nav_6_label" tabindex="">
+          <label class="md-nav__link" for="__nav_6" id="__nav_6_label" tabindex="0">
             
   
   <span class="md-ellipsis">
@@ -1517,7 +1594,7 @@
             <span class="md-nav__icon md-icon"></span>
           </label>
         
-        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_6_label" aria-expanded="true">
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_6_label" aria-expanded="false">
           <label class="md-nav__title" for="__nav_6">
             <span class="md-nav__icon md-icon"></span>
             写入插件
@@ -1531,7 +1608,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../accesswriter/" class="md-nav__link">
+      <a href="../writer/accesswriter/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
@@ -1552,7 +1629,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../cassandrawriter/" class="md-nav__link">
+      <a href="../writer/cassandrawriter/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
@@ -1573,7 +1650,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../clickhousewriter/" class="md-nav__link">
+      <a href="../writer/clickhousewriter/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
@@ -1594,7 +1671,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../dbfwriter/" class="md-nav__link">
+      <a href="../writer/dbfwriter/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
@@ -1615,7 +1692,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../doriswriter/" class="md-nav__link">
+      <a href="../writer/doriswriter/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
@@ -1636,7 +1713,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../databendwriter/" class="md-nav__link">
+      <a href="../writer/databendwriter/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
@@ -1657,7 +1734,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../elasticsearchwriter/" class="md-nav__link">
+      <a href="../writer/elasticsearchwriter/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
@@ -1678,7 +1755,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../excelwriter/" class="md-nav__link">
+      <a href="../writer/excelwriter/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
@@ -1699,7 +1776,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../ftpwriter/" class="md-nav__link">
+      <a href="../writer/ftpwriter/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
@@ -1720,7 +1797,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../greenplumwriter/" class="md-nav__link">
+      <a href="../writer/greenplumwriter/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
@@ -1738,30 +1815,10 @@
                 
   
   
-    
   
   
-  
-    <li class="md-nav__item md-nav__item--active">
-      
-      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
-      
-      
-        
-      
-      
-        <label class="md-nav__link md-nav__link--active" for="__toc">
-          
-  
-  <span class="md-ellipsis">
-    HANA Writer
-  </span>
-  
-
-          <span class="md-nav__icon md-icon"></span>
-        </label>
-      
-      <a href="./" class="md-nav__link md-nav__link--active">
+    <li class="md-nav__item">
+      <a href="../writer/hanawriter/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
@@ -1770,59 +1827,6 @@
   
 
       </a>
-      
-        
-
-<nav class="md-nav md-nav--secondary" aria-label="目录">
-  
-  
-  
-    
-  
-  
-    <label class="md-nav__title" for="__toc">
-      <span class="md-nav__icon md-icon"></span>
-      目录
-    </label>
-    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
-      
-        <li class="md-nav__item">
-  <a href="#_1" class="md-nav__link">
-    <span class="md-ellipsis">
-      示例
-    </span>
-  </a>
-  
-    <nav class="md-nav" aria-label="示例">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#_2" class="md-nav__link">
-    <span class="md-ellipsis">
-      执行采集命令
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#_3" class="md-nav__link">
-    <span class="md-ellipsis">
-      参数说明
-    </span>
-  </a>
-  
-</li>
-      
-    </ul>
-  
-</nav>
-      
     </li>
   
 
@@ -1835,7 +1839,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../hbase11xsqlwriter/" class="md-nav__link">
+      <a href="../writer/hbase11xsqlwriter/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
@@ -1856,7 +1860,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../hbase11xwriter/" class="md-nav__link">
+      <a href="../writer/hbase11xwriter/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
@@ -1877,7 +1881,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../hbase20xsqlwriter/" class="md-nav__link">
+      <a href="../writer/hbase20xsqlwriter/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
@@ -1898,7 +1902,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../hdfswriter/" class="md-nav__link">
+      <a href="../writer/hdfswriter/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
@@ -1919,7 +1923,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../influxdbwriter/" class="md-nav__link">
+      <a href="../writer/influxdbwriter/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
@@ -1940,7 +1944,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../influxdb2writer/" class="md-nav__link">
+      <a href="../writer/influxdb2writer/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
@@ -1961,7 +1965,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../kafkawriter/" class="md-nav__link">
+      <a href="../writer/kafkawriter/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
@@ -1982,7 +1986,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../kuduwriter/" class="md-nav__link">
+      <a href="../writer/kuduwriter/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
@@ -2003,7 +2007,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../mongodbwriter/" class="md-nav__link">
+      <a href="../writer/mongodbwriter/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
@@ -2024,7 +2028,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../mysqlwriter/" class="md-nav__link">
+      <a href="../writer/mysqlwriter/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
@@ -2045,7 +2049,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../oraclewriter/" class="md-nav__link">
+      <a href="../writer/oraclewriter/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
@@ -2066,7 +2070,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../paimonwriter/" class="md-nav__link">
+      <a href="../writer/paimonwriter/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
@@ -2087,7 +2091,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../postgresqlwriter/" class="md-nav__link">
+      <a href="../writer/postgresqlwriter/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
@@ -2108,7 +2112,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../rdbmswriter/" class="md-nav__link">
+      <a href="../writer/rdbmswriter/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
@@ -2129,7 +2133,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../rediswriter/" class="md-nav__link">
+      <a href="../writer/rediswriter/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
@@ -2150,7 +2154,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../s3writer/" class="md-nav__link">
+      <a href="../writer/s3writer/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
@@ -2171,7 +2175,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../sqlitewriter/" class="md-nav__link">
+      <a href="../writer/sqlitewriter/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
@@ -2192,7 +2196,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../sqlserverwriter/" class="md-nav__link">
+      <a href="../writer/sqlserverwriter/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
@@ -2213,7 +2217,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../starrockswriter/" class="md-nav__link">
+      <a href="../writer/starrockswriter/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
@@ -2234,7 +2238,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../streamwriter/" class="md-nav__link">
+      <a href="../writer/streamwriter/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
@@ -2255,7 +2259,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../sybasewriter/" class="md-nav__link">
+      <a href="../writer/sybasewriter/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
@@ -2276,7 +2280,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../tdenginewriter/" class="md-nav__link">
+      <a href="../writer/tdenginewriter/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
@@ -2297,7 +2301,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../txtfilewriter/" class="md-nav__link">
+      <a href="../writer/txtfilewriter/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
@@ -2325,7 +2329,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../debug/" class="md-nav__link">
+      <a href="../debug/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
@@ -2345,7 +2349,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../encrypt_password/" class="md-nav__link">
+      <a href="../encrypt_password/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
@@ -2365,7 +2369,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../statsreport/" class="md-nav__link">
+      <a href="../statsreport/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
@@ -2385,7 +2389,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../transformer/" class="md-nav__link">
+      <a href="../transformer/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
@@ -2405,7 +2409,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../plugin_development/" class="md-nav__link">
+      <a href="../plugin_development/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
@@ -2445,19 +2449,37 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#_1" class="md-nav__link">
+  <a href="#_2" class="md-nav__link">
     <span class="md-ellipsis">
-      示例
+      命令行工具
     </span>
   </a>
   
-    <nav class="md-nav" aria-label="示例">
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_3" class="md-nav__link">
+    <span class="md-ellipsis">
+      使用方法
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_4" class="md-nav__link">
+    <span class="md-ellipsis">
+      参数
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="参数">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#_2" class="md-nav__link">
+  <a href="#params" class="md-nav__link">
     <span class="md-ellipsis">
-      执行采集命令
+      params 参数说明
     </span>
   </a>
   
@@ -2465,15 +2487,6 @@
         
       </ul>
     </nav>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#_3" class="md-nav__link">
-    <span class="md-ellipsis">
-      参数说明
-    </span>
-  </a>
   
 </li>
       
@@ -2492,88 +2505,108 @@
                   
 
 
-<h1 id="hana-writer">HANA Writer<a class="headerlink" href="#hana-writer" title="Permanent link">&para;</a></h1>
-<p>HANA Writer 插件实现了写入数据到 <a href="https://www.sap.com/products/hana.html">SAP HANA</a> 目的表的功能。</p>
-<h2 id="_1">示例<a class="headerlink" href="#_1" title="Permanent link">&para;</a></h2>
-<p>假定要写入的 HANA 表建表语句如下：</p>
-<div class="highlight"><pre><span></span><code><span class="k">create</span><span class="w"> </span><span class="k">table</span><span class="w"> </span><span class="k">system</span><span class="p">.</span><span class="n">addax_tbl</span>
-<span class="p">(</span>
-<span class="n">col1</span><span class="w"> </span><span class="nb">varchar</span><span class="p">(</span><span class="mi">200</span><span class="p">)</span><span class="w"> </span><span class="p">,</span>
-<span class="n">col2</span><span class="w"> </span><span class="nb">int</span><span class="p">(</span><span class="mi">4</span><span class="p">),</span>
-<span class="n">col3</span><span class="w"> </span><span class="nb">date</span><span class="p">,</span>
-<span class="n">col4</span><span class="w"> </span><span class="nb">boolean</span><span class="p">,</span>
-<span class="n">col5</span><span class="w"> </span><span class="k">clob</span>
-<span class="p">);</span>
+<h1 id="_1">命令行工具<a class="headerlink" href="#_1" title="Permanent link">&para;</a></h1>
+<p>这里介绍 <a href="https://github.com/wgzhao/Addax/blob/master/bin/addax.sh">addax.sh</a> 命令行工具的使用方法。</p>
+<h2 id="_2">命令行工具<a class="headerlink" href="#_2" title="Permanent link">&para;</a></h2>
+<p>Addax 提供了一个命令行工具 <code>addax.sh</code>，用于执行 Addax 作业。该工具位于 Addax 安装目录的 <code>bin</code> 目录下。</p>
+<h2 id="_3">使用方法<a class="headerlink" href="#_3" title="Permanent link">&para;</a></h2>
+<p>执行 Addax 作业的基本命令格式如下：</p>
+<div class="highlight"><pre><span></span><code>bin/addax.sh<span class="w"> </span>&lt;job_file&gt;
 </code></pre></div>
-<p>这里使用一份从内存产生到 HANA 导入的数据。</p>
-<div class="tabbed-set" data-tabs="1:1"><input checked="checked" id="__tabbed_1_1" name="__tabbed_1" type="radio" /><label for="__tabbed_1_1">job/hanawriter.json</label><div class="tabbed-content"></div>
-</div>
+<p>其中 <code>&lt;job_file&gt;</code> 是一个 JSON 格式的作业配置文件，包含了数据源的读取和写入配置。</p>
+<h2 id="_4">参数<a class="headerlink" href="#_4" title="Permanent link">&para;</a></h2>
+<p><code>addax.sh</code> 命令行工具支持以下参数：</p>
+<ul>
+<li><code>-h</code>, <code>--help</code>: 显示帮助信息。</li>
+<li><code>-v</code>, <code>--version</code>: 显示 Addax 的版本信息。</li>
+<li><code>-l</code>, <code>--log</code>: 指定日志文件路径，默认是在 <code>$ADDAX_HOME/log</code> 目录下。</li>
+<li><code>-d</code>, <code>--debug</code>: 启用调试模式，详见 <a href="docs/debug.md">调试模式</a>。</li>
+<li><code>-L</code>, <code>--log-level</code>: 设置日志级别，支持 <code>DEBUG</code>, <code>INFO</code>, <code>WARN</code>, <code>ERROR</code> 等级别，默认是 <code>INFO</code>。</li>
+<li><code>-j</code>, <code>--jvm</code>: 指定 JVM 参数，可以传递给 Java 虚拟机的参数。</li>
+<li><code>-p</code>, <code>--params</code> : 传递额外的参数给作业配置文件，可以在作业配置中使用 <code>${param}</code> 的方式引用这些参数。</li>
+</ul>
+<h3 id="params">params 参数说明<a class="headerlink" href="#params" title="Permanent link">&para;</a></h3>
+<p><code>-p</code>, <code>--params</code> 参数用来向设置某些配置任务的参数，使得作业配置文件可以更加灵活。可以在作业配置文件中使用 <code>${param}</code> 的方式引用这些参数。</p>
+<p>假定作业配置文件中有如下内容：</p>
 <div class="highlight"><pre><span></span><code><span class="p">{</span>
 <span class="w">  </span><span class="nt">&quot;job&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
-<span class="w">    </span><span class="nt">&quot;setting&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
-<span class="w">      </span><span class="nt">&quot;speed&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
-<span class="w">        </span><span class="nt">&quot;channel&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">1</span><span class="p">,</span>
-<span class="w">        </span><span class="nt">&quot;bytes&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">-1</span>
-<span class="w">      </span><span class="p">}</span>
+<span class="w">    </span><span class="nt">&quot;settings&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<span class="w">      </span><span class="nt">&quot;param1&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;${param1}&quot;</span><span class="p">,</span>
+<span class="w">      </span><span class="nt">&quot;param2&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;${param2}&quot;</span>
 <span class="w">    </span><span class="p">},</span>
 <span class="w">    </span><span class="nt">&quot;content&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
 <span class="w">      </span><span class="nt">&quot;reader&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
-<span class="w">        </span><span class="nt">&quot;name&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;streamreader&quot;</span><span class="p">,</span>
+<span class="w">        </span><span class="nt">&quot;name&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;mysqlreader&quot;</span><span class="p">,</span>
 <span class="w">        </span><span class="nt">&quot;parameter&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
-<span class="w">          </span><span class="nt">&quot;column&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span>
-<span class="w">            </span><span class="p">{</span>
-<span class="w">              </span><span class="nt">&quot;value&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;Addax&quot;</span><span class="p">,</span>
-<span class="w">              </span><span class="nt">&quot;type&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;string&quot;</span>
-<span class="w">            </span><span class="p">},</span>
-<span class="w">            </span><span class="p">{</span>
-<span class="w">              </span><span class="nt">&quot;value&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">19880808</span><span class="p">,</span>
-<span class="w">              </span><span class="nt">&quot;type&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;long&quot;</span>
-<span class="w">            </span><span class="p">},</span>
-<span class="w">            </span><span class="p">{</span>
-<span class="w">              </span><span class="nt">&quot;value&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;1988-08-08 08:08:08&quot;</span><span class="p">,</span>
-<span class="w">              </span><span class="nt">&quot;type&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;date&quot;</span>
-<span class="w">            </span><span class="p">},</span>
-<span class="w">            </span><span class="p">{</span>
-<span class="w">              </span><span class="nt">&quot;value&quot;</span><span class="p">:</span><span class="w"> </span><span class="kc">true</span><span class="p">,</span>
-<span class="w">              </span><span class="nt">&quot;type&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;bool&quot;</span>
-<span class="w">            </span><span class="p">},</span>
-<span class="w">            </span><span class="p">{</span>
-<span class="w">              </span><span class="nt">&quot;value&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;test&quot;</span><span class="p">,</span>
-<span class="w">              </span><span class="nt">&quot;type&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;bytes&quot;</span>
-<span class="w">            </span><span class="p">}</span>
-<span class="w">          </span><span class="p">],</span>
-<span class="w">          </span><span class="nt">&quot;sliceRecordCount&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">1000</span>
+<span class="w">          </span><span class="nt">&quot;username&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;${username}&quot;</span><span class="p">,</span>
+<span class="w">          </span><span class="nt">&quot;password&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;${password}&quot;</span>
 <span class="w">        </span><span class="p">}</span>
 <span class="w">      </span><span class="p">},</span>
 <span class="w">      </span><span class="nt">&quot;writer&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
-<span class="w">        </span><span class="nt">&quot;name&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;hanawriter&quot;</span><span class="p">,</span>
+<span class="w">        </span><span class="nt">&quot;name&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;mysqlwriter&quot;</span><span class="p">,</span>
 <span class="w">        </span><span class="nt">&quot;parameter&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
-<span class="w">          </span><span class="nt">&quot;connection&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span>
-<span class="w">            </span><span class="p">{</span>
-<span class="w">              </span><span class="nt">&quot;jdbcUrl&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;jdbc:sap://wgzhao-pc:39017/system&quot;</span><span class="p">,</span>
-<span class="w">              </span><span class="nt">&quot;table&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span>
-<span class="w">                </span><span class="s2">&quot;addax_tbl&quot;</span>
-<span class="w">              </span><span class="p">]</span>
-<span class="w">            </span><span class="p">}</span>
-<span class="w">          </span><span class="p">],</span>
-<span class="w">          </span><span class="nt">&quot;username&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;system&quot;</span><span class="p">,</span>
-<span class="w">          </span><span class="nt">&quot;password&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;HXEHana1&quot;</span><span class="p">,</span>
-<span class="w">          </span><span class="nt">&quot;column&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span>
-<span class="w">            </span><span class="s2">&quot;*&quot;</span>
-<span class="w">          </span><span class="p">]</span>
+<span class="w">          </span><span class="nt">&quot;username&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;${username}&quot;</span><span class="p">,</span>
+<span class="w">          </span><span class="nt">&quot;password&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;${password}&quot;</span>
 <span class="w">        </span><span class="p">}</span>
 <span class="w">      </span><span class="p">}</span>
 <span class="w">    </span><span class="p">}</span>
 <span class="w">  </span><span class="p">}</span>
 <span class="p">}</span>
 </code></pre></div>
-<p>将上述配置文件保存为 <code>job/hana2stream.json</code></p>
-<h3 id="_2">执行采集命令<a class="headerlink" href="#_2" title="Permanent link">&para;</a></h3>
-<p>执行以下命令进行数据采集</p>
-<div class="highlight"><pre><span></span><code>bin/addax.sh<span class="w"> </span>job/hana2stream.json
+<p>执行命令时，可以使用 <code>-p</code> 参数传递参数：</p>
+<div class="highlight"><pre><span></span><code>bin/addax.sh<span class="w"> </span>job/test.json<span class="w"> </span>-p<span class="w"> </span><span class="s2">&quot;-Dusername=root -Dpassword=123456 -Dparam1=value1 -Dparam2=value2&quot;</span>
 </code></pre></div>
-<h2 id="_3">参数说明<a class="headerlink" href="#_3" title="Permanent link">&para;</a></h2>
-<p>该插件基于 <a href="../rdbmswriter">RDBMS Writer</a> 实现，因此可以参考 RDBMS Writer 的所有配置项。</p>
+<p>为了方便使用，程序内置了部分常见时间变量，可以直接。假定当前时间是 <code>2025-07-16 12:13:14</code>，下面列出可以直接使用的变量以及变量值：</p>
+<table>
+<thead>
+<tr>
+<th>变量名</th>
+<th>变量值</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>${curr_date_short}</code></td>
+<td><code>20250716</code></td>
+</tr>
+<tr>
+<td><code>${curr_date_dash}</code></td>
+<td><code>2025-07-16</code></td>
+</tr>
+<tr>
+<td><code>$curr_datetime_short}</code></td>
+<td><code>20250716121314</code></td>
+</tr>
+<tr>
+<td><code>${curr_datetime_dash}</code></td>
+<td><code>2025-07-16 12:13:14</code></td>
+</tr>
+<tr>
+<td><code>${biz_date_short}</code></td>
+<td><code>20250715</code></td>
+</tr>
+<tr>
+<td><code>${biz_date_dash}</code></td>
+<td><code>2025-07-15</code></td>
+</tr>
+<tr>
+<td><code>${biz_datetime_short}</code></td>
+<td><code>20250715121314</code></td>
+</tr>
+<tr>
+<td><code>${biz_datetime_dash}</code></td>
+<td><code>2025-07-15 12:13:14</code></td>
+</tr>
+<tr>
+<td><code>${biz_datetime_0_short}</code></td>
+<td><code>20250715000000</code></td>
+</tr>
+<tr>
+<td><code>${biz_datetime_0_dash}</code></td>
+<td><code>2025-07-15 00:00:00</code></td>
+</tr>
+</tbody>
+</table>
 
 
 
@@ -2611,7 +2644,7 @@
       <nav class="md-footer__inner md-grid" aria-label="页脚" >
         
           
-          <a href="../greenplumwriter/" class="md-footer__link md-footer__link--prev" aria-label="上一页: Greenplum Writer">
+          <a href="../setupJob/" class="md-footer__link md-footer__link--prev" aria-label="上一页: 任务配置">
             <div class="md-footer__button md-icon">
               
               <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11h12Z"/></svg>
@@ -2621,20 +2654,20 @@
                 上一页
               </span>
               <div class="md-ellipsis">
-                Greenplum Writer
+                任务配置
               </div>
             </div>
           </a>
         
         
           
-          <a href="../hbase11xsqlwriter/" class="md-footer__link md-footer__link--next" aria-label="下一页: HBase11x SQL Writer">
+          <a href="../reader/accessreader/" class="md-footer__link md-footer__link--next" aria-label="下一页: Access Reader">
             <div class="md-footer__title">
               <span class="md-footer__direction">
                 下一页
               </span>
               <div class="md-ellipsis">
-                HBase11x SQL Writer
+                Access Reader
               </div>
             </div>
             <div class="md-footer__button md-icon">
@@ -2698,10 +2731,10 @@
     </div>
     
     
-    <script id="__config" type="application/json">{"base": "../..", "features": ["announce.dismiss", "content.action.edit", "content.action.view", "content.code.annotate", "content.code.copy", "content.tooltips", "navigation.footer", "navigation.indexes", "navigation.sections", "navigation.tabs", "navigation.tabs.sticky", "navigation.top", "navigation.tracking", "search.highlight", "search.share", "search.suggest", "toc.follow"], "search": "../../assets/javascripts/workers/search.b8dbb3d2.min.js", "translations": {"clipboard.copied": "\u5df2\u590d\u5236", "clipboard.copy": "\u590d\u5236", "search.result.more.one": "\u5728\u8be5\u9875\u4e0a\u8fd8\u6709 1 \u4e2a\u7b26\u5408\u6761\u4ef6\u7684\u7ed3\u679c", "search.result.more.other": "\u5728\u8be5\u9875\u4e0a\u8fd8\u6709 # \u4e2a\u7b26\u5408\u6761\u4ef6\u7684\u7ed3\u679c", "search.result.none": "\u6ca1\u6709\u627e\u5230\u7b26\u5408\u6761\u4ef6\u7684\u7ed3\u679c", "search.result.one": "\u627e\u5230 1 \u4e2a\u7b26\u5408\u6761\u4ef6\u7684\u7ed3\u679c", "search.result.other": "# \u4e2a\u7b26\u5408\u6761\u4ef6\u7684\u7ed3\u679c", "search.result.placeholder": "\u952e\u5165\u4ee5\u5f00\u59cb\u641c\u7d22", "search.result.term.missing": "\u7f3a\u5c11", "select.version": "\u9009\u62e9\u5f53\u524d\u7248\u672c"}, "version": {"provider": "mike"}}</script>
+    <script id="__config" type="application/json">{"base": "..", "features": ["announce.dismiss", "content.action.edit", "content.action.view", "content.code.annotate", "content.code.copy", "content.tooltips", "navigation.footer", "navigation.indexes", "navigation.sections", "navigation.tabs", "navigation.tabs.sticky", "navigation.top", "navigation.tracking", "search.highlight", "search.share", "search.suggest", "toc.follow"], "search": "../assets/javascripts/workers/search.b8dbb3d2.min.js", "translations": {"clipboard.copied": "\u5df2\u590d\u5236", "clipboard.copy": "\u590d\u5236", "search.result.more.one": "\u5728\u8be5\u9875\u4e0a\u8fd8\u6709 1 \u4e2a\u7b26\u5408\u6761\u4ef6\u7684\u7ed3\u679c", "search.result.more.other": "\u5728\u8be5\u9875\u4e0a\u8fd8\u6709 # \u4e2a\u7b26\u5408\u6761\u4ef6\u7684\u7ed3\u679c", "search.result.none": "\u6ca1\u6709\u627e\u5230\u7b26\u5408\u6761\u4ef6\u7684\u7ed3\u679c", "search.result.one": "\u627e\u5230 1 \u4e2a\u7b26\u5408\u6761\u4ef6\u7684\u7ed3\u679c", "search.result.other": "# \u4e2a\u7b26\u5408\u6761\u4ef6\u7684\u7ed3\u679c", "search.result.placeholder": "\u952e\u5165\u4ee5\u5f00\u59cb\u641c\u7d22", "search.result.term.missing": "\u7f3a\u5c11", "select.version": "\u9009\u62e9\u5f53\u524d\u7248\u672c"}, "version": {"provider": "mike"}}</script>
     
     
-      <script src="../../assets/javascripts/bundle.081f42fc.min.js"></script>
+      <script src="../assets/javascripts/bundle.081f42fc.min.js"></script>
       
     
   </body>
