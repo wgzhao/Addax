@@ -10,7 +10,7 @@ copyright: Copyright &copy; 2019 - 2025 Steven Zhao
 theme:
   name: material
   custom_dir: overrides
-  language: zh
+  language: en
   logo: images/logo.png
   favicon: images/favicon.ico
   icon:
@@ -58,19 +58,52 @@ theme:
     - toc.follow
     # - toc.integrate
 
+plugins:
+  - search
+  - i18n:
+      docs_structure: suffix
+      fallback_to_default: true
+      reconfigure_material: true
+      reconfigure_search: true
+      languages:
+        - locale: en
+          default: true
+          name: English
+          build: true
+        - locale: zh
+          name: 中文
+          build: true
+          nav_translations:
+            Home: 首页
+            Quick Start: 快速开始
+            Job Configuration: 任务配置
+            Command Line: 命令行工具
+            Reader Plugins: 读取插件
+            Writer Plugins: 写入插件
+            Debug: 调试模式
+            Password Encryption: 密码加密
+            Statistics Report: 统计报告
+            Transformer: 数据转换
+            Plugin Development: 插件开发
+
 nav:
   - Home: index.md
-  - quickstart.md
-  - setupJob.md
-  - commandline.md
-  - 读取插件:
-      - reader/accessreader.md
+  - Quick Start: quickstart.md
+  - Job Configuration: setupJob.md
+  - Command Line: commandline.md
+  - Reader Plugins:
+      - reader/mysqlreader.md
+      - reader/postgresqlreader.md
+      - reader/oraclereader.md
+      - reader/rdbmsreader.md
+      - reader/txtfilereader.md
+      - reader/elasticsearchreader.md
+      - reader/mongodbereader.md
       - reader/cassandrareader.md
       - reader/clickhousereader.md
       - reader/databendreader.md
       - reader/datareader.md
       - reader/dbfreader.md
-      - reader/elasticsearchreader.md
       - reader/excelreader.md
       - reader/ftpreader.md
       - reader/hanareader.md
@@ -86,11 +119,6 @@ nav:
       - reader/jsonfilereader.md
       - reader/kafkareader.md
       - reader/kudureader.md
-      - reader/mongodbreader.md
-      - reader/mysqlreader.md
-      - reader/oraclereader.md
-      - reader/postgresqlreader.md
-      - reader/rdbmsreader.md
       - reader/redisreader.md
       - reader/s3reader.md
       - reader/sqlitereader.md
@@ -98,16 +126,20 @@ nav:
       - reader/streamreader.md
       - reader/sybasereader.md
       - reader/tdenginereader.md
-      - reader/txtfilereader.md
 
-  - 写入插件:
-      - writer/accesswriter.md
+  - Writer Plugins:
+      - writer/mysqlwriter.md
+      - writer/postgresqlwriter.md
+      - writer/oraclewriter.md
+      - writer/rdbmswriter.md
+      - writer/txtfilewriter.md
+      - writer/elasticsearchwriter.md
+      - writer/mongodbwriter.md
       - writer/cassandrawriter.md
       - writer/clickhousewriter.md
+      - writer/databendwriter.md
       - writer/dbfwriter.md
       - writer/doriswriter.md
-      - writer/databendwriter.md
-      - writer/elasticsearchwriter.md
       - writer/excelwriter.md
       - writer/ftpwriter.md
       - writer/greenplumwriter.md
@@ -120,12 +152,7 @@ nav:
       - writer/influxdb2writer.md
       - writer/kafkawriter.md
       - writer/kuduwriter.md
-      - writer/mongodbwriter.md
-      - writer/mysqlwriter.md
-      - writer/oraclewriter.md
       - writer/paimonwriter.md
-      - writer/postgresqlwriter.md
-      - writer/rdbmswriter.md
       - writer/rediswriter.md
       - writer/s3writer.md
       - writer/sqlitewriter.md
@@ -134,12 +161,11 @@ nav:
       - writer/streamwriter.md
       - writer/sybasewriter.md
       - writer/tdenginewriter.md
-      - writer/txtfilewriter.md
-  - debug.md
-  - encrypt_password.md
-  - statsreport.md
-  - transformer.md
-  - plugin_development.md
+  - Debug: debug.md
+  - Password Encryption: encrypt_password.md
+  - Statistics Report: statsreport.md
+  - Transformer: transformer.md
+  - Plugin Development: plugin_development.md
 
 extra:
   version:
