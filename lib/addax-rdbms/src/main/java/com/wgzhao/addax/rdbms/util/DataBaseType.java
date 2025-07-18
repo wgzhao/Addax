@@ -35,6 +35,7 @@ public enum DataBaseType
     ClickHouse("clickhouse", "com.clickhouse.jdbc.ClickHouseDriver"),
     SQLite("sqlite", "org.sqlite.JDBC"),
     SQLServer("sqlserver", "com.microsoft.sqlserver.jdbc.SQLServerDriver"),
+    GaussDB("gaussdb", "com.huawei.gaussdb.jdbc.Driver"),
     PostgreSQL("postgresql", "org.postgresql.Driver"),
     RDBMS("rdbms", DataBaseType.class.getName()),
     RDBMS_READER("rdbms_reader", DataBaseType.class.getName()),
