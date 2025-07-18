@@ -6,7 +6,7 @@
 
 Addax 运行一个任务的大致流程如下：
 
-![addax-flowchart](./images/addax-flowchart.png)
+![addax-flowchart](../images/addax-flowchart.png)
 
 启动步骤为：
 

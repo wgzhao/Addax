@@ -12,7 +12,7 @@ social:
 
 Addax is a heterogeneous data source offline synchronization tool originally derived from Alibaba's [DataX](https://github.com/alibaba/datax), dedicated to implementing stable and efficient data synchronization between various heterogeneous data sources including relational databases (MySQL, Oracle, etc.), HDFS, Hive, HBase, FTP, and more.
 
-![addax why new](images/addax_why_new.png)
+![addax why new](../images/addax_why_new.png)
 
 To solve the problem of heterogeneous data source synchronization, Addax transforms complex network synchronization links into star-shaped data links. Addax serves as the intermediate transmission carrier responsible for connecting various data sources. When a new data source needs to be integrated, you only need to connect this data source to Addax to achieve seamless data synchronization with existing data sources.
 
