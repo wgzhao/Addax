@@ -26,8 +26,8 @@ print_error() {
 }
 
 # Test configurations
-configs=("mkdocs.yml" "mkdocs-en.yml" "mkdocs-zh.yml")
-config_names=("Main (English default)" "English" "Chinese")
+configs=("mkdocs.yml" "mkdocs-en.yml" "mkdocs-zh.yml" "mkdocs-en-dev.yml" "mkdocs-zh-dev.yml")
+config_names=("Main (English default)" "English Production" "Chinese Production" "English Development" "Chinese Development")
 
 # Test each configuration
 for i in "${!configs[@]}"; do

@@ -1,5 +1,10 @@
 #!/bin/bash
 # build-docs.sh - Comprehensive documentation build script for Addax
+#
+# This script builds the PRODUCTION version of the documentation.
+# For LOCAL DEVELOPMENT, use:
+#   mkdocs serve --config-file mkdocs-en-dev.yml  (English)
+#   mkdocs serve --config-file mkdocs-zh-dev.yml  (Chinese)
 
 set -e
 

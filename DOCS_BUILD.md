@@ -99,23 +99,41 @@ Addax/
 
 ## Configuration Files
 
-### Main Configuration (`mkdocs.yml`)
+### Development Configurations (Recommended for Local Development)
+
+#### English Development (`mkdocs-en-dev.yml`)
+- **Purpose**: Local English documentation development
+- **Docs Directory**: `docs/en`
+- **Output Directory**: `site/` (root level)
+- **URL**: Serves at `http://localhost:8000/`
+- **Features**: No versioning complexity, simplified for development
+
+#### Chinese Development (`mkdocs-zh-dev.yml`)
+- **Purpose**: Local Chinese documentation development
+- **Docs Directory**: `docs/zh`
+- **Output Directory**: `site/` (root level) 
+- **URL**: Serves at `http://localhost:8000/`
+- **Features**: No versioning complexity, simplified for development
+
+### Production Configurations
+
+#### Main Configuration (`mkdocs.yml`)
 - **Purpose**: Default configuration serving English documentation
 - **Docs Directory**: `docs/en`
 - **Output Directory**: `site/`
 - **Language**: English (`en`)
 
-### English Configuration (`mkdocs-en.yml`)
-- **Purpose**: Explicit English documentation build
+#### English Production (`mkdocs-en.yml`)
+- **Purpose**: Production English documentation build
 - **Docs Directory**: `docs/en`
 - **Output Directory**: `site/en/`
-- **Features**: English navigation, metadata, and content
+- **Features**: English navigation, metadata, versioning support
 
-### Chinese Configuration (`mkdocs-zh.yml`)
-- **Purpose**: Chinese documentation build
+#### Chinese Production (`mkdocs-zh.yml`)
+- **Purpose**: Production Chinese documentation build
 - **Docs Directory**: `docs/zh`
 - **Output Directory**: `site/zh/`
-- **Features**: Chinese navigation (中文导航), metadata, and content
+- **Features**: Chinese navigation (中文导航), metadata, versioning support
 
 ## Building Documentation
 
@@ -198,24 +216,44 @@ rsync -av site/zh/ user@server:/var/www/docs/zh/
 
 ### Local Development Server
 
-#### English Documentation
+#### 🚀 Recommended: Use Development Configurations
+
+For **English documentation development**:
 ```bash
-# Start English development server
+# Development config - serves at root level
+mkdocs serve --config-file mkdocs-en-dev.yml
+# Visit: http://localhost:8000/
+```
+
+For **Chinese documentation development**:
+```bash
+# Development config - serves at root level
+mkdocs serve --config-file mkdocs-zh-dev.yml  
+# Visit: http://localhost:8000/
+```
+
+#### Production-like Testing
+
+For **English documentation** (production-like):
+```bash
+# Production config - serves with subdirectory
 mkdocs serve --config-file mkdocs-en.yml
-
-# Or use main config (defaults to English)
-mkdocs serve
-
-# Access at: http://127.0.0.1:8000
+# Visit: http://localhost:8000/Addax/en/
 ```
 
-#### Chinese Documentation
+For **Chinese documentation** (production-like):
 ```bash
-# Start Chinese development server
+# Production config - serves with subdirectory  
 mkdocs serve --config-file mkdocs-zh.yml
-
-# Access at: http://127.0.0.1:8000
+# Visit: http://localhost:8000/Addax/zh/
 ```
+
+#### ⚠️ Important Note about `/latest` URLs
+
+- **Development configs** serve at root level - no `/latest` path needed
+- **Production configs** serve with subdirectories - `/latest` is Mike versioning concept
+- When using `mkdocs-en-dev.yml`, visit `http://localhost:8000/` directly
+- When using `mkdocs-en.yml`, visit `http://localhost:8000/Addax/en/`
 
 #### Custom Port/Host
 ```bash
@@ -451,6 +489,31 @@ echo "All documentation builds passed!"
 ## Troubleshooting
 
 ### Common Issues
+
+#### Development Server Issues
+
+**Problem**: Visiting `/latest` shows Chinese documentation instead of English
+```bash
+# ❌ Wrong - Using production config with versioning paths
+mkdocs serve --config-file mkdocs-en.yml
+# Visit http://localhost:8000/latest ← Shows wrong content
+
+# ✅ Solution - Use development config  
+mkdocs serve --config-file mkdocs-en-dev.yml
+# Visit http://localhost:8000/ ← Shows correct English content
+```
+
+**Problem**: Server serves content at subdirectory path
+```bash
+# Issue: http://localhost:8000/Addax/en/ instead of http://localhost:8000/
+# Solution: Use development configs (-dev.yml) for local development
+```
+
+**Problem**: `/latest` URL returns 404 in development
+```bash
+# Expected behavior with development configs
+# Use root URL instead: http://localhost:8000/
+```
 
 #### Build Errors
 ```bash
