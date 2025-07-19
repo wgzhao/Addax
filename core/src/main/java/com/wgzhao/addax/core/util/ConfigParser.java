@@ -107,7 +107,7 @@ public final class ConfigParser
 
     /**
      * Upgrade the new job format to the old one
-     * 1. the content of job.json is a map instead of list of map
+     * 1. The content of job.json is a map instead of list of a map
      *
      * @param configuration {@link Configuration}
      */

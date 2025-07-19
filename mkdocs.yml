@@ -62,6 +62,7 @@ nav:
   - Home: index.md
   - quickstart.md
   - setupJob.md
+  - commandline.md
   - 读取插件:
       - reader/accessreader.md
       - reader/cassandrareader.md
