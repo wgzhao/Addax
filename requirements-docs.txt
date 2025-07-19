@@ -1,0 +1,18 @@
+# Documentation build dependencies for Addax project
+# Install with: pip install -r requirements-docs.txt
+
+# Core MkDocs
+mkdocs>=1.4.0
+
+# Material theme
+mkdocs-material>=9.0.0
+
+# Extensions
+pymdown-extensions>=9.0
+
+# Additional useful plugins
+mkdocs-minify-plugin>=0.6.0
+mkdocs-redirects>=1.2.0
+
+# For development/testing
+mkdocs-linkcheck>=1.0.0

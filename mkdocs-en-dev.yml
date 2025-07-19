@@ -1,6 +1,6 @@
 site_name: Addax Documentation
 site_description: Addax is an open source universal ETL tool that supports most of those RDBMS and NoSQLs on the planet
-site_url: https://wgzhao.github.io/Addax/
+# No site_url for local development - serves at root level
 site_author: Steven Zhao
 repo_name: wgzhao/addax
 repo_url: https://github.com/wgzhao/Addax
@@ -149,8 +149,6 @@ nav:
   - Plugin Development: plugin_development.md
 
 extra:
-  version:
-    provider: mike
   social:
     - icon: fontawesome/brands/twitter
       link: https://twitter.com/mlsx
@@ -159,13 +157,7 @@ extra:
   analytics:
     provider: google
     property: G-J252L4LHDX
-  alternate:
-    - name: English
-      link: /
-      lang: en
-    - name: 中文
-      link: /zh/
-      lang: zh
+  # No alternate languages for development - keeps it simple
 
 # Extensions
 markdown_extensions:

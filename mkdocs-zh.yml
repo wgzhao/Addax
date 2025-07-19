@@ -1,6 +1,6 @@
 site_name: Addax Documentation
-site_description: Addax is an open source universal ETL tool that supports most of those RDBMS and NoSQLs on the planet
-site_url: https://wgzhao.github.io/Addax/
+site_description: Addax 是一个开源的通用 ETL 工具，支持地球上大多数 RDBMS 和 NoSQL 数据库
+site_url: https://wgzhao.github.io/Addax/zh/
 site_author: Steven Zhao
 repo_name: wgzhao/addax
 repo_url: https://github.com/wgzhao/Addax
@@ -10,7 +10,7 @@ copyright: Copyright &copy; 2019 - 2025 Steven Zhao
 theme:
   name: material
   custom_dir: overrides
-  language: en
+  language: zh
   logo: images/logo.png
   favicon: images/favicon.ico
   icon:
@@ -58,18 +58,18 @@ theme:
     - toc.follow
     # - toc.integrate
 
-docs_dir: docs/en
-site_dir: site
+docs_dir: docs/zh
+site_dir: site/zh
 
 plugins:
   - search
 
 nav:
-  - Home: index.md
-  - Quick Start: quickstart.md
-  - Job Configuration: setupJob.md
-  - Command Line: commandline.md
-  - Reader Plugins:
+  - 首页: index.md
+  - 快速开始: quickstart.md
+  - 任务配置: setupJob.md
+  - 命令行工具: commandline.md
+  - 读取插件:
       - reader/accessreader.md
       - reader/mysqlreader.md
       - reader/postgresqlreader.md
@@ -106,7 +106,7 @@ nav:
       - reader/sybasereader.md
       - reader/tdenginereader.md
 
-  - Writer Plugins:
+  - 写入插件:
       - writer/accesswriter.md
       - writer/mysqlwriter.md
       - writer/postgresqlwriter.md
@@ -142,11 +142,11 @@ nav:
       - writer/streamwriter.md
       - writer/sybasewriter.md
       - writer/tdenginewriter.md
-  - Debug: debug.md
-  - Password Encryption: encrypt_password.md
-  - Statistics Report: statsreport.md
-  - Transformer: transformer.md
-  - Plugin Development: plugin_development.md
+  - 调试模式: debug.md
+  - 密码加密: encrypt_password.md
+  - 统计报告: statsreport.md
+  - 数据转换: transformer.md
+  - 插件开发: plugin_development.md
 
 extra:
   version:
@@ -161,7 +161,7 @@ extra:
     property: G-J252L4LHDX
   alternate:
     - name: English
-      link: /
+      link: /en/
       lang: en
     - name: 中文
       link: /zh/
