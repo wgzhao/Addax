@@ -71,7 +71,7 @@ public class StarRocksWriterManager
                 if (!closed) {
                     try {
                         String label = createBatchLabel();
-                        LOG.info(String.format("StarRocks interval Sinking triggered: label[%s].", label));
+                        LOG.info("StarRocks interval Sinking triggered: label[{}].", label);
                         if (batchCount == 0) {
                             startScheduler();
                         }
@@ -104,7 +104,7 @@ public class StarRocksWriterManager
             batchSize += bts.length;
             if (batchCount >= writerOptions.getBatchRows() || batchSize >= writerOptions.getBatchSize()) {
                 String label = createBatchLabel();
-                LOG.debug(String.format("StarRocks buffer Sinking triggered: rows[%d] label[%s].", batchCount, label));
+                LOG.debug("StarRocks buffer Sinking triggered: rows[{}] label[{}].", batchCount, label);
                 flush(label, false);
             }
         }
@@ -140,7 +140,7 @@ public class StarRocksWriterManager
             try {
                 String label = createBatchLabel();
                 if (batchCount > 0) {
-                    LOG.debug(String.format("StarRocks Sink is about to close: label[%s].", label));
+                    LOG.debug("StarRocks Sink is about to close: label[{}].", label);
                 }
                 flush(label, true);
             }
@@ -176,7 +176,7 @@ public class StarRocksWriterManager
     private void waitAsyncFlushingDone()
             throws InterruptedException
     {
-        // wait previous flushings
+        // wait previous flushing
         for (int i = 0; i <= writerOptions.getFlushQueueLength(); i++) {
             flushQueue.put(new StarRocksFlushTuple("", 0L, null));
         }
@@ -191,12 +191,11 @@ public class StarRocksWriterManager
             return;
         }
         stopScheduler();
-        LOG.debug(String.format("Async stream load: rows[%d] bytes[%d] label[%s].", flushData.getRows().size(), flushData.getBytes(), flushData.getLabel()));
         for (int i = 0; i <= writerOptions.getMaxRetries(); i++) {
             try {
-                // flush to StarRocks with stream load
+                // flush to StarRocks with a stream load
                 starrocksStreamLoadVisitor.doStreamLoad(flushData);
-                LOG.info(String.format("Async stream load finished: label[%s].", flushData.getLabel()));
+                LOG.info("Async stream load finished: label[{}].", flushData.getLabel());
                 startScheduler();
                 break;
             }
@@ -207,7 +206,7 @@ public class StarRocksWriterManager
                 }
                 if (e instanceof StarRocksStreamLoadFailedException && ((StarRocksStreamLoadFailedException) e).needReCreateLabel()) {
                     String newLabel = createBatchLabel();
-                    LOG.warn(String.format("Batch label changed from [%s] to [%s]", flushData.getLabel(), newLabel));
+                    LOG.warn("Batch label changed from [{}] to [{}]", flushData.getLabel(), newLabel);
                     flushData.setLabel(newLabel);
                 }
                 try {
