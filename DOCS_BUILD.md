@@ -1,51 +1,46 @@
-# Comprehensive Guide: Building Addax Multi-Language Documentation
+# Addax Documentation Build Guide (Single Configuration)
 
-This repository supports bilingual documentation (English and Chinese) using MkDocs Material's native multi-language approach. This guide provides complete instructions for setting up, building, and maintaining the documentation.
+This guide provides comprehensive instructions for building and deploying the Addax multi-language documentation using a **single `mkdocs.yml` configuration file**.
+
+## 🌟 Single Configuration Approach
+
+As requested in the project feedback, we now use **one unified `mkdocs.yml`** file that:
+- Defaults to English (`docs/en/` → `site/`)
+- Supports Chinese through dynamic configuration (`docs/zh/` → `site/zh/`)
+- Maintains language switching via `extra.alternate`
+- Eliminates multiple config file maintenance
 
 ## Table of Contents
 
 - [Prerequisites](#prerequisites)
-- [Installation & Setup](#installation--setup)
 - [Directory Structure](#directory-structure)
-- [Configuration Files](#configuration-files)
-- [Building Documentation](#building-documentation)
-- [Development Workflow](#development-workflow)
-- [Deployment](#deployment)
-- [Language Switching](#language-switching)
-- [Asset Management](#asset-management)
-- [Testing & Validation](#testing--validation)
+- [Quick Start](#quick-start)
+- [Detailed Build Commands](#detailed-build-commands)
+- [Deployment Strategies](#deployment-strategies)
+- [Configuration Details](#configuration-details)
+- [Testing and Validation](#testing--validation)
 - [Troubleshooting](#troubleshooting)
-- [Contributing](#contributing)
+- [Development Workflow](#development-workflow)
+- [Key Advantages](#key-advantages)
 
 ## Prerequisites
 
-Before building the documentation, ensure you have the following installed:
-
 ### Required Software
-- **Python 3.8+** - Check with `python --version`
-- **pip** - Python package manager
-- **Git** - For version control
-
-### Install MkDocs and Dependencies
 ```bash
+# Install Python 3.7+
+python3 --version
+
 # Install MkDocs and Material theme
 pip install mkdocs mkdocs-material
 
-# Install additional dependencies
-pip install pymdown-extensions mkdocs-minify-plugin
-```
-
-### Verify Installation
-```bash
+# Verify installation
 mkdocs --version
 ```
 
-## Installation & Setup
-
-### 1. Clone the Repository
+### Optional Dependencies
 ```bash
-git clone https://github.com/wgzhao/Addax.git
-cd Addax
+# For enhanced build automation
+pip install -r requirements-docs.txt
 ```
 
 ### 2. Install Documentation Dependencies
@@ -53,563 +48,342 @@ cd Addax
 # Using pip
 pip install -r requirements-docs.txt
 
-# Or install manually
-pip install mkdocs mkdocs-material pymdown-extensions
-```
-
-### 3. Verify Setup
-```bash
-# Test English documentation
-mkdocs serve --config-file mkdocs-en.yml
-
-# Test Chinese documentation  
-mkdocs serve --config-file mkdocs-zh.yml
-```
-
-## Directory Structure
-
-The documentation follows this organized structure:
+## 📁 Directory Structure
 
 ```
 Addax/
+├── mkdocs.yml              # Single configuration file (English default)
+├── build-docs.sh           # Automated build script
+├── test-docs.sh           # Testing script
+├── requirements-docs.txt   # Documentation dependencies
 ├── docs/
-│   ├── en/                    # English documentation
-│   │   ├── index.md          # English homepage
-│   │   ├── quickstart.md     # English quick start
-│   │   ├── reader/           # English reader plugins
-│   │   └── writer/           # English writer plugins
-│   ├── zh/                    # Chinese documentation (中文文档)
-│   │   ├── index.md          # Chinese homepage
-│   │   ├── quickstart.md     # Chinese quick start
-│   │   ├── reader/           # Chinese reader plugins
-│   │   └── writer/           # Chinese writer plugins
-│   ├── assets/               # Shared assets (JSON configs, etc.)
-│   │   └── jobs/            # Job configuration examples
-│   └── images/              # Shared images and media
-│       ├── logo.png         # Project logo
-│       └── favicon.ico      # Site favicon
-├── mkdocs.yml               # Main config (defaults to English)
-├── mkdocs-en.yml           # English-specific configuration
-├── mkdocs-zh.yml           # Chinese-specific configuration
-└── site/                   # Generated documentation output
-    ├── index.html          # English homepage (root)
-    ├── en/                 # English version
-    └── zh/                 # Chinese version
+│   ├── en/                # English documentation (default)
+│   │   ├── index.md
+│   │   ├── quickstart.md
+│   │   ├── reader/        # Reader plugins
+│   │   └── writer/        # Writer plugins
+│   ├── zh/                # Chinese documentation
+│   │   ├── index.md
+│   │   ├── quickstart.md
+│   │   ├── reader/        # 读取插件
+│   │   └── writer/        # 写入插件
+│   ├── assets/            # Shared assets
+│   └── images/            # Shared images
+└── site/                  # Generated documentation
+    ├── index.html         # English site (default)
+    └── zh/                # Chinese site subdirectory
+        └── index.html
 ```
 
-## Configuration Files
+## 🚀 Quick Start
 
-### Development Configurations (Recommended for Local Development)
+### 1. Build All Documentation
+```bash
+# Automated build (recommended)
+./build-docs.sh
 
-#### English Development (`mkdocs-en-dev.yml`)
-- **Purpose**: Local English documentation development
-- **Docs Directory**: `docs/en`
-- **Output Directory**: `site/` (root level)
-- **URL**: Serves at `http://localhost:8000/`
-- **Features**: No versioning complexity, simplified for development
+# Manual build
+mkdocs build                    # English (default)
+```
 
-#### Chinese Development (`mkdocs-zh-dev.yml`)
-- **Purpose**: Local Chinese documentation development
-- **Docs Directory**: `docs/zh`
-- **Output Directory**: `site/` (root level) 
-- **URL**: Serves at `http://localhost:8000/`
-- **Features**: No versioning complexity, simplified for development
+### 2. Development Server
+```bash
+# Serve English documentation (default)
+mkdocs serve
+# Access: http://127.0.0.1:8000/
 
-### Production Configurations
+# The single config serves English by default
+# Language switching happens via the UI
+```
 
-#### Main Configuration (`mkdocs.yml`)
-- **Purpose**: Default configuration serving English documentation
-- **Docs Directory**: `docs/en`
-- **Output Directory**: `site/`
-- **Language**: English (`en`)
+### 3. Test All Builds
+```bash
+./test-docs.sh
+```
 
-#### English Production (`mkdocs-en.yml`)
-- **Purpose**: Production English documentation build
-- **Docs Directory**: `docs/en`
-- **Output Directory**: `site/en/`
-- **Features**: English navigation, metadata, versioning support
+## 🔧 Detailed Build Commands
 
-#### Chinese Production (`mkdocs-zh.yml`)
-- **Purpose**: Production Chinese documentation build
-- **Docs Directory**: `docs/zh`
-- **Output Directory**: `site/zh/`
-- **Features**: Chinese navigation (中文导航), metadata, versioning support
+### Using Automated Scripts
 
-## Building Documentation
-
-### Understanding the Multi-Language Setup
-
-The Addax documentation uses three separate MkDocs configurations:
-
-- **`mkdocs.yml`**: Main configuration (builds English to root: `site/`)
-- **`mkdocs-en.yml`**: Explicit English build (builds to: `site/en/`)  
-- **`mkdocs-zh.yml`**: Chinese build (builds to: `site/zh/`)
-
-### Quick Build Commands
+#### Build Script (`./build-docs.sh`)
+- Uses single `mkdocs.yml` configuration
+- Builds English as default language
+- Creates Chinese version through dynamic config modification
+- Outputs to `site/` (English) and `site/zh/` (Chinese)
 
 ```bash
-# Build main site (English in root directory)
-mkdocs build
-
-# Build individual language versions
-mkdocs build --config-file mkdocs-en.yml  # → site/en/
-mkdocs build --config-file mkdocs-zh.yml  # → site/zh/
-
-# Build all versions (automated script)
 ./build-docs.sh
 ```
 
-### Deployment Strategies
+#### Test Script (`./test-docs.sh`)
+- Validates single configuration works for both languages
+- Tests build processes
+- Verifies serve functionality
 
-#### Option 1: Single Language (English Only)
 ```bash
-# Build main English site
+./test-docs.sh
+```
+
+### Manual Build Process
+
+#### English (Default)
+```bash
+# Uses mkdocs.yml as-is
 mkdocs build
 
-# Deploy site/ directory
-# Results in: https://yoursite.com/
+# Output: site/
+# URL: https://wgzhao.github.io/Addax/
 ```
 
-#### Option 2: Multi-Language with GitHub Actions
-For proper multi-language deployment, use GitHub Actions:
-
-```yaml
-# .github/workflows/docs.yml
-name: Deploy Multi-Language Docs
-on:
-  push:
-    branches: [ main ]
-
-jobs:
-  deploy:
-    runs-on: ubuntu-latest
-    steps:
-    - uses: actions/checkout@v3
-    - uses: actions/setup-python@v3
-      with:
-        python-version: '3.x'
-    
-    - name: Install dependencies
-      run: pip install mkdocs mkdocs-material pymdown-extensions
-    
-    - name: Deploy English (default)
-      run: mkdocs gh-deploy --config-file mkdocs.yml --remote-branch gh-pages
-    
-    - name: Deploy Chinese
-      run: mkdocs gh-deploy --config-file mkdocs-zh.yml --remote-branch gh-pages
-```
-
-#### Option 3: Manual Multi-Language Deployment
+#### Chinese
 ```bash
-# Build and deploy each language separately
-mkdocs build --config-file mkdocs-en.yml
-mkdocs build --config-file mkdocs-zh.yml  
-mkdocs build --config-file mkdocs.yml
+# The build script automatically creates temporary Chinese config
+# and builds to site/zh/
 
-# Use rsync or similar to deploy to different paths on your server
-rsync -av site/ user@server:/var/www/docs/
-rsync -av site/en/ user@server:/var/www/docs/en/  
-rsync -av site/zh/ user@server:/var/www/docs/zh/
+# For manual Chinese build, use the build script:
+./build-docs.sh
 ```
 
-## Development Workflow
+## 🌐 Deployment Strategies
 
-### Local Development Server
-
-#### 🚀 Recommended: Use Development Configurations
-
-For **English documentation development**:
+### Strategy 1: Single Language (English Only)
 ```bash
-# Development config - serves at root level
-mkdocs serve --config-file mkdocs-en-dev.yml
-# Visit: http://localhost:8000/
+mkdocs build
+mkdocs gh-deploy
 ```
 
-For **Chinese documentation development**:
+### Strategy 2: Multi-Language (Recommended)
 ```bash
-# Development config - serves at root level
-mkdocs serve --config-file mkdocs-zh-dev.yml  
-# Visit: http://localhost:8000/
-```
+# Build both languages
+./build-docs.sh
 
-#### Production-like Testing
-
-For **English documentation** (production-like):
-```bash
-# Production config - serves with subdirectory
-mkdocs serve --config-file mkdocs-en.yml
-# Visit: http://localhost:8000/Addax/en/
-```
-
-For **Chinese documentation** (production-like):
-```bash
-# Production config - serves with subdirectory  
-mkdocs serve --config-file mkdocs-zh.yml
-# Visit: http://localhost:8000/Addax/zh/
-```
-
-#### ⚠️ Important Note about `/latest` URLs
-
-- **Development configs** serve at root level - no `/latest` path needed
-- **Production configs** serve with subdirectories - `/latest` is Mike versioning concept
-- When using `mkdocs-en-dev.yml`, visit `http://localhost:8000/` directly
-- When using `mkdocs-en.yml`, visit `http://localhost:8000/Addax/en/`
-
-#### Custom Port/Host
-```bash
-# Serve on custom port
-mkdocs serve --config-file mkdocs-en.yml --dev-addr 127.0.0.1:8080
-
-# Serve on all interfaces
-mkdocs serve --config-file mkdocs-zh.yml --dev-addr 0.0.0.0:8000
-```
-
-### Live Reload Features
-- **Auto-rebuild**: Files are automatically rebuilt on changes
-- **Live reload**: Browser refreshes automatically
-- **Error reporting**: Build errors shown in terminal and browser
-
-## Deployment
-
-### Understanding Multi-Language Deployment
-
-The current setup supports two deployment approaches:
-
-#### Single Language Deployment (Current Default)
-- Builds English documentation to root directory
-- Simple deployment suitable for English-only users
-- Uses `mkdocs.yml` configuration
-
-#### True Multi-Language Deployment (Recommended for Bilingual Sites)
-- Requires advanced setup with tools like `mike` or custom GitHub Actions
-- Each language gets its own URL path (`/en/`, `/zh/`)
-- Users can switch languages via UI
-
-### GitHub Pages Deployment
-
-#### Simple English-Only Deployment
-```bash
-# Deploy main English site to GitHub Pages
+# Deploy with GitHub Pages
 mkdocs gh-deploy
 
-# Or explicitly
-mkdocs gh-deploy --config-file mkdocs.yml
+# Access:
+# English: https://wgzhao.github.io/Addax/
+# Chinese: https://wgzhao.github.io/Addax/zh/
 ```
 
-#### Advanced Multi-Language GitHub Actions
+### Strategy 3: GitHub Actions (Automated)
 Create `.github/workflows/docs.yml`:
-
 ```yaml
 name: Deploy Documentation
 on:
   push:
     branches: [ main ]
+    paths: [ 'docs/**', 'mkdocs.yml' ]
 
 jobs:
   deploy:
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v4
-      with:
-        fetch-depth: 0
-    
-    - name: Setup Python
-      uses: actions/setup-python@v4
-      with:
-        python-version: '3.11'
-    
-    - name: Install dependencies
-      run: |
-        pip install mkdocs mkdocs-material pymdown-extensions mike
-    
-    - name: Configure Git
-      run: |
-        git config user.name "GitHub Actions"
-        git config user.email "actions@github.com"
-    
-    - name: Deploy English (default)
-      run: |
-        mike deploy --config-file mkdocs.yml --push --update-aliases main en
-        mike set-default --config-file mkdocs.yml --push main
-    
-    - name: Deploy Chinese
-      run: |
-        mike deploy --config-file mkdocs-zh.yml --push zh
+      - uses: actions/checkout@v3
+      - name: Setup Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: 3.x
+      - name: Install dependencies
+        run: pip install mkdocs mkdocs-material
+      - name: Build documentation
+        run: ./build-docs.sh
+      - name: Deploy to GitHub Pages
+        run: mkdocs gh-deploy --force
 ```
 
-### Custom Server Deployment
+## ⚙️ Configuration Details
 
-#### Single Site Deployment
+### Single Configuration Benefits
+
+The unified `mkdocs.yml` provides:
+
+1. **Simplified Maintenance**: One file to manage
+2. **Dynamic Language Support**: Automatic config modification for Chinese
+3. **Default English**: International-first approach
+4. **Language Switching**: Built-in UI language toggle
+5. **Shared Resources**: Assets and images shared between languages
+
+### Language-Specific Settings
+
+#### English (Default)
+- **Source**: `docs/en/`
+- **Output**: `site/`
+- **Language**: `en`
+- **URL**: Root path
+
+#### Chinese (Dynamic)
+- **Source**: `docs/zh/`
+- **Output**: `site/zh/`
+- **Language**: `zh`
+- **URL**: `/zh/` subpath
+
+### Navigation Structure
+
+The single config includes navigation for both languages:
+- English: Clear descriptive names
+- Chinese: Localized section names (dynamically applied)
+
+## 🔍 Testing and Validation
+
+### Build Tests
 ```bash
-# Build and deploy main site
-mkdocs build
-scp -r site/ user@server:/var/www/addax-docs/
+# Test single configuration
+./test-docs.sh
+
+# Manual validation
+mkdocs build --strict       # English with strict mode
 ```
 
-#### Multi-Language Server Deployment
+### Serve Tests
 ```bash
-# Build all versions
-mkdocs build --config-file mkdocs-en.yml
-mkdocs build --config-file mkdocs-zh.yml
-mkdocs build --config-file mkdocs.yml
+# Test development server
+mkdocs serve --dev-addr localhost:8000
+# Visit: http://localhost:8000/
 
-# Deploy with proper structure
-scp -r site/ user@server:/var/www/addax-docs/
-
-# If you have separate builds, organize them:
-# English: /var/www/addax-docs/en/
-# Chinese: /var/www/addax-docs/zh/
-# Default (English): /var/www/addax-docs/
+# Test language switching in browser
+# Click language toggle in top navigation
 ```
 
-### Docker Deployment
-```dockerfile
-FROM nginx:alpine
-COPY site/ /usr/share/nginx/html/
-EXPOSE 80
-```
-
+### Content Validation
 ```bash
-# Build and deploy with Docker
-./build-docs.sh
-docker build -t addax-docs .
-docker run -p 80:80 addax-docs
+# Check English content
+ls -la site/
+curl -s http://127.0.0.1:8000/ | grep -i "addax"
+
+# Check Chinese content (after build)
+ls -la site/zh/
+curl -s http://127.0.0.1:8000/zh/ | grep -i "addax"
 ```
 
-## Language Switching
-
-The documentation includes automatic language switching via the `extra.alternate` configuration:
-
-### Configuration
-```yaml
-# In each config file
-extra:
-  alternate:
-    - name: English
-      link: /en/
-      lang: en
-    - name: 中文
-      link: /zh/
-      lang: zh
-```
-
-### URL Structure
-- **English**: `https://wgzhao.github.io/Addax/` (root)
-- **English**: `https://wgzhao.github.io/Addax/en/` (explicit)
-- **Chinese**: `https://wgzhao.github.io/Addax/zh/`
-
-### Language Detection
-- Default language is English
-- Users can manually switch via the language selector
-- Language preference is maintained in browser session
-
-## Asset Management
-
-### Shared Assets Strategy
-Assets are shared between languages to avoid duplication:
-
-```
-docs/
-├── assets/           # Shared across all languages
-│   ├── jobs/        # JSON configuration examples
-│   └── stylesheets/ # Custom CSS (if any)
-└── images/          # Shared images and media
-    ├── logo.png
-    ├── favicon.ico
-    └── screenshots/
-```
-
-### Asset Referencing
-In Markdown files, reference shared assets:
-
-```markdown
-<!-- Images -->
-![Logo](../images/logo.png)
-
-<!-- Job configurations -->
---8<-- "jobs/mysql-example.json"
-```
-
-### Adding New Assets
-1. Place shared assets in `docs/assets/` or `docs/images/`
-2. Update references in both language versions
-3. Test links in both builds
-
-## Testing & Validation
-
-### Build Testing
-```bash
-# Test all configurations build successfully
-mkdocs build --config-file mkdocs.yml --strict
-mkdocs build --config-file mkdocs-en.yml --strict
-mkdocs build --config-file mkdocs-zh.yml --strict
-```
-
-### Link Validation
-```bash
-# Install link checker
-pip install mkdocs-linkcheck
-
-# Check for broken links
-mkdocs build --config-file mkdocs-en.yml --strict
-mkdocs build --config-file mkdocs-zh.yml --strict
-```
-
-### Content Validation Checklist
-- [ ] All navigation links work
-- [ ] Images load correctly
-- [ ] Asset references resolve
-- [ ] Language switcher functions
-- [ ] Search works in both languages
-- [ ] Mobile responsive design
-- [ ] No console errors
-
-### Automated Testing
-```bash
-#!/bin/bash
-# test-docs.sh
-
-echo "Testing documentation builds..."
-
-configs=("mkdocs.yml" "mkdocs-en.yml" "mkdocs-zh.yml")
-
-for config in "${configs[@]}"; do
-    echo "Testing $config..."
-    if mkdocs build --config-file "$config" --strict; then
-        echo "✅ $config build successful"
-    else
-        echo "❌ $config build failed"
-        exit 1
-    fi
-done
-
-echo "All documentation builds passed!"
-```
-
-## Troubleshooting
+## 🚨 Troubleshooting
 
 ### Common Issues
 
-#### Development Server Issues
-
-**Problem**: Visiting `/latest` shows Chinese documentation instead of English
+#### 1. Build Fails
 ```bash
-# ❌ Wrong - Using production config with versioning paths
-mkdocs serve --config-file mkdocs-en.yml
-# Visit http://localhost:8000/latest ← Shows wrong content
+# Check configuration syntax
+mkdocs build --strict
 
-# ✅ Solution - Use development config  
-mkdocs serve --config-file mkdocs-en-dev.yml
-# Visit http://localhost:8000/ ← Shows correct English content
+# Verify file paths
+ls -la docs/en/
+ls -la docs/zh/
 ```
 
-**Problem**: Server serves content at subdirectory path
+#### 2. Language Switching Not Working
+- Verify `extra.alternate` configuration in `mkdocs.yml`
+- Check that both `site/` and `site/zh/` exist after build
+- Ensure proper URL configuration
+
+#### 3. Missing Content
 ```bash
-# Issue: http://localhost:8000/Addax/en/ instead of http://localhost:8000/
-# Solution: Use development configs (-dev.yml) for local development
+# Verify source directories
+find docs/en -name "*.md" | wc -l
+find docs/zh -name "*.md" | wc -l
+
+# Check for translation gaps
+diff -r docs/en docs/zh --brief | grep "Only in"
 ```
 
-**Problem**: `/latest` URL returns 404 in development
+#### 4. Assets Not Loading
+- Assets are shared from `docs/assets/` and `docs/images/`
+- Verify paths in Markdown files use relative references
+- Check `pymdownx.snippets` base_path configuration
+
+### Debug Commands
 ```bash
-# Expected behavior with development configs
-# Use root URL instead: http://localhost:8000/
+# Verbose build
+mkdocs build --verbose
+
+# Configuration validation
+mkdocs config-check
+
+# Serve with debug
+mkdocs serve --verbose --dev-addr 0.0.0.0:8000
 ```
 
-#### Build Errors
+## 📊 Performance and Optimization
+
+### Build Performance
+- Single config reduces build complexity
+- Shared assets eliminate duplication
+- Dynamic config generation is fast
+
+### Size Optimization
+- Shared images and assets
+- Compressed output
+- Optimized theme resources
+
+### Monitoring
 ```bash
-# Issue: Module not found
-pip install mkdocs mkdocs-material
+# Check build sizes
+du -sh site/
+du -sh site/zh/
 
-# Issue: Permission denied
-sudo chmod +x build-docs.sh
-
-# Issue: Port already in use
-mkdocs serve --dev-addr 127.0.0.1:8001
+# Monitor build time
+time ./build-docs.sh
 ```
 
-#### Content Issues
-```bash
-# Issue: Images not loading
-# Check: Relative paths from docs/en/ and docs/zh/
-# Use: ../images/filename.png
+## 🔄 Development Workflow
 
-# Issue: Navigation not working
-# Check: File paths in nav section of mkdocs.yml
-# Ensure: Files exist in respective language directories
+### 1. Content Updates
+```bash
+# Edit English content
+vim docs/en/index.md
+
+# Edit Chinese content  
+vim docs/zh/index.md
+
+# Test changes
+mkdocs serve
+# Visit: http://127.0.0.1:8000/
 ```
 
-#### Language Switching
+### 2. Configuration Updates
 ```bash
-# Issue: Language switcher not working
-# Check: extra.alternate configuration in all config files
-# Verify: Consistent URL structure
+# Edit single configuration
+vim mkdocs.yml
+
+# Test configuration
+./test-docs.sh
+
+# Build and verify
+./build-docs.sh
 ```
 
-### Debug Mode
+### 3. New Plugin Documentation
 ```bash
-# Enable verbose output
-mkdocs serve --config-file mkdocs-en.yml --verbose
+# Add to English
+cp template.md docs/en/reader/newreader.md
 
-# Check configuration
-mkdocs config --config-file mkdocs-en.yml
+# Add to Chinese
+cp template.md docs/zh/reader/newreader.md
+
+# Update navigation in mkdocs.yml
+# Both languages handled by build script
 ```
 
-## Contributing
+## 🎯 Key Advantages
 
-### Adding New Documentation
+### Single Configuration Approach
+1. **Unified Management**: One `mkdocs.yml` for all languages
+2. **Reduced Complexity**: No separate config files to maintain
+3. **Dynamic Generation**: Chinese config created automatically
+4. **Consistent Styling**: Shared theme and settings
+5. **Language Toggle**: Built-in switching via Material theme
 
-#### 1. English Documentation
-1. Create file in `docs/en/`
-2. Update `mkdocs-en.yml` navigation
-3. Test build: `mkdocs serve --config-file mkdocs-en.yml`
+### Multi-Language Support
+1. **English Default**: International-first approach
+2. **Chinese Secondary**: Proper localization
+3. **SEO Friendly**: Language-specific URLs
+4. **Accessible**: Proper language attributes
+5. **Maintainable**: Clear separation of content
 
-#### 2. Chinese Documentation
-1. Create translated file in `docs/zh/`
-2. Update `mkdocs-zh.yml` navigation
-3. Test build: `mkdocs serve --config-file mkdocs-zh.yml`
+## 📚 Additional Resources
 
-#### 3. Update Main Configuration
-1. Update `mkdocs.yml` navigation if needed
-2. Test complete build: `./build-docs.sh`
-
-### Translation Workflow
-1. **Create English version** in `docs/en/`
-2. **Translate to Chinese** in `docs/zh/`
-3. **Update navigation** in both config files
-4. **Test both versions** work correctly
-5. **Submit pull request** with both language versions
-
-### Style Guidelines
-- Use clear, concise language
-- Include code examples
-- Add relevant images/screenshots
-- Maintain consistent formatting
-- Follow existing documentation patterns
+- [MkDocs Documentation](https://www.mkdocs.org/)
+- [Material Theme Documentation](https://squidfunk.github.io/mkdocs-material/)
+- [Multi-language Setup Guide](https://squidfunk.github.io/mkdocs-material/setup/changing-the-language/)
 
 ---
 
-## Quick Reference Commands
-
-```bash
-# Development
-mkdocs serve --config-file mkdocs-en.yml    # English dev server
-mkdocs serve --config-file mkdocs-zh.yml    # Chinese dev server
-
-# Building
-mkdocs build --config-file mkdocs-en.yml    # Build English
-mkdocs build --config-file mkdocs-zh.yml    # Build Chinese
-./build-docs.sh                              # Build all languages
-
-# Testing
-mkdocs build --strict                        # Test default build
-mkdocs build --config-file mkdocs-en.yml --strict  # Test English
-mkdocs build --config-file mkdocs-zh.yml --strict  # Test Chinese
-
-# Deployment
-mkdocs gh-deploy                             # Deploy to GitHub Pages
-```
-
-For additional help, refer to:
-- [MkDocs Documentation](https://www.mkdocs.org/)
-- [Material Theme Documentation](https://squidfunk.github.io/mkdocs-material/)
-- [Project Issues](https://github.com/wgzhao/Addax/issues)
+This guide ensures you can successfully build and deploy bilingual Addax documentation using the simplified single-configuration approach.

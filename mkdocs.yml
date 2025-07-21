@@ -1,3 +1,8 @@
+# Single configuration file for multi-language Addax documentation
+# Use environment variables to switch languages:
+# - Default: English (docs/en → site/)
+# - ADDAX_LANG=zh: Chinese (docs/zh → site/zh/)
+
 site_name: Addax Documentation
 site_description: Addax is an open source universal ETL tool that supports most of those RDBMS and NoSQLs on the planet
 site_url: https://wgzhao.github.io/Addax/

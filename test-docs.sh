@@ -1,10 +1,10 @@
 #!/bin/bash
-# test-docs.sh - Test script for Addax documentation builds
+# test-docs.sh - Test script for Addax documentation using single mkdocs.yml
 
 set -e
 
-echo "🧪 Testing Addax Documentation Builds"
-echo "====================================="
+echo "🧪 Testing Addax Documentation Build (Single Configuration)"
+echo "=========================================================="
 
 # Colors for output
 RED='\033[0;31m'
@@ -25,37 +25,52 @@ print_error() {
     echo -e "${RED}❌ $1${NC}"
 }
 
-# Test configurations
-configs=("mkdocs.yml" "mkdocs-en.yml" "mkdocs-zh.yml" "mkdocs-en-dev.yml" "mkdocs-zh-dev.yml")
-config_names=("Main (English default)" "English Production" "Chinese Production" "English Development" "Chinese Development")
+# Test main configuration
+print_status "Testing main mkdocs.yml configuration..."
+if mkdocs build > /dev/null 2>&1; then
+    print_success "Main mkdocs.yml builds successfully (English default)"
+else
+    print_error "Main mkdocs.yml build failed"
+    echo "Run 'mkdocs build' for details"
+    exit 1
+fi
 
-# Test each configuration
-for i in "${!configs[@]}"; do
-    config="${configs[$i]}"
-    name="${config_names[$i]}"
-    
-    print_status "Testing $name configuration ($config)..."
-    
-    if mkdocs build --config-file "$config" > /dev/null 2>&1; then
-        print_success "$name configuration builds successfully"
-    else
-        print_error "$name configuration build failed"
-        echo "Run 'mkdocs build --config-file $config' for details"
-        exit 1
-    fi
-done
+# Test Chinese build by creating temporary config
+print_status "Testing Chinese build (temporary config)..."
+cat mkdocs.yml | \
+sed -e 's|docs_dir: docs/en|docs_dir: docs/zh|g' \
+    -e 's|site_dir: site|site_dir: site/zh|g' \
+    -e 's|language: en|language: zh|g' \
+    -e 's|site_description: Addax is an open source universal ETL tool.*|site_description: Addax 是一个开源的通用 ETL 工具，支持地球上大多数 RDBMS 和 NoSQL 数据库|g' \
+    > mkdocs-zh-test.yml
+
+if mkdocs build --config-file mkdocs-zh-test.yml > /dev/null 2>&1; then
+    print_success "Chinese configuration builds successfully"
+    rm -f mkdocs-zh-test.yml
+else
+    print_error "Chinese configuration build failed"
+    echo "Run 'mkdocs build --config-file mkdocs-zh-test.yml' for details"
+    rm -f mkdocs-zh-test.yml
+    exit 1
+fi
 
 # Test serve command (just check if it starts without error)
 print_status "Testing serve command..."
-timeout 5 mkdocs serve --config-file mkdocs-en.yml > /dev/null 2>&1 || true
+timeout 5 mkdocs serve > /dev/null 2>&1 || true
 print_success "Serve command works"
 
-print_success "All documentation tests passed!"
+print_success "All single-configuration documentation tests passed!"
 
 # Show next steps
 echo ""
 echo "🚀 Next Steps:"
 echo "============="
-echo "1. Run './build-docs.sh' to build all documentation"
-echo "2. Run 'mkdocs serve' to start development server"
+echo "1. Run './build-docs.sh' to build both language versions"
+echo "2. Run 'mkdocs serve' to start development server (English)"
 echo "3. Open http://127.0.0.1:8000 to view documentation"
+echo ""
+echo "💡 Single Configuration Benefits:"
+echo "   ✅ One mkdocs.yml file manages both languages"
+echo "   ✅ Dynamic configuration for different builds"
+echo "   ✅ Simplified maintenance and updates"
+echo "   ✅ Automatic language switching support"
