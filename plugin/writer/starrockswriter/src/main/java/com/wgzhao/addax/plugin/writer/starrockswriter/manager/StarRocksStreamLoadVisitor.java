@@ -101,7 +101,7 @@ public class StarRocksStreamLoadVisitor
         }
     }
 
-    private String getAvailableHost()
+    protected String getAvailableHost()
     {
         List<String> hostList = writerOptions.getLoadUrlList();
         long tmp = pos + hostList.size();
@@ -161,7 +161,7 @@ public class StarRocksStreamLoadVisitor
         throw new RuntimeException("Failed to join rows data, unsupported `format` from stream load properties:");
     }
 
-    private void checkLabelState(String host, String label)
+    protected void checkLabelState(String host, String label)
             throws IOException
     {
         int idx = 0;
@@ -191,7 +191,7 @@ public class StarRocksStreamLoadVisitor
                         throw new IOException(String.format("Failed to flush data to StarRocks, Error " +
                                 "could not get the final state of label[%s]. response[%s]\n", label, EntityUtils.toString(respEntity)), null);
                     }
-                    LOG.info("Checking label[{}] state[{}]\n", label, labelState);
+                    LOG.info("Checking label[{}] state[{}]", label, labelState);
                     switch (labelState) {
                         case LABEL_STATE_VISIBLE, LABEL_STATE_COMMITTED -> {
                             return;

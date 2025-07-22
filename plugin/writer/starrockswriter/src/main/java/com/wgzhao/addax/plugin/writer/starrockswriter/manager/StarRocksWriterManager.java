@@ -52,6 +52,7 @@ public class StarRocksWriterManager
     private volatile Exception flushException;
     private ScheduledExecutorService scheduler;
     private ScheduledFuture<?> scheduledFuture;
+    private final List<String> streamLabels;
 
     public StarRocksWriterManager(StarRocksWriterOptions writerOptions)
     {
@@ -60,6 +61,7 @@ public class StarRocksWriterManager
         flushQueue = new LinkedBlockingDeque<>(writerOptions.getFlushQueueLength());
         this.startScheduler();
         this.startAsyncFlushing();
+        this.streamLabels = new ArrayList<>();
     }
 
     public void startScheduler()
@@ -71,6 +73,7 @@ public class StarRocksWriterManager
                 if (!closed) {
                     try {
                         String label = createBatchLabel();
+                        streamLabels.add(label);
                         LOG.info("StarRocks interval Sinking triggered: label[{}].", label);
                         if (batchCount == 0) {
                             startScheduler();
@@ -90,6 +93,19 @@ public class StarRocksWriterManager
         if (this.scheduledFuture != null) {
             scheduledFuture.cancel(false);
             this.scheduler.shutdown();
+            try {
+                // wait for the scheduler to terminate gracefully, up to 5 seconds
+                if (!this.scheduler.awaitTermination(5, TimeUnit.SECONDS)) {
+                    this.scheduler.shutdownNow();
+                    // shutdownNow will interrupt all running tasks
+                    if (!this.scheduler.awaitTermination(5, TimeUnit.SECONDS)) {
+                        LOG.warn("StarRocks scheduler did not terminate gracefully");
+                    }
+                }
+            } catch (InterruptedException ie) {
+                this.scheduler.shutdownNow();
+                Thread.currentThread().interrupt();
+            }
         }
     }
 
@@ -104,6 +120,7 @@ public class StarRocksWriterManager
             batchSize += bts.length;
             if (batchCount >= writerOptions.getBatchRows() || batchSize >= writerOptions.getBatchSize()) {
                 String label = createBatchLabel();
+                streamLabels.add(label);
                 LOG.debug("StarRocks buffer Sinking triggered: rows[{}] label[{}].", batchCount, label);
                 flush(label, false);
             }
@@ -139,6 +156,7 @@ public class StarRocksWriterManager
             closed = true;
             try {
                 String label = createBatchLabel();
+                streamLabels.add(label);
                 if (batchCount > 0) {
                     LOG.debug("StarRocks Sink is about to close: label[{}].", label);
                 }
@@ -149,6 +167,17 @@ public class StarRocksWriterManager
             }
         }
         checkFlushException();
+
+        // assure all stream labels have finished
+        String host = starrocksStreamLoadVisitor.getAvailableHost();
+        for (String streamLabel : streamLabels) {
+            try {
+                starrocksStreamLoadVisitor.checkLabelState(host, streamLabel);
+            }
+            catch (Exception e) {
+                LOG.error("Failed to wait for stream load with label: {}", streamLabel, e);
+            }
+        }
     }
 
     public String createBatchLabel()
@@ -206,6 +235,7 @@ public class StarRocksWriterManager
                 }
                 if (e instanceof StarRocksStreamLoadFailedException && ((StarRocksStreamLoadFailedException) e).needReCreateLabel()) {
                     String newLabel = createBatchLabel();
+                    streamLabels.add(newLabel);
                     LOG.warn("Batch label changed from [{}] to [{}]", flushData.getLabel(), newLabel);
                     flushData.setLabel(newLabel);
                 }
