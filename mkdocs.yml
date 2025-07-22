@@ -166,10 +166,10 @@ extra:
     property: G-J252L4LHDX
   alternate:
     - name: English
-      link: /
+      link: /en
       lang: en
     - name: 中文
-      link: /zh/
+      link: /
       lang: zh
 
 # Extensions
