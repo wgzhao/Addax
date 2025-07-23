@@ -1,10 +1,10 @@
-# 数据转换
+# Data Transformation
 
-## Transformer 定义
+## Transformer Definition
 
-在数据同步、传输过程中，存在用户对于数据传输进行特殊定制化的需求场景，包括裁剪列、转换列等工作，可以借助ETL的T过程实现(Transformer)。Addax包含了完成的E(Extract)、T(Transformer)、L(Load)支持。
+During data synchronization and transmission, users may have customized requirements for data processing, such as trimming columns or transforming column values. This can be achieved through the T (Transformer) process in ETL. Addax includes a Transformer module that allows for flexible data transformation by defining a series of UDFs (User-Defined Functions).
 
-## 运行模型
+## Execution Model
 
 ```mermaid
 graph LR
@@ -17,121 +17,116 @@ target(("target"))
 source ==> fr ==> target
 ```
 
-
-
-## UDF 函数
+## UDF Functions
 
 ### dx_substr
 
 `dx_substr(idx, pos, length) -> str`
 
-参数
+**Parameters**
 
-- `idx`: 字段编号，对应record中第几个字段
-- `pos`: 字段值的开始位置
-- `length`: 目标字段长度
+- `idx`: The index of the field in the record.
+- `pos`: The starting position within the field's value.
+- `length`: The length of the target substring.
 
-返回： 从字符串的指定位置（包含）截取指定长度的字符串。如果开始位置非法抛出异常。如果字段为空值，直接返回（即不参与本transformer）
+**Returns:** A substring of the specified length from the specified starting position (inclusive). An exception is thrown if the starting position is invalid. If the field is null, it is returned directly (i.e., this transformer does not process it).
 
 ### dx_pad
 
 `dx_pad(idx, flag, length, chr)`
 
-参数
+**Parameters**
 
-- `idx`: 字段编号，对应record中第几个字段
-- `flag`: "l","r", 指示是在头进行填充，还是尾进行填充
-- `length`: 目标字段长度
-- `chr`: 需要填充的字符
+- `idx`: The index of the field in the record.
+- `flag`: "l" or "r", indicating whether to pad at the beginning (left) or the end (right).
+- `length`: The target length of the field.
+- `chr`: The character to use for padding.
 
-返回： 如果源字符串长度小于目标字段长度，按照位置添加pad字符后返回。如果长于，直接截断（都截右边）。如果字段为空值，转换为空字符串进行pad，即最后的字符串全是需要pad的字符
+**Returns:** If the source string's length is less than the target length, it returns the string after padding. If it's longer, it is truncated (always from the right). If the field is null, it is converted to an empty string before padding.
 
-举例：
+**Examples:**
 
-- `dx_pad(1,"l","4","A")`: 如果 `column 1` 的值为 `xyz=> Axyz`， 则转换后的值为 `xyzzzzz => xyzz`
-- `dx_pad(1,"r","4","A")`, 如果 `column 1` 的值为 `xyz=> xyzA`， 值为 `xyzzzzz => xyzz`
+- `dx_pad(1, "l", "4", "A")`: If `column 1`'s value is `xyz`, the transformed value is `Axyz`. If the value is `xyzzzzz`, it becomes `xyzz`.
+- `dx_pad(1, "r", "4", "A")`: If `column 1`'s value is `xyz`, the transformed value is `xyzA`. If the value is `xyzzzzz`, it becomes `xyzz`.
 
 ### dx_replace
 
 `dx_replace(idx, pos, length, str) -> str`
 
-参数
+**Parameters**
 
-- `idx`: 字段编号，对应record中第几个字段
-- `pos`: 字段值的开始位置
-- `length`: 需要替换的字段长度
-- `str`: 要替换的字符串
+- `idx`: The index of the field in the record.
+- `pos`: The starting position within the field's value.
+- `length`: The length of the substring to be replaced.
+- `str`: The string to replace with.
 
-返回： 从字符串的指定位置（包含）替换指定长度的字符串。如果开始位置非法抛出异常。如果字段为空值，直接返回（即不参与本transformer）
+**Returns:** Replaces a substring of a specified length from a specified starting position (inclusive). An exception is thrown if the starting position is invalid. If the field is null, it is returned directly (i.e., this transformer does not process it).
 
-举例：
+**Examples:**
 
-- `dx_replace(1,"2","4","****")`:  如果 `column 1` 的值为 `addaxTest`, 则转换为 `da****est`
-- `dx_replace(1,"5","10","****")`  如果 `column 1` 的值为 `addaxTest` 则转换为 `data****`
+- `dx_replace(1, "2", "4", "****")`: If `column 1`'s value is `addaxTest`, it is transformed to `da****est`.
+- `dx_replace(1, "5", "10", "****")`: If `column 1`'s value is `addaxTest`, it is transformed to `data****`.
 
 ### dx_filter
 
 `dx_filter(idx, operator, expr) -> str`
 
-参数：
+**Parameters:**
 
-- `idx`: 字段编号，对应record中第几个字段
-- `operator`: 运算符, 支持 `like`, `not like`, `>`, `=`, `<`, `>=`, `!=`, `<=`
-- `expr`: 正则表达式（java正则表达式）、值
-- `str`: 要替换的字符串
+- `idx`: The index of the field in the record.
+- `operator`: The operator. Supported operators are `like`, `not like`, `>`, `=`, `<`, `>=`, `!=`, `<=`.
+- `expr`: A regular expression (Java-style) or a value.
 
-返回：
+**Returns:**
 
-- 如果匹配正则表达式，返回Null，表示过滤该行。不匹配表达式时，表示保留该行。（注意是该行）。对于 `>`, `=`, `<`都是对字段直接compare的结果.
-- `like` ， `not like` 是将字段转换成字符类型，然后和目标正则表达式进行全匹配。
-- `>`, `=`, `<`, `>=`, `!=`, `<=` ,按照类型进行比较, 数值类型按大小比较,字符及布尔类型按照字典序比较
-- 如果目标字段为空（null），对于 `= null` 的过滤条件，将满足条件，被过滤。`！=null` 的过滤条件，null不满足过滤条件，不被过滤。 `like`，字段为null不满足条件，不被过滤，和 `not like`，字段为null满足条件，被过滤。
+- If the condition is met, it returns `null`, which filters out the entire row. If the condition is not met, the row is kept.
+- `like` and `not like`: The field is converted to a string and then fully matched against the target regular expression.
+- `>`, `=`, `<`, `>=`, `!=`, `<=`: Comparison is performed based on the data type. Numeric types are compared by value; string and boolean types are compared lexicographically.
+- If the target field is `null`, it will satisfy the `= null` filter condition and be filtered out. For the `!= null` condition, `null` does not satisfy the filter condition and is not filtered. For `like`, if the field is `null`, it is not filtered.
 
-举例
+**Examples:**
 
-- `dx_filter(1,"like","dataTest")`  
-- `dx_filter(1,">=","10")`
+- `dx_filter(1, "like", "dataTest")`
+- `dx_filter(1, ">=", "10")`
 
-关联filter暂不支持，即多个字段的联合判断，函参太过复杂，用户难以使用。
+Compound filters (i.e., conditions involving multiple fields) are not currently supported as the function parameters would be too complex for users.
 
 ### dx_groovy
 
 `dx_groovy(code, package) -> record`
 
-参数
+**Parameters**
 
-- `coee`: 符合 groovy 编码要求的代码
-- `package`: extraPackage, 列表或者为空
+- `code`: Code that conforms to Groovy syntax.
+- `package`: `extraPackage`, which can be a list or empty.
 
-返回
+**Returns**
 
-Record 数据类型
+A `Record` data type.
 
-注意：
+**Notes:**
 
-- `dx_groovy` 只能调用一次。不能多次调用。
-- `groovy code` 中支持 `java.lang`, `java.util` 的包，可直接引用的对象有 `record`
-  ，以及element下的各种column（BoolColumn.class,BytesColumn.class,DateColumn.class,DoubleColumn.class,LongColumn.class,StringColumn.class）。
-  不支持其他包，如果用户有需要用到其他包，可设置extraPackage，注意extraPackage不支持第三方jar包。
-- `groovy code` 中，返回更新过的 `Record`（比如record.setColumn(columnIndex, new StringColumn(newValue));），或者null。返回null表示过滤此行。
-- 用户可以直接调用静态的Util方式（GroovyTransformerStaticUtil)
+- `dx_groovy` can only be called once per transformer configuration. Multiple calls are not allowed.
+- The `groovy code` supports packages from `java.lang` and `java.util`. Objects that can be directly referenced include `record` and various column types under `element` (BoolColumn.class, BytesColumn.class, DateColumn.class, DoubleColumn.class, LongColumn.class, StringColumn.class). Other packages are not supported by default. If you need to use other packages, you can set `extraPackage`. Note that `extraPackage` does not support third-party JARs.
+- In the `groovy code`, you must return the updated `Record` (e.g., `record.setColumn(columnIndex, new StringColumn(newValue));`) or `null`. Returning `null` filters out the current row.
+- You can directly call static utility methods (GroovyTransformerStaticUtil).
 
-举例:
+**Examples:**
 
-groovy 实现的 subStr
+Groovy implementation of `subStr`:
 
-``` java
+```java
 String code="Column column = record.getColumn(1);\n"+
         " String oriValue = column.asString();\n"+
         " String newValue = oriValue.substring(0, 3);\n"+
         " record.setColumn(1, new StringColumn(newValue));\n"+
         " return record;";
-        dx_groovy(record);
+dx_groovy(code); // Note: The original doc had `dx_groovy(record)` which is incorrect. It should be the code string.
 ```
 
-groovy 实现的Replace
+Groovy implementation of `replace`:
 
-``` java
+```java
 String code2="Column column = record.getColumn(1);\n"+
         " String oriValue = column.asString();\n"+
         " String newValue = \"****\" + oriValue.substring(3, oriValue.length());\n"+
@@ -139,9 +134,9 @@ String code2="Column column = record.getColumn(1);\n"+
         " return record;";
 ```
 
-groovy 实现的Pad
+Groovy implementation of `pad`:
 
-``` java
+```java
 String code3="Column column = record.getColumn(1);\n"+
         " String oriValue = column.asString();\n"+
         " String padString = \"12345\";\n"+
@@ -162,9 +157,9 @@ String code3="Column column = record.getColumn(1);\n"+
         " return record;";
 ```
 
-从  `4.1.2` 版本开始， `dx_groovy` 支持从外部文件加载 groovy 代码，读取文件的相对路径为 `$ADDAX_HOME` 变量所在的目录，也就是 Addax 的安装目录。
+Starting from version `4.1.2`, `dx_groovy` supports loading Groovy code from an external file. The file is read relative to the `$ADDAX_HOME` directory, which is the installation directory of Addax.
 
-以实现 `subStr` 为例，我们可以创建 `job/substr.groovy` 文件，内容如下：
+For example, to implement `subStr`, you can create a file `job/substr.groovy` with the following content:
 
 ```groovy
 Column column = record.getColumn(1)
@@ -174,7 +169,7 @@ record.setColumn(1, new StringColumn(newValue))
 return record
 ```
 
-然后在 `job` 文件中这样去定义：
+Then, define it in the `job` file like this:
 
 ```json
 {
@@ -189,62 +184,61 @@ return record
 }
 ```
 
-文件也可以使用绝对路径来指定。
+You can also specify an absolute path for the file.
 
+## Job Definition
 
-## Job定义
-
-本例中，配置4个UDF。
+In this example, four UDFs are configured.
 
 ```json
 --8<-- "jobs/udfdemo.json"
 ```
 
-## 自定义函数
+## Custom Functions
 
-如果自带的函数不满足数据转换要求，我们可以在 `transformer` 编写满足 `groovy` 规范要求的代码，下面给出一个完整的例子
+If the built-in functions do not meet your data transformation requirements, you can write code that conforms to Groovy specifications within the `transformer`. Here is a complete example:
 
 ```json
 --8<-- "jobs/groovy.json"
 ```
 
-上述 `transformer` 代码针对每条记录的前面两个字段做了修改，对第一个字段的字符串，在字符串前面增加 `Header_` 字符； 
-第二个整数字段值进行倍增处理。最后执行的结果如下：
+The `transformer` code above modifies the first two fields of each record. It adds the prefix `Header_` to the first string field and doubles the value of the second integer field. The execution result is as follows:
 
-``` shell
+```shell
 --8<-- "output/groovydemo.txt"
 ```
 
-## 计量和脏数据
+## Metrics and Dirty Data
 
-Transform过程涉及到数据的转换，可能造成数据的增加或减少，因此更加需要精确度量，包括：
+The Transform process involves data conversion, which may increase or decrease the amount of data. Therefore, precise metrics are needed, including:
 
-- Transform的入参Record条数、字节数。
-- Transform的出参Record条数、字节数。
-- Transform的脏数据Record条数、字节数。
-- 如果是多个Transform，某一个发生脏数据，将不会再进行后面的transform，直接统计为脏数据。
-- 目前只提供了所有Transform的计量（成功，失败，过滤的count，以及transform的消耗时间）。
+- Number of input records and bytes for the Transform.
+- Number of output records and bytes from the Transform.
+- Number of dirty data records and bytes from the Transform.
+- If there are multiple Transforms, and one of them generates dirty data, subsequent transforms will not be executed for that record, and it will be directly counted as dirty data.
+- Currently, only overall metrics for all Transforms are provided (success, failure, filtered counts, and time consumed by the transform).
 
-涉及到运行过程的计量数据展现定义如下：
+The metrics displayed during the process are defined as follows:
 
 ```shell
 Total 1000000 records, 22000000 bytes | Transform 100000 records(in), 10000 records(out) | Speed 2.10MB/s, 100000 records/s | Error 0 records, 0 bytes | Percentage 100.00%
 ```
 
-注意，这里主要记录转换的输入输出，需要检测数据输入输出的记录数量变化。
+Note: This mainly records the input and output of the transformation, which requires monitoring changes in the number of data records.
 
-涉及到最终作业的计量数据展现定义如下：
+The final job metrics are displayed as follows:
 
 ```shell
-任务启动时刻                    : 2015-03-10 17:34:21
-任务结束时刻                    : 2015-03-10 17:34:31
-任务总计耗时                    :                 10s
-任务平均流量                    :            2.10MB/s
-记录写入速度                    :         100000rec/s
-转换输入总数                    :             1000000
-转换输出总数                    :             1000000
-读出记录总数                    :             1000000
-同步失败总数                    :                   0
+Job start  at             : 2025-07-23 09:08:26
+Job end    at             : 2025-07-23 09:08:29
+Job took secs             :                  3s
+Average   bps             :              110B/s
+Average   rps             :              3rec/s
+Number of rec             :                  10
+Failed record             :                   0
+Transformer success records:                  10
+Transformer failed  records:                   0
+Transformer filter  records:                   0
 ```
 
-注意，这里主要记录转换的输入输出，需要检测数据输入输出的记录数量变化。
+Note: This mainly records the input and output of the transformation, which requires monitoring changes in the number of data records.
