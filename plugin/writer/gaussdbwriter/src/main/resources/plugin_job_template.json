@@ -1,0 +1,17 @@
+{
+    "name": "gaussdbwriter",
+    "parameter": {
+        "username": "",
+        "password": "",
+        "column": ["*"],
+        "connection": [
+            {
+                "jdbcUrl": "jdbc:gaussdb://127.0.0.1:8000/test",
+                "table": []
+            }
+        ],
+        "preSql": ["truncate table @table"],
+        "postSql": []
+    }
+}
+

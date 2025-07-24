@@ -152,6 +152,10 @@ public final class WriterUtil
                 writeDataSqlTemplate = "INSERT INTO %s (" + columns + ") VALUES ( " + placeHolders + " )" +
                         doPostgresqlUpdate(writeMode, columnHolders);
             }
+            else if (dataBaseType == DataBaseType.GaussDB) {
+                writeDataSqlTemplate = "INSERT INTO %s (" + columns + ") VALUES ( " + placeHolders + " )" +
+                        doGaussdbUpdate(columnHolders);
+            }
             else if (dataBaseType == DataBaseType.SQLServer) {
                 writeDataSqlTemplate = doOracleOrSqlServerUpdate(writeMode, columnHolders, valueHolders, dataBaseType) +
                         "INSERT (" + columns + ") VALUES ( " + placeHolders + " );";
@@ -196,6 +200,19 @@ public final class WriterUtil
     }
 
     public static String doMysqlUpdate(List<String> columnHolders)
+    {
+        if (columnHolders == null || columnHolders.isEmpty()) {
+            return "";
+        }
+
+        String updates = columnHolders.stream()
+                .map(column -> column + "=VALUES(" + column + ")")
+                .collect(Collectors.joining(","));
+
+        return " ON DUPLICATE KEY UPDATE " + updates;
+    }
+
+    public static String doGaussdbUpdate(List<String> columnHolders)
     {
         if (columnHolders == null || columnHolders.isEmpty()) {
             return "";

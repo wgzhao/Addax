@@ -1,0 +1,54 @@
+{
+  "job": {
+    "content": [
+      {
+        "writer": {
+          "name": "gaussdbwriter",
+          "parameter": {
+            "column": [
+              "id","subid","msg"
+            ],
+            "connection": [
+              {
+                "jdbcUrl": "jdbc:gaussdb://127.0.0.1:8000/gstest"
+                ,
+                "table": [
+                  "addax_tbl"
+                ]
+              }
+            ],
+            "username": "gstest",
+            "password": "gstest",
+            "writeMode": "update(id, subid)"
+          }
+        },
+        "reader": {
+          "name": "streamreader",
+          "parameter": {
+            "column": [
+              {
+                "random": "100,1000",
+                "type": "long"
+              },
+              {
+                "random": "110,1100",
+                "type": "long"
+              },
+              {
+                "value": "update",
+                "type": "string"
+              }
+            ],
+            "sliceRecordCount": 1
+          }
+        }
+      }
+    ],
+    "setting": {
+      "speed": {
+        "bytes": -1,
+        "channel": 1
+      }
+    }
+  }
+}
