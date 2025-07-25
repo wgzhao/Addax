@@ -35,6 +35,14 @@
             <outputDirectory>/</outputDirectory>
         </fileSet>
         <fileSet>
+            <directory>patch/addax-kerberos-jdk24-patch/target/addax-kerberos-jdk24-patch-${project.version}/lib/</directory>
+            <includes>
+                <include>*.*</include>
+            </includes>
+            <fileMode>0644</fileMode>
+            <outputDirectory>lib</outputDirectory>
+        </fileSet>
+        <fileSet>
             <directory>lib/addax-rdbms/target/addax-rdbms-${project.version}/lib/</directory>
             <includes>
                 <include>*.*</include>
