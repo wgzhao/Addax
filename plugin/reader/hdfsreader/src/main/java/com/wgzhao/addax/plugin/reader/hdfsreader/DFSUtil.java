@@ -35,6 +35,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.hadoop.fs.FileStatus;
 import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
+import org.apache.hadoop.fs.PathFilter;
 import org.apache.hadoop.io.SequenceFile;
 import org.apache.hadoop.io.Text;
 import org.apache.hadoop.io.Writable;
@@ -74,6 +75,11 @@ public class DFSUtil
     private String kerberosPrincipal;
     private final List<ColumnEntry> columns;
     private final String nullFormat;
+
+    private static final PathFilter hiddenFileFilter = p -> {
+        String name = p.getName();
+        return !name.startsWith("_") && !name.startsWith(".");
+    };
 
     public DFSUtil(Configuration taskConfig)
     {
@@ -200,16 +206,16 @@ public class DFSUtil
 
         // If the network disconnected, this method will retry 45 times
         // each time the retry interval for 20 seconds
-        FileStatus[] stats = hdfs.listStatus(listFiles);
+        FileStatus[] stats = hdfs.listStatus(listFiles, hiddenFileFilter);
 
         for (FileStatus f : stats) {
+            if (f.isFile()) {
+                addSourceFileIfNotEmpty(f);
+            }
             // if it is a directory, and not starts with dot(.), recursively call
-            if (f.isDirectory() && ! f.getPath().getName().startsWith(".")) {
+            else if (f.isDirectory() ) {
                 LOG.info("The [{}] is directory, reading all files in the directory.", f.getPath());
                 getHDFSAllFilesNORegex(f.getPath().toString(), hdfs);
-            }
-            else if (f.isFile()) {
-                addSourceFileIfNotEmpty(f);
             }
             else {
                 String message = String.format("The [%s] neither directory nor file,ignore it.", f.getPath());
@@ -225,7 +231,6 @@ public class DFSUtil
      */
     private void addSourceFileByType(String filePath)
     {
-        // 检查file的类型和用户配置的fileType类型是否一致
         boolean isMatchedFileType = FileTypeUtils.checkHdfsFileType(hadoopConf, filePath, this.specifiedFileType);
 
         if (isMatchedFileType) {

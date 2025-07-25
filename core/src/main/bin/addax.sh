@@ -29,6 +29,18 @@ SCRIPT_PATH="$(
 ADDAX_HOME=$(dirname "$SCRIPT_PATH")
 DEBUG_PORT=9999
 
+# common constants for job
+CUR_DATE_SHORT=$(date +"%Y%m%d")
+CUR_DATE_DASH=$(date +"%Y-%m-%d")
+CUR_DATETIME_SHORT=$(date +"%Y%m%d%H%M%S")
+CUR_DATETIME_DASH=$(date +"%Y-%m-%d %H:%M:%S")
+BIZ_DATE_SHORT=$(date +"%Y%m%d" -d "$CUR_DATE_DASH 1 day ago")
+BIZ_DATE_DASH=$(date +"%Y-%m-%d" -d "$CUR_DATE_DASH 1 day ago")
+BIZ_DATETIME_SHORT=$(date +"%Y%m%d%H%M%S" -d "$CUR_DATETIME_DASH 1 day ago")
+BIZ_DATETIME_DASH=$(date +"%Y-%m-%dT%H:%M:%S" -d "$CUR_DATETIME_DASH 1 day ago")
+BIZ_DATETIME_0_SHORT=$(date +"%Y%m%d000000" -d "$CUR_DATETIME_DASH 1 day ago")
+BIZ_DATETIME_0_DASH=$(date +"%Y-%m-%d 00:00:00" -d "$CUR_DATETIME_DASH 1 day ago")
+
 CLASS_PATH=".:/etc/hbase/conf:${ADDAX_HOME}/lib/*"
 LOGBACK_FILE="${ADDAX_HOME}/conf/logback.xml"
 CORE_JSON="${ADDAX_HOME}/conf/core.json"
@@ -96,7 +108,7 @@ trap cleanup EXIT
 # Parse job file (local or remote)
 parse_job_file() {
     case "$JOB_FILE" in
-        http*)
+        [hH][tT][tT][pP]://* | [hH][tT][tT][pP][sS]://*)
             if ! command -v curl >/dev/null 2>&1; then
                 echo "Error: curl command not found, cannot download job file"
                 exit 1
@@ -341,6 +353,9 @@ check_jdk_version
 parse_job_file
 gen_log_file
 
+PARAMS="${PARAMS} -Dcurr_date_short='${CUR_DATE_SHORT}' -Dcurr_date_dash='${CUR_DATE_DASH}' -Dcurr_datetime_short='${CUR_DATETIME_SHORT}' -Dcurr_datetime_dash='${CUR_DATETIME_DASH}'"
+PARAMS="${PARAMS} -Dbiz_date_short='${BIZ_DATE_SHORT}' -Dbiz_date_dash='${BIZ_DATE_DASH}' -Dbiz_datetime_short='${BIZ_DATETIME_SHORT}' -Dbiz_datetime_dash='${BIZ_DATETIME_DASH}'"
+PARAMS="${PARAMS} -Dbiz_datetime_0_short='${BIZ_DATETIME_0_SHORT}' -Dbiz_datetime_0_dash='${BIZ_DATETIME_0_DASH}'"
 PARAMS=" ${DEFAULT_PROPERTY_CONF} -Dloglevel=${LOG_LEVEL} -Daddax.log=${LOG_DIR} -Dlog.file.name=${LOG_FILE} ${PARAMS}"
 cmd="java -server ${DEFAULT_JVM} -classpath ${CLASS_PATH} $JAVA_OPTS ${CUST_JVM} ${PARAMS}"
 [ ${DEBUG} -eq 1 ] && cmd="${cmd} ${REMOTE_DEBUG_CONFIG}"

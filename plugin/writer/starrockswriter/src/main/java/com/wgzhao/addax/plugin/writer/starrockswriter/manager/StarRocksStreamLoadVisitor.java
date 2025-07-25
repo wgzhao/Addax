@@ -1,3 +1,22 @@
+/*
+ *  Licensed to the Apache Software Foundation (ASF) under one
+ *  or more contributor license agreements.  See the NOTICE file
+ *  distributed with this work for additional information
+ *  regarding copyright ownership.  The ASF licenses this file
+ *  to you under the Apache License, Version 2.0 (the
+ *  "License"); you may not use this file except in compliance
+ *  with the License.  You may obtain a copy of the License at
+ *
+ *    http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *  Unless required by applicable law or agreed to in writing,
+ *  software distributed under the License is distributed on an
+ *  "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ *  KIND, either express or implied.  See the License for the
+ *  specific language governing permissions and limitations
+ *  under the License.
+ */
+
 package com.wgzhao.addax.plugin.writer.starrockswriter.manager;
 
 import com.alibaba.fastjson2.JSON;
@@ -37,11 +56,13 @@ public class StarRocksStreamLoadVisitor
     private static final Logger LOG = LoggerFactory.getLogger(StarRocksStreamLoadVisitor.class);
     private static final String RESULT_FAILED = "Fail";
     private static final String RESULT_LABEL_EXISTED = "Label Already Exists";
-    private static final String LAEBL_STATE_VISIBLE = "VISIBLE";
-    private static final String LAEBL_STATE_COMMITTED = "COMMITTED";
+    private static final String RESULT_LABEL_TIMEOUT = "Publish Timeout";
     private static final String RESULT_LABEL_PREPARE = "PREPARE";
     private static final String RESULT_LABEL_ABORTED = "ABORTED";
-    private static final String RESULT_LABEL_UNKNOWN = "UNKNOWN";
+
+    private static final String LABEL_STATE_VISIBLE = "VISIBLE";
+    private static final String LABEL_STATE_COMMITTED = "COMMITTED";
+
     private final StarRocksWriterOptions writerOptions;
     private long pos;
 
@@ -63,20 +84,18 @@ public class StarRocksStreamLoadVisitor
                 "/" +
                 writerOptions.getTable() +
                 "/_stream_load";
-        LOG.debug(String.format("Start to join batch data: rows[%d] bytes[%d] label[%s].", flushData.getRows().size(), flushData.getBytes(), flushData.getLabel()));
         Map<String, Object> loadResult = doHttpPut(loadUrl, flushData.getLabel(), joinRows(flushData.getRows(), flushData.getBytes().intValue()));
+
         final String keyStatus = "Status";
         if (null == loadResult || !loadResult.containsKey(keyStatus)) {
             throw new IOException("Unable to flush data to StarRocks: unknown result status.");
         }
-        LOG.debug("StreamLoad response:\n" + JSON.toJSONString(loadResult));
-        if (RESULT_FAILED.equals(loadResult.get(keyStatus))) {
-            throw new IOException(
-                    "Failed to flush data to StarRocks.\n" + JSON.toJSONString(loadResult)
-            );
+        String resultStatus = loadResult.get(keyStatus).toString();
+        if (RESULT_FAILED.equals(resultStatus)) {
+            throw new IOException( "Failed to flush data to StarRocks.\n" + JSON.toJSONString(loadResult));
         }
-        else if (RESULT_LABEL_EXISTED.equals(loadResult.get(keyStatus))) {
-            LOG.debug("StreamLoad response:\n" + JSON.toJSONString(loadResult));
+        else if (RESULT_LABEL_EXISTED.equals(resultStatus) || RESULT_LABEL_TIMEOUT.equals(resultStatus)) {
+            LOG.debug("StreamLoad response:\n{}", JSON.toJSONString(loadResult));
             // has to block-checking the state to get the final result
             checkLabelState(host, flushData.getLabel());
         }
@@ -142,7 +161,6 @@ public class StarRocksStreamLoadVisitor
         throw new RuntimeException("Failed to join rows data, unsupported `format` from stream load properties:");
     }
 
-    @SuppressWarnings("unchecked")
     private void checkLabelState(String host, String label)
             throws IOException
     {
@@ -173,23 +191,22 @@ public class StarRocksStreamLoadVisitor
                         throw new IOException(String.format("Failed to flush data to StarRocks, Error " +
                                 "could not get the final state of label[%s]. response[%s]\n", label, EntityUtils.toString(respEntity)), null);
                     }
-                    LOG.info(String.format("Checking label[%s] state[%s]\n", label, labelState));
+                    LOG.info("Checking label[{}] state[{}]\n", label, labelState);
                     switch (labelState) {
-                        case LAEBL_STATE_VISIBLE:
-                        case LAEBL_STATE_COMMITTED:
+                        case LABEL_STATE_VISIBLE, LABEL_STATE_COMMITTED -> {
                             return;
-                        case RESULT_LABEL_PREPARE:
+                        }
+                        case RESULT_LABEL_PREPARE -> {
                             continue;
-                        case RESULT_LABEL_ABORTED:
-                            throw new StarRocksStreamLoadFailedException(String.format("Failed to flush data to StarRocks, Error " +
-                                    "label[%s] state[%s]\n", label, labelState), null, true);
-                        case RESULT_LABEL_UNKNOWN:
-                        default:
-                            throw new IOException(String.format("Failed to flush data to StarRocks, Error " +
-                                    "label[%s] state[%s]\n", label, labelState), null);
+                        }
+                        case RESULT_LABEL_ABORTED -> throw new StarRocksStreamLoadFailedException(String.format("Failed to flush data to StarRocks, Error " +
+                                "label[%s] state[%s]\n", label, labelState), null, true);
+                        default -> throw new IOException(String.format("Failed to flush data to StarRocks, Error " +
+                                "label[%s] state[%s]\n", label, labelState), null);
                     }
                 }
-            } catch (URISyntaxException e) {
+            }
+            catch (URISyntaxException e) {
                 throw new RuntimeException(e);
             }
         }
@@ -199,7 +216,7 @@ public class StarRocksStreamLoadVisitor
     private Map<String, Object> doHttpPut(String loadUrl, String label, byte[] data)
             throws IOException
     {
-        LOG.info(String.format("Executing stream load to: '%s', size: '%s'", loadUrl, data.length));
+        LOG.info("Executing stream load to: '{}', size: '{}'", loadUrl, data.length);
         final HttpClientBuilder httpClientBuilder = HttpClients.custom()
                 .setRedirectStrategy(new DefaultRedirectStrategy()
                 {
@@ -213,7 +230,7 @@ public class StarRocksStreamLoadVisitor
             HttpPut httpPut = new HttpPut(loadUrl);
             List<String> cols = writerOptions.getColumns();
             if (null != cols && !cols.isEmpty() && StarRocksWriterOptions.StreamLoadFormat.CSV.equals(writerOptions.getStreamLoadFormat())) {
-                httpPut.setHeader("columns", String.join(",", cols.stream().map(f -> String.format("`%s`", f)).collect(Collectors.toList())));
+                httpPut.setHeader("columns", cols.stream().map(f -> String.format("`%s`", f)).collect(Collectors.joining(",")));
             }
             if (null != writerOptions.getLoadProps()) {
                 for (Map.Entry<String, Object> entry : writerOptions.getLoadProps().entrySet()) {

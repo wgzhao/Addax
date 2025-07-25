@@ -107,7 +107,7 @@ public final class ConfigParser
 
     /**
      * Upgrade the new job format to the old one
-     * 1. the content of job.json is a map instead of list of map
+     * 1. The content of job.json is a map instead of list of a map
      *
      * @param configuration {@link Configuration}
      */
@@ -168,32 +168,11 @@ public final class ConfigParser
     {
         String jobContent;
 
-        boolean isJobResourceFromHttp = jobResource.trim().toLowerCase().startsWith("http");
-
-        if (isJobResourceFromHttp) {
-            Configuration coreConfig = ConfigParser.parseCoreConfig();
-            int timeoutSecs = coreConfig.getInt(CORE_SERVER_TIMEOUT_SEC, 5);
-            HttpClient client = HttpClient.newBuilder()
-                    .connectTimeout(Duration.ofSeconds(timeoutSecs))
-                    .build();
-            HttpRequest request = HttpRequest.newBuilder()
-                    .uri(java.net.URI.create(jobResource))
-                    .timeout(Duration.ofSeconds(timeoutSecs))
-                    .build();
-            try {
-                jobContent = client.send(request, HttpResponse.BodyHandlers.ofString()).body();
-            }
-            catch (IOException | InterruptedException e) {
-                throw AddaxException.asAddaxException(IO_ERROR, "Failed to obtain job configuration:" + jobResource, e);
-            }
+        try {
+            jobContent = FileUtils.readFileToString(new File(jobResource), StandardCharsets.UTF_8);
         }
-        else {
-            try {
-                jobContent = FileUtils.readFileToString(new File(jobResource), StandardCharsets.UTF_8);
-            }
-            catch (IOException e) {
-                throw AddaxException.asAddaxException(CONFIG_ERROR, "Failed to obtain job configuration:" + jobResource, e);
-            }
+        catch (IOException e) {
+            throw AddaxException.asAddaxException(CONFIG_ERROR, "Failed to obtain job configuration:" + jobResource, e);
         }
 
         if (jobContent == null) {

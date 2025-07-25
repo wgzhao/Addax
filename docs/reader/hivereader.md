@@ -92,3 +92,7 @@ jdbc:hive2://node1:2181,node2:2181,node3:2181/;serviceDiscoveryMode=zooKeeper;zo
 
 
 [1]: ../rdbmsreader
+
+## 相关限制
+
+经过测试，HiveReader 目前支持的 Hive 版本为 2.1.1 及以上版本并支持 4.0.0 版本。

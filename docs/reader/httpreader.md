@@ -68,6 +68,23 @@ bin/addax.sh job/httpreader2stream.json
 | isPage     |    否    | boolean  |   无   | 接口是否分支分页                                              |
 | pageParams |    否    |   map    |   无   | 分页参数                                                      |
 
+### reqParams
+
+reqParams 是请求参数， 如果请求是 `GET` 方式，则会以 `k=v` 的方式拼接在 `url` 的后面。
+如果请求的是 `POST` 模式，则会把 `reqParams` 当做 JSON 内容作为请求体发送。
+特别的，如果在 `POST` 模式下，如果你发送的请求提并不是一个 `k-v` 结构，则可以把 `key` 设置为空字符串，类似如下：
+
+```json
+{
+  "reqParams": {
+    "": [123,3456]
+  }
+}
+```
+
+程序会针对这种进行进行特别处理。
+
+
 ### proxy
 
 如果访问的接口需要通过代理，则可以配置 `proxy` 配置项，该配置项是一个 json 字典，包含一个必选的 `host`
