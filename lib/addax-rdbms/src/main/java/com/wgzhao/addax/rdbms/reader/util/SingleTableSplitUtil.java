@@ -193,11 +193,11 @@ public class SingleTableSplitUtil
     /**
      * support Number and String split
      *
-     * @param splitPK primary key will be split
+     * @param splitPK the primary key will be split
      * @param table table name
      * @param where where clause
      * @param configuration configuration
-     * @param adviceNum the number of split
+     * @param adviceNum the number of splits
      * @return 1. empty list of the min value is equal to max value, or the split key has only null value;
      * 2. {@link List} of where clause
      */
@@ -209,7 +209,7 @@ public class SingleTableSplitUtil
 
         MinMaxPackage pkMinAndMaxValue = getPkMinAndMaxValue(dataBaseType, configuration);
         if (pkMinAndMaxValue.getMin() == null || pkMinAndMaxValue.getMax() == null || pkMinAndMaxValue.isSameValue()) {
-            // mean the split key has only null value, it can not split
+            // mean the split key has only a null value, it cannot split
             return Collections.emptyList();
         }
 
@@ -247,21 +247,20 @@ public class SingleTableSplitUtil
     }
 
     /**
-     * generate sql that get the split points, whose points is the boundary of the split
+     * Generate SQL that get the split points, whose points is the boundary of the split
      * we can use math algorithm to get the split points, but it causes the data skew when the
      * split key is not uniform distributed. So we use the random algorithm to get the split points
      *
      * @param splitPK the split key
      * @param table the table name
      * @param whereSql the where clause
-     * @param adviceNum the number of split
+     * @param adviceNum the number of splits
      * @param dataBaseType the database type
      * @param minMaxPack {@link MinMaxPackage}
-     * @return the sql string that get the split points
+     * @return the SQL string that gets the split points
      */
     private static String genSplitPointSql(String splitPK, String table, String whereSql, int adviceNum, DataBaseType dataBaseType, MinMaxPackage minMaxPack)
     {
-        // 使用JDK17的文本块特性来改写SQL拼接
         if (minMaxPack.getType() == MinMaxPackage.PkType.STRING) {
             // For string type, we'll calculate the split points directly instead of using ORDER BY RAND()
             List<Object> splitPoints = calculateStringSplitPoints(
@@ -270,10 +269,9 @@ public class SingleTableSplitUtil
                     adviceNum - 1);
 
             // Store the calculated split points in configuration for use later
-            return buildStringSplitPointQuery(splitPK, table, whereSql, splitPoints);
+            return buildStringSplitPointQuery(splitPK, dataBaseType, splitPoints);
         }
 
-        // 处理whereSql
         if (StringUtils.isBlank(whereSql)) {
             whereSql = " WHERE 1=1 ";
         }
@@ -467,16 +465,20 @@ public class SingleTableSplitUtil
     /**
      * Build a query that returns the pre-calculated split points
      */
-    private static String buildStringSplitPointQuery(String splitPK, String table, String whereSql, List<Object> splitPoints)
+    private static String buildStringSplitPointQuery(String splitPK, DataBaseType databaseType, List<Object> splitPoints)
     {
         if (splitPoints.isEmpty()) {
             return "";
         }
 
         StringJoiner unionQuery = new StringJoiner(" UNION ALL ");
-        splitPoints.forEach(point ->
-                unionQuery.add(String.format("SELECT '%s' AS %s", point, splitPK)));
-
+        if (databaseType == DataBaseType.Oracle) {
+            splitPoints.forEach(point ->
+                    unionQuery.add(String.format("SELECT '%s' AS %s FROM DUAL", point, splitPK)));
+        } else {
+            splitPoints.forEach(point ->
+                    unionQuery.add(String.format("SELECT '%s' AS %s", point, splitPK)));
+        }
         return String.format("SELECT * FROM (%s) t ORDER BY %s", unionQuery, splitPK);
     }
 }
