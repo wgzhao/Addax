@@ -1,53 +1,51 @@
 {
   "job": {
-    "content": [
-      {
-        "writer": {
-          "name": "oraclewriter",
-          "parameter": {
-            "column": [
-              "id","name","mesg", "class"
-            ],
-            "connection": [
-              {
-                "jdbcUrl": "jdbc:oracle:thin:@10.60.168.62:1521/ORCL"
-                ,
-                "table": [
-                  "ini.test"
-                ]
-              }
-            ],
-            "username": "system",
-            "password": "password",
-            "writeMode": "update (id, class)"
-          }
-        },
-        "reader": {
-          "name": "streamreader",
-          "parameter": {
-            "column": [
-              {
-                "random": "100,1000",
-                "type": "long"
-              },
-              {
-                "value": "update col",
-                "type": "string"
-              },
-              {
-                "value": "update message",
-                "type": "string"
-              },
-              {
-                "random": "100,1000",
-                "type": "long"
-              }
-            ],
-            "sliceRecordCount": 1000
+    "content": {
+      "reader": {
+        "name": "streamreader",
+        "parameter": {
+          "column": [
+            {
+              "random": "100,1000",
+              "type": "long"
+            },
+            {
+              "value": "update col",
+              "type": "string"
+            },
+            {
+              "value": "update message",
+              "type": "string"
+            },
+            {
+              "random": "100,1000",
+              "type": "long"
+            }
+          ],
+          "sliceRecordCount": 1000
+        }
+      },
+      "writer": {
+        "name": "oraclewriter",
+        "parameter": {
+          "username": "system",
+          "password": "password",
+          "writeMode": "update (id, class)",
+          "column": [
+            "id",
+            "name",
+            "mesg",
+            "class"
+          ],
+          "connection": {
+            "jdbcUrl": "jdbc:oracle:thin:@10.60.168.62:1521/ORCL",
+            "table": [
+              "ini.test"
+            ]
           }
         }
       }
-    ],
+    },
     "setting": {
       "speed": {
         "bytes": -1,

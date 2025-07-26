@@ -8,13 +8,11 @@
     ],
     "preSql": [],
     "postSql": [],
-    "connection": [
-      {
-        "jdbcUrl": "jdbc:databend://localhost:8000/addax",
-        "table": [
-          "table1"
-        ]
-      }
-    ]
+    "connection": {
+      "jdbcUrl": "jdbc:databend://localhost:8000/addax",
+      "table": [
+        "table1"
+      ]
+    }
   }
 }

@@ -1,5 +1,11 @@
 {
   "job": {
+    "setting": {
+      "speed": {
+        "channel": 1,
+        "bytes": -1
+      }
+    },
     "content": {
       "reader": {
         "name": "redisreader",
@@ -21,12 +27,6 @@
           "redisCluster": false,
           "flushDB": false
         }
-      }
-    },
-    "setting": {
-      "speed": {
-        "channel": 1,
-        "bytes": -1
       }
     }
   }

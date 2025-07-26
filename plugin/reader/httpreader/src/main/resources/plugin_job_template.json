@@ -1,27 +1,36 @@
 {
   "name": "httpreader",
   "parameter": {
-    "connection":
-      {
-        "url": "http://127.0.0.1:9090/mock/17/LDJSC/ASSET",
-        "proxy": {
-          "host": "http://127.0.0.1:3128",
-          "auth": "user:pass"
-        }
+    "connection": {
+      "url": "http://127.0.0.1:9090/mock/17/LDJSC/ASSET",
+      "proxy": {
+        "host": "http://127.0.0.1:3128",
+        "auth": "user:pass"
       }
-    ,
+    },
     "reqParams": {
-      "CURR_DATE":"2021-01-18",
-      "DEPT":"9700"
+      "CURR_DATE": "2021-01-18",
+      "DEPT": "9700"
     },
     "isPage": true,
     "pageParams": {
-      "pageSize": {"key":"pageSize","value":10},
-      "pageIndex":{"key": "pageNo", "value": 1}
+      "pageSize": {
+        "key": "pageSize",
+        "value": 10
+      },
+      "pageIndex": {
+        "key": "pageNo",
+        "value": 1
+      }
     },
-    "resultKey":"result",
+    "resultKey": "result",
     "method": "GET",
-    "column": ["CURR_DATE","DEPT","TOTAL_MANAGED_MARKET_VALUE","TOTAL_MANAGED_MARKET_VALUE_GROWTH"],
+    "column": [
+      "CURR_DATE",
+      "DEPT",
+      "TOTAL_MANAGED_MARKET_VALUE",
+      "TOTAL_MANAGED_MARKET_VALUE_GROWTH"
+    ],
     "username": "user",
     "password": "passw0rd",
     "headers": {

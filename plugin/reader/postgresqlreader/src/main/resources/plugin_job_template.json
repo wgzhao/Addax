@@ -1,8 +1,8 @@
 {
   "name": "postgresqlreader",
   "parameter": {
-    "username": "pgtest",
-    "password": "pgtest",
+    "username": "user",
+    "password": "password",
     "autoPk": false,
     "splitPk": "",
     "column": [

@@ -6,46 +6,44 @@
         "channel": 1
       }
     },
-    "content": [
-      {
-        "reader": {
-          "name": "streamreader",
-          "parameter": {
-            "column": [
-              {
-                "value": "addax",
-                "type": "string"
-              },
-              {
-                "value": 19890604,
-                "type": "long"
-              },
-              {
-                "value": "1989-06-04 00:00:00",
-                "type": "date"
-              },
-              {
-                "value": true,
-                "type": "bool"
-              },
-              {
-                "value": "test",
-                "type": "bytes"
-              }
-            ],
-            "sliceRecordCount": 1000
-          }
-        },
-        "writer": {
-          "name": "txtfilewriter",
-          "parameter": {
-            "path": "/tmp/out",
-            "fileName": "test",
-            "writeMode": "truncate",
-            "encoding": "UTF-8"
-          }
+    "content": {
+      "reader": {
+        "name": "streamreader",
+        "parameter": {
+          "column": [
+            {
+              "value": "addax",
+              "type": "string"
+            },
+            {
+              "value": 19890604,
+              "type": "long"
+            },
+            {
+              "value": "1989-06-04 00:00:00",
+              "type": "date"
+            },
+            {
+              "value": true,
+              "type": "bool"
+            },
+            {
+              "value": "test",
+              "type": "bytes"
+            }
+          ],
+          "sliceRecordCount": 1000
+        }
+      },
+      "writer": {
+        "name": "txtfilewriter",
+        "parameter": {
+          "path": "/tmp/out",
+          "fileName": "test",
+          "writeMode": "truncate",
+          "encoding": "UTF-8"
         }
       }
-    ]
+    }
   }
 }

@@ -5,8 +5,8 @@
         "reader": {
           "name": "oraclereader",
           "parameter": {
-            "password": "password",
             "username": "oracle",
+            "password": "password",
             "where": "",
             "column": [
               "BRANCH_NO",
@@ -15,7 +15,7 @@
             "connection": {
               "jdbcUrl": "jdbc:oracle:thin:@127.0.0.1:1521/stage",
               "table": [
-                "STGUF.ALLBRANCH"
+                "ALLBRANCH"
               ]
             }
           }

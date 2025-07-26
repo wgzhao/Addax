@@ -7,7 +7,9 @@
     "username": "xx",
     "password": "xxx",
     "path": [
-      "/var/ftp/*.txt", "/var/tmp/*.txt", "/public/ftp"
+      "/var/ftp/*.txt",
+      "/var/tmp/*.txt",
+      "/public/ftp"
     ],
     "column": [
       {

@@ -9,13 +9,12 @@
     ],
     "session": [],
     "preSql": [],
-    "connection": [
-      {
-        "jdbcUrl": "jdbc:<dbtype>://<host>:<port>/<database>",
-        "table": [
-          "addax_table"
-        ]
-      }
-    ]
+    "connection": {
+      "jdbcUrl": "jdbc:<dbtype>://<host>:<port>/<database>",
+      "table": [
+        "addax_table"
+      ]
+    },
+    "driver": ""
   }
 }

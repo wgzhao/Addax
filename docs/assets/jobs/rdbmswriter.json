@@ -38,12 +38,6 @@
       "writer": {
         "name": "rdbmswriter",
         "parameter": {
-          "connection": {
-            "jdbcUrl": "jdbc:dm://ip:port/database",
-            "table": [
-              "table"
-            ]
-          },
           "username": "username",
           "password": "password",
           "driver": "dm.jdbc.driver.DmDriver",
@@ -52,7 +46,13 @@
           ],
           "preSql": [
             "delete from XXX;"
-          ]
+          ],
+          "connection": {
+            "jdbcUrl": "jdbc:dm://ip:port/database",
+            "table": [
+              "table"
+            ]
+          }
         }
       }
     }

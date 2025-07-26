@@ -11,13 +11,11 @@
       "truncate table @table"
     ],
     "postSql": [],
-    "connection": [
-      {
-        "jdbcUrl": "jdbc:postgresql://localhost:5432/wgzhao",
-        "table": [
-          "gp_test"
-        ]
-      }
-    ]
+    "connection": {
+      "jdbcUrl": "jdbc:postgresql://localhost:5432/wgzhao",
+      "table": [
+        "gp_test"
+      ]
+    }
   }
 }

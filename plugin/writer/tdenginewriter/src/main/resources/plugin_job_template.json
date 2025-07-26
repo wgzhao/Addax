@@ -11,13 +11,11 @@
       "flag_open",
       "memo"
     ],
-    "connection": [
-      {
-        "jdbcUrl": "jdbc:TAOS://127.0.0.1:6030/test",
-        "table": [
-          "addax_test"
-        ]
-      }
-    ]
+    "connection": {
+      "jdbcUrl": "jdbc:TAOS://127.0.0.1:6030/test",
+      "table": [
+        "addax_test"
+      ]
+    }
   }
 }

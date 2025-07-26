@@ -1,13 +1,12 @@
 {
   "name": "oraclereader",
   "parameter": {
-    "username": "root",
-    "password": "root",
+    "username": "oracle",
+    "password": "oracle",
     "column": [
-      "id",
-      "name"
+      "*"
     ],
-    "splitPk": "db_id",
+    "splitPk": "",
     "autoPk": false,
     "connection": {
       "jdbcUrl": "jdbc:oracle:thin:@<HOST_NAME>:PORT:<DATABASE_NAME>",
