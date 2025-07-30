@@ -13,7 +13,7 @@ GaussDbWriter面向ETL开发工程师，他们使用GaussDbWriter从数仓导入
 
 ## 2 实现原理
 
-GaussDbWriter通过 DataX 框架获取 Reader 生成的协议数据，根据你配置生成相应的SQL插入语句
+GaussDbWriter通过 Addax 框架获取 Reader 生成的协议数据，根据你配置生成相应的SQL插入语句
 
 
 * `insert into...`(当主键/唯一性索引冲突时会写不进去冲突的行)
@@ -46,7 +46,7 @@ GaussDbWriter通过 DataX 框架获取 Reader 生成的协议数据，根据你�
                     "parameter": {
                         "column" : [
                             {
-                                "value": "DataX",
+                                "value": "Addax",
                                 "type": "string"
                             },
                             {
@@ -83,7 +83,7 @@ GaussDbWriter通过 DataX 框架获取 Reader 生成的协议数据，根据你�
                         ],
                         "connection": [
                             {
-                                "jdbcUrl": "jdbc:gaussdb://127.0.0.1:8000/datax",
+                                "jdbcUrl": "jdbc:gaussdb://127.0.0.1:8000/Addax",
                                 "table": [
                                     "test"
                                 ]
@@ -152,7 +152,7 @@ GaussDbWriter通过 DataX 框架获取 Reader 生成的协议数据，根据你�
 
 * **preSql**
 
-    * 描述：写入数据到目的表前，会先执行这里的标准语句。如果 Sql 中有你需要操作到的表名称，请使用 `@table` 表示，这样在实际执行 Sql 语句时，会对变量按照实际表名称进行替换。比如你的任务是要写入到目的端的100个同构分表(表名称为:datax_00,datax01, ... datax_98,datax_99)，并且你希望导入数据前，先对表中数据进行删除操作，那么你可以这样配置：`"preSql":["delete from @table"]`，效果是：在执行到每个表写入数据前，会先执行对应的 delete from 对应表名称 <br />
+    * 描述：写入数据到目的表前，会先执行这里的标准语句。如果 Sql 中有你需要操作到的表名称，请使用 `@table` 表示，这样在实际执行 Sql 语句时，会对变量按照实际表名称进行替换。比如你的任务是要写入到目的端的100个同构分表(表名称为:Addax_00,Addax01, ... Addax_98,Addax_99)，并且你希望导入数据前，先对表中数据进行删除操作，那么你可以这样配置：`"preSql":["delete from @table"]`，效果是：在执行到每个表写入数据前，会先执行对应的 delete from 对应表名称 <br />
 
     * 必选：否 <br />
 
@@ -168,7 +168,7 @@ GaussDbWriter通过 DataX 框架获取 Reader 生成的协议数据，根据你�
 
 * **batchSize**
 
-    * 描述：一次性批量提交的记录数大小，该值可以极大减少DataX与GaussDB的网络交互次数，并提升整体吞吐量。但是该值设置过大可能会造成DataX运行进程OOM情况。<br />
+    * 描述：一次性批量提交的记录数大小，该值可以极大减少Addax与GaussDB的网络交互次数，并提升整体吞吐量。但是该值设置过大可能会造成Addax运行进程OOM情况。<br />
 
     * 必选：否 <br />
 
@@ -180,7 +180,7 @@ GaussDbWriter通过 DataX 框架获取 Reader 生成的协议数据，根据你�
 
 下面列出 GaussDbWriter针对 GaussDB类型转换列表:
 
-| DataX 内部类型| GaussDB 数据类型    |
+| Addax 内部类型| GaussDB 数据类型    |
 | -------- | -----  |
 | Long     |bigint, bigserial, integer, smallint, serial |
 | Double   |double precision, money, numeric, real |
@@ -216,7 +216,7 @@ a_timestamp timestamp
 
 #### 4.1.2 机器参数
 
-* 执行DataX的机器参数为:
+* 执行Addax的机器参数为:
     1. cpu: 16核 Intel(R) Xeon(R) CPU E5620  @ 2.40GHz
     2. mem: MemTotal: 24676836kB    MemFree: 6365080kB
     3. net: 百兆双网卡
@@ -229,7 +229,7 @@ a_timestamp timestamp
 
 #### 4.2.1 单表测试报告
 
-| 通道数|  批量提交batchSize | DataX速度(Rec/s)| DataX流量(M/s) | DataX机器运行负载
+| 通道数|  批量提交batchSize | Addax速度(Rec/s)| Addax流量(M/s) | Addax机器运行负载
 |--------|--------| --------|--------|--------|--------|
 |1| 128 | 9259 | 0.55 | 0.3
 |1| 512 | 10869 | 0.653 | 0.3
@@ -255,13 +255,13 @@ a_timestamp timestamp
 
 **Q: GaussDbWriter 执行 postSql 语句报错，那么数据导入到目标数据库了吗?**
 
-A: DataX 导入过程存在三块逻辑，pre 操作、导入操作、post 操作，其中任意一环报错，DataX 作业报错。由于 DataX 不能保证在同一个事务完成上述几个操作，因此有可能数据已经落入到目标端。
+A: Addax 导入过程存在三块逻辑，pre 操作、导入操作、post 操作，其中任意一环报错，Addax 作业报错。由于 Addax 不能保证在同一个事务完成上述几个操作，因此有可能数据已经落入到目标端。
 
 ***
 
 **Q: 按照上述说法，那么有部分脏数据导入数据库，如果影响到线上数据库怎么办?**
 
-A: 目前有两种解法，第一种配置 pre 语句，该 sql 可以清理当天导入数据， DataX 每次导入时候可以把上次清理干净并导入完整数据。
+A: 目前有两种解法，第一种配置 pre 语句，该 sql 可以清理当天导入数据， Addax 每次导入时候可以把上次清理干净并导入完整数据。
 第二种，向临时表导入数据，完成后再 rename 到线上表。
 
 ***
