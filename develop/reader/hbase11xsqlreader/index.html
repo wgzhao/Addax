@@ -814,7 +814,7 @@
         
   
   <span class="md-ellipsis">
-    Text File Reader
+    TxtFile Reader
   </span>
   
 
@@ -1003,7 +1003,7 @@
         
   
   <span class="md-ellipsis">
-    FTP Reader
+    Ftp Reader
   </span>
   
 
@@ -1108,18 +1108,27 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#configuration-example" class="md-nav__link">
+  <a href="#_1" class="md-nav__link">
     <span class="md-ellipsis">
-      Configuration Example
+      配置样例
     </span>
   </a>
   
 </li>
       
         <li class="md-nav__item">
-  <a href="#parameters" class="md-nav__link">
+  <a href="#_2" class="md-nav__link">
     <span class="md-ellipsis">
-      Parameters
+      参数说明
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_3" class="md-nav__link">
+    <span class="md-ellipsis">
+      类型转换
     </span>
   </a>
   
@@ -1915,7 +1924,7 @@
         
   
   <span class="md-ellipsis">
-    FTP Writer
+    Ftp Writer
   </span>
   
 
@@ -1936,7 +1945,7 @@
         
   
   <span class="md-ellipsis">
-    GreenPlum Writer
+    Greenplum Writer
   </span>
   
 
@@ -1999,7 +2008,7 @@
         
   
   <span class="md-ellipsis">
-    HBase11x Writer
+    HBase11X Writer
   </span>
   
 
@@ -2479,18 +2488,27 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#configuration-example" class="md-nav__link">
+  <a href="#_1" class="md-nav__link">
     <span class="md-ellipsis">
-      Configuration Example
+      配置样例
     </span>
   </a>
   
 </li>
       
         <li class="md-nav__item">
-  <a href="#parameters" class="md-nav__link">
+  <a href="#_2" class="md-nav__link">
     <span class="md-ellipsis">
-      Parameters
+      参数说明
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_3" class="md-nav__link">
+    <span class="md-ellipsis">
+      类型转换
     </span>
   </a>
   
@@ -2512,9 +2530,9 @@
 
 
 <h1 id="hbase11x-sql-reader">HBase11x SQL Reader<a class="headerlink" href="#hbase11x-sql-reader" title="Permanent link">&para;</a></h1>
-<p>HBase11x SQL Reader plugin implements reading data from <a href="https://phoenix.apache.org">Phoenix(HBase SQL)</a>, supporting HBase version 1.x.</p>
-<h2 id="configuration-example">Configuration Example<a class="headerlink" href="#configuration-example" title="Permanent link">&para;</a></h2>
-<p>Configure a job to synchronize and extract data from Phoenix to local:</p>
+<p>HBase11x SQL Reader 插件实现了从 <a href="https://phoenix.apache.org">Phoenix(HBase SQL)</a>读取数据, 支持的 HBase 版本为 1.x</p>
+<h2 id="_1">配置样例<a class="headerlink" href="#_1" title="Permanent link">&para;</a></h2>
+<p>配置一个从Phoenix同步抽取数据到本地的作业:</p>
 <div class="highlight"><pre><span></span><code><span class="p">{</span>
 <span class="w">    </span><span class="nt">&quot;job&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
 <span class="w">        </span><span class="nt">&quot;setting&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
@@ -2527,10 +2545,20 @@
 <span class="w">                </span><span class="nt">&quot;reader&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
 <span class="w">                    </span><span class="nt">&quot;name&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;hbase11xsqlreader&quot;</span><span class="p">,</span>
 <span class="w">                    </span><span class="nt">&quot;parameter&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
-<span class="w">                        </span><span class="nt">&quot;queryServerAddress&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;http://127.0.0.1:8765&quot;</span><span class="p">,</span>
-<span class="w">                        </span><span class="nt">&quot;serialization&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;PROTOBUF&quot;</span><span class="p">,</span>
-<span class="w">                        </span><span class="nt">&quot;table&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;TEST&quot;</span><span class="p">,</span>
-<span class="w">                        </span><span class="nt">&quot;column&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="s2">&quot;ID&quot;</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;NAME&quot;</span><span class="p">]</span>
+<span class="w">                        </span><span class="nt">&quot;hbaseConfig&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<span class="w">                            </span><span class="nt">&quot;hbase.zookeeper.quorum&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;node1,node2,node3&quot;</span>
+<span class="w">                        </span><span class="p">},</span>
+<span class="w">                        </span><span class="nt">&quot;table&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;US_POPULATION&quot;</span><span class="p">,</span>
+<span class="w">                        </span><span class="nt">&quot;column&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[],</span>
+<span class="w">                        </span><span class="nt">&quot;where&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;1=1&quot;</span><span class="p">,</span>
+<span class="w">                        </span><span class="nt">&quot;querySql&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;&quot;</span>
+<span class="w">                    </span><span class="p">}</span>
+<span class="w">                </span><span class="p">},</span>
+<span class="w">                </span><span class="nt">&quot;writer&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<span class="w">                    </span><span class="nt">&quot;name&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;streamwriter&quot;</span><span class="p">,</span>
+<span class="w">                    </span><span class="nt">&quot;parameter&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<span class="w">                        </span><span class="nt">&quot;print&quot;</span><span class="p">:</span><span class="kc">true</span><span class="p">,</span>
+<span class="w">                        </span><span class="nt">&quot;encoding&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;UTF-8&quot;</span>
 <span class="w">                    </span><span class="p">}</span>
 <span class="w">                </span><span class="p">}</span>
 <span class="w">            </span><span class="p">}</span>
@@ -2538,8 +2566,92 @@
 <span class="w">    </span><span class="p">}</span>
 <span class="p">}</span>
 </code></pre></div>
-<h2 id="parameters">Parameters<a class="headerlink" href="#parameters" title="Permanent link">&para;</a></h2>
-<p>This plugin is based on <a href="../rdbmsreader">RDBMS Reader</a>, so you can refer to all configuration items of RDBMS Reader.</p>
+<h2 id="_2">参数说明<a class="headerlink" href="#_2" title="Permanent link">&para;</a></h2>
+<table>
+<thead>
+<tr>
+<th style="text-align: left;">配置项</th>
+<th style="text-align: center;">是否必须</th>
+<th>数据类型</th>
+<th>默认值</th>
+<th>描述</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;">hbaseConfig</td>
+<td style="text-align: center;">是</td>
+<td>map</td>
+<td>无</td>
+<td>需要通过 Phoenix 客户端去连接 hbase 集群，因此这里需要填写对应 hbase 集群的 <code>zkurl</code>地址</td>
+</tr>
+<tr>
+<td style="text-align: left;">table</td>
+<td style="text-align: center;">是</td>
+<td>string</td>
+<td>无</td>
+<td>指定 Phoenix 中的表名,如果有 namespace，该值设置为 <code>namespace.tablename</code></td>
+</tr>
+<tr>
+<td style="text-align: left;">querySql</td>
+<td style="text-align: center;">否</td>
+<td>string</td>
+<td>无</td>
+<td>不是直接查询表，而是提供具体的查询语句，如果该参数和 <code>table</code> 参数同时存在，则优先使用该参数</td>
+</tr>
+<tr>
+<td style="text-align: left;">column</td>
+<td style="text-align: center;">是</td>
+<td><code>list&lt;map&gt;</code></td>
+<td>无</td>
+<td>填写需要从phoenix表中读取的列名集合，使用JSON的数组描述字段信息，空值或 <code>"*"</code> 表示读取所有列</td>
+</tr>
+<tr>
+<td style="text-align: left;">where</td>
+<td style="text-align: center;">否</td>
+<td>string</td>
+<td>无</td>
+<td><code>where</code> 条件</td>
+</tr>
+</tbody>
+</table>
+<h2 id="_3">类型转换<a class="headerlink" href="#_3" title="Permanent link">&para;</a></h2>
+<p>目前支持大部分 Phoenix类型，但也存在部分个别类型没有支持的情况，请注意检查你的类型。</p>
+<p>下面列出类型转换列表:</p>
+<table>
+<thead>
+<tr>
+<th>Addax 内部类型</th>
+<th>Phoenix 数据类型</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>String</td>
+<td>CHAR, VARCHAR</td>
+</tr>
+<tr>
+<td>Bytes</td>
+<td>BINARY, VARBINARY</td>
+</tr>
+<tr>
+<td>Bool</td>
+<td>BOOLEAN</td>
+</tr>
+<tr>
+<td>Long</td>
+<td>INTEGER, TINYINT, SMALLINT, BIGINT</td>
+</tr>
+<tr>
+<td>Double</td>
+<td>FLOAT, DECIMAL, DOUBLE,</td>
+</tr>
+<tr>
+<td>Date</td>
+<td>DATE, TIME, TIMESTAMP</td>
+</tr>
+</tbody>
+</table>
 
 
 

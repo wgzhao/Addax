@@ -751,19 +751,19 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#example" class="md-nav__link">
+  <a href="#_1" class="md-nav__link">
     <span class="md-ellipsis">
-      Example
+      示例
     </span>
   </a>
   
-    <nav class="md-nav" aria-label="Example">
+    <nav class="md-nav" aria-label="示例">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#execute-collection-command" class="md-nav__link">
+  <a href="#_2" class="md-nav__link">
     <span class="md-ellipsis">
-      Execute Collection Command
+      执行采集命令
     </span>
   </a>
   
@@ -775,9 +775,9 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#parameters" class="md-nav__link">
+  <a href="#_3" class="md-nav__link">
     <span class="md-ellipsis">
-      Parameters
+      参数说明
     </span>
   </a>
   
@@ -887,7 +887,7 @@
         
   
   <span class="md-ellipsis">
-    Text File Reader
+    TxtFile Reader
   </span>
   
 
@@ -1076,7 +1076,7 @@
         
   
   <span class="md-ellipsis">
-    FTP Reader
+    Ftp Reader
   </span>
   
 
@@ -1930,7 +1930,7 @@
         
   
   <span class="md-ellipsis">
-    FTP Writer
+    Ftp Writer
   </span>
   
 
@@ -1951,7 +1951,7 @@
         
   
   <span class="md-ellipsis">
-    GreenPlum Writer
+    Greenplum Writer
   </span>
   
 
@@ -2014,7 +2014,7 @@
         
   
   <span class="md-ellipsis">
-    HBase11x Writer
+    HBase11X Writer
   </span>
   
 
@@ -2494,19 +2494,19 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#example" class="md-nav__link">
+  <a href="#_1" class="md-nav__link">
     <span class="md-ellipsis">
-      Example
+      示例
     </span>
   </a>
   
-    <nav class="md-nav" aria-label="Example">
+    <nav class="md-nav" aria-label="示例">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#execute-collection-command" class="md-nav__link">
+  <a href="#_2" class="md-nav__link">
     <span class="md-ellipsis">
-      Execute Collection Command
+      执行采集命令
     </span>
   </a>
   
@@ -2518,9 +2518,9 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#parameters" class="md-nav__link">
+  <a href="#_3" class="md-nav__link">
     <span class="md-ellipsis">
-      Parameters
+      参数说明
     </span>
   </a>
   
@@ -2542,10 +2542,10 @@
 
 
 <h1 id="access-reader">Access Reader<a class="headerlink" href="#access-reader" title="Permanent link">&para;</a></h1>
-<p>AccessReader implements the ability to read data from <a href="https://en.wikipedia.org/wiki/Microsoft_Access">Access</a> databases, based on <a href="../rdbmsreader">Addax RDBMS Reader</a>.</p>
-<h2 id="example">Example<a class="headerlink" href="#example" title="Permanent link">&para;</a></h2>
-<p>We download the test file <a href="http://www.databasedev.co.uk/downloads/AccessThemeDemo.zip">AccessThemeDemo.zip</a>, extract it to get the <code>AccessThemeDemo.mdb</code> file, which contains a <code>tbl_Users</code> table. We will synchronize the data from this table to the terminal.</p>
-<p>The following configuration reads the table to the terminal:</p>
+<p>AccessReader 实现了从 <a href="https://en.wikipedia.org/wiki/Microsoft_Access">Access</a> 数据库上读取数据的能力，他基于 <a href="../rdbmsreader">Addax RDBMS Reader</a> 实现。</p>
+<h2 id="_1">示例<a class="headerlink" href="#_1" title="Permanent link">&para;</a></h2>
+<p>我们下载用于测试用的 <a href="http://www.databasedev.co.uk/downloads/AccessThemeDemo.zip">AcessThemeDemo.zip</a> 文件，解压后得到 <code>AccessThemeDemo.mdb</code> 文件，该文件中包含了一个 <code>tbl_Users</code> 表，我们将该表的数据同步到终端上。</p>
+<p>下面的配置是读取该表到终端的作业:</p>
 <div class="tabbed-set" data-tabs="1:1"><input checked="checked" id="__tabbed_1_1" name="__tabbed_1" type="radio" /><label for="__tabbed_1_1">job/access2stream.json</label><div class="tabbed-content"></div>
 </div>
 <div class="highlight"><pre><span></span><code><span class="p">{</span>
@@ -2585,13 +2585,13 @@
 <span class="w">  </span><span class="p">}</span>
 <span class="p">}</span>
 </code></pre></div>
-<p>Save the above configuration file as <code>job/access2stream.json</code></p>
-<h3 id="execute-collection-command">Execute Collection Command<a class="headerlink" href="#execute-collection-command" title="Permanent link">&para;</a></h3>
-<p>Execute the following command for data collection</p>
+<p>将上述配置文件保存为 <code>job/access2stream.json</code></p>
+<h3 id="_2">执行采集命令<a class="headerlink" href="#_2" title="Permanent link">&para;</a></h3>
+<p>执行以下命令进行数据采集</p>
 <div class="highlight"><pre><span></span><code>bin/addax.sh<span class="w"> </span>job/access2stream.json
 </code></pre></div>
-<h2 id="parameters">Parameters<a class="headerlink" href="#parameters" title="Permanent link">&para;</a></h2>
-<p>AccessReader is based on <a href="../rdbmsreader">RDBMS Reader</a>, so you can refer to all configuration items of RDBMS Reader.</p>
+<h2 id="_3">参数说明<a class="headerlink" href="#_3" title="Permanent link">&para;</a></h2>
+<p>AccessReader 基于 <a href="../rdbmsreader">RDBMS Reader</a> 实现，因此可以参考 RDBMS Reader 的所有配置项。</p>
 
 
 

@@ -809,7 +809,7 @@
         
   
   <span class="md-ellipsis">
-    Text File Reader
+    TxtFile Reader
   </span>
   
 
@@ -998,7 +998,7 @@
         
   
   <span class="md-ellipsis">
-    FTP Reader
+    Ftp Reader
   </span>
   
 
@@ -1689,29 +1689,71 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#configure-driver" class="md-nav__link">
+  <a href="#_1" class="md-nav__link">
     <span class="md-ellipsis">
-      Configure Driver
+      配置驱动
     </span>
   </a>
   
 </li>
       
         <li class="md-nav__item">
-  <a href="#configuration" class="md-nav__link">
+  <a href="#_2" class="md-nav__link">
     <span class="md-ellipsis">
-      Configuration
+      配置说明
     </span>
   </a>
   
 </li>
       
         <li class="md-nav__item">
-  <a href="#parameters" class="md-nav__link">
+  <a href="#_3" class="md-nav__link">
     <span class="md-ellipsis">
-      Parameters
+      参数说明
     </span>
   </a>
+  
+    <nav class="md-nav" aria-label="参数说明">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#column" class="md-nav__link">
+    <span class="md-ellipsis">
+      column
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#jdbcurl" class="md-nav__link">
+    <span class="md-ellipsis">
+      jdbcUrl
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#driver" class="md-nav__link">
+    <span class="md-ellipsis">
+      driver
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#session" class="md-nav__link">
+    <span class="md-ellipsis">
+      session
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
   
 </li>
       
@@ -1924,7 +1966,7 @@
         
   
   <span class="md-ellipsis">
-    FTP Writer
+    Ftp Writer
   </span>
   
 
@@ -1945,7 +1987,7 @@
         
   
   <span class="md-ellipsis">
-    GreenPlum Writer
+    Greenplum Writer
   </span>
   
 
@@ -2008,7 +2050,7 @@
         
   
   <span class="md-ellipsis">
-    HBase11x Writer
+    HBase11X Writer
   </span>
   
 
@@ -2488,29 +2530,71 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#configure-driver" class="md-nav__link">
+  <a href="#_1" class="md-nav__link">
     <span class="md-ellipsis">
-      Configure Driver
+      配置驱动
     </span>
   </a>
   
 </li>
       
         <li class="md-nav__item">
-  <a href="#configuration" class="md-nav__link">
+  <a href="#_2" class="md-nav__link">
     <span class="md-ellipsis">
-      Configuration
+      配置说明
     </span>
   </a>
   
 </li>
       
         <li class="md-nav__item">
-  <a href="#parameters" class="md-nav__link">
+  <a href="#_3" class="md-nav__link">
     <span class="md-ellipsis">
-      Parameters
+      参数说明
     </span>
   </a>
+  
+    <nav class="md-nav" aria-label="参数说明">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#column" class="md-nav__link">
+    <span class="md-ellipsis">
+      column
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#jdbcurl" class="md-nav__link">
+    <span class="md-ellipsis">
+      jdbcUrl
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#driver" class="md-nav__link">
+    <span class="md-ellipsis">
+      driver
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#session" class="md-nav__link">
+    <span class="md-ellipsis">
+      session
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
   
 </li>
       
@@ -2530,8 +2614,8 @@
 
 
 <h1 id="rdbms-writer">RDBMS Writer<a class="headerlink" href="#rdbms-writer" title="Permanent link">&para;</a></h1>
-<p>RDBMS Writer plugin supports writing data to traditional RDBMS. This is a generic relational database writer plugin that can support more relational database writing by registering database drivers.</p>
-<p>At the same time, RDBMS Writer is also the base class for other relational database writer plugins. The following writer plugins all depend on this plugin:</p>
+<p>RDBMS Writer 插件支持从传统 RDBMS 读取数据。这是一个通用关系数据库读取插件，可以通过注册数据库驱动等方式支持更多关系数据库读取。</p>
+<p>同时 RDBMS Writer 又是其他关系型数据库读取插件的的基础类。以下读取插件均依赖该插件</p>
 <ul>
 <li><a href="../oraclewriter">Oracle Writer</a></li>
 <li><a href="../mysqlwriter">MySQL Writer</a></li>
@@ -2541,14 +2625,14 @@
 <li><a href="../accesswriter">Access Writer</a></li>
 <li><a href="../databendwriter">Databend Writer</a></li>
 </ul>
-<p>Note: If a dedicated database writer plugin is already provided, it is recommended to use the dedicated plugin. If the database you need to write to does not have a dedicated plugin, consider using this generic plugin. Before use, you need to perform the following operations to run normally, otherwise exceptions will occur.</p>
-<h2 id="configure-driver">Configure Driver<a class="headerlink" href="#configure-driver" title="Permanent link">&para;</a></h2>
-<p>Suppose you need to write data to IBM DB2. Since no dedicated writer plugin is provided, we can use this plugin to implement it. Before use, you need to perform the following two operations:</p>
+<p>注意, 如果已经提供了专门的数据库写入插件的，推荐使用专用插件，如果你需要写入的数据库没有专门插件，则考虑使用该通用插件。 在使用之前，还需要执行以下操作才可以正常运行，否则运行会出现异常。</p>
+<h2 id="_1">配置驱动<a class="headerlink" href="#_1" title="Permanent link">&para;</a></h2>
+<p>假定你需要写入 IBM DB2 的数据，因为没有提供专门的读取插件，所以我们可以使用该插件来实现，在使用之前，需要执行下面两个操作：</p>
 <ol>
-<li>Download the corresponding JDBC driver and copy it to the <code>plugin/writer/rdbmswriter/libs</code> directory</li>
-<li>Modify the task configuration file, find the <code>driver</code> item, and fill in the correct JDBC driver name, such as DB2's driver name <code>com.ibm.db2.jcc.DB2Driver</code></li>
+<li>下载对应的 JDBC 驱动，并拷贝到 <code>plugin/writer/rdbmswriter/libs</code> 目录</li>
+<li>修改任务配置文件，找到 <code>driver</code> 一项，填写正确的 JDBC 驱动名，比如 DB2 的驱动名为 <code>com.ibm.db2.jcc.DB2Driver</code></li>
 </ol>
-<p>The following lists common databases and their corresponding driver names:</p>
+<p>以下列出常见的数据库以及对应的驱动名称</p>
 <ul>
 <li><a href="http://impala.apache.org/">Apache Impala</a>: <code>com.cloudera.impala.jdbc41.Driver</code></li>
 <li><a href="https://www.enterprisedb.com/">Enterprise DB</a>: <code>com.edb.Driver</code></li>
@@ -2564,8 +2648,8 @@
 <li><a href="https://www.oracle.com/database/">Oracle DB</a>: <code>oracle.jdbc.OracleDriver</code></li>
 <li><a href="https://postgresql.org">PostgreSQL</a>: <code>org.postgresql.Drive</code></li>
 </ul>
-<h2 id="configuration">Configuration<a class="headerlink" href="#configuration" title="Permanent link">&para;</a></h2>
-<p>Configure a job to write to RDBMS.</p>
+<h2 id="_2">配置说明<a class="headerlink" href="#_2" title="Permanent link">&para;</a></h2>
+<p>配置一个写入RDBMS的作业。</p>
 <div class="highlight"><pre><span></span><code><span class="p">{</span>
 <span class="w">  </span><span class="nt">&quot;job&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
 <span class="w">    </span><span class="nt">&quot;setting&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
@@ -2627,8 +2711,156 @@
 <span class="w">  </span><span class="p">}</span>
 <span class="p">}</span>
 </code></pre></div>
-<h2 id="parameters">Parameters<a class="headerlink" href="#parameters" title="Permanent link">&para;</a></h2>
-<p>This plugin provides configuration for writing to relational databases. For detailed parameter descriptions, please refer to the original RDBMS Writer documentation.</p>
+<h2 id="_3">参数说明<a class="headerlink" href="#_3" title="Permanent link">&para;</a></h2>
+<table>
+<thead>
+<tr>
+<th style="text-align: left;">配置项</th>
+<th style="text-align: center;">是否必须</th>
+<th>数据类型</th>
+<th>默认值</th>
+<th>描述</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;">jdbcUrl</td>
+<td style="text-align: center;">是</td>
+<td>string</td>
+<td>无</td>
+<td>对端数据库的JDBC连接信息，jdbcUrl按照RDBMS官方规范，并可以填写连接附件控制信息 ｜</td>
+</tr>
+<tr>
+<td style="text-align: left;">driver</td>
+<td style="text-align: center;">是</td>
+<td>string</td>
+<td>无</td>
+<td>自定义驱动类名，解决兼容性问题，详见下面描述</td>
+</tr>
+<tr>
+<td style="text-align: left;">username</td>
+<td style="text-align: center;">是</td>
+<td>string</td>
+<td>无</td>
+<td>数据源的用户名</td>
+</tr>
+<tr>
+<td style="text-align: left;">password</td>
+<td style="text-align: center;">否</td>
+<td>string</td>
+<td>无</td>
+<td>数据源指定用户名的密码</td>
+</tr>
+<tr>
+<td style="text-align: left;">table</td>
+<td style="text-align: center;">是</td>
+<td>list</td>
+<td>无</td>
+<td>所选取的需要同步的表名,使用JSON数据格式，当配置为多张表时，用户自己需保证多张表是同一表结构</td>
+</tr>
+<tr>
+<td style="text-align: left;">column</td>
+<td style="text-align: center;">是</td>
+<td>list</td>
+<td>无</td>
+<td>所配置的表中需要同步的列名集合，详细描述见后</td>
+</tr>
+<tr>
+<td style="text-align: left;">preSql</td>
+<td style="text-align: center;">否</td>
+<td>list</td>
+<td>无</td>
+<td>执行数据同步任务之前率先执行的sql语句，目前只允许执行一条SQL语句，例如清除旧数据,涉及到的表可用 <code>@table</code>表示</td>
+</tr>
+<tr>
+<td style="text-align: left;">postSql</td>
+<td style="text-align: center;">否</td>
+<td>list</td>
+<td>无</td>
+<td>执行数据同步任务之后执行的sql语句，目前只允许执行一条SQL语句，例如加上某一个时间戳</td>
+</tr>
+<tr>
+<td style="text-align: left;">batchSize</td>
+<td style="text-align: center;">否</td>
+<td>int</td>
+<td>1024</td>
+<td>定义了插件和数据库服务器端每次批量数据获取条数，调高该值可能导致 Addax 出现OOM或者目标数据库事务提交失败导致挂起</td>
+</tr>
+<tr>
+<td style="text-align: left;">session</td>
+<td style="text-align: center;">是否</td>
+<td>list</td>
+<td>无</td>
+<td>针对本地连接,修改会话配置,详见下文</td>
+</tr>
+</tbody>
+</table>
+<h3 id="column">column<a class="headerlink" href="#column" title="Permanent link">&para;</a></h3>
+<p>所配置的表中需要同步的列名集合，使用JSON的数组描述字段信息。用户使用 <code>*</code> 代表默认使用所有列配置，例如 <code>["*"]</code>。</p>
+<p>支持列裁剪，即列可以挑选部分列进行导出。</p>
+<p>支持列换序，即列可以不按照表schema信息进行导出。</p>
+<p>支持常量配置，用户需要按照JSON格式:</p>
+<p><code>["id", "`table`", "1", "'bazhen.csy'", "null", "to_char(a + 1)", "2.3" , "true"]</code></p>
+<ul>
+<li><code>id</code> 为普通列名</li>
+<li><code>`table`</code> 为包含保留在的列名，</li>
+<li><code>1</code> 为整形数字常量，</li>
+<li><code>'bazhen.csy'</code>为字符串常量</li>
+<li><code>null</code> 为空指针，注意，这里的 <code>null</code> 必须以字符串形式出现，即用双引号引用</li>
+<li><code>to_char(a + 1)</code>为表达式，</li>
+<li><code>2.3</code> 为浮点数，</li>
+<li><code>true</code> 为布尔值，同样的，这里的布尔值也必须用双引号引用</li>
+</ul>
+<p>Column必须显示填写，不允许为空！</p>
+<h3 id="jdbcurl">jdbcUrl<a class="headerlink" href="#jdbcurl" title="Permanent link">&para;</a></h3>
+<p><code>jdbcUrl</code> 配置除了配置必要的信息外，我们还可以在增加每种特定驱动的特定配置属性，这里特别提到我们可以利用配置属性对代理的支持从而实现通过代理访问数据库的功能。 
+比如对于 PrestoSQL 数据库的 JDBC 驱动而言，支持 <code>socksProxy</code> 参数，比如一个可能的 <code>jdbcUrl</code> 为</p>
+<p><code>jdbc:presto://127.0.0.1:8080/hive?socksProxy=192.168.1.101:1081</code></p>
+<p>大部分关系型数据库的 JDBC 驱动支持 <code>socksProxyHost,socksProxyPort</code> 参数来支持代理访问。也有一些特别的情况。</p>
+<p>以下是各类数据库 JDBC 驱动所支持的代理类型以及配置方式</p>
+<table>
+<thead>
+<tr>
+<th>数据库</th>
+<th>代理类型</th>
+<th>代理配置</th>
+<th>例子</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>MySQL</td>
+<td>socks</td>
+<td>socksProxyHost,socksProxyPort</td>
+<td><code>socksProxyHost=192.168.1.101&amp;socksProxyPort=1081</code></td>
+</tr>
+<tr>
+<td>Presto</td>
+<td>socks</td>
+<td>socksProxy</td>
+<td><code>socksProxy=192.168.1.101:1081</code></td>
+</tr>
+<tr>
+<td>Presto</td>
+<td>http</td>
+<td>httpProxy</td>
+<td><code>httpProxy=192.168.1.101:3128</code></td>
+</tr>
+</tbody>
+</table>
+<h3 id="driver">driver<a class="headerlink" href="#driver" title="Permanent link">&para;</a></h3>
+<p>大部分情况下，一个数据库的JDBC驱动是固定的，但有些因为版本的不同，所建议的驱动类名不同，比如 MySQL。 
+新的 MySQL JDBC 驱动类型推荐使用 <code>com.mysql.cj.jdbc.Driver</code> 而不是以前的 <code>com.mysql.jdbc.Drver</code>。
+如果想要使用就的驱动名称，则可以配置 <code>driver</code> 配置项。</p>
+<h3 id="session">session<a class="headerlink" href="#session" title="Permanent link">&para;</a></h3>
+<p>描述：设置数据库连接时的session信息，比如针对 Oracle 数据库，可以设置如下：</p>
+<div class="highlight"><pre><span></span><code><span class="p">{</span>
+<span class="w">  </span><span class="nt">&quot;session&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span>
+<span class="w">    </span><span class="s2">&quot;alter session set nls_date_format = &#39;dd.mm.yyyy hh24:mi:ss&#39;;&quot;</span><span class="p">,</span>
+<span class="w">    </span><span class="s2">&quot;alter session set NLS_LANG = &#39;AMERICAN&#39;;&quot;</span>
+<span class="w">  </span><span class="p">]</span>
+<span class="p">}</span>
+</code></pre></div>
 
 
 

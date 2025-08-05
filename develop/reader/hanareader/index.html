@@ -814,7 +814,7 @@
         
   
   <span class="md-ellipsis">
-    Text File Reader
+    TxtFile Reader
   </span>
   
 
@@ -1003,7 +1003,7 @@
         
   
   <span class="md-ellipsis">
-    FTP Reader
+    Ftp Reader
   </span>
   
 
@@ -1066,19 +1066,19 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#example" class="md-nav__link">
+  <a href="#_1" class="md-nav__link">
     <span class="md-ellipsis">
-      Example
+      示例
     </span>
   </a>
   
-    <nav class="md-nav" aria-label="Example">
+    <nav class="md-nav" aria-label="示例">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#execute-collection-command" class="md-nav__link">
+  <a href="#_2" class="md-nav__link">
     <span class="md-ellipsis">
-      Execute Collection Command
+      执行采集命令
     </span>
   </a>
   
@@ -1090,9 +1090,9 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#parameters" class="md-nav__link">
+  <a href="#_3" class="md-nav__link">
     <span class="md-ellipsis">
-      Parameters
+      参数说明
     </span>
   </a>
   
@@ -1930,7 +1930,7 @@
         
   
   <span class="md-ellipsis">
-    FTP Writer
+    Ftp Writer
   </span>
   
 
@@ -1951,7 +1951,7 @@
         
   
   <span class="md-ellipsis">
-    GreenPlum Writer
+    Greenplum Writer
   </span>
   
 
@@ -2014,7 +2014,7 @@
         
   
   <span class="md-ellipsis">
-    HBase11x Writer
+    HBase11X Writer
   </span>
   
 
@@ -2494,19 +2494,19 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#example" class="md-nav__link">
+  <a href="#_1" class="md-nav__link">
     <span class="md-ellipsis">
-      Example
+      示例
     </span>
   </a>
   
-    <nav class="md-nav" aria-label="Example">
+    <nav class="md-nav" aria-label="示例">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#execute-collection-command" class="md-nav__link">
+  <a href="#_2" class="md-nav__link">
     <span class="md-ellipsis">
-      Execute Collection Command
+      执行采集命令
     </span>
   </a>
   
@@ -2518,9 +2518,9 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#parameters" class="md-nav__link">
+  <a href="#_3" class="md-nav__link">
     <span class="md-ellipsis">
-      Parameters
+      参数说明
     </span>
   </a>
   
@@ -2542,9 +2542,9 @@
 
 
 <h1 id="hana-reader">HANA Reader<a class="headerlink" href="#hana-reader" title="Permanent link">&para;</a></h1>
-<p>HANA Reader plugin implements the ability to read data from SAP HANA.</p>
-<h2 id="example">Example<a class="headerlink" href="#example" title="Permanent link">&para;</a></h2>
-<p>The following configuration reads this table to terminal:</p>
+<p>HANA Reader 插件实现了从 SAP HANA 读取数据的能力</p>
+<h2 id="_1">示例<a class="headerlink" href="#_1" title="Permanent link">&para;</a></h2>
+<p>下面的配置是读取该表到终端的作业:</p>
 <div class="tabbed-set" data-tabs="1:1"><input checked="checked" id="__tabbed_1_1" name="__tabbed_1" type="radio" /><label for="__tabbed_1_1">job/hanareader.json</label><div class="tabbed-content"></div>
 </div>
 <div class="highlight"><pre><span></span><code><span class="p">{</span>
@@ -2584,13 +2584,13 @@
 <span class="w">  </span><span class="p">}</span>
 <span class="p">}</span>
 </code></pre></div>
-<p>Save the above configuration file as <code>job/hana2stream.json</code></p>
-<h3 id="execute-collection-command">Execute Collection Command<a class="headerlink" href="#execute-collection-command" title="Permanent link">&para;</a></h3>
-<p>Execute the following command for data collection</p>
+<p>将上述配置文件保存为   <code>job/hana2stream.json</code></p>
+<h3 id="_2">执行采集命令<a class="headerlink" href="#_2" title="Permanent link">&para;</a></h3>
+<p>执行以下命令进行数据采集</p>
 <div class="highlight"><pre><span></span><code>bin/addax.sh<span class="w"> </span>job/hana2stream.json
 </code></pre></div>
-<h2 id="parameters">Parameters<a class="headerlink" href="#parameters" title="Permanent link">&para;</a></h2>
-<p>This plugin is based on <a href="../rdbmsreader">RDBMS Reader</a>, so you can refer to all parameters of RDBMS Reader.</p>
+<h2 id="_3">参数说明<a class="headerlink" href="#_3" title="Permanent link">&para;</a></h2>
+<p>该插件基于 <a href="../rdbmsreader">RDBMS Reader</a> 实现，因此可以参考 RDBMS Reader 的所有参数。</p>
 
 
 
@@ -2628,7 +2628,7 @@
       <nav class="md-footer__inner md-grid" aria-label="Footer" >
         
           
-          <a href="../ftpreader/" class="md-footer__link md-footer__link--prev" aria-label="Previous: FTP Reader">
+          <a href="../ftpreader/" class="md-footer__link md-footer__link--prev" aria-label="Previous: Ftp Reader">
             <div class="md-footer__button md-icon">
               
               <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11h12Z"/></svg>
@@ -2638,7 +2638,7 @@
                 Previous
               </span>
               <div class="md-ellipsis">
-                FTP Reader
+                Ftp Reader
               </div>
             </div>
           </a>

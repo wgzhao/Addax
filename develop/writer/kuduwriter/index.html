@@ -809,7 +809,7 @@
         
   
   <span class="md-ellipsis">
-    Text File Reader
+    TxtFile Reader
   </span>
   
 
@@ -998,7 +998,7 @@
         
   
   <span class="md-ellipsis">
-    FTP Reader
+    Ftp Reader
   </span>
   
 
@@ -1857,7 +1857,7 @@
         
   
   <span class="md-ellipsis">
-    FTP Writer
+    Ftp Writer
   </span>
   
 
@@ -1878,7 +1878,7 @@
         
   
   <span class="md-ellipsis">
-    GreenPlum Writer
+    Greenplum Writer
   </span>
   
 
@@ -1941,7 +1941,7 @@
         
   
   <span class="md-ellipsis">
-    HBase11x Writer
+    HBase11X Writer
   </span>
   
 
@@ -2130,18 +2130,60 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#configuration-example" class="md-nav__link">
+  <a href="#_1" class="md-nav__link">
     <span class="md-ellipsis">
-      Configuration Example
+      示例
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="示例">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#_2" class="md-nav__link">
+    <span class="md-ellipsis">
+      表结构
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#job" class="md-nav__link">
+    <span class="md-ellipsis">
+      job 配置文件
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#_3" class="md-nav__link">
+    <span class="md-ellipsis">
+      运行
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_4" class="md-nav__link">
+    <span class="md-ellipsis">
+      参数说明
     </span>
   </a>
   
 </li>
       
         <li class="md-nav__item">
-  <a href="#parameters" class="md-nav__link">
+  <a href="#column" class="md-nav__link">
     <span class="md-ellipsis">
-      Parameters
+      column
     </span>
   </a>
   
@@ -2479,18 +2521,60 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#configuration-example" class="md-nav__link">
+  <a href="#_1" class="md-nav__link">
     <span class="md-ellipsis">
-      Configuration Example
+      示例
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="示例">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#_2" class="md-nav__link">
+    <span class="md-ellipsis">
+      表结构
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#job" class="md-nav__link">
+    <span class="md-ellipsis">
+      job 配置文件
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#_3" class="md-nav__link">
+    <span class="md-ellipsis">
+      运行
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_4" class="md-nav__link">
+    <span class="md-ellipsis">
+      参数说明
     </span>
   </a>
   
 </li>
       
         <li class="md-nav__item">
-  <a href="#parameters" class="md-nav__link">
+  <a href="#column" class="md-nav__link">
     <span class="md-ellipsis">
-      Parameters
+      column
     </span>
   </a>
   
@@ -2512,9 +2596,25 @@
 
 
 <h1 id="kudu-writer">Kudu Writer<a class="headerlink" href="#kudu-writer" title="Permanent link">&para;</a></h1>
-<p>Kudu Writer plugin implements writing data to Apache Kudu.</p>
-<h2 id="configuration-example">Configuration Example<a class="headerlink" href="#configuration-example" title="Permanent link">&para;</a></h2>
-<p>This plugin is used to write data to Kudu database. For detailed configuration and parameters, please refer to the original Kudu Writer documentation.</p>
+<p>Kudu Writer 插件实现了将数据写入到 <a href="https://kudu.apache.org">kudu</a> 的能力，当前是通过调用原生RPC接口来实现的。
+后期希望通过 <a href="https://impala.apache.org">impala</a> 接口实现，从而增加更多的功能。</p>
+<h2 id="_1">示例<a class="headerlink" href="#_1" title="Permanent link">&para;</a></h2>
+<p>以下示例演示了如何从内存读取样例数据并写入到 kudu 表中的。</p>
+<h3 id="_2">表结构<a class="headerlink" href="#_2" title="Permanent link">&para;</a></h3>
+<p>我们用 <a href="https://trino.io">trino</a> 工具连接到 kudu 服务，然后通过下面的 SQL 语句创建表</p>
+<div class="highlight"><pre><span></span><code><span class="k">CREATE</span><span class="w"> </span><span class="k">TABLE</span><span class="w"> </span><span class="n">kudu</span><span class="p">.</span><span class="k">default</span><span class="p">.</span><span class="n">users</span><span class="w"> </span><span class="p">(</span>
+<span class="w">  </span><span class="n">user_id</span><span class="w"> </span><span class="nb">int</span><span class="w"> </span><span class="k">WITH</span><span class="w"> </span><span class="p">(</span><span class="n">primary_key</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">true</span><span class="p">),</span>
+<span class="w">  </span><span class="n">user_name</span><span class="w"> </span><span class="nb">varchar</span><span class="p">,</span>
+<span class="w">  </span><span class="n">salary</span><span class="w"> </span><span class="n">double</span>
+<span class="p">)</span><span class="w"> </span><span class="k">WITH</span><span class="w"> </span><span class="p">(</span>
+<span class="w">  </span><span class="n">partition_by_hash_columns</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nb">ARRAY</span><span class="p">[</span><span class="s1">&#39;user_id&#39;</span><span class="p">],</span>
+<span class="w">  </span><span class="n">partition_by_hash_buckets</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">2</span>
+<span class="p">);</span>
+</code></pre></div>
+<h3 id="job">job 配置文件<a class="headerlink" href="#job" title="Permanent link">&para;</a></h3>
+<p>创建 <code>job/stream2kudu.json</code> 文件，内容如下：</p>
+<div class="tabbed-set" data-tabs="1:1"><input checked="checked" id="__tabbed_1_1" name="__tabbed_1" type="radio" /><label for="__tabbed_1_1">job/stream2kudu.json</label><div class="tabbed-content"></div>
+</div>
 <div class="highlight"><pre><span></span><code><span class="p">{</span>
 <span class="w">  </span><span class="nt">&quot;job&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
 <span class="w">    </span><span class="nt">&quot;setting&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
@@ -2562,8 +2662,89 @@
 <span class="w">  </span><span class="p">}</span>
 <span class="p">}</span>
 </code></pre></div>
-<h2 id="parameters">Parameters<a class="headerlink" href="#parameters" title="Permanent link">&para;</a></h2>
-<p>This plugin supports writing data to Kudu with configurable master addresses, table operations, and data consistency options.</p>
+<h3 id="_3">运行<a class="headerlink" href="#_3" title="Permanent link">&para;</a></h3>
+<p>执行下下面的命令进行数据采集</p>
+<div class="highlight"><pre><span></span><code>bin/addax.sh<span class="w"> </span>job/stream2kudu.json
+</code></pre></div>
+<h2 id="_4">参数说明<a class="headerlink" href="#_4" title="Permanent link">&para;</a></h2>
+<table>
+<thead>
+<tr>
+<th style="text-align: left;">配置项</th>
+<th style="text-align: center;">是否必须</th>
+<th>类型</th>
+<th>默认值</th>
+<th>描述</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;">masterAddress</td>
+<td style="text-align: center;">是</td>
+<td>string</td>
+<td>无</td>
+<td>Kudu Master集群RPC地址,多个地址用逗号(,)分隔</td>
+</tr>
+<tr>
+<td style="text-align: left;">table</td>
+<td style="text-align: center;">是</td>
+<td>string</td>
+<td>无</td>
+<td>kudu 表名</td>
+</tr>
+<tr>
+<td style="text-align: left;">writeMode</td>
+<td style="text-align: center;">否</td>
+<td>string</td>
+<td>upsert</td>
+<td>表数据写入模式，支持 upsert, insert 两者</td>
+</tr>
+<tr>
+<td style="text-align: left;">timeout</td>
+<td style="text-align: center;">否</td>
+<td>int</td>
+<td>100</td>
+<td>写入数据超时时间(秒), 0 表示不受限制</td>
+</tr>
+<tr>
+<td style="text-align: left;">column</td>
+<td style="text-align: center;">是</td>
+<td>list</td>
+<td>无</td>
+<td>要写入的表字段，配置方式见上示例</td>
+</tr>
+<tr>
+<td style="text-align: left;">skipFail</td>
+<td style="text-align: center;">否</td>
+<td>boolean</td>
+<td>false</td>
+<td>是否跳过插入失败的记录，如果设置为true，则插件不会把插入失败的当作异常</td>
+</tr>
+<tr>
+<td style="text-align: left;">haveKerberos</td>
+<td style="text-align: center;">否</td>
+<td>boolean</td>
+<td>false</td>
+<td>是否启用 Kerberos 认证，如果启用，则需要同时配置以下两项</td>
+</tr>
+<tr>
+<td style="text-align: left;">kerberosKeytabFilePath</td>
+<td style="text-align: center;">否</td>
+<td>string</td>
+<td>无</td>
+<td>用于 Kerberos 认证的凭证文件路径, 比如 <code>/your/path/addax.service.keytab</code></td>
+</tr>
+<tr>
+<td style="text-align: left;">kerberosPrincipal</td>
+<td style="text-align: center;">否</td>
+<td>string</td>
+<td>无</td>
+<td>用于 Kerberos 认证的凭证主体, 比如 <code>addax/node1@WGZHAO.COM</code></td>
+</tr>
+</tbody>
+</table>
+<h2 id="column">column<a class="headerlink" href="#column" title="Permanent link">&para;</a></h2>
+<p><code>column</code> 可以直接指定要写入的列，如同上述例子，也可以设置 <code>["*"]</code> 来表示写入所有列。</p>
 
 
 

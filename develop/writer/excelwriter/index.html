@@ -809,7 +809,7 @@
         
   
   <span class="md-ellipsis">
-    Text File Reader
+    TxtFile Reader
   </span>
   
 
@@ -998,7 +998,7 @@
         
   
   <span class="md-ellipsis">
-    FTP Reader
+    Ftp Reader
   </span>
   
 
@@ -1878,22 +1878,22 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#configuration-example" class="md-nav__link">
+  <a href="#_1" class="md-nav__link">
     <span class="md-ellipsis">
-      Configuration Example
+      配置示例
     </span>
   </a>
   
 </li>
       
         <li class="md-nav__item">
-  <a href="#parameters" class="md-nav__link">
+  <a href="#_2" class="md-nav__link">
     <span class="md-ellipsis">
-      Parameters
+      参数说明
     </span>
   </a>
   
-    <nav class="md-nav" aria-label="Parameters">
+    <nav class="md-nav" aria-label="参数说明">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
@@ -1905,8 +1905,26 @@
   
 </li>
         
+          <li class="md-nav__item">
+  <a href="#header" class="md-nav__link">
+    <span class="md-ellipsis">
+      header
+    </span>
+  </a>
+  
+</li>
+        
       </ul>
     </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_3" class="md-nav__link">
+    <span class="md-ellipsis">
+      限制
+    </span>
+  </a>
   
 </li>
       
@@ -1930,7 +1948,7 @@
         
   
   <span class="md-ellipsis">
-    FTP Writer
+    Ftp Writer
   </span>
   
 
@@ -1951,7 +1969,7 @@
         
   
   <span class="md-ellipsis">
-    GreenPlum Writer
+    Greenplum Writer
   </span>
   
 
@@ -2014,7 +2032,7 @@
         
   
   <span class="md-ellipsis">
-    HBase11x Writer
+    HBase11X Writer
   </span>
   
 
@@ -2494,22 +2512,22 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#configuration-example" class="md-nav__link">
+  <a href="#_1" class="md-nav__link">
     <span class="md-ellipsis">
-      Configuration Example
+      配置示例
     </span>
   </a>
   
 </li>
       
         <li class="md-nav__item">
-  <a href="#parameters" class="md-nav__link">
+  <a href="#_2" class="md-nav__link">
     <span class="md-ellipsis">
-      Parameters
+      参数说明
     </span>
   </a>
   
-    <nav class="md-nav" aria-label="Parameters">
+    <nav class="md-nav" aria-label="参数说明">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
@@ -2521,8 +2539,26 @@
   
 </li>
         
+          <li class="md-nav__item">
+  <a href="#header" class="md-nav__link">
+    <span class="md-ellipsis">
+      header
+    </span>
+  </a>
+  
+</li>
+        
       </ul>
     </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_3" class="md-nav__link">
+    <span class="md-ellipsis">
+      限制
+    </span>
+  </a>
   
 </li>
       
@@ -2542,9 +2578,9 @@
 
 
 <h1 id="excel-writer">Excel Writer<a class="headerlink" href="#excel-writer" title="Permanent link">&para;</a></h1>
-<p>Excel Writer implements the functionality of writing data to Excel files.</p>
-<h2 id="configuration-example">Configuration Example<a class="headerlink" href="#configuration-example" title="Permanent link">&para;</a></h2>
-<p>We assume reading data from memory and writing to Excel file:</p>
+<p>Excel Writer 实现了将数据写入到 Excel 文件的功能</p>
+<h2 id="_1">配置示例<a class="headerlink" href="#_1" title="Permanent link">&para;</a></h2>
+<p>我们假定从内存读取数据，并写入到 Excel 文件中</p>
 <div class="highlight"><pre><span></span><code><span class="p">{</span>
 <span class="w">  </span><span class="nt">&quot;job&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
 <span class="w">    </span><span class="nt">&quot;setting&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
@@ -2600,13 +2636,13 @@
 <span class="w">  </span><span class="p">}</span>
 <span class="p">}</span>
 </code></pre></div>
-<p>Save the above content as <code>job/stream2excel.json</code></p>
-<p>Execute the following command:</p>
+<p>讲上述内容保存为 <code>job/stream2excel.json</code></p>
+<p>执行下面的命令：</p>
 <div class="highlight"><pre><span></span><code>bin/addax.sh<span class="w"> </span>job/stream2excel.sh
 </code></pre></div>
-<p>You should get output similar to the following:</p>
+<p>应该得到类似如下的输出</p>
 <details>
-<summary>Click to expand</summary>
+<summary>点击展开</summary>
 
 <div class="highlight"><pre><span></span><code><span class="w">  </span>___<span class="w">      </span>_<span class="w">     </span>_
 <span class="w"> </span>/<span class="w"> </span>_<span class="w"> </span><span class="se">\ </span><span class="w">   </span><span class="p">|</span><span class="w"> </span><span class="p">|</span><span class="w">   </span><span class="p">|</span><span class="w"> </span><span class="p">|</span>
@@ -2702,43 +2738,54 @@
 </code></pre></div>
 </details>
 
-<h2 id="parameters">Parameters<a class="headerlink" href="#parameters" title="Permanent link">&para;</a></h2>
+<h2 id="_2">参数说明<a class="headerlink" href="#_2" title="Permanent link">&para;</a></h2>
 <table>
 <thead>
 <tr>
-<th style="text-align: left;">Configuration</th>
-<th>Required</th>
-<th>Type</th>
-<th>Default Value</th>
-<th>Description</th>
+<th style="text-align: left;">配置项</th>
+<th>是否必须</th>
+<th>类型</th>
+<th>默认值</th>
+<th>描述</th>
 </tr>
 </thead>
 <tbody>
 <tr>
 <td style="text-align: left;">path</td>
-<td>Yes</td>
+<td>是</td>
 <td>string</td>
-<td>None</td>
-<td>Specify the directory to save files, create if directory doesn't exist</td>
+<td>无</td>
+<td>指定文件保存的目录, 指定的目录如果不存在，则尝试创建</td>
 </tr>
 <tr>
 <td style="text-align: left;">fileName</td>
-<td>Yes</td>
+<td>是</td>
 <td>string</td>
-<td>None</td>
-<td>Excel filename to generate, detailed description below</td>
+<td>无</td>
+<td>要生成的excel 文件名，详述如下</td>
 </tr>
 <tr>
 <td style="text-align: left;">header</td>
-<td>No</td>
+<td>否</td>
 <td>list</td>
-<td>None</td>
-<td>Excel header</td>
+<td>无</td>
+<td>Excel 表头</td>
 </tr>
 </tbody>
 </table>
 <h3 id="filename">fileName<a class="headerlink" href="#filename" title="Permanent link">&para;</a></h3>
-<p>For detailed fileName configuration, please refer to the original Excel Writer documentation.</p>
+<p>如果配置的 <code>fileName</code> 没有后缀，则自动加上 <code>.xlsx</code>；
+如果后缀为 <code>.xls</code>，则报错，因为当前仅生成 Excel 97 以后的文件格式，即 <code>.xlsx</code> 后缀的文件</p>
+<h3 id="header">header<a class="headerlink" href="#header" title="Permanent link">&para;</a></h3>
+<p>如果不指定 <code>header</code> ，则生成的 Excel 文件没有表头，只有数据。
+注意，插件不关心 header 的数量是否匹配数据中的列数，也就是说表头的列数并不要求和接下来的数据的列数相等。</p>
+<h2 id="_3">限制<a class="headerlink" href="#_3" title="Permanent link">&para;</a></h2>
+<ol>
+<li>当前仅生成一个 Excel 文件，且没有考虑行数和列数是否超过了 Excel 的限定</li>
+<li>如果指定的目录下有同名文件，当前会被覆盖，后续会统一处理目标目录的问题</li>
+<li>当前日期格式的数据，设置单元格样式为 <code>yyyy-MM-dd HH:mm:ss</code>，且不能定制</li>
+<li>不支持二进制类型的数据写入</li>
+</ol>
 
 
 
@@ -2793,13 +2840,13 @@
         
         
           
-          <a href="../ftpwriter/" class="md-footer__link md-footer__link--next" aria-label="Next: FTP Writer">
+          <a href="../ftpwriter/" class="md-footer__link md-footer__link--next" aria-label="Next: Ftp Writer">
             <div class="md-footer__title">
               <span class="md-footer__direction">
                 Next
               </span>
               <div class="md-ellipsis">
-                FTP Writer
+                Ftp Writer
               </div>
             </div>
             <div class="md-footer__button md-icon">

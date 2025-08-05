@@ -814,7 +814,7 @@
         
   
   <span class="md-ellipsis">
-    Text File Reader
+    TxtFile Reader
   </span>
   
 
@@ -919,20 +919,35 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#configuration" class="md-nav__link">
+  <a href="#_1" class="md-nav__link">
     <span class="md-ellipsis">
-      Configuration
+      配置
     </span>
   </a>
   
 </li>
       
         <li class="md-nav__item">
-  <a href="#parameters" class="md-nav__link">
+  <a href="#_2" class="md-nav__link">
     <span class="md-ellipsis">
-      Parameters
+      参数说明
     </span>
   </a>
+  
+    <nav class="md-nav" aria-label="参数说明">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#_3" class="md-nav__link">
+    <span class="md-ellipsis">
+      支持的数据类型
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
   
 </li>
       
@@ -1061,7 +1076,7 @@
         
   
   <span class="md-ellipsis">
-    FTP Reader
+    Ftp Reader
   </span>
   
 
@@ -1915,7 +1930,7 @@
         
   
   <span class="md-ellipsis">
-    FTP Writer
+    Ftp Writer
   </span>
   
 
@@ -1936,7 +1951,7 @@
         
   
   <span class="md-ellipsis">
-    GreenPlum Writer
+    Greenplum Writer
   </span>
   
 
@@ -1999,7 +2014,7 @@
         
   
   <span class="md-ellipsis">
-    HBase11x Writer
+    HBase11X Writer
   </span>
   
 
@@ -2479,20 +2494,35 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#configuration" class="md-nav__link">
+  <a href="#_1" class="md-nav__link">
     <span class="md-ellipsis">
-      Configuration
+      配置
     </span>
   </a>
   
 </li>
       
         <li class="md-nav__item">
-  <a href="#parameters" class="md-nav__link">
+  <a href="#_2" class="md-nav__link">
     <span class="md-ellipsis">
-      Parameters
+      参数说明
     </span>
   </a>
+  
+    <nav class="md-nav" aria-label="参数说明">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#_3" class="md-nav__link">
+    <span class="md-ellipsis">
+      支持的数据类型
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
   
 </li>
       
@@ -2512,9 +2542,9 @@
 
 
 <h1 id="cassandra-reader">Cassandra Reader<a class="headerlink" href="#cassandra-reader" title="Permanent link">&para;</a></h1>
-<p><code>CassandraReader</code> plugin implements the ability to read data from <a href="https://cassandra.apache.org">Cassandra</a>.</p>
-<h2 id="configuration">Configuration<a class="headerlink" href="#configuration" title="Permanent link">&para;</a></h2>
-<p>Below is an example configuration for reading data from Cassandra to terminal</p>
+<p><code>CassandraReader</code> 插件实现了从 <a href="https://cassandra.apache.org">Cassandra</a> 读取数据的能力。</p>
+<h2 id="_1">配置<a class="headerlink" href="#_1" title="Permanent link">&para;</a></h2>
+<p>下面是配置一个从 Cassandra 读取数据到终端的例子</p>
 <div class="tabbed-set" data-tabs="1:1"><input checked="checked" id="__tabbed_1_1" name="__tabbed_1" type="radio" /><label for="__tabbed_1_1">job/cassandra2stream.json</label><div class="tabbed-content">
 <div class="highlight"><pre><span></span><code><span class="p">{</span>
 <span class="w">  </span><span class="nt">&quot;job&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
@@ -2572,94 +2602,131 @@
 </code></pre></div>
 </div>
 </div>
-<h2 id="parameters">Parameters<a class="headerlink" href="#parameters" title="Permanent link">&para;</a></h2>
+<h2 id="_2">参数说明<a class="headerlink" href="#_2" title="Permanent link">&para;</a></h2>
 <table>
 <thead>
 <tr>
-<th style="text-align: left;">Configuration</th>
-<th style="text-align: center;">Required</th>
-<th>Data Type</th>
-<th>Default Value</th>
-<th>Description</th>
+<th style="text-align: left;">配置项</th>
+<th style="text-align: center;">是否必须</th>
+<th>数据类型</th>
+<th>默认值</th>
+<th>描述</th>
 </tr>
 </thead>
 <tbody>
 <tr>
 <td style="text-align: left;">host</td>
-<td style="text-align: center;">Yes</td>
+<td style="text-align: center;">是</td>
 <td>list</td>
-<td>None</td>
-<td>Connection domain or IP, multiple nodes separated by commas</td>
+<td>无</td>
+<td>连接的域名或 IP，多个节点之间用逗号分隔</td>
 </tr>
 <tr>
 <td style="text-align: left;">port</td>
-<td style="text-align: center;">Yes</td>
+<td style="text-align: center;">是</td>
 <td>int</td>
 <td>9042</td>
-<td>Port</td>
+<td>端口</td>
 </tr>
 <tr>
 <td style="text-align: left;">username</td>
-<td style="text-align: center;">No</td>
+<td style="text-align: center;">否</td>
 <td>string</td>
-<td>None</td>
-<td>Username</td>
+<td>无</td>
+<td>用户名</td>
 </tr>
 <tr>
 <td style="text-align: left;">password</td>
-<td style="text-align: center;">No</td>
+<td style="text-align: center;">否</td>
 <td>string</td>
-<td>None</td>
-<td>Password</td>
+<td>无</td>
+<td>密码</td>
 </tr>
 <tr>
 <td style="text-align: left;">useSSL</td>
-<td style="text-align: center;">No</td>
+<td style="text-align: center;">否</td>
 <td>boolean</td>
 <td>false</td>
-<td>Whether to use SSL connection</td>
+<td>是否使用SSL连接</td>
 </tr>
 <tr>
 <td style="text-align: left;">keyspace</td>
-<td style="text-align: center;">Yes</td>
+<td style="text-align: center;">是</td>
 <td>string</td>
-<td>None</td>
-<td>Keyspace where the table to be synchronized is located</td>
+<td>无</td>
+<td>需要同步的表所在的 keyspace</td>
 </tr>
 <tr>
 <td style="text-align: left;">table</td>
-<td style="text-align: center;">Yes</td>
+<td style="text-align: center;">是</td>
 <td>string</td>
-<td>None</td>
-<td>Selected table to be synchronized</td>
+<td>无</td>
+<td>所选取的需要同步的表</td>
 </tr>
 <tr>
 <td style="text-align: left;">column</td>
-<td style="text-align: center;">Yes</td>
+<td style="text-align: center;">是</td>
 <td>list</td>
-<td>None</td>
-<td>Collection of columns to be synchronized in the configured table, elements can specify column name or <code>writetime(column_name)</code>, the latter form reads timestamp of <code>column_name</code> column instead of data</td>
+<td>无</td>
+<td>所配置的表中需要同步的列集合,其中的元素可以指定列的名称或 <code>writetime(column_name)</code>，后一种形式会读取<code>column_name</code>列的时间戳而不是数据</td>
 </tr>
 <tr>
 <td style="text-align: left;">where</td>
-<td style="text-align: center;">No</td>
+<td style="text-align: center;">否</td>
 <td>string</td>
-<td>None</td>
-<td>Data filtering condition <code>cql</code> expression</td>
+<td>无</td>
+<td>数据筛选条件的 <code>cql</code> 表达式</td>
 </tr>
 <tr>
 <td style="text-align: left;">allowFiltering</td>
-<td style="text-align: center;">No</td>
+<td style="text-align: center;">否</td>
 <td>boolean</td>
-<td>None</td>
-<td>Whether to filter data on server side, refer to official documentation for detailed description</td>
+<td>无</td>
+<td>是否在服务端过滤数据，详细描述参考官方文档的<a href="https://cassandra.apache.org/doc/latest/cql/dml.html#allowing-filtering">相关描述</a></td>
 </tr>
 <tr>
 <td style="text-align: left;">consistencyLevel</td>
-<td style="text-align: center;">No</td>
+<td style="text-align: center;">否</td>
 <td>string</td>
 <td>LOCAL_QUORUM</td>
-<td>Data consistency level, options: <code>ONE, QUORUM, LOCAL_QUORUM, EACH_QUORUM, ALL, ANY, TWO, THREE, LOCAL_ONE</code></td>
+<td>数据一致性级别, 可选 <code>ONE, QUORUM, LOCAL_QUORUM, EACH_QUORUM, ALL, ANY, TWO, THREE, LOCAL_ONE</code></td>
+</tr>
+</tbody>
+</table>
+<h3 id="_3">支持的数据类型<a class="headerlink" href="#_3" title="Permanent link">&para;</a></h3>
+<p>目前支持除 <code>counter</code> 和 <code>Custom</code> 类型之外的所有类型。</p>
+<p>下面列出类型转换列表:</p>
+<table>
+<thead>
+<tr>
+<th>Addax 内部类型</th>
+<th>Cassandra 数据类型</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Long</td>
+<td>int, tinyint, smallint,varint,bigint,time,counter</td>
+</tr>
+<tr>
+<td>Double</td>
+<td>float, double, decimal</td>
+</tr>
+<tr>
+<td>String</td>
+<td>ascii,varchar, text,uuid,timeuuid,duration,list,map,set,tuple,udt,inet</td>
+</tr>
+<tr>
+<td>Date</td>
+<td>date, timestamp</td>
+</tr>
+<tr>
+<td>Boolean</td>
+<td>bool</td>
+</tr>
+<tr>
+<td>Bytes</td>
+<td>blob</td>
 </tr>
 </tbody>
 </table>

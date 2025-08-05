@@ -814,27 +814,27 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#configuration-example" class="md-nav__link">
+  <a href="#_1" class="md-nav__link">
     <span class="md-ellipsis">
-      Configuration Example
+      配置样例
     </span>
   </a>
   
 </li>
       
         <li class="md-nav__item">
-  <a href="#parameters" class="md-nav__link">
+  <a href="#_2" class="md-nav__link">
     <span class="md-ellipsis">
-      Parameters
+      参数说明
     </span>
   </a>
   
 </li>
       
         <li class="md-nav__item">
-  <a href="#support-for-geometry-type" class="md-nav__link">
+  <a href="#geometry" class="md-nav__link">
     <span class="md-ellipsis">
-      Support for GEOMETRY Type
+      对 GEOMETRY 类型的支持
     </span>
   </a>
   
@@ -881,7 +881,7 @@
         
   
   <span class="md-ellipsis">
-    Text File Reader
+    TxtFile Reader
   </span>
   
 
@@ -1070,7 +1070,7 @@
         
   
   <span class="md-ellipsis">
-    FTP Reader
+    Ftp Reader
   </span>
   
 
@@ -1924,7 +1924,7 @@
         
   
   <span class="md-ellipsis">
-    FTP Writer
+    Ftp Writer
   </span>
   
 
@@ -1945,7 +1945,7 @@
         
   
   <span class="md-ellipsis">
-    GreenPlum Writer
+    Greenplum Writer
   </span>
   
 
@@ -2008,7 +2008,7 @@
         
   
   <span class="md-ellipsis">
-    HBase11x Writer
+    HBase11X Writer
   </span>
   
 
@@ -2488,27 +2488,27 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#configuration-example" class="md-nav__link">
+  <a href="#_1" class="md-nav__link">
     <span class="md-ellipsis">
-      Configuration Example
+      配置样例
     </span>
   </a>
   
 </li>
       
         <li class="md-nav__item">
-  <a href="#parameters" class="md-nav__link">
+  <a href="#_2" class="md-nav__link">
     <span class="md-ellipsis">
-      Parameters
+      参数说明
     </span>
   </a>
   
 </li>
       
         <li class="md-nav__item">
-  <a href="#support-for-geometry-type" class="md-nav__link">
+  <a href="#geometry" class="md-nav__link">
     <span class="md-ellipsis">
-      Support for GEOMETRY Type
+      对 GEOMETRY 类型的支持
     </span>
   </a>
   
@@ -2530,9 +2530,9 @@
 
 
 <h1 id="oracle-reader">Oracle Reader<a class="headerlink" href="#oracle-reader" title="Permanent link">&para;</a></h1>
-<p>Oracle Reader plugin is used to read data from Oracle.</p>
-<h2 id="configuration-example">Configuration Example<a class="headerlink" href="#configuration-example" title="Permanent link">&para;</a></h2>
-<p>Configure a job to synchronize and extract data from Oracle database to local:</p>
+<p>Oracle Reader 插件用于从 Oracle 读取数据</p>
+<h2 id="_1">配置样例<a class="headerlink" href="#_1" title="Permanent link">&para;</a></h2>
+<p>配置一个从Oracle数据库同步抽取数据到本地的作业:</p>
 <div class="tabbed-set" data-tabs="1:1"><input checked="checked" id="__tabbed_1_1" name="__tabbed_1" type="radio" /><label for="__tabbed_1_1">job/oracle2stream.json</label><div class="tabbed-content"></div>
 </div>
 <div class="highlight"><pre><span></span><code><span class="p">{</span>
@@ -2572,17 +2572,17 @@
 <span class="w">  </span><span class="p">}</span>
 <span class="p">}</span>
 </code></pre></div>
-<h2 id="parameters">Parameters<a class="headerlink" href="#parameters" title="Permanent link">&para;</a></h2>
-<p>This plugin is based on <a href="../rdbmsreader">RDBMS Reader</a>, so you can refer to all configuration items of RDBMS Reader.</p>
-<h2 id="support-for-geometry-type">Support for GEOMETRY Type<a class="headerlink" href="#support-for-geometry-type" title="Permanent link">&para;</a></h2>
-<p>Starting from Addax <code>4.0.13</code>, experimental support for Oracle GEOMETRY type is provided. This plugin converts this type of data to JSON array strings.</p>
-<p>Suppose you have such a table and data:</p>
-<div class="highlight"><pre><span></span><code>
+<h2 id="_2">参数说明<a class="headerlink" href="#_2" title="Permanent link">&para;</a></h2>
+<p>该插件基于 <a href="../rdbmsreader">RDBMS Reader</a> 实现，因此可以参考 RDBMS Reader 的所有配置项。</p>
+<h2 id="geometry">对 GEOMETRY 类型的支持<a class="headerlink" href="#geometry" title="Permanent link">&para;</a></h2>
+<p>从 Addax <code>4.0.13</code> 开始，实验性的支持 Oracle GEOMETRY 类型，该插件会把该类型的数据转为 JSON 数组字符串。</p>
+<p>假定你有这样的的表和数据</p>
+<div class="highlight"><pre><span></span><code><span class="c1">--8&lt;-- &quot;assets/sql/oracle_geom.sql</span>
 </code></pre></div>
-<p>The final output result of reading this table data is similar to the following:</p>
-<div class="highlight"><pre><span></span><code>
+<p>读取表该的数据的最后输出结果类似如下：</p>
+<div class="highlight"><pre><span></span><code>--8&lt;-- &quot;assets/output/oracle_geom_reader.txt
 </code></pre></div>
-<p>Note: This data type is currently in experimental support stage. The author's understanding of this data type is not deep, and it has not been comprehensively tested. Please do not use it directly in production environments.</p>
+<p>注意：该数据类型目前还处于实验支持阶段，作者对此数据类型的理解并不深刻，也未经过全面的测试，请勿直接在生产环境使用。</p>
 
 
 

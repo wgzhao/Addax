@@ -809,7 +809,7 @@
         
   
   <span class="md-ellipsis">
-    Text File Reader
+    TxtFile Reader
   </span>
   
 
@@ -998,7 +998,7 @@
         
   
   <span class="md-ellipsis">
-    FTP Reader
+    Ftp Reader
   </span>
   
 
@@ -1773,22 +1773,22 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#configuration-example" class="md-nav__link">
+  <a href="#_1" class="md-nav__link">
     <span class="md-ellipsis">
-      Configuration Example
+      配置样例
     </span>
   </a>
   
 </li>
       
         <li class="md-nav__item">
-  <a href="#parameters" class="md-nav__link">
+  <a href="#_2" class="md-nav__link">
     <span class="md-ellipsis">
-      Parameters
+      参数说明
     </span>
   </a>
   
-    <nav class="md-nav" aria-label="Parameters">
+    <nav class="md-nav" aria-label="参数说明">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
@@ -1815,22 +1815,22 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#type-conversion" class="md-nav__link">
+  <a href="#_3" class="md-nav__link">
     <span class="md-ellipsis">
-      Type Conversion
+      类型转换
     </span>
   </a>
   
 </li>
       
         <li class="md-nav__item">
-  <a href="#constraints" class="md-nav__link">
+  <a href="#_4" class="md-nav__link">
     <span class="md-ellipsis">
-      Constraints
+      约束限制
     </span>
   </a>
   
-    <nav class="md-nav" aria-label="Constraints">
+    <nav class="md-nav" aria-label="约束限制">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
@@ -1972,7 +1972,7 @@
         
   
   <span class="md-ellipsis">
-    FTP Writer
+    Ftp Writer
   </span>
   
 
@@ -1993,7 +1993,7 @@
         
   
   <span class="md-ellipsis">
-    GreenPlum Writer
+    Greenplum Writer
   </span>
   
 
@@ -2056,7 +2056,7 @@
         
   
   <span class="md-ellipsis">
-    HBase11x Writer
+    HBase11X Writer
   </span>
   
 
@@ -2536,22 +2536,22 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#configuration-example" class="md-nav__link">
+  <a href="#_1" class="md-nav__link">
     <span class="md-ellipsis">
-      Configuration Example
+      配置样例
     </span>
   </a>
   
 </li>
       
         <li class="md-nav__item">
-  <a href="#parameters" class="md-nav__link">
+  <a href="#_2" class="md-nav__link">
     <span class="md-ellipsis">
-      Parameters
+      参数说明
     </span>
   </a>
   
-    <nav class="md-nav" aria-label="Parameters">
+    <nav class="md-nav" aria-label="参数说明">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
@@ -2578,22 +2578,22 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#type-conversion" class="md-nav__link">
+  <a href="#_3" class="md-nav__link">
     <span class="md-ellipsis">
-      Type Conversion
+      类型转换
     </span>
   </a>
   
 </li>
       
         <li class="md-nav__item">
-  <a href="#constraints" class="md-nav__link">
+  <a href="#_4" class="md-nav__link">
     <span class="md-ellipsis">
-      Constraints
+      约束限制
     </span>
   </a>
   
-    <nav class="md-nav" aria-label="Constraints">
+    <nav class="md-nav" aria-label="约束限制">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
@@ -2626,9 +2626,9 @@
 
 
 <h1 id="cassandra-writer">Cassandra Writer<a class="headerlink" href="#cassandra-writer" title="Permanent link">&para;</a></h1>
-<p>Cassandra Writer plugin is used to write data to <a href="https://cassandra.apache.org">Cassandra</a>.</p>
-<h2 id="configuration-example">Configuration Example<a class="headerlink" href="#configuration-example" title="Permanent link">&para;</a></h2>
-<p>Configure a job to import data from memory to Cassandra:</p>
+<p>Cassandra Writer 插件用于向 <a href="https://cassandra.apache.org">Cassandra</a> 写入数据。</p>
+<h2 id="_1">配置样例<a class="headerlink" href="#_1" title="Permanent link">&para;</a></h2>
+<p>配置一个从内存产生到 Cassandra 导入的作业:</p>
 <div class="tabbed-set" data-tabs="1:1"><input checked="checked" id="__tabbed_1_1" name="__tabbed_1" type="radio" /><label for="__tabbed_1_1">jobs/stream2cassandra.json</label><div class="tabbed-content"></div>
 </div>
 <div class="highlight"><pre><span></span><code><span class="p">{</span>
@@ -2720,114 +2720,114 @@
 <span class="w">  </span><span class="p">}</span>
 <span class="p">}</span>
 </code></pre></div>
-<h2 id="parameters">Parameters<a class="headerlink" href="#parameters" title="Permanent link">&para;</a></h2>
+<h2 id="_2">参数说明<a class="headerlink" href="#_2" title="Permanent link">&para;</a></h2>
 <table>
 <thead>
 <tr>
-<th style="text-align: left;">Configuration</th>
-<th style="text-align: center;">Required</th>
-<th>Data Type</th>
-<th>Default Value</th>
-<th>Description</th>
+<th style="text-align: left;">配置项</th>
+<th style="text-align: center;">是否必须</th>
+<th>数据类型</th>
+<th>默认值</th>
+<th>描述</th>
 </tr>
 </thead>
 <tbody>
 <tr>
 <td style="text-align: left;">host</td>
-<td style="text-align: center;">Yes</td>
+<td style="text-align: center;">是</td>
 <td>string</td>
-<td>None</td>
-<td>Domain or IP of connection points, multiple nodes separated by commas</td>
+<td>无</td>
+<td>连接点的域名或 ip，多个 node 之间用逗号分隔</td>
 </tr>
 <tr>
 <td style="text-align: left;">port</td>
-<td style="text-align: center;">Yes</td>
+<td style="text-align: center;">是</td>
 <td>int</td>
 <td>9042</td>
-<td>Cassandra port</td>
+<td>Cassandra 端口</td>
 </tr>
 <tr>
 <td style="text-align: left;">username</td>
-<td style="text-align: center;">No</td>
+<td style="text-align: center;">否</td>
 <td>string</td>
-<td>None</td>
-<td>Username of data source</td>
+<td>无</td>
+<td>数据源的用户名</td>
 </tr>
 <tr>
 <td style="text-align: left;">password</td>
-<td style="text-align: center;">No</td>
+<td style="text-align: center;">否</td>
 <td>string</td>
-<td>None</td>
-<td>Password for specified username of data source</td>
+<td>无</td>
+<td>数据源指定用户名的密码</td>
 </tr>
 <tr>
 <td style="text-align: left;">useSSL</td>
-<td style="text-align: center;">No</td>
+<td style="text-align: center;">否</td>
 <td>boolean</td>
 <td>false</td>
-<td>Whether to use SSL connection</td>
+<td>是否使用 SSL 连接</td>
 </tr>
 <tr>
 <td style="text-align: left;">connectionsPerHost</td>
-<td style="text-align: center;">No</td>
+<td style="text-align: center;">否</td>
 <td>int</td>
 <td>8</td>
-<td>Client connection pool configuration: how many connections to establish with each server node</td>
+<td>客户端连接池配置：与服务器每个节点建多少个连接</td>
 </tr>
 <tr>
 <td style="text-align: left;">maxPendingPerConnection</td>
-<td style="text-align: center;">No</td>
+<td style="text-align: center;">否</td>
 <td>int</td>
 <td>128</td>
-<td>Client connection pool configuration: maximum requests per connection</td>
+<td>客户端连接池配置：每个连接最大请求数</td>
 </tr>
 <tr>
 <td style="text-align: left;">keyspace</td>
-<td style="text-align: center;">Yes</td>
+<td style="text-align: center;">是</td>
 <td>string</td>
-<td>None</td>
-<td>Keyspace where the table to be synchronized is located</td>
+<td>无</td>
+<td>需要同步的表所在的 keyspace</td>
 </tr>
 <tr>
 <td style="text-align: left;">table</td>
-<td style="text-align: center;">Yes</td>
+<td style="text-align: center;">是</td>
 <td>string</td>
-<td>None</td>
-<td>Selected table to be synchronized</td>
+<td>无</td>
+<td>所选取的需要同步的表</td>
 </tr>
 <tr>
 <td style="text-align: left;">column</td>
-<td style="text-align: center;">Yes</td>
+<td style="text-align: center;">是</td>
 <td>list</td>
-<td>None</td>
-<td>Collection of columns to be synchronized in the configured table</td>
+<td>无</td>
+<td>所配置的表中需要同步的列集合</td>
 </tr>
 <tr>
 <td style="text-align: left;">consistancyLevel</td>
-<td style="text-align: center;">No</td>
+<td style="text-align: center;">否</td>
 <td>string</td>
 <td><code>LOCAL_QUORUM</code></td>
-<td>Data consistency level</td>
+<td>数据一致性级别,</td>
 </tr>
 <tr>
 <td style="text-align: left;">batchSize</td>
-<td style="text-align: center;">No</td>
+<td style="text-align: center;">否</td>
 <td>int</td>
 <td>1</td>
-<td>Number of records in one batch submission (UNLOGGED BATCH)</td>
+<td>一次批量提交(UNLOGGED BATCH)的记录数大小（条数）</td>
 </tr>
 </tbody>
 </table>
 <h3 id="column">column<a class="headerlink" href="#column" title="Permanent link">&para;</a></h3>
-<p>Content can be column names or <code>writetime()</code>. If a column name is configured as <code>writetime()</code>, the content of this column will be used as timestamp.</p>
+<p>内容可以是列的名称或 <code>writetime()</code>。如果将列名配置为 <code>writetime()</code>，会将这一列的内容作为时间戳</p>
 <h3 id="consistancylevel">consistancyLevel<a class="headerlink" href="#consistancylevel" title="Permanent link">&para;</a></h3>
-<p>Options: <code>ONE, QUORUM, LOCAL_QUORUM, EACH_QUORUM, ALL, ANY, TWO, THREE, LOCAL_ONE</code></p>
-<h2 id="type-conversion">Type Conversion<a class="headerlink" href="#type-conversion" title="Permanent link">&para;</a></h2>
+<p>可选 <code>ONE, QUORUM, LOCAL_QUORUM, EACH_QUORUM, ALL, ANY, TWO, THREE, LOCAL_ONE</code></p>
+<h2 id="_3">类型转换<a class="headerlink" href="#_3" title="Permanent link">&para;</a></h2>
 <table>
 <thead>
 <tr>
-<th>Addax Internal Type</th>
-<th>Cassandra Data Type</th>
+<th>Addax 内部类型</th>
+<th>Cassandra 数据类型</th>
 </tr>
 </thead>
 <tbody>
@@ -2857,15 +2857,15 @@
 </tr>
 </tbody>
 </table>
-<p>Please note:</p>
-<p>Currently does not support <code>counter</code> type and <code>custom</code> type.</p>
-<h2 id="constraints">Constraints<a class="headerlink" href="#constraints" title="Permanent link">&para;</a></h2>
+<p>请注意:</p>
+<p>目前不支持 <code>counter</code> 类型和 <code>custom</code> 类型。</p>
+<h2 id="_4">约束限制<a class="headerlink" href="#_4" title="Permanent link">&para;</a></h2>
 <h3 id="batchsize">batchSize<a class="headerlink" href="#batchsize" title="Permanent link">&para;</a></h3>
 <ol>
-<li>Cannot exceed 65535</li>
-<li>The content size in batch is limited by server-side <code>batch_size_fail_threshold_in_kb</code>.</li>
-<li>If batch content exceeds <code>batch_size_warn_threshold_in_kb</code> limit, warn logs will be printed, but it doesn't affect writing and can be ignored.</li>
-<li>If batch submission fails, all content in this batch will be rewritten record by record.</li>
+<li>不能超过 65535</li>
+<li>batch 中的内容大小受到服务器端 <code>batch_size_fail_threshold_in_kb</code> 的限制。</li>
+<li>如果 batch 中的内容超过了 <code>batch_size_warn_threshold_in_kb</code> 的限制，会打出 warn 日志，但并不影响写入，忽略即可。</li>
+<li>如果批量提交失败，会把这个批量的所有内容重新逐条写入一遍。</li>
 </ol>
 
 

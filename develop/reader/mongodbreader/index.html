@@ -814,7 +814,7 @@
         
   
   <span class="md-ellipsis">
-    Text File Reader
+    TxtFile Reader
   </span>
   
 
@@ -898,22 +898,22 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#configuration-example" class="md-nav__link">
+  <a href="#_1" class="md-nav__link">
     <span class="md-ellipsis">
-      Configuration Example
+      配置样例
     </span>
   </a>
   
 </li>
       
         <li class="md-nav__item">
-  <a href="#parameters" class="md-nav__link">
+  <a href="#_2" class="md-nav__link">
     <span class="md-ellipsis">
-      Parameters
+      参数说明
     </span>
   </a>
   
-    <nav class="md-nav" aria-label="Parameters">
+    <nav class="md-nav" aria-label="参数说明">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
@@ -949,9 +949,9 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#type-conversion" class="md-nav__link">
+  <a href="#_3" class="md-nav__link">
     <span class="md-ellipsis">
-      Type Conversion
+      类型转换
     </span>
   </a>
   
@@ -1103,7 +1103,7 @@
         
   
   <span class="md-ellipsis">
-    FTP Reader
+    Ftp Reader
   </span>
   
 
@@ -1957,7 +1957,7 @@
         
   
   <span class="md-ellipsis">
-    FTP Writer
+    Ftp Writer
   </span>
   
 
@@ -1978,7 +1978,7 @@
         
   
   <span class="md-ellipsis">
-    GreenPlum Writer
+    Greenplum Writer
   </span>
   
 
@@ -2041,7 +2041,7 @@
         
   
   <span class="md-ellipsis">
-    HBase11x Writer
+    HBase11X Writer
   </span>
   
 
@@ -2521,22 +2521,22 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#configuration-example" class="md-nav__link">
+  <a href="#_1" class="md-nav__link">
     <span class="md-ellipsis">
-      Configuration Example
+      配置样例
     </span>
   </a>
   
 </li>
       
         <li class="md-nav__item">
-  <a href="#parameters" class="md-nav__link">
+  <a href="#_2" class="md-nav__link">
     <span class="md-ellipsis">
-      Parameters
+      参数说明
     </span>
   </a>
   
-    <nav class="md-nav" aria-label="Parameters">
+    <nav class="md-nav" aria-label="参数说明">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
@@ -2572,9 +2572,9 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#type-conversion" class="md-nav__link">
+  <a href="#_3" class="md-nav__link">
     <span class="md-ellipsis">
-      Type Conversion
+      类型转换
     </span>
   </a>
   
@@ -2596,9 +2596,9 @@
 
 
 <h1 id="mongodb-reader">MongoDB Reader<a class="headerlink" href="#mongodb-reader" title="Permanent link">&para;</a></h1>
-<p>MongoDBReader plugin uses MongoDB's Java client MongoClient to perform MongoDB read operations.</p>
-<h2 id="configuration-example">Configuration Example<a class="headerlink" href="#configuration-example" title="Permanent link">&para;</a></h2>
-<p>This example reads a table from MongoDB and prints to terminal</p>
+<p>MongoDBReader 插件利用 MongoDB 的java客户端MongoClient进行MongoDB的读操作。</p>
+<h2 id="_1">配置样例<a class="headerlink" href="#_1" title="Permanent link">&para;</a></h2>
+<p>该示例从MongoDB中读一张表并打印到终端</p>
 <div class="tabbed-set" data-tabs="1:1"><input checked="checked" id="__tabbed_1_1" name="__tabbed_1" type="radio" /><label for="__tabbed_1_1">job/mongo2stream.json</label><div class="tabbed-content"></div>
 </div>
 <div class="highlight"><pre><span></span><code><span class="p">{</span>
@@ -2651,85 +2651,85 @@
 <span class="w">  </span><span class="p">}</span>
 <span class="p">}</span>
 </code></pre></div>
-<h2 id="parameters">Parameters<a class="headerlink" href="#parameters" title="Permanent link">&para;</a></h2>
+<h2 id="_2">参数说明<a class="headerlink" href="#_2" title="Permanent link">&para;</a></h2>
 <table>
 <thead>
 <tr>
-<th style="text-align: left;">Configuration</th>
-<th style="text-align: center;">Required</th>
-<th>Type</th>
-<th>Default Value</th>
-<th>Description</th>
+<th style="text-align: left;">配置项</th>
+<th style="text-align: center;">是否必须</th>
+<th>类型</th>
+<th>默认值</th>
+<th>描述</th>
 </tr>
 </thead>
 <tbody>
 <tr>
 <td style="text-align: left;">address</td>
-<td style="text-align: center;">Yes</td>
+<td style="text-align: center;">是</td>
 <td>list</td>
-<td>None</td>
-<td>MongoDB data address information, multiple can be written</td>
+<td>无</td>
+<td>MongoDB 的数据地址信息, 可写多个</td>
 </tr>
 <tr>
 <td style="text-align: left;">username</td>
-<td style="text-align: center;">No</td>
+<td style="text-align: center;">否</td>
 <td>string</td>
-<td>None</td>
-<td>MongoDB username</td>
+<td>无</td>
+<td>MongoDB 用户名</td>
 </tr>
 <tr>
 <td style="text-align: left;">password</td>
-<td style="text-align: center;">No</td>
+<td style="text-align: center;">否</td>
 <td>string</td>
-<td>None</td>
-<td>MongoDB password</td>
+<td>无</td>
+<td>MongoDB 密码</td>
 </tr>
 <tr>
 <td style="text-align: left;">database</td>
-<td style="text-align: center;">Yes</td>
+<td style="text-align: center;">是</td>
 <td>string</td>
-<td>None</td>
-<td>MongoDB database</td>
+<td>无</td>
+<td>MongoDB 数据库</td>
 </tr>
 <tr>
 <td style="text-align: left;">collection</td>
-<td style="text-align: center;">Yes</td>
+<td style="text-align: center;">是</td>
 <td>string</td>
-<td>None</td>
-<td>MongoDB collection name</td>
+<td>无</td>
+<td>MongoDB 的集合名</td>
 </tr>
 <tr>
 <td style="text-align: left;">column</td>
-<td style="text-align: center;">Yes</td>
+<td style="text-align: center;">是</td>
 <td>list</td>
-<td>None</td>
-<td>MongoDB document column names, does not support <code>["*"]</code> to get all columns</td>
+<td>无</td>
+<td>MongoDB 的文档列名，不支持 <code>["*"]</code> 获取所有列方式</td>
 </tr>
 <tr>
 <td style="text-align: left;">query</td>
-<td style="text-align: center;">No</td>
+<td style="text-align: center;">否</td>
 <td>string</td>
-<td>None</td>
-<td>Custom query conditions</td>
+<td>无</td>
+<td>自定义查询条件</td>
 </tr>
 <tr>
 <td style="text-align: left;">fetchSize</td>
-<td style="text-align: center;">No</td>
+<td style="text-align: center;">否</td>
 <td>int</td>
 <td>2048</td>
-<td>Batch size for retrieving records</td>
+<td>批量获取的记录数</td>
 </tr>
 </tbody>
 </table>
 <h3 id="collection">collection<a class="headerlink" href="#collection" title="Permanent link">&para;</a></h3>
-<p>The <code>collection</code> here currently only supports a single collection, so the type is set to string rather than the array type common in other plugins. This is particularly noteworthy.</p>
+<p>这里的 <code>collection</code>  目前只支持单一 collection，因此设置类型为字符串，而不是其他插件常见的数组类型，这一点尤为注意。</p>
 <h3 id="column">column<a class="headerlink" href="#column" title="Permanent link">&para;</a></h3>
-<p><code>column</code> is used to specify the field names to be read. Here we make two assumptions about field name composition:</p>
+<p><code>column</code> 用来指定需要读取的字段名称，这里我们做了字段名称的组成两个假定：</p>
 <ul>
-<li>Cannot start with single quote (<code>'</code>)</li>
-<li>Cannot consist entirely of numbers and dots (<code>.</code>)</li>
+<li>不可能用单引号开头(<code>'</code>)</li>
+<li>不可能全部由数字和点(<code>.</code>)  组成</li>
 </ul>
-<p>Based on the above assumptions, we can simplify the <code>column</code> configuration while also specifying some constants as supplementary fields. For example, when collecting a table, we generally need to add collection time, collection source and other constants, which can be configured like this:</p>
+<p>基于以上假定，我们可以在简化 <code>column</code> 配置的同时，还可以指定一些常量作为补充字段，比如一般采集一张表，我们需要增加采集时间，采集源等常量，那么可以这样配置</p>
 <div class="highlight"><pre><span></span><code><span class="p">{</span>
 <span class="w">  </span><span class="nt">&quot;column&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span>
 <span class="w">    </span><span class="s2">&quot;col1&quot;</span><span class="p">,</span>
@@ -2741,20 +2741,20 @@
 <span class="w">  </span><span class="p">]</span>
 <span class="p">}</span>
 </code></pre></div>
-<p>The last three fields in the above configuration are constants, treated as string type, integer type, and floating point type respectively.</p>
+<p>上述配置的后三个字段就是常量，分别当作字符类型，整型和浮点型处理。</p>
 <h3 id="query">query<a class="headerlink" href="#query" title="Permanent link">&para;</a></h3>
-<p><code>query</code> is a BSON string that conforms to MongoDB query format, for example:</p>
+<p><code>query</code> 是只符合 MongoDB 查询格式的 BSON 字符串，比如：</p>
 <div class="highlight"><pre><span></span><code><span class="p">{</span>
 <span class="w">  </span><span class="nt">&quot;query&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;{amount: {$gt: 140900}, oc_date: {$gt: 20190110}}&quot;</span>
 <span class="p">}</span>
 </code></pre></div>
-<p>The above query is similar to <code>where amount &gt; 140900 and oc_date &gt; 20190110</code> in SQL.</p>
-<h2 id="type-conversion">Type Conversion<a class="headerlink" href="#type-conversion" title="Permanent link">&para;</a></h2>
+<p>上述查询类似 SQL 中的 <code>where amount &gt; 140900 and oc_date &gt; 20190110</code></p>
+<h2 id="_3">类型转换<a class="headerlink" href="#_3" title="Permanent link">&para;</a></h2>
 <table>
 <thead>
 <tr>
-<th>Addax Internal Type</th>
-<th>MongoDB Data Type</th>
+<th>Addax 内部类型</th>
+<th>MongoDB 数据类型</th>
 </tr>
 </thead>
 <tbody>

@@ -809,7 +809,7 @@
         
   
   <span class="md-ellipsis">
-    Text File Reader
+    TxtFile Reader
   </span>
   
 
@@ -998,7 +998,7 @@
         
   
   <span class="md-ellipsis">
-    FTP Reader
+    Ftp Reader
   </span>
   
 
@@ -1857,7 +1857,7 @@
         
   
   <span class="md-ellipsis">
-    FTP Writer
+    Ftp Writer
   </span>
   
 
@@ -1878,7 +1878,7 @@
         
   
   <span class="md-ellipsis">
-    GreenPlum Writer
+    Greenplum Writer
   </span>
   
 
@@ -1941,7 +1941,7 @@
         
   
   <span class="md-ellipsis">
-    HBase11x Writer
+    HBase11X Writer
   </span>
   
 
@@ -2298,18 +2298,18 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#configuration-example" class="md-nav__link">
+  <a href="#_1" class="md-nav__link">
     <span class="md-ellipsis">
-      Configuration Example
+      配置样例
     </span>
   </a>
   
 </li>
       
         <li class="md-nav__item">
-  <a href="#parameters" class="md-nav__link">
+  <a href="#_2" class="md-nav__link">
     <span class="md-ellipsis">
-      Parameters
+      参数说明
     </span>
   </a>
   
@@ -2479,18 +2479,18 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#configuration-example" class="md-nav__link">
+  <a href="#_1" class="md-nav__link">
     <span class="md-ellipsis">
-      Configuration Example
+      配置样例
     </span>
   </a>
   
 </li>
       
         <li class="md-nav__item">
-  <a href="#parameters" class="md-nav__link">
+  <a href="#_2" class="md-nav__link">
     <span class="md-ellipsis">
-      Parameters
+      参数说明
     </span>
   </a>
   
@@ -2512,12 +2512,12 @@
 
 
 <h1 id="sybase-writer">Sybase Writer<a class="headerlink" href="#sybase-writer" title="Permanent link">&para;</a></h1>
-<p>Sybase Writer plugin implements the functionality of writing data to <a href="https://en.wikipedia.org/wiki/Sybase">Sybase</a> database tables.</p>
-<h2 id="configuration-example">Configuration Example<a class="headerlink" href="#configuration-example" title="Permanent link">&para;</a></h2>
-<p>We can use Docker container to start a Sybase database</p>
+<p>Sybase Writer 插件实现了写入数据到 <a href="https://en.wikipedia.org/wiki/Sybase">Sybase</a> 库表的功能。</p>
+<h2 id="_1">配置样例<a class="headerlink" href="#_1" title="Permanent link">&para;</a></h2>
+<p>我们可以用 Docker 容器来启动一个 Sybase 数据库</p>
 <div class="highlight"><pre><span></span><code>docker<span class="w"> </span>run<span class="w"> </span>-tid<span class="w"> </span>--rm<span class="w">  </span>-h<span class="w"> </span>dksybase<span class="w"> </span>--name<span class="w"> </span>sybase<span class="w">  </span>-p<span class="w"> </span><span class="m">5000</span>:5000<span class="w">  </span>ifnazar/sybase_15_7<span class="w"> </span>bash<span class="w"> </span>/sybase/start
 </code></pre></div>
-<p>Then create a table as follows:</p>
+<p>然后创建一张如下表</p>
 <div class="highlight"><pre><span></span><code><span class="k">create</span><span class="w"> </span><span class="k">table</span><span class="w"> </span><span class="n">addax_writer</span><span class="w"> </span>
 <span class="p">(</span>
 <span class="w">    </span><span class="n">id</span><span class="w"> </span><span class="nb">int</span><span class="p">,</span>
@@ -2527,7 +2527,7 @@
 <span class="w">    </span><span class="n">updated_at</span><span class="w"> </span><span class="n">datetime</span>
 <span class="p">);</span>
 </code></pre></div>
-<p>Then use the following task configuration file:</p>
+<p>再使用下面的任务配置文件</p>
 <div class="highlight"><pre><span></span><code><span class="p">{</span>
 <span class="w">  </span><span class="nt">&quot;job&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
 <span class="w">    </span><span class="nt">&quot;setting&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
@@ -2589,8 +2589,8 @@
 <span class="w">  </span><span class="p">}</span>
 <span class="p">}</span>
 </code></pre></div>
-<h2 id="parameters">Parameters<a class="headerlink" href="#parameters" title="Permanent link">&para;</a></h2>
-<p>This plugin is based on <a href="../rdbmswriter">RDBMS Writer</a>, so you can refer to all configuration items of RDBMS Writer.</p>
+<h2 id="_2">参数说明<a class="headerlink" href="#_2" title="Permanent link">&para;</a></h2>
+<p>该插件基于 <a href="../rdbmswriter">RDBMS Writer</a> 实现，因此可以参考 RDBMS Writer 的所有配置项。</p>
 
 
 

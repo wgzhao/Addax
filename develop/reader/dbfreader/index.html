@@ -814,7 +814,7 @@
         
   
   <span class="md-ellipsis">
-    Text File Reader
+    TxtFile Reader
   </span>
   
 
@@ -1003,22 +1003,22 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#configuration" class="md-nav__link">
+  <a href="#_1" class="md-nav__link">
     <span class="md-ellipsis">
-      Configuration
+      配置说明
     </span>
   </a>
   
 </li>
       
         <li class="md-nav__item">
-  <a href="#parameters" class="md-nav__link">
+  <a href="#_2" class="md-nav__link">
     <span class="md-ellipsis">
-      Parameters
+      参数说明
     </span>
   </a>
   
-    <nav class="md-nav" aria-label="Parameters">
+    <nav class="md-nav" aria-label="参数说明">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
@@ -1040,9 +1040,9 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#supported-data-types" class="md-nav__link">
+  <a href="#_3" class="md-nav__link">
     <span class="md-ellipsis">
-      Supported Data Types
+      支持的数据类型
     </span>
   </a>
   
@@ -1094,7 +1094,7 @@
         
   
   <span class="md-ellipsis">
-    FTP Reader
+    Ftp Reader
   </span>
   
 
@@ -1948,7 +1948,7 @@
         
   
   <span class="md-ellipsis">
-    FTP Writer
+    Ftp Writer
   </span>
   
 
@@ -1969,7 +1969,7 @@
         
   
   <span class="md-ellipsis">
-    GreenPlum Writer
+    Greenplum Writer
   </span>
   
 
@@ -2032,7 +2032,7 @@
         
   
   <span class="md-ellipsis">
-    HBase11x Writer
+    HBase11X Writer
   </span>
   
 
@@ -2512,22 +2512,22 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#configuration" class="md-nav__link">
+  <a href="#_1" class="md-nav__link">
     <span class="md-ellipsis">
-      Configuration
+      配置说明
     </span>
   </a>
   
 </li>
       
         <li class="md-nav__item">
-  <a href="#parameters" class="md-nav__link">
+  <a href="#_2" class="md-nav__link">
     <span class="md-ellipsis">
-      Parameters
+      参数说明
     </span>
   </a>
   
-    <nav class="md-nav" aria-label="Parameters">
+    <nav class="md-nav" aria-label="参数说明">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
@@ -2549,9 +2549,9 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#supported-data-types" class="md-nav__link">
+  <a href="#_3" class="md-nav__link">
     <span class="md-ellipsis">
-      Supported Data Types
+      支持的数据类型
     </span>
   </a>
   
@@ -2578,9 +2578,9 @@
 
 
 <h1 id="dbf-reader">Dbf Reader<a class="headerlink" href="#dbf-reader" title="Permanent link">&para;</a></h1>
-<p><code>DbfReader</code> plugin supports reading DBF format files.</p>
-<h2 id="configuration">Configuration<a class="headerlink" href="#configuration" title="Permanent link">&para;</a></h2>
-<p>The following is a configuration example for reading DBF files and printing to terminal</p>
+<p><code>DbfReader</code> 插件支持读取 DBF 格式文件</p>
+<h2 id="_1">配置说明<a class="headerlink" href="#_1" title="Permanent link">&para;</a></h2>
+<p>以下是读取 DBF 文件后打印到终端的配置样例</p>
 <div class="tabbed-set" data-tabs="1:1"><input checked="checked" id="__tabbed_1_1" name="__tabbed_1" type="radio" /><label for="__tabbed_1_1">jobs/dbf2stream.json</label><div class="tabbed-content"></div>
 </div>
 <div class="highlight"><pre><span></span><code><span class="p">{</span>
@@ -2637,61 +2637,61 @@
 <span class="w">  </span><span class="p">}</span>
 <span class="p">}</span>
 </code></pre></div>
-<h2 id="parameters">Parameters<a class="headerlink" href="#parameters" title="Permanent link">&para;</a></h2>
-<p><code>parameter</code> configuration supports the following configurations:</p>
+<h2 id="_2">参数说明<a class="headerlink" href="#_2" title="Permanent link">&para;</a></h2>
+<p><code>parameter</code> 配置项支持以下配置</p>
 <table>
 <thead>
 <tr>
-<th style="text-align: left;">Configuration</th>
-<th style="text-align: center;">Required</th>
-<th>Default Value</th>
-<th>Description</th>
+<th style="text-align: left;">配置项</th>
+<th style="text-align: center;">是否必须</th>
+<th>默认值</th>
+<th>描述</th>
 </tr>
 </thead>
 <tbody>
 <tr>
 <td style="text-align: left;">path</td>
-<td style="text-align: center;">Yes</td>
-<td>None</td>
-<td>DBF file path, supports writing multiple paths, detailed description below</td>
+<td style="text-align: center;">是</td>
+<td>无</td>
+<td>DBF 文件路径，支持写多个路径，详细情况见下</td>
 </tr>
 <tr>
 <td style="text-align: left;">column</td>
-<td style="text-align: center;">Yes</td>
-<td>None</td>
-<td>Collection of columns to be synchronized in the configured table, is a collection of <code>{type: value}</code> or <code>{type: index}</code>, detailed configuration below</td>
+<td style="text-align: center;">是</td>
+<td>无</td>
+<td>所配置的表中需要同步的列集合, 是 <code>{type: value}</code> 或 <code>{type: index}</code> 的集合，详细配置见下</td>
 </tr>
 <tr>
 <td style="text-align: left;">encoding</td>
-<td style="text-align: center;">No</td>
+<td style="text-align: center;">否</td>
 <td>GBK</td>
-<td>DBF file encoding, such as <code>GBK</code>, <code>UTF-8</code></td>
+<td>DBF 文件编码，比如 <code>GBK</code>, <code>UTF-8</code></td>
 </tr>
 <tr>
 <td style="text-align: left;">nullFormat</td>
-<td style="text-align: center;">No</td>
+<td style="text-align: center;">否</td>
 <td><code>\N</code></td>
-<td>Define which string can represent null</td>
+<td>定义哪个字符串可以表示为 null,</td>
 </tr>
 </tbody>
 </table>
 <h3 id="path">path<a class="headerlink" href="#path" title="Permanent link">&para;</a></h3>
-<p>Description: Path information of local file system, note that multiple paths can be supported here.</p>
+<p>描述：本地文件系统的路径信息，注意这里可以支持填写多个路径。</p>
 <ul>
-<li>When specifying a single local file, DbfFileReader can currently only use single-threaded data extraction. Phase 2 considers multi-threaded concurrent reading for single files in uncompressed file situations.</li>
-<li>When specifying multiple local files, DbfFileReader supports using multi-threaded data extraction. Thread concurrency is specified by the number of channels.</li>
-<li>When specifying wildcards, DbfFileReader attempts to traverse multiple file information. For example: specifying <code>/*</code> represents reading all files under the / directory, specifying <code>/foo/*</code> represents reading all files under the <code>foo</code> directory. dbfFileReader currently only supports <code>*</code> as a file wildcard.</li>
+<li>当指定单个本地文件，DbfFileReader 暂时只能使用单线程进行数据抽取。二期考虑在非压缩文件情况下针对单个 File 可以进行多线程并发读取。</li>
+<li>当指定多个本地文件，DbfFileReader 支持使用多线程进行数据抽取。线程并发数通过通道数指定。</li>
+<li>当指定通配符，DbfFileReader 尝试遍历出多个文件信息。例如: 指定 <code>/*</code> 代表读取/目录下所有的文件，指定 <code>/foo/*</code> 代表读取 <code>foo</code> 目录下游所有的文件。 dbfFileReader 目前只支持 <code>*</code> 作为文件通配符。</li>
 </ul>
-<p>It is particularly important to note that Addax treats all dbf files synchronized under one job as the same data table. Users must ensure that all files can adapt to the same set of schema information. Users must ensure that the read files are in dbf-like format and provide Addax with read permissions.</p>
-<p>It is particularly important to note that if there are no matching files for extraction under the path specified by Path, Addax will report an error.</p>
+<p>特别需要注意的是，Addax 会将一个作业下同步的所有 dbf File 视作同一张数据表。用户必须自己保证所有的 File 能够适配同一套 schema 信息。读取文件用户必须保证为类 dbf 格式，并且提供给 Addax 权限可读。</p>
+<p>特别需要注意的是，如果 Path 指定的路径下没有符合匹配的文件抽取，Addax 将报错。</p>
 <h3 id="column">column<a class="headerlink" href="#column" title="Permanent link">&para;</a></h3>
-<p>List of fields to read, <code>type</code> specifies the type of source data, <code>name</code> is the field name with maximum length of 8, <code>value</code> specifies that the current type is constant, not reading data from source file, but automatically generating corresponding columns based on <code>value</code> value.</p>
-<p>By default, users can read all data as <code>String</code> type, configured as follows:</p>
+<p>读取字段列表，<code>type</code> 指定源数据的类型，<code>name</code> 为字段名,长度最大 8，<code>value</code> 指定当前类型为常量，不从源头文件读取数据，而是根据 <code>value</code> 值自动生成对应的列。</p>
+<p>默认情况下，用户可以全部按照 <code>String</code> 类型读取数据，配置如下：</p>
 <div class="highlight"><pre><span></span><code><span class="p">{</span>
 <span class="w">  </span><span class="nt">&quot;column&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="s2">&quot;*&quot;</span><span class="p">]</span>
 <span class="p">}</span>
 </code></pre></div>
-<p>Users can specify Column field information, configured as follows:</p>
+<p>用户可以指定 Column 字段信息，配置如下：</p>
 <div class="highlight"><pre><span></span><code><span class="p">[</span>
 <span class="w">  </span><span class="p">{</span>
 <span class="w">    </span><span class="nt">&quot;type&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;long&quot;</span><span class="p">,</span>
@@ -2704,16 +2704,16 @@
 <span class="p">]</span>
 </code></pre></div>
 <ul>
-<li><code>"index": 0</code> means getting int field from the first column of local DBF file</li>
-<li><code>"value": "addax"</code> means generating string field <code>addax</code> internally from dbfFileReader as the current field. For user-specified <code>column</code> information, <code>type</code> must be filled, and <code>index</code> and <code>value</code> must choose one.</li>
+<li><code>"index": 0</code> 表示从本地 DBF 文件第一列获取 int 字段</li>
+<li><code>"value": "addax"</code> 表示从 dbfFileReader 内部生成 <code>addax</code> 的字符串字段作为当前字段 对于用户指定 <code>column</code>信息，<code>type</code> 必须填写，<code>index</code> 和 <code>value</code> 必须选择其一。</li>
 </ul>
-<h3 id="supported-data-types">Supported Data Types<a class="headerlink" href="#supported-data-types" title="Permanent link">&para;</a></h3>
-<p>Local files provide data types themselves, this type is defined by Addax dbfFileReader:</p>
+<h3 id="_3">支持的数据类型<a class="headerlink" href="#_3" title="Permanent link">&para;</a></h3>
+<p>本地文件本身提供数据类型，该类型是 Addax dbfFileReader 定义：</p>
 <table>
 <thead>
 <tr>
-<th>Addax Internal Type</th>
-<th>Local File Data Type</th>
+<th>Addax 内部类型</th>
+<th>本地文件 数据类型</th>
 </tr>
 </thead>
 <tbody>
@@ -2739,12 +2739,12 @@
 </tr>
 </tbody>
 </table>
-<p>Where:</p>
+<p>其中：</p>
 <ul>
-<li>Long refers to string representation of integer form in local file text, such as <code>19901219</code>.</li>
-<li>Double refers to string representation of Double form in local file text, such as <code>3.1415</code>.</li>
-<li>Boolean refers to string representation of Boolean form in local file text, such as <code>true</code>, <code>false</code>. Case insensitive.</li>
-<li>Date refers to string representation of Date form in local file text, such as <code>2014-12-31</code>, can configure <code>dateFormat</code> to specify format.</li>
+<li>Long 是指本地文件文本中使用整形的字符串表示形式，例如 <code>19901219</code>。</li>
+<li>Double 是指本地文件文本中使用 Double 的字符串表示形式，例如 <code>3.1415</code>。</li>
+<li>Boolean 是指本地文件文本中使用 Boolean 的字符串表示形式，例如 <code>true</code>、<code>false</code>。不区分大小写。</li>
+<li>Date 是指本地文件文本中使用 Date 的字符串表示形式，例如 <code>2014-12-31</code>，可以配置 <code>dateFormat</code> 指定格式。</li>
 </ul>
 
 

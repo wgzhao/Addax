@@ -809,7 +809,7 @@
         
   
   <span class="md-ellipsis">
-    Text File Reader
+    TxtFile Reader
   </span>
   
 
@@ -998,7 +998,7 @@
         
   
   <span class="md-ellipsis">
-    FTP Reader
+    Ftp Reader
   </span>
   
 
@@ -1626,19 +1626,19 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#example" class="md-nav__link">
+  <a href="#_1" class="md-nav__link">
     <span class="md-ellipsis">
-      Example
+      示例
     </span>
   </a>
   
-    <nav class="md-nav" aria-label="Example">
+    <nav class="md-nav" aria-label="示例">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#execute-collection-command" class="md-nav__link">
+  <a href="#_2" class="md-nav__link">
     <span class="md-ellipsis">
-      Execute Collection Command
+      执行采集命令
     </span>
   </a>
   
@@ -1650,13 +1650,13 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#parameters" class="md-nav__link">
+  <a href="#_3" class="md-nav__link">
     <span class="md-ellipsis">
-      Parameters
+      参数说明
     </span>
   </a>
   
-    <nav class="md-nav" aria-label="Parameters">
+    <nav class="md-nav" aria-label="参数说明">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
@@ -1954,7 +1954,7 @@
         
   
   <span class="md-ellipsis">
-    FTP Writer
+    Ftp Writer
   </span>
   
 
@@ -1975,7 +1975,7 @@
         
   
   <span class="md-ellipsis">
-    GreenPlum Writer
+    Greenplum Writer
   </span>
   
 
@@ -2038,7 +2038,7 @@
         
   
   <span class="md-ellipsis">
-    HBase11x Writer
+    HBase11X Writer
   </span>
   
 
@@ -2518,19 +2518,19 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#example" class="md-nav__link">
+  <a href="#_1" class="md-nav__link">
     <span class="md-ellipsis">
-      Example
+      示例
     </span>
   </a>
   
-    <nav class="md-nav" aria-label="Example">
+    <nav class="md-nav" aria-label="示例">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#execute-collection-command" class="md-nav__link">
+  <a href="#_2" class="md-nav__link">
     <span class="md-ellipsis">
-      Execute Collection Command
+      执行采集命令
     </span>
   </a>
   
@@ -2542,13 +2542,13 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#parameters" class="md-nav__link">
+  <a href="#_3" class="md-nav__link">
     <span class="md-ellipsis">
-      Parameters
+      参数说明
     </span>
   </a>
   
-    <nav class="md-nav" aria-label="Parameters">
+    <nav class="md-nav" aria-label="参数说明">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
@@ -2590,9 +2590,9 @@
 
 
 <h1 id="mysql-writer">MySQL Writer<a class="headerlink" href="#mysql-writer" title="Permanent link">&para;</a></h1>
-<p>MySQL Writer plugin implements the functionality of writing data to <a href="https://mysql.com">MySQL</a> destination tables.</p>
-<h2 id="example">Example<a class="headerlink" href="#example" title="Permanent link">&para;</a></h2>
-<p>Assume the MySQL table to be written has the following DDL statement:</p>
+<p>MySQL Writer 插件实现了写入数据到 <a href="https://mysql.com">MySQL</a> 目的表的功能。</p>
+<h2 id="_1">示例<a class="headerlink" href="#_1" title="Permanent link">&para;</a></h2>
+<p>假定要写入的 MySQL 表建表语句如下：</p>
 <div class="highlight"><pre><span></span><code><span class="k">create</span><span class="w"> </span><span class="k">table</span><span class="w"> </span><span class="n">test</span><span class="p">.</span><span class="n">addax_tbl</span>
 <span class="p">(</span>
 <span class="w">  </span><span class="n">col1</span><span class="w"> </span><span class="nb">varchar</span><span class="p">(</span><span class="mi">20</span><span class="p">)</span><span class="w"> </span><span class="p">,</span>
@@ -2602,7 +2602,7 @@
 <span class="w">  </span><span class="n">col5</span><span class="w"> </span><span class="nb">binary</span>
 <span class="p">)</span><span class="w"> </span><span class="k">default</span><span class="w"> </span><span class="n">charset</span><span class="w"> </span><span class="n">utf8</span><span class="p">;</span>
 </code></pre></div>
-<p>Here we use data generated from memory to import into MySQL.</p>
+<p>这里使用一份从内存产生到 MySQL 导入的数据。</p>
 <div class="tabbed-set" data-tabs="1:1"><input checked="checked" id="__tabbed_1_1" name="__tabbed_1" type="radio" /><label for="__tabbed_1_1">job/stream2mysql.json</label><div class="tabbed-content"></div>
 </div>
 <div class="highlight"><pre><span></span><code><span class="p">{</span>
@@ -2669,62 +2669,62 @@
 <span class="w">  </span><span class="p">}</span>
 <span class="p">}</span>
 </code></pre></div>
-<p>Save the above configuration file as <code>job/stream2mysql.json</code></p>
-<h3 id="execute-collection-command">Execute Collection Command<a class="headerlink" href="#execute-collection-command" title="Permanent link">&para;</a></h3>
-<p>Execute the following command for data collection</p>
+<p>将上述配置文件保存为 <code>job/stream2mysql.json</code></p>
+<h3 id="_2">执行采集命令<a class="headerlink" href="#_2" title="Permanent link">&para;</a></h3>
+<p>执行以下命令进行数据采集</p>
 <div class="highlight"><pre><span></span><code>bin/addax.sh<span class="w"> </span>job/stream2mysql.json
 </code></pre></div>
-<h2 id="parameters">Parameters<a class="headerlink" href="#parameters" title="Permanent link">&para;</a></h2>
-<p>This plugin is based on <a href="../rdbmswriter">RDBMS Writer</a>, so you can refer to all configuration items of RDBMS Writer, and adds some MySQL-specific configuration items.</p>
+<h2 id="_3">参数说明<a class="headerlink" href="#_3" title="Permanent link">&para;</a></h2>
+<p>该插件基于 <a href="../rdbmswriter">RDBMS Writer</a> 实现，因此可以参考 RDBMS Writer 的所有配置项，并且增加了一些 MySQL 特有的配置项。</p>
 <table>
 <thead>
 <tr>
-<th style="text-align: left;">Configuration</th>
-<th style="text-align: center;">Required</th>
-<th>Type</th>
-<th>Default Value</th>
-<th>Description</th>
+<th style="text-align: left;">配置项</th>
+<th style="text-align: center;">是否必须</th>
+<th>类型</th>
+<th>默认值</th>
+<th>描述</th>
 </tr>
 </thead>
 <tbody>
 <tr>
 <td style="text-align: left;">writeMode</td>
-<td style="text-align: center;">Yes</td>
+<td style="text-align: center;">是</td>
 <td>string</td>
 <td>insert</td>
-<td>The way data is written to the table, see below</td>
+<td>数据写入表的方式，详见下文</td>
 </tr>
 <tr>
 <td style="text-align: left;">batchSize</td>
-<td style="text-align: center;">No</td>
+<td style="text-align: center;">否</td>
 <td>int</td>
 <td>1024</td>
-<td>Defines the number of batch data fetched between plugin and database server each time</td>
+<td>定义了插件和数据库服务器端每次批量数据获取条数</td>
 </tr>
 </tbody>
 </table>
 <h3 id="driver">driver<a class="headerlink" href="#driver" title="Permanent link">&para;</a></h3>
-<p>The current MySQL JDBC driver uses version 8.0 and above, with driver class name <code>com.mysql.cj.jdbc.Driver</code>, not <code>com.mysql.jdbc.Driver</code>.
-If you need to collect from MySQL server below <code>5.6</code> and need to use <code>Connector/J 5.1</code> driver, you can take the following steps:</p>
+<p>当前采用的 MySQL JDBC 驱动为 8.0 以上版本，驱动类名使用的 <code>com.mysql.cj.jdbc.Driver</code>，而不是 <code>com.mysql.jdbc.Driver</code>。
+如果你需要采集的 MySQL 服务低于 <code>5.6</code>，需要使用到 <code>Connector/J 5.1</code> 驱动，则可以采取下面的步骤：</p>
 <ol>
 <li>
-<p>Replace the built-in driver in the plugin
+<p>替换插件内置的驱动
   <code>rm -f plugin/writer/mysqlwriter/libs/mysql-connector-java-*.jar</code></p>
 </li>
 <li>
-<p>Copy the old driver to the plugin directory
+<p>拷贝老的驱动到插件目录
   <code>cp mysql-connector-java-5.1.48.jar plugin/writer/mysqlwriter/libs/</code></p>
 </li>
 <li>
-<p>Specify driver class name
-  In your json file, configure <code>"driver": "com.mysql.jdbc.Driver"</code></p>
+<p>指定驱动类名称
+  在你的 json 文件类，配置 <code>"driver": "com.mysql.jdbc.Driver"</code></p>
 </li>
 </ol>
 <h3 id="writemode">writeMode<a class="headerlink" href="#writemode" title="Permanent link">&para;</a></h3>
 <ul>
-<li><code>insert</code> means using <code>insert into</code></li>
-<li><code>replace</code> means using <code>replace into</code> method</li>
-<li><code>update</code> means using <code>ON DUPLICATE KEY UPDATE</code> statement</li>
+<li><code>insert</code> 表示采用 <code>insert into</code></li>
+<li><code>replace</code>表示采用<code>replace into</code>方式</li>
+<li><code>update</code> 表示采用 <code>ON DUPLICATE KEY UPDATE</code> 语句</li>
 </ul>
 
 

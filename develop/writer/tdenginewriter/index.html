@@ -809,7 +809,7 @@
         
   
   <span class="md-ellipsis">
-    Text File Reader
+    TxtFile Reader
   </span>
   
 
@@ -998,7 +998,7 @@
         
   
   <span class="md-ellipsis">
-    FTP Reader
+    Ftp Reader
   </span>
   
 
@@ -1857,7 +1857,7 @@
         
   
   <span class="md-ellipsis">
-    FTP Writer
+    Ftp Writer
   </span>
   
 
@@ -1878,7 +1878,7 @@
         
   
   <span class="md-ellipsis">
-    GreenPlum Writer
+    Greenplum Writer
   </span>
   
 
@@ -1941,7 +1941,7 @@
         
   
   <span class="md-ellipsis">
-    HBase11x Writer
+    HBase11X Writer
   </span>
   
 
@@ -2319,18 +2319,84 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#prerequisites" class="md-nav__link">
+  <a href="#_1" class="md-nav__link">
     <span class="md-ellipsis">
-      Prerequisites
+      前置条件
     </span>
   </a>
   
 </li>
       
         <li class="md-nav__item">
-  <a href="#example" class="md-nav__link">
+  <a href="#_2" class="md-nav__link">
     <span class="md-ellipsis">
-      Example
+      示例
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="示例">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#_3" class="md-nav__link">
+    <span class="md-ellipsis">
+      执行采集命令
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_4" class="md-nav__link">
+    <span class="md-ellipsis">
+      参数说明
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="参数说明">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#jdbc-restful" class="md-nav__link">
+    <span class="md-ellipsis">
+      使用 JDBC-RESTful 接口
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_5" class="md-nav__link">
+    <span class="md-ellipsis">
+      类型转换
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_6" class="md-nav__link">
+    <span class="md-ellipsis">
+      当前支持版本
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_7" class="md-nav__link">
+    <span class="md-ellipsis">
+      注意事项
     </span>
   </a>
   
@@ -2479,18 +2545,84 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#prerequisites" class="md-nav__link">
+  <a href="#_1" class="md-nav__link">
     <span class="md-ellipsis">
-      Prerequisites
+      前置条件
     </span>
   </a>
   
 </li>
       
         <li class="md-nav__item">
-  <a href="#example" class="md-nav__link">
+  <a href="#_2" class="md-nav__link">
     <span class="md-ellipsis">
-      Example
+      示例
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="示例">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#_3" class="md-nav__link">
+    <span class="md-ellipsis">
+      执行采集命令
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_4" class="md-nav__link">
+    <span class="md-ellipsis">
+      参数说明
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="参数说明">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#jdbc-restful" class="md-nav__link">
+    <span class="md-ellipsis">
+      使用 JDBC-RESTful 接口
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_5" class="md-nav__link">
+    <span class="md-ellipsis">
+      类型转换
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_6" class="md-nav__link">
+    <span class="md-ellipsis">
+      当前支持版本
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_7" class="md-nav__link">
+    <span class="md-ellipsis">
+      注意事项
     </span>
   </a>
   
@@ -2512,15 +2644,17 @@
 
 
 <h1 id="tdengine-writer">TDengine Writer<a class="headerlink" href="#tdengine-writer" title="Permanent link">&para;</a></h1>
-<p>TDengine Writer plugin implements writing data to <a href="https://www.taosdata.com/cn/">TDengine</a> database system. In the underlying implementation, TDengine Writer connects to remote TDengine database through JDBC JNI driver and executes corresponding SQL statements to batch write data to TDengine database.</p>
-<h2 id="prerequisites">Prerequisites<a class="headerlink" href="#prerequisites" title="Permanent link">&para;</a></h2>
-<p>Considering performance issues, this plugin uses TDengine's JDBC-JNI driver, which directly calls the client API (<code>libtaos.so</code> or <code>taos.dll</code>) to send write and query requests to <code>taosd</code> instances. Therefore, dynamic library link files need to be configured before use.</p>
-<p>First copy <code>plugin/writer/tdenginewriter/libs/libtaos.so.2.0.16.0</code> to <code>/usr/lib64</code> directory, then execute the following commands to create soft links:</p>
+<p>TDengine Writer 插件实现了将数据写入 <a href="https://www.taosdata.com/cn/">TDengine</a> 数据库系统。在底层实现上，TDengine Writer 通过JDBC JNI 驱动连接远程 TDengine 数据库，
+并执行相应的sql语句将数据批量写入 TDengine 库中。</p>
+<h2 id="_1">前置条件<a class="headerlink" href="#_1" title="Permanent link">&para;</a></h2>
+<p>考虑到性能问题，该插件使用了 TDengine 的 JDBC-JNI 驱动， 该驱动直接调用客户端 API（<code>libtaos.so</code> 或 <code>taos.dll</code>）将写入和查询请求发送到 <code>taosd</code> 实例。
+因此在使用之前需要配置好动态库链接文件。</p>
+<p>首先将 <code>plugin/writer/tdenginewriter/libs/libtaos.so.2.0.16.0</code> 拷贝到 <code>/usr/lib64</code> 目录，然后执行下面的命令创建软链接</p>
 <div class="highlight"><pre><span></span><code>ln<span class="w"> </span>-sf<span class="w"> </span>/usr/lib64/libtaos.so.2.0.16.0<span class="w"> </span>/usr/lib64/libtaos.so.1
 ln<span class="w"> </span>-sf<span class="w"> </span>/usr/lib64/libtaos.so.1<span class="w"> </span>/usr/lib64/libtaos.so
 </code></pre></div>
-<h2 id="example">Example<a class="headerlink" href="#example" title="Permanent link">&para;</a></h2>
-<p>Assume the table to be written is as follows:</p>
+<h2 id="_2">示例<a class="headerlink" href="#_2" title="Permanent link">&para;</a></h2>
+<p>假定要写入的表如下：</p>
 <div class="highlight"><pre><span></span><code><span class="k">create</span><span class="w"> </span><span class="k">table</span><span class="w"> </span><span class="n">test</span><span class="p">.</span><span class="n">addax_test</span><span class="w"> </span><span class="p">(</span>
 <span class="w">    </span><span class="n">ts</span><span class="w"> </span><span class="k">timestamp</span><span class="p">,</span>
 <span class="w">    </span><span class="n">name</span><span class="w"> </span><span class="k">nchar</span><span class="p">(</span><span class="mi">100</span><span class="p">),</span>
@@ -2530,7 +2664,226 @@ ln<span class="w"> </span>-sf<span class="w"> </span>/usr/lib64/libtaos.so.1<spa
 <span class="w">    </span><span class="n">memo</span><span class="w"> </span><span class="k">nchar</span><span class="p">(</span><span class="mi">100</span><span class="p">)</span>
 <span class="p">);</span>
 </code></pre></div>
-<p>This plugin is based on <a href="../rdbmswriter">RDBMS Writer</a>, so you can refer to all configuration items of RDBMS Writer.</p>
+<p>以下是配置文件</p>
+<div class="tabbed-set" data-tabs="1:1"><input checked="checked" id="__tabbed_1_1" name="__tabbed_1" type="radio" /><label for="__tabbed_1_1">job/stream2tdengine.json</label><div class="tabbed-content"></div>
+</div>
+<div class="highlight"><pre><span></span><code><span class="p">{</span>
+<span class="w">  </span><span class="nt">&quot;job&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="nt">&quot;setting&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<span class="w">      </span><span class="nt">&quot;speed&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="nt">&quot;channel&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">1</span><span class="p">,</span>
+<span class="w">        </span><span class="nt">&quot;bytes&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">-1</span>
+<span class="w">      </span><span class="p">}</span>
+<span class="w">    </span><span class="p">},</span>
+<span class="w">    </span><span class="nt">&quot;content&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<span class="w">      </span><span class="nt">&quot;reader&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="nt">&quot;name&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;streamreader&quot;</span><span class="p">,</span>
+<span class="w">        </span><span class="nt">&quot;parameter&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<span class="w">          </span><span class="nt">&quot;column&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span>
+<span class="w">            </span><span class="p">{</span>
+<span class="w">              </span><span class="nt">&quot;random&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;2017-08-01 00:01:02,2020-01-01 12:13:14&quot;</span><span class="p">,</span>
+<span class="w">              </span><span class="nt">&quot;type&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;date&quot;</span>
+<span class="w">            </span><span class="p">},</span>
+<span class="w">            </span><span class="p">{</span>
+<span class="w">              </span><span class="nt">&quot;value&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;Addax&quot;</span><span class="p">,</span>
+<span class="w">              </span><span class="nt">&quot;type&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;string&quot;</span>
+<span class="w">            </span><span class="p">},</span>
+<span class="w">            </span><span class="p">{</span>
+<span class="w">              </span><span class="nt">&quot;value&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">19880808</span><span class="p">,</span>
+<span class="w">              </span><span class="nt">&quot;type&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;long&quot;</span>
+<span class="w">            </span><span class="p">},</span>
+<span class="w">            </span><span class="p">{</span>
+<span class="w">              </span><span class="nt">&quot;value&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;1988-08-08 08:08:08&quot;</span><span class="p">,</span>
+<span class="w">              </span><span class="nt">&quot;type&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;date&quot;</span>
+<span class="w">            </span><span class="p">},</span>
+<span class="w">            </span><span class="p">{</span>
+<span class="w">              </span><span class="nt">&quot;value&quot;</span><span class="p">:</span><span class="w"> </span><span class="kc">true</span><span class="p">,</span>
+<span class="w">              </span><span class="nt">&quot;type&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;bool&quot;</span>
+<span class="w">            </span><span class="p">},</span>
+<span class="w">            </span><span class="p">{</span>
+<span class="w">              </span><span class="nt">&quot;value&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;test&quot;</span><span class="p">,</span>
+<span class="w">              </span><span class="nt">&quot;type&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;bytes&quot;</span>
+<span class="w">            </span><span class="p">}</span>
+<span class="w">          </span><span class="p">],</span>
+<span class="w">          </span><span class="nt">&quot;sliceRecordCount&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">1000</span>
+<span class="w">        </span><span class="p">}</span>
+<span class="w">      </span><span class="p">},</span>
+<span class="w">      </span><span class="nt">&quot;writer&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="nt">&quot;name&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;tdenginewriter&quot;</span><span class="p">,</span>
+<span class="w">        </span><span class="nt">&quot;parameter&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<span class="w">          </span><span class="nt">&quot;username&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;root&quot;</span><span class="p">,</span>
+<span class="w">          </span><span class="nt">&quot;password&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;taosdata&quot;</span><span class="p">,</span>
+<span class="w">          </span><span class="nt">&quot;column&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span>
+<span class="w">            </span><span class="s2">&quot;ts&quot;</span><span class="p">,</span>
+<span class="w">            </span><span class="s2">&quot;name&quot;</span><span class="p">,</span>
+<span class="w">            </span><span class="s2">&quot;file_size&quot;</span><span class="p">,</span>
+<span class="w">            </span><span class="s2">&quot;file_date&quot;</span><span class="p">,</span>
+<span class="w">            </span><span class="s2">&quot;flag_open&quot;</span><span class="p">,</span>
+<span class="w">            </span><span class="s2">&quot;memo&quot;</span>
+<span class="w">          </span><span class="p">],</span>
+<span class="w">          </span><span class="nt">&quot;connection&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<span class="w">            </span><span class="nt">&quot;jdbcUrl&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;jdbc:TAOS://127.0.0.1:6030/test&quot;</span><span class="p">,</span>
+<span class="w">            </span><span class="nt">&quot;table&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span>
+<span class="w">              </span><span class="s2">&quot;addax_test&quot;</span>
+<span class="w">            </span><span class="p">]</span>
+<span class="w">          </span><span class="p">}</span>
+<span class="w">        </span><span class="p">}</span>
+<span class="w">      </span><span class="p">}</span>
+<span class="w">    </span><span class="p">}</span>
+<span class="w">  </span><span class="p">}</span>
+<span class="p">}</span>
+</code></pre></div>
+<p>将上述配置文件保存为   <code>job/stream2tdengine.json</code></p>
+<h3 id="_3">执行采集命令<a class="headerlink" href="#_3" title="Permanent link">&para;</a></h3>
+<p>执行以下命令进行数据采集</p>
+<div class="highlight"><pre><span></span><code>bin/addax.sh<span class="w"> </span>job/tdengine2stream.json
+</code></pre></div>
+<p>命令输出类似如下：</p>
+<div class="highlight"><pre><span></span><code>2021-02-20 15:52:07.691 [main] INFO  VMInfo - VMInfo# operatingSystem class =&gt; sun.management.OperatingSystemImpl
+2021-02-20 15:52:07.748 [main] INFO  Engine -
+{
+    &quot;content&quot;:
+        {
+            &quot;reader&quot;:{
+                &quot;parameter&quot;:{
+                    &quot;column&quot;:[
+                        {
+                            &quot;random&quot;:&quot;2017-08-01 00:01:02,2020-01-01 12:13:14&quot;,
+                            &quot;type&quot;:&quot;date&quot;
+                        },
+                        {
+                            &quot;type&quot;:&quot;string&quot;,
+                            &quot;value&quot;:&quot;Addax&quot;
+                        },
+                        {
+                            &quot;type&quot;:&quot;long&quot;,
+                            &quot;value&quot;:19880808
+                        },
+                        {
+                            &quot;type&quot;:&quot;date&quot;,
+                            &quot;value&quot;:&quot;1988-08-08 08:08:08&quot;
+                        },
+                        {
+                            &quot;type&quot;:&quot;bool&quot;,
+                            &quot;value&quot;:true
+                        },
+                        {
+                            &quot;type&quot;:&quot;bytes&quot;,
+                            &quot;value&quot;:&quot;test&quot;
+                        }
+                    ],
+                    &quot;sliceRecordCount&quot;:1000
+                },
+                &quot;name&quot;:&quot;streamreader&quot;
+            },
+            &quot;writer&quot;:{
+                &quot;parameter&quot;:{
+                    &quot;password&quot;:&quot;*****&quot;,
+                    &quot;column&quot;:[
+                        &quot;ts&quot;,
+                        &quot;name&quot;,
+                        &quot;file_size&quot;,
+                        &quot;file_date&quot;,
+                        &quot;flag_open&quot;,
+                        &quot;memo&quot;
+                    ],
+                    &quot;connection&quot;:[
+                        {
+                            &quot;jdbcUrl&quot;:&quot;jdbc:TAOS://127.0.0.1:6030/test&quot;,
+                            &quot;table&quot;:[
+                                &quot;addax_test&quot;
+                            ]
+                        }
+                    ],
+                    &quot;username&quot;:&quot;root&quot;,
+                    &quot;preSql&quot;:[]
+                },
+                &quot;name&quot;:&quot;tdenginewriter&quot;
+            }
+    },
+    &quot;setting&quot;:{
+        &quot;speed&quot;:{
+            &quot;bytes&quot;:-1,
+            &quot;channel&quot;:1
+        }
+    }
+}
+
+2021-02-20 15:52:07.786 [main] INFO  PerfTrace - PerfTrace traceId=job_-1, isEnable=false, priority=0
+2021-02-20 15:52:07.787 [main] INFO  JobContainer - Addax jobContainer starts job.
+2021-02-20 15:52:07.789 [main] INFO  JobContainer - Set jobId = 0
+java.library.path:/usr/java/packages/lib/amd64:/usr/lib64:/lib64:/lib:/usr/lib
+2021-02-20 15:52:08.048 [job-0] INFO  OriginalConfPretreatmentUtil - table:[addax_test] all columns:[ts,name,file_size,file_date,flag_open,memo].
+2021-02-20 15:52:08.056 [job-0] INFO  OriginalConfPretreatmentUtil - Write data [
+INSERT INTO %s (ts,name,file_size,file_date,flag_open,memo) VALUES(?,?,?,?,?,?)
+], which jdbcUrl like:[jdbc:TAOS://127.0.0.1:6030/test]
+
+2021-02-20 15:52:11.158 [job-0] INFO  JobContainer -
+任务启动时刻                    : 2021-02-20 15:52:07
+任务结束时刻                    : 2021-02-20 15:52:11
+任务总计耗时                    :                  3s
+任务平均流量                    :           11.07KB/s
+记录写入速度                    :            333rec/s
+读出记录总数                    :                1000
+读写失败总数                    :                   0
+</code></pre></div>
+<h2 id="_4">参数说明<a class="headerlink" href="#_4" title="Permanent link">&para;</a></h2>
+<p>该插件基于 <a href="../rdbmswriter">RDBMS Writer</a> 实现，因此可以参考 RDBMS Writer 的所有配置项，并且增加了一些 TDengine 特有的配置项。</p>
+<h3 id="jdbc-restful">使用 JDBC-RESTful 接口<a class="headerlink" href="#jdbc-restful" title="Permanent link">&para;</a></h3>
+<p>如果不想依赖本地库，或者没有权限，则可以使用 <code>JDBC-RESTful</code> 接口来写入表，相比 JDBC-JNI 而言，配置区别是：</p>
+<ul>
+<li>driverClass 指定为 <code>com.taosdata.jdbc.rs.RestfulDriver</code></li>
+<li>jdbcUrl 以 <code>jdbc:TAOS-RS://</code> 开头；</li>
+<li>使用 <code>6041</code> 作为连接端口</li>
+</ul>
+<p>所以上述配置中的 <code>connection</code> 应该修改为如下：</p>
+<div class="highlight"><pre><span></span><code><span class="p">{</span>
+<span class="w">  </span><span class="nt">&quot;connection&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span>
+<span class="w">    </span><span class="p">{</span>
+<span class="w">      </span><span class="nt">&quot;jdbcUrl&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;jdbc:TAOS-RS://127.0.0.1:6041/test&quot;</span><span class="p">,</span>
+<span class="w">      </span><span class="nt">&quot;table&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span>
+<span class="w">        </span><span class="s2">&quot;addax_test&quot;</span>
+<span class="w">      </span><span class="p">],</span>
+<span class="w">      </span><span class="nt">&quot;driver&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;com.taosdata.jdbc.rs.RestfulDriver&quot;</span>
+<span class="w">    </span><span class="p">}</span>
+<span class="w">  </span><span class="p">]</span>
+<span class="p">}</span>
+</code></pre></div>
+<h2 id="_5">类型转换<a class="headerlink" href="#_5" title="Permanent link">&para;</a></h2>
+<p>目前 TDenginereader 支持 TDengine 所有类型，具体如下</p>
+<table>
+<thead>
+<tr>
+<th>Addax 内部类型</th>
+<th>TDengine 数据类型</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Long</td>
+<td>SMALLINT, TINYINT, INT, BIGINT, TIMESTAMP</td>
+</tr>
+<tr>
+<td>Double</td>
+<td>FLOAT, DOUBLE</td>
+</tr>
+<tr>
+<td>String</td>
+<td>BINARY, NCHAR</td>
+</tr>
+<tr>
+<td>Boolean</td>
+<td>BOOL</td>
+</tr>
+</tbody>
+</table>
+<h2 id="_6">当前支持版本<a class="headerlink" href="#_6" title="Permanent link">&para;</a></h2>
+<p>TDengine 2.0.16</p>
+<h2 id="_7">注意事项<a class="headerlink" href="#_7" title="Permanent link">&para;</a></h2>
+<ul>
+<li>TDengine JDBC-JNI 驱动和动态库版本要求一一匹配，因此如果你的数据版本并不是 <code>2.0.16</code>，则需要同时替换动态库和插件目录中的JDBC驱动</li>
+<li>TDengine 的时序字段（timestamp）默认最小值为 <code>1500000000000</code>，即 <code>2017-07-14 10:40:00.0</code>，如果你写入的时许时间戳小于该值，则会报错</li>
+</ul>
 
 
 

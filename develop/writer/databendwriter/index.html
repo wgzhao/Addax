@@ -809,7 +809,7 @@
         
   
   <span class="md-ellipsis">
-    Text File Reader
+    TxtFile Reader
   </span>
   
 
@@ -998,7 +998,7 @@
         
   
   <span class="md-ellipsis">
-    FTP Reader
+    Ftp Reader
   </span>
   
 
@@ -1815,22 +1815,22 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#example" class="md-nav__link">
+  <a href="#_1" class="md-nav__link">
     <span class="md-ellipsis">
-      Example
+      示例
     </span>
   </a>
   
 </li>
       
         <li class="md-nav__item">
-  <a href="#parameters" class="md-nav__link">
+  <a href="#_2" class="md-nav__link">
     <span class="md-ellipsis">
-      Parameters
+      参数说明
     </span>
   </a>
   
-    <nav class="md-nav" aria-label="Parameters">
+    <nav class="md-nav" aria-label="参数说明">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
@@ -1930,7 +1930,7 @@
         
   
   <span class="md-ellipsis">
-    FTP Writer
+    Ftp Writer
   </span>
   
 
@@ -1951,7 +1951,7 @@
         
   
   <span class="md-ellipsis">
-    GreenPlum Writer
+    Greenplum Writer
   </span>
   
 
@@ -2014,7 +2014,7 @@
         
   
   <span class="md-ellipsis">
-    HBase11x Writer
+    HBase11X Writer
   </span>
   
 
@@ -2494,22 +2494,22 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#example" class="md-nav__link">
+  <a href="#_1" class="md-nav__link">
     <span class="md-ellipsis">
-      Example
+      示例
     </span>
   </a>
   
 </li>
       
         <li class="md-nav__item">
-  <a href="#parameters" class="md-nav__link">
+  <a href="#_2" class="md-nav__link">
     <span class="md-ellipsis">
-      Parameters
+      参数说明
     </span>
   </a>
   
-    <nav class="md-nav" aria-label="Parameters">
+    <nav class="md-nav" aria-label="参数说明">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
@@ -2542,11 +2542,12 @@
 
 
 <h1 id="databendwriter">DatabendWriter<a class="headerlink" href="#databendwriter" title="Permanent link">&para;</a></h1>
-<p>Databend plugin is used to write data to <a href="https://databend.rs/zh-CN/doc/">Databend</a> database via JDBC.</p>
-<p>Databend is a database backend compatible with MySQL protocol, so Databend writing can use <a href="../../writer/mysqlwriter">MySQLWriter</a> for access.</p>
-<h2 id="example">Example<a class="headerlink" href="#example" title="Permanent link">&para;</a></h2>
-<p>Assume the table to be written has the following DDL statement:</p>
-<div class="highlight"><pre><span></span><code><span class="k">CREATE</span><span class="w"> </span><span class="k">DATABASE</span><span class="w"> </span><span class="n">example_db</span><span class="p">;</span>
+<p>Databend 插件用于向 <a href="https://databend.rs/zh-CN/doc/">Databend</a> 数据库以 JDBC 方式写入数据。 </p>
+<p>Databend 是一个兼容 MySQL 协议的数据库后端，因此 Databend 写入可以使用 <a href="../../writer/mysqlwriter">MySQLWriter</a> 进行访问。</p>
+<h2 id="_1">示例<a class="headerlink" href="#_1" title="Permanent link">&para;</a></h2>
+<p>假定要写入的表的建表语句如下：</p>
+<div class="highlight"><pre><span></span><code><span class="k">CREATE</span>
+<span class="k">DATABASE</span><span class="w"> </span><span class="n">example_db</span><span class="p">;</span>
 <span class="k">CREATE</span><span class="w"> </span><span class="k">TABLE</span><span class="w"> </span><span class="o">`</span><span class="n">example_db</span><span class="o">`</span><span class="p">.</span><span class="o">`</span><span class="n">table1</span><span class="o">`</span>
 <span class="p">(</span>
 <span class="w">    </span><span class="o">`</span><span class="n">siteid</span><span class="o">`</span><span class="w">   </span><span class="nb">INT</span><span class="w"> </span><span class="k">DEFAULT</span><span class="w"> </span><span class="k">CAST</span><span class="p">(</span><span class="mi">10</span><span class="w"> </span><span class="k">AS</span><span class="w"> </span><span class="nb">INT</span><span class="p">),</span>
@@ -2555,7 +2556,7 @@
 <span class="w">    </span><span class="o">`</span><span class="n">pv</span><span class="o">`</span><span class="w">       </span><span class="nb">BIGINT</span>
 <span class="p">);</span>
 </code></pre></div>
-<p>The following configures a configuration file to read data from memory and write to databend table:</p>
+<p>下面配置一个从内存读取数据，然后写入到 databend 表的配置文件</p>
 <div class="highlight"><pre><span></span><code><span class="p">{</span>
 <span class="w">  </span><span class="nt">&quot;job&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
 <span class="w">    </span><span class="nt">&quot;setting&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
@@ -2612,42 +2613,42 @@
 <span class="w">  </span><span class="p">}</span>
 <span class="p">}</span>
 </code></pre></div>
-<p>Save the above configuration file as <code>job/stream2databend.json</code></p>
-<p>Execute the following command:</p>
+<p>将上述配置文件保存为 <code>job/stream2databend.json</code></p>
+<p>执行下面的命令</p>
 <div class="highlight"><pre><span></span><code>bin/addax.sh<span class="w"> </span>job/stream2Databend.json
 </code></pre></div>
-<h2 id="parameters">Parameters<a class="headerlink" href="#parameters" title="Permanent link">&para;</a></h2>
-<p>This plugin is based on <a href="../rdbmswriter">RDBMS Writer</a>, so you can refer to all configuration items of RDBMS Writer, and adds the following configuration items:</p>
+<h2 id="_2">参数说明<a class="headerlink" href="#_2" title="Permanent link">&para;</a></h2>
+<p>该插件基于 <a href="../rdbmswriter">RDBMS Writer</a> 实现，因此可以参考 RDBMS Writer 的所有配置项, 并增加了如下配置项：</p>
 <table>
 <thead>
 <tr>
-<th style="text-align: left;">Configuration</th>
-<th style="text-align: center;">Required</th>
-<th>Type</th>
-<th>Default Value</th>
-<th>Description</th>
+<th style="text-align: left;">配置项</th>
+<th style="text-align: center;">是否必须</th>
+<th>类型</th>
+<th>默认值</th>
+<th>描述</th>
 </tr>
 </thead>
 <tbody>
 <tr>
 <td style="text-align: left;">writeMode</td>
-<td style="text-align: center;">No</td>
+<td style="text-align: center;">否</td>
 <td>string</td>
 <td><code>insert</code></td>
-<td>Write mode, supports <code>insert</code> and <code>replace</code> modes</td>
+<td>写入模式，支持 <code>insert</code> 和 <code>replace</code> 两种模式</td>
 </tr>
 <tr>
 <td style="text-align: left;">onConflictColumn</td>
-<td style="text-align: center;">No</td>
+<td style="text-align: center;">否</td>
 <td>string</td>
-<td>None</td>
-<td>Conflict column, when writeMode is <code>replace</code>, must specify conflict column, otherwise write will fail</td>
+<td>无</td>
+<td>冲突列，当 writeMode 为 <code>replace</code> 时，必须指定冲突列，否则会导致写入失败。</td>
 </tr>
 </tbody>
 </table>
 <h3 id="writemode">writeMode<a class="headerlink" href="#writemode" title="Permanent link">&para;</a></h3>
-<p>Used to support Databend's <code>replace into</code> syntax. When this parameter is set to <code>replace</code>, the <code>onConflictColumn</code> parameter must also be specified to determine whether data is inserted or updated.</p>
-<p>Example of both parameters:</p>
+<p>用来支持 Databend 的 <code>replace into</code> 语法，当该参数设定为 <code>replace</code> 时，必须同时指定 <code>onConflictColumn</code> 参数，用来判断数据是插入还是更新的依据。</p>
+<p>两个参数的示例如下：</p>
 <div class="highlight"><pre><span></span><code><span class="p">{</span>
 <span class="w">  </span><span class="nt">&quot;writeMode&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;replace&quot;</span><span class="p">,</span>
 <span class="w">  </span><span class="nt">&quot;onConflictColumn&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span>

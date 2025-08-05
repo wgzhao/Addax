@@ -809,7 +809,7 @@
         
   
   <span class="md-ellipsis">
-    Text File Reader
+    TxtFile Reader
   </span>
   
 
@@ -998,7 +998,7 @@
         
   
   <span class="md-ellipsis">
-    FTP Reader
+    Ftp Reader
   </span>
   
 
@@ -1857,7 +1857,7 @@
         
   
   <span class="md-ellipsis">
-    FTP Writer
+    Ftp Writer
   </span>
   
 
@@ -1878,7 +1878,7 @@
         
   
   <span class="md-ellipsis">
-    GreenPlum Writer
+    Greenplum Writer
   </span>
   
 
@@ -1941,7 +1941,7 @@
         
   
   <span class="md-ellipsis">
-    HBase11x Writer
+    HBase11X Writer
   </span>
   
 
@@ -2151,18 +2151,51 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#configuration-example" class="md-nav__link">
+  <a href="#_1" class="md-nav__link">
     <span class="md-ellipsis">
-      Configuration Example
+      配置样例
     </span>
   </a>
   
 </li>
       
         <li class="md-nav__item">
-  <a href="#parameters" class="md-nav__link">
+  <a href="#_2" class="md-nav__link">
     <span class="md-ellipsis">
-      Parameters
+      参数说明
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="参数说明">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#writemode" class="md-nav__link">
+    <span class="md-ellipsis">
+      writeMode
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#paimonconfig" class="md-nav__link">
+    <span class="md-ellipsis">
+      paimonConfig
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_3" class="md-nav__link">
+    <span class="md-ellipsis">
+      类型转换
     </span>
   </a>
   
@@ -2479,18 +2512,51 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#configuration-example" class="md-nav__link">
+  <a href="#_1" class="md-nav__link">
     <span class="md-ellipsis">
-      Configuration Example
+      配置样例
     </span>
   </a>
   
 </li>
       
         <li class="md-nav__item">
-  <a href="#parameters" class="md-nav__link">
+  <a href="#_2" class="md-nav__link">
     <span class="md-ellipsis">
-      Parameters
+      参数说明
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="参数说明">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#writemode" class="md-nav__link">
+    <span class="md-ellipsis">
+      writeMode
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#paimonconfig" class="md-nav__link">
+    <span class="md-ellipsis">
+      paimonConfig
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_3" class="md-nav__link">
+    <span class="md-ellipsis">
+      类型转换
     </span>
   </a>
   
@@ -2512,9 +2578,8 @@
 
 
 <h1 id="paimon-writer">Paimon Writer<a class="headerlink" href="#paimon-writer" title="Permanent link">&para;</a></h1>
-<p>Paimon Writer plugin implements writing data to Apache Paimon.</p>
-<h2 id="configuration-example">Configuration Example<a class="headerlink" href="#configuration-example" title="Permanent link">&para;</a></h2>
-<p>This plugin is used to write data to Paimon tables. For detailed configuration and parameters, please refer to the original Paimon Writer documentation.</p>
+<p>Paimon Writer 提供向 已有的paimon表写入数据的能力。</p>
+<h2 id="_1">配置样例<a class="headerlink" href="#_1" title="Permanent link">&para;</a></h2>
 <div class="highlight"><pre><span></span><code><span class="p">{</span>
 <span class="w">  </span><span class="nt">&quot;job&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
 <span class="w">    </span><span class="nt">&quot;setting&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
@@ -2564,8 +2629,470 @@
 <span class="w">  </span><span class="p">}</span>
 <span class="p">}</span>
 </code></pre></div>
-<h2 id="parameters">Parameters<a class="headerlink" href="#parameters" title="Permanent link">&para;</a></h2>
-<p>This plugin supports writing data to Paimon with configurable catalog, table, and schema options.</p>
+<h2 id="_2">参数说明<a class="headerlink" href="#_2" title="Permanent link">&para;</a></h2>
+<table>
+<thead>
+<tr>
+<th style="text-align: left;">配置项</th>
+<th style="text-align: center;">是否必须</th>
+<th>数据类型</th>
+<th>默认值</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;">dbName</td>
+<td style="text-align: center;">是</td>
+<td>string</td>
+<td>无</td>
+<td>要写入的paimon数据库名</td>
+</tr>
+<tr>
+<td style="text-align: left;">tableName</td>
+<td style="text-align: center;">是</td>
+<td>string</td>
+<td>无</td>
+<td>要写入的paimon表名</td>
+</tr>
+<tr>
+<td style="text-align: left;">writeMode</td>
+<td style="text-align: center;">是</td>
+<td>string</td>
+<td>无</td>
+<td>写入模式，详述见下</td>
+</tr>
+<tr>
+<td style="text-align: left;">paimonConfig</td>
+<td style="text-align: center;">是</td>
+<td>json</td>
+<td>{}</td>
+<td>里可以配置与 Paimon catalog和Hadoop 相关的一些高级参数，比如HA的配置</td>
+</tr>
+</tbody>
+</table>
+<h3 id="writemode">writeMode<a class="headerlink" href="#writemode" title="Permanent link">&para;</a></h3>
+<p>写入前数据清理处理模式：</p>
+<ul>
+<li>append，写入前不做任何处理，直接写入，不清除原来的数据。</li>
+<li>truncate 写入前先清空表，再写入。</li>
+</ul>
+<h3 id="paimonconfig">paimonConfig<a class="headerlink" href="#paimonconfig" title="Permanent link">&para;</a></h3>
+<p><code>paimonConfig</code> 里可以配置与 Paimon catalog和Hadoop 相关的一些高级参数，比如HA的配置</p>
+<p>本地目录创建paimon表</p>
+<p>pom.xml</p>
+<div class="highlight"><pre><span></span><code><span class="cp">&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?&gt;</span>
+<span class="nt">&lt;project</span><span class="w"> </span><span class="na">xmlns=</span><span class="s">&quot;http://maven.apache.org/POM/4.0.0&quot;</span>
+<span class="w">         </span><span class="na">xmlns:xsi=</span><span class="s">&quot;http://www.w3.org/2001/XMLSchema-instance&quot;</span>
+<span class="w">         </span><span class="na">xsi:schemaLocation=</span><span class="s">&quot;http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd&quot;</span><span class="nt">&gt;</span>
+<span class="w">    </span><span class="nt">&lt;modelVersion&gt;</span>4.0.0<span class="nt">&lt;/modelVersion&gt;</span>
+
+<span class="w">    </span><span class="nt">&lt;groupId&gt;</span>com.test<span class="nt">&lt;/groupId&gt;</span>
+<span class="w">    </span><span class="nt">&lt;artifactId&gt;</span>paimon-java-api-test<span class="nt">&lt;/artifactId&gt;</span>
+<span class="w">    </span><span class="nt">&lt;version&gt;</span>1.0-SNAPSHOT<span class="nt">&lt;/version&gt;</span>
+
+<span class="w">    </span><span class="nt">&lt;properties&gt;</span>
+<span class="w">        </span><span class="nt">&lt;maven.compiler.source&gt;</span>8<span class="nt">&lt;/maven.compiler.source&gt;</span>
+<span class="w">        </span><span class="nt">&lt;maven.compiler.target&gt;</span>8<span class="nt">&lt;/maven.compiler.target&gt;</span>
+<span class="w">        </span><span class="nt">&lt;project.build.sourceEncoding&gt;</span>UTF-8<span class="nt">&lt;/project.build.sourceEncoding&gt;</span>
+<span class="w">        </span><span class="nt">&lt;hadoop.version&gt;</span>3.2.4<span class="nt">&lt;/hadoop.version&gt;</span>
+<span class="w">        </span><span class="nt">&lt;woodstox.version&gt;</span>7.0.0<span class="nt">&lt;/woodstox.version&gt;</span>
+<span class="w">    </span><span class="nt">&lt;/properties&gt;</span>
+<span class="nt">&lt;dependencies&gt;</span>
+<span class="w">    </span><span class="nt">&lt;dependency&gt;</span>
+<span class="w">        </span><span class="nt">&lt;groupId&gt;</span>org.apache.paimon<span class="nt">&lt;/groupId&gt;</span>
+<span class="w">        </span><span class="nt">&lt;artifactId&gt;</span>paimon-bundle<span class="nt">&lt;/artifactId&gt;</span>
+<span class="w">        </span><span class="nt">&lt;version&gt;</span>1.0.0<span class="nt">&lt;/version&gt;</span>
+<span class="w">    </span><span class="nt">&lt;/dependency&gt;</span>
+
+
+<span class="w">    </span><span class="nt">&lt;dependency&gt;</span>
+<span class="w">        </span><span class="nt">&lt;groupId&gt;</span>org.apache.hadoop<span class="nt">&lt;/groupId&gt;</span>
+<span class="w">        </span><span class="nt">&lt;artifactId&gt;</span>hadoop-common<span class="nt">&lt;/artifactId&gt;</span>
+<span class="w">        </span><span class="nt">&lt;version&gt;</span>${hadoop.version}<span class="nt">&lt;/version&gt;</span>
+<span class="w">        </span><span class="nt">&lt;exclusions&gt;</span>
+<span class="w">            </span><span class="nt">&lt;exclusion&gt;</span>
+<span class="w">                </span><span class="nt">&lt;groupId&gt;</span>com.fasterxml.jackson.core<span class="nt">&lt;/groupId&gt;</span>
+<span class="w">                </span><span class="nt">&lt;artifactId&gt;</span>jackson-databind<span class="nt">&lt;/artifactId&gt;</span>
+<span class="w">            </span><span class="nt">&lt;/exclusion&gt;</span>
+<span class="w">            </span><span class="nt">&lt;exclusion&gt;</span>
+<span class="w">                </span><span class="nt">&lt;groupId&gt;</span>org.codehaus.jackson<span class="nt">&lt;/groupId&gt;</span>
+<span class="w">                </span><span class="nt">&lt;artifactId&gt;</span>jackson-core-asl<span class="nt">&lt;/artifactId&gt;</span>
+<span class="w">            </span><span class="nt">&lt;/exclusion&gt;</span>
+<span class="w">            </span><span class="nt">&lt;exclusion&gt;</span>
+<span class="w">                </span><span class="nt">&lt;groupId&gt;</span>org.codehaus.jackson<span class="nt">&lt;/groupId&gt;</span>
+<span class="w">                </span><span class="nt">&lt;artifactId&gt;</span>jackson-mapper-asl<span class="nt">&lt;/artifactId&gt;</span>
+<span class="w">            </span><span class="nt">&lt;/exclusion&gt;</span>
+<span class="w">            </span><span class="nt">&lt;exclusion&gt;</span>
+<span class="w">                </span><span class="nt">&lt;groupId&gt;</span>com.fasterxml.woodstox<span class="nt">&lt;/groupId&gt;</span>
+<span class="w">                </span><span class="nt">&lt;artifactId&gt;</span>woodstox-core<span class="nt">&lt;/artifactId&gt;</span>
+<span class="w">            </span><span class="nt">&lt;/exclusion&gt;</span>
+<span class="w">            </span><span class="nt">&lt;exclusion&gt;</span>
+<span class="w">                </span><span class="nt">&lt;groupId&gt;</span>commons-codec<span class="nt">&lt;/groupId&gt;</span>
+<span class="w">                </span><span class="nt">&lt;artifactId&gt;</span>commons-codec<span class="nt">&lt;/artifactId&gt;</span>
+<span class="w">            </span><span class="nt">&lt;/exclusion&gt;</span>
+<span class="w">            </span><span class="nt">&lt;exclusion&gt;</span>
+<span class="w">                </span><span class="nt">&lt;groupId&gt;</span>commons-net<span class="nt">&lt;/groupId&gt;</span>
+<span class="w">                </span><span class="nt">&lt;artifactId&gt;</span>commons-net<span class="nt">&lt;/artifactId&gt;</span>
+<span class="w">            </span><span class="nt">&lt;/exclusion&gt;</span>
+<span class="w">            </span><span class="nt">&lt;exclusion&gt;</span>
+<span class="w">                </span><span class="nt">&lt;groupId&gt;</span>io.netty<span class="nt">&lt;/groupId&gt;</span>
+<span class="w">                </span><span class="nt">&lt;artifactId&gt;</span>netty<span class="nt">&lt;/artifactId&gt;</span>
+<span class="w">            </span><span class="nt">&lt;/exclusion&gt;</span>
+<span class="w">            </span><span class="nt">&lt;exclusion&gt;</span>
+<span class="w">                </span><span class="nt">&lt;groupId&gt;</span>log4j<span class="nt">&lt;/groupId&gt;</span>
+<span class="w">                </span><span class="nt">&lt;artifactId&gt;</span>log4j<span class="nt">&lt;/artifactId&gt;</span>
+<span class="w">            </span><span class="nt">&lt;/exclusion&gt;</span>
+<span class="w">            </span><span class="nt">&lt;exclusion&gt;</span>
+<span class="w">                </span><span class="nt">&lt;groupId&gt;</span>net.minidev<span class="nt">&lt;/groupId&gt;</span>
+<span class="w">                </span><span class="nt">&lt;artifactId&gt;</span>json-smart<span class="nt">&lt;/artifactId&gt;</span>
+<span class="w">            </span><span class="nt">&lt;/exclusion&gt;</span>
+<span class="w">            </span><span class="nt">&lt;exclusion&gt;</span>
+<span class="w">                </span><span class="nt">&lt;groupId&gt;</span>org.codehaus.jettison<span class="nt">&lt;/groupId&gt;</span>
+<span class="w">                </span><span class="nt">&lt;artifactId&gt;</span>jettison<span class="nt">&lt;/artifactId&gt;</span>
+<span class="w">            </span><span class="nt">&lt;/exclusion&gt;</span>
+<span class="w">            </span><span class="nt">&lt;exclusion&gt;</span>
+<span class="w">                </span><span class="nt">&lt;groupId&gt;</span>org.eclipse.jetty<span class="nt">&lt;/groupId&gt;</span>
+<span class="w">                </span><span class="nt">&lt;artifactId&gt;</span>jetty-server<span class="nt">&lt;/artifactId&gt;</span>
+<span class="w">            </span><span class="nt">&lt;/exclusion&gt;</span>
+<span class="w">            </span><span class="nt">&lt;exclusion&gt;</span>
+<span class="w">                </span><span class="nt">&lt;groupId&gt;</span>org.xerial.snappy<span class="nt">&lt;/groupId&gt;</span>
+<span class="w">                </span><span class="nt">&lt;artifactId&gt;</span>snappy-java<span class="nt">&lt;/artifactId&gt;</span>
+<span class="w">            </span><span class="nt">&lt;/exclusion&gt;</span>
+<span class="w">            </span><span class="nt">&lt;exclusion&gt;</span>
+<span class="w">                </span><span class="nt">&lt;groupId&gt;</span>org.apache.zookeeper<span class="nt">&lt;/groupId&gt;</span>
+<span class="w">                </span><span class="nt">&lt;artifactId&gt;</span>zookeeper<span class="nt">&lt;/artifactId&gt;</span>
+<span class="w">            </span><span class="nt">&lt;/exclusion&gt;</span>
+<span class="w">            </span><span class="nt">&lt;exclusion&gt;</span>
+<span class="w">                </span><span class="nt">&lt;groupId&gt;</span>org.eclipse.jetty<span class="nt">&lt;/groupId&gt;</span>
+<span class="w">                </span><span class="nt">&lt;artifactId&gt;</span>jetty-util<span class="nt">&lt;/artifactId&gt;</span>
+<span class="w">            </span><span class="nt">&lt;/exclusion&gt;</span>
+<span class="w">        </span><span class="nt">&lt;/exclusions&gt;</span>
+<span class="w">    </span><span class="nt">&lt;/dependency&gt;</span>
+
+<span class="w">    </span><span class="nt">&lt;dependency&gt;</span>
+<span class="w">        </span><span class="nt">&lt;groupId&gt;</span>org.apache.hadoop<span class="nt">&lt;/groupId&gt;</span>
+<span class="w">        </span><span class="nt">&lt;artifactId&gt;</span>hadoop-aws<span class="nt">&lt;/artifactId&gt;</span>
+<span class="w">        </span><span class="nt">&lt;version&gt;</span>${hadoop.version}<span class="nt">&lt;/version&gt;</span>
+<span class="w">        </span><span class="nt">&lt;exclusions&gt;</span>
+<span class="w">            </span><span class="nt">&lt;exclusion&gt;</span>
+<span class="w">                </span><span class="nt">&lt;groupId&gt;</span>com.fasterxml.jackson.core<span class="nt">&lt;/groupId&gt;</span>
+<span class="w">                </span><span class="nt">&lt;artifactId&gt;</span>jackson-databind<span class="nt">&lt;/artifactId&gt;</span>
+<span class="w">            </span><span class="nt">&lt;/exclusion&gt;</span>
+<span class="w">            </span><span class="nt">&lt;exclusion&gt;</span>
+<span class="w">                </span><span class="nt">&lt;groupId&gt;</span>org.codehaus.jackson<span class="nt">&lt;/groupId&gt;</span>
+<span class="w">                </span><span class="nt">&lt;artifactId&gt;</span>jackson-core-asl<span class="nt">&lt;/artifactId&gt;</span>
+<span class="w">            </span><span class="nt">&lt;/exclusion&gt;</span>
+<span class="w">            </span><span class="nt">&lt;exclusion&gt;</span>
+<span class="w">                </span><span class="nt">&lt;groupId&gt;</span>org.codehaus.jackson<span class="nt">&lt;/groupId&gt;</span>
+<span class="w">                </span><span class="nt">&lt;artifactId&gt;</span>jackson-mapper-asl<span class="nt">&lt;/artifactId&gt;</span>
+<span class="w">            </span><span class="nt">&lt;/exclusion&gt;</span>
+<span class="w">            </span><span class="nt">&lt;exclusion&gt;</span>
+<span class="w">                </span><span class="nt">&lt;groupId&gt;</span>com.fasterxml.woodstox<span class="nt">&lt;/groupId&gt;</span>
+<span class="w">                </span><span class="nt">&lt;artifactId&gt;</span>woodstox-core<span class="nt">&lt;/artifactId&gt;</span>
+<span class="w">            </span><span class="nt">&lt;/exclusion&gt;</span>
+<span class="w">            </span><span class="nt">&lt;exclusion&gt;</span>
+<span class="w">                </span><span class="nt">&lt;groupId&gt;</span>commons-codec<span class="nt">&lt;/groupId&gt;</span>
+<span class="w">                </span><span class="nt">&lt;artifactId&gt;</span>commons-codec<span class="nt">&lt;/artifactId&gt;</span>
+<span class="w">            </span><span class="nt">&lt;/exclusion&gt;</span>
+<span class="w">            </span><span class="nt">&lt;exclusion&gt;</span>
+<span class="w">                </span><span class="nt">&lt;groupId&gt;</span>commons-net<span class="nt">&lt;/groupId&gt;</span>
+<span class="w">                </span><span class="nt">&lt;artifactId&gt;</span>commons-net<span class="nt">&lt;/artifactId&gt;</span>
+<span class="w">            </span><span class="nt">&lt;/exclusion&gt;</span>
+<span class="w">            </span><span class="nt">&lt;exclusion&gt;</span>
+<span class="w">                </span><span class="nt">&lt;groupId&gt;</span>io.netty<span class="nt">&lt;/groupId&gt;</span>
+<span class="w">                </span><span class="nt">&lt;artifactId&gt;</span>netty<span class="nt">&lt;/artifactId&gt;</span>
+<span class="w">            </span><span class="nt">&lt;/exclusion&gt;</span>
+<span class="w">            </span><span class="nt">&lt;exclusion&gt;</span>
+<span class="w">                </span><span class="nt">&lt;groupId&gt;</span>log4j<span class="nt">&lt;/groupId&gt;</span>
+<span class="w">                </span><span class="nt">&lt;artifactId&gt;</span>log4j<span class="nt">&lt;/artifactId&gt;</span>
+<span class="w">            </span><span class="nt">&lt;/exclusion&gt;</span>
+<span class="w">            </span><span class="nt">&lt;exclusion&gt;</span>
+<span class="w">                </span><span class="nt">&lt;groupId&gt;</span>net.minidev<span class="nt">&lt;/groupId&gt;</span>
+<span class="w">                </span><span class="nt">&lt;artifactId&gt;</span>json-smart<span class="nt">&lt;/artifactId&gt;</span>
+<span class="w">            </span><span class="nt">&lt;/exclusion&gt;</span>
+<span class="w">            </span><span class="nt">&lt;exclusion&gt;</span>
+<span class="w">                </span><span class="nt">&lt;groupId&gt;</span>org.codehaus.jettison<span class="nt">&lt;/groupId&gt;</span>
+<span class="w">                </span><span class="nt">&lt;artifactId&gt;</span>jettison<span class="nt">&lt;/artifactId&gt;</span>
+<span class="w">            </span><span class="nt">&lt;/exclusion&gt;</span>
+<span class="w">            </span><span class="nt">&lt;exclusion&gt;</span>
+<span class="w">                </span><span class="nt">&lt;groupId&gt;</span>org.eclipse.jetty<span class="nt">&lt;/groupId&gt;</span>
+<span class="w">                </span><span class="nt">&lt;artifactId&gt;</span>jetty-server<span class="nt">&lt;/artifactId&gt;</span>
+<span class="w">            </span><span class="nt">&lt;/exclusion&gt;</span>
+<span class="w">            </span><span class="nt">&lt;exclusion&gt;</span>
+<span class="w">                </span><span class="nt">&lt;groupId&gt;</span>org.xerial.snappy<span class="nt">&lt;/groupId&gt;</span>
+<span class="w">                </span><span class="nt">&lt;artifactId&gt;</span>snappy-java<span class="nt">&lt;/artifactId&gt;</span>
+<span class="w">            </span><span class="nt">&lt;/exclusion&gt;</span>
+<span class="w">            </span><span class="nt">&lt;exclusion&gt;</span>
+<span class="w">                </span><span class="nt">&lt;groupId&gt;</span>org.apache.zookeeper<span class="nt">&lt;/groupId&gt;</span>
+<span class="w">                </span><span class="nt">&lt;artifactId&gt;</span>zookeeper<span class="nt">&lt;/artifactId&gt;</span>
+<span class="w">            </span><span class="nt">&lt;/exclusion&gt;</span>
+<span class="w">            </span><span class="nt">&lt;exclusion&gt;</span>
+<span class="w">                </span><span class="nt">&lt;groupId&gt;</span>org.eclipse.jetty<span class="nt">&lt;/groupId&gt;</span>
+<span class="w">                </span><span class="nt">&lt;artifactId&gt;</span>jetty-util<span class="nt">&lt;/artifactId&gt;</span>
+<span class="w">            </span><span class="nt">&lt;/exclusion&gt;</span>
+<span class="w">        </span><span class="nt">&lt;/exclusions&gt;</span>
+<span class="w">    </span><span class="nt">&lt;/dependency&gt;</span>
+
+<span class="w">    </span><span class="nt">&lt;dependency&gt;</span>
+<span class="w">        </span><span class="nt">&lt;groupId&gt;</span>org.apache.hadoop<span class="nt">&lt;/groupId&gt;</span>
+<span class="w">        </span><span class="nt">&lt;artifactId&gt;</span>hadoop-mapreduce-client-core<span class="nt">&lt;/artifactId&gt;</span>
+<span class="w">        </span><span class="nt">&lt;version&gt;</span>${hadoop.version}<span class="nt">&lt;/version&gt;</span>
+<span class="w">        </span><span class="nt">&lt;exclusions&gt;</span>
+<span class="w">            </span><span class="nt">&lt;exclusion&gt;</span>
+<span class="w">                </span><span class="nt">&lt;groupId&gt;</span>com.fasterxml.jackson.core<span class="nt">&lt;/groupId&gt;</span>
+<span class="w">                </span><span class="nt">&lt;artifactId&gt;</span>jackson-databind<span class="nt">&lt;/artifactId&gt;</span>
+<span class="w">            </span><span class="nt">&lt;/exclusion&gt;</span>
+<span class="w">            </span><span class="nt">&lt;exclusion&gt;</span>
+<span class="w">                </span><span class="nt">&lt;groupId&gt;</span>commons-codec<span class="nt">&lt;/groupId&gt;</span>
+<span class="w">                </span><span class="nt">&lt;artifactId&gt;</span>commons-codec<span class="nt">&lt;/artifactId&gt;</span>
+<span class="w">            </span><span class="nt">&lt;/exclusion&gt;</span>
+<span class="w">            </span><span class="nt">&lt;exclusion&gt;</span>
+<span class="w">                </span><span class="nt">&lt;groupId&gt;</span>io.netty<span class="nt">&lt;/groupId&gt;</span>
+<span class="w">                </span><span class="nt">&lt;artifactId&gt;</span>netty<span class="nt">&lt;/artifactId&gt;</span>
+<span class="w">            </span><span class="nt">&lt;/exclusion&gt;</span>
+<span class="w">            </span><span class="nt">&lt;exclusion&gt;</span>
+<span class="w">                </span><span class="nt">&lt;groupId&gt;</span>org.eclipse.jetty<span class="nt">&lt;/groupId&gt;</span>
+<span class="w">                </span><span class="nt">&lt;artifactId&gt;</span>jetty-util<span class="nt">&lt;/artifactId&gt;</span>
+<span class="w">            </span><span class="nt">&lt;/exclusion&gt;</span>
+<span class="w">        </span><span class="nt">&lt;/exclusions&gt;</span>
+<span class="w">    </span><span class="nt">&lt;/dependency&gt;</span>
+
+
+<span class="w">    </span><span class="nt">&lt;dependency&gt;</span>
+<span class="w">        </span><span class="nt">&lt;groupId&gt;</span>com.fasterxml.woodstox<span class="nt">&lt;/groupId&gt;</span>
+<span class="w">        </span><span class="nt">&lt;artifactId&gt;</span>woodstox-core<span class="nt">&lt;/artifactId&gt;</span>
+<span class="w">        </span><span class="nt">&lt;version&gt;</span>${woodstox.version}<span class="nt">&lt;/version&gt;</span>
+<span class="w">    </span><span class="nt">&lt;/dependency&gt;</span>
+<span class="nt">&lt;/dependencies&gt;</span>
+<span class="nt">&lt;/project&gt;</span>
+</code></pre></div>
+<div class="highlight"><pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="nn">org.apache.paimon.catalog.Catalog</span><span class="p">;</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">org.apache.paimon.catalog.CatalogContext</span><span class="p">;</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">org.apache.paimon.catalog.CatalogFactory</span><span class="p">;</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">org.apache.paimon.catalog.Identifier</span><span class="p">;</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">org.apache.paimon.fs.Path</span><span class="p">;</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">org.apache.paimon.schema.Schema</span><span class="p">;</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">org.apache.paimon.types.DataTypes</span><span class="p">;</span>
+
+<span class="kn">import</span><span class="w"> </span><span class="nn">java.util.HashMap</span><span class="p">;</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">java.util.Map</span><span class="p">;</span>
+
+<span class="kd">public</span><span class="w"> </span><span class="kd">class</span> <span class="nc">CreatePaimonTable</span><span class="w"> </span><span class="p">{</span>
+
+<span class="w">    </span><span class="kd">public</span><span class="w"> </span><span class="kd">static</span><span class="w"> </span><span class="n">Catalog</span><span class="w"> </span><span class="nf">createFilesystemCatalog</span><span class="p">()</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="n">CatalogContext</span><span class="w"> </span><span class="n">context</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">CatalogContext</span><span class="p">.</span><span class="na">create</span><span class="p">(</span><span class="k">new</span><span class="w"> </span><span class="n">Path</span><span class="p">(</span><span class="s">&quot;file:///g:/paimon&quot;</span><span class="p">));</span>
+<span class="w">        </span><span class="k">return</span><span class="w"> </span><span class="n">CatalogFactory</span><span class="p">.</span><span class="na">createCatalog</span><span class="p">(</span><span class="n">context</span><span class="p">);</span>
+<span class="w">    </span><span class="p">}</span>
+<span class="w">    </span><span class="cm">/* 如果是minio则例子如下</span>
+
+<span class="cm">     public static Catalog createFilesystemCatalog() {</span>
+<span class="cm">        Options options = new Options();</span>
+<span class="cm">        options.set(&quot;warehouse&quot;, &quot;s3a://pvc-91d1e2cd-4d25-45c9-8613-6c4f7bf0a4cc/paimon&quot;);</span>
+<span class="cm">        Configuration hadoopConf = new Configuration();</span>
+<span class="cm">        hadoopConf.set(&quot;fs.s3a.endpoint&quot;, &quot;http://localhost:9000&quot;);</span>
+<span class="cm">        hadoopConf.set(&quot;fs.s3a.access.key&quot;, &quot;gy0dX5lALP176g6c9fYf&quot;);</span>
+<span class="cm">        hadoopConf.set(&quot;fs.s3a.secret.key&quot;, &quot;ReuUrCzzu5wKWAegtswoHIWV389BYl9AB1ZQbiKr&quot;);</span>
+<span class="cm">        hadoopConf.set(&quot;fs.s3a.connection.ssl.enabled&quot;, &quot;false&quot;);</span>
+<span class="cm">        hadoopConf.set(&quot;fs.s3a.path.style.access&quot;, &quot;true&quot;);</span>
+<span class="cm">        hadoopConf.set(&quot;fs.s3a.impl&quot;,&quot;org.apache.hadoop.fs.s3a.S3AFileSystem&quot;);</span>
+<span class="cm">        CatalogContext context = CatalogContext.create(options,hadoopConf);</span>
+
+
+<span class="cm">        return CatalogFactory.createCatalog(context);</span>
+<span class="cm">    }</span>
+<span class="cm">     * </span>
+<span class="cm">     * </span>
+<span class="cm">     * */</span>
+
+<span class="w">    </span><span class="kd">public</span><span class="w"> </span><span class="kd">static</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="nf">main</span><span class="p">(</span><span class="n">String</span><span class="o">[]</span><span class="w"> </span><span class="n">args</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="n">Schema</span><span class="p">.</span><span class="na">Builder</span><span class="w"> </span><span class="n">schemaBuilder</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">Schema</span><span class="p">.</span><span class="na">newBuilder</span><span class="p">();</span>
+<span class="w">        </span><span class="n">schemaBuilder</span><span class="p">.</span><span class="na">primaryKey</span><span class="p">(</span><span class="s">&quot;id&quot;</span><span class="p">);</span>
+<span class="w">        </span><span class="n">schemaBuilder</span><span class="p">.</span><span class="na">column</span><span class="p">(</span><span class="s">&quot;id&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">DataTypes</span><span class="p">.</span><span class="na">INT</span><span class="p">());</span>
+<span class="w">        </span><span class="n">schemaBuilder</span><span class="p">.</span><span class="na">column</span><span class="p">(</span><span class="s">&quot;name&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">DataTypes</span><span class="p">.</span><span class="na">STRING</span><span class="p">());</span>
+<span class="w">        </span><span class="n">Map</span><span class="o">&lt;</span><span class="n">String</span><span class="p">,</span><span class="w"> </span><span class="n">String</span><span class="o">&gt;</span><span class="w"> </span><span class="n">options</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">HashMap</span><span class="o">&lt;&gt;</span><span class="p">();</span>
+<span class="w">        </span><span class="n">options</span><span class="p">.</span><span class="na">put</span><span class="p">(</span><span class="s">&quot;bucket&quot;</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;1&quot;</span><span class="p">);</span><span class="c1">//由于paimon java api 限制需要bucket&gt;0</span>
+<span class="w">        </span><span class="n">options</span><span class="p">.</span><span class="na">put</span><span class="p">(</span><span class="s">&quot;bucket-key&quot;</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;id&quot;</span><span class="p">);</span>
+<span class="w">        </span><span class="n">options</span><span class="p">.</span><span class="na">put</span><span class="p">(</span><span class="s">&quot;file.format&quot;</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;orc&quot;</span><span class="p">);</span>
+<span class="w">        </span><span class="n">options</span><span class="p">.</span><span class="na">put</span><span class="p">(</span><span class="s">&quot;file.compression&quot;</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;lz4&quot;</span><span class="p">);</span>
+<span class="w">        </span><span class="n">options</span><span class="p">.</span><span class="na">put</span><span class="p">(</span><span class="s">&quot;lookup.cache-spill-compression&quot;</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;lz4&quot;</span><span class="p">);</span>
+<span class="w">        </span><span class="n">options</span><span class="p">.</span><span class="na">put</span><span class="p">(</span><span class="s">&quot;spill-compression&quot;</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;LZ4&quot;</span><span class="p">);</span>
+<span class="w">        </span><span class="n">options</span><span class="p">.</span><span class="na">put</span><span class="p">(</span><span class="s">&quot;orc.compress&quot;</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;lz4&quot;</span><span class="p">);</span>
+<span class="w">        </span><span class="n">options</span><span class="p">.</span><span class="na">put</span><span class="p">(</span><span class="s">&quot;manifest.format&quot;</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;orc&quot;</span><span class="p">);</span>
+
+<span class="w">        </span><span class="n">schemaBuilder</span><span class="p">.</span><span class="na">options</span><span class="p">(</span><span class="n">options</span><span class="p">);</span>
+<span class="w">        </span><span class="n">Schema</span><span class="w"> </span><span class="n">schema</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">schemaBuilder</span><span class="p">.</span><span class="na">build</span><span class="p">();</span>
+
+<span class="w">        </span><span class="n">Identifier</span><span class="w"> </span><span class="n">identifier</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">Identifier</span><span class="p">.</span><span class="na">create</span><span class="p">(</span><span class="s">&quot;test&quot;</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;test2&quot;</span><span class="p">);</span>
+<span class="w">        </span><span class="k">try</span><span class="w"> </span><span class="p">{</span>
+<span class="w">            </span><span class="n">Catalog</span><span class="w"> </span><span class="n">catalog</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">CreatePaimonTable</span><span class="p">.</span><span class="na">createFilesystemCatalog</span><span class="p">();</span>
+<span class="w">            </span><span class="n">catalog</span><span class="p">.</span><span class="na">createDatabase</span><span class="p">(</span><span class="s">&quot;test&quot;</span><span class="p">,</span><span class="kc">true</span><span class="p">);</span>
+<span class="w">            </span><span class="n">catalog</span><span class="p">.</span><span class="na">createTable</span><span class="p">(</span><span class="n">identifier</span><span class="p">,</span><span class="w"> </span><span class="n">schema</span><span class="p">,</span><span class="w"> </span><span class="kc">true</span><span class="p">);</span>
+<span class="w">        </span><span class="p">}</span><span class="w"> </span><span class="k">catch</span><span class="w"> </span><span class="p">(</span><span class="n">Catalog</span><span class="p">.</span><span class="na">TableAlreadyExistException</span><span class="w"> </span><span class="n">e</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">            </span><span class="n">e</span><span class="p">.</span><span class="na">printStackTrace</span><span class="p">();</span>
+<span class="w">        </span><span class="p">}</span><span class="w"> </span><span class="k">catch</span><span class="w"> </span><span class="p">(</span><span class="n">Catalog</span><span class="p">.</span><span class="na">DatabaseNotExistException</span><span class="w"> </span><span class="n">e</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">            </span><span class="n">e</span><span class="p">.</span><span class="na">printStackTrace</span><span class="p">();</span>
+<span class="w">        </span><span class="p">}</span><span class="w"> </span><span class="k">catch</span><span class="w"> </span><span class="p">(</span><span class="n">Catalog</span><span class="p">.</span><span class="na">DatabaseAlreadyExistException</span><span class="w"> </span><span class="n">e</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">            </span><span class="k">throw</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">RuntimeException</span><span class="p">(</span><span class="n">e</span><span class="p">);</span>
+<span class="w">        </span><span class="p">}</span>
+
+
+<span class="w">    </span><span class="p">}</span>
+<span class="p">}</span>
+</code></pre></div>
+<p>Spark 或者 flink 环境创建表</p>
+<div class="highlight"><pre><span></span><code><span class="k">CREATE</span><span class="w"> </span><span class="k">TABLE</span><span class="w"> </span><span class="k">if</span><span class="w"> </span><span class="k">not</span><span class="w"> </span><span class="k">exists</span><span class="w"> </span><span class="n">test</span><span class="p">.</span><span class="n">test2</span><span class="p">(</span><span class="n">id</span><span class="w"> </span><span class="nb">int</span><span class="w"> </span><span class="p">,</span><span class="n">name</span><span class="w"> </span><span class="n">string</span><span class="p">)</span><span class="w">  </span><span class="n">tblproperties</span><span class="w"> </span><span class="p">(</span>
+<span class="w">    </span><span class="s1">&#39;primary-key&#39;</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s1">&#39;id&#39;</span><span class="p">,</span>
+<span class="w">    </span><span class="s1">&#39;bucket&#39;</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s1">&#39;1&#39;</span><span class="p">,</span>
+<span class="w">    </span><span class="s1">&#39;bucket-key&#39;</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s1">&#39;id&#39;</span>
+<span class="w">    </span><span class="s1">&#39;file.format&#39;</span><span class="o">=</span><span class="s1">&#39;orc&#39;</span><span class="p">,</span>
+<span class="w">    </span><span class="s1">&#39;file.compression&#39;</span><span class="o">=</span><span class="s1">&#39;lz4&#39;</span><span class="p">,</span>
+<span class="w">    </span><span class="s1">&#39;lookup.cache-spill-compression&#39;</span><span class="o">=</span><span class="s1">&#39;lz4&#39;</span><span class="p">,</span>
+<span class="w">    </span><span class="s1">&#39;spill-compression&#39;</span><span class="o">=</span><span class="s1">&#39;LZ4&#39;</span><span class="p">,</span>
+<span class="w">    </span><span class="s1">&#39;orc.compress&#39;</span><span class="o">=</span><span class="s1">&#39;lz4&#39;</span><span class="p">,</span>
+<span class="w">    </span><span class="s1">&#39;manifest.format&#39;</span><span class="o">=</span><span class="s1">&#39;orc&#39;</span>
+<span class="p">)</span>
+</code></pre></div>
+<p>本地文件例子</p>
+<div class="highlight"><pre><span></span><code><span class="p">{</span>
+<span class="w">                    </span><span class="nt">&quot;name&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;paimonwriter&quot;</span><span class="p">,</span>
+<span class="w">                    </span><span class="nt">&quot;parameter&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<span class="w">                        </span><span class="nt">&quot;dbName&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;test&quot;</span><span class="p">,</span>
+<span class="w">                        </span><span class="nt">&quot;tableName&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;test2&quot;</span><span class="p">,</span>
+<span class="w">                        </span><span class="nt">&quot;writeMode&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;truncate&quot;</span><span class="p">,</span>
+<span class="w">                        </span><span class="nt">&quot;paimonConfig&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<span class="w">                           </span><span class="nt">&quot;warehouse&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;file:///g:/paimon&quot;</span><span class="p">,</span>
+<span class="w">                           </span><span class="nt">&quot;metastore&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;filesystem&quot;</span>
+<span class="w">                         </span><span class="p">}</span>
+<span class="w">                    </span><span class="p">}</span>
+<span class="p">}</span>
+</code></pre></div>
+<p>s3 或者 minio catalog例子
+<div class="highlight"><pre><span></span><code><span class="p">{</span>
+<span class="w">    </span><span class="nt">&quot;job&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="nt">&quot;setting&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<span class="w">            </span><span class="nt">&quot;speed&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<span class="w">                </span><span class="nt">&quot;channel&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">3</span>
+<span class="w">            </span><span class="p">},</span>
+<span class="w">            </span><span class="nt">&quot;errorLimit&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<span class="w">                </span><span class="nt">&quot;record&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">0</span><span class="p">,</span>
+<span class="w">                </span><span class="nt">&quot;percentage&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">0</span>
+<span class="w">            </span><span class="p">}</span>
+<span class="w">        </span><span class="p">},</span>
+<span class="w">        </span><span class="nt">&quot;content&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span>
+<span class="w">            </span><span class="p">{</span>
+<span class="w">                </span><span class="nt">&quot;reader&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<span class="w">                    </span><span class="nt">&quot;name&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;rdbmsreader&quot;</span><span class="p">,</span>
+<span class="w">                    </span><span class="nt">&quot;parameter&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<span class="w">                        </span><span class="nt">&quot;username&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;root&quot;</span><span class="p">,</span>
+<span class="w">                        </span><span class="nt">&quot;password&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;root&quot;</span><span class="p">,</span>
+<span class="w">                        </span><span class="nt">&quot;column&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span>
+<span class="w">                            </span><span class="s2">&quot;*&quot;</span>
+<span class="w">                        </span><span class="p">],</span>
+<span class="w">                        </span><span class="nt">&quot;connection&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span>
+<span class="w">                            </span><span class="p">{</span>
+<span class="w">                                </span><span class="nt">&quot;querySql&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span>
+<span class="w">                                    </span><span class="s2">&quot;select 1+0 id ,&#39;test1&#39; as name&quot;</span>
+<span class="w">                                </span><span class="p">],</span>
+<span class="w">                                </span><span class="nt">&quot;jdbcUrl&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span>
+<span class="w">                                    </span><span class="s2">&quot;jdbc:mysql://localhost:3306/ruoyi_vue_camunda?allowPublicKeyRetrieval=true&quot;</span>
+<span class="w">                                </span><span class="p">]</span>
+<span class="w">                            </span><span class="p">}</span>
+<span class="w">                        </span><span class="p">],</span>
+<span class="w">                        </span><span class="nt">&quot;fetchSize&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">1024</span>
+<span class="w">                    </span><span class="p">}</span>
+<span class="w">                </span><span class="p">},</span>
+<span class="w">                </span><span class="nt">&quot;writer&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<span class="w">                    </span><span class="nt">&quot;name&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;paimonwriter&quot;</span><span class="p">,</span>
+<span class="w">                    </span><span class="nt">&quot;parameter&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<span class="w">                        </span><span class="nt">&quot;dbName&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;test&quot;</span><span class="p">,</span>
+<span class="w">                        </span><span class="nt">&quot;tableName&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;test2&quot;</span><span class="p">,</span>
+<span class="w">                        </span><span class="nt">&quot;writeMode&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;truncate&quot;</span><span class="p">,</span>
+<span class="w">                        </span><span class="nt">&quot;paimonConfig&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<span class="w">                            </span><span class="nt">&quot;warehouse&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;s3a://pvc-91d1e2cd-4d25-45c9-8613-6c4f7bf0a4cc/paimon&quot;</span><span class="p">,</span>
+<span class="w">                            </span><span class="nt">&quot;metastore&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;filesystem&quot;</span><span class="p">,</span>
+<span class="w">                            </span><span class="nt">&quot;fs.s3a.endpoint&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;http://localhost:9000&quot;</span><span class="p">,</span>
+<span class="w">                            </span><span class="nt">&quot;fs.s3a.access.key&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;gy0dX5lALP176g6c9fYf&quot;</span><span class="p">,</span>
+<span class="w">                            </span><span class="nt">&quot;fs.s3a.secret.key&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;ReuUrCzzu5wKWAegtswoHIWV389BYl9AB1ZQbiKr&quot;</span><span class="p">,</span>
+<span class="w">                            </span><span class="nt">&quot;fs.s3a.connection.ssl.enabled&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;false&quot;</span><span class="p">,</span>
+<span class="w">                            </span><span class="nt">&quot;fs.s3a.path.style.access&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;true&quot;</span><span class="p">,</span>
+<span class="w">                            </span><span class="nt">&quot;fs.s3a.impl&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;org.apache.hadoop.fs.s3a.S3AFileSystem&quot;</span>
+<span class="w">                        </span><span class="p">}</span>
+<span class="w">                    </span><span class="p">}</span>
+<span class="w">                </span><span class="p">}</span>
+<span class="w">            </span><span class="p">}</span>
+<span class="w">        </span><span class="p">]</span>
+<span class="w">    </span><span class="p">}</span>
+<span class="p">}</span>
+</code></pre></div></p>
+<p>hdfs catalog例子</p>
+<div class="highlight"><pre><span></span><code><span class="p">{</span>
+<span class="w">  </span><span class="nt">&quot;paimonConfig&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="nt">&quot;warehouse&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;hdfs://nameservice1/user/hive/paimon&quot;</span><span class="p">,</span>
+<span class="w">    </span><span class="nt">&quot;metastore&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;filesystem&quot;</span><span class="p">,</span>
+<span class="w">    </span><span class="nt">&quot;fs.defaultFS&quot;</span><span class="p">:</span><span class="s2">&quot;hdfs://nameservice1&quot;</span><span class="p">,</span>
+<span class="w">    </span><span class="nt">&quot;hadoop.security.authentication&quot;</span><span class="w"> </span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;kerberos&quot;</span><span class="p">,</span>
+<span class="w">    </span><span class="nt">&quot;hadoop.kerberos.principal&quot;</span><span class="w"> </span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;hive/_HOST@XXXX.COM&quot;</span><span class="p">,</span>
+<span class="w">    </span><span class="nt">&quot;hadoop.kerberos.keytab&quot;</span><span class="w"> </span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;/tmp/hive@XXXX.COM.keytab&quot;</span><span class="p">,</span>
+<span class="w">    </span><span class="nt">&quot;ha.zookeeper.quorum&quot;</span><span class="w"> </span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;test-pr-nn1:2181,test-pr-nn2:2181,test-pr-nn3:2181&quot;</span><span class="p">,</span>
+<span class="w">    </span><span class="nt">&quot;dfs.nameservices&quot;</span><span class="w"> </span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;nameservice1&quot;</span><span class="p">,</span>
+<span class="w">    </span><span class="nt">&quot;dfs.namenode.rpc-address.nameservice1.namenode371&quot;</span><span class="w"> </span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;test-pr-nn2:8020&quot;</span><span class="p">,</span>
+<span class="w">    </span><span class="nt">&quot;dfs.namenode.rpc-address.nameservice1.namenode265&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;test-pr-nn1:8020&quot;</span><span class="p">,</span>
+<span class="w">    </span><span class="nt">&quot;dfs.namenode.keytab.file&quot;</span><span class="w"> </span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;/tmp/hdfs@XXXX.COM.keytab&quot;</span><span class="p">,</span>
+<span class="w">    </span><span class="nt">&quot;dfs.namenode.keytab.enabled&quot;</span><span class="w"> </span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;true&quot;</span><span class="p">,</span>
+<span class="w">    </span><span class="nt">&quot;dfs.namenode.kerberos.principal&quot;</span><span class="w"> </span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;hdfs/_HOST@XXXX.COM&quot;</span><span class="p">,</span>
+<span class="w">    </span><span class="nt">&quot;dfs.namenode.kerberos.internal.spnego.principal&quot;</span><span class="w"> </span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;HTTP/_HOST@XXXX.COM&quot;</span><span class="p">,</span>
+<span class="w">    </span><span class="nt">&quot;dfs.ha.namenodes.nameservice1&quot;</span><span class="w"> </span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;namenode265,namenode371&quot;</span><span class="p">,</span>
+<span class="w">    </span><span class="nt">&quot;dfs.datanode.keytab.file&quot;</span><span class="w"> </span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;/tmp/hdfs@XXXX.COM.keytab&quot;</span><span class="p">,</span>
+<span class="w">    </span><span class="nt">&quot;dfs.datanode.keytab.enabled&quot;</span><span class="w"> </span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;true&quot;</span><span class="p">,</span>
+<span class="w">    </span><span class="nt">&quot;dfs.datanode.kerberos.principal&quot;</span><span class="w"> </span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;hdfs/_HOST@XXXX.COM&quot;</span><span class="p">,</span>
+<span class="w">    </span><span class="nt">&quot;dfs.client.use.datanode.hostname&quot;</span><span class="w"> </span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;false&quot;</span><span class="p">,</span>
+<span class="w">    </span><span class="nt">&quot;dfs.client.failover.proxy.provider.nameservice1&quot;</span><span class="w"> </span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;org.apache.hadoop.hdfs.server.namenode.ha.ConfiguredFailoverProxyProvider&quot;</span><span class="p">,</span>
+<span class="w">    </span><span class="nt">&quot;dfs.balancer.keytab.file&quot;</span><span class="w"> </span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;/tmp/hdfs@XXXX.COM.keytab&quot;</span><span class="p">,</span>
+<span class="w">    </span><span class="nt">&quot;dfs.balancer.keytab.enabled&quot;</span><span class="w"> </span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;true&quot;</span><span class="p">,</span>
+<span class="w">    </span><span class="nt">&quot;dfs.balancer.kerberos.principal&quot;</span><span class="w"> </span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;hdfs/_HOST@XXXX.COM&quot;</span>
+<span class="w">  </span><span class="p">}</span>
+<span class="p">}</span>
+</code></pre></div>
+<h2 id="_3">类型转换<a class="headerlink" href="#_3" title="Permanent link">&para;</a></h2>
+<table>
+<thead>
+<tr>
+<th>Addax 内部类型</th>
+<th>Paimon 数据类型</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Integer</td>
+<td>TINYINT,SMALLINT,INT,INTEGER</td>
+</tr>
+<tr>
+<td>Long</td>
+<td>BIGINT</td>
+</tr>
+<tr>
+<td>Double</td>
+<td>FLOAT,DOUBLE,DECIMAL</td>
+</tr>
+<tr>
+<td>String</td>
+<td>STRING,VARCHAR,CHAR</td>
+</tr>
+<tr>
+<td>Boolean</td>
+<td>BOOLEAN</td>
+</tr>
+<tr>
+<td>Date</td>
+<td>DATE,TIMESTAMP</td>
+</tr>
+<tr>
+<td>Bytes</td>
+<td>BINARY</td>
+</tr>
+</tbody>
+</table>
 
 
 

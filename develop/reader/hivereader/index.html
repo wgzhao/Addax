@@ -814,7 +814,7 @@
         
   
   <span class="md-ellipsis">
-    Text File Reader
+    TxtFile Reader
   </span>
   
 
@@ -1003,7 +1003,7 @@
         
   
   <span class="md-ellipsis">
-    FTP Reader
+    Ftp Reader
   </span>
   
 
@@ -1192,19 +1192,19 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#example" class="md-nav__link">
+  <a href="#_1" class="md-nav__link">
     <span class="md-ellipsis">
-      Example
+      示例
     </span>
   </a>
   
-    <nav class="md-nav" aria-label="Example">
+    <nav class="md-nav" aria-label="示例">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#execute-collection-command" class="md-nav__link">
+  <a href="#_2" class="md-nav__link">
     <span class="md-ellipsis">
-      Execute Collection Command
+      执行采集命令
     </span>
   </a>
   
@@ -1216,9 +1216,51 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#parameters" class="md-nav__link">
+  <a href="#_3" class="md-nav__link">
     <span class="md-ellipsis">
-      Parameters
+      参数说明
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="参数说明">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#jdbcurl" class="md-nav__link">
+    <span class="md-ellipsis">
+      jdbcUrl
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#driver" class="md-nav__link">
+    <span class="md-ellipsis">
+      driver
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_4" class="md-nav__link">
+    <span class="md-ellipsis">
+      类型转换
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_5" class="md-nav__link">
+    <span class="md-ellipsis">
+      相关限制
     </span>
   </a>
   
@@ -1930,7 +1972,7 @@
         
   
   <span class="md-ellipsis">
-    FTP Writer
+    Ftp Writer
   </span>
   
 
@@ -1951,7 +1993,7 @@
         
   
   <span class="md-ellipsis">
-    GreenPlum Writer
+    Greenplum Writer
   </span>
   
 
@@ -2014,7 +2056,7 @@
         
   
   <span class="md-ellipsis">
-    HBase11x Writer
+    HBase11X Writer
   </span>
   
 
@@ -2494,19 +2536,19 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#example" class="md-nav__link">
+  <a href="#_1" class="md-nav__link">
     <span class="md-ellipsis">
-      Example
+      示例
     </span>
   </a>
   
-    <nav class="md-nav" aria-label="Example">
+    <nav class="md-nav" aria-label="示例">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#execute-collection-command" class="md-nav__link">
+  <a href="#_2" class="md-nav__link">
     <span class="md-ellipsis">
-      Execute Collection Command
+      执行采集命令
     </span>
   </a>
   
@@ -2518,9 +2560,51 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#parameters" class="md-nav__link">
+  <a href="#_3" class="md-nav__link">
     <span class="md-ellipsis">
-      Parameters
+      参数说明
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="参数说明">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#jdbcurl" class="md-nav__link">
+    <span class="md-ellipsis">
+      jdbcUrl
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#driver" class="md-nav__link">
+    <span class="md-ellipsis">
+      driver
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_4" class="md-nav__link">
+    <span class="md-ellipsis">
+      类型转换
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_5" class="md-nav__link">
+    <span class="md-ellipsis">
+      相关限制
     </span>
   </a>
   
@@ -2542,10 +2626,10 @@
 
 
 <h1 id="hive-reader">Hive Reader<a class="headerlink" href="#hive-reader" title="Permanent link">&para;</a></h1>
-<p>Hive Reader plugin implements the ability to read data from <a href="https://hive.apache.org">Apache Hive</a> database.</p>
-<p>The main purpose of adding this plugin is to solve the problem of Kerberos authentication when using <a href="../rdbmsreader">RDBMS Reader</a> plugin to read Hive database. If your Hive database does not have Kerberos authentication enabled, you can directly use <a href="../rdbmsreader">RDBMS Reader</a>. If Kerberos authentication is enabled, you can use this plugin.</p>
-<h2 id="example">Example<a class="headerlink" href="#example" title="Permanent link">&para;</a></h2>
-<p>We create the following table in Hive's test database and insert a record:</p>
+<p>Hive Reader 插件实现了从 <a href="https://hive.apache.org">Apache Hive</a> 数据库读取数据的能力</p>
+<p>新增该插件的主要目的是解决使用 <a href="../rdbmsreader">RDBMS Reader</a> 插件读取 Hive 数据库时不能解决 Kerberos 认证的问题， 如果你的 Hive 数据库没有启用 Kerberos 认证，那么直接使用 <a href="../rdbmsreader">RDBMS Reader</a> 也可以。 如果启用了 Kerberos 认证，则可以使用该插件。</p>
+<h2 id="_1">示例<a class="headerlink" href="#_1" title="Permanent link">&para;</a></h2>
+<p>我们在 Hive 的 test 库上创建如下表，并插入一条记录</p>
 <div class="highlight"><pre><span></span><code><span class="k">create</span><span class="w"> </span><span class="k">table</span><span class="w"> </span><span class="k">default</span><span class="p">.</span><span class="n">hive_reader</span>
 <span class="p">(</span>
 <span class="w">    </span><span class="n">col1</span><span class="w"> </span><span class="nb">int</span><span class="p">,</span>
@@ -2557,7 +2641,7 @@
 
 <span class="k">insert</span><span class="w"> </span><span class="k">into</span><span class="w"> </span><span class="n">hive_reader</span><span class="w"> </span><span class="k">values</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="s1">&#39;hello&#39;</span><span class="p">,</span><span class="w"> </span><span class="k">current_timestamp</span><span class="p">()),</span><span class="w"> </span><span class="p">(</span><span class="mi">2</span><span class="p">,</span><span class="w"> </span><span class="s1">&#39;world&#39;</span><span class="p">,</span><span class="w"> </span><span class="k">current_timestamp</span><span class="p">());</span>
 </code></pre></div>
-<p>The following configuration reads this table to terminal:</p>
+<p>下面的配置是读取该表到终端的作业:</p>
 <div class="tabbed-set" data-tabs="1:1"><input checked="checked" id="__tabbed_1_1" name="__tabbed_1" type="radio" /><label for="__tabbed_1_1">job/hive2stream.json</label><div class="tabbed-content"></div>
 </div>
 <div class="highlight"><pre><span></span><code><span class="p">{</span>
@@ -2603,53 +2687,162 @@
 <span class="w">  </span><span class="p">}</span>
 <span class="p">}</span>
 </code></pre></div>
-<p>Save the above configuration file as <code>job/hive2stream.json</code></p>
-<h3 id="execute-collection-command">Execute Collection Command<a class="headerlink" href="#execute-collection-command" title="Permanent link">&para;</a></h3>
-<p>Execute the following command for data collection</p>
+<p>将上述配置文件保存为 <code>job/hive2stream.json</code></p>
+<h3 id="_2">执行采集命令<a class="headerlink" href="#_2" title="Permanent link">&para;</a></h3>
+<p>执行以下命令进行数据采集</p>
 <div class="highlight"><pre><span></span><code>bin/addax.sh<span class="w"> </span>job/hive2stream.json
 </code></pre></div>
-<h2 id="parameters">Parameters<a class="headerlink" href="#parameters" title="Permanent link">&para;</a></h2>
+<h2 id="_3">参数说明<a class="headerlink" href="#_3" title="Permanent link">&para;</a></h2>
 <table>
 <thead>
 <tr>
-<th style="text-align: left;">Configuration</th>
-<th style="text-align: center;">Required</th>
-<th>Type</th>
-<th>Default Value</th>
-<th>Description</th>
+<th style="text-align: left;">配置项</th>
+<th style="text-align: center;">是否必须</th>
+<th>类型</th>
+<th>默认值</th>
+<th>描述</th>
 </tr>
 </thead>
 <tbody>
 <tr>
 <td style="text-align: left;">jdbcUrl</td>
-<td style="text-align: center;">Yes</td>
+<td style="text-align: center;">是</td>
 <td>list</td>
-<td>None</td>
-<td>JDBC connection information of target database</td>
+<td>无</td>
+<td>对端数据库的 JDBC 连接信息</td>
 </tr>
 <tr>
 <td style="text-align: left;">driver</td>
-<td style="text-align: center;">No</td>
+<td style="text-align: center;">否</td>
 <td>string</td>
-<td>None</td>
-<td>Custom driver class name to solve compatibility issues, see description below</td>
+<td>无</td>
+<td>自定义驱动类名，解决兼容性问题，详见下面描述</td>
 </tr>
 <tr>
 <td style="text-align: left;">username</td>
-<td style="text-align: center;">Yes</td>
+<td style="text-align: center;">是</td>
 <td>string</td>
-<td>None</td>
-<td>Username of data source</td>
+<td>无</td>
+<td>数据源的用户名</td>
 </tr>
 <tr>
 <td style="text-align: left;">password</td>
-<td style="text-align: center;">No</td>
+<td style="text-align: center;">否</td>
 <td>string</td>
-<td>None</td>
-<td>Password for specified username of data source, can be omitted if no password</td>
+<td>无</td>
+<td>数据源指定用户名的密码，若无密码，可不指定</td>
+</tr>
+<tr>
+<td style="text-align: left;">table</td>
+<td style="text-align: center;">是</td>
+<td>list</td>
+<td>无</td>
+<td>所选取的需要同步的表名,使用 JSON 数据格式</td>
+</tr>
+<tr>
+<td style="text-align: left;">column</td>
+<td style="text-align: center;">是</td>
+<td><code>list&lt;map&gt;</code></td>
+<td>无</td>
+<td>所配置的表中需要同步的列名集合，详细描述见 <a href="../rdbmsreader">rdbmreader</a></td>
+</tr>
+<tr>
+<td style="text-align: left;">splitPk</td>
+<td style="text-align: center;">否</td>
+<td>string</td>
+<td>无</td>
+<td>使用 splitPk 代表的字段进行数据分片，详细描述见 <a href="../rdbmsreader">rdbmreader</a></td>
+</tr>
+<tr>
+<td style="text-align: left;">where</td>
+<td style="text-align: center;">否</td>
+<td>string</td>
+<td>无</td>
+<td>针对表的筛选条件</td>
+</tr>
+<tr>
+<td style="text-align: left;">querySql</td>
+<td style="text-align: center;">否</td>
+<td>list</td>
+<td>无</td>
+<td>使用 SQL 来获取数据，当配置了这一项之后， <code>table</code>，<code>column</code> 配置项无效</td>
+</tr>
+<tr>
+<td style="text-align: left;">haveKerberos</td>
+<td style="text-align: center;">否</td>
+<td>string</td>
+<td>无</td>
+<td>是否启用 Kerberos 认证，如果启用，则需要同时配置下面两项</td>
+</tr>
+<tr>
+<td style="text-align: left;">kerberosKeytabFilePath</td>
+<td style="text-align: center;">否</td>
+<td>string</td>
+<td>无</td>
+<td>Kerberos 认证的凭证文件路径, 比如 <code>/your/path/addax.service.keytab</code></td>
+</tr>
+<tr>
+<td style="text-align: left;">kerberosPrincipal</td>
+<td style="text-align: center;">否</td>
+<td>string</td>
+<td>无</td>
+<td>Kerberos 认证的凭证主体, 比如 <code>addax/node1@EXAMPLE.COM</code></td>
 </tr>
 </tbody>
 </table>
+<h3 id="jdbcurl">jdbcUrl<a class="headerlink" href="#jdbcurl" title="Permanent link">&para;</a></h3>
+<p>连接 Hive 的 JDBC URL 有多种写法，一种是直接指定 HiveServer/HiveServer2 服务的主机名和端口即可，比如： <code>jdbc:hive2://node1:10000/default</code></p>
+<p>如果你有多个 HiveServer/HiveServer2 服务，并采取用了服务发现，则可以通过指定 zookeeper 的方式来获得故障转移功能，类似如下：</p>
+<div class="highlight"><pre><span></span><code><span class="nl">jdbc</span><span class="p">:</span><span class="n">hive2</span><span class="p">:</span><span class="c1">//node1:2181,node2:2181,node3:2181/;serviceDiscoveryMode=zooKeeper;zooKeeperNamespace=hiveserver2</span>
+</code></pre></div>
+<p>如果你的 Hive 启用了 Kerberos 认证，还需要在 URL 后指定 <code>principal</code> 参数，一般为 <code>principal=hive/_HOST@EXAMPLE.COM</code>，其中 <code>EXAMPLE.COM</code> 为 <code>realm</code> 值。</p>
+<h3 id="driver">driver<a class="headerlink" href="#driver" title="Permanent link">&para;</a></h3>
+<p>当前 Addax 采用的 Hive JDBC 驱动为 3.1.0 以上版本，驱动类名使用的 <code>org.apache.hive.jdbc.HiveDriver</code>， 如果当前的 Hive JDBC 驱动不兼容 Hive 数据库， 则可以通过以下步骤替换驱动。</p>
+<p><strong>替换插件内置的驱动</strong></p>
+<p><code>rm -f plugin/reader/hivereader/libs/hive-jdbc-*.jar</code></p>
+<p><strong>拷贝兼容驱动到插件目录</strong></p>
+<p><code>cp hive-jdbc-&lt;version&gt;.jar plugin/reader/hivereader/libs/</code></p>
+<p><strong>指定驱动类名称</strong></p>
+<p>在你的 json 文件类，配置 <code>"driver": "&lt;your jdbc class name&gt;"</code></p>
+<h2 id="_4">类型转换<a class="headerlink" href="#_4" title="Permanent link">&para;</a></h2>
+<p>目前 HiveReader 支持大部分 Hive 类型，但也存在部分个别类型没有支持的情况，请注意检查你的类型。</p>
+<p>下面列出 HiveReader 针对 Hive 类型转换列表:</p>
+<table>
+<thead>
+<tr>
+<th>Addax 内部类型</th>
+<th>Hive 数据类型</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Long</td>
+<td>int, tinyint, smallint, mediumint, int, bigint</td>
+</tr>
+<tr>
+<td>Double</td>
+<td>float, double, decimal</td>
+</tr>
+<tr>
+<td>String</td>
+<td>varchar, char, string</td>
+</tr>
+<tr>
+<td>Date</td>
+<td>date, timestamp</td>
+</tr>
+<tr>
+<td>Boolean</td>
+<td>boolean</td>
+</tr>
+<tr>
+<td>Bytes</td>
+<td>binary</td>
+</tr>
+</tbody>
+</table>
+<h2 id="_5">相关限制<a class="headerlink" href="#_5" title="Permanent link">&para;</a></h2>
+<p>经过测试，HiveReader 目前支持的 Hive 版本为 2.1.1 及以上版本并支持 4.0.0 版本。</p>
 
 
 

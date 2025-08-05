@@ -814,7 +814,7 @@
         
   
   <span class="md-ellipsis">
-    Text File Reader
+    TxtFile Reader
   </span>
   
 
@@ -1003,7 +1003,7 @@
         
   
   <span class="md-ellipsis">
-    FTP Reader
+    Ftp Reader
   </span>
   
 
@@ -1234,37 +1234,37 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#example" class="md-nav__link">
+  <a href="#_1" class="md-nav__link">
     <span class="md-ellipsis">
-      Example
+      示例
     </span>
   </a>
   
-    <nav class="md-nav" aria-label="Example">
+    <nav class="md-nav" aria-label="示例">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#create-required-database-tables-and-data" class="md-nav__link">
+  <a href="#_2" class="md-nav__link">
     <span class="md-ellipsis">
-      Create Required Database Tables and Data
+      创建需要的库表和数据
     </span>
   </a>
   
 </li>
         
           <li class="md-nav__item">
-  <a href="#create-job-file" class="md-nav__link">
+  <a href="#job" class="md-nav__link">
     <span class="md-ellipsis">
-      Create Job File
+      创建 job 文件
     </span>
   </a>
   
 </li>
         
           <li class="md-nav__item">
-  <a href="#run" class="md-nav__link">
+  <a href="#_3" class="md-nav__link">
     <span class="md-ellipsis">
-      Run
+      运行
     </span>
   </a>
   
@@ -1276,27 +1276,27 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#parameters" class="md-nav__link">
+  <a href="#_4" class="md-nav__link">
     <span class="md-ellipsis">
-      Parameters
+      参数说明
     </span>
   </a>
   
 </li>
       
         <li class="md-nav__item">
-  <a href="#type-conversion" class="md-nav__link">
+  <a href="#_5" class="md-nav__link">
     <span class="md-ellipsis">
-      Type Conversion
+      类型转换
     </span>
   </a>
   
 </li>
       
         <li class="md-nav__item">
-  <a href="#limitations" class="md-nav__link">
+  <a href="#_6" class="md-nav__link">
     <span class="md-ellipsis">
-      Limitations
+      限制
     </span>
   </a>
   
@@ -1966,7 +1966,7 @@
         
   
   <span class="md-ellipsis">
-    FTP Writer
+    Ftp Writer
   </span>
   
 
@@ -1987,7 +1987,7 @@
         
   
   <span class="md-ellipsis">
-    GreenPlum Writer
+    Greenplum Writer
   </span>
   
 
@@ -2050,7 +2050,7 @@
         
   
   <span class="md-ellipsis">
-    HBase11x Writer
+    HBase11X Writer
   </span>
   
 
@@ -2530,37 +2530,37 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#example" class="md-nav__link">
+  <a href="#_1" class="md-nav__link">
     <span class="md-ellipsis">
-      Example
+      示例
     </span>
   </a>
   
-    <nav class="md-nav" aria-label="Example">
+    <nav class="md-nav" aria-label="示例">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#create-required-database-tables-and-data" class="md-nav__link">
+  <a href="#_2" class="md-nav__link">
     <span class="md-ellipsis">
-      Create Required Database Tables and Data
+      创建需要的库表和数据
     </span>
   </a>
   
 </li>
         
           <li class="md-nav__item">
-  <a href="#create-job-file" class="md-nav__link">
+  <a href="#job" class="md-nav__link">
     <span class="md-ellipsis">
-      Create Job File
+      创建 job 文件
     </span>
   </a>
   
 </li>
         
           <li class="md-nav__item">
-  <a href="#run" class="md-nav__link">
+  <a href="#_3" class="md-nav__link">
     <span class="md-ellipsis">
-      Run
+      运行
     </span>
   </a>
   
@@ -2572,27 +2572,27 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#parameters" class="md-nav__link">
+  <a href="#_4" class="md-nav__link">
     <span class="md-ellipsis">
-      Parameters
+      参数说明
     </span>
   </a>
   
 </li>
       
         <li class="md-nav__item">
-  <a href="#type-conversion" class="md-nav__link">
+  <a href="#_5" class="md-nav__link">
     <span class="md-ellipsis">
-      Type Conversion
+      类型转换
     </span>
   </a>
   
 </li>
       
         <li class="md-nav__item">
-  <a href="#limitations" class="md-nav__link">
+  <a href="#_6" class="md-nav__link">
     <span class="md-ellipsis">
-      Limitations
+      限制
     </span>
   </a>
   
@@ -2614,11 +2614,11 @@
 
 
 <h1 id="influxdb-reader">InfluxDB Reader<a class="headerlink" href="#influxdb-reader" title="Permanent link">&para;</a></h1>
-<p>InfluxDBReader plugin implements reading data from <a href="https://www.influxdata.com">InfluxDB</a>. The underlying implementation calls InfluxQL language to query tables and get returned data.</p>
-<h2 id="example">Example<a class="headerlink" href="#example" title="Permanent link">&para;</a></h2>
-<p>The following example demonstrates how this plugin reads data from specified tables (i.e., metrics) and outputs to terminal</p>
-<h3 id="create-required-database-tables-and-data">Create Required Database Tables and Data<a class="headerlink" href="#create-required-database-tables-and-data" title="Permanent link">&para;</a></h3>
-<p>Use the following commands to create tables and data to be read:</p>
+<p>InfluxDBReader 插件实现了从 <a href="https://www.influxdata.com">InfluxDB</a> 读取数据。底层实现上，是通过调用 InfluQL 语言查询表，然后获得返回数据。</p>
+<h2 id="_1">示例<a class="headerlink" href="#_1" title="Permanent link">&para;</a></h2>
+<p>以下示例用来演示该插件如何从指定表(即指标)上读取数据并输出到终端</p>
+<h3 id="_2">创建需要的库表和数据<a class="headerlink" href="#_2" title="Permanent link">&para;</a></h3>
+<p>通过以下命令来创建需要读取的表以及数据</p>
 <div class="highlight"><pre><span></span><code><span class="c1"># create database</span>
 influx<span class="w"> </span>--execute<span class="w"> </span><span class="s2">&quot;CREATE DATABASE NOAA_water_database&quot;</span>
 <span class="c1"># download sample data</span>
@@ -2626,8 +2626,8 @@ curl<span class="w"> </span>https://s3.amazonaws.com/noaa.water-database/NOAA_da
 <span class="c1"># import data via influx-cli</span>
 influx<span class="w"> </span>-import<span class="w"> </span>-path<span class="o">=</span>NOAA_data.txt<span class="w"> </span>-precision<span class="o">=</span>s<span class="w"> </span>-database<span class="o">=</span>NOAA_water_database
 </code></pre></div>
-<h3 id="create-job-file">Create Job File<a class="headerlink" href="#create-job-file" title="Permanent link">&para;</a></h3>
-<p>Create <code>job/influxdb2stream.json</code> file with the following content:</p>
+<h3 id="job">创建 job 文件<a class="headerlink" href="#job" title="Permanent link">&para;</a></h3>
+<p>创建 <code>job/influxdb2stream.json</code> 文件，内容如下：</p>
 <div class="tabbed-set" data-tabs="1:1"><input checked="checked" id="__tabbed_1_1" name="__tabbed_1" type="radio" /><label for="__tabbed_1_1">job/influxdb2stream.json</label><div class="tabbed-content"></div>
 </div>
 <div class="highlight"><pre><span></span><code><span class="p">{</span>
@@ -2668,106 +2668,106 @@ influx<span class="w"> </span>-import<span class="w"> </span>-path<span class="o
 <span class="w">  </span><span class="p">}</span>
 <span class="p">}</span>
 </code></pre></div>
-<h3 id="run">Run<a class="headerlink" href="#run" title="Permanent link">&para;</a></h3>
-<p>Execute the following command for data collection</p>
+<h3 id="_3">运行<a class="headerlink" href="#_3" title="Permanent link">&para;</a></h3>
+<p>执行下面的命令进行数据采集</p>
 <div class="highlight"><pre><span></span><code>bin/addax.sh<span class="w"> </span>job/influxdb2stream.json
 </code></pre></div>
-<h2 id="parameters">Parameters<a class="headerlink" href="#parameters" title="Permanent link">&para;</a></h2>
+<h2 id="_4">参数说明<a class="headerlink" href="#_4" title="Permanent link">&para;</a></h2>
 <table>
 <thead>
 <tr>
-<th style="text-align: left;">Configuration</th>
-<th style="text-align: center;">Required</th>
-<th>Data Type</th>
-<th>Default Value</th>
-<th>Description</th>
+<th style="text-align: left;">配置项</th>
+<th style="text-align: center;">是否必须</th>
+<th>数据类型</th>
+<th>默认值</th>
+<th>描述</th>
 </tr>
 </thead>
 <tbody>
 <tr>
 <td style="text-align: left;">endpoint</td>
-<td style="text-align: center;">Yes</td>
+<td style="text-align: center;">是</td>
 <td>string</td>
-<td>None</td>
-<td>InfluxDB connection string</td>
+<td>无</td>
+<td>InfluxDB 连接串</td>
 </tr>
 <tr>
 <td style="text-align: left;">username</td>
-<td style="text-align: center;">Yes</td>
+<td style="text-align: center;">是</td>
 <td>string</td>
-<td>None</td>
-<td>Username of data source</td>
+<td>无</td>
+<td>数据源的用户名</td>
 </tr>
 <tr>
 <td style="text-align: left;">password</td>
-<td style="text-align: center;">No</td>
+<td style="text-align: center;">否</td>
 <td>string</td>
-<td>None</td>
-<td>Password for specified username of data source</td>
+<td>无</td>
+<td>数据源指定用户名的密码</td>
 </tr>
 <tr>
 <td style="text-align: left;">database</td>
-<td style="text-align: center;">Yes</td>
+<td style="text-align: center;">是</td>
 <td>string</td>
-<td>None</td>
-<td>Database specified by data source</td>
+<td>无</td>
+<td>数据源指定的数据库</td>
 </tr>
 <tr>
 <td style="text-align: left;">table</td>
-<td style="text-align: center;">Yes</td>
+<td style="text-align: center;">是</td>
 <td>string</td>
-<td>None</td>
-<td>Selected table name to be synchronized</td>
+<td>无</td>
+<td>所选取的需要同步的表名</td>
 </tr>
 <tr>
 <td style="text-align: left;">column</td>
-<td style="text-align: center;">Yes</td>
+<td style="text-align: center;">是</td>
 <td>list</td>
-<td>None</td>
-<td>Collection of column names to be synchronized in configured table, detailed description see <a href="../rdbmsreader">rdbmreader</a></td>
+<td>无</td>
+<td>所配置的表中需要同步的列名集合，详细描述见 <a href="../rdbmsreader">rdbmreader</a></td>
 </tr>
 <tr>
 <td style="text-align: left;">connTimeout</td>
-<td style="text-align: center;">No</td>
+<td style="text-align: center;">否</td>
 <td>int</td>
 <td>15</td>
-<td>Set connection timeout value, in seconds</td>
+<td>设置连接超时值，单位为秒</td>
 </tr>
 <tr>
 <td style="text-align: left;">readTimeout</td>
-<td style="text-align: center;">No</td>
+<td style="text-align: center;">否</td>
 <td>int</td>
 <td>20</td>
-<td>Set read timeout value, in seconds</td>
+<td>设置读取超时值，单位为秒</td>
 </tr>
 <tr>
 <td style="text-align: left;">writeTimeout</td>
-<td style="text-align: center;">No</td>
+<td style="text-align: center;">否</td>
 <td>int</td>
 <td>20</td>
-<td>Set write timeout value, in seconds</td>
+<td>设置写入超时值，单位为秒</td>
 </tr>
 <tr>
 <td style="text-align: left;">where</td>
-<td style="text-align: center;">No</td>
+<td style="text-align: center;">否</td>
 <td>string</td>
-<td>None</td>
-<td>Filtering conditions for the table</td>
+<td>无</td>
+<td>针对表的筛选条件</td>
 </tr>
 <tr>
 <td style="text-align: left;">querySql</td>
-<td style="text-align: center;">No</td>
+<td style="text-align: center;">否</td>
 <td>string</td>
-<td>None</td>
-<td>Use SQL query to get data, if configured, <code>table</code> and <code>column</code> configuration items are invalid</td>
+<td>无</td>
+<td>使用 SQL 查询获取数据，如配置该项，则 <code>table</code>，<code>column</code> 配置项无效</td>
 </tr>
 </tbody>
 </table>
-<h2 id="type-conversion">Type Conversion<a class="headerlink" href="#type-conversion" title="Permanent link">&para;</a></h2>
-<p>Current implementation treats all fields as strings.</p>
-<h2 id="limitations">Limitations<a class="headerlink" href="#limitations" title="Permanent link">&para;</a></h2>
+<h2 id="_5">类型转换<a class="headerlink" href="#_5" title="Permanent link">&para;</a></h2>
+<p>当前实现是将所有字段当作字符串处理</p>
+<h2 id="_6">限制<a class="headerlink" href="#_6" title="Permanent link">&para;</a></h2>
 <ol>
-<li>Current plugin only supports version 1.x, version 2.0 and above are not supported</li>
+<li>当前插件仅支持 1.x 版本，2.0 及以上并不支持</li>
 </ol>
 
 

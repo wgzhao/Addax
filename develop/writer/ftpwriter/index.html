@@ -26,7 +26,7 @@
     
     
       
-        <title>FTP Writer - Addax Documentation</title>
+        <title>Ftp Writer - Addax Documentation</title>
       
     
     
@@ -127,7 +127,7 @@
         <div class="md-header__topic" data-md-component="header-topic">
           <span class="md-ellipsis">
             
-              FTP Writer
+              Ftp Writer
             
           </span>
         </div>
@@ -809,7 +809,7 @@
         
   
   <span class="md-ellipsis">
-    Text File Reader
+    TxtFile Reader
   </span>
   
 
@@ -998,7 +998,7 @@
         
   
   <span class="md-ellipsis">
-    FTP Reader
+    Ftp Reader
   </span>
   
 
@@ -1866,7 +1866,7 @@
           
   
   <span class="md-ellipsis">
-    FTP Writer
+    Ftp Writer
   </span>
   
 
@@ -1877,7 +1877,7 @@
         
   
   <span class="md-ellipsis">
-    FTP Writer
+    Ftp Writer
   </span>
   
 
@@ -1899,18 +1899,51 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#configuration-example" class="md-nav__link">
+  <a href="#_1" class="md-nav__link">
     <span class="md-ellipsis">
-      Configuration Example
+      配置样例
     </span>
   </a>
   
 </li>
       
         <li class="md-nav__item">
-  <a href="#parameters" class="md-nav__link">
+  <a href="#_2" class="md-nav__link">
     <span class="md-ellipsis">
-      Parameters
+      参数说明
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="参数说明">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#writemode" class="md-nav__link">
+    <span class="md-ellipsis">
+      writeMode
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#_3" class="md-nav__link">
+    <span class="md-ellipsis">
+      认证
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_4" class="md-nav__link">
+    <span class="md-ellipsis">
+      类型转换
     </span>
   </a>
   
@@ -1936,7 +1969,7 @@
         
   
   <span class="md-ellipsis">
-    GreenPlum Writer
+    Greenplum Writer
   </span>
   
 
@@ -1999,7 +2032,7 @@
         
   
   <span class="md-ellipsis">
-    HBase11x Writer
+    HBase11X Writer
   </span>
   
 
@@ -2479,18 +2512,51 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#configuration-example" class="md-nav__link">
+  <a href="#_1" class="md-nav__link">
     <span class="md-ellipsis">
-      Configuration Example
+      配置样例
     </span>
   </a>
   
 </li>
       
         <li class="md-nav__item">
-  <a href="#parameters" class="md-nav__link">
+  <a href="#_2" class="md-nav__link">
     <span class="md-ellipsis">
-      Parameters
+      参数说明
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="参数说明">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#writemode" class="md-nav__link">
+    <span class="md-ellipsis">
+      writeMode
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#_3" class="md-nav__link">
+    <span class="md-ellipsis">
+      认证
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_4" class="md-nav__link">
+    <span class="md-ellipsis">
+      类型转换
     </span>
   </a>
   
@@ -2511,9 +2577,9 @@
                   
 
 
-<h1 id="ftp-writer">FTP Writer<a class="headerlink" href="#ftp-writer" title="Permanent link">&para;</a></h1>
-<p>FTP Writer provides the ability to write files to remote FTP/SFTP servers, currently only supports writing text files.</p>
-<h2 id="configuration-example">Configuration Example<a class="headerlink" href="#configuration-example" title="Permanent link">&para;</a></h2>
+<h1 id="ftp-writer">Ftp Writer<a class="headerlink" href="#ftp-writer" title="Permanent link">&para;</a></h1>
+<p>Ftp Writer 提供了向远程 FTP/SFTP 服务写入文件的能力，当前仅支持写入文本文件。</p>
+<h2 id="_1">配置样例<a class="headerlink" href="#_1" title="Permanent link">&para;</a></h2>
 <div class="tabbed-set" data-tabs="1:1"><input checked="checked" id="__tabbed_1_1" name="__tabbed_1" type="radio" /><label for="__tabbed_1_1">job/stream2ftp.json</label><div class="tabbed-content"></div>
 </div>
 <div class="highlight"><pre><span></span><code><span class="p">{</span>
@@ -2554,115 +2620,213 @@
 <span class="w">  </span><span class="p">}</span>
 <span class="p">}</span>
 </code></pre></div>
-<h2 id="parameters">Parameters<a class="headerlink" href="#parameters" title="Permanent link">&para;</a></h2>
+<h2 id="_2">参数说明<a class="headerlink" href="#_2" title="Permanent link">&para;</a></h2>
 <table>
 <thead>
 <tr>
-<th style="text-align: left;">Configuration</th>
-<th style="text-align: center;">Required</th>
-<th>Data Type</th>
-<th>Default Value</th>
-<th>Description</th>
+<th style="text-align: left;">配置项</th>
+<th style="text-align: center;">是否必须</th>
+<th>数据类型</th>
+<th>默认值</th>
+<th>描述</th>
 </tr>
 </thead>
 <tbody>
 <tr>
 <td style="text-align: left;">protocol</td>
-<td style="text-align: center;">Yes</td>
+<td style="text-align: center;">是</td>
 <td>string</td>
 <td><code>ftp</code></td>
-<td>Server protocol, currently supports ftp and sftp transport protocols</td>
+<td>服务器协议，目前支持传输协议有 ftp 和 sftp</td>
 </tr>
 <tr>
 <td style="text-align: left;">host</td>
-<td style="text-align: center;">Yes</td>
+<td style="text-align: center;">是</td>
 <td>string</td>
-<td>None</td>
-<td>Server address</td>
+<td>无</td>
+<td>服务器地址</td>
 </tr>
 <tr>
 <td style="text-align: left;">port</td>
-<td style="text-align: center;">No</td>
+<td style="text-align: center;">否</td>
 <td>int</td>
 <td>22/21</td>
-<td>FTP default is 21, SFTP default is 22</td>
+<td>ftp 默认为 21，sftp 默认为 22</td>
 </tr>
 <tr>
 <td style="text-align: left;">timeout</td>
-<td style="text-align: center;">No</td>
+<td style="text-align: center;">否</td>
 <td>int</td>
 <td><code>60000</code></td>
-<td>Connection timeout for FTP server, in milliseconds (ms)</td>
+<td>连接ftp服务器连接超时时间，单位毫秒(ms)</td>
 </tr>
 <tr>
 <td style="text-align: left;">connectPattern</td>
-<td style="text-align: center;">No</td>
+<td style="text-align: center;">否</td>
 <td>string</td>
 <td><code>PASV</code></td>
-<td>Connection mode, only supports <code>PORT</code>, <code>PASV</code> modes. Used for FTP protocol</td>
+<td>连接模式，仅支持 <code>PORT</code>, <code>PASV</code> 模式。ftp协议时使用 ｜</td>
 </tr>
 <tr>
 <td style="text-align: left;">username</td>
-<td style="text-align: center;">Yes</td>
+<td style="text-align: center;">是</td>
 <td>string</td>
-<td>None</td>
-<td>Username</td>
+<td>无</td>
+<td>用户名</td>
 </tr>
 <tr>
 <td style="text-align: left;">password</td>
-<td style="text-align: center;">Yes</td>
+<td style="text-align: center;">是</td>
 <td>string</td>
-<td>None</td>
-<td>Access password</td>
+<td>无</td>
+<td>访问密码</td>
 </tr>
 <tr>
 <td style="text-align: left;">useKey</td>
-<td style="text-align: center;">No</td>
+<td style="text-align: center;">否</td>
 <td>boolean</td>
 <td>false</td>
-<td>Whether to use private key login, only valid for SFTP login</td>
+<td>是否使用私钥登录，仅针对 sftp 登录有效</td>
 </tr>
 <tr>
 <td style="text-align: left;">keyPath</td>
-<td style="text-align: center;">No</td>
+<td style="text-align: center;">否</td>
 <td>string</td>
 <td><code>~/.ssh/id_rsa</code></td>
-<td>Private key address</td>
+<td>私钥地址</td>
 </tr>
 <tr>
 <td style="text-align: left;">keyPass</td>
-<td style="text-align: center;">No</td>
+<td style="text-align: center;">否</td>
 <td>string</td>
-<td>None</td>
-<td>Private key password, no need to configure if no private key password is set</td>
+<td>无</td>
+<td>私钥密码，若没有设置私钥密码，则无需配置该项</td>
 </tr>
 <tr>
 <td style="text-align: left;">path</td>
-<td style="text-align: center;">Yes</td>
+<td style="text-align: center;">是</td>
 <td>string</td>
-<td>None</td>
-<td>Remote FTP file system path information, FtpWriter will write multiple files under Path directory</td>
+<td>无</td>
+<td>远程FTP文件系统的路径信息，FtpWriter会写入Path目录下属多个文件</td>
 </tr>
 <tr>
 <td style="text-align: left;">fileName</td>
-<td style="text-align: center;">Yes</td>
+<td style="text-align: center;">是</td>
 <td>string</td>
-<td>None</td>
-<td>Name of file to write, this filename will have random suffix added as actual filename for each thread</td>
+<td>无</td>
+<td>写入的文件名，该文件名会添加随机的后缀作为每个线程写入实际文件名</td>
 </tr>
 <tr>
 <td style="text-align: left;">writeMode</td>
-<td style="text-align: center;">Yes</td>
+<td style="text-align: center;">是</td>
 <td>string</td>
-<td>None</td>
-<td>Data cleanup processing mode before writing, see below</td>
+<td>无</td>
+<td>写入前数据清理处理模式，详见下文</td>
 </tr>
 <tr>
 <td style="text-align: left;">fieldDelimiter</td>
-<td style="text-align: center;">Yes</td>
+<td style="text-align: center;">是</td>
 <td>string</td>
 <td><code>,</code></td>
-<td>Field delimiter for reading</td>
+<td>描述：读取的字段分隔符</td>
+</tr>
+<tr>
+<td style="text-align: left;">compress</td>
+<td style="text-align: center;">否</td>
+<td>string</td>
+<td>无</td>
+<td>文本压缩类型，暂不支持</td>
+</tr>
+<tr>
+<td style="text-align: left;">encoding</td>
+<td style="text-align: center;">否</td>
+<td>string</td>
+<td><code>utf-8</code></td>
+<td>读取文件的编码配置</td>
+</tr>
+<tr>
+<td style="text-align: left;">dateFormat</td>
+<td style="text-align: center;">否</td>
+<td>string</td>
+<td>无</td>
+<td>日期类型的数据序列化到文件中时的格式，例如 <code>"yyyy-MM-dd"</code></td>
+</tr>
+<tr>
+<td style="text-align: left;">fileFormat</td>
+<td style="text-align: center;">否</td>
+<td>string</td>
+<td><code>text</code></td>
+<td>文件写出的格式，包括 csv, text 两种，</td>
+</tr>
+<tr>
+<td style="text-align: left;">header</td>
+<td style="text-align: center;">否</td>
+<td>list</td>
+<td>无</td>
+<td>text写出时的表头，示例 <code>['id', 'name', 'age']</code></td>
+</tr>
+<tr>
+<td style="text-align: left;">nullFormat</td>
+<td style="text-align: center;">否</td>
+<td>string</td>
+<td><code>\N</code></td>
+<td>定义哪些字符串可以表示为null</td>
+</tr>
+<tr>
+<td style="text-align: left;">maxTraversalLevel</td>
+<td style="text-align: center;">否</td>
+<td>int</td>
+<td>100</td>
+<td>允许遍历文件夹的最大层数</td>
+</tr>
+<tr>
+<td style="text-align: left;">csvReaderConfig</td>
+<td style="text-align: center;">否</td>
+<td>map</td>
+<td>无</td>
+<td>读取CSV类型文件参数配置，详见下文</td>
+</tr>
+</tbody>
+</table>
+<h3 id="writemode">writeMode<a class="headerlink" href="#writemode" title="Permanent link">&para;</a></h3>
+<p>描述：FtpWriter写入前数据清理处理模式：</p>
+<ol>
+<li><code>truncate</code>，写入前清理目录下一fileName前缀的所有文件。</li>
+<li><code>append</code>，写入前不做任何处理，Addax FtpWriter直接使用filename写入，并保证文件名不冲突。</li>
+<li><code>nonConflict</code>，如果目录下有fileName前缀的文件，直接报错。</li>
+</ol>
+<h3 id="_3">认证<a class="headerlink" href="#_3" title="Permanent link">&para;</a></h3>
+<p>从 <code>4.0.2</code> 版本开始， 支持私钥认证方式登录 SFTP 服务器，如果密码和私有都填写了，则两者认证方式都会尝试。
+注意，如果填写了 <code>keyPath</code>, <code>keyPass</code> 项，但 <code>useKey</code> 设置为 <code>false</code> ，插件依然不会尝试用私钥进行登录。</p>
+<h2 id="_4">类型转换<a class="headerlink" href="#_4" title="Permanent link">&para;</a></h2>
+<p>FTP文件本身不提供数据类型，该类型是 Addax FtpWriter 定义：</p>
+<table>
+<thead>
+<tr>
+<th>Addax 内部类型</th>
+<th>FTP文件 数据类型</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Long</td>
+<td>Long -&gt; 字符串序列化表示</td>
+</tr>
+<tr>
+<td>Double</td>
+<td>Double -&gt; 字符串序列化表示</td>
+</tr>
+<tr>
+<td>String</td>
+<td>String -&gt; 字符串序列化表示</td>
+</tr>
+<tr>
+<td>Boolean</td>
+<td>Boolean -&gt; 字符串序列化表示</td>
+</tr>
+<tr>
+<td>Date</td>
+<td>Date -&gt; 字符串序列化表示</td>
 </tr>
 </tbody>
 </table>
@@ -2720,13 +2884,13 @@
         
         
           
-          <a href="../greenplumwriter/" class="md-footer__link md-footer__link--next" aria-label="Next: GreenPlum Writer">
+          <a href="../greenplumwriter/" class="md-footer__link md-footer__link--next" aria-label="Next: Greenplum Writer">
             <div class="md-footer__title">
               <span class="md-footer__direction">
                 Next
               </span>
               <div class="md-ellipsis">
-                GreenPlum Writer
+                Greenplum Writer
               </div>
             </div>
             <div class="md-footer__button md-icon">

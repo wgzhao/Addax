@@ -809,7 +809,7 @@
         
   
   <span class="md-ellipsis">
-    Text File Reader
+    TxtFile Reader
   </span>
   
 
@@ -998,7 +998,7 @@
         
   
   <span class="md-ellipsis">
-    FTP Reader
+    Ftp Reader
   </span>
   
 
@@ -1836,22 +1836,22 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#configuration-example" class="md-nav__link">
+  <a href="#_1" class="md-nav__link">
     <span class="md-ellipsis">
-      Configuration Example
+      配置样例
     </span>
   </a>
   
 </li>
       
         <li class="md-nav__item">
-  <a href="#parameters" class="md-nav__link">
+  <a href="#_2" class="md-nav__link">
     <span class="md-ellipsis">
-      Parameters
+      参数说明
     </span>
   </a>
   
-    <nav class="md-nav" aria-label="Parameters">
+    <nav class="md-nav" aria-label="参数说明">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
@@ -1869,9 +1869,9 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#type-conversion" class="md-nav__link">
+  <a href="#_3" class="md-nav__link">
     <span class="md-ellipsis">
-      Type Conversion
+      类型转换
     </span>
   </a>
   
@@ -1939,7 +1939,7 @@
         
   
   <span class="md-ellipsis">
-    FTP Writer
+    Ftp Writer
   </span>
   
 
@@ -1960,7 +1960,7 @@
         
   
   <span class="md-ellipsis">
-    GreenPlum Writer
+    Greenplum Writer
   </span>
   
 
@@ -2023,7 +2023,7 @@
         
   
   <span class="md-ellipsis">
-    HBase11x Writer
+    HBase11X Writer
   </span>
   
 
@@ -2503,22 +2503,22 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#configuration-example" class="md-nav__link">
+  <a href="#_1" class="md-nav__link">
     <span class="md-ellipsis">
-      Configuration Example
+      配置样例
     </span>
   </a>
   
 </li>
       
         <li class="md-nav__item">
-  <a href="#parameters" class="md-nav__link">
+  <a href="#_2" class="md-nav__link">
     <span class="md-ellipsis">
-      Parameters
+      参数说明
     </span>
   </a>
   
-    <nav class="md-nav" aria-label="Parameters">
+    <nav class="md-nav" aria-label="参数说明">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
@@ -2536,9 +2536,9 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#type-conversion" class="md-nav__link">
+  <a href="#_3" class="md-nav__link">
     <span class="md-ellipsis">
-      Type Conversion
+      类型转换
     </span>
   </a>
   
@@ -2560,8 +2560,8 @@
 
 
 <h1 id="dbf-writer">DBF Writer<a class="headerlink" href="#dbf-writer" title="Permanent link">&para;</a></h1>
-<p>DBF Writer provides writing DBF-like format to one or more table files in local file system.</p>
-<h2 id="configuration-example">Configuration Example<a class="headerlink" href="#configuration-example" title="Permanent link">&para;</a></h2>
+<p>Dbf Writer 提供了向本地文件写入类dbf格式的一个或者多个表文件。</p>
+<h2 id="_1">配置样例<a class="headerlink" href="#_1" title="Permanent link">&para;</a></h2>
 <div class="highlight"><pre><span></span><code><span class="p">{</span>
 <span class="w">  </span><span class="nt">&quot;job&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
 <span class="w">    </span><span class="nt">&quot;setting&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
@@ -2638,78 +2638,78 @@
 <span class="w">  </span><span class="p">}</span>
 <span class="p">}</span>
 </code></pre></div>
-<h2 id="parameters">Parameters<a class="headerlink" href="#parameters" title="Permanent link">&para;</a></h2>
+<h2 id="_2">参数说明<a class="headerlink" href="#_2" title="Permanent link">&para;</a></h2>
 <table>
 <thead>
 <tr>
-<th style="text-align: left;">Configuration</th>
-<th style="text-align: center;">Required</th>
-<th>Data Type</th>
-<th>Default Value</th>
-<th>Description</th>
+<th style="text-align: left;">配置项</th>
+<th style="text-align: center;">是否必须</th>
+<th>数据类型</th>
+<th>默认值</th>
+<th>描述</th>
 </tr>
 </thead>
 <tbody>
 <tr>
 <td style="text-align: left;">path</td>
-<td style="text-align: center;">Yes</td>
+<td style="text-align: center;">是</td>
 <td>string</td>
-<td>None</td>
-<td>File directory, note this is a folder, not a file</td>
+<td>无</td>
+<td>文件目录，注意这里是文件夹，不是文件</td>
 </tr>
 <tr>
 <td style="text-align: left;">column</td>
-<td style="text-align: center;">Yes</td>
+<td style="text-align: center;">是</td>
 <td><code>list&lt;map&gt;</code></td>
-<td>None</td>
-<td>Collection of columns to be synchronized in configured table, see example configuration</td>
+<td>无</td>
+<td>所配置的表中需要同步的列集合，详见示例配置</td>
 </tr>
 <tr>
 <td style="text-align: left;">fileName</td>
-<td style="text-align: center;">Yes</td>
+<td style="text-align: center;">是</td>
 <td>string</td>
-<td>None</td>
-<td>Name of file to write</td>
+<td>无</td>
+<td>写入的文件名</td>
 </tr>
 <tr>
 <td style="text-align: left;">writeMode</td>
-<td style="text-align: center;">Yes</td>
+<td style="text-align: center;">是</td>
 <td>string</td>
-<td>None</td>
-<td>Data cleanup processing mode before writing, see description below</td>
+<td>无</td>
+<td>写入前数据清理处理模式，详见下面描述</td>
 </tr>
 <tr>
 <td style="text-align: left;">encoding</td>
-<td style="text-align: center;">No</td>
+<td style="text-align: center;">否</td>
 <td>string</td>
 <td>UTF-8</td>
-<td>File encoding, such as <code>GBK</code>, <code>UTF-8</code></td>
+<td>文件编码，比如 <code>GBK</code>, <code>UTF-8</code></td>
 </tr>
 <tr>
 <td style="text-align: left;">nullFormat</td>
-<td style="text-align: center;">No</td>
+<td style="text-align: center;">否</td>
 <td>string</td>
 <td><code>\N</code></td>
-<td>Define which string can represent null</td>
+<td>定义哪个字符串可以表示为null,</td>
 </tr>
 <tr>
 <td style="text-align: left;">dateFormat</td>
-<td style="text-align: center;">No</td>
+<td style="text-align: center;">否</td>
 <td>string</td>
-<td>None</td>
-<td>Format when date type data is serialized to file, e.g. <code>"yyyy-MM-dd"</code></td>
+<td>无</td>
+<td>日期类型的数据序列化到文件中时的格式，例如 <code>"yyyy-MM-dd"</code></td>
 </tr>
 </tbody>
 </table>
 <h3 id="writemode">writeMode<a class="headerlink" href="#writemode" title="Permanent link">&para;</a></h3>
-<p>Data cleanup processing mode before writing:</p>
+<p>写入前数据清理处理模式：</p>
 <ul>
-<li>truncate: Clean all files with <code>fileName</code> prefix under directory before writing</li>
-<li>append: No processing before writing, write directly using <code>filename</code> and ensure no filename conflicts</li>
-<li>nonConflict: If there are files with <code>fileName</code> prefix under directory, report error directly</li>
+<li>truncate: 写入前清理目录下 <code>fileName</code> 前缀的所有文件。</li>
+<li>append: 写入前不做任何处理，直接使用 <code>filename</code> 写入，并保证文件名不冲突。</li>
+<li>nonConflict: 如果目录下有 <code>fileName</code> 前缀的文件，直接报错。</li>
 </ul>
-<h2 id="type-conversion">Type Conversion<a class="headerlink" href="#type-conversion" title="Permanent link">&para;</a></h2>
-<p>Currently this plugin supports the following write types and corresponding relationships:</p>
+<h2 id="_3">类型转换<a class="headerlink" href="#_3" title="Permanent link">&para;</a></h2>
+<p>当前该插件支持写入的类型以及对应关系如下：</p>
 <table>
 <thead>
 <tr>
@@ -2739,8 +2739,19 @@
 <td>L</td>
 <td>java.lang.Boolean</td>
 </tr>
+<tr>
+<td>Date</td>
+<td>D</td>
+<td>java.util.Date</td>
+</tr>
 </tbody>
 </table>
+<p>其中：</p>
+<ul>
+<li>numeric 是指本地文件中使用数字类型表示形式，例如 <code>19901219</code> ,整形小数位数为 <code>0</code>。</li>
+<li>logical 是指本地文件文本中使用Boolean的表示形式，例如 <code>true</code>、<code>false</code>。</li>
+<li>Date 是指本地文件文本中使用Date表示形式，例如 <code>2014-12-31</code>，Date 是JAVA语言的 Date 类型。</li>
+</ul>
 
 
 

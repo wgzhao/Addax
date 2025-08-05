@@ -814,7 +814,7 @@
         
   
   <span class="md-ellipsis">
-    Text File Reader
+    TxtFile Reader
   </span>
   
 
@@ -1003,7 +1003,7 @@
         
   
   <span class="md-ellipsis">
-    FTP Reader
+    Ftp Reader
   </span>
   
 
@@ -1867,7 +1867,7 @@
         
   
   <span class="md-ellipsis">
-    FTP Writer
+    Ftp Writer
   </span>
   
 
@@ -1888,7 +1888,7 @@
         
   
   <span class="md-ellipsis">
-    GreenPlum Writer
+    Greenplum Writer
   </span>
   
 
@@ -1951,7 +1951,7 @@
         
   
   <span class="md-ellipsis">
-    HBase11x Writer
+    HBase11X Writer
   </span>
   
 
@@ -2438,8 +2438,8 @@
 
 
 <h1 id="stream-reader">Stream Reader<a class="headerlink" href="#stream-reader" title="Permanent link">&para;</a></h1>
-<p>Stream Reader is a plugin that reads data from memory, mainly used to quickly generate expected data and test write plugins.</p>
-<p>A complete StreamReader configuration file is as follows:</p>
+<p>Stream Reader 是一个从内存读取数据的插件， 他主要用来快速生成期望的数据并对写入插件进行测试</p>
+<p>一个完整的 StreamReader 配置文件如下：</p>
 <div class="highlight"><pre><span></span><code><span class="p">{</span>
 <span class="w">  </span><span class="nt">&quot;reader&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
 <span class="w">    </span><span class="nt">&quot;name&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;streamreader&quot;</span><span class="p">,</span>
@@ -2476,73 +2476,73 @@
 <span class="w">  </span><span class="p">}</span>
 <span class="p">}</span>
 </code></pre></div>
-<p>The above configuration file will generate 10 records (assuming channel is 1), with each record containing:</p>
+<p>上述配置文件将会生成 10条记录（假定channel为1），每条记录的内容如下：</p>
 <p><code>unique_id,'1989-06-04 08:12:13',1984,1989.64,true,'a long text'</code></p>
-<p>Currently StreamReader supports all output data types listed above:</p>
+<p>目前 StreamReader 支持的输出数据类型全部列在上面，分别是：</p>
 <ul>
-<li><code>string</code> String type</li>
-<li><code>date</code> Date type  </li>
-<li><code>long</code> All integer types</li>
-<li><code>double</code> All floating point numbers</li>
-<li><code>bool</code> Boolean type</li>
-<li><code>bytes</code> Byte type</li>
+<li><code>string</code> 字符类型</li>
+<li><code>date</code> 日期类型</li>
+<li><code>long</code> 所有整型类型</li>
+<li><code>double</code> 所有浮点数</li>
+<li><code>bool</code> 布尔类型</li>
+<li><code>bytes</code> 字节类型</li>
 </ul>
-<p>The <code>date</code> type also supports <code>dateFormat</code> configuration to specify the format of input dates, default is <code>yyyy-MM-dd HH:mm:ss</code>. For example, your input can be like this:</p>
+<p>其中 <code>date</code> 类型还支持 <code>dateFormat</code> 配置，用来指定输入的日期的格式，默认为 <code>yyyy-MM-dd HH:mm:ss</code>。比如你的输入可以这样：</p>
 <div class="highlight"><pre><span></span><code><span class="p">{</span>
 <span class="w">  </span><span class="nt">&quot;value&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;1989/06/04 12:13:14&quot;</span><span class="p">,</span>
 <span class="w">  </span><span class="nt">&quot;type&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;date&quot;</span><span class="p">,</span>
 <span class="w">  </span><span class="nt">&quot;dateFormat&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;yyyy/MM/dd HH:mm:ss&quot;</span>
 <span class="p">}</span>
 </code></pre></div>
-<p>Note that regardless of the input format for date type, it is internally converted to <code>yyyy-MM-dd HH:mm:ss</code> format.</p>
-<p>StreamReader also supports random input functionality. For example, to randomly get any integer between 0-10, we can configure the column like this:</p>
+<p>注意，日期类型不管输入是何种格式，内部都转为 <code>yyyy-MM-dd HH:mm:ss</code> 格式。</p>
+<p>StreamReader 还支持随机输入功能，比如我们要随机得到0-10之间的任意一个整数，我们可以这样配置列：</p>
 <div class="highlight"><pre><span></span><code><span class="p">{</span>
 <span class="w">  </span><span class="nt">&quot;random&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;0,10&quot;</span><span class="p">,</span>
 <span class="w">  </span><span class="nt">&quot;type&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;long&quot;</span>
 <span class="p">}</span>
 </code></pre></div>
-<p>To get a random floating point number between 0 and 100, configure like this:</p>
+<p>获得一个 0 至 100 之间的随机浮点数，可以这样配置：</p>
 <div class="highlight"><pre><span></span><code><span class="p">{</span>
 <span class="w">  </span><span class="nt">&quot;random&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;0,100&quot;</span><span class="p">,</span>
 <span class="w">  </span><span class="nt">&quot;type&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;double&quot;</span>
 <span class="p">}</span>
 </code></pre></div>
-<p>To specify decimal places for floating point numbers, e.g., 2 decimal places, configure like this:</p>
+<p>如果要指定浮点数的小数位数，比如指定小数位为2位，则可以这样设定</p>
 <div class="highlight"><pre><span></span><code><span class="p">{</span>
 <span class="w">  </span><span class="nt">&quot;random&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;0,100,2&quot;</span><span class="p">,</span>
 <span class="w">  </span><span class="nt">&quot;type&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;double&quot;</span>
 <span class="p">}</span>
 </code></pre></div>
-<p>Note: It cannot guarantee that the generated decimal always has exactly 2 places. If the decimal part is 0, the decimal places will be fewer than specified.</p>
-<p>Here we use the <code>random</code> keyword to indicate its value is random, with the range being a closed interval.</p>
-<p>Other random type configurations are as follows:</p>
+<p>注意： 并不能保证每次生成的小数恰好是2位，如果小数为数为0 ，则小数位数会少于指定的位数。</p>
+<p>这里使用 <code>random</code> 这个关键字来表示其值为随机值，其值的范围为左右闭区间。</p>
+<p>其他类型的随机类型配置如下：</p>
 <ul>
-<li><code>long</code>: random 0, 10 - random number between 0 and 10</li>
-<li><code>string</code>: random 0, 10 - random string of length between 0 and 10</li>
-<li><code>bool</code>: random 0, 10 - ratio of false and true occurrences</li>
-<li><code>double</code>: random 0, 10 - random floating point between 0 and 10</li>
-<li><code>double</code>: random 0, 10, 2 - random floating point between 0 and 10 with 2 decimal places</li>
-<li><code>date</code>: random '2014-07-07 00:00:00', '2016-07-07 00:00:00' - random time between start time and end time, default date format (commas not supported) yyyy-MM-dd HH:mm:ss</li>
-<li><code>BYTES</code>: random 0, 10 - random string of length between 0 and 10, get its UTF-8 encoded binary string</li>
+<li><code>long</code>: random 0, 10 0到10之间的随机数字</li>
+<li><code>string</code>: random 0, 10 0到 10 长度之间的随机字符串</li>
+<li><code>bool</code>: random 0, 10 false 和 true出现的比率</li>
+<li><code>double</code>: random 0, 10 0到10之间的随机浮点数</li>
+<li><code>double</code>: random 0, 10, 2 0到10之间的随机浮点数，小数位为2位  </li>
+<li><code>date</code>: random '2014-07-07 00:00:00', '2016-07-07 00:00:00' 开始时间-&gt;结束时间之间的随机时间，日期格式默认(不支持逗号)yyyy-MM-dd HH:mm:ss</li>
+<li><code>BYTES</code>: random 0, 10 0到10长度之间的随机字符串获取其UTF-8编码的二进制串</li>
 </ul>
-<p>StreamReader also supports increment functions. For example, to get an arithmetic sequence starting from 1 with increment of 5, configure like this:</p>
+<p>StreamReader 还支持递增函数，比如我们要得到一个从1开始，每次加5的等差数列，可以这样配置：</p>
 <div class="highlight"><pre><span></span><code><span class="p">{</span>
 <span class="w">  </span><span class="nt">&quot;incr&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;1,5&quot;</span><span class="p">,</span>
 <span class="w">  </span><span class="nt">&quot;type&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;long&quot;</span>
 <span class="p">}</span>
 </code></pre></div>
-<p>To get a decreasing sequence, change the step size (5 in the above example) to negative. Default step size is 1.</p>
-<p>Increment also supports date type (introduced in version <code>4.0.1</code>), for example:</p>
+<p>如果需要获得一个递减的数列，则把第二个参数的步长（上例中的5）改为负数即可。步长默认值为1。</p>
+<p>递增还支持日期类型( <code>4.0.1</code> 版本引入)，比如下面的配置：</p>
 <div class="highlight"><pre><span></span><code><span class="p">{</span>
 <span class="w">  </span><span class="nt">&quot;incr&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;1989-06-04 09:01:02,2,d&quot;</span><span class="p">,</span>
 <span class="w">  </span><span class="nt">&quot;type&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;date&quot;</span>
 <span class="p">}</span>
 </code></pre></div>
-<p><code>incr</code> consists of three parts: start date, step size, and step unit, separated by English commas (,).</p>
+<p><code>incr</code> 由三部分组成，分别是开始日期，步长以及步长单位，中间用英文逗号(,)分隔。</p>
 <ul>
-<li>Start date: Correct date string, default format is <code>yyyy-MM-dd hh:mm:ss</code>. If time format is different, need to configure <code>dateFormat</code> to specify date format. This is mandatory.</li>
-<li>Step size: Length to increase each time, default is 1. For decreasing, fill in negative number. This is optional.</li>
-<li>Step unit: What time unit to increment/decrement by, default is by day. This is optional. Available units:</li>
+<li>开始日期：正确的日期字符串，默认格式为 <code>yyyy-MM-dd hh:mm:ss</code>，如果时间格式不同，则需要配置 <code>dateFormat</code> 来指定日期格式，这是必填项</li>
+<li>步长：每次需要增加的长度，默认为1，如果希望是递减，则填写负数，这是可选项</li>
+<li>步长单位：按什么时间单位进行递增/递减，默认为按天（day），这是可选项，可选的单位有</li>
 <li>d/day</li>
 <li>M/month</li>
 <li>y/year</li>
@@ -2551,7 +2551,7 @@
 <li>s/second</li>
 <li>w/week</li>
 </ul>
-<p>Configuration item <code>sliceRecordCount</code> specifies the number of data records to generate. If <code>channel</code> is specified, actual generated records = <code>sliceRecordCount * channel</code></p>
+<p>配置项 <code>sliceRecordCount</code> 用来指定要生成的数据条数，如果指定的 <code>channel</code>，则实际生成的记录数为 <code>sliceRecordCount * channel</code></p>
 
 
 

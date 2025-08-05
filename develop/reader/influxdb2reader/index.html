@@ -814,7 +814,7 @@
         
   
   <span class="md-ellipsis">
-    Text File Reader
+    TxtFile Reader
   </span>
   
 
@@ -1003,7 +1003,7 @@
         
   
   <span class="md-ellipsis">
-    FTP Reader
+    Ftp Reader
   </span>
   
 
@@ -1255,28 +1255,28 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#example" class="md-nav__link">
+  <a href="#_1" class="md-nav__link">
     <span class="md-ellipsis">
-      Example
+      示例
     </span>
   </a>
   
-    <nav class="md-nav" aria-label="Example">
+    <nav class="md-nav" aria-label="示例">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#create-job-file" class="md-nav__link">
+  <a href="#job" class="md-nav__link">
     <span class="md-ellipsis">
-      Create Job File
+      创建 job 文件
     </span>
   </a>
   
 </li>
         
           <li class="md-nav__item">
-  <a href="#run" class="md-nav__link">
+  <a href="#_2" class="md-nav__link">
     <span class="md-ellipsis">
-      Run
+      运行
     </span>
   </a>
   
@@ -1288,13 +1288,13 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#parameters" class="md-nav__link">
+  <a href="#_3" class="md-nav__link">
     <span class="md-ellipsis">
-      Parameters
+      参数说明
     </span>
   </a>
   
-    <nav class="md-nav" aria-label="Parameters">
+    <nav class="md-nav" aria-label="参数说明">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
@@ -1321,18 +1321,18 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#type-conversion" class="md-nav__link">
+  <a href="#_4" class="md-nav__link">
     <span class="md-ellipsis">
-      Type Conversion
+      类型转换
     </span>
   </a>
   
 </li>
       
         <li class="md-nav__item">
-  <a href="#limitations" class="md-nav__link">
+  <a href="#_5" class="md-nav__link">
     <span class="md-ellipsis">
-      Limitations
+      限制
     </span>
   </a>
   
@@ -1981,7 +1981,7 @@
         
   
   <span class="md-ellipsis">
-    FTP Writer
+    Ftp Writer
   </span>
   
 
@@ -2002,7 +2002,7 @@
         
   
   <span class="md-ellipsis">
-    GreenPlum Writer
+    Greenplum Writer
   </span>
   
 
@@ -2065,7 +2065,7 @@
         
   
   <span class="md-ellipsis">
-    HBase11x Writer
+    HBase11X Writer
   </span>
   
 
@@ -2545,28 +2545,28 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#example" class="md-nav__link">
+  <a href="#_1" class="md-nav__link">
     <span class="md-ellipsis">
-      Example
+      示例
     </span>
   </a>
   
-    <nav class="md-nav" aria-label="Example">
+    <nav class="md-nav" aria-label="示例">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#create-job-file" class="md-nav__link">
+  <a href="#job" class="md-nav__link">
     <span class="md-ellipsis">
-      Create Job File
+      创建 job 文件
     </span>
   </a>
   
 </li>
         
           <li class="md-nav__item">
-  <a href="#run" class="md-nav__link">
+  <a href="#_2" class="md-nav__link">
     <span class="md-ellipsis">
-      Run
+      运行
     </span>
   </a>
   
@@ -2578,13 +2578,13 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#parameters" class="md-nav__link">
+  <a href="#_3" class="md-nav__link">
     <span class="md-ellipsis">
-      Parameters
+      参数说明
     </span>
   </a>
   
-    <nav class="md-nav" aria-label="Parameters">
+    <nav class="md-nav" aria-label="参数说明">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
@@ -2611,18 +2611,18 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#type-conversion" class="md-nav__link">
+  <a href="#_4" class="md-nav__link">
     <span class="md-ellipsis">
-      Type Conversion
+      类型转换
     </span>
   </a>
   
 </li>
       
         <li class="md-nav__item">
-  <a href="#limitations" class="md-nav__link">
+  <a href="#_5" class="md-nav__link">
     <span class="md-ellipsis">
-      Limitations
+      限制
     </span>
   </a>
   
@@ -2644,12 +2644,12 @@
 
 
 <h1 id="influxdb2-reader">InfluxDB2 Reader<a class="headerlink" href="#influxdb2-reader" title="Permanent link">&para;</a></h1>
-<p>InfluxDB2 Reader plugin implements reading data from <a href="https://www.influxdata.com">InfluxDB</a> version 2.0 and above.</p>
-<p>Note: If your InfluxDB is version 1.8 and below, you should use the <a href="../influxdbreader/">InfluxDBReader</a> plugin.</p>
-<h2 id="example">Example<a class="headerlink" href="#example" title="Permanent link">&para;</a></h2>
-<p>The following example demonstrates how this plugin reads data from specified tables (i.e., metrics) and outputs to terminal.</p>
-<h3 id="create-job-file">Create Job File<a class="headerlink" href="#create-job-file" title="Permanent link">&para;</a></h3>
-<p>Create <code>job/influx2stream.json</code> file with the following content:</p>
+<p>InfluxDB2 Reader 插件实现了从 <a href="https://www.influxdata.com">InfluxDB</a> 2.0 及以上版本读取数据。</p>
+<p>注意，如果你的 InfluxDB 是 1.8及以下版本，则应该使用 <a href="../influxdbreader/">InfluxDBReader</a> 插件</p>
+<h2 id="_1">示例<a class="headerlink" href="#_1" title="Permanent link">&para;</a></h2>
+<p>以下示例用来演示该插件如何从指定表(即指标)上读取数据并输出到终端</p>
+<h3 id="job">创建 job 文件<a class="headerlink" href="#job" title="Permanent link">&para;</a></h3>
+<p>创建 <code>job/influx2stream.json</code> 文件，内容如下：</p>
 <div class="tabbed-set" data-tabs="1:1"><input checked="checked" id="__tabbed_1_1" name="__tabbed_1" type="radio" /><label for="__tabbed_1_1">job/influx2stream.json</label><div class="tabbed-content"></div>
 </div>
 <div class="highlight"><pre><span></span><code><span class="p">{</span>
@@ -2695,104 +2695,104 @@
 <span class="w">  </span><span class="p">}</span>
 <span class="p">}</span>
 </code></pre></div>
-<h3 id="run">Run<a class="headerlink" href="#run" title="Permanent link">&para;</a></h3>
-<p>Execute the following command for data collection</p>
+<h3 id="_2">运行<a class="headerlink" href="#_2" title="Permanent link">&para;</a></h3>
+<p>执行下面的命令进行数据采集</p>
 <div class="highlight"><pre><span></span><code>bin/addax.sh<span class="w"> </span>job/influx2stream.json
 </code></pre></div>
-<h2 id="parameters">Parameters<a class="headerlink" href="#parameters" title="Permanent link">&para;</a></h2>
+<h2 id="_3">参数说明<a class="headerlink" href="#_3" title="Permanent link">&para;</a></h2>
 <table>
 <thead>
 <tr>
-<th style="text-align: left;">Configuration</th>
-<th style="text-align: center;">Required</th>
-<th>Data Type</th>
-<th>Default Value</th>
-<th>Description</th>
+<th style="text-align: left;">配置项</th>
+<th style="text-align: center;">是否必须</th>
+<th>数据类型</th>
+<th>默认值</th>
+<th>描述</th>
 </tr>
 </thead>
 <tbody>
 <tr>
 <td style="text-align: left;">endpoint</td>
-<td style="text-align: center;">Yes</td>
+<td style="text-align: center;">是</td>
 <td>string</td>
-<td>None</td>
-<td>InfluxDB connection string</td>
+<td>无</td>
+<td>InfluxDB 连接串 ｜</td>
 </tr>
 <tr>
 <td style="text-align: left;">token</td>
-<td style="text-align: center;">Yes</td>
+<td style="text-align: center;">是</td>
 <td>string</td>
-<td>None</td>
-<td>Token for accessing database</td>
+<td>无</td>
+<td>访问数据库的 token</td>
 </tr>
 <tr>
 <td style="text-align: left;">table</td>
-<td style="text-align: center;">No</td>
+<td style="text-align: center;">否</td>
 <td>list</td>
-<td>None</td>
-<td>Selected table names (i.e., metrics) to be synchronized</td>
+<td>无</td>
+<td>所选取的需要同步的表名(即指标)</td>
 </tr>
 <tr>
 <td style="text-align: left;">org</td>
-<td style="text-align: center;">Yes</td>
+<td style="text-align: center;">是</td>
 <td>string</td>
-<td>None</td>
-<td>Specify InfluxDB org name</td>
+<td>无</td>
+<td>指定 InfluxDB 的 org 名称</td>
 </tr>
 <tr>
 <td style="text-align: left;">bucket</td>
-<td style="text-align: center;">Yes</td>
+<td style="text-align: center;">是</td>
 <td>string</td>
-<td>None</td>
-<td>Specify InfluxDB bucket name</td>
+<td>无</td>
+<td>指定 InfluxDB 的 bucket 名称</td>
 </tr>
 <tr>
 <td style="text-align: left;">column</td>
-<td style="text-align: center;">No</td>
+<td style="text-align: center;">否</td>
 <td>list</td>
-<td>None</td>
-<td>Collection of column names to be synchronized in configured table, detailed description see <a href="../rdbmsreader">rdbmreader</a></td>
+<td>无</td>
+<td>所配置的表中需要同步的列名集合，详细描述见 <a href="../rdbmsreader">rdbmreader</a></td>
 </tr>
 <tr>
 <td style="text-align: left;">range</td>
-<td style="text-align: center;">Yes</td>
+<td style="text-align: center;">是</td>
 <td>list</td>
-<td>None</td>
-<td>Time range for reading data</td>
+<td>无</td>
+<td>读取数据的时间范围</td>
 </tr>
 <tr>
 <td style="text-align: left;">limit</td>
-<td style="text-align: center;">No</td>
+<td style="text-align: center;">否</td>
 <td>int</td>
-<td>None</td>
-<td>Limit number of records to get</td>
+<td>无</td>
+<td>限制获取记录数</td>
 </tr>
 </tbody>
 </table>
 <h3 id="column">column<a class="headerlink" href="#column" title="Permanent link">&para;</a></h3>
-<p>If <code>column</code> is not specified, or <code>column</code> is specified as <code>["*"]</code>, all valid <code>_field</code> fields and <code>_time</code> field will be read.
-Otherwise, read according to specified fields.</p>
+<p>如果不指定 <code>column</code>, 或者指定 <code>column</code> 为 <code>["*"]</code> ， 则会读取所有有效的 <code>_field</code> 字段以及 <code>_time</code> 字段
+否则按照指定字段读取</p>
 <h3 id="range">range<a class="headerlink" href="#range" title="Permanent link">&para;</a></h3>
-<p><code>range</code> is used to specify the time range for reading metrics, with the following format:</p>
+<p><code>range</code> 用来指定读取指标的时间范围，其格式如下:</p>
 <div class="highlight"><pre><span></span><code><span class="p">{</span>
 <span class="w">  </span><span class="nt">&quot;range&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="s2">&quot;start_time&quot;</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;end_time&quot;</span><span class="p">]</span>
 <span class="p">}</span>
 </code></pre></div>
-<p><code>range</code> consists of a list of two strings, the first string represents start time, the second represents end time. The time expression format must comply with <a href="https://docs.influxdata.com/influxdb/v2.0/query-data/flux/">Flux format requirements</a>, like this:</p>
+<p><code>range</code>  由两个字符串组成的列表组成，第一个字符串表示开始时间，第二个表示结束时间。其时间表达方式要求符合 <a href="https://docs.influxdata.com/influxdb/v2.0/query-data/flux/">Flux 格式要求</a>,类似这样:</p>
 <div class="highlight"><pre><span></span><code><span class="p">{</span>
 <span class="w">  </span><span class="nt">&quot;range&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="s2">&quot;-15h&quot;</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;-2h&quot;</span><span class="p">]</span>
 <span class="p">}</span>
 </code></pre></div>
-<p>If you don't want to specify the second end time, you can omit it, like this:</p>
+<p>其中第二个结束时间如果不想指定，可以不写，类似这样：</p>
 <div class="highlight"><pre><span></span><code><span class="p">{</span>
 <span class="w">  </span><span class="nt">&quot;range&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="s2">&quot;-15h&quot;</span><span class="p">]</span>
 <span class="p">}</span>
 </code></pre></div>
-<h2 id="type-conversion">Type Conversion<a class="headerlink" href="#type-conversion" title="Permanent link">&para;</a></h2>
-<p>Current implementation treats all fields as strings.</p>
-<h2 id="limitations">Limitations<a class="headerlink" href="#limitations" title="Permanent link">&para;</a></h2>
+<h2 id="_4">类型转换<a class="headerlink" href="#_4" title="Permanent link">&para;</a></h2>
+<p>当前实现是将所有字段当作字符串处理</p>
+<h2 id="_5">限制<a class="headerlink" href="#_5" title="Permanent link">&para;</a></h2>
 <ol>
-<li>Current plugin only supports version 2.0 and above</li>
+<li>当前插件仅支持 2.0 及以上版本</li>
 </ol>
 
 

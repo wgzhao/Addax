@@ -809,7 +809,7 @@
         
   
   <span class="md-ellipsis">
-    Text File Reader
+    TxtFile Reader
   </span>
   
 
@@ -998,7 +998,7 @@
         
   
   <span class="md-ellipsis">
-    FTP Reader
+    Ftp Reader
   </span>
   
 
@@ -1794,19 +1794,19 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#example" class="md-nav__link">
+  <a href="#_1" class="md-nav__link">
     <span class="md-ellipsis">
-      Example
+      示例
     </span>
   </a>
   
-    <nav class="md-nav" aria-label="Example">
+    <nav class="md-nav" aria-label="示例">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#table-structure-and-data" class="md-nav__link">
+  <a href="#_2" class="md-nav__link">
     <span class="md-ellipsis">
-      Table Structure and Data
+      表结构以数据
     </span>
   </a>
   
@@ -1818,19 +1818,19 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#configuration" class="md-nav__link">
+  <a href="#_3" class="md-nav__link">
     <span class="md-ellipsis">
-      Configuration
+      配置
     </span>
   </a>
   
-    <nav class="md-nav" aria-label="Configuration">
+    <nav class="md-nav" aria-label="配置">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#execute-collection-command" class="md-nav__link">
+  <a href="#_4" class="md-nav__link">
     <span class="md-ellipsis">
-      Execute Collection Command
+      执行采集命令
     </span>
   </a>
   
@@ -1842,9 +1842,9 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#parameters" class="md-nav__link">
+  <a href="#_5" class="md-nav__link">
     <span class="md-ellipsis">
-      Parameters
+      参数说明
     </span>
   </a>
   
@@ -1954,7 +1954,7 @@
         
   
   <span class="md-ellipsis">
-    FTP Writer
+    Ftp Writer
   </span>
   
 
@@ -1975,7 +1975,7 @@
         
   
   <span class="md-ellipsis">
-    GreenPlum Writer
+    Greenplum Writer
   </span>
   
 
@@ -2038,7 +2038,7 @@
         
   
   <span class="md-ellipsis">
-    HBase11x Writer
+    HBase11X Writer
   </span>
   
 
@@ -2518,19 +2518,19 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#example" class="md-nav__link">
+  <a href="#_1" class="md-nav__link">
     <span class="md-ellipsis">
-      Example
+      示例
     </span>
   </a>
   
-    <nav class="md-nav" aria-label="Example">
+    <nav class="md-nav" aria-label="示例">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#table-structure-and-data" class="md-nav__link">
+  <a href="#_2" class="md-nav__link">
     <span class="md-ellipsis">
-      Table Structure and Data
+      表结构以数据
     </span>
   </a>
   
@@ -2542,19 +2542,19 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#configuration" class="md-nav__link">
+  <a href="#_3" class="md-nav__link">
     <span class="md-ellipsis">
-      Configuration
+      配置
     </span>
   </a>
   
-    <nav class="md-nav" aria-label="Configuration">
+    <nav class="md-nav" aria-label="配置">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#execute-collection-command" class="md-nav__link">
+  <a href="#_4" class="md-nav__link">
     <span class="md-ellipsis">
-      Execute Collection Command
+      执行采集命令
     </span>
   </a>
   
@@ -2566,9 +2566,9 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#parameters" class="md-nav__link">
+  <a href="#_5" class="md-nav__link">
     <span class="md-ellipsis">
-      Parameters
+      参数说明
     </span>
   </a>
   
@@ -2590,11 +2590,11 @@
 
 
 <h1 id="clickhouse-writer">ClickHouse Writer<a class="headerlink" href="#clickhouse-writer" title="Permanent link">&para;</a></h1>
-<p>ClickHouse Writer plugin is used to write data to <a href="https://clickhouse.tech">ClickHouse</a>.</p>
-<h2 id="example">Example<a class="headerlink" href="#example" title="Permanent link">&para;</a></h2>
-<p>The following example demonstrates reading content from one table in ClickHouse and writing it to another table with the same table structure, to test the data structures supported by the plugin.</p>
-<h3 id="table-structure-and-data">Table Structure and Data<a class="headerlink" href="#table-structure-and-data" title="Permanent link">&para;</a></h3>
-<p>Assume the table structure and data to be read are as follows:</p>
+<p>ClickHouse Writer 插件用于向 <a href="https://clickhouse.tech">ClickHouse</a> 写入数据。 </p>
+<h2 id="_1">示例<a class="headerlink" href="#_1" title="Permanent link">&para;</a></h2>
+<p>以下示例我们演示从 clickhouse 中读取一张表的内容，并写入到相同表结构的另外一张表中，用来测试插件所支持的数据结构</p>
+<h3 id="_2">表结构以数据<a class="headerlink" href="#_2" title="Permanent link">&para;</a></h3>
+<p>假定要读取的表结构及数据如下：</p>
 <div class="highlight"><pre><span></span><code><span class="k">CREATE</span><span class="w"> </span><span class="k">TABLE</span><span class="w"> </span><span class="n">ck_addax</span><span class="w"> </span><span class="p">(</span>
 <span class="w">    </span><span class="n">c_int8</span><span class="w"> </span><span class="nb">Int8</span><span class="p">,</span>
 <span class="w">    </span><span class="n">c_int16</span><span class="w"> </span><span class="n">Int16</span><span class="p">,</span>
@@ -2637,11 +2637,11 @@
 <span class="w">    </span><span class="s1">&#39;hello&#39;</span>
 <span class="p">);</span>
 </code></pre></div>
-<p>The table to be written uses the same structure as the read table, with the following DDL statement:</p>
+<p>要写入的表采取和读取表结构相同，其建表语句如下：</p>
 <div class="highlight"><pre><span></span><code><span class="k">create</span><span class="w"> </span><span class="k">table</span><span class="w"> </span><span class="n">ck_addax_writer</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="n">ck_addax</span><span class="p">;</span>
 </code></pre></div>
-<h2 id="configuration">Configuration<a class="headerlink" href="#configuration" title="Permanent link">&para;</a></h2>
-<p>The following is the configuration file</p>
+<h2 id="_3">配置<a class="headerlink" href="#_3" title="Permanent link">&para;</a></h2>
+<p>以下为配置文件</p>
 <div class="tabbed-set" data-tabs="1:1"><input checked="checked" id="__tabbed_1_1" name="__tabbed_1" type="radio" /><label for="__tabbed_1_1">job/clickhouse2clickhouse.json</label><div class="tabbed-content"></div>
 </div>
 <div class="highlight"><pre><span></span><code><span class="p">{</span>
@@ -2689,13 +2689,13 @@
 <span class="w">  </span><span class="p">}</span>
 <span class="p">}</span>
 </code></pre></div>
-<p>Save the above configuration file as <code>job/clickhouse2clickhouse.json</code></p>
-<h3 id="execute-collection-command">Execute Collection Command<a class="headerlink" href="#execute-collection-command" title="Permanent link">&para;</a></h3>
-<p>Execute the following command for data collection</p>
+<p>将上述配置文件保存为   <code>job/clickhouse2clickhouse.json</code></p>
+<h3 id="_4">执行采集命令<a class="headerlink" href="#_4" title="Permanent link">&para;</a></h3>
+<p>执行以下命令进行数据采集</p>
 <div class="highlight"><pre><span></span><code>bin/addax.sh<span class="w"> </span>job/clickhouse2clickhouse.json
 </code></pre></div>
-<h2 id="parameters">Parameters<a class="headerlink" href="#parameters" title="Permanent link">&para;</a></h2>
-<p>This plugin is based on <a href="../rdbmswriter">RDBMS Writer</a>, so you can refer to all configuration items of RDBMS Writer.</p>
+<h2 id="_5">参数说明<a class="headerlink" href="#_5" title="Permanent link">&para;</a></h2>
+<p>该插件基于 <a href="../rdbmswriter">RDBMS Writer</a> 实现，因此可以参考 RDBMS Writer 的所有配置项。</p>
 
 
 

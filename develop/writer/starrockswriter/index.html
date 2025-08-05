@@ -809,7 +809,7 @@
         
   
   <span class="md-ellipsis">
-    Text File Reader
+    TxtFile Reader
   </span>
   
 
@@ -998,7 +998,7 @@
         
   
   <span class="md-ellipsis">
-    FTP Reader
+    Ftp Reader
   </span>
   
 
@@ -1857,7 +1857,7 @@
         
   
   <span class="md-ellipsis">
-    FTP Writer
+    Ftp Writer
   </span>
   
 
@@ -1878,7 +1878,7 @@
         
   
   <span class="md-ellipsis">
-    GreenPlum Writer
+    Greenplum Writer
   </span>
   
 
@@ -1941,7 +1941,7 @@
         
   
   <span class="md-ellipsis">
-    HBase11x Writer
+    HBase11X Writer
   </span>
   
 
@@ -2256,18 +2256,27 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#configuration-example" class="md-nav__link">
+  <a href="#_1" class="md-nav__link">
     <span class="md-ellipsis">
-      Configuration Example
+      示例
     </span>
   </a>
   
 </li>
       
         <li class="md-nav__item">
-  <a href="#parameters" class="md-nav__link">
+  <a href="#_2" class="md-nav__link">
     <span class="md-ellipsis">
-      Parameters
+      参数说明
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_3" class="md-nav__link">
+    <span class="md-ellipsis">
+      类型转换
     </span>
   </a>
   
@@ -2479,18 +2488,27 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#configuration-example" class="md-nav__link">
+  <a href="#_1" class="md-nav__link">
     <span class="md-ellipsis">
-      Configuration Example
+      示例
     </span>
   </a>
   
 </li>
       
         <li class="md-nav__item">
-  <a href="#parameters" class="md-nav__link">
+  <a href="#_2" class="md-nav__link">
     <span class="md-ellipsis">
-      Parameters
+      参数说明
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_3" class="md-nav__link">
+    <span class="md-ellipsis">
+      类型转换
     </span>
   </a>
   
@@ -2512,9 +2530,24 @@
 
 
 <h1 id="starrocks-writer">StarRocks Writer<a class="headerlink" href="#starrocks-writer" title="Permanent link">&para;</a></h1>
-<p>StarRocks Writer plugin implements writing data to StarRocks.</p>
-<h2 id="configuration-example">Configuration Example<a class="headerlink" href="#configuration-example" title="Permanent link">&para;</a></h2>
-<p>This plugin is used to write data to StarRocks database. For detailed configuration and parameters, please refer to the original StarRocks Writer documentation.</p>
+<p>StarRocks Writer 插件用于向 <a href="https://www.starrocks.com/zh-CN/index">Starrocks</a> 数据库以流式方式写入数据。 其实现上是通过访问 Doris http 连接(8030)
+，然后通过 <a href="https://docs.starrocks.com/zh-cn/main/loading/StreamLoad">stream load</a>
+加载数据到数据中，相比 <code>insert into</code> 方式效率要高不少，也是官方推荐的生产环境下的数据加载方式。</p>
+<p>StarRocks 是一个兼容 MySQL 协议的数据库后端，因此 Doris 读取可以使用 <a href="../../reader/mysqlreader">MySQLReader</a> 进行访问。</p>
+<h2 id="_1">示例<a class="headerlink" href="#_1" title="Permanent link">&para;</a></h2>
+<p>假定要写入的表的建表语句如下：</p>
+<div class="highlight"><pre><span></span><code><span class="k">CREATE</span><span class="w"> </span><span class="k">DATABASE</span><span class="w"> </span><span class="n">example_db</span><span class="p">;</span>
+<span class="k">CREATE</span><span class="w"> </span><span class="k">TABLE</span><span class="w"> </span><span class="n">example_db</span><span class="p">.</span><span class="n">table1</span>
+<span class="p">(</span>
+<span class="w">    </span><span class="n">siteid</span><span class="w">   </span><span class="nb">INT</span><span class="w">         </span><span class="k">DEFAULT</span><span class="w"> </span><span class="s1">&#39;10&#39;</span><span class="p">,</span>
+<span class="w">    </span><span class="n">citycode</span><span class="w"> </span><span class="nb">SMALLINT</span><span class="p">,</span>
+<span class="w">    </span><span class="n">username</span><span class="w"> </span><span class="nb">VARCHAR</span><span class="p">(</span><span class="mi">32</span><span class="p">)</span><span class="w"> </span><span class="k">DEFAULT</span><span class="w"> </span><span class="s1">&#39;&#39;</span><span class="p">,</span>
+<span class="w">    </span><span class="n">pv</span><span class="w">       </span><span class="nb">BIGINT</span><span class="w"> </span><span class="k">SUM</span><span class="w"> </span><span class="k">DEFAULT</span><span class="w"> </span><span class="s1">&#39;0&#39;</span>
+<span class="p">)</span><span class="w"> </span><span class="k">AGGREGATE</span><span class="w"> </span><span class="k">KEY</span><span class="p">(</span><span class="n">siteid</span><span class="p">,</span><span class="w"> </span><span class="n">citycode</span><span class="p">,</span><span class="w"> </span><span class="n">username</span><span class="p">)</span>
+<span class="n">DISTRIBUTED</span><span class="w"> </span><span class="k">BY</span><span class="w"> </span><span class="n">HASH</span><span class="p">(</span><span class="n">siteid</span><span class="p">)</span><span class="w"> </span><span class="n">BUCKETS</span><span class="w"> </span><span class="mi">10</span>
+<span class="n">PROPERTIES</span><span class="p">(</span><span class="ss">&quot;replication_num&quot;</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="ss">&quot;1&quot;</span><span class="p">);</span>
+</code></pre></div>
+<p>下面配置一个从内存读取数据，然后写入到 doris 表的配置文件</p>
 <div class="highlight"><pre><span></span><code><span class="p">{</span>
 <span class="w">  </span><span class="nt">&quot;job&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
 <span class="w">    </span><span class="nt">&quot;setting&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
@@ -2575,8 +2608,74 @@
 <span class="w">  </span><span class="p">}</span>
 <span class="p">}</span>
 </code></pre></div>
-<h2 id="parameters">Parameters<a class="headerlink" href="#parameters" title="Permanent link">&para;</a></h2>
-<p>This plugin supports writing data to StarRocks with Stream Load capabilities and configurable connection options.</p>
+<p>将上述配置文件保存为 <code>job/stream2starrocks.json</code></p>
+<p>执行下面的命令</p>
+<div class="highlight"><pre><span></span><code>bin/addax.sh<span class="w"> </span>job/stream2starrocks.json
+</code></pre></div>
+<h2 id="_2">参数说明<a class="headerlink" href="#_2" title="Permanent link">&para;</a></h2>
+<p>该插件基于 <a href="../rdbmswriter">RDBMS Writer</a> 实现，因此可以参考 RDBMS Writer 的所有配置项，并增加了下面的配置项。</p>
+<table>
+<thead>
+<tr>
+<th style="text-align: left;">配置项</th>
+<th style="text-align: center;">是否必须</th>
+<th>类型</th>
+<th>默认值</th>
+<th>描述</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;">loadUrl</td>
+<td style="text-align: center;">是</td>
+<td>string</td>
+<td>无</td>
+<td>StarRocks FE 的地址用于StreamLoad<a href="https://docs.starrocks.com/zh-cn/main/loading/StreamLoad">1</a>，可以为多个fe地址，<code>fe_ip:fe_http_port</code></td>
+</tr>
+<tr>
+<td style="text-align: left;">maxBatchRows</td>
+<td style="text-align: center;">否</td>
+<td>int</td>
+<td>500000</td>
+<td>单次StreamLoad导入的最大行数</td>
+</tr>
+<tr>
+<td style="text-align: left;">maxBatchSize</td>
+<td style="text-align: center;">否</td>
+<td>int</td>
+<td>104857600</td>
+<td>单次StreamLoad导入的最大字节数</td>
+</tr>
+<tr>
+<td style="text-align: left;">flushInterval</td>
+<td style="text-align: center;">否</td>
+<td>int</td>
+<td>300000</td>
+<td>上一次StreamLoad结束至下一次开始的时间间隔(单位：ms)</td>
+</tr>
+<tr>
+<td style="text-align: left;">loadProps</td>
+<td style="text-align: center;">否</td>
+<td>map</td>
+<td></td>
+<td>streamLoad 的请求参数，详情参照<a href="https://docs.starrocks.com/zh-cn/main/loading/StreamLoad">StreamLoad介绍页面</a></td>
+</tr>
+</tbody>
+</table>
+<h2 id="_3">类型转换<a class="headerlink" href="#_3" title="Permanent link">&para;</a></h2>
+<p>默认传入的数据均会被转为字符串，并以<code>\t</code>作为列分隔符，<code>\n</code>作为行分隔符，组成<code>csv</code>文件进行StreamLoad导入操作。
+如需更改列分隔符， 则正确配置 <code>loadProps</code> 即可：
+<div class="highlight"><pre><span></span><code><span class="nt">&quot;loadProps&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="nt">&quot;column_separator&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;\\x01&quot;</span><span class="p">,</span>
+<span class="w">    </span><span class="nt">&quot;row_delimiter&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;\\x02&quot;</span>
+<span class="p">}</span>
+</code></pre></div></p>
+<p>如需更改导入格式为<code>json</code>， 则正确配置 <code>loadProps</code> 即可：
+<div class="highlight"><pre><span></span><code><span class="nt">&quot;loadProps&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="nt">&quot;format&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;json&quot;</span><span class="p">,</span>
+<span class="w">    </span><span class="nt">&quot;strip_outer_array&quot;</span><span class="p">:</span><span class="w"> </span><span class="kc">true</span>
+<span class="p">}</span>
+</code></pre></div></p>
 
 
 

@@ -814,7 +814,7 @@
         
   
   <span class="md-ellipsis">
-    Text File Reader
+    TxtFile Reader
   </span>
   
 
@@ -877,22 +877,22 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#example" class="md-nav__link">
+  <a href="#_1" class="md-nav__link">
     <span class="md-ellipsis">
-      Example
+      示例
     </span>
   </a>
   
 </li>
       
         <li class="md-nav__item">
-  <a href="#parameters" class="md-nav__link">
+  <a href="#_2" class="md-nav__link">
     <span class="md-ellipsis">
-      Parameters
+      参数说明
     </span>
   </a>
   
-    <nav class="md-nav" aria-label="Parameters">
+    <nav class="md-nav" aria-label="参数说明">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
@@ -1085,7 +1085,7 @@
         
   
   <span class="md-ellipsis">
-    FTP Reader
+    Ftp Reader
   </span>
   
 
@@ -1939,7 +1939,7 @@
         
   
   <span class="md-ellipsis">
-    FTP Writer
+    Ftp Writer
   </span>
   
 
@@ -1960,7 +1960,7 @@
         
   
   <span class="md-ellipsis">
-    GreenPlum Writer
+    Greenplum Writer
   </span>
   
 
@@ -2023,7 +2023,7 @@
         
   
   <span class="md-ellipsis">
-    HBase11x Writer
+    HBase11X Writer
   </span>
   
 
@@ -2503,22 +2503,22 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#example" class="md-nav__link">
+  <a href="#_1" class="md-nav__link">
     <span class="md-ellipsis">
-      Example
+      示例
     </span>
   </a>
   
 </li>
       
         <li class="md-nav__item">
-  <a href="#parameters" class="md-nav__link">
+  <a href="#_2" class="md-nav__link">
     <span class="md-ellipsis">
-      Parameters
+      参数说明
     </span>
   </a>
   
-    <nav class="md-nav" aria-label="Parameters">
+    <nav class="md-nav" aria-label="参数说明">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
@@ -2560,9 +2560,9 @@
 
 
 <h1 id="elasticsearchreader">ElasticSearchReader<a class="headerlink" href="#elasticsearchreader" title="Permanent link">&para;</a></h1>
-<p>ElasticSearchReader plugin implements the functionality of reading indexes from <a href="https://www.elastic.co/cn/elasticsearch/">Elasticsearch</a>. It uses the Rest API provided by Elasticsearch (default port 9200) to execute specified query statements and batch retrieve data.</p>
-<h2 id="example">Example<a class="headerlink" href="#example" title="Permanent link">&para;</a></h2>
-<p>Assume the index content to be retrieved is as follows</p>
+<p>ElasticSearchReader 插件实现了从 <a href="https://www.elastic.co/cn/elasticsearch/">Elasticsearch</a> 读取索引的功能， 它通过 Elasticsearch 提供的 Rest API （默认端口9200），执行指定的查询语句批量获取数据</p>
+<h2 id="_1">示例<a class="headerlink" href="#_1" title="Permanent link">&para;</a></h2>
+<p>假定要获取的索引内容如下</p>
 <div class="highlight"><pre><span></span><code><span class="p">{</span>
 <span class="w">  </span><span class="nt">&quot;took&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">14</span><span class="p">,</span>
 <span class="w">  </span><span class="nt">&quot;timed_out&quot;</span><span class="p">:</span><span class="w"> </span><span class="kc">false</span><span class="p">,</span>
@@ -2612,7 +2612,7 @@
 <span class="w">  </span><span class="p">}</span>
 <span class="p">}</span>
 </code></pre></div>
-<p>Configure a task to read data from Elasticsearch and print to terminal</p>
+<p>配置一个从 Elasticsearch 读取数据并打印到终端的任务</p>
 <div class="tabbed-set" data-tabs="1:1"><input checked="checked" id="__tabbed_1_1" name="__tabbed_1" type="radio" /><label for="__tabbed_1_1">job/es2stream.json</label><div class="tabbed-content"></div>
 </div>
 <div class="highlight"><pre><span></span><code><span class="p">{</span>
@@ -2675,11 +2675,11 @@
 <span class="w">  </span><span class="p">}</span>
 <span class="p">}</span>
 </code></pre></div>
-<p>Save the above content as <code>job/es2stream.json</code></p>
-<p>Execute the following command for collection</p>
+<p>将上述内容保存为 <code>job/es2stream.json</code></p>
+<p>执行下面的命令进行采集</p>
 <div class="highlight"><pre><span></span><code>bin/addax.sh<span class="w"> </span>job/es2stream.json
 </code></pre></div>
-<p>The output result is similar to the following (output records are reduced):</p>
+<p>其输出结果类似如下（输出记录数有删减)</p>
 <div class="highlight"><pre><span></span><code>2021-02-19 13:38:15.860 [main] INFO  VMInfo - VMInfo# operatingSystem class =&gt; com.sun.management.internal.OperatingSystemImpl
 2021-02-19 13:38:15.895 [main] INFO  Engine -
 {
@@ -2766,120 +2766,120 @@
 读出记录总数                    :                   2
 读写失败总数                    :                   0
 </code></pre></div>
-<h2 id="parameters">Parameters<a class="headerlink" href="#parameters" title="Permanent link">&para;</a></h2>
+<h2 id="_2">参数说明<a class="headerlink" href="#_2" title="Permanent link">&para;</a></h2>
 <table>
 <thead>
 <tr>
-<th style="text-align: left;">Configuration</th>
-<th style="text-align: center;">Required</th>
-<th>Type</th>
-<th>Default Value</th>
-<th>Description</th>
+<th style="text-align: left;">配置项</th>
+<th style="text-align: center;">是否必须</th>
+<th>类型</th>
+<th>默认值</th>
+<th>描述</th>
 </tr>
 </thead>
 <tbody>
 <tr>
 <td style="text-align: left;">endpoint</td>
-<td style="text-align: center;">Yes</td>
+<td style="text-align: center;">是</td>
 <td>string</td>
-<td>None</td>
-<td>ElasticSearch connection address</td>
+<td>无</td>
+<td>ElasticSearch的连接地址</td>
 </tr>
 <tr>
 <td style="text-align: left;">accessId</td>
-<td style="text-align: center;">No</td>
+<td style="text-align: center;">否</td>
 <td>string</td>
 <td><code>""</code></td>
-<td>User in http auth</td>
+<td>http auth中的user</td>
 </tr>
 <tr>
 <td style="text-align: left;">accessKey</td>
-<td style="text-align: center;">No</td>
+<td style="text-align: center;">否</td>
 <td>string</td>
 <td><code>""</code></td>
-<td>Password in http auth</td>
+<td>http auth中的password</td>
 </tr>
 <tr>
 <td style="text-align: left;">index</td>
-<td style="text-align: center;">Yes</td>
+<td style="text-align: center;">是</td>
 <td>string</td>
-<td>None</td>
-<td>Index name in elasticsearch</td>
+<td>无</td>
+<td>elasticsearch中的index名</td>
 </tr>
 <tr>
 <td style="text-align: left;">type</td>
-<td style="text-align: center;">No</td>
+<td style="text-align: center;">否</td>
 <td>string</td>
-<td>index name</td>
-<td>Type name of index in elasticsearch</td>
+<td>index名</td>
+<td>elasticsearch中index的type名</td>
 </tr>
 <tr>
 <td style="text-align: left;">search</td>
-<td style="text-align: center;">Yes</td>
+<td style="text-align: center;">是</td>
 <td>list</td>
 <td><code>[]</code></td>
-<td>JSON format API search data body</td>
+<td>json格式api搜索数据体</td>
 </tr>
 <tr>
 <td style="text-align: left;">column</td>
-<td style="text-align: center;">Yes</td>
+<td style="text-align: center;">是</td>
 <td>list</td>
-<td>None</td>
-<td>Fields to be read</td>
+<td>无</td>
+<td>需要读取的字段</td>
 </tr>
 <tr>
 <td style="text-align: left;">timeout</td>
-<td style="text-align: center;">No</td>
+<td style="text-align: center;">否</td>
 <td>int</td>
 <td>60</td>
-<td>Client timeout (unit: seconds)</td>
+<td>客户端超时时间(单位：秒)</td>
 </tr>
 <tr>
 <td style="text-align: left;">discovery</td>
-<td style="text-align: center;">No</td>
+<td style="text-align: center;">否</td>
 <td>boolean</td>
 <td>false</td>
-<td>Enable node discovery (polling) and periodically update server list in client</td>
+<td>启用节点发现(轮询)并定期更新客户机中的服务器列表</td>
 </tr>
 <tr>
 <td style="text-align: left;">compression</td>
-<td style="text-align: center;">No</td>
+<td style="text-align: center;">否</td>
 <td>boolean</td>
 <td>true</td>
-<td>HTTP request, enable compression</td>
+<td>http请求，开启压缩</td>
 </tr>
 <tr>
 <td style="text-align: left;">multiThread</td>
-<td style="text-align: center;">No</td>
+<td style="text-align: center;">否</td>
 <td>boolean</td>
 <td>true</td>
-<td>HTTP request, whether multi-threaded</td>
+<td>http请求，是否有多线程</td>
 </tr>
 <tr>
 <td style="text-align: left;">searchType</td>
-<td style="text-align: center;">No</td>
+<td style="text-align: center;">否</td>
 <td>string</td>
 <td><code>dfs_query_then_fetch</code></td>
-<td>Search type</td>
+<td>搜索类型</td>
 </tr>
 <tr>
 <td style="text-align: left;">headers</td>
-<td style="text-align: center;">No</td>
+<td style="text-align: center;">否</td>
 <td>map</td>
 <td><code>{}</code></td>
-<td>HTTP request headers</td>
+<td>http请求头</td>
 </tr>
 <tr>
 <td style="text-align: left;">scroll</td>
-<td style="text-align: center;">No</td>
+<td style="text-align: center;">否</td>
 <td>string</td>
 <td><code>""</code></td>
-<td>Scroll pagination configuration</td>
+<td>滚动分页配置</td>
 </tr>
 </tbody>
 </table>
 <h3 id="search">search<a class="headerlink" href="#search" title="Permanent link">&para;</a></h3>
-<p>The search configuration item allows configuration of content that meets Elasticsearch API query requirements, like this:</p>
+<p>search 配置项允许配置为满足 Elasticsearch API 查询要求的内容，比如这样：</p>
 <div class="highlight"><pre><span></span><code><span class="p">{</span>
 <span class="w">  </span><span class="nt">&quot;query&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
 <span class="w">    </span><span class="nt">&quot;match&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
@@ -2897,7 +2897,7 @@
 <span class="p">}</span>
 </code></pre></div>
 <h3 id="searchtype">searchType<a class="headerlink" href="#searchtype" title="Permanent link">&para;</a></h3>
-<p>searchType currently supports the following types:</p>
+<p>searchType 目前支持以下几种：</p>
 <ul>
 <li>dfs_query_then_fetch</li>
 <li>query_then_fetch</li>
@@ -2941,7 +2941,7 @@
       <nav class="md-footer__inner md-grid" aria-label="Footer" >
         
           
-          <a href="../txtfilereader/" class="md-footer__link md-footer__link--prev" aria-label="Previous: Text File Reader">
+          <a href="../txtfilereader/" class="md-footer__link md-footer__link--prev" aria-label="Previous: TxtFile Reader">
             <div class="md-footer__button md-icon">
               
               <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11h12Z"/></svg>
@@ -2951,7 +2951,7 @@
                 Previous
               </span>
               <div class="md-ellipsis">
-                Text File Reader
+                TxtFile Reader
               </div>
             </div>
           </a>

@@ -814,7 +814,7 @@
         
   
   <span class="md-ellipsis">
-    Text File Reader
+    TxtFile Reader
   </span>
   
 
@@ -1003,7 +1003,7 @@
         
   
   <span class="md-ellipsis">
-    FTP Reader
+    Ftp Reader
   </span>
   
 
@@ -1297,28 +1297,28 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#example" class="md-nav__link">
+  <a href="#_1" class="md-nav__link">
     <span class="md-ellipsis">
-      Example
+      示例
     </span>
   </a>
   
-    <nav class="md-nav" aria-label="Example">
+    <nav class="md-nav" aria-label="示例">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#create-task-file" class="md-nav__link">
+  <a href="#_2" class="md-nav__link">
     <span class="md-ellipsis">
-      Create Task File
+      创建任务文件
     </span>
   </a>
   
 </li>
         
           <li class="md-nav__item">
-  <a href="#run" class="md-nav__link">
+  <a href="#_3" class="md-nav__link">
     <span class="md-ellipsis">
-      Run
+      运行
     </span>
   </a>
   
@@ -1330,13 +1330,13 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#parameters" class="md-nav__link">
+  <a href="#_4" class="md-nav__link">
     <span class="md-ellipsis">
-      Parameters
+      参数说明
     </span>
   </a>
   
-    <nav class="md-nav" aria-label="Parameters">
+    <nav class="md-nav" aria-label="参数说明">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
@@ -1354,9 +1354,9 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#limitations" class="md-nav__link">
+  <a href="#_5" class="md-nav__link">
     <span class="md-ellipsis">
-      Limitations
+      限制
     </span>
   </a>
   
@@ -1963,7 +1963,7 @@
         
   
   <span class="md-ellipsis">
-    FTP Writer
+    Ftp Writer
   </span>
   
 
@@ -1984,7 +1984,7 @@
         
   
   <span class="md-ellipsis">
-    GreenPlum Writer
+    Greenplum Writer
   </span>
   
 
@@ -2047,7 +2047,7 @@
         
   
   <span class="md-ellipsis">
-    HBase11x Writer
+    HBase11X Writer
   </span>
   
 
@@ -2527,28 +2527,28 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#example" class="md-nav__link">
+  <a href="#_1" class="md-nav__link">
     <span class="md-ellipsis">
-      Example
+      示例
     </span>
   </a>
   
-    <nav class="md-nav" aria-label="Example">
+    <nav class="md-nav" aria-label="示例">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#create-task-file" class="md-nav__link">
+  <a href="#_2" class="md-nav__link">
     <span class="md-ellipsis">
-      Create Task File
+      创建任务文件
     </span>
   </a>
   
 </li>
         
           <li class="md-nav__item">
-  <a href="#run" class="md-nav__link">
+  <a href="#_3" class="md-nav__link">
     <span class="md-ellipsis">
-      Run
+      运行
     </span>
   </a>
   
@@ -2560,13 +2560,13 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#parameters" class="md-nav__link">
+  <a href="#_4" class="md-nav__link">
     <span class="md-ellipsis">
-      Parameters
+      参数说明
     </span>
   </a>
   
-    <nav class="md-nav" aria-label="Parameters">
+    <nav class="md-nav" aria-label="参数说明">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
@@ -2584,9 +2584,9 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#limitations" class="md-nav__link">
+  <a href="#_5" class="md-nav__link">
     <span class="md-ellipsis">
-      Limitations
+      限制
     </span>
   </a>
   
@@ -2608,11 +2608,11 @@
 
 
 <h1 id="kafka-reader">Kafka Reader<a class="headerlink" href="#kafka-reader" title="Permanent link">&para;</a></h1>
-<p>Kafka Reader plugin implements the functionality of reading JSON format messages from Kafka queues. This plugin was introduced in version <code>4.0.10</code>.</p>
-<h2 id="example">Example<a class="headerlink" href="#example" title="Permanent link">&para;</a></h2>
-<p>The following configuration demonstrates how to read from specified topics in Kafka and output to terminal.</p>
-<h3 id="create-task-file">Create Task File<a class="headerlink" href="#create-task-file" title="Permanent link">&para;</a></h3>
-<p>First create a task file <code>kafka2stream.json</code>, with the following content:</p>
+<p>Kafka Reader 插件实现从 Kafka 队列中读取 JSON 格式消息的功能。 该插件在 <code>4.0.10</code> 版本中引入。</p>
+<h2 id="_1">示例<a class="headerlink" href="#_1" title="Permanent link">&para;</a></h2>
+<p>以下配置演示了如何从从 kafka 的读取指定 topic 中，并输出到终端上。</p>
+<h3 id="_2">创建任务文件<a class="headerlink" href="#_2" title="Permanent link">&para;</a></h3>
+<p>首先创建一个任务文件  <code>kafka2stream.json</code> , 内容如下：</p>
 <div class="highlight"><pre><span></span><code><span class="p">{</span>
 <span class="w">  </span><span class="nt">&quot;job&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
 <span class="w">    </span><span class="nt">&quot;setting&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
@@ -2650,70 +2650,72 @@
 <span class="w">  </span><span class="p">}</span>
 <span class="p">}</span>
 </code></pre></div>
-<h3 id="run">Run<a class="headerlink" href="#run" title="Permanent link">&para;</a></h3>
-<p>Execute the <code>bin/addax.sh kafka2stream.json</code> command.</p>
-<h2 id="parameters">Parameters<a class="headerlink" href="#parameters" title="Permanent link">&para;</a></h2>
+<h3 id="_3">运行<a class="headerlink" href="#_3" title="Permanent link">&para;</a></h3>
+<p>执行  <code>bin/addax.sh kafka2stream.json</code> 命令。</p>
+<h2 id="_4">参数说明<a class="headerlink" href="#_4" title="Permanent link">&para;</a></h2>
 <table>
 <thead>
 <tr>
-<th style="text-align: left;">Configuration</th>
-<th style="text-align: center;">Required</th>
-<th>Data Type</th>
-<th>Default Value</th>
-<th>Description</th>
+<th style="text-align: left;">配置项</th>
+<th style="text-align: center;">是否必须</th>
+<th>数据类型</th>
+<th>默认值</th>
+<th>描述</th>
 </tr>
 </thead>
 <tbody>
 <tr>
 <td style="text-align: left;">brokerList</td>
-<td style="text-align: center;">Yes</td>
+<td style="text-align: center;">是</td>
 <td>string</td>
-<td>None</td>
-<td>Broker configuration for connecting to kafka service, like <code>localhost:9092</code>, multiple brokers separated by commas (<code>,</code>)</td>
+<td>无</td>
+<td>连接 kafka 服务的 broker 配置，类似 <code>localhost:9092</code> ，多个 broker之间用逗号(<code>,</code>)分隔</td>
 </tr>
 <tr>
 <td style="text-align: left;">topic</td>
-<td style="text-align: center;">Yes</td>
+<td style="text-align: center;">是</td>
 <td>string</td>
-<td>None</td>
-<td>Topic to write to</td>
+<td>无</td>
+<td>要写入的 topic</td>
 </tr>
 <tr>
 <td style="text-align: left;">column</td>
-<td style="text-align: center;">Yes</td>
+<td style="text-align: center;">是</td>
 <td>list</td>
-<td>None</td>
-<td>Collection of column names to be synchronized in the configured table, detailed below</td>
+<td>无</td>
+<td>所配置的表中需要同步的列名集合，以下详述</td>
 </tr>
 <tr>
 <td style="text-align: left;">missingKeyValue</td>
-<td style="text-align: center;">No</td>
+<td style="text-align: center;">否</td>
 <td>string</td>
-<td>None</td>
-<td>What value to fill when field does not exist, detailed below</td>
+<td>无</td>
+<td>字段不存在时用什么值填充，以下详述</td>
 </tr>
 <tr>
 <td style="text-align: left;">properties</td>
-<td style="text-align: center;">No</td>
+<td style="text-align: center;">否</td>
 <td>map</td>
-<td>None</td>
-<td>Other kafka connection parameters to be set</td>
+<td>无</td>
+<td>需要设置的其他 kafka 连接参数</td>
 </tr>
 </tbody>
 </table>
 <h3 id="column">column<a class="headerlink" href="#column" title="Permanent link">&para;</a></h3>
-<p><code>column</code> is used to specify the keys to read from JSON messages. If set to <code>*</code>, it means reading all keys in the message. Note that in this case, the output will not be sorted, meaning the output order of keys for each record is not guaranteed to be consistent.</p>
-<p>You can also specify keys to read, for example:</p>
+<p><code>column</code> 用来指定要读取的 JSON 消息中的 key，如果填写为 <code>*</code> ，则表示读取消息中的所有 key。但要注意，这种情况下，一是输出不会有排序，也就是说第每条记录的 key 的
+输出顺序不确保一致。</p>
+<p>也可以指定 key 来进行读取，比如</p>
 <div class="highlight"><pre><span></span><code><span class="p">{</span>
 <span class="w">  </span><span class="nt">&quot;column&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="s2">&quot;col1&quot;</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;col2&quot;</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;col3&quot;</span><span class="p">]</span>
 <span class="p">}</span>
 </code></pre></div>
-<p>This way, the plugin will try to read the corresponding keys in the given order. If a key to be read does not exist in a message, the plugin will report an error and exit. If you want it not to exit, you can set <code>missingKeyValue</code>, which represents the value to fill when the key to be read does not exist.</p>
-<p>Additionally, the plugin will automatically guess the type of the key value being read. If the type cannot be guessed, it will be treated as String type.</p>
-<h2 id="limitations">Limitations<a class="headerlink" href="#limitations" title="Permanent link">&para;</a></h2>
+<p>这样，插件会尝试按照给定的顺序去读取相应的 key，如果一条消息中要读取的 key 不存在，插件会报错并退出。如果希望不退出，则可以设置 <code>missingKeyValue</code>
+他表示当要读取的 key 不存在时，用该配置的值来填充。</p>
+<p>另外，读取的 key 的值的类型，插件会自动去猜测，如果类型无法猜测，则会当作 String 类型。</p>
+<h2 id="_5">限制<a class="headerlink" href="#_5" title="Permanent link">&para;</a></h2>
 <ol>
-<li>Only supports Kafka <code>1.0</code> and above versions, versions below this cannot be guaranteed to work</li>
-<li>Currently does not support kafka services with <code>kerberos</code> authentication enabled</li>
+<li>仅支持 Kafka <code>1.0</code> 及以上版本，低于该版本的无法确定是否能写入</li>
+<li>当前不支持启用了 <code>kerberos</code> 认证的 kafka 服务</li>
 </ol>
 
 

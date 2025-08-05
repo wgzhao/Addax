@@ -809,7 +809,7 @@
         
   
   <span class="md-ellipsis">
-    Text File Reader
+    TxtFile Reader
   </span>
   
 
@@ -998,7 +998,7 @@
         
   
   <span class="md-ellipsis">
-    FTP Reader
+    Ftp Reader
   </span>
   
 
@@ -1731,27 +1731,27 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#configuration-example" class="md-nav__link">
+  <a href="#_1" class="md-nav__link">
     <span class="md-ellipsis">
-      Configuration Example
+      配置样例
     </span>
   </a>
   
 </li>
       
         <li class="md-nav__item">
-  <a href="#parameters" class="md-nav__link">
+  <a href="#_2" class="md-nav__link">
     <span class="md-ellipsis">
-      Parameters
+      参数说明
     </span>
   </a>
   
 </li>
       
         <li class="md-nav__item">
-  <a href="#constraints" class="md-nav__link">
+  <a href="#_3" class="md-nav__link">
     <span class="md-ellipsis">
-      Constraints
+      约束限制
     </span>
   </a>
   
@@ -1924,7 +1924,7 @@
         
   
   <span class="md-ellipsis">
-    FTP Writer
+    Ftp Writer
   </span>
   
 
@@ -1945,7 +1945,7 @@
         
   
   <span class="md-ellipsis">
-    GreenPlum Writer
+    Greenplum Writer
   </span>
   
 
@@ -2008,7 +2008,7 @@
         
   
   <span class="md-ellipsis">
-    HBase11x Writer
+    HBase11X Writer
   </span>
   
 
@@ -2488,27 +2488,27 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#configuration-example" class="md-nav__link">
+  <a href="#_1" class="md-nav__link">
     <span class="md-ellipsis">
-      Configuration Example
+      配置样例
     </span>
   </a>
   
 </li>
       
         <li class="md-nav__item">
-  <a href="#parameters" class="md-nav__link">
+  <a href="#_2" class="md-nav__link">
     <span class="md-ellipsis">
-      Parameters
+      参数说明
     </span>
   </a>
   
 </li>
       
         <li class="md-nav__item">
-  <a href="#constraints" class="md-nav__link">
+  <a href="#_3" class="md-nav__link">
     <span class="md-ellipsis">
-      Constraints
+      约束限制
     </span>
   </a>
   
@@ -2530,9 +2530,9 @@
 
 
 <h1 id="elasticsearch-writer">ElasticSearch Writer<a class="headerlink" href="#elasticsearch-writer" title="Permanent link">&para;</a></h1>
-<p>ElasticSearch Writer plugin is used to write data to <a href="https://www.elastic.co/cn/elastic-stack/">ElasticSearch</a>.
-It is implemented through elasticsearch's rest api interface, writing data to elasticsearch in batches.</p>
-<h2 id="configuration-example">Configuration Example<a class="headerlink" href="#configuration-example" title="Permanent link">&para;</a></h2>
+<p>ElasticSearch Writer 插件用于向 <a href="https://www.elastic.co/cn/elastic-stack/">ElasticSearch</a> 写入数据。
+其实现是通过 elasticsearch 的 rest api 接口， 批量把据写入 elasticsearch</p>
+<h2 id="_1">配置样例<a class="headerlink" href="#_1" title="Permanent link">&para;</a></h2>
 <div class="tabbed-set" data-tabs="1:1"><input checked="checked" id="__tabbed_1_1" name="__tabbed_1" type="radio" /><label for="__tabbed_1_1">job/stream2es.json</label><div class="tabbed-content"></div>
 </div>
 <div class="highlight"><pre><span></span><code><span class="p">{</span>
@@ -2677,164 +2677,164 @@ It is implemented through elasticsearch's rest api interface, writing data to el
 <span class="w">  </span><span class="p">}</span>
 <span class="p">}</span>
 </code></pre></div>
-<h2 id="parameters">Parameters<a class="headerlink" href="#parameters" title="Permanent link">&para;</a></h2>
+<h2 id="_2">参数说明<a class="headerlink" href="#_2" title="Permanent link">&para;</a></h2>
 <table>
 <thead>
 <tr>
-<th style="text-align: left;">Configuration</th>
-<th style="text-align: center;">Required</th>
-<th>Data Type</th>
-<th>Default Value</th>
-<th>Description</th>
+<th style="text-align: left;">配置项</th>
+<th style="text-align: center;">是否必须</th>
+<th>数据类型</th>
+<th>默认值</th>
+<th>描述</th>
 </tr>
 </thead>
 <tbody>
 <tr>
 <td style="text-align: left;">endpoint</td>
-<td style="text-align: center;">Yes</td>
+<td style="text-align: center;">是</td>
 <td>string</td>
-<td>None</td>
-<td>ElasticSearch connection address, if cluster, multiple addresses separated by comma (,)</td>
+<td>无</td>
+<td>ElasticSearch 的连接地址,如果是集群，则多个地址用逗号(,)分割</td>
 </tr>
 <tr>
 <td style="text-align: left;">accessId</td>
-<td style="text-align: center;">No</td>
+<td style="text-align: center;">否</td>
 <td>string</td>
-<td>Empty</td>
-<td>User in http auth, default is empty</td>
+<td>空</td>
+<td>http auth 中的 user, 默认为空</td>
 </tr>
 <tr>
 <td style="text-align: left;">accessKey</td>
-<td style="text-align: center;">No</td>
+<td style="text-align: center;">否</td>
 <td>string</td>
-<td>Empty</td>
-<td>Password in http auth</td>
+<td>空</td>
+<td>http auth 中的 password</td>
 </tr>
 <tr>
 <td style="text-align: left;">index</td>
-<td style="text-align: center;">Yes</td>
+<td style="text-align: center;">是</td>
 <td>string</td>
-<td>None</td>
-<td>Index name</td>
+<td>无</td>
+<td>index 名</td>
 </tr>
 <tr>
 <td style="text-align: left;">type</td>
-<td style="text-align: center;">No</td>
+<td style="text-align: center;">否</td>
 <td>string</td>
 <td><code>default</code></td>
-<td>Index type</td>
+<td>index 类型</td>
 </tr>
 <tr>
 <td style="text-align: left;">cleanup</td>
-<td style="text-align: center;">No</td>
+<td style="text-align: center;">否</td>
 <td>boolean</td>
 <td>false</td>
-<td>Whether to delete original table</td>
+<td>是否删除原表</td>
 </tr>
 <tr>
 <td style="text-align: left;">batchSize</td>
-<td style="text-align: center;">No</td>
+<td style="text-align: center;">否</td>
 <td>int</td>
 <td>1000</td>
-<td>Number of records in each batch</td>
+<td>每次批量数据的条数</td>
 </tr>
 <tr>
 <td style="text-align: left;">trySize</td>
-<td style="text-align: center;">No</td>
+<td style="text-align: center;">否</td>
 <td>int</td>
 <td>30</td>
-<td>Number of retries after failure</td>
+<td>失败后重试的次数</td>
 </tr>
 <tr>
 <td style="text-align: left;">timeout</td>
-<td style="text-align: center;">No</td>
+<td style="text-align: center;">否</td>
 <td>int</td>
 <td>600000</td>
-<td>Client timeout in milliseconds (ms)</td>
+<td>客户端超时时间，单位为毫秒(ms)</td>
 </tr>
 <tr>
 <td style="text-align: left;">discovery</td>
-<td style="text-align: center;">No</td>
+<td style="text-align: center;">否</td>
 <td>boolean</td>
 <td>false</td>
-<td>Enable node discovery (polling) and periodically update server list in client</td>
+<td>启用节点发现将(轮询)并定期更新客户机中的服务器列表</td>
 </tr>
 <tr>
 <td style="text-align: left;">compression</td>
-<td style="text-align: center;">No</td>
+<td style="text-align: center;">否</td>
 <td>boolean</td>
 <td>true</td>
-<td>Whether to enable http request compression</td>
+<td>否是开启 http 请求压缩</td>
 </tr>
 <tr>
 <td style="text-align: left;">multiThread</td>
-<td style="text-align: center;">No</td>
+<td style="text-align: center;">否</td>
 <td>boolean</td>
 <td>true</td>
-<td>Whether to enable multi-threaded http requests</td>
+<td>是否开启多线程 http 请求</td>
 </tr>
 <tr>
 <td style="text-align: left;">ignoreWriteError</td>
-<td style="text-align: center;">No</td>
+<td style="text-align: center;">否</td>
 <td>boolean</td>
 <td>false</td>
-<td>Whether to retry on write error, if <code>true</code> means always retry, otherwise ignore the record</td>
+<td>写入错误时，是否重试，如果是 <code>true</code> 则表示一直重试，否则忽略该条数据</td>
 </tr>
 <tr>
 <td style="text-align: left;">ignoreParseError</td>
-<td style="text-align: center;">No</td>
+<td style="text-align: center;">否</td>
 <td>boolean</td>
 <td>true</td>
-<td>Whether to continue writing when data format parsing error occurs</td>
+<td>解析数据格式错误时，是否继续写入</td>
 </tr>
 <tr>
 <td style="text-align: left;">alias</td>
-<td style="text-align: center;">No</td>
+<td style="text-align: center;">否</td>
 <td>string</td>
-<td>None</td>
-<td>Alias to write after data import is completed</td>
+<td>无</td>
+<td>数据导入完成后写入别名</td>
 </tr>
 <tr>
 <td style="text-align: left;">aliasMode</td>
-<td style="text-align: center;">No</td>
+<td style="text-align: center;">否</td>
 <td>string</td>
 <td>append</td>
-<td>Mode for adding alias after data import completion, append (add mode), exclusive (keep only this one)</td>
+<td>数据导入完成后增加别名的模式，append(增加模式), exclusive(只留这一个)</td>
 </tr>
 <tr>
 <td style="text-align: left;">settings</td>
-<td style="text-align: center;">No</td>
+<td style="text-align: center;">否</td>
 <td>map</td>
-<td>None</td>
-<td>Settings when creating index, same as elasticsearch official</td>
+<td>无</td>
+<td>创建 index 时候的 settings, 与 elasticsearch 官方相同</td>
 </tr>
 <tr>
 <td style="text-align: left;">splitter</td>
-<td style="text-align: center;">No</td>
+<td style="text-align: center;">否</td>
 <td>string</td>
 <td><code>,</code></td>
-<td>If inserted data is array, use specified delimiter</td>
+<td>如果插入数据是 array，就使用指定分隔符</td>
 </tr>
 <tr>
 <td style="text-align: left;">column</td>
-<td style="text-align: center;">Yes</td>
+<td style="text-align: center;">是</td>
 <td><code>list&lt;map&gt;</code></td>
-<td>None</td>
-<td>Field types, the example in the document includes all supported field types</td>
+<td>无</td>
+<td>字段类型，文档中给出的样例中包含了全部支持的字段类型</td>
 </tr>
 <tr>
 <td style="text-align: left;">dynamic</td>
-<td style="text-align: center;">No</td>
+<td style="text-align: center;">否</td>
 <td>boolean</td>
 <td>false</td>
-<td>Don't use addax mappings, use es's own automatic mappings</td>
+<td>不使用 addax 的 mappings，使用 es 自己的自动 mappings</td>
 </tr>
 </tbody>
 </table>
-<h2 id="constraints">Constraints<a class="headerlink" href="#constraints" title="Permanent link">&para;</a></h2>
+<h2 id="_3">约束限制<a class="headerlink" href="#_3" title="Permanent link">&para;</a></h2>
 <ul>
-<li>If importing id, data import failures will also retry, re-import will only overwrite, ensuring data consistency</li>
-<li>If not importing id, it's append_only mode, elasticsearch automatically generates id, speed will improve about 20%, but data cannot be repaired, suitable for log-type data (low precision requirements)</li>
+<li>如果导入 id，这样数据导入失败也会重试，重新导入也仅仅是覆盖，保证数据一致性</li>
+<li>如果不导入 id，就是 append_only 模式，elasticsearch 自动生成 id，速度会提升 20%左右，但数据无法修复，适合日志型数据(对数据精度要求不高的)</li>
 </ul>
 
 

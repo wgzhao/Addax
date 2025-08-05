@@ -809,7 +809,7 @@
         
   
   <span class="md-ellipsis">
-    Text File Reader
+    TxtFile Reader
   </span>
   
 
@@ -998,7 +998,7 @@
         
   
   <span class="md-ellipsis">
-    FTP Reader
+    Ftp Reader
   </span>
   
 
@@ -1857,7 +1857,7 @@
         
   
   <span class="md-ellipsis">
-    FTP Writer
+    Ftp Writer
   </span>
   
 
@@ -1878,7 +1878,7 @@
         
   
   <span class="md-ellipsis">
-    GreenPlum Writer
+    Greenplum Writer
   </span>
   
 
@@ -1941,7 +1941,7 @@
         
   
   <span class="md-ellipsis">
-    HBase11x Writer
+    HBase11X Writer
   </span>
   
 
@@ -2109,28 +2109,28 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#example" class="md-nav__link">
+  <a href="#_1" class="md-nav__link">
     <span class="md-ellipsis">
-      Example
+      示例
     </span>
   </a>
   
-    <nav class="md-nav" aria-label="Example">
+    <nav class="md-nav" aria-label="示例">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#create-task-file" class="md-nav__link">
+  <a href="#_2" class="md-nav__link">
     <span class="md-ellipsis">
-      Create Task File
+      创建任务文件
     </span>
   </a>
   
 </li>
         
           <li class="md-nav__item">
-  <a href="#run" class="md-nav__link">
+  <a href="#_3" class="md-nav__link">
     <span class="md-ellipsis">
-      Run
+      运行
     </span>
   </a>
   
@@ -2138,6 +2138,24 @@
         
       </ul>
     </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_4" class="md-nav__link">
+    <span class="md-ellipsis">
+      参数说明
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_5" class="md-nav__link">
+    <span class="md-ellipsis">
+      限制
+    </span>
+  </a>
   
 </li>
       
@@ -2494,28 +2512,28 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#example" class="md-nav__link">
+  <a href="#_1" class="md-nav__link">
     <span class="md-ellipsis">
-      Example
+      示例
     </span>
   </a>
   
-    <nav class="md-nav" aria-label="Example">
+    <nav class="md-nav" aria-label="示例">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#create-task-file" class="md-nav__link">
+  <a href="#_2" class="md-nav__link">
     <span class="md-ellipsis">
-      Create Task File
+      创建任务文件
     </span>
   </a>
   
 </li>
         
           <li class="md-nav__item">
-  <a href="#run" class="md-nav__link">
+  <a href="#_3" class="md-nav__link">
     <span class="md-ellipsis">
-      Run
+      运行
     </span>
   </a>
   
@@ -2523,6 +2541,24 @@
         
       </ul>
     </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_4" class="md-nav__link">
+    <span class="md-ellipsis">
+      参数说明
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_5" class="md-nav__link">
+    <span class="md-ellipsis">
+      限制
+    </span>
+  </a>
   
 </li>
       
@@ -2542,11 +2578,11 @@
 
 
 <h1 id="kafka-writer">Kafka Writer<a class="headerlink" href="#kafka-writer" title="Permanent link">&para;</a></h1>
-<p>Kafka Writer plugin implements the functionality of writing data to Kafka in JSON format.</p>
-<h2 id="example">Example<a class="headerlink" href="#example" title="Permanent link">&para;</a></h2>
-<p>The following configuration demonstrates how to read data from memory and write to specified topic in Kafka.</p>
-<h3 id="create-task-file">Create Task File<a class="headerlink" href="#create-task-file" title="Permanent link">&para;</a></h3>
-<p>First create a task file <code>stream2kafka.json</code> with the following content:</p>
+<p>Kafka Writer 插件实现了将数据以 json 格式写入 Kafka 的功能。</p>
+<h2 id="_1">示例<a class="headerlink" href="#_1" title="Permanent link">&para;</a></h2>
+<p>以下配置演示了如何从内存读取数据并写入到 kafka 的指定 topic 中。</p>
+<h3 id="_2">创建任务文件<a class="headerlink" href="#_2" title="Permanent link">&para;</a></h3>
+<p>首先创建一个任务文件  <code>stream2kafka.json</code> , 内容如下：</p>
 <div class="highlight"><pre><span></span><code><span class="p">{</span>
 <span class="w">  </span><span class="nt">&quot;job&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
 <span class="w">    </span><span class="nt">&quot;setting&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
@@ -2588,8 +2624,8 @@
 <span class="w">  </span><span class="p">}</span>
 <span class="p">}</span>
 </code></pre></div>
-<h3 id="run">Run<a class="headerlink" href="#run" title="Permanent link">&para;</a></h3>
-<p>Execute <code>bin/addax.sh stream2kafka.json</code> command to get output similar to the following:</p>
+<h3 id="_3">运行<a class="headerlink" href="#_3" title="Permanent link">&para;</a></h3>
+<p>执行  <code>bin/addax.sh stream2kafka.json</code> 命令，获得类似下面的输出：</p>
 <div class="highlight"><pre><span></span><code><span class="m">2022</span>-02-26<span class="w"> </span><span class="m">21</span>:59:22.975<span class="w"> </span><span class="o">[</span><span class="w">        </span>main<span class="o">]</span><span class="w"> </span>INFO<span class="w">  </span>VMInfo<span class="w">               </span>-<span class="w"> </span>VMInfo#<span class="w"> </span>operatingSystem<span class="w"> </span><span class="nv">class</span><span class="w"> </span><span class="o">=</span>&gt;<span class="w"> </span>sun.management.OperatingSystemImpl
 <span class="m">2022</span>-02-26<span class="w"> </span><span class="m">21</span>:59:22.985<span class="w"> </span><span class="o">[</span><span class="w">        </span>main<span class="o">]</span><span class="w"> </span>INFO<span class="w">  </span>Engine<span class="w">               </span>-<span class="w"> </span>
 <span class="o">{</span>
@@ -2757,11 +2793,74 @@
 读出记录总数<span class="w">                    </span>:<span class="w">                 </span><span class="m">100</span>
 读写失败总数<span class="w">                    </span>:<span class="w">                   </span><span class="m">0</span>
 </code></pre></div>
-<p>We use Kafka's built-in <code>kafka-console-consumer.sh</code> to try reading data, output as follows:</p>
+<p>我们使用 kafka 自带的 <code>kafka-console-consumer.sh</code> 尝试读取数据，输出如下：</p>
 <div class="highlight"><pre><span></span><code>$<span class="w"> </span>bin/kafka-console-consumer.sh<span class="w"> </span>--bootstrap-server<span class="w"> </span>localhost:9092<span class="w"> </span>--topic<span class="w"> </span>test-1<span class="w"> </span>--from-beginning
 
 <span class="o">{</span><span class="s2">&quot;col8&quot;</span>:<span class="s2">&quot;41.12,-71.34&quot;</span>,<span class="s2">&quot;col9&quot;</span>:<span class="s2">&quot;2017-05-25 11:22:33&quot;</span>,<span class="s2">&quot;col6&quot;</span>:<span class="s2">&quot;hello world&quot;</span>,<span class="s2">&quot;col7&quot;</span>:<span class="s2">&quot;long text&quot;</span>,<span class="s2">&quot;col4&quot;</span>:19890604,<span class="s2">&quot;col5&quot;</span>:19890604,<span class="s2">&quot;col2&quot;</span>:<span class="s2">&quot;1.1.1.1&quot;</span>,<span class="s2">&quot;col3&quot;</span>:1.9890604E7,<span class="s2">&quot;col1&quot;</span>:916<span class="o">}</span>
+<span class="o">{</span><span class="s2">&quot;col8&quot;</span>:<span class="s2">&quot;41.12,-71.34&quot;</span>,<span class="s2">&quot;col9&quot;</span>:<span class="s2">&quot;2017-05-25 11:22:33&quot;</span>,<span class="s2">&quot;col6&quot;</span>:<span class="s2">&quot;hello world&quot;</span>,<span class="s2">&quot;col7&quot;</span>:<span class="s2">&quot;long text&quot;</span>,<span class="s2">&quot;col4&quot;</span>:19890604,<span class="s2">&quot;col5&quot;</span>:19890604,<span class="s2">&quot;col2&quot;</span>:<span class="s2">&quot;1.1.1.1&quot;</span>,<span class="s2">&quot;col3&quot;</span>:1.9890604E7,<span class="s2">&quot;col1&quot;</span>:572<span class="o">}</span>
+<span class="o">{</span><span class="s2">&quot;col8&quot;</span>:<span class="s2">&quot;41.12,-71.34&quot;</span>,<span class="s2">&quot;col9&quot;</span>:<span class="s2">&quot;2017-05-25 11:22:33&quot;</span>,<span class="s2">&quot;col6&quot;</span>:<span class="s2">&quot;hello world&quot;</span>,<span class="s2">&quot;col7&quot;</span>:<span class="s2">&quot;long text&quot;</span>,<span class="s2">&quot;col4&quot;</span>:19890604,<span class="s2">&quot;col5&quot;</span>:19890604,<span class="s2">&quot;col2&quot;</span>:<span class="s2">&quot;1.1.1.1&quot;</span>,<span class="s2">&quot;col3&quot;</span>:1.9890604E7,<span class="s2">&quot;col1&quot;</span>:88<span class="o">}</span>
+<span class="o">{</span><span class="s2">&quot;col8&quot;</span>:<span class="s2">&quot;41.12,-71.34&quot;</span>,<span class="s2">&quot;col9&quot;</span>:<span class="s2">&quot;2017-05-25 11:22:33&quot;</span>,<span class="s2">&quot;col6&quot;</span>:<span class="s2">&quot;hello world&quot;</span>,<span class="s2">&quot;col7&quot;</span>:<span class="s2">&quot;long text&quot;</span>,<span class="s2">&quot;col4&quot;</span>:19890604,<span class="s2">&quot;col5&quot;</span>:19890604,<span class="s2">&quot;col2&quot;</span>:<span class="s2">&quot;1.1.1.1&quot;</span>,<span class="s2">&quot;col3&quot;</span>:1.9890604E7,<span class="s2">&quot;col1&quot;</span>:33<span class="o">}</span>
+<span class="o">{</span><span class="s2">&quot;col8&quot;</span>:<span class="s2">&quot;41.12,-71.34&quot;</span>,<span class="s2">&quot;col9&quot;</span>:<span class="s2">&quot;2017-05-25 11:22:33&quot;</span>,<span class="s2">&quot;col6&quot;</span>:<span class="s2">&quot;hello world&quot;</span>,<span class="s2">&quot;col7&quot;</span>:<span class="s2">&quot;long text&quot;</span>,<span class="s2">&quot;col4&quot;</span>:19890604,<span class="s2">&quot;col5&quot;</span>:19890604,<span class="s2">&quot;col2&quot;</span>:<span class="s2">&quot;1.1.1.1&quot;</span>,<span class="s2">&quot;col3&quot;</span>:1.9890604E7,<span class="s2">&quot;col1&quot;</span>:697<span class="o">}</span>
+<span class="o">{</span><span class="s2">&quot;col8&quot;</span>:<span class="s2">&quot;41.12,-71.34&quot;</span>,<span class="s2">&quot;col9&quot;</span>:<span class="s2">&quot;2017-05-25 11:22:33&quot;</span>,<span class="s2">&quot;col6&quot;</span>:<span class="s2">&quot;hello world&quot;</span>,<span class="s2">&quot;col7&quot;</span>:<span class="s2">&quot;long text&quot;</span>,<span class="s2">&quot;col4&quot;</span>:19890604,<span class="s2">&quot;col5&quot;</span>:19890604,<span class="s2">&quot;col2&quot;</span>:<span class="s2">&quot;1.1.1.1&quot;</span>,<span class="s2">&quot;col3&quot;</span>:1.9890604E7,<span class="s2">&quot;col1&quot;</span>:381<span class="o">}</span>
+<span class="o">{</span><span class="s2">&quot;col8&quot;</span>:<span class="s2">&quot;41.12,-71.34&quot;</span>,<span class="s2">&quot;col9&quot;</span>:<span class="s2">&quot;2017-05-25 11:22:33&quot;</span>,<span class="s2">&quot;col6&quot;</span>:<span class="s2">&quot;hello world&quot;</span>,<span class="s2">&quot;col7&quot;</span>:<span class="s2">&quot;long text&quot;</span>,<span class="s2">&quot;col4&quot;</span>:19890604,<span class="s2">&quot;col5&quot;</span>:19890604,<span class="s2">&quot;col2&quot;</span>:<span class="s2">&quot;1.1.1.1&quot;</span>,<span class="s2">&quot;col3&quot;</span>:1.9890604E7,<span class="s2">&quot;col1&quot;</span>:304<span class="o">}</span>
+<span class="o">{</span><span class="s2">&quot;col8&quot;</span>:<span class="s2">&quot;41.12,-71.34&quot;</span>,<span class="s2">&quot;col9&quot;</span>:<span class="s2">&quot;2017-05-25 11:22:33&quot;</span>,<span class="s2">&quot;col6&quot;</span>:<span class="s2">&quot;hello world&quot;</span>,<span class="s2">&quot;col7&quot;</span>:<span class="s2">&quot;long text&quot;</span>,<span class="s2">&quot;col4&quot;</span>:19890604,<span class="s2">&quot;col5&quot;</span>:19890604,<span class="s2">&quot;col2&quot;</span>:<span class="s2">&quot;1.1.1.1&quot;</span>,<span class="s2">&quot;col3&quot;</span>:1.9890604E7,<span class="s2">&quot;col1&quot;</span>:103<span class="o">}</span>
+<span class="o">{</span><span class="s2">&quot;col8&quot;</span>:<span class="s2">&quot;41.12,-71.34&quot;</span>,<span class="s2">&quot;col9&quot;</span>:<span class="s2">&quot;2017-05-25 11:22:33&quot;</span>,<span class="s2">&quot;col6&quot;</span>:<span class="s2">&quot;hello world&quot;</span>,<span class="s2">&quot;col7&quot;</span>:<span class="s2">&quot;long text&quot;</span>,<span class="s2">&quot;col4&quot;</span>:19890604,<span class="s2">&quot;col5&quot;</span>:19890604,<span class="s2">&quot;col2&quot;</span>:<span class="s2">&quot;1.1.1.1&quot;</span>,<span class="s2">&quot;col3&quot;</span>:1.9890604E7,<span class="s2">&quot;col1&quot;</span>:967<span class="o">}</span>
+<span class="o">{</span><span class="s2">&quot;col8&quot;</span>:<span class="s2">&quot;41.12,-71.34&quot;</span>,<span class="s2">&quot;col9&quot;</span>:<span class="s2">&quot;2017-05-25 11:22:33&quot;</span>,<span class="s2">&quot;col6&quot;</span>:<span class="s2">&quot;hello world&quot;</span>,<span class="s2">&quot;col7&quot;</span>:<span class="s2">&quot;long text&quot;</span>,<span class="s2">&quot;col4&quot;</span>:19890604,<span class="s2">&quot;col5&quot;</span>:19890604,<span class="s2">&quot;col2&quot;</span>:<span class="s2">&quot;1.1.1.1&quot;</span>,<span class="s2">&quot;col3&quot;</span>:1.9890604E7,<span class="s2">&quot;col1&quot;</span>:147<span class="o">}</span>
 </code></pre></div>
+<h2 id="_4">参数说明<a class="headerlink" href="#_4" title="Permanent link">&para;</a></h2>
+<table>
+<thead>
+<tr>
+<th style="text-align: left;">配置项</th>
+<th style="text-align: center;">是否必须</th>
+<th>数据类型</th>
+<th>默认值</th>
+<th>描述</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;">brokerList</td>
+<td style="text-align: center;">是</td>
+<td>string</td>
+<td>无</td>
+<td>连接 kafka 服务的 broker 配置，多个 broker之间用逗号(<code>,</code>)分隔</td>
+</tr>
+<tr>
+<td style="text-align: left;">topic</td>
+<td style="text-align: center;">是</td>
+<td>string</td>
+<td>无</td>
+<td>要写入的 topic</td>
+</tr>
+<tr>
+<td style="text-align: left;">batchSize</td>
+<td style="text-align: center;">否</td>
+<td>int</td>
+<td>1204</td>
+<td>设置 Kafka 的 <code>batch.size</code> 参数</td>
+</tr>
+<tr>
+<td style="text-align: left;">column</td>
+<td style="text-align: center;">是</td>
+<td>list</td>
+<td>无</td>
+<td>所配置的表中需要同步的列名集合，不允许为 <code>*</code></td>
+</tr>
+<tr>
+<td style="text-align: left;">properties</td>
+<td style="text-align: center;">否</td>
+<td>map</td>
+<td>无</td>
+<td>需要设置的其他 kafka 连接参数</td>
+</tr>
+</tbody>
+</table>
+<h2 id="_5">限制<a class="headerlink" href="#_5" title="Permanent link">&para;</a></h2>
+<ol>
+<li>仅支持 Kafka <code>1.0</code> 及以上版本，低于该版本的无法确定是否能写入</li>
+<li>当前不支持启用了 <code>kerberos</code> 认证的 kafka 服务</li>
+</ol>
 
 
 

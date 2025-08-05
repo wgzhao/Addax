@@ -814,7 +814,7 @@
         
   
   <span class="md-ellipsis">
-    Text File Reader
+    TxtFile Reader
   </span>
   
 
@@ -1003,7 +1003,7 @@
         
   
   <span class="md-ellipsis">
-    FTP Reader
+    Ftp Reader
   </span>
   
 
@@ -1150,18 +1150,36 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#configuration-example" class="md-nav__link">
+  <a href="#_1" class="md-nav__link">
     <span class="md-ellipsis">
-      Configuration Example
+      配置样例
     </span>
   </a>
   
 </li>
       
         <li class="md-nav__item">
-  <a href="#parameters" class="md-nav__link">
+  <a href="#_2" class="md-nav__link">
     <span class="md-ellipsis">
-      Parameters
+      参数说明
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_3" class="md-nav__link">
+    <span class="md-ellipsis">
+      类型转换
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_4" class="md-nav__link">
+    <span class="md-ellipsis">
+      约束限制
     </span>
   </a>
   
@@ -1915,7 +1933,7 @@
         
   
   <span class="md-ellipsis">
-    FTP Writer
+    Ftp Writer
   </span>
   
 
@@ -1936,7 +1954,7 @@
         
   
   <span class="md-ellipsis">
-    GreenPlum Writer
+    Greenplum Writer
   </span>
   
 
@@ -1999,7 +2017,7 @@
         
   
   <span class="md-ellipsis">
-    HBase11x Writer
+    HBase11X Writer
   </span>
   
 
@@ -2479,18 +2497,36 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#configuration-example" class="md-nav__link">
+  <a href="#_1" class="md-nav__link">
     <span class="md-ellipsis">
-      Configuration Example
+      配置样例
     </span>
   </a>
   
 </li>
       
         <li class="md-nav__item">
-  <a href="#parameters" class="md-nav__link">
+  <a href="#_2" class="md-nav__link">
     <span class="md-ellipsis">
-      Parameters
+      参数说明
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_3" class="md-nav__link">
+    <span class="md-ellipsis">
+      类型转换
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_4" class="md-nav__link">
+    <span class="md-ellipsis">
+      约束限制
     </span>
   </a>
   
@@ -2512,9 +2548,9 @@
 
 
 <h1 id="hbase20-sql-reader">HBase20 SQL Reader<a class="headerlink" href="#hbase20-sql-reader" title="Permanent link">&para;</a></h1>
-<p>HBase20 SQL Reader plugin implements reading data from <a href="https://phoenix.apache.org">Phoenix(HBase SQL)</a>, corresponding to HBase2.X and Phoenix5.X versions.</p>
-<h2 id="configuration-example">Configuration Example<a class="headerlink" href="#configuration-example" title="Permanent link">&para;</a></h2>
-<p>Configure a job to synchronize and extract data from Phoenix to local:</p>
+<p>HBase20 SQL Reader 插件实现了从 <a href="https://phoenix.apache.org">Phoenix(HBase SQL)</a> 读取数据，对应版本为 HBase2.X 和 Phoenix5.X。</p>
+<h2 id="_1">配置样例<a class="headerlink" href="#_1" title="Permanent link">&para;</a></h2>
+<p>配置一个从 Phoenix 同步抽取数据到本地的作业:</p>
 <div class="highlight"><pre><span></span><code><span class="p">{</span>
 <span class="w">  </span><span class="nt">&quot;job&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
 <span class="w">    </span><span class="nt">&quot;content&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span>
@@ -2525,16 +2561,148 @@
 <span class="w">            </span><span class="nt">&quot;queryServerAddress&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;http://127.0.0.1:8765&quot;</span><span class="p">,</span>
 <span class="w">            </span><span class="nt">&quot;serialization&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;PROTOBUF&quot;</span><span class="p">,</span>
 <span class="w">            </span><span class="nt">&quot;table&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;TEST&quot;</span><span class="p">,</span>
-<span class="w">            </span><span class="nt">&quot;column&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="s2">&quot;ID&quot;</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;NAME&quot;</span><span class="p">]</span>
+<span class="w">            </span><span class="nt">&quot;column&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="s2">&quot;ID&quot;</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;NAME&quot;</span><span class="p">],</span>
+<span class="w">            </span><span class="nt">&quot;splitKey&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;ID&quot;</span>
+<span class="w">          </span><span class="p">}</span>
+<span class="w">        </span><span class="p">},</span>
+<span class="w">        </span><span class="nt">&quot;writer&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<span class="w">          </span><span class="nt">&quot;name&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;streamwriter&quot;</span><span class="p">,</span>
+<span class="w">          </span><span class="nt">&quot;parameter&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<span class="w">            </span><span class="nt">&quot;encoding&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;UTF-8&quot;</span><span class="p">,</span>
+<span class="w">            </span><span class="nt">&quot;print&quot;</span><span class="p">:</span><span class="w"> </span><span class="kc">true</span>
 <span class="w">          </span><span class="p">}</span>
 <span class="w">        </span><span class="p">}</span>
 <span class="w">      </span><span class="p">}</span>
-<span class="w">    </span><span class="p">]</span>
+<span class="w">    </span><span class="p">],</span>
+<span class="w">    </span><span class="nt">&quot;setting&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<span class="w">      </span><span class="nt">&quot;speed&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="nt">&quot;channel&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">3</span><span class="p">,</span>
+<span class="w">        </span><span class="nt">&quot;bytes&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">-1</span>
+<span class="w">      </span><span class="p">}</span>
+<span class="w">    </span><span class="p">}</span>
 <span class="w">  </span><span class="p">}</span>
 <span class="p">}</span>
 </code></pre></div>
-<h2 id="parameters">Parameters<a class="headerlink" href="#parameters" title="Permanent link">&para;</a></h2>
-<p>This plugin is based on <a href="../rdbmsreader">RDBMS Reader</a>, so you can refer to all configuration items of RDBMS Reader.</p>
+<h2 id="_2">参数说明<a class="headerlink" href="#_2" title="Permanent link">&para;</a></h2>
+<table>
+<thead>
+<tr>
+<th style="text-align: left;">配置项</th>
+<th style="text-align: center;">是否必须</th>
+<th>数据类型</th>
+<th>默认值</th>
+<th>描述</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;">queryServerAddress</td>
+<td style="text-align: center;">是</td>
+<td>string</td>
+<td>无</td>
+<td>Phoenix QueryServer 地址, 该插件通过 PQS 进行连接</td>
+</tr>
+<tr>
+<td style="text-align: left;">serialization</td>
+<td style="text-align: center;">否</td>
+<td>string</td>
+<td>PROTOBUF</td>
+<td>QueryServer 使用的序列化协议</td>
+</tr>
+<tr>
+<td style="text-align: left;">table</td>
+<td style="text-align: center;">是</td>
+<td>string</td>
+<td>无</td>
+<td>所要读取表名</td>
+</tr>
+<tr>
+<td style="text-align: left;">schema</td>
+<td style="text-align: center;">否</td>
+<td>string</td>
+<td>无</td>
+<td>表所在的 schema</td>
+</tr>
+<tr>
+<td style="text-align: left;">column</td>
+<td style="text-align: center;">否</td>
+<td>list</td>
+<td>``</td>
+<td>填写需要从 phoenix 表中读取的列名集合，空值表示读取所有列</td>
+</tr>
+<tr>
+<td style="text-align: left;">splitKey</td>
+<td style="text-align: center;">是</td>
+<td>string</td>
+<td>无</td>
+<td>根据数据特征动态指定切分点，对表数据按照指定的列的最大、最小值进行切分,仅支持整型和字符串类型</td>
+</tr>
+<tr>
+<td style="text-align: left;">splitPoints</td>
+<td style="text-align: center;">否</td>
+<td>string</td>
+<td>无</td>
+<td>按照表的 split 进行切分</td>
+</tr>
+<tr>
+<td style="text-align: left;">where</td>
+<td style="text-align: center;">否</td>
+<td>string</td>
+<td>无</td>
+<td>支持对表查询增加过滤条件，每个切分都会携带该过滤条件</td>
+</tr>
+<tr>
+<td style="text-align: left;">querySql</td>
+<td style="text-align: center;">否</td>
+<td>string</td>
+<td>无</td>
+<td>支持指定多个查询语句，但查询列类型和数目必须保持一致</td>
+</tr>
+</tbody>
+</table>
+<h2 id="_3">类型转换<a class="headerlink" href="#_3" title="Permanent link">&para;</a></h2>
+<p>目前支持大部分 Phoenix 类型，但也存在部分个别类型没有支持的情况，请注意检查你的类型。</p>
+<table>
+<thead>
+<tr>
+<th>Addax 内部类型</th>
+<th>Phoenix 数据类型</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>String</td>
+<td>CHAR, VARCHAR</td>
+</tr>
+<tr>
+<td>Bytes</td>
+<td>BINARY, VARBINARY</td>
+</tr>
+<tr>
+<td>Bool</td>
+<td>BOOLEAN</td>
+</tr>
+<tr>
+<td>Long</td>
+<td>INTEGER, TINYINT, SMALLINT, BIGINT</td>
+</tr>
+<tr>
+<td>Double</td>
+<td>FLOAT, DECIMAL, DOUBLE,</td>
+</tr>
+<tr>
+<td>Date</td>
+<td>DATE, TIME, TIMESTAMP</td>
+</tr>
+</tbody>
+</table>
+<h2 id="_4">约束限制<a class="headerlink" href="#_4" title="Permanent link">&para;</a></h2>
+<ul>
+<li>切分表时切分列仅支持单个列，且该列必须是表主键</li>
+<li>不设置 <code>splitPoint</code> 默认使用自动切分，此时切分列仅支持整形和字符型</li>
+<li>表名和 <code>SCHEMA</code> 名及列名大小写敏感，请与 Phoenix 表实际大小写保持一致</li>
+<li>仅支持通过 Phoenix QueryServer 读取数据，因此您的 Phoenix 必须启动 QueryServer 服务才能使用本插件</li>
+</ul>
 
 
 

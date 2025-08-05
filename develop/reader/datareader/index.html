@@ -814,7 +814,7 @@
         
   
   <span class="md-ellipsis">
-    Text File Reader
+    TxtFile Reader
   </span>
   
 
@@ -982,37 +982,37 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#why-reinvent-the-wheel" class="md-nav__link">
+  <a href="#_1" class="md-nav__link">
     <span class="md-ellipsis">
-      Why Reinvent the Wheel
+      为什么要重复发明轮子
     </span>
   </a>
   
 </li>
       
         <li class="md-nav__item">
-  <a href="#configuration-example" class="md-nav__link">
+  <a href="#_2" class="md-nav__link">
     <span class="md-ellipsis">
-      Configuration Example
+      配置示例
     </span>
   </a>
   
 </li>
       
         <li class="md-nav__item">
-  <a href="#configuration-description" class="md-nav__link">
+  <a href="#_3" class="md-nav__link">
     <span class="md-ellipsis">
-      Configuration Description
+      配置说明
     </span>
   </a>
   
-    <nav class="md-nav" aria-label="Configuration Description">
+    <nav class="md-nav" aria-label="配置说明">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#rule-description" class="md-nav__link">
+  <a href="#rule" class="md-nav__link">
     <span class="md-ellipsis">
-      rule Description
+      rule 说明
     </span>
   </a>
   
@@ -1112,7 +1112,7 @@
         
   
   <span class="md-ellipsis">
-    FTP Reader
+    Ftp Reader
   </span>
   
 
@@ -1966,7 +1966,7 @@
         
   
   <span class="md-ellipsis">
-    FTP Writer
+    Ftp Writer
   </span>
   
 
@@ -1987,7 +1987,7 @@
         
   
   <span class="md-ellipsis">
-    GreenPlum Writer
+    Greenplum Writer
   </span>
   
 
@@ -2050,7 +2050,7 @@
         
   
   <span class="md-ellipsis">
-    HBase11x Writer
+    HBase11X Writer
   </span>
   
 
@@ -2530,37 +2530,37 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#why-reinvent-the-wheel" class="md-nav__link">
+  <a href="#_1" class="md-nav__link">
     <span class="md-ellipsis">
-      Why Reinvent the Wheel
+      为什么要重复发明轮子
     </span>
   </a>
   
 </li>
       
         <li class="md-nav__item">
-  <a href="#configuration-example" class="md-nav__link">
+  <a href="#_2" class="md-nav__link">
     <span class="md-ellipsis">
-      Configuration Example
+      配置示例
     </span>
   </a>
   
 </li>
       
         <li class="md-nav__item">
-  <a href="#configuration-description" class="md-nav__link">
+  <a href="#_3" class="md-nav__link">
     <span class="md-ellipsis">
-      Configuration Description
+      配置说明
     </span>
   </a>
   
-    <nav class="md-nav" aria-label="Configuration Description">
+    <nav class="md-nav" aria-label="配置说明">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#rule-description" class="md-nav__link">
+  <a href="#rule" class="md-nav__link">
     <span class="md-ellipsis">
-      rule Description
+      rule 说明
     </span>
   </a>
   
@@ -2614,13 +2614,13 @@
 
 
 <h1 id="data-reader">Data Reader<a class="headerlink" href="#data-reader" title="Permanent link">&para;</a></h1>
-<p><code>DataReader</code> plugin is specifically designed to generate data that meets certain rule requirements in development and testing environments.</p>
-<p>In actual development and testing, we need to generate test data according to certain business rules, not just random content, such as ID card numbers, bank account numbers, stock codes, etc.</p>
-<h2 id="why-reinvent-the-wheel">Why Reinvent the Wheel<a class="headerlink" href="#why-reinvent-the-wheel" title="Permanent link">&para;</a></h2>
-<p>Indeed, there are quite a few specialized data generation tools on the Internet, many of which are powerful and performant. However, most of these tools consider the data generation part but ignore the problem of writing data to the target end, or some consider it but only consider one or a limited number of databases.</p>
-<p>It happens that the Addax tool can provide enough target-end writing capabilities, plus the existing <a href="../streamreader">Stream Reader</a> is already a simple version of data generation tool. Therefore, adding some specific rules to this functionality and leveraging the diversity of the writing end naturally makes it a good data generation tool.</p>
-<h2 id="configuration-example">Configuration Example<a class="headerlink" href="#configuration-example" title="Permanent link">&para;</a></h2>
-<p>Here I list all the rules currently supported by the plugin in the example below</p>
+<p><code>DataReader</code> 插件是专门提供用于开发和测试环境中，生产满足一定规则要求的数据的插件。</p>
+<p>在实际开发和测试中，我们需要按照一定的业务规则来生产测试数据，而不仅仅是随机内容，比如身份证号码，银行账号，股票代码等。</p>
+<h2 id="_1">为什么要重复发明轮子<a class="headerlink" href="#_1" title="Permanent link">&para;</a></h2>
+<p>诚然，网络上有相当多的专门的数据生产工具，其中不乏功能强大、性能也强悍。 但这些工具大部分是考虑到了数据生成这一段，而忽略了数据写入到目标端的问题，或者说有些考虑到了，但仅仅只考虑了一种或有限的几种数据库。</p>
+<p>恰好 Addax 工具能够提供足够多的目标端写入能力，加上之前的已有的 <a href="../streamreader">Stream Reader</a> 已经算是一个简单版的数据生成工具，因此在此功能上 增加一些特定规则，再利用写入端多样性的能力，自然就成为了一个较好的数据生成工具。</p>
+<h2 id="_2">配置示例<a class="headerlink" href="#_2" title="Permanent link">&para;</a></h2>
+<p>这里我把目前插件支持的规则全部列举到下面的例子中</p>
 <div class="tabbed-set" data-tabs="1:1"><input checked="checked" id="__tabbed_1_1" name="__tabbed_1" type="radio" /><label for="__tabbed_1_1">datareader2stream.json</label><div class="tabbed-content"></div>
 </div>
 <div class="highlight"><pre><span></span><code><span class="p">{</span>
@@ -2718,8 +2718,8 @@
 <span class="w">  </span><span class="p">}</span>
 <span class="p">}</span>
 </code></pre></div>
-<p>Save the above content to <code>job/datareader2stream.json</code></p>
-<p>Then execute this task, the output result is similar to the following:</p>
+<p>保存上述内容到 <code>job/datareader2stream.json</code></p>
+<p>然后执行该任务，其输出结果类似如下：</p>
 <div class="highlight"><pre><span></span><code>$<span class="w"> </span>bin/addax.sh<span class="w"> </span>job/datareader2stream.json
 
 <span class="w">  </span>___<span class="w">      </span>_<span class="w">     </span>_
@@ -2866,206 +2866,206 @@
 读出记录总数<span class="w">                    </span>:<span class="w">                  </span><span class="m">10</span>
 读写失败总数<span class="w">                    </span>:<span class="w">                   </span><span class="m">0</span>
 </code></pre></div>
-<h2 id="configuration-description">Configuration Description<a class="headerlink" href="#configuration-description" title="Permanent link">&para;</a></h2>
-<p>The configuration of <code>column</code> is slightly different from other plugins. A field consists of the following configuration items:</p>
+<h2 id="_3">配置说明<a class="headerlink" href="#_3" title="Permanent link">&para;</a></h2>
+<p><code>column</code> 的配置和其他插件的配置稍有不同，一个字段由以下配置项组成</p>
 <table>
 <thead>
 <tr>
-<th>Configuration</th>
-<th>Required</th>
-<th>Default Value</th>
-<th>Example</th>
-<th>Description</th>
+<th>配置项</th>
+<th>是否必须</th>
+<th>默认值</th>
+<th>示例</th>
+<th>说明</th>
 </tr>
 </thead>
 <tbody>
 <tr>
 <td>value</td>
-<td>No</td>
-<td>None</td>
+<td>否</td>
+<td>无</td>
 <td><code>Addax</code></td>
-<td>Data value, required in some cases</td>
+<td>数据值，在某些情况下为必选项</td>
 </tr>
 <tr>
 <td>rule</td>
-<td>No</td>
+<td>否</td>
 <td><code>constant</code></td>
 <td><code>idCard</code></td>
-<td>Data generation rule, detailed description below</td>
+<td>数据生产规则，详细下面的描述</td>
 </tr>
 <tr>
 <td>type</td>
-<td>No</td>
+<td>否</td>
 <td><code>string</code></td>
 <td><code>double</code></td>
-<td>Data value type</td>
+<td>数据值类型</td>
 </tr>
 <tr>
 <td>dateFormat</td>
-<td>No</td>
+<td>否</td>
 <td><code>yyyy-MM-dd HH:mm:ss</code></td>
 <td><code>yyyy/MM/dd HH:mm:ss</code></td>
-<td>Date format, only valid when <code>type</code> is <code>date</code></td>
+<td>日期格式，仅在 <code>type</code> 为 <code>date</code> 时有效</td>
 </tr>
 </tbody>
 </table>
-<h3 id="rule-description">rule Description<a class="headerlink" href="#rule-description" title="Permanent link">&para;</a></h3>
-<p>The core of this plugin's field configuration is the <code>rule</code> field, which is used to indicate what kind of data should be generated, and according to different rules, combined with other configuration options to generate data that meets expectations. Currently, the configurations of <code>rule</code> are all built-in supported rules, custom rules are not supported yet. Detailed description follows:</p>
+<h3 id="rule">rule 说明<a class="headerlink" href="#rule" title="Permanent link">&para;</a></h3>
+<p>该插件的字段配置核心是 <code>rule</code> 字段，它用来指示应该生成什么样的数据，并依据不同规则，配合其他配置选项来生产满足期望的数据。 当前 <code>rule</code> 的配置均为内置支持的规则，暂不支持自定义，以下详细说明</p>
 <h3 id="constant">constant<a class="headerlink" href="#constant" title="Permanent link">&para;</a></h3>
-<p><code>constant</code> is the default configuration of <code>rule</code>. This rule means that the data value to be generated is determined by the <code>value</code> configuration item, with no changes. For example:</p>
+<p><code>constant</code> 是 <code>rule</code> 的默认配置，该规则意味着要生成的数据值由 <code>value</code> 配置项决定，其不做任何变更。比如</p>
 <div class="highlight"><pre><span></span><code><span class="p">{</span>
 <span class="w">  </span><span class="nt">&quot;value&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;Addax&quot;</span><span class="p">,</span>
 <span class="w">  </span><span class="nt">&quot;type&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;string&quot;</span><span class="p">,</span>
 <span class="w">  </span><span class="nt">&quot;rule&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;constant&quot;</span>
 <span class="p">}</span>
 </code></pre></div>
-<p>This means the data value generated by this field is all <code>Addax</code></p>
+<p>表示该字段生产的数据值均为 <code>Addax</code></p>
 <h3 id="incr">incr<a class="headerlink" href="#incr" title="Permanent link">&para;</a></h3>
-<p>The meaning of <code>incr</code> configuration item is consistent with the <code>incr</code> meaning in the <code>streamreader</code> plugin, indicating this is an incremental data generation rule. For example:</p>
+<p><code>incr</code> 配置项的含义和 <code>streamreader</code> 插件中的 <code>incr</code> 含义一致，表示这是一个递增的数据生产规则，比如</p>
 <div class="highlight"><pre><span></span><code><span class="p">{</span>
 <span class="w">  </span><span class="nt">&quot;value&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;1,2&quot;</span><span class="p">,</span>
 <span class="w">  </span><span class="nt">&quot;rule&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;incr&quot;</span><span class="p">,</span>
 <span class="w">  </span><span class="nt">&quot;type&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;long&quot;</span>
 <span class="p">}</span>
 </code></pre></div>
-<p>This means the field data is a long integer, starting from 1, incrementing by 2 each time, forming an incremental sequence starting from 1 with step size 2.</p>
-<p>For more detailed configuration rules and precautions for this field, refer to the <code>incr</code> description in <a href="../streamreader">streamreader</a>.</p>
+<p>表示该字段的数据是一个长整形，数值从 1 开始，每次递增 2，也就是形成 1 开始，步长为 2 的递增数列。</p>
+<p>该字段更详细的配置规则和注意事项，可以参考 <a href="../streamreader">streamreader</a> 中的 <code>incr</code> 说明。</p>
 <h3 id="random">random<a class="headerlink" href="#random" title="Permanent link">&para;</a></h3>
-<p>The meaning of <code>random</code> configuration item is consistent with the <code>random</code> meaning in the <a href="../streamreader"><code>streamreader</code></a> plugin, indicating this is an incremental data generation rule. For example:</p>
+<p><code>random</code> 配置项的含义和 <a href="../streamreader"><code>streamreader</code></a> 插件中的 <code>random</code> 含义一致，表示这是一个递增的数据生产规则，比如</p>
 <div class="highlight"><pre><span></span><code><span class="p">{</span>
 <span class="w">  </span><span class="nt">&quot;value&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;1,10&quot;</span><span class="p">,</span>
 <span class="w">  </span><span class="nt">&quot;rule&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;random&quot;</span><span class="p">,</span>
 <span class="w">  </span><span class="nt">&quot;type&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;string&quot;</span>
 <span class="p">}</span>
 </code></pre></div>
-<p>This means the field data is a random string with length 1 to 10 (both 1 and 10 included).</p>
-<p>For more detailed configuration rules and precautions for this field, refer to the <code>random</code> description in <a href="../streamreader">streamreader</a>.</p>
+<p>表示该字段的数据是一个长度为 1 到 10 （1 和 10 都包括）随机字符串。</p>
+<p>该字段更详细的配置规则和注意事项，可以参考 <a href="../streamreader">streamreader</a> 中的 <code>random</code> 说明。</p>
 <table>
 <thead>
 <tr>
-<th>Rule Name</th>
-<th>Meaning</th>
-<th>Example</th>
-<th>Data Type</th>
-<th>Description</th>
+<th>规则名称</th>
+<th>含义</th>
+<th>示例</th>
+<th>数据类型</th>
+<th>说明</th>
 </tr>
 </thead>
 <tbody>
 <tr>
 <td><code>address</code></td>
-<td>Randomly generate address information that basically meets domestic actual conditions</td>
+<td>随机生成一条基本满足国内实际情况的地址信息</td>
 <td><code>辽宁省兰州市徐汇区东山街176号</code></td>
 <td>string</td>
 <td></td>
 </tr>
 <tr>
 <td><code>bank</code></td>
-<td>Randomly generate a domestic bank name</td>
+<td>随机生成一个国内银行名称</td>
 <td><code>华夏银行</code></td>
 <td>string</td>
 <td></td>
 </tr>
 <tr>
 <td><code>company</code></td>
-<td>Randomly generate a company name</td>
+<td>随机生成一个公司的名称</td>
 <td><code>万迅电脑科技有限公司</code></td>
 <td>string</td>
 <td></td>
 </tr>
 <tr>
 <td><code>creditCard</code></td>
-<td>Randomly generate a credit card number</td>
+<td>随机生成一个信用卡卡号</td>
 <td><code>430405198908214042</code></td>
 <td>string</td>
-<td>16 digits</td>
+<td>16 位</td>
 </tr>
 <tr>
 <td><code>debitCard</code></td>
-<td>Randomly generate a debit card number</td>
+<td>随机生成一个储蓄卡卡号</td>
 <td><code>6227894836568607</code></td>
 <td>string</td>
-<td>19 digits</td>
+<td>19 位</td>
 </tr>
 <tr>
 <td><code>email</code></td>
-<td>Randomly generate an email address</td>
+<td>随机生成一个电子邮件地址</td>
 <td><code>ok2a@gmail.com</code></td>
 <td>string</td>
 <td></td>
 </tr>
 <tr>
 <td><code>idCard</code></td>
-<td>Randomly generate a domestic ID card number</td>
+<td>随机生成一个国内身份证号码</td>
 <td><code>350600198508222018</code></td>
 <td>string</td>
-<td>18 digits, follows validation rules, first 6 digits meet administrative division requirements</td>
+<td>18 位，负责校验规则，头 6 位编码满足行政区划要求</td>
 </tr>
 <tr>
 <td><code>lat</code></td>
-<td>Randomly generate latitude data</td>
+<td>随机生成维度数据</td>
 <td><code>48.6648764</code></td>
 <td>double</td>
-<td>Fixed 7 decimal places, can also use <code>latitude</code></td>
+<td>固定 7 位小数 ，也可以用<code>latitude</code> 表示</td>
 </tr>
 <tr>
 <td><code>lng</code></td>
-<td>Randomly generate longitude data</td>
+<td>随机生成经度数据</td>
 <td><code>120.6018163</code></td>
 <td>double</td>
-<td>Fixed 7 decimal places, can also use <code>longitude</code></td>
+<td>固定 7 位小数，也可以使用<code>longitude</code> 表示</td>
 </tr>
 <tr>
 <td><code>name</code></td>
-<td>Randomly generate a domestic name</td>
+<td>随机生成一个国内名字</td>
 <td><code>池浩</code></td>
 <td>string</td>
-<td>Currently doesn't consider surname distribution in China</td>
+<td>暂没考虑姓氏在国内的占比度</td>
 </tr>
 <tr>
 <td><code>job</code></td>
-<td>Randomly generate a domestic job title</td>
+<td>随机生成一个国内岗位名称</td>
 <td><code>系统工程师</code></td>
 <td>string</td>
-<td>Data source from recruitment websites</td>
+<td>数据来源于招聘网站</td>
 </tr>
 <tr>
 <td><code>phone</code></td>
-<td>Randomly generate a domestic mobile phone number</td>
+<td>随机生成一个国内手机号码</td>
 <td><code>15292600492</code></td>
 <td>string</td>
-<td>Currently doesn't consider virtual phone numbers</td>
+<td>暂不考虑虚拟手机号</td>
 </tr>
 <tr>
 <td><code>stockCode</code></td>
-<td>Randomly generate a 6-digit stock code</td>
+<td>随机生成一个 6 位的股票代码</td>
 <td><code>687461</code></td>
 <td>string</td>
-<td>First two digits meet domestic stock code standards</td>
+<td>前两位满足国内股票代码编号规范</td>
 </tr>
 <tr>
 <td><code>stockAccount</code></td>
-<td>Randomly generate a 10-digit stock trading account</td>
+<td>随机生成一个 10 位的股票交易账户</td>
 <td><code>0692522928</code></td>
 <td>string</td>
-<td>Completely random, doesn't meet account standards</td>
+<td>完全随机，不满足账户规范</td>
 </tr>
 <tr>
 <td><code>uuid</code></td>
-<td>Randomly generate a UUID string</td>
+<td>随机生成一个 UUID 字符串</td>
 <td><code>bc1cf125-929b-43b7-b324-d7c4cc5a75d2</code></td>
 <td>string</td>
-<td>Completely random</td>
+<td>完全随机，不满足账户规范</td>
 </tr>
 <tr>
 <td><code>zipCode</code></td>
-<td>Randomly generate a domestic postal code</td>
+<td>随机生产一个国内邮政编号</td>
 <td><code>411105</code></td>
 <td>long</td>
-<td>Doesn't fully meet domestic postal code standards</td>
+<td>不完全满足国内邮政编号规范</td>
 </tr>
 </tbody>
 </table>
-<p>Note: The data types returned by the rules in the above table are fixed and cannot be modified, so <code>type</code> doesn't need to be configured, and the configured type will be ignored. Since data generation comes from internal rules, <code>value</code> also doesn't need to be configured, and the configured content will be ignored.</p>
+<p>注意：上述表格中的规则返回的数据类型是固定的，且不支持修改，因此 <code>type</code> 无需配置，配置的类型也会被忽略，因为数据生成来自内部规则，所以 <code>value</code> 也无需配置，配置的内容也会被忽略。</p>
 
 
 

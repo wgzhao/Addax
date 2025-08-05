@@ -809,7 +809,7 @@
         
   
   <span class="md-ellipsis">
-    Text File Reader
+    TxtFile Reader
   </span>
   
 
@@ -998,7 +998,7 @@
         
   
   <span class="md-ellipsis">
-    FTP Reader
+    Ftp Reader
   </span>
   
 
@@ -1857,7 +1857,7 @@
         
   
   <span class="md-ellipsis">
-    FTP Writer
+    Ftp Writer
   </span>
   
 
@@ -1878,7 +1878,7 @@
         
   
   <span class="md-ellipsis">
-    GreenPlum Writer
+    Greenplum Writer
   </span>
   
 
@@ -1941,7 +1941,7 @@
         
   
   <span class="md-ellipsis">
-    HBase11x Writer
+    HBase11X Writer
   </span>
   
 
@@ -2235,22 +2235,22 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#configuration-example" class="md-nav__link">
+  <a href="#_1" class="md-nav__link">
     <span class="md-ellipsis">
-      Configuration Example
+      配置样例
     </span>
   </a>
   
 </li>
       
         <li class="md-nav__item">
-  <a href="#parameters" class="md-nav__link">
+  <a href="#_2" class="md-nav__link">
     <span class="md-ellipsis">
-      Parameters
+      参数说明
     </span>
   </a>
   
-    <nav class="md-nav" aria-label="Parameters">
+    <nav class="md-nav" aria-label="参数说明">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
@@ -2494,22 +2494,22 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#configuration-example" class="md-nav__link">
+  <a href="#_1" class="md-nav__link">
     <span class="md-ellipsis">
-      Configuration Example
+      配置样例
     </span>
   </a>
   
 </li>
       
         <li class="md-nav__item">
-  <a href="#parameters" class="md-nav__link">
+  <a href="#_2" class="md-nav__link">
     <span class="md-ellipsis">
-      Parameters
+      参数说明
     </span>
   </a>
   
-    <nav class="md-nav" aria-label="Parameters">
+    <nav class="md-nav" aria-label="参数说明">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
@@ -2542,9 +2542,9 @@
 
 
 <h1 id="sqlserver-writer">SQLServer Writer<a class="headerlink" href="#sqlserver-writer" title="Permanent link">&para;</a></h1>
-<p>SQLServer Writer plugin implements the functionality of writing data to <a href="https://www.microsoft.com/en-us/sql-server/sql-server-downloads">SQL Server</a> database tables.</p>
-<h2 id="configuration-example">Configuration Example<a class="headerlink" href="#configuration-example" title="Permanent link">&para;</a></h2>
-<p>Here we use data generated from memory to import into SQL Server.</p>
+<p>SQLServer Writer 插件实现了写入数据到 <a href="https://www.microsoft.com/en-us/sql-server/sql-server-downloads">SQL Server</a> 库表的功能。</p>
+<h2 id="_1">配置样例<a class="headerlink" href="#_1" title="Permanent link">&para;</a></h2>
+<p>这里使用一份从内存产生到 SQL Server 导入的数据。</p>
 <div class="highlight"><pre><span></span><code><span class="p">{</span>
 <span class="w">  </span><span class="nt">&quot;job&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
 <span class="w">    </span><span class="nt">&quot;setting&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
@@ -2592,15 +2592,16 @@
 <span class="w">  </span><span class="p">}</span>
 <span class="p">}</span>
 </code></pre></div>
-<h2 id="parameters">Parameters<a class="headerlink" href="#parameters" title="Permanent link">&para;</a></h2>
-<p>This plugin is based on <a href="../rdbmswriter">RDBMS Writer</a>, so you can refer to all configuration items of RDBMS Writer.</p>
+<h2 id="_2">参数说明<a class="headerlink" href="#_2" title="Permanent link">&para;</a></h2>
+<p>该插件基于 <a href="../rdbmswriter">RDBMS Writer</a> 实现，因此可以参考 RDBMS Writer 的所有配置项。</p>
 <h3 id="writemode">writeMode<a class="headerlink" href="#writemode" title="Permanent link">&para;</a></h3>
-<p>By default, <code>insert into</code> syntax is used to write to SQL Server tables. If you want to use the mode of updating when primary key exists and inserting when it doesn't exist, which is SQL Server's <code>MERGE INTO</code> syntax, you can use <code>update</code> mode. Assuming the table's primary key is <code>id</code>, the <code>writeMode</code> configuration method is as follows:</p>
+<p>默认情况下， 采取 <code>insert into</code> 语法写入 SQL Server 表，如果你希望采取主键存在时更新，不存在则写入的方式，也就是 SQL Server 的 <code>MERGE INTO</code> 语法, 可以使用 <code>update</code> 模式。 假定表的主键为 <code>id</code>
+,则 <code>writeMode</code> 配置方法如下：</p>
 <div class="highlight"><pre><span></span><code><span class="p">{</span>
 <span class="w">  </span><span class="nt">&quot;writeMode&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;update(id)&quot;</span>
 <span class="p">}</span>
 </code></pre></div>
-<p>If it's a composite unique index, the configuration method is as follows:</p>
+<p>如果是联合唯一索引，则配置方法如下：</p>
 <div class="highlight"><pre><span></span><code><span class="p">{</span>
 <span class="w">  </span><span class="nt">&quot;writeMode&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;update(col1, col2)&quot;</span>
 <span class="p">}</span>

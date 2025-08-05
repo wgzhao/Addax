@@ -809,7 +809,7 @@
         
   
   <span class="md-ellipsis">
-    Text File Reader
+    TxtFile Reader
   </span>
   
 
@@ -998,7 +998,7 @@
         
   
   <span class="md-ellipsis">
-    FTP Reader
+    Ftp Reader
   </span>
   
 
@@ -1857,18 +1857,60 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#configuration-example" class="md-nav__link">
+  <a href="#_1" class="md-nav__link">
     <span class="md-ellipsis">
-      Configuration Example
+      示例
     </span>
   </a>
   
 </li>
       
         <li class="md-nav__item">
-  <a href="#parameters" class="md-nav__link">
+  <a href="#_2" class="md-nav__link">
     <span class="md-ellipsis">
-      Parameters
+      参数说明
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#loadurl" class="md-nav__link">
+    <span class="md-ellipsis">
+      loadUrl
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="loadUrl">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#column" class="md-nav__link">
+    <span class="md-ellipsis">
+      column
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#loadprops" class="md-nav__link">
+    <span class="md-ellipsis">
+      loadProps
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_3" class="md-nav__link">
+    <span class="md-ellipsis">
+      类型转换
     </span>
   </a>
   
@@ -1915,7 +1957,7 @@
         
   
   <span class="md-ellipsis">
-    FTP Writer
+    Ftp Writer
   </span>
   
 
@@ -1936,7 +1978,7 @@
         
   
   <span class="md-ellipsis">
-    GreenPlum Writer
+    Greenplum Writer
   </span>
   
 
@@ -1999,7 +2041,7 @@
         
   
   <span class="md-ellipsis">
-    HBase11x Writer
+    HBase11X Writer
   </span>
   
 
@@ -2479,18 +2521,60 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#configuration-example" class="md-nav__link">
+  <a href="#_1" class="md-nav__link">
     <span class="md-ellipsis">
-      Configuration Example
+      示例
     </span>
   </a>
   
 </li>
       
         <li class="md-nav__item">
-  <a href="#parameters" class="md-nav__link">
+  <a href="#_2" class="md-nav__link">
     <span class="md-ellipsis">
-      Parameters
+      参数说明
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#loadurl" class="md-nav__link">
+    <span class="md-ellipsis">
+      loadUrl
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="loadUrl">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#column" class="md-nav__link">
+    <span class="md-ellipsis">
+      column
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#loadprops" class="md-nav__link">
+    <span class="md-ellipsis">
+      loadProps
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_3" class="md-nav__link">
+    <span class="md-ellipsis">
+      类型转换
     </span>
   </a>
   
@@ -2512,9 +2596,25 @@
 
 
 <h1 id="doris-writer">Doris Writer<a class="headerlink" href="#doris-writer" title="Permanent link">&para;</a></h1>
-<p>Doris Writer plugin implements writing data to Apache Doris.</p>
-<h2 id="configuration-example">Configuration Example<a class="headerlink" href="#configuration-example" title="Permanent link">&para;</a></h2>
-<p>This plugin is used to write data to Doris database. For detailed configuration and parameters, please refer to the original Doris Writer documentation.</p>
+<p>DorisWriter 插件用于向 <a href="http://doris.incubator.apache.org/master/zh-CN/">Doris</a> 数据库以流式方式写入数据。 其实现上是通过访问
+Doris http 连接(8030)，然后通过 <a href="http://doris.incubator.apache.org/master/zh-CN/administrator-guide/load-data/stream-load-manual.html">stream load</a>
+加载数据到数据中，相比 <code>insert into</code> 方式效率要高不少，也是官方推荐的生产环境下的数据加载方式。</p>
+<p>Doris 是一个兼容 MySQL 协议的数据库后端，因此 Doris 读取可以使用 <a href="../../reader/mysqlreader">MySQL Reader</a> 进行访问。</p>
+<h2 id="_1">示例<a class="headerlink" href="#_1" title="Permanent link">&para;</a></h2>
+<p>假定要写入的表的建表语句如下：</p>
+<div class="highlight"><pre><span></span><code><span class="k">CREATE</span>
+<span class="k">DATABASE</span><span class="w"> </span><span class="n">example_db</span><span class="p">;</span>
+<span class="k">CREATE</span><span class="w"> </span><span class="k">TABLE</span><span class="w"> </span><span class="n">example_db</span><span class="p">.</span><span class="n">table1</span>
+<span class="p">(</span>
+<span class="w">    </span><span class="n">siteid</span><span class="w">   </span><span class="nb">INT</span><span class="w">         </span><span class="k">DEFAULT</span><span class="w"> </span><span class="s1">&#39;10&#39;</span><span class="p">,</span>
+<span class="w">    </span><span class="n">citycode</span><span class="w"> </span><span class="nb">SMALLINT</span><span class="p">,</span>
+<span class="w">    </span><span class="n">username</span><span class="w"> </span><span class="nb">VARCHAR</span><span class="p">(</span><span class="mi">32</span><span class="p">)</span><span class="w"> </span><span class="k">DEFAULT</span><span class="w"> </span><span class="s1">&#39;&#39;</span><span class="p">,</span>
+<span class="w">    </span><span class="n">pv</span><span class="w">       </span><span class="nb">BIGINT</span><span class="w"> </span><span class="k">SUM</span><span class="w"> </span><span class="k">DEFAULT</span><span class="w"> </span><span class="s1">&#39;0&#39;</span>
+<span class="p">)</span><span class="w"> </span><span class="k">AGGREGATE</span><span class="w"> </span><span class="k">KEY</span><span class="p">(</span><span class="n">siteid</span><span class="p">,</span><span class="w"> </span><span class="n">citycode</span><span class="p">,</span><span class="w"> </span><span class="n">username</span><span class="p">)</span>
+<span class="n">DISTRIBUTED</span><span class="w"> </span><span class="k">BY</span><span class="w"> </span><span class="n">HASH</span><span class="p">(</span><span class="n">siteid</span><span class="p">)</span><span class="w"> </span><span class="n">BUCKETS</span><span class="w"> </span><span class="mi">10</span>
+<span class="n">PROPERTIES</span><span class="p">(</span><span class="ss">&quot;replication_num&quot;</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="ss">&quot;1&quot;</span><span class="p">);</span>
+</code></pre></div>
+<p>下面配置一个从内存读取数据，然后写入到 doris 表的配置文件</p>
 <div class="highlight"><pre><span></span><code><span class="p">{</span>
 <span class="w">  </span><span class="nt">&quot;job&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
 <span class="w">    </span><span class="nt">&quot;setting&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
@@ -2577,8 +2677,193 @@
 <span class="w">  </span><span class="p">}</span>
 <span class="p">}</span>
 </code></pre></div>
-<h2 id="parameters">Parameters<a class="headerlink" href="#parameters" title="Permanent link">&para;</a></h2>
-<p>This plugin supports writing data to Doris with Stream Load capabilities and configurable connection options.</p>
+<p>将上述配置文件保存为 <code>job/stream2doris.json</code></p>
+<p>执行下面的命令</p>
+<div class="highlight"><pre><span></span><code>bin/addax.sh<span class="w"> </span>job/stream2doris.json
+</code></pre></div>
+<p>输出类似如下：</p>
+<div class="highlight"><pre><span></span><code>2021-02-23 15:22:57.851 [main] INFO  VMInfo - VMInfo# operatingSystem class =&gt; sun.management.OperatingSystemImpl
+2021-02-23 15:22:57.871 [main] INFO  Engine -
+{
+&quot;content&quot;:{
+&quot;reader&quot;:{
+    &quot;parameter&quot;:{
+            &quot;column&quot;:[
+                    {
+                            &quot;random&quot;:&quot;1,500&quot;,
+                            &quot;type&quot;:&quot;long&quot;
+                    },
+                    {
+                            &quot;random&quot;:&quot;1,127&quot;,
+                            &quot;type&quot;:&quot;long&quot;
+                    },
+                    {
+                            &quot;type&quot;:&quot;string&quot;,
+                            &quot;value&quot;:&quot;username&quot;
+                    }
+            ],
+            &quot;sliceRecordCount&quot;:100
+    },
+    &quot;name&quot;:&quot;streamreader&quot;
+},
+&quot;writer&quot;:{
+    &quot;parameter&quot;:{
+            &quot;password&quot;:&quot;*****&quot;,
+            &quot;batchSize&quot;:1024,
+            &quot;connection&quot;:[
+                    {
+                            &quot;database&quot;:&quot;example_db&quot;,
+                            &quot;endpoint&quot;:&quot;http://127.0.0.1:8030/&quot;,
+                            &quot;table&quot;:&quot;table1&quot;
+                    }
+            ],
+            &quot;username&quot;:&quot;test&quot;
+    },
+    &quot;name&quot;:&quot;doriswriter&quot;
+ }
+},
+&quot;setting&quot;:{
+&quot;speed&quot;:{
+&quot;channel&quot;:2
+}
+}
+}
+
+2021-02-23 15:22:57.886 [main] INFO  PerfTrace - PerfTrace traceId=job_-1, isEnable=false, priority=0
+2021-02-23 15:22:57.886 [main] INFO  JobContainer - Addax jobContainer starts job.
+2021-02-23 15:22:57.920 [job-0] INFO  JobContainer - Scheduler starts [1] taskGroups.
+2021-02-23 15:22:57.928 [taskGroup-0] INFO  TaskGroupContainer - taskGroupId=[0] start [2] channels for [2] tasks.
+2021-02-23 15:22:57.935 [taskGroup-0] INFO  Channel - Channel set byte_speed_limit to -1, No bps activated.
+2021-02-23 15:22:57.936 [taskGroup-0] INFO  Channel - Channel set record_speed_limit to -1, No tps activated.
+2021-02-23 15:22:57.970 [0-0-1-writer] INFO  DorisWriterTask - connect DorisDB with http://127.0.0.1:8030//api/example_db/table1/_stream_load
+2021-02-23 15:22:57.970 [0-0-0-writer] INFO  DorisWriterTask - connect DorisDB with http://127.0.0.1:8030//api/example_db/table1/_stream_load
+
+2021-02-23 15:23:00.941 [job-0] INFO  JobContainer - PerfTrace not enable!
+2021-02-23 15:23:00.946 [job-0] INFO  JobContainer -
+任务启动时刻                    : 2021-02-23 15:22:57
+任务结束时刻                    : 2021-02-23 15:23:00
+任务总计耗时                    :                  3s
+任务平均流量                    :            1.56KB/s
+记录写入速度                    :             66rec/s
+读出记录总数                    :                 200
+读写失败总数                    :                   0
+</code></pre></div>
+<h2 id="_2">参数说明<a class="headerlink" href="#_2" title="Permanent link">&para;</a></h2>
+<table>
+<thead>
+<tr>
+<th style="text-align: left;">配置项</th>
+<th style="text-align: center;">是否必须</th>
+<th>类型</th>
+<th>默认值</th>
+<th>描述</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;">loadUrl</td>
+<td style="text-align: center;">是</td>
+<td>string</td>
+<td>无</td>
+<td>Stream Load 的连接目标 ｜</td>
+</tr>
+<tr>
+<td style="text-align: left;">username</td>
+<td style="text-align: center;">是</td>
+<td>string</td>
+<td>无</td>
+<td>访问Doris数据库的用户名</td>
+</tr>
+<tr>
+<td style="text-align: left;">password</td>
+<td style="text-align: center;">否</td>
+<td>string</td>
+<td>无</td>
+<td>访问Doris数据库的密码</td>
+</tr>
+<tr>
+<td style="text-align: left;">flushInterval</td>
+<td style="text-align: center;">否</td>
+<td>int</td>
+<td>3000</td>
+<td>数据写入到目标表的间隔时间，单位为毫秒，即每隔多少毫秒写入一次数据</td>
+</tr>
+<tr>
+<td style="text-align: left;">flushQueueLength</td>
+<td style="text-align: center;">否</td>
+<td>int</td>
+<td>1</td>
+<td>上传数据的队列长度</td>
+</tr>
+<tr>
+<td style="text-align: left;">table</td>
+<td style="text-align: center;">是</td>
+<td>string</td>
+<td>无</td>
+<td>所选取的需要同步的表名</td>
+</tr>
+<tr>
+<td style="text-align: left;">column</td>
+<td style="text-align: center;">是</td>
+<td>list</td>
+<td>无</td>
+<td>所配置的表中需要同步的列名集合，详细描述见 <a href="../rdbmswriter">RBDMS Writer</a></td>
+</tr>
+<tr>
+<td style="text-align: left;">batchSize</td>
+<td style="text-align: center;">否</td>
+<td>int</td>
+<td>2048</td>
+<td>每批次导入数据的最大行数</td>
+</tr>
+<tr>
+<td style="text-align: left;">loadProps</td>
+<td style="text-align: center;">否</td>
+<td>map</td>
+<td><code>csv</code></td>
+<td>streamLoad 的请求参数，详情参照<a href="https://github.com/apache/doris-streamloader/tree/master">StreamLoad介绍页面</a></td>
+</tr>
+<tr>
+<td style="text-align: left;">preSql</td>
+<td style="text-align: center;">否</td>
+<td>list</td>
+<td></td>
+<td>写入数据到目标表前要执行的 SQL 语句</td>
+</tr>
+<tr>
+<td style="text-align: left;">postSql</td>
+<td style="text-align: center;">否</td>
+<td>list</td>
+<td></td>
+<td>数据写完后要执行的 SQL 语句</td>
+</tr>
+</tbody>
+</table>
+<h2 id="loadurl">loadUrl<a class="headerlink" href="#loadurl" title="Permanent link">&para;</a></h2>
+<p>作为 Stream Load 的连接目标。格式为 "ip:port"。其中 IP 是 FE 节点 IP，port 是 FE 节点的 http_port。可以填写多个，当填写多个时，插件会每个批次随机选择一个有效 FE 节点进行连接。</p>
+<h3 id="column">column<a class="headerlink" href="#column" title="Permanent link">&para;</a></h3>
+<p>允许配置为 <code>["*"]</code> ， 如果是 "*" , 则尝试从 Doris 数据库中直接读取表字段，然后进行拼装。</p>
+<h3 id="loadprops">loadProps<a class="headerlink" href="#loadprops" title="Permanent link">&para;</a></h3>
+<p>StreamLoad 的请求参数，详情参照StreamLoad介绍页面。<a href="https://doris.apache.org/zh-CN/docs/data-operate/import/import-way/stream-load-manual">Stream load - Apache Doris</a></p>
+<p>这里包括导入的数据格式：format等，导入数据格式默认我们使用csv，支持JSON，具体可以参照下面类型转换部分，也可以参照上面Stream load 官方信息</p>
+<h2 id="_3">类型转换<a class="headerlink" href="#_3" title="Permanent link">&para;</a></h2>
+<p>默认传入的数据均会被转为字符串，并以\t作为列分隔符，\n作为行分隔符，组成csv文件进行StreamLoad导入操作。</p>
+<p>默认是csv格式导入，如需更改列分隔符， 则正确配置 loadProps 即可</p>
+<div class="highlight"><pre><span></span><code><span class="p">{</span>
+<span class="w">  </span><span class="nt">&quot;loadProps&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="nt">&quot;column_separator&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;\\x01&quot;</span><span class="p">,</span>
+<span class="w">    </span><span class="nt">&quot;line_delimiter&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;\\x02&quot;</span>
+<span class="w">  </span><span class="p">}</span>
+<span class="p">}</span>
+</code></pre></div>
+<p>如需更改导入格式为json， 则正确配置 loadProps 即可：</p>
+<div class="highlight"><pre><span></span><code><span class="p">{</span>
+<span class="w">  </span><span class="nt">&quot;loadProps&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="nt">&quot;format&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;json&quot;</span><span class="p">,</span>
+<span class="w">    </span><span class="nt">&quot;strip_outer_array&quot;</span><span class="p">:</span><span class="w"> </span><span class="kc">true</span>
+<span class="w">  </span><span class="p">}</span>
+<span class="p">}</span>
+</code></pre></div>
 
 
 

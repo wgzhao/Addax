@@ -809,7 +809,7 @@
         
   
   <span class="md-ellipsis">
-    Text File Reader
+    TxtFile Reader
   </span>
   
 
@@ -998,7 +998,7 @@
         
   
   <span class="md-ellipsis">
-    FTP Reader
+    Ftp Reader
   </span>
   
 
@@ -1857,7 +1857,7 @@
         
   
   <span class="md-ellipsis">
-    FTP Writer
+    Ftp Writer
   </span>
   
 
@@ -1878,7 +1878,7 @@
         
   
   <span class="md-ellipsis">
-    GreenPlum Writer
+    Greenplum Writer
   </span>
   
 
@@ -1941,7 +1941,7 @@
         
   
   <span class="md-ellipsis">
-    HBase11x Writer
+    HBase11X Writer
   </span>
   
 
@@ -2193,18 +2193,42 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#configuration-example" class="md-nav__link">
+  <a href="#_1" class="md-nav__link">
     <span class="md-ellipsis">
-      Configuration Example
+      配置样例
     </span>
   </a>
   
 </li>
       
         <li class="md-nav__item">
-  <a href="#parameters" class="md-nav__link">
+  <a href="#_2" class="md-nav__link">
     <span class="md-ellipsis">
-      Parameters
+      参数说明
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="参数说明">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#object" class="md-nav__link">
+    <span class="md-ellipsis">
+      object
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_3" class="md-nav__link">
+    <span class="md-ellipsis">
+      类型转换
     </span>
   </a>
   
@@ -2479,18 +2503,42 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#configuration-example" class="md-nav__link">
+  <a href="#_1" class="md-nav__link">
     <span class="md-ellipsis">
-      Configuration Example
+      配置样例
     </span>
   </a>
   
 </li>
       
         <li class="md-nav__item">
-  <a href="#parameters" class="md-nav__link">
+  <a href="#_2" class="md-nav__link">
     <span class="md-ellipsis">
-      Parameters
+      参数说明
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="参数说明">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#object" class="md-nav__link">
+    <span class="md-ellipsis">
+      object
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_3" class="md-nav__link">
+    <span class="md-ellipsis">
+      类型转换
     </span>
   </a>
   
@@ -2512,10 +2560,11 @@
 
 
 <h1 id="s3-writer">S3 Writer<a class="headerlink" href="#s3-writer" title="Permanent link">&para;</a></h1>
-<p>S3 Writer plugin is used to write data to Amazon AWS S3 storage, as well as S3 protocol compatible storage, such as <a href="https://min.io">MinIO</a>.</p>
-<p>In implementation, this plugin is written based on S3's official <a href="https://docs.aws.amazon.com/sdk-for-java/latest/developer-guide/home.html">SDK 2.0</a>.</p>
-<h2 id="configuration-example">Configuration Example<a class="headerlink" href="#configuration-example" title="Permanent link">&para;</a></h2>
-<p>The following configuration is used to read data from memory and write to specified S3 bucket.</p>
+<p>S3 Writer 插件用于将数据写入 Amazon AWS S3 存储，以及兼容 S3 协议的存储，比如 <a href="https://min.io">MinIO</a>。</p>
+<p>在实现上，本插件基于 S3 官方的 <a href="https://docs.aws.amazon.com/sdk-for-java/latest/developer-guide/home.
+html">SDK 2.0</a> 编写。</p>
+<h2 id="_1">配置样例<a class="headerlink" href="#_1" title="Permanent link">&para;</a></h2>
+<p>下面的配置用于从内存读取数据，并写入到指定的 S3 bucket 上。</p>
 <div class="highlight"><pre><span></span><code><span class="p">{</span>
 <span class="w">  </span><span class="nt">&quot;job&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
 <span class="w">    </span><span class="nt">&quot;setting&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
@@ -2571,94 +2620,167 @@
 <span class="w">  </span><span class="p">}</span>
 <span class="p">}</span>
 </code></pre></div>
-<h2 id="parameters">Parameters<a class="headerlink" href="#parameters" title="Permanent link">&para;</a></h2>
+<h2 id="_2">参数说明<a class="headerlink" href="#_2" title="Permanent link">&para;</a></h2>
 <table>
 <thead>
 <tr>
-<th style="text-align: left;">Configuration</th>
-<th style="text-align: center;">Required</th>
-<th>Data Type</th>
-<th>Default Value</th>
-<th>Description</th>
+<th style="text-align: left;">配置项</th>
+<th style="text-align: center;">是否必须</th>
+<th>数据类型</th>
+<th>默认值</th>
+<th>描述</th>
 </tr>
 </thead>
 <tbody>
 <tr>
 <td style="text-align: left;">endpoint</td>
-<td style="text-align: center;">Yes</td>
+<td style="text-align: center;">是</td>
 <td>string</td>
-<td>None</td>
-<td>S3 Server EndPoint address, e.g. <code>s3.xx.amazonaws.com</code></td>
+<td>无</td>
+<td>S3 Server的 EndPoint地址，例如 <code>s3.xx.amazonaws.com</code></td>
 </tr>
 <tr>
 <td style="text-align: left;">region</td>
-<td style="text-align: center;">Yes</td>
+<td style="text-align: center;">是</td>
 <td>string</td>
-<td>None</td>
-<td>S3 Server Region address, e.g. <code>ap-southeast-1</code></td>
+<td>无</td>
+<td>S3 Server的 Region 地址，例如 <code>ap-southeast-1</code></td>
 </tr>
 <tr>
 <td style="text-align: left;">accessId</td>
-<td style="text-align: center;">Yes</td>
+<td style="text-align: center;">是</td>
 <td>string</td>
-<td>None</td>
-<td>Access ID</td>
+<td>无</td>
+<td>访问 ID</td>
 </tr>
 <tr>
 <td style="text-align: left;">accessKey</td>
-<td style="text-align: center;">Yes</td>
+<td style="text-align: center;">是</td>
 <td>string</td>
-<td>None</td>
-<td>Access Key</td>
+<td>无</td>
+<td>访问 Key</td>
 </tr>
 <tr>
 <td style="text-align: left;">bucket</td>
-<td style="text-align: center;">Yes</td>
+<td style="text-align: center;">是</td>
 <td>string</td>
-<td>None</td>
-<td>Bucket to write to</td>
+<td>无</td>
+<td>要写入的 bucket</td>
 </tr>
 <tr>
 <td style="text-align: left;">object</td>
-<td style="text-align: center;">Yes</td>
+<td style="text-align: center;">是</td>
 <td>string</td>
-<td>None</td>
-<td>Object to write to, see notes below</td>
+<td>无</td>
+<td>要写入的 object，注意事项见下</td>
 </tr>
 <tr>
 <td style="text-align: left;">fieldDelimiter</td>
-<td style="text-align: center;">No</td>
+<td style="text-align: center;">否</td>
 <td>char</td>
 <td><code>','</code></td>
-<td>Field delimiter</td>
+<td>字段的分隔符</td>
 </tr>
 <tr>
 <td style="text-align: left;">nullFormat</td>
-<td style="text-align: center;">No</td>
+<td style="text-align: center;">否</td>
 <td>char</td>
 <td><code>\N</code></td>
-<td>What character to use when value is null</td>
+<td>当值为空时，用什么字符表示</td>
 </tr>
 <tr>
 <td style="text-align: left;">header</td>
-<td style="text-align: center;">No</td>
+<td style="text-align: center;">否</td>
 <td>list</td>
-<td>None</td>
-<td>Write file header information, e.g. <code>["id","title","url"]</code></td>
+<td>无</td>
+<td>写入文件头信息，比如 <code>["id","title","url"]</code></td>
 </tr>
 <tr>
 <td style="text-align: left;">maxFileSize</td>
-<td style="text-align: center;">No</td>
+<td style="text-align: center;">否</td>
 <td>int</td>
 <td><code>100000</code></td>
-<td>Size of single object, in MB</td>
+<td>单个 object 的大小，单位为 MB</td>
 </tr>
 <tr>
 <td style="text-align: left;">encoding</td>
-<td style="text-align: center;">No</td>
+<td style="text-align: center;">否</td>
 <td>string</td>
 <td><code>utf-8</code></td>
-<td>File encoding format</td>
+<td>文件编码格式</td>
+</tr>
+<tr>
+<td style="text-align: left;">writeMode</td>
+<td style="text-align: center;">否</td>
+<td>string</td>
+<td><code>append</code></td>
+<td>写入模式，详见 <a href="../hdfswriter">hdfswriter</a> 中相关描述</td>
+</tr>
+<tr>
+<td style="text-align: left;">pathStyleAccessEnabled</td>
+<td style="text-align: center;">否</td>
+<td>bool</td>
+<td>false</td>
+<td>是否使用path access方式访问</td>
+</tr>
+<tr>
+<td style="text-align: left;">sslEnabled</td>
+<td style="text-align: center;">否</td>
+<td>bool</td>
+<td>true</td>
+<td>是否使用ssl方式访问</td>
+</tr>
+<tr>
+<td style="text-align: left;">fileType</td>
+<td style="text-align: center;">否</td>
+<td>string</td>
+<td><code>text</code></td>
+<td>文件类型 text, orc ,parquet</td>
+</tr>
+<tr>
+<td style="text-align: left;">compress</td>
+<td style="text-align: center;">否</td>
+<td>string</td>
+<td>orc 默认<code>NONE</code> parquet 默认 <code>UNCOMPRESSED</code></td>
+<td>orc或parquet文件的压缩方式,默认不压缩</td>
+</tr>
+</tbody>
+</table>
+<h3 id="object">object<a class="headerlink" href="#object" title="Permanent link">&para;</a></h3>
+<p>上述配置中的 <code>object</code> 配置的虽然是 <code>upload.csv</code> 文件，实际上在 S3 写入的文件名会在指定的文件名后面加上 <code>uuid</code> 后缀，
+类似 <code>upload_c0d2ca7df0444933a6f18ea76718b569.csv</code>。 这是用于在多通道写入的情况下，确保文件名不会重名。</p>
+<h2 id="_3">类型转换<a class="headerlink" href="#_3" title="Permanent link">&para;</a></h2>
+<table>
+<thead>
+<tr>
+<th>Addax 内部类型</th>
+<th>S3 数据类型</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Long</td>
+<td>int, tinyint, smallint, mediumint, int, bigint</td>
+</tr>
+<tr>
+<td>Double</td>
+<td>float, double, decimal</td>
+</tr>
+<tr>
+<td>String</td>
+<td>varchar, char, tinytext, text, mediumtext, longtext, year,xml</td>
+</tr>
+<tr>
+<td>Date</td>
+<td>date, datetime, timestamp, time</td>
+</tr>
+<tr>
+<td>Boolean</td>
+<td>bit, bool</td>
+</tr>
+<tr>
+<td>Bytes</td>
+<td>tinyblob, mediumblob, blob, longblob, varbinary</td>
 </tr>
 </tbody>
 </table>

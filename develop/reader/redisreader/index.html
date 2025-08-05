@@ -814,7 +814,7 @@
         
   
   <span class="md-ellipsis">
-    Text File Reader
+    TxtFile Reader
   </span>
   
 
@@ -1003,7 +1003,7 @@
         
   
   <span class="md-ellipsis">
-    FTP Reader
+    Ftp Reader
   </span>
   
 
@@ -1339,27 +1339,27 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#configuration-example" class="md-nav__link">
+  <a href="#_1" class="md-nav__link">
     <span class="md-ellipsis">
-      Configuration Example
+      配置样例
     </span>
   </a>
   
 </li>
       
         <li class="md-nav__item">
-  <a href="#parameters" class="md-nav__link">
+  <a href="#_2" class="md-nav__link">
     <span class="md-ellipsis">
-      Parameters
+      参数说明
     </span>
   </a>
   
 </li>
       
         <li class="md-nav__item">
-  <a href="#constraints" class="md-nav__link">
+  <a href="#_3" class="md-nav__link">
     <span class="md-ellipsis">
-      Constraints
+      约束限制
     </span>
   </a>
   
@@ -1924,7 +1924,7 @@
         
   
   <span class="md-ellipsis">
-    FTP Writer
+    Ftp Writer
   </span>
   
 
@@ -1945,7 +1945,7 @@
         
   
   <span class="md-ellipsis">
-    GreenPlum Writer
+    Greenplum Writer
   </span>
   
 
@@ -2008,7 +2008,7 @@
         
   
   <span class="md-ellipsis">
-    HBase11x Writer
+    HBase11X Writer
   </span>
   
 
@@ -2488,27 +2488,27 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#configuration-example" class="md-nav__link">
+  <a href="#_1" class="md-nav__link">
     <span class="md-ellipsis">
-      Configuration Example
+      配置样例
     </span>
   </a>
   
 </li>
       
         <li class="md-nav__item">
-  <a href="#parameters" class="md-nav__link">
+  <a href="#_2" class="md-nav__link">
     <span class="md-ellipsis">
-      Parameters
+      参数说明
     </span>
   </a>
   
 </li>
       
         <li class="md-nav__item">
-  <a href="#constraints" class="md-nav__link">
+  <a href="#_3" class="md-nav__link">
     <span class="md-ellipsis">
-      Constraints
+      约束限制
     </span>
   </a>
   
@@ -2530,8 +2530,8 @@
 
 
 <h1 id="redis-reader">Redis Reader<a class="headerlink" href="#redis-reader" title="Permanent link">&para;</a></h1>
-<p>Redis Reader plugin is used to read <a href="https://redis.io">Redis RDB</a> data.</p>
-<h2 id="configuration-example">Configuration Example<a class="headerlink" href="#configuration-example" title="Permanent link">&para;</a></h2>
+<p>Redis Reader 插件用于读取 <a href="https://redis.io">Redis RDB</a> 数据</p>
+<h2 id="_1">配置样例<a class="headerlink" href="#_1" title="Permanent link">&para;</a></h2>
 <div class="highlight"><pre><span></span><code><span class="p">{</span>
 <span class="w">  </span><span class="nt">&quot;job&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
 <span class="w">    </span><span class="nt">&quot;setting&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
@@ -2573,48 +2573,48 @@
 <span class="w">  </span><span class="p">}</span>
 <span class="p">}</span>
 </code></pre></div>
-<h2 id="parameters">Parameters<a class="headerlink" href="#parameters" title="Permanent link">&para;</a></h2>
+<h2 id="_2">参数说明<a class="headerlink" href="#_2" title="Permanent link">&para;</a></h2>
 <table>
 <thead>
 <tr>
-<th style="text-align: left;">Configuration</th>
-<th style="text-align: center;">Required</th>
-<th>Default Value</th>
-<th>Description</th>
+<th style="text-align: left;">配置项</th>
+<th style="text-align: center;">是否必须</th>
+<th>默认值</th>
+<th>描述</th>
 </tr>
 </thead>
 <tbody>
 <tr>
 <td style="text-align: left;">uri</td>
-<td style="text-align: center;">Yes</td>
-<td>No</td>
-<td>Redis connection, supports multiple local rdb files/network rdb files, if cluster, fill in all master node addresses</td>
+<td style="text-align: center;">是</td>
+<td>否</td>
+<td>redis链接,支持多个本地rdb文件/网络rdb文件,如果是集群,填写所有master节点地址</td>
 </tr>
 <tr>
 <td style="text-align: left;">db</td>
-<td style="text-align: center;">No</td>
-<td>None</td>
-<td>Database index to read, if not filled, read all databases</td>
+<td style="text-align: center;">否</td>
+<td>无</td>
+<td>需要读取的db索引,若不填写,则读取所有db</td>
 </tr>
 <tr>
 <td style="text-align: left;">include</td>
-<td style="text-align: center;">No</td>
-<td>None</td>
-<td>Keys to include, supports regular expressions</td>
+<td style="text-align: center;">否</td>
+<td>无</td>
+<td>要包含的 key, 支持正则表达式</td>
 </tr>
 <tr>
 <td style="text-align: left;">exclude</td>
-<td style="text-align: center;">No</td>
-<td>None</td>
-<td>Keys to exclude, supports regular expressions</td>
+<td style="text-align: center;">否</td>
+<td>无</td>
+<td>要排除的 key,支持正则表达式</td>
 </tr>
 </tbody>
 </table>
-<h2 id="constraints">Constraints<a class="headerlink" href="#constraints" title="Permanent link">&para;</a></h2>
+<h2 id="_3">约束限制<a class="headerlink" href="#_3" title="Permanent link">&para;</a></h2>
 <ol>
-<li>Does not support directly reading any redis server that does not support the <code>sync</code> command. If needed, please read from backed up rdb files.</li>
-<li>If it's a native redis cluster, please fill in all master node TCP addresses. The <code>redisreader</code> plugin will automatically dump rdb files from all nodes.</li>
-<li>Only parses <code>String</code> data type, other composite types (<code>Sets</code>, <code>List</code>, etc. will be ignored)</li>
+<li>不支持直接读取任何不支持 <code>sync</code> 命令的 redis server，如果需要请备份的rdb文件进行读取。</li>
+<li>如果是原生redis cluster集群，请填写所有master节点的tcp地址，<code>redisreader</code> 插件会自动dump 所有节点的rdb文件。</li>
+<li>仅解析 <code>String</code> 数据类型，其他复合类型(<code>Sets</code>, <code>List</code> 等会忽略)</li>
 </ol>
 
 

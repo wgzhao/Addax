@@ -809,7 +809,7 @@
         
   
   <span class="md-ellipsis">
-    Text File Reader
+    TxtFile Reader
   </span>
   
 
@@ -998,7 +998,7 @@
         
   
   <span class="md-ellipsis">
-    FTP Reader
+    Ftp Reader
   </span>
   
 
@@ -1857,7 +1857,7 @@
         
   
   <span class="md-ellipsis">
-    FTP Writer
+    Ftp Writer
   </span>
   
 
@@ -1878,7 +1878,7 @@
         
   
   <span class="md-ellipsis">
-    GreenPlum Writer
+    Greenplum Writer
   </span>
   
 
@@ -1941,7 +1941,7 @@
         
   
   <span class="md-ellipsis">
-    HBase11x Writer
+    HBase11X Writer
   </span>
   
 
@@ -2004,11 +2004,44 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#configuration-example" class="md-nav__link">
+  <a href="#_1" class="md-nav__link">
     <span class="md-ellipsis">
-      Configuration Example
+      配置样例
     </span>
   </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_2" class="md-nav__link">
+    <span class="md-ellipsis">
+      参数说明
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="参数说明">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#jdbcurl" class="md-nav__link">
+    <span class="md-ellipsis">
+      jdbcUrl
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#nullmode" class="md-nav__link">
+    <span class="md-ellipsis">
+      nullMode
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
   
 </li>
       
@@ -2470,11 +2503,44 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#configuration-example" class="md-nav__link">
+  <a href="#_1" class="md-nav__link">
     <span class="md-ellipsis">
-      Configuration Example
+      配置样例
     </span>
   </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_2" class="md-nav__link">
+    <span class="md-ellipsis">
+      参数说明
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="参数说明">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#jdbcurl" class="md-nav__link">
+    <span class="md-ellipsis">
+      jdbcUrl
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#nullmode" class="md-nav__link">
+    <span class="md-ellipsis">
+      nullMode
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
   
 </li>
       
@@ -2494,9 +2560,9 @@
 
 
 <h1 id="hbase20x-sql-writer">HBase20x SQL Writer<a class="headerlink" href="#hbase20x-sql-writer" title="Permanent link">&para;</a></h1>
-<p>HBase20x SQL Writer plugin implements writing data to HBase 2.x via Phoenix SQL interface.</p>
-<h2 id="configuration-example">Configuration Example<a class="headerlink" href="#configuration-example" title="Permanent link">&para;</a></h2>
-<p>This plugin is used to write data to HBase 2.x via Phoenix. This plugin is based on <a href="../rdbmswriter">RDBMS Writer</a>, so you can refer to all configuration items of RDBMS Writer.</p>
+<p>HBase20x SQL Writer 插件利用 Phoenix 向 HBase 2.x 写入数据。</p>
+<p>如果 HBase 是 1.X 版本，则可以使用 <a href="../hbase11xsqlwriter">HBase11xsqlWriter</a> 或<a href="../hbase11xwriter">HBase11xWriter</a> 插件</p>
+<h2 id="_1">配置样例<a class="headerlink" href="#_1" title="Permanent link">&para;</a></h2>
 <div class="highlight"><pre><span></span><code><span class="p">{</span>
 <span class="w">  </span><span class="nt">&quot;job&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
 <span class="w">    </span><span class="nt">&quot;content&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
@@ -2551,6 +2617,108 @@
 <span class="w">  </span><span class="p">}</span>
 <span class="p">}</span>
 </code></pre></div>
+<h2 id="_2">参数说明<a class="headerlink" href="#_2" title="Permanent link">&para;</a></h2>
+<table>
+<thead>
+<tr>
+<th style="text-align: left;">配置项</th>
+<th style="text-align: center;">是否必须</th>
+<th>数据类型</th>
+<th>默认值</th>
+<th>描述</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;">jdbcUrl</td>
+<td style="text-align: center;">是</td>
+<td>string</td>
+<td>无</td>
+<td>Phoenix 连接地址</td>
+</tr>
+<tr>
+<td style="text-align: left;">table</td>
+<td style="text-align: center;">是</td>
+<td>string</td>
+<td>无</td>
+<td>所要读取表名</td>
+</tr>
+<tr>
+<td style="text-align: left;">schema</td>
+<td style="text-align: center;">否</td>
+<td>string</td>
+<td>无</td>
+<td>表所在的 schema</td>
+</tr>
+<tr>
+<td style="text-align: left;">batchSize</td>
+<td style="text-align: center;">否</td>
+<td>int</td>
+<td>256</td>
+<td>一次批量写入的最大行数</td>
+</tr>
+<tr>
+<td style="text-align: left;">column</td>
+<td style="text-align: center;">否</td>
+<td>list</td>
+<td>无</td>
+<td>列名，大小写敏感，通常phoenix的列名都是**大写**</td>
+</tr>
+<tr>
+<td style="text-align: left;">nullMode</td>
+<td style="text-align: center;">否</td>
+<td>string</td>
+<td>skip</td>
+<td>读取的 null 值时，如何处理, 详述见下</td>
+</tr>
+<tr>
+<td style="text-align: left;">haveKerberos</td>
+<td style="text-align: center;">否</td>
+<td>boolean</td>
+<td>false</td>
+<td>是否启用Kerberos认证, true 表示启用, false 表示不启用</td>
+</tr>
+<tr>
+<td style="text-align: left;">kerberosPrincipal</td>
+<td style="text-align: center;">否</td>
+<td>string</td>
+<td>无</td>
+<td>kerberos 凭证信息，仅当 <code>havekerberos</code> 启用后有效</td>
+</tr>
+<tr>
+<td style="text-align: left;">kerberosKeytabFilePath</td>
+<td style="text-align: center;">否</td>
+<td>string</td>
+<td>无</td>
+<td>kerberos 凭证文件的绝对路径，仅当 <code>havekerberos</code> 启用后有效</td>
+</tr>
+</tbody>
+</table>
+<h3 id="jdbcurl">jdbcUrl<a class="headerlink" href="#jdbcurl" title="Permanent link">&para;</a></h3>
+<p><code>queryServerAddress</code> 是满足 Phoenix 链接的地址，具体格式和要求可以参考<a href="http://phoenix.apache.org/index.html">官方文档</a> ，其 jdbc 连接串格式如下：</p>
+<div class="highlight"><pre><span></span><code>jdbc:phoenix [ :&lt;zookeeper quorum&gt; [ :&lt;port number&gt; [ :&lt;root node&gt; [ :&lt;principal&gt; [ :&lt;keytab file&gt; ] ] ] ] ] 
+</code></pre></div>
+<ul>
+<li>zookeeper quorum: zookeeper 集群地址，多个地址用逗号分隔，如：<code>node1,node2,node3</code></li>
+<li>port number: zookeeper 集群端口，默认为 2181</li>
+<li>root node: zookeeper 集群根节点，默认为 <code>/hbase</code>，启用 kerberos 后，默认为 <code>/hbase-secure</code></li>
+<li>principal: kerberos 凭证信息，仅当 <code>havekerberos</code> 启用后有效</li>
+<li>keytab file: kerberos 凭证文件的绝对路径，仅当 <code>havekerberos</code> 启用后有效</li>
+</ul>
+<p>如果你希望通过连接 Phoenix Query Server (a.k.a PQS) ，则 JDBC 连接串如下：</p>
+<div class="highlight"><pre><span></span><code>jdbc:phoenix:thin:url=&lt;scheme&gt;://&lt;server-hostname&gt;:&lt;port&gt;[;option=value...]
+</code></pre></div>
+<ul>
+<li>schema: 传输协议，<code>http</code> 或 <code>https</code>，默认为 <code>http</code></li>
+<li>server-hostname: Phoenix Query Server 地址，如：<code>node1</code></li>
+<li>port: Phoenix Query Server 端口，默认为 8765</li>
+<li>option: 可选参数，可以是多个，用逗号分隔，如：<code>option1=value1,option2=value2</code></li>
+</ul>
+<p>更详细的描述，可以参考<a href="https://phoenix.apache.org/documentation/queryserver/connect.html">官方文档</a></p>
+<h3 id="nullmode">nullMode<a class="headerlink" href="#nullmode" title="Permanent link">&para;</a></h3>
+<p><code>skip</code> 表示不向hbase写这列；<code>empty</code>：写入 <code>HConstants.EMPTY_BYTE_ARRAY</code>，即<code>new byte [0]</code></p>
+<p>注意：启用kerberos认证后，程序需要知道<code>hbase-site.xml</code> 所在的路径，一种办法是运行执行在环境变量 <code>CLASSPATH</code> 中增加该文件的所在路径。</p>
+<p>另外一个解决办法是将 <code>hbase-site.xml</code> 文件拷贝到插件的 <code>libs</code> 目录里。</p>
 
 
 
@@ -2588,7 +2756,7 @@
       <nav class="md-footer__inner md-grid" aria-label="Footer" >
         
           
-          <a href="../hbase11xwriter/" class="md-footer__link md-footer__link--prev" aria-label="Previous: HBase11x Writer">
+          <a href="../hbase11xwriter/" class="md-footer__link md-footer__link--prev" aria-label="Previous: HBase11X Writer">
             <div class="md-footer__button md-icon">
               
               <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11h12Z"/></svg>
@@ -2598,7 +2766,7 @@
                 Previous
               </span>
               <div class="md-ellipsis">
-                HBase11x Writer
+                HBase11X Writer
               </div>
             </div>
           </a>

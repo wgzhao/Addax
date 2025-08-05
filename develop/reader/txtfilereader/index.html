@@ -26,7 +26,7 @@
     
     
       
-        <title>Text File Reader - Addax Documentation</title>
+        <title>TxtFile Reader - Addax Documentation</title>
       
     
     
@@ -88,7 +88,7 @@
     <div data-md-component="skip">
       
         
-        <a href="#text-file-reader" class="md-skip">
+        <a href="#txtfile-reader" class="md-skip">
           Skip to content
         </a>
       
@@ -127,7 +127,7 @@
         <div class="md-header__topic" data-md-component="header-topic">
           <span class="md-ellipsis">
             
-              Text File Reader
+              TxtFile Reader
             
           </span>
         </div>
@@ -823,7 +823,7 @@
           
   
   <span class="md-ellipsis">
-    Text File Reader
+    TxtFile Reader
   </span>
   
 
@@ -834,7 +834,7 @@
         
   
   <span class="md-ellipsis">
-    Text File Reader
+    TxtFile Reader
   </span>
   
 
@@ -856,37 +856,46 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#example" class="md-nav__link">
+  <a href="#_1" class="md-nav__link">
     <span class="md-ellipsis">
-      Example
+      配置样例
     </span>
   </a>
   
 </li>
       
         <li class="md-nav__item">
-  <a href="#parameters" class="md-nav__link">
+  <a href="#_2" class="md-nav__link">
     <span class="md-ellipsis">
-      Parameters
+      参数说明
     </span>
   </a>
   
-    <nav class="md-nav" aria-label="Parameters">
+    <nav class="md-nav" aria-label="参数说明">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#required-parameters" class="md-nav__link">
+  <a href="#path" class="md-nav__link">
     <span class="md-ellipsis">
-      Required Parameters
+      path
     </span>
   </a>
   
 </li>
         
           <li class="md-nav__item">
-  <a href="#optional-parameters" class="md-nav__link">
+  <a href="#column" class="md-nav__link">
     <span class="md-ellipsis">
-      Optional Parameters
+      column
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#csvreaderconfig" class="md-nav__link">
+    <span class="md-ellipsis">
+      csvReaderConfig
     </span>
   </a>
   
@@ -898,269 +907,11 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#column-configuration" class="md-nav__link">
+  <a href="#_3" class="md-nav__link">
     <span class="md-ellipsis">
-      Column Configuration
+      类型转换
     </span>
   </a>
-  
-    <nav class="md-nav" aria-label="Column Configuration">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#supported-data-types" class="md-nav__link">
-    <span class="md-ellipsis">
-      Supported Data Types
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#path-configuration" class="md-nav__link">
-    <span class="md-ellipsis">
-      Path Configuration
-    </span>
-  </a>
-  
-    <nav class="md-nav" aria-label="Path Configuration">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#single-file" class="md-nav__link">
-    <span class="md-ellipsis">
-      Single File
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#multiple-files-with-wildcards" class="md-nav__link">
-    <span class="md-ellipsis">
-      Multiple Files with Wildcards
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#directory" class="md-nav__link">
-    <span class="md-ellipsis">
-      Directory
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#delimiter-examples" class="md-nav__link">
-    <span class="md-ellipsis">
-      Delimiter Examples
-    </span>
-  </a>
-  
-    <nav class="md-nav" aria-label="Delimiter Examples">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#tab-separated-values" class="md-nav__link">
-    <span class="md-ellipsis">
-      Tab-separated Values
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#pipe-separated-values" class="md-nav__link">
-    <span class="md-ellipsis">
-      Pipe-separated Values
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#fixed-width-using-spaces" class="md-nav__link">
-    <span class="md-ellipsis">
-      Fixed-width (using spaces)
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#compression-support" class="md-nav__link">
-    <span class="md-ellipsis">
-      Compression Support
-    </span>
-  </a>
-  
-    <nav class="md-nav" aria-label="Compression Support">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#gzip-files" class="md-nav__link">
-    <span class="md-ellipsis">
-      GZIP Files
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#bzip2-files" class="md-nav__link">
-    <span class="md-ellipsis">
-      BZIP2 Files
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#advanced-examples" class="md-nav__link">
-    <span class="md-ellipsis">
-      Advanced Examples
-    </span>
-  </a>
-  
-    <nav class="md-nav" aria-label="Advanced Examples">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#reading-json-lines-format" class="md-nav__link">
-    <span class="md-ellipsis">
-      Reading JSON Lines Format
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#reading-log-files" class="md-nav__link">
-    <span class="md-ellipsis">
-      Reading Log Files
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#constant-values" class="md-nav__link">
-    <span class="md-ellipsis">
-      Constant Values
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#error-handling" class="md-nav__link">
-    <span class="md-ellipsis">
-      Error Handling
-    </span>
-  </a>
-  
-    <nav class="md-nav" aria-label="Error Handling">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#invalid-data-types" class="md-nav__link">
-    <span class="md-ellipsis">
-      Invalid Data Types
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#missing-files" class="md-nav__link">
-    <span class="md-ellipsis">
-      Missing Files
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#encoding-issues" class="md-nav__link">
-    <span class="md-ellipsis">
-      Encoding Issues
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#performance-tips" class="md-nav__link">
-    <span class="md-ellipsis">
-      Performance Tips
-    </span>
-  </a>
-  
-    <nav class="md-nav" aria-label="Performance Tips">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#large-files" class="md-nav__link">
-    <span class="md-ellipsis">
-      Large Files
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#memory-usage" class="md-nav__link">
-    <span class="md-ellipsis">
-      Memory Usage
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#network-files" class="md-nav__link">
-    <span class="md-ellipsis">
-      Network Files
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
   
 </li>
       
@@ -1352,7 +1103,7 @@
         
   
   <span class="md-ellipsis">
-    FTP Reader
+    Ftp Reader
   </span>
   
 
@@ -2206,7 +1957,7 @@
         
   
   <span class="md-ellipsis">
-    FTP Writer
+    Ftp Writer
   </span>
   
 
@@ -2227,7 +1978,7 @@
         
   
   <span class="md-ellipsis">
-    GreenPlum Writer
+    Greenplum Writer
   </span>
   
 
@@ -2290,7 +2041,7 @@
         
   
   <span class="md-ellipsis">
-    HBase11x Writer
+    HBase11X Writer
   </span>
   
 
@@ -2770,37 +2521,46 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#example" class="md-nav__link">
+  <a href="#_1" class="md-nav__link">
     <span class="md-ellipsis">
-      Example
+      配置样例
     </span>
   </a>
   
 </li>
       
         <li class="md-nav__item">
-  <a href="#parameters" class="md-nav__link">
+  <a href="#_2" class="md-nav__link">
     <span class="md-ellipsis">
-      Parameters
+      参数说明
     </span>
   </a>
   
-    <nav class="md-nav" aria-label="Parameters">
+    <nav class="md-nav" aria-label="参数说明">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#required-parameters" class="md-nav__link">
+  <a href="#path" class="md-nav__link">
     <span class="md-ellipsis">
-      Required Parameters
+      path
     </span>
   </a>
   
 </li>
         
           <li class="md-nav__item">
-  <a href="#optional-parameters" class="md-nav__link">
+  <a href="#column" class="md-nav__link">
     <span class="md-ellipsis">
-      Optional Parameters
+      column
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#csvreaderconfig" class="md-nav__link">
+    <span class="md-ellipsis">
+      csvReaderConfig
     </span>
   </a>
   
@@ -2812,269 +2572,11 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#column-configuration" class="md-nav__link">
+  <a href="#_3" class="md-nav__link">
     <span class="md-ellipsis">
-      Column Configuration
+      类型转换
     </span>
   </a>
-  
-    <nav class="md-nav" aria-label="Column Configuration">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#supported-data-types" class="md-nav__link">
-    <span class="md-ellipsis">
-      Supported Data Types
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#path-configuration" class="md-nav__link">
-    <span class="md-ellipsis">
-      Path Configuration
-    </span>
-  </a>
-  
-    <nav class="md-nav" aria-label="Path Configuration">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#single-file" class="md-nav__link">
-    <span class="md-ellipsis">
-      Single File
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#multiple-files-with-wildcards" class="md-nav__link">
-    <span class="md-ellipsis">
-      Multiple Files with Wildcards
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#directory" class="md-nav__link">
-    <span class="md-ellipsis">
-      Directory
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#delimiter-examples" class="md-nav__link">
-    <span class="md-ellipsis">
-      Delimiter Examples
-    </span>
-  </a>
-  
-    <nav class="md-nav" aria-label="Delimiter Examples">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#tab-separated-values" class="md-nav__link">
-    <span class="md-ellipsis">
-      Tab-separated Values
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#pipe-separated-values" class="md-nav__link">
-    <span class="md-ellipsis">
-      Pipe-separated Values
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#fixed-width-using-spaces" class="md-nav__link">
-    <span class="md-ellipsis">
-      Fixed-width (using spaces)
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#compression-support" class="md-nav__link">
-    <span class="md-ellipsis">
-      Compression Support
-    </span>
-  </a>
-  
-    <nav class="md-nav" aria-label="Compression Support">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#gzip-files" class="md-nav__link">
-    <span class="md-ellipsis">
-      GZIP Files
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#bzip2-files" class="md-nav__link">
-    <span class="md-ellipsis">
-      BZIP2 Files
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#advanced-examples" class="md-nav__link">
-    <span class="md-ellipsis">
-      Advanced Examples
-    </span>
-  </a>
-  
-    <nav class="md-nav" aria-label="Advanced Examples">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#reading-json-lines-format" class="md-nav__link">
-    <span class="md-ellipsis">
-      Reading JSON Lines Format
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#reading-log-files" class="md-nav__link">
-    <span class="md-ellipsis">
-      Reading Log Files
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#constant-values" class="md-nav__link">
-    <span class="md-ellipsis">
-      Constant Values
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#error-handling" class="md-nav__link">
-    <span class="md-ellipsis">
-      Error Handling
-    </span>
-  </a>
-  
-    <nav class="md-nav" aria-label="Error Handling">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#invalid-data-types" class="md-nav__link">
-    <span class="md-ellipsis">
-      Invalid Data Types
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#missing-files" class="md-nav__link">
-    <span class="md-ellipsis">
-      Missing Files
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#encoding-issues" class="md-nav__link">
-    <span class="md-ellipsis">
-      Encoding Issues
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#performance-tips" class="md-nav__link">
-    <span class="md-ellipsis">
-      Performance Tips
-    </span>
-  </a>
-  
-    <nav class="md-nav" aria-label="Performance Tips">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#large-files" class="md-nav__link">
-    <span class="md-ellipsis">
-      Large Files
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#memory-usage" class="md-nav__link">
-    <span class="md-ellipsis">
-      Memory Usage
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#network-files" class="md-nav__link">
-    <span class="md-ellipsis">
-      Network Files
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
   
 </li>
       
@@ -3093,296 +2595,237 @@
                   
 
 
-<h1 id="text-file-reader">Text File Reader<a class="headerlink" href="#text-file-reader" title="Permanent link">&para;</a></h1>
-<p>The TxtFileReader plugin reads data from text files with configurable delimiters and encodings.</p>
-<h2 id="example">Example<a class="headerlink" href="#example" title="Permanent link">&para;</a></h2>
-<p>Sample CSV file (<code>/tmp/users.csv</code>):</p>
-<div class="highlight"><pre><span></span><code>id,name,age,email
-1,John Doe,30,john@example.com
-2,Jane Smith,25,jane@example.com
-3,Bob Johnson,35,bob@example.com
-</code></pre></div>
-<p>Configuration to read the CSV file:</p>
+<h1 id="txtfile-reader">TxtFile Reader<a class="headerlink" href="#txtfile-reader" title="Permanent link">&para;</a></h1>
+<p>TxtFile Reader 提供了读取本地文件系统数据存储的能力。</p>
+<h2 id="_1">配置样例<a class="headerlink" href="#_1" title="Permanent link">&para;</a></h2>
+<div class="tabbed-set" data-tabs="1:1"><input checked="checked" id="__tabbed_1_1" name="__tabbed_1" type="radio" /><label for="__tabbed_1_1">job/txtfile2stream.json</label><div class="tabbed-content"></div>
+</div>
 <div class="highlight"><pre><span></span><code><span class="p">{</span>
 <span class="w">  </span><span class="nt">&quot;job&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
-<span class="w">    </span><span class="nt">&quot;content&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span>
-<span class="w">      </span><span class="p">{</span>
-<span class="w">        </span><span class="nt">&quot;reader&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
-<span class="w">          </span><span class="nt">&quot;name&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;txtfilereader&quot;</span><span class="p">,</span>
-<span class="w">          </span><span class="nt">&quot;parameter&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
-<span class="w">            </span><span class="nt">&quot;path&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;/tmp/users.csv&quot;</span><span class="p">,</span>
-<span class="w">            </span><span class="nt">&quot;encoding&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;UTF-8&quot;</span><span class="p">,</span>
-<span class="w">            </span><span class="nt">&quot;column&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span>
-<span class="w">              </span><span class="p">{</span>
-<span class="w">                </span><span class="nt">&quot;index&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">0</span><span class="p">,</span>
-<span class="w">                </span><span class="nt">&quot;type&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;long&quot;</span>
-<span class="w">              </span><span class="p">},</span>
-<span class="w">              </span><span class="p">{</span>
-<span class="w">                </span><span class="nt">&quot;index&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">1</span><span class="p">,</span>
-<span class="w">                </span><span class="nt">&quot;type&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;string&quot;</span>
-<span class="w">              </span><span class="p">},</span>
-<span class="w">              </span><span class="p">{</span>
-<span class="w">                </span><span class="nt">&quot;index&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">2</span><span class="p">,</span>
-<span class="w">                </span><span class="nt">&quot;type&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;long&quot;</span>
-<span class="w">              </span><span class="p">},</span>
-<span class="w">              </span><span class="p">{</span>
-<span class="w">                </span><span class="nt">&quot;index&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">3</span><span class="p">,</span>
-<span class="w">                </span><span class="nt">&quot;type&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;string&quot;</span>
-<span class="w">              </span><span class="p">}</span>
-<span class="w">            </span><span class="p">],</span>
-<span class="w">            </span><span class="nt">&quot;fieldDelimiter&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;,&quot;</span><span class="p">,</span>
-<span class="w">            </span><span class="nt">&quot;skipHeader&quot;</span><span class="p">:</span><span class="w"> </span><span class="kc">true</span>
-<span class="w">          </span><span class="p">}</span>
-<span class="w">        </span><span class="p">},</span>
-<span class="w">        </span><span class="nt">&quot;writer&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
-<span class="w">          </span><span class="nt">&quot;name&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;streamwriter&quot;</span><span class="p">,</span>
-<span class="w">          </span><span class="nt">&quot;parameter&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
-<span class="w">            </span><span class="nt">&quot;encoding&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;UTF-8&quot;</span><span class="p">,</span>
-<span class="w">            </span><span class="nt">&quot;print&quot;</span><span class="p">:</span><span class="w"> </span><span class="kc">true</span>
-<span class="w">          </span><span class="p">}</span>
-<span class="w">        </span><span class="p">}</span>
-<span class="w">      </span><span class="p">}</span>
-<span class="w">    </span><span class="p">],</span>
 <span class="w">    </span><span class="nt">&quot;setting&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
 <span class="w">      </span><span class="nt">&quot;speed&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
-<span class="w">        </span><span class="nt">&quot;channel&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">1</span>
+<span class="w">        </span><span class="nt">&quot;channel&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">2</span><span class="p">,</span>
+<span class="w">        </span><span class="nt">&quot;bytes&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">-1</span>
+<span class="w">      </span><span class="p">}</span>
+<span class="w">    </span><span class="p">},</span>
+<span class="w">    </span><span class="nt">&quot;content&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<span class="w">      </span><span class="nt">&quot;reader&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="nt">&quot;name&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;txtfilereader&quot;</span><span class="p">,</span>
+<span class="w">        </span><span class="nt">&quot;parameter&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<span class="w">          </span><span class="nt">&quot;path&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span>
+<span class="w">            </span><span class="s2">&quot;/tmp/data&quot;</span>
+<span class="w">          </span><span class="p">],</span>
+<span class="w">          </span><span class="nt">&quot;encoding&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;UTF-8&quot;</span><span class="p">,</span>
+<span class="w">          </span><span class="nt">&quot;column&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span>
+<span class="w">            </span><span class="p">{</span>
+<span class="w">              </span><span class="nt">&quot;index&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">0</span><span class="p">,</span>
+<span class="w">              </span><span class="nt">&quot;type&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;long&quot;</span>
+<span class="w">            </span><span class="p">},</span>
+<span class="w">            </span><span class="p">{</span>
+<span class="w">              </span><span class="nt">&quot;index&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">1</span><span class="p">,</span>
+<span class="w">              </span><span class="nt">&quot;type&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;boolean&quot;</span>
+<span class="w">            </span><span class="p">},</span>
+<span class="w">            </span><span class="p">{</span>
+<span class="w">              </span><span class="nt">&quot;index&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">2</span><span class="p">,</span>
+<span class="w">              </span><span class="nt">&quot;type&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;double&quot;</span>
+<span class="w">            </span><span class="p">},</span>
+<span class="w">            </span><span class="p">{</span>
+<span class="w">              </span><span class="nt">&quot;index&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">3</span><span class="p">,</span>
+<span class="w">              </span><span class="nt">&quot;type&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;string&quot;</span>
+<span class="w">            </span><span class="p">},</span>
+<span class="w">            </span><span class="p">{</span>
+<span class="w">              </span><span class="nt">&quot;index&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">4</span><span class="p">,</span>
+<span class="w">              </span><span class="nt">&quot;type&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;date&quot;</span><span class="p">,</span>
+<span class="w">              </span><span class="nt">&quot;format&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;yyyy.MM.dd&quot;</span>
+<span class="w">            </span><span class="p">}</span>
+<span class="w">          </span><span class="p">],</span>
+<span class="w">          </span><span class="nt">&quot;fieldDelimiter&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;,&quot;</span>
+<span class="w">        </span><span class="p">}</span>
+<span class="w">      </span><span class="p">},</span>
+<span class="w">      </span><span class="nt">&quot;writer&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="nt">&quot;name&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;txtfilewriter&quot;</span><span class="p">,</span>
+<span class="w">        </span><span class="nt">&quot;parameter&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<span class="w">          </span><span class="nt">&quot;path&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;/tmp/result&quot;</span><span class="p">,</span>
+<span class="w">          </span><span class="nt">&quot;fileName&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;txt_&quot;</span><span class="p">,</span>
+<span class="w">          </span><span class="nt">&quot;writeMode&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;truncate&quot;</span><span class="p">,</span>
+<span class="w">          </span><span class="nt">&quot;format&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;yyyy-MM-dd&quot;</span>
+<span class="w">        </span><span class="p">}</span>
 <span class="w">      </span><span class="p">}</span>
 <span class="w">    </span><span class="p">}</span>
 <span class="w">  </span><span class="p">}</span>
 <span class="p">}</span>
 </code></pre></div>
-<h2 id="parameters">Parameters<a class="headerlink" href="#parameters" title="Permanent link">&para;</a></h2>
-<h3 id="required-parameters">Required Parameters<a class="headerlink" href="#required-parameters" title="Permanent link">&para;</a></h3>
+<h2 id="_2">参数说明<a class="headerlink" href="#_2" title="Permanent link">&para;</a></h2>
 <table>
 <thead>
 <tr>
-<th>Parameter</th>
-<th>Description</th>
-<th>Type</th>
-<th>Default</th>
+<th style="text-align: left;">配置项</th>
+<th style="text-align: center;">是否必须</th>
+<th>数据类型</th>
+<th>默认值</th>
+<th>描述</th>
 </tr>
 </thead>
 <tbody>
 <tr>
-<td>path</td>
-<td>File path or directory path</td>
+<td style="text-align: left;">path</td>
+<td style="text-align: center;">是</td>
+<td>list</td>
+<td>无</td>
+<td>本地文件系统的路径信息，注意这里可以支持填写多个路径,详细描述见下文</td>
+</tr>
+<tr>
+<td style="text-align: left;">column</td>
+<td style="text-align: center;">是</td>
+<td><code>list&lt;map&gt;\|*</code></td>
+<td>无</td>
+<td>读取字段列表，type指定源数据的类型，详见下文</td>
+</tr>
+<tr>
+<td style="text-align: left;">fieldDelimiter</td>
+<td style="text-align: center;">是</td>
 <td>string</td>
-<td>None</td>
+<td><code>,</code></td>
+<td>描述：读取的字段分隔符</td>
 </tr>
 <tr>
-<td>column</td>
-<td>Column configuration</td>
-<td>array</td>
-<td>None</td>
-</tr>
-</tbody>
-</table>
-<h3 id="optional-parameters">Optional Parameters<a class="headerlink" href="#optional-parameters" title="Permanent link">&para;</a></h3>
-<table>
-<thead>
-<tr>
-<th>Parameter</th>
-<th>Description</th>
-<th>Type</th>
-<th>Default</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>encoding</td>
-<td>File encoding</td>
+<td style="text-align: left;">encoding</td>
+<td style="text-align: center;">否</td>
 <td>string</td>
-<td>UTF-8</td>
+<td>utf-8</td>
+<td>读取文件的编码配置</td>
 </tr>
 <tr>
-<td>fieldDelimiter</td>
-<td>Field delimiter</td>
-<td>string</td>
-<td>,</td>
-</tr>
-<tr>
-<td>compress</td>
-<td>Compression format</td>
-<td>string</td>
-<td>None</td>
-</tr>
-<tr>
-<td>skipHeader</td>
-<td>Skip first line</td>
+<td style="text-align: left;">skipHeader</td>
+<td style="text-align: center;">否</td>
 <td>boolean</td>
 <td>false</td>
+<td>类CSV格式文件可能存在表头为标题情况，需要跳过。默认不跳过</td>
 </tr>
 <tr>
-<td>nullFormat</td>
-<td>Null value representation</td>
+<td style="text-align: left;">csvReaderConfig</td>
+<td style="text-align: center;">否</td>
 <td>string</td>
-<td>\N</td>
+<td>无</td>
+<td>读取CSV类型文件参数配置，Map类型。不配置则使用默认值,详见下文</td>
 </tr>
 </tbody>
 </table>
-<h2 id="column-configuration">Column Configuration<a class="headerlink" href="#column-configuration" title="Permanent link">&para;</a></h2>
-<p>Each column in the <code>column</code> array can be configured with:</p>
-<table>
-<thead>
-<tr>
-<th>Property</th>
-<th>Description</th>
-<th>Type</th>
-<th>Required</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>index</td>
-<td>Column index (0-based)</td>
-<td>integer</td>
-<td>Yes</td>
-</tr>
-<tr>
-<td>type</td>
-<td>Data type</td>
-<td>string</td>
-<td>Yes</td>
-</tr>
-<tr>
-<td>value</td>
-<td>Constant value</td>
-<td>string</td>
-<td>No</td>
-</tr>
-</tbody>
-</table>
-<h3 id="supported-data-types">Supported Data Types<a class="headerlink" href="#supported-data-types" title="Permanent link">&para;</a></h3>
+<h3 id="path">path<a class="headerlink" href="#path" title="Permanent link">&para;</a></h3>
+<p>本地文件系统的路径信息，注意这里可以支持填写多个路径。</p>
 <ul>
-<li><code>long</code>: Integer numbers</li>
-<li><code>double</code>: Floating point numbers  </li>
-<li><code>string</code>: Text data</li>
-<li><code>date</code>: Date and time</li>
-<li><code>bool</code>: Boolean values</li>
+<li>当指定单个本地文件，TxtFileReader暂时只能使用单线程进行数据抽取。二期考虑在非压缩文件情况下针对单个File可以进行多线程并发读取</li>
+<li>当指定多个本地文件，TxtFileReader支持使用多线程进行数据抽取。线程并发数通过通道数指定</li>
+<li>当指定通配符，TxtFileReader尝试遍历出多个文件信息。例如: 指定 <code>/*</code>代表读取 <code>/</code> 目录下所有的文件，指定 <code>/bazhen/*</code> 代表读取 <code>bazhen</code> 目录下游所有的文件。目前只支持 <code>*</code> 作为文件通配符。</li>
 </ul>
-<h2 id="path-configuration">Path Configuration<a class="headerlink" href="#path-configuration" title="Permanent link">&para;</a></h2>
-<h3 id="single-file">Single File<a class="headerlink" href="#single-file" title="Permanent link">&para;</a></h3>
-<div class="highlight"><pre><span></span><code><span class="p">{</span>
-<span class="w">  </span><span class="nt">&quot;path&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;/data/users.csv&quot;</span>
-<span class="p">}</span>
-</code></pre></div>
-<h3 id="multiple-files-with-wildcards">Multiple Files with Wildcards<a class="headerlink" href="#multiple-files-with-wildcards" title="Permanent link">&para;</a></h3>
-<div class="highlight"><pre><span></span><code><span class="p">{</span>
-<span class="w">  </span><span class="nt">&quot;path&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;/data/users_*.csv&quot;</span>
-<span class="p">}</span>
-</code></pre></div>
-<h3 id="directory">Directory<a class="headerlink" href="#directory" title="Permanent link">&para;</a></h3>
-<div class="highlight"><pre><span></span><code><span class="p">{</span>
-<span class="w">  </span><span class="nt">&quot;path&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;/data/csv_files/&quot;</span>
-<span class="p">}</span>
-</code></pre></div>
-<h2 id="delimiter-examples">Delimiter Examples<a class="headerlink" href="#delimiter-examples" title="Permanent link">&para;</a></h2>
-<h3 id="tab-separated-values">Tab-separated Values<a class="headerlink" href="#tab-separated-values" title="Permanent link">&para;</a></h3>
-<div class="highlight"><pre><span></span><code><span class="p">{</span>
-<span class="w">  </span><span class="nt">&quot;fieldDelimiter&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;\t&quot;</span>
-<span class="p">}</span>
-</code></pre></div>
-<h3 id="pipe-separated-values">Pipe-separated Values<a class="headerlink" href="#pipe-separated-values" title="Permanent link">&para;</a></h3>
-<div class="highlight"><pre><span></span><code><span class="p">{</span>
-<span class="w">  </span><span class="nt">&quot;fieldDelimiter&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;|&quot;</span>
-<span class="p">}</span>
-</code></pre></div>
-<h3 id="fixed-width-using-spaces">Fixed-width (using spaces)<a class="headerlink" href="#fixed-width-using-spaces" title="Permanent link">&para;</a></h3>
-<div class="highlight"><pre><span></span><code><span class="p">{</span>
-<span class="w">  </span><span class="nt">&quot;fieldDelimiter&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot; &quot;</span>
-<span class="p">}</span>
-</code></pre></div>
-<h2 id="compression-support">Compression Support<a class="headerlink" href="#compression-support" title="Permanent link">&para;</a></h2>
-<h3 id="gzip-files">GZIP Files<a class="headerlink" href="#gzip-files" title="Permanent link">&para;</a></h3>
-<div class="highlight"><pre><span></span><code><span class="p">{</span>
-<span class="w">  </span><span class="nt">&quot;path&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;/data/users.csv.gz&quot;</span><span class="p">,</span>
-<span class="w">  </span><span class="nt">&quot;compress&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;gzip&quot;</span>
-<span class="p">}</span>
-</code></pre></div>
-<h3 id="bzip2-files">BZIP2 Files<a class="headerlink" href="#bzip2-files" title="Permanent link">&para;</a></h3>
-<div class="highlight"><pre><span></span><code><span class="p">{</span>
-<span class="w">  </span><span class="nt">&quot;path&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;/data/users.csv.bz2&quot;</span><span class="p">,</span><span class="w">  </span>
-<span class="w">  </span><span class="nt">&quot;compress&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;bzip2&quot;</span>
-<span class="p">}</span>
-</code></pre></div>
-<h2 id="advanced-examples">Advanced Examples<a class="headerlink" href="#advanced-examples" title="Permanent link">&para;</a></h2>
-<h3 id="reading-json-lines-format">Reading JSON Lines Format<a class="headerlink" href="#reading-json-lines-format" title="Permanent link">&para;</a></h3>
-<div class="highlight"><pre><span></span><code><span class="p">{</span>
-<span class="w">  </span><span class="nt">&quot;reader&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
-<span class="w">    </span><span class="nt">&quot;name&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;txtfilereader&quot;</span><span class="p">,</span>
-<span class="w">    </span><span class="nt">&quot;parameter&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
-<span class="w">      </span><span class="nt">&quot;path&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;/data/users.jsonl&quot;</span><span class="p">,</span>
-<span class="w">      </span><span class="nt">&quot;encoding&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;UTF-8&quot;</span><span class="p">,</span>
-<span class="w">      </span><span class="nt">&quot;column&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span>
-<span class="w">        </span><span class="p">{</span>
-<span class="w">          </span><span class="nt">&quot;index&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">0</span><span class="p">,</span>
-<span class="w">          </span><span class="nt">&quot;type&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;string&quot;</span>
-<span class="w">        </span><span class="p">}</span>
-<span class="w">      </span><span class="p">],</span>
-<span class="w">      </span><span class="nt">&quot;fieldDelimiter&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;\n&quot;</span>
-<span class="w">    </span><span class="p">}</span>
-<span class="w">  </span><span class="p">}</span>
-<span class="p">}</span>
-</code></pre></div>
-<h3 id="reading-log-files">Reading Log Files<a class="headerlink" href="#reading-log-files" title="Permanent link">&para;</a></h3>
-<div class="highlight"><pre><span></span><code><span class="p">{</span>
-<span class="w">  </span><span class="nt">&quot;reader&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
-<span class="w">    </span><span class="nt">&quot;name&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;txtfilereader&quot;</span><span class="p">,</span><span class="w"> </span>
-<span class="w">    </span><span class="nt">&quot;parameter&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
-<span class="w">      </span><span class="nt">&quot;path&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;/var/log/app.log&quot;</span><span class="p">,</span>
-<span class="w">      </span><span class="nt">&quot;encoding&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;UTF-8&quot;</span><span class="p">,</span>
-<span class="w">      </span><span class="nt">&quot;column&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span>
-<span class="w">        </span><span class="p">{</span>
-<span class="w">          </span><span class="nt">&quot;index&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">0</span><span class="p">,</span>
-<span class="w">          </span><span class="nt">&quot;type&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;string&quot;</span>
-<span class="w">        </span><span class="p">}</span>
-<span class="w">      </span><span class="p">],</span>
-<span class="w">      </span><span class="nt">&quot;fieldDelimiter&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;\n&quot;</span><span class="p">,</span>
-<span class="w">      </span><span class="nt">&quot;nullFormat&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;&quot;</span>
-<span class="w">    </span><span class="p">}</span>
-<span class="w">  </span><span class="p">}</span>
-<span class="p">}</span>
-</code></pre></div>
-<h3 id="constant-values">Constant Values<a class="headerlink" href="#constant-values" title="Permanent link">&para;</a></h3>
+<p>特别需要注意的是，Addax会将一个作业下同步的所有Text File视作同一张数据表。用户必须自己保证所有的File能够适配同一套schema信息。读取文件用户必须保证为类CSV格式，并且提供给Addax权限可读。</p>
+<p>特别需要注意的是，如果Path指定的路径下没有符合匹配的文件抽取，Addax将报错。</p>
+<p>从 3.2.3 版本起， <code>path</code> 下允许混合不同压缩格式的文件，插件会尝试自动猜测压缩格式并自动解压，目前支持的压缩格式有：</p>
+<ul>
+<li>zip</li>
+<li>bzip2</li>
+<li>gzip</li>
+<li>LZ4</li>
+<li>PACK200</li>
+<li>XZ</li>
+<li>Compress</li>
+</ul>
+<h3 id="column">column<a class="headerlink" href="#column" title="Permanent link">&para;</a></h3>
+<p>读取字段列表，type指定源数据的类型，index指定当前列来自于文本第几列(以0开始)，value指定当前类型为常量，不从源头文件读取数据，而是根据value值自动生成对应的列。</p>
+<p>默认情况下，用户可以全部按照String类型读取数据，配置如下：</p>
 <div class="highlight"><pre><span></span><code><span class="p">{</span>
 <span class="w">  </span><span class="nt">&quot;column&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span>
-<span class="w">    </span><span class="p">{</span>
-<span class="w">      </span><span class="nt">&quot;index&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">0</span><span class="p">,</span>
-<span class="w">      </span><span class="nt">&quot;type&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;long&quot;</span>
-<span class="w">    </span><span class="p">},</span>
-<span class="w">    </span><span class="p">{</span>
-<span class="w">      </span><span class="nt">&quot;index&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">1</span><span class="p">,</span><span class="w"> </span>
-<span class="w">      </span><span class="nt">&quot;type&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;string&quot;</span>
-<span class="w">    </span><span class="p">},</span>
-<span class="w">    </span><span class="p">{</span>
-<span class="w">      </span><span class="nt">&quot;type&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;string&quot;</span><span class="p">,</span>
-<span class="w">      </span><span class="nt">&quot;value&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;batch_001&quot;</span>
-<span class="w">    </span><span class="p">}</span>
+<span class="w">    </span><span class="s2">&quot;*&quot;</span>
 <span class="w">  </span><span class="p">]</span>
 <span class="p">}</span>
 </code></pre></div>
-<h2 id="error-handling">Error Handling<a class="headerlink" href="#error-handling" title="Permanent link">&para;</a></h2>
-<h3 id="invalid-data-types">Invalid Data Types<a class="headerlink" href="#invalid-data-types" title="Permanent link">&para;</a></h3>
-<p>When a field cannot be converted to the specified type, it will be treated as dirty data according to your error handling configuration.</p>
-<h3 id="missing-files">Missing Files<a class="headerlink" href="#missing-files" title="Permanent link">&para;</a></h3>
-<p>If specified files don't exist, the job will fail. Use wildcards carefully to ensure at least one file matches.</p>
-<h3 id="encoding-issues">Encoding Issues<a class="headerlink" href="#encoding-issues" title="Permanent link">&para;</a></h3>
-<p>If file encoding doesn't match the specified encoding, character corruption may occur. Always verify the actual file encoding.</p>
-<h2 id="performance-tips">Performance Tips<a class="headerlink" href="#performance-tips" title="Permanent link">&para;</a></h2>
-<h3 id="large-files">Large Files<a class="headerlink" href="#large-files" title="Permanent link">&para;</a></h3>
-<p>For very large files, consider splitting them or using multiple channels:</p>
+<p>用户可以指定Column字段信息，配置如下：</p>
+<div class="highlight"><pre><span></span><code><span class="p">[</span>
+<span class="w">  </span><span class="p">{</span>
+<span class="w">    </span><span class="nt">&quot;type&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;long&quot;</span><span class="p">,</span>
+<span class="w">    </span><span class="nt">&quot;index&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">0</span>
+<span class="w">  </span><span class="p">},</span>
+<span class="w">  </span><span class="p">{</span>
+<span class="w">    </span><span class="nt">&quot;type&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;string&quot;</span><span class="p">,</span>
+<span class="w">    </span><span class="nt">&quot;value&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;alibaba&quot;</span>
+<span class="w">  </span><span class="p">}</span>
+<span class="p">]</span>
+</code></pre></div>
+<p>对于用户指定Column信息，type必须填写，index/value必须选择其一。</p>
+<p>从 <code>4.0.1</code> 开始，表示字段除了使用 <code>index</code> 来指定字段的顺序外，还支持 <code>name</code> 方式，这需要所读取的文件的都包含了文件头，插件会尝试将指定的 <code>name</code> 去匹配从文件读取的文件头，
+然后得到对应的 <code>index</code> 值，并回写到 配置文件中。同时，<code>index</code> 和 <code>name</code> 可以在不同的列上进行混合使用，比如下面这样：</p>
+<div class="highlight"><pre><span></span><code><span class="p">[</span>
+<span class="w">  </span><span class="p">{</span>
+<span class="w">    </span><span class="nt">&quot;type&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;long&quot;</span><span class="p">,</span>
+<span class="w">    </span><span class="nt">&quot;index&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">0</span>
+<span class="w">  </span><span class="p">},</span>
+<span class="w">  </span><span class="p">{</span>
+<span class="w">    </span><span class="nt">&quot;name&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;region&quot;</span><span class="p">,</span>
+<span class="w">    </span><span class="nt">&quot;type&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;string&quot;</span>
+<span class="w">  </span><span class="p">},</span>
+<span class="w">  </span><span class="p">{</span>
+<span class="w">    </span><span class="nt">&quot;type&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;string&quot;</span><span class="p">,</span>
+<span class="w">    </span><span class="nt">&quot;value&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;alibaba&quot;</span>
+<span class="w">  </span><span class="p">}</span>
+<span class="p">]</span>
+</code></pre></div>
+<p>注： 这种方式以为这在准备阶段就要尝试读取文件，因为会有一定的性能损失，如非必要，不建议配置 <code>name</code> 方式。</p>
+<h3 id="csvreaderconfig">csvReaderConfig<a class="headerlink" href="#csvreaderconfig" title="Permanent link">&para;</a></h3>
+<p>读取CSV类型文件参数配置，Map类型。读取CSV类型文件使用的CsvReader进行读取，会有很多配置，不配置则使用默认值。</p>
+<p>常见配置：</p>
 <div class="highlight"><pre><span></span><code><span class="p">{</span>
-<span class="w">  </span><span class="nt">&quot;setting&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
-<span class="w">    </span><span class="nt">&quot;speed&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
-<span class="w">      </span><span class="nt">&quot;channel&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">4</span>
-<span class="w">    </span><span class="p">}</span>
+<span class="w">  </span><span class="nt">&quot;csvReaderConfig&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="nt">&quot;safetySwitch&quot;</span><span class="p">:</span><span class="w"> </span><span class="kc">false</span><span class="p">,</span>
+<span class="w">    </span><span class="nt">&quot;skipEmptyRecords&quot;</span><span class="p">:</span><span class="w"> </span><span class="kc">false</span><span class="p">,</span>
+<span class="w">    </span><span class="nt">&quot;useTextQualifier&quot;</span><span class="p">:</span><span class="w"> </span><span class="kc">false</span>
 <span class="w">  </span><span class="p">}</span>
 <span class="p">}</span>
 </code></pre></div>
-<h3 id="memory-usage">Memory Usage<a class="headerlink" href="#memory-usage" title="Permanent link">&para;</a></h3>
-<p>The reader loads data in chunks, so memory usage is generally stable regardless of file size.</p>
-<h3 id="network-files">Network Files<a class="headerlink" href="#network-files" title="Permanent link">&para;</a></h3>
-<p>When reading from network-mounted drives, network latency may affect performance. Consider copying files locally first for better performance.</p>
+<p>所有配置项及默认值,配置时 csvReaderConfig 的map中请**严格按照以下字段名字进行配置**：</p>
+<div class="highlight"><pre><span></span><code><span class="na">boolean caseSensitive</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">true</span><span class="c1">;</span>
+<span class="na">char textQualifier</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">34</span><span class="c1">;</span>
+<span class="na">boolean trimWhitespace</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">true</span><span class="c1">;</span>
+<span class="na">boolean useTextQualifier</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">true</span><span class="c1">;//是否使用csv转义字符</span>
+<span class="na">char delimiter</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">44</span><span class="c1">;//分隔符</span>
+<span class="na">char recordDelimiter</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">0</span><span class="c1">;</span>
+<span class="na">char comment</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">35</span><span class="c1">;</span>
+<span class="na">boolean useComments</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">false</span><span class="c1">;</span>
+<span class="na">int escapeMode</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">1</span><span class="c1">;</span>
+<span class="na">boolean safetySwitch</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">true</span><span class="c1">;//单列长度是否限制100000字符</span>
+<span class="na">boolean skipEmptyRecords</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">true</span><span class="c1">;//是否跳过空行</span>
+<span class="na">boolean captureRawRecord</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">true</span><span class="c1">;</span>
+</code></pre></div>
+<h2 id="_3">类型转换<a class="headerlink" href="#_3" title="Permanent link">&para;</a></h2>
+<table>
+<thead>
+<tr>
+<th>Addax 内部类型</th>
+<th>本地文件 数据类型</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Long</td>
+<td>Long</td>
+</tr>
+<tr>
+<td>Double</td>
+<td>Double</td>
+</tr>
+<tr>
+<td>String</td>
+<td>String</td>
+</tr>
+<tr>
+<td>Boolean</td>
+<td>Boolean</td>
+</tr>
+<tr>
+<td>Date</td>
+<td>Date</td>
+</tr>
+</tbody>
+</table>
 
 
 

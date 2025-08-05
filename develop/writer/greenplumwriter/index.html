@@ -26,7 +26,7 @@
     
     
       
-        <title>GreenPlum Writer - Addax Documentation</title>
+        <title>Greenplum Writer - Addax Documentation</title>
       
     
     
@@ -127,7 +127,7 @@
         <div class="md-header__topic" data-md-component="header-topic">
           <span class="md-ellipsis">
             
-              GreenPlum Writer
+              Greenplum Writer
             
           </span>
         </div>
@@ -809,7 +809,7 @@
         
   
   <span class="md-ellipsis">
-    Text File Reader
+    TxtFile Reader
   </span>
   
 
@@ -998,7 +998,7 @@
         
   
   <span class="md-ellipsis">
-    FTP Reader
+    Ftp Reader
   </span>
   
 
@@ -1857,7 +1857,7 @@
         
   
   <span class="md-ellipsis">
-    FTP Writer
+    Ftp Writer
   </span>
   
 
@@ -1887,7 +1887,7 @@
           
   
   <span class="md-ellipsis">
-    GreenPlum Writer
+    Greenplum Writer
   </span>
   
 
@@ -1898,7 +1898,7 @@
         
   
   <span class="md-ellipsis">
-    GreenPlum Writer
+    Greenplum Writer
   </span>
   
 
@@ -1920,9 +1920,42 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#configuration-example" class="md-nav__link">
+  <a href="#_1" class="md-nav__link">
     <span class="md-ellipsis">
-      Configuration Example
+      示例
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="示例">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#_2" class="md-nav__link">
+    <span class="md-ellipsis">
+      任务配置
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#_3" class="md-nav__link">
+    <span class="md-ellipsis">
+      执行采集命令
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_4" class="md-nav__link">
+    <span class="md-ellipsis">
+      参数说明
     </span>
   </a>
   
@@ -1990,7 +2023,7 @@
         
   
   <span class="md-ellipsis">
-    HBase11x Writer
+    HBase11X Writer
   </span>
   
 
@@ -2470,9 +2503,42 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#configuration-example" class="md-nav__link">
+  <a href="#_1" class="md-nav__link">
     <span class="md-ellipsis">
-      Configuration Example
+      示例
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="示例">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#_2" class="md-nav__link">
+    <span class="md-ellipsis">
+      任务配置
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#_3" class="md-nav__link">
+    <span class="md-ellipsis">
+      执行采集命令
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_4" class="md-nav__link">
+    <span class="md-ellipsis">
+      参数说明
     </span>
   </a>
   
@@ -2493,12 +2559,121 @@
                   
 
 
-<h1 id="greenplum-writer">GreenPlum Writer<a class="headerlink" href="#greenplum-writer" title="Permanent link">&para;</a></h1>
-<p>GreenPlum Writer plugin implements writing data to GreenPlum database.</p>
-<h2 id="configuration-example">Configuration Example<a class="headerlink" href="#configuration-example" title="Permanent link">&para;</a></h2>
-<p>This plugin is used to write data to GreenPlum database. This plugin is based on <a href="../rdbmswriter">RDBMS Writer</a>, so you can refer to all configuration items of RDBMS Writer.</p>
-<div class="highlight"><pre><span></span><code>
+<h1 id="greenplum-writer">Greenplum Writer<a class="headerlink" href="#greenplum-writer" title="Permanent link">&para;</a></h1>
+<p>Greenplum Writer 插件使用 <code>COPY FROM</code> 语法 将数据写入 <a href="https://greenplum.org">Greenplum</a> 数据库。</p>
+<h2 id="_1">示例<a class="headerlink" href="#_1" title="Permanent link">&para;</a></h2>
+<p>以下配置演示从 greenplum 指定的表读取数据，并插入到具有相同表结构的另外一张表中，用来测试该插件所支持的数据类型。</p>
+<div class="highlight"><pre><span></span><code><span class="k">create</span><span class="w"> </span><span class="k">table</span><span class="w"> </span><span class="k">if</span><span class="w"> </span><span class="k">not</span><span class="w"> </span><span class="k">exists</span><span class="w"> </span><span class="n">addax_tbl</span>
+<span class="p">(</span>
+<span class="w">    </span><span class="n">c_bigint</span>
+<span class="w">    </span><span class="nb">bigint</span><span class="p">,</span>
+<span class="w">    </span><span class="n">c_bit</span>
+<span class="w">    </span><span class="nb">bit</span><span class="p">(</span><span class="mi">3</span><span class="p">),</span>
+<span class="w">    </span><span class="n">c_bool</span><span class="w"> </span><span class="nb">boolean</span><span class="p">,</span>
+<span class="w">    </span><span class="n">c_byte</span><span class="w"> </span><span class="n">bytea</span><span class="p">,</span>
+<span class="w">    </span><span class="n">c_char</span><span class="w"> </span><span class="nb">char</span><span class="p">(</span><span class="mi">10</span><span class="p">),</span>
+<span class="w">    </span><span class="n">c_varchar</span><span class="w"> </span><span class="nb">varchar</span><span class="p">(</span><span class="mi">20</span><span class="p">),</span>
+<span class="w">    </span><span class="n">c_date</span><span class="w"> </span><span class="nb">date</span><span class="p">,</span>
+<span class="w">    </span><span class="n">c_double</span><span class="w"> </span><span class="n">float8</span><span class="p">,</span>
+<span class="w">    </span><span class="n">c_int</span><span class="w"> </span><span class="nb">integer</span><span class="p">,</span>
+<span class="w">    </span><span class="n">c_json</span><span class="w"> </span><span class="n">json</span><span class="p">,</span>
+<span class="w">    </span><span class="n">c_number</span><span class="w"> </span><span class="nb">decimal</span><span class="p">(</span><span class="mi">8</span><span class="p">,</span><span class="w"> </span><span class="mi">3</span><span class="p">),</span>
+<span class="w">    </span><span class="n">c_real</span><span class="w"> </span><span class="nb">real</span><span class="p">,</span>
+<span class="w">    </span><span class="n">c_small</span><span class="w"> </span><span class="nb">smallint</span><span class="p">,</span>
+<span class="w">    </span><span class="n">c_text</span><span class="w"> </span><span class="nb">text</span><span class="p">,</span>
+<span class="w">    </span><span class="n">c_ts</span><span class="w"> </span><span class="k">timestamp</span><span class="p">,</span>
+<span class="w">    </span><span class="n">c_uuid</span><span class="w"> </span><span class="n">uuid</span><span class="p">,</span>
+<span class="w">    </span><span class="n">c_xml</span><span class="w"> </span><span class="n">xml</span><span class="p">,</span>
+<span class="w">    </span><span class="n">c_money</span><span class="w"> </span><span class="n">money</span><span class="p">,</span>
+<span class="w">    </span><span class="n">c_inet</span><span class="w"> </span><span class="n">inet</span><span class="p">,</span>
+<span class="w">    </span><span class="n">c_cidr</span><span class="w"> </span><span class="n">cidr</span><span class="p">,</span>
+<span class="w">    </span><span class="n">c_macaddr</span><span class="w"> </span><span class="n">macaddr</span>
+<span class="w">    </span><span class="p">);</span>
+<span class="k">insert</span><span class="w"> </span><span class="k">into</span><span class="w"> </span><span class="n">addax_tbl</span>
+<span class="k">values</span><span class="w"> </span><span class="p">(</span><span class="mi">999988887777</span><span class="p">,</span>
+<span class="w">        </span><span class="n">B</span><span class="s1">&#39;101&#39;</span><span class="p">,</span>
+<span class="w">        </span><span class="k">TRUE</span><span class="p">,</span>
+<span class="w">        </span><span class="s1">&#39;\xDEADBEEF&#39;</span><span class="p">,</span>
+<span class="w">        </span><span class="s1">&#39;hello&#39;</span><span class="p">,</span>
+<span class="w">        </span><span class="s1">&#39;hello, world&#39;</span><span class="p">,</span>
+<span class="w">        </span><span class="s1">&#39;2021-01-04&#39;</span><span class="p">,</span>
+<span class="w">        </span><span class="mi">999888</span><span class="p">.</span><span class="mi">9972</span><span class="p">,</span>
+<span class="w">        </span><span class="mi">9876542</span><span class="p">,</span>
+<span class="w">        </span><span class="s1">&#39;{&quot;bar&quot;: &quot;baz&quot;, &quot;balance&quot;: 7.77, &quot;active&quot;: false}&#39;</span><span class="p">::</span><span class="n">json</span><span class="p">,</span>
+<span class="w">        </span><span class="mi">12345</span><span class="p">.</span><span class="mi">123</span><span class="p">,</span>
+<span class="w">        </span><span class="mi">123</span><span class="p">.</span><span class="mi">123</span><span class="p">,</span>
+<span class="w">        </span><span class="mi">126</span><span class="p">,</span>
+<span class="w">        </span><span class="s1">&#39;this is a long text &#39;</span><span class="p">,</span>
+<span class="w">        </span><span class="s1">&#39;2020-01-04 12:13:14&#39;</span><span class="p">,</span>
+<span class="w">        </span><span class="s1">&#39;A0EEBC99-9C0B-4EF8-BB6D-6BB9BD380A11&#39;</span><span class="p">::</span><span class="n">uuid</span><span class="p">,</span>
+<span class="w">        </span><span class="s1">&#39;&lt;foo&gt;bar&lt;/foo&gt;&#39;</span><span class="p">::</span><span class="n">xml</span><span class="p">,</span>
+<span class="w">        </span><span class="s1">&#39;52093.89&#39;</span><span class="p">::</span><span class="n">money</span><span class="p">,</span>
+<span class="w">        </span><span class="s1">&#39;192.168.1.1&#39;</span><span class="p">::</span><span class="n">inet</span><span class="p">,</span>
+<span class="w">        </span><span class="s1">&#39;192.168.1/24&#39;</span><span class="p">::</span><span class="n">cidr</span><span class="p">,</span>
+<span class="w">        </span><span class="s1">&#39;08002b:010203&#39;</span><span class="p">::</span><span class="n">macaddr</span><span class="p">);</span>
 </code></pre></div>
+<p>创建需要插入的表的语句如下:</p>
+<div class="highlight"><pre><span></span><code><span class="k">create</span><span class="w"> </span><span class="k">table</span><span class="w"> </span><span class="n">gp_test</span><span class="w"> </span><span class="k">like</span><span class="w"> </span><span class="n">addax_tbl</span><span class="p">;</span>
+</code></pre></div>
+<h3 id="_2">任务配置<a class="headerlink" href="#_2" title="Permanent link">&para;</a></h3>
+<p>以下是配置文件</p>
+<div class="tabbed-set" data-tabs="1:1"><input checked="checked" id="__tabbed_1_1" name="__tabbed_1" type="radio" /><label for="__tabbed_1_1">job/pg2gp.json</label><div class="tabbed-content"></div>
+</div>
+<div class="highlight"><pre><span></span><code><span class="p">{</span>
+<span class="w">  </span><span class="nt">&quot;job&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="nt">&quot;setting&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<span class="w">      </span><span class="nt">&quot;speed&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="nt">&quot;channel&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">1</span><span class="p">,</span>
+<span class="w">        </span><span class="nt">&quot;bytes&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">-1</span>
+<span class="w">      </span><span class="p">}</span>
+<span class="w">    </span><span class="p">},</span>
+<span class="w">    </span><span class="nt">&quot;content&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<span class="w">      </span><span class="nt">&quot;reader&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="nt">&quot;name&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;postgresqlreader&quot;</span><span class="p">,</span>
+<span class="w">        </span><span class="nt">&quot;parameter&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<span class="w">          </span><span class="nt">&quot;username&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;wgzhao&quot;</span><span class="p">,</span>
+<span class="w">          </span><span class="nt">&quot;password&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;wgzhao&quot;</span><span class="p">,</span>
+<span class="w">          </span><span class="nt">&quot;column&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span>
+<span class="w">            </span><span class="s2">&quot;*&quot;</span>
+<span class="w">          </span><span class="p">],</span>
+<span class="w">          </span><span class="nt">&quot;connection&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<span class="w">            </span><span class="nt">&quot;table&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span>
+<span class="w">              </span><span class="s2">&quot;addax_tbl&quot;</span>
+<span class="w">            </span><span class="p">],</span>
+<span class="w">            </span><span class="nt">&quot;jdbcUrl&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;jdbc:postgresql://localhost:5432/wgzhao&quot;</span>
+<span class="w">          </span><span class="p">}</span>
+<span class="w">        </span><span class="p">}</span>
+<span class="w">      </span><span class="p">},</span>
+<span class="w">      </span><span class="nt">&quot;writer&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="nt">&quot;name&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;greenplumwriter&quot;</span><span class="p">,</span>
+<span class="w">        </span><span class="nt">&quot;parameter&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<span class="w">          </span><span class="nt">&quot;username&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;wgzhao&quot;</span><span class="p">,</span>
+<span class="w">          </span><span class="nt">&quot;password&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;wgzhao&quot;</span><span class="p">,</span>
+<span class="w">          </span><span class="nt">&quot;column&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span>
+<span class="w">            </span><span class="s2">&quot;*&quot;</span>
+<span class="w">          </span><span class="p">],</span>
+<span class="w">          </span><span class="nt">&quot;preSql&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span>
+<span class="w">            </span><span class="s2">&quot;truncate table @table&quot;</span>
+<span class="w">          </span><span class="p">],</span>
+<span class="w">          </span><span class="nt">&quot;connection&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<span class="w">            </span><span class="nt">&quot;jdbcUrl&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;jdbc:postgresql://localhost:5432/wgzhao&quot;</span><span class="p">,</span>
+<span class="w">            </span><span class="nt">&quot;table&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span>
+<span class="w">              </span><span class="s2">&quot;gp_test&quot;</span>
+<span class="w">            </span><span class="p">]</span>
+<span class="w">          </span><span class="p">}</span>
+<span class="w">        </span><span class="p">}</span>
+<span class="w">      </span><span class="p">}</span>
+<span class="w">    </span><span class="p">}</span>
+<span class="w">  </span><span class="p">}</span>
+<span class="p">}</span>
+</code></pre></div>
+<p>将上述配置文件保存为 <code>job/pg2gp.json</code></p>
+<h3 id="_3">执行采集命令<a class="headerlink" href="#_3" title="Permanent link">&para;</a></h3>
+<p>执行以下命令进行数据采集</p>
+<div class="highlight"><pre><span></span><code>bin/addax.sh<span class="w"> </span>job/pg2gp.json
+</code></pre></div>
+<h2 id="_4">参数说明<a class="headerlink" href="#_4" title="Permanent link">&para;</a></h2>
+<p>该插件基于 <a href="../rdbmswriter">RDBMS Writer</a> 实现，因此可以参考 RDBMS Writer 的所有配置项。</p>
 
 
 
@@ -2536,7 +2711,7 @@
       <nav class="md-footer__inner md-grid" aria-label="Footer" >
         
           
-          <a href="../ftpwriter/" class="md-footer__link md-footer__link--prev" aria-label="Previous: FTP Writer">
+          <a href="../ftpwriter/" class="md-footer__link md-footer__link--prev" aria-label="Previous: Ftp Writer">
             <div class="md-footer__button md-icon">
               
               <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11h12Z"/></svg>
@@ -2546,7 +2721,7 @@
                 Previous
               </span>
               <div class="md-ellipsis">
-                FTP Writer
+                Ftp Writer
               </div>
             </div>
           </a>

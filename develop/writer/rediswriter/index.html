@@ -809,7 +809,7 @@
         
   
   <span class="md-ellipsis">
-    Text File Reader
+    TxtFile Reader
   </span>
   
 
@@ -998,7 +998,7 @@
         
   
   <span class="md-ellipsis">
-    FTP Reader
+    Ftp Reader
   </span>
   
 
@@ -1857,7 +1857,7 @@
         
   
   <span class="md-ellipsis">
-    FTP Writer
+    Ftp Writer
   </span>
   
 
@@ -1878,7 +1878,7 @@
         
   
   <span class="md-ellipsis">
-    GreenPlum Writer
+    Greenplum Writer
   </span>
   
 
@@ -1941,7 +1941,7 @@
         
   
   <span class="md-ellipsis">
-    HBase11x Writer
+    HBase11X Writer
   </span>
   
 
@@ -2172,18 +2172,18 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#configuration-example" class="md-nav__link">
+  <a href="#_1" class="md-nav__link">
     <span class="md-ellipsis">
-      Configuration Example
+      配置样例
     </span>
   </a>
   
 </li>
       
         <li class="md-nav__item">
-  <a href="#parameters" class="md-nav__link">
+  <a href="#_2" class="md-nav__link">
     <span class="md-ellipsis">
-      Parameters
+      参数说明
     </span>
   </a>
   
@@ -2479,18 +2479,18 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#configuration-example" class="md-nav__link">
+  <a href="#_1" class="md-nav__link">
     <span class="md-ellipsis">
-      Configuration Example
+      配置样例
     </span>
   </a>
   
 </li>
       
         <li class="md-nav__item">
-  <a href="#parameters" class="md-nav__link">
+  <a href="#_2" class="md-nav__link">
     <span class="md-ellipsis">
-      Parameters
+      参数说明
     </span>
   </a>
   
@@ -2512,9 +2512,8 @@
 
 
 <h1 id="redis-writer">Redis Writer<a class="headerlink" href="#redis-writer" title="Permanent link">&para;</a></h1>
-<p>Redis Writer plugin is used to write data to Redis database.</p>
-<h2 id="configuration-example">Configuration Example<a class="headerlink" href="#configuration-example" title="Permanent link">&para;</a></h2>
-<p>This plugin provides the ability to write data to Redis database. For detailed configuration and parameters, please refer to the original Redis Writer documentation.</p>
+<p>Redis Writer 提供了还原 Redis dump 命令的能力，并写入到目标 Redis。支持 redis cluster 集群、proxy、以及单机</p>
+<h2 id="_1">配置样例<a class="headerlink" href="#_1" title="Permanent link">&para;</a></h2>
 <div class="highlight"><pre><span></span><code><span class="p">{</span>
 <span class="w">  </span><span class="nt">&quot;job&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
 <span class="w">    </span><span class="nt">&quot;setting&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
@@ -2549,8 +2548,55 @@
 <span class="w">  </span><span class="p">}</span>
 <span class="p">}</span>
 </code></pre></div>
-<h2 id="parameters">Parameters<a class="headerlink" href="#parameters" title="Permanent link">&para;</a></h2>
-<p>This plugin supports writing various data types to Redis with configurable connection and data format options.</p>
+<h2 id="_2">参数说明<a class="headerlink" href="#_2" title="Permanent link">&para;</a></h2>
+<table>
+<thead>
+<tr>
+<th style="text-align: left;">配置项</th>
+<th style="text-align: center;">是否必须</th>
+<th>数据类型</th>
+<th>默认值</th>
+<th>描述</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;">uri</td>
+<td style="text-align: center;">是</td>
+<td>string</td>
+<td>否</td>
+<td>redis链接</td>
+</tr>
+<tr>
+<td style="text-align: left;">redisCluster</td>
+<td style="text-align: center;">否</td>
+<td>boolean</td>
+<td>false</td>
+<td>是否为redis cluster集群,如果是 proxy 或单机忽略该项</td>
+</tr>
+<tr>
+<td style="text-align: left;">flushDB</td>
+<td style="text-align: center;">否</td>
+<td>boolean</td>
+<td>false</td>
+<td>迁移前是否清空目标 Redis</td>
+</tr>
+<tr>
+<td style="text-align: left;">batchSize</td>
+<td style="text-align: center;">否</td>
+<td>string</td>
+<td>1000</td>
+<td>每次批量处理数量。如果key过大/小,可以相应的调整</td>
+</tr>
+<tr>
+<td style="text-align: left;">timeout</td>
+<td style="text-align: center;">否</td>
+<td>string</td>
+<td>60000</td>
+<td>每次执行最大超时时间, 单位毫秒(ms)</td>
+</tr>
+</tbody>
+</table>
 
 
 

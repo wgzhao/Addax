@@ -809,7 +809,7 @@
         
   
   <span class="md-ellipsis">
-    Text File Reader
+    TxtFile Reader
   </span>
   
 
@@ -998,7 +998,7 @@
         
   
   <span class="md-ellipsis">
-    FTP Reader
+    Ftp Reader
   </span>
   
 
@@ -1857,7 +1857,7 @@
         
   
   <span class="md-ellipsis">
-    FTP Writer
+    Ftp Writer
   </span>
   
 
@@ -1878,7 +1878,7 @@
         
   
   <span class="md-ellipsis">
-    GreenPlum Writer
+    Greenplum Writer
   </span>
   
 
@@ -1962,11 +1962,35 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#configuration-example" class="md-nav__link">
+  <a href="#_1" class="md-nav__link">
     <span class="md-ellipsis">
-      Configuration Example
+      配置样例
     </span>
   </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_2" class="md-nav__link">
+    <span class="md-ellipsis">
+      参数说明
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="参数说明">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#nullmode" class="md-nav__link">
+    <span class="md-ellipsis">
+      nullMode
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
   
 </li>
       
@@ -1990,7 +2014,7 @@
         
   
   <span class="md-ellipsis">
-    HBase11x Writer
+    HBase11X Writer
   </span>
   
 
@@ -2470,11 +2494,35 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#configuration-example" class="md-nav__link">
+  <a href="#_1" class="md-nav__link">
     <span class="md-ellipsis">
-      Configuration Example
+      配置样例
     </span>
   </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_2" class="md-nav__link">
+    <span class="md-ellipsis">
+      参数说明
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="参数说明">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#nullmode" class="md-nav__link">
+    <span class="md-ellipsis">
+      nullMode
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
   
 </li>
       
@@ -2494,69 +2542,86 @@
 
 
 <h1 id="hbase11x-sql-writer">HBase11x SQL Writer<a class="headerlink" href="#hbase11x-sql-writer" title="Permanent link">&para;</a></h1>
-<p>HBase11x SQL Writer plugin implements writing data to HBase 1.x via Phoenix SQL interface.</p>
-<h2 id="configuration-example">Configuration Example<a class="headerlink" href="#configuration-example" title="Permanent link">&para;</a></h2>
-<p>This plugin is used to write data to HBase 1.x via Phoenix. This plugin is based on <a href="../rdbmswriter">RDBMS Writer</a>, so you can refer to all configuration items of RDBMS Writer.</p>
-<div class="highlight"><pre><span></span><code><span class="p">{</span>
-<span class="w">  </span><span class="nt">&quot;job&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
-<span class="w">    </span><span class="nt">&quot;content&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
-<span class="w">      </span><span class="nt">&quot;reader&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
-<span class="w">        </span><span class="nt">&quot;name&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;txtfilereader&quot;</span><span class="p">,</span>
-<span class="w">        </span><span class="nt">&quot;parameter&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
-<span class="w">          </span><span class="nt">&quot;path&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;/tmp/normal.txt&quot;</span><span class="p">,</span>
-<span class="w">          </span><span class="nt">&quot;charset&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;UTF-8&quot;</span><span class="p">,</span>
-<span class="w">          </span><span class="nt">&quot;column&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span>
-<span class="w">            </span><span class="p">{</span>
-<span class="w">              </span><span class="nt">&quot;index&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">0</span><span class="p">,</span>
-<span class="w">              </span><span class="nt">&quot;type&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;String&quot;</span>
-<span class="w">            </span><span class="p">},</span>
-<span class="w">            </span><span class="p">{</span>
-<span class="w">              </span><span class="nt">&quot;index&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">1</span><span class="p">,</span>
-<span class="w">              </span><span class="nt">&quot;type&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;string&quot;</span>
-<span class="w">            </span><span class="p">},</span>
-<span class="w">            </span><span class="p">{</span>
-<span class="w">              </span><span class="nt">&quot;index&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">2</span><span class="p">,</span>
-<span class="w">              </span><span class="nt">&quot;type&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;string&quot;</span>
-<span class="w">            </span><span class="p">},</span>
-<span class="w">            </span><span class="p">{</span>
-<span class="w">              </span><span class="nt">&quot;index&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">3</span><span class="p">,</span>
-<span class="w">              </span><span class="nt">&quot;type&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;string&quot;</span>
-<span class="w">            </span><span class="p">}</span>
-<span class="w">          </span><span class="p">],</span>
-<span class="w">          </span><span class="nt">&quot;fieldDelimiter&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;,&quot;</span>
-<span class="w">        </span><span class="p">}</span>
-<span class="w">      </span><span class="p">},</span>
-<span class="w">      </span><span class="nt">&quot;writer&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
-<span class="w">        </span><span class="nt">&quot;name&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;hbase11xsqlwriter&quot;</span><span class="p">,</span>
-<span class="w">        </span><span class="nt">&quot;parameter&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
-<span class="w">          </span><span class="nt">&quot;batchSize&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;256&quot;</span><span class="p">,</span>
-<span class="w">          </span><span class="nt">&quot;column&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span>
-<span class="w">            </span><span class="s2">&quot;UID&quot;</span><span class="p">,</span>
-<span class="w">            </span><span class="s2">&quot;TS&quot;</span><span class="p">,</span>
-<span class="w">            </span><span class="s2">&quot;EVENTID&quot;</span><span class="p">,</span>
-<span class="w">            </span><span class="s2">&quot;CONTENT&quot;</span>
-<span class="w">          </span><span class="p">],</span>
-<span class="w">          </span><span class="nt">&quot;haveKerberos&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;true&quot;</span><span class="p">,</span>
-<span class="w">          </span><span class="nt">&quot;kerberosPrincipal&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;hive@EXAMPLE.COM&quot;</span><span class="p">,</span>
-<span class="w">          </span><span class="nt">&quot;kerberosKeytabFilePath&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;/tmp/hive.headless.keytab&quot;</span><span class="p">,</span>
-<span class="w">          </span><span class="nt">&quot;hbaseConfig&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
-<span class="w">            </span><span class="nt">&quot;hbase.zookeeper.quorum&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;node1,node2,node3:2181&quot;</span><span class="p">,</span>
-<span class="w">            </span><span class="nt">&quot;zookeeper.znode.parent&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;/hbase-secure&quot;</span>
-<span class="w">          </span><span class="p">},</span>
-<span class="w">          </span><span class="nt">&quot;nullMode&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;skip&quot;</span><span class="p">,</span>
-<span class="w">          </span><span class="nt">&quot;table&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;TEST_TBL&quot;</span>
-<span class="w">        </span><span class="p">}</span>
-<span class="w">      </span><span class="p">}</span>
-<span class="w">    </span><span class="p">},</span>
-<span class="w">    </span><span class="nt">&quot;setting&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
-<span class="w">      </span><span class="nt">&quot;speed&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
-<span class="w">        </span><span class="nt">&quot;channel&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">5</span><span class="p">,</span>
-<span class="w">        </span><span class="nt">&quot;bytes&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">-1</span>
-<span class="w">      </span><span class="p">}</span>
-<span class="w">    </span><span class="p">}</span>
-<span class="w">  </span><span class="p">}</span>
-<span class="p">}</span>
+<p>HBase11x SQL Writer 插件利用 <a href="https://phoenix.apache.org">Phoniex</a>， 用于向 HBase 1.x 版本的数据库写入数据。</p>
+<p>如果你希望通过调用原生接口写入数据，则需要使用<a href="../hbase11xwriter">HBase11xWriter</a> 插件</p>
+<p>如果 HBase 是 2.X 版本，则需要使用 <a href="../hbase20xsqlwriter">HBase20xsqlwriter</a> 插件</p>
+<h2 id="_1">配置样例<a class="headerlink" href="#_1" title="Permanent link">&para;</a></h2>
+<div class="highlight"><pre><span></span><code>
 </code></pre></div>
+<h2 id="_2">参数说明<a class="headerlink" href="#_2" title="Permanent link">&para;</a></h2>
+<table>
+<thead>
+<tr>
+<th style="text-align: left;">配置项</th>
+<th style="text-align: center;">是否必须</th>
+<th>数据类型</th>
+<th>默认值</th>
+<th>描述</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;">hbaseConfig</td>
+<td style="text-align: center;">是</td>
+<td>map</td>
+<td>无</td>
+<td>hbase 集群地址，详见示例配置</td>
+</tr>
+<tr>
+<td style="text-align: left;">table</td>
+<td style="text-align: center;">是</td>
+<td>string</td>
+<td>无</td>
+<td>要导入的表名，大小写敏感，通常 phoenix 表都是 <strong>大写</strong> 表名</td>
+</tr>
+<tr>
+<td style="text-align: left;">column</td>
+<td style="text-align: center;">是</td>
+<td>list</td>
+<td>无</td>
+<td>列名，大小写敏感，通常 phoenix 的列名都是 <strong>大写</strong></td>
+</tr>
+<tr>
+<td style="text-align: left;">batchSize</td>
+<td style="text-align: center;">否</td>
+<td>int</td>
+<td>256</td>
+<td>一次写入的最大记录数</td>
+</tr>
+<tr>
+<td style="text-align: left;">nullMode</td>
+<td style="text-align: center;">否</td>
+<td>string</td>
+<td>skip</td>
+<td>读取到的列值为 null 时，如何处理。</td>
+</tr>
+<tr>
+<td style="text-align: left;">haveKerberos</td>
+<td style="text-align: center;">否</td>
+<td>bolean</td>
+<td>false</td>
+<td>是否启用 Kerberos 认证, true 表示启用, false 表示不启用</td>
+</tr>
+<tr>
+<td style="text-align: left;">kerberosPrincipal</td>
+<td style="text-align: center;">否</td>
+<td>string</td>
+<td>无</td>
+<td>kerberos 凭证信息，仅当 <code>havekerberos</code> 启用后有效</td>
+</tr>
+<tr>
+<td style="text-align: left;">kerberosKeytabFilePath</td>
+<td style="text-align: center;">否</td>
+<td>string</td>
+<td>无</td>
+<td>kerberos 凭证文件的绝对路径，仅当 <code>havekerberos</code> 启用后有效</td>
+</tr>
+</tbody>
+</table>
+<h3 id="nullmode">nullMode<a class="headerlink" href="#nullmode" title="Permanent link">&para;</a></h3>
+<p>支持 <code>skip</code>, <code>empty</code>,前者表示跳过该列,后者表示插入空值,数值类型为 0,字符类型为 <code>null</code></p>
+<p>注意：启用 kerberos 认证后，程序需要知道<code>hbase-site.xml</code> 所在的路径，一种办法是运行执行在环境变量 <code>CLASSPATH</code> 中增加该文件的所在路径。</p>
+<p>另外一个解决办法是将 <code>hbase-site.xml</code> 文件拷贝到插件的 <code>libs</code> 目录里。</p>
 
 
 
@@ -2611,13 +2676,13 @@
         
         
           
-          <a href="../hbase11xwriter/" class="md-footer__link md-footer__link--next" aria-label="Next: HBase11x Writer">
+          <a href="../hbase11xwriter/" class="md-footer__link md-footer__link--next" aria-label="Next: HBase11X Writer">
             <div class="md-footer__title">
               <span class="md-footer__direction">
                 Next
               </span>
               <div class="md-ellipsis">
-                HBase11x Writer
+                HBase11X Writer
               </div>
             </div>
             <div class="md-footer__button md-icon">

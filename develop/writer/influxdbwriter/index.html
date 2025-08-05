@@ -809,7 +809,7 @@
         
   
   <span class="md-ellipsis">
-    Text File Reader
+    TxtFile Reader
   </span>
   
 
@@ -998,7 +998,7 @@
         
   
   <span class="md-ellipsis">
-    FTP Reader
+    Ftp Reader
   </span>
   
 
@@ -1857,7 +1857,7 @@
         
   
   <span class="md-ellipsis">
-    FTP Writer
+    Ftp Writer
   </span>
   
 
@@ -1878,7 +1878,7 @@
         
   
   <span class="md-ellipsis">
-    GreenPlum Writer
+    Greenplum Writer
   </span>
   
 
@@ -1941,7 +1941,7 @@
         
   
   <span class="md-ellipsis">
-    HBase11x Writer
+    HBase11X Writer
   </span>
   
 
@@ -2067,18 +2067,93 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#configuration-example" class="md-nav__link">
+  <a href="#_1" class="md-nav__link">
     <span class="md-ellipsis">
-      Configuration Example
+      示例
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="示例">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#_2" class="md-nav__link">
+    <span class="md-ellipsis">
+      创建需要的库
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#job" class="md-nav__link">
+    <span class="md-ellipsis">
+      创建 job 文件
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#_3" class="md-nav__link">
+    <span class="md-ellipsis">
+      运行
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_4" class="md-nav__link">
+    <span class="md-ellipsis">
+      参数说明
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="参数说明">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#column" class="md-nav__link">
+    <span class="md-ellipsis">
+      column
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#retentionpolicy" class="md-nav__link">
+    <span class="md-ellipsis">
+      retentionPolicy
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_5" class="md-nav__link">
+    <span class="md-ellipsis">
+      类型转换
     </span>
   </a>
   
 </li>
       
         <li class="md-nav__item">
-  <a href="#parameters" class="md-nav__link">
+  <a href="#_6" class="md-nav__link">
     <span class="md-ellipsis">
-      Parameters
+      限制
     </span>
   </a>
   
@@ -2479,18 +2554,93 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#configuration-example" class="md-nav__link">
+  <a href="#_1" class="md-nav__link">
     <span class="md-ellipsis">
-      Configuration Example
+      示例
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="示例">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#_2" class="md-nav__link">
+    <span class="md-ellipsis">
+      创建需要的库
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#job" class="md-nav__link">
+    <span class="md-ellipsis">
+      创建 job 文件
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#_3" class="md-nav__link">
+    <span class="md-ellipsis">
+      运行
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_4" class="md-nav__link">
+    <span class="md-ellipsis">
+      参数说明
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="参数说明">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#column" class="md-nav__link">
+    <span class="md-ellipsis">
+      column
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#retentionpolicy" class="md-nav__link">
+    <span class="md-ellipsis">
+      retentionPolicy
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_5" class="md-nav__link">
+    <span class="md-ellipsis">
+      类型转换
     </span>
   </a>
   
 </li>
       
         <li class="md-nav__item">
-  <a href="#parameters" class="md-nav__link">
+  <a href="#_6" class="md-nav__link">
     <span class="md-ellipsis">
-      Parameters
+      限制
     </span>
   </a>
   
@@ -2512,9 +2662,19 @@
 
 
 <h1 id="influxdb-writer">InfluxDB Writer<a class="headerlink" href="#influxdb-writer" title="Permanent link">&para;</a></h1>
-<p>InfluxDB Writer plugin implements writing data to InfluxDB time series database.</p>
-<h2 id="configuration-example">Configuration Example<a class="headerlink" href="#configuration-example" title="Permanent link">&para;</a></h2>
-<p>This plugin is used to write data to InfluxDB database. For detailed configuration and parameters, please refer to the original InfluxDB Writer documentation.</p>
+<p>InfluxDB Writer 插件实现了将数据写入 <a href="https://docs.influxdata.com/influxdb/v1.8/query_language/manage-database/#create-retention-policies-with-create-retention-policy">InfluxDB</a> 读取数据的功能。
+底层实现上，是通过调用 InfluQL 语言接口，构建插入语句，然后进行数据插入。</p>
+<h2 id="_1">示例<a class="headerlink" href="#_1" title="Permanent link">&para;</a></h2>
+<p>以下示例用来演示该插件从内存读取数据并写入到指定表</p>
+<h3 id="_2">创建需要的库<a class="headerlink" href="#_2" title="Permanent link">&para;</a></h3>
+<p>通过以下命令来创建需要写入的库</p>
+<div class="highlight"><pre><span></span><code><span class="c1"># create database</span>
+influx<span class="w"> </span>--execute<span class="w"> </span><span class="s2">&quot;CREATE DATABASE addax&quot;</span>
+</code></pre></div>
+<h3 id="job">创建 job 文件<a class="headerlink" href="#job" title="Permanent link">&para;</a></h3>
+<p>创建 <code>job/stream2influxdb.json</code> 文件，内容如下：</p>
+<div class="tabbed-set" data-tabs="1:1"><input checked="checked" id="__tabbed_1_1" name="__tabbed_1" type="radio" /><label for="__tabbed_1_1">job/stream2influxdb.json</label><div class="tabbed-content"></div>
+</div>
 <div class="highlight"><pre><span></span><code><span class="p">{</span>
 <span class="w">  </span><span class="nt">&quot;job&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
 <span class="w">    </span><span class="nt">&quot;setting&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
@@ -2594,8 +2754,119 @@
 <span class="w">  </span><span class="p">}</span>
 <span class="p">}</span>
 </code></pre></div>
-<h2 id="parameters">Parameters<a class="headerlink" href="#parameters" title="Permanent link">&para;</a></h2>
-<p>This plugin supports writing time series data to InfluxDB with configurable database, measurement, and field options.</p>
+<h3 id="_3">运行<a class="headerlink" href="#_3" title="Permanent link">&para;</a></h3>
+<p>执行下面的命令进行数据采集</p>
+<div class="highlight"><pre><span></span><code>bin/addax.sh<span class="w"> </span>job/stream2influxdb.json
+</code></pre></div>
+<h2 id="_4">参数说明<a class="headerlink" href="#_4" title="Permanent link">&para;</a></h2>
+<table>
+<thead>
+<tr>
+<th style="text-align: left;">配置项</th>
+<th style="text-align: center;">是否必须</th>
+<th>数据类型</th>
+<th>默认值</th>
+<th>描述</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;">endpoint</td>
+<td style="text-align: center;">是</td>
+<td>string</td>
+<td>无</td>
+<td>InfluxDB 连接串</td>
+</tr>
+<tr>
+<td style="text-align: left;">username</td>
+<td style="text-align: center;">是</td>
+<td>string</td>
+<td>无</td>
+<td>数据源的用户名</td>
+</tr>
+<tr>
+<td style="text-align: left;">password</td>
+<td style="text-align: center;">否</td>
+<td>string</td>
+<td>无</td>
+<td>数据源指定用户名的密码</td>
+</tr>
+<tr>
+<td style="text-align: left;">database</td>
+<td style="text-align: center;">是</td>
+<td>string</td>
+<td>无</td>
+<td>数据源指定的数据库</td>
+</tr>
+<tr>
+<td style="text-align: left;">table</td>
+<td style="text-align: center;">是</td>
+<td>string</td>
+<td>无</td>
+<td>要写入的表（指标）</td>
+</tr>
+<tr>
+<td style="text-align: left;">column</td>
+<td style="text-align: center;">是</td>
+<td>list</td>
+<td>无</td>
+<td>所配置的表中需要同步的列名集合</td>
+</tr>
+<tr>
+<td style="text-align: left;">connTimeout</td>
+<td style="text-align: center;">否</td>
+<td>int</td>
+<td>15</td>
+<td>设置连接超时值，单位为秒</td>
+</tr>
+<tr>
+<td style="text-align: left;">readTimeout</td>
+<td style="text-align: center;">否</td>
+<td>int</td>
+<td>20</td>
+<td>设置读取超时值，单位为秒</td>
+</tr>
+<tr>
+<td style="text-align: left;">writeTimeout</td>
+<td style="text-align: center;">否</td>
+<td>int</td>
+<td>20</td>
+<td>设置写入超时值，单位为秒</td>
+</tr>
+<tr>
+<td style="text-align: left;">preSql</td>
+<td style="text-align: center;">否</td>
+<td>list</td>
+<td>无</td>
+<td>插入数据前执行的SQL语句</td>
+</tr>
+<tr>
+<td style="text-align: left;">postSql</td>
+<td style="text-align: center;">否</td>
+<td>list</td>
+<td>无</td>
+<td>数据插入完毕后需要执行的语句</td>
+</tr>
+<tr>
+<td style="text-align: left;">retentionPolicy</td>
+<td style="text-align: center;">否</td>
+<td>map</td>
+<td>无</td>
+<td>设置数据库的 Retention Policy 策略</td>
+</tr>
+</tbody>
+</table>
+<h3 id="column">column<a class="headerlink" href="#column" title="Permanent link">&para;</a></h3>
+<p>InfluxDB 作为时序数据库，需要每条记录都有时间戳字段，因此这里会把 <code>column</code> 配置的第一个字段默认当作时间戳</p>
+<h3 id="retentionpolicy">retentionPolicy<a class="headerlink" href="#retentionpolicy" title="Permanent link">&para;</a></h3>
+<p>设定数据库的 <code>Retention Policy</code> 策略，依据给定的配置，在指定数据库上创建一条 <code>Retention Policy</code> 信息。
+有关 <code>Retention Policy</code> 更详细的信息，可以参考 [官方文档][2]</p>
+<h2 id="_5">类型转换<a class="headerlink" href="#_5" title="Permanent link">&para;</a></h2>
+<p>当前支持 InfluxDB 的基本类型</p>
+<h2 id="_6">限制<a class="headerlink" href="#_6" title="Permanent link">&para;</a></h2>
+<ol>
+<li>当前插件仅支持 1.x 版本，2.0 及以上并不支持</li>
+</ol>
 
 
 

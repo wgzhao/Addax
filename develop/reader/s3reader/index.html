@@ -814,7 +814,7 @@
         
   
   <span class="md-ellipsis">
-    Text File Reader
+    TxtFile Reader
   </span>
   
 
@@ -1003,7 +1003,7 @@
         
   
   <span class="md-ellipsis">
-    FTP Reader
+    Ftp Reader
   </span>
   
 
@@ -1360,22 +1360,22 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#configuration-example" class="md-nav__link">
+  <a href="#_1" class="md-nav__link">
     <span class="md-ellipsis">
-      Configuration Example
+      配置样例
     </span>
   </a>
   
 </li>
       
         <li class="md-nav__item">
-  <a href="#parameters" class="md-nav__link">
+  <a href="#_2" class="md-nav__link">
     <span class="md-ellipsis">
-      Parameters
+      参数说明
     </span>
   </a>
   
-    <nav class="md-nav" aria-label="Parameters">
+    <nav class="md-nav" aria-label="参数说明">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
@@ -1387,8 +1387,35 @@
   
 </li>
         
+          <li class="md-nav__item">
+  <a href="#pathstyleaccessenabled" class="md-nav__link">
+    <span class="md-ellipsis">
+      pathStyleAccessEnabled
+    </span>
+  </a>
+  
+</li>
+        
       </ul>
     </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_3" class="md-nav__link">
+    <span class="md-ellipsis">
+      类型转换
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_4" class="md-nav__link">
+    <span class="md-ellipsis">
+      限制说明
+    </span>
+  </a>
   
 </li>
       
@@ -1930,7 +1957,7 @@
         
   
   <span class="md-ellipsis">
-    FTP Writer
+    Ftp Writer
   </span>
   
 
@@ -1951,7 +1978,7 @@
         
   
   <span class="md-ellipsis">
-    GreenPlum Writer
+    Greenplum Writer
   </span>
   
 
@@ -2014,7 +2041,7 @@
         
   
   <span class="md-ellipsis">
-    HBase11x Writer
+    HBase11X Writer
   </span>
   
 
@@ -2494,22 +2521,22 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#configuration-example" class="md-nav__link">
+  <a href="#_1" class="md-nav__link">
     <span class="md-ellipsis">
-      Configuration Example
+      配置样例
     </span>
   </a>
   
 </li>
       
         <li class="md-nav__item">
-  <a href="#parameters" class="md-nav__link">
+  <a href="#_2" class="md-nav__link">
     <span class="md-ellipsis">
-      Parameters
+      参数说明
     </span>
   </a>
   
-    <nav class="md-nav" aria-label="Parameters">
+    <nav class="md-nav" aria-label="参数说明">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
@@ -2521,8 +2548,35 @@
   
 </li>
         
+          <li class="md-nav__item">
+  <a href="#pathstyleaccessenabled" class="md-nav__link">
+    <span class="md-ellipsis">
+      pathStyleAccessEnabled
+    </span>
+  </a>
+  
+</li>
+        
       </ul>
     </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_3" class="md-nav__link">
+    <span class="md-ellipsis">
+      类型转换
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_4" class="md-nav__link">
+    <span class="md-ellipsis">
+      限制说明
+    </span>
+  </a>
   
 </li>
       
@@ -2542,10 +2596,11 @@
 
 
 <h1 id="s3-reader">S3 Reader<a class="headerlink" href="#s3-reader" title="Permanent link">&para;</a></h1>
-<p>S3 Reader plugin is used to read data on Amazon AWS S3 storage. In implementation, this plugin is written based on S3's official <a href="https://docs.aws.amazon.com/sdk-for-java/latest/developer-guide/home.html">SDK 2.0</a>.</p>
-<p>This plugin also supports reading storage services compatible with S3 protocol, such as <a href="https://min.io/">MinIO</a>.</p>
-<h2 id="configuration-example">Configuration Example<a class="headerlink" href="#configuration-example" title="Permanent link">&para;</a></h2>
-<p>The following sample configuration is used to read two files from S3 storage and print them out</p>
+<p>S3 Reader 插件用于读取 Amazon AWS S3 存储上的数据。在实现上，本插件基于 S3 官方的 <a href="https://docs.aws.amazon.com/sdk-for-java/latest/developer-guide/home.
+html">SDK 2.0</a> 编写。</p>
+<p>同时本插件也支持读取兼容 S3 协议的存储服务，比如 <a href="https://min.io/">MinIO</a></p>
+<h2 id="_1">配置样例<a class="headerlink" href="#_1" title="Permanent link">&para;</a></h2>
+<p>以下样例配置用于从 S3 存储上读取两个文件，并打印出来</p>
 <div class="highlight"><pre><span></span><code><span class="p">{</span>
 <span class="w">  </span><span class="nt">&quot;job&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
 <span class="w">    </span><span class="nt">&quot;setting&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
@@ -2590,106 +2645,151 @@
 <span class="w">  </span><span class="p">}</span>
 <span class="p">}</span>
 </code></pre></div>
-<h2 id="parameters">Parameters<a class="headerlink" href="#parameters" title="Permanent link">&para;</a></h2>
+<h2 id="_2">参数说明<a class="headerlink" href="#_2" title="Permanent link">&para;</a></h2>
 <table>
 <thead>
 <tr>
-<th style="text-align: left;">Configuration</th>
-<th style="text-align: center;">Required</th>
-<th>Data Type</th>
-<th>Default Value</th>
-<th>Description</th>
+<th style="text-align: left;">配置项</th>
+<th style="text-align: center;">是否必须</th>
+<th>数据类型</th>
+<th>默认值</th>
+<th>描述</th>
 </tr>
 </thead>
 <tbody>
 <tr>
 <td style="text-align: left;">endpoint</td>
-<td style="text-align: center;">Yes</td>
+<td style="text-align: center;">是</td>
 <td>string</td>
-<td>None</td>
-<td>S3 Server EndPoint address, e.g. <code>s3.xx.amazonaws.com</code></td>
+<td>无</td>
+<td>S3 Server的 EndPoint地址，例如 <code>s3.xx.amazonaws.com</code></td>
 </tr>
 <tr>
 <td style="text-align: left;">region</td>
-<td style="text-align: center;">Yes</td>
+<td style="text-align: center;">是</td>
 <td>string</td>
-<td>None</td>
-<td>S3 Server Region address, e.g. <code>ap-southeast-1</code></td>
+<td>无</td>
+<td>S3 Server的 Region 地址，例如 <code>ap-southeast-1</code></td>
 </tr>
 <tr>
 <td style="text-align: left;">accessId</td>
-<td style="text-align: center;">Yes</td>
+<td style="text-align: center;">是</td>
 <td>string</td>
-<td>None</td>
-<td>Access ID</td>
+<td>无</td>
+<td>访问 ID</td>
 </tr>
 <tr>
 <td style="text-align: left;">accessKey</td>
-<td style="text-align: center;">Yes</td>
+<td style="text-align: center;">是</td>
 <td>string</td>
-<td>None</td>
-<td>Access Key</td>
+<td>无</td>
+<td>访问 Key</td>
 </tr>
 <tr>
 <td style="text-align: left;">bucket</td>
-<td style="text-align: center;">Yes</td>
+<td style="text-align: center;">是</td>
 <td>string</td>
-<td>None</td>
-<td>Bucket to read</td>
+<td>无</td>
+<td>要读取的 bucket</td>
 </tr>
 <tr>
 <td style="text-align: left;">object</td>
-<td style="text-align: center;">Yes</td>
+<td style="text-align: center;">是</td>
 <td>list</td>
-<td>None</td>
-<td>Objects to read, can specify multiple and wildcard patterns, see description below</td>
+<td>无</td>
+<td>要读取的 object，可以填写多个以及通配符方式，详见下面说明</td>
 </tr>
 <tr>
 <td style="text-align: left;">column</td>
-<td style="text-align: center;">Yes</td>
+<td style="text-align: center;">是</td>
 <td>list</td>
-<td>None</td>
-<td>Column information of objects to read, refer to <code>column</code> description in <a href="../rdbmsreader">RDBMS Reader</a></td>
+<td>无</td>
+<td>读取的 object 的列信息，填写方式见<a href="../rdbmsreader">RDBMS Reader</a> 中 <code>column</code> 描述</td>
 </tr>
 <tr>
 <td style="text-align: left;">fieldDelimiter</td>
-<td style="text-align: center;">No</td>
+<td style="text-align: center;">否</td>
 <td>string</td>
 <td><code>,</code></td>
-<td>Field delimiter for reading, only supports single character</td>
+<td>读取的字段分隔符，仅支持单字符</td>
 </tr>
 <tr>
 <td style="text-align: left;">compress</td>
-<td style="text-align: center;">No</td>
+<td style="text-align: center;">否</td>
 <td>string</td>
-<td>None</td>
-<td>File compression format, default is no compression</td>
+<td>无</td>
+<td>文件压缩格式，默认不压缩</td>
 </tr>
 <tr>
 <td style="text-align: left;">encoding</td>
-<td style="text-align: center;">No</td>
+<td style="text-align: center;">否</td>
 <td>string</td>
 <td><code>utf8</code></td>
-<td>File encoding format</td>
+<td>文件编码格式</td>
 </tr>
 <tr>
 <td style="text-align: left;">writeMode</td>
-<td style="text-align: center;">No</td>
+<td style="text-align: center;">否</td>
 <td>string</td>
 <td><code>nonConflict</code></td>
 <td></td>
 </tr>
 <tr>
 <td style="text-align: left;">pathStyleAccessEnabled</td>
-<td style="text-align: center;">No</td>
+<td style="text-align: center;">否</td>
 <td>boolean</td>
 <td>false</td>
-<td>Whether to enable path-style access mode</td>
+<td>是否启用路径访问模式</td>
 </tr>
 </tbody>
 </table>
 <h3 id="object">object<a class="headerlink" href="#object" title="Permanent link">&para;</a></h3>
-<p>When specifying a single object, the plugin can currently only use single-threaded data extraction.</p>
+<p>当指定单个 object，插件暂时只能使用单线程进行数据抽取。</p>
+<p>当指定多个 object，插件支持使用多线程进行数据抽取。线程并发数通过通道数指定。</p>
+<p>当指定通配符，插件尝试遍历出多个 object 信息。</p>
+<p>例如: 指定 <code>/*</code> 代表读取 bucket 下所有的 object，指定 <code>/foo/*</code> 代表读取 <code>foo</code> 目录下所有的 object。</p>
+<h3 id="pathstyleaccessenabled">pathStyleAccessEnabled<a class="headerlink" href="#pathstyleaccessenabled" title="Permanent link">&para;</a></h3>
+<p>是否启用路径访问模式,如果启用，则访问 bucket 的路径为 <code>example.com/bucket-name</code>,否则为 <code>bucket-name.example.com</code> ，详细情况可以参观
+<a href="https://min.io/docs/minio/linux/administration/object-management.html#minio-object-management-path-virtual-access">path vs virtual access</a> </p>
+<h2 id="_3">类型转换<a class="headerlink" href="#_3" title="Permanent link">&para;</a></h2>
+<table>
+<thead>
+<tr>
+<th>Addax 内部类型</th>
+<th>S3 数据类型</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Long</td>
+<td>int, tinyint, smallint, mediumint, int, bigint</td>
+</tr>
+<tr>
+<td>Double</td>
+<td>float, double, decimal</td>
+</tr>
+<tr>
+<td>String</td>
+<td>varchar, char, tinytext, text, mediumtext, longtext, year,xml</td>
+</tr>
+<tr>
+<td>Date</td>
+<td>date, datetime, timestamp, time</td>
+</tr>
+<tr>
+<td>Boolean</td>
+<td>bit, bool</td>
+</tr>
+<tr>
+<td>Bytes</td>
+<td>tinyblob, mediumblob, blob, longblob, varbinary</td>
+</tr>
+</tbody>
+</table>
+<h2 id="_4">限制说明<a class="headerlink" href="#_4" title="Permanent link">&para;</a></h2>
+<ol>
+<li>仅支持读取文本文件</li>
+</ol>
 
 
 
