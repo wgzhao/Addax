@@ -1,0 +1,3290 @@
+
+<!doctype html>
+<html lang="en" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+        <meta name="description" content="Addax is an open source universal ETL tool that supports most of those RDBMS and NoSQLs on the planet">
+      
+      
+        <meta name="author" content="Steven Zhao">
+      
+      
+        <link rel="canonical" href="https://wgzhao.github.io/Addax/6.0.3/en/plugin_development/">
+      
+      
+      
+      
+      <link rel="icon" href="../../images/favicon.ico">
+      <meta name="generator" content="mkdocs-1.6.0, mkdocs-material-9.5.25">
+    
+    
+      
+        <title>Plugin Development - Addax Documentation</title>
+      
+    
+    
+      <link rel="stylesheet" href="../../assets/stylesheets/main.6543a935.min.css">
+      
+        
+        <link rel="stylesheet" href="../../assets/stylesheets/palette.06af60db.min.css">
+      
+      
+
+
+    
+    
+      
+    
+    
+      
+        
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,300i,400,400i,700,700i%7CRoboto+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Roboto";--md-code-font:"Roboto Mono"}</style>
+      
+    
+    
+    <script>__md_scope=new URL("../..",location),__md_hash=e=>[...e].reduce((e,_)=>(e<<5)-e+_.charCodeAt(0),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+  
+
+
+  
+  
+
+<script id="__analytics">function __md_analytics(){function n(){dataLayer.push(arguments)}window.dataLayer=window.dataLayer||[],n("js",new Date),n("config","G-J252L4LHDX"),document.addEventListener("DOMContentLoaded",function(){document.forms.search&&document.forms.search.query.addEventListener("blur",function(){this.value&&n("event","search",{search_term:this.value})}),document$.subscribe(function(){var a=document.forms.feedback;if(void 0!==a)for(var e of a.querySelectorAll("[type=submit]"))e.addEventListener("click",function(e){e.preventDefault();var t=document.location.pathname,e=this.getAttribute("data-md-value");n("event","feedback",{page:t,data:e}),a.firstElementChild.disabled=!0;e=a.querySelector(".md-feedback__note [data-md-value='"+e+"']");e&&(e.hidden=!1)}),a.hidden=!1}),location$.subscribe(function(e){n("config","G-J252L4LHDX",{page_path:e.pathname})})});var e=document.createElement("script");e.async=!0,e.src="https://www.googletagmanager.com/gtag/js?id=G-J252L4LHDX",document.getElementById("__analytics").insertAdjacentElement("afterEnd",e)}</script>
+  
+    <script>"undefined"!=typeof __md_analytics&&__md_analytics()</script>
+  
+
+    
+    
+    
+  </head>
+  
+  
+    
+    
+      
+    
+    
+    
+    
+    <body dir="ltr" data-md-color-scheme="slate" data-md-color-primary="indigo" data-md-color-accent="indigo">
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#plugin-development" class="md-skip">
+          Skip to content
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+      <div data-md-color-scheme="default" data-md-component="outdated" hidden>
+        
+      </div>
+    
+    
+      
+
+  
+
+<header class="md-header md-header--shadow md-header--lifted" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="Header">
+    <a href="../.." title="Addax Documentation" class="md-header__button md-logo" aria-label="Addax Documentation" data-md-component="logo">
+      
+  <img src="../../images/logo.png" alt="logo">
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3V6m0 5h18v2H3v-2m0 5h18v2H3v-2Z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            Addax Documentation
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              Plugin Development
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+      
+        <form class="md-header__option" data-md-component="palette">
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="(prefers-color-scheme: dark)" data-md-color-scheme="slate" data-md-color-primary="indigo" data-md-color-accent="indigo"  aria-label="Switch to light mode"  type="radio" name="__palette" id="__palette_0">
+    
+      <label class="md-header__button md-icon" title="Switch to light mode" for="__palette_1" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M17 7H7a5 5 0 0 0-5 5 5 5 0 0 0 5 5h10a5 5 0 0 0 5-5 5 5 0 0 0-5-5m0 8a3 3 0 0 1-3-3 3 3 0 0 1 3-3 3 3 0 0 1 3 3 3 3 0 0 1-3 3Z"/></svg>
+      </label>
+    
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="(prefers-color-scheme: light)" data-md-color-scheme="default" data-md-color-primary="indigo" data-md-color-accent="indigo"  aria-label="Switch to dark mode"  type="radio" name="__palette" id="__palette_1">
+    
+      <label class="md-header__button md-icon" title="Switch to dark mode" for="__palette_0" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M17 6H7c-3.31 0-6 2.69-6 6s2.69 6 6 6h10c3.31 0 6-2.69 6-6s-2.69-6-6-6zm0 10H7c-2.21 0-4-1.79-4-4s1.79-4 4-4h10c2.21 0 4 1.79 4 4s-1.79 4-4 4zM7 9c-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3-1.34-3-3-3z"/></svg>
+      </label>
+    
+  
+</form>
+      
+    
+    
+      <script>var media,input,key,value,palette=__md_get("__palette");if(palette&&palette.color){"(prefers-color-scheme)"===palette.color.media&&(media=matchMedia("(prefers-color-scheme: light)"),input=document.querySelector(media.matches?"[data-md-color-media='(prefers-color-scheme: light)']":"[data-md-color-media='(prefers-color-scheme: dark)']"),palette.color.media=input.getAttribute("data-md-color-media"),palette.color.scheme=input.getAttribute("data-md-color-scheme"),palette.color.primary=input.getAttribute("data-md-color-primary"),palette.color.accent=input.getAttribute("data-md-color-accent"));for([key,value]of Object.entries(palette.color))document.body.setAttribute("data-md-color-"+key,value)}</script>
+    
+    
+      <div class="md-header__option">
+  <div class="md-select">
+    
+    <button class="md-header__button md-icon" aria-label="Select language">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="m12.87 15.07-2.54-2.51.03-.03A17.52 17.52 0 0 0 14.07 6H17V4h-7V2H8v2H1v2h11.17C11.5 7.92 10.44 9.75 9 11.35 8.07 10.32 7.3 9.19 6.69 8h-2c.73 1.63 1.73 3.17 2.98 4.56l-5.09 5.02L4 19l5-5 3.11 3.11.76-2.04M18.5 10h-2L12 22h2l1.12-3h4.75L21 22h2l-4.5-12m-2.62 7 1.62-4.33L19.12 17h-3.24Z"/></svg>
+    </button>
+    <div class="md-select__inner">
+      <ul class="md-select__list">
+        
+          <li class="md-select__item">
+            <a href="/en" hreflang="en" class="md-select__link">
+              English
+            </a>
+          </li>
+        
+          <li class="md-select__item">
+            <a href="/" hreflang="zh" class="md-select__link">
+              中文
+            </a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+</div>
+    
+    
+      <label class="md-header__button md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.516 6.516 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5Z"/></svg>
+      </label>
+      <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="Search" placeholder="Search" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.516 6.516 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5Z"/></svg>
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11h12Z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="Search">
+        
+          <a href="javascript:void(0)" class="md-search__icon md-icon" title="Share" aria-label="Share" data-clipboard data-clipboard-text="" data-md-component="search-share" tabindex="-1">
+            
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M18 16.08c-.76 0-1.44.3-1.96.77L8.91 12.7c.05-.23.09-.46.09-.7 0-.24-.04-.47-.09-.7l7.05-4.11c.54.5 1.25.81 2.04.81a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3c0 .24.04.47.09.7L8.04 9.81C7.5 9.31 6.79 9 6 9a3 3 0 0 0-3 3 3 3 0 0 0 3 3c.79 0 1.5-.31 2.04-.81l7.12 4.15c-.05.21-.08.43-.08.66 0 1.61 1.31 2.91 2.92 2.91 1.61 0 2.92-1.3 2.92-2.91A2.92 2.92 0 0 0 18 16.08Z"/></svg>
+          </a>
+        
+        <button type="reset" class="md-search__icon md-icon" title="Clear" aria-label="Clear" tabindex="-1">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12 19 6.41Z"/></svg>
+        </button>
+      </nav>
+      
+        <div class="md-search__suggest" data-md-component="search-suggest"></div>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            Initializing search
+          </div>
+          <ol class="md-search-result__list" role="presentation"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+    
+    
+      <div class="md-header__source">
+        <a href="https://github.com/wgzhao/Addax" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 496 512"><!--! Font Awesome Free 6.5.2 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2024 Fonticons, Inc.--><path d="M165.9 397.4c0 2-2.3 3.6-5.2 3.6-3.3.3-5.6-1.3-5.6-3.6 0-2 2.3-3.6 5.2-3.6 3-.3 5.6 1.3 5.6 3.6zm-31.1-4.5c-.7 2 1.3 4.3 4.3 4.9 2.6 1 5.6 0 6.2-2s-1.3-4.3-4.3-5.2c-2.6-.7-5.5.3-6.2 2.3zm44.2-1.7c-2.9.7-4.9 2.6-4.6 4.9.3 2 2.9 3.3 5.9 2.6 2.9-.7 4.9-2.6 4.6-4.6-.3-1.9-3-3.2-5.9-2.9zM244.8 8C106.1 8 0 113.3 0 252c0 110.9 69.8 205.8 169.5 239.2 12.8 2.3 17.3-5.6 17.3-12.1 0-6.2-.3-40.4-.3-61.4 0 0-70 15-84.7-29.8 0 0-11.4-29.1-27.8-36.6 0 0-22.9-15.7 1.6-15.4 0 0 24.9 2 38.6 25.8 21.9 38.6 58.6 27.5 72.9 20.9 2.3-16 8.8-27.1 16-33.7-55.9-6.2-112.3-14.3-112.3-110.5 0-27.5 7.6-41.3 23.6-58.9-2.6-6.5-11.1-33.3 2.6-67.9 20.9-6.5 69 27 69 27 20-5.6 41.5-8.5 62.8-8.5s42.8 2.9 62.8 8.5c0 0 48.1-33.6 69-27 13.7 34.7 5.2 61.4 2.6 67.9 16 17.7 25.8 31.5 25.8 58.9 0 96.5-58.9 104.2-114.8 110.5 9.2 7.9 17 22.9 17 46.4 0 33.7-.3 75.4-.3 83.6 0 6.5 4.6 14.4 17.3 12.1C428.2 457.8 496 362.9 496 252 496 113.3 383.5 8 244.8 8zM97.2 352.9c-1.3 1-1 3.3.7 5.2 1.6 1.6 3.9 2.3 5.2 1 1.3-1 1-3.3-.7-5.2-1.6-1.6-3.9-2.3-5.2-1zm-10.8-8.1c-.7 1.3.3 2.9 2.3 3.9 1.6 1 3.6.7 4.3-.7.7-1.3-.3-2.9-2.3-3.9-2-.6-3.6-.3-4.3.7zm32.4 35.6c-1.6 1.3-1 4.3 1.3 6.2 2.3 2.3 5.2 2.6 6.5 1 1.3-1.3.7-4.3-1.3-6.2-2.2-2.3-5.2-2.6-6.5-1zm-11.4-14.7c-1.6 1-1.6 3.6 0 5.9 1.6 2.3 4.3 3.3 5.6 2.3 1.6-1.3 1.6-3.9 0-6.2-1.4-2.3-4-3.3-5.6-2z"/></svg>
+  </div>
+  <div class="md-source__repository">
+    wgzhao/addax
+  </div>
+</a>
+      </div>
+    
+  </nav>
+  
+    
+      
+<nav class="md-tabs" aria-label="Tabs" data-md-component="tabs">
+  <div class="md-grid">
+    <ul class="md-tabs__list">
+      
+        
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="../.." class="md-tabs__link">
+        
+  
+    
+  
+  Home
+
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="../../quickstart/" class="md-tabs__link">
+        
+  
+    
+  
+  Quick Start
+
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="../../setupJob/" class="md-tabs__link">
+        
+  
+    
+  
+  Job Configuration
+
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="../../commandline/" class="md-tabs__link">
+        
+  
+    
+  
+  Command Line
+
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../../reader/accessreader/" class="md-tabs__link">
+          
+  
+    
+  
+  Reader Plugins
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../../writer/accesswriter/" class="md-tabs__link">
+          
+  
+    
+  
+  Writer Plugins
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="../../debug/" class="md-tabs__link">
+        
+  
+    
+  
+  Debug
+
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="../../encrypt_password/" class="md-tabs__link">
+        
+  
+    
+  
+  Password Encryption
+
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="../../statsreport/" class="md-tabs__link">
+        
+  
+    
+  
+  Statistics Report
+
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="../../transformer/" class="md-tabs__link">
+        
+  
+    
+  
+  Transformer
+
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="../../plugin_development/" class="md-tabs__link">
+        
+  
+    
+  
+  Plugin Development
+
+      </a>
+    </li>
+  
+
+      
+    </ul>
+  </div>
+</nav>
+    
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+  
+
+
+<nav class="md-nav md-nav--primary md-nav--lifted" aria-label="Navigation" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href="../.." title="Addax Documentation" class="md-nav__button md-logo" aria-label="Addax Documentation" data-md-component="logo">
+      
+  <img src="../../images/logo.png" alt="logo">
+
+    </a>
+    Addax Documentation
+  </label>
+  
+    <div class="md-nav__source">
+      <a href="https://github.com/wgzhao/Addax" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 496 512"><!--! Font Awesome Free 6.5.2 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2024 Fonticons, Inc.--><path d="M165.9 397.4c0 2-2.3 3.6-5.2 3.6-3.3.3-5.6-1.3-5.6-3.6 0-2 2.3-3.6 5.2-3.6 3-.3 5.6 1.3 5.6 3.6zm-31.1-4.5c-.7 2 1.3 4.3 4.3 4.9 2.6 1 5.6 0 6.2-2s-1.3-4.3-4.3-5.2c-2.6-.7-5.5.3-6.2 2.3zm44.2-1.7c-2.9.7-4.9 2.6-4.6 4.9.3 2 2.9 3.3 5.9 2.6 2.9-.7 4.9-2.6 4.6-4.6-.3-1.9-3-3.2-5.9-2.9zM244.8 8C106.1 8 0 113.3 0 252c0 110.9 69.8 205.8 169.5 239.2 12.8 2.3 17.3-5.6 17.3-12.1 0-6.2-.3-40.4-.3-61.4 0 0-70 15-84.7-29.8 0 0-11.4-29.1-27.8-36.6 0 0-22.9-15.7 1.6-15.4 0 0 24.9 2 38.6 25.8 21.9 38.6 58.6 27.5 72.9 20.9 2.3-16 8.8-27.1 16-33.7-55.9-6.2-112.3-14.3-112.3-110.5 0-27.5 7.6-41.3 23.6-58.9-2.6-6.5-11.1-33.3 2.6-67.9 20.9-6.5 69 27 69 27 20-5.6 41.5-8.5 62.8-8.5s42.8 2.9 62.8 8.5c0 0 48.1-33.6 69-27 13.7 34.7 5.2 61.4 2.6 67.9 16 17.7 25.8 31.5 25.8 58.9 0 96.5-58.9 104.2-114.8 110.5 9.2 7.9 17 22.9 17 46.4 0 33.7-.3 75.4-.3 83.6 0 6.5 4.6 14.4 17.3 12.1C428.2 457.8 496 362.9 496 252 496 113.3 383.5 8 244.8 8zM97.2 352.9c-1.3 1-1 3.3.7 5.2 1.6 1.6 3.9 2.3 5.2 1 1.3-1 1-3.3-.7-5.2-1.6-1.6-3.9-2.3-5.2-1zm-10.8-8.1c-.7 1.3.3 2.9 2.3 3.9 1.6 1 3.6.7 4.3-.7.7-1.3-.3-2.9-2.3-3.9-2-.6-3.6-.3-4.3.7zm32.4 35.6c-1.6 1.3-1 4.3 1.3 6.2 2.3 2.3 5.2 2.6 6.5 1 1.3-1.3.7-4.3-1.3-6.2-2.2-2.3-5.2-2.6-6.5-1zm-11.4-14.7c-1.6 1-1.6 3.6 0 5.9 1.6 2.3 4.3 3.3 5.6 2.3 1.6-1.3 1.6-3.9 0-6.2-1.4-2.3-4-3.3-5.6-2z"/></svg>
+  </div>
+  <div class="md-source__repository">
+    wgzhao/addax
+  </div>
+</a>
+    </div>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../.." class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Home
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../quickstart/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Quick Start
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../setupJob/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Job Configuration
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../commandline/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Command Line
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_5" >
+        
+          
+          <label class="md-nav__link" for="__nav_5" id="__nav_5_label" tabindex="0">
+            
+  
+  <span class="md-ellipsis">
+    Reader Plugins
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_5_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_5">
+            <span class="md-nav__icon md-icon"></span>
+            Reader Plugins
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../reader/accessreader/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Access Reader
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../reader/mysqlreader/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    MySQL Reader
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../reader/postgresqlreader/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    PostgreSQL Reader
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../reader/oraclereader/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Oracle Reader
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../reader/rdbmsreader/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    RDBMS Reader
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../reader/txtfilereader/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    TxtFile Reader
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../reader/elasticsearchreader/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    ElasticSearchReader
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../reader/mongodbreader/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    MongoDB Reader
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../reader/cassandrareader/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Cassandra Reader
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../reader/clickhousereader/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    ClickHouse Reader
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../reader/databendreader/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Databend Reader
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../reader/datareader/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Data Reader
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../reader/dbfreader/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Dbf Reader
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../reader/excelreader/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Excel Reader
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../reader/ftpreader/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Ftp Reader
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../reader/hanareader/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    HANA Reader
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../reader/hbase11xreader/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    HBase11X Reader
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../reader/hbase11xsqlreader/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    HBase11x SQL Reader
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../reader/hbase20xreader/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    HBase20 Reader
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../reader/hbase20xsqlreader/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    HBase20 SQL Reader
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../reader/hdfsreader/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    HDFS Reader
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../reader/hivereader/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Hive Reader
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../reader/httpreader/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    HTTP Reader
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../reader/influxdbreader/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    InfluxDB Reader
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../reader/influxdb2reader/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    InfluxDB2 Reader
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../reader/jsonfilereader/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    JSON File Reader
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../reader/kafkareader/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Kafka Reader
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../reader/kudureader/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Kudu Reader
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../reader/redisreader/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Redis Reader
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../reader/s3reader/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    S3 Reader
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../reader/sqlitereader/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    SQLite Reader
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../reader/sqlserverreader/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    SQLServer Reader
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../reader/streamreader/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Stream Reader
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../reader/sybasereader/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Sybase Reader
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../reader/tdenginereader/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    TDengine Reader
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_6" >
+        
+          
+          <label class="md-nav__link" for="__nav_6" id="__nav_6_label" tabindex="0">
+            
+  
+  <span class="md-ellipsis">
+    Writer Plugins
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_6_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_6">
+            <span class="md-nav__icon md-icon"></span>
+            Writer Plugins
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../writer/accesswriter/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Access Writer
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../writer/mysqlwriter/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    MySQL Writer
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../writer/postgresqlwriter/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Postgresql Writer
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../writer/oraclewriter/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Oracle Writer
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../writer/rdbmswriter/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    RDBMS Writer
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../writer/txtfilewriter/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    TxtFile Writer
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../writer/elasticsearchwriter/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    ElasticSearch Writer
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../writer/mongodbwriter/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    MongoDB Writer
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../writer/cassandrawriter/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Cassandra Writer
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../writer/clickhousewriter/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    ClickHouse Writer
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../writer/databendwriter/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    DatabendWriter
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../writer/dbfwriter/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    DBF Writer
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../writer/doriswriter/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Doris Writer
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../writer/excelwriter/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Excel Writer
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../writer/ftpwriter/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Ftp Writer
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../writer/greenplumwriter/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Greenplum Writer
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../writer/hanawriter/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    HANA Writer
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../writer/hbase11xsqlwriter/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    HBase11x SQL Writer
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../writer/hbase11xwriter/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    HBase11X Writer
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../writer/hbase20xsqlwriter/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    HBase20x SQL Writer
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../writer/hdfswriter/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    HDFS Writer
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../writer/icebergwriter/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Iceberg Writer
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../writer/influxdbwriter/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    InfluxDB Writer
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../writer/influxdb2writer/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    InfluxDB2 Writer
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../writer/kafkawriter/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Kafka Writer
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../writer/kuduwriter/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Kudu Writer
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../writer/paimonwriter/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Paimon Writer
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../writer/rediswriter/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Redis Writer
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../writer/s3writer/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    S3 Writer
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../writer/sqlitewriter/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    SQLite Writer
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../writer/sqlserverwriter/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    SQLServer Writer
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../writer/starrockswriter/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    StarRocks Writer
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../writer/streamwriter/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Stream Writer
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../writer/sybasewriter/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Sybase Writer
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../writer/tdenginewriter/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    TDengine Writer
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../debug/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Debug
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../encrypt_password/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Password Encryption
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../statsreport/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Statistics Report
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../transformer/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Transformer
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../plugin_development/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Plugin Development
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#addax-flow" class="md-nav__link">
+    <span class="md-ellipsis">
+      Addax Flow
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#plugin-mechanism" class="md-nav__link">
+    <span class="md-ellipsis">
+      Plugin Mechanism
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#framework-from-a-plugins-perspective" class="md-nav__link">
+    <span class="md-ellipsis">
+      Framework from a Plugin's Perspective
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Framework from a Plugin's Perspective">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#logical-execution-model" class="md-nav__link">
+    <span class="md-ellipsis">
+      Logical Execution Model
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#programming-interface" class="md-nav__link">
+    <span class="md-ellipsis">
+      Programming Interface
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Programming Interface">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#plugin-definition" class="md-nav__link">
+    <span class="md-ellipsis">
+      Plugin Definition
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#packaging-and-publishing" class="md-nav__link">
+    <span class="md-ellipsis">
+      Packaging and Publishing
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#configuration-file" class="md-nav__link">
+    <span class="md-ellipsis">
+      Configuration File
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Configuration File">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#how-to-design-configuration-parameters" class="md-nav__link">
+    <span class="md-ellipsis">
+      How to Design Configuration Parameters
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#how-to-use-the-configuration-class" class="md-nav__link">
+    <span class="md-ellipsis">
+      How to Use the Configuration Class
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#plugin-data-transfer" class="md-nav__link">
+    <span class="md-ellipsis">
+      Plugin Data Transfer
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#type-conversion" class="md-nav__link">
+    <span class="md-ellipsis">
+      Type Conversion
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#dirty-data-handling" class="md-nav__link">
+    <span class="md-ellipsis">
+      Dirty Data Handling
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Dirty Data Handling">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#what-is-dirty-data" class="md-nav__link">
+    <span class="md-ellipsis">
+      What is Dirty Data
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#how-to-handle-dirty-data" class="md-nav__link">
+    <span class="md-ellipsis">
+      How to Handle Dirty Data
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#loading-principle" class="md-nav__link">
+    <span class="md-ellipsis">
+      Loading Principle
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              <article class="md-content__inner md-typeset">
+                
+                  
+
+
+<h1 id="plugin-development">Plugin Development<a class="headerlink" href="#plugin-development" title="Permanent link">&para;</a></h1>
+<p>This guide is primarily for developers who need to develop Addax plugins to meet their specific needs.</p>
+<h2 id="addax-flow">Addax Flow<a class="headerlink" href="#addax-flow" title="Permanent link">&para;</a></h2>
+<p>The general process for running a task in Addax is as follows:</p>
+<p><img alt="addax-flowchart" src="../../images/addax-flowchart.png" /></p>
+<p>The startup steps are:</p>
+<ol>
+<li>Parse configurations, including <code>job.json</code>, <code>core.json</code>, and <code>plugin.json</code>.</li>
+<li>Set the <code>jobId</code> in the <code>configuration</code>.</li>
+<li>Start the Engine via <code>Engine.start()</code> to enter the startup procedure.</li>
+<li>Set the <code>RUNTIME_MODE</code> in the <code>configuration</code>.</li>
+<li>Start via the <code>JobContainer</code>'s <code>start()</code> method.</li>
+<li>Execute the job's <code>preHandler()</code>, <code>init()</code>, <code>prepare()</code>, <code>split()</code>, <code>schedule()</code>, <code>post()</code>, and <code>postHandle()</code> methods in sequence.</li>
+<li>The <code>init()</code> method involves initializing the reader and writer plugins based on the configuration. This includes hot-loading JAR packages and calling the plugin's <code>init()</code> method, as well as setting the reader and writer's configuration.</li>
+<li>The <code>prepare()</code> method involves initializing the reader and writer plugins by calling their respective <code>prepare()</code> methods. Each plugin has its own <code>jarLoader</code>, which inherits from <code>URLClassLoader</code>.</li>
+<li>The <code>split()</code> method adjusts the number of channels via <code>adjustChannelNumber()</code> and performs the most granular splitting for the reader and writer. It's important to note that the writer's split result must reference the reader's split result to ensure an equal number of splits, satisfying the 1:1 channel model.</li>
+<li>The channel count is mainly determined by byte and record rate limiting, which is calculated as the first step in the <code>split()</code> function.</li>
+<li>In the <code>split()</code> method, the reader plugin will split based on the channel value, but some reader plugins might not use this value. The writer plugin will always split 1:1 based on the reader's splits.</li>
+<li>The <code>mergeReaderAndWriterTaskConfigs()</code> method inside <code>split()</code> is responsible for merging the configurations of the reader, writer, and transformer to generate task configurations and override the <code>job.content</code> configuration.</li>
+<li>The <code>schedule()</code> method allocates and generates <code>TaskGroup</code> objects based on the task configurations generated by <code>split()</code>. The number of task groups is determined by dividing the total number of tasks by the number of tasks a single <code>TaskGroup</code> can support.</li>
+<li><code>schedule()</code> is executed internally by <code>AbstractScheduler</code>'s <code>schedule()</code> method, which then calls <code>startAllTaskGroup()</code> to create all <code>TaskGroupContainer</code>s to organize the related tasks. <code>TaskGroupContainerRunner</code> is responsible for running the <code>TaskGroupContainer</code> to execute the assigned tasks. The concrete implementation class for the scheduler is <code>ProcessInnerScheduler</code>.</li>
+<li><code>taskGroupContainerExecutorService</code> starts a fixed thread pool to execute <code>TaskGroupContainerRunner</code> objects. The <code>run()</code> method of <code>TaskGroupContainerRunner</code> calls <code>taskGroupContainer.start()</code>, which creates a <code>TaskExecutor</code> for each channel and starts the task via <code>taskExecutor.doStart()</code>.</li>
+</ol>
+<h2 id="plugin-mechanism">Plugin Mechanism<a class="headerlink" href="#plugin-mechanism" title="Permanent link">&para;</a></h2>
+<p>To handle the differences between various data sources while providing consistent synchronization primitives and extensibility, <code>Addax</code> uses a <code>Framework</code> + <code>Plugin</code> model:</p>
+<ul>
+<li>Plugins only need to care about reading from or writing to the data source itself.</li>
+<li>Common synchronization issues, such as type conversion, performance, and statistics, are handled by the framework.</li>
+</ul>
+<p>As a plugin developer, you need to focus on two issues:</p>
+<ol>
+<li>The correctness of reading and writing data from the specific data source.</li>
+<li>How to communicate with the framework and use it correctly.</li>
+</ol>
+<h2 id="framework-from-a-plugins-perspective">Framework from a Plugin's Perspective<a class="headerlink" href="#framework-from-a-plugins-perspective" title="Permanent link">&para;</a></h2>
+<h3 id="logical-execution-model">Logical Execution Model<a class="headerlink" href="#logical-execution-model" title="Permanent link">&para;</a></h3>
+<p>Plugin developers don't need to worry about too much; they mainly need to focus on reading from and writing to specific systems, and how their code is logically executed—which method is called and when. Before that, you need to understand the following concepts:</p>
+<ul>
+<li><code>Job</code>: Describes a synchronization job from a source to a destination, representing the smallest business unit of data synchronization. For example, synchronizing a table from MySQL to a table in PostgreSQL.</li>
+<li><code>Task</code>: The smallest execution unit, obtained by splitting a <code>Job</code> to maximize performance. For example, a <code>Job</code> reading from a sharded MySQL database with 1024 sub-tables can be split into 1024 read <code>Tasks</code>, executed concurrently.</li>
+<li><code>TaskGroup</code>: A collection of <code>Tasks</code>. A set of <code>Tasks</code> executed within the same <code>TaskGroupContainer</code> is called a <code>TaskGroup</code>.</li>
+<li><code>JobContainer</code>: The <code>Job</code> executor, a work unit responsible for the global splitting, scheduling, pre- and post-statements of a <code>Job</code>. Similar to the JobTracker in <a href="https://hadoop.apache.org/docs/stable/hadoop-yarn/hadoop-yarn-site/YARN.html">Yarn</a>.</li>
+<li><code>TaskGroupContainer</code>: The <code>TaskGroup</code> executor, a work unit responsible for executing a group of <code>Tasks</code>. Similar to the TaskTracker in <a href="https://hadoop.apache.org/docs/stable/hadoop-yarn/hadoop-yarn-site/YARN.html">Yarn</a>.</li>
+</ul>
+<p>In short, a <code>Job</code> is split into <code>Tasks</code>, which are executed in containers provided by the framework. The plugin only needs to implement the logic for <code>Job</code> and <code>Task</code>.</p>
+<h2 id="programming-interface">Programming Interface<a class="headerlink" href="#programming-interface" title="Permanent link">&para;</a></h2>
+<p>So, how should the logic of <code>Job</code> and <code>Task</code> be mapped to specific code?</p>
+<p>First, the entry class of a plugin must extend the <code>Reader</code> or <code>Writer</code> abstract class and implement their respective <code>Job</code> and <code>Task</code> inner abstract classes. The implementations of <code>Job</code> and <code>Task</code> must be in the form of <strong>inner classes</strong>.</p>
+<div class="highlight"><pre><span></span><code><span class="kd">public</span><span class="w"> </span><span class="kd">class</span> <span class="nc">SomeReader</span>
+<span class="w">        </span><span class="kd">extends</span><span class="w"> </span><span class="n">Reader</span>
+<span class="p">{</span>
+<span class="w">    </span><span class="kd">public</span><span class="w"> </span><span class="kd">static</span><span class="w"> </span><span class="kd">class</span> <span class="nc">Job</span>
+<span class="w">            </span><span class="kd">extends</span><span class="w"> </span><span class="n">Reader</span><span class="p">.</span><span class="na">Job</span>
+<span class="w">    </span><span class="p">{</span>
+<span class="w">        </span><span class="nd">@Override</span>
+<span class="w">        </span><span class="kd">public</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="nf">init</span><span class="p">()</span>
+<span class="w">        </span><span class="p">{</span>
+<span class="w">        </span><span class="p">}</span>
+
+<span class="w">        </span><span class="nd">@Override</span>
+<span class="w">        </span><span class="kd">public</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="nf">prepare</span><span class="p">()</span>
+<span class="w">        </span><span class="p">{</span>
+<span class="w">        </span><span class="p">}</span>
+
+<span class="w">        </span><span class="nd">@Override</span>
+<span class="w">        </span><span class="kd">public</span><span class="w"> </span><span class="n">List</span><span class="o">&lt;</span><span class="n">Configuration</span><span class="o">&gt;</span><span class="w"> </span><span class="nf">split</span><span class="p">(</span><span class="kt">int</span><span class="w"> </span><span class="n">adviceNumber</span><span class="p">)</span>
+<span class="w">        </span><span class="p">{</span>
+<span class="w">            </span><span class="k">return</span><span class="w"> </span><span class="kc">null</span><span class="p">;</span>
+<span class="w">        </span><span class="p">}</span>
+
+<span class="w">        </span><span class="nd">@Override</span>
+<span class="w">        </span><span class="kd">public</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="nf">post</span><span class="p">()</span>
+<span class="w">        </span><span class="p">{</span>
+<span class="w">        </span><span class="p">}</span>
+
+<span class="w">        </span><span class="nd">@Override</span>
+<span class="w">        </span><span class="kd">public</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="nf">destroy</span><span class="p">()</span>
+<span class="w">        </span><span class="p">{</span>
+<span class="w">        </span><span class="p">}</span>
+<span class="w">    </span><span class="p">}</span>
+
+<span class="w">    </span><span class="kd">public</span><span class="w"> </span><span class="kd">static</span><span class="w"> </span><span class="kd">class</span> <span class="nc">Task</span>
+<span class="w">            </span><span class="kd">extends</span><span class="w"> </span><span class="n">Reader</span><span class="p">.</span><span class="na">Task</span>
+<span class="w">    </span><span class="p">{</span>
+
+<span class="w">        </span><span class="nd">@Override</span>
+<span class="w">        </span><span class="kd">public</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="nf">init</span><span class="p">()</span>
+<span class="w">        </span><span class="p">{</span>
+<span class="w">        </span><span class="p">}</span>
+
+<span class="w">        </span><span class="nd">@Override</span>
+<span class="w">        </span><span class="kd">public</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="nf">prepare</span><span class="p">()</span>
+<span class="w">        </span><span class="p">{</span>
+<span class="w">        </span><span class="p">}</span>
+
+<span class="w">        </span><span class="nd">@Override</span>
+<span class="w">        </span><span class="kd">public</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="nf">startRead</span><span class="p">(</span><span class="n">RecordSender</span><span class="w"> </span><span class="n">recordSender</span><span class="p">)</span>
+<span class="w">        </span><span class="p">{</span>
+<span class="w">        </span><span class="p">}</span>
+
+<span class="w">        </span><span class="nd">@Override</span>
+<span class="w">        </span><span class="kd">public</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="nf">post</span><span class="p">()</span>
+<span class="w">        </span><span class="p">{</span>
+<span class="w">        </span><span class="p">}</span>
+
+<span class="w">        </span><span class="nd">@Override</span>
+<span class="w">        </span><span class="kd">public</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="nf">destroy</span><span class="p">()</span>
+<span class="w">        </span><span class="p">{</span>
+<span class="w">        </span><span class="p">}</span>
+<span class="w">    </span><span class="p">}</span>
+<span class="p">}</span>
+</code></pre></div>
+<p>The <code>Job</code> interface functions are as follows:</p>
+<ul>
+<li><code>init</code>: Initialization work for the Job object. At this point, you can get the plugin-related configuration via <code>super.getPluginJobConf()</code>. The read plugin gets the <code>reader</code> section of the configuration, and the write plugin gets the <code>writer</code> section.</li>
+<li><code>prepare</code>: Global preparation work, such as clearing the target table in MySQL.</li>
+<li><code>split</code>: Splits the job into <code>Tasks</code>. The <code>adviceNumber</code> parameter is the number of splits suggested by the framework, usually the concurrency level configured at runtime. The return value is a list of <code>Task</code> configurations.</li>
+<li><code>post</code>: Global post-processing work, such as the <code>rename</code> operation for a MySQL writer after synchronizing to a shadow table.</li>
+<li><code>destroy</code>: Destruction work for the Job object itself.</li>
+</ul>
+<p>The <code>Task</code> interface functions are as follows:</p>
+<ul>
+<li><code>init</code>: Initialization of the Task object. At this point, you can get the <code>Task</code>-related configuration via <code>super.getPluginJobConf()</code>. This configuration is one of the configurations returned by the <code>Job#split</code> method.</li>
+<li><code>prepare</code>: Local preparation work.</li>
+<li><code>startRead</code>: Reads data from the data source and writes it to the <code>RecordSender</code>. The <code>RecordSender</code> writes the data to the buffer queue connecting the <code>Reader</code> and <code>Writer</code>.</li>
+<li><code>startWrite</code>: Reads data from the <code>RecordReceiver</code> and writes it to the target data source. The data in the <code>RecordReceiver</code> comes from the buffer queue between the <code>Reader</code> and <code>Writer</code>.</li>
+<li><code>post</code>: Local post-processing work.</li>
+<li><code>destroy</code>: Destruction work for the Task object itself.</li>
+</ul>
+<p>Please note:</p>
+<ul>
+<li>There must be no shared variables between <code>Job</code> and <code>Task</code>, because in a distributed runtime, there is no guarantee that shared variables will be initialized correctly. They can only depend on each other through configuration files.</li>
+<li><code>prepare</code> and <code>post</code> exist in both <code>Job</code> and <code>Task</code>. The plugin needs to determine where to perform operations based on the actual situation.</li>
+</ul>
+<p>The framework executes the <code>Job</code> and <code>Task</code> interfaces in the following order:</p>
+<pre class="mermaid"><code>stateDiagram-v2
+direction TB
+Init:::job --&gt; Prepare:::job
+Prepare --&gt; Split:::job
+Split --&gt; Schedule:::fw
+state Schedule {
+    direction LR
+    init\nprepare\nstartRead\npost\ndestroy1 --&gt; init\nprepare\nstartRead\npost\ndestroy : Channel
+}
+Schedule --&gt; Post:::job
+
+classDef job fill:yellow
+classDef fw fill:#c6fac4
+classDef ctask fill:blue</code></pre>
+<p>In the diagram above, yellow represents the execution phase of the <code>Job</code> part, gray represents the execution phase of the <code>Task</code> part, and green represents the framework's execution phase.</p>
+<p>The related class relationships are as follows:</p>
+<pre class="mermaid"><code>%%{init: {"theme": "neutral"}}%%
+classDiagram
+    class Pluginable {
+    + init()
+    + destroy()
+    + others()
+    }
+    class AbstractPlugin {
+        + prepare()
+        + post()
+        + others()
+    }
+    class AbstractJobPlugin {
+        + getJobPluginCollector(): JobPluginCollector
+        + setJobPluginCollector(JobPluginCollector)
+    }
+
+    class AbstractTaskPlugin {
+        + getTaskPluginCollector(): TaskPluginCollector
+        + setTaskPluginCollector(TaskPluginCollector)
+    }
+    class Reader_Job {
+        + split(init): List&lt;&lt;Configuration&gt;&gt;
+    }
+
+    class Writer_Job {
+        + split(init): List&lt;&lt;Configuration&gt;&gt;
+    }
+
+    class Reader_Task {
+        + startRead(RecordSender)
+    }
+
+    class Writer_Task {
+        + startWrite(RecordReceiver)
+    }
+
+    AbstractJobPlugin &lt;|-- Reader_Job
+    AbstractJobPlugin &lt;|-- Writer_Job
+
+    AbstractTaskPlugin &lt;|-- Reader_Task
+    AbstractTaskPlugin &lt;|-- Writer_Task
+
+    AbstractPlugin &lt;|-- AbstractJobPlugin
+    AbstractPlugin &lt;|-- AbstractTaskPlugin
+
+    Pluginable &lt;|-- AbstractPlugin
+</code></pre>
+<h3 id="plugin-definition">Plugin Definition<a class="headerlink" href="#plugin-definition" title="Permanent link">&para;</a></h3>
+<p>In each plugin's project, there is a <code>plugin.json</code> file that defines the plugin's information, including its entry class. For example:</p>
+<div class="highlight"><pre><span></span><code><span class="p">{</span>
+<span class="w">  </span><span class="nt">&quot;name&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;mysqlwriter&quot;</span><span class="p">,</span>
+<span class="w">  </span><span class="nt">&quot;class&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;com.wgzhao.addax.plugin.writer.mysqlwriter.MysqlWriter&quot;</span><span class="p">,</span>
+<span class="w">  </span><span class="nt">&quot;description&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;Use Jdbc connect to database, execute insert sql.&quot;</span><span class="p">,</span>
+<span class="w">  </span><span class="nt">&quot;developer&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;wgzhao&quot;</span>
+<span class="p">}</span>
+</code></pre></div>
+<ul>
+<li><code>name</code>: The plugin name, case-sensitive. The framework searches for the plugin based on the name specified by the user in the configuration file. <strong>Very important</strong>.</li>
+<li><code>class</code>: The fully qualified name of the entry class. The framework creates an instance of the entry class via reflection. <strong>Very important</strong>.</li>
+<li><code>description</code>: Descriptive information.</li>
+<li><code>developer</code>: The developer.</li>
+</ul>
+<h3 id="packaging-and-publishing">Packaging and Publishing<a class="headerlink" href="#packaging-and-publishing" title="Permanent link">&para;</a></h3>
+<p><code>Addax</code> uses <code>assembly</code> for packaging. The packaging commands are as follows:</p>
+<div class="highlight"><pre><span></span><code>mvn<span class="w"> </span>clean<span class="w"> </span>package
+mvn<span class="w"> </span>package<span class="w"> </span>assembly:single
+</code></pre></div>
+<p><code>Addax</code> plugins need to follow a uniform directory structure:</p>
+<div class="highlight"><pre><span></span><code><span class="na">${ADDAX_HOME}</span>
+<span class="na">├── bin</span>
+<span class="na">│     ├── addax.sh</span>
+<span class="na">├── conf</span>
+<span class="na">│     ├── core.json</span>
+<span class="na">│     └── logback.xml</span>
+<span class="na">├── job</span>
+<span class="na">├── lib</span>
+<span class="na">│     ├── addax-common-&lt;version&gt;.jar</span>
+<span class="na">│     ├── addax-core-&lt;version&gt;.jar</span>
+<span class="na">│     ├── addax-rdbms-&lt;version&gt;.jar</span>
+<span class="na">│     ├── addax-storage-&lt;version&gt;.jar</span>
+<span class="na">├── log</span>
+<span class="na">├── plugin</span>
+<span class="na">│     ├── reader</span>
+<span class="na">│     │     ├── cassandrareader</span>
+<span class="na">│     │     │     ├── cassandrareader-&lt;version&gt;.jar</span>
+<span class="na">│     │     │     ├── libs</span>
+<span class="na">│     │     │     │     ├── &lt;symbol link to shared folder&gt;</span>
+<span class="na">│     │     │     ├── plugin.json</span>
+<span class="na">│     │     │     └── plugin_job_template.json</span>
+<span class="na">│     └── writer</span>
+<span class="na">│         ├── cassandrawriter</span>
+<span class="na">│         │     ├── cassandrawriter-&lt;version&gt;.jar</span>
+<span class="na">│         │     ├── libs</span>
+<span class="na">│         │     │     ├── &lt;symbol link to shared folder&gt;</span>
+<span class="na">│         │     ├── plugin.json</span>
+<span class="na">│         │     └── plugin_job_template.json</span>
+<span class="na">├── shared</span>
+</code></pre></div>
+<ul>
+<li><code>${ADDAX_HOME}/bin</code>: Executable program directory</li>
+<li><code>${ADDAX_HOME}/conf</code>: Framework configuration directory</li>
+<li><code>${ADDAX_HOME}/lib</code>: Framework dependency library directory</li>
+<li><code>${ADDAX_HOME}/shared</code>: Plugin dependency directory</li>
+<li><code>${ADDAX_HOME}/plugin</code>: Plugin directory</li>
+</ul>
+<p>The plugin directory is divided into <code>reader</code> and <code>writer</code> subdirectories, where read and write plugins are stored respectively. The plugin directory structure is as follows:</p>
+<ul>
+<li><code>${PLUGIN_HOME}/libs</code>: The plugin's dependency libraries. To reduce package size, these dependencies are symbolic links to the <code>shared</code> directory.</li>
+<li><code>${PLUGIN_HOME}/plugin-name-version.jar</code>: The plugin's own jar file.</li>
+<li><code>${PLUGIN_HOME}/plugin.json</code>: The plugin description file.</li>
+</ul>
+<p>Although the framework adds all jar files under <code>${PLUGIN_HOME}</code> to the <code>classpath</code> when loading the plugin, it is recommended to keep dependency library jars and the plugin's own jar separate.</p>
+<div class="admonition special reminder">
+<p class="admonition-title">Special</p>
+<p>The plugin's directory name must be consistent with the plugin name defined in <code>plugin.json</code>.</p>
+</div>
+<h2 id="configuration-file">Configuration File<a class="headerlink" href="#configuration-file" title="Permanent link">&para;</a></h2>
+<p><code>Addax</code> uses <code>json</code> as the format for configuration files. A typical <code>Addax</code> task configuration is as follows:</p>
+<div class="highlight"><pre><span></span><code><span class="p">{</span>
+<span class="w">  </span><span class="nt">&quot;job&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="nt">&quot;setting&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<span class="w">      </span><span class="nt">&quot;speed&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="nt">&quot;byte&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">-1</span><span class="p">,</span>
+<span class="w">        </span><span class="nt">&quot;channel&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">1</span>
+<span class="w">      </span><span class="p">}</span>
+<span class="w">    </span><span class="p">},</span>
+<span class="w">    </span><span class="nt">&quot;content&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<span class="w">      </span><span class="nt">&quot;reader&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="nt">&quot;name&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;postgresqlreader&quot;</span><span class="p">,</span>
+<span class="w">        </span><span class="nt">&quot;parameter&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<span class="w">          </span><span class="nt">&quot;username&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;pgtest&quot;</span><span class="p">,</span>
+<span class="w">          </span><span class="nt">&quot;password&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;pgtest&quot;</span><span class="p">,</span>
+<span class="w">          </span><span class="nt">&quot;column&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span>
+<span class="w">            </span><span class="s2">&quot;*&quot;</span>
+<span class="w">          </span><span class="p">],</span>
+<span class="w">          </span><span class="nt">&quot;connection&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<span class="w">            </span><span class="nt">&quot;table&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span>
+<span class="w">              </span><span class="s2">&quot;addax_tbl&quot;</span>
+<span class="w">            </span><span class="p">],</span>
+<span class="w">            </span><span class="nt">&quot;jdbcUrl&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;jdbc:postgresql://localhost:5432/pgtest&quot;</span>
+<span class="w">          </span><span class="p">}</span>
+<span class="w">        </span><span class="p">}</span>
+<span class="w">      </span><span class="p">},</span>
+<span class="w">      </span><span class="nt">&quot;writer&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="nt">&quot;name&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;postgresqlwriter&quot;</span><span class="p">,</span>
+<span class="w">        </span><span class="nt">&quot;parameter&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<span class="w">          </span><span class="nt">&quot;username&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;pgtest&quot;</span><span class="p">,</span>
+<span class="w">          </span><span class="nt">&quot;password&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;pgtest&quot;</span><span class="p">,</span>
+<span class="w">          </span><span class="nt">&quot;writeMode&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;insert&quot;</span><span class="p">,</span>
+<span class="w">          </span><span class="nt">&quot;column&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span>
+<span class="w">            </span><span class="s2">&quot;*&quot;</span>
+<span class="w">          </span><span class="p">],</span>
+<span class="w">          </span><span class="nt">&quot;preSql&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span>
+<span class="w">            </span><span class="s2">&quot;truncate table @table&quot;</span>
+<span class="w">          </span><span class="p">],</span>
+<span class="w">          </span><span class="nt">&quot;connection&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<span class="w">            </span><span class="nt">&quot;jdbcUrl&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;jdbc:postgresql://127.0.0.1:5432/pgtest&quot;</span><span class="p">,</span>
+<span class="w">            </span><span class="nt">&quot;table&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span>
+<span class="w">              </span><span class="s2">&quot;addax_tbl1&quot;</span>
+<span class="w">            </span><span class="p">]</span>
+<span class="w">          </span><span class="p">}</span>
+<span class="w">        </span><span class="p">}</span>
+<span class="w">      </span><span class="p">}</span>
+<span class="w">    </span><span class="p">}</span>
+<span class="w">  </span><span class="p">}</span>
+<span class="p">}</span>
+</code></pre></div>
+<p>The <code>Addax</code> framework has a <code>core.json</code> configuration file that specifies the framework's default behavior. A task's configuration can specify configuration items that already exist in the framework, and these will have a higher priority, overriding the settings in <code>core.json</code>.</p>
+<p>The <code>value</code> part of <code>job.content.reader.parameter</code> in the configuration is passed to <code>Reader.Job</code>; the <code>value</code> part of <code>job.content.writer.parameter</code> is passed to <code>Writer.Job</code>. <code>Reader.Job</code> and <code>Writer.Job</code> can retrieve them using <code>super.getPluginJobConf()</code>.</p>
+<h3 id="how-to-design-configuration-parameters">How to Design Configuration Parameters<a class="headerlink" href="#how-to-design-configuration-parameters" title="Permanent link">&para;</a></h3>
+<blockquote>
+<p>Designing the configuration file is the first step in plugin development!</p>
+</blockquote>
+<p>The <code>parameter</code> section under <code>reader</code> and <code>writer</code> in the task configuration contains the plugin's configuration parameters. These parameters should follow these principles:</p>
+<ul>
+<li>Camel Case: All configuration items should use lower camel case, with the first letter being lowercase.</li>
+<li>Orthogonality Principle: Configuration items must be orthogonal, with no overlapping functionality or hidden rules.</li>
+<li>Rich Types: Use JSON types appropriately to reduce unnecessary processing logic and the possibility of errors.<ul>
+<li>Use the correct data types. For example, for a <code>bool</code> type, use <code>true</code>/<code>false</code> instead of <code>"yes"</code>/<code>"true"</code>/<code>0</code>.</li>
+<li>Use collection types reasonably, for example, use an array instead of a delimited string.</li>
+</ul>
+</li>
+<li>Consistency with Similar Plugins: Follow the conventions of similar plugin types. For example, the <code>connection</code> parameter for relational databases usually has the following structure:</li>
+</ul>
+<div class="highlight"><pre><span></span><code><span class="p">{</span>
+<span class="w">  </span><span class="nt">&quot;connection&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span>
+<span class="w">    </span><span class="p">{</span>
+<span class="w">      </span><span class="nt">&quot;table&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="s2">&quot;table_1&quot;</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;table_2&quot;</span><span class="p">],</span>
+<span class="w">      </span><span class="nt">&quot;jdbcUrl&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span>
+<span class="w">        </span><span class="s2">&quot;jdbc:mysql://127.0.0.1:3306/database_1&quot;</span><span class="p">,</span>
+<span class="w">        </span><span class="s2">&quot;jdbc:mysql://127.0.0.2:3306/database_1_slave&quot;</span>
+<span class="w">      </span><span class="p">]</span>
+<span class="w">    </span><span class="p">},</span>
+<span class="w">    </span><span class="p">{</span>
+<span class="w">      </span><span class="nt">&quot;table&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="s2">&quot;table_3&quot;</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;table_4&quot;</span><span class="p">],</span>
+<span class="w">      </span><span class="nt">&quot;jdbcUrl&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span>
+<span class="w">        </span><span class="s2">&quot;jdbc:mysql://127.0.0.3:3306/database_2&quot;</span><span class="p">,</span>
+<span class="w">        </span><span class="s2">&quot;jdbc:mysql://127.0.0.4:3306/database_2_slave&quot;</span>
+<span class="w">      </span><span class="p">]</span>
+<span class="w">    </span><span class="p">}</span>
+<span class="w">  </span><span class="p">]</span>
+<span class="p">}</span>
+</code></pre></div>
+<h3 id="how-to-use-the-configuration-class">How to Use the <code>Configuration</code> Class<a class="headerlink" href="#how-to-use-the-configuration-class" title="Permanent link">&para;</a></h3>
+<p>To simplify operations on <code>json</code>, <code>Addax</code> provides a simple DSL to be used with the <code>Configuration</code> class.</p>
+<p><code>Configuration</code> provides common operations for reading and writing configuration items, such as <code>get</code>, <code>get with type</code>, <code>get with default value</code>, and <code>set</code>, as well as methods like <code>clone</code> and <code>toJSON</code>. Read and write operations require a <code>path</code> parameter.</p>
+<ol>
+<li>A child map is represented by <code>.key</code>. The first dot in the <code>path</code> is omitted.</li>
+<li>An array element is represented by <code>[index]</code>.</li>
+</ol>
+<p>For example, to operate on the following json:</p>
+<div class="highlight"><pre><span></span><code><span class="p">{</span>
+<span class="w">  </span><span class="nt">&quot;a&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="nt">&quot;b&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<span class="w">      </span><span class="nt">&quot;c&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">2</span>
+<span class="w">    </span><span class="p">},</span>
+<span class="w">    </span><span class="nt">&quot;f&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span>
+<span class="w">      </span><span class="mi">1</span><span class="p">,</span>
+<span class="w">      </span><span class="mi">2</span><span class="p">,</span>
+<span class="w">      </span><span class="p">{</span>
+<span class="w">        </span><span class="nt">&quot;g&quot;</span><span class="p">:</span><span class="w"> </span><span class="kc">true</span><span class="p">,</span>
+<span class="w">        </span><span class="nt">&quot;h&quot;</span><span class="p">:</span><span class="w"> </span><span class="kc">false</span>
+<span class="w">      </span><span class="p">},</span>
+<span class="w">      </span><span class="mi">4</span>
+<span class="w">    </span><span class="p">]</span>
+<span class="w">  </span><span class="p">},</span>
+<span class="w">  </span><span class="nt">&quot;x&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">4</span>
+<span class="p">}</span>
+</code></pre></div>
+<p>When calling the <code>configuration.get(path)</code> method, the results for the following path values are:</p>
+<ul>
+<li><code>x</code>: <code>4</code></li>
+<li><code>a.b.c</code>: <code>2</code></li>
+<li><code>a.b.c.d</code>: <code>null</code></li>
+<li><code>a.f[0]</code>: <code>1</code></li>
+<li><code>a.f[2].g</code>: <code>true</code></li>
+</ul>
+<p>Note that because the configuration seen by the plugin is only a part of the whole configuration, you need to be aware of the current root path when using a <code>Configuration</code> object.</p>
+<p>For more operations on <code>Configuration</code>, please refer to <a href="https://github.com/wgzhao/Addax/blob/master/common/src/main/java/com/wgzhao/addax/common/util/Configuration.java">Configuration.java</a>.</p>
+<h2 id="plugin-data-transfer">Plugin Data Transfer<a class="headerlink" href="#plugin-data-transfer" title="Permanent link">&para;</a></h2>
+<p>Like the general <code>producer-consumer</code> model, <code>Reader</code> and <code>Writer</code> plugins also transfer data through a <code>channel</code>. The <code>channel</code> can be in-memory or persistent.</p>
+<p>A piece of data in the <code>channel</code> is a <code>Record</code> object. A <code>Record</code> can contain multiple <code>Column</code> objects, which can be simply understood as records and columns in a database.</p>
+<p><code>Record</code> has the following methods:</p>
+<div class="highlight"><pre><span></span><code><span class="kd">public</span><span class="w"> </span><span class="kd">interface</span> <span class="nc">Record</span>
+<span class="p">{</span>
+<span class="w">    </span><span class="c1">// Add a column to the end</span>
+<span class="w">    </span><span class="kt">void</span><span class="w"> </span><span class="nf">addColumn</span><span class="p">(</span><span class="n">Column</span><span class="w"> </span><span class="n">column</span><span class="p">);</span>
+
+<span class="w">    </span><span class="c1">// Set a column at a specific index</span>
+<span class="w">    </span><span class="kt">void</span><span class="w"> </span><span class="nf">setColumn</span><span class="p">(</span><span class="kt">int</span><span class="w"> </span><span class="n">i</span><span class="p">,</span><span class="w"> </span><span class="kd">final</span><span class="w"> </span><span class="n">Column</span><span class="w"> </span><span class="n">column</span><span class="p">);</span>
+
+<span class="w">    </span><span class="c1">// Get a column</span>
+<span class="w">    </span><span class="n">Column</span><span class="w"> </span><span class="nf">getColumn</span><span class="p">(</span><span class="kt">int</span><span class="w"> </span><span class="n">i</span><span class="p">);</span>
+
+<span class="w">    </span><span class="c1">// Convert to a JSON String</span>
+<span class="w">    </span><span class="n">String</span><span class="w"> </span><span class="nf">toString</span><span class="p">();</span>
+
+<span class="w">    </span><span class="c1">// Get the total number of columns</span>
+<span class="w">    </span><span class="kt">int</span><span class="w"> </span><span class="nf">getColumnNumber</span><span class="p">();</span>
+
+<span class="w">    </span><span class="c1">// Calculate the byte size of the entire record in memory</span>
+<span class="w">    </span><span class="kt">int</span><span class="w"> </span><span class="nf">getByteSize</span><span class="p">();</span>
+<span class="p">}</span>
+</code></pre></div>
+<p>Since <code>Record</code> is an interface, the <code>Reader</code> plugin first calls <code>RecordSender.createRecord()</code> to create a <code>Record</code> instance, and then adds <code>Column</code>s one by one to the <code>Record</code>.</p>
+<p>The <code>Writer</code> plugin calls the <code>RecordReceiver.getFromReader()</code> method to get a <code>Record</code>, then iterates through the <code>Column</code>s and writes them to the target storage. When the <code>Reader</code> has not yet exited and the transfer is still in progress, if <code>getFromReader()</code> returns <code>null</code>, it means there is currently no data in the channel.
+If the transfer has already ended, it will return <code>null</code>, and the <code>Writer</code> plugin can use this to determine whether to end the <code>startWrite</code> method.</p>
+<h2 id="type-conversion">Type Conversion<a class="headerlink" href="#type-conversion" title="Permanent link">&para;</a></h2>
+<p>To standardize type conversion operations between the source and destination and ensure data integrity, Addax supports six internal data types:</p>
+<ul>
+<li><code>Long</code>: Fixed-point numbers (Int, Short, Long, BigInteger, etc.).</li>
+<li><code>Double</code>: Floating-point numbers (Float, Double, BigDecimal (infinite precision), etc.).</li>
+<li><code>String</code>: String type, with no length limit, using a universal character set (Unicode).</li>
+<li><code>Date</code>: Date type.</li>
+<li><code>Timestamp</code>: Timestamp type.</li>
+<li><code>Bool</code>: Boolean value.</li>
+<li><code>Bytes</code>: Binary data, which can store unstructured data such as MP3s.</li>
+</ul>
+<p>Correspondingly, there are seven <code>Column</code> implementations: <code>DateColumn</code>, <code>LongColumn</code>, <code>DoubleColumn</code>, <code>BytesColumn</code>, <code>StringColumn</code>, <code>BoolColumn</code>, and <code>TimestampColumn</code>.</p>
+<p>In addition to providing data-related methods, <code>Column</code> also provides a series of type conversion methods starting with <code>as</code>.</p>
+<pre class="mermaid"><code>%%{init: {"theme": "neutral"}}%%
+classDiagram
+direction TB
+class Column {
+    &lt;&lt;interface&gt;&gt;
+    - rawData: Object
+    - type: Type
+    + getRawData(): Object
+    + getType(): Type
+    + getByteSize(): init
+    + asLong(): Long
+    + asDouble(): Doule
+    + asString(): String
+    + asDate(): Date
+    + asBytes(): Bytes
+    + asBigDecimal(): BigDecimal
+    + asBoolean(): Boolean
+}
+Column &lt;|-- Stringcolumn
+Column &lt;|-- Doublecolumn
+Column &lt;|-- Longcolumn
+Column &lt;|-- Datecolumn
+Column &lt;|-- Boolcolumn
+Column &lt;|-- Bytescolumn</code></pre>
+<p>Addax's internal types use different Java types in their implementation:</p>
+<table>
+<thead>
+<tr>
+<th>Internal Type</th>
+<th>Implementation Type</th>
+<th>Notes</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Date</td>
+<td>java.util.Date</td>
+<td></td>
+</tr>
+<tr>
+<td>Timestamp</td>
+<td>java.sql.Timestamp</td>
+<td>Can be precise to the nanosecond</td>
+</tr>
+<tr>
+<td>Long</td>
+<td>java.math.BigInteger</td>
+<td>Uses infinite-precision integers to ensure no loss of precision</td>
+</tr>
+<tr>
+<td>Double</td>
+<td>java.lang.String</td>
+<td>Represented as a String to ensure no loss of precision</td>
+</tr>
+<tr>
+<td>Bytes</td>
+<td>byte[]</td>
+<td></td>
+</tr>
+<tr>
+<td>String</td>
+<td>java.lang.String</td>
+<td></td>
+</tr>
+<tr>
+<td>Bool</td>
+<td>java.lang.Boolean</td>
+<td></td>
+</tr>
+</tbody>
+</table>
+<p>The relationships for converting between types are as follows:</p>
+<table>
+<thead>
+<tr>
+<th>from/to</th>
+<th>Date</th>
+<th>Long</th>
+<th>Double</th>
+<th>Bytes</th>
+<th>String</th>
+<th>Bool</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Date</td>
+<td>-</td>
+<td>Use millisecond timestamp</td>
+<td>Not supported</td>
+<td>Not supported</td>
+<td>Convert according to configured format</td>
+<td>Not supported</td>
+</tr>
+<tr>
+<td>Long</td>
+<td>Construct Date from ms</td>
+<td>-</td>
+<td><code>BigDecimal.doubleValue()</code></td>
+<td>Not supported</td>
+<td><code>BigInteger.toString()</code></td>
+<td>0 is <code>false</code>, others are <code>true</code></td>
+</tr>
+<tr>
+<td>Double</td>
+<td>Not supported</td>
+<td><code>BigDecimal.longValue()</code></td>
+<td>-</td>
+<td>Not supported</td>
+<td>Return internal String directly</td>
+<td>Not supported</td>
+</tr>
+<tr>
+<td>Bytes</td>
+<td>Not supported</td>
+<td>Not supported</td>
+<td>Not supported</td>
+<td>-</td>
+<td>Convert to <code>byte[]</code> with UTF-8 encoding</td>
+<td>Not supported</td>
+</tr>
+<tr>
+<td>String</td>
+<td>Parse with configured format</td>
+<td><code>BigDecimal.longValue</code></td>
+<td><code>BigDecimal.doubleValue</code><sup id="fnref:1"><a class="footnote-ref" href="#fn:1">1</a></sup></td>
+<td>Convert to <code>byte[]</code> with UTF-8 encoding<sup id="fnref:2"><a class="footnote-ref" href="#fn:2">2</a></sup></td>
+<td>-</td>
+<td>"true" is <code>true</code>, "false" is <code>false</code></td>
+</tr>
+<tr>
+<td>Bool</td>
+<td>Not supported</td>
+<td><code>true</code> is <code>1L</code>, else <code>0L</code></td>
+<td><code>true</code> is <code>1.0</code>, else <code>0.0</code></td>
+<td>Not supported</td>
+<td><code>Boolean.toString()</code></td>
+<td>-</td>
+</tr>
+</tbody>
+</table>
+<h2 id="dirty-data-handling">Dirty Data Handling<a class="headerlink" href="#dirty-data-handling" title="Permanent link">&para;</a></h2>
+<h3 id="what-is-dirty-data">What is Dirty Data<a class="headerlink" href="#what-is-dirty-data" title="Permanent link">&para;</a></h3>
+<p>Currently, there are three main types of dirty data:</p>
+<ol>
+<li>The Reader reads an unsupported type or an illegal value.</li>
+<li>Unsupported type conversion, for example, converting <code>Bytes</code> to <code>Date</code>.</li>
+<li>Writing to the target fails, for example, an integer value exceeds the length limit when writing to MySQL.</li>
+</ol>
+<h3 id="how-to-handle-dirty-data">How to Handle Dirty Data<a class="headerlink" href="#how-to-handle-dirty-data" title="Permanent link">&para;</a></h3>
+<p>In <code>Reader.Task</code> and <code>Writer.Task</code>, you can get a <code>TaskPluginCollector</code> through <code>AbstractTaskPlugin.getPluginCollector()</code>. It provides a series of <code>collectDirtyRecord</code> methods. When dirty data is encountered, you can call this method and pass in the <code>Record</code> that is considered dirty.</p>
+<p>Users can specify a limit on the number of dirty data records or a percentage limit in the task configuration. When the dirty data exceeds the limit, the framework will terminate the synchronization task. Plugins need to ensure that all dirty data is collected.</p>
+<h2 id="loading-principle">Loading Principle<a class="headerlink" href="#loading-principle" title="Permanent link">&para;</a></h2>
+<ol>
+<li>The framework scans the <code>plugin/reader</code> and <code>plugin/writer</code> directories and loads each plugin's <code>plugin.json</code> file.</li>
+<li>It indexes all plugin configurations using the <code>name</code> from the <code>plugin.json</code> file as the key. If duplicate plugin names are found, the framework will exit with an error.</li>
+<li>The user specifies the plugin name in the <code>name</code> field of the <code>reader</code>/<code>writer</code> configuration. The framework then scans all jars in the plugin's path based on the plugin type (<code>reader</code>/<code>writer</code>) and name, and adds them to a custom <code>classloader</code>.</li>
+<li>Based on the entry class defined in the plugin configuration, the framework instantiates the corresponding <code>Job</code> and <code>Task</code> objects via reflection.</li>
+</ol>
+<div class="footnote">
+<hr />
+<ol>
+<li id="fn:1">
+<p>Handles values like <code>NaN</code>, <code>Infinity</code>, <code>-Infinity</code>.&#160;<a class="footnote-backref" href="#fnref:1" title="Jump back to footnote 1 in the text">&#8617;</a></p>
+</li>
+<li id="fn:2">
+<p>Unless another encoding format is specified.&#160;<a class="footnote-backref" href="#fnref:2" title="Jump back to footnote 2 in the text">&#8617;</a></p>
+</li>
+</ol>
+</div>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+                
+              </article>
+            </div>
+          
+          
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+        </div>
+        
+          <button type="button" class="md-top md-icon" data-md-component="top" hidden>
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8v12Z"/></svg>
+  Back to top
+</button>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+    
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+    <div class="md-copyright__highlight">
+      Copyright &copy; 2019 - 2025 Steven Zhao
+    </div>
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+      Material for MkDocs
+    </a>
+  
+</div>
+      
+        <div class="md-social">
+  
+    
+    
+    
+    
+      
+      
+    
+    <a href="https://twitter.com/mlsx" target="_blank" rel="noopener" title="twitter.com" class="md-social__link">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><!--! Font Awesome Free 6.5.2 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2024 Fonticons, Inc.--><path d="M459.37 151.716c.325 4.548.325 9.097.325 13.645 0 138.72-105.583 298.558-298.558 298.558-59.452 0-114.68-17.219-161.137-47.106 8.447.974 16.568 1.299 25.34 1.299 49.055 0 94.213-16.568 130.274-44.832-46.132-.975-84.792-31.188-98.112-72.772 6.498.974 12.995 1.624 19.818 1.624 9.421 0 18.843-1.3 27.614-3.573-48.081-9.747-84.143-51.98-84.143-102.985v-1.299c13.969 7.797 30.214 12.67 47.431 13.319-28.264-18.843-46.781-51.005-46.781-87.391 0-19.492 5.197-37.36 14.294-52.954 51.655 63.675 129.3 105.258 216.365 109.807-1.624-7.797-2.599-15.918-2.599-24.04 0-57.828 46.782-104.934 104.934-104.934 30.213 0 57.502 12.67 76.67 33.137 23.715-4.548 46.456-13.32 66.599-25.34-7.798 24.366-24.366 44.833-46.132 57.827 21.117-2.273 41.584-8.122 60.426-16.243-14.292 20.791-32.161 39.308-52.628 54.253z"/></svg>
+    </a>
+  
+    
+    
+    
+    
+      
+      
+    
+    <a href="https://github.com/wgzhao" target="_blank" rel="noopener" title="github.com" class="md-social__link">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 496 512"><!--! Font Awesome Free 6.5.2 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2024 Fonticons, Inc.--><path d="M165.9 397.4c0 2-2.3 3.6-5.2 3.6-3.3.3-5.6-1.3-5.6-3.6 0-2 2.3-3.6 5.2-3.6 3-.3 5.6 1.3 5.6 3.6zm-31.1-4.5c-.7 2 1.3 4.3 4.3 4.9 2.6 1 5.6 0 6.2-2s-1.3-4.3-4.3-5.2c-2.6-.7-5.5.3-6.2 2.3zm44.2-1.7c-2.9.7-4.9 2.6-4.6 4.9.3 2 2.9 3.3 5.9 2.6 2.9-.7 4.9-2.6 4.6-4.6-.3-1.9-3-3.2-5.9-2.9zM244.8 8C106.1 8 0 113.3 0 252c0 110.9 69.8 205.8 169.5 239.2 12.8 2.3 17.3-5.6 17.3-12.1 0-6.2-.3-40.4-.3-61.4 0 0-70 15-84.7-29.8 0 0-11.4-29.1-27.8-36.6 0 0-22.9-15.7 1.6-15.4 0 0 24.9 2 38.6 25.8 21.9 38.6 58.6 27.5 72.9 20.9 2.3-16 8.8-27.1 16-33.7-55.9-6.2-112.3-14.3-112.3-110.5 0-27.5 7.6-41.3 23.6-58.9-2.6-6.5-11.1-33.3 2.6-67.9 20.9-6.5 69 27 69 27 20-5.6 41.5-8.5 62.8-8.5s42.8 2.9 62.8 8.5c0 0 48.1-33.6 69-27 13.7 34.7 5.2 61.4 2.6 67.9 16 17.7 25.8 31.5 25.8 58.9 0 96.5-58.9 104.2-114.8 110.5 9.2 7.9 17 22.9 17 46.4 0 33.7-.3 75.4-.3 83.6 0 6.5 4.6 14.4 17.3 12.1C428.2 457.8 496 362.9 496 252 496 113.3 383.5 8 244.8 8zM97.2 352.9c-1.3 1-1 3.3.7 5.2 1.6 1.6 3.9 2.3 5.2 1 1.3-1 1-3.3-.7-5.2-1.6-1.6-3.9-2.3-5.2-1zm-10.8-8.1c-.7 1.3.3 2.9 2.3 3.9 1.6 1 3.6.7 4.3-.7.7-1.3-.3-2.9-2.3-3.9-2-.6-3.6-.3-4.3.7zm32.4 35.6c-1.6 1.3-1 4.3 1.3 6.2 2.3 2.3 5.2 2.6 6.5 1 1.3-1.3.7-4.3-1.3-6.2-2.2-2.3-5.2-2.6-6.5-1zm-11.4-14.7c-1.6 1-1.6 3.6 0 5.9 1.6 2.3 4.3 3.3 5.6 2.3 1.6-1.3 1.6-3.9 0-6.2-1.4-2.3-4-3.3-5.6-2z"/></svg>
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    
+    <script id="__config" type="application/json">{"base": "../..", "features": ["announce.dismiss", "content.action.edit", "content.action.view", "content.code.annotate", "content.code.copy", "content.tooltips", "navigation.footer", "navigation.indexes", "navigation.sections", "navigation.tabs", "navigation.tabs.sticky", "navigation.top", "navigation.tracking", "search.highlight", "search.share", "search.suggest", "toc.follow"], "search": "../../assets/javascripts/workers/search.b8dbb3d2.min.js", "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": {"provider": "mike"}}</script>
+    
+    
+      <script src="../../assets/javascripts/bundle.081f42fc.min.js"></script>
+      
+    
+  </body>
+</html>
